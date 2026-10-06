@@ -1,0 +1,321 @@
+{
+  "124": [
+    {
+      "ja": "今回は、仏教がインドでどう広がり、なぜ姿を消していったのかを解説した本を紹介します。著者はまず、仏教の遺跡がインド亜大陸のどこにあるかを地図に落としてみせます。すると、ブッダが教えを説いたガンジス川の中流域だけでなく、西のデカン高原や北西のガンダーラ地方にまで点々と広がっていることが分かるんですね。遺跡の分布をたどることで、交易路に沿って僧院が建てられていく流れが見えてくる、というのがこの章のポイントです。",
+      "form": "分布",
+      "en": "This time I'm introducing a book that explains how Buddhism spread in India and why it disappeared. The author first plots where Buddhist sites are found across the Indian subcontinent on a map. You then see that they are scattered not only along the middle Ganges, where the Buddha taught, but as far as the Deccan Plateau to the west and the Gandhara region to the northwest. The point of this chapter is that by tracing the distribution of the sites, you can see how monasteries came to be built along trade routes.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「遺跡の分布」「人口の分布」のように、場所ごとの散らばり方を表す。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n5-teiru"],
+      "sense": "物がどこにどれだけあるかという広がり方。"
+    },
+    {
+      "ja": "生成AIの普及を受けて、国内ではデータセンターの建設計画が相次いでいる。ただ、現在の立地の分布を見ると、大半が東京圏と大阪圏に集中しており、大きな災害が起きれば多くの施設が同時に止まるおそれが指摘されている。政府は電力を確保しやすい北海道や九州への分散を後押しする方針で、自治体による誘致も活発になってきた。一方、送電網の整備が追いつかなければ、計画どおりに稼働できない施設が出てくる可能性もある。",
+      "form": "分布",
+      "en": "With the spread of generative AI, plans to build data centers are coming one after another in Japan. However, looking at the current distribution of sites, most are concentrated in the Tokyo and Osaka areas, and it has been pointed out that a major disaster could stop many facilities at once. The government's policy is to encourage dispersal to Hokkaido and Kyushu, where electricity is easier to secure, and local governments have also become active in attracting them. On the other hand, if the power grid cannot keep up, some facilities may be unable to operate as planned.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「立地の分布」「分布を見ると」の形で、偏りを指摘する前置きによく使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "物がどこにどれだけあるかという広がり方。"
+    },
+    {
+      "ja": "模試の結果が返ってくると、平均点との差だけを見て一喜一憂する人が多いと思います。でも、本当に見てほしいのは、受験者全体の点数がどう散らばっているかを示すグラフのほうです。点数の分布が真ん中に固まっている試験なら、五点の差でも順位は大きく動きますし、ばらけている試験なら、それほど気にしなくて構いません。数字の意味は、全体の形を知ったうえで初めて見えてくるものなのです。",
+      "form": "分布",
+      "en": "When mock exam results come back, I think many people only look at the gap from the average and swing between joy and gloom. But what I really want you to look at is the graph showing how the scores of all test-takers are spread out. In an exam where the score distribution is bunched in the middle, even a five-point gap moves your rank a lot, while in one where scores are spread out, you don't need to worry so much. The meaning of a number only becomes visible once you know the shape of the whole.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "統計では「点数の分布」「分布が偏る」のように、数値の散らばり方にも使う。",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "数値がどの範囲にどれだけ散らばっているかのようす。"
+    }
+  ],
+  "7": [
+    {
+      "ja": "今回は、記憶に残る読書法を説いた本を要約します。著者がすすめるのは、読みながら線を引くことではなく、読み終えた直後に本を閉じて、内容を自分の言葉で書き出してみることです。そうすると、思い出せない箇所が必ず出てきますが、そこが理解があいまいなまま通り過ぎた部分だというわけですね。あとはそこだけを重点的に読み返せば、全体を二回通して読むよりずっと短い時間で、内容がしっかり頭に定着します。",
+      "form": "箇所",
+      "en": "This time I'm summarizing a book on a reading method that sticks in your memory. What the author recommends is not underlining as you read, but closing the book right after finishing it and writing out the content in your own words. When you do that, there will always be parts you can't recall, and those are exactly the parts you passed over while your understanding was still vague. Then if you reread just those parts carefully, the content settles firmly in your head in far less time than reading the whole thing through twice.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「思い出せない箇所」「間違いの箇所」のように、全体の中の特定の部分を指す。",
+      "grammar": ["n4-nagara", "n3-dewa-naku"]
+    },
+    {
+      "ja": "老朽化した橋やトンネルの点検に、AIを取り入れる自治体が増えている。ドローンで撮影した映像からコンクリートの亀裂を自動で見つけ出し、補修が必要な箇所を地図上に示す仕組みだ。これまでは技術者が足場を組み、目で一つずつ確かめていたため、時間も費用も大きな負担になっていた。ただ、AIが示した結果をもとに最終的な判断を下すのは人であり、AIはあくまで見落としを減らす補助という位置づけだ。",
+      "form": "箇所",
+      "en": "More and more local governments are bringing AI into the inspection of aging bridges and tunnels. The system automatically finds cracks in the concrete from footage shot by drones and shows the spots that need repair on a map. Until now, engineers set up scaffolding and checked each part with their own eyes, so both time and cost were a heavy burden. However, it is people who make the final judgment based on what the AI shows, and the AI is positioned strictly as an aid that reduces oversights.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「補修が必要な箇所」「問題の箇所」のように、場所を特定するときに使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "文章を書き終えたら、一度声に出して読んでみてください。目で追っているだけだと気づかないのに、口に出すと妙につっかえる箇所が必ず出てきます。そこはたいてい、一文が長すぎるか、主語と述語が離れすぎているところです。息継ぎをしたくなる位置で文を切るように直していくと、読み手にとってもずっと楽な文章になります。手間はかかりますが、黙って読み返すだけでは見えないものが見えてきますよ。",
+      "form": "箇所",
+      "en": "When you finish writing something, try reading it aloud once. There will always be spots where you oddly stumble when you say them, even though you don't notice anything while just following with your eyes. Those are usually places where a sentence is too long, or where the subject and predicate are too far apart. If you revise by cutting sentences where you feel like taking a breath, the text becomes much easier for the reader too. It takes effort, but you'll see things that you can't see just by rereading silently.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「つっかえる箇所」「わかりにくい箇所」のように、文章の中の部分を指して使う。",
+      "grammar": ["n3-you-ni", "n4-teiku", "n5-teiru"]
+    }
+  ],
+  "8": [
+    {
+      "ja": "今回は、古い書物がどうやって今まで伝わってきたのかを解説した本を紹介します。印刷技術が広まる前、本は人の手で一冊ずつ書き写されていました。ところが、同じ言葉が近くに二度出てくると、写す人の目がそこで飛んでしまい、あいだの一行がまるごと抜けることがあったんですね。こうした落脱は写本から写本へと受け継がれていくので、研究者は複数の写本を比べることで、もとの文を復元しようとしてきたわけです。",
+      "form": "落脱",
+      "en": "This time I'm introducing a book that explains how old writings have been handed down to the present. Before printing technology spread, books were copied out by hand, one volume at a time. But when the same word appeared twice close together, the copyist's eye would skip there, and the whole line in between could drop out. Such omissions were passed on from manuscript to manuscript, so researchers have tried to restore the original text by comparing several manuscripts.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「写本の落脱」「文字の落脱」のように、書き写す途中で文字や行が抜けることに使う。",
+      "grammar": ["n4-teiku", "n3-koto-de"]
+    },
+    {
+      "ja": "人間の脳は文章を読むとき、実は一文字ずつ確かめているわけではないことが知られています。前後の流れから次に来る言葉を予測しているので、助詞が一つ抜けていても、頭の中で勝手に補って読んでしまうのです。自分で書いた文章の落脱に気づきにくいのは、このためです。見直しをするときは、時間をおいてから読むか、紙に印刷して指でなぞりながら確かめると、見落としがぐっと減ります。",
+      "form": "落脱",
+      "en": "It is known that when the human brain reads text, it does not actually check each character one by one. Because it predicts the next word from the flow of what comes before and after, even if a particle is missing, it fills it in on its own and reads on. This is why it is hard to notice omissions in text you wrote yourself. When you review, if you either read it after some time has passed or print it on paper and check it while tracing it with your finger, oversights drop sharply.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「落脱に気づく」「落脱がある」の形で使う。「脱落」と字の順が逆なので注意。",
+      "grammar": ["n3-wake-dewa-nai", "n5-teiru", "n4-nagara"]
+    },
+    {
+      "ja": "字数を減らすために文を手直ししていると、思わぬ落脱が起こりやすくなります。前の文の一部を消したつもりが、必要な助詞まで一緒に消えていて、意味の通らない文が残ってしまうのです。とくに締め切り直前の修正では、焦って全体を読み返さないまま提出することになり、あとで読者から指摘されて初めて気づく、ということも少なくありません。直したあとは、変更した前後の文だけでも、声に出して読み直すようにしましょう。",
+      "form": "落脱",
+      "en": "When you rework sentences to cut the word count, unexpected omissions become more likely. You think you deleted part of the previous sentence, but a necessary particle has disappeared with it, and a sentence that makes no sense is left behind. Especially with revisions right before a deadline, it is not uncommon to end up submitting in a rush without rereading the whole thing, and only to notice when a reader points it out later. After making changes, make a habit of reading aloud at least the sentences around what you changed.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「思わぬ落脱」のように、うっかり言葉が抜けてしまったことを言うのに使う。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru", "n3-you-ni"]
+    }
+  ],
+  "74": [
+    {
+      "ja": "今回は、学び続ける人の習慣をまとめた本を紹介します。この本で印象的だったのは、学んだことは人に教えて初めて自分のものになる、という主張でした。たとえば、勉強会で得た知識を職場の仲間に共有すると、説明するために内容を整理し直すことになり、自分の理解も深まるんですね。著者はこれを、学びを周りに還元することで、結果的に自分にも返ってくる循環だと呼んでいます。一人で抱え込むより、早めに外に出すほうが伸びる、というわけです。",
+      "form": "還元",
+      "en": "This time I'm introducing a book that summarizes the habits of people who keep learning. What struck me in this book was the claim that what you learn only becomes your own once you teach it to others. For example, when you share knowledge gained at a study group with colleagues at work, you end up reorganizing the content in order to explain it, and your own understanding deepens too. The author calls this a cycle in which giving your learning back to those around you ends up coming back to you as well. In other words, you grow more by putting it out early than by keeping it to yourself.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「学びを還元する」「社会に還元する」のように、得たものを周りに返す意味で使う。",
+      "grammar": ["n3-koto-ni-naru", "n3-koto-de", "n5-teiru"],
+      "sense": "得たものを、人々や社会に返すこと。"
+    },
+    {
+      "ja": "半導体需要の拡大を背景に、大手メーカーの間で、増えた利益を株主に還元する動きが広がっている。自社株買いや配当の引き上げを相次いで発表する企業がある一方、工場の建設や研究開発への投資を優先すべきだとの声も根強い。市況の波が大きい業界だけに、手元の現金をどこまで残しておくかは、経営判断の難しいところだ。各社は今後、成長への投資との釣り合いをどう取るのか、説明を求められることになりそうだ。",
+      "form": "還元",
+      "en": "Against the backdrop of growing semiconductor demand, a move among major manufacturers to return increased profits to shareholders is spreading. While some companies are announcing share buybacks and dividend increases one after another, there are also persistent voices saying investment in building plants and in research and development should take priority. Precisely because this is an industry with big market swings, how much cash to keep on hand is a difficult management decision. Going forward, each company looks set to be asked to explain how it will balance this against investment in growth.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "経済の報道では「株主還元」「利益を還元する」の形でよく使われる。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"],
+      "sense": "得た利益を、株主や人々に返すこと。"
+    },
+    {
+      "ja": "化学で習う還元とは、ざっくり言えば、物質から酸素を取り去る反応のことです。この言葉は、歴史と結びつけて覚えると忘れにくくなります。古代の製鉄では、鉄鉱石を木炭と一緒に高温で熱し、鉱石に含まれる酸素を炭素に奪わせることで鉄を取り出していました。そこから鉄器の普及が農業や戦いのあり方を変えた流れまでつなげれば、用語は単なる暗記ではなく、一つの物語として頭に残るはずです。",
+      "form": "還元",
+      "en": "Reduction, which you learn in chemistry, is roughly speaking a reaction that removes oxygen from a substance. This word is harder to forget if you remember it by linking it to history. In ancient ironmaking, people heated iron ore at high temperature together with charcoal, letting the carbon take away the oxygen in the ore and so extracting iron. If you connect this all the way to how the spread of iron tools changed farming and warfare, the term should stay in your head not as mere rote memorization but as a single story.",
+      "original": true,
+      "register": "学",
+      "topic": "history",
+      "tipJa": "化学では「酸化」と対になる語。「鉄鉱石を還元する」のように使う。",
+      "grammar": ["n3-koto-de", "n3-dewa-naku"],
+      "sense": "化学で、物質から酸素を取り去る反応。"
+    }
+  ],
+  "121": [
+    {
+      "ja": "今回は、科学革命の流れをたどった本から、ニュートンの章を取り上げます。それまでの人々は、天上の星と地上の物体はまったく別のルールで動いていると考えていました。ところがニュートンは、リンゴを地面に引きつける力と、月を地球の周りに引き止めている力は同じものだと見抜いたんですね。この万有引力の考え方によって、空と地上が一つの法則で説明できるようになった、というのが著者の見立てです。",
+      "form": "万有引力",
+      "en": "This time I'm taking up the chapter on Newton from a book that traces the course of the Scientific Revolution. People before then thought that the stars in the heavens and objects on Earth moved by completely different rules. Newton, however, saw that the force pulling an apple to the ground and the force holding the Moon in orbit around the Earth were one and the same. The author's view is that this idea of universal gravitation made it possible to explain the sky and the ground with a single law.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「万有引力の法則」の形でよく使う。ニュートンと結びつけて覚えるとよい。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "物理の授業で意外と多いのが、物を引き寄せる力は地球のような大きな天体だけにある、という誤解です。実際には、質量を持つ物どうしなら、机の上の消しゴムと鉛筆の間にも、ごくわずかに引き合う力が働いています。その大きさは質量に応じて決まるので、身の回りの小さな物どうしでは感じられないだけなのです。万有引力という名前に込められているのは、まさにこの点です。名前の意味を一度考えておくと、試験で問われても迷わずに済みますよ。",
+      "form": "万有引力",
+      "en": "A surprisingly common misunderstanding in physics class is that the force that draws things together exists only in large celestial bodies like the Earth. In fact, between any objects that have mass, even between the eraser and the pencil on your desk, an extremely small attractive force is at work. Its size is determined according to the masses, so between the small things around us it simply can't be felt. That is exactly the point packed into the name universal gravitation. If you think once about what the name means, you won't hesitate when it comes up on a test.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「万有」は「すべてのものにある」という意味。「引力」だけだと特定の物の引く力を指す。",
+      "grammar": ["n2-ni-oujite", "n5-teiru"]
+    },
+    {
+      "ja": "ニュートンって、万有引力を見つけた天才ってイメージじゃないですか。でも実は、錬金術の研究にもかなりの時間を使ってたらしいんですよね。晩年には造幣局の仕事で、偽金をつくる連中を取り締まってたりもして。聖書の年代の研究までしてたみたいで、今の感覚だと物理学者とはちょっと思えないですよね。だから、天才って一つの分野に閉じこもってる人じゃなくて、いろんなことに首を突っ込む人なのかもなって思うんですよ。",
+      "form": "万有引力",
+      "en": "Newton has this image as the genius who discovered universal gravitation, right? But actually, he apparently spent quite a lot of time on alchemy research too. In his later years, in his job at the Mint, he was even cracking down on people making counterfeit coins. He seems to have even done research on biblical chronology, which by today's standards hardly sounds like a physicist. So I think maybe a genius isn't someone shut up in a single field, but someone who sticks their nose into all sorts of things.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "会話では「万有引力を見つけた人」のように、ニュートンの代名詞として出てくることが多い。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "122": [
+    {
+      "ja": "今回は、天文学の歴史をたどった本から、北極星にまつわる話を紹介します。今は夜空の北にほぼ止まって見える北極星ですが、実はこの星が昔からずっと北の目印だったわけではないんです。地球の自転軸は、コマが首を振るように、およそ二万六千年かけてゆっくり向きを変えているんですね。そのため、古代エジプトでピラミッドが造られたころは、りゅう座の別の星が北の目印だったと考えられています。",
+      "form": "自転軸",
+      "en": "This time I'm introducing a story about the North Star from a book that traces the history of astronomy. The North Star now looks almost fixed in the northern night sky, but in fact this star hasn't always been the marker of north. The Earth's axis of rotation slowly changes direction over about twenty-six thousand years, like a spinning top wobbling its head. So when the pyramids were being built in ancient Egypt, another star in the constellation Draco is thought to have been the marker of north.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「自転軸の傾き」「自転軸が向きを変える」のように、星が回る中心の線について使う。",
+      "grammar": ["n3-wake-dewa-nai", "n3-you-ni", "n5-teiru"]
+    },
+    {
+      "ja": "季節がある理由を聞かれて、夏は地球が太陽に近づくからだと答える人は意外と多いです。でも、それなら北半球と南半球で季節が逆になることを説明できませんよね。正解は、地球の自転軸が約二十三・四度傾いたまま、太陽の周りを回っているからです。傾いているせいで、一年の中で太陽の高さや昼の長さが変わり、地面が受け取る熱の量に差が生まれるのです。図を一枚描いて、夏と冬の日差しの角度を比べてみると、すっきり理解できますよ。",
+      "form": "自転軸",
+      "en": "When asked why there are seasons, a surprising number of people answer that summer is when the Earth gets closer to the Sun. But then you can't explain why the seasons are reversed in the Northern and Southern Hemispheres, can you? The correct answer is that the Earth goes around the Sun with its axis of rotation tilted by about 23.4 degrees. Because of the tilt, the Sun's height and the length of the day change over the year, and differences arise in the amount of heat the ground receives. If you draw one diagram and compare the angle of sunlight in summer and winter, it will become clear.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「自転軸が傾いている」の形で、季節の説明によく出てくる。「地軸」とも言う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "古代インドの宇宙観では、世界の中心に須弥山という高い山がそびえ、太陽や月はその周りをめぐると考えられていた。天が回るのか大地が回るのかという違いはあっても、人は昔から、動くものの中心に動かない何かを置きたがってきたのである。現代の私たちは、地球の自転軸が目に見えない一本の線にすぎないことを知っている。中心にあるのが山ではなく、実体のない線だと知ったとき、世界の見え方は静かに変わったのではないだろうか。",
+      "form": "自転軸",
+      "en": "In the cosmology of ancient India, a tall mountain called Mount Meru was thought to rise at the center of the world, with the Sun and Moon circling around it. Whether it is the heavens or the earth that turns, people have long wanted to place something unmoving at the center of what moves. We today know that the Earth's axis of rotation is merely an invisible line. When people learned that what lies at the center is not a mountain but a line with no substance, did not the way the world looked change quietly?",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「地球の自転軸」のように、目に見えない回転の中心線として語られることが多い。",
+      "grammar": ["n2-ni-suginai", "n3-dewa-naku", "n5-teiru"]
+    }
+  ],
+  "123": [
+    {
+      "ja": "今回は、地球の形をめぐる論争を描いた本を紹介します。十八世紀のフランスでは、地球は赤道の方向にふくらんでいるのか、それとも南北に長いのか、学者の間で意見が分かれていました。回転する地球では赤道に近いほど遠心力が大きく働くので、赤道側がふくらむはずだ、というのがニュートン派の主張だったんですね。決着をつけるため、フランスは北のラップランドと南米の赤道近くに測量隊を送り、結果はニュートン派の勝ちとなりました。",
+      "form": "遠心力",
+      "en": "This time I'm introducing a book depicting the debate over the shape of the Earth. In eighteenth-century France, scholars were divided over whether the Earth bulged toward the equator or was elongated from north to south. The Newtonians argued that on a rotating Earth, centrifugal force acts more strongly the closer you get to the equator, so the equatorial side should bulge. To settle the matter, France sent survey expeditions to Lapland in the north and near the equator in South America, and the result was a win for the Newtonians.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「遠心力が働く」の形でよく使う。反対に中心へ向かう力は「求心力」と言う。",
+      "grammar": ["n5-teiru"],
+      "sense": "回転する物が、外へ押し出されるように感じる力。"
+    },
+    {
+      "ja": "強い中心を持つ集団ほど、その中心を失ったときに試される。ブッダが世を去ったのち、弟子たちは集まって教えを確かめ合い、師の言葉をまとめたとされる。しかし百年ほどが過ぎると、戒律の解釈をめぐって教団は二つに分かれ、その後もさらに多くの部派が生まれた。各地に広がるにつれて遠心力が働くのは、どんな組織にも避けがたいことなのだろう。むしろ、分かれながらも教えが受け継がれてきたことにこそ、目を向けるべきなのである。",
+      "form": "遠心力",
+      "en": "The more a group has a strong center, the more it is tested when it loses that center. After the Buddha passed away, his disciples are said to have gathered to confirm the teachings with one another and compile their master's words. But after about a hundred years had passed, the community split in two over the interpretation of the monastic rules, and still more schools arose after that. That centrifugal force comes into play as a community spreads to many regions is probably unavoidable for any organization. Rather, we should turn our eyes to the fact that the teachings were handed down even as it divided.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "比喩として「組織に遠心力が働く」のように、まとまりが外へ散っていく動きにも使う。",
+      "grammar": ["n3-ni-tsurete", "n4-nagara"],
+      "sense": "集団の中心から離れていこうとする力やはたらき。"
+    },
+    {
+      "ja": "円運動の問題で多くの受験生がつまずくのが、どの立場から見ているかという点です。回っている物体といっしょに動く人から見れば、外へ押し出されるような力が働いているように感じられます。これがいわゆる遠心力で、回転する側に立ったときにだけ現れる見かけの力です。一方、外から眺める立場で式を立てるなら、この力は書き込んではいけません。どちらの立場で考えるのかを最初に決めておけば、力の数え間違いはぐっと減ります。",
+      "form": "遠心力",
+      "en": "What many exam takers stumble on in circular motion problems is the question of which standpoint they are viewing from. Seen by a person moving together with the rotating object, it feels as if a force is pushing outward. This is the so-called centrifugal force, an apparent force that appears only when you stand on the rotating side. On the other hand, if you set up your equations from the standpoint of someone watching from outside, you must not write this force in. If you decide first which standpoint you'll think from, miscounting the forces drops sharply.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "物理では「見かけの力」として扱う。どの立場で見ているかとセットで覚えるとよい。",
+      "grammar": ["n5-teiru", "n3-you-ni"],
+      "sense": "回転する物が、外へ押し出されるように感じる力。"
+    }
+  ],
+  "127": [
+    {
+      "ja": "今回は、AIと仕事の未来を論じた本を要約します。著者がまず指摘するのは、文章や絵を生み出すAIの登場で、ものを作る作業そのもののハードルが一気に下がったことです。何年もかけて身につけた技術がなくても、文章なら明るい調子にも重い調子にも、絵ならやわらかな水彩にも重厚な油絵にも、言葉ひとつで自由自在に切り替えられるようになったんですね。だからこそ、これから価値を持つのは手を動かす力よりも、何を作るべきかを決める力だ、というのがこの本の主張です。",
+      "form": "自由自在",
+      "en": "This time I'm summarizing a book that discusses AI and the future of work. What the author points out first is that with the arrival of AI that produces text and pictures, the hurdle for the very act of making things has dropped all at once. Even without skills that take years to acquire, you can now switch freely with a single instruction, writing in a bright tone or a heavy one, painting in soft watercolor or rich oils. That's exactly why, the book argues, what will have value from now on is not the ability to work with your hands but the ability to decide what should be made.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「自由自在に〜できる」の形で、思いどおりに何でもできるようすを表す。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "心を自由自在に操れたら、と人は願う。だが仏教の瞑想が教えるのは、心を力ずくで押さえつけることではなく、浮かんでは消える思いをただ見つめることである。怒りや不安を消そうとすればするほど、それはかえって強くなる。思いに振り回されず、それが過ぎていくのを眺められるようになったとき、ようやく心は落ち着きを取り戻すのだろう。思い通りにしようとする手をゆるめることが、むしろ心を静める近道なのである。",
+      "form": "自由自在",
+      "en": "People wish they could control their minds at will. But what Buddhist meditation teaches is not to forcibly hold the mind down, but simply to watch the thoughts that rise and vanish. The more you try to get rid of anger or anxiety, the stronger it becomes instead. When you can watch thoughts pass without being swept along by them, the mind will at last regain its calm. Loosening the hand that tries to make things go as you wish is, rather, the shortcut to quieting the mind.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「心を自由自在に操る」のように、思うままに動かせることを表す。願望の形でもよく使う。",
+      "grammar": ["n3-dewa-naku", "n4-you-ni-naru", "n4-teiku"]
+    },
+    {
+      "ja": "敬語って、日本語が母語の人でもぶっちゃけ苦手な人、多いじゃないですか。尊敬語と謙譲語がごっちゃになって、変なことになってたりして。でも、接客を長くやってる人って、相手に合わせて言葉の丁寧さを自由自在に切り替えてるんですよね。あれって、ルールを暗記したからじゃなくて、毎日使ってるうちに体が覚えちゃったんだと思うんですよ。だから、本で勉強するより、実際に場数を踏むほうが早いのかもしれないです。",
+      "form": "自由自在",
+      "en": "You know how lots of people, honestly, are bad at keigo even when Japanese is their native language. They get respectful and humble forms mixed up and end up saying weird things. But people who've worked in customer service for a long time switch the politeness of their words freely depending on who they're talking to. I think that's not because they memorized the rules, but because their bodies learned it while they used it every day. So maybe it's faster to actually get experience than to study from books.",
+      "original": true,
+      "register": "話",
+      "topic": "language",
+      "tipJa": "会話では「自由自在に使い分ける」「自由自在に切り替える」の形がよく出る。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "32": [
+    {
+      "ja": "今回は、コンピューターの理論的な土台を解説した本から、計算できるとはどういうことかという章を紹介します。一九三〇年代、数学者たちはこの問いに、それぞれ違う方法で答えを出そうとしていました。その一つが、ゼロや「次の数」といったごく単純な関数から出発して、決まった操作をくり返し組み合わせ、より複雑な関数を作っていく帰納的関数の考え方です。驚くのは、これがチューリングの考えた機械で計算できる関数と、ぴったり同じ範囲になると分かったことなんですね。",
+      "form": "帰納的関数",
+      "en": "This time I'm introducing the chapter on what it means to be computable, from a book explaining the theoretical foundations of computers. In the 1930s, mathematicians were each trying to answer this question by different methods. One of them was the idea of recursive functions, which starts from very simple functions such as zero and \"the next number\" and builds more complex functions by repeatedly combining them with fixed operations. What is surprising is that this turned out to cover exactly the same range as the functions computable by the machine Turing conceived.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "論理学や計算の理論で使う専門用語。「帰納的関数の理論」の形でよく出てくる。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "大学の論理学の授業で、多くの学生がつまずくのが帰納的関数の定義です。式がずらりと並んでいて身構えてしまいますが、発想そのものは高校で習う漸化式によく似ています。最初の値を決め、前の値から次の値を求める手順を決めておけば、どんなに大きな数についても答えがひとつに決まる、という仕組みです。まずは小さな数で実際に手を動かし、一つずつ値を出してみると、抽象的に見えた定義がぐっと身近になりますよ。",
+      "form": "帰納的関数",
+      "en": "In university logic classes, what many students stumble on is the definition of recursive functions. Formulas are lined up in rows and you brace yourself, but the idea itself closely resembles the recurrence relations you learn in high school. It's a mechanism where, if you fix the first value and a procedure for getting the next value from the previous one, the answer is uniquely determined for any number, however large. If you first actually work it through with small numbers and calculate the values one by one, the definition that seemed abstract will feel much more familiar.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "授業では「帰納的関数の定義」のように出てくる。漸化式と結びつけると理解しやすい。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "古代インドの文法学者パーニニは、四千ほどの規則によってサンスクリット語の仕組みを書き表したとされる。規則が別の規則を呼び出し、限られた材料から数えきれないほどの正しい文が生まれていく。その構造は、のちに数学者たちが帰納的関数として定式化した、有限の手続きから無限を生み出す発想を思わせる。言葉をとらえどころのない現象としてではなく、有限の規則の集まりとしてとらえたところに、この古代の学問の驚くべき先見性があるのである。",
+      "form": "帰納的関数",
+      "en": "The ancient Indian grammarian Panini is said to have described the workings of Sanskrit with about four thousand rules. Rules call up other rules, and countless correct sentences are born from limited materials. That structure brings to mind the idea, later formalized by mathematicians as recursive functions, of producing the infinite from finite procedures. Therein lies the astonishing foresight of this ancient scholarship: it grasped language not as an elusive phenomenon but as a collection of finite rules.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「帰納的関数として定式化する」のように、有限の規則で計算の範囲を捉える文脈で使う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"]
+    }
+  ],
+  "34": [
+    {
+      "ja": "今回は、使いやすい道具の条件を論じた本を要約します。著者によれば、多くの製品は便利そうなボタンや設定を足していくうちに、かえって使いにくくなっていくといいます。AIを使ったアプリも同じで、できることを並べるより、利用者が迷わずに目的にたどり着けることのほうが大事なんですね。見た目の派手さではなく、むだを削ぎ落とした機能的な作りこそが、長く使われる道具の共通点だ、というのがこの本の結論です。",
+      "form": "機能的",
+      "en": "This time I'm summarizing a book that discusses what makes a tool easy to use. According to the author, many products become harder to use instead as they keep adding buttons and settings that seem convenient. Apps that use AI are the same: rather than lining up everything they can do, it's more important that users can reach their goal without getting lost. The book's conclusion is that what tools that get used for a long time have in common is not flashy looks but a functional build stripped of waste.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「機能的な作り」「機能的なデザイン」のように、むだがなく使いやすいことをほめて言う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"]
+    },
+    {
+      "ja": "二十世紀の初め、ドイツに生まれたバウハウスは、装飾を重ねる古い美意識に異を唱えた。彼らが目指したのは、工場で大量に作ることができ、しかも暮らしの中でむだなく使える、機能的な形であった。その思想は椅子や照明から建築にまで及び、現在私たちが当たり前に使っている家具の多くにも、その影響の跡を見ることができる。しかし、むだを省くことは、ときに人のぬくもりまで省くことになりかねない。美しさと使いやすさの釣り合いをどこに置くかは、今も問われ続けているのである。",
+      "form": "機能的",
+      "en": "The Bauhaus, born in Germany at the start of the twentieth century, challenged the old aesthetic of piling on ornament. What they aimed for were functional forms that could be made in large numbers in factories and used without waste in daily life. Their thinking extended from chairs and lighting to architecture, and traces of its influence can be seen in much of the furniture we take for granted today. However, cutting out waste can sometimes end up cutting out human warmth as well. Where to strike the balance between beauty and ease of use is a question still being asked today.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「機能的な形」「機能的な美しさ」のように、装飾より使いやすさを重んじる文脈で使う。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"]
+    }
+  ]
+}

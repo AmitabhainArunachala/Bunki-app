@@ -16,34 +16,19 @@
   max-width: 34em;
   margin: 0 auto;
   padding: 14px 6px;
-  border-left: 4px solid #0e8f53;
+  border-left: 4px solid #005f98;
   padding-left: 14px;
 }
-/* edge colour = kind of writing: news blue, blog/Q&A green, literature violet, written-for-deck amber */
-.km.kind-news,
-.km.kind-gov,
-.km.kind-company {
-  border-left-color: #0074b8;
-}
-.km.kind-literature {
-  border-left-color: #6a4fd8;
-}
-.km.kind-original {
-  border-left-color: #b86e00;
+/* edge and first chip = item kind (語 accent, 字 its own hue), as in the player; the source
+   of the passage is text in the chip row, never a colour */
+.km.item-字 {
+  border-left-color: #7f1f86;
 }
 .nightMode .km {
-  border-left-color: #3ee391;
-}
-.nightMode .km.kind-news,
-.nightMode .km.kind-gov,
-.nightMode .km.kind-company {
   border-left-color: #3fd0ff;
 }
-.nightMode .km.kind-literature {
-  border-left-color: #a58bff;
-}
-.nightMode .km.kind-original {
-  border-left-color: #ffb547;
+.nightMode .km.item-字 {
+  border-left-color: #ffb0ea;
 }
 .chips {
   display: flex;
@@ -55,6 +40,48 @@
   border-radius: 999px;
   padding: 1px 8px;
   opacity: 0.7;
+}
+.chip.lvchip {
+  color: #005f98;
+  font-weight: 700;
+  opacity: 1;
+}
+.item-字 .chip.lvchip {
+  color: #7f1f86;
+}
+.nightMode .chip.lvchip {
+  color: #3fd0ff;
+}
+.nightMode .item-字 .chip.lvchip {
+  color: #ffb0ea;
+}
+/* level: the note's level::Nx tag (no extra field), a monochrome chip as in the player;
+   words the public list does not cover carry no tag and show no chip */
+.chip.levelchip {
+  display: none;
+  letter-spacing: 0.04em;
+}
+.level\:\:N1 .chip.levelchip,
+.level\:\:N2 .chip.levelchip,
+.level\:\:N3 .chip.levelchip,
+.level\:\:N4 .chip.levelchip,
+.level\:\:N5 .chip.levelchip {
+  display: inline-block;
+}
+.level\:\:N1 .levelchip::after {
+  content: 'N1';
+}
+.level\:\:N2 .levelchip::after {
+  content: 'N2';
+}
+.level\:\:N3 .levelchip::after {
+  content: 'N3';
+}
+.level\:\:N4 .levelchip::after {
+  content: 'N4';
+}
+.level\:\:N5 .levelchip::after {
+  content: 'N5';
 }
 .sentence {
   font-size: 28px;
@@ -68,8 +95,13 @@
 }
 .sentence b,
 .blank {
-  color: #0074b8;
+  color: #005f98;
   font-weight: 700;
+}
+/* the target is underlined as well as coloured (the shape pairing for colour-blind readers) */
+.sentence b {
+  text-decoration: underline 2px;
+  text-underline-offset: 0.28em;
 }
 .nightMode .sentence b,
 .nightMode .blank {
@@ -78,10 +110,6 @@
 .blank {
   border-bottom: 3px solid currentColor;
 }
-.hint {
-  font-size: 16px;
-  opacity: 0.75;
-}
 .answer {
   border-top: 1px solid rgba(128, 128, 128, 0.35);
   padding-top: 12px;
@@ -89,9 +117,9 @@
   gap: 4px;
 }
 .term {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
-  color: #0074b8;
+  color: #005f98;
   margin-right: 12px;
 }
 .nightMode .term {
@@ -104,34 +132,81 @@
 .def {
   font-size: 17px;
 }
+/* tier two: one tap each; English is never coloured, never bold */
+.folds {
+  margin-top: 6px;
+  border-top: 1px solid rgba(128, 128, 128, 0.35);
+}
+.fold {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+  padding: 8px 0;
+}
+.fold summary {
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.8;
+}
+.fold[open] summary {
+  margin-bottom: 6px;
+}
 .meaning {
   font-size: 15px;
-  font-weight: 600;
-  color: #0e8f53;
-}
-.nightMode .meaning {
-  color: #3ee391;
+  opacity: 0.8;
 }
 .en {
   font-size: 14px;
-  opacity: 0.75;
+}
+.fold.en {
+  opacity: 0.85;
+}
+.en-none {
+  font-size: 13px;
+  opacity: 0.7;
 }
 .tip {
   font-size: 13px;
-  border-left: 3px solid #b86e00;
-  padding-left: 10px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+.tip-label {
+  opacity: 0.7;
+}
+.posbadge {
+  font-size: 12px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin-left: 4px;
+  vertical-align: middle;
   opacity: 0.85;
 }
-details.en summary {
-  cursor: pointer;
-  font-size: 12px;
+.pos-noun .posbadge::after {
+  content: '名詞';
 }
-.src {
+.pos-verb .posbadge::after {
+  content: '動詞';
+}
+.pos-adj .posbadge::after {
+  content: '形容詞';
+}
+.pos-adjna .posbadge::after {
+  content: '形容動詞';
+}
+.pos-adv .posbadge::after {
+  content: '副詞';
+}
+.pos-expr .posbadge::after {
+  content: '表現';
+}
+.pos-sound .posbadge::after {
+  content: '擬音語';
+}
+.srcline {
   font-size: 12px;
-  opacity: 0.65;
+  opacity: 0.75;
   overflow-wrap: anywhere;
 }
-.src a {
+.srcline a {
   color: inherit;
 }
 
@@ -141,7 +216,9 @@ details.en summary {
   color: #c94a12;
 }
 .pos-adj .sentence b,
-.pos-adj .term {
+.pos-adjna .sentence b,
+.pos-adj .term,
+.pos-adjna .term {
   color: #9a6a00;
 }
 .pos-adv .sentence b,
@@ -161,7 +238,9 @@ details.en summary {
   color: #ff8a5c;
 }
 .nightMode .pos-adj .sentence b,
-.nightMode .pos-adj .term {
+.nightMode .pos-adjna .sentence b,
+.nightMode .pos-adj .term,
+.nightMode .pos-adjna .term {
   color: #ffd24a;
 }
 .nightMode .pos-adv .sentence b,
@@ -200,4 +279,52 @@ details.en summary {
 .kj small {
   font-size: 12px;
   opacity: 0.8;
+}
+/* the kanji family (as the player's 漢字 fold): earlier words in the deck sharing a kanji (同)
+   or a reading of one (読), marked in text */
+.kfam {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.kfam li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.kfam li > b {
+  font-size: 18px;
+  min-width: 3em;
+}
+.kfam li > b small {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-left: 3px;
+}
+.kfam .fam {
+  font-size: 14px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+}
+.kfam .fam i {
+  font-style: normal;
+  font-size: 10px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 0 2px;
+  margin-right: 4px;
+  opacity: 0.8;
+}
+.kfam .fam.rd i {
+  border-style: dashed;
+}
+.kfam .more {
+  font-size: 12px;
+  opacity: 0.75;
 }

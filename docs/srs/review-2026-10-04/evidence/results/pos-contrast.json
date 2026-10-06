@@ -1,0 +1,338 @@
+[
+  {
+    "look": "dark",
+    "pos": "noun",
+    "fg": "rgb(63, 208, 255)",
+    "bg": "rgb(18, 25, 34)",
+    "ratio": 9.83
+  },
+  {
+    "look": "dark",
+    "pos": "verb",
+    "fg": "rgb(255, 138, 92)",
+    "bg": "rgb(18, 25, 34)",
+    "ratio": 7.61
+  },
+  {
+    "look": "dark",
+    "pos": "adj",
+    "fg": "rgb(255, 210, 74)",
+    "bg": "rgb(18, 25, 34)",
+    "ratio": 12.27
+  },
+  {
+    "look": "dark",
+    "pos": "adv",
+    "fg": "rgb(197, 155, 255)",
+    "bg": "rgb(18, 25, 34)",
+    "ratio": 8.0
+  },
+  {
+    "look": "dark",
+    "pos": "expr",
+    "fg": "rgb(94, 230, 176)",
+    "bg": "rgb(18, 25, 34)",
+    "ratio": 11.3
+  },
+  {
+    "look": "dark",
+    "pos": "sound",
+    "fg": "rgb(255, 122, 200)",
+    "bg": "rgb(18, 25, 34)",
+    "ratio": 7.47
+  },
+  {
+    "look": "ai",
+    "pos": "noun",
+    "fg": "rgb(242, 193, 78)",
+    "bg": "rgb(18, 26, 70)",
+    "ratio": 9.92
+  },
+  {
+    "look": "ai",
+    "pos": "verb",
+    "fg": "rgb(255, 138, 92)",
+    "bg": "rgb(18, 26, 70)",
+    "ratio": 7.17
+  },
+  {
+    "look": "ai",
+    "pos": "adj",
+    "fg": "rgb(255, 210, 74)",
+    "bg": "rgb(18, 26, 70)",
+    "ratio": 11.55
+  },
+  {
+    "look": "ai",
+    "pos": "adv",
+    "fg": "rgb(197, 155, 255)",
+    "bg": "rgb(18, 26, 70)",
+    "ratio": 7.53
+  },
+  {
+    "look": "ai",
+    "pos": "expr",
+    "fg": "rgb(94, 230, 176)",
+    "bg": "rgb(18, 26, 70)",
+    "ratio": 10.64
+  },
+  {
+    "look": "ai",
+    "pos": "sound",
+    "fg": "rgb(255, 122, 200)",
+    "bg": "rgb(18, 26, 70)",
+    "ratio": 7.03
+  },
+  {
+    "look": "matcha",
+    "pos": "noun",
+    "fg": "rgb(166, 224, 106)",
+    "bg": "rgb(19, 38, 26)",
+    "ratio": 10.22
+  },
+  {
+    "look": "matcha",
+    "pos": "verb",
+    "fg": "rgb(255, 138, 92)",
+    "bg": "rgb(19, 38, 26)",
+    "ratio": 6.85
+  },
+  {
+    "look": "matcha",
+    "pos": "adj",
+    "fg": "rgb(255, 210, 74)",
+    "bg": "rgb(19, 38, 26)",
+    "ratio": 11.04
+  },
+  {
+    "look": "matcha",
+    "pos": "adv",
+    "fg": "rgb(197, 155, 255)",
+    "bg": "rgb(19, 38, 26)",
+    "ratio": 7.2
+  },
+  {
+    "look": "matcha",
+    "pos": "expr",
+    "fg": "rgb(94, 230, 176)",
+    "bg": "rgb(19, 38, 26)",
+    "ratio": 10.17
+  },
+  {
+    "look": "matcha",
+    "pos": "sound",
+    "fg": "rgb(255, 122, 200)",
+    "bg": "rgb(19, 38, 26)",
+    "ratio": 6.72
+  },
+  {
+    "look": "kokuban",
+    "pos": "noun",
+    "fg": "rgb(255, 224, 102)",
+    "bg": "rgb(31, 47, 40)",
+    "ratio": 10.77
+  },
+  {
+    "look": "kokuban",
+    "pos": "verb",
+    "fg": "rgb(255, 158, 122)",
+    "bg": "rgb(31, 47, 40)",
+    "ratio": 6.97
+  },
+  {
+    "look": "kokuban",
+    "pos": "adj",
+    "fg": "rgb(255, 210, 74)",
+    "bg": "rgb(31, 47, 40)",
+    "ratio": 9.74
+  },
+  {
+    "look": "kokuban",
+    "pos": "adv",
+    "fg": "rgb(197, 155, 255)",
+    "bg": "rgb(31, 47, 40)",
+    "ratio": 6.36
+  },
+  {
+    "look": "kokuban",
+    "pos": "expr",
+    "fg": "rgb(94, 230, 176)",
+    "bg": "rgb(31, 47, 40)",
+    "ratio": 8.97
+  },
+  {
+    "look": "kokuban",
+    "pos": "sound",
+    "fg": "rgb(255, 122, 200)",
+    "bg": "rgb(31, 47, 40)",
+    "ratio": 5.93
+  },
+  {
+    "look": "washi",
+    "pos": "noun",
+    "fg": "rgb(178, 58, 30)",
+    "bg": "rgb(251, 246, 234)",
+    "ratio": 5.54
+  },
+  {
+    "look": "washi",
+    "pos": "verb",
+    "fg": "rgb(31, 95, 168)",
+    "bg": "rgb(251, 246, 234)",
+    "ratio": 5.97
+  },
+  {
+    "look": "washi",
+    "pos": "adj",
+    "fg": "rgb(138, 90, 0)",
+    "bg": "rgb(251, 246, 234)",
+    "ratio": 5.5
+  },
+  {
+    "look": "washi",
+    "pos": "adv",
+    "fg": "rgb(107, 74, 168)",
+    "bg": "rgb(251, 246, 234)",
+    "ratio": 6.14
+  },
+  {
+    "look": "washi",
+    "pos": "expr",
+    "fg": "rgb(47, 122, 79)",
+    "bg": "rgb(251, 246, 234)",
+    "ratio": 4.85
+  },
+  {
+    "look": "washi",
+    "pos": "sound",
+    "fg": "rgb(168, 48, 110)",
+    "bg": "rgb(251, 246, 234)",
+    "ratio": 5.88
+  },
+  {
+    "look": "sakura",
+    "pos": "noun",
+    "fg": "rgb(209, 65, 106)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.49
+  },
+  {
+    "look": "sakura",
+    "pos": "verb",
+    "fg": "rgb(42, 111, 184)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 5.17
+  },
+  {
+    "look": "sakura",
+    "pos": "adj",
+    "fg": "rgb(160, 104, 0)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.69
+  },
+  {
+    "look": "sakura",
+    "pos": "adv",
+    "fg": "rgb(125, 79, 200)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 5.49
+  },
+  {
+    "look": "sakura",
+    "pos": "expr",
+    "fg": "rgb(47, 138, 90)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.28
+  },
+  {
+    "look": "sakura",
+    "pos": "sound",
+    "fg": "rgb(194, 72, 154)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.48
+  },
+  {
+    "look": "light",
+    "pos": "noun",
+    "fg": "rgb(0, 116, 184)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 5.01
+  },
+  {
+    "look": "light",
+    "pos": "verb",
+    "fg": "rgb(201, 74, 18)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.7
+  },
+  {
+    "look": "light",
+    "pos": "adj",
+    "fg": "rgb(154, 106, 0)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.73
+  },
+  {
+    "look": "light",
+    "pos": "adv",
+    "fg": "rgb(106, 63, 200)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 6.65
+  },
+  {
+    "look": "light",
+    "pos": "expr",
+    "fg": "rgb(11, 138, 90)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 4.38
+  },
+  {
+    "look": "light",
+    "pos": "sound",
+    "fg": "rgb(184, 35, 122)",
+    "bg": "rgb(255, 255, 255)",
+    "ratio": 5.9
+  },
+  {
+    "look": "contrast",
+    "pos": "noun",
+    "fg": "rgb(255, 255, 0)",
+    "bg": "rgb(0, 0, 0)",
+    "ratio": 19.56
+  },
+  {
+    "look": "contrast",
+    "pos": "verb",
+    "fg": "rgb(255, 138, 92)",
+    "bg": "rgb(0, 0, 0)",
+    "ratio": 9.04
+  },
+  {
+    "look": "contrast",
+    "pos": "adj",
+    "fg": "rgb(255, 210, 74)",
+    "bg": "rgb(0, 0, 0)",
+    "ratio": 14.57
+  },
+  {
+    "look": "contrast",
+    "pos": "adv",
+    "fg": "rgb(197, 155, 255)",
+    "bg": "rgb(0, 0, 0)",
+    "ratio": 9.51
+  },
+  {
+    "look": "contrast",
+    "pos": "expr",
+    "fg": "rgb(94, 230, 176)",
+    "bg": "rgb(0, 0, 0)",
+    "ratio": 13.42
+  },
+  {
+    "look": "contrast",
+    "pos": "sound",
+    "fg": "rgb(255, 122, 200)",
+    "bg": "rgb(0, 0, 0)",
+    "ratio": 8.87
+  }
+]

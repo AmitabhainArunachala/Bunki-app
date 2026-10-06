@@ -1,0 +1,328 @@
+{
+  "31": [
+    {
+      "ja": "今回は、災害の歴史から命を守る知恵を学ぶ一冊を紹介します。1995年の阪神・淡路大震災では、亡くなった人の多くは、倒れた家屋や家具の下敷きになって命を落としたとされています。地震の揺れそのものではなく、古い木造住宅の倒壊が被害を大きくしたわけです。この教訓から、建物の耐震基準が見直され、家具を壁に固定するように呼びかける動きも広がっていきました。著者は、過去の災害を知ることこそが、次の災害へのいちばんの備えになると語っています。",
+      "form": "下敷きになって",
+      "en": "This time I'll introduce a book that teaches the wisdom of protecting lives from the history of disasters. In the 1995 Great Hanshin-Awaji Earthquake, it is said that many of those who died lost their lives pinned under collapsed houses and furniture. In other words, it was not the shaking of the earthquake itself but the collapse of old wooden houses that made the damage so great. From this lesson, building earthquake-resistance standards were revised, and a movement calling on people to fasten furniture to walls also spread. The author says that knowing past disasters is precisely the best preparation for the next one.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「がれきの下敷きになる」のように、重い物に押しつぶされる場面で使う。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n3-you-ni", "n4-teiku"],
+      "sense": "重い物の下に押さえつけられる。"
+    },
+    {
+      "ja": "大きな地震で倒れた建物の下敷きになった人を、AIを使っていち早く見つけ出す技術の開発が進んでいる。ドローンに載せたカメラやマイクで集めた映像と音を解析し、人の声や呼吸に近い反応を絞り込む仕組みだ。救助の現場では、発生から七十二時間を過ぎると助かる可能性が大きく下がるとされ、一刻も早い発見が欠かせない。一方で、がれきの奥は電波が届きにくく、実際の災害でどこまで役立つかは未知数だという。",
+      "form": "下敷きになった",
+      "en": "Development is advancing on technology that uses AI to quickly find people pinned under buildings that collapsed in a major earthquake. It is a system that analyzes video and sound gathered by cameras and microphones mounted on drones and narrows down responses close to a human voice or breathing. At rescue sites, the chance of survival is said to drop sharply once seventy-two hours have passed since the quake, so finding people as early as possible is essential. On the other hand, radio signals have trouble reaching deep inside the rubble, and how useful the technology will be in real disasters is said to be still unknown.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「がれきの下敷きになる」のように、重い物に押しつぶされる場面で使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "重い物の下に押さえつけられる。"
+    },
+    {
+      "ja": "インドの仏教遺跡を訪ねると、崩れ落ちた石の柱が草の中に横たわっている光景に出会う。かつて多くの僧が学んだ場所も、長い年月のうちに形を失ったのである。ある柱のそばでは、石の下敷きになった草が、わずかなすき間から細い茎を伸ばしていた。押しつぶされながらも光のほうへ向かうその姿に、どんな状況でも生きようとする命の力を見る思いがした。形あるものが崩れていく一方で、新しい命は絶えず生まれているのである。",
+      "form": "下敷きになった",
+      "en": "When you visit Buddhist ruins in India, you come upon the sight of collapsed stone pillars lying in the grass. Even places where many monks once studied have lost their shape over the long years. Beside one pillar, a plant pinned under the stone was stretching a thin stem out through a slight gap. In the way it reached toward the light even while being crushed, I felt I was seeing the force of life that tries to live in any circumstances. While things that have form crumble away, new life is constantly being born.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "人だけでなく、草や車など物が押しつぶされる場合にも使える。",
+      "grammar": ["n5-teiru", "n4-nagara", "n4-teiku"],
+      "sense": "重い物の下に押さえつけられる。"
+    }
+  ],
+  "38": [
+    {
+      "ja": "今回は、庭の歴史から権力のあり方を読み解く本を紹介します。フランスのヴェルサイユ宮殿の庭園では、木々が球や四角といった幾何学的な形に刈り込まれ、左右対称に並べられました。著者によれば、これは自然さえも王の思いどおりになることを見せつける演出だったそうです。一方、十八世紀のイギリスでは、なるべく手を加えずに自然の景色を生かす庭が好まれるようになります。庭の形の違いに、それぞれの国の考え方が表れているというわけですね。",
+      "form": "刈り込まれ",
+      "en": "This time I'll introduce a book that reads the nature of power from the history of gardens. In the gardens of the Palace of Versailles in France, trees were clipped into geometric shapes such as spheres and squares and lined up symmetrically. According to the author, this was a show meant to display that even nature bent to the king's will. Meanwhile, in eighteenth-century England, gardens that made use of natural scenery with as little human touch as possible came to be favored. The idea is that each country's way of thinking shows in the differences between the shapes of its gardens.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「形に刈り込む」のように、狙った形に整える意味で使う。受け身の「刈り込まれる」も多い。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru"],
+      "sense": "木の枝や髪などを切って、形を整える。"
+    },
+    {
+      "ja": "人手不足が続く造園の現場で、AIを搭載したロボットに生け垣を刈り込ませる試みが始まっている。カメラで枝の伸び具合を読み取り、決められた形に合わせて刃の位置を細かく調整する仕組みだ。高さのある生け垣の作業は職人にとって負担が大きく、転落事故の心配もあった。開発した企業は、まずは公園や道路沿いの単純な形の生け垣から導入を進めたいとしている。ただ、木の個性を見ながら整える熟練の技を、機械がどこまで再現できるかは今後の課題だという。",
+      "form": "刈り込ませる",
+      "en": "At landscaping sites, where labor shortages continue, trials have begun of having robots equipped with AI trim hedges. It is a system that reads how far branches have grown with a camera and finely adjusts the position of the blades to match a set shape. Work on tall hedges places a heavy burden on craftsmen, and there was also the worry of falls. The company that developed it says it wants to begin introducing it with simply shaped hedges in parks and along roads. However, how far a machine can reproduce the skilled craft of shaping while watching each tree's character is said to be a challenge for the future.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「生け垣を刈り込む」が典型。伸びた部分をまとめて切り、形をそろえる作業。",
+      "grammar": ["n5-teiru", "n5-tai", "n4-nagara"],
+      "sense": "木の枝や髪などを切って、形を整える。"
+    },
+    {
+      "ja": "庭師は毎年、伸びすぎた枝を刈り込んで木の形を整える。放っておけば枝は好き勝手に伸び、いずれ日の光が奥まで届かなくなって、木そのものを弱らせてしまうからである。仏教が説く欲もまた、手入れをしない枝に似ている。一つ手に入れれば次が欲しくなり、気づいたときには心全体が暗く茂ってしまう。欲を根こそぎ断つのではなく、日々少しずつ手を入れて整えていくこと、それが修行というものなのだろう。",
+      "form": "刈り込んで",
+      "en": "Every year the gardener prunes branches that have grown too long and shapes the tree. That is because if left alone the branches grow however they like, and eventually sunlight no longer reaches the inside, weakening the tree itself. The desire that Buddhism speaks of also resembles branches that are not tended. Once you get one thing you want the next, and by the time you notice, your whole mind has grown dark and overgrown. Not cutting off desire at the root but tending and shaping it little by little each day: that is perhaps what practice is.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「枝を刈り込む」のように、根元から切るのではなく伸びた部分を切りそろえる。",
+      "grammar": ["n3-dewa-naku", "n4-teiku", "n5-teiru"],
+      "sense": "木の枝や髪などを切って、形を整える。"
+    }
+  ],
+  "263": [
+    {
+      "ja": "今回は、中国の官僚登用試験である科挙の歴史をたどる本を紹介します。科挙は原則として家柄に関係なく受けられる試験でしたが、それだけに不正を防ぐ工夫も徹底していました。宋の時代には、答案の名前を隠したうえ、筆跡から受験者が分からないよう、係の役人が書き写してから採点したと言われています。それでも、カンニング用の文字がびっしり書かれた下着が今に残っているほど、不正はなくならなかったそうです。公平な試験を作るための苦労は、千年近く前から続いているわけですね。",
+      "form": "採点",
+      "en": "This time I'll introduce a book that traces the history of the imperial examination, China's civil-service recruitment exam. The imperial examination was in principle an exam anyone could take regardless of family background, and precisely for that reason the measures to prevent cheating were thorough. In the Song dynasty, it is said that after the names on the answer sheets were hidden, clerks copied the answers out before they were graded, so that examinees could not be identified from their handwriting. Even so, cheating apparently never went away, to the extent that undergarments densely covered with crib notes survive to this day. The struggle to create a fair exam, in other words, has been going on for nearly a thousand years.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「答案を採点する」が定番。点数をつける作業そのものを指す。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "記述式の答案をAIで採点する試みが、教育の現場で広がり始めている。教員の長時間労働が問題となる中、負担を減らす手段としても注目されている。大量の答案を短時間で処理できるうえ、評価する人による点数のばらつきを抑えられると期待されている。一方で、AIが独創的な答えや想定外の書き方を正しく評価できるのかを不安視する声もある。そのため多くの試みでは、最終的な判断は教員が行い、AIは補助にとどめる形がとられている。",
+      "form": "採点",
+      "en": "Trials of grading written answers with AI have begun to spread in schools. Amid the problem of teachers' long working hours, it is also drawing attention as a means of reducing their burden. It is hoped that, besides processing large numbers of answer sheets in a short time, it can reduce the variation in scores that depends on who is evaluating. On the other hand, there are also voices worried about whether AI can correctly evaluate original answers or unexpected ways of writing. For that reason, in many of the trials, teachers make the final judgment and AI is kept to an assisting role.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「答案を採点する」のように、答案に点数をつける作業を指す。人が行う場合にも機械の場合にも使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "問題集を解いたあと、自分で採点して終わりにしていませんか。丸の数を数えるだけでは、点数は分かっても、次に同じミスを防ぐことにはつながりません。大切なのは、間違えた問題の横に、なぜ間違えたのかを一言書いておくことです。計算ミスなのか、知識が足りなかったのか、問題文を読み違えたのかを区別することで、次にやるべきことがはっきりします。点数ではなく、間違いの原因を集めるつもりで取り組みましょう。",
+      "form": "採点",
+      "en": "After working through a problem book, aren't you stopping once you've graded it yourself? Just counting the circles may tell you your score, but it won't help you prevent the same mistake next time. What matters is writing a word beside each problem you got wrong about why you got it wrong. By distinguishing whether it was a calculation slip, a lack of knowledge, or a misreading of the question, what you should do next becomes clear. Approach it with the aim of collecting the causes of your mistakes rather than points.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「自分で採点する」は、答え合わせをして丸やばつをつけること。",
+      "grammar": ["n3-koto-de", "n3-dewa-naku"]
+    }
+  ],
+  "196": [
+    {
+      "ja": "今回は、日本の女子教育の歩みをたどる本を紹介します。戦前の日本では、小学校を出ると男女は別々の学校に進むのが当たり前で、女子が学べる内容にも大きな差がありました。それが大きく変わったのは戦後のことで、1947年に定められた教育基本法に、男女共学を認める条文が盛り込まれたのです。これをきっかけに、男女が同じ教室で同じ内容を学ぶ学校が全国に広がっていきます。今ではおなじみの光景も、実は八十年ほどの歴史しかないわけですね。",
+      "form": "共学",
+      "en": "This time I'll introduce a book that traces the course of girls' education in Japan. In prewar Japan, it was taken for granted that after finishing elementary school boys and girls went on to separate schools, and there were also large differences in what girls could study. It was after the war that this changed greatly: the Fundamental Law of Education enacted in 1947 included an article recognizing coeducation of boys and girls. With this as a turning point, schools where boys and girls learn the same content in the same classroom spread across the country. In other words, a scene that is familiar today actually has only about eighty years of history.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「男女共学」の形でよく使う。男子校や女子校のように分けることは「別学」という。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "少子化で子どもの数が減る中、私立の男子校や女子校が共学に切り替える動きが続いている。男女どちらも受け入れることで、志願者を集めやすくするのがねらいだ。背景には、男女が同じ教室で学ぶほうが社会に出てからの人間関係に近いと考える保護者が増えていることもある。実際に、切り替えた翌年に志願者が大きく増えた学校もある。一方で、異性の目を気にせずに学べる環境を評価する声も根強く、伝統を守るためにあえて別学を続ける学校も少なくない。",
+      "form": "共学",
+      "en": "As the number of children falls with the declining birthrate, the move by private boys' and girls' schools to switch to coeducation is continuing. The aim is to make it easier to attract applicants by accepting both boys and girls. Behind this there is also an increase in parents who think that boys and girls learning in the same classroom is closer to the human relationships they will have after entering society. In fact, there are schools whose applicants increased greatly the year after they switched. On the other hand, voices that value an environment where students can learn without worrying about the eyes of the opposite sex remain strong, and quite a few schools deliberately continue single-sex education to preserve their traditions.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "「共学に切り替える」「共学化」は、男子校や女子校が男女を受け入れること。",
+      "grammar": ["n3-koto-de", "n5-teiru"]
+    },
+    {
+      "ja": "うちの親の地元って、公立高校がほとんど男子校と女子校に分かれてたらしいんですよ。今でもそういう地域ってちょっと残ってるじゃないですか。母は、高校は女子だけで気楽だったって言ってて、大学で初めて共学の環境になって、最初は男子と話すだけですごく緊張したらしいです。逆に父は、男子校のノリが大学でもずっと続くと思ってたみたいで。時代とか地域で、当たり前ってぜんぜん違うんですよね。",
+      "form": "共学",
+      "en": "Apparently in my parents' hometown, the public high schools were mostly split into boys' schools and girls' schools. There are still a few areas like that left even now, right? My mom says high school was relaxed because it was only girls, and apparently when she was first in a coed environment at university, she got really nervous at first just talking to boys. My dad, on the other hand, seems to have thought the boys'-school vibe would go on forever, even at university. What's normal is totally different depending on the era and the region, isn't it?",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "「共学になる」は、男女が同じ学校や教室で学ぶ環境に入ること。"
+    }
+  ],
+  "209": [
+    {
+      "ja": "今回は、アジアで初めてノーベル文学賞を受けた詩人、タゴールの生涯を描いた本を紹介します。詩人として知られるタゴールですが、晩年になってから絵を描き始め、数多くの作品を残したことはあまり知られていません。原稿の書き損じを消そうとして線を重ねるうちに、それが不思議な形になっていったとも言われています。詩を書き、たくさんの歌を作り、さらに絵筆まで握ったタゴールは、言葉という枠に収まらない、根っからの芸術家だったわけです。",
+      "form": "芸術家",
+      "en": "This time I'll introduce a book depicting the life of Tagore, the poet who was the first in Asia to receive the Nobel Prize in Literature. Tagore is known as a poet, but it is not widely known that he began painting late in life and left a great many works. It is also said that as he layered lines trying to cross out mistakes in his manuscripts, those lines turned into strange shapes. Tagore, who wrote poems, composed many songs, and even took up the paintbrush, was in other words an artist to the core who could not be contained within the frame of words.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "詩人や画家など、作品を生み出す人を広く指す。「〜家」はその道の人を表す。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "文章の指示だけで絵を描く生成AIが広がる中、作品が無断で学習に使われることへの懸念が強まっている。特定の芸術家の作風をまねた絵が簡単に作れるようになり、本人の仕事が奪われかねないという声も上がっている。こうした状況を受け、作品を学習に使わないよう求める仕組みや、AIが作った絵であることを示す表示の導入を進める動きも出てきた。ただ、どこまでをまねと見なすかの線引きは難しく、議論は今も続いている。",
+      "form": "芸術家",
+      "en": "As generative AI that draws pictures from text instructions alone spreads, concern is growing about works being used for training without permission. It has become easy to make pictures imitating the style of a particular artist, and voices are also being raised that the artists' own work could be taken away. In response to this situation, moves have also emerged to introduce systems that request works not be used for training and labels showing that a picture was made by AI. However, drawing the line on how far something counts as imitation is difficult, and the debate is still continuing.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "作品を生み出す人を広く指す語。報道では「芸術家ら」の形でも使われる。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "幼い子どもは、うまく描けるかどうかなど気にせず、思うままに線を引き、色を塗る。ところが成長するにつれて、他人の目や評価を意識するようになり、多くの人は絵を描くこと自体をやめてしまう。芸術家とは、特別な才能を持つ人というより、子どものころのあの自由さを手放さなかった人のことなのかもしれない。だとすれば、表現する力は失われたのではなく、ただ眠っているだけなのである。",
+      "form": "芸術家",
+      "en": "Small children draw lines and lay on colors as they please, without worrying about whether they can draw well. But as they grow up, they become conscious of other people's eyes and judgments, and many people stop drawing pictures altogether. An artist may be not so much a person with special talent as someone who never let go of that freedom of childhood. If so, then the power to express oneself has not been lost but is merely asleep.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "作品を作ることを生き方の中心にしている人。職業に限らず使う。",
+      "grammar": ["n3-ni-tsurete", "n4-you-ni-naru", "n3-dewa-naku", "n5-teiru"]
+    }
+  ],
+  "1": [
+    {
+      "ja": "今回は、アイデアが出なくて困っている人のための発想トレーニングの本を紹介します。著者がすすめるのは、意外にも、昔ながらのなぞかけです。まったく関係のない二つのものを並べて、その共通点をしゃれで言い当てる、あの言葉遊びですね。一つの言葉から連想を広げ、別の言葉と結びつける練習を重ねることで、ものとものをつなげる頭の回路が鍛えられるというのです。新しいアイデアとは、すでにあるもの同士の新しい組み合わせにすぎないというわけですね。",
+      "form": "なぞかけ",
+      "en": "This time I'll introduce a book on idea-generation training for people who are stuck for ideas. What the author recommends is, surprisingly, the old-fashioned riddle-pun. It's that word game where you put two completely unrelated things side by side and hit on what they have in common with a pun. By repeatedly practicing spreading associations out from one word and linking them to another word, the mental circuits that connect one thing to another are trained, the author says. In other words, a new idea is nothing more than a new combination of things that already exist.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「〜とかけて〜と解く、その心は」という型で、二つの物の共通点を言う遊び。",
+      "grammar": ["n5-teiru", "n3-koto-de", "n2-ni-suginai"]
+    },
+    {
+      "ja": "この前、ひまだったんで、AIになぞかけを作らせてみたんですよ。スマホとかけて何々と解く、みたいな定番の形のやつ。それっぽい答えはちゃんと出てくるんですけど、その心はって聞くと、しゃれになってなくて、説明がやたら長いんですよね。笑いって、二つの意味が一瞬でぴたっと重なる、あの気持ちよさじゃないですか。そこを言葉で全部ていねいに説明しちゃうと、もうぜんぜん面白くないんですよ。",
+      "form": "なぞかけ",
+      "en": "The other day I had some free time, so I tried getting an AI to make riddle-puns. You know, the classic format that goes, compare a smartphone to such-and-such. It comes up with answers that sound plausible, but when you ask what the connection is, it's not a pun at all and the explanation is ridiculously long. Laughter is that nice feeling of two meanings snapping together in an instant, right? Once you carefully explain all of that in words, it's not funny at all anymore.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "「なぞかけを作る」のように使う。答えの理由を「その心は」で明かすのがお決まり。"
+    },
+    {
+      "ja": "禅の公案は、一見するとなぞかけに似ている。どちらも、ふつうの考え方では答えにたどり着けない問いを投げかけるからである。だが、一方には必ず気の利いた答えが用意されているのに対し、公案には、頭でひねり出した正解というものがない。理屈で解こうとする心そのものを手放したとき、はじめて何かが見えてくるのだという。言葉遊びと修行の違いは、答えをあらかじめ持っているかどうかにあるのかもしれない。",
+      "form": "なぞかけ",
+      "en": "At first glance, Zen koans resemble riddle-puns. That is because both pose questions whose answers cannot be reached by ordinary ways of thinking. But whereas the one always has a witty answer ready, a koan has no such thing as a correct answer squeezed out by the head. It is said that only when one lets go of the very mind that tries to solve it by logic does something come into view. The difference between word play and practice may lie in whether the answer is held in advance.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "答えがあらかじめ決まっていて、その種明かしを楽しむ言葉遊び。",
+      "grammar": ["n5-teiru"]
+    }
+  ],
+  "3": [
+    {
+      "ja": "今回は、記憶のしくみを生かした勉強法の本を紹介します。人の脳は、意味のないものを覚えるのがとても苦手です。数字の並びや年号がなかなか頭に入らないのはそのためで、そこで役に立つのが語呂合わせだと著者は言います。数字を音に置き換えて言葉や文にすることで、意味のない情報に無理やり意味を与えるわけですね。覚えにくいものほど、覚えやすい形に作り変えてしまえばいいということです。",
+      "form": "語呂合わせ",
+      "en": "This time I'll introduce a book on study methods that make use of how memory works. The human brain is very bad at memorizing things that have no meaning. That is why strings of numbers and dates are so hard to get into your head, and the author says that what helps there are number-word puns. By turning numbers into sounds and making them into words or sentences, you forcibly give meaning to meaningless information. The idea is that the harder something is to remember, the more you should just remake it into a form that is easy to remember.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「語呂合わせで覚える」が定番。数字の読みを言葉や文に当てる工夫。",
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "日本史の年号は、丸暗記しようとすると本番で混乱しやすいものです。たとえば平安京に遷都した794年なら、鳴くよウグイス平安京のように、数字の音を文にすると忘れにくくなります。ただし語呂合わせで覚えられるのは数字だけで、なぜその年に遷都したのかという流れまでは身につきません。年号はこうして押さえたうえで、前後の出来事とつなげて覚えるようにしましょう。そうすることで、記述問題にも対応できる力がつきます。",
+      "form": "語呂合わせ",
+      "en": "Dates in Japanese history are easy to get confused about on the actual exam if you try to memorize them by rote. For example, for 794, when the capital moved to Heian-kyo, turning the sounds of the numbers into a sentence, like the one about the warbler singing at Heian-kyo, makes them hard to forget. However, number-word puns only let you memorize the numbers, and you won't pick up the flow of why the capital moved in that year. Once you've pinned down a date this way, try to memorize it linked with the events before and after it. Doing so gives you the ability to handle written-answer questions as well.",
+      "original": true,
+      "register": "学",
+      "topic": "history",
+      "tipJa": "年号や数字の音を、意味のある文に当てはめて覚える工夫。",
+      "grammar": ["n3-you-ni", "n2-ue-de", "n3-koto-de"]
+    },
+    {
+      "ja": "数字を言葉に置き換えて覚える工夫は、日本だけのものではない。インドには古くから、サンスクリットの子音一つ一つに数字を対応させ、数を単語や詩の形で表す仕組みがあった。南インドの天文学者たちは、この方法で長い数値を詩に織り込み、暗唱によって伝えたとされる。いわば日本の語呂合わせを、より体系的にしたものと言えよう。文字に頼らず知識を受け継いできた文化にとって、数とは書き留めるものではなく、口ずさむものだったのである。",
+      "form": "語呂合わせ",
+      "en": "The device of replacing numbers with words to memorize them is not unique to Japan. In India, since long ago, there was a system that matched a number to each Sanskrit consonant and expressed numbers in the form of words and verses. Astronomers in southern India are said to have used this method to weave long numerical values into verses and pass them on by recitation. It could be called, so to speak, a more systematic version of Japan's number-word puns. For a culture that handed down knowledge without relying on writing, numbers were not something to write down but something to hum aloud.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "数字の音を言葉に置き換えて、覚えやすくする工夫。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "4": [
+    {
+      "ja": "今回は、沖縄の暮らしから心の持ち方を学ぶ本を紹介します。沖縄の人がよく口にする言葉に、なんくるないさ、があります。のんきな楽観のように聞こえますが、本来は、誠実に生きていれば、という意味の言葉と組になっていたとも言われています。つまり、何もしないで構えているのではなく、やるべきことをやったうえで、結果に必要以上にくよくよしないという考え方なんですね。努力と開き直りを両立させるところに、この言葉の強さがあるというわけです。",
+      "form": "なんくるない",
+      "en": "This time I'll introduce a book that teaches a way of holding your mind from life in Okinawa. Among the words Okinawans often say is nankurunaisa. It sounds like carefree optimism, but originally it is also said to have been paired with words meaning if you live sincerely. In other words, it's not about sitting back and doing nothing, but the idea of not fretting more than necessary over the result once you've done what you should do. The strength of this saying, then, lies in reconciling effort with a kind of letting go.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "沖縄の言葉で、心配しなくても物事はうまく運ぶという意味。",
+      "grammar": ["n3-you-ni", "n5-teiru", "n3-dewa-naku", "n2-ue-de"]
+    },
+    {
+      "ja": "仏教では、自分の思いどおりにならないものにしがみつくことが、苦しみの根になると考える。未来の結果もその一つであり、いくら心配しても、すべてを思うままに動かせるわけではない。沖縄のなんくるないという言葉には、この教えに通じる響きがあるように思う。それは投げやりな諦めではなく、今できることに心を注ぎ、あとは流れに任せる落ち着きである。結果への執着を手放したとき、人はかえって目の前のことに力を出せるのではないだろうか。",
+      "form": "なんくるない",
+      "en": "In Buddhism, clinging to what does not go as one wishes is thought to be the root of suffering. Future outcomes are one such thing, and however much we worry, it is not as though we can move everything as we please. I feel that the Okinawan word nankurunai has a ring that connects with this teaching. It is not reckless resignation, but a calm that pours the heart into what can be done now and leaves the rest to the flow of things. When we let go of attachment to results, might we not, on the contrary, be able to put our strength into what is before our eyes?",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "沖縄の言葉で、心配しなくても物事はうまく運ぶという意味。",
+      "grammar": ["n3-wake-dewa-nai", "n3-you-ni", "n3-dewa-naku"]
+    },
+    {
+      "ja": "なんくるないって、翻訳アプリに通すと、大丈夫の一言で片付けられちゃうじゃないですか。でも沖縄出身の知り合いいわく、やるべきことを誠実にこなしていれば、物事はいずれ丸く収まるっていう含みがあるらしいんですよ。ただの楽観ではなく、もっと地に足のついた前向きさなんですって。AIの翻訳精度って格段に上がってますけど、土地に根付いた言葉の奥行きまでは、まだ拾いきれないんですよね。言葉の背景にある暮らしぶりを知らないと訳せないものってあるんだなって、痛感しました。",
+      "form": "なんくるない",
+      "en": "When you run nankurunai through a translation app, it gets brushed off as a single word like it's okay, right? But according to an acquaintance from Okinawa, it carries the nuance that if you diligently do what you should, things will work out in time. Apparently it's not mere optimism but a more down-to-earth kind of positivity. The accuracy of AI translation has gone up dramatically, but it still can't pick up the depth of words rooted in a place. It really hit me that there are things you can't translate unless you know the way of life behind the words.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "沖縄の言葉で、心配しなくても物事はうまく運ぶという意味。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "24": [
+    {
+      "ja": "今回は、人間関係の悩みを減らすヒントをくれる本を紹介します。著者によれば、私たちは本当のことを伝えると関係が壊れるのではないかと、必要以上に恐れているそうです。ところが実際には、多少言いにくいことでも、正直に打ち明けてくれた人のほうが、長い目で見て信頼されやすいといいます。小さなうそは一時的に場を丸く収めるものの、それを守るためにさらにうそを重ねることになりかねません。誠実さは、結局いちばん手間のかからない生き方だというわけですね。",
+      "form": "正直",
+      "en": "This time I'll introduce a book that gives hints for reducing worries in relationships. According to the author, we fear more than necessary that telling the truth will break a relationship. In reality, though, people who frankly confess things even when they are somewhat hard to say are more easily trusted in the long run, the author says. A small lie may smooth things over for the moment, but it can lead to piling up further lies to protect it. Sincerity, in the end, is the way of living that takes the least effort.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「正直に打ち明ける」「正直に話す」のように、に＋動詞の形が定番。",
+      "grammar": ["n5-teiru", "n2-mono-no", "n3-koto-ni-naru"],
+      "sense": "うそやごまかしがないこと。"
+    },
+    {
+      "ja": "対話型のAIが、事実と異なる内容をもっともらしく答えてしまう問題への対策が進んでいる。各社は、根拠が不確かな場合には分からないと正直に答えるよう、AIの学習方法を工夫している。利用者にとっては、何でも答えるAIより、自分の限界を示すAIのほうが信頼しやすいとの見方もある。ただ、慎重になりすぎると役に立つ回答まで控えてしまうため、そのバランスが課題となっている。",
+      "form": "正直",
+      "en": "Measures are advancing against the problem of conversational AI plausibly giving answers that differ from the facts. Companies are devising ways of training AI so that when the grounds are uncertain it honestly answers that it does not know. There is also the view that, for users, an AI that shows its own limits is easier to trust than an AI that answers anything. However, becoming too cautious makes it hold back even useful answers, so that balance has become a challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「正直に答える」は、知らないことや都合の悪いことも隠さず答えること。",
+      "grammar": ["n5-teiru"],
+      "sense": "うそやごまかしがないこと。"
+    },
+    {
+      "ja": "仏教では、在家の信者が守るべき五つの戒めの一つとして、うそをつかないことが挙げられている。これは単に他人をだまさないためだけの決まりではない。小さなうそでも、一度つけば、それを覚えておき、つじつまを合わせ続けなければならない。自分の言葉と心の中身がずれていると、人はそのずれを取りつくろうことに、気づかぬうちに力を使い続けることになるからである。正直であることは、他人のためである以上に、自分の心を軽くするための道なのである。",
+      "form": "正直",
+      "en": "In Buddhism, not lying is listed as one of the five precepts that lay followers should keep. This is not a rule merely for the sake of not deceiving others. Even a small lie, once told, has to be remembered and kept consistent. That is because when one's words and the contents of one's heart are out of line, one ends up continuing, without noticing, to spend strength on covering up that gap. Being honest, more than being for the sake of others, is a path for lightening one's own heart.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「正直である」は書き言葉で、うそのない誠実な態度を表す。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"],
+      "sense": "うそやごまかしがないこと。"
+    }
+  ],
+  "25": [
+    {
+      "ja": "今回は、インテルを率いたアンディ・グローブの『パラノイアだけが生き残る』を紹介します。1980年代、インテルは主力だったメモリー事業で日本のメーカーに押され、苦しい立場に追い込まれていました。そこでグローブは、もし自分たちが追い出されて新しい経営者が来たら何をするだろうかと考え、創業以来の事業から手を引く決断をします。そしてマイクロプロセッサーに集中したことが、その後の成長につながりました。率直に言って、過去の成功を自ら捨てる判断は、誰にでもできるものではありません。",
+      "form": "率直に言って",
+      "en": "This time I'll introduce Only the Paranoid Survive by Andy Grove, who led Intel. In the 1980s, Intel was pushed by Japanese manufacturers in its mainstay memory business and driven into a difficult position. So Grove thought about what a new executive would do if they themselves were thrown out and one came in, and made the decision to pull out of the business the company had been in since its founding. And focusing on microprocessors led to its growth after that. Frankly speaking, a decision to throw away one's own past success is not something just anyone can make.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "厳しい意見や本音の前に置く前置き。改まった場では「率直に申し上げて」とも言う。"
+    },
+    {
+      "ja": "厳しい内容を伝える前に、率直に言って、と前置きを入れると、聞き手は本音の話が始まると心構えができます。ただ、多用すると、ほかの発言は本音ではないのかと思われかねません。相手が身構えすぎないよう、声の調子は落ち着いたままにするのも大切です。使うのは本当に大事な場面に絞り、そのあとは言い訳をはさまずに、短く結論を述べましょう。最後に相手への期待を一言添えると、厳しさが攻撃ではなく励ましとして伝わりやすくなります。",
+      "form": "率直に言って",
+      "en": "If you add the preface frankly speaking before conveying something harsh, the listener can brace themselves for the fact that an honest talk is beginning. However, if you overuse it, people may wonder whether your other remarks are not sincere. It is also important to keep your tone of voice calm so that the other person does not become too defensive. Limit its use to truly important moments, and after it, state your conclusion briefly without inserting excuses. If you add a word at the end about what you expect of the other person, the harshness is more easily received as encouragement rather than an attack.",
+      "original": true,
+      "register": "語",
+      "topic": "mind",
+      "tipJa": "厳しい意見や本音の前に置く前置き。改まった場では「率直に申し上げて」とも言う。",
+      "grammar": ["n3-dewa-naku"]
+    },
+    {
+      "ja": "仏典には、ブッダが言葉を選ぶ基準を語ったとされる場面がある。真実であり、相手のためになる言葉であれば、たとえ相手が聞きたくないことでも、ふさわしい時を選んで語るのだという。率直に言って、これは私たちの日常の会話とは正反対である。私たちは、相手が喜ぶかどうかを先に考え、真実かどうかは後回しにしてしまう。厳しいことを言うのに必要なのは勇気だけではなく、相手を思う心と時を待つ忍耐なのである。",
+      "form": "率直に言って",
+      "en": "In the Buddhist scriptures there is a scene in which the Buddha is said to have spoken of his standard for choosing words. If words are true and of benefit to the other person, he would speak them, choosing a fitting time, even if they were something the other person did not want to hear. Frankly speaking, this is the exact opposite of our everyday conversation. We think first about whether the other person will be pleased and put off whether it is true. What is needed to say something harsh is not only courage but a heart that cares for the other and the patience to wait for the right time.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "厳しい意見や本音の前に置く前置き。改まった場では「率直に申し上げて」とも言う。",
+      "grammar": ["n5-tai", "n3-dewa-naku"]
+    }
+  ]
+}

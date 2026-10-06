@@ -1,0 +1,328 @@
+{
+  "39": [
+    {
+      "ja": "今日は、人が笑うしくみを扱った本を要約していきます。著者によると、私たちが何かを滑稽だと感じるのは、本人がまじめにふるまっているのに、結果がずれてしまったときなんだそうです。たとえば、かっこよく決めようとした人が段差でつまずくと、つい笑ってしまいますよね。ポイントは、本人が笑わせようとしていないところにあるわけです。わざと狙った笑いより、意図とのずれから生まれる笑いのほうが強い、というのがこの本の主張なんです。",
+      "form": "滑稽",
+      "en": "Today I'm going to summarize a book about how laughter works. According to the author, we find something comical when a person is behaving seriously but the result goes off track. For example, when someone trying to look cool trips on a step, we can't help laughing, right? The key point is that the person isn't trying to make anyone laugh. The book's argument is that laughter born from a gap with someone's intention is stronger than laughter aimed for on purpose.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「滑稽な姿」「滑稽に見える」の形が多い。笑われる側を少し見下す響きがある。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "思わず笑いたくなるような、おかしさがあるようす。"
+    },
+    {
+      "ja": "対話型AIに冗談を言わせる研究が各地で進んでいる。言葉遊びや決まった型のジョークは作れるようになったものの、その場の空気に応じた笑いを生むのはまだ難しいとされる。人がある状況を滑稽だと感じるには、期待と現実のずれを一瞬で読み取る必要があるためだ。専門家の間では、笑いの理解こそが言葉の理解の到達点の一つだという見方もある。研究者らは、笑いが生まれる仕組みを調べることが、人の心の働きを知る手がかりにもなると期待している。",
+      "form": "滑稽",
+      "en": "Research into getting conversational AI to tell jokes is advancing in various places. Although it has become able to produce wordplay and jokes of a set pattern, creating laughter that suits the mood of the moment is said to still be difficult. That is because, for a person to find a situation comical, they must read the gap between expectation and reality in an instant. Among experts there is also the view that understanding humor is one of the high points of understanding language. Researchers hope that studying how laughter arises will also offer clues to how the human mind works.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru", "n4-you-ni-naru", "n2-mono-no", "n2-ni-oujite"],
+      "sense": "思わず笑いたくなるような、おかしさがあるようす。"
+    },
+    {
+      "ja": "インドの仏典に伝わる説話には、一見すると笑い話のようなものがある。井戸に映った月を本物だと思い込んだ猿たちが、手をつないで枝からぶら下がり、枝が折れてそろって水に落ちるという話もその一つである。その姿は確かに滑稽だが、実体のないものを必死につかもうとしている点では、笑っている私たちも猿と大差ないのではないか。説話が笑いを入り口にするのは、聞き手が自分の姿に気づくまでの距離を縮めるためなのだろう。",
+      "form": "滑稽",
+      "en": "Among the parables handed down in Indian Buddhist scriptures, there are some that at first glance look like funny stories. One of them tells of monkeys who, convinced that the moon reflected in a well was real, joined hands and hung down from a branch, until the branch broke and they fell into the water together. Their figure is certainly comical, but in that we too desperately try to grasp things without substance, are we who laugh really so different from the monkeys? Parables probably use laughter as a way in, in order to shorten the distance before listeners notice themselves.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n5-teiru"],
+      "sense": "ばかばかしくて、思わず笑いたくなるようす。"
+    }
+  ],
+  "48": [
+    {
+      "ja": "今回は、本能寺の変をめぐる謎を整理した本を要約します。明智光秀が主君の織田信長を討ったこの事件は、動機がいまだにはっきりしていません。そのため、光秀をそそのかして信長を倒そうとたくらんだ人物が別にいたのではないかという説が、昔から数多く唱えられてきました。著者は、こうした黒幕説の多くが、確かな史料ではなく後の時代の推測に頼っていると指摘しています。歴史の謎は、面白さよりも根拠の確かさで見ていこう、というのが本書のメッセージです。",
+      "form": "たくらんだ",
+      "en": "This time I'll summarize a book that sorts out the mysteries surrounding the Honnoji Incident. In this incident, in which Akechi Mitsuhide struck down his lord Oda Nobunaga, the motive is still unclear today. For that reason, theories that there was someone else who schemed to bring Nobunaga down by egging Mitsuhide on have been put forward in great numbers for a long time. The author points out that many of these mastermind theories rely not on reliable historical sources but on guesses from later eras. The book's message is: let's look at historical mysteries by how solid the evidence is rather than by how interesting they are.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「悪事をたくらむ」のように、悪い計画に使う。ひらがなで書くことが多い。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"],
+      "sense": "よくないことを、ひそかに計画する。"
+    },
+    {
+      "ja": "生成AIで家族の声をまねる詐欺が、各国で問題になっている。よからぬことをたくらむ者にとって、声や文章を本物らしく作れる技術は都合のよい道具になりかねない。子や孫を名乗る電話を信じて、まとまったお金を送ってしまう被害も報じられている。警察などは、電話でお金の話が出たら一度切って、本人に直接確かめるよう呼びかけている。技術の進歩に応じて、受け手の側にも新しい用心が求められている。",
+      "form": "たくらむ",
+      "en": "Scams that imitate family members' voices with generative AI have become a problem in various countries. For those scheming something sinister, technology that can make voices and writing look genuine could become a convenient tool. Cases have also been reported of people who believed calls from someone claiming to be a child or grandchild and sent a large sum of money. The police and others are urging people to hang up once if money comes up on a call, and to check directly with the person in question. As technology advances, new caution is being demanded of those on the receiving end too.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru", "n2-ni-oujite"],
+      "sense": "よくないことを、ひそかに計画する。"
+    },
+    {
+      "ja": "人は、他人の何気ない言動の裏に、悪意を読み取ってしまうことがある。同僚の小声の会話を耳にすれば、自分を外そうとたくらんでいるのではないかと思えてくる。しかし実際には、相手はただ昼食の店の相談をしていたにすぎないことのほうが多い。不安が強いときほど、心は分からない部分を最悪の筋書きで埋めようとするのである。疑いが頭をもたげたら、まず確かな事実だけを並べてみることだ。",
+      "form": "たくらんで",
+      "en": "People sometimes read malice behind others' casual words and actions. When you overhear coworkers' hushed conversation, you start to think they might be scheming to push you out. In reality, however, it is more often the case that they were merely discussing where to have lunch. The stronger one's anxiety, the more the mind tries to fill what it doesn't know with the worst possible scenario. When suspicion raises its head, the thing to do is first to line up only the facts that are certain.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n5-teiru", "n2-ni-suginai"],
+      "sense": "よくないことを、ひそかに計画する。"
+    }
+  ],
+  "49": [
+    {
+      "ja": "今回は、記憶のしくみを解説した本から、思い出すという行為について要約します。昔の旅行のことを思い出そうとしても、場面が途切れ途切れにしか浮かんでこないこと、誰にでもありますよね。著者によれば、脳は出来事をビデオのように丸ごと保存しているわけではないそうです。残った断片をもとに、その都度話をつなぎ直しているので、思い出すたびに中身が少しずつ変わることもあるんですね。",
+      "form": "途切れ途切れ",
+      "en": "This time, from a book explaining how memory works, I'll summarize the act of remembering. Even when you try to recall a trip from long ago, the scenes only come to mind in broken bits; that happens to everyone, right? According to the author, the brain doesn't store events whole like a video. Because it reconnects the story each time based on the fragments that remain, what you remember can change little by little each time you recall it.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「途切れ途切れに聞こえる」「途切れ途切れの記憶」のように、声や記憶によく使う。",
+      "grammar": ["n3-wake-dewa-nai", "n5-teiru"],
+      "sense": "続かずに、何度も切れ切れになるようす。"
+    },
+    {
+      "ja": "通信が不安定な環境でのオンライン会議では、相手の声が途切れ途切れになることが少なくない。こうした問題に対し、AIで欠けた音声を補う技術の開発が進んでいる。直前の声の特徴をもとに、聞こえなかった部分をそれらしく埋める仕組みだ。ただ、実際には言っていない言葉まで補ってしまうおそれもあり、使い方には注意が必要だとされる。それでも、聞き取れなかった発言を何度も聞き返す手間が減るとして、期待する声は大きい。",
+      "form": "途切れ途切れ",
+      "en": "In online meetings over unstable connections, it is not rare for the other person's voice to come through in broken bits. To deal with this problem, development of technology that fills in missing audio with AI is advancing. It is a system that, based on the features of the voice just before, plausibly fills in the parts that could not be heard. However, there is also a risk that it will fill in words that were never actually said, so care is said to be needed in how it is used. Even so, expectations are high, since it would cut down on the trouble of asking again and again about remarks that could not be heard.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "続かずに、何度も切れ切れになるようす。"
+    },
+    {
+      "ja": "古代の記録は、そのほとんどが完全な形では残っていない。焼けた木簡や欠けた石碑から読み取れるのは、意味の通らない途切れ途切れの文字にすぎないことも多い。研究者はその隙間を、ほかの資料や当時の制度の知識で慎重に補っていく。だが、埋めた部分はあくまで推定であり、確かな事実とは区別しておかなければならない。歴史とは、残された断片と失われた空白の両方と向き合う営みなのである。",
+      "form": "途切れ途切れ",
+      "en": "Most ancient records do not survive in complete form. What can be read from burned wooden tablets and chipped stone monuments is often nothing more than broken fragments of writing that make no sense. Researchers carefully fill those gaps using other materials and knowledge of the institutions of the time. But the filled-in parts are only estimates, and must be kept distinct from established facts. History is the work of facing both the fragments that remain and the blanks that have been lost.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "grammar": ["n2-ni-suginai", "n4-teiku"],
+      "sense": "続かずに、何度も切れ切れになるようす。"
+    }
+  ],
+  "54": [
+    {
+      "ja": "今回は、思春期の脳について書かれた本を要約します。十代の子どもが親に反抗的な態度をとるのは、性格の問題だけではなく、脳が育つ順番も関係しているそうです。感情を生み出す部分が先に成熟するのに対して、それを抑える前頭前野はゆっくり時間をかけて育っていくんですね。親としては、口答えや無視をいちいち正面から受け止めて叱らず、成長の一段階として見守るのがよいと著者は言います。",
+      "form": "反抗的",
+      "en": "This time I'll summarize a book written about the adolescent brain. When teenagers take a defiant attitude toward their parents, it apparently isn't only a matter of personality; the order in which the brain develops is also involved. The parts that generate emotion mature first, whereas the prefrontal cortex that holds them in check develops slowly, taking its time. The author says that, as a parent, it is best not to meet every bit of talking back or ignoring head-on with a scolding, but to watch over it as one stage of growth.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「反抗的な態度をとる」の形が多い。子どもや部下など、下の立場の人について言う。",
+      "grammar": ["n3-dewa-naku", "n4-teiku", "n5-teiru"],
+      "sense": "目上の人や決まりに、逆らおうとするようす。"
+    },
+    {
+      "ja": "対話型AIの応答が、利用者から反抗的だと受け止められることがある。危険な依頼を断ったり、利用者の思い違いを指摘したりすると、口答えをされたように感じる人がいるためだ。開発各社は、安全のための判断を保ちながら、相手を不快にさせない言い回しの工夫を重ねている。専門家の間では、何でも言いなりになるAIのほうがかえって危ういという指摘もある。どこまで利用者に合わせ、どこで断るかの線引きをめぐっては、今も手探りが続いている。",
+      "form": "反抗的",
+      "en": "Responses from conversational AI are sometimes perceived by users as defiant. This is because when it declines dangerous requests or points out a user's misunderstanding, some people feel as though they have been talked back to. Developers keep refining their wording so as not to offend people, while keeping the judgments they make for safety. Among experts there is also the point that an AI that goes along with anything is actually the more dangerous one. Where to draw the line between going along with users and refusing is still being worked out by trial and error.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n4-nagara", "n5-teiru"],
+      "sense": "目上の人や決まりに、逆らおうとするようす。"
+    },
+    {
+      "ja": "いつの時代も、権力の側から見て反抗的な者は、秩序を乱す存在として扱われてきた。しかし後の世から振り返ると、彼らの訴えが新しい制度の出発点になっていたことも少なくない。異論を唱える声を早くから力で封じてしまえば、社会は自らの誤りに気づく機会を失うことになる。もちろん、ただ従わないこと自体に何か価値があるわけではない。問われるべきは、その声が誰の何に向けられていたかである。",
+      "form": "反抗的",
+      "en": "In every era, those who were defiant in the eyes of those in power have been treated as people who disturb order. But looking back from later ages, it is not rare that their demands had become the starting point of new institutions. If a society silences dissenting voices early by force, it ends up losing the chance to notice its own mistakes. Of course, merely refusing to obey has no particular value in itself. What should be asked is at whom, and at what, those voices were directed.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "grammar": ["n3-koto-ni-naru", "n3-wake-dewa-nai"],
+      "sense": "目上の人や決まりに、逆らおうとするようす。"
+    }
+  ],
+  "55": [
+    {
+      "ja": "今回は、インドのヨーガの古典をやさしく解説した本を要約します。著者がまず強調するのは、ヨーガがもともと体を柔らかくするための体操ではなく、心の動きを静めるための修行だったという点です。呼吸に意識を向ける練習を続けていくと、散らばっていた注意がまとまり、集中する力が一層高まると説明されています。ポーズの完成度より、呼吸の質に目を向けてほしいというのが、著者からのメッセージなんですね。",
+      "form": "一層",
+      "en": "This time I'll summarize a book that explains a classic of Indian yoga in plain terms. What the author stresses first is that yoga was originally not exercise for making the body flexible, but a discipline for calming the movements of the mind. The book explains that as you keep practicing turning your awareness to your breath, your scattered attention comes together and your ability to concentrate rises even further. The author's message is that we should pay attention to the quality of our breathing rather than how perfect our poses are.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「一層高まる」「より一層」の形が多い。改まった文章やあいさつでよく使う。",
+      "grammar": ["n3-dewa-naku", "n4-teiku", "n5-teiru"],
+      "sense": "程度が、前よりもさらに増すようす。"
+    },
+    {
+      "ja": "生成AIの普及に伴い、データセンターの電力需要が急速に伸びている。大規模なAIモデルの学習や利用には大量の計算が必要で、今後も一層の増加が見込まれる。各地では発電所や送電網の整備が追いつかず、新たな施設の建設が遅れる例も出ている。データセンターを、電源を確保しやすい地域に分散させる案も議論されている。省エネ型の半導体や冷却技術の開発が、業界にとって大きな課題となっている。",
+      "form": "一層",
+      "en": "With the spread of generative AI, electricity demand from data centers is growing rapidly. Training and using large AI models requires an enormous amount of computation, and demand is expected to increase even further from here. In various places, building power plants and transmission grids has failed to keep up, and there are even cases where construction of new facilities is delayed. Proposals to spread data centers out to regions where power is easier to secure are also being discussed. Developing energy-saving chips and cooling technology has become a major challenge for the industry.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "程度が、前よりもさらに増すようす。"
+    },
+    {
+      "ja": "孤独は、ひとりきりの部屋よりも、人混みの中でこそ一層深く感じられるものである。周りに大勢の人がいるのに、誰とも心が通っていないという事実が、かえって際立つからだ。逆に、ひとりで過ごす時間がいつも寂しいわけではない。人が恐れているのは、物理的にひとりであることではなく、誰ともつながっていないという感覚なのだろう。孤独を和らげるのは、人の数ではなく、関係の深さなのである。",
+      "form": "一層",
+      "en": "Loneliness is something felt even more deeply in a crowd than in a room where one is all alone. That is because the fact that one's heart connects with no one, despite the many people around, stands out all the more. Conversely, time spent alone is not always lonely. What people fear is probably not being physically alone, but the sense of being connected to no one. What eases loneliness is not the number of people but the depth of one's relationships.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "grammar": ["n3-wake-dewa-nai", "n3-dewa-naku", "n5-teiru"],
+      "sense": "程度が、前よりもさらに増すようす。"
+    }
+  ],
+  "77": [
+    {
+      "ja": "今回は、人前で緊張しやすい人に向けた本を要約します。キーワードはスポットライト効果で、自分が思っているほど周りの人は自分を見ていない、という心理のことです。ある実験では、目立つシャツを着て教室に入った学生が、それに気づいた人の数を実際よりかなり多く見積もったそうです。寝ぐせや小さな言い間違いを一日中気にしてしまうのは、ちょっと自意識過剰なのかもしれません。他人はみんな、自分のことで手一杯なんですね。",
+      "form": "自意識過剰",
+      "en": "This time I'll summarize a book for people who get nervous in front of others. The keyword is the spotlight effect, the psychology whereby the people around you aren't looking at you nearly as much as you think. In one experiment, students who walked into a classroom wearing a conspicuous shirt reportedly estimated the number of people who noticed it as considerably higher than it really was. Fretting all day over bedhead or a small slip of the tongue may be a bit overly self-conscious. Everyone else has their hands full with their own business.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「自意識過剰だ」「自意識過剰になる」の形で、少し責めるように使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "人からどう見られるかを、気にしすぎること。"
+    },
+    {
+      "ja": "AIで顔を自動で整える加工アプリの普及が、若い世代の外見への不安を強めているとの指摘がある。加工した自分の顔を見慣れることで、鏡に映る素顔が以前より気になるようになるためだという。専門家は、こうした悩みを単なる自意識過剰として片付けるのではなく、周囲がまず話を聞く姿勢が大切だと話している。一方で、広告などで写真の加工の有無を表示するよう求める動きも、海外を中心に出ている。",
+      "form": "自意識過剰",
+      "en": "It has been pointed out that the spread of editing apps that use AI to touch up faces automatically is heightening the younger generation's anxiety about their looks. This is said to be because, by getting used to seeing their edited faces, people become more bothered than before by their bare faces in the mirror. Experts say it is important that those around them not dismiss such worries as mere self-consciousness, but first be willing to listen. Meanwhile, there are also moves, mainly overseas, to require that ads and the like show whether their photos have been edited.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru", "n3-koto-de", "n4-you-ni-naru", "n3-dewa-naku"],
+      "sense": "人からどう見られるかを、気にしすぎること。"
+    },
+    {
+      "ja": "初めてインドに行ったとき、街を歩いてるだけで、みんなにじろじろ見られてる気がしたんですよ。外国人って、やっぱり目立つじゃないですか。それで最初の日はずっと縮こまってたんですけど、次の日にふと周りを見たら、みんな値段の交渉とか自分の用事で忙しそうで。なんだ、ただの自意識過剰だったのかって、急に肩の力が抜けました。向こうからしたら、こっちのことなんて誰も気にしてなかったと思います。",
+      "form": "自意識過剰",
+      "en": "When I first went to India, I felt like everyone was staring at me just because I was walking down the street. Foreigners stand out, after all, right? So I spent the whole first day shrinking into myself, but the next day, when I happened to look around, everyone seemed busy haggling over prices and with their own errands. I went, oh, I was just being overly self-conscious, and suddenly I relaxed. From their side, I don't think anyone was paying me any attention at all.",
+      "original": true,
+      "register": "話",
+      "topic": "india",
+      "sense": "人からどう見られるかを、気にしすぎること。"
+    }
+  ],
+  "85": [
+    {
+      "ja": "今回は、権力が人をどう変えるかを扱ったビジネス書を要約します。昇進したとたんに部下に威張り散らすようになる人、職場で見かけたことはありませんか。著者によれば、力を持つと他人の気持ちを想像する働きが弱まりやすいことが、心理学の研究で示されているそうです。つまり、もとから性格が悪かったというより、立場が人を変えてしまう面があるんですね。だからこそ、上に立つ人ほど、耳の痛い意見をあえて聞く仕組みを周りに作っておくべきだと著者は説いています。",
+      "form": "威張り散らす",
+      "en": "This time I'll summarize a business book about how power changes people. Have you ever seen someone at work who starts bossing their subordinates around the moment they're promoted? According to the author, psychological research has shown that having power tends to weaken our ability to imagine other people's feelings. In other words, it's not so much that they had a bad character to begin with; there's a side to it where position changes people. That's exactly why, the author argues, the higher someone stands, the more they should set up ways around themselves to deliberately hear unwelcome opinions.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「部下に威張り散らす」のように「〜に」で相手を示す。周り中に向ける感じがある。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru"],
+      "sense": "周りの人に、やたらとえらそうな態度をとる。"
+    },
+    {
+      "ja": "最近、AIにすごい命令口調で話しかけてる人、いるじゃないですか。早くしろとか、使えないなとか、平気で言っちゃって。相手は機械だから別にいいんですけど、なんか見てると、ふだんも後輩に威張り散らしてるのかなって想像しちゃうんですよね。人って、相手が言い返せないときに本性が出るって言うじゃないですか。逆に、AIにもちゃんとお礼を言う人って、それだけでちょっと信用できる気がします。",
+      "form": "威張り散らし",
+      "en": "Lately there are people who talk to AI in a really bossy, commanding tone, right? Saying stuff like hurry up, or you're useless, without a second thought. It's a machine, so it doesn't really matter, but somehow when I watch it, I can't help imagining they boss their juniors around the rest of the time too. They say people show their true nature when the other side can't talk back, right? On the other hand, people who properly say thank you even to AI, I feel like I can trust them a bit just for that.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "sense": "周りの人に、やたらとえらそうな態度をとる。"
+    },
+    {
+      "ja": "歴史をひもとくと、地位を得たとたんに周りに威張り散らした者が、長く権力を保てた例は多くない。力で押さえつけられた家臣や民は、表向きは従っていても、心の中では離れていくからである。恐れによる服従は、権力の後ろ盾が傾いた瞬間にもろく崩れ去る。反対に、身分の低い者の声にも耳を傾けた支配者は、危機の際にも支えを得やすかった。人の上に立つ者の器は、命令する力ではなく、従う者の信頼によって測られるのだろう。",
+      "form": "威張り散らし",
+      "en": "Looking through history, there are not many cases in which those who bossed everyone around as soon as they gained status managed to hold on to power for long. That is because retainers and common people held down by force drift away in their hearts, even if they obey on the surface. Obedience born of fear crumbles easily the moment the backing of power begins to tilt. Conversely, rulers who listened even to the voices of those of low rank found it easier to win support in times of crisis. The caliber of one who stands above others is probably measured not by the power to command, but by the trust of those who follow.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "sense": "周りの人に、やたらとえらそうな態度をとる。"
+    }
+  ],
+  "86": [
+    {
+      "ja": "今回は、人間関係の悩みを心理学から読み解く本を要約します。著者によれば、周りを見下して威張りくさった態度をとる人ほど、実は心の奥に強い不安を抱えていることが多いそうです。自分の価値に自信が持てないので、他人を下に置くことでしか安心できないんですね。職場や学校で、そういう人に振り回されて疲れている人も多いのではないでしょうか。でも、その強気が不安の裏返しだと分かれば、相手の言葉をまともに受け止めて落ち込む必要はない、というのが著者のアドバイスです。",
+      "form": "威張りくさった",
+      "en": "This time I'll summarize a book that interprets troubles in human relationships through psychology. According to the author, the more someone looks down on those around them and acts high and mighty, the more often they are actually carrying strong anxiety deep in their heart. Because they can't feel confident in their own worth, they can only feel at ease by putting others beneath them. Many of you are probably worn out from being pushed around by such people at work or school. But the author's advice is that once you see their bravado as the flip side of anxiety, there is no need to take their words at face value and feel down.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「くさる」は相手の態度をののしる言い方。「威張りくさって」の形で、話し言葉で使う。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
+    },
+    {
+      "ja": "時代劇の悪代官って、だいたい威張りくさってるじゃないですか。でも実際の代官って、幕府から任されて、少ない人数で広い土地を治めなきゃいけなくて、けっこう大変な仕事だったらしいんですよ。年貢を集めたり、もめ事を収めたり、村の人たちとうまくやらないと回らなかったみたいで。テレビのイメージだけで決めつけちゃうと、ちょっとかわいそうかもしれないですね。もちろん、中には本当にひどい人もいたんでしょうけど。",
+      "form": "威張りくさってる",
+      "en": "The evil magistrates in period dramas are usually acting all high and mighty, right? But apparently real magistrates, entrusted by the shogunate, had to govern large areas of land with only a few people, and it was a pretty tough job. It seems things didn't run unless they collected the annual rice tax, settled disputes, and got along well with the villagers. If you judge them only by the image on TV, it might be a bit unfair to them. Of course, there were probably some who really were awful.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
+    },
+    {
+      "ja": "インドで生まれた仏教では、他人と比べて自分を高く置こうとする心を慢と呼び、心を曇らせる煩悩の一つに数える。地位や知識を盾にして威張りくさる人が、その典型であることは言うまでもない。だが、そうした人に腹を立てるとき、自分の中にも、あの人よりはましだという同じ心が動いてはいないだろうか。慢は、他人を見下す形だけでなく、他人を裁く形でも現れるのである。相手の態度を責める前に、自分の心の動きにも目を向けておきたい。",
+      "form": "威張りくさる",
+      "en": "In Buddhism, which was born in India, the mind that tries to place oneself high by comparing oneself with others is called conceit, and it is counted among the defilements that cloud the mind. It goes without saying that people who act high and mighty, using their status or knowledge as a shield, are a typical example. But when we get angry at such people, isn't the same mind, the thought that we are better than that person, at work within us too? Conceit appears not only in the form of looking down on others, but also in the form of judging them. Before blaming the other person's attitude, I would like to turn my eyes to the movements of my own mind as well.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n1-made-mo-nai", "n5-tai"],
+      "sense": "ひどくえらそうにふるまう。人を悪く言う言い方。"
+    }
+  ],
+  "90": [
+    {
+      "ja": "今回は、感情が人から人へうつるしくみを扱った本を要約します。面接やスピーチの前に、緊張している人のそばにいると、こちらまでその緊張がビンビン伝わってくること、ありますよね。著者によれば、これは情動伝染と呼ばれる現象で、人は相手の表情や姿勢を無意識にまねることで、同じ気持ちを味わうそうです。だから、大事な場面ほど、まず自分がゆったり構えることが、相手を落ち着かせる近道になるんですね。",
+      "form": "ビンビン",
+      "en": "This time I'll summarize a book about how emotions pass from person to person. Before an interview or a speech, when you're near someone who is nervous, their nervousness comes across to you intensely too, doesn't it? According to the author, this is a phenomenon called emotional contagion, in which people unconsciously mimic the other person's facial expressions and posture and thereby experience the same feelings. So the more important the occasion, the more staying relaxed yourself first becomes a shortcut to calming the other person down.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「ビンビン伝わる」「ビンビン感じる」の形でよく使う。くだけた話し言葉。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "刺激や感情などが、強く伝わってくるようす。"
+    },
+    {
+      "ja": "この前、インドのムンバイでガネーシャのお祭りの行列を見たんですよ。象の頭をした神様の大きな像を、みんなで飾り付けた車に載せて、街じゅうを練り歩くんです。太鼓の音って、すぐ近くで聞くと体に直接響くじゃないですか。もうお腹の底までビンビン来て、気づいたら知らない人たちと一緒に踊ってました。言葉は全然分からないんですけど、あのお祭りの熱気だけは一瞬で伝わってくるんですよね。",
+      "form": "ビンビン",
+      "en": "The other day I saw a procession for the Ganesha festival in Mumbai, India. Everyone loads a big statue of the elephant-headed god onto a decorated vehicle and parades it all through the town. Drums, when you hear them right up close, resonate directly through your body, right? It hit me so hard, right down to the pit of my stomach, and before I knew it I was dancing along with people I didn't know. I didn't understand the language at all, but the fervor of that festival alone came across in an instant.",
+      "original": true,
+      "register": "話",
+      "topic": "india",
+      "sense": "刺激や感情などが、強く伝わってくるようす。"
+    },
+    {
+      "ja": "AIが書いた文章は、文法の間違いは少ないものの、どこか書き手の体温が感じられないことがあります。一方で、多少荒削りでも、書き手の思いがビンビン伝わってくる文章もありますよね。その差を生むのは、書き手が実際に見たり聞いたりした場面が書かれているかどうかです。AIに下書きを頼むのはかまいませんが、最後に自分だけの小さな体験を一つ足すことで、文章は見違えるほど生きてきます。",
+      "form": "ビンビン",
+      "en": "Writing produced by AI has few grammatical mistakes, but sometimes you can't feel a writer's body warmth in it. On the other hand, there's also writing where, even if it's a bit rough, the writer's feelings come across intensely. What makes the difference is whether scenes the writer actually saw or heard are written into it. It's fine to ask AI for a draft, but by adding one small experience that's yours alone at the end, the writing comes alive beyond recognition.",
+      "original": true,
+      "register": "語",
+      "topic": "ai",
+      "grammar": ["n2-mono-no", "n3-koto-de", "n5-teiru"],
+      "sense": "刺激や感情などが、強く伝わってくるようす。"
+    }
+  ],
+  "91": [
+    {
+      "ja": "今回は、睡眠の質を高めるための本を要約します。夜遅くまでスマホを見ていると、体は疲れているのに、布団に入っても目がギンギンで眠れない、ということがありますよね。著者によれば、画面の光や刺激の強い情報が、脳を昼間のような興奮状態にしてしまうことが原因の一つだそうです。寝る一時間前には画面から離れ、照明も少し暗くしておく。それだけで、寝つきはずいぶん変わってくると著者は言います。",
+      "form": "ギンギン",
+      "en": "This time I'll summarize a book on improving the quality of your sleep. When you look at your phone until late at night, sometimes your body is tired but even in bed your eyes are wide open and you can't sleep, right? According to the author, one cause is that the light of the screen and highly stimulating information put the brain into an excited state as if it were daytime. Step away from screens an hour before bed, and make the lighting a little dimmer. The author says that alone will change how easily you fall asleep quite a lot.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「目がギンギン」は眠れないほどさえた状態。「ギンギンに冷えた」は冷たさを強める言い方。",
+      "grammar": ["n5-teiru"],
+      "sense": "興奮などで、目や頭がひどくさえているようす。"
+    },
+    {
+      "ja": "新しいAIのモデルが発表された日って、つい夜中までずっと触っちゃうじゃないですか。あれもできる、これもできるって夢中で試してるうちに、気づいたら目がギンギンになってて。結局、布団に入ったあとも、朝まで一睡もできなかったんですよ。次の日の会議では、資料を見るふりをしながら、ずっとあくびをこらえてました。もういい年なんだから、ほどほどにしなきゃとは毎回思ってるんですけどね。",
+      "form": "ギンギン",
+      "en": "On the day a new AI model is announced, you end up playing with it all the way till the middle of the night, right? While I was eagerly trying out how it can do this and it can do that, before I knew it I was totally wired. In the end, even after getting into bed, I couldn't get a wink of sleep until morning. At the meeting the next day, I was stifling yawns the whole time while pretending to look at the documents. I'm not that young anymore, so every time I do think I need to keep it in moderation, though.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "grammar": ["n4-nagara"],
+      "sense": "興奮などで、目や頭がひどくさえているようす。"
+    },
+    {
+      "ja": "旅の文章を書くときは、温度や音を表す言葉を一つ入れるだけで、場面がぐっと身近になります。たとえば、真夏のデリーで飲んだラッシーを、ただ冷たかったと書くのではなく、ギンギンに冷えていたと書いてみてください。それだけで、照りつける日差しと、のどを通る冷たさの落差が読み手に伝わります。ただし、くだけた言い方なので、硬い文章の中で使うと浮いてしまう点には注意しましょう。",
+      "form": "ギンギン",
+      "en": "When you write about travel, just adding one word for temperature or sound makes a scene feel much closer. For example, instead of simply writing that the lassi you drank in Delhi in midsummer was cold, try writing that it was ice-cold. That alone conveys to the reader the contrast between the blazing sun and the coldness going down your throat. However, since it's a casual expression, be careful that it will stick out if you use it in formal writing.",
+      "original": true,
+      "register": "語",
+      "topic": "india",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "飲み物などが、とても冷たく冷えているようす。"
+    }
+  ]
+}

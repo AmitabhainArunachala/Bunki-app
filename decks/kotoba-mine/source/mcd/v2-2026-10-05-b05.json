@@ -1,0 +1,349 @@
+{
+  "195": [
+    {
+      "ja": "今日は、明治の日本がどうやって工業国になったのか、という話をしていきます。当時の政府は、欧米に追いつくために産業を育てることを国策として掲げました。その象徴が、群馬県に建てられた官営の富岡製糸場です。フランスから技師を招いて、全国から集まった若い女性たちに最新の技術を学ばせたんですね。そこで技術を身につけた人たちが地元に戻って広めていったことで、生糸は日本を代表する輸出品になっていきました。",
+      "form": "国策",
+      "en": "Today I'm going to talk about how Meiji Japan became an industrial nation. The government of the time set out, as national policy, to build up industry in order to catch up with Europe and America. The symbol of that is the state-run Tomioka Silk Mill, built in Gunma Prefecture. They invited engineers from France and had young women who had gathered from all over the country learn the latest techniques. As the people who mastered the techniques there went back home and spread them, raw silk became Japan's leading export.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「国策として掲げる」「国策に沿う」の形で、国全体の大きな方針を表す。",
+      "grammar": ["n4-teiku", "n3-koto-de"],
+      "sense": "国が全体の方針として掲げて進める政策。"
+    },
+    {
+      "ja": "先端半導体の国内生産を国策と位置づける動きが、各国で広がっている。生成ＡＩの普及でデータセンター向けの需要が急増し、供給を特定の地域に頼ることへの危機感が強まったためだ。日本でも政府が巨額の補助金を投じ、北海道で新たな工場の建設が進められている。ただ、技術者の確保や電力の安定供給など課題は多く、計画通りに進むかを疑問視する声もある。政府の支援がいつまで続くのかも含め、今後の動向が注目される。",
+      "form": "国策",
+      "en": "Moves to treat domestic production of advanced semiconductors as national policy are spreading across many countries. This is because the spread of generative AI has caused demand for data centers to surge, heightening alarm about relying on particular regions for supply. In Japan too, the government is pouring in huge subsidies, and construction of a new plant is under way in Hokkaido. However, there are many challenges, such as securing engineers and a stable supply of electricity, and some voices question whether the plan will proceed as intended. How developments unfold, including how long government support will last, is being closely watched.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「国策と位置づける」「国策として推し進める」がよく使われる。",
+      "grammar": ["n5-teiru"],
+      "sense": "国が全体の方針として掲げて進める政策。"
+    },
+    {
+      "ja": "古代インドのアショーカ王は、激しい戦いで数多くの命を奪ったのち、深く悔いたと伝えられている。王はその後、仏教に帰依し、武力ではなく法による統治を国策として掲げた。その教えは石柱や岩に刻まれて広い国土の各地に置かれ、今もその一部を目にすることができる。力で人を従わせることはたやすいが、力で心まで従わせることはできない。自らの過ちを認めたところから、この王の新しい歩みは始まったのである。",
+      "form": "国策",
+      "en": "It is said that King Ashoka of ancient India, after taking a great many lives in a fierce war, was filled with deep remorse. The king later took refuge in Buddhism and set out, as national policy, to govern not by force of arms but by the Dharma. His teachings were carved on stone pillars and rocks and set up all across his vast realm, and some of them can still be seen today. It is easy to make people submit by force, but force cannot make their hearts submit as well. It was from the moment he admitted his own wrongs that the king's new path began.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "古代の王朝についても、国の根本となる方針を指して使うことができる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "国が全体の方針として掲げて進める政策。"
+    }
+  ],
+  "201": [
+    {
+      "ja": "紀元前480年、ギリシアの諸都市はペルシアの大軍に攻め込まれ、船の数でも大きく劣勢に立たされていました。そこでアテネの将軍テミストクレスは、あえて敵を狭い海峡に誘い込む作戦を選びます。狭い海では大きな艦隊ほど身動きが取れなくなり、せっかくの兵力を生かせなくなるわけですね。結果として、ギリシア側はサラミスの海戦で勝利を収めることになりました。不利な条件でも、戦う場所を選べば勝負の形は変えられる、という教訓です。",
+      "form": "劣勢",
+      "en": "In 480 BC, the Greek city-states were invaded by a huge Persian army and were also badly outmatched in the number of their ships. So the Athenian general Themistocles chose a plan of deliberately luring the enemy into a narrow strait. In narrow waters, the larger the fleet, the less room it has to move, so it can no longer make use of its strength. As a result, the Greek side ended up winning the naval battle of Salamis. The lesson is that even under unfavorable conditions, choosing where to fight can change the shape of the contest.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「劣勢に立たされる」「劣勢を強いられる」の形で、押されて不利な状況を表す。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "相手より力が弱く、不利な立場にあること。"
+    },
+    {
+      "ja": "スマートフォン向けなどの先端半導体の分野で、日本企業は海外勢に対して劣勢に立たされている。1980年代後半には世界市場で大きなシェアを握っていたが、その後、巨額の投資を続けた海外の企業に差を広げられた。一方で、製造装置や素材の分野では、今も日本企業が高い世界シェアを保っている製品が少なくない。装置や素材の供給が止まれば、海外の工場も生産を続けにくくなる分野だ。こうした強みをどう生かすかが、今後の戦略の鍵になるとみられる。",
+      "form": "劣勢",
+      "en": "In the field of advanced semiconductors, such as those for smartphones, Japanese companies are at a disadvantage against overseas rivals. In the late 1980s they held a large share of the world market, but they were then outpaced by overseas companies that kept up huge investments. On the other hand, in manufacturing equipment and materials, there are quite a few products in which Japanese companies still hold a high global share. These are fields where, if supply stopped, even overseas plants would struggle to keep producing. How to make use of these strengths is seen as key to strategy going forward.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「劣勢に立たされる」「劣勢をはね返す」の形がよく見られる。",
+      "grammar": ["n5-teiru"],
+      "sense": "相手より力が弱く、不利な立場にあること。"
+    },
+    {
+      "ja": "議論で劣勢になると、人ってだいたい急に声が大きくなるじゃないですか。あれって、相手を説得したいっていうより、自分が負けてるって認めたくない気持ちのほうが強いんだと思うんですよね。心理学だと、自分の考えを否定されると、かえって意見を固めちゃう傾向がある、なんて話もあって。だから、言い負かそうとするより、相手が引ける逃げ道を残しといたほうが、結局は話が早く進むんじゃないかなと。",
+      "form": "劣勢",
+      "en": "You know how, when people start losing an argument, they usually suddenly get louder? I think that's less about wanting to persuade the other person and more about not wanting to admit they're losing. In psychology there's even talk that when your ideas are rejected, you tend to dig in on your opinion all the more. So rather than trying to win the argument outright, leaving the other person an escape route so they can back down probably gets things moving faster in the end.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "話し言葉でも「劣勢になる」「劣勢に回る」のように、勝ち負けの流れを語るときに使う。",
+      "grammar": ["n5-tai"],
+      "sense": "相手より力が弱く、不利な立場にあること。"
+    }
+  ],
+  "294": [
+    {
+      "ja": "中世の地中海で、香辛料の交易を握って大いに栄えたのがヴェネツィアです。ところが15世紀の終わりに、ポルトガルの船がアフリカの南端を回ってインドに到達する航路を開きます。地中海を通らずに香辛料を運べる道ができたことで、交易の中心は少しずつ大西洋の側へ移っていきました。ヴェネツィアの凋落は、一つの戦いに負けたからではなく、世界の物の流れが変わったところから始まったわけです。強みが大きい国ほど、その前提が崩れたときの打撃も大きいんですね。",
+      "form": "凋落",
+      "en": "The city that flourished greatly in the medieval Mediterranean by controlling the spice trade was Venice. But at the end of the fifteenth century, Portuguese ships rounded the southern tip of Africa and opened a sea route reaching India. With a route that could carry spices without passing through the Mediterranean, the center of trade gradually shifted toward the Atlantic side. Venice's decline began not because it lost a single battle, but from a change in the flow of goods around the world. The bigger a country's strength, the bigger the blow when the premise behind it collapses.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「凋落の一途をたどる」の形で、坂を転げるような衰えを表すことが多い。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n3-dewa-naku"],
+      "sense": "勢いのあったものが、おとろえて落ちぶれること。"
+    },
+    {
+      "ja": "かつて世界の半導体市場を席巻した日本のメモリー産業は、1990年代以降、急速に勢いを失った。国内大手の事業を統合して生まれたエルピーダメモリも、2012年に経営破綻に追い込まれている。専門家の間では、凋落の背景として、巨額の投資を続けた韓国勢などとの価格競争に加え、円高や経営判断の遅れを挙げる見方が多い。この経験は、現在進められている国内生産の立て直しを議論するうえでも、たびたび引き合いに出される。",
+      "form": "凋落",
+      "en": "Japan's memory chip industry, which once dominated the world semiconductor market, rapidly lost momentum from the 1990s on. Elpida Memory, created by combining the businesses of major domestic makers, was also driven into bankruptcy in 2012. Among experts, many cite as the background to the decline price competition with South Korean rivals and others that kept up huge investments, along with the strong yen and delays in management decisions. This experience is frequently invoked in debates over the rebuilding of domestic production now under way.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「凋落の背景」「凋落ぶり」のように、名詞として使うことが多い。",
+      "grammar": ["n5-teiru", "n2-ue-de"],
+      "sense": "勢いのあったものが、おとろえて落ちぶれること。"
+    },
+    {
+      "ja": "秋が深まると、庭の木々は一枚、また一枚と、色づいた葉を静かに落としていく。枝を離れた葉は土に返って養分となり、次の春に芽吹く命を支えることになる。仏教では、あらゆるものは移り変わり、ひとときも同じ姿にとどまることはないと説く。木の葉の凋落をただ寂しいとだけ見るのは、物事の一面しか見ていないのかもしれない。散ることは終わりではなく、めぐり続ける命の中の一つの節目なのである。",
+      "form": "凋落",
+      "en": "As autumn deepens, the trees in the garden quietly drop their colored leaves, one after another. The leaves that leave the branches return to the soil as nourishment and come to support the life that will bud the next spring. Buddhism teaches that all things change and never stay in the same form even for a moment. To see the withering and fall of leaves as merely lonely may be to see only one side of things. Falling is not an end but one turning point within the life that keeps going round.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "本来は草木がしおれて落ちる意味で、改まった文章で使う。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru", "n3-dewa-naku"],
+      "sense": "草木の花や葉が、しぼんで散り落ちること。"
+    }
+  ],
+  "61": [
+    {
+      "ja": "半導体の世界では、たった一つの投資判断が会社の命運を左右することがあります。最新の工場を一つ建てるだけで、数兆円規模のお金がかかると言われているからです。しかも完成するのは数年先で、そのとき市場がどうなっているかは誰にもわかりません。だから経営者は、先が見えないまま、巨額の賭けに出ざるを得ないんですね。この業界のトップが、慎重さと大胆さの両方を求められるのは、そういう事情があるからなんです。",
+      "form": "命運",
+      "en": "In the semiconductor world, a single investment decision can decide a company's fate. That's because building just one of the newest plants is said to cost on the order of several trillion yen. On top of that, it won't be finished for several years, and nobody knows what the market will look like by then. So executives have no choice but to make huge bets without being able to see what lies ahead. That's why the leaders of this industry are required to be both cautious and bold.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「命運を左右する」「命運を握る」「命運がかかる」の形でよく使う。",
+      "grammar": ["n5-teiru", "n2-zaru-o-enai"],
+      "sense": "生き残るか滅びるかを決める、めぐり合わせ。"
+    },
+    {
+      "ja": "1962年10月、ソ連がキューバに核ミサイルを持ち込もうとしていることが明らかになり、米ソの緊張は一気に高まった。アメリカはキューバ周辺の海域を封鎖し、ソ連にミサイルの撤去を求めた。およそ二週間に及んだにらみ合いの間、核戦争に突き進むかどうか、世界の命運は両国の指導者の判断にかかっていた。最終的にソ連が撤去を受け入れたことで、危機はかろうじて回避された。この経験から、両国の首脳を直接結ぶ通信回線が設けられた。",
+      "form": "命運",
+      "en": "In October 1962, it became clear that the Soviet Union was trying to bring nuclear missiles into Cuba, and tension between the United States and the Soviet Union rose sharply. The United States blockaded the waters around Cuba and demanded that the Soviet Union remove the missiles. During the standoff, which lasted about two weeks, the fate of the world hung on the judgment of the two countries' leaders as to whether they would plunge into nuclear war. In the end, the Soviet Union agreed to the removal, and the crisis was narrowly averted. From this experience, a direct communication line linking the two countries' leaders was set up.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「命運を握る」「命運を分ける」の形で、存亡にかかわる場面に使う。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "生き残るか滅びるかを決める、めぐり合わせ。"
+    },
+    {
+      "ja": "受験とか就活って、たった一度の結果で人生の命運が決まる、みたいに思い込んじゃう人、多いじゃないですか。でも実際は、そこでうまくいかなくても、別のルートで普通に挽回してる人っていっぱいいるんですよね。プレッシャーがかかりすぎると、むしろ頭がうまく回らなくなるって話もあって。だから、まあ落ちても死ぬわけじゃないし、くらいに構えといたほうが、結果的に本番でもうまくいく気がするんですよ。",
+      "form": "命運",
+      "en": "You know how a lot of people convince themselves that, with entrance exams or job hunting, a single result decides their whole fate in life? But in reality, there are loads of people who don't make it there and then make up for it just fine by another route. There's also talk that too much pressure actually makes your head stop working. So I feel like taking the attitude of \"well, failing won't kill me\" tends to make things go better on the day itself in the end.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "話し言葉では「人生の命運が決まる」のように、やや大げさに言うときにも使う。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "生き残るか滅びるかを決める、めぐり合わせ。"
+    }
+  ],
+  "167": [
+    {
+      "ja": "1940年、ドイツ空軍の激しい空襲にさらされたイギリスには、実はある切り札がありました。それが、海岸に沿ってずらりと並べたレーダーの網です。敵の編隊が近づいてくるのを遠くからいち早く捉えられたので、限られた戦闘機を、本当に必要な場所にだけ飛ばすことができたんですね。兵力で劣る側が、情報の速さで差を埋めたわけです。技術が戦争の形そのものを変えた例として、今もよく取り上げられる話です。",
+      "form": "切り札",
+      "en": "In 1940, Britain, under fierce air raids from the German air force, actually had a certain trump card. That was the network of radar stations lined up all along its coast. Because it could detect enemy formations approaching early and from far away, it was able to send its limited fighters only where they were truly needed. The side with fewer forces made up the gap with speed of information. It's a story still often taken up as an example of technology changing the very shape of war.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「最後の切り札」「切り札を持つ」の形で、勝負を決める手段を表す。",
+      "sense": "いちばん効き目のある、とっておきの手段。"
+    },
+    {
+      "ja": "慣用的な言葉の多くは、もとの意味を知っておくと覚えやすくなります。たとえばトランプのゲームには、ほかのどの札よりも強いと決められた札があり、これを切り札と呼びます。ここでの「切る」は、その強い札を出して場を取るという意味です。勝負どころでこれを出せば、相手の高い札も一気に打ち負かせるわけですね。この場面を思い浮かべておけば、比喩として使われたときの意味も自然に頭に入ってくるはずです。",
+      "form": "切り札",
+      "en": "Many idiomatic expressions are easier to remember if you know their original meaning. For example, in card games there is a card decided to be stronger than any other, and this is called the kirifuda, the trump. Here, kiru means to play that strong card and take the trick. If you play it at the crucial moment, you can beat even your opponent's high cards in one go. If you keep this scene in mind, the meaning when the word is used figuratively should also sink in naturally.",
+      "original": true,
+      "register": "学",
+      "topic": "language",
+      "tipJa": "もとはトランプの用語で、「切り札を切る」はその札を出すことを指す。",
+      "sense": "トランプで、ほかのどの札よりも強いと決められた札。"
+    },
+    {
+      "ja": "人手不足が深刻な物流や介護の現場で、ＡＩを使ったロボットへの期待が年々高まっている。働き手の減少が続く中、生産性を高める切り札になるとの見方も多い。ただ、現場からは、機器の操作に慣れるまでの負担や、故障した際の対応を不安視する声も上がっている。導入すればすぐに効果が出るわけではない、との専門家の指摘もある。人と機械の役割分担をどう決めるかが、今後の普及のかぎを握りそうだ。",
+      "form": "切り札",
+      "en": "Expectations are rising year by year for AI-powered robots in logistics and nursing care, where labor shortages are severe. As the number of workers keeps falling, many see them becoming the trump card for raising productivity. However, voices on the ground are also raising concerns about the burden of getting used to operating the equipment and about how to respond when it breaks down. Some experts point out that introducing them will not bring results right away. How to divide roles between people and machines looks set to be key to their further spread.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜の切り札」「切り札として期待される」の形が多い。",
+      "grammar": ["n5-teiru", "n3-wake-dewa-nai"],
+      "sense": "いちばん効き目のある、とっておきの手段。"
+    }
+  ],
+  "161": [
+    {
+      "ja": "今のＡＩブームを語るうえで外せないのが、2022年の終わりに一般公開された対話型のＡＩです。専門家しか扱えなかった技術を、誰でもふだんの言葉で試せるようになったことで、関心が一気に広がりました。これが起爆剤となって、世界中の企業がＡＩへの投資を一斉に増やし、計算を支える半導体の需要も急増していきます。一つのサービスの登場が、産業全体の流れを変えてしまったわけですね。",
+      "form": "起爆剤",
+      "en": "What you can't leave out when talking about today's AI boom is the conversational AI released to the public at the end of 2022. Interest spread in one go because anyone could now try out, in everyday language, a technology that only specialists had been able to handle. With this as the spark, companies around the world increased their AI investment all at once, and demand for the semiconductors that power the computation surged as well. The arrival of a single service changed the course of an entire industry.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「〜の起爆剤となる」「起爆剤として期待する」の形でよく使う。",
+      "grammar": ["n2-ue-de", "n4-you-ni-naru", "n3-koto-de", "n4-teiku"],
+      "sense": "物事が大きく動き出すきっかけになるもの。"
+    },
+    {
+      "ja": "インドは1991年、深刻な外貨不足に陥ったのを受けて、経済の自由化に踏み切った。輸入や外国からの投資に対する規制が次々と緩められ、民間企業が活動しやすい環境が整えられた。この改革は、のちにソフトウェア開発などのサービス産業が大きく伸びる起爆剤になったと評価されている。南部のベンガルールには世界の大手企業が開発拠点を置くようになり、英語を使いこなす技術者層の厚さが強みとされた。",
+      "form": "起爆剤",
+      "en": "In 1991, in response to a severe foreign currency shortage, India took the plunge into economic liberalization. Restrictions on imports and foreign investment were eased one after another, and an environment in which private companies could operate more easily was put in place. This reform is credited with having been the catalyst for the later rapid growth of service industries such as software development. Major global companies came to set up development bases in Bengaluru in the south, and the depth of its pool of engineers fluent in English was seen as a strength.",
+      "original": true,
+      "register": "報",
+      "topic": "india",
+      "tipJa": "報道では「成長の起爆剤」「改革を起爆剤に」のように使う。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"],
+      "sense": "物事が大きく動き出すきっかけになるもの。"
+    },
+    {
+      "ja": "勉強のやる気は、待っていればそのうち湧いてくる、というものではありません。むしろ手を動かし始めてから、意欲があとから高まってくることが多いとされています。そこでおすすめなのが、五分で終わる小さな課題を最初に一つ片づけることです。小さくても「できた」という感覚が起爆剤になって、次の課題に取りかかるハードルがぐっと下がります。大きな目標ほど、最初の作業を思い切って小さくしておくのがコツです。",
+      "form": "起爆剤",
+      "en": "Motivation to study is not something that will well up eventually if you just wait. Rather, it is said that motivation often rises afterward, once you have started working. So what I recommend is to finish one small task that takes five minutes first. Even a small sense of \"I did it\" becomes the spark that greatly lowers the hurdle to starting the next task. The bigger the goal, the more the trick is to make the first piece of work boldly small.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "比喩として、やる気や変化を一気に引き出すきっかけにも使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "物事が大きく動き出すきっかけになるもの。"
+    }
+  ],
+  "69": [
+    {
+      "ja": "人生は苦であると説くことから、仏教を、世をはかなむ暗い教えだと受け取る人は少なくない。しかし、そこで言う苦とは、物事が思い通りにならないという事実を見つめた言葉にすぎない。苦の原因を見きわめ、それを取り除く道があると示した点で、むしろ仏教は希望の教えである。現実をありのままに直視することと、悲観に沈むこととは、まったく別のことなのだ。見るべきものから目をそらさないことが、かえって心を軽くするのである。",
+      "form": "悲観",
+      "en": "Because it teaches that life is suffering, quite a few people take Buddhism to be a dark teaching that despairs of the world. But the suffering it speaks of is merely a word that looks squarely at the fact that things do not go as we wish. In showing that there is a way to see through the causes of suffering and remove them, Buddhism is, if anything, a teaching of hope. Facing reality as it is and sinking into pessimism are two entirely different things. Not turning one's eyes from what must be seen is what, in fact, lightens the heart.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "論説文では「悲観する」「悲観論」のように、楽観と対にして論じることが多い。",
+      "grammar": ["n2-ni-suginai"],
+      "sense": "うまくいかないと考えて、望みを失うこと。"
+    },
+    {
+      "ja": "生成ＡＩに雇用が奪われるって懸念、最近やたら耳にするじゃないですか。定型的な事務作業なんかは、確かに置き換えが進むと思うんですけど、個人的にはそこまで悲観しなくてもいい気がしてて。産業革命のころも、機械が職人の仕事を奪うって騒がれたけど、結局は職種の中身が入れ替わったって側面が大きいんですよね。だから、怖がって遠ざけるより、自分の業務のどこを任せられて、どこに人の判断が欠かせないのかを見極めとくほうが、よっぽど身を守れると思います。",
+      "form": "悲観",
+      "en": "You keep hearing these days the worry that generative AI will take away jobs, right? Routine office work and the like will probably get replaced, sure, but personally I feel we don't need to be that pessimistic. Back in the Industrial Revolution too, people made a fuss about machines taking craftsmen's work, but in the end a big part of it was that the makeup of occupations shifted. So rather than shying away out of fear, I think you protect yourself far better by working out which parts of your job you can hand over and where human judgment is indispensable.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "動詞「悲観する」は「そこまで悲観しなくても」のように打ち消しで使うことが多い。",
+      "sense": "うまくいかないと考えて、望みを失うこと。"
+    },
+    {
+      "ja": "世界史や経済の授業で必ず名前が出てくるのが、18世紀末のイギリスで『人口論』を書いたマルサスです。彼は、人口は食料の生産よりも速いペースで増えるため、人々の暮らしはいずれ行き詰まると論じました。この見通しは当時大きな反響を呼び、人類の将来についての悲観を広めたとも言われます。ところがその後、農業の技術が大きく進歩し、多くの国で人口と食料はともに増えていきました。試験では、主張の内容だけでなく、予測が外れた理由まで説明できるようにしておきましょう。",
+      "form": "悲観",
+      "en": "A name that always comes up in world history and economics classes is Malthus, who wrote An Essay on the Principle of Population in late eighteenth-century Britain. He argued that because population grows faster than food production, people's livelihoods would sooner or later hit a dead end. This outlook caused a great stir at the time and is also said to have spread pessimism about humanity's future. Afterwards, however, farming technology advanced greatly, and in many countries population and food both increased. In the exam, make sure you can explain not just what he argued but also why the prediction proved wrong.",
+      "original": true,
+      "register": "学",
+      "topic": "history",
+      "tipJa": "「悲観を広める」「悲観が広がる」のように、社会全体の空気にも使う。",
+      "grammar": ["n4-teiku", "n3-you-ni"],
+      "sense": "うまくいかないと考えて、望みを失うこと。"
+    }
+  ],
+  "133": [
+    {
+      "ja": "インドの数学者ラマヌジャンは、大学で正式な訓練をほとんど受けないまま、独学で研究を進めた人物です。1913年、彼は自分が見つけた公式を書き連ねた手紙を、イギリスの数学者ハーディに送りました。ハーディはその内容に驚き、彼をケンブリッジ大学に招くことになります。証明の手順を飛ばして結論にたどり着く直観は卓越していて、今も研究者たちがその公式の意味を調べ続けているんですね。",
+      "form": "卓越",
+      "en": "The Indian mathematician Ramanujan was someone who pursued his research on his own, with almost no formal training at university. In 1913, he sent a letter crammed with formulas he had discovered to the British mathematician Hardy. Hardy was astonished by its contents and ended up inviting him to Cambridge University. His intuition, which skipped the steps of proof and arrived at conclusions, was outstanding, and researchers are still investigating the meaning of his formulas today.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「卓越した才能」「卓越している」のように、すぐれた力や技をたたえるときに使う。",
+      "grammar": ["n3-koto-ni-naru", "n5-teiru"],
+      "sense": "ほかよりはるかにすぐれていること。"
+    },
+    {
+      "ja": "先端半導体の受託生産では、台湾の大手企業が世界で高いシェアを握っている。回路をより細かく刻む微細化の技術に加え、大量の注文を安定して納める生産管理の力が卓越しているとされる。各国が自国での生産を急ぐ中でも、同社に製造を頼る企業は多い。一方で、生産が一つの地域に集中することには、地政学的な危うさを指摘する声もある。新工場を海外に設ける動きも、こうした懸念を背景にしている。",
+      "form": "卓越",
+      "en": "In contract manufacturing of advanced semiconductors, a major Taiwanese company holds a high global share. In addition to its miniaturization technology for etching ever finer circuits, its production management capacity for reliably delivering huge orders is said to be outstanding. Even as countries rush to produce chips at home, many companies rely on it for manufacturing. On the other hand, some point to the geopolitical risk of production being concentrated in a single region. Moves to build new plants overseas also stem from such concerns.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「卓越した技術」「卓越性」のように、企業や研究の強みを評価するときに使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "ほかよりはるかにすぐれていること。"
+    },
+    {
+      "ja": "人は他人のすぐれた技を目にすると、それを生まれつきの才能という一語で片づけたくなる。しかし、名人と呼ばれる人ほど、誰の目にも触れない場所で、同じ動作を何千回と繰り返している。卓越は、ある日突然手に入るものではなく、地味な反復の向こう側にようやく現れるものである。才能という言葉は、その長い時間を見ないで済ませるための、便利な言い訳にすぎないのかもしれない。人をうらやむ前に、その背後にある時間の厚みを想像してみたい。",
+      "form": "卓越",
+      "en": "When people see someone else's fine skill, they are tempted to dismiss it with the single word \"talent\", something one is born with. But the more someone is called a master, the more they have repeated the same movement thousands of times in places no one sees. Excellence is not something one gains suddenly one day; it is something that finally appears on the far side of plain repetition. The word \"talent\" may be nothing more than a convenient excuse for not looking at all that time. Before envying others, I would like to try imagining the depth of time behind them.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "論説文では名詞として「卓越は〜」と主語にも立てられる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n2-ni-suginai", "n5-tai"],
+      "sense": "ほかよりはるかにすぐれていること。"
+    }
+  ],
+  "203": [
+    {
+      "ja": "スマホやＡＩ向けの最先端チップを作るには、極端紫外線と呼ばれる光で回路を焼き付ける装置が欠かせません。この装置を作れるのは、今のところ世界でオランダのある企業だけなんです。一台で数百億円もするうえに、部品は世界中の専門メーカーから集められていて、簡単にはまねできません。つまりこの装置は、最先端の半導体づくり全体を支える要石になっているわけですね。だからこそ、どの国に売るかが、外交の問題にまでなっているんです。",
+      "form": "要石",
+      "en": "To make cutting-edge chips for smartphones and AI, you need a machine that prints circuits using light called extreme ultraviolet. Right now, the only company in the world that can build this machine is one in the Netherlands. A single machine costs tens of billions of yen, and its parts are gathered from specialist manufacturers all over the world, so it can't easily be copied. In other words, this machine has become the keystone holding up the whole of cutting-edge chipmaking. That's exactly why which countries it may be sold to has even become a diplomatic issue.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「〜の要石」「要石となる」の形で、全体を成り立たせている中心を表す。",
+      "grammar": ["n5-teiru"],
+      "sense": "全体を支え、それがないと成り立たない大事なもの。"
+    },
+    {
+      "ja": "睡眠が記憶の定着に深く関わっていることが、近年の研究で次々と明らかになっている。眠っている間に、脳はその日に得た情報を整理し、長く残すべきものを選び出していると考えられている。睡眠を削って勉強時間を増やしても、学んだ内容がかえって身につきにくくなるおそれがあるという。試験前の徹夜は、むしろ逆効果になりかねないということだ。専門家の間では、睡眠を学習の要石と位置づけ、生活習慣の見直しを呼びかける声が強まっている。",
+      "form": "要石",
+      "en": "Recent research is revealing one finding after another showing that sleep is deeply involved in consolidating memories. It is thought that during sleep the brain sorts the information it took in that day and picks out what should be kept for the long term. It is said that cutting sleep to increase study time may, on the contrary, make what one has learned harder to retain. In other words, staying up all night before an exam could well backfire. Among experts, there are growing calls to regard sleep as the keystone of learning and to review lifestyle habits.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "報道では「〜の要石と位置づける」のように、政策や研究の中心を示すのに使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "全体を支え、それがないと成り立たない大事なもの。"
+    },
+    {
+      "ja": "仏教の修行は、日々の行いを整える戒、心を静める瞑想、物事を見通す智慧の三つにまとめられることがある。このうち瞑想や智慧はとかく注目を集めやすいが、三つをつなぎとめているのは、地味に見える戒である。行いが乱れていれば心は落ち着かず、心が落ち着かなければ物事をありのままに見ることもかなわない。その意味で戒は、修行という石組み全体を支える要石だと言えるだろう。決まりごとを窮屈と感じる人ほど、この順序の意味を一度考えてみるとよい。",
+      "form": "要石",
+      "en": "Buddhist practice is sometimes summed up as three things: the precepts that order daily conduct, meditation that calms the mind, and the wisdom that sees through things. Of these, meditation and wisdom tend to draw attention, but what holds the three together is the precepts, which look unremarkable. If conduct is disordered the mind does not settle, and if the mind does not settle one cannot see things as they are. In that sense, the precepts can be called the keystone supporting the whole stonework of practice. Those who find rules confining would do well to consider once what this order means.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "抽象的な体系についても、「〜の要石」として中心となる要素を指せる。",
+      "grammar": ["n5-teiru"],
+      "sense": "全体を支え、それがないと成り立たない大事なもの。"
+    }
+  ],
+  "174": [
+    {
+      "ja": "古代インドの文法家パーニニは、サンスクリット語の仕組みを、およそ四千の短い規則に整理してみせました。語の形がどう変わるかを、まるで計算の手順のように書き表したんですね。この体系はその後のインドの学問の礎となり、近代のヨーロッパの言語学者たちにも大きな刺激を与えたと言われています。二千年以上も前に、ここまで精密な言語の分析がすでに行われていたというのは、本当に驚きですよね。",
+      "form": "礎",
+      "en": "The ancient Indian grammarian Panini organized the workings of the Sanskrit language into about four thousand short rules. He wrote out how the forms of words change almost like the steps of a calculation. This system became the foundation of later Indian scholarship, and it is said to have greatly stimulated modern European linguists as well. It's truly amazing that such precise analysis of language was already being carried out more than two thousand years ago.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜の礎となる」「〜の礎を固める」の形で、後のものを支える大もとを表す。",
+      "grammar": ["n3-you-ni", "n5-teiru"],
+      "sense": "物事を支える土台となる、大もと。"
+    },
+    {
+      "ja": "人の品格は、一度の立派な行いによってではなく、目立たない習慣の積み重ねによって形づくられていく。挨拶をする、約束の時刻を守る、使った物を元の場所に戻す。こうした事柄は誰からもほめられないが、長い年月のうちに、その人の在り方の礎となる。困難に直面したときに踏みとどまれるかどうかも、案外、日頃のささやかな行いにかかっているのである。目立つ成果ばかりが語られる時代だからこそ、その見えない部分を大切にしたい。",
+      "form": "礎",
+      "en": "A person's character is shaped not by a single fine deed but by the accumulation of inconspicuous habits. Greeting people, keeping to appointed times, putting things you used back where they belong. No one praises such matters, but over long years they become the foundation of who that person is. Whether one can hold one's ground when facing hardship, too, depends more than we might think on such small everyday acts. Precisely because ours is an age in which only conspicuous achievements are talked about, I want to cherish that unseen part.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "人柄や社会など、目に見えないものを支える土台についても使える。",
+      "grammar": ["n4-teiku", "n3-dewa-naku", "n5-tai"],
+      "sense": "物事を支える土台となる、大もと。"
+    },
+    {
+      "ja": "1947年、アメリカのベル研究所で、電気の流れを増幅したり切り替えたりする小さな部品、トランジスタが発明された。それまでの部品に比べて小さく、壊れにくく、消費電力も少ないという利点があった。この発明はのちの半導体産業全体の礎となり、発明者の三人は1956年にノーベル物理学賞を受けた。現在では、指先ほどの大きさのチップの上に、数百億個ものトランジスタが整然と並んでいる。",
+      "form": "礎",
+      "en": "In 1947, at Bell Labs in the United States, the transistor, a small component that amplifies and switches the flow of electricity, was invented. Compared with the components used until then, it had the advantages of being smaller, harder to break and lower in power consumption. The invention became the foundation of the entire semiconductor industry that followed, and its three inventors received the Nobel Prize in Physics in 1956. Today, tens of billions of transistors are neatly lined up on a chip the size of a fingertip.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜の礎となった」の形で、後の発展を支えた出来事を紹介する。",
+      "grammar": ["n5-teiru"],
+      "sense": "物事を支える土台となる、大もと。"
+    }
+  ]
+}

@@ -1,0 +1,329 @@
+{
+  "250": [
+    {
+      "ja": "今回は、平安時代の天皇家が抱えていた意外な悩みの話です。当時の天皇には子どもが多く、その全員を皇族として養っていると、朝廷の出費はどんどんかさんでいきました。そこで朝廷は、一部の子どもに「源」や「平」といった姓を与え、臣下の身分に移したんです。これが臣籍降下と呼ばれるしくみで、のちに武士として名をあげる源氏や平氏も、もとはここから生まれた家なんですね。名門の始まりが、実は朝廷の台所事情だったというのは面白いところです。",
+      "form": "皇族",
+      "en": "This time, the story is about an unexpected problem the imperial house had in the Heian period. Emperors of that time had many children, and supporting all of them as members of the imperial family made the court's spending pile up and up. So the court gave some of those children surnames such as Minamoto or Taira and moved them into the status of subjects. This was the system called shinseki kōka, and the Minamoto and Taira, who would later make their name as warriors, were originally families born from it. It's interesting that the origin of these great houses was really the court's household budget.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「皇族として養う」「皇族の一人」のように、天皇の一族に属する個々の人を指す。",
+      "grammar": ["n5-teiru", "n4-teiku"]
+    },
+    {
+      "ja": "ニュース原稿で皇族を紹介するときは、名前のあとに「さま」をつけるのが基本です。漢字の「様」ではなく、ひらがなで書くのが新聞やテレビの決まりごとになっています。また、一般の人なら「出席した」で済むところを、「出席された」のように敬語を添えて伝えます。逆に、ここをふつうのニュースと同じ調子で読んでしまうと、聞いている側に強い違和感を与えかねません。こうした約束ごとを頭に入れておけば、本番でも迷うことなく原稿を読み上げられるはずです。",
+      "form": "皇族",
+      "en": "When you introduce a member of the imperial family in a news script, the basic rule is to add \"sama\" after the name. Newspapers and television have made it a convention to write it in hiragana, not with the kanji 様. And where \"attended\" would do for an ordinary person, you add an honorific, as in \"was so gracious as to attend.\" Conversely, if you read this part in the same tone as ordinary news, you risk leaving listeners with a strong sense that something is off. If you keep these conventions in mind, you should be able to read your script on air without hesitating.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "報道では、皇族の名前に敬称「さま」をつけ、動作には敬語を添えるのが慣例。",
+      "grammar": ["n3-dewa-naku", "n2-koto-naku"]
+    },
+    {
+      "ja": "釈迦は、北インドの小さな国の王子として生まれた。恵まれた暮らしを捨てて出家したことが、その教えの出発点となっている。日本で仏教を広めることに力を尽くした聖徳太子もまた、皇族の一人であった。高い身分に生まれた者が、かえって世の苦しみに深く目を向けたのは、偶然ではないのかもしれない。満たされた場所にいたからこそ、満たされることでは救われない心に気づけたのだろう。",
+      "form": "皇族",
+      "en": "The Buddha was born a prince of a small kingdom in northern India. That he cast aside a privileged life and left home is the starting point of his teaching. Prince Shōtoku, who devoted himself to spreading Buddhism in Japan, was likewise a member of the imperial family. That people born to high rank turned their eyes so deeply to the suffering of the world may not be a coincidence. Perhaps it was precisely because they stood in a place of plenty that they could notice a heart that plenty cannot save.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「皇族の一人」のように、天皇の血筋に連なる人物を歴史の中で紹介するときに使う。",
+      "grammar": ["n5-teiru"]
+    }
+  ],
+  "251": [
+    {
+      "ja": "今回は、戦後まもない1947年の出来事を取り上げます。この年の10月、十一の宮家に属する五十一人が、そろって皇籍を離脱することになりました。占領下で宮家を支えてきた経済的な特権が失われ、天皇の弟たちの家を除く宮家が、一度に民間へ移ったわけです。いまでも皇位を継げる人が少ないという話題になると、この出来事がよく持ち出されます。ここを押さえておくと、ニュースの背景がぐっと見えやすくなりますよ。",
+      "form": "離脱",
+      "en": "This time, I'm taking up an event from 1947, shortly after the war. In October of that year, fifty-one people belonging to eleven princely houses all left imperial status together. The economic privileges that had supported those houses were lost under the occupation, and every princely house except those of the emperor's younger brothers moved into civilian life at once. Even now, whenever the topic of how few people can succeed to the throne comes up, this event is often brought up. If you get a grip on it, the background to the news becomes much easier to see.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「皇籍を離脱する」「組織から離脱する」のように、属していた身分や集団から抜ける意味。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "属していた身分や組織から抜けること。"
+    },
+    {
+      "ja": "生成AIの開発をめぐる競争が激しさを増すなか、大手企業から有力な研究者が離脱し、新たな会社を立ち上げる動きが相次いでいる。背景には、安全性をどこまで重視するかといった開発方針の違いがあるとみられる。新会社の多くは設立から短い期間で巨額の投資を集めており、人材の流出は大手にとっても無視できない問題となっている。専門家の間では、研究の担い手が分散することで、技術の方向性が多様になるとの見方も出ている。",
+      "form": "離脱",
+      "en": "As competition over the development of generative AI intensifies, there has been a string of cases in which leading researchers leave major companies and set up new firms. Differences in development policy, such as how much weight to give to safety, are thought to lie behind this. Many of the new firms have attracted huge investment within a short time of being founded, and the outflow of talent has become a problem that even the major players cannot ignore. Among experts, there is also a view that the spread of researchers across companies will make the direction of the technology more diverse.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜から離脱する」の形で、組織やグループを抜けることを伝える。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "属していた組織や集団から抜けること。"
+    },
+    {
+      "ja": "釈迦は二十九歳で城を出て、家族も地位も手放したと伝えられる。仏教でいう出家とは、単に住む場所を変えることではなく、それまで自分を縛っていた世俗の結びつきから離脱することであった。髪を剃り、粗末な衣をまとうのは、その決意を目に見える形にしたものだといえる。だが、それは人との縁を断ち切って終わる話ではない。執着を手放した者だからこそ、かえって人の苦しみに深く寄り添えるという逆説が、そこにはある。",
+      "form": "離脱",
+      "en": "It is said that the Buddha left the palace at twenty-nine, giving up both his family and his position. Renunciation in the Buddhist sense was not simply a change of where one lived, but a withdrawal from the worldly ties that had bound one until then. Shaving one's head and putting on a coarse robe can be said to give that resolve a visible form. Yet it is not a story that ends with cutting off one's bonds with people. There lies a paradox: precisely because one has let go of attachment, one can stay close to the suffering of others all the more deeply.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「世俗から離脱する」のように、思想の文脈では縛られていた関係から抜け出す意味でも使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "それまで属していた関係や集団から抜け出すこと。"
+    }
+  ],
+  "252": [
+    {
+      "ja": "今回は、戦後に皇室のあり方がどう変わったのかを見ていきます。明治の憲法では、天皇は国を治める主権者とされ、軍を率いる立場でもありました。それが1947年に施行された日本国憲法では「日本国の象徴」と位置づけられ、政治に関わる権限を持たないことになったんです。ここから、被災地を訪ねたり外国からの客をもてなしたりする、いまの姿が形づくられていきました。つまり、役割そのものが根本から作り直されたというわけですね。",
+      "form": "皇室",
+      "en": "This time, we'll look at how the imperial household changed after the war. Under the Meiji constitution, the emperor was the sovereign who ruled the country and also stood at the head of the military. Under the Constitution of Japan, which took effect in 1947, he was instead defined as \"the symbol of the State of Japan\" and came to have no powers related to government. From there, the present form took shape, with visits to disaster areas and the hosting of guests from abroad. In other words, the role itself was rebuilt from the ground up.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「皇室のあり方」のように、天皇と一族を一つの制度としてまとめて語るときに使う。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "皇室に関するニュースには、ふだんの会話ではまず使わない言葉がよく出てきます。たとえば、休みを取って体を休めることは「ご静養」、公の場で述べる言葉は「お言葉」と呼ばれます。意味だけを見れば「休養」や「あいさつ」で済みそうですが、言いかえると伝わる敬意の度合いが変わってしまいます。こうした表現は、敬意を示すために長い時間をかけて形づくられてきたものです。原稿を書くときは、意味を正確に押さえた上で、決まった言い回しを崩さないように気をつけましょう。",
+      "form": "皇室",
+      "en": "News about the imperial household often features words you would hardly ever use in everyday conversation. For example, taking time off to rest is called \"goseiyō,\" and words spoken in public are called \"okotoba.\" Judging by meaning alone, \"rest\" or \"greeting\" might seem to do, but rephrasing them changes the degree of respect that comes across. Expressions like these have been shaped over a long time to show respect. When you write a script, grasp their meaning precisely, and then take care not to break the set phrasing.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「皇室に関する報道」のように、天皇家全体を指す語。報道では専用の敬語表現が伴う。",
+      "grammar": ["n2-ue-de", "n3-you-ni"]
+    },
+    {
+      "ja": "奈良の大仏に目を描き入れる儀式が行われたのは、752年のことである。その筆を取って中心の役を務めたのは、インドから海を渡ってきた一人の僧であった。会場には、大仏をつくらせた聖武天皇と、位を継いだ娘の天皇をはじめ、皇室の人々が顔をそろえたという。仏教の生まれた土地の僧に大役を任せたことには、教えの源とじかにつながりたいという願いが込められていたのだろう。国を挙げた祈りの場は、遠い海の向こうとも静かに結ばれていたのである。",
+      "form": "皇室",
+      "en": "It was in 752 that the ceremony of painting in the eyes of the Great Buddha of Nara was held. The one who took up the brush and played the central role was a monk who had crossed the sea from India. It is said that the members of the imperial household gathered there, beginning with Emperor Shōmu, who had the Great Buddha built, and his daughter, who had succeeded him on the throne. Entrusting this great role to a monk from the land where Buddhism was born probably carried a wish to connect directly with the source of the teaching. The nation's great place of prayer was quietly tied to the far side of the sea as well.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「皇室の人々」のように、天皇とその一族をひとまとまりの家として指して使う。"
+    }
+  ],
+  "253": [
+    {
+      "ja": "今回は、戦国時代の朝廷がどこまで追い詰められていたかという話です。各地の大名が力をつける一方で、朝廷の収入はどんどん細っていきました。天皇が位を継いでも、即位の儀式を開くお金がなく、何年も待たされた例さえあったんです。朝廷がこの先も続くのかと危ぶまれても、まったくおかしくない状況だったわけですね。それでも途切れずに残った理由の一つは、有力な大名たちが献金で支えたことでした。",
+      "form": "危ぶまれ",
+      "en": "This time, the story is about just how cornered the imperial court was in the Warring States period. While the regional lords grew stronger, the court's income kept shrinking. There were even cases where an emperor took the throne but, with no money to hold the enthronement ceremony, had to wait for years. In other words, it was a situation in which it would have been no surprise at all if people feared the court would not survive. Even so, one reason it carried on without a break was that powerful lords supported it with donations.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「存続が危ぶまれる」のように受け身で使い、先行きを心配される状況を表すことが多い。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "2021年、世界的な半導体の不足が深刻になり、自動車各社は工場の稼働を相次いで止めた。在宅勤務の広がりでパソコンなどの需要が急増し、車に使う半導体まで手が回らなくなったことが主な原因の一つとされる。一時は年内の生産計画の達成も危ぶまれ、部品の調達を特定の国や企業に頼ることのもろさが浮き彫りになった。これを受けて各国は、国内に工場を呼び込むための支援策を次々と打ち出している。",
+      "form": "危ぶまれ",
+      "en": "In 2021, the global shortage of semiconductors became severe, and carmakers halted operations at their plants one after another. One of the main causes is said to be that demand for computers and similar devices surged as working from home spread, leaving no capacity for the chips used in cars. At one point, even meeting that year's production plans was in doubt, and the fragility of relying on particular countries or companies for parts was laid bare. In response, countries have been rolling out one support measure after another to attract factories at home.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「達成が危ぶまれる」「開催が危ぶまれる」の受け身の形がよく使われる。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "悟りを開いた直後の釈迦は、すぐに教えを説こうとはしなかったと伝えられる。あまりに深く微妙な真理であるため、欲にとらわれた人々には理解されないだろうと危ぶんだのである。経典によれば、そのためらいを破ったのは、天の神による懇願であった。もし釈迦がそこで口を閉ざしていたら、仏教という教えは生まれなかったことになる。誰にも届かないかもしれないと知りながら語り始めたところに、教えというものの本当の重みがある。",
+      "form": "危ぶんだ",
+      "en": "It is said that the Buddha, just after attaining enlightenment, did not set out at once to teach. The truth was so deep and subtle that he feared people caught up in desire would not understand it. According to the scriptures, what broke that hesitation was the entreaty of a heavenly god. Had the Buddha kept silent then, the teaching we call Buddhism would never have come into being. The true weight of a teaching lies in his beginning to speak while knowing it might reach no one.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「〜だろうと危ぶむ」のように、うまくいかないのではと案じる心の動きを表す。",
+      "grammar": ["n4-nagara", "n3-koto-ni-naru"]
+    }
+  ],
+  "254": [
+    {
+      "ja": "今回は、皇位の継承について、よく誤解されるポイントを整理します。日本の歴史には、推古天皇をはじめ八人の女性天皇がいました。ただし、その全員が、父親の側をたどると天皇に行き着く男系の血筋だったんです。つまり、女性が位についた例はあっても、母親の側からだけ天皇につながる人が即位した例はない、というわけですね。いまの議論も、この区別を押さえておくとずっと見通しがよくなります。",
+      "form": "男系",
+      "en": "This time, I'll sort out a point about succession to the throne that is often misunderstood. In Japan's history there were eight female emperors, beginning with Empress Suiko. However, every one of them came from the male line, meaning that if you trace back through the father's side, you arrive at an emperor. In other words, although there were cases of a woman taking the throne, there is no case of someone connected to an emperor only through the mother's side being enthroned. Keeping this distinction in mind gives you a much clearer view of today's debate too.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「男系の血筋」「男系で継ぐ」のように、父方をたどってつながる家系を表す。"
+    },
+    {
+      "ja": "「女性天皇」と「女系天皇」は、似ているようで指している中身がまったく違います。前者は天皇本人が女性であること、後者は母親の側の血筋で天皇につながることを表しています。これに対して、父親の側をたどって天皇につながる血筋は男系と呼ばれます。性別の話と血筋の話を混同したまま説明すると、聞き手は議論の前提からつまずいてしまうので、まず用語を一言で定義しておきましょう。",
+      "form": "男系",
+      "en": "\"A female emperor\" and \"an emperor of the female line\" look similar but refer to completely different things. The former means the emperor herself is a woman; the latter means being connected to an emperor by bloodline through the mother's side. By contrast, a bloodline connected to an emperor by tracing the father's side is called the male line. If you explain while confusing the question of sex with the question of lineage, your listeners will stumble over the very premise of the debate, so define your terms in a word first.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「男系」と「男性」は別の概念。性別ではなく、父方の血筋のつながりを指す。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "古代インドの家では、亡くなった父や祖父を供養する祭祀は、息子が受け継ぐものとされた。息子のいない家では、養子を迎えてでもこの務めを引き継がせようとした。祖先に食べ物を供えるこの儀礼を絶やさないことが、家を保つことそのものだったからである。家の名と祈りが父から子へと手渡される男系の仕組みは、こうして信仰と固く結びついた。血のつながりを守ろうとする心の奥には、死者を忘れまいとする願いがあったのかもしれない。",
+      "form": "男系",
+      "en": "In households of ancient India, the rites honouring a dead father or grandfather were held to be something the son inherited. Households without a son would even adopt one so that the duty could be passed on. This was because never letting this ritual of offering food to the ancestors lapse was itself what kept the household alive. In this way, the male-line system, in which the family's name and prayers were handed from father to son, became firmly bound up with faith. Deep in the wish to protect the ties of blood, there may have been a longing not to forget the dead.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「男系の仕組み」のように、家の名や役目が父から息子へ伝わる制度を指して使う。"
+    }
+  ],
+  "255": [
+    {
+      "ja": "今回は、明治から戦後にかけて、家の財産の受け継ぎ方がどう変わったかを見ていきます。明治の民法では、戸主の地位と財産を原則として長男が一人で引き継ぐ「家督相続」が定められていました。家を途切れさせないことが何より大事だと考えられていたからです。ところが戦後の民法改正でこの仕組みは廃止され、子どもたちは平等に受け継ぐことになったんですね。いま兄弟で遺産をどう分けるかが問題になるのも、実はこの転換があったからなんです。",
+      "form": "相続",
+      "en": "This time, we'll look at how the way family property was passed down changed from the Meiji era to the postwar period. The Meiji Civil Code laid down \"household succession,\" in which, as a rule, the eldest son alone took over both the position of household head and the property. That was because keeping the household from dying out was considered more important than anything. With the postwar revision of the Civil Code, however, this system was abolished, and children came to inherit equally. The reason dividing an estate among siblings can become a problem today is actually this shift.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「家督相続」「遺産を相続する」のように、亡くなった人の財産や地位を引き継ぐ意味。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"],
+      "sense": "亡くなった人の財産や地位を引き継ぐこと。"
+    },
+    {
+      "ja": "仏教では、心は一瞬ごとに生まれては消えていくものと考えられている。それでも人が昨日の自分と今日の自分を同じだと感じるのは、前の心が次の心を引き起こし、途切れることなく流れが続いていくからである。この絶え間ない連なりを、仏教では相続と呼ぶ。水が絶えず入れ替わっていても、同じ川と呼ばれ続けるのに似ている。そこに固定した「自分」はなく、あるのはただ、受け渡されていく流れだけなのだ。",
+      "form": "相続",
+      "en": "In Buddhism, the mind is thought to arise and vanish from one moment to the next. The reason people nonetheless feel that yesterday's self and today's self are the same is that each moment of mind gives rise to the next, and the stream continues without a break. Buddhism calls this unbroken succession sōzoku, continuity. It is much like a river that goes on being called the same river even though its water is constantly replaced. There is no fixed \"self\" in it; there is only a stream being handed on.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "仏教語としては、財産ではなく、心の瞬間が途切れず次へ続いていくことを指す。",
+      "grammar": ["n5-teiru", "n2-koto-naku", "n4-teiku"],
+      "sense": "仏教で、前の心が次の心を生み途切れず続いていくこと。"
+    },
+    {
+      "ja": "親から受け継ぐものを話題にするときも、日本語では対象によって動詞を使い分けます。土地や家屋なら「相続する」、社長の地位や伝統芸能なら「継承する」、体質や顔立ちなら「遺伝する」と言うのが自然です。たとえば「父の会社を継いだ」とだけ言うと、株などの財産の話なのか、経営者としての立場の話なのかがはっきりしません。伝えたいのが財産なのか役割なのかを先に決めてから、言葉を選びましょう。",
+      "form": "相続する",
+      "en": "Even when talking about what you receive from your parents, Japanese uses different verbs depending on the thing. For land or a house it is natural to say \"inherit\" (sōzoku suru), for a company presidency or a traditional art \"succeed to\" (keishō suru), and for one's physical makeup or facial features \"be passed on genetically\" (iden suru). For example, if you just say \"I took over my father's company,\" it is unclear whether you mean property such as shares or your position as its manager. Decide first whether what you want to convey is property or a role, and then choose your words.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "財産や権利には「相続」、地位や伝統には「継承」、体質には「遺伝」を使う。",
+      "sense": "亡くなった人の財産や権利を法に従って受け継ぐこと。"
+    }
+  ],
+  "256": [
+    {
+      "ja": "今回は、1215年にイングランドで結ばれたマグナ・カルタの話です。当時の王ジョンは、戦争での敗北や失政で貴族たちの怒りを買い、彼らの要求をのまざるを得ない状況に追い込まれました。こうして生まれた文書には、王といえども勝手に税を取り立ててはならない、という規定が盛り込まれていたんです。王の権力にも限りがあるという考え方は、のちの議会政治や立憲主義の土台へとつながっていきます。",
+      "form": "規定",
+      "en": "This time, the story is about Magna Carta, agreed in England in 1215. King John, the ruler at the time, had angered the barons through military defeats and misrule, and was driven into a position where he had no choice but to accept their demands. The document produced in this way included a provision that even a king must not levy taxes as he pleased. The idea that a king's power also has limits went on to become the foundation for later parliamentary politics and constitutionalism.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜という規定を盛り込む」のように、法や文書の中で定められた個々の決まりを指す。",
+      "grammar": ["n2-zaru-o-enai", "n4-teiku"],
+      "sense": "法や規則の中で、はっきり定められた決まり。"
+    },
+    {
+      "ja": "われわれは言葉を使って考えているつもりでいるが、実は言葉のほうが考え方を規定しているのかもしれない。虹の色を七つと数える文化もあれば、もっと少なく数える文化もある。日本語では青と緑の境目があいまいで、緑色の信号を「青」と呼ぶのもその表れの一つといえる。色の名前の数が違えば、同じ景色を見ても、そこに引かれる境界線は変わってくるだろう。母語とは、世界を眺めるための窓であると同時に、その窓枠でもあるのだ。",
+      "form": "規定",
+      "en": "We believe we think by using words, but perhaps it is actually words that shape the way we think. There are cultures that count seven colours in the rainbow and cultures that count fewer. In Japanese the line between blue and green is blurry, and calling a green traffic light \"blue\" can be called one sign of that. If the number of colour names differs, the boundaries drawn across the same view will surely change too. A mother tongue is at once a window through which to look at the world and that window's frame.",
+      "original": true,
+      "register": "論",
+      "topic": "language",
+      "tipJa": "「〜を規定する」の形で、物事のあり方を決定づけ、枠をはめるという意味になる。",
+      "grammar": ["n5-teiru"],
+      "sense": "物事のあり方を決定づけ、その枠を定めること。"
+    },
+    {
+      "ja": "EUでは2024年、AIの利用を包括的に定める法律が成立した。リスクの大きさに応じて利用を分類し、人の行動を不当に操作するような使い方を原則として禁じたのが特徴だ。違反した企業に巨額の制裁金を科す規定もあり、域外の企業であっても、EU域内でサービスを提供すれば対象となる。ルールの適用は、2025年から段階的に始まっている。日本企業の間でも、自社の製品が分類のどこに当てはまるかを確認する動きが広がっている。",
+      "form": "規定",
+      "en": "In 2024, the EU passed a law that comprehensively regulates the use of AI. Its distinctive feature is that it classifies uses according to the size of the risk and, in principle, bans uses that unfairly manipulate people's behaviour. It also contains a provision imposing huge fines on companies that break it, and even companies outside the EU are covered if they provide services within it. Application of the rules began in stages from 2025. Among Japanese companies, too, moves to check where their own products fall in the classification are spreading.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「制裁金を科す規定」のように、法律の条文に書かれた具体的な定めを指す。",
+      "grammar": ["n2-ni-oujite", "n5-teiru"],
+      "sense": "法や規則の中で、はっきり定められた決まり。"
+    }
+  ],
+  "301": [
+    {
+      "ja": "今回は、1955年に起きた保守合同の話です。当時、日本の保守勢力は自由党と日本民主党に分かれていましたが、左右に分裂していた社会党が一つにまとまったことで、危機感が一気に高まりました。そこで二つの党が合同し、自民党が誕生したんです。以後、この党が政権を握り、社会党が野党第一党として向き合う時代が長く続きます。これがいわゆる「55年体制」と呼ばれる構図ですね。",
+      "form": "自民党",
+      "en": "This time, the story is about the conservative merger of 1955. At the time, Japan's conservative forces were split between the Liberal Party and the Japan Democratic Party, but when the Socialist Party, which had been divided into left and right, came back together, their sense of crisis shot up. So the two parties merged, and the LDP was born. From then on, a long era continued in which this party held power and the Socialist Party faced it as the largest opposition party. This is the arrangement known as the \"1955 System.\"",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「自民党が誕生する」のように、自由民主党を短く呼ぶ言い方。報道や会話で広く使う。",
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "自由民主党を自民党って縮めるの、ちょっと面白くないですか。日本語の略語って、長い言葉をいくつかのかたまりに分けて、それぞれの最初の字を取るのが基本パターンなんですよ。「自由」から「自」、「民主」から「民」をもらって、そこに「党」がくっつくっていう。「国際連合」が「国連」になるのも同じ作り方なんで、慣れると初めて見る略語でも、元の形がわりと想像できちゃうんですよね。",
+      "form": "自民党",
+      "en": "Isn't it kind of interesting how the Liberal Democratic Party gets shortened to Jimintō? With Japanese abbreviations, the basic pattern is to split a long word into a few chunks and take the first character of each. You take 自 from 自由 and 民 from 民主, and then 党 gets stuck on the end. The United Nations becoming Kokuren works the same way, so once you're used to it, you can pretty much guess the original form even of abbreviations you've never seen.",
+      "original": true,
+      "register": "話",
+      "topic": "language",
+      "tipJa": "「自由民主党」の略。日本語の略語は各要素の頭の字を取って作ることが多い。"
+    },
+    {
+      "ja": "政治経済の暗記で、自民党の結党を「1955年」という数字だけで覚えようとしていませんか。記憶の研究では、情報を理由や背景と結びつけて覚えるほど、あとから思い出しやすくなることがわかっています。たとえば、社会党の統一に危機感を持った保守勢力が合同した、という流れごと押さえておけば、年号も自然と浮かんできます。問題集を繰り返す前に、まず「なぜそうなったのか」を短く説明できるか確かめてみましょう。",
+      "form": "自民党",
+      "en": "When memorising for politics and economics, are you trying to learn the founding of the LDP only as the number 1955? Memory research has shown that the more you link information to reasons and background when you learn it, the easier it is to recall later. For example, if you grasp the whole flow, that conservative forces alarmed by the Socialist Party's reunification merged, the year will come to mind naturally too. Before drilling a problem book over and over, first check whether you can briefly explain why it happened.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学習の場面では「自民党の結党」のように、年号とセットで歴史の出来事として扱う。"
+    }
+  ],
+  "302": [
+    {
+      "ja": "今回は、日本に朝廷が二つあった時代の話です。1336年、後醍醐天皇は京都を離れて吉野に移り、自分こそが正統だと主張しました。一方、京都では足利尊氏が別の天皇を立てたため、南朝と北朝が並立することになったんです。この状態は半世紀以上も続き、1392年になってようやく両者は一つにまとまりました。教科書ではさらっと流されることが多いんですが、国の頂点が二つに分かれた、かなり異常な時代だったんですね。",
+      "form": "並立",
+      "en": "This time, the story is about the period when Japan had two imperial courts. In 1336, Emperor Go-Daigo left Kyoto, moved to Yoshino, and claimed that he alone was the legitimate ruler. Meanwhile, in Kyoto, Ashikaga Takauji set up a different emperor, so the Southern and Northern Courts came to stand side by side. This state of affairs lasted more than half a century, and only in 1392 were the two finally united. Textbooks tend to skim over it, but it was a pretty abnormal era in which the very top of the country was split in two.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「二つの朝廷が並立する」のように、同じ立場のものが同時に並んで存在する意味。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "二つ以上のものが同じ立場で並んで存在すること。"
+    },
+    {
+      "ja": "米中の対立が長引くなか、AIや半導体をめぐって、二つの技術圏が並立する構図が鮮明になりつつある。米国は先端半導体やその製造装置の対中輸出を規制し、中国は国産化を急いでいる。その結果、使われる半導体や開発の基盤が、地域ごとに分かれていく可能性も指摘されている。各国の企業にとっては、どちらの陣営とどう付き合うかが、経営上の大きな課題となっている。一方で、研究者の交流や論文の公開は国境を越えて続いており、完全な分断には至らないとの見方も根強い。",
+      "form": "並立",
+      "en": "As the confrontation between the United States and China drags on, a picture of two technology spheres standing side by side in AI and semiconductors is becoming clearer. The United States has restricted exports of advanced chips and the equipment to make them to China, while China is hurrying to produce its own. As a result, it has been pointed out that the chips in use and the foundations for development may split along regional lines. For companies everywhere, how to deal with which camp has become a major management issue. On the other hand, there is also a persistent view that exchanges among researchers and the publication of papers continue across borders, so things will not come to a complete split.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「二つの勢力が並立する構図」のように、対等な陣営が同時にある状態を表す。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "二つ以上のものが同じ立場で並んで存在すること。"
+    },
+    {
+      "ja": "国語の文法問題でよく出るのが、並立助詞の判別です。「パンと牛乳」の「と」や、「本やノート」の「や」のように、対等な関係にある言葉を並べてつなぐ働きをします。「行くか行かないか」の「か」のように、選ぶ対象を並べるものも同じ仲間に入ります。確かめるときのポイントは、助詞の前と後ろを入れ替えても意味がほとんど変わらないかどうかです。「友達と行く」の「と」は入れ替えられないので、別の働きの助詞だと判断できます。",
+      "form": "並立",
+      "en": "A common topic in Japanese grammar questions is identifying parallel particles. Like the と in \"bread and milk\" or the や in \"books and notebooks,\" they link words in an equal relationship side by side. Ones that line up choices, like the か in \"whether to go or not,\" also belong to the same group. The key point when checking is whether the meaning stays almost the same if you swap what comes before and after the particle. The と in \"go with a friend\" can't be swapped, so you can tell it's a particle with a different function.",
+      "original": true,
+      "register": "学",
+      "topic": "language",
+      "tipJa": "文法では「並立助詞」「並立の関係」のように、語を対等に並べる働きを指す。",
+      "grammar": ["n3-you-ni"],
+      "sense": "文法で、語と語を対等な関係で並べること。"
+    }
+  ],
+  "305": [
+    {
+      "ja": "今回は、1890年に開かれた最初の帝国議会の話です。選挙で選ばれた衆議院では、政府に批判的な民党が多くの議席を占めていました。予算案の審議に入ると、民党は「民力休養」を掲げ、政府の予算を大幅に減らすよう強く求めたんです。結局、政府側が一部の議員を切り崩して、予算はなんとか成立にこぎつけました。政府と議会が真正面からぶつかったこの場面は、日本の議会政治が最初に迎えた大きな試練だったんですね。",
+      "form": "審議",
+      "en": "This time, the story is about the first Imperial Diet, which opened in 1890. In the elected House of Representatives, the popular parties, which were critical of the government, held many of the seats. Once deliberation on the budget began, the popular parties raised the banner of \"relief for the people\" and pressed hard for steep cuts to the government's budget. In the end, the government side won over some of the members, and the budget barely managed to pass. This head-on clash between government and parliament was the first great trial that Japanese parliamentary politics faced.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「予算案の審議に入る」のように、議会で案の中身を詳しく話し合う段階を指す。",
+      "sense": "会議や議会で、案の中身を詳しく話し合うこと。"
+    },
+    {
+      "ja": "会議って、時間をかけてじっくり話し合えば、いい結論が出ると思っちゃうじゃないですか。でも、メンバーの仲がよすぎたり、偉い人の意見が先に出ちゃったりすると、みんな反対しにくくなって、かえって判断を誤るらしいんですよ。心理学だと集団浅慮って呼ばれてるやつですね。だから、審議の時間を長くするより、あえて反対役を一人決めておくほうが、よっぽど意味があると思うんですよね。",
+      "form": "審議",
+      "en": "With meetings, you tend to think that if you take time and talk things through carefully, you'll reach a good conclusion, right? But apparently, if the members get along too well, or if someone senior gives their opinion first, everyone finds it hard to object, and the group actually ends up misjudging. In psychology, that's what's called groupthink. So rather than making the deliberation longer, I think it makes way more sense to deliberately appoint one person as the objector.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話でも「審議の時間」のように、会議で案を詰める場面を少し硬く言うときに使う。",
+      "sense": "会議で、案の良し悪しを詳しく話し合うこと。"
+    },
+    {
+      "ja": "「審」という字には、細かいところまで調べて、明らかにするという意味があります。「審判」や「審査」と並べてみると、その共通点が見えてくるでしょう。どちらも、ものごとをよく見極めたうえで判断を下す場面で使われる言葉です。ですから、ただ意見を出し合う「議論」とは違い、審議という言葉には、案の中身を一つずつ確かめていくニュアンスが含まれます。議事録や記事で言葉を選ぶときは、この字の意味を思い出すと迷いにくくなりますよ。",
+      "form": "審議",
+      "en": "The character 審 carries the meaning of examining things down to the details and making them clear. If you set it alongside words like 審判 (judging) and 審査 (screening), you can see what they have in common. Both are words used when you look closely at something and then make a judgement. So unlike 議論 (discussion), where people simply put forward opinions, the word shingi carries the nuance of checking the content of a proposal point by point. When you choose words for minutes or articles, remembering what this character means makes it easier to decide.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「審」は詳しく調べて明らかにする意。単なる議論ではなく、案を詳しく確かめる話し合いを指す。",
+      "grammar": ["n4-teiku"],
+      "sense": "会議で、案の中身を一つずつ詳しく調べて話し合うこと。"
+    }
+  ]
+}

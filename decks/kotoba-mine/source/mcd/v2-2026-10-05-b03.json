@@ -1,0 +1,352 @@
+{
+  "6": [
+    {
+      "ja": "今回は、AIブームを支えたGPUという部品の話です。GPUはもともとゲームの映像を描くために作られたもので、単純な計算を同時にたくさんこなすのが得意でした。そこへ大量のデータから学ぶ深層学習が広まり、GPUはAIの学習に欠かせない部品として使われるようになりました。部品が速くなれば学習が進み、学習の成果がさらに部品への投資を呼ぶという相乗効果が生まれたわけです。どちらか片方だけでは、ここまでの急成長はなかったと言われています。",
+      "form": "相乗",
+      "en": "This time we're talking about the GPU, the component that underpinned the AI boom. GPUs were originally made for drawing game graphics, and they were good at handling lots of simple calculations at the same time. Then deep learning, which learns from large amounts of data, spread, and GPUs came to be used as an indispensable component for training AI. The faster the components got, the further training advanced, and the results of training drew still more investment into the components: a synergistic effect was born. It is said that with only one of the two, growth this rapid would never have happened.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「相乗効果」の形で使うことが多い。悪い方向に強め合う場合にも使える。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "二つ以上のものが重なり、互いの効果を強め合うこと。"
+    },
+    {
+      "ja": "試験勉強でよく勧められる方法に、思い出す練習と、間隔をあけた復習があります。どちらも単独で記憶の定着を助けることが、多くの実験で確かめられています。面白いのは、この二つを組み合わせることで、思い出すたびに次の復習が効きやすくなり、復習のたびに思い出しやすくなるという点です。一方の効果がもう一方を押し上げる、いわば相乗効果ですね。ですから、同じ問題集でも、解く日を一週間ごとに散らすだけで成績は変わってくるはずです。",
+      "form": "相乗",
+      "en": "Two methods often recommended for exam study are retrieval practice and spaced review. Many experiments have confirmed that each of them, on its own, helps memories stick. What's interesting is that by combining the two, each act of recalling makes the next review more effective, and each review makes recalling easier. One effect pushes up the other: a synergy, you might say. So even with the same workbook, simply spreading the days you work through it a week apart should change your results.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「相乗効果が生まれる／を狙う」のように言う。単なる合計より大きくなる点が大事。",
+      "grammar": ["n3-koto-de", "n5-teiru"],
+      "sense": "二つ以上のものが重なり、互いの効果を強め合うこと。"
+    },
+    {
+      "ja": "ルネサンスのころのフィレンツェって、とんでもない天才が同じ時期にまとまって出てきたじゃないですか。レオナルドとかミケランジェロとか、同じ街にいて、お互いをかなり意識してたらしいんですよね。で、お金を出すパトロンもいて、腕のいい職人もいて、っていう環境がそろってたわけです。そうなると、一人ひとりの才能がただ足されるだけじゃなくて、掛け算みたいになるんですよ。ああいうのが本当の相乗効果なんだろうなって思います。",
+      "form": "相乗",
+      "en": "You know how Renaissance Florence produced a bunch of incredible geniuses all at the same time? Leonardo, Michelangelo and so on were in the same city, and apparently they were pretty conscious of each other. And then there were patrons putting up money and skilled craftsmen too, so the whole environment was in place. When that happens, each person's talent doesn't just get added on, it becomes more like multiplication. I think that's what real synergy looks like.",
+      "original": true,
+      "register": "話",
+      "topic": "history",
+      "tipJa": "話し言葉でも「相乗効果ってやつ」のように、そのまま気軽に使える。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "二つ以上のものが重なり、互いの効果を強め合うこと。"
+    }
+  ],
+  "239": [
+    {
+      "ja": "今回は、中世ヨーロッパの荘園の仕組みを見ていきます。農民は領主から土地を借りて耕し、その代わりに収穫の一部を納めたり、領主の畑で働いたりしていました。ここで大事なのは、領主の側も、農民を外敵から守るという役目を負っていたことです。つまり、労働や作物は、保護に対する一種の対価だったと考えられるわけですね。もちろん実際には力の差が大きく、対等な取引とはとても言えませんでしたが。",
+      "form": "対価",
+      "en": "This time we'll look at how the manorial system of medieval Europe worked. Peasants rented land from the lord and farmed it, and in return they handed over part of the harvest or worked in the lord's fields. What matters here is that the lord, for his part, also had the duty of protecting the peasants from outside enemies. In other words, their labour and crops can be seen as a kind of payment in return for protection. Of course, in practice the gap in power was large, and it could hardly be called an equal exchange.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「労働の対価」「正当な対価を支払う」のように、何に対する支払いかを添えて使う。",
+      "grammar": ["n4-teiku"],
+      "sense": "労働や品物、サービスに見合って支払われる報酬。"
+    },
+    {
+      "ja": "生成AIの開発をめぐり、学習に使われた記事や作品の扱いが各国で議論を呼んでいる。報道機関や出版社の中には、開発企業と契約を結び、記事の利用料を受け取る例も出てきた。ただ、ネット上の文章を広く集めて学習させる方式では、誰の作品がどれだけ使われたのかを把握するのが難しい。書き手や描き手に正当な対価が届く仕組みをどう作るかは、各国に共通する課題となっている。日本でも、文化庁が考え方を示すなど、議論が続いている。",
+      "form": "対価",
+      "en": "Debate is growing in many countries over how articles and creative works used to train generative AI should be treated. Some news organisations and publishers have signed contracts with developers and now receive fees for the use of their articles. However, with a method that trains models on text gathered widely from the internet, it is hard to know whose work was used and how much. How to build a system that gets fair payment to writers and artists has become a challenge shared by every country. In Japan too, debate continues, with the Agency for Cultural Affairs among others setting out its views.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「対価を支払う／得る」「適正な対価」の形が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "労働や品物、サービスに見合って支払われる報酬。"
+    },
+    {
+      "ja": "仏教で説かれる布施は、何かを与えながら、その行為に何も求めないことを本来の姿とする。物を渡して代金を受け取るなら、それは売り買いにすぎない。感謝や評判を期待して施すのも、形を変えた取引であろう。僧に食を捧げる人も、受け取る僧も、互いに貸し借りを数えないところに、この教えの深さがある。与えることに対価を求めない心は、実は与える側をいちばん自由にするのかもしれない。",
+      "form": "対価",
+      "en": "Dana, the giving taught in Buddhism, is at its truest when one gives something while asking nothing for the act. If you hand over goods and receive the price, that is no more than buying and selling. Giving in the hope of thanks or reputation is also, surely, a trade in another form. The depth of this teaching lies in the fact that neither the person offering food to a monk nor the monk receiving it keeps count of debts. A heart that asks no payment for giving may in fact be what frees the giver most of all.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「対価を求める」は見返りを期待する意味にもなる。与える行為と対にして読むとよい。",
+      "grammar": ["n4-nagara", "n2-ni-suginai"],
+      "sense": "労働や品物、サービスに見合って支払われる報酬。"
+    }
+  ],
+  "258": [
+    {
+      "ja": "今回は、江戸時代の参勤交代について見ていきます。大名は一年おきに江戸と領地を行き来し、大勢の家来を連れて長い道のりを旅しました。宿代や人件費、江戸屋敷の維持まで含めると、その負担は藩にとってかなりのものだったと言われています。古い言い方をすれば、まさに大きな費えだったわけですね。ただ、この制度の狙いが大名を弱らせることにあったのかどうかは、研究者の間でも見方が分かれています。",
+      "form": "費え",
+      "en": "This time we'll look at sankin-kotai, the alternate attendance system of the Edo period. Daimyo travelled back and forth between Edo and their domains every other year, making the long journey with large retinues of retainers. Including lodging, wages and the upkeep of their Edo residences, the burden is said to have been considerable for the domains. To put it in old-fashioned terms, it was a great drain indeed. Whether the aim of the system was to weaken the daimyo, though, is something on which even researchers are divided.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「費え」は古風な書き言葉。日常では「出費」「むだな出費」と言うことが多い。",
+      "grammar": ["n4-teiku"],
+      "sense": "物事にかかる出費。特に、むだに出ていくお金や手間。"
+    },
+    {
+      "ja": "生成AIの普及を見込み、米国の大手IT企業はデータセンターへの投資を急速に増やしている。電力の確保も課題となり、各社は発電事業者との長期契約に動いている。ただ、AIがどれほどの収益を生むかはまだ見通せず、市場では慎重な見方も根強い。需要が想定を下回れば、巨額の設備投資が無用の費えに終わりかねないとの指摘も出ている。過去にも、通信網への過剰な投資が、ITバブルの崩壊とともに重い負担となった例がある。",
+      "form": "費え",
+      "en": "Anticipating the spread of generative AI, major US tech companies are rapidly increasing their investment in data centres. Securing electricity has also become an issue, and companies are moving to sign long-term contracts with power producers. However, how much revenue AI will generate cannot yet be foreseen, and cautious views remain strong in the market. Some point out that if demand falls short of expectations, the huge capital spending could end up as a needless waste. There is precedent, too: excessive investment in communications networks became a heavy burden when the dot-com bubble burst.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「無用の費え」「国の費え」のように、硬い文章で使われる。",
+      "grammar": ["n5-teiru"],
+      "sense": "物事にかかる出費。特に、むだに出ていくお金や手間。"
+    },
+    {
+      "ja": "仏教は、苦しみのもとを、ものを欲しがって手放せない心に見る。新しい服も最新の道具も、手に入れた瞬間の喜びは驚くほど短く、すぐに次の欲しいものが現れる。その繰り返しの中で失われたお金と時間を振り返れば、大半はただの費えにすぎないと気づくことも少なくない。手に入れるたびに、心はかえって落ち着きを失っていくのである。仏典が繰り返し足るを知ることを説くのも、そのためであろう。",
+      "form": "費え",
+      "en": "Buddhism sees the source of suffering in a mind that craves things and cannot let them go. Whether new clothes or the latest gadget, the joy at the moment of getting it is surprisingly short, and the next thing we want soon appears. Looking back on the money and time lost in that cycle, we often realise that most of it was nothing but waste. Each time we acquire something, the mind, if anything, loses its calm. That is surely why the scriptures teach again and again to know what is enough.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「時間の費え」「心の費え」のように、お金以外の損失にも比喩的に使える。",
+      "grammar": ["n2-ni-suginai", "n4-teiku"],
+      "sense": "物事にかかる出費。特に、むだに出ていくお金や手間。"
+    }
+  ],
+  "262": [
+    {
+      "ja": "今回は、戦後の日本で交通事故の裁判がどう変わったかを見ていきます。一九六〇年代には車が急に増え、事故で亡くなる人が年に一万人を超えて、交通戦争とまで呼ばれました。裁判が増えるにつれて、亡くなった人が働き続けていれば得られたはずの収入を、年齢や平均的な給料から計算するやり方が整えられていきます。こうして算定される逸失利益は、今では賠償額の大きな部分を占めるようになりました。",
+      "form": "逸失利益",
+      "en": "This time we'll look at how traffic-accident lawsuits changed in postwar Japan. In the 1960s cars increased rapidly, more than ten thousand people a year died in accidents, and it was even called the traffic war. As lawsuits increased, a method was worked out for calculating, from age and average pay, the income the deceased would have earned had they kept working. Lost earnings calculated this way have now come to make up a large part of compensation awards.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "損害賠償の用語。慰謝料（心の苦痛への賠償）とは別に計算される。",
+      "grammar": ["n3-ni-tsurete", "n4-teiku", "n4-you-ni-naru"],
+      "sense": "事故などがなければ将来得られたはずの収入や利益。"
+    },
+    {
+      "ja": "自動運転車の実用化を見据え、事故が起きた際の賠償の在り方をめぐる議論が各国で続いている。人が運転していれば責任は主に運転者が負うが、システムが運転を担う場合には、メーカーやソフトウェアの開発者にも責任が及ぶ可能性がある。被害者が亡くなったり働けなくなったりした場合には、将来得られたはずの収入を逸失利益として算定し、賠償額に含めるのが一般的だ。誰がどの程度これを負担するのかを明確にしなければ、普及は進まないとの見方が強い。",
+      "form": "逸失利益",
+      "en": "With the practical use of self-driving cars in view, debate continues in many countries over how compensation should work when an accident occurs. When a person is driving, liability falls mainly on the driver, but when a system does the driving, liability may extend to manufacturers and software developers as well. When a victim dies or becomes unable to work, it is standard to calculate the income they would have earned in future as lost earnings and include it in the damages. The prevailing view is that unless it is made clear who bears how much of this, adoption will not advance.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「逸失利益を算定する」「逸失利益の請求」の形で出てくる。",
+      "grammar": ["n5-teiru"],
+      "sense": "事故などがなければ将来得られたはずの収入や利益。"
+    },
+    {
+      "ja": "事故がなければ得られたはずの収入を、法律は逸失利益と呼んで数え上げる。残された者の暮らしを守るために、その計算は欠かせないものであろう。だが心の中で同じ勘定を始めると、人はなかなかそこから抜け出せない。あの日がなければ、あの人がいれば、と失った未来を数えるほど、いま手もとにある日々が見えなくなっていく。仏教が執着を手放せと説くのは、過去を忘れろということではなく、数え終えた勘定をそっと閉じよということなのかもしれない。",
+      "form": "逸失利益",
+      "en": "The law counts up the income that would have been earned had there been no accident, and calls it lost earnings. To protect the livelihoods of those left behind, that calculation is surely indispensable. But once we start the same reckoning in our hearts, it is hard to get out of it. The more we count the futures we lost, if only that day had not happened, if only that person were here, the less we can see the days we have in hand now. When Buddhism teaches us to let go of attachment, perhaps it means not that we should forget the past but that we should quietly close an account we have finished counting.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "法律用語だが、「得られたはずのもの」を数える発想として比喩的に論じることもできる。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"],
+      "sense": "事故などがなければ将来得られたはずの収入や利益。"
+    }
+  ],
+  "295": [
+    {
+      "ja": "今回は、一四九四年に結ばれたトルデシリャス条約を見ていきます。当時、海の向こうの新しい土地をめぐって、スペインとポルトガルは激しく張り合っていました。そこで両国は大西洋の上に境界線を引き、その西側をスペイン、東側をポルトガルのものにすると取り決めます。まだよく知りもしない世界を、二つの国だけで折半しようとしたわけですね。もちろん、そこに住んでいた人々の意向は、まったく問われませんでした。",
+      "form": "折半",
+      "en": "This time we'll look at the Treaty of Tordesillas, concluded in 1494. At the time, Spain and Portugal were fiercely vying over new lands across the sea. So the two countries drew a boundary line across the Atlantic and agreed that the land to its west would belong to Spain and the land to its east to Portugal. They were trying to split a world they barely even knew down the middle between just the two of them. Of course, the wishes of the people who lived there were never asked at all.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「費用を折半する」「利益を折半で」のように、二者の間で使うのが基本。",
+      "grammar": ["n4-teiku"],
+      "sense": "金や物などを二つに分け、半分ずつにすること。"
+    },
+    {
+      "ja": "先端半導体の開発や工場の建設にかかる費用が膨らむなか、企業どうしが手を組む動きが広がっている。二社が出資を折半して合弁会社をつくれば、それぞれの負担は半分で済む。ただ、出資の比率が同じだと、どちらにも最終的な決定権がないため、方針が食い違ったときに身動きが取れなくなるおそれがある。このため、契約の段階で、対立した場合の決め方をあらかじめ定めておくことが重要だとされる。",
+      "form": "折半",
+      "en": "As the cost of developing advanced semiconductors and building plants swells, moves by companies to join forces are spreading. If two companies split the investment fifty-fifty and form a joint venture, each one's burden is only half. However, if their shares are equal, neither has the final say, so there is a risk of deadlock when their policies diverge. For this reason, it is considered important to settle in advance, at the contract stage, how decisions will be made in case of a dispute.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「出資を折半する」「折半出資」の形でよく出る。",
+      "grammar": ["n5-teiru"],
+      "sense": "金や物などを二つに分け、半分ずつにすること。"
+    },
+    {
+      "ja": "行動経済学でよく知られた実験に、最後通牒ゲームがあります。一人が一定のお金の分け方を提案し、相手が断れば二人とも一円も受け取れないというルールです。損得だけを考えれば、どんなに少ない額でも受け入れたほうが得なはずです。ところが実際には、極端に不公平な提案はしばしば拒否されることが分かっています。提案する側も、それを見越してか、折半か、それに近い分け方を示すことが多いのです。",
+      "form": "折半",
+      "en": "A well-known experiment in behavioural economics is the ultimatum game. One person proposes how to divide a set sum of money, and if the other refuses, neither of them gets a single yen. If you think only about gain and loss, accepting any amount, however small, should be the better deal. In reality, however, it is known that extremely unfair proposals are often rejected. Perhaps anticipating this, proposers often offer a fifty-fifty split or something close to it.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「折半にする」「折半で払う」とも言う。きっちり半々という含みがある。",
+      "grammar": ["n5-teiru"],
+      "sense": "金や物などを二つに分け、半分ずつにすること。"
+    }
+  ],
+  "316": [
+    {
+      "ja": "今回は、一六〇二年に設立されたオランダ東インド会社の話です。アジアまでの航海には、船の建造や船員の給料、食料などに莫大な経費がかかり、そのうえ嵐や病気で船や人を失うことも珍しくありませんでした。船が一隻戻らなければ、それだけで商人は破産しかねません。そこで、大勢の出資者から少しずつお金を集め、利益もリスクも分け合う仕組みが生まれることになりました。これが、世界初の株式会社とも言われるゆえんです。",
+      "form": "経費",
+      "en": "This time we're talking about the Dutch East India Company, founded in 1602. A voyage to Asia ran up enormous expenses for building ships, sailors' wages, food and so on, and on top of that it was not unusual to lose ships and men to storms and disease. If a single ship failed to return, that alone could bankrupt a merchant. So a system came into being in which money was gathered little by little from many investors, who shared both the profits and the risks. That is why it is said to be the world's first joint-stock company.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「経費がかかる」「経費を削る」「経費で落とす」のように使う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "仕事や活動を続けるためにかかる費用。"
+    },
+    {
+      "ja": "企業の間で、社員の経費の精算に人工知能を取り入れる動きが広がっている。スマートフォンで撮影した領収書から金額や日付を読み取り、社内のルールに照らして不自然な申請を自動で洗い出す仕組みだ。これまで経理の担当者が一枚ずつ目で確かめていた作業が大幅に減り、締め日前の残業が少なくなったという企業もある。一方で、最終的な判断を機械に任せきりにすることには、慎重な声も根強い。",
+      "form": "経費",
+      "en": "Companies are increasingly bringing artificial intelligence into the settlement of employees' expenses. The systems read the amount and date from receipts photographed on a smartphone and automatically flag claims that look irregular against company rules. Some companies say the work their accounting staff used to check one sheet at a time by eye has been greatly reduced, and overtime before closing day has fallen. On the other hand, cautious voices remain strong about leaving final judgments entirely to machines.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「経費精算」は社員が立て替えた費用を会社が払い戻す手続き。",
+      "grammar": ["n5-teiru"],
+      "sense": "仕事や活動を続けるためにかかる費用。"
+    },
+    {
+      "ja": "初期の仏教の僧は、托鉢によって日々の食を得ており、持ち物も衣と鉢などわずかな品に限られ、蓄えることは戒められていたという。雨季に身を寄せる僧院も、信者の寄進によって建てられたものだった。現代の組織は、活動を続けるための経費をいかに切り詰めるかに知恵を絞る。だが僧たちは、そもそも維持すべきものを持たないことで、その悩みの外に立っていたのである。持たない身軽さは、ひとつの豊かさでもあったのだろう。",
+      "form": "経費",
+      "en": "The monks of early Buddhism obtained their daily food through alms rounds, and their possessions were limited to a few items such as robes and a bowl, and storing things up was forbidden, it is said. Even the monasteries where they took shelter in the rainy season were built with gifts from lay followers. Modern organisations rack their brains over how to cut the expenses of keeping their activities going. The monks, however, stood outside that worry by having nothing to maintain in the first place. The lightness of owning nothing was surely a kind of wealth as well.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "組織の運営を語る硬い文脈では「経費を切り詰める」「経費がかさむ」がよく合う。",
+      "grammar": ["n3-koto-de"],
+      "sense": "仕事や活動を続けるためにかかる費用。"
+    }
+  ],
+  "125": [
+    {
+      "ja": "今回は、江戸時代の商家の帳簿の話です。大きな商家では、日々の売り買いを大福帳と呼ばれる帳面に書きつけていました。ただ、帳面の数字と蔵に残っている品が本当に合っているかは、実際に数えてみないと分かりません。そこで決まった時期に店を閉め、品物を一つ残らず数え上げる棚卸しを行っていたわけです。帳簿だけを信じるのではなく、現物で確かめるという発想は、今の会計にもそのまま受け継がれています。",
+      "form": "棚卸し",
+      "en": "This time we're talking about the account books of merchant houses in the Edo period. Large merchant houses wrote their daily buying and selling in a ledger called the daifukucho. But whether the figures in the ledger really matched the goods left in the storehouse could not be known without actually counting them. So at fixed times they closed the shop and carried out a stocktaking, counting every last item. The idea of checking against the actual goods rather than trusting the books alone has been handed down unchanged to accounting today.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「棚卸」とも書く。「年に一度棚卸しをする」のように、決まった時期に行う作業。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"],
+      "sense": "在庫の商品や材料を実際に数え、その量や価値を調べること。"
+    },
+    {
+      "ja": "小売業界で、在庫を数える作業を自動化する動きが広がっている。商品に付けた小さな電子タグを読み取る方式なら、機器を持って店内を歩くだけで、数千点の在庫を短時間で把握できる。閉店後に従業員総出で行っていた棚卸しが、数時間から数十分に短くなった例もある。棚を撮影した映像から人工知能が商品の数を数える仕組みも試されており、人手不足が深刻になるなか、導入はさらに進みそうだ。",
+      "form": "棚卸し",
+      "en": "In the retail industry, moves to automate the work of counting stock are spreading. With systems that read small electronic tags attached to products, staff can grasp the stock of several thousand items in a short time just by walking around the store carrying a device. In some cases, stocktaking that used to be done after closing with all hands on deck has been cut from several hours to a few dozen minutes. Systems in which artificial intelligence counts products from video of the shelves are also being tested, and with labour shortages becoming severe, adoption looks set to go further.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「棚卸し作業」「棚卸しの効率化」のように業務名として使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "在庫の商品や材料を実際に数え、その量や価値を調べること。"
+    },
+    {
+      "ja": "転職を考え始めたら、まず自分のキャリアの棚卸しをしろってよく言われるじゃないですか。これ、実際にやってみると案外ばかにできなくて、これまで携わった業務や身につけた技能を、一つずつ紙に書き出していくんですよ。そうすると、自分では当たり前だと思ってた作業が、実は周りから重宝されてる強みだったりするんですよね。逆に、得意だと自負してた分野が、客観的に見るとそれほどでもなかったりして。頭の中で漠然と考えてるだけだと、こういう偏りにはなかなか気づけないんですよ。",
+      "form": "棚卸し",
+      "en": "You know how, when you start thinking about changing jobs, people always tell you to begin by taking stock of your career? When you actually try it, it's surprisingly worthwhile: you write out on paper, one by one, the work you've been involved in and the skills you've picked up. Then it turns out tasks you took for granted are actually strengths the people around you really value. And the other way round, fields you prided yourself on turn out, looked at objectively, to be not all that special. If you only think about it vaguely in your head, you hardly ever notice this kind of skew.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "比喩的に「経験の棚卸し」「キャリアの棚卸し」と言い、自分を見直す意味になる。",
+      "grammar": ["n4-teiku"],
+      "sense": "自分の経験や能力などを一つずつ洗い出して見直すこと。"
+    }
+  ],
+  "126": [
+    {
+      "ja": "今回は、トヨタが広めたジャスト・イン・タイムという考え方を見ていきます。必要なものを、必要なときに、必要な量だけ作るという発想ですね。工場に部品や作りかけの品が山積みになっていると、帳簿の上では棚卸資産として資産に数えられます。でもトヨタは、それを資産というより、お金が寝ている状態、つまりムダとして捉えました。在庫を減らすことで、隠れていた問題が見えるようになる、というのがこの考え方の核心です。",
+      "form": "棚卸資産",
+      "en": "This time we'll look at just-in-time, the approach that Toyota spread. It's the idea of making only what is needed, when it is needed, in the amount needed. When parts and half-finished goods are piled up in a factory, on the books they count as assets, under inventory. But Toyota saw that less as an asset than as money lying idle, in other words as waste. The heart of this approach is that by reducing stock, problems that had been hidden become visible.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "会計用語。いわゆる「在庫」を帳簿上で呼ぶときの言い方。",
+      "grammar": ["n4-teiku", "n3-koto-de", "n4-you-ni-naru"],
+      "sense": "販売のために持っている商品や製品、原材料など。"
+    },
+    {
+      "ja": "パソコンやスマートフォンの需要が落ち込んだ二〇二二年後半から、半導体メモリーの市場では売れ残りが急増した。大手メーカーの多くで棚卸資産が積み上がり、在庫の評価を引き下げて損失を計上する動きも相次いだ。各社は生産を絞って在庫の調整を進め、その後、生成AI向けの需要が伸びるにつれて状況は持ち直した。半導体は好況と不振の波が大きく、在庫の動きがそのまま業績を左右しやすい。",
+      "form": "棚卸資産",
+      "en": "From the second half of 2022, when demand for PCs and smartphones fell, unsold stock surged in the semiconductor memory market. At many of the major makers inventory piled up, and there was a string of moves to write down the value of stock and book losses. Companies cut production and worked through their stock, and later, as demand for generative AI grew, the situation picked up. Semiconductors swing widely between boom and slump, and movements in stock tend to sway results directly.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "決算記事では「棚卸資産が積み上がる」「棚卸資産の評価損」の形で出る。",
+      "grammar": ["n3-ni-tsurete"],
+      "sense": "販売のために持っている商品や製品、原材料など。"
+    },
+    {
+      "ja": "簿記の試験で点を落としやすいのが、期末に売れ残った商品の扱いです。売れ残った商品は、その期の費用ではなく、棚卸資産として次の期に持ち越します。決算整理で、期首の在庫を仕入に戻し、期末の在庫を繰越商品に振り替える、あの手順がこれにあたります。ここを取り違えると、売上原価も利益もまとめてずれてしまいます。仕入れた分から残った分を引いて、はじめて売れた分の原価が出る、という流れを、図にして覚えておきましょう。",
+      "form": "棚卸資産",
+      "en": "A place where people tend to lose marks in bookkeeping exams is how to treat goods left unsold at the end of the period. Goods left unsold are not an expense for that period but are carried over into the next period as inventory. That is what the familiar closing-adjustment step does, moving opening stock back into purchases and transferring closing stock to merchandise carried forward. If you get this wrong, the cost of sales and the profit both end up off. Remember the flow as a diagram: only when you subtract what is left from what you purchased do you get the cost of what was sold.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "簿記では、期末に残った商品を費用から外し、資産として次の期へ繰り越す。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "販売のために持っている商品や製品、原材料など。"
+    }
+  ],
+  "219": [
+    {
+      "ja": "今回は、一九二九年に始まった世界恐慌の話です。ニューヨークの株価が暴落したのをきっかけに、銀行の倒産や失業がアメリカ全体に広がっていきました。各国は自国の産業を守ろうと、輸入品に高い関税をかけ、その結果、世界の貿易はさらに細ってしまいます。一国の景気の落ち込みが、国境を越えて連鎖していったわけです。この苦い経験は、戦後の国際的な経済の仕組みづくりに大きな影響を与えることになりました。",
+      "form": "景気",
+      "en": "This time we're talking about the Great Depression that began in 1929. Triggered by the crash of share prices in New York, bank failures and unemployment spread across the whole of America. Each country put high tariffs on imports to protect its own industries, and as a result world trade shrank even further. A downturn in one country's economy set off a chain reaction across borders. This bitter experience went on to have a great influence on the building of the postwar international economic order.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「景気がいい／悪い」「景気が冷え込む」「景気の落ち込み」のように使う。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"],
+      "sense": "売り買いや取引など、経済活動全体の調子。"
+    },
+    {
+      "ja": "米国では、人工知能向けのデータセンターや半導体への巨額の投資が、景気を下支えしているとの見方が広がっている。建設や電力設備の需要が増え、関連する雇用も生まれているためだ。ただ、投資の多くは少数の大手企業に集中しており、各社が投資を絞れば経済全体への影響も小さくないとの指摘がある。市場では、AIの収益化がどこまで進むかに注目が集まっている。一方で、それ以外の分野の動きは鈍いとの声もある。",
+      "form": "景気",
+      "en": "In the United States the view is spreading that huge investment in data centres and semiconductors for artificial intelligence is propping up the economy. This is because demand for construction and power equipment is rising and related jobs are being created. However, much of the investment is concentrated in a small number of large companies, and some point out that if they cut back, the impact on the economy as a whole would be far from small. In the market, attention is focused on how far AI can be turned into profit. On the other hand, some say activity in other sectors is sluggish.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "経済報道では「景気を下支えする」「景気の先行き」の形が頻出。",
+      "grammar": ["n5-teiru"],
+      "sense": "売り買いや取引など、経済活動全体の調子。"
+    },
+    {
+      "ja": "試験前とか締め切り前って、どうしても気分が落ちてくるじゃないですか。そういうとき僕は、景気づけに好きな曲を大音量でかけてから机に向かうんですよ。で、その曲が終わるころには、なんとなくやれそうな気分になってるんですよね。科学的な根拠があるわけじゃないんですけど、少なくとも最初の一歩は踏み出しやすくなる気がしていて。結局、やる気って待ってても来ないんで、自分で勢いをつけるしかないんですよね。",
+      "form": "景気",
+      "en": "Before exams or deadlines your mood inevitably starts to drop, right? At times like that, I blast a song I like at full volume to pump myself up before I sit down at my desk. And by the time the song is over, I somehow feel like I can do it. It's not like there's any scientific basis for it, but I feel like it at least makes it easier to take the first step. In the end, motivation doesn't come if you just wait for it, so you have no choice but to build momentum yourself.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "「景気づけ」は気分を盛り上げるために何かをすること。経済の意味とは別。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "活気や勢いがあること。威勢のよさ。"
+    }
+  ],
+  "297": [
+    {
+      "ja": "今回は、一九九〇年代初めのバブル崩壊を見ていきます。株や土地の値段が急落すると、それを担保にお金を貸していた銀行は、大量の不良債権を抱えることになりました。銀行が貸し出しに慎重になれば、企業は新しい設備にお金を回せず、雇用も伸びません。こうして長い不況が続き、のちに失われた十年と呼ばれる時代が始まります。問題の処理を先送りしたことが、傷を深くしたとも言われています。",
+      "form": "不況",
+      "en": "This time we'll look at the bursting of the bubble in the early 1990s. When the prices of shares and land plunged, the banks that had lent money against them as collateral ended up saddled with huge bad debts. When banks become cautious about lending, companies cannot put money into new equipment, and jobs do not grow either. In this way a long recession set in, and an era later called the lost decade began. It is also said that putting off dealing with the problem deepened the wound.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「不況に陥る」「長引く不況」「不況を乗り切る」のように使う。",
+      "grammar": ["n4-teiku", "n3-koto-ni-naru"],
+      "sense": "物が売れず、経済活動が長く落ち込んでいる状態。"
+    },
+    {
+      "ja": "半導体業界は、数年ごとに好況と不況を繰り返してきた。需要が伸びると各社が一斉に増産に動き、その結果、供給がだぶついて価格が下がるためで、この波はシリコンサイクルと呼ばれる。近年は人工知能向けの需要が急増し、波そのものが小さくなるとの見方も出ている。ただ、専門家の間では、過去と同じように投資の行き過ぎが反動を招くと警戒する声も根強い。各社の設備投資の判断は、これまで以上に難しくなっている。",
+      "form": "不況",
+      "en": "The semiconductor industry has gone through repeated booms and recessions every few years. This is because when demand grows, companies all move to raise output at once, and as a result supply becomes excessive and prices fall; this wave is called the silicon cycle. In recent years demand for artificial intelligence has surged, and some take the view that the wave itself will become smaller. Among experts, however, there are also persistent voices warning that, just as in the past, overinvestment will bring a backlash. Companies' decisions on capital investment have become harder than ever.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "業界名を付けて「半導体不況」のようにも言う。",
+      "grammar": ["n3-you-ni", "n5-teiru"],
+      "sense": "物が売れず、経済活動が長く落ち込んでいる状態。"
+    },
+    {
+      "ja": "卒業する年にたまたま不況が来ると、その後の給料にけっこう長く響くらしいんですよね。海外の研究でも、そういう傾向が出てるみたいです。最初に入れる会社が限られるから、そこからのスタートになっちゃうじゃないですか。で、本人が努力しなかったわけじゃないのに、自分はダメだって思い込んじゃう人も多くて。でも、生まれた年なんて選べないんで、そこを自分のせいにするのはちょっと違うと思うんですよ。",
+      "form": "不況",
+      "en": "Apparently if a recession happens to hit the year you graduate, it affects your pay for quite a long time afterwards. Research overseas seems to show that kind of tendency too. The companies you can get into at first are limited, so that's where you end up starting from, right? And a lot of people convince themselves they're no good, even though it's not like they didn't try. But you can't choose the year you were born, so I think blaming yourself for that is a bit off.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話では「不況のときに就職した」のように、時期を表す言い方でよく使う。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "物が売れず、経済活動が長く落ち込んでいる状態。"
+    }
+  ]
+}

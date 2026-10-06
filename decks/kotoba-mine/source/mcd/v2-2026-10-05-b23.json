@@ -1,0 +1,318 @@
+{
+  "160": [
+    {
+      "ja": "今日は、コンピューターがプログラムのコードをどうやって読んでいるのか、という話をします。人間の言葉なら、一つの文に二通りの読み方があっても、前後の流れから何となく決められますよね。ところが機械が迷うたびに前へ戻って読み直していたら、時間がいくらあっても足りません。そこで多くのプログラミング言語は、決定的文脈自由文法と呼ばれる、後戻りせずに頭から一回で読み切れるタイプの規則に近づけて作られているわけです。言語の作り手は、書きやすさだけではなく、機械にとっての読みやすさまで考えているということですね。",
+      "form": "決定的文脈自由文法",
+      "en": "Today I'm going to talk about how a computer actually reads program code. With human language, even if a sentence can be read two ways, we can more or less decide from the flow of what comes before and after. But if a machine went back and reread every time it got confused, there would never be enough time. So many programming languages are built close to a type of rule called a deterministic context-free grammar, which can be read through from the start in a single pass without backtracking. In other words, the people who make languages think not only about how easy they are to write, but even about how easy they are for machines to read.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "情報科学の専門用語。「後戻りせずに解析できる」という説明と組で覚えるとよい。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "読書中の目の動きを記録すると、私たちの目は意外なほど頻繁に、少し前の語へ戻っていることが分かっています。コンピューターの世界には、決定的文脈自由文法のように、一度も後戻りせずに文を解析できるよう作られた規則もありますが、人間の読みはそこまで一方向ではないわけです。だから外国語の長文で何度も読み返してしまうのは、あなただけの弱点ではありません。ただ、戻りすぎを減らしたいなら、文の切れ目を予想しながら読む練習が効果的です。主語と述語の組を先に探すだけでも、読み返す回数はかなり減っていきます。",
+      "form": "決定的文脈自由文法",
+      "en": "When eye movements during reading are recorded, it turns out that our eyes go back to a slightly earlier word surprisingly often. In the computer world there are rules, such as a deterministic context-free grammar, built so that a sentence can be parsed without ever backtracking, but human reading is not that one-directional. So if you keep rereading long passages in a foreign language, that is not a weakness peculiar to you. Still, if you want to cut down on going back, practicing reading while predicting where the sentence breaks is effective. Just looking for the subject-predicate pair first will steadily reduce how many times you reread.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「〜のように、後戻りせずに解析できる」と性質を添えて使われることが多い。",
+      "grammar": ["n5-teiru", "n4-nagara", "n4-teiku"]
+    },
+    {
+      "ja": "日本語って、二通りに読める文がけっこうあるじゃないですか。「黒い目のきれいな女の子」とか、黒いのが目なのか女の子なのか、パッと決まらないんですよね。人間は前後の流れで何となく判断しちゃうんですけど、プログラミング言語でこれをやられると困るんですよ。なので、決定的文脈自由文法っていう、迷わず後戻りなしで解析できるタイプの規則に寄せて作るのが普通なんです。言葉としての自由さを少し手放す代わりに、機械が一発で読めるようにしてるってことですね。",
+      "form": "決定的文脈自由文法",
+      "en": "Japanese has quite a few sentences that can be read two ways, right? Take \"kuroi me no kirei na onna no ko\": you can't instantly tell whether it's the eyes or the girl that's black. Humans just sort of judge from the surrounding flow, but when a programming language does that, it's a problem. So the norm is to build it close to a type of rule called a deterministic context-free grammar, which can be parsed without hesitation and without backtracking. It means giving up a bit of freedom as a language in exchange for letting the machine read it in one go.",
+      "original": true,
+      "register": "話",
+      "topic": "language",
+      "tipJa": "話し言葉では「〜っていう」で専門用語を紹介し、すぐ言い換えを添えると伝わりやすい。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "172": [
+    {
+      "ja": "今回は、AIの歴史を二つの流れに分けて整理してみます。一つ目は、「鳥」「飛ぶ」といった意味を一つずつ記号で表し、それを論理の規則どおりに組み合わせて結論を出させるやり方です。機械自身は中身を理解していなくても、その並びを正しく動かせば答えにたどり着ける、という発想ですね。ところが現実の世界は「飛ばない鳥」のような例外だらけで、ルールを書き足しても追いつきませんでした。そこで、大量のデータから傾向を学ばせる二つ目の流れが、だんだん主役になっていくわけです。",
+      "form": "記号",
+      "en": "This time I'll sort the history of AI into two streams. The first is the approach of representing meanings such as \"bird\" and \"fly\" one by one with symbols and having the machine combine them according to the rules of logic to draw conclusions. The idea is that even if the machine itself doesn't understand the content, it can reach the answer as long as it moves those sequences around correctly. But the real world is full of exceptions like \"birds that don't fly,\" and no amount of adding rules could keep up. That is how the second stream, which has machines learn tendencies from large amounts of data, gradually takes center stage.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "人工知能の文脈では「記号処理」「記号的人工知能」のように、意味を持つしるしを操作する考え方を指す。",
+      "grammar": ["n4-teiku"],
+      "sense": "意味を表すために使うしるしや文字。"
+    },
+    {
+      "ja": "言語学者ソシュールは、言葉を記号の一つとしてとらえた。「イヌ」という音と、四本足で吠える動物という意味の結びつきには、もともと何の必然もない。それでも私たちは、その音を聞けば迷うことなく同じ生き物を思い浮かべる。結びつきは勝手に決められたものでありながら、社会の約束として固く守られているのである。言葉が自由でありながら不自由でもあるのは、この二重の性格によるのだろう。",
+      "form": "記号",
+      "en": "The linguist Saussure regarded words as one kind of sign. There is, to begin with, no necessity at all in the link between the sound \"inu\" and the meaning of a four-legged animal that barks. Even so, when we hear that sound we picture the same creature without hesitation. The link, though decided arbitrarily, is firmly kept as a social agreement. That language is both free and unfree probably comes from this double character.",
+      "original": true,
+      "register": "論",
+      "topic": "language",
+      "tipJa": "言語学では、音や形と意味が結びついたものを広く「記号」と呼ぶ。",
+      "grammar": ["n2-koto-naku", "n4-nagara"],
+      "sense": "言語学で、音や形と意味とが結びついたもの。"
+    },
+    {
+      "ja": "数学が苦手だという人の話を聞くと、中身より先に式の見た目でつまずいているケースが少なくありません。シグマやパイといった記号を頭の中で何と読めばいいのか分からないまま、先へ進んでしまっているのです。声に出せない文字は短期記憶にとどめにくく、そのぶん理解に使える力が足りなくなると考えられています。まずは式に出てくる文字に一つずつ読み方を付け、声に出して読んでみてください。それだけで、式が意味のある文として頭に入ってくるようになります。",
+      "form": "記号",
+      "en": "When you listen to people who say they are bad at math, quite often they are stumbling over how the formulas look before they even get to the content. They are pressing on without knowing what to call symbols like sigma and pi in their heads. Characters you cannot say aloud are thought to be hard to hold in short-term memory, leaving that much less capacity for understanding. First, give each character that appears in a formula a reading, one by one, and try reading it out loud. That alone lets the formula start to come into your head as a meaningful sentence.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "数式や楽譜などのしるしを広く指す。「記号を読む」「記号で表す」の形でよく使う。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"],
+      "sense": "意味を表すために使うしるしや文字。"
+    }
+  ],
+  "136": [
+    {
+      "ja": "今日は、本の最後にある「あの一覧」の歴史を紹介します。中世ヨーロッパの修道士たちは、聖書のどこにどの言葉が出てくるかを調べるため、手作業で途方もない量の一覧を作りました。ただ、手で書き写す本は一冊ごとにページがずれるので、当時は章や節を手がかりにするしかなかったわけです。印刷が広まってページが固定されるようになると、言葉からページを引ける索引が一気に実用的なものになっていきます。私たちが当たり前に使っているこの道具は、印刷という技術とセットで育ってきたんですね。",
+      "form": "索引",
+      "en": "Today I'll introduce the history of \"that list\" at the back of a book. Monks in medieval Europe compiled lists of staggering length by hand to find out where each word appeared in the Bible. But because hand-copied books shifted their page breaks from copy to copy, at the time they had no choice but to go by chapter and verse. Once printing spread and pages became fixed, the index, which lets you look up a page from a word, quickly turned into a practical tool. This tool we use without a second thought grew up together with the technology of printing.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "本の巻末の語の一覧。「索引を引く」「巻末の索引」の形で使う。",
+      "grammar": ["n4-you-ni-naru", "n4-teiku"],
+      "sense": "本の語句がどのページにあるかを並べた一覧。"
+    },
+    {
+      "ja": "教科書を読み終えたら、最後に巻末の索引を開いてみてください。並んでいる用語を一つずつ見て、その意味を何も見ずに説明できるか確かめるんです。説明できなかった語にだけ印をつけてそのページに戻れば、復習の時間をぐっと短くできます。これは、思い出そうとする行為そのものが記憶を強めるという、想起練習の考え方に基づいています。ただ読み返すより、テストのように頭から引き出すことで、知識が定着しやすくなるわけです。",
+      "form": "索引",
+      "en": "When you finish reading a textbook, try opening the index at the back last of all. Look at the listed terms one at a time and check whether you can explain each meaning without looking at anything. If you mark only the words you couldn't explain and go back to those pages, you can cut your review time sharply. This is based on the idea of retrieval practice, which holds that the very act of trying to recall something strengthens memory. Pulling knowledge out of your head as in a test, rather than just rereading, makes it stick more easily.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「巻末の索引」「索引を引く」が定番の組み合わせ。",
+      "grammar": ["n5-teiru", "n3-you-ni", "n3-koto-de"],
+      "sense": "本の語句がどのページにあるかを並べた一覧。"
+    },
+    {
+      "ja": "検索エンジンは、ネット上のページを自動で巡回するプログラムを使い、どの語がどのページに出てくるかを記録した巨大な索引を作っている。利用者が語を打ち込むと、ページそのものを一から調べるのではなく、この一覧を参照することで瞬時に結果を返す仕組みだ。近年は生成AIが答えを文章にまとめて示す機能も広がり、サイト運営者の間ではアクセスの減少を懸念する声が出ている。調べ物の入り口が変わりつつある中、自分のページが一覧に載るかどうかは、今も事業者にとって大きな関心事だ。",
+      "form": "索引",
+      "en": "Search engines use programs that automatically crawl pages on the internet and build a huge index recording which words appear on which pages. When a user types in a word, the system returns results instantly by consulting this list rather than examining the pages themselves from scratch. In recent years, features in which generative AI sums up answers in prose have also spread, and some site operators have voiced concern about falling traffic. As the gateway to looking things up shifts, whether one's own pages appear in that list remains a major concern for businesses.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "情報技術では、データを速く探すための目録の意味でも使う。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n3-koto-de"],
+      "sense": "検索のために、語と所在を対応させたデータ。"
+    }
+  ],
+  "80": [
+    {
+      "ja": "今回は、古文でおなじみの「係り結び」を初めて体系的に整理した人物の話です。江戸時代の国学者、本居宣長は、『てにをは紐鏡』という一枚の表に、「ぞ」「こそ」などの助詞と文末の形の対応をまとめました。いま古語辞典でこうした助詞を引くと、品詞の欄に係助という略語が載っています。この呼び名自体は後の時代の文法学者が整えたものですが、その土台には彼の観察があったわけですね。辞書の小さな表示の裏にも、二百年以上にわたる研究が積み重なっているということです。",
+      "form": "係助",
+      "en": "This time it's the story of the person who first systematically organized kakari-musubi, familiar from classical Japanese. Motoori Norinaga, an Edo-period scholar of national learning, set out the correspondence between particles such as zo and koso and the forms at the end of the sentence in a single chart called Teniwoha Himokagami. If you look up such particles in a dictionary of classical Japanese today, the part-of-speech field shows the abbreviation kakarijo. The name itself was put in order by grammarians of a later age, but his observations were its foundation. Even behind a dictionary's small label lie more than two hundred years of accumulated research.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "辞書の品詞欄に〔係助〕と出る略語。読み上げるときは「かかりじょし」と言うことが多い。"
+    },
+    {
+      "ja": "古文の助詞を覚えるとき、辞書の略語を味方につけると効率が上がります。たとえば「ぞ」を古語辞典で引くと、品詞の欄に係助と書かれていて、文末の形を変える助詞だとすぐに分かります。格助詞か副助詞か、それとも文末に決まった形を求めるものかを、この短い表示が教えてくれるわけです。問題を解く前に略語の意味を一つずつ確認しておくと、知識が整理されたまま頭に残るようになります。暗記カードにも略語を書き添えておけば、試験直前の見直しがかなり楽になるはずです。",
+      "form": "係助",
+      "en": "When you memorize the particles of classical Japanese, making the dictionary's abbreviations your ally boosts efficiency. For example, if you look up zo in a classical dictionary, the part-of-speech field says kakarijo, and you know at once that it is a particle that changes the form at the end of the sentence. This short label tells you whether it is a case particle, an adverbial particle, or one that demands a set form at the end of the sentence. If you check the meaning of each abbreviation before working on questions, the knowledge stays in your head in an organized way. If you also add the abbreviations to your flashcards, your review just before the exam should become a lot easier.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "〔格助〕〔副助〕〔係助〕など、辞書の略語は並べて覚えると区別しやすい。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "日本語の文を単語に切り分ける、形態素解析ってあるじゃないですか。あれに「私は学生です」とか入れると、単語ごとに品詞のラベルがずらっと付いて出てくるんですよ。で、「は」のところを見ると、格助詞じゃなくて、紙の辞書でいう係助と同じ分類になってるんですよね。「が」と「は」って、学校だと似たようなものとして習うじゃないですか。でも機械のほうは、ちゃんと別物として扱ってるってことなんです。",
+      "form": "係助",
+      "en": "You know morphological analysis, which splits Japanese sentences into words? If you feed it something like \"watashi wa gakusei desu,\" it spits out a whole row of part-of-speech labels, one for each word. And if you look at the wa, it isn't a case particle; it's in the same class that paper dictionaries label kakarijo. At school we learn ga and wa as more or less the same kind of thing, right? But the machine is properly treating them as different things.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "「は」「も」などに付く辞書の品詞略語。話し言葉では「係助詞」と言い直すのが普通。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "2": [
+    {
+      "ja": "今日は「うま味」がどうやって見つかったのかという話をします。1908年、化学者の池田菊苗が昆布のだしからグルタミン酸を取り出し、これを甘味や塩味とは別の味として提案しました。その数年後、弟子の小玉新太郎がかつお節からイノシン酸を見つけ、うま味の正体は一つではないことが分かっていきます。面白いのは、この二つを合わせると、それぞれを単独で味わうよりもずっと強くうま味を感じるという点です。昆布と魚の合わせだしは、科学より先に私たちの舌がその組み合わせを知っていた例と言えるわけですね。",
+      "form": "かつお節",
+      "en": "Today I'll talk about how umami was discovered. In 1908 the chemist Kikunae Ikeda extracted glutamic acid from kelp stock and proposed it as a taste distinct from sweetness and saltiness. A few years later his student Shintaro Kodama found inosinic acid in dried bonito, and it gradually became clear that umami had more than one source. What's interesting is that when you combine the two, you sense umami far more strongly than when you taste each on its own. Stock made from kelp and fish together is an example of our tongues knowing that combination before science did.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "だしの材料としての定番語。「かつお節でだしを取る」の形でよく使う。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "精進料理では、だしを取るのに昆布や干ししいたけを使い、かつお節は用いない。命あるものを殺さないという、古代インドに始まる仏教の戒めを、日々の台所にまで及ぼした工夫である。ただ、昆布もまた海の中で生きていたものであり、どこに線を引くかに絶対の正解があるわけではない。大切なのは、何をいただいているかを知り、それを粗末にしない心のほうなのだろう。一杯の汁にも、私たちがほかの命に支えられて生きているという事実が溶け込んでいるのである。",
+      "form": "かつお節",
+      "en": "In shojin cuisine, kelp and dried shiitake are used to make stock, and dried bonito is not. It is a practice that extends to the everyday kitchen the Buddhist precept, which began in ancient India, against killing living things. Yet kelp too was once alive in the sea, and there is no absolute right answer as to where the line should be drawn. What matters, perhaps, is rather the heart that knows what one is receiving and does not waste it. Even in a single bowl of soup is dissolved the fact that we live supported by other lives.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「かつお節を用いない」のように、精進料理の説明で対比的に出てくることがある。",
+      "grammar": ["n3-wake-dewa-nai"]
+    },
+    {
+      "ja": "料理について書くとき、「おいしい」という言葉だけで済ませると、読み手の心にはあまり残りません。たとえばみそ汁なら、だしを取るためにかつお節を削るしゃっしゃっという音や、鍋から立ちのぼる香りを書いてみてください。味を直接説明しなくても、読み手はまるで台所に立っているように感じ、その味まで想像してくれます。感想を並べるより、五感でとらえた場面を差し出すほうが、文章はずっと伝わりやすくなるのです。書く前に、その場で何が聞こえ、何がにおったかをメモしておくと便利です。",
+      "form": "かつお節",
+      "en": "When you write about food, if you make do with just the word \"delicious,\" it won't stay much in the reader's mind. For miso soup, for example, try writing the shh-shh sound of shaving dried bonito to make stock, or the aroma rising from the pot. Even without your explaining the taste directly, readers feel as though they are standing in the kitchen and will imagine that taste for themselves. Rather than listing your impressions, offering a scene caught with the five senses makes your writing far easier to get across. Before you write, it helps to jot down what you heard and what you smelled on the spot.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「かつお節を削る」のように、だしの材料として削る動作と組で出てくることが多い。",
+      "grammar": ["n5-teiru", "n3-you-ni"]
+    }
+  ],
+  "47": [
+    {
+      "ja": "今回は、毎日使う台所道具の名前から、昔の食生活をのぞいてみます。「まな」はもともと「真魚」と書き、おかずとして食べる魚を指したと言われています。つまり、まな板は本来、魚をさばくための板だったわけですね。実際、日本料理の儀式である包丁式では、今でも手を触れずに箸と包丁だけで魚をさばく作法が受け継がれています。何気なく口にしている名前も、由来を調べると当時の暮らしが見えてくるということです。",
+      "form": "まな板",
+      "en": "This time we'll peek into how people used to eat through the name of a kitchen tool we use every day. Mana is said to have originally been written with the characters for \"true fish,\" referring to fish eaten as a side dish. In other words, the cutting board was originally a board for dressing fish. In fact, in the hocho-shiki, a ritual of Japanese cuisine, the practice of dressing a fish using only chopsticks and a knife without touching it by hand is still handed down today. Even names we say without a second thought reveal how people lived back then once you look into where they came from.",
+      "original": true,
+      "register": "講",
+      "topic": "language",
+      "tipJa": "台所で食材を切るときの板。「まな板の上で切る」「まな板を洗う」の形で使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "包丁で食材を切るときに下に置く板。"
+    },
+    {
+      "ja": "試験が終わって結果を待っているときは、まさにまな板の上の鯉の状態です。もう答案は書き直せないのに、つい答え合わせを何度もくり返してしまう人も多いでしょう。しかし、変えられない結果を考え続けても、不安が大きくなるだけで得るものはほとんどありません。心理学では、自分で動かせることとそうでないことを分けて考えるのが、ストレスを減らす基本だとされています。待っているあいだは、次の試験の準備という、自分の手で変えられることに力を向けるのがおすすめです。",
+      "form": "まな板",
+      "en": "When the exam is over and you are waiting for the results, you are exactly like a carp on the cutting board. You can no longer rewrite your answers, yet many people can't help checking their answers again and again. But if you keep thinking about a result you cannot change, it only makes your anxiety grow and you gain almost nothing. In psychology, separating what you can influence from what you can't is considered the basis of reducing stress. While you wait, it is a good idea to direct your energy toward something you can change with your own hands: preparing for the next exam.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「まな板の上の鯉」は、相手に任せて覚悟を決めるしかない状態のたとえ。",
+      "grammar": ["n5-teiru"],
+      "sense": "（まな板の上の鯉）相手に運命を任せるしかない状態。"
+    },
+    {
+      "ja": "江戸時代の絵を見ると、料理人が床に座り、脚のついたまな板に向かって魚をさばく姿がよく描かれている。立って調理する台所が一般の家に広まったのは、ずっと後のことである。道具の形は、人の体の使い方とともに少しずつ変わってきたのだ。いま私たちが当たり前だと思っている姿勢も、ある時代の選択にすぎない。暮らしの細部に目を向けると、歴史は教科書の中だけではなく、台所の高さにも刻まれていることに気づかされる。",
+      "form": "まな板",
+      "en": "In pictures from the Edo period, cooks are often shown sitting on the floor and dressing fish at a cutting board with legs. It was much later that kitchens where people cook standing up spread to ordinary homes. The shape of tools has changed little by little along with the way people use their bodies. The posture we now take for granted is also no more than the choice of a certain era. When we turn our eyes to the details of daily life, we realize that history is inscribed not only in textbooks but also in the height of a kitchen.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "昔の台所を語るときにも使える。「脚のついたまな板」のように形を添えると具体的になる。",
+      "grammar": ["n5-teiru", "n2-ni-suginai", "n3-dewa-naku"],
+      "sense": "包丁で食材を切るときに下に置く板。"
+    }
+  ],
+  "205": [
+    {
+      "ja": "今回は、讃岐うどんの「中身」の話をします。香川といえば小麦のイメージがありますが、実は地元の小麦だけでは需要に追いつかず、オーストラリア産の小麦粉が広く使われるようになりました。麺にしたときのなめらかさや色合いが好まれ、名物の味を支える存在になっていきます。一方で香川県は、地元産の小麦を取り戻そうと、2000年ごろに独自の品種を開発しました。ご当地の味の裏にも、貿易と農業の歴史が詰まっているということですね。",
+      "form": "讃岐うどん",
+      "en": "This time I'll talk about what Sanuki udon is actually made of. Kagawa has an image of wheat, but in fact local wheat alone couldn't keep up with demand, and flour from Australian wheat came to be widely used. It was favored for the smoothness and color it gives the noodles, and it becomes a pillar supporting the famous local flavor. Kagawa Prefecture, for its part, developed its own wheat variety around 2000 in an effort to bring back locally grown wheat. Even behind a regional specialty, a history of trade and agriculture is packed in.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "香川県の名物うどん。「本場の讃岐うどん」のように産地を強調して使う。",
+      "grammar": ["n4-you-ni-naru", "n4-teiku"]
+    },
+    {
+      "ja": "讃岐うどんの始まりについては、讃岐出身の僧である空海が、唐から麺づくりの技を持ち帰ったという言い伝えがある。史料による裏づけは乏しく、歴史学の立場からは伝説と見るほかない。それでも人々がこの話を語り継いできたのは、インドに源をもつ教えを海の向こうから運んだ人物に、日々の糧の始まりまで託したかったからではないか。事実かどうかとは別に、伝説はその土地の人が何を大切にしてきたかを映している。一杯の麺にも、祈りと感謝の記憶が重ねられているのである。",
+      "form": "讃岐うどん",
+      "en": "About the origins of Sanuki udon, there is a tradition that Kukai, a monk from Sanuki, brought the art of noodle-making back from Tang China. There is little support for it in historical records, and from the standpoint of historical scholarship it can only be seen as legend. Even so, might people not have kept passing down this story because they wanted to entrust even the origin of their daily bread to the man who carried teachings rooted in India across the sea? Whether or not it is fact, a legend reflects what the people of a place have cherished. Even in a single bowl of noodles, memories of prayer and gratitude are layered.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "地名を冠した名物の呼び名。由来を語る文脈では伝説とともに出てくることが多い。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "香川県は2011年、「うどん県に改名」と打ち出した観光宣伝で大きな話題を集めました。もちろん、本当に県の名前を変えたわけではありません。讃岐うどんという誰もが知る名物を、たった一語で県と結びつけたからこそ、人の記憶に残ったのです。伝えたいことが多いときほど、相手の頭にすでにあるものと結びつけ、短い言葉に絞り込むのが話し方のコツです。説明を足すより、思い切って減らすほうが届く場面は意外と多いものです。",
+      "form": "讃岐うどん",
+      "en": "In 2011 Kagawa Prefecture drew a lot of attention with a tourism campaign announcing that it had \"renamed itself Udon Prefecture.\" Of course, it did not really change the prefecture's name. It stuck in people's memories precisely because it tied a famous specialty that everyone knows, Sanuki udon, to the prefecture in a single word. The trick to speaking is that the more you want to convey, the more you should link it to something already in the listener's head and narrow it down to a few words. There are surprisingly many situations where boldly cutting back gets through better than adding explanation.",
+      "original": true,
+      "register": "語",
+      "topic": "mind",
+      "tipJa": "名物としての知名度を前提に、「誰もが知る讃岐うどん」のように使える。"
+    }
+  ],
+  "298": [
+    {
+      "ja": "今回は、身近な食べ物の名前から中国語をのぞいてみます。中華料理の付け合わせでおなじみのザーサイは、中国語の発音がほぼそのまま日本語に入ってきた言葉です。名前の最初の字は「搾る」に近い意味を持ち、塩漬けにした茎を押して水分を抜く作り方から来ているとされます。つまり、名前そのものが作り方の説明になっているわけですね。外来語も由来を知ると、ただのカタカナではなく、意味のある言葉として頭に残るようになります。",
+      "form": "ザーサイ",
+      "en": "This time we'll take a peek at Chinese through the name of a familiar food. Zha cai, the familiar side dish at Chinese restaurants, is a word that came into Japanese with its Chinese pronunciation almost unchanged. The first character of the name means something close to \"squeeze,\" and is said to come from the method of pressing the salted stems to drive out the water. In other words, the name itself is an explanation of how it's made. Once you know where loanwords come from, they stay in your head not as mere katakana but as meaningful words.",
+      "original": true,
+      "register": "講",
+      "topic": "language",
+      "tipJa": "中国語由来のカタカナ語。中華料理の付け合わせとしてよく出てくる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "ザーサイの主な産地として知られるのは、中国内陸部の重慶市周辺である。長江沿いの霧が多く湿り気のある気候が、原料となるからし菜の太い茎を育てるのに適しているとされる。19世紀の終わりごろにこの地で作り方が確立したと伝えられ、その後、長江の水運に乗って国内各地へ広まった。現在では瓶詰めや袋詰めの形で海外にも輸出され、日本の食卓でも定番の一品となっている。一地方の保存食が、川の道を通じて世界に届いた例と言える。",
+      "form": "ザーサイ",
+      "en": "The best-known production area for zha cai is around the city of Chongqing in inland China. The foggy, humid climate along the Yangtze is said to be suited to growing the thick stems of the mustard plant used as the raw material. The method of making it is said to have been established there around the end of the nineteenth century, after which it spread across the country by Yangtze river transport. Today it is exported abroad in jars and pouches and has become a staple on Japanese tables as well. It is an example of one region's preserved food reaching the world by way of a river route.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "中国の漬物の名前。報道では産地や輸出の話題で出てくる。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "この前、冷蔵庫の残り物を写真に撮ってAIに見せて、何が作れるか聞いてみたんですよ。そしたら、卵と豆腐とザーサイがあるなら中華スープにしましょうって返ってきて。瓶の奥に残ってたのまでちゃんと見つけてて、ちょっとびっくりしたんですよね。まあ、味つけは結局自分で調整したんですけど。こういうのって、レシピを調べるっていうより、相談相手として使っていくのがちょうどいい気がします。",
+      "form": "ザーサイ",
+      "en": "The other day I took a photo of the leftovers in my fridge, showed it to an AI, and asked what I could make. It came back saying that if I had eggs, tofu, and zha cai, I should make a Chinese soup. It had even spotted what was left at the back of the jar, which kind of surprised me. Well, in the end I adjusted the seasoning myself. With this kind of thing, I feel it works best to use it as someone to talk things over with rather than to look up recipes.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉では食材名としてそのまま使う。",
+      "grammar": ["n4-teiku"]
+    }
+  ],
+  "214": [
+    {
+      "ja": "今回は、江戸時代の旅人がどこに泊まっていたのかを見ていきます。食事付きの宿は旅籠と呼ばれ、夕食と朝食が出るぶん料金もそれなりにかかりました。一方、お金をかけたくない旅人は、自分で米を持ち込み、煮炊きに使う薪の代金だけを払う木賃宿を使ったと言われています。名前の「木賃」は、まさにこの薪代のことなんですね。今でいう素泊りの宿に近い発想が、二百年以上前にはすでにあったわけです。",
+      "form": "素泊り",
+      "en": "This time let's look at where travelers in the Edo period stayed. Inns that served meals were called hatago, and since they provided dinner and breakfast, they cost a fair amount. Travelers who didn't want to spend much, on the other hand, are said to have used kichin-yado, where they brought their own rice and paid only for the firewood used to cook. The name kichin refers to exactly this firewood fee. So an idea close to today's room-only lodging already existed more than two hundred years ago.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "食事なしで泊まること。宿の予約で「素泊りプラン」の形でよく見る。表記は「素泊まり」とも。",
+      "grammar": ["n5-teiru", "n4-teiku"]
+    },
+    {
+      "ja": "旅行の宿って、つい夕食付きのプランにしちゃうじゃないですか。でも最近、あえて素泊りにするのもアリだなと思ってるんですよ。夕飯どこで食べようかって、地元の人が行くような店を歩き回って探すのが、けっこう旅の記憶に残るんですよね。決まったコースより、自分で選んだもののほうが印象に残るって、まあよく言われる話なんで。もちろん疲れてる日は楽なほうがいいんで、そこは気分次第なんですけど。",
+      "form": "素泊り",
+      "en": "With travel lodgings, you tend to just go for the plan with dinner included, right? But lately I've been thinking that deliberately going room-only is a good option too. Wandering around looking for the kind of place locals go to for dinner actually sticks in your memory of the trip. It's a pretty common claim that what you choose yourself leaves a stronger impression than a set course. Of course, on days when you're tired the easy option is better, so it depends on your mood.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "「素泊りにする」「素泊りで泊まる」の形で会話でもよく使う。"
+    }
+  ],
+  "21": [
+    {
+      "ja": "今回は、和室の奥にある床の間が、もともと何のための場所だったのかを見ていきます。ルーツの一つとされるのが室町時代の押板で、壁に仏さまの絵を掛け、その前にお香や花を供えて祈るための飾りの場でした。それが時代とともに、季節の花や絵を楽しみ、客をもてなすための場へと変わっていきました。今もそこに花を飾る習慣には、祈りの場だったころの姿が残っているわけですね。インドで生まれた仏教の祈りの形が、日本の住まいに溶け込んでいったと考えると面白いですよね。",
+      "form": "床の間",
+      "en": "This time we'll look at what the alcove at the back of a tatami room was originally for. One of its roots is said to be the oshiita of the Muromachi period, a display space where a picture of the Buddha was hung on the wall and incense and flowers were offered in front of it for prayer. Over time, that changed into a place for enjoying seasonal flowers and pictures and for entertaining guests. So the custom of putting flowers there even today still keeps something of the days when it was a place of prayer. It's interesting to think that a form of Buddhist prayer born in India melted into Japanese homes.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "和室の奥の飾りの場所。「床の間に掛け軸を掛ける」の形でよく使う。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "ビジネスマナーの試験で、意外と間違えやすいのが和室の席順です。基本は、床の間に近い奥の席が上座、出入り口に近い席が下座になります。お客さまには奥に座ってもらい、もてなす側は入り口に近い側に控えるわけです。迷ったら「一番大切な人を、一番落ち着ける場所に」と覚えておくと、洋室や車の席順にも応用できます。丸暗記ではなく、なぜそうなるのかという理由ごと覚えることで、初めて見る問題にも対応できるようになります。",
+      "form": "床の間",
+      "en": "On business-etiquette exams, one thing that's surprisingly easy to get wrong is the seating order in a tatami room. The basic rule is that the seat at the back near the alcove is the seat of honor, and the seat near the entrance is the lowest. The guest is seated at the back, and the host side waits on the side nearer the entrance. If you're unsure, remember \"put the most important person in the most restful place,\" and you can apply it to seating in Western-style rooms and cars as well. By learning not by rote but together with the reason why it works that way, you become able to handle questions you've never seen before.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "席順を説明するときの基準になる語。「床の間を背にする」は上座に座ることを表す。",
+      "grammar": ["n3-dewa-naku", "n3-koto-de", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "床の間には、普段使う道具は置かれない。そこにあるのは掛け軸と、季節の花がひと枝だけである。室町から江戸にかけて形づくられたこの空間は、何かを足すためではなく、引き算によって心を整えるための場所だったのだろう。物があふれる現代の部屋に、こうした何も置かない一角はほとんど残っていない。しかし、何もない場所があるからこそ、人はそこに季節を感じ、自分の内側に目を向けることができるのである。",
+      "form": "床の間",
+      "en": "In the alcove, no everyday tools are placed. All that is there is a hanging scroll and a single sprig of seasonal flowers. This space, shaped from the Muromachi period into the Edo period, was perhaps a place not for adding something but for settling the mind through subtraction. In modern rooms overflowing with things, hardly any such corners where nothing is placed remain. Yet it is precisely because there is a place with nothing in it that people can feel the season there and turn their eyes inward.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "和室の美意識を語るときの中心となる語。「床の間に花を生ける」のように使う。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ]
+}

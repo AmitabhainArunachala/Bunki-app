@@ -1,0 +1,347 @@
+{
+  "68": [
+    {
+      "ja": "今回は、職場の人間関係に悩む人に向けた本を要約していきます。著者によれば、組織の中で自分の立ち位置が曖昧なままだと、人は周囲の評価を必要以上に気にして、本来の業務に注ぐべき力を消耗してしまうそうです。そこで本書が提案しているのが、自分の強みを一つに絞り、周囲にはっきり示しておくという方法です。「数字の確認ならあの人に任せればいい」と認識されるだけで、無用な衝突は徐々に減っていくんですね。居場所は誰かに与えられるものではなく、自らの役割を通じて築いていくものだ、というのが本書の主張です。",
+      "form": "立ち位置",
+      "en": "This time I'm going to summarize a book for people troubled by relationships at work. According to the author, when your position within an organization stays vague, you worry more than necessary about how those around you rate you and use up the energy you should be putting into your actual work. So what the book proposes is narrowing your strengths down to one and showing it clearly to the people around you. Simply being recognized as \"the person to leave number-checking to\" gradually reduces needless friction. The book's argument is that a place to belong is not something someone gives you but something you build yourself through your role.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「チームの中での立ち位置」のように、集団の中で自分が占める役回りに使う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku", "n5-teiru"],
+      "sense": "集団や周りとの関係の中で自分が占める位置や役割。"
+    },
+    {
+      "ja": "人前で話すときは、話の中身と同じくらい、どこに立つかが大事です。スライドの真ん前に立つと、聞き手の目は画面とあなたの間で迷ってしまいます。おすすめは、画面の左側を基本の立ち位置にして、話の区切りでだけ少し歩くことです。動きに意味を持たせることで、聞き手は話題が変わったのだと自然に気づけます。リハーサルでは、床に小さな印をつけて、何度か練習しておくと安心ですよ。",
+      "form": "立ち位置",
+      "en": "When you speak in front of people, where you stand matters as much as what you say. If you stand right in front of the slides, your listeners' eyes will waver between the screen and you. I recommend making the left side of the screen your basic standing position and walking a little only at breaks in your talk. By giving your movement a meaning, listeners will naturally notice that the topic has changed. In rehearsal, it's reassuring to put a small mark on the floor and practice a few times.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "舞台や撮影、発表の場では、文字どおり人が立つ場所そのものを指す。",
+      "grammar": ["n3-koto-de"],
+      "sense": "舞台や発表の場で、人が立つ場所。"
+    },
+    {
+      "ja": "ぶっちゃけ、生成AIって、職場での立ち位置がまだ全然決まってないと思うんですよね。便利な道具だと思ってる人もいれば、新人の相棒みたいに見てる人もいるじゃないですか。道具だと思ってる人は、出てきた答えをそのまま貼り付けて終わりにしちゃう。でも相棒だと思ってる人は、どこか間違ってないかなって疑いながら使うんですよ。結局、どっちの見方で付き合うかで、出てくる成果がけっこう変わるんじゃないかなと。",
+      "form": "立ち位置",
+      "en": "Honestly, I think generative AI's position in the workplace still hasn't been settled at all. Some people think of it as a handy tool, and others see it like a new colleague working alongside them, right? The people who think it's a tool just paste in whatever answer comes out and call it done. But the people who think of it as a partner use it while doubting whether something might be wrong somewhere. In the end, I think the results you get change quite a bit depending on which way you look at it.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "人だけでなく、道具や組織が周りの中でどんな役回りかを言うときにも使う。",
+      "grammar": ["n4-nagara"],
+      "sense": "周りとの関係の中で、ものが占める位置や役割。"
+    }
+  ],
+  "307": [
+    {
+      "ja": "今回は、世界で最も古い会社の一つとして知られる金剛組の話です。始まりは飛鳥時代で、聖徳太子が四天王寺を建てるために、朝鮮半島から職人を招いたことだと伝えられています。それから千四百年以上、この会社は寺や神社の施工を中心に技を受け継いできました。面白いのは、図面だけでは伝わらない木の癖の読み方を、親方が弟子に現場で教えることで、技を絶やさなかった点なんですね。長く続く会社の秘密は、案外こういう地道な積み重ねにあるのかもしれません。",
+      "form": "施工",
+      "en": "This time the story is about Kongō Gumi, known as one of the oldest companies in the world. It is said to have begun in the Asuka period, when Prince Shōtoku invited craftsmen from the Korean Peninsula to build Shitennō-ji. For more than 1,400 years since then, the company has carried on its skills, centred on construction work for temples and shrines. What's interesting is that by having masters teach apprentices on site how to read the quirks of the wood, which drawings alone cannot convey, it never let those skills die out. The secret of a long-lasting company may, surprisingly, lie in this kind of steady accumulation.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「寺社の施工」「施工管理」のように、工事を実際に手がけることを表す。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "建物などの工事を実際に行うこと。"
+    },
+    {
+      "ja": "熊本県菊陽町に建設された台湾TSMCの半導体工場は、着工から2年足らずで開所式を迎えた。昼夜を問わず工事が続き、その速さは業界でも話題になった。半導体工場の施工では、ちりを極端に嫌うクリーンルームと、大量の水や電気を送る設備を同時に仕上げる必要がある。一方で、急ピッチの工事は、周辺の道路の渋滞や人手不足も招いた。働き手が限られる中、工期と安全をどう両立させるかが課題となっている。",
+      "form": "施工",
+      "en": "The semiconductor plant of Taiwan's TSMC built in Kikuyō, Kumamoto Prefecture, held its opening ceremony less than two years after construction began. Work continued day and night, and its speed became a talking point even within the industry. Construction of a semiconductor plant requires finishing, at the same time, clean rooms that cannot tolerate dust and the facilities that deliver large amounts of water and electricity. On the other hand, the rapid pace of work also brought traffic jams on nearby roads and labour shortages. With workers in short supply, how to balance construction schedules with safety has become an issue.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「工場の施工」「施工業者」のように、建設工事を実際に進める段階を指す。",
+      "grammar": ["n5-teiru"],
+      "sense": "建物などの工事を実際に行うこと。"
+    },
+    {
+      "ja": "インドのエローラ石窟にあるカイラーサ寺院は、一つの巨大な岩山を上から掘り下げて造られた。石を積み上げるのではなく、不要な岩を取り除きながら建物を彫り出すという、ふつうとは逆の順序で施工が進められたのである。私たちはつい、建てるとは何かを付け加えていくことだと考えてしまう。だがこの寺では、取り去ることそのものが建てることだった。足すことでしか前に進めないと思い込む心に、この寺は静かな問いを投げかけている。",
+      "form": "施工",
+      "en": "At the Ellora Caves in India, the Kailasa temple was made by digging down from above into a single enormous rock hill. Rather than piling up stones, the construction work proceeded in the reverse of the usual order, carving the building out while removing the rock that was not needed. We can't help thinking that to build is to keep adding something. But at this temple, taking away was itself the act of building. To a mind convinced that it can only move forward by adding, this temple quietly poses a question.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n3-dewa-naku", "n4-nagara", "n4-teiku", "n3-koto-de", "n5-teiru"],
+      "sense": "建物などの工事を実際に行うこと。"
+    }
+  ],
+  "309": [
+    {
+      "ja": "今回は、半導体業界の意外な仕組みを解説していきます。実は、AI向けのチップで有名なエヌビディアは、自社で大きな工場を持っていません。チップの設計に力を集中させ、実際の製造は台湾のTSMCなどに任せているんです。こうした会社は、工場を持たないという意味で「ファブレス」と呼ばれています。巨額の工場への投資を避け、得意な部分だけに専念するやり方が、今の業界ではすっかり主流になっているわけですね。",
+      "form": "設計",
+      "en": "This time I'll explain a surprising feature of how the semiconductor industry works. In fact, Nvidia, famous for its chips for AI, does not own large factories of its own. It concentrates its efforts on chip design and leaves the actual manufacturing to Taiwan's TSMC and others. Companies like this are called \"fabless\", in the sense that they have no factories. Avoiding huge investments in factories and devoting themselves only to what they're good at has become firmly the mainstream approach in the industry today.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「チップの設計」「設計に集中する」のように、作る前に形や仕組みを決める工程を指す。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "作る前に、形や仕組みを考えて決めること。"
+    },
+    {
+      "ja": "長い文章を、思いつくままに書き始めていませんか。途中で話がそれて、結論が最初の主張とずれてしまうのは、たいてい準備が足りないからです。書き出す前に、言いたいことを一文にまとめ、それを支える理由を三つほど並べてみてください。こうして全体の設計ができていれば、あとは順番に肉付けしていくだけです。家を建てる前に図面を描くのと同じで、文章にもしっかりした骨組みが欠かせません。",
+      "form": "設計",
+      "en": "Do you start writing long texts just as things come to mind? When the text wanders off along the way and the conclusion drifts from your first claim, it's usually because you didn't prepare enough. Before you start writing, try summing up what you want to say in one sentence and lining up about three reasons that support it. Once the overall design is in place like this, all that's left is to flesh it out in order. Just as you draw plans before building a house, a piece of writing can't do without a solid framework.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "文章や話の組み立てにも「全体の設計」「構成を設計する」の形で使える。",
+      "grammar": ["n4-teiku"],
+      "sense": "作る前に、全体の形や組み立てを考えること。"
+    },
+    {
+      "ja": "東京スカイツリーの設計には、千年以上前から伝わる五重塔に通じる考え方が取り入れられている。塔の中心に鉄筋コンクリートの円筒を立て、まわりの鉄骨の塔と切り離すことで、地震の揺れを抑える仕組みだ。これは五重塔の中心を貫く柱にならったもので、「心柱制振」と呼ばれる。古い木造の塔が大きな地震でもほとんど倒れてこなかったことは、以前から研究者の関心を集めてきた。伝統の知恵を新しい技術にどう生かすかが、改めて注目されている。",
+      "form": "設計",
+      "en": "The design of Tokyo Skytree incorporates an idea that connects with the five-storey pagodas handed down from more than a thousand years ago. It is a system that dampens the shaking of earthquakes by erecting a reinforced-concrete cylinder at the centre of the tower and separating it from the surrounding steel tower. This follows the pillar that runs through the centre of a five-storey pagoda and is called \"shinbashira vibration control\". That old wooden pagodas have hardly ever fallen even in large earthquakes has long attracted researchers' interest. How to make use of traditional wisdom in new technology is drawing attention once again.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "作る前に、形や仕組みを考えて決めること。"
+    }
+  ],
+  "310": [
+    {
+      "ja": "今回は、古代ローマの建物がなぜこれほど長持ちするのか、という話です。ローマのパンテオンは、二千年近くたった今も、巨大なドームが当時の姿のまま残っています。ところが現代のコンクリートは、数十年でひびが入り、ひどい場合には天井の崩落にまでつながることがあります。最近の研究では、ローマのコンクリートに混ざった石灰の粒が、ひびを自分でふさいでいた可能性が指摘されているんですね。古いものが新しいものに劣るとは限らない、というのがこの話の面白いところです。",
+      "form": "崩落",
+      "en": "This time the topic is why the buildings of ancient Rome last so long. The Pantheon in Rome still keeps its enormous dome in its original form after nearly two thousand years. Modern concrete, however, cracks within a few decades and in bad cases this can even lead to the ceiling caving in. Recent research has pointed out the possibility that grains of lime mixed into Roman concrete sealed the cracks by themselves. What's interesting about this story is that old things are not necessarily inferior to new ones.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「天井の崩落」「トンネルの崩落事故」のように、建物や崖が崩れ落ちる場面で使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "建物や崖の一部が、崩れて落ちること。"
+    },
+    {
+      "ja": "2012年12月、山梨県の中央自動車道笹子トンネルで天井板の崩落事故が起き、9人が亡くなった。事故を受けて国は、トンネルや橋を5年に1度、近くから目で見て点検することを義務づけた。ただ、対象となる橋だけでも全国に70万以上あり、点検を担う技術者の数は限られている。そこで、ドローンで撮った写真をAIに読み込ませ、ひびなどの傷みを見つけ出す取り組みが各地で進められている。人の目による確認をどこまでAIに任せられるかが、今後の焦点となりそうだ。",
+      "form": "崩落",
+      "en": "In December 2012, ceiling panels collapsed in the Sasago Tunnel on the Chūō Expressway in Yamanashi Prefecture, and nine people died. In response to the accident, the government made it mandatory to inspect tunnels and bridges once every five years by looking at them up close. However, there are more than 700,000 bridges alone subject to this across the country, and the number of engineers who carry out inspections is limited. So efforts are under way in various places to feed photos taken by drones into AI and find damage such as cracks. How far checking by human eyes can be entrusted to AI looks set to be the focus from now on.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「崩落事故」「天井板の崩落」の形が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "建物や崖の一部が、崩れて落ちること。"
+    },
+    {
+      "ja": "人間って、周りのみんなが信じてることを、自分もつい信じちゃうじゃないですか。日本のバブルの頃も、土地や株は絶対に下がらないって、本気で思ってた人が多かったらしいんですよ。でも1990年に入ったとたん株価が一気に下がり始めて、ニュースでは「株価の崩落」なんて言われたわけです。別に、下がる理由がその年に急に生まれたわけじゃないんですよね。みんなが一斉に気づいただけなので、周りが全員強気なときこそ、ちょっと疑ってみたほうがいいと思います。",
+      "form": "崩落",
+      "en": "People tend to end up believing whatever everyone around them believes, right? Apparently during Japan's bubble, too, lots of people seriously thought land and stocks would never go down. But the moment 1990 began, stock prices started falling all at once, and the news talked about a \"collapse in stock prices\". It's not as if a reason for them to fall suddenly appeared that year. Everyone just realized it at the same time, so I think it's when everyone around you is bullish that you should doubt things a little.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "相場では「株価の崩落」のように、値段が一気に大きく下がる意味でも使う。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "相場や値段が、急に大きく下がること。"
+    }
+  ],
+  "311": [
+    {
+      "ja": "今回は、伊勢神宮の式年遷宮という仕組みを紹介します。伊勢神宮では、二十年ごとに社殿をすべて新しく建て替えているんです。普通に考えれば、古い建物の修繕費を払い続けたほうが安く済みそうですよね。でも二十年という間隔は、若い職人が親方から技を学び、次の世代に渡すのにちょうどいい長さだと言われています。つまり、守っているのは建物ではなく、技そのものだというわけですね。",
+      "form": "修繕費",
+      "en": "This time I'll introduce the system called Shikinen Sengū at Ise Jingū. At Ise Jingū, all the shrine buildings are rebuilt anew every twenty years. If you think about it normally, it seems it would be cheaper to keep paying repair costs for the old buildings, right? But the interval of twenty years is said to be just the right length for young craftsmen to learn skills from their masters and pass them on to the next generation. In other words, what is being preserved is not the buildings but the skills themselves.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「修繕費がかさむ」「修繕費を払う」のように、建物を直すための出費に使う。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "建物や設備の傷んだところを直すための費用。"
+    },
+    {
+      "ja": "製造業の現場で、機械が壊れる前に兆しをつかむ「予知保全」にAIを使う動きが広がっている。モーターの振動や温度のデータを常に集め、普段と違う動きが出た段階で部品を交換する仕組みだ。故障してから直す場合に比べ、生産ラインが止まる時間を減らせるうえ、修繕費も抑えられるとされる。一方で、センサーの設置やデータの管理には、新たな手間とコストがかかる。導入の効果をどう見極めるかが、各社の課題となっている。",
+      "form": "修繕費",
+      "en": "On manufacturing sites, a movement is spreading to use AI for \"predictive maintenance\", catching the signs before machines break down. It is a system that constantly collects data on motors' vibration and temperature and replaces parts at the stage when unusual behaviour appears. Compared with repairing after a failure, it is said to reduce the time production lines are stopped and also to hold down repair costs. On the other hand, installing sensors and managing the data take new effort and cost. How to judge the effects of adoption has become an issue for each company.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「修繕費を抑える」「修繕費がかさむ」の形でよく使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "建物や設備の傷んだところを直すための費用。"
+    },
+    {
+      "ja": "古い寺を訪ねると、本堂の隅に、修繕費への協力を呼びかける紙が貼られていることがある。瓦の一枚、柱の一本にも、名も知られない人々の小さな志が込められているのだろう。仏教では、見返りを求めない施しを尊い行いとしてきた。建物を支えているのは、木や石だけではなく、そうした見えない手の積み重ねなのである。誰かが直し続けてきたからこそ、私たちは今もその縁側に腰を下ろすことができる。",
+      "form": "修繕費",
+      "en": "When you visit an old temple, there is sometimes a notice posted in a corner of the main hall asking for help with repair costs. Even in a single roof tile or a single pillar, the small goodwill of nameless people is probably contained. Buddhism has regarded giving that seeks nothing in return as a noble act. What holds the building up is not only wood and stone but the accumulation of such unseen hands. It is precisely because someone has kept repairing it that we can still sit down on its veranda today.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "建物の傷んだところを直すための費用。"
+    }
+  ],
+  "312": [
+    {
+      "ja": "今回は、生成AIとの付き合い方について解説していきます。AIの答えは自然な文章で返ってくるので、つい正しいと思い込んでしまいます。実際アメリカでは、AIが作った存在しない判例を、弁護士がそのまま裁判所に出してしまった例も報じられました。大事なのは、出てきた数字や出典を一つずつ精査する時間を、最初から作業の中に組み込んでおくことなんですね。速く書けるようになった分、確かめる手間に時間を回す、というのがこれからの使い方です。",
+      "form": "精査",
+      "en": "This time I'll explain how to deal with generative AI. Because AI's answers come back as natural-sounding text, we end up assuming they're correct. In fact, in the United States a case was reported in which a lawyer submitted to a court, as is, precedents that AI had made up and that did not exist. What matters is building time into the work from the start to closely examine the numbers and sources one by one. Putting the time saved by being able to write faster into the effort of checking is how it should be used from now on.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「数字を精査する」「内容を精査する」のように、細かい点まで一つずつ確かめる場面で使う。",
+      "grammar": ["n4-teiku", "n4-you-ni-naru"],
+      "sense": "細かいところまで、くわしく調べること。"
+    },
+    {
+      "ja": "アメリカの聖書博物館は2020年、所蔵していた「死海文書」の断片16点が、すべて偽物だったと発表した。外部の調査チームがインクの成分や革の状態を精査した結果、古い革に近年になって文字を書き込んだものと判断された。これらの断片は2000年代以降に市場に出回り、本物として高い値段で取引されていた。来歴のはっきりしない資料をどう扱うかが、各地の博物館や研究者の間で改めて問われている。",
+      "form": "精査",
+      "en": "In 2020, the Museum of the Bible in the United States announced that all 16 fragments of the \"Dead Sea Scrolls\" in its collection were fakes. After an outside research team closely examined the composition of the ink and the condition of the leather, they were judged to be old leather on which text had been written in recent times. These fragments had come onto the market from the 2000s onward and were traded at high prices as genuine. How to handle materials whose provenance is unclear is being questioned anew among museums and researchers in many places.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「〜を精査した結果」の形で、調査の結論を導く前置きとして使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "細かいところまで、くわしく調べること。"
+    },
+    {
+      "ja": "仏典の中には、言い伝えや師の言葉だからといって、そのまま信じてはならないと説く経がある。自分で確かめ、それが苦しみを減らすと分かったときにこそ受け入れよ、というのである。教えさえも精査の対象にしてよいという姿勢は、宗教としてはかなり大胆だ。だがそれは、何でも疑えと勧めているのではなく、借り物の信念に頼らず自分の足で立てという励ましなのだろう。確かめる自由は、その結果を自分で引き受ける責任と、いつも背中合わせなのである。",
+      "form": "精査",
+      "en": "Among the Buddhist scriptures there is a sutra which teaches that one must not believe something as is just because it is tradition or the words of a teacher. It says one should accept it precisely when one has checked it oneself and found that it reduces suffering. The stance that even the teachings themselves may be subjected to close examination is quite bold for a religion. Yet it is probably not urging us to doubt everything, but encouraging us to stand on our own feet without relying on borrowed beliefs. The freedom to check always goes hand in hand with the responsibility to take on the results yourself.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "細かいところまで、くわしく調べること。"
+    }
+  ],
+  "314": [
+    {
+      "ja": "アメリカでは、生成AIをめぐる著作権の裁判が相次いでいます。たとえばニューヨーク・タイムズは2023年、記事を無断で学習に使われたとして、オープンAIとマイクロソフトを訴え、損害は数十億ドル規模にのぼると主張しました。こうした裁判のニュースでは、どうしても訴額の大きさに目が行きますよね。でも実際には、判決まで行かずに和解で終わるケースも多いんです。つまりニュースの大きな数字は、最終的に払われる額ではなく、交渉のスタート地点にすぎないわけですね。",
+      "form": "訴額",
+      "en": "In the United States, copyright lawsuits over generative AI keep coming one after another. For example, in 2023 The New York Times sued OpenAI and Microsoft, saying its articles had been used for training without permission, and claimed the damages ran into billions of dollars. In news about lawsuits like these, your eye inevitably goes to the size of the amount claimed, right? But in reality, many cases end in a settlement without ever reaching a verdict. In other words, the big number in the news is not the amount that will finally be paid but merely the starting point for negotiation.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "裁判で原告が求める金額のこと。ニュースでは「訴額は〜億円」の形で出てくる。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n2-ni-suginai"],
+      "sense": "裁判で相手に求める金額。"
+    },
+    {
+      "ja": "1984年、インド中部ボパールの化学工場から有毒ガスが漏れ出し、多くの住民が亡くなった。インド政府は被害者に代わって、工場の親会社である米ユニオン・カーバイド社を訴え、33億ドルの賠償を求めた。しかし1989年、最高裁判所の仲介によって、訴額のおよそ七分の一にあたる4億7000万ドルで和解が成立した。被害の大きさに比べて少なすぎるとの批判は根強く、補償をめぐる問題は今も尾を引いている。",
+      "form": "訴額",
+      "en": "In 1984, toxic gas leaked from a chemical plant in Bhopal in central India, and many residents died. On behalf of the victims, the Indian government sued the plant's parent company, America's Union Carbide, and demanded 3.3 billion dollars in compensation. In 1989, however, through the mediation of the Supreme Court, a settlement was reached for 470 million dollars, about one-seventh of the amount claimed. Criticism that this was far too little compared with the scale of the harm remains strong, and problems over compensation still linger today.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「訴額の〜分の一」のように、和解額や判決額と比べる形でよく出てくる。",
+      "grammar": ["n5-teiru"],
+      "sense": "裁判で相手に求める金額。"
+    },
+    {
+      "ja": "裁判で最初にでっかい金額を出すのって、心理学的にはけっこう意味があるらしいんですよ。いわゆるアンカリングってやつで、最初に聞いた数字に、人の判断が引っぱられちゃうんですよね。訴額が一億円って聞いたあとだと、和解で三千万円って言われても、なんか安く感じちゃうじゃないですか。もちろん、裁判官がそれだけで判断するわけじゃないですけど。ただ交渉ごとでは、最初の数字を誰が出すかって、意外と大事だと思うんですよ。",
+      "form": "訴額",
+      "en": "Putting out a huge amount at the start of a lawsuit apparently means quite a lot psychologically. It's what's called anchoring: people's judgements get pulled toward the first number they hear. After hearing that the amount claimed is a hundred million yen, even if you're told thirty million in a settlement, it somehow feels cheap, right? Of course, it's not as if judges decide based on that alone. But in negotiations, I think who puts out the first number matters more than you'd expect.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "話し言葉では硬い語なので、「訴額が〜円」と金額と組み合わせて使うのが自然。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "裁判で相手に求める金額。"
+    }
+  ],
+  "315": [
+    {
+      "ja": "今回は、コロンブスの航海にまつわる、よくある誤解の話です。当時の人は地球が平らだと信じていた、と言われることがありますが、実は学者たちの多くは、地球が丸いことを知っていました。彼らが問題にしたのは地球の形ではなく、西へ進めばすぐにアジアに着くという、コロンブスの見積もりの妥当性だったんです。実際、彼は地球の大きさをかなり小さく見積もっていて、反対した学者たちのほうが正しかったんですね。たまたま途中に大陸があったおかげで、彼の航海は歴史に残ることになったわけです。",
+      "form": "妥当性",
+      "en": "This time it's about a common misunderstanding surrounding Columbus's voyage. It is sometimes said that people back then believed the Earth was flat, but in fact most scholars knew the Earth was round. What they took issue with was not the shape of the Earth but the validity of Columbus's estimate that heading west would quickly bring you to Asia. In fact, he had estimated the size of the Earth as considerably smaller than it is, and the scholars who opposed him were the ones who were right. Thanks to there happening to be a continent in the way, his voyage ended up going down in history.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「計画の妥当性」「見積もりの妥当性」のように、考えや数字が筋の通ったものかを問う。",
+      "grammar": ["n3-dewa-naku", "n3-koto-ni-naru"],
+      "sense": "考えや数字が、その場に合っていて正しいこと。"
+    },
+    {
+      "ja": "心理テストや入試問題を作るときに欠かせないのが、信頼性と妥当性という二つの物差しです。信頼性は、何度測っても同じような結果が出るかどうかを表します。それに対してもう一つは、本当に測りたい力を測れているかどうかを問うものです。たとえば体重計で頭の良さを測ろうとすれば、毎回同じ数字は出ても、意味のある結果とは言えませんよね。模試の点数も、本番の力をどこまで映しているかを意識しておくと、結果に振り回されにくくなります。",
+      "form": "妥当性",
+      "en": "What you can't do without when making psychological tests or entrance exam questions are two yardsticks: reliability and validity. Reliability expresses whether you get similar results no matter how many times you measure. The other one, by contrast, asks whether you are really able to measure the ability you want to measure. For example, if you tried to measure intelligence with a bathroom scale, you might get the same number every time, but you couldn't call it a meaningful result. If you stay aware of how far your mock exam scores reflect your real ability, you'll be less likely to be thrown around by the results.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "心理学や教育では「テストの妥当性」として、測りたい力を測れているかを指す専門語。",
+      "grammar": ["n5-teiru"],
+      "sense": "テストなどが、測りたいものを正しく測れている度合い。"
+    },
+    {
+      "ja": "生成AIの実力を比べるために広く使われているテストについて、その妥当性を疑う声が研究者の間で強まっている。テストの問題と答えが、AIの学習用データに紛れ込んでいる例が相次いで見つかっているためだ。答えを覚えているだけなら、高い点数が本当の理解を示しているとは言えない。このため、問題を公開しないまま評価に使う新たな仕組みづくりも始まっている。点数の高さだけを追う段階から、点数の中身を問う段階へと、議論は移りつつある。",
+      "form": "妥当性",
+      "en": "Voices among researchers doubting the validity of the tests widely used to compare the abilities of generative AI are growing stronger. This is because cases keep being found in which the tests' questions and answers have slipped into AI training data. If a model has merely memorized the answers, a high score cannot be said to show real understanding. For this reason, work has also begun on new systems that use questions for evaluation while keeping them unpublished. The debate is shifting from a stage of chasing only high scores to one of questioning what the scores contain.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜の妥当性を疑う」「妥当性が問われる」の形が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "考えや数字が、その場に合っていて正しいこと。"
+    }
+  ],
+  "304": [
+    {
+      "ja": "今回は、新聞の歴史に残るちょっと変わった記事の話です。1920年、ニューヨーク・タイムズは、ロケットは空気のない宇宙では進めないとして、研究者ゴダードの考えを社説で笑いものにしました。ところが49年後の1969年、アポロ11号が月へ向けて飛び立った翌日、同じ新聞は小さな訂正を載せることになったんです。ゴダード本人はすでに亡くなっていて、それを読むことはありませんでした。間違いを認めるのに遅すぎることはないのか、それとも遅すぎたのか、皆さんはどう考えるでしょうか。",
+      "form": "訂正",
+      "en": "This time it's about a slightly unusual article that has gone down in newspaper history. In 1920, The New York Times ridiculed the ideas of the researcher Goddard in an editorial, saying that a rocket could not move in airless space. But 49 years later, in 1969, on the day after Apollo 11 lifted off toward the Moon, the same newspaper ended up printing a small correction. Goddard himself had already died and never read it. Is it never too late to admit a mistake, or was it too late after all, what do you think?",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「訂正を載せる」「発言を訂正する」のように、誤りを正しく直すことに使う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "言葉や数字などの間違いを、正しく直すこと。"
+    },
+    {
+      "ja": "送ったメールに誤りを見つけたら、件名の頭に「訂正」と入れて、すぐに送り直しましょう。本文では、どこがどう違っていたのかを、正しい内容と並べて書くと、読み手が迷いません。言い訳を長々と書くのは逆効果で、おわびは一言で十分です。大切なのは、相手が前のメールを読み返さなくても済むようにすることです。間違いそのものより、その後の対応のほうが、意外と相手の記憶に残るものですよ。",
+      "form": "訂正",
+      "en": "If you find an error in an email you've sent, put \"Correction\" at the start of the subject line and resend it right away. In the body, if you write what was wrong and how, side by side with the correct content, the reader won't be confused. Writing excuses at length is counterproductive, and a one-line apology is enough. What matters is making it so the other person doesn't have to reread the previous email. Surprisingly, it's how you handle things afterwards, more than the mistake itself, that stays in the other person's memory.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "ビジネスメールでは件名に「【訂正】」と付けるのが定番。",
+      "grammar": ["n3-you-ni"],
+      "sense": "言葉や数字などの間違いを、正しく直すこと。"
+    },
+    {
+      "ja": "2023年2月、グーグルが対話型AI「バード」の宣伝で示した回答に誤りがあると、天文学者らが相次いで指摘した。回答は、ジェイムズ・ウェッブ宇宙望遠鏡が太陽系の外の惑星を初めて撮影したとしていたが、最初の撮影は2004年に別の望遠鏡で行われていた。指摘が広がると、親会社アルファベットの株価は大きく下がった。宣伝用の回答でさえ間違いを含んでいたことで、AIの答えをどこまで信じてよいのかが改めて問われた。もっともらしい文章の中から誤りを見つけて訂正するのは、人間にとっても簡単ではない。",
+      "form": "訂正",
+      "en": "In February 2023, astronomers one after another pointed out an error in an answer that Google had shown in an advertisement for its conversational AI, Bard. The answer said the James Webb Space Telescope had taken the first pictures of a planet outside the solar system, but the first such image had been taken in 2004 by a different telescope. As the criticism spread, the share price of the parent company, Alphabet, fell sharply. Because even an answer used for advertising contained a mistake, the question of how far AI's answers can be trusted was raised anew. Finding and correcting errors within plausible-sounding text is not easy even for humans.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n3-koto-de"],
+      "sense": "言葉や数字などの間違いを、正しく直すこと。"
+    }
+  ],
+  "306": [
+    {
+      "ja": "今回は、南極点を目指した二つの探検隊の話です。1911年、ノルウェーのアムンセンとイギリスのスコットは、ほぼ同じ時期に基地を出発しました。アムンセンは以前、北極圏でイヌイットの人々と暮らしながら、犬ぞりの扱い方や寒さをしのぐ服の工夫など、極地の旅に事前に必要な知恵を学んでいたんです。その結果、彼の隊はスコットより五週間ほど早く目的地に着き、全員が無事に戻りました。一方、スコットの隊は極点にたどり着いた五人が帰り道で全員命を落とし、準備の差が明暗を分けたと言われています。",
+      "form": "事前に必要",
+      "en": "This time it's the story of two expeditions that aimed for the South Pole. In 1911, Amundsen of Norway and Scott of Britain set out from their bases at almost the same time. Earlier, while living with the Inuit in the Arctic, Amundsen had learned the know-how required in advance for polar travel, such as how to handle dog sleds and how to make clothing that keeps out the cold. As a result, his team reached the goal about five weeks before Scott and all returned safely. Meanwhile, on Scott's team, the five men who reached the Pole all lost their lives on the way back, and it is said that the difference in preparation decided their fates.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「事前に必要な準備・手続き・技術」のように、後ろに名詞を続けて使うことが多い。",
+      "grammar": ["n4-nagara", "n5-teiru"],
+      "sense": "何かをする前に、済ませておかなければならないこと。"
+    },
+    {
+      "ja": "欧州連合（EU）のAI規則は、採用や教育などに使われるAIを「高リスク」と位置づけ、市場に出す前に一定の基準を満たしているかの確認を求めている。事業者には、リスク管理の仕組みづくりや技術文書の作成など、事前に必要な対応が数多く課される。欧州で製品やサービスを提供する日本企業も対象となるため、準備を進める動きが広がっている。規則は2024年に発効し、段階的に適用が始まっている。各社にとっては、技術開発と規則への対応をどう両立させるかが課題となりそうだ。",
+      "form": "事前に必要",
+      "en": "The European Union's AI regulation classifies AI used in areas such as hiring and education as \"high-risk\" and requires confirmation that it meets certain standards before it is placed on the market. Businesses face many measures required in advance, such as building risk-management systems and preparing technical documentation. Japanese companies that provide products and services in Europe are also covered, so moves to get ready are spreading. The regulation came into force in 2024, and its application has begun in stages. For each company, how to balance technology development with compliance looks set to be a challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「事前に必要な手続き・対応」の形で、制度上の義務を説明するときによく使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "何かをする前に、済ませておかなければならないこと。"
+    },
+    {
+      "ja": "資格試験で意外と多いのが、勉強ではなく手続きでつまずくケースです。受験票の印刷や証明写真の用意など、事前に必要なことは、申し込んだその日にリストにしておきましょう。前日になって写真がないと気づいても、もう間に合わないことがあります。当日の持ち物は、前の晩にかばんへ入れておくように習慣づけると安心です。準備で迷わない分、試験そのものに集中できるようになりますよ。",
+      "form": "事前に必要",
+      "en": "A surprisingly common case in qualification exams is stumbling not over studying but over procedures. Things required in advance, such as printing your admission ticket or preparing an ID photo, should be put on a list on the very day you apply. Even if you notice the day before that you have no photo, it may already be too late. You'll feel at ease if you make a habit of putting the things to bring on the day into your bag the night before. Because you won't be thrown by preparations, you'll be able to concentrate on the exam itself.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「事前に必要なこと」「事前に必要な書類」のように、準備や手続きの話でよく使う。",
+      "grammar": ["n3-dewa-naku", "n3-you-ni", "n4-you-ni-naru"],
+      "sense": "何かをする前に、済ませておかなければならないこと。"
+    }
+  ]
+}

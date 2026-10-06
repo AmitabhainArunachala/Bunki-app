@@ -21740,7 +21740,7 @@ const deckSummaries = {};
 function loadDeckPlayer() {
   if (deckPlayer) return Promise.resolve(deckPlayer);
   if (!deckPlayerLoading) {
-    deckPlayerLoading = import('./decks/player/mount.js').then(
+    deckPlayerLoading = Promise.all([import('./decks/player/mount.js'), loadDeckHost()]).then(([mod]) => mod).then(
       (mod) => {
         deckPlayer = mod;
         return mod;
@@ -21829,7 +21829,7 @@ function renderDeckPlay(main) {
   deckPlayer
     .render(main, {
       deckId: S.deckPlay || DOJO_DECKS[0].id,
-      storage: localStorage,
+      storage: localStorage, host: deckHost(),
       onLeave() {
         delete deckSummaries[S.deckPlay];
         S.view = 'dojo';
@@ -28832,3 +28832,42 @@ window.addEventListener('DOMContentLoaded', () => {
     if (maintenanceReports) root.append(reportEntries('report-line-page'));
   });
 });
+
+/* ---- 集中道場 › デッキ: the host lexicon adapter the deck player receives
+ * (decks/player/host.js; learning-design §3). Kept below the storage-ledger
+ * line pins on purpose (residual-storage-callers.json): the two call sites
+ * above changed in place, so no pinned line moved. The adapter is closures
+ * over this module's own lexicon, entry sheets and one-tap save: a tap on a
+ * deck card is capture, never evidence, so nothing here writes the
+ * observation log or any schedule, and taking a word never enrols it in the
+ * deck. The single-file build cannot import it and mounts no deck anyway. */
+let deckHostModule = null;
+let deckHostAdapter = null;
+function loadDeckHost() {
+  if (deckHostModule || window.__CORRIDOR_STANDALONE__ === true) return Promise.resolve(deckHostModule);
+  return import('./decks/player/host.js').then(
+    (mod) => (deckHostModule = mod),
+    () => null, // the deck still opens, with furigana only
+  );
+}
+
+function deckHost() {
+  if (!deckHostModule) return null;
+  if (!deckHostAdapter) {
+    const norm = (p) => String(p || '').replace(/[〜～\s（）()]/g, '');
+    deckHostAdapter = deckHostModule.createHost({
+      word: (id, reading) => lookup(id, null, reading),
+      kanji: (glyph) => D.kanji?.[glyph] || null,
+      grammar: (id, pattern) =>
+        GRAMMARS().find((g) => g.id === id) || (pattern ? GRAMMARS().find((g) => norm(g.p) === norm(pattern)) : null) || null,
+      open: (node) => go(node),
+      taken: () => S.taken,
+      // 覚える from a deck card is the corridor's one save path (STANDARD A51): the same one-tap
+      // save, Saved toast and 元に戻す as the reader's dictionary visit, into the shared review
+      // pool; no chooser. A row already held for this identity is left as it is, never toggled off.
+      capture: (node, label) => (wordCaptureState(node) === 'taken' ? true : toggleWordSave(node, label)),
+      addToList: (node, label, invoker) => openVocabularyListPopover(node, label, invoker),
+    });
+  }
+  return deckHostAdapter;
+}

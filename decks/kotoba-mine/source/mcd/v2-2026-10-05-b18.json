@@ -1,0 +1,333 @@
+{
+  "14": [
+    {
+      "ja": "今回は、チェスのコンピューターがどうやって次の手を選んでいるのか、その基本の考え方を紹介します。ポイントは、自分に都合のいい展開を期待しないことです。相手もこちらにとっていちばん痛い手を打ってくる、と想定した上で、何手か先まで枝分かれを読んでいきます。そして、相手がどの局面でも最善の手を返してきた場合に、損がいちばん小さく済む手を選ぶわけです。「ミニマックス法」と呼ばれる、楽観を捨てた発想なんですね。",
+      "form": "最善",
+      "en": "This time I'll introduce the basic idea behind how chess computers choose their next move. The key point is not to hope for developments that suit you. The program reads several moves ahead through the branching possibilities, on the assumption that the opponent will also play the move that hurts you most. Then it chooses the move whose loss stays smallest in the case where the opponent replies with the very best move in every position. It's an idea called the minimax method, one that throws optimism away.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「最善の手」「最善を尽くす」の形でよく使う。",
+      "grammar": ["n2-ue-de", "n4-teiku"]
+    },
+    {
+      "ja": "インドの古典『バガヴァッド・ギーター』には、行為の結果に執着せず、なすべきことをなせ、という教えがある。結果を気にするなと言われると、投げやりになれという意味に聞こえるかもしれない。だが、そうではない。手を抜くことなく最善を尽くし、そのうえで、どう転ぶかは自分の手の及ばないところにあると認めるのである。結果への執着を手放したとき、人はかえって目の前の仕事に深く打ち込めるのだろう。",
+      "form": "最善",
+      "en": "The Indian classic the Bhagavad Gita contains the teaching that one should do what must be done without clinging to the fruits of one's actions. Being told not to care about results may sound like being told to stop trying. But that is not it. It means doing one's very best without cutting corners, and then accepting that how things turn out lies beyond one's reach. Perhaps it is when we let go of our attachment to results that we can, on the contrary, throw ourselves deeply into the work in front of us.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「最善を尽くす」は、できるかぎりの力を出しきるという意味の決まった言い方。",
+      "grammar": ["n2-koto-naku", "n2-ue-de"]
+    },
+    {
+      "ja": "参考書選びに何週間もかける受験生は、意外と多いものです。心理学の調査では、選択肢を残らず比べてからでないと決められない人ほど、選んだあとの満足度が低い傾向にあることが示されています。比べれば比べるほど、選ばなかった本の長所が気になってしまうからです。勉強では、最善の一冊を探すより、「これで十分」と決めて早く始めるほうが、結局は伸びることが多いのです。迷ったら評判のいいものを一冊選び、それを三周するつもりで取りかかりましょう。",
+      "form": "最善",
+      "en": "There are surprisingly many exam candidates who spend weeks choosing a study guide. Psychological surveys have shown that people who can't decide until they have compared every last option tend to be less satisfied after choosing. That's because the more you compare, the more the strengths of the books you didn't choose bother you. In studying, rather than hunting for the single best book, deciding \"this is good enough\" and starting early usually leads to more progress in the end. If you're unsure, pick one well-reviewed book and set to work intending to go through it three times.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「最善の一冊」「最善の策」のように、「最善の＋名詞」の形でも使える。",
+      "grammar": ["n5-teiru"]
+    }
+  ],
+  "5": [
+    {
+      "ja": "今回は、ダニエル・カーネマンの『ファスト＆スロー』を紹介します。この本によると、人間の頭の中には、二つの思考のモードがあります。一つは、怒った顔を見た瞬間に反射的に身構えるような、速くて自動的に働く思考です。もう一つは、ややこしい計算を一つずつ進めるときのような、遅くて手間のかかる思考ですね。私たちは普段ほとんど速いほうに頼っているのですが、それが思わぬ判断ミスを生む、というのが本の大きな主張です。",
+      "form": "反射的に",
+      "en": "This time I'll introduce Daniel Kahneman's Thinking, Fast and Slow. According to this book, there are two modes of thought in the human mind. One is fast thinking that works automatically, like when you brace yourself by reflex the instant you see an angry face. The other is slow, effortful thinking, like when you work through a tricky calculation step by step. We usually rely almost entirely on the fast one, and the book's big claim is that this produces unexpected errors of judgment.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「反射的に〜する」の形で、考える前に体や口が動く様子を表す。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "最近の車って、前に人が飛び出してくると、勝手にブレーキをかけてくれるやつがあるじゃないですか。あれ、カメラの映像をAIが読み取って、歩行者かどうかを判断してるらしいんですよ。人間だと、危ないって思ってから足が動くまでに、どうしても一瞬かかるんですよね。どんなに反射的に踏んだつもりでも、その一瞬で車は何メートルも進んじゃう。だから、機械に任せたほうがいい場面って、意外と多いと思うんですよ。",
+      "form": "反射的に",
+      "en": "You know how some cars these days will brake on their own when someone runs out in front of them? Apparently the AI reads the camera footage and judges whether it's a pedestrian. With a human, there's inevitably an instant between thinking \"that's dangerous\" and your foot moving. However reflexively you think you hit the brake, in that instant the car travels several meters. So I think there are surprisingly many situations where it's better to leave things to the machine.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉では「反射的に〜しちゃう」のように気軽に使える。"
+    },
+    {
+      "ja": "人に責められたり、ばかにされたりすると、私たちはほとんど反射的に言い返してしまう。仏教の瞑想が鍛えようとするのは、その一瞬の自動的な反応に気づく力である。怒りが湧いたと気づけば、怒りはもう自分そのものではなく、眺めることのできる一つの出来事になる。そこに小さな隙間が生まれ、言い返すか黙るかを選ぶ余裕ができるのだ。修行とは、この隙間を少しずつ広げていくことなのかもしれない。",
+      "form": "反射的に",
+      "en": "When someone blames us or makes fun of us, we almost reflexively talk back. What Buddhist meditation tries to train is the ability to notice that momentary, automatic reaction. Once you notice that anger has arisen, the anger is no longer you yourself but a single event you can look at. A small gap opens there, and you gain the room to choose whether to talk back or stay silent. Practice may be a matter of widening this gap little by little.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「反射的に言い返す」「反射的に身構える」など、とっさの反応に使う。",
+      "grammar": ["n3-dewa-naku", "n4-teiku"]
+    }
+  ],
+  "50": [
+    {
+      "ja": "今回は、細かい技術の話はいったん置いて、AIの七十年ほどの歴史をざっと俯瞰してみます。1950年代から60年代にかけては、コンピューターに推論や探索をさせる研究が盛り上がり、これが第一次ブームと呼ばれます。80年代には、専門家の知識をルールとして詰め込む方式で、第二次ブームが起きました。そして2010年代、大量のデータから学ぶディープラーニングで第三次ブームが始まります。最初の二つのブームのあとには、どちらも期待が冷え込む「冬の時代」が来ている、というのが面白いところですね。",
+      "form": "俯瞰",
+      "en": "This time, setting aside the fine technical details for now, let's take a quick bird's-eye view of the roughly seventy-year history of AI. From the 1950s into the 60s, research that had computers carry out reasoning and search took off, and this is called the first boom. In the 80s, a second boom arose from the approach of packing experts' knowledge into computers as rules. Then, in the 2010s, the third boom began with deep learning, which learns from huge amounts of data. What's interesting is that each of the first two booms was followed by a \"winter\" in which expectations cooled.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「歴史を俯瞰する」「全体を俯瞰する」のように、全体を見渡す意味で使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "全体を広く見渡すこと。"
+    },
+    {
+      "ja": "ペルー南部の砂漠に残るナスカの地上絵は、およそ二千年前に描かれたと考えられている。ハチドリやサルなどを描いた大きな図柄は、地上に立つと、ただの溝の連なりにしか見えない。全体の形がはっきり確認されたのは、飛行機から一帯を俯瞰できるようになった二十世紀以降のことだという。近年は日本の大学の研究チームも現地調査を続けており、新たな図柄の発見が相次いでいる。描いた人々がなぜ空からしか見えない絵を残したのかについては、いまも議論が続いている。",
+      "form": "俯瞰",
+      "en": "The Nazca Lines, which remain in the desert of southern Peru, are thought to have been drawn about two thousand years ago. The large figures, depicting hummingbirds, monkeys and other things, look like nothing more than a series of grooves when you stand on the ground. Their overall shapes were reportedly only clearly confirmed in the twentieth century, once it became possible to look down on the area from airplanes. In recent years a research team from a Japanese university has also been continuing fieldwork, and discoveries of new figures have followed one after another. Debate still continues over why the people who drew them left pictures that can only be seen from the sky.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「上空から俯瞰する」のように、文字どおり高い所から見下ろす意味でも使う。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru"],
+      "sense": "高い所から見下ろすこと。"
+    },
+    {
+      "ja": "成績が伸びる人に共通しているのは、自分の勉強を少し離れたところから眺める習慣です。心理学ではこれを「メタ認知」と呼びます。今日はどこまで理解できたか、どこでつまずいたか、時間の使い方に無駄はなかったか。こうして自分の学習を俯瞰することで、次にやるべきことがはっきり見えてきます。一日の終わりに、ノートの隅に三行だけでも振り返りを書いてみると、効果を実感しやすいですよ。",
+      "form": "俯瞰",
+      "en": "What people whose grades improve have in common is the habit of looking at their own studying from a little distance. Psychology calls this metacognition. How far did I understand today, where did I stumble, was there any waste in how I used my time? By taking an overall view of your own learning like this, you can clearly see what you need to do next. If you try writing even just three lines of reflection in the corner of your notebook at the end of the day, it's easy to feel the effect.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「自分を俯瞰する」は、一歩引いて自分を外から眺めるという意味。",
+      "grammar": ["n5-teiru", "n3-koto-de"],
+      "sense": "全体を広く見渡すこと。"
+    }
+  ],
+  "51": [
+    {
+      "ja": "今回は、アポロ計画の話です。1961年、アメリカのケネディ大統領は、60年代のうちに人間を月に送り、無事に地球へ帰すという目標を打ち出しました。当時のアメリカは、宇宙開発でソ連に先を越され続けていたんですね。期限がはっきりしたことで、何十万人もの関係者が、同じ一点に照準を合わせて動けたと言われています。そして1969年、アポロ11号は実際に月面着陸を成し遂げました。",
+      "form": "照準",
+      "en": "This time it's about the Apollo program. In 1961, US President Kennedy set out the goal of sending a man to the Moon within the sixties and returning him safely to Earth. At the time, America had kept being beaten to the punch by the Soviet Union in space development. It's said that because the deadline was clear, hundreds of thousands of people involved were able to move with their sights set on the same single point. And in 1969, Apollo 11 actually achieved the Moon landing.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「照準を合わせる」「照準を定める」の形で、目標をしぼる意味でよく使う。",
+      "grammar": ["n3-koto-de", "n5-teiru"],
+      "sense": "目指すねらい。目標とするところ。"
+    },
+    {
+      "ja": "北海道千歳市で、次世代半導体の大規模な工場づくりが進んでいる。国内の大手企業8社が出資して2022年に設立したラピダスは、回路の線幅が2ナノメートル級の先端品について、2027年の本格生産に照準を合わせている。2025年には試作ラインが動き始め、政府もこれまでに巨額の支援を決めている。ただ、先行する台湾や韓国の大手との技術の差は大きく、計画どおりに進むかを疑問視する声も根強い。",
+      "form": "照準",
+      "en": "In Chitose, Hokkaido, construction of a large-scale factory for next-generation semiconductors is under way. Rapidus, set up in 2022 with investment from eight major domestic companies, has its sights set on full-scale production in 2027 of cutting-edge chips with circuit line widths in the 2-nanometer class. In 2025 its trial production line began running, and the government has also decided on huge support so far. However, the technological gap with the leading Taiwanese and South Korean majors that are ahead is large, and voices doubting whether things will go as planned remain persistent.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜に照準を合わせる」で、狙う時期や市場を示すことが多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "目指すねらい。目標とするところ。"
+    },
+    {
+      "ja": "シューティングゲームのうまい人って、敵が出てきた瞬間に、もう照準が合ってるじゃないですか。あれ、目で見てから手を動かしてるっていうより、敵が現れそうな場所に最初から構えてるらしいんですよ。つまり速いのは手じゃなくて、予測のほうだっていう。脳って、次に起きることを先読みして準備しておくのが、もともと得意なんですよね。だから練習で鍛えてるのも、実は指より頭なのかもしれないです。",
+      "form": "照準",
+      "en": "You know how people who are good at shooting games already have their sights on the enemy the instant it appears? Apparently, rather than seeing it and then moving their hands, they're positioned from the start on the spot where an enemy is likely to appear. In other words, what's fast isn't their hands but their prediction. The brain is naturally good at reading ahead to what will happen next and getting ready for it. So what they're training through practice may actually be their heads more than their fingers.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "「照準が合う」「照準を合わせる」は、もとは銃などのねらいを定めること。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "銃などのねらいを、目標に合わせること。"
+    }
+  ],
+  "10": [
+    {
+      "ja": "今回は、ダーウィンの進化論が生まれるきっかけになった、ある協力者の話です。ダーウィンはガラパゴス諸島で多くの鳥を集めましたが、本人は、くちばしの形もばらばらなそれらを、別々の種類の鳥だと思っていました。ところがイギリスに戻ったあと、鳥類学者のジョン・グールドが調べると、そのほとんどがフィンチの仲間の、互いに近い種だとわかったんです。専門家が細かな違いを見分けたことで、ダーウィンは種が変わっていく可能性を真剣に考えるようになります。大発見の陰には、目のいい協力者がいたわけですね。",
+      "form": "見分けた",
+      "en": "This time it's the story of a certain collaborator who helped give rise to Darwin's theory of evolution. Darwin collected many birds in the Galápagos Islands, but he himself thought that these, with their varied beak shapes, were different kinds of birds altogether. However, after he returned to Britain, the ornithologist John Gould examined them and found that most of them were closely related species within the finch group. Because an expert told the fine differences apart, Darwin came to seriously consider the possibility that species change. Behind the great discovery, in other words, was a collaborator with a good eye.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「違いを見分ける」「本物と偽物を見分ける」の形でよく使う。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "生成AIで作られた偽の動画や音声が、詐欺などに悪用される例が国内外で増えている。本物と見分けるのが難しいほど精巧なものも多く、各国で対策が急がれている。こうした中、映像の中の不自然な光の当たり方や、まばたきの間隔などをAIで分析し、偽物の可能性を判定する技術の開発が進んでいる。一方で、作る側の技術も日々進歩しており、いたちごっこが続くとの見方も強い。専門家は、技術だけに頼らず、情報の出どころを確かめる習慣が欠かせないと指摘している。",
+      "form": "見分ける",
+      "en": "Cases in which fake videos and audio made with generative AI are misused for fraud and the like are increasing in Japan and abroad. Many are so elaborate that they are hard to tell apart from the real thing, and countries are hurrying to take countermeasures. Amid this, development is advancing on technology that uses AI to analyze things such as unnatural lighting in footage and the intervals between blinks, and to judge the likelihood of a fake. On the other hand, the makers' technology is also advancing day by day, and there is a strong view that the cat-and-mouse game will continue. Experts point out that, rather than relying on technology alone, the habit of checking where information comes from is indispensable.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「本物と見分ける」のように、区別する相手を「と」で示す。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "似た問題をまとめて解く練習と、種類の違う問題を混ぜて解く練習では、どちらが力がつくでしょうか。ある心理学の実験では、画家ごとに絵をまとめて見せるより、何人もの画家の絵を混ぜて見せたほうが、初めて見る絵の作者を言い当てやすくなったそうです。混ぜて練習すると、違いに注目せざるを得ないからだと考えられています。数学でも同じで、問題の種類を見分ける力は、混ぜた練習でこそ育つのです。",
+      "form": "見分ける",
+      "en": "Between practice in which you solve similar problems in a block and practice in which you solve different kinds of problems mixed together, which builds more skill? In one psychology experiment, showing paintings by many painters mixed together, rather than grouped by painter, reportedly made it easier to name the artist of a painting seen for the first time. This is thought to be because mixed practice forces you to pay attention to differences. It's the same in math: the ability to tell types of problems apart grows precisely through mixed practice.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「見分ける力」「見分け方」のように、区別する能力の話でよく使う。",
+      "grammar": ["n2-zaru-o-enai", "n5-teiru"]
+    }
+  ],
+  "265": [
+    {
+      "ja": "今回は、脳の「作り替え」の話です。生まれつき目の見えない人の脳を調べると、本来は視覚を担当する部分が、音や指先の感覚を処理するのに使われていることがわかっています。点字を読む指先が驚くほど鋭敏になるのも、この働きによるものだと考えられているんですね。脳は、使われない領域を遊ばせておかず、別の仕事に回すわけです。私たちの能力は、生まれ持ったものだけで決まるわけではない、ということがよくわかる例です。",
+      "form": "鋭敏",
+      "en": "This time it's about the brain \"remodeling\" itself. When the brains of people who were born blind are examined, it turns out that the part that normally handles vision is used to process sound and the sensations of the fingertips. It's thought that this mechanism is also why the fingertips that read Braille become astonishingly sensitive. The brain doesn't leave unused regions idle, but reassigns them to other work. It's an example that shows clearly that our abilities are not decided solely by what we were born with.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「感覚が鋭敏だ」「鋭敏な耳」のように、感覚の鋭さを表すかたい言葉。",
+      "grammar": ["n5-teiru", "n3-wake-dewa-nai"],
+      "sense": "感覚がとてもするどいようす。"
+    },
+    {
+      "ja": "仏教では、知恵と慈悲は鳥の両翼にたとえられる。どちらか一方の翼だけでは、鳥はまっすぐに飛ぶことができないというのである。頭の働きが鋭敏な人ほど、他人の欠点や議論のわずかな穴がよく見え、見えた分だけ指摘したくなる。だが、見えたものをそのまま突きつけるだけでは、相手を傷つけるにすぎない。その力を人のために使えるかどうかは、それを包みこむ心のやわらかさにかかっているのだろう。",
+      "form": "鋭敏",
+      "en": "In Buddhism, wisdom and compassion are likened to a bird's two wings. The point is that with only one of them, a bird cannot fly straight. The sharper someone's mind, the more readily they see other people's faults and the slightest holes in an argument, and the more they see, the more they want to point them out. But merely thrusting what one has seen at others does nothing more than hurt them. Whether that power can be used for others' sake probably depends on the gentleness of heart that wraps it.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「頭の働きが鋭敏だ」のように、知性の鋭さにも使う。",
+      "grammar": ["n2-ni-suginai"],
+      "sense": "頭の働きがするどいようす。"
+    },
+    {
+      "ja": "赤ちゃんの耳は、生後しばらくのあいだ、世界中の言語の音の違いに鋭敏だと言われています。たとえば日本の赤ちゃんでも、生後半年ほどなら、英語のエルとアールの音をかなり聞き分けられるそうです。ところが生後一年近くになると、ふだん耳にする言語に合わせて、聞き分ける力が絞り込まれていきます。大人になってから外国語の発音に苦労するのは、こうした耳の「最適化」がもう済んでいるからなのです。だからこそ、発音は学び始めの早い段階から意識して練習するのが近道です。",
+      "form": "鋭敏",
+      "en": "Babies' ears are said to be keenly sensitive, for a while after birth, to differences between the sounds of the world's languages. For example, even Japanese babies can reportedly distinguish the English L and R sounds fairly well at about six months old. But as they near one year old, their ability to tell sounds apart narrows to fit the language they usually hear. The reason adults struggle with pronunciation in foreign languages is that this \"optimization\" of the ear is already complete. That is exactly why the shortcut is to practice pronunciation consciously from an early stage of learning.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「〜に鋭敏だ」の形で、何に対して感覚が鋭いかを示せる。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "感覚がとてもするどいようす。"
+    }
+  ],
+  "99": [
+    {
+      "ja": "今回は、有名な「見えないゴリラ」の実験を紹介します。参加者は、バスケットボールをパスし合う映像を見ながら、白いシャツのチームのパスの回数を数えます。その途中で、ゴリラの着ぐるみを着た人が画面の真ん中を堂々と横切るのですが、見ていた人のおよそ半数がまったく気づかなかったんです。眼前で起きていることでも、注意を向けていなければ、脳はそれを見たことにしてくれないんですね。",
+      "form": "眼前",
+      "en": "This time I'll introduce the famous \"invisible gorilla\" experiment. Participants watch a video of people passing a basketball to each other while counting the passes made by the team in white shirts. Partway through, a person in a gorilla suit boldly walks across the middle of the screen, but about half of those watching didn't notice at all. Even if something is happening right before your eyes, unless you're paying attention, the brain won't count it as something you saw.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「眼前で起きる」「眼前に広がる」のように、改まった話や書き言葉で使う。",
+      "grammar": ["n4-nagara", "n5-teiru"]
+    },
+    {
+      "ja": "過去を悔やみ、未来を案じているあいだに、私たちは眼前のこの瞬間を取り逃がしている。初期の経典には、過ぎ去ったことを追わず、まだ来ないことを待ち望むな、という趣旨の教えが残っている。それは、未来の計画を捨てよということではない。いま手の中にある一杯の茶、一歩の足取りに心を置くことでしか、人生は本当には生きられないということである。悟りへの道とは、遠くへ旅立つことではなく、足もとへ帰ってくることなのだろう。",
+      "form": "眼前",
+      "en": "While we regret the past and worry about the future, we let slip this very moment before our eyes. In the early scriptures there remains a teaching to the effect that one should not chase what has passed nor long for what has not yet come. This does not mean throwing away plans for the future. It means that only by placing one's mind on the cup of tea now in one's hand, on each single step, can life truly be lived. The path to awakening is perhaps not a matter of setting out for somewhere far away, but of coming back to where one stands.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「眼前の〜」の形で、いま目の前にあるものを強く示す。",
+      "grammar": ["n5-teiru", "n3-koto-de", "n3-dewa-naku"]
+    },
+    {
+      "ja": "1962年10月、ソ連がキューバに核ミサイルを配備しようとしていることが明らかになり、米ソは一触即発の状態に陥った。アメリカはキューバ周辺の海を封鎖し、ソ連の船の動きを止めようとした。核戦争の危機が眼前に迫る中、両国の首脳は非公式の連絡も使いながら交渉を続けた。最終的にソ連はミサイルの撤去を受け入れ、アメリカはキューバに侵攻しないことを約束した。この経験から、翌年には両国の首脳を直接結ぶ通信回線が設けられた。",
+      "form": "眼前",
+      "en": "In October 1962, it came to light that the Soviet Union was trying to deploy nuclear missiles in Cuba, and the US and the USSR fell into a situation where war could break out at any moment. The United States blockaded the waters around Cuba and tried to stop the movement of Soviet ships. With the danger of nuclear war looming right before their eyes, the leaders of both countries continued negotiating, also using unofficial channels. In the end, the Soviet Union accepted the removal of the missiles, and the United States promised not to invade Cuba. From this experience, a communication line directly linking the two countries' leaders was set up the following year.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「危機が眼前に迫る」のように、差し迫った事態にも使う。",
+      "grammar": ["n5-teiru", "n4-nagara"],
+      "sense": "危険などが、すぐ目の前に迫っていること。"
+    }
+  ],
+  "102": [
+    {
+      "ja": "今回は、AIの計算を支えるデータセンターが、なぜ置き場所にこだわるのかという話です。光は真空中なら秒速およそ30万キロメートルで進みますが、光ファイバーの中では、その3分の2ほどの速さに落ちます。国内の距離ならほぼ一瞬ですが、海の向こうのサーバーとやり取りすると、往復で100ミリ秒前後の遅れが出ることもあるんですね。だから、反応の速さが求められるサービスほど、利用者の近くにデータセンターを置こうとするわけです。",
+      "form": "秒速",
+      "en": "This time it's about why the data centers that support AI computation are so particular about where they're located. In a vacuum, light travels at about 300,000 kilometers per second, but inside optical fiber it drops to about two-thirds of that speed. Over domestic distances it's practically instantaneous, but when you communicate with servers across the ocean, a round trip can sometimes involve a delay of around 100 milliseconds. That's why the more a service demands quick responses, the more it tries to put its data centers close to users.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「秒速〇メートル」「秒速〇キロ」のように、数字と単位を続けて使う。"
+    },
+    {
+      "ja": "2010年6月、小惑星探査機「はやぶさ」が、7年にわたる旅を終えて地球に帰還した。本体から切り離されたカプセルは、秒速およそ12キロメートルという猛烈な速さで大気圏に飛び込み、オーストラリアの砂漠に着地した。本体は大気圏で燃え尽きたが、カプセルの中からは、小惑星イトカワの微粒子が見つかった。小惑星の表面から物質を持ち帰ったのは世界で初めてで、日本の宇宙開発の大きな成果として記憶されている。",
+      "form": "秒速",
+      "en": "In June 2010, the asteroid probe Hayabusa returned to Earth, completing a journey of seven years. The capsule separated from the main body plunged into the atmosphere at a ferocious speed of about 12 kilometers per second and landed in the Australian desert. The main body burned up in the atmosphere, but tiny particles from the asteroid Itokawa were found inside the capsule. It was the world's first return of material from an asteroid's surface, and it is remembered as a major achievement of Japan's space program.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「秒速約〇キロ」のように、数字の前に「約」を添えることが多い。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "体の神経を伝わる信号は、太い神経なら秒速100メートル近くに達します。こう聞くと、ものすごく速く感じますよね。でも、ボールを見てから手を伸ばすまでには、5分の1秒ほどかかるのが普通です。時間を食っているのは、信号の移動よりも、脳の中で情報を処理して判断する部分なのです。スポーツの練習で反応が速くなるのも、主にこの処理の部分が鍛えられるからだと考えられています。",
+      "form": "秒速",
+      "en": "Signals traveling along the body's nerves reach close to 100 meters per second in thick nerves. Hearing that, it feels incredibly fast, doesn't it? But it normally takes about a fifth of a second from seeing a ball to reaching out your hand. What eats up the time is less the travel of the signal than the part where the brain processes information and makes a judgment. It's thought that reactions get faster with sports practice mainly because this processing part is trained.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "時速は一時間、分速は一分間、秒速は一秒間に進む距離で表す。",
+      "grammar": ["n5-teiru"]
+    }
+  ],
+  "9": [
+    {
+      "ja": "今回は、災害のときに人がとってしまう、意外な行動の話です。非常ベルが鳴っても、多くの人はすぐには逃げず、まず周りの様子をうかがってしまいます。「たいしたことはないだろう」と思い込もうとする心の働きで、心理学では正常性バイアスと呼ばれています。いざという時に頭で考えている余裕はない、という前提に立つなら、答えは一つです。避難訓練をくり返して、考えなくても体が動く状態をつくっておくことなんですね。",
+      "form": "いざという時",
+      "en": "This time it's about the surprising behavior people fall into during disasters. Even when the fire alarm goes off, many people don't flee right away but first check how those around them are reacting. This is a mental tendency to try to convince oneself that \"it's probably nothing serious,\" and in psychology it's called normalcy bias. If you start from the premise that when it really counts there's no time to think things through, there is only one answer. It's to repeat evacuation drills and get yourself into a state where your body moves without thinking.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「いざという時のために」「いざという時に役立つ」の形でよく使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "11月5日は「津波防災の日」で、国連が定めた「世界津波の日」でもある。由来は、1854年の安政南海地震の際、現在の和歌山県にあった村で、浜口梧陵が収穫した稲の束に火を放ち、暗い中で村人を高台へ導いたという逸話だ。この話は戦前の教科書にも載り、広く知られるようになった。専門家は、いざという時に迷わず高い場所へ逃げられるよう、日ごろから避難経路を確かめておくことが大切だと呼びかけている。",
+      "form": "いざという時",
+      "en": "November 5 is Tsunami Preparedness Day, and it is also World Tsunami Awareness Day, established by the United Nations. Its origin is an episode during the 1854 Ansei-Nankai earthquake in which, in a village in what is now Wakayama Prefecture, Hamaguchi Goryō set fire to sheaves of harvested rice and guided villagers to high ground in the dark. The story was also included in prewar textbooks and became widely known. Experts are urging people to check evacuation routes in everyday life so that, when it really counts, they can flee to high ground without hesitation.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "災害や緊急の場面で「いざという時に備える」とよく言う。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru"]
+    },
+    {
+      "ja": "最近、取引先へのメールの文面とか、ほぼ全部AIに任せちゃってるんですけど、ちょっと危機感を覚えることがあるんですよ。ふだんは手間が省けて助かるんですけど、AIに頼れない場面って、突然来るじゃないですか。面接での受け答えとか、クレームの電話の対応とか、端末の充電が切れたときとか。そういう、いざという時に自分の言葉がとっさに出てこなかったら、けっこう致命的だなっていう。だから最近は、文章の骨組みだけは自分で練るようにしてます。",
+      "form": "いざという時",
+      "en": "Lately I've been leaving nearly all my emails to clients and such to AI, but sometimes I get a bit of a sense of alarm about it. Usually it's a big help because it saves me effort, but situations where you can't rely on AI come up out of nowhere, right? Like answering questions in a job interview, or handling a complaint call, or when your device's battery dies. If my own words don't come out on the spot in a moment like that, when it really counts, that could be pretty fatal. So lately I've made a point of at least working out the skeleton of my writing myself.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉では「いざって時」と縮めて言うこともある。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "226": [
+    {
+      "ja": "今回は、ミスをしたときの謝り方についてです。人はつい、「でも」「実は」と事情を説明したくなりますが、聞く側には言い訳にしか聞こえないことが多いんですね。よく勧められるのは、まず自分の非を認め、次に何をどう直すかをはっきり伝えるという順番です。潔く認めた人のほうが、かえって信頼を取り戻しやすいと言われています。事情の説明は、相手から聞かれたときに短く添えるくらいでちょうどいいわけです。",
+      "form": "潔く",
+      "en": "This time it's about how to apologize when you've made a mistake. People tend to want to explain the circumstances with a \"but\" or an \"actually,\" yet to the listener it often sounds like nothing but excuses. The order usually recommended is to first admit your own fault, then clearly convey what you'll fix and how. It's said that people who admit it without excuses actually find it easier to win back trust. Explaining the circumstances is best kept to a short addition when the other person asks.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「潔く認める」「潔く身を引く」のように、「潔く＋動詞」の形が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "言い訳をせず、思い切りがよいようす。"
+    },
+    {
+      "ja": "執着を手放せと仏教は説くが、それはすべてを投げ出せということではない。力を尽くしたあとは、結果がどう出ようと、それ以上しがみつかないということである。負けを何度も思い返して自分を責めるのは、過ぎた出来事に心をつなぎとめておくことにほかならない。勝ちにも負けにも心を縛られないその姿は、外から見ると、驚くほど潔いものに映る。手放すとは敗北ではなく、心を自由にするための選択なのである。",
+      "form": "潔い",
+      "en": "Buddhism teaches us to let go of attachment, but that does not mean throwing everything away. It means that once you have given it your all, you cling no further, however the result turns out. Going over a defeat again and again and blaming yourself is nothing other than keeping your mind tethered to an event that has passed. Seen from outside, a figure whose heart is bound neither by victory nor by defeat appears astonishingly gracious. To let go is not defeat but a choice to set the mind free.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「潔い態度」「引き際が潔い」のように、未練を見せない姿をほめて言う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "未練を残さず、思い切りがよいようす。"
+    },
+    {
+      "ja": "アメリカ初代大統領のワシントンは、2期8年を務めたあと、続投を望む声もあった中で自ら3期目を断り、1797年に職を退いた。権力の座にとどまることもできた人物が潔く身を引いたことで、大統領は2期までという慣例が生まれたとされる。この慣例は140年あまり守られたが、第二次世界大戦期にフランクリン・ルーズベルトが4回当選したのを受けて、1951年の憲法修正で明文化された。平和的な権力の交代を支える仕組みとして、いまも重視されている。",
+      "form": "潔く",
+      "en": "George Washington, the first president of the United States, served two terms totaling eight years, and amid voices wanting him to continue, he himself declined a third term and left office in 1797. It is said that because a man who could have stayed in power stepped down without clinging to it, the custom of presidents serving no more than two terms was born. This custom was kept for more than 140 years, but after Franklin Roosevelt won four elections around the time of World War II, it was written into the Constitution by an amendment in 1951. It is still valued today as a mechanism that supports the peaceful transfer of power.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「潔く身を引く」は、地位や役目から未練なく退くこと。",
+      "grammar": ["n5-teiru"],
+      "sense": "未練を残さず、思い切りがよいようす。"
+    }
+  ]
+}

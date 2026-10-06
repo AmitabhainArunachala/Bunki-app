@@ -1,0 +1,328 @@
+{
+  "274": [
+    {
+      "ja": "生成AIを業務に取り入れる動きが広がる中、社員の教育に力を入れる企業が増えている。中には、全社員を対象に、わずか数週間でAIへの指示の出し方やデータの扱い方を集中的にたたき込む特訓を行う企業もある。ただ、短期間で詰め込んでも、実際の仕事で使わなければ効果は長続きしないとの指摘も多い。専門家は、学んだ内容をすぐに日々の業務と結びつけることで、ようやく本当に定着するのだと話している。",
+      "form": "特訓",
+      "en": "As moves to bring generative AI into everyday work spread, more and more companies are putting effort into training their staff. Some even run intensive training for all employees, drilling them in just a few weeks on how to give instructions to AI and how to handle data. However, many point out that even if people cram it in a short time, the effect does not last unless they use it in their actual jobs. Experts say that what is learned only truly takes hold once it is tied to daily work right away.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜の特訓を行う」「特訓を実施する」の形が多い。長期の教育には「研修」「育成」を使う。",
+      "grammar": ["n5-teiru", "n3-koto-de"]
+    },
+    {
+      "ja": "来月ドイツに出張することになったんで、いま必死にドイツ語の特訓してるんですよ。いや、三週間でぺらぺらしゃべれるようになるとは、さすがに思ってないです。でも、あいさつとか数字とか、レストランで注文するくらいは何とかしたいじゃないですか。で、朝はアプリで三十分、夜はオンラインの先生と会話の練習、っていうのを毎日続けてて。聞き取れる単語が増えてくると、意外と楽しくなってくるんですよね。",
+      "form": "特訓",
+      "en": "I'm going on a business trip to Germany next month, so right now I'm desperately doing intensive German training. No, I don't seriously think I'll be speaking fluently in three weeks. But you want to at least manage greetings, numbers and ordering at a restaurant, right? So every day I've been doing thirty minutes on an app in the morning and conversation practice with an online teacher at night. Once the number of words you can catch starts going up, it gets surprisingly fun.",
+      "original": true,
+      "register": "話",
+      "topic": "language",
+      "tipJa": "会話では「特訓する」「特訓中」と動詞や状態の形でも気軽に使う。",
+      "grammar": ["n3-koto-ni-naru", "n4-you-ni-naru"]
+    },
+    {
+      "ja": "普段の練習とは別に、本番前の短い期間だけ集中して行う特訓は、確かに手応えを得やすいものです。ところが運動の学習に関する研究では、練習した動きは睡眠中に脳内で整理され、翌朝のほうが動作の精度が上がる場合があることが示されています。上達には練習の量だけでなく、その間に挟む休息も欠かせないということです。追い込みに意味がないわけではないものの、夜遅くまで詰め込むのではなく、数日に分けて毎晩十分に休むほうが技術は定着しやすいのです。",
+      "form": "特訓",
+      "en": "Intensive training done in a concentrated burst just before the real event, apart from your usual practice, certainly tends to feel productive. But research on motor learning has reported that practised movements are sorted out in the brain during sleep, so that their precision sometimes improves by the next morning. In other words, getting better depends not only on the amount of practice but also on the rest you take in between. A final push is not meaningless, but rather than cramming late into the night, splitting the work over several days and resting properly every night makes a skill stick more easily.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学習の文脈では「短期間の集中練習」を指す。長い計画的な学習は「積み重ね」と対比される。",
+      "grammar": ["n5-teiru", "n3-wake-dewa-nai", "n2-mono-no", "n3-dewa-naku"]
+    }
+  ],
+  "275": [
+    {
+      "ja": "今回は、退職後の暮らし方を扱った本の要点を紹介します。現役のころは時間さえあればと思っていた人ほど、実際に毎日が休みになると、その時間を持て余してしまうというんですね。そこで著者が勧めているのは、働いているうちから、損得と関係なく夢中になれることを一つ持っておくことです。やりたいことがはっきりしていれば、時間がいくら多くても重荷にはなりません。問題は時間の長さではなく、その中身だというわけです。",
+      "form": "持て余して",
+      "en": "This time I'll introduce the main points of a book about how to live after retirement. The idea is that the more people thought during their working years that they only needed time, the more they end up not knowing what to do with it once every day becomes a holiday. So what the author recommends is having one thing you can lose yourself in, regardless of profit or loss, while you are still working. If you are clear about what you want to do, no amount of time becomes a burden. In other words, the problem is not the length of the time but what fills it.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「時間・暇を持て余す」は定番の組み合わせ。量が多すぎて使い切れない困り方を表す。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "時間や暇が多すぎて、使い道に困る。"
+    },
+    {
+      "ja": "仏典には、一瞬たりとも落ち着かずに動き回る心を、枝から枝へ飛び移る猿にたとえる話がある。人は外の敵よりも、むしろ自分の心を持て余している生き物なのかもしれない。怒りや不安を力ずくで押さえつけようとすれば、心はかえって激しく暴れ出すものだ。だから瞑想では、浮かんでくる思いを追い払うのではなく、ただ眺めることから始めるのである。手なずけるとは、まず相手をよく知ることなのだろう。",
+      "form": "持て余して",
+      "en": "The Buddhist scriptures contain a passage that likens the mind, which roams about without settling for even a moment, to a monkey leaping from branch to branch. Perhaps human beings are creatures who find their own minds harder to handle than any outside enemy. If you try to suppress anger or anxiety by force, the mind only runs all the wilder. That is why meditation begins not by driving away the thoughts that arise but simply by watching them. To tame something is, perhaps, first of all to know it well.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「自分を持て余す」「感情を持て余す」のように、手に負えないものにも使える。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n1-tari-tomo"],
+      "sense": "自分の手に負えず、扱いに困る。"
+    },
+    {
+      "ja": "AIに資料づくりを任せるようになったら、午後の時間がまるっと空いちゃったんですよ。最初はラッキーって思ってたんですけど、一週間もすると暇を持て余しちゃって。で、気づいたんですけど、作業が減ったぶん、何を考えるべきかを決める仕事だけが残ってるわけじゃないですか。それって実は一番しんどいところで、人間に残る仕事ってたぶんそこなんですよね。まあ、まだ答えは出てないんですけど。",
+      "form": "持て余し",
+      "en": "Once I started leaving document-making to AI, my afternoons became completely free. At first I thought I'd got lucky, but after a week or so I didn't know what to do with all the free time. And then I realised that, with less busywork, the only job left is deciding what to think about, right? That's actually the hardest part, and that's probably where the work left for humans lies. Well, I haven't found the answer yet, though.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "くだけた会話では「暇を持て余しちゃう」「持て余してる」の形がよく出る。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "時間や暇が多すぎて、使い道に困る。"
+    }
+  ],
+  "276": [
+    {
+      "ja": "今回は、1962年のキューバ危機を取り上げます。ソ連がキューバにミサイルを配備していると知ったケネディ大統領は、側近を集めて、どう対応するかを連日話し合いました。軍事攻撃から外交交渉まで、あらゆる選択肢を一つずつ検討した末に選ばれたのが、船の出入りを止める封鎖という手でした。いきなり攻撃するのではなく、相手に考える時間を与える道を選んだわけです。結果として、核戦争の寸前で危機は収まりました。",
+      "form": "検討",
+      "en": "This time we take up the Cuban Missile Crisis of 1962. On learning that the Soviet Union was deploying missiles in Cuba, President Kennedy gathered his advisers and discussed day after day how to respond. After examining every option one by one, from military strikes to diplomatic negotiation, the course they chose was a blockade that stopped ships from going in and out. Rather than attacking straight away, they chose a path that gave the other side time to think. In the end, the crisis was defused on the brink of nuclear war.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜を検討する」「検討を重ねる」のように、複数の案を比べて慎重に考える場面で使う。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "国内の自治体の間で、生成AIを窓口業務や文書の作成に活用する動きが広がっている。一方で、個人情報の扱いや、誤った回答に対する責任をどう考えるかなど、課題も少なくない。このため多くの自治体は、まず一部の部署で試しに使ってみたうえで、本格的な導入を検討する方針だ。専門家は、効率だけを求めるのではなく、住民の信頼を損なわないためのルールづくりが欠かせないと指摘している。",
+      "form": "検討",
+      "en": "Among local governments in Japan, moves to use generative AI for counter services and document preparation are spreading. On the other hand, there are many challenges, such as how to handle personal information and who is responsible for wrong answers. For this reason, many local governments plan to first try it out in some departments and then consider full-scale adoption. Experts point out that rather than pursuing efficiency alone, it is essential to draw up rules that do not damage residents' trust.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「導入を検討する」「検討に入る」「前向きに検討」が定番。結論が出る前の段階を示す。",
+      "grammar": ["n5-teiru", "n2-ue-de"]
+    },
+    {
+      "ja": "仏典には、さまざまな教えを説く者が次々に村を訪れ、どれを信じればよいのか迷う人々に、釈迦が答える場面がある。言い伝えだから、権威ある人が言ったから、という理由だけで、疑うことなく受け入れてはならない。自分でよく確かめ、それが苦しみを減らすかどうかを見極めよ、というのである。信仰を重んじる宗教が、教えそのものを批判的に検討するよう人々に求めるというのは、意外に思えるかもしれない。だが、問いを許さない教えは、結局は人を縛るだけなのだろう。",
+      "form": "検討",
+      "en": "The Buddhist scriptures contain a scene in which teachers of all kinds visit a village one after another, and the Buddha answers people who are unsure which of them to believe. One must not accept something without doubt merely because it is tradition or because an authority said it. Examine it well yourself and judge whether it lessens suffering: that is the teaching. That a religion which values faith should ask people to examine its teachings critically may seem surprising. Yet a teaching that permits no questions probably ends up doing nothing but binding people.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "論説では「批判的な検討」「検討を加える」のように、内容を吟味する硬い意味で使う。",
+      "grammar": ["n2-koto-naku"]
+    }
+  ],
+  "277": [
+    {
+      "ja": "今回は、今から二千五百年ほど前に起きたテルモピュライの戦いを取り上げます。ペルシャの大軍がギリシャに攻めてきたとき、スパルタ王レオニダスは、わずかな兵とともに海と山にはさまれた狭い道で敵を待ち受けました。地形をうまく利用したことで、彼らは数日にわたって敵の前進を止め続けたんですね。最後は別の道から背後に回られて敗れますが、その健闘ぶりはのちの時代まで語られることになりました。数で負けていても、戦う場所をうまく選べば大きな相手を苦しめられるという例です。",
+      "form": "健闘",
+      "en": "This time we take up the Battle of Thermopylae, which took place about 2,500 years ago. When a huge Persian army invaded Greece, the Spartan king Leonidas waited for the enemy with a small force in a narrow passage squeezed between the sea and the mountains. By making clever use of the terrain, they kept the enemy's advance stopped for several days. In the end they were taken from behind by way of another path and defeated, but the way they fought so well came to be told for generations. It is an example of how, even when outnumbered, you can trouble a far larger opponent if you choose your battleground well.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「健闘ぶり」「健闘むなしく」のように、強い相手によく戦ったことをたたえる語。結果は負けでも使える。",
+      "grammar": ["n3-koto-de", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "日本語に強い国産の小型AIモデルが、海外の巨大モデルを相手に健闘する例が出てきている。学習に使うデータの量では大きく見劣りするものの、日本語の文書を重点的に学ばせることで、特定の分野では肩を並べる結果も出ている。背景には、限られた計算資源の中で、地道に工夫を重ねてきた開発者たちの存在がある。今後は、こうしたモデルを用途に応じて巨大モデルと使い分ける企業が増えるとみられる。",
+      "form": "健闘",
+      "en": "Cases are emerging of small domestic AI models that are strong in Japanese putting up a good fight against huge overseas models. Although they fall far short in the amount of training data, by concentrating on Japanese documents they have produced results that stand alongside the giants in certain fields. Behind this are developers who have steadily kept refining their methods within limited computing resources. Going forward, more companies are expected to use such models alongside the giant ones, choosing according to the purpose.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜を相手に健闘する」「健闘が光る」の形で、格上に食い下がる様子を伝える。",
+      "grammar": ["n5-teiru", "n2-mono-no", "n3-koto-de", "n2-ni-oujite"]
+    },
+    {
+      "ja": "友達が第一志望の大学に、ほんとにあと数点で落ちちゃったんですよ。本人はかなり落ち込んでたんですけど、模試では夏までずっと一番下の判定だったんですよね。そこから合格ラインの目の前まで来たって、普通にすごい健闘じゃないですか。結果だけ見たら不合格なんですけど、そこまで伸ばした経験って、たぶん次にも生きてくると思うんですよ。だから、とりあえず焼肉おごって、よくやったって言っときました。",
+      "form": "健闘",
+      "en": "A friend of mine missed getting into their first-choice university by literally a few points. They were pretty down about it, but on the mock exams they'd had the lowest grade all the way until summer. Getting from there to right in front of the pass line is honestly a great effort, isn't it? If you only look at the result it's a fail, but I think the experience of improving that much will probably pay off next time too. So for now I treated them to yakiniku and told them they did well.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "会話では「健闘したね」「よく健闘した」と、結果より努力や粘りを認めるときに使う。"
+    }
+  ],
+  "278": [
+    {
+      "ja": "今回は、2016年に行われた囲碁AIとトップ棋士の五番勝負を振り返ります。囲碁はチェスや将棋に比べて打てる手の数がけた違いに多く、AIがプロと互角に戦えるようになるのは、まだ十年は先だと言われていました。ところが、グーグル傘下の企業が開発したアルファ碁は、韓国のイ・セドル九段に四勝一敗で勝ったんです。注目したいのは、人間が思いつかなかった手をAIが次々に打ち、プロたちが逆にそこから学び始めたという点です。負けた側が教わる側に回ったわけですね。",
+      "form": "互角",
+      "en": "This time we look back on the five-game match held in 2016 between a Go AI and a top professional player. Compared with chess or shogi, Go has an incomparably larger number of possible moves, and it was said that AI being able to fight professionals as an equal was still at least ten years away. But AlphaGo, developed by a company under Google, beat Korea's Lee Sedol, a ninth-dan player, four games to one. What I want to highlight is that the AI played one move after another that humans had never thought of, and professionals in turn began to learn from them. The side that lost ended up becoming the side that was taught.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「互角に戦う」「互角の勝負」の形が基本。力の差がない状態を表す。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "第一次世界大戦の西部戦線では、開戦からまもなく、両軍が長い塹壕を掘って向かい合う状態が続いた。機関銃などの新しい兵器によって、守る側が攻める側より圧倒的に有利になったためである。兵力がほぼ互角だったことも、戦線が動かなかった一因とされる。1916年のソンムの戦いでは、両軍合わせて100万人を超える死傷者が出たものの、前線は十キロほどしか動かなかった。状況は、戦車の本格的な投入やアメリカの参戦によって、ようやく大きく動き出すことになる。",
+      "form": "互角",
+      "en": "On the Western Front in the First World War, soon after the war began, a situation set in where both armies dug long trenches and faced each other. This was because new weapons such as machine guns gave the defending side an overwhelming advantage over the attacking side. The fact that their forces were almost evenly matched is also considered one reason the front did not move. At the Battle of the Somme in 1916, over a million casualties were suffered by both armies combined, yet the front line moved only about ten kilometres. The situation would finally begin to shift significantly with the large-scale use of tanks and America's entry into the war.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "分析記事では「戦力が互角」「互角の展開」のように、決着がつかない背景を説明する。",
+      "grammar": ["n2-mono-no", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "手書きでノートを取るのと、パソコンで打ち込むのと、どちらが記憶に残りやすいのでしょうか。手書きのほうが有利だとする研究が話題になりましたが、その後の追試では、両者の成績がほぼ互角になった例も出ています。結局のところ、差を生むのは道具ではなく、聞いた内容を自分の言葉でまとめ直しているかどうかのようです。パソコンでも、先生の話をそのまま写すのではなく、要約しながら打てば十分に効果があります。",
+      "form": "互角",
+      "en": "Which sticks in memory better: taking notes by hand, or typing them on a computer? A study claiming handwriting has the edge attracted attention, but in later replications there have also been cases where the two came out about even. In the end, what makes the difference seems to be not the tool but whether you are restating what you heard in your own words. Even on a computer, if you summarise as you type instead of copying the teacher's words verbatim, it is quite effective.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "研究の比較では「ほぼ互角」「互角の結果」と、差がほとんどないことを示すのに使う。",
+      "grammar": ["n5-teiru", "n3-dewa-naku", "n4-nagara"]
+    }
+  ],
+  "279": [
+    {
+      "ja": "今回は、江戸時代に全国を歩いて測量した伊能忠敬を取り上げます。彼が本格的に測量を始めたのは、商人としての仕事を息子に譲ったあとの、五十代半ばのことでした。そこから十七年にわたって各地を歩き、その距離は地球一周分に近いとも言われています。彼の死後に弟子たちが完成させた地図は、驚くほど正確なものでした。当時の道具と技術を考えれば、まさに快挙と呼ぶにふさわしい仕事だったわけです。",
+      "form": "快挙",
+      "en": "This time we take up Ino Tadataka, who walked the whole country surveying it in the Edo period. He began surveying in earnest in his mid-fifties, after handing over his merchant business to his son. From then on he walked all over the land for seventeen years, and the distance is said to come close to once around the Earth. The map his disciples completed after his death was astonishingly accurate. Considering the tools and techniques of the day, it was work truly worthy of being called a remarkable achievement.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「快挙を成し遂げる」「〜という快挙」の形で、周りも喜ぶ見事な成果に使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "2024年のノーベル化学賞は、タンパク質の立体構造をAIで予測する技術を開発した研究者らに贈られた。タンパク質の形を実験で突き止めるには、一つにつき何年もかかることが珍しくなかった。AIが予測した構造のデータはその後無料で公開され、世界中の研究者が使えるようになった。AIを使った研究がこの賞を受けたことは、研究者の間で快挙として受け止められている。一方で、予測の精度をどう確かめるかなど、課題も残るとの声もある。",
+      "form": "快挙",
+      "en": "The 2024 Nobel Prize in Chemistry was awarded to researchers including those who developed a technique for predicting the three-dimensional structure of proteins with AI. Pinning down the shape of a protein through experiments often took years for each one. The structure data predicted by the AI was later released free of charge, so researchers around the world became able to use it. That research using AI won this prize is seen among researchers as a remarkable achievement. On the other hand, some say challenges remain, such as how to confirm the accuracy of the predictions.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜の快挙」「快挙を達成」と、初めての達成や記録的な成果を伝えるときの定番の語。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "七世紀、玄奘は国の許しを得ないまま長安を出て、砂漠や高い山々を越えてインドへ向かった。目的はただ一つ、仏の教えをもとの言葉で読み、その本当の意味を知ることであった。十数年後、彼は数多くの経典を持ち帰り、残りの人生をその翻訳に注いだ。後の時代の人々はこれを快挙と呼ぶが、本人にとっては、一つの問いを手放さなかった結果にすぎないのではないか。大きな成果とは、案外そうした粘り強さから生まれるものなのかもしれない。",
+      "form": "快挙",
+      "en": "In the seventh century, Xuanzang left Chang'an without the state's permission and set out for India across deserts and high mountains. His aim was singular: to read the Buddha's teaching in its original language and learn its true meaning. More than ten years later he brought back a great many sutras and poured the rest of his life into translating them. People of later ages call this a remarkable feat, but for the man himself, was it not merely the result of never letting go of a single question? Great achievements may, surprisingly, grow out of that kind of persistence.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "論説では「快挙とたたえる」のように、他人や後世の評価として語られることが多い。",
+      "grammar": ["n2-ni-suginai"]
+    }
+  ],
+  "280": [
+    {
+      "ja": "今回は、1927年にベルギーのブリュッセルで開かれた第5回ソルベー会議の話です。このときの集合写真には、アインシュタイン、ボーア、キュリー夫人、プランクなど、そうそうたる科学者が並んでいます。テーマは、生まれたばかりの量子力学をどう理解するかでした。会議の場でも食事の席でも、アインシュタインとボーアは議論を重ね、決着はつきませんでした。一流の頭脳が答えの出ない問いを真剣にぶつけ合った場として、今も語り継がれているんですね。",
+      "form": "そうそうたる",
+      "en": "This time the story is about the fifth Solvay Conference, held in Brussels, Belgium, in 1927. The group photo from that time shows a line-up of eminent scientists such as Einstein, Bohr, Marie Curie and Planck. The theme was how to understand the newly born quantum mechanics. Both in the sessions and at meals, Einstein and Bohr argued again and again, and no conclusion was reached. It is still told today as a place where first-rate minds earnestly clashed over a question with no answer.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「そうそうたる顔ぶれ・メンバー」のように、「〜たる」の形で名詞を修飾して使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "2023年に英国で開かれたAIの安全性をめぐる国際会議には、各国の政府代表や大手企業のトップなど、そうそうたる顔ぶれが集まった。会議では、最先端のAIがもたらし得る危険について、国の枠を超えて話し合う必要があることが確認された。その後も同様の会議が、開催地を変えながら各国で開かれている。ただ、各国の思惑は必ずしも一致しておらず、実際のルールづくりはこれからだとの見方が多い。",
+      "form": "そうそうたる",
+      "en": "The international conference on AI safety held in Britain in 2023 brought together an illustrious line-up, including government representatives from various countries and the heads of major companies. At the conference, it was confirmed that the dangers cutting-edge AI could bring need to be discussed across national boundaries. Similar conferences have since been held in various countries, with the venue changing each time. However, the countries' intentions do not necessarily coincide, and many take the view that the actual rule-making is still to come.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「そうそうたる顔ぶれが集まる・並ぶ」が定番。会議や式典の出席者を紹介するときに使う。",
+      "grammar": ["n5-teiru", "n4-nagara"]
+    },
+    {
+      "ja": "集中力って、そうそう長くは続かないじゃないですか。僕なんか、本気で勉強できるのってせいぜい四十分くらいで、それを過ぎるとスマホ触っちゃうんですよ。で、最近は二十五分やって五分休むっていうのをひたすら繰り返してて、これが意外と合ってるっぽいんですよね。ポモドーロ・テクニックとかいうらしいんですけど。無理に長くやろうとするより、短く区切ったほうが結果的にちゃんと進むっていう。",
+      "form": "そうそう",
+      "en": "Concentration doesn't last all that long, right? For me, the time I can really study is forty minutes at most, and after that I end up touching my phone. So lately I've been endlessly repeating twenty-five minutes of work and five minutes of rest, and it seems to suit me surprisingly well. Apparently it's called the Pomodoro Technique or something. It's like, rather than forcing yourself to go long, breaking it up into short chunks actually gets things properly done in the end.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "「そうそう〜ない」と打ち消しを伴うと「それほど〜ない」の意味。名の知れた意味の「そうそうたる」とは別。",
+      "sense": "（打ち消しを伴って）それほどたびたびは。そんなには。"
+    }
+  ],
+  "12": [
+    {
+      "ja": "今回は、戦国時代の最後に天下を手にした徳川家康の生き方を見ていきます。彼は幼いころから人質として暮らし、若いころには武田信玄に大敗するなど、何度も苦い経験をしています。それでも家康は、無理な戦いを避けて力を蓄え、豊臣秀吉が世を去ったあとに勝負に出ました。華々しく勝ち続けた武将ではなく、生き延びて最後に勝ち残ったのが家康だったわけです。長く続けることそのものが強さになる、という教訓が読み取れますね。",
+      "form": "勝ち残った",
+      "en": "This time we look at the life of Tokugawa Ieyasu, who took control of the realm at the end of the Warring States period. From childhood he lived as a hostage, and as a young man he suffered bitter experiences many times, such as a crushing defeat by Takeda Shingen. Even so, Ieyasu avoided reckless battles, built up his strength, and made his move after Toyotomi Hideyoshi passed away. It was not a general who won brilliantly again and again but Ieyasu, who survived and was the last one standing. You can read in this the lesson that simply lasting a long time can itself become strength.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「最後まで勝ち残る」「勝ち残った者」の形で、競争の末に残った側を表す。",
+      "grammar": ["n4-teiku", "n5-teiru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "生成AI向けの半導体をめぐっては、ここ数年で新興企業が相次いで市場に参入している。ただ、開発には巨額の投資が必要なうえ、最先端のチップを作れる工場も限られている。このため業界では、最終的に勝ち残るのはごく一部の企業にとどまるとの見方が強い。一方で、特定の用途に絞った製品で存在感を示す企業も出ており、すべてが大手にのみ込まれるわけではないとの声もある。大手との提携や買収の動きも目立ち始めており、市場の再編は今後さらに進むとみられる。",
+      "form": "勝ち残る",
+      "en": "In the field of chips for generative AI, start-ups have entered the market one after another in recent years. However, development requires huge investment, and the factories able to make cutting-edge chips are limited. For this reason, the prevailing view in the industry is that only a small number of companies will win out in the end. On the other hand, some companies are making their presence felt with products focused on specific uses, and some say not everything will be swallowed up by the big players. Tie-ups with and acquisitions by major firms are also becoming conspicuous, and the market is expected to reorganise further.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「市場で勝ち残る」「勝ち残りをかける」のように、淘汰の中で残る意味で使う。",
+      "grammar": ["n5-teiru", "n3-wake-dewa-nai"]
+    },
+    {
+      "ja": "新しい単語を覚えるとき、頭の中では意味や発音の似た語どうしが、想起される機会を奪い合っていると考えられています。頻繁に呼び出される語ほど取り出しやすくなる一方、使われない語はほかの語の干渉を受け、次第に出てこなくなります。つまり、記憶の中で勝ち残るのは、繰り返し目にした語ではなく、自力で思い出した回数の多い語なのです。単語帳を眺めるより、何も見ずに意味を答える検索練習のほうが定着しやすいのは、このためです。",
+      "form": "勝ち残る",
+      "en": "When you learn new words, words with similar meanings or sounds are thought to compete in your head for the chance to be recalled. The more frequently a word is called up, the easier it becomes to retrieve, while words that go unused suffer interference from other words and gradually stop coming out. In other words, what survives in memory is not the word you have seen over and over but the word you have recalled on your own most often. This is why retrieval practice, answering the meaning without looking, makes words stick better than staring at a word list.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "比喩的に「記憶の中で勝ち残る」のように、競い合いの末に残るものにも使える。",
+      "grammar": ["n5-teiru", "n3-dewa-naku"],
+      "sense": "最後まで残る。生き残る。"
+    }
+  ],
+  "211": [
+    {
+      "ja": "今回は、14世紀から15世紀にかけてイングランドとフランスの間で続いた百年戦争です。きっかけは、母親を通じてフランス王家の血を引くイングランド王エドワード3世が、フランスの王位を主張したことでした。つまり、一つの王位を二つの国の王が争う形になったわけです。戦いは何度も休戦をはさみながら、実に百年以上続きました。終盤にはジャンヌ・ダルクが現れ、最終的にフランスがほぼ全土からイングランドの勢力を追い出しています。",
+      "form": "争う",
+      "en": "This time it's the Hundred Years' War, fought between England and France from the fourteenth to the fifteenth century. It began when the English king Edward III, who had French royal blood through his mother, laid claim to the French throne. In other words, it became a situation in which the kings of two countries contended for a single crown. The fighting, interrupted by truces again and again, went on for over a hundred years. Towards the end Joan of Arc appeared, and in the end France drove English power out of almost all its territory.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「王位を争う」「優勝を争う」のように、「〜を争う」で奪い合う対象を示す。",
+      "grammar": ["n4-nagara", "n5-teiru"],
+      "sense": "ある物を得ようとして、互いに張り合う。"
+    },
+    {
+      "ja": "先端半導体の供給をめぐり、各国が主導権を争っている。AIの開発に欠かせない最先端のチップは、ごく限られた工場でしか作れないためだ。台湾に生産が集中していることへの警戒も、各国の動きを後押ししている。米国は国内に生産拠点を増やそうと巨額の補助金を出し、日本や欧州も工場の誘致を進めている。ただ、特定の地域に生産が偏る状態は当面続くとみられ、供給網の安定が大きな課題となっている。",
+      "form": "争っている",
+      "en": "Countries are vying for the upper hand over the supply of advanced semiconductors. This is because the cutting-edge chips essential to AI development can only be made in a very small number of factories. Wariness about production being concentrated in Taiwan is also spurring countries into action. The United States is paying huge subsidies to increase production sites at home, and Japan and Europe are also working to attract factories. However, the concentration of production in particular regions is expected to continue for the time being, and stabilising supply chains has become a major challenge.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「主導権を争う」「首位を争う」のように、立場や順位の奪い合いを表す。",
+      "grammar": ["n5-teiru"],
+      "sense": "優位な立場を得ようとして張り合う。"
+    },
+    {
+      "ja": "人はなぜ、取るに足らないことで争うのだろうか。仏教は、その根に自分というものへの強いこだわりを見る。自分の考えこそ正しい、自分の持ち物は守らねばならない、という思いが強いほど、他人とのぶつかり合いは避けられなくなる。だから釈迦は、相手を言い負かすことではなく、自らのこだわりに気づくことを説いたのである。勝ち負けへの執着を手放したとき、ぶつかる理由そのものが消えていく。",
+      "form": "争う",
+      "en": "Why do people quarrel over trivial things? Buddhism sees strong attachment to the self at the root of it. The stronger the feeling that one's own ideas are right and one's own possessions must be protected, the more unavoidable clashes with others become. That is why the Buddha taught not how to defeat others in argument but how to notice one's own attachments. When we let go of our attachment to winning and losing, the very reason for clashing fades away.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "けんかの意味では「〜と争う」「言い争う」の形をとる。「争いごと」は名詞の形。",
+      "grammar": ["n3-dewa-naku", "n4-teiku"],
+      "sense": "互いに言い張って、けんかをする。"
+    }
+  ],
+  "212": [
+    {
+      "ja": "大手IT企業の間で、AIモデルの賢さを競う動きが一段と激しくなっている。各社は新しいモデルを発表するたびに、数学やプログラミングの試験での得点を公表し、他社との差を強調する。ただ、こうした試験の点数が、実際の業務での使いやすさをどこまで表しているかについては、疑問の声も上がっている。利用者の間では、点数よりも自分の仕事に合うかどうかで選ぶべきだとの意見も多い。",
+      "form": "競う",
+      "en": "Among major IT companies, the race to outdo each other in how smart their AI models are has become even more intense. Each time a company announces a new model, it publishes its scores on maths and programming tests and stresses the gap with its rivals. However, doubts have been raised about how far such test scores reflect ease of use in actual work. Among users, many also say models should be chosen by whether they suit one's own work rather than by their scores.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜を競う」「〜を競い合う」で、各社や各国が優劣を張り合う様子を伝える。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "クラスメートと点数を競うと、やる気が出るという人は少なくありません。確かに、短い期間で見れば、他人との比較は強い刺激になります。ただ、心理学の研究では、人に勝つことだけを目標にすると、負けが続いたときに意欲が一気に落ちやすいことが分かっています。おすすめは、昨日の自分を相手にすることです。先週より一問多く解けた、という小さな前進を記録していくと、学ぶこと自体が楽しくなっていきます。",
+      "form": "競う",
+      "en": "Quite a few people say that competing with classmates for scores motivates them. Certainly, in the short term, comparing yourself with others is a strong stimulus. But psychological research has found that if beating others is your only goal, your motivation tends to plunge when you keep losing. What I recommend is taking on yesterday's version of yourself. If you keep recording small steps forward, like solving one more problem than last week, learning itself becomes enjoyable.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「〜と競う」で相手、「〜を競う」で比べる中身を示す。勉強やスポーツの場面で頻出。",
+      "grammar": ["n5-teiru", "n4-teiku"]
+    },
+    {
+      "ja": "平安時代の宮中では、歌合という催しが盛んに行われました。左右の組に分かれ、同じ題で詠んだ和歌を一首ずつ出し合い、その出来を競うのです。判者と呼ばれる審判役が勝ち負けを決め、その理由も言葉で説明しました。この判定の言葉が積み重なることで、どんな表現がよいとされるのかという基準が少しずつ形づくられていきました。勝負の場が、そのまま歌の批評を育てる場にもなっていたわけです。",
+      "form": "競う",
+      "en": "At the Heian court, events called uta-awase were held frequently. Participants split into left and right teams, each put forward a waka composed on the same theme one poem at a time, and they competed on the quality of the poems. A referee called the hanja decided the winner and also explained the reasons in words. As these judgments built up, a standard for what kind of expression was considered good gradually took shape. The arena of competition was, at the same time, the place that nurtured poetry criticism.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「出来・美しさを競う」のように、優劣を比べる中身を目的語にとる。勝負を表す硬めの語。",
+      "grammar": ["n3-koto-de", "n4-teiku"]
+    }
+  ]
+}

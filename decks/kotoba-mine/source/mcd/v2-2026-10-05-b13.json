@@ -1,0 +1,348 @@
+{
+  "308": [
+    {
+      "ja": "今回は、戦後の日本の出発点になったとも言われる、一枚の写真を取り上げます。1945年9月、昭和天皇がアメリカ大使館を訪ね、連合国軍の最高司令官だったマッカーサーと初めて顔を合わせました。このときの会見で撮られた写真には、ネクタイも締めずに腰に手を当てた大柄なマッカーサーと、正装で緊張した面持ちの天皇が並んで写っています。新聞に載ったこの写真を見て、多くの人が戦争に負けたという現実を改めて突きつけられたと言われています。言葉で説明されるより、一枚の写真のほうが時代の変わり目を雄弁に語ることもあるわけですね。",
+      "form": "会見",
+      "en": "This time I'm taking up a single photograph that is sometimes called the starting point of postwar Japan. In September 1945, Emperor Shōwa visited the American embassy and met for the first time with MacArthur, who was the supreme commander of the Allied forces. The photo taken at this meeting shows the large MacArthur, without even a tie and with his hands on his hips, standing beside the Emperor in formal dress with a tense expression. It is said that when this photo appeared in the newspapers, many people were confronted afresh with the reality that the war had been lost. A single photograph can sometimes speak more eloquently about a turning point in history than any verbal explanation.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「首脳の会見」「天皇とマッカーサーの会見」のように、改まって人と会う意味でも使う。",
+      "sense": "身分の高い人などが、改まって人と会うこと。"
+    },
+    {
+      "ja": "生成AIの需要の拡大を背景に、半導体関連企業の決算発表への注目が高まっている。経営者が会見で口にした一言をきっかけに、翌日の株価が大きく動くことも珍しくない。このため各社は、数字の説明だけでなく、記者や投資家からの質問にどこまで答えるかを入念に準備しているという。一方で、慎重になりすぎて中身のない受け答えが続けば、市場の不信を招きかねない。言葉の選び方そのものが、経営の一部になりつつあると言えそうだ。",
+      "form": "会見",
+      "en": "Against the backdrop of growing demand for generative AI, attention is rising on the earnings announcements of semiconductor-related companies. It is not unusual for a single remark an executive makes at a press conference to send the next day's share price moving sharply. For this reason, each company is said to prepare carefully not only how to explain the figures but also how far to answer questions from reporters and investors. On the other hand, if answers become overly cautious and empty of substance, they risk inviting distrust from the market. It seems fair to say that the choice of words itself is becoming part of management.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「会見を開く」「会見で述べた」「記者会見に臨む」の形が定番。",
+      "grammar": ["n5-teiru"],
+      "sense": "記者などを集めて、公式に考えや事実を話す場。"
+    },
+    {
+      "ja": "謝罪の会見を見るとき、私たちはいったい何を聞いているのだろうか。カメラの前で深く頭を下げる場面が繰り返し映し出されるが、人々が見ているのは言葉の中身ではなく、頭を下げる角度や声の震えであることが多い。謝罪とは本来、傷つけた相手に向けて行うものであるはずだ。ところがカメラの前に立った瞬間、それは見る者すべてに向けた演技にもなりうる。誠実さを示そうとするほど型にはまっていく、その矛盾にこそ人の心の難しさがあるのではないか。",
+      "form": "会見",
+      "en": "When we watch an apology press conference, what exactly are we listening to? Scenes of people bowing deeply before the cameras are shown again and again, but what viewers are watching is often not the content of the words but the angle of the bow or the trembling of the voice. An apology should by nature be directed at the person one has hurt. Yet the moment one stands before the cameras, it can also become a performance directed at everyone watching. Is it not in this contradiction, falling further into a set form the harder one tries to show sincerity, that the difficulty of the human heart lies?",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「謝罪会見」「緊急会見」のように、前に目的を付けた複合語でもよく使う。",
+      "grammar": ["n3-dewa-naku", "n4-teiku"],
+      "sense": "記者などを集めて、公式に考えや事実を話す場。"
+    }
+  ],
+  "313": [
+    {
+      "ja": "今回は、日本の地方議会がどう始まったのかを見ていきます。明治11年に府県会規則という法令ができて、各府県に選挙で選ばれた議員の集まりが置かれることになりました。ただし選挙権があったのは、一定以上の税を納める男性だけで、今の感覚からするとかなり限られた人たちです。それでも、地元の予算について住民の代表が意見を言える場ができたことは、大きな一歩でした。今の県議会のルーツは、実はこの時代までさかのぼるわけですね。",
+      "form": "県議会",
+      "en": "This time, let's look at how local assemblies in Japan began. In 1878, a law called the Prefectural Assembly Regulations was enacted, and each prefecture came to have a body of members chosen by election. However, only men who paid more than a certain amount of tax had the right to vote, a rather limited group by today's standards. Even so, the creation of a place where residents' representatives could voice opinions on the local budget was a big step. The roots of today's prefectural assemblies actually go back to this period.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「県議会議員」「県議会で可否を問う」など、県の政治を語るときの基本語。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "県の予算や条例を決める、選挙で選ばれた議員の集まり。"
+    },
+    {
+      "ja": "生成AIを行政の仕事に取り入れる動きが自治体に広がる中、県議会でもその是非をめぐる質問が相次いでいる。文書の下書きや問い合わせへの対応に使えば職員の負担を減らせる一方、誤った情報をそのまま住民に伝えてしまうおそれもある。このため、使ってよい範囲や個人情報の扱いについて、独自の指針を定める県が増えている。議員からは、便利さだけでなく、誤りが起きたときの責任の所在をはっきりさせるよう求める声も出ている。",
+      "form": "県議会",
+      "en": "As moves to bring generative AI into administrative work spread among local governments, questions over whether it is appropriate have been coming one after another in prefectural assemblies as well. Using it for drafting documents or responding to inquiries could lighten the load on staff, but there is also a risk of passing incorrect information straight on to residents. For this reason, a growing number of prefectures are setting their own guidelines on the scope of permitted use and the handling of personal information. Some assembly members are also calling for clarity not only about convenience but also about where responsibility lies when errors occur.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「県議会の一般質問」「県議会で成立した条例」のように、県の議論の場として出てくる。",
+      "grammar": ["n5-teiru"],
+      "sense": "県の予算や条例を決める、選挙で選ばれた議員の集まり。"
+    },
+    {
+      "ja": "平日の昼間に開かれる県議会の傍聴席は、たいてい空いている。だが、道路や学校、病院の予算といった暮らしに近い事柄の多くは、そこで決まっているのである。人は遠くの大きな出来事には心を動かされるのに、身近な決定にはなぜか無関心になりやすい。関心は物事の重さではなく、目立つかどうかに引き寄せられるものなのだろう。足元で起きていることを見つめる難しさは、政治に限った話ではない。",
+      "form": "県議会",
+      "en": "The public gallery of a prefectural assembly, which meets in the daytime on weekdays, is usually empty. Yet many of the matters close to our lives, such as budgets for roads, schools and hospitals, are decided there. People are moved by large events far away, yet for some reason tend to become indifferent to decisions close at hand. Attention, it seems, is drawn not by how weighty a matter is but by whether it stands out. The difficulty of looking closely at what is happening at our feet is not limited to politics.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「県議会の傍聴」「県議会を傍聴する」は、一般の人が議論を見に行く場面で使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "県の予算や条例を決める、選挙で選ばれた議員の集まり。"
+    }
+  ],
+  "317": [
+    {
+      "ja": "今回は、仏教の教団が守ってきた、ある集まりの話です。お釈迦さまの時代から、出家した僧たちは月に二回、新月と満月の日に同じ場所へ集まっていました。そこで戒律の条文を読み上げ、もし破ったものがあれば、仲間の前で打ち明けたといいます。布薩と呼ばれるこの集まりは、いわば教団の定例の反省会のようなものだったわけです。決まった日に必ず集まる仕組みがあったからこそ、大きな組織になっても規律がゆるまずに続いたと考えられています。",
+      "form": "定例",
+      "en": "This time, it's about a certain gathering that the Buddhist order has kept up. Since the time of the Buddha, ordained monks gathered at the same place twice a month, on the days of the new moon and the full moon. There they recited the articles of the monastic rules, and if they had broken any, they are said to have confessed it in front of their fellows. This gathering, called uposatha, was in a sense something like the order's regular review meeting. It is thought that precisely because there was a system of always gathering on fixed days, discipline continued without slackening even as the order grew large.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「定例の〜」「定例会」「定例化する」の形で、決まった時期にくり返す行事に付く。",
+      "sense": "いつも決まった時期に行うこと。また、そのならわし。"
+    },
+    {
+      "ja": "主要国の首脳が集まるサミットは、1975年にフランスで初めて開かれた。当初は石油危機のあとの経済の立て直しを話し合うための会合という色合いが強かったが、しだいに毎年持ち回りで開く定例の会議として定着した。議題は経済だけでなく、安全保障や気候変動にまで広がっている。一方で、参加国の顔ぶれが固定されていることから、新興国の声が十分に反映されていないとの指摘もある。",
+      "form": "定例",
+      "en": "The summit at which the leaders of the major countries gather was first held in France in 1975. At first it had a strong flavour of a meeting to discuss rebuilding the economy after the oil crisis, but it gradually took root as a regular conference held every year with the host role rotating. Its agenda has broadened beyond the economy to include security and climate change. On the other hand, because the lineup of participating countries is fixed, some point out that the voices of emerging countries are not sufficiently reflected.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「定例の会議」「定例記者会」など、予定どおりくり返される公式行事に使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "いつも決まった時期に行うこと。また、そのならわし。"
+    },
+    {
+      "ja": "定例の会議ほど、中身が空になりやすいものはない。毎週同じ曜日に同じ顔ぶれが集まると、集まること自体が目的になり、話すべきことがなくても時間は埋められていく。それでも人が決まった集まりをやめられないのは、そこに一種の安心があるからだろう。変わらない予定は、変わり続ける日々の中で自分の位置を確かめる目印になる。形だけの習慣を笑うのはたやすいが、その形に支えられている心もあるのである。",
+      "form": "定例",
+      "en": "Nothing is as prone to becoming hollow as a regular meeting. When the same faces gather on the same day every week, gathering itself becomes the purpose, and the time gets filled even when there is nothing that needs to be said. Even so, the reason people cannot give up fixed gatherings is probably that there is a kind of reassurance in them. An unchanging schedule becomes a landmark for confirming one's position amid days that keep changing. It is easy to laugh at habits that are mere form, but there are also hearts that are held up by that form.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「定例の会議」は、急に開く「臨時の会議」と対になる言い方。",
+      "grammar": ["n4-teiku"],
+      "sense": "いつも決まった時期に行うこと。また、そのならわし。"
+    }
+  ],
+  "221": [
+    {
+      "ja": "半導体をめぐる米国と中国の対立は長期化し、収束の兆しは見えない。米国が先端品やその製造装置の輸出を制限すれば、中国はガリウムなどの鉱物の輸出管理で応じるなど、措置の応酬が続いている。双方とも相手への依存を減らそうとしているが、供給網を短期間で作り直すのは容易ではない。板挟みになった日本や韓国の企業は、どちらの市場も手放せないまま、生産拠点の見直しを迫られている。",
+      "form": "双方",
+      "en": "The confrontation between the United States and China over semiconductors has become protracted, with no sign of it settling. When the US restricts exports of advanced chips and the equipment for making them, China responds with export controls on minerals such as gallium, and this exchange of measures continues. Both sides are trying to reduce their dependence on the other, but rebuilding supply chains in a short time is not easy. Caught in the middle, Japanese and South Korean companies are being forced to review their production bases, unable to let go of either market.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「双方とも」「双方の溝」「双方が譲らない」の形が多い。",
+      "grammar": ["n5-teiru"],
+      "sense": "向かい合う二つの側の、どちらも。"
+    },
+    {
+      "ja": "釈迦は悟りを開く前、王子としての豊かで満ち足りた暮らしと、命を落としかねないほどの苦行の、双方を経験したと伝えられる。そのどちらにも真理はないと気づいた末にたどり着いたのが、中道と呼ばれる考え方である。中道とは、二つの極端のちょうど平均をとることではなく、執着から離れて物事をありのままに見る態度を指す。偏りを捨てることは、何かを中途半端に選ぶことと同じではないのである。",
+      "form": "双方",
+      "en": "Before attaining enlightenment, the Buddha is said to have experienced both the rich and contented life of a prince and ascetic practice so severe it could have cost him his life. What he arrived at after realising that truth lay in neither was the way of thinking called the Middle Way. The Middle Way does not mean taking the exact average of two extremes, but refers to an attitude of seeing things as they are, apart from attachment. Casting off one-sidedness is not the same as choosing something half-heartedly.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「双方を経験する」のように、対になる二つのものをまとめて指すこともできる。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "向かい合う二つの側の、どちらも。"
+    },
+    {
+      "ja": "ディベートの授業では、本当は賛成なのに反対の側を担当させられる、ということがよくあります。最初は戸惑いますが、相手の主張を本気で組み立てようとすることで、自分の考えの弱い点がはっきり見えてきます。反対の立場から考えてみる練習が、思い込みを和らげることを示した研究もあります。試験の小論文でも、双方の言い分を示した上で自分の結論を述べると、説得力がぐっと増します。",
+      "form": "双方",
+      "en": "In debate classes, it often happens that you are made to take the opposing side even though you actually agree. At first you're thrown, but by seriously trying to build the other side's argument, the weak points in your own thinking become clear. There is also research showing that practice in thinking from the opposite position softens preconceptions. In exam essays too, if you state your conclusion after presenting what both sides have to say, your argument becomes far more persuasive.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「双方の言い分」「双方の立場」は、議論や小論文で公平さを示すときの定番表現。",
+      "grammar": ["n3-koto-de", "n2-ue-de"],
+      "sense": "向かい合う二つの側の、どちらも。"
+    }
+  ],
+  "73": [
+    {
+      "ja": "今回は、AIが文章を書く仕組みをざっくり整理しておきます。いまの言語モデルは、大量の文章を読み込んで、次に来る単語を予測するように訓練されています。当然ながら、学習に使った文章に偏りがあれば、AIの答えにも同じ偏りが出てきます。たとえば英語のデータが圧倒的に多ければ、日本語の細かいニュアンスは取りこぼされやすくなるわけです。AIが賢く見えるかどうかは、結局のところ何を読ませたかで決まる、というのがポイントですね。",
+      "form": "当然ながら",
+      "en": "This time, let me roughly sort out how AI writes text. Today's language models are trained to read in huge amounts of text and predict the word that comes next. Naturally, if the text used for training is skewed, the same skew shows up in the AI's answers. For example, if English data vastly outnumbers everything else, the fine nuances of Japanese become easy to miss. The key point is that whether an AI looks smart is ultimately decided by what it was given to read.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "前の内容から当然出てくる結果を述べるときに文頭で使う。やや改まった言い方。",
+      "grammar": ["n3-you-ni", "n5-teiru"],
+      "sense": "言うまでもなく。当たり前のことだが。"
+    },
+    {
+      "ja": "仏教では、行いはそのまま消えることなく、必ず何らかの結果となって返ってくると説く。これが業の教えである。怒りを抱えたまま人と向き合えば、当然ながら相手の言葉も棘を含んで聞こえ、こちらの返す言葉もまた荒くなる。そうして生まれた険しい関係が、次の怒りの種となり、また新たな行いを生んでいく。業とは遠い来世の話である以上に、いまこの瞬間の心の連鎖を言い当てたものなのかもしれない。",
+      "form": "当然ながら",
+      "en": "Buddhism teaches that actions do not simply vanish but always come back in the form of some result. This is the teaching of karma. If you face someone while holding on to anger, naturally even their words sound thorny, and the words you return become harsh in turn. The strained relationship born this way becomes the seed of the next anger and gives rise to new actions in turn. More than a story about a distant next life, karma may be something that precisely describes the chain of the mind in this very moment.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "原因と結果の筋道が明らかなときに使い、「〜ば、当然ながら〜」の形と相性がよい。",
+      "grammar": ["n2-koto-naku", "n4-teiku"],
+      "sense": "言うまでもなく。当たり前のことだが。"
+    },
+    {
+      "ja": "いや、試験の前の日に徹夜する人って、けっこういるじゃないですか。気持ちはわかるんですけど、記憶って寝てる間に整理されるらしいんですよね。だから、当然ながら寝ないで詰め込んでも、肝心の本番で思い出せなかったりするわけで。ぶっちゃけ、一時間よけいに勉強するより、一時間多く寝たほうがコスパいいと思うんですよ。まあ、わかっていても前の日って不安でなかなか眠れないんですけどね。",
+      "form": "当然ながら",
+      "en": "I mean, there are quite a few people who pull an all-nighter the day before an exam, right? I get how they feel, but apparently memories get sorted out while you sleep. So naturally, even if you cram without sleeping, you might not be able to recall things in the actual exam where it counts. Honestly, I think sleeping an extra hour is better value than studying an extra hour. Well, even knowing that, you can hardly sleep the night before because you're anxious.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "くだけた会話でも使えるが、少し理屈っぽく聞こえる。軽く言うなら「そりゃ」。",
+      "sense": "言うまでもなく。当たり前のことだが。"
+    }
+  ],
+  "236": [
+    {
+      "ja": "今回は、日本の古代史を語るうえで欠かせない、ある中国の歴史書を取り上げます。三世紀の中国の歴史をまとめた『三国志』の中に、「魏志倭人伝」と呼ばれる部分があります。ここには、倭の国々が卑弥呼という女王を立てて国の乱れをおさめた、という話が書かれているんですね。日本の側にまだ文字の記録がなかった時代なので、当時の列島の様子にここまで詳しく言及した資料はほかにありません。邪馬台国がどこにあったのかという長い論争も、すべてはこの短い記述から始まっているわけです。",
+      "form": "言及",
+      "en": "This time, I'm taking up a certain Chinese history book that is indispensable in talking about Japan's ancient history. Within the Records of the Three Kingdoms, which compiled the history of third-century China, there is a section known as the \"Account of the Wa.\" It tells how the countries of Wa set up a queen named Himiko and brought an end to the turmoil in the land. Since this was an era when there were still no written records on the Japanese side, there is no other source that refers in such detail to conditions in the archipelago at the time. The long debate over where Yamatai was located all started from this short passage.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜に言及する」の形で、話や文章の中である事柄に触れる意味。書き言葉的。",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "話や文章の中で、ある事柄に触れること。"
+    },
+    {
+      "ja": "生成AIを使った検索サービスが広がる中、ニュースサイトの記事が無断で学習や回答に使われているとして、報道機関が開発企業を訴える例が相次いでいる。回答の中で記事の内容に言及しながら、どの記事から得た情報なのかをはっきり示さないケースもあるという。報道機関側は、記事を作るための取材のコストに見合う支払いを求めている。一方、開発企業の多くは、公開された情報を学習に使うことは認められるべきだと主張しており、議論の行方が注目される。",
+      "form": "言及",
+      "en": "As search services using generative AI spread, there have been a succession of cases in which news organisations sue developers, claiming their articles are being used without permission for training and answers. There are reportedly also cases in which an answer refers to the content of an article while not clearly showing which article the information came from. The news organisations are seeking payment commensurate with the cost of the reporting that goes into producing articles. Meanwhile, many developers argue that using publicly available information for training should be permitted, and attention is focused on where the debate will lead.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜への言及を避けた」「言及はなかった」の形で、発言の有無を伝える。",
+      "grammar": ["n4-nagara", "n5-teiru"],
+      "sense": "話や文章の中で、ある事柄に触れること。"
+    },
+    {
+      "ja": "人が何について語るかより、何に言及しないかのほうが、その人の心を雄弁に物語ることがある。大切な人を失ったばかりの友人が、その名前だけを避けるように話を続けるとき、その沈黙はどんな言葉よりも重い。私たちは言葉を手がかりに他人を理解しようとするが、言葉にならなかった部分にこそ、本当の思いは隠れているのかもしれない。聞くとは、相手の話の中にあいた空白を、そのまま受け止めることでもあるのである。",
+      "form": "言及",
+      "en": "What a person does not mention can sometimes tell more eloquently about their heart than what they talk about. When a friend who has just lost someone dear keeps talking as if avoiding only that person's name, the silence weighs more than any words. We try to understand others with words as our clue, but it may be precisely in the parts that never became words that true feelings are hidden. To listen is also to accept, as it is, the blank space that opens up in the other person's talk.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「〜に言及しない」「言及を避ける」のように、否定の形で意図を読む文脈にも使う。",
+      "grammar": ["n3-you-ni"],
+      "sense": "話や文章の中で、ある事柄に触れること。"
+    }
+  ],
+  "227": [
+    {
+      "ja": "今回は、悪い知らせほど上に伝わりにくい、という人間の心理を取り上げます。心理学では、人が悪いニュースを伝えるのをためらう傾向が古くから知られていて、「マム効果」と呼ばれています。伝える側は、相手をがっかりさせたくないし、自分が責められるのも怖いわけですね。その結果、失敗の報告が遅れて、小さなトラブルが取り返しのつかない問題にふくらんでいきます。だからこそ、悪い知らせを持ってきた人をまず褒める、という文化が組織には必要なんです。",
+      "form": "報告",
+      "en": "This time, I'm taking up the human psychology whereby the worse the news, the harder it is for it to reach the top. In psychology, the tendency for people to hesitate to pass on bad news has long been known and is called the \"MUM effect.\" The person delivering it doesn't want to disappoint the other person, and is also afraid of being blamed themselves. As a result, reports of failures are delayed, and small troubles swell into problems that can't be undone. That's exactly why organisations need a culture of first praising the person who brings bad news.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「〜を報告する」「報告が遅れる」のように、仕事で起きたことを伝える場面の基本語。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "起きたことや調べたことを、人に知らせること。"
+    },
+    {
+      "ja": "AIの不具合や事故の情報を共有する仕組みづくりが、各国で進んでいる。欧州連合のAI法は、高いリスクを持つAIを提供する事業者に対し、重大な事故が起きた場合に当局への報告を義務づけている。航空の分野では、小さなミスでも記録して共有することで、大きな事故を防いできた経緯がある。AIでも同じように、失敗の情報を隠さずに集めることが安全につながると期待されている。ただ、何を重大な事故とみなすかの線引きはまだあいまいで、仕組みを実際に機能させるには課題も残る。",
+      "form": "報告",
+      "en": "Efforts to build systems for sharing information on AI malfunctions and incidents are advancing in many countries. The European Union's AI Act obliges providers of high-risk AI to report to the authorities when a serious incident occurs. In aviation, there is a history of preventing major accidents by recording and sharing even small errors. With AI as well, it is hoped that gathering information on failures without hiding it will lead to safety. However, the line on what counts as a serious incident is still vague, and challenges remain in making the system actually work.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「報告を義務づける」「報告書をまとめる」の形でよく使われる。",
+      "grammar": ["n3-koto-de", "n3-you-ni", "n5-teiru"],
+      "sense": "起きたことや調べたことを、人に知らせること。"
+    },
+    {
+      "ja": "見たことを伝えるのは、見ることよりも難しい。マルコ・ポーロが東方の国々について語った話は、同時代の多くの人に誇張だと受け止められたと伝えられる。聞き手の知っている世界の外側にあるものは、どれほど正確に伝えても作り話に聞こえてしまうのである。報告の真偽を決めるのは、事実そのものよりも、受け手がすでに持っている世界の広さなのかもしれない。だとすれば、信じがたい話を前にしたときにまず疑うべきは、語り手よりも自分の物差しであろう。",
+      "form": "報告",
+      "en": "Conveying what you have seen is harder than seeing it. The accounts Marco Polo gave of the lands of the East are said to have been taken as exaggerations by many of his contemporaries. Things lying outside the world the listener knows sound like fabrications no matter how accurately they are conveyed. What decides whether a report is true or false may be less the facts themselves than the breadth of the world the recipient already holds. If so, then when faced with an unbelievable story, what we should doubt first is not the teller but our own yardstick.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "仕事の連絡だけでなく、旅や調査で見聞きしたことを伝える記録にも使う。",
+      "sense": "起きたことや調べたことを、人に知らせること。"
+    }
+  ],
+  "321": [
+    {
+      "ja": "今回は、ピカソの代表作『ゲルニカ』が生まれた背景を見ていきます。1937年、スペイン内戦のさなか、北部の小さな町ゲルニカが、反乱軍を支援するドイツの空軍部隊による激しい空爆を受けました。市場が開かれる日の午後だったこともあり、町は大きな被害を受け、多くの市民が犠牲になったとされています。このニュースを知ったピカソは、パリ万博のために依頼されていた壁画のテーマを変え、ひと月あまりで巨大な作品を描き上げたんです。",
+      "form": "空爆",
+      "en": "This time, let's look at the background to the birth of Picasso's masterpiece Guernica. In 1937, in the midst of the Spanish Civil War, the small northern town of Guernica suffered a fierce airstrike by a German air force unit supporting the rebel side. Because it was the afternoon of a market day, the town suffered heavy damage, and many civilians are said to have been killed. On hearing this news, Picasso changed the theme of the mural he had been commissioned to paint for the Paris World's Fair and completed the huge work in little more than a month.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「空爆を受ける」「空爆を行う」の形で、受ける側・する側の両方から使う。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "飛行機などから爆弾を落として攻撃すること。"
+    },
+    {
+      "ja": "人工知能を兵器に使うことへの懸念が、国際社会で強まっている。無人機による空爆では、標的の識別にAIの分析が使われる例も出てきたとされる。標的を見極める速さが増す一方で、機械の誤った判断を人間が見過ごすおそれも指摘されている。人間がどこまで判断に関わるべきかをめぐり、国連では自律型の致死兵器システムを規制するための議論が続いているが、各国の立場の違いは大きい。技術の進歩に、ルールづくりが追いついていないのが実情だ。",
+      "form": "空爆",
+      "en": "Concern about using artificial intelligence in weapons is growing in the international community. In airstrikes by unmanned aircraft, there have reportedly been cases where AI analysis is used to identify targets. While the speed of picking out targets increases, some point out the risk that humans may overlook a machine's mistaken judgments. Discussions on regulating lethal autonomous weapons systems are continuing at the United Nations over how far humans should be involved in decisions, but the differences in countries' positions are large. The reality is that rule-making has not kept up with the progress of technology.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「空爆を続ける」「空爆の停止」のように、軍事行動を伝える硬い語。",
+      "grammar": ["n5-teiru"],
+      "sense": "飛行機などから爆弾を落として攻撃すること。"
+    },
+    {
+      "ja": "空爆という戦い方は、殺す者と殺される者の距離を、かつてないほど引き離した。顔の見えない相手に対しては、人は驚くほど冷たい決定を下せてしまう。心理学の実験が繰り返し示してきたのは、相手との距離が広がるにつれて、ためらいが薄れていくという人間の性質である。だとすれば、平和を守るとは、遠くにいる他者の顔をどこまで思い浮かべられるかという、想像力の問題でもあるのだろう。",
+      "form": "空爆",
+      "en": "The way of fighting called aerial bombing has pulled those who kill and those who are killed further apart than ever before. Toward an opponent whose face they cannot see, people can make astonishingly cold decisions. What psychological experiments have shown again and again is the human trait whereby hesitation fades as the distance from the other person grows. If so, then keeping the peace is also a matter of imagination: how far we can picture the faces of others who are far away.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「空爆という〜」のように、戦い方そのものを論じる文脈でも使われる。",
+      "grammar": ["n3-ni-tsurete", "n4-teiku"],
+      "sense": "飛行機などから爆弾を落として攻撃すること。"
+    }
+  ],
+  "318": [
+    {
+      "ja": "今回は、エネルギーの歴史の中でも大きな転換点となった出来事を取り上げます。1954年、ソ連のオブニンスクで、世界で初めて電力網に電気を送る原子力発電所が動き始めました。もともと兵器のために開発された核の技術を、暮らしのための電気に使おうという発想で、当時は「平和のための原子力」という言葉も広まっていました。日本でも1960年代に商業用の発電が始まり、資源の乏しい国の希望として期待を集めたわけです。ただその期待は、のちに起きた大きな事故によって何度も揺らぐことになります。",
+      "form": "原子力発電所",
+      "en": "This time, I'm taking up an event that became a major turning point in the history of energy. In 1954, at Obninsk in the Soviet Union, the world's first nuclear power plant to send electricity into a power grid began operating. The idea was to use nuclear technology, originally developed for weapons, to make electricity for everyday life, and at the time the phrase \"atoms for peace\" was also spreading. In Japan too, commercial power generation began in the 1960s, and it drew expectations as a hope for a country poor in resources. But those expectations would be shaken again and again by the major accidents that eventually occurred.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「原子力発電所を建てる」「原子力発電所が稼働する」など。略して「原発」とも言う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "核分裂で生まれる熱を使って、電気を作る施設。"
+    },
+    {
+      "ja": "生成AIの普及でデータセンターの電力需要が急増する中、米国の大手IT企業が原子力に相次いで目を向けている。停止していた原子力発電所を再び動かして電気を買い取る契約や、小型の原子炉を開発する企業への出資が次々に発表された。天候に左右されず、二酸化炭素もほとんど出さない電源として、安定した電気を求めるAI産業と相性がよいとされる。ただ、建設には長い時間がかかるうえ、使用済み燃料の処分という課題も解決していない。",
+      "form": "原子力発電所",
+      "en": "With the spread of generative AI rapidly increasing demand for electricity at data centres, major American IT companies have been turning their attention to nuclear power one after another. Contracts to restart a nuclear power plant that had been shut down and buy its electricity, as well as investments in companies developing small reactors, have been announced in quick succession. As a power source unaffected by the weather and emitting almost no carbon dioxide, it is said to suit the AI industry, which seeks a stable supply of electricity. However, construction takes a long time, and the problem of disposing of spent fuel has not been solved either.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「原子力発電所の再稼働」「原子力発電所の建設」の形で頻出する。",
+      "grammar": ["n5-teiru"],
+      "sense": "核分裂で生まれる熱を使って、電気を作る施設。"
+    },
+    {
+      "ja": "人は、めったに起きないが、起きれば取り返しのつかない被害をもたらす危険を、統計が示す以上に恐れる。原子力発電所をめぐる議論が、数字だけではなかなか決着しないのはそのためである。毎日のように起きる交通事故よりも、一度の大事故の記憶のほうが、心に深く刻まれるのだ。だからといって、その恐れを非合理だと笑うことはできない。取り返しのつかない失敗を避けようとする感覚は、人が長い時間をかけて身につけてきた知恵でもあるからである。",
+      "form": "原子力発電所",
+      "en": "People fear dangers that rarely occur but would cause irreversible damage if they did, more than the statistics would suggest. That is why debates over nuclear power plants are hard to settle with numbers alone. The memory of a single major accident is etched more deeply in the mind than traffic accidents that happen almost every day. Even so, we cannot laugh off that fear as irrational. For the sense of trying to avoid irreversible failure is also wisdom that humans have acquired over a long time.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "議論や論説では、技術の是非を問う象徴的な施設として取り上げられることが多い。",
+      "grammar": ["n3-you-ni"],
+      "sense": "核分裂で生まれる熱を使って、電気を作る施設。"
+    }
+  ],
+  "300": [
+    {
+      "ja": "今回は、インドの暮らしと信仰を大きく左右してきた、モンスーンの話です。毎年6月の初めごろ、インド洋から湿った空気が流れ込んで、まず南端のケーララ州に雨季がやってきます。雨の帯はそこから少しずつ北上し、7月の半ばには、ほぼ国全体に雨を降らせるようになります。農業の多くを雨に頼ってきたこの土地では、雨の到来はまさに命そのもので、各地に雨を迎える祭りや儀礼が残っているんですね。",
+      "form": "北上",
+      "en": "This time, it's about the monsoon, which has greatly shaped life and faith in India. Every year around the beginning of June, moist air flows in from the Indian Ocean, and the rainy season first arrives in Kerala, the southernmost state. From there the rain belt gradually moves north, and by mid-July it is bringing rain to almost the whole country. In this land, which has long relied on rain for much of its farming, the arrival of the rain is truly life itself, and festivals and rites welcoming the rain survive in many places.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「桜前線が北上する」「雨の帯が北上する」など、季節や天気の移り変わりにもよく使う。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru"],
+      "sense": "北の方へ向かって進むこと。"
+    },
+    {
+      "ja": "朝鮮戦争の戦闘が止まってから、70年以上が過ぎた。1950年9月、国連軍は半島西岸への上陸作戦を成功させると、38度線を越えて中国との国境近くまで北上した。しかし同年10月、中国が大規模な部隊を送り込んだことで戦局は一変し、戦線は再び南へ押し戻された。現在の境界線がほぼ休戦時の戦線に沿って引かれていることは、この戦争がいまだに正式には終わっていないことを物語っている。",
+      "form": "北上",
+      "en": "More than 70 years have passed since the fighting in the Korean War stopped. In September 1950, after succeeding in a landing operation on the peninsula's west coast, UN forces crossed the 38th parallel and advanced north to near the border with China. But in October of the same year, China sent in large-scale forces, the course of the war changed completely, and the front was pushed back south again. The fact that today's boundary line is drawn roughly along the front as it stood at the ceasefire shows that this war has still not formally ended.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道や戦史では「部隊が北上する」「北上を続ける」のように、移動の向きを示す。",
+      "grammar": ["n5-teiru"],
+      "sense": "北の方へ向かって進むこと。"
+    },
+    {
+      "ja": "インドで生まれた仏教は、北西のガンダーラ地方を経て北上し、砂漠のオアシスの町々をたどって中国へと伝わった。山を越え砂漠を渡るたびに、教えはその土地の言葉と考え方で語り直された。インドの言葉で説かれた教えが漢字に置き換えられたとき、もとの意味がそのまま残ったわけではない。しかし、形を変えながら生き延びることこそ、すべては移ろうと説いたこの教えに、ふさわしい姿だったのではないか。",
+      "form": "北上",
+      "en": "Buddhism, born in India, moved north by way of the Gandhara region in the northwest and travelled along the oasis towns of the desert to reach China. Each time it crossed mountains and deserts, the teaching was retold in the language and ways of thinking of that land. When teachings expounded in Indian languages were replaced with Chinese characters, the original meanings did not simply remain intact. Yet surviving while changing form may have been precisely the fitting shape for this teaching, which held that all things pass.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "人や文化の移動にも使い、「〜を経て北上する」の形で道筋を示せる。",
+      "grammar": ["n3-wake-dewa-nai", "n4-nagara"],
+      "sense": "北の方へ向かって進むこと。"
+    }
+  ]
+}

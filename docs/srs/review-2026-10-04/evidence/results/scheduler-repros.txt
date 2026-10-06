@@ -1,0 +1,6 @@
+early_learning_requeue {"scheduledDue":"2026-10-04T09:10:00.000Z","queueNext":"c1","shownAt":"2026-10-04T09:00:00.000Z","secondsBeforeDue":600}
+same_day_sibling_reopen {"first":["c1"],"reopened":["c2"]}
+backward_clock_error Invalid delta_t "-1"
+malformed_import_accepted {"format":"bunki-cloze-state","version":1,"deckId":"demo","cards":{"c1":{"due":"not-a-date"}},"groupsOff":[],"log":[]}
+malformed_grade_error Invalid state:[undefined]
+log_truncation {"received":5001,"retained":5000,"firstRetained":["c1",3,"1"]}

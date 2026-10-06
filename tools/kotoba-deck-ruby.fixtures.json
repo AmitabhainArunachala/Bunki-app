@@ -1,0 +1,1012 @@
+{
+  "about": "Readings the shipped 言葉の鉱脈 decks must show (review finding F17). For each entry, every ruby segment of `card` that spells `surface`, follows text ending in `after` and precedes text starting with `before`, reads `right`; at least one such segment exists; none reads `wrong`. Checked by tools/kotoba-deck-ruby.test.mjs and prototypes/corridor/tools/verify-kotoba-mine.mjs. The fixes come from decks/kotoba-mine/source/readings.json.",
+  "pairs": [
+    {
+      "card": "km-175-m01",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-277-m05",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-226-m03",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-222-m01",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-222-m04",
+      "after": "日本",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-158-m06",
+      "after": "外国",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-179-m04",
+      "after": "外国",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-298-m02",
+      "after": "中国",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-189-m05",
+      "after": "宇宙",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-017-m06",
+      "after": "エジプト",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-254-m04",
+      "after": "文化",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-271-m04",
+      "after": "著名",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-266-m04",
+      "after": "星",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-150-m03",
+      "after": "オランダ",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-150-m03",
+      "after": "スウェーデン",
+      "surface": "人",
+      "right": "じん",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-218-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-169-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-135-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-122-m05",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-071-m04",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-209-m06",
+      "after": "",
+      "surface": "他",
+      "right": "ほか",
+      "wrong": "た"
+    },
+    {
+      "card": "km-081-m01",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-081-m02",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-081-m03",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-149-m01",
+      "after": "",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-196-1",
+      "after": "恋愛",
+      "surface": "上手",
+      "right": "じょうず",
+      "wrong": "かみて"
+    },
+    {
+      "card": "km-304-m01",
+      "after": "読者の",
+      "surface": "方",
+      "right": "かた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-119-m03",
+      "after": "薬剤師の",
+      "surface": "方",
+      "right": "かた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-118-m01",
+      "after": "一般の",
+      "surface": "方",
+      "right": "かた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-118-m01",
+      "after": "曜",
+      "surface": "日",
+      "right": "び",
+      "wrong": "ひ"
+    },
+    {
+      "card": "km-250-m04",
+      "after": "",
+      "surface": "寛仁",
+      "right": "ともひと",
+      "wrong": "かんにん"
+    },
+    {
+      "card": "km-250-m04",
+      "after": "皇族",
+      "surface": "方",
+      "right": "がた",
+      "wrong": "ほう"
+    },
+    {
+      "card": "km-039-m05",
+      "after": "いい",
+      "surface": "方",
+      "right": "ほう",
+      "wrong": "かた"
+    },
+    {
+      "card": "km-098-m01",
+      "after": "",
+      "surface": "甲賀",
+      "right": "こうか",
+      "wrong": "こうが"
+    },
+    {
+      "card": "km-098-m02",
+      "after": "",
+      "surface": "甲賀",
+      "right": "こうか",
+      "wrong": "こうが"
+    },
+    {
+      "card": "km-098-1",
+      "after": "",
+      "surface": "甲賀",
+      "right": "こうか",
+      "wrong": "こうが"
+    },
+    {
+      "card": "km-149-m03",
+      "after": "斉藤愛",
+      "surface": "璃",
+      "right": "り",
+      "wrong": ""
+    },
+    {
+      "card": "km-298-m02",
+      "after": "鹹",
+      "surface": "豆",
+      "right": "とう",
+      "wrong": "まめ"
+    },
+    {
+      "card": "km-298-m02",
+      "after": "鹹豆",
+      "surface": "漿",
+      "right": "しょう",
+      "wrong": ""
+    },
+    {
+      "card": "km-298-m02",
+      "after": "（25",
+      "surface": "元",
+      "right": "げん",
+      "wrong": "もと"
+    },
+    {
+      "card": "km-071-m07",
+      "after": "",
+      "surface": "日本",
+      "before": "や欧州",
+      "right": "にほん",
+      "wrong": "にっぽん"
+    },
+    {
+      "card": "km-183-m07",
+      "after": "",
+      "surface": "私",
+      "before": "たち",
+      "right": "わたし",
+      "wrong": "わたくし"
+    },
+    {
+      "card": "km-060-m04",
+      "after": "出入り",
+      "surface": "口",
+      "right": "ぐち",
+      "wrong": "くち"
+    },
+    {
+      "card": "km-130-m07",
+      "after": "",
+      "surface": "後",
+      "before": "工程",
+      "right": "あと",
+      "wrong": "ご"
+    },
+    {
+      "card": "km-087-m09",
+      "after": "",
+      "surface": "何",
+      "before": "か",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-117-m04",
+      "after": "",
+      "surface": "蓮",
+      "right": "はす",
+      "wrong": "れん"
+    },
+    {
+      "card": "km-117-m06",
+      "after": "",
+      "surface": "間",
+      "before": "の取り方",
+      "right": "ま",
+      "wrong": "あいだ"
+    },
+    {
+      "card": "km-027-m05",
+      "after": "",
+      "surface": "何",
+      "before": "不自由",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-060-m05",
+      "after": "心を",
+      "surface": "一",
+      "before": "点",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-204-m07",
+      "after": "メディチ",
+      "surface": "家",
+      "right": "け",
+      "wrong": "か"
+    },
+    {
+      "card": "km-222-m07",
+      "after": "",
+      "surface": "都",
+      "before": "を離れ",
+      "right": "みやこ",
+      "wrong": "と"
+    },
+    {
+      "card": "km-001-m06",
+      "after": "はじめて",
+      "surface": "何",
+      "before": "かが",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-002-m06",
+      "after": "なのは、",
+      "surface": "何",
+      "before": "をい",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-002-m07",
+      "after": "その場で",
+      "surface": "何",
+      "before": "が聞",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-002-m07",
+      "after": "聞こえ、",
+      "surface": "何",
+      "before": "がに",
+      "right": "なに",
+      "wrong": "なん"
+    },
+    {
+      "card": "km-006-m07",
+      "after": "解く日を",
+      "surface": "一",
+      "before": "週間",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-008-m06",
+      "after": "人の手で",
+      "surface": "一",
+      "before": "冊ず",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-014-m08",
+      "after": "、最善の",
+      "surface": "一",
+      "before": "冊を",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-046-m08",
+      "after": "だと結局",
+      "surface": "一",
+      "before": "歩も",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-197-m07",
+      "after": "Iが四勝",
+      "surface": "一",
+      "before": "敗で",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-160-m15",
+      "after": "、機械が",
+      "surface": "一",
+      "before": "発で",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-298-m05",
+      "after": "も定番の",
+      "surface": "一",
+      "before": "品と",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-078-m08",
+      "after": "試験前に",
+      "surface": "一",
+      "before": "晩で",
+      "right": "ひと",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-025-m07",
+      "after": "の期待を",
+      "surface": "一",
+      "before": "言添",
+      "right": "ひと",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-008-m06",
+      "after": "あいだの",
+      "surface": "一行",
+      "right": "いちぎょう",
+      "wrong": "いっこう"
+    },
+    {
+      "card": "km-050-m06",
+      "after": "きます。",
+      "surface": "一日",
+      "right": "いちにち",
+      "wrong": "ついたち"
+    },
+    {
+      "card": "km-077-m09",
+      "after": "いを一日",
+      "surface": "中気",
+      "right": "じゅうき",
+      "wrong": "ちゅうき"
+    },
+    {
+      "card": "km-011-m06",
+      "after": "文が世界",
+      "surface": "中",
+      "before": "から",
+      "right": "じゅう",
+      "wrong": "ちゅう"
+    },
+    {
+      "card": "km-093-m08",
+      "after": "め、腹八",
+      "surface": "分",
+      "before": "目で",
+      "right": "ぶん",
+      "wrong": "ふん"
+    },
+    {
+      "card": "km-164-m07",
+      "after": "、ほぼ1",
+      "surface": "分",
+      "before": "おき",
+      "right": "ぷん",
+      "wrong": "ふん"
+    },
+    {
+      "card": "km-274-m07",
+      "after": "アプリで",
+      "surface": "三十",
+      "right": "さんじゅっ",
+      "wrong": "さんじゅう"
+    },
+    {
+      "card": "km-125-m07",
+      "after": "時間から",
+      "surface": "数十",
+      "right": "すうじゅっ",
+      "wrong": "すうじゅう"
+    },
+    {
+      "card": "km-280-m06",
+      "after": "せいぜい",
+      "surface": "四十",
+      "before": "分く",
+      "right": "よんじゅっ",
+      "wrong": "よんじゅう"
+    },
+    {
+      "card": "km-152-m09",
+      "after": "じ予報が",
+      "surface": "十",
+      "before": "回出",
+      "right": "じゅっ",
+      "wrong": "じゅう"
+    },
+    {
+      "card": "km-271-m08",
+      "after": "「",
+      "surface": "十",
+      "before": "で神",
+      "right": "とお",
+      "wrong": "じゅう"
+    },
+    {
+      "card": "km-271-m08",
+      "after": "で才子、",
+      "surface": "二十",
+      "before": "過ぎ",
+      "right": "はたち",
+      "wrong": "にじゅう"
+    },
+    {
+      "card": "km-268-m06",
+      "after": "七百六十",
+      "surface": "八",
+      "before": "回と",
+      "right": "はっ",
+      "wrong": "はち"
+    },
+    {
+      "card": "km-259-m07",
+      "after": "わずか十",
+      "surface": "七",
+      "before": "音で",
+      "right": "しち",
+      "wrong": "なな"
+    },
+    {
+      "card": "km-153-m06",
+      "after": "に、二十",
+      "surface": "四",
+      "before": "時間",
+      "right": "よ",
+      "wrong": "よん"
+    },
+    {
+      "card": "km-158-m09",
+      "after": "うちに計",
+      "surface": "四",
+      "before": "件を",
+      "right": "よん",
+      "wrong": "し"
+    },
+    {
+      "card": "km-307-m06",
+      "after": "徳太子が",
+      "surface": "四",
+      "before": "天王",
+      "right": "し",
+      "wrong": "よん"
+    },
+    {
+      "card": "km-172-m07",
+      "after": "音と、四",
+      "surface": "本",
+      "before": "足で",
+      "right": "ほん",
+      "wrong": "ぽん"
+    },
+    {
+      "card": "km-169-m07",
+      "after": "も、数千",
+      "surface": "本",
+      "before": "に及",
+      "right": "ぼん",
+      "wrong": "ぽん"
+    },
+    {
+      "card": "km-105-m06",
+      "after": "のマスに",
+      "surface": "二",
+      "before": "粒と",
+      "right": "ふた",
+      "wrong": "に"
+    },
+    {
+      "card": "km-011-m07",
+      "after": "警察官2",
+      "surface": "人",
+      "before": "が殉",
+      "right": "り",
+      "wrong": "にん"
+    },
+    {
+      "card": "km-011-m07",
+      "after": "72年2",
+      "surface": "月",
+      "before": "、長",
+      "right": "がつ",
+      "wrong": "つき"
+    },
+    {
+      "card": "km-015-m08",
+      "after": "3年11",
+      "surface": "月",
+      "before": "、対",
+      "right": "がつ",
+      "wrong": "つき"
+    },
+    {
+      "card": "km-061-m07",
+      "after": "2年10",
+      "surface": "月",
+      "before": "、ソ",
+      "right": "がつ",
+      "wrong": "つき"
+    },
+    {
+      "card": "km-059-m07",
+      "after": "3月15",
+      "surface": "日",
+      "before": "、ロ",
+      "right": "にち",
+      "wrong": "か"
+    },
+    {
+      "card": "km-262-m08",
+      "after": "なる人が",
+      "surface": "年",
+      "before": "に一",
+      "right": "ねん",
+      "wrong": "とし"
+    },
+    {
+      "card": "km-001-m05",
+      "after": "この",
+      "surface": "前",
+      "before": "、ひ",
+      "right": "まえ",
+      "wrong": "ぜん"
+    },
+    {
+      "card": "km-003-m07",
+      "after": "",
+      "surface": "日本",
+      "before": "史の",
+      "right": "にほん",
+      "wrong": "にっぽん"
+    },
+    {
+      "card": "km-003-m08",
+      "after": "工夫は、",
+      "surface": "日本",
+      "before": "だけ",
+      "right": "にほん",
+      "wrong": "にっぽん"
+    },
+    {
+      "card": "km-003-m08",
+      "after": "。いわば",
+      "surface": "日本",
+      "before": "の語",
+      "right": "にほん",
+      "wrong": "にっぽん"
+    },
+    {
+      "card": "km-015-m09",
+      "after": "",
+      "surface": "日本",
+      "before": "史で",
+      "right": "にほん",
+      "wrong": "にっぽん"
+    },
+    {
+      "card": "km-002-m05",
+      "after": "より先に",
+      "surface": "私",
+      "before": "たち",
+      "right": "わたし",
+      "wrong": "わたくし"
+    },
+    {
+      "card": "km-080-m08",
+      "after": "あれに「",
+      "surface": "私",
+      "before": "は学",
+      "right": "わたし",
+      "wrong": "わたくし"
+    },
+    {
+      "card": "km-104-m06",
+      "after": "ですか。",
+      "surface": "私",
+      "before": "、人",
+      "right": "わたし",
+      "wrong": "わたくし"
+    },
+    {
+      "card": "km-098-m06",
+      "after": "っては、",
+      "surface": "私",
+      "before": "生活",
+      "right": "し",
+      "wrong": "わたくし"
+    },
+    {
+      "card": "km-268-m08",
+      "after": "ミングを",
+      "surface": "大",
+      "before": "問ご",
+      "right": "だい",
+      "wrong": "おお"
+    },
+    {
+      "card": "km-235-m06",
+      "after": "必ずしも",
+      "surface": "大勢",
+      "right": "おおぜい",
+      "wrong": "たいせい"
+    },
+    {
+      "card": "km-011-m07",
+      "after": "で長時間",
+      "surface": "生",
+      "before": "中継",
+      "right": "なま",
+      "wrong": "せい"
+    },
+    {
+      "card": "km-320-m08",
+      "after": "である。",
+      "surface": "生",
+      "before": "と死",
+      "right": "せい",
+      "wrong": "なま"
+    },
+    {
+      "card": "km-112-m06",
+      "after": "メディチ",
+      "surface": "家",
+      "before": "の銀",
+      "right": "け",
+      "wrong": "か"
+    },
+    {
+      "card": "km-072-m08",
+      "after": "、経済史",
+      "surface": "家",
+      "before": "キン",
+      "right": "か",
+      "wrong": "や"
+    },
+    {
+      "card": "km-125-m07",
+      "after": "員総出で",
+      "surface": "行",
+      "before": "って",
+      "right": "おこな",
+      "wrong": "い"
+    },
+    {
+      "card": "km-273-m04",
+      "after": "渡ると、",
+      "surface": "都",
+      "before": "の長",
+      "right": "みやこ",
+      "wrong": "と"
+    },
+    {
+      "card": "km-296-m07",
+      "after": "、いつの",
+      "surface": "間",
+      "before": "にか",
+      "right": "ま",
+      "wrong": "あいだ"
+    },
+    {
+      "card": "km-067-m08",
+      "after": "るより、",
+      "surface": "間",
+      "before": "にま",
+      "right": "あいだ",
+      "wrong": "ま"
+    },
+    {
+      "card": "km-135-m08",
+      "after": "が一気に",
+      "surface": "開",
+      "before": "けま",
+      "right": "ひら",
+      "wrong": "あ"
+    },
+    {
+      "card": "km-293-m07",
+      "after": "で手元の",
+      "surface": "柄",
+      "before": "をわ",
+      "right": "え",
+      "wrong": "がら"
+    },
+    {
+      "card": "km-034-m08",
+      "after": "美意識に",
+      "surface": "異",
+      "before": "を唱",
+      "right": "い",
+      "wrong": "こと"
+    },
+    {
+      "card": "km-083-m07",
+      "after": "かかわる",
+      "surface": "海馬",
+      "right": "かいば",
+      "wrong": "うみうま"
+    },
+    {
+      "card": "km-202-m06",
+      "after": "兵法書『",
+      "surface": "孫子",
+      "right": "そんし",
+      "wrong": "まごこ"
+    },
+    {
+      "card": "km-022-m07",
+      "after": "、回路が",
+      "surface": "正",
+      "before": "しく",
+      "right": "ただ",
+      "wrong": "まさ"
+    },
+    {
+      "card": "km-164-m06",
+      "after": "はなく、",
+      "surface": "黒子",
+      "right": "くろこ",
+      "wrong": "ほくろ"
+    },
+    {
+      "card": "km-021-m06",
+      "after": "の前にお",
+      "surface": "香",
+      "before": "や花",
+      "right": "こう",
+      "wrong": "かおり"
+    },
+    {
+      "card": "km-063-m06",
+      "after": "堺などの",
+      "surface": "鍛冶",
+      "right": "かじ",
+      "wrong": "たんや"
+    },
+    {
+      "card": "km-269-m07",
+      "after": "イルスの",
+      "surface": "飛沫",
+      "right": "ひまつ",
+      "wrong": "しぶき"
+    },
+    {
+      "card": "km-155-m06",
+      "after": "い数学の",
+      "surface": "書物",
+      "right": "しょもつ",
+      "wrong": "かきもの"
+    },
+    {
+      "card": "km-214-m06",
+      "after": "けを払う",
+      "surface": "木賃",
+      "right": "きちん",
+      "wrong": "もくちん"
+    },
+    {
+      "card": "km-073-m07",
+      "after": "でいく。",
+      "surface": "業",
+      "before": "とは",
+      "right": "ごう",
+      "wrong": "ぎょう"
+    },
+    {
+      "card": "km-105-m06",
+      "after": "スの発明",
+      "surface": "者",
+      "before": "とご",
+      "right": "しゃ",
+      "wrong": "もの"
+    },
+    {
+      "card": "km-273-m04",
+      "after": "帰国後は",
+      "surface": "高野",
+      "right": "こうや",
+      "wrong": "たかの"
+    },
+    {
+      "card": "km-122-m09",
+      "after": "心に須弥",
+      "surface": "山",
+      "before": "とい",
+      "right": "せん",
+      "wrong": "やま"
+    },
+    {
+      "card": "km-082-m05",
+      "after": "スヴィオ",
+      "surface": "山",
+      "before": "が大",
+      "right": "さん",
+      "wrong": "やま"
+    },
+    {
+      "card": "km-020-m04",
+      "after": "話には、",
+      "surface": "乳",
+      "before": "海攪",
+      "right": "にゅう",
+      "wrong": "ちち"
+    },
+    {
+      "card": "km-267-m06",
+      "after": "局する「",
+      "surface": "御",
+      "before": "城将",
+      "right": "お",
+      "wrong": "ご"
+    },
+    {
+      "card": "km-046-m08",
+      "after": "と結局一",
+      "surface": "歩",
+      "before": "も前",
+      "right": "ぽ",
+      "wrong": "ほ"
+    },
+    {
+      "card": "km-197-m07",
+      "after": "が四勝一",
+      "surface": "敗",
+      "before": "で",
+      "right": "ぱい",
+      "wrong": "はい"
+    },
+    {
+      "card": "km-267-m06",
+      "after": "する「御",
+      "surface": "城",
+      "before": "将棋",
+      "right": "しろ",
+      "wrong": "じょう"
+    },
+    {
+      "card": "km-268-m08",
+      "after": "ングを大",
+      "surface": "問",
+      "before": "ごと",
+      "right": "もん",
+      "wrong": "とい"
+    },
+    {
+      "card": "km-273-m04",
+      "after": "後は高野",
+      "surface": "山",
+      "before": "を開",
+      "right": "さん",
+      "wrong": "やま"
+    }
+  ]
+}

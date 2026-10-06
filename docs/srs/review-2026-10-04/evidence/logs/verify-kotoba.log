@@ -1,0 +1,25 @@
+— 言葉の鉱脈: the deck as data
+  ok   the deck is a bunki-cloze-deck v1 with 12 topics
+  ok   323 words, each with one or more sentences, best first  — 323 words · 1597 cards
+  ok   every passage names its source; real mined passages and passages written for the deck  — 943 passages · 454 mined · 489 written
+  ok   MCD: one gap per card — 語 cards blank the word, 字 cards one kanji with its reading as the hint  — 943 語 · 654 字
+  ok   every card spells its sentence, asks exactly one word, and gives it a kana reading  — 1597/1597
+  ok   言葉の鉱脈・文 sits beside it: 323 words of real single sentences, each with its source  — 503 sentence cards
+  ok   the two decks open in different colour themes  — ai · dark
+
+— 集中道場 › デッキ, in a real browser
+  ok   集中道場 opens with the deck list: 言葉の鉱脈・MCD and ・文 side by side, 文脈札, and the saved-word queue  — kotoba-mcd, kotoba-mine, context, mine
+  ok   the deck home explains the method (このデッキのしくみ)
+  ok   the deck home shows today’s count and the 12 topics  — {"start":"始める — 15枚","groups":12}
+  ok   a card is a passage with one gap and a Japanese hint — no readings, no English
+  ok   the answer puts readings over the kanji, gives the meaning, and names the source  — {"rt":17,"target":true,"term":"財政","src":true}
+  ok   a grade lands in the deck’s own ledger and never in the word queue  — 1 card · 0 taken
+  ok   ?deck=mcd opens the MCD deck directly and the ledger survived the reload
+  ok   4-choice mode: four words, one tap answers and grades
+  ok   ?deck=kotoba opens 言葉の鉱脈・文: a real sentence with the word marked, in its own theme  — {"look":"dark","blank":0}
+  ok   覚える opens “どこに保存しますか？” and writes nothing yet  — 0 rows
+  ok   保存する writes the word and its new list together  — ["経済ニュース"]
+  ok   the sheet then says where the word went  — saved to: daily review · 経済ニュース
+  ok   no console errors
+
+all checks green

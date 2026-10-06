@@ -1,0 +1,611 @@
+{
+  "240": [
+    {
+      "ja": "今回取り上げるのは、江戸時代に『解体新書』を訳した蘭学者たちの話です。彼らには頼れる辞書もほとんどなく、オランダ語をほぼゼロから学ぶことになりました。たった一つの単語の意味をつかむのに、長い時間をかけて考え込んだと伝えられています。ここで注目したいのは、言葉の習得そのものが目的ではなく、目の前の医学を知るための手段だったという点です。目的がはっきりしていたからこそ、途方もない作業を続けられたわけですね。",
+      "form": "習得",
+      "en": "What we're looking at this time is the story of the Rangaku scholars who translated the Kaitai Shinsho in the Edo period. They had hardly any dictionaries to rely on, and ended up learning Dutch almost from scratch. It is said that they spent a long time puzzling over the meaning of a single word. The point I want to draw attention to is that acquiring the language was not the goal in itself but a means of understanding the medicine in front of them. It was precisely because their goal was clear that they could keep up such an enormous task.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「技術・言語を習得する」のように、時間をかけて身につける技能に使う。知識には「獲得」「身につける」も。",
+      "grammar": ["n3-koto-ni-naru", "n3-dewa-naku"]
+    },
+    {
+      "ja": "楽器や外国語なら、上達の度合いをある程度は外から測ることができる。けれども、心を静める修行には、ここまで来れば合格という線がどこにもない。今日できたことが、明日もできるとは限らないのである。だから昔の修行者たちは、坐ることを一つの技術の習得としてではなく、毎日の暮らしそのものとして続けたのだろう。終わりがないと知ったとき、人はかえって肩の力が抜けるのかもしれない。",
+      "form": "習得",
+      "en": "With a musical instrument or a foreign language, progress can to some extent be measured from outside. But in the practice of calming the mind, there is no line anywhere beyond which you can say you have passed. What you managed today is not guaranteed to be within reach tomorrow. That is probably why practitioners of old kept up sitting not as the acquisition of a single skill but as daily life itself. Perhaps it is when we learn there is no end that we finally relax our shoulders.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「習得」は到達点のある技能に向く語。終わりのない営みと対比すると、その含みがよく見える。",
+      "grammar": ["n3-dewa-naku"]
+    },
+    {
+      "ja": "最近のAIって、プログラムの書き方とか、普通に覚えちゃうじゃないですか。でも、だから人間はもう勉強しなくていいってわけじゃないと思うんですよね。結局、AIの答えが合ってるかどうかを判断するのって、人間側なんで。基本の習得をサボってると、そもそもその判断ができなくなっちゃうんですよ。なので、道具が便利になればなるほど、地味な基本のほうが大事になるんじゃないかなと思います。",
+      "form": "習得",
+      "en": "These days AI just picks up things like how to write programs, right? But I don't think that means humans no longer need to study. In the end, it's the human side that judges whether the AI's answer is right or not. If you skimp on acquiring the basics, you end up unable to make that judgment in the first place. So I think the more convenient the tools get, the more the unglamorous basics matter.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉でも「基本の習得」「技術の習得」のように名詞句で使うのが自然。動詞なら「習得する」。",
+      "grammar": ["n3-wake-dewa-nai"]
+    }
+  ],
+  "283": [
+    {
+      "ja": "言語学者のチョムスキーが注目したのは、子どもが言葉を覚える速さでした。周りの大人が話す文には言い間違いも多く、子どもが受け取れる手がかりは限られています。それなのに、子どもはわずか数年で母語の複雑なルールを使いこなすようになります。そこで彼は、人間には言語を身につけるための生得的な仕組みが備わっていると考えたわけです。この考え方には今も賛否があって、そこが言語学の面白いところなんですね。",
+      "form": "生得的",
+      "en": "What the linguist Chomsky focused on was how fast children learn language. The sentences the adults around them speak contain plenty of slips, and the clues a child can pick up are limited. Even so, within just a few years children come to handle the complex rules of their mother tongue. So he concluded that humans are equipped with an innate mechanism for acquiring language. This idea still divides opinion today, and that is exactly what makes linguistics interesting.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「生得的な能力・仕組み」のように学術的な文脈で使う硬い語。日常では「生まれつきの」が普通。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "大乗仏教には、生きとし生けるものはみな仏となる性質を宿している、という教えがある。それは修行によって外から付け加えるものではなく、はじめから内にあるものだとされる。もしそうなら、修行とは何かを新しく得ることではなく、曇った鏡を磨くことに近いのだろう。人の心に生得的な明るさがあると信じられるかどうかで、他人を見る目も変わってくる。厳しい言葉を投げる前に、その人の鏡がただ曇っているだけなのかもしれないと考えてみたい。",
+      "form": "生得的",
+      "en": "Mahayana Buddhism teaches that every living being carries within it the nature to become a Buddha. That nature is said not to be something added from outside through practice, but something present within from the very beginning. If so, practice is less a matter of gaining something new than something close to polishing a clouded mirror. Whether we can believe there is an innate brightness in the human heart changes the way we look at others too. Before throwing harsh words at someone, I would like to stop and consider that their mirror may simply be clouded.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「生得的な〜」と連体形で名詞を修飾する形が多い。後から身につけるものとの対比で使われやすい。",
+      "grammar": ["n3-dewa-naku"]
+    },
+    {
+      "ja": "AIの研究では、どこまでを最初から組み込み、どこからをデータに学ばせるかがよく議論になります。人間の赤ちゃんも、顔らしい形に目を向けやすい傾向を持って生まれてくると言われています。こうした生得的な偏りが、その後の学習を進める上で、よい道しるべになっているわけです。勉強法に置きかえると、白紙から覚えるより、すでにある枠組みに結びつけたほうが定着しやすいということです。新しい単語も、知っている言葉と関連づけて覚えるのがおすすめです。",
+      "form": "生得的",
+      "en": "In AI research, there is often debate over how much to build in from the start and how much to let the system learn from data. Human babies, too, are said to be born with a tendency to look toward face-like shapes. Innate biases like this serve as a useful guide as learning goes on. Translated into study methods, it means that things stick better when you tie them to a framework you already have than when you learn them from a blank slate. With new words, too, I recommend learning them by linking them to words you already know.",
+      "original": true,
+      "register": "学",
+      "topic": "ai",
+      "tipJa": "「生得的な傾向・偏り」は心理学や認知科学の定番の言い回し。対になる語は「経験的」「後天的」。",
+      "grammar": ["n2-ue-de"]
+    }
+  ],
+  "23": [
+    {
+      "ja": "今回は、習慣づくりについての本を要約していきます。著者がまず強調しているのは、やる気に頼るより、行動のきっかけを先に決めておくことです。たとえば、朝コーヒーをいれたら単語を五つ覚える、というふうに、すでにある習慣に新しい行動をくっつけるわけですね。これを毎日くり返していると、意識しなくても体が自ずと動くようになります。最初の数週間さえ乗り切れば、あとは仕組みが助けてくれる、というのがこの本の結論です。",
+      "form": "自ずと",
+      "en": "This time I'm going to summarize a book about building habits. What the author stresses first is deciding in advance what will trigger an action, rather than relying on motivation. For example, you attach a new action to a habit you already have: once you've made your morning coffee, you learn five words. If you repeat this every day, your body comes to move on its own without your thinking about it. The book's conclusion is that if you can just get through the first few weeks, the system will carry you from there.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「自ずと身につく」「自ずと動く」のように、意識しなくても自然にそうなる意味で使う。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "特に意識しなくても、自然にそうなるさま。"
+    },
+    {
+      "ja": "半導体の工場が一つ動き出すと、その周りには部品や薬品を扱う企業、物流の拠点などが集まってくる。熊本県では、台湾の半導体大手TSMCが中心となって建てた工場をきっかけに、周辺の地価や人手不足が大きな話題になった。工場の誘致は雇用を生むものの、人や車が一気に増えれば、道路の渋滞や住宅不足、地下水の確保といった課題は、わざわざ探さなくても自ずと浮かび上がる。自治体には、企業を呼び込むだけでなく、暮らしの側の備えも求められている。",
+      "form": "自ずと",
+      "en": "When a single semiconductor plant starts running, companies handling parts and chemicals, logistics hubs and the like gather around it. In Kumamoto Prefecture, a plant built mainly by the Taiwanese chip giant TSMC set off widespread discussion of nearby land prices and labor shortages. Attracting a plant creates jobs, but once people and cars increase all at once, issues such as traffic congestion, housing shortages and securing groundwater come to the surface naturally, without anyone having to go looking for them. Local governments are being asked not only to bring in companies but also to prepare on the side of everyday life.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「わざわざ〜しなくても自ずと〜」のように、意図しなくても結果が生じる流れを示す。報道では「課題が自ずと浮かび上がる」の形が多い。",
+      "grammar": ["n2-mono-no"]
+    },
+    {
+      "ja": "歴史について文章を書くとき、年号や出来事を順に並べるだけでは、読み手の頭にはなかなか残りません。そこでおすすめしたいのが、一人の人物が迫られた選択に焦点を当てる書き方です。その人が何を知っていて、何を知らなかったのかを描けば、時代の空気は自ずと伝わります。説明を重ねるより、場面を一つ見せることで、読み手は自分で考え始めるのです。書き終えたら、登場人物の迷いが読み取れるかどうか、読み返してみてください。",
+      "form": "自ずと",
+      "en": "When you write about history, simply listing dates and events in order rarely leaves much in the reader's mind. What I'd recommend instead is a way of writing that focuses on a choice one person was forced to make. If you depict what that person knew and what they did not know, the atmosphere of the era comes across naturally. Rather than piling up explanations, by showing a single scene you get readers to start thinking for themselves. Once you've finished writing, read it back and check whether the character's hesitation comes through.",
+      "original": true,
+      "register": "語",
+      "topic": "history",
+      "tipJa": "「自ずと伝わる」は文章論の定番表現。「自然に」より改まった響きで、書き手の工夫が不要に見える効果がある。",
+      "grammar": ["n3-koto-de"]
+    }
+  ],
+  "13": [
+    {
+      "ja": "アイデアが出ないとき、机にかじりついて考え続けるのは、かえって遠回りになることがあるそうです。心理学では、問題から一度離れている間に頭の中で整理が進む現象を「あたため」と呼んだりします。散歩の途中やシャワーを浴びているときに、ふと答えがひらめくのはそのためだと考えられています。ただし、その前に十分悩み抜いておくことが条件です。とことん考え抜いた上で休む、この順番が大事なんですね。",
+      "form": "ひらめく",
+      "en": "When ideas won't come, staying glued to your desk and thinking on and on can apparently end up being the long way round. In psychology, the phenomenon in which things get sorted out in your head while you are away from a problem is sometimes called incubation. That is thought to be why an answer suddenly comes to you in the middle of a walk or while you are in the shower. The condition, though, is that you have wrestled with the problem thoroughly beforehand. Rest only after thinking it through completely: this order is what matters.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「答え・アイデアがひらめく」と、思いつく内容を主語にするのが基本。人を主語にすると「名案をひらめく」。",
+      "grammar": ["n2-ue-de"]
+    },
+    {
+      "ja": "蒸し暑い夏の夜、山の向こうの遠い空に稲妻がひらめいた。少し遅れて雷の音が届くころには、その光はもうどこにも見えない。古い仏教の教えには、この世のものごとを夢や稲妻にたとえる言葉がある。それは、消えていくものをただ悲しむのではなく、その一瞬の明るさを大切に受け止めなさい、ということなのだろう。人の一生もやはり、長い夜の中でたった一度だけ光る、あの稲妻のようなものなのかもしれない。",
+      "form": "ひらめいた",
+      "en": "On a sultry summer night, lightning flashed in the far sky beyond the mountains. By the time the sound of thunder arrived a little later, the light was nowhere to be seen. Among old Buddhist teachings there are words that liken the things of this world to dreams and lightning. That is probably telling us not simply to grieve over what fades away, but to take that moment's brightness to heart and treasure it. A human life, too, may after all be something like that lightning, shining just once in a long night.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "光の意味では「稲妻・刃・旗がひらめく」。考えの意味の「ひらめく」も、この一瞬の光から来ている。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "光が一瞬鋭く光る。稲妻などがきらめく。"
+    },
+    {
+      "ja": "AIに相談しながら企画を考えてると、急にいいアイデアがひらめくことってあるじゃないですか。あれって、AIが答えをくれたっていうより、質問を言葉にした時点で、頭の中が整理されてるんだと思うんですよね。だから、相手は別に人間でもいいし、ノートでもいいっていう。逆に、AIの答えをそのまま使うだけだと、自分の考えはあんまり育たない気がします。まあ、結局は使い方次第なんじゃないですかね。",
+      "form": "ひらめく",
+      "en": "When you're working out a project while bouncing ideas off an AI, sometimes a good idea suddenly comes to you, right? I think that's less because the AI gave you the answer and more because your head gets sorted out the moment you put your question into words. So the other party could just as well be a person, or even a notebook. On the other hand, if you just use the AI's answer as it is, I feel your own thinking doesn't really grow. Well, in the end it comes down to how you use it, doesn't it?",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "会話では「〜がひらめくことってある」「ひらめいた！」の形でよく使う。名詞形は「ひらめき」。",
+      "grammar": []
+    }
+  ],
+  "16": [
+    {
+      "ja": "今回のテーマは、AIに体は必要なのか、という問いです。いまの言語モデルは大量の文章から学びますが、コップの重さや水の冷たさを実際に感じたことはありません。そこで研究者の間では、知能には身体性が欠かせないのではないか、という議論が続いています。ロボットに手や目を持たせて、試行錯誤させる研究が増えているのはそのためです。言葉の意味は、体を通した経験に支えられているのかもしれませんね。",
+      "form": "身体性",
+      "en": "This time's theme is the question of whether AI needs a body. Today's language models learn from huge amounts of text, but they have never actually felt the weight of a cup or the coldness of water. So among researchers there is an ongoing debate over whether embodiment might be indispensable to intelligence. That is why research that gives robots hands and eyes and lets them learn by trial and error is on the rise. The meaning of words may well be supported by experience gained through the body.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「身体性が欠かせない」「身体性を持つ」など、認知科学やロボット工学の議論で使う専門寄りの語。",
+      "grammar": []
+    },
+    {
+      "ja": "仏教の修行では、心を整えようとする前に、まず姿勢と呼吸を整える。頭の中であれこれ考えるだけでは、心はなかなか静まらないからである。背筋を伸ばし、吐く息を長くするうちに、散らかっていた思いが少しずつ落ち着いていく。心の働きを体から切り離さないこの身体性こそが、坐禅という行の土台なのだろう。悟りもまた、本を読んで理解するものではなく、体ごと味わうものなのかもしれない。",
+      "form": "身体性",
+      "en": "In Buddhist practice, before trying to settle the mind, one first settles posture and breathing. That is because the mind rarely grows still just by turning things over in one's head. As you straighten your back and lengthen each out-breath, scattered thoughts gradually calm down. It is probably this embodiment, which does not separate the workings of the mind from the body, that forms the foundation of the practice of zazen. Awakening, too, may be something to be tasted with the whole body rather than understood by reading books.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「〜の身体性」「身体性こそが」など、抽象的な論の中で心と体の結びつきを指して使う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"]
+    }
+  ],
+  "222": [
+    {
+      "ja": "今回は、鴨長明の『方丈記』を取り上げます。冒頭の「ゆく河の流れは絶えずして、しかももとの水にあらず」という一節は、教科書で読んだ人も多いと思います。長明は、大火や地震、飢饉が続いた時代を生き、立派な屋敷が一夜で焼けてしまう様子を目の当たりにしました。そうした体験から、世の中のすべては移り変わり、同じ姿でとどまるものはないという無常の考え方を、川の流れにたとえて描いたわけです。晩年の彼が都を離れ、山あいの小さな住まいで静かに暮らしたのも、そう考えると納得がいきますね。",
+      "form": "無常",
+      "en": "This time I'm taking up Kamo no Chōmei's Hōjōki. Many of you will have read its opening line, \"The flowing river never stops, and yet its water is never the same,\" in a school textbook. Chōmei lived through an age of great fires, earthquakes and famine, and saw with his own eyes fine mansions burn down in a single night. From those experiences, he described the idea of impermanence, that everything in the world changes and nothing stays in the same form, by likening it to the flow of a river. Seen that way, it makes sense that in his later years he left the capital and lived quietly in a small dwelling in the hills.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「無常を感じる」「世の無常」のように、すべては移り変わるという仏教の考え方を指す。",
+      "grammar": [],
+      "sense": "この世のものはすべて移り変わり、とどまることがないこと。"
+    },
+    {
+      "ja": "いや、AIの世界って、去年の常識が今年にはもう陳腐化してたりするじゃないですか。半年前にがんばって覚えたツールの使い方が、定着する前に通用しなくなってたりして。そういうのを見てると、無常ってたぶんこういうことなのかなって、ちょっと思うんですよね。だから、新しく出てくるものを全部追いかけるのは、まあ無理なんですよ。状況は常に流動的だって最初から割り切っておいたほうが、気が楽になるんじゃないかなと。",
+      "form": "無常",
+      "en": "I mean, in the world of AI, last year's common sense has already gone stale by this year, right? The way you worked hard to learn a tool six months ago can stop working before it even becomes second nature. Watching that kind of thing, I sort of think, this is probably what impermanence means. So chasing everything new that comes out is, well, impossible. I think you'll feel more at ease if you accept from the start that the situation is always in flux.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "くだけた会話では「〜って無常だなあ」と、軽い感慨としても使う。",
+      "grammar": []
+    }
+  ],
+  "199": [
+    {
+      "ja": "本日は、法句経という古いお経から、怠けについての章を要約していきます。この章のキーワードは「放逸」、つまり、したい放題に流されて自分を律しない生き方のことで、これが修行の大きな敵とされているんです。面白いのは、悪いことをする前の段階として、だらけること自体を問題にしている点なんですね。ブッダが最期に弟子たちへ残したとされる言葉も、怠らずに励みなさいという内容でした。言ってみれば仏教は、日々の気の緩みから人生を見直す教えなんです。",
+      "form": "放逸",
+      "en": "Today I'll summarize the chapter on laziness from an old scripture called the Dhammapada. The key word of this chapter is 'heedlessness', that is, a way of life that gets carried along by doing whatever one likes without disciplining oneself, and this is treated as a great enemy of practice. What's interesting is that it treats slacking itself as a problem, as a stage before doing anything bad. The words the Buddha is said to have left his disciples at the very end were also about striving without slacking. You could say Buddhism is a teaching that reexamines life starting from the small lapses of each day.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "仏典では「放逸」をいましめ、「不放逸（怠らないこと）」を説く。日常語ではかなり硬い。",
+      "grammar": []
+    },
+    {
+      "ja": "欲しいものがすぐに手に入る時代は、ある意味で、放逸に生きることをずいぶんたやすくした。指先ひとつで食事も娯楽も家まで届き、我慢する場面はめっきり減っている。しかし、満たされるほど心が落ち着くかといえば、そうとは限らない。むしろ、ほどよい不便さの中でこそ、人は自分を整える力を育ててきたのではないか。便利さを手放す必要はないものの、それに使われない工夫は要るだろう。",
+      "form": "放逸",
+      "en": "An age in which we can get what we want right away has, in a sense, made it much easier to live a self-indulgent life. Meals and entertainment arrive at our door at the touch of a finger, and the moments when we must hold back have sharply decreased. But it is not necessarily true that the more satisfied we are, the calmer the mind becomes. Rather, wasn't it within a moderate inconvenience that people have grown the power to put themselves in order? There is no need to give up convenience, but some effort not to be used by it is surely required.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「放逸に流れる」「放逸な暮らし」のように、書き言葉で自分をいましめる文脈に多い。",
+      "grammar": ["n2-mono-no"]
+    },
+    {
+      "ja": "ぶっちゃけ、生成AIが出てきてから、自分の頭で考えなくて済む場面ってめちゃくちゃ増えたじゃないですか。レポートも要約もメールの文面も、頼めば一瞬で返ってくるし、楽なのは間違いないんですよ。でも、楽だからって全部任せてると、仏教でいう放逸な状態にじわじわ近づいてる気がするんですよね。まあ、使うなって話ではないです。どこまで任せるかを自分で決めておくのが大事なのかなと。",
+      "form": "放逸",
+      "en": "Frankly, since generative AI came along, the situations where you don't have to think with your own head have increased like crazy, right? Reports, summaries, the wording of emails, you ask and it comes back in an instant, and it's definitely easy. But if you hand everything over just because it's easy, I feel like you're slowly drifting toward what Buddhism calls a self-indulgent state. Well, I'm not saying don't use it. I think what matters is deciding for yourself how much you'll hand over.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "会話ではほぼ使わない硬い語なので、「仏教でいう」と前置きして持ち出すと自然。",
+      "grammar": []
+    }
+  ],
+  "17": [
+    {
+      "ja": "今回は、インド哲学と仏教の違いを、魂というテーマで整理してみます。古代インドの多くの思想では、たとえ体が滅びても、本当の自己であるアートマンは消えずに残ると考えられていました。いわゆる霊魂不滅の立場ですね。ところが仏教は、変わらない自己という考え方そのものに疑問を投げかけたんです。同じインドの土壌から生まれたにもかかわらず、ここで両者ははっきりと道を分けることになるわけです。",
+      "form": "霊魂不滅",
+      "en": "This time, let's sort out the difference between Indian philosophy and Buddhism through the theme of the soul. In many schools of thought in ancient India, it was believed that even if the body perishes, the true self, the atman, remains without vanishing. This is the position known as the immortality of the soul. Buddhism, however, cast doubt on the very idea of an unchanging self. Although both grew from the same Indian soil, this is where the two clearly part ways.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「霊魂不滅説」「霊魂不滅を信じる」の形で、宗教や哲学の議論に使う硬い語。",
+      "grammar": ["n3-koto-ni-naru"]
+    },
+    {
+      "ja": "死んだらすべてが終わるのか、それとも目に見えない何かが残るのか。この問いは、文字が生まれるよりずっと前から、人の心の奥にあったに違いない。古代エジプトで手間をかけて遺体を保存したのも、霊魂不滅への信仰と深く結びついていたとされる。証明しようのない考えが、これほど長く人を支えてきたのはなぜだろうか。それは答えそのものよりも、問い続けることに意味があったからかもしれない。",
+      "form": "霊魂不滅",
+      "en": "Does everything end when we die, or does something invisible remain? This question must have been deep in people's hearts long before writing was born. The painstaking preservation of bodies in ancient Egypt is also said to have been deeply tied to faith in the immortality of the soul. Why has an idea that there is no way to prove sustained people for so long? Perhaps it is because there was meaning in continuing to ask, more than in the answer itself.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "信仰や思想の名前として使い、「霊魂不滅への信仰」のように「への」で受けることも多い。",
+      "grammar": []
+    },
+    {
+      "ja": "最近、故人の口癖とか考え方をAIに学習させて、その人との会話を再現するサービスの話をよく聞くじゃないですか。あれって、ある意味ではデジタル版の霊魂不滅みたいなものなのかなって思うんですよ。ただ、それが本当に本人なのかっていうと、かなり怪しいですよね。似たことを言うだけのコピーにすぎないのに、本人と話してるって錯覚しちゃいそうで。まあ、結局は遺族の気持ちの問題なのかもしれないですけど。",
+      "form": "霊魂不滅",
+      "en": "Lately you often hear about services that train an AI on a deceased person's pet phrases and way of thinking to recreate conversations with them, right? I think that's, in a sense, something like a digital version of the immortality of the soul. But whether it's really that person is pretty doubtful, isn't it? It's nothing more than a copy that just says similar things, yet you'd probably fall into the illusion that you're talking to them. Well, in the end maybe it's a matter of how the bereaved family feels.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "くだけた会話では「デジタル版の霊魂不滅」のように、比喩として軽く借りることもある。",
+      "grammar": ["n2-ni-suginai"]
+    }
+  ],
+  "117": [
+    {
+      "ja": "お経の現代語訳を読むと、たとえ話の多さにきっと驚かされると思います。蓮が泥の中から清らかな花を咲かせるごとく、人も迷いの中から目覚めることができる、といった具合ですね。こうした比喩は、抽象的な教えを日常の景色に結びつけるための工夫なんです。難しい理屈を覚えるより、一つのイメージを持ち帰るほうが記憶に残りやすい。今日の要約でも、そのイメージを大切にしていきます。",
+      "form": "ごとく",
+      "en": "When you read modern translations of the sutras, I think you'll be surprised by how many parables there are. It goes like this: just as the lotus brings forth a pure flower from the mud, people too can awaken from within their delusions. Metaphors like these are a device for tying abstract teachings to everyday scenes. Taking home a single image sticks in memory more easily than memorizing difficult logic. In today's summary too, I'll make a point of valuing those images.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜のごとく」「〜するがごとく」の形をとる書き言葉。話し言葉なら「〜のように」。",
+      "grammar": []
+    },
+    {
+      "ja": "生成AIの普及を受けて、データセンター向けの計算用チップの需要が急速に拡大している。各社は新しい工場の建設を相次いで発表し、投資額も大きく増えている。一方で、需要が堰を切ったごとく膨らむ局面ほど、その後の反動への警戒も欠かせない。この分野の市場はこれまでも、需要の急増と落ち込みを何度も繰り返してきた。専門家の間では、今回の波がどこまで続くかについて見方が分かれている。",
+      "form": "ごとく",
+      "en": "With the spread of generative AI, demand for computing chips for data centers is expanding rapidly. Companies have announced the construction of new factories one after another, and the amount of investment is also rising sharply. On the other hand, the more demand swells as if a dam had burst, the more caution about the backlash that follows is indispensable. The market in this field has repeatedly gone through surges and slumps in demand in the past as well. Among experts, views are divided on how long the current wave will last.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道や論評の硬い文体で「堰を切ったごとく」「前述のごとく」などと使う。",
+      "grammar": []
+    },
+    {
+      "ja": "話がうまい人というと、立て板に水のごとく、よどみなく話す人を思い浮かべる方が多いでしょう。けれど、実際に聞き手の心に残るのは、むしろ間の取り方が上手な人だったりします。一文を短めに切り、相手がうなずいたり考えたりする時間をつくる。それだけで、同じ内容でも伝わり方は驚くほど変わります。話す速さではなく、相手の理解のペースに合わせて話すことを意識してみてください。",
+      "form": "ごとく",
+      "en": "When people think of a good speaker, many probably picture someone who talks without a hitch, like water poured down a propped-up board. But the ones who actually stay in listeners' hearts are often, if anything, people who are good at pausing. Cut each sentence on the short side and make time for the other person to nod or think. That alone changes how the same content comes across to a surprising degree. Try to be conscious of speaking not at a fast pace, but in step with the pace of the other person's understanding.",
+      "original": true,
+      "register": "語",
+      "topic": "mind",
+      "tipJa": "「立て板に水のごとく」は慣用句。よどみなく話すさまを表す。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "27": [
+    {
+      "ja": "ブッダの生涯をざっくりまとめると、最初の大きな転機は、何不自由ない暮らしを捨てた出家です。王子として生まれた彼は、国を継いでほしいという父の期待に背き、城を出ていきました。ここ、現代の感覚だとただの家出に見えるかもしれません。でも本人にとっては、老いや病、死という苦しみの答えを探すための、避けられない選択だったわけです。そう考えると、この決断の重さがぐっと伝わってくると思います。",
+      "form": "背き",
+      "en": "To summarize the Buddha's life roughly, the first big turning point is his renunciation, in which he gave up a life that lacked nothing. Born a prince, he went against his father's hope that he would inherit the kingdom, and left the palace. By modern standards, this might look like simply running away from home. But for him, it was an unavoidable choice made in order to search for an answer to the suffering of old age, sickness and death. Thinking of it that way, I think the weight of this decision really comes across.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「期待に背く」「命令に背く」のように「〜に背く」の形をとる。",
+      "grammar": []
+    },
+    {
+      "ja": "条約は、国と国との約束を文書にしたものである。しかし国内の法律と違い、国際社会には違反を強制的に取り締まる警察のような存在がない。そのため、ある国が合意に背く行動を取っても、他国が取れる手段は経済制裁や外交上の抗議などに限られる。こうした仕組みの弱さは、近代以降の国際関係において繰り返し議論されてきた。条約の実効性は、最終的には各国の信頼関係に支えられていると言える。",
+      "form": "背く",
+      "en": "A treaty is a promise between nations put into writing. But unlike domestic law, international society has no police-like body that forcibly cracks down on violations. Therefore, even if a country takes action that goes against an agreement, the means other countries can take are limited to things like economic sanctions and diplomatic protests. This weakness of the system has been debated repeatedly in international relations since the modern era. It can be said that the effectiveness of treaties is, in the end, supported by trust among nations.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「合意に背く」「国際法に背く」など、約束や規範を破る意味で使う。",
+      "grammar": []
+    },
+    {
+      "ja": "勉強の計画を立てても、なかなかその通りに進まないことってありますよね。実は、自分で決めたルールに背いてしまうのは、意志が弱いからとは限りません。そもそも計画が細かすぎて、少しのずれで全体が崩れる作りになっている場合が多いんです。多少遅れても立て直せるように、最初から週に一度は予備の時間を組み込んでおきましょう。完璧な計画よりも、崩れても戻れる計画を目指すのがコツです。",
+      "form": "背いて",
+      "en": "Even when you make a study plan, it often doesn't go quite as planned, right? Actually, going against the rules you set for yourself isn't necessarily because your willpower is weak. In many cases, the plan is too detailed in the first place and built so that a small slip makes the whole thing collapse. Build in spare time at least once a week from the start so that you can recover even if you fall a little behind. The trick is to aim not for a perfect plan, but for one you can return to even when it breaks down.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "自分で決めたことに逆らう場合にも「ルールに背く」「誓いに背く」と言える。",
+      "grammar": ["n3-you-ni"]
+    }
+  ],
+  "87": [
+    {
+      "ja": "半導体の工場でいちばん大事な数字は何かというと、実は歩留まりなんです。一枚のウエハーから何百個ものチップを切り出しますが、そのすべてが正しく動くわけではありません。目に見えないほど小さなほこりが一つ付いただけで、そのチップは不良品になってしまいます。同じ設備で同じ枚数を作っても、良品の割合が九十パーセントの工場と五十パーセントの工場とでは、利益がまるで違ってきます。だからこそ、各社はクリーンルームの管理に莫大なお金をかけているんですね。",
+      "form": "歩留まり",
+      "en": "If you ask what the single most important number in a semiconductor plant is, it's actually the yield. Hundreds of chips are cut from a single wafer, but that doesn't mean every one of them works properly. A single speck of dust too small to see is enough to turn a chip into a reject. Even with the same equipment making the same number of wafers, a plant where 90 percent of the chips are good and one where 50 percent are make completely different profits. That's exactly why companies spend enormous sums keeping their clean rooms in order.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「歩留まりが高い／低い」「歩留まりを上げる」の形でよく使う。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "製造した品物のうち、良品として使えるものの割合。"
+    },
+    {
+      "ja": "先端半導体をめぐっては、各国が巨額の補助金を投じて国内への工場誘致に力を入れている。ただ、建物や装置はそろえられるものの、大量生産を軌道に乗せるのは容易ではない。新しい工場では当初、不良品が多く出て歩留まりが低い状態が続き、採算が合うまでに数年を要することも珍しくないという。専門家の間では、熟練した技術者をどれだけ確保できるかが成否を分けるとの見方が強い。工場の完成を伝える発表だけで、計画がうまくいったと判断するのは早計だと言えそうだ。",
+      "form": "歩留まり",
+      "en": "Countries are pouring in huge subsidies in a push to attract advanced chip plants to their own soil. Yet although buildings and equipment can be put in place, getting mass production on track is no easy matter. At a new plant, many defective chips come off the line at first and the yield stays low, and it is said to be not unusual for it to take several years before the plant turns a profit. Among experts, the prevailing view is that success or failure hinges on how many skilled engineers can be secured. It would seem premature, then, to judge that such a plan has succeeded from announcements that a plant has been completed.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「歩留まりの改善」「歩留まりが安定する」などの言い方が多い。",
+      "grammar": ["n2-mono-no"],
+      "sense": "製造した品物のうち、良品として使えるものの割合。"
+    },
+    {
+      "ja": "参考書を三冊読んだのに、試験で使えた知識はほんの少しだった、という経験はありませんか。読んだ量に対して、実際に身についた量の割合を考えてみると、案外低いものです。学習の歩留まりを上げたいなら、読む時間を削ってでも、思い出す練習に時間を回したほうが効果的だとされています。インプットを増やすのではなく、記憶から取り出す回数を増やすことが、忘れにくくする近道なのです。",
+      "form": "歩留まり",
+      "en": "Have you ever read three study guides only to find that very little of that knowledge was of use in the exam? If you look at how much actually stuck compared with how much you read, the proportion is surprisingly low. If you want to raise the yield of your studying, it is said to work better to spend time practising recall, even if that means cutting reading time. Rather than increasing input, increasing the number of times you pull things out of memory is the shortcut to forgetting less.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "本来は製造の用語だが、「勉強の歩留まり」のように比喩でも使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "費やした量のうち、実際に役立つ成果として残る割合。"
+    }
+  ],
+  "130": [
+    {
+      "ja": "今日は、アイデアを形にするときの話をしましょう。生成AIを使ったサービスは毎週のように発表されていますが、思いついた機能をそのままアプリに実装しても、使われるとは限りません。大事なのは、誰のどんな困りごとを解決するのかを先に決めることです。実際、うまくいっているサービスほど機能を絞り込み、本当に必要なものだけを残しています。機能を足すのではなく削って考える、これがポイントなんですね。",
+      "form": "実装",
+      "en": "Today let's talk about turning an idea into something real. New services built on generative AI are announced almost every week, but just building a feature you thought of straight into an app doesn't guarantee anyone will use it. What matters is deciding first whose problem, and what kind of problem, you're solving. In fact, the more successful a service is, the more it narrows down its features and keeps only what is truly needed. Thinking by cutting features rather than adding them is the key point.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "ソフトでは「機能を実装する」、ハードでは「部品を基板に実装する」と使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "ソフトウェアなどに機能を組み込み、実際に動くようにすること。"
+    },
+    {
+      "ja": "半導体の処理能力の向上は、これまで主に回路の微細化によって支えられてきた。しかし微細化のペースが鈍るにつれて、複数のチップを一つの基板の上にまとめて実装する技術に注目が集まっている。チップどうしをどう並べ、発生する熱をどう逃がすかが、製品全体の出来を左右するためだ。後工程と呼ばれるこの分野は、長く比較的地味な存在と見られてきた。ここにきて各国の政府や企業は、関連する投資を相次いで拡大している。",
+      "form": "実装",
+      "en": "Gains in semiconductor performance have so far been sustained mainly by making circuits ever smaller. But as the pace of miniaturisation slows, attention is turning to technology that mounts several chips together on a single substrate. That is because how the chips are arranged and how the heat they generate is drawn away decide the quality of the product as a whole. This field, known as back-end processing, had long been seen as a relatively unglamorous one. Now governments and companies in many countries are expanding related investment one after another.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "半導体では、チップを基板に載せる「後工程」の文脈で使われる。",
+      "grammar": ["n3-ni-tsurete"],
+      "sense": "部品を基板などに取り付けて組み込むこと。"
+    },
+    {
+      "ja": "仏教の本はけっこう読んだんですけど、怒りを抑えるとか、執着を手放すとか、理屈としてはわかるじゃないですか。でも、それを自分の生活に実装できてるかっていうと、ぶっちゃけかなりあやしいんですよね。知識として蓄えておくだけじゃ意味がなくて、日々の些細な場面で実践を重ねることで、ようやく腑に落ちるんだと思います。満員電車で足を踏まれたとき、咄嗟にどう反応するか、とか。結局そういう瞬間に、本物かどうかが試されてる気がします。",
+      "form": "実装",
+      "en": "I've read quite a few books on Buddhism, and things like keeping your anger in check or letting go of attachment, you understand them in principle, right? But whether I've actually managed to implement that in my own life, to be blunt, that's pretty doubtful. I suspect just storing it up as knowledge is pointless, and it only truly clicks once you build up practice in the trivial moments of everyday life. Like how you react on the spot when someone steps on your foot on a packed train. In the end, I feel it's in moments like that that you're tested on whether it's real.",
+      "original": true,
+      "register": "話",
+      "topic": "india",
+      "tipJa": "会話では「生活に実装する」のように、比喩的に「実際に取り入れる」意味でも使う。",
+      "grammar": ["n3-koto-de"],
+      "sense": "考えや方法を、実際の生活や仕組みに取り入れること。"
+    }
+  ],
+  "178": [
+    {
+      "ja": "最近のAIは、文章を書いたり絵を描いたりと、かなり高度な作業までこなすようになりました。でも、ここで一度立ち止まって押さえておきたいのは、AIが中身を理解しているかどうかは別の問題だということです。AIは大量のデータをもとに、次に来そうな言葉をとても上手に予測しています。人間の理解とどこが同じでどこが違うのか、それを考えることが、これからの時代の教養になっていくはずです。",
+      "form": "高度",
+      "en": "AI these days has come to handle some fairly advanced tasks, writing text and drawing pictures. But the thing I want you to stop and grasp here is that whether AI understands the content is a separate question. Based on vast amounts of data, AI is very good at predicting the word likely to come next. Thinking about where it is the same as human understanding and where it differs is surely going to become part of a well-rounded education in the years ahead.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「高度な技術」「高度な判断」のように、な形容詞的に使うことが多い。",
+      "grammar": ["n4-you-ni-naru", "n4-teiku"],
+      "sense": "程度が高く、進んでいること。"
+    },
+    {
+      "ja": "第二次世界大戦の後、偵察機は相手国の基地や港を上空から撮影し、軍事上の情報を集める役目を担った。地上から撃ち落とされないよう、機体には相手のミサイルや戦闘機が届かない高度を飛び続けることが求められた。ところが1960年、ソ連の上空を飛んでいた米国の偵察機が地対空ミサイルで撃墜され、操縦士が捕らえられる事件が起きた。高く飛ぶだけでは身を守れないことが明らかになったのである。その後、相手国の上空から情報を集める任務は、次第に人工衛星が担うようになった。",
+      "form": "高度",
+      "en": "After the Second World War, reconnaissance planes took on the job of photographing the other country's bases and ports from the air to gather military intelligence. To avoid being shot down from the ground, the aircraft had to keep flying at an altitude beyond the reach of the other side's missiles and fighters. In 1960, however, an American reconnaissance plane flying over the Soviet Union was brought down by a surface-to-air missile, and its pilot was captured. It had become clear that flying high was not enough to stay safe. After that, the task of gathering information from above the other country gradually passed to satellites.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "高さの意味では「高度を飛ぶ」「高度を上げる／下げる」のように使う。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "海面や地表から測った高さ。"
+    },
+    {
+      "ja": "難しい教えを深く理解する力は、たしかに立派なものだが、高度な理屈を語れることと、目の前の怒りを手放せることとは、まったく別の話である。人は難しい言葉を覚えると、それだけで一段高いところに立ったような気になりやすい。仏教が日々の実践を大切にしてきたのは、頭で理解するだけでは人は変わらないと知っていたからだろう。知ることは道の入り口にすぎない。歩くのはあくまで自分の足なのである。",
+      "form": "高度",
+      "en": "The ability to understand difficult teachings deeply is certainly admirable, yet being able to discuss advanced reasoning and being able to let go of the anger in front of you are entirely different matters. Once people learn difficult words, they easily feel as if that alone has lifted them a step higher. Buddhism has probably valued daily practice because it knew that people do not change through intellectual understanding alone. Knowing is no more than the entrance to the path. The walking is done, after all, with your own feet.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「高度な理屈」のように、ほめるだけでなく距離を置く言い方にもなる。",
+      "grammar": ["n2-ni-suginai"],
+      "sense": "程度が高く、進んでいること。"
+    }
+  ],
+  "33": [
+    {
+      "ja": "機械学習の考え方を一言でまとめるなら、帰納的に学ぶ仕組みだと言えます。ルールを人間が一つずつ教えるのではなく、大量の例を見せて、そこから共通するパターンを見つけさせるわけです。猫の写真を何万枚も見せれば、AIは猫らしさの特徴を自分でつかんでいきます。ただし、例に偏りがあれば、引き出される結論もまた偏ってしまいます。データの質が大事だと言われるのは、そのためなんですね。",
+      "form": "帰納的",
+      "en": "If I had to sum up the idea behind machine learning in a word, it's a system that learns inductively. Instead of humans teaching it rules one by one, you show it a huge number of examples and have it find the patterns they share. Show it tens of thousands of cat photos and the AI picks up for itself the features that make a cat look like a cat. But if the examples are skewed, the conclusions drawn from them will be skewed too. That's why people say the quality of the data matters.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "対になる語は「演繹的」。「帰納的に考える／導く」の形でよく使う。",
+      "grammar": ["n3-dewa-naku", "n4-teiku"],
+      "sense": "個々の事例から、一般的な法則を導き出すさま。"
+    },
+    {
+      "ja": "インドの論理学では、昔から「煙のあるところには火がある」という例がよく用いられてきた。かまどでも山火事でも、煙が立てば必ずそこに火があった。そうした経験を何度も重ねることで、人はそこから一つの法則を導き出す。だが、帰納的に得た結論は、どれほど確からしく見えても、次の一例によって覆されうる。確かさを求める心と、それを許さない世界とのあいだに、哲学は生まれるのかもしれない。",
+      "form": "帰納的",
+      "en": "Indian logic has long made frequent use of the example that where there is smoke, there is fire. Whether in a kitchen hearth or a forest fire, wherever smoke rose there was always fire. By accumulating such experiences again and again, people derive from them a general rule. Yet a conclusion reached inductively, however certain it may appear, can be overturned by the very next case. Perhaps philosophy is born in the gap between a mind that seeks certainty and a world that will not grant it.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "論理学や哲学の文章で使う硬めの語。話し言葉では「例から考えると」と言い換えやすい。",
+      "grammar": ["n3-koto-de"],
+      "sense": "個々の事例から、一般的な法則を導き出すさま。"
+    }
+  ],
+  "200": [
+    {
+      "ja": "半導体の業界では、トップを走る企業がずっと安泰だとは限りません。技術の世代が一つ変わるたびに、後ろの企業が一気に差を詰めるチャンスが生まれるからです。実際、かつての首位企業が投資の判断を一度誤っただけで、後発組に追い上げられ、立場を失った例もあります。逆に言えば、先頭の企業ほど、常に次の一手を考え続けざるを得ないわけです。この緊張感こそが、業界全体の進歩を支えてきたと言えるでしょう。",
+      "form": "追い上げられ",
+      "en": "In the semiconductor industry, the company out in front is by no means guaranteed to stay safe forever. That's because each time the technology moves on a generation, a chance arises for those behind to close the gap in one go. In fact, there have been cases where a former leader misjudged a single investment decision, was closed in on by latecomers, and lost its position. Put the other way round, the company in front has no choice but to keep thinking about its next move. You could say this very tension is what has driven the progress of the whole industry.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "受け身「追い上げられる」は、先頭側が差を詰められて苦しい立場を表す。",
+      "grammar": ["n2-zaru-o-enai"],
+      "sense": "先を行く者との差を縮めて、すぐ後ろまで迫る。"
+    },
+    {
+      "ja": "十九世紀の後半、産業革命の先頭を走っていたイギリスを、ドイツとアメリカが急速に追い上げた。両国は鉄鋼や化学、電気といった新しい分野に力を注ぎ、生産を大きく伸ばした。十九世紀の終わりまでには、工業生産の規模でアメリカがイギリスを上回っていた。先に工業化した国ほど古い設備を抱え、新しい技術への切り替えが遅れたとの指摘もある。後発の国が一気に差を詰める構図は、その後も形を変えて繰り返されている。",
+      "form": "追い上げた",
+      "en": "In the second half of the nineteenth century, Germany and the United States rapidly closed in on Britain, which had led the Industrial Revolution. Both countries poured effort into new fields such as steel, chemicals and electricity, and greatly expanded their output. By the end of the nineteenth century, the United States had overtaken Britain in the scale of its industrial production. Some point out that the countries that industrialised first were saddled with older equipment and were slower to switch to new technologies. The pattern of latecomers rapidly closing the gap has repeated itself in different forms ever since.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では、経済や選挙、スポーツで差を詰める動きを表すのによく使う。",
+      "grammar": [],
+      "sense": "先を行く者との差を縮めて、すぐ後ろまで迫る。"
+    },
+    {
+      "ja": "模試の判定が悪くても、そこで諦める必要はまったくありません。受験生の成績は、秋以降に大きく伸びることも珍しくないからです。特に、基礎をしっかり固めてから応用問題に移った人は、終盤になって一気に追い上げてくることがよくあります。焦って難しい問題集に手を出すことなく、まずは間違えた問題を解き直すところから始めましょう。最後に笑うのは、地道な復習を積み重ねた人です。",
+      "form": "追い上げて",
+      "en": "Even if your mock exam rating is poor, there is absolutely no need to give up at that point. That's because it's not unusual for students' results to jump a great deal from autumn onward. In particular, people who firmly shore up the basics before moving on to applied problems often surge from behind in the final stretch. Without rushing to grab difficult problem books, start by reworking the problems you got wrong. The ones who laugh last are those who have steadily built up their review.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「追い上げてくる」「終盤に追い上げる」のように、後ろから迫る動きに使う。",
+      "grammar": ["n2-koto-naku"],
+      "sense": "先を行く者との差を縮めて、すぐ後ろまで迫る。"
+    }
+  ],
+  "71": [
+    {
+      "ja": "今回は、国際秩序の変遷を、覇権の交代という観点から整理します。ある時代に経済力と軍事力で他国を圧倒する国家が現れると、その国の通貨や制度が事実上の標準として定着します。十九世紀の英国、第二次世界大戦後の米国が典型的な例です。ただし、その地位が永続するわけではないという点が重要で、戦費の負担や新興国の台頭によって、優位は次第に失われていきます。本日扱う書籍は、こうした交代が生じる条件を、豊富な史料から読み解いています。",
+      "form": "覇権",
+      "en": "This time I'll organize the shifts in the international order from the angle of changes in hegemony. When, in a given era, a state appears that overwhelms others in economic and military power, its currency and institutions take root as the de facto standard. Nineteenth-century Britain and America after the Second World War are typical examples. The important point, however, is that this position does not last forever: through the cost of wars and the rise of emerging powers, its advantage is gradually lost. The book we're looking at today reads, from a wealth of historical sources, the conditions under which such changes occur.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「覇権を握る」「覇権争い」の形でよく使う。",
+      "grammar": ["n4-teiku", "n3-wake-dewa-nai"],
+      "sense": "ほかを抑えて頂点に立つ者が持つ、支配的な力。"
+    },
+    {
+      "ja": "生成AIの普及を背景に、先端半導体をめぐる各国の動きが活発になっている。AI向けチップの開発では米国企業が強みを持つ一方、最先端の製造は台湾の企業に大きく依存しているのが現状だ。こうした中、日本や欧州も補助金を投じて、国内での生産拠点づくりを急いでいる。専門家の間では、技術の覇権を一国が握り続けるのは難しいとの見方もある。各国の政策に応じて、供給網の形は今後も変わっていきそうだ。",
+      "form": "覇権",
+      "en": "Against the backdrop of the spread of generative AI, countries are becoming more active over advanced semiconductors. In developing chips for AI, American companies hold the advantage, while the most advanced manufacturing currently relies heavily on a Taiwanese company. Amid this, Japan and Europe are also pouring in subsidies and hurrying to build production bases at home. Among experts, there is also the view that it is hard for one country to keep holding technological hegemony. The shape of supply chains looks set to keep changing in response to each country's policies.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "ニュースでは「技術覇権」「覇権を握る」のように硬い文脈で使う。",
+      "grammar": ["n2-ni-oujite", "n4-teiku"],
+      "sense": "ほかを抑えて頂点に立つ者が持つ、支配的な力。"
+    },
+    {
+      "ja": "インドの歴史をたどると、武力で広い地域をまとめた王は少なくない。アショーカ王もその一人だが、激しい戦争の後、仏教を深く信仰したと伝えられている。力だけで手に入れた覇権は、人の体を従わせても心までは従わせられない、一時の支配にすぎない。王が「法」による統治の大切さを記した文を岩や石の柱に刻ませ、各地に残したのは、そのことに気づいたからだろうか。戦に勝つことと国を長く保つことは、同じではないのである。",
+      "form": "覇権",
+      "en": "Looking back over Indian history, there were not a few kings who united wide regions by force of arms. King Ashoka was one of them, but after a fierce war he is said to have become a devout believer in Buddhism. Hegemony gained by force alone is only a passing rule that can make people's bodies obey but not their hearts. Was it because he realized this that the king had texts on the importance of rule by the Dharma carved on rocks and stone pillars and left across his lands? Winning a war and keeping a country for a long time are not the same thing.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "武力による支配を言うやや硬い語。精神的な支配には使いにくい。",
+      "grammar": ["n2-ni-suginai"],
+      "sense": "ほかを抑えて頂点に立つ者が持つ、支配的な力。"
+    }
+  ],
+  "60": [
+    {
+      "ja": "今日は、地図で見ればほんの小さな点にすぎない場所が、なぜ何百年も奪い合われてきたのかをお話しします。例えばジブラルタル海峡は、地中海と大西洋をつなぐ唯一の出入り口です。ここを押さえれば、行き来する船を一隻残らず見張ることができるわけです。つまり、海の交通のかなめを握った国が、貿易でも戦争でも優位に立てるということなんですね。地図を見るときは、海峡のような狭い水路に注目してみてください。",
+      "form": "かなめ",
+      "en": "Today I'll talk about why places that are no more than tiny dots when you look at a map have been fought over for hundreds of years. The Strait of Gibraltar, for example, is the only gateway linking the Mediterranean and the Atlantic. Hold it, and you can watch every single ship that comes and goes. In other words, the country that holds the linchpin of sea traffic gains the upper hand in both trade and war. When you look at a map, pay attention to narrow waterways such as straits.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜のかなめ」「かなめを握る」の形で、全体を左右する一点を指す。漢字では「要」。",
+      "grammar": ["n2-ni-suginai"],
+      "sense": "物事のいちばん大切なところ。"
+    },
+    {
+      "ja": "扇は、根元のかなめ一本で何枚もの骨を束ねている。そこが緩めば、どれほど美しい絵が描かれていても、扇はたちまちばらばらになってしまう。仏教でいう戒も、案外これに似ているのかもしれない。一つ一つの決まりは細かく見えても、それらは散らばりやすい心を一点にまとめておくための留め具なのである。日々の暮らしが散らかって感じられるときは、自分を束ねている根元を確かめてみたい。",
+      "form": "かなめ",
+      "en": "A folding fan holds its many ribs together with a single pivot at the base. If that loosens, however beautiful the picture painted on it, the fan falls apart at once. The precepts of Buddhism may, surprisingly, be similar to this. Each rule may look petty, but together they are the clasp that keeps a mind prone to scattering gathered at one point. When daily life feels cluttered, I want to check the base that holds me together.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "もとは扇の骨を留める釘のこと。そこから「大事な一点」の意味が生まれた。",
+      "grammar": [],
+      "sense": "扇の骨を根元でとじ合わせる留め具。"
+    }
+  ],
+  "204": [
+    {
+      "ja": "今回は、十五世紀のイタリアで栄えたメディチ家の話です。もともとはフィレンツェの銀行家で、王でも貴族でもありませんでした。ところが、ヨーロッパ各地に支店を広げて富を築き、その財力で有力な家と手を結んでいきます。表向きは共和国の制度をそのまま残しながら、実際には一族が町の政治を裏から牛耳っていたわけです。お金の流れを握る者が権力も握る、という構図がよく見える例ですね。",
+      "form": "牛耳って",
+      "en": "This time the story is about the Medici, who flourished in fifteenth-century Italy. They were originally bankers in Florence, neither kings nor nobles. But they spread branches across Europe, built up a fortune, and used that wealth to ally themselves with powerful families. While the republic's institutions were outwardly left as they were, in reality the family was controlling the city's politics from behind the scenes. It's an example that shows clearly how whoever holds the flow of money also holds power.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「政治を牛耳る」「業界を牛耳る」のように、組織や集団を思いのままに動かす意味で使う。",
+      "grammar": ["n4-nagara", "n4-teiku"],
+      "sense": "集団や組織の中心に立ち、思いのままに動かす。"
+    },
+    {
+      "ja": "会議とか勉強会で発言力の強い人が一人いると、その人が議論を全部牛耳っちゃうこと、ありますよね。で、周りは黙り込むんですけど、別に意見がないわけじゃないんですよ。心理学でいう同調圧力ってやつで、集団の中だと空気を読んで遠慮しちゃう傾向が強いらしくて。だから僕は、最初に匿名で意見を書き出してもらう方式を提案してるんです。そうすると、意外と鋭い指摘が出てきたりするんですよね。",
+      "form": "牛耳っちゃう",
+      "en": "You know how, in meetings or study groups, if there's one person with a lot of clout, that person sometimes takes over the whole discussion? Then everyone else falls silent, but it's not like they have no opinions. It's what psychology calls conformity pressure: apparently, in a group there's a strong tendency to read the room and hold back. So what I suggest is a format where everyone first writes out their opinions anonymously. When you do that, surprisingly sharp points tend to come out.",
+      "original": true,
+      "register": "話",
+      "topic": "mind",
+      "tipJa": "話し言葉では「牛耳っちゃう」「牛耳ってる」のように崩しても使う。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "集団や組織の中心に立ち、思いのままに動かす。"
+    }
+  ],
+  "183": [
+    {
+      "ja": "今日は、江戸幕府がペリーの来航をどう受け止めたか、という話をします。1853年、黒船が浦賀沖に現れると、幕府はこれを国の行く末に関わる由々しき事態と見ました。面白いのは、幕府がそれまでの慣例を破り、大名たちにまで広く意見を求めたことです。これが結果的に、幕府の権威を弱めるきっかけになったとも言われています。危機のときのリーダーの判断がその後の流れをどう変えるのか、一緒に考えていきましょう。",
+      "form": "由々しき",
+      "en": "Today I'll talk about how the Edo shogunate took the arrival of Perry. In 1853, when the Black Ships appeared off Uraga, the shogunate saw it as a grave situation bearing on the country's future. What's interesting is that the shogunate broke with past custom and widely sought opinions, even from the daimyo. It is also said that this ended up becoming a trigger that weakened the shogunate's authority. Let's think together about how a leader's judgment in a crisis changes the course of what follows.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「由々しき事態」「由々しき問題」の形でほぼ決まって使う、硬い書き言葉。",
+      "grammar": ["n4-teiku"],
+      "sense": "放っておけないほど重大で、よくない。"
+    },
+    {
+      "ja": "生成AIを使って作られた偽の音声や動画が、インターネット上で急速に広がっている。実在の人物が言ってもいないことを話しているように見せる手口もあり、本物かどうかを判断するのは専門家でも容易ではない。選挙や災害の際にこうした情報が拡散すれば、社会の信頼を損なう由々しき問題になりかねない。各国では、AIで作った映像や音声に表示を義務づける動きも出ている。技術の進歩にルールづくりが追いつけるかが問われている。",
+      "form": "由々しき",
+      "en": "Fake audio and video made with generative AI are spreading rapidly on the internet. Some tricks make a real person appear to say things they never said, and judging whether something is genuine is not easy even for experts. If such information spreads during elections or disasters, it could become a grave problem that damages trust in society. In various countries there are also moves to require labels on video and audio made with AI. The question is whether rule-making can keep up with the progress of technology.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道や公式の発言で、事の重大さを強調するときに使う。",
+      "grammar": ["n3-you-ni"],
+      "sense": "放っておけないほど重大で、よくない。"
+    },
+    {
+      "ja": "私たちは、他人の小さな過ちにはすぐ気づくのに、自分の心に起きている変化にはなかなか気づかない。仏教の教えには、怒りや欲そのものよりも、それに気づかないまま流されていく心のほうを、由々しきこととして見る面がある。火は小さなうちなら手で消せるが、燃え広がってからでは遅い。だからこそ、一日の終わりに静かに座り、今日の自分の心をそっと振り返る時間を持ちたい。それは特別な修行ではなく、誰にでもできる小さな手入れなのである。",
+      "form": "由々しき",
+      "en": "We notice other people's small faults at once, yet we are slow to notice the changes taking place in our own minds. In the Buddhist teachings there is a side that regards as grave not so much anger or desire itself as the mind that is swept along without noticing them. A fire can be put out by hand while it is small, but once it has spread it is too late. That is exactly why I want to have time at the end of each day to sit quietly and gently look back on my mind. It is not a special practice but a small bit of upkeep that anyone can do.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "連体形「由々しき」で名詞を修飾する文語の名残。「由々しい」より改まった響き。",
+      "grammar": ["n3-dewa-naku", "n4-teiku"],
+      "sense": "放っておけないほど重大で、よくない。"
+    }
+  ],
+  "185": [
+    {
+      "ja": "今回のテーマは、モンゴル帝国です。1206年にチンギス・ハンが草原の部族をまとめてから、わずか数十年のうちに、その支配は中国から東ヨーロッパにまで広がりました。この拡大のスピードは、世界史の中でもとにかく凄まじいものです。秘密は、馬を乗り継ぐ連絡網と、征服した土地の技術者を積極的に取り込む柔軟さにありました。強さの裏にある仕組みを、今日は順番に見ていきましょう。",
+      "form": "凄まじい",
+      "en": "This time the theme is the Mongol Empire. Within just a few decades after Genghis Khan united the tribes of the steppe in 1206, its rule spread from China all the way to Eastern Europe. The speed of this expansion is truly tremendous, even within world history. The secret lay in a relay network of fresh horses and in the flexibility to actively take in engineers from the lands they conquered. Today let's look in order at the mechanisms behind that strength.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「凄まじい勢い」「凄まじいものがある」のように、程度の激しさを強調する。",
+      "grammar": ["n4-teiku"],
+      "sense": "勢いや程度が、恐ろしいほど激しい。"
+    },
+    {
+      "ja": "生成AIの開発競争が続く中、データセンターの電力消費が急増している。大規模なAIモデルの学習には大量の半導体を長時間動かす必要があり、その電力需要の伸びは凄まじい。データセンターが集まる地域では、電力会社や各国政府が、発電所や送電網の整備を急いでいる。冷却に使う水の確保も、新たな課題として浮上している。省電力型のチップや新しい冷却技術の開発が、今後の鍵を握りそうだ。",
+      "form": "凄まじい",
+      "en": "As the race to develop generative AI continues, the power consumption of data centers is soaring. Training large AI models requires running huge numbers of semiconductors for long periods, and the growth in that power demand is tremendous. In regions where data centers cluster, power companies and national governments are rushing to build up power plants and grids. Securing the water used for cooling has also emerged as a new challenge. The development of power-saving chips and new cooling technologies looks set to hold the key going forward.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「凄まじい勢いで」「伸びは凄まじい」など、数量の急変にも使う。",
+      "grammar": [],
+      "sense": "勢いや程度が、恐ろしいほど激しい。"
+    }
+  ]
+}

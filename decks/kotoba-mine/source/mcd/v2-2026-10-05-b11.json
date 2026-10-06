@@ -1,0 +1,333 @@
+{
+  "95": [
+    {
+      "ja": "今回紹介するのは、脳科学者の中野信子さんの『人は、なぜ他人を許せないのか？』という本です。キーワードは「正義中毒」で、人は他人の間違いを責めるとき、脳が快感を覚えてしまうというんですね。ネットで誰かの失言が見つかると、「言語道断だ」という怒りのコメントが一気に集まるのも、この仕組みで説明できるわけです。ただ、その怒りは相手を正すためではなく、自分が気持ちよくなるためのものかもしれません。叩きたくなったときこそ、一度立ち止まってみる価値がありそうです。",
+      "form": "言語道断",
+      "en": "The book I'm introducing this time is Why Can't People Forgive Others? by the neuroscientist Nobuko Nakano. The keyword is \"justice addiction\": when people condemn someone else's mistake, the brain ends up feeling pleasure. That is how we can explain why, when someone's gaffe is found online, angry comments calling it outrageous pile up all at once. But that anger may be less about correcting the other person and more about making ourselves feel good. It seems worth stopping for a moment precisely when we feel the urge to pile on.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「言語道断だ」「言語道断の行為」のように、許しがたい行いを強く非難するときに使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "あまりにひどくて、言葉にならないこと"
+    },
+    {
+      "ja": "生成AIで本人そっくりの声を作り、家族や上司になりすまして金をだまし取る詐欺が、各国で問題になっている。わずか数秒の録音があれば声を再現できるとされ、被害に気づくのが遅れるケースも多い。開発企業の間でも、こうした悪用は言語道断だとして、音声に識別用の電子透かしを埋め込む取り組みが広がっている。一方で、透かしを消す方法もすでに出回っており、いたちごっこが続いている。専門家は、電話で急に送金を求められたら、一度切ってかけ直すように呼びかけている。",
+      "form": "言語道断",
+      "en": "Scams in which generative AI is used to create a voice identical to a real person's, impersonating a family member or boss to swindle money, have become a problem in many countries. It is said that a voice can be reproduced from a recording just a few seconds long, and in many cases victims are slow to notice. Among the companies developing the technology too, efforts are spreading to embed identifying digital watermarks in audio, on the grounds that such misuse is outrageous. Meanwhile, ways of removing the watermarks are already circulating, and the cat-and-mouse game continues. Experts urge people who are suddenly asked over the phone to send money to hang up once and call back.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「〜は言語道断だとして」の形で、非難の理由を示すことが多い。",
+      "grammar": ["n3-you-ni", "n5-teiru"],
+      "sense": "あまりにひどくて、言葉にならないこと"
+    },
+    {
+      "ja": "仏教では古くから、最も深い真理は言葉では言い尽くせないと考えられてきた。言葉は物事を切り分けて名前を付ける道具だが、悟りの境地はその切り分けの手前にあるからである。禅僧が問いに言葉で答えるのではなく、ただ黙ったり棒で打ったりしたという話が多く残るのも、そのためだろう。言葉の道が断たれたところという意味で、その境地はかつて言語道断とも呼ばれた。もってのほかという現代の使い方からは、なかなか想像しにくい由来である。",
+      "form": "言語道断",
+      "en": "In Buddhism it has long been thought that the deepest truth cannot be fully expressed in words. That is because words are tools for dividing things up and naming them, while the state of enlightenment lies before that dividing. That is probably also why so many stories remain of Zen monks who, instead of answering a question with words, simply stayed silent or struck with a stick. In the sense of a place where the road of words is cut off, that state was once also called gongo-dōdan. It is an origin that is hard to imagine from the modern use meaning outrageous.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "もとは仏教語。現代では「もってのほか」の意味でしか使わないので注意。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "仏教で、深い真理は言葉では言い表せないこと"
+    }
+  ],
+  "11": [
+    {
+      "ja": "今日のテーマは、AIブームで半導体の世界がどう変わったかです。対話型のAIが話題になってから、大量の計算をこなせるGPUの注文が世界中から殺到しました。その結果、一部のメーカーの株価は数年で何倍にも跳ね上がり、業界は本格的な奪い合いの時代に突入したわけです。この流れを理解する上で押さえておきたいのは、最先端のチップを作れる工場が世界でもごく限られているという点です。だからこそ、各国の政府まで工場の誘致に乗り出しているんですね。",
+      "form": "突入",
+      "en": "Today's theme is how the AI boom changed the world of semiconductors. After conversational AI became the talk of the town, orders for GPUs that can handle huge amounts of computation poured in from all over the world. As a result, some manufacturers' share prices shot up several times over in a few years, and the industry entered an era of all-out scramble. What I want you to grasp in order to understand this trend is that the factories able to make cutting-edge chips are very limited even worldwide. That's exactly why even national governments are setting out to attract factories.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「〜の時代に突入する」「新たな局面に突入」のように、新しい段階に入るときに使う。",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "新しい段階や状態に入ること"
+    },
+    {
+      "ja": "1972年2月、長野県軽井沢町の山荘に武装したグループが立てこもり、管理人の妻を人質に取った。警察は説得を続けたが、にらみ合いは10日間にわたり、最終的に機動隊が建物に突入して人質を救出した。この間の様子はテレビで長時間生中継され、多くの人が画面にくぎ付けになったとされる。一方、作戦では警察官2人が殉職するなど、大きな犠牲も出た。事件は、報道のあり方や人質事件への対応を考える上で、今も繰り返し取り上げられている。",
+      "form": "突入",
+      "en": "In February 1972, an armed group barricaded itself in a mountain lodge in Karuizawa, Nagano Prefecture, and took the manager's wife hostage. The police kept trying to persuade them, but the standoff lasted ten days, and in the end the riot police stormed the building and rescued the hostage. The scenes during that time were broadcast live on television for hours, and many people are said to have been glued to their screens. On the other hand, the operation came at a heavy cost, with two police officers killed in the line of duty. The incident is still taken up again and again when considering how news should be reported and how hostage cases should be handled.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「建物に突入する」のように、勢いよく中へ入る意味。警察や部隊の行動によく使う。",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "勢いよく中へ入り込むこと"
+    },
+    {
+      "ja": "古代インドには、人生を四つの時期に分ける考え方があった。学びの時期、家庭を持って働く時期を経て、人は森に退いて静かに暮らし、最後はすべてを手放して旅に出るとされる。現代の私たちは、受験から就職、子育てへと、息つく間もなく次の段階に突入していくように見える。けれども、一つの時期を終えることは、何かを失うことではなく、次の生き方へ向けた準備でもあるのだろう。年を重ねることを、少し違う目で眺めてみたくなる。",
+      "form": "突入",
+      "en": "In ancient India there was a way of thinking that divided life into four stages. After a stage of learning and a stage of having a family and working, a person was to withdraw to the forest and live quietly, and finally let go of everything and set out on a journey. We moderns seem to plunge into the next stage, from exams to employment to child-rearing, without time to catch our breath. Yet ending one stage is not losing something; it may also be preparation for the next way of living. It makes me want to look at growing older with slightly different eyes.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "人生の段階に使うと、心の準備もないまま勢いで入っていく感じが出る。",
+      "grammar": ["n4-teiku", "n3-you-ni", "n3-dewa-naku"],
+      "sense": "新しい段階や状態に入ること"
+    }
+  ],
+  "164": [
+    {
+      "ja": "今回取り上げるのは、台湾のTSMCという会社が、なぜ半導体の受託製造で世界のトップに立てたのか、という話です。創業者のモリス・チャンが選んだのは、自社の製品を持たず、他社のチップを作ることに専念するというやり方でした。お客さんから見れば、自分たちのアイデアを盗まれる心配がないわけですね。そのうえで、注文の変更やトラブルが起きても、お客さんを何週間も待たせたりせずに迅速に応えることで、信頼を積み上げてきたと言われています。ライバルと張り合うのではなく、黒子に徹したことが最大の武器になったんです。",
+      "form": "迅速",
+      "en": "What I'm taking up this time is why the Taiwanese company TSMC was able to reach the top of the world in contract chip manufacturing. What founder Morris Chang chose was a model of having no products of its own and devoting itself to making other companies' chips. From the customer's point of view, there's no worry about having their ideas stolen. On top of that, it is said to have built up trust by responding swiftly to order changes and problems, without keeping customers waiting for weeks. Rather than going head to head with rivals, sticking to a behind-the-scenes role became its greatest weapon.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「迅速に応える」「迅速な対応」のように、組織の対応の速さをほめるときに使う。",
+      "grammar": ["n3-koto-de", "n3-dewa-naku"]
+    },
+    {
+      "ja": "1948年6月、ソ連は西ベルリンへの陸路と水路を封鎖し、200万人を超える住民が孤立した。これに対し、アメリカとイギリスは飛行機で食料や燃料を運び込む作戦を迅速に立ち上げた。輸送は約1年にわたって続き、最も多い日には、ほぼ1分おきに輸送機が着陸したとされる。運ばれる物資の量は日を追うごとに増え、ソ連は翌年5月に封鎖を解いた。この出来事は、東西の対立が深まっていく中で起きた最初の大きな危機の一つとされている。",
+      "form": "迅速",
+      "en": "In June 1948, the Soviet Union blockaded the land and water routes into West Berlin, leaving more than two million residents cut off. In response, the United States and Britain swiftly launched an operation to fly in food and fuel. The airlift continued for about a year, and on the busiest day transport planes are said to have landed almost once a minute. The volume of supplies delivered grew day by day, and the Soviet Union lifted the blockade in May of the following year. The episode is regarded as one of the first major crises to occur as the confrontation between East and West deepened.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「迅速に〜を立ち上げた」「迅速な支援」のように、公的な動きの速さに使う。",
+      "grammar": ["n4-teiku", "n5-teiru"]
+    },
+    {
+      "ja": "現代の職場では、何事も迅速に片付けることが美徳とされている。メールにはすぐ返事をし、決まったことは翌日には動き出すのが当たり前になった。だが仏教の瞑想は、反対に、一つの呼吸を急がずに見つめることから始まる。速さそのものが悪いのではなく、急ぐあまり自分が何をしているのかを見失うことが問題なのだろう。手を動かすのが速い人ほど、ときどき立ち止まる時間が必要なのかもしれない。",
+      "form": "迅速",
+      "en": "In today's workplace, getting everything done swiftly is treated as a virtue. Replying to emails right away and getting decisions moving by the next day have become the norm. Buddhist meditation, by contrast, begins with watching a single breath without hurrying. It is probably not speed itself that is bad, but losing sight of what one is doing in one's haste. Perhaps the faster someone's hands move, the more they need time to stop now and then.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「迅速に片付ける」のように仕事の処理の速さに使う。日常会話では「すばやく」「すぐ」が自然。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    }
+  ],
+  "202": [
+    {
+      "ja": "今回は、ダニエル・カーネマンの『ファスト＆スロー』を要約していきます。この本の柱は、人間の頭には二つの考え方のモードがあるという話です。一つ目は、相手の顔を見て機嫌を察するように、努力なしで速やかに働く直感のモードです。二つ目は、複雑な掛け算を解くときのような、時間と集中を必要とするじっくりモードです。私たちの判断ミスの多くは、本来じっくり考えるべき場面を直感に任せてしまうことで起きる、というわけですね。",
+      "form": "速やか",
+      "en": "This time I'm going to summarize Daniel Kahneman's Thinking, Fast and Slow. The pillar of this book is the idea that the human mind has two modes of thinking. The first is the intuitive mode, which works promptly and without effort, as when you look at someone's face and sense their mood. The second is the slow mode, which demands time and concentration, as when you work out a complicated multiplication. Many of our errors of judgment, the book says, happen because we leave to intuition situations we really ought to think through carefully.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「速やかに働く」「速やかに対処する」のように、間を置かずに起こる動きに使う。",
+      "grammar": ["n4-teiku", "n3-you-ni", "n3-koto-de"]
+    },
+    {
+      "ja": "生成AIを使ったサービスが広がるなか、利用者が入力した情報が外部に漏れる事故への備えが課題となっている。日本の法律では、一定の個人情報が漏えいした場合、企業は国の委員会に届け出るとともに、本人にも知らせることが義務づけられている。届け出は事態を把握してから速やかに行う必要があり、目安はおおむね3日から5日以内とされる。一方、AIの学習データに何が含まれているかを、企業自身が把握しきれていない例もある。専門家は、導入の段階から情報の扱いを決めておくべきだと指摘している。",
+      "form": "速やか",
+      "en": "As services using generative AI spread, preparing for incidents in which information entered by users leaks outside has become an issue. Under Japanese law, when certain personal information is leaked, companies are obliged to notify a national commission and also to inform the people concerned. The notification must be made promptly after the company grasps the situation, with a rough guideline of within three to five days. On the other hand, there are cases where companies themselves cannot fully grasp what their AI training data contains. Experts point out that how information is handled should be decided from the stage of adoption.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "法令や通知では「速やかに〜する」の形で、すぐに行う義務を表すことが多い。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "古代中国の兵法書『孫子』は、戦いを長引かせることの害を繰り返し説いている。兵を遠くに送り続ければ、国の蓄えはやせ細り、民は疲れ果てるからである。だから戦うのであれば、多少不格好でも速やかに終えるほうがよいとされた。勝ち方の美しさにこだわるより、終わらせ方を先に考えよということだろう。戦は始めるより終えるほうがはるかに難しいという知恵は、二千年以上を経た今も古びていない。",
+      "form": "速やか",
+      "en": "The ancient Chinese military treatise The Art of War repeatedly warns of the harm of dragging out a war. For if troops keep being sent far away, the nation's reserves waste away and the people are exhausted. So if one is to fight, it was held better to finish promptly, even if somewhat clumsily. It is probably saying: think first about how to end it, rather than fixating on the beauty of how to win. The wisdom that a war is far harder to end than to begin has not grown old even after more than two thousand years.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「速やかに終える」のように、ぐずぐずせずに片をつける意味で使う。",
+      "grammar": ["n5-teiru"]
+    }
+  ],
+  "266": [
+    {
+      "ja": "今日は、ブッダの教えがどうやって今に伝わったのか、という話をします。ブッダが亡くなったあと、教えが散らばってしまうことを心配した弟子たちが、王舎城という町に集結しました。そこで、ブッダのそばに長く仕えたアーナンダが、聞いた教えを一つずつ唱えていきます。ほかの弟子たちはそれを聞き、内容に間違いがないかを全員で確かめたわけです。この時点では文字ではなく、すべて口で伝えて覚えたというのが面白いところなんですね。",
+      "form": "集結",
+      "en": "Today I'll talk about how the Buddha's teachings were handed down to the present. After the Buddha died, his disciples, worried that the teachings would scatter, gathered in a town called Rajagriha. There, Ananda, who had long served at the Buddha's side, recited one by one the teachings he had heard. The other disciples listened and checked together whether there were any errors in the content. The interesting part is that at this point it was all passed on and memorized by word of mouth, not in writing.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜に集結する」の形で、多くの人が目的をもって一か所に集まるときに使う。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"]
+    },
+    {
+      "ja": "1944年6月6日、連合国軍はフランス北部のノルマンディー海岸に上陸する作戦を始めた。作戦に先立ち、イギリス南部には兵士や戦車、船が大規模に集結し、兵士の数は200万人を超えたとされる。ドイツ側に上陸地点を悟らせないため、連合国は別の海岸を狙うと見せかける偽の部隊まで用意した。天候の悪化で決行は当初の予定から延期されたが、上陸は成功し、西ヨーロッパの戦局は大きく転換することになった。この作戦は、史上最大級の上陸作戦として知られている。",
+      "form": "集結",
+      "en": "On June 6, 1944, Allied forces began an operation to land on the Normandy coast of northern France. Ahead of the operation, soldiers, tanks and ships massed on a large scale in southern England, with the number of soldiers said to have exceeded two million. To keep the German side from guessing the landing site, the Allies even prepared a fake army that made it look as if they were aiming at a different coast. Because of worsening weather the launch was postponed from the original schedule, but the landing succeeded and the war in Western Europe took a major turn. The operation is known as one of the largest amphibious landings in history.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "軍事の報道では「部隊が国境付近に集結する」のように、大勢が一か所に集まる意味で使う。",
+      "grammar": ["n3-koto-ni-naru", "n5-teiru"]
+    },
+    {
+      "ja": "AIの研究って、毎年十二月ごろにめちゃくちゃでかい国際学会があるんですよ。そこに世界中の研究者とか企業の人が一万人以上集結するんで、もはやお祭りみたいな感じなんですよね。で、面白いのが、論文の発表より廊下での立ち話のほうが大事だって言う人が結構いることで。ネットで何でも読める時代でも、結局人が会う場所にいい話も仕事も転がってくるっていう。そう考えると、オンラインで全部済むってわけじゃないんだなと思います。",
+      "form": "集結",
+      "en": "In AI research, there's this ridiculously huge international conference every year around December. Over ten thousand researchers and industry people from all over the world gather there, so it's basically like a festival. And the funny thing is that quite a few people say the hallway chats matter more than the paper presentations. Even in an age when you can read anything online, the good leads and the jobs end up rolling in at the places where people meet. When you think about it that way, it's not like everything can be done online.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "「集結」は本来かたい語。会話で使うと、大げさで少しおどけた響きになる。",
+      "grammar": ["n3-wake-dewa-nai"]
+    }
+  ],
+  "15": [
+    {
+      "ja": "今回紹介するのは、マイクロソフトのトップを務めるサティア・ナデラの『ヒット・リフレッシュ』です。彼が2014年にトップに就いたとき、社内では部署どうしの足の引っ張り合いが当たり前になっていたといいます。そこでナデラは新体制の柱として、すべてを知っている人ではなく、学び続ける人であれという文化づくりを掲げました。そのもとになったのは、心理学者キャロル・ドゥエックが唱えた成長マインドセットという考え方です。人を入れ替えるだけでなく、社員一人ひとりの考え方まで変えようとしたのがポイントなんですね。",
+      "form": "新体制",
+      "en": "The book I'm introducing this time is Hit Refresh by Satya Nadella, who heads Microsoft. When he took the top job in 2014, infighting between departments had reportedly become the norm inside the company. So, as a pillar of the new leadership, Nadella set out to build a culture of being someone who keeps learning rather than someone who knows everything. The basis for this was the idea of the growth mindset put forward by the psychologist Carol Dweck. The key point is that he tried not just to swap people out but to change the way each employee thinks.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「新体制の柱」「新体制のもとで」のように、組織が仕切り直したあとの形を指す。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"],
+      "sense": "組織などの、新しくなった仕組みや顔ぶれ"
+    },
+    {
+      "ja": "2023年11月、対話型AIの開発で知られる米オープンAIで、取締役会がサム・アルトマン氏を突然解任した。社員の大半が抗議の署名に加わるなど混乱が広がり、同氏はわずか数日後に復帰することで合意した。これに伴って取締役会の顔ぶれは大きく入れ替わり、会社は新体制のもとで再出発することになった。この騒動は、安全性を重んじる立場と事業の拡大を急ぐ立場の間の緊張を浮き彫りにしたとも指摘されている。AI企業の統治のあり方をめぐる議論は、その後も続いている。",
+      "form": "新体制",
+      "en": "In November 2023, at the US company OpenAI, known for developing conversational AI, the board suddenly dismissed Sam Altman. Turmoil spread, with most employees joining a protest petition, and just a few days later an agreement was reached for him to return. Along with this, the board's membership changed substantially, and the company made a fresh start under a new setup. It has also been pointed out that the uproar laid bare the tension between those who prioritize safety and those in a hurry to expand the business. Debate over how AI companies should be governed has continued since.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「新体制のもとで再出発」「新体制が発足」の形でよく使う。",
+      "grammar": ["n3-koto-ni-naru", "n5-teiru"],
+      "sense": "組織などの、新しくなった仕組みや顔ぶれ"
+    },
+    {
+      "ja": "日本史で狙われやすいのが、1940年に近衛文麿が中心となって進めた新体制運動です。ナチス・ドイツの一党体制なども意識しながら、国民を一つにまとめる強い組織を作ろうとした動きでした。その流れの中で、既成の政党は次々と自ら解散し、同じ年の秋に大政翼賛会が発足します。ここで押さえたいのは、もとは強力な政党を作る構想だったものの、最終的には政府の方針を上から伝える組織になったという点です。用語だけを覚えるのではなく、なぜそうなったのかという流れで覚えるのがコツです。",
+      "form": "新体制",
+      "en": "A frequent target in Japanese history exams is the New Order Movement promoted in 1940 with Fumimaro Konoe at its center. It was a move to build a strong organization uniting the people, with an eye on things like Nazi Germany's one-party system. In that flow, the existing political parties dissolved themselves one after another, and in the autumn of the same year the Imperial Rule Assistance Association was launched. What you should grasp here is that although it began as a plan to create a powerful party, it ended up as an organization that passed government policy down from above. The trick is not to memorize just the terms but to remember them through the flow of why things turned out that way.",
+      "original": true,
+      "register": "学",
+      "topic": "history",
+      "tipJa": "日本史用語の「新体制運動」は1940年の近衛文麿の運動を指す。",
+      "grammar": ["n4-nagara", "n2-mono-no", "n3-dewa-naku"],
+      "sense": "一九四〇年、近衛文麿らが進めた挙国一致の政治体制"
+    }
+  ],
+  "215": [
+    {
+      "ja": "今日は、第二次世界大戦の初め、イギリスがどうやって踏みとどまったのかという話です。1940年5月、ドイツ軍が西ヨーロッパへの攻撃を始めたまさにその日に、チャーチルが首相に就任しました。当時の政府内には、ドイツとの和平の道を探るべきだという声も根強くあったとされています。それでもチャーチルは戦い続けることを選び、ラジオの演説で国民を励まし続けたんですね。その判断が正しかったかどうかは、結果を知る私たちだからこそ言えることなのかもしれません。",
+      "form": "首相",
+      "en": "Today's topic is how Britain held its ground at the start of the Second World War. In May 1940, on the very day the German army began its attack on Western Europe, Churchill became prime minister. Within the government at the time, there were reportedly also strong voices saying that a path to peace with Germany should be explored. Even so, Churchill chose to keep fighting and kept encouraging the nation with his radio speeches. Whether that decision was right may be something only we, who know the outcome, can say.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「首相に就任する」「〜首相」のように使う。日本では「総理大臣」とも言う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "インドで2024年に行われた総選挙は、有権者がおよそ9億7000万人にのぼり、投票は6週間あまりにわたって行われた。開票の結果、モディ首相が率いる与党は単独での過半数を失ったものの、連立を組む政党と合わせて過半数を確保した。これにより、モディ氏は3期連続で政権を担うことになった。今後は、連立相手の意向にも配慮しながら政策を進める必要があるとみられている。世界最多の人口を抱える国の政治の行方に、各国の関心が集まっている。",
+      "form": "首相",
+      "en": "India's 2024 general election had roughly 970 million eligible voters, and voting took place over a little more than six weeks. When the votes were counted, the ruling party led by Prime Minister Modi had lost its majority on its own, but secured a majority together with its coalition partners. As a result, Mr. Modi will lead the government for a third consecutive term. Going forward, it is thought he will need to advance his policies while also taking the wishes of his coalition partners into account. Countries around the world are watching where politics in the nation with the world's largest population is headed.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "報道では「モディ首相」のように名前のあとに付け、二度目からは「〜氏」とすることが多い。",
+      "grammar": ["n2-mono-no", "n3-koto-ni-naru", "n4-nagara", "n5-teiru"]
+    },
+    {
+      "ja": "首相の演説には専門のスタッフが関わり、言葉の一つひとつが時間をかけて練られるのが普通です。聞き手の大半は原稿を見ずに耳だけで受け取るため、一文を短く切り、大事な言葉を何度か繰り返すといった工夫が欠かせません。数字を並べるより、一人の国民の暮らしに置き換えて語るほうが、ずっと心に届きやすくなります。これは、朝礼のあいさつや結婚式のスピーチでもそのまま使える考え方です。長さではなく、聞き手が覚えて帰れる一言があるかどうかで勝負が決まります。",
+      "form": "首相",
+      "en": "Professional staff are usually involved in a prime minister's speeches, and each word is polished over time. Because most listeners take it in by ear alone without seeing the script, devices such as cutting sentences short and repeating key words several times are essential. Rather than lining up figures, talking in terms of one citizen's daily life reaches people's hearts far more easily. This is a way of thinking you can use as is in a morning-assembly greeting or a wedding speech. Success depends not on length but on whether there is one phrase the listeners can remember and take home.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「首相の演説」「首相が表明する」のように、国の代表としての発言によく使う。",
+      "grammar": ["n3-dewa-naku"]
+    }
+  ],
+  "216": [
+    {
+      "ja": "今回は、明治の日本で、選挙で選ばれた代表が政治に加わるようになるまでの流れを押さえていきましょう。明治の初め、政府の中心にいたのは、薩摩や長州など一部の藩の出身者でした。これに対して板垣退助らは、国民の声を政治に届ける場を作るように求め、各地で自由民権運動が広がっていきます。勢いに押された政府は1881年、1890年までに国会を開くと約束し、それまでに憲法を整えることになりました。こうして1889年に憲法が発布され、翌年には最初の選挙が行われたわけです。",
+      "form": "国会",
+      "en": "This time, let's go over the path by which, in Meiji Japan, representatives chosen in elections came to take part in politics. At the start of the Meiji era, the people at the center of government came from a handful of domains such as Satsuma and Chōshū. In response, Itagaki Taisuke and others demanded the creation of a place to carry the people's voices into politics, and the Freedom and People's Rights Movement spread across the country. Pushed by its momentum, in 1881 the government promised to open a national assembly by 1890, and it was decided that a constitution would be put in place before then. And so the constitution was promulgated in 1889, and the first election was held the following year.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "日本の議会は「国会」、外国の議会は「議会」と呼ぶのがふつう。",
+      "grammar": ["n4-you-ni-naru", "n4-teiku", "n3-you-ni", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "日本で初めてAIに特化した法律が、2025年5月、国会で成立した。法律は研究開発と活用の後押しを主な目的としており、違反した企業を罰する仕組みは盛り込まれていない。その代わり、AIを使った悪質な事例があれば国が調査し、事業者に指導などを行えるとしている。欧州連合が厳しいルールで利用を縛る方向に進んだのとは対照的で、産業の育成を優先した形だ。今後は、偽の映像や音声による被害にどこまで対応できるかが問われることになる。",
+      "form": "国会",
+      "en": "Japan's first law specifically focused on AI was enacted by the Diet in May 2025. The law's main aim is to promote research, development and use, and it contains no mechanism for punishing companies that violate it. Instead, it provides that if there are malicious cases involving AI, the state can investigate and give guidance and the like to businesses. It stands in contrast to the European Union, which moved toward restricting use with strict rules, and gives priority to fostering the industry. Going forward, the question will be how far it can deal with harm from fake video and audio.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「国会で成立する」「国会に提出する」のように、法律が決まる場として使う。",
+      "grammar": ["n3-koto-ni-naru", "n5-teiru"]
+    },
+    {
+      "ja": "国会の中継を眺めていると、言葉が理解し合うためではなく、相手を言い負かすために使われているように見えることがある。だが、これは政治の世界に限った話ではないだろう。家庭でも職場でも、私たちは議論に勝つことと、よい結論にたどり着くことを、しばしば取り違えてしまう。言い負かされた相手は、たいてい何も納得していないものである。勝ち負けの手前に、まず聞くという仕事があるのだろう。",
+      "form": "国会",
+      "en": "Watching broadcasts of the Diet, it can sometimes look as though words are being used not to understand one another but to argue the other side down. Yet this is probably not a story limited to the world of politics. At home and at work alike, we often confuse winning an argument with arriving at a good conclusion. A person who has been argued down has usually not been convinced of anything. Before winning and losing, there is probably first the work of listening.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「国会の中継」「国会での議論」のように、日本の議会そのものを指す。",
+      "grammar": ["n3-dewa-naku", "n3-you-ni", "n5-teiru"]
+    }
+  ],
+  "248": [
+    {
+      "ja": "今日は、アメリカの公民権法がどうやって成立したのか、という話です。人種による差別を禁じるこの法案に対し、上院の反対派は延々と演説を続けることで、採決を先延ばしにしました。演説による引き延ばしは約2か月に及びましたが、賛成派は粘り強く票を集めてついに討論を打ち切り、法案は可決されます。そして1964年7月、ジョンソン大統領が署名して法律が成立しました。キング牧師たちの運動が世論を動かしていたことも、大きな後押しになったわけですね。",
+      "form": "可決",
+      "en": "Today's topic is how the American Civil Rights Act came to pass. Opponents in the Senate put off the vote on this bill banning racial discrimination by making speeches that went on and on. The stalling by speeches dragged on for about two months, but supporters patiently gathered votes, finally cut off debate, and the bill was passed. Then in July 1964, President Johnson signed it and it became law. The way the movement of Dr. King and others had been swaying public opinion was also a big push, you see.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「法案が可決される」「賛成多数で可決」のように、議案が認められる場面に使う。反対は「否決」。",
+      "grammar": ["n3-koto-de"]
+    },
+    {
+      "ja": "欧州議会は2024年3月、AIの利用をリスクの高さに応じて規制する法案を、賛成多数で可決した。顔認識などを使った一部の監視や、人の弱みにつけ込んで行動を操るようなAIは、原則として禁止される。違反した企業には、世界全体の売上高に応じた多額の制裁金が科される可能性がある。AIを包括的に規制する法律は世界でも初めてとされ、各国のルールづくりにも影響を与えるとみられる。一方、厳しい規制が域内の技術開発を妨げるとの懸念も根強い。",
+      "form": "可決",
+      "en": "In March 2024, the European Parliament passed by a majority a bill that regulates the use of AI according to its level of risk. Some forms of surveillance using facial recognition and the like, and AI that manipulates people's behavior by exploiting their weaknesses, will in principle be banned. Companies that violate it could face large fines in proportion to their worldwide sales. It is said to be the world's first law to regulate AI comprehensively, and it is expected to influence rule-making in other countries. On the other hand, concerns also persist that strict regulation will hamper technological development within the region.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「賛成多数で可決した」が定番の言い方。",
+      "grammar": ["n2-ni-oujite"]
+    },
+    {
+      "ja": "紀元前五世紀のアテネで、反乱を起こした同盟都市の男たちをすべて処刑するという案が、市民の集会で可決されたことがある。ところが翌日になると、多くの市民が怒りに任せた決定を悔やみ、集会が開き直された。議論の末に決定はわずかな差でひっくり返り、取り消しを伝える船は、処刑が始まる直前に着いたと伝えられる。多数の賛成は、その瞬間の空気を映したものにすぎない。だからこそ、一晩おいて考え直す仕組みを持てるかどうかが、集団の知恵を左右するのだろう。",
+      "form": "可決",
+      "en": "In fifth-century BC Athens, a proposal to execute all the men of an allied city that had revolted was once passed at the citizens' assembly. But the next day many citizens regretted a decision made in anger, and the assembly was convened again. After debate the decision was overturned by a narrow margin, and the ship carrying the cancellation is said to have arrived just before the executions were to begin. A majority in favor merely reflects the mood of that moment. That is exactly why whether a group can have a mechanism for sleeping on it and reconsidering probably decides its collective wisdom.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「案が可決される」のように、議案が賛成を得て決まることに使う。",
+      "grammar": ["n2-ni-suginai"]
+    }
+  ],
+  "249": [
+    {
+      "ja": "今回は、半導体の工場がなぜあれほど水を使うのか、という話をします。チップを作る途中では、薬品で表面を処理するたびに、ウエハーをきれいに洗い流す工程が何度も入ります。ここでほんのわずかでも薬品や微粒子が残留すると、回路がショートして、そのチップは使い物になりません。そのため工場では、不純物を極限まで取り除いた超純水を大量に使っているわけです。工場の建設地を選ぶうえで、水を確保できるかどうかが大きな条件になるのは、こうした理由からなんですね。",
+      "form": "残留",
+      "en": "This time I'll talk about why semiconductor factories use so much water. In the course of making chips, every time the surface is treated with chemicals, a step that washes the wafer clean is inserted, many times over. If even the tiniest amount of chemical or particles remains here, the circuit shorts and that chip is useless. That's why factories use huge amounts of ultrapure water from which impurities have been removed to the limit. This is the reason why, in choosing where to build a factory, whether water can be secured becomes a major condition.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「薬品が残留する」「残留農薬」のように、取り除くべき物質があとに残る意味でも使う。",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "取り除くべき物質などが、そのまま残っていること"
+    },
+    {
+      "ja": "2016年6月、イギリスで欧州連合への加盟を続けるかどうかを問う国民投票が行われた。投票前の世論調査では、残留がわずかに上回るとの見方が多かった。しかし開票の結果、脱退を支持する票が約52パーセントを占め、市場には大きな動揺が広がった。国民投票の実施を公約に掲げていた保守党のキャメロン党首は、結果を受けて辞任を表明した。その後の交渉は難航し、イギリスが正式に欧州連合から脱退したのは2020年1月末のことだった。",
+      "form": "残留",
+      "en": "In June 2016, Britain held a referendum asking whether to continue its membership of the European Union. In pre-vote opinion polls, many expected Remain to come out slightly ahead. But when the votes were counted, ballots in favour of withdrawal took about 52 percent, and great turmoil spread through the markets. Conservative leader David Cameron, who had pledged to hold the referendum, announced his resignation in response to the result. The negotiations that followed were difficult, and it was at the end of January 2020 that Britain formally withdrew from the European Union.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "国民投票などでは「残留」と「離脱」が対になる。",
+      "sense": "ほかが去ったあとも、その場にとどまること"
+    },
+    {
+      "ja": "ヒンドゥー教では古くから、ガンジス川で身を清めれば罪が洗い流されると信じられてきた。ところが現実のガンジス川は、流域の都市から出る下水や工場の排水を大量に受け止めている。有害な金属は水に溶けて流れ去るとは限らず、川底の泥に長く残留することがある。人の汚れを引き受けてきた川が、その汚れを自分では流しきれなくなっているのである。清めるという営みは、清める側の水を守ることから始めなければならないのだろう。",
+      "form": "残留",
+      "en": "In Hinduism it has long been believed that bathing in the Ganges washes away one's sins. Yet the real Ganges takes in huge amounts of sewage from the cities along its banks and wastewater from factories. Harmful metals do not necessarily dissolve and flow away; they can remain for a long time in the mud of the riverbed. A river that has taken on people's impurities is becoming unable to wash those impurities away by itself. The work of purifying must probably begin by protecting the water that does the purifying.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「川底に残留する」「残留農薬」のように、なくなるべき物質があとまで残るときに使う。",
+      "grammar": ["n5-teiru"],
+      "sense": "取り除くべき物質などが、そのまま残っていること"
+    }
+  ]
+}

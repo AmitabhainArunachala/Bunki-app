@@ -1,29 +1,57 @@
-<div class="km kind-{{Kind}} pos-{{POS}}">
+<div class="km item-{{Type}} kind-{{Kind}} pos-{{POS}} {{Tags}}">
   <div class="chips">
     <span class="chip lvchip">{{Type}}</span><span class="chip">{{Source}}</span
-    ><span class="chip">{{Topic}}</span>
+    ><span class="chip">{{Topic}}</span><span class="chip levelchip"></span>
   </div>
   <div class="sentence">{{furigana:SentenceFurigana}}</div>
+  <!-- the back's tiers (docs/srs/CARD_CONTRACT_V2.md §3), as in the player: tier one is the
+  word, reading, part of speech and the Japanese definition; tier two is folds, in order -->
   <div class="answer">
     <div class="word">
-      <span class="term">{{Word}}</span><span class="reading">{{Reading}}</span>
+      <span class="term">{{Word}}</span><span class="reading">{{Reading}}</span
+      ><span class="posbadge"></span>
     </div>
-    {{#Kanji}}
-    <div class="kanji">{{Kanji}}</div>
-    {{/Kanji}}
     <div class="def">{{DefJA}}</div>
-    {{#SentenceEN}}
-    <details class="en">
-      <summary>英語</summary>
-      {{Meaning}}<br />
-      {{SentenceEN}}
-    </details>
-    {{/SentenceEN}} {{#Tip}}
-    <div class="tip">{{Tip}}</div>
-    {{/Tip}}
-    <div class="src">
-      出典 {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
-      >{{/SourceURL}}
+    <div class="folds">
+      <details class="fold gloss">
+        <summary>英語</summary>
+        <div class="meaning" lang="en">{{Meaning}}</div>
+        {{#Tip}}
+        <div class="tip"><span class="tip-label">注 </span><span lang="en">{{Tip}}</span></div>
+        {{/Tip}}
+      </details>
+      {{#SentenceEN}}
+      <details class="fold en">
+        <summary>英訳</summary>
+        <div class="en" lang="en">{{SentenceEN}}</div>
+      </details>
+      {{/SentenceEN}} {{^SentenceEN}}
+      <details class="fold en">
+        <summary>英訳</summary>
+        <div class="en-none">
+          この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）
+        </div>
+      </details>
+      {{/SentenceEN}} {{#Kanji}} {{#Hint}}
+      <details class="fold kfold">
+        <summary>漢字の形と意味</summary>
+        <div class="kanji">{{Kanji}}</div>
+      </details>
+      {{/Hint}} {{^Hint}}
+      <details class="fold kfold" open>
+        <summary>漢字の形と意味</summary>
+        <div class="kanji">{{Kanji}}</div>
+      </details>
+      {{/Hint}} {{/Kanji}}
+      <!-- 出典, the last fold as in the player; the licence of each source is listed in
+      ATTRIBUTION-<deck id>.md (a note field for it would change the note type) -->
+      <details class="fold src">
+        <summary>出典</summary>
+        <div class="srcline">
+          {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
+          >{{/SourceURL}}
+        </div>
+      </details>
     </div>
   </div>
 </div>

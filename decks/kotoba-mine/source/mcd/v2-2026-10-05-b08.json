@@ -1,0 +1,324 @@
+{
+  "22": [
+    {
+      "ja": "今回は、石油がどうやって私たちの暮らしに入ってきたのかを見ていきます。地下から汲み上げた原油は、そのままでは黒くてどろどろした液体にすぎないんですね。これを熱して、沸点の違いを利用して成分ごとに分けるのが分留という技術です。十九世紀の後半には、まずランプの明かりに使う灯油を取り出すことが主な目的でした。同じ原油から何を取り出すかを見れば、その時代が何を求めていたかが分かるわけです。",
+      "form": "分留",
+      "en": "This time we'll look at how petroleum came into our everyday lives. Crude oil pumped up from underground is, as it is, nothing more than a black, sludgy liquid. Heating it and separating it into its components by their differences in boiling point is the technique called fractional distillation. In the latter half of the nineteenth century, the main aim was first of all to extract kerosene for lamplight. If you look at what was taken out of the same crude oil, you can see what that era wanted.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「原油を分留する」「分留で取り出す」のように、化学や工業の文脈で使う。",
+      "grammar": ["n4-teiku", "n2-ni-suginai"]
+    },
+    {
+      "ja": "化学の入試で原油の分留が出たら、まず沸点の低い順に並べられるかが勝負です。塔の上から石油ガス、ナフサ、灯油、軽油、そして一番下側が重油ですね。この順番を丸暗記で済ませようとすると、本番で一つずれただけで全部崩れてしまいます。小さくて軽い分子ほど早く気体になると理解しておけば、順番は自然に出てくるようになります。覚える量を減らすことで、ミスも減らせるというわけです。",
+      "form": "分留",
+      "en": "If fractional distillation of crude oil comes up in the chemistry entrance exam, the key is first whether you can line things up from the lowest boiling point. From the top of the tower it's petroleum gas, naphtha, kerosene, light oil, and at the very bottom, heavy oil. If you try to get by memorizing this order by rote, everything falls apart on exam day if a single item slips. If you understand that the smaller and lighter the molecule, the sooner it becomes a gas, the order will come out naturally. By reducing the amount you memorize, you can reduce your mistakes too.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「蒸留」は蒸発させて分けること全般、「分留」は沸点の差で複数の成分に分けること。",
+      "grammar": ["n4-you-ni-naru", "n3-koto-de"]
+    },
+    {
+      "ja": "半導体の材料となるシリコンには、「イレブンナイン」と呼ばれるほどの極めて高い純度が求められている。そのため原料をいったん液体の化合物に変え、分留によって不純物を取り除く工程が欠かせない。わずかな金属が混じるだけで、回路が正しく動かなくなるおそれがあるためだ。用途によって求められる純度は異なり、精製の度合いもそれに応じて変わる。目立たない上流の工程が、最先端の半導体を支えているといえる。",
+      "form": "分留",
+      "en": "Purity so extreme that it is called 'eleven nines' is required of the silicon that serves as the material for semiconductors. For this reason, a process is indispensable in which the raw material is first turned into a liquid compound and impurities are removed by fractional distillation. This is because the mixing-in of even a tiny amount of metal risks circuits no longer working correctly. The purity required differs by application, and the degree of refining changes accordingly. It can be said that an inconspicuous upstream process supports cutting-edge semiconductors.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「分留によって」「分留を繰り返す」のように、工程の説明に添えて使われる。",
+      "grammar": ["n5-teiru", "n2-ni-oujite"]
+    }
+  ],
+  "20": [
+    {
+      "ja": "インドの神話には、乳海攪拌と呼ばれる有名な場面があります。神々と阿修羅たちが大蛇を綱にして大きな山に巻きつけ、両側から交互に引っ張って、海に立てた山をぐるぐると回し続けたというお話です。山が回るにつれて乳の海は大きな渦を巻き、その底から不死の霊薬をはじめ、さまざまな宝が次々と現れたとされています。この場面は、カンボジアのアンコール・ワットの回廊にも大きな浮き彫りとして残っているんですね。インドで生まれた物語が、東南アジアの石の壁にまで届いているわけです。",
+      "form": "攪拌",
+      "en": "In Indian mythology there is a famous scene called the Churning of the Ocean of Milk. It's the story in which the gods and the asuras wrapped a giant serpent around a great mountain as a rope and, pulling alternately from both sides, kept spinning the mountain they had stood upright in the sea. It's said that as the mountain turned, the ocean of milk swirled into a great whirlpool, and from its depths various treasures appeared one after another, beginning with the elixir of immortality. This scene survives as a large relief in a gallery of Angkor Wat in Cambodia too. A story born in India has reached all the way to the stone walls of Southeast Asia.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "神話の名「乳海攪拌」は定訳として定着している。日常語なら「かき混ぜる」。",
+      "grammar": ["n3-ni-tsurete", "n5-teiru"]
+    },
+    {
+      "ja": "溶解の問題でよく狙われるのが、攪拌によって何が変わり、何が変わらないのかという点です。液をぐるぐる回せば、固体の表面に新しい液が次々と触れるので、溶ける速さは上がります。ところが、一定量の水に最大どれだけ溶けるかという溶解度そのものは、温度が同じなら変わりません。速さと量を混同していると、選択肢の引っかけにそのままはまることになります。迷ったら、それが速さの話なのか量の話なのかを、まず問題文で確かめましょう。",
+      "form": "攪拌",
+      "en": "What is often targeted in dissolution questions is what stirring changes and what it does not. If you swirl the liquid around, fresh liquid keeps touching the surface of the solid, so the speed at which it dissolves goes up. However, the solubility itself, meaning the maximum amount that will dissolve in a given amount of water, does not change if the temperature is the same. If you confuse speed with amount, you will walk straight into the trap in the answer choices. If in doubt, first check in the question whether it is about speed or about amount.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "試験では「攪拌すると溶ける速さは上がるが、溶解度は変わらない」が定番の引っかけ。",
+      "grammar": ["n3-koto-ni-naru"]
+    },
+    {
+      "ja": "半導体の工場では、ウエハーの表面を平らに磨く研磨液が、常に攪拌されながら装置へ送られている。液に含まれる細かな粒子が底に沈むと、濃さにむらが出て、磨き方が場所ごとに変わってしまうためだ。回路の微細化が進むにつれて、表面のわずかな凹凸も許されなくなってきた。液の状態を一定に保つ地道な管理が、工場全体の品質を左右しているといえる。一枚のウエハーから取れるチップの数にも、こうした細部が響いてくる。",
+      "form": "攪拌",
+      "en": "At semiconductor plants, the polishing liquid used to make wafer surfaces flat is sent to the machines while being constantly stirred. This is because if the fine particles in the liquid sink to the bottom, its concentration becomes uneven and the polishing differs from place to place. As circuits have grown finer, even slight unevenness on the surface has ceased to be tolerated. The steady work of keeping the liquid in a constant state can be said to determine the quality of the whole plant. Such details even affect the number of chips that can be taken from a single wafer.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「攪拌しながら」「常に攪拌される」のように、工業の現場で混ぜ続ける動作に使う。",
+      "grammar": ["n5-teiru", "n3-ni-tsurete"]
+    }
+  ],
+  "62": [
+    {
+      "ja": "大学選びで迷う人が多いのが、理学と工学の違いです。ざっくり言うと、前者は「なぜそうなるのか」を突き詰め、後者は「どうすれば役に立つ形にできるか」を考えます。同じ電気を扱うにしても、仕組みを解き明かすのか、使える製品に仕上げるのかで、問いの立て方がまったく変わるんですね。どちらが上という話ではなく、自分がどちらの問いに燃えるかで選ぶのがおすすめです。ちなみに研究の世界では、この二つの境目はかなりあいまいになってきています。",
+      "form": "理学",
+      "en": "Something many people get stuck on when choosing a university is the difference between natural science and engineering. Roughly speaking, the former digs into why things happen as they do, while the latter thinks about how to turn them into something useful. Even when dealing with the same electricity, the way you pose questions changes completely depending on whether you are uncovering the mechanism or finishing it into a usable product. It's not a matter of which is superior; I recommend choosing by which kind of question fires you up. Incidentally, in the world of research, the boundary between the two has become quite blurry.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「理学部」「理学博士」のように、工学と対にして自然の仕組みを探る学問を指す。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    },
+    {
+      "ja": "宋の時代に体系化された理学は、万物に「理」が宿るという考えを柱としていた。人は物事の筋道を一つずつ確かめることで、自らの心の内にある理にも近づけるとされたのである。この思想は南宋の朱子によってまとめられ、のちに朝鮮や江戸時代の日本の学問にも深く根を下ろした。それは近代科学のいう法則とは違うが、世界には読み解くべき筋道があるという信頼において、両者は案外近いのかもしれない。",
+      "form": "理学",
+      "en": "The Learning of Principle, systematised in the Song dynasty, rested on the idea that a 'principle' dwells in all things. It was held that by examining the pattern of things one by one, a person could also draw closer to the principle within their own mind. This thought was brought together by Zhu Xi of the Southern Song, and later took deep root in the scholarship of Korea and of Edo-period Japan as well. It differs from what modern science calls laws, yet in their trust that the world has a pattern to be deciphered, the two are perhaps surprisingly close.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "思想史では、宋代の儒学（朱子学など）を指して「理学」と呼ぶことがある。",
+      "grammar": ["n3-koto-de"],
+      "sense": "宋代に体系化された儒学の一派。朱子学など"
+    },
+    {
+      "ja": "明治十年、東京大学は法・理・文・医の四つの学部で発足した。このうち理学の分野では、当初は欧米から招かれた教師が、外国語で講義の多くを担っていた。留学から戻った日本人の研究者が育つにつれて、授業は次第に日本語で行われるようになった。専門の用語を一から日本語に置き換える作業も、同時に進められた。現在の日本の基礎研究は、こうした明治期の地道な積み重ねの上に成り立っている。",
+      "form": "理学",
+      "en": "In 1877, the tenth year of Meiji, the University of Tokyo was founded with four faculties: law, science, letters and medicine. In the field of natural science, teachers invited from Europe and America at first carried much of the lecturing, in foreign languages. As Japanese researchers who had returned from study abroad developed, classes gradually came to be held in Japanese. The work of replacing specialist terms with Japanese from scratch also went ahead at the same time. Basic research in Japan today stands on this steady work built up in the Meiji era.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "明治期の大学制度を語るときには、学部の名とともに分野名として出てくる。",
+      "grammar": ["n3-ni-tsurete", "n4-you-ni-naru", "n5-teiru"]
+    }
+  ],
+  "57": [
+    {
+      "ja": "江戸時代の旅を考えるうえで外せないのが、日本橋です。徳川家康の時代に整えられた五街道は、すべてこの橋を起点としていました。東海道も中山道も、ここから距離を数え、一里ごとに塚を築いて旅人の目印にしたわけですね。実は今でも、橋の中央には道路の基準となる印が埋め込まれていて、いくつかの国道はこの場所から始まっているんです。つまり、江戸の地図は日本橋を中心に描かれていたと言ってもいいでしょう。",
+      "form": "起点",
+      "en": "When thinking about travel in the Edo period, one thing you can't leave out is Nihonbashi. The Five Routes, put in order in Tokugawa Ieyasu's time, all took this bridge as their starting point. Both the Tōkaidō and the Nakasendō counted their distances from here, building a mound at every ri as a marker for travellers. In fact, even today a marker that serves as the reference point for roads is embedded in the middle of the bridge, and several national highways begin at this spot. In other words, you could say that the map of Edo was drawn with Nihonbashi at its centre.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜を起点とする」は、道路や鉄道の始まりを示す定番の言い方。",
+      "grammar": ["n2-ue-de", "n5-teiru"]
+    },
+    {
+      "ja": "1947年に米国のベル研究所で発明されたトランジスタは、現在の半導体産業の起点とされる。それまで電気信号を増幅するには、熱を持ちやすく壊れやすい大きな部品に頼るしかなかった。小さく丈夫な部品に置き換わったことで、ラジオやコンピューターなどの電子機器は急速に小型化が進んだ。その延長線上に、いまのAIを動かす計算用のチップがあるといえる。三人の開発者は、この功績によって後にノーベル物理学賞を受けている。",
+      "form": "起点",
+      "en": "The transistor, invented at Bell Labs in the United States in 1947, is regarded as the starting point of today's semiconductor industry. Until then, amplifying electrical signals meant relying on large components that ran hot and broke easily. With the switch to small, sturdy components, electronic devices such as radios and computers rapidly became smaller. It can be said that the computing chips that run today's AI lie on the extension of that line. The three developers later received the Nobel Prize in Physics for this achievement.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「〜の起点とされる」で、物事の流れが始まったところを指す比喩にも使う。",
+      "grammar": ["n3-koto-de"],
+      "sense": "物事の流れが始まるきっかけとなるところ"
+    },
+    {
+      "ja": "釈迦の教えは、世界の成り立ちを説くことからではなく、人が苦しんでいるという事実から始まった。老いること、病むこと、死ぬこと、求めても得られないこと。教えはまず、生きることに伴う苦しみをありのままに見つめるよう求める。その苦しみを起点に、原因を探り、それを断つ道を示したのが四つの真理である。身近な痛みから目をそらさなかったからこそ、この教えは二千年以上も人々に届き続けているのだろう。",
+      "form": "起点",
+      "en": "The Buddha's teaching began not from explaining how the world came to be, but from the fact that people suffer. Ageing, falling ill, dying, not obtaining what one seeks. The teaching first asks us to look squarely at the suffering that comes with living. Taking that suffering as the starting point, what sought out its cause and showed the path to cut it off was the Four Noble Truths. Perhaps it is precisely because it did not look away from familiar pain that this teaching has kept reaching people for more than two thousand years.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「〜を起点に」は、そこから考えや行動を始める場合にも使える。",
+      "grammar": ["n3-dewa-naku", "n5-teiru"]
+    }
+  ],
+  "137": [
+    {
+      "ja": "紀元前399年、古代ギリシャの都市国家アテネで、一人の年老いた哲学者が裁判にかけられました。ソクラテスです。若者を堕落させ、国の神々を敬わないという罪で、市民たちに訴えられたんですね。被告人となった彼は、命ごいをするどころか、自分は正しいことをしてきたと法廷で堂々と主張しました。結果は死刑で、友人たちが逃亡の手はずを整えたのに、彼は法に従って毒杯を受け入れたと伝えられています。",
+      "form": "被告人",
+      "en": "In 399 BC, in the ancient Greek city-state of Athens, an aged philosopher was put on trial. It was Socrates. He was charged by fellow citizens with corrupting the young and not honouring the city's gods. Having become the defendant, far from begging for his life, he boldly argued in court that he had done what was right. The verdict was death, and it is said that although his friends had arranged an escape, he obeyed the law and accepted the cup of poison.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "刑事裁判で罪を問われた人は「被告人」。古代の裁判を語るときにも使える。",
+      "grammar": ["n2-dokoroka", "n5-teiru"]
+    },
+    {
+      "ja": "ニュースでは、名前の後ろに「被告」とつける呼び方をよく耳にします。けれども法律の上では、刑事裁判で罪を問われている人は被告人と呼ばれます。「被告」だけだと、本来は民事裁判で訴えられた側を指す言葉なんです。報道が短い呼び方を使うのは、限られた紙面や放送時間に収めるためだとも言われています。書き手としては、正式な言葉と慣用の言い方がずれる場面を知っておけば、誤解を招くことなく書けます。",
+      "form": "被告人",
+      "en": "On the news we often hear the style of attaching 'hikoku' after a person's name. In law, however, a person charged with a crime in a criminal trial is called a 'hikokunin'. The word 'hikoku' on its own is properly a word for the side being sued in a civil trial. It's also said that the media use the shorter form to fit it into limited page space or broadcast time. As a writer, if you know the situations where the formal word and customary usage diverge, you can write without inviting misunderstanding.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "法律では刑事が「被告人」、民事が「被告」。報道は刑事でも「〜被告」と呼ぶ。",
+      "grammar": ["n5-teiru", "n2-koto-naku"]
+    },
+    {
+      "ja": "裁判で有罪か無罪かを決める場面でも、人の判断は思ったほど公平ではないことが知られています。たとえば、被告人の見た目の印象が、刑の重さに影響しうることを示した心理学の研究があります。大事なのは、こうした偏りは誰にも避けられないという前提に立つことです。そのうえで、証拠だけを順に確かめる手順を決めておけば、印象に流されにくくなります。裁判員に選ばれたときだけでなく、日常で人を評価する場面にも通じる考え方です。",
+      "form": "被告人",
+      "en": "Even when deciding at trial whether someone is guilty or not guilty, people's judgments are known to be less fair than one might think. For example, there is psychological research showing that the impression made by a defendant's appearance can affect the severity of the sentence. What matters is to start from the premise that no one can avoid such biases. On that basis, if you decide in advance on a procedure for checking only the evidence in order, you become less likely to be swayed by impressions. This way of thinking applies not only when you are chosen as a lay judge but also whenever you evaluate people in daily life.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「被告人の〜」の形で、裁判で判断される側の人の属性を述べる。",
+      "grammar": ["n5-teiru", "n2-ue-de"]
+    }
+  ],
+  "138": [
+    {
+      "ja": "今日は、お金に困っていないのに万引きをやめられない人の話をします。精神医学では、こうした状態は窃盗症、クレプトマニアと呼ばれ、衝動をうまく抑えられない病気の一つとされているんですね。本人は品物が欲しいわけではないのに、盗む瞬間の緊張と、その後の解放感に引き寄せられてしまうと言われます。だからこそ、罰を重くするだけでは繰り返しを止められず、治療という視点が欠かせないわけです。",
+      "form": "万引き",
+      "en": "Today I'll talk about people who can't stop shoplifting even though they aren't short of money. In psychiatry this condition is called kleptomania, and it is regarded as one of the disorders in which a person cannot properly control impulses. It's said that although the person doesn't actually want the goods, they are drawn to the tension at the moment of stealing and the sense of release that follows. That is precisely why making punishments heavier can't on its own stop the repetition, and a treatment perspective is indispensable.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「万引きをやめられない」「万引きを繰り返す」のように、行為の名前として使う。",
+      "grammar": ["n3-wake-dewa-nai"]
+    },
+    {
+      "ja": "小売店で万引きによる損失を減らそうと、AIを使った防犯カメラを導入する動きが広がっている。棚の前で何度も周囲を見回したり、同じ場所を行き来したりといった不審な動きを検知し、店員の端末に知らせる仕組みだ。一方で、映像から客の行動を自動で判定することには、誤った疑いを生むおそれも指摘されている。導入する店側には、精度とともに、客のプライバシーへの配慮も求められることになりそうだ。",
+      "form": "万引き",
+      "en": "Moves are spreading among retailers to introduce AI-powered security cameras in order to reduce losses from shoplifting. The system detects suspicious movements such as repeatedly glancing around in front of a shelf or going back and forth in the same spot, and notifies staff devices. On the other hand, it has been pointed out that automatically judging customers' behaviour from video also risks generating false suspicion. Stores introducing it will likely be required to show consideration for customers' privacy as well as accuracy.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「万引きによる損失」「万引き被害」の形でよく使われる。",
+      "grammar": ["n5-teiru", "n3-koto-ni-naru"]
+    },
+    {
+      "ja": "仏教の五戒の一つに、与えられていないものを取らないという戒めがある。わざわざそう言葉にしたのは、人は何かを欲しいと思った瞬間、それが誰のものかを忘れやすいからだろう。店先での小さな万引きも、国を奪う戦争も、根にあるのは同じ一つの心の動きだと考えれば、この戒めの射程の広さが見えてくる。大切なのは、手を伸ばす前のほんの一瞬に、自分の欲に気づけるかどうかなのである。",
+      "form": "万引き",
+      "en": "Among the Five Precepts of Buddhism is one against taking what has not been given. That it was spelled out in words is perhaps because, the moment people want something, they easily forget whose it is. If we consider that at the root of a small shoplifting at a shopfront and of a war that seizes a country lies the same single movement of the mind, the breadth of this precept's reach comes into view. What matters is whether, in the brief instant before reaching out a hand, one can notice one's own desire.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "小さな盗みの代表例として、日々の行いを語る文脈にも出てくる。"
+    }
+  ],
+  "139": [
+    {
+      "ja": "江戸の町には、本を背負って得意先を回る貸本屋という商売がありました。当時の本は高価で、庶民が気軽に買えるものではなかったんですね。そこで、数日だけ本を貸し、次に回ってきたときに返却してもらって、また別の本を置いていくという仕組みが広まりました。人気の読み物は大勢に回し読みされ、江戸の人々の読書を支えていたと言われています。いまの図書館の貸し出しと、考え方はほとんど同じなんです。",
+      "form": "返却",
+      "en": "In the towns of Edo there was a trade called the lending library, in which people carried books on their backs and made the rounds of their customers. Books at the time were expensive, not something ordinary people could casually buy. So a system spread in which books were lent for just a few days, returned when the lender came round next, and another book was left in their place. It's said that popular reading matter was passed around among many people and supported the reading of Edo's townsfolk. The idea is almost the same as lending at today's libraries.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「本を返却する」「返却期限」のように、借りた物を戻す場面で使う。",
+      "grammar": ["n4-teiku", "n5-teiru"]
+    },
+    {
+      "ja": "テストで一番伸びるのは、実は答案の返却のあとです。点数だけ見てすぐにかばんにしまい込む人が多いのですが、間違えた問題こそ、自分の弱点がはっきり書かれた地図なんです。記憶の研究でも、間違えたあとに正しい答えを確かめると、ただ読み直すより記憶に残りやすいことが知られています。返ってきたその日のうちに、なぜ間違えたのかを一行でいいので書き出しておきましょう。それだけで、次のテストの準備はもう半分終わっています。",
+      "form": "返却",
+      "en": "The point where you improve most from a test is actually after the answer sheets are returned. Many people just look at the score and immediately put it away in their bag, but the questions you got wrong are precisely a map with your weak points clearly written on it. Memory research also shows that checking the correct answer after making a mistake makes it stick in memory more easily than simply rereading. On the very day it comes back, write down why you got it wrong, even if it's just one line. With just that, half your preparation for the next test is already done.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学校では「答案の返却」「テストの返却」が決まった言い方。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "この身体も、いくつかの要素が縁によって一時的に寄り集まったものにすぎないと仏教は説く。そうであれば、私たちが自分のものと思っている肉体も才能も、いずれは手放さなければならない借り物である。しかも、いつ返すことになるのかは誰にも知らされていない。死とは、預かっていたものの返却なのだと考えると、失うことへの恐れは少し形を変える。惜しむことよりも、借りているあいだに何をするかが問われているのだろう。",
+      "form": "返却",
+      "en": "Buddhism teaches that this body too is nothing more than a number of elements temporarily gathered together through conditions. If so, the flesh and the talents we think of as our own are borrowed things that must someday be let go. Moreover, no one is told when they will have to give them back. When we think of death as the return of what we had been entrusted with, the fear of losing changes its shape a little. What is asked of us is perhaps not clinging, but what we do while we are borrowing.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "ここでは「預かっていたものの返却」として、命を借り物にたとえている。",
+      "grammar": ["n2-ni-suginai", "n5-teiru"]
+    }
+  ],
+  "140": [
+    {
+      "ja": "禁酒法時代のシカゴで、アル・カポネは密造酒の取引で巨大な組織を築いていました。ところが、殺人や密輸に関わった証拠はなかなか固められず、当局は彼の立件に手を焼いていたんですね。そこで目をつけたのが、派手な暮らしぶりに見合う収入を申告していないという点でした。1931年、彼は脱税の罪で有罪となり、長い刑に服することになります。どんな大物でも、証明できる罪から崩していくという捜査の発想がよく表れた例です。",
+      "form": "立件",
+      "en": "In Prohibition-era Chicago, Al Capone had built a huge organisation on the trade in bootleg liquor. However, evidence that he was involved in murder and smuggling could hardly be firmed up, and the authorities were having trouble building a case against him. So what they turned their attention to was that he had not declared an income to match his flashy lifestyle. In 1931 he was found guilty of tax evasion, and he would go on to serve a long sentence. It's an example that clearly shows the investigative idea of bringing down even a major figure starting from the crime that can be proved.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜の立件に手を焼く」「立件を見送る」のように、捜査する側を主語にして使う。",
+      "grammar": ["n3-koto-ni-naru"]
+    },
+    {
+      "ja": "生成AIで作った偽の音声や映像を使った詐欺が、各地で問題になっている。家族や会社の上司になりすまし、送金を求める手口が典型だ。捜査当局にとって難しいのは、誰がどの段階で偽物を作ったのかを突き止めることだ。データが海外のサーバーを経由している場合も多く、証拠を集めて立件に至るまでには長い時間がかかる。技術の急速な進歩に、法律と捜査の仕組みがどこまで追いつけるかが問われている。",
+      "form": "立件",
+      "en": "Fraud using fake voices and video made with generative AI is becoming a problem in many places. A typical method is to pose as a family member or a boss at work and ask for money to be sent. What is difficult for investigators is tracking down who created the fakes and at what stage. In many cases the data passes through servers overseas, and it takes a long time to get from gathering evidence to building a case. The question is how far laws and investigative systems can keep up with the rapid progress of technology.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「立件に至る」「立件までに時間がかかる」は報道の定番の言い方。",
+      "grammar": ["n5-teiru", "n1-ni-itaru-made"]
+    },
+    {
+      "ja": "ニュースで「警察は立件を見送った」と聞くと、何も起きなかったように感じる人もいるかもしれません。けれども実際には、捜査はしたものの、刑事事件として扱えるだけの証拠がそろわなかったという意味です。つまり、疑いが晴れたのではなく、証明できなかったという話なんですね。書く側も、読み手がどこで誤解しやすいかを意識して、言葉を選ぶ必要があります。短い言葉ほど、省かれた部分を補って読む力が求められます。",
+      "form": "立件",
+      "en": "When you hear on the news that 'the police decided not to build a case', some people may feel as though nothing happened. In reality, though, it means that while there was an investigation, not enough evidence came together to treat it as a criminal case. In other words, it's not that the suspicion was cleared, but that it couldn't be proved. Those who write, too, need to choose their words while staying aware of where readers are likely to misunderstand. The shorter the wording, the more it demands the ability to read by filling in what was left out.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "「立件を見送る」は、疑いが晴れたという意味ではない点に注意。",
+      "grammar": ["n2-mono-no", "n3-dewa-naku"]
+    }
+  ],
+  "143": [
+    {
+      "ja": "ネットのニュースを読んでいて、記事の中身と見出しがずれていると感じたことはありませんか。最近は、どの言葉を使うとクリックされやすいかをAIで分析して、表現を選ぶ仕組みも広がっています。その結果、読まれる数は増えても、記事への信頼が少しずつ失われていくという問題が指摘されているんですね。大事なのは、数字を最適化するだけではなく、何を正確に伝えたいかという軸を手放さないことです。",
+      "form": "見出し",
+      "en": "Have you ever been reading online news and felt that the content of the article and its headline didn't match? These days, systems are spreading that use AI to analyse which words get clicked more easily and choose the wording accordingly. As a result, the problem has been pointed out that even if the number of reads goes up, trust in articles is gradually lost. What matters is not just optimising the numbers, but never letting go of the core of what you want to convey accurately.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「見出しをつける」「見出しが大きい」のように、記事の題を指す。",
+      "grammar": ["n5-teiru", "n4-teiku", "n3-dewa-naku"]
+    },
+    {
+      "ja": "1948年の米大統領選挙で、シカゴの新聞がトルーマン候補の敗北を伝える紙面を刷ったことはよく知られている。開票の結果が出そろう前に、事前の予想をもとに大きな見出しを組んでしまったのである。実際にはトルーマンが勝利し、その新聞を笑顔で掲げる彼の写真が後世に残ることになった。速さを優先する報道が、確かめる手間を省いたときの危うさを示す例といえる。ネットで記事が瞬時に届く現在、この教訓の重みはむしろ増している。",
+      "form": "見出し",
+      "en": "It is well known that in the 1948 US presidential election, a Chicago newspaper printed an edition reporting the defeat of candidate Truman. It had set a large headline based on advance predictions before the results of the count were all in. In fact Truman won, and a photo of him holding up that newspaper with a smile ended up being handed down to posterity. It can be called an example showing the danger when reporting that prioritises speed skips the trouble of checking. Now that articles arrive instantly online, the weight of this lesson has if anything increased.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "新聞では「見出しを組む」「大見出し」のような業界の言い方もある。",
+      "grammar": ["n3-koto-ni-naru"]
+    },
+    {
+      "ja": "教科書や参考書を読むとき、いきなり一行目から読み始めるのはおすすめしません。まず章の見出しと太字、図の説明だけをざっと眺めて、全体の地図を頭に入れましょう。先に枠組みを持っておくことで、細かい説明がどこに収まるのかが分かり、記憶に残りやすくなります。慣れてくると、読む前に「ここではこんな問いに答えるはずだ」と予想できるようになり、理解の速さがはっきり変わってきます。試験前の復習でも、同じやり方が使えます。",
+      "form": "見出し",
+      "en": "When reading a textbook or study guide, I don't recommend starting straight from the first line. First just skim the chapter headings, the bold text and the figure captions to get a map of the whole in your head. By having the framework first, you can see where the detailed explanations fit, and they stick in memory more easily. Once you get used to it, you'll be able to predict before reading that this part should answer a certain kind of question, and your speed of understanding will clearly change. The same method works for review before exams too.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "本の章や節の題も「見出し」と呼ぶ。読む前にざっと眺めると効果的。",
+      "grammar": ["n3-koto-de", "n4-you-ni-naru"],
+      "sense": "本や文章の章・節につける短い題"
+    }
+  ],
+  "144": [
+    {
+      "ja": "アメリカの大統領は二期八年までというのが、今では憲法で決められたルールです。でも、もともとは初代のワシントンが二期で退いたことから生まれた、ただの慣例だったんですね。この慣例を破ったのがフランクリン・ルーズベルトで、大恐慌と第二次世界大戦のさなかに、異例の四回連続当選を果たしました。その後、同じことが起きないように、任期を制限する修正条項がつくられたわけです。",
+      "form": "異例",
+      "en": "That an American president is limited to two terms, eight years, is now a rule set by the Constitution. But originally it was just a custom that arose from the first president, Washington, stepping down after two terms. The one who broke this custom was Franklin Roosevelt, who, in the midst of the Great Depression and the Second World War, achieved an exceptional four consecutive election victories. Afterwards, an amendment limiting the term was created so that the same thing would not happen again.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「異例の〜」の形で、過去にほとんど例のない出来事を強調する。",
+      "grammar": ["n3-you-ni"]
+    },
+    {
+      "ja": "対話型AIのChatGPTは、2022年11月の公開からわずか2か月ほどで、利用者が1億人に達したと推計された。普及のこの速さは、それまでのネットサービスと比べても異例とされ、各国の企業が一斉に開発へ乗り出すきっかけとなった。急速な広がりは、AIの計算を担う半導体の需要にも波及した。一方で、利用の急拡大にルールづくりが追いつかないという課題も浮かび上がっている。",
+      "form": "異例",
+      "en": "The conversational AI ChatGPT was estimated to have reached 100 million users only about two months after its release in November 2022. This speed of adoption was regarded as exceptional even compared with earlier internet services, and it became the trigger for companies in many countries to launch into development all at once. The rapid spread also rippled out into demand for the semiconductors that handle AI computation. On the other hand, the problem has also emerged that rule-making cannot keep up with the rapid expansion of use.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「異例の速さ」「異例とされる」のように、評価を添えて使う。",
+      "grammar": ["n5-teiru"]
+    },
+    {
+      "ja": "人は、予想どおりに進む世界を好む生き物である。いつもと違うことが起きると、私たちはまずそれを間違いとして片づけようとする。だが、異例の出来事こそ、自分が当たり前だと思っていた前提を、くっきりと映し出す鏡でもある。慣れた枠組みに無理に押し込めることなく、なぜそれが起きたのかを問うとき、思考はほんの少しだけ広がる。驚きを避けるのではなく、驚きから学ぶ姿勢が求められているのだろう。",
+      "form": "異例",
+      "en": "People are creatures that prefer a world that goes as expected. When something out of the ordinary happens, we first try to dismiss it as a mistake. Yet an unusual event is also precisely a mirror that sharply reflects the assumptions we had taken for granted. When we ask why it happened, without forcibly pushing it into a familiar framework, our thinking widens just a little. What is asked of us is perhaps not to avoid surprise but an attitude of learning from it.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「異例の出来事」は、いつもの型に当てはまらない出来事を指す。",
+      "grammar": ["n2-koto-naku", "n3-dewa-naku", "n5-teiru"]
+    }
+  ]
+}

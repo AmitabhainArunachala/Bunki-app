@@ -1,16 +1,18 @@
 /* 集中道場 deck player — one column, dark by default, high contrast.
- * Colour carries meaning and nothing else:
- *   cyan   the word being asked (blank, answer, target)
- *   red    again / hard words      amber  learning / due today
- *   green  good / known words      violet easy
- * Level 1–3 of a word's sentences: green → cyan → violet edge on the card. */
+ * One hue axis per surface (docs/srs/brief-2026-10-04/aesthetics.md §3), each hue paired
+ * with text or shape:
+ *   target / term       part of speech (--kp-noun … --kp-sound), underlined; the blank is the accent
+ *   card edge + chip    item kind: 語 --kp-kind-go, 字 --kp-kind-ji, 文法 --kp-kind-bun
+ *   grades, state       red again / hard · amber learning / due · green good / known
+ *   everything else     ink, ink-2, mute — English and the level chip (N1/N2/N3) are never coloured
+ * Textures sit on the page, never on the card under the ruby. Contrast: tools/contrast-kotoba.mjs. */
 .kp {
   --kp-bg: #0a0e13;
   --kp-panel: #121922;
   --kp-panel-2: #18212c;
   --kp-ink: #f3f7fb;
   --kp-ink-2: #b7c3cf;
-  --kp-mute: #7f8d9b;
+  --kp-mute: #8796a4;
   --kp-line: #263240;
   --kp-cyan: #3fd0ff;
   --kp-cyan-wash: rgba(63, 208, 255, 0.14);
@@ -18,10 +20,15 @@
   --kp-amber: #ffb648;
   --kp-green: #3ee391;
   --kp-violet: #a58bff;
+  /* item kind: the card's left edge and its 語・字・文法 chip (aesthetics.md §3) */
+  --kp-kind-go: var(--kp-cyan);
+  --kp-kind-ji: #ffb0ea; /* was #ff8fd8, ΔE 4.4 from --kp-sound (STANDARD A40) */
+  --kp-kind-bun: var(--kp-violet);
   --kp-jp: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif;
   --kp-num: ui-monospace, 'SF Mono', 'Menlo', monospace;
   color-scheme: dark;
   background: var(--kp-bg);
+  background-image: var(--kp-tex);
   color: var(--kp-ink);
   font-family: var(--kp-jp);
   margin: -8px -16px 0;
@@ -34,15 +41,16 @@
   --kp-panel: #ffffff;
   --kp-panel-2: #eef3f7;
   --kp-ink: #0b1520;
-  --kp-ink-2: #32424f;
-  --kp-mute: #5d6c79;
+  --kp-ink-2: #27343f;
+  --kp-mute: #4f5d6a;
   --kp-line: #d3dde6;
-  --kp-cyan: #0074b8;
-  --kp-cyan-wash: rgba(0, 116, 184, 0.1);
-  --kp-red: #d22f43;
-  --kp-amber: #b86e00;
-  --kp-green: #0e8f53;
-  --kp-violet: #6a4fd8;
+  --kp-cyan: #005f98;
+  --kp-cyan-wash: rgba(0, 95, 152, 0.1);
+  --kp-red: #c32a3d;
+  --kp-amber: #955900;
+  --kp-green: #075e36;
+  --kp-violet: #5f46c9;
+  --kp-kind-ji: #7f1f86; /* was #a3237a, ΔE 4.4 from --kp-sound */
   color-scheme: light;
 }
 .kp * { box-sizing: border-box; }
@@ -62,7 +70,7 @@
 .kp-tile b { font-family: var(--kp-num); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .kp-tile span { font-size: 12px; color: var(--kp-ink-2); }
 .kp-c-due b, .kp-c-due { color: var(--kp-amber); }
-.kp-c-new b { color: var(--kp-cyan); }
+.kp-c-new b { color: var(--kp-ink); }
 .kp-c-known b, .kp-verdict.kp-c-known { color: var(--kp-green); }
 .kp-c-hard b, .kp-verdict.kp-c-hard { color: var(--kp-red); }
 .kp-tile span { color: var(--kp-ink-2); }
@@ -82,7 +90,7 @@
 .kp-bar { grid-column: 1 / -1; display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--kp-panel-2); }
 .kp-bar i { display: block; height: 100%; }
 .kp-bar .kp-c-known { background: var(--kp-green); }
-.kp-bar .kp-c-grow { background: var(--kp-cyan); }
+.kp-bar .kp-c-grow { background: color-mix(in srgb, var(--kp-green) 55%, var(--kp-panel-2)); }
 .kp-bar .kp-c-learn { background: var(--kp-amber); }
 
 .kp-foot { display: flex; gap: 20px; justify-content: center; }
@@ -91,55 +99,145 @@
 /* study */
 .kp-top-study { gap: 10px; }
 .kp-progress { flex: 1; height: 6px; border-radius: 3px; background: var(--kp-panel-2); overflow: hidden; }
-.kp-progress i { display: block; height: 100%; background: var(--kp-cyan); transition: width 0.2s; }
+/* the rail ticks per card on the compositor: scaleX, never width */
+.kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1); }
 .kp-count { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 
-.kp-card { background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-green); border-radius: 18px; padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s, box-shadow 0.12s; min-height: 220px; }
-.kp-lv2 { border-left-color: var(--kp-cyan); }
-.kp-lv3 { border-left-color: var(--kp-violet); }
+.kp-card { --kp-kind: var(--kp-kind-go); background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-kind); border-radius: 18px; padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s, box-shadow 0.12s; min-height: 220px; }
+/* item kind: the left edge and the kind chip, nothing else */
+.kp-kind-ji { --kp-kind: var(--kp-kind-ji); }
+.kp-kind-bun { --kp-kind: var(--kp-kind-bun); }
 .kp-card[data-swipe='good'] { box-shadow: 0 0 0 2px var(--kp-green); }
 .kp-card[data-swipe='again'] { box-shadow: 0 0 0 2px var(--kp-red); }
 .kp-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .kp-chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--kp-line); color: var(--kp-ink-2); white-space: nowrap; }
-.kp-lv1 .kp-lvchip { color: var(--kp-green); border-color: currentColor; }
-.kp-lv2 .kp-lvchip { color: var(--kp-cyan); border-color: currentColor; }
-.kp-lv3 .kp-lvchip { color: var(--kp-violet); border-color: currentColor; }
-.kp-st-new { color: var(--kp-cyan); border-color: currentColor; }
+.kp-kindchip { color: var(--kp-kind); border-color: currentColor; font-weight: 700; }
+/* level: a monochrome text chip, only when the word has one (aesthetics.md §3) */
+.kp-levelchip { color: var(--kp-ink-2); background: var(--kp-panel-2); font-family: var(--kp-num); letter-spacing: 0.04em; }
+.kp-st-new { color: var(--kp-ink-2); }
 .kp-st-learn { color: var(--kp-amber); border-color: currentColor; }
-.kp-st-grow { color: var(--kp-cyan); border-color: currentColor; }
+.kp-st-grow { color: var(--kp-green); border-color: currentColor; border-style: dashed; }
 .kp-st-known { color: var(--kp-green); border-color: currentColor; }
 .kp-st-hard { color: var(--kp-red); border-color: currentColor; }
 
 .kp-sentence { margin: 0; font-size: clamp(22px, 6.2vw, 30px); line-height: 2.05; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
 .kp-sentence rt { font-size: 0.45em; color: var(--kp-ink-2); font-weight: 400; letter-spacing: 0; }
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: 6px 6px 0 0; margin: 0 2px; line-height: 1.3; }
-.kp-target { color: var(--kp-cyan); font-weight: 700; }
-.kp-target rt { color: var(--kp-cyan); }
-.kp-tapword { border-bottom: 1px dotted var(--kp-mute); cursor: pointer; }
-.kp-hint { margin: 0; font-size: 16px; color: var(--kp-ink-2); }
+.kp-target { color: var(--kp-cyan); font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.28em; }
+.kp-target rt { color: inherit; }
 .kp-taphint { margin: 0; font-size: 12px; color: var(--kp-mute); letter-spacing: 0.08em; }
 
 .kp-answer { display: grid; gap: 6px; border-top: 1px solid var(--kp-line); padding-top: 14px; }
 .kp-word { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.kp-term { font-size: 34px; font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
+.kp-term { font-size: 30px; font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
 .kp-reading { font-size: 18px; color: var(--kp-ink-2); }
 .kp-def { margin: 0; font-size: 17px; line-height: 1.6; }
-.kp-meaning { margin: 0; font-size: 15px; color: var(--kp-green); font-weight: 600; }
+.kp-note { margin: 0; font-size: 15px; line-height: 1.6; color: var(--kp-ink-2); }
+.kp-pitch { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); border: 1px solid var(--kp-line); border-radius: 6px; padding: 0 5px; }
 .kp-en { margin: 0; font-size: 14px; color: var(--kp-ink-2); line-height: 1.5; }
-.kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); border-left: 3px solid var(--kp-amber); padding-left: 10px; line-height: 1.5; }
-.kp-src { margin: 2px 0 0; font-size: 12px; color: var(--kp-ink-2); letter-spacing: .02em; }
+.kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); line-height: 1.5; }
+.kp-tip-label { color: var(--kp-mute); }
+.kp-en-none { font-size: 13px; color: var(--kp-mute); }
+.kp-src { margin: 0; display: grid; gap: 2px; font-size: 12px; color: var(--kp-ink-2); letter-spacing: .02em; line-height: 1.6; }
+.kp-src-label { color: var(--kp-mute); }
+
+/* the back's second tier: one tap each, the same order on every card */
+.kp-folds { display: grid; margin-top: 6px; border-top: 1px solid var(--kp-line); }
+.kp-fold { border-bottom: 1px solid var(--kp-line); }
+.kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--kp-ink-2); letter-spacing: .04em; }
+.kp-fold > summary::-webkit-details-marker { display: none; }
+.kp-fold > summary::before { content: '▸'; color: var(--kp-mute); font-size: 11px; width: 1em; }
+.kp-fold[open] > summary::before { content: '▾'; }
+.kp-fold > :not(summary) { margin-bottom: 10px; }
+.kp-gloss { margin: 0; font-size: 15px; line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
+.kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-sem b { color: var(--kp-ink); font-weight: 600; margin-right: 8px; }
+.kp-sem-rel { font-size: 12px; color: var(--kp-mute); margin-right: 8px; }
+.kp-sem small { display: block; font-size: 12px; color: var(--kp-mute); }
+
+/* the kanji family inside 漢字の形と意味: the learner's own words sharing a kanji (同) or a
+ * reading (読), each a link to 語の一覧; text marks, no hue */
+/* rows 44px apart, so each link's 44px reach never overlaps the next row's */
+.kp-kfam { margin: 6px 0 12px; padding: 0; list-style: none; display: grid; gap: 14px; }
+.kp-kfam li { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 6px; }
+.kp-kfam-c { font-size: 20px; font-weight: 600; min-width: 3.2em; display: inline-flex; align-items: baseline; gap: 4px; }
+.kp-kfam-c small { font-size: 12px; font-weight: 400; color: var(--kp-mute); }
+.kp-fam, .kp-see-link { position: relative; display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: 15px; color: var(--kp-ink); }
+/* 44px reach: from inside the 1px border, 28 + 16 */
+.kp-fam::after, .kp-see-link::after { content: ''; position: absolute; inset: -8px 0; }
+.kp-fam-mark { font-size: 11px; color: var(--kp-ink-2); border: 1px solid currentColor; border-radius: 4px; padding: 0 3px; line-height: 1.3; }
+.kp-fam[data-mark='読'] .kp-fam-mark { border-style: dashed; }
+.kp-fam-more { font-size: 12px; color: var(--kp-mute); }
+.kp-see { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--kp-line); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-see-label { color: var(--kp-mute); letter-spacing: .04em; margin-left: 2px; }
+.kp-see-label + .kp-see-label, .kp-see-link + .kp-see-label, .kp-see-item + .kp-see-label { margin-left: 10px; }
+.kp-see-item { font-size: 15px; color: var(--kp-ink); }
+
+/* a leech (CARD_CONTRACT_V2 §4): the repair ladder after tier one, before the folds, in order; quiet
+   (line and ink-2), the lapse count a state chip */
+.kp-ladder { border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px; margin-top: 4px; display: grid; gap: 8px; }
+.kp-ladder-head { margin: 0; font-size: 14px; color: var(--kp-ink-2); display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.kp-ladder-n { margin: 0 4px; font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
+.kp-ladder-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.kp-ladder-step { width: 100%; min-height: 48px; display: grid; justify-items: start; gap: 1px; padding: 6px 12px; text-align: left; border-radius: 10px; border: 1px solid var(--kp-line); background: var(--kp-panel-2); }
+.kp-ladder-step b { font-size: 15px; }
+.kp-ladder-step small { font-size: 12px; color: var(--kp-ink-2); }
+.kp-ladder-step:disabled { cursor: default; opacity: 0.55; }
+.kp-ladder-keep { justify-self: start; padding: 6px 2px; min-height: 36px; }
+/* a repaired card's front hint: marked as a repair, this card only */
+.kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 16px; color: var(--kp-ink-2); }
+.kp-rhint-label { font-size: 11px; color: var(--kp-mute); border: 1px dashed currentColor; border-radius: 4px; padding: 0 4px; }
+/* 削除: quiet, one tap, at the right end of the study top bar (44px, like ✕); undone from the toast */
+.kp-delete { flex: none; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--kp-line); background: none; color: var(--kp-ink-2); font-size: 13px; }
+.kp-toast.is-info { border-color: var(--kp-line); grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.kp-seg button:disabled { opacity: 0.5; cursor: default; }
+
+/* zoom: 全文 or 焦点 (the sentences around the target dimmed, never removed) */
+.kp-zoom { margin-left: auto; display: inline-flex; border: 1px solid var(--kp-line); border-radius: 999px; position: relative; z-index: 1; } /* its hit area stays above the passage, even while the readings fade in */
+.kp-zoom-btn { position: relative; border: 0; background: none; border-radius: 999px; font-size: 12px; padding: 2px 10px; min-height: 28px; color: var(--kp-ink-2); }
+/* 44px touch targets without a bigger look: the hit area reaches past the drawn button */
+.kp-zoom-btn::after, .kp-rule-x::after { content: ''; position: absolute; inset: -8px 0; }
+.kp-rule-x::after { inset: -7px; } /* from inside the 1px border: 30 + 14 */
+.kp-zoom-btn[aria-pressed='true'] { background: var(--kp-cyan-wash); color: var(--kp-cyan); font-weight: 700; }
+.kp-s { transition: opacity 0.16s cubic-bezier(0.2, 0, 0, 1); }
+.kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.38; }
+/* 焦点 on a long passage (STANDARD A38): the sentences before and after the target fold to two
+ * dimmed lines each — the before group shows its last two, the after group its first two — with
+ * ⋯ to open a group that runs longer. 全文 lays the groups out inline, as if they were not there. */
+.kp-ctx, .kp-ctx-in, .kp-ctx-flow { display: contents; }
+.kp-more { display: none; }
+.kp-card[data-zoom='focus'] .kp-ctx { display: block; position: relative; }
+.kp-card[data-zoom='focus'] .kp-ctx-in { display: block; max-height: 4.1em; overflow: hidden; }
+.kp-card[data-zoom='focus'] .kp-ctx[data-side='before'] .kp-ctx-in { display: flex; flex-direction: column; justify-content: flex-end; }
+.kp-card[data-zoom='focus'] .kp-ctx-flow { display: block; }
+.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'][data-side='before']:not([data-open='1']) .kp-ctx-in { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 1.4em); mask-image: linear-gradient(to bottom, transparent, #000 1.4em); }
+.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'][data-side='after']:not([data-open='1']) .kp-ctx-in { -webkit-mask-image: linear-gradient(to top, transparent, #000 1.4em); mask-image: linear-gradient(to top, transparent, #000 1.4em); }
+.kp-card[data-zoom='focus'] .kp-ctx[data-open='1'] .kp-ctx-in { max-height: none; }
+.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-more { display: inline-flex; }
+/* the ⋯ keeps its own gutter (44px pill + gap), open or folded, so it never sits on a glyph */
+.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-ctx-in { padding-right: 56px; }
+.kp-more { position: absolute; right: 0; z-index: 1; align-items: center; justify-content: center; min-width: 44px; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--kp-line); background: var(--kp-panel-2); color: var(--kp-ink-2); font-size: 16px; line-height: 1; }
+.kp-ctx[data-side='before'] .kp-more { top: 0; }
+.kp-ctx[data-side='after'] .kp-more { bottom: 0; }
+.kp-more::after { content: ''; position: absolute; inset: -8px 0; } /* 44px reach */
+.kp-more[aria-expanded='true'] { color: var(--kp-cyan); border-color: currentColor; }
 .kp-src a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 
 .kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: 16px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 17px; font-weight: 700; }
-.kp-grades { display: grid; grid-template-columns: 1fr 0.8fr 1.2fr 0.8fr; gap: 8px; }
+.kp-grades { display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; position: sticky; bottom: 0; z-index: 2; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom); background: var(--kp-bg); }
 .kp-grade { min-height: 64px; border-radius: 14px; border: 1px solid var(--kp-line); background: var(--kp-panel); display: grid; place-content: center; gap: 2px; }
 .kp-grade b { font-size: 15px; }
 .kp-grade small { font-family: var(--kp-num); font-size: 12px; color: var(--kp-ink-2); }
 .kp-again { border-color: var(--kp-red); } .kp-again b { color: var(--kp-red); }
-.kp-hard b { color: var(--kp-amber); }
 .kp-good { border-color: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); } .kp-good b { color: var(--kp-green); }
-.kp-easy b { color: var(--kp-violet); }
 .kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: 11px; color: var(--kp-mute); letter-spacing: 0.1em; }
+.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-rule-x { position: relative; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+/* phones: the grade bar is pinned to the bottom of the screen, so a long passage never hides it */
+@media (max-width: 640px) {
+  .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
+  .kp-study.has-bar { padding-bottom: var(--kp-bar-h, 140px); }
+}
 .kp-undo { justify-self: center; background: none; border: 0; color: var(--kp-mute); font-size: 13px; padding: 8px; }
 .kp-verdict { margin: 0; text-align: center; font-size: 18px; font-weight: 700; }
 
@@ -169,23 +267,76 @@
 .kp-seg button { min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 14px; }
 .kp-seg button.is-on { border-color: var(--kp-cyan); color: var(--kp-cyan); background: var(--kp-cyan-wash); font-weight: 700; }
 .kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: 11px; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 10px; padding: 8px; }
-.kp-danger { color: var(--kp-red) !important; border-color: var(--kp-red) !important; }
-.kp-toast { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--kp-panel-2); border: 1px solid var(--kp-line); border-radius: 12px; padding: 10px 16px; font-size: 14px; }
+.kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: 12px; padding: 10px 16px; font-size: 14px; line-height: 1.5; }
+.kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
 
 @media (max-width: 420px) {
   .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
   .kp-row .kp-dots { display: none; }
 }
+/* motion (aesthetics.md §5): the reveal keeps the card and fades the answer in; a grade
+ * slides the old card out in its direction while the next one settles. Opacity and
+ * transform only, 120–180 ms. */
+.kp-sentence.kp-enter .kp-target { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-sentence.kp-enter rt { animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) 0.04s both; }
+.kp-answer.kp-enter { animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-card.kp-arrive { animation: kp-arrive 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-study { position: relative; }
+.kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; }
+.kp-ghost.kp-out-good { animation: kp-out-good 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
+.kp-ghost.kp-out-again { animation: kp-out-again 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
+@keyframes kp-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes kp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes kp-arrive { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes kp-out-good { to { opacity: 0; transform: translateX(24px); } }
+@keyframes kp-out-again { to { opacity: 0; transform: translateX(-24px); } }
+/* reduced motion: nothing moves, nothing fades — every change is instant */
 @media (prefers-reduced-motion: reduce) {
-  .kp-card, .kp-progress i { transition: none; }
+  .kp *, .kp *::before, .kp *::after { animation: none !important; transition: none !important; }
+  .kp-progress i { transform: none; width: calc(var(--kp-frac, 0) * 100%); }
+  .kp-ghost { display: none; }
 }
-.kp-method { margin: 16px 0 4px; border: 1px solid var(--kp-line, #26303b); border-radius: 14px; padding: 10px 14px; }
-.kp-method summary { cursor: pointer; font-weight: 700; color: var(--kp-cyan); }
+.kp-method { margin: 4px 0; border: 1px solid var(--kp-line, #26303b); border-radius: 14px; padding: 10px 14px; }
+.kp-method summary { cursor: pointer; font-weight: 700; color: var(--kp-ink); }
 .kp-method p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
-.kp-endetails summary { cursor: pointer; font-size: 13px; color: var(--kp-ink-2); }
-.kp-endetails[open] summary { margin-bottom: 4px; }
 .kp-blank { color: var(--kp-cyan); }
+
+/* tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44). A word of the
+ * passage or of the definition looks like the text around it: no colour, no box, no underline
+ * until hover or keyboard focus, when a dotted underline says it can be opened. Its reach is
+ * 44px tall across the word's width (the line keeps its own height). */
+.kp-tok { position: relative; cursor: pointer; border-radius: 3px; -webkit-tap-highlight-color: transparent; }
+.kp-tok::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
+.kp-tok:focus { outline: none; }
+.kp-tok:hover, .kp-tok:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 0.3em; }
+.kp-target.kp-tok:hover, .kp-target.kp-tok:focus-visible { text-decoration: underline dotted 2px; }
+/* the entry sheet (with a host): a bottom sheet over the card and the grade bar */
+.kp-sheet-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.42); }
+.kp-sheet { width: 100%; max-width: 40rem; max-height: min(78vh, 640px); overflow-y: auto; overscroll-behavior: contain; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 10px; box-shadow: var(--kp-depth); animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-sheet-top { display: flex; align-items: flex-start; gap: 10px; }
+.kp-sheet-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; min-width: 0; flex: 1; padding-top: 4px; }
+.kp-sheet-term { margin: 0; font-size: 26px; line-height: 1.25; font-weight: 700; color: var(--kp-ink); outline: none; }
+.kp-sheet-reading { font-size: 17px; color: var(--kp-ink-2); }
+.kp-sheet-chips { display: flex; gap: 6px; padding-top: 12px; }
+.kp-sheet-def { margin: 0; font-size: 18px; line-height: 1.7; }
+.kp-sheet-none { margin: 0; font-size: 14px; line-height: 1.6; color: var(--kp-ink-2); }
+.kp-sheet-stop { margin: 0; font-size: 13px; color: var(--kp-mute); letter-spacing: 0.08em; }
+.kp-sheet-indeck, .kp-sheet-taken, .kp-sheet-note { margin: 0; font-size: 15px; color: var(--kp-ink-2); padding: 10px 12px; border: 1px solid var(--kp-line); border-radius: 12px; background: var(--kp-panel-2); }
+.kp-sheet-full { justify-self: start; min-height: 44px; }
+.kp-take-list { min-height: 44px; margin-top: 6px; }
+.kp-take-note { margin: 6px 0 0; font-size: 12px; color: var(--kp-ink-2); }
+.kp-take { min-height: 48px; width: 100%; border-radius: 14px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 16px; font-weight: 700; }
+/* the popover (no host: the standalone study pages) */
+.kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
+.kp-pop-term { font-size: 20px; }
+.kp-pop-reading { font-size: 14px; color: var(--kp-ink-2); flex: 1; }
+.kp-pop-x { margin-left: auto; position: relative; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; align-self: center; }
+.kp-pop-x::after { content: ''; position: absolute; inset: -7px; }
+.kp-pop-def { margin: 0; font-size: 15px; line-height: 1.6; }
+.kp-pop .kp-fold > summary { min-height: 36px; }
+.kp-pop-note { margin: 0; font-size: 11px; line-height: 1.5; color: var(--kp-mute); }
 
 /* ---------------------------------------------------------------- themes
  * Each deck picks its own default; 設定 › 色 switches. Every theme keeps the
@@ -193,42 +344,42 @@
 .kp { --kp-on-accent: #00131d; --kp-tex: none; --kp-depth: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 30px rgba(0, 0, 0, 0.35);
   --kp-noun: var(--kp-cyan); --kp-verb: #ff8a5c; --kp-adj: #ffd24a; --kp-adv: #c59bff; --kp-expr: #5ee6b0; --kp-sound: #ff7ac8; }
 .kp[data-look='light'] { --kp-on-accent: #fff; --kp-depth: 0 1px 2px rgba(15, 30, 45, 0.08), 0 8px 24px rgba(15, 30, 45, 0.1);
-  --kp-verb: #c94a12; --kp-adj: #9a6a00; --kp-adv: #6a3fc8; --kp-expr: #0b8a5a; --kp-sound: #b8237a; }
+  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a; }
 .kp[data-look='ai'] { /* 藍 indigo night, gold accent */
-  --kp-bg: #0b1030; --kp-panel: #121a46; --kp-panel-2: #1a2458; --kp-ink: #eef1ff; --kp-ink-2: #b9c1ea; --kp-mute: #8590c4; --kp-line: #2a3672;
-  --kp-cyan: #f2c14e; --kp-cyan-wash: rgba(242, 193, 78, 0.16); --kp-on-accent: #1a1300; --kp-green: #59e0a6; --kp-violet: #9fb4ff;
+  --kp-bg: #0b1030; --kp-panel: #121a46; --kp-panel-2: #1a2458; --kp-ink: #eef1ff; --kp-ink-2: #b9c1ea; --kp-mute: #929dd0; --kp-line: #2a3672;
+  --kp-cyan: #f2c14e; --kp-cyan-wash: rgba(242, 193, 78, 0.16); --kp-on-accent: #1a1300; --kp-green: #59e0a6; --kp-violet: #9fb4ff; --kp-kind-ji: #7fd6ff; --kp-kind-bun: #b9a6ff;
   --kp-noun: #f2c14e; --kp-tex: radial-gradient(120% 80% at 0% 0%, rgba(120, 140, 255, 0.12), transparent 60%);
   color-scheme: dark; }
 .kp[data-look='washi'] { /* 和紙 warm paper with fibres */
-  --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #574a39; --kp-mute: #7d6d58; --kp-line: #dccfb5;
-  --kp-cyan: #b23a1e; --kp-cyan-wash: rgba(178, 58, 30, 0.1); --kp-on-accent: #fff; --kp-red: #c0283a; --kp-amber: #a35f00; --kp-green: #3d7a2a; --kp-violet: #6b4aa8;
-  --kp-noun: #b23a1e; --kp-verb: #1f5fa8; --kp-adj: #8a5a00; --kp-adv: #6b4aa8; --kp-expr: #2f7a4f; --kp-sound: #a8306e;
+  --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #4a3e2f; --kp-mute: #5c4f3e; --kp-line: #dccfb5;
+  --kp-cyan: #93301a; --kp-cyan-wash: rgba(147, 48, 26, 0.1); --kp-on-accent: #fff; --kp-red: #a82233; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; /* was #1e5da4, the verb's own blue */ --kp-noun: #93301a; --kp-verb: #1e5da4; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.035) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.03) 0 1px, transparent 1px 11px);
   --kp-depth: 0 1px 1px rgba(80, 60, 30, 0.12), 0 10px 28px rgba(80, 60, 30, 0.14); color-scheme: light; }
 .kp[data-look='sakura'] { /* 桜 soft pink */
-  --kp-bg: #fbf1f3; --kp-panel: #ffffff; --kp-panel-2: #fde7ec; --kp-ink: #2b1a20; --kp-ink-2: #5d4049; --kp-mute: #8a6b74; --kp-line: #f1d3dc;
-  --kp-cyan: #d1416a; --kp-cyan-wash: rgba(209, 65, 106, 0.1); --kp-on-accent: #fff; --kp-red: #c62a3c; --kp-amber: #b26a00; --kp-green: #2f8a5a; --kp-violet: #7d4fc8;
-  --kp-noun: #d1416a; --kp-verb: #2a6fb8; --kp-adj: #a06800; --kp-adv: #7d4fc8; --kp-expr: #2f8a5a; --kp-sound: #c2489a;
+  --kp-bg: #fbf1f3; --kp-panel: #ffffff; --kp-panel-2: #fde7ec; --kp-ink: #2b1a20; --kp-ink-2: #523842; --kp-mute: #664c55; --kp-line: #f1d3dc;
+  --kp-cyan: #a1264a; --kp-cyan-wash: rgba(161, 38, 74, 0.1); --kp-on-accent: #fff; --kp-red: #ab2333; --kp-amber: #7f4c00; --kp-green: #21613f; --kp-violet: #6a40b8;
+  --kp-kind-ji: #5e0b63; /* was #2665a7, the verb's own blue */ --kp-noun: #a1264a; --kp-verb: #2665a7; --kp-adj: #895900; --kp-adv: #7747c6; --kp-expr: #266f49; --kp-sound: #a73882;
   --kp-tex: radial-gradient(60% 40% at 100% 0%, rgba(255, 182, 200, 0.35), transparent 70%);
   --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light; }
 .kp[data-look='matcha'] { /* 抹茶 deep green */
-  --kp-bg: #0d1a12; --kp-panel: #13261a; --kp-panel-2: #1a3123; --kp-ink: #eef7ef; --kp-ink-2: #b8d1bd; --kp-mute: #84a58c; --kp-line: #24402e;
-  --kp-cyan: #a6e06a; --kp-cyan-wash: rgba(166, 224, 106, 0.14); --kp-on-accent: #0d1a05; --kp-noun: #a6e06a;
+  --kp-bg: #0d1a12; --kp-panel: #13261a; --kp-panel-2: #1a3123; --kp-ink: #eef7ef; --kp-ink-2: #b8d1bd; --kp-mute: #8fb097; --kp-line: #24402e;
+  --kp-cyan: #a6e06a; --kp-cyan-wash: rgba(166, 224, 106, 0.14); --kp-on-accent: #0d1a05; --kp-noun: #a6e06a; --kp-kind-ji: #ffb3d9; /* was #ff9ad5, ΔE 6.7 from --kp-sound */ --kp-kind-bun: #c3b0ff;
   --kp-tex: radial-gradient(100% 60% at 100% 100%, rgba(166, 224, 106, 0.08), transparent 60%); color-scheme: dark; }
 .kp[data-look='kokuban'] { /* 黒板 chalkboard */
-  --kp-bg: #18241f; --kp-panel: #1f2f28; --kp-panel-2: #263a31; --kp-ink: #f4f1e8; --kp-ink-2: #cfd6cc; --kp-mute: #95a597; --kp-line: #34493f;
-  --kp-cyan: #ffe066; --kp-cyan-wash: rgba(255, 224, 102, 0.14); --kp-on-accent: #1d1800; --kp-noun: #ffe066; --kp-verb: #ff9e7a;
+  --kp-bg: #18241f; --kp-panel: #1f2f28; --kp-panel-2: #263a31; --kp-ink: #f4f1e8; --kp-ink-2: #cfd6cc; --kp-mute: #a0b0a2; --kp-line: #34493f;
+  --kp-cyan: #ffe066; --kp-cyan-wash: rgba(255, 224, 102, 0.14); --kp-on-accent: #1d1800; --kp-noun: #ffe066; --kp-verb: #ff9e7a; --kp-green: #52e89c; --kp-kind-ji: #8fd8ff; --kp-kind-bun: #d0b8ff;
   --kp-tex: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 5px);
   color-scheme: dark; }
 .kp[data-look='contrast'] { /* 高コントラスト */
   --kp-bg: #000; --kp-panel: #000; --kp-panel-2: #111; --kp-ink: #fff; --kp-ink-2: #fff; --kp-mute: #d0d0d0; --kp-line: #fff;
-  --kp-cyan: #ffff00; --kp-cyan-wash: rgba(255, 255, 0, 0.18); --kp-on-accent: #000; --kp-red: #ff4d4d; --kp-green: #00ff7f; --kp-noun: #ffff00;
+  --kp-cyan: #ffff00; --kp-cyan-wash: rgba(255, 255, 0, 0.18); --kp-on-accent: #000; --kp-red: #ff4d4d; --kp-green: #00ff7f; --kp-noun: #ffff00; --kp-kind-ji: #00ffff; --kp-kind-bun: #ff80ff;
   --kp-depth: none; color-scheme: dark; }
 
-/* depth and texture: the card is a physical object */
-.kp .kp-card { background-color: var(--kp-panel); background-image: var(--kp-tex); box-shadow: var(--kp-depth); }
+/* depth: the card is a physical object; its surface stays plain so the ruby reads cleanly
+ * (the texture is on the page, see .kp above) */
+.kp .kp-card { background-color: var(--kp-panel); background-image: none; box-shadow: var(--kp-depth); }
 .kp[data-look] .kp-start { color: var(--kp-on-accent); }
-.kp .kp-card.kp-topic { border-left-color: var(--kp-topic); }
 
 /* part of speech colours the asked word: nouns, verbs, adjectives… each their own hue */
 .kp-pos-noun .kp-target, .kp-pos-noun .kp-term { color: var(--kp-noun); }
@@ -246,17 +397,15 @@
 .kp-kj span { font-size: 13px; color: var(--kp-ink-2); }
 .kp-kj small { font-size: 12px; color: var(--kp-mute); }
 
-/* topic colour swatches on the home list */
-.kp-group { border-left: 4px solid var(--kp-topic, transparent); }
+/* theme swatches in 設定 */
 .kp-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
 .kp-swatch { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--kp-line); display: grid; place-items: center; font-size: 13px; }
 .kp-swatch.is-on { border-color: var(--kp-cyan); box-shadow: 0 0 0 2px var(--kp-cyan-wash); }
-.kp-tips { margin: 4px 0; border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 14px; }
-.kp-tips summary { cursor: pointer; font-weight: 700; color: var(--kp-cyan); }
-.kp-tips p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
 .kp-pos-noun .kp-posbadge { color: var(--kp-noun); }
 .kp-pos-verb .kp-posbadge { color: var(--kp-verb); }
 .kp-pos-adj .kp-posbadge { color: var(--kp-adj); }
 .kp-pos-adv .kp-posbadge { color: var(--kp-adv); }
 .kp-pos-expr .kp-posbadge { color: var(--kp-expr); }
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
+/* a written passage's register and topic (CARD_CONTRACT_V2 §6): text chips, a size down, no hue */
+.kp-chip-sm { font-size: 11px; padding: 2px 6px; }

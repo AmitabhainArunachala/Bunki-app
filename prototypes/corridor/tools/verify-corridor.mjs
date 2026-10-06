@@ -12,7 +12,12 @@
  * measurement table (contrast ratios, hit targets, focused-vs-background font
  * sizes, and each shelf text's three grader signals).
  *
- * Usage: node verify-corridor.mjs [--shots DIR] [--keep-open]
+ * Usage: node verify-corridor.mjs [--shots DIR] [--report FILE] [--keep-open]
+ *
+ * The JSON report goes to FILE when --report names one, else into the evidence directory
+ * (resolveCorridorEvidence(), outside the checkout) — never into the tracked
+ * docs/prototype/verification-report.json unless that path is asked for, so a run leaves the
+ * checkout clean (refresh the tracked copy with --report docs/prototype/verification-report.json).
  */
 
 import { openShelfTools } from './shelf-tools-support.mjs';
@@ -85,6 +90,7 @@ export function startCorridorServer(rootDir = CORRIDOR_DIR) {
 const results = [];
 let failures = 0;
 let activeReport = null;
+let activeReportPath = resolve(EVIDENCE_DIR, 'verification-report.json');
 
 function check(name, pass, detail = '') {
   results.push({ name, pass: !!pass, detail: String(detail) });
@@ -458,6 +464,10 @@ async function main() {
   const shotsDir =
     shotArg >= 0 ? resolve(argv[shotArg + 1]) : resolve(EVIDENCE_DIR, 'screenshots');
   mkdirSync(shotsDir, { recursive: true });
+  const reportArg = argv.indexOf('--report');
+  const reportPath =
+    reportArg >= 0 ? resolve(argv[reportArg + 1]) : resolve(EVIDENCE_DIR, 'verification-report.json');
+  activeReportPath = reportPath;
 
   const { server, base } = await startCorridorServer();
   const browser = await chromium.launch({
@@ -495,7 +505,15 @@ async function main() {
   activeReport = report;
 
   const open = async (query = '') => {
-    await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
+    try {
+      await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
+    } catch (err) {
+      // a step that just reloaded the page itself (an import, a restore) can
+      // still be navigating; let that finish, then go where this step asked
+      if (!/interrupted by another navigation/.test(String(err?.message))) throw err;
+      await page.waitForLoadState('load');
+      await page.goto(`${base}/index.html${query}`, { waitUntil: 'load' });
+    }
     await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   };
 
@@ -4293,7 +4311,6 @@ async function main() {
 
   report.summary = { total: results.length, failed: failures };
   report.results = results;
-  const reportPath = resolve(EVIDENCE_DIR, 'verification-report.json');
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 
@@ -4311,7 +4328,7 @@ if (resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
       if (activeReport) {
         activeReport.summary = { total: results.length, failed: failures, error: err.stack || String(err) };
         activeReport.results = results;
-        writeFileSync(resolve(EVIDENCE_DIR, 'verification-report.json'), `${JSON.stringify(activeReport, null, 2)}\n`);
+        writeFileSync(activeReportPath, `${JSON.stringify(activeReport, null, 2)}\n`);
       }
       process.exit(2);
     },

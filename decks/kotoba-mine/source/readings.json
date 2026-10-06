@@ -1,0 +1,1051 @@
+{
+  "about": "Readings the tokeniser gets wrong in these two decks (review finding F17). build.py applies them after tokenising and before ruby is built; they do not touch the app-wide lexicon in docs/content/reading-overrides.json. A rule sets `reading` (hiragana) on `surface` where the text right before it ends with a match of `after` and the text right after it starts with a match of `before` (both regexes, empty = anything). With `cards`, it applies only to the passages those card ids (from ids.json) are built from. A rule that matches nothing fails the build. tools/kotoba-deck-ruby.fixtures.json lists the readings the shipped decks must and must not show.",
+  "rules": [
+    {
+      "surface": "人",
+      "reading": "じん",
+      "after": "(日本|外国|中国|宇宙|エジプト|文化|著名|星|オランダ|スウェーデン)",
+      "before": "",
+      "note": "nationality and kind of person: 日本人, 宇宙人, 文化人 (UniDic reads a separate 人 token as にん)"
+    },
+    {
+      "surface": "日",
+      "reading": "び",
+      "after": "曜",
+      "before": "",
+      "note": "月曜日, 土曜日 (UniDic gives 曜 and 日 as separate tokens and reads 日 as ひ)"
+    },
+    {
+      "surface": "一日",
+      "reading": "いちにち",
+      "after": "",
+      "before": "",
+      "cards": ["km-081-m01", "km-081-m02", "km-081-m03", "km-149-m01"],
+      "note": "a whole day (一日のうちでも, 一日で楽しめる), not the first of the month; listed by card because 一日 is ついたち in dates"
+    },
+    {
+      "surface": "他",
+      "reading": "ほか",
+      "after": "(^|[^自排利])",
+      "before": "[のに、]",
+      "note": "他の, 他に, 〜がある他、 mean other or besides (ほか); 自他, 排他, 利他 keep た"
+    },
+    {
+      "surface": "方",
+      "reading": "かた",
+      "after": "(読者の|薬剤師の|一般の)",
+      "before": "",
+      "note": "a polite word for a person (読者の方, 一般の方), not a direction or side"
+    },
+    {
+      "surface": "皇族方",
+      "reading": "こうぞくがた",
+      "after": "",
+      "before": "",
+      "note": "方 as an honorific plural after people"
+    },
+    {
+      "surface": "方",
+      "reading": "ほう",
+      "after": "いい",
+      "before": "",
+      "cards": ["km-039-m05"],
+      "note": "あればいい方で (it is lucky if …): ほう, not the かた of 言い方"
+    },
+    {
+      "surface": "上手",
+      "reading": "じょうず",
+      "after": "恋愛",
+      "before": "",
+      "cards": ["km-196-1"],
+      "note": "恋愛上手, someone good at romance; not かみて (upstage)"
+    },
+    {
+      "surface": "寛仁",
+      "reading": "ともひと",
+      "after": "",
+      "before": "",
+      "cards": ["km-250-m04"],
+      "note": "the given name of 寛仁親王, not the word かんにん"
+    },
+    {
+      "surface": "甲賀",
+      "reading": "こうか",
+      "after": "",
+      "before": "",
+      "cards": ["km-098-m01", "km-098-m02", "km-098-1"],
+      "note": "the source passage spells it 甲賀（こうか） (source/review/b4.json)"
+    },
+    {
+      "surface": "璃",
+      "reading": "り",
+      "after": "斉藤愛",
+      "before": "",
+      "cards": ["km-149-m03"],
+      "note": "the golfer 斉藤愛璃 (あいり); UniDic gives 璃 no reading"
+    },
+    {
+      "surface": "豆",
+      "reading": "とう",
+      "after": "鹹",
+      "before": "漿",
+      "cards": ["km-298-m02"],
+      "note": "鹹豆漿 (かんとうしょう, Taiwanese salty soy milk), not まめ"
+    },
+    {
+      "surface": "漿",
+      "reading": "しょう",
+      "after": "鹹豆",
+      "before": "",
+      "cards": ["km-298-m02"],
+      "note": "鹹豆漿; UniDic gives 漿 no reading"
+    },
+    {
+      "surface": "元",
+      "reading": "げん",
+      "after": "（25",
+      "before": "）",
+      "cards": ["km-298-m02"],
+      "note": "25元, the Taiwanese yuan, not もと"
+    },
+    {
+      "surface": "日本",
+      "reading": "にほん",
+      "after": "",
+      "before": "や欧州",
+      "cards": ["km-071-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 日本や欧州, the country in a news register (UniDic reads にっぽん)"
+    },
+    {
+      "surface": "一国",
+      "reading": "いっこく",
+      "after": "を",
+      "before": "が",
+      "cards": ["km-071-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 技術の覇権を一国が握り続ける: one country (UniDic splits 一 and 国 and reads いち こく)"
+    },
+    {
+      "surface": "私",
+      "reading": "わたし",
+      "after": "",
+      "before": "たち",
+      "cards": ["km-183-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 私たち in an essay, not the formal わたくし"
+    },
+    {
+      "surface": "口",
+      "reading": "ぐち",
+      "after": "出入り",
+      "before": "",
+      "cards": ["km-060-m04"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 出入り口 (でいりぐち), rendaku"
+    },
+    {
+      "surface": "一隻",
+      "reading": "いっせき",
+      "after": "を",
+      "before": "残らず",
+      "cards": ["km-060-m04"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 船を一隻残らず: one ship (UniDic reads いち せき)"
+    },
+    {
+      "surface": "一本",
+      "reading": "いっぽん",
+      "after": "かなめ",
+      "before": "で",
+      "cards": ["km-060-m05"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): かなめ一本で: one pivot (UniDic reads いち ぽん)"
+    },
+    {
+      "surface": "後",
+      "reading": "あと",
+      "after": "",
+      "before": "工程",
+      "cards": ["km-130-m07"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 後工程 (あとこうてい), the back end of chip making"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "か",
+      "cards": ["km-017-m09", "km-283-m08", "km-087-m09"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何か (something / what is it), not なん"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "を",
+      "cards": ["km-023-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何を知っていて、何を知らなかった"
+    },
+    {
+      "surface": "蓮",
+      "reading": "はす",
+      "after": "",
+      "before": "",
+      "cards": ["km-117-m04"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): the lotus flower (はす), not the Buddhist-name reading れん"
+    },
+    {
+      "surface": "方",
+      "reading": "かた",
+      "after": "思い浮かべる",
+      "before": "",
+      "cards": ["km-117-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 思い浮かべる方が多い: a polite word for people, not ほう"
+    },
+    {
+      "surface": "間",
+      "reading": "ま",
+      "after": "",
+      "before": "の取り方",
+      "cards": ["km-117-m06"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 間の取り方 (pausing in speech), not あいだ"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "不自由",
+      "cards": ["km-027-m05"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 何不自由ない暮らし (なにふじゆう), not なん"
+    },
+    {
+      "surface": "一点",
+      "reading": "いってん",
+      "after": "を",
+      "before": "に",
+      "cards": ["km-060-m05"],
+      "note": "pilot passage (source/mcd/pilot-2026-10-04.json): 心を一点にまとめる: one point (UniDic splits 一 and 点 and reads いち てん)"
+    },
+    {
+      "surface": "家",
+      "reading": "け",
+      "after": "メディチ",
+      "before": "",
+      "cards": ["km-204-m07"],
+      "note": "refill passage (source/mcd/pilot-2026-10-04.json): メディチ家, a family name + 家 (け), not the か of 銀行家"
+    },
+    {
+      "surface": "都",
+      "reading": "みやこ",
+      "after": "",
+      "before": "を離れ",
+      "cards": ["km-222-m07"],
+      "note": "refill passage (source/mcd/pilot-2026-10-04.json): 都を離れ, the capital (みやこ), not the と of 東京都"
+    },
+    {
+      "surface": "何",
+      "reading": "なに",
+      "after": "",
+      "before": "(?:[をがもに]|か(?![国月所])|より|気な)",
+      "cards": [
+        "km-001-m06",
+        "km-002-m06",
+        "km-002-m07",
+        "km-004-m03",
+        "km-011-m08",
+        "km-012-m08",
+        "km-020-m05",
+        "km-021-m08",
+        "km-022-m05",
+        "km-025-m06",
+        "km-026-m06",
+        "km-026-m07",
+        "km-039-m06",
+        "km-047-m05",
+        "km-048-m06",
+        "km-053-m07",
+        "km-054-m09",
+        "km-059-m08",
+        "km-073-m06",
+        "km-075-m07",
+        "km-079-m10",
+        "km-083-m07",
+        "km-094-m07",
+        "km-097-m07",
+        "km-106-m08",
+        "km-109-m08",
+        "km-120-m06",
+        "km-122-m09",
+        "km-127-m08",
+        "km-129-m11",
+        "km-132-m08",
+        "km-134-m09",
+        "km-136-m07",
+        "km-138-m08",
+        "km-139-m08",
+        "km-140-m07",
+        "km-142-m10",
+        "km-143-m06",
+        "km-146-m06",
+        "km-152-m07",
+        "km-153-m07",
+        "km-154-m08",
+        "km-156-m10",
+        "km-157-m06",
+        "km-164-m08",
+        "km-189-m07",
+        "km-202-m05",
+        "km-205-m07",
+        "km-213-m07",
+        "km-216-m08",
+        "km-218-m08",
+        "km-221-m07",
+        "km-225-m06",
+        "km-226-m05",
+        "km-227-m07",
+        "km-236-m08",
+        "km-239-m08",
+        "km-244-m04",
+        "km-245-m06",
+        "km-246-m06",
+        "km-255-m06",
+        "km-259-m05",
+        "km-260-m06",
+        "km-261-m05",
+        "km-270-m08",
+        "km-275-m07",
+        "km-284-m09",
+        "km-289-m06",
+        "km-293-m08",
+        "km-298-m06",
+        "km-299-m06",
+        "km-307-m08",
+        "km-308-m08"
+      ],
+      "note": "full run passages (73, source/mcd/v2-2026-10-05-b*.json): 何を, 何が, 何も, 何に, 何か, 何より, 何気なく: なに; UniDic reads a lone 何 as なん, which stays for 何度, 何年, 何の, 何でも"
+    },
+    {
+      "surface": "一",
+      "reading": "いっ",
+      "after": "",
+      "before": "(?:冊|回|週間|周|隻|点|頭|件|党|社|首|直線|国|本|か月)",
+      "cards": [
+        "km-006-m07",
+        "km-008-m06",
+        "km-014-m08",
+        "km-015-m09",
+        "km-018-m08",
+        "km-029-m09",
+        "km-031-m05",
+        "km-042-m08",
+        "km-045-m08",
+        "km-051-m06",
+        "km-052-m06",
+        "km-078-m08",
+        "km-093-m06",
+        "km-097-m05",
+        "km-098-m05",
+        "km-104-m04",
+        "km-115-m07",
+        "km-116-m06",
+        "km-118-m04",
+        "km-122-m09",
+        "km-136-m06",
+        "km-156-m08",
+        "km-159-m08",
+        "km-160-m13",
+        "km-173-m05",
+        "km-184-m08",
+        "km-212-m07",
+        "km-219-m06",
+        "km-234-m04",
+        "km-245-m04",
+        "km-272-m05",
+        "km-275-m07",
+        "km-279-m06",
+        "km-288-m10",
+        "km-289-m06",
+        "km-289-m07",
+        "km-301-m07",
+        "km-311-m09",
+        "km-316-m06",
+        "km-319-m06",
+        "km-320-m07",
+        "km-320-m08"
+      ],
+      "note": "full run passages (42, source/mcd/v2-2026-10-05-b*.json): 一冊, 一回, 一週間, 一周, 一隻, 一点, 一頭, 一件, 一党, 一社, 一首, 一直線, 一国, 一本, 一か月: いっ; UniDic splits 一 from the counter and reads いち"
+    },
+    {
+      "surface": "一歩",
+      "reading": "いっぽ",
+      "after": "",
+      "before": "",
+      "cards": ["km-046-m08", "km-099-m07", "km-219-m08", "km-246-m06", "km-289-m06", "km-313-m07"],
+      "note": "full run passages (6, source/mcd/v2-2026-10-05-b*.json): 一歩 (one step): いっぽ, not いち ほ"
+    },
+    {
+      "surface": "一敗",
+      "reading": "いっぱい",
+      "after": "",
+      "before": "",
+      "cards": ["km-197-m07", "km-267-m05", "km-278-m06"],
+      "note": "full run passages (3, source/mcd/v2-2026-10-05-b*.json): 四勝一敗 (one loss): いっぱい, not いち はい"
+    },
+    {
+      "surface": "一発",
+      "reading": "いっぱつ",
+      "after": "",
+      "before": "",
+      "cards": ["km-160-m15"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b23.json): 一発で (in one go): いっぱつ, not いち はつ"
+    },
+    {
+      "surface": "一品",
+      "reading": "いっぴん",
+      "after": "",
+      "before": "",
+      "cards": ["km-298-m05"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b23.json): 定番の一品 (a dish): いっぴん, not いち ひん"
+    },
+    {
+      "surface": "一",
+      "reading": "ひと",
+      "after": "",
+      "before": "(?:晩|マス)",
+      "cards": ["km-078-m08", "km-105-m06", "km-159-m09", "km-248-m08"],
+      "note": "full run passages (4, source/mcd/v2-2026-10-05-b*.json): 一晩 (one night), 一マス (one square): ひと, not いち"
+    },
+    {
+      "surface": "一言添える",
+      "reading": "ひとことそえる",
+      "after": "",
+      "before": "",
+      "cards": ["km-025-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b26.json): 一言添える (add a word): ひとこと そえる, not いち いいそえる"
+    },
+    {
+      "surface": "一行",
+      "reading": "いちぎょう",
+      "after": "",
+      "before": "",
+      "cards": ["km-008-m06", "km-052-m08", "km-114-m07", "km-139-m07", "km-179-m08"],
+      "note": "full run passages (5, source/mcd/v2-2026-10-05-b*.json): 一行 (one line of text): いちぎょう, not いっこう (a party)"
+    },
+    {
+      "surface": "一日",
+      "reading": "いちにち",
+      "after": "",
+      "before": "",
+      "cards": ["km-050-m06", "km-166-m07"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 一日の終わり, 一日に処理できる量 (a whole day): いちにち, not ついたち"
+    },
+    {
+      "surface": "中気",
+      "reading": "じゅうき",
+      "after": "一日",
+      "before": "",
+      "cards": ["km-077-m09"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b27.json): 一日中気にして: いちにちじゅう 気, not ちゅうき (UniDic joins 中 and 気)"
+    },
+    {
+      "surface": "中",
+      "reading": "じゅう",
+      "after": "世界",
+      "before": "",
+      "cards": [
+        "km-011-m06",
+        "km-097-m05",
+        "km-105-m06",
+        "km-161-m07",
+        "km-203-m06",
+        "km-265-m08",
+        "km-266-m08",
+        "km-279-m07"
+      ],
+      "note": "full run passages (8, source/mcd/v2-2026-10-05-b*.json): 世界中 (all over the world): じゅう, not ちゅう"
+    },
+    {
+      "surface": "分",
+      "reading": "ぶん",
+      "after": "(?:七|腹八|毎晩十)",
+      "before": "",
+      "cards": ["km-093-m08", "km-274-m08", "km-314-m07"],
+      "note": "full run passages (3, source/mcd/v2-2026-10-05-b*.json): 七分の一 (a seventh), 腹八分目, 十分に休む (enough): ぶん, not ふん"
+    },
+    {
+      "surface": "分",
+      "reading": "ぷん",
+      "after": "(?:(?:^|[^0-9])1|四十)",
+      "before": "",
+      "cards": ["km-164-m07", "km-280-m06"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 1分おき, 四十分 (minutes): ぷん, not ふん"
+    },
+    {
+      "surface": "三十分",
+      "reading": "さんじゅっぷん",
+      "after": "",
+      "before": "",
+      "cards": ["km-274-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b17.json): 三十分 (thirty minutes): さんじゅっぷん, not さんじゅう ふん"
+    },
+    {
+      "surface": "数十分",
+      "reading": "すうじゅっぷん",
+      "after": "",
+      "before": "",
+      "cards": ["km-125-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b03.json): 数十分 (tens of minutes): すうじゅっぷん, not すうじゅう ふん"
+    },
+    {
+      "surface": "四十",
+      "reading": "よんじゅっ",
+      "after": "",
+      "before": "分",
+      "cards": ["km-280-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b17.json): 四十分 (forty minutes): よんじゅっぷん, not よんじゅう ふん"
+    },
+    {
+      "surface": "十",
+      "reading": "じゅっ",
+      "after": "",
+      "before": "(?:回|個)",
+      "cards": ["km-152-m09", "km-192-m08", "km-231-m07"],
+      "note": "full run passages (3, source/mcd/v2-2026-10-05-b*.json): 十回, 十個: じゅっ, not じゅう"
+    },
+    {
+      "surface": "十",
+      "reading": "とお",
+      "after": "",
+      "before": "で神童",
+      "cards": ["km-271-m08"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): the saying 十で神童: とお, not じゅう"
+    },
+    {
+      "surface": "二十",
+      "reading": "はたち",
+      "after": "",
+      "before": "過ぎ",
+      "cards": ["km-271-m08"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): the saying 二十過ぎればただの人: はたち, not にじゅう"
+    },
+    {
+      "surface": "八",
+      "reading": "はっ",
+      "after": "",
+      "before": "回",
+      "cards": ["km-268-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): 六十八回: はっかい, not はち かい"
+    },
+    {
+      "surface": "七",
+      "reading": "しち",
+      "after": "十",
+      "before": "音",
+      "cards": ["km-259-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b30.json): 十七音 (a haiku): じゅうしちおん, not じゅうなな"
+    },
+    {
+      "surface": "四",
+      "reading": "よ",
+      "after": "",
+      "before": "(?:次|時間)",
+      "cards": ["km-153-m06", "km-272-m06"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 第四次 (だいよじ), 二十四時間 (にじゅうよじかん): よ, not よん"
+    },
+    {
+      "surface": "四",
+      "reading": "よん",
+      "after": "",
+      "before": "件",
+      "cards": ["km-158-m09"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b10.json): 計四件 (four cases): よんけん, not しけん"
+    },
+    {
+      "surface": "四",
+      "reading": "し",
+      "after": "",
+      "before": "天王寺",
+      "cards": ["km-307-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b14.json): 四天王寺 (the temple): してんのうじ, not よん"
+    },
+    {
+      "surface": "本",
+      "reading": "ほん",
+      "after": "四",
+      "before": "足",
+      "cards": ["km-172-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b23.json): 四本足 (four legs): よんほん, not よんぽん"
+    },
+    {
+      "surface": "本",
+      "reading": "ぼん",
+      "after": "(?:何|数千)",
+      "before": "",
+      "cards": ["km-169-m07", "km-319-m06"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 何本も, 数千本: ぼん, not ぽん"
+    },
+    {
+      "surface": "二",
+      "reading": "ふた",
+      "after": "",
+      "before": "(?:通り|粒)",
+      "cards": ["km-105-m06", "km-160-m13", "km-160-m15"],
+      "note": "full run passages (3, source/mcd/v2-2026-10-05-b*.json): 二通り, 二粒: ふた, not に"
+    },
+    {
+      "surface": "人",
+      "reading": "り",
+      "after": "(?:^|[^0-9])[12]",
+      "before": "",
+      "cards": ["km-011-m07", "km-284-m08"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 1人, 2人: ひとり, ふたり (り on 人), not にん"
+    },
+    {
+      "surface": "月",
+      "reading": "がつ",
+      "after": "[0-9]",
+      "before": "",
+      "cards": [
+        "km-011-m07",
+        "km-015-m08",
+        "km-061-m07",
+        "km-099-m08",
+        "km-102-m07",
+        "km-147-m07",
+        "km-164-m07",
+        "km-215-m06",
+        "km-216-m07",
+        "km-228-m06",
+        "km-248-m06",
+        "km-248-m07",
+        "km-249-m07",
+        "km-251-m06",
+        "km-269-m07",
+        "km-300-m07",
+        "km-304-m08",
+        "km-308-m06",
+        "km-310-m07"
+      ],
+      "note": "full run passages (19, source/mcd/v2-2026-10-05-b*.json): a date (1962年10月、): がつ; UniDic reads 月 before a comma as つき"
+    },
+    {
+      "surface": "日",
+      "reading": "にち",
+      "after": "(?:^|[^0-9])1[57]",
+      "before": "",
+      "cards": ["km-059-m07", "km-267-m06"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 3月15日, 11月17日: にち, not か"
+    },
+    {
+      "surface": "年",
+      "reading": "ねん",
+      "after": "",
+      "before": "(?:に一万|まで確か)",
+      "cards": ["km-262-m08", "km-285-m07"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 年に一万人 (a year), 年まで確かに示す (to the year): ねん, not とし"
+    },
+    {
+      "surface": "前",
+      "reading": "まえ",
+      "after": "この",
+      "before": "、",
+      "cards": [
+        "km-001-m05",
+        "km-036-m14",
+        "km-090-m04",
+        "km-110-m07",
+        "km-173-m07",
+        "km-247-m05",
+        "km-298-m06"
+      ],
+      "note": "full run passages (7, source/mcd/v2-2026-10-05-b*.json): この前、 (the other day): まえ, not ぜん"
+    },
+    {
+      "surface": "日本",
+      "reading": "にほん",
+      "after": "",
+      "before": "(?!橋)",
+      "cards": [
+        "km-003-m07",
+        "km-003-m08",
+        "km-015-m09",
+        "km-021-m06",
+        "km-025-m06",
+        "km-030-m08",
+        "km-040-m03",
+        "km-047-m05",
+        "km-050-m05",
+        "km-062-m07",
+        "km-062-m08",
+        "km-073-m06",
+        "km-075-m08",
+        "km-076-m07",
+        "km-076-m08",
+        "km-080-m08",
+        "km-097-m06",
+        "km-098-m07",
+        "km-102-m07",
+        "km-108-m06",
+        "km-116-m07",
+        "km-127-m10",
+        "km-131-m05",
+        "km-131-m07",
+        "km-134-m08",
+        "km-141-m07",
+        "km-152-m07",
+        "km-158-m09",
+        "km-160-m15",
+        "km-165-m08",
+        "km-173-m06",
+        "km-179-m07",
+        "km-182-m08",
+        "km-186-m07",
+        "km-188-m06",
+        "km-190-m06",
+        "km-191-m08",
+        "km-195-m06",
+        "km-195-m07",
+        "km-196-m06",
+        "km-201-m07",
+        "km-202-m05",
+        "km-210-m07",
+        "km-211-m06",
+        "km-216-m06",
+        "km-216-m07",
+        "km-217-m07",
+        "km-221-m06",
+        "km-236-m06",
+        "km-239-m07",
+        "km-243-m04",
+        "km-243-m05",
+        "km-250-m08",
+        "km-252-m06",
+        "km-254-m06",
+        "km-255-m08",
+        "km-256-m07",
+        "km-256-m08",
+        "km-262-m08",
+        "km-265-m08",
+        "km-268-m06",
+        "km-272-m06",
+        "km-273-m04",
+        "km-277-m07",
+        "km-294-m07",
+        "km-298-m04",
+        "km-298-m05",
+        "km-301-m07",
+        "km-301-m08",
+        "km-302-m06",
+        "km-305-m06",
+        "km-306-m09",
+        "km-308-m06",
+        "km-310-m08",
+        "km-313-m07",
+        "km-318-m10"
+      ],
+      "note": "full run passages (76, source/mcd/v2-2026-10-05-b*.json): 日本, 日本語, 日本企業: にほん; UniDic reads にっぽん, and 日本 語 as にっぽんご"
+    },
+    {
+      "surface": "私",
+      "reading": "わたし",
+      "after": "",
+      "before": "(?:たち|」|は|、|の)",
+      "cards": [
+        "km-002-m05",
+        "km-002-m06",
+        "km-005-m07",
+        "km-005-m09",
+        "km-011-m08",
+        "km-018-m06",
+        "km-022-m05",
+        "km-024-m06",
+        "km-025-m08",
+        "km-028-m09",
+        "km-034-m08",
+        "km-037-m08",
+        "km-039-m06",
+        "km-039-m08",
+        "km-041-m07",
+        "km-047-m07",
+        "km-052-m06",
+        "km-058-m08",
+        "km-080-m08",
+        "km-099-m07",
+        "km-104-m06",
+        "km-118-m06",
+        "km-122-m09",
+        "km-131-m05",
+        "km-132-m08",
+        "km-134-m09",
+        "km-136-m06",
+        "km-139-m08",
+        "km-144-m08",
+        "km-145-m08",
+        "km-146-m06",
+        "km-148-m08",
+        "km-152-m07",
+        "km-153-m07",
+        "km-154-m10",
+        "km-157-m07",
+        "km-160-m14",
+        "km-166-m08",
+        "km-172-m07",
+        "km-173-m07",
+        "km-180-m08",
+        "km-192-m09",
+        "km-193-m08",
+        "km-202-m04",
+        "km-213-m07",
+        "km-215-m06",
+        "km-216-m08",
+        "km-223-m09",
+        "km-224-m05",
+        "km-235-m08",
+        "km-236-m08",
+        "km-241-m08",
+        "km-243-m06",
+        "km-260-m06",
+        "km-265-m06",
+        "km-289-m08",
+        "km-307-m08",
+        "km-308-m08",
+        "km-311-m09"
+      ],
+      "note": "full run passages (59, source/mcd/v2-2026-10-05-b*.json): 私たち, 私は, 私の: わたし, not the formal わたくし"
+    },
+    {
+      "surface": "私",
+      "reading": "し",
+      "after": "",
+      "before": "生活",
+      "cards": ["km-098-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b28.json): 私生活 (private life): しせいかつ, not わたくし"
+    },
+    {
+      "surface": "大問",
+      "reading": "だいもん",
+      "after": "",
+      "before": "",
+      "cards": ["km-268-m08"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): 大問ごとに (each main question): だいもん, not おお とい"
+    },
+    {
+      "surface": "大勢",
+      "reading": "おおぜい",
+      "after": "",
+      "before": "",
+      "cards": ["km-235-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b29.json): 必ずしも大勢の力ではない (the many): おおぜい, not たいせい"
+    },
+    {
+      "surface": "生",
+      "reading": "なま",
+      "after": "",
+      "before": "中継",
+      "cards": ["km-011-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b11.json): 生中継 (live broadcast): なま, not せい"
+    },
+    {
+      "surface": "生",
+      "reading": "せい",
+      "after": "",
+      "before": "と死",
+      "cards": ["km-320-m08"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b30.json): 生と死 (life and death): せい, not なま"
+    },
+    {
+      "surface": "家",
+      "reading": "け",
+      "after": "(?:メディチ|創業|天皇)",
+      "before": "",
+      "cards": ["km-112-m06", "km-188-m07", "km-188-m08", "km-250-m06"],
+      "note": "full run passages (4, source/mcd/v2-2026-10-05-b*.json): メディチ家, 創業家, 天皇家 (a family): け, not か"
+    },
+    {
+      "surface": "家",
+      "reading": "か",
+      "after": "経済史",
+      "before": "",
+      "cards": ["km-072-m08"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b04.json): 経済史家 (an economic historian): か, not や"
+    },
+    {
+      "surface": "行っ",
+      "reading": "おこなっ",
+      "after": "総出で",
+      "before": "",
+      "cards": ["km-125-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b03.json): 総出で行っていた棚卸し (carried out): おこなっ, not いっ"
+    },
+    {
+      "surface": "都",
+      "reading": "みやこ",
+      "after": "",
+      "before": "の長安",
+      "cards": ["km-273-m04"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): 都の長安 (the capital): みやこ, not と"
+    },
+    {
+      "surface": "間",
+      "reading": "ま",
+      "after": "いつの",
+      "before": "にか",
+      "cards": ["km-296-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b30.json): いつの間にか: ま, not あいだ"
+    },
+    {
+      "surface": "間",
+      "reading": "あいだ",
+      "after": "",
+      "before": "にまったく",
+      "cards": ["km-067-m08"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b10.json): 間にまったく違う科目をはさむ (in between): あいだ, not ま"
+    },
+    {
+      "surface": "開け",
+      "reading": "ひらけ",
+      "after": "",
+      "before": "(?:ていて|ます)",
+      "cards": ["km-135-m08", "km-170-m08"],
+      "note": "full run passages (source/mcd/v2-2026-10-05-b15.json): 明るく開けていて, 道が開けます (open up): ひらけ, not あけ"
+    },
+    {
+      "surface": "柄",
+      "reading": "え",
+      "after": "手元の",
+      "before": "",
+      "cards": ["km-293-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b19.json): 手元の柄 (a handle): え, not がら"
+    },
+    {
+      "surface": "異",
+      "reading": "い",
+      "after": "",
+      "before": "を唱え",
+      "cards": ["km-034-m08", "km-285-m08"],
+      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 異を唱える (object): い, not こと"
+    },
+    {
+      "surface": "海馬",
+      "reading": "かいば",
+      "after": "",
+      "before": "",
+      "cards": ["km-083-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b07.json): 海馬 (the hippocampus): かいば, not うみうま"
+    },
+    {
+      "surface": "孫子",
+      "reading": "そんし",
+      "after": "",
+      "before": "",
+      "cards": ["km-202-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b11.json): 兵法書『孫子』: そんし, not まごこ"
+    },
+    {
+      "surface": "正",
+      "reading": "ただ",
+      "after": "",
+      "before": "しく動かなく",
+      "cards": ["km-022-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b08.json): 正しく動かなくなる: ただしく, not まさしく"
+    },
+    {
+      "surface": "黒子",
+      "reading": "くろこ",
+      "after": "",
+      "before": "",
+      "cards": ["km-164-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b11.json): 黒子に徹する (stay behind the scenes): くろこ, not ほくろ"
+    },
+    {
+      "surface": "香",
+      "reading": "こう",
+      "after": "お",
+      "before": "や花",
+      "cards": ["km-021-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b23.json): お香や花 (incense): こう, not かおり"
+    },
+    {
+      "surface": "鍛冶",
+      "reading": "かじ",
+      "after": "",
+      "before": "",
+      "cards": ["km-063-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b06.json): 鍛冶職人 (a smith): かじ, not たんや"
+    },
+    {
+      "surface": "飛沫",
+      "reading": "ひまつ",
+      "after": "",
+      "before": "",
+      "cards": ["km-269-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): ウイルスの飛沫 (droplets): ひまつ, not しぶき"
+    },
+    {
+      "surface": "書物",
+      "reading": "しょもつ",
+      "after": "",
+      "before": "",
+      "cards": ["km-155-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b10.json): 数学の書物 (a book): しょもつ, not かきもの"
+    },
+    {
+      "surface": "木賃",
+      "reading": "きちん",
+      "after": "",
+      "before": "",
+      "cards": ["km-214-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b23.json): 木賃宿, 「木賃」 (firewood fee): きちん, not もくちん"
+    },
+    {
+      "surface": "業",
+      "reading": "ごう",
+      "after": "",
+      "before": "とは遠い",
+      "cards": ["km-073-m07"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b13.json): 業 (karma) in a Buddhist passage: ごう, not ぎょう"
+    },
+    {
+      "surface": "者",
+      "reading": "しゃ",
+      "after": "発明",
+      "before": "",
+      "cards": ["km-105-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b01.json): 発明者 (an inventor): しゃ, not もの"
+    },
+    {
+      "surface": "高野山",
+      "reading": "こうやさん",
+      "after": "",
+      "before": "",
+      "cards": ["km-273-m04"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): 高野山 (the mountain and temple): こうやさん, not たかの やま"
+    },
+    {
+      "surface": "山",
+      "reading": "せん",
+      "after": "須弥",
+      "before": "",
+      "cards": ["km-122-m09"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b22.json): 須弥山 (Mount Meru): しゅみせん, not やま"
+    },
+    {
+      "surface": "山",
+      "reading": "さん",
+      "after": "ヴェスヴィオ",
+      "before": "",
+      "cards": ["km-082-m05"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b15.json): ヴェスヴィオ山 (Vesuvius): さん, not やま"
+    },
+    {
+      "surface": "乳",
+      "reading": "にゅう",
+      "after": "",
+      "before": "海攪拌",
+      "cards": ["km-020-m04"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b08.json): 乳海攪拌 (the churning of the ocean of milk): にゅうかい, not ちち"
+    },
+    {
+      "surface": "御城",
+      "reading": "おしろ",
+      "after": "",
+      "before": "",
+      "cards": ["km-267-m06"],
+      "note": "full run passage (source/mcd/v2-2026-10-05-b16.json): 御城将棋 (castle shogi): おしろ, not ご じょう"
+    }
+  ]
+}

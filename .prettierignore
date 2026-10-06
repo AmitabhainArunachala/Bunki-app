@@ -75,3 +75,8 @@ decks/kotoba-mine/source/mined.json
 # across agents still writing.
 research_notes/
 reports/
+
+# The curator's library-candidate round (#113, 2026-10-03): agent-written
+# picks, cuts, picture briefs and a hand-tick page reviewed as committed.
+# Reformatting would churn a review artefact other agents are still reading.
+docs/content/library-candidates-2026-10-03/

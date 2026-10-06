@@ -1,0 +1,331 @@
+{
+  "18": [
+    {
+      "ja": "今回紹介するのは、意思決定についての本です。著者によれば、私たちが判断を誤るのは、情報が足りないからというより、目先のことしか見えていないからだそうです。そこで本書がすすめるのが、大事な決断の前に「十年後の自分ならこれをどう見るか」と問い直してみる方法です。目の前の損得ではなく、長期的な見地から選び直すと、意外なほど答えが変わるわけですね。迷ったときほど一歩引いて眺めてみる、これがこの本のいちばんのメッセージです。",
+      "form": "見地",
+      "en": "The book I'm introducing this time is about decision-making. According to the author, we make bad judgments not so much because we lack information as because we can only see what's right in front of us. So what the book recommends is, before a big decision, asking yourself again, \"How would I see this ten years from now?\" When you choose again from a long-term standpoint rather than from immediate gains and losses, the answer changes surprisingly often. The more unsure you are, the more you should step back and look at it from a distance: that is the book's main message.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「長期的な見地から」「〜の見地に立つ」のように、判断のよりどころとなる立場を表す。",
+      "grammar": ["n3-dewa-naku"]
+    },
+    {
+      "ja": "欧州連合は2024年、人工知能の利用を幅広く規制する法律を成立させた。同法は、用途ごとの危険性に応じてAIを分類し、危険性が高いものほど厳しい義務を課す仕組みだ。人の採用や信用の審査に使われるAIは、人権保護の見地から特に厳しい管理の対象となる。一方、企業の間には、規制が重すぎれば開発の遅れにつながるとの懸念も根強い。各国の当局は、安全と技術の発展をどう両立させるかを問われている。",
+      "form": "見地",
+      "en": "In 2024 the European Union passed a law broadly regulating the use of artificial intelligence. The law classifies AI according to the level of risk of each use and imposes stricter obligations the higher the risk. AI used in hiring people or assessing creditworthiness is subject to especially strict control from the standpoint of protecting human rights. On the other hand, concern remains strong among companies that overly heavy regulation could delay development. Authorities in each country are being asked how to reconcile safety with technological progress.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「人権保護の見地から」「安全上の見地から」のように、規制や判断の根拠を示す形が多い。",
+      "grammar": ["n2-ni-oujite"]
+    },
+    {
+      "ja": "仏典に、目の見えない人々が一頭の象に触れ、その姿を言い合う話がある。頭に触れた者は壺のようだと言い、足に触れた者は柱のようだと言って、互いに譲らない。誰も嘘はついていないが、それぞれが知っているのは象のほんの一部にすぎないのである。自分はどれほど広い見地に立っているつもりでも、実は足に触れただけの一人かもしれないと気づくとき、人はようやく、違う場所に立つ他人の言葉に耳を傾けられるのだろう。",
+      "form": "見地",
+      "en": "In the Buddhist scriptures there is a story of blind people who touch an elephant and argue over what it looks like. The one who touched its head says it is like a pot, the one who touched its leg says it is like a pillar, and none of them will give way. None of them is lying, yet what each of them knows is merely a tiny part of the elephant. Perhaps it is only when we realize that, however broad a standpoint we think we stand on, we may in fact be just one more person who touched only a leg, that we can finally listen to the words of others who stand in a different place.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「広い見地に立つ」は、物事を広く見渡して判断する立場にいること。",
+      "grammar": ["n2-ni-suginai"]
+    }
+  ],
+  "26": [
+    {
+      "ja": "心理学者のスキナーは、ハトに一定の間隔で餌を与えるという実験を行いました。ハトが何をしても餌は同じように出てくるのに、多くのハトは、たまたま餌の直前にしていた動きを何度も繰り返すようになったんです。首を回したり、体を揺らしたりといった具合ですね。偶然の一致を「この動きのおかげだ」と思い込んでしまったわけで、スキナーはこれをハトの迷信と呼びました。人間のジンクスやお守りへのこだわりも、案外同じ仕組みから生まれているのかもしれません。",
+      "form": "迷信",
+      "en": "The psychologist Skinner carried out an experiment in which pigeons were given food at fixed intervals. Although the food came out the same way whatever the pigeons did, many of them came to repeat over and over whatever movement they happened to be making just before the food appeared. Things like turning their heads or swaying their bodies. They had convinced themselves that a coincidence was \"thanks to this movement,\" and Skinner called this superstition in the pigeon. Human jinxes and attachment to lucky charms may, surprisingly, arise from the same mechanism.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「迷信を信じる」「ただの迷信だ」のように、根拠のない思い込みを指して使う。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "葬儀は友引の日を避けるという習わしがあるが、六曜はもともと仏教とは関わりのない暦の考え方である。友引に葬儀をすると友をあの世へ引き込むという話も、字の見た目からの連想にすぎない。それを迷信だと切り捨てるのはたやすいが、人がそれにすがるのは、死という分からないものを前にして、何か手がかりがほしいからだろう。仏の教えが本当に問うのは、日の良し悪しではなく、今日をどう生きるかなのである。",
+      "form": "迷信",
+      "en": "There is a custom of avoiding tomobiki days for funerals, but the six-day calendar cycle originally has nothing to do with Buddhism. The idea that holding a funeral on tomobiki draws one's friends into the next world is likewise merely an association drawn from how the characters look. It is easy to dismiss that as superstition, but people cling to it, I think, because in the face of something as unknowable as death they want some kind of foothold. What the Buddha's teaching really asks is not whether a day is lucky or unlucky but how we will live today.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「迷信だと切り捨てる」は、根拠がないとして退けること。信じる人の心に目を向ける文脈で使われる。",
+      "grammar": ["n2-ni-suginai"]
+    },
+    {
+      "ja": "最近、AIに今日の運勢を聞く人っているじゃないですか。あれって、AIが星の動きをちゃんと計算してるわけじゃないんですよ。ネット上の占いっぽい文章を、それっぽくまねして並べてるだけなんですよね。でも、機械に言われると妙に信じちゃう人もけっこういて、新しい道具が出てきても古い迷信は形を変えて生き残るんだなって思います。まあ、遊びとして楽しむ分には全然いいと思いますけどね。",
+      "form": "迷信",
+      "en": "These days there are people who ask AI for today's fortune, right? With that, the AI isn't actually calculating the movements of the stars. It's just imitating fortune-telling-style text from the internet and stringing it together in a plausible way. But quite a few people find it oddly believable when a machine says it, and it makes me think that even when new tools come along, old superstitions survive by changing their form. Well, I think it's totally fine as long as you're just enjoying it for fun.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "tipJa": "話し言葉でも「古い迷信」「ただの迷信」の形で使う。新しい技術と対比されることも多い。",
+      "grammar": ["n3-wake-dewa-nai"]
+    }
+  ],
+  "284": [
+    {
+      "ja": "今回は、才能は遺伝で決まるのか努力で決まるのか、という永遠のテーマに挑んだ本を要約していきます。著者はまず双子の研究を紹介し、性格や能力のある部分には遺伝が関わっていると認めます。ただ、先天的な差があるからといって、努力の意味がなくなるわけではない、というのが著者の立場です。遺伝の影響は、育つ環境によって出方が大きく変わるからなんですね。つまり、どんな環境に身を置くかが最終的なカギになる、というのがこの本の結論です。",
+      "form": "先天的",
+      "en": "This time I'm going to summarize a book that takes on the eternal question of whether talent is decided by genes or by effort. The author first introduces research on twins and acknowledges that genes are involved in some parts of personality and ability. However, the author's position is that having innate differences does not mean effort becomes meaningless. That's because the way genetic influence shows itself changes greatly depending on the environment a person grows up in. In other words, the book's conclusion is that what kind of environment you put yourself in is the ultimate key.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「先天的な差・才能」は遺伝など、もとから備わったもの。対になる語は「後天的」。",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "経験によらず、もとから備わっているさま。"
+    },
+    {
+      "ja": "胎児の心臓の病気を、AIを使って見つけやすくする研究が国内外で進められている。先天的な心臓の病気は、新生児の約100人に1人にみられるとされる。妊婦健診の超音波検査で見つけることもできるが、胎児の心臓は小さく動きも速いため、経験の浅い医師には見落としが起きやすい。大量の検査映像を学ばせたAIで医師の判断を補うことで、生まれてすぐに治療を始められる態勢を整えるのが狙いだ。",
+      "form": "先天的",
+      "en": "Research to make it easier to find heart disease in unborn babies using AI is under way both in Japan and abroad. Congenital heart disease is said to be found in about 1 in 100 newborns. It can be found in ultrasound scans during prenatal checkups, but because a fetus's heart is small and moves quickly, oversights tend to happen with less experienced doctors. The aim is to support doctors' judgment with AI trained on large amounts of scan footage, so that treatment can be started right after birth.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「先天的な心臓の病気」のように、病気や障害が生まれる前からあることを表す医学の言い方。",
+      "grammar": ["n3-koto-de"],
+      "sense": "生まれる前から体に備わっているさま。"
+    },
+    {
+      "ja": "足の速さや声の質のように、本人が努力して手に入れたのではない資質というものがある。仏教の目から見れば、それを誇るのも嘆くのも、自分というものへのとらわれであることに変わりはない。先天的な資質は自分で選んで持ってきたものではない以上、手柄でも落ち度でもないはずだ。持っていないものを数えるより、いま手の中にあるもので今日何ができるかを問うほうが、心はずっと軽くなるのだろう。",
+      "form": "先天的",
+      "en": "There are qualities, like how fast we can run or the quality of our voice, that we did not obtain through our own effort. Seen through Buddhist eyes, whether we take pride in them or lament them, it is all the same attachment to the self. Since innate qualities are not something we chose and brought with us, they should be neither an achievement nor a fault. Rather than counting what we do not have, asking what we can do today with what is in our hands right now probably makes the heart much lighter.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「先天的な資質」は本人が選べないもの。努力で得たものと対比して使われることが多い。",
+      "sense": "経験によらず、もとから備わっているさま。"
+    }
+  ],
+  "285": [
+    {
+      "ja": "今回は、AIを支える半導体の話をざっくり整理していきます。従来のパソコンの頭脳だったCPUは、複雑な処理を一つずつ順番にこなすのが得意でした。ところが、AIの学習で必要になるのは、単純な掛け算を同時に何億回も行うことなんです。そこで注目されたのが、もともとゲームの映像を描くために作られたGPUで、大量の計算を並べて一気に片づけられるんですね。こうして、ゲームの部品がAIの主役になるという逆転が起きることになりました。",
+      "form": "従来",
+      "en": "This time I'm going to give a rough overview of the semiconductors that support AI. The CPU, which was the brain of conventional computers, was good at handling complex processing one step at a time, in order. But what AI training needs is to perform simple multiplications hundreds of millions of times at once. That's where the GPU drew attention: originally made to draw game graphics, it can process huge amounts of calculation side by side in one go. And so a reversal came about in which a gaming component became the star of AI.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「従来の〜」の形で、新しいものと比べる前の、これまでのものを指す。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "これまで一般に行われてきたこと。"
+    },
+    {
+      "ja": "カナダ東部のランス・オ・メドーには、北欧のバイキングが築いた集落の跡が残っている。ここで見つかった木材を調べた国際研究チームは2021年、その木が金属の刃物で切られたのは1021年だったと特定したと発表した。手がかりとなったのは、993年に起きた宇宙線の急増が年輪に残した痕跡である。従来は数十年の幅でしか示せなかった年代を、一年単位まで絞り込んだことになる。ヨーロッパから来た人々がアメリカ大陸にいたことを、年まで確かに示す証拠としては、最も古いものとなる。",
+      "form": "従来",
+      "en": "At L'Anse aux Meadows in eastern Canada, the remains of a settlement built by Norse Vikings survive. In 2021, an international research team that examined wood found there announced that it had determined the trees had been cut with metal blades in 1021. The clue was a trace left in the tree rings by a sharp increase in cosmic rays that occurred in 993. This means they narrowed down to a single year a date that until now could only be given within a range of several decades. As evidence showing, down to the year, that people from Europe were in the Americas, it is the oldest there is.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「従来は〜だった」と副詞的に使い、今回の成果との違いを示すのは報道の定番の形。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "以前から今まで。これまで。"
+    },
+    {
+      "ja": "仏教が生まれたころのインドでは、祭祀をつかさどるバラモンが社会の頂点に立ち、人の尊さは家柄で決まるとされていた。ブッダは、人の価値は生まれではなく行いによって決まると説き、従来の身分の考え方に正面から異を唱えた。それは制度を力で壊すことではなく、人を見る目そのものを改めることであった。当たり前とされてきたものを疑うには、声の大きさではなく、自らの行いという裏づけが必要なのだろう。",
+      "form": "従来",
+      "en": "In India around the time Buddhism arose, the Brahmins who presided over rituals stood at the top of society, and a person's worth was held to be decided by family lineage. The Buddha taught that a person's value is decided not by birth but by conduct, and openly challenged the conventional idea of social rank. That was not a matter of breaking the system by force but of changing the very way we look at people. To question what has been taken for granted, what is needed is perhaps not a loud voice but the backing of one's own conduct.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「従来の考え方に異を唱える」は、長く当たり前とされてきたものに反対すること。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "これまで一般に行われてきたこと。"
+    }
+  ],
+  "289": [
+    {
+      "ja": "今回は、江戸時代に全国の地図を作り上げた伊能忠敬の話です。彼が測量の旅に出たのは、商家の主人として家業を退いたあとの、五十代半ばのことでした。歩幅を一定に保つ訓練を重ね、海岸線を一歩一歩、丹念に測っていきました。その旅は十数年に及び、全国を歩いた距離は、合わせると地球一周に近いとも言われています。何かを始めるのに遅すぎることはない、という話の代表例として、今もよく紹介されているんですね。",
+      "form": "丹念",
+      "en": "This time it's the story of Ino Tadataka, who produced a map of the whole country in the Edo period. He set out on his surveying journeys in his mid-fifties, after retiring from the family business as head of a merchant house. Training himself to keep his stride constant, he painstakingly measured the coastline step by step. The journeys lasted more than a decade, and the total distance he walked across the country is said to be close to once around the earth. That's why he is still often presented as a prime example of the idea that it's never too late to start something.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「丹念に測る・調べる」のように、時間をかけて一つ一つていねいに行う様子に使う。",
+      "grammar": ["n4-teiku"]
+    },
+    {
+      "ja": "生成AIの開発が加速するなか、学習に使うデータの質を確保する作業に改めて注目が集まっている。インターネットから集めた文章には誤りや重複が多く含まれ、そのまま学ばせると、AIが誤った内容をもっともらしく答える原因になりかねない。このため各社は、自動の選別に加えて、専門知識を持つ人がデータを一件ずつ丹念に確かめる体制を整えている。こうした作業は外から見えにくいものの、AIへの信頼を支える土台となっている。",
+      "form": "丹念",
+      "en": "As the development of generative AI accelerates, renewed attention is being paid to the work of ensuring the quality of the data used for training. Text collected from the internet contains many errors and duplicates, and training on it as is could lead AI to give plausible-sounding answers with wrong content. For this reason, companies are setting up systems in which, on top of automatic screening, people with specialist knowledge painstakingly check the data one item at a time. Such work is hard to see from outside, but it forms the foundation that supports trust in AI.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「一件ずつ丹念に確認する」のように、手間を惜しまない作業を表す。報道でも多い形。",
+      "grammar": ["n2-mono-no"]
+    },
+    {
+      "ja": "写経では、経文の一字一字を丹念に書き写していく。速く書こうとすれば字は乱れ、うまく見せようとすれば筆は固くなる。ただ目の前の一字に心を置くとき、人は不思議と静かになり、外の物音さえ遠のいていくのである。書き終えたあとに残るのは、立派な作品ではなく、急がずに過ごしたひとときの記憶なのかもしれない。何でも急ぐことに慣れた私たちにとって、それは失った時間を取り戻す営みでもあるのだろう。",
+      "form": "丹念",
+      "en": "In sutra copying, you painstakingly copy out the text of the sutra character by character. If you try to write fast, the characters become messy, and if you try to make them look good, the brush grows stiff. Only when you rest your mind on the single character in front of you do you become strangely calm, and even the sounds outside recede. What remains after you finish writing may be not a fine piece of work but the memory of a stretch of time spent without hurrying. For us, used to hurrying through everything, it is perhaps also a practice for regaining lost time.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「一字一字を丹念に」のように、細部まで心をこめて進める様子を表す。",
+      "grammar": ["n4-teiku", "n3-dewa-naku"]
+    }
+  ],
+  "28": [
+    {
+      "ja": "AIの世界で大きな転機になったのが、2020年にOpenAIの研究者たちが発表した論文です。モデルを大きくし、学習データと計算量を増やすと、予測の誤差がどれだけ小さくなるかを定量的に示したんですね。それまでは「大きくすれば賢くなりそうだ」という感覚的な話でしたが、これで、どれだけ投資すればどこまで伸びるかを見積もれるようになりました。巨大なモデルに大金をつぎ込む今の流れは、ここから始まったと言ってもいいんです。",
+      "form": "定量的",
+      "en": "A major turning point in the AI world was a paper published in 2020 by researchers at OpenAI. It showed quantitatively how much the prediction error shrinks as you make the model bigger and increase the training data and the amount of computation. Until then it had been an intuitive matter of \"it'll probably get smarter if we make it bigger,\" but now people could estimate how far performance would go for how much investment. You could say the current trend of pouring huge sums into giant models started from here.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「定量的に示す・測る」のように、数や量ではっきり表すこと。対になる語は「定性的」。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "企業の間で、社員の心の状態を定量的に把握しようとする取り組みが広がっている。2015年12月からは、従業員50人以上の事業所に、年に一度のストレスチェックが法律で義務づけられた。質問票への回答を点数にし、高いストレスがあると判定された人には医師との面談を勧める仕組みだ。ただ、数値はあくまで目安にすぎないうえ、本人がありのままに答えなければ実態は見えないとの指摘もある。",
+      "form": "定量的",
+      "en": "Efforts by companies to grasp their employees' mental state quantitatively are spreading. Since December 2015, workplaces with 50 or more employees have been required by law to carry out a stress check once a year. The system converts the answers on a questionnaire into scores and recommends an interview with a doctor for people judged to be under high stress. However, some point out that the figures are merely a guide and that, besides, the real situation cannot be seen unless people answer honestly.",
+      "original": true,
+      "register": "報",
+      "topic": "mind",
+      "tipJa": "「定量的に把握する」は報道で多い言い方。数値化できるものとできないものの対比で使われる。",
+      "grammar": ["n2-ni-suginai"]
+    },
+    {
+      "ja": "歩いた歩数も眠った時間も、今では手首に巻いた小さな機械が教えてくれる。数で示されると、私たちは自分のことが分かったような気になり、数字が増えれば安心し、減れば落ち込む。けれども、坐禅をした時間は記録できても、その間に心がどれほど静まったかを定量的に表す物差しはどこにもない。今日の坐禅は何点だった、とは誰にも言えないのである。測れないものを測れないままに大切にすること、そこに修行の難しさと深さがあるのだろう。",
+      "form": "定量的",
+      "en": "These days a small device strapped to our wrist tells us both how many steps we have walked and how long we have slept. When things are shown in numbers, we easily feel as though we understand ourselves, relieved when the numbers go up and dejected when they go down. Yet although the time spent in zazen can be recorded, there is no yardstick anywhere that expresses quantitatively how far the mind grew still during that time. No one can say how many points today's zazen was worth. Perhaps the difficulty and depth of practice lie in cherishing what cannot be measured, just as it is, unmeasured.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「定量的に表す」は数で示すこと。数にできない心の働きと対比されると意味がよく見える。"
+    }
+  ],
+  "29": [
+    {
+      "ja": "世界史で習う百年戦争は、イギリスとフランスの間で1337年から1453年まで続いた戦争です。ただ、百年以上ずっと戦場で戦っていたのではなく、休戦をはさみながら断続的に戦いが起きていた、というのが実際のところなんですね。ペストが大流行して、戦争を続けるどころではなくなった時期もありました。最後はフランスが巻き返し、イギリスは大陸の領地のほとんどを失って終わります。",
+      "form": "断続的",
+      "en": "The Hundred Years' War that you learn about in world history was a war between England and France that lasted from 1337 to 1453. But they weren't fighting on the battlefield nonstop for over a hundred years; in reality, the fighting broke out intermittently, with truces in between. There was even a period when the plague spread so widely that continuing the war was out of the question. In the end France fought back, and it ended with England losing almost all its territory on the Continent.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「断続的に続く」は、休みをはさみながら何度もくり返すこと。戦争や交渉にも使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "戦いなどが、間を置きながら何度も起こるさま。"
+    },
+    {
+      "ja": "対話型のAIサービスでは、利用が集中する時間帯に、つながりにくい状態が断続的に起きることがある。数分ほど応答が止まっては再び動き出し、しばらくするとまた止まる、といった具合だ。背景には、AIが答えを返すのに大量の計算が必要で、利用者が増えるとサーバーの処理が追いつかなくなるという事情がある。各社は計算に使う半導体の確保を急いでいるものの、最先端のチップを作れる企業は世界でも限られており、供給はすぐには増えない。",
+      "form": "断続的",
+      "en": "With conversational AI services, connections can become difficult intermittently during periods of heavy use. Responses stop for a few minutes, start moving again, and then stop once more after a while. Behind this is the fact that returning an answer requires a great deal of computation, and when users increase, the servers' processing can't keep up. Companies are rushing to secure the semiconductors used for computation, but only a limited number of firms in the world can make cutting-edge chips, so supply won't increase right away.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「断続的に起きる」は、止まったり続いたりをくり返すこと。障害や雨、騒音などに使う。",
+      "grammar": ["n2-mono-no"],
+      "sense": "切れたりつながったりをくり返すさま。"
+    },
+    {
+      "ja": "坐って呼吸を一つ二つと数えていると、そこに向けたはずの注意が、気づけば昨日の会話や明日の予定へと流れている。集中とは一本の線のように続くものではなく、断続的な点の連なりにすぎないのかもしれない。点と点の間の空白を嘆く必要はない。それた心に気づき、責めることなく、そっと呼吸に戻ればよいのである。その小さな戻り道を何度でも歩き直すことこそが、瞑想という営みの中身なのだろう。",
+      "form": "断続的",
+      "en": "When you sit and count your breaths, one, two, the attention you thought you had directed there has, before you know it, drifted to yesterday's conversation or tomorrow's plans. Concentration may not be something that continues like a single line but merely a chain of intermittent dots. There is no need to lament the gaps between the dots. It is enough to notice the mind that has wandered and, without blaming yourself, gently return to the breath. Walking that small path back again and again is perhaps the very substance of the practice of meditation.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「断続的な〜」と名詞を修飾する形も多い。ひと続きのものと対比すると意味が際立つ。",
+      "grammar": ["n3-dewa-naku", "n2-ni-suginai", "n2-koto-naku"],
+      "sense": "切れたりつながったりをくり返すさま。"
+    }
+  ],
+  "41": [
+    {
+      "ja": "今回は、人間の脳が文字を読む仕組みを描いた『プルーストとイカ』という本を取り上げます。著者によれば、文字が生まれたのはたかだか数千年前で、脳にはもともと読むための専用の回路がありません。私たちは、物の形をとらえる部分や言葉を聞き取る部分などをつなぎ合わせて、後から読むための回路を作っているんです。失読症は、このつなぎ方が多くの人と少し違うだけで、頭の良し悪しとは関係がないんですね。",
+      "form": "失読症",
+      "en": "This time I'm taking up a book called Proust and the Squid, which describes how the human brain reads. According to the author, writing appeared at most a few thousand years ago, and the brain has no dedicated circuit for reading to begin with. We build a reading circuit after the fact by linking together parts such as the area that grasps the shapes of things and the area that picks up spoken words. Dyslexia simply means this linking is a little different from most people's, and it has nothing to do with how smart you are.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「失読症のある人」のように使う。知能の問題ではないことを添えて説明されることが多い。"
+    },
+    {
+      "ja": "文字を音声に変える技術が、失読症のある人の学び方を変えつつある。視力にも知能にも問題がないのに、文字を目で追って内容をつかむことに大きな苦労を抱える人にとって、耳から学べる利点は大きい。かつての読み上げソフトは機械的な発音で聞き取りにくかったが、AIの発達により、人の声に近い自然な読み上げができるようになった。2024年4月からは民間の事業者にも合理的配慮の提供が義務づけられ、こうした道具を使える場面はさらに広がるとみられる。",
+      "form": "失読症",
+      "en": "Technology that turns text into speech is changing the way people with dyslexia learn. For people who have no problem with their eyesight or intelligence yet struggle greatly to follow written words with their eyes and grasp the content, being able to learn by ear is a big advantage. Earlier text-to-speech software had mechanical pronunciation that was hard to follow, but advances in AI have made natural reading aloud close to a human voice possible. From April 2024, private businesses have also been required to provide reasonable accommodation, and the situations in which such tools can be used are expected to expand further.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「失読症のある人の学び」のように、支援や配慮の話題で使われることが多い。",
+      "grammar": ["n4-you-ni-naru"]
+    },
+    {
+      "ja": "十九世紀の末、イギリスのある医師が、利発で計算も得意なのに、文字だけがどうしても読めない少年の例を医学雑誌に記した。それまで、そうした子どもは単に怠けているか、物覚えが悪いと見なされていたのである。のちに失読症と呼ばれることになるこの状態に名前が与えられたことで、責められる側にいた子どもたちは、ようやく理解される側へと移ることができた。名づけるという行為は、ときに人を救うのである。",
+      "form": "失読症",
+      "en": "At the end of the nineteenth century, a British doctor described in a medical journal the case of a boy who was bright and good at arithmetic yet simply could not read written words. Until then, such children had been regarded as merely lazy or slow to learn. Because this condition, which would later come to be called dyslexia, was given a name, children who had stood on the side of the blamed were finally able to move to the side of the understood. The act of naming sometimes saves people.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "tipJa": "「失読症と呼ばれる」のように、状態に名前を与える文脈で使われる。",
+      "grammar": ["n3-koto-ni-naru"]
+    }
+  ],
+  "42": [
+    {
+      "ja": "今回は、読めない地名がなぜ生まれたのか、その歴史をひもといていきます。きっかけの一つが奈良時代の713年に出された命令で、国や郡の名前を、縁起のいい漢字二文字で書くよう求めたんです。たとえば「いずみ」は、もともと「泉」一文字で書かれていましたが、二文字にそろえるため「和泉」と書くようになりました。読みは変わらないのに字だけが増えたわけですね。今の難読地名をたどると、こうした役所の都合に行き着くことも少なくないんです。",
+      "form": "難読",
+      "en": "This time I'm going to unravel the history of how unreadable place names came about. One trigger was an order issued in 713, in the Nara period, requiring the names of provinces and districts to be written with two auspicious kanji. For example, \"Izumi\" was originally written with the single character 泉, but to make it two characters it came to be written 和泉. In other words, only the characters increased while the reading stayed the same. If you trace today's hard-to-read place names back, they often lead to bureaucratic convenience of this kind.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「難読地名」「難読漢字」のように、名詞の前につけて使うことが多い。",
+      "grammar": ["n4-you-ni-naru"],
+      "sense": "漢字の読み方が難しく、正しく読める人が少ないこと。"
+    },
+    {
+      "ja": "スマートフォンのアプリには、中身を解析されにくくするため、プログラムをわざと読みにくく書き換える難読化の技術が広く使われている。他社に仕組みをまねされたり、不正に書き換えられたりするのを防ぐのが目的だ。一方で、同じ技術は悪意あるソフトが監視の目をくぐり抜けるためにも使われてきた。最近では、AIにこうした読みにくいコードを読み解かせる研究も進んでおり、守る側と攻める側の駆け引きは新たな段階に入りつつある。",
+      "form": "難読",
+      "en": "In smartphone apps, obfuscation techniques that deliberately rewrite programs to be hard to read are widely used to make their contents harder to analyze. The aim is to prevent other companies from copying how they work or tampering with them. On the other hand, the same techniques have also been used by malicious software to slip past monitoring. Recently, research on having AI decipher such hard-to-read code has also been advancing, and the tug-of-war between defenders and attackers is entering a new stage.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "情報技術では「難読化」の形で、中身を解析されにくくするためにわざと読みにくくすることを指す。",
+      "sense": "プログラムなどを読み解きにくくすること。「難読化」の形で。"
+    },
+    {
+      "ja": "漢字検定の上の級を目指すと、ふだん見かけない難読の熟語がぐっと増えてきます。こうした語は、読みをただ丸暗記しようとしても、なかなか頭に残りません。おすすめは、その字がなぜそう読まれるのかという由来と一緒に覚えることです。たとえば「海老」は、腰の曲がった姿を海の老人に見立てた書き方だと知れば、一回で記憶に結びつきます。理由をセットにすることで、思い出すための手がかりが増えるわけです。",
+      "form": "難読",
+      "en": "When you aim for the higher levels of the Kanji Proficiency Test, the number of hard-to-read compounds you rarely see in daily life jumps. Words like these don't stay in your head easily if you just try to memorize the readings by rote. What I recommend is learning them together with the origin of why the characters are read that way. For example, once you know that 海老 is a way of writing that likens the shrimp's bent back to an old man of the sea, it links to your memory in one go. By pairing each word with a reason, you increase the cues for recalling it.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "「難読の熟語」のように使う。読みの由来とセットで覚えると定着しやすい。",
+      "grammar": ["n3-koto-de"],
+      "sense": "漢字の読み方が難しく、正しく読める人が少ないこと。"
+    }
+  ],
+  "238": [
+    {
+      "ja": "今回は、インドの言語事情をざっくり見ていきます。インドの憲法には、ヒンディー語を含む22の言語が挙げられていて、その中には古典語のサンスクリットも入っています。ところが、2011年の国勢調査でサンスクリットを母語と答えた人は、わずか2万5千人ほどでした。それでも、宗教の儀式や古典を通じてこの言葉を学ぶ人は今も多く、話者の数だけでは言葉の重みは測れないんですね。",
+      "form": "話者",
+      "en": "This time let's take a rough look at the language situation in India. India's constitution lists 22 languages, including Hindi, and among them is the classical language Sanskrit. However, in the 2011 census only about 25,000 people answered that Sanskrit was their mother tongue. Even so, many people still learn the language through religious rituals and the classics, so you can't measure the weight of a language by its number of speakers alone.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「〜語の話者」「話者の数」のように、ある言語を使う人を数える文脈で使う。",
+      "grammar": ["n4-teiku"],
+      "sense": "ある言語を使って話す人。"
+    },
+    {
+      "ja": "イギリスとアイルランドの間に浮かぶマン島では、1974年、マン島語を母語として育った最後の話者とされる男性が亡くなった。ユネスコは2009年、この言語を「消滅した言語」に分類したが、住民らの反発を受け、のちに「危機にある言語」へと見直した。島では録音や記録をもとに言葉を学び直す運動が続き、現在はマン島語で授業を行う小学校もある。途絶えたとみられた言語が、再び子どもたちの口にのぼり始めている。",
+      "form": "話者",
+      "en": "On the Isle of Man, which lies between Britain and Ireland, a man said to be the last speaker who grew up with Manx as his mother tongue died in 1974. In 2009 UNESCO classified the language as \"extinct,\" but after protests from residents it later revised this to \"endangered.\" On the island, a movement to relearn the language from recordings and records has continued, and there is now an elementary school that teaches in Manx. A language thought to have died out is beginning to be spoken by children again.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「最後の話者」は、その言語を母語とする人がいなくなる場面で報道によく出る言い方。",
+      "sense": "ある言語を使って話す人。"
+    },
+    {
+      "ja": "話し方の講座でよくお伝えするのが、文末の小さな言葉が印象を大きく左右するということです。「明日は雨です」と言い切るのと、「明日は雨ですね」と言うのとでは、聞き手の受け取り方がまるで違います。「ね」には、相手と気持ちを分かち合おうとする話者の姿勢が表れるからです。説明が一方的に聞こえると言われる人は、ところどころで「ね」を添えてみてください。それだけで語り口がぐっとやわらかくなります。",
+      "form": "話者",
+      "en": "Something I often tell people in speaking courses is that the small words at the end of a sentence greatly affect the impression you give. Saying flatly \"It will rain tomorrow\" and saying \"It will rain tomorrow, won't it\" are received completely differently by the listener. That's because \"ne\" shows the speaker's attitude of trying to share feelings with the other person. If people say your explanations sound one-sided, try adding \"ne\" here and there. That alone makes your way of talking much softer.",
+      "original": true,
+      "register": "語",
+      "topic": "language",
+      "tipJa": "言語学では、発話する側を「話者」、受け取る側を「聞き手」と呼ぶ。",
+      "sense": "その文や発話を口にしている人。"
+    }
+  ]
+}

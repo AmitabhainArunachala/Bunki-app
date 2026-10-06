@@ -1,0 +1,318 @@
+{
+  "170": [
+    {
+      "ja": "今回は、南インドの大きなヒンドゥー寺院を、建物の配置という視点から読み解いていきます。参拝者はまず高い門をくぐり、本尊のまわりを右回りにめぐりながら、少しずつ奥へと進んでいくんですね。外側ほど明るく開けていて、中心の聖室に近づくにつれて、通路は狭く薄暗くなっていきます。つまりこれは、歩く順番そのものが信仰の体験になるように組み立てられた動線計画なんです。建物の中を歩くこと自体が、心を内側へ向けていく修行になっているわけです。",
+      "form": "動線計画",
+      "en": "This time, let's read the great Hindu temples of South India from the angle of how their buildings are laid out. Worshippers first pass through a tall gate, then make their way gradually inward, circling the main image clockwise. The outer areas are bright and open, but as you get closer to the sanctum at the centre, the passages become narrow and dim. In other words, this is flow planning built so that the very order in which you walk becomes an experience of faith. Walking through the building is itself a practice that turns the mind inward.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "建築の言葉。「動線計画を練る」「動線計画が悪い」のように使う。",
+      "grammar": ["n3-ni-tsurete", "n3-you-ni", "n4-nagara"],
+      "sense": "建物の中で人が動く道すじを考えて、配置を決めること。"
+    },
+    {
+      "ja": "大型の駅や空港の改修で、人の流れをコンピューター上で再現する技術の活用が広がっている。過去の混雑データをもとに、数万人の利用者がどの通路をどう歩くかをAIが予測し、人がたまりやすい場所を洗い出す仕組みだ。これまで担当者の経験に頼る部分が大きかった動線計画を、数値で裏づけられる点が利点とされる。一方、乗り換え客の急な増加や災害時の避難など、想定しにくい状況への対応には課題も残る。専門家は、予測はあくまで判断材料の一つにすぎないと指摘している。",
+      "form": "動線計画",
+      "en": "In the renovation of large stations and airports, the use of technology that recreates the flow of people on a computer is spreading. Based on past congestion data, AI predicts which passages tens of thousands of users will take and how they will walk, picking out the spots where people tend to pile up. Its advantage is said to be that it can back up with numbers the flow planning that until now relied heavily on the experience of the staff in charge. On the other hand, challenges remain in handling situations that are hard to foresee, such as a sudden surge in transferring passengers or evacuation during a disaster. Experts point out that the predictions are no more than one input for making decisions.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "駅・空港・病院・店舗など、人の流れが多い施設の話でよく出る。",
+      "grammar": ["n2-ni-suginai", "n5-teiru"],
+      "sense": "建物の中で人が動く道すじを考えて、配置を決めること。"
+    },
+    {
+      "ja": "近世の城の門をくぐっても、多くの場合、本丸へまっすぐ進むことはできない。四角く囲まれた小さな空間で向きを直角に変えさせられ、折れ曲がった通路を進まざるを得ないのである。攻め込んだ兵は足を止めたその瞬間、周囲の高い石垣の上から狙われることになる。現代の建築でいう動線計画は、ふつう人々がいかに快適に移動できるかを考えるものだ。城の場合はその逆で、人をいかに迷わせ、疲れさせるかが追求されていたと言える。",
+      "form": "動線計画",
+      "en": "Even after passing through the gate of an early modern Japanese castle, in most cases you cannot head straight for the inner keep. In a small, square enclosure you are made to turn at a right angle, and you have no choice but to advance along a passage that doubles back on itself. Attacking soldiers end up targeted from the top of the high stone walls all around them the moment they stop. Flow planning in modern architecture usually considers how comfortably people can move about. In the case of castles it was the opposite: what was pursued, one could say, was how to confuse people and wear them out.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "grammar": ["n2-zaru-o-enai", "n3-koto-ni-naru"],
+      "sense": "建物の中で人が動く道すじを考えて、配置を決めること。"
+    }
+  ],
+  "303": [
+    {
+      "ja": "半導体の進化といえば、これまでは回路をどこまで細かくできるかの勝負でした。ところが、線の幅を縮める技術は、そろそろ物理的な限界に近づいていると言われています。そこで注目されているのが、平らに並べていたチップを何層にも重ねて、立体的に組み上げるやり方なんです。土地の足りない都市で、平屋ではなく高層ビルを建てるのと同じ発想ですね。限られた面積にどれだけ詰め込めるかという戦いの舞台が、横から縦へと移りつつあるわけです。",
+      "form": "立体的",
+      "en": "When it comes to advances in semiconductors, until now the contest has been about how fine the circuits could be made. However, the technology for shrinking line widths is said to be nearing its physical limits. That is why attention is turning to an approach in which chips that used to be laid out flat are stacked in many layers and built up three-dimensionally. It's the same idea as putting up a high-rise building rather than a single-storey house in a city short of land. The battleground over how much can be packed into a limited area is shifting from horizontal to vertical.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「立体的に積む」「立体的な構造」のように、物の形について使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "高さや奥行きがあるようす。"
+    },
+    {
+      "ja": "古代都市の遺跡を、AIを使って当時の姿に復元する取り組みが各地で進んでいる。発掘で見つかった土台の位置や、崩れ落ちた石材の形をもとに、建物の高さや屋根の形を推定する仕組みだ。平面の図だけでは伝わりにくかった街並みが、立体的な映像として画面上に再現される。研究者からは、これまでの想像図との違いが新たな発見につながるとの期待も出ている。ただ、記録の残っていない部分は推測で補うことになり、どこまでが確かな情報かを示す工夫が欠かせないとされる。",
+      "form": "立体的",
+      "en": "Efforts to restore the ruins of ancient cities to how they looked at the time using AI are under way in many places. The system estimates the height of buildings and the shape of their roofs from the positions of foundations found in excavations and the shapes of fallen stones. Streetscapes that were hard to convey with flat plans alone are recreated on screen as three-dimensional images. Researchers also hope that differences from earlier artists' impressions will lead to new discoveries. However, parts with no surviving records have to be filled in by guesswork, and it is said to be essential to find ways to show how much of the information is certain.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "grammar": ["n3-koto-ni-naru", "n5-teiru"],
+      "sense": "高さや奥行きがあるようす。"
+    },
+    {
+      "ja": "ある人を一言で片づけたくなるのは、誰にでもある心の癖だろう。あの人は冷たい、あの人は優しい、と決めてしまえば、それ以上考えずに済むからだ。だが、職場では無口な人が家では冗談ばかり言っていることも、厳しい上司が陰で部下をかばっていることもある。一つの面だけを見てわかった気になるのではなく、角度を変えて眺め直すことで、人は初めて立体的に見えてくる。他人を理解するとは、その奥行きに付き合い続けることなのかもしれない。",
+      "form": "立体的",
+      "en": "Wanting to sum a person up in a single word is probably a habit of mind everyone has. Once you decide that this person is cold and that one is kind, you no longer have to think any further. Yet a person who is silent at work may crack jokes nonstop at home, and a strict boss may be quietly covering for subordinates behind the scenes. Only when we look again from a different angle, rather than feeling we understand from seeing a single side, do people begin to appear three-dimensional. Perhaps understanding others means continuing to engage with that depth.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "人や物事について「立体的に見る／描く」と言うと、多面的にとらえる意味になる。",
+      "grammar": ["n3-dewa-naku", "n3-koto-de"],
+      "sense": "物事をいろいろな面からとらえるようす。"
+    }
+  ],
+  "135": [
+    {
+      "ja": "半導体業界の地図を理解するには、ビジネスの形を二つに分けて考えるとわかりやすいです。一つは、チップの開発から工場での生産までを一つの会社で抱え込む、いわゆる垂直統合型ですね。もう一つは、開発だけを手がける会社と、生産を引き受ける会社とで仕事を分ける形です。1980年代後半に生産を専門とする会社が台湾で生まれたことで、後者の形が一気に広まりました。どちらが優れているというより、時代ごとにバランスが揺れ動いてきた、と見るのが正確だと思います。",
+      "form": "垂直",
+      "en": "To understand the map of the semiconductor industry, it helps to think of business models as falling into two types. One is the so-called vertically integrated model, in which a single company keeps everything in-house, from developing the chip to producing it in the factory. The other is a model in which the work is divided between companies that only develop chips and companies that take on production. With the birth in Taiwan of a company specialising in production in the late 1980s, the latter model spread rapidly. Rather than one being better than the other, I think it is more accurate to see the balance as having swung back and forth from era to era.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "経済では「垂直統合」の形で、一社が工程を一手に担うことを表す。",
+      "grammar": ["n3-koto-de"],
+      "sense": "開発から生産までを一つの企業がまとめて担う形。"
+    },
+    {
+      "ja": "中世ヨーロッパのゴシック様式の大聖堂に足を踏み入れると、視線は自然と天井へ引き上げられる。細い柱は床から一気に伸び、はるか頭上でアーチとなって交わっていく。水平に広がる日常の世界に対し、垂直に伸びる線は、天へ向かう祈りを形にしたものだと言われる。人はこの空間で、自分の小ささと同時に、届かないものへ手を伸ばしたいという願いを知ったのだろう。建物の形が、そのまま信仰の言葉になっていたのである。",
+      "form": "垂直",
+      "en": "Step inside a Gothic cathedral of medieval Europe, and your gaze is naturally drawn up toward the ceiling. Slender columns shoot up from the floor and meet as arches far overhead. Against the everyday world that spreads out horizontally, the lines rising vertically are said to give shape to prayer reaching toward heaven. In such a space, people must have come to know their own smallness, and at the same time a longing to reach for what lies beyond their grasp. The form of the building was itself the language of faith.",
+      "original": true,
+      "register": "論",
+      "topic": "history",
+      "grammar": ["n4-teiku"],
+      "sense": "水平な面に対して、まっすぐ縦の方向であること。"
+    },
+    {
+      "ja": "図形の問題で手が止まったら、まず直角がどこにあるかを探してみてください。二つの直線が垂直に交わっていれば三平方の定理が使えるようになり、長さを求める道が一気に開けます。問題文に書かれていなくても、補助線を引くだけで隠れた直角が見つかることも少なくありません。ただし本番では、図の見た目で判断するのではなく、条件から確かめる習慣をつけておきましょう。見た目が直角に近くても、そうだと決まっているわけではないからです。",
+      "form": "垂直",
+      "en": "When you get stuck on a geometry problem, start by looking for where the right angles are. If two straight lines meet perpendicularly, you can use the Pythagorean theorem, and the way to find lengths suddenly opens up. Even when the problem doesn't say so, it is not unusual to find a hidden right angle just by drawing an auxiliary line. In the actual exam, though, make a habit of confirming it from the given conditions rather than judging by how the figure looks. Just because an angle looks close to a right angle doesn't mean it is one.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "数学では「垂直に交わる」「〜に垂直な直線」の形でよく使う。",
+      "grammar": ["n4-you-ni-naru", "n3-dewa-naku", "n3-wake-dewa-nai"],
+      "sense": "二つの直線や面が直角に交わること。"
+    }
+  ],
+  "128": [
+    {
+      "ja": "自動運転の車やロボットがどうやって周りを把握しているのか、基本の考え方を押さえておきましょう。カメラやセンサーでとらえた物体は、すべて位置を表す数字の組に置き換えられています。たとえば、前方の歩行者は何メートル先にいて、左右にどれだけずれているか、という形ですね。こうして世界を座標の集まりとして扱うことで、初めてコンピューターが距離や動きを計算できるようになるんです。人間が目で見ている景色も、機械の中では数字の地図になっているわけです。",
+      "form": "座標",
+      "en": "Let's get a grip on the basic idea of how self-driving cars and robots make sense of their surroundings. Every object picked up by cameras and sensors is converted into a set of numbers that express its position. For example, how many metres ahead a pedestrian in front is, and how far they are off to the left or right. Only by treating the world as a collection of coordinates in this way can a computer calculate distance and movement. The scenery that humans see with their eyes becomes, inside the machine, a map made of numbers.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「座標を求める」「座標で表す」の形でよく使う。",
+      "grammar": ["n3-koto-de", "n4-you-ni-naru"],
+      "sense": "点の位置を数の組で表したもの。"
+    },
+    {
+      "ja": "人は迷ったとき、自分がいまどこにいるのかを確かめたくなる生き物である。かつては家や村、信じる神が、その位置を示す目印の役目を果たしていた。だが多くのことを自分で選べるようになった今、人は頼るべき基準そのものを見失いやすい。他人と比べることで安心しようとしても、比べる相手が変わるたびに足場は揺れてしまう。人生の座標を定める軸は、結局、自分がなにを大切にしたいかという問いの中にしかないのだろう。",
+      "form": "座標",
+      "en": "Human beings are creatures who, when lost, want to check where they are now. Once, the household, the village and the gods people believed in served as landmarks showing that position. But now that we can choose so much for ourselves, people easily lose sight of the very standard they should rely on. Even if we try to reassure ourselves by comparing ourselves with others, our footing wobbles each time the people we compare ourselves with change. In the end, the axis that fixes the coordinates of a life probably lies nowhere but in the question of what we ourselves want to hold dear.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「人生の座標」「思想の座標」のように、比喩で位置づけの基準を表す。",
+      "grammar": ["n4-you-ni-naru", "n3-koto-de"],
+      "sense": "物事の位置を確かめるための基準や枠組み。"
+    },
+    {
+      "ja": "関数のグラフの問題が苦手な人は、まず図の上に点を正確に打つ練習から始めてみましょう。点の位置は、横にいくつ、縦にいくつ進んだかという二つの数で決まります。交点の座標を求める問題なら、二つの式を連立させて解けば、その答えがそのまま点の位置になります。式と図を行き来しながら考えることで、計算ミスにも気づきやすくなります。面倒がらずに手を動かして確かめる習慣が、得点の安定につながります。",
+      "form": "座標",
+      "en": "If you find graph problems on functions difficult, start by practising plotting points accurately on the diagram. A point's position is determined by two numbers: how many steps across and how many steps up. In a problem asking for the coordinates of an intersection, if you solve the two equations simultaneously, the answer is exactly the point's position. Thinking while moving back and forth between the equations and the diagram also makes it easier to spot calculation slips. The habit of checking things by hand rather than cutting corners leads to steadier scores.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "数学では「交点の座標」「座標を求めよ」が定番の言い方。",
+      "grammar": ["n4-nagara", "n3-koto-de"],
+      "sense": "点の位置を数の組で表したもの。"
+    }
+  ],
+  "129": [
+    {
+      "ja": "今日は、十七世紀の哲学者デカルトが数学にもたらした大きな発明について話します。彼は1637年に出版した著作の付録の中で、図形を式で扱うという新しい方法を示しました。それまで図を描いて論じるのが中心だった円や直線を、文字と数を使った式で表せるようになったわけです。これが、のちに座標幾何学と呼ばれる分野の出発点になりました。目で見る形と計算の世界がつながったことで、その後の物理学の発展にも大きな影響を与えたんですね。",
+      "form": "座標幾何学",
+      "en": "Today I'll talk about a major invention that the seventeenth-century philosopher Descartes brought to mathematics. In an appendix to a work he published in 1637, he presented a new method of handling figures with equations. Circles and straight lines, which until then had mainly been discussed by drawing diagrams, could now be expressed in equations using letters and numbers. This became the starting point of the field later called coordinate geometry. By linking the shapes we see with the world of calculation, it also had a great influence on the later development of physics.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「解析幾何学」とも呼ばれる。",
+      "grammar": ["n4-you-ni-naru", "n3-koto-de"],
+      "sense": "図形を式で表し、計算で性質を調べる数学の分野。"
+    },
+    {
+      "ja": "図形の証明問題で、どの補助線を引けばいいか思いつかない、という人は多いはずです。そんなときの奥の手が、座標幾何学の考え方を使って、図形を式に置き換えてしまうやり方です。点の位置を数で表せば、長さも角度も、あとは計算で機械的に求められます。センスに頼らずに済む一方で、式が長くなりやすいので、計算の正確さが試されることになります。図で解くか式で解くか、問題に応じて使い分けられるようにしておくと安心です。",
+      "form": "座標幾何学",
+      "en": "There must be many people who can't think which auxiliary line to draw in a geometry proof. The trump card at times like that is to use the approach of coordinate geometry and turn the figure into equations. Once you express the positions of points as numbers, lengths and angles can then be found mechanically by calculation. While you no longer have to rely on intuition, the equations tend to get long, so your accuracy in calculation ends up being tested. You can feel secure if you're ready to choose between solving with diagrams and solving with equations depending on the problem.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "grammar": ["n3-koto-ni-naru", "n2-ni-oujite", "n3-you-ni"],
+      "sense": "図形を式で表し、計算で性質を調べる数学の分野。"
+    },
+    {
+      "ja": "ゲームを自作してみて思ったんですけど、画面の中のキャラって、全部数字で動いてるんですよね。敵とぶつかったかどうかの判定も、結局は二つの点の距離を計算してるだけで。学生のころは座標幾何学なんて何に使うんだって思ってたんですけど、いや、めちゃくちゃ使うじゃん、っていう。円と直線が交わるかどうか、みたいな教科書の問題が、そのまま当たり判定のコードになってたりするんですよ。数学ってこういうところで生きてくるんだなって、ちょっと感動しましたね。",
+      "form": "座標幾何学",
+      "en": "When I tried making a game myself, it struck me that the characters on screen all move by numbers. Even deciding whether you've collided with an enemy is, in the end, just calculating the distance between two points. Back when I was a student I thought, what's coordinate geometry even for, but it's like, wow, you use it constantly. Textbook problems like whether a circle and a line intersect turn straight into the code for hit detection. It actually moved me a bit to realise this is where maths comes to life.",
+      "original": true,
+      "register": "話",
+      "topic": "ai",
+      "sense": "図形を式で表し、計算で性質を調べる数学の分野。"
+    }
+  ],
+  "19": [
+    {
+      "ja": "古い木造建築の保存修理では、まず建物をいったん解体し、状態を細かく調べることが多い。柱や梁、屋根の板など各部の傷み具合を記録し、使える部材はできる限り元の場所に戻すのが基本だ。こうした作業は数十年に一度の機会となるため、残された記録そのものが後世への貴重な資料にもなる。近年は、職人の目による点検に加えて、三次元の計測データを残す試みも広がっている。一方で、伝統的な技術を受け継ぐ職人の高齢化が進んでおり、人材の確保が課題となっている。",
+      "form": "各部",
+      "en": "In the conservation and repair of old wooden buildings, the structure is often first taken apart so that its condition can be examined in detail. The basic practice is to record how damaged each part is, such as pillars, beams and roof boards, and to return usable members to their original places as far as possible. Because such work is a chance that comes only once every few decades, the records left behind also become valuable material for later generations. In recent years, in addition to inspections by craftsmen's eyes, attempts to keep three-dimensional measurement data have also been spreading. On the other hand, the craftsmen who carry on traditional techniques are ageing, and securing successors has become an issue.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "grammar": ["n5-teiru"],
+      "sense": "全体を形づくっている、それぞれの部分。"
+    },
+    {
+      "ja": "脳の各部には、それぞれ得意な仕事があるとされています。たとえば、新しい出来事を記憶としてまとめるときには海馬が、計画を立てたり衝動を抑えたりするときには前頭葉が、大きな役目を果たしています。とはいえ、一つの能力が一つの場所だけで生まれる、というわけではないんです。実際の学習では、複数の領域が連携しながら働いていると考えられています。暗記ばかりに偏らず、手を動かす、人に説明する、といった多様な使い方を組み合わせるのが効果的です。",
+      "form": "各部",
+      "en": "Each part of the brain is said to have work it is especially good at. For example, the hippocampus plays a major role when new events are consolidated into memory, and the frontal lobe when we make plans or hold back impulses. That said, it isn't as if any one ability arises in only one place. In actual learning, several regions are thought to work while cooperating with each other. Rather than leaning only on rote memorisation, it is effective to combine a variety of uses, such as working things out by hand or explaining them to someone.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "grammar": ["n3-wake-dewa-nai", "n4-nagara", "n5-teiru"],
+      "sense": "全体を形づくっている、それぞれの部分。"
+    }
+  ],
+  "81": [
+    {
+      "ja": "生成AIのブームで一気に需要が伸びたのが、HBMと呼ばれる特殊なメモリーです。ざっくり説明すると、薄く加工したメモリーのチップを何枚も積み重ねて、ひとつのかたまりにしたものなんですね。重ねたチップどうしは、上下を貫く無数の細い穴を通して電気的につながっています。平らに並べるより信号が通る道のりが短くなるので、速さと省エネを両立できるわけです。ただし作るのが非常に難しく、安定して作れる会社は、世界でもごく限られているんです。",
+      "form": "上下",
+      "en": "One thing whose demand shot up with the generative AI boom is a special kind of memory called HBM. Roughly speaking, it is made by stacking many thinly processed memory chips into a single block. The stacked chips are electrically connected through countless fine holes running from top to bottom. Because the path signals travel is shorter than when chips are laid out flat, it can combine speed with energy saving. However, it is extremely difficult to make, and the companies in the world that can produce it reliably are very few indeed.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「上下に重ねる」「上下をつなぐ」のように、位置としての上と下を表す。",
+      "grammar": ["n5-teiru"],
+      "sense": "上と下。"
+    },
+    {
+      "ja": "江戸時代の大坂では、堂島のコメ市場が全国のコメの値段を左右する場となっていた。豊作か不作かの見通しや天候の知らせが届くたびに、相場は大きく上下した。商人たちは、実物のコメを受け渡す前に将来の値段で売り買いを約束する取引を行い、値動きの危険を和らげていたとされる。この仕組みは、世界でも早い時期に整った先物取引の一つとして知られている。幕府もたびたびコメの値段を安定させようと手を打ったものの、市場の動きを思い通りに抑えるのは難しかった。",
+      "form": "上下",
+      "en": "In Osaka during the Edo period, the Dojima rice market became the place that swayed the price of rice across the country. Every time forecasts of a good or poor harvest or news of the weather arrived, prices rose and fell sharply. Merchants are said to have eased the risk of price swings by making deals that promised to buy and sell at a future price before the actual rice changed hands. This system is known as one of the earliest futures markets to take shape anywhere in the world. Although the shogunate repeatedly took steps to stabilise the price of rice, it was hard to hold the market's movements down as it wished.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "「株価が上下する」「上下に揺れる」のように、動きを表すときは「する」をつける。",
+      "grammar": ["n2-mono-no", "n5-teiru"],
+      "sense": "値段などが上がったり下がったりすること。"
+    },
+    {
+      "ja": "敬語って、相手との上下を言葉でいちいち確認する仕組みなのかなって思うんですよ。はじめて会う人だと、年齢とか役職がわかるまで、どの話し方でいくか決められないじゃないですか。だから飲み会で最初に年を聞き合うのも、失礼な詮索っていうより、話し方を決めるための情報集めなんですよね、たぶん。まあ、最近はフラットな職場も増えてるんで、全部が全部そうってわけじゃないですけど。それでも、ため口に切り替えるタイミングって、いまだに悩みません？",
+      "form": "上下",
+      "en": "I kind of think honorific speech is a system for confirming, word by word, who's above and who's below in relation to the other person. When you meet someone for the first time, you can't decide how to talk until you know their age or job title, right? So asking each other's age at the start of a drinking party probably isn't nosy prying so much as gathering information to decide how to talk. Well, there are more flat workplaces these days, so it's not like that's true everywhere. Even so, don't you still agonise over when to switch to casual speech?",
+      "original": true,
+      "register": "話",
+      "topic": "language",
+      "grammar": ["n3-wake-dewa-nai"],
+      "sense": "地位や年齢などの上と下の関係。"
+    }
+  ],
+  "82": [
+    {
+      "ja": "西暦79年、イタリア南部のヴェスヴィオ山が大噴火を起こしました。ふもとの町ポンペイは、降り注いだ火山灰や軽石にすっかり覆われ、そのまま地中に埋まってしまいます。ところが皮肉なことに、そのおかげで当時の街並みやパン屋、壁の落書きまでが、ほぼそのままの形で残ることになったんですね。十八世紀に本格的な発掘が始まると、古代ローマの人々の日常生活が、驚くほど生々しくよみがえってきました。一瞬の悲劇が、二千年近く前の暮らしを伝えるタイムカプセルになったわけです。",
+      "form": "覆われ",
+      "en": "In AD 79, Mount Vesuvius in southern Italy erupted violently. The town of Pompeii at its foot was completely covered by the volcanic ash and pumice that rained down, and it was buried underground just as it was. Ironically, though, thanks to that, the streets of the time, the bakeries and even the graffiti on the walls ended up surviving almost exactly as they were. When serious excavation began in the eighteenth century, the daily life of the people of ancient Rome came back to life with startling vividness. A moment's tragedy became a time capsule conveying life from nearly two thousand years ago.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「灰に覆われる」「雪に覆われる」のように、受け身の形でよく使う。",
+      "grammar": ["n3-koto-ni-naru"],
+      "sense": "上から全体にかぶさって、見えないようにする。"
+    },
+    {
+      "ja": "生成AI向けの計算用チップでは、発熱をどう抑えるかが大きな課題となっている。消費電力の増加に伴い、空気で冷やすこれまでの方式では追いつかないケースが増えているためだ。そこで、サーバーを丸ごと特殊な液体に沈めたり、チップの表面を冷却用の部品で覆ったりする液冷の導入が進んでいる。設備の初期費用は高いものの、電力の削減につながるとして、採用を広げるデータセンターも多い。冷却技術の優劣がAI時代の競争力を左右するとの見方も出ている。",
+      "form": "覆ったり",
+      "en": "For computing chips aimed at generative AI, how to keep heat under control has become a major issue. This is because, as power consumption rises, there are more and more cases where conventional air cooling cannot keep up. In response, liquid cooling is being introduced, such as submerging entire servers in special liquids or covering the surface of chips with cooling components. Although the initial cost of the equipment is high, many data centres are widening its use on the grounds that it leads to lower power use. There is also a view that superiority in cooling technology will determine competitiveness in the AI era.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n2-mono-no", "n5-teiru"],
+      "sense": "物の表面に、別の物をかぶせる。"
+    }
+  ],
+  "84": [
+    {
+      "ja": "今回は、古代エジプトの長い歴史がどうやって幕を閉じたのかを見ていきます。最後の女王クレオパトラは、ローマの有力な政治家と手を組んで国を守ろうとしましたが、その試みは失敗に終わりました。紀元前三十年に彼女が亡くなると、エジプトはローマの属州として編入されます。ここで面白いのは、エジプトがほかの属州と違い、皇帝が直接治める特別な土地とされた点なんですね。豊かな穀物を生む土地だったので、ローマにとっては食料を支える大事な存在だったわけです。",
+      "form": "編入",
+      "en": "This time we'll look at how the long history of ancient Egypt came to a close. The last queen, Cleopatra, tried to protect her country by joining forces with powerful Roman politicians, but the attempt ended in failure. When she died in 30 BC, Egypt was incorporated into Rome as a province. What's interesting here is that, unlike other provinces, Egypt was made a special territory ruled directly by the emperor. Because it was a land that produced abundant grain, it was vital to Rome as a mainstay of its food supply.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「〜に編入される」「〜として編入する」の形が多い。",
+      "grammar": ["n4-teiku"],
+      "sense": "あとから組織や領土の中に組み入れること。"
+    },
+    {
+      "ja": "大学を途中で変えたいとき、一年生からやり直さずに済む方法があるのを知っていますか。短大や高専、別の大学で取った単位をある程度認めてもらい、三年次から新しい大学に編入するという道です。試験は英語と専門科目、面接が中心で、一般入試のような幅広い科目の勉強は求められないことが多いようです。ただし、認められる単位の数によっては卒業までの計画が狂うこともあるので、出願前に受け入れ先の条件をよく確かめておきましょう。募集人数も少ないため、志望先の過去問を早めに手に入れた上で対策を立てるのが近道です。",
+      "form": "編入",
+      "en": "Did you know there is a way to change universities partway through without having to start over from the first year? It is the route of having a certain number of credits earned at a junior college, technical college or another university recognised, and transferring into a new university from the third year. The exams centre on English, specialist subjects and an interview, and often don't require study across a wide range of subjects as general entrance exams do. However, depending on how many credits are recognised, your plan for graduating can go off course, so check the receiving school's conditions carefully before applying. Places are also few, so the shortcut is to get hold of past papers from your target schools early and then plan your preparation.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "学校では「編入試験」「三年次に編入する」のように使う。",
+      "grammar": ["n2-ue-de", "n5-teiru"],
+      "sense": "途中の学年から、別の学校に入ること。"
+    },
+    {
+      "ja": "AI関連の人材をめぐっては、大手企業がスタートアップを丸ごと買収し、その技術者を自社の研究部門に編入する動きが相次いでいる。優秀な技術者を一人ずつ採用するより、チームごと迎え入れたほうが早いとの判断があるとみられる。一方で、小さな組織の自由な文化が大企業の中で失われ、主要な人材が数年のうちに離れてしまう例も少なくない。買収後の組織づくりこそが成否を分けるとの指摘も出ている。",
+      "form": "編入",
+      "en": "In the race for AI talent, there has been a string of moves by major companies to buy start-ups outright and incorporate their engineers into their own research divisions. Behind this is thought to be the judgement that bringing in a whole team is faster than hiring excellent engineers one by one. On the other hand, there are many cases where the freewheeling culture of a small organisation is lost inside a large company, and key people leave within a few years. Some also point out that it is the organisation-building after an acquisition that decides success or failure.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "grammar": ["n5-teiru"],
+      "sense": "人や組織を、あとから別の組織に組み入れること。"
+    }
+  ],
+  "88": [
+    {
+      "ja": "今日は、不安で頭がいっぱいになったときに使える、シンプルな方法を紹介します。それは、頭の中にあることを、ひたすら紙に書き出すというものです。心理学の研究では、悩みを言葉にして外に出すことで、気持ちの負担が軽減される場合があると示されています。ポイントは、きれいな文章にしようとせず、思いついた順に書いていくことなんですね。考えが目に見える形になるだけで、意外と冷静に自分を眺められるようになるんです。",
+      "form": "軽減",
+      "en": "Today I'll introduce a simple method you can use when your head is full of worries. It's just writing out everything in your head on paper, and nothing more. Psychological research has shown that putting your worries into words and getting them out can, in some cases, reduce the emotional burden. The key point is not to try to write tidy prose, but to write things down in the order they come to you. Just by seeing your thoughts in visible form, you become able to look at yourself surprisingly calmly.",
+      "original": true,
+      "register": "講",
+      "topic": "mind",
+      "tipJa": "「負担を軽減する」「痛みが軽減される」の形でよく使う。",
+      "grammar": ["n3-koto-de", "n4-teiku", "n4-you-ni-naru"],
+      "sense": "負担や痛みなどを減らして軽くすること。"
+    },
+    {
+      "ja": "教員の長時間労働が問題となる中、生成AIを校務に活用する動きが広がっている。保護者向けのお便りの下書きや会議資料の要約などをAIに任せることで、事務作業の負担を軽減する狙いだ。文部科学省も、学校での利用に関する指針をまとめている。一方、児童や生徒の個人情報を扱う場面も多く、入力してよい情報の線引きが課題となっている。専門家は、浮いた時間を子どもと向き合う時間にどう生かすかまで見据えた仕組みが必要だと指摘している。",
+      "form": "軽減",
+      "en": "Amid concern over teachers' long working hours, moves to use generative AI for school administrative work are spreading. The aim is to reduce the burden of clerical work by leaving tasks such as drafting newsletters for parents and summarising meeting materials to AI. The Ministry of Education has also compiled guidelines on its use in schools. On the other hand, there are many situations involving pupils' and students' personal information, and drawing the line on what may be entered has become an issue. Experts point out that a system is needed that looks ahead to how the time freed up can be put to use for engaging with children.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "報道では「負担軽減」「税の軽減」のように、名詞を前に置く形が多い。",
+      "grammar": ["n3-koto-de", "n5-teiru"],
+      "sense": "負担や痛みなどを減らして軽くすること。"
+    },
+    {
+      "ja": "仏典には、二つの矢のたとえがある。体に矢を受ければ、誰でも痛みを感じる。だが多くの人は、なぜ自分がこんな目に、という嘆きや怒りによって、自ら二つ目の矢を心に射込んでしまうのだという。最初の痛みを消すことはできなくとも、二つ目の矢を避けることで、苦しみはずいぶん軽減できるはずである。苦しみをなくすのではなく、増やさないことに目を向ける教えは、驚くほど現実的だと言えるだろう。",
+      "form": "軽減",
+      "en": "In the Buddhist scriptures there is the parable of the two arrows. Anyone struck by an arrow feels pain. But many people, it is said, shoot a second arrow into their own hearts with laments and anger over why this should happen to them. Even if the first pain cannot be erased, by avoiding the second arrow, suffering can surely be greatly reduced. A teaching that looks not at eliminating suffering but at not adding to it can be called remarkably realistic.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "grammar": ["n3-koto-de", "n3-dewa-naku"],
+      "sense": "苦しみなどを減らして軽くすること。"
+    }
+  ]
+}

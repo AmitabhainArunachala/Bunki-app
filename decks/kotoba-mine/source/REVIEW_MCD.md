@@ -1,57 +1,154 @@
 # Building each word's MCD passages
 
-Every word gets **2–4 passages** (a passage = 2–4 connected sentences, 70–180 characters).
-Each passage becomes cloze cards: the word blanked with a Japanese-definition hint, and
-(for the first passage only) each of its kanji blanked with the reading as hint.
+Writing rules, contract v2 (`docs/srs/CARD_CONTRACT_V2.md` §2, §5–§7; STANDARD A46). A card
+is one passage with one target, graded on that target alone. Each word gets **three or four
+passages** that differ in register and, where the word has more than one sense, in sense. New
+passages go in a dated batch file, `source/mcd/<name>-YYYY-MM-DD.json`; `tools/export_mcd.py`
+reads it after the undated files, so its passages follow the word's existing ones and no
+existing card id moves.
+
+The passages written before 2026-10-04 (`s1.json`–`s6.json`, `preview.json`: 2–4 sentences,
+70–180 characters) stay valid as they are. Do not edit them: a passage's text is part of its
+card id, so an edit retires the card and its review history.
 
 Your sheet gives, per word: `term`, `reading`, the learner's `gloss`, the deck's `meaning`
-and `def_ja`, mined `passages` (real text, ranked), and `sentences` (single real sentences
-already approved for this word).
+and `def_ja`, mined `passages` (real text, ranked), and the word's existing passages.
 
 ## 1. Choose real passages (mined)
 
-Take up to **2** from `passages` that pass all of these:
+A real passage is preferred when one of the right register exists. Take one from `passages`
+when it passes all of these:
 
 - reads on its own: no unexplained 同記事/この件/彼, no dangling quote, no list or caption;
-- uses the word in a sense in the gloss; the blank has one natural answer in that context;
+- uses the word in a sense in the gloss; the passage constrains it (check 5 below);
 - modern standard Japanese, no typos; no graphic violence, no private person's name;
-- the context actually helps: a reader can infer the word from what surrounds it.
-  Copy `ja` **exactly**. If no passage passes, you may use one of `sentences` instead.
+- copy `ja` **exactly**.
 
 ## 2. Write passages (original)
 
-Write **1–2** passages yourself (2 when fewer than 2 real passages passed):
+Write the rest yourself. Each written passage:
 
-- 2–4 sentences, 70–160 characters, one coherent little scene, article excerpt or explanation;
-- natural, idiomatic, the kind of Japanese a good newspaper, essay, blog or novel would print;
-  no textbook stiffness, no translated feel, no 〜について説明します framing;
-- the word appears **once**, in the gloss sense, with its most typical partners
-  (財政が悪化する, 金利を引き上げる, 顔を両手で覆う); the other sentences make it guessable;
-- the other vocabulary should be easier than the word (one hard thing per card);
-- standalone: introduce who/what (市の財政, 中央銀行, 祖母); no 「彼」 without a name or role;
-- slang/casual words in casual speech, literary words in literary prose, technical words in
-  a plain explanation;
-- vary situations across a word's passages (news / daily life / work / story).
-  Mark it `"original": true` and give `form` = the word exactly as written in your passage.
+- **4–5 sentences, 180–300 characters**, one coherent stretch of text in **one register**;
+- the target appears **exactly once**, in the sense the passage is about, with its most typical
+  partners (財政が悪化する, 金利を引き上げる, 覇権を握る); the other sentences make its sense
+  predictable;
+- no other word from the learner's list (any word of this deck) appears, unless it is already
+  in review;
+- vocabulary and grammar at about N2: the rest of the passage should not read as N4–N3, and it
+  should not stack several N1 words around the target either;
+- no whitespace anywhere in `ja`;
+- natural, idiomatic Japanese a native editor would accept: no translationese, no textbook
+  stiffness, no 〜について説明します framing; register markers consistent within the passage
+  (no です・ます mixed into a である essay; no 書き言葉 in casual talk);
+- facts checkable or absent: dates, names, numbers and attributions are right or left out; real
+  people only in the public record, never quoted at length; no partisan framing.
 
-## 3. Order and translate
+### Registers (contract §6)
 
-Put the clearest, most typical passage **first** (it is learned first and gets the 字 cards);
-this is often your written one. Give every passage one faithful, natural English translation.
+| Code | Register                     | Sounds like                                             | Per word       |
+| ---- | ---------------------------- | ------------------------------------------------------- | -------------- |
+| 講   | lecture / book summary       | 中田敦彦, アバタロー, サラタメ, 本要約チャンネル, PIVOT | always one     |
+| 報   | news / analysis              | NHK, ReHacQ, 楽待; である, no first person              | usually one    |
+| 論   | essay / philosophy           | Floating Stories, 高野山の法話; である, reflective      | one if it fits |
+| 話   | spoken, informal             | ひろゆき, ゆる言語学ラジオ; 〜じゃないですか, 〜って    | one if it fits |
+| 学   | learning science / exam talk | 星友啓, PIVOT 勉強法, DaiGo                             | optional       |
+| 語   | craft of speaking / writing  | 山口拓朗, 元局アナ流話し方スクール                      | optional       |
+
+### Topics
+
+Rotate through the learner's four: `mind` (mind and learning), `india` (Indian and Buddhist
+philosophy), `ai` (AI with semiconductors), `history` (world history). `language` (Japanese about
+Japanese: 語源, 言語学) is allowed for a word whose kanji or etymology is interesting.
+
+## 3. The five checks (contract §7)
+
+Every written passage passes five independent checks, each by a judge other than the writer,
+before it is added. A failure means a rewrite, not a patch:
+
+1. **Naturalness**: no translationese, unnatural collocation (要所を牛耳る), wrong register
+   marker, or 書き言葉/話し言葉 mixing.
+2. **Facts**: every checkable claim verified, or removed.
+3. **Level**: grammar and vocabulary audited against the N3/N2/N1 inventories in
+   `docs/srs/n2n1/`. Each `grammar` id must be one of
+   `prototypes/corridor/data/original/grammar-v11.json` and must actually occur in a form its
+   cues match (咲かせることにもなります does not match ことになる).
+4. **One target**: the target once; no other deck word. `export_mcd.py` checks this mechanically
+   (below): it tokenises the passage as `build.py` does and refuses any of the 323 deck terms it
+   finds, so a word such as 性能, 設計, 競う (競っている), 財政, 正直 or 割 (九割) has to be swapped
+   (戦費の負担, ぶっちゃけ, 力を入れている, 九十パーセント).
+5. **Context does work**: shown the passage with the target blanked, a reader names its sense.
+   A blank that 短絡的に or すぐ fills just as well fails.
+
+## 4. Order and translate
+
+Give every passage one faithful, natural English translation **with the same number of
+sentences as the Japanese**, so the back can show the target sentence's 英訳 (contract §3 item 6;
+`export_mcd.py` refuses a mismatch). Inside a batch, order a word's passages 講 first.
+`export_mcd.py` puts every word's contract-v2 passages before its earlier ones (STANDARD A49), so
+the first passage in the batch is the one the learner meets first.
+
+The full run (STANDARD A50) ran the five checks as two judging lanes per passage: an editor lane
+(naturalness, one target, context does work) and a facts lane (facts, topic, level, grammar ids).
+A passage failing either lane is rewritten once and rechecked by the lane(s) it failed; one still
+failing is dropped. Keep the judges' verdict journals until the batch is committed and verified.
 
 ## Output
 
-`source/mcd/<range>.json`:
+`source/mcd/<name>-YYYY-MM-DD.json`, keyed by the word's entry number:
 
 ```json
 {
-  "64": [
-    { "ja": "<real passage copied exactly>", "en": "…" },
-    { "ja": "<your passage>", "form": "財政", "en": "…", "original": true }
+  "240": [
+    {
+      "ja": "<your passage>",
+      "form": "習得",
+      "en": "…",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「技術・言語を習得する」のように、時間をかけて身につける技能に使う。",
+      "grammar": ["n3-koto-ni-naru", "n3-dewa-naku"],
+      "sense": "技術や知識を学んで、自分のものにすること。"
+    }
   ]
 }
 ```
 
-Every word in the sheet gets an entry. Then run
-`npx prettier --write source/mcd/<range>.json && python3 tools/export_mcd.py` (stops on a real
-passage that is not a candidate, or an original whose `form` is not in its `ja`).
+- `form`: the target exactly as written in the passage (背き, 追い上げられ, 牛耳っちゃう).
+- `register`, `topic`: as above.
+- `tipJa`: the usage note, one Japanese line of at most 80 characters with no Latin letters. It
+  is shown in tier one of the back (contract §3 item 4), so it says what this passage shows
+  about the word: its partners, its register, the sense.
+- `grammar`: the grammar-v11 ids the passage exercises (may be empty).
+- `sense`: the dictionary sense the passage uses (contract §3 item 3), one Japanese
+  dictionary-style line of at most 40 characters, no Latin letters (海面や地表から測った高さ。 for
+  高度 as altitude; 光が一瞬鋭く光る。稲妻などがきらめく。 for ひらめく as lightning). Write it for a
+  word with more than one sense; it may be empty otherwise. Never English.
+- `allow` and `allowReason` (rare): when another deck word is unavoidable (it is already in
+  review, or no other word says it), list it in `allow` (`["性能"]`) and say why in `allowReason`.
+  An allow the passage does not need is refused. Neither field reaches the cards.
+
+A real (mined) passage takes the same optional fields and no `original`.
+
+Then, from the repo root:
+
+```bash
+npx prettier --write decks/kotoba-mine/source/mcd/<file>.json
+python3 decks/kotoba-mine/tools/export_mcd.py          # checks the rules above; writes source/mcd.json
+npx prettier --write decks/kotoba-mine/source/mcd.json
+python3 decks/kotoba-mine/tools/build.py               # once, not frozen: mints ids for the new passages
+```
+
+`export_mcd.py` stops on a real passage that is not a candidate, a written passage with a
+space, a `form` not in its `ja`, a written passage over 300 characters or 5 sentences, a v2
+passage (one with a `register`) outside 4–5 sentences and 180–300 characters, a target that does
+not appear exactly once, an English translation with a different sentence count, an optional
+field that breaks its rule (a `sense` in English or over 40 characters), or another deck word in a
+v2 passage (check 4). For check 4 it tokenises the passage with the corridor's tokeniser
+(fugashi + UniDic) and joins compounds as `build.py` does, so 半導体 is one word and not 半 + the
+deck word 導体; a run of up to six tokens outside the target matches a deck term (or a spelling in
+`tools/rank.py` `VARIANTS`) by its surface (kana words, compounds such as 生得的) or by its
+dictionary form (競っ → 競う, ひらめい → ひらめく). Then check the furigana of every new passage and add the fixes to
+`source/readings.json` (scoped to the new card ids), add the passages' lemmas to
+`source/gloss_ja.json`, and run the gates (`docs/srs/HANDOFF_2026-10-04.md`, "Passage pilot
+landed").

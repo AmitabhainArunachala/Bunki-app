@@ -1,0 +1,107 @@
+{
+  "261": [
+    {
+      "ja": "今日は、AIを支える半導体について書かれた本を要約していきます。著者がまず強調しているのは、AIの計算に使われるチップが、手のひらに載るほどの大きさの割に、とんでもない量の電気を食うという点です。一枚で電子レンジ一台分ほどの電力を使うものもあるそうです。そのため、データセンターでは計算する仕組みと同じくらい、熱を逃がして冷やす仕組みが大事になってくるんですね。これからのAI開発は電力をどう確保するかの勝負にもなっていく、というのがこの本の結論です。",
+      "form": "割",
+      "en": "Today I'm going to summarize a book about the semiconductors that support AI. The first thing the author stresses is that the chips used for AI computation eat an enormous amount of electricity for something small enough to sit in the palm of your hand. Apparently a single chip can use about as much power as a microwave oven. That's why, in data centers, the systems that release heat and cool things down become just as important as the systems that do the computing. The book's conclusion is that AI development from here on will also become a contest over how to secure electricity.",
+      "original": true,
+      "register": "講",
+      "topic": "ai",
+      "tipJa": "「大きさの割に」のように「名詞＋の割に」の形で、予想より程度が大きいことを表す。",
+      "grammar": ["n5-teiru", "n4-teiku"],
+      "sense": "「〜の割に」の形で、そこから考えられる程度と比べて。"
+    },
+    {
+      "ja": "十四世紀半ばのヨーロッパでは、黒死病と呼ばれたペストが大流行した。感染は交易路に沿って広がり、数年のうちに大陸のほぼ全域に及んだ。死者の数をめぐる推計には幅があるものの、人口の少なくとも三割が命を落としたとされる。働き手が急に減ったことで、生き残った農民の賃金が上がるなど、社会の仕組みにも大きな変化が生じた。疫病は、多くの命を奪うと同時に、中世の秩序を内側から揺るがしたのである。",
+      "form": "割",
+      "en": "In mid-fourteenth-century Europe, the plague known as the Black Death spread widely. The infection moved along trade routes and within a few years reached almost the entire continent. Although estimates of the death toll vary, it is thought that at least thirty percent of the population lost their lives. Because the number of workers suddenly fell, the wages of surviving peasants rose, and the structure of society also changed greatly. The epidemic took many lives and, at the same time, shook the medieval order from within.",
+      "original": true,
+      "register": "報",
+      "topic": "history",
+      "tipJa": "数字の後につけて、全体の十分の一を単位とした割合を表す。「三割」は三十パーセント。",
+      "grammar": ["n2-mono-no", "n3-koto-de"],
+      "sense": "全体を十に分けたうちの一つ分。十分の一。"
+    },
+    {
+      "ja": "過去問で八割取れるようになったら、もう合格圏だと安心する受験生は少なくありません。ところが、同じ問題を繰り返し解いているうちに、解き方ではなく答えの並びを丸暗記しているだけ、という状態に陥っていることも珍しくありません。学習の研究では、見覚えのある問題がすらすら解けると、内容が定着したかのような錯覚が生じやすいと指摘されています。そこで、正解した問題も数日あけてから、何も見ずに自力で解き直し、手順を一から再現できるか確かめてみてください。それでも同じ水準の点が取れるなら、その実力は本物だと言えるでしょう。",
+      "form": "割",
+      "en": "Quite a few test-takers feel relieved, thinking they are within passing range, once they can score eighty percent on past exam papers. However, while solving the same questions over and over, it is not unusual to fall into a state where you have merely memorized the sequence of answers rather than the way to solve them. Learning research points out that when you can solve familiar-looking problems smoothly, an illusion that the content has taken hold easily arises. So, even for questions you got right, leave a few days, then solve them again on your own without looking at anything, and check whether you can reproduce the steps from scratch. If you can still get a score at the same level, you can say that ability is the real thing.",
+      "original": true,
+      "register": "学",
+      "topic": "mind",
+      "tipJa": "点数や出来具合を「八割取れる」「七割の出来」のように十段階で言うときに使う。",
+      "grammar": ["n4-you-ni-naru", "n5-teiru", "n3-dewa-naku"],
+      "sense": "全体を十に分けたうちの一つ分。十分の一。"
+    }
+  ],
+  "282": [
+    {
+      "ja": "今日は、第二次世界大戦後に開かれたニュルンベルク裁判を扱った本を要約していきます。この裁判で連合国は、ナチス・ドイツの指導者たちを、国家ではなく個人として裁くことにしました。上官の命令に従っただけだと主張する被告もいましたが、それは責任を逃れる理由としては認められなかったんです。国の指導者であっても、戦争を起こした責任を個人として問われ、戦犯として裁かれることがある、という考え方ですね。この考え方は、のちの国際的な法廷にも受け継がれていきます。",
+      "form": "犯",
+      "en": "Today I'm going to summarize a book about the Nuremberg trials, held after the Second World War. At these trials, the Allies decided to try the leaders of Nazi Germany not as a state but as individuals. Some defendants claimed they had merely followed their superiors' orders, but that was not accepted as a reason to escape responsibility. The idea is that even a nation's leaders can be held personally responsible for starting a war and tried as war criminals. This idea was carried on into later international tribunals.",
+      "original": true,
+      "register": "講",
+      "topic": "history",
+      "tipJa": "「戦犯」は戦争の罪を問われた人。「〜犯」の形で、罪の種類やそれをした人を表す。",
+      "grammar": ["n3-dewa-naku", "n4-teiku"],
+      "sense": "罪をおかした人。戦争の罪を問われた者を戦犯という。"
+    },
+    {
+      "ja": "家族や取引先の声をまねた電話で、急な送金を求める詐欺の被害が各国で相次いでいる。わずかな録音があれば、本人とよく似た声を作り出せる生成AIが、誰でも手軽に使えるようになったためだ。犯行グループは、交流サイトに投稿された動画から声を集めることもあるという。聞き慣れた声というだけで、相手を本人だと信じ込んでしまう人は少なくない。専門家は、電話で急かされてもいったん切り、本人に別の手段で確かめるよう呼びかけている。",
+      "form": "犯",
+      "en": "Fraud in which callers imitate the voices of family members or business partners to demand urgent money transfers is occurring one case after another in many countries. This is because generative AI that can create a voice closely resembling a real person's from only a small recording has become easy for anyone to use. The criminal groups reportedly sometimes collect voices from videos posted on social media. Quite a few people come to believe the caller is the real person just because the voice sounds familiar. Experts are urging people to hang up even if they are being rushed on the phone, and to check with the person through another means.",
+      "original": true,
+      "register": "報",
+      "topic": "ai",
+      "tipJa": "「犯行グループ」「犯行に及ぶ」のように、報道で罪となる行いを表す語の一部として使う。",
+      "grammar": ["n5-teiru", "n4-you-ni-naru"],
+      "sense": "罪となる行いをすること。また、その行い。"
+    },
+    {
+      "ja": "仏教には、出家していない在家の信者が日々の暮らしの中で守るべき五つの戒めがある。生き物を殺さない、盗まない、うそをつかないといった内容で、一見すると法の条文とよく似ている。しかし戒は、破れば罰を受ける命令ではなく、みずから誓って守ろうとする心の向きだとされる。人は弱いものであり、誓ったそばから過ちを犯すこともあるだろう。それでも誓い直すところにこそ、戒の本当の意味があるのである。",
+      "form": "犯す",
+      "en": "Buddhism has five precepts that lay believers, who have not left home to become monks, should keep in their daily lives. Their content includes not killing living things, not stealing, and not lying, and at first glance they closely resemble the articles of a law. Yet the precepts are said to be not commands that bring punishment if broken, but an orientation of the heart that one vows of one's own will to keep. People are weak, and they may commit wrongs even right after making a vow. It is precisely in vowing again nonetheless that the true meaning of the precepts lies.",
+      "original": true,
+      "register": "論",
+      "topic": "india",
+      "tipJa": "「過ちを犯す」「罪を犯す」「法を犯す」の形で使う。",
+      "grammar": ["n3-dewa-naku"],
+      "sense": "「犯す」の形で、決まりを破ったり過ちをしたりする。"
+    }
+  ],
+  "322": [
+    {
+      "ja": "今日は、ブッダの生涯をたどった本を要約していきます。ブッダは小さな国の王子として生まれ、ぜいたくな暮らしを送っていました。ところが、老いや病、死といった苦しみを目にして、城を出る決心をします。このとき、豪華な衣服を脱ぎ捨て、粗末な布を身に纏って修行の道に入ったと伝えられています。著者は、この着替えこそが、持っているものを手放すことの始まりだったと読み解いているんですね。",
+      "form": "纏って",
+      "en": "Today I'm going to summarize a book that traces the life of the Buddha. The Buddha was born a prince of a small kingdom and lived a life of luxury. However, after seeing the suffering of old age, illness and death, he resolves to leave the castle. It is said that at this time he cast off his splendid clothes, wrapped himself in coarse cloth, and entered the path of spiritual practice. The author interprets this change of clothes as the very beginning of letting go of what he possessed.",
+      "original": true,
+      "register": "講",
+      "topic": "india",
+      "tipJa": "「身に纏う」の形で、衣服や布を体に着けることを少しかたく言う。",
+      "grammar": ["n4-teiku", "n5-teiru"],
+      "sense": "衣服などを身につける。"
+    },
+    {
+      "ja": "生成AIに書かせた文章は、整っているのに、どこか似たような匂いを纏ってしまうことが多いです。もっともらしい言い回しで締めくくる文が続き、誰が書いても変わらない印象になってしまうんですね。これを避けるには、自分が実際に見たことや感じたことを、一つでいいので入れてみてください。小さな体験がひとつ入るだけで、文章の空気はがらりと変わります。言葉は意味だけでなく、書き手の体温も運んでいるのです。",
+      "form": "纏って",
+      "en": "Text written by generative AI, though well-ordered, often ends up carrying a similar kind of smell. Sentences that wrap up with plausible-sounding phrases go on and on, leaving the impression that anyone could have written it. To avoid this, try putting in just one thing you actually saw or felt yourself. Adding a single small experience changes the air of a piece of writing completely. Words carry not only meaning but also the warmth of the person who wrote them.",
+      "original": true,
+      "register": "語",
+      "topic": "ai",
+      "tipJa": "「雰囲気を纏う」「匂いを纏う」のように、目に見えない印象が人や物に加わることも表す。",
+      "grammar": ["n5-teiru"],
+      "sense": "ある雰囲気や印象を身に帯びる。"
+    },
+    {
+      "ja": "心理学には、考えないようにと言われた考えほど、かえって浮かびやすくなるという知見がある。白い熊のことを考えるなと言われると、白い熊が頭から離れなくなるというものだ。不安も同じで、振り払おうとすればするほど、しつこく心に纏わりついてくる。むしろ、浮かんだ思いをそのまま眺め、雲が流れていくのを待つように放っておくほうが、早く薄れることも多い。心は、押さえつけるよりゆるめるほうが静まるものなのである。",
+      "form": "纏わりついて",
+      "en": "Psychology has the finding that the very thoughts we are told not to think become all the more likely to surface. When told not to think about a white bear, people find they cannot get the white bear out of their heads. Anxiety is the same: the more we try to shake it off, the more persistently it clings to the mind. Rather, simply watching a thought that has arisen and leaving it alone, as if waiting for a cloud to drift past, often makes it fade sooner. The mind is something that settles more when loosened than when held down.",
+      "original": true,
+      "register": "論",
+      "topic": "mind",
+      "tipJa": "「纏わりつく」は、不安や噂、子どもなどがしつこく離れない様子を表す。",
+      "grammar": ["n3-you-ni", "n4-teiku"],
+      "sense": "「纏わりつく」の形で、しつこく離れずにつきまとう。"
+    }
+  ]
+}
