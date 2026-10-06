@@ -16,6 +16,13 @@ const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8'
 const api = (path) =>
   JSON.parse(execFileSync('gh', ['api', path], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }));
 const endpoint = (suffix) => `repos/${REPOSITORY}/${suffix}`;
+function* pages(path, key) {
+  for (let page = 1; ; page++) {
+    const batch = api(`${path}&page=${page}`)[key];
+    yield* batch;
+    if (batch.length < 100) return;
+  }
+}
 const sha = (value) => assert.match(value || '', /^[a-f0-9]{40}$/, 'Expected a Git object SHA');
 
 export function assertArtifactMetadata(artifact, { runId, id, name, digest } = {}) {
@@ -209,8 +216,10 @@ async function lookup(plan, out) {
   assert.equal(plan.identity.tree, git('rev-parse', 'HEAD^{tree}'));
   mkdirSync(out, { recursive: true });
   const name = `bunki-proof-${plan.identity.tree}`;
-  const artifacts = api(endpoint(`actions/artifacts?name=${name}&per_page=100`)).artifacts;
-  for (const artifact of artifacts) {
+  for (const artifact of pages(
+    endpoint(`actions/artifacts?name=${name}&per_page=100`),
+    'artifacts',
+  )) {
     try {
       assertArtifactMetadata(artifact, { runId: artifact.workflow_run?.id, name });
       const run = api(endpoint(`actions/runs/${artifact.workflow_run.id}`));
@@ -229,16 +238,12 @@ async function lookup(plan, out) {
         cwd: ROOT,
         stdio: 'pipe',
       });
-      const jobs = [];
-      for (let page = 1; ; page++) {
-        const batch = api(
-          endpoint(
-            `actions/runs/${run.id}/attempts/${run.run_attempt}/jobs?per_page=100&page=${page}`,
-          ),
-        ).jobs;
-        jobs.push(...batch);
-        if (batch.length < 100) break;
-      }
+      const jobs = [
+        ...pages(
+          endpoint(`actions/runs/${run.id}/attempts/${run.run_attempt}/jobs?per_page=100`),
+          'jobs',
+        ),
+      ];
       const siteArtifact = api(endpoint(`actions/artifacts/${receipt.artifact.id}`));
       const admitted = admitProof({
         receipt,

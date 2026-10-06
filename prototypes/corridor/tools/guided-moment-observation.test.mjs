@@ -1,17 +1,15 @@
 /** Real browser controls for the verifier's passive observation, never product mutations. */
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import test from 'node:test';
 import { chromium, webkit } from 'playwright-core';
+import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { observeGuidedMomentPhases } from './guided-moment-observation.mjs';
 
-const base = join(homedir(), '.dharma/bunki_review/2026-10-06/ci/guided-observation-controls');
-mkdirSync(base, { recursive: true });
-const evidence = mkdtempSync(join(base, 'run-'));
+const evidence = resolveCorridorEvidence();
 const product = readFileSync(new URL('../guided-moments.mjs', import.meta.url), 'utf8');
 const rows = [];
 const faultSource = (kind) => {

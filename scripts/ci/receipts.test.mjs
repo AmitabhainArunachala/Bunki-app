@@ -1,10 +1,22 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { delimiter, dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { admitProof, extractSiteArchive, REPOSITORY } from './receipts.mjs';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const endpoint = (suffix) => `repos/${REPOSITORY}/${suffix}`;
+function scratch(prefix) {
+  const base =
+    process.env.CI && process.env.RUNNER_TEMP
+      ? join(process.env.RUNNER_TEMP, 'ci-receipt-tests')
+      : join(homedir(), '.dharma/bunki_review/2026-10-06/ci/receipt-tests');
+  mkdirSync(base, { recursive: true });
+  return mkdtempSync(join(base, prefix));
+}
 
 const commit = 'a'.repeat(40);
 const tree = 'b'.repeat(40);
@@ -173,12 +185,7 @@ for (const [name, mutate] of Object.entries(rejections))
   });
 
 test('site archive extracts bytes and refuses traversal, links, duplicate paths and unexpected files', () => {
-  const base =
-    process.env.CI && process.env.RUNNER_TEMP
-      ? join(process.env.RUNNER_TEMP, 'ci-receipt-tests')
-      : join(homedir(), '.dharma/bunki_review/2026-10-06/ci/receipt-tests');
-  mkdirSync(base, { recursive: true });
-  const out = mkdtempSync(join(base, 'archive-'));
+  const out = scratch('archive-');
   for (const kind of ['safe', 'traversal', 'symlink', 'duplicate', 'extra']) {
     const archive = join(out, `${kind}.zip`);
     execFileSync('python3', [
@@ -204,4 +211,79 @@ with zipfile.ZipFile(path,'w') as z:
       assert.equal(readFileSync(join(destination, 'index.html'), 'utf8'), 'verified bytes');
     } else assert.throws(() => extractSiteArchive(archive, destination));
   }
+});
+
+test('proof lookup pages past a full page of unusable same-name artifacts, then fails closed', () => {
+  const dir = scratch('lookup-');
+  const [head, headTree] = execFileSync('git', ['rev-parse', 'HEAD', 'HEAD^{tree}'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  })
+    .trim()
+    .split('\n');
+  const name = `bunki-proof-${headTree}`;
+  const listing = endpoint(`actions/artifacts?name=${name}&per_page=100`);
+  const artifacts = Array.from({ length: 101 }, (_, index) => ({
+    id: 1000 + index,
+    name,
+    digest,
+    expired: index < 100,
+    workflow_run: { id: 7000 + index },
+  }));
+  const responses = {
+    [`${listing}&page=1`]: { artifacts: artifacts.slice(0, 100) },
+    [`${listing}&page=2`]: { artifacts: artifacts.slice(100) },
+    [endpoint('actions/runs/7100')]: {
+      id: 7100,
+      repository: { full_name: REPOSITORY },
+      head_repository: { full_name: REPOSITORY },
+      path: '.github/workflows/nightly-verify.yml',
+      status: 'completed',
+      conclusion: 'success',
+    },
+  };
+  const requests = join(dir, 'requests.log');
+  const fixture = join(dir, 'fixture.json');
+  writeFileSync(fixture, JSON.stringify({ requests, responses }));
+  writeFileSync(
+    join(dir, 'fake-gh.mjs'),
+    `import { appendFileSync, readFileSync } from 'node:fs';
+const [command, path] = process.argv.slice(2);
+const { requests, responses } = JSON.parse(readFileSync(process.env.FAKE_GH_FIXTURE, 'utf8'));
+appendFileSync(requests, path + '\\n');
+if (command !== 'api' || !Object.hasOwn(responses, path)) process.exit(1);
+process.stdout.write(JSON.stringify(responses[path]));
+`,
+  );
+  writeFileSync(
+    join(dir, 'gh'),
+    `#!/bin/sh\nexec "${process.execPath}" "${join(dir, 'fake-gh.mjs')}" "$@"\n`,
+  );
+  chmodSync(join(dir, 'gh'), 0o755);
+  const plan = join(dir, 'plan.json');
+  writeFileSync(plan, JSON.stringify({ scope: 'full', identity: { sha: head, tree: headTree } }));
+  const githubOutput = join(dir, 'github-output');
+  const stdout = execFileSync(
+    process.execPath,
+    ['scripts/ci/receipts.mjs', 'lookup', '--plan', plan, '--out', join(dir, 'out')],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        PATH: `${dir}${delimiter}${process.env.PATH}`,
+        FAKE_GH_FIXTURE: fixture,
+        GITHUB_OUTPUT: githubOutput,
+      },
+    },
+  );
+  assert.deepEqual(readFileSync(requests, 'utf8').trim().split('\n'), [
+    `${listing}&page=1`,
+    `${listing}&page=2`,
+    endpoint('actions/runs/7100'),
+  ]);
+  assert.match(stdout, /Proof artifact 1000 rejected: Artifact expired/);
+  assert.match(stdout, /Proof artifact 1100 rejected:/);
+  assert.doesNotMatch(stdout, /Proof lookup unavailable/);
+  assert.equal(readFileSync(githubOutput, 'utf8'), 'matched=false\n');
 });
