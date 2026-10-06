@@ -83,6 +83,8 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'decks/kotoba-mcd/deck.json',
   'decks/kotoba-mine/tokens.json',
   'decks/kotoba-mcd/tokens.json',
+  'decks/n2n1-sample/deck.json',
+  'decks/n2n1-sample/tokens.json',
   'data',
   'vendor',
   'design',

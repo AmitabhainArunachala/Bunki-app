@@ -21732,7 +21732,7 @@ function renderStudyHall(main) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
+const DOJO_DECKS = [{ id: 'n2n1-sample', ja: 'N2・N1 見本（20枚）', en: 'N2/N1 sample · 20 cards to judge' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;

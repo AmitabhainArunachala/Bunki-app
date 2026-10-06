@@ -1,0 +1,400 @@
+{"term": "言語化", "reading": "げんごか", "gloss": "putting into words; verbalizing", "field": "language", "level": "N1", "why": "seed from 言語化大全"}
+{"term": "言語学", "reading": "げんごがく", "gloss": "linguistics", "field": "language", "level": "N1", "why": "seed from スキルとしての言語学"}
+{"term": "伝わる文章", "reading": "つたわるぶんしょう", "gloss": "writing that gets through", "field": "language", "level": "N1", "why": "seed from 短くても伝わる文章のコツ"}
+{"term": "語源", "reading": "ごげん", "gloss": "etymology", "field": "language", "level": "N1", "why": "seed from ゆる言語学ラジオ seam (diet doc: 語源, 言語学 register)"}
+{"term": "滑舌", "reading": "かつぜつ", "gloss": "articulation; enunciation", "field": "language", "level": "N1", "why": "seed from 元局アナ流話し方スクール seam (diet doc: 滑舌, 間)"}
+{"term": "間", "reading": "ま", "gloss": "pause; timing", "field": "language", "level": "N1", "why": "seed from 元局アナ流話し方スクール seam (diet doc: 滑舌, 間)"}
+{"term": "朗読", "reading": "ろうどく", "gloss": "reading aloud; narration", "field": "language", "level": "N1", "why": "seed from Audible shelf (朗読 narrators)"}
+{"term": "シャドーイング", "reading": "しゃどーいんぐ", "gloss": "shadowing", "field": "language", "level": "N1", "why": "seed from シャドーイング大学"}
+{"term": "第二言語習得", "reading": "だいにげんごしゅうとく", "gloss": "second language acquisition", "field": "language", "level": "N1", "why": "seed from Hapa英会話 × Matt vs Japan (インプット9割)"}
+{"term": "饒舌", "reading": "じょうぜつ", "gloss": "loquacious; talkative", "field": "language", "level": "N1", "why": "seed from his voice note (loquacious)"}
+{"term": "当意即妙", "reading": "とういそくみょう", "gloss": "ready wit; deft response", "field": "language", "level": "N1", "why": "seed from his voice note (deft agility)"}
+{"term": "慧眼", "reading": "けいがん", "gloss": "keen insight; perspicacity", "field": "language", "level": "N1", "why": "seed from his voice note (perspicacity)"}
+{"term": "言語化力", "reading": "げんごかりょく", "gloss": "ability to put things into words", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語彙力", "reading": "ごいりょく", "gloss": "vocabulary strength", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語彙", "reading": "ごい", "gloss": "vocabulary", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "要約", "reading": "ようやく", "gloss": "summary", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "要約力", "reading": "ようやくりょく", "gloss": "summarizing ability", "field": "language", "level": "N1", "why": "register word"}
+{"term": "具体例", "reading": "ぐたいれい", "gloss": "concrete example", "field": "language", "level": "N1", "why": "register word"}
+{"term": "比喩", "reading": "ひゆ", "gloss": "figure of speech; metaphor", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "たとえ話", "reading": "たとえばなし", "gloss": "illustrative story; parable", "field": "language", "level": "N1", "why": "register word"}
+{"term": "説得力", "reading": "せっとくりょく", "gloss": "persuasiveness", "field": "language", "level": "N1", "why": "register word"}
+{"term": "簡潔", "reading": "かんけつ", "gloss": "concise", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "簡潔明瞭", "reading": "かんけつめいりょう", "gloss": "clear and concise", "field": "language", "level": "N1", "why": "register word"}
+{"term": "冗長", "reading": "じょうちょう", "gloss": "verbose; redundant", "field": "language", "level": "N1", "why": "register word"}
+{"term": "冗漫", "reading": "じょうまん", "gloss": "rambling; diffuse", "field": "language", "level": "beyond", "why": "register word"}
+{"term": "推敲", "reading": "すいこう", "gloss": "polishing a text", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "一文一義", "reading": "いちぶんいちぎ", "gloss": "one idea per sentence", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "述語", "reading": "じゅつご", "gloss": "predicate", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "主述のねじれ", "reading": "しゅじゅつのねじれ", "gloss": "subject–predicate mismatch", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "修飾語", "reading": "しゅうしょくご", "gloss": "modifier", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "被修飾語", "reading": "ひしゅうしょくご", "gloss": "modified word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "読点", "reading": "とうてん", "gloss": "comma (、)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "句点", "reading": "くてん", "gloss": "full stop (。)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "句読点", "reading": "くとうてん", "gloss": "punctuation marks", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "改行", "reading": "かいぎょう", "gloss": "line break", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "接続詞", "reading": "せつぞくし", "gloss": "conjunction", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "文末表現", "reading": "ぶんまつひょうげん", "gloss": "sentence-final expressions", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語尾", "reading": "ごび", "gloss": "word ending", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "敬体", "reading": "けいたい", "gloss": "polite (desu/masu) style", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "常体", "reading": "じょうたい", "gloss": "plain (da/de-aru) style", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "です・ます調", "reading": "ですますちょう", "gloss": "desu/masu style", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "である調", "reading": "であるちょう", "gloss": "de-aru style", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "体言止め", "reading": "たいげんどめ", "gloss": "ending a sentence on a noun", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "選択体系機能言語学", "reading": "せんたくたいけいきのうげんごがく", "gloss": "systemic functional linguistics", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "文脈", "reading": "ぶんみゃく", "gloss": "context", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "語用論", "reading": "ごようろん", "gloss": "pragmatics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "意味論", "reading": "いみろん", "gloss": "semantics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "統語論", "reading": "とうごろん", "gloss": "syntax", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "形態論", "reading": "けいたいろん", "gloss": "morphology", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "音韻論", "reading": "おんいんろん", "gloss": "phonology", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "音声学", "reading": "おんせいがく", "gloss": "phonetics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "談話", "reading": "だんわ", "gloss": "discourse; talk", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "談話分析", "reading": "だんわぶんせき", "gloss": "discourse analysis", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "社会言語学", "reading": "しゃかいげんごがく", "gloss": "sociolinguistics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "心理言語学", "reading": "しんりげんごがく", "gloss": "psycholinguistics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "認知言語学", "reading": "にんちげんごがく", "gloss": "cognitive linguistics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "対照言語学", "reading": "たいしょうげんごがく", "gloss": "contrastive linguistics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "比較言語学", "reading": "ひかくげんごがく", "gloss": "comparative linguistics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "歴史言語学", "reading": "れきしげんごがく", "gloss": "historical linguistics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "言語習得", "reading": "げんごしゅうとく", "gloss": "language acquisition", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "母語", "reading": "ぼご", "gloss": "mother tongue", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "母語話者", "reading": "ぼごわしゃ", "gloss": "native speaker", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "臨界期仮説", "reading": "りんかいきかせつ", "gloss": "critical period hypothesis", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "言語相対論", "reading": "げんごそうたいろん", "gloss": "linguistic relativity", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "普遍文法", "reading": "ふへんぶんぽう", "gloss": "universal grammar", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "生成文法", "reading": "せいせいぶんぽう", "gloss": "generative grammar", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "構造主義", "reading": "こうぞうしゅぎ", "gloss": "structuralism", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "記号論", "reading": "きごうろん", "gloss": "semiotics", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "恣意性", "reading": "しいせい", "gloss": "arbitrariness (of the sign)", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "言語変化", "reading": "げんごへんか", "gloss": "language change", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "標準語", "reading": "ひょうじゅんご", "gloss": "standard Japanese", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "共通語", "reading": "きょうつうご", "gloss": "common language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "音便", "reading": "おんびん", "gloss": "euphonic sound change", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "連濁", "reading": "れんだく", "gloss": "rendaku (sequential voicing)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "音象徴", "reading": "おんしょうちょう", "gloss": "sound symbolism", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "オノマトペ", "reading": "おのまとぺ", "gloss": "onomatopoeia", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "擬音語", "reading": "ぎおんご", "gloss": "onomatopoeic word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "擬態語", "reading": "ぎたいご", "gloss": "mimetic word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "品詞", "reading": "ひんし", "gloss": "part of speech", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "助動詞", "reading": "じょどうし", "gloss": "auxiliary verb", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "美化語", "reading": "びかご", "gloss": "beautified words (お茶, ご飯)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "二重敬語", "reading": "にじゅうけいご", "gloss": "double honorific", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "待遇表現", "reading": "たいぐうひょうげん", "gloss": "expressions of social treatment", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "和語", "reading": "わご", "gloss": "native Japanese words", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "漢語", "reading": "かんご", "gloss": "Sino-Japanese words", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "外来語", "reading": "がいらいご", "gloss": "loanwords", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "混種語", "reading": "こんしゅご", "gloss": "hybrid words", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "呉音", "reading": "ごおん", "gloss": "go-on reading", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "漢音", "reading": "かんおん", "gloss": "kan-on reading", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "唐音", "reading": "とうおん", "gloss": "tō-on reading", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "当て字", "reading": "あてじ", "gloss": "phonetic kanji substitute", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "熟字訓", "reading": "じゅくじくん", "gloss": "whole-word kun reading", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "送り仮名", "reading": "おくりがな", "gloss": "okurigana", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "ルビ", "reading": "るび", "gloss": "ruby (reading aid)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "表記", "reading": "ひょうき", "gloss": "notation; spelling", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "表記ゆれ", "reading": "ひょうきゆれ", "gloss": "inconsistent spelling", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "仮名遣い", "reading": "かなづかい", "gloss": "kana orthography", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "歴史的仮名遣い", "reading": "れきしてきかなづかい", "gloss": "historical kana orthography", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "現代仮名遣い", "reading": "げんだいかなづかい", "gloss": "modern kana orthography", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "漢字仮名交じり文", "reading": "かんじかなまじりぶん", "gloss": "mixed kanji-kana writing", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "表意文字", "reading": "ひょういもじ", "gloss": "ideogram", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "表音文字", "reading": "ひょうおんもじ", "gloss": "phonogram", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "失語症", "reading": "しつごしょう", "gloss": "aphasia", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "万葉仮名", "reading": "まんようがな", "gloss": "man'yōgana", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "草書", "reading": "そうしょ", "gloss": "cursive script", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "楷書", "reading": "かいしょ", "gloss": "regular (block) script", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "行書", "reading": "ぎょうしょ", "gloss": "semi-cursive script", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "部首", "reading": "ぶしゅ", "gloss": "radical", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "画数", "reading": "かくすう", "gloss": "stroke count", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "筆順", "reading": "ひつじゅん", "gloss": "stroke order", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "字形", "reading": "じけい", "gloss": "character shape", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "旧字体", "reading": "きゅうじたい", "gloss": "old character form", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "新字体", "reading": "しんじたい", "gloss": "simplified character form", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "常用漢字", "reading": "じょうようかんじ", "gloss": "jōyō kanji", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "人名用漢字", "reading": "じんめいようかんじ", "gloss": "kanji for personal names", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "国字", "reading": "こくじ", "gloss": "Japan-made kanji", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "和製漢語", "reading": "わせいかんご", "gloss": "Japan-coined Sino words", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "和製英語", "reading": "わせいえいご", "gloss": "Japan-made English", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "翻訳語", "reading": "ほんやくご", "gloss": "translation coinage", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "借用語", "reading": "しゃくようご", "gloss": "borrowed word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "修辞", "reading": "しゅうじ", "gloss": "rhetoric; figures", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "修辞学", "reading": "しゅうじがく", "gloss": "rhetoric (discipline)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "レトリック", "reading": "れとりっく", "gloss": "rhetoric", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "直喩", "reading": "ちょくゆ", "gloss": "simile", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "隠喩", "reading": "いんゆ", "gloss": "metaphor", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "換喩", "reading": "かんゆ", "gloss": "metonymy", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "提喩", "reading": "ていゆ", "gloss": "synecdoche", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "擬人法", "reading": "ぎじんほう", "gloss": "personification", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "誇張法", "reading": "こちょうほう", "gloss": "hyperbole", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "対句", "reading": "ついく", "gloss": "parallel couplet", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "倒置法", "reading": "とうちほう", "gloss": "inversion", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "反語", "reading": "はんご", "gloss": "rhetorical question; irony", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "皮肉", "reading": "ひにく", "gloss": "irony; sarcasm", "field": "language", "level": "N2", "why": "register word"}
+{"term": "婉曲", "reading": "えんきょく", "gloss": "euphemistic; roundabout", "field": "language", "level": "N1", "why": "register word"}
+{"term": "婉曲表現", "reading": "えんきょくひょうげん", "gloss": "euphemism", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "遠回し", "reading": "とおまわし", "gloss": "indirect; roundabout", "field": "language", "level": "N1", "why": "register word"}
+{"term": "掛詞", "reading": "かけことば", "gloss": "pivot word (poetic pun)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "縁語", "reading": "えんご", "gloss": "associated words (poetics)", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "枕詞", "reading": "まくらことば", "gloss": "pillow word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "本歌取り", "reading": "ほんかどり", "gloss": "allusive variation", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "押韻", "reading": "おういん", "gloss": "rhyme", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "韻律", "reading": "いんりつ", "gloss": "meter; prosody", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "韻文", "reading": "いんぶん", "gloss": "verse", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "散文", "reading": "さんぶん", "gloss": "prose", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "七五調", "reading": "しちごちょう", "gloss": "7-5 meter", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "起承転結", "reading": "きしょうてんけつ", "gloss": "intro–development–turn–close", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "序破急", "reading": "じょはきゅう", "gloss": "jo-ha-kyū (slow, break, rush)", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "三段論法", "reading": "さんだんろんぽう", "gloss": "syllogism", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "論証", "reading": "ろんしょう", "gloss": "proof; argumentation", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "論拠", "reading": "ろんきょ", "gloss": "grounds of an argument", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "反論", "reading": "はんろん", "gloss": "counterargument", "field": "language", "level": "N1", "why": "register word"}
+{"term": "反証", "reading": "はんしょう", "gloss": "disproof; counterevidence", "field": "language", "level": "N1", "why": "register word"}
+{"term": "詭弁", "reading": "きべん", "gloss": "sophistry", "field": "language", "level": "N1", "why": "register word"}
+{"term": "論点", "reading": "ろんてん", "gloss": "point at issue", "field": "language", "level": "N1", "why": "register word"}
+{"term": "論点のすり替え", "reading": "ろんてんのすりかえ", "gloss": "shifting the issue", "field": "language", "level": "N1", "why": "register word"}
+{"term": "論旨", "reading": "ろんし", "gloss": "thrust of an argument", "field": "language", "level": "N1", "why": "register word"}
+{"term": "論調", "reading": "ろんちょう", "gloss": "tone of argument", "field": "language", "level": "N1", "why": "register word"}
+{"term": "前提", "reading": "ぜんてい", "gloss": "premise", "field": "language", "level": "N1", "why": "register word"}
+{"term": "要旨", "reading": "ようし", "gloss": "gist; summary", "field": "language", "level": "N2", "why": "register word"}
+{"term": "趣旨", "reading": "しゅし", "gloss": "purport; aim", "field": "language", "level": "N1", "why": "register word"}
+{"term": "骨子", "reading": "こっし", "gloss": "gist; framework", "field": "language", "level": "N1", "why": "register word"}
+{"term": "大意", "reading": "たいい", "gloss": "general meaning", "field": "language", "level": "N1", "why": "register word"}
+{"term": "含意", "reading": "がんい", "gloss": "implication", "field": "language", "level": "N1", "why": "register word"}
+{"term": "行間を読む", "reading": "ぎょうかんをよむ", "gloss": "to read between the lines", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言外の意味", "reading": "げんがいのいみ", "gloss": "implied meaning", "field": "language", "level": "N1", "why": "register word"}
+{"term": "機微", "reading": "きび", "gloss": "subtleties", "field": "language", "level": "N1", "why": "register word"}
+{"term": "余韻", "reading": "よいん", "gloss": "lingering resonance", "field": "language", "level": "N1", "why": "register word"}
+{"term": "含蓄", "reading": "がんちく", "gloss": "depth of meaning", "field": "language", "level": "N1", "why": "register word"}
+{"term": "示唆", "reading": "しさ", "gloss": "suggestion; implication", "field": "language", "level": "N1", "why": "register word"}
+{"term": "暗示", "reading": "あんじ", "gloss": "hint; suggestion", "field": "language", "level": "N1", "why": "register word"}
+{"term": "明示", "reading": "めいじ", "gloss": "stating explicitly", "field": "language", "level": "N1", "why": "register word"}
+{"term": "ニュアンス", "reading": "にゅあんす", "gloss": "nuance", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語感", "reading": "ごかん", "gloss": "feel of a word", "field": "language", "level": "N1", "why": "register word"}
+{"term": "文体", "reading": "ぶんたい", "gloss": "literary style", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "筆致", "reading": "ひっち", "gloss": "style of writing", "field": "language", "level": "N1", "why": "register word"}
+{"term": "筆力", "reading": "ひつりょく", "gloss": "writing power", "field": "language", "level": "N1", "why": "register word"}
+{"term": "文才", "reading": "ぶんさい", "gloss": "literary talent", "field": "language", "level": "N1", "why": "register word"}
+{"term": "文章力", "reading": "ぶんしょうりょく", "gloss": "writing skill", "field": "language", "level": "N1", "why": "register word"}
+{"term": "構成力", "reading": "こうせいりょく", "gloss": "ability to structure", "field": "language", "level": "N1", "why": "register word"}
+{"term": "序論", "reading": "じょろん", "gloss": "introduction", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "本論", "reading": "ほんろん", "gloss": "main body", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "書き出し", "reading": "かきだし", "gloss": "opening line", "field": "language", "level": "N1", "why": "register word"}
+{"term": "冒頭", "reading": "ぼうとう", "gloss": "beginning; opening", "field": "language", "level": "N1", "why": "register word"}
+{"term": "締めくくり", "reading": "しめくくり", "gloss": "conclusion; wrap-up", "field": "language", "level": "N1", "why": "register word"}
+{"term": "見出し", "reading": "みだし", "gloss": "heading; headline", "field": "language", "level": "N2", "why": "register word"}
+{"term": "論理展開", "reading": "ろんりてんかい", "gloss": "development of an argument", "field": "language", "level": "N1", "why": "register word"}
+{"term": "一貫性", "reading": "いっかんせい", "gloss": "consistency", "field": "language", "level": "N1", "why": "register word"}
+{"term": "整合性", "reading": "せいごうせい", "gloss": "coherence; consistency", "field": "language", "level": "N1", "why": "register word"}
+{"term": "明晰", "reading": "めいせき", "gloss": "lucid; clear", "field": "language", "level": "N1", "why": "register word"}
+{"term": "明快", "reading": "めいかい", "gloss": "clear; lucid", "field": "language", "level": "N1", "why": "register word"}
+{"term": "平易", "reading": "へいい", "gloss": "plain; easy", "field": "language", "level": "N1", "why": "register word"}
+{"term": "平明", "reading": "へいめい", "gloss": "plain and clear", "field": "language", "level": "N1", "why": "register word"}
+{"term": "難解", "reading": "なんかい", "gloss": "hard to understand", "field": "language", "level": "N1", "why": "register word"}
+{"term": "晦渋", "reading": "かいじゅう", "gloss": "obscure; abstruse", "field": "language", "level": "beyond", "why": "register word"}
+{"term": "端的", "reading": "たんてき", "gloss": "direct; straightforward", "field": "language", "level": "N1", "why": "register word"}
+{"term": "的確", "reading": "てきかく", "gloss": "precise; apt", "field": "language", "level": "N2", "why": "register word"}
+{"term": "精緻", "reading": "せいち", "gloss": "precise; elaborate", "field": "language", "level": "N1", "why": "register word"}
+{"term": "添削", "reading": "てんさく", "gloss": "correcting (a text)", "field": "language", "level": "N1", "why": "register word"}
+{"term": "校正", "reading": "こうせい", "gloss": "proofreading", "field": "language", "level": "N1", "why": "register word"}
+{"term": "校閲", "reading": "こうえつ", "gloss": "copyediting", "field": "language", "level": "N1", "why": "register word"}
+{"term": "加筆", "reading": "かひつ", "gloss": "adding to a text", "field": "language", "level": "N1", "why": "register word"}
+{"term": "草稿", "reading": "そうこう", "gloss": "draft", "field": "language", "level": "N1", "why": "register word"}
+{"term": "清書", "reading": "せいしょ", "gloss": "fair copy", "field": "language", "level": "N2", "why": "register word"}
+{"term": "書き言葉", "reading": "かきことば", "gloss": "written language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "話し言葉", "reading": "はなしことば", "gloss": "spoken language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "口語", "reading": "こうご", "gloss": "colloquial language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "文語", "reading": "ぶんご", "gloss": "literary language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "口語体", "reading": "こうごたい", "gloss": "colloquial style", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "文語体", "reading": "ぶんごたい", "gloss": "classical literary style", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "位相語", "reading": "いそうご", "gloss": "register-specific vocabulary", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "若者言葉", "reading": "わかものことば", "gloss": "youth slang", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "流行語", "reading": "りゅうこうご", "gloss": "buzzword", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "俗語", "reading": "ぞくご", "gloss": "slang", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "隠語", "reading": "いんご", "gloss": "jargon; argot", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "業界用語", "reading": "ぎょうかいようご", "gloss": "industry jargon", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "専門用語", "reading": "せんもんようご", "gloss": "technical term", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "術語", "reading": "じゅつご", "gloss": "technical term", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "言葉遣い", "reading": "ことばづかい", "gloss": "wording; use of language", "field": "language", "level": "N2", "why": "register word"}
+{"term": "言い回し", "reading": "いいまわし", "gloss": "turn of phrase", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言い換え", "reading": "いいかえ", "gloss": "paraphrase", "field": "language", "level": "N1", "why": "register word"}
+{"term": "口調", "reading": "くちょう", "gloss": "tone of voice", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語調", "reading": "ごちょう", "gloss": "tone; intonation", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語気", "reading": "ごき", "gloss": "tone of speech", "field": "language", "level": "N1", "why": "register word"}
+{"term": "抑揚", "reading": "よくよう", "gloss": "intonation; modulation", "field": "language", "level": "N1", "why": "register word"}
+{"term": "高低アクセント", "reading": "こうていあくせんと", "gloss": "pitch accent", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "拍", "reading": "はく", "gloss": "mora; beat", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "音節", "reading": "おんせつ", "gloss": "syllable", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "母音", "reading": "ぼいん", "gloss": "vowel", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "子音", "reading": "しいん", "gloss": "consonant", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "撥音", "reading": "はつおん", "gloss": "moraic nasal (ん)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "促音", "reading": "そくおん", "gloss": "geminate (small っ)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "拗音", "reading": "ようおん", "gloss": "contracted sound (ゃゅょ)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "鼻濁音", "reading": "びだくおん", "gloss": "nasal g", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "無声化", "reading": "むせいか", "gloss": "devoicing", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "発声", "reading": "はっせい", "gloss": "vocalization", "field": "language", "level": "N1", "why": "register word"}
+{"term": "間合い", "reading": "まあい", "gloss": "timing; interval", "field": "language", "level": "N1", "why": "register word"}
+{"term": "話術", "reading": "わじゅつ", "gloss": "art of conversation", "field": "language", "level": "N1", "why": "register word"}
+{"term": "弁舌", "reading": "べんぜつ", "gloss": "speech; eloquence", "field": "language", "level": "N1", "why": "register word"}
+{"term": "雄弁", "reading": "ゆうべん", "gloss": "eloquence", "field": "language", "level": "N1", "why": "register word"}
+{"term": "能弁", "reading": "のうべん", "gloss": "eloquent; glib", "field": "language", "level": "N1", "why": "register word"}
+{"term": "訥弁", "reading": "とつべん", "gloss": "halting speech", "field": "language", "level": "beyond", "why": "register word"}
+{"term": "口下手", "reading": "くちべた", "gloss": "poor at speaking", "field": "language", "level": "N1", "why": "register word"}
+{"term": "聞き上手", "reading": "ききじょうず", "gloss": "good listener", "field": "language", "level": "N1", "why": "register word"}
+{"term": "寡黙", "reading": "かもく", "gloss": "taciturn", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言葉足らず", "reading": "ことばたらず", "gloss": "insufficiently explained", "field": "language", "level": "N1", "why": "register word"}
+{"term": "舌足らず", "reading": "したたらず", "gloss": "inarticulate; lisping", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言葉を濁す", "reading": "ことばをにごす", "gloss": "to be evasive", "field": "language", "level": "N1", "why": "register word"}
+{"term": "口をつぐむ", "reading": "くちをつぐむ", "gloss": "to keep one's mouth shut", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言葉に詰まる", "reading": "ことばにつまる", "gloss": "to be lost for words", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言い淀む", "reading": "いいよどむ", "gloss": "to falter in speech", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言葉尻を捉える", "reading": "ことばじりをとらえる", "gloss": "to nitpick someone's wording", "field": "language", "level": "N1", "why": "register word"}
+{"term": "揚げ足を取る", "reading": "あげあしをとる", "gloss": "to trip someone up on words", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語順", "reading": "ごじゅん", "gloss": "word order", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "目的語", "reading": "もくてきご", "gloss": "object (grammar)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "主題", "reading": "しゅだい", "gloss": "theme; topic", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "指示語", "reading": "しじご", "gloss": "demonstrative", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語形成", "reading": "ごけいせい", "gloss": "word formation", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "複合語", "reading": "ふくごうご", "gloss": "compound word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "派生語", "reading": "はせいご", "gloss": "derived word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "接頭辞", "reading": "せっとうじ", "gloss": "prefix", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "接尾辞", "reading": "せつびじ", "gloss": "suffix", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語幹", "reading": "ごかん", "gloss": "word stem", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "膠着語", "reading": "こうちゃくご", "gloss": "agglutinative language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "屈折語", "reading": "くっせつご", "gloss": "inflectional language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "孤立語", "reading": "こりつご", "gloss": "isolating language", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "文法化", "reading": "ぶんぽうか", "gloss": "grammaticalization", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "時制", "reading": "じせい", "gloss": "tense", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "アスペクト", "reading": "あすぺくと", "gloss": "aspect (grammar)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "受動態", "reading": "じゅどうたい", "gloss": "passive voice", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "使役", "reading": "しえき", "gloss": "causative", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "授受表現", "reading": "じゅじゅひょうげん", "gloss": "giving-receiving expressions", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語義", "reading": "ごぎ", "gloss": "word meaning", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "多義語", "reading": "たぎご", "gloss": "polysemous word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "同音異義語", "reading": "どうおんいぎご", "gloss": "homophone", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "同訓異字", "reading": "どうくんいじ", "gloss": "kanji sharing a kun reading", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "類義語", "reading": "るいぎご", "gloss": "synonym", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "対義語", "reading": "たいぎご", "gloss": "antonym", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "上位語", "reading": "じょういご", "gloss": "hypernym", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "下位語", "reading": "かいご", "gloss": "hyponym", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "慣用句", "reading": "かんようく", "gloss": "idiom", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "慣用表現", "reading": "かんようひょうげん", "gloss": "idiomatic expression", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "成句", "reading": "せいく", "gloss": "set phrase", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "四字熟語", "reading": "よじじゅくご", "gloss": "four-character compound", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "故事成語", "reading": "こじせいご", "gloss": "idiom from a classical tale", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "格言", "reading": "かくげん", "gloss": "maxim", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "箴言", "reading": "しんげん", "gloss": "aphorism", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "金言", "reading": "きんげん", "gloss": "golden saying", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "語法", "reading": "ごほう", "gloss": "usage; diction", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "誤用", "reading": "ごよう", "gloss": "misuse", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "言葉の乱れ", "reading": "ことばのみだれ", "gloss": "corruption of the language", "field": "language", "level": "N1", "why": "register word"}
+{"term": "重言", "reading": "じゅうげん", "gloss": "redundant expression (頭痛が痛い)", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "陳腐", "reading": "ちんぷ", "gloss": "hackneyed", "field": "language", "level": "N1", "why": "register word"}
+{"term": "常套句", "reading": "じょうとうく", "gloss": "cliché", "field": "language", "level": "N1", "why": "register word"}
+{"term": "決まり文句", "reading": "きまりもんく", "gloss": "stock phrase", "field": "language", "level": "N1", "why": "register word"}
+{"term": "紋切り型", "reading": "もんきりがた", "gloss": "stereotyped; formulaic", "field": "language", "level": "N1", "why": "register word"}
+{"term": "美文", "reading": "びぶん", "gloss": "ornate prose", "field": "language", "level": "N1", "why": "register word"}
+{"term": "名文", "reading": "めいぶん", "gloss": "fine piece of writing", "field": "language", "level": "N1", "why": "register word"}
+{"term": "悪文", "reading": "あくぶん", "gloss": "bad writing", "field": "language", "level": "N1", "why": "register word"}
+{"term": "達意", "reading": "たつい", "gloss": "lucid expression", "field": "language", "level": "beyond", "why": "register word"}
+{"term": "表現力", "reading": "ひょうげんりょく", "gloss": "expressiveness", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言語感覚", "reading": "げんごかんかく", "gloss": "feel for language", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言葉選び", "reading": "ことばえらび", "gloss": "choice of words", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言葉の綾", "reading": "ことばのあや", "gloss": "figure of speech", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言霊", "reading": "ことだま", "gloss": "spirit of words", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "以心伝心", "reading": "いしんでんしん", "gloss": "tacit understanding", "field": "language", "level": "N1", "why": "register word"}
+{"term": "阿吽の呼吸", "reading": "あうんのこきゅう", "gloss": "perfect unspoken coordination", "field": "language", "level": "N1", "why": "register word"}
+{"term": "察し", "reading": "さっし", "gloss": "perceptiveness; understanding", "field": "language", "level": "N1", "why": "register word"}
+{"term": "空気を読む", "reading": "くうきをよむ", "gloss": "to read the room", "field": "language", "level": "N1", "why": "register word"}
+{"term": "本音と建前", "reading": "ほんねとたてまえ", "gloss": "true feelings vs public face", "field": "language", "level": "N1", "why": "register word"}
+{"term": "曖昧さ", "reading": "あいまいさ", "gloss": "ambiguity", "field": "language", "level": "N1", "why": "register word"}
+{"term": "単刀直入", "reading": "たんとうちょくにゅう", "gloss": "straight to the point", "field": "language", "level": "N1", "why": "register word"}
+{"term": "歯に衣着せぬ", "reading": "はにきぬきせぬ", "gloss": "outspoken; blunt", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言わずもがな", "reading": "いわずもがな", "gloss": "needless to say", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言い得て妙", "reading": "いいえてみょう", "gloss": "aptly put", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言語道断", "reading": "ごんごどうだん", "gloss": "outrageous; beyond words", "field": "language", "level": "N1", "why": "register word"}
+{"term": "一を聞いて十を知る", "reading": "いちをきいてじゅうをしる", "gloss": "to grasp the whole from a hint", "field": "language", "level": "N1", "why": "register word"}
+{"term": "筆舌に尽くしがたい", "reading": "ひつぜつにつくしがたい", "gloss": "beyond description", "field": "language", "level": "N1", "why": "register word"}
+{"term": "意思疎通", "reading": "いしそつう", "gloss": "mutual understanding", "field": "language", "level": "N1", "why": "register word"}
+{"term": "傾聴", "reading": "けいちょう", "gloss": "attentive listening", "field": "language", "level": "N1", "why": "register word"}
+{"term": "相槌", "reading": "あいづち", "gloss": "back-channel response", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "質疑応答", "reading": "しつぎおうとう", "gloss": "question and answer", "field": "language", "level": "N1", "why": "register word"}
+{"term": "論破", "reading": "ろんぱ", "gloss": "refuting; out-arguing", "field": "language", "level": "N1", "why": "register word"}
+{"term": "腑に落ちる", "reading": "ふにおちる", "gloss": "to make sense; sink in", "field": "language", "level": "N1", "why": "register word"}
+{"term": "腹落ち", "reading": "はらおち", "gloss": "real understanding (business)", "field": "language", "level": "N1", "why": "register word"}
+{"term": "噛み砕く", "reading": "かみくだく", "gloss": "to explain in plain terms", "field": "language", "level": "N1", "why": "register word"}
+{"term": "咀嚼", "reading": "そしゃく", "gloss": "digesting (an idea)", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言い表す", "reading": "いいあらわす", "gloss": "to express", "field": "language", "level": "N1", "why": "register word"}
+{"term": "掘り下げる", "reading": "ほりさげる", "gloss": "to dig into", "field": "language", "level": "N1", "why": "register word"}
+{"term": "読解力", "reading": "どっかいりょく", "gloss": "reading comprehension", "field": "language", "level": "N1", "why": "register word"}
+{"term": "精読", "reading": "せいどく", "gloss": "close reading", "field": "language", "level": "N1", "why": "register word"}
+{"term": "多読", "reading": "たどく", "gloss": "extensive reading", "field": "language", "level": "N1", "why": "register word"}
+{"term": "熟読", "reading": "じゅくどく", "gloss": "careful reading", "field": "language", "level": "N1", "why": "register word"}
+{"term": "音読", "reading": "おんどく", "gloss": "reading aloud", "field": "language", "level": "N1", "why": "register word"}
+{"term": "素読", "reading": "そどく", "gloss": "reading aloud without interpretation", "field": "language", "level": "beyond", "why": "register word"}
+{"term": "通読", "reading": "つうどく", "gloss": "reading through", "field": "language", "level": "N1", "why": "register word"}
+{"term": "味読", "reading": "みどく", "gloss": "savoring a text", "field": "language", "level": "beyond", "why": "register word"}
+{"term": "乱読", "reading": "らんどく", "gloss": "indiscriminate reading", "field": "language", "level": "N1", "why": "register word"}
+{"term": "積読", "reading": "つんどく", "gloss": "unread pile of books", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語り口", "reading": "かたりくち", "gloss": "manner of telling", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語り手", "reading": "かたりて", "gloss": "narrator", "field": "language", "level": "N1", "why": "register word"}
+{"term": "聞き手", "reading": "ききて", "gloss": "listener", "field": "language", "level": "N1", "why": "register word"}
+{"term": "読み手", "reading": "よみて", "gloss": "reader", "field": "language", "level": "N1", "why": "register word"}
+{"term": "受け手", "reading": "うけて", "gloss": "recipient; audience", "field": "language", "level": "N1", "why": "register word"}
+{"term": "一言で言えば", "reading": "ひとことでいえば", "gloss": "in a word", "field": "language", "level": "N1", "why": "register word"}
+{"term": "換言すれば", "reading": "かんげんすれば", "gloss": "in other words (formal)", "field": "language", "level": "N1", "why": "register word"}
+{"term": "平たく言えば", "reading": "ひらたくいえば", "gloss": "to put it plainly", "field": "language", "level": "N1", "why": "register word"}
+{"term": "端的に言えば", "reading": "たんてきにいえば", "gloss": "to put it simply", "field": "language", "level": "N1", "why": "register word"}
+{"term": "裏を返せば", "reading": "うらをかえせば", "gloss": "conversely; flip side", "field": "language", "level": "N1", "why": "register word"}
+{"term": "結論から言うと", "reading": "けつろんからいうと", "gloss": "to start with the conclusion", "field": "language", "level": "N1", "why": "register word"}
+{"term": "前置き", "reading": "まえおき", "gloss": "preamble", "field": "language", "level": "N1", "why": "register word"}
+{"term": "本題", "reading": "ほんだい", "gloss": "main subject", "field": "language", "level": "N1", "why": "register word"}
+{"term": "余談", "reading": "よだん", "gloss": "digression", "field": "language", "level": "N1", "why": "register word"}
+{"term": "脱線", "reading": "だっせん", "gloss": "digression (going off track)", "field": "language", "level": "N2", "why": "register word"}
+{"term": "話を戻す", "reading": "はなしをもどす", "gloss": "to get back to the point", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言い切る", "reading": "いいきる", "gloss": "to state flatly", "field": "language", "level": "N1", "why": "register word"}
+{"term": "断定", "reading": "だんてい", "gloss": "assertion; conclusion", "field": "language", "level": "N2", "why": "register word"}
+{"term": "断言", "reading": "だんげん", "gloss": "declaration; assertion", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言及", "reading": "げんきゅう", "gloss": "reference; mention", "field": "language", "level": "N1", "why": "register word"}
+{"term": "出典", "reading": "しゅってん", "gloss": "source of a quote", "field": "language", "level": "N1", "why": "register word"}
+{"term": "典拠", "reading": "てんきょ", "gloss": "authoritative source", "field": "language", "level": "N1", "why": "register word"}
+{"term": "注釈", "reading": "ちゅうしゃく", "gloss": "annotation", "field": "language", "level": "N1", "why": "register word"}
+{"term": "脚注", "reading": "きゃくちゅう", "gloss": "footnote", "field": "language", "level": "N1", "why": "register word"}
+{"term": "文献", "reading": "ぶんけん", "gloss": "literature; references", "field": "language", "level": "N2", "why": "register word"}
+{"term": "概念", "reading": "がいねん", "gloss": "concept", "field": "language", "level": "N1", "why": "register word"}
+{"term": "定義", "reading": "ていぎ", "gloss": "definition", "field": "language", "level": "N1", "why": "register word"}
+{"term": "抽象度", "reading": "ちゅうしょうど", "gloss": "level of abstraction", "field": "language", "level": "N1", "why": "register word"}
+{"term": "解像度", "reading": "かいぞうど", "gloss": "resolution; clarity of thought", "field": "language", "level": "N1", "why": "register word"}
+{"term": "語呂合わせ", "reading": "ごろあわせ", "gloss": "wordplay mnemonic", "field": "language", "level": "N1", "why": "register word"}
+{"term": "駄洒落", "reading": "だじゃれ", "gloss": "pun", "field": "language", "level": "N1", "why": "register word"}
+{"term": "叙述", "reading": "じょじゅつ", "gloss": "description; narration", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "描写", "reading": "びょうしゃ", "gloss": "depiction", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "心理描写", "reading": "しんりびょうしゃ", "gloss": "psychological portrayal", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "情景描写", "reading": "じょうけいびょうしゃ", "gloss": "description of a scene", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "地の文", "reading": "じのぶん", "gloss": "narrative text (not dialogue)", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "論説文", "reading": "ろんせつぶん", "gloss": "argumentative essay", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "随筆", "reading": "ずいひつ", "gloss": "essay", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "評論", "reading": "ひょうろん", "gloss": "critique; criticism", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "小論文", "reading": "しょうろんぶん", "gloss": "short essay", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "文芸", "reading": "ぶんげい", "gloss": "literary arts", "field": "language", "level": "N2", "why": "core concept"}
+{"term": "和歌", "reading": "わか", "gloss": "waka poem", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "短歌", "reading": "たんか", "gloss": "tanka", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "季語", "reading": "きご", "gloss": "season word", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "漢文", "reading": "かんぶん", "gloss": "classical Chinese text", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "訓読", "reading": "くんどく", "gloss": "reading Chinese in Japanese order", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "返り点", "reading": "かえりてん", "gloss": "kanbun reordering marks", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "書き下し文", "reading": "かきくだしぶん", "gloss": "kanbun rendered as Japanese", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "古文", "reading": "こぶん", "gloss": "classical Japanese", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "係り結び", "reading": "かかりむすび", "gloss": "kakari-musubi concord", "field": "language", "level": "beyond", "why": "core concept"}
+{"term": "現代語訳", "reading": "げんだいごやく", "gloss": "modern-language translation", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "直訳", "reading": "ちょくやく", "gloss": "literal translation", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "意訳", "reading": "いやく", "gloss": "free translation", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "翻訳調", "reading": "ほんやくちょう", "gloss": "translationese", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "話法", "reading": "わほう", "gloss": "reported speech; narration", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "鉤括弧", "reading": "かぎかっこ", "gloss": "Japanese quotation brackets 「」", "field": "language", "level": "N1", "why": "core concept"}
+{"term": "沈黙は金", "reading": "ちんもくはきん", "gloss": "silence is golden", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言わぬが花", "reading": "いわぬがはな", "gloss": "some things are better left unsaid", "field": "language", "level": "N1", "why": "register word"}
+{"term": "口は災いの元", "reading": "くちはわざわいのもと", "gloss": "the mouth invites misfortune", "field": "language", "level": "N1", "why": "register word"}
+{"term": "言うは易く行うは難し", "reading": "いうはやすくおこなうはかたし", "gloss": "easier said than done", "field": "language", "level": "N1", "why": "register word"}
+{"term": "百聞は一見にしかず", "reading": "ひゃくぶんはいっけんにしかず", "gloss": "seeing is believing", "field": "language", "level": "N1", "why": "register word"}
+{"term": "文は人なり", "reading": "ぶんはひとなり", "gloss": "the style is the person", "field": "language", "level": "N1", "why": "register word"}
