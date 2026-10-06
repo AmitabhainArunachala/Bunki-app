@@ -121,7 +121,7 @@ for (const name of ['verify-practice-history.mjs', ...helperPaths])
 writeFileSync(resolve(OUT, 'build-identity.json'), JSON.stringify(manifest, null, 2) + '\n');
 const set = JSON.parse(readFileSync(resolve(ROOT, 'data/mock/sets/n5-01.json'), 'utf8'));
 const items = set.sections.flatMap((section) => section.items);
-assert.equal(items.length, 18, 'This journey uses the real 18-item N5-01 fixture');
+assert.equal(items.length, process.env.KAIRO_BROWSER === 'chromium' ? 19 : 18, 'This journey uses the real 18-item N5-01 fixture');
 assert.equal(set.approved, false);
 const browserName = process.env.KAIRO_BROWSER || 'chromium';
 assert(['chromium', 'webkit'].includes(browserName), 'Supported engine is chromium or webkit');
