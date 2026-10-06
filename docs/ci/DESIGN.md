@@ -220,7 +220,10 @@ never create a successful check or reusable receipt.
 Every run's summary lists gate, shard, duration, result, retry, evidence links,
 total wall time, and the slowest ten gates. Step-level error capture permits
 receipt upload, but only the aggregator can decide full success. A green retry
-does not erase the red first attempt.
+does not erase the red first attempt. A red summary labels each gate from both
+attempts as PASSED, FLAKY, FAILED TWICE, CANCELLED, SKIPPED, MISSING or UNVERIFIED.
+FLAKY and FAILED TWICE require an admitted first attempt paired with a
+fresh-runner retry; any other evidence is UNVERIFIED and never promotable.
 
 ## Scope, consolidation, and caches
 
