@@ -21,6 +21,7 @@ export function supplementalGates(out) {
         'scripts/ci/battery.test.mjs',
         'scripts/ci/receipts.test.mjs',
         'scripts/ci/ledger.test.mjs',
+        'scripts/ci/runner.integration.test.mjs',
       ],
       requiredPath: 'scripts/ci/receipts.test.mjs',
     },
@@ -53,7 +54,7 @@ export function supplementalGates(out) {
     ]),
     node('legacy-drift-storage', 'prototypes/drift/tools/verify-storage-integrity.mjs', [
       '--out',
-      join(out, 'legacy-drift-storage/report.json'),
+      join(out, 'legacy-drift-storage.json'),
     ]),
     node('runtime-syntax', 'scripts/ci/runtime-syntax.mjs'),
     node('standalone-build', 'prototypes/corridor/tools/build-standalone.mjs', [

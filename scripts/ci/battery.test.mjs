@@ -259,6 +259,7 @@ for (const [name, mutate] of Object.entries({
     f.retryPlan.retryDigest = digest(body);
   },
   'cancelled retry': (f) => (f.jobs.at(-1).conclusion = 'cancelled'),
+  'passed retry from failed job': (f) => (f.jobs.at(-1).conclusion = 'failure'),
 }))
   test(`retry rejects ${name}`, () => {
     const f = withRetry();
@@ -349,6 +350,170 @@ test('failure summary retains expected rows, cancelled/missing shards, retry dur
   assert.match(text, /practice-history/);
   assert.match(text, /format-check/);
   assert(row);
+});
+function failFirst(f, name) {
+  const one = f.receipts.find((r) => r.attempt === 1 && r.gates.some((g) => g.name === name));
+  Object.assign(
+    one.gates.find((g) => g.name === name),
+    { status: 'failed', exitCode: 1 },
+  );
+  Object.assign(one, { status: 'failed', exitCode: 1 });
+  return one;
+}
+function addRetry(f, one, status) {
+  const jobId = String(5000 + f.receipts.length);
+  const two = {
+    ...clone(one),
+    attempt: 2,
+    status,
+    exitCode: status === 'passed' ? 0 : 1,
+    jobId,
+    runner: `fresh-${one.shardId}`,
+    gates: one.gates
+      .filter((g) => g.status !== 'passed')
+      .map((g) => ({ ...gate(g.name), ...(status === 'passed' ? {} : { status, exitCode: 1 }) })),
+  };
+  f.receipts.push(two);
+  f.jobs.push({
+    ...job(`retry / ${one.shardId}`, jobId),
+    conclusion: status === 'passed' ? 'success' : 'failure',
+  });
+  return two;
+}
+function mixedFixture() {
+  const f = fixture();
+  const history = failFirst(f, 'practice-history');
+  const flaky = failFirst(f, 'teaching-context');
+  refreshRetryPlans(f);
+  return {
+    f,
+    history,
+    flaky,
+    failed: addRetry(f, history, 'failed'),
+    passed: addRetry(f, flaky, 'passed'),
+  };
+}
+function summaryRows(text) {
+  const cells = (line) => line.slice(2, -2).split(' | ');
+  const [header, , ...body] = text.split('\n').filter((line) => line.startsWith('| '));
+  const keys = cells(header);
+  return Object.fromEntries(
+    body.map((line) => {
+      const row = Object.fromEntries(cells(line).map((value, i) => [keys[i], value]));
+      return [row.gate, row];
+    }),
+  );
+}
+function rejection(f) {
+  try {
+    aggregate(f);
+  } catch (error) {
+    return error;
+  }
+  assert.fail('Aggregate admitted red evidence');
+}
+test('red aggregate reaches the explicit second-failure verdict and separates FLAKY from FAILED TWICE', () => {
+  const { f } = mixedFixture();
+  const error = rejection(f);
+  assert.equal(error.message.split('\n')[0], 'Failed twice: practice-history');
+  const rows = summaryRows(failureSummary({ ...f, error }));
+  assert.equal(Object.keys(rows).length, f.plan.requiredNames.length);
+  const history = rows['practice-history'];
+  assert.equal(history.result, 'FAILED TWICE');
+  assert.equal(
+    history['first attempt'],
+    `failed (runner-${f.plan.shards.findIndex((s) => s.id === 'practice-history')})`,
+  );
+  assert.equal(history.retry, 'failed (fresh-practice-history)');
+  assert.equal(history['retry seconds'], '1.00');
+  assert.match(
+    history.evidence,
+    /^\[first\]\(.+\/runs\/42\/job\/\d+\) · \[retry\]\(.+\/runs\/42\/job\/5\d+\)$/,
+  );
+  const flaky = rows['teaching-context'];
+  assert.equal(flaky.result, 'FLAKY');
+  assert.match(flaky['first attempt'], /^failed \(runner-\d+\)$/);
+  assert.match(flaky.retry, /^passed \(fresh-balanced-\d+\)$/);
+  assert.equal(flaky.seconds, '1.00');
+  assert.equal(flaky['retry seconds'], '1.00');
+  assert.equal(rows['format-check'].result, 'PASSED');
+  assert.equal(rows['format-check'].retry, '—');
+  assert.deepEqual([...new Set(Object.values(rows).map((r) => r.result))].sort(), [
+    'FAILED TWICE',
+    'FLAKY',
+    'PASSED',
+  ]);
+});
+for (const [name, mutate, expected] of [
+  ['same retry runner', ({ passed, flaky }) => (passed.runner = flaky.runner)],
+  ['reused first job', ({ passed, flaky }) => (passed.jobId = flaky.jobId)],
+  ['wrong retry artifact', ({ passed }) => (passed.artifact = { ...artifact, id: '101' })],
+  [
+    'wrong retry candidate',
+    ({ passed }) => (passed.identity = { ...identity, sha: '0'.repeat(40) }),
+  ],
+  ['wrong retry plan', ({ passed }) => (passed.planDigest = '0'.repeat(64))],
+  [
+    'extra retried gate',
+    ({ passed, flaky }) =>
+      passed.gates.push(gate(flaky.gates.find((g) => g.status === 'passed').name)),
+  ],
+  [
+    'wrong retry job identity',
+    ({ f, passed }) => (f.jobs.find((j) => j.id === passed.jobId).id = '1'),
+  ],
+  [
+    'stale retry job',
+    ({ f, passed }) => (f.jobs.find((j) => j.id === passed.jobId).run_attempt = 2),
+  ],
+  [
+    'passed retry from failed job',
+    ({ f, passed }) => (f.jobs.find((j) => j.id === passed.jobId).conclusion = 'failure'),
+  ],
+  ['duplicate retry', ({ f, passed }) => f.receipts.push(clone(passed))],
+  ['untrusted first attempt', ({ flaky }) => (flaky.planDigest = '0'.repeat(64))],
+  ['missing artifact metadata', ({ f }) => (f.artifact = undefined)],
+  ['interrupted retry', ({ passed }) => (passed.status = 'interrupted'), 'CANCELLED'],
+  [
+    'cancelled retry without receipt',
+    ({ f, passed }) => {
+      f.receipts.splice(f.receipts.indexOf(passed), 1);
+      f.jobs.find((j) => j.id === passed.jobId).conclusion = 'cancelled';
+    },
+    'CANCELLED',
+  ],
+  [
+    'missing retry',
+    ({ f, passed }) => {
+      f.receipts.splice(f.receipts.indexOf(passed), 1);
+      f.jobs.splice(
+        f.jobs.findIndex((j) => j.id === passed.jobId),
+        1,
+      );
+    },
+    'MISSING',
+  ],
+])
+  test(`failure summary never proves a FLAKY pair with ${name}`, () => {
+    const fixture = mixedFixture();
+    mutate(fixture);
+    const error = rejection(fixture.f);
+    const text = failureSummary({ ...fixture.f, error });
+    const rows = summaryRows(text);
+    assert.equal(rows['teaching-context'].result, expected || 'UNVERIFIED');
+    assert.match(rows['teaching-context']['first attempt'], /^failed/);
+    if (!expected) {
+      assert.match(text, /\nUnverified evidence:\n/);
+      assert.match(text, new RegExp(`\\n- (?:battery|retry) / ${fixture.flaky.shardId}: `));
+    }
+    assert(!Object.values(rows).some((r) => r.result === 'FLAKY'));
+  });
+test('failure summary does not prove FAILED TWICE from a retry on the same runner', () => {
+  const { f, history, failed } = mixedFixture();
+  failed.runner = history.runner;
+  const rows = summaryRows(failureSummary({ ...f, error: rejection(f) }));
+  assert.equal(rows['practice-history'].result, 'UNVERIFIED');
+  assert.equal(rows['teaching-context'].result, 'FLAKY');
 });
 test('flake importer admits only exact observed pair, deduplicates and rejects malformed/conflicting evidence', () => {
   const pair = aggregate(withRetry()).flakes[0];
