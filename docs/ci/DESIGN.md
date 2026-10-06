@@ -48,7 +48,7 @@ Python dependencies installed.
 
 | Linux work                     |                                           Initial prediction | Scheduling                                          |
 | ------------------------------ | -----------------------------------------------------------: | --------------------------------------------------- |
-| Fast checks                    |                                          Under 10 min target | Parallel early lanes if measured sum exceeds budget |
+| Fast checks                    |                                          Under 10 min target | Three measured LPT lanes plus dedicated deck checks |
 | Practice history / WebKit      |                                                    15.98 min | Dedicated shard                                     |
 | Practice history / Chromium    |                                                    12.10 min | Dedicated shard                                     |
 | Remaining gates                | Approximately 14 min per shard before extracting fast checks | Ten duration-balanced shards                        |
@@ -64,6 +64,25 @@ minutes); final checked-in weights use each gate's observed maximum and record
 their provenance in CI_MAP. Browser engines and dependency requirements are
 explicit plan metadata. Unknown or new gates receive conservative weights, never
 disappear. Timings change allocation only, never required membership.
+
+The first hosted run supplied 31 passed fast-gate observations, retained in a
+separate `planningObservations` field with immutable receipt provenance. Historical
+five-run data is unchanged; scheduling uses the greater historical or new weight.
+Three non-deck fast lanes now exist even below the old threshold, so unit tests and
+typechecking run concurrently. The measured-workload prediction is approximately
+126/72/72 seconds plus the dedicated 51-second deck lane. These are gate-work
+predictions, excluding setup and later contract-test additions.
+
+Planning checks out two commits and fetches only the explicitly pinned baseline
+without tags. Docs selection requires a PR event, the exact event base as the
+merge candidate's first parent, and that same base as its verified merge-base.
+Only then is the complete three-dot diff classified. Any ancestry uncertainty
+selects full scope. Non-PR events always select full scope. Admission jobs use
+shallow checkouts. Fast jobs and their single retries use depth two without tags;
+their Git contracts inspect the current commit, tree, index and working diff.
+Executable shallow fixtures check those identity and cleanliness contracts. Build
+and slow gate jobs keep complete history, including the older commits read by slow
+verifier assertions. Native checkout retains its existing default depth.
 
 Cold setup, artifact transfer, and supplemental gates need headroom under the
 40-minute target. Step timeouts must exceed twice their measured healthy duration;
@@ -159,9 +178,9 @@ workflow lands on the default branch, `CI flake ledger` automatically appends ne
 observations to that path on the fixed data branch `ci/flake-ledger`. The producer
 CI token remains read-only; the trusted consumer has contents-write and
 actions-read. It never writes main or the tested candidate. The feature branch's
-copy stays empty until the hosted fail-once experiment adds the controlled-experiment
-seed; the data branch starts from the default branch's copy and becomes the ongoing
-ledger.
+copy includes independently admitted hosted observations; the deliberate fail-once
+experiment is recorded separately as `controlled-experiment`. The data branch starts
+from the default branch's copy and becomes the ongoing ledger.
 
 The consumer observes exactly three same-repository producers of the one CI
 pipeline: `ci.yml` (pull request or dispatch), `pages-app.yml` (push to main or
@@ -251,6 +270,18 @@ Cache npm by lockfile, Playwright downloads by OS/architecture and package lock,
 and pip by Python version plus dependency specifications. Browser system libraries
 are still installed. Pin deck dependencies to fugashi 1.5.2, unidic-lite 1.0.8,
 and genanki 0.13.1. Cached dependencies are not cached passing evidence.
+
+Three hosted setup tails spent 13–16 minutes downloading the same 126 MB of
+Ubuntu packages from `azure.archive.ubuntu.com`. The observed runner image uses
+the fixed `/etc/apt/apt-mirrors.txt` file through APT mirror indirection. Before
+browser dependency installation, the Ubuntu GitHub runner helper replaces only
+that exact Azure Ubuntu archive URI with the official Ubuntu archive, preserving
+scheme, path, priority, other mirrors and signature configuration. It also handles
+literal active archive URIs in supported APT source files; security or ambiguous
+source stanzas remain unchanged. Logs count source and mirror-file substitutions
+separately so a safe no-op is distinguishable from an applied change. Normal APT,
+Playwright dependency installation and ffmpeg installation still run. This is a
+measured transport correction; its end-to-end benefit requires hosted timing.
 
 ## Implementation boundaries and proof
 
