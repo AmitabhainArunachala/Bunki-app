@@ -3972,7 +3972,15 @@ export async function verifyWorkflows(root = ROOT) {
   };
   const needs = (job, expected, message) =>
     assert.deepEqual([...job.needs].sort(), [...expected].sort(), message);
-  for (const name of ['plan', 'fast-retry-plan', 'fast-signal', 'retry-plan', 'required']) {
+  for (const name of [
+    'plan',
+    'fast',
+    'fast-retry',
+    'fast-retry-plan',
+    'fast-signal',
+    'retry-plan',
+    'required',
+  ]) {
     const checkout = find(
       ci.jobs[name],
       (step) => step.uses === 'actions/checkout@v4',
@@ -3980,7 +3988,7 @@ export async function verifyWorkflows(root = ROOT) {
     );
     assert.equal(
       checkout.with?.['fetch-depth'],
-      name === 'plan' ? 2 : 1,
+      ['plan', 'fast', 'fast-retry'].includes(name) ? 2 : 1,
       `${name} must fetch only its required candidate history`,
     );
     assert.equal(checkout.with?.['fetch-tags'], false, `${name} must not fetch unrelated tags`);
@@ -4734,6 +4742,8 @@ export async function verifyWorkflowGitHistory(out, root = ROOT) {
     '-m',
     'Synthetic PR merge',
   );
+  const candidate = git(origin, 'rev-parse', 'HEAD');
+  const candidateTree = git(origin, 'rev-parse', 'HEAD^{tree}');
   git(
     fixture,
     'clone',
@@ -4743,14 +4753,51 @@ export async function verifyWorkflowGitHistory(out, root = ROOT) {
     pathToFileURL(origin).href,
     checkout,
   );
-  symlinkSync(join(root, 'node_modules'), join(checkout, 'node_modules'), 'dir');
-  symlinkSync(join(root, 'prototypes'), join(checkout, 'prototypes'), 'dir');
   assert.equal(git(checkout, 'rev-parse', '--is-shallow-repository'), 'true');
   assert.notEqual(
     spawnSync('git', ['cat-file', '-e', `${pinned}^{commit}`], { cwd: checkout }).status,
     0,
     'Depth two must omit the historical parity commit',
   );
+  assert.equal(git(checkout, 'rev-parse', 'HEAD'), candidate);
+  assert.equal(git(checkout, 'rev-parse', 'HEAD^{tree}'), candidateTree);
+  assert.deepEqual(git(checkout, 'show', '-s', '--format=%P', 'HEAD').split(' '), [base, topic]);
+  const tracked = git(checkout, 'ls-files');
+  assert.equal(tracked, git(origin, 'ls-files'), 'Shallow checkout must retain the complete index');
+  assert.equal(git(checkout, 'status', '--porcelain'), '');
+  assert.equal(git(checkout, 'diff', '--stat', '--exit-code'), '');
+  const fastSource = join(checkout, 'docs/operator/topic.md');
+  const originalSource = readFileSync(fastSource);
+  writeFileSync(fastSource, 'changed tracked fast input\n');
+  assert.equal(git(checkout, 'status', '--porcelain'), 'M docs/operator/topic.md');
+  assert.notEqual(
+    spawnSync('git', ['diff', '--stat', '--exit-code'], { cwd: checkout }).status,
+    0,
+    'Shallow checkout must reject a changed tracked output',
+  );
+  writeFileSync(fastSource, originalSource);
+  const untrackedSource = join(checkout, 'docs/operator/untracked.md');
+  writeFileSync(untrackedSource, 'uncommitted fast output\n');
+  assert.equal(
+    git(checkout, 'ls-files', '--others', '--exclude-standard'),
+    'docs/operator/untracked.md',
+    'Shallow checkout must expose uncommitted outputs',
+  );
+  unlinkSync(untrackedSource);
+  assert.equal(git(checkout, 'status', '--porcelain'), '');
+  assert.equal(git(checkout, 'diff', '--stat', '--exit-code'), '');
+  const currentContracts = {
+    name: 'shallow-fast-current-identity-and-cleanliness',
+    sha: candidate,
+    tree: candidateTree,
+    trackedFiles: tracked.split('\n').length,
+    parents: [base, topic],
+    olderHistoryUnavailable: true,
+    changedTrackedOutputRejected: true,
+    untrackedOutputDetected: true,
+  };
+  symlinkSync(join(root, 'node_modules'), join(checkout, 'node_modules'), 'dir');
+  symlinkSync(join(root, 'prototypes'), join(checkout, 'prototypes'), 'dir');
   const parityStep = ci.jobs.plan.steps.find((step) =>
     workflowShellCommands(step.run || '').some((argv) => argv[1] === 'scripts/ci/parity.mjs'),
   );
@@ -4773,7 +4820,7 @@ export async function verifyWorkflowGitHistory(out, root = ROOT) {
     ['invalid-base', 'pull_request', 'not-a-sha', [], 'full'],
     ['dispatch', 'workflow_dispatch', base, [], 'full'],
   ];
-  const results = [];
+  const results = [currentContracts];
   for (const [name, event, sha, expected, scope] of cases) {
     const directory = join(fixture, name);
     mkdirSync(directory);
@@ -4814,6 +4861,7 @@ export async function verifyWorkflowGitHistory(out, root = ROOT) {
     results,
   });
   return [
+    'shallow fast checkout preserves exact current identity, complete index and dirty-output rejection',
     'shallow synthetic PR merge retains complete diff, defaults full on races and fetches original parity',
   ];
 }
@@ -4845,6 +4893,22 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
     apple(ci).steps = apple(ci).steps.filter((step) => !predicate(step));
   };
   const cases = [
+    ...['fast', 'fast-retry'].flatMap((name) => [
+      [
+        `unbounded-${name}-checkout`,
+        (ci) => {
+          ci.jobs[name].steps[0].with['fetch-depth'] = 0;
+        },
+        /required candidate history/,
+      ],
+      [
+        `unrelated-${name}-tags`,
+        (ci) => {
+          ci.jobs[name].steps[0].with['fetch-tags'] = true;
+        },
+        /unrelated tags/,
+      ],
+    ]),
     [
       'unbounded-plan-checkout',
       (ci) => {

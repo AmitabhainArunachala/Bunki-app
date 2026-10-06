@@ -199,7 +199,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+          fetch-tags: false
       - uses: ./.github/actions/ci-setup
         with:
           python: ${{ matrix.python }}
@@ -320,7 +321,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+          fetch-tags: false
       - uses: ./.github/actions/ci-setup
         with:
           python: ${{ matrix.python }}
