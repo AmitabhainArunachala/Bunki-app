@@ -1,26 +1,102 @@
-# The only live publisher. Its reusable verification job builds and tests the
-# artifact; deployment consumes that same run's immutable Pages artifact.
+# Sole Pages publisher. Tree proof is admitted independently before byte reuse.
 name: pages-app
-
 on:
   workflow_dispatch:
   push:
     branches: [main]
-
 permissions:
   contents: read
-
+  actions: read
 concurrency:
-  group: kairo-pages
+  group: ${{ github.ref == 'refs/heads/main' && 'kairo-pages' || format('kairo-pages-test-{0}', github.ref) }}
   cancel-in-progress: false
-
 jobs:
+  lookup:
+    name: admit existing full-tree proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matched: ${{ steps.lookup.outputs.matched }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Plan the current full policy
+        run: node scripts/ci/battery.mjs plan --scope full --out "$RUNNER_TEMP/plan.json"
+      - name: Independently admit exact-tree proof or require fresh CI
+        id: lookup
+        run: node scripts/ci/receipts.mjs lookup --plan "$RUNNER_TEMP/plan.json" --out "$RUNNER_TEMP/reuse"
+      - name: Check out the independently admitted original producer
+        if: steps.lookup.outputs.matched == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.lookup.outputs.producer_sha }}
+          fetch-depth: 0
+      - name: Install the admitted producer's pinned verification dependencies
+        if: steps.lookup.outputs.matched == 'true'
+        run: npm ci --ignore-scripts
+      - name: Verify unchanged tested bytes against the original producer
+        id: transfer
+        if: steps.lookup.outputs.matched == 'true'
+        run: node scripts/ci/receipts.mjs verify-transfer --transfer "$RUNNER_TEMP/reuse/transfer.json"
+      - name: Retain the transfer evidence
+        if: success() && steps.transfer.outputs.verified == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/reuse/receipt.json
+            ${{ runner.temp }}/reuse/transfer.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Package admitted bytes without rebuilding
+        if: success() && steps.transfer.outputs.verified == 'true' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: kairo-pages
+          path: ${{ steps.transfer.outputs.site_dir }}
   verify:
+    if: always() && (needs.lookup.result != 'success' || needs.lookup.outputs.matched != 'true')
+    needs: lookup
     uses: ./.github/workflows/ci.yml
-
+  package:
+    name: package freshly tested artifact
+    if: always() && needs.verify.result == 'success' && github.ref == 'refs/heads/main'
+    needs: [lookup, verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Download the exact immutable artifact admitted by full CI
+        env:
+          SITE_ID: ${{ needs.verify.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.verify.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/download" --out "$RUNNER_TEMP/site"
+      - name: Recheck complete source and byte identity before Pages packaging
+        run: node scripts/verify-release-gates.mjs --verify-artifact "$RUNNER_TEMP/site" --require-clean
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          name: kairo-pages
+          path: ${{ runner.temp }}/site
   deploy:
-    needs: verify
-    if: github.ref == 'refs/heads/main' && needs.verify.result == 'success'
+    if: always() && github.ref == 'refs/heads/main' && ((needs.lookup.result == 'success' && needs.lookup.outputs.matched == 'true') || (needs.verify.result == 'success' && needs.package.result == 'success'))
+    needs: [lookup, verify, package]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

@@ -3807,6 +3807,83 @@ function verifyArtifactFailures(out) {
   ];
 }
 
+/** Parse the executable shell surface, excluding comments and heredoc program bodies.
+ * Environment arguments remain symbolic; single-quoted dollars stay literal.
+ * Quoting is normalized without evaluating variables or executing code.
+ * Contracts below compare complete argv, so a mentioned command is not execution.
+ */
+function workflowShellCommands(text) {
+  const commands = [];
+  let heredoc = null;
+  for (const line of text.replace(/\\\n/g, '').split('\n')) {
+    if (heredoc) {
+      if (line.trim() === heredoc) heredoc = null;
+      continue;
+    }
+    const tokens = [];
+    let word = '',
+      quote = null,
+      literalDollar = false;
+    const flush = () => {
+      if (word) tokens.push(literalDollar ? `literal:${word}` : word);
+      word = '';
+      literalDollar = false;
+    };
+    for (let index = 0; index < line.length; index++) {
+      const char = line[index];
+      if (quote) {
+        if (char === quote) quote = null;
+        else if (char === '\\' && quote === '"' && ['"', '\\'].includes(line[index + 1]))
+          word += line[++index];
+        else {
+          if (quote === "'" && char === '$') literalDollar = true;
+          word += char;
+        }
+      } else if (char === '"' || char === "'") quote = char;
+      else if (char === '#' && !word) break;
+      else if (/\s/.test(char)) flush();
+      else if (
+        char === ';' ||
+        char === '>' ||
+        (['&', '|'].includes(char) && line[index + 1] === char)
+      ) {
+        flush();
+        let operator = char;
+        if (line[index + 1] === char) {
+          operator += char;
+          index++;
+        }
+        tokens.push(operator);
+      } else word += char;
+    }
+    flush();
+    assert(
+      !tokens.includes('||'),
+      'Required executable command contracts cannot swallow shell failure',
+    );
+    assert(!quote, 'Workflow command contracts require balanced shell quotes');
+    const marker = tokens.find((token) => token.startsWith('<<'));
+    if (marker) heredoc = marker.slice(2);
+    let segment = [];
+    const finish = () => {
+      let argv = segment;
+      while (argv[0] === 'then' || argv[0] === 'exec' || /^[A-Z_][A-Z_0-9]*=/.test(argv[0] || ''))
+        argv = argv.slice(1);
+      if (argv.length && !['fi', 'else'].includes(argv[0])) commands.push(argv);
+      segment = [];
+    };
+    for (const token of tokens) {
+      if (token.startsWith('<<')) break;
+      if (token === '>' || token === '>>') break;
+      if ([';', '&&', '||'].includes(token)) finish();
+      else segment.push(token);
+    }
+    finish();
+  }
+  assert(!heredoc, 'Workflow command heredoc must terminate');
+  return commands;
+}
+
 export async function verifyWorkflows(root = ROOT) {
   const { parseDocument } = await import('yaml');
   const workflow = (name) => {
@@ -3820,29 +3897,118 @@ export async function verifyWorkflows(root = ROOT) {
     );
     return document.toJS();
   };
-  const ci = workflow('ci.yml');
-  const pages = workflow('pages-app.yml');
+  const ci = workflow('ci.yml'),
+    pages = workflow('pages-app.yml'),
+    nightly = workflow('nightly-verify.yml');
+  const steps = (job) => job?.steps || [];
+  const commands = (job) => steps(job).flatMap((step) => workflowShellCommands(step.run || ''));
+  const matching = (job, argv) =>
+    commands(job).filter((command) => JSON.stringify(command) === JSON.stringify(argv));
+  const has = (job, argv) => matching(job, argv).length > 0;
+  const node = (...args) => ['node', ...args];
+  const input = (name) => `$RUNNER_TEMP/inputs/${name}.json`;
+  const archiveDownload = [
+    'node',
+    'scripts/ci/receipts.mjs',
+    'download-site',
+    '--id',
+    '$SITE_ID',
+    '--run-id',
+    '$GITHUB_RUN_ID',
+    '--digest',
+    '$SITE_DIGEST',
+    '--temp',
+    '$RUNNER_TEMP/site-download',
+    '--out',
+    '$RUNNER_TEMP/site',
+  ];
+  const jobsQuery = [
+    'gh',
+    'api',
+    '--paginate',
+    '--slurp',
+    'repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100',
+  ];
+  const retryCommand = (phase, file) =>
+    node(
+      'scripts/ci/battery.mjs',
+      'retry-plan',
+      '--phase',
+      phase,
+      '--plan',
+      input('plan'),
+      '--artifact',
+      input('artifact'),
+      '--receipts',
+      '$RUNNER_TEMP/receipts',
+      '--jobs',
+      '$RUNNER_TEMP/jobs.json',
+      '--out',
+      `$RUNNER_TEMP/${file}.json`,
+    );
+  const aggregateCommand = (phase, retryFile) =>
+    node(
+      'scripts/ci/battery.mjs',
+      'aggregate',
+      '--phase',
+      phase,
+      '--plan',
+      input('plan'),
+      '--artifact',
+      input('artifact'),
+      ...(phase === 'all' ? ['--fast-retry-plan', input('fast-retry-plan')] : []),
+      ...(retryFile ? ['--retry-plan', input(retryFile)] : []),
+      '--receipts',
+      '$RUNNER_TEMP/receipts',
+      '--jobs',
+      '$RUNNER_TEMP/jobs.json',
+      '--out',
+      '$RUNNER_TEMP/proof',
+    );
+  const find = (job, predicate, message) => {
+    const matches = steps(job).filter(predicate);
+    assert.equal(matches.length, 1, message);
+    return matches[0];
+  };
+  const needs = (job, expected, message) =>
+    assert.deepEqual([...job.needs].sort(), [...expected].sort(), message);
+  assert.equal(
+    pages.concurrency.group,
+    "${{ github.ref == 'refs/heads/main' && 'kairo-pages' || format('kairo-pages-test-{0}', github.ref) }}",
+    'Pages main concurrency must stay kairo-pages while test refs remain isolated',
+  );
+  assert.equal(
+    pages.concurrency['cancel-in-progress'],
+    false,
+    'Pages must never cancel a live publisher or test',
+  );
+  assert(
+    !steps(ci.jobs.fast).some((step) => step.with?.name?.startsWith('bunki-e2e-')),
+    'Fast phase cannot contain unreachable E2E export',
+  );
+  for (const job of Object.values(ci.jobs))
+    assert(
+      !Object.hasOwn(job.env || {}, 'KAIRO_CI_GATE_ATTEMPT'),
+      'Permanent CI must not carry a dead synthetic attempt environment',
+    );
   assert(Object.hasOwn(ci.on, 'workflow_call'));
   assert(Object.hasOwn(ci.on, 'pull_request'));
+  assert(Object.hasOwn(ci.on, 'workflow_dispatch'));
+  assert(
+    !ci.on.pull_request?.paths && !ci.on.pull_request?.['paths-ignore'],
+    'Every PR must report required status',
+  );
   assert(!Object.hasOwn(ci.on, 'push'), 'Main builds must use the single Pages build/test chain');
-  assert.deepEqual(ci.permissions, { contents: 'read' });
-  const apple = ci.jobs['apple-sync'];
+  assert.deepEqual(ci.permissions, { contents: 'read', actions: 'read' });
+  const apple = ci.jobs.native;
   assert(apple, 'Native transport requires an Apple SDK gate');
   assert.equal(apple['runs-on'], 'macos-26');
-  assert.equal(
-    ci.jobs.checks.needs,
-    'apple-sync',
-    'Artifact publication must wait for the native gate',
+  assert.equal(apple.needs, 'plan', 'Native compilation must run in parallel with Linux');
+  assert.equal(apple.if, "needs.plan.outputs.scope == 'full'", 'native job cannot skip full scope');
+  assert(
+    !Object.hasOwn(apple, 'continue-on-error'),
+    'native job cannot skip or swallow a required failure',
   );
-  for (const [name, job] of [
-    ['apple-sync', apple],
-    ['checks', ci.jobs.checks],
-  ]) {
-    assert(
-      !Object.hasOwn(job, 'if') && !Object.hasOwn(job, 'continue-on-error'),
-      `${name} job cannot skip or swallow a required failure`,
-    );
-  }
   const nativeSteps = [
     {
       id: 'apple-sync',
@@ -3857,26 +4023,29 @@ export async function verifyWorkflows(root = ROOT) {
   ];
   let previous = -1;
   for (const expected of nativeSteps) {
-    const matches = apple.steps.filter((step) => step.id === expected.id);
-    assert.equal(matches.length, 1, `Exactly one required ${expected.id} step must execute`);
-    const step = matches[0];
+    const step = find(
+      apple,
+      (step) => step.id === expected.id,
+      `Exactly one required ${expected.id} step must execute`,
+    );
     assert.equal(step.run, expected.run, `${expected.id} must execute its exact native verifier`);
     assert(!Object.hasOwn(step, 'if'), `${expected.id} cannot conditionally skip native tests`);
     assert(
-      apple.steps.every((entry) => !Object.hasOwn(entry, 'continue-on-error')),
+      steps(apple).every((entry) => !Object.hasOwn(entry, 'continue-on-error')),
       'The native gate cannot swallow a compiler/test failure',
     );
-    const index = apple.steps.indexOf(step);
+    const index = steps(apple).indexOf(step);
     assert(index > previous, 'Native RPC verification must follow the existing Apple SDK gate');
     previous = index;
-    const uploads = apple.steps.filter(
+    const upload = find(
+      apple,
       (entry) =>
         entry.uses?.startsWith('actions/upload-artifact@') &&
-        entry.with?.name === `${expected.evidence}-evidence`,
+        entry.with?.name ===
+          `${expected.evidence}-evidence-\${{ github.run_id }}-\${{ github.run_attempt }}`,
+      `${expected.id} requires one retained evidence artifact`,
     );
-    assert.equal(uploads.length, 1, `${expected.id} requires one retained evidence artifact`);
-    const upload = uploads[0];
-    assert(apple.steps.indexOf(upload) > index, `${expected.id} evidence must follow execution`);
+    assert(steps(apple).indexOf(upload) > index, `${expected.id} evidence must follow execution`);
     assert.equal(upload.uses, 'actions/upload-artifact@v4');
     assert.equal(upload.if, 'always()', `${expected.id} failure evidence must be retained`);
     assert.equal(
@@ -3887,18 +4056,515 @@ export async function verifyWorkflows(root = ROOT) {
     assert.equal(upload.with['retention-days'], 14);
     assert.equal(upload.with['if-no-files-found'], 'warn');
   }
-  // Only an installed runner from this checkout may provide the native result.
-  for (const environment of [ci.env, apple.env, ...apple.steps.map((step) => step.env)]) {
+  for (const environment of [ci.env, apple.env, ...steps(apple).map((step) => step.env)])
     assert(
       !Object.hasOwn(environment || {}, 'KAIRO_RPC_REPO_ROOT'),
       'CI cannot redirect native RPC verification to another repository',
     );
+  const required = ci.jobs.required;
+  assert.equal(required.name, 'bunki / required');
+  assert.equal(required.if, 'always()', 'Required aggregate must always run');
+  needs(
+    required,
+    [
+      'plan',
+      'build',
+      'native',
+      'fast',
+      'fast-retry-plan',
+      'fast-retry',
+      'fast-signal',
+      'battery',
+      'retry-plan',
+      'retry',
+    ],
+    'Artifact publication must wait for every required job',
+  );
+  assert(
+    !required['continue-on-error'] && steps(required).every((step) => !step['continue-on-error']),
+    'Aggregate cannot turn a failure green',
+  );
+  assert(
+    has(required, aggregateCommand('all', 'retry-plan')) &&
+      has(required, aggregateCommand('all')) &&
+      has(required, ['if', '[', '$CI_SCOPE', '=', 'full', ']']),
+    'Aggregate must independently admit complete planned evidence and actual jobs',
+  );
+  assert(has(required, jobsQuery), 'Aggregate must read this exact attempt from GitHub');
+  const aggregateStep = find(
+    required,
+    (step) => step.id === 'aggregate',
+    'Exactly one aggregate admission',
+  );
+  assert.equal(
+    aggregateStep.if,
+    'always()',
+    'Aggregate admission must always attempt failure diagnostics',
+  );
+  assert.deepEqual(
+    workflowShellCommands(aggregateStep.run),
+    [
+      ['if', '[', '$CI_SCOPE', '=', 'full', ']'],
+      aggregateCommand('all', 'retry-plan'),
+      aggregateCommand('all'),
+    ],
+    'Aggregate must execute the exact full/docs command branches',
+  );
+  const receiptDownload = find(
+    required,
+    (step) => step.with?.pattern === 'bunki-shard-*-${{ github.run_id }}-${{ github.run_attempt }}',
+    'Aggregate requires all current shard receipts',
+  );
+  assert(receiptDownload.if === 'always()', 'Aggregate receipt download cannot conditionally skip');
+  const proof = find(
+    required,
+    (step) => step.with?.name === 'bunki-proof-${{ needs.plan.outputs.tree }}',
+    'Exactly one full proof artifact',
+  );
+  assert.equal(
+    proof.if,
+    "success() && needs.plan.outputs.scope == 'full'",
+    'Docs receipt cannot become full proof',
+  );
+  assert.equal(proof.with.path, '${{ runner.temp }}/proof/receipt.json');
+  for (const [id, job] of Object.entries(ci.jobs)) {
+    assert(!job['continue-on-error'], `${id} job cannot swallow failure`);
+    for (const step of steps(job))
+      if (step['continue-on-error'])
+        assert(
+          ['fast', 'battery'].includes(id) &&
+            step.id === 'gates' &&
+            step['continue-on-error'] === true,
+          'Only first gate execution may capture failure for one fresh-runner retry',
+        );
   }
+  for (const id of ['fast', 'battery', 'fast-retry', 'retry']) {
+    const job = ci.jobs[id];
+    assert.equal(job.strategy['fail-fast'], false, `${id} matrix must retain all shards`);
+    assert.equal(job['runs-on'], 'ubuntu-latest');
+    assert.equal(
+      job.name,
+      `${['fast', 'battery'].includes(id) ? 'battery' : 'retry'} / \${{ matrix.shard }}`,
+    );
+    const matrices = {
+      fast: '${{ fromJSON(needs.plan.outputs.fast-matrix) }}',
+      battery: '${{ fromJSON(needs.plan.outputs.matrix) }}',
+      'fast-retry': '${{ fromJSON(needs.fast-retry-plan.outputs.matrix) }}',
+      retry: '${{ fromJSON(needs.retry-plan.outputs.matrix) }}',
+    };
+    assert.equal(job.strategy.matrix, matrices[id], 'Matrix must execute complete checked-in plan');
+    const run = find(job, (step) => step.id === 'gates', 'Exactly one shard execution');
+    assert(!Object.hasOwn(run, 'if'), 'Required shard execution cannot conditionally skip');
+    assert(
+      has(
+        { steps: [run] },
+        node(
+          'scripts/ci/battery.mjs',
+          'run',
+          '--plan',
+          input('plan'),
+          '--shard',
+          '$SHARD',
+          '--artifact',
+          input('artifact'),
+          '--site',
+          '$RUNNER_TEMP/site',
+          ...(['fast-retry', 'retry'].includes(id)
+            ? ['--retry-plan', input(id === 'retry' ? 'retry-plan' : 'fast-retry-plan')]
+            : []),
+          '--out',
+          '$RUNNER_TEMP/evidence',
+        ),
+      ),
+      'Shard must execute canonical artifact-bound gates',
+    );
+    if (['fast', 'battery'].includes(id))
+      assert.equal(
+        run['continue-on-error'],
+        true,
+        'Initial gate results must be retained for the one-retry protocol',
+      );
+    assert(has(job, archiveDownload), 'Shard must verify immutable artifact ID and archive digest');
+    assert.equal(
+      workflowShellCommands(run.run).length,
+      1,
+      'Shard gate execution must be a direct executable command',
+    );
+    const download = find(
+      job,
+      (step) => has({ steps: [step] }, archiveDownload),
+      'Exactly one immutable site download',
+    );
+    assert.equal(
+      workflowShellCommands(download.run).length,
+      1,
+      'Artifact download must be a direct executable command',
+    );
+    assert.equal(
+      download.env.SITE_ID,
+      '${{ needs.build.outputs.site-id }}',
+      'Shard must consume the admitted build artifact ID',
+    );
+    assert.equal(
+      download.env.SITE_DIGEST,
+      '${{ needs.build.outputs.site-digest }}',
+      'Shard must consume the admitted archive digest',
+    );
+    assert(
+      has(job, ['tar', '-czf', '$RUNNER_TEMP/evidence.tar.gz', '-C', '$RUNNER_TEMP', 'evidence']),
+      'Bulk evidence must be compressed before upload',
+    );
+    assert(
+      steps(job).some(
+        (step) =>
+          step.with?.path === '${{ runner.temp }}/evidence/shard.json' &&
+          step.if === 'always()' &&
+          step.with['if-no-files-found'] === 'error',
+      ),
+      'Every shard must retain a current complete receipt',
+    );
+  }
+  needs(ci.jobs.battery, ['plan', 'build'], 'Shards require plan and exact build');
+  needs(
+    ci.jobs.fast,
+    ['plan', 'build'],
+    'Fast shards must start without slow or native dependencies',
+  );
+  assert(!Object.hasOwn(ci.jobs.fast, 'if'), 'Fast shards cannot skip on any selected scope');
+  assert.equal(
+    ci.jobs.battery.if,
+    "needs.plan.outputs.has-battery == 'true'",
+    'Slow shards must run exactly when planned',
+  );
+  for (const [id, phase, initial] of [
+    ['fast-retry-plan', 'fast', 'fast'],
+    ['retry-plan', 'battery', 'battery'],
+  ]) {
+    needs(
+      ci.jobs[id],
+      ['plan', 'build', initial],
+      'Phase retry planning must not wait for the other phase',
+    );
+    assert(
+      has(ci.jobs[id], retryCommand(phase, id)),
+      'Each retry planner must independently admit exactly its phase',
+    );
+  }
+  needs(
+    ci.jobs['fast-retry'],
+    ['plan', 'build', 'fast-retry-plan'],
+    'Fast retries must start without slow or native dependencies',
+  );
+  assert.equal(
+    ci.jobs['fast-retry'].if,
+    "always() && needs.fast-retry-plan.result == 'success' && needs.fast-retry-plan.outputs.has-retries == 'true'",
+    'Fast retry requires one admitted failure plan',
+  );
+  const early = ci.jobs['fast-signal'];
+  assert(early, 'A decisive fast aggregate is required');
+  assert.equal(
+    early.name,
+    'bunki / fast',
+    'First trustworthy signal must be an explicit fast aggregate',
+  );
+  assert.equal(early.if, 'always()', 'Fast aggregate must always report');
+  needs(
+    early,
+    ['plan', 'build', 'fast', 'fast-retry-plan', 'fast-retry'],
+    'Fast aggregate cannot wait for slow or native completion',
+  );
+  const earlyAdmission = find(
+    early,
+    (step) => step.id === 'aggregate',
+    'Exactly one fast aggregate admission',
+  );
+  assert.equal(earlyAdmission.if, 'always()', 'Fast admission must always attempt diagnostics');
+  assert(
+    has({ steps: [earlyAdmission] }, aggregateCommand('fast', 'fast-retry-plan')),
+    'Fast admission must validate only the complete fast phase',
+  );
+  assert(
+    !steps(early).some((step) => step.with?.name?.startsWith('bunki-proof-')),
+    'A partial fast signal cannot publish full proof',
+  );
+  assert.deepEqual(
+    workflowShellCommands(earlyAdmission.run),
+    [aggregateCommand('fast', 'fast-retry-plan')],
+    'Fast admission must be a direct executable command',
+  );
+  const fastDownload = find(
+    early,
+    (step) =>
+      step.with?.pattern === 'bunki-shard-fast-*-${{ github.run_id }}-${{ github.run_attempt }}',
+    'Fast signal must consume all and only current fast receipts',
+  );
+  assert.equal(
+    fastDownload.if,
+    'always()',
+    'Fast receipt collection must survive preceding failures',
+  );
+  assert(
+    has(required, ['test', '$FAST_RESULT', '=', 'success']),
+    'Final admission must require decisive fast success',
+  );
+  assert.equal(
+    ci.jobs.plan.outputs['fast-matrix'],
+    '${{ steps.plan.outputs.fast-matrix }}',
+    'Fast matrix must derive from the same immutable plan',
+  );
+  assert.equal(
+    ci.jobs.plan.outputs['has-battery'],
+    '${{ steps.plan.outputs.has-battery }}',
+    'Slow scope must derive from the same immutable plan',
+  );
+
+  needs(
+    ci.jobs.retry,
+    ['plan', 'build', 'retry-plan'],
+    'Retry requires a fresh runner and admitted failure plan',
+  );
+  assert.equal(
+    ci.jobs.retry.if,
+    "always() && needs.retry-plan.result == 'success' && needs.retry-plan.outputs.has-retries == 'true'",
+    'Retry may execute only one admitted retry plan',
+  );
+  assert(
+    has(
+      ci.jobs.retry,
+      node(
+        'scripts/ci/battery.mjs',
+        'run',
+        '--plan',
+        input('plan'),
+        '--shard',
+        '$SHARD',
+        '--artifact',
+        input('artifact'),
+        '--site',
+        '$RUNNER_TEMP/site',
+        '--retry-plan',
+        input('retry-plan'),
+        '--out',
+        '$RUNNER_TEMP/evidence',
+      ),
+    ),
+    'Retry must select exactly planned failed gates',
+  );
+  assert(
+    has(ci.jobs['retry-plan'], retryCommand('battery', 'retry-plan')) &&
+      has(ci.jobs['retry-plan'], jobsQuery),
+    'Retry planning must independently reject cancelled or incomplete first jobs',
+  );
+  const fallbackSummary = find(
+    required,
+    (step) =>
+      step.name === 'Retain infrastructure summary even when setup or evidence was unavailable',
+    'Required job needs an infrastructure summary fallback',
+  );
+  assert.equal(
+    fallbackSummary.if,
+    "always() && steps.aggregate.outcome != 'success'",
+    'Infrastructure summary must survive failed setup and missing evidence',
+  );
+  assert(
+    has(ci.jobs['retry-plan'], retryCommand('battery', 'retry-plan')),
+    'Retry plan derives complete first receipts',
+  );
+  const build = ci.jobs.build;
+  assert(
+    !build.if && !build.needs,
+    'Build starts independently and cannot skip required packaging',
+  );
+  assert.equal(
+    matching(build, node('scripts/build-corridor-site.mjs', '--out', '$KAIRO_SITE_DIR')).length,
+    1,
+    'Canonical artifact must be built exactly once',
+  );
+  assert(
+    has(build, ['bash', 'scripts/ci/smoke.sh']),
+    'Every packaged smoke obligation must execute',
+  );
+  assert.equal(
+    matching(
+      build,
+      node(
+        'scripts/verify-release-gates.mjs',
+        '--verify-artifact',
+        '$KAIRO_SITE_DIR',
+        '--require-clean',
+      ),
+    ).length,
+    2,
+    'Build must verify artifact before and after packaged smoke',
+  );
+  for (const step of steps(build).filter((step) =>
+    workflowShellCommands(step.run || '').some(
+      (argv) =>
+        argv[1] === 'scripts/build-corridor-site.mjs' ||
+        argv[1] === 'scripts/verify-release-gates.mjs' ||
+        argv[1] === 'scripts/ci/smoke.sh',
+    ),
+  ))
+    assert(
+      !Object.hasOwn(step, 'if'),
+      'Required build and smoke assertions cannot conditionally skip',
+    );
+  const builder = node('scripts/build-corridor-site.mjs', '--out', '$KAIRO_SITE_DIR');
+  const verifier = node(
+    'scripts/verify-release-gates.mjs',
+    '--verify-artifact',
+    '$KAIRO_SITE_DIR',
+    '--require-clean',
+  );
+  const smoke = ['bash', 'scripts/ci/smoke.sh'];
+  assert.deepEqual(
+    commands(build).filter((argv) => [builder[1], verifier[1], smoke[1]].includes(argv[1])),
+    [builder, verifier, smoke, verifier],
+    'Build must execute assembly, pre-smoke verification, smoke and final verification in order',
+  );
+  for (const step of steps(build).filter((step) =>
+    workflowShellCommands(step.run || '').some((argv) =>
+      [builder[1], verifier[1], smoke[1]].includes(argv[1]),
+    ),
+  ))
+    assert(
+      !workflowShellCommands(step.run).some((argv) => ['if', 'for', 'while'].includes(argv[0])),
+      'Required build commands cannot hide behind shell guards',
+    );
+  const site = find(build, (step) => step.id === 'site', 'Exactly one immutable site upload');
+  assert.equal(site.with.name, 'bunki-site-${{ github.run_id }}-${{ github.run_attempt }}');
+  assert.equal(site.with.path, '${{ runner.temp }}/site-package/site.tar');
+  assert(
+    has(build, ['tar', '-cf', '$RUNNER_TEMP/site-package/site.tar', '-C', '$KAIRO_SITE_DIR', '.']),
+    'Upload must preserve complete original site bytes',
+  );
+  assert.equal(ci.on.workflow_call.outputs['site-id'].value, '${{ jobs.build.outputs.site-id }}');
+  assert.equal(
+    ci.on.workflow_call.outputs['site-digest'].value,
+    '${{ jobs.build.outputs.site-digest }}',
+  );
+  assert.equal(nightly.jobs['full-battery'].uses, './.github/workflows/ci.yml');
+  assert(!nightly.on.push, 'Nightly must not retain a stale branch trigger');
   assert.equal(pages.jobs.verify.uses, './.github/workflows/ci.yml');
-  assert.equal(pages.jobs.deploy.needs, 'verify');
+  assert.equal(
+    pages.jobs.verify.if,
+    "always() && (needs.lookup.result != 'success' || needs.lookup.outputs.matched != 'true')",
+    'Absent or invalid proof requires full CI',
+  );
+  assert(
+    has(
+      pages.jobs.lookup,
+      node(
+        'scripts/ci/receipts.mjs',
+        'lookup',
+        '--plan',
+        '$RUNNER_TEMP/plan.json',
+        '--out',
+        '$RUNNER_TEMP/reuse',
+      ),
+    ) &&
+      has(
+        pages.jobs.lookup,
+        node(
+          'scripts/ci/receipts.mjs',
+          'verify-transfer',
+          '--transfer',
+          '$RUNNER_TEMP/reuse/transfer.json',
+        ),
+      ),
+    'Reuse requires producer admission and exact-tree transfer validation',
+  );
+  const producer = find(
+    pages.jobs.lookup,
+    (step) => step.name === 'Check out the independently admitted original producer',
+    'Exactly one admitted producer checkout',
+  );
+  assert.equal(
+    producer.with.ref,
+    '${{ steps.lookup.outputs.producer_sha }}',
+    'Reuse must verify original producer source',
+  );
+  assert.equal(
+    pages.jobs.lookup.permissions?.pages,
+    undefined,
+    'Producer checkout has no publication authority',
+  );
+  const reuseUpload = find(
+    pages.jobs.lookup,
+    (step) => step.uses?.startsWith('actions/upload-pages-artifact@'),
+    'Exactly one reused Pages artifact',
+  );
+  assert.equal(
+    reuseUpload.if,
+    "success() && steps.transfer.outputs.verified == 'true' && github.ref == 'refs/heads/main'",
+    'Only successful main tree transfer can package reused bytes',
+  );
+  assert.equal(
+    reuseUpload.with.path,
+    '${{ steps.transfer.outputs.site_dir }}',
+    'Reuse must package the exact admitted site',
+  );
+  const transferEvidence = find(
+    pages.jobs.lookup,
+    (step) =>
+      step.uses?.startsWith('actions/upload-artifact@') &&
+      step.with?.name === 'bunki-transfer-${{ github.run_id }}-${{ github.run_attempt }}',
+    'Exactly one retained transfer evidence upload',
+  );
+  const lookupSteps = steps(pages.jobs.lookup);
+  assert(
+    lookupSteps.at(-1) === reuseUpload &&
+      lookupSteps.indexOf(transferEvidence) < lookupSteps.indexOf(reuseUpload),
+    'Reused Pages packaging must be the final lookup step, after transfer evidence retention',
+  );
+  const freshUpload = find(
+    pages.jobs.package,
+    (step) => step.uses?.startsWith('actions/upload-pages-artifact@'),
+    'Exactly one fresh Pages artifact',
+  );
+  assert.equal(
+    pages.jobs.package.if,
+    "always() && needs.verify.result == 'success' && github.ref == 'refs/heads/main'",
+  );
+  assert(
+    has(
+      pages.jobs.package,
+      node(
+        'scripts/ci/receipts.mjs',
+        'download-site',
+        '--id',
+        '$SITE_ID',
+        '--run-id',
+        '$GITHUB_RUN_ID',
+        '--digest',
+        '$SITE_DIGEST',
+        '--temp',
+        '$RUNNER_TEMP/download',
+        '--out',
+        '$RUNNER_TEMP/site',
+      ),
+    ) &&
+      has(
+        pages.jobs.package,
+        node(
+          'scripts/verify-release-gates.mjs',
+          '--verify-artifact',
+          '$RUNNER_TEMP/site',
+          '--require-clean',
+        ),
+      ),
+    'Fresh publication must reverify admitted original bytes',
+  );
+  assert.equal(freshUpload.with.path, '${{ runner.temp }}/site');
+  needs(
+    pages.jobs.deploy,
+    ['lookup', 'verify', 'package'],
+    'Deploy must wait for either verified transfer or full CI packaging',
+  );
   assert.equal(
     pages.jobs.deploy.if,
-    "github.ref == 'refs/heads/main' && needs.verify.result == 'success'",
+    "always() && github.ref == 'refs/heads/main' && ((needs.lookup.result == 'success' && needs.lookup.outputs.matched == 'true') || (needs.verify.result == 'success' && needs.package.result == 'success'))",
+    'Deploy must enforce main-only successful proof',
   );
   assert.deepEqual(pages.on.push.branches, ['main']);
   assert(!Object.hasOwn(pages.on, 'pull_request'));
@@ -3909,47 +4575,46 @@ export async function verifyWorkflows(root = ROOT) {
   assert.equal(pages.jobs.deploy.environment.name, 'github-pages');
   assert.equal(pages.jobs.deploy.permissions.pages, 'write');
   assert.equal(pages.jobs.deploy.permissions['id-token'], 'write');
-  const steps = ci.jobs.checks.steps;
-  const battery = steps.findIndex((step) => step.id === 'battery');
-  const artifact = steps.findIndex((step) =>
-    step.uses?.startsWith('actions/upload-pages-artifact@'),
+  const deployment = find(
+    pages.jobs.deploy,
+    (step) => step.uses?.startsWith('actions/deploy-pages@'),
+    'Exactly one Pages deployment',
   );
-  assert(battery >= 0 && artifact > battery);
-  assert.equal(
-    steps[battery].run,
-    'exec bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"',
-  );
-  assert.equal(steps[artifact].with.path, '${{ env.KAIRO_SITE_DIR }}');
-  for (const step of steps.slice(0, artifact + 1))
-    assert(!step['continue-on-error'], `${step.name || step.id} cannot turn a failure green`);
-  assert.equal(
-    steps[artifact].if,
-    "success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'",
-  );
-  const deployment = pages.jobs.deploy.steps.find((step) =>
-    step.uses?.startsWith('actions/deploy-pages@'),
-  );
-  assert.equal(deployment.with.artifact_name, steps[artifact].with.name);
+  assert.equal(deployment.with.artifact_name, reuseUpload.with.name);
+  assert.equal(deployment.with.artifact_name, freshUpload.with.name);
   assert(
-    pages.jobs.deploy.steps.every((step) => !step.run && !step['continue-on-error']),
-    'Deploy consumes the verified artifact without rebuilding or swallowing failure',
+    steps(pages.jobs.deploy).every((step) => !step.run && !step['continue-on-error']),
+    'Deploy consumes verified bytes without rebuilding or swallowing failure',
   );
+  for (const [id, job] of Object.entries(pages.jobs)) {
+    assert(
+      !job['continue-on-error'] && steps(job).every((step) => !step['continue-on-error']),
+      `${id} promotion cannot swallow failure`,
+    );
+    assert(
+      !commands(job).some(
+        (argv) => argv[1] === 'scripts/build-corridor-site.mjs' || argv.includes('bunki:web:build'),
+      ),
+      'No rebuild between proof and publication',
+    );
+  }
   for (const name of ['pages-preview.yml', 'bunki-v11.yml']) {
     const legacy = workflow(name);
     assert.deepEqual(legacy.permissions, { contents: 'read' }, `${name} must be read-only`);
     for (const job of Object.values(legacy.jobs)) {
       assert(!job.environment, `${name} must not create a production deployment record`);
-      for (const step of job.steps)
+      for (const step of steps(job))
         assert(!step.uses?.includes('pages@') && !step.uses?.includes('pages-artifact@'));
     }
   }
   return [
-    'YAML 1.2 parsed without duplicate keys',
-    'native Apple SDK and RPC interop gates precede the tested artifact job and retain failure evidence',
-    'required battery precedes artifact upload',
-    'same artifact name and build/test/deploy dependency',
-    'main-only deployment with required permissions',
-    'legacy jobs cannot publish or create production environments',
+    'YAML parsed without duplicate keys',
+    'parallel native SDK and RPC execution retain exact commands and evidence',
+    'complete non-fail-fast plan and fresh-runner retry feed always-required admission',
+    'one packaged build and immutable artifact identity on every shard',
+    'full-only proof with exact-tree producer transfer or full verification fallback',
+    'main-only deployment of admitted unchanged bytes',
+    'legacy jobs remain read-only',
   ];
 }
 
@@ -3958,15 +4623,24 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
   const { parseDocument, stringify } = await import('yaml');
   const fixtures = join(out, 'workflow-fixtures');
   mkdirSync(fixtures);
-  const names = ['ci.yml', 'pages-app.yml', 'pages-preview.yml', 'bunki-v11.yml'];
+  const names = [
+    'ci.yml',
+    'pages-app.yml',
+    'pages-preview.yml',
+    'bunki-v11.yml',
+    'nightly-verify.yml',
+  ];
   const originals = Object.fromEntries(
     names.map((name) => [name, readFileSync(join(root, '.github/workflows', name), 'utf8')]),
   );
   const original = parseDocument(originals['ci.yml'], { uniqueKeys: true }).toJS();
-  const apple = (ci) => ci.jobs['apple-sync'];
+  const apple = (ci) => ci.jobs.native;
   const rpc = (ci) => apple(ci).steps.find((step) => step.id === 'native-rpc');
   const upload = (ci, id = 'native-rpc') =>
-    apple(ci).steps.find((step) => step.with?.name === `kairo-${id}-evidence`);
+    apple(ci).steps.find(
+      (step) =>
+        step.with?.name === `kairo-${id}-evidence-\${{ github.run_id }}-\${{ github.run_attempt }}`,
+    );
   const remove = (ci, predicate) => {
     apple(ci).steps = apple(ci).steps.filter((step) => !predicate(step));
   };
@@ -4014,14 +4688,14 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
       (ci) => {
         apple(ci).if = false;
       },
-      /apple-sync job cannot skip/,
+      /native job cannot skip/,
     ],
     [
       'swallowed-native-job',
       (ci) => {
         apple(ci)['continue-on-error'] = true;
       },
-      /apple-sync job cannot skip/,
+      /native job cannot skip/,
     ],
     [
       'linux-native-job',
@@ -4033,16 +4707,16 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
     [
       'missing-native-dependency',
       (ci) => {
-        delete ci.jobs.checks.needs;
+        ci.jobs.required.needs = ci.jobs.required.needs.filter((name) => name !== 'native');
       },
       /publication must wait/,
     ],
     [
-      'unconditional-product-job',
+      'success-only-required-job',
       (ci) => {
-        ci.jobs.checks.if = 'always()';
+        ci.jobs.required.if = 'success()';
       },
-      /checks job cannot skip/,
+      /must always run/,
     ],
     [
       'reversed-native-order',
@@ -4118,13 +4792,392 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
       /one retained evidence/,
     ],
   ];
+  cases.push(
+    [
+      'fail-fast-cancels-siblings',
+      (ci) => {
+        ci.jobs.battery.strategy['fail-fast'] = true;
+      },
+      /must retain all shards/,
+    ],
+    [
+      'partial-shard-matrix',
+      (ci) => {
+        ci.jobs.battery.strategy.matrix = { include: [{ shard: 'balanced-01' }] };
+      },
+      /complete checked-in plan/,
+    ],
+    [
+      'missing-build-dependency',
+      (ci) => {
+        ci.jobs.required.needs = ci.jobs.required.needs.filter((name) => name !== 'build');
+      },
+      /publication must wait/,
+    ],
+    [
+      'missing-fast-and-slow-dependency',
+      (ci) => {
+        ci.jobs.required.needs = ci.jobs.required.needs.filter((name) => name !== 'battery');
+      },
+      /publication must wait/,
+    ],
+    [
+      'missing-retry-dependency',
+      (ci) => {
+        ci.jobs.required.needs = ci.jobs.required.needs.filter((name) => name !== 'retry');
+      },
+      /publication must wait/,
+    ],
+    [
+      'success-only-aggregate',
+      (ci) => {
+        ci.jobs.required.if = 'success()';
+      },
+      /must always run/,
+    ],
+    [
+      'swallowed-aggregate',
+      (ci) => {
+        ci.jobs.required.steps.find((step) => step.id === 'aggregate')['continue-on-error'] = true;
+      },
+      /Aggregate cannot/,
+    ],
+    [
+      'docs-proof-promotion',
+      (ci) => {
+        ci.jobs.required.steps.find((step) => step.with?.name?.startsWith('bunki-proof')).if =
+          'success()';
+      },
+      /Docs receipt/,
+    ],
+    [
+      'wrong-artifact-id',
+      (ci) => {
+        ci.jobs.battery.steps.find((step) => step.env?.SITE_ID).env.SITE_ID = '123';
+      },
+      /admitted build artifact ID/,
+    ],
+    [
+      'wrong-archive-digest',
+      (ci) => {
+        ci.jobs.retry.steps.find((step) => step.env?.SITE_DIGEST).env.SITE_DIGEST = 'sha256:wrong';
+      },
+      /admitted archive digest/,
+    ],
+    [
+      'stale-job-attempt',
+      (ci) => {
+        const step = ci.jobs.required.steps.find((step) => step.run?.includes('gh api'));
+        step.run = step.run.replace('/attempts/$GITHUB_RUN_ATTEMPT', '');
+      },
+      /exact attempt/,
+    ],
+    [
+      'swallowed-second-failure',
+      (ci) => {
+        ci.jobs.retry.steps.find((step) => step.id === 'gates')['continue-on-error'] = true;
+      },
+      /Only first gate/,
+    ],
+    [
+      'missing-smoke',
+      (ci) => {
+        ci.jobs.build.steps = ci.jobs.build.steps.filter(
+          (step) => step.run !== 'bash scripts/ci/smoke.sh',
+        );
+      },
+      /packaged smoke/,
+    ],
+    [
+      'missing-byte-recheck',
+      (ci) => {
+        const step = ci.jobs.build.steps.find(
+          (step) => step.name === 'Seal the exact packaged bytes',
+        );
+        step.run = step.run
+          .split('\n')
+          .filter((line) => !line.includes('--verify-artifact'))
+          .join('\n');
+      },
+      /before and after/,
+    ],
+    [
+      'swallowed-download',
+      (ci) => {
+        ci.jobs.battery.steps.find((step) => step.env?.SITE_ID)['continue-on-error'] = true;
+      },
+      /Only first gate/,
+    ],
+  );
+  cases.push(
+    [
+      'conditional-aggregate-admission',
+      (ci) => {
+        ci.jobs.required.steps.find((step) => step.id === 'aggregate').if = false;
+      },
+      /must always attempt/,
+    ],
+    [
+      'missing-receipt-download',
+      (ci) => {
+        ci.jobs.required.steps = ci.jobs.required.steps.filter((step) => !step.with?.pattern);
+      },
+      /all current shard receipts/,
+    ],
+    [
+      'conditional-packaged-smoke',
+      (ci) => {
+        ci.jobs.build.steps.find((step) => step.run === 'bash scripts/ci/smoke.sh').if = false;
+      },
+      /cannot conditionally skip/,
+    ],
+    [
+      'conditional-shard-execution',
+      (ci) => {
+        ci.jobs.battery.steps.find((step) => step.id === 'gates').if = false;
+      },
+      /cannot conditionally skip/,
+    ],
+  );
+  cases.push(
+    [
+      'fast-waits-for-slow',
+      (ci) => {
+        ci.jobs.fast.needs.push('battery');
+      },
+      /without slow or native dependencies/,
+    ],
+    [
+      'fast-signal-waits-for-native',
+      (ci) => {
+        ci.jobs['fast-signal'].needs.push('native');
+      },
+      /cannot wait for slow or native/,
+    ],
+    [
+      'fast-retry-plan-waits-for-slow',
+      (ci) => {
+        ci.jobs['fast-retry-plan'].needs.push('battery');
+      },
+      /must not wait for the other phase/,
+    ],
+    [
+      'partial-fast-matrix',
+      (ci) => {
+        ci.jobs.fast.strategy.matrix = '${{ fromJSON(needs.plan.outputs.matrix) }}';
+      },
+      /complete checked-in plan/,
+    ],
+    [
+      'fast-fail-fast',
+      (ci) => {
+        ci.jobs.fast.strategy['fail-fast'] = true;
+      },
+      /must retain all shards/,
+    ],
+    [
+      'conditional-fast-scope',
+      (ci) => {
+        ci.jobs.fast.if = false;
+      },
+      /cannot skip on any selected scope/,
+    ],
+    [
+      'success-only-fast-signal',
+      (ci) => {
+        ci.jobs['fast-signal'].if = 'success()';
+      },
+      /must always report/,
+    ],
+    [
+      'partial-fast-publishes-proof',
+      (ci) => {
+        ci.jobs['fast-signal'].steps.push({
+          uses: 'actions/upload-artifact@v4',
+          with: { name: 'bunki-proof-counterfeit' },
+        });
+      },
+      /partial fast signal cannot/,
+    ],
+    [
+      'fast-admission-claims-all',
+      (ci) => {
+        const step = ci.jobs['fast-signal'].steps.find((step) => step.id === 'aggregate');
+        step.run = step.run.replace('--phase fast', '--phase all');
+      },
+      /complete fast phase/,
+    ],
+    [
+      'missing-decisive-fast-dependency',
+      (ci) => {
+        ci.jobs.required.needs = ci.jobs.required.needs.filter((name) => name !== 'fast-signal');
+      },
+      /publication must wait/,
+    ],
+    [
+      'retry-crosses-phase',
+      (ci) => {
+        const step = ci.jobs['fast-retry-plan'].steps.find((step) => step.id === 'retry');
+        step.run = step.run.replace('--phase fast', '--phase battery');
+      },
+      /exactly its phase/,
+    ],
+    [
+      'final-omits-fast-retry-plan',
+      (ci) => {
+        const step = ci.jobs.required.steps.find((step) => step.id === 'aggregate');
+        step.run = step.run.replace('--fast-retry-plan', '--omitted-fast-plan');
+      },
+      /complete planned evidence/,
+    ],
+  );
+  cases.push(
+    [
+      'commented-shard-command',
+      (ci) => {
+        const step = ci.jobs.fast.steps.find((step) => step.id === 'gates');
+        step.run = '# ' + step.run;
+      },
+      /canonical artifact-bound gates/,
+    ],
+    [
+      'wrong-shard-site-argument',
+      (ci) => {
+        const step = ci.jobs.battery.steps.find((step) => step.id === 'gates');
+        step.run = step.run.replace('"$RUNNER_TEMP/site"', '"$RUNNER_TEMP/wrong-site"');
+      },
+      /canonical artifact-bound gates/,
+    ],
+    [
+      'heredoc-is-not-shard-execution',
+      (ci) => {
+        const step = ci.jobs.fast.steps.find((step) => step.id === 'gates');
+        step.run = "cat <<'DEAD'\n" + step.run + '\nDEAD';
+      },
+      /canonical artifact-bound gates/,
+    ],
+    [
+      'conditional-shell-shard-command',
+      (ci) => {
+        const step = ci.jobs.fast.steps.find((step) => step.id === 'gates');
+        step.run = 'if false; then ' + step.run + '; fi';
+      },
+      /direct executable command/,
+    ],
+    [
+      'commented-build-command',
+      (ci) => {
+        const step = ci.jobs.build.steps.find(
+          (step) => step.name === 'Build once and verify source identity',
+        );
+        step.run = step.run.replace(
+          'node scripts/build-corridor-site.mjs',
+          '# node scripts/build-corridor-site.mjs',
+        );
+      },
+      /built exactly once/,
+    ],
+    [
+      'wrong-builder-output-argument',
+      (ci) => {
+        const step = ci.jobs.build.steps.find(
+          (step) => step.name === 'Build once and verify source identity',
+        );
+        step.run = step.run.replace('--out "$KAIRO_SITE_DIR"', '--out wrong-site');
+      },
+      /built exactly once/,
+    ],
+    [
+      'commented-smoke-command',
+      (ci) => {
+        ci.jobs.build.steps.find((step) => step.run === 'bash scripts/ci/smoke.sh').run =
+          '# bash scripts/ci/smoke.sh';
+      },
+      /packaged smoke obligation/,
+    ],
+    [
+      'swallowed-smoke-shell-failure',
+      (ci) => {
+        ci.jobs.build.steps.find((step) => step.run === 'bash scripts/ci/smoke.sh').run +=
+          ' || true';
+      },
+      /cannot swallow shell failure/,
+    ],
+    [
+      'commented-retry-command',
+      (ci) => {
+        const step = ci.jobs['fast-retry-plan'].steps.find((step) => step.id === 'retry');
+        step.run = '# ' + step.run;
+      },
+      /exactly its phase/,
+    ],
+    [
+      'wrong-retry-plan-argument',
+      (ci) => {
+        const step = ci.jobs['fast-retry-plan'].steps.find((step) => step.id === 'retry');
+        step.run = step.run.replace('"$RUNNER_TEMP/inputs/plan.json"', 'wrong-plan.json');
+      },
+      /exactly its phase/,
+    ],
+    [
+      'commented-aggregate-command',
+      (ci) => {
+        const step = ci.jobs.required.steps.find((step) => step.id === 'aggregate');
+        step.run = step.run
+          .split('\n')
+          .map((line) => (line.includes('node scripts/ci/battery.mjs') ? '# ' + line : line))
+          .join('\n');
+      },
+      /complete planned evidence/,
+    ],
+    [
+      'wrong-aggregate-jobs-argument',
+      (ci) => {
+        const step = ci.jobs.required.steps.find((step) => step.id === 'aggregate');
+        step.run = step.run.replaceAll('--jobs "$RUNNER_TEMP/jobs.json"', '--jobs wrong-jobs.json');
+      },
+      /complete planned evidence/,
+    ],
+    [
+      'dead-synthetic-attempt-env',
+      (ci) => {
+        ci.jobs.fast.env.KAIRO_CI_GATE_ATTEMPT = 1;
+      },
+      /dead synthetic attempt/,
+    ],
+    [
+      'dead-fast-e2e-export',
+      (ci) => {
+        ci.jobs.fast.steps.push({
+          uses: 'actions/upload-artifact@v4',
+          with: { name: 'bunki-e2e-dead' },
+        });
+      },
+      /unreachable E2E export/,
+    ],
+  );
+  cases.push([
+    'single-quoted-variable-is-not-expanded',
+    (ci) => {
+      const step = ci.jobs.fast.steps.find((step) => step.id === 'gates');
+      step.run = step.run.replace('"$RUNNER_TEMP/site"', "'$RUNNER_TEMP/site'");
+    },
+    /canonical artifact-bound gates/,
+  ]);
   const results = [];
   const check = async (name, contents, expected) => {
     const fixture = join(fixtures, name);
     const directory = join(fixture, '.github/workflows');
     mkdirSync(directory, { recursive: true });
     for (const file of names)
-      writeFileSync(join(directory, file), file === 'ci.yml' ? contents : originals[file]);
+      writeFileSync(
+        join(directory, file),
+        typeof contents === 'string'
+          ? file === 'ci.yml'
+            ? contents
+            : originals[file]
+          : contents[file] || originals[file],
+      );
     if (!expected) {
       const checks = await verifyWorkflows(fixture);
       results.push({ name, status: 'accepted', checks });
@@ -4141,10 +5194,132 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
     results.push({ name, status: 'rejected', diagnostic: rejection.message });
   };
   await check('complete-native-ci-chain', originals['ci.yml']);
+  const normalized = globalThis.structuredClone(original);
+  normalized.jobs.build.steps.find((step) => step.run === 'bash scripts/ci/smoke.sh').run =
+    '# Command documentation is not execution.\nbash   "scripts/ci/smoke.sh" # retained obligation';
+  await check('normalized-quoting-and-comments', stringify(normalized));
+
   for (const [name, mutate, expected] of cases) {
     const ci = globalThis.structuredClone(original);
     mutate(ci);
     await check(name, stringify(ci), expected);
+  }
+  const pageCases = [
+    [
+      'commented-producer-transfer',
+      (pages) => {
+        const step = pages.jobs.lookup.steps.find((step) => step.id === 'transfer');
+        step.run = '# ' + step.run;
+      },
+      /exact-tree transfer/,
+    ],
+    [
+      'wrong-transfer-argument',
+      (pages) => {
+        const step = pages.jobs.lookup.steps.find((step) => step.id === 'transfer');
+        step.run = step.run.replace('"$RUNNER_TEMP/reuse/transfer.json"', 'wrong-transfer.json');
+      },
+      /exact-tree transfer/,
+    ],
+    [
+      'main-pages-concurrency-changed',
+      (pages) => {
+        pages.concurrency.group = 'kairo-pages-renamed';
+      },
+      /main concurrency must stay/,
+    ],
+    [
+      'test-pages-concurrency-collides',
+      (pages) => {
+        pages.concurrency.group = 'kairo-pages';
+      },
+      /test refs remain isolated/,
+    ],
+    [
+      'pages-cancels-live-publisher',
+      (pages) => {
+        pages.concurrency['cancel-in-progress'] = true;
+      },
+      /never cancel a live publisher/,
+    ],
+    [
+      'unrestricted-deploy',
+      (pages) => {
+        pages.jobs.deploy.if = 'always()';
+      },
+      /main-only successful proof/,
+    ],
+    [
+      'reuse-without-transfer',
+      (pages) => {
+        pages.jobs.lookup.steps = pages.jobs.lookup.steps.filter((step) => step.id !== 'transfer');
+      },
+      /exact-tree transfer/,
+    ],
+    [
+      'wrong-producer-checkout',
+      (pages) => {
+        pages.jobs.lookup.steps.find(
+          (step) => step.name === 'Check out the independently admitted original producer',
+        ).with.ref = 'main';
+      },
+      /original producer source/,
+    ],
+    [
+      'wrong-reused-site',
+      (pages) => {
+        pages.jobs.lookup.steps.find((step) =>
+          step.uses?.startsWith('actions/upload-pages-artifact'),
+        ).with.path = 'prototypes/corridor';
+      },
+      /exact admitted site/,
+    ],
+    [
+      'pages-upload-before-transfer-evidence',
+      (pages) => {
+        const upload = pages.jobs.lookup.steps.findIndex((step) =>
+          step.uses?.startsWith('actions/upload-pages-artifact'),
+        );
+        const [packaged] = pages.jobs.lookup.steps.splice(upload, 1);
+        pages.jobs.lookup.steps.splice(upload - 1, 0, packaged);
+      },
+      /final lookup step/,
+    ],
+    [
+      'swallowed-promotion',
+      (pages) => {
+        pages.jobs.deploy.steps[0]['continue-on-error'] = true;
+      },
+      /without rebuilding or swallowing/,
+    ],
+    [
+      'rebuild-before-deploy',
+      (pages) => {
+        pages.jobs.package.steps.unshift({
+          run: 'node scripts/build-corridor-site.mjs --out site',
+        });
+      },
+      /No rebuild/,
+    ],
+    [
+      'proof-miss-bypasses-full',
+      (pages) => {
+        pages.jobs.verify.if = "needs.lookup.outputs.matched == 'true'";
+      },
+      /requires full CI/,
+    ],
+    [
+      'missing-fresh-package-dependency',
+      (pages) => {
+        pages.jobs.deploy.needs = ['lookup', 'verify'];
+      },
+      /verified transfer or full CI packaging/,
+    ],
+  ];
+  for (const [name, mutate, expected] of pageCases) {
+    const pages = parseDocument(originals['pages-app.yml'], { uniqueKeys: true }).toJS();
+    mutate(pages);
+    await check(name, { 'pages-app.yml': stringify(pages) }, expected);
   }
   await check('duplicate-yaml-key', originals['ci.yml'] + '\njobs: {}\n', /without duplicate keys/);
   writeJson(join(out, 'workflow-controls.json'), {
@@ -4153,7 +5328,7 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
     results,
   });
   return [
-    'native workflow admission accepts the full chain and rejects missing, skipped, swallowed, redirected or unretained native execution',
+    'workflow admission preserves all native controls and rejects incomplete DAGs, partial matrices, skipped assertions, unverified artifact transfer and weakened promotion',
   ];
 }
 
