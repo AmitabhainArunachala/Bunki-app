@@ -128,6 +128,8 @@ This is strong evidence of periodic account-level automation consistent with the
 
 The API establishes the actor account, timestamps and conclusions. It does **not** identify a bot installation, process, scheduler host or whether it remains active at collection. Cancelled overlapping attempts are consistent with CI's concurrency policy, but the API does not prove each cancellation's causal initiator. No account automation was modified.
 
+Interaction with the redesigned CI: every job now admits only its own attempt's plan, build and shard artifacts. A failed-jobs-only rerun, like the one noted above that reused the earlier native job, therefore always fails closed with missing-artifact errors. Gate failures already get one automatic fresh-runner retry inside each attempt; a manual rerun must use **Re-run all jobs**. If the automation keeps rerunning failed jobs only, each of its attempts will be red until John decides whether to change it.
+
 Raw evidence stays under `~/.dharma/bunki_review/2026-10-06/ci/`: run pages, job records, per-attempt JSON, five battery logs, diagnostics ZIPs and extracted receipts. The earlier full log stays at `~/.dharma/bunki_review/2026-10-06/battery-f938.log`. Acquisition used only `gh api`, `gh run view --log --job`, and artifact-download GETs against the authoritative repository.
 
 ## All 135 measured gates

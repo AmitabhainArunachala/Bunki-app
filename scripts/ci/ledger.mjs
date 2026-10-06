@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import { admitReceipt, createPlan, policyDigest } from './battery.mjs';
 import { validateFlake } from './import-flakes.mjs';
@@ -20,6 +20,27 @@ const POLICY_PATHS = [
   'docs/ci/gate-timings.json',
 ];
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
+const HOUR = 3600 * 1000;
+// Artifacts are retained 14 days; one extra day covers the attempt's own duration.
+const SCHEDULE_RETENTION = 15 * 24 * HOUR;
+/** Canonical same-repository callers of the one CI pipeline and their reusable-job prefixes. */
+export const PRODUCERS = [
+  { path: '.github/workflows/ci.yml', events: ['pull_request', 'workflow_dispatch'], prefix: '' },
+  {
+    path: '.github/workflows/pages-app.yml',
+    events: ['push', 'workflow_dispatch'],
+    prefix: 'verify / ',
+  },
+  {
+    path: '.github/workflows/nightly-verify.yml',
+    events: ['schedule', 'workflow_dispatch'],
+    prefix: 'full-battery / ',
+  },
+];
+class Unavailable extends Error {}
+const available = (condition, message) => {
+  if (!condition) throw new Unavailable(message);
+};
 const hash = (data) => createHash('sha256').update(data).digest('hex');
 const sha = (value) => assert.match(value || '', /^[a-f0-9]{40}$/);
 const endpoint = (suffix) => `repos/${REPOSITORY}/${suffix}`;
@@ -44,20 +65,24 @@ const stepName = (attempt) =>
     ? 'Run the exact planned gates and retain first failures'
     : 'Run the exact planned gates and record the second and final attempt';
 
-export function admitRun(run, workflowId) {
+export function admitRun(run, workflows) {
   assert.equal(run.repository?.full_name, REPOSITORY);
   assert.equal(run.head_repository?.full_name, REPOSITORY, 'Fork observations are not admitted');
-  assert.equal(run.workflow_id, workflowId);
-  assert.equal(run.path, '.github/workflows/ci.yml');
-  assert(['pull_request', 'workflow_dispatch'].includes(run.event));
-  assert.equal(run.status, 'completed');
+  const producer = PRODUCERS.find((p) => p.path === run.path);
+  assert(producer, 'Unexpected producer workflow');
+  assert(Number.isSafeInteger(run.workflow_id), 'Producer workflow id missing');
+  assert.equal(run.workflow_id, workflows[producer.path], 'Unexpected producer workflow id');
+  assert(producer.events.includes(run.event), 'Unexpected producer event');
+  if (run.event === 'push') assert.equal(run.head_branch, 'main', 'Deploy runs come from main');
+  available(run.status === 'completed', 'Producer still running');
   assert.match(String(run.id), /^\d+$/);
   assert(Number.isSafeInteger(run.run_attempt) && run.run_attempt > 0);
   sha(run.head_sha);
+  return producer;
 }
 
-function admitJob(record, jobs, run) {
-  const name = `${record.attempt === 1 ? 'battery' : 'retry'} / ${record.shardId}`;
+function admitJob(record, jobs, run, prefix) {
+  const name = `${prefix}${record.attempt === 1 ? 'battery' : 'retry'} / ${record.shardId}`;
   const matches = jobs.filter((j) => j.name === name);
   assert.equal(matches.length, 1, 'Missing or duplicate hosted job');
   const job = matches[0];
@@ -98,8 +123,8 @@ function admitJob(record, jobs, run) {
   }
 }
 
-export function observePair({ plan, artifact, first, second, jobs, run, workflowId }) {
-  admitRun(run, workflowId);
+export function observePair({ plan, artifact, first, second, jobs, run, workflows }) {
+  const { prefix } = admitRun(run, workflows);
   assert.equal(plan.identity.repository, REPOSITORY);
   assert.equal(String(plan.identity.runId), String(run.id));
   assert.equal(plan.identity.runAttempt, run.run_attempt);
@@ -109,8 +134,8 @@ export function observePair({ plan, artifact, first, second, jobs, run, workflow
   const failures = first.gates.filter((g) => g.status !== 'passed').map((g) => g.name);
   assert(failures.length > 0);
   admitReceipt(plan, second, shard, 2, artifact, failures);
-  admitJob(first, jobs, run);
-  admitJob(second, jobs, run);
+  admitJob(first, jobs, run, prefix);
+  admitJob(second, jobs, run, prefix);
   assert.notEqual(first.jobId, second.jobId);
   assert.notEqual(first.runner, second.runner);
   return second.gates
@@ -177,12 +202,37 @@ export function assertLedgerTree(tree) {
   assert.deepEqual(paths, [LEDGER_PATH, STATE_PATH].sort(), 'Unexpected ledger destination paths');
 }
 
-export function pendingAttempts(recent, state, consumer, now = Date.now(), trigger) {
+/** Assertion failures judge immutable evidence; anything else may succeed later. */
+export function settle(error, prior, { policy, startedAt, now }) {
+  const reason = String(error.message).split('\n')[0].slice(0, 240);
+  if (error instanceof assert.AssertionError)
+    return { result: 'rejected', policy, startedAt, reason };
+  return {
+    result: 'retry',
+    policy,
+    startedAt,
+    failures: (prior?.result === 'retry' ? prior.failures : 0) + 1,
+    attemptedAt: new Date(now).toISOString(),
+    reason,
+  };
+}
+
+export function isDue(entry, policy, now) {
+  if (!entry) return true;
+  if (entry.result === 'observed') return false;
+  if (entry.policy !== policy) return true;
+  if (entry.result === 'rejected') return false;
+  const backoff = Math.min(2 ** (entry.failures - 1), 24) * HOUR;
+  return !(now - Date.parse(entry.attemptedAt) < backoff);
+}
+
+export function pendingAttempts(recent, state, policy, now = Date.now(), trigger) {
   const requested = trigger
     ? {
         id: trigger.id,
         attempt: trigger.run_attempt,
         key: `${trigger.id}/${trigger.run_attempt}`,
+        startedAt: trigger.run_started_at,
         triggered: true,
       }
     : null;
@@ -192,6 +242,7 @@ export function pendingAttempts(recent, state, consumer, now = Date.now(), trigg
         id: run.id,
         attempt: i + 1,
         key: `${run.id}/${i + 1}`,
+        startedAt: run.run_started_at,
       })),
     )
     .filter(({ key }) => key !== requested?.key);
@@ -199,11 +250,7 @@ export function pendingAttempts(recent, state, consumer, now = Date.now(), trigg
   return candidates
     .filter(
       ({ key, triggered }) =>
-        state[key]?.result !== 'observed' &&
-        (triggered ||
-          !state[key] ||
-          state[key].consumer !== consumer ||
-          now - Date.parse(state[key].attemptedAt) >= 3600 * 1000),
+        state[key]?.result !== 'observed' && (triggered || isDue(state[key], policy, now)),
     )
     .sort(
       (a, b) =>
@@ -216,6 +263,36 @@ export function pendingAttempts(recent, state, consumer, now = Date.now(), trigg
     .slice(0, 20);
 }
 
+/** Scheduling metadata only; pruning rides along with real writes and never touches the ledger. */
+export function nextRuns(previous, updates, now = Date.now()) {
+  const merged = { ...previous, ...updates };
+  if (JSON.stringify(merged) === JSON.stringify(previous)) return previous;
+  return Object.fromEntries(
+    Object.entries(merged).filter(
+      ([, entry]) => !(now - Date.parse(entry.startedAt) > SCHEDULE_RETENTION),
+    ),
+  );
+}
+
+/** A hosted job of this exact attempt must have produced the artifact before it can be late. */
+export function locate({ run, jobs, artifacts, prefix }, job, name) {
+  const producers = jobs.filter((j) => j.name === `${prefix}${job}`);
+  assert.equal(producers.length, 1, `Missing or duplicate hosted job: ${prefix}${job}`);
+  assert.equal(
+    producers[0].run_attempt,
+    run.run_attempt,
+    `${prefix}${job} did not run in this attempt; Re-run all jobs is required`,
+  );
+  assert(
+    ['success', 'failure'].includes(producers[0].conclusion),
+    `Interrupted hosted job: ${prefix}${job}`,
+  );
+  const found = artifacts.filter((a) => a.name === name);
+  assert(found.length <= 1, `Duplicate observation artifact: ${name}`);
+  available(found.length === 1, `Observation artifact not yet available: ${name}`);
+  return found[0];
+}
+
 /** ZIP is digest-checked; only one bounded JSON member is read, never extracted. */
 export function readArtifact(artifact, runId, member, temp) {
   assertArtifactMetadata(artifact, { runId });
@@ -226,30 +303,47 @@ export function readArtifact(artifact, runId, member, temp) {
   assert.equal(`sha256:${hash(bytes)}`, artifact.digest, 'Observation archive digest mismatch');
   const file = join(temp, `${artifact.id}.zip`);
   writeFileSync(file, bytes);
-  return JSON.parse(
-    execFileSync(
+  let json;
+  try {
+    json = execFileSync(
       'python3',
       [
         '-c',
-        'import sys,zipfile\nwith zipfile.ZipFile(sys.argv[1]) as z:\n names=z.namelist(); allowed=[sys.argv[2]]+(["parity.json"] if sys.argv[2]=="plan.json" else [])\n assert len(names)==len(set(names)) and sys.argv[2] in names and all(n in allowed for n in names), "unexpected archive members"\n i=z.getinfo(sys.argv[2]); assert i.file_size<=4194304, "oversized JSON"\n sys.stdout.buffer.write(z.read(i))',
+        'import sys,zipfile\ntry:\n with zipfile.ZipFile(sys.argv[1]) as z:\n  names=z.namelist(); allowed=[sys.argv[2]]+(["parity.json"] if sys.argv[2]=="plan.json" else [])\n  assert len(names)==len(set(names)) and sys.argv[2] in names and all(n in allowed for n in names), "unexpected archive members"\n  i=z.getinfo(sys.argv[2]); assert i.file_size<=4194304, "oversized JSON"\n  data=z.read(i)\nexcept Exception as e:\n sys.stderr.write(str(e)); sys.exit(3)\nsys.stdout.buffer.write(data)',
         file,
         member,
       ],
       { maxBuffer: 4 * 1024 * 1024, encoding: 'utf8' },
-    ),
-  );
+    );
+  } catch (error) {
+    if (error.status === 3) assert.fail(`Malformed observation archive: ${error.stderr}`);
+    throw error;
+  }
+  try {
+    return JSON.parse(json);
+  } catch {
+    assert.fail(`Malformed observation JSON: ${member}`);
+  }
 }
 
-function observeRun(run, workflowId, temp) {
-  admitRun(run, workflowId);
+function observeRun(run, workflows, temp) {
+  const { prefix } = admitRun(run, workflows);
+  const jobs = pages(
+    endpoint(`actions/runs/${run.id}/attempts/${run.run_attempt}/jobs?per_page=100`),
+    'jobs',
+  );
+  // Only an executed retry can pair a failure with a fresh-runner pass.
+  if (!jobs.some((j) => j.name.startsWith(`${prefix}retry / `) && j.conclusion !== 'skipped'))
+    return [];
   const artifacts = pages(endpoint(`actions/runs/${run.id}/artifacts?per_page=100`), 'artifacts');
-  const find = (name) => {
-    const found = artifacts.filter((a) => a.name === name);
-    assert.equal(found.length, 1, `Missing/duplicate observation artifact: ${name}`);
-    return found[0];
-  };
+  const evidence = { run, jobs, artifacts, prefix };
   const suffix = `${run.id}-${run.run_attempt}`;
-  const plan = readArtifact(find(`bunki-plan-${suffix}`), run.id, 'plan.json', temp);
+  const plan = readArtifact(
+    locate(evidence, 'plan', `bunki-plan-${suffix}`),
+    run.id,
+    'plan.json',
+    temp,
+  );
   sha(plan.identity.sha);
   const commit = api(endpoint(`commits/${plan.identity.sha}`));
   assert.equal(commit.commit.tree.sha, plan.identity.tree);
@@ -271,7 +365,7 @@ function observeRun(run, workflowId, temp) {
     'Producer plan differs from trusted policy',
   );
   const artifact = readArtifact(
-    find(`bunki-build-metadata-${suffix}`),
+    locate(evidence, 'build', `bunki-build-metadata-${suffix}`),
     run.id,
     'artifact.json',
     temp,
@@ -282,22 +376,21 @@ function observeRun(run, workflowId, temp) {
     name: artifact.name,
     digest: artifact.digest,
   });
-  const jobs = pages(
-    endpoint(`actions/runs/${run.id}/attempts/${run.run_attempt}/jobs?per_page=100`),
-    'jobs',
-  );
   const rows = [];
   for (const shard of plan.shards) {
-    const name = `bunki-shard-${shard.id}-2-${suffix}`;
-    if (!artifacts.some((a) => a.name === name)) continue;
-    const first = readArtifact(
-      find(`bunki-shard-${shard.id}-1-${suffix}`),
-      run.id,
-      'shard.json',
-      temp,
+    if (!jobs.some((j) => j.name === `${prefix}retry / ${shard.id}`)) continue;
+    const [first, second] = [
+      ['battery', 1],
+      ['retry', 2],
+    ].map(([job, attempt]) =>
+      readArtifact(
+        locate(evidence, `${job} / ${shard.id}`, `bunki-shard-${shard.id}-${attempt}-${suffix}`),
+        run.id,
+        'shard.json',
+        temp,
+      ),
     );
-    const second = readArtifact(find(name), run.id, 'shard.json', temp);
-    rows.push(...observePair({ plan, artifact, first, second, jobs, run, workflowId }));
+    rows.push(...observePair({ plan, artifact, first, second, jobs, run, workflows }));
   }
   return rows;
 }
@@ -386,15 +479,25 @@ async function main() {
   );
   assert(process.env.RUNNER_TEMP);
   const temp = mkdtempSync(join(process.env.RUNNER_TEMP, 'flake-ledger-'));
-  const workflow = api(endpoint('actions/workflows/ci.yml'));
-  const since = new Date(Date.now() - 13 * 24 * 3600 * 1000).toISOString();
-  // Reconcile retained evidence even when GitHub replaces a pending consumer run.
-  const recent = pages(
-    endpoint(
-      `actions/workflows/${workflow.id}/runs?status=completed&created=%3E%3D${encodeURIComponent(since)}&per_page=100`,
-    ),
-    'workflow_runs',
+  const workflows = Object.fromEntries(
+    PRODUCERS.map(({ path }) => {
+      const workflow = api(endpoint(`actions/workflows/${basename(path)}`));
+      assert.equal(workflow.path, path);
+      return [path, workflow.id];
+    }),
   );
+  const now = Date.now();
+  const since = new Date(now - 13 * 24 * HOUR).toISOString();
+  // Reconcile retained evidence even when GitHub replaces a pending consumer run.
+  const recent = Object.values(workflows).flatMap((id) =>
+    pages(
+      endpoint(
+        `actions/workflows/${id}/runs?status=completed&created=%3E%3D${encodeURIComponent(since)}&per_page=100`,
+      ),
+      'workflow_runs',
+    ),
+  );
+  const policy = policyDigest();
   const initial = readState();
   const updates = {},
     observations = [];
@@ -403,26 +506,23 @@ async function main() {
     process.env.GITHUB_EVENT_NAME === 'workflow_run'
       ? JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')).workflow_run
       : undefined;
-  for (const { id, attempt, key } of pendingAttempts(
+  for (const { id, attempt, key, startedAt } of pendingAttempts(
     recent,
     initial.runs,
-    process.env.GITHUB_SHA,
-    Date.now(),
+    policy,
+    now,
     trigger,
   )) {
     processed++;
     try {
       const run = api(endpoint(`actions/runs/${id}/attempts/${attempt}`));
-      observations.push(...observeRun(run, workflow.id, temp));
-      updates[key] = { result: 'observed', consumer: process.env.GITHUB_SHA };
+      observations.push(...observeRun(run, workflows, temp));
+      updates[key] = { result: 'observed', startedAt };
     } catch (error) {
-      updates[key] = {
-        result: 'rejected',
-        consumer: process.env.GITHUB_SHA,
-        attemptedAt: new Date().toISOString(),
-        reason: String(error.message).split('\n')[0].slice(0, 240),
-      };
-      console.log(`::warning title=Flake evidence rejected::Run ${key}: ${updates[key].reason}`);
+      updates[key] = settle(error, initial.runs[key], { policy, startedAt, now });
+      console.log(
+        `::warning title=Flake evidence ${updates[key].result}::Run ${key}: ${updates[key].reason}`,
+      );
     }
   }
   // Ordinary fast-forward push plus bounded reload handles any concurrent human append.
@@ -433,7 +533,7 @@ async function main() {
       const commit = persist({
         ...state,
         ledger,
-        runs: { ...state.runs, ...updates },
+        runs: nextRuns(state.runs, updates, now),
         previousLedger: state.ledger,
         previousRuns: state.runs,
         temp,

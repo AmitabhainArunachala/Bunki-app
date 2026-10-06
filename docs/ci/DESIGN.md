@@ -144,12 +144,30 @@ Retain both durations, runner identities, logs, and result details. A retry rece
 must contain exactly the planned failures. Extra retries, retried successes,
 duplicate rows, and different artifact/run/plan identities fail admission.
 
+Every job reads only its own attempt's plan, build, retry-plan and shard artifacts,
+and receipts bind the run attempt. GitHub's **Re-run failed jobs** skips the
+producers of those artifacts, so such an attempt always fails closed with missing
+artifacts; it can never turn green by mixing attempts. The automatic single
+fresh-runner gate retry happens inside every attempt. A manual rerun must use
+**Re-run all jobs**; the aggregate summary of any failed later attempt says so.
+The account-level rerun automation documented in CI_MAP will produce these
+fail-closed attempts if it reruns failed jobs only. It is left unchanged until John
+decides.
+
 The committed `docs/ci/flakes.jsonl` starts with observed evidence only. After this
 workflow lands on the default branch, `CI flake ledger` automatically appends new
 observations to that path on the fixed data branch `ci/flake-ledger`. The producer
 CI token remains read-only; the trusted consumer has contents-write and
 actions-read. It never writes main or the tested candidate. The feature branch
 contains the controlled-experiment seed; the data branch becomes the ongoing ledger.
+
+The consumer observes exactly three same-repository producers of the one CI
+pipeline: `ci.yml` (pull request or dispatch), `pages-app.yml` (push to main or
+dispatch, jobs prefixed `verify / `) and `nightly-verify.yml` (schedule or dispatch,
+jobs prefixed `full-battery / `). Each producer's workflow ID, path, event and exact
+job prefix must match; other workflows, prefixes and forks are rejected. A deploy
+or nightly retry is therefore recorded like a PR retry. These observations never
+widen deployment proof, which still admits only `ci.yml` producers.
 
 The consumer reads immutable shard artifacts, so a passing retry is recorded even
 when another gate makes the run red. It verifies the producer repository/workflow,
@@ -162,10 +180,21 @@ Writes use an isolated Git index, a fixed two-file data tree (ledger and process
 index), and ordinary fast-forward pushes. Existing ledger bytes are preserved;
 identical observations do nothing and conflicts fail. Serialized workflow-run
 consumers and hourly reconciliation inspect the retained 13-day window, processing
-up to 20 attempts per invocation. Rejections are retried, oldest-attempted first,
-after an hour or immediately when trusted code changes. Missing/expired evidence
-produces warnings, never invented rows. This recovery is bounded by artifact
-retention and consumer capacity; its rejected-run index makes those limits visible.
+up to 20 attempts per invocation: the triggering attempt first, then never-tried
+and least recently tried attempts. An attempt in which no retry job ran has nothing
+to observe and is closed after reading its job list.
+
+Each outcome is classified once. Observed attempts are final. An assertion about
+immutable evidence (fork, wrong workflow or event, malformed or inconsistent
+reports, policy mismatch, or a "Re-run failed jobs" attempt) is a rejection recorded
+against the trusted policy digest that judged it. It carries no timestamp and is
+reconsidered only when that digest changes. Anything else (API, download or fetch
+failures, or an artifact not yet listed for a completed job) is retried with
+backoff doubling from one hour to a 24-hour cap, and never becomes an empty
+observation. Missing or expired evidence produces warnings, never invented rows.
+Scheduling entries are pruned 15 days after their attempt started, beyond the
+14-day artifact retention, and only alongside a real write. Ledger rows are never
+pruned.
 
 The always-reporting `bunki / required` job independently computes expected jobs,
 shards, and gate names from the selected scope. It rejects missing, cancelled,

@@ -435,6 +435,12 @@ jobs:
           evidence.mkdir(exist_ok=True)
           text = '\n## Required workflow admission failed\n\n'
           text += 'Setup, evidence collection or aggregate admission failed. No promotable full receipt was issued.\n\n'
+          if int(os.environ['GITHUB_RUN_ATTEMPT']) > 1:
+              rerun = ('Every job admits only this attempt\'s own plan, build and shard artifacts, so a '
+                       '"Re-run failed jobs" attempt always fails closed with missing artifacts. Failed gates '
+                       'already received one automatic fresh-runner retry; to rerun, use "Re-run all jobs".')
+              print('::warning title=Re-run all jobs required::' + rerun)
+              text += '**Attempt ' + os.environ['GITHUB_RUN_ATTEMPT'] + ':** ' + rerun + '\n\n'
           text += 'Required dependency results:\n\n```json\n' + json.dumps(json.loads(os.environ['NEEDS_JSON']), indent=2) + '\n```\n'
           (evidence / 'WORKFLOW_FAILURE.md').write_text(text)
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
@@ -762,6 +768,12 @@ jobs:
           evidence.mkdir(exist_ok=True)
           text = '\n## Required workflow admission failed\n\n'
           text += 'Setup, evidence collection or aggregate admission failed. No promotable full receipt was issued.\n\n'
+          if int(os.environ['GITHUB_RUN_ATTEMPT']) > 1:
+              rerun = ('Every job admits only this attempt\'s own plan, build and shard artifacts, so a '
+                       '"Re-run failed jobs" attempt always fails closed with missing artifacts. Failed gates '
+                       'already received one automatic fresh-runner retry; to rerun, use "Re-run all jobs".')
+              print('::warning title=Re-run all jobs required::' + rerun)
+              text += '**Attempt ' + os.environ['GITHUB_RUN_ATTEMPT'] + ':** ' + rerun + '\n\n'
           text += 'Required dependency results:\n\n```json\n' + json.dumps(json.loads(os.environ['NEEDS_JSON']), indent=2) + '\n```\n'
           (evidence / 'WORKFLOW_FAILURE.md').write_text(text)
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:

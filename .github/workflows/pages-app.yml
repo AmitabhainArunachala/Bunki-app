@@ -46,12 +46,6 @@ jobs:
         id: transfer
         if: steps.lookup.outputs.matched == 'true'
         run: node scripts/ci/receipts.mjs verify-transfer --transfer "$RUNNER_TEMP/reuse/transfer.json"
-      - name: Package admitted bytes without rebuilding
-        if: success() && steps.transfer.outputs.verified == 'true' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          name: kairo-pages
-          path: ${{ steps.transfer.outputs.site_dir }}
       - name: Retain the transfer evidence
         if: success() && steps.transfer.outputs.verified == 'true'
         uses: actions/upload-artifact@v4
@@ -62,6 +56,12 @@ jobs:
             ${{ runner.temp }}/reuse/transfer.json
           retention-days: 14
           if-no-files-found: error
+      - name: Package admitted bytes without rebuilding
+        if: success() && steps.transfer.outputs.verified == 'true' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: kairo-pages
+          path: ${{ steps.transfer.outputs.site_dir }}
   verify:
     if: always() && (needs.lookup.result != 'success' || needs.lookup.outputs.matched != 'true')
     needs: lookup

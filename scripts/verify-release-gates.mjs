@@ -4504,6 +4504,19 @@ export async function verifyWorkflows(root = ROOT) {
     '${{ steps.transfer.outputs.site_dir }}',
     'Reuse must package the exact admitted site',
   );
+  const transferEvidence = find(
+    pages.jobs.lookup,
+    (step) =>
+      step.uses?.startsWith('actions/upload-artifact@') &&
+      step.with?.name === 'bunki-transfer-${{ github.run_id }}-${{ github.run_attempt }}',
+    'Exactly one retained transfer evidence upload',
+  );
+  const lookupSteps = steps(pages.jobs.lookup);
+  assert(
+    lookupSteps.at(-1) === reuseUpload &&
+      lookupSteps.indexOf(transferEvidence) < lookupSteps.indexOf(reuseUpload),
+    'Reused Pages packaging must be the final lookup step, after transfer evidence retention',
+  );
   const freshUpload = find(
     pages.jobs.package,
     (step) => step.uses?.startsWith('actions/upload-pages-artifact@'),
@@ -5260,6 +5273,17 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
         ).with.path = 'prototypes/corridor';
       },
       /exact admitted site/,
+    ],
+    [
+      'pages-upload-before-transfer-evidence',
+      (pages) => {
+        const upload = pages.jobs.lookup.steps.findIndex((step) =>
+          step.uses?.startsWith('actions/upload-pages-artifact'),
+        );
+        const [packaged] = pages.jobs.lookup.steps.splice(upload, 1);
+        pages.jobs.lookup.steps.splice(upload - 1, 0, packaged);
+      },
+      /final lookup step/,
     ],
     [
       'swallowed-promotion',

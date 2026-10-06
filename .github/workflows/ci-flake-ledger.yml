@@ -2,7 +2,7 @@
 name: CI flake ledger
 on:
   workflow_run:
-    workflows: [CI]
+    workflows: [CI, pages-app, Nightly full verification]
     types: [completed]
   schedule:
     - cron: '19 * * * *'

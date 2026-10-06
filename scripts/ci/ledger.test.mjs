@@ -1,19 +1,47 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { URL } from 'node:url';
+import { parse } from 'yaml';
 import {
   admitRun,
   appendObservations,
   assertLedgerTree,
+  isDue,
   LEDGER_PATH,
   LEDGER_REF,
+  locate,
+  nextRuns,
   observePair,
   persist,
   pendingAttempts,
+  PRODUCERS,
+  settle,
 } from './ledger.mjs';
 import { createPlan } from './battery.mjs';
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
-function fixture() {
+const workflows = {
+  '.github/workflows/ci.yml': 9,
+  '.github/workflows/pages-app.yml': 10,
+  '.github/workflows/nightly-verify.yml': 11,
+};
+const callers = {
+  ci: { path: '.github/workflows/ci.yml', event: 'pull_request', prefix: '' },
+  pages: { path: '.github/workflows/pages-app.yml', event: 'push', prefix: 'verify / ' },
+  'pages dispatch': {
+    path: '.github/workflows/pages-app.yml',
+    event: 'workflow_dispatch',
+    prefix: 'verify / ',
+    branch: 'codex/ci-revolution-20261007',
+  },
+  nightly: {
+    path: '.github/workflows/nightly-verify.yml',
+    event: 'schedule',
+    prefix: 'full-battery / ',
+  },
+};
+function fixture(caller = callers.ci) {
   const identity = {
     repository: 'AmitabhainArunachala/Bunki-app',
     sha: 'a'.repeat(40),
@@ -76,12 +104,13 @@ function fixture() {
   const run = {
     id: 42,
     run_attempt: 1,
-    workflow_id: 9,
     repository: { full_name: identity.repository },
     head_repository: { full_name: identity.repository },
     head_sha: identity.sha,
-    path: '.github/workflows/ci.yml',
-    event: 'pull_request',
+    head_branch: caller.branch ?? 'main',
+    path: caller.path,
+    workflow_id: workflows[caller.path],
+    event: caller.event,
     status: 'completed',
     conclusion: 'failure',
   };
@@ -90,7 +119,7 @@ function fixture() {
     run_id: 42,
     run_attempt: 1,
     runner_name: r.runner,
-    name: `${r.attempt === 1 ? 'battery' : 'retry'} / ${shard.id}`,
+    name: `${caller.prefix}${r.attempt === 1 ? 'battery' : 'retry'} / ${shard.id}`,
     status: 'completed',
     conclusion: r.attempt === 1 ? 'success' : 'failure',
     started_at: '2026-10-06T00:00:00Z',
@@ -109,17 +138,91 @@ function fixture() {
       },
     ],
   }));
-  return { plan, artifact, first, second, jobs, run, workflowId: 9 };
+  return { plan, artifact, first, second, jobs, run, workflows };
 }
 
-test('observes a fresh passing retry even when another gate makes the run red', () => {
-  const f = fixture();
-  const rows = observePair(f);
-  assert.equal(rows.length, 1);
-  assert.equal(rows[0].gate, f.first.gates[0].name);
-  assert.deepEqual(rows[0].durations, [4, 4]);
-  assert.deepEqual(rows[0].jobIds, ['123', '456']);
-  assert.deepEqual(rows[0].statuses, ['failed', 'passed']);
+for (const [name, caller] of Object.entries(callers))
+  test(`observes a ${name} fresh passing retry even when another gate makes the run red`, () => {
+    const f = fixture(caller);
+    const rows = observePair(f);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].gate, f.first.gates[0].name);
+    assert.deepEqual(rows[0].durations, [4, 4]);
+    assert.deepEqual(rows[0].jobIds, ['123', '456']);
+    assert.deepEqual(rows[0].statuses, ['failed', 'passed']);
+  });
+
+for (const [name, mutate] of Object.entries({
+  'unprefixed deploy jobs': (f) => {
+    for (const job of f.jobs) job.name = job.name.replace(/^verify \/ /, '');
+  },
+  'another caller prefix': (f) => {
+    for (const job of f.jobs) job.name = job.name.replace(/^verify \/ /, 'full-battery / ');
+  },
+  'arbitrary caller prefix': (f) => {
+    for (const job of f.jobs) job.name = job.name.replace(/^verify \/ /, 'attacker / ');
+  },
+  'another caller workflow id': (f) => {
+    f.run.workflow_id = workflows['.github/workflows/nightly-verify.yml'];
+  },
+  'unlisted caller path': (f) => {
+    f.run.path = '.github/workflows/pages-preview.yml';
+  },
+  'pull request deploy event': (f) => {
+    f.run.event = 'pull_request';
+  },
+  'deploy push off main': (f) => {
+    f.run.head_branch = 'feature';
+  },
+}))
+  test(`rejects pages-app evidence with ${name}`, () => {
+    const f = fixture(callers.pages);
+    mutate(f);
+    assert.throws(() => observePair(f), assert.AssertionError);
+  });
+
+test('rejects events outside each canonical caller', () => {
+  for (const [caller, event] of [
+    [callers.ci, 'push'],
+    [callers.ci, 'schedule'],
+    [callers.nightly, 'push'],
+    [callers.nightly, 'pull_request'],
+    [callers.pages, 'schedule'],
+  ]) {
+    const f = fixture(caller);
+    f.run.event = event;
+    assert.throws(() => observePair(f), /Unexpected producer event/);
+  }
+});
+
+test('consumer triggers on exactly the canonical callers, whose job prefixes it admits', () => {
+  const load = (path) => parse(readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8'));
+  const consumer = load('.github/workflows/ci-flake-ledger.yml');
+  assert.deepEqual(
+    [...consumer.on.workflow_run.workflows].sort(),
+    PRODUCERS.map((p) => load(p.path).name).sort(),
+  );
+  assert.deepEqual(consumer.on.workflow_run.types, ['completed']);
+  assert.deepEqual(consumer.permissions, { contents: 'read' });
+  assert.deepEqual(consumer.jobs.record.permissions, { contents: 'write', actions: 'read' });
+  for (const producer of PRODUCERS) {
+    const workflow = load(producer.path);
+    assert.deepEqual(
+      Object.keys(workflow.on)
+        .filter((event) => event !== 'workflow_call')
+        .sort(),
+      [...producer.events].sort(),
+    );
+    const callersOfCi = Object.entries(workflow.jobs).filter(
+      ([, job]) => job.uses === './.github/workflows/ci.yml',
+    );
+    if (producer.prefix === '') assert.equal(callersOfCi.length, 0);
+    else {
+      assert.equal(callersOfCi.length, 1);
+      const [[id, job]] = callersOfCi;
+      assert.equal(`${job.name ?? id} / `, producer.prefix);
+    }
+  }
 });
 
 for (const [name, mutate] of Object.entries({
@@ -254,33 +357,176 @@ test('writer uses only isolated index and fixed normal fast-forward data destina
 test('unknown run metadata fails before observation admission', () => {
   const f = fixture();
   f.run.id = 'not-numeric';
-  assert.throws(() => admitRun(f.run, f.workflowId));
+  assert.throws(() => admitRun(f.run, f.workflows));
 });
 
-test('rejected attempts remain retryable without starving newer observations', () => {
-  const recent = Array.from({ length: 25 }, (_, i) => ({ id: i + 1, run_attempt: 1 }));
-  const now = Date.parse('2026-10-06T00:00:00Z');
+const NOW = Date.parse('2026-10-06T00:00:00Z');
+const HOUR = 3600 * 1000;
+const startedAt = '2026-10-05T23:00:00Z';
+const run = (id, attempts = 1) => ({ id, run_attempt: attempts, run_started_at: startedAt });
+
+test('transient failures back off, recover, and never become empty observations', () => {
+  const recent = [run(1)];
+  let state = {};
+  const unavailable = () =>
+    locate(
+      {
+        run: { run_attempt: 1 },
+        jobs: [{ name: 'verify / plan', run_attempt: 1, conclusion: 'success' }],
+        artifacts: [],
+        prefix: 'verify / ',
+      },
+      'plan',
+      'bunki-plan-1-1',
+    );
+  const failures = [new Error('gh: HTTP 502'), new Error('fetch failed')];
+  try {
+    unavailable();
+  } catch (error) {
+    failures.push(error);
+  }
+  assert.equal(failures.length, 3, 'A missing artifact from a completed job must throw');
+  let now = NOW;
+  for (const [index, error] of failures.entries()) {
+    assert.deepEqual(
+      pendingAttempts(recent, state, 'p1', now).map((c) => c.key),
+      ['1/1'],
+    );
+    const entry = settle(error, state['1/1'], { policy: 'p1', startedAt, now });
+    assert.equal(entry.result, 'retry');
+    assert.equal(entry.failures, index + 1);
+    state = nextRuns(state, { '1/1': entry }, now);
+    const backoff = 2 ** index * HOUR;
+    assert.equal(isDue(state['1/1'], 'p1', now + backoff - 1), false);
+    now += backoff;
+  }
+  assert(!(failures[2] instanceof assert.AssertionError));
+  const at = Date.parse(state['1/1'].attemptedAt);
+  assert.equal(isDue({ ...state['1/1'], failures: 40 }, 'p1', at + 23 * HOUR), false);
+  assert.equal(isDue({ ...state['1/1'], failures: 40 }, 'p1', at + 24 * HOUR), true);
+  state = nextRuns(state, { '1/1': { result: 'observed', startedAt } }, now);
+  assert.deepEqual(pendingAttempts(recent, state, 'p2', now + 30 * 24 * HOUR), []);
+});
+
+test('deterministic rejection is stable and commit-free under one trusted policy', () => {
+  const recent = [run(1)];
+  const judge = (prior) => {
+    const f = fixture();
+    f.run.head_repository.full_name = 'x/y';
+    try {
+      observePair(f);
+    } catch (error) {
+      return settle(error, prior, { policy: 'p1', startedAt, now: NOW });
+    }
+    assert.fail('Fork evidence must be rejected');
+  };
+  const entry = judge();
+  assert.equal(entry.result, 'rejected');
+  assert(!('attemptedAt' in entry), 'Permanent rejection carries no timestamp churn');
+  const state = nextRuns({}, { '1/1': entry }, NOW);
+  for (const later of [NOW + HOUR, NOW + 24 * HOUR, NOW + 12 * 24 * HOUR])
+    assert.deepEqual(pendingAttempts(recent, state, 'p1', later), []);
+  assert.equal(nextRuns(state, { '1/1': judge(state['1/1']) }, NOW + HOUR), state);
+  const rerun = locate.bind(null, {
+    run: { run_attempt: 2 },
+    jobs: [{ name: 'plan', run_attempt: 1, conclusion: 'success' }],
+    artifacts: [],
+    prefix: '',
+  });
+  assert.throws(() => rerun('plan', 'bunki-plan-1-2'), /Re-run all jobs is required/);
+  try {
+    rerun('plan', 'bunki-plan-1-2');
+  } catch (error) {
+    assert.equal(
+      settle(error, undefined, { policy: 'p1', startedAt, now: NOW }).result,
+      'rejected',
+    );
+  }
+});
+
+test('policy change reconsiders rejected and backed-off evidence', () => {
+  const recent = [run(1), run(2)];
+  const state = {
+    '1/1': { result: 'rejected', policy: 'p1', startedAt, reason: 'policy differs' },
+    '2/1': {
+      result: 'retry',
+      policy: 'p1',
+      startedAt,
+      failures: 5,
+      attemptedAt: new Date(NOW).toISOString(),
+      reason: 'HTTP 502',
+    },
+  };
+  assert.deepEqual(pendingAttempts(recent, state, 'p1', NOW + HOUR), []);
+  assert.deepEqual(
+    pendingAttempts(recent, state, 'p2', NOW + HOUR).map((c) => c.key),
+    ['1/1', '2/1'],
+  );
+});
+
+test('pruning drops only expired scheduling metadata and never ledger rows', () => {
+  const rows = observePair(fixture());
+  const ledger = appendObservations('', rows);
+  const old = new Date(NOW - 16 * 24 * HOUR).toISOString();
+  const previous = {
+    '1/1': { result: 'observed', startedAt: old },
+    '2/1': { result: 'rejected', policy: 'p1', startedAt: old, reason: 'fork' },
+    '3/1': { result: 'observed', startedAt },
+  };
+  assert.equal(nextRuns(previous, {}, NOW), previous, 'Pruning alone never writes');
+  const runs = nextRuns(previous, { '4/1': { result: 'observed', startedAt } }, NOW);
+  assert.deepEqual(Object.keys(runs), ['3/1', '4/1']);
+  const written = [];
+  persist(
+    {
+      parent: 'b'.repeat(40),
+      ledger: appendObservations(ledger, []),
+      runs,
+      previousLedger: ledger,
+      previousRuns: previous,
+      temp: '/runner-temp/ledger',
+    },
+    (args, options) => {
+      if (args[0] === 'hash-object') written.push(options.input);
+      return 'a'.repeat(40);
+    },
+  );
+  assert.equal(written[0], ledger);
+  assert.deepEqual(JSON.parse(written[1]), runs);
+});
+
+test('backed-off attempts never starve newer observations', () => {
+  const recent = Array.from({ length: 25 }, (_, i) => run(i + 1));
   const state = Object.fromEntries(
-    recent
-      .slice(0, 20)
-      .map((r) => [
-        `${r.id}/1`,
-        { result: 'rejected', consumer: 'one', attemptedAt: new Date(now).toISOString() },
-      ]),
+    recent.slice(0, 20).map((r) => [
+      `${r.id}/1`,
+      {
+        result: 'retry',
+        policy: 'p1',
+        startedAt,
+        failures: 1,
+        attemptedAt: new Date(NOW).toISOString(),
+        reason: 'HTTP 502',
+      },
+    ]),
   );
   assert.deepEqual(
-    pendingAttempts(recent, state, 'one', now).map((r) => r.id),
+    pendingAttempts(recent, state, 'p1', NOW).map((r) => r.id),
     [21, 22, 23, 24, 25],
   );
-  assert(pendingAttempts(recent, state, 'one', now + 3600001).some((r) => r.id === 1));
-  assert(pendingAttempts(recent, state, 'two', now).some((r) => r.id === 1));
-  state['1/1'].result = 'observed';
-  assert(!pendingAttempts(recent, state, 'two', now).some((r) => r.id === 1));
+  const later = pendingAttempts(recent, state, 'p1', NOW + HOUR).map((r) => r.id);
+  assert.deepEqual(later.slice(0, 5), [21, 22, 23, 24, 25]);
+  assert.equal(later.length, 20);
+  assert(later.includes(1));
 });
 
 test('an old-created run with a new triggered attempt is prioritized outside the lookback', () => {
-  const recent = Array.from({ length: 25 }, (_, i) => ({ id: i + 100, run_attempt: 1 }));
-  const pending = pendingAttempts(recent, {}, 'consumer', Date.now(), { id: 1, run_attempt: 7 });
+  const recent = Array.from({ length: 25 }, (_, i) => run(i + 100));
+  const pending = pendingAttempts(recent, {}, 'p1', NOW, {
+    id: 1,
+    run_attempt: 7,
+    run_started_at: startedAt,
+  });
   assert.equal(pending.length, 20);
-  assert.deepEqual(pending[0], { id: 1, attempt: 7, key: '1/7', triggered: true });
+  assert.deepEqual(pending[0], { id: 1, attempt: 7, key: '1/7', startedAt, triggered: true });
 });
