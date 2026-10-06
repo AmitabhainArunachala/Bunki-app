@@ -1,8 +1,9 @@
-import { Stack } from 'expo-router';
+import { Stack, useSegments } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { AppProvider, useDebugFlags } from '@/state/app-context';
 import { NavShell } from '@/ui/nav-shell';
+import { RouteTitle } from '@/ui/route-title';
 import { ThemeProvider, useTheme } from '@/ui/theme-context';
 
 /**
@@ -22,10 +23,16 @@ import { ThemeProvider, useTheme } from '@/ui/theme-context';
  * under dark content.
  */
 export default function RootLayout(): ReactNode {
+  const segments = useSegments().filter((segment) => !segment.startsWith('('));
   return (
-    <AppProvider>
-      <ThemedShell />
-    </AppProvider>
+    <>
+      {/* Storage opens after mount. Metadata must exist before that boundary,
+          including during static export, where effects never run. */}
+      <RouteTitle href={`/${segments.join('/')}`} />
+      <AppProvider>
+        <ThemedShell />
+      </AppProvider>
+    </>
   );
 }
 

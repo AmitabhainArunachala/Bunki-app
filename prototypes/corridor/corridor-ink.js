@@ -792,7 +792,7 @@ function startGPU(canvas, spec, device) {
       t0 = performance.now();
       writer.start(t0);
       writing = true;
-      spec.onPhase && spec.onPhase('writing');
+      if (spec.onPhase) spec.onPhase('writing');
     } catch (e) { console.error('ink gpu begin failed:', e); dead = true; }
   }
   function uploadSprite(ix) {
@@ -810,7 +810,7 @@ function startGPU(canvas, spec, device) {
   }
   function frame(now) {
     if (!alive) return;
-    if (dead) { handle.ondead && handle.ondead(); return; }
+    if (dead) { if (handle.ondead) handle.ondead(); return; }
     if (!writing) {
       // FREEZE at finish — see the gl2 path's note
       try { blit(); } catch { /* the device may be gone; the freeze stands */ }
@@ -823,11 +823,11 @@ function startGPU(canvas, spec, device) {
       const step = writer.advance(vNow);
       if (step.beginStroke !== null) {
         uploadSprite(step.beginStroke);
-        spec.onStroke && spec.onStroke(step.beginStroke);
+        if (spec.onStroke) spec.onStroke(step.beginStroke);
       }
       engine.frameStep(step.splats, seed);
       blit();
-      if (step.finished) { writing = false; spec.onPhase && spec.onPhase('done'); }
+      if (step.finished) { writing = false; if (spec.onPhase) spec.onPhase('done'); }
     } catch (e) { console.error('ink gpu frame failed:', e); dead = true; }
   }
   const handle = {
@@ -1011,7 +1011,7 @@ function startGL2(canvas, spec) {
     t0 = performance.now();
     writer.start(t0);
     writing = true;
-    spec.onPhase && spec.onPhase('writing');
+    if (spec.onPhase) spec.onPhase('writing');
   }
   function uploadSprite(ix) {
     gl.bindTexture(gl.TEXTURE_2D, spriteT);
@@ -1091,13 +1091,13 @@ function startGL2(canvas, spec) {
     const out = writer.advance(vNow);
     if (out.beginStroke !== null) {
       uploadSprite(out.beginStroke);
-      spec.onStroke && spec.onStroke(out.beginStroke);
+      if (spec.onStroke) spec.onStroke(out.beginStroke);
     }
     if (out.splats.length) splat(out.splats);
     step();
     step();
     render();
-    if (out.finished) { writing = false; spec.onPhase && spec.onPhase('done'); }
+    if (out.finished) { writing = false; if (spec.onPhase) spec.onPhase('done'); }
   }
   const handle = {
     kind: 'gl2',

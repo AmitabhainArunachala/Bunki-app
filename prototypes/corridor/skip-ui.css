@@ -39,16 +39,35 @@
 .skip-wheel-option:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
 .skip-option-sub { font-size: var(--t-label); line-height: 1.15; max-width: 65px; }
 .skip-selection-band { position: absolute; inset-inline: 0; top: 136px; height: 44px; border-block: 1px solid var(--ink-2); background: color-mix(in srgb, var(--ink) 7%, transparent); pointer-events: none; z-index: 0; }
-.skip-symbol { position: relative; display: inline-flex; width: 22px; height: 22px; gap: 3px; flex: 0 0 22px; vertical-align: middle; }
-.skip-symbol i { display: block; border: 1.5px solid currentColor; }
+/* the four pattern marks: drawn in ink, 2px edges, so left/right, up/down,
+ * the enclosure and the solid read at a glance even in an unselected row
+ * (operator, 2026-09-17: "the left, right, up down and edges need to be
+ * shaped in a darker color") */
+.skip-symbol { position: relative; display: inline-flex; width: 22px; height: 22px; gap: 3px; flex: 0 0 22px; vertical-align: middle; color: var(--ink); }
+.skip-symbol i { display: block; border: 2px solid var(--ink); box-sizing: border-box; }
 .skip-symbol-1 i { width: 10px; height: 22px; }
 .skip-symbol-2 { flex-direction: column; }
 .skip-symbol-2 i { width: 22px; height: 10px; }
-.skip-symbol-3 { border: 1.5px solid currentColor; padding: 4px; }
-.skip-symbol-3 i:first-child { width: 11px; height: 11px; }
+.skip-symbol-3 { border: 2px solid var(--ink); padding: 3px; box-sizing: border-box; }
+.skip-symbol-3 i:first-child { width: 12px; height: 12px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
 .skip-symbol-3 i:last-child { display: none; }
-.skip-symbol-4 { border: 1.5px solid currentColor; background: currentColor; }
+.skip-symbol-4 { border: 2px solid var(--ink); background: var(--ink); }
 .skip-symbol-4 i { display: none; }
+/* the radical column is a filter beside the code, not a fourth number: it
+ * stands apart with a heavier rule and its own ground (operator, 2026-09-17:
+ * "is it traditional skip methodology? seems confusing") */
+.skip-wheel-column.skip-wheel-filter { border-left: 2px solid var(--ink-2); background: color-mix(in srgb, var(--ground-2) 55%, transparent); }
+.skip-wheel-column.skip-wheel-filter .skip-wheel-label { color: var(--ink); }
+/* the parts column (operator, 2026-09-17): the parts among the hits with the
+ * code's first stroke count, far right; five columns need room, so on a
+ * phone the wheel row scrolls sideways inside its own host, never the page */
+.skip-wheels.has-parts { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.skip-wheel-parts .skip-wheel-option { font-family: var(--serif); font-size: 22px; }
+.skip-wheel-parts .skip-option-sub { color: var(--ink-2); }
+@media (max-width: 440px) {
+  .skip-wheel-host { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+  .skip-wheels.has-parts { min-width: 520px; }
+}
 .skip-rules { border-top: 1px solid var(--line); margin-top: 20px; font-size: var(--t-chrome); }
 .skip-rules summary { padding: 12px 0; min-height: var(--tap); cursor: pointer; color: var(--ink); }
 .skip-rules-body { line-height: 1.8; }

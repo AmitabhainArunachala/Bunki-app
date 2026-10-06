@@ -1,0 +1,203 @@
+.card {
+  font-family:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  background: #f5f8fb;
+  color: #0b1520;
+  text-align: left;
+  font-size: 18px;
+  line-height: 1.6;
+}
+.nightMode.card,
+.night_mode .card {
+  background: #0a0e13;
+  color: #f3f7fb;
+}
+.km {
+  max-width: 34em;
+  margin: 0 auto;
+  padding: 14px 6px;
+  border-left: 4px solid #0e8f53;
+  padding-left: 14px;
+}
+/* edge colour = kind of writing: news blue, blog/Q&A green, literature violet, written-for-deck amber */
+.km.kind-news,
+.km.kind-gov,
+.km.kind-company {
+  border-left-color: #0074b8;
+}
+.km.kind-literature {
+  border-left-color: #6a4fd8;
+}
+.km.kind-original {
+  border-left-color: #b86e00;
+}
+.nightMode .km {
+  border-left-color: #3ee391;
+}
+.nightMode .km.kind-news,
+.nightMode .km.kind-gov,
+.nightMode .km.kind-company {
+  border-left-color: #3fd0ff;
+}
+.nightMode .km.kind-literature {
+  border-left-color: #a58bff;
+}
+.nightMode .km.kind-original {
+  border-left-color: #ffb547;
+}
+.chips {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+}
+.chip {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 8px;
+  opacity: 0.7;
+}
+.sentence {
+  font-size: 28px;
+  line-height: 2.05;
+  margin: 14px 0 10px;
+  font-weight: 500;
+}
+.sentence rt {
+  font-size: 0.45em;
+  opacity: 0.75;
+}
+.sentence b,
+.blank {
+  color: #0074b8;
+  font-weight: 700;
+}
+.nightMode .sentence b,
+.nightMode .blank {
+  color: #3fd0ff;
+}
+.blank {
+  border-bottom: 3px solid currentColor;
+}
+.hint {
+  font-size: 16px;
+  opacity: 0.75;
+}
+.answer {
+  border-top: 1px solid rgba(128, 128, 128, 0.35);
+  padding-top: 12px;
+  display: grid;
+  gap: 4px;
+}
+.term {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0074b8;
+  margin-right: 12px;
+}
+.nightMode .term {
+  color: #3fd0ff;
+}
+.reading {
+  font-size: 18px;
+  opacity: 0.8;
+}
+.def {
+  font-size: 17px;
+}
+.meaning {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0e8f53;
+}
+.nightMode .meaning {
+  color: #3ee391;
+}
+.en {
+  font-size: 14px;
+  opacity: 0.75;
+}
+.tip {
+  font-size: 13px;
+  border-left: 3px solid #b86e00;
+  padding-left: 10px;
+  opacity: 0.85;
+}
+details.en summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+.src {
+  font-size: 12px;
+  opacity: 0.65;
+  overflow-wrap: anywhere;
+}
+.src a {
+  color: inherit;
+}
+
+/* part of speech colours the word: noun blue, verb orange, adjective gold, adverb violet */
+.pos-verb .sentence b,
+.pos-verb .term {
+  color: #c94a12;
+}
+.pos-adj .sentence b,
+.pos-adj .term {
+  color: #9a6a00;
+}
+.pos-adv .sentence b,
+.pos-adv .term {
+  color: #6a3fc8;
+}
+.pos-expr .sentence b,
+.pos-expr .term {
+  color: #0b8a5a;
+}
+.pos-sound .sentence b,
+.pos-sound .term {
+  color: #b8237a;
+}
+.nightMode .pos-verb .sentence b,
+.nightMode .pos-verb .term {
+  color: #ff8a5c;
+}
+.nightMode .pos-adj .sentence b,
+.nightMode .pos-adj .term {
+  color: #ffd24a;
+}
+.nightMode .pos-adv .sentence b,
+.nightMode .pos-adv .term {
+  color: #c59bff;
+}
+.nightMode .pos-expr .sentence b,
+.nightMode .pos-expr .term {
+  color: #5ee6b0;
+}
+.nightMode .pos-sound .sentence b,
+.nightMode .pos-sound .term {
+  color: #ff7ac8;
+}
+/* kanji anatomy: each character large, with meaning and parts */
+.kanji {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.kj {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 8px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+}
+.kj b {
+  grid-row: span 2;
+  font-size: 34px;
+  line-height: 1;
+}
+.kj span,
+.kj small {
+  font-size: 12px;
+  opacity: 0.8;
+}

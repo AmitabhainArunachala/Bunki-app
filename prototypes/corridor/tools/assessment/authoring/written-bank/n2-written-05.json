@@ -1,0 +1,582 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N2",
+  "number": 5,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "私の職場では、半年前から、会議の最初の五分間を「雑談の時間」にしている。仕事とは関係のない話を、自由にするのだ。\n　始めたばかりのころは、忙しいのに時間の無駄だという声もあった。（１）、続けているうちに、会議の雰囲気が変わってきた。雑談で気持ちがほぐれるのか、若い社員も意見を言いやすくなったようだ。\n　考えてみれば、普段あまり話さない相手に、いきなり反対意見を言うのは難しい。（２）、相手がどんな人かを知っていれば、多少言いにくいことでも伝えやすくなる。雑談は、（３）のかもしれない。",
+    "s1": "マンションにお住まいの皆様へ\n\n11月12日（日）午前10時から、防災訓練を行います。当日は、非常ベルが鳴ったら、各部屋から階段を使って駐車場に集まってください。エレベーターは使えません。\n訓練に参加できない方は、管理室に置いてある防災マニュアルを必ず受け取ってください。なお、雨の場合は、集会室で消火器の使い方の説明のみを行います。\n\n管理組合",
+    "s2": "天気予報の「降水確率30％」を、一日のうち30％の時間に雨が降るという意味だと思っている人が意外に多い。実際には、同じような条件の日が100回あったとき、そのうち約30回は1ミリ以上の雨が降る、という意味である。雨の強さや、降る時間の長さを表しているわけではない。確率が低くても、激しい雨が降ることはあるのだ。",
+    "s3": "子どものころ、博物館は静かにしなければならない、退屈な場所だった。ガラスのケースの向こうの展示物を、ただ眺めるだけだったからだ。ところが先日、久しぶりに訪れた博物館では、昔の道具を実際に手に取って使ってみることができた。重さや手触りを感じると、それを使っていた人々の暮らしが急に身近に感じられた。見るだけでは伝わらないことがあるのだと思う。",
+    "m1": "日本の職場では、「報告・連絡・相談」が大切だとよく言われる。上司や同僚に仕事の状況をこまめに伝えることで、問題を早く見つけられるからだ。\n　しかし、新人のころの私は、相談することが苦手だった。忙しそうな先輩に声をかけるのは申し訳ないと思い、わからないことがあっても、自分だけで何とかしようとした。その結果、ある仕事で大きな間違いに気づくのが遅れ、締め切りの直前になって、チーム全員に迷惑をかけてしまった。\n　そのとき先輩に言われたのは、「もっと早く聞いてくれれば、五分で済んだのに」という言葉だった。相手の時間を奪わないようにと遠慮したことが、かえって多くの人の時間を奪うことになったのだ。\n　今では、迷ったらまず聞くようにしている。相談は、相手に迷惑をかけることではなく、仕事を守るための手段なのだと思う。",
+    "m2": "天気予報の精度は、この数十年で大きく向上した。人工衛星やコンピューターの発達により、数日先の天気もかなり正確に予測できるようになった。\n　一方で、予報を伝える側には、新しい悩みも生まれている。たとえば、大雨の危険が高まったときに早めに注意を呼びかけても、結果的に大きな被害が出なかった場合、「大げさだった」と言われてしまうことがある。そうしたことが繰り返されると、次に本当に危険なときに、人々が注意を聞かなくなるおそれがある。\n　しかし、被害が出なかったのは、多くの人が早めに備えた結果かもしれない。予報が「外れた」のではなく、備えが「役に立った」と考えることもできるのだ。予報を受け取る私たちにも、そうした見方が求められているのではないだろうか。",
+    "a": "Ａ\n最近、館内での写真撮影を認める博物館が増えている。訪れた人がSNSで写真を紹介すれば、それを見た人が興味を持ち、新しい来館者につながる。展示物を傷めるおそれのあるフラッシュさえ禁止すれば、撮影を認めることの利点は大きい。",
+    "b": "Ｂ\n博物館での撮影には、慎重であるべきだと思う。展示物を撮影することに夢中になり、実物をじっくり見ない人が増えているからだ。また、シャッターの音や、撮影のために立ち止まる人が、ほかの人の鑑賞の邪魔になることもある。撮影を認めるとしても、時間や場所を限るなどの工夫が必要だろう。",
+    "c": "災害への備えというと、非常用の食料や水をそろえることを思い浮かべる人が多いだろう。もちろん、それは大切なことだ。しかし、物をそろえただけで安心してしまうのは危険である。\n　ある調査によると、非常用の持ち出し袋を用意している家庭でも、中身を一度も確認したことがないという人が半数近くいたという。袋の中の食料は賞味期限が切れ、懐中電灯の電池は使えなくなっているかもしれない。備えたつもりになっているだけでは、いざというときに役に立たないのだ。\n　私は、防災を特別な行事として考えるのではなく、日常生活の中に組み込むことが大切だと考える。たとえば、非常用の食料を普段の食事で少しずつ食べ、食べた分を買い足していけば、自然に中身が新しく保たれる。家族で散歩をするときに、避難場所までの道を実際に歩いてみるのもよいだろう。\n　災害はいつ起こるかわからない。だからこそ、年に一度の訓練だけでなく、毎日の暮らしの中で、無理なく続けられる備えを考えるべきなのである。",
+    "info": "ひかり市立博物館　夏休みイベントのご案内\n\n①はにわを作ろう\n日時：7月27日（土）10:00〜12:00\n対象：小学生（1・2年生は保護者と一緒に参加）\n参加費：500円（材料費）\n定員：20名（事前申し込み・先着順）\n\n②学芸員と歩く展示室ツアー\n日時：毎週日曜日 14:00〜14:45\n対象：どなたでも\n参加費：無料（ただし入館料が必要）\n申し込み：不要。当日、1階受付前にお集まりください。\n\n③夜の博物館\n日時：8月10日（土）18:00〜20:00\n対象：中学生以上\n参加費：1,000円（入館料を含む）\n定員：40名（事前申し込み・応募者多数の場合は抽選）\n\n■入館料：大人600円、高校生・大学生300円、中学生以下無料\n■①と③の申し込み：博物館ホームページから（7月15日まで）"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n地震のときは、落ち着いて近くの公園に【避難】してください。",
+      "options": [
+        "へきなん",
+        "ひだん",
+        "ひがん",
+        "ひなん"
+      ],
+      "answer": 3,
+      "rationale": "避難は「ひなん」と読み、危険を避けて安全な所へ逃げることを表す。\nThe word 避難 (evacuation) is read hinan.",
+      "target": "避難"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n今日は【湿度】が高く、洗濯物がなかなか乾かない。",
+      "options": [
+        "しど",
+        "じつど",
+        "しっど",
+        "しつど"
+      ],
+      "answer": 3,
+      "rationale": "湿度は「しつど」と読み、空気の湿り具合を表す。\nThe word 湿度 (humidity) is read shitsudo.",
+      "target": "湿度"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの博物館では、昔の農具を【展示】している。",
+      "options": [
+        "てんじ",
+        "でんし",
+        "でんじ",
+        "てんし"
+      ],
+      "answer": 0,
+      "rationale": "展示は「てんじ」と読み、物を並べて人に見せることを表す。\nThe word 展示 (exhibition) is read tenji.",
+      "target": "展示"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\nテレビの【きしょう】情報によると、明日は大雨になるらしい。",
+      "options": [
+        "気象",
+        "起床",
+        "気性",
+        "希少"
+      ],
+      "answer": 0,
+      "rationale": "天気など大気の状態を表す「きしょう」は「気象」と書く。「気性」「希少」「起床」は意味が違う。\nKishō meaning weather conditions is written 気象; the other options are homophones with other meanings.",
+      "target": "気象"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n会議で、新しい仕事の進め方を【ていあん】した。",
+      "options": [
+        "提安",
+        "低案",
+        "定案",
+        "提案"
+      ],
+      "answer": 3,
+      "rationale": "意見や計画を出すことを「提案」と書く。\nTeian, making a proposal, is written 提案.",
+      "target": "提案"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "word-formation",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n地震に備えて、非常（　）の持ち出し袋を玄関に置いている。",
+      "options": [
+        "用",
+        "型",
+        "性",
+        "式"
+      ],
+      "answer": 0,
+      "rationale": "そのために使うという意味の「用」がつき、「非常用」で非常時に使うものを表す。\nThe suffix 用 means for use in, so hijōyō means for emergencies."
+    },
+    {
+      "skill": "vocabulary",
+      "task": "word-formation",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n連休（　）の月曜日は、メールの返事を書くだけで午前中が終わってしまう。",
+      "options": [
+        "明け",
+        "済み",
+        "付き",
+        "向け"
+      ],
+      "answer": 0,
+      "rationale": "休みなどが終わった直後を表す「明け」がつき、「連休明け」となる。\nAke means the time just after a period ends, as in renkyū-ake."
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n防災訓練では、実際に災害が起きたときの避難の（　）を確認した。",
+      "options": [
+        "手当て",
+        "手元",
+        "手数",
+        "手順"
+      ],
+      "answer": 3,
+      "rationale": "物事を行う順番を「手順」という。\nTejun is the order of steps in a procedure.",
+      "target": "手順"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n天気予報によると、台風は今夜、九州地方に（　）する見込みだ。",
+      "options": [
+        "接触",
+        "接近",
+        "接続",
+        "接待"
+      ],
+      "answer": 1,
+      "rationale": "近づくことを「接近」といい、「台風が接近する」と言う。\nSekkin means approaching, as when a typhoon draws near.",
+      "target": "接近"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n上司の指示が（　）で、何をすればいいのかわからなかった。",
+      "options": [
+        "素直",
+        "あいまい",
+        "丁寧",
+        "正確"
+      ],
+      "answer": 1,
+      "rationale": "はっきりしない様子を「あいまい（曖昧）」という。\nAimai means vague or unclear.",
+      "target": "曖昧"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n警報が出たら、【直ちに】高い所へ移動してください。",
+      "options": [
+        "すぐに",
+        "ゆっくり",
+        "必ず",
+        "家族と"
+      ],
+      "answer": 0,
+      "rationale": "「直ちに」は、時間をおかずにすぐという意味だ。\nTadachi ni means at once, the same as sugu ni.",
+      "target": "直ちに"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n明日は、今日より【一段と】寒くなるでしょう。",
+      "options": [
+        "少し",
+        "急に",
+        "さらに",
+        "意外に"
+      ],
+      "answer": 2,
+      "rationale": "「一段と」は、前よりいっそう程度が進む様子で、「さらに」に近い。\nIchidan to means even more, close to sara ni.",
+      "target": "一段と"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n午後から、取引先と新しい商品について【打ち合わせ】をする。",
+      "options": [
+        "見学",
+        "話し合い",
+        "食事",
+        "契約"
+      ],
+      "answer": 1,
+      "rationale": "「打ち合わせ」は、前もって相談して決めることで、「話し合い」に近い。\nUchiawase is a preparatory meeting, close to hanashiai.",
+      "target": "打ち合わせ"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【備える】",
+      "options": [
+        "天気予報が備えて、明日は雨が降るそうだ。",
+        "会議の資料を、机の上に備えて帰った。",
+        "地震に備えて、家具が倒れないように固定した。",
+        "博物館には、昔の着物が備えて展示されている。"
+      ],
+      "answer": 2,
+      "rationale": "「備える」は、起こるかもしれないことに対して前もって準備することを表す。\nSonaeru means to prepare in advance for something that may happen.",
+      "target": "備える"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【見当】",
+      "options": [
+        "今日の会議に何人集まるのか、まったく見当がつかない。",
+        "防災訓練の見当を、事前に全員に配った。",
+        "博物館の見当は、毎週月曜日だ。",
+        "新しい上司は、見当が厳しい人だ。"
+      ],
+      "answer": 0,
+      "rationale": "「見当がつかない」は、予想や見込みがまったく立たないことを表す。\nKentō ga tsukanai means one cannot even guess.",
+      "target": "見当"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n古い家具を固定しておかないと、地震のときに倒れて、大けがにつながり（　）。",
+      "options": [
+        "ようがない",
+        "っこない",
+        "かねる",
+        "かねない"
+      ],
+      "answer": 3,
+      "rationale": "悪い結果になる可能性があることを表す「かねない」が合う。\nKanenai means something bad could well happen.",
+      "subject": "grammar:kanenai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n台風の影響で、三日間（　）強い雨が降り続いた。",
+      "options": [
+        "に沿って",
+        "について",
+        "にわたって",
+        "にとって"
+      ],
+      "answer": 2,
+      "rationale": "期間の全体に及ぶことを表す「にわたって」が合う。\nNi watatte means throughout a whole period.",
+      "subject": "grammar:niwatatte"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n避難訓練（　）、参加者に注意事項が説明された。",
+      "options": [
+        "にかぎって",
+        "にこたえて",
+        "に際して",
+        "に反して"
+      ],
+      "answer": 2,
+      "rationale": "何かを行うときにという意味の「に際して」が合う。\nNi saishite means on the occasion of.",
+      "subject": "grammar:nisaishite"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nさすが長年テレビで天気を伝えてきた人（　）、彼の説明はとてもわかりやすい。",
+      "options": [
+        "ものの",
+        "だけあって",
+        "くせに",
+        "わりに"
+      ],
+      "answer": 1,
+      "rationale": "「さすが〜だけあって」で、経験にふさわしい結果であることを表す。\nDake atte means as one would expect from.",
+      "subject": "grammar:dakeatte"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n新しい展示の方法（　）、博物館の職員の間で意見が分かれた。",
+      "options": [
+        "をこめて",
+        "をもとに",
+        "をめぐって",
+        "を通じて"
+      ],
+      "answer": 2,
+      "rationale": "ある問題について意見が対立するときに使う「をめぐって」が合う。\nO megutte is used for disputes surrounding an issue.",
+      "subject": "grammar:womegutte"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n彼は、忙しいと言い（　）、いつも同僚の相談に乗ってくれる。",
+      "options": [
+        "ながらも",
+        "つつある",
+        "次第",
+        "ついでに"
+      ],
+      "answer": 0,
+      "rationale": "前と後ろで食い違う内容をつなぐ逆接の「ながらも」が合う。\nNagara mo means although, linking two contrasting facts.",
+      "subject": "grammar:nagaramo"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n訓練の日は、全員が校庭に＿＿＿ ＿＿＿ ＿★＿ ＿＿＿ 遅れないでください。",
+      "options": [
+        "ことに",
+        "集まる",
+        "なって",
+        "いるので"
+      ],
+      "answer": 2,
+      "rationale": "正しい順は「集まる・ことに・なって・いるので」で、★には「なって」が入る。\nThe order is atsumaru / koto ni / natte / iru node."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\n天気予報では晴れだと＿＿＿ ＿★＿ ＿＿＿ ＿＿＿ 、夕方から雨が降ってきた。",
+      "options": [
+        "出かけたら",
+        "傘を持たずに",
+        "言っていた",
+        "ので"
+      ],
+      "answer": 3,
+      "rationale": "正しい順は「言っていた・ので・傘を持たずに・出かけたら」で、★には「ので」が入る。\nThe order is itte ita / node / kasa o motazu ni / dekaketara."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこの博物館は、＿★＿ ＿＿＿ ＿＿＿ ＿＿＿ 知られている。",
+      "options": [
+        "多い",
+        "ことで",
+        "道具が",
+        "江戸時代の"
+      ],
+      "answer": 3,
+      "rationale": "正しい順は「江戸時代の・道具が・多い・ことで」で、★には「江戸時代の」が入る。\nThe order is Edo jidai no / dōgu ga / ōi / koto de."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "なぜなら",
+        "つまり",
+        "しかし",
+        "そのうえ"
+      ],
+      "answer": 2,
+      "rationale": "時間の無駄だという声があったことと、雰囲気がよくなったことが反対の内容なので「しかし」が合う。\nShikashi introduces the contrasting result.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "それとも",
+        "反対に",
+        "ところで",
+        "たとえば"
+      ],
+      "answer": 1,
+      "rationale": "話さない相手には言いにくいことと、相手を知っていれば伝えやすいことを対比しているので「反対に」が合う。\nHantai ni contrasts the two situations.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "仕事を円滑に進めるための準備でもある",
+        "仕事の時間を減らすためのものだ",
+        "会議に参加しない人のためのものだ",
+        "若い社員だけに必要なものだ"
+      ],
+      "answer": 0,
+      "rationale": "雑談で相手を知ることが意見を伝えやすくするので、仕事を円滑に進める準備になるという意味が合う。\nSmall talk helps work go smoothly by making colleagues easier to talk to.",
+      "passage": "tg"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "訓練に参加できない人は、どうしなければならないか。",
+      "options": [
+        "集会室で消火器の使い方の説明を受ける。",
+        "管理室で防災マニュアルを受け取る。",
+        "当日の午前10時に駐車場に集まる。",
+        "管理組合に電話で連絡する。"
+      ],
+      "answer": 1,
+      "rationale": "参加できない人は、管理室に置いてある防災マニュアルを必ず受け取るように書かれている。\nThose who cannot attend must collect the disaster manual from the management office.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "「降水確率30％」について、本文の内容と合うものはどれか。",
+      "options": [
+        "雨の強さが弱いことを表している。",
+        "一日のうち30％の時間、雨が降るという意味だ。",
+        "同じような条件の日のうち、約30％の日に雨が降るという意味だ。",
+        "30ミリ以上の雨が降るという意味だ。"
+      ],
+      "answer": 2,
+      "rationale": "同じような条件の日が100回あれば、約30回は1ミリ以上の雨が降るという意味だと説明している。\nIt means rain falls on about 30 out of 100 days with similar conditions.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "筆者は、久しぶりに訪れた博物館で、何がよかったと述べているか。",
+      "options": [
+        "昔の道具を実際に手に取って使えたこと",
+        "展示物を静かに眺められたこと",
+        "子どものころと変わっていなかったこと",
+        "ガラスのケースがきれいになっていたこと"
+      ],
+      "answer": 0,
+      "rationale": "昔の道具を実際に手に取って使うことができ、人々の暮らしが身近に感じられたと述べている。\nHandling the old tools made past lives feel close to the writer.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "筆者が新人のころ、先輩に相談しなかったのはなぜか。",
+      "options": [
+        "先輩に相談するなと言われていたから",
+        "自分の仕事には間違いがないと思っていたから",
+        "忙しそうな先輩に声をかけるのは申し訳ないと思ったから",
+        "先輩と話すのが好きではなかったから"
+      ],
+      "answer": 2,
+      "rationale": "忙しそうな先輩に声をかけるのは申し訳ないと思ったと書かれている。\nThe writer felt bad about bothering a busy senior colleague.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "筆者は今、相談についてどのように考えているか。",
+      "options": [
+        "相談は、自分で解決できないときだけにするべきだ。",
+        "相談は、締め切りの直前にするのがよい。",
+        "相談は、相手の時間を奪うので、なるべく避けるべきだ。",
+        "相談は、仕事を守るための手段である。"
+      ],
+      "answer": 3,
+      "rationale": "最後に、相談は迷惑をかけることではなく、仕事を守るための手段だと述べている。\nThe writer now sees asking for advice as a way to protect the work.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "予報を伝える側の新しい悩みとして、本文で挙げられているものはどれか。",
+      "options": [
+        "数日先の天気が予測できないこと",
+        "コンピューターの使い方が難しいこと",
+        "大雨の予報がなかなか当たらないこと",
+        "早めに注意を呼びかけて被害が出なかったとき、大げさだと言われること"
+      ],
+      "answer": 3,
+      "rationale": "早めに注意を呼びかけても被害が出なかった場合、大げさだったと言われてしまうことを挙げている。\nForecasters may be called alarmist when early warnings are followed by little damage.",
+      "passage": "m2"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "筆者の考えに合うものはどれか。",
+      "options": [
+        "天気予報の精度は、まだまだ低い。",
+        "被害が出なかったのは、早めに備えた結果だと考えることもできる。",
+        "大げさな注意の呼びかけは、やめるべきだ。",
+        "予報が外れた場合は、予報を出した側が謝るべきだ。"
+      ],
+      "answer": 1,
+      "rationale": "被害が出なかったのは、多くの人が早めに備えた結果かもしれないと述べている。\nThe writer suggests the lack of damage may result from early preparation.",
+      "passage": "m2"
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "prompt": "AとBのどちらの文章でも触れられている点は何か。",
+      "options": [
+        "撮影がSNSでの宣伝になること",
+        "撮影を認める場合の条件や工夫",
+        "撮影する人が実物をよく見なくなること",
+        "シャッターの音がほかの人の邪魔になること"
+      ],
+      "answer": 1,
+      "rationale": "Aはフラッシュの禁止を条件に挙げ、Bも時間や場所を限るなどの工夫が必要だと述べている。\nBoth texts mention conditions or measures for allowing photography.",
+      "passages": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "skill": "reading",
+      "task": "integrated-reading",
+      "prompt": "博物館での写真撮影について、AとBはどのような立場をとっているか。",
+      "options": [
+        "Aは撮影を認めることに積極的で、Bは慎重な立場をとっている。",
+        "AもBも、撮影を自由に認めるべきだと考えている。",
+        "Aは撮影に反対し、Bは賛成している。",
+        "AもBも、撮影は禁止するべきだと考えている。"
+      ],
+      "answer": 0,
+      "rationale": "Aは撮影を認める利点は大きいとし、Bは撮影には慎重であるべきだと述べている。\nA favours allowing photography, while B is cautious about it.",
+      "passages": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "prompt": "ある調査の結果について、筆者はどのように述べているか。",
+      "options": [
+        "持ち出し袋の中身は、ほとんどの家庭で新しく保たれている。",
+        "懐中電灯を用意している家庭は少ない。",
+        "持ち出し袋を用意していても、中身を確かめていない家庭が多い。",
+        "多くの家庭が非常用の持ち出し袋を用意していない。"
+      ],
+      "answer": 2,
+      "rationale": "持ち出し袋を用意していても、中身を一度も確認したことがない人が半数近くいたと述べている。\nNearly half of households with an emergency bag had never checked its contents.",
+      "passage": "c"
+    },
+    {
+      "skill": "reading",
+      "task": "claim-reading",
+      "prompt": "筆者が最も言いたいことは何か。",
+      "options": [
+        "防災は特別な行事として、年に一度しっかり行うべきだ。",
+        "非常用の食料や水は、できるだけ多くそろえるべきだ。",
+        "避難場所は、家族で話し合って決めるべきだ。",
+        "防災の備えは、日常生活の中で無理なく続けるべきだ。"
+      ],
+      "answer": 3,
+      "rationale": "防災を日常生活の中に組み込み、無理なく続けられる備えを考えるべきだと述べている。\nThe writer argues for building disaster preparation into everyday life.",
+      "passage": "c"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "7月20日、小学2年生の子どもとその母親が、一緒に参加できるイベントを探している。二人が参加できるものはどれか。",
+      "options": [
+        "①だけ",
+        "②だけ",
+        "②と③",
+        "①と②"
+      ],
+      "answer": 1,
+      "rationale": "①は申し込みの締め切りが過ぎており、③は中学生以上が対象なので、申し込みが不要な②だけに参加できる。\nThe deadline for event 1 has passed and event 3 is for ages 13 and up, so only the tour fits.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "大学生の佐藤さんは、8月の日曜日に展示室ツアーに参加したい。佐藤さんが払う金額はいくらか。",
+      "options": [
+        "0円",
+        "300円",
+        "600円",
+        "1,000円"
+      ],
+      "answer": 1,
+      "rationale": "ツアーは無料だが入館料が必要で、大学生の入館料は300円なので、300円を払う。\nThe tour is free, but a university student pays the 300-yen admission.",
+      "passage": "info"
+    }
+  ]
+}

@@ -1,0 +1,928 @@
+{
+  "id": "m01-money",
+  "cards": [
+    {
+      "n": 64,
+      "term": "財政",
+      "reading": "ざいせい",
+      "meaning": "public finances",
+      "def_ja": "国や自治体のお金のやりくり。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "国の財政は赤字が続いている。",
+          "form": "財政",
+          "en": "The country's finances keep running a deficit."
+        },
+        {
+          "lv": 2,
+          "ja": "市の財政が厳しいので、図書館の開館時間が短くなった。",
+          "form": "財政",
+          "en": "The city's finances are tight, so the library's opening hours were cut."
+        },
+        {
+          "lv": 3,
+          "ja": "少子高齢化で社会保障費が膨らみ、多くの自治体が財政難に苦しんでいる。",
+          "form": "財政",
+          "en": "With an aging, shrinking population pushing up welfare costs, many local governments are struggling financially."
+        }
+      ],
+      "tip": "For a household budget say 家計; 財政 is mainly used for governments."
+    },
+    {
+      "n": 65,
+      "term": "資金",
+      "reading": "しきん",
+      "meaning": "funds",
+      "def_ja": "ある目的のために用意するお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "店を開く資金をためている。",
+          "form": "資金",
+          "en": "I'm saving up the money to open a shop."
+        },
+        {
+          "lv": 2,
+          "ja": "新しい工場を建てるための資金を銀行から借りた。",
+          "form": "資金",
+          "en": "We borrowed the funds to build a new factory from the bank."
+        },
+        {
+          "lv": 3,
+          "ja": "売り上げが落ちて資金繰りが苦しくなり、社長は親戚にまでお金を借りに行った。",
+          "form": "資金",
+          "en": "Sales fell and cash flow got tight, so the company president even went to relatives to borrow money."
+        }
+      ],
+      "tip": "資金繰り means juggling cash so you can pay your bills on time."
+    },
+    {
+      "n": 66,
+      "term": "利回り",
+      "reading": "りまわり",
+      "meaning": "investment yield",
+      "def_ja": "投資したお金に対するもうけの割合。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この国債は利回りが低い。",
+          "form": "利回り",
+          "en": "This government bond has a low yield."
+        },
+        {
+          "lv": 2,
+          "ja": "銀行預金より利回りのいい投資先を探している。",
+          "form": "利回り",
+          "en": "I'm looking for an investment with a better yield than a bank deposit."
+        },
+        {
+          "lv": 3,
+          "ja": "都心のマンションは家賃収入の利回りが低いため、投資するなら地方の物件も比べたほうがいい。",
+          "form": "利回り",
+          "en": "Rental yields on central Tokyo condos are low, so if you invest, you should also compare properties outside the big cities."
+        }
+      ],
+      "tip": "When bond prices fall, their 利回り goes up."
+    },
+    {
+      "n": 105,
+      "term": "等比",
+      "reading": "とうひ",
+      "meaning": "geometric (equal ratio)",
+      "def_ja": "となり合う数の比がいつも同じこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "2、4、8、16は等比数列だ。",
+          "form": "等比",
+          "en": "2, 4, 8, 16 is a geometric sequence."
+        },
+        {
+          "lv": 2,
+          "ja": "毎回同じ数を掛けていく数列を等比数列という。",
+          "form": "等比",
+          "en": "A sequence where you keep multiplying by the same number is called a geometric sequence."
+        },
+        {
+          "lv": 3,
+          "ja": "複利でお金が増えていく様子は、高校数学で習う等比数列の考え方で説明できる。",
+          "form": "等比",
+          "en": "How money grows with compound interest can be explained with the geometric sequences you learn in high school math."
+        }
+      ],
+      "tip": "Almost always met in 等比数列; the arithmetic version is 等差数列."
+    },
+    {
+      "n": 106,
+      "term": "数列",
+      "reading": "すうれつ",
+      "meaning": "sequence of numbers",
+      "def_ja": "決まった順に数を並べたもの。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "数学の授業で数列を習った。",
+          "form": "数列",
+          "en": "We learned about sequences in math class."
+        },
+        {
+          "lv": 2,
+          "ja": "1、3、5、7と続く数列の次の数は9だ。",
+          "form": "数列",
+          "en": "The next number in the sequence 1, 3, 5, 7 is 9."
+        },
+        {
+          "lv": 3,
+          "ja": "入社試験に数列の規則を見つける問題が出たので、高校の数学を思い出しながら解いた。",
+          "form": "数列",
+          "en": "The company's entrance test had a question on finding the rule in a number sequence, so I solved it by recalling high school math."
+        }
+      ]
+    },
+    {
+      "n": 107,
+      "term": "返済",
+      "reading": "へんさい",
+      "meaning": "repayment",
+      "def_ja": "借りたお金を返すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "毎月ローンを返済している。",
+          "form": "返済",
+          "en": "I pay back my loan every month."
+        },
+        {
+          "lv": 2,
+          "ja": "奨学金の返済があと五年残っている。",
+          "form": "返済",
+          "en": "I still have five more years of student loan repayments."
+        },
+        {
+          "lv": 3,
+          "ja": "住宅ローンの返済が苦しくなったので、銀行に相談して月々の支払いを減らしてもらった。",
+          "form": "返済",
+          "en": "Paying off my mortgage got hard, so I talked to the bank and had my monthly payments lowered."
+        }
+      ],
+      "tip": "A refund in a shop is 返金, not 返済."
+    },
+    {
+      "n": 108,
+      "term": "預金",
+      "reading": "よきん",
+      "meaning": "bank deposit",
+      "def_ja": "銀行などに預けたお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "ATMで預金を下ろした。",
+          "form": "預金",
+          "en": "I withdrew some money from my account at an ATM."
+        },
+        {
+          "lv": 2,
+          "ja": "毎月の給料の一部を定期預金にしている。",
+          "form": "預金",
+          "en": "Every month I put part of my salary into a fixed-term deposit."
+        },
+        {
+          "lv": 3,
+          "ja": "金利がとても低いので、預金をしておくだけではお金はなかなか増えない。",
+          "form": "預金",
+          "en": "Interest rates are very low, so money hardly grows if you just keep it in a bank account."
+        }
+      ],
+      "tip": "預金を下ろす means to withdraw money from your account."
+    },
+    {
+      "n": 109,
+      "term": "金利",
+      "reading": "きんり",
+      "meaning": "interest rate",
+      "def_ja": "お金を貸し借りするときの利息の割合。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "住宅ローンの金利が上がった。",
+          "form": "金利",
+          "en": "Interest rates on home loans have gone up."
+        },
+        {
+          "lv": 2,
+          "ja": "金利が低いうちに家を買おうと考えている。",
+          "form": "金利",
+          "en": "We're thinking of buying a house while interest rates are low."
+        },
+        {
+          "lv": 3,
+          "ja": "中央銀行が金利を引き上げると、お金を借りる人が減って景気が冷えやすい。",
+          "form": "金利",
+          "en": "When the central bank raises interest rates, fewer people borrow and the economy tends to cool down."
+        }
+      ],
+      "tip": "金利 is the rate; the money you actually pay or receive is 利息."
+    },
+    {
+      "n": 110,
+      "term": "利率",
+      "reading": "りりつ",
+      "meaning": "interest rate (formal)",
+      "def_ja": "元金に対する利息の割合。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この預金の利率は年1％です。",
+          "form": "利率",
+          "en": "The interest rate on this deposit is 1% a year."
+        },
+        {
+          "lv": 2,
+          "ja": "契約書には、借りたお金の利率がはっきり書いてある。",
+          "form": "利率",
+          "en": "The contract clearly states the interest rate on the money borrowed."
+        },
+        {
+          "lv": 3,
+          "ja": "年5％の利率で10万円を1年間預けると、利息は5000円になる。",
+          "form": "利率",
+          "en": "If you deposit 100,000 yen for one year at an interest rate of 5%, you get 5,000 yen in interest."
+        }
+      ],
+      "tip": "Common in contracts and math problems; in conversation people usually say 金利."
+    },
+    {
+      "n": 111,
+      "term": "初項",
+      "reading": "しょこう",
+      "meaning": "first term of a sequence",
+      "def_ja": "数列のいちばん最初の数。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この数列の初項は3だ。",
+          "form": "初項",
+          "en": "The first term of this sequence is 3."
+        },
+        {
+          "lv": 2,
+          "ja": "初項が2、公比が3の等比数列を書き出してみよう。",
+          "form": "初項",
+          "en": "Let's write out the geometric sequence with first term 2 and common ratio 3."
+        },
+        {
+          "lv": 3,
+          "ja": "等差数列の問題では、まず初項と公差を求めれば、何番目の項でもすぐに計算できる。",
+          "form": "初項",
+          "en": "In arithmetic sequence problems, once you find the first term and the common difference, you can quickly work out any term."
+        }
+      ],
+      "tip": "A math-class word; it usually comes with 公比 (common ratio) or 公差 (common difference)."
+    },
+    {
+      "n": 112,
+      "term": "運用",
+      "reading": "うんよう",
+      "meaning": "managing, putting to use",
+      "def_ja": "お金や制度をうまく使って動かすこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "退職金を運用して増やしたい。",
+          "form": "運用",
+          "en": "I want to invest my retirement money and make it grow."
+        },
+        {
+          "lv": 2,
+          "ja": "新しいルールは来月から運用が始まる予定だ。",
+          "form": "運用",
+          "en": "The new rules are due to be put into practice from next month."
+        },
+        {
+          "lv": 3,
+          "ja": "年金の積立金を株式で運用しているため、株価が大きく下がると評価額も減ってしまう。",
+          "form": "運用",
+          "en": "Because pension reserves are invested in stocks, their value drops when share prices fall sharply."
+        }
+      ],
+      "tip": "Two common uses: 資産運用 (investing money) and 制度の運用 (running a system)."
+    },
+    {
+      "n": 113,
+      "term": "利息",
+      "reading": "りそく",
+      "meaning": "interest (money)",
+      "def_ja": "貸し借りしたお金に上乗せされるお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "友だちから利息なしでお金を借りた。",
+          "form": "利息",
+          "en": "I borrowed money from a friend with no interest."
+        },
+        {
+          "lv": 2,
+          "ja": "一年間預けても、利息は数十円しかつかなかった。",
+          "form": "利息",
+          "en": "Even after a year in the bank, I only earned a few dozen yen in interest."
+        },
+        {
+          "lv": 3,
+          "ja": "カードの支払いを分割にすると利息がかかるので、できるだけ一回払いにしている。",
+          "form": "利息",
+          "en": "Paying by card in installments adds interest, so I try to pay in a single payment."
+        }
+      ]
+    },
+    {
+      "n": 114,
+      "term": "元金",
+      "reading": "がんきん",
+      "meaning": "principal",
+      "def_ja": "利息がつく前の、もとのお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "毎月、利息と元金を少しずつ返している。",
+          "form": "元金",
+          "en": "Every month I pay back a little interest and principal."
+        },
+        {
+          "lv": 2,
+          "ja": "元金が大きいほど、つく利息も多くなる。",
+          "form": "元金",
+          "en": "The bigger the principal, the more interest it earns."
+        },
+        {
+          "lv": 3,
+          "ja": "最初の数年は返済の多くが利息に回るため、借りた元金はなかなか減らない。",
+          "form": "元金",
+          "en": "In the first few years most of each payment goes to interest, so the principal you borrowed barely goes down."
+        }
+      ],
+      "tip": "Also read もときん, but がんきん is the standard reading in banking."
+    },
+    {
+      "n": 115,
+      "term": "単利",
+      "reading": "たんり",
+      "meaning": "simple interest",
+      "def_ja": "最初のお金だけに利息をつける計算。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この預金は単利で計算される。",
+          "form": "単利",
+          "en": "Interest on this deposit is calculated as simple interest."
+        },
+        {
+          "lv": 2,
+          "ja": "単利だと、毎年もらえる利息の額は変わらない。",
+          "form": "単利",
+          "en": "With simple interest, the amount you receive each year stays the same."
+        },
+        {
+          "lv": 3,
+          "ja": "単利と複利の違いは最初の数年では小さいが、三十年たつと大きな差になる。",
+          "form": "単利",
+          "en": "The difference between simple and compound interest is small in the first few years, but after thirty years it becomes large."
+        }
+      ],
+      "tip": "Its opposite is 複利, compound interest."
+    },
+    {
+      "n": 116,
+      "term": "歴然",
+      "reading": "れきぜん",
+      "meaning": "clear, obvious",
+      "def_ja": "だれが見てもはっきりしているようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "二人の実力の差は歴然としている。",
+          "form": "歴然",
+          "en": "The gap in skill between the two is obvious."
+        },
+        {
+          "lv": 2,
+          "ja": "新しい薬を使った患者とそうでない患者では、効果の違いが歴然だった。",
+          "form": "歴然",
+          "en": "The difference between patients who took the new drug and those who didn't was clear."
+        },
+        {
+          "lv": 3,
+          "ja": "防犯カメラに犯人の顔がはっきり映っていたので、証拠は歴然としていた。",
+          "form": "歴然",
+          "en": "The culprit's face was clearly caught on the security camera, so the evidence was plain."
+        }
+      ],
+      "tip": "Usually used with 差, 違い or 証拠, as in 差は歴然だ."
+    },
+    {
+      "n": 184,
+      "term": "指数関数",
+      "reading": "しすうかんすう",
+      "meaning": "exponential function",
+      "def_ja": "同じ数を何回も掛け合わせる形の関数。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "高校で指数関数を習った。",
+          "form": "指数関数",
+          "en": "I learned about exponential functions in high school."
+        },
+        {
+          "lv": 2,
+          "ja": "感染者の数が指数関数的に増えている。",
+          "form": "指数関数",
+          "en": "The number of infections is rising exponentially."
+        },
+        {
+          "lv": 3,
+          "ja": "複利でお金が増える様子をグラフにすると、指数関数の曲線になる。",
+          "form": "指数関数",
+          "en": "If you graph money growing with compound interest, you get the curve of an exponential function."
+        }
+      ],
+      "tip": "In news, 指数関数的に simply means growing very fast."
+    },
+    {
+      "n": 120,
+      "term": "足し算",
+      "reading": "たしざん",
+      "meaning": "addition",
+      "def_ja": "数を合わせて合計を出す計算。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "弟はもう足し算ができる。",
+          "form": "足し算",
+          "en": "My little brother can already do addition."
+        },
+        {
+          "lv": 2,
+          "ja": "子どもが指を使って足し算の練習をしている。",
+          "form": "足し算",
+          "en": "The child is practicing addition by counting on their fingers."
+        },
+        {
+          "lv": 3,
+          "ja": "単利は毎年同じ額が増える足し算だが、複利は掛け算のように増えていく。",
+          "form": "足し算",
+          "en": "Simple interest grows by addition, the same amount every year, but compound interest grows like multiplication."
+        }
+      ],
+      "tip": "Subtraction is 引き算, multiplication 掛け算 and division 割り算."
+    },
+    {
+      "n": 131,
+      "term": "電卓",
+      "reading": "でんたく",
+      "meaning": "pocket calculator",
+      "def_ja": "数字を打ちこんで計算する小さな機械。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "電卓で計算してください。",
+          "form": "電卓",
+          "en": "Please work it out with a calculator."
+        },
+        {
+          "lv": 2,
+          "ja": "数学のテストでは電卓を使ってはいけない。",
+          "form": "電卓",
+          "en": "You're not allowed to use a calculator in the math test."
+        },
+        {
+          "lv": 3,
+          "ja": "スマホにも計算の機能はあるが、経理の仕事では今でも大きなボタンの電卓が手放せない。",
+          "form": "電卓",
+          "en": "Phones can do calculations too, but in accounting work people still can't do without a calculator with big buttons."
+        }
+      ]
+    },
+    {
+      "n": 132,
+      "term": "電卓を叩く",
+      "reading": "でんたくをたたく",
+      "meaning": "to crunch the numbers",
+      "def_ja": "損か得かを細かく計算してみる。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "店の主人が電卓を叩いて値段を出した。",
+          "form": "電卓を叩い",
+          "en": "The shop owner tapped away on a calculator and came up with a price."
+        },
+        {
+          "lv": 2,
+          "ja": "引っ越すか迷って、家賃と通勤費で電卓を叩いてみた。",
+          "form": "電卓を叩い",
+          "en": "Unsure whether to move, I crunched the numbers on rent and commuting costs."
+        },
+        {
+          "lv": 3,
+          "ja": "各社は円安でどれだけ利益が増えるか電卓を叩いているが、材料費の値上がりも無視できない。",
+          "form": "電卓を叩い",
+          "en": "Companies are working out how much a weak yen will raise profits, but rising material costs can't be ignored either."
+        }
+      ],
+      "tip": "Can be literal, or mean working out whether something pays off; the second use is common in business news."
+    },
+    {
+      "n": 134,
+      "term": "計算機",
+      "reading": "けいさんき",
+      "meaning": "calculating machine",
+      "def_ja": "計算をするための機械。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "計算機で答えを確かめた。",
+          "form": "計算機",
+          "en": "I checked the answer with a calculator."
+        },
+        {
+          "lv": 2,
+          "ja": "昔の計算機は部屋いっぱいの大きさだった。",
+          "form": "計算機",
+          "en": "Early computing machines were big enough to fill a whole room."
+        },
+        {
+          "lv": 3,
+          "ja": "試験会場には関数電卓などの計算機を持ちこめないので、筆算の練習をしておこう。",
+          "form": "計算機",
+          "en": "You can't bring calculators such as scientific ones into the exam hall, so practice working things out on paper."
+        }
+      ],
+      "tip": "In daily life 電卓 is more common; 計算機 sounds technical or old."
+    },
+    {
+      "n": 6,
+      "term": "相乗",
+      "reading": "そうじょう",
+      "meaning": "synergy",
+      "def_ja": "重なって効果を強め合うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "二つの薬には相乗効果がある。",
+          "form": "相乗",
+          "en": "The two drugs have a synergistic effect."
+        },
+        {
+          "lv": 2,
+          "ja": "運動と食事の改善を組み合わせると、相乗効果でやせやすくなる。",
+          "form": "相乗",
+          "en": "Combining exercise with a better diet works together to make losing weight easier."
+        },
+        {
+          "lv": 3,
+          "ja": "合併すれば販売網と技術の相乗効果が期待できるとして、両社の株価が上がった。",
+          "form": "相乗",
+          "en": "Both companies' shares rose on hopes that a merger would create synergy between their sales networks and technology."
+        }
+      ],
+      "tip": "Today it is almost always in 相乗効果; for multiplication in math say 掛け算."
+    },
+    {
+      "n": 239,
+      "term": "対価",
+      "reading": "たいか",
+      "meaning": "payment in return",
+      "def_ja": "仕事や品物に見合って受け取るお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "働いた対価として給料をもらう。",
+          "form": "対価",
+          "en": "We receive a salary in return for our work."
+        },
+        {
+          "lv": 2,
+          "ja": "他人の写真を使うなら、きちんと対価を払うべきだ。",
+          "form": "対価",
+          "en": "If you use someone else's photo, you should pay properly for it."
+        },
+        {
+          "lv": 3,
+          "ja": "長時間の残業に見合う対価が支払われていないとして、社員たちが会社を訴えた。",
+          "form": "対価",
+          "en": "Employees sued the company, saying they were not fairly paid for their long overtime."
+        }
+      ],
+      "tip": "Sounds formal; common in contracts, law and debates about fair pay."
+    },
+    {
+      "n": 258,
+      "term": "費え",
+      "reading": "ついえ",
+      "meaning": "wasteful expense",
+      "def_ja": "むだに出ていくお金や手間。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "無駄な費えはできるだけ省きたい。",
+          "form": "費え",
+          "en": "I want to cut wasteful expenses as much as possible."
+        },
+        {
+          "lv": 2,
+          "ja": "祭りのたびに大きな費えがかかり、村の暮らしは楽ではなかった。",
+          "form": "費え",
+          "en": "Every festival cost a great deal, so life in the village was not easy."
+        },
+        {
+          "lv": 3,
+          "ja": "戦が長引けば国の費えはかさむばかりだと、家老は殿様に和睦を勧めた。",
+          "form": "費え",
+          "en": "Warning that a long war would only pile up the domain's expenses, the chief retainer urged his lord to make peace."
+        }
+      ],
+      "tip": "Rare and old-fashioned, mostly met in historical novels; in normal speech say 出費 or 無駄遣い."
+    },
+    {
+      "n": 262,
+      "term": "逸失利益",
+      "reading": "いっしつりえき",
+      "meaning": "lost earnings",
+      "def_ja": "事故などがなければ得られたはずの収入。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "裁判で逸失利益が認められた。",
+          "form": "逸失利益",
+          "en": "The court recognized the claim for lost earnings."
+        },
+        {
+          "lv": 2,
+          "ja": "事故で働けなくなった男性に、逸失利益を含む賠償が命じられた。",
+          "form": "逸失利益",
+          "en": "Compensation including lost earnings was ordered for a man who could no longer work after an accident."
+        },
+        {
+          "lv": 3,
+          "ja": "交通事故で亡くなった子どもの逸失利益は、将来働いて得たはずの収入をもとに計算される。",
+          "form": "逸失利益",
+          "en": "The lost earnings of a child killed in a traffic accident are calculated from the income they would have earned as an adult."
+        }
+      ],
+      "tip": "A legal and insurance term, mostly seen in court and accident news."
+    },
+    {
+      "n": 295,
+      "term": "折半",
+      "reading": "せっぱん",
+      "meaning": "splitting fifty-fifty",
+      "def_ja": "お金などを二人で半分ずつ分けること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "食事代は二人で折半した。",
+          "form": "折半",
+          "en": "We split the cost of the meal between the two of us."
+        },
+        {
+          "lv": 2,
+          "ja": "引っ越しの費用は、兄と折半することにした。",
+          "form": "折半",
+          "en": "I decided to split the moving costs with my older brother."
+        },
+        {
+          "lv": 3,
+          "ja": "事故の原因がどちらにもあったため、修理代は相手の運転手と折半することになった。",
+          "form": "折半",
+          "en": "Since both of us were to blame for the accident, I ended up splitting the repair bill with the other driver."
+        }
+      ]
+    },
+    {
+      "n": 316,
+      "term": "経費",
+      "reading": "けいひ",
+      "meaning": "business expenses",
+      "def_ja": "仕事や活動を続けるのにかかるお金。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "タクシー代は経費で落ちますか？",
+          "form": "経費",
+          "en": "Can I claim the taxi fare as an expense?"
+        },
+        {
+          "lv": 2,
+          "ja": "会社は経費を減らすため、紙の書類をやめた。",
+          "form": "経費",
+          "en": "The company stopped using paper documents to cut costs."
+        },
+        {
+          "lv": 3,
+          "ja": "出張で使った交通費は、領収書を出せば後で経費として精算してもらえる。",
+          "form": "経費",
+          "en": "If you hand in the receipts, travel costs from a business trip are paid back to you later as expenses."
+        }
+      ],
+      "tip": "経費で落とす means having the company pay for something as a business expense."
+    },
+    {
+      "n": 125,
+      "term": "棚卸",
+      "reading": "たなおろし",
+      "meaning": "stocktaking",
+      "def_ja": "店の商品の数をすべて数えて調べること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "今日は店の棚卸の日だ。",
+          "form": "棚卸",
+          "en": "Today is stocktaking day at the store."
+        },
+        {
+          "lv": 2,
+          "ja": "年に一度の棚卸のため、明日は臨時休業します。",
+          "form": "棚卸",
+          "en": "We will be closed tomorrow for our annual stocktaking."
+        },
+        {
+          "lv": 3,
+          "ja": "転職を考えるなら、まず自分のスキルを棚卸ししてみると、何ができるかが見えてくる。",
+          "form": "棚卸",
+          "en": "If you're thinking of changing jobs, taking stock of your skills first shows you what you can do."
+        }
+      ],
+      "tip": "Also written 棚卸し; job hunters use it for taking stock of their own skills."
+    },
+    {
+      "n": 126,
+      "term": "棚卸資産",
+      "reading": "たなおろししさん",
+      "meaning": "inventory (in accounts)",
+      "def_ja": "売るために持っている商品や材料。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "売れ残りで棚卸資産が増えた。",
+          "form": "棚卸資産",
+          "en": "Inventory went up because of unsold goods."
+        },
+        {
+          "lv": 2,
+          "ja": "決算書を見ると、その会社は棚卸資産が前の年の倍になっていた。",
+          "form": "棚卸資産",
+          "en": "The financial statements showed that the company's inventory had doubled from the year before."
+        },
+        {
+          "lv": 3,
+          "ja": "スマホの販売が落ちこんだため、部品メーカーの棚卸資産が膨らみ、利益を圧迫している。",
+          "form": "棚卸資産",
+          "en": "Smartphone sales have slumped, so parts makers' inventories have swollen and are eating into profits."
+        }
+      ],
+      "tip": "An accounting word from financial statements; in a shop people just say 在庫."
+    },
+    {
+      "n": 219,
+      "term": "景気",
+      "reading": "けいき",
+      "meaning": "the economy, business conditions",
+      "def_ja": "物の売り買いなど、経済全体の調子。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "最近は景気が悪くて、物が売れない。",
+          "form": "景気",
+          "en": "Business is bad these days, and things don't sell."
+        },
+        {
+          "lv": 2,
+          "ja": "ボーナスが増えたのは、景気が回復してきたからだ。",
+          "form": "景気",
+          "en": "Bonuses went up because the economy has started to recover."
+        },
+        {
+          "lv": 3,
+          "ja": "年末の商店街には景気のいい掛け声が飛び交っていて、歩くだけで楽しい気分になる。",
+          "form": "景気",
+          "en": "The shopping street at the end of the year is full of lively calls from shopkeepers, so just walking there puts you in a good mood."
+        }
+      ],
+      "tip": "景気のいい can also just mean lively or upbeat, as in 景気のいい話."
+    },
+    {
+      "n": 297,
+      "term": "不況",
+      "reading": "ふきょう",
+      "meaning": "recession",
+      "def_ja": "物が売れず、経済が落ちこんでいる状態。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "不況で仕事が減った。",
+          "form": "不況",
+          "en": "Work has dried up because of the recession."
+        },
+        {
+          "lv": 2,
+          "ja": "長い不況のせいで、大学生の就職が難しくなっている。",
+          "form": "不況",
+          "en": "Because of the long recession, it has become hard for university students to find jobs."
+        },
+        {
+          "lv": 3,
+          "ja": "出版不況と言われて久しいが、漫画の売り上げだけは電子書籍のおかげで伸びている。",
+          "form": "不況",
+          "en": "People have talked about a publishing slump for years, but manga sales alone are growing thanks to e-books."
+        }
+      ],
+      "tip": "Often joined to an industry name, as in 出版不況 (the publishing slump)."
+    },
+    {
+      "n": 218,
+      "term": "回復",
+      "reading": "かいふく",
+      "meaning": "recovery",
+      "def_ja": "悪くなったものが、もとの状態にもどること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "父の体調が回復した。",
+          "form": "回復",
+          "en": "My father's health has recovered."
+        },
+        {
+          "lv": 2,
+          "ja": "失った信頼を回復するには、長い時間がかかる。",
+          "form": "回復",
+          "en": "It takes a long time to win back lost trust."
+        },
+        {
+          "lv": 3,
+          "ja": "旅行客の数がコロナ前の水準まで回復したことで、観光地のホテルは人手不足に悩んでいる。",
+          "form": "回復",
+          "en": "With tourist numbers back to pre-COVID levels, hotels in tourist areas are struggling with staff shortages."
+        }
+      ]
+    },
+    {
+      "n": 220,
+      "term": "健全",
+      "reading": "けんぜん",
+      "meaning": "healthy, sound",
+      "def_ja": "無理やかたよりがなく、しっかりしたようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "この会社の経営は健全だ。",
+          "form": "健全",
+          "en": "This company is run on a sound footing."
+        },
+        {
+          "lv": 2,
+          "ja": "子どもが健全に育つ環境をつくるのは、大人の役目だ。",
+          "form": "健全",
+          "en": "Creating an environment where children grow up healthily is the job of adults."
+        },
+        {
+          "lv": 3,
+          "ja": "借金に頼らず税収の範囲で予算を組めば、国の財政を健全に保つことができる。",
+          "form": "健全",
+          "en": "If the budget stays within tax revenue without relying on borrowing, the nation's finances can be kept sound."
+        }
+      ],
+      "tip": "Used for finances, organizations and upbringing; for a person's body say 健康."
+    }
+  ]
+}

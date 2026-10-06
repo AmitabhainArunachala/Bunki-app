@@ -1,0 +1,1096 @@
+{
+  "id": "m07-board",
+  "cards": [
+    {
+      "n": 267,
+      "term": "盤上",
+      "reading": "ばんじょう",
+      "meaning": "on the board (shogi, go)",
+      "def_ja": "将棋や碁の盤の上。そこでの勝負。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "盤上に駒を並べて、将棋を始めた。",
+          "form": "盤上",
+          "en": "I set the pieces out on the board and started a game of shogi."
+        },
+        {
+          "lv": 2,
+          "ja": "二人の棋士は、盤上で静かな戦いを続けた。",
+          "form": "盤上",
+          "en": "The two players kept up their quiet battle on the board."
+        },
+        {
+          "lv": 3,
+          "ja": "対局中の棋士は、盤上の勝負だけに集中できるよう、スマホを預けることになっている。",
+          "form": "盤上",
+          "en": "During a game, players hand over their phones so they can focus only on the battle on the board."
+        }
+      ],
+      "tip": "盤上 is the game itself; things happening off the board are 盤外."
+    },
+    {
+      "n": 268,
+      "term": "秒針",
+      "reading": "びょうしん",
+      "meaning": "second hand",
+      "def_ja": "時計で、秒を示す細い針。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "時計の秒針が止まっている。",
+          "form": "秒針",
+          "en": "The second hand of the clock has stopped."
+        },
+        {
+          "lv": 2,
+          "ja": "試験の終わりが近づき、時計の秒針の音が気になった。",
+          "form": "秒針",
+          "en": "As the exam was ending, the ticking of the second hand bothered me."
+        },
+        {
+          "lv": 3,
+          "ja": "電池が切れかけると秒針が二秒おきに動く腕時計もあるので、その動きを見たら電池を替えよう。",
+          "form": "秒針",
+          "en": "Some watches move the second hand every two seconds when the battery is low, so if you see that, change the battery."
+        }
+      ],
+      "tip": "The hour hand is 短針 and the minute hand is 長針."
+    },
+    {
+      "n": 269,
+      "term": "制覇",
+      "reading": "せいは",
+      "meaning": "winning the championship",
+      "def_ja": "大会などで勝って、一番になること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "地元の高校が全国大会を制覇した。",
+          "form": "制覇",
+          "en": "A local high school won the national tournament."
+        },
+        {
+          "lv": 2,
+          "ja": "地元のプロ野球チームが、二十五年ぶりにリーグ制覇を果たした。",
+          "form": "制覇",
+          "en": "The local pro baseball team won the league for the first time in 25 years."
+        },
+        {
+          "lv": 3,
+          "ja": "テニスの四大大会を一年ですべて制覇することはグランドスラムと呼ばれ、選手にとって最高の名誉だ。",
+          "form": "制覇",
+          "en": "Winning all four tennis majors in one year is called a Grand Slam and is the highest honor for a player."
+        }
+      ],
+      "tip": "In sports news 制覇 just means winning a title; the sense of military conquest is mostly historical."
+    },
+    {
+      "n": 270,
+      "term": "盤面",
+      "reading": "ばんめん",
+      "meaning": "board position",
+      "def_ja": "将棋や碁で、盤の上の駒や石の並び方。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "将棋の盤面をスマホで写真に撮った。",
+          "form": "盤面",
+          "en": "I took a photo of the shogi board with my phone."
+        },
+        {
+          "lv": 2,
+          "ja": "テレビの解説者は、盤面を指しながら次の一手を説明した。",
+          "form": "盤面",
+          "en": "The TV commentator pointed at the board position as he explained the next move."
+        },
+        {
+          "lv": 3,
+          "ja": "囲碁の対局は終盤に入り、盤面ではわずかに黒が優勢だと解説者は話した。",
+          "form": "盤面",
+          "en": "The go game had reached the endgame, and the commentator said Black was slightly ahead on the board."
+        }
+      ]
+    },
+    {
+      "n": 271,
+      "term": "神童",
+      "reading": "しんどう",
+      "meaning": "child prodigy",
+      "def_ja": "小さいころから、すごい才能を見せる子。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "兄は子どものころ、神童と呼ばれていた。",
+          "form": "神童",
+          "en": "My older brother was called a child prodigy when he was little."
+        },
+        {
+          "lv": 2,
+          "ja": "小学生でプロ棋士に勝った少年は、将棋界の神童として注目された。",
+          "form": "神童",
+          "en": "The boy who beat a professional player while still in elementary school drew attention as shogi's child prodigy."
+        },
+        {
+          "lv": 3,
+          "ja": "子どものころ神童と騒がれても、大人になって普通の人になる例は珍しくない。",
+          "form": "神童",
+          "en": "It is not unusual for someone hailed as a prodigy in childhood to become an ordinary adult."
+        }
+      ],
+      "tip": "A well-known saying: 十で神童、十五で才子、二十過ぎればただの人."
+    },
+    {
+      "n": 272,
+      "term": "揺さぶる",
+      "reading": "ゆさぶる",
+      "meaning": "to shake; to unsettle",
+      "def_ja": "強くゆらす。人の心を大きく動かす。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "寝ている弟の肩を揺さぶって起こした。",
+          "form": "揺さぶって",
+          "en": "I shook my sleeping little brother by the shoulder to wake him up."
+        },
+        {
+          "lv": 2,
+          "ja": "被災地の子どもたちの合唱が、多くの人の心を揺さぶった。",
+          "form": "揺さぶった",
+          "en": "The choir of children from the disaster area moved many people deeply."
+        },
+        {
+          "lv": 3,
+          "ja": "相手チームは、ピッチャーを揺さぶるためにバントの構えを何度も見せてきた。",
+          "form": "揺さぶる",
+          "en": "The other team kept showing bunts to unsettle the pitcher."
+        }
+      ]
+    },
+    {
+      "n": 273,
+      "term": "たぐいまれ",
+      "reading": "たぐいまれ",
+      "meaning": "exceptional, rare",
+      "def_ja": "ほかにないほど、とてもすぐれているようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "たぐいまれな才能を持つ少年が、プロ棋士になった。",
+          "form": "たぐいまれな",
+          "en": "A boy with exceptional talent became a professional shogi player."
+        },
+        {
+          "lv": 2,
+          "ja": "主演の女優は、たぐいまれな美しさで観客を魅了した。",
+          "form": "たぐいまれな",
+          "en": "The lead actress captivated the audience with her rare beauty."
+        },
+        {
+          "lv": 3,
+          "ja": "監督は、まだ十代の選手をたぐいまれな集中力の持ち主だと評価し、代表に選んだ。",
+          "form": "たぐいまれな",
+          "en": "The manager praised the teenage player's exceptional concentration and picked him for the national team."
+        }
+      ],
+      "tip": "Also written 類いまれ; it is always praise and almost always comes before a noun as たぐいまれな."
+    },
+    {
+      "n": 274,
+      "term": "特訓",
+      "reading": "とっくん",
+      "meaning": "intensive training",
+      "def_ja": "短い間に、特に力を入れてする練習。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "夏休みに水泳の特訓をした。",
+          "form": "特訓",
+          "en": "I did intensive swimming training over the summer break."
+        },
+        {
+          "lv": 2,
+          "ja": "試合に向けて、コーチと毎朝特訓している。",
+          "form": "特訓",
+          "en": "I'm training hard with my coach every morning for the match."
+        },
+        {
+          "lv": 3,
+          "ja": "逆上がりができない息子のために、父親が週末ごとに公園で特訓に付き合った。",
+          "form": "特訓",
+          "en": "Because his son couldn't do a back hip circle, the father practiced with him at the park every weekend."
+        }
+      ]
+    },
+    {
+      "n": 275,
+      "term": "持て余す",
+      "reading": "もてあます",
+      "meaning": "to not know what to do with",
+      "def_ja": "多すぎたり難しすぎたりして、扱いに困る。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "休みの日は暇を持て余している。",
+          "form": "持て余して",
+          "en": "On my days off I have too much time on my hands."
+        },
+        {
+          "lv": 2,
+          "ja": "定年退職した父は、時間を持て余しているようだ。",
+          "form": "持て余して",
+          "en": "My father, who has retired, seems not to know what to do with his time."
+        },
+        {
+          "lv": 3,
+          "ja": "元気すぎる子犬のエネルギーを持て余して、毎朝一時間散歩させることにした。",
+          "form": "持て余して",
+          "en": "I couldn't cope with the puppy's endless energy, so I started walking it for an hour every morning."
+        }
+      ],
+      "tip": "Most often used with 暇 or 時間, and with people who are hard to handle."
+    },
+    {
+      "n": 276,
+      "term": "検討",
+      "reading": "けんとう",
+      "meaning": "consideration; analysis",
+      "def_ja": "よいかどうか、よく調べて考えること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しい案を会議で検討した。",
+          "form": "検討",
+          "en": "We discussed the new proposal at the meeting."
+        },
+        {
+          "lv": 2,
+          "ja": "引っ越しを検討しているので、週末に部屋を見に行く。",
+          "form": "検討",
+          "en": "I'm thinking about moving, so I'm going to look at apartments this weekend."
+        },
+        {
+          "lv": 3,
+          "ja": "対局が終わると、二人の棋士は盤を挟んで、どの手が悪かったかを検討し始めた。",
+          "form": "検討",
+          "en": "After the game, the two players sat at the board and started analyzing which moves had been bad."
+        }
+      ],
+      "tip": "In business, 前向きに検討します is often a polite way of not saying yes."
+    },
+    {
+      "n": 277,
+      "term": "健闘",
+      "reading": "けんとう",
+      "meaning": "putting up a good fight",
+      "def_ja": "強い相手にも負けずに、よくがんばること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "日本チームは決勝で健闘した。",
+          "form": "健闘",
+          "en": "The Japanese team put up a good fight in the final."
+        },
+        {
+          "lv": 2,
+          "ja": "健闘むなしく、地元の高校は一回戦で敗れた。",
+          "form": "健闘",
+          "en": "Despite a brave effort, the local high school lost in the first round."
+        },
+        {
+          "lv": 3,
+          "ja": "優勝は逃したものの、初出場で三位に入った選手たちの健闘を、監督は大いにたたえた。",
+          "form": "健闘",
+          "en": "They didn't win, but the coach praised the players' hard fight in finishing third in their first appearance."
+        }
+      ],
+      "tip": "Don't mix it up with 検討, which has the same reading; ご健闘をお祈りします means good luck."
+    },
+    {
+      "n": 278,
+      "term": "互角",
+      "reading": "ごかく",
+      "meaning": "evenly matched",
+      "def_ja": "両方の力が同じくらいであること。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "二人の実力はほぼ互角だ。",
+          "form": "互角",
+          "en": "The two of them are about evenly matched."
+        },
+        {
+          "lv": 2,
+          "ja": "前半は両チームとも互角の戦いを見せた。",
+          "form": "互角",
+          "en": "In the first half both teams were evenly matched."
+        },
+        {
+          "lv": 3,
+          "ja": "経験では先輩のほうが上だが、スピードなら新人も互角に戦えると思う。",
+          "form": "互角",
+          "en": "The senior player has more experience, but I think the newcomer can compete on equal terms in speed."
+        }
+      ]
+    },
+    {
+      "n": 279,
+      "term": "快挙",
+      "reading": "かいきょ",
+      "meaning": "remarkable achievement",
+      "def_ja": "みんなが喜ぶような、すばらしい成果。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "地元の高校が初出場初優勝の快挙を成し遂げた。",
+          "form": "快挙",
+          "en": "A local high school pulled off the feat of winning in its first appearance."
+        },
+        {
+          "lv": 2,
+          "ja": "中学生棋士がプロに勝つという快挙が、ニュースで大きく報じられた。",
+          "form": "快挙",
+          "en": "A junior-high-school player's remarkable win over a professional made big news."
+        },
+        {
+          "lv": 3,
+          "ja": "小さな町工場の部品が月面探査機に使われるという快挙に、社員たちは涙を流して喜んだ。",
+          "form": "快挙",
+          "en": "The staff of the small factory wept with joy at the achievement of having their part used in a lunar probe."
+        }
+      ]
+    },
+    {
+      "n": 280,
+      "term": "そうそう",
+      "reading": "そうそう",
+      "meaning": "eminent, distinguished",
+      "def_ja": "名の知れた、すぐれた人ばかりであるようす。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "会場にはそうそうたる顔ぶれがそろった。",
+          "form": "そうそうたる",
+          "en": "A distinguished lineup of people gathered at the venue."
+        },
+        {
+          "lv": 2,
+          "ja": "審査員には、有名な作家や映画監督などそうそうたるメンバーが並んだ。",
+          "form": "そうそうたる",
+          "en": "The judges were a star-studded panel of famous writers and film directors."
+        },
+        {
+          "lv": 3,
+          "ja": "歴代の受賞者には、ノーベル賞を受けた科学者など、そうそうたる名前が並んでいる。",
+          "form": "そうそうたる",
+          "en": "The list of past winners includes eminent names such as Nobel Prize-winning scientists."
+        }
+      ],
+      "tip": "Written 錚々 in kanji; it is used almost only as そうそうたる plus a noun like 顔ぶれ."
+    },
+    {
+      "n": 12,
+      "term": "勝ち残る",
+      "reading": "かちのこる",
+      "meaning": "to win and advance",
+      "def_ja": "勝って次の試合に進む。最後まで残る。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "うちのチームが準決勝に勝ち残った。",
+          "form": "勝ち残った",
+          "en": "Our team made it through to the semifinals."
+        },
+        {
+          "lv": 2,
+          "ja": "百人の参加者のうち、最後まで勝ち残ったのは高校生だった。",
+          "form": "勝ち残った",
+          "en": "Of the hundred contestants, the one who survived to the end was a high school student."
+        },
+        {
+          "lv": 3,
+          "ja": "値下げ競争が激しいスマホ市場で勝ち残るには、ほかにない機能が必要だ。",
+          "form": "勝ち残る",
+          "en": "To survive in the smartphone market, with its fierce price war, you need features no one else has."
+        }
+      ]
+    },
+    {
+      "n": 211,
+      "term": "争う",
+      "reading": "あらそう",
+      "meaning": "to compete for; to quarrel",
+      "def_ja": "相手に勝とうとして張り合う。けんかする。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "三つのチームが優勝を争っている。",
+          "form": "争って",
+          "en": "Three teams are competing for the championship."
+        },
+        {
+          "lv": 2,
+          "ja": "患者は一刻を争う状態なので、すぐに手術が始まった。",
+          "form": "争う",
+          "en": "The patient's condition was critical, so the operation began right away."
+        },
+        {
+          "lv": 3,
+          "ja": "遺産をめぐって兄弟が裁判で争うことになり、家族の関係はすっかり壊れてしまった。",
+          "form": "争う",
+          "en": "The brothers ended up fighting over the inheritance in court, and the family fell apart."
+        }
+      ],
+      "tip": "一刻を争う means every second counts."
+    },
+    {
+      "n": 212,
+      "term": "競う",
+      "reading": "きそう",
+      "meaning": "to compete, vie",
+      "def_ja": "相手より上になろうと、力や技を比べ合う。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "子どもたちが走る速さを競った。",
+          "form": "競った",
+          "en": "The children raced to see who was fastest."
+        },
+        {
+          "lv": 2,
+          "ja": "全国のパン職人が、味と見た目を競う大会が開かれた。",
+          "form": "競う",
+          "en": "A contest was held where bakers from all over the country competed on taste and looks."
+        },
+        {
+          "lv": 3,
+          "ja": "新しいスマホが出るたびに、各社はカメラの性能を競うように新機能を発表している。",
+          "form": "競う",
+          "en": "Every time new phones come out, the makers announce new features as if competing over camera quality."
+        }
+      ],
+      "tip": "競う is about comparing skill; 争う can also mean quarrel or fight."
+    },
+    {
+      "n": 14,
+      "term": "最善",
+      "reading": "さいぜん",
+      "meaning": "the very best",
+      "def_ja": "いちばんよいこと。できるかぎりのこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "試合では最善を尽くします。",
+          "form": "最善",
+          "en": "I'll do my very best in the match."
+        },
+        {
+          "lv": 2,
+          "ja": "医師たちは患者を救うために最善の方法を考えた。",
+          "form": "最善",
+          "en": "The doctors worked out the best way to save the patient."
+        },
+        {
+          "lv": 3,
+          "ja": "プロ棋士でも、限られた時間の中で毎回最善の手を指すことはできないと言われている。",
+          "form": "最善",
+          "en": "It is said that even professionals can't always play the best move within the time limit."
+        }
+      ],
+      "tip": "最善を尽くす is the set phrase for doing your best; in shogi the best move is 最善手."
+    },
+    {
+      "n": 13,
+      "term": "ひらめく",
+      "reading": "ひらめく",
+      "meaning": "to come to mind suddenly",
+      "def_ja": "考えが急に頭にうかぶ。光が一瞬光る。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "風呂に入っていたら、いいアイデアがひらめいた。",
+          "form": "ひらめいた",
+          "en": "A good idea came to me while I was in the bath."
+        },
+        {
+          "lv": 2,
+          "ja": "暗い空に稲妻がひらめき、すぐに大きな雷の音がした。",
+          "form": "ひらめき",
+          "en": "Lightning flashed across the dark sky, followed at once by a loud clap of thunder."
+        },
+        {
+          "lv": 3,
+          "ja": "何時間考えても解けなかった数学の問題の答えが、寝る直前に突然ひらめいた。",
+          "form": "ひらめいた",
+          "en": "The answer to a math problem I couldn't solve for hours suddenly hit me just before I fell asleep."
+        }
+      ],
+      "tip": "Usually written in kana; the noun ひらめき means a flash of inspiration."
+    },
+    {
+      "n": 5,
+      "term": "反射的に",
+      "reading": "はんしゃてきに",
+      "meaning": "by reflex, without thinking",
+      "def_ja": "考えるより先に、体が自然に動いて。",
+      "pos": "adverb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "名前を呼ばれて、反射的に振り向いた。",
+          "form": "反射的に",
+          "en": "When someone called my name, I turned around without thinking."
+        },
+        {
+          "lv": 2,
+          "ja": "ボールが飛んできたので、反射的に目を閉じた。",
+          "form": "反射的に",
+          "en": "A ball came flying at me, so I shut my eyes by reflex."
+        },
+        {
+          "lv": 3,
+          "ja": "熱いなべに手が触れた瞬間、反射的に手を引っ込めたので、やけどはしなかった。",
+          "form": "反射的に",
+          "en": "The moment my hand touched the hot pot I pulled it back by reflex, so I didn't get burned."
+        }
+      ],
+      "tip": "反射 on its own also means the reflection of light."
+    },
+    {
+      "n": 50,
+      "term": "俯瞰",
+      "reading": "ふかん",
+      "meaning": "looking down from above",
+      "def_ja": "高い所から見下ろすこと。全体を広く見ること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "山の上から町を俯瞰した。",
+          "form": "俯瞰",
+          "en": "I looked down over the town from the top of the mountain."
+        },
+        {
+          "lv": 2,
+          "ja": "ドローンで撮影した俯瞰映像で、祭りの人の多さがよくわかった。",
+          "form": "俯瞰",
+          "en": "The aerial footage shot by drone showed just how crowded the festival was."
+        },
+        {
+          "lv": 3,
+          "ja": "目の前の作業に追われていると、仕事全体を俯瞰して見る余裕がなくなりがちだ。",
+          "form": "俯瞰",
+          "en": "When you're swamped with the task in front of you, it's easy to lose the space to step back and see the whole job."
+        }
+      ],
+      "tip": "In business talk, 俯瞰して見る means stepping back to see the big picture."
+    },
+    {
+      "n": 51,
+      "term": "照準",
+      "reading": "しょうじゅん",
+      "meaning": "aim; target",
+      "def_ja": "ねらいを合わせること。その目標。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "猟師はシカに銃の照準を合わせた。",
+          "form": "照準",
+          "en": "The hunter aimed his gun at the deer."
+        },
+        {
+          "lv": 2,
+          "ja": "チームは来年のオリンピックに照準を合わせて練習している。",
+          "form": "照準",
+          "en": "The team is training with next year's Olympics as its target."
+        },
+        {
+          "lv": 3,
+          "ja": "警察は、高齢者をねらった詐欺グループに照準を絞り、捜査を進めている。",
+          "form": "照準",
+          "en": "The police have narrowed their focus to a fraud ring targeting elderly people and are pressing on with the investigation."
+        }
+      ],
+      "tip": "Outside hunting and the military, it is mostly used in 〜に照準を合わせる, to aim for something."
+    },
+    {
+      "n": 10,
+      "term": "見分ける",
+      "reading": "みわける",
+      "meaning": "to tell apart",
+      "def_ja": "見て、ちがいや良い悪いを区別する。",
+      "pos": "verb",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "双子の兄弟を見分けるのは難しい。",
+          "form": "見分ける",
+          "en": "It's hard to tell the twin brothers apart."
+        },
+        {
+          "lv": 2,
+          "ja": "新鮮な魚は、目の色で見分けることができる。",
+          "form": "見分ける",
+          "en": "You can tell a fresh fish by the color of its eyes."
+        },
+        {
+          "lv": 3,
+          "ja": "毒のあるキノコと食べられるキノコは見た目がよく似ているので、素人が見分けるのは危険だ。",
+          "form": "見分ける",
+          "en": "Poisonous and edible mushrooms look very alike, so it's dangerous for amateurs to try to tell them apart."
+        }
+      ]
+    },
+    {
+      "n": 265,
+      "term": "鋭敏",
+      "reading": "えいびん",
+      "meaning": "sharp, keen",
+      "def_ja": "感覚や頭の働きがとてもするどいようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "犬の嗅覚はとても鋭敏だ。",
+          "form": "鋭敏",
+          "en": "A dog's sense of smell is very sharp."
+        },
+        {
+          "lv": 2,
+          "ja": "年を取ると、味覚や聴覚は少しずつ鋭敏さを失っていく。",
+          "form": "鋭敏",
+          "en": "As we age, our senses of taste and hearing gradually lose their sharpness."
+        },
+        {
+          "lv": 3,
+          "ja": "鋭敏な頭脳を持つ若手研究者が、長年だれも解けなかった問題をわずか一年で解決した。",
+          "form": "鋭敏",
+          "en": "A young researcher with a keen mind solved, in just one year, a problem no one had cracked for many years."
+        }
+      ],
+      "tip": "A written word; in speech people usually say 鋭い."
+    },
+    {
+      "n": 99,
+      "term": "眼前",
+      "reading": "がんぜん",
+      "meaning": "right before one's eyes",
+      "def_ja": "目のすぐ前。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "窓を開けると、眼前に青い海が広がった。",
+          "form": "眼前",
+          "en": "When I opened the window, the blue sea spread out before my eyes."
+        },
+        {
+          "lv": 2,
+          "ja": "選手たちは、まず眼前の試合に集中しなければならない。",
+          "form": "眼前",
+          "en": "The players must first focus on the game right in front of them."
+        },
+        {
+          "lv": 3,
+          "ja": "登山道の角を曲がった瞬間、眼前に雪をかぶった富士山が現れ、思わず足が止まった。",
+          "form": "眼前",
+          "en": "The moment I turned a corner on the trail, snow-capped Mt. Fuji appeared right before me and I stopped in my tracks."
+        }
+      ],
+      "tip": "A written word; in conversation 目の前 is far more common."
+    },
+    {
+      "n": 102,
+      "term": "秒速",
+      "reading": "びょうそく",
+      "meaning": "speed per second",
+      "def_ja": "一秒間に進む距離で表した速さ。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "最大で秒速三十メートルの風が吹いた。",
+          "form": "秒速",
+          "en": "Winds reached up to 30 meters per second."
+        },
+        {
+          "lv": 2,
+          "ja": "音は空気中を秒速約三百四十メートルで進む。",
+          "form": "秒速",
+          "en": "Sound travels through air at about 340 meters per second."
+        },
+        {
+          "lv": 3,
+          "ja": "メッセージを送ったら秒速で返信が来たので、ずっとスマホを見ていたのだろう。",
+          "form": "秒速",
+          "en": "I got a reply the instant I sent the message, so they must have been looking at their phone the whole time."
+        }
+      ],
+      "tip": "Casually, 秒速で means instantly."
+    },
+    {
+      "n": 9,
+      "term": "いざという時",
+      "reading": "いざというとき",
+      "meaning": "when it really counts",
+      "def_ja": "大事なことや危ないことが起きたとき。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "いざという時のために貯金している。",
+          "form": "いざという時",
+          "en": "I'm saving money for a rainy day."
+        },
+        {
+          "lv": 2,
+          "ja": "懐中電灯は、いざという時にすぐ出せる場所に置こう。",
+          "form": "いざという時",
+          "en": "Keep the flashlight where you can grab it quickly in an emergency."
+        },
+        {
+          "lv": 3,
+          "ja": "ふだんは頼りなく見える兄だが、いざという時には落ち着いて家族を守ってくれる。",
+          "form": "いざという時",
+          "en": "My brother usually seems unreliable, but when it really counts he stays calm and protects the family."
+        }
+      ]
+    },
+    {
+      "n": 226,
+      "term": "潔い",
+      "reading": "いさぎよい",
+      "meaning": "gracious; without excuses",
+      "def_ja": "未練を残さず、思い切りがよい。",
+      "pos": "い-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "部長は自分の間違いを潔く認めた。",
+          "form": "潔く",
+          "en": "The department head admitted his mistake without making excuses."
+        },
+        {
+          "lv": 2,
+          "ja": "試合に負けた横綱は、潔く引退を決めた。",
+          "form": "潔く",
+          "en": "After losing, the yokozuna gracefully decided to retire."
+        },
+        {
+          "lv": 3,
+          "ja": "言い訳をせずに潔く謝ったほうが、かえって相手の信頼を得られることも多い。",
+          "form": "潔く",
+          "en": "Apologizing cleanly without excuses often earns you more trust, not less."
+        }
+      ],
+      "tip": "Most often seen as the adverb 潔く with verbs like 認める, 謝る or 負けを認める."
+    },
+    {
+      "n": 281,
+      "term": "千差万別",
+      "reading": "せんさばんべつ",
+      "meaning": "endless variety",
+      "def_ja": "一つ一つがみなちがっていること。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "人の好みは千差万別だ。",
+          "form": "千差万別",
+          "en": "People's tastes vary endlessly."
+        },
+        {
+          "lv": 2,
+          "ja": "同じ病気でも、症状の出方は千差万別です。",
+          "form": "千差万別",
+          "en": "Even with the same illness, symptoms vary from person to person."
+        },
+        {
+          "lv": 3,
+          "ja": "一口に雑煮と言っても、地域によって味も具も千差万別なので、比べてみると面白い。",
+          "form": "千差万別",
+          "en": "Zoni soup differs endlessly in flavor and ingredients from region to region, so it's fun to compare."
+        }
+      ],
+      "tip": "Usually ends a sentence as 千差万別だ."
+    },
+    {
+      "n": 292,
+      "term": "率先",
+      "reading": "そっせん",
+      "meaning": "taking the lead",
+      "def_ja": "人より先に、自分から進んで行うこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "兄はいつも率先して皿を洗う。",
+          "form": "率先",
+          "en": "My brother always takes the lead in washing the dishes."
+        },
+        {
+          "lv": 2,
+          "ja": "災害のとき、地域の若者が率先して高齢者の避難を手伝った。",
+          "form": "率先",
+          "en": "During the disaster, young people in the area took it on themselves to help the elderly evacuate."
+        },
+        {
+          "lv": 3,
+          "ja": "上司が率先して休みを取らないと、部下も遠慮して有給休暇を使いにくい。",
+          "form": "率先",
+          "en": "If bosses don't lead by example and take time off, their staff feel they can't use their paid leave."
+        }
+      ],
+      "tip": "Almost always used as 率先して followed by a verb."
+    },
+    {
+      "n": 293,
+      "term": "舵を取る",
+      "reading": "かじをとる",
+      "meaning": "to take the helm",
+      "def_ja": "船の向きを決める。組織を導く。",
+      "pos": "expression",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "船長が自分で舵を取っている。",
+          "form": "舵を取って",
+          "en": "The captain is steering the ship himself."
+        },
+        {
+          "lv": 2,
+          "ja": "新しい社長が会社の舵を取ることになった。",
+          "form": "舵を取る",
+          "en": "A new president is going to take the helm of the company."
+        },
+        {
+          "lv": 3,
+          "ja": "物価が上がり続ける中で、政府がどう経済の舵を取るのか、国民は注目している。",
+          "form": "舵を取る",
+          "en": "With prices still rising, people are watching how the government will steer the economy."
+        }
+      ]
+    },
+    {
+      "n": 290,
+      "term": "加勢",
+      "reading": "かせい",
+      "meaning": "backing one side",
+      "def_ja": "争いで、一方の味方をして助けること。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "綱引きで、負けている赤組に加勢した。",
+          "form": "加勢",
+          "en": "In the tug-of-war, I joined the red team, which was losing."
+        },
+        {
+          "lv": 2,
+          "ja": "兄弟げんかになると、母はいつも弟に加勢する。",
+          "form": "加勢",
+          "en": "Whenever we brothers fight, Mom always takes my younger brother's side."
+        },
+        {
+          "lv": 3,
+          "ja": "議論が自分に不利になってきたところで、先輩が加勢してくれたので、なんとか案が通った。",
+          "form": "加勢",
+          "en": "Just as the debate turned against me, a senior colleague backed me up, and my proposal got through."
+        }
+      ]
+    },
+    {
+      "n": 43,
+      "term": "格闘",
+      "reading": "かくとう",
+      "meaning": "grappling; wrestling with",
+      "def_ja": "組み合って戦うこと。難しいことに取り組むこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "警察官が犯人と格闘して取り押さえた。",
+          "form": "格闘",
+          "en": "The police officer grappled with the suspect and pinned him down."
+        },
+        {
+          "lv": 2,
+          "ja": "祖父は新しいスマホの設定と一時間も格闘していた。",
+          "form": "格闘",
+          "en": "My grandfather wrestled with setting up his new phone for a whole hour."
+        },
+        {
+          "lv": 3,
+          "ja": "留学したばかりのころは、毎日辞書を片手に専門書と格闘していた。",
+          "form": "格闘",
+          "en": "When I first went abroad to study, I struggled through textbooks every day with a dictionary in hand."
+        }
+      ],
+      "tip": "The figurative 〜と格闘する, struggling with a task, is very common."
+    },
+    {
+      "n": 44,
+      "term": "格闘家",
+      "reading": "かくとうか",
+      "meaning": "martial artist, fighter",
+      "def_ja": "戦う競技を仕事にしている人。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "兄はプロの格闘家だ。",
+          "form": "格闘家",
+          "en": "My older brother is a professional fighter."
+        },
+        {
+          "lv": 2,
+          "ja": "有名な格闘家が、テレビの料理番組に出演した。",
+          "form": "格闘家",
+          "en": "A famous fighter appeared on a TV cooking show."
+        },
+        {
+          "lv": 3,
+          "ja": "引退した格闘家が、子どもたちに身の守り方を教える教室を地元で開いた。",
+          "form": "格闘家",
+          "en": "A retired fighter opened a class in his hometown teaching children how to protect themselves."
+        }
+      ]
+    },
+    {
+      "n": 89,
+      "term": "屈強",
+      "reading": "くっきょう",
+      "meaning": "brawny, powerfully built",
+      "def_ja": "体が大きく、力が強そうなようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "屈強な男たちが重い荷物を運んだ。",
+          "form": "屈強",
+          "en": "Brawny men carried the heavy loads."
+        },
+        {
+          "lv": 2,
+          "ja": "店の入り口には屈強な警備員が立っている。",
+          "form": "屈強",
+          "en": "A burly security guard stands at the shop entrance."
+        },
+        {
+          "lv": 3,
+          "ja": "屈強な体つきの男性が、迷子の子猫を優しく抱いて交番に届けてくれた。",
+          "form": "屈強",
+          "en": "A powerfully built man gently carried a lost kitten to the police box."
+        }
+      ],
+      "tip": "Used for people and bodies, not for things or arguments."
+    },
+    {
+      "n": 45,
+      "term": "演習",
+      "reading": "えんしゅう",
+      "meaning": "exercises; drills; seminar",
+      "def_ja": "本番のように行う練習。大学の少人数授業。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "数学の演習問題を毎日十問解いている。",
+          "form": "演習",
+          "en": "I solve ten math practice problems every day."
+        },
+        {
+          "lv": 2,
+          "ja": "自衛隊が富士山のふもとで演習を行った。",
+          "form": "演習",
+          "en": "The Self-Defense Forces held exercises at the foot of Mt. Fuji."
+        },
+        {
+          "lv": 3,
+          "ja": "大学三年生になると、少人数の演習で自分のテーマを決めて発表しなければならない。",
+          "form": "演習",
+          "en": "In the third year of university, you have to pick your own topic and present it in a small seminar."
+        }
+      ],
+      "tip": "Three common uses: practice problems, military or disaster drills, and university seminars."
+    },
+    {
+      "n": 46,
+      "term": "模索",
+      "reading": "もさく",
+      "meaning": "searching for a way",
+      "def_ja": "手がかりが少ない中で、方法を探すこと。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "店は生き残る方法を模索している。",
+          "form": "模索",
+          "en": "The shop is searching for a way to survive."
+        },
+        {
+          "lv": 2,
+          "ja": "両国は、争いを終わらせる方法を模索している。",
+          "form": "模索",
+          "en": "The two countries are looking for a way to end the conflict."
+        },
+        {
+          "lv": 3,
+          "ja": "人口が減り続ける町では、空き家を観光客向けの宿として使う道を模索している。",
+          "form": "模索",
+          "en": "The town, whose population keeps shrinking, is exploring ways to turn empty houses into lodgings for tourists."
+        }
+      ],
+      "tip": "A news word, often in 〜の道を模索する; 暗中模索 means groping in the dark."
+    },
+    {
+      "n": 286,
+      "term": "手法",
+      "reading": "しゅほう",
+      "meaning": "technique, method",
+      "def_ja": "物事をするときのやり方や技術。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "老舗の蔵は、昔ながらの手法でしょうゆを作っている。",
+          "form": "手法",
+          "en": "The old brewery makes soy sauce using traditional methods."
+        },
+        {
+          "lv": 2,
+          "ja": "ドキュメンタリーのような手法で撮影された映画が話題だ。",
+          "form": "手法",
+          "en": "A film shot in a documentary style is getting a lot of attention."
+        },
+        {
+          "lv": 3,
+          "ja": "研究チームは、AIを使った新しい手法で、がんを早期に見つける精度を大きく上げた。",
+          "form": "手法",
+          "en": "The research team greatly improved early cancer detection with a new AI-based technique."
+        }
+      ],
+      "tip": "手法 is used for methods in art, research and business; for everyday how-to, say やり方."
+    }
+  ]
+}

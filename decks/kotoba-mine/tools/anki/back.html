@@ -1,0 +1,29 @@
+<div class="km kind-{{Kind}} pos-{{POS}}">
+  <div class="chips">
+    <span class="chip lvchip">{{Type}}</span><span class="chip">{{Source}}</span
+    ><span class="chip">{{Topic}}</span>
+  </div>
+  <div class="sentence">{{furigana:SentenceFurigana}}</div>
+  <div class="answer">
+    <div class="word">
+      <span class="term">{{Word}}</span><span class="reading">{{Reading}}</span>
+    </div>
+    {{#Kanji}}
+    <div class="kanji">{{Kanji}}</div>
+    {{/Kanji}}
+    <div class="def">{{DefJA}}</div>
+    {{#SentenceEN}}
+    <details class="en">
+      <summary>英語</summary>
+      {{Meaning}}<br />
+      {{SentenceEN}}
+    </details>
+    {{/SentenceEN}} {{#Tip}}
+    <div class="tip">{{Tip}}</div>
+    {{/Tip}}
+    <div class="src">
+      出典 {{#SourceURL}}<a href="{{SourceURL}}">{{/SourceURL}}{{Source}}{{#SourceURL}}</a
+      >{{/SourceURL}}
+    </div>
+  </div>
+</div>

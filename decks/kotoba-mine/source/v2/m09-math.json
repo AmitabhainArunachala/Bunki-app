@@ -1,0 +1,324 @@
+{
+  "id": "m09-math",
+  "cards": [
+    {
+      "n": 121,
+      "term": "万有引力",
+      "reading": "ばんゆういんりょく",
+      "meaning": "universal gravitation",
+      "def_ja": "重さのある物どうしが、互いに引き合う力。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "ニュートンは万有引力の法則を発見した。",
+          "form": "万有引力",
+          "en": "Newton discovered the law of universal gravitation."
+        },
+        {
+          "lv": 2,
+          "ja": "万有引力によって、月は地球の周りを回り続けている。",
+          "form": "万有引力",
+          "en": "Universal gravitation keeps the moon orbiting the Earth."
+        },
+        {
+          "lv": 3,
+          "ja": "リンゴが木から落ちるのも、地球が太陽の周りを回るのも、同じ万有引力の働きによるものだ。",
+          "form": "万有引力",
+          "en": "An apple falling from a tree and the Earth orbiting the sun are both caused by the same universal gravitation."
+        }
+      ],
+      "tip": "A school physics term; in everyday speech people say 重力 or 引力."
+    },
+    {
+      "n": 122,
+      "term": "自転軸",
+      "reading": "じてんじく",
+      "meaning": "axis of rotation",
+      "def_ja": "星などが回るときの、中心になる線。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "地球の自転軸は少し傾いている。",
+          "form": "自転軸",
+          "en": "The Earth's axis is slightly tilted."
+        },
+        {
+          "lv": 2,
+          "ja": "自転軸が傾いているので、地球には四季がある。",
+          "form": "自転軸",
+          "en": "The Earth has four seasons because its axis is tilted."
+        },
+        {
+          "lv": 3,
+          "ja": "天王星は自転軸が横倒しに近いため、ほかの惑星とはまったく違う季節の変化がある。",
+          "form": "自転軸",
+          "en": "Uranus's axis is tipped almost on its side, so its seasons change completely differently from other planets'."
+        }
+      ],
+      "tip": "Used for planets and stars; a machine's shaft is 回転軸 or シャフト."
+    },
+    {
+      "n": 123,
+      "term": "遠心力",
+      "reading": "えんしんりょく",
+      "meaning": "centrifugal force",
+      "def_ja": "回る物が、外へ押し出されるように感じる力。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "洗濯機は遠心力で服の水を切る。",
+          "form": "遠心力",
+          "en": "A washing machine spins water out of clothes using centrifugal force."
+        },
+        {
+          "lv": 2,
+          "ja": "カーブで体が外側に引っ張られるのは、遠心力のせいだ。",
+          "form": "遠心力",
+          "en": "Centrifugal force is why your body gets pulled outward on a curve."
+        },
+        {
+          "lv": 3,
+          "ja": "選挙で大敗して以来、党内では遠心力が強まり、離党を考える議員が増えている。",
+          "form": "遠心力",
+          "en": "Since the big election defeat, the party has been pulling apart, and more lawmakers are thinking of leaving."
+        }
+      ],
+      "tip": "In political news, 遠心力 means a group is starting to break apart."
+    },
+    {
+      "n": 127,
+      "term": "自由自在",
+      "reading": "じゆうじざい",
+      "meaning": "freely, at will",
+      "def_ja": "思いどおりに、どのようにでもできるようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "祖母は三か国語を自由自在に話す。",
+          "form": "自由自在",
+          "en": "My grandmother speaks three languages with ease."
+        },
+        {
+          "lv": 2,
+          "ja": "熟練の職人は、竹を自由自在に曲げてかごを作る。",
+          "form": "自由自在",
+          "en": "Skilled craftsmen bend bamboo however they like to make baskets."
+        },
+        {
+          "lv": 3,
+          "ja": "表計算ソフトを自由自在に使えるようになったら、毎月の集計作業がずっと楽になった。",
+          "form": "自由自在",
+          "en": "Once I could use spreadsheets freely, my monthly number-crunching became much easier."
+        }
+      ],
+      "tip": "Most often used as 自由自在に before verbs like 操る or 使いこなす."
+    },
+    {
+      "n": 32,
+      "term": "帰納的関数",
+      "reading": "きのうてきかんすう",
+      "meaning": "recursive function (logic)",
+      "def_ja": "決まった操作のくり返しで作られる、計算できる関数。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "計算論の授業で帰納的関数を習った。",
+          "form": "帰納的関数",
+          "en": "I learned about recursive functions in a computability theory class."
+        },
+        {
+          "lv": 2,
+          "ja": "帰納的関数とは、計算できる関数を数学的に定義したものだ。",
+          "form": "帰納的関数",
+          "en": "A recursive function is a mathematical definition of a computable function."
+        },
+        {
+          "lv": 3,
+          "ja": "チューリング機械で計算できる関数と帰納的関数が一致することは、計算理論の重要な結果の一つだ。",
+          "form": "帰納的関数",
+          "en": "That the functions computable by a Turing machine are exactly the recursive functions is one of the key results of computability theory."
+        }
+      ],
+      "tip": "A term from mathematical logic; programmers call a function that calls itself 再帰関数."
+    },
+    {
+      "n": 33,
+      "term": "帰納的",
+      "reading": "きのうてき",
+      "meaning": "inductive",
+      "def_ja": "いくつもの例から、一般的な結論を出すようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "多くの例から帰納的に結論を出す。",
+          "form": "帰納的",
+          "en": "We draw a conclusion inductively from many examples."
+        },
+        {
+          "lv": 2,
+          "ja": "帰納的な推論では、たくさんの観察から一般的な法則を導く。",
+          "form": "帰納的",
+          "en": "In inductive reasoning, you derive a general rule from many observations."
+        },
+        {
+          "lv": 3,
+          "ja": "帰納的な考え方は便利だが、例外が一つ見つかるだけで結論がくずれることもある。",
+          "form": "帰納的",
+          "en": "Inductive thinking is useful, but a single exception can be enough to overturn the conclusion."
+        }
+      ],
+      "tip": "The opposite is 演繹的, deductive; in logic, 帰納的 can also translate recursive."
+    },
+    {
+      "n": 34,
+      "term": "機能的",
+      "reading": "きのうてき",
+      "meaning": "functional, practical",
+      "def_ja": "むだがなく、使う目的によく合っているようす。",
+      "pos": "な-adjective",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "新しい台所はとても機能的だ。",
+          "form": "機能的",
+          "en": "The new kitchen is very practical."
+        },
+        {
+          "lv": 2,
+          "ja": "収納が多くて機能的なリュックを探している。",
+          "form": "機能的",
+          "en": "I'm looking for a functional backpack with lots of pockets."
+        },
+        {
+          "lv": 3,
+          "ja": "狭い部屋でも暮らしやすいように、家具を減らして機能的なレイアウトに変えた。",
+          "form": "機能的",
+          "en": "To make my small room easier to live in, I cut down on furniture and switched to a practical layout."
+        }
+      ],
+      "tip": "Same reading as 帰納的, inductive; context tells them apart."
+    },
+    {
+      "n": 160,
+      "term": "決定的文脈自由文法",
+      "reading": "けっていてきぶんみゃくじゆうぶんぽう",
+      "meaning": "deterministic context-free grammar",
+      "def_ja": "後戻りせずに構文を解析できる種類の文法。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "コンパイラの授業で決定的文脈自由文法を学んだ。",
+          "form": "決定的文脈自由文法",
+          "en": "I studied deterministic context-free grammars in a compilers class."
+        },
+        {
+          "lv": 2,
+          "ja": "多くのプログラミング言語の文法は、決定的文脈自由文法で書かれている。",
+          "form": "決定的文脈自由文法",
+          "en": "The grammars of many programming languages are written as deterministic context-free grammars."
+        },
+        {
+          "lv": 3,
+          "ja": "決定的文脈自由文法で書かれた言語なら、後戻りせずに一度読むだけで構文を解析できる。",
+          "form": "決定的文脈自由文法",
+          "en": "A language written with a deterministic context-free grammar can be parsed in one pass with no backtracking."
+        }
+      ],
+      "tip": "A formal-language term; read it as 決定的 plus 文脈自由 plus 文法."
+    },
+    {
+      "n": 172,
+      "term": "記号",
+      "reading": "きごう",
+      "meaning": "symbol, sign",
+      "def_ja": "意味を表すために使う、しるしや文字。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "パスワードには記号を一つ入れてください。",
+          "form": "記号",
+          "en": "Please include at least one symbol in your password."
+        },
+        {
+          "lv": 2,
+          "ja": "地図の記号を見れば、学校や郵便局の場所がわかる。",
+          "form": "記号",
+          "en": "The map symbols show you where the schools and post offices are."
+        },
+        {
+          "lv": 3,
+          "ja": "化学の授業では、元素を表す記号を覚えるのに苦労したが、語呂合わせを使ったらすぐに覚えられた。",
+          "form": "記号",
+          "en": "In chemistry class I struggled to memorize the element symbols, but with a mnemonic I learned them quickly."
+        }
+      ],
+      "tip": "On keyboards and in passwords, 記号 means characters like #, @ and !."
+    },
+    {
+      "n": 136,
+      "term": "索引",
+      "reading": "さくいん",
+      "meaning": "index",
+      "def_ja": "本の言葉がどのページにあるかを並べた一覧。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "専門書の最後には、たいてい索引がある。",
+          "form": "索引",
+          "en": "Technical books usually have an index at the back."
+        },
+        {
+          "lv": 2,
+          "ja": "知りたい言葉を索引で探して、そのページを開いた。",
+          "form": "索引",
+          "en": "I looked up the word in the index and turned to that page."
+        },
+        {
+          "lv": 3,
+          "ja": "データベースに索引を作っておくと、大量のデータの中からでも必要な情報をすばやく探せる。",
+          "form": "索引",
+          "en": "If you build an index on a database, you can quickly find what you need even in huge amounts of data."
+        }
+      ],
+      "tip": "In computing, インデックス is used as often as 索引."
+    },
+    {
+      "n": 80,
+      "term": "係助",
+      "reading": "かかりじょ",
+      "meaning": "binding particle (dictionary label)",
+      "def_ja": "辞書の品詞表示で、係り助詞を表す略語。",
+      "pos": "noun",
+      "sentences": [
+        {
+          "lv": 1,
+          "ja": "古語辞典では係助という略語をよく見る。",
+          "form": "係助",
+          "en": "You often see the abbreviation 係助 in classical Japanese dictionaries."
+        },
+        {
+          "lv": 2,
+          "ja": "国語辞典の品詞表示で、係助は係り助詞の略として使われる。",
+          "form": "係助",
+          "en": "In Japanese dictionaries' part-of-speech labels, 係助 is used as an abbreviation for binding particle."
+        },
+        {
+          "lv": 3,
+          "ja": "古語辞典で係り結びに関わる助詞を引くと、品詞の欄にはたいてい係助と書かれている。",
+          "form": "係助",
+          "en": "If you look up a particle involved in kakari-musubi in a classical dictionary, the part-of-speech field usually says 係助."
+        }
+      ],
+      "tip": "Rare: a dictionary label read かかりじょ; the full term is 係助詞, かかりじょし."
+    }
+  ]
+}

@@ -1,0 +1,382 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N5",
+  "number": 4,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "リンさんへ\n　おげんきですか。わたしは　げんきです。\n　きょうは　あたたかかったので、ちかくの　公園へ　いきました。公園には　花が　たくさん　さいて　いました。わたしは　ベンチで　ほんを　よみました。（１）、いぬと　さんぽして　いる　人が「こんにちは」と　いいました。わたしも「こんにちは」と　いいました。\n　らいげつ、リンさんの　まちへ　いきます。いっしょに　ごはんを　（２）。\n　では、また。\nマリ",
+    "s1": "アンナさん\n　きょうは　三時に　えきの　まえで　あう　やくそくでしたね。でも、しごとが　おわらないので、四時に　なっても　いいですか。四時に　えきの　まえの　きっさてんに　います。\nケン",
+    "s2": "みどり公園の　きまり\n・ごみは　もって　かえって　ください。\n・いぬと　いっしょに　はいっても　いいです。\n・ここで　やきゅうを　しては　いけません。ひろばで　して　ください。",
+    "s3": "　わたしの　ともだちの　リサさんは　えが　じょうずです。いつも　ノートに　いぬや　ねこの　えを　かいて　います。らいねん、えの　がっこうに　いきたいと　いって　います。",
+    "m1": "たいせつな　ともだち\n　わたしの　ともだちの　ユミさんは、きょねん　アメリカへ　いきました。おとうさんの　しごとで、三年　アメリカに　すみます。\n　ユミさんが　いないので、はじめは　さびしかったです。でも、ユミさんは　まいつき　手紙を　くれます。手紙には、アメリカの　がっこうや　ともだちの　ことが　かいて　あります。しゃしんも　はいって　います。\n　わたしも　ユミさんに　手紙を　かきます。えいごで　かきたいので、まいにち　すこし　えいごを　べんきょうして　います。\n　ユミさんが　かえって　きたら、いっしょに　公園で　ピクニックを　したいです。",
+    "info": "ゆうびんの　りょうきん（日本の　中）\n　はがき　　　　　　　　　　８５円\n　手紙（２５グラムまで）　　１１０円\n　手紙（５０グラムまで）　　１４０円\n※　外国へ　おくる　ときは、まどぐちで　きいて　ください。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nきのう　おじいさんに　【手紙】を　かきました。",
+      "options": [
+        "てじ",
+        "しゅし",
+        "てがみ",
+        "てかみ"
+      ],
+      "answer": 2,
+      "rationale": "「手紙」は「てがみ」と読む。\nThe word 手紙 is read tegami and means letter.",
+      "target": "手紙"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nうちの　ちかくに　大きい　【公園】が　あります。",
+      "options": [
+        "こえん",
+        "こうえん",
+        "くえん",
+        "こうおん"
+      ],
+      "answer": 1,
+      "rationale": "「公園」は「こうえん」と読む。\nThe word 公園 is read kouen and means park.",
+      "target": "公園"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　いぬの　【名前】は　ポチです。",
+      "options": [
+        "めいまえ",
+        "なまい",
+        "なまえ",
+        "なまへ"
+      ],
+      "answer": 2,
+      "rationale": "「名前」は「なまえ」と読む。\nThe word 名前 is read namae and means name.",
+      "target": "名前"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n公園に　大きな　【き】が　あります。",
+      "options": [
+        "休",
+        "未",
+        "本",
+        "木"
+      ],
+      "answer": 3,
+      "rationale": "「き」は「木」と書く。「本」「休」「未」はちがう字だ。\nThe word ki (tree) is written 木.",
+      "target": "木"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n公園の　【ひだり】に　ゆうびんきょくが　あります。",
+      "options": [
+        "石",
+        "右",
+        "在",
+        "左"
+      ],
+      "answer": 3,
+      "rationale": "「ひだり」は「左」と書く。「右」は「みぎ」だ。\nThe word hidari (left) is written 左.",
+      "target": "左"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n公園で　ともだちと　【ぼーる】で　あそびました。",
+      "options": [
+        "ボーレ",
+        "ボール",
+        "ポール",
+        "ホール"
+      ],
+      "answer": 1,
+      "rationale": "「ぼーる」はカタカナで「ボール」と書く。\nThe word booru (ball) is written ボール in katakana.",
+      "target": "ボール"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nともだちに　手紙を　（　）。",
+      "options": [
+        "のりました",
+        "あいました",
+        "だしました",
+        "かえりました"
+      ],
+      "answer": 2,
+      "rationale": "手紙をおくることを「手紙をだす」と言う。\nTegami o dasu means to send a letter.",
+      "target": "出す"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n公園の　ベンチに　（　）　はなしました。",
+      "options": [
+        "およいで",
+        "すわって",
+        "あるいて",
+        "はしって"
+      ],
+      "answer": 1,
+      "rationale": "ベンチには「すわる」。\nSuwaru means to sit, which you do on a bench.",
+      "target": "座る"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nこの　ケーキは　【おいしい】です。",
+      "options": [
+        "この　ケーキは　あじが　わるいです。",
+        "この　ケーキは　あじが　いいです。",
+        "この　ケーキは　大きいです。",
+        "この　ケーキは　たかいです。"
+      ],
+      "answer": 1,
+      "rationale": "「おいしい」は「あじがいい」と同じ意味だ。\nOishii means delicious, the same as the taste being good.",
+      "target": "おいしい"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nともだちは　【まだ】　きて　いません。",
+      "options": [
+        "ともだちは　きません。",
+        "ともだちは　きのう　きました。",
+        "ともだちは　これから　きます。",
+        "ともだちは　もう　きました。"
+      ],
+      "answer": 2,
+      "rationale": "「まだきていない」は、これからくるという意味だ。\nMada kite imasen means the friend has not come yet but will come.",
+      "target": "まだ"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nわたしは　犬（　）　すきです。",
+      "options": [
+        "に",
+        "で",
+        "が",
+        "へ"
+      ],
+      "answer": 2,
+      "rationale": "「すき」の前には「が」をつかう。\nSuki takes ga: I like dogs.",
+      "subject": "particle:ga"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n「どうして　きのう　こなかったんですか。」「あたまが　いたかった（　）。」",
+      "options": [
+        "ください",
+        "んです",
+        "でしょう",
+        "ましょう"
+      ],
+      "answer": 1,
+      "rationale": "りゆうをせつめいするときは「〜んです」をつかう。\nN desu explains a reason: it was because I had a headache.",
+      "subject": "grammar:ndesu"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nともだちは　いま　公園で　テニスを　して（　）。",
+      "options": [
+        "います",
+        "あります",
+        "ください",
+        "でした"
+      ],
+      "answer": 0,
+      "rationale": "いましていることは「〜ています」で言う。\nTe imasu shows an action in progress: my friend is playing tennis now.",
+      "subject": "grammar:teiru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n公園の　いけで　およいでは（　）。",
+      "options": [
+        "いけません",
+        "いいです",
+        "ありません",
+        "ください"
+      ],
+      "answer": 0,
+      "rationale": "してはだめなことは「〜てはいけません」で言う。\nTe wa ikemasen means you must not: do not swim in the pond.",
+      "subject": "grammar:tewaikenai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nこの　ゲームの　あそび（　）を　おしえて　ください。",
+      "options": [
+        "もの",
+        "こと",
+        "ところ",
+        "かた"
+      ],
+      "answer": 3,
+      "rationale": "「あそびかた」は、あそぶやりかたのことだ。\nAsobikata means how to play.",
+      "subject": "grammar:kata"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nしゅくだいを　＿＿＿　＿★＿　＿＿＿　＿＿＿　いきました。",
+      "options": [
+        "公園へ",
+        "あそびに",
+        "して",
+        "から"
+      ],
+      "answer": 3,
+      "rationale": "ただしいじゅんばんは「して　から　公園へ　あそびに　いきました」で、★には「から」が入る。\nThe order is して から 公園へ あそびに いきました, so から fills the star.",
+      "subject": "grammar:tekara"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nわたしの　いもうとは　＿＿＿　＿＿＿　＿★＿　＿＿＿　できます。",
+      "options": [
+        "ひとりで",
+        "じてんしゃに",
+        "ことが",
+        "のる"
+      ],
+      "answer": 3,
+      "rationale": "ただしいじゅんばんは「ひとりで　じてんしゃに　のる　ことが　できます」で、★には「のる」が入る。\nThe order is ひとりで じてんしゃに のる ことが できます, so のる fills the star.",
+      "subject": "grammar:kotogadekiru"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "だから",
+        "それから",
+        "でも",
+        "では"
+      ],
+      "answer": 1,
+      "rationale": "ベンチでほんをよんだあとのことなので「それから」がいい。\nSore kara (and then) leads to what happened next.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "たべましょう",
+        "たべて　います",
+        "たべました",
+        "たべません"
+      ],
+      "answer": 0,
+      "rationale": "らいげつのことをさそうので「たべましょう」がいい。\nTabemashou invites Rin to eat together next month.",
+      "passage": "tg",
+      "subject": "grammar:mashou"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "ケンさんは　なん時に　どこに　いますか。",
+      "options": [
+        "四時に　えきの　なか",
+        "三時に　えきの　まえ",
+        "四時に　えきの　まえの　きっさてん",
+        "三時に　きっさてん"
+      ],
+      "answer": 2,
+      "rationale": "「四時に　えきの　まえの　きっさてんに　います」とある。\nKen will be at the coffee shop in front of the station at four.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "みどり公園で　して　いい　ことは　どれですか。",
+      "options": [
+        "いぬと　いっしょに　はいる",
+        "ごみを　公園に　すてる",
+        "ごみを　ここに　おいて　かえる",
+        "ここで　やきゅうを　する"
+      ],
+      "answer": 0,
+      "rationale": "「いぬと　いっしょに　はいっても　いいです」とある。\nThe rules say you may come in with a dog.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "リサさんは　らいねん　なにを　したいですか。",
+      "options": [
+        "えの　がっこうに　いく",
+        "ねこと　あそぶ",
+        "いぬを　かう",
+        "ノートを　かう"
+      ],
+      "answer": 0,
+      "rationale": "「らいねん、えの　がっこうに　いきたい」とある。\nLisa wants to go to an art school next year.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "ユミさんは　どうして　アメリカへ　いきましたか。",
+      "options": [
+        "がっこうが　おわったから",
+        "アメリカの　ともだちに　あいたかったから",
+        "えいごを　べんきょうしたかったから",
+        "おとうさんの　しごとで"
+      ],
+      "answer": 3,
+      "rationale": "「おとうさんの　しごとで、三年　アメリカに　すみます」とある。\nYumi moved to America because of her father's job.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　どうして　えいごを　べんきょうして　いますか。",
+      "options": [
+        "ユミさんに　えいごで　手紙を　かきたいから",
+        "ユミさんが　えいごを　おしえて　くれるから",
+        "えいごの　テストが　あるから",
+        "アメリカへ　いきたいから"
+      ],
+      "answer": 0,
+      "rationale": "「えいごで　かきたいので、まいにち　すこし　えいごを　べんきょうして　います」とある。\nThe writer studies English to write letters to Yumi in English.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "はがきを　二まい　おくります。いくら　かかりますか。",
+      "options": [
+        "８５円",
+        "１１０円",
+        "１７０円",
+        "２２０円"
+      ],
+      "answer": 2,
+      "rationale": "はがきは１まい８５円なので、二まいで１７０円だ。\nA postcard is 85 yen, so two cost 170 yen.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "３０グラムの　手紙を　日本の　ともだちに　おくります。いくらですか。",
+      "options": [
+        "２２０円",
+        "１１０円",
+        "８５円",
+        "１４０円"
+      ],
+      "answer": 3,
+      "rationale": "３０グラムは２５グラムより重いので、５０グラムまでの１４０円だ。\nA 30-gram letter is over 25 grams, so it costs 140 yen.",
+      "passage": "info"
+    }
+  ]
+}

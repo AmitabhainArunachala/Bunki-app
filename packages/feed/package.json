@@ -1,0 +1,26 @@
+{
+  "name": "@bunki/feed",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal-device source registry, bounded RSS/Atom metadata and feed request policy.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run --root ../.. packages/feed/test",
+    "lint": "eslint src test"
+  },
+  "dependencies": {
+    "@bunki/ai": "*",
+    "@bunki/reading": "*",
+    "@xmldom/xmldom": "0.8.15",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.1"
+  }
+}

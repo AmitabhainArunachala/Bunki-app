@@ -1,8 +1,9 @@
 /**
  * Browser acceptance for every one of the 30 added native 本棚 readings.
  *
- * This drives the real served corridor at 390×844 with touch input. Each
- * article is opened from its ordinary `.shelf-item`, then exercises its own
+ * This drives the real served corridor at 390×844 with touch input, on a
+ * pinned shelf day. Each article is opened from its one `.shelf-item` card
+ * (in the grid or today's six), then exercises its own
  * JSON load, reader/ruby/paragraphs, text settings, quick look, full entry,
  * completion, bookmark, Back, shelf scroll return, and article-position
  * restoration. No representative-only shortcut and no alternate reader.
@@ -11,7 +12,8 @@
  * non-empty titleEn with a titleEnSource provenance marker, the code-side
  * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
  * must render each English title from the record itself, and every
- * human-review-pending row must stay visibly 検収前 on the shelf.
+ * human-review-pending story must be counted in the masthead's 未確認 note
+ * and wear 未確認 in its reader meta line.
  *
  * R3-A (furigana truth): the reading-override lexicon
  * (docs/content/reading-overrides.json) must be minted into every curated
@@ -35,16 +37,15 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR = resolve(HERE, '..');
-const REPO = resolve(CORRIDOR, '..', '..');
+const CORRIDOR = resolveCorridorSite();
+const REPO = resolve(HERE, '..', '..', '..');
 const VIEWPORT = { width: 390, height: 844 };
 const SOURCE = resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.jsonl');
-const DEFAULT_EVIDENCE = resolve(
-  REPO,
-  'docs/build-evidence/kairo-feel-lock/native-readings',
-);
+const DEFAULT_EVIDENCE = resolveCorridorEvidence();
 const REFERENCE_SHELF = resolve(REPO, 'docs/prototype/screenshots/14-phase1-shelf-v11.png');
 const REFERENCE_READER = resolve(REPO, 'docs/prototype/screenshots/16-phase1-v11-article.png');
 const MIME = {
@@ -117,17 +118,33 @@ function startServer(rootDir) {
   });
 }
 
+const touchAttempts = [];
+
 async function touchAt(page, locator, holdMs = 0) {
   await locator.scrollIntoViewIfNeeded();
   await page.waitForTimeout(35);
   const box = await locator.evaluate((node) => {
     const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    const x = rect.x + rect.width / 2;
+    const y = rect.y + Math.min(rect.height / 2, 20);
+    const hit = document.elementFromPoint(x, y);
+    window.__nativeIntendedTouch = node;
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+      target: { tag: node.tagName, id: node.id, passage: node.dataset.passage },
+      hit: hit ? { tag: hit.tagName, id: hit.id } : null,
+      reachesTarget: hit === node || node.contains(hit),
+      offsetLeft: window.visualViewport?.offsetLeft ?? 0,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+    };
   });
+  const attempt = { box, holdMs };
+  touchAttempts.push(attempt);
   if (!box?.width || !box?.height) throw new Error('touch target has no rendered box');
+  if (!box.reachesTarget) throw new Error(`touch target is obstructed: ${JSON.stringify(box)}`);
+  const before = await page.evaluate(() => window.__nativeTargetClicks ?? 0);
   const point = {
-    x: box.x + box.width / 2,
-    y: box.y + Math.min(box.height / 2, 20),
+    x: box.x + box.width / 2 - box.offsetLeft,
+    y: box.y + Math.min(box.height / 2, 20) - box.offsetTop,
     radiusX: 6,
     radiusY: 6,
     force: 1,
@@ -140,6 +157,13 @@ async function touchAt(page, locator, holdMs = 0) {
   if (holdMs) await page.waitForTimeout(holdMs);
   await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await session.detach();
+  if (!holdMs) {
+    try {
+      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: 5000 });
+    } finally {
+      attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
+    }
+  } else attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
   await page.waitForTimeout(90);
 }
 
@@ -147,17 +171,47 @@ async function settleReader(page) {
   await page.waitForSelector('#reader .tok', { timeout: 20_000 });
   await page.evaluate(() => {
     window.__nativeReadingTokenCount = -1;
+    window.__nativeReadingReader = null;
   });
   await page.waitForFunction(
     () => {
-      const count = document.querySelectorAll('#reader .tok').length;
-      if (count > 0 && count === window.__nativeReadingTokenCount) return true;
+      const reader = document.getElementById('reader');
+      const count = reader?.querySelectorAll('.tok').length ?? 0;
+      if (count > 0 && reader === window.__nativeReadingReader &&
+          count === window.__nativeReadingTokenCount) return true;
+      window.__nativeReadingReader = reader;
       window.__nativeReadingTokenCount = count;
       return false;
     },
     null,
     { polling: 180, timeout: 15_000 },
   );
+}
+
+async function setReaderDial(page, key, index) {
+  const selector = `[data-dial="${key}:${index}"]`;
+  const clicked = await page.locator(selector).elementHandle();
+  if (!clicked) throw new Error(`Reader dial is missing: ${key}:${index}`);
+  try {
+    // An already-selected dial still commits asynchronously. Its old
+    // aria-pressed value cannot acknowledge this tap. The actual clicked
+    // button leaves the DOM only when the successful save renders the reader.
+    await touchAt(page, clicked);
+    await page.waitForFunction((node) => !node.isConnected, clicked, { timeout: 10_000 });
+    const record = await waitForAppRecord(page, (value) => value.dials?.[key] === index,
+      { description: `committed reader dial ${key}:${index}` });
+    await settleReader(page);
+    return {
+      key,
+      requested: index,
+      persisted: record.dials[key],
+      acknowledgedReplacement: true,
+      selected: await page.locator(selector).getAttribute('aria-pressed') === 'true',
+      enabled: await page.locator(selector).isEnabled(),
+    };
+  } finally {
+    await clicked.dispose();
+  }
 }
 
 async function openQuickLook(page, preferredIndex = 0) {
@@ -167,7 +221,11 @@ async function openQuickLook(page, preferredIndex = 0) {
     (value, index, values) => value < count && values.indexOf(value) === index,
   );
   for (const index of candidates) {
-    await touchAt(page, tokens.nth(index), 560);
+    // one tap is the quick look (reader lane 2026-10-02); a press and hold opens the word menu instead
+    await touchAt(page, tokens.nth(index));
+    if (await page.locator('#sheet').count()) {
+      throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
+    }
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;
@@ -220,7 +278,75 @@ const rows = new Map(index.articles.map((record) => [record.id, record]));
 // Counts are data (the feed grows the index 検収前-marked); composition is
 // pinned by tools/verify-feed.mjs against the review queue, so these checks
 // hold for EVERY row without hardcoding a census.
-const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08']);
+// fresh-shelf readings (feed_fresh.py) carry the authorship their titles file
+// names; every other row keeps the two historical markers
+const FRESH_TITLES = JSON.parse(
+  readFileSync(new URL('../../../docs/content/feed-fresh-titles-en.json', import.meta.url), 'utf8'),
+);
+const FEED_TITLES = JSON.parse(
+  readFileSync(new URL('../../../docs/content/feed-titles-en.json', import.meta.url), 'utf8'),
+);
+// 2026-10-02 (owner note 5): a shelf title is either the publisher's own
+// English headline, with its URL, or a faithful translation checked by a
+// second model family. The feeds' authoring markers still name rows a later
+// feed run mints before anyone checks them; the archive keeps its wrapper.
+// 2026-10-03 (owner decision): the label must be honest — 'publisher' only when the title IS the
+// page's headline, 'publisher, shortened' when we trimmed it, 'publisher, adapted' when it is built
+// from the page but no shorter, 'established English title' for a
+// literary work's known English name (', adapted' when we added to it, e.g. ': the opening'),
+// 'Bunki original, bilingual title' for an authored deck passage — and every label is backed by a
+// receipt in data/articles/title-receipts.json (the page headline compared against; the
+// model-family checks; the authored module).
+const PUBLISHER_SOURCE = /^(publisher|publisher, shortened|publisher, adapted|established English title|established English title, adapted): (https:\/\/\S+)$/;
+const CHECKED_SOURCE = (source) => source === 'Bunki original, bilingual title' || source === 'translation, cross-checked' || PUBLISHER_SOURCE.test(source ?? '');
+const TITLE_RECEIPTS = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/title-receipts.json'), 'utf8'));
+// a publisher's English edition lives on its own host; a headline from anywhere else is not theirs
+const ENGLISH_EDITIONS = {
+  'jp.globalvoices.org': ['globalvoices.org'],
+  'www.env.go.jp': ['www.env.go.jp'],
+  'www.kantei.go.jp': ['japan.kantei.go.jp'],
+  'ja.wikinews.org': ['en.wikinews.org'],
+  'ja.wikipedia.org': ['en.wikipedia.org'],
+};
+const normalHeadline = (s) => String(s ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
+const sameHeadline = (a, b) => normalHeadline(a) === normalHeadline(b);
+function titleReceiptProblem(record) {
+  const source = record.titleEnSource ?? '';
+  if (source === 'Bunki original, bilingual title') {
+    const receipt = TITLE_RECEIPTS.authored?.[record.id];
+    const moduleId = record.id.replace(/^kotoba-mine-/u, '');
+    const path = `decks/kotoba-mine/source/modules/${moduleId}.json`;
+    if (record.pool !== 'original' || record.licence !== 'Bunki original' || record.lane !== 'deck' ||
+        !receipt || receipt.path !== path || receipt.titleJa !== record.title || receipt.titleEn !== record.titleEn)
+      return `${record.id}: no matching authored bilingual title receipt`;
+    const authored = JSON.parse(readFileSync(new URL('../../../' + path, import.meta.url), 'utf8')).passage;
+    return authored.title === record.title && authored.title_en === record.titleEn
+      ? null : `${record.id}: title differs from its authored module`;
+  }
+  if (source === 'translation, cross-checked') {
+    const families = new Set((TITLE_RECEIPTS.translations?.[record.id] ?? []).filter((c) => c.verdict).map((c) => c.model));
+    return families.size >= 2 ? null : `${record.id}: ${families.size} model-family check(s) on file`;
+  }
+  const match = PUBLISHER_SOURCE.exec(source);
+  if (!match) return null;
+  const [, label, url] = match;
+  const receipt = TITLE_RECEIPTS.publisher?.[record.id];
+  if (!receipt || receipt.url !== url || receipt.label !== label) return `${record.id}: no receipt for "${label}"`;
+  if (label.startsWith('established')) return null;
+  let home, there;
+  try { home = new URL(record.url).host; there = new URL(url).host; } catch { return `${record.id}: unreadable URL`; }
+  if (!(ENGLISH_EDITIONS[home] ?? []).includes(there)) return `${record.id}: ${there} is not ${home}'s English edition`;
+  const same = sameHeadline(receipt.pageHeadline, record.titleEn);
+  const shorter = normalHeadline(record.titleEn).length < normalHeadline(receipt.pageHeadline).length;
+  if (label === 'publisher' && !same) return `${record.id}: labelled the publisher's headline, but the page says "${receipt.pageHeadline}"`;
+  if (label === 'publisher, shortened' && !shorter) return `${record.id}: labelled shortened, but the title is no shorter than the page headline on file`;
+  if (label === 'publisher, adapted' && (!receipt.pageHeadline || same || shorter))
+    return `${record.id}: labelled adapted, but the title is ${same ? 'the page headline' : shorter ? 'shorter than it' : 'without a page headline on file'}`;
+  return null;
+}
+const FEED_TITLE_MARKERS = new Set([FEED_TITLES.titleEnSource, FRESH_TITLES.titleEnSource]);
+const ARCHIVE_TITLE_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08', FRESH_TITLES.titleEnSource]);
+const titleSourceFor = (map, id) => map.sources?.[id] ?? map.titleEnSource;
 // rows still WAITING on a human — an 'approved' review value is a decided
 // row (TENOHIRA Decision 4: the rubric may lift 検収前 where the committed
 // queue says approved), and a decided row no longer wears the mark
@@ -236,26 +362,36 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
       ? missingEn.map((record) => record.id).join(', ')
       : `${index.articles.length}/${index.articles.length}`,
   );
-  const unsourced = index.articles.filter((record) => !TITLE_EN_SOURCES.has(record.titleEnSource));
+  const unsourced = index.articles.filter(
+    (record) => !CHECKED_SOURCE(record.titleEnSource) && !FEED_TITLE_MARKERS.has(record.titleEnSource),
+  );
   check(
     'every titleEn names its provenance in titleEnSource',
     unsourced.length === 0,
     unsourced.map((record) => record.id).join(', '),
   );
-  // 検収前 no longer means one thing: the 30 recovered originals and the feed
-  // mints wear AI-authored titles, while a row held for UNVERIFIED RIGHTS or
-  // an unverified source text keeps whatever title it already had. The rule
-  // is about who wrote the title, not about who is waiting.
-  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt).map((r) => r.id)]);
-  const wrongMarker = index.articles.filter((record) =>
-    aiTitled.has(record.id)
-      ? record.titleEnSource !== 'renkan-ai-2026-08'
-      : record.titleEnSource !== 'shelf-map-2026',
-  );
+  // The rule is about where the English came from, not about who is
+  // waiting: a feed row's title and provenance are whatever its titles file
+  // says (a per-row source wins over the file's authoring marker), and every
+  // other shelf row is a publisher headline, a cross-checked translation, or an original bilingual title.
+  const feedMap = (record) =>
+    record.feed === 'fresh' ? FRESH_TITLES : Object.hasOwn(FEED_TITLES.titles ?? {}, record.id) ? FEED_TITLES : null;
+  const wrongMarker = index.articles.filter((record) => {
+    const map = feedMap(record);
+    return map
+      ? record.titleEnSource !== titleSourceFor(map, record.id) || map.titles?.[record.id] !== record.titleEn
+      : !CHECKED_SOURCE(record.titleEnSource);
+  });
   check(
-    'the title marker names its author: AI for the recovered and minted rows, the shelf map for the rest',
+    'every title says where its English came from: the publisher headline with its URL, a cross-checked translation or an authored original, and a feed row matches its titles file',
     wrongMarker.length === 0,
     wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
+  );
+  const unbacked = index.articles.map(titleReceiptProblem).filter(Boolean);
+  check(
+    'every title label is honest and on file: a publisher headline matches its page on the English edition, a shortened one is shorter, an adapted one says so, a translation carries two model-family checks, and an original matches its authored bilingual title',
+    unbacked.length === 0,
+    unbacked.slice(0, 4).join(' · ') || `${index.articles.length} rows backed`,
   );
   // TENOHIRA Decision 4: the committed queue may lift an authored record out
   // of 検収前. Each of the 30 is paired to its queue row — approved means
@@ -287,7 +423,7 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
     'every archive row carries a non-empty titleEn with wrapper provenance',
     archive.articles.length > 0 &&
       archiveMissingEn.length === 0 &&
-      TITLE_EN_SOURCES.has(archive.titleEnSource),
+      ARCHIVE_TITLE_SOURCES.has(archive.titleEnSource),
     archiveMissingEn.length
       ? archiveMissingEn
           .slice(0, 5)
@@ -402,13 +538,27 @@ const reviewRows = index.articles.filter((record) => /-pending$/.test(record.rev
     `${oneInCensus.size} distinct 1-in-N values, largest share ${censusMax}/${censusTotal}`,
   );
 }
-// The shelf must render EXACTLY the curated index — no extras, none missing.
+// The shelf must render EXACTLY the curated index — no extras, none missing —
+// one card per story: an N3 rewrite whose original stands folds into it, and
+// a story in today's six stands in that band inside the grid, not twice.
 // The count itself is data: the feed (R2-D) grows it 検収前-marked and
 // queue-covered, and tools/verify-feed.mjs pins the composition (the
 // inherited 70 plus the review queue's live mints) against the queue file.
-const CURATED_COUNT = index.articles.filter(
+const curatedRows = index.articles.filter(
   (record) => !String(record.file || '').startsWith('archive/'),
-).length;
+);
+const standingIds = new Set(curatedRows.map((record) => record.id));
+const storyRows = curatedRows.filter(
+  (record) => !(record.adaptation?.basedOn && standingIds.has(record.adaptation.basedOn)),
+);
+const STORY_COUNT = storyRows.length;
+const STORY_CARDS = '#shelf-reading-results .shelf-item';
+const storyCard = (id) => `${STORY_CARDS}[data-passage="${id}"]`;
+const storyVariant = (className) => className.match(/\bstory-(lead|second|grid|teaser)\b/u)?.[1] ?? null;
+// Today's six change with the date. The shelf's own day seam pins a day whose six hold existing
+// teasers beside added ones, so every added card has an existing card of its variant to match.
+const SHELF_DAY = '2026-10-01';
+const pendingStories = storyRows.filter((record) => reviewRows.includes(record));
 const bodies = new Map(
   IDS.map((id) => {
     const row = rows.get(id);
@@ -562,9 +712,17 @@ const sequenceSites = (tokens, entries) => {
 
 const executablePath = process.env.CHROMIUM_PATH || undefined;
 const { server, base } = await startServer(CORRIDOR);
+const articleResults = [];
+const noise = [];
 let browser;
+let browserVersion = null;
+let activeArticleId = null;
+let journeyCompleted = false;
+let page;
+let failureEvidence = null;
 try {
   browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
+  browserVersion = await browser.version();
   const context = await browser.newContext({
     viewport: VIEWPORT,
     screen: VIEWPORT,
@@ -574,8 +732,23 @@ try {
     userAgent:
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
   });
-  const page = await context.newPage();
-  const noise = [];
+  await context.addInitScript((day) => {
+    try { localStorage.setItem('kairo-shelf-day', day); } catch { /* storage refused: the census below still runs */ }
+    window.__nativeTouchTrace = [];
+    for (const type of ['pointerdown', 'pointerup', 'pointercancel', 'click']) {
+      addEventListener(type, (event) => {
+        const intended = window.__nativeIntendedTouch;
+        const reachesTarget = Boolean(intended && (event.target === intended || intended.contains(event.target)));
+        if (type === 'click' && reachesTarget) window.__nativeTargetClicks = (window.__nativeTargetClicks ?? 0) + 1;
+        window.__nativeTouchTrace.push({ type, at: performance.now(), reachesTarget,
+          tag: event.target.tagName, id: event.target.id, classes: String(event.target.className),
+          mini: Boolean(event.target.closest('#mini')), sheet: Boolean(event.target.closest('#sheet')),
+          x: event.clientX, y: event.clientY, offsetTop: window.visualViewport?.offsetTop ?? 0 });
+        window.__nativeTouchTrace = window.__nativeTouchTrace.slice(-24);
+      }, true);
+    }
+  }, SHELF_DAY);
+  page = await context.newPage();
   const responses = new Map();
   page.on('console', (message) => {
     if (message.type() === 'error' || message.type() === 'warning') {
@@ -602,8 +775,8 @@ try {
   await page.waitForFunction(
     (expected) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item').length === expected,
-    CURATED_COUNT,
+      document.querySelectorAll(expected.cards).length === expected.count,
+    { cards: STORY_CARDS, count: STORY_COUNT },
     { timeout: 30_000 },
   );
   // Minimal CI Chromium images often ship without CJK fonts. These optional
@@ -620,58 +793,74 @@ try {
   }
 
   check(
-    'the one native shelf renders exactly the curated index rows',
-    (await page.locator('.shelf-item').count()) === CURATED_COUNT,
-    `${await page.locator('.shelf-item').count()}/${CURATED_COUNT}`,
+    'the one native shelf renders every curated story once, across the grid and today’s six',
+    (await page.locator(STORY_CARDS).count()) === STORY_COUNT,
+    `${await page.locator(STORY_CARDS).count()}/${STORY_COUNT}`,
   );
-  const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]').evaluate((node) => {
+  // Added readings wear the same native card as the existing ones: each card is compared with an
+  // existing reading's card of the same variant (lead, second, grid, or a teaser in today's six).
+  const cardStyles = await page.locator(STORY_CARDS).evaluateAll((nodes) => nodes.map((node) => {
     const style = getComputedStyle(node);
     const title = getComputedStyle(node.querySelector('.shelf-title'));
-    const snippet = getComputedStyle(node.querySelector('.shelf-snippet'));
     return {
+      id: node.dataset.passage,
       className: node.className,
       background: style.backgroundColor,
       border: style.border,
       radius: style.borderRadius,
       titleFamily: title.fontFamily,
       titleSize: title.fontSize,
-      snippetClamp: snippet.webkitLineClamp,
     };
-  });
+  }));
+  const addedIds = new Set(IDS);
+  const existingStyles = new Map();
+  for (const card of cardStyles.filter((row) => !addedIds.has(row.id))) {
+    const variant = storyVariant(card.className);
+    if (!existingStyles.has(variant)) existingStyles.set(variant, card);
+  }
+  const addedVariants = [...new Set(cardStyles.filter((row) => addedIds.has(row.id)).map((row) => storyVariant(row.className)))];
+  const unmatchedVariants = addedVariants.filter((variant) => !existingStyles.has(variant));
+  check(
+    `on ${SHELF_DAY} every added card's variant has an existing reading's card to match, today's six included`,
+    unmatchedVariants.length === 0 && existingStyles.has('teaser'),
+    `added ${addedVariants.join('/')} · existing ${[...existingStyles.keys()].join('/')}` +
+      (unmatchedVariants.length ? ` · no existing ${unmatchedVariants.join('/')}` : ''),
+  );
 
   // A shelf screenshot at the boundary between the preserved 40 and additions.
-  await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
+  await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-first-added.png') });
 
-  const articleResults = [];
-  for (const [position, id] of IDS.entries()) {
+  for (const id of IDS) {
+    activeArticleId = id;
     const row = rows.get(id);
     const body = bodies.get(id);
-    const authoredRecord = authored[position];
     const beforeNoise = noise.length;
-    const item = page.locator(`[data-passage="${id}"]`);
+    const item = page.locator(storyCard(id));
+    // The design's card: a topic kicker, the headline and the JLPT level chip — since the FEEL pass
+    // (2026-10-02) the level stands on the card's picture slot, top-right, and the foot keeps the date
+    // (and 読了 once finished). Source, licence and 未確認 live in the reader.
     const shelfState = await item.evaluate((node) => {
       const style = getComputedStyle(node);
       const title = node.querySelector('.shelf-title');
-      const snippet = node.querySelector('.shelf-snippet');
       const titleStyle = getComputedStyle(title);
-      const snippetStyle = getComputedStyle(snippet);
       return {
         className: node.className,
+        kicker: node.querySelector('.story-kicker .l-ja')?.textContent ?? '',
         title: title?.textContent ?? '',
-        source: node.querySelector('.shelf-meta span')?.textContent ?? '',
-        licence: [...node.querySelectorAll('.shelf-meta .pool-tag')].map((n) => n.textContent),
-        snippet: snippet?.textContent ?? '',
+        foot: !!node.querySelector('.story-foot'),
         level: node.querySelector('.level-chip')?.textContent ?? '',
         background: style.backgroundColor,
         border: style.border,
         radius: style.borderRadius,
         titleFamily: titleStyle.fontFamily,
         titleSize: titleStyle.fontSize,
-        snippetClamp: snippetStyle.webkitLineClamp,
         forbidden: !!node.querySelector('.draft-tag, [class*="editorial"], [class*="pack"]'),
       };
     });
+    const teaser = storyVariant(shelfState.className) === 'teaser';
+    const expectedLevel = row.readingFacets?.jlpt ?? null;
+    const learnerSource = row.sourceLabel.replace(/\s*·\s*検収前/gu, '').trim();
     const nativeStyle = [
       'className',
       'background',
@@ -679,8 +868,7 @@ try {
       'radius',
       'titleFamily',
       'titleSize',
-      'snippetClamp',
-    ].every((key) => shelfState[key] === existingStyle[key]);
+    ].every((key) => shelfState[key] === existingStyles.get(storyVariant(shelfState.className))?.[key]);
     await item.scrollIntoViewIfNeeded();
     await page.waitForTimeout(35);
     const shelfY = await page.evaluate(() => window.scrollY);
@@ -688,6 +876,10 @@ try {
 
     await touchAt(page, item);
     await settleReader(page);
+    await page.waitForFunction(({ id, title }) =>
+      document.querySelector('.listen-row[data-passage]')?.dataset.passage === id &&
+        document.querySelector('.view-title')?.textContent === title,
+    { id, title: row.title }, { timeout: 5000 });
     await page.waitForTimeout(80);
 
     const readerShape = await page.evaluate(() => {
@@ -695,8 +887,11 @@ try {
       const style = getComputedStyle(reader);
       return {
         title: document.querySelector('.view-title')?.textContent ?? '',
-        source: document.querySelector('main .eyebrow')?.textContent ?? '',
-        level: document.querySelector('main .level-chip')?.textContent ?? '',
+        source: document.querySelector('main .reader-meta .reader-source')?.textContent ?? '',
+        level: document.querySelector('main .reader-meta .level-chip')?.textContent ?? '',
+        unreviewed: document.querySelector('main .reader-meta .status-chip')?.textContent ?? null,
+        facts: Object.fromEntries([...document.querySelectorAll('main .article-facts dt')].map((dt) =>
+          [dt.firstChild?.textContent ?? '', dt.nextElementSibling?.textContent ?? ''])),
         tokens: reader?.querySelectorAll('.tok').length ?? 0,
         ruby: reader?.querySelectorAll('ruby rt').length ?? 0,
         paragraphs: reader?.querySelectorAll('.para-break').length ?? 0,
@@ -712,9 +907,8 @@ try {
       await touchAt(page, page.locator('#dials-toggle'));
     }
     const dialCount = await page.locator('.dials [data-dial]').count();
-    await touchAt(page, page.locator('[data-dial="furigana:2"]'));
-    const settingsChanged =
-      (await page.locator('[data-dial="furigana:2"]').getAttribute('aria-pressed')) === 'true';
+    const dialCommit = await setReaderDial(page, 'furigana', 2);
+    const settingsChanged = dialCommit.selected && dialCommit.enabled;
 
     // R3-A — the flagship's rendered ruby IS the lexicon reading at every
     // override site: 神 wears かみ in deity-name positions, しん never.
@@ -773,12 +967,20 @@ try {
       // touching the sheet's own Back control.
       await page.waitForTimeout(720);
       await touchAt(page, page.locator('#sheet-back'));
-      await page.waitForSelector('#reader .tok');
+      await page.waitForSelector('#sheet', { state: 'detached', timeout: 5000 });
+      await page.waitForFunction(() => document.querySelector('#reader .tok') &&
+        !document.querySelector('#reader')?.closest('[inert]'), null, { timeout: 5000 });
     }
 
     // Completion and exact per-article bookmark are both persisted. Back must
     // return to this shelf location, then reopening must restore the reader.
+    const beforeCompletion = await readAppRecord(page);
+    if (beforeCompletion.readDone?.[id] || await page.locator('#read-fin.finished').count()) {
+      throw new Error(`expected an unfinished article before its single completion touch: ${id}`);
+    }
     await touchAt(page, page.locator('#read-fin'));
+    await waitForAppRecord(page, (record) => !!record.readDone?.[id],
+      { description: `one acknowledged completion write for ${id}` });
     await page.waitForSelector('#read-fin.finished');
     await page.evaluate(() =>
       window.scrollTo(0, Math.min(620, document.body.scrollHeight - innerHeight)),
@@ -786,24 +988,25 @@ try {
     await page.waitForTimeout(80);
     const intendedPosition = await page.evaluate(() => Math.round(window.scrollY));
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]`);
+    await page.waitForSelector(storyCard(id));
     const returnedShelfY = await page.evaluate(() => window.scrollY);
-    const persisted = await page.evaluate((articleId) => {
-      const state = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
-      return {
-        position: state.readerPos?.[articleId] ?? null,
-        done: !!state.readDone?.[articleId],
-      };
-    }, id);
-    const completionTag = await page
-      .locator(`[data-passage="${id}"] .read-tag`)
+    const state = await waitForAppRecord(page,
+      (record) => record.readDone?.[id] && record.readerPos?.[id] === intendedPosition,
+      { description: `native completion and exact bookmark for ${id}` });
+    const persisted = {
+      position: state.readerPos?.[id] ?? null,
+      done: !!state.readDone?.[id],
+    };
+    const completionTag = teaser ? '' : await page
+      .locator(`${storyCard(id)} .read-tag`)
       .textContent()
       .catch(() => '');
 
-    await touchAt(page, page.locator(`[data-passage="${id}"]`));
+    await touchAt(page, page.locator(storyCard(id)));
     await settleReader(page);
     await page.waitForTimeout(120);
     const restoredPosition = await page.evaluate(() => Math.round(window.scrollY));
+    const finishedInReader = (await page.locator('#read-fin.finished').count()) === 1;
 
     if (SHOT_IDS.has(id)) {
       await page.screenshot({
@@ -816,14 +1019,15 @@ try {
     const pass =
       nativeStyle &&
       !shelfState.forbidden &&
+      shelfState.kicker.trim().length > 0 &&
       shelfState.title === row.title &&
-      shelfState.source === row.sourceLabel &&
-      shelfState.licence.includes('Bunki original') &&
-      shelfState.snippet === row.snippet &&
-      shelfState.level === row.grading.signals.jreadability.band &&
+      !!expectedLevel && shelfState.level === expectedLevel &&
       readerShape.title === row.title &&
-      readerShape.source === row.sourceLabel &&
-      readerShape.level === row.grading.signals.jreadability.band &&
+      readerShape.source === learnerSource &&
+      readerShape.facts['出典'] === learnerSource &&
+      readerShape.facts['利用条件']?.includes('Bunki original') &&
+      readerShape.level === expectedLevel &&
+      readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? '未確認' : null) &&
       readerShape.tokens === body.tokens.length &&
       readerShape.ruby > 0 &&
       readerShape.paragraphs === body.paras.length &&
@@ -838,7 +1042,8 @@ try {
       !!fullEntry?.headword &&
       persisted.done &&
       persisted.position === intendedPosition &&
-      /読了/.test(completionTag) &&
+      (teaser || /読了/.test(completionTag)) &&
+      finishedInReader &&
       Math.abs(returnedShelfY - shelfY) <= 4 &&
       Math.abs(restoredPosition - intendedPosition) <= 4 &&
       ownFileLoaded &&
@@ -851,6 +1056,7 @@ try {
       pass,
       shelfState,
       readerShape,
+      dialCommit,
       quick,
       fullEntry,
       ownFileLoaded,
@@ -863,8 +1069,9 @@ try {
     });
 
     await touchAt(page, page.locator('#back'));
-    await page.waitForSelector(`[data-passage="${id}"]`);
+    await page.waitForSelector(storyCard(id));
   }
+  activeArticleId = null;
 
   check(
     'all 30 article files were served independently',
@@ -875,21 +1082,14 @@ try {
     noise.length === 0,
     noise.slice(0, 8).map((entry) => `${entry.kind}: ${entry.text}`).join(' | '),
   );
+  const savedRecord = await readAppRecord(page);
   check(
-    'all completion and bookmark state survives localStorage',
-    await page.evaluate(
-      (ids) => {
-        const state = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
-        return ids.every(
-          (id) => state.readDone?.[id] && Number.isFinite(state.readerPos?.[id]),
-        );
-      },
-      IDS,
-    ),
+    'all completion and bookmark state persists in the native learner record',
+    IDS.every((id) => savedRecord.readDone?.[id] && Number.isFinite(savedRecord.readerPos?.[id])),
   );
 
-  // B3 — the shelf's English titles come from the record itself, and the
-  // 検収前 marking stays visible in both chrome languages
+  // B3 — the shelf's English titles come from the record itself, and 未確認 is said once in the
+  // masthead and worn in each unreviewed article's reader meta, in both chrome languages
   check(
     'the 日本語のみ chrome renders no English titles',
     (await page.locator('.shelf-title-en').count()) === 0,
@@ -897,25 +1097,47 @@ try {
   const readShelfCards = () =>
     page.evaluate(() =>
       Object.fromEntries(
-        [...document.querySelectorAll('.shelf-item')].map((item) => [
+        [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map((item) => [
           item.dataset.passage,
           {
             en: item.querySelector('.shelf-title-en')?.textContent ?? null,
-            meta: item.querySelector('.shelf-meta')?.textContent ?? '',
+            teaser: item.classList.contains('story-teaser'),
           },
         ]),
       ),
     );
-  const jaCards = await readShelfCards();
-  const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
+  const reviewNote = async () => {
+    const notes = await page.locator('.shelf-review-note').count();
+    if (!notes) return { notes, text: '', count: 0, total: null };
+    const text = (await page.locator('.shelf-review-note').first().textContent()) ?? '';
+    // the bilingual note is one short line since the glance pass: 「未確認 · 54 of 120 not yet checked by a person」
+    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|未確認 · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
+    return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
+  };
+  const jaNote = await reviewNote();
   check(
-    'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
-    // the floor was "all 30 authored rows are still pending" — a
-    // pre-delegation assumption; the queue-pairing check above owns lift
-    // legitimacy, this check owns only the marking of what IS pending
-    reviewRows.length > 0 && jaUnmarked.length === 0,
-    jaUnmarked.map((record) => record.id).slice(0, 4).join(', ') ||
-      `${reviewRows.length} pending rows marked`,
+    'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
+    pendingStories.length === 0 ? jaNote.notes === 0 : jaNote.notes === 1 && jaNote.count === pendingStories.length,
+    jaNote.text || `no review note for ${pendingStories.length} pending stories`,
+  );
+  const pendingNoiseBefore = noise.length;
+  const unmarkedInReader = [];
+  for (const record of pendingStories) {
+    activeArticleId = record.id;
+    await page.locator(`${storyCard(record.id)} .shelf-open`).click();
+    await page.waitForSelector('main .reader-meta .reader-source', { state: 'attached' });
+    const chip = await page.locator('main .reader-meta .status-chip').textContent().catch(() => null);
+    if (chip !== '未確認') unmarkedInReader.push(record.id);
+    await page.locator('#back').click();
+    await page.waitForSelector(storyCard(record.id));
+  }
+  activeArticleId = null;
+  check(
+    'every human-review-pending story wears 未確認 in its reader meta line',
+    unmarkedInReader.length === 0 && noise.length === pendingNoiseBefore,
+    unmarkedInReader.slice(0, 4).join(', ') ||
+      `${pendingStories.length} pending stories marked` +
+        (noise.length === pendingNoiseBefore ? '' : ` · ${noise.length - pendingNoiseBefore} errors`),
   );
   const biNoiseBefore = noise.length;
   await page.goto(`${base}/index.html?entry=shelf&ui=bi&cachebust=${Date.now()}`, {
@@ -924,24 +1146,31 @@ try {
   await page.waitForFunction(
     (want) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item').length === want,
-    CURATED_COUNT,
+      document.querySelectorAll(want.cards).length === want.count,
+    { cards: STORY_CARDS, count: STORY_COUNT },
     { timeout: 30_000 },
   );
+  const reloadedRecord = await readAppRecord(page);
+  check(
+    'all 30 native completions and exact bookmarks survive a real page reload',
+    IDS.every((id) => reloadedRecord.readDone?.[id] === savedRecord.readDone?.[id] &&
+      reloadedRecord.readerPos?.[id] === savedRecord.readerPos?.[id]),
+  );
   const biCards = await readShelfCards();
-  const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
+  const wrongEn = storyRows.filter((record) => !biCards[record.id] || biCards[record.id].en !== record.titleEn);
   check(
-    'the bilingual shelf renders every English title from the records themselves',
+    'the bilingual shelf renders every English title from the records themselves, today’s six included',
     wrongEn.length === 0,
-    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${index.articles.length} titles`,
+    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${storyRows.length} titles`,
   );
-  const biUnmarked = reviewRows.filter((record) => !/検収前/.test(biCards[record.id]?.meta ?? ''));
+  const biNote = await reviewNote();
   check(
-    'every human-review-pending row stays visibly 検収前 on the bilingual shelf',
-    biUnmarked.length === 0,
-    biUnmarked.map((record) => record.id).slice(0, 4).join(', '),
+    'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
+    pendingStories.length === 0 ? biNote.notes === 0
+      : biNote.notes === 1 && biNote.count === pendingStories.length && biNote.total === STORY_COUNT,
+    biNote.text || `no review note for ${pendingStories.length} pending stories`,
   );
-  await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
+  await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
   check(
     'the bilingual shelf pass added no request, console, or page errors',
@@ -952,76 +1181,117 @@ try {
       .join(' | '),
   );
 
-  writeFileSync(
-    reportPath,
-    `${JSON.stringify(
-      {
-        schemaVersion: 1,
-        kind: 'native-bunki-readings-browser-verification',
-        viewport: VIEWPORT,
-        touchEmulation: true,
-        browser: await browser.version(),
-        completedAt: new Date().toISOString(),
-        artifactHashes: {
-          source: fileSha256(SOURCE),
-          editorial: fileSha256(
-            resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.editorial.json'),
-          ),
-          index: fileSha256(resolve(CORRIDOR, 'data/articles/index.json')),
-          manifest: fileSha256(resolve(CORRIDOR, 'data/manifest.json')),
-          corridorJs: fileSha256(resolve(CORRIDOR, 'corridor.js')),
-          corridorCss: fileSha256(resolve(CORRIDOR, 'corridor.css')),
-          standalone: fileSha256(resolve(CORRIDOR, 'corridor-standalone.html')),
-          words: fileSha256(resolve(CORRIDOR, 'data/share_alike/words.json')),
-          idioms: fileSha256(resolve(CORRIDOR, 'data/share_alike/idioms.json')),
-          sem: fileSha256(resolve(CORRIDOR, 'data/proprietary_safe/sem.json')),
-          articleFiles: Object.fromEntries(
-            IDS.map((id) => [id, fileSha256(resolve(CORRIDOR, 'data/articles', rows.get(id).file))]),
-          ),
-        },
-        visualReferenceEvidence: {
-          method: 'native computed-style equality plus retained comparison screenshots; manual visual inspection remains non-pixel-diff',
-          references: {
-            shelf: { path: 'docs/prototype/screenshots/14-phase1-shelf-v11.png', sha256: fileSha256(REFERENCE_SHELF) },
-            reader: { path: 'docs/prototype/screenshots/16-phase1-v11-article.png', sha256: fileSha256(REFERENCE_READER) },
-          },
-          captures: {
-            shelf: { path: 'screenshots/shelf-first-added.png', sha256: fileSha256(join(shotsDir, 'shelf-first-added.png')) },
-            biShelf: {
-              path: 'screenshots/shelf-bilingual-titles.png',
-              sha256: fileSha256(join(shotsDir, 'shelf-bilingual-titles.png')),
-            },
-            n3Reader: {
-              path: 'screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png',
-              sha256: fileSha256(join(shotsDir, 'bunki-graded-n3-zoka-sanjin-morning-reader.png')),
-            },
-            n2Reader: {
-              path: 'screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png',
-              sha256: fileSha256(join(shotsDir, 'bunki-essay-n2-silent-amenominakanushi-reader.png')),
-            },
-            n1Reader: {
-              path: 'screenshots/bunki-essay-n1-prayer-reality-reader.png',
-              sha256: fileSha256(join(shotsDir, 'bunki-essay-n1-prayer-reality-reader.png')),
-            },
-          },
-        },
-        articles: articleResults,
-        noise,
-        results,
-        failures: failures.map((row) => row.name),
-      },
-      null,
-      2,
-    )}\n`,
-  );
+  journeyCompleted = true;
   await context.close();
 } catch (error) {
-  failures.push({ name: 'browser harness', pass: false, detail: String(error) });
+  if (page && !page.isClosed()) {
+    failureEvidence = await page.evaluate(() => ({
+      view: document.body.dataset.view,
+      passage: document.querySelector('.listen-row[data-passage]')?.dataset.passage,
+      title: document.querySelector('.view-title')?.textContent,
+      sheet: Boolean(document.getElementById('sheet')),
+      readerInert: Boolean(document.getElementById('reader')?.closest('[inert]')),
+      finish: (() => { const node = document.getElementById('read-fin'); return node ? {
+        disabled: node.disabled, finished: node.classList.contains('finished'), text: node.textContent,
+        rect: node.getBoundingClientRect().toJSON(),
+      } : null; })(),
+      storeAlert: document.getElementById('store-alert')?.textContent,
+      scrollY: window.scrollY,
+      offsetTop: window.visualViewport?.offsetTop ?? 0,
+      events: window.__nativeTouchTrace ?? [],
+    })).catch((captureError) => ({ captureError: captureError.message }));
+    const record = await readAppRecord(page).catch(() => null);
+    failureEvidence.persisted = record ? { done: record.readDone?.[activeArticleId] ?? null,
+      position: record.readerPos?.[activeArticleId] ?? null } : null;
+    await page.screenshot({ path: join(shotsDir, 'failure.png') }).catch(() => {});
+  }
+  check('browser harness', false, error.stack || String(error), activeArticleId);
   console.error(error);
 } finally {
   if (browser) await browser.close();
   server.close();
 }
+
+// A failed journey still emits its completed rows and marks absent captures
+// with null hashes; the printed report path must identify a real receipt.
+function screenshotSha256(path) {
+  return existsSync(path) ? fileSha256(path) : null;
+}
+
+writeFileSync(
+  reportPath,
+  `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      kind: 'native-bunki-readings-browser-verification',
+      viewport: VIEWPORT,
+      touchEmulation: true,
+      browser: browserVersion,
+      completed: journeyCompleted,
+      failureEvidence,
+      touchAttempts,
+      pass: journeyCompleted && failures.length === 0,
+      completedAt: new Date().toISOString(),
+      artifact: {
+        path: CORRIDOR,
+        artifactSha256: JSON.parse(readFileSync(resolve(CORRIDOR, 'build-identity.json'), 'utf8')).artifactSha256,
+      },
+      verificationSources: {
+        verifier: fileSha256(fileURLToPath(import.meta.url)),
+        nativeRecordHelper: fileSha256(resolve(HERE, 'record-test-support.mjs')),
+      },
+      artifactHashes: {
+        source: fileSha256(SOURCE),
+        editorial: fileSha256(
+          resolve(REPO, 'docs/content/bunki-originals-zoka-sanjin.editorial.json'),
+        ),
+        index: fileSha256(resolve(CORRIDOR, 'data/articles/index.json')),
+        manifest: fileSha256(resolve(CORRIDOR, 'data/manifest.json')),
+        corridorJs: fileSha256(resolve(CORRIDOR, 'corridor.js')),
+        corridorCss: fileSha256(resolve(CORRIDOR, 'corridor.css')),
+        standalone: fileSha256(resolve(HERE, '..', 'corridor-standalone.html')),
+        words: fileSha256(resolve(CORRIDOR, 'data/share_alike/words.json')),
+        idioms: fileSha256(resolve(CORRIDOR, 'data/share_alike/idioms.json')),
+        sem: fileSha256(resolve(CORRIDOR, 'data/proprietary_safe/sem.json')),
+        articleFiles: Object.fromEntries(
+          IDS.map((id) => [id, fileSha256(resolve(CORRIDOR, 'data/articles', rows.get(id).file))]),
+        ),
+      },
+      visualReferenceEvidence: {
+        method: 'native computed-style equality plus retained comparison screenshots; manual visual inspection remains non-pixel-diff',
+        references: {
+          shelf: { path: 'docs/prototype/screenshots/14-phase1-shelf-v11.png', sha256: fileSha256(REFERENCE_SHELF) },
+          reader: { path: 'docs/prototype/screenshots/16-phase1-v11-article.png', sha256: fileSha256(REFERENCE_READER) },
+        },
+        captures: {
+          shelf: { path: 'screenshots/shelf-first-added.png', sha256: screenshotSha256(join(shotsDir, 'shelf-first-added.png')) },
+          biShelf: {
+            path: 'screenshots/shelf-bilingual-titles.png',
+            sha256: screenshotSha256(join(shotsDir, 'shelf-bilingual-titles.png')),
+          },
+          n3Reader: {
+            path: 'screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png',
+            sha256: screenshotSha256(join(shotsDir, 'bunki-graded-n3-zoka-sanjin-morning-reader.png')),
+          },
+          n2Reader: {
+            path: 'screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png',
+            sha256: screenshotSha256(join(shotsDir, 'bunki-essay-n2-silent-amenominakanushi-reader.png')),
+          },
+          n1Reader: {
+            path: 'screenshots/bunki-essay-n1-prayer-reality-reader.png',
+            sha256: screenshotSha256(join(shotsDir, 'bunki-essay-n1-prayer-reality-reader.png')),
+          },
+        },
+      },
+      articles: articleResults,
+      noise,
+      results,
+      failures: failures.map((row) => row.name),
+    },
+    null,
+    2,
+  )}\n`,
+);
 
 console.log(`\n${results.length - failures.length}/${results.length} browser checks passed`);
 console.log(`screenshots → ${shotsDir}`);

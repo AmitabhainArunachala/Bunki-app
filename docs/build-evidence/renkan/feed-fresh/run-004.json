@@ -1,0 +1,40 @@
+{
+  "kind": "feed-fresh-run",
+  "run": 4,
+  "startedAt": "2026-09-28T03:05:02+00:00",
+  "asOf": "2026-09-28",
+  "mode": "mint-only",
+  "window": null,
+  "terms": [],
+  "sources": {},
+  "staged": [],
+  "restaged": [],
+  "skipped": [],
+  "minted": [
+    {
+      "id": "jawiki-news:2026-09-21",
+      "kind": "fresh",
+      "title": "9月21日〜9月27日のできごと",
+      "titleEn": "The news, 21–27 September — Wikipedia's current-events summaries",
+      "lane": "news",
+      "licence": "CC BY-SA 4.0",
+      "gradingSummary": "中級後半 · jread 2.85 · JLPT語彙 79% · 356字",
+      "addedAt": "2026-09-28",
+      "decision": "pending",
+      "source": "ja.wikipedia",
+      "date": "2026-09-25",
+      "url": "https://ja.wikipedia.org/w/index.php?oldid=111174909",
+      "topic": "news digest"
+    }
+  ],
+  "untitled": [],
+  "retitled": [
+    "jawiki-news:2026-09-14"
+  ],
+  "allowUntitled": false,
+  "outputSha256": {
+    "index.json": "361886a06dbeff57c95171a2c61134e1fd7d9f1731f6705b27129c5224fd8d64",
+    "feed-review-queue.json": "f5c204f188eb21ced73efed30931d192385a9de34937f7c09b8e16e7071abc78",
+    "items.jsonl": "75e13ab84c9d40e4cc47b00e969436e8c38ce5d34b8e434ddf30a29246792b55"
+  }
+}
