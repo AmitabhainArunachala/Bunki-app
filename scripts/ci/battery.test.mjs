@@ -7,6 +7,7 @@ import test from 'node:test';
 import { batteryGates, runGates } from '../verify-release-gates.mjs';
 import { EventEmitter } from 'node:events';
 import { importFlakes, validateFlake } from './import-flakes.mjs';
+import { supplementalGates } from './supplemental.mjs';
 import {
   aggregate,
   classifyPaths,
@@ -182,8 +183,10 @@ test('hosted measured fast workload separates heavy gates within the existing fo
       assert.match(source.receiptSha256, /^[a-f0-9]{64}$/);
     }
   }
-  const full = createPlan({ identity, timings }),
-    docs = createPlan({ identity, timings, scope: 'docs' });
+  // This recorded workload predates the temporary probe; full membership is tested separately.
+  const supplemental = supplementalGates('/unused').filter((g) => g.name !== 'ci-flake-probe');
+  const full = createPlan({ identity, timings, supplemental }),
+    docs = createPlan({ identity, timings, supplemental, scope: 'docs' });
   for (const plan of [full, docs]) {
     const lanes = plan.shards.filter((s) => s.kind === 'fast');
     assert.equal(lanes.length, 4);
