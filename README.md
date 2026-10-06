@@ -96,6 +96,14 @@ by contract parity — see ADR-004). Product features are real and interactive;
 claims about efficacy, retention, or review burden remain outside the evidence
 currently collected (REQ-GATE-03).
 
+## Research draft for agent review
+
+The [2026-09-28 KAIRO research handoff](docs/build-evidence/kairo-learning-engine-research/2026-09-28/AGENT_HANDOFF.md)
+links the A–J build specification, ten research tracks, source index, cost model,
+and verification limits. This is a proposed design for review; its acceptance
+criteria are not implementation results. Read the handoff before using it to
+plan changes alongside the current governing documents.
+
 ## Governing documents
 
 The production plan links the current campaigns and accepted additions.
