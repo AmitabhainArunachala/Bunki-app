@@ -1,0 +1,1146 @@
+[
+ {
+  "id": "wikinews:1403",
+  "file": "wikinews-1403.webp",
+  "topic": "Shiretoko Peninsula joins UNESCO's World Natural Heritage list (2005)",
+  "scene": "The Shiretoko Peninsula in Hokkaido seen from the Sea of Okhotsk in late winter: forested volcanic mountains rise behind a rocky coastline while white drift ice floats on the dark sea in low morning light.",
+  "alt": "Snow-dusted forested mountains of the Shiretoko Peninsula rising above a sea scattered with drift ice.",
+  "accent": "#2F4A5C",
+  "titleJa": "世界自然遺産に7箇所を追加 知床半島も"
+ },
+ {
+  "id": "wikinews:6460",
+  "file": "wikinews-6460.webp",
+  "topic": "Ichiro reaches 2,500 career hits for the Seattle Mariners (2006)",
+  "scene": "A June evening at the major-league ballpark in Seattle: a white baseball streaks low over bright green outfield grass towards centre field under the stadium lights, the stands softly blurred in the dusk. No players' faces.",
+  "alt": "A baseball flying over the green outfield of a floodlit major-league ballpark at dusk.",
+  "accent": "#2E5A3A",
+  "titleJa": "マリナーズ・イチロー選手 現役通算2500安打達成"
+ },
+ {
+  "id": "wikinews:12024",
+  "file": "wikinews-12024.webp",
+  "topic": "The first section of JR's Osaka-Higashi Line opens (2008)",
+  "scene": "A silver JR commuter train crosses a new concrete viaduct above the low tiled and flat roofs of eastern Osaka's houses and small workshops on a clear, quiet March morning.",
+  "alt": "A silver commuter train on a new elevated railway line above the rooftops of eastern Osaka.",
+  "accent": "#3A5568",
+  "titleJa": "JRおおさか東線部分開業"
+ },
+ {
+  "id": "wikinews:20090",
+  "file": "wikinews-20090.webp",
+  "topic": "Court rules on who pays for the 1991 Shigaraki Kogen Railway collision",
+  "scene": "A single-track rural railway line curving through wooded hills of cedar and bamboo near Shigaraki in Shiga Prefecture on a misty, overcast day, a small one-car local train running along it. Quiet and respectful; no wreckage.",
+  "alt": "A small one-car train on a single-track line through wooded hills under a grey sky.",
+  "accent": "#46504F",
+  "titleJa": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定"
+ },
+ {
+  "id": "wikinews:45227",
+  "file": "wikinews-45227.webp",
+  "topic": "Wikinews, the volunteer-written news site, closes after 21 years",
+  "scene": "A home desk at night: an open laptop shows a dimmed, greyed-out web page with no readable text, beside a stack of old printed news pages and a cup of tea under a desk lamp.",
+  "alt": "A laptop showing a dimmed web page on a desk at night beside a stack of printed news pages.",
+  "accent": "#3B4252",
+  "titleJa": "ウィキニュース、21年の歴史に幕を閉じる"
+ },
+ {
+  "id": "aozora:051034",
+  "file": "aozora-051034.webp",
+  "topic": "Ogawa Mimei's story of two border guards, an old man and a young man, who become friends",
+  "scene": "On a lonely mountain pass in spring, two soldiers sit talking on a rock beside an uninscribed stone border marker: an old man and a young man, both in plain grey-green early-1900s soldiers' uniforms with peaked caps. A wild rose bush in full white bloom grows by the stone, honeybees around it, morning mist in the valley below.",
+  "alt": "An old soldier and a young soldier sitting by a stone marker on a mountain pass next to a blooming wild rose.",
+  "accent": "#7A3E4F",
+  "titleJa": "野ばら"
+ },
+ {
+  "id": "aozora:000628",
+  "file": "aozora-000628.webp",
+  "topic": "Niimi Nankichi's story of Gon, a lonely little fox, and the villager Hyōjū",
+  "scene": "A small lone fox peeks out from wet pampas grass on the bank of a rain-swollen stream in the old Japanese countryside in autumn, watching a farmer in a ragged dark kimono hitched up to the waist and a cloth headband, standing waist-deep in the muddy water and lifting a fishing net. Thatched farmhouses faint in the distance.",
+  "alt": "A small fox hiding in wet autumn grass, watching a man fishing with a net in a muddy stream.",
+  "accent": "#8A4520",
+  "titleJa": "ごん狐"
+ },
+ {
+  "id": "aozora:046605",
+  "file": "aozora-046605.webp",
+  "topic": "Miyazawa Kenji's story of two young crabs at the bottom of a mountain stream",
+  "scene": "Underwater at the bottom of a small, clear mountain stream in May: two young freshwater crabs on pale stones, bubbles rising, sunlight rippling in a net of light across the riverbed as a silver fish passes overhead.",
+  "alt": "Two small crabs on the bed of a clear stream with bubbles rising and sunlight rippling on the stones.",
+  "accent": "#1F5A63",
+  "titleJa": "やまなし"
+ },
+ {
+  "id": "yasashii:1",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: childcare leave",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "育児休業"
+ },
+ {
+  "id": "yasashii:2",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: childcare-leave benefit",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "育児休業給付金"
+ },
+ {
+  "id": "yasashii:3",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: basic survivor's pension",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "遺族基礎年金"
+ },
+ {
+  "id": "yasashii:4",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: employees' survivor's pension",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "遺族厚生年金"
+ },
+ {
+  "id": "yasashii:5",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: medical insurance",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "医療保険"
+ },
+ {
+  "id": "yasashii:6",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: seal-registration certificate",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "印鑑登録証明書"
+ },
+ {
+  "id": "yasashii:7",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: seal-registration card",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "印鑑登録証"
+ },
+ {
+  "id": "yasashii:8",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: overstaying a visa",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "オーバーステイ"
+ },
+ {
+  "id": "yasashii:9",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: landlord",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "大家"
+ },
+ {
+  "id": "yasashii:10",
+  "kind": "definition",
+  "file": null,
+  "topic": "Plain-Japanese life glossary: long-term care",
+  "scene": null,
+  "alt": "",
+  "accent": "#3F5466",
+  "titleJa": "介護"
+ },
+ {
+  "id": "bunki-graded-n5-morning",
+  "file": "bunki-graded-n5-morning.webp",
+  "topic": "A learner's quiet morning: a walk to the bakery and breakfast in the park",
+  "scene": "Early morning in a small neighbourhood park in a Japanese town: a round bread roll on a paper bag and an open notebook lie on a wooden bench under a clear blue sky, sparrows on a nearby branch, low tiled-roof houses beyond the trees.",
+  "alt": "A bread roll and an open notebook on a park bench on a clear morning.",
+  "accent": "#2E5D86",
+  "titleJa": "静かな朝"
+ },
+ {
+  "id": "bunki-graded-n4-bookshop",
+  "file": "bunki-graded-n4-bookshop.webp",
+  "topic": "Finding an old travel book with a stranger's notes in a small second-hand bookshop",
+  "scene": "A narrow second-hand bookshop in an old two-storey wooden shopfront near a Japanese station on a rainy day: a wet umbrella in a stand by the sliding glass door, tall stacks of old books inside, and an old travel book lying open on the counter at a photograph of mountains across the sea. No readable text.",
+  "alt": "The inside of a small second-hand bookshop on a rainy day, with an old travel book open on the counter.",
+  "accent": "#5A4632",
+  "titleJa": "雨の日の古本屋"
+ },
+ {
+  "id": "bunki-graded-n3-town",
+  "file": "bunki-graded-n3-town.webp",
+  "topic": "Walking a strange town without a map and finding an old stone stairway",
+  "scene": "Looking up a mossy old stone stairway that climbs between cedar trees to a small wooden Shinto shrine on a hillside at the edge of a Japanese mountain town, in late-afternoon light and thin mist.",
+  "alt": "Mossy stone steps climbing a wooded hillside towards a small shrine.",
+  "accent": "#4B5B34",
+  "titleJa": "知らない町を歩く"
+ },
+ {
+  "id": "bunki-essay-n2-mountain",
+  "file": "bunki-essay-n2-mountain.webp",
+  "topic": "An essay on thinking while walking a mountain path, and on layers of understanding",
+  "scene": "A lone hiker seen small and from behind on a quiet mountain trail in Japan, walking between tall cedar trunks with morning mist hanging between them.",
+  "alt": "A hiker walking alone on a misty forest trail among tall cedars.",
+  "accent": "#34503F",
+  "titleJa": "山を歩きながら考えたこと"
+ },
+ {
+  "id": "bunki-essay-n1-ai",
+  "file": "bunki-essay-n1-ai.webp",
+  "topic": "An essay on what knowing and judging mean for language learners once AI can write",
+  "scene": "A learner's desk by a window in the evening: a paper dictionary lies open beside a laptop and a handwritten notebook, lit by a warm desk lamp, the dusk sky outside. No readable text on any page or screen.",
+  "alt": "A desk with an open paper dictionary, a laptop and a handwritten notebook under a lamp.",
+  "accent": "#3A4660",
+  "titleJa": "AI時代の知識と判断"
+ },
+ {
+  "id": "real-gokajo",
+  "file": "real-gokajo.webp",
+  "topic": "The Charter Oath of 1868, the five principles that opened the Meiji era",
+  "scene": "A formal hall of an old Kyoto palace in spring 1868: tatami floor, gilded sliding screens and, on a low black-lacquered stand, a single rolled-up scroll tied with cord, in soft daylight. No people, no visible writing.",
+  "alt": "A rolled scroll on a lacquered stand in a formal tatami hall with gilded screens.",
+  "accent": "#6B2E22",
+  "titleJa": "五箇条の御誓文"
+ },
+ {
+  "id": "real-hojoki",
+  "file": "real-hojoki.webp",
+  "topic": "The opening of Hōjōki (1212): the river that flows on and is never the same water",
+  "scene": "A clear river running over stones at the edge of old Kyoto at dawn, foam bubbles forming and vanishing in a quiet eddy, with low wooden houses with dark tiled roofs on the far bank.",
+  "alt": "A clear river flowing over stones, with bubbles in an eddy and wooden houses on the far bank.",
+  "accent": "#2D5560",
+  "titleJa": "方丈記 · 冒頭"
+ },
+ {
+  "id": "real-tsurezure",
+  "file": "real-tsurezure.webp",
+  "topic": "The opening of Tsurezuregusa: idly writing down whatever comes to mind",
+  "scene": "A low writing desk by an open window in a quiet old Japanese house: an inkstone, a brush resting on it and a sheet of blank paper, with afternoon light falling across the tatami.",
+  "alt": "An inkstone, a brush and blank paper on a low desk by a window in an old Japanese room.",
+  "accent": "#3A3530",
+  "titleJa": "徒然草 · 序段"
+ },
+ {
+  "id": "bunki-graded-n5-station",
+  "file": "bunki-graded-n5-station.webp",
+  "topic": "Waiting for the morning train and learning one new word",
+  "scene": "A small suburban train platform in Japan at ten to eight on a bright morning: a few students in navy school uniforms and office workers in dark suits wait quietly as a train approaches, mountains faint in the distance.",
+  "alt": "Commuters and students waiting on a station platform as a morning train arrives.",
+  "accent": "#2F5873",
+  "titleJa": "駅で待つ時間"
+ },
+ {
+  "id": "bunki-graded-n5-kitchen",
+  "file": "bunki-graded-n5-kitchen.webp",
+  "topic": "Hearing dinner being made in the kitchen, and finally understanding the word 'warm'",
+  "scene": "A warm Japanese home kitchen in the evening: a woman in a plain apron, seen from behind, chops vegetables at the counter while steam rises from a pot; the low table nearby is set with grilled fish, vegetables and bowls of rice.",
+  "alt": "A woman cooking in a warm kitchen at night beside a table set with fish, vegetables and rice.",
+  "accent": "#6A3F25",
+  "titleJa": "台所の音"
+ },
+ {
+  "id": "bunki-graded-n5-neighbour",
+  "file": "bunki-graded-n5-neighbour.webp",
+  "topic": "Short good-mornings with the elderly man next door",
+  "scene": "The open-air corridor of a small two-storey Japanese apartment building at dawn, with metal doors and railings: an elderly Japanese man in a padded winter jacket and flat cap steps out of his door while a young neighbour in a coat stands at the next door, cold blue morning light.",
+  "alt": "An elderly man and a young neighbour at their doors in an apartment corridor at dawn.",
+  "accent": "#3E4A5A",
+  "titleJa": "となりの部屋の人"
+ },
+ {
+  "id": "bunki-graded-n4-letter",
+  "file": "bunki-graded-n4-letter.webp",
+  "topic": "Finding an unsent letter from a stranger while packing to move",
+  "scene": "An open wooden desk drawer in a half-packed Japanese apartment room with tatami and cardboard boxes, holding an old stamped envelope and a folded letter, with spring light and a glimpse of cherry blossom through the window. No readable writing.",
+  "alt": "An old envelope and folded letter in an open desk drawer in a room full of moving boxes.",
+  "accent": "#6E4B3A",
+  "titleJa": "引き出しの中の手紙"
+ },
+ {
+  "id": "bunki-graded-n4-market",
+  "file": "bunki-graded-n4-market.webp",
+  "topic": "A Sunday morning at the local market, hearing 'kesa' spoken for the first time",
+  "scene": "A small neighbourhood market early on a Sunday in Japan: wooden stalls of fresh vegetables under canvas awnings and a fishmonger's counter of fish on ice, one stallholder in a rubber apron and headscarf finishing her setup in the early light. Price cards blank or turned away.",
+  "alt": "Vegetable stalls and a fish counter at a small morning market.",
+  "accent": "#4A6230",
+  "titleJa": "朝の市場"
+ },
+ {
+  "id": "bunki-graded-n4-bicycle",
+  "file": "bunki-graded-n4-bicycle.webp",
+  "topic": "Reporting a stolen bicycle at the police box with only simple Japanese",
+  "scene": "Early evening outside a small Japanese suburban train station: a long row of parked bicycles with one empty gap in the line, and a small lit police box with a red lamp across the street. No people, no readable signs.",
+  "alt": "A row of parked bicycles outside a station with one empty space, a small police box across the street.",
+  "accent": "#3C4F6B",
+  "titleJa": "自転車をなくした日"
+ },
+ {
+  "id": "bunki-graded-n3-river",
+  "file": "bunki-graded-n3-river.webp",
+  "topic": "Choosing the longer path by the river, where an old ferry crossing once stood",
+  "scene": "A quiet riverside path in a Japanese town on an early-summer morning: tall grass along the bank, a low concrete bridge ahead, and one person walking towards the station in light mist.",
+  "alt": "A person walking along a grassy riverside path towards a low bridge in the morning.",
+  "accent": "#2F5B57",
+  "titleJa": "川沿いの道"
+ },
+ {
+  "id": "bunki-graded-n3-radio",
+  "file": "bunki-graded-n3-radio.webp",
+  "topic": "Falling asleep to late-night radio until the sounds start to make sense",
+  "scene": "A small radio glowing softly on a bedside table in a dark bedroom late at night, its dial lit amber, the edge of a blanket and pillow just visible.",
+  "alt": "A small radio with a glowing dial on a bedside table in a dark bedroom.",
+  "accent": "#2C2F4A",
+  "titleJa": "深夜のラジオ"
+ },
+ {
+  "id": "bunki-essay-n2-handwriting",
+  "file": "bunki-essay-n2-handwriting.webp",
+  "topic": "Writing three kanji by hand each day, and how it changes the way you see them",
+  "scene": "A close view of a hand holding a pencil over an empty squared writing-practice notebook on a wooden desk, in soft morning light. The squares are still blank.",
+  "alt": "A hand holding a pencil over an empty squared practice notebook.",
+  "accent": "#4A4036",
+  "titleJa": "手で書くということ"
+ },
+ {
+  "id": "bunki-essay-n2-notebook",
+  "file": "bunki-essay-n2-notebook.webp",
+  "topic": "Taking only three lines of notes per article and leaving the margins for later",
+  "scene": "An open notebook on a café table: only a few short pencil lines at the top of the page and a wide empty margin, with a pen and a folded printed article beside it. No readable writing.",
+  "alt": "An open notebook with a few short lines and wide empty margins on a café table.",
+  "accent": "#3D4A3E",
+  "titleJa": "余白のためのノート"
+ },
+ {
+  "id": "bunki-essay-n2-rain",
+  "file": "bunki-essay-n2-rain.webp",
+  "topic": "How rain slows a town down, and why reading goes better on rainy days",
+  "scene": "A rainy crossing in a Japanese city seen through a café window: a few people with clear plastic umbrellas wait at the lights on a glistening street, and an open book lies on the table by the glass.",
+  "alt": "An open book on a café table by a rain-streaked window overlooking people with umbrellas at a crossing.",
+  "accent": "#34495E",
+  "titleJa": "雨の日の速度"
+ },
+ {
+  "id": "bunki-essay-n2-translation",
+  "file": "bunki-essay-n2-translation.webp",
+  "topic": "Words like 'otsukaresama' that no dictionary translation quite reaches",
+  "scene": "In a quiet Japanese office at dusk, two colleagues in plain business clothes give each other a small nod by the lift as one leaves for the day, the city lights coming on beyond the windows.",
+  "alt": "Two colleagues nodding goodbye to each other in an office at dusk.",
+  "accent": "#4B3F5C",
+  "titleJa": "訳せない言葉について"
+ },
+ {
+  "id": "bunki-essay-n1-memory",
+  "file": "bunki-essay-n1-memory.webp",
+  "topic": "An essay on planning study around forgetting: recall, spacing and meeting a word in new contexts",
+  "scene": "A learner's desk in the morning: a small stack of handmade flashcards, some turned face down, beside a desk calendar with a few days circled. No readable text.",
+  "alt": "A stack of flashcards, some face down, beside a desk calendar with circled days.",
+  "accent": "#3B4A6B",
+  "titleJa": "忘却を前提とした設計"
+ },
+ {
+  "id": "bunki-essay-n1-city",
+  "file": "bunki-essay-n1-city.webp",
+  "topic": "An essay on city anonymity and what it does for someone living in a second language",
+  "scene": "A quiet corner of a large Tokyo station late in the evening: a row of ticket machines glowing, one traveller in a coat standing in front of them, a few blurred figures passing behind. No readable signs.",
+  "alt": "A traveller at a row of ticket machines in a crowded station concourse.",
+  "accent": "#3A3F4E",
+  "titleJa": "都市の匿名性と言語"
+ },
+ {
+  "id": "bunki-graded-n3-zoka-sanjin-morning",
+  "file": "bunki-graded-n3-zoka-sanjin-morning.webp",
+  "topic": "Reading the Kojiki's first lines, about three creation deities, in a library one morning",
+  "scene": "A quiet public library in Japan in the morning: an old book lies open on a wooden reading desk, sunlight from a tall window falling across its pages and empty chairs. No readable text.",
+  "alt": "An old book open on a library desk in morning sunlight.",
+  "accent": "#5A4A2E",
+  "titleJa": "造化三神に出会う朝"
+ },
+ {
+  "id": "bunki-graded-n3-nakaima-diary",
+  "file": "bunki-graded-n3-nakaima-diary.webp",
+  "topic": "A student's diary of one day spent trying to pay attention to the present moment",
+  "scene": "A small Japanese apartment kitchen at seven in the morning: a cup of green tea steaming on the counter beside a phone lying face down, soft light through a frosted window.",
+  "alt": "A steaming cup of green tea next to a face-down phone on a kitchen counter in the morning.",
+  "accent": "#3F5A3A",
+  "titleJa": "「中今」を感じる一日"
+ },
+ {
+  "id": "bunki-graded-n3-world-beginning",
+  "file": "bunki-graded-n3-world-beginning.webp",
+  "topic": "What the Kojiki actually says about the first gods, and the young land 'like floating oil'",
+  "scene": "A shallow, still marsh at dawn: new green reed shoots push up through water with an oily sheen, low mist over the surface.",
+  "alt": "Young reed shoots rising from still water in a misty marsh at dawn.",
+  "accent": "#3E5A4C",
+  "titleJa": "世界のはじまりに現れた三柱"
+ },
+ {
+  "id": "bunki-graded-n3-hidden-deity",
+  "file": "bunki-graded-n3-hidden-deity.webp",
+  "topic": "After class, a student asks why the Kojiki's first gods hid away",
+  "scene": "An after-school classroom in a Japanese high school: a teacher in a plain cardigan and a student in a navy school blazer sit at a desk with an open book between them, late-afternoon sun slanting across the empty desks.",
+  "alt": "A teacher and a student talking over an open book in an empty classroom in the afternoon.",
+  "accent": "#4A5868",
+  "titleJa": "姿を隠した神さま"
+ },
+ {
+  "id": "bunki-graded-n3-kojiki-book",
+  "file": "bunki-graded-n3-kojiki-book.webp",
+  "topic": "What kind of book is the Kojiki? Japan's oldest surviving chronicle, from 712",
+  "scene": "Three old, hand-bound Japanese manuscript volumes, closed and tied with thread, lying side by side in a museum display case under soft light.",
+  "alt": "Three old thread-bound manuscript volumes in a museum display case.",
+  "accent": "#5B3E2E",
+  "titleJa": "『古事記』はどんな本？"
+ },
+ {
+  "id": "bunki-graded-n3-hashira-counter",
+  "file": "bunki-graded-n3-hashira-counter.webp",
+  "topic": "Why Japanese counts gods with hashira, the word for 'pillar'",
+  "scene": "Tall, plain pillars of unpainted cypress wood holding up the roof of a Shinto shrine hall, in quiet morning light.",
+  "alt": "Plain wooden pillars supporting the roof of a shrine hall.",
+  "accent": "#6B4A2B",
+  "titleJa": "神さまを「一柱」と数えるわけ"
+ },
+ {
+  "id": "bunki-graded-n3-feel-jingu-forest",
+  "file": "bunki-graded-n3-feel-jingu-forest.webp",
+  "topic": "Walking the Ise Jingū forest through the shrine's own film",
+  "scene": "The deep cedar forest at Ise Jingū in early morning mist: a wide gravel path runs between enormous ancient cedar trunks, shafts of light falling through the canopy, one small figure far down the path.",
+  "alt": "A wide gravel path through a forest of huge cedar trees with light falling through.",
+  "accent": "#2F4A35",
+  "titleJa": "伊勢神宮の森を映像で歩く"
+ },
+ {
+  "id": "bunki-graded-n3-musubi-visual",
+  "file": "bunki-graded-n3-musubi-visual.webp",
+  "topic": "'Musubi', the creative force named in the Ise film, between sky, earth and prayer",
+  "scene": "The Isuzu River at Ise in the morning: clear water flowing over smooth stones beneath tall trees, patches of sky visible through the branches.",
+  "alt": "A clear river flowing over smooth stones under tall trees.",
+  "accent": "#2B5560",
+  "titleJa": "天・地・祈りをつなぐ「むすひ」"
+ },
+ {
+  "id": "bunki-graded-n3-gratitude-week",
+  "file": "bunki-graded-n3-gratitude-week.webp",
+  "topic": "A made-up diary: a learner tries a prayer of thanks for a week and keeps track honestly",
+  "scene": "An open diary on a desk at night beside a pen and a lamp, with a train pass and a wallet nearby. No readable writing.",
+  "alt": "An open diary, a pen, a train pass and a wallet on a desk under a lamp.",
+  "accent": "#4A3F5E",
+  "titleJa": "一週間、感謝の言葉を唱えてみた"
+ },
+ {
+  "id": "bunki-graded-n3-thanks-before-help",
+  "file": "bunki-graded-n3-thanks-before-help.webp",
+  "topic": "Two students in a café talk about saying 'thank you' before asking for help",
+  "scene": "Two Japanese high-school students in navy school uniforms talk across a small café table after school, one holding a phone, two glasses of iced tea between them, warm afternoon light.",
+  "alt": "Two students talking over iced tea at a café table.",
+  "accent": "#6A4A35",
+  "titleJa": "「助けて」より先に「ありがとう」？"
+ },
+ {
+  "id": "bunki-essay-n2-zoka-as-one",
+  "file": "bunki-essay-n2-zoka-as-one.webp",
+  "topic": "Reading the three creation deities as one process, used as a lens rather than an answer",
+  "scene": "Three sheets of tracing paper laid over one another on a desk under a lamp, a pencil and an open book beside them. No readable text.",
+  "alt": "Three overlapping sheets of tracing paper on a desk beside a pencil and an open book.",
+  "accent": "#44506A",
+  "titleJa": "三柱の神を一つの働きとして読む"
+ },
+ {
+  "id": "bunki-essay-n2-nakaima-time",
+  "file": "bunki-essay-n2-nakaima-time.webp",
+  "topic": "Past, present and future, and the idea of the 'middle now'",
+  "scene": "In a small Japanese apartment in the evening, a bowl of rice and a bowl of miso soup go cold on a low dining table while a young person in a sweater sits looking at a phone.",
+  "alt": "A person looking at a phone while a meal of rice and soup sits untouched on the table.",
+  "accent": "#5A4030",
+  "titleJa": "過去・現在・未来と「中今」"
+ },
+ {
+  "id": "bunki-essay-n2-creator-god",
+  "file": "bunki-essay-n2-creator-god.webp",
+  "topic": "How far 'creator god' is the right translation for the Kojiki's first deities",
+  "scene": "A reader's desk under a lamp: an old Japanese book and an English book lie open side by side with a pencil between them. No readable text.",
+  "alt": "A Japanese book and an English book open side by side on a desk with a pencil.",
+  "accent": "#3D3F5C",
+  "titleJa": "「創造神」という言葉はどこまで正しいか"
+ },
+ {
+  "id": "bunki-essay-n2-silent-amenominakanushi",
+  "file": "bunki-essay-n2-silent-amenominakanushi.webp",
+  "topic": "Amenominakanushi, the first god named in the Kojiki and never heard of again",
+  "scene": "A small, quiet shrine on a wooded hill at dusk: a plain wooden hall behind a low fence, nobody there, a single lantern lit.",
+  "alt": "A small wooden shrine with one lit lantern on a wooded hill at dusk.",
+  "accent": "#3A3448",
+  "titleJa": "天之御中主神――語られない神をどう読むか"
+ },
+ {
+  "id": "bunki-essay-n2-kojiki-myth-history",
+  "file": "bunki-essay-n2-kojiki-myth-history.webp",
+  "topic": "Is the Kojiki myth or history? Asking the right question of each kind of evidence",
+  "scene": "A museum study table with an old hand-copied manuscript volume, closed, beside excavated pottery shards and an ancient bronze mirror, under soft archive lighting.",
+  "alt": "An old manuscript book beside pottery shards and a bronze mirror on a museum table.",
+  "accent": "#5C4630",
+  "titleJa": "『古事記』は神話か、歴史か"
+ },
+ {
+  "id": "bunki-essay-n2-myth-to-book",
+  "file": "bunki-essay-n2-myth-to-book.webp",
+  "topic": "How spoken stories became the written Kojiki in 712",
+  "scene": "A low desk in a dim room lit by an oil lamp: a brush, an inkstone and a long sheet of paper ready for writing, as if a story told aloud were about to be written down. The paper is blank.",
+  "alt": "A brush, an inkstone and blank paper on a low desk lit by an oil lamp.",
+  "accent": "#4A3A2A",
+  "titleJa": "語りから書物へ――神話を編む"
+ },
+ {
+  "id": "bunki-essay-n2-feel-jingu-musubi",
+  "file": "bunki-essay-n2-feel-jingu-musubi.webp",
+  "topic": "How the Ise Jingū film shows 'musubi' through forest, water and craftwork",
+  "scene": "A close view of a craftsman's hands planing a pale block of Japanese cypress in a workshop, fine wood shavings curling away, soft side light.",
+  "alt": "A craftsman's hands planing a block of pale wood, shavings curling off.",
+  "accent": "#6B4F2E",
+  "titleJa": "映像が伝える「むすひ」"
+ },
+ {
+  "id": "bunki-essay-n2-prayer-on-screen",
+  "file": "bunki-essay-n2-prayer-on-screen.webp",
+  "topic": "What a camera can and cannot show of prayer",
+  "scene": "Seen from a distance, a Shinto priest in white robes and a black lacquered cap walks slowly along a gravel path through the forest of a large shrine at dawn, carrying an offering tray, mist between the trees.",
+  "alt": "A priest in white robes walking along a gravel path through a forest shrine at dawn.",
+  "accent": "#3F4A3A",
+  "titleJa": "映像の中で祈りはどう見えるか"
+ },
+ {
+  "id": "bunki-essay-n2-thanks-first",
+  "file": "bunki-essay-n2-thanks-first.webp",
+  "topic": "Why some people say 'thank you' before they have been helped",
+  "scene": "A shop counter in a Japanese department store: a clerk in a dark uniform wraps a small box in plain paper while the customer waits with a slight bow.",
+  "alt": "A shop clerk wrapping a small box while a customer waits at the counter.",
+  "accent": "#6A3E3E",
+  "titleJa": "「ありがとうございます」を先に言う心理"
+ },
+ {
+  "id": "bunki-essay-n2-testimony-literacy",
+  "file": "bunki-essay-n2-testimony-literacy.webp",
+  "topic": "How to listen to someone's personal testimony without either swallowing or dismissing it",
+  "scene": "Two people at a low table in a Japanese home in the evening: one talks while the other listens closely, holding a cup of green tea, a paper lamp glowing.",
+  "alt": "One person talking and another listening at a kitchen table in the evening.",
+  "accent": "#4E4A3A",
+  "titleJa": "体験談をどう受け取るか"
+ },
+ {
+  "id": "bunki-essay-n1-cosmic-analogy",
+  "file": "bunki-essay-n1-cosmic-analogy.webp",
+  "topic": "The temptation to read the Kojiki's creation deities as Big Bang cosmology",
+  "scene": "A clear night sky full of stars and the Milky Way over the dark roofline of a small mountain shrine among trees.",
+  "alt": "The Milky Way above the dark roof of a small shrine in the mountains.",
+  "accent": "#1E2A44",
+  "titleJa": "造化三神を宇宙論として読む誘惑"
+ },
+ {
+  "id": "bunki-essay-n1-nakaima-time-theory",
+  "file": "bunki-essay-n1-nakaima-time-theory.webp",
+  "topic": "Can the 'middle now' become a real theory of time?",
+  "scene": "A hand holding a warm teacup on a wooden table beside a wall clock, steam rising, in morning light.",
+  "alt": "A hand holding a steaming teacup on a wooden table next to a clock.",
+  "accent": "#4D3F33",
+  "titleJa": "「中今」は時間論になり得るか"
+ },
+ {
+  "id": "bunki-essay-n1-first-versus-supreme",
+  "file": "bunki-essay-n1-first-versus-supreme.webp",
+  "topic": "Why 'first' does not mean 'supreme' for the Kojiki's first god",
+  "scene": "A hand-drawn family-tree diagram of lines and empty boxes spread on a study table among open books, a hand tracing one branch. No readable text.",
+  "alt": "A hand tracing a hand-drawn family-tree diagram on a table among open books.",
+  "accent": "#3F3A55",
+  "titleJa": "原初神を「最高神」と呼ぶときの問題"
+ },
+ {
+  "id": "bunki-essay-n1-silent-god-theology",
+  "file": "bunki-essay-n1-silent-god-theology.webp",
+  "topic": "The silent god: what a text's silence can and cannot tell us",
+  "scene": "The empty prayer hall of a small shrine at dawn: doors open, nobody inside, faint light on the polished wooden floor.",
+  "alt": "An empty shrine prayer hall with its doors open at dawn.",
+  "accent": "#2F3440",
+  "titleJa": "沈黙する神と不在の神学"
+ },
+ {
+  "id": "bunki-essay-n1-kojiki-power",
+  "file": "bunki-essay-n1-kojiki-power.webp",
+  "topic": "Compiling the Kojiki as a story of power, and why that is not the whole story",
+  "scene": "The reconstructed great hall of the Heijō Palace in Nara, Japan's capital in 712: a vast red-pillared building on a wide gravel plain under a clear sky.",
+  "alt": "A large red-pillared palace hall on a wide gravel plain under a clear sky.",
+  "accent": "#7A2E26",
+  "titleJa": "『古事記』編纂と権力の物語"
+ },
+ {
+  "id": "bunki-essay-n1-beyond-fact-fiction",
+  "file": "bunki-essay-n1-beyond-fact-fiction.webp",
+  "topic": "Why myth should not be judged only as fact or fiction",
+  "scene": "A university seminar room in Japan seen from the doorway: three students around a table of old books, photocopies and a laptop, in mid-discussion, late-afternoon light.",
+  "alt": "Students discussing around a seminar table covered with books and papers.",
+  "accent": "#3E4C5E",
+  "titleJa": "神話を「事実か虚構か」で裁かないために"
+ },
+ {
+  "id": "bunki-essay-n1-sacred-media",
+  "file": "bunki-essay-n1-sacred-media.webp",
+  "topic": "How the Ise film's pace, distance and silence make viewers feel the sacred",
+  "scene": "An aerial view of plain shrine buildings of unpainted cypress with thatched roofs, set deep in a dark green cedar forest at Ise in early-morning haze. No people.",
+  "alt": "Plain wooden shrine buildings deep in a green forest, seen from above.",
+  "accent": "#2E4634",
+  "titleJa": "「感じる」映像は神聖さをどう構成するか"
+ },
+ {
+  "id": "bunki-essay-n1-ise-time",
+  "file": "bunki-essay-n1-ise-time.webp",
+  "topic": "Time at Ise: nature, repetition and rebuilding",
+  "scene": "At Ise, a newly built shrine hall of fresh pale cypress stands next to the empty gravel plot where the old hall stood, under forest light.",
+  "alt": "A new shrine building of pale wood beside an empty gravel plot in a forest.",
+  "accent": "#5A4B2E",
+  "titleJa": "産霊・自然・反復――伊勢の時間"
+ },
+ {
+  "id": "bunki-essay-n1-miracle-testimony",
+  "file": "bunki-essay-n1-miracle-testimony.webp",
+  "topic": "Miracle stories and the responsibility to match belief to evidence",
+  "scene": "An evening meeting in a small Japanese community hall: four or five people sit in a circle of folding chairs on a wooden floor, one speaking while the others listen, a window dark behind them.",
+  "alt": "A small group sitting in a circle of chairs in a community hall, one person speaking.",
+  "accent": "#4A3B4F",
+  "titleJa": "奇跡の体験談と認識の責任"
+ },
+ {
+  "id": "bunki-essay-n1-prayer-reality",
+  "file": "bunki-essay-n1-prayer-reality.webp",
+  "topic": "A made-up dialogue: a believer, a researcher and a sceptic on what prayer changes",
+  "scene": "Three Japanese people of different ages sit around a small table after a book club, a single sheet of paper lying face down between them, mugs of tea under evening lamplight.",
+  "alt": "Three people at a small table with a sheet of paper and mugs of tea.",
+  "accent": "#3F4B5A",
+  "titleJa": "祈りの言葉は誰の現実を変えるのか"
+ },
+ {
+  "id": "wikinews:44381",
+  "file": "wikinews-44381.webp",
+  "topic": "Japan's squad numbers for the November 2025 Kirin Challenge Cup friendlies against Ghana and Bolivia",
+  "scene": "Toyota Stadium in Aichi at dusk before an international friendly in November: an empty floodlit green pitch and steep empty stands, mist in the floodlights. No people, no readable signs.",
+  "alt": "An empty floodlit football stadium at dusk.",
+  "accent": "#1F3F7A",
+  "titleJa": "サッカー日本代表が背番号発表！ キリンチャレンジカップ"
+ },
+ {
+  "id": "wikinews:45208",
+  "file": "wikinews-45208.webp",
+  "topic": "Nankai is closing its Wakayama–Tokushima car ferry, a route hit by the bridges, the pandemic and fuel costs",
+  "scene": "A large white car ferry pulling away from Wakayama port into the Kii Channel on a hazy morning, gulls over its wake, low green hills behind. No names or logos on the hull.",
+  "alt": "A white car ferry leaving port on a hazy morning with gulls following.",
+  "accent": "#2C4F6E",
+  "titleJa": "南海 フェリー事業から撤退へ"
+ },
+ {
+  "id": "wikinews:45095",
+  "file": "wikinews-45095.webp",
+  "topic": "Changes in the idol unit AiScReam: one member leaves and two join",
+  "scene": "An empty concert stage before a show, lit in soft pink and mint, four microphone stands in a row, glow sticks held up in the dark audience. No people on stage, no logos.",
+  "alt": "Four microphone stands on a softly lit concert stage with glow sticks in the dark crowd.",
+  "accent": "#6A2E55",
+  "titleJa": "AiScReam、ルビィちゃん卒業と新メンバー2人加入"
+ },
+ {
+  "id": "wikinews:45098",
+  "file": "wikinews-45098.webp",
+  "topic": "After the general election, the Diet re-elects Sanae Takaichi and her second cabinet takes office",
+  "scene": "The National Diet Building in Tokyo on a clear winter day, its stepped central tower against a pale blue sky, the forecourt quiet.",
+  "alt": "The National Diet Building in Tokyo under a clear winter sky.",
+  "accent": "#3A4A5E",
+  "titleJa": "第2次高市内閣が始動"
+ },
+ {
+  "id": "wikinews:44384",
+  "file": "wikinews-44384.webp",
+  "topic": "Cristiano Ronaldo is sent off for an elbow in a World Cup qualifier against Ireland",
+  "scene": "A referee's raised hand holding a red card at a night football match in Dublin, the floodlit pitch and the crowd blurred behind in a cold mist. Only the hand and card are sharp; no faces.",
+  "alt": "A referee's hand holding up a red card under stadium floodlights.",
+  "accent": "#8A1F24",
+  "titleJa": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か"
+ },
+ {
+  "id": "wikinews:45089",
+  "file": "wikinews-45089.webp",
+  "topic": "Junya Ogawa wins the Centrist Reform Alliance leadership vote, 27 to 22",
+  "scene": "A meeting room at a party headquarters in Nagatachō, Tokyo, set up for a leadership vote: a ballot box on a table at the front, rows of empty chairs and microphones, grey morning light through tall windows. No people, no readable signs.",
+  "alt": "A ballot box at the front of a meeting room set with rows of empty chairs.",
+  "accent": "#3E4A5C",
+  "titleJa": "中道改革連合新代表選挙 小川淳也氏が新代表に"
+ },
+ {
+  "id": "wikinews:42478",
+  "file": "wikinews-42478.webp",
+  "topic": "Shohei Ohtani becomes the sixth player to hit 40 home runs and steal 40 bases in a season",
+  "scene": "Close-up of a base runner's spikes and gloved hand sliding into second base in a spray of infield dirt at a sunny major-league ballpark in Los Angeles, palm trees beyond the outfield. No face, no team logos.",
+  "alt": "A runner's foot and hand sliding into second base in a spray of dirt.",
+  "accent": "#34506B",
+  "titleJa": "大谷翔平 史上6人目の40盗塁40本塁打達成"
+ },
+ {
+  "id": "govonline:article-202609-radio-3739",
+  "file": "govonline-article-202609-radio-3739.webp",
+  "topic": "What the United Nations does, as Japan marks 70 years of membership",
+  "scene": "The General Assembly hall at UN Headquarters in New York, empty and quiet before a session: curved rows of delegates' desks facing the podium beneath the high domed ceiling. No emblem or text visible.",
+  "alt": "The empty UN General Assembly hall with rows of desks facing the podium.",
+  "accent": "#2B4C7E",
+  "titleJa": "世界をひとつに！国連ってどんなところ？"
+ },
+ {
+  "id": "env:press-press_05463",
+  "file": "env-press-press-05463.webp",
+  "topic": "Results of the UN conference on desertification (COP17) in Ulaanbaatar, Mongolia",
+  "scene": "Dry steppe on the edge of the Gobi in Mongolia at dawn: windblown sand creeping over sparse grass, rows of newly planted saxaul shrubs held in straw grids, and one white felt ger in the far distance. No people.",
+  "alt": "Rows of young shrubs planted in straw grids on dry, sandy Mongolian steppe.",
+  "accent": "#6E5228",
+  "titleJa": "「国連砂漠化対処条約（UNCCD）第17回締約国会議（COP17）」の結果について"
+ },
+ {
+  "id": "env:press-press_05585",
+  "file": "env-press-press-05585.webp",
+  "topic": "An environmental-education training day for teachers at a Kyoto waste-recycling centre",
+  "scene": "Inside a large industrial waste-recycling plant in Kyoto, seen from a raised visitors' walkway: sorted materials move along a long conveyor belt below, three teachers in white hard hats and plain jackets watching from the rail.",
+  "alt": "Visitors in hard hats watching a recycling conveyor belt from a walkway.",
+  "accent": "#3F5A4A",
+  "titleJa": "令和８年度「体験の機会の場」と連携した教職員等環境教育・学習推進リーダー養成研修の開催～「循環型社会を支える現場から学ぶ環境教育」①－サステナブルな未来を拓く環境学習の実践－～"
+ },
+ {
+  "id": "kantei:jp-105-actions-202609-15hyousyou",
+  "file": "kantei-jp-105-actions-202609-15hyousyou.webp",
+  "topic": "Prime Minister's awards for people who saved lives and prepared communities for disasters",
+  "scene": "A Japanese neighbourhood street of low two-storey houses on a clear morning during a disaster drill: two members of a local volunteer fire brigade in navy uniforms and white helmets carry an empty stretcher past a small tent stacked with bottled water. No readable text.",
+  "alt": "Volunteer firefighters carrying a stretcher during a neighbourhood disaster drill.",
+  "accent": "#2E3F5C",
+  "titleJa": "防災功労者内閣総理大臣表彰式"
+ },
+ {
+  "id": "env:press-press_05575",
+  "file": "env-press-press-05575.webp",
+  "topic": "Nine years of 'nudge' experiments to help households cut carbon, summed up",
+  "scene": "A kitchen table in the evening with a printed home-energy report showing a simple bar chart, an electricity bill and a mug of tea, a lamp switched off in the background. No readable text.",
+  "alt": "A home-energy report with a bar chart and an electricity bill on a kitchen table.",
+  "accent": "#2F5A4A",
+  "titleJa": "環境省ナッジ実証事業の取りまとめ結果の公表について"
+ },
+ {
+  "id": "env:press-press_04591",
+  "file": "env-press-press-04591.webp",
+  "topic": "The IAEA confirms that the labs monitoring Japan's seas are accurate and reliable",
+  "scene": "A small research boat on a calm grey sea off the coast of Fukushima at dawn: two scientists in orange life jackets on deck lower a seawater sampling bottle over the side, the coastline low on the horizon. No logos.",
+  "alt": "Scientists on a small boat lowering a water-sampling bottle into the sea.",
+  "accent": "#2A4A5E",
+  "titleJa": "国際原子力機関（IAEA）による分析機関間比較の報告書の公表について"
+ },
+ {
+  "id": "env:press-press_05584",
+  "file": "env-press-press-05584.webp",
+  "topic": "A Kitakyushu landfill opens to schoolchildren as a certified place to learn about waste",
+  "scene": "A large industrial-waste landfill set among green hills near the sea at Moji, Kitakyushu: a bulldozer spreads and compacts soil-covered waste, and a small group of schoolchildren in yellow hard hats watch from a fenced viewing platform.",
+  "alt": "Children in hard hats watching a bulldozer at a landfill among green hills.",
+  "accent": "#4A5A3A",
+  "titleJa": "環境教育等促進法に基づく「体験の機会の場」の新規認定について（株式会社ツネミ「産業廃棄物最終処分場」）"
+ },
+ {
+  "id": "env:press-press_05589",
+  "file": "env-press-press-05589.webp",
+  "topic": "The first check on Japan's fifth plan for a circular, low-waste economy",
+  "scene": "Bales of sorted, compressed plastic bottles, cans and cardboard stacked in the yard of a recycling centre, a forklift lifting one, in bright daylight.",
+  "alt": "Stacked bales of compressed bottles, cans and cardboard at a recycling centre.",
+  "accent": "#3B5B47",
+  "titleJa": "第五次循環型社会形成推進基本計画の進捗状況の第１回点検結果について"
+ },
+ {
+  "id": "govonline:article-202609-tv-6623",
+  "file": "govonline-article-202609-tv-6623.webp",
+  "topic": "'Dark part-time jobs': how young people are recruited into crime, and why they should go to the police",
+  "scene": "A Japanese teenager in a hoodie sits on a bed in a dark room late at night, lit only by the glow of the smartphone in their hands, hesitating. The screen is not readable and the face is in shadow.",
+  "alt": "A teenager in a dark room looking at a glowing smartphone.",
+  "accent": "#2C2A45",
+  "titleJa": "闇バイトは犯罪!"
+ },
+ {
+  "id": "env:press-press_05582",
+  "file": "env-press-press-05582.webp",
+  "topic": "Environment minister's awards for five people who served Japan's water supply",
+  "scene": "A water purification plant in Japan at sunrise: rows of still settling and filtration basins reflecting the sky, one technician in a navy work uniform and cap holding up a glass sample of water.",
+  "alt": "A technician holding up a water sample beside the basins of a water treatment plant.",
+  "accent": "#23566A",
+  "titleJa": "令和８年度水道関係功労者環境大臣表彰の受賞者の決定"
+ },
+ {
+  "id": "kantei:jp-105-actions-202609-18fukudaijin",
+  "file": "kantei-jp-105-actions-202609-18fukudaijin.webp",
+  "topic": "The new senior vice-ministers' first meeting and group photo with the Prime Minister",
+  "scene": "The grand staircase inside the Prime Minister's Office in Tokyo, empty, with its red carpet and pale stone steps where the official group photographs are taken.",
+  "alt": "An empty red-carpeted staircase inside the Prime Minister's Office.",
+  "accent": "#6B2A2A",
+  "titleJa": "初副大臣会議・記念撮影"
+ },
+ {
+  "id": "kantei:jp-105-actions-202609-19seimukan",
+  "file": "kantei-jp-105-actions-202609-19seimukan.webp",
+  "topic": "The new parliamentary vice-ministers' first meeting, late in the evening",
+  "scene": "A government meeting room in Tokyo at night: a long oval table with rows of chairs and microphones, the lights on and the windows dark. No people, no readable text.",
+  "alt": "A long meeting table with chairs and microphones in a government room at night.",
+  "accent": "#34404F",
+  "titleJa": "初大臣政務官会合・記念撮影"
+ },
+ {
+  "id": "mhlw:stf-newpage_76100",
+  "file": "mhlw-stf-newpage-76100.webp",
+  "topic": "Results of the government's inspections of Japan's 88 advanced-treatment hospitals",
+  "scene": "A long, clean corridor of a large Japanese university hospital, two inspectors in dark suits with clipboards walking away from the camera, a nurses' station softly lit at the far end. No readable signs.",
+  "alt": "Two inspectors with clipboards walking along a hospital corridor.",
+  "accent": "#2E5A66",
+  "titleJa": "特定機能病院に対する立入検査結果について（令和７年度）"
+ },
+ {
+  "id": "mhlw:stf-newpage_76233",
+  "file": "mhlw-stf-newpage-76233.webp",
+  "topic": "Japan's 73rd mental-health awareness week, with a national gathering in Toyama",
+  "scene": "A modern convention hall in Toyama city on a clear autumn morning, a few people walking towards its glass entrance, with the snow-capped Tateyama mountain range rising behind the city. No readable banners.",
+  "alt": "People walking into a convention hall in Toyama with mountains in the distance.",
+  "accent": "#3F5266",
+  "titleJa": "第73回精神保健福祉普及運動を実施します"
+ },
+ {
+  "id": "mhlw:stf-newpage_76330",
+  "file": "mhlw-stf-newpage-76330.webp",
+  "topic": "Survey: 82% of Japan's hospitals are now built to withstand earthquakes",
+  "scene": "The outside of a large Japanese hospital building fitted with diagonal steel seismic braces across its facade, under a clear sky.",
+  "alt": "A hospital building with diagonal steel earthquake braces on its outside walls.",
+  "accent": "#3A4A5A",
+  "titleJa": "病院の耐震改修状況調査の結果"
+ },
+ {
+  "id": "sports:sports-b_menu-houdou-31-09-1421070_00039",
+  "file": "sports-sports-b-menu-houdou-31-09-1421070-00039.webp",
+  "topic": "Education minister's awards for 78 volunteers who promote sport in their towns",
+  "scene": "A school gym in a Japanese town on a Sunday morning: a community sports volunteer in a tracksuit leads a small group of local residents, from children to grandparents, in light stretching exercises on the wooden floor.",
+  "alt": "A volunteer in a tracksuit leading residents of all ages in exercises in a school gym.",
+  "accent": "#2F5D50",
+  "titleJa": "令和8年度「スポーツ推進委員功労者表彰」受賞者を決定しました"
+ },
+ {
+  "id": "govonline:article-202609-radio-3741",
+  "file": "govonline-article-202609-radio-3741.webp",
+  "topic": "Sign language is a language: Japan's new law and Sign Language Day on 23 September",
+  "scene": "A Japanese sign-language interpreter dressed in plain black stands at the side of a dim concert stage, hands mid-sign and face expressive under a single spotlight, the band in soft focus behind.",
+  "alt": "A sign-language interpreter signing beside a concert stage under a spotlight.",
+  "accent": "#4B2E6B",
+  "titleJa": "「伝える」をもっと豊かに！手話は言語です。"
+ },
+ {
+  "id": "kantei:jp-105-discourse-20260923message",
+  "file": "kantei-jp-105-discourse-20260923message.webp",
+  "topic": "Japanese food and travel showcased at an evening for US–Japan exchange",
+  "scene": "A reception table at an evening event, laid with Japanese dishes: sliced wagyu beef, sea bream and yellowtail sashimi, grilled scallops, wedges of green melon, and unlabelled bottles of sake and shochu, glasses glinting in warm low light. No people.",
+  "alt": "A reception table of wagyu, sashimi, scallops, melon and sake bottles.",
+  "accent": "#6B3A2A",
+  "titleJa": "日米観光・食文化交流の夕べ　高市総理ビデオメッセージ"
+ },
+ {
+  "id": "env:press-press_05569",
+  "file": "env-press-press-05569.webp",
+  "topic": "A free advice desk for groups restoring Japan's coastal waters, seagrass beds and tidal flats",
+  "scene": "A shallow coastal bay in Japan at low tide on a misty morning: two volunteers in chest waders and sun hats plant eelgrass seedlings in the mud of a tidal flat, small wooden fishing boats moored beyond.",
+  "alt": "Volunteers in waders planting seagrass on a tidal flat at low tide.",
+  "accent": "#2B5A5C",
+  "titleJa": "「里海づくり相談窓口」の開設について～里海づくりの疑問・課題を専門家に無料で相談できます～"
+ },
+ {
+  "id": "env:press-press_05603",
+  "file": "env-press-press-05603.webp",
+  "topic": "Japan and Singapore renew their agreement to work together on climate, waste and pollution",
+  "scene": "Two fountain pens resting on two closed leather document folders on a polished signing table in a Tokyo ministry office, the city skyline beyond the window. No flags as the main subject, no people.",
+  "alt": "Two pens on closed document folders on a signing table, the city beyond the window.",
+  "accent": "#2F4A5A",
+  "titleJa": "シンガポール共和国持続可能性・環境省との環境協力に関する協力覚書の更新について"
+ },
+ {
+  "id": "govonline:article-202609-tv-6628",
+  "file": "govonline-article-202609-tv-6628.webp",
+  "topic": "Critical minerals: how Japan is securing rare earths from Australia via Malaysia",
+  "scene": "An open-pit rare-earth mine in the red earth of Western Australia: huge haul trucks on terraced benches under a hard blue sky.",
+  "alt": "Haul trucks on the terraces of a red-earth open-pit mine under a blue sky.",
+  "accent": "#7E3A1E",
+  "titleJa": "先端産業に必須“重要鉱物”"
+ },
+ {
+  "id": "mext:b_menu-houdou-mext_01683",
+  "file": "mext-b-menu-houdou-mext-01683.webp",
+  "topic": "The national fair for vocational high schools, with robot and flower contests, in Saga",
+  "scene": "In a large arena in Saga, a home-made robot built by high-school students carries small pieces of white Arita porcelain across a competition course, two students in school tracksuits steering it from the side. No readable banners.",
+  "alt": "Students steering a home-made robot across a competition course in an arena.",
+  "accent": "#3A4F7A",
+  "titleJa": "第36回全国産業教育フェア佐賀大会（さんフェア SAGA2026）を開催します！"
+ },
+ {
+  "id": "env:press-press_05614",
+  "file": "env-press-press-05614.webp",
+  "topic": "Three companies chosen for a model project tackling carbon, waste and nature together",
+  "scene": "An aerial view of a factory site with solar panels across its roofs, a belt of newly planted native trees around it, and bales of recycled material by the loading dock. No logos.",
+  "alt": "A factory with solar panels on its roofs and a belt of young trees around it, seen from above.",
+  "accent": "#3D5A3A",
+  "titleJa": "「令和８年度環境課題の統合的解決に向けたモデル支援事業」参加企業の決定について"
+ },
+ {
+  "id": "env:press-press_05616",
+  "file": "env-press-press-05616.webp",
+  "topic": "The 40th national septic-tank convention, held on Septic Tank Day, 1 October",
+  "scene": "Beside a rural Japanese house with a tiled roof and a small vegetable garden, a technician in a grey work uniform and cap lifts the round lid of a household septic tank set into the ground to inspect it.",
+  "alt": "A technician lifting the lid of a septic tank beside a house.",
+  "accent": "#3E5560",
+  "titleJa": "「浄化槽の日」における「第40回全国浄化槽大会」の開催について"
+ },
+ {
+  "id": "env:press-press_05643",
+  "file": "env-press-press-05643.webp",
+  "topic": "Golden fire ants, an invasive species, found at Kobe port: a first for Japan",
+  "scene": "A macro close-up of golden-yellow ants swarming over sandy soil at the edge of a concrete container yard at Kobe port, stacked shipping containers and gantry cranes blurred in the background.",
+  "alt": "A close-up of golden-yellow ants on sandy soil beside a container yard.",
+  "accent": "#6B4A1E",
+  "titleJa": "神戸港におけるコガネヒアリの確認について"
+ },
+ {
+  "id": "kantei:jp-105-actions-202609-25startup",
+  "file": "kantei-jp-105-actions-202609-25startup.webp",
+  "topic": "Japan Startup Awards 2026: the top prize goes to Mujin, which makes warehouse robots that see and think",
+  "scene": "An industrial robot arm in a bright, quiet distribution warehouse picks up mixed cardboard boxes and stacks them neatly onto a pallet. No people, no logos.",
+  "alt": "A robot arm stacking mixed cardboard boxes onto a pallet in a warehouse.",
+  "accent": "#34406A",
+  "titleJa": "日本スタートアップ大賞２０２６表彰式"
+ },
+ {
+  "id": "mhlw:stf-houdou-newpage_75698",
+  "file": "mhlw-stf-houdou-newpage-75698.webp",
+  "topic": "Information about family doctors is now searchable on the government's Navii medical website",
+  "scene": "At a low table in a Japanese home, a person searches for a local family clinic on a laptop showing a map with clinic pins, a health insurance card beside it. No readable text.",
+  "alt": "A person at a laptop looking at a map of nearby clinics, an insurance card on the table.",
+  "accent": "#2F5A6E",
+  "titleJa": "かかりつけ医機能に関する情報の医療情報ネット（ナビイ）での提供について"
+ },
+ {
+  "id": "mhlw:stf-newpage_76360",
+  "file": "mhlw-stf-newpage-76360.webp",
+  "topic": "Japan starts pre-entry tuberculosis screening for long-stay visitors from Indonesia",
+  "scene": "A chest X-ray glowing on a lit viewing screen in a quiet clinic room in Jakarta, a stethoscope and a folder of forms on the desk below, a tropical plant by the window. No people, no readable text.",
+  "alt": "A chest X-ray on a lit viewing screen in a quiet clinic room.",
+  "accent": "#2E4F63",
+  "titleJa": "インドネシアにおける入国前結核スクリーニングを開始します"
+ },
+ {
+  "id": "jawiki:3492442",
+  "file": "jawiki-3492442.webp",
+  "topic": "The 20th Asian Games, hosted by Aichi and Nagoya in 2026",
+  "scene": "Paloma Mizuho Stadium in Nagoya at dusk on the evening the Asian Games opened: an empty athletics stadium with a red running track under floodlights, the sky deep blue. No people, no logos or readable signs.",
+  "alt": "An empty athletics stadium with a red track under evening floodlights.",
+  "accent": "#7A2E35",
+  "titleJa": "2026年アジア競技大会"
+ },
+ {
+  "id": "jawiki:5238864-s63",
+  "file": "jawiki-5238864-s63.webp",
+  "topic": "Typhoon No. 25 (Dujuan), which brought record rain to Tōkai and Kantō in September 2026",
+  "scene": "A satellite-style view of a large typhoon spiral over the Pacific just south of Japan's main island, its eye clearly visible, the coastline faint at the top of the frame.",
+  "alt": "A satellite view of a large typhoon spiral south of Japan.",
+  "accent": "#3B4A5A",
+  "titleJa": "2026年の台風（台風25号（ドゥージェン））"
+ },
+ {
+  "id": "jawiki:5294446",
+  "file": "jawiki-5294446.webp",
+  "topic": "The reshuffled second Takaichi cabinet, formed on 17 September 2026",
+  "scene": "The Prime Minister's Office in Tokyo on a September afternoon: the modern glass-and-stone building with its bamboo garden, two black cars waiting at the entrance.",
+  "alt": "The Prime Minister's Office in Tokyo, with its bamboo garden and cars at the entrance.",
+  "accent": "#3A4D44",
+  "titleJa": "第2次高市内閣 (改造)"
+ },
+ {
+  "id": "govonline:article-202609-radio-3743",
+  "file": "govonline-article-202609-radio-3743.webp",
+  "topic": "Japan's registered cultural properties, from station buildings to old bathhouses, turn 30",
+  "scene": "An old wooden public bathhouse in a Japanese town, with its curved tiled roof, tall brick chimney and wooden sliding doors, now used as a café, tables visible through the open doors in late-afternoon light. No readable signs.",
+  "alt": "An old wooden bathhouse with a curved tiled roof, now a café.",
+  "accent": "#5A3A2A",
+  "titleJa": "えっ、この建物も文化財！？地域の遺産・登録有形文化財"
+ },
+ {
+  "id": "env:press-press_05591",
+  "file": "env-press-press-05591.webp",
+  "topic": "Study tours to Kameoka and Ishinomaki to see local, low-waste ways of living",
+  "scene": "The Hozu River at Kameoka in autumn mist: a small study-tour group of four walking along the cleaned riverbank with a local guide in a fleece jacket pointing ahead, wooded hills in red and gold around them.",
+  "alt": "A small group with a guide walking along a riverbank among autumn hills.",
+  "accent": "#3D5A45",
+  "titleJa": "地域循環共生圏スタディツアー2026（京都府亀岡市・宮城県石巻市）の開催について"
+ },
+ {
+  "id": "mhlw:stf-newpage_76340",
+  "file": "mhlw-stf-newpage-76340.webp",
+  "topic": "The health ministry teams up with a TV drama about drug-company reps to explain medicine safety",
+  "scene": "At a Japanese pharmacy counter, a pharmacist in a white coat hands a patient a paper bag of prescribed medicines and a small medication notebook, shelves of medicine boxes behind. No readable labels.",
+  "alt": "A pharmacist handing a bag of medicines to a patient across the counter.",
+  "accent": "#2F5E5A",
+  "titleJa": "ＷＯＷＯＷ「連続ドラマＷ MR -医薬情報担当者-」とタイアップします"
+ },
+ {
+  "id": "jawiki-news:2026-09-14",
+  "file": "jawiki-news-2026-09-14.webp",
+  "topic": "A week of news, 14–20 September 2026: the Asian Games open, the Bank of Japan raises rates, a new cabinet",
+  "scene": "The stone facade of the Bank of Japan's head office in Nihonbashi, Tokyo, early on a September morning, its domed roof against a pale sky, a few people walking past on the pavement.",
+  "alt": "The stone front of the Bank of Japan building in Tokyo in the morning.",
+  "accent": "#4A4A3A",
+  "titleJa": "9月14日〜9月20日のできごと"
+ },
+ {
+  "id": "sports:sports-b_menu-houdou-jsa_00246",
+  "file": "sports-sports-b-menu-houdou-jsa-00246.webp",
+  "topic": "The Sports Agency's commissioner visits Toyama for talks and the opening of a new arena",
+  "scene": "A newly built indoor arena near the canal in Toyama on opening day, its modern curved roof under a clear autumn sky, the snow-capped Tateyama mountains in the distance. No readable signs.",
+  "alt": "A new arena with a curved roof near the harbour, mountains in the distance.",
+  "accent": "#2F5070",
+  "titleJa": "河合スポーツ庁長官が富山県を訪問します～富山県新田知事、富山市藤井市長との意見交換～"
+ },
+ {
+  "id": "global-voices:2026-09-28-65726",
+  "file": "global-voices-2026-09-28-65726.webp",
+  "topic": "The Jaramana Solidarity Field near Damascus, part of a refugee-founded farming project, works to revive native seeds",
+  "scene": "On the dusty edge of Jaramana, a town outside Damascus, a few Syrian volunteers plant rows of native seeds in a small green plot on a spring morning: men in plain work shirts and trousers, women in long dresses and headscarves. A hose carries water along the furrows; flat-roofed concrete houses and a few olive trees stand behind.",
+  "alt": "Syrian volunteers planting rows of seeds in a small green field at the edge of a town of flat-roofed houses.",
+  "accent": "#3E5A2E",
+  "titleJa": "シリアの「連帯の畑」で在来種子の再生を目指す"
+ },
+ {
+  "id": "jawiki-news:2026-09-21",
+  "file": "jawiki-news-2026-09-21.webp",
+  "topic": "A week of news, 21–27 September 2026: a world record at the Asian Games, typhoon landslides, a US–China summit",
+  "scene": "A single swimmer racing breaststroke in an Olympic-size pool, spray flying from the stroke, lane ropes and the black line visible under clear water, empty lanes beside. No face in focus.",
+  "alt": "Swimmers racing breaststroke in an indoor pool.",
+  "accent": "#1F5A7A",
+  "titleJa": "9月21日〜9月27日のできごと"
+ },
+ {
+  "id": "adapt-n3:govonline:article-202609-radio-3741",
+  "file": "adapt-n3-govonline-article-202609-radio-3741.webp",
+  "topic": "Sign language is a language too (easier version)",
+  "scene": "Two young Japanese friends in casual clothes talk in sign language at a café table, hands mid-gesture and faces animated, in warm afternoon light by a window.",
+  "alt": "Two friends talking in sign language at a café table.",
+  "accent": "#5A3A6B",
+  "titleJa": "手話も「言語」です"
+ },
+ {
+  "id": "adapt-n3:govonline:article-202609-tv-6628",
+  "file": "adapt-n3-govonline-article-202609-tv-6628.webp",
+  "topic": "The critical minerals inside phones and electric cars (easier version)",
+  "scene": "A smartphone and an electric-car charging plug laid on a lab bench beside small piles of raw mineral ore and a dish of grey rare-earth powder.",
+  "alt": "A phone and a charging plug beside small piles of ore and grey powder on a bench.",
+  "accent": "#3A4A5E",
+  "titleJa": "スマホや電気自動車に必要な「重要鉱物」"
+ },
+ {
+  "id": "adapt-n3:env:press-press_05643",
+  "file": "adapt-n3-env-press-press-05643.webp",
+  "topic": "Golden fire ants found at Kobe port (easier version)",
+  "scene": "Two inspectors in white protective suits check the base of a stack of shipping containers at Kobe port at dawn with torches and set small bait traps on the concrete. No logos.",
+  "alt": "Inspectors in protective suits checking the base of stacked shipping containers.",
+  "accent": "#3D4F5A",
+  "titleJa": "神戸港で「コガネヒアリ」が見つかった"
+ },
+ {
+  "id": "adapt-n3:jawiki:3492442",
+  "file": "adapt-n3-jawiki-3492442.webp",
+  "topic": "The Asian Games come to Aichi and Nagoya (easier version)",
+  "scene": "Nagoya at dusk seen from above: Nagoya Castle with its white walls and green copper roofs in the foreground, the city's towers beyond, a stadium's floodlights glowing in the distance.",
+  "alt": "Nagoya Castle and the city at dusk, a stadium lit up in the distance.",
+  "accent": "#3A3F6A",
+  "titleJa": "アジア競技大会が愛知・名古屋で"
+ },
+ {
+  "id": "adapt-n3:jawiki:5238864-s63",
+  "file": "adapt-n3-jawiki-5238864-s63.webp",
+  "topic": "Typhoon No. 25 and record rain (easier version)",
+  "scene": "Rain-lashed streets in a low-rise town in Chiba: a river has overflowed and brown floodwater covers the road up to the wheels of parked cars, beside two-storey houses with tiled roofs, under a heavy grey sky. No people in danger.",
+  "alt": "Brown floodwater covering a town street up to the wheels of parked cars in heavy rain.",
+  "accent": "#3A4550",
+  "titleJa": "台風25号と記録的な大雨"
+ },
+ {
+  "id": "adapt-n3:global-voices:2026-09-28-65726",
+  "file": "adapt-n3-global-voices-2026-09-28-65726.webp",
+  "topic": "Reviving native seeds at a solidarity field near Damascus (easier version)",
+  "scene": "Close-up of a Syrian farmer's hands, the sleeve of a plain work shirt rolled up, pressing native seeds into a freshly dug furrow of dry pale soil beside a small irrigation channel, flat-roofed concrete houses blurred behind, outside Damascus in spring.",
+  "alt": "A farmer's hands pressing seeds into a furrow of dry soil next to a small water channel.",
+  "accent": "#5A4626",
+  "titleJa": "シリアの「連帯の畑」"
+ },
+ {
+  "id": "mhlw:stf-newpage_76095",
+  "file": "mhlw-stf-newpage-76095.webp",
+  "topic": "2025 labour inspections at workplaces employing foreign trainees and skilled workers",
+  "scene": "In a small Japanese metal workshop, a labour inspector in a dark suit with a clipboard checks the safety guard on a metal-press machine while a young Southeast Asian worker in grey work overalls looks on.",
+  "alt": "An inspector checking the safety guard of a factory machine while a worker watches.",
+  "accent": "#3E4A52",
+  "titleJa": "外国人技能実習生又は特定技能外国人を使用する事業場に対して行った令和７年の監督指導、送検等の状況を公表します"
+ },
+ {
+  "id": "mhlw:stf-newpage_76126",
+  "file": "mhlw-stf-newpage-76126.webp",
+  "topic": "Winners of the contest for companies where older people keep working well",
+  "scene": "In a small manufacturing workshop in Hamamatsu, an experienced Japanese worker in his sixties shows a younger colleague how to finish a part at a workbench; both wear light-blue factory work uniforms and caps.",
+  "alt": "An older worker showing a younger colleague a task at a workbench.",
+  "accent": "#5A4A3A",
+  "titleJa": "令和８年度「高年齢者活躍企業コンテスト」の入賞企業が決定しました"
+ },
+ {
+  "id": "mhlw:stf-newpage_76152",
+  "file": "mhlw-stf-newpage-76152.webp",
+  "topic": "October is the month to sign up small businesses for the state-backed retirement fund",
+  "scene": "The back office of a small family-run Japanese workshop: the owner and an employee in work clothes look over paperwork together at a cluttered desk, tools and shelves behind them. No readable text.",
+  "alt": "A workshop owner and an employee going over papers at a desk.",
+  "accent": "#3E4E5E",
+  "titleJa": "10月は中小企業退職金共済制度の加入促進強化月間"
+ },
+ {
+  "id": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+  "file": "sports-sports-b-menu-houdou-31-09-1420919-00007.webp",
+  "topic": "Awards for 154 people and 96 groups who have spread sport in their communities for years",
+  "scene": "A few older Japanese residents in caps and windbreakers playing a friendly game of ground golf on a riverside field on a misty autumn morning.",
+  "alt": "Older residents playing ground golf on a riverside field.",
+  "accent": "#3F5F3A",
+  "titleJa": "令和8年度「生涯スポーツ功労者」及び「生涯スポーツ優良団体表彰」受賞者を決定しました"
+ },
+ {
+  "id": "mext:b_menu-houdou-2025-mext_00009",
+  "file": "mext-b-menu-houdou-2025-mext-00009.webp",
+  "topic": "The university start-up prize goes to Rapyuta Robotics, maker of warehouse robots",
+  "scene": "Small autonomous mobile robots carry picking crates between tall shelves in a quiet modern warehouse at night, one worker in a work vest placing an item into a crate. No logos.",
+  "alt": "Small wheeled robots carrying crates between warehouse shelves.",
+  "accent": "#2F4A6A",
+  "titleJa": "「日本スタートアップ大賞2026」受賞者を決定しました"
+ }
+]
