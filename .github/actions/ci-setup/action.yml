@@ -38,6 +38,10 @@ runs:
       with:
         path: ~/.cache/ms-playwright
         key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+    - name: Retain Ubuntu sources and change only the Azure archive URI
+      run: sudo --preserve-env=CI,GITHUB_ACTIONS,RUNNER_OS "$(command -v node)" scripts/ci/ubuntu-archive.mjs
+      if: inputs.browsers != '' && runner.os == 'Linux'
+      shell: bash
     - run: npx playwright install --with-deps ${{ inputs.browsers }}
       if: inputs.browsers != ''
       shell: bash

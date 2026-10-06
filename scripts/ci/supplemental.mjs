@@ -21,6 +21,7 @@ export function supplementalGates(out) {
         'scripts/ci/receipts.test.mjs',
         'scripts/ci/ledger.test.mjs',
         'scripts/ci/runner.integration.test.mjs',
+        'scripts/ci/ubuntu-archive.test.mjs',
       ],
       requiredPath: 'scripts/ci/receipts.test.mjs',
     },
