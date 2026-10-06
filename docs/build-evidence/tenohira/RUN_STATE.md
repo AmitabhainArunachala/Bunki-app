@@ -7,9 +7,9 @@
 
 | PR  | State       | Branch / evidence                                                       |
 | --- | ----------- | ----------------------------------------------------------------------- |
-| 一  | **IN PR**   | `claude/bunki-kairo-pr76-review-qa1qnh` · battery in `tenohira/pr-ichi/` |
-| 二  | next        | —                                                                       |
-| 三  | queued      | —                                                                       |
+| 一  | **MERGED**  | content via #80 (2026-08-21), receipt via #78 (operator, 2026-08-25)    |
+| 二  | queued      | —                                                                       |
+| 三  | next        | first rubric pass shipped in 一; the living loop remains                |
 | 四  | queued      | —                                                                       |
 | 五  | queued      | voice research done (operator artifact, 2026-08-19); shootout unrun     |
 | 六  | queued      | awaits mockup approval round                                            |
@@ -55,6 +55,33 @@ and wikinews:45227 — whose approval the feed gate CONVICTED (its
 final-revision caveat is verification, not taste; the rubric yielded and
 its text now says so). The census check follows the queue with a pairing
 assertion. verify-feed 31/31; the queue file is the per-row audit trail.
+
+## Review-debt interstitial (2026-08-25, after 一 merged)
+
+PR 一's outside review (Codex, on #78) found real defects that rode into
+`main` via #80; they are paid as one small PR before 三 resumes:
+
+- `sw.js`: fetch-handler `cache.put` now held open by `event.waitUntil`;
+  activate deletes only `kairo-` caches (CacheStorage is origin-wide on a
+  shared Pages origin); the three boot-critical data files
+  (`manifest.json`, `fsrs-pin.json`, `articles/index.json`) precache at
+  install so offline FIRST boot works — not just offline revisit.
+- `openPassage` stops a running 聞く when the passage actually changes:
+  the glossary cross-ref door and the word sheet's この記事を読む door
+  switch passages without leaving the reader view, so the view-change
+  guard alone let article A keep speaking over article B.
+- `verify-native-readings`: the `reviewRows.length > 0` floor convicted a
+  legitimately finished review queue; the marking law is vacuous when
+  nothing is pending, and lift legitimacy already belongs to the pairing
+  check. Floor removed — a truthfulness repair, not a weakening.
+- The residual-storage ledger's line-pins were recomputed (the tray-door
+  pin had already drifted 105 lines on `main` — the 書の間 lane grew
+  corridor.js above it without a recompute; latent gate red, repaired
+  here).
+
+Codex's two voice findings were re-examined and are **already answered on
+`main`** (the boot voiceschanged warm-up + repaint), except the passage
+switch above, which was real.
 
 ## 書の間 escalations (operator, 2026-08-24)
 

@@ -1,0 +1,506 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N3",
+  "number": 2,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "　先週の日曜日、祖母の八十歳の誕生日を祝うために、親戚が十五人ほど集まりました。祖母は、みんなが自分のために集まってくれたことを、とても喜んでいました。（１）、いちばん祖母を喜ばせたのは、孫たちが作ったアルバムでした。\n　アルバムには、祖母の若いころの写真や、家族旅行の写真がたくさんはってありました。祖母はページを（２）、一枚一枚の写真について楽しそうに話してくれました。わたしは祖母の話を聞きながら、家族の歴史をもっと知りたいと（３）。",
+    "s1": "山本様\n　このたびは、はなみ旅館をご予約いただき、ありがとうございます。ご予約は、十月十二日（土）から一泊、大人二名様です。チェックインは午後三時から、チェックアウトは午前十時までとなっております。\n　駅から旅館までは無料の送迎バスがございます。ご利用の場合は、前日までにお電話でお知らせください。\nはなみ旅館",
+    "s2": "　友人とルームシェアを始めて半年になる。家賃が半分になるのはうれしいが、生活の時間が違うことに、最初はとまどった。わたしは朝早く起きるが、友人は夜遅くまで起きている。そこで、夜十時以降は洗濯機を使わない、台所を使ったらすぐに片付ける、などのルールを二人で決めた。ルールを決めてからは、お互いに気持ちよく暮らせている。",
+    "s3": "市民プールからのお知らせ\n　七月二十日から八月三十一日まで、夏休みの特別営業を行います。この期間は、朝九時から夜八時まで開いています（ふだんは午前十時から午後六時までです）。\n　ただし、小学生以下の子どもは、大人と一緒でなければ入れません。また、プールの中での飲食はご遠慮ください。",
+    "m1": "　先月、初めて一人で旅行をした。行き先は、山の中にある小さな温泉の町だ。これまでは、いつも家族や友だちと一緒に旅行していたので、一人で大丈夫だろうかと少し不安だった。\n　旅館に着くと、おかみさんが「一人旅ですか。ゆっくりしていってくださいね」と笑顔で迎えてくれた。夕食のときには、同じように一人で来ていた年上の女性と話す機会があった。その人は毎年この町に来ていて、おすすめの店や散歩道を教えてくれた。\n　次の日は、教えてもらった道を歩いてみた。だれかと一緒だと、つい話に夢中になってしまうが、一人だと周りの景色や音にゆっくり気づくことができる。川の音や鳥の声を聞きながら歩いた時間は、今回の旅でいちばん心に残っている。",
+    "l1": "　わたしの家では、毎年正月になると、親戚が祖父母の家に集まる。子どものころは、それが当たり前だと思っていた。いとこたちと遊んだり、祖母の作った料理を食べたりする正月が、一年でいちばんの楽しみだった。\n　ところが、大学に入ってから、正月に集まることが少し面倒に感じるようになった。久しぶりに会う親戚に、学校のことや将来のことを何度も聞かれるのが嫌だったのだ。友だちと過ごしたほうが楽しいのではないかと思い、一度だけ正月に帰らなかった年もある。\n　その年の春、祖父が入院した。幸い、すぐに元気になったが、病院で祖父が「正月にみんなの顔を見るのが、いちばんの楽しみなんだよ」と言うのを聞いて、わたしは何も言えなかった。自分にとっては毎年の行事の一つでも、祖父にとっては、一年に一度家族がそろう大切な日だったのだ。\n　今年の正月、わたしは久しぶりに祖父母の家へ行った。親戚からはやはりいろいろなことを聞かれたが、前ほど嫌だとは思わなかった。家族が集まる時間は、いつまでも続くわけではない。だからこそ、その時間を大切にしたいと、今は思っている。",
+    "i1": "はなみ旅館　宿泊プランのご案内\n（大人お一人様・一泊の料金です）\n\n【Ａ　さくらプラン】夕食・朝食つき\n　平日　12,000円　／　土曜日・祝日の前日　14,000円\n【Ｂ　もみじプラン】朝食のみ\n　平日　8,000円　／　土曜日・祝日の前日　9,500円\n【Ｃ　つきプラン】夕食・朝食つき、部屋に温泉つき\n　平日　18,000円　／　土曜日・祝日の前日　21,000円\n\n※小学生は大人料金の半額です。小学生未満のお子様は無料です（食事はつきません）。\n※三泊以上ご宿泊の方は、合計金額から10％引きになります。\n※Ｃプランは、二名様からのご予約となります。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nこの旅館に【宿泊】する客は、夕食を部屋で食べることができる。",
+      "options": [
+        "しゅくばく",
+        "すくはく",
+        "しゅうはく",
+        "しゅくはく"
+      ],
+      "answer": 3,
+      "rationale": "宿泊は「しゅくはく」と読む。ホテルや旅館に泊まることだ。\nThe word 宿泊 (lodging, staying overnight) is read shukuhaku.",
+      "target": "宿泊"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n京都には、毎年たくさんの【観光】客が訪れる。",
+      "options": [
+        "かんこう",
+        "がんこう",
+        "かんごう",
+        "かんこ"
+      ],
+      "answer": 0,
+      "rationale": "観光は「かんこう」と読む。「こう」は長く、濁らない。\nThe word 観光 (sightseeing) is read kankō.",
+      "target": "観光"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\nルームシェアでは、台所やふろを【共同】で使う。",
+      "options": [
+        "こうどう",
+        "きょうとう",
+        "きょどう",
+        "きょうどう"
+      ],
+      "answer": 3,
+      "rationale": "共同は「きょうどう」と読む。二人以上で一緒に使ったりすることだ。\nThe word 共同 (shared, joint) is read kyōdō.",
+      "target": "共同"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方として最もよいものを、１・２・３・４から一つ選んでください。\n正月には、【親戚】が祖父の家に集まる。",
+      "options": [
+        "おやせき",
+        "しんぜき",
+        "しんせき",
+        "しんせい"
+      ],
+      "answer": 2,
+      "rationale": "親戚は「しんせき」と読む。おじやおば、いとこなどの家族のつながりがある人のことだ。\nThe word 親戚 (relatives) is read shinseki.",
+      "target": "親戚"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n旅館の夕食で、飲み物を【ちゅうもん】した。",
+      "options": [
+        "柱文",
+        "注問",
+        "注紋",
+        "注文"
+      ],
+      "answer": 3,
+      "rationale": "店などで品物や料理を頼むことは「注文」と書く。\nOrdering food or goods is written 注文.",
+      "target": "注文"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n部屋のエアコンがこわれたので、【しゅうり】をたのんだ。",
+      "options": [
+        "収理",
+        "終理",
+        "修里",
+        "修理"
+      ],
+      "answer": 3,
+      "rationale": "こわれた物を直すことは「修理」と書く。\nRepairing something broken is written 修理.",
+      "target": "修理"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の言葉を漢字で書くとき、最もよいものを選んでください。\n今年の【もくひょう】は、毎日三十分英語を勉強することだ。",
+      "options": [
+        "木標",
+        "目漂",
+        "目標",
+        "目票"
+      ],
+      "answer": 2,
+      "rationale": "「もくひょう」は「目標」と書く。\nMokuhyō (goal, target) is written 目標.",
+      "target": "目標"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n夏休みの市民プールはとても（　）していて、ゆっくり泳げなかった。",
+      "options": [
+        "混乱",
+        "集中",
+        "混雑",
+        "渋滞"
+      ],
+      "answer": 2,
+      "rationale": "人がたくさんいて込んでいる様子は「混雑」で表す。「渋滞」は道路の車に使う。\nA place crowded with people is 混雑; 渋滞 is used for traffic jams.",
+      "target": "混雑"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n兄は（　）が苦手で、料理もそうじもほとんどしない。",
+      "options": [
+        "家事",
+        "行事",
+        "返事",
+        "用事"
+      ],
+      "answer": 0,
+      "rationale": "料理やそうじなど、家の仕事のことを「家事」という。\nHousework such as cooking and cleaning is called 家事.",
+      "target": "家事"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入れるのに最もよいものを選んでください。\n両親の結婚三十年の（　）に、家族で旅行に行った。",
+      "options": [
+        "記憶",
+        "記録",
+        "記念",
+        "記入"
+      ],
+      "answer": 2,
+      "rationale": "特別な日を忘れないように何かをすることを「記念」という。\nDoing something to mark a special occasion is 記念 (commemoration).",
+      "target": "記念"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n旅館で、【偶然】高校のときの先生に会った。",
+      "options": [
+        "久しぶりに",
+        "約束して",
+        "わざわざ",
+        "たまたま"
+      ],
+      "answer": 3,
+      "rationale": "「偶然」は、思いがけずそうなったという意味で、「たまたま」と同じだ。\nThe word 偶然 means by chance, the same as たまたま.",
+      "target": "偶然"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】に意味が最も近いものを選んでください。\n雨が強くなってきたので、プールで泳ぐのを【諦める】ことにした。",
+      "options": [
+        "急ぐ",
+        "やめる",
+        "待つ",
+        "続ける"
+      ],
+      "answer": 1,
+      "rationale": "「諦める」は、したかったことをしないと決めることで、ここでは「やめる」に近い。\nThe verb 諦める means to give up, close to やめる here.",
+      "target": "諦める"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【預ける】",
+      "options": [
+        "駅で道が分からなかったので、交番で道を預けた。",
+        "友だちに借りていた本を、きのう預けた。",
+        "雨が降りそうだったので、傘を預けて家を出た。",
+        "旅館に着いてすぐ、大きな荷物をフロントに預けた。"
+      ],
+      "answer": 3,
+      "rationale": "「預ける」は、自分の物をしばらく人や場所に保管してもらうことに使う。\nThe verb 預ける means to leave something in someone's care, like luggage at a front desk.",
+      "target": "預ける"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "次の言葉の使い方として最もよいものを選んでください。\n【譲る】",
+      "options": [
+        "電車の中で、お年寄りに席を譲った。",
+        "母の誕生日に、きれいな花を譲った。",
+        "毎月、給料の一部を銀行に譲っている。",
+        "友だちに、旅行の写真をメールで譲った。"
+      ],
+      "answer": 0,
+      "rationale": "「譲る」は、自分が使える物や場所を人に渡すことで、「席を譲る」はよく使う言い方だ。\nThe verb 譲る means to give up something for another person, as in giving up one's seat.",
+      "target": "譲る"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n料理が温かい（　）、どうぞ召し上がってください。",
+      "options": [
+        "ところに",
+        "うちに",
+        "までに",
+        "ために"
+      ],
+      "answer": 1,
+      "rationale": "「〜うちに」は、その状態が変わる前に何かをすることを表す。冷める前に食べてほしいという意味だ。\nThe pattern うちに means while a state lasts: eat it before it gets cold.",
+      "subject": "grammar:uchini"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nこの旅館に来る（　）、同じ部屋に泊まっている。",
+      "options": [
+        "たびに",
+        "うちに",
+        "ばかりに",
+        "とおりに"
+      ],
+      "answer": 0,
+      "rationale": "「〜たびに」は、そうするときはいつも、という意味を表す。\nThe pattern たびに means every time: whenever I come, I stay in the same room.",
+      "subject": "grammar:tabini"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n祖父（　）、孫たちと過ごす正月は一年でいちばん楽しい時間だ。",
+      "options": [
+        "について",
+        "によって",
+        "に対して",
+        "にとって"
+      ],
+      "answer": 3,
+      "rationale": "「〜にとって」は、だれの立場から見た評価かを表す。\nThe pattern にとって marks whose point of view an evaluation comes from.",
+      "subject": "grammar:nitotte"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\nプールから出たあと、ぬれた（　）の髪で外に出ると、かぜをひくよ。",
+      "options": [
+        "ほど",
+        "きり",
+        "ながら",
+        "まま"
+      ],
+      "answer": 3,
+      "rationale": "「〜たまま」は、その状態が変わらずに続いていることを表す。髪がぬれた状態で、という意味だ。\nThe pattern たまま means the state stays unchanged: with your hair still wet.",
+      "subject": "grammar:mama"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n旅行中に道に迷わない（　）、スマホに地図を入れておいた。",
+      "options": [
+        "ように",
+        "らしく",
+        "ことに",
+        "そうに"
+      ],
+      "answer": 0,
+      "rationale": "「〜ないように」は、そうならないための目的を表す。\nThe pattern ないように expresses a purpose: so as not to get lost.",
+      "subject": "grammar:n3-you-ni"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "次の文の（　）に入れるのに最もよいものを選んでください。\n今、旅館に着いた（　）なので、あとでこちらから電話します。",
+      "options": [
+        "ところ",
+        "まま",
+        "あいだ",
+        "うち"
+      ],
+      "answer": 0,
+      "rationale": "「〜たところだ」は、ある動作が終わった直後であることを表す。\nThe pattern たところだ means one has just finished doing something.",
+      "subject": "grammar:tokoroda"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nこのプールは、＿＿＿　＿★＿　＿＿＿　＿＿＿　人でも、気軽に利用できる。",
+      "options": [
+        "ない",
+        "では",
+        "泳ぎが",
+        "得意"
+      ],
+      "answer": 3,
+      "rationale": "正しい順番は「泳ぎが　得意　では　ない」で、★には「得意」が入る。\nThe order is 泳ぎが 得意 では ない (even people who are not good swimmers), so 得意 fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "次の文の＿★＿に入る最もよいものを選んでください。\nルームシェアを始める前に、＿＿＿　＿＿＿　＿★＿　＿＿＿　について話し合った。",
+      "options": [
+        "などの",
+        "当番",
+        "ごみ出し",
+        "そうじや"
+      ],
+      "answer": 0,
+      "rationale": "正しい順番は「そうじや　ごみ出し　などの　当番」で、★には「などの」が入る。\nThe order is そうじや ごみ出し などの 当番 (duties such as cleaning and taking out trash), so などの fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（１）に入る最もよいものを選んでください。",
+      "options": [
+        "それで",
+        "つまり",
+        "中でも",
+        "それとも"
+      ],
+      "answer": 2,
+      "rationale": "祖母が喜んだことの中から、特に一つを取り上げているので「中でも」が合う。\nThe writer singles out one thing among what pleased the grandmother, so 中でも (above all) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（２）に入る最もよいものを選んでください。",
+      "options": [
+        "めくったまま",
+        "めくりながら",
+        "めくるために",
+        "めくるより"
+      ],
+      "answer": 1,
+      "rationale": "ページをめくる動作と話す動作を同時にしているので「めくりながら」が合う。\nShe turned the pages and talked at the same time, so めくりながら (while turning) fits."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "passage": "tg",
+      "prompt": "文章の（３）に入る最もよいものを選んでください。",
+      "options": [
+        "思っていません",
+        "思いました",
+        "思わせました",
+        "思われました"
+      ],
+      "answer": 1,
+      "rationale": "「わたし」が自分の気持ちを述べているので「知りたいと思いました」が自然だ。\nThe writer states her own feeling, so 知りたいと思いました (I wanted to know) is natural."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s1",
+      "prompt": "山本さんが送迎バスを利用したい場合、どうしなければならないか。",
+      "options": [
+        "十月十二日に、駅から旅館に電話する。",
+        "十月十一日までに、旅館に電話する。",
+        "チェックインのときに、フロントで申し込む。",
+        "十月十二日までに、メールで旅館に知らせる。"
+      ],
+      "answer": 1,
+      "rationale": "送迎バスを使う場合は、前日（十月十一日）までに電話で知らせるように書いてある。\nThe shuttle must be requested by phone by the day before arrival, October 11."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s2",
+      "prompt": "二人が生活のルールを決めたのは、なぜか。",
+      "options": [
+        "台所がせまかったから",
+        "友人が朝早く起きるから",
+        "二人の生活の時間が違ったから",
+        "家賃を半分にしたかったから"
+      ],
+      "answer": 2,
+      "rationale": "生活の時間が違うことにとまどったので、ルールを決めたと書いてある。\nThey made rules because their daily schedules were different."
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "passage": "s3",
+      "prompt": "このお知らせの内容と合っているものはどれか。",
+      "options": [
+        "夏休みの間は、小学生だけでもプールに入れる。",
+        "夏休みの間は、朝十時からプールが開く。",
+        "夏休みの間は、ふだんより長い時間プールが開いている。",
+        "プールの中で、飲み物を飲んでもいい。"
+      ],
+      "answer": 2,
+      "rationale": "特別営業は朝九時から夜八時までで、ふだんの十時から六時より長い。\nDuring the special season it opens 9 a.m. to 8 p.m., longer than the usual 10 to 6."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "旅行の前、「わたし」はどんな気持ちだったか。",
+      "options": [
+        "温泉が好きではないので、行きたくなかった。",
+        "前にも行ったことがある町なので、楽しみだった。",
+        "一人で旅行するのは初めてなので、少し不安だった。",
+        "家族と一緒に行けなくて、さびしかった。"
+      ],
+      "answer": 2,
+      "rationale": "初めての一人旅で「一人で大丈夫だろうかと少し不安だった」とある。\nIt was the writer's first solo trip, and they felt a little uneasy."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "夕食のとき、「わたし」はどんなことをしたか。",
+      "options": [
+        "家族に電話をして、旅館の話をした。",
+        "一人で来ていた女性と話して、おすすめの店や散歩道を教えてもらった。",
+        "同じ年の女性と、一緒に散歩をした。",
+        "おかみさんに、散歩道を教えてもらった。"
+      ],
+      "answer": 1,
+      "rationale": "夕食のとき、一人で来ていた年上の女性と話し、店や散歩道を教えてもらった。\nAt dinner the writer talked with an older woman traveling alone, who recommended shops and walks."
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "passage": "m1",
+      "prompt": "「わたし」が、一人旅でよかったと思っていることは何か。",
+      "options": [
+        "だれかと話に夢中になれること",
+        "周りの景色や音にゆっくり気づけること",
+        "行きたい店にすぐに行けること",
+        "旅館の人と仲良くなれること"
+      ],
+      "answer": 1,
+      "rationale": "一人だと周りの景色や音にゆっくり気づくことができる、と書いてある。\nAlone, the writer could slowly notice the scenery and sounds around them."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "大学に入ってから、「わたし」が正月に集まるのを面倒に感じたのは、なぜか。",
+      "options": [
+        "いとこたちと遊ぶのがつまらなくなったから",
+        "祖母の料理が好きではなくなったから",
+        "親戚に、学校や将来のことを何度も聞かれるのが嫌だったから",
+        "大学の勉強が忙しくて、時間がなかったから"
+      ],
+      "answer": 2,
+      "rationale": "親戚に学校のことや将来のことを何度も聞かれるのが嫌だった、と書いてある。\nThe writer disliked being asked again and again about school and the future."
+    },
+    {
+      "skill": "reading",
+      "task": "long-reading",
+      "passage": "l1",
+      "prompt": "この文章で「わたし」がいちばん言いたいことは何か。",
+      "options": [
+        "家族が集まる時間はいつまでも続くわけではないので、大切にしたい。",
+        "祖父の病気がすぐに治って、本当によかった。",
+        "正月は、家族より友だちと過ごしたほうが楽しい。",
+        "親戚に将来のことを聞くのは、やめたほうがいい。"
+      ],
+      "answer": 0,
+      "rationale": "最後に、家族が集まる時間はいつまでも続かないので大切にしたいと述べている。\nThe writer concludes that family gatherings will not last forever, so they want to treasure them."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "大人二人と小学生一人が、平日にＡプランで一泊する。料金は全部でいくらか。",
+      "options": [
+        "24,000円",
+        "30,000円",
+        "36,000円",
+        "42,000円"
+      ],
+      "answer": 1,
+      "rationale": "平日のＡプランは大人12,000円で、小学生は半額の6,000円。12,000×2＋6,000で30,000円になる。\nTwo adults at 12,000 yen plus a child at half price, 6,000 yen, makes 30,000 yen."
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "passage": "i1",
+      "prompt": "大学生の森さんは、一人で旅行する。夕食がついていて、できるだけ安いプランに、土曜日に一泊したい。森さんが選ぶプランと料金はどれか。",
+      "options": [
+        "Ａプランで12,000円",
+        "Ａプランで14,000円",
+        "Ｂプランで9,500円",
+        "Ｃプランで21,000円"
+      ],
+      "answer": 1,
+      "rationale": "Ｂプランは夕食がなく、Ｃプランは二名からなので、Ａプランになる。土曜日なので14,000円だ。\nPlan B has no dinner and Plan C needs two people, so Mori takes Plan A at the Saturday rate, 14,000 yen."
+    }
+  ]
+}

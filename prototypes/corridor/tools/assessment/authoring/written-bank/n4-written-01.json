@@ -1,0 +1,409 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N4",
+  "number": 1,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "わたしの　週末\n　わたしは　毎週　土曜日に　図書館へ　行きます。図書館は　しずかなので、勉強が　よく　できます。（１）、先週の　土曜日は　図書館が　休みでした。それで、近くの　きっさてんで　勉強する　ことに　しました。きっさてんは　少し　うるさかったですが、コーヒーが　とても　おいしかったです。来週は　友だちも　（２）　つもりです。",
+    "s1": "山田さん\n　山田さんが　かりて　いる　本を　かえす　日は、今週の　金曜日です。まだ　読みおわって　いない　ときは、図書館の　ホームページで　もう　一週間　かりる　ことが　できます。でも、ほかの　人が　よやくして　いる　本は、かりる　日を　のばす　ことが　できません。\nみどり図書館",
+    "s2": "学生の　みなさんへ\n　来週の　月曜日から　水曜日まで、三階の　教室の　エアコンを　とりかえます。この　三日間は　三階の　教室が　使えませんので、じゅぎょうは　一階の　大きい　教室で　します。木曜日からは、いつもの　教室に　もどります。\n事務所",
+    "s3": "　きのう、デパートへ　くつを　買いに　行きました。茶色の　くつが　ほしかったのですが、わたしの　足に　合う　大きさの　ものは　黒い　くつしか　ありませんでした。店の　人が「来週、茶色の　くつが　入ります」と　言ったので、きのうは　何も　買わないで　帰りました。",
+    "m1": "日曜日の　市場\n　わたしの　家の　近くに、日曜日だけ　開く　市場が　あります。朝　七時から　十一時まで、近くの　村の　人たちが　やさいや　くだものを　売りに　来ます。\n　市場の　やさいは　スーパーより　少し　高いです。でも、その　日の　朝　とった　ものなので、とても　おいしいです。それに、店の　人と　話すのも　楽しいです。どう　料理すると　おいしいか、教えて　くれる　人も　います。\n　先週、はじめて　見る　やさいが　ありました。店の　おばあさんが「スープに　入れると　おいしいですよ」と　教えて　くれたので、一つ　買って　みました。家で　スープを　作ると、少し　にがかったですが、母は　よろこんで　全部　食べました。\n　市場は　十一時まで　開いて　いますが、人気の　ある　店の　やさいは　九時ごろには　ほとんど　なくなって　しまいます。それで、わたしは　いつも　八時ごろまでに　行くように　して　います。",
+    "info": "さくら図書館　夏休みの　イベント\n①　えいがの　日\n　日：８月３日（土）　時間：午後２時～４時\n　ところ：２階　ホール\n　お金：いりません\n②　子どもの　本を　読む　会\n　日：８月１０日（土）　時間：午前１０時～１１時\n　ところ：１階　子どもの　へや\n　お金：いりません\n　※小学生までの　子どもと　その　家族が　さんかできます。\n③　本の　カバーを　作ろう\n　日：８月１７日（土）　時間：午後１時～３時\n　ところ：３階　会議室\n　お金：３００円\n　※２０人まで。８月１０日までに　電話で　よやくして　ください。\n④　古い　本の　市\n　日：８月２４日（土）　時間：午前１０時～午後３時\n　ところ：図書館の　前の　広場\n　※雨が　ふったら、ありません。\nさくら図書館　電話：０３－１２３４－５６７８"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　【品物】は　となりの　店で　買いました。",
+      "options": [
+        "ひんぶつ",
+        "しなぶつ",
+        "ひんもの",
+        "しなもの"
+      ],
+      "answer": 3,
+      "rationale": "「品物」は「しなもの」と読む。「品」も「物」も訓読みで読む。\nThe word 品物 is read shinamono and means goods.",
+      "target": "品物"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n学校の　【規則】は　かならず　まもって　ください。",
+      "options": [
+        "きそく",
+        "きぞく",
+        "きそっく",
+        "ぎそく"
+      ],
+      "answer": 0,
+      "rationale": "「規則」は「きそく」と読む。学校などで守るきまりのことだ。\nThe word 規則 is read kisoku and means rules.",
+      "target": "規則"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　くつは　【値段】が　少し　高いです。",
+      "options": [
+        "ねたん",
+        "ちだん",
+        "ねだん",
+        "ねいだん"
+      ],
+      "answer": 2,
+      "rationale": "「値段」は「ねだん」と読む。物を買うときに払うお金のことだ。\nThe word 値段 is read nedan and means price.",
+      "target": "値段"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nわからない　ことばは　じしょで　【しらべる】　ように　して　います。",
+      "options": [
+        "課べる",
+        "周べる",
+        "謂べる",
+        "調べる"
+      ],
+      "answer": 3,
+      "rationale": "「しらべる」は「調べる」と書く。ほかは正しくない漢字だ。\nThe verb shiraberu (to look up) is written 調べる.",
+      "target": "調べる"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n買い物の　【れしーと】は　さいふに　入れて　おきました。",
+      "options": [
+        "レシーテ",
+        "ルシート",
+        "レシード",
+        "レシート"
+      ],
+      "answer": 3,
+      "rationale": "「れしーと」はカタカナで「レシート」と書く。\nThe word reshiito (receipt) is written レシート in katakana.",
+      "target": "レシート"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nスーパーの　やさい（　）は　入り口の　近くに　あります。",
+      "options": [
+        "会場",
+        "受付",
+        "事務所",
+        "売り場"
+      ],
+      "answer": 3,
+      "rationale": "「やさい売り場」は、スーパーでやさいを売っているところだ。\nAn uriba is the part of a store where goods are sold.",
+      "target": "売り場"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nあした　テストが　あるので、今晩は　ならった　ところの　（　）を　します。",
+      "options": [
+        "予約",
+        "復習",
+        "返事",
+        "相談"
+      ],
+      "answer": 1,
+      "rationale": "テストの前に、ならったことをもう一度勉強するのは「復習」だ。\nFukushuu means reviewing what you have already learned.",
+      "target": "復習"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n図書館の　本は　二週間　（　）に　かえして　ください。",
+      "options": [
+        "以下",
+        "以内",
+        "以上",
+        "以外"
+      ],
+      "answer": 1,
+      "rationale": "「二週間以内に」は「二週間が終わるまでに」という意味だ。\nInai means within, so the book must be returned within two weeks.",
+      "target": "以内"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nこの　しゅくだいは　【簡単】でした。",
+      "options": [
+        "この　しゅくだいは　ながかったです。",
+        "この　しゅくだいは　やさしかったです。",
+        "この　しゅくだいは　おもしろかったです。",
+        "この　しゅくだいは　むずかしかったです。"
+      ],
+      "answer": 1,
+      "rationale": "「簡単」は「やさしい」「むずかしくない」と同じ意味だ。\nKantan means easy, the same as yasashii here.",
+      "target": "簡単"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n土曜日は　【用事】が　あって、図書館に　行けませんでした。",
+      "options": [
+        "土曜日は　雨が　ふって、図書館に　行けませんでした。",
+        "土曜日は　お金が　なくて、図書館に　行けませんでした。",
+        "土曜日は　しなければ　ならない　ことが　あって、図書館に　行けませんでした。",
+        "土曜日は　かぜを　ひいて、図書館に　行けませんでした。"
+      ],
+      "answer": 2,
+      "rationale": "「用事」は、しなければならないことだ。\nYouji means an errand, something you have to do.",
+      "target": "用事"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "つぎの　ことばの　つかいかたで　いちばん　いい　ものを　えらんで　ください。\n【返事】",
+      "options": [
+        "図書館に　本を　返事しに　行きます。",
+        "母は　毎朝　にわの　花に　水を　返事します。",
+        "まちがえた　ところを　赤い　ペンで　返事しました。",
+        "友だちに　メールを　送ったのに、まだ　返事が　来ません。"
+      ],
+      "answer": 3,
+      "rationale": "「返事」は、手紙やメール、呼びかけなどにこたえることだ。1は「返し」、3は「直し」が正しい。\nHenji means a reply, for example to a letter or an email.",
+      "target": "返事"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nケーキを　食べ（　）、おなかが　いたく　なりました。",
+      "options": [
+        "たくて",
+        "にくくて",
+        "やすくて",
+        "すぎて"
+      ],
+      "answer": 3,
+      "rationale": "「食べすぎる」は多く食べることで、おなかがいたくなった理由になる。\nTabesugiru means eating too much, which explains the stomachache.",
+      "subject": "grammar:sugiru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nあしたの　パーティーに　行ける（　）、まだ　わかりません。",
+      "options": [
+        "ことが",
+        "かどうか",
+        "ために",
+        "ように"
+      ],
+      "answer": 1,
+      "rationale": "「〜かどうかわからない」で、まだはっきりしないことを言う。\nKa dou ka means whether or not, so I do not know whether I can go.",
+      "subject": "grammar:kadouka"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nじしょを　わすれたので、友だちに　かして（　）。",
+      "options": [
+        "くれました",
+        "やりました",
+        "もらいました",
+        "あげました"
+      ],
+      "answer": 2,
+      "rationale": "自分がじしょをわすれたので、友だちにかしてもらったと言う。\nMorau shows that I received the favor of a friend lending me a dictionary.",
+      "subject": "grammar:age-kure-morau"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n毎日　れんしゅうしたので、ピアノが　ひける（　）。",
+      "options": [
+        "ように　しました",
+        "ことに　しました",
+        "ように　なりました",
+        "ことに　なりました"
+      ],
+      "answer": 2,
+      "rationale": "「〜ようになる」は、できなかったことができるようにかわることを表す。\nYou ni naru shows a change: I became able to play the piano.",
+      "subject": "grammar:n4-you-ni-naru"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nあしたは　しけんが　あるので、朝　六時に　起き（　）。",
+      "options": [
+        "なければ　なりません",
+        "ないで　ください",
+        "なくても　いいです",
+        "たがります"
+      ],
+      "answer": 0,
+      "rationale": "しけんがあるので、早く起きる必要がある。「〜なければならない」を使う。\nNakereba naranai means must, so I have to get up at six.",
+      "subject": "grammar:nakerebanaranai"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nなつやすみは　国へ　帰る（　）です。",
+      "options": [
+        "ために",
+        "ように",
+        "つもり",
+        "ことが"
+      ],
+      "answer": 2,
+      "rationale": "「〜つもりです」は、自分がする予定や考えを言う。\nTsumori expresses a plan or intention: I intend to go home.",
+      "subject": "grammar:tsumori"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nテストの　前に　＿＿＿　＿＿＿　＿★＿　＿＿＿　います。",
+      "options": [
+        "ノートを",
+        "して",
+        "ように",
+        "見なおす"
+      ],
+      "answer": 2,
+      "rationale": "正しいじゅんばんは「ノートを　見なおす　ように　して　います」で、★には「ように」が入る。\nThe order is ノートを 見なおす ように して います, so ように fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nきのう　＿＿＿　＿★＿　＿＿＿　＿＿＿　しまいました。",
+      "options": [
+        "かりた",
+        "友だちに",
+        "なくして",
+        "本を"
+      ],
+      "answer": 0,
+      "rationale": "正しいじゅんばんは「友だちに　かりた　本を　なくして　しまいました」で、★には「かりた」が入る。\nThe order is 友だちに かりた 本を なくして しまいました, so かりた fills the star.",
+      "subject": "grammar:teshimau"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "それから",
+        "だから",
+        "でも",
+        "たとえば"
+      ],
+      "answer": 2,
+      "rationale": "いつもは図書館へ行くが、先週は休みだった。反対のことをつなぐ「でも」が入る。\nDemo (but) links the usual habit with the fact that the library was closed.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "さそって　いる",
+        "さそわれる",
+        "さそって　しまう",
+        "さそって　みる"
+      ],
+      "answer": 3,
+      "rationale": "これからためしにすることなので「さそってみるつもり」がいい。\nSasotte miru means to try inviting, which fits a plan for next week.",
+      "passage": "tg",
+      "subject": "grammar:temiru"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "山田さんは　本を　もう　一週間　かりたいです。どう　しますか。",
+      "options": [
+        "図書館の　ホームページで　かりる　日を　のばす",
+        "金曜日までに　図書館へ　本を　かえしに　行く",
+        "金曜日に　図書館へ　電話を　かける",
+        "ほかの　人に　本を　よやくして　もらう"
+      ],
+      "answer": 0,
+      "rationale": "本文に「ホームページで　もう　一週間　かりる　ことが　できます」とある。\nThe email says the loan can be extended for one more week on the library website.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "来週の　火曜日、じゅぎょうは　どこで　ありますか。",
+      "options": [
+        "二階の　教室",
+        "一階の　大きい　教室",
+        "事務所の　となりの　教室",
+        "三階の　いつもの　教室"
+      ],
+      "answer": 1,
+      "rationale": "月曜日から水曜日までは、一階の大きい教室でじゅぎょうがある。火曜日はその間だ。\nFrom Monday to Wednesday, classes are held in the large classroom on the first floor.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人は　きのう　どう　しましたか。",
+      "options": [
+        "くつを　買わないで　帰った",
+        "来週の　くつを　よやくした",
+        "茶色の　くつを　買った",
+        "黒い　くつを　買った"
+      ],
+      "answer": 0,
+      "rationale": "本文の最後に「何も　買わないで　帰りました」とある。\nThe last sentence says the writer went home without buying anything.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は、市場の　やさいに　ついて　どう　言って　いますか。",
+      "options": [
+        "スーパーより　少し　高いが、おいしい",
+        "スーパーより　少し　安いが、おいしくない",
+        "スーパーより　安くて、おいしい",
+        "スーパーより　高くて、おいしくない"
+      ],
+      "answer": 0,
+      "rationale": "「スーパーより　少し　高いです。でも、…とても　おいしいです」とある。\nThe writer says the vegetables cost a little more than at the supermarket but taste very good.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人が　いつも　八時ごろまでに　市場へ　行くのは　どうしてですか。",
+      "options": [
+        "人気の　ある　店の　やさいが　早く　なくなるから",
+        "市場が　十一時に　しまるから",
+        "朝ごはんの　前に　買い物を　したいから",
+        "おばあさんと　話す　時間が　ほしいから"
+      ],
+      "answer": 0,
+      "rationale": "「人気のある店のやさいは九時ごろにはほとんどなくなってしまいます。それで」とある。\nThe writer goes early because vegetables at popular stalls are almost gone by about nine.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "リンさんは　大学生で、子どもは　いません。土曜日の　午前中に　イベントに　行きたいです。リンさんが　行ける　イベントは　どれですか。",
+      "options": [
+        "本の　カバーを　作ろう",
+        "古い　本の　市",
+        "えいがの　日",
+        "子どもの　本を　読む　会"
+      ],
+      "answer": 1,
+      "rationale": "午前中のイベントは②と④だが、②は小学生までの子どもとその家族のためのものだ。\nOnly the old book market is in the morning and open to an adult without children.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "本の　カバーを　作る　イベントに　出たい　人は、どう　しなければ　なりませんか。",
+      "options": [
+        "８月１０日までに　図書館へ　行って　よやくする",
+        "８月１０日までに　電話で　よやくする",
+        "よやくしないで、当日　図書館へ　行く",
+        "当日、３階の　会議室で　よやくする"
+      ],
+      "answer": 1,
+      "rationale": "③に「８月１０日までに　電話で　よやくして　ください」とある。\nThe notice says to book by phone by August 10 for the book cover event.",
+      "passage": "info"
+    }
+  ]
+}

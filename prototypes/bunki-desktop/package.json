@@ -5,26 +5,30 @@
   "description": "Bunki (分岐) — Mac desktop shell around the Corridor (掌 TENOHIRA line) PWA.",
   "main": "main.cjs",
   "scripts": {
-    "start": "env -u ELECTRON_RUN_AS_NODE electron .",
-    "dist": "electron-builder --mac --dir && node tools/add-launch-shim.cjs release/mac-arm64/Bunki.app && codesign --force --deep --sign - release/mac-arm64/Bunki.app"
+    "start": "node ../../scripts/start-corridor-desktop.mjs",
+    "test": "node --test test/*.test.cjs",
+    "dist": "node tools/build.cjs",
+    "verify": "node tools/verify-desktop.cjs"
   },
   "build": {
     "appId": "app.bunki.desktop",
     "productName": "Bunki",
-    "directories": {
-      "output": "release"
-    },
     "files": [
-      "main.cjs"
+      "main.cjs",
+      "preload.cjs",
+      "lib/**/*.cjs"
     ],
     "mac": {
       "target": "dir",
       "identity": null,
-      "category": "public.app-category.education"
+      "category": "public.app-category.education",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Bunki uses the microphone only when you choose to record Japanese practice."
+      }
     }
   },
   "devDependencies": {
-    "electron": "^44.0.0",
-    "electron-builder": "^26.15.3"
+    "electron": "44.0.0",
+    "electron-builder": "26.15.3"
   }
 }

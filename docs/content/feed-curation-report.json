@@ -1,6 +1,6 @@
 {
   "kind": "feed-curation-report",
-  "asOf": "2026-08-19",
+  "asOf": "2026-09-28",
   "law": "signals are ranked by the named criteria below, never composited (#42); culling is PROPOSED here and decided only by the operator in docs/content/feed-review-queue.json — never automatic",
   "criteria": {
     "droppedText": "LINK-SAFE patterns (the wikinews-1483/1403 lesson): dangling particle after 知られる — a linked name was dropped in extraction / empty quote/paren pair — bracketed content was dropped in extraction",
@@ -11,7 +11,7 @@
     "ranking": "most flags first, then fewest chars, then id — no composite score"
   },
   "counts": {
-    "shelf": 77,
+    "shelf": 126,
     "archive": 686,
     "flagged": 8,
     "cullProposals": 1

@@ -12,14 +12,14 @@
 
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { extname, resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { restoreAppFixture } from './record-fixture-support.mjs';
+import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
-const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+const CORRIDOR_DIR = resolveCorridorSite();
 const PHONE = { width: 390, height: 844 };
 const PUBLIC_WORLDS = [
   ['sumi', '墨'],
@@ -84,9 +84,8 @@ async function bootShelf(page, base, { clear = false } = {}) {
   await page.goto(`${base}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
   if (clear) {
-    await page.evaluate(() => localStorage.clear());
-    await page.reload({ waitUntil: 'load' });
-    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
+    await page.evaluate(() => localStorage.removeItem('kairo-theme'));
+    await restoreAppFixture(page, { v: 1, taken: [] }, { archive: [] });
   }
 }
 
@@ -303,10 +302,10 @@ async function main() {
       JSON.stringify({ minimal: asleep?.minimal, chrome: asleep?.chrome }),
     );
     check(
-      'sleeping controls are the four corners and the ensō mark, nothing else',
-      asleep?.interactive.length === 5 &&
+      'sleeping controls are the four corners, ensō mark and permanent bug entry',
+      asleep?.interactive.length === 6 &&
         asleep.interactive.some((node) => node.isTrigger) &&
-        ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].every((id) =>
+        ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed-range', 'bunki-report-bug'].every((id) =>
           asleep.interactive.some((node) => node.id === id),
         ),
       JSON.stringify(asleep?.interactive),
@@ -379,7 +378,7 @@ async function main() {
           (node) =>
             node.inField ||
             node.isTrigger ||
-            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].includes(node.id),
+            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed-range', 'bunki-report-bug'].includes(node.id),
         ),
       JSON.stringify(awake?.interactive),
     );
@@ -436,14 +435,13 @@ async function main() {
         { timeout: 15_000 },
       );
       const state = await page.evaluate(
-        (world) => ({
+        () => ({
           stored: localStorage.getItem('kairo-theme'),
           chrome: document.querySelector('#stroke-page')?.dataset.chrome,
           pressed: 1, // the stones close on choice; the stored world is the proof
 
           canvases: document.querySelectorAll('#stroke-page .ink-sheet').length,
         }),
-        id,
       );
       check(
         `${id} palette applies, persists, and keeps one live sheet`,
@@ -830,7 +828,7 @@ async function main() {
         slept.interactive.every(
           (node) =>
             node.isTrigger ||
-            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].includes(node.id),
+            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed-range', 'bunki-report-bug'].includes(node.id),
         ),
       JSON.stringify(slept),
     );
@@ -887,10 +885,11 @@ async function main() {
       'a no-stroke kanji keeps the same valid dormant trigger contract',
       noData?.minimal === 'on' &&
         noData.chrome === 'sleeping' &&
-        noData.interactive.length === 3 &&
+        noData.interactive.length === 4 &&
         noData.interactive.some((node) => node.isTrigger) &&
         noData.interactive.some((node) => node.id === 'strokes-back') &&
         noData.interactive.some((node) => node.id === 'stroke-world-seal') &&
+        noData.interactive.some((node) => node.id === 'bunki-report-bug') &&
         noData.trigger?.controls === 'stroke-awake-field' &&
         noDataProse.target,
       JSON.stringify({ room: noData, noDataProse }),

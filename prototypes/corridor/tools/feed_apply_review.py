@@ -25,6 +25,11 @@ and this command applies exactly what was decided, nothing more:
   legacy + rejected the original leaves the shelf (index row + body file);
                     its provenance source in docs/content/ stays untouched
                     and the queue row remains as the tombstone.
+  fresh + approved  a feed_fresh.py reading is accepted: review flips to
+                    approved and 検収前 leaves its sourceLabel (index + body).
+  fresh + rejected  the reading leaves the shelf (index row + body file); its
+                    fetched source text in corpus/datasets/fresh/ stays, and
+                    the queue row is the tombstone feed_fresh.py honours.
   anything pending  untouched. This command NEVER decides — deciding is the
                     operator's; unknown kinds or decisions fail the whole run.
 
@@ -58,7 +63,7 @@ from feed_ingest import (  # noqa: E402
     page_number,
 )
 
-KINDS = {"mint", "cull", "legacy", "rights"}
+KINDS = {"mint", "cull", "legacy", "rights", "fresh"}
 DECISIONS = {"pending", "approved", "rejected"}
 
 
@@ -204,7 +209,7 @@ def main() -> int:
                 (ARTICLES / target["file"]).unlink(missing_ok=True)
             applied.append(f"rights-rejected {rid} — off the shelf")
             changed = True
-        elif kind in ("mint", "legacy") and decision == "approved":
+        elif kind in ("mint", "legacy", "fresh") and decision == "approved":
             target = by_id.get(rid)
             if target is None:
                 raise SystemExit(f"{rid}: approved in the queue but not on the shelf")
@@ -238,14 +243,15 @@ def main() -> int:
                 restore_to_archive(rid, archive_index, tagger, jlpt_maps)
             applied.append(f"rejected mint {rid} — off the shelf, restored to the archive")
             changed = True
-        elif kind == "legacy" and decision == "rejected":
+        elif kind in ("legacy", "fresh") and decision == "rejected":
             target = by_id.get(rid)
             if target is None:
                 continue  # already applied
             index["articles"] = [r for r in index["articles"] if r["id"] != rid]
             if not args.dry_run:
                 (ARTICLES / target["file"]).unlink(missing_ok=True)
-            applied.append(f"rejected legacy {rid} — off the shelf; docs/content source untouched")
+            where = "docs/content source" if kind == "legacy" else "corpus/datasets/fresh source text"
+            applied.append(f"rejected {kind} {rid} — off the shelf; {where} untouched")
             changed = True
         elif kind == "cull" and decision == "approved":
             if rid in archive_ids:

@@ -173,7 +173,7 @@ test('T-11: a capture made while a call hangs is acknowledged and kept', async (
   expect(errors).toEqual([]);
 });
 
-test('T-11: reloading mid-flight loses no capture and writes nothing unlabelled', async ({
+test('T-11: reloading mid-flight preserves captures without attaching the cancelled note', async ({
   page,
   app,
 }) => {
@@ -184,10 +184,11 @@ test('T-11: reloading mid-flight loses no capture and writes nothing unlabelled'
 
   await openApp(page, app.origin);
   await keepWord(page, '分岐');
-  const eventsBefore = await durableEventCount(page);
 
   await v('capture-open-word').click();
   await expect(v('screen-word')).toBeVisible();
+  await expect.poll(async () => durableEventCount(page)).toBe(3);
+  const eventsBefore = await durableEventCount(page);
   await v('candidate-request').click();
   await expect(v('state-loading')).toBeVisible();
 
@@ -197,31 +198,16 @@ test('T-11: reloading mid-flight loses no capture and writes nothing unlabelled'
   await hydrated(page);
   await expect(v('screen-word')).toBeVisible();
 
-  // Nothing was lost. Stated as "never shrank" rather than "is exactly what it
-  // was", because tearing the document down *does* let one more event land —
-  // finding T3-3, asserted precisely in `adv-known-defects.spec.ts`. The
-  // invariant this lane owns is that the loss direction stays empty.
+  // The word lookup is in the baseline. Teardown neither removes that work
+  // nor attaches a candidate from the request that was cancelled (T3-3).
   expect(
     await durableEventCount(page),
-    'the durable log lost events when the document was torn down mid-request',
-  ).toBeGreaterThanOrEqual(eventsBefore);
+    'the durable log changed when the document was torn down mid-request',
+  ).toBe(eventsBefore);
 
-  // Whatever the teardown wrote, it is labelled. This is the safety property
-  // that has to hold whether or not T3-3 is fixed: no unlabelled generated
-  // content may enter the record by any path (REQ-AI-02, T-12).
-  for (const attached of await candidateEvents(page)) {
-    expect(
-      attached.envelope.provider,
-      'a candidate reached the log without the offline-fallback provider label',
-    ).toBe('offline-fallback');
-    expect(
-      attached.status,
-      'a candidate reached the log already accepted, with no user action behind it',
-    ).toBe('generated');
-  }
+  expect(await candidateEvents(page)).toEqual([]);
 
-  // The panel is back at "ask": candidate *text* is deliberately not durable
-  // (`memory-store.ts` rehydrate note), so an empty panel is the honest state.
+  // The cancelled request left no candidate, and the panel can ask again.
   await expect(v('candidate-request')).toBeVisible();
   expect(await page.getByTestId('candidate-card').count()).toBe(0);
 

@@ -1,0 +1,238 @@
+import { z } from 'zod';
+import { immutable, type DeepReadonly } from './common.ts';
+
+export const examSchema = z.discriminatedUnion('family', [
+  z.strictObject({ family: z.literal('jlpt'), track: z.enum(['N5', 'N4', 'N3', 'N2', 'N1']) }),
+  z.strictObject({ family: z.literal('jtest'), track: z.enum(['A-C', 'D-E', 'F-G']) }),
+]);
+export type Exam = DeepReadonly<z.infer<typeof examSchema>>;
+
+export interface BlueprintFacts {
+  readonly id: string;
+  readonly kind: 'official-blueprint-facts';
+  readonly checkedAt: '2026-09-10';
+  readonly exam: Exam;
+  readonly sources: readonly string[];
+  readonly timingBlocks: readonly {
+    readonly id: string;
+    readonly skills: readonly string[];
+    readonly minutes: number;
+    readonly duration: 'fixed' | 'nominal-listening';
+  }[];
+  /** Known requirements, not a claim to be an exhaustive authoring blueprint. */
+  readonly knownRequiredTasks: readonly string[];
+  readonly forbiddenTasks: readonly string[];
+  readonly fixedUniversalItemCount: null;
+  readonly writtenResponseRequired: boolean;
+  readonly areasPerHalf: number | null;
+  readonly officialMaximum: number;
+  readonly scoreMethod: 'scaled-response-pattern' | 'publisher-weighted';
+  readonly breakBetweenHalves: 'not-specified-here' | 'none';
+  readonly coverageCatalog: 'partial-requires-editorial-review';
+}
+
+const jlptSources = [
+  'https://www.jlpt.jp/e/guideline/testsections.html',
+  'https://www.jlpt.jp/e/guideline/pdf/n1_e_revised.pdf',
+  'https://www.jlpt.jp/e/guideline/pdf/n5_e_revised.pdf',
+  'https://jlpt.jp/e/about/pdf/scaledscore_e.pdf',
+];
+
+function jlpt(
+  track: Extract<Exam, { family: 'jlpt' }>['track'],
+  minutes: readonly number[],
+): BlueprintFacts {
+  const combined = minutes.length === 2;
+  const timingBlocks = combined
+    ? [
+        {
+          id: 'language-reading',
+          skills: ['vocabulary', 'grammar', 'reading'],
+          minutes: minutes[0]!,
+          duration: 'fixed' as const,
+        },
+        {
+          id: 'listening',
+          skills: ['listening'],
+          minutes: minutes[1]!,
+          duration: 'nominal-listening' as const,
+        },
+      ]
+    : [
+        {
+          id: 'vocabulary',
+          skills: ['vocabulary'],
+          minutes: minutes[0]!,
+          duration: 'fixed' as const,
+        },
+        {
+          id: 'grammar-reading',
+          skills: ['grammar', 'reading'],
+          minutes: minutes[1]!,
+          duration: 'fixed' as const,
+        },
+        {
+          id: 'listening',
+          skills: ['listening'],
+          minutes: minutes[2]!,
+          duration: 'nominal-listening' as const,
+        },
+      ];
+  return immutable({
+    id: `jlpt-${track.toLowerCase()}-facts-20260910`,
+    kind: 'official-blueprint-facts',
+    checkedAt: '2026-09-10',
+    exam: { family: 'jlpt', track },
+    sources: jlptSources,
+    timingBlocks,
+    knownRequiredTasks: ['sentence-composition', 'text-grammar', 'information-retrieval'],
+    forbiddenTasks: track === 'N1' ? ['orthography'] : [],
+    fixedUniversalItemCount: null,
+    writtenResponseRequired: false,
+    areasPerHalf: null,
+    officialMaximum: 180,
+    scoreMethod: 'scaled-response-pattern',
+    breakBetweenHalves: 'not-specified-here',
+    coverageCatalog: 'partial-requires-editorial-review',
+  });
+}
+
+function jtest(
+  track: Extract<Exam, { family: 'jtest' }>['track'],
+  reading: number,
+  listening: number,
+  maximum: number,
+): BlueprintFacts {
+  return immutable({
+    id: `jtest-${track.toLowerCase()}-facts-20260910`,
+    kind: 'official-blueprint-facts',
+    checkedAt: '2026-09-10',
+    exam: { family: 'jtest', track },
+    sources: [
+      'https://j-test.jp/newjtest',
+      'https://j-test.jp/wp-content/uploads/2025/09/Brochure_20250904.pdf',
+    ],
+    timingBlocks: [
+      {
+        id: 'reading-writing',
+        skills: ['vocabulary', 'grammar', 'reading', 'writing'],
+        minutes: reading,
+        duration: 'fixed',
+      },
+      { id: 'listening', skills: ['listening'], minutes: listening, duration: 'nominal-listening' },
+    ],
+    knownRequiredTasks: [],
+    forbiddenTasks: [],
+    fixedUniversalItemCount: null,
+    writtenResponseRequired: track !== 'F-G',
+    areasPerHalf: 4,
+    officialMaximum: maximum,
+    scoreMethod: 'publisher-weighted',
+    breakBetweenHalves: 'none',
+    coverageCatalog: 'partial-requires-editorial-review',
+  });
+}
+
+/** Facts do not supply questions, licenses, fixed item counts, or human review. */
+export const OFFICIAL_BLUEPRINTS: readonly BlueprintFacts[] = immutable([
+  jlpt('N5', [20, 40, 30]),
+  jlpt('N4', [25, 55, 35]),
+  jlpt('N3', [30, 70, 40]),
+  jlpt('N2', [105, 50]),
+  jlpt('N1', [110, 55]),
+  jtest('A-C', 80, 45, 1000),
+  jtest('D-E', 70, 35, 700),
+  jtest('F-G', 60, 25, 350),
+]);
+
+export function getOfficialBlueprint(id: string): BlueprintFacts | undefined {
+  return OFFICIAL_BLUEPRINTS.find((blueprint) => blueprint.id === id);
+}
+
+/** Official JLPT result facts: 得点区分, ranges, 合格点 and 基準点. Scaled scores come from
+ * item-response-theory equating, so a raw count is never converted into any of them.
+ * Kept apart from OFFICIAL_BLUEPRINTS so reviewed requests that quote those stay unchanged. */
+export interface JlptScoreFacts {
+  readonly track: Extract<Exam, { family: 'jlpt' }>['track'];
+  readonly checkedAt: '2026-09-29';
+  readonly sources: readonly string[];
+  /** [minimum, maximum] */
+  readonly totalRange: readonly number[];
+  readonly passMark: number;
+  readonly sections: readonly {
+    readonly id: string;
+    readonly label: string;
+    readonly skills: readonly ('vocabulary' | 'grammar' | 'reading' | 'listening')[];
+    /** [minimum, maximum] */
+    readonly range: readonly number[];
+    readonly sectionalMinimum: number;
+  }[];
+  /** 試験科目: the papers sat, by the blueprint timing-block id. */
+  readonly papers: Readonly<Record<string, string>>;
+}
+
+const scoreSources = [
+  'https://www.jlpt.jp/guideline/results.html',
+  'https://www.jlpt.jp/e/guideline/testsections.html',
+  'https://www.jlpt.jp/e/about/pdf/scaledscore_e.pdf',
+];
+function jlptScores(track: JlptScoreFacts['track'], passMark: number): JlptScoreFacts {
+  const combined = track === 'N4' || track === 'N5';
+  const listening = {
+    id: 'listening',
+    label: '聴解',
+    skills: ['listening'] as const,
+    range: [0, 60] as const,
+    sectionalMinimum: 19,
+  };
+  return immutable({
+    track,
+    checkedAt: '2026-09-29',
+    sources: scoreSources,
+    totalRange: [0, 180],
+    passMark,
+    sections: combined
+      ? [
+          {
+            id: 'language-reading',
+            label: '言語知識（文字・語彙・文法）・読解',
+            skills: ['vocabulary', 'grammar', 'reading'],
+            range: [0, 120],
+            sectionalMinimum: 38,
+          },
+          listening,
+        ]
+      : [
+          {
+            id: 'language',
+            label: '言語知識（文字・語彙・文法）',
+            skills: ['vocabulary', 'grammar'],
+            range: [0, 60],
+            sectionalMinimum: 19,
+          },
+          {
+            id: 'reading',
+            label: '読解',
+            skills: ['reading'],
+            range: [0, 60],
+            sectionalMinimum: 19,
+          },
+          listening,
+        ],
+    papers: {
+      'language-reading': '言語知識（文字・語彙・文法）・読解',
+      vocabulary: '言語知識（文字・語彙）',
+      'grammar-reading': '言語知識（文法）・読解',
+      listening: '聴解',
+    },
+  });
+}
+
+// Each row is already deeply frozen; freezing the list keeps its tuple types.
+export const JLPT_SCORE_FACTS: readonly JlptScoreFacts[] = Object.freeze([
+  jlptScores('N5', 80),
+  jlptScores('N4', 90),
+  jlptScores('N3', 95),
+  jlptScores('N2', 90),
+  jlptScores('N1', 100),
+]);

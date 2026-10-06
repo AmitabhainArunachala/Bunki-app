@@ -1,38 +1,43 @@
 /** Whole-user QA: clean context, visible controls, no internal mutators or HTTP mocks.
  * node prototypes/corridor/tools/verify-experience.mjs
- * EXPERIENCE_ROOT=/other/tree/prototypes/corridor EXPERIENCE_OUT=/evidence node ...
- * EXPERIENCE_URL=http://127.0.0.1:3015/ optionally reuses a real server.
+ * KAIRO_SITE_DIR=/verified/site KAIRO_EVIDENCE_DIR=/external/evidence node ...
+ * A bounded regression walk; this is not one of the 36 persistent full-product journeys.
  * --require-skip / EXPERIENCE_REQUIRE_SKIP=1 makes combined SKIP coverage required.
  * Evaluation is READ ONLY: storage/DOM observations, never application interaction.
  */
+import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve, extname, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { resolve, extname, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
-const HERE=dirname(fileURLToPath(import.meta.url));
-const ROOT=resolve(process.env.EXPERIENCE_ROOT||resolve(HERE,'..'));
-const OUT=resolve(process.env.EXPERIENCE_OUT||resolve(HERE,'../../../docs/build-evidence/experience'));
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+const ROOT=resolveCorridorSite();
+const { selectPractice } = await import(pathToFileURL(resolve(ROOT, 'assessment-controller.mjs')).href);
+const OUT=resolveCorridorEvidence();
 const REQUIRE_SKIP=process.argv.includes('--require-skip')||process.env.EXPERIENCE_REQUIRE_SKIP==='1';
 mkdirSync(resolve(OUT,'screenshots'),{recursive:true});
 const started=new Date().toISOString();
 const runId=started.replace(/[^0-9]/g,'').slice(0,14);
 const checks=[],shots=[],errors=[],requests=[],observations=[];
 const result={started,root:ROOT,method:'One clean primary context; normal Playwright input only. Read-only evaluate for evidence. No state staging. No fake HTTP responses.',checks,screenshots:shots,pageErrors:errors,observations,requiredSkip:REQUIRE_SKIP};
-try{result.revision=execFileSync('git',['-C',ROOT,'rev-parse','HEAD'],{encoding:'utf8'}).trim();result.dirty=execFileSync('git',['-C',ROOT,'status','--short'],{encoding:'utf8'});}catch{}
+const identity=JSON.parse(readFileSync(resolve(ROOT,'build-identity.json'),'utf8'));
+Object.assign(result,{revision:identity.gitSha,sourceDirty:identity.sourceDirty,artifactSha256:identity.artifactSha256,sourceAssetSha256:identity.sourceAssetSha256});
 const trackedAssets=['index.html','corridor.js','corridor.css','drift-layer.js','drift-layer.css','reference-ui.js','reference-ui.css','reference-core.js','data/share_alike/reference-extra.json'];
 result.assetHashes=Object.fromEntries(trackedAssets.map(f=>[f,createHash('sha256').update(readFileSync(resolve(ROOT,f))).digest('hex')]));
 let server;
-let base=process.env.EXPERIENCE_URL;
+let base;
 if(!base){const mime={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png'};
 server=createServer((req,res)=>{const clean=decodeURIComponent((req.url||'/').split('?')[0]);const f=resolve(ROOT,'.'+(clean==='/'?'/index.html':clean));if(!f.startsWith(ROOT+sep)||!existsSync(f)){res.writeHead(404).end();return;}res.writeHead(200,{'content-type':mime[extname(f)]||'application/octet-stream'});res.end(readFileSync(f));});await new Promise(r=>server.listen(0,'127.0.0.1',r));base=`http://127.0.0.1:${server.address().port}/`;}
 result.url=base;
 const executablePath=[process.env.CHROMIUM_PATH,'/home/user/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome','/opt/pw-browsers/chromium-1194/chrome-linux/chrome','/usr/bin/chromium'].filter(Boolean).find(existsSync);
 const browser=await chromium.launch({executablePath,args:['--no-sandbox']});
 const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,acceptDownloads:true});
+await silenceBrowserAudio(context);
 const page=await context.newPage();page.setDefaultTimeout(6500);
 page.on('pageerror',e=>errors.push({at:new Date().toISOString(),error:String(e)}));
 page.on('request',r=>{if(/anthropic|openai|generativelanguage/.test(r.url()))requests.push({url:r.url(),method:r.method()});});
@@ -40,10 +45,13 @@ page.on('dialog',async d=>{observations.push({type:'native-dialog',message:d.mes
 let serial=0;
 const sleep=ms=>page.waitForTimeout(ms);
 const visible=async s=>await page.locator(s).first().isVisible().catch(()=>false);
-const click=async s=>{await page.locator(s).first().click();await sleep(280);};
+// a door inside a closed menu, or inside the shelf's 学習ツール panel, is reached the way a learner reaches it: open the menu or
+// the panel's one Tools button (shared helper), then the door
+const click=async s=>{const target=page.locator(s).first();const where=await target.evaluate(n=>{const menu=n.closest('details');if(menu&&!menu.open)menu.querySelector(':scope > summary')?.click();return n.closest('#shelf-tools-panel')?'tools':'';});if(where==='tools')await openShelfTools(page);await target.click();await sleep(280);};
 const role=async name=>{await page.getByRole('button',{name}).first().click();await sleep(280);};
 const text=()=>page.locator('body').innerText();
-const state=()=>page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('kairo-corridor-v1')||'{}');return Object.fromEntries(['taken','srs','revlog','obslog','lessonsDone','mockDone','lists','suspended'].map(k=>[k,s[k]??(k==='taken'||k.endsWith('log')?[]:{})]));});
+const state=async()=>{const s=await readAppRecord(page);return Object.fromEntries(['taken','srs','revlog','obslog','lessonsDone','mockDone','assessmentLibrary','lists','suspended'].map(k=>[k,s[k]??(k==='taken'||k.endsWith('log')?[]:{})]));};
+const submittedAttempts=s=>(s.assessmentLibrary?.attempts||[]).filter(attempt=>attempt.status==='submitted');
 const debt=s=>JSON.stringify({taken:s.taken,srs:s.srs,revlog:s.revlog,suspended:s.suspended});
 const flush=()=>writeFileSync(resolve(OUT,'results.json'),JSON.stringify({...result,updated:new Date().toISOString()},null,2)+'\n');
 function note(id,status,expected,observed,extra={}){const c={id,status,expected,observed,...extra};checks.push(c);console.log(`${status.toUpperCase()} ${id}: ${observed}`);flush();return c;}
@@ -68,7 +76,7 @@ async function recoverShelf(){
 async function closeSheet(){await sleep(800);await click('#sheet-close');await sleep(350);}
 async function sheetHop(name){await role(name);await sleep(850);}
 async function noOverflow(id){await check(id,'No horizontal document overflow',async()=>{const d=await page.evaluate(()=>({w:innerWidth,sw:document.documentElement.scrollWidth}));assert.ok(d.sw<=d.w+1,JSON.stringify(d));return JSON.stringify(d);});}
-let initial,captured,afterReview,lessonBefore,mockBefore;
+let initial,captured,afterReview,lessonBefore,mockBefore,savedMockAttempt;
 try{
  await page.goto(base,{waitUntil:'load'});await page.waitForSelector('#drift-layer.active',{timeout:30000});await sleep(1600);initial=await state();
  await check('E01-clean','Primary starts with zero saved, scheduled or reviewed items',()=>{assert.equal(initial.taken.length,0);assert.equal(Object.keys(initial.srs).length,0);assert.equal(initial.revlog.length,0);return 'Clean actual app, no init scripts or staged store';});
@@ -105,10 +113,11 @@ try{
  });
  await segment('E05-reader-capture',async()=>{
   await click('.details-toggle');await shot('shelf-source-details','Source and difficulty detail disclosure stays distinct from mastery');
-  await page.locator('.shelf-open').filter({hasText:'静かな朝'}).click();await page.locator('.reader .tok.content').first().waitFor();await sleep(900);await shot('reader-initial','Actual Japanese text, reading controls, and clear return');
+  await page.locator('.shelf-item:not([data-recommendation]) .shelf-open').filter({hasText:'静かな朝'}).click();await page.locator('.reader .tok.content').first().waitFor();await sleep(900);await shot('reader-initial','Actual Japanese text, reading controls, and clear return');
   await role(/text settings/);await click('[data-dial="spacing:1"]');await click('[data-dial="furigana:2"]');await click('[data-dial="kanji:2"]');await shot('reader-settings','Independent kanji, furigana and spacing settings all accept deliberate input');await click('[data-dial="kanji:0"]');await click('[data-dial="furigana:1"]');await click('[data-dial="spacing:0"]');await role(/text settings/);
-  const token=page.locator('.reader .tok.content').first();await token.click();await sleep(350);await shot('reader-reading-rung','First activation reveals reading without opening full entry');await token.click();await sleep(350);await shot('reader-gloss-rung','Second activation reveals meaning without taking over the reading');
-  await token.click({delay:2500});await sleep(850);
+  const token=page.locator('.reader .tok.content').first();await token.click();await page.locator('#mini .mini-gloss').waitFor();await sleep(350);await shot('reader-word-popup','One tap shows the word, its reading and its meaning in a popup, without opening the full entry');
+  await check('E05-one-tap-meaning','One tap shows reading and meaning together, with Save and Full entry, and writes nothing under the word',async()=>{const p=await page.evaluate(()=>({reading:document.querySelector('#mini .mini-reading')?.textContent||'',gloss:document.querySelector('#mini .mini-gloss')?.textContent||'',save:document.querySelector('#mini #mini-take')?.textContent,entry:document.querySelector('#mini .mini-entry')?.textContent,under:document.querySelectorAll('.reader .tok-en').length,sheet:!!document.querySelector('#sheet')}));assert.ok(p.reading&&p.gloss&&p.save==='Save'&&/Full entry/.test(p.entry)&&p.under===0&&!p.sheet,JSON.stringify(p));return p;});
+  await click('#mini .mini-entry');await sleep(850);
   await check('E06-pre-capture-no-debt','Passive reading/lookups create no review debt',async()=>{assert.equal(debt(await state()),debt(initial));});
   await page.locator('#sheet-take').waitFor();const label=await page.locator('#sheet-take').getAttribute('aria-label');
   await check('E06-explicit-enrollment-label','The chosen take control explicitly says memorize, not an innocent save',()=>{assert.match(label,/memorize|覚える/);return `User explicitly chose ${label}. Current app has no separate save-only door on this sheet.`;});
@@ -124,9 +133,9 @@ try{
   await check('E07-list-create','Normal typed list creation persists an empty named list',async()=>{assert.deepEqual((await state()).lists['Evening Japanese'],[]);});
   await page.getByRole('button',{name:'rename Evening Japanese',exact:true}).click();await sleep(250);await page.getByRole('textbox',{name:'new name',exact:true}).fill('Uncommitted rename');await page.getByRole('textbox',{name:'new name',exact:true}).press('Escape');await sleep(250);await check('E07-list-cancel','Escape cancels rename without saving typed draft',async()=>{assert.equal(await page.getByRole('textbox',{name:'new name',exact:true}).count(),0);assert.ok(Object.hasOwn((await state()).lists,'Evening Japanese'));assert.ok(!Object.hasOwn((await state()).lists,'Uncommitted rename'));});
   await shot('my-study-list-created','Named list created, rename canceled safely');
-  await click('#review-start');await page.locator('#declare-recalled').waitFor();await shot('review-recall','Review asks learner for honest recall before revealing the answer');
-  await click('#declare-recalled');await page.locator('.grade.g-good').waitFor();await sleep(1600);await shot('review-revealed-grade','Answer and explicit grade control precede FSRS scheduling');await click('.grade.g-good');let gradeActions=1;
-  for(let i=0;i<12&&!await visible('.review-summary');i++){await page.locator('#declare-recalled').waitFor();await click('#declare-recalled');await click('.grade.g-good');gradeActions++;}
+  await click('#review-start');await page.locator('#reveal').waitFor();await shot('review-recall','Review shows the front with one Show answer, like Anki');
+  await click('#reveal');await page.locator('.grade.g-good').waitFor();await sleep(1600);await shot('review-revealed-grade','Answer and explicit grade control precede FSRS scheduling');await click('.grade.g-good');let gradeActions=1;
+  for(let i=0;i<12&&!await visible('.review-summary');i++){await page.locator('#reveal').waitFor();await click('#reveal');await click('.grade.g-good');gradeActions++;}
   await page.locator('.review-summary').waitFor();
   await check('E07-summary-surface','Completion restores matching day/night paper and readable heading',async()=>{
    const measured=await page.evaluate(async()=>{
@@ -167,13 +176,67 @@ try{
   await role(/back to lessons|レッスン一覧/);await click('#back');
  });
  await segment('E09-mock',async()=>{
-  mockBefore=await state();await click('#mock-link');await page.locator('.mock-row').first().waitFor();await shot('mock-catalog','Bundled mock papers clearly separate score evidence from scheduling');await click('.mock-row');await page.locator('[data-mock-opt]').first().waitFor();await shot('mock-question','Paper starts with unselected answer and next disabled');
+  mockBefore=await state();await click('#mock-link');
+  await page.locator('.assessment-room #exam-legacy').waitFor();await click('.assessment-room #exam-legacy');
+  await page.locator('button[data-mock-set="n5-01"]').waitFor();await shot('mock-catalog','Bundled mock papers clearly separate score evidence from scheduling');await click('button[data-mock-set="n5-01"]');
+  await page.locator('[data-mock-opt]').first().waitFor();
+  const pinned=selectPractice((await readAppRecord(page)).assessmentLibrary);
+  assert.equal(pinned?.status,'in-progress');assert.equal(pinned.run.setId,'n5-01');
+  assert.equal(pinned.run.ix,0);assert.equal(pinned.flat.length,18);
+  const currentPractice=record=>{
+   const current=selectPractice(record.assessmentLibrary);
+   assert.equal(current?.attemptId,pinned.attemptId);
+   assert.deepEqual(current.attempt.form,pinned.attempt.form);
+   return current;
+  };
+  const waitQuestion=async(index,answered=false)=>{
+   await waitForAppRecord(page,record=>{
+    const current=currentPractice(record);
+    return current.status==='in-progress'&&current.run.ix===index&&(!answered||current.run.answers[index]===0);
+   },{description:`saved practice question ${index+1}${answered?' answer':''}`});
+   await page.waitForFunction(({setId,index,total,optionCount})=>{
+    const main=document.querySelector('main[data-mock-set]');
+    if(main?.dataset.mockSet!==setId)return false;
+    const choices=[...main.querySelectorAll('[data-mock-opt]')];
+    const position=[...main.querySelectorAll('.card-kind')].some(node=>
+     node.textContent.endsWith(`Question ${index+1} of ${total}`)||node.textContent.endsWith(`${index+1} / ${total} 問`));
+    return position&&choices.length===optionCount&&choices.every(choice=>{
+     const rect=choice.getBoundingClientRect();
+     return !choice.disabled&&rect.width>0&&rect.height>0&&getComputedStyle(choice).visibility==='visible';
+    });
+   },{setId:pinned.run.setId,index,total:pinned.flat.length,optionCount:pinned.flat[index].item.opts.length});
+  };
+  await waitQuestion(0);await shot('mock-question','Paper starts with unselected answer and next disabled');
   await check('E09-requires-answer','Cannot advance without choosing an answer',async()=>assert.equal(await page.locator('#mock-next').isDisabled(),true));
-  await click('[data-mock-opt="0"]');await shot('mock-selected-answer','Selection is visible and still editable; no instant correctness');
-  await click('#mock-next');await click('#mock-prev');await check('E09-answer-persists-back','Previous returns to original chosen answer',async()=>assert.equal(await page.locator('[data-mock-opt="0"]').getAttribute('aria-pressed'),'true'));
-  for(let i=0;i<40&&!await visible('#mock-done');i++){await click('[data-mock-opt="0"]');await click('#mock-next');}
+  await click('[data-mock-opt="0"]');await waitQuestion(0,true);await shot('mock-selected-answer','Selection is visible and still editable; no instant correctness');
+  await click('#mock-next');await waitQuestion(1);await click('#mock-prev');await waitQuestion(0,true);
+  await check('E09-answer-persists-back','Previous returns to original chosen answer',async()=>assert.equal(await page.locator('[data-mock-opt="0"]').getAttribute('aria-pressed'),'true'));
+  for(let index=0;index<pinned.flat.length;index++){
+   // The first answer was already saved before exercising Next and Previous.
+   if(index>0){await click('[data-mock-opt="0"]');await waitQuestion(index,true);}
+   await click('#mock-next');
+   if(index+1<pinned.flat.length)await waitQuestion(index+1);
+   else await waitForAppRecord(page,record=>currentPractice(record).status==='submitted',
+    {description:'submitted pinned practice attempt'});
+  }
   await page.locator('#mock-done').waitFor();await shot('mock-results','Submitted paper has score, explanations and deliberate optional enrollment');
-  await check('E09-no-auto-enrollment','Paper submission records score without altering deck or scheduler',async()=>{const s=await state();assert.equal(debt(s),debt(mockBefore));assert.ok(Object.keys(s.mockDone).length>Object.keys(mockBefore.mockDone).length);return `Deck remains ${s.taken.length}; completed papers ${Object.keys(s.mockDone).length}`;});await click('#mock-done');await click('#back');
+  await check('E09-no-auto-enrollment','Paper submission retains a complete unreviewed practice attempt without altering deck or scheduler',async()=>{
+   const s=await waitForAppRecord(page,record=>submittedAttempts(record).length===submittedAttempts(mockBefore).length+1);
+   assert.equal(debt(s),debt(mockBefore));assert.deepEqual(s.mockDone,mockBefore.mockDone,'Legacy score summaries are preserved, not overwritten');
+   savedMockAttempt=submittedAttempts(s).at(-1);assert.ok(savedMockAttempt.answers.length>0);
+   assert.equal(savedMockAttempt.attemptId,pinned.attemptId);assert.deepEqual(savedMockAttempt.form,pinned.attempt.form);
+   assert.ok(savedMockAttempt.answers.every(answer=>answer.response.kind!=='unanswered'&&answer.lastResponseFactId));
+   const storedForm=s.assessmentLibrary.forms.find(entry=>entry.form.revisionId===savedMockAttempt.form.revisionId)?.form;
+   assert.ok(storedForm);assert.equal(storedForm.sha256,savedMockAttempt.form.sha256);
+   assert.equal(savedMockAttempt.editorialAtStart.status,'unreviewed');
+   return `Deck remains ${s.taken.length}; ${savedMockAttempt.answers.length} responses and exact form retained in ${submittedAttempts(s).length} submitted practice attempt`;
+  });await click('#mock-done');
+  const dismissed=await waitForAppRecord(page,record=>record.assessmentLibrary?.activeAttemptId===null,
+   {description:'dismissed submitted practice attempt'});
+  assert.deepEqual(submittedAttempts(dismissed).find(attempt=>attempt.attemptId===pinned.attemptId),
+   savedMockAttempt,'Done preserves the exact submitted practice attempt');
+  await page.locator('main button[data-mock-set]').first().waitFor();
+  await click('#back');await page.locator('#levels-link').waitFor({ state: 'attached' });
  });
  await segment('E10-reference',async()=>{
   const before=await state();await click('#levels-link');await page.locator('#reference-library').waitFor();await shot('reference-overview','Reference includes complete bundled level collections independently of lessons');
@@ -203,14 +266,14 @@ try{
  });
  await segment('E16-settings',async()=>{
   await click('#theme-seal');await shot('world-picker','Exactly ten public worlds in consistent order');await page.locator('.world-picker .world-stone').nth(4).click();await sleep(450);await shot('shelf-dark','Dark world changes the whole shelf with legible controls');
-  await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.ok((await text()).includes('the bookshelf'));assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
+  await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.equal(await page.locator('.shelf-mast-title .en-inline').innerText(),'bookshelf');assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
   await page.keyboard.press('Tab');await shot('keyboard-focus-dark','Keyboard focus remains perceivable in dark palette');await page.setViewportSize({width:1280,height:900});await shot('shelf-desktop-dark','Desktop dark shelf has coherent hierarchy');await noOverflow('E19-shelf-desktop');await page.setViewportSize({width:390,height:844});
   await page.reload({waitUntil:'load'});await sleep(1200);await check('E18-palette-reload','Chosen dark world survives reload',async()=>assert.equal(await page.locator('html').getAttribute('data-theme'),'yoru'));await recoverShelf();await click('#tray');await shot('study-reloaded','Personal evidence and cards survive normal reload');
-  await check('E18-state-reload','Review, lesson, mock and chosen card persist',async()=>{const s=await state();assert.equal(s.taken.length,1);assert.equal(s.revlog.length,afterReview.revlog.length);assert.ok(Object.keys(s.lessonsDone).length);assert.ok(Object.keys(s.mockDone).length);return `1 chosen item, ${s.revlog.length} review, ${Object.keys(s.lessonsDone).length} lesson, ${Object.keys(s.mockDone).length} mock`;});await click('#back');
+  await check('E18-state-reload','Review, lesson, exact submitted practice attempt and chosen card persist',async()=>{const s=await state();assert.equal(s.taken.length,1);assert.equal(s.revlog.length,afterReview.revlog.length);assert.ok(Object.keys(s.lessonsDone).length);assert.ok(savedMockAttempt);assert.deepEqual(submittedAttempts(s).find(attempt=>attempt.attemptId===savedMockAttempt.attemptId),savedMockAttempt);return `1 chosen item, ${s.revlog.length} review, ${Object.keys(s.lessonsDone).length} lesson, ${submittedAttempts(s).length} exact submitted practice attempt`;});await click('#back');
  });
  await segment('E17-tutor-offline',async()=>{
-  await click('#ai-link');await shot('tutor-unconfigured','No key means honest setup, not a fabricated conversation');const before=await state();await click('#ai-key-save');await check('E17-empty-key','Empty tutor-key action cannot enable AI or alter learning state',async()=>{assert.equal(debt(await state()),debt(before));assert.ok(await visible('#ai-link'));assert.equal(await page.evaluate(()=>localStorage.getItem('kairo-ai-key')),null);assert.equal(requests.length,0);return 'Empty save deliberately returns to shelf; key remains absent, no provider request or fabricated response';});
-  await click('#ai-link');await context.setOffline(true);await click('#ai-key-save');await click('#ai-link');await shot('tutor-offline-no-key','Offline/unconfigured tutor stays safe; no provider reliability claim');await check('E17-offline-safe','No-key offline tutor action leaves canonical state unchanged',async()=>assert.equal(debt(await state()),debt(before)));await click('#back');
+  await click('#ai-link');await shot('tutor-unconfigured','No key means honest setup, not a fabricated conversation');const before=await state();await click('#ai-key-save');await check('E17-empty-key','Empty tutor-key action cannot enable AI or alter learning state',async()=>{assert.equal(debt(await state()),debt(before));assert.ok(await visible('#ai-key-save'));assert.equal(await page.locator('#ai-key-input').inputValue(),'');assert.equal(await page.locator('#chat-send').isDisabled(),true);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-ai-provider-v1')).credential.key),'');assert.equal(await page.evaluate(()=>localStorage.getItem('kairo-ai-key')),null);assert.equal(requests.length,0);return 'Device settings save returns to the tutor with an empty bound credential; no provider request or fabricated response';});
+  await context.setOffline(true);await click('#ai-key-save');await shot('tutor-offline-no-key','Offline/unconfigured tutor stays safe; no provider reliability claim');await check('E17-offline-safe','No-key offline tutor action leaves canonical state unchanged',async()=>{assert.equal(debt(await state()),debt(before));assert.equal(await page.locator('#ai-key-input').inputValue(),'');assert.equal(await page.locator('#chat-send').isDisabled(),true);assert.equal(requests.length,0);});await click('#back');
   await click('#levels-link');await click('[data-reference-collection="jlpt:N3"]');await page.locator('#reference-search').fill('water');await shot('offline-reference-warm','Warm loaded reference remains usable while network is disabled');await check('E18-warm-offline','Reference search works offline from already loaded assets',async()=>assert.ok(await visible('#reference-results-count')));
   await context.setOffline(false);await click('#reference-back');await click('#back');await click('#theme-seal');await page.locator('.world-picker .world-stone').nth(5).click();await sleep(400);
   await page.setViewportSize({width:320,height:844});await noOverflow('E19-shelf-320');await shot('shelf-narrow-final','Narrow header retains 44px controls and unwrapped language labels');await check('E19-header-44','At 320px each language segment has a 44px touch height and a single line',async()=>{const dims=await page.locator('#lang button').evaluateAll(es=>es.map(e=>({text:e.textContent,h:e.getBoundingClientRect().height,whiteSpace:getComputedStyle(e).whiteSpace})));assert.ok(dims.length===2);for(const d of dims){assert.ok(d.h>=44);assert.equal(d.whiteSpace,'nowrap');}return JSON.stringify(dims);});await page.setViewportSize({width:390,height:844});await click('#back');await page.locator('#drift-layer.active').waitFor();await shot('home-return','Whole continuous journey closes at Drift with personal state retained');await check('E18-home','Return home succeeds after learning/reference/settings/offline work',async()=>assert.ok(await visible('#drift-layer.active')));
