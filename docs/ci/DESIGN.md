@@ -46,14 +46,14 @@ profiles, frozen IDs, tracked-output and untracked-output checks, the existing
 `.apkg` exception, Python assertions, and deck/player tests with their pinned
 Python dependencies installed.
 
-| Linux work                     |                                           Initial prediction | Scheduling                                          |
-| ------------------------------ | -----------------------------------------------------------: | --------------------------------------------------- |
-| Fast checks                    |                                          Under 10 min target | Parallel early lanes if measured sum exceeds budget |
-| Practice history / WebKit      |                                                    15.98 min | Dedicated shard                                     |
-| Practice history / Chromium    |                                                    12.10 min | Dedicated shard                                     |
-| Remaining gates                | Approximately 14 min per shard before extracting fast checks | Ten duration-balanced shards                        |
-| Build and packaged-asset smoke |                                            Measure on branch | Once, before artifact-dependent gates               |
-| Native Swift and RPC           |                                            Measure on branch | One macOS job, parallel to Linux                    |
+| Linux work                     |                                           Initial prediction | Scheduling                                  |
+| ------------------------------ | -----------------------------------------------------------: | ------------------------------------------- |
+| Fast checks                    |                                          Under 10 min target | Three LPT-balanced lanes plus one deck lane |
+| Practice history / WebKit      |                                                    15.98 min | Dedicated shard                             |
+| Practice history / Chromium    |                                                    12.10 min | Dedicated shard                             |
+| Remaining gates                | Approximately 14 min per shard before extracting fast checks | Ten duration-balanced shards                |
+| Build and packaged-asset smoke |                                            Measure on branch | Once, before artifact-dependent gates       |
+| Native Swift and RPC           |                                            Measure on branch | One macOS job, parallel to Linux            |
 
 The initial 12-bin estimate uses the complete f938 log: 135 gates and 166.76
 minutes between battery start and final gate completion. Longest-processing-time
@@ -61,8 +61,10 @@ allocation across 12 unrestricted bins predicts a 15.98-minute maximum; isolatin
 both history gates leaves about 13.87 minutes of average work in each remaining
 bin. Five complete runs were recovered (163.23, 162.42, 166.76, 146.40, and 123.00
 minutes); final checked-in weights use each gate's observed maximum and record
-their provenance in CI_MAP. Browser engines and dependency requirements are
-explicit plan metadata. Unknown or new gates receive conservative weights, never
+their provenance in CI_MAP. Hosted fast-lane rows under `planningObservations` in
+`gate-timings.json` keep their own provenance and can only raise a weight, never
+lower it; the five-run baseline rows stay unchanged. Browser engines and
+dependency requirements are explicit plan metadata. Unknown or new gates receive conservative weights, never
 disappear. Timings change allocation only, never required membership.
 
 Cold setup, artifact transfer, and supplemental gates need headroom under the
@@ -231,7 +233,9 @@ The PR workflow itself has no path filter. Its planner examines the complete dif
 from the PR base, including deleted and renamed paths. A small explicit allowlist
 of prose-only locations enables docs scope; build scripts under `docs/`, fixtures,
 generated evidence, runtime assets, workflows, policy, locks, and unknown paths
-require full scope. Diff/API failure also requires full scope. Docs scope always
+require full scope. Planning checks out only the merge commit and its parents, so
+docs scope also requires the first parent and merge base to both equal the PR base;
+otherwise, or on diff/API failure, it requires full scope. Docs scope always
 runs the fast checks and aggregator. Dispatch and deployment default to full.
 
 Move duplicate Corridor, reference, SKIP, personal-collection, and corpus checks

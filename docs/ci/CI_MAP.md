@@ -134,7 +134,7 @@ Raw evidence stays under `~/.dharma/bunki_review/2026-10-06/ci/`: run pages, job
 
 ## All 135 measured gates
 
-These are the original required names. Every row has five complete observations. Median includes failed observations; maximum is the measured scheduling weight. Setup/upload time is excluded. The runner is **ubuntu-latest** for every gate, within `ci.yml:checks` (also called by `pages-app.yml:verify`). Commands and assertions remain defined in `batteryGates()` in `scripts/verify-release-gates.mjs`; browser names and flags are retained there.
+These are the original required names. Every row has five complete observations. Median includes failed observations; maximum is the baseline scheduling weight ([DESIGN](DESIGN.md) covers later observations that can raise it). Setup/upload time is excluded. The runner is **ubuntu-latest** for every gate, within `ci.yml:checks` (also called by `pages-app.yml:verify`). Commands and assertions remain defined in `batteryGates()` in `scripts/verify-release-gates.mjs`; browser names and flags are retained there.
 
 | Gate                                | Median sec | Maximum sec | Observed failures / 5 |
 | ----------------------------------- | ---------: | ----------: | --------------------: |
