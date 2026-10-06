@@ -30,8 +30,11 @@ carry their own reviewed ruby annotations.
 
 Each revealed paragraph can open Bunki's actual dictionary, kanji and grammar
 sheets. The sheet is a sibling overlay: recursive entry navigation does not
-replace the personal card. **覚える** opens the existing list chooser and can
-create a named list. Saving uses the shared Bunki learner envelope. Closing or
+replace the personal card. **保存 / Save** saves the entry in one tap, with no
+destination prompt; the confirmation offers **元に戻す / Undo**, and pressing
+**保存済み ✓ / Saved ✓** again removes it. The optional **リストに追加… / Add to
+list…** opens a compact list popover where an existing list can be ticked or a
+named list created. Saving uses the shared Bunki learner envelope. Closing or
 using device Back returns to the same card and position. Grading shortcuts and
 buttons are disabled while a dictionary sheet is active.
 
@@ -48,11 +51,13 @@ review state are the meaningful signals available today.
   assessment IDs remain unchanged. Each modality keeps its own evidence.
 - An answer reveal, English reveal, lookup, source visit, or captured word is
   not a successful review. Only an explicit grade writes a personal review.
-- Opening a dictionary or its save chooser does not enroll an item. Confirming
-  **覚える** preserves Bunki's existing explicit memorization contract: it adds
-  the item to the host's review pool and selected lists. The chooser labels
-  this destination “daily review.” It writes no grade, FSRS record or review
-  log, and it does not change the personal paragraph's FSRS state.
+- Opening a dictionary or the list popover does not enroll an item. One tap on
+  **保存 / Save** preserves Bunki's existing explicit memorization contract: it
+  adds the item to the host's review pool, and its confirmation reads “Saved to
+  review.” Ticking a list in the popover saves the item first when needed, then
+  adds it to that list; closing the popover never removes a saved item. Neither
+  writes a grade, FSRS record or review log, and neither changes the personal
+  paragraph's FSRS state.
 - Writes still commit before advancing. Failed writes retain the answer;
   concurrent stale windows fail rather than overwrite newer work. Undo remains
   append-only.
@@ -140,17 +145,17 @@ acceptance. Final run results are recorded with the pull request.
 
 ## Further improvements, in priority order
 
-| Priority | Improvement                                                 | Why it matters                                                                                                               | Acceptance condition                                                                                                                               |
-| -------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1        | Independent fluent editorial review and correction workflow | Hashes and complete ruby cannot certify contextual naturalness or sense accuracy.                                            | Each disputed reading/definition has a correction, provenance and a revision that preserves assessment identity where appropriate.                 |
-| 1        | Encounter backlinks in saved items                          | The shared chooser currently saves canonical entry identity; it should also remember which private paragraph led to capture. | Store a local collection/lesson reference and selected sense without copying private passages into public data; return to the original passage.    |
-| 1        | Repair workflow for genuinely confusing cards               | Repeated failures can arise from ambiguity, not weak memory.                                                                 | Pause, inspect the intended sense, record a note, and resume deliberately; preserve original events.                                               |
-| 2        | Verified listening and pronunciation layers                 | Meaning, reading aloud and listening are different skills.                                                                   | Licensed/consented audio and reliable pitch/reading metadata; no audio on a reading-test front; distinct assessments if scheduled.                 |
-| 2        | A second sense-matched context and transfer check           | Success in a familiar paragraph does not establish flexible use.                                                             | Fluent review, clear source, optional practice, and an unfamiliar-context outcome measured separately from ordinary reviews.                       |
-| 2        | Selective MCD for grammar and collocations                  | Form retrieval can complement meaning retrieval.                                                                             | One meaningful deletion, sensible alternate-answer policy, explicit opt-in and separate card identity/history. No blanket deck conversion.         |
-| 2        | Bring the same boundary and durable saves to legacy players | The earlier review documented independent player defects.                                                                    | Fix the old storage/restore and identity defects first, then share presentation components without mixing ledgers.                                 |
-| 3        | Local learning-quality evaluation                           | More taps or longer sessions do not demonstrate better learning.                                                             | Track recall time separately from exploration, delayed target recall, unseen-context transfer and confusion errors; export only by learner choice. |
-| 3        | Signed native packaging and real-device acceptance          | Browser emulation cannot verify every iOS or Mac lifecycle behavior.                                                         | Physical-device install, offline, force-quit, recovery, keyboard, share and accessibility walkthroughs.                                            |
+| Priority | Improvement                                                 | Why it matters                                                                                                         | Acceptance condition                                                                                                                               |
+| -------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | Independent fluent editorial review and correction workflow | Hashes and complete ruby cannot certify contextual naturalness or sense accuracy.                                      | Each disputed reading/definition has a correction, provenance and a revision that preserves assessment identity where appropriate.                 |
+| 1        | Encounter backlinks in saved items                          | Shared Save currently stores canonical entry identity; it should also remember which private paragraph led to capture. | Store a local collection/lesson reference and selected sense without copying private passages into public data; return to the original passage.    |
+| 1        | Repair workflow for genuinely confusing cards               | Repeated failures can arise from ambiguity, not weak memory.                                                           | Pause, inspect the intended sense, record a note, and resume deliberately; preserve original events.                                               |
+| 2        | Verified listening and pronunciation layers                 | Meaning, reading aloud and listening are different skills.                                                             | Licensed/consented audio and reliable pitch/reading metadata; no audio on a reading-test front; distinct assessments if scheduled.                 |
+| 2        | A second sense-matched context and transfer check           | Success in a familiar paragraph does not establish flexible use.                                                       | Fluent review, clear source, optional practice, and an unfamiliar-context outcome measured separately from ordinary reviews.                       |
+| 2        | Selective MCD for grammar and collocations                  | Form retrieval can complement meaning retrieval.                                                                       | One meaningful deletion, sensible alternate-answer policy, explicit opt-in and separate card identity/history. No blanket deck conversion.         |
+| 2        | Bring the same boundary and durable saves to legacy players | The earlier review documented independent player defects.                                                              | Fix the old storage/restore and identity defects first, then share presentation components without mixing ledgers.                                 |
+| 3        | Local learning-quality evaluation                           | More taps or longer sessions do not demonstrate better learning.                                                       | Track recall time separately from exploration, delayed target recall, unseen-context transfer and confusion errors; export only by learner choice. |
+| 3        | Signed native packaging and real-device acceptance          | Browser emulation cannot verify every iOS or Mac lifecycle behavior.                                                   | Physical-device install, offline, force-quit, recovery, keyboard, share and accessibility walkthroughs.                                            |
 
 These are explicit remaining improvements, not shipped claims. No research in
 this pass establishes a 10× learning-speed gain, a complete JLPT N1/N2 syllabus,

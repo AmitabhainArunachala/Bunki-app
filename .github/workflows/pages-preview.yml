@@ -1,35 +1,27 @@
-name: pages-preview
+# Historical Sites v11 remains downloadable for review. It has no Pages
+# permissions, environment or publisher and cannot replace live Corridor.
+name: legacy Sites v11 artifact preview
 
-# Publishes the client-only static build of the Sites v11 prototype (local
-# harness entry) to GitHub Pages so the operator can interact with the
-# repaired app on a real phone. Server-backed flows (live feeds, teacher,
-# cloud sync) stay stubbed; the app runs in its designed local/offline mode.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - claude/sites-v11-interaction-recovery
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: legacy-sites-preview-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  artifact:
+    name: historical prototype artifact (no deployment)
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
       - name: Install prototype dependencies
         working-directory: prototypes/bunki-sites-v11
         run: npm ci
@@ -39,34 +31,12 @@ jobs:
       - name: Build static client bundle
         working-directory: prototypes/bunki-sites-v11
         run: ./node_modules/.bin/vite build --config vite.config.harness.mts
-      - name: Upload build as downloadable artifact
+      - name: Upload historical preview artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bunki-sites-v11-static
+          name: legacy-bunki-sites-v11-static
           path: prototypes/bunki-sites-v11/dist
-      # Pages cannot be enabled by the workflow token on this private repo
-      # (configure-pages: "Resource not accessible by integration"). Attempt
-      # it, but treat unavailability as a skip, not a failure — the build
-      # above is the verified deliverable either way. Once Pages is enabled
-      # in Settings → Pages (source: GitHub Actions), this deploys for real.
-      - id: cfg
-        continue-on-error: true
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - if: steps.cfg.outcome == 'success'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: prototypes/bunki-sites-v11/dist
-      - id: deployment
-        if: steps.cfg.outcome == 'success'
-        uses: actions/deploy-pages@v4
-      - name: Report Pages availability
-        run: |
-          if [ "${{ steps.cfg.outcome }}" = "success" ]; then
-            echo "### Pages deployed: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "### Pages unavailable on this repository" >> "$GITHUB_STEP_SUMMARY"
-            echo "Build succeeded and is attached as the *bunki-sites-v11-static* artifact." >> "$GITHUB_STEP_SUMMARY"
-            echo "To get a live URL: Settings → Pages → Source: GitHub Actions (requires a public repo or a plan with private Pages), then re-run this workflow." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          retention-days: 7
+          if-no-files-found: error
+      - name: Report artifact-only result
+        run: echo 'Historical Sites v11 artifact attached. This workflow does not deploy; live KAIRO is owned by pages-app.' >> "$GITHUB_STEP_SUMMARY"

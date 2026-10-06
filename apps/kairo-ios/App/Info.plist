@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleDevelopmentRegion</key><string>ja</string>
+  <key>CFBundleDisplayName</key><string>KAIRO</string>
+  <key>CFBundleExecutable</key><string>$(EXECUTABLE_NAME)</string>
+  <key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleName</key><string>$(PRODUCT_NAME)</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
+  <key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
+  <key>LSRequiresIPhoneOS</key><true/>
+  <key>UIApplicationSupportsMultipleScenes</key><false/>
+  <key>UILaunchScreen</key><dict/>
+  <key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationPortrait</string><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>
+  <key>UISupportedInterfaceOrientations~ipad</key><array><string>UIInterfaceOrientationPortrait</string><string>UIInterfaceOrientationPortraitUpsideDown</string><string>UIInterfaceOrientationLandscapeLeft</string><string>UIInterfaceOrientationLandscapeRight</string></array>
+  <key>UIUserInterfaceStyle</key><string>Light</string>
+  <key>NSMicrophoneUsageDescription</key><string>KAIRO uses the microphone only when you start a speaking practice recording.</string>
+  <key>NSCameraUsageDescription</key><string>KAIRO uses the camera only when you choose to photograph Japanese text. You choose where to save the photo before reviewing and capturing its text.</string>
+  <key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
+  <key>WKAppBoundDomains</key><array><string>localhost</string></array>
+  <key>KairoArtifactSHA256</key><string>$(KAIRO_ARTIFACT_SHA256)</string>
+  <key>KairoManifestSHA256</key><string>$(KAIRO_MANIFEST_SHA256)</string>
+  <key>KairoCloudKitContainer</key><string>$(KAIRO_CLOUDKIT_CONTAINER)</string>
+</dict></plist>

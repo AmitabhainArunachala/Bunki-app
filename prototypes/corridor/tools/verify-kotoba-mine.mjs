@@ -1,5 +1,5 @@
 /**
- * 言葉の鉱脈 deck + 覚える save-chooser verifier. Done = this is green.
+ * 言葉の鉱脈 deck + 覚える one-tap save verifier. Done = this is green.
  *
  * Half one reads the shipped deck as DATA: 323 words, each with one or more
  * sentences (mostly mined from real Japanese, each naming its source), every
@@ -12,23 +12,24 @@
  *     meaning and source, and a grade lands in
  *     the deck's own ledger (bunki-cloze:kotoba-mine), never the word queue;
  *   · the ledger survives a reload; the 4-choice mode answers in one tap;
- *   · 覚える asks where to save: nothing is written until 保存する, and a new
- *     list named in the chooser receives the word in the same commit.
+ *   · 覚える is one tap (the reader's save path): the word is written at once,
+ *     the list drawer opens with it, and a list named there receives the word
+ *     through the same guarded commit.
  *
  * Usage: node verify-kotoba-mine.mjs   (rebuild the deck: python3 decks/kotoba-mine/tools/build.py)
  */
 
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { extname, resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
-const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
-const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
+// The battery's law: verify the built artifact, not the source tree.
+const CORRIDOR_DIR = resolveCorridorSite();
 const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mcd/deck.json');
 const SENTENCE_DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
 
@@ -131,7 +132,7 @@ async function main() {
     await page.click('.nav-dojo');
     await page.waitForSelector('[data-deck="kotoba-mine"]', { timeout: 8000 });
     const rows = await page.evaluate(`[...document.querySelectorAll('.dojo-deck')].map((b) => b.dataset.deck)`);
-    check('集中道場 opens with the deck list: 言葉の鉱脈・MCD and ・文 side by side, 文脈札, and the saved-word queue', rows[0] === 'kotoba-mcd' && rows[1] === 'kotoba-mine' && rows.includes('context') && rows.includes('mine'), rows.join(', '));
+    check('集中道場 opens with the deck list: 私の文脈, then 言葉の鉱脈・MCD and ・文 side by side, 文脈札, and the saved-word queue', rows[0] === 'personal' && rows[1] === 'kotoba-mcd' && rows[2] === 'kotoba-mine' && rows.includes('context') && rows.includes('mine'), rows.join(', '));
 
     await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
@@ -146,10 +147,10 @@ async function main() {
     await page.waitForSelector('#kp-grade-good');
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
     check('the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
-    const takenBefore = (await ls('kairo-corridor-v1')).taken.length;
+    const takenBefore = (await readAppRecord(page)).taken.length;
     await page.click('#kp-grade-good');
     const ledger = await ls('bunki-cloze:kotoba-mcd');
-    const after = await ls('kairo-corridor-v1');
+    const after = await readAppRecord(page);
     check('a grade lands in the deck’s own ledger and never in the word queue', Object.keys(ledger?.cards || {}).length === 1 && after.taken.length === takenBefore && (after.revlog || []).length === 0, `${Object.keys(ledger?.cards || {}).length} card · ${after.taken.length} taken`);
 
     await boot('?deck=mcd');
@@ -172,25 +173,33 @@ async function main() {
     const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
     check('?deck=kotoba opens 言葉の鉱脈・文: a real sentence with the word marked, in its own theme', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
 
-    // 覚える asks where to save
+    // 覚える is one tap (round-1 save path): the row is written through the
+    // guarded commit at once, and the list drawer opens under the finger so
+    // where the word went is right there.
     await boot();
     await page.fill('#search', '金利');
     await page.waitForSelector('[data-result^="word:金利"]', { timeout: 15000 });
     await page.click('[data-result^="word:金利"]');
     await page.waitForSelector('#sheet #take');
     await page.click('#sheet #take');
-    await page.waitForSelector('#take-chooser');
-    const pending = (await ls('kairo-corridor-v1')).taken.length;
-    check('覚える opens “どこに保存しますか？” and writes nothing yet', pending === 0 && (await page.locator('#take-chooser .take-always').count()) === 1, `${pending} rows`);
-    await page.fill('#take-new-list', '経済ニュース');
-    await page.keyboard.press('Enter');
-    await page.waitForSelector('[data-pick-list="経済ニュース"][aria-pressed="true"]');
-    await page.click('#take-save');
-    await page.waitForTimeout(250);
-    const saved = await ls('kairo-corridor-v1');
-    check('保存する writes the word and its new list together', saved.taken.some((t) => t.id === '金利') && (saved.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), JSON.stringify(Object.keys(saved.lists || {})));
+    await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
+      { description: 'one-tap sheet save' });
+    await page.waitForSelector('#sheet .list-picker .fold-head.open');
+    const saved = await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
+      { description: 'saved word record' });
+    check('one tap on 覚える saves the word and opens its lists, nothing more written yet',
+      saved.taken.length === 1 && Object.keys(saved.lists || {}).length === 0,
+      `${saved.taken.length} rows · lists ${Object.keys(saved.lists || {}).length}`);
+    // a list named in the drawer receives the word through the same guarded commit
+    await page.click('#sheet #new-list');
+    await page.fill('#sheet [id^="list-picker-name:"]', '経済ニュース');
+    await page.click('#sheet .list-maker-make');
+    const listed = await waitForAppRecord(page, (record) =>
+      (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
+    check('the new list receives the word, still one card', listed.taken.length === 1 &&
+      listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
     const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
-    check('the sheet then says where the word went', /覚えるの札|daily review/.test(where) && where.includes('経済ニュース'), where);
+    check('the sheet then says where the word went', where.includes('経済ニュース'), where);
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
   } finally {
     await browser.close();

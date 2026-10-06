@@ -4,15 +4,95 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 77,
-  "tokens": 41266
+  "articles": 126,
+  "tokens": 64925
  },
  "statusCounts": {
-  "lexicon-fixed": 303,
-  "accepted": 8
+  "lexicon-fixed": 368,
+  "accepted": 30
  },
  "openCount": 0,
  "rows": [
+  {
+   "article": "wikinews:1403",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "屋久",
+   "reading": "やく",
+   "status": "lexicon-fixed",
+   "context": "国内では、屋久島、白神山地に",
+   "note": "屋久島"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 103,
+   "rule": "override-site",
+   "surface": "島",
+   "reading": "しま",
+   "status": "lexicon-fixed",
+   "context": "内では、屋久島、白神山地につぐ",
+   "note": "屋久島"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 353,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "れている。（日本語版ウィキペディア「知床",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 354,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ている。（日本語版ウィキペディア「知床半島",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 426,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "に作成され、日本語版は同年7",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 427,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "作成され、日本語版は同年7月",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 567,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "されている。日本語版において",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 568,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "れている。日本語版においても",
+   "note": "日本語"
+  },
   {
    "article": "aozora:051034",
    "token": 42,
@@ -22,6 +102,26 @@
    "status": "lexicon-fixed",
    "context": "ました。ここは都から遠い、国境で",
    "note": "都"
+  },
+  {
+   "article": "bunki-graded-n5-morning",
+   "token": 139,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "昨日は分からなかった日本語の言葉を思い出し",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-morning",
+   "token": 140,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "は分からなかった日本語の言葉を思い出しまし",
+   "note": "日本語"
   },
   {
    "article": "real-gokajo",
@@ -54,6 +154,26 @@
    "note": "倦マザラシメン"
   },
   {
+   "article": "real-gokajo",
+   "token": 166,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "原文の表記は現代日本語と異なるが、",
+   "note": "日本語"
+  },
+  {
+   "article": "real-gokajo",
+   "token": 167,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "の表記は現代日本語と異なるが、近代",
+   "note": "日本語"
+  },
+  {
    "article": "real-hojoki",
    "token": 56,
    "rule": "override-site",
@@ -72,6 +192,106 @@
    "status": "lexicon-fixed",
    "context": "を並べ、甍を争へる、高き、卑",
    "note": "争ヘル"
+  },
+  {
+   "article": "bunki-graded-n5-kitchen",
+   "token": 19,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "は隣の部屋で日本語の本を読ん",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-kitchen",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "隣の部屋で日本語の本を読んで",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-neighbour",
+   "token": 41,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ませんでした。日本語が下手でした",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-neighbour",
+   "token": 42,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "んでした。日本語が下手でしたから",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n4-letter",
+   "token": 185,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ました。いつか日本語がもっと上手に",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n4-letter",
+   "token": 186,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "た。いつか日本語がもっと上手になっ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-radio",
+   "token": 0,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "日本語を聞く練習と",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-radio",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "日本語を聞く練習とし",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-translation",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "言葉に必ず出会う。日本語で言えば「",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-translation",
+   "token": 21,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "に必ず出会う。日本語で言えば「もったい",
+   "note": "日本語"
   },
   {
    "article": "bunki-graded-n3-zoka-sanjin-morning",
@@ -975,6 +1195,26 @@
   },
   {
    "article": "bunki-graded-n3-hashira-counter",
+   "token": 0,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "日本語では、物",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "日本語では、物に",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
    "token": 54,
    "rule": "override-site",
    "surface": "天之御中主",
@@ -1092,6 +1332,66 @@
    "status": "lexicon-fixed",
    "context": "、高御産巣日神、神産巣日神について「三",
    "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 484,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "は、古い用例や日本語史の研究が",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 485,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "、古い用例や日本語史の研究が必要",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 601,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "助数詞として日本語に定着して",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 602,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "数詞として日本語に定着している",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 665,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "考えることが、古い日本語を丁寧に学ぶ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 666,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ことが、古い日本語を丁寧に学ぶ方法",
+   "note": "日本語"
   },
   {
    "article": "bunki-graded-n3-feel-jingu-forest",
@@ -1252,6 +1552,46 @@
    "status": "lexicon-fixed",
    "context": "始まったか、造化三神が何をした",
    "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 3,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "これは、日本語を学ぶミナを",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 4,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "これは、日本語を学ぶミナを主人",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 168,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "考えなかった。新しい日本語の文を練習",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 169,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "なかった。新しい日本語の文を練習し",
+   "note": "日本語"
   },
   {
    "article": "bunki-essay-n2-zoka-as-one",
@@ -2082,6 +2422,26 @@
    "status": "lexicon-fixed",
    "context": "が展開され、誦習がどのような行為",
    "note": "誦習"
+  },
+  {
+   "article": "bunki-essay-n2-thanks-first",
+   "token": 8,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ある場面では、日本語で「すみませ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-thanks-first",
+   "token": 9,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "場面では、日本語で「すみません",
+   "note": "日本語"
   },
   {
    "article": "bunki-essay-n1-cosmic-analogy",
@@ -3122,6 +3482,516 @@
    "status": "accepted",
    "context": "月13日に東京都永田町にある党本部",
    "note": "東京都"
+  },
+  {
+   "article": "env:press-press_05585",
+   "token": 434,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "、申請により、都道府県知事・",
+   "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_05584",
+   "token": 7,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "等促進法に基づき都道府県知事等",
+   "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_05584",
+   "token": 675,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "に、申請に基づき都道府県知事・",
+   "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_05582",
+   "token": 179,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "22階）（東京都千代田区霞が関１－",
+   "note": "東京都"
+  },
+  {
+   "article": "mhlw:stf-newpage_76100",
+   "token": 171,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "第１項に基づき都道府県・保健",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 133,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "主催厚生労働省、都道府県及び市",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 216,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "ます。（２）都道府県及び市",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 262,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "２の行事が各都道府県及び市",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 337,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "の取組のみ（各都道府県の取組",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76330",
+   "token": 125,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "年10月に各都道府県に対し",
+   "note": "都道府県"
+  },
+  {
+   "article": "mext:b_menu-houdou-mext_01683",
+   "token": 108,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "場として、都道府県教育委員",
+   "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 362,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "市ヶ谷(住所：東京都新宿区市谷本村町",
+   "note": "東京都"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 544,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "作成のほか、各都道府県、市",
+   "note": "都道府県"
+  },
+  {
+   "article": "jawiki:3492442",
+   "token": 31,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "および名古屋市・東京都において2026年",
+   "note": "東京都"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 75,
+   "rule": "override-site",
+   "surface": "自",
+   "reading": "じ",
+   "status": "lexicon-fixed",
+   "context": "とする連立内閣（自維連立政権）で",
+   "note": "自維連立"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 76,
+   "rule": "override-site",
+   "surface": "維連",
+   "reading": "いれん",
+   "status": "lexicon-fixed",
+   "context": "する連立内閣（自維連立政権）で、",
+   "note": "自維連立"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 77,
+   "rule": "override-site",
+   "surface": "立",
+   "reading": "りつ",
+   "status": "lexicon-fixed",
+   "context": "連立内閣（自維連立政権）で、初めて",
+   "note": "自維連立"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
+   "token": 250,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "師会をはじめ、都道府県や地方",
+   "note": "都道府県"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 85,
+   "rule": "override-site",
+   "surface": "習近",
+   "reading": "しゅうきん",
+   "status": "lexicon-fixed",
+   "context": "国最高指導者の習近平（総書記）",
+   "note": "習近平"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 86,
+   "rule": "override-site",
+   "surface": "平",
+   "reading": "ぺい",
+   "status": "lexicon-fixed",
+   "context": "最高指導者の習近平（総書記）と",
+   "note": "習近平"
+  },
+  {
+   "article": "adapt-n3:jawiki:3492442",
+   "token": 28,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "名古屋市です。東京都など、愛知県の",
+   "note": "東京都"
+  },
+  {
+   "article": "mhlw:stf-newpage_76126",
+   "token": 573,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "HALL&CONFERENCE（東京都中央区日本橋兜町7",
+   "note": "東京都"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 358,
+   "rule": "override-site",
+   "surface": "建",
+   "reading": "けん",
+   "status": "lexicon-fixed",
+   "context": "退職金共済制度（建退共）」、",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 359,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "金共済制度（建退共）」、「",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 360,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "共済制度（建退共）」、「清酒",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 373,
+   "rule": "override-site",
+   "surface": "清",
+   "reading": "せい",
+   "status": "lexicon-fixed",
+   "context": "退職金共済制度（清退共）」、",
+   "note": "清退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 374,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "金共済制度（清退共）」、「",
+   "note": "清退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 375,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "共済制度（清退共）」、「林業",
+   "note": "清退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 386,
+   "rule": "override-site",
+   "surface": "林",
+   "reading": "りん",
+   "status": "lexicon-fixed",
+   "context": "退職金共済制度（林退共）」が",
+   "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 387,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "金共済制度（林退共）」があり",
+   "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 388,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "共済制度（林退共）」があります",
+   "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 501,
+   "rule": "override-site",
+   "surface": "建",
+   "reading": "けん",
+   "status": "lexicon-fixed",
+   "context": "配布など中退共、建退共、清退",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 502,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "など中退共、建退共、清退共",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 503,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "中退共、建退共、清退共、",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 505,
+   "rule": "override-site",
+   "surface": "清",
+   "reading": "せい",
+   "status": "lexicon-fixed",
+   "context": "、建退共、清退共、林退",
+   "note": "清退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 506,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "建退共、清退共、林退共",
+   "note": "清退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 507,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "退共、清退共、林退共の",
+   "note": "清退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 509,
+   "rule": "override-site",
+   "surface": "林",
+   "reading": "りん",
+   "status": "lexicon-fixed",
+   "context": "、清退共、林退共の各制度",
+   "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 510,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "清退共、林退共の各制度の",
+   "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 511,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "退共、林退共の各制度のポスター",
+   "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 649,
+   "rule": "override-site",
+   "surface": "建",
+   "reading": "けん",
+   "status": "lexicon-fixed",
+   "context": "要請をします。建退共に加入し",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 650,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "をします。建退共に加入して",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 651,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "します。建退共に加入している",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 661,
+   "rule": "override-site",
+   "surface": "建",
+   "reading": "けん",
+   "status": "lexicon-fixed",
+   "context": "いることを示す「建退共現場標識」",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 662,
+   "rule": "override-site",
+   "surface": "退",
+   "reading": "たい",
+   "status": "lexicon-fixed",
+   "context": "ことを示す「建退共現場標識」の",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 663,
+   "rule": "override-site",
+   "surface": "共",
+   "reading": "きょう",
+   "status": "lexicon-fixed",
+   "context": "を示す「建退共現場標識」の掲示",
+   "note": "建退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 250,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "労働省では、都道府県労働局",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 263,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "る周知・広報、都道府県に対する",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 680,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "２）厚生労働省都道府県労働局",
+   "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 699,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "を実施します。都道府県に対し",
+   "note": "都道府県"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+   "token": 88,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "上決定する。・都道府県・公益",
+   "note": "都道府県"
   }
  ]
 }

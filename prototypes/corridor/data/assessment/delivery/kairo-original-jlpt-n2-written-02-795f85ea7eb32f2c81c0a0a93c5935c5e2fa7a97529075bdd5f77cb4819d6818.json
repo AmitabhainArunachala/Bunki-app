@@ -1,0 +1,413 @@
+{
+  "schema": "kairo-assessment-bank-delivery/1",
+  "form": {
+    "kind": "form",
+    "id": "kairo-original-jlpt-n2-written-02:written-review",
+    "revisionId": "assessment-form:b20e2a1848d1d4640615d086be2990a069cde6d8f52bc46fb55e8473741675ab",
+    "sha256": "b20e2a1848d1d4640615d086be2990a069cde6d8f52bc46fb55e8473741675ab"
+  },
+  "assets": [],
+  "units": [],
+  "itemChecks": [
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q01",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q02",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q03",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q04",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q05",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q06",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q07",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q08",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q09",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q10",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q11",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q12",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q13",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q14",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q15",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q16",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q17",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q18",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q19",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q20",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q21",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q22",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q23",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q24",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q25",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q26",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q27",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q28",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q29",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q30",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q31",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q32",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q33",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q34",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q35",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q36",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q37",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q38",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q39",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-02:q40",
+      "author": "anthropic-claude",
+      "verifiers": [
+        "GLM",
+        "Kimi",
+        "DeepSeek"
+      ],
+      "agreed": 3
+    }
+  ]
+}

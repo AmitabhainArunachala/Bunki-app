@@ -359,7 +359,10 @@ def main() -> int:
         radical_names[glyph] = entry
         radical_names.setdefault(plain, entry)
 
-    # words: the full wbig lexicon, so word->kanji->word never dead-ends
+    # wbig's glosses are capped at 32 characters and the cut lands MID-WORD — completed
+    # from the same-pool dictionaries by gloss_heal (PR #77 f7cd297c, extended 2026-09-28)
+    import gloss_heal
+
     words: dict[str, dict] = {}
     for entry in wbig:
         word, reading, gloss, level = entry[0], entry[1], entry[2], entry[3]
@@ -373,6 +376,8 @@ def main() -> int:
                 "k": sorted({c for c in word if c in KINFO}),
             },
         )
+    healed = gloss_heal.heal_words(words, CORRIDOR / "data/share_alike")
+    print(f"· glosses completed from the full dictionary: {healed}")
 
     # every word that appears as a content token in the shelf, even if wbig
     # does not carry it — the reader must never open an empty panel
