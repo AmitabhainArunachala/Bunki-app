@@ -487,7 +487,6 @@ export async function executeShard({
       assert(gate, 'Unknown gate');
       return gateForShard(gate, shard, artifactEnv);
     });
-    for (const gate of selected) mkdirSync(gate.env.KAIRO_EVIDENCE_DIR, { recursive: true });
     const battery = await runGates({
       gates: selected,
       signal,
@@ -584,6 +583,29 @@ export function admitReceipt(plan, receipt, shard, attempt, artifact, expected =
   );
   return receipt;
 }
+function retryShardFor(shard, first) {
+  const failed = first.gates.filter((g) => g.status !== 'passed').map((g) => g.name);
+  if (!failed.length) return null;
+  const retryShard = { ...shard, gates: failed };
+  if (failed.includes('e2e') && !failed.includes('e2e-build')) {
+    assert.match(
+      first.dependencies?.e2eBuild?.sha256 || '',
+      /^[a-f0-9]{64}$/,
+      'E2E retry requires the passed build digest',
+    );
+    retryShard.dependencies = { e2eBuild: first.dependencies.e2eBuild };
+  }
+  return retryShard;
+}
+function admitRetry(plan, shard, one, two, jobs, artifact, retryShard) {
+  admitReceipt(plan, two, shard, 2, artifact, retryShard.gates);
+  if (retryShard.dependencies)
+    equal(two.dependencies, retryShard.dependencies, 'Retry dependency identity changed');
+  assert.notEqual(one.jobId, two.jobId, 'Retry requires a new job');
+  assert.notEqual(one.runner, two.runner, 'Retry requires a fresh runner');
+  requireJob(jobs, `retry / ${shard.id}`, plan.identity, two, two.status === 'failed');
+  return two;
+}
 export function phaseShards(plan, phase = 'all') {
   assert(['fast', 'battery', 'all'].includes(phase), 'Unknown execution phase');
   return phase === 'all' ? plan.shards : plan.shards.filter((s) => s.kind === phase);
@@ -605,19 +627,8 @@ export function createRetryPlan(plan, receipts, artifact, jobs, phase = 'all') {
     assert(row, 'Missing first-attempt shard');
     admitReceipt(plan, row, shard, 1, artifact);
     if (jobs) requireJob(jobs, `battery / ${shard.id}`, plan.identity, row);
-    const failed = row.gates.filter((g) => g.status !== 'passed').map((g) => g.name);
-    if (failed.length) {
-      const retryShard = { ...shard, gates: failed };
-      if (failed.includes('e2e') && !failed.includes('e2e-build')) {
-        assert.match(
-          row.dependencies?.e2eBuild?.sha256 || '',
-          /^[a-f0-9]{64}$/,
-          'E2E retry requires the passed build digest',
-        );
-        retryShard.dependencies = { e2eBuild: row.dependencies.e2eBuild };
-      }
-      shards.push(retryShard);
-    }
+    const retryShard = retryShardFor(shard, row);
+    if (retryShard) shards.push(retryShard);
   }
   const retry = {
     schemaVersion: 1,
@@ -749,12 +760,7 @@ export function aggregate({
     if (retryShard) {
       two = second.find((r) => r.shardId === shard.id);
       assert(two);
-      admitReceipt(plan, two, shard, 2, artifact, retryShard.gates);
-      if (retryShard.dependencies)
-        equal(two.dependencies, retryShard.dependencies, 'Retry dependency identity changed');
-      assert.notEqual(one.jobId, two.jobId, 'Retry requires a new job');
-      assert.notEqual(one.runner, two.runner, 'Retry requires a fresh runner');
-      requireJob(jobs, `retry / ${shard.id}`, plan.identity, two);
+      admitRetry(plan, shard, one, two, jobs, artifact, retryShard);
       expectedJobs.push(`retry / ${shard.id}`);
     }
     for (const original of one.gates) {
@@ -857,68 +863,131 @@ export function summary(receipt) {
     lines.push(`- ${row.name}: ${row.seconds.toFixed(2)}s (${row.shard})`);
   return lines.join('\n') + '\n';
 }
-export function failureSummary({ plan, receipts = [], jobs = [], error, phase = 'all' }) {
+/** Labels each gate from both attempts; FLAKY and FAILED TWICE need an admitted pair. */
+function diagnoseShard({ plan, shard, receipts, jobs, artifact }) {
+  const observe = (attempt, admit) => {
+    const name = `${attempt === 1 ? 'battery' : 'retry'} / ${shard.id}`;
+    const found = receipts.filter((r) => r.shardId === shard.id && r.attempt === attempt);
+    const hosted = jobs.filter((j) => j.name === name);
+    const job = hosted.length === 1 ? hosted[0] : undefined;
+    const receipt = found[0];
+    const side = {
+      receipt,
+      jobId: job?.id ?? receipt?.jobId,
+      runner: receipt?.runner ?? job?.runner_name,
+    };
+    if (job?.conclusion === 'cancelled' || receipt?.status === 'interrupted')
+      return { ...side, verdict: 'cancelled' };
+    if (!receipt)
+      return { ...side, verdict: job?.conclusion === 'skipped' ? 'skipped' : 'missing' };
+    try {
+      assert.equal(found.length, 1, 'Duplicate shard receipt');
+      admit(receipt);
+      return { ...side, verdict: 'trusted' };
+    } catch (error) {
+      return { ...side, verdict: 'unverified', reason: `${name}: ${error.message}` };
+    }
+  };
+  const first = observe(1, (receipt) => {
+    assert(artifact, 'Artifact metadata missing');
+    validateArtifact(artifact, plan.identity);
+    admitReceipt(plan, receipt, shard, 1, artifact);
+    requireJob(jobs, `battery / ${shard.id}`, plan.identity, receipt);
+  });
+  const second = observe(2, (receipt) => {
+    assert.equal(first.verdict, 'trusted', 'Retry pairs only with an admitted first attempt');
+    const retryShard = retryShardFor(shard, first.receipt);
+    assert(retryShard, 'Retry without a first-attempt failure');
+    admitRetry(plan, shard, first.receipt, receipt, jobs, artifact, retryShard);
+  });
+  const seconds = (gate) => {
+    const value = (Date.parse(gate?.completedAt) - Date.parse(gate?.startedAt)) / 1000;
+    return Number.isFinite(value) ? Math.max(0, value) : null;
+  };
+  const view = (side, gate) => ({
+    status: gate?.status ?? side.verdict,
+    seconds: seconds(gate),
+    jobId: side.jobId,
+    runner: side.runner,
+  });
+  const rows = shard.gates.map((name) => {
+    const initial = first.receipt?.gates.find((g) => g?.name === name),
+      retry = second.receipt?.gates.find((g) => g?.name === name);
+    const status =
+      first.verdict !== 'trusted'
+        ? first.verdict
+        : initial.status === 'passed'
+          ? 'passed'
+          : second.verdict !== 'trusted'
+            ? second.verdict
+            : retry.status === 'passed'
+              ? 'flaky'
+              : 'failed twice';
+    const awaited = first.verdict === 'trusted' && initial.status !== 'passed';
+    return {
+      name,
+      shard: shard.id,
+      status,
+      first: view(first, initial),
+      retry: retry || awaited ? view(second, retry) : null,
+    };
+  });
+  return { rows, notes: [first.reason, second.reason].filter(Boolean) };
+}
+export function failureSummary({ plan, receipts = [], jobs = [], artifact, error, phase = 'all' }) {
   const safe = (value) =>
     String(value ?? '')
       .replaceAll('|', '/')
       .replaceAll('\n', ' ');
-  const rows = [];
   jobs = normalizeJobs(
     Array.isArray(jobs) ? jobs.filter((j) => j && typeof j.name === 'string') : [],
   );
   receipts = Array.isArray(receipts) ? receipts.filter((r) => r && Array.isArray(r.gates)) : [];
+  const rows = [],
+    notes = [];
   for (const shard of phaseShards(plan, phase)) {
-    const one = receipts.find((r) => r.shardId === shard.id && r.attempt === 1),
-      two = receipts.find((r) => r.shardId === shard.id && r.attempt === 2);
-    const job = jobs.find((j) => j.name === `battery / ${shard.id}`);
-    for (const name of shard.gates) {
-      const initial = one?.gates?.find((g) => g.name === name),
-        retry = two?.gates?.find((g) => g.name === name);
-      const seconds = (g) =>
-        g && Number.isFinite(Date.parse(g.completedAt) - Date.parse(g.startedAt))
-          ? Math.max(0, (Date.parse(g.completedAt) - Date.parse(g.startedAt)) / 1000)
-          : null;
-      rows.push({
-        name,
-        shard: shard.id,
-        seconds: seconds(initial),
-        retrySeconds: seconds(retry),
-        status: initial
-          ? `reported ${initial.status}`
-          : job?.conclusion === 'cancelled'
-            ? 'cancelled'
-            : job?.conclusion === 'skipped'
-              ? 'skipped'
-              : 'missing',
-        jobId: two?.jobId || one?.jobId,
-      });
-    }
+    const diagnosis = diagnoseShard({ plan, shard, receipts, jobs, artifact });
+    rows.push(...diagnosis.rows);
+    notes.push(...diagnosis.notes);
   }
+  const link = (label, attempt) =>
+    attempt?.jobId
+      ? `[${label}](https://github.com/${plan.identity.repository}/actions/runs/${plan.identity.runId}/job/${safe(attempt.jobId)})`
+      : null;
+  const cell = (attempt) =>
+    attempt ? `${safe(attempt.status)}${attempt.runner ? ` (${safe(attempt.runner)})` : ''}` : '—';
   const lines = [
     '# Bunki CI — failed',
     '',
     `Admission rejected: ${safe(error.message)}`,
     '',
-    'Rows below are diagnostic observations; admission failed.',
+    'Rows below are diagnostic observations; admission failed. FLAKY and FAILED TWICE require an admitted first-attempt and fresh-runner retry pair; unproven evidence is UNVERIFIED.',
     '',
-    '| gate | shard | seconds | result | retry seconds | evidence |',
-    '| --- | --- | ---: | --- | ---: | --- |',
+    '| gate | shard | result | first attempt | seconds | retry | retry seconds | evidence |',
+    '| --- | --- | --- | --- | ---: | --- | ---: | --- |',
   ];
   for (const row of rows)
     lines.push(
-      `| ${safe(row.name)} | ${safe(row.shard)} | ${row.seconds?.toFixed(2) || '—'} | ${safe(row.status).toUpperCase()} | ${row.retrySeconds?.toFixed(2) || '—'} | ${row.jobId ? `[job](https://github.com/${plan.identity.repository}/actions/runs/${plan.identity.runId}/job/${safe(row.jobId)})` : 'missing'} |`,
+      `| ${safe(row.name)} | ${safe(row.shard)} | ${safe(row.status).toUpperCase()} | ${cell(row.first)} | ${row.first.seconds?.toFixed(2) || '—'} | ${cell(row.retry)} | ${row.retry?.seconds?.toFixed(2) || '—'} | ${[link('first', row.first), link('retry', row.retry)].filter(Boolean).join(' · ') || 'missing'} |`,
     );
+  const counts = {};
+  for (const row of rows) counts[row.status] = (counts[row.status] || 0) + 1;
   lines.push(
     '',
-    `Observed total gate execution: ${rows.reduce((s, g) => s + (g.seconds || 0) + (g.retrySeconds || 0), 0).toFixed(2)} seconds.`,
+    `Results: ${Object.entries(counts)
+      .map(([status, count]) => `${count} ${status}`)
+      .join(', ')}.`,
     '',
-    'Slowest ten observed gates:',
+    `Observed total gate execution: ${rows.reduce((s, g) => s + (g.first.seconds || 0) + (g.retry?.seconds || 0), 0).toFixed(2)} seconds.`,
   );
+  if (notes.length)
+    lines.push('', 'Unverified evidence:', ...[...new Set(notes)].map((note) => `- ${safe(note)}`));
+  lines.push('', 'Slowest ten observed gates:');
   for (const row of rows
-    .filter((r) => r.seconds !== null)
-    .sort((a, b) => b.seconds - a.seconds)
+    .filter((r) => r.first.seconds !== null)
+    .sort((a, b) => b.first.seconds - a.first.seconds)
     .slice(0, 10))
-    lines.push(`- ${row.name}: ${row.seconds.toFixed(2)}s (${row.shard})`);
+    lines.push(`- ${row.name}: ${row.first.seconds.toFixed(2)}s (${row.shard})`);
   return lines.join('\n') + '\n';
 }
 export function loadReceipts(dir) {
@@ -1068,6 +1137,12 @@ export async function main(args = process.argv.slice(2)) {
       } catch {
         /* Missing or invalid evidence remains a diagnostic absence. */
       }
+      let artifact;
+      try {
+        artifact = read(o.artifact);
+      } catch {
+        /* Missing or invalid evidence remains a diagnostic absence. */
+      }
       let diagnosticPlan;
       try {
         diagnosticPlan = read(o.plan);
@@ -1079,6 +1154,7 @@ export async function main(args = process.argv.slice(2)) {
         plan: diagnosticPlan,
         receipts,
         jobs,
+        artifact,
         error,
         phase: o.phase || 'all',
       });
