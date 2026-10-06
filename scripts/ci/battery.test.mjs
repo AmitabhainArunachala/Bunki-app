@@ -149,7 +149,7 @@ function withRetry() {
 test('measured deterministic partition covers every original and supplemental gate once', () => {
   const f = fixture();
   assert.equal(f.plan.batteryNames.length, 135);
-  assert.equal(f.plan.requiredNames.length, 149);
+  assert.equal(f.plan.requiredNames.length, 150);
   assert.equal(f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length, 10);
   assert.deepEqual(createPlan({ identity }), f.plan);
   for (const s of f.plan.shards.filter((s) => s.kind === 'fast')) assert(s.predictedSeconds <= 480);
@@ -175,7 +175,7 @@ test('complete successful evidence promotes full proof and unified summary', () 
   const f = fixture();
   const result = aggregate(f);
   assert.equal(result.kind, 'bunki-full-battery');
-  assert.equal(result.gates.length, 149);
+  assert.equal(result.gates.length, 150);
   assert.match(summary(result), /Slowest ten/);
 });
 const mutations = {

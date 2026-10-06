@@ -185,6 +185,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.fast-matrix) }}
     env:
+      CI_PROBE_ATTEMPT: '1'
       GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
     steps:
@@ -303,6 +304,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.fast-retry-plan.outputs.matrix) }}
     env:
+      CI_PROBE_ATTEMPT: '2'
       GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
     steps:

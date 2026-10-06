@@ -39,6 +39,7 @@ const exact = (a, b, message) => {
   equal([...names(a)].sort(), [...names(b)].sort(), message);
 };
 const FAST = new Set([
+  'ci-flake-probe',
   'format-check',
   'official-content-guard',
   'lint',

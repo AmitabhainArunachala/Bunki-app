@@ -12,6 +12,7 @@ export function supplementalGates(out) {
     env: { KAIRO_EVIDENCE_DIR: join(out, name), ...env },
   });
   return [
+    node('ci-flake-probe', 'scripts/ci/flake-probe.mjs'),
     {
       name: 'ci-contracts',
       command: process.execPath,
