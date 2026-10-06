@@ -1054,6 +1054,26 @@ unchanged: only deck outputs changed, and `decks/` is served network-first (A48)
 §5 asks three to four passages per word across registers; two lanes kept the five checks
 independent at 1,212 passages.
 
+**A51 → S26, S39, S52 (the consolidation fold merged, 2026-10-06; amends A43, A44, A48).** Replaces
+A44's "Then comes the reader's 覚える chooser (どこに保存しますか？, 覚えるの札 always, named lists, a
+new list, nothing saved until 保存する)" with: "Then comes 覚える, the corridor's one save path: one
+tap writes the word to 覚えるの札, the shared review pool, through the corridor's `toggleWordSave`
+(the save bound to the dictionary visit, with its Saved toast and 元に戻す). Nothing is asked
+first. Once saved, リストに追加… opens the corridor's own list popover; a list is optional." The
+host adapter (A43) loses `lists()` and the list argument of `take()`: `take(entry)` resolves
+true once the row is written, and an optional `addToList(entry, invoker)` opens the popover. A
+row already held for the identity is never written twice or toggled off from a deck card. The
+save carries no deck provenance: the corridor's capture accepts a source only as a teacher
+context (a bundled passage, a source capture, a publisher reading, an assessment item), and a
+deck card is none of these. A tap stays capture, never evidence (A44). Replaces A48's `VERSION`:
+the worker's cache is the fold's release stamp (`kairo-<SHA-256>` written by the site build, a
+manual `kairo-v10-dev` fallback for unstaged installs, bumped from v9 because the merged SHELL
+gained the player's host and tokens); the player's files, `host.js` and both `tokens.json` files
+are in its SHELL and in the release's required assets (`scripts/corridor-assets.mjs`). Held by `tools/kotoba-player-host.test.mjs` and
+verify-kotoba-mine (tap → 覚える → the word in the durable record's 覚えるの札, no chooser, the
+toast with 元に戻す, the popover on top). Why: the handoff agreement of 2026-10-05, "one player,
+one save path"; the fold retired the pre-save chooser.
+
 The Phase 2 run (2026-10-04) is recorded in A37–A45. Read default and the 字 skip: A37. Hint
 retirement: A26 and A37. Reset re-scoped to 削除 and 復元: A42. Source fold with its licence: A27.
 Bar reserve and the settling scroll: A39. 焦点 groups and the ⋯ gutter: A38. Tokens side file,

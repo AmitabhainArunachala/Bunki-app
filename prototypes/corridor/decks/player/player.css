@@ -324,22 +324,9 @@
 .kp-sheet-stop { margin: 0; font-size: 13px; color: var(--kp-mute); letter-spacing: 0.08em; }
 .kp-sheet-indeck, .kp-sheet-taken, .kp-sheet-note { margin: 0; font-size: 15px; color: var(--kp-ink-2); padding: 10px 12px; border: 1px solid var(--kp-line); border-radius: 12px; background: var(--kp-panel-2); }
 .kp-sheet-full { justify-self: start; min-height: 44px; }
+.kp-take-list { min-height: 44px; margin-top: 6px; }
+.kp-take-note { margin: 6px 0 0; font-size: 12px; color: var(--kp-ink-2); }
 .kp-take { min-height: 48px; width: 100%; border-radius: 14px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 16px; font-weight: 700; }
-.kp-chooser { display: grid; gap: 10px; border: 1px solid var(--kp-line); border-radius: 14px; padding: 12px; background: var(--kp-panel-2); }
-.kp-chooser-q { margin: 0; font-size: 15px; font-weight: 700; }
-.kp-chooser-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.kp-pick { min-height: 44px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); padding: 4px 12px; display: grid; justify-items: start; align-content: center; text-align: left; }
-.kp-pick b { font-size: 14px; }
-.kp-pick small { font-size: 11px; color: var(--kp-ink-2); }
-.kp-pick.is-on { border-color: var(--kp-cyan); }
-.kp-pick.is-on b { color: var(--kp-cyan); }
-.kp-pick:disabled { cursor: default; opacity: 1; }
-.kp-chooser-new { display: flex; gap: 8px; flex: 1 1 100%; }
-.kp-chooser-field { flex: 1; min-width: 0; min-height: 44px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: 15px; padding: 0 12px; }
-.kp-chooser-field::placeholder { color: var(--kp-mute); }
-.kp-chooser-note { margin: 0; font-size: 12px; color: var(--kp-ink-2); }
-.kp-chooser-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-.kp-chooser-actions .kp-take-cancel { place-content: center; }
 /* the popover (no host: the standalone study pages) */
 .kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
