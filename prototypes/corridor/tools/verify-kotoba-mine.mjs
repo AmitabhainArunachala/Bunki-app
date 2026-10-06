@@ -1,5 +1,5 @@
 /**
- * 言葉の鉱脈 deck + 覚える save-chooser verifier. Done = this is green.
+ * 言葉の鉱脈 deck + 覚える one-tap save verifier. Done = this is green.
  *
  * Half one reads the shipped deck as DATA: 323 words, each with one or more
  * passages (written for the deck to contract v2 first, then mined from real
@@ -13,8 +13,9 @@
  *     meaning and source, and a grade lands in
  *     the deck's own ledger (bunki-cloze:kotoba-mine), never the word queue;
  *   · the ledger survives a reload; the 4-choice mode answers in one tap;
- *   · 覚える asks where to save: nothing is written until 保存する, and a new
- *     list named in the chooser receives the word in the same commit.
+ *   · 覚える is one tap (the reader's save path): the word is written at once,
+ *     the list drawer opens with it, and a list named there receives the word
+ *     through the same guarded commit.
  *
  * Then the grade path: when storage refuses a write the card stays and the
  * ledger is untouched; a learning step that comes due while a card is open
@@ -127,17 +128,23 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AxeBuilder } from '@axe-core/playwright';
 import { chromium } from 'playwright-core';
+import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 import { contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+// The battery's law: verify the built artifact, not the source tree. Deck sources, the release
+// folder and the build tools live in the repository, outside the built site.
+const CORRIDOR_DIR = resolveCorridorSite();
+const SOURCE_CORRIDOR_DIR = resolve(TOOL_DIR, '..');
+const REPO_DIR = resolve(TOOL_DIR, '../../..');
 const DATA_DIR = resolve(CORRIDOR_DIR, 'data');
 const DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mcd/deck.json');
 const SENTENCE_DECK_PATH = resolve(CORRIDOR_DIR, 'decks/kotoba-mine/deck.json');
-const IDS_PATH = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/source/ids.json');
-const PILOT_PATH = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/source/mcd/pilot-2026-10-04.json');
-const RUBY_FIXTURES_PATH = resolve(CORRIDOR_DIR, '../../tools/kotoba-deck-ruby.fixtures.json');
+const IDS_PATH = resolve(REPO_DIR, 'decks/kotoba-mine/source/ids.json');
+const PILOT_PATH = resolve(REPO_DIR, 'decks/kotoba-mine/source/mcd/pilot-2026-10-04.json');
+const RUBY_FIXTURES_PATH = resolve(REPO_DIR, 'tools/kotoba-deck-ruby.fixtures.json');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -581,8 +588,8 @@ function verifyBackData(decks) {
 
 /** the standalone study pages and the Anki templates keep parity with the player's front and back */
 function verifyBackParity() {
-  const tools = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/tools');
-  const release = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release');
+  const tools = resolve(REPO_DIR, 'decks/kotoba-mine/tools');
+  const release = resolve(REPO_DIR, 'decks/kotoba-mine/release');
   const bad = [];
   for (const dir of ['anki', 'anki-sentence']) {
     const front = readFileSync(resolve(tools, dir, 'front.html'), 'utf8');
@@ -707,7 +714,7 @@ async function verifyHost(browser, base) {
   } finally {
     await context.close();
   }
-  const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
+  const release = await startServer(resolve(REPO_DIR, 'decks/kotoba-mine/release'));
   const seen = [];
   try {
     for (const page of ['study-mcd.html', 'study.html']) {
@@ -724,7 +731,7 @@ async function verifyHost(browser, base) {
   } finally {
     release.server.close();
   }
-  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release', f), 'utf8'));
+  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(REPO_DIR, 'decks/kotoba-mine/release', f), 'utf8'));
   check(
     'host: the standalone study pages mount with a null adapter (data-host none), bundle no host.js and no tokens, and fetch none',
     seen.every((x) => x.host === 'none' && x.tokens === 0) && html.every((t) => !t.includes('createHost') && !t.includes('bunki-cloze-tokens","version') && !/"tokens":"tokens/.test(t) && t.includes('function hostAdapter')),
@@ -1085,7 +1092,7 @@ async function verifyTap(browser, base) {
   }
 
   // 2. the standalone study pages: furigana, this deck's words only, a popover with no 覚える
-  const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
+  const release = await startServer(resolve(REPO_DIR, 'decks/kotoba-mine/release'));
   try {
     const seen = [];
     // a due card whose passage names another word of the deck: 返済 in km-109-m01 (金利), km-114-1 (元金)
@@ -1129,10 +1136,10 @@ async function verifyTap(browser, base) {
   } finally {
     release.server.close();
   }
-  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release', f), 'utf8'));
+  const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(REPO_DIR, 'decks/kotoba-mine/release', f), 'utf8'));
   check('tap: the study pages carry the gloss map of their own deck (bunki-cloze-gloss) and still no tokens', html.every((t) => t.includes('"format":"bunki-cloze-gloss"') && !t.includes('bunki-cloze-tokens","version') && t.includes('function drawPop') && t.includes('ここで止めよう')), '');
   // 3. Anki: no tap-to-define, nothing added
-  const anki = ['anki/front.html', 'anki/back.html', 'anki-sentence/front.html', 'anki-sentence/back.html'].map((f) => resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/tools', f)).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
+  const anki = ['anki/front.html', 'anki/back.html', 'anki-sentence/front.html', 'anki-sentence/back.html'].map((f) => resolve(REPO_DIR, 'decks/kotoba-mine/tools', f)).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
   check('tap: the Anki templates add nothing for it (no tap-to-define in Anki: furigana only, STANDARD A44)', anki.length >= 2 && anki.every((t) => !/kp-tok|kp-sheet|kp-pop|tap-to-define|onclick/.test(t)), `${anki.length} templates`);
 }
 
@@ -1457,7 +1464,7 @@ async function verifyBack(browser, base) {
   // long contract-v2 one since A49: there the word and definition win the scroll (A39), so the
   // top bar may leave the screen; a short passage (km-064-m01, due) keeps it.
   {
-    const release = await startServer(resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release'));
+    const release = await startServer(resolve(REPO_DIR, 'decks/kotoba-mine/release'));
     const seen = [];
     try {
       for (const [page, deck, state, short] of [
@@ -1701,7 +1708,7 @@ async function verifyReviewData(decks) {
     }
   check('c) each kanji of a word carries its reading in that word (kanji[].r, from the kanji table, never guessed): kana only, and together they spell an all-kanji word', bad.length === 0 && n / all > 0.9, bad.slice(0, 3).join(' | ') || `${n / decks.length}/${all / decks.length} kanji per deck`);
   // the Anki back: the same family, over the words before this one in deck order (Anki's new-card order)
-  const release = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/release');
+  const release = resolve(REPO_DIR, 'decks/kotoba-mine/release');
   const wrong = [];
   let rows = 0;
   for (const d of decks) {
@@ -2026,7 +2033,7 @@ async function verifyReview(browser, base) {
 }
 
 /* ------------------------- the visual system (CARD_CONTRACT_V2 §9, aesthetics.md) */
-const WBIG_PATH = resolve(CORRIDOR_DIR, '../drift/data/wbig.json');
+const WBIG_PATH = resolve(SOURCE_CORRIDOR_DIR, '../drift/data/wbig.json');
 /** the colours the card actually paints, next to the theme tokens they must equal */
 const PAINT = `(() => {
   const card = document.getElementById('kp-card');
@@ -2218,7 +2225,7 @@ async function verifyVisual(browser, base) {
 
   // b) Anki: the level chip comes from the note's level::Nx tag through {{Tags}}; a note without the tag shows none
   {
-    const tools = resolve(CORRIDOR_DIR, '../../decks/kotoba-mine/tools');
+    const tools = resolve(REPO_DIR, 'decks/kotoba-mine/tools');
     const seen = [];
     for (const dir of ['anki', 'anki-sentence']) {
       const css = readFileSync(resolve(tools, dir, 'style.css'), 'utf8');
@@ -2362,7 +2369,7 @@ async function main() {
     await page.click('.nav-dojo');
     await page.waitForSelector('[data-deck="kotoba-mine"]', { timeout: 8000 });
     const rows = await page.evaluate(`[...document.querySelectorAll('.dojo-deck')].map((b) => b.dataset.deck)`);
-    check('集中道場 opens with the deck list: 言葉の鉱脈・MCD then ・文, with 文脈札 and the saved-word queue', rows.indexOf('kotoba-mcd') >= 0 && rows.indexOf('kotoba-mine') === rows.indexOf('kotoba-mcd') + 1 && rows.includes('context') && rows.includes('mine'), rows.join(', '));
+    check('集中道場 opens with the deck list: 私の文脈, then 言葉の鉱脈・MCD and ・文 side by side, 文脈札, and the saved-word queue', rows[0] === 'personal' && rows[1] === 'kotoba-mcd' && rows[2] === 'kotoba-mine' && rows.includes('context') && rows.includes('mine'), rows.join(', '));
 
     await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
@@ -2377,10 +2384,10 @@ async function main() {
     await page.waitForSelector('#kp-grade-good');
     const back = await page.evaluate(`({ rt: document.querySelectorAll('#kp-card rt').length, target: !!document.querySelector('#kp-card .kp-target'), term: document.querySelector('.kp-term')?.textContent, src: !!document.querySelector('#kp-card .kp-src') })`);
     check('the answer puts readings over the kanji, gives the meaning, and names the source', back.rt > 0 && back.target && !!back.term && back.src, JSON.stringify(back));
-    const takenBefore = (await ls('kairo-corridor-v1')).taken.length;
+    const takenBefore = (await readAppRecord(page)).taken.length;
     await page.click('#kp-grade-good');
     const ledger = await ls('bunki-cloze:kotoba-mcd');
-    const after = await ls('kairo-corridor-v1');
+    const after = await readAppRecord(page);
     check('a grade lands in the deck’s own ledger and never in the word queue', Object.keys(ledger?.cards || {}).length === 1 && after.taken.length === takenBefore && (after.revlog || []).length === 0, `${Object.keys(ledger?.cards || {}).length} card · ${after.taken.length} taken`);
 
     await boot('?deck=mcd');
@@ -2411,25 +2418,33 @@ async function main() {
     const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
     check('?deck=kotoba opens 言葉の鉱脈・文: a real sentence with the word marked, in its own theme', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
 
-    // 覚える asks where to save
+    // 覚える is one tap (round-1 save path): the row is written through the
+    // guarded commit at once, and the list drawer opens under the finger so
+    // where the word went is right there.
     await boot();
     await page.fill('#search', '金利');
     await page.waitForSelector('[data-result^="word:金利"]', { timeout: 15000 });
     await page.click('[data-result^="word:金利"]');
     await page.waitForSelector('#sheet #take');
     await page.click('#sheet #take');
-    await page.waitForSelector('#take-chooser');
-    const pending = (await ls('kairo-corridor-v1')).taken.length;
-    check('覚える opens “どこに保存しますか？” and writes nothing yet', pending === 0 && (await page.locator('#take-chooser .take-always').count()) === 1, `${pending} rows`);
-    await page.fill('#take-new-list', '経済ニュース');
-    await page.keyboard.press('Enter');
-    await page.waitForSelector('[data-pick-list="経済ニュース"][aria-pressed="true"]');
-    await page.click('#take-save');
-    await page.waitForTimeout(250);
-    const saved = await ls('kairo-corridor-v1');
-    check('保存する writes the word and its new list together', saved.taken.some((t) => t.id === '金利') && (saved.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), JSON.stringify(Object.keys(saved.lists || {})));
+    await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
+      { description: 'one-tap sheet save' });
+    await page.waitForSelector('#sheet .list-picker .fold-head.open');
+    const saved = await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
+      { description: 'saved word record' });
+    check('one tap on 覚える saves the word and opens its lists, nothing more written yet',
+      saved.taken.length === 1 && Object.keys(saved.lists || {}).length === 0,
+      `${saved.taken.length} rows · lists ${Object.keys(saved.lists || {}).length}`);
+    // a list named in the drawer receives the word through the same guarded commit
+    await page.click('#sheet #new-list');
+    await page.fill('#sheet [id^="list-picker-name:"]', '経済ニュース');
+    await page.click('#sheet .list-maker-make');
+    const listed = await waitForAppRecord(page, (record) =>
+      (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
+    check('the new list receives the word, still one card', listed.taken.length === 1 &&
+      listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
     const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
-    check('the sheet then says where the word went', /覚えるの札|daily review/.test(where) && where.includes('経済ニュース'), where);
+    check('the sheet then says where the word went', where.includes('経済ニュース'), where);
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
 
     console.log('\n— a grade is saved before the card moves on');

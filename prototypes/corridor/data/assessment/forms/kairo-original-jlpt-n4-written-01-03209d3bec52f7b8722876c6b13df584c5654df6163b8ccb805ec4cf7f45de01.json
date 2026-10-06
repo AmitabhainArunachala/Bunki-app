@@ -1,0 +1,2531 @@
+{
+  "v": 1,
+  "id": "kairo-original-jlpt-n4-written-01:written-review",
+  "provenance": {
+    "kind": "original-ai",
+    "authorRef": null,
+    "processRef": "claude-original-jlpt-written-bank-20260928",
+    "sources": []
+  },
+  "rights": {
+    "display": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "retain": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "sync": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "adapt": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "synthesize-audio": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    }
+  },
+  "format": "kairo-assessment-form",
+  "title": "N4 written test 1 — written editorial review",
+  "exam": {
+    "family": "jlpt",
+    "track": "N4"
+  },
+  "scope": "section-practice",
+  "blueprintId": "jlpt-n4-facts-20260910",
+  "items": [
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q01",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　【品物】は　となりの　店で　買いました。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「品物」は「しなもの」と読む。「品」も「物」も訓読みで読む。\nThe word 品物 is read shinamono and means goods.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ひんぶつ"
+          },
+          {
+            "id": "choice-2",
+            "text": "しなぶつ"
+          },
+          {
+            "id": "choice-3",
+            "text": "ひんもの"
+          },
+          {
+            "id": "choice-4",
+            "text": "しなもの"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "word:品物"
+      ],
+      "revisionId": "assessment-item:aa24f59d211e5cc72e75606acd9291cc448f4613ffaab415972b6d162545d558",
+      "sha256": "aa24f59d211e5cc72e75606acd9291cc448f4613ffaab415972b6d162545d558"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q02",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n学校の　【規則】は　かならず　まもって　ください。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「規則」は「きそく」と読む。学校などで守るきまりのことだ。\nThe word 規則 is read kisoku and means rules.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "きそく"
+          },
+          {
+            "id": "choice-2",
+            "text": "きぞく"
+          },
+          {
+            "id": "choice-3",
+            "text": "きそっく"
+          },
+          {
+            "id": "choice-4",
+            "text": "ぎそく"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "word:規則"
+      ],
+      "revisionId": "assessment-item:b74447e30f3e2d972e990258497a6644986f99cc925c34c40ca275764d06ea2c",
+      "sha256": "b74447e30f3e2d972e990258497a6644986f99cc925c34c40ca275764d06ea2c"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q03",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nこの　くつは　【値段】が　少し　高いです。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「値段」は「ねだん」と読む。物を買うときに払うお金のことだ。\nThe word 値段 is read nedan and means price.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ねたん"
+          },
+          {
+            "id": "choice-2",
+            "text": "ちだん"
+          },
+          {
+            "id": "choice-3",
+            "text": "ねだん"
+          },
+          {
+            "id": "choice-4",
+            "text": "ねいだん"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "word:値段"
+      ],
+      "revisionId": "assessment-item:ba864a99c91dfb41a37b7e52bfb7e691b8c39e06c538b4f5f0d01f51e99a0e48",
+      "sha256": "ba864a99c91dfb41a37b7e52bfb7e691b8c39e06c538b4f5f0d01f51e99a0e48"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q04",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nわからない　ことばは　じしょで　【しらべる】　ように　して　います。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「しらべる」は「調べる」と書く。ほかは正しくない漢字だ。\nThe verb shiraberu (to look up) is written 調べる.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "課べる"
+          },
+          {
+            "id": "choice-2",
+            "text": "周べる"
+          },
+          {
+            "id": "choice-3",
+            "text": "謂べる"
+          },
+          {
+            "id": "choice-4",
+            "text": "調べる"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "word:調べる"
+      ],
+      "revisionId": "assessment-item:9afc17cb786575f5230b00cf796fa632be75837ddbb9c8a90e37ffbe6b7c0447",
+      "sha256": "9afc17cb786575f5230b00cf796fa632be75837ddbb9c8a90e37ffbe6b7c0447"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q05",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n買い物の　【れしーと】は　さいふに　入れて　おきました。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「れしーと」はカタカナで「レシート」と書く。\nThe word reshiito (receipt) is written レシート in katakana.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "レシーテ"
+          },
+          {
+            "id": "choice-2",
+            "text": "ルシート"
+          },
+          {
+            "id": "choice-3",
+            "text": "レシード"
+          },
+          {
+            "id": "choice-4",
+            "text": "レシート"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "word:レシート"
+      ],
+      "revisionId": "assessment-item:ad4ffe14298b6b2b149bc34778b561c2dc06f7a2b9913080423fa0d6faec9366",
+      "sha256": "ad4ffe14298b6b2b149bc34778b561c2dc06f7a2b9913080423fa0d6faec9366"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q06",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nスーパーの　やさい（　）は　入り口の　近くに　あります。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「やさい売り場」は、スーパーでやさいを売っているところだ。\nAn uriba is the part of a store where goods are sold.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "会場"
+          },
+          {
+            "id": "choice-2",
+            "text": "受付"
+          },
+          {
+            "id": "choice-3",
+            "text": "事務所"
+          },
+          {
+            "id": "choice-4",
+            "text": "売り場"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "word:売り場"
+      ],
+      "revisionId": "assessment-item:9e3c43cb2855d39c55cc50f58fdc44da5acf7d71b08bc5a29a96a00974ee1b72",
+      "sha256": "9e3c43cb2855d39c55cc50f58fdc44da5acf7d71b08bc5a29a96a00974ee1b72"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q07",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nあした　テストが　あるので、今晩は　ならった　ところの　（　）を　します。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "テストの前に、ならったことをもう一度勉強するのは「復習」だ。\nFukushuu means reviewing what you have already learned.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "予約"
+          },
+          {
+            "id": "choice-2",
+            "text": "復習"
+          },
+          {
+            "id": "choice-3",
+            "text": "返事"
+          },
+          {
+            "id": "choice-4",
+            "text": "相談"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "word:復習"
+      ],
+      "revisionId": "assessment-item:7471163cc2de3bbbb65a381b397ceafef48aaa08adeb34a641a844c40e5b1bc9",
+      "sha256": "7471163cc2de3bbbb65a381b397ceafef48aaa08adeb34a641a844c40e5b1bc9"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q08",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n図書館の　本は　二週間　（　）に　かえして　ください。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「二週間以内に」は「二週間が終わるまでに」という意味だ。\nInai means within, so the book must be returned within two weeks.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "以下"
+          },
+          {
+            "id": "choice-2",
+            "text": "以内"
+          },
+          {
+            "id": "choice-3",
+            "text": "以上"
+          },
+          {
+            "id": "choice-4",
+            "text": "以外"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "word:以内"
+      ],
+      "revisionId": "assessment-item:8e8ac3660333c06ba2f6ec656e746e2cee047814d54b1d97e4b1175421ac97c5",
+      "sha256": "8e8ac3660333c06ba2f6ec656e746e2cee047814d54b1d97e4b1175421ac97c5"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q09",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nこの　しゅくだいは　【簡単】でした。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「簡単」は「やさしい」「むずかしくない」と同じ意味だ。\nKantan means easy, the same as yasashii here.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "この　しゅくだいは　ながかったです。"
+          },
+          {
+            "id": "choice-2",
+            "text": "この　しゅくだいは　やさしかったです。"
+          },
+          {
+            "id": "choice-3",
+            "text": "この　しゅくだいは　おもしろかったです。"
+          },
+          {
+            "id": "choice-4",
+            "text": "この　しゅくだいは　むずかしかったです。"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "word:簡単"
+      ],
+      "revisionId": "assessment-item:d7b0695d6df4ebef1e795fa512ede751fd088b9b5eaf37d47b97cdfaeb525ea2",
+      "sha256": "d7b0695d6df4ebef1e795fa512ede751fd088b9b5eaf37d47b97cdfaeb525ea2"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q10",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n土曜日は　【用事】が　あって、図書館に　行けませんでした。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「用事」は、しなければならないことだ。\nYouji means an errand, something you have to do.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "土曜日は　雨が　ふって、図書館に　行けませんでした。"
+          },
+          {
+            "id": "choice-2",
+            "text": "土曜日は　お金が　なくて、図書館に　行けませんでした。"
+          },
+          {
+            "id": "choice-3",
+            "text": "土曜日は　しなければ　ならない　ことが　あって、図書館に　行けませんでした。"
+          },
+          {
+            "id": "choice-4",
+            "text": "土曜日は　かぜを　ひいて、図書館に　行けませんでした。"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "word:用事"
+      ],
+      "revisionId": "assessment-item:89add37e589de36f05600536e3acc495b7b8b8bed23c4a16e81c6eea63da75f0",
+      "sha256": "89add37e589de36f05600536e3acc495b7b8b8bed23c4a16e81c6eea63da75f0"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q11",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "つぎの　ことばの　つかいかたで　いちばん　いい　ものを　えらんで　ください。\n【返事】",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「返事」は、手紙やメール、呼びかけなどにこたえることだ。1は「返し」、3は「直し」が正しい。\nHenji means a reply, for example to a letter or an email.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "図書館に　本を　返事しに　行きます。"
+          },
+          {
+            "id": "choice-2",
+            "text": "母は　毎朝　にわの　花に　水を　返事します。"
+          },
+          {
+            "id": "choice-3",
+            "text": "まちがえた　ところを　赤い　ペンで　返事しました。"
+          },
+          {
+            "id": "choice-4",
+            "text": "友だちに　メールを　送ったのに、まだ　返事が　来ません。"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "word:返事"
+      ],
+      "revisionId": "assessment-item:5cba956599ad8c2b136bff5f7653435b29cf773dc2a575840806cca04a27e900",
+      "sha256": "5cba956599ad8c2b136bff5f7653435b29cf773dc2a575840806cca04a27e900"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q12",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nケーキを　食べ（　）、おなかが　いたく　なりました。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「食べすぎる」は多く食べることで、おなかがいたくなった理由になる。\nTabesugiru means eating too much, which explains the stomachache.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "たくて"
+          },
+          {
+            "id": "choice-2",
+            "text": "にくくて"
+          },
+          {
+            "id": "choice-3",
+            "text": "やすくて"
+          },
+          {
+            "id": "choice-4",
+            "text": "すぎて"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "grammar:sugiru"
+      ],
+      "revisionId": "assessment-item:02015cc0c3ccba47045925cdb6f5e8030917ede81cebf9f02606c1b3c6cb9a9a",
+      "sha256": "02015cc0c3ccba47045925cdb6f5e8030917ede81cebf9f02606c1b3c6cb9a9a"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q13",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nあしたの　パーティーに　行ける（　）、まだ　わかりません。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「〜かどうかわからない」で、まだはっきりしないことを言う。\nKa dou ka means whether or not, so I do not know whether I can go.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ことが"
+          },
+          {
+            "id": "choice-2",
+            "text": "かどうか"
+          },
+          {
+            "id": "choice-3",
+            "text": "ために"
+          },
+          {
+            "id": "choice-4",
+            "text": "ように"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "grammar:kadouka"
+      ],
+      "revisionId": "assessment-item:443bc9ab92960f758256f5bc1176d63b80dd3e94f5a90c663bb2e7eaff8c791e",
+      "sha256": "443bc9ab92960f758256f5bc1176d63b80dd3e94f5a90c663bb2e7eaff8c791e"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q14",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nじしょを　わすれたので、友だちに　かして（　）。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "自分がじしょをわすれたので、友だちにかしてもらったと言う。\nMorau shows that I received the favor of a friend lending me a dictionary.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "くれました"
+          },
+          {
+            "id": "choice-2",
+            "text": "やりました"
+          },
+          {
+            "id": "choice-3",
+            "text": "もらいました"
+          },
+          {
+            "id": "choice-4",
+            "text": "あげました"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "grammar:age-kure-morau"
+      ],
+      "revisionId": "assessment-item:141c45896f229b29a436cc7e928a12d68ca3a2045352fd45a2fb6e3dce88703b",
+      "sha256": "141c45896f229b29a436cc7e928a12d68ca3a2045352fd45a2fb6e3dce88703b"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q15",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n毎日　れんしゅうしたので、ピアノが　ひける（　）。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「〜ようになる」は、できなかったことができるようにかわることを表す。\nYou ni naru shows a change: I became able to play the piano.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ように　しました"
+          },
+          {
+            "id": "choice-2",
+            "text": "ことに　しました"
+          },
+          {
+            "id": "choice-3",
+            "text": "ように　なりました"
+          },
+          {
+            "id": "choice-4",
+            "text": "ことに　なりました"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "grammar:n4-you-ni-naru"
+      ],
+      "revisionId": "assessment-item:04495511f1bc32f4ef5839c681326e02f3e9342cfcf5717ed25875de45276b95",
+      "sha256": "04495511f1bc32f4ef5839c681326e02f3e9342cfcf5717ed25875de45276b95"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q16",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nあしたは　しけんが　あるので、朝　六時に　起き（　）。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "しけんがあるので、早く起きる必要がある。「〜なければならない」を使う。\nNakereba naranai means must, so I have to get up at six.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "なければ　なりません"
+          },
+          {
+            "id": "choice-2",
+            "text": "ないで　ください"
+          },
+          {
+            "id": "choice-3",
+            "text": "なくても　いいです"
+          },
+          {
+            "id": "choice-4",
+            "text": "たがります"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "grammar:nakerebanaranai"
+      ],
+      "revisionId": "assessment-item:ecf274df0c2ced665a11ddfd26852713083e0559dbebc3dded1bcdc239ee4604",
+      "sha256": "ecf274df0c2ced665a11ddfd26852713083e0559dbebc3dded1bcdc239ee4604"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q17",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nなつやすみは　国へ　帰る（　）です。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「〜つもりです」は、自分がする予定や考えを言う。\nTsumori expresses a plan or intention: I intend to go home.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ために"
+          },
+          {
+            "id": "choice-2",
+            "text": "ように"
+          },
+          {
+            "id": "choice-3",
+            "text": "つもり"
+          },
+          {
+            "id": "choice-4",
+            "text": "ことが"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "grammar:tsumori"
+      ],
+      "revisionId": "assessment-item:9599f96ca42be67637d2ad9073fb555c8fc5182f383e6cf53c1e56142b4d1840",
+      "sha256": "9599f96ca42be67637d2ad9073fb555c8fc5182f383e6cf53c1e56142b4d1840"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q18",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nテストの　前に　＿＿＿　＿＿＿　＿★＿　＿＿＿　います。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "正しいじゅんばんは「ノートを　見なおす　ように　して　います」で、★には「ように」が入る。\nThe order is ノートを 見なおす ように して います, so ように fills the star.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ノートを"
+          },
+          {
+            "id": "choice-2",
+            "text": "して"
+          },
+          {
+            "id": "choice-3",
+            "text": "ように"
+          },
+          {
+            "id": "choice-4",
+            "text": "見なおす"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "jlpt-n4:sentence-composition"
+      ],
+      "revisionId": "assessment-item:9ebbf6e2355ad187aa0c79791145d14cd2661c5c9e7e692ab7bc803666916b37",
+      "sha256": "9ebbf6e2355ad187aa0c79791145d14cd2661c5c9e7e692ab7bc803666916b37"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q19",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nきのう　＿＿＿　＿★＿　＿＿＿　＿＿＿　しまいました。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "正しいじゅんばんは「友だちに　かりた　本を　なくして　しまいました」で、★には「かりた」が入る。\nThe order is 友だちに かりた 本を なくして しまいました, so かりた fills the star.",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "かりた"
+          },
+          {
+            "id": "choice-2",
+            "text": "友だちに"
+          },
+          {
+            "id": "choice-3",
+            "text": "なくして"
+          },
+          {
+            "id": "choice-4",
+            "text": "本を"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "grammar:teshimau"
+      ],
+      "revisionId": "assessment-item:08fbc0a5a03e5153cf47d73412ad3754966e28edcf616551d4fdb72f23f08d81",
+      "sha256": "08fbc0a5a03e5153cf47d73412ad3754966e28edcf616551d4fdb72f23f08d81"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q20",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "いつもは図書館へ行くが、先週は休みだった。反対のことをつなぐ「でも」が入る。\nDemo (but) links the usual habit with the fact that the library was closed.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-tg",
+          "revisionId": "assessment-passage:3b219867dff8a34f48fac0decad7f5a9b090039c8ab6eb30683d51bc7b1b39ce",
+          "sha256": "3b219867dff8a34f48fac0decad7f5a9b090039c8ab6eb30683d51bc7b1b39ce"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "それから"
+          },
+          {
+            "id": "choice-2",
+            "text": "だから"
+          },
+          {
+            "id": "choice-3",
+            "text": "でも"
+          },
+          {
+            "id": "choice-4",
+            "text": "たとえば"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "jlpt-n4:text-grammar"
+      ],
+      "revisionId": "assessment-item:4216bcd0b654f210959add4a4ee71ff316b9e3086245d33ef8f85878e0e3150c",
+      "sha256": "4216bcd0b654f210959add4a4ee71ff316b9e3086245d33ef8f85878e0e3150c"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q21",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "これからためしにすることなので「さそってみるつもり」がいい。\nSasotte miru means to try inviting, which fits a plan for next week.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-tg",
+          "revisionId": "assessment-passage:3b219867dff8a34f48fac0decad7f5a9b090039c8ab6eb30683d51bc7b1b39ce",
+          "sha256": "3b219867dff8a34f48fac0decad7f5a9b090039c8ab6eb30683d51bc7b1b39ce"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "さそって　いる"
+          },
+          {
+            "id": "choice-2",
+            "text": "さそわれる"
+          },
+          {
+            "id": "choice-3",
+            "text": "さそって　しまう"
+          },
+          {
+            "id": "choice-4",
+            "text": "さそって　みる"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "grammar:temiru"
+      ],
+      "revisionId": "assessment-item:d5b7abe99742a0f20e98c8d108523a93d92c04df764b3e998339f0a757ba58ca",
+      "sha256": "d5b7abe99742a0f20e98c8d108523a93d92c04df764b3e998339f0a757ba58ca"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q22",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "山田さんは　本を　もう　一週間　かりたいです。どう　しますか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "本文に「ホームページで　もう　一週間　かりる　ことが　できます」とある。\nThe email says the loan can be extended for one more week on the library website.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-s1",
+          "revisionId": "assessment-passage:df0c1fd1497dc190c667d63a0e9c9b42f3834c76494ae614ce6b380f87f433f9",
+          "sha256": "df0c1fd1497dc190c667d63a0e9c9b42f3834c76494ae614ce6b380f87f433f9"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "図書館の　ホームページで　かりる　日を　のばす"
+          },
+          {
+            "id": "choice-2",
+            "text": "金曜日までに　図書館へ　本を　かえしに　行く"
+          },
+          {
+            "id": "choice-3",
+            "text": "金曜日に　図書館へ　電話を　かける"
+          },
+          {
+            "id": "choice-4",
+            "text": "ほかの　人に　本を　よやくして　もらう"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "jlpt-n4:short-reading"
+      ],
+      "revisionId": "assessment-item:1ed21027960d23fbfdba35a2959deefc2f0a39107634ea9d724ec03c99bb65b7",
+      "sha256": "1ed21027960d23fbfdba35a2959deefc2f0a39107634ea9d724ec03c99bb65b7"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q23",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "来週の　火曜日、じゅぎょうは　どこで　ありますか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "月曜日から水曜日までは、一階の大きい教室でじゅぎょうがある。火曜日はその間だ。\nFrom Monday to Wednesday, classes are held in the large classroom on the first floor.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-s2",
+          "revisionId": "assessment-passage:c5769c2b72a1d08aa35fe1ab7de7edb4fa5669070ddea3e5ad5d53c5ae9280bf",
+          "sha256": "c5769c2b72a1d08aa35fe1ab7de7edb4fa5669070ddea3e5ad5d53c5ae9280bf"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "二階の　教室"
+          },
+          {
+            "id": "choice-2",
+            "text": "一階の　大きい　教室"
+          },
+          {
+            "id": "choice-3",
+            "text": "事務所の　となりの　教室"
+          },
+          {
+            "id": "choice-4",
+            "text": "三階の　いつもの　教室"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "jlpt-n4:short-reading"
+      ],
+      "revisionId": "assessment-item:ac13744052cabac2891103543117ae57649baab03cfe344540ed80a2e24cf5c3",
+      "sha256": "ac13744052cabac2891103543117ae57649baab03cfe344540ed80a2e24cf5c3"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q24",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人は　きのう　どう　しましたか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "本文の最後に「何も　買わないで　帰りました」とある。\nThe last sentence says the writer went home without buying anything.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-s3",
+          "revisionId": "assessment-passage:fd56829d2567413de6e7961597a49e987bd09e9e380437e30f2f6d28a570ebca",
+          "sha256": "fd56829d2567413de6e7961597a49e987bd09e9e380437e30f2f6d28a570ebca"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "くつを　買わないで　帰った"
+          },
+          {
+            "id": "choice-2",
+            "text": "来週の　くつを　よやくした"
+          },
+          {
+            "id": "choice-3",
+            "text": "茶色の　くつを　買った"
+          },
+          {
+            "id": "choice-4",
+            "text": "黒い　くつを　買った"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "jlpt-n4:short-reading"
+      ],
+      "revisionId": "assessment-item:b1d08d6ef415388e0f1389f4bfb1e203a759941838a9d0414068118698fd74e9",
+      "sha256": "b1d08d6ef415388e0f1389f4bfb1e203a759941838a9d0414068118698fd74e9"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q25",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は、市場の　やさいに　ついて　どう　言って　いますか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「スーパーより　少し　高いです。でも、…とても　おいしいです」とある。\nThe writer says the vegetables cost a little more than at the supermarket but taste very good.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-m1",
+          "revisionId": "assessment-passage:71d1e33d2f0526489a5beb5787fc3e9fd44d03a5b48ef69107efec936a972cfd",
+          "sha256": "71d1e33d2f0526489a5beb5787fc3e9fd44d03a5b48ef69107efec936a972cfd"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "スーパーより　少し　高いが、おいしい"
+          },
+          {
+            "id": "choice-2",
+            "text": "スーパーより　少し　安いが、おいしくない"
+          },
+          {
+            "id": "choice-3",
+            "text": "スーパーより　安くて、おいしい"
+          },
+          {
+            "id": "choice-4",
+            "text": "スーパーより　高くて、おいしくない"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "jlpt-n4:mid-reading"
+      ],
+      "revisionId": "assessment-item:7336bf3e298d112456990414cd734ea1ac157ca9d478c9848fb7c612a1fb5452",
+      "sha256": "7336bf3e298d112456990414cd734ea1ac157ca9d478c9848fb7c612a1fb5452"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q26",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人が　いつも　八時ごろまでに　市場へ　行くのは　どうしてですか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「人気のある店のやさいは九時ごろにはほとんどなくなってしまいます。それで」とある。\nThe writer goes early because vegetables at popular stalls are almost gone by about nine.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-m1",
+          "revisionId": "assessment-passage:71d1e33d2f0526489a5beb5787fc3e9fd44d03a5b48ef69107efec936a972cfd",
+          "sha256": "71d1e33d2f0526489a5beb5787fc3e9fd44d03a5b48ef69107efec936a972cfd"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "人気の　ある　店の　やさいが　早く　なくなるから"
+          },
+          {
+            "id": "choice-2",
+            "text": "市場が　十一時に　しまるから"
+          },
+          {
+            "id": "choice-3",
+            "text": "朝ごはんの　前に　買い物を　したいから"
+          },
+          {
+            "id": "choice-4",
+            "text": "おばあさんと　話す　時間が　ほしいから"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "jlpt-n4:mid-reading"
+      ],
+      "revisionId": "assessment-item:b17ee99f6cadf944ccd3f1ccaed64bc408b07e9408d5b354d1c9bc2717d4d78e",
+      "sha256": "b17ee99f6cadf944ccd3f1ccaed64bc408b07e9408d5b354d1c9bc2717d4d78e"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q27",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "リンさんは　大学生で、子どもは　いません。土曜日の　午前中に　イベントに　行きたいです。リンさんが　行ける　イベントは　どれですか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "午前中のイベントは②と④だが、②は小学生までの子どもとその家族のためのものだ。\nOnly the old book market is in the morning and open to an adult without children.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-info",
+          "revisionId": "assessment-passage:757f90e6a11046f0a303e374a2f8fb05433f608351870ddb1277f6dc30db5c3e",
+          "sha256": "757f90e6a11046f0a303e374a2f8fb05433f608351870ddb1277f6dc30db5c3e"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "本の　カバーを　作ろう"
+          },
+          {
+            "id": "choice-2",
+            "text": "古い　本の　市"
+          },
+          {
+            "id": "choice-3",
+            "text": "えいがの　日"
+          },
+          {
+            "id": "choice-4",
+            "text": "子どもの　本を　読む　会"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "jlpt-n4:information-retrieval"
+      ],
+      "revisionId": "assessment-item:ea6bb6fbff2d7cbd854659c07e621ea792499b7afff45e871a54f03a54930af7",
+      "sha256": "ea6bb6fbff2d7cbd854659c07e621ea792499b7afff45e871a54f03a54930af7"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:q28",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "本の　カバーを　作る　イベントに　出たい　人は、どう　しなければ　なりませんか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "③に「８月１０日までに　電話で　よやくして　ください」とある。\nThe notice says to book by phone by August 10 for the book cover event.",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n4-written-01:passage-info",
+          "revisionId": "assessment-passage:757f90e6a11046f0a303e374a2f8fb05433f608351870ddb1277f6dc30db5c3e",
+          "sha256": "757f90e6a11046f0a303e374a2f8fb05433f608351870ddb1277f6dc30db5c3e"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "８月１０日までに　図書館へ　行って　よやくする"
+          },
+          {
+            "id": "choice-2",
+            "text": "８月１０日までに　電話で　よやくする"
+          },
+          {
+            "id": "choice-3",
+            "text": "よやくしないで、当日　図書館へ　行く"
+          },
+          {
+            "id": "choice-4",
+            "text": "当日、３階の　会議室で　よやくする"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "jlpt-n4:information-retrieval"
+      ],
+      "revisionId": "assessment-item:91172cffa8e3ac4a3b8e115e6a88bd8e47e0990a81877b2eb1eea6275203124a",
+      "sha256": "91172cffa8e3ac4a3b8e115e6a88bd8e47e0990a81877b2eb1eea6275203124a"
+    }
+  ],
+  "passages": [
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:passage-tg",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "わたしの　週末\n　わたしは　毎週　土曜日に　図書館へ　行きます。図書館は　しずかなので、勉強が　よく　できます。（１）、先週の　土曜日は　図書館が　休みでした。それで、近くの　きっさてんで　勉強する　ことに　しました。きっさてんは　少し　うるさかったですが、コーヒーが　とても　おいしかったです。来週は　友だちも　（２）　つもりです。",
+      "textSha256": "b3e56be7b3b8d0aaad5def66c554827aecf9df76aef99897fd0fdddf1d159e9b",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:3b219867dff8a34f48fac0decad7f5a9b090039c8ab6eb30683d51bc7b1b39ce",
+      "sha256": "3b219867dff8a34f48fac0decad7f5a9b090039c8ab6eb30683d51bc7b1b39ce"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:passage-s1",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "山田さん\n　山田さんが　かりて　いる　本を　かえす　日は、今週の　金曜日です。まだ　読みおわって　いない　ときは、図書館の　ホームページで　もう　一週間　かりる　ことが　できます。でも、ほかの　人が　よやくして　いる　本は、かりる　日を　のばす　ことが　できません。\nみどり図書館",
+      "textSha256": "b85fa06632941fd1610236daa2df8903840c5804de7ad15e6ec24d4b3a6d2642",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:df0c1fd1497dc190c667d63a0e9c9b42f3834c76494ae614ce6b380f87f433f9",
+      "sha256": "df0c1fd1497dc190c667d63a0e9c9b42f3834c76494ae614ce6b380f87f433f9"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:passage-s2",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "学生の　みなさんへ\n　来週の　月曜日から　水曜日まで、三階の　教室の　エアコンを　とりかえます。この　三日間は　三階の　教室が　使えませんので、じゅぎょうは　一階の　大きい　教室で　します。木曜日からは、いつもの　教室に　もどります。\n事務所",
+      "textSha256": "69c075461820fd7bba9327961dcf57d291929c9d1591f524955cb7548aea96f9",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:c5769c2b72a1d08aa35fe1ab7de7edb4fa5669070ddea3e5ad5d53c5ae9280bf",
+      "sha256": "c5769c2b72a1d08aa35fe1ab7de7edb4fa5669070ddea3e5ad5d53c5ae9280bf"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:passage-s3",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "　きのう、デパートへ　くつを　買いに　行きました。茶色の　くつが　ほしかったのですが、わたしの　足に　合う　大きさの　ものは　黒い　くつしか　ありませんでした。店の　人が「来週、茶色の　くつが　入ります」と　言ったので、きのうは　何も　買わないで　帰りました。",
+      "textSha256": "67cd423594491d0a7301210998cdd8ae668a98fd42c9ae93a3d0567b3e5cb48e",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:fd56829d2567413de6e7961597a49e987bd09e9e380437e30f2f6d28a570ebca",
+      "sha256": "fd56829d2567413de6e7961597a49e987bd09e9e380437e30f2f6d28a570ebca"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:passage-m1",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "日曜日の　市場\n　わたしの　家の　近くに、日曜日だけ　開く　市場が　あります。朝　七時から　十一時まで、近くの　村の　人たちが　やさいや　くだものを　売りに　来ます。\n　市場の　やさいは　スーパーより　少し　高いです。でも、その　日の　朝　とった　ものなので、とても　おいしいです。それに、店の　人と　話すのも　楽しいです。どう　料理すると　おいしいか、教えて　くれる　人も　います。\n　先週、はじめて　見る　やさいが　ありました。店の　おばあさんが「スープに　入れると　おいしいですよ」と　教えて　くれたので、一つ　買って　みました。家で　スープを　作ると、少し　にがかったですが、母は　よろこんで　全部　食べました。\n　市場は　十一時まで　開いて　いますが、人気の　ある　店の　やさいは　九時ごろには　ほとんど　なくなって　しまいます。それで、わたしは　いつも　八時ごろまでに　行くように　して　います。",
+      "textSha256": "e1e4f9d21110da4236a55b71eba39f895e9689d72767de9d5ccc4baff5fa9a52",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:71d1e33d2f0526489a5beb5787fc3e9fd44d03a5b48ef69107efec936a972cfd",
+      "sha256": "71d1e33d2f0526489a5beb5787fc3e9fd44d03a5b48ef69107efec936a972cfd"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n4-written-01:passage-info",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-jlpt-written-bank-20260928",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "さくら図書館　夏休みの　イベント\n①　えいがの　日\n　日：８月３日（土）　時間：午後２時～４時\n　ところ：２階　ホール\n　お金：いりません\n②　子どもの　本を　読む　会\n　日：８月１０日（土）　時間：午前１０時～１１時\n　ところ：１階　子どもの　へや\n　お金：いりません\n　※小学生までの　子どもと　その　家族が　さんかできます。\n③　本の　カバーを　作ろう\n　日：８月１７日（土）　時間：午後１時～３時\n　ところ：３階　会議室\n　お金：３００円\n　※２０人まで。８月１０日までに　電話で　よやくして　ください。\n④　古い　本の　市\n　日：８月２４日（土）　時間：午前１０時～午後３時\n　ところ：図書館の　前の　広場\n　※雨が　ふったら、ありません。\nさくら図書館　電話：０３－１２３４－５６７８",
+      "textSha256": "6c999ed107997e84563702fd7a6d0d29804d13562646f770aef579b854ccb8aa",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:757f90e6a11046f0a303e374a2f8fb05433f608351870ddb1277f6dc30db5c3e",
+      "sha256": "757f90e6a11046f0a303e374a2f8fb05433f608351870ddb1277f6dc30db5c3e"
+    }
+  ],
+  "media": [],
+  "sections": [
+    {
+      "id": "section-vocabulary",
+      "title": "文字・語彙",
+      "skill": "vocabulary",
+      "itemIds": [
+        "kairo-original-jlpt-n4-written-01:q01",
+        "kairo-original-jlpt-n4-written-01:q02",
+        "kairo-original-jlpt-n4-written-01:q03",
+        "kairo-original-jlpt-n4-written-01:q04",
+        "kairo-original-jlpt-n4-written-01:q05",
+        "kairo-original-jlpt-n4-written-01:q06",
+        "kairo-original-jlpt-n4-written-01:q07",
+        "kairo-original-jlpt-n4-written-01:q08",
+        "kairo-original-jlpt-n4-written-01:q09",
+        "kairo-original-jlpt-n4-written-01:q10",
+        "kairo-original-jlpt-n4-written-01:q11"
+      ]
+    },
+    {
+      "id": "section-grammar",
+      "title": "文法",
+      "skill": "grammar",
+      "itemIds": [
+        "kairo-original-jlpt-n4-written-01:q12",
+        "kairo-original-jlpt-n4-written-01:q13",
+        "kairo-original-jlpt-n4-written-01:q14",
+        "kairo-original-jlpt-n4-written-01:q15",
+        "kairo-original-jlpt-n4-written-01:q16",
+        "kairo-original-jlpt-n4-written-01:q17",
+        "kairo-original-jlpt-n4-written-01:q18",
+        "kairo-original-jlpt-n4-written-01:q19",
+        "kairo-original-jlpt-n4-written-01:q20",
+        "kairo-original-jlpt-n4-written-01:q21"
+      ]
+    },
+    {
+      "id": "section-reading",
+      "title": "読解",
+      "skill": "reading",
+      "itemIds": [
+        "kairo-original-jlpt-n4-written-01:q22",
+        "kairo-original-jlpt-n4-written-01:q23",
+        "kairo-original-jlpt-n4-written-01:q24",
+        "kairo-original-jlpt-n4-written-01:q25",
+        "kairo-original-jlpt-n4-written-01:q26",
+        "kairo-original-jlpt-n4-written-01:q27",
+        "kairo-original-jlpt-n4-written-01:q28"
+      ]
+    }
+  ],
+  "timingBlocks": [
+    {
+      "id": "block-vocabulary",
+      "sectionIds": [
+        "section-vocabulary"
+      ],
+      "durationMs": 1500000,
+      "clock": "elapsed-including-interruptions",
+      "authority": {
+        "kind": "official-fact",
+        "blueprintId": "jlpt-n4-facts-20260910",
+        "blockId": "vocabulary"
+      }
+    },
+    {
+      "id": "block-grammar-reading",
+      "sectionIds": [
+        "section-grammar",
+        "section-reading"
+      ],
+      "durationMs": 3300000,
+      "clock": "elapsed-including-interruptions",
+      "authority": {
+        "kind": "official-fact",
+        "blueprintId": "jlpt-n4-facts-20260910",
+        "blockId": "grammar-reading"
+      }
+    }
+  ],
+  "authoring": {
+    "policyVersion": "n4-written-bank-allocation-20260928",
+    "countsAre": "authoring-rules",
+    "requirements": [
+      {
+        "task": "kanji-reading",
+        "minimumItems": 3
+      },
+      {
+        "task": "orthography",
+        "minimumItems": 2
+      },
+      {
+        "task": "contextual-expression",
+        "minimumItems": 3
+      },
+      {
+        "task": "paraphrase",
+        "minimumItems": 2
+      },
+      {
+        "task": "usage",
+        "minimumItems": 1
+      },
+      {
+        "task": "grammar-form",
+        "minimumItems": 6
+      },
+      {
+        "task": "sentence-composition",
+        "minimumItems": 2
+      },
+      {
+        "task": "text-grammar",
+        "minimumItems": 2
+      },
+      {
+        "task": "short-reading",
+        "minimumItems": 3
+      },
+      {
+        "task": "mid-reading",
+        "minimumItems": 2
+      },
+      {
+        "task": "information-retrieval",
+        "minimumItems": 2
+      }
+    ]
+  },
+  "revisionId": "assessment-form:03209d3bec52f7b8722876c6b13df584c5654df6163b8ccb805ec4cf7f45de01",
+  "sha256": "03209d3bec52f7b8722876c6b13df584c5654df6163b8ccb805ec4cf7f45de01"
+}

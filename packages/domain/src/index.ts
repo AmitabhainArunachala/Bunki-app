@@ -44,5 +44,6 @@ export * from './contracts/index.ts';
 export * from './evidence/index.ts';
 export * from './reducers/index.ts';
 export * from './replay/index.ts';
+export * from './projections/index.ts';
 export * from './session/index.ts';
 export * from './interaction/index.ts';

@@ -1,0 +1,381 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N5",
+  "number": 3,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "わたしの　へや\n　わたしの　へやは　あまり　ひろく　ありません。でも、まどが　大きいので、あかるいです。\n　へやには　ベッドと　つくえと　ほんだなが　あります。つくえの　上には　かぞくの　しゃしんが　あります。わたしは　この　しゃしんを　みると、げんきに　なります。\n　きのう、あたらしい　ほんだなを　（１）。まえの　ほんだなは　小さかったからです。いまは　ほんが　ぜんぶ　ほんだな（２）　はいって　います。",
+    "s1": "えきの　おしらせ\n　あしたの　あさ　八時から　十時まで、三ばんせんの　電車は　とまりません。この　じかんは、二ばんせんから　でる　電車に　のって　ください。",
+    "s2": "けんさん\n　おかあさんは　きょう　しごとで　おそく　なります。ばんごはんは　れいぞうこに　あります。あたためて　たべて　ください。たべたら、おさらを　あらって　くださいね。\nはは",
+    "s3": "　わたしは　まいにち　七時に　いえを　でます。えきまで　あるいて　十五ふん　かかります。電車に　四十五ふん　のって、八時に　かいしゃの　ちかくの　えきに　つきます。",
+    "m1": "ねぼう\n　けさ、わたしは　ねぼうを　しました。目が　さめた　とき、もう　八時でした。いつもは　七時に　おきます。\n　いそいで　ふくを　きて、あさごはんを　たべないで　いえを　でました。えきまで　はしって　いきましたが、いつもの　電車は　もう　でて　いました。つぎの　電車は　十五ふん　あとでした。\n　がっこうに　ついた　とき、じゅぎょうは　もう　はじまって　いました。先生に「すみません」と　いいました。先生は「あしたから　気を　つけて　くださいね」と　いいました。\n　こんばんは　はやく　ねます。",
+    "info": "みどりえき　→　さくらえき（土曜日・日曜日）\n　でる　じかん　　つく　じかん\n　９：００　　　　９：２５\n　９：３０　　　　９：５５\n　１０：１５　　　１０：４０\n　１１：００　　　１１：２５\n※　きっぷは　おとな　ひとり　２４０円、こども　ひとり　１２０円です。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n【電車】で　かいしゃへ　いきます。",
+      "options": [
+        "てんしゃ",
+        "でんじゃ",
+        "でんしや",
+        "でんしゃ"
+      ],
+      "answer": 3,
+      "rationale": "「電車」は「でんしゃ」と読む。\nThe word 電車 is read densha and means train.",
+      "target": "電車"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nえきの　【出口】で　まって　います。",
+      "options": [
+        "でくち",
+        "だしぐち",
+        "でぐち",
+        "しゅっこう"
+      ],
+      "answer": 2,
+      "rationale": "「出口」は「でぐち」と読む。「いりぐち」は「入口」だ。\nThe word 出口 is read deguchi and means exit.",
+      "target": "出口"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nわたしは　【毎朝】　七時に　おきます。",
+      "options": [
+        "まいちょう",
+        "めいあさ",
+        "まいあさ",
+        "まいにち"
+      ],
+      "answer": 2,
+      "rationale": "「毎朝」は「まいあさ」と読む。「まいにち」は「毎日」だ。\nThe word 毎朝 is read maiasa and means every morning.",
+      "target": "毎朝"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nわたしの　【へや】は　二かいに　あります。",
+      "options": [
+        "部屋",
+        "都屋",
+        "部星",
+        "部家"
+      ],
+      "answer": 0,
+      "rationale": "「へや」は「部屋」と書く。\nThe word heya (room) is written 部屋.",
+      "target": "部屋"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nえきまで　あるいて　どのくらい　【じかん】が　かかりますか。",
+      "options": [
+        "待間",
+        "時門",
+        "時間",
+        "時聞"
+      ],
+      "answer": 2,
+      "rationale": "「じかん」は「時間」と書く。「聞」「門」「待」はまちがい。\nThe word jikan (time) is written 時間.",
+      "target": "時間"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\nへやの　まんなかに　【てーぶる】が　あります。",
+      "options": [
+        "テープル",
+        "テーブル",
+        "ラーブル",
+        "テーブレ"
+      ],
+      "answer": 1,
+      "rationale": "「てーぶる」はカタカナで「テーブル」と書く。\nThe word teeburu (table) is written テーブル in katakana.",
+      "target": "テーブル"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nつぎの　えきで　電車を　（　）。",
+      "options": [
+        "のります",
+        "はいります",
+        "でかけます",
+        "おります"
+      ],
+      "answer": 3,
+      "rationale": "「電車を」のあとには「おります」が合う。「のります」は「電車に」だ。\nOrimasu (get off) takes densha o; noru would need densha ni.",
+      "target": "降りる"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nへやが　くらいので、（　）を　つけました。",
+      "options": [
+        "でんき",
+        "かぎ",
+        "ドア",
+        "まど"
+      ],
+      "answer": 0,
+      "rationale": "くらいときにつけるのは「でんき」だ。\nDenki means the light, which you turn on when a room is dark.",
+      "target": "電気"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nわたしは　【いつも】　九時に　ねます。",
+      "options": [
+        "わたしは　あまり　九時に　ねません。",
+        "わたしは　きのう　九時に　ねました。",
+        "わたしは　ときどき　九時に　ねます。",
+        "わたしは　まいばん　九時に　ねます。"
+      ],
+      "answer": 3,
+      "rationale": "「いつも」は、まいにち同じようにするという意味だ。「まいばん」と同じだ。\nItsumo means always, the same as every night here.",
+      "target": "いつも"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nえきの　ホームで　はしっては　【だめ】です。",
+      "options": [
+        "えきの　ホームで　はしっても　いいです。",
+        "えきの　ホームで　はしりましょう。",
+        "えきの　ホームで　はしらないで　ください。",
+        "えきの　ホームで　はしりたいです。"
+      ],
+      "answer": 2,
+      "rationale": "「〜てはだめです」は「〜ないでください」と同じ意味だ。\nTe wa dame desu means you must not, like naide kudasai.",
+      "target": "だめ"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nでかける（　）、まどを　しめます。",
+      "options": [
+        "まえに",
+        "あとで",
+        "ながら",
+        "まで"
+      ],
+      "answer": 0,
+      "rationale": "でかけるより先にすることなので「〜まえに」をつかう。\nMae ni means before: I close the window before going out.",
+      "subject": "grammar:maeni"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nてを　あらって（　）、ごはんを　たべます。",
+      "options": [
+        "ながら",
+        "から",
+        "ので",
+        "まで"
+      ],
+      "answer": 1,
+      "rationale": "「〜てから」で、じゅんばんを言う。\nTe kara means after doing: I eat after washing my hands.",
+      "subject": "grammar:tekara"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nらいしゅう、ともだちと　きょうと（　）　いきます。",
+      "options": [
+        "が",
+        "へ",
+        "を",
+        "で"
+      ],
+      "answer": 1,
+      "rationale": "いくところには「へ」をつかう。\nE marks the destination: I will go to Kyoto.",
+      "subject": "particle:e"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nこの　へやの　まどを　あけ（　）　いいですか。",
+      "options": [
+        "ても",
+        "ながら",
+        "たり",
+        "まえに"
+      ],
+      "answer": 0,
+      "rationale": "きょかをもらうときは「〜てもいいですか」をつかう。\nTemo ii desu ka asks for permission: may I open the window?",
+      "subject": "grammar:temoii"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nえきに　ついた（　）、あめが　ふって　きました。",
+      "options": [
+        "より",
+        "ながら",
+        "とき",
+        "まえに"
+      ],
+      "answer": 2,
+      "rationale": "「〜たとき」で、そのときにおこったことを言う。\nTa toki means when: it started raining when I arrived at the station.",
+      "subject": "grammar:toki"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nえきで　＿＿＿　＿＿＿　＿★＿　＿＿＿　かいました。",
+      "options": [
+        "きょうとまで",
+        "きっぷを",
+        "電車の",
+        "いく"
+      ],
+      "answer": 2,
+      "rationale": "ただしいじゅんばんは「きょうとまで　いく　電車の　きっぷを　かいました」で、★には「電車の」が入る。\nThe order is きょうとまで いく 電車の きっぷを かいました, so 電車の fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nまいばん　＿＿＿　＿★＿　＿＿＿　＿＿＿　ねます。",
+      "options": [
+        "はを",
+        "みがいて",
+        "ベッドで",
+        "から"
+      ],
+      "answer": 1,
+      "rationale": "ただしいじゅんばんは「はを　みがいて　から　ベッドで　ねます」で、★には「みがいて」が入る。\nThe order is はを みがいて から ベッドで ねます, so みがいて fills the star.",
+      "subject": "grammar:tekara"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "かいました",
+        "かって　ください",
+        "かいます",
+        "かいましょう"
+      ],
+      "answer": 0,
+      "rationale": "「きのう」のことなので「かいました」がいい。\nThe sentence is about yesterday, so the past form kaimashita fits.",
+      "passage": "tg"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "を",
+        "に",
+        "が",
+        "で"
+      ],
+      "answer": 1,
+      "rationale": "ものがはいるところには「に」をつかう。\nNi marks where the books are: they are in the bookshelf.",
+      "passage": "tg",
+      "subject": "particle:ni"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "あした　あさ　九時に　電車に　のる　人は、どこから　のりますか。",
+      "options": [
+        "一ばんせん",
+        "二ばんせん",
+        "三ばんせん",
+        "四ばんせん"
+      ],
+      "answer": 1,
+      "rationale": "八時から十時までは三ばんせんの電車がとまらないので、二ばんせんからのる。\nFrom eight to ten, trains leave from track two instead of track three.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "けんさんは　ばんごはんの　あとで　なにを　しますか。",
+      "options": [
+        "ばんごはんを　つくる",
+        "おさらを　あらう",
+        "れいぞうこに　ばんごはんを　いれる",
+        "おかあさんを　まつ"
+      ],
+      "answer": 1,
+      "rationale": "「たべたら、おさらを　あらって　くださいね」とある。\nThe note asks Ken to wash the dishes after eating.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人は　なん時ごろ　電車に　のりますか。",
+      "options": [
+        "七時四十五ふん",
+        "八時",
+        "七時",
+        "七時十五ふん"
+      ],
+      "answer": 3,
+      "rationale": "七時にいえをでて、えきまで十五ふんあるくので、七時十五ふんごろにのる。\nThe writer leaves at seven and walks fifteen minutes, so boards around 7:15.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　どうして　いつもの　電車に　のれませんでしたか。",
+      "options": [
+        "あさごはんを　たべたから",
+        "えきまで　あるいたから",
+        "電車が　おくれたから",
+        "おきるのが　おそかったから"
+      ],
+      "answer": 3,
+      "rationale": "ねぼうをして八時におきたので、いつもの電車はもうでていた。\nThe writer overslept, so the usual train had already left.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　けさ　なにを　しませんでしたか。",
+      "options": [
+        "えきまで　はしる",
+        "ふくを　きる",
+        "先生に　はなす",
+        "あさごはんを　たべる"
+      ],
+      "answer": 3,
+      "rationale": "「あさごはんを　たべないで　いえを　でました」とある。\nThe writer left home without eating breakfast.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "日曜日に　さくらえきに　１０時までに　つきたいです。いちばん　おそい　電車は　なん時に　でますか。",
+      "options": [
+        "９時半",
+        "９時",
+        "１１時",
+        "１０時１５分"
+      ],
+      "answer": 0,
+      "rationale": "９時半にでる電車は９時５５分につくので、１０時までにつく。\nThe 9:30 train arrives at 9:55, the last one before ten.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "おとな　ふたりと　こども　ひとりで　のります。きっぷは　ぜんぶで　いくらですか。",
+      "options": [
+        "３６０円",
+        "４８０円",
+        "６００円",
+        "７２０円"
+      ],
+      "answer": 2,
+      "rationale": "おとな２４０円×２と、こども１２０円で、６００円だ。\nTwo adults at 240 yen and one child at 120 yen come to 600 yen.",
+      "passage": "info"
+    }
+  ]
+}

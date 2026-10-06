@@ -39,20 +39,24 @@
  *     kernel-minted events, so the store can accept the sitting without becoming
  *     able to accept a forgery (COORD-B8-2 closed).
  *
- * Two remain open and annotated. Both are narrower successors rather than
- * survivors: closing a defect here has repeatedly revealed a smaller one behind
- * it, and recording that is the point of the file.
+ * The two successors are now closed as well:
  *
- *   - **T4-1b (P2)** — the pre-hydration bytes still ship an empty `<title>`.
- *     Left by fixing T4-1.
- *   - **T3-3 (P2)** — an abandoned AI request still attaches a candidate.
+ *   - **T4-1b** — root-layout metadata renders before storage boot, so the
+ *     exported HTML has a title with JavaScript disabled.
+ *   - **T3-3** — page teardown invalidates a candidate request before aborting,
+ *     and a late result cannot write or clear a newer request.
  *
  * Finding **T4-1** itself (empty `<title>` on every exported page) is closed;
  * the positive assertion that replaced it lives with the rest of the
  * accessibility evidence in `adv-a11y-audit.spec.ts`.
  */
 
+import { relative, sep } from 'node:path';
+
 import type { Page } from '@playwright/test';
+
+import { DESTINATIONS } from '../src/ui/navigation.ts';
+import { startExportHost } from './support/export-server.ts';
 
 import {
   expect,
@@ -62,6 +66,9 @@ import {
   keepWord,
   takeUpForStudy,
   durableEventTypes,
+  candidateEvents,
+  exportFiles,
+  keptThreadCount,
   hangEverythingOffOrigin,
   mountedScreenCount,
   visibleTestId,
@@ -260,125 +267,211 @@ test('T3-2: navigating between destinations does not accumulate mounted screens'
  * ------------------------------------------------------------------ */
 
 /**
- * **T4-1b (P2).** The residual left by the T4-1 fix, written down so it is not
- * mistaken for closed.
- *
- * T4-1 was "every exported page ships an empty `<title>`". Every route now sets
- * a real, distinct title through `src/ui/route-title.tsx`, and
- * `adv-a11y-audit.spec.ts` asserts that positively on all nine routes — so the
- * axe violation is gone and `KNOWN_AXE_FINDINGS` is empty.
- *
- * But axe scans the **hydrated** page. The bytes `expo export` writes still
- * contain `<title data-rh="true"></title>`, because expo-router's `Head` is
- * gated on `useIsFocused` and does not render during static pre-rendering. So
- * the tab is blank for the moment between first paint and hydration, and a
- * bookmark saved from a page that never finished loading is still blank.
- *
- * *Why P2 and not P1.* The window is short, no assistive-technology user is
- * left without a title once the app runs, and every route is correctly titled in
- * the state a person actually reads. It is a real gap, not a theoretical one,
- * and it is smaller than what it replaced.
- *
- * *What a fix looks like.* Something that renders a title during static export —
- * a non-focus-gated head for the pre-render, or expo-router growing static head
- * support. `+html.tsx` is deliberately *not* it: helmet emits its (empty) title
- * first, so a title added there is second in tree order and `document.title`
- * keeps reading the empty one. That was measured, not assumed.
- *
- * This test reads the export off the wire rather than through the DOM, because
- * the DOM is exactly what hides the defect.
+ * T4-1b: AppProvider returns null until its storage-opening effect completes.
+ * Per-screen Head components therefore never mounted during static export.
+ * Root-layout metadata now sits outside that boot boundary. Every HTML file,
+ * including grouped aliases and the not-found route, is loaded without JS.
  */
-test('T4-1b: the exported HTML names itself before any JavaScript runs', async ({ page, app }) => {
-  test.fail(
-    true,
-    'T4-1b (P2): expo-router Head is focus-gated, so static pre-rendering emits an empty ' +
-      '<title>; the title only appears once the app hydrates.',
+test('T4-1b: every exported HTML document names itself before JavaScript runs', async ({
+  browser,
+  app,
+}) => {
+  const documents = exportFiles(app.distDir)
+    .filter((file) => file.endsWith('.html'))
+    .map((file) => relative(app.distDir, file).split(sep).join('/'));
+  expect(documents).toContain('index.html');
+  expect(documents).toContain('+not-found.html');
+  expect(documents, 'the diagnostic sitemap is disabled in the production router').not.toContain(
+    '_sitemap.html',
   );
 
-  const response = await page.request.get(`${app.origin}/evidence`);
-  const html = await response.text();
+  const cold = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await cold.newPage();
+    for (const file of documents) {
+      const path = file === 'index.html' ? '/' : `/${file.slice(0, -'.html'.length)}`;
+      const href = path
+        .split('/')
+        .filter((segment) => !segment.startsWith('('))
+        .join('/');
+      const label =
+        href === '/+not-found'
+          ? 'Page not found'
+          : DESTINATIONS.find((destination) => destination.href === href)?.label;
+      expect(label, `exported route ${file} has no title requirement`).toBeDefined();
+      const response = await page.goto(`${app.origin}${path}`, { waitUntil: 'load' });
+      expect(response?.status(), `could not load exported route ${file}`).toBe(200);
+      await expect(page.locator('head title'), `${file} must have exactly one title`).toHaveCount(
+        1,
+      );
+      await expect(page, `${file} has the wrong cold-load title`).toHaveTitle(
+        `${label} · Bunki 分岐`,
+      );
+    }
+  } finally {
+    await cold.close();
+  }
+});
 
-  const title = /<title[^>]*>([\s\S]*?)<\/title>/.exec(html)?.[1] ?? '';
-  expect(title.trim(), 'the pre-rendered document has a blank <title>').not.toBe('');
+test('T4-1b: an unknown URL returns a named 404 and a working way back to Capture', async ({
+  page,
+  app,
+}) => {
+  // This existing host serves +not-found.html with HTTP 404, including for
+  // deep paths. The adversarial host only serves literal exported routes.
+  const host = await startExportHost(app.distDir);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  try {
+    await openApp(page, host.baseUrl);
+    await keepWord(page, '分岐');
+    const before = await durableEventTypes(page);
+
+    const response = await page.goto(`${host.baseUrl}/missing/chapter/fixture`, {
+      waitUntil: 'load',
+    });
+    expect(response?.status()).toBe(404);
+    await expect(visibleTestId(page, 'screen-not-found')).toBeVisible();
+    await expect(page).toHaveTitle('Page not found · Bunki 分岐');
+    expect(await durableEventTypes(page)).toEqual(before);
+    await visibleTestId(page, 'not-found-capture').click();
+    await onCaptureScreen(page);
+    await expect(page).toHaveURL(`${host.baseUrl}/`);
+    expect(await keptThreadCount(page)).toBe(1);
+    expect(errors).toEqual([]);
+  } finally {
+    await host.close();
+  }
 });
 
 /* ------------------------------------------------------------------ *
- * T3-3 — abandoning an AI request still attaches a candidate
+ * T3-3 — abandoning an AI request must not attach a candidate
  * ------------------------------------------------------------------ */
 
 /**
- * **T3-3 (P2).** Tearing the document down while a candidate request is in
- * flight causes the cancellation to be handled as a *fallback*, and the
- * resulting `CandidateAttached` event is written to the durable log during
- * unload. On the next load the panel says "Nothing has been requested yet"
- * while the log — and therefore the evidence inspector and any export —
- * contains a candidate that was generated by the act of leaving.
- *
- * *Reproduction.* Ask for a note with the live route armed and the transport
- * hung, then reload before it settles. Reproduced 3/3 in this environment;
- * treated as a race, because whether the write lands depends on the store
- * completing before the JS context is discarded.
- *
- * *Mechanism.* Navigation aborts the fetch; `fallbackReasonOf` maps the
- * `AiCancelledError` to a fallback like any other failure
- * (`packages/ai/src/runtime.ts`), so the runtime resolves with a scripted
- * candidate; `useCandidate`'s `.then()` still sees `active.current === true`,
- * because React never unmounts on a document teardown, and writes it
- * (`apps/app/src/candidate/use-candidate.ts`).
- *
- * *Why it is P2 and not higher.* Nothing is lost, no memory state changes, the
- * candidate is correctly labelled `offline-fallback` and correctly `generated`
- * rather than accepted, and candidate *text* is deliberately not durable
- * (`memory-store.ts`). The defect is the divergence: a record exists for
- * something the learner never saw, and the screen afterwards denies it. That is
- * adjacent to definition-of-done §2 item 6 without being it — the learner did
- * press Ask — but the inspector will show a candidate whose only proximate cause
- * was navigation.
- *
- * *The safety half is asserted positively, and passes:*
- * `adv-ai-timeout-storm.spec.ts` requires that whatever reaches the log this way
- * is labelled and unaccepted.
- *
- * *Suggested owner.* WP-07. A cancellation is not a fallback; distinguishing
- * `AiCancelledError` from the failure reasons would close it.
+ * The runtime intentionally resolves cancellation to a labelled fallback.
+ * The panel owns whether that result still belongs to an active request.
+ * A document reload does not trigger React unmount, so pagehide must invalidate
+ * the request before its aborted transport can settle and append an event.
  */
 test('T3-3: abandoning a request in flight writes nothing to the log', async ({ page, app }) => {
-  test.fail(
-    true,
-    'T3-3 (P2): a cancellation is handled as a fallback, so the abandoned request attaches a ' +
-      'scripted candidate to the durable log during unload.',
-  );
+  const hung = await hangEverythingOffOrigin(page, app.origin);
+  await armLiveRoute(page);
+  await openCandidatePanel(page, app.origin);
+  const before = await durableEventTypes(page);
 
+  await visibleTestId(page, 'candidate-request').click();
+  await expect(visibleTestId(page, 'state-loading')).toBeVisible();
+  await expect.poll(() => hung.some((url) => url.includes('api.anthropic.com'))).toBe(true);
+
+  await page.reload({ waitUntil: 'load' });
+  await expect(visibleTestId(page, 'screen-word')).toBeVisible();
+  await expect(visibleTestId(page, 'candidate-request')).toBeVisible();
+  expect(
+    await durableEventTypes(page),
+    'the log gained an event from a request the learner abandoned',
+  ).toEqual(before);
+  expect(await candidateEvents(page)).toEqual([]);
+});
+
+interface ControlledCandidateTransport {
+  readonly calls: { readonly aborted: () => boolean; readonly fail: () => void }[];
+  readonly settled: number[];
+}
+
+/**
+ * A deliberately slow cancellation acknowledgment models a provider that does
+ * not settle immediately on abort. This test dispatches persisted page events;
+ * it tests the lifecycle handling, not whether Chromium admitted a page to BFCache.
+ */
+test('T3-3: a resumed page drops a late cancelled result and can finish a new request', async ({
+  page,
+  app,
+}) => {
   await hangEverythingOffOrigin(page, app.origin);
+  await armLiveRoute(page);
+  await page.addInitScript(() => {
+    const originalFetch = globalThis.fetch.bind(globalThis);
+    const control: ControlledCandidateTransport = { calls: [], settled: [] };
+    (globalThis as { candidateTransport?: ControlledCandidateTransport }).candidateTransport =
+      control;
+    globalThis.fetch = (input, init) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+      if (!url.startsWith('https://api.anthropic.com/')) return originalFetch(input, init);
+      const index = control.calls.length;
+      return new Promise<Response>((_resolve, reject) => {
+        control.calls.push({
+          aborted: () => init?.signal?.aborted === true,
+          fail: () => reject(new TypeError('Controlled transport failure')),
+        });
+      }).finally(() => control.settled.push(index));
+    };
+  });
+  await openCandidatePanel(page, app.origin);
+  const before = await durableEventTypes(page);
+  const transport = () =>
+    page.evaluate(() => {
+      const control = (globalThis as { candidateTransport?: ControlledCandidateTransport })
+        .candidateTransport;
+      return {
+        aborted: control?.calls.map((call) => call.aborted()),
+        settled: control?.settled,
+      };
+    });
+
+  await visibleTestId(page, 'candidate-request').click();
+  await expect.poll(async () => (await transport()).aborted).toEqual([false]);
+  await page.evaluate(() => {
+    globalThis.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+    globalThis.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+  });
+  await expect.poll(async () => (await transport()).aborted).toEqual([true]);
+  await expect(visibleTestId(page, 'candidate-request')).toBeVisible();
+
+  await visibleTestId(page, 'candidate-request').click();
+  await expect.poll(async () => (await transport()).aborted).toEqual([true, false]);
+  await page.evaluate(async () => {
+    const control = (globalThis as { candidateTransport?: ControlledCandidateTransport })
+      .candidateTransport;
+    control?.calls[0]?.fail();
+    // Flush the completion microtasks before asserting on the durable log.
+    await new Promise<void>((resolve) => globalThis.setTimeout(resolve, 0));
+  });
+  expect((await transport()).settled).toEqual([0]);
+  await expect(visibleTestId(page, 'state-loading')).toBeVisible();
+  expect(await durableEventTypes(page)).toEqual(before);
+  expect((await transport()).aborted).toEqual([true, false]);
+
+  await page.evaluate(() => {
+    (
+      globalThis as { candidateTransport?: ControlledCandidateTransport }
+    ).candidateTransport?.calls[1]?.fail();
+  });
+  await expect(visibleTestId(page, 'candidate-card')).toBeVisible();
+  await expect(visibleTestId(page, 'candidate-fallback-label')).toHaveText('offline-fallback');
+  await expect.poll(async () => (await candidateEvents(page)).length).toBe(1);
+  const [attached] = await candidateEvents(page);
+  expect(attached?.status).toBe('generated');
+  expect(attached?.envelope.provider).toBe('offline-fallback');
+  expect(await durableEventTypes(page)).toEqual([...before, 'CandidateAttached']);
+});
+
+async function armLiveRoute(page: Page): Promise<void> {
   await page.addInitScript(() => {
     (globalThis as { process?: { env: Record<string, string> } }).process = {
       env: { ANTHROPIC_API_KEY: 'fixture-not-a-real-key' },
     };
   });
+}
 
-  await openApp(page, app.origin);
+async function openCandidatePanel(page: Page, origin: string): Promise<void> {
+  await openApp(page, origin);
   await keepWord(page, '分岐');
-
   await visibleTestId(page, 'capture-open-word').click();
   await expect(visibleTestId(page, 'screen-word')).toBeVisible();
-  // The baseline is read *after* the word-page press: that press is a real
-  // lookup and legitimately records `LookupFrictionLogged` (T-07, RENKAN R2-X),
-  // so reading it earlier would blame the abandoned request for an event a
-  // deliberate gesture wrote. The poll lets the asynchronous durable append
-  // settle before the baseline is taken.
+  // The deliberate word lookup appends an event asynchronously; settle it
+  // before measuring what the candidate request adds.
   await expect
     .poll(async () => (await durableEventTypes(page)).includes('LookupFrictionLogged'))
     .toBe(true);
-  const before = await durableEventTypes(page);
-
-  await visibleTestId(page, 'candidate-request').click();
-  await expect(visibleTestId(page, 'state-loading')).toBeVisible();
-
-  await page.reload({ waitUntil: 'load' });
-  await expect(visibleTestId(page, 'screen-word')).toBeVisible();
-
-  expect(
-    await durableEventTypes(page),
-    'the log gained an event from a request the learner abandoned',
-  ).toEqual(before);
-});
+}

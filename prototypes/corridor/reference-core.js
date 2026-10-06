@@ -26,6 +26,7 @@
  *   node tools/build-reference-data.mjs --check [--archive /path/to/archive.zip]
  * No network or generated classifications are used.
  */
+/* global module:readonly -- Optional CommonJS export, guarded for browsers. */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.BunkiReferenceCore = factory();
@@ -54,7 +55,7 @@
   const POLICY = Object.freeze({
     membership: 'All attested levels; distinct entries within each collection. Conflicts repeat across levels.',
     displayPrecedence: 'Dictionary reading/meanings first, graded words fallback. Kanji metadata first, committed metadata fallback.',
-    identity: 'Exact printed source key; never NFKC-fold identities. Missing Unicode glyphs use their source entry ID.',
+    identity: 'Exact printed form and reading identify vocabulary; never normalize or merge homographs. Missing Unicode glyphs use their source entry ID.',
     scope: 'Complete indexed committed corpus, not official or exam-complete lists. Kentei collections are assigned-grade bins, not cumulative test scope.',
     jlptKanji: 'Bundled editorial JLPT tags retained verbatim; N3 has no tagged kanji. Historical pre-2010 KANJIDIC levels are not mapped to modern JLPT levels.',
     unknown: 'No attested label, or an unrecognized label kept verbatim; never infer a level from school grade or rank.',
@@ -63,6 +64,12 @@
 
   function text(value) {
     return value == null ? '' : String(value);
+  }
+
+  // JSON tuple encoding is unambiguous even when source strings contain
+  // separators. Query normalization must never change dictionary identity.
+  function wordKey(id, reading) {
+    return JSON.stringify([text(id), text(reading)]);
   }
 
   function normalizeQuery(value) {
@@ -165,15 +172,15 @@
     const kanjiEntries = new Map();
     const collections = new Map();
 
-    function getEntry(map, id, type) {
-      if (!map.has(id)) map.set(id, {
-        id, text: id, type, reading: '', readings: [], meanings: [],
+    function getEntry(map, key, type, id = key) {
+      if (!map.has(key)) map.set(key, {
+        id, key, text: id, type, reading: '', readings: [], meanings: [],
         on: [], kun: [], aliases: [], sources: [], levelSources: [],
         sourceRecords: [], variants: [], conflict: false, missingGlyph: false,
         metadataSources: {}, dictionaryLinks: [], relatedForms: [],
         kanjiLinks: [], canonicalTarget: null,
       });
-      return map.get(id);
+      return map.get(key);
     }
 
     function addSource(entry, source) {
@@ -195,8 +202,8 @@
     }
 
     function addWord(id, row, source, sourceId) {
-      const entry = getEntry(wordEntries, id, 'word');
       const reading = text(row.r);
+      const entry = getEntry(wordEntries, wordKey(id, reading), 'word', id);
       const meanings = strings(row.m == null ? row.g : row.m);
       if (!entry.reading && reading) {
         entry.reading = reading;
@@ -209,6 +216,7 @@
       entry.readings = unique([...entry.readings, ...strings(reading)]);
       entry.aliases = unique([...entry.aliases, ...strings(row.alt)]);
       const variant = { source, reading, meanings: [...meanings] };
+      if (row.jlpt != null && row.jlpt !== '') variant.level = normalizeLevel(row.jlpt, 'jlpt');
       if (sourceId != null) variant.sourceId = sourceId;
       entry.variants.push(variant);
       for (const glyph of strings(row.k)) {
@@ -228,7 +236,7 @@
         addWord(id, { r: reading, m: meanings, jlpt: level, k: glyphs }, source, sourceId);
       }
       for (const [id, reading, candidates] of extra.wordLinks || []) {
-        const entry = wordEntries.get(id);
+        const entry = wordEntries.get(wordKey(id, reading));
         if (!entry) continue;
         entry.dictionaryLinks.push({
           reading, candidates: [...candidates], source: 'dictionary-index',
@@ -335,10 +343,15 @@
     }
 
     function indexEntry(entry, families) {
+      // The app resolves a printed word through dict first, then words. A
+      // shadowed row with another reading is a reference-only source record,
+      // even if its form happens to exist in one of those runtime tables.
+      const runtimeWord = dict[entry.id] || words[entry.id];
       const canonical = entry.type === 'word'
-        ? Object.hasOwn(dict, entry.id) || Object.hasOwn(words, entry.id)
+        ? !!entry.reading && !!runtimeWord && text(runtimeWord.r) === entry.reading
         : !entry.missingGlyph && Object.hasOwn(kanji, entry.id);
       entry.canonicalTarget = canonical ? { type: entry.type, id: entry.id } : null;
+      if (canonical && entry.type === 'word') entry.canonicalTarget.reading = entry.reading;
       for (const link of entry.kanjiLinks) {
         link.referenceId = kanjiEntries.has(link.id) ? link.id : null;
         link.status = link.canonicalTarget ? 'bundled'
@@ -395,7 +408,7 @@
       const relevant = result.filter((collection) => collection.family === family);
       const labelled = relevant.filter((collection) => collection.level !== 'unknown');
       const entries = new Map(labelled.flatMap((collection) =>
-        collection.entries.map((entry) => [entry.id, entry])));
+        collection.entries.map((entry) => [entry.key, entry])));
       stats.families[family] = {
         uniqueLabelled: entries.size,
         memberships: labelled.reduce((sum, collection) => sum + collection.count, 0),
@@ -410,6 +423,6 @@
 
   return Object.freeze({
     createCatalog, search, searchEntries, sortEntries, paginateEntries,
-    normalizeQuery, normalizeLevel, compareEntries, JLPT_LEVELS, KANKEN_LEVELS,
+    normalizeQuery, normalizeLevel, compareEntries, wordKey, JLPT_LEVELS, KANKEN_LEVELS,
   });
 });

@@ -1,0 +1,1229 @@
+{
+  "schema": "bunki-machine-check-review/1",
+  "form": {
+    "kind": "form",
+    "id": "kairo-original-jlpt-n2-written-04:written-review",
+    "revisionId": "assessment-form:059f609a009e32355f0e13aea40d6f51226adf86e161efbb4e2688480b5a7171",
+    "sha256": "059f609a009e32355f0e13aea40d6f51226adf86e161efbb4e2688480b5a7171"
+  },
+  "route": "machine-checked-written/1",
+  "policy": "bunki-machine-check/1",
+  "status": "machine-checked",
+  "acceptance": "awaiting-john",
+  "label": "検収前 · machine-checked, awaiting John's review",
+  "rule": "Each verifier family solved every item blind (no key, no rationale) and could flag ambiguity, no correct option or unnatural Japanese. An item is kept only when every family that answered chose the key and none flagged it: at least three families, or two when a family could not answer. The author family never verifies its own items.",
+  "author": {
+    "family": "anthropic-claude",
+    "model": "claude-opus-5.5"
+  },
+  "verifierFamilies": [
+    "zhipu-glm",
+    "moonshot-kimi",
+    "deepseek"
+  ],
+  "manuscriptSha256": "316ff05e6a35538081d6d190a6244ae069684c415e1a74931d2814b64c270dd5",
+  "bindingSha256": "8179889384b59bf0830e46f1064a494c4eaa0a81ccb13706ee9c1b09a5edb934",
+  "items": [
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q01",
+      "itemSha256": "cf195928f01b4e942106521f34f351edfaf9dbd9b650ec0686e53e663835361a",
+      "viewSha256": "a336c40c9db1b2e81243631c32121b4c8effa6e0cb1a96f1a20727472f5c62f0",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "9d6dd2e33705103e1107ad78f8c181bffaccef541d5c6984f3c3b0e8ab5ca413"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "4ecf97e5216ca4ff6e31cf3afcc69b1f147bd282a25a861d6595d20ba8ed9678"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "af3e2efa69985144d58cbceed21c3346d704951db72d3bc6a4c42f2bd9acfc43"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q02",
+      "itemSha256": "99f6e4cb97ac425f91c0bf5f7b9b55f8fd17b7916e7ff9c36e8344167fa4dc17",
+      "viewSha256": "38434b7980b67de271b06cf342ce8b635c4a1210da8d246807d09c5379a319e1",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "9d6dd2e33705103e1107ad78f8c181bffaccef541d5c6984f3c3b0e8ab5ca413"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "4ecf97e5216ca4ff6e31cf3afcc69b1f147bd282a25a861d6595d20ba8ed9678"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "af3e2efa69985144d58cbceed21c3346d704951db72d3bc6a4c42f2bd9acfc43"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q03",
+      "itemSha256": "1ef960b230ced1a6c467aca7d3b9506ee7a1d86dea59459a94850d11f86606cb",
+      "viewSha256": "e5533dd89dfeafe2a0d44fc27e9528b3bc0faba852163329e45057e09fe4fb42",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "9d6dd2e33705103e1107ad78f8c181bffaccef541d5c6984f3c3b0e8ab5ca413"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "4ecf97e5216ca4ff6e31cf3afcc69b1f147bd282a25a861d6595d20ba8ed9678"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "af3e2efa69985144d58cbceed21c3346d704951db72d3bc6a4c42f2bd9acfc43"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q04",
+      "itemSha256": "32ea7fd8b9c6d89c38362ee20e3dfb33402a62116bbfaa85cccb6c5e4a4923b5",
+      "viewSha256": "11f6d3536ee1ce9a2f2c49ae5be79b7098298df93560a8278c6d84f738f6d8b5",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "9d6dd2e33705103e1107ad78f8c181bffaccef541d5c6984f3c3b0e8ab5ca413"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "4ecf97e5216ca4ff6e31cf3afcc69b1f147bd282a25a861d6595d20ba8ed9678"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "af3e2efa69985144d58cbceed21c3346d704951db72d3bc6a4c42f2bd9acfc43"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q05",
+      "itemSha256": "7274cee961c29fa28f0e79e7e6253102d7f1349bf93db2084ddea62f8e64cb1f",
+      "viewSha256": "01de19ba96cf137ead0084592c51189e0feaddab170624389829978d547c086c",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "9d6dd2e33705103e1107ad78f8c181bffaccef541d5c6984f3c3b0e8ab5ca413"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "4ecf97e5216ca4ff6e31cf3afcc69b1f147bd282a25a861d6595d20ba8ed9678"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "af3e2efa69985144d58cbceed21c3346d704951db72d3bc6a4c42f2bd9acfc43"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q06",
+      "itemSha256": "afc68c1245a65e9a71835a784a7d614e9f380e2169c949fb82cb41dc267dbb4f",
+      "viewSha256": "0dac971165cf67cbc3a9a3f70fde688c28cf5f721372c47c1bc1f75e2d40d586",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "9d6dd2e33705103e1107ad78f8c181bffaccef541d5c6984f3c3b0e8ab5ca413"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "4ecf97e5216ca4ff6e31cf3afcc69b1f147bd282a25a861d6595d20ba8ed9678"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "af3e2efa69985144d58cbceed21c3346d704951db72d3bc6a4c42f2bd9acfc43"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q07",
+      "itemSha256": "e1141347afe086bb12a001d684d218627ad250d9b0f60e511998ecb5b1c74771",
+      "viewSha256": "28d281bc8c5a4bf5761c4dd35ebeeb89e102d53602a63d28e1411aec04791059",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "ce48ef3773b58a80e858d247b1c5c0bd9235c293a5139d6cc80e8f4a86ef0cb1"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "7e290583dee98026cfb4d4a016e2ec835982c8f249c2a2f06ba4105963cc2cfd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "65ab3a8201a91465c5c3188461ac33b5f558f056bf3af47746162525b0f7733a"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q08",
+      "itemSha256": "00342d0aa2f318245cc743d8f12eb655f9a63b3e1f8d15e7a09b151cd7eeb030",
+      "viewSha256": "279dc2a7a74f28cdeb4d329883941a525efc955e3507f6575b2b8bd1e7adc26d",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "ce48ef3773b58a80e858d247b1c5c0bd9235c293a5139d6cc80e8f4a86ef0cb1"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "7e290583dee98026cfb4d4a016e2ec835982c8f249c2a2f06ba4105963cc2cfd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "65ab3a8201a91465c5c3188461ac33b5f558f056bf3af47746162525b0f7733a"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q09",
+      "itemSha256": "f2455c0d7dc8c0c27a7413cbb970beb3e2fc98905273459812132eb3da123c30",
+      "viewSha256": "7702aa12206c6d863131461fe1b2a3742f5a0e74bcb184d45be9248f6b573e02",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "ce48ef3773b58a80e858d247b1c5c0bd9235c293a5139d6cc80e8f4a86ef0cb1"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "7e290583dee98026cfb4d4a016e2ec835982c8f249c2a2f06ba4105963cc2cfd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "65ab3a8201a91465c5c3188461ac33b5f558f056bf3af47746162525b0f7733a"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q10",
+      "itemSha256": "98a1574a50ec43904f58542827b02cdf9a8e73e783fa6b139b397770c534efce",
+      "viewSha256": "0f7452a0b45712787e0846180644eae4710b4cd79d042b5431538bdc22be9e3f",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "ce48ef3773b58a80e858d247b1c5c0bd9235c293a5139d6cc80e8f4a86ef0cb1"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "7e290583dee98026cfb4d4a016e2ec835982c8f249c2a2f06ba4105963cc2cfd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "65ab3a8201a91465c5c3188461ac33b5f558f056bf3af47746162525b0f7733a"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q11",
+      "itemSha256": "2a1a5b3c7065eae9167d7b92d057d48f8015827326f356c507ff69c847958f72",
+      "viewSha256": "2b55313bd707f09c903a8d745df439cec91719b7d724664935948ce551e03cdf",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "ce48ef3773b58a80e858d247b1c5c0bd9235c293a5139d6cc80e8f4a86ef0cb1"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "7e290583dee98026cfb4d4a016e2ec835982c8f249c2a2f06ba4105963cc2cfd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "65ab3a8201a91465c5c3188461ac33b5f558f056bf3af47746162525b0f7733a"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q12",
+      "itemSha256": "1b758b4dc9530d5261e61338ffa3aaef6d3ccfc751027978d2e0d4feaaf741d6",
+      "viewSha256": "66977ce06bc5e3d63d24473d510be1a2334f945a25b510012b43de6cf3181447",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "ce48ef3773b58a80e858d247b1c5c0bd9235c293a5139d6cc80e8f4a86ef0cb1"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "7e290583dee98026cfb4d4a016e2ec835982c8f249c2a2f06ba4105963cc2cfd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "65ab3a8201a91465c5c3188461ac33b5f558f056bf3af47746162525b0f7733a"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q13",
+      "itemSha256": "734e17ecb743c2ce0160865b051380b500455c1cc674f909694beea6da47b4e6",
+      "viewSha256": "3f1719c7107b02fe615407235bdecb328c7bcd2081db2ec29a10aabd50cf7bfb",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "a2587b2ff42ebe14147c03b2ff0da6bc957c640cb834b9502b4dfbb3cbad5596"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "be18c7ea3a30b3b6e5140c6ac4ecdc41c73e31f9fac93bf3d808242272e3c78f"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "3e73de4450b0efed2f40d3dd69ecb6d8aaf87e1e74ff1eff401cec7616b3ff79"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q14",
+      "itemSha256": "6effa3ba5448b4bfd41196f4916acbdb5d81e0825cf806266a6bd98354fafa4c",
+      "viewSha256": "478df061580895614471a230a40c9e8448b29aa9b1c4bf425e581ec5ab4f4f74",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "a2587b2ff42ebe14147c03b2ff0da6bc957c640cb834b9502b4dfbb3cbad5596"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "be18c7ea3a30b3b6e5140c6ac4ecdc41c73e31f9fac93bf3d808242272e3c78f"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "3e73de4450b0efed2f40d3dd69ecb6d8aaf87e1e74ff1eff401cec7616b3ff79"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q15",
+      "itemSha256": "8980fd5b99ee94b475f5194c39eb8a382b121d10928a8f70c4698c85ebaeab88",
+      "viewSha256": "28c58b411d2e5ad91550ede8cada2a5d727ff8bdbc3166811a35f63c75efcd05",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "a2587b2ff42ebe14147c03b2ff0da6bc957c640cb834b9502b4dfbb3cbad5596"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "be18c7ea3a30b3b6e5140c6ac4ecdc41c73e31f9fac93bf3d808242272e3c78f"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "3e73de4450b0efed2f40d3dd69ecb6d8aaf87e1e74ff1eff401cec7616b3ff79"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q16",
+      "itemSha256": "6178230f255f6745703b276b736edbbe4742969bbf40be74da351443eb7c271d",
+      "viewSha256": "8462dd3731bb76a9db7c91a19366941daa3487907adbca4d8c3e1c09223aa3a4",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "bb054dfd6b0528d8f5c88e9494b819a7a0cf095c0aaeba1e84310d1c3ac69fa0"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "96a909dd2d5ab6234ce05006703876573d80db603aed1312db7b59abdb18ce02"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "867fc9b1d0d4df379387b624f0fc53c900860003eaba499a83b118462b3ad3c9"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q17",
+      "itemSha256": "985b416bd3bec40308ca5d0f2c325220176c0ed8c9b0fac47f6227e02e8844b2",
+      "viewSha256": "92ca48fc6857a9a72321b326978dcea304bad799d9828fe241d7a38fc7fdb332",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "bb054dfd6b0528d8f5c88e9494b819a7a0cf095c0aaeba1e84310d1c3ac69fa0"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "96a909dd2d5ab6234ce05006703876573d80db603aed1312db7b59abdb18ce02"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "867fc9b1d0d4df379387b624f0fc53c900860003eaba499a83b118462b3ad3c9"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q18",
+      "itemSha256": "77c7c106f36523228f82f7fe248be9a44637b7cbac4b43244c5203c13d5df5d3",
+      "viewSha256": "8179dc7ffcfdf874223563e8d69808e83c9afadf29f84535d7414c634d7af23f",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "bb054dfd6b0528d8f5c88e9494b819a7a0cf095c0aaeba1e84310d1c3ac69fa0"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "96a909dd2d5ab6234ce05006703876573d80db603aed1312db7b59abdb18ce02"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "867fc9b1d0d4df379387b624f0fc53c900860003eaba499a83b118462b3ad3c9"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q19",
+      "itemSha256": "06e49224134b56ca457d768e1276529897d37a8aafadcbe26384a8711688d630",
+      "viewSha256": "48852925587e181d98d2c6e7d58ecc21eedd3eec08a50e31a19624c29738d10a",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "bb054dfd6b0528d8f5c88e9494b819a7a0cf095c0aaeba1e84310d1c3ac69fa0"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "96a909dd2d5ab6234ce05006703876573d80db603aed1312db7b59abdb18ce02"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "867fc9b1d0d4df379387b624f0fc53c900860003eaba499a83b118462b3ad3c9"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q20",
+      "itemSha256": "6c69ad67944517645f842ffa3dcbd663740e164e5c5969456ef810f8f223a96f",
+      "viewSha256": "2020cdbdee472983a024c40ae25d97ae2316fce5bb3533bba0fc8f3506ca03d0",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "bb054dfd6b0528d8f5c88e9494b819a7a0cf095c0aaeba1e84310d1c3ac69fa0"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "96a909dd2d5ab6234ce05006703876573d80db603aed1312db7b59abdb18ce02"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "867fc9b1d0d4df379387b624f0fc53c900860003eaba499a83b118462b3ad3c9"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q21",
+      "itemSha256": "54b886d40af2c7f2e7a8ece1b2c1706414df8fe848c83caf3ea74226310a9ce1",
+      "viewSha256": "378df5b4869c0ca6525530ae3d88e7561209c803d93de9881097f8a4a20ac2fd",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "bb054dfd6b0528d8f5c88e9494b819a7a0cf095c0aaeba1e84310d1c3ac69fa0"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "96a909dd2d5ab6234ce05006703876573d80db603aed1312db7b59abdb18ce02"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "867fc9b1d0d4df379387b624f0fc53c900860003eaba499a83b118462b3ad3c9"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q22",
+      "itemSha256": "4b4bba03d988b279f81c6d5bf6e811bd2a7eea8809461e87dd0fc5770cf65e7d",
+      "viewSha256": "feace432113b5774df86c4cc18650d8229160bbae9a61f09add96fc9a67e6042",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "ab0825caf6d13d4f98e21fd3e32f4cb28c4f16eb1f571235eab830054e0c6b9b"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "efc39248c3088a1f0ed48ca5738304e441bd7d348f113ae54b7826098c65b2b3"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "f0310528568950de55e48e8dc366e82ac36d9dc3a3911eabd3ec32cad34191cd"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q23",
+      "itemSha256": "fed8ea5e0be761f0f03adf7bca9918d5b8abca9e2dc024e99470d90572db7f07",
+      "viewSha256": "0cdb40691c57321ff1b68d940f4a607eca1d7e9a22b2396ebc88c9a19821b96a",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "ab0825caf6d13d4f98e21fd3e32f4cb28c4f16eb1f571235eab830054e0c6b9b"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "efc39248c3088a1f0ed48ca5738304e441bd7d348f113ae54b7826098c65b2b3"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "f0310528568950de55e48e8dc366e82ac36d9dc3a3911eabd3ec32cad34191cd"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q24",
+      "itemSha256": "dec1cc669270eb8eb226acbbb6a5ca786e5dfe0a27e2108447faba66b768d729",
+      "viewSha256": "e68da09c1d6556a6649d036a4e2cf952940c17590773ef322637151c097529cb",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "ab0825caf6d13d4f98e21fd3e32f4cb28c4f16eb1f571235eab830054e0c6b9b"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "efc39248c3088a1f0ed48ca5738304e441bd7d348f113ae54b7826098c65b2b3"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "f0310528568950de55e48e8dc366e82ac36d9dc3a3911eabd3ec32cad34191cd"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q25",
+      "itemSha256": "452bdebeba07140cffff9b052653b6aaa692104531c45608197dc350a6b85854",
+      "viewSha256": "4e017efad5f70557d2e6c2e9a05a520bea4740ee11802e1f50b9cdff23f55e61",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "de6958e838036574872d21b59fa327a182bfcc5b6a4ebdb836d6b9437748b18b"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "efed6cf4e6cbaac1cbcef2a42e5481b8b2ced062a5ffcc05168f5e20b71b69fd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "8eeb282dc6bb0842331c9415671874018fa99ef7d727cd6a46a250216903bec6"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q26",
+      "itemSha256": "05959951fdeba2ce1a5a5bdaedee284f60dac48bf945632ffd0d7f91c97556e2",
+      "viewSha256": "3a34bd05a25f1fcbb7e4e30af3b87bda1eec031b01595b7728d3407549079cba",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "de6958e838036574872d21b59fa327a182bfcc5b6a4ebdb836d6b9437748b18b"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "efed6cf4e6cbaac1cbcef2a42e5481b8b2ced062a5ffcc05168f5e20b71b69fd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "8eeb282dc6bb0842331c9415671874018fa99ef7d727cd6a46a250216903bec6"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q27",
+      "itemSha256": "ae82c572d2ec6a71a9f6819edb85cf41ce142030f2facba30405e943e661a0ed",
+      "viewSha256": "8802990bc98392179119bd129205205fc54c280fc239dc920fc503ef6e4982f8",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "de6958e838036574872d21b59fa327a182bfcc5b6a4ebdb836d6b9437748b18b"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "efed6cf4e6cbaac1cbcef2a42e5481b8b2ced062a5ffcc05168f5e20b71b69fd"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "8eeb282dc6bb0842331c9415671874018fa99ef7d727cd6a46a250216903bec6"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q28",
+      "itemSha256": "ce439bb14f97a50760797df0102e7e7fec101c22baf01b6fbf08000dcb6bf582",
+      "viewSha256": "1e8f111c8ee8c8bb9278a7aabf893e68214f1e579bfc345d899f48ce744fc7de",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "3ef8bfdc60fc2a25612c12c063d5485ed434be18679a9627ec8e927496d872a6"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "795fb491c16645e60e1038d59e4f3849b26e71ee50173ade075f16f39a0c8310"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "9b81a38b1b1c61a5fc2536f0a5fe3c8120ebcc0f86a8600f30b05bb570d90fc3"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q29",
+      "itemSha256": "50cfbb65b1f90cf033cbcfca8a256b59ae8c560cb9d287a01b6441738fc4643b",
+      "viewSha256": "004c3f8fac31be18315369514e2be5cfd92d9e63ed44b97056bff23b2e15a4cb",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "38ddecb2c14f14cebd263a75e5ea293d41c1bdccc87438ccd14c488a69ebe098"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "60de4d12194e796ba848ca5d9a3e8750392f454f0c3a53645872d3a51b9bc308"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "7c6fc71538847452561240a316ebf07f5a416dabb09844f40028454dd224378b"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q30",
+      "itemSha256": "03c63592998bfab0cd3dd0325a0db0b3ee6499cf8d08b6b903e520962e4f10f1",
+      "viewSha256": "fc841807a621ba37a43f21543f28bebf558b5e9cf2eb16a23bcc1f72b1a4f363",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "759275423659875362748c73f1daa52c0345e99fbd902c83dde8421a94b505fb"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "fc580715a1f247ab715d6c494941dacfa51d9008ac112e87cb92c036587c9b31"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "4dce1144cee5df47a0b8a4741777077e797f7f81e6d977ef8891b19c778c4cee"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q31",
+      "itemSha256": "b073ce31d8acdb4d19eff1933821bfdd6b793c13162ee0e83c94cfc756c2cb29",
+      "viewSha256": "c76b3904a662eda9d4a89a6f156177f3e627d2c0077c26aef41ebe2c816d68c4",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "708c95e7f9d884928f7d73b59ac2ff3d28dd26cdb72ec30d801f5f3bbc8cd0f8"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "0e9e33f722c9b0a34a10b0082454b920f9f5bd5abc3b5e4b4ab47490503b31dc"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "4e8c30c146985e65d311fa50450fea82f8e9c5ef9b1592cf2e51926c728a3a3d"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q32",
+      "itemSha256": "cf54422b17499f663879b217081e0cdd875c85b8aaf5dcbac32fe5a004de8a1f",
+      "viewSha256": "b7b7f8138a13f2e20e917fe31237cbd59290dff52354483f40611a43442a803e",
+      "key": 3,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "708c95e7f9d884928f7d73b59ac2ff3d28dd26cdb72ec30d801f5f3bbc8cd0f8"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "0e9e33f722c9b0a34a10b0082454b920f9f5bd5abc3b5e4b4ab47490503b31dc"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 3,
+          "flags": [],
+          "responseSha256": "4e8c30c146985e65d311fa50450fea82f8e9c5ef9b1592cf2e51926c728a3a3d"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q33",
+      "itemSha256": "1939c6a8d3606930b5873d7b44df6da9b060a0e692a7fd81da424997843e71d1",
+      "viewSha256": "74580dca323da29cb068d79a510ba512a854b60cebdd1d2d2cf8a76749db1c82",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "a8838334c7f240edfed2bd128baef48b36dd3bf8f38485af2692c2910ab984b2"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "69ee33e9707fd3cdf8eeb7f2d1ea02ec3e4cb0260e8f9687c76564348c2c1fc5"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "a231265bb826dde04f6c662f35efcfcebf1f8725a50a93c97990c65ce83b2ae7"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q34",
+      "itemSha256": "c9b0be4320b3546f0ad898d652d44cb46020ed6f02ec351ef439a448f1ebe964",
+      "viewSha256": "d7520f7e5b0ac96c9ff3f8d7db0ae3553e032ab926a81ef0e788126ba666a5af",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "a8838334c7f240edfed2bd128baef48b36dd3bf8f38485af2692c2910ab984b2"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "69ee33e9707fd3cdf8eeb7f2d1ea02ec3e4cb0260e8f9687c76564348c2c1fc5"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "a231265bb826dde04f6c662f35efcfcebf1f8725a50a93c97990c65ce83b2ae7"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q35",
+      "itemSha256": "43975f8a2e6adb7f9559f28da7b31de1dfe11b161248a81132d4912708fe3038",
+      "viewSha256": "2b9305e078326436a0f90f0c8f70b3ec3fcf29813c68c42fb1e0ff724556d4a9",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "a7e23642ac16e365d2e89ed025078e03f4eb91a328be602b83ac0948beeda70f"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "7472b05d2d45e6d578cb1dceab43309a993af65fec3b0e1af046873f5b3fd59c"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "f058d1c81528eca13d5481932a7c2df0c57e4eec20a3b6352d6b9b226685106d"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q36",
+      "itemSha256": "c62a5d0052cbbdd49812e3a268276d75096e8478edaf716c9d05f61477c8774d",
+      "viewSha256": "b4c9fb323a137bd9de1b384746b2abbaab9a9eb266dc0fe9aaf80c4791827f7a",
+      "key": 1,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "a7e23642ac16e365d2e89ed025078e03f4eb91a328be602b83ac0948beeda70f"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "7472b05d2d45e6d578cb1dceab43309a993af65fec3b0e1af046873f5b3fd59c"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 1,
+          "flags": [],
+          "responseSha256": "f058d1c81528eca13d5481932a7c2df0c57e4eec20a3b6352d6b9b226685106d"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q37",
+      "itemSha256": "526cc59af06c12d6af106b30ecabae6ae93e90b84a163eeaa0b4e6503b45f952",
+      "viewSha256": "bf75aee0fa7c5bf3a24c4a0114af1c522fb6aaebac064c8dc581ecb5359a62d2",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "99e0c1aa532b7c801f525494e5bf1f3255c8e871f5d0428950a01f588b660e22"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "911c1e1480e1234fd10b4732d141c3cdd2bee1414162f09805f8d2ff4d562c32"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "bd6d0ca7d40e2f1c863d576aac2e860413f12ae8ce686f03161f05ac0474ecfd"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q38",
+      "itemSha256": "5ec1e744de4678beb093555ab23d4ba7a2dcd36eb815e6e7bcf2321f4cce06d8",
+      "viewSha256": "bd1bf52ddca76ca61ef51c85c486524622ae20334448ebeeb7ec6a0d2c86a7ba",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "99e0c1aa532b7c801f525494e5bf1f3255c8e871f5d0428950a01f588b660e22"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "911c1e1480e1234fd10b4732d141c3cdd2bee1414162f09805f8d2ff4d562c32"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "bd6d0ca7d40e2f1c863d576aac2e860413f12ae8ce686f03161f05ac0474ecfd"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q39",
+      "itemSha256": "bf62b69fa99c64d74cbb9f3708c927a9e5b6e3bff7d7173310f9561aab20d1ce",
+      "viewSha256": "8ad4c16f098aa1f73bd00555764b659ca471aef1c2c371c805681a1b8657af82",
+      "key": 2,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "cc484b8d77dbfed4994e83ba0c45c95ae7e55e055818bcac8320d482d2b3f6a2"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "8fc628aa6cc8d3600e8baa4ac60ddeaa29e3e2a49d62a80a6217a517cab1abb5"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 2,
+          "flags": [],
+          "responseSha256": "0102f7c6024f9bdd4a6f85ca158ef5dc5920474208d2ca51167928adecb0c886"
+        }
+      ]
+    },
+    {
+      "itemId": "kairo-original-jlpt-n2-written-04:q40",
+      "itemSha256": "45b202aa295e7f65e0750429ead5bf879f8fe5c4cf92f56d577b4a0a2623d8e8",
+      "viewSha256": "383f4a259dba92addcb17c71e458d365538c43d9159b70c025832df2be9b50de",
+      "key": 4,
+      "status": "kept",
+      "verdicts": [
+        {
+          "family": "zhipu-glm",
+          "model": "glm-5.3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "cc484b8d77dbfed4994e83ba0c45c95ae7e55e055818bcac8320d482d2b3f6a2"
+        },
+        {
+          "family": "moonshot-kimi",
+          "model": "kimi-k3:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "8fc628aa6cc8d3600e8baa4ac60ddeaa29e3e2a49d62a80a6217a517cab1abb5"
+        },
+        {
+          "family": "deepseek",
+          "model": "deepseek-v4-pro:cloud",
+          "choice": 4,
+          "flags": [],
+          "responseSha256": "0102f7c6024f9bdd4a6f85ca158ef5dc5920474208d2ca51167928adecb0c886"
+        }
+      ]
+    }
+  ],
+  "officialScoreCalibrated": false
+}

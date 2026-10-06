@@ -1,0 +1,2955 @@
+{
+  "schema": "kairo-assessment-audio-scripts/1",
+  "formId": "kairo-original-jlpt-n2-form-01",
+  "units": [
+    {
+      "id": "kairo-original-jlpt-n2-form-01:example-listening-task",
+      "kind": "example",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l01"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "ここから聴解です。音声は一度ずつ流れます。必要なことはメモしてください。最初は、話の中で決まった行動を聞き取る問題です。質問を先に聞き、そのあと会話を聞きます。会話が終わったら、画面の四つの選択肢から答えを選びます。まず練習をしましょう。練習では選択肢も読み上げます。これは採点されません。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "図書館で二人が話しています。女の人は、まず何をしますか。選択肢、一、本を棚に戻す。二、返却する本の冊数を数える。三、貸出用の袋を用意する。四、利用者に電話する。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "読書会で使った本が戻ってきました。今から棚に戻してもいいですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "戻す前に、全部で何冊あるか確かめてもらえるかな。貸し出したのは二十冊のはずだから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "足りなかったら、利用者の方に電話するんですね。袋も片付けておきます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん。でも連絡は冊数を確かめてからでいいよ。袋は私が片付けるから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、まず何をしますか。少し考えてください。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "答えは二、返却する本の冊数を数える、です。本を棚に戻すことと、足りない場合に電話することは、そのあとの行動です。いくつかの作業が出てきても、質問で聞かれた順序に注意しましょう。練習はここまでです。次から採点される問題が始まります。"
+        }
+      ],
+      "transcript": "ここから聴解です。音声は一度ずつ流れます。必要なことはメモしてください。最初は、話の中で決まった行動を聞き取る問題です。質問を先に聞き、そのあと会話を聞きます。会話が終わったら、画面の四つの選択肢から答えを選びます。まず練習をしましょう。練習では選択肢も読み上げます。これは採点されません。\n図書館で二人が話しています。女の人は、まず何をしますか。選択肢、一、本を棚に戻す。二、返却する本の冊数を数える。三、貸出用の袋を用意する。四、利用者に電話する。\n読書会で使った本が戻ってきました。今から棚に戻してもいいですか。\n戻す前に、全部で何冊あるか確かめてもらえるかな。貸し出したのは二十冊のはずだから。\n足りなかったら、利用者の方に電話するんですね。袋も片付けておきます。\nうん。でも連絡は冊数を確かめてからでいいよ。袋は私が片付けるから。\n女の人は、まず何をしますか。少し考えてください。\n答えは二、返却する本の冊数を数える、です。本を棚に戻すことと、足りない場合に電話することは、そのあとの行動です。いくつかの作業が出てきても、質問で聞かれた順序に注意しましょう。練習はここまでです。次から採点される問題が始まります。",
+      "transcriptSha256": "b0551fc1370864e38801eb1b52f48b688506031b24eb60bbf9e583c114943a7f",
+      "authoringEvidence": {
+        "kind": "original-ai",
+        "familyId": "codex",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l01",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l01"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "地域の情報誌を作っている二人が話しています。女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "次の号の原稿、誤字のチェックは一通り終わりました。これで取材先に送って確認してもらおうと思っているんですが、よろしいですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "送るのはまだ待って。昨日の夜、筆者の方から修正依頼のメールが届いていてね。本文中の数字を一か所変えたいという申し出なんだ。まずそのメールをちゃんと読んで、どの部分か把握してから原稿に反映してほしい。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "数字というと、取材先の料金のところでしょうか。それなら先方に電話で確認したほうがいいですよね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "いや、料金は僕のほうで先方に確認済みだから、改めて電話する必要はないよ。何の数字をどう変えたいか、メールに具体的に書いてあるから、そこを見ればすぐ分かる。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "わかりました。じゃあ、筆者のメールを確認して修正を反映してから、取材先に送る版を作ります。あと、写真の説明文も少し気になるんですが、あちらも直しておきましょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "写真の説明は僕が今見直しているところだから、そっちは任せて。君は筆者の修正を先に済ませてくれ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "地域の情報誌を作っている二人が話しています。女の人は、このあとまず何をしますか。\n次の号の原稿、誤字のチェックは一通り終わりました。これで取材先に送って確認してもらおうと思っているんですが、よろしいですか。\n送るのはまだ待って。昨日の夜、筆者の方から修正依頼のメールが届いていてね。本文中の数字を一か所変えたいという申し出なんだ。まずそのメールをちゃんと読んで、どの部分か把握してから原稿に反映してほしい。\n数字というと、取材先の料金のところでしょうか。それなら先方に電話で確認したほうがいいですよね。\nいや、料金は僕のほうで先方に確認済みだから、改めて電話する必要はないよ。何の数字をどう変えたいか、メールに具体的に書いてあるから、そこを見ればすぐ分かる。\nわかりました。じゃあ、筆者のメールを確認して修正を反映してから、取材先に送る版を作ります。あと、写真の説明文も少し気になるんですが、あちらも直しておきましょうか。\n写真の説明は僕が今見直しているところだから、そっちは任せて。君は筆者の修正を先に済ませてくれ。\n女の人は、このあとまず何をしますか。",
+      "transcriptSha256": "7bed66886b1845007e5e81808ee010e01d942f87097632753703bf3217ab7de4",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "修正依頼を確認する女性編集担当",
+          "speaker-b": "写真説明を見直す男性編集担当",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-01",
+        "runtimeSha256": "0e42e03427d47e8e09ab4ff8c2a82160eb9ea830470441720cc2d317583cfee2",
+        "responseSha256": "acf5bcd5fe6728110a0f05ea86394edda3dddddd3051aed9f424176765a53e69",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「筆者のメールを読み、修正箇所を確認する」：男の人は「まずそのメールをちゃんと読んで、どの部分か把握してから原稿に反映してほしい」と明確に指示しており、女の人がこのあとまず行うべき行動は筆者のメールを読んで修正箇所を確認することである。\n誤答「取材先に料金を電話で確認する」：女の人が「料金なら電話で確認すべき」と提案したのに対し、男の人は「料金は確認済みだから電話する必要はない」と明示的に否定している。\n誤答「写真の説明文を全て書き直す」：女の人が「写真の説明文も直しておきましょうか」と尋ねたが、男の人は「僕が今見直しているところだから任せて」と自分の担当であることを示し、女の人に任せていない。\n誤答「誤字だけを直した原稿を取材先に送る」：男の人は「送るのはまだ待って」と送付を差し止め、筆者の修正を反映してから送る版を作るよう指示しており、誤字のみの原稿を送ることは否定されている。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l02",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l02"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "衣装を借りる店で、男の人が店員と話しています。男の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "来週末の式に着ていく衣装を探しているんですが、この上着、少し袖が長い感じがします。短くしてもらうことはできますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "申し訳ありません、こちらは貸出用の商品ですので、袖の縫い直しはできないんです。お直しは販売用のみになります。ただ、同じデザインでワンサイズ小さいものなら、明日の午後に別のお客様からの返却予定がありますよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "明日は来られそうになくて。式は来週の土曜日なので、できれば今日中に決めてしまいたいんです。ほかに何か方法はありますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうですね。実は、今店内に別のデザインの上着がございます。寸法の表を見ますと、そちらのほうがお客様に合いそうなんです。よろしければ、すぐに試着できますよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうですか。じゃあ、それを一度着てみてもいいですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、ぜひ。実際に着た感じを確かめてから決めたほうがよろしいですね。それから、明日戻る小さいサイズのほうは、必要であればお電話で取り置きもできますので、あとでご連絡いただいても大丈夫ですよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "なるほど。では、まずそちらを試着して、着心地を確認してから決めますね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "衣装を借りる店で、男の人が店員と話しています。男の人は、このあとまず何をしますか。\n来週末の式に着ていく衣装を探しているんですが、この上着、少し袖が長い感じがします。短くしてもらうことはできますか。\n申し訳ありません、こちらは貸出用の商品ですので、袖の縫い直しはできないんです。お直しは販売用のみになります。ただ、同じデザインでワンサイズ小さいものなら、明日の午後に別のお客様からの返却予定がありますよ。\n明日は来られそうになくて。式は来週の土曜日なので、できれば今日中に決めてしまいたいんです。ほかに何か方法はありますか。\nそうですね。実は、今店内に別のデザインの上着がございます。寸法の表を見ますと、そちらのほうがお客様に合いそうなんです。よろしければ、すぐに試着できますよ。\nそうですか。じゃあ、それを一度着てみてもいいですか。\nええ、ぜひ。実際に着た感じを確かめてから決めたほうがよろしいですね。それから、明日戻る小さいサイズのほうは、必要であればお電話で取り置きもできますので、あとでご連絡いただいても大丈夫ですよ。\nなるほど。では、まずそちらを試着して、着心地を確認してから決めますね。\n男の人は、このあとまず何をしますか。",
+      "transcriptSha256": "1691b455d4187b962d069d10242c32cd7022371dbd4815ba2f38cf2f3929dd74",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "male",
+        "speaker-b": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "試着する男性客",
+          "speaker-b": "貸衣装店の店員",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "The authored question or speaker description identifies speaker-a as a man; the other dialogue voice is distinct and female."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-02",
+        "runtimeSha256": "a7a24f3f7dcfefbf646ccafd47a58f94a78a3cb48bc32b11a53a1be687fb9d64",
+        "responseSha256": "238712375d90f812144d2e2897f551f8e1435bc6f26fd06432498d3cf7db0496",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「店にある別のデザインの上着を試着する」：客は今日決めたいと言い、店員が店内にある別デザインを提案し、客は「まずそちらを試着して」と明言するため、このあとの行動は一意に定まる。誤答「今の上着の袖を縫い直してもらう」：貸出用のため縫い直し不可と店員が断っている。誤答「明日戻る上着の取り置きを電話で頼む」：店員は電話での取り置きを「必要であれば」の後日選択肢として紹介するにとどまり、客は今日店内で試着する道を選ぶため、これが今の行動ではない。誤答「来週の式の日程を変更する」：式は来週の土曜日と述べられるが日程変更の話は一切出てこない。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l03",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l03"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "研究室で、公開実験の準備について話しています。女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "今週末の公開実験、申し込みが予定よりずいぶん多いですね。当初の二倍近く集まっています。実験の回数を増やした方がいいでしょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "回数を増やすのはまだ早いよ。まず、倉庫の箱に入っている器具が全部動くか確かめないと。前の実験からだいぶ時間が経っているし、数はあっていても、故障しているものがあるかもしれないから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そういえば、先週数は数えましたが、実際に動かしてはいませんでした。でも、回数を増やすなら、早めに参加者に連絡しないと間に合わないのでは？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "確かに連絡は急ぎたいけど、器具が足りなければ回数を増やしても意味がない。じゃあ、午前中に動作確認をして、使えないものは別に分けておいてくれない？ 使える数がはっきりしないと、何回実験を回せるかも決まらないし、不足分を隣の研究室に借りられるかどうかも確認できないから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "分かりました。参加者への開始時間の変更連絡は、器具の数が確定してからにするんですね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "うん、それでいいよ。人数の表は僕の方で整理しておくから、君はそっちの確認作業に専念して。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "研究室で、公開実験の準備について話しています。女の人は、このあとまず何をしますか。\n今週末の公開実験、申し込みが予定よりずいぶん多いですね。当初の二倍近く集まっています。実験の回数を増やした方がいいでしょうか。\n回数を増やすのはまだ早いよ。まず、倉庫の箱に入っている器具が全部動くか確かめないと。前の実験からだいぶ時間が経っているし、数はあっていても、故障しているものがあるかもしれないから。\nそういえば、先週数は数えましたが、実際に動かしてはいませんでした。でも、回数を増やすなら、早めに参加者に連絡しないと間に合わないのでは？\n確かに連絡は急ぎたいけど、器具が足りなければ回数を増やしても意味がない。じゃあ、午前中に動作確認をして、使えないものは別に分けておいてくれない？ 使える数がはっきりしないと、何回実験を回せるかも決まらないし、不足分を隣の研究室に借りられるかどうかも確認できないから。\n分かりました。参加者への開始時間の変更連絡は、器具の数が確定してからにするんですね。\nうん、それでいいよ。人数の表は僕の方で整理しておくから、君はそっちの確認作業に専念して。\n女の人は、このあとまず何をしますか。",
+      "transcriptSha256": "6bad8314eabdab74eb3c02ff64939e59a0577f8777579f61796385fe881bdc88",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "動作確認をする女性担当",
+          "speaker-b": "実験準備の同僚",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-03",
+        "runtimeSha256": "b6f6785dec516508e88dc5a2f62a85752de3efb5e192945b0d3fd458d73d7756",
+        "responseSha256": "740a7b9e76edc56596c41856cebdd965c66eac0af723f1dd47f8e2c2b22e5c75",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「器具を実際に動かして、使えるものを確認する」：男の人は午前中に動作確認をし、使えないものを分けるよう女の人に依頼し、女の人も承諾している。これが回数決定・不足数の判断・隣室への相談のすべての前提となる最初の行動である。誤答「参加者に実験の開始時間の変更を知らせる」：女の人が提起するが、男の人は器具の数が確定してからでいいと明示し、先延ばしを指示している。誤答「隣の研究室に器具を借りるよう連絡する」：使える数が判明した後に不足分を借りられるか確認すると言っており、現時点では行わない。誤答「申し込みの人数を表にまとめる」：男の人が「人数の表は僕の方で整理しておく」と述べ、女の人の作業ではない。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l04",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l04"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "催し物の会場で、商品を運び込んだ二人が話しています。男の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "入口に置いた箱、底がぬれているね。外は雨が降っていたから、搬入中に濡れたのかな。中の商品を出して乾かしたほうがいいかな。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "待って、その前に、今の状態を写真に残しておいてもらえる？ 底が濡れているのがはっきり分かる角度で撮って。あとで運送会社に連絡するとき、現状の記録がないと対応してもらえないかもしれないから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "なるほど、記録が先か。じゃあ、商品を取り出すのはまだ待ったほうがいいんだね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ。箱を動かしたり開けたりすると、濡れ方が変わってしまうかもしれないし。まずは今のまま撮って、それから二人で中身を確認しましょう。予備の箱は私が倉庫から持ってくるわ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "わかった。商品が無事なら、箱だけ替えればいいんだよね。運送会社への連絡は、中身を確認してからでいいの？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そう。まだ破損していると決まったわけじゃないから、確認してから連絡すればいいと思う。じゃあ、写真をお願いね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "了解。今の箱を動かす前に撮っておくよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "催し物の会場で、商品を運び込んだ二人が話しています。男の人は、このあとまず何をしますか。\n入口に置いた箱、底がぬれているね。外は雨が降っていたから、搬入中に濡れたのかな。中の商品を出して乾かしたほうがいいかな。\n待って、その前に、今の状態を写真に残しておいてもらえる？ 底が濡れているのがはっきり分かる角度で撮って。あとで運送会社に連絡するとき、現状の記録がないと対応してもらえないかもしれないから。\nなるほど、記録が先か。じゃあ、商品を取り出すのはまだ待ったほうがいいんだね。\nええ。箱を動かしたり開けたりすると、濡れ方が変わってしまうかもしれないし。まずは今のまま撮って、それから二人で中身を確認しましょう。予備の箱は私が倉庫から持ってくるわ。\nわかった。商品が無事なら、箱だけ替えればいいんだよね。運送会社への連絡は、中身を確認してからでいいの？\nそう。まだ破損していると決まったわけじゃないから、確認してから連絡すればいいと思う。じゃあ、写真をお願いね。\n了解。今の箱を動かす前に撮っておくよ。\n男の人は、このあとまず何をしますか。",
+      "transcriptSha256": "aead3d94abf5a0a811fa6cf6caa4ec736bff31929e84786917a95b0a9d00c6e4",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "male",
+        "speaker-b": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "箱を撮影する男性",
+          "speaker-b": "予備の箱を取りに行く女性",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "The authored question or speaker description identifies speaker-a as a man; the other dialogue voice is distinct and female."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-04",
+        "runtimeSha256": "4a7e02978cd0455c69bfb59e81a5314d5ea5eeb2acbff29529afb15086cdd06c",
+        "responseSha256": "9c67612dc1c8e62cc8402f53749aa1b3920b9cc821f486b707bee73af14b6d09",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「ぬれた箱を、今の状態のまま撮影する」は、女の人が「その前に、今の状態を写真に残しておいてもらえる？」と頼み、男が「今の箱を動かす前に撮っておくよ」と答えることで確定する。男がまず行う行動は撮影である。誤答「商品を全て箱から出して乾かす」は、男の最初の提案だが女の人に止められ、撮影後かつ中身確認後に対応すべきとされるため不適。誤答「運送会社に商品の破損を伝える」は、破損が未確認であり連絡は確認後でよいと明示されているため不適。誤答「倉庫から予備の箱を持ってくる」は、女の人が自分で行くと述べており男の行動ではないため不適。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l05",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l05"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "長期展示の受付で、責任者と担当者が話しています。担当の女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "あの、発券機が急に止まってしまって。外に来場者の列ができ始めています。このままだと混乱しそうです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうか。修理の連絡はさっき私の方で入れてあるから、技術者が来るまでは手書きの券で対応しよう。引き出しに予備があるはずだ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "ありました。じゃあ、この手書き券を出して販売を始めますか。来場者も待たせているので、早く窓口を動かしたいのですが。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "いや、販売を再開する前に、入口にいる案内係に、手書き券に切り替えたことを伝えてほしい。券の見た目が普段と全然違うから、入場のところで見慣れないと止めてしまうかもしれない。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "確かに、色も形も機械の券と違いますね。案内係に実物を見せながら説明した方がよさそうです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうしてくれ。手書き券の番号の記録は、私が後でまとめて確認するから、そちらは気にしなくていい。お互いに番号が重ならないようには私が管理する。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "わかりました。まず案内係に説明して、それから窓口に戻って販売を再開します。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "担当の女の人は、このあとまず何をしますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "長期展示の受付で、責任者と担当者が話しています。担当の女の人は、このあとまず何をしますか。\nあの、発券機が急に止まってしまって。外に来場者の列ができ始めています。このままだと混乱しそうです。\nそうか。修理の連絡はさっき私の方で入れてあるから、技術者が来るまでは手書きの券で対応しよう。引き出しに予備があるはずだ。\nありました。じゃあ、この手書き券を出して販売を始めますか。来場者も待たせているので、早く窓口を動かしたいのですが。\nいや、販売を再開する前に、入口にいる案内係に、手書き券に切り替えたことを伝えてほしい。券の見た目が普段と全然違うから、入場のところで見慣れないと止めてしまうかもしれない。\n確かに、色も形も機械の券と違いますね。案内係に実物を見せながら説明した方がよさそうです。\nそうしてくれ。手書き券の番号の記録は、私が後でまとめて確認するから、そちらは気にしなくていい。お互いに番号が重ならないようには私が管理する。\nわかりました。まず案内係に説明して、それから窓口に戻って販売を再開します。\n担当の女の人は、このあとまず何をしますか。",
+      "transcriptSha256": "d98909fa6eef6bbbce10abc44a45597d83a0da6c9c845e7546c3a9d636e8ad3f",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "受付担当の女性",
+          "speaker-b": "展示受付の責任者",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-05",
+        "runtimeSha256": "3a23e0a10dde84046d3b0d1364d81facbd08a6190d6e6455ddc0c00b05b9c560",
+        "responseSha256": "9417619462159315bb76a27ef8d96e0c87628250332d7fb99821ba94d2b13ddb",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「入口の案内係に、券が変わることを説明する」：責任者は販売再開より前に案内係へ事前共有を指示し、担当の女性も「まず案内係に説明して」と復唱しているため、最初の行動として一意に確定する。誤答「発券機の修理を依頼する」：修理の連絡は責任者がすでに入れており、担当者の行動ではない。誤答「手書き券の販売をすぐ始める」：担当者は早く再開したいと提案するが、責任者は案内係への説明を先に命じており、販売はその後と明示されている。誤答「使った券の番号を全て記録し直す」：番号の記録は責任者が後で確認すると分業されており、担当者の役割ではない。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:example-listening-point",
+      "kind": "example",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l06"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "次は、理由や条件など、質問で指定された点を聞き取る問題です。先に質問を聞き、選択肢を確認する時間があります。そのあと、話を一度聞いて答えてください。まず採点されない練習です。練習の選択肢は音声で読み上げます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "会社で二人が話しています。会議の開始時刻を変更した理由は何ですか。一、会議室が使えないから。二、資料の印刷が終わらないから。三、参加する人の到着が遅れるから。四、話し合う内容が増えたから。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "今日の会議、二時から三時に変わったんですね。いつもの会議室が取れなかったんですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "部屋は二時から使えるんだけど、取引先の担当者から、前の打ち合わせが長引いて二時には間に合わないって連絡があってね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうだったんですか。資料の印刷がまだ残っていたので、少し助かりました。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "資料は先に画面で共有できるから、そのために遅らせたわけじゃないんだ。話し合う内容も予定どおりだよ。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "会議の開始時刻を変更した理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "答えは三、参加する人の到着が遅れるから、です。印刷が残っているという情報も出てきましたが、それは時刻を変えた理由ではありません。質問が尋ねている点と、話の中の補足情報を区別してください。練習はここまでです。"
+        }
+      ],
+      "transcript": "次は、理由や条件など、質問で指定された点を聞き取る問題です。先に質問を聞き、選択肢を確認する時間があります。そのあと、話を一度聞いて答えてください。まず採点されない練習です。練習の選択肢は音声で読み上げます。\n会社で二人が話しています。会議の開始時刻を変更した理由は何ですか。一、会議室が使えないから。二、資料の印刷が終わらないから。三、参加する人の到着が遅れるから。四、話し合う内容が増えたから。\n今日の会議、二時から三時に変わったんですね。いつもの会議室が取れなかったんですか。\n部屋は二時から使えるんだけど、取引先の担当者から、前の打ち合わせが長引いて二時には間に合わないって連絡があってね。\nそうだったんですか。資料の印刷がまだ残っていたので、少し助かりました。\n資料は先に画面で共有できるから、そのために遅らせたわけじゃないんだ。話し合う内容も予定どおりだよ。\n会議の開始時刻を変更した理由は何ですか。\n答えは三、参加する人の到着が遅れるから、です。印刷が残っているという情報も出てきましたが、それは時刻を変えた理由ではありません。質問が尋ねている点と、話の中の補足情報を区別してください。練習はここまでです。",
+      "transcriptSha256": "5307fa14a1cf4db8d5c56dafad274bcf071a03c6e4e9c12d384ee4746e4889cd",
+      "authoringEvidence": {
+        "kind": "original-ai",
+        "familyId": "codex",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l06",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l06"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "社内の勉強会について、男の人が説明しています。次回から形式を変える主な理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "来月の社内勉強会から、形式を少し変えたいと思います。これまでは、説明が終わった後に十五分ほど質問を受けていました。ただ、説明が予定より長引くことが多くて、質問の時間が十分に取れなかったり、途中で切らざるを得なかったりしました。せっかく質問があっても、最後まで答えられないのはもったいないですよね。そこで次回からは、冒頭の二十分を質問タイムに充てます。参加人数が増えたから変えるわけではありません。むしろ、最初に皆さんの疑問を聞いておけば、その後の説明でどこを重点的に話すかを調整できるのが大きいです。例えば、基本用語については事前に配布した資料で確認してもらう前提で進めますので、当日は具体的な疑問や応用の場面に絞って深く掘り下げたいと考えています。そうすれば、限られた時間でも皆さんが本当に知りたい部分にしっかり答えられるはずですので、ぜひ協力してください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "次回から形式を変える主な理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "社内の勉強会について、男の人が説明しています。次回から形式を変える主な理由は何ですか。\n来月の社内勉強会から、形式を少し変えたいと思います。これまでは、説明が終わった後に十五分ほど質問を受けていました。ただ、説明が予定より長引くことが多くて、質問の時間が十分に取れなかったり、途中で切らざるを得なかったりしました。せっかく質問があっても、最後まで答えられないのはもったいないですよね。そこで次回からは、冒頭の二十分を質問タイムに充てます。参加人数が増えたから変えるわけではありません。むしろ、最初に皆さんの疑問を聞いておけば、その後の説明でどこを重点的に話すかを調整できるのが大きいです。例えば、基本用語については事前に配布した資料で確認してもらう前提で進めますので、当日は具体的な疑問や応用の場面に絞って深く掘り下げたいと考えています。そうすれば、限られた時間でも皆さんが本当に知りたい部分にしっかり答えられるはずですので、ぜひ協力してください。\n次回から形式を変える主な理由は何ですか。",
+      "transcriptSha256": "8f7ca60bc94c223575c28f2b28af4f2926d24aa138b94960ad8877f0ccb9bb33",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "勉強会について説明する男性",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "The authored question or speaker description identifies speaker-a as a man; the other dialogue voice is distinct and female."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-06",
+        "runtimeSha256": "24666d5908c6cb6b4ef4c9e6e04decbc2a99143b2267045ef20e65ec61035fb1",
+        "responseSha256": "1534e29b895076530853b98845cc96d8053406cf994b6ba4f45ab7cf4bb48a44",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答choice-3「参加者の疑問に時間を確保し、説明の重点にも反映するため」：冒頭二十分を質問タイムに充てる理由として、これまで説明が長引いて質問に十分に答えられなかった問題を挙げ、さらに最初に疑問を聞けばその後の説明の重点を調整できると明示しており、二つの目的が両方述べられている。誤答choice-2「参加人数が増え、会場に全員入れなくなったため」：参加人数が増えたから変えるわけではないと明示的に否定している。誤答choice-1「基本用語の説明だけで勉強会を終えるため」：当日は具体的な疑問や応用の場面に絞って深く掘り下げたいとしており、基本用語だけで終える方針ではない。誤答choice-4「資料を事前に読む必要をなくすため」：基本用語は事前配布資料で確認してもらう前提としており、むしろ事前読み込みを求めている。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l07",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l07"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "出版社の担当者が書店への連絡事項を話しています。今回、返送する本について変わったのは何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "書店の皆様、いつもお世話になっております。出版社の営業担当の佐藤です。本日は売れ残った本の返送について、来月から変更となる点をお知らせいたします。これまで書店様から返送いただく際は、本の種類ごとに箱を分けていただいておりました。例えば、小説と雑誌とムックはそれぞれ別々の箱に入れていただいていました。しかし、来月の返送分からは、異なる種類の本を同じ箱に一緒に入れていただいて構いません。ただし、箱に同封する一覧表には、これまで通り書名ごとの冊数を正確に記入してください。箱の中身が混ざることになっても、一覧表で何が何冊入っているか確認できれば問題ありません。今回の変更は、箱の数を減らして運搬の負担を軽くすることを目的としております。なお、返送先の住所と受け付け期間には変更ありませんのでご安心ください。箱に貼る送り状も、従来のものをそのままお使いいただけます。引き続きよろしくお願いいたします。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "今回、返送する本について変わったのは何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "出版社の担当者が書店への連絡事項を話しています。今回、返送する本について変わったのは何ですか。\n書店の皆様、いつもお世話になっております。出版社の営業担当の佐藤です。本日は売れ残った本の返送について、来月から変更となる点をお知らせいたします。これまで書店様から返送いただく際は、本の種類ごとに箱を分けていただいておりました。例えば、小説と雑誌とムックはそれぞれ別々の箱に入れていただいていました。しかし、来月の返送分からは、異なる種類の本を同じ箱に一緒に入れていただいて構いません。ただし、箱に同封する一覧表には、これまで通り書名ごとの冊数を正確に記入してください。箱の中身が混ざることになっても、一覧表で何が何冊入っているか確認できれば問題ありません。今回の変更は、箱の数を減らして運搬の負担を軽くすることを目的としております。なお、返送先の住所と受け付け期間には変更ありませんのでご安心ください。箱に貼る送り状も、従来のものをそのままお使いいただけます。引き続きよろしくお願いいたします。\n今回、返送する本について変わったのは何ですか。",
+      "transcriptSha256": "3b3d070a76c100d6bd3c022ad9fe4d55009be266690ec78fc0c53f99d2d8efd2",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "出版社の連絡担当",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-07",
+        "runtimeSha256": "693b33dc735ff2eb73971b69aff6556b651c8ba1628f413b6a6245ff8a1597f1",
+        "responseSha256": "9ed84b338080550e4e3daddf213c683f207442a8bbd2296627447366c48160b5",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「種類の違う本を同じ箱に入れられるようになった」：話者は来月から異なる種類の本を同じ箱に一緒に入れてよいと明示し、その目的は箱の数を減らして運搬負担を軽くすることと述べている。誤答「これまでの送り状が使えなくなった」：送り状は従来のものをそのまま使えると明言しており拒否される。誤答「書名ごとの冊数を一覧に書かなくてよくなった」：一覧表への書名別冊数の正確な記入はこれまで通り必要と述べており拒否される。誤答「返送する住所が別の場所になった」：返送先の住所と受け付け期間には変更がないと明示しており拒否される。各選択肢の可否はすべて音声情報から一意に判定できる。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l08",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l08"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "翻訳の授業で、先生が説明しています。最初に辞書を使わずに読むように言っているのはなぜですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "今日は翻訳の実習を始めますが、最初の五分間は辞書を閉じたまま、手元の文章全体を通して読んでください。これは知らない単語をどれくらい覚えているかを試すためではありませんし、知っている語の数で成績をつけることもありません。実は、一つの語の意味を早い段階で決めてしまうと、その後の文とどうしても合わないことに気づいても、一度決めた意味に引っ張られてそのまま読み進めてしまうことがよくあるんです。翻訳では文脈を外した一語の訳が文章全体を狂わせてしまいますからね。ですから、まず誰が何を伝えようとしているのか、文章の流れを大まかに捉えてください。その上で、意味を確かめる必要がある語に印をつけましょう。そのあとで辞書を開き、全体の理解と矛盾しない意味を選び直してください。辞書を使わないわけではなく、辞書を引くタイミングをずらすことで文脈に合う訳を選ぶ力を養いたいのです。では、五分後に辞書を開きますので、始めてください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "最初に辞書を使わずに読むように言っているのはなぜですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "翻訳の授業で、先生が説明しています。最初に辞書を使わずに読むように言っているのはなぜですか。\n今日は翻訳の実習を始めますが、最初の五分間は辞書を閉じたまま、手元の文章全体を通して読んでください。これは知らない単語をどれくらい覚えているかを試すためではありませんし、知っている語の数で成績をつけることもありません。実は、一つの語の意味を早い段階で決めてしまうと、その後の文とどうしても合わないことに気づいても、一度決めた意味に引っ張られてそのまま読み進めてしまうことがよくあるんです。翻訳では文脈を外した一語の訳が文章全体を狂わせてしまいますからね。ですから、まず誰が何を伝えようとしているのか、文章の流れを大まかに捉えてください。その上で、意味を確かめる必要がある語に印をつけましょう。そのあとで辞書を開き、全体の理解と矛盾しない意味を選び直してください。辞書を使わないわけではなく、辞書を引くタイミングをずらすことで文脈に合う訳を選ぶ力を養いたいのです。では、五分後に辞書を開きますので、始めてください。\n最初に辞書を使わずに読むように言っているのはなぜですか。",
+      "transcriptSha256": "546c468d1e300bda4468ef71fce12cf7d04f6d15cf34d7c2a3171086c43b176c",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "翻訳授業の先生",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-08",
+        "runtimeSha256": "5436a5325af08bf6c009c782a1c0a1967bdd8b01a5f01e2956e9cc118486448d",
+        "responseSha256": "b31d2fb19624ac0d5615752deeacc5fc1a3718e36fdd530ab30d892ac838c613",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「文全体を捉えてから、文脈に合う語の意味を考えるため」が一意に正しい：先生は「まず誰が何を伝えようとしているのか、文章の流れを大まかに捉えてください」と述べ、そのあとで辞書を開き「全体の理解と矛盾しない意味を選び直す」と指示している。辞書を引くタイミングをずらす目的は文脈に合う訳を選ぶ力を養うことだと明言する。誤答「辞書に載っている意味は全て誤っているため」は否定される——先生は辞書を使わないわけではなく、後で辞書を開いて確認する手順を示しており、辞書の情報自体を否定していない。誤答「知っている単語の数だけで成績をつけるため」は「知っている語の数で成績をつけることもありません」と明示的に排除される。誤答「知らない語を最後まで一切調べない練習をするため」も否定される——五分後に辞書を開き、印をつけた語の意味を選び直す手順が示されており、一切調べないわけではない。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l09",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l09"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "研修旅行の担当者が集合について説明しています。参加者が受付を済ませておかなければならないのは何時までですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "明日の研修旅行のバスについて、集合時間のお知らせです。お世話になっております、研修旅行の担当です。バスの出発時刻は八時四十分で、これは以前の案内と変わりません。ただ、集合時間については重要な変更がありますので、よく聞いてください。以前の案内では八時半集合とお伝えしていましたが、今回は乗車前に参加者のみなさんに研修資料をお渡しし、バスの座席を確定させるため乗車人数の最終確認をさせていただきます。前回の出発時、受付と確認が重なって出発が遅れてしまいました。そのため、今回は八時二十分までに受付を済ませていただくことに変更しました。受付自体は八時から開いておりますので、二十分間で手続きを行ってください。なお、最寄りの駅から集合場所までは歩いて十分ほどかかります。ですから、八時の受付開始と同時に着けるよう、時間に余裕を持ってお越しください。受付に遅れると出発に間に合わなくなりますので、ご注意ください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "参加者が受付を済ませておかなければならないのは何時までですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "研修旅行の担当者が集合について説明しています。参加者が受付を済ませておかなければならないのは何時までですか。\n明日の研修旅行のバスについて、集合時間のお知らせです。お世話になっております、研修旅行の担当です。バスの出発時刻は八時四十分で、これは以前の案内と変わりません。ただ、集合時間については重要な変更がありますので、よく聞いてください。以前の案内では八時半集合とお伝えしていましたが、今回は乗車前に参加者のみなさんに研修資料をお渡しし、バスの座席を確定させるため乗車人数の最終確認をさせていただきます。前回の出発時、受付と確認が重なって出発が遅れてしまいました。そのため、今回は八時二十分までに受付を済ませていただくことに変更しました。受付自体は八時から開いておりますので、二十分間で手続きを行ってください。なお、最寄りの駅から集合場所までは歩いて十分ほどかかります。ですから、八時の受付開始と同時に着けるよう、時間に余裕を持ってお越しください。受付に遅れると出発に間に合わなくなりますので、ご注意ください。\n参加者が受付を済ませておかなければならないのは何時までですか。",
+      "transcriptSha256": "b7f24ef1bd8b77390e74d77451d26048683e427f0647b60e8b216a906c30bf7e",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "研修旅行の担当者",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-09",
+        "runtimeSha256": "4ef25af1ce82f8191a86fc854700b15924fac94717f0c0c1670fa823810c9ac4",
+        "responseSha256": "d6ba5d87f1bd337a00c37fb9dfad3f4fa8fd674dc0244adf1c8a3e490723e3c5",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「八時二十分」は、変更後の受付完了期限として明示的に述べられている。乗車前の資料配布と座席確定のための最終確認に十分な時間が必要であり、前回の出発遅延を防ぐ目的で八時半から前倒しされたことが理由として説明されている。誤答「八時四十分」はバスの出発時刻そのものであり、受付期限ではない。誤答「八時三十分」は以前の案内に書かれていた古い集合時刻であり、変更された旨が明確に述べられている。誤答「八時」は受付の開始時刻であり、完了期限ではない。駅から十分かかる点も補足され、八時の開始と同時に到着できるよう余裕を持つよう求められているが、問われているのは受付完了期限であるため八時二十分が唯一正しい。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l10",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l10"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "かばんの修理について、客と店員が話しています。店員は、なぜ今日すぐに修理代を確定できないと言っていますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "すみません、このかばん、持ち手が外れてしまって。縫い直して付けていただきたいんですが、だいたいいくらになりますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "持ち手を縫い直すだけでしたら、基本料金として三千円いただいています。ただ、少し見せていただいてもいいですか。こちらの内側の布もかなり傷んでいるようですね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "ああ、そこは前から気になっていたんですが、やっぱりだめですか。布も直したほうがいいんでしょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "外からでは判断しかねますので、一度かばんを開いて内側をしっかり確認しないと、布の交換が必要かどうかわからないんです。もし交換が必要な場合は、追加で千五百円かかります。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうですか。じゃあ、今日すぐにいくらになるかはわからないということですね。修理をする方は今日いらっしゃいますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、担当はおりますので、お預かりして内側を確認したうえで、必要な作業と最終的な金額を後ほどお電話でお伝えします。ご了承いただく前に修理を進めることはありませんので、ご安心ください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "店員は、なぜ今日すぐに修理代を確定できないと言っていますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "かばんの修理について、客と店員が話しています。店員は、なぜ今日すぐに修理代を確定できないと言っていますか。\nすみません、このかばん、持ち手が外れてしまって。縫い直して付けていただきたいんですが、だいたいいくらになりますか。\n持ち手を縫い直すだけでしたら、基本料金として三千円いただいています。ただ、少し見せていただいてもいいですか。こちらの内側の布もかなり傷んでいるようですね。\nああ、そこは前から気になっていたんですが、やっぱりだめですか。布も直したほうがいいんでしょうか。\n外からでは判断しかねますので、一度かばんを開いて内側をしっかり確認しないと、布の交換が必要かどうかわからないんです。もし交換が必要な場合は、追加で千五百円かかります。\nそうですか。じゃあ、今日すぐにいくらになるかはわからないということですね。修理をする方は今日いらっしゃいますか。\nええ、担当はおりますので、お預かりして内側を確認したうえで、必要な作業と最終的な金額を後ほどお電話でお伝えします。ご了承いただく前に修理を進めることはありませんので、ご安心ください。\n店員は、なぜ今日すぐに修理代を確定できないと言っていますか。",
+      "transcriptSha256": "cf83e1c55b6807a3e6dd5f28caf106159a008d87fcc0d81ed0ae15a0f231934e",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "かばんの修理を頼む客",
+          "speaker-b": "修理店の店員",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-10",
+        "runtimeSha256": "3d9c28fb47ede82d9a99fefa29d83328ce66bde01a07783644609d2c4b0f9481",
+        "responseSha256": "39dd1e0ea86de32df6ec7ce270ca597e4e1781bca5d12b387134e01935fcc5b9",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「内側の布を交換する必要があるか、まだ確認できていないから」：店員は、外からでは判断しかねるため、かばんを開いて内側を確認しないと布の交換が必要かどうかわからないと明言しており、追加費用の有無が未確定なため今日すぐに修理代を確定できないという要点が保たれている。誤答「修理担当者が休んでいて、誰もかばんを見られないから」：客が担当者の不在を疑う問いに対し、店員は「担当はおります」と明示しており、休みではない。誤答「持ち手を縫い直す基本料金がまだ決まっていないから」：縫い直しの基本料金は冒頭で三千円と提示済みであり、未決定ではない。誤答「客が電話番号を持っていないから」：電話番号の有無は話題に上っておらず、代金未確定の理由とは無関係である。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:l29:audio",
+      "kind": "question",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l29"],
+      "printedOptions": true,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "リサイクル拠点が受付方法を変更する一番の理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人と男の人が、町のリサイクル拠点について話しています。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "ねえ、知ってる？ 区のリサイクル拠点、来月から受付が予約制になるんだって。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、そうなの？ 今まで通り当日に直接行っても受け付けしてもらえないの？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "うん。ホームページか電話で事前に日時を申し込まないと、持ち込んだものを受け付けしてもらえないって。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうか。手続きが面倒になるし、利用者にとっては不便になるけど、何か理由があるの？"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "聞いた話だと、最近、不用品を搬入する車が入り口付近の道に路上駐車して、通行人や自転車が危ない目に遭ったケースが何度かあったんだって。お年寄りが転びそうになったこともあったみたい。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "なるほど。それで整理するわけか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "うん。スタッフが足りなくて対応しきれないとか、受付の流れを一本化したいって話も出てたんだけど、結局、一番の理由はあの道路の危険をなんとかしたいからみたい。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "確かに、予約で来る時間をずらせば、一気に車が殺到しないもんね。安全が一番大事だよね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "リサイクル拠点が受付方法を変更する一番の理由は何ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "リサイクル拠点が受付方法を変更する一番の理由は何ですか。\n女の人と男の人が、町のリサイクル拠点について話しています。\nねえ、知ってる？ 区のリサイクル拠点、来月から受付が予約制になるんだって。\nええ、そうなの？ 今まで通り当日に直接行っても受け付けしてもらえないの？\nうん。ホームページか電話で事前に日時を申し込まないと、持ち込んだものを受け付けしてもらえないって。\nそうか。手続きが面倒になるし、利用者にとっては不便になるけど、何か理由があるの？\n聞いた話だと、最近、不用品を搬入する車が入り口付近の道に路上駐車して、通行人や自転車が危ない目に遭ったケースが何度かあったんだって。お年寄りが転びそうになったこともあったみたい。\nなるほど。それで整理するわけか。\nうん。スタッフが足りなくて対応しきれないとか、受付の流れを一本化したいって話も出てたんだけど、結局、一番の理由はあの道路の危険をなんとかしたいからみたい。\n確かに、予約で来る時間をずらせば、一気に車が殺到しないもんね。安全が一番大事だよね。\nリサイクル拠点が受付方法を変更する一番の理由は何ですか。",
+      "transcriptSha256": "39879a8eaf67e525d064a98d4fb81c33713c53f6ef011ef0c6f65cb81f9d9b83",
+      "authoringEvidence": {
+        "jobId": "n2-full-01-add-listening-point",
+        "runtimeSha256": "f141775a0af39c7ca670cc686cf25de7d8ea7a7e5d04238e825ed8894def88a3",
+        "responseSha256": "0ae5f24e6e7adcbd1904f26faaf6b8f39856b7130004d97da7ed0d3d519a16e5",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:example-listening-gist",
+      "kind": "example",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l11"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "次は、話全体の要点をつかむ問題です。画面には選択肢の文章は出ません。質問は話を聞いたあとに流れます。続いて四つの選択肢を聞き、画面の番号で答えてください。まず採点されない練習です。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "植物を育て始めたころは、決めた曜日に必ず水をやるようにしていました。でも、同じ鉢でも、暑い日が続いた週と雨の多かった週とでは、土の乾き方が違うんですね。曜日だけを守っていたら、かえって根を傷めてしまいました。それからは、土や葉の様子を見て、水が必要か考えるようになりました。育て方の本に書いてある目安は役に立ちますが、目の前の植物の状態を見ることを忘れてはいけないと思います。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人が最も伝えたいことは何ですか。一、植物の種類を毎年変えるとよい。二、目安に従うだけでなく、実際の状態を見て世話をすることが大切だ。三、雨の日には必ず植物を室内に入れるべきだ。四、育て方の本に書いてあることは全て間違っている。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "答えは二です。話の中心は、曜日や本の目安だけで決めず、植物の様子を見て判断することです。本を否定しているわけではありません。一部分の言葉だけで選ばず、話全体で何を伝えているか考えてください。練習はここまでです。"
+        }
+      ],
+      "transcript": "次は、話全体の要点をつかむ問題です。画面には選択肢の文章は出ません。質問は話を聞いたあとに流れます。続いて四つの選択肢を聞き、画面の番号で答えてください。まず採点されない練習です。\n植物を育て始めたころは、決めた曜日に必ず水をやるようにしていました。でも、同じ鉢でも、暑い日が続いた週と雨の多かった週とでは、土の乾き方が違うんですね。曜日だけを守っていたら、かえって根を傷めてしまいました。それからは、土や葉の様子を見て、水が必要か考えるようになりました。育て方の本に書いてある目安は役に立ちますが、目の前の植物の状態を見ることを忘れてはいけないと思います。\n女の人が最も伝えたいことは何ですか。一、植物の種類を毎年変えるとよい。二、目安に従うだけでなく、実際の状態を見て世話をすることが大切だ。三、雨の日には必ず植物を室内に入れるべきだ。四、育て方の本に書いてあることは全て間違っている。\n答えは二です。話の中心は、曜日や本の目安だけで決めず、植物の様子を見て判断することです。本を否定しているわけではありません。一部分の言葉だけで選ばず、話全体で何を伝えているか考えてください。練習はここまでです。",
+      "transcriptSha256": "79fe96ac69a98b5040ec566ad9e054e9f6692065cc881f2b4622709b5324ff7b",
+      "authoringEvidence": {
+        "kind": "original-ai",
+        "familyId": "codex",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l11",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l11"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "料理を人に教えるようになって長いですが、以前は分量と手順を正確に伝えれば十分だと思っていました。実際、初心者にはレシピ通りに作ってもらうのが一番確実ですし。けれども、教え続けるうちに気づいたことがあります。同じ材料を使っても、その日の野菜の水分量が少し違えば、同じ火加減で同じ時間煮ても、仕上がりは変わってしまうのです。生徒さんが同じレシピで作ったのに味が違うと言ってきたとき、理由はそこにありました。そこで最近は、何分という数字だけではなく、どんな香りがしてきたら火を弱めるか、鍋を混ぜたときにどのくらいの重さを感じるかも話すようにしています。もちろん、手順を守らなくていいということではありません。手順が何のためにあるのかわかれば、その日の材料や道具に合わせて自分で調整できるからです。結局、料理を再現するには、決められた通りにするだけでなく、変化を見て判断する力も必要なのだと思います。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人が最も伝えたいことは何ですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "手順の目的と変化の目安も伝え、状況に応じて判断できるようにすることが大切だ"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "毎回同じ材料を使えば、火加減や道具は結果に影響しない"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "料理では分量や手順を覚える必要がなく、感覚だけで作るべきだ"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "四番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "料理を教える人は、数字以外の表現を一切使わないほうがよい"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 12000
+        }
+      ],
+      "transcript": "料理を人に教えるようになって長いですが、以前は分量と手順を正確に伝えれば十分だと思っていました。実際、初心者にはレシピ通りに作ってもらうのが一番確実ですし。けれども、教え続けるうちに気づいたことがあります。同じ材料を使っても、その日の野菜の水分量が少し違えば、同じ火加減で同じ時間煮ても、仕上がりは変わってしまうのです。生徒さんが同じレシピで作ったのに味が違うと言ってきたとき、理由はそこにありました。そこで最近は、何分という数字だけではなく、どんな香りがしてきたら火を弱めるか、鍋を混ぜたときにどのくらいの重さを感じるかも話すようにしています。もちろん、手順を守らなくていいということではありません。手順が何のためにあるのかわかれば、その日の材料や道具に合わせて自分で調整できるからです。結局、料理を再現するには、決められた通りにするだけでなく、変化を見て判断する力も必要なのだと思います。\n女の人が最も伝えたいことは何ですか。\n一番。\n手順の目的と変化の目安も伝え、状況に応じて判断できるようにすることが大切だ\n二番。\n毎回同じ材料を使えば、火加減や道具は結果に影響しない\n三番。\n料理では分量や手順を覚える必要がなく、感覚だけで作るべきだ\n四番。\n料理を教える人は、数字以外の表現を一切使わないほうがよい",
+      "transcriptSha256": "09eae4a64cd68cae08401fe99fd7c451d0dc260ca965563363a4b626b08ebeef",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "料理を教える女性",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-11",
+        "runtimeSha256": "701794b373d5afe4aa7ffa031f7555a4fd82e9cb7b00224b7e8992738cb72710",
+        "responseSha256": "e1807cb4eb2b1841f4864e26306acfdefc8fa00f016a4e24bd60f7d0aa6c7929",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答（選択肢１）を担保する根拠：話者は数字や手順を否定せず、「手順が何のためにあるのかわかれば調整できる」と述べ、香りや重さといった変化の目安も伝える重要性を強調している。これが「手順の目的と変化の目安も伝え、状況に応じて判断できるようにすることが大切だ」に直接対応する。選択肢２を排除：水分量が違えば同じ条件でも仕上がりが変わると明言しており、材料が同じなら火加減や道具が影響しないという主張と矛盾する。選択肢３を排除：「手順を守らなくていいということではありません」と明確に否定している。選択肢４を排除：数字だけでなく香りや重さも話すようになったと肯定的に述べており、数字以外の表現を一切使わないべきだという主張とは正反対である。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l12",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l12"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "会議の記録の作り方については、社内でも意見が分かれます。決まったことだけを簡潔に残せば十分だという人もいれば、すべての発言を一言も省かず書き起こすべきだという人もいます。確かに、後で何をすべきか確認するには、決定事項だけの記録が読みやすくて便利です。ただ、すべてを書き起こすのは時間がかかり、結局誰も読まなくなります。私が大切にしているのは、採用されなかった案についても、なぜ反対されたのか、その理由を短く残すことです。状況や条件が変わったとき、以前却下された理由が今も当てはまるのかを確かめられるからです。却下されたという事実だけが伝わると、再検討する価値があっても、同じ案を出しにくくなってしまいます。議論をすべて書き起こす必要はありませんが、なぜその結論に至ったかを後からたどれる記録こそが本当に意味のあるものだと考えています。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人は、主にどのような記録が必要だと話していますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "結論に加え、後から判断を見直せる程度に理由も残した記録"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "今後することだけを残し、議論の経緯を全て消した記録"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "会議での発言を一言も省かず全て書き起こした記録"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "四番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一度採用されなかった案を二度と検討しないための記録"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 12000
+        }
+      ],
+      "transcript": "会議の記録の作り方については、社内でも意見が分かれます。決まったことだけを簡潔に残せば十分だという人もいれば、すべての発言を一言も省かず書き起こすべきだという人もいます。確かに、後で何をすべきか確認するには、決定事項だけの記録が読みやすくて便利です。ただ、すべてを書き起こすのは時間がかかり、結局誰も読まなくなります。私が大切にしているのは、採用されなかった案についても、なぜ反対されたのか、その理由を短く残すことです。状況や条件が変わったとき、以前却下された理由が今も当てはまるのかを確かめられるからです。却下されたという事実だけが伝わると、再検討する価値があっても、同じ案を出しにくくなってしまいます。議論をすべて書き起こす必要はありませんが、なぜその結論に至ったかを後からたどれる記録こそが本当に意味のあるものだと考えています。\n男の人は、主にどのような記録が必要だと話していますか。\n一番。\n結論に加え、後から判断を見直せる程度に理由も残した記録\n二番。\n今後することだけを残し、議論の経緯を全て消した記録\n三番。\n会議での発言を一言も省かず全て書き起こした記録\n四番。\n一度採用されなかった案を二度と検討しないための記録",
+      "transcriptSha256": "efdf29671390f1079560fbcab30facdff2c823db57bdb4b1badc891decc406e0",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "male",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "会議記録について話す男性",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "The authored question or speaker description identifies speaker-a as a man; the other dialogue voice is distinct and female."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-12",
+        "runtimeSha256": "12f1bcd38338681cc2961fa848b5688d56cc3524e020889ea002712653fa3757",
+        "responseSha256": "9a932923a327d181516fd8bbafe6eab43c1240a1dfd0f444f7a1474db51de628",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "話者は会議記録のあり方について、二つの対立する立場を提示した上で自らの主張を展開する。決定事項のみの記録は確認しやすいが限界があり、全発言の書き起こしは時間がかかり誰も読まないと否定する。話者の中核主張は「採用されなかった案の反対理由を短く残し、条件変化時に再検討できるようにすること」であり、これが正答「結論に加え、後から判断を見直せる程度に理由も残した記録」を直接支える。誤答「今後することだけを残し議論の経緯を全て消した記録」は、話者が決定事項のみの記録の限界を明示的に述べているため排除される。誤答「会議での発言を一言も省かず全て書き起こした記録」は、話者が「書き起こす必要はない」「誰も読まなくなる」と否定しているため不適。誤答「一度採用されなかった案を二度と検討しないための記録」は、話者が「条件が変われば再検討する価値がある」「同じ案を出しにくくなるのは問題だ」と述べており、正反対の立場であるため排除される。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l13",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l13"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "初めて野球を観戦に来た友人に、ルールを最初から全部説明しようとして、かえって困惑させてしまったことがあります。ストライクやバント、フォースプレーといった私にとって当たり前の言葉が、友人にはまったく馴染みのない言葉のように響いていたようで、せっかくの試合なのに友人は質問するのも遠慮する様子でした。事前にきちんと教えれば楽しめるだろうと思っていたのに、逆効果だったわけです。それ以来、やり方を変えました。最初から一方的に教え込むのではなく、友人が「今、なんであの選手は走ったの？」と自然に聞いてきた瞬間に、その場面で必要なことだけを短く話すようにしました。すると、しだいに友人のほうから「次はここに投げるのかな」など、次のプレーを自ら予想するようになり、試合を一緒に盛り上がって楽しめるようになりました。詳しい人間ほど、相手が何に気づき、何を知りたがっているかを待つ姿勢が大切だと痛感しました。知識を一度に注ぎ込むより、相手の関心が生まれたその瞬間に合わせて説明するほうが、一緒に楽しみやすい入口になるのです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人が最も伝えたいことは何ですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "詳しい人はルールを聞かれても、説明を断ったほうがよい"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "相手の関心が生まれた場面に合わせて説明すると、一緒に楽しみやすい"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "初心者には最初に全ての専門用語を暗記させる必要がある"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "四番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "初心者が自分で次の動きを予想することは避けるべきだ"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 12000
+        }
+      ],
+      "transcript": "初めて野球を観戦に来た友人に、ルールを最初から全部説明しようとして、かえって困惑させてしまったことがあります。ストライクやバント、フォースプレーといった私にとって当たり前の言葉が、友人にはまったく馴染みのない言葉のように響いていたようで、せっかくの試合なのに友人は質問するのも遠慮する様子でした。事前にきちんと教えれば楽しめるだろうと思っていたのに、逆効果だったわけです。それ以来、やり方を変えました。最初から一方的に教え込むのではなく、友人が「今、なんであの選手は走ったの？」と自然に聞いてきた瞬間に、その場面で必要なことだけを短く話すようにしました。すると、しだいに友人のほうから「次はここに投げるのかな」など、次のプレーを自ら予想するようになり、試合を一緒に盛り上がって楽しめるようになりました。詳しい人間ほど、相手が何に気づき、何を知りたがっているかを待つ姿勢が大切だと痛感しました。知識を一度に注ぎ込むより、相手の関心が生まれたその瞬間に合わせて説明するほうが、一緒に楽しみやすい入口になるのです。\n男の人が最も伝えたいことは何ですか。\n一番。\n詳しい人はルールを聞かれても、説明を断ったほうがよい\n二番。\n相手の関心が生まれた場面に合わせて説明すると、一緒に楽しみやすい\n三番。\n初心者には最初に全ての専門用語を暗記させる必要がある\n四番。\n初心者が自分で次の動きを予想することは避けるべきだ",
+      "transcriptSha256": "908c68b5a0dae0fb240d9bcf61a31f23cd42e5f09ae12df2fa722f44414a9135",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "male",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "観戦の経験を話す男性",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "The authored question or speaker description identifies speaker-a as a man; the other dialogue voice is distinct and female."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-13",
+        "runtimeSha256": "f4970cd98792ee6d5e358bdcd4f22e96ee4e7986377743136bf1ddd37d68075b",
+        "responseSha256": "3c21e8e7d78b14e53425145f23c4e72cf3d3fa3baa72c1cc73c3b44e5be5cfe1",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答choice-2「相手の関心が生まれた場面に合わせて説明すると、一緒に楽し぀やすい」は、話者が最も伝えたい結論として明示されている。友人が自発的に質問した瞬間に必要な情報だけを渡すと、友人が次のプレーを自ら予想するようになり、一緒に楽しめるようになったという因果が語られる。誤答choice-1「説明を断ったほうがよい」は、聞かれた場面で短く説明すると述べており断るのではないため排除される。誤答choice-3「最初に全ての専門用語を暗記させる必要がある」は、事前の一括説明が逆効果だったと明言されているため排除される。誤答choice-4「初心者が自分で次の動きを予想することは避けるべきだ」は、自発的な予想をよい変化として肯定的に述べているため排除される。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l14",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l14"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "外国語の案内文を作る仕事をしています。最近は自動翻訳を使うと、初稿がすぐできるので作業がかなり速くなりました。ただ、訳文が外国語として自然に見えるかどうかだけで確認を終えてはいけません。例えば、誰が申請するのか、何をいつまでにどこへ提出するのか、そうした条件や順番が元の文と同じように伝わっているかが重要です。一度、自然な訳文だったのに、読み手が提出先を間違えてしまったことがありました。それ以来、私は、訳文だけを読んだ人に、実際にどの順番で行動すると思うかを尋ねるようにしています。便利な道具を使わないという話ではありません。むしろ道具に頼りつつも、その文章で相手に何をしてもらいたいのかに立ち戻って確かめるのです。読みやすい文であることと、必要な行動につながる文であることは、いつも同じではありません。元の文章より短くなっているかどうかよりも、読み手が元の案内と同じ条件や手順で動けるかを重視しています。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人が最も重視している確認はどれですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "元の文章より必ず短い文になっているかを調べること"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "自動翻訳を使わず、全てを手作業に戻すこと"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "読み手が、元の案内と同じ条件や手順で行動できるかを確かめること"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "四番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "外国語として自然に見えれば、内容の確認を省くこと"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 12000
+        }
+      ],
+      "transcript": "外国語の案内文を作る仕事をしています。最近は自動翻訳を使うと、初稿がすぐできるので作業がかなり速くなりました。ただ、訳文が外国語として自然に見えるかどうかだけで確認を終えてはいけません。例えば、誰が申請するのか、何をいつまでにどこへ提出するのか、そうした条件や順番が元の文と同じように伝わっているかが重要です。一度、自然な訳文だったのに、読み手が提出先を間違えてしまったことがありました。それ以来、私は、訳文だけを読んだ人に、実際にどの順番で行動すると思うかを尋ねるようにしています。便利な道具を使わないという話ではありません。むしろ道具に頼りつつも、その文章で相手に何をしてもらいたいのかに立ち戻って確かめるのです。読みやすい文であることと、必要な行動につながる文であることは、いつも同じではありません。元の文章より短くなっているかどうかよりも、読み手が元の案内と同じ条件や手順で動けるかを重視しています。\n女の人が最も重視している確認はどれですか。\n一番。\n元の文章より必ず短い文になっているかを調べること\n二番。\n自動翻訳を使わず、全てを手作業に戻すこと\n三番。\n読み手が、元の案内と同じ条件や手順で行動できるかを確かめること\n四番。\n外国語として自然に見えれば、内容の確認を省くこと",
+      "transcriptSha256": "a97dcbe92e7492ea8019e3e3f4306fd12276d5fb0ed4fafda98cdfe7fa778a28",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "案内文の確認について話す女性",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-14",
+        "runtimeSha256": "756152622a82cbf31ceed9993a4823392074d5ebaa9d94d3b55abaa72bf06160",
+        "responseSha256": "4d312b52649543361a0baf06e0f51e3c85e369b5d1163d369796f4e500c45ac7",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「読み手が、元の案内と同じ条件や手順で行動できるかを確かめること」は、話者が訳文だけを読んだ人に実際の行動順を尋ね、条件や順番が元の文と同じように伝わっているかを重視すると明言している点で直接裏付けられる。誤答「外国語として自然に見えれば内容の確認を省く」は、自然さだけで確認を終えてはいけないと否定されている。誤答「自動翻訳を使わず全て手作業に戻す」は、道具を使わないという話ではないと明示的に排除されている。誤答「元の文章より必ず短い文になっているかを調べる」は、短くなっているかどうかよりも読み手が同じ条件や手順で動けるかを重視すると最終文で排除されている。提出先を間違えた具体例を加えることで、自然さと行動関係の乖離を強調し、正答の一意性を高めた。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:l30:audio",
+      "kind": "question",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l30"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女性の学芸員が、博物館の解説文の改善について話しています。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "先月、当館の常設展について、来館者にアンケートへのご協力をお願いしました。当館では江戸時代の生活用具を中心に展示を行っていますが、解説文が難しすぎるという声が多く寄せられました。特に、専門用語がそのまま使われているため、展示の内容が頭に入ってこないというご意見が目立ちました。そこで私は、解説文を全面的に書き直すことにしました。専門用語には必ず分かりやすい言葉で説明を添え、さらに、展示物が作られた背景にある物語を盛り込むことで、興味を持って読んでもらえるように工夫しました。結果として、来館者の滞在時間が以前より伸び、展示の前で熱心に解説文を読む方が増えました。ただ、今度は文章が長くなりすぎたというご意見も出ておりまして、今後は分かりやすさと簡潔さの両立を図りたいと考えております。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女性の学芸員は、主に何について話していますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "アンケートの回収率を上げるための方法"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "解説文を分かりやすく改善した結果と課題"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "専門用語をなくすべきかどうかの検討"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "4番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "来館者の滞在時間を延ばす展示の配置"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "女性の学芸員が、博物館の解説文の改善について話しています。\n先月、当館の常設展について、来館者にアンケートへのご協力をお願いしました。当館では江戸時代の生活用具を中心に展示を行っていますが、解説文が難しすぎるという声が多く寄せられました。特に、専門用語がそのまま使われているため、展示の内容が頭に入ってこないというご意見が目立ちました。そこで私は、解説文を全面的に書き直すことにしました。専門用語には必ず分かりやすい言葉で説明を添え、さらに、展示物が作られた背景にある物語を盛り込むことで、興味を持って読んでもらえるように工夫しました。結果として、来館者の滞在時間が以前より伸び、展示の前で熱心に解説文を読む方が増えました。ただ、今度は文章が長くなりすぎたというご意見も出ておりまして、今後は分かりやすさと簡潔さの両立を図りたいと考えております。\n女性の学芸員は、主に何について話していますか。\n1番。\nアンケートの回収率を上げるための方法\n2番。\n解説文を分かりやすく改善した結果と課題\n3番。\n専門用語をなくすべきかどうかの検討\n4番。\n来館者の滞在時間を延ばす展示の配置",
+      "transcriptSha256": "9de18467b59d5564bd73b5053a37c12f6489f2ebe7fc6b234e5e3001b81992e4",
+      "authoringEvidence": {
+        "jobId": "n2-full-01-add-listening-gist",
+        "runtimeSha256": "1c33e0022d621cbc9e0297f2d7887a89e7cc601366faac9fbf2ea1d07866d744",
+        "responseSha256": "14ec49bc249077e422016c5b123de6ba976de20586646f0001f67c9fd4e47d60",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:example-listening-response",
+      "kind": "example",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l15"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "次は、短い発言に対する自然な返事を選ぶ問題です。発言に続いて三つの返事が流れます。画面には文章は出ません。意味だけでなく、相手の気持ちや場面に合う返事を選んでください。まず採点されない練習です。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "この荷物、上の棚まで運んでいただけると助かるんですが。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、今そちらに置きますね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "運んでいただいて、ありがとうございました。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "もう荷物がないので、棚は要りません。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "答えは一番です。「運んでいただけると助かるんですが」は、荷物を運んでほしいという依頼です。一番は、その依頼を引き受ける返事になっています。練習はここまでです。ここからは、発言と三つの返事を続けて聞いてください。"
+        }
+      ],
+      "transcript": "次は、短い発言に対する自然な返事を選ぶ問題です。発言に続いて三つの返事が流れます。画面には文章は出ません。意味だけでなく、相手の気持ちや場面に合う返事を選んでください。まず採点されない練習です。\nこの荷物、上の棚まで運んでいただけると助かるんですが。\n一番。\nええ、今そちらに置きますね。\n二番。\n運んでいただいて、ありがとうございました。\n三番。\nもう荷物がないので、棚は要りません。\n答えは一番です。「運んでいただけると助かるんですが」は、荷物を運んでほしいという依頼です。一番は、その依頼を引き受ける返事になっています。練習はここまでです。ここからは、発言と三つの返事を続けて聞いてください。",
+      "transcriptSha256": "bf22aadd09319aca33f3bbc1863d7b6523da96adf495154527a35db3c85f258e",
+      "authoringEvidence": {
+        "kind": "original-ai",
+        "familyId": "codex",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l15",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l15"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "今日の説明、もう少し具体的にしていただけるとありがたいのですが。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、実際の例を挙げてご説明します。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、詳しい例は省いて、全体だけお話しします。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ありがとうございます。具体的なご説明でよくわかりました。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "今日の説明、もう少し具体的にしていただけるとありがたいのですが。\n一番。\nでは、実際の例を挙げてご説明します。\n二番。\nでは、詳しい例は省いて、全体だけお話しします。\n三番。\nありがとうございます。具体的なご説明でよくわかりました。",
+      "transcriptSha256": "b5aa034d1d6a963a787dd8eac27f52e128f4d369ed1c5f58e3fca8380e1f4d7f",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l16",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l16"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "結局、今回の担当は私ということになったんですね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "はい、今回はどなたに担当していただくか、まだ決めていません。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、今回は私が担当することになったんですね。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "はい、ほかの皆さんにもそう伝えてあります。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "結局、今回の担当は私ということになったんですね。\n一番。\nはい、今回はどなたに担当していただくか、まだ決めていません。\n二番。\nええ、今回は私が担当することになったんですね。\n三番。\nはい、ほかの皆さんにもそう伝えてあります。",
+      "transcriptSha256": "ddda8b8f49d1996d449f97093bd3cd12f615aff270770d4cd47a1997d3b31d14",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l17",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l17"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "この締め切り、何とか一日延ばしてもらえないでしょうか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "一日延ばしていただき、ありがとうございました。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "一日だけなら調整できるか、確認してみます。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、締め切りを一日早められるか確認します。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "この締め切り、何とか一日延ばしてもらえないでしょうか。\n一番。\n一日延ばしていただき、ありがとうございました。\n二番。\n一日だけなら調整できるか、確認してみます。\n三番。\nでは、締め切りを一日早められるか確認します。",
+      "transcriptSha256": "cef22be75c32df37be54c17ca23d736427d6bdc2f0ab941b604532b07ab364dd",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l18",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l18"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "お手数ですが、席を替わっていただけませんか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "席を取っていただき、ありがとうございました。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "席は来月から全て予約制になるそうです。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "かまいませんよ。こちらでよろしいですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "お手数ですが、席を替わっていただけませんか。\n一番。\n席を取っていただき、ありがとうございました。\n二番。\n席は来月から全て予約制になるそうです。\n三番。\nかまいませんよ。こちらでよろしいですか。",
+      "transcriptSha256": "22fd52a79d1acf4cf8b472a1a203877a22b12b5a08e0ba46d8990095739cb967",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l19",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l19"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "もう少しで終わるところだったのに、途中で電源が切れてしまって。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "それは大変でしたね。保存した分は残っていますか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "これから電源を切ってもよろしいですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "終わったあとでよかったですね。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "もう少しで終わるところだったのに、途中で電源が切れてしまって。\n一番。\nそれは大変でしたね。保存した分は残っていますか。\n二番。\nこれから電源を切ってもよろしいですか。\n三番。\n終わったあとでよかったですね。",
+      "transcriptSha256": "78db995a1bfd225aee005084206d8e2fb7257a1df17932cbb59cfb98be5ebfb4",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l20",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l20"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "来月から毎週出張だそうですね。体には気をつけてください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "出張の報告書なら、先月提出してあります。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "はい、来月の出張はもう全て終わりました。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ありがとうございます。無理のない予定を組むつもりです。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "来月から毎週出張だそうですね。体には気をつけてください。\n一番。\n出張の報告書なら、先月提出してあります。\n二番。\nはい、来月の出張はもう全て終わりました。\n三番。\nありがとうございます。無理のない予定を組むつもりです。",
+      "transcriptSha256": "58a4f36d4eb03d4e14e0ac1367626ac92918a53af8febb6cb7695dee6e013144",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l21",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l21"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "この資料、思ったほど複雑じゃありませんね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "いえ、昨日はまだ持ってきていません。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうですね。要点が見つけやすくなっています。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、予想よりずっと複雑ですね。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "この資料、思ったほど複雑じゃありませんね。\n一番。\nいえ、昨日はまだ持ってきていません。\n二番。\nそうですね。要点が見つけやすくなっています。\n三番。\nええ、予想よりずっと複雑ですね。",
+      "transcriptSha256": "247ca1984468f1f051e7bbc507bca3424b4c6dd7e66b3bbe18377953910c2696",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l22",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l22"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "遠いところ、わざわざお越しいただいて。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "いえ、お目にかかれてうれしいです。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "いえ、これからそちらへ伺うところです。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "どういたしまして。来ていただいて助かりました。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "遠いところ、わざわざお越しいただいて。\n一番。\nいえ、お目にかかれてうれしいです。\n二番。\nいえ、これからそちらへ伺うところです。\n三番。\nどういたしまして。来ていただいて助かりました。",
+      "transcriptSha256": "c0fa6963470d7810b05dd452b35558c066aa10d453aa774772d543ad587f1a99",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l23",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l23"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "手伝ってもらったうえに、お土産までいただいて、恐縮です。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "どうぞお気になさらないでください。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、お土産をいただけると助かります。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "手伝う前にお土産を買っておいてください。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "手伝ってもらったうえに、お土産までいただいて、恐縮です。\n一番。\nどうぞお気になさらないでください。\n二番。\nでは、お土産をいただけると助かります。\n三番。\n手伝う前にお土産を買っておいてください。",
+      "transcriptSha256": "880d35082245a264a273d5b555196aa1a604d1821f8d9099495f00179b56b043",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:script-l24",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l24"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "一応決まりましたが、まだ社外には知らせないでいただけますか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、社外の方にもすぐお知らせします。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "承知しました。正式な発表を待ちます。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "まだ何も決まっていないとおっしゃったんですね。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 8000
+        }
+      ],
+      "transcript": "一応決まりましたが、まだ社外には知らせないでいただけますか。\n一番。\nでは、社外の方にもすぐお知らせします。\n二番。\n承知しました。正式な発表を待ちます。\n三番。\nまだ何も決まっていないとおっしゃったんですね。",
+      "transcriptSha256": "490633b4318e305d428c8df1dfe4d05054b0d9c4770531a9cdce650bd3a599b7",
+      "printedOptions": false,
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "短い発言の話者（実際の声は未割当）。",
+          "speaker-b": "相手または応答選択肢の話者（実際の声は未割当）。",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:l31:audio",
+      "kind": "question",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l31"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "あの、先日お願いした資料の件なんですが、急ぎではありませんので、お忙しい時期が落ち着いたころで。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "お気遣いありがとうございます。落ち着き次第、取りかかります。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "こちらこそ、お急ぎのところ作っていただいて、助かりました。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、私から資料をお願いするのは控えておきます。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "あの、先日お願いした資料の件なんですが、急ぎではありませんので、お忙しい時期が落ち着いたころで。\n1番。\nお気遣いありがとうございます。落ち着き次第、取りかかります。\n2番。\nこちらこそ、お急ぎのところ作っていただいて、助かりました。\n3番。\nでは、私から資料をお願いするのは控えておきます。",
+      "transcriptSha256": "5c66b57ff3737033eadeecfef16763ffebb229bf41f31b0c76237b4c9a3613fd",
+      "authoringEvidence": {
+        "jobId": "n2-full-01-add-listening-response",
+        "runtimeSha256": "dec4cadc39740d42f03960e0c6c3bbf6674ec344e3811500b2fcad9bd67f524b",
+        "responseSha256": "771802c7616339b4884e7f92eaadada1de3bf6aec1196a0024ace18500ee0314",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "editorialPatchSha256": "c5b801eacc068241a665beed324dea50c620a85e72a691ec5e30b85cdfa17182",
+        "editorialPatchAuthor": "codex",
+        "editorialPatchBasis": "Author self-check: original second item had multiple natural responses; first key introduced unnecessary next-month timing. Keys, stimuli and explanations are replaced as new original candidate content, not accepted by model vote."
+      },
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:l32:audio",
+      "kind": "question",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l32"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "先日の会議、あなたの説明がなかったら、あの場では決まらなかったと思います。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "1番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "お役に立てたなら、うれしいです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "2番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "決まるまでは、ご説明できませんので。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "3番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "では、説明を抜いてお話しします。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 10000
+        }
+      ],
+      "transcript": "先日の会議、あなたの説明がなかったら、あの場では決まらなかったと思います。\n1番。\nお役に立てたなら、うれしいです。\n2番。\n決まるまでは、ご説明できませんので。\n3番。\nでは、説明を抜いてお話しします。",
+      "transcriptSha256": "ab1bed47307d3d5059dfe96819ce83c5bc92a6939ab5c3ff989e8d8640b216af",
+      "authoringEvidence": {
+        "jobId": "n2-full-01-add-listening-response",
+        "runtimeSha256": "dec4cadc39740d42f03960e0c6c3bbf6674ec344e3811500b2fcad9bd67f524b",
+        "responseSha256": "771802c7616339b4884e7f92eaadada1de3bf6aec1196a0024ace18500ee0314",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "editorialPatchSha256": "c5b801eacc068241a665beed324dea50c620a85e72a691ec5e30b85cdfa17182",
+        "editorialPatchAuthor": "codex",
+        "editorialPatchBasis": "Author self-check: original second item had multiple natural responses; first key introduced unnecessary next-month timing. Keys, stimuli and explanations are replaced as new original candidate content, not accepted by model vote."
+      },
+      "voiceRoles": {
+        "speaker-a": "female",
+        "narrator": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:example-listening-integrated",
+      "kind": "example",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l25"],
+      "printedOptions": false,
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "最後は、長めの話を聞き、複数の情報を組み合わせて答える問題です。この種類には練習問題はありません。必要な条件や、誰がどのような希望を持っているかをメモしてかまいません。最初の二つの話では、質問と四つの選択肢も音声で流れます。最後の一つの話には二つの質問があり、選択肢は画面に表示されます。同じ話を聞いて二つの質問に答えるので、話者それぞれの条件を整理してください。では、始めます。"
+        }
+      ],
+      "transcript": "最後は、長めの話を聞き、複数の情報を組み合わせて答える問題です。この種類には練習問題はありません。必要な条件や、誰がどのような希望を持っているかをメモしてかまいません。最初の二つの話では、質問と四つの選択肢も音声で流れます。最後の一つの話には二つの質問があり、選択肢は画面に表示されます。同じ話を聞いて二つの質問に答えるので、話者それぞれの条件を整理してください。では、始めます。",
+      "transcriptSha256": "71ee94f8030ea1e9bd309d708f48a7638b2723a97ddbda0dc1416f0a8b785f56",
+      "authoringEvidence": {
+        "kind": "original-ai",
+        "familyId": "codex",
+        "review": "not-established"
+      },
+      "voiceRoles": {
+        "narrator": "female"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": null,
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      }
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-integrated-1",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l25"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "科学館の担当者三人が、来月の短い体験企画について話しています。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "来月の科学館の短い体験企画ですけど、今回は来場者がただ見るだけじゃなくて、自分で手を動かして確かめられるものにしたいですね。最初からその方針で考えましょう。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "そうですね。やっぱり参加型のほうが印象に残りますし。それなら、いつも協力してくださる外部の先生に来てもらって、実演を交えた講演をしてもらうのはどうでしょう。先生の実験はいつも評判がいいですから。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-c",
+          "text": "それは魅力的ですけど、先生に伺ったところ、その日はたまたま海外出張だとおっしゃっていました。ただ、現地からオンラインでつないで講演することは可能だそうです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "オンラインですか。画面越しに先生の話を聞くだけなら来場者は試せないし、この部屋は通信環境があまり安定しないんですよね。途中で切れたら企画全体が台無しになります。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "確かに、この部屋はWi-Fiが弱いんですよね。じゃあ、先生には今回は見送ってもらうしかないか。代わりに、先生が以前撮ってくださった録画の実験映像を流すという手もあります。通信は不要ですし。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-c",
+          "text": "映像なら確実に映せますけど、結局見るだけになってしまいませんか。来場者から質問が出てもその場では答えられないし、条件を変えてもう一度試すこともできません。方針に合わない気がします。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうですよね。それに、準備期間があと三日しかないんです。新しい装置を一から作る時間はないでしょう。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "三日じゃ新しい装置は無理ですね。あ、でも、職員が普段から使っている道具で簡単な音の実験をするのはどうでしょう。材料はもう庫に揃っていますし、最初に職員がやり方を見せれば、来場者にも同じように試してもらえます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-c",
+          "text": "それはいいですね。手元にある材料でできるし、外部の人や通信にも頼らないから不確実な要素がありません。一回二十分くらいで回せるでしょうし、何度も実施できますね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "わかりました。来場者自身が試せるという方針にも合っていますし、職員と既存の材料で進めましょう。映像だけの企画は別の機会に考えます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "どのような企画を行うことにしましたか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "新しい装置を作り、外部の先生に実演してもらう"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "録画した実験の映像だけを繰り返し流す"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "海外の先生と通信しながら、オンライン講演を聞く"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "四番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "職員が手元の材料で実験を紹介し、来場者にも試してもらう"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 15000
+        }
+      ],
+      "transcript": "科学館の担当者三人が、来月の短い体験企画について話しています。\n来月の科学館の短い体験企画ですけど、今回は来場者がただ見るだけじゃなくて、自分で手を動かして確かめられるものにしたいですね。最初からその方針で考えましょう。\nそうですね。やっぱり参加型のほうが印象に残りますし。それなら、いつも協力してくださる外部の先生に来てもらって、実演を交えた講演をしてもらうのはどうでしょう。先生の実験はいつも評判がいいですから。\nそれは魅力的ですけど、先生に伺ったところ、その日はたまたま海外出張だとおっしゃっていました。ただ、現地からオンラインでつないで講演することは可能だそうです。\nオンラインですか。画面越しに先生の話を聞くだけなら来場者は試せないし、この部屋は通信環境があまり安定しないんですよね。途中で切れたら企画全体が台無しになります。\n確かに、この部屋はWi-Fiが弱いんですよね。じゃあ、先生には今回は見送ってもらうしかないか。代わりに、先生が以前撮ってくださった録画の実験映像を流すという手もあります。通信は不要ですし。\n映像なら確実に映せますけど、結局見るだけになってしまいませんか。来場者から質問が出てもその場では答えられないし、条件を変えてもう一度試すこともできません。方針に合わない気がします。\nそうですよね。それに、準備期間があと三日しかないんです。新しい装置を一から作る時間はないでしょう。\n三日じゃ新しい装置は無理ですね。あ、でも、職員が普段から使っている道具で簡単な音の実験をするのはどうでしょう。材料はもう庫に揃っていますし、最初に職員がやり方を見せれば、来場者にも同じように試してもらえます。\nそれはいいですね。手元にある材料でできるし、外部の人や通信にも頼らないから不確実な要素がありません。一回二十分くらいで回せるでしょうし、何度も実施できますね。\nわかりました。来場者自身が試せるという方針にも合っていますし、職員と既存の材料で進めましょう。映像だけの企画は別の機会に考えます。\nどのような企画を行うことにしましたか。\n一番。\n新しい装置を作り、外部の先生に実演してもらう\n二番。\n録画した実験の映像だけを繰り返し流す\n三番。\n海外の先生と通信しながら、オンライン講演を聞く\n四番。\n職員が手元の材料で実験を紹介し、来場者にも試してもらう",
+      "transcriptSha256": "5d47d7c8ec5a060f25f5a53601749107d97f50c8b69cea0b43ab8c1e0ea6385a",
+      "printedOptions": false,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male",
+        "speaker-c": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "企画担当者Ａ",
+          "speaker-b": "企画担当者Ｂ",
+          "speaker-c": "企画担当者Ｃ"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-25",
+        "runtimeSha256": "388aa50c6ca6a5b2390aa404195d01ee5a298f441697e2faba0d190927c8e513",
+        "responseSha256": "53ca9c682ef8a82710dd88cefb7a45ac1a75617eebf1c09ce17c6f8e17f5ae70",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "正答「職員が手元の材料で実験を紹介し、来場者にも試してもらう」：参加者が自分で試せる方針、三日の準備期間、既存材料の有無、通信不要という条件がすべてうため選ばれる。誤答「海外の先生とオンライン講演」：先生は当日海外で、かつ部屋の通信が不安定であるため却下。誤答「録画映像を繰り返し流す」：見るだけになり方針に合わず、質問対応や条件変更もできないため別機会に回された。誤答「新しい装置を作り外部の先生に実演」：準備期間が三日しかなく新装置の製作は不可能で、先生も来られないため不適。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-integrated-2",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l26"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "地域の案内冊子に載せる写真を、編集担当の二人が選んでいます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "今度の地域案内冊子の表紙ですが、横長で大きく印刷しても鮮明に見える写真を使いたいですね。撮影者四名からそれぞれ使ってもよいと返事が来ています。候補は、川の夕景、春の祭り、図書館の外観、商店街の朝の四枚です。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "まず春の祭りはにぎやかで魅力的ですが、パレードの参加者の顔がかなりはっきり写っていますね。今回は掲載前に本人の確認を取るという方針でしたが、状況はいかがですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "それが、撮影者から名簿はもらったものの、数十人に一人ずつ連絡するのは印刷の締め切りまでに間に合いそうにありません。全員分の許可が揃わないと使えないので、表紙は厳しいですね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "わかりました。では川の夕景はどうでしょう。人が写っていないので確認の問題はなさそうですが。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうですね、人物の許可は不要です。ただ、いただいたデータの解像度が低くて、表紙サイズに拡大すると輪郭がぼやけてしまいます。大きく印刷することを考えると、画質が足りません。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "それでは商店街の朝の写真はどうですか。あちらは画質も十分でしたよね。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "画質自体は問題ないんですが、画面の中央に去年取り壊された古い木造の建物が入っているんです。今回は、実際に今この町を訪れた人が目にする景色を表紙にしたいという条件がありましたから、もう存在しない建物が目立つ位置にあると読者に誤解を与えかねません。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "なるほど、現状と合わないわけですね。残るは図書館の外観ですが、こちらは先月完成したばかりの建物を撮ったものです。横長の構図ですし、画質も十分で、人の顔も写っていません。拡大印刷にも対応できそうです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "ええ、確認の必要もなく、今の町の顔にもぴったりです。この写真を表紙に決めましょう。ほかの三枚は、本文の中で使えるページがないか後で検討しましょう。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "表紙に使うことにしたのは、どの写真ですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "一番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "川の夕景"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "二番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "春の祭り"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "三番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "図書館の外観"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "四番。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "商店街の朝"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 1500
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 15000
+        }
+      ],
+      "transcript": "地域の案内冊子に載せる写真を、編集担当の二人が選んでいます。\n今度の地域案内冊子の表紙ですが、横長で大きく印刷しても鮮明に見える写真を使いたいですね。撮影者四名からそれぞれ使ってもよいと返事が来ています。候補は、川の夕景、春の祭り、図書館の外観、商店街の朝の四枚です。\nまず春の祭りはにぎやかで魅力的ですが、パレードの参加者の顔がかなりはっきり写っていますね。今回は掲載前に本人の確認を取るという方針でしたが、状況はいかがですか。\nそれが、撮影者から名簿はもらったものの、数十人に一人ずつ連絡するのは印刷の締め切りまでに間に合いそうにありません。全員分の許可が揃わないと使えないので、表紙は厳しいですね。\nわかりました。では川の夕景はどうでしょう。人が写っていないので確認の問題はなさそうですが。\nそうですね、人物の許可は不要です。ただ、いただいたデータの解像度が低くて、表紙サイズに拡大すると輪郭がぼやけてしまいます。大きく印刷することを考えると、画質が足りません。\nそれでは商店街の朝の写真はどうですか。あちらは画質も十分でしたよね。\n画質自体は問題ないんですが、画面の中央に去年取り壊された古い木造の建物が入っているんです。今回は、実際に今この町を訪れた人が目にする景色を表紙にしたいという条件がありましたから、もう存在しない建物が目立つ位置にあると読者に誤解を与えかねません。\nなるほど、現状と合わないわけですね。残るは図書館の外観ですが、こちらは先月完成したばかりの建物を撮ったものです。横長の構図ですし、画質も十分で、人の顔も写っていません。拡大印刷にも対応できそうです。\nええ、確認の必要もなく、今の町の顔にもぴったりです。この写真を表紙に決めましょう。ほかの三枚は、本文の中で使えるページがないか後で検討しましょう。\n表紙に使うことにしたのは、どの写真ですか。\n一番。\n川の夕景\n二番。\n春の祭り\n三番。\n図書館の外観\n四番。\n商店街の朝",
+      "transcriptSha256": "6602395df864259bfa150ca9fe668a8cf4ea184fe24bd4f4056734bfe1442db1",
+      "printedOptions": false,
+      "voiceRoles": {
+        "narrator": "female",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "編集担当者Ａ",
+          "speaker-b": "編集担当者Ｂ",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-26",
+        "runtimeSha256": "24f932ddb571fa1c6286aa276d9b3eac5193bea80a1ee02a55416630ae334cda",
+        "responseSha256": "59b4e6c1b51d7e2443b28b00838348a1cfd47a9d270dc03172ab637708286694",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "本対話では表紙写真の選定条件として、横長で拡大印刷に耐える画質、人物の顔が写っていないまたは確認済み、現在の町の景色であること、が提示される。正答「図書館の外観」は先月撮影で画質十分、横長、顔なし、現存する建物であり全条件を満たす。誤答「春の祭り」は顔が明瞭に写っているが数十名への確認が締め切りまでに間に合わず不適。誤答「川の夕景」は人物の問題はないが解像度が低く拡大でぼやけるため不適。誤答「商店街の朝」は画質は十分だが取り壊された建物が中央に写り、現在の景色という条件に合わないため不適。以上により図書館の外観のみが唯一適切な選択となる。"
+      },
+      "kind": "question"
+    },
+    {
+      "id": "kairo-original-jlpt-n2-form-01:unit-stimulus-integrated-3",
+      "itemIds": ["kairo-original-jlpt-n2-form-01:l27", "kairo-original-jlpt-n2-form-01:l28"],
+      "cues": [
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "地域活動の説明会で、四つの担当について説明したあと、参加を考えている二人が話しています。この話を一度聞いて、続く二つの質問に答えます。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 15000
+        },
+        {
+          "kind": "speech",
+          "voice": "announcer",
+          "text": "今回の地域活動では、四つの担当をご用意しています。いずれの担当も、まず一回だけ参加していただき、そのあと継続するかどうかはご自身で決めていただけます。では、順番にご説明します。まず「資料入力」は土曜午前、室内で二時間です。昔の記録をパソコンに入力する作業で、基本的に一人ずつ進めていただきます。次に「イベント案内」は土曜午後、屋外で三時間、来場者に直接説明するのが中心になります。三つ目の「写真整理」は土曜午後、室内で二時間で、紙の写真を二人一組で整理します。パソコンは使いませんので、手作業がメインです。最後に「広報取材」は土曜午前、屋外で三時間、二人一組で地域の方に話を聞きます。その後、平日に自宅のパソコンで短い記事にまとめていただきます。どの担当も経験は問いませんので、初心者の方もお気軽にご参加ください。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "説明ありがとうございました。四つあるんですね、どれも地域に貢献できそうで迷います。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "本当ですね。でも、それぞれ活動する時間や場所がだいぶ違うので、まずは自分の都合に合うものから絞ったほうがよさそうです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうですね。私は土曜の午前が仕事で参加できないので、午後だけになります。できれば誰かと一緒に作業したいんですけど、長時間外に立つのは膝が悪くてちょっと難しいんです。午後の屋外は三時間もありますし、ずっと立ちっぱなしだと負担が大きそうです。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "僕は逆に土曜は午前中しか空いていません。一人で黙々と入力するより、人と話すような活動のほうが向いてる気がして。地域の方に話を聞くっていうのは面白そうですね。ただ、記事を書いた経験はあまりなくて、そこは少し不安があります。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "広報取材だと、取材のあと平日に記事をまとめる必要がありますよね。その時間は取れそうですか。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-b",
+          "text": "ええ、平日の夕方なら大丈夫です。家にもパソコンもありますし。それに、最初からずっと続けると約束しなくてもいいなら、一度挑戦してみたいですね。一回やってみて、自分に合うかどうか考えてから決めます。"
+        },
+        {
+          "kind": "speech",
+          "voice": "speaker-a",
+          "text": "そうですか。私は午後で室内、それに二人一組でできるものなら条件に合いますね。パソコンを使わないのもちょうどいいです。一回やってみて、それから続けるか決めようと思います。"
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "女の人が参加するのは、どの担当ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 15000
+        },
+        {
+          "kind": "speech",
+          "voice": "narrator",
+          "text": "男の人が参加するのは、どの担当ですか。"
+        },
+        {
+          "kind": "planned-silence",
+          "milliseconds": 15000
+        }
+      ],
+      "transcript": "地域活動の説明会で、四つの担当について説明したあと、参加を考えている二人が話しています。この話を一度聞いて、続く二つの質問に答えます。\n今回の地域活動では、四つの担当をご用意しています。いずれの担当も、まず一回だけ参加していただき、そのあと継続するかどうかはご自身で決めていただけます。では、順番にご説明します。まず「資料入力」は土曜午前、室内で二時間です。昔の記録をパソコンに入力する作業で、基本的に一人ずつ進めていただきます。次に「イベント案内」は土曜午後、屋外で三時間、来場者に直接説明するのが中心になります。三つ目の「写真整理」は土曜午後、室内で二時間で、紙の写真を二人一組で整理します。パソコンは使いませんので、手作業がメインです。最後に「広報取材」は土曜午前、屋外で三時間、二人一組で地域の方に話を聞きます。その後、平日に自宅のパソコンで短い記事にまとめていただきます。どの担当も経験は問いませんので、初心者の方もお気軽にご参加ください。\n説明ありがとうございました。四つあるんですね、どれも地域に貢献できそうで迷います。\n本当ですね。でも、それぞれ活動する時間や場所がだいぶ違うので、まずは自分の都合に合うものから絞ったほうがよさそうです。\nそうですね。私は土曜の午前が仕事で参加できないので、午後だけになります。できれば誰かと一緒に作業したいんですけど、長時間外に立つのは膝が悪くてちょっと難しいんです。午後の屋外は三時間もありますし、ずっと立ちっぱなしだと負担が大きそうです。\n僕は逆に土曜は午前中しか空いていません。一人で黙々と入力するより、人と話すような活動のほうが向いてる気がして。地域の方に話を聞くっていうのは面白そうですね。ただ、記事を書いた経験はあまりなくて、そこは少し不安があります。\n広報取材だと、取材のあと平日に記事をまとめる必要がありますよね。その時間は取れそうですか。\nええ、平日の夕方なら大丈夫です。家にもパソコンもありますし。それに、最初からずっと続けると約束しなくてもいいなら、一度挑戦してみたいですね。一回やってみて、自分に合うかどうか考えてから決めます。\nそうですか。私は午後で室内、それに二人一組でできるものなら条件に合いますね。パソコンを使わないのもちょうどいいです。一回やってみて、それから続けるか決めようと思います。\n女の人が参加するのは、どの担当ですか。\n男の人が参加するのは、どの担当ですか。",
+      "transcriptSha256": "06b264e993ce01db705525a621c54a410232be67d8fa1d9bbb729c945ac90eef",
+      "printedOptions": true,
+      "voiceRoles": {
+        "narrator": "female",
+        "announcer": "male",
+        "speaker-a": "female",
+        "speaker-b": "male"
+      },
+      "roleEvidence": {
+        "basis": "author-voice-assignment-with-source-constraints",
+        "sourceDescriptions": {
+          "narrator": "案内・質問・選択肢番号。実際の声は未割当。",
+          "announcer": "四つの活動や講座の条件を案内する話者。",
+          "speaker-a": "土曜午後だけ参加できる女性",
+          "speaker-b": "土曜午前に参加したい男性",
+          "speaker-c": "三人目の担当者（実際の声は未割当）。"
+        },
+        "note": "Speaker-a is assigned a female voice, speaker-b and speaker-c distinct male voices; narrator is female and announcer male where used. Check against the actual audio before admission."
+      },
+      "authoringEvidence": {
+        "jobId": "n2-full-01-revise-27",
+        "runtimeSha256": "d3000d5363c08630d77dffc78f9b5ba5d2066dc998ea388b108949c843fcabb4",
+        "responseSha256": "c89af095341c0d7dcec87c619ad3d64a4e817a7adef95a129d17fffbb0ec6b5f",
+        "familyId": "glm",
+        "actualModel": "glm-5.2",
+        "review": "not-established",
+        "answerPreservationRationale": "アナウンサーは四つの担当の条件を明確に提示する。資料入力は土曜午前・室内・一人・パソコン使用。イベント案内は土曜午後・屋外・三時間。写真整理は土曜午後・室内・二時間・二人一組・パソコン不使用。広報取材は土曜午前・屋外・三時間・二人一組・聞き取り後平日に自宅で記事作成。女性は土曜午前が仕事で午後のみ参加可能、誰かと一緒に作業したい、長時間の屋外は膝の問題で困難と述べる。これにより資料入力（午前・一人）は時間と希望の両方で不適、イベント案内（午後・屋外三時間）は屋外長時間で不適、広報取材（午前・屋外）は時間と場所で不適となり、写真整理（午後・室内・二人一組・パソコン不要）のみが全条件に合致する。男性は土曜午前のみ空いている、一人の入力より人と話す活動を希望、記事経験は少ないが平日夕方に自宅パソコンで対応可能と述べる。資料入力（一人作業）は希望に合わず、イベント案内と写真整理は午後で参加不可、広報取材（午前・聞き取り・平日記事作成可）のみが全条件に合致する。両問の正答と全誤答排除が保持されている。"
+      },
+      "kind": "question"
+    }
+  ]
+}

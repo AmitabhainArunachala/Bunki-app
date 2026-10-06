@@ -1,0 +1,1131 @@
+{
+  "v": 1,
+  "id": "kairo-original-jlpt-n1-written-12-01:written-review",
+  "provenance": {
+    "kind": "original-ai",
+    "authorRef": null,
+    "processRef": "claude-original-n1-practice-20260925",
+    "sources": []
+  },
+  "rights": {
+    "display": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "retain": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "sync": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "adapt": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    },
+    "synthesize-audio": {
+      "status": "allowed",
+      "basisRef": "bunki-original-authoring-20260923",
+      "policyVersion": "bunki-original-rights-1"
+    }
+  },
+  "format": "kairo-assessment-form",
+  "title": "N1 written practice — written editorial review",
+  "exam": {
+    "family": "jlpt",
+    "track": "N1"
+  },
+  "scope": "section-practice",
+  "blueprintId": "jlpt-n1-facts-20260910",
+  "items": [
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q01",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の言葉の読み方を選んでください。\nこの私設図書館は、運営にかかる費用の大半を、地域の人々からの寄付で【賄って】いる。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "賄うは「まかなう」と読み、必要な費用や物をととのえて用を満たすこと。「運営費を寄付で賄う」は典型的な結びつき。「おぎなう」は「補う」（足りない分を足す）、「つぐなう」は「償う」（損害や罪の埋め合わせをする）、「あがなう」は「贖う」（罪を償う、代価を払って手に入れる）の読みで、いずれも「賄」の読みではない。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "おぎなって"
+          },
+          {
+            "id": "choice-2",
+            "text": "まかなって"
+          },
+          {
+            "id": "choice-3",
+            "text": "つぐなって"
+          },
+          {
+            "id": "choice-4",
+            "text": "あがなって"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "word:賄う"
+      ],
+      "revisionId": "assessment-item:97bd4684a64c2df1fa5a83e9923075b77ce4ab382acea243bec9c98e8440c026",
+      "sha256": "97bd4684a64c2df1fa5a83e9923075b77ce4ab382acea243bec9c98e8440c026"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q02",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に入る最もよいものを選んでください。\n大型の台風が通り過ぎた翌朝、海岸には（　）数の流木が打ち上げられていた。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "おびただしいは数や量が非常に多いことを表し、「おびただしい数の〜」は定型的な結びつき。台風の後に打ち上げられた流木の多さに合う。あわただしいは物事に追われて落ち着かない様子（あわただしい朝）、けたたましいは音が大きく鋭いこと（けたたましいサイレン）、ものものしいは厳重で重々しいこと（ものものしい警備）で、いずれも数量の多さを表さない。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "あわただしい"
+          },
+          {
+            "id": "choice-2",
+            "text": "けたたましい"
+          },
+          {
+            "id": "choice-3",
+            "text": "おびただしい"
+          },
+          {
+            "id": "choice-4",
+            "text": "ものものしい"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "word:おびただしい"
+      ],
+      "revisionId": "assessment-item:da5d8a9ba94ccd184d1f248f4243c0b1627a63b5bf4e85fd5b45eba6281fa98e",
+      "sha256": "da5d8a9ba94ccd184d1f248f4243c0b1627a63b5bf4e85fd5b45eba6281fa98e"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q03",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の言葉に意味が最も近いものを選んでください。\n担当者は、事故が起きた日の作業記録を【つぶさに】調べ直し、手順が一つだけ飛ばされていたことを突き止めた。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "つぶさには、細かい点まで詳しく、という意味。記録を細かく見たからこそ、一つだけ飛ばされていた手順を突き止められたので、「詳しく」が最も近い。ざっとは細部に立ち入らず大まかに見ること、手早くは時間をかけずに素早く、ひそかには人に知られないように、という意味で、いずれも細部まで見るという意味を持たない。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "ざっと"
+          },
+          {
+            "id": "choice-2",
+            "text": "手早く"
+          },
+          {
+            "id": "choice-3",
+            "text": "ひそかに"
+          },
+          {
+            "id": "choice-4",
+            "text": "詳しく"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "word:つぶさに"
+      ],
+      "revisionId": "assessment-item:72e229d544fa028d5cc10591d86bfa96d5efea306c7a6a66195d8304f59f0f9e",
+      "sha256": "72e229d544fa028d5cc10591d86bfa96d5efea306c7a6a66195d8304f59f0f9e"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q04",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "「携わる」の使い方として、最もよいものを選んでください。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "携わるは、ある仕事や分野に関係して従事するという意味で、「設計に携わる」が正しい。傘を身につけて持っていくのは「携える」（傘を携えて）、人柄が結果を後押ししたのは「手伝う」（人柄も手伝って）、報告書に意見が現れていないのは「反映される」（声が反映されていない）が適切。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "父は定年を迎えるまでの三十年余り、橋の設計に携わってきた。"
+          },
+          {
+            "id": "choice-2",
+            "text": "雨になりそうだったので、折りたたみの傘を携わって家を出た。"
+          },
+          {
+            "id": "choice-3",
+            "text": "彼女の誠実な人柄も携わって、難しい交渉は思いのほか円満にまとまった。"
+          },
+          {
+            "id": "choice-4",
+            "text": "この報告書には、現場で働く人たちの声が十分に携わっていない。"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "word:携わる"
+      ],
+      "revisionId": "assessment-item:f3778414f6e284208dd3d421c2855f07ab36e7e91782b0e36b7cd7e5c08f2350",
+      "sha256": "f3778414f6e284208dd3d421c2855f07ab36e7e91782b0e36b7cd7e5c08f2350"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q05",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に入る最もよいものを選んでください。\n彼女は度重なる怪我（　）、三年ぶりに日本代表の座を取り戻した。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「〜をものともせず」は、困難や障害を問題にしないで、という意味で、度重なる怪我にひるまずに代表の座を取り戻したという文脈に合う。「〜にひきかえ」は二つのものを対比する表現、「〜にかこつけて」は何かを口実にする表現、「〜をかわきりに」は物事の始まりを示す表現で、いずれも怪我と代表復帰の関係を表せない。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "にひきかえ"
+          },
+          {
+            "id": "choice-2",
+            "text": "にかこつけて"
+          },
+          {
+            "id": "choice-3",
+            "text": "をかわきりに"
+          },
+          {
+            "id": "choice-4",
+            "text": "をものともせず"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "jlpt-n1:grammar-form"
+      ],
+      "revisionId": "assessment-item:32b0a00e7e464d88e7007608bfdd098a2b2f792b09c25cf43d0bdc5e3f692785",
+      "sha256": "32b0a00e7e464d88e7007608bfdd098a2b2f792b09c25cf43d0bdc5e3f692785"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q06",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に入る最もよいものを選んでください。\nこの程度の床の傷みなら、わざわざ業者を呼ぶ（　）。自分で十分に直せる。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「〜までもない」は、そうする必要はないという意味で、「わざわざ」とともに使われ、「自分で十分に直せる」という話し手の判断に合う。「〜に越したことはない」は、そうするのが最も望ましいという勧めを表すので、業者を呼ぶ必要を認めていないこの話し手の評価と合わない。「〜始末だ」は、悪い経過をたどった末の結果を述べる表現で、「この程度の傷みなら」という仮定の判断には合わない。「〜に値する」は、そうするだけの価値があるという評価を表し、「この程度」「わざわざ」という軽い見方と合わない。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "に越したことはない"
+          },
+          {
+            "id": "choice-2",
+            "text": "までもない"
+          },
+          {
+            "id": "choice-3",
+            "text": "始末だ"
+          },
+          {
+            "id": "choice-4",
+            "text": "に値する"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "jlpt-n1:grammar-form"
+      ],
+      "revisionId": "assessment-item:bfa74609d4add4a65a44e2fc6c36e73ce467b07dc029cbf41c1c245134a1a0bc",
+      "sha256": "bfa74609d4add4a65a44e2fc6c36e73ce467b07dc029cbf41c1c245134a1a0bc"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q07",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "★に入るものを選んでください。\nその写真家は、____ ____ ★ ____ で、町の何気ない日常を撮り続けている。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "「地元に暮らす者ならではの視点で」の順になる。★は三番目の「ならではの」。「〜ならではの」は名詞（暮らす者）に付き、その人やその場にしかない特徴を表して、後ろの名詞（視点）を修飾する。「地元に」は動詞「暮らす」にかかるので先頭に置き、「視点」は後の「で」に続くので最後に置く。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "視点"
+          },
+          {
+            "id": "choice-2",
+            "text": "地元に"
+          },
+          {
+            "id": "choice-3",
+            "text": "ならではの"
+          },
+          {
+            "id": "choice-4",
+            "text": "暮らす者"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "jlpt-n1:sentence-composition"
+      ],
+      "revisionId": "assessment-item:5baba49d31e4f00358dfdcf14a9afd427ed08449cb7b88a1cb5055c29098c51e",
+      "sha256": "5baba49d31e4f00358dfdcf14a9afd427ed08449cb7b88a1cb5055c29098c51e"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q08",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（　）に入る最もよいものを選んでください。\n新しい薬が本当に効くのかを確かめる方法の一つに、薬を使う集団と使わない集団とを比べる試験がある。例えば、ある患者がその薬を飲み、数日後に回復したとする。この事実から、薬が効いたと（　）。病気によっては、何もしなくても時間とともに快方に向かうことがあるし、薬を飲んだという安心感が症状を和らげることもあるからだ。一人の回復のような、比べる相手を持たない観察は、それだけでは効き目の証拠として弱いのである。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "空欄の文だけを見れば、四つとも文法的に成り立ち、意味も通る。決め手は前後の論の流れである。文章は、薬の効き目を確かめる方法の一つとして、薬を使う集団と使わない集団とを比べる試験を挙げ、一人の患者が回復した例を示す。空欄の後の「からだ」で、自然に快方に向かうことや安心感による効果という別の説明を理由として挙げ、一人の回復のような比べる相手のない観察は、それだけでは証拠として弱いとまとめている。したがって、一人の回復という事実から効いたと断定はできないという意味の「言い切れるものではない」が入る。「言ってしかるべきだ」「言うまでもない」「言わざるを得ない」は、いずれも効いたと認める方向の判断で、「からだ」で示される理由や最後の結論とつながらない。",
+      "passages": [],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "言い切れるものではない"
+          },
+          {
+            "id": "choice-2",
+            "text": "言ってしかるべきだ"
+          },
+          {
+            "id": "choice-3",
+            "text": "言うまでもない"
+          },
+          {
+            "id": "choice-4",
+            "text": "言わざるを得ない"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "jlpt-n1:text-grammar"
+      ],
+      "revisionId": "assessment-item:4f00c2328469be325c54f2b803b5aaf10b742f5f2f561e6e0a8d3815f3ec2a7d",
+      "sha256": "4f00c2328469be325c54f2b803b5aaf10b742f5f2f561e6e0a8d3815f3ec2a7d"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q09",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "市内に拠点を置き、営利を目的としない構成員八人の団体が、昨年度この助成を受けて開いた朗読会を、今年度は規模を広げて開催する。その朗読会の実績報告書は提出済みである。対象経費が六十万円の場合、採択されたときに受けられる助成額は最大でいくらですか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "昨年度に本助成を受けた朗読会を発展させて開くので、継続事業（Ｂ）にあたる。これまでに実施したことのある事業なので、新規事業（Ａ）にはあたらない。実績報告書は提出済みなので、申請の条件も満たす。採択された場合、対象経費六十万円の二分の一は三十万円だが、Ｂの上限は二十万円なので、最大で二十万円。三十万円は二分の一で計算して上限を見落とした額。四十万円は新規事業（Ａ）の三分の二で計算し、上限も見落とした額。過去に助成を受けた団体でも、実績報告書を提出していれば申請できるので、「受けられない」は誤り。",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n1-written-12-01:passage-grantNotice",
+          "revisionId": "assessment-passage:261ac5619e59ab0e2ec4fa2213cefa035c1f463584734338b97dde6d1cc5f96d",
+          "sha256": "261ac5619e59ab0e2ec4fa2213cefa035c1f463584734338b97dde6d1cc5f96d"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "二十万円"
+          },
+          {
+            "id": "choice-2",
+            "text": "三十万円"
+          },
+          {
+            "id": "choice-3",
+            "text": "四十万円"
+          },
+          {
+            "id": "choice-4",
+            "text": "助成は受けられない"
+          }
+        ],
+        "answerOptionId": "choice-1"
+      },
+      "subjects": [
+        "jlpt-n1:information-retrieval"
+      ],
+      "revisionId": "assessment-item:c74744ee63819e88a1dcabf9a3dc7c89015e1d4c41b46be239c291aede8813bb",
+      "sha256": "c74744ee63819e88a1dcabf9a3dc7c89015e1d4c41b46be239c291aede8813bb"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q10",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "次のうち、この助成に申請できる団体はどれですか。なお、各団体について書かれていない点は、募集の条件を満たしているものとします。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "対象団体は、市内に活動拠点を置き、構成員が五人以上で、営利を目的としない団体。劇団はこの三つの条件をすべて満たし、これまで行ったことのない公演を新たに始めるので新規事業（Ａ）にあたる。朗読グループは構成員が四人で、五人以上という条件を満たさない。イベント会社は営利を目的とする団体なので対象外。書道会は、以前本助成を受けた事業の実績報告書を提出していないため、申請の条件を満たさない。",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n1-written-12-01:passage-grantNotice",
+          "revisionId": "assessment-passage:261ac5619e59ab0e2ec4fa2213cefa035c1f463584734338b97dde6d1cc5f96d",
+          "sha256": "261ac5619e59ab0e2ec4fa2213cefa035c1f463584734338b97dde6d1cc5f96d"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "市内に拠点を置き、営利を目的としない構成員四人の朗読グループが、これまで行ったことのない朗読会を新たに開く。"
+          },
+          {
+            "id": "choice-2",
+            "text": "市内に拠点を置き、営利を目的とする社員十五人のイベント会社が、これまで行ったことのない音楽祭を新たに開く。"
+          },
+          {
+            "id": "choice-3",
+            "text": "市内に拠点を置き、営利を目的としない構成員十二人の劇団が、これまで行ったことのない野外公演を新たに行う。"
+          },
+          {
+            "id": "choice-4",
+            "text": "市内に拠点を置き、営利を目的としない構成員七人の書道会が、以前本助成を受けた作品展を発展させて開く。その作品展の実績報告書は、まだ提出していない。"
+          }
+        ],
+        "answerOptionId": "choice-3"
+      },
+      "subjects": [
+        "jlpt-n1:information-retrieval"
+      ],
+      "revisionId": "assessment-item:dcc2744781d5140e515946f610e5cb9a9f62685fe273952bd3450f53605edd2a",
+      "sha256": "dcc2744781d5140e515946f610e5cb9a9f62685fe273952bd3450f53605edd2a"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q11",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "compact-comprehension",
+      "prompt": "「町を縮めた図にすぎなかった」とあるが、どういうことですか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "直前に「画面上の矢印を追っているあいだ」とあり、「私が見ていたのは町ではなく」と続く。案内の画面ばかり見ていて、町そのものを見ていなかったという意味。地図の縮尺や表示の細かさ、通った範囲の広さ、実際の町の複雑さについては、本文で述べていない。",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n1-written-12-01:passage-wayfindingEssay",
+          "revisionId": "assessment-passage:746bee2d68a4710e0960897bfbdab405918b0122910a9484961a4f015f199ef3",
+          "sha256": "746bee2d68a4710e0960897bfbdab405918b0122910a9484961a4f015f199ef3"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "端末の地図は縮尺が小さく、細い道までは表示されなかったということ"
+          },
+          {
+            "id": "choice-2",
+            "text": "案内に従って移動していた筆者は、町そのものを見ていなかったということ"
+          },
+          {
+            "id": "choice-3",
+            "text": "最短の経路をたどったため、町のごく一部しか通らなかったということ"
+          },
+          {
+            "id": "choice-4",
+            "text": "実際の町は、画面で見るよりもはるかに複雑だったということ"
+          }
+        ],
+        "answerOptionId": "choice-2"
+      },
+      "subjects": [
+        "practice-n1:compact-comprehension"
+      ],
+      "revisionId": "assessment-item:0b90541b40de0fd25eb2148abe3105a31938bb614eec84df03fde71da0da6477",
+      "sha256": "0b90541b40de0fd25eb2148abe3105a31938bb614eec84df03fde71da0da6477"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:q12",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-item",
+      "skill": "reading",
+      "task": "compact-main-idea",
+      "prompt": "筆者が最も言いたいことはどれですか。",
+      "translatedInstruction": "Choose the best answer.",
+      "rationale": "最後の段落で、目的地に着くことと土地を知ることは「似ているようでいて別の事柄」だとまとめており、これが筆者の中心的な主張である。「端末の案内に頼らずに移動するべきだ」は、筆者が述べていない行動の指示を加えている。筆者は「便利な道具を手放せと言うつもりはない」とし、どう移動すべきかを指示するのではなく、二つの事柄の区別を述べるにとどめている。出かける前に地図で地形を確かめるという話は本文になく、筆者はむしろ、自分の誤りを通して地形を確かめると述べている。迷った経験は今も鮮明に覚えているものとして描かれており、早く忘れたほうがよいという考えとは逆である。",
+      "passages": [
+        {
+          "kind": "passage",
+          "id": "kairo-original-jlpt-n1-written-12-01:passage-wayfindingEssay",
+          "revisionId": "assessment-passage:746bee2d68a4710e0960897bfbdab405918b0122910a9484961a4f015f199ef3",
+          "sha256": "746bee2d68a4710e0960897bfbdab405918b0122910a9484961a4f015f199ef3"
+        }
+      ],
+      "media": [],
+      "response": {
+        "kind": "selected",
+        "options": [
+          {
+            "id": "choice-1",
+            "text": "土地をよく知るためには、端末の案内に頼らずに移動するべきだ"
+          },
+          {
+            "id": "choice-2",
+            "text": "道に迷わないよう、出かける前に地図で地形を確かめておくべきだ"
+          },
+          {
+            "id": "choice-3",
+            "text": "迷った経験は時間の無駄なので、早く忘れてしまったほうがよい"
+          },
+          {
+            "id": "choice-4",
+            "text": "効率よく目的地に着けても、それでその土地を知ったことにはならない"
+          }
+        ],
+        "answerOptionId": "choice-4"
+      },
+      "subjects": [
+        "practice-n1:compact-main-idea"
+      ],
+      "revisionId": "assessment-item:ff348f9fddce932243d39685e56aa1b2bb65100b495519eb26febd9f28bcaac6",
+      "sha256": "ff348f9fddce932243d39685e56aa1b2bb65100b495519eb26febd9f28bcaac6"
+    }
+  ],
+  "passages": [
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:passage-grantNotice",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "地域文化活動助成　募集のご案内\n市内で文化・芸術活動に取り組む団体を対象に、事業に要する経費の一部を助成します。\n【対象団体】市内に活動拠点を置き、構成員が五人以上の団体。ただし、営利を目的とする団体は除きます。\n【助成区分と助成額】\nＡ　新規事業：団体がこれまでに実施したことのない事業を、今年度新たに始めるもの。対象経費の三分の二以内、上限三十万円。\nＢ　継続事業：過去に本助成を受けた事業を、発展させて実施するもの。対象経費の二分の一以内、上限二十万円。\n※過去に実施した事業のうち、本助成を受けていないものは、Ａ・Ｂのいずれにも該当しません。\n【対象経費】会場使用料、外部講師への謝礼、広報物の印刷費など。飲食費および団体の構成員に支払う謝礼は対象となりません。\n【申請方法】申請は一団体につき一件に限ります。所定の申請書に事業計画書と収支予算書を添えて、五月三十一日（必着）までに文化振興課へ郵送または持参してください。なお、過去に本助成を受けた団体は、その事業の実績報告書を提出済みであることが申請の条件となります。\n【選考】書類審査のうえ、必要に応じて面接を行います。結果は七月上旬までに文書で通知します。",
+      "textSha256": "0b857920b4112a347baf42f7cd30cc02f663126e1412c309b93cbb7faede9c0b",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:261ac5619e59ab0e2ec4fa2213cefa035c1f463584734338b97dde6d1cc5f96d",
+      "sha256": "261ac5619e59ab0e2ec4fa2213cefa035c1f463584734338b97dde6d1cc5f96d"
+    },
+    {
+      "v": 1,
+      "id": "kairo-original-jlpt-n1-written-12-01:passage-wayfindingEssay",
+      "provenance": {
+        "kind": "original-ai",
+        "authorRef": null,
+        "processRef": "claude-original-n1-practice-20260925",
+        "sources": []
+      },
+      "rights": {
+        "display": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "retain": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "sync": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "adapt": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        },
+        "synthesize-audio": {
+          "status": "allowed",
+          "basisRef": "bunki-original-authoring-20260923",
+          "policyVersion": "bunki-original-rights-1"
+        }
+      },
+      "format": "kairo-assessment-passage",
+      "title": null,
+      "text": "道に迷うことがなくなって久しい。行き先を入力すれば、手元の端末が最短の経路を示してくれる。限られた時間で目的地にたどり着かなければならないとき、これほど心強いものはない。\n　だが、そうして効率よく移動するうちに、私は訪れた町のことをほとんど覚えていないことに気づいた。画面上の矢印を追っているあいだ、私が見ていたのは町ではなく、町を縮めた図にすぎなかったのである。一方、かつて見知らぬ町で、曲がるべき角を何度も通り過ぎ、同じ通りを行きつ戻りつしたときのことは、今でも妙に鮮明に覚えている。遠回りを強いられた分だけ、坂の傾きや店の並びが否応なく体に刻まれたのだろう。\n　迷うことは、無駄な時間として切り捨てられがちだ。しかし、ある土地を知るとは、本来、自分の誤りを通して少しずつその地形を確かめていく営みではなかったか。便利な道具を手放せと言うつもりはない。ただ、目的地に着くことと、その土地を知ることとは、似ているようでいて別の事柄なのである。",
+      "textSha256": "f8ea7b7c74be92cd68b1a79331f98eb1b39b513d3099488d8ffeb7f475120cc7",
+      "language": "ja",
+      "locationUnit": "utf16-code-unit",
+      "revisionId": "assessment-passage:746bee2d68a4710e0960897bfbdab405918b0122910a9484961a4f015f199ef3",
+      "sha256": "746bee2d68a4710e0960897bfbdab405918b0122910a9484961a4f015f199ef3"
+    }
+  ],
+  "media": [],
+  "sections": [
+    {
+      "id": "section-vocabulary",
+      "title": "文字・語彙",
+      "skill": "vocabulary",
+      "itemIds": [
+        "kairo-original-jlpt-n1-written-12-01:q01",
+        "kairo-original-jlpt-n1-written-12-01:q02",
+        "kairo-original-jlpt-n1-written-12-01:q03",
+        "kairo-original-jlpt-n1-written-12-01:q04"
+      ]
+    },
+    {
+      "id": "section-grammar",
+      "title": "文法",
+      "skill": "grammar",
+      "itemIds": [
+        "kairo-original-jlpt-n1-written-12-01:q05",
+        "kairo-original-jlpt-n1-written-12-01:q06",
+        "kairo-original-jlpt-n1-written-12-01:q07",
+        "kairo-original-jlpt-n1-written-12-01:q08"
+      ]
+    },
+    {
+      "id": "section-reading",
+      "title": "読解",
+      "skill": "reading",
+      "itemIds": [
+        "kairo-original-jlpt-n1-written-12-01:q09",
+        "kairo-original-jlpt-n1-written-12-01:q10",
+        "kairo-original-jlpt-n1-written-12-01:q11",
+        "kairo-original-jlpt-n1-written-12-01:q12"
+      ]
+    }
+  ],
+  "timingBlocks": [
+    {
+      "id": "block-language-reading",
+      "sectionIds": [
+        "section-vocabulary",
+        "section-grammar",
+        "section-reading"
+      ],
+      "durationMs": 1140000,
+      "clock": "elapsed-including-interruptions",
+      "authority": {
+        "kind": "authoring-rule",
+        "ruleId": "n1-written-allocation-20260925"
+      }
+    }
+  ],
+  "authoring": {
+    "policyVersion": "n1-written-allocation-20260925",
+    "countsAre": "authoring-rules",
+    "requirements": [
+      {
+        "task": "kanji-reading",
+        "minimumItems": 1
+      },
+      {
+        "task": "contextual-expression",
+        "minimumItems": 1
+      },
+      {
+        "task": "paraphrase",
+        "minimumItems": 1
+      },
+      {
+        "task": "usage",
+        "minimumItems": 1
+      },
+      {
+        "task": "grammar-form",
+        "minimumItems": 2
+      },
+      {
+        "task": "sentence-composition",
+        "minimumItems": 1
+      },
+      {
+        "task": "text-grammar",
+        "minimumItems": 1
+      },
+      {
+        "task": "information-retrieval",
+        "minimumItems": 2
+      },
+      {
+        "task": "compact-comprehension",
+        "minimumItems": 1
+      },
+      {
+        "task": "compact-main-idea",
+        "minimumItems": 1
+      }
+    ]
+  },
+  "revisionId": "assessment-form:1683c3c2fd53f27995099e32ff2fac67c63574b97c3eee1cd345d7ee3f8e387e",
+  "sha256": "1683c3c2fd53f27995099e32ff2fac67c63574b97c3eee1cd345d7ee3f8e387e"
+}

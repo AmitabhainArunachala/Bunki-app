@@ -1,0 +1,409 @@
+{
+  "schema": "bunki-written-bank-manuscript/1",
+  "level": "N4",
+  "number": 5,
+  "authorModelFamily": "anthropic-claude",
+  "authorModel": "claude-opus-5.5",
+  "passages": {
+    "tg": "わたしの　友だち\n　わたしの　友だちの　ケンさんは、ピアノが　とても　上手です。子どもの　ころから　毎日　れんしゅうして　いるそうです。\n　先週、ケンさんの　コンサートが　ありました。わたしは　ピアノの　ことは　よく　わかりませんが、ケンさんの　ピアノを　聞いて、とても　かんどうしました。コンサートの　あとで、わたしが「すばらしかったです」と　言うと、ケンさんは　（１）　顔を　しました。\n　わたしも　ケンさんの　ように　楽器が　ひける　（２）　なりたいと　思って、来月から　ギターを　ならう　ことに　しました。",
+    "s1": "駅からの　お知らせ\n　あしたの　朝は、午前５時から　午前７時まで　電車が　止まります。この　時間は、駅前から　バスが　出ます。バスは　電車より　時間が　かかりますので、早めに　家を　出て　ください。",
+    "s2": "エマさんへ\n　あしたは　アパートの　そうじの　日です。朝　九時に　一階の　入り口に　集まって、みんなで　まわりの　道や　にわを　そうじします。そうじの　道具は　大家さんが　用意して　くれるので、手ぶらで　来て　ください。終わったら、大家さんが　お茶を　ごちそうして　くれるそうです。\n田中",
+    "s3": "　わたしは　毎日　ピアノを　れんしゅうして　います。平日は　学校から　帰って、夕ごはんの　前に　一時間　ひきます。週末は　午前と　午後に　二時間ずつ　ひきます。でも、夜　九時を　すぎたら、ひかない　ことに　して　います。となりの　家の　人が　ねて　いるかもしれないからです。",
+    "m1": "友だちの　手紙\n　中学生の　ときからの　友だちの　サキさんが、去年　大阪へ　ひっこしました。はじめは　毎日　電話で　話して　いましたが、だんだん　話す　ことが　少なく　なりました。\n　先月、サキさんから　手紙が　来ました。手紙には、大阪の　学校の　ことや、新しい　友だちの　ことが　書いて　ありました。そして、さいごに「来月、そちらに　帰るので、会いたいです」と　書いて　ありました。\n　わたしは　すぐ　返事を　書きました。電話や　メールの　ほうが　早いですが、サキさんが　手紙を　くれたので、わたしも　手紙で　返事を　したかったのです。\n　先週、サキさんと　一年ぶりに　会いました。サキさんは　少し　かみが　長く　なって　いましたが、話し方は　前と　同じでした。二人で　よく　行った　きっさてんで、夜まで　話しました。",
+    "info": "みどり駅から　さくら駅までの　電車（朝）\n①　ふつう　　　８時５分に　出る　→　９時１０分に　着く　４５０円\n②　かいそく　　８時２０分に　出る　→　９時５分に　着く　４５０円\n③　きゅうこう　８時３０分に　出る　→　８時５５分に　着く　６５０円\n④　ふつう　　　８時４０分に　出る　→　９時４５分に　着く　４５０円\n※　きゅうこうには、ふつうの　きっぷ（４５０円）と　きゅうこうけん（２００円）が　ひつようです。"
+  },
+  "items": [
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n毎週　日曜日の　夜、音楽の　【番組】を　見て　います。",
+      "options": [
+        "ばんぐみ",
+        "ばんくみ",
+        "ぱんぐみ",
+        "ばんそ"
+      ],
+      "answer": 0,
+      "rationale": "「番組」は「ばんぐみ」と読む。テレビやラジオで見たり聞いたりするものだ。\nThe word 番組 is read bangumi and means a TV or radio program.",
+      "target": "番組"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\nそんなに　たくさんの　仕事を　一日で　するのは　【無理】です。",
+      "options": [
+        "むうり",
+        "むり",
+        "むいり",
+        "ぶり"
+      ],
+      "answer": 1,
+      "rationale": "「無理」は「むり」と読む。できないという意味だ。\nThe word 無理 is read muri and means impossible.",
+      "target": "無理"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "kanji-reading",
+      "prompt": "【　】の　ことばは　ひらがなで　どう　かきますか。\n友だちと　三時に　駅で　会う　【約束】を　しました。",
+      "options": [
+        "やくそく",
+        "やくそっく",
+        "やくぞく",
+        "やっそく"
+      ],
+      "answer": 0,
+      "rationale": "「約束」は「やくそく」と読む。\nThe word 約束 is read yakusoku and means a promise or appointment.",
+      "target": "約束"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n毎週　土曜日に　へやの　【そうじ】を　します。",
+      "options": [
+        "婦除",
+        "掃徐",
+        "帰除",
+        "掃除"
+      ],
+      "answer": 3,
+      "rationale": "「そうじ」は「掃除」と書く。形がにている「帰」「婦」「徐」はまちがい。\nThe word souji (cleaning) is written 掃除.",
+      "target": "掃除"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "orthography",
+      "prompt": "【　】の　ことばは　どう　かきますか。\n兄は　毎晩　バンドで　【どらむ】を　たたいて　います。",
+      "options": [
+        "ドラハ",
+        "ドラム",
+        "ドウム",
+        "トラム"
+      ],
+      "answer": 1,
+      "rationale": "「どらむ」はカタカナで「ドラム」と書く。\nThe word doramu (drum) is written ドラム in katakana.",
+      "target": "ドラム"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\n電車に　（　）　ないように、早く　家を　出ました。",
+      "options": [
+        "おくれ",
+        "とまら",
+        "おり",
+        "のりかえ"
+      ],
+      "answer": 0,
+      "rationale": "早く家を出た理由なので「電車におくれないように」が入る。\nOkurenai you ni means so as not to be late for the train.",
+      "target": "遅れる"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nきたない　へやを　（　）ので、母に　ほめられました。",
+      "options": [
+        "かたづけた",
+        "よごした",
+        "こわした",
+        "ちらかした"
+      ],
+      "answer": 0,
+      "rationale": "ほめられたので、へやをきれいにした「かたづけた」が入る。\nKatazuketa (tidied up) explains why the writer was praised.",
+      "target": "片付ける"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "contextual-expression",
+      "prompt": "（　）に　なにを　いれますか。\nこの　歌を　聞くと、子どもの　ころを　（　）。",
+      "options": [
+        "考えます",
+        "わすれます",
+        "おぼえます",
+        "思い出します"
+      ],
+      "answer": 3,
+      "rationale": "前のことが頭にうかぶのは「思い出す」だ。\nOmoidasu means to remember or recall the past, here one's childhood.",
+      "target": "思い出す"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\nとなりの　へやの　音楽が　【うるさい】です。",
+      "options": [
+        "となりの　へやの　音楽の　音が　大きすぎます。",
+        "となりの　へやの　音楽が　しずかです。",
+        "となりの　へやの　音楽が　聞こえません。",
+        "となりの　へやの　音楽が　すてきです。"
+      ],
+      "answer": 0,
+      "rationale": "「うるさい」は、音が大きすぎていやだという意味だ。\nUrusai means noisy, so the music is too loud.",
+      "target": "うるさい"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "paraphrase",
+      "prompt": "【　】の　ぶんと　だいたい　おなじ　いみの　ぶんは　どれですか。\n図書館の　人が　【親切】に　本の　さがし方を　教えて　くれました。",
+      "options": [
+        "図書館の　人が　はやく　本の　さがし方を　教えて　くれました。",
+        "図書館の　人が　かんたんに　本の　さがし方を　教えて　くれました。",
+        "図書館の　人が　やさしく　本の　さがし方を　教えて　くれました。",
+        "図書館の　人が　大きい　声で　本の　さがし方を　教えて　くれました。"
+      ],
+      "answer": 2,
+      "rationale": "「親切に」は、人のことを考えて「やさしく」という意味だ。\nShinsetsu ni means kindly, close to yasashiku.",
+      "target": "親切"
+    },
+    {
+      "skill": "vocabulary",
+      "task": "usage",
+      "prompt": "つぎの　ことばの　つかいかたで　いちばん　いい　ものを　えらんで　ください。\n【集まる】",
+      "options": [
+        "毎朝　六時に　集まって、顔を　あらいます。",
+        "この　ペンは　インクが　集まって　書けません。",
+        "駅の　前に　人が　たくさん　集まって　います。",
+        "わたしの　しゅみは　古い　コインを　集まる　ことです。"
+      ],
+      "answer": 2,
+      "rationale": "「集まる」は、人や物が一つのところに来ることだ。4は「集める」が正しい。\nAtsumaru means to gather, as when many people gather in front of a station.",
+      "target": "集まる"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nかれは　きのう　早く　ねたから、きょうは　元気な（　）です。",
+      "options": [
+        "ばかり",
+        "つもり",
+        "ところ",
+        "はず"
+      ],
+      "answer": 3,
+      "rationale": "理由から考えて、たぶんそうだと言うときは「〜はずです」を使う。\nHazu desu expresses a reasoned expectation: he should be well today.",
+      "subject": "grammar:hazuda"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n妹は　犬を　こわ（　）ので、いっしょに　公園へ　行けません。",
+      "options": [
+        "くて",
+        "がって",
+        "さ",
+        "がる"
+      ],
+      "answer": 3,
+      "rationale": "ほかの人の気持ちを言うときは「こわがる」を使う。「ので」の前なので「こわがる」になる。\nKowagaru describes someone else's fear; before node the form is kowagaru.",
+      "subject": "grammar:garu"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n駅（　）　学校まで　バスで　十五分です。",
+      "options": [
+        "で",
+        "から",
+        "に",
+        "を"
+      ],
+      "answer": 1,
+      "rationale": "「AからBまで」で、はじめと終わりのところを言う。\nKara ... made marks the start and end point: from the station to the school.",
+      "subject": "particle:kara"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nかばんの　中には　本が　一さつ（　）　ありません。",
+      "options": [
+        "より",
+        "から",
+        "しか",
+        "まで"
+      ],
+      "answer": 2,
+      "rationale": "「〜しかない」で、それだけで少ないことを言う。\nShika with a negative verb means only: there is only one book."
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\n駅で　道が　わからなかったので、駅員さんに　教えて（　）。",
+      "options": [
+        "もらいました",
+        "さしあげました",
+        "くれました",
+        "あげました"
+      ],
+      "answer": 0,
+      "rationale": "自分が駅員さんに教えてもらったので「〜てもらいました」を使う。\nTe moraimashita shows the writer received help from the station staff.",
+      "subject": "grammar:age-kure-morau"
+    },
+    {
+      "skill": "grammar",
+      "task": "grammar-form",
+      "prompt": "（　）に　なにを　いれますか。\nこの　きっぷの　買い（　）が　わかりません。",
+      "options": [
+        "こと",
+        "かた",
+        "もの",
+        "ところ"
+      ],
+      "answer": 1,
+      "rationale": "「買い方」は、買うやり方のことだ。\nKaikata means the way to buy something.",
+      "subject": "grammar:kata"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\n駅の　前で　＿＿＿　＿★＿　＿＿＿　＿＿＿　います。",
+      "options": [
+        "歌を",
+        "うたって",
+        "ギターを",
+        "ひきながら"
+      ],
+      "answer": 3,
+      "rationale": "正しいじゅんばんは「ギターを　ひきながら　歌を　うたって　います」で、★には「ひきながら」が入る。\nThe order is ギターを ひきながら 歌を うたって います, so ひきながら fills the star.",
+      "subject": "grammar:nagara"
+    },
+    {
+      "skill": "grammar",
+      "task": "sentence-composition",
+      "prompt": "＿★＿に　はいる　ものは　どれですか。\nそうじを　した　あとで、＿＿＿　＿＿＿　＿＿＿　＿★＿　ください。",
+      "options": [
+        "しめる",
+        "まどを",
+        "わすれないで",
+        "のを"
+      ],
+      "answer": 2,
+      "rationale": "正しいじゅんばんは「まどを　しめる　のを　わすれないで　ください」で、★には「わすれないで」が入る。\nThe order is まどを しめる のを わすれないで ください, so わすれないで fills the star."
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（１）に　なにを　いれますか。",
+      "options": [
+        "こわそうな",
+        "ねむそうな",
+        "さびしそうな",
+        "うれしそうな"
+      ],
+      "answer": 3,
+      "rationale": "ほめられたときの顔なので「うれしそうな顔」が合う。\nUreshisou na kao means a happy-looking face, natural after being praised.",
+      "passage": "tg",
+      "subject": "grammar:souda-youtai"
+    },
+    {
+      "skill": "grammar",
+      "task": "text-grammar",
+      "prompt": "（２）に　なにを　いれますか。",
+      "options": [
+        "そうに",
+        "ように",
+        "ことに",
+        "ために"
+      ],
+      "answer": 1,
+      "rationale": "できるようにかわりたいという意味なので「ひけるようになりたい」が入る。\nHikeru you ni naritai means wanting to become able to play.",
+      "passage": "tg",
+      "subject": "grammar:n4-you-ni-naru"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "あしたの　朝　六時に　電車に　乗る　つもりだった　人は、どう　しますか。",
+      "options": [
+        "いつもの　ように　電車に　乗る",
+        "駅前から　バスに　乗る",
+        "七時まで　駅で　まつ",
+        "駅の　人に　電話する"
+      ],
+      "answer": 1,
+      "rationale": "午前５時から７時まで電車が止まり、その間は駅前からバスが出る。\nTrains stop from five to seven, and buses run from the station during that time.",
+      "passage": "s1"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "エマさんは　あした　何を　持って　いけば　いいですか。",
+      "options": [
+        "お茶",
+        "そうじの　道具",
+        "にわの　花",
+        "何も　持って　いかなくて　いい"
+      ],
+      "answer": 3,
+      "rationale": "道具は大家さんが用意するので「手ぶらで　来て　ください」とある。\nThe landlord provides the tools, so Emma does not need to bring anything.",
+      "passage": "s2"
+    },
+    {
+      "skill": "reading",
+      "task": "short-reading",
+      "prompt": "この　人が　夜　九時を　すぎたら　ピアノを　ひかないのは　どうしてですか。",
+      "options": [
+        "夕ごはんの　時間だから",
+        "自分が　ねる　時間だから",
+        "となりの　人の　じゃまに　なるかもしれないから",
+        "学校の　しゅくだいが　あるから"
+      ],
+      "answer": 2,
+      "rationale": "「となりの　家の　人が　ねて　いるかもしれないからです」とある。\nThe writer stops because the neighbors might be asleep.",
+      "passage": "s3"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "この　人は　どうして　手紙で　返事を　書きましたか。",
+      "options": [
+        "サキさんの　電話ばんごうを　わすれたから",
+        "大阪の　ことを　知りたかったから",
+        "サキさんが　手紙を　くれたから",
+        "電話や　メールより　早いから"
+      ],
+      "answer": 2,
+      "rationale": "「サキさんが　手紙を　くれたので、わたしも　手紙で　返事を　したかった」とある。\nThe writer replied by letter because Saki had written a letter.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "mid-reading",
+      "prompt": "サキさんに　会った　とき、サキさんは　どうでしたか。",
+      "options": [
+        "大阪の　ことばで　話して　いた",
+        "かみは　同じだったが、話し方が　かわって　いた",
+        "かみは　長く　なって　いたが、話し方は　同じだった",
+        "かみも　話し方も　前と　同じだった"
+      ],
+      "answer": 2,
+      "rationale": "「少し　かみが　長く　なって　いましたが、話し方は　前と　同じでした」とある。\nSaki's hair was a little longer, but the way she talked was the same.",
+      "passage": "m1"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "９時までに　さくら駅に　着かなければ　なりません。どの　電車に　乗りますか。",
+      "options": [
+        "８時４０分の　ふつう",
+        "８時３０分の　きゅうこう",
+        "８時２０分の　かいそく",
+        "８時５分の　ふつう"
+      ],
+      "answer": 1,
+      "rationale": "９時までに着くのは、８時５５分に着く③のきゅうこうだけだ。\nOnly the 8:30 express arrives before nine, at 8:55.",
+      "passage": "info"
+    },
+    {
+      "skill": "reading",
+      "task": "information-retrieval",
+      "prompt": "きゅうこうに　乗る　とき、ふつうの　きっぷの　ほかに　いくら　はらいますか。",
+      "options": [
+        "２００円",
+        "４５０円",
+        "６５０円",
+        "はらわなくて　いい"
+      ],
+      "answer": 0,
+      "rationale": "きゅうこうには、ふつうのきっぷのほかに、きゅうこうけん２００円がひつようだ。\nThe express needs a 200-yen express ticket in addition to the normal fare.",
+      "passage": "info"
+    }
+  ]
+}

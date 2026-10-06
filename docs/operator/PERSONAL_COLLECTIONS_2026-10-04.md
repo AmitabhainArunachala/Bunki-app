@@ -16,9 +16,11 @@ and related expressions. English is available through an explicit reveal.
 Phones show the answer immediately; wide screens pair it with the paragraph.
 
 Tap a revealed word, kanji or grammar expression to open Bunki's actual shared
-dictionary. **覚える** uses the existing list chooser, including named-list
-creation. Close the sheet to return to the same card. Capturing an item creates
-no scheduled review and changes no personal assessment history.
+dictionary. **保存 / Save** saves it in one tap, and the confirmation offers
+**元に戻す / Undo**. The optional **リストに追加… / Add to list…** opens a small
+list popover, including named-list creation. Close the sheet to return to the
+same card. Capturing an item creates no scheduled review and changes no personal
+assessment history.
 
 Import the enriched collection JSON again to add these guides to an existing
 collection. The original paragraph hashes, card IDs, settings and review

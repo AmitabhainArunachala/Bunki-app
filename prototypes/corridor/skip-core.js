@@ -2,6 +2,7 @@
  * Data/attribution live separately in data/share_alike/skip.json.
  * Rules: http://www.edrdg.org/wwwjdic/SKIP.html
  */
+/* global module:readonly -- Optional CommonJS export, guarded for browsers. */
 (function (root, factory) {
   'use strict';
   if (typeof module === 'object' && module.exports) module.exports = factory();
