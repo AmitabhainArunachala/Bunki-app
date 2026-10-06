@@ -23,6 +23,8 @@ jobs:
     outputs:
       scope: ${{ steps.plan.outputs.scope }}
       matrix: ${{ steps.plan.outputs.matrix }}
+      fast-matrix: ${{ steps.plan.outputs.fast-matrix }}
+      has-battery: ${{ steps.plan.outputs.has-battery }}
       tree: ${{ steps.tree.outputs.tree }}
     steps:
       - uses: actions/checkout@v4
@@ -174,8 +176,292 @@ jobs:
           path: ${{ runner.temp }}/kairo-native-rpc/
           retention-days: 14
           if-no-files-found: warn
+  fast:
+    name: battery / ${{ matrix.shard }}
+    needs: [plan, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.fast-matrix) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KAIRO_CORPUS_PYTHON: python3
+      KAIRO_CI_GATE_ATTEMPT: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          python: ${{ matrix.python }}
+          corpus: ${{ matrix.corpus }}
+          browsers: ${{ matrix.browsers }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - name: Verify immutable archive digest before extraction
+        env:
+          SITE_ID: ${{ needs.build.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.build.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/site-download" --out "$RUNNER_TEMP/site"
+      - name: Bind this actual GitHub job identity
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const suffix=`battery / ${process.env.SHARD}`;
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs.json`)).flatMap(x=>x.jobs).filter(x=>x.name===suffix||x.name.endsWith(` / ${suffix}`));
+          assert.equal(jobs.length,1); appendFileSync(process.env.GITHUB_ENV,`CI_JOB_ID=${jobs[0].id}\n`);
+          NODE
+      - name: Run the exact planned gates and retain first failures
+        id: gates
+        continue-on-error: true
+        timeout-minutes: 45
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --out "$RUNNER_TEMP/evidence"
+      - name: Retain the built app for an exact failed-e2e retry
+        if: always() && matrix.e2e
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: apps/app/dist/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Compress evidence before upload
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/evidence" ]; then tar -czf "$RUNNER_TEMP/evidence.tar.gz" -C "$RUNNER_TEMP" evidence; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-shard-${{ matrix.shard }}-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence/shard.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-evidence-${{ matrix.shard }}-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  fast-retry-plan:
+    name: fast-retry-plan
+    if: always() && needs.plan.result == 'success' && needs.build.result == 'success'
+    needs: [plan, build, fast]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      matrix: ${{ steps.retry.outputs.matrix }}
+      has-retries: ${{ steps.retry.outputs.has-retries }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bunki-shard-fast-*-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipts
+      - name: Independently admit completed first-attempt jobs before retry planning
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs-pages.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs-pages.json`)).flatMap(page=>page.jobs);
+          writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
+          NODE
+      - id: retry
+        run: node scripts/ci/battery.mjs retry-plan --phase fast --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/fast-retry-plan.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/fast-retry-plan.json
+          retention-days: 14
+          if-no-files-found: error
+  fast-retry:
+    name: retry / ${{ matrix.shard }}
+    if: always() && needs.fast-retry-plan.result == 'success' && needs.fast-retry-plan.outputs.has-retries == 'true'
+    needs: [plan, build, fast-retry-plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.fast-retry-plan.outputs.matrix) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KAIRO_CORPUS_PYTHON: python3
+      KAIRO_CI_GATE_ATTEMPT: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          python: ${{ matrix.python }}
+          corpus: ${{ matrix.corpus }}
+          browsers: ${{ matrix.browsers }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - name: Verify immutable archive digest before extraction
+        env:
+          SITE_ID: ${{ needs.build.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.build.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/site-download" --out "$RUNNER_TEMP/site"
+      - name: Bind this actual GitHub job identity
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const suffix=`retry / ${process.env.SHARD}`;
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs.json`)).flatMap(x=>x.jobs).filter(x=>x.name===suffix||x.name.endsWith(` / ${suffix}`));
+          assert.equal(jobs.length,1); appendFileSync(process.env.GITHUB_ENV,`CI_JOB_ID=${jobs[0].id}\n`);
+          NODE
+      - name: Run the exact planned gates and record the second and final attempt
+        id: gates
+        timeout-minutes: 45
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --out "$RUNNER_TEMP/evidence"
+      - name: Compress evidence before upload
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/evidence" ]; then tar -czf "$RUNNER_TEMP/evidence.tar.gz" -C "$RUNNER_TEMP" evidence; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-shard-${{ matrix.shard }}-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence/shard.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-evidence-${{ matrix.shard }}-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  fast-signal:
+    name: bunki / fast
+    if: always()
+    needs: [plan, build, fast, fast-retry-plan, fast-retry]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Require complete planning and independently successful build
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          RETRY_PLAN_RESULT: ${{ needs.fast-retry-plan.result }}
+        run: test "$PLAN_RESULT" = success && test "$BUILD_RESULT" = success && test "$RETRY_PLAN_RESULT" = success
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          pattern: bunki-shard-fast-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipts
+      - name: Read actual jobs from this exact run attempt
+        if: always()
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs-pages.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs-pages.json`)).flatMap(page=>page.jobs);
+          writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
+          NODE
+      - name: Fail closed on incomplete evidence, cancellation or repeated failures
+        id: aggregate
+        if: always()
+        run: node scripts/ci/battery.mjs aggregate --phase fast --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+      - name: Retain infrastructure summary even when setup or evidence was unavailable
+        if: always() && steps.aggregate.outcome != 'success'
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, pathlib
+          evidence = pathlib.Path(os.environ['RUNNER_TEMP']) / 'proof'
+          evidence.mkdir(exist_ok=True)
+          text = '\n## Required workflow admission failed\n\n'
+          text += 'Setup, evidence collection or aggregate admission failed. No promotable full receipt was issued.\n\n'
+          text += 'Required dependency results:\n\n```json\n' + json.dumps(json.loads(os.environ['NEEDS_JSON']), indent=2) + '\n```\n'
+          (evidence / 'WORKFLOW_FAILURE.md').write_text(text)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(text)
+          PYEOF
+      - name: Retain summary and appendable flake ledger entries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-fast-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/proof/
+          retention-days: 14
+          if-no-files-found: warn
   battery:
     name: battery / ${{ matrix.shard }}
+    if: needs.plan.outputs.has-battery == 'true'
     needs: [plan, build]
     runs-on: ubuntu-latest
     timeout-minutes: 65
@@ -257,7 +543,7 @@ jobs:
           if-no-files-found: warn
   retry-plan:
     name: retry-plan
-    if: always() && needs.plan.result == 'success' && needs.build.result == 'success'
+    if: always() && needs.plan.result == 'success' && needs.build.result == 'success' && needs.plan.outputs.has-battery == 'true'
     needs: [plan, build, battery]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -294,7 +580,7 @@ jobs:
           writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
           NODE
       - id: retry
-        run: node scripts/ci/battery.mjs retry-plan --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/retry-plan.json"
+        run: node scripts/ci/battery.mjs retry-plan --phase battery --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/retry-plan.json"
       - uses: actions/upload-artifact@v4
         with:
           name: bunki-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
@@ -396,7 +682,19 @@ jobs:
   required:
     name: bunki / required
     if: always()
-    needs: [plan, build, native, battery, retry-plan, retry]
+    needs:
+      [
+        plan,
+        build,
+        native,
+        fast,
+        fast-retry-plan,
+        fast-retry,
+        fast-signal,
+        battery,
+        retry-plan,
+        retry,
+      ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -414,8 +712,13 @@ jobs:
         env:
           PLAN_RESULT: ${{ needs.plan.result }}
           BUILD_RESULT: ${{ needs.build.result }}
+          FAST_RESULT: ${{ needs.fast-signal.result }}
+          FAST_RETRY_PLAN_RESULT: ${{ needs.fast-retry-plan.result }}
           RETRY_PLAN_RESULT: ${{ needs.retry-plan.result }}
-        run: test "$PLAN_RESULT" = success && test "$BUILD_RESULT" = success && test "$RETRY_PLAN_RESULT" = success
+          CI_SCOPE: ${{ needs.plan.outputs.scope }}
+        run: |
+          test "$PLAN_RESULT" = success && test "$BUILD_RESULT" = success && test "$FAST_RESULT" = success && test "$FAST_RETRY_PLAN_RESULT" = success
+          if [ "$CI_SCOPE" = full ]; then test "$RETRY_PLAN_RESULT" = success; else test "$RETRY_PLAN_RESULT" = skipped; fi
       - uses: actions/download-artifact@v4
         if: always()
         with:
@@ -428,6 +731,11 @@ jobs:
           path: ${{ runner.temp }}/inputs
       - uses: actions/download-artifact@v4
         if: always()
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always() && needs.plan.outputs.scope == 'full'
         with:
           name: bunki-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/inputs
@@ -448,7 +756,12 @@ jobs:
       - name: Fail closed on incomplete evidence, cancellation or repeated failures
         id: aggregate
         if: always()
-        run: node scripts/ci/battery.mjs aggregate --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --retry-plan "$RUNNER_TEMP/inputs/retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+        env:
+          CI_SCOPE: ${{ needs.plan.outputs.scope }}
+        run: |
+          retry_args=()
+          if [ "$CI_SCOPE" = full ]; then retry_args=(--retry-plan "$RUNNER_TEMP/inputs/retry-plan.json"); fi
+          node scripts/ci/battery.mjs aggregate --phase all --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --fast-retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" "${retry_args[@]}" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
       - name: Retain infrastructure summary even when setup or evidence was unavailable
         if: always() && steps.aggregate.outcome != 'success'
         env:

@@ -41,7 +41,10 @@ const artifact = {
 };
 function fixture() {
   const plan = createPlan({ identity });
-  const jobs = plan.requiredJobs.map((name, i) => job(name, String(i + 1)));
+  const jobs = [
+    ...plan.requiredJobs.map((name, i) => job(name, String(i + 1))),
+    job('bunki / fast', '99'),
+  ];
   const receipts = plan.shards.map((shard, i) => {
     const jobId = String(i + 100);
     jobs.push(job(`battery / ${shard.id}`, jobId));
@@ -64,7 +67,22 @@ function fixture() {
       gates: shard.gates.map((name) => gate(name)),
     };
   });
-  return { plan, jobs, receipts, artifact, retryPlan: createRetryPlan(plan, receipts, artifact) };
+  return refreshRetryPlans({ plan, jobs, receipts, artifact });
+}
+function refreshRetryPlans(f) {
+  f.retryPlans = (f.plan.scope === 'full' ? ['fast', 'battery'] : ['fast']).map((phase) =>
+    createRetryPlan(
+      f.plan,
+      f.receipts.filter(
+        (r) => r.attempt === 1 && f.plan.shards.find((s) => s.id === r.shardId)?.kind === phase,
+      ),
+      f.artifact,
+      undefined,
+      phase,
+    ),
+  );
+  f.retryPlan = f.retryPlans.find((r) => r.phase === 'battery') || f.retryPlans[0];
+  return f;
 }
 function gate(name) {
   return {
@@ -105,7 +123,7 @@ function failedFixture() {
   first.gates[0].status = 'failed';
   first.gates[0].exitCode = 1;
   f.jobs.find((j) => String(j.id) === first.jobId).conclusion = 'success';
-  f.retryPlan = createRetryPlan(f.plan, f.receipts, f.artifact);
+  refreshRetryPlans(f);
   return f;
 }
 function withRetry() {
@@ -263,7 +281,7 @@ test('docs receipt is a distinct non-full proof and unknown/deleted implementati
   f.receipts = f.receipts
     .filter((r) => plan.shards.some((s) => s.id === r.shardId))
     .map((r) => ({ ...r, planDigest: plan.planDigest }));
-  f.retryPlan = createRetryPlan(plan, f.receipts, artifact);
+  refreshRetryPlans(f);
   assert.equal(aggregate(f).kind, 'bunki-docs-check');
 });
 test('missing directory, empty directory and malformed receipts fail closed', () => {
@@ -362,7 +380,7 @@ test('retry failed e2e consumes prior passed export identity; changed export dep
   one.exitCode = 1;
   assert.throws(() => createRetryPlan(f.plan, f.receipts, artifact), /passed build digest/);
   one.dependencies = { e2eBuild: { sha256: '1'.repeat(64), files: 10 } };
-  f.retryPlan = createRetryPlan(f.plan, f.receipts, artifact);
+  refreshRetryPlans(f);
   assert.deepEqual(f.retryPlan.shards[0].gates, ['e2e']);
   const retry = {
     ...clone(one),
@@ -404,4 +422,78 @@ test('retry planning forbids cancelled or failed infrastructure jobs despite com
     f.jobs.find((j) => j.name === 'battery / practice-history').conclusion = conclusion;
     assert.throws(() => createRetryPlan(f.plan, f.receipts, f.artifact, f.jobs), /Job failed/);
   }
+});
+
+test('fast signal runs independently of absent or slow failing battery/native jobs and cannot produce full proof', () => {
+  const f = fixture();
+  const fast = f.plan.shards.filter((s) => s.kind === 'fast').map((s) => s.id);
+  const receipts = f.receipts.filter((r) => fast.includes(r.shardId));
+  const retryPlan = f.retryPlans.find((r) => r.phase === 'fast');
+  const jobs = f.jobs.filter(
+    (j) => j.name === 'build' || fast.some((id) => j.name === `battery / ${id}`),
+  );
+  const signal = aggregate({ plan: f.plan, phase: 'fast', receipts, retryPlan, jobs, artifact });
+  assert.equal(signal.kind, 'bunki-fast-signal');
+  assert.equal(signal.phase, 'fast');
+  assert.equal(signal.shards.length, fast.length);
+  assert(signal.requiredNames.length < f.plan.requiredNames.length);
+  assert.throws(
+    () => aggregate({ plan: f.plan, receipts, retryPlans: [retryPlan], jobs, artifact }),
+    /execution phase/,
+  );
+});
+test('final aggregation rejects missing, duplicate, unknown or overlapping phase plans and red early signal', () => {
+  for (const change of ['missing', 'duplicate', 'unknown', 'overlap', 'red-fast']) {
+    const f = fixture();
+    if (change === 'missing') f.retryPlans.pop();
+    if (change === 'duplicate') f.retryPlans = [f.retryPlans[0], clone(f.retryPlans[0])];
+    if (change === 'unknown') {
+      f.retryPlans[1].phase = 'all';
+      const body = { ...f.retryPlans[1] };
+      delete body.retryDigest;
+      f.retryPlans[1].retryDigest = digest(body);
+    }
+    if (change === 'overlap') {
+      f.retryPlans[1].shardIds.push(f.retryPlans[0].shardIds[0]);
+      const body = { ...f.retryPlans[1] };
+      delete body.retryDigest;
+      f.retryPlans[1].retryDigest = digest(body);
+    }
+    if (change === 'red-fast') f.jobs.find((j) => j.name === 'bunki / fast').conclusion = 'failure';
+    assert.throws(() => aggregate(f));
+  }
+});
+test('fast first failure is red until exactly one fresh fast retry passes and remains FLAKY', () => {
+  const f = fixture();
+  const shard = f.plan.shards.find((s) => s.gates.includes('lint'));
+  const one = f.receipts.find((r) => r.shardId === shard.id);
+  one.status = 'failed';
+  one.exitCode = 1;
+  const g = one.gates.find((g) => g.name === 'lint');
+  g.status = 'failed';
+  g.exitCode = 1;
+  refreshRetryPlans(f);
+  const fastIds = f.plan.shards.filter((s) => s.kind === 'fast').map((s) => s.id);
+  const input = {
+    plan: f.plan,
+    phase: 'fast',
+    receipts: f.receipts.filter((r) => fastIds.includes(r.shardId)),
+    retryPlan: f.retryPlans[0],
+    jobs: f.jobs,
+    artifact,
+  };
+  assert.throws(() => aggregate(input), /Missing\/extra retries/);
+  input.receipts.push({
+    ...clone(one),
+    attempt: 2,
+    status: 'passed',
+    exitCode: 0,
+    jobId: '7777',
+    runner: 'fresh-fast-retry',
+    gates: [gate('lint')],
+  });
+  input.jobs.push(job(`retry / ${shard.id}`, '7777'));
+  const signal = aggregate(input);
+  assert.equal(signal.kind, 'bunki-fast-signal');
+  assert.equal(signal.gates.find((g) => g.name === 'lint').status, 'flaky');
 });

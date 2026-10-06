@@ -3910,7 +3910,18 @@ export async function verifyWorkflows(root = ROOT) {
   assert.equal(required.if, 'always()', 'Required aggregate must always run');
   needs(
     required,
-    ['plan', 'build', 'native', 'battery', 'retry-plan', 'retry'],
+    [
+      'plan',
+      'build',
+      'native',
+      'fast',
+      'fast-retry-plan',
+      'fast-retry',
+      'fast-signal',
+      'battery',
+      'retry-plan',
+      'retry',
+    ],
     'Artifact publication must wait for every required job',
   );
   assert(
@@ -3918,8 +3929,9 @@ export async function verifyWorkflows(root = ROOT) {
     'Aggregate cannot turn a failure green',
   );
   assert(
-    runs(required).includes('scripts/ci/battery.mjs aggregate --plan') &&
+    runs(required).includes('scripts/ci/battery.mjs aggregate --phase all --plan') &&
       runs(required).includes('--retry-plan') &&
+      runs(required).includes('--fast-retry-plan') &&
       runs(required).includes('--jobs'),
     'Aggregate must independently admit complete planned evidence and actual jobs',
   );
@@ -3959,22 +3971,27 @@ export async function verifyWorkflows(root = ROOT) {
     for (const step of steps(job))
       if (step['continue-on-error'])
         assert(
-          id === 'battery' && step.id === 'gates' && step['continue-on-error'] === true,
+          ['fast', 'battery'].includes(id) &&
+            step.id === 'gates' &&
+            step['continue-on-error'] === true,
           'Only first gate execution may capture failure for one fresh-runner retry',
         );
   }
-  for (const id of ['battery', 'retry']) {
+  for (const id of ['fast', 'battery', 'fast-retry', 'retry']) {
     const job = ci.jobs[id];
     assert.equal(job.strategy['fail-fast'], false, `${id} matrix must retain all shards`);
     assert.equal(job['runs-on'], 'ubuntu-latest');
-    assert.equal(job.name, `${id} / \${{ matrix.shard }}`);
     assert.equal(
-      job.strategy.matrix,
-      id === 'battery'
-        ? '${{ fromJSON(needs.plan.outputs.matrix) }}'
-        : '${{ fromJSON(needs.retry-plan.outputs.matrix) }}',
-      'Matrix must execute complete checked-in plan',
+      job.name,
+      `${['fast', 'battery'].includes(id) ? 'battery' : 'retry'} / \${{ matrix.shard }}`,
     );
+    const matrices = {
+      fast: '${{ fromJSON(needs.plan.outputs.fast-matrix) }}',
+      battery: '${{ fromJSON(needs.plan.outputs.matrix) }}',
+      'fast-retry': '${{ fromJSON(needs.fast-retry-plan.outputs.matrix) }}',
+      retry: '${{ fromJSON(needs.retry-plan.outputs.matrix) }}',
+    };
+    assert.equal(job.strategy.matrix, matrices[id], 'Matrix must execute complete checked-in plan');
     const run = find(job, (step) => step.id === 'gates', 'Exactly one shard execution');
     assert(!Object.hasOwn(run, 'if'), 'Required shard execution cannot conditionally skip');
     assert(
@@ -3983,6 +4000,12 @@ export async function verifyWorkflows(root = ROOT) {
         run.run.includes('--site'),
       'Shard must execute canonical artifact-bound gates',
     );
+    if (['fast', 'battery'].includes(id))
+      assert.equal(
+        run['continue-on-error'],
+        true,
+        'Initial gate results must be retained for the one-retry protocol',
+      );
     assert(
       runs(job).includes(
         'receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST"',
@@ -4016,6 +4039,96 @@ export async function verifyWorkflows(root = ROOT) {
     );
   }
   needs(ci.jobs.battery, ['plan', 'build'], 'Shards require plan and exact build');
+  needs(
+    ci.jobs.fast,
+    ['plan', 'build'],
+    'Fast shards must start without slow or native dependencies',
+  );
+  assert(!Object.hasOwn(ci.jobs.fast, 'if'), 'Fast shards cannot skip on any selected scope');
+  assert.equal(
+    ci.jobs.battery.if,
+    "needs.plan.outputs.has-battery == 'true'",
+    'Slow shards must run exactly when planned',
+  );
+  for (const [id, phase, initial] of [
+    ['fast-retry-plan', 'fast', 'fast'],
+    ['retry-plan', 'battery', 'battery'],
+  ]) {
+    needs(
+      ci.jobs[id],
+      ['plan', 'build', initial],
+      'Phase retry planning must not wait for the other phase',
+    );
+    assert(
+      runs(ci.jobs[id]).includes(`battery.mjs retry-plan --phase ${phase} --plan`) &&
+        runs(ci.jobs[id]).includes('--jobs "$RUNNER_TEMP/jobs.json"'),
+      'Each retry planner must independently admit exactly its phase',
+    );
+  }
+  needs(
+    ci.jobs['fast-retry'],
+    ['plan', 'build', 'fast-retry-plan'],
+    'Fast retries must start without slow or native dependencies',
+  );
+  assert.equal(
+    ci.jobs['fast-retry'].if,
+    "always() && needs.fast-retry-plan.result == 'success' && needs.fast-retry-plan.outputs.has-retries == 'true'",
+    'Fast retry requires one admitted failure plan',
+  );
+  const early = ci.jobs['fast-signal'];
+  assert(early, 'A decisive fast aggregate is required');
+  assert.equal(
+    early.name,
+    'bunki / fast',
+    'First trustworthy signal must be an explicit fast aggregate',
+  );
+  assert.equal(early.if, 'always()', 'Fast aggregate must always report');
+  needs(
+    early,
+    ['plan', 'build', 'fast', 'fast-retry-plan', 'fast-retry'],
+    'Fast aggregate cannot wait for slow or native completion',
+  );
+  const earlyAdmission = find(
+    early,
+    (step) => step.id === 'aggregate',
+    'Exactly one fast aggregate admission',
+  );
+  assert.equal(earlyAdmission.if, 'always()', 'Fast admission must always attempt diagnostics');
+  assert(
+    earlyAdmission.run.includes('battery.mjs aggregate --phase fast --plan') &&
+      earlyAdmission.run.includes('--retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json"'),
+    'Fast admission must validate only the complete fast phase',
+  );
+  assert(
+    !steps(early).some((step) => step.with?.name?.startsWith('bunki-proof-')),
+    'A partial fast signal cannot publish full proof',
+  );
+  const fastDownload = find(
+    early,
+    (step) =>
+      step.with?.pattern === 'bunki-shard-fast-*-${{ github.run_id }}-${{ github.run_attempt }}',
+    'Fast signal must consume all and only current fast receipts',
+  );
+  assert.equal(
+    fastDownload.if,
+    'always()',
+    'Fast receipt collection must survive preceding failures',
+  );
+  assert(
+    runs(required).includes('test "$FAST_RESULT" = success'),
+    'Final admission must require decisive fast success',
+  );
+  assert.equal(
+    ci.jobs.plan.outputs['fast-matrix'],
+    '${{ steps.plan.outputs.fast-matrix }}',
+    'Fast matrix must derive from the same immutable plan',
+  );
+  assert.equal(
+    ci.jobs.plan.outputs['has-battery'],
+    '${{ steps.plan.outputs.has-battery }}',
+    'Slow scope must derive from the same immutable plan',
+  );
+
   needs(
     ci.jobs.retry,
     ['plan', 'build', 'retry-plan'],
@@ -4529,6 +4642,98 @@ export async function verifyWorkflowFailures(out, root = ROOT) {
         ci.jobs.battery.steps.find((step) => step.id === 'gates').if = false;
       },
       /cannot conditionally skip/,
+    ],
+  );
+  cases.push(
+    [
+      'fast-waits-for-slow',
+      (ci) => {
+        ci.jobs.fast.needs.push('battery');
+      },
+      /without slow or native dependencies/,
+    ],
+    [
+      'fast-signal-waits-for-native',
+      (ci) => {
+        ci.jobs['fast-signal'].needs.push('native');
+      },
+      /cannot wait for slow or native/,
+    ],
+    [
+      'fast-retry-plan-waits-for-slow',
+      (ci) => {
+        ci.jobs['fast-retry-plan'].needs.push('battery');
+      },
+      /must not wait for the other phase/,
+    ],
+    [
+      'partial-fast-matrix',
+      (ci) => {
+        ci.jobs.fast.strategy.matrix = '${{ fromJSON(needs.plan.outputs.matrix) }}';
+      },
+      /complete checked-in plan/,
+    ],
+    [
+      'fast-fail-fast',
+      (ci) => {
+        ci.jobs.fast.strategy['fail-fast'] = true;
+      },
+      /must retain all shards/,
+    ],
+    [
+      'conditional-fast-scope',
+      (ci) => {
+        ci.jobs.fast.if = false;
+      },
+      /cannot skip on any selected scope/,
+    ],
+    [
+      'success-only-fast-signal',
+      (ci) => {
+        ci.jobs['fast-signal'].if = 'success()';
+      },
+      /must always report/,
+    ],
+    [
+      'partial-fast-publishes-proof',
+      (ci) => {
+        ci.jobs['fast-signal'].steps.push({
+          uses: 'actions/upload-artifact@v4',
+          with: { name: 'bunki-proof-counterfeit' },
+        });
+      },
+      /partial fast signal cannot/,
+    ],
+    [
+      'fast-admission-claims-all',
+      (ci) => {
+        const step = ci.jobs['fast-signal'].steps.find((step) => step.id === 'aggregate');
+        step.run = step.run.replace('--phase fast', '--phase all');
+      },
+      /complete fast phase/,
+    ],
+    [
+      'missing-decisive-fast-dependency',
+      (ci) => {
+        ci.jobs.required.needs = ci.jobs.required.needs.filter((name) => name !== 'fast-signal');
+      },
+      /publication must wait/,
+    ],
+    [
+      'retry-crosses-phase',
+      (ci) => {
+        const step = ci.jobs['fast-retry-plan'].steps.find((step) => step.id === 'retry');
+        step.run = step.run.replace('--phase fast', '--phase battery');
+      },
+      /exactly its phase/,
+    ],
+    [
+      'final-omits-fast-retry-plan',
+      (ci) => {
+        const step = ci.jobs.required.steps.find((step) => step.id === 'aggregate');
+        step.run = step.run.replace('--fast-retry-plan', '--omitted-fast-plan');
+      },
+      /complete planned evidence/,
     ],
   );
   const results = [];

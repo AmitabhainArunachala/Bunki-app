@@ -93,7 +93,12 @@ export function admitProof({
   const required = jobs.filter((job) => job.name === 'bunki / required');
   assert.equal(required.length, 1, 'Expected one required aggregate job');
   assert.equal(required[0].conclusion, 'success', 'Required aggregate was not green');
-  for (const name of ['build', 'native', ...plan.shards.map((shard) => `battery / ${shard.id}`)]) {
+  for (const name of [
+    'build',
+    'native',
+    'bunki / fast',
+    ...plan.shards.map((shard) => `battery / ${shard.id}`),
+  ]) {
     const matches = jobs.filter((job) => job.name === name);
     assert.equal(matches.length, 1, `Missing or duplicate producer job: ${name}`);
     assert.equal(matches[0].conclusion, 'success', `Producer job was not green: ${name}`);

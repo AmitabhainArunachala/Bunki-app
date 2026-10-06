@@ -18,6 +18,27 @@ The workflow starts planning, the fast lane, build, and the single macOS native
 job without the old native-before-Linux dependency. Independent matrix jobs use
 `fail-fast: false`. Each gate has exactly one execution home in a full attempt.
 
+Fast checks and their single permitted retry run independently of the slow
+battery. `bunki / fast` reports a decisive early result after those checks;
+`bunki / required` waits for both paths and the native checks. Initial failures
+remain visible in shard summaries and annotations. An early fast receipt has
+kind `bunki-fast-signal` and cannot authorize publication.
+
+```mermaid
+flowchart LR
+  P[Plan] --> F[Fast shards]
+  B[One site build] --> F
+  P --> S[Slow shards]
+  B --> S
+  F --> FR[Fast retry once]
+  FR --> FS[bunki / fast]
+  S --> SR[Slow retry once]
+  FS --> A[bunki / required]
+  SR --> A
+  N[Native SDK and RPC] --> A
+  A --> R[Full proof receipt]
+```
+
 The fast lane owns format, lint, Corridor lint, typecheck, unit tests, short
 contract verifiers, and the frozen deck no-diff checks. These gates are removed
 from the slower matrix, not repeated. The deck check retains private and public

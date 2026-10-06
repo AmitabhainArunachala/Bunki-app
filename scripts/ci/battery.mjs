@@ -475,6 +475,22 @@ export async function executeShard({
     });
     record.gates = battery.gates;
     record.exitCode = battery.exitCode;
+    const shardSummary = [
+      `## Shard ${shard.id} — ${battery.status} (attempt ${attempt})`,
+      '',
+      '| gate | seconds | result |',
+      '| --- | ---: | --- |',
+      ...battery.gates.map(
+        (g) =>
+          `| ${g.name} | ${((Date.parse(g.completedAt) - Date.parse(g.startedAt)) / 1000).toFixed(2)} | ${g.status.toUpperCase()} |`,
+      ),
+      '',
+    ].join('\n');
+    if (env.GITHUB_STEP_SUMMARY) appendFileSync(env.GITHUB_STEP_SUMMARY, shardSummary);
+    for (const gate of battery.gates.filter((g) => g.status !== 'passed'))
+      console.log(
+        `::error title=Gate ${gate.name} failed::${gate.name} -> ${gate.status}; attempt ${attempt}${attempt === 1 ? '; one fresh-job retry pending' : ''}`,
+      );
     if (battery.gates.some((g) => g.name === 'e2e-build' && g.status === 'passed'))
       record.dependencies.e2eBuild = e2eBuildIdentity();
     if (retryShard?.dependencies?.e2eBuild)
@@ -489,6 +505,14 @@ export async function executeShard({
     record.status = 'infrastructure-failed';
     record.exitCode = 1;
     record.error = error.message;
+    console.log(
+      `::error title=Shard ${shard.id} infrastructure failed::${String(error.message).replaceAll('\n', ' ')}`,
+    );
+    if (env.GITHUB_STEP_SUMMARY)
+      appendFileSync(
+        env.GITHUB_STEP_SUMMARY,
+        `\n## Shard ${shard.id} — infrastructure failed\n\n${String(error.message).replaceAll('\n', ' ')}\n`,
+      );
     record.completedAt = NOW();
     persist();
     throw error;
@@ -532,17 +556,23 @@ function admitReceipt(plan, receipt, shard, attempt, artifact, expected = shard.
   );
   return receipt;
 }
-export function createRetryPlan(plan, receipts, artifact, jobs) {
+export function phaseShards(plan, phase = 'all') {
+  assert(['fast', 'battery', 'all'].includes(phase), 'Unknown execution phase');
+  return phase === 'all' ? plan.shards : plan.shards.filter((s) => s.kind === phase);
+}
+export function createRetryPlan(plan, receipts, artifact, jobs, phase = 'all') {
   if (jobs) jobs = normalizeJobs(jobs);
   validatePlan(plan);
   validateArtifact(artifact, plan.identity);
-  assert.equal(receipts.length, plan.shards.length, 'Missing or extra first-attempt shard');
+  const selected = phaseShards(plan, phase);
+  assert(selected.length > 0, 'Empty execution phase');
+  assert.equal(receipts.length, selected.length, 'Missing or extra first-attempt shard');
   unique(
     receipts.map((r) => r.shardId),
     'Duplicate first-attempt shard',
   );
   const shards = [];
-  for (const shard of plan.shards) {
+  for (const shard of selected) {
     const row = receipts.find((r) => r.shardId === shard.id);
     assert(row, 'Missing first-attempt shard');
     admitReceipt(plan, row, shard, 1, artifact);
@@ -564,6 +594,8 @@ export function createRetryPlan(plan, receipts, artifact, jobs) {
   const retry = {
     schemaVersion: 1,
     kind: 'bunki-ci-retry-plan',
+    phase,
+    shardIds: selected.map((s) => s.id),
     identity: plan.identity,
     planDigest: plan.planDigest,
     artifact,
@@ -575,6 +607,12 @@ export function createRetryPlan(plan, receipts, artifact, jobs) {
 export function validateRetryPlan(plan, retry) {
   assert.equal(retry.schemaVersion, 1);
   assert.equal(retry.kind, 'bunki-ci-retry-plan');
+  const selected = phaseShards(plan, retry.phase);
+  exact(
+    retry.shardIds,
+    selected.map((s) => s.id),
+    'Retry phase membership changed',
+  );
   equal(retry.identity, plan.identity);
   assert.equal(retry.planDigest, plan.planDigest);
   const { retryDigest, ...body } = retry;
@@ -584,7 +622,7 @@ export function validateRetryPlan(plan, retry) {
     'Duplicate retry shard',
   );
   for (const s of retry.shards) {
-    const original = plan.shards.find((row) => row.id === s.id);
+    const original = selected.find((row) => row.id === s.id);
     assert(original);
     assert(s.gates.length > 0);
     unique(s.gates);
@@ -613,7 +651,15 @@ export function normalizeJobs(jobs) {
     name: job.name.replace(/^(?:verify|full-battery) \/ /, ''),
   }));
 }
-export function aggregate({ plan, receipts, retryPlan, jobs, artifact }) {
+export function aggregate({
+  plan,
+  receipts,
+  retryPlan,
+  retryPlans,
+  jobs,
+  artifact,
+  phase = 'all',
+}) {
   validatePlan(plan);
   assert(Array.isArray(jobs), 'Independent GitHub jobs metadata required');
   assert(Array.isArray(receipts) && receipts.length > 0, 'Shard receipts missing');
@@ -621,24 +667,56 @@ export function aggregate({ plan, receipts, retryPlan, jobs, artifact }) {
   const first = receipts.filter((r) => r.attempt === 1),
     second = receipts.filter((r) => r.attempt === 2);
   assert.equal(first.length + second.length, receipts.length, 'Unknown attempt');
-  const expectedRetry = createRetryPlan(plan, first, artifact, jobs);
-  validateRetryPlan(plan, retryPlan);
-  equal(retryPlan, expectedRetry, 'Retry membership is not exactly first-attempt failures');
-  assert.equal(second.length, retryPlan.shards.length, 'Missing/extra retries');
+  const selected = phaseShards(plan, phase);
+  assert(selected.length > 0, 'Empty aggregate phase');
+  const selectedIds = selected.map((s) => s.id);
+  assert(
+    receipts.every((r) => selectedIds.includes(r.shardId)),
+    'Receipt outside aggregate phase',
+  );
+  const phases =
+    phase === 'all' ? (plan.scope === 'full' ? ['fast', 'battery'] : ['fast']) : [phase];
+  const admittedPlans = phase === 'all' ? retryPlans : [retryPlan];
+  assert(Array.isArray(admittedPlans), 'All execution phases require explicit retry plans');
+  exact(
+    admittedPlans.map((r) => r.phase),
+    phases,
+    'Missing/duplicate/unknown execution phase',
+  );
+  const retryShards = [];
+  for (const item of admittedPlans) {
+    validateRetryPlan(plan, item);
+    const expected = createRetryPlan(
+      plan,
+      first.filter((r) => item.shardIds.includes(r.shardId)),
+      artifact,
+      jobs,
+      item.phase,
+    );
+    equal(item, expected, 'Retry membership is not exactly first-attempt failures');
+    retryShards.push(...item.shards);
+  }
+  exact(
+    admittedPlans.flatMap((r) => r.shardIds),
+    selectedIds,
+    'Execution phase union is incomplete or overlapping',
+  );
+  assert.equal(second.length, retryShards.length, 'Missing/extra retries');
   unique(
     second.map((r) => r.shardId),
     'Duplicate retry shard',
   );
-  for (const name of plan.requiredJobs) requireJob(jobs, name, plan.identity);
+  const obligations = phase === 'all' ? [...plan.requiredJobs, 'bunki / fast'] : ['build'];
+  for (const name of obligations) requireJob(jobs, name, plan.identity);
   const rows = [],
     flakes = [],
-    expectedJobs = [...plan.requiredJobs];
-  for (const shard of plan.shards) {
+    expectedJobs = [...obligations];
+  for (const shard of selected) {
     const one = first.find((r) => r.shardId === shard.id);
     const jobName = `battery / ${shard.id}`;
     requireJob(jobs, jobName, plan.identity, one);
     expectedJobs.push(jobName);
-    const retryShard = retryPlan.shards.find((s) => s.id === shard.id);
+    const retryShard = retryShards.find((s) => s.id === shard.id);
     let two;
     if (retryShard) {
       two = second.find((r) => r.shardId === shard.id);
@@ -690,7 +768,8 @@ export function aggregate({ plan, receipts, retryPlan, jobs, artifact }) {
         });
     }
   }
-  exact(rows, plan.requiredNames, 'Aggregate membership mismatch');
+  const requiredNames = selected.flatMap((s) => s.gates).sort();
+  exact(rows, requiredNames, 'Aggregate membership mismatch');
   const failed = rows.filter((row) => row.status === 'failed');
   assert.equal(failed.length, 0, `Failed twice: ${failed.map((r) => r.name).join(', ')}`);
   const completedAt = NOW();
@@ -699,15 +778,23 @@ export function aggregate({ plan, receipts, retryPlan, jobs, artifact }) {
   );
   return {
     schemaVersion: 1,
-    kind: plan.scope === 'full' ? 'bunki-full-battery' : 'bunki-docs-check',
+    kind:
+      phase === 'fast'
+        ? 'bunki-fast-signal'
+        : phase === 'battery'
+          ? 'bunki-battery-signal'
+          : plan.scope === 'full'
+            ? 'bunki-full-battery'
+            : 'bunki-docs-check',
+    phase,
     scope: plan.scope,
     status: 'passed',
     identity: plan.identity,
     planDigest: plan.planDigest,
     artifact,
-    requiredNames: plan.requiredNames,
+    requiredNames,
     expectedJobs,
-    shards: plan.shards.map((s) => ({ id: s.id, gates: s.gates })),
+    shards: selected.map((s) => ({ id: s.id, gates: s.gates })),
     gates: rows,
     flakes,
     startedAt: new Date(startedMs).toISOString(),
@@ -742,7 +829,7 @@ export function summary(receipt) {
     lines.push(`- ${row.name}: ${row.seconds.toFixed(2)}s (${row.shard})`);
   return lines.join('\n') + '\n';
 }
-export function failureSummary({ plan, receipts = [], jobs = [], error }) {
+export function failureSummary({ plan, receipts = [], jobs = [], error, phase = 'all' }) {
   const safe = (value) =>
     String(value ?? '')
       .replaceAll('|', '/')
@@ -752,7 +839,7 @@ export function failureSummary({ plan, receipts = [], jobs = [], error }) {
     Array.isArray(jobs) ? jobs.filter((j) => j && typeof j.name === 'string') : [],
   );
   receipts = Array.isArray(receipts) ? receipts.filter((r) => r && Array.isArray(r.gates)) : [];
-  for (const shard of plan.shards) {
+  for (const shard of phaseShards(plan, phase)) {
     const one = receipts.find((r) => r.shardId === shard.id && r.attempt === 1),
       two = receipts.find((r) => r.shardId === shard.id && r.attempt === 2);
     const job = jobs.find((j) => j.name === `battery / ${shard.id}`);
@@ -837,7 +924,7 @@ export async function main(args = process.argv.slice(2)) {
     const plan = createPlan({ scope });
     write(o.out, plan);
     const matrix = {
-      include: plan.shards.map((s) => ({
+      include: phaseShards(plan, 'battery').map((s) => ({
         shard: s.id,
         kind: s.kind,
         python: s.python,
@@ -846,11 +933,24 @@ export async function main(args = process.argv.slice(2)) {
         browsers: s.browsers.join(' '),
       })),
     };
-    console.log(JSON.stringify({ scope, planDigest: plan.planDigest, matrix }));
+    const fastMatrix = {
+      include: phaseShards(plan, 'fast').map((s) => ({
+        shard: s.id,
+        kind: s.kind,
+        python: s.python,
+        corpus: s.corpus,
+        e2e: s.e2e,
+        browsers: s.browsers.join(' '),
+      })),
+    };
+    const hasBattery = phaseShards(plan, 'battery').length > 0;
+    console.log(
+      JSON.stringify({ scope, planDigest: plan.planDigest, matrix, fastMatrix, hasBattery }),
+    );
     if (process.env.GITHUB_OUTPUT)
       appendFileSync(
         process.env.GITHUB_OUTPUT,
-        `scope=${scope}\nmatrix=${JSON.stringify(matrix)}\nplan-digest=${plan.planDigest}\ntree=${plan.identity.tree}\nsha=${plan.identity.sha}\n`,
+        `scope=${scope}\nmatrix=${JSON.stringify(matrix)}\nfast-matrix=${JSON.stringify(fastMatrix)}\nhas-battery=${hasBattery}\nplan-digest=${plan.planDigest}\ntree=${plan.identity.tree}\nsha=${plan.identity.sha}\n`,
       );
     return;
   }
@@ -867,11 +967,20 @@ export async function main(args = process.argv.slice(2)) {
     return;
   }
   if (command === 'retry-plan') {
+    const plan = read(o.plan),
+      phase = o.phase || 'all';
+    const allReceipts = loadReceipts(o.receipts).filter((r) => r.attempt === 1);
+    assert(
+      allReceipts.every((r) => plan.shards.some((s) => s.id === r.shardId)),
+      'Unknown shard receipt',
+    );
+    const selectedIds = phaseShards(plan, phase).map((s) => s.id);
     const retry = createRetryPlan(
-      read(o.plan),
-      loadReceipts(o.receipts).filter((r) => r.attempt === 1),
+      plan,
+      allReceipts.filter((r) => selectedIds.includes(r.shardId)),
       read(o.artifact),
       read(o.jobs).jobs || read(o.jobs),
+      phase,
     );
     write(o.out, retry);
     const matrix = {
@@ -898,7 +1007,12 @@ export async function main(args = process.argv.slice(2)) {
       const receipt = aggregate({
         plan: read(o.plan),
         receipts: loadReceipts(o.receipts),
-        retryPlan: read(o['retry-plan']),
+        phase: o.phase || 'all',
+        retryPlan: o.phase && o.phase !== 'all' ? read(o['retry-plan']) : undefined,
+        retryPlans:
+          !o.phase || o.phase === 'all'
+            ? [read(o['fast-retry-plan']), ...(o['retry-plan'] ? [read(o['retry-plan'])] : [])]
+            : undefined,
         jobs: read(o.jobs).jobs || read(o.jobs),
         artifact: read(o.artifact),
       });
@@ -930,7 +1044,13 @@ export async function main(args = process.argv.slice(2)) {
       } catch {
         diagnosticPlan = createPlan();
       }
-      const diagnostic = failureSummary({ plan: diagnosticPlan, receipts, jobs, error });
+      const diagnostic = failureSummary({
+        plan: diagnosticPlan,
+        receipts,
+        jobs,
+        error,
+        phase: o.phase || 'all',
+      });
       writeFileSync(join(out, 'SUMMARY.md'), diagnostic);
       if (process.env.GITHUB_STEP_SUMMARY)
         appendFileSync(process.env.GITHUB_STEP_SUMMARY, diagnostic);

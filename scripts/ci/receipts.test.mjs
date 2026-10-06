@@ -57,9 +57,14 @@ function fixture() {
       conclusion: 'success',
       head_sha: commit,
     },
-    jobs: ['bunki / required', 'build', 'native', 'battery / fast-1', 'battery / browser-1'].map(
-      (name) => ({ name, status: 'completed', conclusion: 'success', run_attempt: 1 }),
-    ),
+    jobs: [
+      'bunki / required',
+      'build',
+      'native',
+      'battery / fast-1',
+      'battery / browser-1',
+      'bunki / fast',
+    ].map((name) => ({ name, status: 'completed', conclusion: 'success', run_attempt: 1 })),
     proofArtifact: {
       id: 43,
       name: `bunki-proof-${tree}`,
@@ -90,6 +95,9 @@ test('admits synthetic PR merge only when its parent is the API head and trees m
 });
 
 const rejections = {
+  'early fast signal': (v) => {
+    v.receipt.kind = 'bunki-fast-signal';
+  },
   'docs-only proof': (v) => {
     v.receipt.scope = 'docs';
   },
