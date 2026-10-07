@@ -1,0 +1,1004 @@
+{
+ "cards": [
+  {
+   "term": "加筆",
+   "reading": "かひつ",
+   "pos": "noun",
+   "meaning": "adding to a text",
+   "defJa": "文章に書き足すこと",
+   "passage": {
+    "ja": "一度書き上げた文章に加筆するときほど、書き手の力量が試される場面はない。足せば足すほど親切になる、というのは思い込みであって、むしろ余計な説明が全体の調子を崩すことのほうが多い。優れた編集者は、書き足す前にまず削れるものを探し、それでもなお足りない一点にだけ、句読点の位置まで気を配りながら言葉を置く。結局のところ、文章を育てるとは、増やすことよりも、残す理由を一つずつ確かめていくことなのである。",
+    "form": "加筆",
+    "en": "There is no moment that tests a writer's skill like adding to a text that has already been finished. It is a delusion that the more you add the kinder you are; more often, superfluous explanation spoils the tone of the whole. A good editor first looks for what can be cut before adding, and only at the one point that is still lacking does he place words, attending even to where the punctuation goes. In the end, to grow a text is less about increasing it than about checking, one by one, the reasons for what remains.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「原稿に加筆する」「加筆修正」。書き足すこと。「削除」「推敲」と対で考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "劣等感",
+   "reading": "れっとうかん",
+   "pos": "noun",
+   "meaning": "inferiority complex",
+   "defJa": "自分が人より劣っていると感じる気持ち",
+   "passage": {
+    "ja": "人前で話すのが苦手な人の多くは、話し方そのものより、劣等感に足を引っ張られています。「自分は口下手だから」という思い込みが先に立つと、声は小さくなり、視線は下がり、聞き手には自信のなさだけが伝わってしまいます。ところが、堂々とした話し手に取材してみると、意外にも本人は緊張を抱えたまま話していたりするものです。大切なのは、不安を消すことではなく、不安があっても話し始められる型を一つ持つことでしょう。",
+    "form": "劣等感",
+    "en": "Most people who dislike speaking in public are held back less by their way of speaking than by an inferiority complex. When the belief \"I am a poor speaker\" comes first, the voice gets small, the eyes drop, and listeners receive only your lack of confidence. Yet if you interview confident speakers, you often find, surprisingly, that they were speaking with their nerves intact. What matters is not to erase anxiety but to have one form with which you can begin speaking even while anxious.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「劣等感を抱く」「劣等感に悩む」。「優越感」と対になる語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "努力家",
+   "reading": "どりょくか",
+   "pos": "noun",
+   "meaning": "hard worker",
+   "defJa": "こつこつ努力を続ける人",
+   "passage": {
+    "ja": "「あの人は努力家だ」という褒め言葉には、実は微妙な含みがあります。才能があるとは言えないけれど、という前置きが、聞き手の耳には聞こえてしまうことがあるからです。だから相手を励ましたいときは、「頑張り屋さんですね」と評価を貼るより、「毎朝続けているところが本当にすごい」と、具体的な行動を挙げるほうが伝わります。ほめ言葉は、ラベルではなく観察の証拠として差し出すほうが、相手の動機づけにも火をつけます。",
+    "form": "努力家",
+    "en": "The compliment \"that person is a hard worker\" actually carries a subtle implication. A preface like \"not that you could call them talented\" can end up audible in the listener's ear. So when you want to encourage someone, naming a concrete action, \"what's really impressive is that you keep at it every morning,\" lands better than sticking an evaluation on them as in \"you're a hard worker.\" Praise offered as evidence of observation rather than as a label also lights a fire under the other person's motivation.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「努力家で知られる」。才能より継続する姿勢をほめるが、含みに注意が要る語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "労働組合",
+   "reading": "ろうどうくみあい",
+   "pos": "noun",
+   "meaning": "labor union",
+   "defJa": "労働者が結成する団体",
+   "passage": {
+    "ja": "産業革命の工場では、長時間労働と低い賃金が当たり前だった。一人の労働者の声は雇い主に届かなくとも、数百人が声をそろえれば、無視できない力になる。労働組合は、そうした実感のなかから生まれ、のちの労働運動の土台となった、弱い立場の人々の知恵の結晶であった。いまその役割が見直されつつあるのは、働き方が多様になるにつれ、誰が誰と団結するのかという問いそのものが、揺らいでいるからにほかならない。",
+    "form": "労働組合",
+    "en": "In the factories of the Industrial Revolution, long hours and low wages were taken for granted. A single worker's voice might not reach the employer, but when hundreds speak together it becomes a force that cannot be ignored. The labor union was a crystallization of the wisdom of people in weak positions, born from that sense and later the foundation of the labor movement. Its role is now being reconsidered for no other reason than that, as ways of working diversify, the very question of who unites with whom is wavering.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「労働組合に加入する」「労働組合を結成する」。団体交渉で労働者の立場を守る組織。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "労働運動",
+   "reading": "ろうどううんどう",
+   "pos": "noun",
+   "meaning": "labor movement",
+   "defJa": "労働者が待遇改善を求める運動",
+   "passage": {
+    "ja": "歴史の授業で労働運動という単元を扱うとき、教える側は、年表を読み上げる前に、一つの問いを黒板に書いておくと生徒の食いつきが変わります。「もしあなたの給料が、ある日突然半分になったら、何をしますか」。この問いがあれば、十九世紀の工場労働者が団結を選んだ理由が、他人事ではなくなります。事実を並べる前に、受け手を当事者の席に座らせる。これが、語りの技術というものです。",
+    "form": "労働運動",
+    "en": "When teaching the labor movement in a history class, writing one question on the blackboard before reading out the chronology changes how engaged students are. \"If your pay were suddenly cut in half one day, what would you do?\" With this question, the reason nineteenth-century factory workers chose to unite stops being someone else's problem. Before lining up facts, you seat the audience in the participant's chair. That is what the craft of telling is.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「労働運動が高まる」。賃金・待遇の改善を求める組織的な運動の総称。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "勃興",
+   "reading": "ぼっこう",
+   "pos": "noun",
+   "meaning": "sudden rise",
+   "defJa": "急に勢いよく盛り上がり起こること",
+   "passage": {
+    "ja": "モンゴル帝国の勃興って、よく考えると本当にすごい話なんだよね。馬に乗った遊牧民の集団が、たった数十年のうちに、ユーラシアの端から端までをつなぐ巨大な国を作っちゃったわけでしょ。しかも、勢力圏を広げただけじゃなくて、駅伝制みたいな交通網を整えて、東西の商人が行き来できるようにした。力で征服した側が、結果的に世界を一つの市場にしてしまった、っていうのが皮肉で面白いんだよ。",
+    "form": "勃興",
+    "en": "The rise of the Mongol Empire is a pretty amazing story when you think about it. A band of nomads on horseback built, in just a few decades, a vast state linking one end of Eurasia to the other. And they did not only extend their sphere of influence; they set up a relay-station transport network so that merchants from East and West could travel back and forth. The irony, and the interest, is that the conquerors by force ended up turning the world into a single market.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「新興国の勃興」「勃興期」。新しい勢力が急に盛り上がって力をもつこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "動乱",
+   "reading": "どうらん",
+   "pos": "noun",
+   "meaning": "upheaval; disturbance",
+   "defJa": "世の中が乱れ騒ぐこと",
+   "passage": {
+    "ja": "幕末の動乱を語るとき、いちばん難しいのは、登場人物が多すぎて聞き手が迷子になることです。そこで、史実を細かく追う前に、「黒船が来た日から、江戸城が明け渡されるまで、およそ十五年」というひと言で、時間の幅だけを先に示します。枠が決まれば、その中に出てくる名前は、聞き手が自分で整理してくれるものです。それでも混乱しそうなときは、地図を一枚見せるだけで、聞き手の頭は驚くほど片づきます。",
+    "form": "動乱",
+    "en": "When speaking of the turmoil of the late Edo period, the hardest thing is that there are too many figures and the listener gets lost. So before tracing the historical facts in detail, I first show only the span of time in one phrase: \"from the day the Black Ships came to the surrender of Edo Castle, about fifteen years.\" Once the frame is set, listeners tend to sort out the names that appear inside it for themselves. And if they still seem likely to get confused, just showing one map tidies their heads astonishingly well.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「幕末の動乱」「動乱の時代」。社会・政治が大きく乱れること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "動機づけ",
+   "reading": "どうきづけ",
+   "pos": "noun",
+   "meaning": "motivation; motivating",
+   "defJa": "やる気を起こさせること",
+   "passage": {
+    "ja": "社員の動機づけをどう高めるかは、多くの企業にとって長年の悩みの種である。賞与や昇進といった外からの報酬は短期的には効くが、仕事そのものへの関心を損ないかねないことが、研究で指摘されている。ここ十年ほどは、仕事の意味や裁量を社員に実感させる取り組みを重視する企業が増えてきた。ただ、制度やスローガンだけを整えても、現場の上司の口調ひとつで意欲が冷え込むことは珍しくない。",
+    "form": "動機づけ",
+    "en": "How to raise employee motivation is a headache for many companies. External rewards such as bonuses and promotions work in the short term, but research has pointed out that they may damage interest in the work itself. In recent years, more companies have been emphasizing efforts to make employees feel the meaning of their work and their discretion. Still, even if a system is put in place, it is not rare for a front-line supervisor's tone alone to chill people's drive.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「動機づけを高める」。やる気を引き出すこと。「内発的」「外発的」と結びつく。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "勢力圏",
+   "reading": "せいりょくけん",
+   "pos": "noun",
+   "meaning": "sphere of influence",
+   "defJa": "ある国が影響力をおよぼす地域",
+   "passage": {
+    "ja": "十九世紀の列強にとって、勢力圏という考え方は、植民地をつくるほど露骨でなく、しかし自由貿易よりは強い、中間の支配の形でした。たとえば中国では、各国が港や鉄道の権益を分け合い、「この地域はうちの国が優先する」という暗黙の線引きをしました。これによって、各国は直接の領土を奪い合うことなく、勢力均衡を保ったまま、経済的な影響力だけを手に入れたのです。この発想は、のちの冷戦期の陣営づくりにも、形を変えて受け継がれていきます。",
+    "form": "勢力圏",
+    "en": "For the great powers of the nineteenth century, the idea of a sphere of influence was a middle form of control, not as blatant as creating colonies but stronger than free trade. In China, for example, countries divided up rights to ports and railways and drew tacit lines saying, \"this region is our country's priority.\" Through this, each country gained only economic influence without fighting over direct territory, keeping the balance of power intact. This idea was inherited, in changed form, in the bloc-building of the later Cold War.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「勢力圏を広げる」「勢力圏に置く」。直接領土にせず影響下に置く地域。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "勢力均衡",
+   "reading": "せいりょくきんこう",
+   "pos": "noun",
+   "meaning": "balance of power",
+   "defJa": "国家間の力の釣り合い",
+   "passage": {
+    "ja": "欧州では、十九世紀を通じて、勢力均衡の維持が外交の最大の目標とされた。特定の国が突出して強くなれば、周辺の国々が同盟を組んで、それを抑え込むという仕組みである。ウィーン会議は、ナポレオン戦争後の秩序をこの原則に基づいて築こうとした試みだった。もっとも、均衡は互いへの不信の上に成り立つ危うさも抱えており、同盟国どうしの結束が崩れたとき、一気に大戦へと転がり落ちることになった。",
+    "form": "勢力均衡",
+    "en": "In Europe through the nineteenth century, maintaining the balance of power was regarded as the greatest goal of diplomacy. If one country grew conspicuously strong, neighboring countries would form alliances and hold it down. The Congress of Vienna was an attempt to build the order after the Napoleonic Wars on this principle. Still, the balance carried the fragility of resting on mutual distrust, and when cohesion among allies broke down, Europe tumbled all at once into a great war.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「勢力均衡を保つ」。特定の国が突出しないよう力を釣り合わせる外交の原則。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "勾配",
+   "reading": "こうばい",
+   "pos": "noun",
+   "meaning": "gradient; slope",
+   "defJa": "傾きの度合い",
+   "passage": {
+    "ja": "ニューラルネットワークの学習は、山の斜面を目隠しで下る作業にたとえられます。いまの地点で、どの方向にどれだけ傾いているか、つまり勾配を計算して、一番下がる向きに少しだけ進む。これを何億回も反復すると、モデルは、少しずつ、答えを間違えにくくなっていきます。ここで重要なのは一歩の大きさで、大きすぎれば谷を飛び越えてしまい、小さすぎれば、いつまでたっても底にたどり着けません。",
+    "form": "勾配",
+    "en": "Training a neural network is likened to going down a mountain slope. At your current point, you compute which way and how steeply the ground tilts, that is, the gradient, and take a small step in the direction that descends fastest. Repeat this hundreds of millions of times and the model gradually becomes less likely to get answers wrong. What matters here is the size of the step: too big and you leap over the valley, too small and you never reach the bottom.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「勾配を計算する」「勾配降下法」。傾き。坂道の傾斜の意味もある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "化身",
+   "reading": "けしん",
+   "pos": "noun",
+   "meaning": "incarnation, avatar",
+   "defJa": "神仏がこの世に姿を現したもの",
+   "passage": {
+    "ja": "インドの神話で、ヴィシュヌ神は、世界が危機に陥るたびに、さまざまな姿をとって地上に降りてくるとされます。その化身のなかでも、クリシュナは、人間の友として戦場に現れる点で異色です。語り手として大切なのは、「神様が人になった」という説明で終わらせることなく、「いちばん苦しい場面で、一番近くにいてくれる存在」という感情の核を、受け手に先に渡すことでしょう。神話は、設定よりも、その手触りで記憶に残るのです。",
+    "form": "化身",
+    "en": "In Indian myth, the god Vishnu is said to descend to earth in various forms whenever the world falls into crisis. Among his incarnations, Krishna is unusual in appearing on the battlefield as a human friend. What matters for a storyteller is not to stop at the explanation \"a god became human\" but to hand the audience first the emotional core: \"the one who is closest to you in your hardest moment.\" Myths stay in memory through that texture rather than through their settings.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「神の化身」。神が姿を変えて現れたもの。比喩で「〜の化身」も使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "十字軍",
+   "reading": "じゅうじぐん",
+   "pos": "noun",
+   "meaning": "the Crusades",
+   "defJa": "中世ヨーロッパが聖地奪回に派遣した遠征軍",
+   "passage": {
+    "ja": "十字軍というと、聖地エルサレムを取り戻すための宗教戦争と習いますが、実際の動機はもっと雑多でした。教皇の呼びかけに応じて集まった騎士たちには、遠征すれば罪が許されるという免罪符めいた約束に加えて、領地や名誉を求める者も少なくなかったのです。第四回の遠征では、目的地であるはずのイスラム勢力ではなく、同じキリスト教世界のコンスタンティノープルを攻め落としてしまいました。理念と現実がこれほどずれた例は、世界史でもそう多くありません。",
+    "form": "十字軍",
+    "en": "The Crusades are taught as a religious war to retake the holy city of Jerusalem, but the actual motives were far more mixed. Among the knights who gathered answering the pope's call, besides an indulgence-like promise that going on the expedition would absolve their sins, not a few sought land and honor. On the Fourth Crusade, they stormed not the Muslim forces who were supposed to be the target but Constantinople, in the same Christian world. There are not many examples in world history in which ideal and reality diverged so far.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「十字軍の遠征」。十一〜十三世紀、聖地奪回をかかげたが動機は複合的だった。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "千里の道も一歩から",
+   "reading": "せんりのみちもいっぽから",
+   "pos": "expression",
+   "meaning": "a long journey starts with one step",
+   "defJa": "大きなことも小さな一歩から始まる",
+   "passage": {
+    "ja": "年が明けて、スポーツジムの新規入会者が急増する一方で、数か月後には通う人が大きく減るという話は、運営会社の間では半ば常識になっている。理由として専門家が挙げるのは、勢いだけに頼った動機づけが続かないという点である。「千里の道も一歩から」という古いことわざは、実は習慣づくりの理論とも相性がよい。まず靴を履いて玄関を出るだけでも続ければ、行動のハードルが下がり、結果として長続きする確率が上がるという。",
+    "form": "千里の道も一歩から",
+    "en": "While the number of new gym members surges after the new year, it is said to be half common sense among operators that attendance drops sharply a few months later. The reason experts cite is that motivation relying on momentum alone does not last. The old proverb \"a journey of a thousand miles begins with a single step\" in fact fits well with the theory of habit formation. If you simply keep putting on your shoes and stepping out the front door, the hurdle to action drops, and as a result the chance of lasting rises, it is said.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "ことわざ。遠い目標も足元の小さな行動から始まる。習慣づくりの文脈で引かれる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "南下政策",
+   "reading": "なんかせいさく",
+   "pos": "noun",
+   "meaning": "southward expansion policy",
+   "defJa": "ロシアが不凍港を求めて南へ進出した政策",
+   "passage": {
+    "ja": "ロシアの南下政策って、要するに、凍らない港がほしいっていう話なんですよね。国土は広いけど、北の海は冬になると凍るから、一年中使える海への出口が、喉から手が出るほど欲しかった。だから黒海からバルカン、さらには極東の旅順まで、手を伸ばしていった。それを警戒して勢力均衡を守ろうとしたイギリスや日本との間で衝突が起きたのが、クリミア戦争や日露戦争だった、と考えると、流れがつながります。",
+    "form": "南下政策",
+    "en": "Russia's southward expansion policy basically comes down to wanting a port that doesn't freeze. The country is vast, but the northern seas freeze in winter, so it desperately wanted an outlet to the sea usable all year round. So it reached out from the Black Sea to the Balkans and even to Port Arthur in the Far East. If you think of the Crimean War and the Russo-Japanese War as clashes with Britain and Japan, who were wary and wanted to preserve the balance of power, the flow connects.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「南下政策をとる」。ロシアの不凍港獲得をめざす拡張政策。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "南北問題",
+   "reading": "なんぼくもんだい",
+   "pos": "noun",
+   "meaning": "North–South problem",
+   "defJa": "先進国と途上国の経済格差の問題",
+   "passage": {
+    "ja": "南北問題って、地図の上の南と北の話じゃなくて、豊かな国と貧しい国の格差の話なんですよ。たとえばコーヒー豆を作っている国は、豆を安く売らざるを得なくて、それを加工して売る先進国のほうが、ずっと儲かる仕組みになってる。しかも、貧しい国は借金を返すために、また安く輸出しなきゃいけない。そうやって、生まれた場所で人生の上限が決まってしまうのは、やっぱり不公平だと思うんですよね。",
+    "form": "南北問題",
+    "en": "The North–South problem isn't about the south and north on a map; it's about the gap between rich and poor countries. A country growing coffee beans has no choice but to sell the beans cheap, and the developed countries that process and sell them make far more money; that's how the system works. On top of that, poor countries have to export cheaply again to repay their debts. I do think it's unfair that the ceiling of a person's life gets set by where they were born.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「南北問題の解決」。北の先進国と南の途上国の格差。「先進国」と対で出る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "単刀直入",
+   "reading": "たんとうちょくにゅう",
+   "pos": "na-adj",
+   "meaning": "straight to the point",
+   "defJa": "前置きなく本題に入ること",
+   "passage": {
+    "ja": "小論文の冒頭で、背景説明に三行も使ってしまう人は、単刀直入に結論から書き出す練習をしてみてください。「私は〜と考える。なぜなら〜」の形に慣れると、読み手は最初の二行で、あなたの立場を理解できます。採点者は一日に何十枚も答案を読んでおり、回りくどい書き出しは、それだけで印象を下げかねません。まず主張、次に理由、最後に具体例。この順番を反復練習で体に覚えさせるのが、いちばんの近道です。",
+    "form": "単刀直入",
+    "en": "If you spend three lines on background at the start of a short essay, try practicing a straight-to-the-point opening that begins with the conclusion. Once you get used to the form \"I think that…; this is because…,\" the reader can understand your position within the first two lines. Graders read dozens of answer sheets a day, and a roundabout opening can lower their impression by itself. First the claim, then the reason, and lastly a concrete example. Drilling this order into your body by repetition is the shortest route.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「単刀直入に言う」。前置きを省いて核心に入る。回りくどいの対。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "単純接触効果",
+   "reading": "たんじゅんせっしょくこうか",
+   "pos": "noun",
+   "meaning": "mere-exposure effect",
+   "defJa": "何度も接すると好意が増す心理効果",
+   "passage": {
+    "ja": "最初は何とも思わなかった曲なのに、お店で何度も繰り返し流れているうちに、なんだか好きになってきた、ってことありませんか。あれは単純接触効果といって、人は何度も目にしたものに、だんだん好意を持つようになるんです。ただ、たしかに効果はあるものの、もともと嫌いなものには逆効果になるという研究もあります。テレビの広告が同じ映像を反復して流すのも、この効果をねらってるんですよね。",
+    "form": "単純接触効果",
+    "en": "Haven't you had the experience of a song you felt nothing about at first, but as it kept playing in a shop, somehow you started to like it? That is called the mere-exposure effect: people gradually develop a liking for things they see again and again. That said, although the effect exists, there is research showing it backfires for things you disliked to begin with. Ads that run the same footage repeatedly are aiming at this effect too, you know.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「単純接触効果」。見聞きする回数が増えるだけで好意が高まる現象。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "即断即決",
+   "reading": "そくだんそっけつ",
+   "pos": "noun",
+   "meaning": "deciding on the spot",
+   "defJa": "その場で判断し決めること",
+   "passage": {
+    "ja": "ビジネス書で「即断即決が大事」と言われますが、これは何でもその場で決めろという意味ではありません。本来は、判断の材料が十分にそろっていて、しかも間違えても取り返しがつく場面で、迷って反芻するだけの時間を削りなさい、という教えです。逆に、取り返しのつかない決断は、むしろ一晩寝かせたほうがいい。この二つを見分ける目を持っている人だけが、本当に決断の速い人だと言えるでしょう。",
+    "form": "即断即決",
+    "en": "Business books say \"decisive on-the-spot decision-making is important,\" but this does not mean you should decide everything on the spot. Originally it teaches that, in situations where the materials for judgment are sufficiently in hand and a mistake can be undone, you should cut the time spent hesitating and ruminating. Conversely, decisions that cannot be undone are better slept on for a night. Only people with an eye to tell these two apart can truly be called quick decision-makers.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「即断即決で進める」。迷わずその場で決める四字熟語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "即時報酬",
+   "reading": "そくじほうしゅう",
+   "pos": "noun",
+   "meaning": "immediate reward",
+   "defJa": "行動の直後に得られる報酬",
+   "passage": {
+    "ja": "人間の脳は、遠い将来の大きな報酬よりも、いま目の前にある小さな即時報酬を選びやすくできています。スマホの通知が気になってしまうのも、勉強の「いつか役に立つ」より、メッセージの「いますぐ嬉しい」が勝つからです。そこで有効なのは、将来の成果を待たずに、いま小さな達成感が得られる仕組みを自分で作ってしまうことです。たとえば、勉強した日にカレンダーへ印をつけるだけで、反復の習慣は驚くほど続きます。",
+    "form": "即時報酬",
+    "en": "The human brain is built to choose the small immediate reward right before it over a large reward in the distant future. The reason a phone notification pulls at us is that the message's \"instant joy\" beats the study's \"it will help someday.\" What works, then, is to build for yourself a system that gives a small sense of achievement right now without waiting for future results. For example, merely marking the calendar on days you studied makes the habit of repetition last surprisingly well.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「即時報酬に弱い」。行動の直後に得られる報酬。習慣づくりの設計で重要。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "参入",
+   "reading": "さんにゅう",
+   "pos": "noun",
+   "meaning": "market entry",
+   "defJa": "新しく市場や分野に加わること",
+   "passage": {
+    "ja": "半導体の世界に新しく参入するって、素人が考えるよりずっとハードルが高いんですよ。工場一つ建てるのに、数千億円とか平気でかかるし、そもそも製造の技術を持ってる人材が世界中で取り合いになってる。だから、新規に名乗りを上げて成功する例は、国が資金を出してくれる場合に、ほとんど限られるんです。それでも、AIの先行きが明るいと見られているだけあって、挑戦したいって企業は後を絶たないんですよね。",
+    "form": "参入",
+    "en": "Newly entering the semiconductor world is far harder than amateurs imagine. Building a single factory easily costs hundreds of billions of yen, and in the first place people with manufacturing know-how are being fought over worldwide. So successful newcomers are almost entirely limited to cases where the state puts up the money. Even so, precisely because the outlook for AI is seen as bright, companies that want to take the challenge keep coming.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「市場に参入する」「新規参入」。「撤退」の対。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "参政権",
+   "reading": "さんせいけん",
+   "pos": "noun",
+   "meaning": "right to vote",
+   "defJa": "政治に参加する権利",
+   "passage": {
+    "ja": "参政権の歴史を語るなら、「いつ認められたか」という年号の前に、「なぜこれほど長く認められなかったのか」という問いを置くと、聞き手の関心が一気に高まります。たとえばイギリスでは、一九一八年に一部の女性、一九二八年に二十一歳以上の全女性に選挙権が広がりました。長い運動の末に勝ち取られた権利だという事実を、数字と一緒に語ると、重みが伝わります。年号だけの羅列では、受け手の記憶に残りません。",
+    "form": "参政権",
+    "en": "If you tell the history of the right to political participation, putting the question \"why was it denied for so long?\" before the date of \"when was it granted?\" instantly raises the listener's interest. In Britain, for example, the vote was extended to some women in 1918 and to all women aged twenty-one and over in 1928. Telling the fact that it was a right won after a long movement together with the numbers conveys its weight. A mere string of dates will not stay in the audience's memory.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「参政権を得る」「女性参政権」。選挙権・被選挙権など政治に参加する権利。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "反復",
+   "reading": "はんぷく",
+   "pos": "noun",
+   "meaning": "repetition",
+   "defJa": "同じことを繰り返すこと",
+   "passage": {
+    "ja": "語学学習では、同じ内容を短い間隔で何度も繰り返す反復が、長く記憶を保つ最も確実な方法のひとつとされる。ただし、同じ形で単に繰り返すだけでは効果は限られ、少し間をおいて、思い出す作業を挟むことが重要だという。近年は、この原理を取り入れたアプリが数多く登場し、利用者の習熟度に応じて復習の間隔を自動で調整している。しかし、機械に任せきりにすれば、学習そのものが受動的になりかねないという指摘もある。",
+    "form": "反復",
+    "en": "In language learning, repetition, going over the same content many times at short intervals, is regarded as one of the surest ways to retain memory for a long time. However, merely repeating in the same form has limited effect; it is said to be important to leave a little interval and insert the work of recalling. In recent years many apps incorporating this principle have appeared, automatically adjusting review intervals according to the user's proficiency. Yet there is also the point that leaving everything to the machine could make learning itself passive.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「反復練習」「反復する」。同じ動作・学習を繰り返すこと。学習法の文脈で頻出。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "反芻",
+   "reading": "はんすう",
+   "pos": "noun",
+   "meaning": "rumination",
+   "defJa": "同じことを何度も思い返すこと",
+   "passage": {
+    "ja": "嫌なことがあった夜に、同じ場面を何度も頭の中で再生してしまう経験は、誰にでもあるでしょう。心理学では、これを反芻と呼びます。牛が食べたものを何度も口に戻して噛み直す様子から来た言葉ですが、人間の場合、噛み直せば噛み直すほど、栄養ではなく苦味が増えていきます。抜け出すコツは、「なぜ」ではなく「次はどうするか」に問いを切り替え、紙に書き出して可視化することです。",
+    "form": "反芻",
+    "en": "Everyone has had the experience of replaying the same scene over and over in their head on a night after something unpleasant. Psychology calls this rumination. The word comes from the way a cow brings eaten food back to its mouth and chews again, but with humans, the more you rechew, the more bitterness, not nutrition, increases. The trick to getting out is to switch the question from \"why\" to \"what next,\" and to write it on paper and make it visible.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「反芻する」「反芻思考」。牛の再咀嚼から、同じ考えを何度も思い返す意味に。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "反証",
+   "reading": "はんしょう",
+   "pos": "noun",
+   "meaning": "disproof; counterevidence",
+   "defJa": "誤りだと示す証拠をあげること",
+   "passage": {
+    "ja": "科学哲学者ポパーは、ある理論が科学的であるかどうかを分ける基準として、反証の可能性を挙げた。つまり、どんな観察が出てきたらその理論が誤りだと認められるのか、あらかじめ言えることが条件になる。何が起きても説明がつく理論は、一見強そうに見えて、実は何も語っていないというのである。この考え方は、日常の議論にも応用でき、「それが間違いだと分かる証拠は何か」と問うだけで、話の質は変わり、反論も建設的になる。",
+    "form": "反証",
+    "en": "The philosopher of science Popper offered the possibility of refutation as the criterion dividing scientific from non-scientific theories. That is, it is a condition that one can say in advance what observation would count as showing the theory wrong. A theory that can explain whatever happens looks strong at first sight but in fact says nothing, he argued. This idea can be applied to everyday arguments too: just asking \"what evidence would show this is wrong?\" changes the quality of the talk and makes objections constructive.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「反証可能性」「反証を挙げる」。主張が誤りだと示す証拠・手続き。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "反語",
+   "reading": "はんご",
+   "pos": "noun",
+   "meaning": "rhetorical question; irony",
+   "defJa": "疑問の形で逆の意味を強く言う表現",
+   "passage": {
+    "ja": "「そんなこと、誰が信じるだろうか」という言い方は、文法の上では疑問文だが、実際には「誰も信じない」と強く言い切っている。これが反語である。古文では「やは」「かは」などの助詞が目印になり、現代文でも「〜ではないか」「〜だろうか」の形で頻繁に使われる。問いの形をとることで、断定の角が取れ、読み手に自分で結論を出させる効果が生まれる。ただし、使いすぎると、皮肉な口調に聞こえ、反発を招きかねない。",
+    "form": "反語",
+    "en": "The phrase \"who would believe such a thing?\" is grammatically a question but in fact asserts strongly that no one would. This is a rhetorical question. In classical Japanese, particles such as \"ya wa\" and \"ka wa\" serve as markers, and in modern prose it is frequently used in the forms \"isn't it…?\" and \"I wonder…?\" By taking the form of a question, it softens the edge of assertion and has the effect of letting the reader reach the conclusion himself. However, if overused, it sounds sarcastic in tone and may provoke a backlash.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「反語表現」。疑問形で、実は逆の断定を強く述べる修辞。古文では「かは」など。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "反論",
+   "reading": "はんろん",
+   "pos": "noun",
+   "meaning": "counterargument",
+   "defJa": "相手の意見に対して述べる反対意見",
+   "passage": {
+    "ja": "会議や議論の場で相手の意見に反論するとき、まず相手の主張を、相手が納得する形で言い直してみてください。これをやるだけで、議論の空気は驚くほど大きく変わります。人は、自分の話を正確に理解してもらえたと感じると、はじめて相手の話を聞く余裕が生まれるからです。そのうえで「ただ、ここだけは違う」と一点だけ単刀直入に述べれば、感情的な応酬を避けつつ、議論を前に進められます。",
+    "form": "反論",
+    "en": "When you object to someone's opinion, first try restating their claim in a form they would accept. Just doing this changes the atmosphere of the debate greatly. A person has room to listen to the other side only after feeling that their own words have been accurately understood. Then, if you state straight out only the one point, \"but this is where I differ,\" you can move the discussion forward while avoiding emotional exchanges.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「反論する」「反論を唱える」。相手の主張に対する反対意見。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "取りかかる",
+   "reading": "とりかかる",
+   "pos": "verb",
+   "meaning": "to set about; begin",
+   "defJa": "作業を始める",
+   "passage": {
+    "ja": "宿題とか確定申告とか、やらなきゃいけないのは分かってるのに、なかなか取りかかる気になれないこと、ありませんか。あれは意志が弱いんじゃなくて、「始める前の気持ち」が一番しんどいだけなんですよね。実際、やり始めてしまえば、十分もすれば結構進んでたりする。だから私は、「五分だけやる」って決めて、タイマーを置くんです。終わったらコーヒー、という即時報酬も用意しておくと、その五分が意外と楽になりますよ。",
+    "form": "取りかかる",
+    "en": "Don't you sometimes know you have to do something like homework or your tax return, yet can't bring yourself to get started? That isn't weak willpower; it's just that \"the feeling before starting\" is the hardest part. In fact, once you start, ten minutes in you've often made decent progress. So I decide \"just five minutes\" and set a timer. If you also prepare a small immediate reward, like a coffee afterward, those five minutes get surprisingly easy.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「作業に取りかかる」。仕事・課題などを実際に始める意味。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "受け手",
+   "reading": "うけて",
+   "pos": "noun",
+   "meaning": "recipient; audience",
+   "defJa": "情報などを受け取る側の人",
+   "passage": {
+    "ja": "話し上手な人って、たいてい、話の内容より、受け手が何を求めてるかを先に見てるんだよね。たとえば同じ「新しいアプリを作った」って話でも、友達には「こんなことができて面白いんだよ」、上司には「この作業が半分になるんです」って、相手に応じて言い方を変える。相手の頭の中に今ある関心の形に、自分の話を合わせてるんだ。それができると、口下手でも、ちゃんと相手に伝わる話になるよ。",
+    "form": "受け手",
+    "en": "Good talkers look first at what the audience wants rather than at the content of what they're saying. Even for the same story, \"I made a new app,\" they change how they put it depending on the listener: to a friend, \"it's fun, it can do this,\" and to a boss, \"this task gets cut in half.\" They fit their talk to the shape of the interest currently in the other person's head. Once you can do that, even a poor speaker can make a talk that really gets across.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「受け手の立場に立つ」。送り手に対し、情報や話を受け取る側。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "受動態",
+   "reading": "じゅどうたい",
+   "pos": "noun",
+   "meaning": "passive voice",
+   "defJa": "動作を受ける側を主語にした文の形",
+   "passage": {
+    "ja": "日本語の受動態って、英語と使い方がけっこう違うんですよね。英語だと「この本は多くの人に読まれている」みたいな、普通の説明にも受け身を使うけど、日本語で同じことを言うと、どこか翻訳調に聞こえる。一方で、日本語には「雨に降られた」みたいに、迷惑を受けた気持ちをこめる、独特の受け身があって、口語ではとくによく使われます。だから受け身を使うかどうかは、文法の問題というより、誰の気持ちに寄り添うかの問題なんです。",
+    "form": "受動態",
+    "en": "The passive voice in Japanese is used quite differently from English, you know. English uses passives even for plain explanation, like \"this book is read by many people,\" but say the same in Japanese and it somehow sounds like a translation. On the other hand, Japanese has a unique passive that carries the feeling of being inconvenienced, like \"I got rained on,\" and it is especially common in spoken language. So whether to use the passive is less a matter of grammar than of whose feelings you sit beside.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「受動態の文」。英語の受け身に当たる。日本語は「迷惑の受け身」にも注意。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "受動的",
+   "reading": "じゅどうてき",
+   "pos": "na-adj",
+   "meaning": "passive",
+   "defJa": "自分から働きかけず受け身であるさま",
+   "passage": {
+    "ja": "画面に流れてくる動画を眺めているだけの時間は、一見休息のようでいて、実際には脳を休ませていないという指摘がある。自分で選び、考え、手を動かす能動的な活動と違い、受動的な視聴は、刺激に反応するだけの状態をつくりやすい。しかも、次の動画が自動で再生され、即時報酬が途切れない仕組みのせいで、やめどきを見失う人も多い。研究者は、視聴の時間を決めておくか、見たあとに一行でも感想を書く習慣をすすめている。",
+    "form": "受動的",
+    "en": "It has been pointed out that time spent merely watching videos streaming across a screen seems like rest at first glance but in fact does not rest the brain. Unlike active pursuits in which you choose, think and move your hands, passive viewing readily produces a state of merely reacting to stimuli. Moreover, because the next video plays automatically and immediate rewards never stop, many people lose track of when to quit. Researchers recommend deciding viewing time in advance or making a habit of writing even one line of impression afterward.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「受動的な姿勢」。「能動的」の対。自分から動かず受け身であること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "叙述",
+   "reading": "じょじゅつ",
+   "pos": "noun",
+   "meaning": "description; narration",
+   "defJa": "事柄を順を追って述べること",
+   "passage": {
+    "ja": "小説の叙述って、誰の目で語ってるかで全然印象が変わるんですよね。同じ殺人事件でも、犯人の視点だととても生々しいし、探偵の視点だと謎解きっぽくなる。だから、作家は書き出す前に、「誰に語らせるか」をまず決めるんだって。日記を試しに三人称で書き直すと、他人の日記かのように自分の行動が見えて面白いですよ。古文の物語でも、語り手の位置を意識して読むと、読み方がぐっと変わります。",
+    "form": "叙述",
+    "en": "How a novel is narrated changes its impression entirely depending on whose eyes are telling it, you know. Even for the same murder case, the criminal's viewpoint feels visceral and the detective's feels like puzzle-solving. So writers apparently decide \"who will do the telling\" first, before they begin. If you rewrite your diary in the third person, your actions look as if they were someone else's diary, which is fun. Even with classical tales, if you read while aware of the narrator's position, the way you read changes.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「叙述の視点」「叙述トリック」。出来事や状態を述べ表すこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "叡智",
+   "reading": "えいち",
+   "pos": "noun",
+   "meaning": "wisdom, intellect",
+   "defJa": "物事の本質を見抜く深い知恵",
+   "passage": {
+    "ja": "インド思想では、知識と叡智はきちんと区別されてきました。知識が外から集めた情報の量だとすれば、後者は、それを自分の体験に落とし込んで初めて現れる理解の深さです。ウパニシャッドの師が弟子に求めたのは、暗唱ではなく、師の言葉を自分の中で何度も噛みしめ、体験として確かめることでした。学習の面から見ても、反復と内省を欠いた学びは、知識にとどまってしまう、と言えそうです。",
+    "form": "叡智",
+    "en": "In Indian thought, knowledge and wisdom have been carefully distinguished. If knowledge is the amount of information gathered from outside, the latter is the depth of understanding that appears only once you have brought it down into your own experience. What the teachers of the Upanishads asked of their disciples was not recitation but to chew over the teacher's words many times within themselves and confirm them as experience. From the viewpoint of learning too, it seems fair to say that study lacking repetition and introspection stays at the level of knowledge.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「人類の叡智」。知識よりも深い、本質を見抜く知恵。哲学・宗教の文脈で使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "口は災いの元",
+   "reading": "くちはわざわいのもと",
+   "pos": "expression",
+   "meaning": "the mouth invites misfortune",
+   "defJa": "不用意な発言は災いを招く",
+   "passage": {
+    "ja": "「口は災いの元」ということわざは、黙っていろという意味ではなく、言葉は一度出ると取り消せない、という事実への戒めです。会議で、つい勢いで言ってしまった一言が、何年も人間関係に影を落とす、なんてことも決して珍しくありません。ここで意外と役に立つのが、話す前の一呼吸です。口調を落ち着かせ、相手に届く形に整えてから出すだけで、同じ内容でも、災いにも、味方にもなるのです。",
+    "form": "口は災いの元",
+    "en": "The proverb \"the mouth is the source of misfortune\" does not mean \"keep quiet\"; it is a warning about the fact that once words are out they cannot be taken back. It is not rare for a single remark blurted out in a meeting in the heat of the moment to cast a shadow over a relationship for years. What helps here is one breath before you speak. Just calming your tone and shaping it into a form that reaches the other person before letting it out can make the same content either a misfortune or an ally.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "ことわざ。「口は災いの元」。軽率な発言が自分に災いを招く戒め。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "口をつぐむ",
+   "reading": "くちをつぐむ",
+   "pos": "expression",
+   "meaning": "to keep one's mouth shut",
+   "defJa": "何も言わず黙る",
+   "passage": {
+    "ja": "会議で意見を求められたとき、無難な発言で場をしのぐより、あえて口をつぐむほうが賢明な場面があります。たとえば、事実関係がまだはっきりしていない問題について、憶測で語れば、あとで訂正しきれない誤解を生みかねません。沈黙は何も言わないことではなく、「まだ言えない」というメッセージを、態度で伝えることなのです。「口は災いの元」とはいえ、肝心なところで黙りすぎれば、逃げたと受け取られる危険もあるので、見極めが要ります。",
+    "form": "口をつぐむ",
+    "en": "When asked for an opinion in a meeting, there are situations in which deliberately keeping your mouth shut is wiser than getting through with an inoffensive remark. For a problem whose facts are still unclear, for example, speaking from conjecture can create a misunderstanding you cannot fully correct later. Silence is not saying nothing; it is conveying through your attitude the message \"I can't say yet.\" \"The mouth is the source of misfortune,\" true, but if you stay silent too much at the crucial point you risk being taken as running away, so judgment is needed.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「口をつぐむ」。話さずに黙る。事情や配慮で言わない含み。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "口下手",
+   "reading": "くちべた",
+   "pos": "na-adj",
+   "meaning": "poor at speaking",
+   "defJa": "話すのが下手なこと",
+   "passage": {
+    "ja": "自分は口下手だって言う人ほど、実はものすごく聞き上手だったりするんですよね。話すのが苦手なだけに、相手の話をよく聞いて、一番知りたいところに単刀直入に質問できる。それって、会話の中でいちばん喜ばれるスキルの一つなんじゃないかな。無理に面白い話をしようとしなくても、相手の話の要点を一度だけ言い直して返してあげれば、それだけで「わかってくれる人だ」って思ってもらえますよ。",
+    "form": "口下手",
+    "en": "The people who say they are poor talkers are often, in fact, good listeners. Precisely because speaking is hard for them, they listen well and can ask, straight out, about what they most want to know. Isn't that the skill most welcomed in conversation? Even without forcing yourself to tell funny stories, if you just restate the gist of what the other person said once and hand it back, they will think \"this person understands me.\"",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「口下手な人」。話すのが苦手で言葉がうまく出ない。聞き上手とも両立する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "口語",
+   "reading": "こうご",
+   "pos": "noun",
+   "meaning": "colloquial language",
+   "defJa": "日常の話し言葉",
+   "passage": {
+    "ja": "日本語には、書き言葉と話し言葉の間に、思っている以上に大きな溝があります。たとえば「〜である」は文章の言葉で、日常の会話で急に使うと、まるで演説のように聞こえてしまいます。この話し言葉をそのまま文字にしたものを、口語と呼びます。明治時代になって言文一致運動が進むにつれ、それまで古文に近い文体が当たり前だった小説や新聞や雑誌も、少しずつ、確実に話し言葉に近づいていきました。",
+    "form": "口語",
+    "en": "In Japanese there is a bigger gap than you might think between the written and spoken languages. For example, \"de aru\" is a word of writing, and used in everyday conversation it suddenly sounds like a speech. Putting this spoken language into writing just as it is, we call colloquial language. As the movement to unify written and spoken styles advanced in the Meiji era, novels and newspapers, which had taken a style close to classical Japanese for granted, also drew gradually closer to spoken language.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「口語」と「文語」。話し言葉に基づく文体。言文一致で書き言葉にも広がった。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "口語体",
+   "reading": "こうごたい",
+   "pos": "noun",
+   "meaning": "colloquial style",
+   "defJa": "話し言葉に近い文体",
+   "passage": {
+    "ja": "ブログとかSNSの文章って、もう完全に口語体が主流になってますよね。「です・ます」より、「だよね」「かも」みたいに、友達に話しかけるような感じのほうが、受け手との距離が近く感じられる。でも、そのまま仕事のメールに持ち込んじゃうと、さすがにくだけすぎで、失礼に受け取られかねない。場面に応じて、文体の切り替えスイッチを持っておくのが大人としてのたしなみなんだと思います。",
+    "form": "口語体",
+    "en": "In blogs and social media, a colloquial style is now completely the mainstream, isn't it? Talking to a friend with \"dayo ne\" or \"kamo\" feels closer to the reader than with \"desu/masu.\" But if you carry that as is into a work email, it is, after all, too casual and could be taken as rude. I think having a switch for changing styles according to the occasion is the mark of an adult.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「口語体で書く」。話し言葉に近い文体。「文語体」の対。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "口調",
+   "reading": "くちょう",
+   "pos": "noun",
+   "meaning": "tone of voice",
+   "defJa": "話しぶり、言葉の調子",
+   "passage": {
+    "ja": "言葉の内容が同じでも、口調一つで、聞き手に届くものはまるで別物になる。「お願いします」という五文字は、静かに言えば信頼を、投げやりに言えばあからさまな不満を、それぞれ伝える。つまり、人は言葉の意味だけでなく、その運び方から、話し手の心の状態まで読み取っているのである。言葉を選ぶことと同じくらい丁寧に、自分の声の調子を内省することこそ、対話への誠実さにほかならない。",
+    "form": "口調",
+    "en": "Even with the same content, the tone alone changes entirely what reaches the listener. The five characters of \"onegai shimasu\" convey trust if said quietly and discontent if said offhandedly. People, that is, read not only the meaning of words but, from the way they are delivered, even the speaker's state of mind. Reflecting on one's own tone of voice, as much as choosing words, is nothing other than sincerity toward dialogue.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「穏やかな口調」「強い口調で言う」。話すときの調子・言い方。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "古文",
+   "reading": "こぶん",
+   "pos": "noun",
+   "meaning": "classical Japanese",
+   "defJa": "昔の日本語で書かれた文章",
+   "passage": {
+    "ja": "古文が苦手という人の多くは、単語や文法でつまずく前に、「昔の人は何を面白がっていたのか」という興味を持てずにいます。たとえば『枕草子』の「春はあけぼの」は、まさに季節の一番いい時間帯を、ひと言で言い切る遊びです。口語に置き換えてみると、現代人が「夏はビール」と言うのに通じるものがあります。そう考えると、千年も前の文章が、急にぐっと身近なおしゃべりに聞こえてきませんか。",
+    "form": "古文",
+    "en": "Many people who are bad at classical Japanese, before they stumble on vocabulary or grammar, fail to feel any interest in \"what did people of old find fun?\" For example, \"In spring, dawn\" from The Pillow Book is a game of declaring in a single phrase the best time of day for each season. Rendered into colloquial Japanese, it has something in common with a modern person saying \"summer means beer.\" Think of it that way and doesn't a thousand-year-old text suddenly sound like friendly chatter?",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「古文を読む」。平安時代などの文語文。「現代文」「漢文」と区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "句点",
+   "reading": "くてん",
+   "pos": "noun",
+   "meaning": "full stop (。)",
+   "defJa": "文の終わりにうつ「。」",
+   "passage": {
+    "ja": "LINEなんかで、句点をつけて返信すると、なんか怒ってる感じがするって言われませんか。あれ、不思議だけど、本当にそう受け取る人がけっこう多いんですよ。口語に近いやりとりでは、文末の「。」が、会話をそこでぴしゃっと切るサインみたいに見えちゃうらしくて。でも、仕事の連絡では文末にこれがないと逆に雑で冷たい印象に見えるから、相手との関係に応じて上手に使い分けるしかないですね。",
+    "form": "句点",
+    "en": "Haven't you been told that if you reply on LINE with a full stop, it feels like you're angry? It's odd, but a lot of people really do take it that way. In exchanges close to spoken language, the \"。\" at the end of a sentence apparently looks like a sign that cuts off the conversation right there. But in work messages, lacking the full stop looks sloppy, so there is nothing for it but to use them differently depending on your relationship with the other person.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「句点を打つ」。「。」のこと。「読点」と対。チャットでは印象を左右する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "句読点",
+   "reading": "くとうてん",
+   "pos": "noun",
+   "meaning": "punctuation marks",
+   "defJa": "句点と読点の総称",
+   "passage": {
+    "ja": "句読点の打ち方に、絶対的な決まりはない。基本は、読みやすさを基準に、書き手が判断することになる。しかし、一文の中に読点が一つもなければ、読み手は息つぎの位置を見失い、逆に打ちすぎれば、文の流れが細切れになる。近年は、スマートフォンで短い文章を書く機会が増え、句点を省く人もいる一方、改まった文書では今も欠かせない。それらは、書き手が読み手に差し出す、小さな道しるべである。",
+    "form": "句読点",
+    "en": "There is no absolute rule for how to place punctuation. As a basic principle, the writer judges, taking readability as the standard. But if a sentence has not a single comma, the reader loses the place to take a breath, and conversely, if you put too many, the flow of the sentence becomes fragmented. In recent years opportunities to write short texts on smartphones have grown, and while some people omit the full stop, it is still indispensable in formal documents. They are a small signpost the writer offers the reader.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「句読点を打つ」。「、」と「。」の総称。書き方の指針は読みやすさ。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "可視化",
+   "reading": "かしか",
+   "pos": "noun",
+   "meaning": "visualization",
+   "defJa": "見えるようにすること",
+   "passage": {
+    "ja": "頭の中だけで考えていると、不安は実際より大きく見える。紙に書き出し、可視化してみれば、悩みの多くが、じつは三つか四つの具体的な問いに整理できることに気づく。見えないものは、扱いようがない。しかし、見えるようにした途端に、人はそれを動かし、並べ替え、手放すことができるのである。反芻という堂々巡りを断つ最初の一歩は、考えることではなく、取り出して眺めることなのかもしれない。",
+    "form": "可視化",
+    "en": "When we think only inside our heads, anxiety looks bigger than it really is. If you write it on paper and make it visible, you notice that many worries can in fact be sorted into three or four concrete questions. What cannot be seen cannot be handled. But the moment it is made visible, a person can move it, rearrange it, and let it go. The first step to cutting the endless circle of rumination may be not thinking but taking it out and looking at it.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「データを可視化する」「悩みの可視化」。見えないものを図・文字で見えるようにする。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "台頭",
+   "reading": "たいとう",
+   "pos": "noun",
+   "meaning": "rise; emergence",
+   "defJa": "勢力が伸びて前面に出てくること",
+   "passage": {
+    "ja": "十九世紀の後半、ヨーロッパの外から新しい強国の台頭が始まります。アメリカは南北戦争を経て工業国へ姿を変え、日本は明治維新を経て、アジアで初めての近代国家をめざしました。この二国は、ともに、すでにある勢力均衡の中に、後から参入した側だったと言えます。新興の国と、既存の覇権国との摩擦は、歴史の中で何度も繰り返されてきたパターンなのです。彼らの動きは、既存の国々に、立場の見直しを迫りました。",
+    "form": "台頭",
+    "en": "In the latter half of the nineteenth century, the rise of new powers began from outside Europe. The United States transformed into an industrial nation after the Civil War, and Japan, after the Meiji Restoration, aimed to become Asia's first modern state. Both can be said to have been latecomers entering an already existing balance of power. Friction between a rising country and an established hegemon is a pattern that has repeated many times in history. Their moves forced the established countries to reconsider their positions.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「新興国の台頭」「頭角」と近い。それまで目立たなかった勢力が力をつけること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "史実",
+   "reading": "しじつ",
+   "pos": "noun",
+   "meaning": "historical fact",
+   "defJa": "歴史上実際にあった事実",
+   "passage": {
+    "ja": "歴史をわかりやすく語ろうとして、つい物語を盛りすぎてしまうことがあります。信長が本能寺で「是非に及ばず」と言ったという場面は有名ですが、史実としてどこまで確かなのかは、史料によって揺れがあります。話し手として誠実であるなら、「こう伝えられている」と「確かにこうだった」を、はっきり分けて語ることです。面白さを守りながら、根拠の線引きを聞き手に見せる。それが信頼につながります。",
+    "form": "史実",
+    "en": "In trying to tell history in an accessible way, we sometimes embellish the story too much. The scene in which Nobunaga is said to have said \"it cannot be helped\" at Honnoji is famous, but how far it is certain as historical fact varies depending on the sources. If you want to be honest as a speaker, clearly separate \"this is what is handed down\" from \"this is certainly how it was.\" While keeping the fun, show your listeners where the evidence draws the line. That leads to trust.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「史実に基づく」「史実と異なる」。歴史上実際にあったとされる事実。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "史料",
+   "reading": "しりょう",
+   "pos": "noun",
+   "meaning": "historical sources",
+   "defJa": "歴史研究のよりどころとなる資料",
+   "passage": {
+    "ja": "歴史の勉強で面白いのは、同じ出来事でも、史料によって書いてあることが違うところなんですよね。勝った側の記録は、自分たちに都合よく書かれている反面、負けた側のは恨みがこもってたりする。だから歴史家は、一つの記録を鵜呑みにしないで、いくつか突き合わせて、食い違いを洗い出し、史実に近いところを絞り込んでいく。まるで探偵みたいで、その作業を想像するだけでちょっとわくわくしてきませんか。",
+    "form": "史料",
+    "en": "What's fun about studying history is that, even for the same event, what is written differs depending on the source. Records by the winning side are written to suit themselves, while those of the losing side are sometimes laced with grudges. So historians don't swallow a single record whole; they cross-check several and narrow down what is close to the historical facts. It's just like a detective, and doesn't it excite you just to imagine that work?",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「史料を読み解く」「一次史料」。歴史研究の根拠となる文書・遺物。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "史観",
+   "reading": "しかん",
+   "pos": "noun",
+   "meaning": "historical outlook",
+   "defJa": "歴史を見る見方・立場",
+   "passage": {
+    "ja": "同じ歴史でも、誰が語るかによって、まったく違う物語になる。その分かれ目にあるのが史観である。経済の仕組みが歴史を動かすと考える立場もあれば、偉大な指導者の決断を重んじる立場もあり、どの史実を選び、どう並べるかに、語り手の見方がにじむ。マルクス主義のように体系だった見方は、見通しを与えてくれる反面、例外を切り捨てる危うさも抱える。大切なのは、読み手が自分の立ち位置を意識しておくことだと専門家は説く。",
+    "form": "史観",
+    "en": "The same history becomes an entirely different story depending on who tells it. What marks the dividing line is the historical outlook. Some hold that economic structures move history, others stress the decisions of great leaders, and in which facts one chooses and how one arranges them, the narrator's view seeps through. A systematic view like Marxism gives a perspective but also carries the danger of discarding exceptions. What matters, experts say, is that readers be conscious of their own standpoint.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「皇国史観」「唯物史観」など。歴史全体をどう捉えるかという基本的な立場。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "合理化",
+   "reading": "ごうりか",
+   "pos": "noun",
+   "meaning": "rationalization",
+   "defJa": "もっともらしい理由で自分を正当化すること",
+   "passage": {
+    "ja": "人は、自分の失敗や劣等感を、もっともらしい理由で飾らずにはいられない生き物です。「忙しかったから仕方ない」「みんなやっているから」。心理学ではこれを合理化と呼び、自分を守るための無意識のしくみだとされています。語り手が気をつけたいのは、人前で話すとき、自分の言い訳を、いつの間にか「事実の説明」として語ってしまうことです。話す前に、「これは理由か、それとも言い訳か」と自問する習慣が、話の誠実さを守ってくれます。",
+    "form": "合理化",
+    "en": "People are creatures who cannot help dressing up their failures and inferiority complexes with plausible reasons. \"I was busy, so it cannot be helped,\" \"everyone is doing it.\" Psychology calls this rationalization and regards it as an unconscious mechanism for protecting oneself. What a speaker should watch out for is, when speaking in public, unknowingly presenting one's own excuses as \"an explanation of the facts.\" A habit of asking yourself before speaking, \"is this a reason or an excuse?\" protects the sincerity of your talk.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "心理学の防衛機制。「自己の行動を合理化する」。経営の効率化の意味とは別。",
+    "sense": "自己正当化の意味"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "同業組合",
+   "reading": "どうぎょうくみあい",
+   "pos": "noun",
+   "meaning": "guild; trade association",
+   "defJa": "同じ職業の人が作る組合",
+   "passage": {
+    "ja": "中世ヨーロッパの商工業の都市では、同業組合が、職人の暮らしと技術を守る要でした。親方、職人、徒弟という階層があり、親方になるには、長い年月の修業と、自作の作品の審査を通らなければなりません。この仕組みは、品質を保つ一方で、新しい人の参入を拒む壁にもなりました。歴史を語るとき、制度の良い面と悪い面を、一つの具体例の中で同時に見せられると、聞き手は立体的に理解できます。",
+    "form": "同業組合",
+    "en": "In medieval European cities, the guild was the linchpin protecting craftsmen's livelihoods and skills. There were ranks of master, journeyman and apprentice, and to become a master one had to pass long training and an examination of one's own work. While this system maintained quality, it also became a wall refusing the entry of newcomers. When telling history, if you can show both the good and bad sides of an institution at once within a single concrete example, listeners understand it in three dimensions.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「同業組合」はギルド・座・株仲間など。職人の技術と利益を守る組織。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "同盟国",
+   "reading": "どうめいこく",
+   "pos": "noun",
+   "meaning": "ally",
+   "defJa": "同盟を結んでいる国",
+   "passage": {
+    "ja": "第一次世界大戦って、もともとはバルカン半島の小さな事件だったのに、同盟国どうしが次々に巻き込まれて、あっという間に世界規模になっちゃったんですよね。オーストリアがセルビアに宣戦すると、ロシア、ドイツ、フランス、イギリスと、約束された助け合いが連鎖して、誰も止められなくなった。助けるつもりの同盟が、かえって戦火を広げてしまったわけです。この皮肉は、勢力均衡を守るための仕組みが、逆に危うさを生んだ、という話でもありますよね。",
+    "form": "同盟国",
+    "en": "The First World War began as a small incident in the Balkans, but allies were dragged in one after another, and it became global in no time. When Austria declared war on Serbia, the promised mutual aid chained through Russia, Germany, France and Britain, and nobody could stop it. Alliances meant to help ended up spreading the flames. This irony is also a story of how a mechanism for preserving the balance of power instead created fragility.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「同盟国と協力する」。同盟を結んだ相手国。第一次大戦の「同盟国」陣営とは別に使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  }
+ ]
+}
