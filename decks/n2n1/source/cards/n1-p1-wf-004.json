@@ -837,28 +837,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ヒント",
-   "reading": "ヒント",
-   "pos": "noun",
-   "meaning": "hint; clue",
-   "defJa": "手がかり。解決への示唆",
-   "passage": {
-    "ja": "考古学者が、土器の破片の成分をもとに失われた交易路を割り出した。決め手になったのは、粘土に含まれるごくわずかな違いである。たとえば、焼き色のむらや縁の厚みから、窯の温度や作り手の癖まで読み取れることがある。そうした小さなヒントを見逃さない姿勢が、文献の乏しい時代の歴史を描き出す鍵となる。調査チームは、同じ手法を近隣の遺跡にも広げ、交易の地図を少しずつ描き直していく方針だ。",
-    "form": "ヒント",
-    "en": "An archaeologist worked out a lost trade route from the composition of pottery fragments. The deciding factor was the tiniest difference in the clay. From uneven firing colors or the thickness of a rim, for example, one can sometimes read even the kiln's temperature and the maker's habits. The habit of never overlooking small hints like these is the key to portraying eras poor in written records. The research team plans to extend the same method to neighboring sites and redraw the map of trade bit by bit.",
-    "register": "報",
-    "topic": "history",
-    "tipJa": "「ヒントを得る」「ヒントになる」と組む。手がかりの意味。",
-    "sense": ""
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "フォーム",
    "reading": "フォーム",
    "pos": "noun",

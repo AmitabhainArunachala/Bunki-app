@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "応急",
+   "reading": "おうきゅう",
+   "pos": "noun",
+   "meaning": "emergency; stopgap",
+   "defJa": "急な事態に、ひとまず対応すること。",
+   "passage": {
+    "ja": "試験の前夜に苦手な範囲が見つかると、心細い気持ちになり、眠る時間を削ってでも全部を覚えたくなります。要点だけを紙にまとめるのは応急の対策として役立ちますが、それで理解が完成したと思うと、同じ所でまた迷います。試験を終えたら、答えを見ずに説明できなかった箇所を改めて確かめてください。焦って無理に勉強を続けたあげく、復習そのものが嫌になっては残念です。その場を乗り切る工夫と、時間をかけて身につける練習の違いを知っておくと、学習計画を立て直せます。",
+    "form": "応急",
+    "en": "Finding a weak area on the night before an exam can make you feel uneasy and want to learn everything even at the expense of sleep. Writing down just the key points can serve as an emergency measure, but assuming that this completes your understanding will leave you confused in the same places again. After the exam, revisit the points you could not explain without looking at the answers. It would be unfortunate to force yourself to keep studying in a panic only to end up disliking revision itself. Recognising the difference between getting through an immediate difficulty and practising for lasting mastery allows you to rebuild your study plan.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「応急の対策」は、その場の困難にひとまず対応する手段です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "頭",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "counter for large animals",
+   "defJa": "牛や馬などを数える語。",
+   "passage": {
+    "ja": "牧場の日記に牛が三頭生まれたとあれば、数え方だけでも大きな動物のいる場面が浮かびます。小さい生き物によく使う匹とは、語から受ける印象も少し異なります。ただし、生まれたばかりの牛にも同じ単位を使うので、その場の体の重量だけでは使い分けを説明しきれません。文章を声に出すにあたっては、何を数える単位なのかに加えて、数字と続いたときの読みも確認します。知っている漢字が並んでいても、まとまりとして発音できるかを確かめる時間が要ります。",
+    "form": "頭",
+    "en": "If a farm diary says that three calves were born, the counter itself evokes a setting with large animals. Its impression differs somewhat from hiki, which is often used for smaller creatures. Yet the same counter applies to a newborn calf, so the weight of the body in front of us cannot fully explain the choice. When reading a passage aloud, check not only what the unit counts but also how it is pronounced after a numeral. Even if the characters are individually familiar, you need time to verify that you can pronounce the combination.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "ここでは「とう」と読み、牛などの動物を数える助数詞です。",
+    "sense": "牛や馬などを数える助数詞。"
+   }
+  }
+ ]
+}

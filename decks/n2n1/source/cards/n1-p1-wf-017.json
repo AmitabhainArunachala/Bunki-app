@@ -221,28 +221,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "準ずる",
-   "reading": "じゅんずる",
-   "pos": "verb",
-   "meaning": "to correspond to; to be based on",
-   "defJa": "それを基準にして同様に扱う",
-   "passage": {
-    "ja": "契約書や条文には、つい読み流してしまう言葉が潜んでいます。たとえば「正社員に準ずる待遇」とあれば、全く同じではないが、それに近い扱いをするという意味になります。「同じ」と「近い」のあいだには、思いのほか大きな隔たりがあります。この距離感を押さえておかないと、契約の意図を損ないかねません。法律の日本語は、一語一語が重い責任を負いながら、条文のなかで静かに働いているのです。",
-    "form": "準ずる",
-    "en": "Contracts and statutes hide words that are easy to skim past. For example, if a clause says treatment that corresponds to that of regular employees, it means treatment that is not identical but close. Between the same and close there is an unexpectedly large gap. If you do not grasp this distance, you may end up undermining the intent of the contract. In legal Japanese, every single word carries heavy responsibility and works quietly within the clauses.",
-    "register": "講",
-    "topic": "language",
-    "tipJa": "「〜に準ずる」は同等ではなく近い扱い。「準じる」とも言う。",
-    "sense": "基準にして同様に扱う"
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "痛める",
    "reading": "いためる",
    "pos": "verb",

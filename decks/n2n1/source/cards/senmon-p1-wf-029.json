@@ -705,28 +705,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "圧縮",
-   "reading": "あっしゅく",
-   "pos": "noun",
-   "meaning": "compression, condensation",
-   "defJa": "大きなものを小さくまとめること",
-   "passage": {
-    "ja": "人工知能の世界で「圧縮」と言えば、データ容量を小さくすることだけを指すわけではありません。大規模言語モデルは、膨大な文章をもとに、誤差の勾配をたどって調整された数十億個のパラメータに、規則性を凝縮したものだと見ることもできます。この見方に立てば、学習とは世界の情報を小さな形に畳み込む営みです。人間の勉強も同じで、ノート一冊に要点を畳めたとき、初めて理解したと言えるでしょう。",
-    "form": "圧縮",
-    "en": "In the world of artificial intelligence, “compression” does not refer only to making data smaller. A large language model can also be seen as condensing regularities from vast amounts of text into billions of parameters tuned by following the gradient of error. From this view, learning is the work of folding the world’s information into a small form. Human study is the same: only when you can fold the essentials into a single notebook can you say you have understood.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "「データを圧縮する」から、情報や考えを凝縮する比喩にも広がる",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "回復力",
    "reading": "かいふくりょく",
    "pos": "noun",

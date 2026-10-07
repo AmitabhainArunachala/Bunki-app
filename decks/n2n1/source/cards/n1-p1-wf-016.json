@@ -89,28 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "悪癖",
-   "reading": "あくへき",
-   "pos": "noun",
-   "meaning": "bad habit",
-   "defJa": "身についてしまった良くないくせ",
-   "passage": {
-    "ja": "爪を噛む、貧乏ゆすりをする、夜更かしを繰り返す。こうした悪癖は意志の弱さではなく、報酬系の学習の結果だとする見方が研究者の間で広まっている。実際、叱るだけでは効果は薄く、きっかけとなる状況そのものを変えたほうが成果は出やすいという。とはいえ、本人が慢性的な疲労を抱えていれば、改善が思うように進まない恐れがある。専門家の間で勧められているのは、癖を無理に消すのではなく、同じきっかけで別の行動を起こす置き換えの方法である。",
-    "form": "悪癖",
-    "en": "Biting nails, jiggling a leg, staying up late again and again. Many researchers now see such bad habits not as weakness of will but as the result of reward-system learning. In fact, scolding alone has little effect, and changing the very situation that triggers the habit is said to work better. That said, if the person is carrying chronic fatigue, improvement may well fail to go as hoped. What experts commonly recommend is not forcibly erasing a habit but replacing it, taking a different action at the same trigger.",
-    "register": "報",
-    "topic": "mind",
-    "tipJa": "「悪癖を直す」「悪癖がつく」のように、良くない習慣を指す改まった語。",
-    "sense": ""
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "故意",
    "reading": "こい",
    "pos": "noun",

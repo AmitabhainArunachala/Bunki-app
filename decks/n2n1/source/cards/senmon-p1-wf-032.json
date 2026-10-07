@@ -903,28 +903,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "心理言語学",
-   "reading": "しんりげんごがく",
-   "pos": "noun",
-   "meaning": "psycholinguistics",
-   "defJa": "言語と心の関係を研究する分野",
-   "passage": {
-    "ja": "赤ちゃんは、教えられてもいないのに、どうして文法を身につけるのでしょうか。この疑問に実験で迫るのが心理言語学という分野です。「ワンワン」のように音をまねた言葉は、乳児が語彙を増やす助けになるのではないかという研究があります。もっとも、言葉の意味論を頭で理解することと、実際に話せることのあいだには、まだ大きな溝が残されています。言葉を覚える順序や、聞き間違いの傾向までが、研究の対象になります。",
-    "form": "心理言語学",
-    "en": "How do babies acquire grammar when nobody has even taught them? The field that approaches this question through experiments is called psycholinguistics. There is research asking whether words that imitate sounds, like \"wanwan\" for a dog, may help infants build their vocabulary. Still, a big gap remains between understanding the semantics of language in your head and actually being able to speak. Even the order in which words are learned and the tendencies in mishearing become objects of study.",
-    "register": "講",
-    "topic": "language",
-    "tipJa": "実験や観察で言語の習得・処理を調べる学問。学問名は「〜学」。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "情緒不安定",
    "reading": "じょうちょふあんてい",
    "pos": "noun",

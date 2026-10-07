@@ -507,28 +507,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "唱える",
-   "reading": "となえる",
-   "pos": "verb",
-   "meaning": "to chant, to recite",
-   "defJa": "声に出して読む。主張する。",
-   "passage": {
-    "ja": "インド南部のある古い寺院では、まだ暗い夜明け前から僧侶たちがサンスクリット語の経文を唱える声が響き始める。遠くから訪れた参拝者は、意味を完全に理解していなくとも、その音の連なりに耳を傾けるだけで心が静まるという。近年は、こうした朗唱が呼吸や心拍、さらには脳の活動に与える影響を調べる研究も進みつつある。信仰の営みと科学とが、密接に結びつく時代になったといえよう。",
-    "form": "唱える",
-    "en": "At an old temple in southern India, in the dark before dawn, the sound of monks chanting Sanskrit scriptures begins to echo. Worshippers who have come from afar are said to find their minds calmed merely by listening to the sequence of sounds, even without fully understanding the meaning. In recent years, research into how such recitation affects breathing, heart rate and even brain activity has also been advancing. One might say we have entered an age in which devotional practice and science are closely linked.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「念仏を唱える」「呪文を唱える」。声に出して述べる意味で、仏教の場面によく出る。",
-    "sense": "声に出して読む"
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "存続",
    "reading": "そんぞく",
    "pos": "noun",

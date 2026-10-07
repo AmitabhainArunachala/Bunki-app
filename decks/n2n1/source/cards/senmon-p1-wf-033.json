@@ -89,28 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "探究心",
-   "reading": "たんきゅうしん",
-   "pos": "noun",
-   "meaning": "spirit of inquiry",
-   "defJa": "物事を探り究めようとする心",
-   "passage": {
-    "ja": "子どもは「なんで？」を一日に何十回も口にします。この探究心は、大人になるにつれて、「役に立つか」「テストに出るか」という物差しに押されて、しぼんでいきがちです。ところが、後から高く評価されるような大きな発見は、むしろ役に立つかどうかを問わない好奇心から生まれることが多いのです。もし最近、何かを調べていて夜更かしした覚えがないなら、少し心の余裕をつくって、自分の「なんで？」を取り戻してみてください。",
-    "form": "探究心",
-    "en": "Children say \"why?\" dozens of times a day. This spirit of inquiry tends to wither as they grow up, pressed by yardsticks like \"will it be useful?\" and \"will it be on the test?\" Yet great discoveries that are highly valued later are often born from curiosity that doesn't ask whether something is useful. If you can't remember staying up late recently because you were looking into something, try making a little breathing room and take back your own \"why?\"",
-    "register": "講",
-    "topic": "mind",
-    "tipJa": "「探究心が旺盛だ」。知りたい気持ちが深い。「好奇心」よりも究める方向。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "拠点",
    "reading": "きょてん",
    "pos": "noun",

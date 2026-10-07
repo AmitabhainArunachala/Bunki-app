@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "購入",
+   "reading": "こうにゅう",
+   "pos": "noun",
+   "meaning": "purchase",
+   "defJa": "代金を払って品物などを手に入れること。",
+   "passage": {
+    "ja": "商品を手に入れるという文には、それを借りたのか、譲り受けたのかが書かれていない。購入という語を選べば、代金を支払って得たという条件が加わる。広告の短い文章であれ、この違いを曖昧にすると、読み手は契約の内容を誤ることがある。月額の支払いで利用する仕組みなら、物を自分のものにする場合と区別して記す必要がある。魅力を伝える表現を整える前に、読み手に何を約束し、どの費用を負担してもらうのかを確かめることが、言葉への信頼を支える。",
+    "form": "購入",
+    "en": "A sentence saying that someone obtains a product does not state whether they borrowed it or received it as a gift. Choosing the word purchase adds the condition that money was paid to acquire it. Even in a short advertisement, blurring this difference can cause readers to misunderstand the agreement. If the arrangement permits use for a monthly fee, it needs to be distinguished from making the object one’s own. Checking what is promised to readers and which expenses they must bear before polishing the appealing language supports trust in the wording.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "代金を払う点が中心で、借りたり無料でもらったりすることとは区別します。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "購読",
+   "reading": "こうどく",
+   "pos": "noun",
+   "meaning": "paid subscription; paid reading",
+   "defJa": "新聞や雑誌などを買って読むこと。",
+   "passage": {
+    "ja": "古い新聞の購読料を調べると、書かれた記事だけでは見えない読者の暮らしが研究の対象になる。紙面の値段が記録に残っていても、それだけで当時の負担の大きさを判断することはできない。同じ時期の賃金や、ほかの品物の価格と照らし合わせる必要がある。さらに、一部の新聞を複数の人が読んでいた可能性もあるため、販売部数を読者数と同じものとして扱うのは誤りを招きかねない。文字が誰の手に届き、どこで読まれたかという問いが、新聞を社会の中に置き直すのである。",
+    "form": "購読",
+    "en": "Examining historical newspaper subscription prices brings readers’ lives into focus in ways that the articles alone cannot. Even when the price of the paper is recorded, it cannot by itself establish how great an expense it represented. It must be compared with wages and the prices of other goods in the same period. Furthermore, because several people may have shared a single copy, treating circulation as identical to readership risks error. Asking whose hands the printed words reached and where they were read places the newspaper back in its social setting.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「購読料」は、新聞や雑誌などを買って読むために支払う料金です。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "質疑",
+   "reading": "しつぎ",
+   "pos": "noun",
+   "meaning": "questions; questioning",
+   "defJa": "説明などの不明な点について質問すること。",
+   "passage": {
+    "ja": "講演の最後に設ける質疑の時間は、感想を順番に述べる場とは役割が違います。聞き取れなかった条件や、説明だけでは分からない理由を確かめるために、まず質問を一つに絞ります。長い前置きで自分の論理を語るより、どの発言に関して尋ねたいのかを先に示すと、相手も答えやすくなります。答えを聞いてなお疑問が残った場合は、理解した部分と残った部分を分けて伝えてください。問いの焦点が見えれば、その場で聞いているほかの人にも、やり取りの意味が伝わります。",
+    "form": "質疑",
+    "en": "The question period at the end of a lecture serves a different purpose from taking turns expressing impressions. To check a condition you missed or a reason the explanation left unclear, first narrow your inquiry to one question. Rather than presenting your own reasoning in a long preamble, identify which statement you are asking about so that the speaker can respond more easily. If a doubt remains after the answer, distinguish what you understood from what remains unresolved. A clear focus also helps the other people listening understand the significance of the exchange.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「質疑の時間」は、説明を受けた側が不明点を尋ねるための時間です。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "軽快",
+   "reading": "けいかい",
+   "pos": "na-adj",
+   "meaning": "light and lively; brisk",
+   "defJa": "動きや調子が軽やかで快いさま。",
+   "passage": {
+    "ja": "朝の散歩で軽快な音楽を選ぶと、重い気分のまま歩いていたときとは、同じ道の感じ方も変わってきます。弾むようなリズムにつられ、次の角まで行ってみようと思える日もあるでしょう。ただし、歩く速さを無理に曲へ合わせる必要はなく、体への負担に応じて調整します。習慣を続けるには強い意志だけが必要だと思いがちですが、行動そのものを少し楽しめる工夫にも目を向けたいですね。運動の記録に距離だけでなく、その日に心地よかったことも残してみると、自分に合う続け方を探れます。",
+    "form": "軽快",
+    "en": "Choosing light, lively music for a morning walk can change how the same route feels compared with walking in a gloomy mood. On some days its bouncing rhythm may make you want to continue to the next corner. You do not need to force your walking pace to match the music, however, and should adjust it according to the strain on your body. Although it is easy to think that sustaining a habit requires only strong willpower, it is also worth finding ways to enjoy the activity itself a little. Recording what felt pleasant that day as well as the distance can help you find a way of continuing that suits you.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「軽快な音楽」は、リズムや調子が軽やかで気持ちよい音楽です。",
+    "sense": "音楽などの調子が軽やかで快いこと。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

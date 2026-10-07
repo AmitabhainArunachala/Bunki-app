@@ -661,28 +661,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "日清戦争",
-   "reading": "にっしんせんそう",
-   "pos": "noun",
-   "meaning": "First Sino-Japanese War",
-   "defJa": "一八九四年に始まった日本と清の戦争",
-   "passage": {
-    "ja": "一八九四年に始まった日清戦争は、日本にとって、近代国家としての実力を内外に示す機会となった。朝鮮への影響力をめぐる清との対立が発端であったが、結果として日本は、台湾の割譲と巨額の賠償金を得て、アジアの新興国から帝国主義の列強へと歩み出す。他方、この勝利が、のちの日露戦争へと続く道を整え、軍部の発言力を高めたことも見逃せない。戦争の成果を称える声の影に、見えにくくなった代償について、現代の私たちは考える必要がある。",
-    "form": "日清戦争",
-    "en": "The First Sino-Japanese War, which began in 1894, became for Japan an opportunity to show its strength as a modern state at home and abroad. It started from a confrontation with Qing over influence in Korea, but as a result Japan gained the cession of Taiwan and a huge indemnity and stepped from an emerging Asian nation toward the imperialist great powers. At the same time, we cannot overlook that this victory paved the way to the later Russo-Japanese War and raised the military's voice. We today need to think about the costs that became hard to see in the shadow of voices praising the war's gains.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "一八九四〜九五年。下関条約で終結。日露戦争へつながる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "時流",
    "reading": "じりゅう",
    "pos": "noun",

@@ -2,6 +2,19 @@
 
 You are a demanding native Japanese editor and fact-checker. You did not write these cards. For EVERY card, give two independent verdicts.
 
+The six valid register codes are the writer's codes below. Judge the prose against
+the assigned voice; do not reject a code for not being a generic label such as
+「書き言葉」.
+
+| Code | Voice |
+| ---- | ----- |
+| 講 | Lecture or book summary, addressing a learner |
+| 報 | News or analysis, written plain style, no first person |
+| 論 | Reflective essay or philosophy, written plain style |
+| 話 | Informal spoken conversation |
+| 学 | Learning science or study/exam coaching |
+| 語 | Craft of speaking or writing, including editing and word-choice advice |
+
 ## Lane A: editor
 
 Pass only if ALL hold:

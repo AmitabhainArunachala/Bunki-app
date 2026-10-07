@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "怠惰",
+   "reading": "たいだ",
+   "pos": "na-adj",
+   "meaning": "lazy; idle",
+   "defJa": "なすべきことをせず怠けているさま",
+   "passage": {
+    "ja": "机に向かわず動画ばかり見ている自分を、怠惰な人間だと責めてしまうことはありませんか。けれども、予定どおりに勉強できなかったからといって、意志力の弱さだけが原因だと決めつけるのは早いですよね。取りかかる課題が曖昧だったのか、疲れていたのか、その日の状況を一つずつ確かめてみてください。性格の問題だという思い込みをいったん脇に置けば、机に本を出しておくなど、具体的に変えられる点も探せます。自分を裁く言葉を増やすより、明日の最初の一歩を小さく決めておきましょう。",
+    "form": "怠惰",
+    "en": "Do you ever call yourself a lazy person for watching videos instead of sitting down at your desk? But just because you failed to study as planned, it is too early to decide that weak willpower was the only cause. Check the circumstances of that day one by one, such as whether the task was unclear or you were tired. If you set aside the assumption that your personality is the problem, you can also look for concrete things to change, such as putting a book on your desk. Instead of finding more words to judge yourself with, decide on a small first step for tomorrow.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「怠惰な人間」のように、なすべきことを怠る態度を厳しく評する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

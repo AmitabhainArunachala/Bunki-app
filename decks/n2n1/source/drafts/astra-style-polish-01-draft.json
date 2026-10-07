@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "非公式",
+   "reading": "ひこうしき",
+   "pos": "na-adj",
+   "meaning": "unofficial; informal",
+   "defJa": "正式な手続きや立場によらないさま。",
+   "passage": {
+    "ja": "授業後の廊下では質問できるのに、教室で手を挙げるとなると、言葉が出なくなることがあります。先生との非公式なやり取りでは、答えを評価されるという意識が薄れ、自分の疑問を出しやすいのでしょう。ただし、その場の助言だけで、試験の採点方針まで変わったと受け取るのは早計です。専門用語に関して聞いた話と、提出方法について確認したことを、あとでノートに分けて書くと整理できます。質問する機会を増やすことと、聞いた話の位置づけを確かめることを組み合わせれば、学びを支える好循環を作れます。",
+    "form": "非公式",
+    "en": "Sometimes we can ask a question in the corridor after class but cannot find the words when it comes to raising a hand in the classroom. In an informal exchange with a teacher, reduced awareness of being assessed may make it easier to express our questions. It is premature, however, to take advice given there alone as a change in the grading policy for an exam. We can organize what we heard by noting explanations concerning technical terms separately from information about how to submit work. Combining more opportunities to ask questions with checking the status of what we hear can create a positive cycle that supports learning.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「非公式な相談」「非公式の見解」。秘密であることを必ずしも意味しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "擬音語",
+   "reading": "ぎおんご",
+   "pos": "noun",
+   "meaning": "word imitating a sound",
+   "defJa": "物の音をまねて表したことば。",
+   "passage": {
+    "ja": "窓を「こんこん」とたたく音を「どんどん」に変えると、同じ動作でも、訪ねてきた人の様子が違って聞こえます。擬音語を選ぶ際には、音の大きさだけでなく、硬さや間隔にも耳を向けたいところです。ただし、音を写した言葉だけでは人物の怒りまで確定できず、状況を合わせて読む必要があります。文章の目的に応じて、小論文では動作を平明に記し、物語では前後の描写と合わせて響きを選ぶ、といった書き分けができます。録音を聞きながら二つの表現を書き比べると、音そのものと、そこから受ける印象の違いを意識できます。",
+    "form": "擬音語",
+    "en": "Changing the sound of knocking on a window from “kon kon” to “don don” makes the visitor seem different even though the action is the same. When choosing a word that imitates a sound, we should listen not only to volume but also to hardness and intervals. A word representing a sound alone cannot establish that a character is angry, however, so it must be read together with the situation. Depending on the purpose of the text, you can vary your writing by describing the action plainly in a short essay and choosing sounds to fit the surrounding description in a story. Comparing two written expressions while listening to a recording helps us distinguish the sound itself from the impressions it creates.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「ざあざあ」「こんこん」など。音のない状態を表す擬態語と区別する。",
+    "sense": ""
+   }
+  }
+ ]
+}
