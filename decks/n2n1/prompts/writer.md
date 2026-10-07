@@ -13,6 +13,24 @@ For EVERY item in the batch, write one card. The batch gives you the `term`, its
 - **Natural, idiomatic Japanese a native editor would accept.** No translationese, no textbook stiffness, no 「〜について説明します」 framing. Keep register markers consistent: no です・ます in a である essay, no written style in casual talk.
 - **Facts are checkable, or left out.** Dates, names, numbers and attributions are right or absent. Real people only as in the public record, never quoted at length. No partisan framing. Never invent statistics or quotes.
 
+## Variety (these cards are read hundreds at a time)
+
+- Write in the voice of the register you were given, and let it show: a 報 card reads like a news analysis, a 話 card like two people talking, a 論 card like an essay.
+- **No stock openings:** 「今日は〜の話をしましょう」「皆さん、」「〜について考えてみましょう」「〜をご存じですか」.
+- **No stock closings:** 「つまり〜なんですね」「〜というわけです」「〜かもしれません」 as an automatic last line.
+- Start in the middle of something concrete (a scene, a fact, a claim, a question someone really asks). Vary sentence length; one short sentence among long ones is good.
+
+## Reinforcement: the cards compound each other
+
+- **Weave in 1–3 other words from the batch's `weave` list** (other words the learner is studying) wherever they fit naturally, unmarked. Every word then also appears in other cards, in other contexts, and the deck reinforces itself.
+- **Use at least one N2 or N1 grammar pattern** from `decks/n2n1/source/grammar-n2n1.txt`, naturally (〜にほかならない, 〜を余儀なくされる, 〜ともなると…).
+- **Prefer real compounds and kanji families:** the passage may use a compound that shares a kanji with the target, and `tipJa` may name one (覇権 → 覇者・覇気).
+- **Model the best passages on JLPT N1 読解 texts** (editorials, essays, explanations of an idea), as well as on his books and channels.
+
+## What to write about
+
+His fields come first: mind and learning, Indian and Buddhist philosophy and Advaita, AI and semiconductors, world history, Japanese about Japanese. Bring in anything else a curious, cultured adult would find fascinating: science, art, architecture, food, nature, myth, economics, travel, craftsmanship, sport, cities. If the topic isn't one of his five, use `"other"` as the topic code.
+
 ## Registers
 
 | Code | Register                     | Sounds like                                             |
@@ -48,7 +66,7 @@ Return a JSON object `{"cards": [...]}`, with one object per batch item, in the 
     "form": "the target exactly as written in ja",
     "en": "a faithful, natural English translation with the SAME number of sentences as ja",
     "register": "the register given",
-    "topic": "the topic you used (mind | india | ai | history | language)",
+    "topic": "the topic you used (mind | india | ai | history | language | other)",
     "tipJa": "one Japanese line, at most 80 characters, no Latin letters: what this passage shows about the word (its partners, its register, its sense)",
     "sense": "the dictionary sense used here, one Japanese line, at most 40 characters, when the word has more than one sense; otherwise \"\""
   }

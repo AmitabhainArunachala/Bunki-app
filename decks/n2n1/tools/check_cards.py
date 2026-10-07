@@ -55,8 +55,8 @@ def check(card: dict) -> list[str]:
         bad.append(str(e))
     if p.get("register") not in ex.REGISTERS:
         bad.append(f"register {p.get('register')!r} is not one of {''.join(ex.REGISTERS)}")
-    if p.get("topic") not in ex.TOPICS:
-        bad.append(f"topic {p.get('topic')!r} is not one of {', '.join(ex.TOPICS)}")
+    if p.get("topic") not in (*ex.TOPICS, "other"):
+        bad.append(f"topic {p.get('topic')!r} is not one of {', '.join(ex.TOPICS)}, other")
     if rec["form"] and rec["form"] in rec["ja"] and not on_token_edges(rec["ja"], rec["form"]):
         bad.append(f"the target {rec['form']} sits inside a longer word")
     d = card.get("defJa", "")

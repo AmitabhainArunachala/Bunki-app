@@ -35,6 +35,7 @@ TOPICS = {
     "ai": ("AI・半導体", "AI and semiconductors"),
     "history": ("世界史", "World history"),
     "language": ("日本語", "Japanese about Japanese"),
+    "other": ("教養", "Wider interests"),
 }
 DECKS = {
     "n2": ("N2・文章で覚える", "N2 vocabulary · passages", "ai"),

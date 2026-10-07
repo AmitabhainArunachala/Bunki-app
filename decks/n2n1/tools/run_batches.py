@@ -58,6 +58,15 @@ def ask(model: str, prompt: str, payload: dict, key: str) -> tuple[list | None, 
     return None, {"model": model, "secs": round(time.time() - t0), "error": err}
 
 
+def merge_verdicts(verdicts) -> dict[str, dict]:
+    """the judge sometimes returns one object per lane (editor, facts) for the same card: merge them"""
+    out: dict[str, dict] = {}
+    for x in verdicts or []:
+        if isinstance(x, dict) and x.get("term"):
+            out.setdefault(x["term"].strip(), {}).update({k: v for k, v in x.items() if v not in (None, "")})
+    return out
+
+
 def item_for(t: dict, pass_no: int) -> dict:
     topic = t.get("field") or ROTATE[int(hashlib.sha1(t["term"].encode()).hexdigest(), 16) % len(ROTATE)]
     return {"term": t["term"], "reading": t["reading"], "gloss": t["gloss"], "level": t["level"],
@@ -75,7 +84,7 @@ def run_batch(bid: str, targets: list[dict], pass_no: int) -> dict:
     def judge(cards: list[dict]) -> dict[str, dict]:
         verdicts, info = ask(JUDGE, PROMPT_J, {"cards": cards}, "verdicts")
         log.write(json.dumps({"step": "judge", **info, "verdicts": verdicts}, ensure_ascii=False) + "\n")
-        return {v.get("term", "").strip(): v for v in (verdicts or []) if isinstance(v, dict)}
+        return merge_verdicts(verdicts)
 
     cards, info = ask(WRITER, PROMPT_W, {"items": items}, "cards")
     log.write(json.dumps({"step": "write", **info, "cards": cards}, ensure_ascii=False) + "\n")
