@@ -76,6 +76,12 @@ function levelPhrase(grading) {
  * (2026-08-07): more separation between layers, and navigation a learner can
  * read before they can read Japanese. */
 const VARIANTS = {
+  nav: {
+    ticket: null,
+    label: 'ナビゲーション',
+    en: 'navigation',
+    options: [['tabs', '五つの入口', 'five destinations'], ['legacy', '従来の入口', 'legacy doors']],
+  },
   cards: {
     ticket: 38,
     label: 'A 札の形 #38',
@@ -427,6 +433,7 @@ const S = {
   dials: { kanji: 0, furigana: 1, spacing: 0 },
   // entry: 'drift' — The Walk's first step is arriving in the living universe
   variants: {
+    nav: 'tabs',
     cards: 'mcd',
     difficulty: 'three',
     contrast: 'wcag',
@@ -4084,7 +4091,7 @@ async function boot() {
       // Choosing a front door must never summon the operator debug strip —
       // the fixed strip swallows taps (filed by three review lanes). The
       // strip remains reachable explicitly via ?variants=1.
-      if (key !== 'entry') anyVariantParam = true;
+      if (key !== 'entry' && key !== 'nav') anyVariantParam = true;
     }
   }
   S.variantsBar = anyVariantParam;
@@ -4137,6 +4144,8 @@ async function boot() {
         location.assign(url);
       },
     });
+    buildPrimaryTabs($('#app'), { personal: true });
+    stampRegister();
     return;
   }
   if (params.get('dials')) {
@@ -4160,6 +4169,12 @@ async function boot() {
   if (['kotoba', 'mcd', 'n2', 'n1', 'senmon'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
     S.view = 'deckplay';
     S.deckPlay = ['n2', 'n1', 'senmon'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+  }
+  // Private collections leave through the same five destinations on a fresh
+  // host page. These are UI routes only, never learner-record state.
+  if (PRIMARY_TABS.some(tab => tab.view === params.get('room'))) {
+    S.view = params.get('room');
+    if (S.view === 'search') S.searchFrom = 'shelf';
   }
 
   render();
@@ -21851,9 +21866,17 @@ function renderDeckPlay(main) {
 
 function renderFocus(main) {
   main.append(withEn(el('h1', 'view-title', '集中道場'), 'the focus dojo', 'en-inline'));
-  renderStudyHall(main);
-  main.append(withEn(el('p', 'eyebrow', '集中'), 'a focus block', 'en-inline'));
-  main.append(
+  const guided = el('section', 'learn-section');
+  guided.dataset.learnSection = 'guided';
+  renderStudyHall(guided);
+  const decks = el('section', 'learn-section');
+  decks.dataset.learnSection = 'decks';
+  renderDojoDecks(decks);
+  const focus = el('section', 'learn-section');
+  focus.dataset.learnSection = 'focus';
+  main.append(guided, decks, focus);
+  focus.append(withEn(el('p', 'eyebrow', '集中'), 'a focus block', 'en-inline'));
+  focus.append(
     el(
       'p',
       'gloss',
@@ -21864,10 +21887,9 @@ function renderFocus(main) {
     ),
   );
 
-  renderDojoDecks(main);
 
-  main.append(withEn(el('p', 'eyebrow', '集中ブロック'), 'timed block', 'en-inline'));
-  main.append(withEn(el('p', 'eyebrow', '時間'), 'how long', 'en-inline'));
+  focus.append(withEn(el('p', 'eyebrow', '集中ブロック'), 'timed block', 'en-inline'));
+  focus.append(withEn(el('p', 'eyebrow', '時間'), 'how long', 'en-inline'));
   const mins = el('div', 'focus-choices');
   S.focusMin = S.focusMin || 20;
   for (const m of FOCUS_MINUTES) {
@@ -21883,9 +21905,9 @@ function renderFocus(main) {
     });
     mins.append(b);
   }
-  main.append(mins);
+  focus.append(mins);
 
-  main.append(withEn(el('p', 'eyebrow', '何を'), 'what to drill', 'en-inline'));
+  focus.append(withEn(el('p', 'eyebrow', '何を'), 'what to drill', 'en-inline'));
   const forecast = srsForecast();
   const due = forecast.today + forecast.fresh;
   const modes = el('div', 'focus-modes');
@@ -21909,10 +21931,10 @@ function renderFocus(main) {
     });
     modes.append(b);
   }
-  main.append(modes);
+  focus.append(modes);
 
   if (S.focusEmpty) {
-    main.append(
+    focus.append(
       el(
         'div',
         'sem-empty',
@@ -21928,7 +21950,7 @@ function renderFocus(main) {
   const start = biLabel('button', 'take focus-start', 'はじめる', 'begin the block');
   start.type = 'button';
   start.addEventListener('click', () => startFocus(S.focusMin, S.focusMode));
-  main.append(start);
+  focus.append(start);
 }
 
 /* ------------------------------------------------------------- 読み探査
@@ -28220,6 +28242,124 @@ function buildGingaChrome(root) {
   root.append(shelf, sensei);
 }
 
+/** The shell has one label table; rooms retain their existing navigation paths. */
+const PRIMARY_TABS = [
+  { id: 'today', ja: '今日', en: 'Today', view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
+  { id: 'read', ja: '読む', en: 'Read', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
+  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
+  { id: 'words', ja: '辞書', en: 'Words', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
+  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'personaldeck', 'settings'] },
+];
+function buildPrimaryTabs(root, { personal = false } = {}) {
+  const show = S.variants.nav === 'tabs' && (S.ready || personal) &&
+    !['drift', 'entry'].includes(S.view) && !document.body.classList.contains('zen') &&
+    !S.stack.length && !S.strokes;
+  document.body.classList.toggle('has-primary-tabs', show);
+  if (!show) return;
+  const bar = el('nav', 'primary-tabs');
+  bar.id = 'primary-tabs';
+  bar.setAttribute('aria-label', tx('主な入口', 'Main destinations'));
+  for (const tab of PRIMARY_TABS) {
+    const button = el('button', 'primary-tab', tx(tab.ja, tab.en));
+    button.type = 'button';
+    button.id = `tab-${tab.id}`;
+    if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
+    button.addEventListener('click', () => {
+      if (personal) {
+        const url = new URL(location.href);
+        url.searchParams.delete('deck'); url.searchParams.delete('dojo');
+        url.searchParams.set('entry', 'shelf'); url.searchParams.set('room', tab.view);
+        url.searchParams.set('ui', S.lang);
+        location.assign(url); return;
+      }
+      if (S.view === tab.view) return;
+      closeWorldPicker();
+      S.captureOpen = false;
+      S.navOpen = false;
+      if (tab.view === 'search') { openSearchPage(); return; }
+      if (tab.view === 'me') keepNavigationReturn('me', button);
+      else keepScroll();
+      if (tab.view === 'tray') S.trayFrom = { view: S.view, scroll: Math.round(window.scrollY) };
+      S.stack = [];
+      S.view = tab.view;
+      render();
+      window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
+    });
+    bar.append(button);
+  }
+  root.append(bar);
+}
+
+/** Hub doors use the existing return frames, including exact reader positions. */
+function foundationDoor(id, ja, en, view, before) {
+  const button = biLabel('button', 'grammar-link foundation-door', ja, en);
+  button.type = 'button'; button.id = id;
+  button.addEventListener('click', () => {
+    keepNavigationReturn(view, button);
+    before?.();
+    S.view = view; render(); window.scrollTo(0, 0);
+  });
+  return button;
+}
+function openPersonalCollection() {
+  const url = new URL(location.href);
+  url.searchParams.delete('room'); url.searchParams.delete('dojo');
+  url.searchParams.set('deck', 'personal'); url.searchParams.set('ui', S.lang);
+  location.assign(url);
+}
+function renderMe(main) {
+  main.append(el('h1', 'view-title', tx('私', 'Me')));
+  main.append(el('p', 'gloss', tx('学びの足跡、集めた言葉、あなたのための設定。', 'Your progress, your collections, and the way you like to learn.')));
+  const doors = el('div', 'foundation-doors');
+  doors.append(
+    foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
+    foundationDoor('me-statistics', '復習の統計', 'Review statistics', 'srs-stats'),
+    foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
+    foundationDoor('me-settings', '設定', 'Settings', 'settings'),
+  );
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    const personal = biLabel('button', 'grammar-link foundation-door', '私の文脈', 'Personal collections');
+    personal.type = 'button'; personal.id = 'me-personal';
+    personal.addEventListener('click', openPersonalCollection); doors.append(personal);
+  }
+  main.append(doors);
+}
+function renderSettings(main) {
+  main.append(el('h1', 'view-title', tx('設定', 'Settings')));
+  const language = el('section', 'foundation-section');
+  language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
+  const choices = el('div', 'lang-seg settings-language');
+  choices.setAttribute('role', 'group'); choices.setAttribute('aria-label', tx('表示言語', 'Interface language'));
+  for (const [id, ja, en] of [['bi', '英語', 'English'], ['ja', '日本語', 'Japanese']]) {
+    const button = el('button', '', tx(ja, en)); button.type = 'button'; button.dataset.lang = id;
+    button.setAttribute('aria-pressed', String(S.lang === id));
+    button.addEventListener('click', () => { S.lang = id; render(); }); choices.append(button);
+  }
+  language.append(choices);
+  const world = biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
+  world.type = 'button'; world.id = 'settings-world'; attachWorldPicker(world);
+  const doors = el('div', 'foundation-doors');
+  doors.append(world,
+    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => { S.srsPrefsOpen = true; }),
+    foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
+    foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
+    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray'),
+  );
+  main.append(language, doors);
+}
+function renderWordsDoors(main) {
+  const section = el('section', 'foundation-section');
+  section.append(el('h2', 'eyebrow', tx('言葉のつながりを探す', 'Explore the language')));
+  const doors = el('div', 'foundation-doors');
+  doors.append(
+    foundationDoor('words-kanji', '漢字を調べる', 'Kanji by shape', 'kanjidex'),
+    foundationDoor('words-grammar', '文法', 'Grammar', 'grammar'),
+    foundationDoor('words-web', '言葉のつながり', 'Word web', 'thesaurus'),
+    foundationDoor('words-idioms', '四字熟語', 'Four-character idioms', 'yoji'),
+  );
+  section.append(doors); main.append(section);
+}
+
 /* The whole-app register (register.css) gives each purpose its own material. It keys on
  * <html data-room>, stamped here after every render from what the room actually drew — the
  * same rules the 2026-09-24 register study walked across 13 rooms — plus the attempt's stage
@@ -28606,6 +28746,7 @@ function render() {
   });
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+  buildPrimaryTabs(root);
 
   // the capture panel — anchored under the chrome's top-right seal. It
   // reuses the sheet's own instruments verbatim: the reversible 覚える
@@ -28711,7 +28852,9 @@ function render() {
     else if (S.view === 'grammar') renderGrammar(main);
     else if (S.view === 'guided') renderGuided(main);
     else if (S.view === 'contextdeck') renderContextDeck(main);
-    else if (S.view === 'search') renderSearchPage(main);
+    else if (S.view === 'search') { renderSearchPage(main); renderWordsDoors(main); }
+    else if (S.view === 'me') renderMe(main);
+    else if (S.view === 'settings') renderSettings(main);
     else renderShelf(main);
   } catch (error) {
     main.replaceChildren();

@@ -3651,3 +3651,88 @@ body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px
   --ease: var(--ease-standard);
 }
 /* END BUNKI DESIGN TOKENS V2 =============================================== */
+
+/* BEGIN BUNKI NAVIGATION SHELL · additive foundation ======================== */
+body { --nav-clearance: 0px; }
+body.has-primary-tabs { --nav-clearance: calc(60px + env(safe-area-inset-bottom, 0px)); }
+body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
+.primary-tabs {
+  position: fixed;
+  z-index: 70;
+  inset: auto 0 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-1);
+  box-sizing: border-box;
+  height: var(--nav-clearance);
+  padding: 6px max(8px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right));
+  border-top: var(--stroke-relief) solid var(--color-edge-strong);
+  background: var(--color-glass);
+  color: var(--color-ink);
+  box-shadow: 0 -6px 20px color-mix(in srgb, var(--color-ink) 7%, transparent);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  backdrop-filter: saturate(160%) blur(20px);
+}
+.primary-tabs .primary-tab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink-2);
+  box-shadow: none;
+  font: 600 var(--type-label)/1.2 var(--font-ui);
+  letter-spacing: 0;
+  transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+}
+.primary-tabs .primary-tab[aria-current='page'] {
+  background: var(--color-tint-wash);
+  color: var(--color-accent);
+}
+.primary-tabs .primary-tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  inset: auto 24% 3px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+.primary-tabs .primary-tab::before { content: none; }
+.primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(var(--nav-clearance) + 12px); }
+body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px); }
+body.has-primary-tabs .kp-grades,
+body.has-primary-tabs .pc-controls { bottom: var(--nav-clearance); }
+body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
+body.has-primary-tabs:has(#sheet, #stroke-page, .kp-sheet-wrap, [role='dialog']) .primary-tabs { display: none; }
+body.has-primary-tabs:has(#sheet, #stroke-page, .kp-sheet-wrap, [role='dialog']) { --nav-clearance: 0px; }
+.learn-section + .learn-section,
+.foundation-section { margin-top: var(--space-8); }
+.learn-section { padding-top: var(--space-2); }
+.learn-section + .learn-section { border-top: var(--stroke-relief) solid var(--color-edge-strong); }
+.foundation-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-3); }
+.foundation-doors .foundation-door { min-height: var(--hit-min); margin: 0; }
+.settings-language { display: inline-flex; min-height: var(--hit-min); }
+.settings-language button { min-height: var(--hit-min); padding-inline: var(--space-4); }
+@media (max-width: 520px) {
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app::after {
+    bottom: var(--nav-clearance);
+    height: 64px;
+  }
+  body.has-primary-tabs.v-depth-layered[data-view='reader'] .listen-row.play-bar,
+  body.has-primary-tabs[data-view='reader'] .listen-row.play-bar { bottom: calc(var(--nav-clearance) + 8px); }
+  body.has-primary-tabs[data-view='reader'] .listen-row.play-bar.is-pending { bottom: var(--nav-clearance); }
+  body.has-primary-tabs .teacher-door.reader-actions { bottom: calc(var(--nav-clearance) + 72px); }
+  body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 84px); }
+}
+@media (min-width: 521px) {
+  .primary-tabs { padding-inline: max(12px, calc((100vw - 720px) / 2)); }
+}
+@media (prefers-reduced-motion: reduce) { .primary-tabs .primary-tab { transition: none; } }
+/* END BUNKI NAVIGATION SHELL =============================================== */
