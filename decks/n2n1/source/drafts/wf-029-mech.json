@@ -1,0 +1,254 @@
+[
+ {
+  "term": "同訓異字",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "同調圧力",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "同音異義語",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "名君",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "名文",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "名誉革命",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "向上心",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "君主制",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "含意",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "含蓄",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "呉音",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "周縁",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "咀嚼",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "和平",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "和歌",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "和製漢語",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "和製英語",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "和語",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "品詞",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "唯物史観",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "啓蒙思想",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "嘘も方便",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "噛み砕く",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "四字熟語",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "四苦八苦",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "回復力",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "因果",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "因果関係",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "因縁",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "囲い込み",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "固定マインドセット",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "固定観念",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国債",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国力",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国境線",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国字",
+  "ok": false,
+  "why": [
+   "国字: 「峠」「畑」「働」は、いずれも、中国ではなく日本… the English has 3 sentences, the Japanese 4: they must match"
+  ]
+ },
+ {
+  "term": "国家主義",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国民国家",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国際分業",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国際秩序",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "国際連盟",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "圧縮",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "地の文",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "地方分権",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "地殻変動",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "地頭",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "埋没費用",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "基軸通貨",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "報酬系",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "塵も積もれば山となる",
+  "ok": true,
+  "why": []
+ }
+]

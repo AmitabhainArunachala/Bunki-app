@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "同訓異字",
+   "reading": "どうくんいじ",
+   "pos": "noun",
+   "meaning": "kanji sharing a kun reading",
+   "defJa": "訓が同じで字の違う漢字",
+   "passage": {
+    "ja": "和語の「はかる」には、測る・計る・量る・図る・謀るなど、当てられる漢字がたくさんあります。こうした同訓異字を使い分けるコツは、「何を対象にしているか」を考えることです。長さや深さなら「測る」、時間や数なら「計る」、重さや量なら「量る」と、対象に応じて整理すると、迷いはぐっと減ります。もっとも、最近は新聞でも表記にゆれがあり、最終的には、文脈と読み手への配慮で決めるほかありません。",
+    "form": "同訓異字",
+    "en": "The native word \"hakaru\" has many kanji that can be assigned to it: 測る, 計る, 量る, 図る, 謀る and more. The trick to choosing among such kanji sharing a kun reading is to think about what the object is. Organize it according to the object: \"測る\" for length and depth, \"計る\" for time and number, \"量る\" for weight and quantity, and your hesitation drops sharply. That said, even newspapers vary in notation these days, so in the end there is nothing for it but to decide by context and consideration for the reader.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「同訓異字」の例は、測る・計る・量る。対象に応じて使い分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "同調圧力",
+   "reading": "どうちょうあつりょく",
+   "pos": "noun",
+   "meaning": "peer pressure",
+   "defJa": "周囲に合わせるよう求める無言の圧力",
+   "passage": {
+    "ja": "即断即決が好まれる日本の職場では、会議で誰も異論を唱えないまま、結論が決まってしまう場面がしばしば指摘される。背景には、周囲と違う意見を口にすることへの心理的な抵抗、いわゆる同調圧力がある。ただ、これは日本に限らず見られる現象で、心理学者アッシュの実験では、明らかに間違った答えにも、多数派に合わせて同意する人が少なくなかった。組織の側が、異論を述べる人をあえて評価する仕組みを設けるかどうかが、判断の質を左右するとみられる。",
+    "form": "同調圧力",
+    "en": "In Japanese workplaces that prize quick decisions, it is often pointed out that conclusions get settled with no one raising an objection in meetings. Behind this lies psychological resistance to voicing an opinion different from those around you, so-called peer pressure. But this is a phenomenon seen not only in Japan: in psychologist Asch's experiments, not a few people agreed with an obviously wrong answer to match the majority. Whether an organization sets up a system that deliberately rewards those who voice dissent is thought to affect the quality of its judgments.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「同調圧力に屈する」「同調圧力が強い」。周囲に合わせるよう迫る空気。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "同音異義語",
+   "reading": "どうおんいぎご",
+   "pos": "noun",
+   "meaning": "homophone",
+   "defJa": "発音が同じで意味の違う語",
+   "passage": {
+    "ja": "同音異義語は、同訓異字と並んで、日本語の表記を難しくする要因です。「こうせい」だけで、構成、公正、更生、厚生、校正と、すぐ五つは挙がります。音だけで聞いていると混乱しそうなものの、実際には、私たちは文脈から無意識に正しい意味を選んでいます。ただし、ラジオやポッドキャストのように耳だけで伝える場面では、「公平のコウセイ」のように、一言添える配慮が欠かせません。",
+    "form": "同音異義語",
+    "en": "Homophones, together with kanji sharing a kun reading, are a factor that makes Japanese orthography difficult. \"Kōsei\" alone yields five at once: 構成, 公正, 更生, 厚生, 校正. Listening by sound alone, you might expect confusion, but in practice we unconsciously choose the right meaning from context. However, in settings that convey by ear alone, like radio and podcasts, a considerate extra word such as \"the kōsei of kōhei (fairness)\" is indispensable.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「同音異義語が多い」。音が同じで意味が違う語。耳だけの場面では補足が要る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "名君",
+   "reading": "めいくん",
+   "pos": "noun",
+   "meaning": "wise ruler",
+   "defJa": "すぐれた君主",
+   "passage": {
+    "ja": "世界史や日本史で名君と言われる人物を問われたら、ただの業績の羅列で終わらせないことが、記述問題で点を伸ばすコツです。たとえば唐の太宗は、臣下の諫言をよく聞き入れたことで知られ、その姿勢が「貞観の治」と呼ばれる安定期を生みました。君主制の国では、君主一人の資質が国の運命を左右しますが、その資質を生かせるかは、周りに意見を言える人材がいたかどうかにも左右されます。この観点を一文加えるだけで、答案の深みは変わります。",
+    "form": "名君",
+    "en": "If you are asked about a figure called a wise ruler in world or Japanese history, the knack for raising your score on essay questions is not to end with a mere list of achievements. Taizong of Tang, for example, is known for listening well to his ministers' remonstrations, and that attitude produced the stable era called the \"Zhenguan reign.\" In a monarchy, a single ruler's qualities decide the nation's fate, but whether those qualities can be put to use also depends on whether there were people around able to speak their minds. Adding just one sentence from this angle changes the depth of an answer.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「名君の誉れ高い」。「暗君」の対。業績だけでなく人材を生かす力も評価される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "名文",
+   "reading": "めいぶん",
+   "pos": "noun",
+   "meaning": "fine piece of writing",
+   "defJa": "すぐれた文章",
+   "passage": {
+    "ja": "名文を書けるようになりたい人は、まず優れた文章を手で写してみてください。夏目漱石でも、司馬遼太郎でも、好きな作家なら誰でも構いません。一文を写すあいだに、読点の位置や言葉の順序、文のリズムが、目で読むより深く体に入ってきます。そのうえで、自分の文章と比べて、どこが違うのかを一つだけ見つけます。この小さな差を毎日反復して積み重ねることが、文章力を伸ばす最短ルートなのです。",
+    "form": "名文",
+    "en": "If you want to become able to write fine prose, first try copying excellent writing by hand. Natsume Soseki or Shiba Ryotaro will do. While copying one sentence, the placement of commas, the order of words and the rhythm of the sentence enter your body more deeply than when you read with your eyes. Then, compare it with your own writing and find just one place where it differs. Repeating this small difference every day and piling it up is the shortest route to improving your writing.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「名文を写す」「名文家」。読み手の心に残る優れた文章。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "名誉革命",
+   "reading": "めいよかくめい",
+   "pos": "noun",
+   "meaning": "Glorious Revolution",
+   "defJa": "一六八八年の英国の無血革命",
+   "passage": {
+    "ja": "一六八八年に起きた名誉革命は、イギリスの王が、流血をほとんど伴わずに交代した出来事として知られる。議会は新たな王夫妻を迎える際に、権利の章典を示し、王が議会の同意なく課税や立法を行えないことを確認させた。これによって、国王の権力は法の下に置かれ、のちの立憲君主制の原型が築かれたとされる。この前例は、絶対王政に批判的だった啓蒙思想の議論にも、大きな影響を与えた。",
+    "form": "名誉革命",
+    "en": "The Glorious Revolution of 1688 is known as the event in which the English monarch was replaced with almost no bloodshed. On welcoming the new royal couple, Parliament presented the Bill of Rights and had them confirm that the king could not tax or legislate without its consent. This placed the king's power under the law and is said to have laid the prototype of the later constitutional monarchy. The precedent also had a great influence on the arguments of Enlightenment thought, which was critical of absolute monarchy.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「名誉革命が起きる」。一六八八年、議会が王を交代させ権利の章典へ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "向上心",
+   "reading": "こうじょうしん",
+   "pos": "noun",
+   "meaning": "desire for self-improvement",
+   "defJa": "より高い水準を目指す気持ち",
+   "passage": {
+    "ja": "向上心のある人は、うまくいかなかったとき、「自分には才能がない」と結論づけるのではなく、「やり方のどこが違ったのか」と問い直します。これは、能力は努力で伸びると信じる成長マインドセットの持ち主に、共通する特徴です。逆に、能力は生まれつきだと考える固定マインドセットの人は、失敗を、自分の価値への攻撃のように受け取ってしまいます。この意欲は、才能の有無ではなく、失敗をどう意味づけるかという習慣から、育っていくものなのです。",
+    "form": "向上心",
+    "en": "A person with the drive to improve, when things do not go well, does not conclude \"I have no talent\" but asks again \"where did my method differ?\" This is a feature common to holders of the growth mindset, who believe ability grows through effort. Conversely, people with a fixed mindset, who think ability is innate, take failure like an attack on their worth. This drive grows not from the presence or absence of talent but from the habit of how one gives meaning to failure.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「向上心を持つ」「向上心に欠ける」。現状に満足せず高みを目指す気持ち。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "君主制",
+   "reading": "くんしゅせい",
+   "pos": "noun",
+   "meaning": "monarchy",
+   "defJa": "君主が国を治める政治体制",
+   "passage": {
+    "ja": "今でもイギリスや日本、スペインみたいに君主制の国って、けっこうあるじゃないですか。でも、昔と違って、イギリスは名誉革命のあと少しずつ王様の力を議会に移していって、今は政治を直接動かさない象徴的な存在になってる。国民が選んだ議会と首相が実際の政治を担うから、王家は不人気でも、政権とは切り離されるんですよね。そう考えると、王家って、権力というより、国の連続性を担当する仕組みなのかなって思います。",
+    "form": "君主制",
+    "en": "Even now there are quite a few monarchies like Britain, Japan and Spain, aren't there? But unlike the old days, Britain gradually shifted the king's power to Parliament after the Glorious Revolution, and today the monarch is a symbolic presence who does not directly run politics. Because a parliament and prime minister chosen by the people carry out actual politics, even an unpopular royal house is cut off from the government. Thinking it over, I feel the royal family is less about power than a mechanism in charge of the nation's continuity.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「君主制の国」。君主が元首の体制。立憲君主制と絶対君主制で意味が大きく違う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "含意",
+   "reading": "がんい",
+   "pos": "noun",
+   "meaning": "implication",
+   "defJa": "言外に含まれている意味",
+   "passage": {
+    "ja": "文章を読むときは、書いてあることだけでなく、書いていないけれど読み取れることを、見落とさないでください。この含意をつかめるかどうかが、読解問題の正解率を大きく分けます。たとえば「彼はまだ来ていない」という一文には、「来るはずだった」という前提が含まれています。慣れないうちは、各文に対して「この文は、何を当たり前のこととしているか」と問う練習を続けると、含蓄のある文章も、ぐっと読みやすくなります。",
+    "form": "含意",
+    "en": "When you read, do not overlook not just what is written but what is unwritten yet can be read. Whether you can grasp this implication greatly divides the correct-answer rate on reading questions. For example, the single sentence \"he hasn't come yet\" contains the premise \"he was supposed to come.\" While you are unaccustomed, keep practicing asking of each sentence, \"what does this sentence take for granted?\" and even rich, suggestive prose becomes much easier to read.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「含意を読み取る」。直接言っていないが、そこから推し量れる意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "含蓄",
+   "reading": "がんちく",
+   "pos": "noun",
+   "meaning": "depth of meaning",
+   "defJa": "言葉の裏にある深い意味",
+   "passage": {
+    "ja": "含蓄のある言葉って、言ってることは短いのに、含意が深くて、あとからじわじわ効いてくるんだよね。たとえば「急がば回れ」は、たった五文字なのに、焦ってる時ほど遠回りが近道になることを、一瞬で思い出させてくれる。全部を噛み砕いて説明しすぎないぶん、聞いた人が自分の経験を重ねて意味を膨らませる余白が残る。昔のことわざは、長く使われてきただけあって、時代が変わっても、なんとなく生き残るんだと思うよ。",
+    "form": "含蓄",
+    "en": "Words with depth are short in what they say, yet they take effect slowly afterward. \"Isogaba maware\" (\"more haste, less speed\") is only five characters, yet it instantly reminds you that a detour becomes the shortcut when you are flustered. Because it doesn't chew everything up and over-explain, it leaves room for the listener to layer their own experience and expand the meaning. Old proverbs, as one would expect of things used for so long, somehow survive even as times change, I think.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「含蓄のある言葉」。言葉に深い意味や味わいがこもっていること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "呉音",
+   "reading": "ごおん",
+   "pos": "noun",
+   "meaning": "go-on reading",
+   "defJa": "漢字の古い日本語読み",
+   "passage": {
+    "ja": "漢字の音読みには、重なった層がある。たとえば「行」は、「行列」の「ぎょう」と「行動」の「こう」で読みが違い、前者は古くに伝わった呉音、後者は遣唐使の時代に広まった漢音にあたる。和語と漢語が混ざりあう日本語のなかで、仏教用語に古い読みが多いのは、仏教がいち早く伝わった時期の読みが、そのまま固定して残ったためと考えられる。読みの違いは、単なる暗記事項ではなく、日本語が受け入れてきた文明の地層を、音の上に示しているのである。",
+    "form": "呉音",
+    "en": "Sino-Japanese readings of kanji come in layers. For instance, 行 is read differently in 行列 (\"gyō\") and 行動 (\"kō\"), the former being the Go reading that arrived early and the latter the Kan reading that spread in the age of the Japanese embassies to Tang. In a Japanese where native words and Chinese-derived words mix, the many old readings in Buddhist terms are thought to be readings from the time Buddhism arrived early, fixed and left as they were. The differences in reading are not mere memorization items but show, in sound, the strata of civilization Japanese has taken in.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "漢字の古い音読み。「行(ぎょう)」。仏教語に多い。漢音・唐音と層をなす。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "周縁",
+   "reading": "しゅうえん",
+   "pos": "noun",
+   "meaning": "periphery",
+   "defJa": "中心から離れた周辺部",
+   "passage": {
+    "ja": "歴史は、しばしば中心の側から書かれる。都や宮廷で何が起きたかは詳しく残るが、国境の山間や島々に暮らした人々の営みは、記録の隙間に沈んでしまう。辺境と呼ばれた土地の側から歴史を読み直すと、中心の語りには出てこない交流が見えてくる。しかし、新しい文化や技術は、案外、周縁から勃興して中心へ流れ込む。中心の視点だけで世界を見る限り、変化の兆しは、いつも見落とされることになるのである。",
+    "form": "周縁",
+    "en": "History is often written from the side of the center. What happened in the capital and at court is recorded in detail, but the lives of people in mountain borderlands and on islands sink into the gaps of the record. If we reread history from the lands once called the frontier, exchanges that never appear in the center's narrative come into view. Yet new cultures and technologies, surprisingly often, rise from the periphery and flow into the center. As long as we view the world only from the center's perspective, the signs of change will always be overlooked.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「周縁部」「周縁から見る」。中心に対して外側にある領域や人々。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "咀嚼",
+   "reading": "そしゃく",
+   "pos": "noun",
+   "meaning": "digesting (an idea)",
+   "defJa": "かみ砕いて内容を深く理解すること",
+   "passage": {
+    "ja": "本を読むとき、速く多く読むことばかりが重視されがちですが、内容を咀嚼する時間を確保しないと、知識は身につきません。読み終えたら、一章ごとに、「この章の主張を、自分の言葉で三行に直すと何か」と書いてみてください。これを噛み砕く作業と呼んでもいいでしょう。一冊に二時間かけるなら、読むのに一時間、考えるのに一時間と、配分を変えて反復するだけで、記憶の定着は大きく違ってきます。",
+    "form": "咀嚼",
+    "en": "When reading, there is a tendency to prize reading fast and a lot, but unless you set aside time to digest the content, the knowledge will not stick. After finishing, write for each chapter, \"if I put this chapter's claim in my own words in three lines, what is it?\" You might call this the work of chewing it down. If you spend two hours on one book, just changing the split, one hour reading and one hour thinking, and repeating it makes a big difference in retention.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「内容を咀嚼する」。食べ物をかむ意から、理解を深める意味に広がった語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和平",
+   "reading": "わへい",
+   "pos": "noun",
+   "meaning": "peace",
+   "defJa": "争いをやめて平和になること",
+   "passage": {
+    "ja": "長期化する紛争では、和平への道筋が見えないまま、民間人の犠牲だけが積み重なることが多い。停戦の交渉が始まっても、領土や安全の保証をめぐって、双方の主張が大きく食い違えば、合意までに年単位の時間を要する。歴史を振り返れば、国際秩序の後ろ盾が続く間は決着がつかず、国内の世論と経済の疲弊が限界に達した時期に初めて、交渉が動くことが少なくない。外部の仲介役に求められるのは、どちらにも肩入れせず、双方が引き返せる出口を用意することである。",
+    "form": "和平",
+    "en": "In protracted conflicts, civilian casualties often pile up with no path to peace in sight. Even once ceasefire talks begin, if the two sides' positions differ greatly over territory and security guarantees, it takes years to reach agreement. Looking back in history, it is not rare that things do not settle while outside backing within the international order continues, and negotiations move only when domestic opinion and economic exhaustion reach their limit. What is asked of an outside mediator is to take neither side and to prepare an exit by which both can turn back.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「和平交渉」「和平を結ぶ」。戦いをやめ、平和な関係に戻ること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和歌",
+   "reading": "わか",
+   "pos": "noun",
+   "meaning": "waka poem",
+   "defJa": "五七五七七の定型詩",
+   "passage": {
+    "ja": "和歌って、たった三十一文字なのに、そこに季節も恋も後悔も全部詰め込んでるのが、改めてすごいなって思うんですよね。たとえば在原業平の「ちはやぶる」の歌なんか、屏風の絵を見て詠んだだけなのに、水が真っ赤に染まる様子を、神代の昔と結びつけてる。言葉を削るほど、読む人の想像が広がるっていう、さっきの含蓄の話にもつながるんですよ。古文の授業で退屈だったあの歌が、実は一番コスパのいい表現形式だったりします。",
+    "form": "和歌",
+    "en": "It strikes me anew how amazing it is that a waka, in just thirty-one syllables, packs in the seasons, love and regret all together. Ariwara no Narihira's \"Chihayaburu\" poem, for example, was merely composed on seeing a painting on a screen, yet it ties the scene of water dyed crimson to the age of the gods. The more you cut words, the more the reader's imagination expands, which connects to what I said earlier about depth of meaning. That poem that bored you in classical-Japanese class may actually be the best-value form of expression.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「和歌を詠む」。五七五七七の短歌形式。古今集などの歌の総称にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和製漢語",
+   "reading": "わせいかんご",
+   "pos": "noun",
+   "meaning": "Japan-coined Sino words",
+   "defJa": "日本で作られた漢字の熟語",
+   "passage": {
+    "ja": "明治の啓蒙思想家、西周が「哲学」という言葉を作ったように、西洋の概念を訳す過程で、日本人は和製漢語をたくさん生み出しました。先人たちは、既存の漢字を組み合わせて、意味が一目で伝わる言葉を新しく作ったのです。それらの多くは、のちに中国語にも取り入れられ、現代の漢字文化圏の共通の語彙になっています。話すときも、こうした言葉の由来を一言添えるだけで、聞き手の興味は一段と高まります。",
+    "form": "和製漢語",
+    "en": "Just as the Meiji Enlightenment thinker Nishi Amane coined the word \"tetsugaku\" (philosophy), in the process of translating Western concepts the Japanese produced many Japan-made Sino-words. The predecessors combined existing kanji to create new words whose meaning is conveyed at a glance. Many of them were later taken into Chinese too, and have become shared vocabulary of the kanji cultural sphere today. When you speak, just adding a word on the origin of such terms raises your listeners' interest a notch.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「和製漢語」の例は「哲学」。西洋の概念を訳すため日本で作られた漢字語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和製英語",
+   "reading": "わせいえいご",
+   "pos": "noun",
+   "meaning": "Japan-made English",
+   "defJa": "日本で作られた英語風の言葉",
+   "passage": {
+    "ja": "「サラリーマン」「コンセント」「ガソリンスタンド」は、いずれも英語圏では通じにくい和製英語である。和製漢語が漢字を組み合わせて新語を作ったのと同じように、英語の語を組み合わせたり、省略したりして、独自の意味を持たせたものだ。国際的な場面で誤解を招かないよう、学校や企業の研修では、こうした語の本来の言い方を教える動きもある。一方で、日本語の中ではすでに定着しており、無理に言い換えれば、かえって通じなくなる場合もある。",
+    "form": "和製英語",
+    "en": "\"Sarariman,\" \"konsento\" and \"gasorin sutando\" are all Japan-made English that is hard to get across in the English-speaking world. In the same way that Japan-made Sino-words combine kanji to create new words, these combine or abbreviate English words to give them their own meaning. To avoid misunderstanding in international settings, schools and companies have also begun teaching the original ways of saying such words in training. On the other hand, they are already established in Japanese, and forcibly rephrasing them can sometimes make you less understood.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「和製英語」の例は「コンセント」。英語の語を使い日本で作った語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和語",
+   "reading": "わご",
+   "pos": "noun",
+   "meaning": "native Japanese words",
+   "defJa": "もとから日本にあった言葉",
+   "passage": {
+    "ja": "日本語の語彙は、大きく漢語、外来語、そしてもともとあった言葉に分けられます。このもともとあった言葉、すなわち和語は、「やま」「かわ」「うれしい」のように、やわらかく、感覚に近い響きを持つのが特徴です。同じ意味でも、「食べる」と「摂取する」では、受ける印象がまるで違います。話すときは、これを中心に組み立てると、聞き手の心にすっと入りますし、難しい内容を噛み砕くときにも頼りになります。",
+    "form": "和語",
+    "en": "Japanese vocabulary is broadly divided into Sino-Japanese words, loanwords, and the words that were there originally. These original words, that is, native Japanese words, are characterized by soft, sensation-close sounds, like \"yama,\" \"kawa\" and \"ureshii.\" Even with the same meaning, the impression received from \"taberu\" and \"sesshu suru\" is entirely different. If you build your speech around them, it slips right into the listener's heart, and they are also a help when you break down difficult content.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「和語」は「やま」「かわ」のような固有の語。「漢語」「外来語」と対にして分類する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "品詞",
+   "reading": "ひんし",
+   "pos": "noun",
+   "meaning": "part of speech",
+   "defJa": "単語を文法上の性質で分けた種類",
+   "passage": {
+    "ja": "日本語の品詞は、学校文法では十種類に分けられますが、外国人の学習者にとって、いちばんの難所は形容動詞だと言われます。「静かな」は名詞を修飾する形が「な」で終わるため、形容詞のようで、でも活用は名詞に近い、という中途半端さが混乱のもとです。教える側は、用語の名前を先に覚えさせるより、「だ」を付けて言えるかどうかで見分ける、という手がかりを、噛み砕く形で渡すほうが効果的です。文法用語は、使いこなすための道具であり、暗記の対象ではありません。",
+    "form": "品詞",
+    "en": "Japanese parts of speech are divided into ten kinds in school grammar, but for foreign learners the hardest spot is said to be the na-adjective. Because the form of \"shizuka na\" that modifies a noun ends in \"na,\" it resembles an adjective yet conjugates closer to a noun, and that in-betweenness is the source of confusion. Rather than making them memorize the names of terms first, it is more effective for teachers to break down and hand over the clue of telling by whether you can attach \"da.\" Grammar terms are tools to master, not objects of memorization.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "学校文法の十品詞。「品詞を分類する」。形容動詞などが学習者の難所。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "唯物史観",
+   "reading": "ゆいぶつしかん",
+   "pos": "noun",
+   "meaning": "historical materialism",
+   "defJa": "経済が歴史を動かすとみる史観",
+   "passage": {
+    "ja": "唯物史観は、歴史を動かす根本の力を、思想や英雄ではなく、人々が物を作り分け合う仕組み、つまり経済に見る。生産の方法が変われば、社会の構造も、人々の考え方も変わるというのである。この見方は、国民国家の成立や産業革命を、一本の流れとして鮮やかに説明する力を持っていた。だが一方で、経済だけで歴史を説明しようとすれば、宗教や文化、偶然の出来事が人を動かす力を軽く見るおそれがある。",
+    "form": "唯物史観",
+    "en": "Historical materialism sees the fundamental force driving history not in ideas or heroes but in the way people produce and share things, that is, the economy. If the mode of production changes, society's structure and people's thinking change too, it holds. This view had the power to explain the formation of nation-states and the Industrial Revolution as one flow. But if one tries to explain history by economics alone, there is a risk of underrating the power of religion and culture to move people.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "マルクスの歴史理論。「唯物史観に立つ」。経済基盤が社会を規定する見方。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "啓蒙思想",
+   "reading": "けいもうしそう",
+   "pos": "noun",
+   "meaning": "Enlightenment thought",
+   "defJa": "理性によって社会を改めようとする思想",
+   "passage": {
+    "ja": "十八世紀のヨーロッパで広がった啓蒙思想は、人間は理性によって世界を理解し、社会をよりよくできるという信念に支えられていた。ロックやモンテスキューは、権力を制限する仕組みを考え、ルソーは、人民の意志こそが政治の正統性の源だと説いた。こうした議論は、アメリカ独立やフランス革命の理念を支え、のちの国民国家の形にも影響を与えた。もっとも、理性への過信が、植民地支配を正当化する論理に使われたという批判も根強い。",
+    "form": "啓蒙思想",
+    "en": "Enlightenment thought, which spread in eighteenth-century Europe, was supported by the belief that humans could understand the world through reason and improve society. Locke and Montesquieu devised mechanisms to limit power, and Rousseau argued that the will of the people was the source of political legitimacy. These arguments underpinned the ideals of the American Revolution and the French Revolution and also influenced the shape of the later nation-state. Nevertheless, there is persistent criticism that overconfidence in reason was used as logic to justify colonial rule.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「啓蒙思想家」。十八世紀、理性を重んじ旧制度を批判した。ロック、ルソーなど。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "嘘も方便",
+   "reading": "うそもほうべん",
+   "pos": "expression",
+   "meaning": "a lie can be skillful means",
+   "defJa": "目的のためには嘘も手段になりうる",
+   "passage": {
+    "ja": "仏教には、「嘘も方便」という考え方がある。法華経の「火宅のたとえ」では、燃える家の中で遊びに夢中な子どもたちを助けるため、仏の化身ともいえる父親が、「外にもっとおもしろい車がある」と呼びかけて、外へ連れ出す。結果的に、子どもたちは命を救われる。この話は、真実を告げることだけが誠実さではなく、相手を救うという目的のために、手段を選ぶことも慈悲の形でありうることを示している。ただし、私利のために使えば、単なる欺瞞にほかならない。",
+    "form": "嘘も方便",
+    "en": "Buddhism has the idea that \"a lie can be a skillful means.\" In the Lotus Sutra's parable of the burning house, to rescue children absorbed in play inside a burning house, the father, who might be called an incarnation of the Buddha, calls out, \"there are more fun carts outside,\" and leads them out. As a result, the children's lives are saved. This tale shows that telling the truth is not the only form of sincerity, and that choosing one's means for the purpose of saving the other can also be a form of compassion. But if used for selfish gain, it is nothing but deceit.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏教の方便。目的は救い。「嘘も方便」は私利に使えば単なる欺瞞になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "噛み砕く",
+   "reading": "かみくだく",
+   "pos": "verb",
+   "meaning": "to explain in plain terms",
+   "defJa": "難しい内容をやさしく言い直す",
+   "passage": {
+    "ja": "専門用語だらけの説明は、いくら正確でも、受け手に届かなければ意味がない。そのため、解説記事の書き手には、難しい概念を噛み砕いて伝える技術が求められる。たとえば、金利を説明するなら、「お金を借りるときの使用料」と言い換えるだけで、読者は直感をつかみ、咀嚼する負担も減る。ただし、これは内容を薄めることではない。核心を保ったまま、入り口を低くする工夫だと、ベテランの編集者は言う。",
+    "form": "噛み砕いて",
+    "en": "An explanation full of technical terms, however accurate, is meaningless if it does not reach the audience. Therefore the writer of an explanatory article is required to have the skill of conveying difficult concepts in plain terms. To explain interest rates, for example, just rephrasing it as \"the fee for borrowing money\" lets the reader grasp the intuition and lightens the burden of digesting it. But this is not diluting the content. It is a device for lowering the entrance while keeping the core, a veteran editor says.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「噛み砕いて説明する」。もとは食べ物をかむ意。難解な内容を平易に言い直す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "四字熟語",
+   "reading": "よじじゅくご",
+   "pos": "noun",
+   "meaning": "four-character compound",
+   "defJa": "漢字四字で成る熟語",
+   "passage": {
+    "ja": "四字熟語は、使い方次第で、話にぐっと奥行きが出る反面、並べすぎると、押しつけがましくなります。「臨機応変」「温故知新」のように、意味が広く知られた言葉を、一つだけ要所に置くのが、話し言葉では効果的です。難しい熟語を使うときは、そのすぐ後に、「つまり、その場に合わせて動くということですね」と、平易な言い換えを添えてください。熟語は飾りではなく、意味を圧縮して運ぶための容器なのです。",
+    "form": "四字熟語",
+    "en": "Four-character compounds, depending on how you use them, add depth to a talk, but line up too many and they become pushy. In spoken language it works to place just one widely known phrase, like \"rin'ki ōhen\" or \"onko chishin,\" at a key point. When you use a difficult compound, add a plain paraphrase right after it, \"in other words, it means acting to suit the occasion.\" A compound is not an ornament but a container for carrying compressed meaning.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「四字熟語を使う」。「臨機応変」など。話すときは一つだけ要所に置き、言い換えを添える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "四苦八苦",
+   "reading": "しくはっく",
+   "pos": "noun",
+   "meaning": "the four and eight sufferings; great hardship",
+   "defJa": "仏教の八つの苦／ひどく苦労すること",
+   "passage": {
+    "ja": "仏教でいう四苦とは、生まれた以上、因果の理として誰も避けられない、生まれる、老いる、病む、死ぬという四つの苦しみのことです。これに、愛する人と別れる苦、憎む相手と会う苦、求めて得られない苦、そして心身を構成する要素そのものから生じる苦の四つを加えると、八苦になります。私たちが日常で「四苦八苦する」と言うときの、あたふたした苦労は、実はここに由来します。語源を知って使うと、同じ言葉でも、少し重みが増して聞こえるでしょう。",
+    "form": "四苦八苦",
+    "en": "The \"four sufferings\" of Buddhism are the four pains no one can avoid, as a matter of the law of cause and effect, once born: being born, aging, falling ill and dying. Add to these four more, the pain of parting from loved ones, of meeting those you hate, of not getting what you seek, and of the very elements that make up body and mind, and you get the eight sufferings. The flustered struggle we mean in daily life when we say \"shi-ku hakku suru\" in fact derives from here. If you use it knowing the etymology, even the same word will sound a little weightier.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「四苦八苦する」の語源。生老病死の四苦に四つを加えた八苦。苦労の意に転じた。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "回復力",
+   "reading": "かいふくりょく",
+   "pos": "noun",
+   "meaning": "power of recovery; resilience",
+   "defJa": "逆境から立ち直る力",
+   "passage": {
+    "ja": "心理学では、逆境から立ち直る力を回復力、英語でレジリエンスと呼びます。研究によると、これは生まれつきの性格というより、困難にどう意味づけを与えるかで育てられる能力だとされています。たとえば、失敗した日の夜に「今日の学び」を一つだけ書き出す習慣は、出来事を、固定マインドセットに染まった自己評価から切り離す練習になります。いちばん地味ですが、いちばん確実な方法かもしれません。",
+    "form": "回復力",
+    "en": "In psychology, the power to recover from adversity is called recovery power, or resilience in English. According to research, this is a capacity that can be grown by how you give meaning to hardship, rather than an innate temperament. For example, the habit of writing down just one \"lesson of today\" on the night of a failure is practice in separating the event from a self-evaluation steeped in the fixed mindset. It is the plainest method, but perhaps the most reliable.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「回復力が高い」。レジリエンス。困難から立ち直る力は育てられる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "因果",
+   "reading": "いんが",
+   "pos": "noun",
+   "meaning": "cause and effect",
+   "defJa": "原因と結果のつながり",
+   "passage": {
+    "ja": "歴史を語るとき、出来事をただ年表の順に並べるだけでは、聞き手は退屈してしまいます。そこで大切なのは、「AがあったからBが起きた」という因果の線を、一本はっきり引いてあげることです。たとえば、凶作で食糧が不足し、パンの値段が上がって、民衆の怒りが爆発した。その流れを一息でなめらかに話せれば、フランス革命という動乱の入り口は、教科書の記述よりもずっと鮮やかに伝わります。",
+    "form": "因果",
+    "en": "When talking about history, merely lining events up in chronological order bores the listener. What matters, then, is to draw one clear line of cause and effect: \"because A happened, B occurred.\" For example: harvests failed, food ran short, the price of bread rose, and the people's anger exploded. If you can tell that flow in one breath, the entrance to the upheaval of the French Revolution comes across more vividly than in a textbook.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「因果の道理」「因果を語る」。出来事を原因と結果の線でつなぐ視点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "因果関係",
+   "reading": "いんがかんけい",
+   "pos": "noun",
+   "meaning": "causal relationship",
+   "defJa": "一方が原因で他方が結果という関係",
+   "passage": {
+    "ja": "「朝食を食べる子は成績がいい」というデータを見て、「だから朝食を食べさせよう」と言い切ってしまうのは、早計です。成績のよさと朝食の間には相関があっても、因果関係があるとは限らないからです。家庭が安定している子は朝食も食べやすく、勉強にも集中しやすい、という第三の要因が、両方を生んでいるかもしれません。その反証の可能性も考えたうえで、「関係がある」と「原因である」を、言葉の上で区別して語る習慣をつけたいものです。",
+    "form": "因果関係",
+    "en": "Seeing data that \"children who eat breakfast have good grades,\" and declaring \"so let's make them eat breakfast,\" is premature. Even if there is a correlation between good grades and breakfast, there is not necessarily a causal relationship. A third factor, that children from stable homes find it easier to eat breakfast and to concentrate on study, may be producing both. We should want to build the habit of distinguishing in words \"is related to\" from \"is the cause of,\" considering also the possibility of such a counterexample.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「因果関係がある」「相関と因果関係」。原因と結果という関係があること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "因縁",
+   "reading": "いんねん",
+   "pos": "noun",
+   "meaning": "cause and condition; fate; pretext",
+   "defJa": "物事を生む原因と条件",
+   "passage": {
+    "ja": "仏教でいう因縁とは、物事が生まれるための「因」、つまり直接の原因と、それを助ける「縁」、つまり条件が、そろって初めて結果が生じる、という考え方です。たとえば、種が因なら、土、水、日光が縁にあたります。同じ種でも、縁が違えば、花が咲くことも、枯れることもあり、これを因果の道理として説きます。日常の「言いがかり」の意味とは別に、本来はもっと深い、世界のつながり方を示す言葉なのです。",
+    "form": "因縁",
+    "en": "In Buddhism, \"inen\" is the idea that a result arises only when a \"cause\" (the direct reason) and a \"condition\" (the circumstance that helps it) come together. If a seed is the cause, for instance, soil, water and sunlight are the conditions. Even with the same seed, if the conditions differ, a flower may bloom or wither, and this is taught as the law of cause and effect. Apart from its everyday sense of \"a pretext,\" it is originally a word that shows a deeper way the world is connected.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教語。因は直接の原因、縁は条件。日常語の「因縁をつける」とは別の本来の意味。",
+    "sense": "仏教の本来の意味"
+   }
+  },
+  {
+   "term": "囲い込み",
+   "reading": "かこいこみ",
+   "pos": "noun",
+   "meaning": "enclosure",
+   "defJa": "土地を囲って私有地にすること",
+   "passage": {
+    "ja": "世界史の試験によく出る「囲い込み」は、イギリスで、地主が共有地や農地を囲って、牧羊や大規模農業に切り替えた動きのことです。この結果、土地を失った農民が都市へ流れ込み、工場で働く労働者になりました。つまり、産業革命の人手は、この動きが生んだとも言えます。のちに労働組合を作って団結する労働者たちも、元をたどれば土地を失った農民でした。覚えるときは、「羊が人を食う」という当時の言い回しを、手がかりにするとよいでしょう。",
+    "form": "囲い込み",
+    "en": "The \"enclosure,\" which often appears on world-history exams, was the movement in England in which landowners fenced in common land and farmland and switched to sheep-raising and large-scale farming. As a result, peasants who lost their land flowed into cities and became factory workers. In other words, the labor force of the Industrial Revolution can be said to have been produced by this movement. The workers who later formed labor unions and united were, traced back, peasants who had lost their land. When memorizing, it helps to use the saying of the time, \"sheep eat men,\" as a handle.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「囲い込み運動」。英国の農地囲い込み。企業が顧客を囲い込む比喩にも使う。",
+    "sense": "歴史用語としての意味"
+   }
+  },
+  {
+   "term": "固定マインドセット",
+   "reading": "こていまいんどせっと",
+   "pos": "noun",
+   "meaning": "fixed mindset",
+   "defJa": "能力は変わらないと信じる考え方",
+   "passage": {
+    "ja": "心理学者ドゥエックは、能力は生まれつき決まっていると信じる考え方と、努力で伸ばせると信じる成長マインドセットを区別しました。固定マインドセットの人は、失敗を、自分の限界の証拠と受け取り、難しい課題を避けがちになります。反対に、成長マインドセットの人は、同じ失敗を、次に何を変えればいいかの手がかりと見るのです。向上心がある人ほど、この違いに気づいておく価値があります。",
+    "form": "固定マインドセット",
+    "en": "The psychologist Dweck distinguished the belief that ability is fixed at birth from the growth mindset, which believes it can be developed through effort. People with a fixed mindset take failure as proof of their limits and tend to avoid difficult tasks. By contrast, people with a growth mindset see the same failure as a clue to what to change next. The more drive to improve a person has, the more worthwhile it is for them to be aware of this difference.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「固定マインドセット」と「成長マインドセット」。能力は変わらないという信念。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "固定観念",
+   "reading": "こていかんねん",
+   "pos": "noun",
+   "meaning": "fixed idea; stereotype",
+   "defJa": "変わりにくい決まった考え方",
+   "passage": {
+    "ja": "「男の子は泣いちゃだめ」とか「女の子は理系に向いてない」とか、あれって、誰かがちゃんと検証した話じゃなくて、ただの固定観念なんですよね。反証になる例はいくらでもあるのに、小さい頃から言われ続けると、本人まで自分の可能性を勝手に狭めちゃう。怖いのは、悪意がなくても、親や先生の何気ないひと言で刷り込まれてしまうところなんです。だから、「それ、本当にそう？」って一回疑ってみる習慣は、自分を守る盾になると思います。",
+    "form": "固定観念",
+    "en": "\"Boys mustn't cry\" or \"girls aren't suited to science\" — those aren't things someone properly verified; they're just fixed ideas. Even though there are plenty of counterexamples, if you keep being told them from childhood, you yourself end up narrowing your own possibilities. The scary part is that, even without ill will, they get imprinted by an offhand remark from a parent or teacher. So I think the habit of doubting once, \"is that really so?\", becomes a shield that protects you.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「固定観念にとらわれる」。検証せず思い込んでいる、変えにくい考え。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国債",
+   "reading": "こくさい",
+   "pos": "noun",
+   "meaning": "government bond",
+   "defJa": "国が発行する債券",
+   "passage": {
+    "ja": "国債って、ざっくり簡単に言うと、国がみんなから借りるお金の借用書なんですよね。税金だけでは足りないとき、国は借用書を発行して、銀行や個人から資金を集める。ただ、あまりに発行しすぎると、返せるのかなって不安が出てきて、金利が上がって、また利払いが重くなるっていう悪循環に入りかねない。そうなると、国力そのものが疑われて、通貨の信用まで揺らぐので、案外こわい話なんです。",
+    "form": "国債",
+    "en": "A government bond, put simply, is an IOU for money the state borrows from everyone. When taxes alone are not enough, the state issues IOUs and gathers funds from banks and individuals. But if it issues too many, doubts arise about whether it can repay, interest rates rise, interest payments get heavier again, and it can fall into a vicious circle. Then the nation's very strength comes into question and even the currency's credibility wobbles, so it's a surprisingly scary story.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「国債を発行する」「国債残高」。国が資金調達のため発行する債券。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国力",
+   "reading": "こくりょく",
+   "pos": "noun",
+   "meaning": "national power",
+   "defJa": "国の総合的な力",
+   "passage": {
+    "ja": "国力とは、軍事力だけでなく、経済力、技術力、人口、教育水準、さらには国民の結束まで含めた、総合的な力のことです。たとえば、明治日本が短期間で国際秩序の中に地位を築けたのは、この総合力の土台である教育と産業の整備を、並行して進めたからだと言われます。逆に、軍備だけを肥大させて経済が追いつかなければ、長い戦争には耐えられません。この力を見るときは、点ではなく、複数の要素のつながりで考えることが肝心です。",
+    "form": "国力",
+    "en": "National power means a comprehensive strength that includes not just military power but economic power, technology, population, educational level, and even national cohesion. Meiji Japan is said to have been able to establish a position in the international order in a short time because it advanced education and industry, the foundations of that comprehensive strength, in parallel. Conversely, if only armaments swell and the economy does not keep up, a long war cannot be endured. When assessing this strength, it is essential to think not in points but in the connections among multiple elements.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「国力を高める」「国力の差」。軍事・経済・技術など総合した国の力。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国境線",
+   "reading": "こっきょうせん",
+   "pos": "noun",
+   "meaning": "border line",
+   "defJa": "国と国との境を示す線",
+   "passage": {
+    "ja": "アフリカの国境線って、定規で引いたみたいにまっすぐなところが多いと思いませんか。あれは実際、十九世紀に欧州の国々が、自分たちの勢力圏を分け合うために、現地の民族や言語を考えずに、会議の席で決めた線を地図に引いたからなんですよ。そのせいで、同じ民族が二つの国に分けられたり、仲の悪い集団が一つの国に押し込められたりして、今の内戦や対立の火種になってる。線は、ただの線に見えて、人の暮らしを割る刃にもなるんです。",
+    "form": "国境線",
+    "en": "Don't you think a lot of African borders are as straight as if drawn with a ruler? That is in fact because in the nineteenth century European countries, to divide up their own spheres of influence, drew onto the map lines decided at conference tables without considering local peoples or languages. As a result, one people was split into two countries, and hostile groups were crammed into one country, which became the seeds of present-day civil wars and conflicts. A line looks like just a line, but it can also be a blade that cleaves people's lives.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「国境線を引く」「国境線の画定」。地図上の国と国との境目。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国字",
+   "reading": "こくじ",
+   "pos": "noun",
+   "meaning": "Japan-made kanji",
+   "defJa": "日本で作られた漢字",
+   "passage": {
+    "ja": "「峠」「畑」「働」は、いずれも、中国ではなく日本で作られた国字です。「峠」は、山道の上りと下りの境目を示すために、山と上と下を組み合わせた会意文字で、ひと目見ただけで意味が伝わります。話すときに、こうした文字の成り立ちを一言添えると、漢字を苦手に感じている聞き手でも、「なるほど」と身を乗り出してくれます。和製漢語が言葉を作る知恵なら、こちらは文字を作る知恵です。",
+    "form": "国字",
+    "en": "\"峠\" (pass), \"畑\" (field) and \"働\" (work) are all kanji made in Japan rather than in China. \"峠\" combines the characters for mountain, up and down to mark the boundary between the ascent and descent of a mountain road, so its meaning comes across at a glance. When you speak, adding a word on how such characters are formed makes even listeners who dislike kanji lean in with a \"so that's it.\" If Japan-made Sino-words are the wisdom of making words, the latter is the wisdom of making characters.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「国字」の例は「峠」「畑」「働」。日本で作られた漢字で、音読みがないものが多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国家主義",
+   "reading": "こっかしゅぎ",
+   "pos": "noun",
+   "meaning": "statism; nationalism",
+   "defJa": "国家を最優先に考える思想",
+   "passage": {
+    "ja": "国家主義とは、個人の自由や権利よりも、国家の利益や統一を優先すべきだとする考え方です。十九世紀の後半から二十世紀の前半にかけて、国民国家の形成と結びついて各国で広がり、とくに、経済的な危機や敗戦の記憶が重なった国で、急速に支持を集めました。しかし、国家の名のもとに個人の自由が抑えられ、他国への侵略が正当化されたことで、やがて世界大戦への道を開くことになります。愛国心とは似て非なるもの、という見方は、今も重要です。",
+    "form": "国家主義",
+    "en": "Statism is the view that the interests and unity of the state should take priority over individual freedom and rights. From the late nineteenth to the early twentieth century it spread across countries in connection with the formation of nation-states, and it gained support rapidly especially in countries where economic crisis and the memory of defeat overlapped. But as individual freedom was suppressed in the name of the state and aggression against other countries was justified, it eventually opened the road to world war. The view that patriotism and statism are similar but different remains important today.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「国家主義的」。個人より国家を重視する考え方。愛国心とは区別される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国民国家",
+   "reading": "こくみんこっか",
+   "pos": "noun",
+   "meaning": "nation-state",
+   "defJa": "国民を単位として成り立つ国家",
+   "passage": {
+    "ja": "国民国家とは、同じ言語や文化を共有するとされる人々が、一つの国境線で囲まれた領域に暮らし、主権を持つ国家のことである。十九世紀のヨーロッパで広がったこの形は、のちに世界中へ波及し、今日の国際秩序の基本単位となった。もっとも、現実の国家の多くは、複数の民族を含んでおり、「一つの国民」という物語を維持するために、教育や言語政策が重要な役割を果たしてきた。移民の増加を背景に、その前提を問い直す議論が、各国で強まっている。",
+    "form": "国民国家",
+    "en": "A nation-state is a state in which people regarded as sharing a language and culture live in a territory enclosed by a single border and hold sovereignty. This form, which spread in nineteenth-century Europe, later radiated around the world and became the basic unit of today's international order. However, most real states include multiple peoples, and education and language policy have played an important role in maintaining the story of \"one nation.\" Against the background of rising immigration, debate questioning that premise is strengthening in many countries.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「国民国家の成立」。同じ国民意識を持つ人々が主権を担う国家の形。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国際分業",
+   "reading": "こくさいぶんぎょう",
+   "pos": "noun",
+   "meaning": "international division of labor",
+   "defJa": "各国が得意な分野を分担する仕組み",
+   "passage": {
+    "ja": "国際分業とは、各国が得意な分野に特化して生産し、貿易によって互いに補い合う仕組みである。たとえば、半導体の設計は米国、製造は台湾、材料や装置は日本やオランダ、というように、一つの製品が複数の国をまたいで作られる。この仕組みは、全体の効率を高めた一方で、一か所の停止が世界の供給を止めてしまう脆さも生んだ。もともと、この関係は、資源を輸出する国と工業製品を輸出する国の格差という、南北問題の文脈でも論じられてきた。近年、各国が国内の生産を重視し始めたのは、この脆さを痛感したことが背景にある。",
+    "form": "国際分業",
+    "en": "The international division of labor is a system in which each country specializes in what it does best and the countries complement one another through trade. For example, a single product is made across several countries: chip design in the US, manufacturing in Taiwan, materials and equipment in Japan and the Netherlands. While this system raised overall efficiency, it also created a fragility in which a stoppage in one place can halt the world's supply. Originally, this relationship was also discussed in the context of the North-South problem, the gap between countries exporting resources and those exporting manufactures. That countries have recently begun to stress domestic production is rooted in having acutely felt this fragility.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「国際分業が進む」。各国が得意分野に特化して貿易で補い合う体制。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国際秩序",
+   "reading": "こくさいちつじょ",
+   "pos": "noun",
+   "meaning": "international order",
+   "defJa": "国家間関係を律する枠組み",
+   "passage": {
+    "ja": "国際秩序とは、国と国との関係を律する、暗黙または明文のルールの全体を指します。第二次世界大戦後の秩序は、国際連合や自由貿易の枠組み、そして基軸通貨ドルを中心とした通貨の体制によって支えられてきました。ところが、新興国の台頭や、大国どうしの対立が深まるにつれ、このルールが従来のように機能しなくなっているという声が増えています。地殻変動のただなかで、私たち一人ひとりが、何が変わり、何が変わらないのかを見極める目を持つことが重要です。",
+    "form": "国際秩序",
+    "en": "The international order refers to the whole of the implicit or explicit rules that govern relations between countries. The postwar order has been supported by the United Nations, the framework of free trade, and a currency system centered on the key currency, the dollar. But as the rise of emerging countries and the deepening of rivalry among great powers advance, voices saying these rules no longer function as before are increasing. In the midst of a tectonic shift, it is important for each of us to have an eye for seeing what is changing and what is not.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「国際秩序を維持する」。国家間の関係を支えるルールと力関係の全体。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国際連盟",
+   "reading": "こくさいれんめい",
+   "pos": "noun",
+   "meaning": "League of Nations",
+   "defJa": "第一次大戦後に発足した国際平和機構",
+   "passage": {
+    "ja": "第一次世界大戦の惨禍を二度と繰り返すまいと、一九二〇年に発足した国際連盟は、人類が初めて試みた、恒久平和のための国際組織であった。だが、提唱国であるアメリカが、議会の反対で参加しなかったこと、侵略に対して軍事的な制裁を科す力を持たなかったことが、致命的な弱点となった。日本、ドイツ、イタリアの脱退は、組織の権威を決定的に損なった。理想だけでは国際秩序は守れない。その苦い教訓が、のちの国際連合の設計に生かされたのである。",
+    "form": "国際連盟",
+    "en": "Founded in 1920 in the resolve never to repeat the horrors of the First World War, the League of Nations was an international organization for lasting peace that humankind tried for the first time. But the fact that the proposing country, the United States, did not join owing to opposition in Congress, and that it lacked the power to impose military sanctions on aggression, became fatal weaknesses. The withdrawals of Japan, Germany and Italy decisively damaged its authority. Ideals alone cannot protect the international order. That bitter lesson was put to use in designing the later United Nations.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「国際連盟の脱退」。一九二〇年発足。米国不参加と制裁力の弱さが限界に。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "圧縮",
+   "reading": "あっしゅく",
+   "pos": "noun",
+   "meaning": "compression, condensation",
+   "defJa": "大きさや量を小さくすること",
+   "passage": {
+    "ja": "大きなAIモデルは、そのままではスマートフォンの中で動かせません。そこで、モデルの性能をなるべく保ったまま、サイズを小さくする圧縮の技術が重要になります。たとえば、数値の精度を少し落としたり、あまり使われない部分を削ったりすることで、必要なメモリを大きく減らせます。同じ発想は勉強の世界にもあって、要点だけに絞ってまとめ直したノートを、反復して読み返すことは、知識をぎゅっと小さくして持ち歩くようなものなのです。",
+    "form": "圧縮",
+    "en": "A large AI model cannot run inside a smartphone as it is. So the technology of compression, shrinking the size while keeping performance as much as possible, becomes important. By slightly lowering numerical precision or trimming rarely used parts, for example, the memory needed can be greatly reduced. The same idea exists in the world of study: rereading, repeatedly, notes recast down to the essentials is like squeezing knowledge small and carrying it around.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「データを圧縮する」「圧縮率」。大きさ・量を小さくまとめること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "地の文",
+   "reading": "じのぶん",
+   "pos": "noun",
+   "meaning": "narrative text (not dialogue)",
+   "defJa": "会話以外の語りの部分",
+   "passage": {
+    "ja": "小説を読むとき、会話の「かぎかっこ」の外側、つまり地の文にこそ、作者の工夫が最も強く出ます。たとえば、三人称の語りでありながら、ある登場人物の内面にぐっと近くまで寄り添うと、読者は、その人物の視点で世界を見ることになります。作者が何度も加筆して整えるのも、多くはこの部分です。会話文は人物の声、かぎ括弧の外は作者の声、と整理しておくと、作品の読み方が立体的になります。",
+    "form": "地の文",
+    "en": "When reading a novel, the author's craft shows most outside the quotation marks of dialogue, that is, in the narrative passages. For example, if the narration, while in the third person, draws closely alongside a character's inner life, the reader ends up seeing the world from that character's viewpoint. It is also mostly this part that the author revises and adds to again and again. If you sort it as dialogue being the characters' voices and what lies outside the brackets being the author's voice, the way you read the work becomes three-dimensional.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「地の文」は会話文以外の語り。「会話文」と対。視点や語りの工夫が出る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "地方分権",
+   "reading": "ちほうぶんけん",
+   "pos": "noun",
+   "meaning": "decentralization",
+   "defJa": "国の権限を地方に移すこと",
+   "passage": {
+    "ja": "地方分権とは、国が持つ権限や財源を、都道府県や市町村に移し、地域のことは地域で決められるようにする改革である。日本では、二〇〇〇年に施行された関連法を一つの節目として、国と地方の関係が「上下」から「対等」へと位置づけ直された。ただ、権限が移っても、財源が十分でなければ、自治体は思い切った政策を打てない。分権は、災害や人口減少に対する地域の回復力を高める手段としても、期待されている。",
+    "form": "地方分権",
+    "en": "Decentralization is a reform that moves powers and revenue held by the state to prefectures and municipalities so that local matters can be decided locally. In Japan, with related laws that took effect in 2000 as a milestone, the relationship between state and localities was repositioned from \"superior and subordinate\" to \"equal.\" Still, even if powers are transferred, local governments cannot adopt bold policies unless revenue is sufficient. Devolution is also expected to be a means of raising localities' resilience against disasters and population decline.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「地方分権を進める」。国から自治体へ権限と財源を移す改革。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "地殻変動",
+   "reading": "ちかくへんどう",
+   "pos": "noun",
+   "meaning": "tectonic shift (fig.)",
+   "defJa": "社会などの大きな構造の変化",
+   "passage": {
+    "ja": "今の世界経済は、地殻変動のただなかにあると言われます。長年、世界の工場だった中国が、賃金の上昇で、生産拠点としての魅力を落とす一方、インドや東南アジアに、新しい生産が移り始めています。さらに、国際分業の仕組みも、安全保障への意識の高まりにつれて、効率一辺倒から、多少高くても安心できる供給網へと組み替えられつつあります。こうした大きな動きは、短期のニュースでは見えにくく、数十年のスパンで眺めて初めて、輪郭がつかめます。",
+    "form": "地殻変動",
+    "en": "The current world economy is said to be in the midst of a tectonic shift. China, long the world's factory, is losing its appeal as a production base as wages rise, while new production is starting to move to India and Southeast Asia. Furthermore, as awareness of security grows, the international division of labor too is being reorganized from pure efficiency to supply chains that offer security even if somewhat more costly. Such large movements are hard to see in short-term news and take shape only when viewed over a span of decades.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「地殻変動が起きる」。地質用語から、社会・経済の大きな構造変化の比喩に。",
+    "sense": "比喩的な意味"
+   }
+  },
+  {
+   "term": "地頭",
+   "reading": "じあたま",
+   "pos": "noun",
+   "meaning": "native wit; innate smarts",
+   "defJa": "生まれつきの頭のよさ、考える力",
+   "passage": {
+    "ja": "「地頭がいい」とは、知識の量ではなく、初めて出会う問題でも筋道を立てて考えられる力を指す、と説明されることが多い。ただ、この能力は、生まれつきだけで決まるわけではないと、教育の専門家は指摘する。むしろ、日頃から「なぜ」と問い、因果関係を言葉にする習慣が、この力を鍛えるという。固定観念にとらわれず、別の可能性を探しながら考える癖がついた人ほど、未知の課題に強いとされる。",
+    "form": "地頭",
+    "en": "\"Having native wit\" is often explained as referring not to the amount of knowledge but to the ability to reason in an orderly way even about a problem one meets for the first time. But educators point out that this ability is not determined by innate factors alone. Rather, the habit of asking \"why\" every day and putting causal relationships into words is said to train this power. People who have the habit of thinking while looking for counterevidence, unbound by fixed ideas, are said to be strong at unfamiliar challenges.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「地頭がいい」。知識量ではなく、筋道を立てて考える生来的な力。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "埋没費用",
+   "reading": "まいぼつひよう",
+   "pos": "noun",
+   "meaning": "sunk cost",
+   "defJa": "すでに支払い取り戻せない費用",
+   "passage": {
+    "ja": "すでに払ってしまって、取り戻せないお金や時間を、埋没費用という。経済学の原則では、これは今後の判断に影響させるべきではない。ところが、現実の人間は、「ここまで払ったのだから」と、見込みのない映画や事業を続けてしまいがちである。この心理は、失敗を認めたくない劣等感や、過去の自分の判断を守りたい気持ちとも結びついているとされる。損切りを早めるには、「いまゼロから始めるとしたら、同じ選択をするか」と問い直すのが有効だという。",
+    "form": "埋没費用",
+    "en": "Money and time already paid and unrecoverable are called sunk costs. By the principle of economics, they should not influence future decisions. Yet real people tend to keep watching a hopeless film or continuing a hopeless business because \"we've paid this much.\" This psychology is said to be tied to an inferiority complex that does not want to admit failure and to a wish to defend one's past judgments. To cut losses sooner, it is said to be effective to ask again, \"if I were starting from zero now, would I make the same choice?\"",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「埋没費用にこだわる」。サンクコスト。回収できない過去の支出。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "基軸通貨",
+   "reading": "きじくつうか",
+   "pos": "noun",
+   "meaning": "key currency",
+   "defJa": "国際取引の中心となる通貨",
+   "passage": {
+    "ja": "基軸通貨とは、国際的な貿易や金融取引の決済に、世界で広く使われる通貨のことである。第二次世界大戦後は、米ドルがこの役割を担い、各国は外貨準備の多くをドルで保有してきた。この地位は、アメリカにとって、国債を低い金利で発行しやすいという利点をもたらす一方、世界の景気が米国の金融政策に大きく左右されるという脆さも生んだ。近年は、国際秩序の変化を背景に、複数の通貨に分散して持つ動きも見られる。",
+    "form": "基軸通貨",
+    "en": "A key currency is a currency widely used around the world to settle international trade and financial transactions. After the Second World War, the US dollar took on this role, and countries have held much of their foreign-exchange reserves in dollars. This status brought the United States the advantage of being able to issue government bonds easily at low interest rates, while also creating a fragility in which the world economy is greatly affected by American monetary policy. In recent years, against the background of changes in the international order, moves to hold a spread of several currencies have also been seen.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「基軸通貨ドル」。国際決済・準備に広く使われる通貨。発行国に利点と責任。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "報酬系",
+   "reading": "ほうしゅうけい",
+   "pos": "noun",
+   "meaning": "reward system (brain)",
+   "defJa": "快をもたらす脳の神経回路",
+   "passage": {
+    "ja": "脳の報酬系は、何かを達成したときや、期待していた通りのことが起きたときに、ドーパミンを出して、「もう一度やりたい」という気持ちを生みます。ここで重要なのは、ごほうびの大きさよりも、行動の直後に、小さな達成感が得られることです。脳をうまくだますのではなく、仕組みを味方につけるイメージです。ですから、勉強を続けたいなら、反復の結果をチェックリストに印をつけて見えるようにし、毎日、小さな即時報酬を与えてあげましょう。",
+    "form": "報酬系",
+    "en": "The brain's reward system, when you achieve something or when what you expected happens, releases dopamine and produces the feeling \"I want to do it again.\" What matters here is not the size of the reward but getting a small sense of achievement right after the action. The image is not of tricking the brain cleverly but of making the mechanism your ally. So if you want to keep studying, mark a checklist with the results of your repetitions to make them visible, and give yourself a small immediate reward every day.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「報酬系が働く」。ドーパミンで意欲を生む脳の回路。習慣づくりの要。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "塵も積もれば山となる",
+   "reading": "ちりもつもればやまとなる",
+   "pos": "expression",
+   "meaning": "many a little makes a mickle",
+   "defJa": "小さなことも積み重なれば大きくなる",
+   "passage": {
+    "ja": "「塵も積もれば山となる」。この言葉を、単なる気休めの励ましとして読むのは惜しい。毎日の努力が、翌日の鏡の中では何も変わって見えないのは、成果が、複利のように、ゆっくり、しかし確実に積み上がるからである。最初の数か月は、反復しても手応えがなく、多くの人がそこで努力家であることをやめてしまう。だが、その平らな時期を越えた先に、いきなり景色がまるごと変わる地点が待っている。",
+    "form": "塵も積もれば山となる",
+    "en": "\"Even dust, piled up, becomes a mountain.\" It is a waste to read this saying as mere encouragement. That daily effort looks as though nothing has changed by the next day is because results accumulate slowly but surely, like compound interest. For the first few months there is no sense of response however much one repeats, and many people stop being hard workers right there. But beyond that flat stretch awaits a point where the scenery suddenly changes.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "ことわざ。小さな積み重ねが大きな成果に。複利や習慣の話でよく引かれる。",
+    "sense": ""
+   }
+  }
+ ]
+}
