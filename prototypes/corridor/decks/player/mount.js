@@ -581,12 +581,14 @@ function studyScreen() {
   face.dataset.card = id;
   face.dataset.kind = kind;
   const source = KIND_NAME[card.kind] || '例文';
+  const written = passageChips(card, source);
   const chips = el(
     'div',
     'kp-chips',
     el('span', 'kp-chip kp-kindchip', kindLabel),
-    el('span', 'kp-chip', source),
-    ...passageChips(card),
+    // a written passage's register chip names its source too, so the row stays one line at 390px
+    REGISTER[card.register] ? null : el('span', 'kp-chip', source),
+    ...written,
     TOPIC[card.topic] ? null : el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
     word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
@@ -684,9 +686,10 @@ function levelChip(level) {
 const REGISTER = { 講: ['講義', '講義・本の要約'], 報: ['報道', 'ニュース・解説'], 論: ['論説', 'エッセイ・思想'], 話: ['会話', '話し言葉'], 学: ['学び', '勉強法・学習の話'], 語: ['話し方', '話し方・書き方の話'] };
 const TOPIC = { mind: ['心と学び', '心と学び'], india: ['インド・仏教', 'インド哲学と仏教'], ai: ['AI・半導体', 'AI と半導体'], history: ['世界史', '世界史'], language: ['日本語', '日本語についての話'] };
 /** small text chips for the passage's register and topic (none on a card without them); the
- * passage's topic takes the place of the word's group chip, so the row stays kind · source ·
- * register · topic · level · state (aesthetics.md §4) */
-function passageChips(card) {
+ * passage's topic takes the place of the word's group chip, and its register the place of the
+ * source chip (its label names the source), so the row stays one line: kind · register · topic ·
+ * level · state (aesthetics.md §4) */
+function passageChips(card, source = '') {
   const out = [];
   for (const [table, value, cls, what] of [
     [REGISTER, card.register, 'kp-regchip', '文体'],
@@ -695,8 +698,9 @@ function passageChips(card) {
     const [text, full] = (typeof value === 'string' && table[value]) || [];
     if (!text) continue;
     const chip = el('span', `kp-chip kp-chip-sm ${cls}`, text);
-    chip.title = `${what}：${full}`;
-    chip.setAttribute('aria-label', `${what}：${full}`);
+    const label = `${what}：${full}${table === REGISTER && source ? `（${source}）` : ''}`;
+    chip.title = label;
+    chip.setAttribute('aria-label', label);
     out.push(chip);
   }
   return out;
@@ -1565,10 +1569,6 @@ function settleBack() {
   } else dy = bottom - bottomLimit;
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
-  // with no host header the study top bar (× n/N 削除) is the page's top edge: the fold step never
-  // slides it under the viewport edge (A39); a host header covers it either way
-  const head = inset ? null : ctx.root.querySelector('.kp-top-study')?.getBoundingClientRect().top;
-  const headOk = (more) => head == null || head - dy - more >= Math.min(topLimit, head - dy);
   for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
     const r = s.getBoundingClientRect();
     const [rTop, rBottom] = [r.top - lift - dy, r.bottom - lift - dy];
@@ -1576,14 +1576,15 @@ function settleBack() {
     // rows touch, so the edge goes exactly at the bar: the next (or the previous) row is then whole
     const intoView = rBottom - barTop + 1; // scroll down: the row just above the bar
     const underBar = barTop - rTop; // scroll up: the row wholly under the bar
-    if (top - dy - intoView >= topLimit && dy + intoView <= room.down && headOk(intoView)) dy += intoView;
+    if (top - dy - intoView >= topLimit && dy + intoView <= room.down) dy += intoView;
     else if (bottom - dy + underBar <= bottomLimit && dy - underBar >= room.up) dy -= underBar;
     break;
   }
   if (Math.abs(dy) < 1) return;
   window.scrollTo({ top: window.scrollY + dy, behavior: motionOk() ? 'smooth' : 'instant' });
 }
-/** the height of a header the host pins over the top of the page (the corridor's chrome), if any */
+/** the height of a header the host pins over the top of the page (the corridor's chrome); with
+ * none, the study top bar pins itself (player.css, data-host none): where it rests once stuck */
 function topInset() {
   let n = document.elementFromPoint(innerWidth / 2, 1);
   while (n && n !== document.body && !ctx.root.contains(n)) {
@@ -1591,7 +1592,9 @@ function topInset() {
     if (pos === 'fixed' || pos === 'sticky') return Math.max(0, n.getBoundingClientRect().bottom);
     n = n.parentElement;
   }
-  return 0;
+  const own = ctx.root.querySelector('.kp-top-study');
+  const cs = own && getComputedStyle(own);
+  return cs?.position === 'sticky' ? (parseFloat(cs.top) || 0) + own.offsetHeight : 0;
 }
 
 /**

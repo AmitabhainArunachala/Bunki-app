@@ -98,6 +98,8 @@
 
 /* study */
 .kp-top-study { gap: 10px; }
+/* no host header (the standalone study pages): the study top bar pins itself, so a long passage's settling scroll cannot take it off screen */
+.kp[data-host='none'] .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-bg); padding-block: 8px; margin-block: -8px; } /* 8px of its own ground above and below once stuck; the same place at rest */
 .kp-progress { flex: 1; height: 6px; border-radius: 3px; background: var(--kp-panel-2); overflow: hidden; }
 /* the rail ticks per card on the compositor: scaleX, never width */
 .kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1); }

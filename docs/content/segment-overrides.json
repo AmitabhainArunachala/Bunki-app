@@ -1,0 +1,43 @@
+{
+  "kind": "segment-override-lexicon",
+  "schemaVersion": 1,
+  "law": "A tap must open the word the text means. In kana-only text UniDic sometimes splits or names the wrong word, and the reader and the decks look a word up by its base, so a wrong split opens a wrong entry. This lexicon re-splits those runs at tokenization time (build_corridor.tokenise, before the reading lexicon), so every consumer of tokenise() — the shelf, feed and archive mints, build_examples, the 言葉の鉱脈 decks — gets the same split. It never changes the text: each entry's tokens spell exactly what it matched.",
+  "provenance": {
+    "authored": "2026-10-06, the player-bugs pass after #121, from the library curator's kanji screen (docs/content/library-candidates-2026-10-03: こうばん, まどの, ぶちょう) and the deck handoff's open item (docs/srs/HANDOFF_2026-10-04.md, what remains: なん in 〜なんで tagged as the pronoun).",
+    "policy": "Match adjacent token surfaces exactly; a match row may also name the POS (p) or the base (b) UniDic gave, and `after` may guard the token before the run, so an entry fires only on the mistake it was written for. A replacement token's base (b) is the dictionary headword the reader should open (交番, not こうばん, which is also 降板). Every entry has a sentence fixture in prototypes/corridor/tools/test_segment_overrides.py."
+  },
+  "entries": [
+    {
+      "word": "交番",
+      "match": [{ "s": "こう" }, { "s": "ばん" }],
+      "tokens": [{ "s": "こうばん", "b": "交番", "p": "名詞", "r": "こうばん", "c": true }],
+      "note": "UniDic reads kana こうばん as the adverb こう + 晩. Found by the library curator (bunki-orig-n4-police-box-note was written with 交番 in kanji to avoid it)."
+    },
+    {
+      "word": "窓の",
+      "match": [{ "s": "ま", "p": "感動詞" }, { "s": "どの" }],
+      "tokens": [
+        { "s": "まど", "b": "窓", "p": "名詞", "r": "まど", "c": true },
+        { "s": "の", "b": "の", "p": "助詞", "r": "の", "c": false }
+      ],
+      "note": "UniDic reads kana まどの as the interjection ま + どの. Guarded on the interjection, so いまどの (今どの) is untouched."
+    },
+    {
+      "word": "部長",
+      "match": [{ "s": "ぶちょう", "b": "ふちょう" }],
+      "tokens": [{ "s": "ぶちょう", "b": "部長", "p": "名詞", "r": "ぶちょう", "c": true }],
+      "note": "UniDic keeps the surface but names 不調 (ふちょう), so a tap opened 不調. Kana ぶちょう is 部長."
+    },
+    {
+      "word": "〜ずなんで (copula な + ん + で)",
+      "after": { "s": "ず" },
+      "match": [{ "s": "なん", "p": "代名詞" }, { "s": "で" }],
+      "tokens": [
+        { "s": "な", "b": "だ", "p": "助動詞", "r": "な", "c": false },
+        { "s": "ん", "b": "ん", "p": "助詞", "r": "ん", "c": false },
+        { "s": "で", "b": "だ", "p": "助動詞", "r": "で", "c": false }
+      ],
+      "note": "After ず (相変わらずなんで) UniDic tags なん as the pronoun 何, so a tap opened 何. It is the explanatory な + ん + で, split the way UniDic itself splits 暇なんで. Guarded on ず: a sentence-initial なんで (why) stays 何."
+    }
+  ]
+}
