@@ -662,7 +662,7 @@ async function journey(browser, browserName, viewport) {
     check('J18 the practised target is marked practised', field.reviewed.includes(Q[0]));
     check(
       'J19 the field reads the real deck: 5 session cards and 支障 from the sheet are ready',
-      /復習する · 6/u.test(await act(page, 'review').innerText()),
+      /review what is ready · 6/u.test(await act(page, 'review').innerText()),
       await act(page, 'review').innerText(),
     );
     check(

@@ -379,3 +379,5 @@ T13/T14 fixture interception URLs and behavior assertions remain byte-for-byte u
 | `verify-design-reader-shelf.mjs` | G7 exact version-switch labels | `原文 Original · N1`, `やさしい版 Simplified · N3` → `Original · N1`, `Simplified · N3` | F2 selects English; both version identities, levels, pressed states and retelling explanation remain required. |
 
 | `verify-design-reader-shelf.mjs` | G7 active version wait | active label contains `やさしい` → contains `Simplified` | F2 selects the English version label. The switch must still complete, show the alternate article and retain its level/caption checks. |
+
+| `verify-guided-session.mjs` | J19 ready-card count | button matches `復習する · 6` → matches `review what is ready · 6` | F2 changes the active English label. The exact six ready cards remain mandatory; the product restores the count in its EN label rather than relaxing the assertion. |

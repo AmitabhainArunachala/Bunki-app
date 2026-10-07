@@ -3420,6 +3420,18 @@ body:not([data-view='drift']) .sem-row .sem-note {
 
 /* Counts must not change the header's line count during a word action. */
 @media (max-width: 520px) {
+  /* The article already names its level. Reserve its capture door even before
+     a word is selected, so selecting/saving never changes header height. */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > .chrome-level { display: none; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take {
+    display: inline-flex; width: 44px; min-width: 44px; padding: 0;
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: hidden; }
+  body.has-primary-tabs[data-view='reader'] #reader-take .l-ja {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  body.has-primary-tabs[data-view='reader'] #reader-take::after { content: '+'; font-size: 24px; }
+  body.has-primary-tabs[data-view='reader'] #reader-take[aria-pressed='true']::after { content: '✓'; }
   body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
   body:not(.zen) #app > .chrome > button.chrome-dojo { padding-inline: 4px; }
   body:not(.zen) #app > .chrome > .level-chip.chrome-level { padding-inline: 4px; margin-inline: 0 2px; }

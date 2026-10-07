@@ -127,6 +127,7 @@ export async function inspectChrome(page) {
       const contentValues = (el.closest('[data-ui-content-value]')?.dataset.uiContentValue || '').split('|').filter(Boolean);
       // Proper source attribution is a named mark; no interface labels qualify.
       if (el.closest('.reader-source, .article-facts')) contentValues.push('ウィキニュース');
+      if (el.closest('.article-facts')) contentValues.push('政府広報オンライン');
       // Lookup buttons may split one declared learned phrase into several
       // lexical fragments. Permit only fragments of that exact declared value.
       const withoutContent = value => contentValues.reduce((text, content) => text.split(content).join(''), value)

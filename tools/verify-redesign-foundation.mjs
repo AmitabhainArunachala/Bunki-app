@@ -74,7 +74,13 @@ try {
             assert(dock.play.bottom <= dock.tabs.top, `Reader play bar overlaps tabs: ${JSON.stringify(dock)}`);
           }
           // Dictionary content stays Japanese; its sheet owns the layer and hides the tabs.
+          const headerBefore = await page.locator('.chrome').evaluate(node => node.getBoundingClientRect().height);
           await page.locator('#reader .tok.content').first().click();
+          await page.locator('#mini').waitFor();
+          const headerAfter = await page.locator('.chrome').evaluate(node => node.getBoundingClientRect().height);
+          assert(Math.abs(headerAfter - headerBefore) <= 1, 'Selecting a word must not shift the header/article');
+          const capture = await page.locator('#reader-take').boundingBox();
+          assert(capture.width >= 44 && capture.height >= 44, 'The retained capture door keeps its touch target');
           const dictionary = page.locator('#mini .mini-entry');
           {
             await dictionary.click();
