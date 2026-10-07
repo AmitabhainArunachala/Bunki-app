@@ -155,28 +155,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "名場面",
-   "reading": "めいばめん",
-   "pos": "noun",
-   "meaning": "famous scene, memorable scene",
-   "defJa": "物語や劇で特に印象に残る場面",
-   "passage": {
-    "ja": "インドの二大叙事詩の一つ『マハーバーラタ』には、名場面が数多くある。なかでも戦場でアルジュナが親族と戦うことをためらい、御者のクリシュナが語りかける場面は、のちに『バガヴァッド・ギーター』として独立した聖典になった。この対話で説かれるのは、結果に執着せず行為そのものを引き受ける生き方である。長きにわたり宗派を問わず読み継がれてきたことが、その重みを物語っている。",
-    "form": "名場面",
-    "en": "The Mahabharata, one of India's two great epics, has many famous scenes. Among them, the scene on the battlefield where Arjuna hesitates to fight his own kin and his charioteer Krishna speaks to him later became an independent scripture, the Bhagavad Gita. What this dialogue teaches is a way of life that takes on action itself without clinging to its results. That it has been read for so long, whatever the school, speaks to its weight.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「名場面を振り返る」のように、物語の山場を人に紹介するときの語。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "数年",
    "reading": "すうねん",
    "pos": "noun",
@@ -299,28 +277,6 @@
     "register": "話",
     "topic": "language",
     "tipJa": "割は十分の一。「四割引き」は定価の六割で買えるという意味になる。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "引き受ける",
-   "reading": "ひきうける",
-   "pos": "verb",
-   "meaning": "to undertake, to take on",
-   "defJa": "仕事や責任を自分のものとして受けもつ",
-   "passage": {
-    "ja": "『バガヴァッド・ギーター』は、行為の結果ではなく、行為そのものを引き受けることを説く。成功するか失敗するかは、自分の力の及ばない縁に左右されるからである。結果への執着を手放せばこそ、人は目の前の務めに全力で向き合える。この教えは、報酬を求めて動く現代の働き方にも、行為の主体はだれなのかという静かな問いを投げかけている。うまくいくかどうかは天に任せて今日の一歩に集中することは、諦めではなく力の使い方なのだ。",
-    "form": "引き受ける",
-    "en": "The Bhagavad Gita teaches us to take on action itself, not the results of action. This is because success or failure depends on conditions beyond one's own power. Precisely because one lets go of attachment to results, one can face the duty before one with all one's strength. This teaching also puts a quiet question to modern ways of working driven by pay: who is the agent of the action? Leaving success to heaven and focusing on today's single step is not resignation but a way of using one's strength.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "「責任を引き受ける」と使う。結果ではなく務めそのものを受けもつ意味。",
     "sense": ""
    },
    "deck": "n2",

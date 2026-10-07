@@ -573,28 +573,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "口語",
-   "reading": "こうご",
-   "pos": "noun",
-   "meaning": "colloquial language",
-   "defJa": "ふだんの話し言葉。文語に対する語",
-   "passage": {
-    "ja": "日本語には、話し言葉と書き言葉の大きな隔たりがありました。明治になると、「言文一致」運動が起こり、口語で小説を書こうとする試みが始まります。二葉亭四迷の『浮雲』は、その先駆けとして知られています。それまで文章といえば古文に近い文語が当たり前だっただけに、話すように書くことは、当時として大きな革新でした。今私たちが当たり前に読んでいる現代の文章は、この試行錯誤の延長線上にあるのです。",
-    "form": "口語",
-    "en": "Japanese once had a wide gap between spoken and written language. In the Meiji era, the genbun itchi movement arose and attempts began to write novels in colloquial language. Futabatei Shimei's Ukigumo is known as a pioneer of that effort. Because writing had until then been taken to mean a literary style close to classical Japanese, writing as one speaks was a great innovation at the time. The modern prose we read as a matter of course today lies on the extension of this trial and error.",
-    "register": "講",
-    "topic": "language",
-    "tipJa": "「口語」はふだんの話し言葉。「文語」と対になり、「口語訳」などの形でも出る。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "化身",
    "reading": "けしん",
    "pos": "noun",
@@ -793,28 +771,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "句読点",
-   "reading": "くとうてん",
-   "pos": "noun",
-   "meaning": "punctuation marks",
-   "defJa": "句点と読点。文章の区切りを示す記号",
-   "passage": {
-    "ja": "文章の読みやすさは、句読点の打ち方で大きく変わる。公的な文書の書き方を定めた国の資料では、読点を文の構造に応じて打つ原則が示されてきた。たとえば、長い修飾語が二つ続く場合、その境目に読点を入れると、誤読を防ぎやすい。とりわけ日本語は分かち書きをしないため、読点の位置ひとつで意味が変わることさえある。これらの符号は飾りではなく、受け手の呼吸を設計する道具にほかならない。",
-    "form": "句読点",
-    "en": "How easy a text is to read changes greatly with the way punctuation is placed. In national materials that set out how to write official documents, the principle of placing commas according to sentence structure has been laid down. For example, when two long modifiers follow one another, putting a comma at the boundary makes misreading easier to prevent. Since Japanese in particular does not put spaces between words, the position of a single comma can even change the meaning. These marks are not decoration but nothing other than tools for designing the reader's breathing.",
-    "register": "報",
-    "topic": "language",
-    "tipJa": "「句読点を打つ」と使う。句点（。）と読点（、）の総称。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "反芻",
    "reading": "はんすう",
    "pos": "noun",
@@ -985,28 +941,6 @@
    },
    "deck": "senmon",
    "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "口調",
-   "reading": "くちょう",
-   "pos": "noun",
-   "meaning": "tone of voice",
-   "defJa": "話す時の調子や言い方",
-   "passage": {
-    "ja": "同じ言葉でも、口調が変わると、伝わる意味はまるで違ってくる。「そうですか」の一言は、穏やかに言えば納得の表明だが、語尾を下げて短く切れば、拒絶にも聞こえる。文字に起こすと、この差は句読点では表せず、読み手は文脈から声の調子を推し量らざるを得ない。だからこそ、文章を書く人は、声の気配を言葉の選び方に忍ばせる必要がある。それは、文章という静かな媒体で、声を呼び戻す小さな工夫にほかならない。",
-    "form": "口調",
-    "en": "Even with the same words, the meaning that gets across is entirely different if the tone changes. Said gently, a simple I see expresses acceptance, but said short with a falling ending it can sound like rejection. Once transcribed, this difference cannot be shown by punctuation, and readers have no choice but to infer the vocal tone from context. That is exactly why people who write must slip the trace of a voice into their choice of words. That is nothing other than a small device for calling a voice back into the quiet medium of writing.",
-    "register": "論",
-    "topic": "language",
-    "tipJa": "「穏やかな口調」「強い口調」と使う。声の調子・言い回しの印象を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

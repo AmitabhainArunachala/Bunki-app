@@ -353,28 +353,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "見本",
-   "reading": "みほん",
-   "pos": "noun",
-   "meaning": "sample, model",
-   "defJa": "全体の品質や形を示すための実物。",
-   "passage": {
-    "ja": "古代アテネは、民主政治の見本としてしばしば引き合いに出される。だが、政治に加われたのは成人男性の市民に限られ、女性や奴隷、外国生まれの住民は最初から数に入っていなかった。理想を過去に求めるとき、私たちは都合のよい部分だけを切り取り、無条件にたたえてしまいがちである。歴史から学ぶとは、栄光をなぞることではなく、その陰に何があったのかを見抜くことにほかならない。",
-    "form": "見本",
-    "en": "Ancient Athens is often cited as a model of democratic politics. But only adult male citizens could take part in politics, and women, slaves, and foreign-born residents were not counted from the start. When we seek an ideal in the past, we tend to cut out only the convenient parts and praise them unconditionally. To learn from history is nothing other than seeing through to what lay in the shadow of glory, not tracing that glory.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "「政治の見本」「商品の見本」のように、手本や標本の意。比喩にも使う。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "詫びる",
    "reading": "わびる",
    "pos": "verb",

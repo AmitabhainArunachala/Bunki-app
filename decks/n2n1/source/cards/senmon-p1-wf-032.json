@@ -89,28 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "悪文",
-   "reading": "あくぶん",
-   "pos": "noun",
-   "meaning": "bad writing",
-   "defJa": "わかりにくい悪い文章",
-   "passage": {
-    "ja": "悪文とは、文法の誤りを含む文のことではない。むしろ、文法的には正しいのに、読み手に余計な負担を強いる文を指すと言ったほうが近い。主語と述語が離れすぎている、修飾語の係り先が曖昧である、一文に論点が三つも四つも詰め込まれている。こうした文は、小論文の採点でも真っ先に減点され、ビジネス文書では誤解のもとにもなる。それは、書き手が頭の中を整理しないまま筆を執った証拠にほかならない。",
-    "form": "悪文",
-    "en": "Bad writing does not mean sentences containing grammatical errors. Rather, it is closer to say it refers to sentences that are grammatically correct yet impose needless burden on the reader. The subject and predicate are too far apart, what a modifier attaches to is ambiguous, three or four points are crammed into a single sentence. Such sentences are the first to lose marks even in a short-essay exam and become a source of misunderstanding in business documents. That is nothing other than proof that the writer picked up the pen without sorting things out in their head.",
-    "register": "論",
-    "topic": "language",
-    "tipJa": "「悪文を直す」。誤りではなく読みにくさが問題。対は「名文」。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "律令",
    "reading": "りつりょう",
    "pos": "noun",
@@ -545,28 +523,6 @@
    },
    "deck": "senmon",
    "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "急務",
-   "reading": "きゅうむ",
-   "pos": "noun",
-   "meaning": "urgent task",
-   "defJa": "急いでしなければならない務め",
-   "passage": {
-    "ja": "生成AIの普及に、法制度が追いついていない。著作物の学習利用の線引きも、誤情報への責任の所在も、定まらないまま利用者だけが増えている。こうした空白を埋めることが各国政府の急務だが、規制が厳しすぎれば開発は国外へ流れかねず、緩すぎれば被害が広がる。両者の均衡点を見つけるには、悪用の実例を丁寧に積み上げ、議論の土台とするほかない。技術の進歩は待ってくれないが、議論を急ぎすぎても信頼は得られない。",
-    "form": "急務",
-    "en": "Legal systems have not kept up with the spread of generative AI. Both the line on using copyrighted works for training and the question of who is responsible for misinformation remain undecided while only the number of users grows. Filling this vacuum is the urgent task of governments, but if regulation is too strict, development may flow overseas, and if it is too loose, the harm spreads. To find the balance point between the two, there is nothing for it but to carefully accumulate real examples of misuse and make them the basis of debate. Technological progress will not wait, but rushing the debate will not win trust either.",
-    "register": "論",
-    "topic": "ai",
-    "tipJa": "「〜が急務だ」「急務となる」。早急に取り組むべき課題。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

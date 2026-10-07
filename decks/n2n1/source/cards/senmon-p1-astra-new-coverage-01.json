@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "言語学",
-   "reading": "げんごがく",
-   "pos": "noun",
-   "meaning": "linguistics",
-   "defJa": "人間のことばの仕組みや働きを研究する学問。",
-   "passage": {
-    "ja": "子どもが「行った」を「行いた」と言ったら、大人はすぐ言い直させたくなるものです。しかし、その間違いを手がかりにすると、子どもが動詞の変化をどう捉えているかという問いが生まれます。言語学では、正しい言い方を勧めるだけでなく、実際の発話を集めて、背後にある仕組みを探ります。専門用語を覚えることは、観察した違いを平明な言葉で説明する作業と切り離せません。一つの言い間違いにも、別の動詞なら同じ形になるのかと問い直すことで、調べる価値のある筋道が見つかります。",
-    "form": "言語学",
-    "en": "When a child uses the nonstandard “行いた” instead of “行った” for “went,” an adult may immediately want to correct them. Yet taking that error as a clue raises the question of how the child understands changes in verb forms. Linguistics goes beyond recommending correct expressions to collect actual utterances and investigate the systems behind them. Learning technical terms is inseparable from the work of explaining observed differences in clear language. Even a single verbal error can open up a worthwhile line of investigation if we ask whether another verb would take the same form.",
-    "register": "語",
-    "topic": "language",
-    "tipJa": "ことばの正誤を指導する活動とは区別する。「言語学の研究」。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "gpt-6-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "潜在能力",
    "reading": "せんざいのうりょく",
    "pos": "noun",

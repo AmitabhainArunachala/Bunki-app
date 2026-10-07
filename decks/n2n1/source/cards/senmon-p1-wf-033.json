@@ -1057,28 +1057,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "掌握",
-   "reading": "しょうあく",
-   "pos": "noun",
-   "meaning": "grasp, command",
-   "defJa": "完全に把握して自分の支配下に置くこと",
-   "passage": {
-    "ja": "生成AIの競争で優位に立つには、計算資源の掌握が欠かせないと言われる。最先端のGPUを大量に確保できる企業だけが、巨大なモデルの学習に挑めるからだ。そのため各国は、半導体の設計から製造、輸出入に至るまでの供給網を、自国の影響下に置こうと動いている。一方、計算資源が一部に集中することへの懸念も根強く、独占を防ぐ仕組みづくりが議論されている。半導体をめぐる競争は、技術だけでなく、供給網をめぐる駆け引きでもある。",
-    "form": "掌握",
-    "en": "To gain the upper hand in the competition over generative AI, it is said that command of computing resources is indispensable. This is because only companies that can secure large quantities of cutting-edge GPUs can take on training huge models. For that reason, countries are moving to place the supply chain, from the design and manufacture of semiconductors to their import and export, under their own influence. On the other hand, concern about computing resources concentrating in a few hands is also deep-rooted, and the building of mechanisms to prevent monopoly is being discussed. The competition over semiconductors is a contest of maneuvering over supply chains as well as technology.",
-    "register": "報",
-    "topic": "ai",
-    "tipJa": "「実権を掌握する」「市場を掌握する」。手中におさめ、支配すること。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "成句",
    "reading": "せいく",
    "pos": "noun",

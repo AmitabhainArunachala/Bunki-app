@@ -243,28 +243,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "占領",
-   "reading": "せんりょう",
-   "pos": "noun",
-   "meaning": "occupation, possession",
-   "defJa": "他国の領土を軍事力で支配すること",
-   "passage": {
-    "ja": "一九四五年から七年近く続いた連合国による日本の占領は、戦後の日本人にとって、敗北であると同時に、ある種の解放でもあった。農地改革や女性参政権が実現した一方で、報道は検閲を受け、言葉の自由は制限された。この二面性を一つの言葉で語ろうとすると、どちらかの面が必ず削り落とされてしまう。一九五二年に日本が主権を回復したのちも、評価は割れたままである。歴史を記述するとは、そうした矛盾を矛盾のまま抱えて書くことにほかならない。",
-    "form": "占領",
-    "en": "The Allied occupation of Japan, which lasted nearly seven years from 1945, was for postwar Japanese at once a defeat and a kind of liberation. While land reform and women's suffrage were realized, the press was censored and freedom of speech was restricted. If you try to tell this duality in a single word, one side or the other is bound to be shaved away. Even after Japan recovered its sovereignty in 1952, assessments remain divided. To write history is nothing other than to write while holding such contradictions as contradictions.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "「占領下」「占領軍」。軍事力で他国の領土を支配すること。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "助動詞",
    "reading": "じょどうし",
    "pos": "noun",
@@ -529,28 +507,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "人工知能",
-   "reading": "じんこうちのう",
-   "pos": "noun",
-   "meaning": "artificial intelligence",
-   "defJa": "人間の知的な働きを行う計算機の仕組み",
-   "passage": {
-    "ja": "人工知能って言葉、最近は何でもかんでもこれで呼ぶじゃないですか。でも研究者に聞くと、一九五六年のダートマス会議でこの名前が付けられたときから、定義はずっとあいまいだったそうです。だから、冷蔵庫の温度調整にまでAI搭載と書くのは、盛るにしても限度がありますよね。僕は、何をインプットして何を出す仕組みなのかを、まず聞くことにしてます。それが説明できない製品は、少し疑ってかかるくらいでちょうどいいです。",
-    "form": "人工知能",
-    "en": "The term artificial intelligence, these days people call just about everything by it, don't they? But if you ask researchers, the definition has been vague all along, ever since the name was coined at the Dartmouth conference in 1956, so I hear. So writing \"AI-equipped\" even on a refrigerator's temperature control is going beyond what even exaggeration allows. I make a point of first asking what it takes as input and what kind of mechanism produces the output. A product that can't explain that deserves a bit of suspicion, and that's about right.",
-    "register": "話",
-    "topic": "ai",
-    "tipJa": "1956年のダートマス会議で名づけられた語。広く使われすぎ、定義があいまいになった。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "分断",
    "reading": "ぶんだん",
    "pos": "noun",
@@ -567,28 +523,6 @@
    },
    "deck": "senmon",
    "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "不可欠",
-   "reading": "ふかけつ",
-   "pos": "na-adj",
-   "meaning": "indispensable, essential",
-   "defJa": "なくてはならないこと",
-   "passage": {
-    "ja": "生成AIの学習に不可欠なのは、アルゴリズムの工夫はもちろん、桁違いの計算能力です。数千から数万の画像処理用チップを並べ、何週間も止めずに計算を回せる設備があって初めて、巨大なモデルは育ちます。ところが、そのチップを作れる半導体工場は世界でもごく限られていて、需要が急に膨らむたびに品薄が起きてきました。ソフトの話に見えて、実は電力や設備といった物理的な土台が勝負を分けているのです。",
-    "form": "不可欠",
-    "en": "What is indispensable for training generative AI is, of course, ingenious algorithms, but also computing power on an entirely different scale. Only when you have facilities that can line up thousands to tens of thousands of graphics-processing chips and run calculations for weeks without stopping do giant models grow. Yet the semiconductor plants able to make those chips are extremely few even worldwide, and every time demand has suddenly swelled, shortages have occurred. It looks like a story about software, but in fact physical foundations such as power and equipment are deciding the contest.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "「〜に不可欠だ」「不可欠な要素」。なくては成り立たない条件を言う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

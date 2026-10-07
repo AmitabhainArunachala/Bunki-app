@@ -1,0 +1,178 @@
+{
+ "batch": "div-003",
+ "writer": "gpt-6-astra",
+ "items": [
+  {
+   "term": "瞑想",
+   "reading": "めいそう",
+   "gloss": "meditation",
+   "level": "N1",
+   "register": "話",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "採点"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "アウトプット",
+   "reading": "あうとぷっと",
+   "gloss": "output",
+   "level": "N1",
+   "register": "学",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "曖昧",
+    "該当"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "内発的動機づけ",
+   "reading": "ないはつてきどうきづけ",
+   "gloss": "intrinsic motivation",
+   "level": "N1",
+   "register": "話",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "成果"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "歴史は繰り返す",
+   "reading": "れきしはくりかえす",
+   "gloss": "history repeats itself",
+   "level": "N1",
+   "register": "話",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "背景",
+    "投機"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)",
+    "phrase 「ておくに越したことは」 appears in 15 cards (cap 11)",
+    "phrase 「おくに越したことはな」 appears in 13 cards (cap 11)",
+    "phrase 「くに越したことはない」 appears in 13 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "不可欠",
+   "reading": "ふかけつ",
+   "gloss": "indispensable, essential",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "検証",
+    "正解"
+   ],
+   "fixThis": [
+    "ending …ているのです appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "漢語",
+   "reading": "かんご",
+   "gloss": "Chinese word, Sino-Japanese word",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "和語",
+    "言い換え"
+   ],
+   "fixThis": [
+    "ending …ているのです appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "再興",
+   "reading": "さいこう",
+   "gloss": "revival, restoration",
+   "level": "N1",
+   "register": "報",
+   "preferTopic": "other",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "工芸",
+    "産地",
+    "確保"
+   ],
+   "fixThis": [
+    "ending …ているのです appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "文語体",
+   "reading": "ぶんごたい",
+   "gloss": "classical literary style",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "語尾",
+    "音読"
+   ],
+   "fixThis": [
+    "ending …ているのです appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "浮世",
+   "reading": "うきよ",
+   "gloss": "the transient, floating world",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "india",
+   "deck": "senmon",
+   "field": "india",
+   "weave": [
+    "無常",
+    "執着"
+   ],
+   "fixThis": [
+    "ending …ているのです appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "筆致",
+   "reading": "ひっち",
+   "gloss": "style of writing",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "描写",
+    "余韻"
+   ],
+   "fixThis": [
+    "ending …ているのです appears in 17 cards (cap 11)"
+   ]
+  }
+ ]
+}

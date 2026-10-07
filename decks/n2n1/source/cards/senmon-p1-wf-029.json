@@ -881,28 +881,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "和製英語",
-   "reading": "わせいえいご",
-   "pos": "noun",
-   "meaning": "Japan-made English",
-   "defJa": "日本で作られた英語風の言葉",
-   "passage": {
-    "ja": "「ノートパソコン」「コンセント」「ガソリンスタンド」。いずれも日本ではあたり前に使われながら、英語圏では通じにくい和製英語である。外来語は日本語に入るたびに意味や形が少しずつ変わり、原語とは別の言葉として定着してきた。留学や出張で初めてそのずれに気づき、冷や汗をかき、赤面する人も少なくない。借用の歴史は、和製漢語を大量に生んだ明治以来の翻訳の営みの延長にほかならない。",
-    "form": "和製英語",
-    "en": "“Notebook pasokon,” “konsento,” “gasorin sutando.” All are in everyday use in Japan, yet are Japan-made English that hardly gets through in English-speaking countries. Each time a loanword enters Japanese, its meaning and form shift a little, and it has settled in as a word apart from the original. Not a few people notice that gap for the first time on study abroad or a business trip and break into a cold sweat and blush. The history of borrowing is nothing other than an extension of the translation work since the Meiji era that produced Japan-coined Sino words in bulk.",
-    "register": "報",
-    "topic": "language",
-    "tipJa": "「和製英語」は英語に見えて英語圏では通じにくい語を指す",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "嘘も方便",
    "reading": "うそもほうべん",
    "pos": "expression",

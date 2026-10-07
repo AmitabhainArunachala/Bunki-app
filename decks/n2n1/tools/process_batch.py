@@ -3,6 +3,7 @@
 
 usage: python3 decks/n2n1/tools/process_batch.py BATCH_ID            (after the agent wrote drafts/BATCH_ID-draft.json)
        python3 decks/n2n1/tools/process_batch.py BATCH_ID --rewrite  (after it wrote drafts/BATCH_ID-rewrite.json)
+       Add --writer MODEL to record the actual author (legacy default: claude-sonnet-5-5).
 
 First run: check_cards.check on every card, then the judge (prompts/judge.md, a model of another
 family than the writer) on the cards that pass; accepted cards go to source/cards/, failures and

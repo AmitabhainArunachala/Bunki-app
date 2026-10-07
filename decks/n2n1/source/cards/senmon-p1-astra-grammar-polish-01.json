@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "擬音語",
+   "reading": "ぎおんご",
+   "pos": "noun",
+   "meaning": "word imitating a sound",
+   "defJa": "物の音をまねて表したことば。",
+   "passage": {
+    "ja": "窓を「こんこん」とたたく音を「どんどん」に変えると、同じ動作でも、訪ねてきた人の様子が違って聞こえます。擬音語を選ぶ際には、音の大きさだけでなく、硬さや間隔にも耳を向けたいところです。ただし、音を写した言葉から、人物が怒っていると必ず判断できるわけではありません。文章の目的に応じて、小論文では動作を平明に記し、物語では前後の描写と合わせて響きを選ぶ、といった書き分けができます。録音を聞きながら二つの表現を書き比べると、音そのものと、そこから受ける印象の違いを意識できます。",
+    "form": "擬音語",
+    "en": "Changing the sound of knocking on a window from “kon kon” to “don don” makes the visitor seem different even though the action is the same. When choosing a word that imitates a sound, we should listen not only to volume but also to hardness and intervals. A word representing a sound does not, however, necessarily establish that a character is angry. Depending on the purpose of the text, you can vary your writing by describing the action plainly in a short essay and choosing sounds to fit the surrounding description in a story. Comparing two written expressions while listening to a recording helps us distinguish the sound itself from the impressions it creates.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「ざあざあ」「こんこん」など。音のない状態を表す擬態語と区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "言語学",
+   "reading": "げんごがく",
+   "pos": "noun",
+   "meaning": "linguistics",
+   "defJa": "人間のことばの仕組みや働きを研究する学問。",
+   "passage": {
+    "ja": "子どもが「行った」を「行いた」と言ったら、大人はすぐ言い直させたくなるものです。しかし、その間違いを手がかりにすると、子どもが動詞の変化をどう捉えているかという問いが生まれます。言語学では、正しい言い方を勧めるだけでなく、実際の発話を集めて、背後にある仕組みを探ります。専門用語を学ぶにあたって、観察した違いを平明な言葉で説明する練習も欠かせません。一つの言い間違いにも、別の動詞なら同じ形になるのかと問い直すことで、調べる価値のある筋道が見つかります。",
+    "form": "言語学",
+    "en": "When a child uses the nonstandard “行いた” instead of “行った” for “went,” an adult may immediately want to correct them. Yet taking that error as a clue raises the question of how the child understands changes in verb forms. Linguistics goes beyond recommending correct expressions to collect actual utterances and investigate the systems behind them. When learning technical terms, practicing how to explain observed differences in clear language is also essential. Even a single verbal error can open up a worthwhile line of investigation if we ask whether another verb would take the same form.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "ことばの正誤を指導する活動とは区別する。「言語学の研究」。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "景気循環",
+   "reading": "けいきじゅんかん",
+   "pos": "noun",
+   "meaning": "business cycle",
+   "defJa": "経済全体の活動が活発化と停滞を繰り返すこと。",
+   "passage": {
+    "ja": "店の売り上げが落ちたとき、商品の人気が薄れたのか、世の中全体で買い物が減っているのかを分けて考える必要があります。景気循環とは、経済全体の活動が盛んになる時期と、弱まる時期が繰り返される動きを指します。市場経済では企業の投資や家計の消費などが互いに関わるため、一軒の店の工夫だけで説明しようとしても、説明しきれない変化が起こります。ただし、季節ごとの行事のように、決まった日が来れば自動的に回復するものではありません。巻き返しを考える際にも、自社の問題と周囲の変化を区別して見ることが役立ちます。",
+    "form": "景気循環",
+    "en": "When a shop’s sales fall, we need to distinguish a loss of interest in its products from a decline in spending across society. The business cycle refers to recurring movements between periods of stronger and weaker economic activity overall. In a market economy, business investment and household consumption interact, so even an attempt to explain changes through the efforts of a single shop will leave some unexplained. Unlike seasonal events, however, recovery does not happen automatically on a predetermined date. Distinguishing a firm’s own problems from changes around it is also useful when considering a comeback.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「景気循環の局面」。決まった年数で機械的に繰り返すという意味ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "比較優位",
+   "reading": "ひかくゆうい",
+   "pos": "noun",
+   "meaning": "comparative advantage",
+   "defJa": "他の生産を諦める程度が相対的に小さいこと。",
+   "passage": {
+    "ja": "二人の職人が椅子と机を作るとして、一方が両方とも速く作れるなら、仕事は全部その人に任せるべきでしょうか。比較優位を考える問題では、速さだけでなく、椅子を作るために机をどれだけ諦めるかを比べます。もう一人が全体として遅いとしても、その人にとって椅子作りの代わりに失う机の数が少なければ、分担には意味が生まれます。工程ごとの数字を表にして、同じ時間を別の作業に使った場合と見比べましょう。市場経済の専門用語を暗記する前に、何を選ぶと何を手放すのかという問いを押さえると、計算の意味が分かります。",
+    "form": "比較優位",
+    "en": "If two craftspeople make chairs and tables and one is faster at both, should all the work go to that person? A comparative-advantage problem compares not only speed but also how many tables must be forgone to make a chair. Even supposing the other person is slower overall, dividing the work can make sense if that person forgoes fewer tables by making chairs. Put the figures for each process in a table and compare what happens when the same amount of time is spent on the other task. Before memorizing the technical language of market economics, grasping the question of what must be given up when something is chosen makes the calculations meaningful.",
+    "register": "学",
+    "topic": "other",
+    "tipJa": "生産量の多さだけでなく、別の生産をどれだけ諦めるかで比べる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "美化語",
+   "reading": "びかご",
+   "pos": "noun",
+   "meaning": "beautifying expression",
+   "defJa": "ものごとの言い方を上品に整えることば。",
+   "passage": {
+    "ja": "自分で飲むものでも「お酒」と言えるのは、酒の持ち主を敬っているからではありません。ものごとの言い方を上品に整える、こうした働きを持つ表現が美化語です。「お料理」もその例ですが、どの名詞にも同じように「お」を足せるとは限りません。専門用語の分類はさておき、普段の会話で何に付き、何には付かないかを集めてみましょう。相手を高く扱う言い方なのか、表現そのものを整える言い方なのかを見分けると、敬語の形が同じでも、働きには違いがあると分かります。",
+    "form": "美化語",
+    "en": "You can say “osake” even for sake you drink yourself, not because you are honoring its owner. Expressions with this function of making the wording more refined are called beautifying expressions. “Oryōri” is another example, but that does not mean you can add “o” to any noun in the same way. Setting the technical categories aside for now, collect examples of what takes it and what does not in everyday conversation. Distinguishing language that elevates another person from language that refines the expression itself shows that honorific forms can look alike while serving different functions.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「お酒」「お料理」など。相手や持ち主を高める尊敬語とは働きが異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

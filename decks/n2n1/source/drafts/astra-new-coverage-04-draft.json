@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "明晰",
+   "reading": "めいせき",
+   "pos": "na-adj",
+   "meaning": "lucid; clear",
+   "defJa": "考えや説明の筋道がはっきりしているさま。",
+   "passage": {
+    "ja": "二つの推敲案を比べると、短いほうの文章が必ずしも分かりやすいとは限りません。前提を省きすぎた説明より、少し長くても理由と結論のつながりが見える説明のほうが明晰です。平易な語を使うことに加えて、何と何を比べ、どこから判断したのかを示す必要があります。小論文の下書きなら、段落の横にその役割を一言ずつ書くと、話が飛んだ箇所を探しやすくなります。読み手が書き手の頭の中を推測し続けなくても済むように、考えが進む順序を文章の上に表します。",
+    "form": "明晰",
+    "en": "Comparing two revised drafts, the shorter version is not necessarily easier to understand. An explanation that makes the connection between reasons and conclusions visible is more lucid, even if slightly longer, than one that omits too many premises. Besides using plain words, we need to show what is being compared and on what basis a judgment is made. For a short essay draft, a brief note beside each paragraph naming its role makes gaps in the argument easier to find. We put the progression of thought into the text so readers do not have to keep guessing what is in the writer’s head.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「明晰な思考」「明晰な文章」。語彙が簡単なことだけを指すのではない。",
+    "sense": "思考や説明の筋道がはっきりしているさま。"
+   }
+  },
+  {
+   "term": "景気循環",
+   "reading": "けいきじゅんかん",
+   "pos": "noun",
+   "meaning": "business cycle",
+   "defJa": "経済全体の活動が活発化と停滞を繰り返すこと。",
+   "passage": {
+    "ja": "店の売り上げが落ちたとき、商品の人気が薄れたのか、世の中全体で買い物が減っているのかを分けて考える必要があります。景気循環とは、経済全体の活動が盛んになる時期と、弱まる時期が繰り返される動きを指します。市場経済では企業の投資や家計の消費などが互いに関わるため、一軒の店の工夫だけでは説明できない変化も起こります。ただし、季節ごとの行事のように、決まった日が来れば自動的に回復するものではありません。巻き返しを考える際にも、自社の問題と周囲の変化を区別して見ることが役立ちます。",
+    "form": "景気循環",
+    "en": "When a shop’s sales fall, we need to distinguish a loss of interest in its products from a decline in spending across society. The business cycle refers to recurring movements between periods of stronger and weaker economic activity overall. In a market economy, business investment and household consumption interact, so some changes cannot be explained by the efforts of a single shop. Unlike seasonal events, however, recovery does not happen automatically on a predetermined date. Distinguishing a firm’s own problems from changes around it is also useful when considering a comeback.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「景気循環の局面」。決まった年数で機械的に繰り返すという意味ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "書き出し",
+   "reading": "かきだし",
+   "pos": "noun",
+   "meaning": "opening lines",
+   "defJa": "文章の冒頭の部分。",
+   "passage": {
+    "ja": "取材ノートには店の住所から順に情報が並んでいましたが、その順番のまま記事にする必要はありません。書き出しを、店主が古い包丁を研いでいる場面に替えると、読者の前に人の姿が現れます。もちろん、目を引く場面だからといって、記事の本題と関係のない話を置くのは避けたいところです。そこから道具を長く使う工夫へつなげれば、冒頭の描写が後の説明への布石になります。序論を立派に飾るより、最初に見せたものが読み終わったときにどんな意味を持つかを考えて構成します。",
+    "form": "書き出し",
+    "en": "The interview notes listed information starting with the shop’s address, but the article does not need to follow that order. Replacing the opening with a scene of the owner sharpening an old knife puts a person before the reader. Of course, an eye-catching scene is no reason to include something unrelated to the article’s main subject. Leading from there into ways of making tools last turns the opening description into groundwork for the later explanation. Rather than decorating the introduction impressively, I plan the structure by considering what the first thing shown will mean once the reader reaches the end.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「書き出しを工夫する」。実際に文章を書く動作を指す用法もある。",
+    "sense": "文章の最初の部分。"
+   }
+  },
+  {
+   "term": "母語話者",
+   "reading": "ぼごわしゃ",
+   "pos": "noun",
+   "meaning": "native speaker",
+   "defJa": "幼いころから身につけた言語を使う人。",
+   "passage": {
+    "ja": "二つの日本語の文を見せると、理由は説明できなくても、片方は少し変だと感じる人がいます。母語話者は、幼いころから言葉を使う中で、こうした判断の土台を身につけています。ただし、自然に話せるからといって、文の仕組みを専門用語で説明できるとは限りません。また、育った地域や普段接する文章によって、同じ表現への受け止め方が違うこともあります。一人の感想を言語全体の規則と決めつけず、使われる場面やほかの例も集めると、学習者の疑問により丁寧に答えられます。",
+    "form": "母語話者",
+    "en": "Shown two Japanese sentences, some people can sense that one is slightly odd even without being able to explain why. Native speakers develop the foundation for such judgments through using the language from early childhood. Speaking naturally does not, however, necessarily mean being able to explain sentence structure in technical terms. Responses to the same expression can also differ depending on where people grew up and what writing they ordinarily encounter. Instead of treating one person’s impression as a rule for the entire language, collecting other examples and contexts of use lets us answer learners’ questions more carefully.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「日本語の母語話者」。国籍や、文法を教えられる能力とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "比較優位",
+   "reading": "ひかくゆうい",
+   "pos": "noun",
+   "meaning": "comparative advantage",
+   "defJa": "他の生産を諦める程度が相対的に小さいこと。",
+   "passage": {
+    "ja": "二人の職人が椅子と机を作るとして、一方が両方とも速く作れるなら、仕事は全部その人に任せるべきでしょうか。比較優位を考える問題では、速さだけでなく、椅子を作るために机をどれだけ諦めるかを比べます。もう一人が全体として遅くても、その人にとって椅子作りの代わりに失う机の数が少なければ、分担には意味が生まれます。工程ごとの数字を表にして、同じ時間を別の作業に使った場合と見比べましょう。市場経済の専門用語を暗記する前に、何を選ぶと何を手放すのかという問いを押さえると、計算の意味が分かります。",
+    "form": "比較優位",
+    "en": "If two craftspeople make chairs and tables and one is faster at both, should all the work go to that person? A comparative-advantage problem compares not only speed but also how many tables must be forgone to make a chair. Even if the other person is slower overall, dividing the work can make sense if that person forgoes fewer tables by making chairs. Put the figures for each process in a table and compare what happens when the same amount of time is spent on the other task. Before memorizing the technical language of market economics, grasping the question of what must be given up when something is chosen makes the calculations meaningful.",
+    "register": "学",
+    "topic": "other",
+    "tipJa": "生産量の多さだけでなく、別の生産をどれだけ諦めるかで比べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "民族主義",
+   "reading": "みんぞくしゅぎ",
+   "pos": "noun",
+   "meaning": "nationalism based on ethnic identity",
+   "defJa": "共通の文化などを持つ集団の自立や統一を求める思想。",
+   "passage": {
+    "ja": "支配される側が、自分たちの言葉で学校教育を行いたいと願うことには、暮らしの尊厳が関わっている。民族主義は、共通の文化や歴史を持つ集団が、自立や統一を求める動きを支える思想となり得る。帝国主義への抵抗の中で語られる場合と、国内の少数民族を排除するために使われる場合とでは、その働きは同じではない。自由を求める言葉であれ、それが誰を仲間に含め、誰の声を退けているのかを確かめる必要がある。運動の名称だけで善悪を決めず、具体的な要求と、要求を向けられた人々の立場を読むべきである。",
+    "form": "民族主義",
+    "en": "When people under domination wish to educate children in their own language, the dignity of their lives is at stake. Ethnic nationalism can support movements by groups sharing culture or history to seek autonomy or unity. Its function differs when invoked in resistance to imperialism and when used to exclude ethnic minorities within a country. Even language demanding freedom needs to be examined for whom it includes as members and whose voices it rejects. Rather than deciding right and wrong from a movement’s name alone, we should examine its specific demands and the positions of those at whom the demands are directed.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「民族主義の高まり」。自立を求める運動にも排他的な主張にも現れ得る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "瓦解",
+   "reading": "がかい",
+   "pos": "noun",
+   "meaning": "collapse; disintegration",
+   "defJa": "まとまっていた組織や仕組みが崩れ去ること。",
+   "passage": {
+    "ja": "王の退位をもって、一つの政治体制が終わったと年表に記すことはできる。しかし、体制の瓦解を理解するには、最後の宣言に先立って、どの組織が機能を失っていたのかを調べる必要がある。地方へ命令が届いても、税が集まらず、兵士への給料も払えなければ、中央の権威は実際の力を伴わなくなる。年代記に残る宮廷内の争いだけでなく、行政や輸送の日常的な働きにも目を向けたい。長く積み重なった問題の帰結なのか、急な出来事が決定的だったのかは、複数の記録を突き合わせて判断すべきである。",
+    "form": "瓦解",
+    "en": "A chronology can mark a king’s abdication as the end of a political system. Understanding the system’s collapse, however, requires investigating which institutions had stopped functioning before the final declaration. Even if orders reach the provinces, central authority loses its practical force when taxes cannot be collected and soldiers cannot be paid. Attention should extend beyond court struggles recorded in chronicles to the everyday workings of administration and transport. Whether the end resulted from long-accumulated problems or a decisive sudden event should be judged by comparing multiple records.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「体制が瓦解する」。屋根の瓦が崩れ落ちるように、まとまりを失う比喩。",
+    "sense": "組織や体制がまとまりを失って崩れること。"
+   }
+  },
+  {
+   "term": "相槌",
+   "reading": "あいづち",
+   "pos": "noun",
+   "meaning": "listener’s back-channel response",
+   "defJa": "相手の話に調子を合わせて入れる短い応答。",
+   "passage": {
+    "ja": "友達が話してる途中で、うんって言っただけなのに、全部賛成したことになってて驚いたんだ。こっちは相槌を打って、ちゃんと聞いてるよって伝えたつもりだったんだけどね。短い返事は会話を進める助けになる反面、どこまで同意したのかが曖昧になることもあるんだよね。相手の察しに任せずに、事情は分かったけど、その結論には迷ってるって言えばよかったんだ。寡黙な人が黙って聞いてる場合も同じで、声がないから反対だと決めつけず、今どう受け止めてるかを確かめたいな。",
+    "form": "相槌",
+    "en": "I was surprised when simply saying “yeah” while a friend was talking was taken as agreement with everything. I had meant to give a listener’s response to show I was paying attention. Short replies help conversation move along, but they can also leave unclear how far we agree. Instead of relying on my friend to infer it, I should have said I understood the circumstances but was unsure about the conclusion. The same goes for a quiet person listening silently, so I want to check how they are taking it rather than assume that silence means disagreement.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「相槌を打つ」。聞いている合図であり、必ずしも賛成を意味しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "神道",
+   "reading": "しんとう",
+   "pos": "noun",
+   "meaning": "Shinto",
+   "defJa": "日本の神々への信仰と祭祀を中心とする伝統。",
+   "passage": {
+    "ja": "古い寺社の案内を読むと、今は離れている神と仏の名前が、同じ場所の歴史に登場することがあります。神道と仏教は、長い間まったく別々の世界として存在していたのではなく、各地でさまざまに関わってきました。神を仏と結び付けて捉えたり、神社のそばに寺院を置いたりする営みも、その歴史の一部です。巡礼の道を歩くにあたって、現在の看板の区分だけで昔の信仰を考えると、見えなくなるつながりがあります。地域に残る建物や記録を手がかりにすると、人々が何を祈り、どの場所を大切にしたかを具体的にたどれます。",
+    "form": "神道",
+    "en": "In accounts of old religious sites, names of kami and buddhas now treated separately sometimes appear in the history of the same place. Shinto and Buddhism did not exist as entirely separate worlds throughout their long histories, but interacted in various ways across Japan. Practices such as interpreting kami in relation to buddhas and placing temples near shrines form part of that history. When walking a pilgrimage route, thinking about past faith solely through the categories on present-day signs obscures some connections. Buildings and records preserved locally offer concrete clues to what people prayed for and which places they valued.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「神道と仏教」「神道の祭祀」。両者の歴史的な関わりにも注意する。",
+    "sense": ""
+   }
+  }
+ ]
+}

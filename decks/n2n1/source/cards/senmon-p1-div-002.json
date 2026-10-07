@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "王道",
+   "reading": "おうどう",
+   "pos": "noun",
+   "meaning": "reliable, orthodox route",
+   "defJa": "確実な成果につながる正統的な進め方",
+   "passage": {
+    "ja": "試験前になると、一晩で覚えられるっていう勉強法を探したくなるけど、見つけたころには眠る時間まで減ってるんだよね。苦手な問題を解いて、間違えた理由を確かめて、日を置いてもう一度やるのが、やっぱり勉強の王道なんだと思う。地味だからといって飛ばすと、応用問題でつまずいたときに、どの基礎へ戻ればいいのかも分からなくなる。派手な方法に乗り換える前に、昨日の間違いを一つだけ、自分の言葉で説明できるか試してみようよ。",
+    "form": "王道",
+    "en": "Before an exam, I feel like hunting for a method that promises overnight memorization, but by the time I find one I have even less time left to sleep. I think the reliable route in studying is still to tackle difficult questions, work out why you went wrong, and try again after a few days. If you skip this just because it is unglamorous, you will not even know which basics to return to when you get stuck on an application question. Before switching to a flashy method, let’s see whether we can explain just one of yesterday’s mistakes in our own words.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "ここでは政治思想ではなく、学習の正攻法を指す。",
+    "sense": "物事を進める際の正統的で確実な方法"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "治外法権",
+   "reading": "ちがいほうけん",
+   "pos": "noun",
+   "meaning": "extraterritoriality",
+   "defJa": "外国人などが滞在国の裁判権を免れる特権",
+   "passage": {
+    "ja": "外国人が起こした事件なのに、現地の裁判所では裁けないとしたら、その国の人々は何に不満を抱くでしょうか。近代の不平等条約では、治外法権の一形態である領事裁判権によって、外国人をその本国の領事が裁く仕組みが認められました。主権の問題として読めば、争点は刑罰の重さにとどまらず、誰が裁く権限を持つのかという点にもあると分かります。条文を読むときは、保護される側の安心と、裁く権限を制限された側の不満を区別して整理しましょう。",
+    "form": "治外法権",
+    "en": "If a local court could not try a case involving a foreigner, what would the people of that country resent? Under modern unequal treaties, consular jurisdiction, a form of extraterritoriality, allowed foreigners to be tried by consuls of their own countries. Viewed as an issue of sovereignty, the dispute concerns not just the severity of penalties but also who holds the authority to judge. When reading the provisions, distinguish the reassurance of those protected from the resentment of those whose judicial authority was restricted.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "歴史では、外国人をその本国の領事が裁く制度が例です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "熟達者",
+   "reading": "じゅくたつしゃ",
+   "pos": "noun",
+   "meaning": "expert",
+   "defJa": "経験を積み、ある技術に十分通じた人",
+   "passage": {
+    "ja": "同じ木を削っても、見習いは刃の動きだけを追い、長年働く職人は木目の変わり目で手を緩める。熟達者に手順を尋ねると簡単な返事しか戻らないことがあるのは、判断の一部が、言葉にするまでもない動作に組み込まれているためだろう。教わる側は完成品の形をまねるだけでなく、手が止まった場所を示して理由を聞くとよい。教える側も、普段なら通り過ぎる小さな違いを一緒に眺めることで、自分の技術を他人に渡せる説明へと少しずつ変えていける。",
+    "form": "熟達者",
+    "en": "When carving the same wood, an apprentice follows only the blade’s movement, while an experienced craftsperson eases off where the grain changes. An expert may give only a brief answer when asked about the procedure because some judgments have become embedded in movements that no longer seem to need words. The learner should not just imitate the finished shape but point out where the hand paused and ask why. By examining small differences they would normally pass over, teachers too can gradually turn their skills into explanations they can pass on.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「熟達者の判断」のように、経験に裏づけられた力を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "知能",
+   "reading": "ちのう",
+   "pos": "noun",
+   "meaning": "intelligence",
+   "defJa": "物事を理解し、考え、問題に対応する能力",
+   "passage": {
+    "ja": "機械が難しい試験問題に正解したとき、「何でも分かる」と見出しを付けると、その能力を広く言い過ぎてしまいます。知能を評価したと書くにしても、知識を尋ねたのか、初めての条件から推論させたのかを読者に伝える必要があります。同じ正解でも、問題の出し方や手掛かりの与え方が違えば、結果から読み取れる内容は変わります。記事では人間と似ているという印象を先に置かず、どんな課題を、どの条件で解けたのかを具体的に記しましょう。",
+    "form": "知能",
+    "en": "When a machine answers a difficult exam question correctly, a headline saying it understands everything overstates its abilities. Even if we say we evaluated intelligence, readers need to know whether we asked for knowledge or required reasoning from unfamiliar conditions. The same correct answer can support different interpretations when the way a problem is presented or the clues supplied differ. In an article, describe the task solved and the conditions precisely instead of leading with an impression of human likeness.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "知識の量だけでなく、理解や判断などの働きを含みます。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "人工知能",
+   "reading": "じんこうちのう",
+   "pos": "noun",
+   "meaning": "artificial intelligence",
+   "defJa": "学習や推論などの知的処理を行う計算機技術",
+   "passage": {
+    "ja": "写真の中から猫だけを選ぶ仕事なら簡単そうだけど、暗い場所や後ろ姿でも見分けるとなると、条件はいろいろあるよね。人工知能を使うにしても、分類の成績だけを見て終わりにせず、どんな写真で間違えるかを確かめたいんだ。少しの誤差で済む整理用のアルバムと、見落としが大きな問題になる検査では、同じ数字でも受け止め方が変わる。便利だから使うっていう一歩の先に、間違えたとき誰が気づける仕組みにするかまで考える仕事が残ってるんだよ。",
+    "form": "人工知能",
+    "en": "Picking out only cats from photographs sounds easy, but once they are in dark places or facing away, there are all sorts of conditions to consider. Even when using artificial intelligence, I want to check which photographs it gets wrong instead of stopping at its classification score. The same figure means something different in an album-organizing task where a little error is tolerable and in an inspection where a missed case is a serious problem. Beyond deciding to use it because it is convenient, there is still the work of designing a system in which someone can notice its mistakes.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "人間の知的な働きの一部を計算機で実現する技術です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "本論",
+   "reading": "ほんろん",
+   "pos": "noun",
+   "meaning": "main body",
+   "defJa": "論文などで中心となる議論を展開する部分",
+   "passage": {
+    "ja": "町の図書館を夜まで開けるべきだという文章で、建物の歴史ばかりが長く続くと、読み手は提案の行方を見失います。序論で問題を示したら、本論では利用者の声や運営上の負担を取り上げ、延長が必要だと考える根拠を積み重ねましょう。賛成の材料のみならず、職員の配置が難しいという反対意見にも答えると、議論に厚みが出ます。書き終えたら各段落の最初の一文を読み、背景の紹介から主張を支える検討へ、無理なく移れているか確かめてください。",
+    "form": "本論",
+    "en": "In an essay arguing that the town library should stay open into the evening, a lengthy history of the building can leave readers wondering where the proposal is going. Once the introduction presents the issue, use the main body to build the case for extended hours by discussing users’ views and operational burdens. The argument gains depth when it addresses not only supporting material but also objections such as the difficulty of arranging staff. After writing, read the first sentence of each paragraph to check that the essay moves naturally from background information to an examination supporting the claim.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "序論で問いを立て、本論で根拠を示して答えを論じます。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "流動性知能",
+   "reading": "りゅうどうせいちのう",
+   "pos": "noun",
+   "meaning": "fluid intelligence",
+   "defJa": "未知の問題で関係を見いだし解決する能力",
+   "passage": {
+    "ja": "初めて見る図形の並びで、次に入る一枚を選ぶ課題を考えてみてください。習った答えを思い出すだけでは足りず、形や向きの変化から法則を見いだすような働きは、流動性知能を考える際の分かりやすい例になります。蓄えた知識を使う力とは区別されますが、現実の課題では両方が関わることもあるため、単純に頭の良さを二つに分けて終わりにはできません。試験の点を読むにあたっては、何を覚えていたかと、どんな関係をその場で見つけたかを分けて検討しましょう。",
+    "form": "流動性知能",
+    "en": "Imagine a task in which you choose the next figure in an unfamiliar sequence. Finding a rule in changes of shape or orientation, when recalling a learned answer is insufficient, is an accessible example for thinking about fluid intelligence. It is distinguished from the ability to use accumulated knowledge, but real tasks can involve both, so we cannot simply divide being smart into two parts and stop there. When interpreting a test score, examine separately what the person already knew and what relationships they discovered on the spot.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "覚えた知識の量より、新しい関係を見抜く働きに注目します。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -177,28 +177,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "何となく",
-   "reading": "なんとなく",
-   "pos": "adverb",
-   "meaning": "somehow",
-   "defJa": "はっきりした理由はないが",
-   "passage": {
-    "ja": "日本語ネイティブって、助詞を何となくで選んでるんですよ。「雨が降ってきた」と「雨は降ってきた」、どっちも言えるのに、聞き比べると空気が違うじゃないですか。でも学習者にとっては、その違いの中身こそが一番知りたいところなんですよね。ここを曖昧にしたままだと、いつまでも不安が残りますからね。だから、感覚だけに頼らず、新しい情報かどうかという視点で整理してみると、案外すっきりするんです。",
-    "form": "何となく",
-    "en": "Native Japanese speakers pick particles somehow, by feel. You can say both \"ame ga futte kita\" and \"ame wa futte kita,\" but if you compare them side by side, the atmosphere differs, doesn't it? But for learners, what's inside that difference is exactly what they most want to know. If you leave this vague, the unease just lingers forever, you know. So instead of relying on feel alone, if you try sorting it out from the viewpoint of whether the information is new, it becomes surprisingly clear.",
-    "register": "話",
-    "topic": "language",
-    "tipJa": "「何となく」は理由をはっきり言えないときに使う。会話で多く、書き言葉では少ない。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "全国的",
    "reading": "ぜんこくてき",
    "pos": "na-adj",
@@ -365,28 +343,6 @@
     "register": "論",
     "topic": "mind",
     "tipJa": "「乗車券を購入する」。駅の場面を比喩に使う論の文でも、切符の意味は変わらない。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "コピー",
-   "reading": "こぴー",
-   "pos": "noun",
-   "meaning": "copy",
-   "defJa": "元と同じものを写し取ったもの",
-   "passage": {
-    "ja": "画像生成AIが出す絵は、既存の作品のコピーなのだろうか。仕組みをたどると、学習データの断片をそのまま貼り合わせているわけではなく、膨大な絵から共通する特徴を数値として抜き出している。同じ指示を何度も入れても、毎回少しずつ違う絵が出てくるのも、そのためだ。とはいえ、特定の画風によく似た出力が生まれることもあり、権利の線引きは簡単ではない。著作権をめぐる訴訟が各国で起きているのは、その難しさの表れにほかならない。",
-    "form": "コピー",
-    "en": "Are the pictures an image-generating AI produces copies of existing works? Tracing the mechanism, it does not paste fragments of its training data together as they are, but extracts shared features from a vast number of pictures as numbers. That is also why entering the same instruction many times gives a slightly different picture each time. Even so, output closely resembling a particular style sometimes appears, and drawing the line on rights is not simple. That lawsuits over copyright are being filed in various countries is nothing other than a sign of that difficulty.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "「作品のコピー」は複製の意味。「〜のコピーではない」と否定の形でも使う。",
     "sense": ""
    },
    "deck": "n2",

@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "擬音語",
-   "reading": "ぎおんご",
-   "pos": "noun",
-   "meaning": "word imitating a sound",
-   "defJa": "物の音をまねて表したことば。",
-   "passage": {
-    "ja": "窓を「こんこん」とたたく音を「どんどん」に変えると、同じ動作でも、訪ねてきた人の様子が違って聞こえます。擬音語を選ぶ際には、音の大きさだけでなく、硬さや間隔にも耳を向けたいところです。ただし、音を写した言葉から、人物が怒っていると必ず判断できるわけではありません。小論文なら動作を平明に記すほうが合う場合もあり、物語なら前後の描写と合わせて響きを選べます。録音を聞きながら二つの表現を書き比べると、音そのものと、そこから受ける印象の違いを意識できます。",
-    "form": "擬音語",
-    "en": "Changing the sound of knocking on a window from “kon kon” to “don don” makes the visitor seem different even though the action is the same. When choosing a word that imitates a sound, we should listen not only to volume but also to hardness and intervals. A word representing a sound does not, however, necessarily establish that a character is angry. A short essay may be better served by a plain description of the action, whereas in a story the sound can be selected to fit the surrounding description. Comparing two written expressions while listening to a recording helps us distinguish the sound itself from the impressions it creates.",
-    "register": "語",
-    "topic": "language",
-    "tipJa": "「ざあざあ」「こんこん」など。音のない状態を表す擬態語と区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "gpt-6-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "膨張",
    "reading": "ぼうちょう",
    "pos": "noun",
