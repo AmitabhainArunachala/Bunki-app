@@ -102,7 +102,7 @@ for (const engine of engines) {
     const before=await snapshot('before-armed-fault');const count=fault.served;fault.corruptAudio=true;
     await page.locator('#sentence-practice-confirm').click();await page.locator('#sentence-production-text').waitFor();
     const pending=page.locator('#sentence-listening-pending');await pending.waitFor();
-    assert.match(await pending.innerText(),/音声準備中 · Kore/u);
+    assert.match(await pending.innerText(),/^audio coming soon · Kore$/u);
     assert.equal(await page.locator('#sentence-add-listening, #sentence-listening-start, #sentence-listening-play').count(),0);
     const chosen=await snapshot('production-chosen-listening-pending');
     unchanged(before,chosen,['taken','srs','revlog','stats']);

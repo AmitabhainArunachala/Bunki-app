@@ -169,7 +169,7 @@ async function runEngine(engine) {
     assert.equal(await page.locator('.exam-official-badge').count(), 1);
     assert((await page.locator('.exam-prompt .paper-underline').count()) >= 1, 'printed underline rendered');
     assert.equal(await page.locator('.exam-official-instruction').count(), 1);
-    assert.match(await page.locator('.exam-task-heading').textContent(), /^問題 1\u3000/u);
+    assert.match(await page.locator('.exam-task-heading').textContent(), /^Question 1\u3000/u);
     step('question-1-rendered', { underline: true, instruction: true });
     await shot(page, 'question-1', engine);
     await page.locator('.exam-official-pages > summary').click();
@@ -199,7 +199,7 @@ async function runEngine(engine) {
     await page.locator('#exam-next-block').click();
     await page.locator('#exam-audio-play').waitFor({ timeout: 60_000 });
     // The listening paper numbers its own 問題 again from 1, under its printed section title.
-    assert.equal(await page.locator('.exam-task-heading').textContent(), '問題 1\u3000聴解');
+    assert.equal(await page.locator('.exam-task-heading').textContent(), 'Question 1\u3000Listening');
     assert.equal(await page.locator('.exam-official-instruction').count(), 1);
     await page.locator('#exam-audio-play').click();
     await page.waitForFunction(() => window.__lastMedia && !window.__lastMedia.paused && window.__lastMedia.currentTime > 1, null, { timeout: 60_000 });
@@ -245,9 +245,9 @@ async function runEngine(engine) {
     assert.deepEqual(sections.map((row) => row.id), ['language-knowledge', 'reading', 'listening']);
     for (const row of sections) assert.match(row.mark, /19/u);
     assert.match(await page.locator('.exam-official-pass').innerText(), /100/u);
-    assert.match(await page.locator('.exam-official-scale').innerText(), /換算できません/u);
+    assert.match(await page.locator('.exam-official-scale').innerText(), /can’t be converted/u);
     assert.equal(await page.locator('#exam-sensei').count(), 0, 'no Sensei for a real paper');
-    assert.equal(await page.getByText('先生にこの問題を聞く').count(), 0);
+    assert.equal(await page.getByText('Ask Sensei about this question').count(), 0);
     step('results-by-official-section', sections.map((row) => ({ id: row.id, raw: row.raw })));
     await shot(page, 'results', engine);
     // Backup export: no question text; the live record (control) does carry it.

@@ -166,7 +166,7 @@ async function send(surface, trigger) {
 }
 const wordRequest = async (form = words.n5) => {
   await openWord(form);
-  const request = await send('word-tutor', () => page.locator('#sheet .ai-ask').filter({ hasText: '先生に聞く' }).click());
+  const request = await send('word-tutor', () => page.locator('#sheet .ai-ask').filter({ hasText: 'ask the tutor' }).click());
   assert.ok(request.archive.every((row) => row.contextRef === `word:${form}`));
   return request;
 };
@@ -246,7 +246,7 @@ try {
     check('selected N1 cards without judged evidence remain four sparse dimensions', () => assert.ok(teaching(tutor).bands.every((entry) => entry.evidence === 'sparse' && entry.workingBand === null && entry.cells.length === 0)));
     await openWord(words.unknown);
     let before = learning(await readAppRecord(page));
-    const examples = await send('examples', () => page.locator('#sheet .ai-ask').filter({ hasText: '例文をつくる' }).click());
+    const examples = await send('examples', () => page.locator('#sheet .ai-ask').filter({ hasText: 'write examples at my level' }).click());
     await page.locator('#sheet .ai-ex').first().waitFor();
     const learningAfterExamples = learning(await readAppRecord(page));
     check('unknown source word classification stays unknown in actual examples request', () => assert.ok(examples.body.messages.at(-1).content.includes('Source word JLPT classification: not recorded')));

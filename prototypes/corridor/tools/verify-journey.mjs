@@ -301,7 +301,7 @@ try {
     await page.click('#back');
     await page.waitForSelector(JOURNEY_TEXT, { timeout: 5000 });
     const t = await page.evaluate((sel) => document.querySelector(`${sel} .read-tag`)?.textContent || '', JOURNEY_TEXT);
-    if (!t.includes('途中')) throw new Error('tag: ' + JSON.stringify(t));
+    if (!t.includes('in progress')) throw new Error('tag: ' + JSON.stringify(t));
   });
 
   await step('7 JLPT lesson end to end', async () => {

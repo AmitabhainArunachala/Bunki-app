@@ -8,22 +8,22 @@ Site: `/Users/dhyana/.dharma/bunki_review/2026-10-08/redesign/sol/baseline-site`
 
 The brief names `verify-navigation-returns.mjs`; this checkout provides `test-navigation-returns.mjs`, which executes the actual navigation functions (four cases). That existing suite was used.
 
-| Verifier | Baseline | Duration |
-| --- | --- | --- |
-| `verify-corridor` | PASS | 210.8s |
-| `verify-corridor-storage-integrity` | PASS | 0.5s |
-| `verify-corridor-doors` | FAIL | 65.6s |
-| `verify-dojo-door` | PASS | 79.5s |
-| `test-navigation-returns` | PASS | 0.1s |
-| `verify-design-reader-shelf` | PASS | 184.8s |
-| `verify-relief` | FAIL | 3.3s |
-| `verify-theme-consistency` | FAIL | 51.4s |
-| `verify-corridor-accessibility` | PASS | 28.5s |
-| `verify-experience` | PASS | 118.8s |
-| `verify-kotoba-mine` | PASS | 66.1s |
-| `verify-n2n1-decks` | PASS | 19.8s |
-| `verify-personal-collections` | PASS | 11.8s |
-| `sw-shell` | PASS | 0.8s |
+| Verifier                            | Baseline | Duration |
+| ----------------------------------- | -------- | -------- |
+| `verify-corridor`                   | PASS     | 210.8s   |
+| `verify-corridor-storage-integrity` | PASS     | 0.5s     |
+| `verify-corridor-doors`             | FAIL     | 65.6s    |
+| `verify-dojo-door`                  | PASS     | 79.5s    |
+| `test-navigation-returns`           | PASS     | 0.1s     |
+| `verify-design-reader-shelf`        | PASS     | 184.8s   |
+| `verify-relief`                     | FAIL     | 3.3s     |
+| `verify-theme-consistency`          | FAIL     | 51.4s    |
+| `verify-corridor-accessibility`     | PASS     | 28.5s    |
+| `verify-experience`                 | PASS     | 118.8s   |
+| `verify-kotoba-mine`                | PASS     | 66.1s    |
+| `verify-n2n1-decks`                 | PASS     | 19.8s    |
+| `verify-personal-collections`       | PASS     | 11.8s    |
+| `sw-shell`                          | PASS     | 0.8s     |
 
 11 of 14 verifier processes passed. Three failed before any foundation edits:
 

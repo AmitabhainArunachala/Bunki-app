@@ -1159,19 +1159,30 @@ export function createAssessmentView(host) {
       : ['N1', 'N2'].includes(level) ? paperLabel('言語知識（文字・語彙・文法）・読解')
         : tx(...(SKILLS[question.skill] || [question.skill,question.skill]))), selected, question.id, 'instruction'); paperHeader.append(skillHeading);
     const taskHeading = node('h2', 'exam-task-heading'); taskHeading.lang = host.english() ? 'en' : 'ja';
+    // Practice retains the printed Japanese as study text and lookup doors,
+    // beneath the active English heading. Both fragments share one Tab stop.
+    const headingText = (container, ja, en) => {
+      write('instruction')(container, tx(ja, en), taskHeading);
+      if (host.english() && selected.attempt.mode === 'practice') {
+        const original = node('small', 'exam-heading-original');
+        original.lang = 'ja'; original.dataset.uiContent = 'learning';
+        container.append(original);
+        write('instruction')(original, ja, taskHeading);
+      }
+    };
     const printed = official ? form.sections.find(row => row.itemIds.includes(question.id)) : null;
     if (place) {
       taskHeading.dataset.mondai = String(place.group.mondai); taskHeading.dataset.task = place.group.task;
       const number = node('span', 'exam-mondai-no');
       taskHeading.append(number, document.createTextNode('\u3000'));
-      write('instruction')(number, tx(mondaiLabel(level, place.group.mondai), `Question ${place.group.mondai}`), taskHeading);
+      headingText(number, mondaiLabel(level, place.group.mondai), `Question ${place.group.mondai}`);
       const name = node('span', 'exam-daimon');
       taskHeading.append(name);
-      write('instruction')(name, tx(...(DAIMON[place.group.task] || SKILLS[question.skill] || [question.task,question.task])), taskHeading);
+      headingText(name, ...(DAIMON[place.group.task] || SKILLS[question.skill] || [question.task,question.task]));
     } else {
       const number = printed ? spec.sectionIds.indexOf(printed.id) + 1 : layout.group;
-      const task = tx(...(DAIMON[question.task] || SKILLS[question.skill] || [question.task,question.task]));
-      appendText(taskHeading, `${tx(`問題 ${number}`, `Question ${number}`)}\u3000${task}`, selected, question.id, 'instruction');
+      const [taskJa, taskEn] = DAIMON[question.task] || SKILLS[question.skill] || [question.task,question.task];
+      headingText(taskHeading, `問題 ${number}\u3000${taskJa}`, `Question ${number}\u3000${taskEn}`);
     }
     taskHeading.id = 'exam-task-title'; paperHeader.append(taskHeading);
     const officialLine = place ? officialInstruction(level, place.group.task, { passages: place.group.passageIds.length,

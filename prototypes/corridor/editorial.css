@@ -629,6 +629,7 @@ html[data-register='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; c
 }
 .exam-paper-header { margin: 0 0 24px; }
 .assessment-room .exam-task-heading { font: 700 21px/1.6 var(--serif); letter-spacing: 0; margin: 0 0 10px; }
+.assessment-room .exam-heading-original { display: block; font-size: .65em; font-weight: 400; line-height: 1.5; }
 .exam-task-instruction { font: 17px/1.85 var(--serif); margin: 0; color: var(--ed-ink); }
 .exam-question-number { display: inline-block; margin-right: 12px; font: 700 20px/1.5 var(--sans); font-variant-numeric: tabular-nums; }
 .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em; }
@@ -1994,6 +1995,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   /* on the narrowest phones the open text settings take the picture's place entirely */
   body[data-view='reader'] #app > main:has(> .dials) > .reader-picture { display: none; }
   .shelf-tools-toggle > .ui-icon:first-child { display: none; }
+  /* Wider system fonts put the full 44px Tools door on its own row. */
+  .shelf-mast-name { flex-wrap: wrap; }
   /* on the narrowest phones each of today's six takes the whole width (this block precedes the
      520px one, so it carries one more selector to win) */
   body #shelf-today.shelf-today-strip { grid-template-columns: minmax(0, 1fr); }

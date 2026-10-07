@@ -49,13 +49,13 @@ The browser lint excludes precise learning nodes, including `[data-ui-content='l
 
 `PRIMARY_TABS` in `corridor.js` is the single label/routing table. `buildPrimaryTabs()` appends one bar after the existing chrome, using the existing view/render, return-frame and search paths.
 
-| Tab | Entry view | Active family |
-| --- | --- | --- |
-| Today / 今日 | `tray` | Lists, browse, review and quiz |
-| Read / 読む | `shelf` | Shelf, reader, archive and source reading |
-| Learn / 学ぶ | `dojo` | Decks, JLPT, guided, lessons, probe and tutor |
-| Words / 辞書 | `search` | Search, kanji, grammar, idioms and word web |
-| Me / 私 | `me` | Progress, personal collections and settings |
+| Tab          | Entry view | Active family                                 |
+| ------------ | ---------- | --------------------------------------------- |
+| Today / 今日 | `tray`     | Lists, browse, review and quiz                |
+| Read / 読む  | `shelf`    | Shelf, reader, archive and source reading     |
+| Learn / 学ぶ | `dojo`     | Decks, JLPT, guided, lessons, probe and tutor |
+| Words / 辞書 | `search`   | Search, kanji, grammar, idioms and word web   |
+| Me / 私      | `me`       | Progress, personal collections and settings   |
 
 `S.variants.nav` defaults to `'tabs'`; `?nav=legacy` selects the retained doors, and `?variants=1` exposes the comparison control. Existing IDs/classes such as `#back`, `#chrome-dojo`, `.bubble-shelf`, `#ginga-symbol` and shelf link IDs stay available. Learn groups its existing controls into guided, decks and focus sections. Personal collections use their existing full-document mount; primary-tab routes retain the selected `ui` locale.
 
@@ -63,17 +63,17 @@ The bar is hidden on drift/entry, zen review/probe, entry-sheet/stroke stacks an
 
 `stampRegister()` sets `html[data-room]` from `ROOM_IDS` for stable room identity. Views keep their name except the following mappings:
 
-| View | `data-room` |
-| --- | --- |
-| `drift` | `door` |
-| `dojo` | `learn` |
-| `mock` | `jlpt` |
-| `kanjidex` | `kanji` |
-| `personaldeck` | `personal` |
-| `kagami`, `srs-stats` | `progress` |
-| `ai`, `aiquiz` | `tutor`, `quiz` |
+| View                          | `data-room`                       |
+| ----------------------------- | --------------------------------- |
+| `drift`                       | `door`                            |
+| `dojo`                        | `learn`                           |
+| `mock`                        | `jlpt`                            |
+| `kanjidex`                    | `kanji`                           |
+| `personaldeck`                | `personal`                        |
+| `kagami`, `srs-stats`         | `progress`                        |
+| `ai`, `aiquiz`                | `tutor`, `quiz`                   |
 | `levels`, `thesaurus`, `yoji` | `reference`, `word-web`, `idioms` |
-| `airead` | `personal-reading` |
+| `airead`                      | `personal-reading`                |
 
 `data-register` remains the stage-sensitive material (`attempt`, `threshold`, `results`, `jlpt`, `tutor`, `shelf`, `review`, `hall`, `door`). Keep it for existing stage CSS, along with numeric `--stage` and `data-answered`; use `data-room` for a concept's room identity. `data-room-entering` is stamped only when the room or material changes, removed after 220ms, and cleared on same-room rerenders so grades/saves/ticks do not replay entrance motion.
 

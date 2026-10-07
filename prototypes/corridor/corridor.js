@@ -4044,7 +4044,7 @@ const tx = (ja, en) => {
 };
 /** Existing call sites name the Japanese label and its explicit translation.
  * Select the active label instead of exposing both in English chrome. */
-function withEn(node, en, cls = 'en-sub') {
+function withEn(node, en) {
   if (bi()) node.textContent = tx(node.textContent, en);
   return node;
 }

@@ -191,7 +191,7 @@ async function press(page) { await page.locator('#listen-toggle').click(); }
 /** The shut bar: the quiet pending line, with no play control to press and no picker. */
 const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-toggle') && !document.querySelector('#listen-voice')
   && !!document.querySelector('.listen-row.is-pending #listen-note'));
-const PENDING = /音声準備中 · Kore/u;
+const PENDING = /^audio coming soon · Kore$/u;
 const FAILED = /could not play|再生できませんでした/u;
 async function counts(page) {
   return page.evaluate(() => ({

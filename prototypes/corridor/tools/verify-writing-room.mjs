@@ -502,8 +502,8 @@ async function main() {
     check(
       'readings are two properly labeled Japanese rows',
       readings.length === 2 &&
-        readings[0].label === '音読み' &&
-        readings[1].label === '訓読み' &&
+        readings[0].label === 'on' &&
+        readings[1].label === 'kun' &&
         readings.every((row) => row.lang === 'ja'),
       JSON.stringify(readings),
     );
