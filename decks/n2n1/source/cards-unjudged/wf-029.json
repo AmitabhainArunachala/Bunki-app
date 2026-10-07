@@ -701,6 +701,26 @@
    "writer": "claude-sonnet-5-5"
   },
   {
+   "term": "国字",
+   "reading": "こくじ",
+   "pos": "noun",
+   "meaning": "Japan-made kanji",
+   "defJa": "日本で作られた漢字",
+   "passage": {
+    "ja": "「峠」「畑」「働」は、いずれも、中国ではなく日本で作られた国字です。「峠」は、山道の上りと下りの境目を示すために、山と上と下を組み合わせた会意文字で、ひと目見ただけで意味が伝わります。話すときに、こうした文字の成り立ちを一言添えると、漢字を苦手に感じている聞き手でも、身を乗り出して耳を傾けてくれます。和製漢語が言葉を作る知恵なら、こちらは文字を作る知恵です。",
+    "form": "国字",
+    "en": "\"峠\" (pass), \"畑\" (field) and \"働\" (work) are all kanji made in Japan rather than in China. The character 峠 combines the characters for mountain, up and down to mark the boundary between the ascent and descent of a mountain road, so its meaning comes across at a glance. When you speak, adding a word on how such characters are formed makes even listeners who dislike kanji lean in and listen. If Japan-made Sino-words are the wisdom of making words, these are the wisdom of making characters.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「国字」の例は「峠」「畑」「働」。日本で作られた漢字で、音読みがないものが多い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
    "term": "国家主義",
    "reading": "こっかしゅぎ",
    "pos": "noun",

@@ -176,10 +176,8 @@
  },
  {
   "term": "国字",
-  "ok": false,
-  "why": [
-   "国字: 「峠」「畑」「働」は、いずれも、中国ではなく日本… the English has 3 sentences, the Japanese 4: they must match"
-  ]
+  "ok": true,
+  "why": []
  },
  {
   "term": "国家主義",
