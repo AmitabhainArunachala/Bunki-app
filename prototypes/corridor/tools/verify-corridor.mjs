@@ -686,7 +686,7 @@ async function main() {
   // one tally counts every story and says how many of them are glossary entries
   const glossaryProbe = await page.evaluate(`(() => {
     const cards = [...document.querySelectorAll('#shelf-reading-results .shelf-item')];
-    const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === '用語集');
+    const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === 'Glossary');
     // the masthead prints the tally twice (long on a desk, short on a phone): read the long copy
     const intro = document.querySelector('.dateline-tally .tally-long')?.textContent ?? '';
     const results = document.querySelector('.shelf-results-count')?.textContent ?? '';
@@ -697,7 +697,7 @@ async function main() {
     return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
   };
   const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);
-  check('glossary rows wear 用語集, and the one tally counts every story and names its glossary entries',
+  check('glossary rows wear Glossary, and the one tally counts every story and names its glossary entries',
     glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
       JSON.stringify(resulted) === JSON.stringify(billed),
     `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
@@ -780,7 +780,7 @@ async function main() {
   const sigValues = await page.evaluate(
     `[...document.querySelectorAll('.article-about .sig .sig-val')].map((n) => n.textContent)`,
   );
-  const ninjalRow = sigNames.findIndex((n) => n.includes('国語研'));
+  const ninjalRow = sigNames.findIndex((n) => n === 'NINJAL pair');
   const firstGrading = gradingTruth.articles[0].grading;
   check('the NINJAL pair is either measured or marked 未測定 — never faked',
     firstGrading.signals.lexical_coverage
@@ -1137,8 +1137,8 @@ async function main() {
     kanjiPage.node.startsWith('kanji:') && kanjiPage.glyph.length === 1 && kanjiPage.meaning.length > 0,
     `${kanjiPage.glyph} — ${kanjiPage.meaning}; ${kanjiPage.tags.join(' / ')}`);
   check('the kanji page carries its 漢検級',
-    kanjiPage.tags.some((t) => t.includes('漢検')),
-    kanjiPage.tags.filter((t) => t.includes('漢検')).join(','));
+    kanjiPage.tags.some((t) => t.includes('Kanji Kentei')),
+    kanjiPage.tags.filter((t) => t.includes('Kanji Kentei')).join(','));
   await waitForFiniteMotion(page, '#sheet');
   const phoneSheet = await sheetViewportGeometry(page);
   report.measurements.kanjiPhoneViewport = phoneSheet;
@@ -1193,7 +1193,7 @@ async function main() {
   await tap(page, '#sheet [data-kanjirow]');
   await waitForFiniteMotion(page, '#sheet');
 
-  const idiomHeading = await page.locator('#sheet .eyebrow', { hasText: '熟語' }).count();
+  const idiomHeading = await page.locator('#sheet .eyebrow', { hasText: /^\d+ idioms and set phrases$/u }).count();
   report.idiomSectionPresent = idiomHeading > 0;
   check('idioms hang off the kanji page (provenance lives in the sources panel)',
     idiomHeading > 0, `${idiomHeading} idiom section(s)`);
@@ -1201,7 +1201,7 @@ async function main() {
   // kanji → a word containing it (same page, before descending)
   const markWordChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('よく使う語') || x.textContent.includes('含む語'));
+    const h = heads.find((x) => x.textContent === 'common compounds' || x.textContent === 'words that contain it');
     if (!h) return 0;
     const first = h.nextElementSibling?.querySelector('.entry-row');
     if (!first) return 0;
@@ -1223,7 +1223,7 @@ async function main() {
   // kanji → radical
   const markPartChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('部品'));
+    const h = heads.find((x) => x.textContent === 'main components');
     if (!h) return 0;
     const first = h.nextElementSibling?.querySelector('.entry-row');
     if (!first) return 0;
@@ -1254,7 +1254,7 @@ async function main() {
   // radical → back out to another kanji that uses it
   const markFamilyChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('含む字'));
+    const h = heads.find((x) => x.textContent === 'kanji that contain this part');
     if (!h) return 0;
     const chips = [...(h.nextElementSibling?.querySelectorAll('.chip') ?? [])];
     const pick = chips[chips.length > 1 ? 1 : 0];
@@ -1275,7 +1275,7 @@ async function main() {
   console.log('\n— step 5 · 覚える');
   await tap(page, '#take');
   const taken = await page.locator('#tray').textContent();
-  check('any node can be taken into study', /覚\s*[1-9]/.test(taken), `chrome reads "${taken.trim()}"`);
+  check('any node can be taken into study', /^Lists\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
     const p = document.querySelector('.list-picker .fold-sub');
     return p ? p.textContent : null;
@@ -1649,7 +1649,7 @@ async function main() {
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
   check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /音声準備中/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
+    listenBefore.toggles === 0 && /^audio coming soon · Kore$/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
       !/device voice|端末の声|F1/u.test(listenBefore.note),
     JSON.stringify(listenBefore));
 
@@ -1666,7 +1666,7 @@ async function main() {
   // were on the strip, so it passed for any five rows and failed for the right
   // seven. The four Wayfinder tickets keep their own count; every other row the
   // strip is supposed to carry is now named here and must actually be present.
-  const NON_TICKET_ROWS = ['E 奥行', 'F 触れの段', 'G 衛星の触れ'];
+  const NON_TICKET_ROWS = ['E depth', 'F tap ladder', 'G satellite tap'];
   const rowKeys = await page.evaluate(
     `[...document.querySelectorAll('#variants .vseg button')].map((b) => b.dataset.variant.split(':')[0])
        .filter((k, i, a) => a.indexOf(k) === i)`,
@@ -1685,15 +1685,15 @@ async function main() {
   await open('?entry=shelf');
   const biChrome = await page.evaluate(`(() => ({
     backEn: /back/i.test(document.querySelector('#back')?.textContent ?? ''),
-    trayEn: /lists/i.test(document.querySelector('#tray')?.textContent ?? ''),
-    trayJa: /覚/.test(document.querySelector('#tray')?.textContent ?? ''),
+    trayEn: /^Lists [0-9]+$/u.test(document.querySelector('#tray')?.textContent ?? ''),
+    chromeCjk: /[\\u3040-\\u30ff\\u3400-\\u9fff]/u.test(['#back', '#tray'].map((sel) => document.querySelector(sel)?.textContent ?? '').join(' ')),
     segEn: document.querySelector('#lang [data-lang="bi"]')?.textContent === 'EN',
     segJa: document.querySelector('#lang [data-lang="ja"]')?.textContent === '日本語',
     active: document.querySelector('#lang [data-lang="bi"]')?.getAttribute('aria-pressed'),
   }))()`);
-  check('v1.1 · navigation is bilingual by default (a learner can steer)',
-    biChrome.backEn && biChrome.trayEn && biChrome.trayJa && biChrome.active === 'true',
-    `back carries "back", 覚 carries "lists", EN active=${biChrome.active}`);
+  check('language law · navigation is English by default (a learner can steer)',
+    biChrome.backEn && biChrome.trayEn && !biChrome.chromeCjk && biChrome.active === 'true',
+    `back carries "back", lists keeps its count, chrome CJK=${biChrome.chromeCjk}, EN active=${biChrome.active}`);
   check('v1.2 · the language toggle reads exactly EN | 日本語',
     biChrome.segEn && biChrome.segJa, `EN=${biChrome.segEn} 日本語=${biChrome.segJa}`);
 
@@ -2020,7 +2020,7 @@ async function main() {
   // the seal keeps its product ink (paintSeal reads the spelling's row) and is disabled: its taken/aria-pressed are
   // reported, not required either way
   check('D23 · at a core mini the 1353320 card is held, says only that a saved card exists, and offers that card',
-    d23Heldmini.disabled && d23Held.includes(d23Heldmini.reason) && d23Heldmini.open && d23Heldmini.openLabel === 'そのカードを開く',
+    d23Heldmini.disabled && d23Held.includes(d23Heldmini.reason) && d23Heldmini.open && d23Heldmini.openLabel === 'open that card',
     JSON.stringify(d23Heldmini));
   // the action and its DOM observation, in one guard: a failure is latched in the report at once, the bounded after
   // snapshot is still attempted and kept, and the row is incomplete
@@ -2171,7 +2171,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: '読み探査' }).click();
+  await page.locator('.focus-mode', { hasText: 'yomi probe' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   const probeZen = await page.evaluate(`document.body.classList.contains('zen')`);
@@ -2220,7 +2220,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+  await page.locator('.focus-mode', { hasText: 'kanji only' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   // card 1 · the taken 水 leads the pool — honest intervals, full deck path
@@ -2356,7 +2356,7 @@ async function main() {
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
   // the eyebrow teaches the gesture: one tap gives the meaning (reader lane 2026-10-02)
   const exampleEyebrow = await page.evaluate(
-    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t.includes('用例')) ?? ''`,
+    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t === 'examples — tap a word for its meaning') ?? ''`,
   );
   check('the 用例 eyebrow says that a tap on a word gives its meaning',
     /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
@@ -3989,7 +3989,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+  await page.locator('.focus-mode', { hasText: 'kanji only' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   {
@@ -4042,7 +4042,7 @@ async function main() {
   await page.waitForSelector('.lesson-row');
   const lessonBreadth = await page.evaluate(`({
     jlptHeads: [...document.querySelectorAll('.list-head')].filter((n) => /^N[1-5]/.test(n.textContent.trim())).length,
-    kanken: [...document.querySelectorAll('.eyebrow')].some((n) => n.textContent.includes('漢検')),
+    kanken: [...document.querySelectorAll('.eyebrow')].some((n) => n.textContent.includes('Kanji Kentei')),
   })`);
   check('R4-B · the lesson lanes keep their breadth — JLPT levels and the 漢検 grades',
     lessonBreadth.jlptHeads >= 3 && lessonBreadth.kanken,
@@ -4141,13 +4141,13 @@ async function main() {
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
   const dueModeSub = await page.evaluate(`(() => {
-    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('覚えるの札'));
+    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('your due cards'));
     return mode?.querySelector('.focus-mode-sub')?.textContent ?? '';
   })()`);
   check('R4-B · the due-mode copy says what the refill does — after the first lap, practice',
     /稽古|practice/.test(dueModeSub) && dueModeSub.includes('2'),
     `sub "${dueModeSub}"`);
-  await page.locator('.focus-mode', { hasText: '覚えるの札' }).click();
+  await page.locator('.focus-mode', { hasText: 'your due cards' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   for (let i = 0; i < 2; i += 1) {

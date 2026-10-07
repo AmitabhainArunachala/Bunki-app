@@ -2,6 +2,13 @@
  * All exam/source strings are text nodes, including private imported content. */
 const SKILLS = { vocabulary: ['文字・語彙', 'Vocabulary'], grammar: ['文法', 'Grammar'],
   reading: ['読解', 'Reading'], listening: ['聴解', 'Listening'] };
+const PAPER_LABEL_EN = {
+  '言語知識（文字・語彙・文法）・読解': 'Language knowledge (vocabulary & grammar) · Reading',
+  '言語知識（文字・語彙・文法）': 'Language knowledge (vocabulary & grammar)',
+  '言語知識（文字・語彙）': 'Language knowledge (vocabulary)',
+  '言語知識（文法）': 'Grammar', '言語知識': 'Language knowledge',
+  '言語知識（文法）・読解': 'Grammar · Reading', '聴解': 'Listening', '読解': 'Reading',
+};
 const LENGTHS = { short: ['ショート', 'Short'], medium: ['ミディアム', 'Medium'], full: ['フル模試', 'Full mock'] };
 // Model families named in machine-checked provenance (the review record keeps exact model ids).
 const FAMILIES = { 'anthropic-claude': 'Claude', 'zhipu-glm': 'GLM', 'moonshot-kimi': 'Kimi', deepseek: 'DeepSeek', minimax: 'MiniMax' };
@@ -266,10 +273,10 @@ export function createAssessmentView(host) {
   const imageUrls = new Map();
   let confirmation = null;
   const tx = (ja, en) => host.english() ? en : ja;
-  // A section heading reads like the room's title: Japanese first, a short English gloss after.
+  const paperLabel = ja => tx(ja, PAPER_LABEL_EN[ja] || ja);
+  // Room headings follow the active interface language.
   const sectionHeading = (ja, en, jaAlone = ja) => {
-    const heading = node('h2', 'exam-section-heading', host.english() ? ja : jaAlone); heading.lang = 'ja';
-    if (host.english()) { const gloss = node('span', 'en-inline', en); gloss.lang = 'en'; heading.append(gloss); }
+    const heading = node('h2', 'exam-section-heading', tx(jaAlone, en)); heading.lang = host.english() ? 'en' : 'ja';
     return heading;
   };
   // 未確認 — one quiet chip where no person has reviewed the questions yet, its reason in the
@@ -277,8 +284,8 @@ export function createAssessmentView(host) {
   const reviewMark = (label, withReason = false, className = 'exam-machine-label') => {
     const mark = node('p', className);
     const reason = tx('AIが作成・検証した問題です。まだ人は確認していません。', 'Written and checked by AI models; not yet reviewed by a person.');
-    const chip = node('span', 'status-chip', '未確認');
-    chip.title = reason; chip.setAttribute('aria-label', `未確認 — ${reason}`);
+    const chip = node('span', 'status-chip', tx('未確認', 'Unreviewed'));
+    chip.title = reason; chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
     mark.append(chip);
     if (withReason) mark.append(node('span', 'exam-review-reason', tx('人による確認の前', 'not yet reviewed by a person')));
     mark.dataset.reviewLabel = label;
@@ -355,12 +362,12 @@ export function createAssessmentView(host) {
     const facts = officialFacts(entry.level);
     if (entry.timingAuthority !== 'official-fact' || !facts?.blueprint) return [];
     return facts.blueprint.timingBlocks.filter(block => block.duration === 'fixed' && !block.skills.includes('listening'))
-      .map(block => ({ label: facts.score.papers[block.id], minutes: block.minutes,
+      .map(block => ({ label: paperLabel(facts.score.papers[block.id]), minutes: block.minutes,
         questions: block.skills.reduce((total, skill) => total + Number(entry.skillCounts?.[skill] || 0), 0) }));
   }
   const paperName = (selected, blockId) => {
     const spec = selected.form.timingBlocks.find(row => row.id === blockId);
-    return spec?.authority.kind === 'official-fact' ? officialFacts(selected.form.exam.track)?.score.papers[spec.authority.blockId] || null : null;
+    return spec?.authority.kind === 'official-fact' ? paperLabel(officialFacts(selected.form.exam.track)?.score.papers[spec.authority.blockId]) || null : null;
   };
   function blockUnits(selected) {
     const open = selected.attempt.blocks.find(row => row.status === 'open');
@@ -500,7 +507,7 @@ export function createAssessmentView(host) {
     if (allUnchecked) {
       const mark = node('p', 'exam-machine-label exam-older-mark'); mark.dataset.olderMark = '';
       const reason = tx('答えはまだ人が確認していません', 'answers not yet checked by a person');
-      const chip = node('span', 'status-chip', '未確認'); chip.title = reason; chip.setAttribute('aria-label', `未確認 — ${reason}`);
+      const chip = node('span', 'status-chip', tx('未確認', 'Unreviewed')); chip.title = reason; chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
       mark.append(chip, node('span', 'exam-review-reason', reason));
       block.append(mark);
     }
@@ -527,8 +534,7 @@ export function createAssessmentView(host) {
     main.append(block);
   }
   function renderCatalog(main) {
-    const heading = node('h1', 'view-title', 'JLPT 模試・練習'); heading.lang = 'ja';
-    if (host.english()) { const en = node('span', 'en-inline', 'JLPT tests & practice'); en.lang = 'en'; heading.append(en); }
+    const heading = node('h1', 'view-title', tx('JLPT 模試・練習', 'JLPT tests & practice')); heading.lang = host.english() ? 'en' : 'ja';
     main.append(heading);
     main.append(node('p', 'exam-intro', tx('級と長さを選んで、今できることを確かめよう。', 'Choose your level and how much time you have.')));
     const levels = node('div', 'exam-levels'); levels.setAttribute('role', 'group'); levels.setAttribute('aria-label', tx('級', 'Level'));
@@ -1032,7 +1038,7 @@ export function createAssessmentView(host) {
     box.append(node('h2', 'exam-official-title', tx('得点区分別の結果（素点）', 'By official score section (raw count)')));
     for (const row of rows) {
       const part = node('div', 'exam-official-row'); part.dataset.scoreSection = row.id;
-      const label = node('p', 'exam-official-label', row.label); label.lang = 'ja';
+      const label = node('p', 'exam-official-label', paperLabel(row.label)); label.lang = host.english() ? 'en' : 'ja';
       const helped = score.items.filter(item => row.skills.includes(item.skill) && assistedItem(item.itemId)).length;
       const spent = minutes(score.items.filter(item => row.skills.includes(item.skill)).reduce((n, item) => n + item.elapsedMs, 0));
       const raw = node('p', 'exam-official-raw', row.total
@@ -1048,7 +1054,7 @@ export function createAssessmentView(host) {
         const list = node('ul', 'exam-official-daimon');
         for (const entry of row.byTask) {
           const line = node('li', ''); line.dataset.task = entry.task;
-          const title = node('span', 'exam-daimon-name', DAIMON[entry.task]?.[0] || entry.task); title.lang = 'ja';
+          const title = node('span', 'exam-daimon-name', tx(...(DAIMON[entry.task] || [entry.task, entry.task]))); title.lang = host.english() ? 'en' : 'ja';
           line.append(title, node('span', 'exam-daimon-count', ` ${entry.correct}/${entry.total}`));
           list.append(line);
         }
@@ -1057,7 +1063,7 @@ export function createAssessmentView(host) {
       box.append(part);
     }
     const ranges = facts.sections.every(row => row.range[1] === 60) ? tx('各0〜60点', 'each 0–60')
-      : facts.sections.map(row => `${row.label} ${row.range[0]}〜${row.range[1]}`).join(tx('、', ', '));
+      : facts.sections.map(row => `${paperLabel(row.label)} ${row.range[0]}–${row.range[1]}`).join(tx('、', ', '));
     box.append(node('p', 'exam-official-pass', tx(
       `本試験の合格点は ${facts.passMark}点（0〜180点）で、すべての得点区分が基準点以上であることも必要です。`,
       `The real test's pass mark is ${facts.passMark} of 180, and every score section must also reach its minimum.`)),
@@ -1149,32 +1155,37 @@ export function createAssessmentView(host) {
     paper.setAttribute('aria-labelledby', 'exam-task-title'); main.append(paper);
     const paperHeader = node('header', 'exam-paper-header');
     const skillHeading = node('p', 'exam-skill');
-    appendText(skillHeading, (place && paperName(selected, block.blockId)) || (question.skill === 'listening' ? '聴解'
-      : ['N1', 'N2'].includes(level) ? '言語知識（文字・語彙・文法）・読解'
-        : SKILLS[question.skill]?.[0] || question.skill), selected, question.id, 'instruction'); paperHeader.append(skillHeading);
-    const taskHeading = node('h2', 'exam-task-heading');
+    appendText(skillHeading, (place && paperName(selected, block.blockId)) || (question.skill === 'listening' ? tx('聴解', 'Listening')
+      : ['N1', 'N2'].includes(level) ? paperLabel('言語知識（文字・語彙・文法）・読解')
+        : tx(...(SKILLS[question.skill] || [question.skill,question.skill]))), selected, question.id, 'instruction'); paperHeader.append(skillHeading);
+    const taskHeading = node('h2', 'exam-task-heading'); taskHeading.lang = host.english() ? 'en' : 'ja';
     const printed = official ? form.sections.find(row => row.itemIds.includes(question.id)) : null;
     if (place) {
       taskHeading.dataset.mondai = String(place.group.mondai); taskHeading.dataset.task = place.group.task;
       const number = node('span', 'exam-mondai-no');
       taskHeading.append(number, document.createTextNode('\u3000'));
-      write('instruction')(number, mondaiLabel(level, place.group.mondai), taskHeading);
+      write('instruction')(number, tx(mondaiLabel(level, place.group.mondai), `Question ${place.group.mondai}`), taskHeading);
       const name = node('span', 'exam-daimon');
       taskHeading.append(name);
-      write('instruction')(name, DAIMON[place.group.task]?.[0] || layout.task, taskHeading);
-    } else appendText(taskHeading, `問題 ${printed ? spec.sectionIds.indexOf(printed.id) + 1 : layout.group}\u3000${layout.task}`,
-      selected, question.id, 'instruction');
+      write('instruction')(name, tx(...(DAIMON[place.group.task] || SKILLS[question.skill] || [question.task,question.task])), taskHeading);
+    } else {
+      const number = printed ? spec.sectionIds.indexOf(printed.id) + 1 : layout.group;
+      const task = tx(...(DAIMON[question.task] || SKILLS[question.skill] || [question.task,question.task]));
+      appendText(taskHeading, `${tx(`問題 ${number}`, `Question ${number}`)}\u3000${task}`, selected, question.id, 'instruction');
+    }
     taskHeading.id = 'exam-task-title'; paperHeader.append(taskHeading);
     const officialLine = place ? officialInstruction(level, place.group.task, { passages: place.group.passageIds.length,
       ...(place.group.gaps ? { first: place.group.numbers[0], last: place.group.numbers.at(-1) } : {}) }) : null;
     if (printed) {
-      const instruction = textNode('p', 'exam-task-instruction exam-official-instruction', printed.title, true); instruction.lang = 'ja';
+      const instruction = textNode('p', 'exam-task-instruction exam-official-instruction', printed.title, true); instruction.lang = 'ja'; instruction.dataset.uiContent = 'learning';
       paperHeader.append(instruction);
     } else if (officialLine) {
       const instruction = node('p', 'exam-task-instruction exam-mondai-instruction');
+      instruction.dataset.uiContent = 'learning';
       appendSegments(instruction, officialLine, null, write('instruction')); paperHeader.append(instruction);
     } else if (layout.instruction && !official && (!place || paperStemDropsLine(question))) {
       const instruction = node('p', 'exam-task-instruction');
+      instruction.dataset.uiContent = 'learning';
       appendText(instruction, layout.instruction, selected, question.id, 'instruction'); paperHeader.append(instruction);
     }
     paper.append(paperHeader);
@@ -1185,6 +1196,7 @@ export function createAssessmentView(host) {
         text.append(node('p', 'exam-passage-label', `（${place.group.passageIds.indexOf(reference.id) + 1}）`));
       if (passage?.title) {
         const heading = official ? textNode('h3', '', passage.title, true) : node('h3', '');
+        heading.dataset.uiContent = 'learning';
         if (!official) appendText(heading, passage.title, selected, question.id, 'passage'); text.append(heading);
       }
       // a real paper keeps its printed underlines, ruby and boxed numbers
@@ -1234,13 +1246,13 @@ export function createAssessmentView(host) {
           return command({ kind: 'answer', itemId: question.id, response: { kind: 'selected', optionId: option.id } });
         }, lookupChoice ? 'mock-opt exam-option-number' : 'mock-opt');
         if (official && !audioOnly) control.append(paperNodes(option.text));
-        control.lang = 'ja'; control.dataset.examOption = option.id;
+        control.lang = 'ja'; control.dataset.uiContentValue = option.text; control.dataset.examOption = option.id;
         control.setAttribute('aria-pressed', String(answer.response.kind === 'selected' && answer.response.optionId === option.id));
         control.disabled = host.pending() || !!answer.assistance;
         if (lookupChoice) {
           control.setAttribute('aria-label', tx(`回答 ${number + 1}: ${option.text}`, `Answer ${number + 1}: ${option.text}`));
           const row = node('div', 'exam-option-row'); row.dataset.selected = control.getAttribute('aria-pressed');
-          const text = node('span', 'exam-option-text');
+          const text = node('span', 'exam-option-text'); text.dataset.uiContent = 'learning';
           appendText(text, option.text, selected, question.id, 'choice'); row.append(control, text); options.append(row);
         } else options.append(control);
       });
@@ -1298,9 +1310,8 @@ export function createAssessmentView(host) {
     table.append(list);
     if (entry.passMark) table.append(node('p', 'exam-official-pass', tx(`合格点 ${entry.passMark.total}点 / ${entry.passMark.maximum}点（尺度得点の合計）`,
       `Pass mark ${entry.passMark.total} of ${entry.passMark.maximum} (total of scaled scores)`)));
-    const note = node('p', 'exam-score-note exam-official-scale', '本試験の得点は項目応答理論による尺度得点（各0–60）で、素点からは換算できません。'); note.lang = 'ja';
+    const note = node('p', 'exam-score-note exam-official-scale', tx('本試験の得点は項目応答理論による尺度得点（各0–60）で、素点からは換算できません。', 'Real JLPT scores are scaled by item response theory (0–60 per section); raw counts can’t be converted.')); note.lang = host.english() ? 'en' : 'ja';
     table.append(note);
-    if (host.english()) table.append(node('p', 'exam-score-note', 'Real JLPT scores are scaled by item response theory (0–60 per section); raw counts can’t be converted.'));
     main.append(table);
   }
   function renderResult(main, selected) {
@@ -1395,11 +1406,12 @@ export function createAssessmentView(host) {
       const helped = assistedItem(result.itemId);
       if (helped) details.dataset.examAssisted = 'true';
       const plain = official ? paperPlain : text => text;
-      const daimon = paperMode(selected) ? DAIMON[question.task]?.[0] : null;
+      const daimon = paperMode(selected) && DAIMON[question.task] ? tx(...DAIMON[question.task]) : null;
       // A real paper's prompt opens with its printed number; the list already numbers each question.
       const promptLine = official ? plain(question.prompt.replace(/^\uE005\d+\uE006\u3000?/u, '')).split('\n').at(-1) || tx('本文の空欄', 'Blank in the passage')
         : question.prompt.split('\n').at(-1);
-      details.append(node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`));
+      const summary = node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`);
+      summary.dataset.uiContentValue = promptLine; details.append(summary);
       const choice = id => { const index = question.response.options.findIndex(row => row.id === id);
         return index < 0 ? '' : official ? `${index + 1}　${plain(question.response.options[index].text)}` : question.response.options[index].text; };
       const selectedOption = question.response.kind === 'selected' && result.response.kind === 'selected'

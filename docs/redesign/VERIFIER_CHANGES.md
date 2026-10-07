@@ -5,3 +5,336 @@ Only chrome language and room-material selector pins change. Storage, SRS, ledge
 | File | Assertion | Before → after | Reason |
 | --- | --- | --- | --- |
 | `prototypes/corridor/tools/verify-guided-session.mjs` | J3 attempt chrome material | `html.dataset.room === attempt` → `html.dataset.register === attempt` | F5 gives `data-room=guided` a stable room identity while preserving the exact stage-sensitive register and chrome assertion. |
+
+| `verify-design-reader-shelf.mjs` | T1 tools name | `^学習ツール` → `^Tools` | F2 selects the English button label; title placement and visibility stay required. |
+| `verify-design-reader-shelf.mjs` | M1 unreviewed note | `未確認` → `Unreviewed` | F2 selects English; both numeric counts, single line and explanation control remain required. |
+| `verify-corridor-accessibility.mjs` | Quiet kanji dialog locator and sampled eyebrow | `この語の漢字` → `kanji in this word` | F2 selects English; dialog behavior, geometry and contrast are unchanged. |
+| `verify-experience.mjs` | E11 stroke and parts buttons | `画数 by strokes`, `部品 by its parts` → `by strokes`, `by its parts` | F2 removes the leaking Japanese label; the same shape-filter journey remains. |
+| `verify-experience.mjs` | E16 shelf title selector | `.shelf-mast-title .en-inline` → `.shelf-mast-title .view-title` | The active English title is now the heading itself; language-cycle and pressed-state assertions remain. |
+| `verify-n2n1-decks.mjs` | UI deck title equality | Three Japanese titles → their explicit English UI titles | F2 changes chrome; original `titleJa` data assertions stay Japanese and unchanged. |
+| `verify-design-reader-shelf.mjs` | T1 tool tile names | Requires Japanese `.l-ja` plus `.en-sub` in accessible name → requires CJK-free active English label equal to accessible name | F2 deliberately selects one language. All tiles, containment, viewport fit and one-line checks stay required. |
+
+## Corridor language pins
+
+| Assertion / selector | Before → after | Reason |
+|---|---|---|
+| Glossary kicker census, line 689 | `.story-kicker .l-ja` equals `用語集` → equals `Glossary` | `storyTopic()` supplies the exact English kicker through the language law; the complete census/tally equality assertions are retained. |
+| Glossary check description, line 700 | `rows wear 用語集` → `rows wear Glossary` | Describe the actual EN label being checked. |
+| NINJAL signal-row identity, line 783 | name includes `国語研` → name equals `NINJAL pair` | `renderSignals()` now selects the explicit English instrument name. All measured/unmeasured truth checks remain unchanged. |
+| Kanji Kentei tag existence and diagnostic filter, lines 1140–1141 | tag includes `漢検` → includes `Kanji Kentei` | The catalogue level tag is now English. Its required presence is retained. |
+| Idiom-heading count, line 1196 | heading contains `熟語` → matches `^\d+ idioms and set phrases$` | Kanji-page idiom headings explicitly preserve the count in the English label. `idiomHeading > 0` remains. |
+| Kanji-to-word header selector, line 1204 | `よく使う語` or `含む語` → exact `common compounds` or `words that contain it` | Select the same two translated compound sections; the real word hop assertion remains. |
+| Kanji-to-radical header selector, line 1226 | header contains `部品` → exact `main components` | Select the same translated component section; radical identity and family-size assertions remain. |
+| Radical-to-kanji header selector, line 1257 | header contains `含む字` → exact `kanji that contain this part` | Select the same translated radical-family section; real kanji-hop assertion remains. |
+| Saved-node chrome count, line 1278 | `覚\s*[1-9]` → `^Lists\s+[1-9][0-9]*$` | EN chrome must retain a positive numeric count. This requires the source to restore `Lists N`; it does not accept a count-free label. |
+| Locked-audio pending label, line 1652 | `音声準備中` → exact `audio coming soon · Kore` | Existing approved-voice pending copy is now English. Zero playback/voice controls, Kore identity and forbidden-device-voice checks remain. |
+| Variant non-ticket row identity, line 1669 | `E 奥行`, `F 触れの段`, `G 衛星の触れ` → `E depth`, `F tap ladder`, `G satellite tap` | The same three A–G identities have English labels. Exact seven-row census and four ticket marker counts remain unchanged. |
+| Default EN tray label, line 1688 | contains `lists` → exact `Lists N` with numeric count | Preserve the tray count as well as its translated name. |
+| Default EN chrome language observation, line 1689 | requires `覚` in tray → observes CJK across back and tray | English mode deliberately removes Japanese from chrome; the later condition now rejects CJK and still requires the active EN toggle and back/lists controls. |
+| Default language assertion and diagnostic, lines 1694–1696 | bilingual-default title/condition and Japanese tray presence → English-default title/condition, no CJK, numeric tray label | The intentional language-law behavior supersedes the old bilingual chrome contract. The subsequent Japanese toggle assertions remain unchanged. |
+| D23 held-card management door, line 2023 | exact `そのカードを開く` → exact `open that card` | Same card-management action, translated label; all retained-entry identity, held-state and ledger assertions remain unchanged. |
+| Probe dojo mode selector, line 2174 | `読み探査` → `yomi probe` | Select the same translated mode before asserting zen glass and missed-probe record effects. |
+| Taken-kanji dojo mode selector, line 2223 | `漢字だけ` → `kanji only` | Select the same translated mode; honest intervals, FSRS and ledger assertions remain unchanged. |
+| Examples-gesture heading selector, line 2359 | heading contains `用例` → exact `examples — tap a word for its meaning` | Select the same translated gesture instruction. Example counts/token-door behavior and gesture wording assertions remain unchanged. |
+| Unstarted-kanji dojo mode selector, line 3992 | `漢字だけ` → `kanji only` | Select the same translated mode; no invented FSRS/revlog/new-card-slot assertions remain unchanged. |
+| Lesson Kanji Kentei breadth assertion, line 4045 | heading includes `漢検` → includes `Kanji Kentei` | The lesson-lane heading is translated. Required JLPT breadth and required Kentei section remain. |
+| Due-card mode-copy selector, line 4144 | `覚えるの札` → `your due cards` | Find the same translated due-card mode before checking refill/practice copy and count. |
+| Due-card mode activation selector, line 4150 | `覚えるの札` → `your due cards` | Activate the same translated due-card mode. First-lap schedule effects and second-lap byte-stable ledger assertions remain unchanged. |
+
+
+## Deck language and navigation pins
+
+1. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 298; occurrences: 1.
+   Before: `after.text.includes('保存できませんでした')`
+   After: `after.text.includes('Could not save.')`
+   Reason: EN save-failure chrome; unchanged card, grade controls and ledger-byte checks.
+
+2. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 375; occurrences: 1.
+   Before: `empty.msg.includes('入っていません') && !empty.msg.includes('復元しました') && empty.button === '復元'`
+   After: `empty.msg.includes('This backup has no card records.') && !empty.msg.includes('Restored') && empty.button === 'Restore'`
+   Reason: EN empty-backup notice and Restore label; unchanged ledger-byte preservation and negative-success assertion.
+
+3. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 386; occurrences: 1.
+   Before: `first.msg.includes('このバックアップ：1枚・1回答') && first.msg.includes('いまの記録：2枚・2回答') && first.msg.includes('いまより少ない') && first.button === '置き換える'`
+   After: `first.msg.includes('Backup: 1 cards · 1 answers') && first.msg.includes('Current record: 2 cards · 2 answers') && first.msg.includes('fewer records') && first.button === 'Replace'`
+   Reason: EN restore-preview counts, warning and confirmation label; identical numeric counts and confirmation workflow.
+
+4. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 386; occurrences: 1.
+   Before: `done.includes('復元しました')`
+   After: `done.includes('Restored')`
+   Reason: EN successful restore status; all backup quarantine, record-count and acknowledgment checks retained.
+
+5. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 395; occurrences: 1.
+   Before: `home.includes('別に保管しました')`
+   After: `home.includes('kept separately')`
+   Reason: EN quarantine notice; exact quarantined bytes still required.
+
+6. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 465; occurrences: 1.
+   Before: `two.labels === 'もう一度/思い出せた' && two.hint.includes('思い出せた')`
+   After: `two.labels === 'Again/Recalled' && two.hint.includes('Recalled')`
+   Reason: EN two-grade labels and swipe hint; still exactly two buttons, fixed dock and ignored keys 2/4.
+
+7. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 493; occurrences: 1.
+   Before: `document.getElementById('kp-persist')?.textContent.includes('：')`
+   After: `document.getElementById('kp-persist')?.textContent.includes('Device storage:')`
+   Reason: Wait for the localized storage-status chrome rather than the retired Japanese colon.
+
+8. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 495; occurrences: 1.
+   Before: `/記録を消す|消えます/.test(b.textContent)`
+   After: `/記録を消す|消えます|erase.*record|delete.*record|reset.*record|clear.*record/i.test(b.textContent)`
+   Reason: Retain Japanese reset-deny strings and add English equivalents; reset prohibition is strengthened, not removed.
+
+9. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 498; occurrences: 1.
+   Before: `settings.label === 'バックアップの文字列'`
+   After: `settings.label === 'Backup text'`
+   Reason: EN backup textarea label; label association and axe checks unchanged.
+
+10. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 498; occurrences: 1.
+   Before: `/^端末の保存領域：(確保済み|未確保|不明)$/.test(settings.persist)`
+   After: `/^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist)`
+   Reason: EN storage-status strings; the same three exhaustive statuses remain required.
+
+11. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 499; occurrences: 1.
+   Before: `settings.backup.join() === 'コピー,復元'`
+   After: `settings.backup.join() === 'Copy,Restore'`
+   Reason: EN backup actions in the same exact order; reset absence still required.
+
+12. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 520; occurrences: 1.
+   Before: `done.text.includes('思い出せた割合')`
+   After: `done.text.includes('Recall rate')`
+   Reason: EN completion summary label; Undo still restores the exact card count and review log.
+
+13. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 531; occurrences: 1.
+   Before: `kanji.chip === '字'`
+   After: `kanji.chip === 'Kanji'`
+   Reason: EN card-kind chrome; kanji blank text, no-choice rule, reveal and two-grade behavior retained.
+
+14. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 543; occurrences: 1.
+   Before: `const FOLD_ORDER = ['英語', '英訳', '漢字の形と意味', '類語', 'この語の他の文', '出典'];`
+   After: `const FOLD_ORDER = ['English', 'Translation', 'Kanji form and meaning', 'Related words', 'Other sentences for this word', 'Source'];`
+   Reason: EN disclosure labels; same six disclosure slots and strict ordering, with explicit passage-name normalization below.
+
+15. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 544; occurrences: 1.
+   Before: `const RULE_TEXT = '答えを見て理解が深まったなら もう一度';`
+   After: `const RULE_TEXT = '答えを見て理解が深まったなら もう一度';
+const UI_RULE_TEXT = 'Choose Again if seeing the answer improved your understanding.';`
+   Reason: Keep Japanese source/bundle parity pin intact; add exact EN visible instruction for runtime chrome.
+
+16. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 750; occurrences: 1.
+   Before: `const TOPICS = { mind: '心と学び', india: 'インド・仏教', ai: 'AI・半導体', history: '世界史', language: '日本語' };`
+   After: `const TOPICS = { mind: '心と学び', india: 'インド・仏教', ai: 'AI・半導体', history: '世界史', language: '日本語' };
+const UI_REGISTERS = { 講: 'Lecture', 報: 'Reporting', 論: 'Essay', 話: 'Conversation', 学: 'Learning', 語: 'Expression' };
+const UI_REGISTER_NAMES = { 講: 'Lectures and book summaries', 報: 'News and commentary', 論: 'Essays and ideas', 話: 'Spoken language', 学: 'Study and learning', 語: 'Speaking and writing' };
+const UI_TOPICS = { mind: 'Mind and learning', india: 'India and Buddhism', ai: 'AI and semiconductors', history: 'World history', language: 'Japanese' };`
+   Reason: Keep original Japanese source-data dictionaries intact; add exact EN presentation dictionaries solely for chrome assertions.
+
+17. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 879; occurrences: 1.
+   Before: `front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && !front.chips.includes('書き下ろし') && front.reg === `文体：${REGISTER_NAMES[card.register]}（書き下ろし）``
+   After: `front.chips.includes(UI_REGISTERS[card.register]) && front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === `Register: ${UI_REGISTER_NAMES[card.register]} (Original composition)``
+   Reason: EN register/topic chips and complete aria name; continue forbidding duplicated group/source chips and retaining 390px one-line assertion.
+
+18. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1078; occurrences: 1.
+   Before: `self.indeck === 'このデッキにあります'`
+   After: `self.indeck === 'Already in this deck'`
+   Reason: EN own-deck note; exact learned term, dictionary key, absence of take/full/stop and definition-token assertions retained.
+
+19. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1086; occurrences: 1.
+   Before: `deep.stop === 'ここで止めよう'`
+   After: `deep.stop === 'Pause here'`
+   Reason: EN recursive lookup stop note; lookup depth, token absence, definition, deck membership and Back behavior retained.
+
+20. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1226; occurrences: 1.
+   Before: `const at = summaries.map((t) => FOLD_ORDER.findIndex((k) => t.startsWith(k)));`
+   After: `const at = summaries.map((t) => FOLD_ORDER.findIndex((k) => t.replace(/^Other passages for this word/, 'Other sentences for this word').startsWith(k)));`
+   Reason: Explicitly recognize both localized passage and sentence disclosures in the original shared ordering slot; strict order and recognized-label requirement unchanged.
+
+21. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1279; occurrences: 1.
+   Before: `b.summaries[0] === '英語' && b.summaries.at(-1) === '出典'`
+   After: `b.summaries[0] === 'English' && b.summaries.at(-1) === 'Source'`
+   Reason: EN first/last fold labels; native disclosure type, exact positions, order and closed English gloss assertions retained.
+
+22. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1285; occurrences: 1.
+   Before: `b.src.text.includes(`文章${c.passage}`)`
+   After: `b.src.text.includes(`Passage ${c.passage}`)`
+   Reason: EN passage-number chrome inside source fold; learned source metadata, URLs, licence and closed-fold checks retained.
+
+23. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1290; occurrences: 1.
+   Before: `b.others?.summary === `この語の他の文章（${sibs.length}）``
+   After: `b.others?.summary === `Other passages for this word (${sibs.length})``
+   Reason: EN sibling-passage fold title and same exact count; sibling answer text remains forbidden.
+
+24. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1302; occurrences: 1.
+   Before: `const ja = [...ans.querySelectorAll('.kp-folds summary, .kp-tip-label')].every((n) => n.closest('[lang]').lang === 'ja');`
+   After: `const chrome = [...ans.querySelectorAll('.kp-folds summary, .kp-tip-label')].every((n) => n.closest('[lang]').lang === 'en');`
+   Reason: Fold labels are EN chrome and must use EN screen-reader language; translated content keeps its independent language checks.
+
+25. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1304; occurrences: 1.
+   Before: `return { ja, en, details:`
+   After: `return { chrome, en, details:`
+   Reason: Report localized chrome-language result under a descriptive property; retain English-content and native-details checks.
+
+26. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1305; occurrences: 1.
+   Before: `check('c) screen readers: the fold summaries read as Japanese, only the English text inside carries lang="en"', lang.ja && lang.en && lang.details`
+   After: `check('c) screen readers: EN fold summaries and English content carry lang="en", while native details add no language override', lang.chrome && lang.en && lang.details`
+   Reason: Update the localized speech-language assertion and its description without dropping any language or native-details requirement.
+
+27. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1330; occurrences: 1.
+   Before: `bar.rule?.includes(RULE_TEXT)`
+   After: `bar.rule?.includes(UI_RULE_TEXT)`
+   Reason: Exact EN grade instruction; fixed dock dimensions, hit testing, dismissal, stored preference and preserved open fold unchanged.
+
+28. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1343; occurrences: 1.
+   Before: `b.summaries[1] === '英訳' && b.en?.text.includes('未対応')`
+   After: `b.summaries[1] === 'Translation' && b.en?.text.includes('unavailable')`
+   Reason: EN unmatched-translation disclosure and honest unavailable notice; still prohibit the full passage translation.
+
+29. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1556; occurrences: 1.
+   Before: `first.front === '意味を思い出してからタップ'`
+   After: `first.front === 'Recall the meaning, then tap'`
+   Reason: EN front gesture instruction; sitting counts, third/fourth visit retirement and swipe-hint behavior unchanged.
+
+30. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1612; occurrences: 1.
+   Before: `b.summaries.at(-1) === '出典'`
+   After: `b.summaries.at(-1) === 'Source'`
+   Reason: EN final source-disclosure label in the sentence-deck assertion; same open gloss, source metadata and zero-zoom checks.
+
+31. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1613; occurrences: 1.
+   Before: `b.others?.summary === `この語の他の文（${w.cards.length - 1}）``
+   After: `b.others?.summary === `Other sentences for this word (${w.cards.length - 1})``
+   Reason: EN sentence sibling-disclosure name and exact original sibling count.
+
+32. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1613; occurrences: 1.
+   Before: `!/文章\d/.test(b.src.text)`
+   After: `!/(?:文章|Passage )\d/.test(b.src.text)`
+   Reason: Preserve Japanese passage-number deny pattern and add EN counterpart; sentence-source numbering prohibition strengthened.
+
+33. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1836; occurrences: 1.
+   Before: `tools.label === '削除'`
+   After: `tools.label === 'Remove'`
+   Reason: EN removal control label; exact 44px hit, top-bar placement, FSRS identity and reversible removal checks retained.
+
+34. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1836; occurrences: 1.
+   Before: `/削除しました/.test(gone.toast)`
+   After: `/Card removed/.test(gone.toast)`
+   Reason: EN reversible removal toast; all suspension, repair-log and undo assertions retained.
+
+35. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1843; occurrences: 1.
+   Before: `/1枚/.test(home) && /^1枚（削除 1）$/.test(counted) && after.text === 'ありません'`
+   After: `/1 cards/.test(home) && /^1 cards \(Remove 1\)$/.test(counted) && after.text === 'None'`
+   Reason: EN queue/card count, paused-removal reason and empty state; identical numeric counts and restored-record checks retained.
+
+36. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1843; occurrences: 1.
+   Before: `/2枚/.test(homeAfter)`
+   After: `/2 cards/.test(homeAfter)`
+   Reason: EN queue-size units after restoring suspended card; exact original numeric queue size retained.
+
+37. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1873; occurrences: 1.
+   Before: `ladder.head === 'この文で5回つまずいています'`
+   After: `ladder.head === 'Difficulty on this sentence: 5 times'`
+   Reason: EN five-lapse explanation; exact lapse count retained.
+
+38. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1873; occurrences: 1.
+   Before: `ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留'`
+   After: `ladder.labels.join('/') === 'Use another sentence/Add a hint/Pause'`
+   Reason: EN repair-step labels in identical swap/hint/suspend order.
+
+39. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1873; occurrences: 1.
+   Before: `ladder.swapTo.startsWith(`文章${swapOf('km-064-m01').passage}へ`)`
+   After: `ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage}`)`
+   Reason: EN swap destination label; exact selected passage identity and unchanged repair workflow retained.
+
+40. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1904; occurrences: 1.
+   Before: `f1.hint === 'ヒントざ○○○'`
+   After: `f1.hint === 'Hintざ○○○'`
+   Reason: Only the hint caption changes to EN; Japanese stored reading hint remains byte-identical and confined to its repaired card.
+
+41. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1928; occurrences: 1.
+   Before: `/別の文に替えました/.test(now.toast)`
+   After: `/Changed to another sentence/.test(now.toast)`
+   Reason: EN sentence-swap status; unchanged suspension reason, preserved FSRS state, repair log and reload identity.
+
+42. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1948; occurrences: 1.
+   Before: `swapTo.startsWith('例文2へ')`
+   After: `swapTo.startsWith('Example 2')`
+   Reason: EN sentence-example destination caption; same exact example number.
+
+43. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1948; occurrences: 1.
+   Before: `/保留にしました/.test(now.toast)`
+   After: `/Card paused/.test(now.toast)`
+   Reason: EN suspension status; leech reason, suspend log and original lapse count retained.
+
+44. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1966; occurrences: 1.
+   Before: `ji.why === '替えられる文がありません' && ji.hint === '表に「貝＋才」'`
+   After: `ji.why === 'No alternative sentence available' && ji.hint === 'Show “貝＋才” on the front'`
+   Reason: EN no-alternative explanation and hint instructions; learned kanji parts remain identical, swap still disabled and keep log checked.
+
+45. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1999; occurrences: 1.
+   Before: `list.title === '語の一覧'`
+   After: `list.title === 'Word list'`
+   Reason: EN word-list heading; exact opened word, revealed-card return and details preserved.
+
+46. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 2042; occurrences: 1.
+   Before: `see.labels.join() === '参照,文法'`
+   After: `see.labels.join() === 'See also,Grammar'`
+   Reason: EN see-also/grammar captions; exact lexical items, IDs, grammar entry, positioning and word-list route retained.
+
+47. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 2174; occurrences: 1.
+   Before: `set.summary === 'このデッキのしくみ'`
+   After: `set.summary === 'How this deck works'`
+   Reason: EN method disclosure label; same deck-method line count, four settings groups and home-panel prohibitions retained.
+
+48. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 2191; occurrences: 1.
+   Before: `front.kindChip === '語'`
+   After: `front.kindChip === 'Word'`
+   Reason: EN whole-word kind chip; unchanged card type, hue axes, edge/color equality and visual invariants.
+
+49. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 2217; occurrences: 1.
+   Before: `ji.kindChip === '字'`
+   After: `ji.kindChip === 'Kanji'`
+   Reason: EN kanji kind chip; unchanged edge/type/state colors and all contrast requirements.
+
+50. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 2218; occurrences: 1.
+   Before: `s.kindChip === '語'`
+   After: `s.kindChip === 'Word'`
+   Reason: EN sentence-word kind chip; unchanged hue, level and no progress-counter assertion.
+
+51. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1151; occurrences: 1.
+   Before: `/覚える/.test(x.pop.note)`
+   After: `x.pop.note === 'Save to your review cards in Bunki.'`
+   Reason: Exact EN standalone save note; still one line, no save control, no sheet, no schedule change, same lookup record and close behavior.
+
+52. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1586; occurrences: 1.
+   Before: `/今日はここまで/.test(read.start) && modeRead === 'true' && /1枚/.test(self)`
+   After: `read.start === 'Done for today' && modeRead === 'true' && self === 'Begin — 1 cards'`
+   Reason: Exact EN disabled done label and one-card start label; unchanged due kanji, read/self mode, FSRS stability and no-suspension requirements.
+
+53. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 2193; occurrences: 1.
+   Before: `front.levelLabel === 'N1相当（公開リストによる目安）'`
+   After: `front.levelLabel === 'N1 equivalent (estimated from public lists)'`
+   Reason: EN level-chip aria description; unchanged N1 level, monochrome colors, kind/target styling and underline checks.
+
+54. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1206; occurrences: 1.
+   Before: `rest.querySelectorAll('.kp-chips, .kp-sentence').forEach((n) => n.remove());`
+   After: `rest.querySelectorAll('.kp-chips, .kp-sentence').forEach((n) => n.remove());
+    rest.querySelectorAll('.kp-taphint').forEach((n) => { if (['Recall the meaning, then tap', 'Tap to reveal the answer'].includes(n.textContent)) n.textContent = ''; });
+    rest.querySelectorAll('.kp-rhint-label').forEach((n) => { if (n.textContent === 'Hint') n.textContent = ''; });`
+   Reason: The existing front detector excludes metadata chrome. Ignore only the exact translated instruction strings and exact Hint caption in their original chrome nodes; every other Latin character still fails, learned repaired hints remain checked, and gloss/translation/tip/front-reading leakage checks are unchanged.
+
+55. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1326; occurrences: 1.
+   Before measurement: `const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null };`
+   After measurement: `const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); const t = document.getElementById('primary-tabs')?.getBoundingClientRect(); const tabs = t?.height > 0 ? t : null; return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), expectedBottom: Math.round(tabs?.top ?? innerHeight), tabsBottom: tabs ? Math.round(tabs.bottom) : null, viewport: innerHeight, noOverlap: b.bottom <= (tabs?.top ?? innerHeight), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null };`
+   Before assertion: `bar.position === 'fixed' && bar.bottom === 844 && bar.hit`
+   After assertion: `bar.position === 'fixed' && bar.bottom === bar.expectedBottom && bar.viewport === 844 && (bar.tabsBottom === null || bar.tabsBottom === 844) && bar.noOverlap && bar.hit`
+   Reason: F4 deliberately docks the grading controls above visible primary tabs. Require the exact tabs top (or viewport bottom standalone), retain the exact 844px viewport/bottom pin for tabs, add explicit no-overlap, and keep actual grade-button hit checks and the full existing behavior/scroll assertions. Parent authorized this moved-dock assertion change.
+
+56. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1529; occurrences: 1.
+   Before measurement: `const top = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const g = document.getElementById('kp-grade-again').getBoundingClientRect(); return { bottom: Math.round(b.bottom), inView: g.top >= 0 && g.bottom <= innerHeight, hit: !!document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)?.closest('#kp-grade-again') }; })()`);`
+   After measurement: `const top = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const g = document.getElementById('kp-grade-again').getBoundingClientRect(); const t = document.getElementById('primary-tabs')?.getBoundingClientRect(); const tabs = t?.height > 0 ? t : null; return { bottom: Math.round(b.bottom), expectedBottom: Math.round(tabs?.top ?? innerHeight), tabsBottom: tabs ? Math.round(tabs.bottom) : null, viewport: innerHeight, noOverlap: b.bottom <= (tabs?.top ?? innerHeight), inView: g.top >= 0 && g.bottom <= innerHeight, hit: !!document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)?.closest('#kp-grade-again') }; })()`);`
+   Before assertion: `top.bottom === 844 && top.inView && top.hit`
+   After assertion: `top.bottom === top.expectedBottom && top.viewport === 844 && (top.tabsBottom === null || top.tabsBottom === 844) && top.noOverlap && top.inView && top.hit`
+   Reason: F4 deliberately docks the grading controls above visible primary tabs. Require the exact tabs top (or viewport bottom standalone), retain the exact 844px viewport/bottom pin for tabs, add explicit no-overlap, and keep actual grade-button hit checks and the full existing behavior/scroll assertions. Parent authorized this moved-dock assertion change.
+
+57. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1151; occurrences: 1.
+   Before: `x.pop.note === 'Save to your review cards in Bunki.'`
+   After: `/覚える/.test(x.pop.note)`
+   Reason: Supersedes edit 51 after actual run showed this assertion serves unchanged repository release/study*.html, not the redesigned built corridor. Restore its original Japanese expected save note; every standalone behavior check remains exactly as before. This is a correction of an overly broad label expectation change.

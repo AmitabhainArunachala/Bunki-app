@@ -195,7 +195,7 @@ async function openQuietLabelDialog(page) {
   await page.locator('#nav-search-input').fill('学校');
   await page.locator('#nav-search-input').press('Enter');
   const sheet = page.locator('#sheet[data-node="word:学校"]');
-  await sheet.locator('.eyebrow').filter({ hasText: 'この語の漢字' }).waitFor({ state: 'visible' });
+  await sheet.locator('.eyebrow').filter({ hasText: 'kanji in this word' }).waitFor({ state: 'visible' });
   await sheet.locator('.pool-tag[data-reference-door="jlpt:N5"]').waitFor({ state: 'visible' });
 }
 
@@ -730,7 +730,7 @@ async function main() {
         const bg = getComputedStyle(sheet).backgroundColor;
         const out = {};
         const labels = [
-          ['#sheet .eyebrow', [...sheet.querySelectorAll('.eyebrow')].find(node => node.textContent.includes('この語の漢字'))],
+          ['#sheet .eyebrow', [...sheet.querySelectorAll('.eyebrow')].find(node => node.textContent.includes('kanji in this word'))],
           ['#sheet .pool-tag', sheet.querySelector('.pool-tag[data-reference-door="jlpt:N5"]')],
         ];
         for (const [sel, node] of labels) {

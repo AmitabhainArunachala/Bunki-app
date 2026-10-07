@@ -233,8 +233,10 @@
 .kp-again { border-color: var(--kp-red); } .kp-again b { color: var(--kp-red); }
 .kp-good { border-color: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); } .kp-good b { color: var(--kp-green); }
 .kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: 11px; color: var(--kp-mute); letter-spacing: 0.1em; }
-.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
-.kp-rule-x { position: relative; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 13px; color: var(--kp-ink-2); text-align: left; }
+.kp-rule > span { flex: 1; min-width: 0; }
+/* The report control occupies the lower-right corner; keep the rule dismissal on the left. */
+.kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
 /* phones: the grade bar is pinned to the bottom of the screen, so a long passage never hides it */
 @media (max-width: 640px) {
   .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
@@ -411,3 +413,10 @@
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
 /* a written passage's register and topic (CARD_CONTRACT_V2 §6): text chips, a size down, no hue */
 .kp-chip-sm { font-size: 11px; padding: 2px 6px; }
+
+/* Full English metadata stays on one phone row without abbreviating the labels. */
+@media (max-width: 640px) {
+  .kp-chips { gap: 3px; }
+  .kp-chip { font-size: 11px; padding-inline: 2px; }
+  .kp-chip-sm { padding-inline: 0; }
+}

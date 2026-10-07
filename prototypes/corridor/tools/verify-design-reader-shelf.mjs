@@ -467,7 +467,7 @@ try {
             between,
           };
         }, TOOL_DOORS);
-        assert(served.toggle?.shown && served.toggle.inTitle && /^学習ツール/u.test(served.toggle.text), `no 学習ツール button in the title block: ${JSON.stringify(served.toggle)}`);
+        assert(served.toggle?.shown && served.toggle.inTitle && /^Tools/u.test(served.toggle.text), `no 学習ツール button in the title block: ${JSON.stringify(served.toggle)}`);
         assert.equal(served.toggle.expanded, 'false', 'the tools panel is open on arrival');
         assert.equal(served.visibleDoors.length, 0, `tool doors visible before the button is pressed: ${served.visibleDoors.join(', ')}`);
         assert.equal(served.between.length, 0, `controls between the filters and the first story: ${served.between.join(', ')}`);
@@ -494,8 +494,8 @@ try {
         assert.equal(opened.expanded, 'true', 'the button does not report the panel open');
         assert(opened.panel, 'the tools panel is not shown');
         assert.deepEqual(opened.missing, [], `the panel is missing doors: ${opened.missing.join(', ')}`);
-        const bad = opened.tiles.filter((t) => !t.inPanel || !t.inView || !t.ja || !t.oneLine || !t.en || !t.name.startsWith(t.ja) || !t.name.includes(t.en));
-        assert.equal(bad.length, 0, `tiles not in the panel, off screen, broken over two lines, or missing their Japanese/English names: ${JSON.stringify(bad.slice(0, 3))}`);
+        const bad = opened.tiles.filter((t) => !t.inPanel || !t.inView || !t.ja || !t.oneLine || /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(t.ja) || t.name !== t.ja);
+        assert.equal(bad.length, 0, `tiles not in the panel, off screen, broken over two lines, or missing their active English accessible name: ${JSON.stringify(bad.slice(0, 3))}`);
         await page.locator('#grammar-link').click();
         await page.waitForFunction(() => document.body.dataset.view === 'grammar');
         return { doors: served.doors, tiles: opened.tiles.length, toggle: served.toggle.text };
@@ -529,7 +529,7 @@ try {
             why: !!why?.querySelector('summary'), seal: seal ? Math.round(Math.max(seal.width, seal.height)) : 0 };
         });
         assert(Math.abs(probe.dateTop - probe.tallyTop) <= 2 && probe.datelineLines === 1, `date and count are not one line: ${JSON.stringify(probe)}`);
-        assert(/未確認/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the 未確認 note does not count the pending stories against the total: "${probe.note}"`);
+        assert(/Unreviewed/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the 未確認 note does not count the pending stories against the total: "${probe.note}"`);
         assert.equal(probe.noteLines, 1, `the 未確認 note runs to ${probe.noteLines} lines: "${probe.note}"`);
         assert(probe.why, 'the 未確認 note has no ⓘ for its longer explanation');
         await page.locator('.shelf-review-note summary').click();

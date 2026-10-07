@@ -5765,11 +5765,9 @@ function renderShelfBody() {
   }
 
   toolsBox.append(...toolGroups.filter((section) => section.querySelector('button')));
-  // each tile names its door in Japanese with its English underneath; the accessible name says both
-  for (const door of toolsBox.querySelectorAll('button')) {
-    const en = door.querySelector('.en-sub')?.textContent;
-    if (en) door.setAttribute('aria-label', `${door.querySelector('.l-ja')?.textContent || ''} · ${en}`);
-  }
+  // The accessible name follows the same active label as the visible tile.
+  for (const door of toolsBox.querySelectorAll('button'))
+    door.setAttribute('aria-label', door.textContent.trim());
   const toolsToggle = el('button', 'shelf-tools-toggle');
   toolsToggle.type = 'button';
   toolsToggle.id = 'shelf-tools-toggle';
@@ -5860,7 +5858,7 @@ function renderShelfBody() {
     }
     const selection = el('section', 'shelf-daily-selection shelf-band');
     selection.setAttribute('aria-labelledby', 'shelf-today-head');
-    const todayHead = withEn(el('h2', 'shelf-band-head', '今日の６本'), 'six picks for today', 'en-inline');
+    const todayHead = withEn(el('h2', 'shelf-band-head eyebrow shelf-section', '今日の６本'), 'six picks for today', 'en-inline');
     todayHead.id = 'shelf-today-head';
     selection.append(todayHead);
     bands.unshift(selection);
@@ -9722,7 +9720,7 @@ function renderReader(main) {
   fact('出典', 'source', learnerSourceLabel(p) || p.source);
   if (shelfDay(p)) fact('日付', 'date', dateStamp(shelfDay(p), 'shelf-date'));
   const lv = levelPhrase(p.grading);
-  fact('レベル', 'level', levelChip(p), el('span', 'level-note', bi() ? ` ${lv.level} · ${lv.ja}${lv.note}` : ` ${lv.ja}${lv.noteJa}`));
+  fact('レベル', 'level', levelChip(p), el('span', 'level-note', bi() ? ` ${lv.level}${lv.note}` : ` ${lv.ja}${lv.noteJa}`));
   const licence = p.licenceUrl ? el('a', 'inline-link', p.licence) : el('span', null, p.licence);
   if (p.licenceUrl) { licence.href = p.licenceUrl; licence.rel = 'noreferrer'; licence.target = '_blank'; }
   fact('利用条件', 'licence', licence);
@@ -11905,7 +11903,7 @@ function renderLessons(main) {
     };
     for (const lvl of JLPT_LANES) section('word', lvl, lvl);
     main.append(withEn(el('p', 'eyebrow', '漢検 — 字のレッスン'), 'kanji lessons, by Kanji Kentei grade', 'en-inline'));
-    for (const lvl of KANKEN_LANES) section('kanji', lvl, `漢検 ${lvl}`);
+    for (const lvl of KANKEN_LANES) section('kanji', lvl, tx(`漢検 ${lvl}`, `Kanji Kentei ${kankenGradeLabel(lvl)}`));
     return;
   }
   // learn phase: one word at a time, plainly
@@ -14126,8 +14124,7 @@ function renderKagami(main) {
     const block = el('div', 'kagami-band');
     block.dataset.band = id;
     const head = el('p', 'eyebrow list-head');
-    head.append(document.createTextNode(ja));
-    if (bi()) head.append(el('span', 'en-inline', en));
+    head.append(document.createTextNode(tx(ja, en)));
     block.append(head);
     if (!band.evidence) {
       block.append(el('p', 'kagami-thin', tx('まだ記録がない。', 'no evidence yet')));
@@ -15569,7 +15566,7 @@ function renderReferenceNode(sheet, node) {
   }
   renderReferenceMetadata(sheet, entry);
   renderReferenceConnections(sheet, entry);
-  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${source.level}`).join(' · ')));
+  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${/級/u.test(source.level) ? tx(source.level, kankenGradeLabel(source.level)) : source.level}`).join(' · ')));
   for (const source of entry.sourceRecords || []) {
     const info = el('p', 'sense-pos', `${source.sourceId} · ${source.form || ''} · ${source.level || ''}`);
     // Consult the source only on an explicit link. No glyph images or
@@ -15595,7 +15592,7 @@ function renderReferenceNode(sheet, node) {
  * opens the same idiom entry the kanji pages open. */
 function renderYoji(main) {
   main.append(withEn(el('p', 'eyebrow', '四字熟語'), 'four-character idioms', 'en-inline'));
-  main.append(el('h1', 'view-title', '四字熟語'));
+  main.append(el('h1', 'view-title', tx('四字熟語', 'Four-character idioms')));
   const all = Object.values(D.idioms)
     .filter((i) => i.yoji)
     .sort((a, b) => (a.r < b.r ? -1 : a.r > b.r ? 1 : 0));
@@ -16031,7 +16028,7 @@ function renderKdxLevel(main) {
   const row = el('div', 'kdx-row');
   for (const lv of kankenLevels()) {
     const on = S.kdx.kk === lv;
-    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', lv);
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', tx(lv, kankenGradeLabel(lv)));
     b.type = 'button';
     b.dataset.kdxKk = lv;
     b.setAttribute('aria-pressed', String(on));
@@ -16457,7 +16454,7 @@ function thesClusters() {
 
 function renderThesaurus(main) {
   main.append(withEn(el('p', 'eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
-  main.append(el('h1', 'view-title', '類語辞典'));
+  main.append(el('h1', 'view-title', tx('類語辞典', 'Thesaurus')));
   const clusters = thesClusters();
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
@@ -16526,7 +16523,9 @@ function renderParticleNode(sheet, node) {
   sheet.append(head);
   if (pt.r !== pt.p) sheet.append(el('p', 'reading', pt.r));
   sheet.append(el('p', 'sense-pos', bi() ? pt.role : pt.roleJa));
-  sheet.append(el('p', 'gloss', bi() ? pt.exp : pt.exp));
+  const explanation = el('p', 'gloss', pt.exp);
+  explanation.dataset.uiContentValue = (pt.exp.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+/gu) || []).join('|');
+  sheet.append(explanation);
   sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
   for (const ex of pt.ex) {
     const line = el('div', 'example');
@@ -16540,7 +16539,7 @@ function renderParticleNode(sheet, node) {
     const row = el('button', 'entry-row');
     row.type = 'button';
     row.append(el('span', 'row-glyph', '文'));
-    row.append(el('span', 'row-main', `${g.p} — ${bi() ? g.mEn : g.mJa}`));
+    row.append(el('span', 'row-main grammar-related-content', `${g.p} — ${bi() ? g.mEn : g.mJa}`));
     row.append(el('span', 'row-go', '›'));
     row.addEventListener('click', () => go({ t: 'grammar', id: g.id }));
     sheet.append(row);
@@ -17319,7 +17318,7 @@ function renderGrammarNode(sheet, node) {
   sheet.append(el('h2', 'headword', g.p));
   sheet.append(el('p', 'sense-pos', g.lv));
   const meaning = bi() ? (g.mJa ? `${g.mEn} — ${g.mJa}` : g.mEn) : g.mJa || g.mEn;
-  sheet.append(el('p', 'gloss', meaning));
+  sheet.append(el('p', 'gloss grammar-meaning', meaning));
   sheet.append(withEn(el('p', 'eyebrow', '接続'), 'formation', 'en-inline'));
   sheet.append(el('p', 'formation', g.form));
   sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
@@ -20856,10 +20855,10 @@ function renderReview(main) {
     b.type = 'button';
     b.disabled = !!rv.pending || !recordWritable();
     b.dataset.gradeKey = String(grades.findIndex((g) => g[1] === key) + 1);
-    b.title = `${rating} (${b.dataset.gradeKey})`;
+    b.title = tx(`${ja} (${b.dataset.gradeKey})`, `${rating} (${b.dataset.gradeKey})`);
     b.append(el('span', 'g-when', when));
     b.append(el('span', 'g-label', tx(ja, rating)));
-    b.append(el('span', 'g-sub', tx(rating, ja)));
+    b.append(el('span', 'g-sub', b.dataset.gradeKey));
     b.addEventListener('click', async () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return;
       const pressedNow = new Date();
@@ -22238,7 +22237,7 @@ function renderProbe(main) {
     face.append(el('div', 'review-reading', it.r));
     face.append(el('div', 'review-sense', it.m.slice(0, 3).join('; ')));
     const rt = YOMI_RT_LABEL[it.rt] || YOMI_RT_LABEL['熟'];
-    face.append(el('div', 'probe-meta', `漢検${it.band} · ${tx(rt[0], rt[1])}`));
+    face.append(el('div', 'probe-meta', `${tx(`漢検${it.band}`, `Kanji Kentei ${kankenGradeLabel(it.band)}`)} · ${tx(rt[0], rt[1])}`));
   }
   main.append(face);
 
@@ -22328,7 +22327,6 @@ function renderProbe(main) {
 function renderSchedule(container) {
   const preview = schedulePreview();
   container.append(
-    withEn(
       // the scheduler is named for the learner; its internal parameter-set
       // slug (bunki-fsrs6-…) is provenance and stays in exports/debug —
       // it leaked into every entry footer (P2, full-instrument review).
@@ -22341,8 +22339,6 @@ function renderSchedule(container) {
           ' — FSRS-6' +
           (srsCustom ? tx('・自分の記録で調整済み', ' · tuned from your record') : ''),
       ),
-      null,
-    ),
   );
   if (!preview) {
     container.append(el('div', 'sem-empty', tx('スケジューラを読み込めなかった。', 'The scheduler failed to load.')));
@@ -23654,7 +23650,7 @@ async function generatePersonalReading(settings) {
 
 function renderAiReading(main) {
   main.append(withEn(el('p', 'eyebrow', '先生の読み物'), 'original articles for you', 'en-inline'));
-  main.append(el('h1', 'view-title', '私の読み物'));
+  main.append(el('h1', 'view-title', tx('私の読み物', 'My readings')));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
     '興味のあることを、自分に合う長さと文体で。語彙・読み・文法などの学習記録を参考にする。証拠が少ないときは、実力を決めつけない。',
@@ -24972,7 +24968,7 @@ function renderKanjiNode(sheet, node) {
   const chips = el('div', 'shelf-meta');
   if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk)
-    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `漢検 ${D.kanken[k.c].kk}`, 'kanken', D.kanken[k.c].kk, node.from));
+    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `Kanji Kentei ${kankenGradeLabel(D.kanken[k.c].kk)}`, 'kanken', D.kanken[k.c].kk, node.from));
   if (D.kmeta?.[k.c]?.jlpt)
     chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
   // the entry number in the operator's paper dictionary (Kodansha KKLD),
@@ -25021,7 +25017,7 @@ function renderKanjiNode(sheet, node) {
     const text = el('span', 'rad-text');
     text.append(el('span', 'rad-name', rad.name));
     const posLabel =
-      rad.pos === '独立' ? tx('独立', 'stands alone') : tx(rad.pos, `${rad.pos} · ${rad.posEn}`);
+      rad.pos === '独立' ? tx('独立', 'stands alone') : tx(rad.pos, rad.posEn || 'position not supplied');
     text.append(el('span', 'rad-sub', tx(`${posLabel}・部首 ${rad.n}`, `${posLabel} · radical ${rad.n}`)));
     door.append(text);
     door.append(el('span', 'row-go', '›'));
@@ -25117,8 +25113,7 @@ function renderKanjiNode(sheet, node) {
   const idioms = D.idiomsByKanji[k.c] || [];
   if (idioms.length) {
     const heading = el('p', 'eyebrow');
-    heading.append(document.createTextNode(`熟語・慣用句 — ${idioms.length}　`));
-    if (bi()) heading.append(el('span', 'en-inline', 'idioms and set phrases'));
+    heading.textContent = tx(`熟語・慣用句 — ${idioms.length}`, `${idioms.length} idioms and set phrases`);
     sheet.append(heading);
     sheet.append(
       chipsFor(
@@ -26476,7 +26471,7 @@ function renderStrokePage(root) {
       };
       const links = [];
       if (D.kanken[st.id]?.kk)
-        links.push(metaLink(`漢検 ${D.kanken[st.id].kk}`, 'kanken', D.kanken[st.id].kk));
+        links.push(metaLink(tx(`漢検 ${D.kanken[st.id].kk}`, `Kanji Kentei ${kankenGradeLabel(D.kanken[st.id].kk)}`), 'kanken', D.kanken[st.id].kk));
       if (D.kmeta?.[st.id]?.jlpt)
         links.push(metaLink(`JLPT ${D.kmeta[st.id].jlpt}`, 'jlpt', D.kmeta[st.id].jlpt));
       links.push(
@@ -26672,7 +26667,7 @@ function renderRadicalNode(sheet, node) {
   );
   sheet.append(
     chipsFor(
-      r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
+      r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
       (item) => go({ t: 'kanji', id: item.label, from: node.from }),
       null,
       'kanji',
@@ -26701,7 +26696,7 @@ function renderIdiomNode(sheet, node) {
   sheet.append(withEn(el('p', 'eyebrow', '字へ'), 'into the kanji', 'en-inline'));
   sheet.append(
     chipsFor(
-      idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
+      idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
       (item) => go({ t: 'kanji', id: item.label, from: node.from }),
       null,
       'kanji',
@@ -26946,7 +26941,7 @@ function renderSheet(root) {
     const summary = el('summary', null, tx('この項目の資料・級タグ', 'Sources & level tags for this entry'));
     notes.append(summary);
     for (const source of node.referenceEntry.levelSources) {
-      notes.append(el('p', null, `${source.source}: ${source.level}`));
+      notes.append(el('p', null, `${source.source}: ${/級/u.test(source.level) ? tx(source.level, kankenGradeLabel(source.level)) : source.level}`));
     }
     renderReferenceMetadata(notes, node.referenceEntry);
     notes.append(el('p', null, tx('辞書についている級の目安です。公式の出題一覧でも、あなたが覚えたかどうかの記録でもありません。',
@@ -27100,8 +27095,8 @@ function renderVariants(root) {
     const body = el('div', 'vbody');
     for (const [key, spec] of Object.entries(VARIANTS)) {
       const row = el('div', 'vrow');
-      const label = el('span', 'vlabel', spec.label);
-      if (bi()) label.append(el('span', 'en-sub', spec.en));
+      const label = el('span', 'vlabel', tx(spec.label,
+        `${spec.label.match(/^[A-G] /u)?.[0] || ''}${spec.en}${spec.ticket ? ` #${spec.ticket}` : key === 'depth' ? ' v1.1' : ''}`));
       row.append(label);
       const seg = el('div', 'vseg');
       for (const [id, ja, en] of spec.options) {
@@ -27696,7 +27691,12 @@ function openWorldPicker(anchor) {
     b.style.background = t.g;
     b.style.color = t.ink;
     b.style.setProperty('--stone-red', t.red);
-    b.setAttribute('aria-label', t.name);
+    b.setAttribute('aria-label', tx(t.name, {
+      sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
+      rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
+      akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
+      hakuu: 'Lightning below the summit', kaku: 'Phosphor',
+    }[t.id]));
     const active = t.id === themeId();
     b.setAttribute('aria-pressed', String(active));
     if (active) {
@@ -28729,7 +28729,7 @@ function render() {
     chrome.append(capBtn);
   }
 
-  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, 'lists');
+  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, `Lists ${S.taken.length}`);
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {

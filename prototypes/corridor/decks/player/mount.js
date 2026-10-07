@@ -944,7 +944,9 @@ function kanjiAnatomy(word) {
 
 /** one tier-two fold: a native disclosure, closed unless open is set */
 function fold(cls, title, open, ...kids) {
-  const d = el('details', `kp-fold ${cls}`, el('summary', null, title), ...kids);
+  const summary = el('summary', null, title);
+  summary.lang = ctx.english === false ? 'ja' : 'en';
+  const d = el('details', `kp-fold ${cls}`, summary, ...kids);
   d.open = !!open;
   d.addEventListener('click', (e) => e.stopPropagation());
   return d;
@@ -964,8 +966,9 @@ const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言�
  */
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
-  a.lang = ctx.english !== false ? 'en' : 'ja';
-  const pos = t((POS[word.pos] || ['', ''])[1] || word.pos, word.pos);
+  a.lang = 'ja';
+  // Part of speech belongs to the Japanese answer, alongside its definition.
+  const pos = (POS[word.pos] || ['', ''])[1] || word.pos;
   a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
   // the definition's words are tap targets like the passage's (STANDARD A44)
   a.append(defLine(card, word));
@@ -979,14 +982,18 @@ function answerBlock(card, word) {
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
 
   const folds = el('div', 'kp-folds');
-  // English text carries lang='en'; the summaries and labels stay Japanese for screen readers
+  // Learning text carries its language; chrome follows the active interface language.
   const english = (tag, cls, text) => {
     const n = el(tag, cls, text);
     n.lang = 'en';
     return n;
   };
   const gloss = fold('kp-f-gloss', t("英語"), ctx.prefs.gloss === 'show', english('p', 'kp-gloss', word.meaning));
-  if (word.tip && !jaNote) gloss.append(el('p', 'kp-tip', el('span', 'kp-tip-label', t("注 ")), english('span', null, word.tip)));
+  if (word.tip && !jaNote) {
+    const label = el('span', 'kp-tip-label', t("注 "));
+    label.lang = ctx.english === false ? 'ja' : 'en';
+    gloss.append(el('p', 'kp-tip', label, english('span', null, word.tip)));
+  }
   folds.append(gloss);
   // a passage translates only the sentence holding the target (enTarget, from build.py), never
   // the whole passage; when its sentences could not be matched the fold says so, so the slot
