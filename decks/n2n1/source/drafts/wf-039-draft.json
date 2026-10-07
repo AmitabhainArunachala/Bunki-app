@@ -1,0 +1,516 @@
+{
+ "cards": [
+  {
+   "term": "空気を読む",
+   "reading": "くうきをよむ",
+   "pos": "expression",
+   "meaning": "to read the room",
+   "defJa": "場の雰囲気や相手の意図を察する",
+   "passage": {
+    "ja": "日本語の会話では、言葉にされない部分こそが本題であることが少なくない。たとえば「ちょっと考えさせてください」は、多くの場面で断りの意味になる。この暗黙の了解を前提に、相手の表情や間から意図を汲み取って空気を読む力が、日本社会では重んじられてきた。反面、外国人にとっては、直訳しても真意が伝わらない厄介な壁でもある。そこで会話の達人ほど、あえて一言足して相手を安心させるのである。",
+    "form": "空気を読む",
+    "en": "In Japanese conversation, the unspoken part is often the real point. For example, \"Let me think about it a little\" means a refusal in many situations. Japanese society has long prized the ability to read the room, drawing out intent from a person's expression and pauses on the strength of this tacit understanding. On the other hand, for foreigners it is also a stubborn wall, since a literal translation does not carry the true meaning across. That is why the real masters of conversation deliberately add one more phrase to put the other person at ease.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「空気を読む力」のように、暗黙の了解を察する意味で使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "立ち直る",
+   "reading": "たちなおる",
+   "pos": "verb",
+   "meaning": "to recover; bounce back",
+   "defJa": "悪い状態から元の良い状態に戻る",
+   "passage": {
+    "ja": "失敗した直後の自分に、どんな言葉をかけているだろうか。「なぜできなかったんだ」と責めるより、「次はどうする」と問いを変えたほうが、人は早く立ち直る。話し方も同じで、人前で噛んでしまった一言を引きずったあげく、そのあとの話まで崩れてしまう人は意外に多い。大切なのは、間違いを素直に認めつつ、何事もなかったかのように淡々と先へ進む粘り強さである。聞き手は、完璧さよりも、つまずいたあとに持ち直す姿に信頼を寄せるものだ。",
+    "form": "立ち直る",
+    "en": "What kind of words do you speak to yourself right after a failure? Rather than blaming yourself with \"Why could you not do it,\" shifting the question to \"What will you do next\" helps a person bounce back faster. Speaking is the same: surprisingly many people dwell on a phrase they stumbled over in public and end up letting the rest of the talk collapse too. What matters is the tenacity to admit the mistake honestly and move calmly on as if nothing had happened. Listeners place their trust not in perfection but in the sight of someone recovering after a stumble.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「失敗から立ち直る」のように、挫折のあとの回復を表す",
+    "sense": ""
+   }
+  },
+  {
+   "term": "立憲君主制",
+   "reading": "りっけんくんしゅせい",
+   "pos": "noun",
+   "meaning": "constitutional monarchy",
+   "defJa": "憲法によって君主の権力を制限する政治体制",
+   "passage": {
+    "ja": "イギリスの立憲君主制は、一夜にして生まれたものではない。一六八八年の名誉革命を経て、王権を法の下に置くという原則が少しずつ固まっていった。「君臨すれども統治せず」という言い回しは、この仕組みを端的に表している。とはいえ、王の権限が実際にどこまで削られたかは、時代ごとに大きく異なる。制度の盛衰を追うことは、権力が飼いならされていく歴史を追うことにほかならない。",
+    "form": "立憲君主制",
+    "en": "Britain's constitutional monarchy was not born overnight. Through the Glorious Revolution of 1688, the principle of placing royal power under the law gradually took hold. The phrase \"the monarch reigns but does not rule\" expresses this arrangement succinctly. That said, how far the monarch's powers were actually pared back differs greatly from one era to the next. Tracing the rise and fall of the institution is nothing other than tracing a history in which power was gradually tamed.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜は立憲君主制だ」のように、国の政体を述べる硬い語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "端的",
+   "reading": "たんてき",
+   "pos": "na-adj",
+   "meaning": "direct; straightforward",
+   "defJa": "要点だけを手短にはっきり示すさま",
+   "passage": {
+    "ja": "プレゼンで一番もったいないのは、前置きが長すぎるあまり、結論が埋もれてしまうことだ。聞き手が知りたいのは、会社の沿革や調査の背景よりも、まず「で、何がどう変わるのか」である。そこで私は、一文目で端的に答えを述べ、理由は後から二つだけ添えるようにしている。簡潔明瞭に話せる人ほど、実は話す前に、何を削るかをじっくり考えているものだ。",
+    "form": "端的",
+    "en": "The biggest waste in a presentation is a preamble so long that the conclusion gets buried. What listeners want to know is not the company's history or the background of the survey but, first of all, \"So what changes, and how.\" That is why I state the answer directly in the first sentence and add only two reasons afterward. People who can speak clearly and concisely are, in fact, the ones who think carefully before they speak about what to cut.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「端的に述べる」「端的な例」のように、要点を飾らず示す",
+    "sense": ""
+   }
+  },
+  {
+   "term": "端的に言えば",
+   "reading": "たんてきにいえば",
+   "pos": "expression",
+   "meaning": "to put it simply",
+   "defJa": "要点だけをはっきり言うと",
+   "passage": {
+    "ja": "単語帳を何周しても点が伸びない人には、驚くほどはっきりした共通点がある。端的に言えば、「見て分かる」ことと「使える」ことを混同しているのだ。文章を読んで意味が取れたからといって、書くときや話すときに、その語を自分から引き出せるとは限らない。だから例文を声に出して精読し、さらに自分の言葉で言い換えてみる練習が欠かせない。",
+    "form": "端的に言えば",
+    "en": "People whose scores do not rise no matter how many times they cycle through a vocabulary book share a surprisingly clear trait. To put it simply, they confuse \"recognizing it when I see it\" with \"being able to use it.\" Just because you understood the meaning while reading a text does not mean you can pull that word out yourself when writing or speaking. That is why practice is essential in which you read example sentences closely aloud and then try rephrasing them in your own words.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "文頭で結論を切り出す前置き。講義や解説でよく使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "端緒",
+   "reading": "たんしょ",
+   "pos": "noun",
+   "meaning": "beginning; first step",
+   "defJa": "物事の始まりとなる手がかり",
+   "passage": {
+    "ja": "一八五三年のペリー来航は、日本が国際政治の渦に巻き込まれていく端緒となった。もちろん、それ以前にも異国船は何度も日本の沿岸に現れており、危機感が突然生まれたわけではない。とはいえ、開国を迫る国書が正式に突きつけられたことで、幕府は的確な判断を迫られ、議論を避けて通れなくなった。ある出来事を歴史の始まりと呼ぶとき、私たちは無数の前史の中から一本の糸だけを選び取っているのだ。",
+    "form": "端緒",
+    "en": "Perry's arrival in 1853 was the starting point from which Japan came to be drawn into the whirlpool of international politics. Of course, foreign ships had appeared off Japan's coast many times before, so the sense of crisis did not arise suddenly. Even so, once a letter demanding that Japan open its ports was formally thrust upon it, the shogunate was pressed for a sound judgment and could no longer avoid debate. When we call a certain event the beginning of history, we are selecting just one thread out of countless prehistories.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜の端緒となる」「端緒を開く」のように、物事の始まりを言う硬い語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "競争力",
+   "reading": "きょうそうりょく",
+   "pos": "noun",
+   "meaning": "competitiveness",
+   "defJa": "他と競い合って勝ち抜くための力",
+   "passage": {
+    "ja": "半導体の世界で国の競争力を決めるのは、工場の数だけではない。最先端の回路を安定して作れる精度、つまり歩留まりの高さが、利益を大きく左右するからだ。台湾の受託製造大手が圧倒的な地位を築いたのも、数十年にわたって微細化への巨額投資を続けたからこそである。ただ、微細化の進展に伴って、設備投資の額は年々膨らむばかりで、参入できる企業は世界でもごく限られている。",
+    "form": "競争力",
+    "en": "What determines a country's competitiveness in semiconductors is not just the number of factories. The precision with which cutting-edge circuits can be made reliably, in other words the height of the yield, greatly affects profit. Taiwan's contract-manufacturing giant built its overwhelming position precisely because it kept making huge investments in miniaturization over several decades. Still, as miniaturization advances, capital spending does nothing but swell year after year, and the companies able to enter are extremely limited even worldwide.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「国際競争力」「競争力を高める」の形で、産業や企業の強さを言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "符号化",
+   "reading": "ふごうか",
+   "pos": "noun",
+   "meaning": "encoding",
+   "defJa": "情報を別の形式に変換して記憶や伝達に使う",
+   "passage": {
+    "ja": "記憶の第一段階は、見聞きした情報を脳が扱える形に変える符号化である。この段階で意味づけが浅いと、あとでいくら思い出そうとしても、取り出しようがない。たとえば単語を機械的に丸暗記するより、自分の経験や知っている話と結びつけたほうが、はるかに長く記憶に残る。試験前に徹夜で詰め込むのが非効率なのは、睡眠負債がたまって、そもそも情報を取り込む質が落ちるからにほかならない。",
+    "form": "符号化",
+    "en": "The first stage of memory is encoding, in which seen and heard information is converted into a form the brain can handle. If the meaning attached at this stage is shallow, there is no way to retrieve it later, however hard you try to recall it. For example, tying a word to your own experience or to a story you know makes it stay in memory far longer than mechanical rote memorization does. Cramming all night before an exam is inefficient for no other reason than that accumulated sleep debt lowers the quality of taking in information in the first place.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "記憶の「符号化・貯蔵・検索」という段階を言う心理学の用語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "第一人者",
+   "reading": "だいいちにんしゃ",
+   "pos": "noun",
+   "meaning": "leading authority",
+   "defJa": "ある分野で最も優れた実績をもつ人",
+   "passage": {
+    "ja": "ニューラルネットワーク研究の第一人者として知られるジェフリー・ヒントンは、二〇二四年にノーベル物理学賞を受賞した。受賞理由は、人工ニューラルネットワークによる機械学習の基礎を築いたことである。二〇二三年にグーグルを退社したのをきっかけに、同氏は人工知能の進歩がもたらす危険について警鐘を鳴らし続けている。研究者としての知見を、社会への責任へと結びつけようとする姿勢が注目されている。",
+    "form": "第一人者",
+    "en": "Geoffrey Hinton, known as the leading authority on neural network research, won the Nobel Prize in Physics in 2024. The prize was awarded for laying the foundations of machine learning with artificial neural networks. Prompted by leaving Google in 2023, he has continued to sound the alarm about the dangers that advances in artificial intelligence may bring. His attempt to tie his knowledge as a researcher to responsibility toward society is drawing attention.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「〜の第一人者」の形で、分野の最高権威を言う報道向きの語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "第三世界",
+   "reading": "だいさんせかい",
+   "pos": "noun",
+   "meaning": "Third World",
+   "defJa": "冷戦期に東西どちらにも属さなかった国々",
+   "passage": {
+    "ja": "「第三世界」という言葉を、いまの文章でそのまま使う書き手は減った。もともとは冷戦期に、アメリカを中心とする西側にもソ連を中心とする東側にも属さない国々を指す呼び名だったからだ。ところが、のちに貧しい国の総称として広まるにつれ、見下したような響きまで帯びるようになった。言葉選びに敏感な書き手なら、時代ごとの含意をきちんと確かめたうえで、「発展途上国」や具体的な国名を選ぶだろう。",
+    "form": "第三世界",
+    "en": "Writers who use the phrase \"Third World\" as is in today's prose have become fewer. That is because it originally was a label for the countries that belonged to neither the Western bloc centered on the United States nor the Eastern bloc centered on the Soviet Union during the Cold War. Later, however, as it spread as a collective term for poor countries, it came to take on even a condescending ring. A writer attuned to word choice would properly check the connotations of each era and then choose \"developing countries\" or a specific country name.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "もとは冷戦期の非同盟の立場を指し、のち貧困国の総称へ変わった",
+    "sense": ""
+   }
+  },
+  {
+   "term": "筆力",
+   "reading": "ひつりょく",
+   "pos": "noun",
+   "meaning": "writing power",
+   "defJa": "文章を書き表す力",
+   "passage": {
+    "ja": "同じ題材を書いても、読み終えたあとに残る余韻がまるで違う二つの文章がある。その差を生むのは、語彙の多さではなく、筆力としか呼びようのない言葉の勢いと正確さだ。力のある書き手は、的確な直喩ひとつで場面を目の前に立ち上げ、余計な修飾をためらいなく削る。そのうえ、文を書き終えるそばから、読者の目で読み直しているのである。それは小手先の技術というより、読み手に対する敬意の表れなのだろう。",
+    "form": "筆力",
+    "en": "Even when writing on the same subject, there are two pieces whose afterglow once you finish reading them is completely different. What creates the difference is not the size of the vocabulary but a force and accuracy of language that can only be called writing power. A capable writer conjures up a scene before your eyes with a single apt simile and cuts excess modifiers without hesitation. On top of that, no sooner has the writer finished a sentence than he rereads it through the reader's eyes. That is probably less a matter of petty technique than an expression of respect toward the reader.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「筆力がある」「筆力に欠ける」のように、文章を書く力を言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "筆致",
+   "reading": "ひっち",
+   "pos": "noun",
+   "meaning": "style of writing",
+   "defJa": "文章や絵の書きぶり",
+   "passage": {
+    "ja": "夏目漱石の『吾輩は猫である』は、一九〇五年に発表されて以来、猫の目を借りて人間社会を眺める、軽妙な筆致で読み継がれてきた。皮肉を効かせながらも棘がなく、読者は思わず声を出して笑ってしまう。同じ作者が晩年に書いた『こころ』では、一転して、静かで張りつめた文体に切り替えている。題材や人物に応じて筆の調子を自在に変えられることこそ、文豪の素質といえよう。",
+    "form": "筆致",
+    "en": "Natsume Soseki's I Am a Cat has been read for generations since its publication in 1905 for its light, witty style, which views human society through a cat's eyes. It is sharply ironic yet has no sting, and readers cannot help laughing out loud. In Kokoro, written late in his life, the same author switches abruptly to a quiet, tautly strung style. Being able to change the tone of one's pen freely according to subject and character is precisely the mark of a literary master's natural gift.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「軽妙な筆致」「繊細な筆致」のように、文章の書きぶりを評する",
+    "sense": ""
+   }
+  },
+  {
+   "term": "筆舌に尽くしがたい",
+   "reading": "ひつぜつにつくしがたい",
+   "pos": "expression",
+   "meaning": "beyond description",
+   "defJa": "言葉や文章では表しきれない",
+   "passage": {
+    "ja": "大規模な地震から一か月、被災地では筆舌に尽くしがたい苦難が今も続いている。体育館などの避難所では、仕切りもなくプライバシーの乏しい暮らしを余儀なくされている住民も少なくない。支援団体は、水や食料といった物資の提供に加えて、心のケアにも力を入れ始めた。専門家は、避難生活が長引けば、精神疾患の発症につながる恐れがあると指摘する。",
+    "form": "筆舌に尽くしがたい",
+    "en": "One month after the large earthquake, hardships beyond description are still continuing in the stricken area. In shelters such as gymnasiums, not a few residents are forced to live without partitions and with little privacy. Support groups have begun putting effort into mental care in addition to supplying goods such as water and food. Experts point out that if life in shelters drags on, it may lead to the onset of mental illness.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「筆舌に尽くしがたい苦しみ」の形で、悲惨さの強調に使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "筆順",
+   "reading": "ひつじゅん",
+   "pos": "noun",
+   "meaning": "stroke order",
+   "defJa": "漢字を書くときの画の順序",
+   "passage": {
+    "ja": "文化庁は、漢字の書き方の順序について、どれか一つだけが正しいわけではないという考え方を示している。学校で教わる筆順は、あくまで手書きで字形を整えやすい標準にすぎない。たとえば「右」と「左」では、一画目と二画目の順番が入れ替わる。それでも、画数の多い字になるほど、決まった順序を守ったほうが、直観的に整った形に書けるものだ。",
+    "form": "筆順",
+    "en": "The Agency for Cultural Affairs has indicated a view that no single order of writing kanji strokes is the only correct one. The stroke order taught in schools is merely a standard that makes it easy to shape characters when writing by hand. For example, in \"右\" and \"左\" the order of the first and second strokes is swapped. Even so, the more strokes a character has, the more intuitively you can write it in a tidy shape by keeping to a fixed order.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「筆順を守る」「正しい筆順」のように、漢字の書き順を言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "簡潔明瞭",
+   "reading": "かんけつめいりょう",
+   "pos": "na-adj",
+   "meaning": "clear and concise",
+   "defJa": "短くて要点がはっきりしている",
+   "passage": {
+    "ja": "ビジネス文書で評価される文章には、一つの型がある。それは簡潔明瞭であること、つまり一文を短く保ち、主語と述語をはっきり結ぶことだ。長い一文に条件を詰め込むと、書き手は賢く見えても、読み手は途中で迷子になる。結論から言うと、削れる言葉は削るに越したことはなく、残った言葉に力を持たせるのが近道である。",
+    "form": "簡潔明瞭",
+    "en": "Writing that is valued in business documents has one pattern. It is being clear and concise, that is, keeping each sentence short and tying subject and predicate together plainly. If you cram conditions into one long sentence, the writer may look clever, but the reader gets lost halfway. To start with the conclusion, there is nothing better than cutting every word you can cut and giving the remaining words their force, which is the shortcut.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「簡潔明瞭に述べる」のように、文章や説明の理想を言う四字熟語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "粘り強さ",
+   "reading": "ねばりづよさ",
+   "pos": "noun",
+   "meaning": "tenacity",
+   "defJa": "あきらめずにやり抜く性質",
+   "passage": {
+    "ja": "心理学者のアンジェラ・ダックワースは、生まれ持った素質よりも粘り強さが成果を左右すると主張し、世界的な議論を呼んだ。一方、その後の研究では、効果は主張されたほど大きくないとの指摘も出ている。とはいえ、失敗しても挑戦をやめない姿勢が学びを支えるという考え方は、教育現場で根強い支持を集めている。知能指数のような数値で測れないものにこそ、人は惹かれるのだろう。",
+    "form": "粘り強さ",
+    "en": "The psychologist Angela Duckworth argued that tenacity, more than innate aptitude, determines results, and drew worldwide debate. Later research, on the other hand, has pointed out that the effect is not as large as claimed. Even so, the idea that an attitude of not giving up after failure supports learning keeps drawing strong support in education. People are perhaps drawn precisely to what cannot be measured by a number like an IQ.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「粘り強さが求められる」のように、持続力を評価して言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "粛清",
+   "reading": "しゅくせい",
+   "pos": "noun",
+   "meaning": "purge",
+   "defJa": "反対者や不純な分子を厳しく取り除くこと",
+   "passage": {
+    "ja": "一九三〇年代後半のソ連では、スターリンによる大規模な粛清が進められ、党幹部や軍の将校をはじめ、多くの人々が命を奪われた。密告が奨励される中、無実の罪で処刑された者も少なくない。体制は恐怖によって内部の異論を封じ込める一方で、経済や軍の運営に深刻な打撃を受けた。歴史家は、犠牲者の数をめぐって、資料の精度に関する議論を今も続けている。",
+    "form": "粛清",
+    "en": "In the Soviet Union of the late 1930s, a large-scale purge by Stalin was pushed forward, and many people, starting with party leaders and army officers, lost their lives. With denunciation being encouraged, those executed on false charges were not few. While the regime shut down dissent within by means of terror, it suffered serious damage to the running of its economy and military. Historians continue to debate, over the number of victims, the accuracy of the sources.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「反対派を粛清する」のように、権力が敵を排除する意味で使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "精度",
+   "reading": "せいど",
+   "pos": "noun",
+   "meaning": "precision, accuracy",
+   "defJa": "計算や測定の正確さの度合い",
+   "passage": {
+    "ja": "画像認識の精度は、この十年で人間の水準に迫るところまで高まった。しかし、学習に使ったデータと性質の異なる写真を与えると、同じモデルが驚くほど簡単に間違える。研究者は、平均的な正解率だけでなく、どんな場面で失敗するのかを的確に把握する必要があると訴える。数字の高さは、安心材料であると同時に、見えにくい弱点を隠す覆いにもなり得るのだ。",
+    "form": "精度",
+    "en": "The accuracy of image recognition has risen over the past decade to the point of approaching the human level. However, when it is given photos whose nature differs from the data used in training, the same model makes mistakes with surprising ease. Researchers argue that we need to grasp precisely not only the average rate of correct answers but in what situations it fails. A high figure is at once a reassurance and, potentially, a cover that hides hard-to-see weaknesses.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「精度が高い」「精度を上げる」のように、正確さの程度を言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "精神力",
+   "reading": "せいしんりょく",
+   "pos": "noun",
+   "meaning": "mental strength",
+   "defJa": "困難に耐え抜く心の強さ",
+   "passage": {
+    "ja": "マラソンの終盤、足が止まりかけた選手を前へ押し出すのは、結局のところ精神力であるとよく言われる。だが、スポーツ心理学者は、それを根性論として片づけることに慎重だ。重要なのは、苦しさを感じながらも、あらかじめ決めた小さな目標に意識を戻す技術だという。目標設定のしかた次第で、同じ苦痛でも耐えられる長さが変わるのである。",
+    "form": "精神力",
+    "en": "It is often said that what pushes forward a runner whose legs are about to stop in the final stretch of a marathon is, in the end, mental strength. But sports psychologists are cautious about dismissing it as mere grit-and-guts doctrine. What matters, they say, is the skill of returning attention to a small goal set in advance even while feeling the pain. Depending on how goals are set, the length one can endure even the same pain changes.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「精神力が試される」のように、苦境に耐える心の力を言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "精神疾患",
+   "reading": "せいしんしっかん",
+   "pos": "noun",
+   "meaning": "mental illness",
+   "defJa": "心の働きに支障が出る病気の総称",
+   "passage": {
+    "ja": "厚生労働省の統計によると、日本で精神疾患のために医療機関にかかっている人は、年々増える傾向にある。背景には、病気そのものが増えただけでなく、受診へのためらいが薄れたこともあると見られている。一方で、偏見は根強く、症状が出ていても周囲に打ち明けられずに悩む人は少なくない。専門家は、最新の知見に基づいて早期の相談窓口を整える必要があると指摘する。",
+    "form": "精神疾患",
+    "en": "According to statistics from the Ministry of Health, Labour and Welfare, the number of people in Japan being treated at medical institutions for mental illness is tending to rise year by year. The background is thought to include not only an increase in the illness itself but also a fading of hesitation to seek consultation. On the other hand, prejudice is deeply rooted, and not a few people suffer without being able to confide in those around them even when symptoms appear. Experts point out the need to establish early consultation services based on the latest findings.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「精神疾患の患者」のように、医療・行政の文脈で使う正式な語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "精緻",
+   "reading": "せいち",
+   "pos": "na-adj",
+   "meaning": "precise; elaborate",
+   "defJa": "細かいところまで行き届いて巧みなさま",
+   "passage": {
+    "ja": "日本語の敬語は、聞き手との距離を測る、きわめて精緻な体系である。同じ「行く」でも、「参る」「いらっしゃる」「伺う」を使い分けるだけで、誰を立て、誰を下げるかが一語で決まる。母語話者でさえ、場面に応じた正解に迷うことがあるほどだ。謙譲語を選ぶときは、動作の目的語にあたる人物が誰なのかを、まず確かめる癖をつけたい。",
+    "form": "精緻",
+    "en": "Japanese honorifics are an extremely elaborate system that measures distance from the listener. Even for the same \"to go,\" merely choosing among \"mairu,\" \"irassharu\" and \"ukagau\" decides in a single word whom you raise and whom you lower. Even native speakers sometimes hesitate over the right answer for a given occasion. When choosing humble forms, one should make a habit of first confirming who the person is that serves as the object of the action.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「精緻な理論」「精緻な構造」のように、細部まで巧みな様子を褒める",
+    "sense": ""
+   }
+  },
+  {
+   "term": "精読",
+   "reading": "せいどく",
+   "pos": "noun",
+   "meaning": "close reading",
+   "defJa": "細かい点まで注意して丁寧に読むこと",
+   "passage": {
+    "ja": "難しい本ってさ、最初から全部理解しようとすると、三ページで挫折するじゃないですか。だから僕は、まず流し読みで全体像をつかんで、知的好奇心に火がついてから、大事なところだけ精読するようにしてるんです。一語ずつ辞書を引きながら読むのは、気持ちはいいものの、時間のわりに身につかないんですよね。じっくり読むのは、あくまで勝負どころで使う道具なんです。",
+    "form": "精読",
+    "en": "With a hard book, if you try to understand everything from the start, you give up in three pages, don't you? So I first skim to grasp the whole picture, and only after my intellectual curiosity has caught fire do I read just the important parts closely. Reading while looking up every word is satisfying, but it doesn't stick for the time it takes, you know. Reading slowly is, after all, a tool you use at the decisive moments.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「教科書を精読する」のように、じっくり読む意味で使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "精進",
+   "reading": "しょうじん",
+   "pos": "noun",
+   "meaning": "devotion; diligence",
+   "defJa": "仏道などで怠らず努力を続けること",
+   "passage": {
+    "ja": "仏教でいう精進とは、もともと、悟りという目的意識を失うことなく努力を続けることを指す。六波羅蜜の一つに数えられ、布施や持戒と並んで、修行者の土台とされてきた。のちに肉や魚を断つ食事の意味が加わったが、本来は心の姿勢を表す言葉である。華々しい成果ではなく、毎日の小さな積み重ねを尊ぶところに、この教えの要がある。",
+    "form": "精進",
+    "en": "Diligence in Buddhism originally refers to continuing one's effort without losing the sense of purpose called awakening. It is counted as one of the six perfections and, alongside giving and keeping the precepts, has been regarded as the foundation of a practitioner. Later the meaning of a diet that abstains from meat and fish was added, but originally it is a word expressing a posture of the mind. The key to this teaching lies in prizing the small daily accumulation rather than brilliant results.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「精進する」「日々精進」の形で、努力を続ける意。仏教語が源",
+    "sense": "努力して励む（仏教語）"
+   }
+  },
+  {
+   "term": "系譜",
+   "reading": "けいふ",
+   "pos": "noun",
+   "meaning": "lineage, genealogy",
+   "defJa": "血筋や思想などの受け継がれてきた流れ",
+   "passage": {
+    "ja": "インドの思想は、一本の道ではなく、いくつもの流れが交わる系譜として捉えると見通しがよくなる。『ウパニシャッド』に始まる、世界の根源と自己を同一視する考え方は、のちにシャンカラによって不二一元論として体系化された。一方、仏教は、永遠不変の自己を認めない立場から出発し、同じ問いに別の答えを出した。両者の違いを知ることは、真理を求める道の幅を知ることにほかならない。",
+    "form": "系譜",
+    "en": "Indian thought becomes easier to see through if you grasp it not as a single road but as a lineage in which many streams intersect. The idea, beginning with the Upanishads, of identifying the root of the world with the self was later systematized by Shankara as non-dualism. Buddhism, on the other hand, set out from a position that does not accept an eternal, unchanging self, and gave a different answer to the same question. To know the difference between the two is nothing other than to know the breadth of the path that seeks truth.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「思想の系譜」「〜の系譜に連なる」のように、受け継ぎの流れを言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "紀元前",
+   "reading": "きげんぜん",
+   "pos": "noun",
+   "meaning": "BC",
+   "defJa": "キリスト生誕とされる年より前の時代",
+   "passage": {
+    "ja": "紀元前五世紀のアテネでは、市民が広場に集まり、戦争や課税といった国の大事を直接投票で決めていた。これが、のちの民主主義の源流とされる。ただし、投票できたのは成人男性の市民に限られ、女性や奴隷は議論の外に置かれた。アテネの盛衰を学ぶと、制度の長所と限界が同時に見えてくる。理想と現実のずれを見つめ直すことは、今の民主主義を考える上でも欠かせない。",
+    "form": "紀元前",
+    "en": "In Athens of the fifth century BC, citizens gathered in the public square and decided great affairs of state, such as war and taxation, by direct vote. This is regarded as the source of later democracy. However, those who could vote were limited to adult male citizens, and women and slaves were left outside the debate. Studying the rise and fall of Athens lets one see the strengths and limits of the system at once. Taking a fresh look at the gap between ideal and reality is indispensable even in thinking about democracy today.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「紀元前五世紀」のように、数字の前に置いて古代の年代を示す",
+    "sense": ""
+   }
+  },
+  {
+   "term": "紋切り型",
+   "reading": "もんきりがた",
+   "pos": "noun",
+   "meaning": "stereotyped; formulaic",
+   "defJa": "型にはまって新味のないさま",
+   "passage": {
+    "ja": "「想像を絶する」「言葉を失う」といった表現は、報道で繰り返されるうちに、すっかり紋切り型になってしまった。使う側は感情を込めたつもりでも、読む側は既視感を覚えずにはいられない。型どおりの言葉は、書き手の思考を止めてしまうところに怖さがある。言葉を選ぶ手間を省いたとき、人は感じたことではなく、感じるべきだとされていることを書いてしまうのだ。借り物の言葉を疑う省察こそが、文章に命を宿す。",
+    "form": "紋切り型",
+    "en": "Expressions like \"beyond imagination\" and \"at a loss for words\" have, through repetition in the news, become thoroughly stereotyped. Even if the user meant to put feeling into them, the reader cannot help feeling a sense of déjà vu. The fear in formulaic words lies in the way they stop the writer's thinking. When people skip the effort of choosing words, they write not what they felt but what one is supposed to feel. It is the reflection that doubts borrowed words that gives life to writing.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「紋切り型の表現」のように、新鮮味のない決まり文句を批判する",
+    "sense": ""
+   }
+  },
+  {
+   "term": "素質",
+   "reading": "そしつ",
+   "pos": "noun",
+   "meaning": "talent, capability",
+   "defJa": "生まれつきもっている能力や性質",
+   "passage": {
+    "ja": "『才能』って言葉、僕あんまり好きじゃないんですよ。生まれつきの素質が違うのはたしかだけど、知能指数が高いからといって続けられるとは限らないし、結局は何年続けたかで差がつくじゃないですか。たとえば語学なんて、耳のいい人が最初は有利だったにしても、三年後には毎日やった人が追い抜いてるんです。才能を言い訳にした瞬間に、伸びしろは止まっちゃうんですよね。",
+    "form": "素質",
+    "en": "I don't much like the word \"talent,\" you know. It's true that innate aptitude differs, but a high IQ doesn't mean you'll keep going, and in the end the difference comes from how many years you kept at it, doesn't it? Take language learning: even if people with a good ear have an edge at first, three years later the ones who did it every day have overtaken them. The moment you use talent as an excuse, your room to grow stops.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「素質がある」「素質を見抜く」のように、生まれつきの可能性を言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "経典",
+   "reading": "きょうてん",
+   "pos": "noun",
+   "meaning": "sutra, scripture",
+   "defJa": "宗教の教えを記した聖なる書物",
+   "passage": {
+    "ja": "仏教の経典は、釈迦の死後、弟子たちが口伝えを通じて受け継いだ教えを、のちに文字にまとめたものである。般若心経のように短いものもあれば、法華経のように壮大な物語を含むものもある。日本に伝わったのは漢訳された経典が中心で、現代の私たちが耳にする読経も、多くは漢文の音読みなのだ。同じ真理を説いていても、どの経典に拠るかに応じて、宗派の姿は大きく変わる。",
+    "form": "経典",
+    "en": "The Buddhist sutras are the teachings that the disciples handed down by word of mouth after the Buddha's death, later set down in writing. Some are short, like the Heart Sutra, while others, like the Lotus Sutra, contain grand narratives. What reached Japan was mainly sutras translated into Chinese, and the chanting we hear today is also mostly the Sino-Japanese reading of classical Chinese. Even when expounding the same truth, the shape of a sect changes greatly depending on which sutra it relies on.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教では「きょうてん」、儒教の古典は「けいてん」と読み分ける",
+    "sense": "仏教などの聖典"
+   }
+  },
+  {
+   "term": "経済制裁",
+   "reading": "けいざいせいさい",
+   "pos": "noun",
+   "meaning": "economic sanctions",
+   "defJa": "相手国に経済的な圧力をかける措置",
+   "passage": {
+    "ja": "経済制裁は、軍事力を使わずに相手国の行動を変えさせるための手段として、二十世紀に広く使われるようになった。ところが、経済史を振り返っても、実際に目的を果たした例は多くない。一九三五年、国際連盟はエチオピアに侵攻したイタリアに制裁を科したが、石油が対象から外されたこともあり、侵攻を止められなかった。制裁を決める側は、その痛みが指導者ではなく、一般の市民にまず及ぶという現実を、抜きにして語ってはならない。",
+    "form": "経済制裁",
+    "en": "Economic sanctions came into wide use in the twentieth century as a means of changing another country's behavior without using military force. Yet looking back over economic history, there are not many cases that actually achieved their aim. In 1935 the League of Nations imposed sanctions on Italy, which had invaded Ethiopia, but partly because oil was excluded from the targets, it could not stop the invasion. Those who decide on sanctions must not speak while leaving out the reality that the pain falls first not on leaders but on ordinary citizens.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「経済制裁を科す」「経済制裁を解除する」の形で、外交ニュースに頻出",
+    "sense": ""
+   }
+  },
+  {
+   "term": "経済史",
+   "reading": "けいざいし",
+   "pos": "noun",
+   "meaning": "economic history",
+   "defJa": "経済の変遷を研究する歴史学の分野",
+   "passage": {
+    "ja": "経済史の研究者の間で、産業革命がなぜ十八世紀のイギリスで始まったのかをめぐる議論が続いている。石炭が豊富だったこと、賃金が高く機械化の動機があったことなど、有力な説はいくつもある。ただ、相関関係が見つかっても、それが原因だと言い切れるとは限らない。どれか一つで説明しきれないところに、この問いの難しさがある。近年は、膨大な史料をデータ化して分析する手法が広がり、従来の通説が見直されつつある。",
+    "form": "経済史",
+    "en": "Among researchers of economic history, debate continues over why the Industrial Revolution began in eighteenth-century Britain. There are several strong theories, such as the abundance of coal and the high wages that gave an incentive to mechanize. Still, even when a correlation is found, one cannot always claim that it is the cause. The difficulty of this question lies in that no single factor can fully explain it. In recent years methods that digitize and analyze huge amounts of historical records have spread, and the conventional wisdom is being revised.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「日本経済史」のように、学問分野の名や講座名に使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "結晶性知能",
+   "reading": "けっしょうせいちのう",
+   "pos": "noun",
+   "meaning": "crystallized intelligence",
+   "defJa": "経験や学習で蓄えた知識を生かす知能",
+   "passage": {
+    "ja": "知能には、大きく分けて二つの種類があるとされる。新しい問題を素早く解く流動性知能は二十代でピークを迎えるものの、その後ゆるやかに下がっていく。一方、知識や経験が積み重なる結晶性知能は、年齢を重ねても伸び続けることがわかっている。だから、四十代から始める学びは決して遅くないし、むしろ蓄えた知識が新しい情報を結びつける土台になるのだ。",
+    "form": "結晶性知能",
+    "en": "Intelligence is said to come in two broad types. Fluid intelligence, which solves new problems quickly, peaks in one's twenties and then declines gradually. Crystallized intelligence, in which knowledge and experience pile up, on the other hand, is known to keep growing even as one ages. So learning begun in one's forties is by no means too late, and if anything the stored knowledge becomes the foundation for connecting new information.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "流動性知能と対にして使う。年齢とともに伸びるとされる",
+    "sense": ""
+   }
+  },
+  {
+   "term": "結論から言うと",
+   "reading": "けつろんからいうと",
+   "pos": "expression",
+   "meaning": "to start with the conclusion",
+   "defJa": "まず結論を先に述べると",
+   "passage": {
+    "ja": "会議に限らず、評価される人は、たいてい話の頭に答えを置く。結論から言うと、という一言があるだけで、聞き手は何に注意すればいいのかを先に知ることができる。反対に、経緯の説明から始めると、相手は話の行き先が見えず、相槌を打つ余裕さえなくなる。要するに、順序を入れ替えるだけで、同じ内容がずっと伝わりやすくなるのだ。",
+    "form": "結論から言うと",
+    "en": "Not only in meetings, people who are well regarded usually put the answer at the head of their talk. With just the single phrase \"to start with the conclusion,\" listeners can know in advance what they should pay attention to. Conversely, if you begin with an explanation of the background, the other person cannot see where the talk is heading and has no room even to nod along. In short, merely swapping the order makes the same content far easier to get across.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "話の冒頭で使い、聞き手に先に答えを知らせる定型の前置き",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "縁",
+   "reading": "へり",
+   "pos": "noun",
+   "meaning": "edge; rim",
+   "defJa": "物の端や周囲を囲む部分。",
+   "passage": {
+    "ja": "同じ量のお茶を注いでも、口に触れる部分の厚さが違うと、器の印象はずいぶん変わります。陶芸で湯飲みを作るなら、底の安定だけでなく、縁の仕上げにも注意が必要です。薄く削ればよいというものでもなく、持ちやすさや全体の形との釣り合いを見ます。焼く前の工程で形を整えるにあたって、指でなぞるだけでは気づけないゆがみを、横から眺めて確かめることもあります。専門用語で形を覚えるのと同時に、実際に使ったときに唇や指がどこへ触れるかを考えると、作業の意味が身近になります。",
+    "form": "縁",
+    "en": "Even with the same amount of tea, a vessel can feel quite different depending on the thickness of the part that touches your mouth. When making a ceramic teacup, attention is needed not only to the stability of the base but also to finishing the rim. Simply shaving it thin is not enough, as you must consider how it balances with the overall shape and ease of handling. In shaping it before firing, you may look from the side to check for distortions that tracing it with a finger does not reveal. Along with learning technical terms for shapes, considering where your lips and fingers will touch during use makes the purpose of the work more tangible.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "ここでは「へり」。人どうしのつながりを表す「えん」と読み分ける。",
+    "sense": "物の周囲を囲む端の部分。"
+   }
+  },
+  {
+   "term": "膨張",
+   "reading": "ぼうちょう",
+   "pos": "noun",
+   "meaning": "expansion",
+   "defJa": "物の体積や規模が大きくなること。",
+   "passage": {
+    "ja": "瓶の口に風船を付け、瓶を湯で温める実験では、内部の空気が風船を押し広げる様子を観察できる。気体の膨張を確かめるには、湯の温度に加えて、空気の漏れや瓶が温まるまでの時間にも気を配る必要がある。風船が十分に広がらなかったからといって、すぐに説明全体が誤りだとは判断できない。工程を一つずつ記録し、どの条件を変えたときに結果が変わるかを調べることが大切である。専門用語と目の前の現象を結び付けるには、成功した見本を見るだけでなく、違いが出た理由を考える過程が要る。",
+    "form": "膨張",
+    "en": "In an experiment where a balloon is fitted over a bottle’s mouth and the bottle is warmed in hot water, the air inside can be seen pushing the balloon outward. To examine gas expansion, attention must be paid not only to water temperature but also to air leaks and the time needed for the bottle to warm up. A balloon failing to inflate sufficiently does not immediately establish that the entire explanation is wrong. It is important to record each stage and investigate which changed conditions alter the result. Connecting technical terms with the phenomenon in front of us requires thinking through why results differ, as well as watching a successful demonstration.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "「気体が膨張する」「膨張を抑える」。温度変化に伴う体積の増加を示す。",
+    "sense": "物の体積が増すこと。"
+   }
+  },
+  {
+   "term": "自我",
+   "reading": "じが",
+   "pos": "noun",
+   "meaning": "sense of self; ego",
+   "defJa": "自分を他人と区別して捉える意識。",
+   "passage": {
+    "ja": "友人に選んでもらった服を着て鏡の前に立つと、似合うと思いながらも、自分らしくないと感じることがある。その違和感には、他人の目に映る姿と、自分が自分について抱いている像のずれがある。自我は、こうした場面で、自分と他人の好みを分ける意識として姿を現す。ただし、自分らしさを守ることを、周囲の言葉をすべて退けることと同じにすれば、新しい経験へ踏み出しにくくなる。相手の察しに任せず、気に入った点と落ち着かない点を伝えることで、自分の輪郭を確かめながら関係を続けられる。",
+    "form": "自我",
+    "en": "Putting on clothes chosen by a friend and standing before a mirror, we may think they suit us yet feel they are not like us. That discomfort involves a gap between how we appear to others and the image we hold of ourselves. In such situations, the sense of self emerges as an awareness distinguishing our preferences from another person’s. But equating preserving our identity with rejecting everything others say can make it harder to venture into new experiences. Telling the other person what we like and what feels uncomfortable, rather than leaving them to infer it, lets us maintain the relationship while clarifying our own identity.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「自我の形成」「自我が芽生える」。単なるわがままと同一視しない。",
+    "sense": "自分を他者と区別して捉える意識。"
+   }
+  },
+  {
+   "term": "規格",
+   "reading": "きかく",
+   "pos": "noun",
+   "meaning": "technical standard; specification",
+   "defJa": "品質や寸法などについて定めた基準。",
+   "passage": {
+    "ja": "半導体を組み込む装置では、部品が物理的に収まっても、そのまま接続して使えるとは限らない。端子の配置や電気的な条件が規格に合うかを、設計の段階で確かめる必要がある。条件がそろわなければ、正常に動かないだけでなく、部品を傷める恐れもある。共通の基準に沿って設計することは、異なる会社が作った部品を組み合わせるための布石となる。ただし、基準への適合だけで製品全体の動作が保証されるわけではなく、実際の使用条件を想定した試験を工程に組み込むことも欠かせない。",
+    "form": "規格",
+    "en": "In equipment incorporating semiconductors, a component fitting physically does not necessarily mean it can be connected and used as it is. Designers need to check whether pin arrangements and electrical conditions meet the relevant standard. If conditions do not match, the component may not only fail to work properly but also suffer damage. Designing in accordance with shared criteria lays the groundwork for combining parts from different companies. Compliance alone, however, does not guarantee operation of the product as a whole, so tests reflecting actual conditions of use must also be built into the process.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「規格に適合する」「規格を統一する」。用途ごとの条件を定める。",
+    "sense": "製品の寸法や性能などに関する基準。"
+   }
+  },
+  {
+   "term": "零度",
+   "reading": "れいど",
+   "pos": "noun",
+   "meaning": "zero degrees",
+   "defJa": "温度などの目盛りで、ゼロに当たる値。",
+   "passage": {
+    "ja": "冬の海を見て、気温が摂氏零度を下回ってるのに、なんで水面が全部凍らないんだろうって思ったんだ。海水には塩が含まれているから、淡水とは凍り始める温度が違うんだって。ただ、塩だけの話にしてしまうと、水そのものの温度や波の動きを見落とすよね。気温を測っただけでは海の状態を言い切れないんだと知ってから、天気予報の数字も、何をどこで測ったものか気にするようになったよ。専門用語は難しく感じるけど、散歩中に生まれた疑問とつながると、もう少し先まで知りたくなるんだ。",
+    "form": "零度",
+    "en": "Looking at the winter sea, I wondered why the whole surface was not freezing even though the air temperature was below zero degrees Celsius. Apparently, because seawater contains salt, it starts freezing at a different temperature from fresh water. But if we make it only about salt, we overlook the temperature of the water itself and the movement of the waves. Since learning that air temperature alone cannot tell us the state of the sea, I have started paying attention to what was measured and where when I hear weather figures. Technical terms feel difficult, but when they connect with a question from a walk, I want to learn a little more.",
+    "register": "話",
+    "topic": "other",
+    "tipJa": "「摂氏零度」「零度を下回る」。温度の尺度を添えると意味が明確になる。",
+    "sense": "温度の目盛りでゼロに当たる値。"
+   }
+  },
+  {
+   "term": "非公式",
+   "reading": "ひこうしき",
+   "pos": "na-adj",
+   "meaning": "unofficial; informal",
+   "defJa": "正式な手続きや立場によらないさま。",
+   "passage": {
+    "ja": "授業後の廊下では質問できるのに、教室で手を挙げるとなると、言葉が出なくなることがあります。先生との非公式なやり取りでは、答えを評価されるという意識が薄れ、自分の疑問を出しやすいのでしょう。ただし、その場の助言が試験の採点方針を変更するわけではありません。専門用語の意味を聞いたのか、提出方法について確認したのかを、あとでノートに分けて書くと整理できます。質問する機会を増やすことと、聞いた話の位置づけを確かめることを組み合わせれば、学びを支える好循環を作れます。",
+    "form": "非公式",
+    "en": "Sometimes we can ask a question in the corridor after class but cannot find the words when it comes to raising a hand in the classroom. In an informal exchange with a teacher, reduced awareness of being assessed may make it easier to express our questions. Advice given there, however, does not change the grading policy for an exam. We can organize what we heard by noting separately whether we asked about a technical term or checked how to submit work. Combining more opportunities to ask questions with checking the status of what we hear can create a positive cycle that supports learning.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「非公式な相談」「非公式の見解」。秘密であることを必ずしも意味しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "擬音語",
+   "reading": "ぎおんご",
+   "pos": "noun",
+   "meaning": "word imitating a sound",
+   "defJa": "物の音をまねて表したことば。",
+   "passage": {
+    "ja": "窓を「こんこん」とたたく音を「どんどん」に変えると、同じ動作でも、訪ねてきた人の様子が違って聞こえます。擬音語を選ぶ際には、音の大きさだけでなく、硬さや間隔にも耳を向けたいところです。ただし、音を写した言葉から、人物が怒っていると必ず判断できるわけではありません。小論文なら動作を平明に記すほうが合う場合もあり、物語なら前後の描写と合わせて響きを選べます。録音を聞きながら二つの表現を書き比べると、音そのものと、そこから受ける印象の違いを意識できます。",
+    "form": "擬音語",
+    "en": "Changing the sound of knocking on a window from “kon kon” to “don don” makes the visitor seem different even though the action is the same. When choosing a word that imitates a sound, we should listen not only to volume but also to hardness and intervals. A word representing a sound does not, however, necessarily establish that a character is angry. A short essay may be better served by a plain description of the action, whereas in a story the sound can be selected to fit the surrounding description. Comparing two written expressions while listening to a recording helps us distinguish the sound itself from the impressions it creates.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「ざあざあ」「こんこん」など。音のない状態を表す擬態語と区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "斜陽",
+   "reading": "しゃよう",
+   "pos": "noun",
+   "meaning": "decline; waning fortunes",
+   "defJa": "かつての勢いや繁栄が衰えていくこと。",
+   "passage": {
+    "ja": "以前は注文が絶えなかった製品でも、暮らし方が変われば、倉庫に在庫が残るようになる。こうした需要の減少が続く業種を斜陽産業と呼ぶことがあるが、そこで働く人の技術まで価値を失ったと決めつけるのは早計である。古い製品の市場が縮む一方で、同じ加工技術を別の用途に生かせる場合もある。巻き返しを図る企業には、新たな顧客が何を必要とするかを調べ、工程を組み替える判断が求められる。過去の成功を繰り返すだけでは届かない相手を見つけられるかどうかが、次の仕事を左右する。",
+    "form": "斜陽",
+    "en": "Even products that once attracted constant orders can accumulate in warehouses when lifestyles change. Industries experiencing such sustained declines in demand are sometimes described as declining industries, but it is premature to conclude that their workers’ skills have lost value too. While markets for old products shrink, the same processing techniques can sometimes be applied to other uses. Companies seeking a comeback need to investigate what new customers require and decide how to reorganize production. Finding customers who cannot be reached merely by repeating past successes can determine what work comes next.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "「斜陽産業」のように使う。西へ傾く太陽から、衰退する勢いをたとえる。",
+    "sense": "産業などの勢いが衰えること。"
+   }
+  },
+  {
+   "term": "新興国",
+   "reading": "しんこうこく",
+   "pos": "noun",
+   "meaning": "emerging economy",
+   "defJa": "近年、経済が成長し存在感を増してきた国。",
+   "passage": {
+    "ja": "海外市場の記事を読むと、人口の多さと経済の伸びが、一つの国の魅力として並べられることがあります。新興国という呼び名にも、成長への期待が込められていますが、国ごとに産業の構成や暮らしの条件は異なります。工業化が進んでいるからといって、すべての住民の所得が同じ速さで増えるとは限りません。都市と農村の違い、教育を受ける機会、市場経済を支える制度など、数字の背後を見る視点が必要です。国名を同じ箱に入れて覚えるより、何が伸び、誰がその変化に参加できているのかを比べるほうが理解は深まります。",
+    "form": "新興国",
+    "en": "Articles about overseas markets sometimes present a large population and economic growth together as attractions of a country. The label “emerging economy” also carries expectations of growth, but industrial structures and living conditions vary by country. Industrialization does not mean all residents’ incomes rise at the same pace. We need to look behind the figures at differences between urban and rural areas, access to education, and institutions supporting a market economy. Rather than memorizing country names in a single category, comparing what is growing and who can participate in that change deepens understanding.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「新興国市場」。新しく独立した国という意味とは限らず、経済上の呼び名。",
+    "sense": "経済の成長で国際的な存在感を増した国。"
+   }
+  }
+ ]
+}

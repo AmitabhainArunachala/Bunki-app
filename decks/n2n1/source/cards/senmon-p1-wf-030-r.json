@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "孤立語",
+   "reading": "こりつご",
+   "pos": "noun",
+   "meaning": "isolating language",
+   "defJa": "語形変化に乏しく語順などで文法関係を示す言語",
+   "passage": {
+    "ja": "語尾が変わらないというだけで、表現が単純だと決めつけるのは早計である。語の形をほとんど変えず、主に語順や独立した語で文法関係を示す言語の型を、孤立語という。これは文法がないという意味ではなく、語の働きを示す仕組みが異なるということである。外来語の多さや文字の種類から、その仕組みを判断することはできない。言語を比較するにあたっては、品詞の名前を対応させるだけでなく、実際の文で何が誰にどう働きかけているかを確かめる必要がある。",
+    "form": "孤立語",
+    "en": "It is premature to assume that expression is simple merely because word endings do not change. An isolating language is a type of language that changes word forms very little and expresses grammatical relationships mainly through word order and independent words. This does not mean that it lacks grammar, but that it has a different system for indicating how words function. You cannot identify that system from the number of loanwords or the type of writing used. When comparing languages, we need to do more than match names for parts of speech and examine what acts on whom, and how, in actual sentences.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "語が孤独なのではなく、語形変化に頼らず文法関係を示すという分類。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "天皇制",
+   "reading": "てんのうせい",
+   "pos": "noun",
+   "meaning": "emperor system",
+   "defJa": "天皇を君主または国家の象徴とする制度",
+   "passage": {
+    "ja": "明治の政治を学んだあとで戦後の憲法を読むと、同じ天皇という言葉でも、その役割の違いに戸惑うことがあります。天皇制を理解するにあたっては、地位の名称だけでなく、誰が政治を決め、どのような責任を負うのかを整理するとよいでしょう。明治の国づくりなら、富国強兵という目標と官僚制の整備も視野に入れます。それを戦後の象徴としての地位と区別して、表に並べてみてください。名前の連続性に加えて、権限や制度の変化にも目を向けることが、歴史を理解する手がかりになります。",
+    "form": "天皇制",
+    "en": "When you read the postwar constitution after studying Meiji politics, the different roles attached to the same word, emperor, can be confusing. To understand the emperor system, it helps to look beyond the title and identify who makes political decisions and bears what responsibilities. For Meiji nation building, include the goal of enriching the country and strengthening its military and the development of a bureaucracy. Distinguish these from the emperor's postwar position as a symbol, and arrange them in a comparison table. Looking at changes in powers and institutions alongside continuity in names provides a key to understanding history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "制度全体を指す語で、各時代の天皇の地位や権限を区別して考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

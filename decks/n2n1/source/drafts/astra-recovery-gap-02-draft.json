@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "非難",
+   "reading": "ひなん",
+   "pos": "noun",
+   "meaning": "blame; condemnation",
+   "defJa": "相手の過ちや欠点を取り上げ責めること。",
+   "passage": {
+    "ja": "締め切りを守ってほしいと書くつもりが、君は無責任だという文になったら、話の焦点が変わるよね。前の言い方は行動を求めているけど、後の言い方は相手を非難する表現になっている。強く伝えたいからといって、人の性質を決めつける語まで必要になるとは限らないんだ。日本語の依頼文を直すときは、相手を表す形容詞を探すより、してほしいことを具体的な動詞で示すといい。起きた問題と次のお願いを順序よく並べれば、怒っている理由を残しながら、行動について話し合える文章にできるよ。",
+    "form": "非難",
+    "en": "If you intend to write that you want someone to meet a deadline but end up writing that they are irresponsible, the focus changes. The first wording requests an action, while the second becomes an expression of blame. Wanting to communicate firmly does not necessarily mean that you need words making categorical judgments about someone’s character. When revising a request in Japanese, use a concrete verb to state what you want done rather than searching for an adjective to describe the person. Arranging the problem and the next request in a clear order lets you retain the reason for your anger while producing a text that opens discussion of action.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「相手を非難する」は、間違いや欠点を挙げて責めることです。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "淡水",
+   "reading": "たんすい",
+   "pos": "noun",
+   "meaning": "fresh water",
+   "defJa": "塩分をほとんど含まない水",
+   "passage": {
+    "ja": "塩分をほとんど含まない水を、学術の文章では淡水と呼ぶ。一方で、台所や漁業の現場の会話では、真水という言い方が好まれる。「真水で洗う」のように、動作と結びつく例が多いのも、この語の特徴である。同じ水でも、どの言葉で呼ぶかによって、文章の硬さと距離感は大きく変わる。辞書を引き比べると、日本語の語彙が場面ごとに住み分けていることがよく分かる。",
+    "form": "淡水",
+    "en": "Water that contains almost no salt is called tansui in academic writing. In the kitchen or in conversation at fishing sites, on the other hand, the word mamizu is preferred. It is also a feature of this word that it often pairs with actions, as in washing with mamizu. Even for the same water, the stiffness and distance of a text change greatly depending on which word you use to call it. Comparing dictionary entries makes it clear that Japanese vocabulary divides its territory by occasion.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "学術・報道では「淡水」、日常では「真水」。対義語は「海水」「塩水」。",
+    "sense": ""
+   }
+  }
+ ]
+}

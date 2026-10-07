@@ -1,0 +1,395 @@
+{"term": "覇権", "reading": "はけん", "gloss": "hegemony; supremacy", "field": "history", "level": "N1", "why": "seed (S3 brief)"}
+{"term": "冷戦", "reading": "れいせん", "gloss": "Cold War", "field": "history", "level": "N1", "why": "seed (S3 brief)"}
+{"term": "産業革命", "reading": "さんぎょうかくめい", "gloss": "Industrial Revolution", "field": "history", "level": "N1", "why": "seed (S3 brief)"}
+{"term": "植民地", "reading": "しょくみんち", "gloss": "colony", "field": "history", "level": "N1", "why": "seed (S3 brief)"}
+{"term": "帝国", "reading": "ていこく", "gloss": "empire", "field": "history", "level": "N1", "why": "seed (S3 brief)"}
+{"term": "啓蒙", "reading": "けいもう", "gloss": "enlightenment (of the public)", "field": "history", "level": "N1", "why": "seed (S3 brief)"}
+{"term": "地政学", "reading": "ちせいがく", "gloss": "geopolitics", "field": "history", "level": "N1", "why": "seed from 中田敦彦 【地政学】"}
+{"term": "紛争", "reading": "ふんそう", "gloss": "conflict; dispute", "field": "history", "level": "N1", "why": "seed from 中田敦彦 【地政学】 (なぜ紛争は同じ場所で起きるのか)"}
+{"term": "資本主義", "reading": "しほんしゅぎ", "gloss": "capitalism", "field": "history", "level": "N1", "why": "seed from PIVOT シュンペーター video (資本主義は成功するから滅びる)"}
+{"term": "米中対立", "reading": "べいちゅうたいりつ", "gloss": "US–China rivalry", "field": "history", "level": "N1", "why": "seed from 中田敦彦 半導体② 米中チップ戦争"}
+{"term": "皇室典範", "reading": "こうしつてんぱん", "gloss": "Imperial House Law", "field": "history", "level": "N1", "why": "seed from 中田敦彦 【皇室典範改正】"}
+{"term": "記紀", "reading": "きき", "gloss": "the Kojiki and Nihon Shoki", "field": "history", "level": "N1", "why": "seed from TOLAND VLOG (記紀)"}
+{"term": "古事記", "reading": "こじき", "gloss": "Kojiki", "field": "history", "level": "N1", "why": "seed from TOLAND VLOG (記紀)"}
+{"term": "日本書紀", "reading": "にほんしょき", "gloss": "Nihon Shoki", "field": "history", "level": "N1", "why": "seed from TOLAND VLOG (記紀)"}
+{"term": "認知革命", "reading": "にんちかくめい", "gloss": "Cognitive Revolution", "field": "history", "level": "N1", "why": "seed from サピエンス全史"}
+{"term": "農業革命", "reading": "のうぎょうかくめい", "gloss": "Agricultural Revolution", "field": "history", "level": "N1", "why": "seed from サピエンス全史"}
+{"term": "科学革命", "reading": "かがくかくめい", "gloss": "Scientific Revolution", "field": "history", "level": "N1", "why": "seed from サピエンス全史"}
+{"term": "虚構", "reading": "きょこう", "gloss": "fiction; shared myth", "field": "history", "level": "N1", "why": "seed from サピエンス全史"}
+{"term": "想像上の秩序", "reading": "そうぞうじょうのちつじょ", "gloss": "imagined order", "field": "history", "level": "N1", "why": "seed from サピエンス全史"}
+{"term": "狩猟採集民", "reading": "しゅりょうさいしゅうみん", "gloss": "hunter-gatherers", "field": "history", "level": "N1", "why": "seed from サピエンス全史"}
+{"term": "分断", "reading": "ぶんだん", "gloss": "division; split", "field": "history", "level": "N1", "why": "seed from FACTFULNESS (分断本能)"}
+{"term": "啓蒙思想", "reading": "けいもうしそう", "gloss": "Enlightenment thought", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "定住", "reading": "ていじゅう", "gloss": "permanent settlement", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "家畜化", "reading": "かちくか", "gloss": "domestication", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "人類史", "reading": "じんるいし", "gloss": "history of humankind", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "貨幣", "reading": "かへい", "gloss": "money; coinage", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "創造的破壊", "reading": "そうぞうてきはかい", "gloss": "creative destruction", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "社会主義", "reading": "しゃかいしゅぎ", "gloss": "socialism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "共産主義", "reading": "きょうさんしゅぎ", "gloss": "communism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "景気循環", "reading": "けいきじゅんかん", "gloss": "business cycle", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "世界恐慌", "reading": "せかいきょうこう", "gloss": "Great Depression", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "恐慌", "reading": "きょうこう", "gloss": "panic; financial crisis", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "緩衝地帯", "reading": "かんしょうちたい", "gloss": "buffer zone", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "緩衝国", "reading": "かんしょうこく", "gloss": "buffer state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "海洋国家", "reading": "かいようこっか", "gloss": "maritime nation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "大陸国家", "reading": "たいりくこっか", "gloss": "continental power", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "ランドパワー", "reading": "らんどぱわー", "gloss": "land power", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "シーパワー", "reading": "しーぱわー", "gloss": "sea power", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "要衝", "reading": "ようしょう", "gloss": "strategic point", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "不凍港", "reading": "ふとうこう", "gloss": "ice-free port", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "南下政策", "reading": "なんかせいさく", "gloss": "southward expansion policy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "勢力圏", "reading": "せいりょくけん", "gloss": "sphere of influence", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "勢力均衡", "reading": "せいりょくきんこう", "gloss": "balance of power", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "帝国主義", "reading": "ていこくしゅぎ", "gloss": "imperialism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "帝政", "reading": "ていせい", "gloss": "imperial rule", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "王朝", "reading": "おうちょう", "gloss": "dynasty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "王権神授説", "reading": "おうけんしんじゅせつ", "gloss": "divine right of kings", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "君主制", "reading": "くんしゅせい", "gloss": "monarchy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "絶対王政", "reading": "ぜったいおうせい", "gloss": "absolute monarchy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "立憲君主制", "reading": "りっけんくんしゅせい", "gloss": "constitutional monarchy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "共和制", "reading": "きょうわせい", "gloss": "republic (system)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "元老院", "reading": "げんろういん", "gloss": "senate (Roman)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "属州", "reading": "ぞくしゅう", "gloss": "province (of an empire)", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "属国", "reading": "ぞっこく", "gloss": "vassal state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "朝貢", "reading": "ちょうこう", "gloss": "tribute", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "冊封体制", "reading": "さくほうたいせい", "gloss": "tributary investiture system", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "華夷秩序", "reading": "かいちつじょ", "gloss": "Sinocentric world order", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "中華思想", "reading": "ちゅうかしそう", "gloss": "Sinocentrism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宗主国", "reading": "そうしゅこく", "gloss": "suzerain; colonial ruler", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "版図", "reading": "はんと", "gloss": "territory; domain", "field": "history", "level": "beyond", "why": "register word"}
+{"term": "領土拡張", "reading": "りょうどかくちょう", "gloss": "territorial expansion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "膨張", "reading": "ぼうちょう", "gloss": "expansion", "field": "history", "level": "N1", "why": "register word"}
+{"term": "征服", "reading": "せいふく", "gloss": "conquest", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "遠征", "reading": "えんせい", "gloss": "expedition; campaign", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "侵略", "reading": "しんりゃく", "gloss": "aggression; invasion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "侵攻", "reading": "しんこう", "gloss": "invasion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "併合", "reading": "へいごう", "gloss": "annexation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "割譲", "reading": "かつじょう", "gloss": "cession of territory", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "租借地", "reading": "そしゃくち", "gloss": "leased territory", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "保護国", "reading": "ほごこく", "gloss": "protectorate", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "傀儡政権", "reading": "かいらいせいけん", "gloss": "puppet government", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "委任統治", "reading": "いにんとうち", "gloss": "mandate (League of Nations)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "入植", "reading": "にゅうしょく", "gloss": "settlement; colonization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "先住民", "reading": "せんじゅうみん", "gloss": "indigenous people", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "奴隷制", "reading": "どれいせい", "gloss": "slavery", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "奴隷貿易", "reading": "どれいぼうえき", "gloss": "slave trade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "三角貿易", "reading": "さんかくぼうえき", "gloss": "triangular trade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "奴隷解放", "reading": "どれいかいほう", "gloss": "emancipation of slaves", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "遊牧民", "reading": "ゆうぼくみん", "gloss": "nomads", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "騎馬民族", "reading": "きばみんぞく", "gloss": "horse-riding people", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "異民族", "reading": "いみんぞく", "gloss": "foreign peoples", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "民族大移動", "reading": "みんぞくだいいどう", "gloss": "Migration Period", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "交易", "reading": "こうえき", "gloss": "trade; commerce", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "交易路", "reading": "こうえきろ", "gloss": "trade route", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "通商", "reading": "つうしょう", "gloss": "commerce; trade relations", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "シルクロード", "reading": "しるくろーど", "gloss": "Silk Road", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "香辛料貿易", "reading": "こうしんりょうぼうえき", "gloss": "spice trade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "大航海時代", "reading": "だいこうかいじだい", "gloss": "Age of Discovery", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "東インド会社", "reading": "ひがしいんどがいしゃ", "gloss": "East India Company", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "重商主義", "reading": "じゅうしょうしゅぎ", "gloss": "mercantilism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "自由貿易", "reading": "じゆうぼうえき", "gloss": "free trade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "保護貿易", "reading": "ほごぼうえき", "gloss": "protective trade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "保護主義", "reading": "ほごしゅぎ", "gloss": "protectionism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "関税", "reading": "かんぜい", "gloss": "tariff", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "金本位制", "reading": "きんほんいせい", "gloss": "gold standard", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "貨幣経済", "reading": "かへいけいざい", "gloss": "money economy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "同業組合", "reading": "どうぎょうくみあい", "gloss": "guild; trade association", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "市場経済", "reading": "しじょうけいざい", "gloss": "market economy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "計画経済", "reading": "けいかくけいざい", "gloss": "planned economy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "資本家", "reading": "しほんか", "gloss": "capitalist", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "財閥", "reading": "ざいばつ", "gloss": "zaibatsu; financial clique", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "独占", "reading": "どくせん", "gloss": "monopoly", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "寡占", "reading": "かせん", "gloss": "oligopoly", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国際分業", "reading": "こくさいぶんぎょう", "gloss": "international division of labor", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "比較優位", "reading": "ひかくゆうい", "gloss": "comparative advantage", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "南北問題", "reading": "なんぼくもんだい", "gloss": "North–South problem", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "市民革命", "reading": "しみんかくめい", "gloss": "bourgeois revolution", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "名誉革命", "reading": "めいよかくめい", "gloss": "Glorious Revolution", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "清教徒革命", "reading": "せいきょうとかくめい", "gloss": "Puritan Revolution", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "独立宣言", "reading": "どくりつせんげん", "gloss": "Declaration of Independence", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "人権宣言", "reading": "じんけんせんげん", "gloss": "Declaration of the Rights of Man", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "辛亥革命", "reading": "しんがいかくめい", "gloss": "Xinhai Revolution", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "明治維新", "reading": "めいじいしん", "gloss": "Meiji Restoration", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "恐怖政治", "reading": "きょうふせいじ", "gloss": "reign of terror", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "王政復古", "reading": "おうせいふっこ", "gloss": "restoration of monarchy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "議会制民主主義", "reading": "ぎかいせいみんしゅしゅぎ", "gloss": "parliamentary democracy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "普通選挙", "reading": "ふつうせんきょ", "gloss": "universal suffrage", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "参政権", "reading": "さんせいけん", "gloss": "right to vote", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "民主化", "reading": "みんしゅか", "gloss": "democratization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "市民社会", "reading": "しみんしゃかい", "gloss": "civil society", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "社会契約説", "reading": "しゃかいけいやくせつ", "gloss": "social contract theory", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "自然権", "reading": "しぜんけん", "gloss": "natural rights", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "三権分立", "reading": "さんけんぶんりつ", "gloss": "separation of powers", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "主権", "reading": "しゅけん", "gloss": "sovereignty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "主権国家", "reading": "しゅけんこっか", "gloss": "sovereign state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国民国家", "reading": "こくみんこっか", "gloss": "nation-state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "民族主義", "reading": "みんぞくしゅぎ", "gloss": "ethnic nationalism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国家主義", "reading": "こっかしゅぎ", "gloss": "statism; nationalism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "愛国心", "reading": "あいこくしん", "gloss": "patriotism", "field": "history", "level": "N1", "why": "register word"}
+{"term": "自由主義", "reading": "じゆうしゅぎ", "gloss": "liberalism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "保守主義", "reading": "ほしゅしゅぎ", "gloss": "conservatism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "専制", "reading": "せんせい", "gloss": "despotism", "field": "history", "level": "N2", "why": "core concept"}
+{"term": "専制君主", "reading": "せんせいくんしゅ", "gloss": "despot; autocrat", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "啓蒙専制君主", "reading": "けいもうせんせいくんしゅ", "gloss": "enlightened despot", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "ルネサンス", "reading": "るねさんす", "gloss": "Renaissance", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "人文主義", "reading": "じんぶんしゅぎ", "gloss": "humanism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "総力戦", "reading": "そうりょくせん", "gloss": "total war", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "鉄のカーテン", "reading": "てつのかーてん", "gloss": "Iron Curtain", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "東西対立", "reading": "とうざいたいりつ", "gloss": "East–West confrontation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "代理戦争", "reading": "だいりせんそう", "gloss": "proxy war", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "核抑止", "reading": "かくよくし", "gloss": "nuclear deterrence", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "抑止力", "reading": "よくしりょく", "gloss": "deterrent", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "軍拡競争", "reading": "ぐんかくきょうそう", "gloss": "arms race", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "軍縮", "reading": "ぐんしゅく", "gloss": "disarmament", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "核拡散", "reading": "かくかくさん", "gloss": "nuclear proliferation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宥和政策", "reading": "ゆうわせいさく", "gloss": "appeasement", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "封じ込め政策", "reading": "ふうじこめせいさく", "gloss": "containment policy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "緊張緩和", "reading": "きんちょうかんわ", "gloss": "détente; easing of tension", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "雪解け", "reading": "ゆきどけ", "gloss": "thaw (in relations)", "field": "history", "level": "N1", "why": "register word"}
+{"term": "非同盟", "reading": "ひどうめい", "gloss": "non-alignment", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "第三世界", "reading": "だいさんせかい", "gloss": "Third World", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "脱植民地化", "reading": "だつしょくみんちか", "gloss": "decolonization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "民族自決", "reading": "みんぞくじけつ", "gloss": "national self-determination", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "独立運動", "reading": "どくりつうんどう", "gloss": "independence movement", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "植民地支配", "reading": "しょくみんちしはい", "gloss": "colonial rule", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国際連盟", "reading": "こくさいれんめい", "gloss": "League of Nations", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "安全保障理事会", "reading": "あんぜんほしょうりじかい", "gloss": "Security Council", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "拒否権", "reading": "きょひけん", "gloss": "veto", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "安全保障", "reading": "あんぜんほしょう", "gloss": "security", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "集団安全保障", "reading": "しゅうだんあんぜんほしょう", "gloss": "collective security", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "軍事同盟", "reading": "ぐんじどうめい", "gloss": "military alliance", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "経済制裁", "reading": "けいざいせいさい", "gloss": "economic sanctions", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "禁輸", "reading": "きんゆ", "gloss": "embargo", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "輸出規制", "reading": "ゆしゅつきせい", "gloss": "export controls", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "サプライチェーン", "reading": "さぷらいちぇーん", "gloss": "supply chain", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "封鎖", "reading": "ふうさ", "gloss": "blockade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "海上封鎖", "reading": "かいじょうふうさ", "gloss": "naval blockade", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "同盟国", "reading": "どうめいこく", "gloss": "ally", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "枢軸国", "reading": "すうじくこく", "gloss": "Axis powers", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "連合国", "reading": "れんごうこく", "gloss": "Allied powers", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "中立国", "reading": "ちゅうりつこく", "gloss": "neutral country", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "講和条約", "reading": "こうわじょうやく", "gloss": "peace treaty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "休戦", "reading": "きゅうせん", "gloss": "armistice; truce", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "停戦", "reading": "ていせん", "gloss": "ceasefire", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "和平", "reading": "わへい", "gloss": "peace", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "無条件降伏", "reading": "むじょうけんこうふく", "gloss": "unconditional surrender", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "占領", "reading": "せんりょう", "gloss": "occupation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "賠償", "reading": "ばいしょう", "gloss": "reparations", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "戦後処理", "reading": "せんごしょり", "gloss": "postwar settlement", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国際秩序", "reading": "こくさいちつじょ", "gloss": "international order", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "多極化", "reading": "たきょくか", "gloss": "multipolarization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "超大国", "reading": "ちょうたいこく", "gloss": "superpower", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "覇権国", "reading": "はけんこく", "gloss": "hegemonic power", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "覇権主義", "reading": "はけんしゅぎ", "gloss": "hegemonism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "覇権争い", "reading": "はけんあらそい", "gloss": "struggle for hegemony", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "新興国", "reading": "しんこうこく", "gloss": "emerging nation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "全体主義", "reading": "ぜんたいしゅぎ", "gloss": "totalitarianism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "独裁", "reading": "どくさい", "gloss": "dictatorship", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "一党独裁", "reading": "いっとうどくさい", "gloss": "one-party dictatorship", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "集団化", "reading": "しゅうだんか", "gloss": "collectivization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "粛清", "reading": "しゅくせい", "gloss": "purge", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "弾圧", "reading": "だんあつ", "gloss": "oppression; crackdown", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "迫害", "reading": "はくがい", "gloss": "persecution", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "虐殺", "reading": "ぎゃくさつ", "gloss": "massacre", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "民族浄化", "reading": "みんぞくじょうか", "gloss": "ethnic cleansing", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "人種差別", "reading": "じんしゅさべつ", "gloss": "racial discrimination", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "公民権運動", "reading": "こうみんけんうんどう", "gloss": "civil rights movement", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "難民", "reading": "なんみん", "gloss": "refugee", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "亡命", "reading": "ぼうめい", "gloss": "exile; defection", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "離散", "reading": "りさん", "gloss": "dispersal; diaspora", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "少数民族", "reading": "しょうすうみんぞく", "gloss": "ethnic minority", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "多民族国家", "reading": "たみんぞくこっか", "gloss": "multiethnic state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "連邦制", "reading": "れんぽうせい", "gloss": "federal system", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宗派対立", "reading": "しゅうはたいりつ", "gloss": "sectarian conflict", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "経済史", "reading": "けいざいし", "gloss": "economic history", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "工業化", "reading": "こうぎょうか", "gloss": "industrialization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "近代化", "reading": "きんだいか", "gloss": "modernization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "都市化", "reading": "としか", "gloss": "urbanization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "分業", "reading": "ぶんぎょう", "gloss": "division of labor", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "生産性", "reading": "せいさんせい", "gloss": "productivity", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "生産手段", "reading": "せいさんしゅだん", "gloss": "means of production", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "余剰", "reading": "よじょう", "gloss": "surplus", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "剰余価値", "reading": "じょうよかち", "gloss": "surplus value", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "資本蓄積", "reading": "しほんちくせき", "gloss": "capital accumulation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "囲い込み", "reading": "かこいこみ", "gloss": "enclosure", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "農奴", "reading": "のうど", "gloss": "serf", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "封建制", "reading": "ほうけんせい", "gloss": "feudalism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "荘園", "reading": "しょうえん", "gloss": "manor; estate", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "領主", "reading": "りょうしゅ", "gloss": "feudal lord", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "小作人", "reading": "こさくにん", "gloss": "tenant farmer", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "農地改革", "reading": "のうちかいかく", "gloss": "land reform", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "労働運動", "reading": "ろうどううんどう", "gloss": "labor movement", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "労働組合", "reading": "ろうどうくみあい", "gloss": "labor union", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "階級闘争", "reading": "かいきゅうとうそう", "gloss": "class struggle", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "搾取", "reading": "さくしゅ", "gloss": "exploitation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "格差", "reading": "かくさ", "gloss": "disparity; gap", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "再分配", "reading": "さいぶんぱい", "gloss": "redistribution", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "福祉国家", "reading": "ふくしこっか", "gloss": "welfare state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "不況", "reading": "ふきょう", "gloss": "recession", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "好況", "reading": "こうきょう", "gloss": "boom; prosperity", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "ハイパーインフレ", "reading": "はいぱーいんふれ", "gloss": "hyperinflation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "通貨危機", "reading": "つうかきき", "gloss": "currency crisis", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "金融危機", "reading": "きんゆうきき", "gloss": "financial crisis", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "石油危機", "reading": "せきゆきき", "gloss": "oil crisis", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "基軸通貨", "reading": "きじくつうか", "gloss": "key currency", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "債務", "reading": "さいむ", "gloss": "debt", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国債", "reading": "こくさい", "gloss": "government bond", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "財政赤字", "reading": "ざいせいあかじ", "gloss": "fiscal deficit", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "徴税", "reading": "ちょうぜい", "gloss": "tax collection", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "租税", "reading": "そぜい", "gloss": "taxation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "年貢", "reading": "ねんぐ", "gloss": "feudal land tax", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "蒸気機関", "reading": "じょうききかん", "gloss": "steam engine", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "海運", "reading": "かいうん", "gloss": "shipping", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "先進国", "reading": "せんしんこく", "gloss": "developed country", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "発展途上国", "reading": "はってんとじょうこく", "gloss": "developing country", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "極度の貧困", "reading": "きょくどのひんこん", "gloss": "extreme poverty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "平均寿命", "reading": "へいきんじゅみょう", "gloss": "life expectancy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "人口爆発", "reading": "じんこうばくはつ", "gloss": "population explosion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "人口動態", "reading": "じんこうどうたい", "gloss": "demographics", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "乳幼児死亡率", "reading": "にゅうようじしぼうりつ", "gloss": "infant mortality rate", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "グローバル化", "reading": "ぐろーばるか", "gloss": "globalization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "世界システム", "reading": "せかいしすてむ", "gloss": "world-system", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "中核", "reading": "ちゅうかく", "gloss": "core; nucleus", "field": "history", "level": "N1", "why": "register word"}
+{"term": "周縁", "reading": "しゅうえん", "gloss": "periphery", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "文明の衝突", "reading": "ぶんめいのしょうとつ", "gloss": "clash of civilizations", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "西洋中心主義", "reading": "せいようちゅうしんしゅぎ", "gloss": "Eurocentrism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "近世", "reading": "きんせい", "gloss": "early modern period", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "先史時代", "reading": "せんしじだい", "gloss": "prehistoric times", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "有史以来", "reading": "ゆうしいらい", "gloss": "since recorded history began", "field": "history", "level": "N1", "why": "register word"}
+{"term": "紀元前", "reading": "きげんぜん", "gloss": "BC", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "時代区分", "reading": "じだいくぶん", "gloss": "periodization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "史観", "reading": "しかん", "gloss": "historical outlook", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "唯物史観", "reading": "ゆいぶつしかん", "gloss": "historical materialism", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "進歩史観", "reading": "しんぽしかん", "gloss": "progressive (Whig) view of history", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "史料", "reading": "しりょう", "gloss": "historical sources", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "一次史料", "reading": "いちじしりょう", "gloss": "primary source", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "史実", "reading": "しじつ", "gloss": "historical fact", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "考古学", "reading": "こうこがく", "gloss": "archaeology", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "遺跡", "reading": "いせき", "gloss": "ruins; historic site", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "碑文", "reading": "ひぶん", "gloss": "inscription", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "年代記", "reading": "ねんだいき", "gloss": "chronicle", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "正史", "reading": "せいし", "gloss": "official history", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "通史", "reading": "つうし", "gloss": "general history (survey)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "伝承", "reading": "でんしょう", "gloss": "tradition; legend", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宗教改革", "reading": "しゅうきょうかいかく", "gloss": "the Reformation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "十字軍", "reading": "じゅうじぐん", "gloss": "the Crusades", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "異端", "reading": "いたん", "gloss": "heresy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "異端審問", "reading": "いたんしんもん", "gloss": "the Inquisition", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宗教戦争", "reading": "しゅうきょうせんそう", "gloss": "religious war", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "政教分離", "reading": "せいきょうぶんり", "gloss": "separation of church and state", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "教皇", "reading": "きょうこう", "gloss": "the Pope", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "免罪符", "reading": "めんざいふ", "gloss": "indulgence", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宣教師", "reading": "せんきょうし", "gloss": "missionary", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "改宗", "reading": "かいしゅう", "gloss": "religious conversion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "神聖ローマ帝国", "reading": "しんせいろーまていこく", "gloss": "Holy Roman Empire", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "大英帝国", "reading": "だいえいていこく", "gloss": "British Empire", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "パクス・ブリタニカ", "reading": "ぱくすぶりたにか", "gloss": "Pax Britannica", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "清朝", "reading": "しんちょう", "gloss": "Qing dynasty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "日清戦争", "reading": "にっしんせんそう", "gloss": "First Sino-Japanese War", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "日露戦争", "reading": "にちろせんそう", "gloss": "Russo-Japanese War", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "ウェストファリア体制", "reading": "うぇすとふぁりあたいせい", "gloss": "Westphalian system", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "ウィーン体制", "reading": "うぃーんたいせい", "gloss": "Vienna system (Concert of Europe)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "ヴェルサイユ体制", "reading": "ゔぇるさいゆたいせい", "gloss": "Versailles system", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "ブレトンウッズ体制", "reading": "ぶれとんうっずたいせい", "gloss": "Bretton Woods system", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "天皇制", "reading": "てんのうせい", "gloss": "emperor system", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "摂政", "reading": "せっしょう", "gloss": "regent", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "廃藩置県", "reading": "はいはんちけん", "gloss": "abolition of domains for prefectures", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "大政奉還", "reading": "たいせいほうかん", "gloss": "return of power to the emperor", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "鎖国", "reading": "さこく", "gloss": "national isolation", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "開国", "reading": "かいこく", "gloss": "opening the country", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "文明開化", "reading": "ぶんめいかいか", "gloss": "civilization and enlightenment (Meiji)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "富国強兵", "reading": "ふこくきょうへい", "gloss": "rich country, strong army", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "殖産興業", "reading": "しょくさんこうぎょう", "gloss": "promotion of new industry", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "不平等条約", "reading": "ふびょうどうじょうやく", "gloss": "unequal treaty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "治外法権", "reading": "ちがいほうけん", "gloss": "extraterritoriality", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "関税自主権", "reading": "かんぜいじしゅけん", "gloss": "tariff autonomy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "列強", "reading": "れっきょう", "gloss": "the great powers", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "高度経済成長", "reading": "こうどけいざいせいちょう", "gloss": "high economic growth (postwar)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "バブル経済", "reading": "ばぶるけいざい", "gloss": "bubble economy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "制海権", "reading": "せいかいけん", "gloss": "command of the sea", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "制空権", "reading": "せいくうけん", "gloss": "air supremacy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国力", "reading": "こくりょく", "gloss": "national power", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "国境線", "reading": "こっきょうせん", "gloss": "border line", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "中央集権", "reading": "ちゅうおうしゅうけん", "gloss": "centralization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "地方分権", "reading": "ちほうぶんけん", "gloss": "decentralization", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "官僚制", "reading": "かんりょうせい", "gloss": "bureaucracy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "科挙", "reading": "かきょ", "gloss": "imperial examination (China)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "律令", "reading": "りつりょう", "gloss": "ritsuryō legal codes", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "宦官", "reading": "かんがん", "gloss": "eunuch", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "世襲", "reading": "せしゅう", "gloss": "hereditary succession", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "王位継承", "reading": "おういけいしょう", "gloss": "royal succession", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "正統性", "reading": "せいとうせい", "gloss": "legitimacy", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "簒奪", "reading": "さんだつ", "gloss": "usurpation", "field": "history", "level": "beyond", "why": "core concept"}
+{"term": "支配層", "reading": "しはいそう", "gloss": "ruling class", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "特権階級", "reading": "とっけんかいきゅう", "gloss": "privileged class", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "身分制度", "reading": "みぶんせいど", "gloss": "status (caste) system", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "内乱", "reading": "ないらん", "gloss": "civil strife; rebellion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "内戦", "reading": "ないせん", "gloss": "civil war", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "反乱", "reading": "はんらん", "gloss": "rebellion", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "暴動", "reading": "ぼうどう", "gloss": "riot", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "一揆", "reading": "いっき", "gloss": "uprising (peasant)", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "蜂起", "reading": "ほうき", "gloss": "uprising", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "動乱", "reading": "どうらん", "gloss": "upheaval; disturbance", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "暴君", "reading": "ぼうくん", "gloss": "tyrant", "field": "history", "level": "N1", "why": "register word"}
+{"term": "名君", "reading": "めいくん", "gloss": "wise ruler", "field": "history", "level": "N1", "why": "register word"}
+{"term": "興亡", "reading": "こうぼう", "gloss": "rise and fall", "field": "history", "level": "N1", "why": "register word"}
+{"term": "盛衰", "reading": "せいすい", "gloss": "rise and fall; vicissitudes", "field": "history", "level": "N1", "why": "register word"}
+{"term": "栄枯盛衰", "reading": "えいこせいすい", "gloss": "rise and fall; ups and downs", "field": "history", "level": "N1", "why": "register word"}
+{"term": "衰退", "reading": "すいたい", "gloss": "decline", "field": "history", "level": "N1", "why": "register word"}
+{"term": "没落", "reading": "ぼつらく", "gloss": "downfall; ruin", "field": "history", "level": "N1", "why": "register word"}
+{"term": "滅亡", "reading": "めつぼう", "gloss": "fall; destruction (of a state)", "field": "history", "level": "N1", "why": "register word"}
+{"term": "崩壊", "reading": "ほうかい", "gloss": "collapse", "field": "history", "level": "N1", "why": "register word"}
+{"term": "瓦解", "reading": "がかい", "gloss": "collapse; disintegration", "field": "history", "level": "N1", "why": "register word"}
+{"term": "分裂", "reading": "ぶんれつ", "gloss": "split; division", "field": "history", "level": "N1", "why": "register word"}
+{"term": "群雄割拠", "reading": "ぐんゆうかっきょ", "gloss": "rivalry of warlords", "field": "history", "level": "N1", "why": "register word"}
+{"term": "下剋上", "reading": "げこくじょう", "gloss": "the lower toppling the upper", "field": "history", "level": "N1", "why": "register word"}
+{"term": "台頭", "reading": "たいとう", "gloss": "rise; emergence", "field": "history", "level": "N1", "why": "register word"}
+{"term": "勃興", "reading": "ぼっこう", "gloss": "sudden rise", "field": "history", "level": "N1", "why": "register word"}
+{"term": "興隆", "reading": "こうりゅう", "gloss": "prosperity; rise", "field": "history", "level": "N1", "why": "register word"}
+{"term": "隆盛", "reading": "りゅうせい", "gloss": "prosperity; flourishing", "field": "history", "level": "N1", "why": "register word"}
+{"term": "全盛期", "reading": "ぜんせいき", "gloss": "golden age; peak", "field": "history", "level": "N1", "why": "register word"}
+{"term": "最盛期", "reading": "さいせいき", "gloss": "peak period", "field": "history", "level": "N1", "why": "register word"}
+{"term": "凋落", "reading": "ちょうらく", "gloss": "decline; withering", "field": "history", "level": "beyond", "why": "register word"}
+{"term": "斜陽", "reading": "しゃよう", "gloss": "declining (setting sun)", "field": "history", "level": "N1", "why": "register word"}
+{"term": "覇者", "reading": "はしゃ", "gloss": "supreme ruler; champion", "field": "history", "level": "N1", "why": "register word"}
+{"term": "覇道", "reading": "はどう", "gloss": "rule by force", "field": "history", "level": "beyond", "why": "register word"}
+{"term": "王道", "reading": "おうどう", "gloss": "royal road; rule by virtue", "field": "history", "level": "N1", "why": "register word"}
+{"term": "均衡", "reading": "きんこう", "gloss": "equilibrium; balance", "field": "history", "level": "N1", "why": "register word"}
+{"term": "拮抗", "reading": "きっこう", "gloss": "rivalry; being evenly matched", "field": "history", "level": "N1", "why": "register word"}
+{"term": "対峙", "reading": "たいじ", "gloss": "confrontation; facing off", "field": "history", "level": "N1", "why": "register word"}
+{"term": "摩擦", "reading": "まさつ", "gloss": "friction", "field": "history", "level": "N2", "why": "register word"}
+{"term": "軋轢", "reading": "あつれき", "gloss": "friction; discord", "field": "history", "level": "N1", "why": "register word"}
+{"term": "融和", "reading": "ゆうわ", "gloss": "reconciliation", "field": "history", "level": "N1", "why": "register word"}
+{"term": "妥協", "reading": "だきょう", "gloss": "compromise", "field": "history", "level": "N1", "why": "register word"}
+{"term": "譲歩", "reading": "じょうほ", "gloss": "concession", "field": "history", "level": "N1", "why": "register word"}
+{"term": "使節団", "reading": "しせつだん", "gloss": "delegation; mission", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "通商条約", "reading": "つうしょうじょうやく", "gloss": "commercial treaty", "field": "history", "level": "N1", "why": "core concept"}
+{"term": "過渡期", "reading": "かとき", "gloss": "transitional period", "field": "history", "level": "N1", "why": "register word"}
+{"term": "転換点", "reading": "てんかんてん", "gloss": "turning point", "field": "history", "level": "N1", "why": "register word"}
+{"term": "分水嶺", "reading": "ぶんすいれい", "gloss": "watershed", "field": "history", "level": "N1", "why": "register word"}
+{"term": "端緒", "reading": "たんしょ", "gloss": "beginning; first step", "field": "history", "level": "N1", "why": "register word"}
+{"term": "発端", "reading": "ほったん", "gloss": "origin; inception", "field": "history", "level": "N1", "why": "register word"}
+{"term": "遠因", "reading": "えんいん", "gloss": "remote cause", "field": "history", "level": "N1", "why": "register word"}
+{"term": "帰結", "reading": "きけつ", "gloss": "consequence; outcome", "field": "history", "level": "N1", "why": "register word"}
+{"term": "余波", "reading": "よは", "gloss": "aftermath", "field": "history", "level": "N1", "why": "register word"}
+{"term": "負の遺産", "reading": "ふのいさん", "gloss": "negative legacy", "field": "history", "level": "N1", "why": "register word"}
+{"term": "爪痕", "reading": "つめあと", "gloss": "scars; lasting damage", "field": "history", "level": "N1", "why": "register word"}
+{"term": "教訓", "reading": "きょうくん", "gloss": "lesson", "field": "history", "level": "N1", "why": "register word"}
+{"term": "功罪", "reading": "こうざい", "gloss": "merits and demerits", "field": "history", "level": "N1", "why": "register word"}
+{"term": "功績", "reading": "こうせき", "gloss": "achievement; contribution", "field": "history", "level": "N2", "why": "register word"}
+{"term": "偉業", "reading": "いぎょう", "gloss": "great achievement", "field": "history", "level": "N1", "why": "register word"}
+{"term": "変遷", "reading": "へんせん", "gloss": "transition; changes over time", "field": "history", "level": "N1", "why": "register word"}
+{"term": "推移", "reading": "すいい", "gloss": "transition; shift", "field": "history", "level": "N1", "why": "register word"}
+{"term": "潮流", "reading": "ちょうりゅう", "gloss": "current; trend", "field": "history", "level": "N1", "why": "register word"}
+{"term": "趨勢", "reading": "すうせい", "gloss": "trend; tendency", "field": "history", "level": "N1", "why": "register word"}
+{"term": "時流", "reading": "じりゅう", "gloss": "trend of the times", "field": "history", "level": "N1", "why": "register word"}
+{"term": "因果", "reading": "いんが", "gloss": "cause and effect", "field": "history", "level": "N1", "why": "register word"}
+{"term": "必然", "reading": "ひつぜん", "gloss": "inevitability", "field": "history", "level": "N1", "why": "register word"}
+{"term": "歴史的必然", "reading": "れきしてきひつぜん", "gloss": "historical inevitability", "field": "history", "level": "N1", "why": "register word"}
+{"term": "連鎖", "reading": "れんさ", "gloss": "chain; chain reaction", "field": "history", "level": "N1", "why": "register word"}
+{"term": "波及", "reading": "はきゅう", "gloss": "spread; ripple effect", "field": "history", "level": "N1", "why": "register word"}
+{"term": "地殻変動", "reading": "ちかくへんどう", "gloss": "tectonic shift (fig.)", "field": "history", "level": "N1", "why": "register word"}
+{"term": "パラダイムシフト", "reading": "ぱらだいむしふと", "gloss": "paradigm shift", "field": "history", "level": "N1", "why": "register word"}
+{"term": "歴史は繰り返す", "reading": "れきしはくりかえす", "gloss": "history repeats itself", "field": "history", "level": "N1", "why": "register word"}
+{"term": "温故知新", "reading": "おんこちしん", "gloss": "learning from the past", "field": "history", "level": "N1", "why": "register word"}

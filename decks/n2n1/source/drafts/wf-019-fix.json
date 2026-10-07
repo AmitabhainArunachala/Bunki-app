@@ -1,0 +1,9 @@
+{
+ "頭": "Natural, target used once, context forces animal counter. / Topic is 'other', but allowed topics are mind, india, ai, history, language.",
+ "過ぎる": "Target suffix appears more than once in the passage (頑張り過ぎる and 詰めすぎる). / Exercise and rest claims are generally true.",
+ "重量": "Blank could be filled by 重み just as well; context does not force 重量. / No checkable false claims.",
+ "じきに": "Blank could be filled by すぐに just as well; context does not force じきに. / Habit formation research claim about 21 days is true.",
+ "農産物": "Slightly unnatural collocation; 作物 would be more natural, and blank could be filled by 作物. / Farming claims are generally true.",
+ "軒並み": "Blank could be filled by 大きく and still work; context does not force the across-the-board sense. / The claim that essay passage volume has risen across the board in university entrance exams is checkable and not certain.",
+ "閑静": "Blank could be filled by 静かな just as well; context does not force 閑静. / Library and reading aloud claims are generally true."
+}

@@ -1,0 +1,89 @@
+{
+ "batch": "astra-editorial-a01",
+ "items": [
+  {
+   "term": "準ずる",
+   "reading": "じゅんずる",
+   "level": "N1",
+   "deck": "n1",
+   "field": null,
+   "gloss": "to correspond to; to be based on",
+   "register": "講",
+   "preferTopic": "language"
+  },
+  {
+   "term": "偏る",
+   "reading": "かたよる",
+   "level": "N2",
+   "deck": "n2",
+   "field": null,
+   "gloss": "to be unbalanced",
+   "register": "語",
+   "preferTopic": "mind"
+  },
+  {
+   "term": "開拓",
+   "reading": "かいたく",
+   "level": "N1",
+   "deck": "n1",
+   "field": null,
+   "gloss": "cultivation, pioneering",
+   "register": "講",
+   "preferTopic": "mind"
+  },
+  {
+   "term": "ヒント",
+   "reading": "ヒント",
+   "level": "N1",
+   "deck": "n1",
+   "field": null,
+   "gloss": "hint; clue",
+   "register": "報",
+   "preferTopic": "history"
+  },
+  {
+   "term": "多読",
+   "reading": "たどく",
+   "level": "N1",
+   "deck": "senmon",
+   "field": "language",
+   "gloss": "extensive reading",
+   "register": "講",
+   "preferTopic": "language"
+  },
+  {
+   "term": "製作",
+   "reading": "せいさく",
+   "level": "N2",
+   "deck": "n2",
+   "field": null,
+   "gloss": "production, manufacture",
+   "register": "講",
+   "preferTopic": "mind"
+  },
+  {
+   "term": "高学歴",
+   "reading": "こうがくれき",
+   "level": "N2",
+   "deck": "n2",
+   "field": null,
+   "gloss": "high educational background",
+   "register": "話",
+   "preferTopic": "mind"
+  }
+ ],
+ "weave": [
+  "専門用語",
+  "小論文",
+  "序論",
+  "工程",
+  "寸法",
+  "年代記",
+  "地形",
+  "大意",
+  "先入観",
+  "根拠",
+  "論点"
+ ],
+ "note": "Fresh replacements for material factual/editorial problems found in inherited spot-read; preserve original register and use naturally appropriate topic. Root deletes replaced source entries after accepted replacement."
+}

@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "宣教師",
+   "reading": "せんきょうし",
+   "pos": "noun",
+   "meaning": "missionary",
+   "defJa": "宗教を広めるために派遣される人。",
+   "passage": {
+    "ja": "宗教を広めようと異国へ渡った宣教師が、現地の習慣を手紙に書き残したとします。この手紙を歴史の本で紹介するなら、観察した内容だけでなく、誰に向けて書いたのかも確かめます。文章の大意を短くまとめる際に、本人の推測を現地の人々に共通する考えへ置き換えないよう注意してください。細部まで詳しく書いてあるからといって、その地域の暮らしをすべて知っていたとは限りません。読みやすい説明にする工夫と、記録した人の立場を読者に示す工夫を、両方とも残すことが大切です。",
+    "form": "宣教師",
+    "en": "Suppose a missionary who travelled abroad to spread a religion left a letter describing local customs. When introducing that letter in a history book, check not only what was observed but also whom it was written for. In summarising the overall meaning, take care not to replace the writer’s inferences with beliefs supposedly shared by the local people. A detailed account does not necessarily mean that the writer knew every aspect of life in the area. It is important to preserve both the effort to make the explanation readable and the effort to show readers the position of the person who made the record.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "布教のために派遣された人を指し、その人の立場も記録の読み方に関わります。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

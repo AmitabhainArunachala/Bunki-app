@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "幻影",
+   "reading": "げんえい",
+   "pos": "noun",
+   "meaning": "illusion; phantom",
+   "defJa": "実体があるように見えても実在しない姿",
+   "passage": {
+    "ja": "暗い舞台に人影を浮かべ、観客が近づくと何もないという演出を考えると、見えることと実在することの違いが際立つ。そこに現れる幻影は、手を伸ばして触れられる人物ではなく、照明や映像によって生み出された姿である。仕掛けを作る工程が明らかになったとしても、観客が一瞬感じた驚きまで消えるものではない。舞台の批評では、だまされたかどうかだけを問うのではなく、存在しない相手へ思わず呼びかけたくなるような場面が、どんな感情を呼び起こしたかも論点となる。",
+    "form": "幻影",
+    "en": "Imagining a production in which a human figure appears on a dark stage but nothing is there when the audience approaches highlights the difference between visibility and existence. The phantom that appears is not a person one can reach out and touch, but an image created by lighting or projection. Even if the stages of constructing the effect are revealed, the audience's momentary surprise does not disappear with them. Theater criticism considers not only whether viewers were deceived but also what emotions were evoked by a scene that makes them want to call out to someone who is not there.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "実在するように見える姿を指し、「幻影が浮かぶ」「幻影を見る」と使います。",
+    "sense": "実在しないのに、あるように見える姿"
+   }
+  },
+  {
+   "term": "序論",
+   "reading": "じょろん",
+   "pos": "noun",
+   "meaning": "introduction to an argument",
+   "defJa": "論述の初めに問題や目的を示す部分",
+   "passage": {
+    "ja": "文章を読み始めた人が、何が問題なのか分からないまま具体例へ連れていかれると、途中で話の筋を見失いやすくなります。序論には、これから答えようとする問いと、それを考える理由を置くと、読み手が進む方向をつかめます。小論文で字数が限られているとしても、時代の変化を大きく語る前置きは省いても、問いの焦点は残したいところです。本論を書き終えた後に冒頭へ戻り、実際に論じた内容と約束した内容が一致しているかを確かめる作業も、仕上げには欠かせません。",
+    "form": "序論",
+    "en": "If readers are taken straight into examples before understanding the issue, they can easily lose the thread along the way. Placing the question to be answered and the reason for considering it in the introduction helps readers grasp the direction. Even in a short essay with a word limit, you may omit a broad preamble about changing times, but should retain the focus of the question. Returning to the opening after finishing the main argument to check that what was discussed matches what was promised is also an essential part of finishing the text.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「序論・本論・結論」の初めの部分で、問題設定と論述の目的を示します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "廃藩置県",
+   "reading": "はいはんちけん",
+   "pos": "noun",
+   "meaning": "replacement of domains with prefectures",
+   "defJa": "明治政府が藩を廃止し府県による統治に改めた政策",
+   "passage": {
+    "ja": "明治初期の変化を短く伝える文章で、地図の区切りが変わっただけと書くと、政治の仕組みの転換が抜け落ちます。廃藩置県では、藩をなくして府県による統治に改めた点を述べ、地方を治める権限と中央政府の関係にも言葉を添えましょう。大政奉還と同じ一回の出来事としてまとめず、誰が何を手放し、次に何が決められたのかを分けて記すと流れが明確になります。専門用語を並べるかわりに、役人を誰が任命するようになったかという具体的な変化を示すと、制度の説明が読みやすくなります。",
+    "form": "廃藩置県",
+    "en": "In a short account of changes in the early Meiji period, describing only altered lines on a map leaves out the transformation of the political system. When explaining the replacement of domains with prefectures, state that the domains were abolished and prefectural administration introduced, and add wording about the relationship between local governing powers and the central government. Rather than combining it with the return of governing authority as a single event, distinguish who relinquished what and what was decided next to make the sequence clear. Showing a concrete change, such as who came to appoint officials, makes institutional explanations easier to read than simply listing technical terms.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「藩を廃し県を置く」という政策名で、地方支配と中央政府の関係の転換を含みます。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "弁舌",
+   "reading": "べんぜつ",
+   "pos": "noun",
+   "meaning": "eloquence; skill in speaking",
+   "defJa": "言葉で筋道を立て、人に話す能力やその話しぶり",
+   "passage": {
+    "ja": "日本語の討論では、同じ語句を繰り返したり、対句を用いたりすることで、主張の印象を強めることができる。弁舌の巧みさは聞き手の注意を引く一方、示された根拠の確かさとは別に評価する必要がある。相手の発言を短く言い換える場面では、耳に残る表現になっていても、元の意味が保たれているかが問われる。話す速さや声の強さに引きずられず、発言を文字に戻して、主張、理由、具体例がどのように結びつくかを確かめれば、説得力の源をより丁寧に検討できる。",
+    "form": "弁舌",
+    "en": "In a Japanese debate, repeating phrases and using parallel expressions can strengthen the impression of an argument. Eloquence draws listeners' attention, but needs to be evaluated separately from the reliability of the evidence presented. When briefly restating an opponent's remark, even memorable wording must be examined for whether it preserves the original meaning. By transcribing remarks and checking how claims, reasons, and examples connect, rather than being swayed by pace or vocal force, one can examine the sources of persuasive power more carefully.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「弁舌が巧み」「弁舌を振るう」と言い、話す能力や話しぶりを表します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引き金",
+   "reading": "ひきがね",
+   "pos": "noun",
+   "meaning": "trigger; immediate cause",
+   "defJa": "ある出来事や反応を起こす直接のきっかけ",
+   "passage": {
+    "ja": "体験記で「先生の一言が不安の引き金になった」と書くなら、その言葉の前後で気持ちがどう変わったかを描くと伝わります。もともと試験への心配が積もっていたのか、その場で初めて恐れを感じたのかによって、読み手の受け止め方も違います。平常心を失った場面を強く印象づけようとするあまり、背景にあった事情まで一言のせいにしてしまわないよう注意しましょう。直接のきっかけと長く続いた負担を分けて書けば、自分の心の動きを振り返る文章にも、無理な因果関係を持ち込まずに済みます。",
+    "form": "引き金",
+    "en": "If you write in a personal account that a teacher's remark triggered anxiety, showing how your feelings changed before and after the words makes the experience clearer. Readers' responses will differ depending on whether exam worries had already accumulated or fear arose for the first time at that moment. Be careful that trying too hard to make a loss of composure vivid does not lead you to attribute all the background circumstances to a single remark. Distinguishing the immediate trigger from a long-standing burden lets you reflect on your feelings without forcing a causal relationship into the account.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「引き金になる」は、背景にある条件ではなく、反応を起こす直接のきっかけを示します。",
+    "sense": "出来事や反応を起こす直接のきっかけ"
+   }
+  },
+  {
+   "term": "強化",
+   "reading": "きょうか",
+   "pos": "noun",
+   "meaning": "reinforcement",
+   "defJa": "行動の結果によって、その行動が増えること",
+   "passage": {
+    "ja": "子どもが片づけをした後に褒めたとしても、それだけで次も片づけるようになるとは限りません。行動の研究でいう強化は、ある行動の後に生じた結果によって、その行動が以前より起こりやすくなることを指します。ご褒美を用意した側の意図ではなく、その後の行動がどう変わったかを見る点が大切です。外発的動機づけと関連する話題ではあるものの、褒めれば必ず学習が進むと決めつけず、何をした直後にどんなことが起き、同じ行動が増えたのかを確かめていきます。",
+    "form": "強化",
+    "en": "Even if you praise a child after they tidy up, that alone does not mean they will do it again. In behavioral research, reinforcement refers to a consequence following a behavior making that behavior more likely than before. What matters is examining how subsequent behavior changed rather than the intentions of the person who offered the reward. Although this relates to extrinsic motivation, we should not assume that praise invariably advances learning, but check what happened immediately after which action and whether the same action increased.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "心理学では、行動の後の結果によって、その行動の生起頻度が増すことを指します。",
+    "sense": "行動の結果が、その行動の起こりやすさを高めること"
+   }
+  },
+  {
+   "term": "弾圧",
+   "reading": "だんあつ",
+   "pos": "noun",
+   "meaning": "political repression; crackdown",
+   "defJa": "権力を使い、反対する運動や言論を押さえつけること",
+   "passage": {
+    "ja": "古い新聞を読んでいて、ある時期から政府への批判が急に載らなくなっても、国民が全員賛成したとは言えないよね。もし発言した人が逮捕されたり、集会が禁止されたりしていたなら、弾圧によって声を上げられなくなった可能性を調べる必要がある。専制の時代の資料を見るときは、書かれている意見だけでなく、書くことを許されなかった意見も気になるんだ。もちろん、紙面にない意見を勝手に作るわけにはいかないから、個人の日記や国外へ送った手紙も探して、残された言葉を少しずつ照らし合わせたい。",
+    "form": "弾圧",
+    "en": "When criticism of the government suddenly disappears from old newspapers at a certain point, it does not mean that everyone in the country agreed. If speakers were being arrested or meetings banned, we need to investigate the possibility that repression prevented people from speaking out. When I examine sources from an autocratic period, I wonder not only about opinions that were written down but also those people were forbidden to write. Of course, we cannot simply invent views missing from the papers, so I want to look for private diaries and letters sent abroad and gradually compare the words that survive.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「言論を弾圧する」「弾圧を受ける」と、権力による強制的な抑制に使います。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "形態論",
+   "reading": "けいたいろん",
+   "pos": "noun",
+   "meaning": "morphology",
+   "defJa": "語の内部構造や語形の変化を研究する分野",
+   "passage": {
+    "ja": "「読ませた」という形を眺めると、読むという動作に、誰かにさせる意味と過去を表す働きが重なっていることが分かります。形態論は、このように語がどんな要素から成り、どのように形を変えるかを調べる分野です。専門用語を先に覚えるよりも、読む、読まない、読ませるといった形を並べて、どこが同じでどこが変わるかを探すところから始められます。文全体の語順を考える作業と区別しながらも、語の形が文中の他の語との関係を示す場合にも目を向けると、分析のつながりが見えてきます。",
+    "form": "形態論",
+    "en": "Looking at the form yomaseta shows that the act of reading is combined with the meaning of making someone do it and the marking of the past. Morphology studies what elements words consist of and how they change form. Rather than memorizing technical terms first, you can begin by lining up forms such as yomu, yomanai, and yomaseru and looking for what stays the same and what changes. While distinguishing this from considering word order across a sentence, attending to cases where word forms show relationships with other words reveals connections between the analyses.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "語の内部の組み立てや変化を扱い、文の構造を扱う統語論と区別します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "彼岸",
+   "reading": "ひがん",
+   "pos": "noun",
+   "meaning": "the other shore; realm of awakening",
+   "defJa": "仏教で、迷いや苦しみを離れた悟りの境地",
+   "passage": {
+    "ja": "川のこちら側に立ち、向こう岸を望む姿を思い浮かべると、仏教の比喩が少し身近になります。彼岸とは、迷いや苦しみのあるこちら側に対して、悟りの境地を向こう側の岸になぞらえた言葉です。物理的な距離の話にすぎないと考えると、欲望や怒りに振り回される自分のあり方を問い直すという意味を捉えきれません。春や秋の墓参りで耳にする呼び名でもありますが、日程を確かめるだけにとどまらず、岸を隔てるという表現にどんな人間の願いが込められているかへ目を向けると、言葉の奥行きが見えてきます。",
+    "form": "彼岸",
+    "en": "Imagining yourself on this side of a river looking toward the opposite bank makes a Buddhist metaphor a little more familiar. The other shore is an expression that likens the realm of awakening to the far bank in contrast to this side, where delusion and suffering exist. Considering it merely a matter of physical distance fails to capture the sense of questioning one's way of being when swayed by desire and anger. Although it is also a name heard around spring and autumn grave visits, looking beyond the calendar to the human aspirations expressed by separated shores reveals the word's depth.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "ここでは悟りの境地を指し、春分・秋分を中心とする行事の期間とは区別します。",
+    "sense": "迷いを離れた悟りの境地を向こう岸にたとえたもの"
+   }
+  },
+  {
+   "term": "往生",
+   "reading": "おうじょう",
+   "pos": "noun",
+   "meaning": "rebirth in the Pure Land",
+   "defJa": "この世の命を終え、浄土に生まれること",
+   "passage": {
+    "ja": "仏教の文章に出てくる語を日常会話の意味だけで読むと、筆者の願いを取り違えることがあります。浄土の教えで往生を願うとある場合、それは物事に困り果てることではなく、命を終えて仏の浄土に生まれることを指します。娑婆という語が同じ段落にあれば、今生きている迷いの世界と、願いの向かう先との対比にも注目します。辞書の訳語を一つに決めることなく、誰が何を願っているのかを文脈から確かめれば、同じ漢字が宗教と日常で異なる意味を担うことを整理できます。",
+    "form": "往生",
+    "en": "Reading words in Buddhist texts only through their everyday meanings can lead you to misunderstand the writer's wishes. When Pure Land teachings speak of wishing for rebirth, the term refers not to being hopelessly stuck but to being born in a Buddha's Pure Land after one's life ends. If the word shaba appears in the same paragraph, also note the contrast between the present world of delusion and the destination of the aspiration. Rather than fixing on one dictionary translation, checking who wishes for what in context helps you organize how the same characters carry different meanings in religion and daily life.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "仏教では浄土に生まれることを指し、日常語の「困り果てる」とは意味が異なります。",
+    "sense": "命を終えて仏の浄土に生まれること"
+   }
+  }
+ ]
+}

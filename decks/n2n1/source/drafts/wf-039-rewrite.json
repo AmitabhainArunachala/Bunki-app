@@ -1,0 +1,20 @@
+{
+  "cards": [
+    {
+      "term": "立憲君主制",
+      "reading": "りっけんくんしゅせい",
+      "pos": "noun",
+      "meaning": "constitutional monarchy",
+      "defJa": "憲法によって君主の権限が制限される政治制度",
+      "passage": {
+        "ja": "王がいる国だからといって、王が望むままに税を課し、法律を決められるとは限らない。立憲君主制では、君主の権限は憲法によって制限され、議会や政府との関係の中に位置づけられる。ただし、君主にどこまで実際の政治権力を認めるかは、国や時代によって異なる。王朝の系譜をたどるだけでは見えてこないのは、権限をめぐる交渉と、長い時間をかけた制度の変化である。政治体制の名前を覚えるにとどまらず、誰が決定し、誰がそれを止められるのかを問うことが、歴史を読む上で欠かせない。",
+        "form": "立憲君主制",
+        "en": "Just because a country has a king does not mean that he can levy taxes and make laws as he pleases. Under a constitutional monarchy, the monarch's powers are limited by a constitution and situated in a relationship with parliament and government. However, the extent of the monarch's actual political power differs by country and period. Tracing royal dynasties alone does not reveal negotiations over powers or institutional changes that unfold over long periods. When reading history, it is essential to go beyond memorizing the names of political systems and ask who makes decisions and who can stop them.",
+        "register": "論",
+        "topic": "history",
+        "tipJa": "君主が存在することと、政治上の権限を無制限に持つことを区別する。",
+        "sense": ""
+      }
+    }
+  ]
+}

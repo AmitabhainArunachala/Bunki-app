@@ -1,0 +1,246 @@
+{
+ "cards": [
+  {
+   "term": "仕組み",
+   "reading": "しくみ",
+   "pos": "noun",
+   "meaning": "structure; mechanism",
+   "defJa": "ものごとが成り立つ構造や仕掛け",
+   "passage": {
+    "ja": "言葉は、意味を運ぶ容器にすぎないのだろうか。私にはそうは思えない。助詞ひとつが文の重心を動かす仕組みを知れば、母語と外国語の垣根さえ低く見えてくる。たとえば「は」と「が」の違いは、辞書の訳語を並べても決して説明しきれず、話し手が何を既知とし、何を新しい情報として差し出すかという構造に根ざしている。外国語を学ぶとは、他人の言葉を覚えることである以前に、自分の言葉の骨組みを発見することにほかならない。",
+    "form": "仕組み",
+    "en": "Is language nothing more than a container that carries meaning? I cannot think so. Once you know the mechanism by which a single particle shifts the center of gravity of a sentence, even the hedge between your mother tongue and a foreign language begins to look low. The difference between wa and ga, for example, can never be fully explained by lining up dictionary translations; it is rooted in a structure of what the speaker treats as already known and what is offered as new information. To learn a foreign language is, before it is memorizing someone else's words, nothing other than discovering the framework of your own.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「〜の仕組みを知る・解き明かす」と使い、物事が動く内部の構造を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "倫理的",
+   "reading": "りんりてき",
+   "pos": "na-adj",
+   "meaning": "ethical",
+   "defJa": "人としての正しい道に関わるさま",
+   "passage": {
+    "ja": "歴史の授業では、奴隷制や植民地支配のように、過去の人物の行いを現代の基準で裁いてよいか、という問いが出ることがある。倫理的な評価を下すこと自体は否定されないが、当時の制度や価値観、人々の置かれた状況を知らないまま裁けば、事実の理解を誤りかねない。まず何が起きたのかを、複数の史料に基づいて確かめ、そのあとで評価を考える。この順序を逆にすると危うい、というのが歴史学習の基本である。",
+    "form": "倫理的",
+    "en": "In history class, the question sometimes arises, over things like slavery and colonial rule, whether it is right to judge the deeds of figures of the past by present-day standards. Passing an ethical judgment is not itself denied, but if one judges without knowing the institutions, the values, and the circumstances people found themselves in at the time, one may well misunderstand the facts. First confirm what happened on the basis of multiple historical sources, and only afterward consider the evaluation. That reversing this order is precarious is a basic principle of studying history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「倫理的な問題・判断・配慮」。善悪や人の道という観点から見るさま。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "固い",
+   "reading": "かたい",
+   "pos": "i-adj",
+   "meaning": "firm; hard; rigid",
+   "defJa": "形や意志が簡単に変わらないさま",
+   "passage": {
+    "ja": "固い決意は、しばしば人を支えるが、同時に人を縛りもする。「三日坊主を二度としない」と誓った人ほど、一日でも休もうものなら、そこで全てが終わったと感じ、すべてを投げ出したくなる。その意味で、決意は岩のようにではなく、結んだ紐のように、ほどけても結び直せるしなやかさがあるほうが長持ちする。習慣を育てるとは、強さを競うことではなく、折れても何度でも戻ってくる力を養うことにほかならない。",
+    "form": "固い",
+    "en": "A firm resolve often supports a person, but at the same time it also binds them. The more a person has vowed 'never to be a three-day quitter again,' the more, if they so much as rest for a day, they feel that everything is over and want to throw it all away. In that sense, a resolution lasts longer if it is not like a rock but like a tied cord, supple enough to be retied even when it comes undone. Cultivating a habit is nothing other than nurturing the power to come back time and again even when broken, not competing in strength.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「固い決意・約束・絆」。簡単には変わらず揺るがないさま。",
+    "sense": "簡単には変わらないさま"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "使いこなす",
+   "reading": "つかいこなす",
+   "pos": "verb",
+   "meaning": "master (a tool)",
+   "defJa": "道具や技術を自在に扱う",
+   "passage": {
+    "ja": "辞書アプリを入れただけで日本語が上達するわけではない。使いこなす人は、調べた語を必ず例文ごと保存し、翌日に声に出して読み直している。ここで大事なのは、道具の機能の多さではなく、毎日同じ手順を、疲れていても忙しくても繰り返す習慣だ。機能を覚えるそばから忘れていくようでは、どんな優れたアプリも宝の持ち腐れになってしまう。最後に物を言うのは、道具の性能ではなく、使い手の手順である。",
+    "form": "使いこなす",
+    "en": "Installing a dictionary app does not by itself make your Japanese improve. People who have mastered the tool always save each word they look up together with an example sentence and read it aloud again the next day. What matters here is not the number of features a tool has but the habit of repeating the same routine every day, whether tired or busy. If you forget features the moment you learn them, even the finest app becomes a treasure wasted. In the end, what counts is not the tool's performance but the user's routine.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「道具・ツール・技術を使いこなす」。単に使うのでなく、自在に扱える状態を表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "依然として",
+   "reading": "いぜんとして",
+   "pos": "adverb",
+   "meaning": "still; as before",
+   "defJa": "前と変わらず、同じ状態が続いて",
+   "passage": {
+    "ja": "生成AIの性能は急速に向上したが、事実に反する内容をもっともらしく述べる問題は依然として残っている。各社は検索結果を参照させる方式などで対策を進めているものの、完全な解消には至っておらず、専門性の高い分野ほど誤りの見極めが難しい。企業が業務に導入する際には、重要な判断ほど、人間による確認の体制を省けないのが実情だ。精度への期待が高まる一方で、責任の所在という課題も浮かび上がっている。",
+    "form": "依然として",
+    "en": "Generative AI has improved rapidly in performance, but the problem of plausibly stating things contrary to fact still remains. Companies are advancing countermeasures such as having systems consult search results, but they have not reached a complete fix, and the more specialized the field, the harder it is to spot errors. When businesses bring it into operations, the reality is that the more important the decision, the less they can do without a system of human verification. While expectations for accuracy rise, the question of where responsibility lies is also emerging.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「依然として〜が続く・残る」と、状況が変わらないことを硬い文体で述べる。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "取り扱い",
+   "reading": "とりあつかい",
+   "pos": "noun",
+   "meaning": "handling",
+   "defJa": "物事を処理したり扱ったりすること",
+   "passage": {
+    "ja": "AIに質問を入力すると、その内容が学習に使われることがあります。そのため企業では、顧客の個人情報や社外秘の資料の取り扱いについて、入力してよい範囲をあらかじめ社内ルールで決めておくのが普通です。そそっかしい社員が機密をうっかり入力してしまえば、それまでです。ただし、禁止一辺倒では、現場は黙って隠れて使い始めます。便利な道具ほど、使い方の約束が先に必要になるのです。",
+    "form": "取り扱い",
+    "en": "When you enter a question into an AI, that content may be used for training. That is why companies normally decide in advance, in internal rules, the range of what may be entered concerning the handling of customers' personal information and confidential documents. If a careless employee inadvertently enters a secret, that is the end of it. Yet if the policy is nothing but prohibition, people on the ground will quietly start using it in secret. The more convenient the tool, the more a promise about how to use it is needed first.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「個人情報の取り扱い」「取り扱い注意」。物や情報の扱い方・処理の仕方。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "修復",
+   "reading": "しゅうふく",
+   "pos": "noun",
+   "meaning": "restoration, repair",
+   "defJa": "傷んだものを元の状態に直すこと",
+   "passage": {
+    "ja": "この前、古い写真をAIで修復してみたんですよ。祖父の若い頃の一枚だけに、ひびだらけで色も抜けていた状態から数十秒でよみがえったときは、ちょっと感動しました。ただ、よく見ると、顔のしわが勝手に消されてたりするじゃないですか。直してくれるのはありがたいけど、そこにあった時間まで消えちゃうのは、なんか複雑ですよね。結局、全部おまかせにしないで、気になる所だけ自分で戻すことにしました。",
+    "form": "修復",
+    "en": "The other day I tried restoring an old photo with AI. Since it was a shot of my grandfather when he was young, I was a little moved when it came back to life in a few dozen seconds from a state riddled with cracks and faded color. But if you look closely, the wrinkles on his face have been erased on their own, you know. I'm grateful that it fixes things, but it feels kind of complicated that even the time that was there gets wiped out. In the end, I decided not to leave everything to it and to put back by hand only the spots that bothered me.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「写真・関係・建物を修復する」。傷んだものを元に近づける。比喩にも広がる。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "候補者",
+   "reading": "こうほしゃ",
+   "pos": "noun",
+   "meaning": "candidate",
+   "defJa": "選ばれる対象として挙げられた人",
+   "passage": {
+    "ja": "面接でも同じなんですけど、候補者って、「頑張ります」って言いすぎなんですよ。聞いてる側は、何を、どこまで、いつまでにっていうのが知りたいわけで、気持ちの強さはその次なんです。はきはきした声で話したからといって、中身が伝わるとは限らないんです。言葉を具体的にするだけで、同じ人が別人みたいに信頼されたりしますよ。だから僕は、答えを話す前に、数字をひとつ入れるようにしてます。",
+    "form": "候補者",
+    "en": "It's the same in interviews, but candidates say 'I'll do my best' far too much. What the listener wants to know is what, how far, and by when, and the strength of your feelings comes after that. Just because you spoke in a crisp, clear voice doesn't mean the substance gets across. Merely making your words concrete can make the same person trusted like a different individual. That's why, before giving an answer, I make a point of working in a single number.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「候補者を擁立する・絞る」。選挙や採用で選ばれる対象となる人を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "伝統的",
+   "reading": "でんとうてき",
+   "pos": "na-adj",
+   "meaning": "traditional",
+   "defJa": "古くから受け継がれてきたさま",
+   "passage": {
+    "ja": "日本の学校では、黒板の板書をノートに写す授業が、伝統的なやり方として長く定着してきた。ところが近年、書きながら考えさせたり、友達と説明し合わせたりする方式を取り入れる学校も出てきている。背景にあるのは、写しただけで理解した気になるのは勘違いだ、という学習研究の蓄積である。とはいえ、板書を写す作業が集中を助ける場面もあり、従来の方法が無駄だったと断じるのは早計だろう。",
+    "form": "伝統的",
+    "en": "In Japanese schools, lessons in which students copy the blackboard into their notebooks have long been established as the traditional way. In recent years, however, some schools have begun to adopt methods in which students think while writing or explain things to friends. Behind this lies an accumulation of learning research holding that feeling you have understood merely because you copied something is a misunderstanding. Even so, copying the board can help concentration in some situations, so it would be premature to conclude that the older method was a waste.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「伝統的な方法・手法・文化」と名詞を修飾する。新しい方法との対比でよく使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "何とぞ",
+   "reading": "なにとぞ",
+   "pos": "adverb",
+   "meaning": "kindly; please",
+   "defJa": "相手に強く願うときに使う丁寧な語",
+   "passage": {
+    "ja": "江戸時代の百姓が代官に出した嘆願書を読むと、決まり文句の多さに驚きます。「何とぞ御慈悲を」と深く頭を下げ、凶作を理由に年貢の軽減を願い出る形が、ほとんど型になっているのです。とはいえ、へりくだるばかりではありません。村の窮状を石高や人数まで細かく書き連ねて、相手が断りにくい状況をつくろうともくろんでいたのです。言葉づかいは丁重でも、中身は意外なほど戦略的でした。",
+    "form": "何とぞ",
+    "en": "Reading the petitions that Edo-period farmers submitted to their magistrates, you are struck by how many set phrases there are. The form of bowing deeply with an expression like 'kindly show your mercy' and requesting a reduction in the land tax on grounds of crop failure has become almost a template. Yet they were not merely humbling themselves. By setting out the village's plight in detail, down to crop yields and head counts, they schemed to create a situation in which it would be hard for the other side to refuse. The wording was courteous, but the substance was surprisingly strategic.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「何とぞ〜お願い申し上げます」と、依頼や嘆願を強める丁寧な副詞。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "人脈",
+   "reading": "じんみゃく",
+   "pos": "noun",
+   "meaning": "personal connections, network",
+   "defJa": "仕事や生活に役立つ人のつながり",
+   "passage": {
+    "ja": "ねえ、通訳の仕事って、辞書を引く速さとか語学力だけじゃ、とても回らないんですよ。現場で頼れるのは、結局のところ人脈なんです。あの人に聞けば医療でも法律でも専門用語がわかる、という相手が何人いるかで、準備の速さがまるで違いますからね。ただ、名刺を配りまくるだけでは、つながりは育たず、相手の役に立てた経験が一つずつ積み重なって初めて、信頼になるんです。まずは目の前の仕事を、なんとかやり抜くに限ります。",
+    "form": "人脈",
+    "en": "You know, interpreting can't possibly run on dictionary speed or language skill alone. What you can really count on in the field is, in the end, your network of connections. How fast you can prepare differs enormously depending on how many people you have who can explain the terminology, whether in medicine or in law. But just handing out business cards won't make those ties grow; only when experiences of having been useful to someone pile up one by one does it turn into trust. It's best to start by somehow seeing the work in front of you through.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「人脈を築く・広げる・頼る」が典型の組み合わせ。仕事で使える人間関係を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

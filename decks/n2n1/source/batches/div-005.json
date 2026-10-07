@@ -1,0 +1,161 @@
+{
+ "batch": "div-005",
+ "writer": "gpt-6-astra",
+ "items": [
+  {
+   "term": "献身",
+   "reading": "けんしん",
+   "gloss": "devotion, self-sacrifice",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "india",
+   "deck": "senmon",
+   "field": "india",
+   "weave": [
+    "布施",
+    "労力"
+   ],
+   "fixThis": [
+    "phrase 「バガヴァッド・ギータ」 appears in 16 cards (cap 11)",
+    "phrase 「ガヴァッド・ギーター」 appears in 16 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "です・ます調",
+   "reading": "ですますちょう",
+   "gloss": "desu/masu style",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "語尾",
+    "本文"
+   ],
+   "fixThis": [
+    "phrase 「ておくに越したことは」 appears in 15 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "人名用漢字",
+   "reading": "じんめいようかんじ",
+   "gloss": "kanji for personal names",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "常用漢字",
+    "由来"
+   ],
+   "fixThis": [
+    "phrase 「ておくに越したことは」 appears in 15 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "熟字訓",
+   "reading": "じゅくじくん",
+   "gloss": "whole-word kun reading",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "余地"
+   ],
+   "fixThis": [
+    "phrase 「ておくに越したことは」 appears in 15 cards (cap 11)",
+    "phrase 「おくに越したことはな」 appears in 13 cards (cap 11)",
+    "phrase 「くに越したことはない」 appears in 13 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "海洋国家",
+   "reading": "かいようこっか",
+   "gloss": "maritime nation",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "基盤",
+    "運営"
+   ],
+   "fixThis": [
+    "opening 歴史を語る… appears in 13 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "異端",
+   "reading": "いたん",
+   "gloss": "heresy",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "教義",
+    "資料"
+   ],
+   "fixThis": [
+    "opening 歴史を語る… appears in 13 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "文才",
+   "reading": "ぶんさい",
+   "gloss": "literary talent",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "推敲",
+    "随筆"
+   ],
+   "fixThis": [
+    "ending …かもしれない appears in 12 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "口語",
+   "reading": "こうご",
+   "gloss": "colloquial language",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "省略",
+    "共有"
+   ],
+   "fixThis": [
+    "opening 日本語には… appears in 12 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "相関関係",
+   "reading": "そうかんかんけい",
+   "gloss": "correlation",
+   "level": "N1",
+   "register": "学",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "因果",
+    "検証"
+   ],
+   "fixThis": [
+    "phrase 「わけではありません。」 appears in 12 cards (cap 11)"
+   ]
+  }
+ ]
+}

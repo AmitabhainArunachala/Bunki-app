@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "魂",
+   "reading": "たましい",
+   "pos": "noun",
+   "meaning": "soul, spirit",
+   "defJa": "人の体に宿る心の働き",
+   "passage": {
+    "ja": "「三つ子の魂百まで」ということわざがあるように、幼いころに身についた気質は、大人になっても変わりにくいと考えられています。実際、幼少期の習慣や環境が、のちの学習意欲に影響することは多くの研究が示しています。とはいえ、大人になってからの学び直しが無駄になるわけではありません。身の回りの環境を変えれば、習慣は少しずつ書き換えられます。習慣は、環境という土台の上に育っていくのです。",
+    "form": "魂",
+    "en": "As the proverb “the soul of a three-year-old lasts until a hundred” says, the temperament acquired in early childhood has been thought to be hard to change even in adulthood. In fact, many studies show that childhood habits and environment affect later motivation to learn. That said, relearning as an adult is not wasted. If you change your surroundings, habits can be rewritten little by little. Habits grow on the foundation of one's environment.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「魂」は「心」より深い、人の核。ことわざ「三つ子の魂百まで」で使われる。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

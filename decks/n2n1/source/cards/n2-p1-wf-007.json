@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "懐かしい",
+   "reading": "なつかしい",
+   "pos": "i-adj",
+   "meaning": "nostalgic, dear",
+   "defJa": "昔が思い出されて、慕わしい",
+   "passage": {
+    "ja": "「懐かしい」という言葉に頼ることなく、その感覚を書くにはどうすればよいか。たとえば、夏祭りの帰りに食べたかき氷の味と、舌が青く染まっていた記憶を一文だけ置いてみる。感情の名前を出さず、五感の細部を差し出すと、読み手は自分の記憶で空白を埋めはじめる。それが、夏の名残のような感覚を読み手と分かち合う、いちばん確かな手続きになる。それは説明ではなく、読み手の中にある記憶を呼び起こす小さな鍵になる。",
+    "form": "懐かしい",
+    "en": "How can you write that feeling without relying on the word \"nostalgic\"? For example, try placing just one sentence about the taste of shaved ice eaten on the way home from a summer festival and the memory of a tongue stained blue. If you offer sensory details without naming the emotion, the reader begins to fill the blanks with their own memories. That is the surest method for sharing with the reader a feeling like the lingering trace of summer. It is not an explanation but a small key that awakens the memories already inside the reader.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「懐かしい味」「懐かしい歌」のように、過去を慕う気持ちを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "抽象",
+   "reading": "ちゅうしょう",
+   "pos": "noun",
+   "meaning": "abstraction",
+   "defJa": "具体的な違いをとりのぞいて共通点を取り出すこと",
+   "passage": {
+    "ja": "「抽象化」と聞くと難しそうですが、要するに細かい違いを捨てて共通点だけを残す作業です。柴犬も秋田犬もまとめて「犬」と呼べるのは、頭の中でその操作をしているからです。この力が強い人は、一つの経験を手掛かりに、別の場面にも使える原則を引き出せます。勉強に限らず仕事でも、具体例を集めるだけで終わらず、そこから型を取り出して初めて、知識が応用に耐えるものになります。",
+    "form": "抽象",
+    "en": "Abstraction may sound difficult, but in short it is the work of discarding fine differences and keeping only what is shared. We can call both a Shiba and an Akita simply \"dog\" because we perform that operation in our heads. People strong in this ability can draw, from a single experience as a clue, principles that apply in other situations. Not only in study but in work too, knowledge becomes able to withstand application only once you go beyond collecting concrete examples and extract a pattern from them.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「抽象化」「抽象的」のように、個別の違いを離れて共通点をつかむ意味。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "手",
+   "reading": "～しゅ",
+   "pos": "other",
+   "meaning": "-er, person who does (suffix)",
+   "defJa": "その役目や仕事をする人を表す言葉",
+   "passage": {
+    "ja": "半導体の世界では、微細化の旗手といえば、長らく台湾の受託製造企業とアメリカの大企業だった。しかし近年は、日本でも国の支援を受けた新工場の建設が進み、顔ぶれが変わりつつある。製造装置や素材では、日本企業が圧倒的な存在感を持つ分野も少なくない。巨額の投資を重ねて自前の力を持とうとする各国の流れは、当分続くとみられる。微細化の競争は、いまや企業同士にとどまらず、国家の戦略そのものになっている。",
+    "form": "旗手",
+    "en": "In the world of semiconductors, the standard-bearers of miniaturization were long a Taiwanese contract manufacturer and a large American company. In recent years, however, new government-backed plants have been going up in Japan too, and the cast of players is changing. In manufacturing equipment and materials, there are quite a few fields where Japanese firms have an overwhelming presence. The trend of countries pouring in huge investments to build up their own capability is expected to continue for the time being. The race for miniaturization has now gone beyond rivalry between companies and become national strategy itself.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「旗手」「歌手」「運転手」など、人を表す接尾語として使う。",
+    "sense": "人を表す接尾語"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "憧れる",
+   "reading": "あこがれる",
+   "pos": "verb",
+   "meaning": "to long for, to look up to",
+   "defJa": "ある人や物にひかれて、そうなりたいと願う",
+   "passage": {
+    "ja": "若い頃、ヒマラヤの洞窟で瞑想する聖者に憧れたことがある。静けさの奥に答えがあると、信じて疑わなかったのである。だがアドヴァイタが説くのは、探している当の自分こそ求めていたものだという逆説である。遠回りをしたあげく、手掛かりは遠い山ではなく、いま見ている目そのものにあるのだと気づいた。憧れは、距離があるうちだけ輝く不思議な光であり、近づくほど、ありふれた日常の景色に変わっていく。",
+    "form": "憧れた",
+    "en": "In my youth I once longed to be like the sages who meditated in Himalayan caves. I never doubted that the answer lay deep within the silence. But what Advaita teaches is the paradox that the very self that is searching is what was being sought. After a long detour, I realized that the clue lay not in a distant mountain but in the very eyes now looking. Longing is a strange light that shines only while there is distance, and the closer you get the more it turns into the scenery of ordinary days.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「聖者に憧れる」のように、遠くの理想にひかれる気持ちを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

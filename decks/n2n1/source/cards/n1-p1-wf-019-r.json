@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "閑静",
+   "reading": "かんせい",
+   "pos": "na-adj",
+   "meaning": "quiet, peaceful (area)",
+   "defJa": "ものしずかで落ち着いているようす",
+   "passage": {
+    "ja": "閑静な住宅街にある学校は、子どもの成績も良いはずだと見られがちだ。だが研究者は、静けさそのものより、家庭の経済力や教育への関心の差が結果に影響している可能性を指摘する。静かな環境が集中を助ける面はあるにしても、それだけで成績が決まるわけではない。環境の印象だけで原因を決めつければ、本当の要因を見落としかねない。数字を読むときは、何が何に影響したのかを一つずつ分けて考える必要がある。",
+    "form": "閑静",
+    "en": "Schools in quiet residential neighborhoods tend to be assumed to have children with good grades too. But researchers point out the possibility that differences in family economic power and interest in education, rather than the quiet itself, are affecting the results. Even if a quiet environment helps concentration in some ways, that alone does not decide grades. If you decide a cause on the impression of the environment alone, you may overlook the real factor. When reading numbers, you need to separate what influenced what, one thing at a time.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「閑静な住宅街」が決まった言い方。落ち着いた環境をほめる語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

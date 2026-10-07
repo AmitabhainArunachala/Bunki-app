@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "休養",
+   "reading": "きゅうよう",
+   "pos": "noun",
+   "meaning": "rest, recuperation",
+   "defJa": "仕事を休んで、体や心を休めること",
+   "passage": {
+    "ja": "睡眠を削って勉強したあげく、成績が伸び悩むという相談をよく受けます。脳は起きている間に取り込んだ情報を、眠っている間に整理して定着させているとされています。休養は怠けではなく、学習という工程の後半にあたります。勉強の合間に短い仮眠を挟むだけでも、午後の集中が変わると言われます。机に向かう時間をむやみに延ばすより、ぐっすり眠るほうが、結果として記憶は強く残ります。",
+    "form": "休養",
+    "en": "I often get consultations from people whose grades stall after they cut sleep to study. The brain is said to organize and consolidate, while we sleep, the information it took in while awake. Rest is not laziness; it is the latter half of the learning process. It is said that even a short nap between study sessions changes your afternoon concentration. Sleeping soundly leaves a stronger memory in the end than stretching out the hours at the desk.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「休養を取る」「十分な休養」と使い、疲れを回復するために休むことを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "譲歩",
+   "reading": "じょうほ",
+   "pos": "noun",
+   "meaning": "concession, compromise",
+   "defJa": "自分の主張を抑えて、相手に歩み寄ること",
+   "passage": {
+    "ja": "世界史の論述では、「誰が何を手放したのか」を軸に整理すると頭に残りやすい。たとえば一八一五年のウィーン会議では、各国が領土をめぐって互いに譲歩を重ねた。結果として生まれたのは、完璧な平和ではなく、数十年持ちこたえる均衡である。年号の暗記に追われるより、取引の構図を把握するほうがずっと効率がいい。「勝者が全部を取った」という図式で覚えると、のちの歴史の流れがつかめなくなる。",
+    "form": "譲歩",
+    "en": "In essay questions on world history, organizing around who gave up what makes things stick. At the Congress of Vienna in 1815, for example, the powers made concession after concession to one another over territory. What emerged was not perfect peace but a balance that held for decades. Grasping the structure of the bargaining is far more efficient than being chased around by date memorization. Remembering it as a picture in which the winner took everything leaves you unable to follow the later flow of history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「譲歩を重ねる」「譲歩を迫る」など、交渉や外交の場面で相手に歩み寄る意味で使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
