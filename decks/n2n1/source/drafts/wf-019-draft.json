@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "軒並み",
+   "reading": "のきなみ",
+   "pos": "adverb",
+   "meaning": "across the board; all alike",
+   "defJa": "どれもこれも、ほとんどそろって",
+   "passage": {
+    "ja": "新語の採録をめぐって、軒並み横文字ばかりだと嘆く人は多い。しかし、そう感じるのは、外来語を目にした瞬間に新しさを覚える一方で、漢語や和語の新しい言葉には気づきにくいからではないだろうか。印象が実態とずれることは、言葉の世界では決して珍しくない。変化を論じるときは、感覚に頼るより先に、まず統計を取って数えることが肝心である。そうすれば、嘆きの中身が案外あいまいだったことにも、気づくはずだ。",
+    "form": "軒並み",
+    "en": "Over which words get recorded, many people lament that the new ones are all across the board in katakana. But might we not feel that way because we sense novelty the instant we see a loanword, while we fail to notice new Sino-Japanese or native words? It is by no means rare in the world of language for impression to drift from reality. When discussing change, before relying on feeling, it is essential first to take statistics and count. Then you would surely notice that the content of the lament was rather vague after all.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「軒並み上昇／軒並み下落」。家々が並ぶ様子から、全体が同じ傾向をたどることを言う。",
+    "sense": "どれもそろって・一様に"
+   }
+  },
+  {
+   "term": "辛うじて",
+   "reading": "かろうじて",
+   "pos": "adverb",
+   "meaning": "barely; narrowly",
+   "defJa": "やっとのことで。ぎりぎり間に合って",
+   "passage": {
+    "ja": "試験の前日にほとんど勉強できなかったのに、辛うじて合格点に滑り込んだ。そんな経験をすると、人は「ぎりぎりでも何とかなる」と学んでしまいます。ところが、脳は成功の理由を分析するより先に、その行動を繰り返すべきものとして記憶に刻んでしまうんです。だからこそ、運よく乗り切れたときほど、もう一日分の準備を追加するくらいの余裕を持っておくに越したことはありません。成功体験は、使い方を間違えると、いちばん手強い落とし穴になるのです。",
+    "form": "辛うじて",
+    "en": "Though I could hardly study the day before the exam, I barely slid in at the passing mark. After such an experience, people learn that it will work out somehow even at the last minute. Yet the brain engraves that behavior in memory as something to repeat before it analyzes the reason for success. That is exactly why, right after you have scraped through by luck, it is best to keep a margin by adding at least one more day of preparation. A successful experience becomes the most formidable pitfall if used wrongly.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「辛うじて〜する」の形で、危ないところを、やっと乗り切る様子を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "農産物",
+   "reading": "のうさんぶつ",
+   "pos": "noun",
+   "meaning": "agricultural produce",
+   "defJa": "畑や田でつくられる、食べ物や作物",
+   "passage": {
+    "ja": "日本の農産物は、見た目の美しさと品質の高さで、海外でも高い評価を受けています。りんごひとつにも、摘果や袋かけといった手間が重ねられ、形も色も均一に揃えられます。こうした丁寧さは、消費者の信頼につながる一方で、人手不足が進む産地にとっては大きな負担にもなっています。過疎化が進む地域で、この技術をどう次の世代に引き継ぐかが、いま静かに問われているのです。そうした技術を守ることは、食の文化を守ることでもあります。",
+    "form": "農産物",
+    "en": "Japanese agricultural products are highly evaluated overseas too for their beauty of appearance and high quality. Even for a single apple, pains such as thinning fruit and bagging are piled on, and shape and color are made uniform. Such care leads to consumer trust, but on the other hand it is also a great burden for production areas where labor shortages are advancing. In regions where depopulation is advancing, how to hand this technique on to the next generation is now being quietly asked. Protecting such techniques is also protecting food culture.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「農産物の輸出・地域の農産物」。野菜や果物、米など、農業が生み出す産物の総称。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "込み上げる",
+   "reading": "こみあげる",
+   "pos": "verb",
+   "meaning": "to well up (emotion)",
+   "defJa": "気持ちが下から上へ、わき上がってくる",
+   "passage": {
+    "ja": "日本語には、感情が込み上げる様子を表す言葉が、とても豊かです。「胸が熱くなる」「喉が詰まる」「目頭が熱くなる」のように、身体の部位を使って気持ちを描くのが特徴です。感情を直接説明することなく、体に起きた変化を語るほうが、聞き手の想像力に委ねられるため、かえって深く伝わります。小説や歌詞が心に響くのは、こうした間接的な表現のおかげかもしれません。日本語の感情表現の奥行きは、こうした身体の語彙に支えられています。",
+    "form": "込み上げる",
+    "en": "Japanese is very rich in words for the way emotion wells up. A feature is that feelings are depicted through parts of the body, as in my chest grows hot, my throat tightens, or my eyes grow hot. Telling of the changes that occurred in the body, without explaining the emotion directly, leaves things to the listener's imagination and so comes across more deeply. That novels and song lyrics resonate in the heart may be thanks to such indirect expressions. The depth of emotional expression in Japanese is supported by such bodily vocabulary.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "涙・怒り・感動などが『込み上げる』。体の内側から自然にわく感情に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "追加",
+   "reading": "ついか",
+   "pos": "noun",
+   "meaning": "addition, supplement",
+   "defJa": "すでにあるものに、さらに加えること",
+   "passage": {
+    "ja": "アメリカ合衆国の憲法は、最初に制定されたあと、二十七回の修正条項を追加しながら、改められてきました。最初の十か条は、権利章典と呼ばれ、言論や信教の自由を守るために加えられたものです。つまり建国の父たちは、完璧な憲法を一度に作ろうとはせず、欠けた部分を後から書き足す道を、あらかじめ開いておいたのです。変化に開かれた設計が、二百年以上にわたって、この憲法を絶えず生かし続けてきたといえるでしょう。",
+    "form": "追加",
+    "en": "The Constitution of the United States has been amended since it was first enacted, with twenty-seven amendments added. The first ten articles are called the Bill of Rights and were added to protect freedom of speech and religion. In other words, the Founding Fathers did not try to make a perfect constitution all at once but opened in advance a path for writing in missing parts later. It can be said that a design open to change has kept this constitution constantly alive for over two hundred years.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「追加する／追加料金／追加条項」。既存のものに足して増やす意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "透明",
+   "reading": "とうめい",
+   "pos": "na-adj",
+   "meaning": "transparency, clearness",
+   "defJa": "すきとおって、向こうが見えること",
+   "passage": {
+    "ja": "ガンジス川って、聖なる川って言われるけど、お世辞にも透明とは言えないんですよ。上流の山の麓では、氷河が溶けた冷たい水が澄んでるのに、人口の多い平野に出ると、一気に濁ってくるんです。それでも人々は、その水に浸かって祈りを捧げるし、小瓶に汲んで持ち帰る人もいます。信仰と現実の間には、簡単には埋まらない隙間があるんですよね。だからこそ、清らかさとは何かを、改めて考えさせられる川なんです。",
+    "form": "透明",
+    "en": "The Ganges is called a sacred river, but to be flattering it cannot be said to be clear. At the foot of the upstream mountains the cold water from melted glaciers is limpid, yet once it comes out onto the heavily populated plains it suddenly turns muddy. Even so, people bathe in that water and offer prayers, and some draw it into small bottles and take it home. Between faith and reality there is a gap that cannot easily be filled. That is exactly why it is a river that makes you think anew about what purity is.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "水・ガラスなど透き通る物のほか、「透明な会計」のように、隠し事のない意味も。",
+    "sense": "すきとおっている"
+   }
+  },
+  {
+   "term": "通",
+   "reading": "～つう",
+   "pos": "other",
+   "meaning": "counter for letters",
+   "defJa": "手紙や書類などを数える言葉",
+   "passage": {
+    "ja": "毎朝、人工知能が要約してくれるメールって、便利なんだけど、ちゃんと一つひとつ読む感覚がなくなるんですよね。大事そうなのだけ読んで、あとは見出しだけで済ませちゃうというか。そのせいか、友だちからの長い手紙みたいな一通が届いても、読むのがつい後回しになっちゃって。便利さの裏で、ゆっくり読むという体験が、いつの間にか痩せていってる気がするんです。それでも、返信を待つ時間まではなくしたくないんですけどね。",
+    "form": "通",
+    "en": "The emails that artificial intelligence summarizes for me each morning are convenient, but the sense of reading each one properly disappears, you know. I read only the ones that seem important and get by with just the headings for the rest. Perhaps because of that, even when a single long letter like one from a friend arrives, I end up putting off reading it. Behind the convenience, I feel that the experience of reading slowly has been growing thin before I knew it. Even so, I would rather not lose even the time spent waiting for a reply.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "手紙・メール・書類を数える語で、「一通・二通」と読む。『通』の読みの一つ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "連携",
+   "reading": "れんけい",
+   "pos": "noun",
+   "meaning": "cooperation, coordination",
+   "defJa": "別々のものが、つながって協力し合うこと",
+   "passage": {
+    "ja": "言葉の力を伸ばすには、聞く、話す、読む、書くという四つの技能を、ばらばらに鍛えるのではなく、連携させることが大切です。たとえば、読んで知った表現を、その日のうちに声に出して使ってみると、記憶への定着がぐっと高まります。逆に、読むだけ、聞くだけで終わると、知識は頭の中で孤立したままになりがちです。四つの技能が互いに支え合うとき、学びは自ら動き出す仕組みになります。",
+    "form": "連携",
+    "en": "To grow your language ability, it is important not to train the four skills of listening, speaking, reading and writing separately but to make them work in concert. For example, if you try using an expression you learned through reading aloud on the same day, retention in memory rises greatly. Conversely, if you end with only reading or only listening, knowledge tends to remain isolated in the head. When the four skills support one another, learning becomes a mechanism that starts moving by itself.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「連携を取る・強める」。組織や技能など別々のものが連絡を取り合い、協力する意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "逸材",
+   "reading": "いつざい",
+   "pos": "noun",
+   "meaning": "outstanding talent",
+   "defJa": "特にすぐれた才能を持つ人",
+   "passage": {
+    "ja": "スポーツの世界では、幼いころから逸材と呼ばれた選手が、必ずしも大成するとは限らない。むしろ、早い段階で注目を浴びたことで、周囲の期待に押しつぶされる例も少なくない。一方で、遅咲きの選手は、失敗を重ねながら自分の長所と課題を見つけ、絶えず修正してきたことが多いとされる。才能を見抜く目と同じくらい、才能を育てる環境を整える目が、指導者には求められている。結局、人を伸ばすのは、才能ではなく、機会と時間の使い方なのだろう。",
+    "form": "逸材",
+    "en": "In the world of sports, players called outstanding talents from childhood do not necessarily go on to succeed. Rather, there are not a few cases of being crushed by the expectations around them because they drew attention at an early stage. On the other hand, late bloomers are said to have often found their own strengths and tasks while piling up failures and corrected constantly. Coaches are required to have an eye for setting up an environment that nurtures talent as much as an eye for spotting it. In the end, what makes people grow is probably not talent but how opportunity and time are used.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「逸材」は人を評する語で、将来を期待される抜きん出た人物を指す。「若き逸材」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "過ぎる",
+   "reading": "～すぎる",
+   "pos": "other",
+   "meaning": "too much, excessively",
+   "defJa": "程度をこえて、ある動作がはなはだしいこと",
+   "passage": {
+    "ja": "考え過ぎる人は、行動する前に、起こりうる失敗をすべて想像してしまいます。その結果、準備だけで疲れ果てて、一歩目が踏み出せなくなるのです。ところが、脳科学の知見によれば、人は実際に動き出してからのほうが、不安が小さくなりやすいといわれています。だから、悩みすぎて動けないときは、まず五分だけ手を動かして、その感触を確かめてみてください。考えることをやめるのではなく、考える時間に区切りをつけるのです。",
+    "form": "過ぎる",
+    "en": "People who think too much imagine every possible failure before acting. As a result, they are exhausted by preparation alone and cannot take the first step. Yet according to findings in brain science, anxiety tends to become smaller after one actually starts moving. So when you are too troubled to move, first move your hands for just five minutes and check how it feels. You do not stop thinking; you put a limit on the time for thinking.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "動詞の連用形に付き『考え過ぎる』のように、ほどよい程度を超える意味を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "過疎化",
+   "reading": "かそか",
+   "pos": "noun",
+   "meaning": "depopulation",
+   "defJa": "人口が減って、まばらになること",
+   "passage": {
+    "ja": "インドの農村では、若者が都市へ働きに出る流れが続き、都市化に伴って一部の地域で過疎化が進んでいる。残された高齢者は畑を耕す体力を失い、農地が放置される例も報告されている。政府は、農村での雇用を増やすために、小規模な工場や観光の誘致を進めているが、効果が見えるまでには時間がかかるとみられる。都市と農村の格差をどう縮めるかが、今後の大きな課題となる。人口が減った村では、祭りや行事の担い手も足りなくなっている。",
+    "form": "過疎化",
+    "en": "In Indian villages, the flow of young people going to cities to work continues, and along with urbanization depopulation is advancing in some areas. The older people left behind lose the strength to till the fields, and cases of farmland being abandoned have also been reported. The government is promoting small factories and the attraction of tourism to increase employment in rural areas, but it is expected to take time before effects are seen. How to narrow the gap between city and countryside will be a major challenge from here. In villages where the population has fallen, people to carry on festivals and events are also running short.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「過疎化が進む・過疎地域」。農山村などで人口が減り、暮らしが成り立ちにくくなる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "酒",
+   "reading": "～しゅ",
+   "pos": "other",
+   "meaning": "kind of alcohol (suffix)",
+   "defJa": "アルコールを含む飲み物の種類を表す語",
+   "passage": {
+    "ja": "人工知能を使って、醸造の工程を最適化する試みが、各地の蔵元で広がっている。ウイスキーや焼酎のような蒸留酒の風味は、温度や湿度のわずかな違いに左右されるため、長年の勘に頼ってきた部分が大きい。そこで、規模の大小を問わず、センサーで集めたデータを学習させ、発酵の状態を予測する仕組みが開発されている。職人の技を置き換えるのではなく、継承を支える道具として使えるかどうかが、鍵になる。",
+    "form": "酒",
+    "en": "Attempts to optimize brewing processes using artificial intelligence are spreading among breweries in various regions. The flavor of distilled spirits such as whisky and shochu is swayed by slight differences in temperature and humidity, so much of it has relied on long years of intuition. So, regardless of scale, systems are being developed that train on data gathered by sensors and predict the state of fermentation. The key will be whether it can be used not to replace the craftsmen's skill but as a tool supporting its succession.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「蒸留酒・果実酒」のように、他の語の後に付いて酒の種類を示す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "重量",
+   "reading": "じゅうりょう",
+   "pos": "noun",
+   "meaning": "heavyweight; weight",
+   "defJa": "もののおもさ。かさや程度が大きいこと",
+   "passage": {
+    "ja": "インドの古典音楽には、一曲が一時間を超えるものもあり、聞き手にも相応の集中力が求められます。話し手も同じで、重量のある内容を長く語るときは、聞き手の呼吸に応じて、緩急をつける工夫が欠かせません。インドの演奏家は、同じ旋律を少しずつ変えながら繰り返し、聴衆の心に響く深い没入へ導きます。話し方の達人は、一つの主題を、飽きさせずに掘り下げるこの技術から、多くを学べるはずです。",
+    "form": "重量",
+    "en": "Some pieces of Indian classical music last more than an hour, and the listener too is asked for a corresponding concentration. The same goes for the speaker: when you speak at length on weighty content, ingenuity in varying pace to suit the listener's breathing is indispensable. Indian performers repeat the same melody while changing it little by little and lead audiences into a deep immersion that resonates in their hearts. Masters of speech should be able to learn much from this technique of digging into a single theme without boring anyone.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「重量のある内容」のように、比喩的に内容の重さにも使える。普通は物の重さ。",
+    "sense": "重さ・内容の重さ"
+   }
+  },
+  {
+   "term": "鉄橋",
+   "reading": "てっきょう",
+   "pos": "noun",
+   "meaning": "iron bridge",
+   "defJa": "鉄でつくった橋",
+   "passage": {
+    "ja": "古い橋って、さびていく鉄の色とか、リベットの並びとか、なんか見てるだけで落ち着くんですよね。最近は人工知能が、写真から傷み具合を判定して、補修が必要な場所を教えてくれるそうなんです。そうすれば、人が危ない高所に登って点検する回数も減って、事故の防止にもなるし、いいことずくめですよね。でも、鉄橋が持つあの味わいまで、効率の名の下に消えちゃわないか、ちょっと心配なんですよ。",
+    "form": "鉄橋",
+    "en": "Old iron bridges, with the color of iron as it rusts and the lines of rivets, somehow calm me just by looking at them. I hear that recently artificial intelligence judges the extent of damage from photos and tells you where repairs are needed. That way the number of times people climb to dangerous heights to inspect them goes down too, and it also helps prevent accidents, so it's nothing but good, right? But I'm a little worried that even the charm iron bridges have might disappear in the name of efficiency.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "鉄道や道路を支える鉄製の橋。「鉄橋を渡る」。古い橋はさびの色にも趣がある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "鉢",
+   "reading": "はち",
+   "pos": "noun",
+   "meaning": "bowl, pot",
+   "defJa": "草木を植える入れ物。ものを入れる、深い器",
+   "passage": {
+    "ja": "観葉植物の水やりを自動で行う装置に、人工知能を組み合わせた製品が登場している。土の湿り具合や日照量をセンサーで測り、鉢ごとに最適な水の量を判断する仕組みだ。旅行や出張で家を空けがちな人にとっては、草花を枯らしてしまう不安を減らせる利点がある。ただ、植物の様子を日々眺めて手をかけるという楽しみまで、機械に任せてしまうことには、違和感を覚える愛好家もいる。植物との付き合い方は、便利さとの距離感で変わっていく。",
+    "form": "鉢",
+    "en": "Products combining artificial intelligence with devices that water houseplants automatically have appeared. They measure soil moisture and sunlight with sensors and judge the optimal amount of water pot by pot. For people who tend to leave home for trips or business, there is the advantage of reducing the worry of letting flowers and plants wither. However, some enthusiasts feel uneasy about leaving even the pleasure of watching and tending plants day by day to a machine. How we relate to plants changes with our sense of distance from convenience.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "草花を植える入れ物。『鉢ごとに』のように鉢植えを数える。",
+    "sense": "草木を植える入れ物"
+   }
+  },
+  {
+   "term": "長所",
+   "reading": "ちょうしょ",
+   "pos": "noun",
+   "meaning": "strong point, merit",
+   "defJa": "すぐれていて、ほめるべき点",
+   "passage": {
+    "ja": "人工知能の長所は、疲れず、同じ精度で、膨大な情報を処理できることにある。一方、人間の強みは、データが乏しい状況でも、経験や直感を頼りに判断を下せる柔軟さである。両者の持ち味が異なるからこそ、単純にどちらが優れているかを競わせるより、役割を分担させる発想が重要になってくる。医療や法律の現場でも、この連携のあり方をめぐる議論が活発化している。その組み合わせ方に、これからの働き方の答えがある。",
+    "form": "長所",
+    "en": "The merit of artificial intelligence is that it can process vast amounts of information without tiring and with the same precision. The strength of humans, on the other hand, is the flexibility to make judgments relying on experience and intuition even when data are scarce. Precisely because the two have different distinctive qualities, the idea of dividing roles becomes important rather than simply making them compete over which is better. In medical and legal settings too, debate over how this cooperation should work is becoming active. The answer to future ways of working lies in how they are combined.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "対義語は短所。人・物の良い点を言い、「長所を伸ばす」「長所と短所」と対にする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "閑静",
+   "reading": "かんせい",
+   "pos": "na-adj",
+   "meaning": "quiet, peaceful (area)",
+   "defJa": "ひっそりとして、静かな様子",
+   "passage": {
+    "ja": "閑静な住宅街に暮らす人ほど、幸福度が高いとは限らない、という見方がある。静けさは、確かに睡眠や集中力を支える一方で、人との偶然の出会いを減らす面も持つからだ。研究者は、物理的な静けさよりも、顔なじみの人と挨拶を交わせる環境のほうが、心の安定に寄与すると指摘している。住まいを選ぶとき、静かさだけでなく、街角で人がつながっているかどうかまで、見ておく価値がある。",
+    "form": "閑静",
+    "en": "There is a view that people who live in quiet residential districts do not necessarily have higher happiness. Quietness certainly supports sleep and concentration, but it also has the side of reducing chance encounters with other people. Researchers point out that an environment where you can exchange greetings with familiar faces contributes more to mental stability than physical quietness. When choosing a home, it is worth looking not only at quietness but at whether people are connected on the street corners.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「閑静な住宅街」。人通りが少なく、落ち着いた環境をほめて言う、やや改まった語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "間もなく",
+   "reading": "まもなく",
+   "pos": "adverb",
+   "meaning": "soon, shortly",
+   "defJa": "時をおかず、ほどなく",
+   "passage": {
+    "ja": "無人タクシーの実用化が、世界の一部の都市で進んでいる。日本でも、間もなく本格的な実証が各地で始まるとの見方が出ている。運転手のいない車が一般の乗客を乗せて走るため、事故の防止に向けた安全性の確認が、最大の課題となる。一方で、事故が起きたときの責任をどこに置くのかについては、法整備がなお追いついていないとの指摘もある。技術が先に進む以上、社会の側の準備も急がなければならない。",
+    "form": "間もなく",
+    "en": "The practical use of driverless taxis is advancing in some cities of the world. In Japan as well, a view has emerged that full-scale demonstration will soon begin in various places. Because cars without drivers will run with ordinary passengers aboard, confirming safety to prevent accidents is the greatest challenge. On the other hand, it is also pointed out that legislation has not yet caught up regarding where to place responsibility when an accident occurs. As technology moves ahead, society's side must also hurry its preparations.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「間もなく発車します」「間もなく〜する」。さほど時間がたたないうちに、の意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "防止",
+   "reading": "ぼうし",
+   "pos": "noun",
+   "meaning": "prevention, check",
+   "defJa": "よくないことが起きないように、前もって防ぐこと",
+   "passage": {
+    "ja": "勉強中にスマホを触ってしまう問題を、意志の力だけで防止しようとしても、たいていは失敗します。というのも、通知の音や画面の光は、脳の注意を自動的に引きつけるように設計されているからです。効果的なのは、そもそも手の届かない場所に置くなど、誘惑に触れない環境を先につくることです。環境を整えたうえで、すべての意志力を勉強そのものに注げるようにすれば、集中はぐっと楽になります。",
+    "form": "防止",
+    "en": "Even if you try to prevent the problem of touching your phone while studying by willpower alone, you usually fail. That is because the sound of notifications and the light of the screen are designed to automatically attract the brain's attention. What is effective is to set up in advance an environment where you do not touch temptation, such as putting the phone somewhere out of reach in the first place. If, with the environment in order, you can pour all your willpower into studying itself, concentration becomes far easier.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「事故防止・再発防止」。悪いことが起こる前に防ぐ意味で、対策の語とよく結ぶ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "険しい",
+   "reading": "けわしい",
+   "pos": "i-adj",
+   "meaning": "steep, rugged; severe",
+   "defJa": "けわしく、進むのが困難である",
+   "passage": {
+    "ja": "半導体産業をめぐる国際的な競争は、年々険しい局面を迎えている。先端の製造装置の輸出を制限する動きが広がり、各国が軒並み、自前の供給網を築くために多額の補助金を投じている。一方で、巨額の投資が採算に合うかどうかを疑問視する声も根強い。技術の優位を保つ道は、どの国にとっても、決して平坦ではないといえる。半導体は、あらゆる産業の基盤であるだけに、その行方は私たちの暮らしにも直結する。",
+    "form": "険しい",
+    "en": "International competition over the semiconductor industry is entering a steeper phase year by year. Moves to restrict exports of advanced manufacturing equipment are spreading, and countries across the board are pouring large subsidies into building their own supply chains. On the other hand, voices doubting whether the huge investments will pay off persist. The road to keeping a technological edge can be said to be anything but flat for any country. Because semiconductors are the foundation of every industry, their course is directly tied to our lives as well.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「険しい山道」から、「険しい表情」「険しい道のり」など厳しい状況の意味にも広がる。",
+    "sense": "けわしく、困難である"
+   }
+  },
+  {
+   "term": "隔てる",
+   "reading": "へだてる",
+   "pos": "verb",
+   "meaning": "to separate; to be shut out",
+   "defJa": "間に何かを置いて、たがいを離す",
+   "passage": {
+    "ja": "同じ日本語でも、方言の違いは、時として互いの理解を隔てる壁になる。たとえば、青森と鹿児島の話者が、それぞれの方言のまま話し合うと、ほとんど通じない場合があるという。にもかかわらず、テレビや芸能番組の普及によって、共通語を理解する力は、全国でほぼ揃ってきた。方言同士の距離は縮まったが、同時に、街角の言葉の個性も、少しずつ失われつつある。言葉の個性を守る取り組みも、各地で少しずつ始まっている。",
+    "form": "隔てる",
+    "en": "Even within the same Japanese, differences in dialect sometimes become a wall that separates mutual understanding. For example, when speakers from Aomori and Kagoshima talk in their own dialects, there are said to be cases in which they are almost unintelligible to each other. Even so, through the spread of television and entertainment programs, the ability to understand the standard language has become nearly even across the country. The distance between dialects has narrowed, but at the same time the individuality of street-corner speech is also being lost little by little. Efforts to protect the individuality of speech are also beginning little by little in various places.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "『壁を隔てる』『時を隔てる』。物や時間が間にあって、二つを離す意味。",
+    "sense": "間に置いて離す"
+   }
+  },
+  {
+   "term": "隙間",
+   "reading": "すきま",
+   "pos": "noun",
+   "meaning": "crack, gap",
+   "defJa": "物と物との間の、せまいあき",
+   "passage": {
+    "ja": "言葉と言葉の隙間にこそ、日本語の味わいが宿るとよく言われます。「ちょっと」「まあ」「なんか」のような、一見すると意味のない言葉が、実は、話し手の気持ちや相手への配慮を伝える役割を果たしているのです。こうした言葉を、すべて削ってしまうと、文章は整いますが、人の温度が消えてしまいます。だからこそ、話し言葉を研究する人たちは、あえてこの余白に耳を傾けるのです。沈黙の長さまで含めて、会話は一つの音楽だといえます。",
+    "form": "隙間",
+    "en": "It is often said that the flavor of Japanese dwells precisely in the gaps between words. Words that seem at first glance meaningless, such as chotto, maa and nanka, actually play the role of conveying the speaker's feelings and consideration for the other person. If you cut all such words, the text becomes tidy, but the warmth of people disappears. That is exactly why people who study spoken language deliberately lend their ears to these gaps. Including even the length of silences, conversation can be called a kind of music.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "物の隙間のほか、「心の隙間」「言葉の隙間」と、目に見えない空白にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "集会",
+   "reading": "しゅうかい",
+   "pos": "noun",
+   "meaning": "meeting, assembly",
+   "defJa": "おおぜいの人が、ある目的で集まること",
+   "passage": {
+    "ja": "インドの村では、重要なことを決めるとき、広場で集会が開かれ、住民が車座になって意見を交わす伝統があります。パンチャーヤトと呼ばれる長老会議が、争いごとを調停する役割を担ってきました。この場面で大切なのは、声の大きい人が勝つのではなく、全員の言葉に耳を傾けて合意を探る姿勢です。人前で話す仕事をする人にとっても、職場の会議の進め方に生かせる、学ぶところの多いお手本になります。",
+    "form": "集会",
+    "en": "In Indian villages, when deciding important matters, there is a tradition of holding an assembly in the square where residents sit in a circle and exchange opinions. A council of elders called the panchayat has played the role of mediating disputes. What matters in this setting is not that the loud person wins but the stance of listening to everyone's words and seeking agreement. For those who speak in public as work, it is also a model with much to learn that can be applied to how meetings at the workplace are run.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「集会を開く・屋外集会」。意見を交わしたり、主張したりするために人々が集まる場。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "雇用",
+   "reading": "こよう",
+   "pos": "noun",
+   "meaning": "employment",
+   "defJa": "人をやとうこと。やとわれて働くこと",
+   "passage": {
+    "ja": "言葉の使い方は、雇用の現場においても、無視できない影響を持つ。求人広告に「アットホームな職場です」と書かれていれば、人は温かい人間関係を想像するが、一方で、公私の境目がない働き方を連想する人もいる。同じ言葉が、読み手によって、正反対の期待を生むのである。募集する側が自分の言葉の響きに無自覚なとき、入社後のずれは、避けがたいものになってしまう。言葉の選び方一つで、採用の成否さえ変わりうるのだ。",
+    "form": "雇用",
+    "en": "The way words are used has an influence that cannot be ignored even in the field of employment. If a job ad says it is a homey workplace, people imagine warm human relations, but there are also people who associate it with a way of working with no boundary between public and private. The same words give rise to opposite expectations depending on the reader. When the recruiting side is unaware of how its own words sound, a mismatch after joining the company becomes hard to avoid. Even the success or failure of hiring can change with a single choice of words.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「雇用を生む・雇用を守る」。働く場を与える意味で、経済・社会の話題に頻出。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "響く",
+   "reading": "ひびく",
+   "pos": "verb",
+   "meaning": "to resound; to affect",
+   "defJa": "音が広がって聞こえる。心に強く伝わる",
+   "passage": {
+    "ja": "話が相手の心に響くかどうかは、言葉の巧みさよりも、話し手が何を本当に大切にしているかで決まります。たとえ表現が多少ぎこちなくても、自らの経験から出てきた言葉には、聞き手を引きつける力が宿ります。逆に、どれほど整っていても、借り物の言葉では、すぐに見透かされてしまうものです。だから、人前で話す前には、原稿を磨くよりも、自分の言いたいことを一言で言えるまで考え抜いてください。",
+    "form": "響く",
+    "en": "Whether a talk resonates in the other person's heart is decided less by the skill of the words than by what the speaker truly cherishes. Even if the expression is somewhat awkward, words that come out of one's own experience carry a power that attracts the listener. Conversely, however polished, borrowed words are quickly seen through. So before speaking in public, think it through until you can state what you want to say in a single sentence, rather than polishing the script.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "『音が響く』と、『心に響く』のように、強い印象を与える意味の二つがある。",
+    "sense": "心に強く伝わる"
+   }
+  },
+  {
+   "term": "項目",
+   "reading": "こうもく",
+   "pos": "noun",
+   "meaning": "item, entry",
+   "defJa": "全体をいくつかに分けた、一つ一つの事柄",
+   "passage": {
+    "ja": "歴史教科書の記述をめぐって、どの項目を取り上げ、どれを割愛するかは、常に議論の的になってきた。限られた紙幅の中では、すべてを載せることは不可能であり、選ばれなかった出来事は、人々の記憶から静かに遠ざかる。そのため近年は、教科書では簡潔にとどめ、詳しい内容は電子版や副読本で追加する方式が広がっている。何を載せ、何を載せないかという編集の判断そのものが、歴史の語り方を形づくっているのである。",
+    "form": "項目",
+    "en": "Over the description in history textbooks, which items to take up and which to omit has always been a target of debate. With limited space it is impossible to include everything, and events that were not chosen quietly recede from people's memory. For that reason, in recent years a method has spread of keeping textbooks concise and adding detailed content in electronic editions and supplementary readers. The editorial judgment itself about what to include and what not to include shapes how history is told.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「項目を立てる・各項目」。文書や表を、分けて整理した一つ一つの区分。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "領収書",
+   "reading": "りょうしゅうしょ",
+   "pos": "noun",
+   "meaning": "receipt",
+   "defJa": "お金を受け取ったことを書いた、証明の書類",
+   "passage": {
+    "ja": "日本の商習慣では、「領収書をください」と頼む場面が頻繁にあるが、宛名を「上様」と書いてもらう慣習は、外国人にとって不思議に映る。「上様」は、名前を書かずに済ませるための便宜的な呼び方として、長く使われてきた。しかし近年は、不正の防止という観点から、きちんと社名や氏名を記すことが求められるようになってきた。言葉の習慣は、社会の信頼の仕組みと、静かに連動して変わっていくのである。",
+    "form": "領収書",
+    "en": "In Japanese business custom there are frequent scenes of asking for a receipt, but the custom of having the addressee written as uesama looks strange to foreigners. Uesama has long been used as a convenient way of addressing someone so as to get by without writing a name. In recent years, however, from the standpoint of preventing fraud, it has come to be required to write the company name or personal name properly. Linguistic habits change quietly in step with the mechanisms of social trust.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「領収書をもらう／切る」。受け取った金額と宛名を記した証明書。「上様」の習慣も有名。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "頭",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "counter for animals",
+   "defJa": "牛や馬など、大きな動物を数える言葉",
+   "passage": {
+    "ja": "大規模な牧場の管理に、人工知能を取り入れる動きが進んでいます。たとえば、牛の群れの歩き方や食事の量をカメラで記録し、体調の異変を早い段階で知らせてくれます。農家が一頭ずつ細かく観察する負担は減りますが、牛と人との間にあった触れ合いが薄れる懸念もあります。話し手として、こうした技術を語るときは、便利さと失われるものの両面を、具体的な場面で示すと、聞き手の理解が深まります。",
+    "form": "頭",
+    "en": "Moves to adopt artificial intelligence in the management of large-scale ranches are advancing. For example, it records the way a herd of cattle walks and the amount they eat with cameras and notifies you of abnormalities in condition at an early stage. The burden of farmers observing each head in detail decreases, but there is also a concern that the contact once present between cattle and people will fade. As a speaker, when you discuss such technology, showing both the convenience and what is lost in concrete scenes deepens the listener's understanding.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "大きな動物を数える言葉。「一頭・二頭」と読み、牛・馬・象などに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "高齢化",
+   "reading": "こうれいか",
+   "pos": "noun",
+   "meaning": "population aging",
+   "defJa": "全体に占める高齢者の割合が高くなること",
+   "passage": {
+    "ja": "高齢化が進む社会では、話し方の工夫も変わってきます。年配の聞き手には、早口を避け、一文を短く区切り、大事な言葉を繰り返すと、内容がぐっと伝わりやすくなります。ただし、子どもに話しかけるような口調は、かえって相手の自尊心を傷つけかねません。相手への敬意を保ちながら、聞き取りやすいゆっくりした速さと、落ち着いた声の高さを選ぶ。その配慮こそが、世代を超えて信頼される話し手の条件です。",
+    "form": "高齢化",
+    "en": "In a society where aging is advancing, ways of speaking change too. For older listeners, avoiding fast speech, breaking sentences short and repeating important words make the content far easier to get across. However, a tone as if addressing a child could instead hurt the other person's self-respect. Keeping respect while choosing a speed and pitch that are easy to hear. That consideration is the very condition of a speaker trusted across generations.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「高齢化社会・高齢化が進む」。年を重ねた人の割合が社会で増える現象を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "麓",
+   "reading": "ふもと",
+   "pos": "noun",
+   "meaning": "foot of a mountain",
+   "defJa": "山のふもと。山のすそ",
+   "passage": {
+    "ja": "富士山の麓には、古くから、山を神として拝む人々の暮らしがありました。江戸時代には、各地に富士講という信仰の集団が作られ、人々は食べ物を節約して旅費をため、順番に山へ登ったのです。いつの間にか、山は信仰の対象であると同時に、人々の結びつきを生む存在にもなっていました。その賑わいは、現代の登山者の群れにも、どこか通じるものがあります。山を見上げる暮らしは、人の心の持ち方まで形づくってきたのでしょう。",
+    "form": "麓",
+    "en": "At the foot of Mount Fuji, there had long been the lives of people who worshiped the mountain as a god. In the Edo period, faith groups called Fuji-ko were formed in various places, and people saved on food to build up travel money and climbed the mountain in turn. Before they knew it, the mountain had become both an object of faith and something that created bonds among people. That bustle has something in common with the crowds of modern climbers. A life of looking up at a mountain has probably shaped even people's attitudes of mind.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「山の麓」「麓の町」。山の下のほう、すそ野の一帯を指す。難読漢字の一つ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "いつの間にか",
+   "reading": "いつのまにか",
+   "pos": "adverb",
+   "meaning": "before one knows it",
+   "defJa": "気づかないうちに、知らぬ間に",
+   "passage": {
+    "ja": "歴史の授業って、最初のうちは年号ばかりでつまらないって思ってたのに、いつの間にか人間ドラマとして読んじゃってるんですよね。たとえば戦国時代の武将なんて、現代の会社でいう中間管理職みたいな悩みを抱えてたりして。そう考えると、五百年ほど前の人たちが、急に身近に感じられてくるじゃないですか。そうなったらもう、年号なんて、つい勝手に頭に入ってきますよ。歴史は、暗記する科目というより、覗き込む窓みたいなものなんですよね。",
+    "form": "いつの間にか",
+    "en": "In history class I thought it was boring at first, all dates, but before I knew it I was reading it as human drama. For example, warlords of the Warring States era had worries like those of middle managers in modern companies. When you think of it that way, people from some five hundred years ago suddenly begin to feel close, don't they? Once that happens, the dates somehow enter your head on their own before you know it. History is more like a window you peer through than a subject you memorize.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「いつの間にか〜ていた」。変化がいつ起きたか気づかないまま進んだ様子を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "おとなしい",
+   "reading": "おとなしい",
+   "pos": "i-adj",
+   "meaning": "quiet; docile",
+   "defJa": "静かで、すなおに言うことを聞く",
+   "passage": {
+    "ja": "「おとなしい子」は、教室では扱いやすいと見なされがちだが、その静けさの裏に、さまざまな気持ちが隠れていることがある。発言しないのは、考えがないからではなく、考えを整理するのに時間がかかるだけかもしれない。教師が、すぐに答えを求める代わりに、書く時間を与えると、思いがけない鋭い意見が出てくることも少なくない。静かな子どもを、逸材として見る視点が、教育の現場でも広がりつつある。",
+    "form": "おとなしい",
+    "en": "A quiet child tends to be regarded as easy to handle in the classroom, but behind that quietness various feelings may be hidden. Not speaking may not be because there is no thought, but perhaps only that organizing thoughts takes time. If a teacher gives time to write instead of demanding an answer right away, it is not uncommon for unexpectedly sharp opinions to come out. A viewpoint that sees quiet children as outstanding talents is spreading in the field of education as well.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "人や動物、子どもに使う。「おとなしい性格」。控え目で扱いやすい良い面と、消極的な面の両方。",
+    "sense": "静かですなお"
+   }
+  },
+  {
+   "term": "お構いなく",
+   "reading": "おかまいなく",
+   "pos": "expression",
+   "meaning": "please don't bother",
+   "defJa": "どうぞ気をつかわないでほしい、の気持ちを表す",
+   "passage": {
+    "ja": "日本語の「お構いなく」は、相手の気遣いを、やんわりと断るときの表現です。人工知能の対話サービスにこの言葉を入力すると、字面どおりに「構わない」という意味と、辞退を伝える意味が、混同されることがあります。これは、文脈によって意味が変わる丁寧表現が、機械にとって、いかに難しいかを示す好例です。試験でも、この種の慣用表現は、出題項目として定番ですから、場面とセットで覚えておくと確実に得点できます。",
+    "form": "お構いなく",
+    "en": "The Japanese okamainaku is an expression for gently declining the other person's attentiveness. When this phrase is entered into a conversational artificial-intelligence service, the literal sense of not minding and the sense of conveying a polite refusal are sometimes confused. This is a good example of how hard polite expressions whose meaning changes with context are for machines. On exams too, this kind of idiom is a standard item, so learning it together with its scene earns you points reliably.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "来客への気づかいを、やんわり断る表現。字面どおりの意味と混同しやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "お湯",
+   "reading": "おゆ",
+   "pos": "noun",
+   "meaning": "hot water",
+   "defJa": "わかして、あつくした水",
+   "passage": {
+    "ja": "「お湯」と「水」は、英語圏では同じ仲間として扱われますが、日本語では、温度によって別の語が使い分けられます。「湯を沸かす」とは言っても、「水を沸かす」とは普通言いません。これは、日本人が昔から、湯と水を別の存在として感じてきたことの現れかもしれません。湯気の向こうでゆっくりと疲れを溶かす風呂の文化を持つ国ならではの、言葉の感覚だといえるでしょう。言葉の差は、暮らしの差でもあるのです。",
+    "form": "お湯",
+    "en": "Oyu and mizu are treated as the same kind in the English-speaking world, but in Japanese different words are used depending on temperature. One says boil the hot water but ordinarily does not say boil the water. This may be a sign that the Japanese have long felt hot water and cold water to be different things. It can be called a linguistic sense unique to a country with a bathing culture that slowly melts away fatigue beyond the steam. A difference in words is also a difference in life.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「お湯を沸かす・お湯に浸かる」。水に対し、熱した水を指す。『お』をつけて丁寧に言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ぐったり",
+   "reading": "ぐったり",
+   "pos": "adverb",
+   "meaning": "exhausted, limp",
+   "defJa": "疲れて、力が抜けた様子",
+   "passage": {
+    "ja": "仕事から帰って、ぐったり疲れているのに、スマホを手放せない。そんな夜を、多くの人が経験しています。実は、脳は疲れているときほど、自分で考えなくても刺激を与えてくれる動画や画面に、引き寄せられやすいのです。休息のつもりが、かえって疲れを増やす結果になるのは、そのためです。本当に回復したいなら、画面から離れて、ゆっくり時間をかけてお湯につかるほうが、はるかに効果的です。",
+    "form": "ぐったり",
+    "en": "Coming home from work, I am limp with exhaustion and yet cannot let go of my phone. Many people experience such nights. In fact, the more tired the brain is, the more easily it is drawn to videos and screens that give stimulation without your having to think for yourself. That is why what was meant as rest ends up increasing fatigue instead. If you truly want to recover, stepping away from the screen and soaking slowly in hot water is far more effective.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「ぐったり疲れる／ぐったりする」。体の力が抜けてしまう様子を表す擬態語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ご無沙汰",
+   "reading": "ごぶさた",
+   "pos": "noun",
+   "meaning": "long silence (not writing or visiting)",
+   "defJa": "長い間、訪ねも連絡もしないでいること",
+   "passage": {
+    "ja": "インド出身の友人や取引先に、久しぶりにメールを送るときは、冒頭で「ご無沙汰しております」と一言添えると、礼儀正しい印象になります。この表現は、長く連絡しなかったことへの、軽いお詫びの気持ちを含んでいます。そのあとに、近況を一文だけ追加すると、相手との関係がぐっと近づきます。ビジネスメールでは、挨拶の定型表現をいくつか暗記しておくと、場面に応じて使い分けられます。",
+    "form": "ご無沙汰",
+    "en": "When sending an email after a long time to friends or business contacts from India, adding a word at the opening like long time no contact gives a polite impression. This expression contains a light feeling of apology for not having been in touch for long. If you then add just one sentence about how you have been, the relationship with the other person draws much closer. In business emails, memorizing several set greeting phrases lets you use them selectively according to the situation.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「ご無沙汰しております」はメールや電話の冒頭の挨拶。長い無沙汰を軽くわびる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "さびる",
+   "reading": "さびる",
+   "pos": "verb",
+   "meaning": "to rust",
+   "defJa": "金属が、空気や水でいたんで赤茶色になる",
+   "passage": {
+    "ja": "インドのデリーには、千五百年以上、さびることなく立ち続けている鉄の柱があります。高い純度の鉄に、リンが多く含まれていることが、表面に保護膜を作り、腐食を防いでいるといわれています。つねに風雨にさらされながら、古代の職人たちが、理論ではなく経験によって、この金属の性質を見抜いていたと考えると、感嘆を禁じ得ません。この柱は、技術が必ずしも新しいほど優れているとは限らないことを、静かに教えてくれます。",
+    "form": "さびる",
+    "en": "In Delhi, India, there is an iron pillar that has stood for over fifteen hundred years without rusting. It is said that the iron's high purity and large phosphorus content form a protective film on the surface and prevent corrosion. Considering that ancient craftsmen, constantly exposed to wind and rain, saw through the nature of this metal not by theory but by experience, one cannot suppress admiration. This pillar quietly teaches us that technology is not necessarily better the newer it is.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「鉄がさびる／さびついた」。金属の表面が酸化して傷む意味で、「頭がさびる」の比喩も。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "しかたがない",
+   "reading": "しかたがない",
+   "pos": "expression",
+   "meaning": "it can't be helped",
+   "defJa": "ほかにどうすることもできない、あきらめ",
+   "passage": {
+    "ja": "「しかたがない」という言葉は、日本人の心の持ち方を象徴するといわれます。変えられない現実を受け入れて、気持ちを切り替えるときには、この言葉が心の支えになります。しかし、変えられるものまであきらめの言葉で片づけてしまうと、自ら行動する力そのものが失われていきます。大切なのは、変えられることと、そうでないことを、静かに見分ける知恵です。言葉は、心を守る盾にも、動きを止める錠にもなる。",
+    "form": "しかたがない",
+    "en": "The phrase shikata ga nai is said to symbolize the Japanese way of holding the mind. When accepting an unchangeable reality and switching your feelings, this phrase becomes a support for the heart. But if you dismiss even what can be changed with words of resignation, the very power to act on your own is lost. What matters is the wisdom to quietly tell apart what can be changed from what cannot. Words can be a shield that protects the heart and also a lock that stops movement.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "変えられない状況を受け入れる気持ち。しかし、変えられる事まで使うと消極的になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "じきに",
+   "reading": "じきに",
+   "pos": "adverb",
+   "meaning": "soon, before long",
+   "defJa": "まもなく。時をおかず",
+   "passage": {
+    "ja": "睡眠不足で集中できない状態は、じきに慢性的な疲労へと変わっていくと、専門家は警告している。最初は、午後の眠気や小さなミスといった軽い症状にとどまるが、放置すると、判断力の低下や気分の落ち込みにまで及びかねない。疲労が絶えず積み重なる前に、早めに対策をとることが重要で、まず就寝と起床の時刻を一定に保つことが、最も基本的な方法とされる。体のサインを軽く見ない姿勢が、長い目で見た健康を守ることにつながる。",
+    "form": "じきに",
+    "en": "A state of being unable to concentrate from lack of sleep will soon turn into chronic fatigue, experts warn. At first it stays at mild symptoms such as afternoon drowsiness and small mistakes, but if left alone it could extend to declining judgment and a depressed mood. It is important to take measures early, before fatigue piles up constantly, and keeping bedtime and wake-up time constant is regarded as the most basic method. An attitude of not taking the body's signals lightly leads to protecting health over the long term.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「じきに〜なる」。ほどなく起きる変化を言う。やや話し言葉に近いが報道にも使われる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "すべて",
+   "reading": "すべて",
+   "pos": "noun",
+   "meaning": "all",
+   "defJa": "ひとつ残らず、全部",
+   "passage": {
+    "ja": "歴史の勉強で、すべてを暗記しようとすると、必ず途中で挫折します。大切なのは、時代の大きな流れを、一本の物語として理解することです。流れが分かっていれば、細かい年号や人名は、あとから自然にその物語へ紐づいていきます。まずは教科書の各章の見出しと項目だけを、声に出して順にたどってみてください。年号は、物語を支える目印として、あとから少しずつ増やせば十分で、焦る必要はまったくありません。",
+    "form": "すべて",
+    "en": "When you try to memorize everything in studying history, you always give up partway. What matters is to understand the big flow of the eras as one story. If you grasp the flow, the detailed dates and names attach themselves naturally to that story afterward. First, try tracing just the headings and items of each chapter of the textbook in order, out loud. Dates are enough if you increase them little by little afterward as markers that support the story.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「すべてを〜」「すべての〜」。例外なく全体を指し、全部より改まった語感がある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "せいぜい",
+   "reading": "せいぜい",
+   "pos": "adverb",
+   "meaning": "at most; at best",
+   "defJa": "多く見積もっても。たかだか",
+   "passage": {
+    "ja": "江戸時代の庶民が、一生のうちに旅できた範囲は、せいぜい近隣の数か国までだったとされる。それでも、お伊勢参りのような信仰を理由にした旅には、例外的に許可が下りやすかった。関所を通るには手形が必要で、紙一枚の有無が、人の自由な移動を左右していたのである。旅先では、藩ごとに通用する藩札という紙幣を、両替しなければならない場面もあった。それでも、人々の旅への憧れは強く、各地の名所を紹介する案内記が数多く出版された。",
+    "form": "せいぜい",
+    "en": "The range that ordinary people of the Edo period could travel in a lifetime is said to have been at most a few neighboring provinces. Even so, permission was exceptionally easy to obtain for trips on religious grounds such as pilgrimage to Ise. Passing a checkpoint required a travel permit, and the presence or absence of a single sheet of paper governed people's freedom of movement. On the road, there were also occasions when one had to exchange the paper money called han-satsu, valid domain by domain. Even so, people's longing for travel was strong, and many guidebooks introducing famous places in various regions were published.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「せいぜい〜程度」。上限を低く見て、たいしたことがないと言うときの副詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ただし",
+   "reading": "ただし",
+   "pos": "adverb",
+   "meaning": "however; provided that",
+   "defJa": "ただ、条件や例外をつけ加える",
+   "passage": {
+    "ja": "人前で話すとき、結論を先に伝える手法は、多くの場面で有効です。ただし、苦情を訴える電話のように、相手が感情的になっているときは、結論より先に、まず気持ちを受け止める一言を添えるほうが、話がスムーズに進みます。伝える順番は、情報の価値だけでなく、相手の心の状態によっても変わるからです。型を知ったうえで、目の前の相手に合わせて崩せる人が、話し方の達人です。型は、守るためだけでなく、崩すために覚えるものでもあります。",
+    "form": "ただし",
+    "en": "When speaking in public, the technique of conveying the conclusion first is effective in many situations. However, when the other person is emotional, as on a phone call complaining about a problem, adding a word that first receives their feelings, ahead of the conclusion, makes the talk go more smoothly. This is because the order of conveying changes not only with the value of the information but also with the state of the other person's heart. A person who knows the form and can break it to suit the person before them is a master of speech. A form is something you learn not only to keep but also to break.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "前の文に、条件・例外・注意を付け足す接続詞。「ただし、〜に限る」の形も多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "つい",
+   "reading": "つい",
+   "pos": "adverb",
+   "meaning": "unintentionally; before one realizes",
+   "defJa": "そうするつもりはないのに、思わず、うっかり",
+   "passage": {
+    "ja": "歴史の本を読んでいると、つい夜更かしをしてしまう、という人は多いはずです。それは、歴史が、単なる過去の記録ではなく、人間の欲望や裏切り、友情といった、普遍的なドラマに満ちているからです。たとえば、織田信長と明智光秀の関係を知ると、現代の職場の人間関係にも通じる部分があって、思わず引き込まれてしまいます。過去の人々の選択を追体験することが、歴史を読む一番の楽しみかもしれません。",
+    "form": "つい",
+    "en": "Many people must find that while reading history books they unintentionally stay up late. That is because history is not a mere record of the past but is full of universal dramas of human desire, betrayal and friendship. For example, learning about the relationship between Oda Nobunaga and Akechi Mitsuhide, you find parts that also resonate with human relations in a modern workplace, and you are drawn in involuntarily. Reliving the choices of people of the past may be the greatest pleasure of reading history.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「つい〜してしまう」の形で、意図せずやってしまうことを言う。後悔や苦笑を含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ついている",
+   "reading": "ついている",
+   "pos": "expression",
+   "meaning": "to be lucky",
+   "defJa": "運がよい。めぐまれている",
+   "passage": {
+    "ja": "言葉の力は、不運な出来事を、前向きに言い換えられるかどうかにも現れます。たとえば、雨の日に「ついてない」と嘆く代わりに、「おかげで傘を新調できた」と笑うこともできます。同じ出来事でも、自分は今日ついていると語る人の周りには、自然と人が集まってくるものです。話し方を磨くとは、自らの世界の見え方を磨くことにほかなりません。運の良し悪しは、起きた出来事ではなく、語り方に宿るのかもしれません。",
+    "form": "ついている",
+    "en": "The power of words also shows in whether you can rephrase an unlucky event positively. For example, instead of lamenting that you have no luck on a rainy day, you can laugh and say that thanks to it you could get a new umbrella. Even for the same event, people tend to gather naturally around someone who says that he is lucky today. Polishing how you speak is nothing other than polishing how you see your own world. Whether you are lucky or unlucky may dwell not in what happened but in how you tell it.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「今日はついている」。『ついてない』の反対で、運に恵まれている状態を言う口語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "つねに",
+   "reading": "つねに",
+   "pos": "adverb",
+   "meaning": "always, constantly",
+   "defJa": "どんなときも。いつでも",
+   "passage": {
+    "ja": "インドの伝統医学アーユルヴェーダは、心と体と環境が、つねに影響し合っていると考えます。たとえば、季節ごとに食べ物や生活の習慣を変えることで、体の調和を保とうとするのです。現代の研究でも、生活リズムや食事の内容が、気分や免疫力と関係していることが少しずつ明らかになっています。古い知恵と新しい科学の連携が、思いがけない形で進んでいるのは、とても興味深いことです。",
+    "form": "つねに",
+    "en": "Ayurveda, India's traditional medicine, holds that mind, body and environment are always affecting each other. For example, it tries to keep the body in harmony by changing food and daily habits with each season. In modern research as well, it is gradually becoming clear that the rhythm of life and the content of meals are related to mood and immunity. It is very interesting that the cooperation between old wisdom and new science is advancing in unexpected forms.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「つねに〜している」。「いつも」より改まっていて、書き言葉や講義で多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "つらい",
+   "reading": "つらい",
+   "pos": "i-adj",
+   "meaning": "painful; hard",
+   "defJa": "心や体が苦しくて、耐えがたい",
+   "passage": {
+    "ja": "人工知能に悩みを打ち明けるのって、つらいときほど楽なんですよね。だって、相手は疲れないし、絶えず話を聞いてくれるし、何度同じ話をしても怒らないから。でも、その楽さに慣れすぎると、人と話すときのちょっとした気まずさに耐えられなくなりそうで、少し怖いんです。苦しみを分かち合うって、本当は、相手の時間を分けてもらうことでもあるんですよね。だから私は、機械には相談しきれない話を、人に預ける勇気も持っていたいんです。",
+    "form": "つらい",
+    "en": "Confiding worries to artificial intelligence is easier precisely when things are painful, you know. Because the other party does not tire, keeps listening to you constantly, and never gets angry however many times you tell the same story. But if I get too used to that ease, I feel I might become unable to bear the little awkwardness of talking with people, and that is a little scary. Sharing suffering is really also receiving a share of the other person's time. So I want to keep the courage to entrust to people the stories I cannot fully confide to a machine.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「つらい経験・つらい思い」。苦しい、耐えがたいという感情を、自分の側から言う。",
+    "sense": "苦しく耐えがたい"
+   }
+  },
+  {
+   "term": "でこぼこ",
+   "reading": "でこぼこ",
+   "pos": "na-adj",
+   "meaning": "bumpy; uneven",
+   "defJa": "表面が平らでなく、高い所と低い所がある",
+   "passage": {
+    "ja": "古い街道の石畳を歩くと、でこぼこの感触が足の裏から伝わってくる。この不揃いな表面は、何世紀もの間に、人や馬車や雨風が刻んだ時間の記録にほかならない。平らに舗装し直せば歩きやすくなるが、同時に、そこに積もっていた歴史の層も、一緒にならされてしまう。便利さと記憶の保存をどう両立させるかは、古い町を持つすべての国が抱える悩みである。新しい舗装の下にも、いつか誰かが刻む記憶が眠るのだろう。",
+    "form": "でこぼこ",
+    "en": "Walking on the cobblestones of an old highway, the feel of unevenness comes up through the soles of your feet. This irregular surface is nothing other than a record of time carved over the centuries by people, carriages, wind and rain. If it is paved flat again it becomes easier to walk on, but at the same time the layers of history that had piled up there are leveled along with it. How to reconcile convenience with the preservation of memory is a worry shared by every country with old towns. Beneath the new paving too, memories that someone will carve someday will sleep.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "道・肌・石などの表面。「でこぼこ道」。平らでなく、ざらついた様子を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "なだらか",
+   "reading": "なだらか",
+   "pos": "na-adj",
+   "meaning": "gently sloping",
+   "defJa": "傾きがゆるやかで、急でない様子",
+   "passage": {
+    "ja": "人工知能の学習では、損失関数と呼ばれる値の「地形」を、少しずつ下って最適な状態を探します。この地形がなだらかな斜面であれば、一歩ずつ着実に進めますが、険しい谷や崖があると、学習は不安定になります。そこで研究者は、地形をできるだけ滑らかにするために、さまざまな工夫を重ねてきました。見えない山道を、手探りで下っていくような作業だと考えると、イメージしやすいでしょう。",
+    "form": "なだらか",
+    "en": "In the learning of artificial intelligence, one searches for the optimal state by descending bit by bit the terrain of a value called the loss function. If this terrain is a gently sloping hillside, you can proceed steadily step by step, but if there are steep valleys or cliffs, learning becomes unstable. So researchers have piled up various devices to make the terrain as smooth as possible. It is easy to picture if you think of it as work like groping your way down an invisible mountain path.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「なだらかな坂・丘陵」。傾きや変化がゆるやかなこと。比喩で変化の穏やかさにも。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "のろい",
+   "reading": "のろい",
+   "pos": "i-adj",
+   "meaning": "slow",
+   "defJa": "動きや進み方が、おそい",
+   "passage": {
+    "ja": "勉強の進みがのろいと感じて、焦ってしまう人は多いですが、速さと理解の深さは、別のものです。実際、基礎をじっくり固めた人のほうが、あとから応用問題で一気に伸びることがよくあります。大事なのは、他人の進度と比べることではなく、昨日の自分より少し前に進めたかを確かめることです。ゆっくりでも、毎日続けていれば、いつの間にか、景色は大きく変わっています。焦りは、いちばん大切な継続の力を、静かに奪っていきます。",
+    "form": "のろい",
+    "en": "Many people feel their study is progressing slowly and become impatient, but speed and depth of understanding are different things. In fact, people who have firmly built the basics often grow in a rush later on application problems. What matters is not comparing with others' progress but checking whether you have moved a little further than yesterday's self. Even if slowly, if you continue every day, before you know it the scenery has changed greatly. Impatience quietly robs you of the most important power of continuing.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "動作や進みがおそい意。「のろい亀」。やや批判的な響きがあり、「ゆっくり」と区別。",
+    "sense": "動きがおそい"
+   }
+  },
+  {
+   "term": "ほがらか",
+   "reading": "ほがらか",
+   "pos": "na-adj",
+   "meaning": "cheerful, sunny",
+   "defJa": "心が明るく、晴れ晴れしている",
+   "passage": {
+    "ja": "ロボットの受付係って、ほがらかな声で話しかけてくるものの、なんか違和感があるんですよね。声のトーンは完璧なのに、相手の表情を見て間を調整することはまだ苦手だから、会話のテンポがずれるんです。それでも、小さな子どもたちは、そんな不器用なロボットにも、すぐに懐いたりします。完璧じゃないからこそ、その不器用さが、かえって長所として働く場合もあるんでしょうね。機械に完璧さを求める前に、私たちの側の期待も見直す必要がありそうです。",
+    "form": "ほがらか",
+    "en": "Robot receptionists speak to you in a cheerful voice, but something about it feels off, you know. The tone of voice is perfect, but it is still bad at adjusting the pauses by looking at the other person's expression, so the tempo of the conversation goes out of sync. Even so, small children take to such clumsy robots right away. Precisely because it is not perfect, its clumsiness may work as a merit instead. Before demanding perfection from machines, it seems we need to review our own expectations too.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「ほがらかな声・性格」。曇りのない明るさを言い、笑い声や人柄にも使う。",
+    "sense": ""
+   }
+  }
+ ]
+}
