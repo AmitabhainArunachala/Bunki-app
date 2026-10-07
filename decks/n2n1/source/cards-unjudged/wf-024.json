@@ -1,0 +1,1004 @@
+{
+ "cards": [
+  {
+   "term": "ご利益",
+   "reading": "ごりやく",
+   "pos": "noun",
+   "meaning": "divine favor; blessing; benefit",
+   "defJa": "神仏から授かる、ありがたい恵み。",
+   "passage": {
+    "ja": "お寺や神社でお参りをするとき、多くの人が思い浮かべるのがご利益でしょう。厄除け、学業成就、商売繁盛と、場所ごとに得意分野があるのも面白いところです。ただ、仏教の本来の教えでは、見返りを求めて拝むこと自体が執着の一つとされ、縁起を深く見つめる態度とは少し距離があります。それでも、祈る行為の底には、不安を和らげて前へ進む力を得たいという素朴な願いがあります。その意味では、お参りは気持ちの整理を助ける装置だと考えることもできるでしょう。",
+    "form": "ご利益",
+    "en": "When people pay a visit at a temple or shrine, what many think of is divine favor. It is also interesting that each place has its own specialty: warding off misfortune, success in studies, business prosperity. However, in the original teaching of Buddhism, praying in expectation of a return is itself regarded as a kind of attachment, and it sits somewhat apart from the attitude of looking deeply into dependent origination. Even so, at the bottom of the act of praying is a simple wish to ease anxiety and gain strength to move forward. In that sense, a visit can also be thought of as a device that helps sort out one's feelings.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「ご利益がある」「ご利益にあずかる」。神仏の恵みを敬って言う。仏教の「利益」は「りやく」と読む。",
+    "sense": "神仏から授かる恵み"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "たとえ話",
+   "reading": "たとえばなし",
+   "pos": "noun",
+   "meaning": "illustrative story; parable; analogy",
+   "defJa": "わかりやすく伝えるために使う、たとえの話。",
+   "passage": {
+    "ja": "難しい話をするとき、たとえ話を一つ持っているかどうかで、伝わり方は大きく変わります。たとえば、記憶の仕組みを「図書館の本棚」にたとえると、聞き手は頭の中に絵を描きながら聞いてくれます。ただし、たとえが長すぎると、本題より比喩のほうが印象に残ってしまうので要注意です。コツは、聞き手の生活にすでにあるものを選ぶこと。ワーキングメモリの容量を「机の広さ」に置き換えるだけでも、理解の速さはまるで違います。",
+    "form": "たとえ話",
+    "en": "When you talk about something difficult, how well it gets across changes greatly depending on whether you have an illustrative story at hand. For example, if you liken the workings of memory to “shelves in a library,” the listener draws a picture in their head as they listen. However, if the analogy is too long, the metaphor sticks in the mind more than the main point, so be careful. The knack is to choose something already present in the listener's life. Just swapping the capacity of working memory for “the size of a desk” makes the speed of understanding completely different.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「たとえ話をする」。抽象的な内容を具体的な話に置き換えて伝える手法で、講義や説法に多い。",
+    "sense": "わかりやすく伝えるためのたとえの話"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "である調",
+   "reading": "であるちょう",
+   "pos": "expression",
+   "meaning": "de-aru style (plain written style)",
+   "defJa": "文末を「である」で結ぶ、論文などの文体。",
+   "passage": {
+    "ja": "小論文の試験では、文体の統一が思いのほか大切な要素になる。である調で書き始めたのに、途中で「〜と思います」が混ざると、答案の完成度が見た目にも一気に下がって見える。書き終えたら、必ず各文の語尾だけを順に確かめる時間を、あらかじめ数分確保しておくとよい。逆に、文体さえ揃っていれば、内容が平凡でも読みやすい答案になる。この習慣は、日々のメモ書きの段階から身につけておくのが近道だ。",
+    "form": "である調",
+    "en": "In essay exams, unifying the style matters more than you would expect. If you start writing in the de-aru style and then a “to omoimasu” slips in midway, the polish of the answer appears to drop all at once. When you finish writing, it is good to set aside a few minutes beforehand to check just the endings of each sentence in turn. Conversely, as long as the style is consistent, even a commonplace content becomes an easy-to-read answer. The shortcut is to build this habit from the stage of everyday jotted notes.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「である調」は常体の一つ。対は「です・ます調」。論文や小論文の標準の文体。",
+    "sense": "文末を「である」で結ぶ文体"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "です・ます調",
+   "reading": "ですますちょう",
+   "pos": "expression",
+   "meaning": "desu/masu style (polite style)",
+   "defJa": "文末を「です・ます」で結ぶ、丁寧な文体。",
+   "passage": {
+    "ja": "面接や口頭試問では、です・ます調で一貫して話すことが基本になります。ところが、緊張すると「〜なんですけど」「〜じゃないですか」のように、くだけた言い方が混ざりやすくなります。これを防ぐには、あらかじめ想定問答を声に出して練習し、語尾の形を体に覚えさせるのが効果的です。ルーティンとして毎日五分続ければ、本番でも自然に切り替えられるようになります。語尾を整えるのにウィルパワーは要らず、型を決めるだけでいいのです。",
+    "form": "です・ます調",
+    "en": "In interviews and oral exams, speaking consistently in the desu/masu style is the basic rule. However, when nervous, casual phrasings such as “nandesu kedo” or “janai desu ka” tend to get mixed in. To prevent this, it is effective to practice anticipated questions and answers aloud and make your body memorize the shape of the endings. If you keep it up for five minutes a day as a routine, you will be able to switch naturally even on the day. Tidying up your endings takes no willpower, only fixing a form.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「です・ます調」は敬体。対は「である調」。話し言葉や丁寧な文章の基本の文体。",
+    "sense": "文末を「です・ます」で結ぶ文体"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ひらめき",
+   "reading": "ひらめき",
+   "pos": "noun",
+   "meaning": "flash of inspiration; hunch",
+   "defJa": "突然わく、よい考えや気づき。",
+   "passage": {
+    "ja": "難問の答えが、入浴中や散歩中に突然ひらめきとして浮かぶ経験は、多くの人にあるだろう。心理学では、課題から一度離れる「孵化期」が、無意識の処理を進めると説明される。ただし、何もしないで待てばよいわけではなく、事前に問題を十分に考え抜いていることが前提になる。机の前で粘った時間があってこそ、休息のあとに、散らばっていた知識が一気につながるのだ。この休息は、ワーキングメモリを空にする時間でもある。",
+    "form": "ひらめき",
+    "en": "Many people have had the experience of the answer to a hard problem popping up suddenly as a flash of inspiration in the bath or on a walk. Psychology explains that an “incubation period,” stepping away from the task once, advances unconscious processing. However, it is not enough to wait doing nothing; it presupposes that you have thought the problem through thoroughly beforehand. Only because of the time spent persisting at the desk do scattered pieces of knowledge connect all at once after a rest. This rest is also time for emptying working memory.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「ひらめきが浮かぶ」「ひらめきを得る」。「閃き」と書く。論理を飛び越えて突然わく考え。",
+    "sense": "突然わく、よい考え"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "もっともらしい",
+   "reading": "もっともらしい",
+   "pos": "i-adj",
+   "meaning": "plausible-sounding; seemingly reasonable",
+   "defJa": "いかにも本当らしく聞こえるさま。",
+   "passage": {
+    "ja": "生成AIの怖いところは、間違っていても、もっともらしい文章で答えてくるところです。文法は完璧で、口調も自信たっぷり、しかも一見、出典まで添えられている。だから、読んだ人は疑う理由を見つけにくいのです。実際には存在しない論文を引用する事例も報告されており、見かけの説得力と事実の正しさは別物だと言わざるを得ません。使う側には、流暢さに惑わされず、重要な点を自分で裏づける習慣が求められます。",
+    "form": "もっともらしい",
+    "en": "What is scary about generative AI is that even when it is wrong, it answers in plausible-sounding prose. The grammar is perfect, the tone full of confidence, and at first glance it even comes with sources attached. So people who read it find it hard to see a reason to doubt. Cases have been reported of it citing papers that do not actually exist, and one has to say that apparent persuasiveness and factual correctness are different things. Users are asked to build the habit of not being misled by fluency and corroborating important points themselves.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「もっともらしい理屈・顔つき」。いかにも筋が通っているように見えるが、疑わしい含みがある。",
+    "sense": "いかにも本当らしく聞こえる"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "アイデンティティ",
+   "reading": "あいでんてぃてぃ",
+   "pos": "noun",
+   "meaning": "identity",
+   "defJa": "自分が何者であるかという意識。",
+   "passage": {
+    "ja": "自分のアイデンティティって、何で決まると思います？国籍とか職業とかを思い浮かべる人が多いけど、実は、周りの人とのやり取りの中でだんだん形になっていくものなんですよ。たとえば転職したとき、名刺の肩書きが変わるだけで、自分の気持ちまでぐらついたりするじゃないですか。それは、肩書きに頼って自分を説明してたからなんです。だから、ときどき「肩書きを抜きにした自分」を言語化しておくのは、すごく大事なんですよ。",
+    "form": "アイデンティティ",
+    "en": "What do you think determines your identity? Many people picture nationality or occupation, but actually it's something that gradually takes shape through your dealings with the people around you. For example, when you change jobs, just the title on your business card changing can even shake how you feel about yourself, can't it? That's because you were relying on the title to explain yourself. So it's really important to put into words, from time to time, “myself without the title.”",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「アイデンティティ」は自己同一性。「アイデンティティの危機」など。国や集団への帰属意識にも使う。",
+    "sense": "自分が何者かという意識"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "アウトプット",
+   "reading": "あうとぷっと",
+   "pos": "noun",
+   "meaning": "output",
+   "defJa": "学んだことを外に向けて表すこと。",
+   "passage": {
+    "ja": "勉強って、インプットばっかりしてても、意外と身につかないんですよ。本を読んだら、その日のうちに誰かに説明するとか、メモ書き程度でもいいから三行まとめるとか、アウトプットを前提にしたほうがいい。人に話そうとすると、わかったつもりだった部分がスカスカだったことに気づくんです。そのときの悔しさが、次に読むときの姿勢を、ぐっと変えてくれます。結局、出す前提で入れた知識だけが、本当に残るんですよね。",
+    "form": "アウトプット",
+    "en": "With studying, even if you do nothing but input, it surprisingly doesn't stick. After reading a book, it's better to assume output: explain it to someone that same day, or sum it up in three lines, even just as a scribbled note. When you try to tell someone, you notice that the parts you thought you understood were hollow. The frustration then changes your stance the next time you read, quite a lot. In the end, only knowledge taken in on the premise of putting it out really stays.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「アウトプット」は外へ出すこと。対は「インプット」。学習・仕事・情報技術のどれでも使う。",
+    "sense": "外に向けて表し出すこと"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "アスペクト",
+   "reading": "あすぺくと",
+   "pos": "noun",
+   "meaning": "aspect (grammar)",
+   "defJa": "動作の進み具合や状態を表す文法の区分。",
+   "passage": {
+    "ja": "日本語教育の現場で、アスペクトの指導は難所の一つとされる。「窓が開いている」と「窓が開けてある」は、結果の状態を表す点で似ているが、誰かの意図が含まれるかどうかで違いが生じる。学習者は、動詞の語尾の形だけでなく、動作の局面をどう捉えるかという視点の切り替えを求められる。研究者は、文法の説明に先立って、場面の映像を見せる教材の効果を検証している。オノマトペが動作の局面をよく表す点も、この感覚と無関係ではないだろう。",
+    "form": "アスペクト",
+    "en": "In Japanese language teaching, instruction on aspect is regarded as one of the hard points. “Mado ga aite iru” and “mado ga akete aru” are alike in expressing a resulting state, but a difference arises according to whether someone's intention is included. Learners are asked not only for the shape of the verb ending but for a switch of viewpoint in how to grasp the phase of the action. Researchers are testing the effect of teaching materials that show video of the scene prior to the grammar explanation. That onomatopoeia express the phases of an action well is probably not unrelated to this sense.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「アスペクト」は動作の局面（開始・継続・完了）を表す文法範疇。「テンス」（時制）とは別。",
+    "sense": "動作の局面を表す文法の区分"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ウィルパワー",
+   "reading": "うぃるぱわー",
+   "pos": "noun",
+   "meaning": "willpower",
+   "defJa": "目標のために自分を抑え、やり抜く力。",
+   "passage": {
+    "ja": "ウィルパワーって、使うほど減っていくって説が昔あったじゃないですか。朝からいろんな我慢をすると、夕方には誘惑に負けやすくなるっていうやつ。でも最近は、この説に疑問を投げかける追試が続いてて、結果が揃ってないんですよ。結局のところ、気合いに頼るより、誘惑が目に入らない環境をつくって習慣化するほうが、確実なんじゃないかな。マシュマロ実験の印象が強いせいで、意志の弱さを責める空気が生まれたのも問題だと思う。",
+    "form": "ウィルパワー",
+    "en": "There was a theory a while back that willpower runs down the more you use it, wasn't there? The one where if you hold back in lots of ways from morning, by evening you give in to temptation more easily. But recently, follow-up studies casting doubt on this theory have continued, and the results don't line up. In the end, I think it's more reliable to build an environment where temptation isn't in sight and make it a habit than to rely on sheer spirit. I think it's also a problem that the strong impression left by the marshmallow experiment created an atmosphere of blaming weakness of will.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「ウィルパワー」は意志力。自己制御の研究で使われる語で、「意志力」とも言う。",
+    "sense": "目標のため自分を抑える意志の力"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ウィーン体制",
+   "reading": "うぃーんたいせい",
+   "pos": "noun",
+   "meaning": "Vienna System; Concert of Europe",
+   "defJa": "ナポレオン戦争後の、ヨーロッパの国際秩序。",
+   "passage": {
+    "ja": "ウィーン体制を人前で説明するときは、「ナポレオン戦争のあとの後始末」と、最初の一文で言い切ってしまうのが効果的である。一八一四年から翌年にかけてのウィーン会議で、列強は勢力の均衡を保つ仕組みを作り、革命前の秩序を取り戻そうとした。その中心にいたのが、オーストリアのメッテルニヒである。体制は一八四八年の革命で大きく揺らぐが、会議外交という発想そのものは、のちのヴェルサイユ体制にも受け継がれた。",
+    "form": "ウィーン体制",
+    "en": "When explaining the Vienna System to an audience, it is effective to state in the very first sentence, “the cleanup after the Napoleonic Wars.” At the Congress of Vienna from 1814 into the following year, the great powers built a mechanism for maintaining the balance of power and sought to restore the pre-revolutionary order. At its center was Austria's Metternich. The system was greatly shaken by the revolutions of 1848, but the very idea of conference diplomacy was inherited even by the later Versailles system.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「〜体制」は国際秩序の枠組み。「ウィーン体制」「ヴェルサイユ体制」と並べて覚える。",
+    "sense": "ナポレオン戦争後の欧州の秩序"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "エピソード記憶",
+   "reading": "えぴそーどきおく",
+   "pos": "noun",
+   "meaning": "episodic memory",
+   "defJa": "個人の体験を時間や場所とともに覚える記憶。",
+   "passage": {
+    "ja": "エピソード記憶は、「昨日の夕食に何を食べたか」のように、個人の経験を、時間や場所といった状況とともに思い出す記憶である。一方、「パリはフランスの首都だ」という知識は意味記憶と呼ばれ、いつ覚えたかは問われない。加齢に伴って衰えやすいのは、どちらかといえば前者のほうだとされる。そのため認知症の初期には、体験を丸ごと忘れる症状が目立つ。研究者は、コルチゾールの濃度との関連も調べている。",
+    "form": "エピソード記憶",
+    "en": "Episodic memory is memory in which one recalls personal experience together with time and place, as in “what did I eat for dinner yesterday.” On the other hand, knowledge such as “Paris is the capital of France” is called semantic memory, and when it was learned is not asked. It is the former that is said to decline easily with age. For that reason, in the early stage of dementia, the symptom of forgetting an experience whole stands out. Researchers are also examining the link with cortisol levels.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "記憶の種類。対は「意味記憶」。タルヴィングが区別した。体験の「いつ・どこで」を伴う。",
+    "sense": "個人の体験を覚える記憶"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "オノマトペ",
+   "reading": "おのまとぺ",
+   "pos": "noun",
+   "meaning": "onomatopoeia; mimetic words",
+   "defJa": "音や様子をまねて作った言葉。",
+   "passage": {
+    "ja": "日本語は、オノマトペが特に豊富な言語の一つとして知られている。「ふわふわ」「きらきら」のような擬態語は、感覚を直接伝えるため、外国人学習者が最初に習得する語彙にも含まれやすい。一方で、「しっとり」と「じっとり」のように、微妙な違いを説明しなければならないものは、中上級者にとって難関になる。試験では、文脈から意味を絞り込む力が試されるので、音の響きから語感をつかむ練習も欠かせない。",
+    "form": "オノマトペ",
+    "en": "Japanese is known as one of the languages especially rich in onomatopoeia. Mimetic words like “fuwafuwa” and “kirakira” convey sensation directly, so they tend to be included even in the vocabulary foreign learners acquire first. On the other hand, ones like “shittori” and “jittori,” whose subtle difference must be explained, become a hurdle for intermediate and advanced learners. Since exams test the ability to narrow down meaning from context, practice in grasping the feel of words from the sound is also indispensable.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "擬音語・擬声語・擬態語の総称。「ふわふわ」「どきどき」など。日本語は種類が非常に多い。",
+    "sense": "音や様子をまねた言葉"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "グローバル化",
+   "reading": "ぐろーばるか",
+   "pos": "noun",
+   "meaning": "globalization",
+   "defJa": "人・物・資金・情報が国境を越えて広がること。",
+   "passage": {
+    "ja": "グローバル化は、国境を越えた人・物・資金の動きが急速に増える現象である。十九世紀の蒸気船と電信、二十世紀末のインターネットという二つの大きな波が、その速度を押し上げてきた。便利さが増す一方で、遠い国の景気の悪化が、すぐに自国の工場を止めてしまう脆さも明らかになった。コロナ禍では、サプライチェーンの途絶が、世界中で品不足を引き起こした。国と国との関係は、シーパワーが支えた十九世紀以上に、物流の安定に依存している。",
+    "form": "グローバル化",
+    "en": "Globalization is the phenomenon in which the movement of people, goods and money across borders increases rapidly. Two great waves, the steamship and telegraph of the nineteenth century and the internet of the late twentieth, have pushed up its speed. As convenience increased, the fragility of a distant country's economic downturn immediately stopping one's own factories also became clear. In the pandemic, disruptions to supply chains caused shortages around the world. Relations between countries depend on the stability of logistics even more than in the nineteenth century that sea power supported.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「〜化」は変化を表す接尾辞。「グローバル化」は国際化より、世界が一体になる進行を指す。",
+    "sense": "国境を越えて世界が一体化すること"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "コルチゾール",
+   "reading": "こるちぞーる",
+   "pos": "noun",
+   "meaning": "cortisol",
+   "defJa": "ストレスを受けると分泌されるホルモン。",
+   "passage": {
+    "ja": "コルチゾールは、ストレスを受けたときに分泌されるホルモンで、一般に「ストレスホルモン」と呼ばれています。短期的には、血糖を上げて体を戦闘態勢にしてくれる、頼もしい味方です。ところが、強いストレスが長く続くと、分泌が過剰になり、記憶をつかさどる海馬の働きを弱めてしまうことがわかっています。だから、試験前の追い込みで睡眠を削るのは、実は逆効果なんですね。ストレス耐性を高めたいなら、まず眠ることです。",
+    "form": "コルチゾール",
+    "en": "Cortisol is a hormone secreted when you are under stress, generally called the “stress hormone.” In the short term it is a reliable ally that raises blood sugar and puts the body on a combat footing. However, it has been found that when strong stress continues long, secretion becomes excessive and weakens the function of the hippocampus, which governs memory. So cutting sleep for a last-minute push before exams is in fact counterproductive. If you want to raise your stress tolerance, first of all, sleep.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "副腎から分泌される糖質コルチコイド。「ストレスホルモン」として知られ、海馬の働きにも影響する。",
+    "sense": "ストレスで分泌されるホルモン"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "コンフォートゾーン",
+   "reading": "こんふぉーとぞーん",
+   "pos": "noun",
+   "meaning": "comfort zone",
+   "defJa": "失敗の不安が少なく、安心して過ごせる範囲。",
+   "passage": {
+    "ja": "コンフォートゾーンとは、失敗の不安が少なく、心地よく過ごせる行動範囲を指す。そこにとどまり続けると、確かに安心は得られるが、新しい能力を育てる機会は減っていく。心理学の古典的な研究では、適度な緊張があるときに、課題の成績が最も高くなるとされている。だから、成長を求めるなら、手の届く少し先の課題を選び、小さな挑戦を重ねるのが現実的な方法だという。ただ、その挑戦の幅を決めるのは、ストレス耐性に応じた、人それぞれの物差しである。",
+    "form": "コンフォートゾーン",
+    "en": "The comfort zone refers to the range of behavior in which there is little worry about failure and one can feel at ease. Staying in it, you do get peace of mind, but the chances to develop new abilities decrease. In classic psychological research, performance on a task is said to be highest when there is moderate tension. So if you seek growth, the realistic way is said to be choosing a task a little beyond your reach and piling up small challenges. Still, what sets the width of that challenge is each person's own yardstick, according to their stress tolerance.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「コンフォートゾーンを出る・抜ける」。慣れて安心できる領域のこと。成長の話で使う。",
+    "sense": "慣れて安心できる行動の範囲"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "サプライチェーン",
+   "reading": "さぷらいちぇーん",
+   "pos": "noun",
+   "meaning": "supply chain",
+   "defJa": "原材料から消費者の手元までの供給の連なり。",
+   "passage": {
+    "ja": "一台のスマートフォンができるまでに、部品は十か国以上を旅すると言われます。設計はアメリカ、半導体は台湾、組み立ては中国といった具合に、サプライチェーンは地球規模で張りめぐらされているのです。効率は高いですが、一か所が止まれば全体が止まる、という弱点も抱えています。二〇二一年の半導体不足では、自動車メーカーが生産を減らさざるを得ませんでした。グローバル化の便利さと危うさが、一度に見えた出来事でした。",
+    "form": "サプライチェーン",
+    "en": "It is said that before a single smartphone is made, its parts travel through more than ten countries. With design in the United States, semiconductors in Taiwan and assembly in China, supply chains are strung across the globe. It is highly efficient but carries the weakness that if one point stops, the whole stops. In the semiconductor shortage of 2021, automakers had no choice but to cut production. It was an event in which both the convenience and the precariousness of globalization were seen at once.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「サプライチェーン」は部品調達から販売までの流れ。「供給網」とも言う。途絶や再編の話で出る。",
+    "sense": "原料から消費者までの供給の連なり"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "サンクコスト",
+   "reading": "さんくこすと",
+   "pos": "noun",
+   "meaning": "sunk cost",
+   "defJa": "すでに支払い、取り戻せない費用。",
+   "passage": {
+    "ja": "映画がつまらないとわかっても、「高いお金を払ったんだから」と最後まで見てしまった経験はありませんか。これがサンクコスト、つまり、すでに支払って戻らない費用にとらわれる心理です。ウィルパワーに頼らず合理的に考えれば、過去の出費は取り戻せないので、これからの時間を何に使うかだけで判断すべきなのです。ところが人は、損を確定させたくない気持ちから、さらに損を重ねてしまう。この癖を知っておくだけでも、撤退の判断はずいぶん楽になります。",
+    "form": "サンクコスト",
+    "en": "Have you never had the experience of knowing a movie is boring but watching it to the end because “I paid good money for it”? This is the sunk cost, that is, the psychology of being caught by costs already paid and unrecoverable. Thinking rationally, past outlays cannot be taken back, so you should judge only by what to spend your time on from now. Yet people, out of a feeling of not wanting to lock in a loss, pile up further losses. Just knowing this tendency makes decisions to withdraw considerably easier.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「サンクコスト（埋没費用）」は回収できない過去の支出。「サンクコスト効果」に陥ると撤退が遅れる。",
+    "sense": "すでに支払い取り戻せない費用"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "シナプス",
+   "reading": "しなぷす",
+   "pos": "noun",
+   "meaning": "synapse",
+   "defJa": "神経細胞どうしが信号をやり取りする接合部。",
+   "passage": {
+    "ja": "シナプスは、神経細胞どうしが信号をやり取りする接合部で、わずかな隙間を介して情報が伝わる。人間の脳には、一千億ほどの神経細胞があり、それぞれが平均して数千もの接合を持つとされる。学習とは、このつながりの強さが少しずつ変化していくことだと考えられている。繰り返し使われる回路は次第に強まり、使われない回路は刈り込まれて消えていく。ドーパミンの放出が、その強化を後押しすることも知られている。",
+    "form": "シナプス",
+    "en": "A synapse is the junction where nerve cells exchange signals. The human brain is said to have around a hundred billion nerve cells, each with several thousand junctions. Learning is thought to be a change in the strength of these connections. Circuits that are used repeatedly grow stronger, and circuits that are not used get pruned away. It is also known that the release of dopamine boosts that strengthening.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「シナプス」は神経細胞の接合部。「シナプス結合」の強弱の変化が学習と記憶の基盤とされる。",
+    "sense": "神経細胞どうしの接合部"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "シルクロード",
+   "reading": "しるくろーど",
+   "pos": "noun",
+   "meaning": "Silk Road",
+   "defJa": "東西を結んだ古代の交易路。",
+   "passage": {
+    "ja": "シルクロードという名は、十九世紀のドイツの地理学者リヒトホーフェンが広めた呼び方である。実際には、絹だけが運ばれたわけではなく、香料、宝石、紙、さらには仏教や数学の知識までが、この道を行き交った。一人の商人が全行程を旅することはまれで、荷は幾つもの町を経由して、人から人へ受け渡されていった。つまりこの道は、一本の道というより、無数の出会いが編み上げた網の目であった。その様子は、現代のサプライチェーンの原型のようにも見える。",
+    "form": "シルクロード",
+    "en": "The name Silk Road was popularized by the nineteenth-century German geographer Richthofen. In reality it was not only silk that was carried; spices, gems, paper, and even Buddhist and mathematical knowledge traveled along this road. It was rare for a single merchant to travel the whole route, and goods were handed from person to person through many towns. In other words, this road was less a single road than a mesh woven by countless encounters. The scene even looks like the prototype of the modern supply chain.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「シルクロード」は絹の道。東西の交易・文化交流の道の総称で、陸路と海路がある。",
+    "sense": "東西を結んだ古代の交易路"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "シーパワー",
+   "reading": "しーぱわー",
+   "pos": "noun",
+   "meaning": "sea power",
+   "defJa": "海軍と海上交通を押さえて持つ、海の力。",
+   "passage": {
+    "ja": "地政学では、国の強さを、海の力と陸の力に分けて考えることがあります。シーパワーとは、強い海軍と商船隊を背景に、海上交通路を押さえることで影響力を持つ国の力のことです。アメリカの海軍軍人マハンは、十九世紀末に、海の支配こそが大国の条件だと説きました。島国で資源の乏しい日本にとって、この視点は、いまも身近な問題として響きます。対になるのがランドパワーで、両者の綱引きが近代の国際政治を形づくってきました。",
+    "form": "シーパワー",
+    "en": "In geopolitics, a country's strength is sometimes considered divided into the power of the sea and the power of the land. Sea power is the strength of a country that holds influence by securing sea lanes on the backing of a strong navy and merchant fleet. The American naval officer Mahan argued at the end of the nineteenth century that command of the sea was the condition of a great power. For Japan, an island nation poor in resources, this viewpoint still resonates as a familiar issue. Its counterpart is land power, and the tug-of-war between the two has shaped modern international politics.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "マハンが広めた地政学の語。対は「ランドパワー」。海上交通路の支配に重きを置く。",
+    "sense": "海を押さえて持つ国の力"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ストレス耐性",
+   "reading": "すとれすたいせい",
+   "pos": "noun",
+   "meaning": "stress tolerance",
+   "defJa": "ストレスに耐え、乗り越える力。",
+   "passage": {
+    "ja": "ストレス耐性が高い人は、そもそも出来事を感じにくいのでしょうか。実際は逆で、同じ出来事を、脅威ではなく挑戦として捉えることが多いと言われています。言い方を変えれば、物事の意味づけを切り替える力です。この力は、生まれつきだけで決まるものではなく、小さな失敗を乗り越える経験を重ねることで、鍛えていけます。レジリエンスという言葉で、この研究が語られることもあります。",
+    "form": "ストレス耐性",
+    "en": "Do people with high stress tolerance simply feel events less to begin with? In fact it is the opposite: they are said to often see the same event not as a threat but as a challenge. Put differently, it is the power to switch how one gives meaning to things. This power is not decided by innate factors alone and can be trained by accumulating experiences of overcoming small failures. This research is sometimes discussed under the word resilience.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「ストレス耐性が高い・低い」。ストレスを受けても心身の調子を保つ力。",
+    "sense": "ストレスに耐え乗り越える力"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "セロトニン",
+   "reading": "せろとにん",
+   "pos": "noun",
+   "meaning": "serotonin",
+   "defJa": "気分や睡眠の調節に関わる神経伝達物質。",
+   "passage": {
+    "ja": "セロトニンは、気分や睡眠の調節に関わる神経伝達物質である。朝の光を浴び、規則正しいリズムで歩くと、分泌が促されるとされ、体内時計の調整にも関わると考えられている。そのため、うつ症状の予防には、薬だけでなく、日中の散歩や食事のルーティンも重視される。ただし、「この物質が減るとうつになる」という単純な図式は、近年の研究で見直しが進んでいる。脳の働きは、一つの物質で説明できるほど単純ではない。",
+    "form": "セロトニン",
+    "en": "Serotonin is a neurotransmitter involved in regulating mood and sleep. Exposure to morning light and walking in a regular rhythm are said to promote its secretion. For that reason, in preventing depressive symptoms, not only medication but also daytime walks and eating habits are emphasized. However, the simple scheme that “when this substance decreases, depression results” is being reexamined in recent research. The workings of the brain are not so simple as to be explained by one substance.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "幸福感に関わるとされる脳内物質。「幸せホルモン」と俗称されるが、実際は神経伝達物質。",
+    "sense": "気分や睡眠に関わる脳内物質"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "テスト効果",
+   "reading": "てすとこうか",
+   "pos": "noun",
+   "meaning": "testing effect",
+   "defJa": "思い出す練習が記憶を強めるという現象。",
+   "passage": {
+    "ja": "テスト効果とは、学んだ内容を思い出す作業が、読み返すよりも記憶を強くするという現象である。一般に、学習とは情報を頭に入れることだと考えられているが、実は出力の瞬間にこそ、記憶は鍛えられる。思い出そうとして苦しむ過程が、後の想起を確かなものにするのだ。この知見に基づけば、復習の主役は教科書の再読ではなく、白紙に何も見ずに書き出す作業になるはずである。ひらめきを待つより、思い出す練習を毎日の習慣に組み込むほうが確実だ。",
+    "form": "テスト効果",
+    "en": "The testing effect is the phenomenon that the act of recalling what you have learned strengthens memory more than rereading. Learning is generally thought of as putting information into the head, but in fact it is at the moment of output that memory is trained. The process of struggling to remember makes later recall secure. Based on this finding, the leading part of review should be not rereading the textbook but writing things out on a blank sheet without looking at anything. Building recall practice into a daily habit is more reliable than waiting for inspiration.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「テスト効果」は想起練習の効果。「検索練習」とも。読み返すより自己テストが記憶に効く。",
+    "sense": "思い出す練習が記憶を強める現象"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "トラウマ",
+   "reading": "とらうま",
+   "pos": "noun",
+   "meaning": "trauma",
+   "defJa": "強い衝撃を受けて心に残る深い傷。",
+   "passage": {
+    "ja": "トラウマは、強い恐怖や衝撃を伴う出来事が、心に深い傷として残る状態を指します。本人は忘れたつもりでも、似た匂いや音に触れた瞬間に、体が先に反応してしまうことがあります。これは意志の弱さではなく、脳が危険をエピソード記憶として強く刻む仕組みの働きです。だから、周りの人が「もう終わったことだから」と励ますだけでは、かえって苦しみを深めかねません。まず話を聴き、安心できる時間を重ねることが回復の土台になります。",
+    "form": "トラウマ",
+    "en": "Trauma refers to a state in which an event involving intense fear or shock remains as a deep wound in the mind. Even if the person thinks they have forgotten, there are times when the body reacts first the moment it touches a similar smell or sound. This is not weakness of will but the working of the mechanism by which the brain records danger. So if those around them merely encourage with “it's over now,” it may deepen the suffering instead. Listening first and accumulating time in which they feel safe becomes the foundation of recovery.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「トラウマ」は心的外傷。「トラウマになる」は日常でも使うが、医学的には強い衝撃体験を指す。",
+    "sense": "強い衝撃で心に残った深い傷"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ドーパミン",
+   "reading": "どーぱみん",
+   "pos": "noun",
+   "meaning": "dopamine",
+   "defJa": "意欲や期待に関わる神経伝達物質。",
+   "passage": {
+    "ja": "ドーパミンは、しばしば快楽物質と呼ばれるが、実際に担っているのは、満足そのものではなく、期待や欲求の信号である。目標に近づく感覚が、この物質の分泌を促し、人を次の行動へと駆り立てる。ゲームやSNSが、通知という小さな報酬を不規則に与えるのは、まさにこの仕組みを利用しているからだ。だとすれば、依存を避ける第一歩は、意志の力に頼ることではなく、通知を切るという環境の調整である。そう考えると、シナプスの強化とやる気の関係も、見え方が変わってくる。",
+    "form": "ドーパミン",
+    "en": "Dopamine is often called the pleasure chemical, but what it actually carries is not satisfaction itself but the signal of anticipation and desire. The sense of approaching a goal prompts the secretion of this substance and drives a person to the next action. The reason games and social media give small rewards called notifications at irregular intervals is that they exploit precisely this mechanism. If so, the first step in avoiding dependence is not relying on the force of will but adjusting the environment by turning off notifications. Thinking this way, how the link between synaptic strengthening and motivation looks changes too.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「ドーパミン」は報酬予測や意欲に関わる物質。「快楽物質」と俗称されるが、期待の信号とされる。",
+    "sense": "意欲や期待に関わる脳内物質"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ハイパーインフレ",
+   "reading": "はいぱーいんふれ",
+   "pos": "noun",
+   "meaning": "hyperinflation",
+   "defJa": "物価が短期間に急激に上がり続けること。",
+   "passage": {
+    "ja": "ハイパーインフレを語るときは、一九二三年のドイツを例に出すと、聞き手が情景を思い浮かべやすい。ヴェルサイユ条約の賠償負担と財政の悪化を背景に、紙幣が際限なく刷られ、物価は文字どおり日ごとに跳ね上がった。パンを一つ買うのに、手押し車いっぱいの札束が必要だったという逸話も残る。数字だけでなく、人々の暮らしの具体的な光景を添えることが、歴史を語る技術である。その混乱は、のちのヴェルサイユ体制への不満とも結びつき、政治の急進化を招いた。",
+    "form": "ハイパーインフレ",
+    "en": "When talking about hyperinflation, citing Germany in 1923 as an example makes it easy for listeners to picture the scene. Against the background of the reparations burden of the Treaty of Versailles and deteriorating finances, banknotes were printed without limit and prices literally jumped by the day. There also remains an anecdote that buying a single loaf of bread required a wheelbarrow full of bundled bills. Adding not just figures but concrete scenes of people's lives is the craft of telling history. That turmoil also linked with discontent with the Versailles system and invited political radicalization.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「ハイパー」は超過を表す。月率五〇％超の物価上昇などを言う。一九二三年のドイツが典型例。",
+    "sense": "物価が極端な速さで上がり続けること"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ハロー効果",
+   "reading": "はろーこうか",
+   "pos": "noun",
+   "meaning": "halo effect",
+   "defJa": "一つの目立つ特徴が全体の評価を左右する現象。",
+   "passage": {
+    "ja": "ハロー効果って知ってます？一つだけ目立ついいところがあると、ほかの部分まで全部よく見えちゃう現象なんですよ。たとえば、有名大学の出身ってだけで、仕事もできそうだし性格もよさそうだなって思っちゃうじゃないですか。面接官がこの錯覚に引っ張られると、実力じゃなくて印象で選んじゃうことになる。だから、評価するときは、項目ごとに点数をつけるのをルーティンにして、第一印象をきちんと切り離す工夫が必要なんです。",
+    "form": "ハロー効果",
+    "en": "Do you know the halo effect? It's the phenomenon where if there's one conspicuously good point, everything else looks good too. For example, just from someone having graduated from a famous university, you end up thinking they must be good at their job, don't you? If an interviewer gets pulled along by this, they end up choosing by impression rather than by ability. So when evaluating, you need the device of giving a score item by item and cutting off the first impression.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「ハロー」は聖像の後光。ソーンダイクが提唱した認知の偏りで、面接や人事評価で問題になる。",
+    "sense": "一つの特徴が全体評価を左右する現象"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "バブル経済",
+   "reading": "ばぶるけいざい",
+   "pos": "noun",
+   "meaning": "bubble economy",
+   "defJa": "資産価格が実力以上にふくらんだ好景気。",
+   "passage": {
+    "ja": "一九八〇年代後半の日本では、株と土地の値段が実力以上に膨らんだバブル経済が起きました。「東京の土地を売れば、アメリカ全土が買える」と言われたほどです。ところが一九九〇年代初頭に株価が急落すると、銀行は不良債権を抱え、長い停滞の時代に入りました。この経験は、資産価格が上がり続けるという思い込みの危うさを教えてくれます。いまの投資ブームを「パラダイムシフトだ」と持ち上げる声を聞くときにも、同じ視点が役に立つでしょう。",
+    "form": "バブル経済",
+    "en": "In Japan in the latter half of the 1980s, a bubble economy occurred in which stock and land prices swelled beyond their real strength. It was even said that “if you sold the land of Tokyo, you could buy the whole of America.” But when stock prices plunged in the early 1990s, banks were left with bad loans and the country entered a long age of stagnation. This experience teaches the danger of the belief that asset prices will keep rising. The same viewpoint will be useful when looking at today's investment boom as well.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「バブル」は泡。実体のない値上がりが破裂するさまから。日本では一九八〇年代後半の好況を指す。",
+    "sense": "資産価格が実力以上にふくらんだ好景気"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "パクス・ブリタニカ",
+   "reading": "ぱくすぶりたにか",
+   "pos": "noun",
+   "meaning": "Pax Britannica",
+   "defJa": "十九世紀の、イギリスの力による世界の平和。",
+   "passage": {
+    "ja": "パクス・ブリタニカという言葉は、「イギリスによる平和」を意味する。十九世紀、世界最強の海軍、つまりシーパワーと、ロンドンを中心とする金融網を背景に、イギリスは国際秩序の守り手として振る舞った。もっとも、その平和は、植民地での支配と搾取の上に成り立っていたことも、忘れてはならない。歴史を語るときは、華やかな時代の名前を紹介すると同時に、その光が落とす影にも触れる姿勢が欠かせない。",
+    "form": "パクス・ブリタニカ",
+    "en": "The term Pax Britannica means “peace by Britain.” In the nineteenth century, backed by the world's strongest navy, that is, sea power, and a financial network centered on London, Britain acted as the guardian of the international order. Still, we must not forget that this peace rested on rule and exploitation in the colonies. When telling history, a stance is indispensable of introducing the name of a splendid age while also touching on the shadow cast by its light.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "ラテン語で「イギリスの平和」。ローマの平和「パクス・ロマーナ」にならった呼び方。",
+    "sense": "十九世紀のイギリスによる平和"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "パラダイムシフト",
+   "reading": "ぱらだいむしふと",
+   "pos": "noun",
+   "meaning": "paradigm shift",
+   "defJa": "ある時代の根本的な見方が入れ替わること。",
+   "passage": {
+    "ja": "パラダイムシフトとは、ある時代の人々が当たり前だと思っていた見方が、根本から入れ替わることです。科学史家トーマス・クーンが、一九六二年の著書で広めた概念で、天動説から地動説への転換が典型例とされます。大切なのは、新しい理論が古い理論を、単に正しさで追い出すのではないという点です。世代が入れ替わり、新しい見方で育った人々が主流になることで、初めて転換が完了する、とクーンは考えました。いまのグローバル化やAIの普及も、そう呼ばれることがあります。",
+    "form": "パラダイムシフト",
+    "en": "A paradigm shift is a fundamental replacement of the view that people of an era took for granted. It is a concept popularized by the historian of science Thomas Kuhn in his 1962 book, and the turn from the geocentric to the heliocentric theory is regarded as the typical example. What matters is that a new theory does not simply drive out the old one by being right. Kuhn thought that only when generations turn over and people raised with the new view become the mainstream is the shift completed. Today's globalization and the spread of AI are sometimes called that too.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「パラダイム」は物の見方の枠組み。クーンの『科学革命の構造』で広まった科学史の用語。",
+    "sense": "時代の根本的な見方の入れ替わり"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ヒューリスティック",
+   "reading": "ひゅーりすてぃっく",
+   "pos": "noun",
+   "meaning": "heuristic",
+   "defJa": "限られた情報で素早く判断するための経験則。",
+   "passage": {
+    "ja": "ヒューリスティックとは、限られた時間と情報で素早く判断するための、経験則のことである。たとえば、思い出しやすい出来事ほど、起こる頻度が高いと見積もる傾向がある。飛行機事故の報道が続くと、実際の確率が変わらなくても、飛行機を怖く感じる人が増えるのはその一例だ。この種の近道は、ふだんは役に立つが、ときに系統的な誤りを生む。行動経済学の研究は、サンクコストやハロー効果なども含め、その偏りを明らかにしてきた。",
+    "form": "ヒューリスティック",
+    "en": "A heuristic is a rule of thumb for judging quickly with limited time and information. For example, there is a tendency to estimate that events that are easy to recall occur more frequently. When reports of plane crashes continue, an increase in people who feel afraid of flying even though the actual probability has not changed is one instance of this. Shortcuts of this kind are usually useful but sometimes produce systematic errors. Research in behavioral economics has made these biases clear.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「ヒューリスティック」は経験則的な近道の判断。カーネマンとトヴェルスキーの研究で知られる。",
+    "sense": "素早く判断するための経験則"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ピグマリオン効果",
+   "reading": "ぴぐまりおんこうか",
+   "pos": "noun",
+   "meaning": "Pygmalion effect",
+   "defJa": "期待されることで成績が伸びる現象。",
+   "passage": {
+    "ja": "ピグマリオン効果とは、教師が生徒に寄せる期待が、生徒の成績を実際に押し上げるという現象を指す。一九六〇年代にアメリカの心理学者ローゼンタールが報告し、教育現場で大きな反響を呼んだ。ただし、その後の追試では、効果の大きさにばらつきがあり、条件によっては確認されないこともあったという。期待が自己認識を変え、行動を変えるという筋道は、いまも議論の対象である。似た現象に、第一印象が全体の評価を左右するハロー効果がある。",
+    "form": "ピグマリオン効果",
+    "en": "The Pygmalion effect refers to the phenomenon in which the expectations a teacher holds for students actually push up the students' grades. It was reported in the 1960s by the American psychologist Rosenthal and drew a large response in education. However, in later replications the size of the effect varied, and under some conditions it was reportedly not confirmed. The path by which expectation changes self-perception and in turn changes behavior is still a subject of debate. A similar phenomenon is the halo effect, in which first impressions sway the overall evaluation.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "ギリシャ神話の彫刻家ピグマリオンにちなむ名。期待がそのまま実現しやすくなる自己成就の一例。",
+    "sense": "期待された人の成績が伸びる現象"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "フロー状態",
+   "reading": "ふろーじょうたい",
+   "pos": "noun",
+   "meaning": "flow state",
+   "defJa": "作業に深く没入し、時間を忘れる状態。",
+   "passage": {
+    "ja": "気づけば時間の感覚が消え、目の前の作業と自分が溶け合ったようになる。ハンガリー出身の心理学者チクセントミハイは、この状態をフロー状態と名づけた。入るには、課題の難しさと自分の技能が、ちょうどよく釣り合っていることが大切な条件になる。簡単すぎれば退屈になり、難しすぎれば不安や焦りになる。だから、フローは偶然の恵みではなく、課題の設計とルーティンの整備によって招き寄せるものなのである。",
+    "form": "フロー状態",
+    "en": "The sense of time vanishes, and you and the work in front of you seem to melt together. The psychologist Csikszentmihalyi named this state the flow state. To enter it, the condition is that the difficulty of the task and your own skill are exactly balanced. If it is too easy it becomes boring, and if too hard it becomes anxiety. So flow is not a chance gift but something to be drawn in by the design of the task.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「フロー」はチクセントミハイの用語。「フロー状態に入る」。挑戦と技能の釣り合いが条件。",
+    "sense": "作業に没入し時間を忘れる状態"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ブレトンウッズ体制",
+   "reading": "ぶれとんうっずたいせい",
+   "pos": "noun",
+   "meaning": "Bretton Woods system",
+   "defJa": "戦後の、ドルを軸とした国際通貨の仕組み。",
+   "passage": {
+    "ja": "ブレトンウッズ体制って、簡単に言うと、戦後の世界のお金のルールなんだよね。一九四四年に決められて、ドルだけが金と交換できて、ほかの国の通貨はドルと固定的に結びつくっていう仕組み。アメリカの金が減って、一九七一年にニクソンが交換を停止したことで崩れた。それ以降は、為替が日々変動する時代が続いてるんだ。ハイパーインフレの記憶が、この体制を作る動機の一つだったとも言われるよ。",
+    "form": "ブレトンウッズ体制",
+    "en": "The Bretton Woods system, put simply, is the postwar world's rules for money. It was set in 1944, a mechanism in which only the dollar could be exchanged for gold and other countries' currencies were fixedly tied to the dollar. It collapsed when America's gold dwindled and Nixon suspended convertibility in 1971. Since then, an era in which exchange rates fluctuate daily has continued. It's also said that the memory of hyperinflation was one of the motives for creating this system.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「ブレトンウッズ体制」は一九四四年の会議から生まれた固定相場制。一九七一年に実質崩壊した。",
+    "sense": "戦後のドルを軸とした通貨の仕組み"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "プラシーボ効果",
+   "reading": "ぷらしーぼこうか",
+   "pos": "noun",
+   "meaning": "placebo effect",
+   "defJa": "偽薬でも、効くと信じて症状が軽くなる現象。",
+   "passage": {
+    "ja": "プラシーボ効果とは、薬としての成分を含まない偽薬でも、効くと信じて飲むことで、症状が軽くなる現象である。痛みや気分の改善では、この効果が顕著に表れることがあり、臨床試験では、薬の効果を測る際の比較対象として使われる。ただし、細菌やウイルスそのものを減らすような作用はなく、効果の範囲には限界がある。期待が脳の働きを変えるという事実は、医療の捉え方に影響を与え続けており、ピグマリオン効果とも通じる議論を呼んでいる。",
+    "form": "プラシーボ効果",
+    "en": "The placebo effect is the phenomenon in which even a sham drug containing no medicinal ingredient lightens symptoms when taken in the belief that it works. In relief of pain and mood, this effect can appear markedly, and in clinical trials a placebo is used as the comparison when measuring a drug's effect. However, it has no action that reduces bacteria or viruses themselves, and the range of its effect has limits. The fact that expectation changes the workings of the brain continues to influence how medicine is understood.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「プラシーボ」は偽薬。「偽薬効果」とも。対は「ノセボ効果」で、悪い予期が症状を招く現象。",
+    "sense": "偽薬でも症状が軽くなる現象"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "マインドフルネス",
+   "reading": "まいんどふるねす",
+   "pos": "noun",
+   "meaning": "mindfulness",
+   "defJa": "今この瞬間に評価せず気づいている状態。",
+   "passage": {
+    "ja": "マインドフルネスって、結局は「今この瞬間に、評価せず気づいてること」なんですよね。呼吸とか足の裏の感覚とかに注意を向けて、考えごとが浮かんだら、そのまま眺めてまた戻す。これを毎日十分やるだけでも、イライラしたときの切り替えが速くなるって言われてます。もちろん、万能薬ではないけど、自分の反応を一歩引いて見られるようになるのは大きいですよね。ルーティンにするコツは、歯みがきの時間など、すでにある習慣に重ねることです。",
+    "form": "マインドフルネス",
+    "en": "Mindfulness, in the end, is “noticing, without judging, this very moment,” isn't it. You turn your attention to the breath or the sensation of the soles of your feet, and when a thought comes up, you just watch it and return. They say that even doing this for ten minutes a day makes switching quicker when you're irritated. Of course it's not a cure-all, but being able to step back and see your own reactions is significant. The knack for making it a routine is to layer it onto an existing habit, such as brushing your teeth.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「マインドフルネス」は仏教の念（サティ）に由来する実践。「今ここ」への評価しない気づき。",
+    "sense": "今この瞬間に評価せず気づくこと"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "マシュマロ実験",
+   "reading": "ましゅまろじっけん",
+   "pos": "noun",
+   "meaning": "marshmallow test",
+   "defJa": "子どもの我慢と将来を調べた、有名な心理実験。",
+   "passage": {
+    "ja": "マシュマロ実験って聞いたことありません？子どもにマシュマロを一個見せて、十五分我慢できたら二個あげるっていうやつ。待てた子は、のちの成績が良かったって話で有名になったんだけど、あとの追試だと、家庭環境の差で説明できる部分が大きいってわかったんです。結局、意志の強さだけの話じゃなくて、待てば本当にもらえるって信じられる環境にいたかどうかが大きいんですよね。大人の期待が子どもの行動を変えるというピグマリオン効果とも、どこかでつながっていそうです。",
+    "form": "マシュマロ実験",
+    "en": "Haven't you heard of the marshmallow experiment? The one where you show a child one marshmallow and say you'll give them two if they can wait fifteen minutes. It became famous for the story that kids who could wait did better later, but later replications showed that much could be explained by differences in home environment. In the end it isn't just about strength of will; whether they were in an environment where they could believe that if they waited they'd really get it matters a lot. It also seems to connect somewhere with the Pygmalion effect, in which adults' expectations change a child's behavior.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "ミッシェルの研究で知られる。「待てる力」と将来の関係を示したとされたが、追試で見直しが進んだ。",
+    "sense": "我慢と将来の関係を調べた心理実験"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "マルチタスク",
+   "reading": "まるちたすく",
+   "pos": "noun",
+   "meaning": "multitasking",
+   "defJa": "複数の作業を同時に進めること。",
+   "passage": {
+    "ja": "マルチタスクが得意だという人は多いですが、脳の仕組みからすると、実際には、二つの作業を高速に切り替えているだけです。切り替えのたびに、前の作業を思い出すための時間が必要になり、全体の効率はむしろ下がってしまいます。ワーキングメモリの容量には限りがあるので、複数の課題を抱えるほど、ミスも増えます。重要な仕事ほど、通知を切り、一つに集中して取り組むほうが、結果的に早く終わるのです。",
+    "form": "マルチタスク",
+    "en": "Many people say they are good at multitasking, but given how the brain works, in reality you are just switching between two tasks at high speed. Each switch requires time to recall the previous task, and overall efficiency rather drops. The capacity of working memory is limited, so the more tasks you hold, the more mistakes increase. The more important the work, the sooner it ends up finishing if you turn off notifications and concentrate on one thing.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「マルチタスク」は複数の仕事を同時に処理すること。人の脳では実際は素早い切り替えとされる。",
+    "sense": "複数の作業を同時に進めること"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "メモ書き",
+   "reading": "めもがき",
+   "pos": "noun",
+   "meaning": "jotted note; quick scribbled note",
+   "defJa": "思いつくまま、手早く書きつけること。",
+   "passage": {
+    "ja": "A4の紙に、一件一ページ、四行から六行で、一分だけ書き出す方法があって、それを毎日十枚やってるんだ。きれいにまとめようとするんじゃなくて、頭に浮かんだことを、ばーっとメモ書きするだけ。そうすると、モヤモヤしてたことが、意外とすっきり言語化されるんだよね。続けて一か月くらいたつと、考えるスピードが明らかに上がった気がする。書いたものは見返さなくてよく、アウトプットする行為そのものが思考の整理になるんだ。",
+    "form": "メモ書き",
+    "en": "There's a method where you write out, on a sheet of A4, one item per page in four to six lines, for just one minute, and I do ten of those every day. It's not about trying to summarize neatly; you just scribble down whatever comes to mind in a rush. Then the things that were foggy get put into words unexpectedly cleanly. After keeping it up for about a month, I feel my thinking speed has clearly gone up. You don't have to look back at what you wrote; the act of putting it out itself sorts your thinking.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「メモ書き」は思いつきを手早く書くこと。「走り書き」に近い。整えず出すのが要点。",
+    "sense": "思いつくまま手早く書きつけること"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ランドパワー",
+   "reading": "らんどぱわー",
+   "pos": "noun",
+   "meaning": "land power",
+   "defJa": "広い陸地と陸軍を背景にした、陸の国の力。",
+   "passage": {
+    "ja": "ランドパワーとは、広大な陸地と陸軍を背景に、大陸の支配を通じて影響力を持つ国の力を指す地政学の用語である。シーパワーの対義語として、ロシアや中国が典型例に挙げられることが多い。陸の国は、国境線の長さゆえに、周囲との緊張を常に抱えやすい。一方で、冬でも凍らない港を求めて海への出口を探す動きは、歴史の中で何度も繰り返されてきた。現代では、サプライチェーンの安全をどう確保するかも、この力の延長で論じられる。",
+    "form": "ランドパワー",
+    "en": "Land power is a geopolitical term referring to the strength of a country that holds influence through control of a continent on the backing of vast land and an army. As the opposite of sea power, Russia and China are often cited as typical examples. A land state, because of the length of its borders, readily carries constant tension with its surroundings. On the other hand, the movement to seek an exit to the sea, looking for ports that do not freeze even in winter, has been repeated many times in history. Today, how to secure the safety of supply chains is also discussed as an extension of this power.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "マッキンダーらの地政学で、シーパワーと対にして語る。大陸の国が持つ陸の力を指す。",
+    "sense": "陸地と陸軍を背景にした国の力"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ルネサンス",
+   "reading": "るねさんす",
+   "pos": "noun",
+   "meaning": "the Renaissance",
+   "defJa": "十四世紀にイタリアで始まった、文化の再生運動。",
+   "passage": {
+    "ja": "ルネサンスを説明するとき、「再生」という原義から入ると、聞き手の頭に残りやすい。十四世紀のイタリアで、古代ギリシャ・ローマの文化を手本に、人間そのものを見つめ直す動きが起こった。レオナルド・ダ・ヴィンチやミケランジェロのような芸術家が輩出された背景には、商業で栄えた都市と、それを支えるパトロンの存在があった。シルクロードを経由して流れ込んだ東方の知識も、その土壌を豊かにしていた。",
+    "form": "ルネサンス",
+    "en": "When explaining the Renaissance, starting from the original meaning, “rebirth,” makes it easier to stay in the listener's head. In fourteenth-century Italy a movement arose to look anew at humanity itself, taking the culture of ancient Greece and Rome as a model. Behind the emergence of artists like Leonardo da Vinci and Michelangelo were cities prospering from commerce and the existence of patrons who supported them. Eastern knowledge that flowed in by way of the Silk Road also enriched that soil.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "フランス語で「再生」。古代の人間中心の文化を学び直した運動で、美術・文学・科学に及んだ。",
+    "sense": "十四世紀イタリアに始まった文化の再生"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ルビ",
+   "reading": "るび",
+   "pos": "noun",
+   "meaning": "ruby; furigana",
+   "defJa": "漢字の読みを示すため、そばに添える小さな仮名。",
+   "passage": {
+    "ja": "本にルビが振ってあると、読めない漢字があっても止まらずに読み進められるから、ほんとにありがたいんだよね。昔は、新聞の漢字にも全部ふりがなが付いてた時代があったらしい。それが戦後、当用漢字で字数が絞られて、だんだん減っていったんだって。いまは電子書籍で、読めない字をタップするとふりがなが出る機能もあって、学習者にはすごく便利だよ。難しいオノマトペや当て字の読みにも、助けられることが多いよ。",
+    "form": "ルビ",
+    "en": "When a book has ruby printed on it, you can keep reading without stopping even if there are kanji you can't read, so it's really a blessing. Apparently there was a time long ago when even the kanji in newspapers all had furigana attached. After the war, the number of characters was narrowed by the Tōyō kanji list, and they gradually decreased, they say. Nowadays e-books even have a function where tapping a character you can't read brings up ruby, which is very convenient for learners. It often helps me with the readings of difficult onomatopoeia and phonetic spellings too.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「ルビ」はふりがなを指す印刷用語。「ルビを振る」と言う。",
+    "sense": "漢字の読みを添える小さな仮名"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ルーティン",
+   "reading": "るーてぃん",
+   "pos": "noun",
+   "meaning": "routine",
+   "defJa": "決まった手順で繰り返される行動。",
+   "passage": {
+    "ja": "一流のスポーツ選手が試合前に決まった動作を繰り返すのは、ルーティンによって心を整えるためである。イチロー氏が打席に入る前に見せた一連の動きは、その代表例として知られる。決まった手順を踏むと、緊張で乱れがちな注意が、目の前の動作へと戻ってくる。この仕組みは、勉強や仕事にも応用でき、始める前の小さな儀式を決めておくだけで、取りかかりが楽になるという。集中がフロー状態に入りやすくなる効果も、報告されている。",
+    "form": "ルーティン",
+    "en": "Top athletes repeat fixed motions before a game in order to settle the mind through a routine. The series of movements Ichiro showed before stepping into the batter's box is known as a representative example. Following a fixed procedure brings attention, which tends to be scattered by tension, back to the action in front of you. This mechanism can also be applied to study and work, and just deciding on a small ritual before starting is said to make getting started easier. An effect of making it easier to enter a flow state has also been reported.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「ルーティン」は決まった手順。「ルーティンワーク」は日課の仕事。スポーツでは集中のための型。",
+    "sense": "決まった手順で繰り返す行動"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "レジリエンス",
+   "reading": "れじりえんす",
+   "pos": "noun",
+   "meaning": "resilience",
+   "defJa": "逆境から、しなやかに立ち直る力。",
+   "passage": {
+    "ja": "レジリエンスとは、思わぬ逆境にあっても、しなやかに立ち直る力のことである。話し方の指導でも、ストレス耐性とも重なるこの力は思いのほか大きな役割を果たす。人前で失敗したあとに、どう気持ちを切り替えるかで、次の挑戦の質がおのずと決まるからだ。元局アナだった先輩は、失敗した原稿を捨てずに、どこで詰まったかを必ず余白に書き残していた。失敗を、感情で処理せず、情報として扱う姿勢が、立ち直りをいっそう早くするのだろう。",
+    "form": "レジリエンス",
+    "en": "Resilience is the power to recover flexibly even in adversity. In coaching how to speak, too, this power plays a large role. This is because how you switch your feelings after failing in front of people determines the quality of the next challenge. A senior colleague who had been a station announcer never threw away a failed script and always wrote down where he had stalled. An attitude of handling failure not through emotion but as information probably speeds up recovery.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「レジリエンス」は回復力・しなやかさ。心理学や組織論で、逆境に強い力として使う。",
+    "sense": "逆境からしなやかに立ち直る力"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "レトリック",
+   "reading": "れとりっく",
+   "pos": "noun",
+   "meaning": "rhetoric",
+   "defJa": "言葉で人を動かす表現の技術。",
+   "passage": {
+    "ja": "レトリックって、悪い意味で使われがちだけど、本来は、言葉で人を動かす技術のことなんですよ。たとえば、「時は金なり」みたいに、抽象的なことを別のものにたとえると、一瞬で相手の頭に絵が浮かぶじゃないですか。ひらめきをそのまま話すより、少し形を整えて伝えるほうが、聞き手は納得しやすい。もちろん、中身が伴ってないと、ただの口先だけって言われちゃうんですけどね。聞き手の頭にすっと入るたとえ話は、その代表格ですよね。",
+    "form": "レトリック",
+    "en": "Rhetoric tends to be used in a bad sense, but originally it is the technique of moving people with words. For example, when you liken an abstract thing to something else, as in “time is money,” a picture appears in the other person's head instantly, doesn't it? Rather than talking out an inspiration just as it came, shaping it a little before conveying it makes listeners more readily convinced. Of course, if the substance isn't there, you get called just lip service. A story that slips easily into the listener's head is the prime example.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「レトリック」は修辞。比喩や対句など。「単なるレトリック」と言うと、中身のない言い回しの含み。",
+    "sense": "言葉で人を動かす表現の技術"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ワーキングメモリ",
+   "reading": "わーきんぐめもり",
+   "pos": "noun",
+   "meaning": "working memory",
+   "defJa": "作業中に情報を一時的に保持して処理する記憶。",
+   "passage": {
+    "ja": "ワーキングメモリとは、作業の途中で必要な情報を、一時的に頭の中に保持し、処理するための記憶の仕組みである。暗算をするときや、会話の流れを追うときに、休みなく働いている。容量には個人差があり、一度に扱える項目は、一般に数個程度とされる。そのため、情報を細かく区切ったり、メモ書きで外に出したりすることが、学習の効率を高める手段として推奨されている。マルチタスクがかえって成績を下げるのも、この容量の限界が一因とされる。",
+    "form": "ワーキングメモリ",
+    "en": "Working memory is a memory mechanism for temporarily holding and processing information needed in the middle of a task. It works without rest when doing mental arithmetic or following the flow of a conversation. Capacity differs by individual, and the number of items that can be handled at once is generally said to be a few. For that reason, dividing information finely or getting it out of the head by jotting notes is recommended as a means of raising learning efficiency. That multitasking in fact lowers performance is also attributed in part to the limit of this capacity.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「ワーキングメモリ」は作業記憶。短期記憶に操作の働きを加えた概念で、学習や会話の基盤。",
+    "sense": "作業中に情報を保持し処理する記憶"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "ヴェルサイユ体制",
+   "reading": "ゔぇるさいゆたいせい",
+   "pos": "noun",
+   "meaning": "Versailles System",
+   "defJa": "第一次世界大戦後の、ヨーロッパの国際秩序。",
+   "passage": {
+    "ja": "ヴェルサイユ体制を語るときは、「勝者が敗者に課した平和」という切り口が分かりやすい。第一次世界大戦後の一九一九年、ドイツは領土の一部を失い、のちのハイパーインフレにもつながる巨額の賠償を課され、軍備も制限された。この過酷な条件が、ドイツ国内の不満を高め、のちのナチ党の台頭を許す土壌になったとされる。一方で、国際連盟という新しい枠組みが生まれた点も見逃せない。歴史の評価は、いつも光と影の両面を持っている。",
+    "form": "ヴェルサイユ体制",
+    "en": "When speaking of the Versailles system, the angle “a peace imposed by victors on the vanquished” is easy to follow. In 1919, after the First World War, Germany lost part of its territory, was charged enormous reparations and had its armaments limited. These harsh conditions are said to have heightened discontent within Germany and become the soil that allowed the later rise of the Nazi Party. On the other hand, the point that a new framework, the League of Nations, was born cannot be overlooked. Historical evaluation always has both light and shadow.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「ヴェルサイユ体制」は一九一九年の講和条約を軸にした秩序。「ウィーン体制」と対で覚える。",
+    "sense": "第一次大戦後の欧州の国際秩序"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一を聞いて十を知る",
+   "reading": "いちをきいてじゅうをしる",
+   "pos": "expression",
+   "meaning": "to grasp the whole from a hint",
+   "defJa": "一部を聞いただけで、全体を理解する。",
+   "passage": {
+    "ja": "うちの部長は、一を聞いて十を知るタイプで、ちょっと説明しただけで、その先の問題点まで全部見抜いちゃうんだよ。最初は、すごいなって思ってたけど、一緒に働くと、こっちも説明を省きがちになって、あとで認識がずれたりするんだよね。やっぱり大事なのは、わかってても、一度は言葉にして確かめることなんだと思う。察しのよさは、確認の手間を省く言い訳にしちゃいけないんだ。優秀な人という印象、つまりハロー効果で、こっちが勝手に安心するのも危ないんだ。",
+    "form": "一を聞いて十を知る",
+    "en": "My department head is the type who hears one and knows ten; with just a little explanation, he sees through all the problems beyond it. At first I thought it was amazing, but working together, I tend to skip explanations too, and later our understandings sometimes drift apart. I think what's really important is that even if you understand, you confirm by putting it into words once. Quickness of perception must not become an excuse for skipping the trouble of confirming. It's also dangerous when we feel reassured on our own because of an impression of an excellent person, that is, the halo effect.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "孔子の弟子・顔回を評した『論語』の言葉に由来。理解の早い人をほめる慣用句。",
+    "sense": "一を聞いて全体を悟る"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一万時間の法則",
+   "reading": "いちまんじかんのほうそく",
+   "pos": "expression",
+   "meaning": "the 10,000-hour rule",
+   "defJa": "一流になるには約一万時間の練習が要るという説。",
+   "passage": {
+    "ja": "一万時間の法則とは、どんな分野でも、一流になるには、一万時間の練習が必要だという考え方です。作家のマルコム・グラッドウェルが、著書で紹介して広まりました。ただし、元になった研究では、練習の量だけでなく、質の高い、改善を意識した練習であることが条件でした。つまり、漫然と一万時間を過ごしても、一流にはなれないのです。ウィルパワーに頼らず、何を直すかを毎回決めて取り組むことが、本当の分かれ目になります。",
+    "form": "一万時間の法則",
+    "en": "The 10,000-hour rule is the idea that to become world-class in any field, ten thousand hours of practice are needed. The writer Malcolm Gladwell introduced it in his book and it spread. However, in the research it was based on, the condition was not just the amount of practice but that it be high-quality practice with an eye to improvement. In other words, spending ten thousand hours aimlessly will not make you world-class. Deciding each time what to fix and working at it is the real dividing line.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「一万時間の法則」はグラッドウェルが広めた説。元の研究は「意図的な練習」の質を重視した。",
+    "sense": "一流には一万時間の練習が要る説"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  }
+ ]
+}
