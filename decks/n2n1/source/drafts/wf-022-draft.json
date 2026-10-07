@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "日本式",
+   "reading": "にほんしき",
+   "pos": "noun",
+   "meaning": "Japanese-style (way of doing things)",
+   "defJa": "日本に特有のやり方や様式。",
+   "passage": {
+    "ja": "日本式の集中とは、一つの対象に没頭することだと思われがちだ。しかし茶の湯や剣道の稽古を見ていると、むしろ余計な力を抜き、型に身を預けることが重んじられている。型があればこそ、心は迷いから解放されて自由に動けるのである。意志の力で自分を縛るのではなく、手順に任せるこの発想には、現代の習慣化の技術にも通じるものがある。たとえば剣道では、竹刀を構える前の礼と呼吸の順序まで決まっており、そこでは決意すら型が肩代わりする。",
+    "form": "日本式",
+    "en": "Japanese-style concentration is often taken to mean absorbing oneself in a single object. Yet watching practice in the tea ceremony or kendo, one sees that what is valued is rather letting go of unnecessary force and entrusting oneself to the form. Precisely because there is a form, the mind is freed from hesitation and can move freely. This way of thinking, which relies on procedure instead of binding oneself by willpower, has something in common with modern techniques of habit formation. In kendo, for example, even the bow and the order of breathing before raising the sword are fixed, and there the form takes over even the work of resolve.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「日本式の〜」で、日本に固有の方式・流儀を名詞の前に付けて示す。",
+    "sense": "日本に特有の様式"
+   }
+  },
+  {
+   "term": "日本書紀",
+   "reading": "にほんしょき",
+   "pos": "noun",
+   "meaning": "Nihon Shoki (Chronicles of Japan, 720)",
+   "defJa": "奈良時代に完成した、漢文の官撰の歴史書。",
+   "passage": {
+    "ja": "七二〇年に完成した日本書紀は、漢文で書かれた正史である。同じ時期の古事記が日本語の語りを残そうとしたのに対し、こちらは対外的にも通用する歴史の体裁を整えようとした。神代から持統天皇の時代までを年代順に並べる構成には、権力の由来を語る意図が透けて見える。とはいえ、異伝を「一書に曰く」と並記する編者の姿勢は、驚くほど誠実でもある。漢語を駆使した本文とあわせて原典に当たると、この書物の二面性がよく見えてくる。",
+    "form": "日本書紀",
+    "en": "The Nihon Shoki, completed in 720, is an official history written in classical Chinese. Whereas the Kojiki of the same period sought to preserve a Japanese oral narrative, this work sought to give the nation's history a form that would also stand up abroad. In the structure that lines events up chronologically from the age of the gods to the reign of Empress Jito, one can see through to the intent of explaining where power comes from. Even so, the editors' habit of setting variant accounts side by side under the formula “one text says” is surprisingly honest. Going back to the original text alongside its Sino-Japanese prose reveals the double nature of this book.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「日本書紀」は正史の名。六国史の最初で、古事記と対で「記紀」と呼ばれる。",
+    "sense": "奈良時代の勅撰の正史"
+   }
+  },
+  {
+   "term": "普遍",
+   "reading": "ふへん",
+   "pos": "noun",
+   "meaning": "universality; ubiquity",
+   "defJa": "あらゆるものに共通して当てはまること。",
+   "passage": {
+    "ja": "ウパニシャッドを読む受験生が最初につまずくのは、アートマンとブラフマンの等式である。この等式は個人の体験を超えた普遍を言い当てようとしているのだが、抽象的なまま暗記しても頭には残らない。コツは、日常の具体例を三つ自分で作り、それぞれに共通する骨組みを一言で言い直してみることだ。この作業を繰り返すと、本質をつかむ速さが目に見えて上がっていく。具体と抽象を往復する習慣が、理解を長持ちさせてくれる。",
+    "form": "普遍",
+    "en": "What trips up examinees reading the Upanishads at first is the equation of atman and brahman. The equation tries to hit upon a universal that goes beyond individual experience, but memorized in the abstract it will not stay in the head. The trick is to make up three everyday examples yourself and restate in one phrase the skeleton they share. If you repeat this exercise, the speed at which you grasp the essence visibly goes up. The habit of going back and forth between the concrete and the abstract makes understanding last.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「普遍」は個別・特殊の対義語。「普遍的」「普遍性」と派生し、哲学や学術の文章に多い。",
+    "sense": "すべてに共通して通じること"
+   }
+  },
+  {
+   "term": "暗示",
+   "reading": "あんじ",
+   "pos": "noun",
+   "meaning": "hint; suggestion; implication",
+   "defJa": "遠回しにそれとなく伝えること。",
+   "passage": {
+    "ja": "さっきの「ちょっと寒いね」って、窓を閉めてほしいっていう暗示だったんだよね。言われた側が気づかないと、ただの感想で終わっちゃうじゃないですか。日本語って、こういう婉曲な言い方をわざと使うところがあるんですよ。ストレートに言うのは失礼だという感覚があるから、相手が察してくれることを前提にしている。逆に、察してもらえない場面では、気まずい沈黙だけが残ってしまうんです。",
+    "form": "暗示",
+    "en": "That “it's a bit cold, isn't it” just now was a hint that I wanted you to close the window, you know. If the person it is said to doesn't pick up on it, it ends as a mere remark, doesn't it? Japanese has a tendency to deliberately use this sort of roundabout way of speaking. Because there is a feeling that saying things straight out is rude, it presupposes that the other person will read between the lines. Conversely, in situations where you are not understood, only an awkward silence is left.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「〜を暗示する」「暗示をかける」など。言葉にせず、それとなく示すこと。",
+    "sense": "それとなく示すこと"
+   }
+  },
+  {
+   "term": "暴動",
+   "reading": "ぼうどう",
+   "pos": "noun",
+   "meaning": "riot; insurrection",
+   "defJa": "群衆が集まって起こす暴力的な騒ぎ。",
+   "passage": {
+    "ja": "一七八九年、パリでパンの値段が跳ね上がると、民衆の不満はついに暴動となって街路にあふれた。バスティーユ襲撃はその象徴とされるが、背景には深刻な財政難と、長く続いた不作があった。国王側の対応が後手に回るうちに、事態は一都市の騒ぎにとどまらず、旧体制の崩壊へと広がっていったのである。農村でも領主の館が襲われる例が相次いだという。パンを求める行列は、やがて政治への怒りに姿を変えていったのである。",
+    "form": "暴動",
+    "en": "In 1789, when the price of bread in Paris shot up, popular discontent finally overflowed into the streets as a riot. The storming of the Bastille is regarded as its symbol, but behind it lay a severe fiscal crisis and a long run of bad harvests. While the king's side kept responding too late, the affair spread beyond the disturbance of a single city into the collapse of the old regime. In the countryside too, it is said, cases of lords' manors being attacked followed one after another. The queues for bread gradually changed shape into anger at politics.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「暴動を起こす・鎮圧する」。集団による暴力的な騒ぎで、暴力性が反乱より前に出る語。",
+    "sense": "集団の暴力的な騒ぎ"
+   }
+  },
+  {
+   "term": "曖昧",
+   "reading": "あいまい",
+   "pos": "na-adj",
+   "meaning": "vague; ambiguous",
+   "defJa": "はっきりせず、いろいろに取れるさま。",
+   "passage": {
+    "ja": "生成AIが返す答えには、ときに曖昧な言い回しが混じる。たとえば「可能性があります」と書かれていても、確率が一割なのか九割なのか、読み手には判断のしようがない。こうした表現は誤りを避けるための工夫でもあるが、利用者にとっては責任の所在が見えにくくなる原因にもなる。現段階では、回答の確信度を数値で示す仕組みは広く普及していない。利用者の側にも、答えをそのまま鵜呑みにしない読み方が求められるだろう。",
+    "form": "曖昧",
+    "en": "The answers returned by generative AI sometimes contain vague phrasing. Even when it says “there is a possibility,” the reader has no way of judging whether the probability is ten percent or ninety. Such expressions are also a device for avoiding error, but for users they also become a cause of making it hard to see where responsibility lies. At the present stage, mechanisms that show an answer's confidence in numbers are not widely in use. Users, too, will be asked for a way of reading that does not swallow an answer whole.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「曖昧な表現・態度・記憶」。輪郭がぼやけて意味が一つに定まらない状態を言う。",
+    "sense": "はっきりしないさま"
+   }
+  },
+  {
+   "term": "最大",
+   "reading": "さいだい",
+   "pos": "noun",
+   "meaning": "largest; greatest; maximum",
+   "defJa": "程度や規模がいちばん大きいこと。",
+   "passage": {
+    "ja": "人間の脳が一日に使うエネルギーは、体全体の約二割にのぼる。重さにすれば体重のわずか二パーセント程度なのに、これだけの燃料を食うのだから、体の中で最大の消費者と言ってもいいくらいだ。だからこそ、脳は考えることをできるだけ省こうとする。「面倒くさい」という感覚は、実は省エネのための合理的な信号なのである。実際、難しい計算をしていなくても、ぼんやり考え事をしているだけで消費量はほとんど変わらないという。",
+    "form": "最大",
+    "en": "The energy the human brain uses in a day amounts to about twenty percent of the whole body's. Though by weight it is only about two percent of body weight, it eats this much fuel, so you could even call it the largest consumer in the body. That is exactly why the brain tries to skip thinking wherever it can. The feeling of “what a bother” is in fact a rational signal for saving energy. In fact, it is said that even without doing hard calculations, consumption barely changes when one is merely musing absentmindedly.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「最大の〜」「最大限」。規模・程度が上限であること。対義語は「最小」。",
+    "sense": "いちばん大きいこと"
+   }
+  },
+  {
+   "term": "未使用",
+   "reading": "みしよう",
+   "pos": "noun",
+   "meaning": "unused",
+   "defJa": "まだ一度も使われていないこと。",
+   "passage": {
+    "ja": "メルカリで未使用のGPUが安く出てたんだよ。箱は開いているものの、中のシールがそのままだから、たぶん買ったあと使わなかったんだと思う。ただ、保証が切れているとなると、あとで壊れても文句は言えないよね。結局、開封前の新品を定価で買うか、リスクを承知で安い方を取るか、悩んでるところなんだ。しかも出品者の説明がやけに丁寧で、かえって怪しく思えるから、見た目は多少傷んでいても構わないと思えるくらいの値段でないと手が出ないんだよね。",
+    "form": "未使用",
+    "en": "There was an unused GPU listed cheaply on Mercari, you know. The box has been opened, but the seals inside are still on, so I figure the person bought it and then never used it. Still, if the warranty has run out, I can't complain if it breaks later, right? In the end I'm torn between buying a sealed new one at list price and taking the cheaper one knowing the risk. On top of that, the seller's description is oddly polite and, if anything, looks suspicious, so I can't bring myself to buy unless the price is low enough that I wouldn't mind some scuffs on the outside.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「未使用品」「未使用のまま」。「未〜」は「まだ〜していない」を表す接頭辞。",
+    "sense": "まだ使っていないこと"
+   }
+  },
+  {
+   "term": "本質",
+   "reading": "ほんしつ",
+   "pos": "noun",
+   "meaning": "essence; true nature",
+   "defJa": "物事がそれであるための根本の性質。",
+   "passage": {
+    "ja": "学習の効率を論じる報道では、勉強時間の長さばかりが取り上げられがちである。しかし、教育心理学の知見が示す本質は、時間ではなく「思い出す回数」にある。教科書の読み直しだけをした人より、何も見ずに内容を再現しようとした人のほうが、一週間後の成績が高かったという実験結果が報告されている。長時間の机上の努力をもって勉強とみなす発想は、見直しを迫られている。量より質という古い言葉が、ここでは実験で裏づけられた形になるが、気をつけたいのは、質とは苦しさのことではないという点だ。",
+    "form": "本質",
+    "en": "In reports that discuss learning efficiency, attention tends to go only to the length of study time. But the essence shown by findings in educational psychology lies not in time but in “the number of times you recall.” Experimental results have been reported that people who tried to reproduce the content without looking scored higher a week later than people who only reread the textbook. The idea of treating long hours of effort at a desk as studying is being forced to be reconsidered. The old saying that quality beats quantity is here backed by experiment, though one point to be careful about is that quality does not mean pain.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「本質を見抜く・突く」「本質的」。現象の奥にある変わらない核心を指す。",
+    "sense": "物事の根本の性質"
+   }
+  },
+  {
+   "term": "根気",
+   "reading": "こんき",
+   "pos": "noun",
+   "meaning": "patience; perseverance; stamina",
+   "defJa": "物事をあきらめず根強く続ける力。",
+   "passage": {
+    "ja": "文章がうまくなる近道はない、と元アナウンサーの先輩はよく言っていた。毎日同じ短い原稿を声に出して読み、録音して聞き直し、気になった箇所を一つずつ直す。その単調な繰り返しに耐えるだけの根気がなければ、どんな技術も身につかない。裏を返せば、続ける力さえあれば、才能の差はかなりの部分まで埋められる。私自身、三か月続けたところ、見栄えのする言い回しや滑舌の良さが増えるより先に、語尾の迷いが消えていったのを今もよく覚えている。",
+    "form": "根気",
+    "en": "There is no shortcut to writing well, an older colleague who used to be an announcer often said. Read the same short script aloud every day, record it, listen back, and fix the spots that bother you one by one. Without the perseverance to endure that monotonous repetition, no technique will take hold. Turn that around, and with perseverance alone the gap in talent can be closed to a considerable degree. When I kept it up for three months myself, I still remember well that the hesitation in my sentence endings disappeared even before showy turns of phrase increased.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「根気がいる」「根気よく続ける」。地道な作業をあきらめず続ける粘り強さ。",
+    "sense": "根気強く続ける力"
+   }
+  },
+  {
+   "term": "構わない",
+   "reading": "かまわない",
+   "pos": "i-adj",
+   "meaning": "doesn't matter; may; it's fine",
+   "defJa": "そうしても差し支えないこと。",
+   "passage": {
+    "ja": "このスクリプト、とりあえず動けば構わないんだけど、AIに書かせたやつをそのまま本番に入れるのはどうなんだろう。誰も中身を読まないまま動いてるって、あとで怖いじゃないですか。テストが通ってるならいいって言う人もいるけど、テストそのものが間違ってたら意味ないんだよね。現段階では、遅くてもいいから一行ずつ自分で確認するほうが、結局は安上がりだと思うんだ。動いてることと分かってることは、別の話なんだよね。",
+    "form": "構わない",
+    "en": "As for this script, it doesn't matter if it just runs for now, but I wonder about putting something the AI wrote straight into production. Isn't it scary later, with it running while nobody has read what's inside? Some people say it's fine if the tests pass, but it's meaningless if the tests themselves are wrong. At this stage I think it's cheaper in the end to check it myself line by line, even if it's slow. Something running and something being understood are separate matters.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「〜ても構わない」「構わず進む」。許可・無関心の両方で使う。",
+    "sense": "差し支えない・気にしない"
+   }
+  },
+  {
+   "term": "気をつける",
+   "reading": "きをつける",
+   "pos": "expression",
+   "meaning": "to be careful; to take care",
+   "defJa": "失敗しないよう注意を払う。",
+   "passage": {
+    "ja": "熱中症で搬送される人のうち、高齢者は半数以上を占める。喉の渇きを感じにくくなるため、本人が気をつけるだけでは限界があると専門家は指摘する。温暖化の影響で夏の暑さが長引くなか、周囲が声をかけ、室温をこまめに確かめることが欠かせない。注意を呼びかける自治体も増えているが、独り暮らしの人にどう届けるかが課題として残っている。また、エアコンの使用をためらわず、水分と塩分を早めに補うことも、有効な予防策とされる。",
+    "form": "気をつける",
+    "en": "Among the people taken to hospital for heatstroke, the elderly account for more than half. Because they find it harder to feel thirst, experts point out that there are limits to the person simply being careful. With the effects of warming drawing out the summer heat, it is indispensable for those around them to call out and check the room temperature often. The number of municipalities urging caution is also growing, but how to reach people living alone remains as a challenge. Not hesitating to use air conditioning and replenishing water and salt early are also regarded as effective preventive measures.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「〜に気をつける」。気を配って備える意で、「注意する」より日常的。",
+    "sense": "注意して備える"
+   }
+  },
+  {
+   "term": "気質",
+   "reading": "きしつ",
+   "pos": "noun",
+   "meaning": "temperament; disposition; character",
+   "defJa": "生まれつきの性格や気だて。",
+   "passage": {
+    "ja": "同じ環境で育った兄弟でも、乳児期から落ち着きの度合いに差が見られることは、発達心理学で古くから知られている。こうした生まれつきの気質は、育て方だけでは説明できない。もっとも、それが性格のすべてを決めるわけではなく、成長の過程で周囲との関わりによって形を変えていく。研究者は、遺伝と環境の二者択一ではなく、両者の相互作用や脳の可塑性に注目している。性格の違いを、育て方のせいだけにする見方には無理があるのだ。",
+    "form": "気質",
+    "en": "It has long been known in developmental psychology that even siblings raised in the same environment show differences in degree of calm from infancy. Such innate temperament cannot be explained by upbringing alone. That said, temperament does not decide all of personality, and it changes shape through contact with those around it in the course of growth. Researchers are looking not at an either-or between heredity and environment but at the interaction of the two and at the plasticity of the brain. It is a stretch to put differences in personality down to upbringing alone.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「〜気質」は職人気質のように集団の性向にも使う。個人の持って生まれた性質。",
+    "sense": "生まれ持った性格の傾向"
+   }
+  },
+  {
+   "term": "決意",
+   "reading": "けつい",
+   "pos": "noun",
+   "meaning": "resolution; determination",
+   "defJa": "ある行動をやり抜くと心に決めること。",
+   "passage": {
+    "ja": "新年の決意は、たいてい二週間もたたないうちに色あせる。それは意志が弱いからではなく、宣言という行為そのものが、実行の代わりに満足感を与えてしまうからではないか。人は「やると決めた」時点で、半分やり遂げたような気分になるのである。だとすれば、必要なのは固い誓いよりも、明日の朝、最初の三分で何に着手するかという小さな手順の方だろう。大きな誓いで自分を縛るより、小さな型をつくるほうが長続きする。",
+    "form": "決意",
+    "en": "New Year's resolutions usually fade within two weeks. Isn't that not because of weak will but because the very act of resolving gives a sense of satisfaction in place of carrying it out? The moment a person decides “I'll do it,” they feel as if they had half accomplished it. If so, what is needed is not firm resolve but a small procedure: what you will start on in the first three minutes tomorrow morning. Building a small routine lasts longer than binding yourself with a grand resolution.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「決意を固める・新たにする」。覚悟を決める意で、「決心」よりやや改まる。",
+    "sense": "やり抜くと決めた心"
+   }
+  },
+  {
+   "term": "没落",
+   "reading": "ぼつらく",
+   "pos": "noun",
+   "meaning": "downfall; ruin; decline",
+   "defJa": "勢いを失って衰え、ほろびること。",
+   "passage": {
+    "ja": "ヴェネツィア共和国は、地中海の海運で栄えた海洋国家である。十五世紀末に喜望峰経由のインド航路が開かれると、香辛料貿易の主導権を失い、没落への道を歩み始めた。決定打となったのは、一七九七年のナポレオンによる征服である。千年にわたって続いた共和国は、ほとんど戦うこともなく幕を閉じた。かつて繁栄の源だった地中海という立地は、大西洋に重心が移るにつれて、むしろ不利な条件に変わっていったのである。",
+    "form": "没落",
+    "en": "The Republic of Venice was a maritime state that prospered on Mediterranean shipping. When the sea route to India by way of the Cape of Good Hope opened at the end of the fifteenth century, it lost the lead in the spice trade and began walking the road to decline. The decisive blow was Napoleon's conquest in 1797. The republic, which had lasted for roughly a thousand years, closed its curtain almost without a fight. The Mediterranean location that had once been the source of prosperity turned instead into a disadvantage as the center of gravity shifted to the Atlantic.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「名家の没落」「没落貴族」。栄えていたものが衰えて地位を失う。滅亡よりゆるやか。",
+    "sense": "栄えたものが衰え落ちぶれる"
+   }
+  },
+  {
+   "term": "注意する",
+   "reading": "ちゅういする",
+   "pos": "verb",
+   "meaning": "to be careful; to pay attention",
+   "defJa": "気をつけて、細かく心を配る。",
+   "passage": {
+    "ja": "日本語学習者が最初に注意する点は、「は」と「が」の使い分けではないでしょうか。たとえば「私は学生です」と「私が学生です」では、同じ事実を言っていても、聞き手に伝わる情報の重心がまるで違います。「は」は話題を示し、「が」は新しい情報や選択を示す、と説明されることが多いですね。ただし、これはあくまで目安であり、微妙な例外は文脈が暗示するものから身につけるしかありません。",
+    "form": "注意する",
+    "en": "Isn't the first point Japanese learners pay attention to the distinction between は and が? For example, with “watashi wa gakusei desu” and “watashi ga gakusei desu,” even though they state the same fact, the center of gravity of the information conveyed to the listener is completely different. It is often explained that は marks the topic while が marks new information or a choice. However, this is only a rule of thumb, and the subtle exceptions you can only acquire from what the context implies.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜に注意する」。心を向けて警戒する。「気をつける」の硬い言い方。",
+    "sense": "心を向けて気を配る"
+   }
+  },
+  {
+   "term": "流動性知能",
+   "reading": "りゅうどうせいちのう",
+   "pos": "noun",
+   "meaning": "fluid intelligence",
+   "defJa": "新しい問題をその場で解く知的な能力。",
+   "passage": {
+    "ja": "流動性知能って、新しい問題をその場で解く力のことで、二十代をピークに少しずつ落ちていくって言われてるんですよ。でも、知識や経験が積み重なる結晶性知能のほうは、六十代になっても伸びる。ってことは、年を取って頭が悪くなるっていうより、頭の使い方が切り替わるだけなんじゃないですか。だから、独学で新しい分野に挑むときは、若い頃の速さを競うより、すでにある知識とつなげるほうが勝てるんですよ。",
+    "form": "流動性知能",
+    "en": "Fluid intelligence is the ability to solve new problems on the spot, and it's said to peak in your twenties and then decline little by little. But crystallized intelligence, the kind that builds up from knowledge and experience, keeps growing even into your sixties. Which means it's not so much that your head gets worse with age as that the way you use it just switches over, isn't it? So when you take on a new field by teaching yourself, you win more by connecting to the knowledge you already have than by competing on the speed of your younger days.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "キャッテルの区分。対は「結晶性知能」で、前者は新規課題処理、後者は蓄積した知識。",
+    "sense": "新しい問題を解く知的能力"
+   }
+  },
+  {
+   "term": "海運",
+   "reading": "かいうん",
+   "pos": "noun",
+   "meaning": "marine transportation; shipping",
+   "defJa": "船で人や貨物を運ぶ事業。",
+   "passage": {
+    "ja": "十七世紀のオランダが世界の富を集めた秘密は、海運にあったと言われる。軽くて安い船を大量に造り、他国の荷まで運んで運賃を稼いだのである。船はアムステルダムに集まり、その情報と資金が株式会社という新しい器を育てた。モノを運ぶ仕事が、やがて金融という目に見えない産業を生んだ点に、この国の強さの本質がある。運ぶだけでなく、保険や為替といった周辺の仕組みまで整えたことも、他国との差を広げた。",
+    "form": "海運",
+    "en": "The secret of how the seventeenth-century Netherlands gathered the world's wealth is said to have lain in shipping. It built light, cheap ships in large numbers and earned freight charges by carrying other countries' cargo too. Ships gathered at Amsterdam, and the information and capital there nurtured a new vessel called the joint-stock company. The essence of this country's strength lies in the point that the work of carrying goods eventually gave birth to the invisible industry of finance. That it built up not only the carrying but also surrounding mechanisms such as insurance and exchange further widened the gap with other countries.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「海運業」「海運会社」。海上輸送。陸運・空運と並べて使う。",
+    "sense": "船で貨物や人を運ぶ事業"
+   }
+  },
+  {
+   "term": "消費者",
+   "reading": "しょうひしゃ",
+   "pos": "noun",
+   "meaning": "consumer",
+   "defJa": "商品やサービスを買って使う人。",
+   "passage": {
+    "ja": "生成AIは、いまや企業のためのツールであると同時に、一般の消費者が毎日触れるサービスにもなりました。検索の代わりに質問を投げ、買い物の相談をし、旅行の計画まで任せる人が増えています。ところが、便利になるほど、自分で調べて比べる習慣が薄れていく危険もあります。気をつけたいのは、答えが整って聞こえても、それが正しいとは限らないという点です。便利さと引き換えに何を手放しているのか、ときどき立ち止まって考えてみたいものです。",
+    "form": "消費者",
+    "en": "Generative AI has now become not only a tool for companies but also a service that ordinary consumers touch every day. More and more people toss it questions instead of searching, consult it about shopping, and even leave their travel plans to it. However, the more convenient it gets, the greater the danger that the habit of investigating and comparing for oneself fades. What we should be careful about is that even if an answer sounds polished, it is not necessarily correct. In exchange for convenience, I would like us to stop now and then and think about what we are giving up.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「消費者」は買う側。対は「生産者」「供給者」。「消費者保護」などの形で出る。",
+    "sense": "商品やサービスを使う側の人"
+   }
+  },
+  {
+   "term": "温暖化",
+   "reading": "おんだんか",
+   "pos": "noun",
+   "meaning": "global warming; warming",
+   "defJa": "気温が全体として上がっていくこと。",
+   "passage": {
+    "ja": "地球温暖化で猛暑が常態化するなか、気温四十度以上の日を何と呼ぶかが議論になった。「猛暑」では言い表せないほどの暑さが当たり前になりつつある、という認識が背景にある。言葉は現実に追い越されるたびに、新しい名前を求めて変わっていく。もっとも、新語が定着するかどうかは、気象情報の発信者だけでなく、使う側の感覚にもかかっている。各国の気象機関でも、見出しに使われる言葉が年々強くなっていることに、その変化は表れている。",
+    "form": "温暖化",
+    "en": "As extreme heat becomes the norm because of global warming, there was a debate over what to call days when the temperature reaches forty degrees or more. In the background is a recognition that heat too intense for the word “scorching” is becoming commonplace. Each time reality overtakes them, words change in search of new names. That said, whether a new word takes hold depends not only on those who send out weather information but also on the sense of those who use it. The change shows even in the way the words used in headlines grow stronger year by year, at weather agencies in other countries too.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「地球温暖化」の形が多い。「〜化」は状態の変化を表す接尾辞で、「寒冷化」が対。",
+    "sense": "気温が上昇していくこと"
+   }
+  },
+  {
+   "term": "準優勝",
+   "reading": "じゅんゆうしょう",
+   "pos": "noun",
+   "meaning": "runner-up; second place",
+   "defJa": "優勝の次の成績。決勝で敗れた側。",
+   "passage": {
+    "ja": "インドでクリケットは、街角の子どもから大企業の社長までが語り合う、宗教に近い熱を帯びた国民的な娯楽です。二〇二三年のワールドカップ決勝で、地元開催のインド代表はオーストラリアに敗れ、準優勝に終わりました。スタジアムは静まり返り、国中が深い落胆に包まれたと報じられています。それでも翌日から、人々は「次こそは」と語り合い始めました。この立ち直りの速さに、私はあの国の人々の気質のようなものを感じずにはいられません。",
+    "form": "準優勝",
+    "en": "In India, cricket is a national pastime charged with a heat close to religion, talked about by everyone from children on street corners to the heads of big companies. In the 2023 World Cup final, the Indian team, playing at home, lost to Australia and finished as runner-up. It was reported that the stadium fell silent and the whole country was wrapped in deep disappointment. Even so, from the next day people began saying to each other, “next time for sure.” In the speed of this recovery I cannot help feeling something like the temperament of that country's people.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「準〜」は一つ下の位を表す。「準決勝」「準優勝」と並び、優勝の次の順位。",
+    "sense": "優勝に次ぐ第二位"
+   }
+  },
+  {
+   "term": "滅亡",
+   "reading": "めつぼう",
+   "pos": "noun",
+   "meaning": "downfall; extinction; collapse",
+   "defJa": "国や種族などが、すっかりほろびること。",
+   "passage": {
+    "ja": "西ローマ帝国の滅亡は、四七六年にゲルマン人の傭兵隊長オドアケルが皇帝を退位させた事件として、教科書では扱われる。だが近年の研究は、この年を境に突然世界が変わったという見方に慎重である。税の徴収や法の運用は、その後もしばらく旧来のやり方で続いたからだ。「帝国の終わり」という単純な言い方は、ゆるやかな変化を一本の線にまとめてしまった結果にほかならない。歴史の区切りは、後の世代が便宜的に引くものなのだ。",
+    "form": "滅亡",
+    "en": "In textbooks the fall of the Western Roman Empire is treated as the event in 476 when the Germanic mercenary commander Odoacer deposed the emperor. But recent research is cautious about the view that the world suddenly changed with that year as the boundary. This is because the collection of taxes and the operation of law continued in the old ways for some time afterward. The plain phrase “downfall” is nothing other than the result of gathering a gradual change into a single line. The dividing lines of history are drawn for convenience by later generations.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「国家の滅亡」「滅亡の危機」。完全にほろびて存続しないこと。没落より終わりが決定的。",
+    "sense": "国や種がすっかりほろびること"
+   }
+  },
+  {
+   "term": "滑舌",
+   "reading": "かつぜつ",
+   "pos": "noun",
+   "meaning": "articulation; enunciation; diction",
+   "defJa": "言葉を、はっきり聞き取れるように発音する力。",
+   "passage": {
+    "ja": "アナウンサーの滑舌がいいのは、生まれつき舌が回るからではありません。毎朝、五十音の発音練習や早口言葉を繰り返す、地味な訓練の積み重ねなんです。特に「ら行」や「さ行」は、舌の位置が少しずれるだけで聞き取りにくくなります。だから、口の動きを意識して、ゆっくり、大げさにやるところから始めるのが近道ですね。録音して自分の声を聞くのは恥ずかしいですが、改善点が一番はっきり見えるのもこの方法です。",
+    "form": "滑舌",
+    "en": "An announcer's good enunciation is not because their tongue naturally moves well. It comes from an accumulation of plain training, repeating pronunciation drills of the fifty sounds and tongue twisters every morning. The “ra” and “sa” rows in particular become hard to make out if the tongue's position is off even a little. So it's the shortcut to start by being conscious of the movement of your mouth and doing it slowly and with exaggeration. Listening to your own recorded voice is embarrassing, but this method also shows what needs improving most clearly.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「滑舌がいい・悪い」。口の動きと舌の回りで、発音が明瞭かどうかを言う。",
+    "sense": "発音が明瞭かどうかの力"
+   }
+  },
+  {
+   "term": "漢語",
+   "reading": "かんご",
+   "pos": "noun",
+   "meaning": "Sino-Japanese word; word of Chinese origin",
+   "defJa": "中国語に由来し、音読みで用いる日本語の語。",
+   "passage": {
+    "ja": "文章を書くとき、漢語に頼りすぎると、文が急に硬くなる。「実施する」「検討する」「確認する」と並べば、報告書の匂いがしてくるだろう。そこで、やまと言葉に言い換えられるところは言い換える。「行う」を「進める」に、「確認する」を「見届ける」に替えると、同じ内容でも、読み手に届く温度がずいぶん変わる。ただし、書き言葉の硬さが必要な場面もあるので、注意する必要がある。",
+    "form": "漢語",
+    "en": "When writing, relying too much on Sino-Japanese words makes a sentence suddenly stiff. Line up “implement,” “consider,” and “confirm,” and it starts to smell of a report. So wherever something can be rephrased in native Japanese words, rephrase it. If you swap “carry out” for “move forward” and “confirm” for “see through,” the warmth that reaches the reader changes considerably even with the same content. However, there are also situations that need the stiffness of written language, so care is required.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「漢語」は音読みの語。対は「和語（やまと言葉）」。硬さ・改まりの印象を左右する。",
+    "sense": "音読みで使う中国由来の語"
+   }
+  },
+  {
+   "term": "熱演",
+   "reading": "ねつえん",
+   "pos": "noun",
+   "meaning": "passionate performance; spirited acting",
+   "defJa": "役に全力を込めて演じること。",
+   "passage": {
+    "ja": "この前の大河ドラマ、織田信長を演じた俳優の熱演がすごくてさ、本能寺の場面は鳥肌が立ったよ。史実では、信長がどんな最期の言葉を残したのか、実はよくわかってないらしいんだよね。だからこそ脚本家が想像で補うわけで、そこに作り手の腕が出るんじゃないかな。名場面と呼ばれるものって、たいていそういう歴史の空白に生まれるんだと思う。もちろん、フィクションだと割り切って観ないと、史実を誤解してしまうけどね。",
+    "form": "熱演",
+    "en": "In that recent taiga drama, the actor who played Oda Nobunaga gave such a passionate performance that I got goosebumps at the Honnoji scene. In the historical record, apparently nobody really knows what last words Nobunaga left. That's exactly why the screenwriter fills it in with imagination, and I think that's where the makers' skill shows. I think what people call great scenes are usually born in gaps in history like that. Of course, if you don't watch it accepting that it's fiction, you end up misunderstanding the facts, though.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「熱演する」「熱演を見せる」。演技が熱を帯びている賞賛の語。",
+    "sense": "力をこめた熱のある演技"
+   }
+  },
+  {
+   "term": "特許",
+   "reading": "とっきょ",
+   "pos": "noun",
+   "meaning": "patent; special permission",
+   "defJa": "発明を一定期間、独占的に使える権利。",
+   "passage": {
+    "ja": "半導体の世界では、特許が技術の優位を守る盾であると同時に、競争相手を牽制する武器にもなる。出願から二十年という権利の期間は、微細化の競争が数年ごとに世代交代する業界にとって、決して短くない。そのため、企業は自社の技術を公開して権利を得る道と、あえて秘密にして独占する道のどちらを選ぶかを、慎重に見極めなければならない。この選択は、収益の見通しを大きく左右する。",
+    "form": "特許",
+    "en": "In the semiconductor world, a patent is a shield protecting technological advantage and at the same time a weapon for holding rivals in check. A rights period of twenty years from filing is by no means short for an industry where the race of miniaturization changes generations every few years. Companies therefore have to judge carefully whether to take the road of disclosing their technology to gain a right or the road of keeping it deliberately secret and monopolizing it. This choice greatly affects the outlook for revenue.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「特許を取る・出願する」。「特許権」。発明を独占的に実施できる法的な権利。",
+    "sense": "発明を独占的に使える権利"
+   }
+  },
+  {
+   "term": "狩猟採集民",
+   "reading": "しゅりょうさいしゅうみん",
+   "pos": "noun",
+   "meaning": "hunter-gatherers",
+   "defJa": "狩りや採集で食料を得て暮らす人々。",
+   "passage": {
+    "ja": "人類の歴史の九割以上は、狩猟採集民として過ごした時間である。農耕が始まるのは約一万年前にすぎず、それ以前の私たちの祖先は、数十人ほどの集団で移動しながら暮らしていた。彼らは食料を蓄えず、ものを独占することも少なかったと考えられている。進化心理学者らは、この長い時間が現代人の心の癖の土台になったと考えている。定住して農耕を始めたのは、人類史ではごく最近の出来事にすぎず、体はまだ当時の暮らしに合わせてできている。",
+    "form": "狩猟採集民",
+    "en": "More than ninety percent of human history is time spent as hunter-gatherers. Farming began only about ten thousand years ago, and before that our ancestors lived moving about in groups of a few dozen. They are thought not to have stored food and to have rarely monopolized things. Evolutionary psychologists think that this long stretch of time became the foundation of the quirks of the modern mind. Settling down and taking up farming is a very recent event in human history, and our bodies are still built for the life of that time.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「狩猟」と「採集」の複合。農耕・牧畜以前の生活様式の担い手を指す学術語。",
+    "sense": "狩りと採集で暮らす人々"
+   }
+  },
+  {
+   "term": "独占",
+   "reading": "どくせん",
+   "pos": "noun",
+   "meaning": "monopoly; exclusive possession",
+   "defJa": "利益や権利を一人だけで独り占めすること。",
+   "passage": {
+    "ja": "十七世紀のオランダ東インド会社は、香辛料の貿易を独占するために、ときに島ごと支配した。バンダ諸島では、ナツメグの供給を握るため、住民に過酷な支配を強いた歴史がある。囲い込みは利益を生むが、同時に反発も生む。力で囲い込むやり方は、やがて他国の参入と現地の反乱という形で、そのコストを請求されることになる。結局、その市場を守り続けるための武力と監視の費用が、得られた利益をじわじわと食いつぶしていったのである。",
+    "form": "独占",
+    "en": "In the seventeenth century the Dutch East India Company, in order to monopolize the spice trade, sometimes ruled whole islands. In the Banda Islands there is a history of forcing harsh rule on the inhabitants in order to hold the supply of nutmeg. A monopoly produces profit but at the same time produces backlash. A way of fencing things in by force will in time be billed for its cost in the form of other countries' entry and local rebellion. In the end, the cost of arms and surveillance to keep guarding that market gradually ate up the profit gained.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「独占する」「市場を独占」。一人・一社が占めて他を排除すること。「独り占め」より硬い。",
+    "sense": "一人で占めて他を排除すること"
+   }
+  },
+  {
+   "term": "独学",
+   "reading": "どくがく",
+   "pos": "noun",
+   "meaning": "self-study; teaching oneself",
+   "defJa": "先生につかず、自分一人で学ぶこと。",
+   "passage": {
+    "ja": "独学で身につけた知識は、人から教わったものより忘れにくいと、昔からよく言われます。誰にも手取り足取り教わらず、自分で問いを立てて調べるぶん、頭の中で何度も組み立て直すからです。ただし、間違った理解に自分では気づけないという思わぬ落とし穴もあります。そこで有効なのが、短期間でもいいので、学んだことを誰かに説明してみる方法です。うまく話せない部分こそ、まだ理解が浅い部分だと教えてくれます。",
+    "form": "独学",
+    "en": "It is often said that knowledge acquired through self-study is hard to forget. Because you learn without being taught by anyone, raising your own questions and looking things up, you reassemble it in your head many times over. However, there is also the pitfall that you cannot notice a mistaken understanding by yourself. What works well here is the method of trying to explain what you have learned to someone, even over a short period. The parts you cannot say well are exactly what tell you which parts you still understand only shallowly.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「独学で身につける」「独学者」。師や学校によらず自力で学ぶ。",
+    "sense": "自分一人で学ぶこと"
+   }
+  },
+  {
+   "term": "現段階",
+   "reading": "げんだんかい",
+   "pos": "noun",
+   "meaning": "the present stage",
+   "defJa": "物事が今ある段階。",
+   "passage": {
+    "ja": "現段階では、完全な自動運転が公道を走るためには、技術と制度の両面で課題が残っている。専門家は、悪天候時の認識精度や、事故の責任を誰が負うかという法整備の遅れを挙げる。それでも、特定の地域や路線に限って実証が進み、無人の送迎を始める自治体も出てきた。実用化の時期については見解が割れているが、各国とも段階的に広げるという点では一致している。期待と慎重論が入り混じる状況が、しばらくは続きそうだ。",
+    "form": "現段階",
+    "en": "At the present stage, challenges remain on both the technological and institutional sides before fully autonomous driving can run on public roads. Experts cite recognition accuracy in bad weather and the lag in legislation over who bears responsibility for accidents. Even so, trials have advanced limited to particular areas and routes, and some municipalities have begun unmanned shuttle service. Views differ on the timing of practical use, but all countries agree on expanding it in stages. A situation where expectation and caution are mixed looks set to continue for a while.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「現段階では」の形で多用。「現時点」より、進行する過程の途中という含みがある。",
+    "sense": "いま進んでいる段階"
+   }
+  },
+  {
+   "term": "生まれつき",
+   "reading": "うまれつき",
+   "pos": "noun",
+   "meaning": "by nature; innate; by birth",
+   "defJa": "生まれたときから備わっていること。",
+   "passage": {
+    "ja": "絶対音感は生まれつきの才能だと思われがちだが、研究では幼少期の訓練が大きく影響すると示されている。四、五歳ごろまでに音楽教育を受けた人ほど、後に始めた人より高い割合で絶対音感を持つ傾向がある。脳の可塑性が高い時期を過ぎると、習得は難しく、完全には至らないことが多い。才能と環境のどちらか一方で説明する見方は、いまや時代遅れである。才能という言葉で片づける前に、まず環境を疑ってみる価値がある。",
+    "form": "生まれつき",
+    "en": "Absolute pitch tends to be thought of as an innate talent, but research has shown that training in early childhood has a large influence. People who received music education by around age four or five tend to have absolute pitch at a higher rate than those who started later. Once the period of high brain plasticity has passed, acquisition is difficult and often does not become complete. The view that explains it by either talent or environment alone is now out of date. Before settling the matter with the word talent, it is worth first suspecting the environment.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「生まれつきの〜」「生まれつき〜だ」。後天的に身につけたものとの対比で使う。",
+    "sense": "生まれたときから備わること"
+   }
+  },
+  {
+   "term": "生死",
+   "reading": "せいし",
+   "pos": "noun",
+   "meaning": "life and death",
+   "defJa": "生きることと死ぬこと。",
+   "passage": {
+    "ja": "仏教では、生死は断ち切るべき苦しみの輪であり、それを抜け出すことが解脱と呼ばれます。ところが禅の世界には、「無常迅速」という言葉が伝わっています。生と死は一大事であり、時は速やかに過ぎ去る、という意味です。だからこそ今この瞬間に打ち込めと、和尚は寺の板に刻まれた言葉を毎日見つめてきました。毎朝その板を打つ音は、修行者に、今日が最後の一日かもしれないという覚悟を呼び起こすのです。",
+    "form": "生死",
+    "en": "In Buddhism, life and death is a wheel of suffering that should be cut off, and escaping it is called liberation. In the world of Zen, however, the words “life and death are the great matter, impermanence is swift” have been handed down. It means that life and death are a momentous affair and that time passes quickly. That is why, urged to give oneself to this very moment, the priest has gazed every day at the words carved on the temple's board. The sound of that board being struck each morning awakens in the practitioner the resolve that today may be the last day.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「生死」は「しょうじ」とも読む（仏教語）。「生死をさまよう」「生死に関わる」。",
+    "sense": "生きることと死ぬこと"
+   }
+  },
+  {
+   "term": "産業革命",
+   "reading": "さんぎょうかくめい",
+   "pos": "noun",
+   "meaning": "Industrial Revolution",
+   "defJa": "機械の導入で産業と社会が一変した変革。",
+   "passage": {
+    "ja": "十八世紀後半にイギリスで始まった産業革命は、蒸気機関の改良をきっかけに、綿織物の生産を一変させた。工場が都市に集まるにつれ、農村から人口が流れ込み、劣悪な住環境と長時間労働が社会問題となった。こうした変化は、やがてヨーロッパ大陸と北米へと広がっていった。その過程で消費者の暮らしは豊かになったが、代償として環境への負荷も増え、今日の温暖化にまでつながっているのである。",
+    "form": "産業革命",
+    "en": "The Industrial Revolution, which began in Britain in the latter half of the eighteenth century, transformed cotton cloth production, with improvements to the steam engine as its occasion. As factories gathered in cities, population flowed in from farm villages, and wretched housing and long working hours became social problems. These changes spread in time to continental Europe and North America. In the process the lives of consumers became richer, but at the price of a heavier burden on the environment, which connects even to today's warming.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「第一次・第二次産業革命」。「革命」は急激な社会の質的転換を表す接尾要素。",
+    "sense": "機械化による産業と社会の大変革"
+   }
+  },
+  {
+   "term": "甥",
+   "reading": "おい",
+   "pos": "noun",
+   "meaning": "nephew",
+   "defJa": "きょうだいの息子。",
+   "passage": {
+    "ja": "叔父が亡くなった際、遺産の相続をめぐって、甥にあたる三人が家庭裁判所に調停を申し立てたという。故人には子がおらず、きょうだいも先に他界していたため、法定相続人はきょうだいの子に移る。このように、親族の範囲が広がるほど、連絡のつかない相続人が増えて手続きが長引く可能性が高い。専門家は、遺言書を残しておくことが最も確実な対策だと述べている。普段は付き合いのない親戚との話し合いが、負担になる例も少なくない。",
+    "form": "甥",
+    "en": "When his uncle died, three nephews reportedly filed for mediation at the family court over the division of the estate. The deceased had no children and his siblings had already passed away, so the statutory heirs shift to nephews and nieces. In this way, the wider the circle of relatives, the more likely it is that heirs who cannot be reached increase and the procedure drags on. Experts say that leaving a will is the most reliable countermeasure. It is not uncommon for talks with relatives one normally has no dealings with to become a burden.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "「甥」はきょうだいの息子、娘は「姪」。「叔父・伯父」に対する関係の語。",
+    "sense": "きょうだいの息子"
+   }
+  },
+  {
+   "term": "畜生",
+   "reading": "ちくしょう",
+   "pos": "noun",
+   "meaning": "beast; brute; (Buddhism) the animal realm",
+   "defJa": "動物。仏教で、六道の一つ。",
+   "passage": {
+    "ja": "仏教の世界観では、生き物は生死を繰り返しながら六つの世界を巡るとされ、その一つが畜生の世界である。ここでいう住人とは、動物そのものというより、本能のままに生き、他者への配慮を欠いた状態を指すと解釈される。和尚の説法では、人間もまた、怒りや欲に任せて行動するときその世界に落ちると戒められてきた。六道は死後の行き先であると同時に、日々の心の状態の比喩でもあるのだ。",
+    "form": "畜生",
+    "en": "In the Buddhist worldview, living beings are said to circulate through six realms while repeating birth and death, and one of them is the realm of beasts. The “beast” spoken of here is interpreted as indicating, rather than animals themselves, a state of living by instinct and lacking consideration for others. In priests' sermons, it has been cautioned that humans too fall into that realm when they act on anger and greed. The six realms are both destinations after death and, at the same time, metaphors for daily states of mind.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏教の六道（天・人・修羅・畜生・餓鬼・地獄）の一つ。罵り語の「畜生！」は転用。",
+    "sense": "仏教で六道の一つ・動物"
+   }
+  },
+  {
+   "term": "皇室典範",
+   "reading": "こうしつてんぱん",
+   "pos": "noun",
+   "meaning": "Imperial House Law",
+   "defJa": "皇位継承など皇室の事項を定めた法律。",
+   "passage": {
+    "ja": "皇室典範って、天皇の位を継ぐ順番とか、皇族の身分とかを決めてる法律なんですよね。現行のものは一九四七年に国会が制定したもので、戦前の旧典範とは位置づけがまったく違うんです。旧典範は帝国憲法と並ぶ別格の存在だったけど、いまは普通の法律の一つにすぎない。だから、改正するなら国会で議論することになるんですよ。ちなみに、天皇の退位については、二〇一七年に特例法が別に作られたんですよ。",
+    "form": "皇室典範",
+    "en": "The Imperial House Law is the law that determines things like the order of succession to the throne and the status of members of the imperial family, right? The current one was enacted by the Diet in 1947, and its position is completely different from the old law of the prewar period. The old law was in a special class standing alongside the Imperial Constitution, but now it is just one ordinary statute. So if it is to be revised, it will be discussed in the Diet. Incidentally, for the emperor's abdication, a separate special law was created in 2017.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「典範」は模範となる規則。「皇室典範」は皇位継承や皇族の身分を定める法律の名。",
+    "sense": "皇位継承などを定める法律の名"
+   }
+  },
+  {
+   "term": "真っ先に",
+   "reading": "まっさきに",
+   "pos": "adverb",
+   "meaning": "first of all; before anything else",
+   "defJa": "何よりも先に。ほかに先んじて。",
+   "passage": {
+    "ja": "新しい技術が登場したとき、真っ先に反応するのは、それで利益を得る人々ではなく、失うものを恐れる人々であることが多い。生成AIをめぐる議論も例外ではなく、著作権や雇用、報酬への不安が、技術そのものの評価より先に語られた。恐れを笑うのは簡単だが、その恐れが何を守ろうとしているのかを見極めることこそ、冷静な判断の出発点である。その順序を知っておくだけでも、ニュースの見え方は少し変わってくる。",
+    "form": "真っ先に",
+    "en": "When a new technology appears, it is often not those who profit from it but those who fear what they will lose who react first. The debate surrounding generative AI was no exception, and worries about copyright, employment and pay were voiced ahead of any evaluation of the technology itself. It is easy to laugh at fear, but seeing what that fear is trying to protect is precisely the starting point of calm judgment. Just knowing that order changes how the news looks, a little.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「真っ先に〜する」。「先に」を強めた語。動作や反応が最初であることを言う。",
+    "sense": "いちばん最初に"
+   }
+  },
+  {
+   "term": "着手",
+   "reading": "ちゃくしゅ",
+   "pos": "noun",
+   "meaning": "starting on; embarking on; launch",
+   "defJa": "物事に取りかかること。",
+   "passage": {
+    "ja": "心理学の研究によれば、課題に着手するまでの時間が短い人ほど、最終的な達成度が高い傾向がある。最初の一歩を踏み出すと、人は「やりかけ」の状態を気持ち悪く感じ、続きを求めるようになるからだ。この性質は、やる気を待つより先に動くほうが理にかなう根拠とされる。逆に、完璧な計画づくりに時間をかけすぎると、かえって動き出せなくなるおそれがある。だから、固い決意よりも、まず五分だけ机に向かうという約束が、意外なほど効く。",
+    "form": "着手",
+    "en": "According to psychological research, people who take less time to start a task tend to reach a higher final level of achievement. This is because once a person has taken the first step, they feel the “half-done” state to be uncomfortable and come to seek the rest. This property is cited as grounds for why moving before waiting for motivation makes sense. Conversely, spending too much time on perfect planning risks making it impossible to start moving at all. So a promise to sit at the desk for just five minutes first works surprisingly well, more than a firm resolve.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「作業に着手する」「着手金」。計画ではなく、実際に取りかかる段階を指す。",
+    "sense": "物事に取りかかること"
+   }
+  },
+  {
+   "term": "瞑想",
+   "reading": "めいそう",
+   "pos": "noun",
+   "meaning": "meditation",
+   "defJa": "目を閉じて心を静め、一つに集中すること。",
+   "passage": {
+    "ja": "瞑想って、最初は十分間座るだけでも結構きついんですよ。頭の中にいろんな考えが浮かんで、呼吸に集中しようとしても、すぐ夕飯の献立とか仕事のメールとかに引っ張られちゃう。でも、それに気づいてまた呼吸に戻る、その繰り返しこそが練習なんです。根気よく続けるうえで、集中が切れたのを失敗だと思わないことが、一番のコツですね。ジムで筋肉を鍛えるように、注意力を鍛える時間だと考えると、気が楽になりますよ。",
+    "form": "瞑想",
+    "en": "Meditation, at first, even just sitting for ten minutes is pretty hard. All sorts of thoughts come up in your head, and even when you try to focus on your breathing you are immediately pulled off to the dinner menu or work email. But noticing that and returning to the breath again, that very repetition is the practice. In sticking with it patiently, the biggest tip is not to think of a lapse in concentration as a failure. It makes things easier if you think of it as time spent training attention, the way you train muscles at the gym.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「瞑想する」「瞑想にふける」。目を閉じ、静かに心を整えて深く思うこと。",
+    "sense": "目を閉じて静かに思うこと"
+   }
+  },
+  {
+   "term": "知性",
+   "reading": "ちせい",
+   "pos": "noun",
+   "meaning": "intellect; intelligence",
+   "defJa": "物事を考え、判断する能力。",
+   "passage": {
+    "ja": "AIが知性を持つかどうかという問いは、話し方の巧みさと混同されやすい。流暢に話す人が賢いとは限らないのと同じで、整った文章を出力できることは、理解の証拠にはならない。私が文章講座で伝えたいのは、読み手を動かす言葉は、客観的に見て滑らかな表面ではなく、考え抜かれた中身に支えられているということだ。AIの時代だからこそ、自分の頭で考えた一文の重みが増していく。この区別をつけることが、情報があふれる時代の読み書きの基本だと私は考えている。",
+    "form": "知性",
+    "en": "The question of whether AI has intellect is easily confused with skill in how it speaks. Just as a person who speaks fluently is not necessarily wise, being able to output well-formed sentences is not evidence of understanding. What I want to convey in my writing course is that words that move a reader are supported not by a smooth surface, objectively speaking, but by contents that have been thought through. Precisely because it is the age of AI, the weight of a single sentence you thought out with your own head increases. I think making this distinction is the basis of reading and writing in an age flooded with information.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「知性的」「知性を磨く」。感情や本能と対比される、思考・判断の働き。",
+    "sense": "考えて判断する能力"
+   }
+  },
+  {
+   "term": "短期間",
+   "reading": "たんきかん",
+   "pos": "noun",
+   "meaning": "short period of time",
+   "defJa": "時間があまり長くないあいだ。",
+   "passage": {
+    "ja": "インド哲学の根底には、真理は短期間では得られないという感覚がある。ヨーガの伝統では、安定した心の状態に至るまで、長い年月にわたる修練が前提とされた。もちろん、数週間の集中的な瞑想の修行で何かをつかむ人もいる。だが、それをもって悟りと呼ぶのは早計であり、変化が日常に根づくかどうかこそが試金石になる。何年もかけて少しずつ心の癖がほどけていくという感覚は、東洋の修行観に共通した特徴である。",
+    "form": "短期間",
+    "en": "Underlying Indian philosophy is a sense that truth cannot be obtained in a short period. In the yoga tradition, long years of discipline were presupposed before reaching a stable state of mind. Of course, some people grasp something through an intensive few weeks of meditation practice. But calling that enlightenment is premature, and whether the change takes root in daily life is the real touchstone. The sense that mental habits loosen little by little over many years is a feature common to Eastern views of practice.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「短期間で習得する」「短期間に」。「長期間」と対。期間の短さを強調する。",
+    "sense": "あまり長くない期間"
+   }
+  },
+  {
+   "term": "短歌",
+   "reading": "たんか",
+   "pos": "noun",
+   "meaning": "tanka (31-syllable poem)",
+   "defJa": "五七五七七の三十一音からなる和歌。",
+   "passage": {
+    "ja": "短歌って、五七五七七の三十一音しかないのに、ちゃんと一つの世界が立ち上がるのが不思議なんだよね。たとえば俵万智の『サラダ記念日』みたいに、日常の一場面を切り取るだけでも、読む人の記憶が勝手に動き出す。字余りや字足らずも、ルール違反というより、わざとリズムを崩す技だと思うんだ。考えてみれば、短い器だからこそ、言わないことが暗示になるんじゃないかな。だから三十一音って、短いようで実はすごく密度が高い形式なんだと思う。",
+    "form": "短歌",
+    "en": "It's strange how a tanka, with only thirty-one syllables in a 5-7-5-7-7 pattern, still makes a whole world stand up. Like Machi Tawara's “Salad Anniversary,” just cutting out a scene of everyday life makes the reader's memories start moving on their own. I think excess or shortfall in syllables is not so much a rule violation as a technique of breaking the rhythm on purpose. Come to think of it, precisely because the vessel is short, what goes unsaid becomes a suggestion, doesn't it? So I think thirty-one syllables is a form that seems short but is actually very dense.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「短歌を詠む」。五七五七七の定型。五七五の俳句に対し、後半の七七がある。",
+    "sense": "五七五七七の定型の和歌"
+   }
+  },
+  {
+   "term": "神経科学",
+   "reading": "しんけいかがく",
+   "pos": "noun",
+   "meaning": "neuroscience",
+   "defJa": "神経系、特に脳のしくみを調べる科学。",
+   "passage": {
+    "ja": "神経科学の世界では、脳は使うほど形を変える臓器だと考えられています。ロンドンのタクシー運転手の研究では、膨大な道を覚えた人ほど、記憶をつかさどる海馬の後ろの部分が大きいことがわかりました。つまり、大人になってからも、経験によって脳の構造は変わりうるのです。この性質は可塑性と呼ばれ、学び直しに挑む人にとって大きな励みになります。もちろん、年齢とともに習得が遅くなる面はありますが、道が閉ざされるわけではありません。",
+    "form": "神経科学",
+    "en": "In the world of neuroscience, the brain is thought of as an organ that changes shape the more it is used. A study of London taxi drivers found that the more of the vast street network a person had memorized, the larger the rear part of the hippocampus, which governs memory. In other words, even after adulthood, the structure of the brain can change through experience. This property is called plasticity, and it is a great encouragement for people taking on relearning. Of course there is the side that acquisition slows with age, but that does not mean the road is closed.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「神経」＋「科学」。脳科学を含む広い分野で、「認知神経科学」などと複合する。",
+    "sense": "脳や神経のしくみを調べる学問"
+   }
+  },
+  {
+   "term": "祭り",
+   "reading": "まつり",
+   "pos": "noun",
+   "meaning": "festival",
+   "defJa": "神や祖先をまつる行事。にぎやかな催し。",
+   "passage": {
+    "ja": "祭りに参加すると、見知らぬ人と同じリズムで声を出し、同じ方向へ体を動かすことになります。こうした同期した行動には、集団の絆を強める効果があると、社会心理学で報告されています。あの行事は単なる娯楽ではなく、共同体が自分たちの輪郭を確かめる装置だったのかもしれません。そう考えると、誰もが喜んで担ぐ神輿の重さにも、意味があるように思えてきます。踊りの輪に入ると、肩書きや年齢の差がふっと薄れる感覚も、その一つでしょう。",
+    "form": "祭り",
+    "en": "When you take part in a festival, you end up voicing in the same rhythm as strangers and moving your body in the same direction. Social psychology has reported that such synchronized action has the effect of strengthening group bonds. A festival may not have been mere entertainment but a device by which a community confirms its own outline. Thinking that way, even the weight of the portable shrine that everyone gladly shoulders begins to seem to carry meaning. The sensation of differences in title and age suddenly fading once you enter a ring of dancers is one of them.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「祭りに参加する」。語源は「まつる」。神事から転じて、にぎやかな催し全般を指す。",
+    "sense": "神をまつる行事・にぎやかな催し"
+   }
+  },
+  {
+   "term": "科学革命",
+   "reading": "かがくかくめい",
+   "pos": "noun",
+   "meaning": "Scientific Revolution",
+   "defJa": "十七世紀に近代科学が成立した大転換。",
+   "passage": {
+    "ja": "十七世紀の科学革命は、天文学や物理学の発見だけでなく、「自然は数学の言葉で書かれている」という見方を広めた点に意味があります。ガリレオは望遠鏡で木星の衛星を見つけ、地球が宇宙の中心だという考えに疑いを投げかけました。やがてニュートンが万有引力を数式にまとめ、天上と地上を同じ法則で語る道が開かれたのです。こうした流れが、のちの啓蒙の時代を準備しました。教科書では一行で済まされがちですが、その影響は今の私たちの発想にまで及んでいます。",
+    "form": "科学革命",
+    "en": "The Scientific Revolution of the seventeenth century is significant not only for discoveries in astronomy and physics but for spreading the view that “nature is written in the language of mathematics.” Galileo found the moons of Jupiter with a telescope and cast doubt on the idea that the Earth is the center of the universe. In time Newton gathered universal gravitation into a formula, and a path opened to speak of heaven and earth by the same laws. This flow prepared the later age of Enlightenment. In textbooks it tends to be disposed of in one line, but its influence extends even to how we think today.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「科学」＋「革命」。ルネサンスと啓蒙の間に置かれる、世界観の根本的な転換。",
+    "sense": "近代科学を生んだ十七世紀の大転換"
+   }
+  },
+  {
+   "term": "究極",
+   "reading": "きゅうきょく",
+   "pos": "noun",
+   "meaning": "ultimate; final; the last degree",
+   "defJa": "行き着くところまで行って、それ以上がないこと。",
+   "passage": {
+    "ja": "ヴェーダーンタの学習で、究極の問いとして必ず出てくるのが、「私とは何か」である。この問いに、試験対策のように一つの正解を暗記して答えても、理解したことにはならない。大切なのは、身体や思考と、見ている自分とがどう違うのかを、自分の経験に照らして確かめていくことだ。結論を急がず、普遍的な原理と日常の体験を行き来する作業が、結局は一番の近道になる。問いそのものを味わう時間も、勉強の一部なのである。",
+    "form": "究極",
+    "en": "In studying Vedanta, the ultimate question that always comes up is “What am I?” Even if you memorize a single correct answer to this question as in exam preparation and give it, that does not mean you have understood. What matters is to check, in light of your own experience, how the body and thoughts differ from the self that is looking. The work of going back and forth between universal principles and everyday experience, without hurrying to a conclusion, turns out in the end to be the best shortcut. The time spent savoring the question itself is also part of studying.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「究極の選択」「究極の目標」。「極」まで至ったところ。「究極的」とも言う。",
+    "sense": "行き着くところまで行った最後"
+   }
+  },
+  {
+   "term": "第二言語習得",
+   "reading": "だいにげんごしゅうとく",
+   "pos": "noun",
+   "meaning": "second language acquisition",
+   "defJa": "母語のほかの言語を身につける過程。",
+   "passage": {
+    "ja": "第二言語習得の研究では、十分に理解できる入力に大量に触れることが、上達の鍵だと考えられている。ところが、聞き流すだけでは語彙は増えにくく、意味を推測しながら能動的に聞く姿勢が必要だという指摘もある。さらに、間違いを恐れて話さない学習者は、出力の機会を失い、伸び悩む傾向がある。独学で学ぶ人にとっても、現段階の自分に合った入力と出力の釣り合いをどう取るかが、中心の課題になる。",
+    "form": "第二言語習得",
+    "en": "In research on second language acquisition, exposure to large amounts of input one can understand well enough is thought to be the key to improvement. However, there is also a point made that merely letting it wash over you does not easily increase vocabulary and that an active listening attitude of inferring meaning is needed. Furthermore, learners who do not speak for fear of mistakes lose the chance to produce and tend to plateau. Even for self-taught learners, how to strike a balance between input and output suited to their present stage becomes the central task.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「第二言語」は母語に次いで学ぶ言語。習得の過程を調べる研究分野の名でもある。",
+    "sense": "母語以外の言語を身につける過程"
+   }
+  },
+  {
+   "term": "筆跡",
+   "reading": "ひっせき",
+   "pos": "noun",
+   "meaning": "handwriting; (person's) hand",
+   "defJa": "その人が書いた文字に表れる癖。",
+   "passage": {
+    "ja": "この手紙、織田信長の筆跡かどうかで、研究者の意見が割れてるらしいんですよ。信長って、ほとんど自分で書かなくて、祐筆っていう書記役に書かせることが多かったんだって。だから、本人の字だと確かめるのは意外と難しい。署名の癖や紙の質を調べて、やっと可能性が高いとわかるくらいなんです。ちなみに、鑑定では癖のある一画だけを根拠にせず、文字全体の流れや墨の乗り方まで総合して判断するそうです。",
+    "form": "筆跡",
+    "en": "Researchers are apparently divided over whether this letter is in Oda Nobunaga's handwriting. Nobunaga, they say, hardly wrote himself and often had a secretary called a yuhitsu write for him. So it's surprisingly hard to confirm that it's the man's own hand. Only by examining the quirks of the signature and the quality of the paper can you finally tell the possibility is high. Incidentally, in authentication they apparently don't rest on a single distinctive stroke but judge comprehensively, down to the flow of the whole writing and how the ink sits.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「筆跡鑑定」「筆跡を残す」。書かれた字の形や癖から、書き手を見分ける手がかりになる。",
+    "sense": "書かれた文字に表れる癖"
+   }
+  },
+  {
+   "term": "米中対立",
+   "reading": "べいちゅうたいりつ",
+   "pos": "noun",
+   "meaning": "US-China rivalry; US-China confrontation",
+   "defJa": "米国と中国が対立している状態。",
+   "passage": {
+    "ja": "米中対立は、関税の引き上げに始まり、半導体の輸出規制へと広がってきた。双方の主張は、貿易の不均衡や安全保障上の懸念といった形をとるが、その根底には、技術の覇権をめぐる競争がある。日本をはじめとする各国は、どちらの陣営にも偏らない立場を探りつつ、サプライチェーンの見直しを迫られている。地政学の観点から見れば、対立が長引くほど、世界経済の分断は一層深まるとの懸念が出ている。",
+    "form": "米中対立",
+    "en": "The US-China confrontation began with tariff increases and has spread to export controls on semiconductors. Each side's claims take the form of trade imbalances and security concerns, but at the root lies competition over technological supremacy. Countries including Japan are being forced to review their supply chains while seeking a position that leans toward neither camp. Viewed from geopolitics, concern is emerging that the longer the confrontation drags on, the deeper the division of the world economy will become.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「米中」は米国と中国の略。「〜対立」で二者の争いを表す。「日中」「日米」と同型。",
+    "sense": "米国と中国が対立する状態"
+   }
+  },
+  {
+   "term": "粘る",
+   "reading": "ねばる",
+   "pos": "verb",
+   "meaning": "to persevere; to stick with it; to be sticky",
+   "defJa": "あきらめずに、しぶとく続ける。",
+   "passage": {
+    "ja": "うちの祖母は、ほんとに粘る人でさ。電話口で値引き交渉を始めたら、相手が根負けするまで二十分でも三十分でも平気で引かないんだよ。最初は横で聞いていて恥ずかしかったけど、最近は、あの粘りが結果を変えるんだなって思うようになった。才能とかじゃなく、あきらめないで一歩ずつ話を進める根気なんだよね。それを見習って、僕も苦手な交渉の電話をかけてみたら、意外と通ったんだ。",
+    "form": "粘る",
+    "en": "My grandmother is really a stubborn one, you know. Once she starts bargaining over the phone, she doesn't back down for twenty or even thirty minutes, until the other side gives in. At first I was embarrassed listening beside her, but lately I've come to think that her persistence is what changes the result. It's not a matter of talent but the perseverance to move the conversation along step by step without giving up. Following her example, I tried making a negotiating call, which I'm bad at, and it went through, surprisingly.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「粘る」は「粘り強く続ける」。物が「ねばねばする」意味もあるが、人の態度に多い。",
+    "sense": "あきらめずしぶとく続ける"
+   }
+  }
+ ]
+}
