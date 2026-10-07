@@ -3351,8 +3351,8 @@ body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
 .primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 body.has-primary-tabs #variants { bottom: var(--nav-clearance); }
 body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(max(var(--nav-clearance), var(--foundation-dock-clearance, 0px)) + 12px); }
-/* The list sheet hides tabs and reserves the original report-button strip. */
-body.has-primary-tabs:has(#vocabulary-list-popover) #bunki-reports-root .br-rail { bottom: 12px; }
+/* Sheets hide tabs and reserve the original report-button strip. */
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail { bottom: 12px; }
 body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px); }
 body.has-primary-tabs .kp-grades,
 body.has-primary-tabs .pc-controls,
