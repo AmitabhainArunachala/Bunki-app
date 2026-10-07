@@ -1,0 +1,1004 @@
+{
+ "cards": [
+  {
+   "term": "一党独裁",
+   "reading": "いっとうどくさい",
+   "pos": "noun",
+   "meaning": "one-party dictatorship",
+   "defJa": "一つの政党だけが権力を握る政治体制。",
+   "passage": {
+    "ja": "一党独裁っていうと、ただ怖い体制ってイメージが先に来るけど、実際は、なぜ人々が受け入れたのかを考えるほうが面白いんですよ。たとえば一九三〇年代のドイツでは、世界恐慌のあとの失業と混乱に、みんなが疲れ切っていた。そこに「強いリーダーが秩序を取り戻す」って約束する党が現れて、支持を集めたんです。やがて他の政党は禁止され、三権分立も形だけのものになっていきました。怖いのは、その過程が一夜じゃなくて、少しずつ進んだことなんですよね。",
+    "form": "一党独裁",
+    "en": "When you say one-party dictatorship, the image of a frightening regime comes first, but in fact it's more interesting to think about why people accepted it. In 1930s Germany, for example, everyone was worn out by the unemployment and chaos after the Great Depression. Then a party appeared promising that “a strong leader will restore order,” and gathered support. In time the other parties were banned, and even the separation of powers became a mere formality. What's frightening is that the process didn't happen overnight but advanced little by little.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「一党独裁」は複数政党制の対。「独裁」は権力の集中。「〜制」を付けて「一党独裁制」とも言う。",
+    "sense": "一つの政党だけが権力を握る体制"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一念発起",
+   "reading": "いちねんほっき",
+   "pos": "expression",
+   "meaning": "resolving to make a change",
+   "defJa": "ある事をやり遂げようと、心を決めて奮い立つこと。",
+   "passage": {
+    "ja": "話し方を変えようと一念発起して、まず評判のよい話し方教室に申し込む人は多い。ただ、そこで数週間で燃え尽きてしまう人が少なくないのも事実だ。元局アナだった私の先輩は、決意の熱さよりも、その後の毎日欠かさず積み重ねる小さな練習こそが成否を分けると言っていた。三日坊主を責めるより、無理なく続けられる仕組みを先に作る。それが、最初の熱を一過性で終わらせない唯一の方法だろう。",
+    "form": "一念発起",
+    "en": "Many people resolve to change how they speak and first sign up for a speaking class. But it is also true that not a few burn out right there. A senior colleague who used to be an announcer said that what decides success or failure is not the heat of the resolve but the small daily practice afterward. Rather than blaming a three-day quitter, first create a mechanism that can be kept up. That is probably the only way to keep the initial heat from being a passing thing.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「一念発起して〜する」の形が多い。仏教語の「発起」は思い立つこと。決意して行動に移る場面で使う。",
+    "sense": "ある事をやり遂げようと決心する"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一揆",
+   "reading": "いっき",
+   "pos": "noun",
+   "meaning": "uprising; revolt (esp. peasant)",
+   "defJa": "農民などが団結して起こす、支配への抗議行動。",
+   "passage": {
+    "ja": "中学校の歴史の試験では、一揆と打ちこわしの違いがよく問われる。これは、農民などが年貢の軽減や代官の交代を求めて、団結して行動するものである。一方、打ちこわしは、米の買い占めをした商人の家などを、都市の民衆が襲う行動を指す。どちらも、支配への不満が背景にある点は同じだが、要求や担い手が異なると覚えておくと得点しやすい。丸暗記ではなく、発生の原因と結びつけることが肝心だ。",
+    "form": "一揆",
+    "en": "In junior high school history exams, the difference between ikki and uchikowashi is often asked. An ikki is where peasants and others act in unity demanding a reduction of the land tax or the replacement of a magistrate. An uchikowashi, on the other hand, refers to city commoners attacking the houses of merchants who hoarded rice. Both share discontent with the ruling order in the background, but it is easy to score if you remember that their demands and bearers differ. What matters is not rote memorization but linking them to the causes of their occurrence.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「一揆」は「揆（はかりごと）を一にする」で、心を合わせること。「百姓一揆」「土一揆」など。",
+    "sense": "人々が団結して起こす抗議行動"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一期一会",
+   "reading": "いちごいちえ",
+   "pos": "expression",
+   "meaning": "once-in-a-lifetime encounter",
+   "defJa": "一生に一度の出会いと思って、誠意を尽くすこと。",
+   "passage": {
+    "ja": "茶道の心得として知られる一期一会は、「この出会いは一生に一度きり」と思って、誠意を尽くすことを教える。話し手としても、同じ聴衆の前で同じ話をする機会は二度とない。だから、原稿を覚えて再生するのではなく、その場の空気を読んで言葉を選ぶ姿勢が大切になる。仏教の世界観にある無常の感覚とも響き合うこの言葉は、一回きりの講演を、一つの修行の場に変えてくれる。そう考えると、目の前の一人に向けて話す意味が、ずっと重くなる。",
+    "form": "一期一会",
+    "en": "Ichigo ichie, known as a precept of the tea ceremony, teaches us to devote sincerity thinking “this encounter is once in a lifetime.” As a speaker too, there is never a second chance to give the same talk before the same audience. So rather than memorizing a script and replaying it, an attitude of reading the atmosphere of the moment and choosing words becomes important. This phrase, which resonates with the Buddhist sense of impermanence, turns a one-time lecture into a place of practice. Thinking so, the meaning of speaking to the one person in front of you becomes much heavier.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "茶道から広まった言葉。「一期」は一生、「一会」は一度の出会い。二度と来ない場を大切にする心。",
+    "sense": "一生に一度の出会いを大切にすること"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一次史料",
+   "reading": "いちじしりょう",
+   "pos": "noun",
+   "meaning": "primary source",
+   "defJa": "当時の人が実際に書き残した、一次の史料。",
+   "passage": {
+    "ja": "歴史研究では、当時の人が実際に書き残した日記や公文書などの一次史料が、最も重視される。後世に編まれた歴史書は、編者の意図や記憶違いが混じりやすいからだ。たとえば古い正史の記述を検証する際も、同時代の木簡や金石文と照らし合わせる作業が欠かせない。ただし、こうした史料でも書き手の立場による偏りはあり、複数の史料を主体的に突き合わせて読む姿勢が求められる。その手間を惜しまないことが、歴史を読む基本とされる。",
+    "form": "一次史料",
+    "en": "In historical research, primary sources, such as diaries and official documents that people of the time actually left in writing, are given the most weight. This is because histories compiled in later ages readily mix in the compilers' intentions and lapses of memory. When verifying the accounts in an old official history, for example, collating them with contemporary wooden tablets and inscriptions is indispensable. However, even primary sources carry bias from the writer's position, and an attitude of reading by actively cross-checking multiple sources is required. Not sparing that effort is regarded as the basis of reading history.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「一次」は元の・直接のの意。対は「二次史料」（後世の編纂物や研究）。",
+    "sense": "当時の人が直接書き残した史料"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一言で言えば",
+   "reading": "ひとことでいえば",
+   "pos": "expression",
+   "meaning": "in a word; to put it simply",
+   "defJa": "長い話を短く、要点だけでまとめて言うと。",
+   "passage": {
+    "ja": "長い話を聞かされたあとで、「要するにどういうこと？」と聞かれて、困った経験はないでしょうか。これに即答できる人は、話の中核をつかんでいる人です。逆に、短くまとめられないのは、理解がまだ曖昧な証拠かもしれません。ですから、人に説明するときは、話し始める前に、まず自分の頭で一言で言えばを決めておくと、全体に一貫性が生まれて、ぐっと締まります。聞き手は、細部よりも、最後に残るその一言で話を記憶するからです。",
+    "form": "一言で言えば",
+    "en": "Haven't you had the trouble of being asked “so what does it come down to?” after being made to listen to a long talk? A person who can answer this immediately has grasped the core of the talk. Conversely, being unable to sum it up briefly may be a sign that your understanding is still vague. So when explaining to someone, if you first decide in your own head what you would say in a word before you begin, the whole tightens up considerably. This is because listeners remember a talk not by the details but by that one phrase that remains at the end.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「一言で言えば」は要約の前置き。「要するに」「端的に言えば」と近く、話の締めや導入で使う。",
+    "sense": "長い話を要点だけで言うと"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "一貫性",
+   "reading": "いっかんせい",
+   "pos": "noun",
+   "meaning": "consistency; coherence",
+   "defJa": "考え方や言動に筋が通っていること。",
+   "passage": {
+    "ja": "話に一貫性があるかどうかは、聞き手が最初に無意識に評価するポイントです。冒頭で「結論は三つあります」と言ったのに、二つしか話さなければ、聞き手は不安になります。逆に、最初に示した枠組みどおりに進めば、内容が多少難しくても、安心して付いてきてくれます。そのために、原稿には三段論法のような骨組みを用意しておくと、話が脱線しにくくなります。話し方の指導で最初に教わるのは、声の出し方より、この構成の筋道かもしれません。",
+    "form": "一貫性",
+    "en": "Whether a talk has consistency is the point listeners evaluate first, without realizing it. If you said at the start “there are three conclusions” but talk about only two, the listener becomes uneasy. Conversely, if you proceed according to the framework shown at the start, they will follow with peace of mind even if the content is somewhat difficult. For that reason, if you prepare a skeleton like a syllogism in your script, the talk is less likely to wander off. What is taught first in speaking instruction may be this line of structure rather than how to produce the voice.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「一貫性がある・欠ける」。「一貫」は始めから終わりまで同じ筋で貫くこと。",
+    "sense": "始めから終わりまで筋が通っていること"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "七五調",
+   "reading": "しちごちょう",
+   "pos": "noun",
+   "meaning": "7-5 meter",
+   "defJa": "七音と五音を繰り返す、日本語の韻律。",
+   "passage": {
+    "ja": "七五調は、七音と五音を繰り返す日本語の韻律である。「祇園精舎の鐘の声、諸行無常の響きあり」のような平家物語の冒頭が耳に残るのも、このリズムのおかげだ。試験では、この調子か、五七調かを見分ける問題が出るので、音数を数えて区切る練習が有効である。万葉仮名で書かれた古い歌の多くが、五七調であったことも合わせて覚えておきたい。近代の唱歌や童謡の多くもこのリズムで作られていて、日本人の耳によく馴染んでいる。",
+    "form": "七五調",
+    "en": "The 7-5 meter is a Japanese rhythm that repeats seven and five syllables. That the opening of the Tale of the Heike, “the bell of Gion Shōja, its voice the echo of impermanence,” stays in the ear is thanks to this rhythm. Exams ask you to tell 7-5 from 5-7 meter, so practice counting syllables and breaking lines is effective. It is also worth remembering together that many of the old songs written in man'yōgana were in 5-7 meter. Many modern school songs and nursery rhymes too are made with this rhythm and are familiar to Japanese ears.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "七五調は軽快で、近世以降の歌謡・標語に多い。対は古代の和歌に多い「五七調」。",
+    "sense": "七音と五音の繰り返しの韻律"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "七転び八起き",
+   "reading": "ななころびやおき",
+   "pos": "expression",
+   "meaning": "fall seven times, rise eight",
+   "defJa": "何度失敗しても、くじけず立ち上がること。",
+   "passage": {
+    "ja": "七転び八起きという言葉は、何度失敗しても立ち上がることを励ます、日本の定番の格言です。ところが最近の研究では、この言葉の裏にある心の働き、つまりレジリエンスは、単なる根性論では説明できないとされています。立ち直りが早い人は、失敗を自分の能力のせいにせず、状況や手順の問題として切り分けているといいます。三日坊主で終わった過去があっても、やり方を変えればもう一度始められる。そう考えると、心が少し軽くなります。",
+    "form": "七転び八起き",
+    "en": "The phrase nanakorobi yaoki is a standard Japanese maxim encouraging us to stand up however many times we fail. In recent research, though, the workings of the mind behind this phrase, that is, resilience, are said not to be explained by mere grit-ism. People who recover quickly are said not to blame failure on their own ability but to separate it out as a problem of circumstances and procedure. Even if you have a past of quitting after three days, you can start again if you change the way. Thinking so, the heart gets a little lighter.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「七」と「八」は「たくさん」の意。倒れた数より起きた数が一つ多い点に、励ましがある。",
+    "sense": "何度失敗しても立ち上がること"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "万物",
+   "reading": "ばんぶつ",
+   "pos": "noun",
+   "meaning": "all things; the whole of creation",
+   "defJa": "宇宙に存在するすべてのもの。",
+   "passage": {
+    "ja": "インドの古い哲学では、万物の根源は何かという問いが、繰り返し立てられました。ウパニシャッドは、それをブラフマンと呼び、見えるものも見えないものも、すべてその現れだと説きます。この世界観に立つと、自分と他人、人間と自然という区別が、本質的なものではなくなります。もちろん、すぐに腑に落ちる考え方ではないので、まずは身近な例えで考えてみるのが近道です。一見すると抽象的な議論でも、世界観の違いを知る手がかりになる。",
+    "form": "万物",
+    "en": "In ancient Indian philosophy, the question of what is the source of all things was raised again and again. The Upanishads call it Brahman and teach that everything, visible and invisible, is its manifestation. From this worldview, distinctions such as self and other, human and nature, cease to be essential. Of course, it is not a way of thinking that sinks in at once, so the shortcut is to try thinking first with a familiar analogy. Even a discussion that looks abstract at first becomes a clue to knowing differences in worldview.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「万物」は存在するもの全部。「万物流転」「万物の霊長」など。哲学・宗教で根源を問うときに出る。",
+    "sense": "宇宙に存在するすべてのもの"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "万葉仮名",
+   "reading": "まんようがな",
+   "pos": "noun",
+   "meaning": "man'yōgana",
+   "defJa": "漢字の音や訓を借りて日本語を書き表した文字。",
+   "passage": {
+    "ja": "日本には、もともと自分たちの文字がありませんでした。そこで、漢字を音だけ借りて日本語を書き表す方法が生まれます。これが万葉仮名で、「夜麻」で「やま」を書くようなものです。のちに、この文字を崩したり一部を取ったりして、平仮名と片仮名が生まれました。つまり、いまの私たちが当たり前に使う仮名は、中国との交易や交流を通じて入った漢字を、日本語に合わせて工夫した長い歴史の結晶なのです。",
+    "form": "万葉仮名",
+    "en": "Japan originally had no script of its own. So a method was born of borrowing only the sounds of kanji to write Japanese. This is man'yōgana, like writing “yama” with “夜麻.” Later, by cursively simplifying these characters or taking a part of them, hiragana and katakana were born. In other words, the kana we use as a matter of course today are the crystallization of a long history of adapting kanji from China to Japanese.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "『万葉集』に多く使われたことから。漢字の意味を捨て、音（または訓）だけを借りた表記。",
+    "sense": "漢字の音を借りて書いた古い仮名"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "三日坊主",
+   "reading": "みっかぼうず",
+   "pos": "noun",
+   "meaning": "one who quits after three days",
+   "defJa": "何事も長続きしないこと。また、その人。",
+   "passage": {
+    "ja": "一念発起して勉強の計画を立てても、三日坊主で終わってしまう受験生は決して少なくない。原因の多くは、じつは、意志が弱いことではなく、最初の目標が高すぎることにある。まずは一日十分、机に向かうだけでよい、と最初に決めてしまうのが効果的だ。小さく始めてルーティンにできれば、あとから時間を少しずつ増やすのは難しくない。逆に、いきなり五時間の計画を立てると、一度崩れたときに立て直せなくなる。",
+    "form": "三日坊主",
+    "en": "Not a few examinees make a study plan and end up quitting after three days. The cause is mostly not weak will but that the initial goal is too high. It is effective to decide first that sitting at the desk for just ten minutes a day is enough. If you start small and can make it a routine, it is not hard to increase the time later. Conversely, if you suddenly make a five-hour plan, you cannot get back on track once it collapses.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「三日坊主」は出家しても三日で戻る僧の意から。「三日坊主で終わる」。飽きやすい人にも言う。",
+    "sense": "長続きせず、すぐ投げ出すこと"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "三昧",
+   "reading": "さんまい",
+   "pos": "noun",
+   "meaning": "samadhi; total absorption (also suffix -zanmai)",
+   "defJa": "心を一つの対象に集中し、乱れない状態。",
+   "passage": {
+    "ja": "仏教の瞑想では、心が一つの対象に完全に集中した状態を三昧と呼ぶ。この語は、サンスクリット語のサマーディの音を写したものである。日本語では、のちに、読書ざんまいや贅沢ざんまいのように、何かに没頭する様子を表す言い方へと広がった。近代心理学のフロー状態に近いとされる本来の深い境地が、日常語として使われる一方で、否定的な意味合いを帯びる例もある点は興味深い。ひらめきが生まれる条件として、この深い集中が語られることも多い。",
+    "form": "三昧",
+    "en": "In Buddhist meditation, the state in which the mind is completely concentrated on a single object is called samadhi. This word transcribes the sound of the Sanskrit samādhi. In Japanese it later spread to ways of expressing absorption in something, as in being immersed in reading or indulging in luxury. It is interesting that the original deep state, said to be close to the flow state of modern psychology, is used as an everyday word while sometimes taking on a negative nuance. This deep concentration is also often cited as a condition for insights to arise.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "音写語。本来は精神統一の境地だが、「〜ざんまい」は没頭や度を越した耽溺にも使う。",
+    "sense": "心を一つに集中し乱れない状態"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "三権分立",
+   "reading": "さんけんぶんりつ",
+   "pos": "noun",
+   "meaning": "separation of powers",
+   "defJa": "国家の権力を三つに分け、互いに抑制させること。",
+   "passage": {
+    "ja": "三権分立とは、国家の権力を立法・行政・司法の三つに分け、互いに抑制させることで、権力の濫用を防ぐ仕組みである。モンテスキューが『法の精神』で唱え、人権宣言や各国の憲法に影響を与えた。日本国憲法でも、国会、内閣、裁判所がそれぞれの役割を持つ。試験では、どの機関がどの機関をどう抑えるのかを、矢印で整理しておくと得点につながる。世界恐慌後の独裁の経験は、この仕組みの価値を改めて世界に認識させた。",
+    "form": "三権分立",
+    "en": "The separation of powers is a mechanism that prevents the abuse of power by dividing state power into three, legislative, executive and judicial, and having them check one another. Montesquieu advocated it in The Spirit of the Laws, and it influenced declarations of rights and the constitutions of various countries. In the Constitution of Japan too, the Diet, the Cabinet and the courts each have their roles. In exams, organizing with arrows which body checks which body and how will lead to points. The experience of dictatorship after the Great Depression made the world recognize anew the value of this mechanism.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "立法（国会）・行政（内閣）・司法（裁判所）の三つ。モンテスキューの『法の精神』で広まった。",
+    "sense": "権力を三つに分けて抑制させる仕組み"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "三段論法",
+   "reading": "さんだんろんぽう",
+   "pos": "noun",
+   "meaning": "syllogism",
+   "defJa": "二つの前提から結論を導く、論理の形式。",
+   "passage": {
+    "ja": "「人間はみんな死ぬ。ソクラテスは人間だ。だからソクラテスは死ぬ」っていう三段論法、聞いたことありますよね。形式としては正しいんだけど、日常会話では、前提の中身が怪しいまま、それっぽく結論を出す人もいるんですよ。「成功する人は朝型だ。私は朝型だ。だから私は成功する」みたいなやつ。これ、話に一貫性があるように聞こえても、前提が全然成り立ってないんですよね。論理の形と、中身の正しさは別物なんです。",
+    "form": "三段論法",
+    "en": "You've heard of the syllogism, “all humans die; Socrates is human; therefore Socrates dies,” right? It's correct in form, but in everyday conversation there are people who draw conclusions that sound plausible while the contents of the premises are dubious. Something like “successful people are morning people; I'm a morning person; therefore I'll succeed.” Even if it sounds as though the talk is consistent, the premises don't hold at all. The form of logic and the correctness of the content are different things.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "大前提・小前提・結論の三段で推論する形式。形が正しくても前提が偽なら結論は保証されない。",
+    "sense": "二つの前提から結論を導く論理形式"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "三角貿易",
+   "reading": "さんかくぼうえき",
+   "pos": "noun",
+   "meaning": "triangular trade",
+   "defJa": "三つの地域を結んで成り立つ貿易。",
+   "passage": {
+    "ja": "三角貿易とは、三つの地域を結んで成り立つ貿易の形で、とくに大西洋のそれが知られている。ヨーロッパから武器や雑貨がアフリカへ運ばれ、そこで奴隷が積まれて新大陸に送られ、さらに砂糖や綿花がヨーロッパへ戻った。この循環は、奴隷にされた人々の苦しみの上に成り立っており、のちの人種差別の根にもなった。今日、各国の博物館や研究機関で、この歴史と向き合う取り組みが進んでいる。",
+    "form": "三角貿易",
+    "en": "Triangular trade is a form of trade that works by connecting three regions, and the Atlantic triangular trade in particular is well known. Weapons and sundries were carried from Europe to Africa, where slaves were loaded and sent to the New World, and then sugar and cotton returned to Europe. This cycle rested on the suffering of the people enslaved and also became a root of later racial discrimination. Today, efforts to face this history are advancing in museums and research institutions in various countries.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「三角」は三つの地点の関係。アフリカ・新大陸・ヨーロッパを結ぶ大西洋の例が有名。",
+    "sense": "三つの地域を結ぶ貿易"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "上位語",
+   "reading": "じょういご",
+   "pos": "noun",
+   "meaning": "hypernym; superordinate term",
+   "defJa": "他の語をまとめて含む、上のくくりの語。",
+   "passage": {
+    "ja": "言語学では、「動物」は「犬」の上位語であり、逆に「犬」は「動物」の下位語にあたる。この階層関係は、語彙の整理だけでなく、文章の読解にも役立つ。長い説明の途中で、筆者が具体例を並べたあと、それらをまとめる語を持ち出すことがあるが、それはたいてい、より大きなくくりを示す語である。読解問題で、指示語の内容を探すときも、大きなくくりの言葉を手がかりにすると、答えを絞りやすくなる。",
+    "form": "上位語",
+    "en": "In linguistics, “animal” is a hypernym of “dog,” and conversely “dog” is a hyponym of “animal.” This hierarchical relation is useful not only for organizing vocabulary but also for reading comprehension. In the middle of a long explanation, the author may line up concrete examples and then bring out a word that sums them up, and that is usually a word showing a larger grouping. In comprehension questions, too, when looking for what a demonstrative refers to, using a word for the larger grouping as a clue makes it easier to narrow down the answer.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「上位語」は意味の範囲が広い語。例は「動物」（上位）と「犬」（下位）。",
+    "sense": "他をまとめて含む、上のくくりの語"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "下位語",
+   "reading": "かいご",
+   "pos": "noun",
+   "meaning": "hyponym; subordinate term",
+   "defJa": "より具体的な、下のくくりの語。",
+   "passage": {
+    "ja": "説明がぼんやりしていると言われる人は、抽象的な言葉ばかり使っていることが多い。「乗り物」と言うより「自転車」、「食べ物」と言うより「焼きたてのパン」と言うほうが、聞き手の頭に像が浮かぶ。言い換えれば、より具体的な下位語を選ぶということだ。ただし、すべてを細かくすると冗長になるので、大きなくくりの語と具体的な語のバランスを意識するとよい。上位語ばかり使う癖があると、話は一貫性のないぼんやりしたものになりやすい。",
+    "form": "下位語",
+    "en": "People told that their explanations are vague often use only abstract words. Saying “bicycle” rather than “vehicle,” or “freshly baked bread” rather than “food,” makes an image appear in the listener's head. In other words, it means choosing a more concrete hyponym. However, making everything fine-grained becomes redundant, so it is good to be conscious of the balance between words for larger groupings and concrete words. A habit of using only hypernyms makes a talk prone to becoming vague and without consistency.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「下位語」は具体的な語で、「上位語」と対。説明を具体的にする時は下位語を選ぶ。",
+    "sense": "より具体的な、下のくくりの語"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "下剋上",
+   "reading": "げこくじょう",
+   "pos": "noun",
+   "meaning": "gekokujō; the low overthrowing the high",
+   "defJa": "身分の低い者が、上の者を実力で倒すこと。",
+   "passage": {
+    "ja": "戦国時代を象徴する言葉が、下剋上です。身分の低い者が、血筋ではなく実力で上の者を倒して取って代わる風潮を指します。斎藤道三のように、油売りから美濃の国主になったとされる人物の話は有名ですが、実際は親子二代の事業だった可能性が指摘されています。それでも、家柄より実力が評価される空気が広がっていたのは確かです。この流れの先に、織田信長や豊臣秀吉といった、世襲ではなく実力で上り詰めた人物が現れました。",
+    "form": "下剋上",
+    "en": "The word that symbolizes the Sengoku period is gekokujō. It refers to the trend of low-ranking people overthrowing and replacing their superiors by ability. The story of figures like Saito Dosan, said to have gone from oil seller to lord of Mino, is famous, but it has been pointed out that in fact it may have been the enterprise of two generations, father and son. Even so, it is certain that an atmosphere in which ability was valued over pedigree had spread. At the end of this flow, Oda Nobunaga and Toyotomi Hideyoshi appeared.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「下が上に剋（か）つ」。室町後期〜戦国の社会変動を示す語で、実力主義の風潮を指す。",
+    "sense": "下の者が実力で上の者を倒すこと"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "不凍港",
+   "reading": "ふとうこう",
+   "pos": "noun",
+   "meaning": "ice-free port",
+   "defJa": "冬でも凍らず、一年中使える港。",
+   "passage": {
+    "ja": "ロシアの歴史を貫くテーマの一つが、不凍港の獲得です。国土の大半が冬に凍る北の大国にとって、一年中船が出入りできる港は、海軍にも交易にも欠かせませんでした。そのため、ランドパワーの国でありながら、黒海や、バルト海、さらに極東へと、南や東へ出口を求める動きが繰り返されます。十九世紀にクリミア戦争が起きたのも、この延長線上にあります。地図を見ながら考えると、世界史がぐっと立体的に見えてきます。",
+    "form": "不凍港",
+    "en": "One theme running through Russian history is the acquisition of ice-free ports. For a northern great power whose land mostly freezes in winter, a port that ships can enter and leave all year was indispensable to both navy and trade. Therefore, even as a land power, it repeatedly sought outlets to the south and east, to the Black Sea, the Baltic Sea, and then the Far East. The outbreak of the Crimean War in the nineteenth century also lies on the extension of this. Thinking while looking at a map makes world history look much more three-dimensional.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「不凍」は凍らないこと。ロシアの南下政策の動機として世界史で頻出する語。",
+    "sense": "冬も凍らず通年使える港"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "不安障害",
+   "reading": "ふあんしょうがい",
+   "pos": "noun",
+   "meaning": "anxiety disorder",
+   "defJa": "強い不安が長く続き、生活に支障が出る病気。",
+   "passage": {
+    "ja": "不安障害は、強い不安や恐怖が長く続き、日常生活に支障が出る状態を指します。誰でも緊張する場面はありますが、その程度や期間が、状況に釣り合わない点が特徴です。体のほうも反応し、動悸や息苦しさ、交感神経の過剰な働きが見られることがあります。一人で抱え込まず、早めに専門家に相談することが回復への近道です。ストレス耐性の問題として片づけてしまうのは、危険な誤解です。",
+    "form": "不安障害",
+    "en": "Anxiety disorder refers to a state in which strong anxiety or fear continues for a long time and interferes with daily life. Everyone has situations where they get nervous, but a feature is that the degree and duration are out of proportion to the situation. The body reacts too, and palpitations, shortness of breath and excessive activity of the sympathetic nerve can be seen. Not holding it in alone and consulting a specialist early is the shortcut to recovery. Dismissing it as a problem of stress tolerance is a dangerous misunderstanding.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「不安障害」は医学的な診断名の総称。「障害」は日常生活への支障を意味する。",
+    "sense": "強い不安が続き生活に支障が出る病気"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "不平等条約",
+   "reading": "ふびょうどうじょうやく",
+   "pos": "noun",
+   "meaning": "unequal treaties",
+   "defJa": "一方に不利な条件を強いた、不公平な条約。",
+   "passage": {
+    "ja": "幕末に結ばれた不平等条約って、歴史の教科書だと、治外法権と関税自主権がないって、そこばっかり覚えるじゃないですか。でも、本当に大事なのは、それを解消するために明治政府が何をしたかなんです。憲法を作って、近代的な法律を整えて、議会まで開いた。全部、西洋の世界観で言う「文明国」と認めさせるためだったんですよ。交渉が実を結ぶのは、ようやく明治の終わりごろ、日露戦争のあとなんです。",
+    "form": "不平等条約",
+    "en": "As for the unequal treaties concluded at the end of the Edo period, in textbooks you only memorize that they lacked extraterritoriality and tariff autonomy, right? But what's really important is what the Meiji government did to eliminate them. It made a constitution, put laws in order, and even opened a parliament. All of it was to make the West recognize it as a “civilized nation.” The negotiations bore fruit only around the end of the Meiji era.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "幕末に日本が欧米と結んだ条約で、治外法権の承認と関税自主権の欠如が特徴。",
+    "sense": "一方に不利な条件を強いた条約"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "不滅",
+   "reading": "ふめつ",
+   "pos": "noun",
+   "meaning": "immortality; indestructibility",
+   "defJa": "いつまでも滅びずに存在し続けること。",
+   "passage": {
+    "ja": "インド哲学の入試対策では、アートマンの不滅という論点を、必ず押さえておきたい。ウパニシャッドは、肉体が滅びても、真の自己は生まれも死にもしないと説いた。これに対して、仏教は無我を唱え、固定した実体としての自己を認めなかった点が対照的である。両者を比較する問題では、それを認めるか否かを軸に整理すると、答案が書きやすい。ただし、何が滅びないのか、そして万物の根源とどう関わるのかという定義は、学派によって大きく食い違う。",
+    "form": "不滅",
+    "en": "In exam preparation for Indian philosophy, you want to be sure to cover the issue of the immortality of the atman. The Upanishads taught that even when the body perishes, the true self is neither born nor dies. In contrast, Buddhism advocated non-self and did not admit a self as a fixed substance. In questions comparing the two, organizing around whether each admits that makes the answer easier to write. However, the definition of what does not perish and how it relates to the source of all things differs greatly by school.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「不滅」は滅びないこと。「不滅の名声」「魂の不滅」など。哲学・宗教・称賛の文脈で使う。",
+    "sense": "滅びず永く存在し続けること"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "不透明",
+   "reading": "ふとうめい",
+   "pos": "na-adj",
+   "meaning": "unclear; opaque; murky",
+   "defJa": "はっきり見通せず、先行きがわからないさま。",
+   "passage": {
+    "ja": "AIの判断が不透明だという批判は、近年ますます強まっています。ディープラーニングは、何億ものパラメータを調整して答えを出すため、なぜその結論に至ったのかを、人間が追いかけるのは容易ではありません。医療や融資のように、判断の理由が重要な場面では、これは大きな問題です。そこで、もっともらしい後付けではない説明可能なAIの研究が進んでいますが、精度と説明しやすさの両立は、まだ難しい課題です。",
+    "form": "不透明",
+    "en": "Criticism that AI's judgments are opaque has grown stronger in recent years. Deep learning produces answers by adjusting hundreds of millions of parameters, so it is not easy for humans to trace why it reached a conclusion. In situations where the reason for a judgment matters, such as medicine and lending, this is a major problem. Research on explainable AI is therefore advancing, but reconciling accuracy and ease of explanation is still a difficult challenge.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「不透明な情勢」「不透明な仕組み」。中が見えず、判断や見通しが立たない含み。対は「透明」。",
+    "sense": "中や先が見通せないさま"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "世界恐慌",
+   "reading": "せかいきょうこう",
+   "pos": "noun",
+   "meaning": "Great Depression; world economic crisis",
+   "defJa": "一九二九年に始まった、世界的な大不況。",
+   "passage": {
+    "ja": "世界恐慌は、一九二九年十月のニューヨーク株式市場の暴落をきっかけに始まった。アメリカの銀行が相次いで破綻し、失業者は急増、不況は国境を越えて広がった。各国が自国の産業を守るために関税を引き上げた結果、世界の貿易は急速に縮んだ。この混乱のなかで、ドイツでは一党独裁の道が開かれ、日本でも軍部の発言力が強まった。経済の危機が政治の危機に変わる過程を、歴史は鮮明に示している。",
+    "form": "世界恐慌",
+    "en": "The Great Depression began with the crash of the New York stock market in October 1929. American banks failed one after another, the number of unemployed rose sharply, and the slump spread across borders. As countries raised tariffs to protect their own industries, world trade shrank rapidly. Amid this turmoil the road to one-party dictatorship opened in Germany, and the military's voice grew stronger in Japan too. History shows vividly the process by which an economic crisis turns into a political crisis.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "一九二九年のニューヨーク株の大暴落から世界に波及した。世界史の必須用語。",
+    "sense": "一九二九年に始まった世界的大不況"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "世界観",
+   "reading": "せかいかん",
+   "pos": "noun",
+   "meaning": "worldview",
+   "defJa": "世界や人生についての根本的な見方。",
+   "passage": {
+    "ja": "インドの友だちと話してると、世界観の違いを感じる瞬間がよくあるんだよね。仕事で失敗した私に、彼が笑って「大丈夫、また巡ってくるよ」って言ったんだ。最初は軽い励ましだと思ったけど、輪廻の考え方が根っこにあるのかもしれないと気づいた。万物は巡るっていう感覚があると、一回の失敗の重みが、ずいぶん違って見えるんだよね。自分の常識が、ほんの一つの見方にすぎないと教えられた気がする。",
+    "form": "世界観",
+    "en": "When I talk with my Indian friend, there are often moments when I feel a difference in worldview. When I'd failed at work, he said with a smile, “It's okay, it'll come around again.” At first I took it as a light word of encouragement, but I realized that the idea of reincarnation may be at the root of it. With a sense that all things go around, the weight of a single failure looks quite different. I feel I was taught that my common sense is just one way of seeing.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「〜観」は見方。「世界観」は世界全体への根本的な見方。作品の設定にも使う。",
+    "sense": "世界や人生についての根本的な見方"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "世襲",
+   "reading": "せしゅう",
+   "pos": "noun",
+   "meaning": "hereditary succession",
+   "defJa": "地位や職業を、親から子へ受け継ぐこと。",
+   "passage": {
+    "ja": "政治家の世襲をめぐっては、賛否が分かれ続けている。地盤や知名度を受け継いだ候補は、有利に選挙を戦えるため、新人が参入しにくく、候補者選びの過程も不透明だという批判がある。一方で、幼いころから政治の現場を見て育った経験が、人材として強みになるという意見もある。重要なのは、親から継いだかどうかよりも、有権者が政策や実績を見て判断できる環境が整っているかどうかである。地方の事情に根ざした人事慣行が、この問題を複雑にしているとの指摘もある。",
+    "form": "世襲",
+    "en": "Over hereditary succession among politicians, opinion has remained divided. There is a criticism that candidates who inherit a support base and name recognition can fight elections to their advantage, making it hard for newcomers to enter. On the other hand, there is also the opinion that the experience of growing up watching politics from childhood is a strength as talent. What matters is less whether it is hereditary than whether an environment is in place where voters can judge by policies and records. It has also been pointed out that centralized personnel practices make this problem more complicated.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「世襲」は地位・財産・職業を親から子へ受け継ぐこと。「世襲制」「世襲議員」。",
+    "sense": "親から子へ地位を受け継ぐこと"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "中央集権",
+   "reading": "ちゅうおうしゅうけん",
+   "pos": "noun",
+   "meaning": "centralization of power",
+   "defJa": "権力を中央に集め、中央が統治すること。",
+   "passage": {
+    "ja": "中央集権を説明するときは、まず「地方の力を弱めて、中央に権力を集める仕組み」と一言で言い切ると、聞き手がついてきやすい。たとえば、律令国家は、全国に国司を派遣して、土地と人民を朝廷が直接支配しようとした。ところが、時代が下ると、貴族の世襲化と荘園の拡大によって、その支配は徐々にゆるんでいった。この流れを知ると、のちの武家政権の登場も、地方の力が強まった結果として説明しやすくなる。",
+    "form": "中央集権",
+    "en": "When explaining centralization of power, stating it in one phrase first, “a mechanism that weakens regional power and gathers authority in the center,” makes it easy for the listener to follow. For example, the ritsuryō state dispatched provincial governors across the country and tried to rule land and people directly from the court. However, as time passed, that rule gradually loosened through the expansion of private estates. Knowing this flow makes it easier to explain the later emergence of warrior governments as a result of regional power growing stronger.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "対は「地方分権」。律令国家や絶対王政、近代国家の説明で使う。",
+    "sense": "権力を中央に集めて治めること"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "中核",
+   "reading": "ちゅうかく",
+   "pos": "noun",
+   "meaning": "core; nucleus; central part",
+   "defJa": "物事の中心となる、重要な部分。",
+   "passage": {
+    "ja": "この会社の中核って、結局どこなんだろうねって、飲み会で話題になったんだ。売上を見ると、半導体の部品が全体の半分以上を占めてるから、表向きはそこが主力事業なんだけど。でも、社員の話を聞くと、技術を磨く研究部門こそが本当の心臓部だって言うんだ。先行きが不透明な時代だからこそ、数字だけじゃなくて、人や文化の観点でも見ないと、会社の本質は見えないよなって思ったよ。そういう見方が、転職を考えるときの判断材料にもなるんだよね。",
+    "form": "中核",
+    "en": "Where the core of this company really is, it came up as a topic at a drinking party. Looking at sales, semiconductor parts account for more than half of the total, so on the surface that is the core business. But when you listen to employees, they say the research division that hones the technology is the real core. Precisely in an age when the outlook is murky, I thought you can't see a company's essence unless you look not just at numbers but from the viewpoint of people and culture. That kind of view can also become material for judgment when you think about changing jobs.",
+    "register": "話",
+    "topic": "other",
+    "tipJa": "「中核」は中心の核。「中核事業」「中核を担う」。組織や計画の最も重要な部分を指す。",
+    "sense": "物事の中心となる重要な部分"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "中立国",
+   "reading": "ちゅうりつこく",
+   "pos": "noun",
+   "meaning": "neutral country",
+   "defJa": "戦争に加わらず、中立を保つ国。",
+   "passage": {
+    "ja": "第二次世界大戦中、スイスやスウェーデンは中立国として、大きな戦火をほぼ免れた。ただ、その立場は、決して単純な平和主義の産物ではなかった。スイスは国民皆兵の体制を長年維持し、侵攻を受けた場合には徹底的に抵抗する態勢を整えていた。また、中立の維持のために、ドイツへ物資を輸出するなど、亡命者の受け入れ制限を含む、複雑で苦しい妥協も迫られた。中立とは、強い覚悟と現実的な判断に支えられた、絶え間ない緊張の産物なのである。",
+    "form": "中立国",
+    "en": "During the Second World War, Switzerland and Sweden escaped the flames of war as neutral countries. But that position was by no means the product of simple pacifism. Switzerland maintained universal military service and had put in place a posture of resisting thoroughly if invaded. In order to maintain neutrality, they were also pressed into complicated compromises, such as exporting goods to Germany. Neutrality is a product of tension, supported by strong resolve and realistic judgment.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「中立国」は戦争に加わらず、どの陣営にも味方しない国。永世中立国はスイスなど。",
+    "sense": "戦争に加わらず中立を保つ国"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "中華思想",
+   "reading": "ちゅうかしそう",
+   "pos": "noun",
+   "meaning": "Sinocentrism",
+   "defJa": "自国を世界の中心とみなす中国の考え方。",
+   "passage": {
+    "ja": "中華思想って、自分たちが世界の中心で、周りは野蛮だって考える見方のことなんですよ。中国の歴代王朝は、周辺の国から貢ぎ物を受け取って、それを「臣下の礼」として扱ってきた。日本も、遣唐使を送って学ぶ一方で、「日出づる処の天子」と書いた国書を送って、対等さを主張しようとしたんですよね。こういう駆け引きを知ると、東アジアの歴史が、ずっと立体的に見えてくるんです。その思想が、周辺国のアイデンティティ意識を刺激した面も見逃せないんです。",
+    "form": "中華思想",
+    "en": "Sinocentrism is the view that we ourselves are the center of the world and those around us are barbarians. Successive Chinese dynasties received tribute from neighboring countries and treated it as “the courtesy of vassals.” Japan too, while sending embassies to Tang China to learn, sent a letter reading “the Son of Heaven in the land where the sun rises” and tried to assert equality. Knowing such maneuvering makes East Asian history look much more three-dimensional. It also can't be overlooked that this idea stimulated the sense of identity of neighboring countries.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「中華」は世界の中心の意。周辺を夷狄とみなす考えで、朝貢と冊封の外交の根にある。",
+    "sense": "自国を世界の中心とみなす考え方"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "丸暗記",
+   "reading": "まるあんき",
+   "pos": "noun",
+   "meaning": "rote memorization",
+   "defJa": "意味を考えず、そのまま覚えること。",
+   "passage": {
+    "ja": "歴史の年号を丸暗記しても、試験が終わるとほとんど忘れてしまう、という経験はないだろうか。理由は、意味のつながりがない情報は、記憶の網の目に引っかかりにくいからである。たとえば、乱読で得た雑多な知識も、一つの物語に結びつけて整理すれば、思い出しやすくなる。有効なのは、因果関係を自分の言葉で説明し、白紙に書き出してみる方法だ。テスト効果の観点からも、この方法は理にかなっている。",
+    "form": "丸暗記",
+    "en": "Haven't you had the experience of memorizing historical dates by rote and then forgetting most of them once the exam is over? The reason is that information with no connection of meaning does not easily catch in the mesh of memory. For example, even the miscellaneous knowledge obtained through indiscriminate reading becomes easier to recall if tied into a single story and organized. An effective method is to explain causal relations in your own words and write them out on a blank sheet. From the viewpoint of the testing effect too, this method makes sense.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「丸」はそのまま全部の意。「丸ごと」「丸写し」と同じ。理解せず形だけ覚えること。",
+    "sense": "意味を考えずそのまま覚えること"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "主体性",
+   "reading": "しゅたいせい",
+   "pos": "noun",
+   "meaning": "initiative; autonomy; independence",
+   "defJa": "自分の意志と判断で行動する態度。",
+   "passage": {
+    "ja": "企業の採用現場では、学生の主体性を重視する傾向が強まっている。指示を待つのではなく、自ら課題を見つけ、周囲を巻き込んで動く力が求められるためだ。ただし、面接で語られるそうした経験は、似通ったものになりがちで、見極めは容易ではない。教育の現場でも、生徒に選択の機会を与え、結果に責任を持たせる実践が広がっている。この力は、一念発起で急に身につくものというより、機会の中で育つものだと考えられている。",
+    "form": "主体性",
+    "en": "In corporate hiring settings, the tendency to emphasize students' independence is growing stronger. This is because the ability to find tasks oneself and move while drawing others in is demanded, rather than waiting for instructions. However, the experiences told in interviews tend to become similar, and discerning is not easy. In education too, practices of giving students chances to choose and making them responsible for the results are spreading. This power is thought of as something that grows within opportunities rather than something taught.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「主体性がある・欠ける」。自分の意志で判断して動く姿勢。「主体的」は形容動詞形。",
+    "sense": "自分の意志と判断で行動する姿勢"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "主体的",
+   "reading": "しゅたいてき",
+   "pos": "na-adj",
+   "meaning": "proactive; self-directed",
+   "defJa": "自分の意志で、進んで物事に取り組むさま。",
+   "passage": {
+    "ja": "主体的に学ぶとは、与えられた課題をこなすことではなく、何を学ぶべきかを自分で問うことである。教師の説明を聞いて理解した気になるのと、自分で疑問を立てて調べるのとでは、記憶の定着がまるで違う。もっとも、完全に自力で学べる人は少なく、適切な足場かけは必要だ。要は、乱読のように手当たり次第に読むのではなく、問いを持って選ぶ姿勢が、学びの質を決めるのである。受け身の丸暗記では、点数は取れても、考える力は育ちにくい。",
+    "form": "主体的",
+    "en": "To learn proactively is not to get through the tasks given but to ask yourself what you should learn. Between feeling you've understood after hearing the teacher's explanation and raising your own questions and looking things up, the retention of memory is completely different. Still, few people can learn entirely on their own, and appropriate scaffolding is needed. The point is that it is the attitude of choosing with a question in mind, rather than reading at random like indiscriminate reading, that decides the quality of learning. With passive rote memorization, even if you get points, the power to think is hard to grow.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「主体的に学ぶ・取り組む」。教育の用語として多用。対は「受け身」「受動的」。",
+    "sense": "自分の意志で進んで取り組むさま"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "主導権",
+   "reading": "しゅどうけん",
+   "pos": "noun",
+   "meaning": "initiative; the lead; the upper hand",
+   "defJa": "物事を進める上で、先に立って決める力。",
+   "passage": {
+    "ja": "AI開発の主導権をめぐる争いは、技術だけでなく、半導体の供給という物理的な土台の上で戦われている。最先端の演算チップを製造できる企業が、世界でもごく一握りしかないからである。不透明な国際情勢のなかで、各国政府は、国内に工場を誘致するために巨額の補助金を投じている。この競争で優位に立つとは、単に優れた技術を持つことではなく、供給網全体を押さえることを意味するようになった。",
+    "form": "主導権",
+    "en": "The contest over the lead in AI development is fought not only in technology but on the physical foundation of semiconductor supply. This is because only a very handful of companies in the world can manufacture the most advanced computing chips. Amid an opaque international situation, governments are pouring in huge subsidies to attract factories to their countries. Gaining the advantage in this competition has come to mean not simply having superior technology but holding the whole supply network.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「主導権を握る・争う・奪う」。会議・交渉・競争で、先に進め方を決める力。",
+    "sense": "物事を先導して決める力"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "主権国家",
+   "reading": "しゅけんこっか",
+   "pos": "noun",
+   "meaning": "sovereign state",
+   "defJa": "最高の統治権を持ち、他国に従属しない国。",
+   "passage": {
+    "ja": "主権国家という考え方は、一六四八年のウェストファリア条約に始まるとよく説明されます。三十年戦争の講和で、それぞれの国が自国の内政について最終的な決定権を持つ、という原則が確認されたからです。この仕組みは、国内の中央集権化と組み合わさって、のちに国際法の土台になりました。もっとも、この物語は後世の単純化だという見方もあり、歴史家の間では議論が続いています。いずれにしても、現代の国際秩序を理解する鍵であることに変わりはありません。",
+    "form": "主権国家",
+    "en": "The idea of the sovereign state is often explained as beginning with the Treaty of Westphalia in 1648. This is because the principle that each country holds the final decision-making power over its own internal affairs was confirmed in the peace settlement of the Thirty Years' War. This mechanism later became the foundation of international law. Still, there is also a view that this story is a later simplification, and debate continues among historians. In any case, it remains the key to understanding the modern international order.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「主権」は最高の統治権。「国民主権」とは別の語感。国際法・国際政治の基本概念。",
+    "sense": "最高の統治権を持つ独立した国"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "乱読",
+   "reading": "らんどく",
+   "pos": "noun",
+   "meaning": "indiscriminate reading; reading widely",
+   "defJa": "手当たり次第に、いろいろな本を読むこと。",
+   "passage": {
+    "ja": "読書の方法については、精読か乱読かという議論が古くからある。一冊を何度も読み込む精読は、内容を深く理解するのに向いている。他方、こちらは、さまざまな分野の本を手当たり次第に読むことで、思わぬ発見やひらめき、知識同士の意外な結びつきを生む。どちらか一方が正しいというより、時期や目的によって使い分けるのが賢明である。私自身は、新しい分野に入るときは、まず手当たり次第に読むことから始めることにしている。",
+    "form": "乱読",
+    "en": "On the method of reading, there has long been a debate between close reading and indiscriminate reading. Close reading, working through one book many times, suits understanding the content deeply. Indiscriminate reading, by contrast, reading books from various fields at random, produces unexpected discoveries and surprising connections between pieces of knowledge. Rather than one being right, it is wise to use them according to period and purpose. For myself, when entering a new field, I make a point of starting with indiscriminate reading.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「乱読」は手当たり次第の読書。対は「精読」。「乱」は秩序のなさを表す。",
+    "sense": "手当たり次第に何でも読むこと"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "乳幼児死亡率",
+   "reading": "にゅうようじしぼうりつ",
+   "pos": "noun",
+   "meaning": "infant and child mortality rate",
+   "defJa": "幼い子どもが亡くなる割合。",
+   "passage": {
+    "ja": "江戸時代の人の平均寿命が驚くほど短かったのは、乳幼児死亡率が高かったからなんですよ。少なくない子どもが、五歳まで生き延びられなかった。だから、七五三みたいな行事は、もともと、無事に育ったことへの感謝として始まったとされるんです。大人になるまで生きれば、六十歳、七十歳まで生きる人も、案外いた。人口動態の数字、とくに平均寿命だけを見ると、昔の人がみんな短命だったように誤解してしまうんですよね。",
+    "form": "乳幼児死亡率",
+    "en": "The average lifespan of people in the Edo period was short because the infant and child mortality rate was high. Not a few children did not survive to the age of five. So events like Shichi-Go-San are said to have begun as thanks for children having grown up safely. If you lived to adulthood, there were quite a few who lived to sixty or seventy. Looking only at the figure for average lifespan, you end up misunderstanding as if all people of the past were short-lived.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「乳幼児」は乳児と幼児。「死亡率」は人口や出生数に対する死者の割合。平均寿命の理解に必須。",
+    "sense": "幼い子どもが亡くなる割合"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "二重敬語",
+   "reading": "にじゅうけいご",
+   "pos": "noun",
+   "meaning": "double honorific; redundant honorific",
+   "defJa": "敬語を二重に重ねた、過剰な言い方。",
+   "passage": {
+    "ja": "「社長がおっしゃられました」は、敬語としてはちょっと変、と聞いたことはありませんか。これが二重敬語です。「おっしゃる」という尊敬語に、さらに「れる」という尊敬の助動詞が重なっているからです。丁寧にしようとして、つい重ねてしまうのですが、文法的には過剰とされます。ただし、「お見えになられる」のように、慣用として定着している例もあり、一律に誤りとは言えず、です・ます調の丁寧さとは別に、敬語の整理が必要です。",
+    "form": "二重敬語",
+    "en": "Haven't you heard that “shachō ga osshararemashita” is a bit odd as honorific speech? This is a double honorific. It is because the honorific verb “ossharu” is further overlaid with the honorific auxiliary “reru.” People try to be polite and end up piling them on, but grammatically it is regarded as excessive. However, there are also examples like “omie ni nareru” that have settled as usage, so they cannot be called uniformly wrong, and apart from the politeness of the desu/masu style, an organization of honorifics is needed.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "同じ種類の敬語を二重にした形。文法的には過剰とされるが、慣用で定着した語もある。",
+    "sense": "敬語を二重に重ねた言い方"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "亡命",
+   "reading": "ぼうめい",
+   "pos": "noun",
+   "meaning": "exile; defection",
+   "defJa": "迫害などから逃れて、他国へ身を寄せること。",
+   "passage": {
+    "ja": "亡命とは、政治的な迫害や弾圧を逃れて、他国に身を寄せることである。二十世紀には、ナチスの迫害を逃れて、アインシュタインら多くの科学者や芸術家がアメリカへ渡った。彼らの頭脳の流入が、アメリカの科学の発展を大きく後押ししたと言われる。一方で、受け入れ国側では、人種差別的な風潮から、受け入れを制限する動きもあった。この選択は、個人の悲劇であると同時に、国家の力関係を動かす歴史の要因でもある。",
+    "form": "亡命",
+    "en": "Exile is escaping political persecution or repression and seeking refuge in another country. In the twentieth century, many scientists and artists, including Einstein, fled Nazi persecution and went to America. The inflow of their brains is said to have greatly boosted the development of American science. On the other hand, on the receiving side there were also moves to restrict the entry of exiles out of a racially discriminatory climate. Exile is both a personal tragedy and a factor in history that moves the power relations among states.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「亡命」は政治・宗教・思想上の理由で国外へ逃れること。「亡命政府」「亡命者」。",
+    "sense": "迫害を逃れて他国へ身を寄せること"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "交感神経",
+   "reading": "こうかんしんけい",
+   "pos": "noun",
+   "meaning": "sympathetic nervous system",
+   "defJa": "体を活動に向かわせる、自律神経の一つ。",
+   "passage": {
+    "ja": "人は緊張すると、心臓がどきどきし、手に汗をかく。これは、交感神経が優位になり、体が戦闘や逃走に備え、コルチゾールなどのホルモンも分泌されるからである。進化の観点から見れば、危険から身を守る役に立つ仕組みだが、現代の私たちは、締め切りやメールといった、逃げることのできない刺激に、この反応を繰り返し引き起こしてしまう。だからこそ、意識的に呼吸を深くし、体の緊張をほどく時間が必要になる。マインドフルネスは、その一つの方法である。",
+    "form": "交感神経",
+    "en": "When people get tense, the heart pounds and the hands sweat. This is because the sympathetic nervous system becomes dominant and the body prepares for fight or flight. From an evolutionary viewpoint it is a mechanism useful for protecting oneself from danger, but we moderns repeatedly trigger this reaction in response to stimuli we cannot flee, such as deadlines and email. That is exactly why time is needed to consciously deepen the breath and loosen the body's tension. Mindfulness is one method for that.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "自律神経は「交感神経」（活動）と「副交感神経」（休息）の二つ。緊張時は前者が優位になる。",
+    "sense": "体を活動に向かわせる自律神経"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "交易",
+   "reading": "こうえき",
+   "pos": "noun",
+   "meaning": "trade; commerce; exchange of goods",
+   "defJa": "品物を交換し合うこと。貿易。",
+   "passage": {
+    "ja": "古代の地中海世界では、フェニキア人が優れた船乗りとして、広い範囲で交易を行った。彼らは、レバノン杉やガラス、染料を各地に運び、その見返りに銀や錫を得ていた。のちのシルクロードの交流と同じく、この活動は、単に物を動かしただけでなく、文字の伝播にもつながった。彼らが使った表音文字が、のちのギリシャ文字やラテン文字の祖先となったからである。入試では、こうした文化の波及まで説明できるかどうかが問われる。",
+    "form": "交易",
+    "en": "In the ancient Mediterranean world, the Phoenicians, as excellent sailors, traded over a wide area. They carried Lebanese cedar, glass and dyes to various places and in return obtained silver and tin. This activity did not merely move goods but also led to the spread of writing. This is because the phonetic script they used became the ancestor of the later Greek and Latin alphabets. In entrance exams, whether you can explain even such cultural diffusion is asked.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「交易」は品物を交換すること。「貿易」より古い時代や地域間の物のやり取りに使う印象がある。",
+    "sense": "品物を交換し合うこと"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "交易路",
+   "reading": "こうえきろ",
+   "pos": "noun",
+   "meaning": "trade route",
+   "defJa": "交易のために人や物が通る道筋。",
+   "passage": {
+    "ja": "アジアとヨーロッパを結んだ交易路は、一本の道ではなく、いくつもの陸路と海路が複雑に絡んだ網でした。シルクロードは、中央アジアのオアシス都市を結ぶ陸の道、一方で、インド洋から東南アジアを通る海の道は、季節風を利用した船が行き来していました。これらの道に沿って、物だけでなく、仏教やイスラム教といった宗教も広がりました。道筋の変化は、国の盛衰に直結していたのです。",
+    "form": "交易路",
+    "en": "The trade routes that linked Asia and Europe were not a single road but a net in which many land and sea routes were intricately entwined. The Silk Road was the land route linking the oasis cities of Central Asia, while on the sea route passing from the Indian Ocean through Southeast Asia, ships taking advantage of the monsoon came and went. Along these roads, not only goods but also religions such as Buddhism and Islam spread. Changes in the course of the routes were directly tied to the rise and fall of states.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「交易路」は交易に使う道。「香辛料交易路」「海上交易路」。路線の変化が国の盛衰を左右した。",
+    "sense": "交易のための道筋"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人口動態",
+   "reading": "じんこうどうたい",
+   "pos": "noun",
+   "meaning": "demographics; population dynamics",
+   "defJa": "人口の増減や構成の変化の動き。",
+   "passage": {
+    "ja": "人口動態の話をするときは、いきなり数字を並べず、「日本は世界でも類を見ない速さで高齢化している」という一文から始めると、聞き手の注意を引ける。続けて、人口爆発に直面する国々とは対照的に、出生数と死亡数の推移、そして総人口の減少を、グラフで見せるとよい。ここで大切なのは、数字を読み上げるだけでなく、それが暮らしに何をもたらすかを、一つの具体例で示すことだ。たとえば、地方の学校の統廃合は、わかりやすい実例になる。",
+    "form": "人口動態",
+    "en": "When talking about demographics, rather than lining up figures right away, starting with a single sentence, “Japan is aging at a speed unparalleled in the world,” can catch the listener's attention. Then, in contrast with countries facing a population explosion, it is good to show with graphs the trend in births and deaths and the decline in the total population. What matters here is not just reading out figures but showing with one concrete example what they bring to people's lives. For instance, the merging of rural schools makes an easy-to-grasp example.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「人口動態」は出生・死亡・移動などによる人口の変化。「動態統計」と対で「静態統計」がある。",
+    "sense": "人口の増減や構成の変化の動き"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人口爆発",
+   "reading": "じんこうばくはつ",
+   "pos": "noun",
+   "meaning": "population explosion",
+   "defJa": "人口が短期間に急激に増えること。",
+   "passage": {
+    "ja": "人口爆発とは、人口が短期間に急激に増える現象です。世界の人口は、産業革命以前はゆっくり増えていましたが、二十世紀に入ると、医療と衛生の進歩により、乳幼児死亡率が下がり、急速に増加しました。国連の推計では、二〇二二年に八十億人を超えたとされています。ただ、その増加率は、すでに多くの国で鈍っています。この現実を、人口動態の変化として見ることが、将来を考えるうえで欠かせません。",
+    "form": "人口爆発",
+    "en": "A population explosion is the phenomenon in which population increases sharply over a short period. The world's population grew slowly before the Industrial Revolution, but entering the twentieth century, with advances in medicine and hygiene, infant and child mortality fell and it increased rapidly. According to United Nations estimates, it surpassed eight billion in 2022. However, the rate of increase has already slowed in many countries. Seeing this reality as a change in demographics is indispensable for thinking about the future.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「爆発」は急激な増大の比喩。世界史では十八世紀以降と二十世紀後半の急増を指す。",
+    "sense": "人口が急激に増える現象"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人名用漢字",
+   "reading": "じんめいようかんじ",
+   "pos": "noun",
+   "meaning": "kanji for personal names",
+   "defJa": "名づけに使える、常用漢字以外の漢字。",
+   "passage": {
+    "ja": "子どもの名前に使える漢字には、制限がある。常用漢字のほかに、法務省が定めた人名用漢字が追加され、現在は八百六十字ほどが認められている。たとえば、「翔」や「蓮」といった字は、人気の名前に多く使われている。試験では、制度の背景と、その見直しの経緯を問う問題が出ることがあるので、用語の意味をしっかり押さえておきたい。名前は子どものアイデンティティにも関わるだけに、名付けの自由と、行政の事務上の都合の間で、制度は揺れ動いてきた。",
+    "form": "人名用漢字",
+    "en": "There are limits on the kanji that can be used in a child's name. In addition to the jōyō kanji, kanji for personal names set by the Ministry of Justice have been added, and about 860 characters are currently permitted. For example, characters like “翔” and “蓮” are used a lot in popular names. Exams sometimes ask about the background of the system and the history of its revisions, so you want to be sure of the meaning of the terms. The system has swayed between freedom in naming and the administrative convenience of the government.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「人名用漢字」は常用漢字表にはないが、名づけに使える漢字。法務省令で追加されてきた。",
+    "sense": "名づけに使える常用漢字以外の字"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人文主義",
+   "reading": "じんぶんしゅぎ",
+   "pos": "noun",
+   "meaning": "humanism (Renaissance)",
+   "defJa": "人間の価値を重んじ、古典を学ぶ知的な立場。",
+   "passage": {
+    "ja": "ルネサンス期の人文主義は、古代ギリシャ・ローマの古典を研究し、人間の可能性を肯定する知的運動だった。ペトラルカやエラスムスのように、古典を原典で読み、教会の権威にとらわれずに考える態度が、その特徴である。この運動は、印刷術の普及によって、ヨーロッパ全体へ広がった。やがて、宗教改革や科学革命の土台となり、近代的な世界観を育てたと評価されている。その精神は、のちの大学教育や学問のあり方にも、長く影響を残した。",
+    "form": "人文主義",
+    "en": "Renaissance humanism was an intellectual movement that studied the classics of ancient Greece and Rome and affirmed human potential. Its hallmark was an attitude, as with Petrarch and Erasmus, of reading the classics in the original and thinking without being bound by church authority. This movement spread across all of Europe through the spread of printing. In time it became the foundation of the Reformation and the Scientific Revolution and is credited with nurturing the modern worldview. That spirit left a long influence on later university education and the shape of scholarship.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「人文主義」は「ヒューマニズム」の訳。人間性の解放を掲げ、ルネサンスの中心的な思想となった。",
+    "sense": "人間の価値を重んじ古典を学ぶ立場"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人権宣言",
+   "reading": "じんけんせんげん",
+   "pos": "noun",
+   "meaning": "Declaration of the Rights of Man",
+   "defJa": "一七八九年のフランス革命で出された、人権の宣言。",
+   "passage": {
+    "ja": "一七八九年のフランスで出された人権宣言は、「人は生まれながらにして自由かつ平等である」と述べて、世界中に衝撃を与えました。身分制を前提とした旧体制に対して、すべての人が同じ権利を持つという考えを、はっきりと言葉にしたからです。この宣言は、のちの各国の憲法に影響を与えます。ただ、当時の女性や奴隷は、その権利の外に置かれていたことも、忘れてはなりません。三権分立の考えと並んで、この理念は、のちに世界各地の憲法の旗印となった。",
+    "form": "人権宣言",
+    "en": "The Declaration of the Rights of Man issued in France in 1789 gave a shock to the world by stating that “men are born and remain free and equal in rights.” This is because, against the old regime that presupposed a class system, it put into clear words the idea that all people hold the same rights. This declaration influenced the later constitutions of various countries. However, we must not forget that women and slaves of the time were placed outside those rights. Alongside the idea of separation of powers, this ideal later became the banner of constitutions around the world.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "一七八九年八月に国民議会が採択。正式名は「人間および市民の権利の宣言」。",
+    "sense": "フランス革命で出された人権の宣言"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人種差別",
+   "reading": "じんしゅさべつ",
+   "pos": "noun",
+   "meaning": "racial discrimination",
+   "defJa": "人種を理由に、人を不当に差別すること。",
+   "passage": {
+    "ja": "人種差別は、生物学的な違いを根拠に、特定の集団を劣った存在とみなして、不当に扱うことです。しかし、現代の遺伝学は、人間の集団を明確に分ける「人種」という区分に、科学的な根拠は乏しいことを示しています。それでも、この考えは、植民地支配や三角貿易を支えた奴隷制度を正当化する道具として、長く使われてきました。歴史を学ぶ意味は、その仕組みを理解して、同じ過ちを繰り返さないことにあります。",
+    "form": "人種差別",
+    "en": "Racial discrimination is regarding a particular group as inferior on the basis of biological differences and treating it unjustly. However, modern genetics shows that the category of “race,” which clearly divides human groups, has little scientific basis. Even so, this idea has long been used as a tool for justifying colonial rule and slavery. The meaning of studying history lies in understanding that mechanism and not repeating the same mistake.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「人種差別」は人種を理由にした不当な扱い。「差別」は区別を超えて不利益を与えること。",
+    "sense": "人種を理由に不当に扱うこと"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "人類史",
+   "reading": "じんるいし",
+   "pos": "noun",
+   "meaning": "history of humankind",
+   "defJa": "人類が誕生してから現在までの歴史。",
+   "passage": {
+    "ja": "人類史を大きくとらえると、七万年前の認知革命、一万年前の農業革命、そして五百年前の科学革命という、三つの転換点が見えてきます。それぞれの革命は、人間の世界観、つまり自然や社会を理解する枠組みを、根本から入れ替えました。ハラリの『サピエンス全史』は、この大きな流れを、一つの物語として描いて、世界的な反響を呼びました。細部の議論はあるにせよ、巨大な視点で歴史を考える練習になる一冊です。",
+    "form": "人類史",
+    "en": "Taking a broad view of the history of humankind, three turning points come into sight: the Cognitive Revolution seventy thousand years ago, the Agricultural Revolution ten thousand years ago, and the Scientific Revolution five hundred years ago. Each revolution fundamentally replaced the framework by which humans understand nature and society. Harari's Sapiens drew this large flow as a single story and drew a worldwide response. Whatever the debates over details, it is a book that gives practice in thinking about history from an enormous viewpoint.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「人類史」は人類の誕生から現在までの歴史。「世界史」より長い時間幅で語る。",
+    "sense": "人類誕生から現在までの歴史"
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  }
+ ]
+}
