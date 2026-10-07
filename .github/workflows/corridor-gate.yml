@@ -139,6 +139,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Use Ubuntu archive with bounded package requests
+        run: |
+          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' "$source"
+          done
+          printf '%s\n' 'Acquire::http::Timeout "30";' 'Acquire::https::Timeout "30";' 'Acquire::Retries "2";' | sudo tee /etc/apt/apt.conf.d/99-bunki-network
       - run: npx playwright install --with-deps chromium webkit
       - name: Build the clean foundation candidate
         run: |
