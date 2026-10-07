@@ -1,0 +1,212 @@
+{
+ "cards": [
+  {
+   "term": "構わない",
+   "reading": "かまわない",
+   "pos": "expression",
+   "meaning": "doesn't matter",
+   "defJa": "気にしない、差し支えない",
+   "passage": {
+    "ja": "友達と議事録の話をしていて、AIに任せるなら多少の言い回しの違いなんて構わない、という点では意見が一致したんだよね。ただ、人の名前を間違えようものなら、取り返しがつかないじゃない。だから人名と日付だけは人間が確認して、あとは任せちゃおうって決めたんだ。それなら今週中にも、会議のあとの面倒な作業がかなり楽になるはずだよ。ただ、AIが勝手に話を盛ってしまう可能性もあるから、そこだけは気をつけたいな。",
+    "form": "構わない",
+    "en": "Talking about meeting minutes with a friend, we agreed that if we leave it to AI, slight differences in phrasing don't matter. But if it gets a person's name wrong, there's no undoing it, right? So we decided that a human will check just the names and dates and leave the rest to it. That should make the tedious work after meetings a lot easier, even this week. Still, there's a chance the AI will embellish things on its own, so we should be careful about that.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「〜ても構わない」「構わないと思う」。許容を表す。会話で多用する。",
+    "sense": "差し支えない"
+   }
+  },
+  {
+   "term": "注意する",
+   "reading": "ちゅういする",
+   "pos": "verb",
+   "meaning": "to take care",
+   "defJa": "気を配り、悪いことが起きないよう用心する",
+   "passage": {
+    "ja": "日本語学習者がよく注意するよう言われるのが、助詞の「は」と「が」の使い分けです。この二つは、文法書の説明を読んでもなかなか腑に落ちないんですよね。たとえば「私が行きます」と「私は行きます」では、相手に伝わる焦点がまるで違います。実は、「は」は話題を、「が」は新しい情報を示すという目安で、かなりの場面が整理できます。もちろん例外はあるものの、まず原則を押さえてから例外に進むのが、独学でも効率のいい道です。",
+    "form": "注意する",
+    "en": "What Japanese learners are often told to watch out for is the distinction between the particles wa and ga. These two just don't click, no matter how much of the grammar book's explanation you read. For example, watashi ga ikimasu and watashi wa ikimasu convey a completely different focus to the listener. In fact, with the rule of thumb that wa marks the topic and ga marks new information, you can sort out quite a lot of cases. There are of course exceptions, but grasping the principle first and then moving on to the exceptions is an efficient path even for self-study.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「注意するよう言われる」「〜に注意する」。気をつける意で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "温暖化",
+   "reading": "おんだんか",
+   "pos": "noun",
+   "meaning": "(global) warming",
+   "defJa": "気温が次第に高くなっていくこと",
+   "passage": {
+    "ja": "2023年7月、国連のグテーレス事務総長は「地球温暖化の時代は終わり、地球沸騰の時代が到来した」と述べた。日本語のこの語はどこか婉曲で穏やかな響きがあり、危機の切迫感が伝わりにくいという指摘が以前からあった。「沸騰」ほど強い言葉なら、確かに報道の見出しにも載りやすい。言葉の選び方ひとつで、受け手の行動が左右される恐れがある。それだけに、各国の報道が表現をどう選ぶかは、見過ごせない問題である。",
+    "form": "温暖化",
+    "en": "In July 2023, UN Secretary-General Guterres said that the era of global warming had ended and the era of global boiling had arrived. It had long been pointed out that the Japanese term has a somewhat euphemistic, mild ring, which makes the urgency of the crisis hard to convey. A word as strong as boiling would, admittedly, also find its way into headlines more easily. There is a risk that the audience's behavior is swayed by a single choice of word. All the more so, how each country's media chooses its expressions is a problem that cannot be overlooked.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「地球温暖化」の形で多く現れる。「〜化」は変化の進行を表す接尾辞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "準優勝",
+   "reading": "じゅんゆうしょう",
+   "pos": "noun",
+   "meaning": "runner-up",
+   "defJa": "決勝で敗れ、優勝に次ぐ二位になること",
+   "passage": {
+    "ja": "1996年夏の甲子園決勝は、延長十回に右翼手が見せた好返球で、今も語り継がれています。敗れた熊本工は準優勝に終わりましたが、最後まであきらめない戦いぶりは、勝った松山商とともに名場面として記憶されています。勝った側の物語は残りやすいものですが、敗れた側にも同じだけの物語があります。勝ち負けだけでは測れない価値が、スポーツにはあるということでしょう。だからこそ、私たちは結果にかかわらず熱戦を何度でも見返したくなるのです。",
+    "form": "準優勝",
+    "en": "The final of the summer 1996 Koshien is still talked about for the fine throw by the right fielder in the tenth inning. The defeated Kumamoto Kogyo finished as runners-up, but their never-give-up fighting spirit is remembered, along with the winning Matsuyama Shogyo, as a great scene. The stories of the winning side tend to survive, but the losing side has just as many stories. Sports must hold a value that cannot be measured by wins and losses alone. That is exactly why we want to rewatch a hard-fought game again and again regardless of the result.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「準優勝に終わる」「準優勝校」。「準〜」は一歩手前の意を表す接頭辞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "熱演",
+   "reading": "ねつえん",
+   "pos": "noun",
+   "meaning": "passionate performance",
+   "defJa": "熱のこもった演技や演奏をすること",
+   "passage": {
+    "ja": "こないだ大河ドラマの総集編を見たんだけど、織田信長役の俳優の熱演がすごかったんだよ。本能寺の場面ときたら、画面から目が離せなくて、ついテレビの前で息を止めてたよ。共演者に向ける殺気立った視線まで画面ににじんで、こっちまで手に汗を握ったよ。史実とは違うところも多いのかもしれないけど、あの数分間だけでも見る価値があるなって思った。歴史の名場面って、こうやって演じる人の力で何度でも生き返るんだよね。",
+    "form": "熱演",
+    "en": "The other day I watched a recap of a taiga drama, and the passionate performance of the actor playing Oda Nobunaga was amazing. When it comes to the Honnoji scene, I couldn't take my eyes off the screen and found myself holding my breath in front of the TV. Even the murderous glare he turned on his co-stars seeped through the screen, and I was gripping my hands in sweat myself. There may be a lot that differs from the historical record, but just those few minutes were worth watching. Great scenes from history come back to life again and again through the power of the people who play them.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「熱演を見せる」「熱演が光る」。俳優の演技を称えるときの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "特許",
+   "reading": "とっきょ",
+   "pos": "noun",
+   "meaning": "special permission, patent",
+   "defJa": "発明に対して国が認める独占的な権利",
+   "passage": {
+    "ja": "特許の仕組みを学び始めたばかりの人は、まず条文の言い回しの硬さに驚くはずです。しかし、この制度の目的が「発明を公開するかわりに、一定期間の独占を認める」ことだと押さえれば、細かい規定の多くが一本の筋でつながります。半導体やAIの分野で出願が相次ぐ理由も、同じ仕組みから説明できます。たとえば新しい半導体の製造方法が公開されると、他社はそれを手がかりに改良を重ねられます。暗記より先に趣旨を理解するのが、法律科目の定石ですね。",
+    "form": "特許",
+    "en": "Someone who has just begun learning how patents work will surely be surprised first by how stiff the wording of the provisions is. But once you grasp that the purpose of the system is to 'grant a monopoly for a fixed period in exchange for disclosing the invention,' many of the detailed rules connect along a single thread. The reason filings keep coming in the fields of semiconductors and AI can also be explained by the same mechanism. For example, once a new semiconductor manufacturing method is published, other companies can build on it with further improvements. Understanding the purpose before memorizing is the standard approach for legal subjects.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「特許を取る」「特許権」。発明を保護する法制度の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "生まれつき",
+   "reading": "うまれつき",
+   "pos": "adverb",
+   "meaning": "by nature, by birth",
+   "defJa": "生まれたときから備わっていること",
+   "passage": {
+    "ja": "「天才は先天的なものか、育ちか」という古い問いに、近年の研究は第三の答えを加えつつある。遺伝は気質など個人差の一部を確かに説明するが、その現れ方は環境によって大きく変わるというのだ。実際、双子の研究でも、環境が異なれば似た素質の持ち主が別々の道を歩む例が報告されている。同じ素質でも、練習の量と質が違えば、到達点には開きが出る。生まれつきの才能を信じるあまり、努力の余地を見失うのは大きな損失である。",
+    "form": "生まれつき",
+    "en": "Recent research is adding a third answer to the old question of whether genius is innate or the product of upbringing. Genes certainly explain part of individual differences, such as temperament, but how they manifest changes greatly with the environment. Indeed, twin studies too have reported cases in which people of similar aptitude walk separate paths when their environments differ. Even with the same aptitude, if the amount and quality of practice differ, the point reached will differ. To lose sight of room for effort through excessive belief in innate talent is a great loss.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「生まれつきの才能」「生まれつき〜だ」。後天的な育ちと対比される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "畜生",
+   "reading": "ちくしょう",
+   "pos": "noun",
+   "meaning": "beast, brute",
+   "defJa": "人以外の動物。仏教で六道の一つ",
+   "passage": {
+    "ja": "仏教の世界観では、生き物は六つの世界を輪廻するとされ、人間や天の世界のほかに、畜生や餓鬼の世界も数えられる。地獄と阿修羅を加えたこの六つは、あわせて六道と呼ばれる。この語は本来、人間以外の動物を指し、本能と愚かさに支配された状態の象徴でもあった。後に罵りの言葉として日本語に定着し、元の宗教的な意味は薄れていった。だが和尚の法話では今も、人は心のあり方次第で、天にも地獄にも近づくと説かれる。",
+    "form": "畜生",
+    "en": "In the Buddhist worldview, living beings are said to transmigrate through six realms, which count the worlds of humans and devas as well as those of beasts and hungry ghosts. Adding hell and the asuras gives six realms, called together the six paths. The word originally referred to animals other than humans and was also a symbol of a state ruled by instinct and folly. Later it settled into Japanese as an expletive, and its original religious meaning faded. Yet in a monk's sermon even now, it is taught that, depending on the state of one's mind, a person can approach either heaven or hell.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「畜生道」は六道の一つ。罵り言葉の「ちくしょう」とは語の来歴が重なる。",
+    "sense": "動物、六道の一つ"
+   }
+  },
+  {
+   "term": "真っ先に",
+   "reading": "まっさきに",
+   "pos": "adverb",
+   "meaning": "first of all",
+   "defJa": "何よりも先に、いちばん最初に",
+   "passage": {
+    "ja": "新しい技術が現れると、人は真っ先に「これで何が楽になるか」を考える。電卓や検索エンジンが現れたときも、同じ期待と不安が繰り返されてきた。だが歴史が教えるのは、本当に問うべきは「これで何が失われるか」のほうだということだ。AIが文章を書き、絵を描く時代に、私たちが手放しかけているのは、迷いながら考えるという営みそのものかもしれない。便利さに浮かれるのは簡単でも、その代償を直視することには根気が要る。",
+    "form": "真っ先に",
+    "en": "When a new technology appears, people first of all ask what it will make easier. The same hopes and anxieties were repeated when calculators and search engines appeared. But what history teaches is that the question we should truly ask is what this will cost us. In an age when AI writes text and draws pictures, what we are on the verge of letting go of may be the very act of thinking while wavering. Getting carried away by convenience is easy, but facing its price squarely takes perseverance.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「真っ先に〜する」。順序の一番手であることを強調する副詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "知性",
+   "reading": "ちせい",
+   "pos": "noun",
+   "meaning": "intelligence",
+   "defJa": "物事を理解し判断する知的な働き",
+   "passage": {
+    "ja": "話し方に知性がにじむのは、難しい言葉を使うときではなく、複雑なことを短く言い切れたときです。長々と説明するのではなく、核心だけを短く渡す人の話は、不思議と記憶に残ります。AIが流暢な文章を生み出せる時代だからこそ、何を言い、何を捨てるかを決める力が問われます。そこで、話し始める前に「結論を一言でいうと何か」と自分に問う癖をつけてみてください。結論が曖昧なまま話し出そうものなら、聞き手は途中で道に迷ってしまいます。",
+    "form": "知性",
+    "en": "Intelligence shows in how you speak not when you use difficult words but when you can state something complex briefly. Talk from people who hand over just the core briefly, rather than explaining at length, strangely stays in memory. In an age when AI can produce fluent prose, what is tested is the ability to decide what to say and what to discard. So, before you start speaking, try forming the habit of asking yourself what your conclusion is in a word. If you start talking with your conclusion still vague, your listeners will lose their way partway through.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「知性が光る」「知性的」。「知能」より、考える力の質に重きを置く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "科学革命",
+   "reading": "かがくかくめい",
+   "pos": "noun",
+   "meaning": "Scientific Revolution",
+   "defJa": "近代科学が成立した、世界観の大転換",
+   "passage": {
+    "ja": "科学革命というと、ガリレオやニュートンの名前が浮かびますが、それを支えたのは、印刷術や望遠鏡といった技術の普及でした。もちろん、一夜にして世界観が変わったわけではありません。16世紀から17世紀にかけて、技術の普及に伴って、人々は「古代の権威が言うから正しい」という態度から、「観察と実験によって客観的に確かめる」という態度へ移っていきます。この転換が、のちの啓蒙思想や産業革命の土台になったのです。",
+    "form": "科学革命",
+    "en": "When people say the Scientific Revolution, the names of Galileo and Newton come to mind, but what supported it was the spread of technologies such as printing and the telescope. Of course, worldviews did not change overnight. From the sixteenth to the seventeenth century, along with the spread of technology, people moved from the attitude that ancient authority makes a thing right to the attitude of verifying objectively through observation and experiment. This shift became the foundation of the later Enlightenment and the Industrial Revolution.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「科学革命」は十六〜十七世紀の知の転換を指す。「産業革命」と区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "米中対立",
+   "reading": "べいちゅうたいりつ",
+   "pos": "noun",
+   "meaning": "US-China rivalry",
+   "defJa": "米国と中国が互いに対抗し合う状態",
+   "passage": {
+    "ja": "米中対立は、2018年に米国が中国製品への追加関税を発動したのを機に、一気に表面化した。関税の応酬は、双方の暮らしにも少なからず跳ね返ってきた。その後、争点は貿易から先端半導体の輸出管理へと広がり、地政学の問題として各国の企業を巻き込んでいる。台湾に集中する半導体の生産は、供給網の最も脆い部分だと指摘されて久しい。企業は効率だけでなく、調達先の分散という安全保障の視点からも、戦略の見直しを余儀なくされている。",
+    "form": "米中対立",
+    "en": "The US-China rivalry surfaced all at once when, in 2018, the United States imposed additional tariffs on Chinese goods. The exchange of tariffs also rebounded to no small degree on people's lives on both sides. Since then, the point of contention has broadened from trade to export controls on advanced semiconductors and, as a geopolitical issue, is drawing in companies in many countries. It has long been pointed out that semiconductor production concentrated in Taiwan is the most fragile part of the supply chain. Companies are being forced to rethink strategy not just for efficiency but also from the security viewpoint of diversifying suppliers.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「米中対立の激化」「米中対立が深まる」。国名の略称を並べた複合語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "粘る",
+   "reading": "ねばる",
+   "pos": "verb",
+   "meaning": "to be sticky, to be adhesive",
+   "defJa": "あきらめず、しつこく続けて頑張る",
+   "passage": {
+    "ja": "勉強に限らず、最後にうまくいく人は、才能よりも踏ん張れるかどうかで決まる気がするんだよね。ただ、粘るって言うと根性論みたいに聞こえるけど、実際は「やめ方を工夫する」ことに近いんだ。根性を絞り出すより、仕組みで続けるという発想だね。たとえば、わからない問題は十分だけ考えると決めて、それでもだめなら解説を読む。そうやって区切りをつけておけば、決意が揺らぐ日でも、根気を使い果たさずに続けられるんだよ。",
+    "form": "粘る",
+    "en": "Not just in studying, I feel that those who succeed in the end are decided by whether they can hang in there rather than by talent. But saying persevere sounds like grit-talk, whereas it's actually closer to devising how to quit. It's the idea of continuing through a system rather than wringing out guts. For instance, you decide to think about an unsolved problem for just ten minutes and, if that doesn't work, read the explanation. If you set limits like that, you can keep going without exhausting your stamina even on days when your resolve wavers.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「粘って頑張る」「粘り強い」。粘る＝手放さず続ける意の比喩的用法。",
+    "sense": "あきらめずに頑張る"
+   }
+  }
+ ]
+}

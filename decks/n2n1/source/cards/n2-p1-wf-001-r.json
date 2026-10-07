@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "募集",
+   "reading": "ぼしゅう",
+   "pos": "noun",
+   "meaning": "recruitment, call for applicants",
+   "defJa": "必要な人や物を広く呼びかけて集めること",
+   "passage": {
+    "ja": "求人広告の「社員募集」と「社員公募」は、似ているようで実はどう違うのだろうか。前者は人を広く集める行為全般を指し、後者は公開で募ることを強調する語である。公募はやや堅く、官公庁や大学の公式な採用案内で目にすることが多い。場面に応じた使い分けは、単語帳より、実際の求人票を待遇欄まで含めて読み比べるのが近道だ。応募する側も、言葉の硬さから、その組織の文化をある程度察することができる。",
+    "form": "募集",
+    "en": "What is the difference between the job-ad phrases recruitment of employees and open call for employees? The former refers to the act of gathering people widely, and the latter is a word that emphasizes calling openly. The open call is somewhat stiff and is often seen in hiring by government offices and universities. Learning to use each according to the situation is quicker by comparing actual job listings, down to the benefits column, than by using a vocabulary book. Applicants too can sense something of the organization's culture from how stiff the wording is.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「社員を募集する」「募集要項」と使い、人や作品を広く呼びかけて集める。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "応援",
+   "reading": "おうえん",
+   "pos": "noun",
+   "meaning": "support, cheering",
+   "defJa": "がんばっている人を励まし、力を貸すこと",
+   "passage": {
+    "ja": "日本語で相手を励ますとき、スポーツの観客に限らず、受験生や起業家にも同じ言葉が使える。「頑張れ」はときに命令や忠告めいて響くが、「応援しています」と伝えれば、相手に負担をかけずに見守る立場を示せる。外国人学習者がこの違いを把握するには、単語の意味より、使われる場面を読み取ることが欠かせない。言葉の選び方一つで、ほんの少しの違いで、同じ励ましが重荷にも支えにもなる。",
+    "form": "応援",
+    "en": "When encouraging someone in Japanese, the same word can be used not only for sports spectators but also for exam candidates and entrepreneurs. A word meaning do your best can at times sound like an order or a warning, but saying I'm cheering for you shows a stance of watching over the person without burdening them. For foreign learners to grasp this difference, reading the situations in which a word is used is more essential than its dictionary meaning. With one choice of words, the same encouragement can become a burden or a support.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「応援する」「応援団」と使い、声援に限らず、人を励まし力を貸すことを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "寿命",
+   "reading": "じゅみょう",
+   "pos": "noun",
+   "meaning": "life span, lifetime",
+   "defJa": "生き物が生きられる年数。物の使える期間",
+   "passage": {
+    "ja": "インドの平均寿命は、独立直後の一九四七年ごろには三十代前半だったとされる。予防接種の普及や衛生環境の改善に伴って、現在は七十歳前後まで延びた。一方で、都市部と農村部、豊かな州と貧しい州のあいだでは、いまも大きな開きが残る。長寿化が社会保障の整備を追い越しつつある以上、介護の担い手をどう確保するかが、次の課題として浮上している。長く生きられる社会は、同時に、長く支え合う仕組みを必要とする社会でもある。",
+    "form": "寿命",
+    "en": "India's average life expectancy is said to have been in the early thirties around 1947, just after independence. With the spread of vaccination and improved sanitation, it has now risen to around seventy. On the other hand, large gaps remain between urban and rural areas and between rich and poor states. Since longer lives are overtaking the build-up of social security, how to secure people to provide nursing care is emerging as the next issue. A society where people live long is at the same time a society that needs a system of long-term mutual support.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「平均寿命」「寿命が延びる」と使い、人の一生や物の使える期間を表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

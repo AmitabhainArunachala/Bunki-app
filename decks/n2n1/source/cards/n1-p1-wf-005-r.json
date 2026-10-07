@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "冴える",
+   "reading": "さえる",
+   "pos": "verb",
+   "meaning": "to be clear; to be sharp",
+   "defJa": "頭や感覚が澄んで鋭く働く",
+   "passage": {
+    "ja": "同じ人でも、頭が冴える時間帯には波があることが、睡眠研究でわかっています。朝型か夜型かという体質も、遺伝の影響を受けるそうです。だからといって、誰もが朝五時に起きれば天才になれるわけではありません。大切なのは、自分の頭のピークの時間帯を知り、一番重い仕事をそこに置くことです。そうすれば、同じ八時間の仕事でも、効率は段違いに変わり、夕方の疲れ方まで違ってきます。",
+    "form": "冴える",
+    "en": "Sleep research shows that even in the same person, the hours when the mind is sharp rise and fall. Whether you are a morning or an evening type is also said to be influenced by genes. That does not mean anyone who gets up at five in the morning becomes a genius. What matters is to know the hours of your own peak and to place your heaviest work there. Do that, and even in the same eight hours of work, efficiency changes dramatically, and even how tired you feel by evening is different.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「頭が冴える」「目が冴える」のように、感覚や頭脳が澄んで鋭いさまを表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "優越感",
+   "reading": "ゆうえつかん",
+   "pos": "noun",
+   "meaning": "sense of superiority",
+   "defJa": "他人より優れていると感じる気持ち",
+   "passage": {
+    "ja": "他人より上に立ちたいという欲求は、思いのほか根が深く、本人にもなかなか自覚しにくい。人は資格や肩書きを手にした瞬間に、周囲を見下ろすような、ささやかな優越感を覚えてしまうものだ。しかし、その快感に身を任せるほど、物事を見る判断力は静かに鈍っていく。自分の中に生まれた小さな高ぶりに気づくには、日々の静かな内省が欠かせない。その高ぶりは、劣等感の裏返しにほかならないのである。",
+    "form": "優越感",
+    "en": "The urge to stand above others runs deeper than we expect, and is hard even for the person himself to recognize. The moment people obtain a qualification or a title, they tend to feel a faint sense of superiority. Yet the more they surrender to that pleasure, the more quietly their judgment in seeing things dulls. To notice the small swelling of pride arising within us, daily introspection is indispensable. That pride is nothing other than the flip side of an inferiority complex.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "優越感を「覚える」「抱く」と言う。劣等感と対になる心理語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "元老院",
+   "reading": "げんろういん",
+   "pos": "noun",
+   "meaning": "Roman senate",
+   "defJa": "古代ローマで国政を担った長老の議会",
+   "passage": {
+    "ja": "ローマの元老院は、王を追放した後の共和制を支える中枢であった。議員は任期を終えた高官たちで構成され、戦争や外交をめぐって、長きにわたって強い影響力を持った。ただし法を決める権限は民会にあり、その決議はあくまで助言という形をとっていた。それにもかかわらず、各地から訪れる使節団は、まず議員たちの意向をうかがったという。実質的な権威が制度上の権限を上回っていた、興味深い例といえる。",
+    "form": "元老院",
+    "en": "The Roman Senate was the core supporting the republic after the kings were expelled. Its members were senior officials who had finished their terms, and over war and diplomacy they held strong influence for a long time. However, the power to make laws lay with the popular assemblies, and its resolutions took the form of mere advice. Even so, envoys arriving from various regions are said to have first sought the senators' wishes. It is an interesting example of real authority outweighing formal powers.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "古代ローマの話題で使う固有性の強い語。「元老院議員」「元老院決議」などと続く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先住民",
+   "reading": "せんじゅうみん",
+   "pos": "noun",
+   "meaning": "indigenous people",
+   "defJa": "その土地に古くから住んでいた人々",
+   "passage": {
+    "ja": "文章を書くとき、一語の選び方で読み手の受け取り方は大きく変わる。たとえば北米の先住民を語る際、「発見」を「到達」に置き換えるだけでも、文の視点は一瞬で入れ替わる。入植者の側から見た歴史に慣れていると、そこに潜む先入観には、なかなか気づきにくいものだ。とはいえ、言い換えさえすれば済むという単純な話ではなく、問われているのは語り手の姿勢である。誰の目線で語っているのかを自覚してこそ、文章に説得力が生まれる。",
+    "form": "先住民",
+    "en": "When you write, a single word choice greatly changes how readers receive it. For example, when speaking of the indigenous peoples of North America, merely replacing 'discovery' with 'arrival' flips the viewpoint of a sentence in an instant. If you are used to history seen from the settlers' side, the preconceptions lurking there are hard to notice. That said, it is not as simple as just rephrasing; what is being tested is the speaker's stance. Only when you are aware of whose eyes you are speaking through does your writing gain persuasive force.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「先住民族」とも言う。語の選び方が視点を決めるという文脈で使われる名詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先入観",
+   "reading": "せんにゅうかん",
+   "pos": "noun",
+   "meaning": "preconception",
+   "defJa": "前もって持っている固定的な考え",
+   "passage": {
+    "ja": "最初に会ったとき、あの人ちょっと怖そうだなって思ったんですよ。でも実際に話してみたら、むちゃくちゃ面倒見がよくて、後輩の相談にも夜中まで付き合ってくれる人でした。見た目だけで決めつけていた自分が、本当に恥ずかしくなりました。先入観って、気づかないうちに判断力をじわじわ曇らせるじゃないですか。だからこそ、第一印象はいったん疑ってみるに越したことはないと思います。",
+    "form": "先入観",
+    "en": "When I first met him, I remember thinking that guy looked a bit scary. But once we actually talked, he turned out to be incredibly caring, the kind of person who'd stay up late helping a junior with their troubles. I was truly embarrassed that I had judged him by looks alone. Preconceptions slowly cloud your judgment before you even notice, don't they? That's exactly why it's best to doubt your first impression for a moment.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "先入観を「持つ」「捨てる」「にとらわれる」と使う。偏った判断の原因を指す語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先史時代",
+   "reading": "せんしじだい",
+   "pos": "noun",
+   "meaning": "prehistoric times",
+   "defJa": "文字による記録が現れる前の時代",
+   "passage": {
+    "ja": "文字を持たなかった先史時代の人々は、何を頼りに過去を語り継いだのだろうか。手がかりの一つは、世代を超えて受け継がれた伝承である。洞窟の壁画や埋葬の跡は、言葉なき記録でありながら、供養にも似た祈りの気配を今に伝えている。それでも、石器の形や貝塚の厚みといった小さな物証から、当時の暮らしを読み解こうとする研究は、いまも続いている。とはいえ、それをどう読むかは、後世の私たちの想像に委ねられているにすぎない。",
+    "form": "先史時代",
+    "en": "What did people in prehistoric times, who had no writing, rely on to hand down the past? One clue is oral tradition passed across generations. Cave paintings and burial remains, though wordless records, convey to this day a trace of prayer akin to memorial rites. Even so, research that tries to read the lives of that time from small physical evidence, such as the shapes of stone tools and the thickness of shell middens, continues even now. Even so, how to read them is merely left to the imagination of us in later ages.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「先史」は文字記録以前。「先史時代」「有史以前」と並べて覚えると整理しやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先手を打つ",
+   "reading": "せんてをうつ",
+   "pos": "expression",
+   "meaning": "to make the first move, forestall",
+   "defJa": "相手より先に行動して有利に立つ",
+   "passage": {
+    "ja": "あの会社、生成AIがここまで騒がれる前から、自前のチップの設計を、こっそり始めてたんですよ。要するに、先手を打つのが抜群にうまいんです。需要が目に見えてから動いたのでは遅いんだって、ちゃんと分かってたんでしょうね、きっと。外から買うだけだと、供給が止まったが最後、工場も売り場も全部ストップじゃないですか。代替の利かない部品ほど、危なくなったときのために、自分で握っておくべきだってことです。",
+    "form": "先手を打つ",
+    "en": "That company had started designing its own chips before generative AI got this much buzz. In short, it is outstandingly good at making the first move. They must have understood that moving only after demand is visible is too late. If you only buy from outside, once supply stops, the factories and the shops all stop, right? The less replaceable a part is, the more you should hold it yourself.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「先手を打って〜する」の形が多い。後手に回る、の反対。碁・将棋が語源。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先行き",
+   "reading": "さきゆき",
+   "pos": "noun",
+   "meaning": "outlook, future prospects",
+   "defJa": "これから先の成り行きや見通し",
+   "passage": {
+    "ja": "半導体株の先行きについては、いまみんな気にしてますよね。ここ数年はずっと右肩上がりだったのに、最近は伸び悩みが目立ってきて、買った人は気が気じゃないはずです。かといって、需要そのものが消えてなくなったわけじゃないんです。AI向けの設備投資は、各社とも、むしろ膨らむばかりだっていうじゃないですか。ただ、期待が先走りすぎていると、ちょっとした悪材料の余波で一気に崩れかねないんですよ。",
+    "form": "先行き",
+    "en": "Everyone is worried about the outlook for semiconductor stocks, aren't they? They had been on a steady rise for several years, but lately the stalling growth has become conspicuous, so those who bought must be on edge. That said, demand itself hasn't vanished. Capital spending for AI is, if anything, only swelling, they say. But when expectations run too far ahead, the aftershock of some small piece of bad news could bring everything down at once.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「先行きが不安／不透明」が定番。「さきゆき」と読み、「せんこう」とは読まない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先行研究",
+   "reading": "せんこうけんきゅう",
+   "pos": "noun",
+   "meaning": "prior research",
+   "defJa": "すでに発表されている関連の研究",
+   "passage": {
+    "ja": "論文を書くとき、まず最初に取りかかるべきは先行研究の整理です。すでに誰が何を明らかにしたのかを知らないまま始めると、他人がすでに通った道を、もう一度ゼロから歩くことになりかねません。心理学では、のちに再現性の低さが問題になった研究も少なくありません。そのため、一本の論文を鵜呑みにせず、複数の結果を突き合わせる姿勢が求められます。これは学問に限らず、日々の学習にも通じる考え方です。",
+    "form": "先行研究",
+    "en": "When writing a paper, the first thing to tackle is organizing the prior research. If you start without knowing who has already shown what, you may end up walking the road others have already trodden. In psychology, there are quite a few studies whose low reproducibility became a problem. So an attitude of not swallowing a single paper whole, and instead cross-checking multiple results, is required. This applies not only to scholarship but also to daily learning.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「先行研究を踏まえる」「先行研究を整理する」と使う。論文の定型語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先進国",
+   "reading": "せんしんこく",
+   "pos": "noun",
+   "meaning": "developed country",
+   "defJa": "経済や技術が高度に発達した国",
+   "passage": {
+    "ja": "先進国と呼ばれる国だって、昔からずっと豊かだったわけじゃないんですよね。たとえば明治の日本は、不平等な条約に苦しみながら、列強に追いつこうと、それはもう必死でした。教育にも、工場にも、鉄道にも、ありったけの力を注ぎ込んだじゃないですか。今の豊かさは、当たり前どころか、そうした長い積み重ねの結果なんです。そう思うと、いまは貧しい後発の国にだって、伸びしろは十分すぎるほどあるはずですよ。",
+    "form": "先進国",
+    "en": "Even countries called developed nations haven't always been wealthy. For example, Meiji Japan, suffering under unequal treaties, was desperate to catch up with the great powers. They poured every bit of strength into education and factories, didn't they? Today's affluence is far from a given; it's the result of that long accumulation. Thinking about it that way, even latecomer countries that are poor now should have plenty of room to grow.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「発展途上国」「後発国」と対比される。「先進国首脳会議」のような複合語でも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先駆け",
+   "reading": "さきがけ",
+   "pos": "noun",
+   "meaning": "forerunner",
+   "defJa": "他に先んじて物事を始めること",
+   "passage": {
+    "ja": "日本の半導体産業は、かつて世界市場で圧倒的な存在感を示した全盛期を持つ。その後は韓国や台湾の台頭に押され、投資の出遅れが長く指摘されてきた。近年は海外大手を招いた工場の建設が相次ぎ、熊本の拠点がその先駆けとして注目を集めている。ただし、半導体を扱える人材や、工場を動かす電力の確保など、課題は残されたままである。工場の稼働をもって復活と呼ぶには、まだ早いとの見方も根強い。",
+    "form": "先駆け",
+    "en": "Japan's semiconductor industry once had a golden age in which it showed an overwhelming presence in the world market. Afterward it was pushed back by the rise of South Korea and Taiwan, and its lagging investment has long been pointed out. In recent years, factories built by inviting major overseas firms have followed one after another, and the Kumamoto site is drawing attention as the forerunner. However, challenges such as securing people who can work with semiconductors and the electric power to run the plants remain. There is also a persistent view that it is still too early to call it a revival just because the plant is running.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「〜の先駆けとなる」「先駆けて」と使う。新しい動きの最初を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "免罪符",
+   "reading": "めんざいふ",
+   "pos": "noun",
+   "meaning": "indulgence; get-out-of-blame card",
+   "defJa": "罪や責任をまぬがれるための口実",
+   "passage": {
+    "ja": "16世紀、ローマ教会が売り出した免罪符は、聖堂の建設資金を集める手段でもあった。これに疑問を投げかけたルターが、1517年に九十五か条の論題を発表する。ルターの怒りは、信仰の証が金で買えるかのように扱われる風潮そのものに向けられていた。論題を皮切りに改革の動きは各地へ広がり、その余波は欧州全体に及んだ。現代では、「これさえあれば責任を問われない」という口実の意味で、この語が比喩的にも使われる。",
+    "form": "免罪符",
+    "en": "In the sixteenth century, the indulgences the Roman Church put on sale were also a means of raising funds to build a cathedral. Luther, who questioned this, published his Ninety-Five Theses in 1517. Luther's anger was aimed at the very climate in which a token of faith was treated as something money could buy. Starting with the theses, the reform movement spread to many places, and its aftershocks reached all of Europe. Today the word is also used figuratively to mean an excuse of the kind, 'with this alone, no one can hold me responsible'.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "本来は宗教改革の語。「〜は免罪符にならない」と比喩で使う用法も多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "入植",
+   "reading": "にゅうしょく",
+   "pos": "noun",
+   "meaning": "settlement, colonization",
+   "defJa": "新しい土地に移り住んで開拓すること",
+   "passage": {
+    "ja": "19世紀、アメリカ西部への入植が加速すると、土地をめぐる先住民との衝突が各地で相次いだ。政府は条約を結んでは居留地を狭め、人々の移住を迫ったとされる。鉄道の延伸に伴って開拓者は増える一方で、彼らの暮らしは急速に追い込まれていった。開拓の物語は、同時に土地を失った人々の記憶でもあり、どちらか一方の側だけから語る歴史は、事実の半分しか映していない。その余波は、今日の土地返還や補償をめぐる議論にまで及んでいる。",
+    "form": "入植",
+    "en": "In the nineteenth century, as settlement of the American West accelerated, clashes with indigenous peoples over land occurred one after another in many places. The government is said to have signed treaties and then narrowed the reservations, pressing people to relocate. With the extension of the railroads the number of pioneers kept growing, while the lives of the native people were rapidly driven into a corner. A tale of pioneering is at the same time a memory of people who lost their land, and a history told from only one side reflects just half of the facts. The aftershocks reach even today's debates over the return of land and compensation.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「入植者」「入植地」と複合する。新天地へ移り住み開拓する意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "全体主義",
+   "reading": "ぜんたいしゅぎ",
+   "pos": "noun",
+   "meaning": "totalitarianism",
+   "defJa": "個人より国家や集団を優先する体制",
+   "passage": {
+    "ja": "全体主義がおそろしいのは、暴力そのものよりも、人々が自分で考えることをやめていく点にある。ハンナ・アーレントは、悪が凡庸な人間の服従から生まれうることを描いた。命令に従っただけだという弁明は、個人が判断力を手放すことにつながりかねない。だからこそ、日々の小さな内省が、社会を守る最後の砦になるのである。考えることをやめた社会では、強い言葉を唱える者の声だけが、いつのまにか正しさの顔をして響きはじめる。",
+    "form": "全体主義",
+    "en": "What is frightening about totalitarianism is less the violence itself than the fact that people stop thinking for themselves. Hannah Arendt portrayed how evil can arise from the obedience of ordinary people. The excuse that one merely followed orders could lead to an individual giving up their judgment. That is exactly why small daily introspection becomes the last bulwark protecting society. In a society that has stopped thinking, only the voices of those chanting strong words begin, before long, to ring out wearing the face of righteousness.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜主義」型の抽象名詞。「全体主義国家」「全体主義的」と展開する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "全盛期",
+   "reading": "ぜんせいき",
+   "pos": "noun",
+   "meaning": "golden age; peak",
+   "defJa": "最も勢いが盛んだった時期",
+   "passage": {
+    "ja": "どんな帝国にも全盛期はあり、そしてその頂点は驚くほど短い。ローマ帝国は五賢帝の時代に最大版図を築いたが、そのころすでに、衰えの種はまかれていたといわれる。繁栄の余韻に浸っているうちに、国境の守りは薄くなり、財政も傾いていった。のちには、軍隊を維持する費用がふくらみ続け、貨幣の質を落として穴を埋めようとする皇帝まで現れた。栄華の頂にいる者ほど、坂の始まりには気づきにくい。",
+    "form": "全盛期",
+    "en": "Every empire has its golden age, and its peak is astonishingly short. The Roman Empire built its greatest territory in the age of the Five Good Emperors, yet the seeds of decline are said to have been sown already by then. While basking in the afterglow of prosperity, border defenses thinned and finances tilted. Later, the cost of maintaining the army kept swelling, and even emperors appeared who tried to fill the hole by debasing the currency. Those standing at the summit of glory find it hardest to notice the start of the slope.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜の全盛期」「全盛期を迎える」と使う。人・国・産業の絶頂期。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "公民権運動",
+   "reading": "こうみんけんうんどう",
+   "pos": "noun",
+   "meaning": "civil rights movement",
+   "defJa": "人種差別の撤廃を求めた権利獲得の運動",
+   "passage": {
+    "ja": "世界史の論述で点が伸びる人は、公民権運動のような出来事を、年号の暗記で終わらせません。時間の流れに沿って、1955年のバス・ボイコット運動から1964年の公民権法成立までを覚えているんです。さらに、背景にある南部の人種隔離を具体例とセットで押さえておくと、記憶が定着しやすくなります。単語カードより、「なぜ起きたのか」と自分に問いかけるほうが、分散学習とも相性がいいのです。",
+    "form": "公民権運動",
+    "en": "People whose scores rise on world-history essays don't stop at memorizing years for events like the civil rights movement. They remember it along the flow of time, from the 1955 bus boycott to the passage of the Civil Rights Act in 1964. Moreover, if you grasp the background of Southern racial segregation together with concrete examples, memory sticks more easily. Asking yourself 'why did it happen?' works better than flashcards, and it also pairs well with spaced learning.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "米国史の頻出語。1950〜60年代の運動を指し、年号と因果で覚える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "共和制",
+   "reading": "きょうわせい",
+   "pos": "noun",
+   "meaning": "republic (system of government)",
+   "defJa": "君主を置かず国民が主権を持つ政治体制",
+   "passage": {
+    "ja": "共和制を民主主義と同じ意味だと思い込んだばかりに、試験で点を落とす人は少なくありません。その本質は、君主がいないこと、そして権力が一人に集中しないことにあります。古代ローマでは、執政官が二人置かれ、元老院がその働きを支えました。この仕組みを押さえておけば、のちの帝政との違いも、すっきり整理できるはずです。権力を分け合う工夫こそ、この制度が長く語られてきた理由なのだと、年表の裏側から読み取ってください。",
+    "form": "共和制",
+    "en": "Quite a few people lose points on exams simply because they assumed a republic means the same as democracy. Its essence lies in having no monarch and in power not being concentrated in one person. In ancient Rome two consuls were appointed, and the Senate supported their work. If you grasp this mechanism, you should be able to sort out the difference from the later empire neatly. Please read, from behind the chronology, that the ingenuity of sharing power is the reason this system has been discussed for so long.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「帝政」「君主制」と対にして覚える。「共和国」は国そのものを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "共産主義",
+   "reading": "きょうさんしゅぎ",
+   "pos": "noun",
+   "meaning": "communism",
+   "defJa": "財産を共有し平等な社会を目指す思想",
+   "passage": {
+    "ja": "冷戦期、共産主義陣営と資本主義陣営の対立は、直接の戦火を避けながら、各地の代理戦争という形で現れた。朝鮮半島やベトナムでは、内戦に大国が介入し、多くの犠牲を生んだ。1991年のソ連崩壊をもって、東西対立は一つの区切りを迎える。イデオロギーの違いが、ふつうの人々の暮らしや国境線までも動かしたことは、あらためて強調しておく必要がある。しかし、その遺産は、今も国際関係に影を落としている。",
+    "form": "共産主義",
+    "en": "During the Cold War, the confrontation between the communist and capitalist camps avoided direct combat and appeared in the form of proxy wars in various places. On the Korean Peninsula and in Vietnam, great powers intervened in civil wars, producing many casualties. With the collapse of the Soviet Union in 1991, the East-West confrontation reached a turning point. It needs to be stressed again that differences in ideology moved even the lives of ordinary people and the borders on the map. Yet its legacy still casts a shadow over international relations today.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「共産主義陣営」「共産主義国家」と使う。資本主義・社会主義と区別して覚える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "共通語",
+   "reading": "きょうつうご",
+   "pos": "noun",
+   "meaning": "common language; standard Japanese",
+   "defJa": "地域や集団を超えて通じる言葉",
+   "passage": {
+    "ja": "日本ってさ、方言がこんなに違うのに、よく通じるよなって思わない？それは、テレビやラジオを通じて、共通語がじわじわ広まったからなんだって。ちなみに、昔は「標準語」って呼ぶほうが普通だったんだよね。余談だけど、関西の人は標準語を話してるつもりでも、イントネーションでバレるらしい。以心伝心に頼れない初対面の相手とは、やっぱり共通のことばがなきゃ話にならないんだろうね。",
+    "form": "共通語",
+    "en": "Japan has such different dialects, yet people understand each other well, don't you think? Apparently that's because the common language gradually spread through TV and radio. By the way, it used to be more usual to call it 'standard language'. An aside, but they say people from Kansai give themselves away by their intonation even when they think they're speaking standard Japanese. With a stranger you can't rely on telepathic understanding with, you probably can't get anywhere without a shared language after all.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "方言と対比される。「標準語」より中立的で、現代の国語学で多く使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "具体例",
+   "reading": "ぐたいれい",
+   "pos": "noun",
+   "meaning": "concrete example",
+   "defJa": "はっきりした形で示される事例",
+   "passage": {
+    "ja": "説明がうまい人は、抽象的な話のあとに、必ず具体例を一つ添える。「効率を上げましょう」と言うだけでは何も伝わらないが、「会議を15分で切り上げる」と言えば、聞き手の頭に絵が浮かぶからだ。同じ抽象論でも、聞き手の身近な場面に置き換えて話せる人は、不思議と信頼されやすいものだ。ただし、例を並べすぎると冗長になり、肝心の主張が埋もれかねない。体言止めで短く締めると、余韻も残って印象が深まる。",
+    "form": "具体例",
+    "en": "People who explain well always add one concrete example after an abstract remark. Merely saying 'let's raise efficiency' conveys nothing, but saying 'wrap up meetings in fifteen minutes' puts a picture in the listener's mind. Even with the same abstract argument, a person who can recast it in scenes familiar to the listener is strangely easier to trust. However, lining up too many examples turns verbose and the essential claim may get buried. Closing briefly with a noun-ending sentence leaves an afterglow and deepens the impression.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「具体例を挙げる」「具体例を示す」が定番。抽象的な主張を支える材料。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "具体化",
+   "reading": "ぐたいか",
+   "pos": "noun",
+   "meaning": "making concrete",
+   "defJa": "考えや計画を実際の形にすること",
+   "passage": {
+    "ja": "目標は、具体化しない限り、ただの願望で終わります。「日本語を上手になりたい」ではなく、「三か月後に、五分間の自己紹介をやり遂げる」と決めるのです。ここまで絞り込めば、今日やるべきことが、おのずと見えてきます。そうして一歩ずつ体得したものは、のちの伸びしろにもなっていくでしょう。曖昧な夢に期限と数字を与えるだけで、頭の中の景色は驚くほど鮮明になり、行動のハードルも下がっていきます。",
+    "form": "具体化",
+    "en": "A goal ends up as a mere wish unless you make it concrete. Instead of 'I want to get good at Japanese,' you decide, 'in three months, I will carry off a five-minute self-introduction'. Once you narrow it down this far, what you should do today comes into view naturally. What you master step by step in that way will also become room for further growth later. Merely giving a vague dream a deadline and a number makes the scenery in your head astonishingly clear, and the hurdle to action drops as well.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「計画を具体化する」「構想の具体化」。「〜化」でサ変動詞的に働く名詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "典拠",
+   "reading": "てんきょ",
+   "pos": "noun",
+   "meaning": "authoritative source",
+   "defJa": "言葉や考えのよりどころとなる文献",
+   "passage": {
+    "ja": "辞書の例文の多くは、確かな典拠に基づいて選ばれています。たとえば古い仮名遣いで書かれた用例は、『源氏物語』などの古典から引かれたものが少なくありません。出典の示されていない引用は、どれほどもっともらしくても、学術の世界では信用されないのです。だからこそ、言葉の意味を会得するには、まず用例の根っこをたどる習慣が役に立ちます。用例の出どころを確かめる手間こそが、言葉への理解を一段深くしてくれます。",
+    "form": "典拠",
+    "en": "Many example sentences in dictionaries are chosen on the basis of a reliable authoritative source. For instance, usage examples written in old kana orthography are often drawn from classics such as The Tale of Genji. Quotations whose source is not shown, however plausible, are not trusted in the academic world. That is why, to truly grasp the meaning of a word, the habit of tracing an example back to its roots is useful. It is precisely the trouble of checking where an example comes from that deepens your understanding of words a step further.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「典拠を示す」「〜に典拠を持つ」。出典より、拠り所としての権威を強く含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "内向型",
+   "reading": "ないこうがた",
+   "pos": "noun",
+   "meaning": "introvert (type)",
+   "defJa": "関心が自分の内面に向かいやすい性格",
+   "passage": {
+    "ja": "内向型の人は、人付き合いが苦手なのではなく、刺激の多い場所で消耗しやすいだけだと説明されることが多い。静かな環境で一人考える時間を確保したほうが、創造性が高まるという指摘もある。ところが、職場では発言の多さが評価されがちで、内省を重んじる人ほど損をしかねない。近年は、会議の進め方を見直し、事前に意見を書面で集める企業も出てきた。静かな力を活かせる仕組みづくりが、チーム全体の成果にもつながるとみられている。",
+    "form": "内向型",
+    "en": "Introverts are often explained as people who are not bad at socializing but simply tire easily in highly stimulating places. It has also been pointed out that securing time to think alone in a quiet environment raises creativity. Yet in workplaces, talkativeness tends to be rewarded, and people who value introspection may end up at a disadvantage. In recent years, some companies have reviewed how meetings run and gather opinions in writing beforehand. Building a system that can make use of quiet strengths is also seen as leading to better results for the whole team.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "外向型と対にする。「内向型人間」のように人を指す名詞としても使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "内在",
+   "reading": "ないざい",
+   "pos": "noun",
+   "meaning": "immanence",
+   "defJa": "物事の内部にもとから存在すること",
+   "passage": {
+    "ja": "難しい思想を話すときは、比喩を一つ持っておくと強い。たとえばインド哲学の内在という考えは、「波は海の外から来るのではなく、海そのものの動きだ」と言えば、一瞬で伝わる。この発想に立てば、神を探しに遠くへ旅する必要はなく、探している当の自分こそが答えの在りかとなる。アートマンとブラフマンの一致という核心も、この比喩に乗せれば、会得しやすくなるだろう。ただし、比喩はあくまで入口にすぎず、そこから先は自分で確かめるほかない。",
+    "form": "内在",
+    "en": "When speaking about a difficult idea, it helps to keep one metaphor in hand. For example, the Indian-philosophical idea of immanence comes across instantly if you say, 'a wave doesn't come from outside the sea; it is the movement of the sea itself'. From this standpoint, there is no need to travel far to look for God; the very self that is searching becomes the place where the answer lies. The core of the unity of Atman and Brahman, too, becomes easier to grasp when carried on this metaphor. However, a metaphor is only a doorway, and from there on you have no choice but to verify it yourself.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「超越」の反対語。神や真理が世界・自己の内にあるという思想の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "内戦",
+   "reading": "ないせん",
+   "pos": "noun",
+   "meaning": "civil war",
+   "defJa": "一つの国の中で起こる武力の争い",
+   "passage": {
+    "ja": "内戦の悲惨さは、前線の外にこそ現れる。隣人が敵となり、同じ言葉を話す者同士が、子どもに至るまで戦いに巻き込まれるとき、国の傷は一世代では癒えない。そこへ外国の思惑が加われば、戦いはたちまち代理戦争の様相を帯びる。停戦の後に残るのは、廃墟だけではなく、互いへの不信という長い余波である。だからこそ、戦いを終わらせる試みは、銃を置かせるだけでなく、傷ついた記憶を癒やす長い作業でなければならない。",
+    "form": "内戦",
+    "en": "The misery of civil war shows itself most outside the front lines. When neighbors become enemies and people who speak the same language are drawn into the fighting, down to the children, a nation's wound does not heal within a generation. Add foreign calculations, and the conflict at once takes on the look of a proxy war. What remains after a ceasefire is not only ruins but the long aftershock of mutual distrust. That is why an attempt to end the fighting must be a long work that not only makes people lay down their guns but also heals wounded memories.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「内戦状態」「内戦が勃発する」。国内の勢力同士が武力で争うこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "内発的動機づけ",
+   "reading": "ないはつてきどうきづけ",
+   "pos": "noun",
+   "meaning": "intrinsic motivation",
+   "defJa": "興味や関心から自然にわく意欲",
+   "passage": {
+    "ja": "ゲームにはまってると、勉強しなさいって言われても、やる気なんて出ないじゃないですか。でも、自分が面白いと思った実験とあれば、誰に言われなくても夜中まで続けちゃうんですよね。この内発的動機づけって、短期の成績より、長続きに効くって言われてます。ごほうびで釣りすぎると、かえって伸び悩みを招くこともあるそうです。やらされる勉強が続かないのは、意志が弱いからというより、仕組みの問題なのかもしれませんね。",
+    "form": "内発的動機づけ",
+    "en": "When you're hooked on a game, motivation to study doesn't show up even if someone tells you to, right? But if it's an experiment you find fascinating, you keep at it past midnight without anyone telling you. This intrinsic motivation is said to work more on staying power than on short-term grades. They say that dangling too many rewards can even backfire and lead to stagnation. Study you're forced into doesn't last, and that may be a problem of the system rather than of weak willpower.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "外から与えられる外発的動機づけと対。心理学・教育の基本語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "内省",
+   "reading": "ないせい",
+   "pos": "noun",
+   "meaning": "introspection; reflection",
+   "defJa": "自分の考えや行いを深く省みること",
+   "passage": {
+    "ja": "一日の終わりに、静かに内省する時間を持つ人は、意外なほど少ないものだ。出来事の余韻を味わうそばから、次の予定やスマホの通知に追われてしまうからである。だが、たとえ数分でも自分の言動を振り返れば、翌日の選択は驚くほど変わるものだ。ノートに三行だけ書く、湯船につかりながら今日の自分に問いかける、そんな小さな習慣で、十分に足りる。夜の静けさは、そのための最良の場なのかもしれない。",
+    "form": "内省",
+    "en": "Surprisingly few people set aside quiet time to reflect at the end of the day. That is because, no sooner do they savor the afterglow of events than they are chased by the next appointment or notification. But even a few minutes of looking back on one's words and deeds changes tomorrow's choices remarkably. Writing just three lines in a notebook, or asking yourself about today while soaking in the bath, such small habits are enough. The quiet of night may be the best place for that.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「内省する」「内省を深める」。反省より、自分の内面を静かに見つめる語感。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "再分配",
+   "reading": "さいぶんぱい",
+   "pos": "noun",
+   "meaning": "redistribution",
+   "defJa": "集めた富を改めて人々に配り直すこと",
+   "passage": {
+    "ja": "再分配とは、豊かな者から取り上げて貧しい者に配るという単純な話ではない。社会が生み出した余剰を、どの程度、どのような仕組みで人々に戻すかをめぐって、思想は大きく分かれてきた。共産主義のように徹底した平等を掲げる立場もあれば、機会の平等だけで足りるとする立場もある。いずれにしても、配り方を誤れば、働く意欲そのものを損ないかねない。何を公平と呼ぶかという問いに、唯一の正解がないことが、この議論を終わりにくくしている。",
+    "form": "再分配",
+    "en": "Redistribution is not the simple matter of taking from the rich and handing it to the poor. Over how much of the surplus a society produces should be returned to people, and by what mechanism, schools of thought have split widely. There are positions that champion thorough equality, as in communism, and positions that hold equality of opportunity alone is enough. Either way, if the distribution is done wrongly, it may damage the very will to work. The fact that the question of what to call fair has no single right answer makes this debate hard to bring to an end.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「所得の再分配」「再分配政策」。税や社会保障で富を配り直す経済の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "再現性",
+   "reading": "さいげんせい",
+   "pos": "noun",
+   "meaning": "reproducibility",
+   "defJa": "同じ条件で同じ結果が得られる性質",
+   "passage": {
+    "ja": "勉強法の本には、「これで成績が上がった」という体験談があふれています。体験談は参考にはなるものの、再現性があるかどうかは、まったく別の問題です。たまたま合う人に効いただけなら、あなたが同じことをしても、同じ結果になるとは限りません。だからこそ、先行研究で効果が確かめられた方法から試すのが、近道なんです。効果を信じたいという気持ちが強いほど、都合のいい話だけを拾ってしまうので、注意が必要です。",
+    "form": "再現性",
+    "en": "Books on study methods are full of testimonials saying 'my grades went up with this'. Testimonials can be helpful, but whether they are reproducible is an entirely separate question. If it merely worked for someone who happened to suit it, doing the same thing won't necessarily give you the same result. That's exactly why it's a shortcut to start with methods whose effects have been confirmed in prior research. The stronger your wish to believe in an effect, the more you pick up only convenient stories, so caution is needed.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「再現性が高い／低い」「再現性を確かめる」。科学の信頼性を測る語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "再編",
+   "reading": "さいへん",
+   "pos": "noun",
+   "meaning": "reorganization, consolidation",
+   "defJa": "組織や仕組みを組み替えること",
+   "passage": {
+    "ja": "半導体業界では、ここ数年、企業の再編が相次いでいます。巨額の開発費を一社で背負いきれなくなり、合併や提携に活路を見いだす動きが増えたからです。その一方で、買収には各国の規制当局が目を光らせ、承認に数年を要する例も珍しくありません。その結果、どの国のどの企業が主導権を握るのかが、今後の産業地図を大きく塗り替えるでしょう。代替の利かない部品が多い業界だけに、一つの判断の余波が世界中に広がるのです。",
+    "form": "再編",
+    "en": "In the semiconductor industry, corporate reorganizations have followed one after another over the past few years. This is because more companies, unable to shoulder enormous development costs alone, are finding a way out in mergers and partnerships. On the other hand, regulators in each country keep a sharp eye on acquisitions, and it is not rare for approval to take several years. As a result, which company in which country takes the initiative will greatly redraw the industrial map from here on. Precisely because it is an industry with many irreplaceable parts, the aftershock of a single decision spreads around the world.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「業界再編」「事業再編」と使う。合併・統合・分割などで形を組み替えること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "再興",
+   "reading": "さいこう",
+   "pos": "noun",
+   "meaning": "revival, restoration",
+   "defJa": "衰えたものを再び盛んにすること",
+   "passage": {
+    "ja": "日本の半導体の再興は、国策だけでは実現しません。かつて全盛期を支えたのは、素材や製造装置といった、地味ながら世界に通用する技術でした。そこに最先端の工場を呼び込み、人材を育てていくことが、復活への現実的な道筋です。伸びしろは大きいものの、時間のかかる挑戦であることは間違いありません。日本が積み上げてきた強みを新しい需要とどうつなぐのか、その設計図こそが、いま問われているのです。",
+    "form": "再興",
+    "en": "Reviving Japan's semiconductors cannot be achieved by national policy alone. What once supported its golden age was technology, plain but world-class, such as materials and manufacturing equipment. Drawing cutting-edge factories into that base and nurturing talent is the realistic path to a comeback. There is plenty of room to grow, but there is no doubt it is a challenge that will take time. How to connect the strengths Japan has built up to new demand, that blueprint is exactly what is being asked of us now.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「産業の再興」「再興を図る」。一度衰えたものを立て直す硬い語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "冗長",
+   "reading": "じょうちょう",
+   "pos": "na-adj",
+   "meaning": "verbose; redundant",
+   "defJa": "むだが多くてくどいこと",
+   "passage": {
+    "ja": "文章が冗長になる原因の多くは、同じ内容を言い換えて繰り返すことにある。「まず最初に」「必ず必要」のような重複表現は、その典型だ。会議の議事録でも報告書でも、書き終えたあとで声に出して読むと、無駄な語がどこにあるのか耳が教えてくれる。余談を削るのは惜しいが、読み手の時間を奪ってまで残すに足るものではない。思い切って体言止めを使えば、リズムが生まれ、文は驚くほど引き締まる。",
+    "form": "冗長",
+    "en": "The cause of wordy prose is, in most cases, restating the same content in other words. Redundant phrases like 'first of all, at the start' are typical. Whether it is meeting minutes or a report, reading it aloud after finishing lets your ears tell you where the wasted words are. Cutting an aside is painful, but it is not worth keeping at the cost of the reader's time. If you boldly use noun-ending sentences, rhythm arises and the prose tightens remarkably.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「冗長な説明」「冗長になる」。短く削れる無駄を指すマイナス評価の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "出典",
+   "reading": "しゅってん",
+   "pos": "noun",
+   "meaning": "source of a quotation",
+   "defJa": "引用や言葉のもとになった書物",
+   "passage": {
+    "ja": "「以心伝心」という言葉の出典は、禅の書物にあります。釈迦が花を掲げると、弟子の迦葉だけが微笑んだという「拈華微笑」の伝承とも、結びつけて語られてきました。言葉を抜きにして心から心へ真理が伝わる、という意味は、そこから広がったものです。このように由来をたどると、慣用句が急に立体的に見えてきます。背景を知っていれば、会話の中で故事を引くときにも、自信を持って意味を説明できるようになります。",
+    "form": "出典",
+    "en": "The source of the phrase 'ishin-denshin' lies in Zen writings. It has also been discussed in connection with the tradition of 'nenge-mishō,' in which, when the Buddha held up a flower, only his disciple Kasyapa smiled. The meaning that truth passes from heart to heart without words spread from there. Tracing an origin like this makes an idiom suddenly look three-dimensional. If you know the background, you can explain the meaning with confidence even when you cite an old tale in conversation.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「出典を明記する」「出典は〜」。引用文・故事成語の出どころを示す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "出家",
+   "reading": "しゅっけ",
+   "pos": "noun",
+   "meaning": "renouncing the world; becoming a monk",
+   "defJa": "俗世を離れて仏道に入ること",
+   "passage": {
+    "ja": "釈迦は二十九歳のとき、王子としての暮らしを捨てて出家したと伝えられます。老い、病、死という現実を目の当たりにしたことが、きっかけでした。以来、六年にわたる苦行を経て、菩提樹の下で悟りを開いたとされます。真理を会得するためなら、地位も家族も手放す、という覚悟がそこにあったのです。のちに釈迦の教えを慕って家を離れる人々が増え、やがて修行者の共同体が生まれていきます。",
+    "form": "出家",
+    "en": "The Buddha is said to have left his life as a prince and renounced the world at twenty-nine. Witnessing the realities of aging, sickness and death was the trigger. Since then, after six years of ascetic practice, he is said to have attained enlightenment under the bodhi tree. There lay the resolve to give up status and family if it meant grasping the truth. Later, more and more people left home out of admiration for his teaching, and before long a community of practitioners came into being.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「出家する」「出家者」。在家と対。サ変動詞として使う仏教語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "出遅れ",
+   "reading": "でおくれ",
+   "pos": "noun",
+   "meaning": "late start; lagging behind",
+   "defJa": "他より動き出しが遅れること",
+   "passage": {
+    "ja": "生成AIの開発競争では、日本企業の出遅れが目立つとの指摘が相次ぐ。計算資源を確保するための投資で、米国や中国に大きく水をあけられたことが一因とされる。一方で、日本語に特化した小型のモデルを磨き、独自の強みを築こうとする動きが、新たな先駆けになるとの期待もある。巨額の資金力では太刀打ちできない分、どこで勝負するかという狙いの精度が、いっそう問われている。後発であっても、用途を絞れば活路は開ける、との見方である。",
+    "form": "出遅れ",
+    "en": "In the race to develop generative AI, one after another points out that Japanese firms' late start stands out. Being left far behind the United States and China in investment to secure computing resources is cited as one cause. On the other hand, there is also hope that efforts to hone small models specialized in Japanese and build a distinctive strength will become a new forerunner. Since they cannot compete on sheer financial power, the precision of aim in choosing where to fight is all the more tested. The view is that even latecomers can find a way forward if they narrow the use case.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「出遅れが目立つ」「出遅れを取り戻す」。競争での初動の遅れを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "分散学習",
+   "reading": "ぶんさんがくしゅう",
+   "pos": "noun",
+   "meaning": "spaced learning",
+   "defJa": "間隔を空けて繰り返す学び方",
+   "passage": {
+    "ja": "試験前の一夜漬けは、翌週にはほとんど忘れてしまうものです。それに対して、日にちを空けて同じ内容を繰り返す分散学習は、長期の記憶に残りやすいことが知られています。さらに、学習の合間に仮眠をとると、記憶の整理が進むという研究もあります。自分の体内時計に応じて、頭の冴える時間に新しい内容を入れるのも効果的です。勉強は、頑張りの量だけでなく、時間の配り方でも差がつくという、わかりやすい好例です。",
+    "form": "分散学習",
+    "en": "What you cram the night before an exam, you mostly forget by the following week. In contrast, spaced learning, which repeats the same content with days in between, is known to stay in long-term memory. Furthermore, there is research suggesting that taking a nap between study sessions helps organize memory. It is also effective to put new material in at the time your head is sharp, according to your own body clock. It is an easy-to-grasp example showing that in study, differences arise not only from the amount of effort but from how you distribute your time.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「集中学習」と対。復習の間隔を空けて記憶を定着させる学習法。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "分水嶺",
+   "reading": "ぶんすいれい",
+   "pos": "noun",
+   "meaning": "watershed; turning point",
+   "defJa": "物事の方向が分かれる重大な境目",
+   "passage": {
+    "ja": "歴史の分水嶺って、あとから振り返らないと分からないものですよね。たとえば1914年のサラエボの銃声も、その瞬間は地方で起きた事件にすぎなかったはずです。それが同盟関係を通じて余波を広げ、気づけば世界大戦ですよ。当事者は、まさか自分たちが歴史の曲がり角に立っているなんて、思ってもいなかったでしょうね。だからこそ、いまの私たちも、気づかないまま大きな分かれ道を通り過ぎているのかもしれませんね。",
+    "form": "分水嶺",
+    "en": "The watersheds of history can't be recognized unless you look back later, can they? For example, the gunshots in Sarajevo in 1914 too must have been, at that moment, nothing more than an incident in a provincial place. Through alliance ties they spread their aftershocks, and before you knew it, it was a world war. The people involved surely never imagined they were standing at a turning point in history. That is why we too, now, may be passing a major fork in the road without noticing.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「歴史の分水嶺」「運命の分水嶺」。山の尾根で水が分かれる所から転じた比喩。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "切磋琢磨",
+   "reading": "せっさたくま",
+   "pos": "noun",
+   "meaning": "honing one another",
+   "defJa": "互いに励まし合って向上すること",
+   "passage": {
+    "ja": "切磋琢磨とは、骨や玉を磨くように、互いに励まし合いながら、己を高めていくことをいう。競い合う相手がいればこそ、人は自分でも気づかなかった伸びしろに出会える。同じ志をもつ仲間の成長を、自分のことのように喜べるとき、人は嫉妬ではなく刺激を受け取れるようになる。ただし、それは他力本願とは、まったく別のものだ。自分の足で立とうとする者同士の間でしか、この関係は成り立たないからである。",
+    "form": "切磋琢磨",
+    "en": "Sessa-takuma means improving oneself by encouraging one another, as one polishes bone or jade. Precisely because there is a rival to compete with, a person meets room for growth they had not noticed themselves. When one can rejoice in a companion's growth as if it were one's own, one comes to receive stimulation rather than jealousy. However, that is different from relying on others. This relationship holds only between people who try to stand on their own feet.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "四字熟語。「切磋琢磨し合う」「切磋琢磨する仲間」。骨角と玉石を磨く意から。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "列強",
+   "reading": "れっきょう",
+   "pos": "noun",
+   "meaning": "the great powers",
+   "defJa": "強大な力を持つ複数の国々",
+   "passage": {
+    "ja": "歴史を語る上で、列強という言葉は、ただの「強い国々」と訳してはもったいない。この語には、他国を従わせる力を持つ複数の大国が、互いに牽制し合っているという構図が含まれている。たとえば清が領土の割譲を余儀なくされた例は、その力関係を象徴している。使節団を送って学ぼうとした当時の日本は、その構図の中で必死に立ち位置を探っていた。用語の背景まで説明できてこそ、聞き手の記憶に残る歴史の語りになる。",
+    "form": "列強",
+    "en": "When talking about history, it is a waste to translate 'reppo' merely as 'strong countries'. The word contains the picture of several major powers, able to subjugate other nations, checking one another. The case of Qing China being forced to cede territory, for instance, symbolizes that balance of power. Japan at the time, which sent a mission abroad to learn, was desperately seeking its position within that picture. Only when you can explain even the background of a term does it become a telling of history that stays in the listener's memory.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「欧米列強」「列強の仲間入り」。帝国主義期の大国群を指す歴史語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "初心忘るべからず",
+   "reading": "しょしんわするべからず",
+   "pos": "expression",
+   "meaning": "never forget your beginner's spirit",
+   "defJa": "未熟だった頃の心を忘れるなという戒め",
+   "passage": {
+    "ja": "「初心忘るべからず」は、能を大成した世阿弥の言葉として知られる。ただし本来の意味は、精神論というより、未熟だった頃の自分を忘れるな、という戒めに近いとされる。苦労した過去を覚えているからこそ、年齢を重ねても学び続けられるのである。熟練者になるほど、基本を疑う謙虚さを失いやすいという教訓も、ここには込められている。伸び悩みを感じる中堅社員に向けて、この言葉を研修で紹介する企業もある。",
+    "form": "初心忘るべからず",
+    "en": "'Never forget your beginner's spirit' is known as a saying of Zeami, who brought Noh to its height. However, its original meaning is said to be closer to a warning not to forget your own unripe self than to a pep talk. Precisely because you remember a past of hardship, you can go on learning even as the years pile up. It also carries the lesson that the more skilled one becomes, the easier it is to lose the humility to question the basics. Some companies introduce this saying in training for mid-career employees who feel their growth stalling.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "世阿弥の『花鏡』由来。始めた頃の気持ちに限らず、未熟さの自覚を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "判断力",
+   "reading": "はんだんりょく",
+   "pos": "noun",
+   "meaning": "judgment",
+   "defJa": "物事を見極めて決める力",
+   "passage": {
+    "ja": "寝不足の日って、ランチのメニューすら、なかなか決められなくないですか。あれは前頭葉が疲れて、判断力が落ちてるからなんですって。だから大事な決断は、午後の眠くなる時間じゃなくて、頭が冴えてる朝にやるのがいいらしいです。それに、お腹がすいているときの買い物は、あとで見返すと不要なものだらけだったりしますよね。昼に十五分でもいいので仮眠をとると、午後の頭の働きがだいぶ違いますよ。",
+    "form": "判断力",
+    "en": "On a day you're short of sleep, you can't even decide what to have for lunch, can you? They say that's because the frontal lobe is tired and your judgment drops. So for important decisions, it's apparently better to do them in the morning when your head is clear, not in the sleepy afternoon. Besides, shopping when you're hungry often turns out, on looking back, to be full of things you didn't need, doesn't it? Even a fifteen-minute nap at midday makes quite a difference.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「判断力が鈍る／を養う」。決断の質を左右する能力を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "制海権",
+   "reading": "せいかいけん",
+   "pos": "noun",
+   "meaning": "command of the sea",
+   "defJa": "海上での軍事的な支配権",
+   "passage": {
+    "ja": "歴史を語る上で、制海権という言葉は、地図の上の線ではなく、海を行き交う船の動きとして描くと伝わりやすい。たとえば1905年の日本海海戦で日本がバルチック艦隊を破ると、ロシアは海からの増援の望みを失い、講和へと傾いた。この一戦の余波は、のちの割譲交渉の席にまで及んだ。聞き手が地図を頭に描ける話し方こそ、歴史を語る技術である。用語の背景まで説明できてこそ、聞き手の記憶に残る歴史の語りになる。",
+    "form": "制海権",
+    "en": "When talking about history, the word 'command of the sea' comes across better if you depict it not as lines on a map but as the movement of ships sailing the waters. For example, when Japan defeated the Baltic Fleet at the Battle of Tsushima in 1905, Russia lost hope of reinforcements by sea and leaned toward peace. The aftershock of that single battle reached even the table of the later territorial-cession negotiations. A way of speaking that lets listeners picture the map in their heads is the very skill of telling history. Only when you can explain even the background of a term does it become a telling of history that stays in the listener's memory.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「制海権を握る／失う」。海上交通と海戦の主導権を指す軍事・歴史語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "制空権",
+   "reading": "せいくうけん",
+   "pos": "noun",
+   "meaning": "air supremacy",
+   "defJa": "空域を軍事的に支配する力",
+   "passage": {
+    "ja": "現代の戦争では、地上で戦う前に、まず制空権を握れるかどうかが勝敗を左右します。1940年のバトル・オブ・ブリテンで、ドイツ空軍は上陸作戦に先立って、イギリス上空の主導権を奪おうとしました。しかし、イギリスの戦闘機部隊が粘り強く抵抗し、目標は果たせませんでした。その結果、英本土への侵攻計画は断念されたのです。空を押さえた側が、地上の戦いでも主導権を握るという教訓は、のちの戦争にも受け継がれました。",
+    "form": "制空権",
+    "en": "In modern war, before fighting on the ground, whether you can seize air supremacy first decides victory or defeat. In the Battle of Britain in 1940, the German air force tried to wrest control of the skies over Britain prior to a landing operation. But Britain's fighter squadrons resisted tenaciously, and the goal was not achieved. As a result, the plan to invade the British mainland was abandoned. The lesson that the side that holds the sky also takes the initiative in the ground fight was carried over into later wars.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「制空権を握る／確保する」。制海権と並べて覚える軍事語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "刹那",
+   "reading": "せつな",
+   "pos": "noun",
+   "meaning": "an instant; a moment (ksana)",
+   "defJa": "きわめて短い一瞬の時間",
+   "passage": {
+    "ja": "仏教でいう刹那は、七十五分の一秒ほどとされる、きわめて短い時間の単位である。しかし、この短さを知ったところで、体得したことにはならない。昨日の悩みも、明日の不安も、突きつめれば、いま浮かんでいる思考の連なりにすぎない。心はその一瞬ごとに生まれては消え、その連なりが「私」という感覚をつくっているという。そう思って見つめると、いま交わした言葉の余韻すら、すでに過去のものになっている。",
+    "form": "刹那",
+    "en": "In Buddhism, the ksana is a very short unit of time, said to be about one seventy-fifth of a second. But merely knowing how short it is does not mean you have truly embodied it. Yesterday's worries and tomorrow's anxieties are, in the end, nothing more than a chain of thoughts floating up now. The mind is said to arise and vanish with each such instant, and the chain of them creates the sense of 'I'. Looking at it that way, even the lingering resonance of the words just exchanged has already become the past.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "仏教語の時間の最小単位。「刹那的」は今だけを追う意で、日常語化した。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "前代未聞",
+   "reading": "ぜんだいみもん",
+   "pos": "noun",
+   "meaning": "unprecedented",
+   "defJa": "今までに聞いたことがない珍しさ",
+   "passage": {
+    "ja": "小論文で「前代未聞」と書くなら、必ず比較の根拠を添えてください。たとえば、対話型AIの利用者が二か月ほどで一億人に達したと報じられたとき、多くの人がこの言葉を使いました。ただ、先行研究や統計に基づかずに使えば、ただの大げさな表現になりかねません。何と比べて前例がないのかを示すことが、説得力を左右するのです。根拠のある比較を一文入れるだけで、同じ言葉が主張を支える強い一撃に変わります。",
+    "form": "前代未聞",
+    "en": "If you write 'unprecedented' in a short essay, be sure to attach the basis for the comparison. For instance, when it was reported that a conversational AI had reached a hundred million users in about two months, many people used this word. But if you use it without grounding in prior studies or statistics, it may become mere exaggeration. Showing what you are comparing against to claim no precedent is what governs persuasiveness. Just adding one sentence of grounded comparison turns the same word into a strong blow that supports your claim.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「前代未聞の事態／出来事」。四字熟語。根拠のない誇張に使うと弱くなる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "前頭葉",
+   "reading": "ぜんとうよう",
+   "pos": "noun",
+   "meaning": "frontal lobe",
+   "defJa": "大脳の前方にあり思考を司る部分",
+   "passage": {
+    "ja": "前頭葉は、計画を立て、衝動を抑える、人間らしい働きの中枢といわれる。ところが、疲労やストレスが重なると、真っ先に働きが鈍るのもこの領域である。そうなると、冷静な判断力は揺らぎ、わかっていながらも目先の快楽に流されてしまう。睡眠不足の翌日に、つい甘いものへ手が伸びるのも、この働きが落ちている証拠だといわれる。意志の弱さを責める前に、脳を休ませる工夫を考えたい。",
+    "form": "前頭葉",
+    "en": "The frontal lobe is said to be the center of distinctly human functions, such as planning and suppressing impulses. Yet when fatigue and stress pile up, it is also this region whose function dulls first. Then calm judgment wavers, and even knowing better, we are swept along by immediate pleasure. The way a hand reaches for sweets after a short night's sleep is also said to be evidence that this function has dropped. Before blaming weakness of will, we should think about ways to rest the brain.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "脳の部位名。「前頭葉の働き」「前頭葉が衰える」。計画・抑制と結びつく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "副交感神経",
+   "reading": "ふくこうかんしんけい",
+   "pos": "noun",
+   "meaning": "parasympathetic nervous system",
+   "defJa": "体を休息へ導く自律神経",
+   "passage": {
+    "ja": "緊張で眠れない夜は、副交感神経をうまく働かせることがカギです。ゆっくり息を吐くと、心拍が落ち着き、体が休息モードへ切り替わっていきます。逆に、寝る直前までスマホを見っぱなしにしていると、刺激が脳に入り続け、体内時計まで乱れてしまいます。依存症とは言えないまでも、寝室に持ち込まない工夫は、試す価値があります。一日の終わりを整えることが、翌日の集中力を決めるといっても言いすぎではありません。",
+    "form": "副交感神経",
+    "en": "On nights you can't sleep from tension, the key is to engage the parasympathetic nervous system well. When you exhale slowly, your heart rate settles and your body gradually switches to rest mode. Conversely, if you keep staring at your phone until just before bed, stimulation keeps entering the brain and even your body clock gets disrupted. Even if it can't be called an addiction, keeping it out of the bedroom is worth trying. It is no exaggeration to say that how you settle the end of the day decides tomorrow's concentration.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "交感神経と対になる自律神経。「副交感神経が優位になる」と使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "割り込み",
+   "reading": "わりこみ",
+   "pos": "noun",
+   "meaning": "interruption",
+   "defJa": "進行中の作業の途中に入ること",
+   "passage": {
+    "ja": "勉強の最中に通知が入ると、元の集中状態へ戻るまでに二十分ほどかかるといわれます。小さな割り込みでも、頭の中の作業メモリは確実に消耗するのです。そのため、効率のいい人ほど、机に向かう前にスマホを別の部屋に置いてしまいます。創造性を要する課題ほど、途切れない時間の確保が成果を分けるでしょう。通知を切る、机の上を片づける、そんな小さな環境づくりが、最も確実な集中の技術なのです。",
+    "form": "割り込み",
+    "en": "It is said that when a notification arrives in the middle of studying, it takes about twenty minutes to return to the original state of concentration. Even a small interruption reliably drains the working memory in your head. That is why efficient people put their phones in another room before sitting at the desk. The more a task demands creativity, the more securing uninterrupted time will decide the result. Turning off notifications and tidying the desk, such small environment-building is the most reliable technique for concentration.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "名詞「割り込み」。「割り込みが入る」。IT用語の割り込み処理とも同じ語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "割譲",
+   "reading": "かつじょう",
+   "pos": "noun",
+   "meaning": "cession of territory",
+   "defJa": "領土の一部を他国に譲り渡すこと",
+   "passage": {
+    "ja": "アヘン戦争に敗れた清は、1842年の南京条約で、香港島をイギリスに割譲しました。領土を手放すという決断は、国の威信を大きく傷つけるものでした。条約の文面は短くても、そこで決められた領土の移り変わりは、住民の暮らしを根こそぎ変えてしまいました。これを皮切りに、列強の要求が相次ぐ時代が幕を開けたのです。その余波は、二十世紀に入っても、東アジアの国際関係に影を落とし続けました。",
+    "form": "割譲",
+    "en": "Defeated in the Opium War, the Qing ceded Hong Kong Island to Britain in the Treaty of Nanking in 1842. The decision to give up territory badly damaged the nation's prestige. Though the wording of a treaty may be short, the shift of territory decided there changed the lives of the residents from the roots. Starting with this, an era in which the great powers' demands came one after another opened. Its aftershocks kept casting a shadow over East Asian international relations even after the twentieth century began.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「領土を割譲する」「割譲地」。条約で領土を譲る歴史・外交の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "創造性",
+   "reading": "そうぞうせい",
+   "pos": "noun",
+   "meaning": "creativity",
+   "defJa": "新しいものを生み出す力",
+   "passage": {
+    "ja": "話に創造性を持たせたいなら、いきなり結論へ行かず、小さな脱線を入れてみるといい。余談があるからこそ、聞き手は肩の力を抜き、本題が心にしみ込みやすくなる。とはいえ、脱線ばかりでは聞き手が迷子になるので、戻る合図を決めておくことが肝心だ。「さて、本題に戻ると」の一言があるだけで、話の運びは見違えるほど整う。型を知ったうえで、あえて外せる人にこそ、聞き手を驚かせる話し方が生まれる。",
+    "form": "創造性",
+    "en": "If you want your talk to have creativity, don't go straight to the conclusion; try inserting a small digression. Because of the aside, listeners relax their shoulders and the main point sinks in more easily. That said, with nothing but digressions the listener gets lost, so it matters to decide on a signal for returning. Just one phrase, 'now, back to the main point,' makes the flow of the talk neat beyond recognition. A way of speaking that surprises listeners is born in those who, knowing the form, can deliberately break it.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「創造性を発揮する／養う」。「創造力」より性質・傾向のニュアンスが強い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "功罪",
+   "reading": "こうざい",
+   "pos": "noun",
+   "meaning": "merits and demerits",
+   "defJa": "良い面と悪い面の両方",
+   "passage": {
+    "ja": "どんな偉業にも功罪があります。たとえば産業革命は、生産力を飛躍的に高め、先進国の豊かさの土台を築きました。その反面、長時間労働や環境汚染など、人々の暮らしに深い傷も残したのです。だからこそ、歴史を学ぶ上では、光だけを誇ることも、影だけを責めることもせず、両面を並べて見る姿勢が欠かせません。さらに、評価の物差しは時代とともに変わるという点も、頭に入れておきたいところです。",
+    "form": "功罪",
+    "en": "Every great achievement has its merits and demerits. For example, the Industrial Revolution dramatically raised productive power and laid the foundation of the wealth of developed countries. On the other hand, it also left deep wounds on people's lives, such as long working hours and environmental pollution. That is why, in studying history, an attitude of viewing both sides together, neither boasting of the light alone nor blaming the shadow alone, is indispensable. Furthermore, it is worth keeping in mind that the yardstick of evaluation changes with the times.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「功罪相半ばする」「功罪を論じる」。評価が良し悪し両面あることを言う。",
+    "sense": ""
+   }
+  }
+ ]
+}

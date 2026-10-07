@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "願望",
+   "reading": "がんぼう",
+   "pos": "noun",
+   "meaning": "wish, desire",
+   "defJa": "こうなりたい、こうしたいと強く願う気持ち",
+   "passage": {
+    "ja": "心理学の分野では、「こうなりたい」という願望を人に話しただけで、実現したような満足感を得てしまうという指摘がある。目標を宣言するほど、実行が遠のくという皮肉な結果である。これを避けるには、宣言よりも最初の一歩を記録するほうがよいとされる。ただし、効果の大きさに関しては研究によって差があり、一概には言えない。口に出す前に、まず五分で終わる行動に変えてしまうのが得策である。",
+    "form": "願望",
+    "en": "In psychology, it has been pointed out that merely telling others that you want to become something can bring the satisfaction of having already achieved it. It is an ironic result: the more openly one declares a goal, the further action recedes. To avoid this, recording the first step is said to be better than making a declaration. However, the size of the effect differs from study to study, and it cannot be stated unconditionally. Before saying it aloud, the best move is to turn it first into an action that takes five minutes.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「願望を抱く」「願望を口にする」と使い、実現前の強い望みを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "直感",
+   "reading": "ちょっかん",
+   "pos": "noun",
+   "meaning": "intuition, instinct",
+   "defJa": "推理によらず、一瞬で物事を感じ取ること",
+   "passage": {
+    "ja": "「なぜかこの道は危ない」と足が止まることがある。理屈はあとから息を切らして追いかけてくるもので、先に走り出すのは、理由のわからない確信である。とはいえ、それを万能の羅針盤とみなすのは危うい。熟練した将棋の棋士が盤面を見た瞬間に抱く直感も、膨大な対局の蓄積を圧縮した要約にすぎない。だからこそ、頼りにする前に、一度は結果と照らして検証にかけてみる習慣が要るのだ。",
+    "form": "直感",
+    "en": "Sometimes your feet stop with the sense that somehow this road is dangerous. Reasoning comes chasing after, out of breath; what sets off first is a conviction you cannot explain. That said, it is risky to treat it as an all-purpose compass. The intuition a veteran shogi player feels the instant they look at the board is also nothing more than a compressed summary of an enormous accumulation of games. That is exactly why the habit of testing it against outcomes, before you rely on it, is needed.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「直感が働く」「直感に頼る」の形で使い、理屈や推論と対にして語られる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "功績",
+   "reading": "こうせき",
+   "pos": "noun",
+   "meaning": "achievement, meritorious service",
+   "defJa": "世のために成し遂げた、価値のある仕事",
+   "passage": {
+    "ja": "伊能忠敬が本格的に測量の旅に出たのは、五十五歳のときでした。それまでは商家を立て直した実務家で、隠居後に江戸で天文学を学び直したのです。彼の功績は、地図の正確さに限らず、年齢を理由に新しい仕事へ挑むことを諦めない生き方そのものにあります。その姿は、時代を越えて今も多くの社会人学習者を励ましています。五十代からの学び直しも、彼の生き方を見れば遅すぎることはないとわかります。",
+    "form": "功績",
+    "en": "Ino Tadataka set out on his full-scale surveying journeys at the age of fifty-five. Until then he had been a practical man who rebuilt a merchant house, and after retiring he went to Edo and studied astronomy anew. His achievement lies not only in the accuracy of his maps but in a way of living that never gives up taking on new work because of age. His example still encourages many adult learners today. Seen against his life, it is clear that relearning from one's fifties is never too late.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「功績を残す」「功績をたたえる」と使い、世に貢献した価値ある成果を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "恩恵",
+   "reading": "おんけい",
+   "pos": "noun",
+   "meaning": "blessing, benefit",
+   "defJa": "他から受ける利益や、ありがたいめぐみ",
+   "passage": {
+    "ja": "半導体の微細化がもたらした恩恵は、天気予報の精度向上をはじめ、新薬の候補を絞り込む計算など、目立たない場所で私たちの生活を支えています。ただ、その利益を受けられる人と受けられない人の間で差が広がる恐れもあり、一概に喜べる話ではありません。技術の歴史を振り返ると、新しい道具はいつも、使いこなせる人のところから広まってきました。この流れを変える鍵は、道具そのものよりも、学ぶ機会の分け方にあります。",
+    "form": "恩恵",
+    "en": "The benefits brought by shrinking semiconductors support our lives in unnoticeable places, from improved weather-forecast accuracy to computations that narrow down candidates for new drugs. But the gap may widen between those who can receive the gains and those who cannot, so it is not a story to celebrate unconditionally. Looking back over the history of technology, new tools have always spread starting from people who could make good use of them. The key to changing this flow lies less in the tools themselves than in how opportunities to learn are shared.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「恩恵を受ける」「恩恵をもたらす」と使い、ほかからもたらされる恵みや利益を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "趣旨",
+   "reading": "しゅし",
+   "pos": "noun",
+   "meaning": "gist, purport, aim",
+   "defJa": "話や文章で言おうとしている中心の内容",
+   "passage": {
+    "ja": "日本語の「ご趣旨は理解しました」という一言には、賛成か反対かの色がほとんど含まれていない。ただ話の骨子を受け取ったと言っているだけだ。ビジネスメールでこの表現を見かけたら、返事が来たからといって安心してはいけない。相手の本音は、そのあとに続く一文から察するしかないのである。返信する側は、「まだ賛成したわけではない」という距離を、相手を傷つけない言い方で、さりげなく保っているのだ。",
+    "form": "趣旨",
+    "en": "The Japanese phrase meaning I understand the gist of your proposal carries hardly any hint of agreement or disagreement. It merely says that the outline of the matter has been received. When you see this expression in a business email, you should not relax just because a reply has come. The other party's true feelings can only be read from the sentence that follows. The person replying is quietly keeping the distance of not having agreed yet, in a way that does not hurt the other party.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「ご趣旨」「趣旨を説明する」「趣旨に賛同する」など、提案や文書の中心的な狙いを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

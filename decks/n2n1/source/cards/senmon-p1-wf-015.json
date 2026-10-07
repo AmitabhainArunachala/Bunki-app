@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "後回し",
+   "reading": "あとまわし",
+   "pos": "noun",
+   "meaning": "putting off, postponement",
+   "defJa": "順番を遅らせてあとにすること",
+   "passage": {
+    "ja": "心理学の研究では、課題を後回しにする傾向は、怠けというより、不安や退屈といった不快な感情から逃れる行動だと考えられている。つまり、時間管理の技術だけでは解決しにくい。課題を細かく区切り、最初の五分だけ着手するという小さな仕掛けは、その感情の壁を低くするとされる。とくに、完璧にこなそうとする人ほど、始める前から気が重くなりやすいという。締め切りに追われて徹夜するあげく、質が落ちる人は少なくない。",
+    "form": "後回し",
+    "en": "In psychological research, the tendency to put tasks off is thought to be less laziness than behavior to escape unpleasant feelings such as anxiety and boredom. In other words, it is hard to solve with time-management techniques alone. The small device of splitting a task finely and starting for just the first five minutes is said to lower the wall of that feeling. Especially those who try to do things perfectly are said to find it heavy going even before they start. Not a few people are chased by deadlines, pull all-nighters, and end up with lower quality.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「後回しにする」の形で、先延ばしの意味。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

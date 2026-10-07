@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "再三",
+   "reading": "さいさん",
+   "pos": "adverb",
+   "meaning": "repeatedly, again and again",
+   "defJa": "同じことを何度も繰り返すさま",
+   "passage": {
+    "ja": "歴史の資料を読むときは、同じ出来事が何度も、くどいほど繰り返されたと書かれた箇所に注目するといい。繰り返されたということは、一度では解決しなかった、根の深い問題がそこにあった証拠だからである。たとえば幕末、幕府が再三命令を出したにもかかわらず従わない藩が現れたこと自体が、権威の低下を物語っている。回数の記述は、権力の実際の強さを把握する地味で確かな手がかりになるのだ。",
+    "form": "再三",
+    "en": "When reading historical sources, pay attention to passages that say the same event was repeated again and again. That something was repeated is evidence that there was a problem there that was not solved at one stroke. In the late Edo period, for example, the very fact that domains appeared that did not obey even though the shogunate issued orders repeatedly tells of a decline in its authority. A record of how many times is a clue for grasping the actual strength of power.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「再三にわたって」「再三の注意」と使い、何度も繰り返す動作や働きかけを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

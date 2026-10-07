@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "改める",
+   "reading": "あらためる",
+   "pos": "verb",
+   "meaning": "to correct, to change for the better",
+   "defJa": "悪い点を直して良くする",
+   "passage": {
+    "ja": "江戸の町人は、年の暮れになると帳面を締め、借金も人間関係のもつれも清算して新年を迎えた。過ちを改めるのに暦は要らないとはいえ、区切りの日が人を動かす力は侮れない。暦とは時間を測る道具であると同時に、生き方を見直す口実を社会が共有するための仕掛けでもあったのだ。そこに込められた意図は、人間の弱さへの思いやりだったのではないか。新年の誓いが三日で消えるのもまた、人間らしい話である。",
+    "form": "改める",
+    "en": "Townspeople in Edo closed their account books at year's end, settling debts and tangled relationships before welcoming the new year. True, one needs no calendar to correct a mistake, but the power of a dividing day to move people should not be underestimated. A calendar was a tool for measuring time and, at the same time, a device by which society shared a pretext for reviewing how to live. Perhaps the intent behind it was kindness toward human weakness. That new-year resolutions vanish within three days is also very human.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「過ちを改める」のように、悪い点を直す意味で使う。",
+    "sense": "誤りや態度を直す"
+   }
+  },
+  {
+   "term": "放射能",
+   "reading": "ほうしゃのう",
+   "pos": "noun",
+   "meaning": "radioactivity",
+   "defJa": "物質が放射線を出す性質",
+   "passage": {
+    "ja": "キュリー夫人が放射能という言葉を生んだのは、一八九八年ごろのことです。ウランの出す不思議な光が化学反応に左右されないと気づいたとき、彼女は原子の根底に秘密があると考えました。この発想は試験でもよく問われるので、年号と人物をセットで覚えておくに越したことはありません。ただし暗記より先に、なぜ常識外れだったのかを自分の言葉で説明できるようにしてください。ここに、科学史という物語のいちばんの面白さがある。",
+    "form": "放射能",
+    "en": "Marie Curie coined the word radioactivity around 1898. When she noticed that the strange rays given off by uranium were unaffected by chemical reactions, she concluded that the secret lay at the root of the atom itself. This idea is often asked about in exams, so it is best to memorize the year and the person as a set. Before memorizing, though, make sure you can explain in your own words why it defied common sense. Herein lies the greatest fascination of the story of the history of science.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「放射能」は性質を指す語。物質そのものや線とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "政策",
+   "reading": "せいさく",
+   "pos": "noun",
+   "meaning": "policy, political measures",
+   "defJa": "国や自治体が定める方針と手段",
+   "passage": {
+    "ja": "ねえ、江戸の鎖国って、よく政策として語られるけど、実際は外交をぜんぶ閉じたわけじゃないんですよね。長崎ではオランダと中国と貿易してたし、対馬は海峡を渡って朝鮮と、薩摩は琉球と、松前はアイヌとつながってたじゃないですか。だから「国を閉ざした」というより、窓口を幕府が管理したって言うほうが近いと思うんです。教科書の一行って、案外おおざっぱですよ。そういう細部を知ると、歴史の見え方がずいぶん変わります。",
+    "form": "政策",
+    "en": "You know, Edo-period national seclusion is often described as a policy, but in reality they didn't shut down all diplomacy. At Nagasaki they traded with the Dutch and the Chinese, and Tsushima was linked across the strait to Korea, Satsuma to the Ryukyus, and Matsumae to the Ainu. So I think it's closer to say the shogunate controlled the points of contact than to say they closed the country. A single line in a textbook can be surprisingly rough. Knowing such details changes how history looks quite a lot.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「〜政策を取る」「政策として」など、国の方針に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "敏感",
+   "reading": "びんかん",
+   "pos": "na-adj",
+   "meaning": "sensitive, susceptible",
+   "defJa": "わずかな変化にもすぐ反応する",
+   "passage": {
+    "ja": "江戸の養蚕農家は、気温や湿度の変化にとても敏感だったと言われます。蚕は桑の葉の食べ方で体調を伝えるので、観察を怠ると一晩で全滅しかねません。こうした現場の経験知が、のちの日本の生糸輸出を支えました。学習も同じで、小さな変化に気づく練習を重ねるほど、桑の栽培のように手応えのある判断が育ちます。江戸時代に書かれた農書には、季節や天候ごとの注意点が、驚くほど細かく書き残されています。",
+    "form": "敏感",
+    "en": "Silkworm farmers in the Edo period are said to have been very sensitive to changes in temperature and humidity. Silkworms signal their condition by how they eat mulberry leaves, so neglecting observation could wipe them out in a single night. This kind of experience on the ground later supported Japan's raw-silk exports. Learning is the same: the more you practice noticing small changes, the more your judgment grows solid, like the cultivation of mulberry. Agricultural books written in the Edo period record seasonal and weather-specific cautions in surprising detail.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「〜に敏感だ」の形で、変化や刺激を鋭く感じ取る意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "文房具",
+   "reading": "ぶんぼうぐ",
+   "pos": "noun",
+   "meaning": "stationery",
+   "defJa": "筆記や事務に使う道具の総称",
+   "passage": {
+    "ja": "紀元前のエジプトで、文房具といえばパピルスと葦のペンだった。紙が広まる以前、書くという行為は一部の書記だけが担う専門技術だったのである。やがて中国で紙が改良され、筆や墨とともに東へ西へ運ばれると、知識の流通する速度は一変した。紙の普及に伴って、何を使うかが何を学べるかを決める時代が来たのだ。現代の私たちが万年筆や付箋を選ぶときの小さなこだわりも、その長い歴史の延長線上にある。",
+    "form": "文房具",
+    "en": "In ancient Egypt before our era, stationery meant papyrus and a reed pen. Before paper spread, writing was a specialized skill carried out only by a few scribes. When paper was later improved in China and carried east and west along with brushes and ink, the speed at which knowledge circulated changed completely. As paper became widespread, an age arrived in which what you used decided what you could learn. Even the small preferences we have today when choosing a fountain pen or sticky notes lie on the extension of that long history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「文房具」は筆記・事務用の道具全般。筆や紙も含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "斜面",
+   "reading": "しゃめん",
+   "pos": "noun",
+   "meaning": "slope, slanting surface",
+   "defJa": "傾いている平らでない面",
+   "passage": {
+    "ja": "半導体の製造現場では、ウエハーの表面にできるわずかな斜面が歩留まりを左右する。回路の側壁がなだらかに傾くと、次の工程で膜が均一に付かず、断線を招く恐れがある。研究開発が活発な分野だけに、ある装置メーカーはこの角度をナノメートル単位で制御する技術を売りにしている。微細化が進むにつれて、図面に現れない形の誤差が競争の焦点となりつつある。角度の小さな違いが、最終的な製品の価値を大きく変えるのだ。",
+    "form": "斜面",
+    "en": "On semiconductor production floors, a slight slope formed on a wafer's surface can decide the yield. If the sidewall of a circuit tilts gently, the next process may fail to deposit a uniform film and cause a broken wire. In a field where research and development is so active, one equipment maker markets its ability to control this angle at the nanometer scale. As miniaturization advances, errors in shape that never appear on the drawings are becoming the focus of competition. A small difference in angle can greatly change the value of the final product.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「斜面」は傾いた面。山や屋根だけでなく、微細な構造にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "方策",
+   "reading": "ほうさく",
+   "pos": "noun",
+   "meaning": "plan, measure, policy",
+   "defJa": "目的を果たすための手立て",
+   "passage": {
+    "ja": "外国語の勉強で挫折する人は、意志が弱いどころか、むしろ真面目すぎるあまり方策を変えられない人が多いと私は見ています。たとえば、毎日単語帳を三十分めくるより、好きな動画を字幕つきで十分見るほうが有益な人もいます。大切なのは、自分が楽しんで反復できる入口を見つけることです。続いてしまえば、語彙はあとから勝手についてきます。まずは一週間だけ試して、合わなければ遠慮なく捨てて次を探せばいいのです。",
+    "form": "方策",
+    "en": "I think many people who give up on studying a foreign language are far from weak-willed; rather, they are so earnest that they cannot change their approach. For some, for example, watching a favorite video with subtitles for ten minutes is more beneficial than flipping through a vocabulary book for thirty minutes every day. What matters is finding an entrance you can enjoy and repeat. Once it keeps going, vocabulary follows on its own. Just try one for a week, and if it doesn't suit you, throw it away without hesitation and look for the next.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「方策を講じる／変える」の形で、目的のための具体的手段を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "施す",
+   "reading": "ほどこす",
+   "pos": "verb",
+   "meaning": "to apply, to give, to carry out",
+   "defJa": "手を加えたり行ったりする",
+   "passage": {
+    "ja": "介護の現場では、専門の職員が昔の写真を使った回想法を施す施設が増えている。写真を前にすると、本人が語り出す場面が増え、表情にも明朗さが戻るという報告がある。もっとも、思い出が苦痛を呼び起こしかねないため、事前の聞き取りは欠かせない。効果を裏づけるには、より大規模な調査が必要とされている。高齢化が進むなか、こうした取り組みの重みは今後いっそう増し、自治体の予算配分にも影響を及ぼすとみられる。",
+    "form": "施す",
+    "en": "More facilities are staffed by specialists who carry out reminiscence therapy using old photographs in nursing care. There are reports that when people face the photos, they begin to speak more and their expressions regain brightness. However, memories can stir up pain, so a prior interview is indispensable. Larger studies are needed to back up the effect. As the population ages, the weight of such efforts is expected to grow further and to affect how local governments allocate budgets.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「治療・処置・工夫を施す」のように、手を加える意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "施行",
+   "reading": "しこう",
+   "pos": "noun",
+   "meaning": "enforcement, coming into effect",
+   "defJa": "法令の効力を実際に生じさせること",
+   "passage": {
+    "ja": "法律の条文には「公布」と「施行」という二つの言葉が並びます。前者は国民に知らせる日、後者は強制力が実際に生じる日で、両者のあいだには数か月の猶予が置かれることが多いです。この違いを知らないと、ニュースの日付を読み違える恐れがあります。試験でも似た漢字語の区別は定番の出題だから、場面とセットで覚えておきましょう。最後に、日付だけは必ず自分の目で原文を確認する習慣をつけましょう。",
+    "form": "施行",
+    "en": "Two words, promulgation and enforcement, appear side by side in the text of a law. The former is the day the public is informed, and the latter is the day the binding force actually takes effect, and a grace period of a few months is often set between the two. If you don't know this difference, you risk misreading the dates in the news. Distinguishing similar kanji words is a staple exam question, so memorize them together with their situations. Finally, get into the habit of checking the dates against the original text with your own eyes.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「法の施行」「〜年に施行」。効力が実際に生じる日を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "施設",
+   "reading": "しせつ",
+   "pos": "noun",
+   "meaning": "facility, institution",
+   "defJa": "ある目的のために設けた建物や設備",
+   "passage": {
+    "ja": "インドのナーランダ大学は、五世紀ごろに建てられた仏教の学問施設として知られています。最盛期には玄奘をはじめ、憧れる学僧が世界各地から集まり、論理学や医学まで幅広く学んだと伝えられます。寄宿舎や図書館をそなえていた点が、いまの大学のはしりだと言う研究者もいます。のちに破壊されましたが、遺跡は世界遺産に登録されています。千年以上前の学びの場が、いまも人々の想像力をかき立てるのは不思議なことです。",
+    "form": "施設",
+    "en": "India's Nalanda University is known as a Buddhist center of learning built around the fifth century. At its height, scholar-monks who admired it, including Xuanzang, gathered from around the world and are said to have studied a wide range from logic to medicine. Some researchers say that its dormitories and libraries make it the forerunner of today's university. It was later destroyed, but the ruins are registered as a World Heritage site. It is remarkable that a place of learning from over a thousand years ago still stirs people's imaginations.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「学問施設」「福祉施設」など、目的をもった建物や設備を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "昆虫",
+   "reading": "こんちゅう",
+   "pos": "noun",
+   "meaning": "insect",
+   "defJa": "六本脚の小さな節足動物",
+   "passage": {
+    "ja": "「虫」という漢字は、昆虫に限らず、ヘビやカエル、貝までを指していた。古代中国では、人間や獣、鳥、魚以外の小さな生き物を、おおまかに虫と呼んだのである。森林や水辺に暮らす身近な生き物をひとまとめにする発想は、現代の分類学とはまるで違う世界の見方だった。「腹の虫」や「虫の知らせ」といった表現には、その広い守備範囲の名残がうかがえる。言葉の使い方をたどると、昔の人の自然観まで見えてくる。",
+    "form": "昆虫",
+    "en": "The kanji for 'mushi' referred not only to insects but also to snakes, frogs, and even shellfish. In ancient China, small creatures other than humans, beasts, birds, and fish were loosely called mushi. The idea of lumping together familiar creatures living in forests and by the water was a view of the world quite unlike modern taxonomy. Expressions such as 'the bug in the belly' and 'a premonition' still show traces of that broad range. Tracing how a word was used reveals even how people of old saw nature.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「昆虫に限らず」の形で、分類の範囲を示す文脈に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "明朗",
+   "reading": "めいろう",
+   "pos": "na-adj",
+   "meaning": "clear, open, aboveboard",
+   "defJa": "明るくて、隠し事がないこと",
+   "passage": {
+    "ja": "金融機関の説明資料では、手数料の表記を明朗にするよう求める声が強まっている。強制ではないものの、指針に沿って書き直す会社が増えた。この発想は、もとは飲食店や理髪店が料金を壁に貼り出す習慣から広まったものだ。投資信託から保険まで、契約書の分かりやすさを測る物差しになりつつある。利用者にとっては、あとから「聞いていない」と困る場面が減り、企業にとっても信頼を築く近道になると期待されている。",
+    "form": "明朗",
+    "en": "In explanatory materials from financial institutions, calls are growing for fees to be stated in a clear, aboveboard way. Though not compulsory, more companies are rewriting their documents in line with guidelines. The idea spread from the custom of restaurants and barbershops posting their prices on the wall. It is becoming a yardstick for the clarity of contracts, from investment trusts to insurance. It is expected that for users there will be fewer occasions of being troubled later by 'nobody told me', and that it will be a shortcut to building trust for companies as well.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「明朗会計」のように、料金や運営が隠し事なく明るいさま。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "明白",
+   "reading": "めいはく",
+   "pos": "na-adj",
+   "meaning": "obvious, clear",
+   "defJa": "疑う余地がなくはっきりしている",
+   "passage": {
+    "ja": "「言わなくても分かるはず」という期待ほど、話し手を裏切るものはない。自分にとって明白なことでも、聞き手は別の前提で聞いており、意図は半分も伝わらないことがある。講演の冒頭で結論を一文にして置いておくと、聞き手は迷子にならずに済む。話し方の上手さとは、話術より先に、相手の頭の中を想像する力のことだ。だから大事なことほど、まず結論を先に述べ、理由はそのあとに置くのが基本である。",
+    "form": "明白",
+    "en": "No expectation betrays a speaker like 'surely they'll understand without being told'. Even what is obvious to you is heard by the listener on different assumptions, and sometimes not even half of your intent comes across. If you state your conclusion in one sentence at the start of a talk, listeners don't get lost. Skill in speaking is, before technique, the power to imagine what is in the other person's head. So the more important a matter is, the basic rule is to state the conclusion first and put the reasons after it.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「明白な事実」。話し手には自明でも、聞き手には自明と限らない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "普及",
+   "reading": "ふきゅう",
+   "pos": "noun",
+   "meaning": "spread, diffusion",
+   "defJa": "広く行き渡ること",
+   "passage": {
+    "ja": "生成AIの普及は、歴史的に見ても異例の速さだった。二〇二二年末に公開されたChatGPTは、二か月ほどで月間利用者が一億人に達したと報じられた。専用の機器が要らず、画面に文章を打つだけで使えたことが大きい。学校や企業は使用を認めるか禁じるかの判断を余儀なくされ、各国で規制をめぐる議論が活発になった。便利さの裏で、出力された情報の真偽を自分で確かめる習慣が、いっそう重要になっている。",
+    "form": "普及",
+    "en": "The spread of generative AI was unusually fast even by historical standards. ChatGPT, released at the end of 2022, was reported to have reached a hundred million monthly users in about two months. It mattered that no special device was needed, only typing text on a screen. Schools and companies were forced to decide whether to allow or forbid its use, and debate over regulation grew heated in many countries. Behind the convenience, the habit of checking for yourself whether the output is true has become all the more important.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「技術の普及」「普及率」。新しいものが社会に広がる流れを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "晴天",
+   "reading": "せいてん",
+   "pos": "noun",
+   "meaning": "fine weather, clear sky",
+   "defJa": "よく晴れた空模様",
+   "passage": {
+    "ja": "晴天の朝は人前でも気持ちよく話せるのに、雨の日は声がこもってしまう。そんな経験をしたことはないだろうか。気圧や湿度の影響もあるが、実際には、気分が呼吸の深さを変えることのほうが大きいと言われる。大事な場面の前には、天気や気分に任せることなく、鼻からゆっくり息を吸う腹式呼吸を三回しておくのが望ましい。それだけで声の通りも、聞き手に与える印象も、ずいぶん違ってくるものだ。",
+    "form": "晴天",
+    "en": "On a fine morning you can speak comfortably even in public, yet on a rainy day your voice gets muffled. Haven't you ever had that experience? Air pressure and humidity have an effect, but in practice it is said that mood changing the depth of your breathing matters more. Before an important occasion, rather than leaving it to the weather or your mood, it is desirable to take three abdominal breaths, drawing air in slowly through the nose. That alone makes a considerable difference both to how your voice carries and to the impression you give listeners.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「晴天の朝」。雨や曇りと対比して、よく晴れた天気を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有益",
+   "reading": "ゆうえき",
+   "pos": "na-adj",
+   "meaning": "beneficial, profitable",
+   "defJa": "役に立ち利益になるさま",
+   "passage": {
+    "ja": "歴史を学ぶことは有益か、という問いに、古代ギリシャの歴史家トゥキュディデスは自分の書物を「永遠の財産」と呼んで答えた。人間の本性が変わらないと悟る者には、似た出来事がまた起こると見えるからである。もっとも、過去をそのまま当てはめれば失敗する。役に立つのは年号の暗記ではなく、構造を見抜く目を養うことだ。歴史を学ぶ価値は、過去を知ることよりも、現在を疑う力を得ることにあると言えるだろう。",
+    "form": "有益",
+    "en": "Asked whether studying history is beneficial, the ancient Greek historian Thucydides answered by calling his book 'a possession for all time'. To one who realizes that human nature does not change, similar events appear likely to happen again. Still, applying the past as it is will fail. What helps is not memorizing dates but cultivating an eye that sees through to structure. The value of studying history can be said to lie less in knowing the past than in gaining the power to question the present.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「有益な情報」。役に立ち、得るところが大きいという意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "望ましい",
+   "reading": "のぞましい",
+   "pos": "i-adj",
+   "meaning": "desirable, preferable",
+   "defJa": "そうあってほしいと思われる",
+   "passage": {
+    "ja": "大勢の前の壇上は、誰でも心細いものだ。聞き手の緊張をできるだけ早くほぐすには、最初に笑いを取るのが望ましいと言われる。ところが実際には、無理に面白くしようとして場を凍らせてしまう人のほうが多い。落語の枕のように、自分の小さな失敗談から入るのは、安全で効果も高い方法である。笑いは目的というより、場をほぐすための道具だと割り切れば、気持ちはずっと楽になり、話もしやすくなる。",
+    "form": "望ましい",
+    "en": "Anyone feels uneasy on a stage in front of a crowd. To ease the audience's tension as early as possible, it is said to be desirable to get a laugh at the start. In practice, though, more people freeze the room by trying to be funny by force. Starting with a small story of your own failure, like the opening of a rakugo performance, is safe and highly effective. If you accept that laughter is less a goal than a tool for loosening up the room, your mind becomes much lighter and speaking becomes easier.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「〜が望ましい」。理想として好ましい状態を述べる書き言葉寄りの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "未練",
+   "reading": "みれん",
+   "pos": "noun",
+   "meaning": "lingering attachment, regret",
+   "defJa": "思い切れずに心に残る気持ち",
+   "passage": {
+    "ja": "別れた相手への打ちかけのメッセージを、送らずに消す。そんな夜の気持ちを、日本語は「未練」の一語で言い当てる。恋愛に限らず、古い手帳や前の職場など、断ち切ったはずのものへの思いが残る状態を指すのだ。他人に向けると責める響きが出やすいので、自分への自嘲として使うほうが無難である。ちなみに、仏教では執着を苦しみの原因と見るが、日本語のこの一語には、どこか愛おしさも混じっている。",
+    "form": "未練",
+    "en": "You delete, unsent, a half-written message to someone you broke up with. Japanese captures the feeling of such a night in a single word, 'miren'. It is not limited to romance; it refers to the state in which feelings remain for things you thought you had cut off, such as an old notebook or a former workplace. Directed at others it easily sounds accusing, so using it as self-mockery is safer. Incidentally, Buddhism sees attachment as the cause of suffering, but in this one Japanese word there is also a trace of tenderness.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「未練が残る」「未練がましい」。断ち切れない思いを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本場",
+   "reading": "ほんば",
+   "pos": "noun",
+   "meaning": "home, birthplace, the real thing",
+   "defJa": "その物事が本来盛んな土地",
+   "passage": {
+    "ja": "半導体産業の本場といえば、いまも米国のシリコンバレーだと思われがちです。しかし製造に目を向けると、最先端の回路をつくる工場は台湾に集中してきました。アメリカが設計で強く、台湾が製造で強いという分業が、世界のAIブームを支えているのです。この分業の危うさが表に出たとき、世界経済は新しい様相を見せました。半導体の地図は、国名ではなく工程名で描き直さなければならない時代に入っています。",
+    "form": "本場",
+    "en": "When it comes to the home of the semiconductor industry, people still tend to think of Silicon Valley in the United States. But looking at manufacturing, the factories that make the most advanced circuits have been concentrated in Taiwan. A division of labor, with America strong in design and Taiwan strong in manufacturing, supports the world's AI boom. When the fragility of this division came to the surface, the world economy took on a new aspect. The map of semiconductors has entered an age in which it must be redrawn by process names rather than country names.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「〜の本場」。その分野がもっとも盛んで本物とされる土地を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "束縛",
+   "reading": "そくばく",
+   "pos": "noun",
+   "meaning": "restraint, bondage",
+   "defJa": "自由を制限して縛りつけること",
+   "passage": {
+    "ja": "束縛が強い人って、実は心の奥に強い不安を抱えている人なんですよね。相手がどこで何をしているか全部知りたいって、結局は自分が捨てられるのが怖いからじゃないですか。でも、縛られる側は息苦しくなって、いつかは逃げ出したくなる。逃げられると、不安がますます強くなって、さらに強く縛ろうとする。この悪循環に気づかない限り、相手の意向をいくら聞いても、結局は同じような関係を何度でも繰り返しますよ。",
+    "form": "束縛",
+    "en": "People who are controlling are actually people with strong anxiety, you know. Wanting to know everything about where the other person is and what they're doing is, in the end, because they're afraid of being abandoned, isn't it? But the one being tied down feels stifled and wants to run away. When they run, the anxiety grows even stronger, and they try to tie the person down harder. As long as you don't notice this vicious circle, no matter how much you ask the other person's wishes, you'll repeat the same relationship over and over.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「束縛が強い」。人の自由や行動を縛る関係に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "染みる",
+   "reading": "しみる",
+   "pos": "verb",
+   "meaning": "to soak in, to sting, to touch deeply",
+   "defJa": "中まで入り込んで感じられる",
+   "passage": {
+    "ja": "凍える朝だけに、湯気の立つ味噌汁が体にじんわり染みる。この感覚は、舌だけでなく体全体で味わっているから生まれます。心理学では、体の状態が感じ方を変えることを身体化認知と呼びます。寒さや疲れが強いほど、同じ一杯が特別な味になり、どこか懐かしい気持ちさえ呼び起こすのです。ですから、毎日の食事を急いで済ませるのは、人生の小さな楽しみを自分から手放していることになります。",
+    "form": "染みる",
+    "en": "Precisely because it is a freezing morning, miso soup soaks into the body. This sensation arises because we taste with the whole body, not just the tongue. In psychology, the way bodily states change how we feel is called embodied cognition. The stronger the cold or fatigue, the more the same bowl becomes a special taste and even stirs a somehow nostalgic feeling. So rushing through daily meals means giving up one of life's small pleasures.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「体に染みる」。味や寒さ、言葉が深く届く感覚を表す。",
+    "sense": "深く入り込んで感じられる"
+   }
+  },
+  {
+   "term": "根底",
+   "reading": "こんてい",
+   "pos": "noun",
+   "meaning": "root, foundation",
+   "defJa": "物事を成り立たせる最も深い所",
+   "passage": {
+    "ja": "アドヴァイタ・ヴェーダーンタの根底にあるのは、「あなたはすでにブラフマンである」という一点の主張だ。修行によって何かを獲得するのではなく、本来の姿を覆っている無知を取り除くことが、解脱の中身とされる。この考え方は、成長を志向する近代の常識とは、かなり相性が悪い。それでもなお、誰もが気づかぬうちに自分を何者かに限定している、という指摘には、読むたびに胸を突かれるものがある。",
+    "form": "根底",
+    "en": "At the root of Advaita Vedanta lies a single claim: 'you are already Brahman'. Liberation is said to consist not in acquiring something through practice but in removing the ignorance that covers one's original nature. This way of thinking is a rather poor match for the modern common sense oriented toward growth. Even so, the observation that everyone, without noticing, confines themselves to being something strikes me every time I read it.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「考えの根底にある」。表に見えない最も深い土台を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "栽培",
+   "reading": "さいばい",
+   "pos": "noun",
+   "meaning": "cultivation, growing",
+   "defJa": "植物を育て収穫すること",
+   "passage": {
+    "ja": "農業をAIで変える話を書くとき、栽培という言葉だけ見せても、読者は畑の土しか思い浮かべません。植物工場なら「光と水と空気を数値で管理して野菜を育てる」と一文添えるだけで、画像が一気に具体的になります。専門用語は、定義を置くか、身近な例を添えるかの二択だと考えましょう。読み手に辞書を引かせることなく読み切らせるのが、いい文章の最低条件です。具体例の一行が、長い説明を三行も省いてくれることがある。",
+    "form": "栽培",
+    "en": "When you write about changing agriculture with AI, showing only the word cultivation makes readers picture nothing but field soil. For a plant factory, adding a single sentence such as 'vegetables are grown by controlling light, water, and air numerically' makes the image concrete at once. Think of technical terms as a choice of two: place a definition or add a familiar example. Getting readers to finish without having to reach for a dictionary is the minimum condition of good writing. One line of a concrete example can sometimes save three lines of long explanation.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「野菜の栽培」。育て方の管理まで含む、農業の基本語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "案の定",
+   "reading": "あんのじょう",
+   "pos": "adverb",
+   "meaning": "as expected, sure enough",
+   "defJa": "予想したとおりに",
+   "passage": {
+    "ja": "試験前日に徹夜で詰め込んだ生徒は、案の定、本番の一問目でいきなり問題文を読み間違えた。睡眠不足は記憶の定着だけでなく、注意力そのものも削る。とはいえ、頭では分かっていても、心細くなると人は手を動かしたくなるものだ。だからこそ、直前の夜は復習を減らし、六時間以上眠る計画を先に立てておきたい。結局のところ、前夜にもっとも望ましい勉強法は、思い切って早く布団に入ることである。",
+    "form": "案の定",
+    "en": "The student who crammed through the night before the exam suddenly misread the very first question on the day, just as expected. Lack of sleep eats away not only memory consolidation but attention itself. Even so, though one knows it in the head, when feeling uneasy people want to keep their hands moving. That is exactly why, on the last night, you should reduce review and plan in advance to sleep at least six hours. In the end, the most desirable way to study on the night before is to go to bed early without hesitation.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「案の定、〜」。悪い予感が当たった文脈でよく使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "森林",
+   "reading": "しんりん",
+   "pos": "noun",
+   "meaning": "forest, woods",
+   "defJa": "木が広く茂っている所",
+   "passage": {
+    "ja": "インドでは古来、人生を四つの時期に分ける考え方があり、その三番目が「林住期」です。家督を子に譲った人が、森林に入って静かな暮らしを送る時期のことです。静かな暮らしに憧れる人は、いまも少なくありません。俗世を離れるというより、世間の役割を手放して本来の自分に戻る時間だと考えると、現代の私たちにも他人事ではありません。ブッダも家を出てのち、各地の森の中で長く修行を重ねたと伝えられる。",
+    "form": "森林",
+    "en": "In India since ancient times there has been a way of dividing life into four stages, and the third is the 'forest-dwelling stage'. It is the period when a person who has passed the household to a child goes into the forest to lead a quiet life. Even now, not a few people long for a quiet life. If you think of it less as leaving the world than as putting down society's roles and returning to your true self, it is no stranger to us today. The Buddha too is said to have practiced for a long time in forests in various places after leaving home.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「森林」は広く木が茂る場所。「森林浴」「森林伐採」と使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "業績",
+   "reading": "ぎょうせき",
+   "pos": "noun",
+   "meaning": "achievement, results, performance",
+   "defJa": "成し遂げた仕事や成果",
+   "passage": {
+    "ja": "心理学者ダニエル・カーネマンは、二〇〇二年にノーベル経済学賞を受けた。人間の判断が合理的でないことを実験で示した業績が、評価されたのである。共同研究者のエイモス・トベルスキーは、すでに亡くなっていたため、受賞者には含まれなかった。二人が築いた行動経済学は、いまや政策づくりから商品設計に至るまで、幅広い分野で使われている。ただし、実験の再現性をめぐっては、近年議論も起きている。",
+    "form": "業績",
+    "en": "The psychologist Daniel Kahneman received the Nobel Prize in Economics in 2002. His achievement, showing through experiments that human judgment is not rational, was recognized. His collaborator Amos Tversky had already died, so he was not among the recipients. The behavioral economics the two built is now used in a wide range of fields, from policymaking to product design. In recent years, however, debate has also arisen over the reproducibility of such experiments.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「研究業績」「業績が伸びる」。成果や、会社の成績にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "極端",
+   "reading": "きょくたん",
+   "pos": "na-adj",
+   "meaning": "extreme",
+   "defJa": "考え方や程度が大きく偏っているさま",
+   "passage": {
+    "ja": "歴史の教科書は、ときに極端な単純化をしてしまう。たとえば「ルターが宗教改革を始めた」と書けば、一人の僧が一夜で世界を変えたように読める。しかし実際には、印刷術の普及や諸侯の思惑など、複数の条件が重なって運動が広がったのである。偉人の物語は覚えやすい反面、社会の仕組みを見えなくしてしまう。単純な図式の裏にある複雑さを意識するだけでも、歴史を読む目はずいぶん変わってくるはずだ。",
+    "form": "極端",
+    "en": "History textbooks sometimes fall into extreme oversimplification. For example, if it is written that 'Luther began the Reformation', it reads as if a single monk changed the world overnight. In reality, though, the movement spread because several conditions overlapped, such as the spread of printing and the calculations of the princes. Stories of great figures are easy to remember but, on the other hand, hide how society works. Merely being aware of the complexity behind a simple scheme should change the eye with which you read history quite a lot.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「極端な〜」「極端に言えば」。中庸から大きく外れた偏りを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "楽器",
+   "reading": "がっき",
+   "pos": "noun",
+   "meaning": "musical instrument",
+   "defJa": "音楽を演奏する道具",
+   "passage": {
+    "ja": "楽器の練習で上達が速い人は、通しで弾くより、つまずく小節だけを何度も繰り返す。AIの学習も似たところがあり、すでに正解できる例ばかり見せても、性能は伸びるどころか、ほとんど変わらない。意図的に苦手な例を与えることで、モデルはようやく弱点を直していく。勉強の効率は、時間の長さよりも、間違いに向き合う密度で決まるものだ。同じ時間を使うなら、できる部分より、できない部分に使うべきだ。",
+    "form": "楽器",
+    "en": "People who improve quickly at a musical instrument repeat only the bars where they stumble, rather than playing through. AI training is similar: showing only examples it can already answer correctly leaves performance almost unchanged, let alone improved. By deliberately giving it weak examples, the model finally fixes its weaknesses. The efficiency of study is determined not by the length of time but by the density with which you face your mistakes. If you are spending the same time, you should spend it on the parts you cannot do rather than on the parts you can.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「楽器を演奏する」。弦楽器・管楽器など、音を出す道具の総称。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "概説",
+   "reading": "がいせつ",
+   "pos": "noun",
+   "meaning": "outline, general survey",
+   "defJa": "全体をおおまかに説明すること",
+   "passage": {
+    "ja": "AIの入門書は、数式を避けた概説に徹するものと、実装まで踏み込むものに大別される。前者は全体像をつかむのに向くが、読後に何を試せばよいかが見えにくい。後者は手を動かせる反面、途中で挫折する読者も少なくない。自分の志向が地図なのか道具なのかを、先に決めておくに越したことはない。書店の棚の前で数分だけ立ち止まり、目次と第一章を読み比べてみるのも、失敗を減らす有効な方法の一つだろう。",
+    "form": "概説",
+    "en": "Introductory books on AI can be divided broadly into those that stick to an outline avoiding formulas and those that go as far as implementation. The former suit grasping the whole picture, but it is hard to see what to try after reading. The latter let you work with your hands but, on the other hand, not a few readers give up midway. It is best to decide in advance whether your inclination is for a map or a tool. Pausing for a few minutes at a bookstore shelf and comparing the table of contents and first chapter is probably one effective way to reduce failures.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「概説書」「概説する」。細部より全体像を示す説明を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "様相",
+   "reading": "ようそう",
+   "pos": "noun",
+   "meaning": "aspect, state of affairs",
+   "defJa": "物事のありさま",
+   "passage": {
+    "ja": "ことばの様相って、世代ごとにけっこう変わるじゃないですか。たとえば「全然おいしい」って、昔は先生に直されたのが懐かしいくらい、いまは普通に聞きますよね。実は「全然」の後ろに肯定が来る言い方は、明治の小説にも出てくるらしいんです。変わったというより、もとからあった用法がまた表に出てきただけなんじゃないですかね。ことばって、生き物みたいに、使う人たちしだいで少しずつ姿を変えていくものなんですよね。",
+    "form": "様相",
+    "en": "The aspect of language changes quite a bit with each generation, doesn't it? For example, 'zenzen oishii' used to be corrected by teachers, so much so that I feel nostalgic about it, but now you hear it all the time. Apparently the way of putting an affirmative after 'zenzen' even appears in Meiji novels. I wonder if it's less that it changed than that a usage that was there all along has just come back to the surface. Language, like a living thing, changes its shape little by little depending on the people who use it.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「様相を呈する」「新たな様相」。状況の見え方・ありさまを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "標語",
+   "reading": "ひょうご",
+   "pos": "noun",
+   "meaning": "motto, slogan",
+   "defJa": "主張や目標を短く言い表した句",
+   "passage": {
+    "ja": "インドの国の標語は、「真理のみが勝つ」を意味する「サティヤメーヴァ・ジャヤテ」である。この句は古い聖典の一節に基づいて選ばれ、国章のアショーカ王の獅子柱頭の下に刻まれている。独立国家を樹立するにあたって、この言葉が選ばれたのは、非暴力と真実を重んじたガンディーの思想の影響だと説明されることが多い。文字はデーヴァナーガリーで書かれ、貨幣や公文書でも目にすることができる。",
+    "form": "標語",
+    "en": "India's national motto is 'Satyameva Jayate', meaning 'truth alone triumphs'. This phrase was chosen on the basis of a passage from an ancient scripture and is inscribed beneath the lion capital of Ashoka in the national emblem. It is often explained that, as the independent state was being established, the phrase was chosen under the influence of Gandhi's thought, which valued nonviolence and truth. It is written in Devanagari script and can be seen on coins and official documents.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「標語を掲げる」。団体や国が理念を短く示した句を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "模型",
+   "reading": "もけい",
+   "pos": "noun",
+   "meaning": "model, scale model",
+   "defJa": "実物に似せて作った小さなもの",
+   "passage": {
+    "ja": "AIの仕組みを概説するときは、数式の前に模型を一つ見せるのがいい。たとえば、神経細胞を電球とスイッチに見立てた小さな装置でも、聞き手の頭には像が残る。像があればこそ、あとから出てくる専門用語がそこに貼りついて、記憶に定着しやすくなる。話し方の技術とは、情報を減らす勇気であり、残す一点を選ぶ判断力でもある。聞き手が持ち帰れるのは、結局、情報の量ではなく、像の鮮明さである。",
+    "form": "模型",
+    "en": "When outlining how AI works, it is good to show one model before the formulas. Even a small device that likens a nerve cell to a bulb and a switch leaves an image in the listener's mind. Precisely because there is an image, the technical terms that come later stick to it and are more easily fixed in memory. The craft of speaking is the courage to reduce information and the judgment to choose the one point to keep. What listeners can take home is, in the end, not the amount of information but the vividness of the image.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「模型を作る」。実物の形や仕組みを縮めて見せる道具。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "権威",
+   "reading": "けんい",
+   "pos": "noun",
+   "meaning": "authority, prestige",
+   "defJa": "人々が従う力や影響力",
+   "passage": {
+    "ja": "中世ヨーロッパでは、教皇の権威は王をも従わせるほどだった。一〇七七年、皇帝ハインリヒ四世が雪の中で三日間立ち尽くして許しを請うた「カノッサの屈辱」は、その象徴とされる。のちに形勢が逆転し、各国の王が力をつけると、教皇の影響力は政治の場から後退を余儀なくされた。宗教改革は、その揺らぎを決定づける出来事となる。権力と信仰の綱引きは、その後もヨーロッパ史を貫く大きな軸の一つであり続けた。",
+    "form": "権威",
+    "en": "In medieval Europe, the pope's authority was such that it could even make kings submit. In 1077, the 'Humiliation of Canossa', in which Emperor Henry IV stood in the snow for three days begging forgiveness, is seen as its symbol. Later the balance reversed, and as the kings of each country gained strength, the pope's influence was forced to retreat from the political arena. The Reformation would be the event that settled that wavering. The tug of war between power and faith continued to be one of the great axes running through European history.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「権威を持つ」「権威ある〜」。人が従うほどの力や格を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "樹木",
+   "reading": "じゅもく",
+   "pos": "noun",
+   "meaning": "trees and shrubs",
+   "defJa": "幹や枝をもつ木の総称",
+   "passage": {
+    "ja": "米国の研究チームは、衛星画像とAIを使い、アフリカの乾燥地にある樹木を一本ずつ数えあげた。従来の推定では見落とされていた、畑や牧草地に点在する木々が、十億本を超えて見つかったという。森林として地図に載らない木も、炭素の貯蔵や土壌の保全に重要な役割を担う。画像認識技術が、環境の調査を大きく変えつつある。地球温暖化の対策を考えるうえで、見えなかった木を数えることには大きな意味がある。",
+    "form": "樹木",
+    "en": "A US research team used satellite images and AI to count, one by one, the trees in the drylands of Africa. Trees scattered across fields and pastures, overlooked in earlier estimates, were reportedly found in numbers exceeding a billion. Trees that don't appear on maps as forest also play an important role in storing carbon and conserving soil. Image recognition technology is greatly changing environmental surveys. In considering measures against global warming, counting trees that had been invisible carries great significance.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「樹木」は木の総称。「街路樹」「樹木医」など専門的な語にも。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "樹立",
+   "reading": "じゅりつ",
+   "pos": "noun",
+   "meaning": "establishment, setting (a record)",
+   "defJa": "新しく打ち立てること",
+   "passage": {
+    "ja": "世界記録を樹立し、第一線で活躍する選手でも、日々の練習の大半は地味な基礎の反復だと言われる。同じ場面で同じ動作を繰り返すほど、脳には「この状況ではこれをする」という回路が刻まれていく。ロンドン大学の研究では、行動が自動化するまでに平均六十六日かかったが、人や行動によって大きく幅があった。ゆえに、日数の目安にこだわるよりも、毎日無理なく続ける仕組みを先に整えることが肝心だ。",
+    "form": "樹立",
+    "en": "Even athletes who set world records and are active at the top are said to spend most of their daily practice on plain repetition of the basics. The more you repeat the same motion in the same situation, the more a circuit saying 'in this situation, do this' is engraved in the brain. In a study at the University of London, it took an average of sixty-six days for a behavior to become automatic, but it varied greatly by person and behavior. Hence, it is vital to set up a system for continuing every day before worrying about a target number of days.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「記録を樹立」「政権を樹立」。新しく確かなものを打ち立てる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "欠乏",
+   "reading": "けつぼう",
+   "pos": "noun",
+   "meaning": "shortage, deficiency",
+   "defJa": "必要なものが足りないこと",
+   "passage": {
+    "ja": "AIの学習には大量のデータが必要ですが、意外なことに、いま問題になっているのはデータの欠乏です。インターネット上の質の高い文章は有限で、研究に従事する人の中には、数年のうちに使い尽くされると予測する人もいます。そこで注目されるのが、AI自身に学習用のデータを作らせる方法です。ただし、AIが作った文章だけを食べ続けると、性能が劣化する恐れがあるという研究もあります。",
+    "form": "欠乏",
+    "en": "AI training needs huge amounts of data, but surprisingly, what is a problem now is a shortage of data. High-quality text on the internet is finite, and some of those engaged in research predict it will be used up within a few years. What draws attention, then, is the method of having AI itself produce training data. However, some studies suggest that if it keeps consuming only text made by AI, its performance may degrade.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「ビタミン欠乏」「データの欠乏」。必要なものが足りない状態。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "正当",
+   "reading": "せいとう",
+   "pos": "na-adj",
+   "meaning": "just, legitimate, proper",
+   "defJa": "道理にかなっていて正しいこと",
+   "passage": {
+    "ja": "AIが著作物を学習に使うことは、正当な利用と言えるのか。二〇二三年末、米国の新聞社が生成AIの開発企業を提訴し、利用の是非をめぐって各地で同様の訴訟が相次いだ。企業側は「変形的な利用で、公正な使用にあたる」と主張し、権利者側は「無断の複製で、市場を奪う」と反論している。欧州ではAI規制法が段階的に施行されつつあるが、判断が出るまでには、まだ数年を要する見通しだ。",
+    "form": "正当",
+    "en": "Can an AI's use of copyrighted works for training be called legitimate use? At the end of 2023 a US newspaper sued a generative-AI developer, and similar lawsuits followed one after another in various places over the question of whether such use is acceptable. The companies argue that it is 'transformative use and counts as fair use', while rights holders counter that it is 'unauthorized copying that takes away the market'. In Europe an AI regulation law is being put into effect in stages, but it is expected to take several more years before a ruling emerges.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「正当な理由」「正当な権利」。法や道理にかなっていること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気兼ね",
+   "reading": "きがね",
+   "pos": "noun",
+   "meaning": "hesitation, reserve, constraint",
+   "defJa": "遠慮して心を使うこと",
+   "passage": {
+    "ja": "インドの寺院に併設された施設では、訪れた人に無料で食事が出されることがある。シク教の寺院グルドワーラーの「ランガル」はその代表で、誰もが同じ床に座り、同じ食事を受け取る。貧しい人が気兼ねなく腹を満たせるように、身分や宗教を問わず開かれていることが理念とされる。運営は信徒の寄付と奉仕に支えられ、旅人にとっても心強い存在だ。ランガルの食卓に並ぶのは、豆のカレーとパンといった素朴な料理である。",
+    "form": "気兼ね",
+    "en": "At facilities attached to temples in India, meals are sometimes served to visitors free of charge. The 'langar' of the Sikh temple gurdwara is the best-known example, where everyone sits on the same floor and receives the same food. It is held as a principle that the langar is open regardless of status or religion so that poor people can fill their stomachs without hesitation. Its operation is supported by believers' donations and service, and it is a reassuring presence for travelers too. What lines the langar table is simple fare such as lentil curry and bread.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「気兼ねなく」「気兼ねする」。相手に遠慮して心を使う気持ち。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気品",
+   "reading": "きひん",
+   "pos": "noun",
+   "meaning": "grace, elegance, refinement",
+   "defJa": "自然にそなわる上品さ",
+   "passage": {
+    "ja": "文章で「気品がある」と書くだけでは、読者の頭に何も浮かばず、褒め言葉がただ通り過ぎていくだけだ。ルイ十四世の宮廷を描くなら、読者に像を結ばせるべく、背筋の伸びた立ち姿や扇を閉じる指先の動きといった具体を一つ添えたい。形容詞は結論であって、証拠ではないからだ。読者に結論を渡す前に、証拠を見せる順序を守りたい。あなたが祖母の所作を懐かしい思いで書き残すときも、同じ原理が働くはずだ。",
+    "form": "気品",
+    "en": "Merely writing 'has grace' conjures nothing in the reader's mind, and the praise just passes by. If you depict the court of Louis XIV, in order to make an image form for the reader, you want to add one concrete detail, such as an upright standing posture or the motion of fingers closing a fan. This is because an adjective is a conclusion, not evidence. Before handing readers the conclusion, I want to keep to the order of showing the evidence. When you write down your grandmother's gestures with fond nostalgic feeling, the same principle should be at work.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「気品がある／漂う」。態度や姿から感じる上品さを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気象",
+   "reading": "きしょう",
+   "pos": "noun",
+   "meaning": "weather, meteorological conditions",
+   "defJa": "天気や気温など大気の状態",
+   "passage": {
+    "ja": "歴史を動かしたのは、英雄に限らず、気象もそうです。たとえば一二七四年と一二八一年の元寇では、暴風雨が元軍の船団に大きな損害を与えたとされ、のちに「神風」と呼ばれました。ただし近年は、台風だけでなく、船の構造や補給の問題も指摘されています。天気は、戦いの形勢を左右する見えない主役でもあったのです。戦国の合戦も、大航海時代の航路も、風や雨をどう読むかしだいで、運命が大きく分かれました。",
+    "form": "気象",
+    "en": "What moved history was not limited to heroes; the weather did too. For example, in the Mongol invasions of 1274 and 1281, storms are said to have inflicted great damage on the Yuan fleet and were later called the 'divine wind'. In recent years, however, not only typhoons but also problems of ship construction and supply have been pointed out. The weather was also an invisible protagonist that swayed the course of battles. Both the battles of the warring-states era and the sea routes of the age of exploration had their fates divided by how the wind and rain were read.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「気象」は天気や大気の状態。「気象庁」「異常気象」など。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "決勝",
+   "reading": "けっしょう",
+   "pos": "noun",
+   "meaning": "final (of a competition)",
+   "defJa": "勝ち残った者が優勝を争う試合",
+   "passage": {
+    "ja": "決勝を翌日に控えた選手に「早く寝なさい」と言うのは、実は逆効果になりやすいんです。眠らなければと思うほど、脳は覚醒してしまうからです。眠れないからといって、翌日の力が必ず落ちるわけではありません。眠れなくても目を閉じて横になっているだけで、体はある程度回復すると言われています。それを知っているだけでも心強いはずなので、受験の前夜も、静かに休むことを優先してください。",
+    "form": "決勝",
+    "en": "Telling a player the day before the final to 'go to bed early' tends in fact to backfire. The more they think they must sleep, the more their brain becomes alert. Just because you can't sleep doesn't mean your strength the next day will necessarily drop. It is said that merely lying down with your eyes closed lets the body recover to some extent even if you can't sleep. Simply knowing that should be reassuring, so on the night before an entrance exam too, put quiet rest first.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「決勝戦」「決勝に進む」。勝ち残った者が優勝を争う最後の試合。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "治まる",
+   "reading": "おさまる",
+   "pos": "verb",
+   "meaning": "to calm down, to subside",
+   "defJa": "乱れや痛みなどがしずまる",
+   "passage": {
+    "ja": "ペストの流行の波が治まる間もなく、数年おきに次の波が戻ってきた。十四世紀半ばのヨーロッパでは、人口の三分の一以上が失われた地域もあったとされ、悲惨な時代が長く続いた。働き手が減ったのをきっかけに農民の賃金が上がり、領主の力が弱まったことも見逃せない。災厄が、結果として中世の身分秩序をゆるめたのです。人々は死を身近に感じるようになり、墓碑の彫刻や祈りの言葉の形までもが変わっていきました。",
+    "form": "治まる",
+    "en": "Before a wave of plague had even subsided, the next wave returned, every few years. In mid-fourteenth-century Europe, some regions are said to have lost more than a third of their population, and a wretched age continued for a long time. It cannot be overlooked that, with the fall in workers as a trigger, peasants' wages rose and the lords' power weakened. The catastrophe, as a result, loosened the medieval order of status. People came to feel death close at hand, and even the carving of tombstones and the shape of prayers changed.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「痛みが治まる」「騒ぎが治まる」。乱れや症状がしずまる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "活発",
+   "reading": "かっぱつ",
+   "pos": "na-adj",
+   "meaning": "active, lively, vigorous",
+   "defJa": "勢いがあり盛んなさま",
+   "passage": {
+    "ja": "ここ数年、エッジAIをめぐる投資が活発だ。クラウドではなく手元の端末で推論を処理できれば、通信の遅れも、個人情報の流出リスクも抑えられるからである。スマートフォン向けの半導体を手がける各社は、省電力志向を強め、電力あたりの性能を競い合っている。一方で、小さなモデルは精度に限界があるため、用途に応じた使い分けが課題になる。投資家の関心は、モデルの大きさから、どこで動かすかへと移りつつある。",
+    "form": "活発",
+    "en": "In the past few years, investment around edge AI has been active. If inference can be processed on the device at hand rather than in the cloud, communication delays and the risk of personal-data leaks can both be held down. Companies making semiconductors for smartphones are strengthening a low-power orientation and competing on performance per unit of power. On the other hand, small models have limits in accuracy, so using different ones according to purpose becomes an issue. Investors' interest is shifting from the size of the model to where it runs.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「投資が活発」「活発な議論」。勢いよく盛んに動くさま。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "活躍",
+   "reading": "かつやく",
+   "pos": "noun",
+   "meaning": "success in an active role, prominent work",
+   "defJa": "目立った働きをすること",
+   "passage": {
+    "ja": "履歴書に「営業で活躍しました」と書く人は多いが、読み手は中身を想像できない。「三年間で新規顧客を四十社開拓した」のように数字と動詞で示せば、褒め言葉を使わなくても働きぶりは伝わる。自己評価の形容詞を並べるより、事実を一つ差し出すほうが、はるかに信用に足る文章になる。聞かれる前に成果の背景を一言添えるのも、効果的だ。履歴書は、自慢を並べる場ではなく、読み手が検証できる証拠を並べる場なのだ。",
+    "form": "活躍",
+    "en": "Many people write 'I was highly active in sales' on their resume, but readers cannot imagine what is behind it. If you show it with numbers and verbs, like 'opened forty new accounts in three years', your work comes across even without praise words. Offering one fact makes a far more trustworthy piece of writing than lining up self-assessing adjectives. Adding a word on the background of your results before being asked is also effective. A resume is not a place to line up boasts but a place to line up evidence the reader can verify.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「活躍する」。目立つ成果や働きを出す意味。自分には使いにくい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "派遣",
+   "reading": "はけん",
+   "pos": "noun",
+   "meaning": "dispatch, sending out",
+   "defJa": "仕事のために人を送り出すこと",
+   "passage": {
+    "ja": "海外の教室に派遣された日本語教師は、まず自分の話し方の速さに気づくといわれる。母語として自然に話す速度は、学習者にとっては川の流れのように速い。そこで教師は、学習者が心細いと感じないよう、一文を短く切り、間を置き、同じ内容を言い換えながら進める。話すとは、内容だけでなく、相手の理解に応じて速度を設計することでもあるのだ。この感覚は、動画で日本語を話すときの速さの調整にも応用できる。",
+    "form": "派遣",
+    "en": "Japanese teachers dispatched to classrooms abroad are said to notice first how fast they speak. The speed at which one speaks naturally as a native language is as fast as a river's current to learners. So the teacher proceeds by cutting each sentence short, leaving pauses, and rephrasing the same content so that learners do not feel uneasy. Speaking is also, besides content, a matter of designing the speed according to the other person's understanding. This sense can also be applied to adjusting your speed when you speak Japanese in videos.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「教師を派遣する」。仕事や任務のため人を送り出す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "海峡",
+   "reading": "かいきょう",
+   "pos": "noun",
+   "meaning": "strait, channel",
+   "defJa": "陸地に挟まれた狭い海",
+   "passage": {
+    "ja": "津軽海峡って、よく考えたら変な名前なんですよね。同じように狭い海でも、豊後水道は「水道」だし、島のあいだは「瀬戸」と呼ぶじゃないですか。ただ、地名辞典の概説を読むと、厳密なルールはなくて、土地の呼び方がそのまま残ったものが多いようです。ルールというより、土地ごとの習慣に近いんでしょうね。ちなみに、世界地図を広げてみると、同じような狭い海に違う呼び名がついている例は、他にもたくさんあるんですよ。",
+    "form": "海峡",
+    "en": "Tsugaru Strait, when you think about it, is a strange name. Even for equally narrow stretches of sea, the Bungo Channel is a 'channel', and the gaps between islands are called 'seto', right? But reading a gazetteer's outline, there seems to be no strict rule, and many names are just local usage that has remained as it is. It's probably closer to local custom than to a rule. By the way, if you spread out a world map, there are plenty of other cases where similar narrow seas carry different names.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「津軽海峡」のように地名に付く。水道・瀬戸との呼び分けは慣習。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "消去",
+   "reading": "しょうきょ",
+   "pos": "noun",
+   "meaning": "erasure, elimination",
+   "defJa": "書かれたものなどを消し去ること",
+   "passage": {
+    "ja": "古い羊皮紙の写本には、上から書き直された痕跡を残すものがあり、「パリンプセスト」と呼ばれます。羊皮紙は高価だったため、インクを削って消去し、その上に別の文章を書くのが日常でした。ところが近年は多波長の撮影によって、かつては読みようがなかった下の文字が読み取れるようになりました。たとえば、アルキメデスの失われた論考は、祈禱書の下から姿を現し、その存在が明白になったのです。",
+    "form": "消去",
+    "en": "Some old parchment manuscripts bear traces of having been written over and are called palimpsests. Because parchment was expensive, it was routine to scrape off the ink to erase it and write another text on top. In recent years, however, multispectral imaging has made it possible to read the underlying writing that once could not be read. For example, a lost treatise of Archimedes emerged from beneath a prayer book, and its existence became clear.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「データを消去する」。書かれたものを跡形なく消す意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "添える",
+   "reading": "そえる",
+   "pos": "verb",
+   "meaning": "to add, to attach, to accompany",
+   "defJa": "主なものに付け加える",
+   "passage": {
+    "ja": "贈り物に和歌を添える習慣は、平安の貴族社会で、季節や相手を問わず広く行われた。慕う相手に恋文を届ければ、返歌の巧拙によって教養の深さまで測られ、恋愛は一種の知的な試験でもあった。返歌を誤ろうものなら、たちまち教養を疑われたのだ。歌は単なる飾りではなく、物と心をつなぐ最も短い手紙であった。いまの私たちがメッセージの終わりに絵文字を置く気持ちも、その遠い子孫なのだろう。",
+    "form": "添える",
+    "en": "The custom of adding a waka poem to a gift was widespread in Heian aristocratic society, regardless of season or recipient. If you delivered a love letter to someone you adored, even the depth of your education was measured by the skill of the reply poem, and romance was a kind of intellectual exam. If you so much as botched a reply, your learning was immediately doubted. The poem was no mere decoration but the shortest letter linking object and heart. The feeling with which we now put an emoji at the end of a message is probably its distant descendant.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「花を添える」「一言添える」。主なものに付け加える意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "満場",
+   "reading": "まんじょう",
+   "pos": "noun",
+   "meaning": "the whole audience, unanimity",
+   "defJa": "会場にいる全員",
+   "passage": {
+    "ja": "スピーチの終わりで満場の拍手を受ける人は、最後の一文を決して即興にしない。多くは結びの言葉だけを先に決め、そこから逆算して本文を組み立てている。着地点が決まっていれば、途中で話が脱線しても、戻る場所を見失わないからだ。大勢の前ともなると、緊張で頭より口が先に動くので、結びを暗記しておくことは心強い保険になる。練習するときは、本文よりも先に、最後の三十秒から声に出して始めるといい。",
+    "form": "満場",
+    "en": "People who receive applause from the whole hall at the end of a speech never improvise the last sentence. Many decide only the closing words first and build the body by working backward from there. If the landing point is fixed, then even if the talk strays midway, you never lose the place to return to. In front of a large crowd, the mouth moves ahead of the head from nerves, so memorizing the close is a reassuring insurance. When you practice, it is good to start aloud with the final thirty seconds before the body.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「満場の拍手」「満場一致」。会場にいる人全員という意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "源",
+   "reading": "みなもと",
+   "pos": "noun",
+   "meaning": "source, origin",
+   "defJa": "物事が始まる大もと",
+   "passage": {
+    "ja": "文明の源をたどると、たいてい大きな川に行き着きます。メソポタミアはチグリス・ユーフラテス、エジプトはナイル、インダスにはインダス川と、水が運ぶ肥沃な土が麦の栽培を支えました。川は食料を生むのみならず、交易路にも、境界にもなります。氾濫を予測する暦や、土地を測り直す幾何学が生まれたのも、水の恵みと脅威が背中合わせだったからなのです。川の流れを見つめるだけで、文明の始まりまで想像が広がる。",
+    "form": "源",
+    "en": "If you trace the source of a civilization, you usually arrive at a great river. Mesopotamia had the Tigris and Euphrates, Egypt the Nile, and the Indus the Indus River, and the fertile soil carried by water supported wheat cultivation. A river not only produces food but also becomes a trade route and a boundary. A calendar to predict floods and the geometry of re-measuring land arose because the blessing and the menace of water were two sides of one coin. Just gazing at a river's flow, your imagination extends to the beginnings of civilization.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「文明の源」「力の源」。物事の出どころや大もとを指す。",
+    "sense": ""
+   }
+  }
+ ]
+}

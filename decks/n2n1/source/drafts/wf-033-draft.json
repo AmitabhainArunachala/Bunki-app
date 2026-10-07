@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "慣用句",
+   "reading": "かんようく",
+   "pos": "noun",
+   "meaning": "idiom",
+   "defJa": "二語以上が結びつき特別な意味を表す言い回し",
+   "passage": {
+    "ja": "「急がば回れ」のような慣用句は、一語ずつ訳しても意味が見えてきません。字面どおりなら「急ぐなら遠回りしろ」という奇妙な命令ですが、日本人は思い込みなしにこれを「焦るな」と受け取れます。外国語として学ぶ人は、そこでつまずくものの、意味の塊ごと覚えてしまえば一気に楽になります。単語の足し算では、決して読めないのです。むしろ、使われる場面ごと頭に入れるのが、いちばんの近道になります。",
+    "form": "慣用句",
+    "en": "An idiom like 「急がば回れ」 does not reveal its meaning when you translate it word by word. Read literally, it is the odd command 'if you are in a hurry, take the long way round,' yet Japanese people take it as 'do not rush' without any preconception. Learners of Japanese stumble there, but once they memorize the whole chunk of meaning, things get far easier. It can never be read as a sum of words. Rather, memorizing it together with the situations where it is used is the surest shortcut.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜のような慣用句」と例を添える形。語の足し算では読めない固定表現を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "慣用表現",
+   "reading": "かんようひょうげん",
+   "pos": "noun",
+   "meaning": "idiomatic expression",
+   "defJa": "決まった形で使われる習慣的な言い方",
+   "passage": {
+    "ja": "官公庁の文書には、前例を踏襲した慣用表現が目立つ。「遺憾の意を表する」や「善処する」といった言い回しは、書き手の思惑を隠す盾として長く使われてきた。便利な型だけに、頼りすぎれば読む側も書く側も思考停止に陥るおそれがある。実際、同じ定型句の繰り返しが、文書全体の印象を平板にしている例は少なくない。こうした型は道具であって、考えないための言い訳ではないはずだ。",
+    "form": "慣用表現",
+    "en": "Official documents are full of idiomatic expressions inherited from precedent. Phrases such as 「遺憾の意を表する」 and 「善処する」 have long served as shields that hide the writer's real intentions. Precisely because the set forms are so convenient, relying on them risks leaving both reader and writer in a state of thoughtless inertia. In fact, there are not a few cases where the repetition of the same stock phrases flattens the impression of an entire document. Such forms are tools, and they should not be an excuse for not thinking.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "型として定着した言い回しを指す。「慣用表現が目立つ」「慣用表現に頼る」と使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "懸念",
+   "reading": "けねん",
+   "pos": "noun",
+   "meaning": "concern, worry",
+   "defJa": "悪い結果になるのではないかという心配",
+   "passage": {
+    "ja": "AIが仕事を奪うんじゃないか、っていう懸念、周りでもよく聞くじゃないですか。でも半導体メーカーの人の話だと、現場はむしろ人手不足で、自動化が急務らしいんですよ。もちろん、すべての職種が安全だとは言えないにしても、ひとまとめに怖がるのは思い込みだと思うんです。事務の仕事が全部消えるわけじゃないですし。むしろ、仕事の中身が少しずつ入れ替わっていくんだと思いますね。",
+    "form": "懸念",
+    "en": "People around me often voice the worry that AI will take our jobs, don't they? But according to someone at a chip maker, the factory floor is actually short of hands and automation is said to be urgent. Of course, even granting that not every occupation is safe, I think fearing them all in one lump is a mere assumption. It's not as if every office job will vanish. I think it's more that the content of work will be swapped out little by little.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「懸念を抱く」「懸念が広がる」が典型。将来の悪い結果への不安を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "成仏",
+   "reading": "じょうぶつ",
+   "pos": "noun",
+   "meaning": "attaining buddhahood; dying peacefully",
+   "defJa": "死者が迷いを離れて仏になること",
+   "passage": {
+    "ja": "ある寺では、災害で亡くなった人々の成仏を願う法要が、毎年欠かさず営まれている。仏教でこの語は、迷いを離れて仏になることを指すが、その理解は宗派によって大きく異なる。浄土系では阿弥陀仏の力で極楽に往生すると説かれ、禅は戒律を守りながら今この身での悟りを重んじる。それでも、宗派を問わず、死者を悼む心だけは変わらない。僧侶たちの読経の声は、その共通の祈りを静かに伝えている。",
+    "form": "成仏",
+    "en": "At one temple, a memorial service praying for the buddhahood of those who died in a disaster is held every year without fail. In Buddhism the word means leaving delusion behind and becoming a buddha, but how it is understood differs greatly by school. The Pure Land schools teach rebirth in paradise through the power of Amida Buddha, while Zen values awakening in this very body and keeps the precepts. Even so, whatever the school, the heart that mourns the dead does not change. The voices of the monks chanting sutras quietly convey that shared prayer.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「成仏を願う」の形が多い。仏教語としては、悟りを開いて仏になること。",
+    "sense": "仏になること"
+   }
+  },
+  {
+   "term": "成功体験",
+   "reading": "せいこうたいけん",
+   "pos": "noun",
+   "meaning": "experience of success",
+   "defJa": "うまくいったという過去の経験",
+   "passage": {
+    "ja": "かつて通用したやり方に固執するのは、成功体験がもたらす最も厄介な副作用である。うまくいった記憶は、「次も同じでよい」という思い込みを静かに育てる。環境が変わったというのに、人は過去がまだ続いているかのように振る舞う。市場が縮んでも、組織が古い勝ちパターンを手放せないのはそのためだ。強さの記憶は、時に怠け癖と区別がつかないのではないか。",
+    "form": "成功体験",
+    "en": "Clinging to methods that once worked is the most troublesome side effect of a success experience. The memory of things going well quietly nurtures the assumption that the same will do next time. Even though the environment has changed, people behave as if the past were still going on. That is why organizations cannot let go of old winning patterns even when the market shrinks. Might the memory of strength sometimes be indistinguishable from a habit of laziness?",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「成功体験に縛られる」「成功体験を捨てる」と使う。過去の勝ちパターンの含み。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "成句",
+   "reading": "せいく",
+   "pos": "noun",
+   "meaning": "set phrase",
+   "defJa": "いくつかの語が固定して用いられる言い回し",
+   "passage": {
+    "ja": "辞書をつくる人々は、新語を採録する一方で、使われなくなった成句の扱いに頭を悩ませている。「帯に短したすきに長し」のような言い回しは、若い世代にはもはや通じにくい。とはいえ、古い言い回しを削れば、小説や古典の心理描写を読み解く手がかりが一つ減ることになる。かといって、全部を残せば、辞書は際限なく分厚くなってしまう。収録の基準は、辞書ごとの哲学が最も表れる部分だ。",
+    "form": "成句",
+    "en": "Dictionary makers are troubled over how to treat set phrases that have fallen out of use, even as they add new words. An expression like 「帯に短したすきに長し」 hardly gets through to the younger generation any more. That said, if the old expressions are cut, one clue for reading the psychological portrayal in novels and classics is lost. Yet if all are kept, the dictionary swells without limit. The criteria for inclusion are where each dictionary's philosophy shows most.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「成句」は二語以上の固定した言い回し。辞書の項目名としても使われる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "成長マインドセット",
+   "reading": "せいちょうまいんどせっと",
+   "pos": "noun",
+   "meaning": "growth mindset",
+   "defJa": "能力は努力で伸びるという考え方",
+   "passage": {
+    "ja": "心理学者のキャロル・ドゥエックが広めた成長マインドセットとは、能力は努力によって伸びると信じる考え方です。これを持つ人は、挫折に出会っても「まだできていないだけ」と受け止めます。逆に、才能は生まれつきだと考える人は、失敗するたびに自分の限界を見せられたように感じてしまいます。ただ、この考えを子どもに押しつけるばかりでは、かえって逆効果になりかねません。大切なのは、結果ではなく試行錯誤の過程をほめることです。",
+    "form": "成長マインドセット",
+    "en": "The growth mindset popularized by the psychologist Carol Dweck is the belief that ability can grow through effort. People who hold it take a setback as 'I just haven't managed it yet.' By contrast, people who think talent is innate feel they are shown their own limits every time they fail. Still, merely pressing this idea on children can end up backfiring. What matters is to praise the process of trial and error rather than the result.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「固定マインドセット」と対になる語。「成長マインドセットを持つ」と使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "成長曲線",
+   "reading": "せいちょうきょくせん",
+   "pos": "noun",
+   "meaning": "growth curve",
+   "defJa": "成長の度合いの時間的な変化を示す線",
+   "passage": {
+    "ja": "人の成長が、きれいな直線を描くわけがない。成長曲線は、長い停滞期のあと、ある日突然立ち上がる形を取りやすい。学習者が途中で諦めるのは、その平らな部分を才能の限界と取り違えるからだ。語学であれ楽器であれ、見えない蓄積は水面下で確実に進んでいる。忘却曲線のように下がる局面まで含めて、一本の線として眺めたい。",
+    "form": "成長曲線",
+    "en": "There is no way a person's growth traces a neat straight line. A growth curve tends to take the shape of a long plateau followed by a sudden rise one day. Learners give up midway because they mistake that flat stretch for the limit of their talent. Be it language or an instrument, unseen accumulation is surely advancing below the surface. I would like to view it as one line, including the phases that fall like a forgetting curve.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「成長曲線を描く」で、時間とともに伸びる様子を線で捉える比喩になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "我",
+   "reading": "わが～",
+   "pos": "other",
+   "meaning": "our ~ (prefix)",
+   "defJa": "自分たちの、という意味の連体語",
+   "passage": {
+    "ja": "日本の仏教は、インドに生まれ、中国と朝鮮半島を経て我が国に伝わりました。ですから、お経の言葉をたどると、サンスクリット語まで行き着くことが少なくありません。たとえば「卒塔婆」は、仏塔を意味するストゥーパの音写です。「檀那」や「袈裟」も、同じく古いインドの言葉に由来します。遠い異国の言葉が、漢字をまとって今も私たちの身近に暮らしているのです。",
+    "form": "我",
+    "en": "Japanese Buddhism was born in India and reached our country by way of China and the Korean peninsula. So when you trace the words of the sutras, you often end up at Sanskrit. For example, 「卒塔婆」 is a phonetic transcription of stupa, meaning a Buddhist tower. 「檀那」 and 「袈裟」 likewise derive from ancient Indian words. Words from a distant foreign land live on today, clothed in kanji, close to our everyday lives.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「我が国」「我が社」のように「わが+名詞」で自分側を指す改まった連体形。",
+    "sense": "わが（自分たちの）"
+   }
+  },
+  {
+   "term": "我慢強い",
+   "reading": "がまんづよい",
+   "pos": "i-adj",
+   "meaning": "patient; persevering",
+   "defJa": "つらいことを辛抱してよく耐える",
+   "passage": {
+    "ja": "うちの祖母、ほんとに我慢強い人でね。腰を痛めても、弱音を吐くどころか、笑って畑に出てたんですよ。でも最近思うのは、あの粘りって、心の余裕がないと続かないってこと。ただ耐えてるんじゃなくて、先の景色が見えてたんだろうなって。私なんか、ちょっと待たされただけでため息が出ちゃうのに、全然かなわないです。",
+    "form": "我慢強い",
+    "en": "My grandmother was really a patient person, you know. Even when she hurt her back, far from complaining, she would go out to the fields smiling. But what I think lately is that kind of grit can't last without some room in your heart. She wasn't just enduring, I bet she could see the landscape ahead. Me, I sigh just from being kept waiting a little, so I'm no match for her at all.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「我慢強い人」「我慢強く待つ」。耐える力を肯定的に述べる語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "戒律",
+   "reading": "かいりつ",
+   "pos": "noun",
+   "meaning": "precepts, monastic rules",
+   "defJa": "僧や信者が守るべき規律",
+   "passage": {
+    "ja": "タイやスリランカの上座部仏教では、僧は心身を律する二百を超える戒律を守って暮らしている。正午を過ぎれば食事を取れず、金銭の扱いにも厳しい制限がある。ところが日本では、明治五年の太政官布告を境に、僧侶の肉食や妻帯が公に認められるようになった。同じ仏教でありながらも、規則への向き合い方は大きく隔たったのである。この違いは、現代の寺院の暮らしにも色濃く残っている。",
+    "form": "戒律",
+    "en": "In the Theravada Buddhism of Thailand and Sri Lanka, monks live keeping more than two hundred precepts that discipline body and mind. After noon they may not eat, and there are strict limits on handling money. In Japan, however, from the Grand Council of State proclamation of 1872 onward, monks' eating of meat and marrying came to be openly allowed. Although it is the same Buddhism, the attitude toward rules diverged greatly. This difference remains strongly visible in the life of present-day temples.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「戒律を守る」「戒律を破る」。仏教で修行者が守る規則の総称。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "戦後処理",
+   "reading": "せんごしょり",
+   "pos": "noun",
+   "meaning": "postwar settlement",
+   "defJa": "戦争が終わったあとの後始末や取り決め",
+   "passage": {
+    "ja": "第一次世界大戦後のヴェルサイユ条約は、ドイツに巨額の賠償を課した。この戦後処理は、のちの恐慌と相まって、ドイツ国内の不満を高めたとされる。勝者の思惑が先に立った講和は、平和を築くどころか、次の戦争の火種を残した。一方、第二次世界大戦のあとには、敗戦国の再建を支える政策も取られた。罰と再建のどちらを優先するかという問いは、いつの時代にも重くのしかかる。",
+    "form": "戦後処理",
+    "en": "After the First World War, the Treaty of Versailles imposed enormous reparations on Germany. This postwar settlement, together with the later depression, is said to have heightened discontent within Germany. A peace driven by the victors' calculations, far from building peace, left the seeds of the next war. After the Second World War, by contrast, policies supporting the reconstruction of defeated nations were also adopted. The question of whether to prioritize punishment or reconstruction weighs heavily in every age.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「戦後処理を進める」「戦後処理の問題」。賠償・領土・責任など講和後の整理全般。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "手続き記憶",
+   "reading": "てつづききおく",
+   "pos": "noun",
+   "meaning": "procedural memory",
+   "defJa": "体で覚えた動作や手順の記憶",
+   "passage": {
+    "ja": "自転車の乗り方は、一度身につければ何年たっても忘れません。これは手続き記憶と呼ばれ、言葉で説明できる知識とは別の場所に保存されています。泳ぎ方を本で読んだだけの人が、いざ水に入ると沈んでしまうのはそのためです。ピアノの指づかいや、タイピングも同じ仲間に入ります。体で覚える上で大切なのは、頭で理解するより先に、心身に手順を刻み込むことなのです。",
+    "form": "手続き記憶",
+    "en": "Once you have learned to ride a bicycle, you never forget it, however many years pass. This is called procedural memory, and it is stored in a different place from knowledge you can explain in words. That is why someone who has only read about swimming sinks the moment they get in the water. Piano fingering and typing belong to the same family. In learning with the body, what matters is to engrave the steps into mind and body before you grasp them with the head.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「宣言的記憶」と対の語。自転車・楽器など言葉にしにくい熟練の記憶。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "批判的思考",
+   "reading": "ひはんてきしこう",
+   "pos": "noun",
+   "meaning": "critical thinking",
+   "defJa": "物事を鵜呑みにせず根拠から検討する思考",
+   "passage": {
+    "ja": "「この資料の主張は本当に正しいのか」と問い直す姿勢を、批判的思考と呼びます。これは相手を否定することではなく、根拠と結論のつながりを点検する作業です。現代文の試験に限らず、思い込みを疑いながら読む習慣のある人は、選択肢の罠にも引っかかりにくくなります。たとえば、「必ず」「すべて」といった強い言葉が出てきたら、いったん立ち止まるのがコツです。この思考法は、今日の勉強の振り返りにもそのまま使えます。",
+    "form": "批判的思考",
+    "en": "The attitude of asking again, 'Is the claim in this material really correct?', is called critical thinking. It is not about denying the other side, but about checking the link between evidence and conclusion. Not only in modern-Japanese exams, people in the habit of reading while doubting their assumptions are less likely to fall for the traps in answer choices. For example, when strong words like 'always' or 'all' appear, the knack is to stop for a moment. This way of thinking can also be used as it is in reviewing today's study.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「批判」は否定ではなく吟味の意。「批判的思考を養う」「批判的思考力」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "承認欲求",
+   "reading": "しょうにんよっきゅう",
+   "pos": "noun",
+   "meaning": "need for approval",
+   "defJa": "他人に認められたいという欲求",
+   "passage": {
+    "ja": "SNSの「いいね」が気になって仕方がない。そんな経験は誰にでもあるでしょう。他人に認められたいという承認欲求は、人間が集団で生きてきた以上、自然な心の働きです。しかし、数字で満たされる快楽に頼りすぎると、自分の価値を他人の目だけで測るようになりかねません。大事なのは、満たされない自分を責めずに、その欲求の正体を静かに観察してみることです。",
+    "form": "承認欲求",
+    "en": "You can't stop caring about the 'likes' on social media. Everyone has had that experience, surely. The need for approval, the wish to be recognized by others, is a natural working of the mind, given that humans have lived in groups. But if you rely too much on the pleasure that numbers satisfy, you may come to measure your own worth only through other people's eyes. What matters is to quietly observe the true nature of that desire without blaming yourself for being unsatisfied.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「承認欲求が強い」「承認欲求を満たす」。他者からの評価を求める心の動き。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抑うつ",
+   "reading": "よくうつ",
+   "pos": "noun",
+   "meaning": "depression (mood)",
+   "defJa": "気分が沈んで意欲がわかない状態",
+   "passage": {
+    "ja": "朝起きても体が鉛のように重く、何をしても楽しめない。抑うつの状態にある人は、それを怠け癖だと思い込み、自分を責めてしまいがちです。しかし、これは意志の弱さではなく、心身がエネルギーを失っている状態です。周りの人にできるのは、励ますことより、まず話を最後まで聞くことでしょう。つらい日が二週間以上続くなら、早めに専門家へ相談するに越したことはありません。",
+    "form": "抑うつ",
+    "en": "Even after waking, your body is heavy as lead and nothing is enjoyable. People in a state of depression tend to assume it is just laziness and blame themselves. But this is not weakness of will, it is a state in which mind and body have lost their energy. What those around them can do is, before encouraging, first listen to the end. If the hard days go on for two weeks or more, it is best to consult a specialist early.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「抑うつ状態」「抑うつ気分」。医学・心理学の語で、うつ病より広い気分の落ち込み。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抑揚",
+   "reading": "よくよう",
+   "pos": "noun",
+   "meaning": "intonation; modulation",
+   "defJa": "声の高低や強弱の変化",
+   "passage": {
+    "ja": "同じ「ありがとう」でも、抑揚が違えば伝わる温度はまるで変わる。語尾を少し上げれば軽い挨拶になり、ゆっくり下げれば深い感謝になる。話し方を磨く人は、言葉の選び方のみならず、こうした微差にまで気を配るものだ。原稿を読む時は、息継ぎの位置と強調する語に、鉛筆で印をつけておくとよい。声に心の余裕がにじむかどうかは、結局、音の高低に表れる。",
+    "form": "抑揚",
+    "en": "Even with the same 「ありがとう」, the warmth that comes across changes completely if the intonation differs. Raise the ending slightly and it is a light greeting, lower it slowly and it is deep gratitude. People who polish their speech attend not only to word choice but to such fine differences. When reading a script, it is good to mark the breathing spots and emphasized words with a pencil. Whether ease of heart seeps into the voice shows, in the end, in the rise and fall of the sound.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「抑揚をつける」「抑揚がない」。声の高低・強弱の変化で表情を出すこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抑止力",
+   "reading": "よくしりょく",
+   "pos": "noun",
+   "meaning": "deterrent",
+   "defJa": "相手に行動を思いとどまらせる力",
+   "passage": {
+    "ja": "冷戦期、アメリカとソ連は互いに核兵器を持つことで、相手の先制攻撃を思いとどまらせようとしました。これが抑止力という考え方です。米ソの力が拮抗している限り、全面戦争は避けられると信じられていたんですね。ただ、その均衡の上で、世界は何度も危機に直面し、キューバ危機はその最たる例です。一九六二年の十月、人類は核戦争の一歩手前まで近づいたと言われています。",
+    "form": "抑止力",
+    "en": "During the Cold War, the United States and the Soviet Union tried to make each other think twice about a first strike by both holding nuclear weapons. This is the idea of a deterrent. It was believed that as long as American and Soviet power remained evenly matched, all-out war could be avoided. Yet on top of that balance the world faced crises many times, and the Cuban Missile Crisis is the prime example. In October 1962, humanity is said to have come within one step of nuclear war.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「抑止力を高める」「核抑止力」。攻撃を思いとどまらせる力を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "投影",
+   "reading": "とうえい",
+   "pos": "noun",
+   "meaning": "projection",
+   "defJa": "自分の感情を他人のものとして映すこと",
+   "passage": {
+    "ja": "心理学では、自分の中にある感情や欲求を他人のものとして捉えてしまう働きを投影と呼ぶ。たとえば、自分が抱える不安を、相手の態度のせいだと思い込む場合がそれにあたる。精神分析の流れをくむ心理学者たちは、この仕組みが対人関係のこじれの背景にあると考えてきた。気づかないうちに、人は自分の影を相手に重ねてしまう。ただし、あらゆる誤解をこの働きだけで説明し得ないことも、見落とせない。",
+    "form": "投影",
+    "en": "In psychology, the tendency to perceive feelings and desires within oneself as belonging to others is called projection. For instance, it applies when you assume that your own anxiety is caused by the other person's attitude. Psychologists in the psychoanalytic tradition have considered this mechanism to lie behind tangled human relationships. Without realizing it, people lay their own shadows over others. However, it must not be overlooked that not every misunderstanding can be explained by this alone.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "心理学では自分の感情を他者に映す防衛機制。「自分を投影する」とも使う。",
+    "sense": "心理学の防衛機制"
+   }
+  },
+  {
+   "term": "投機",
+   "reading": "とうき",
+   "pos": "noun",
+   "meaning": "speculation",
+   "defJa": "値上がりを見込んで利益を狙う取引",
+   "passage": {
+    "ja": "半導体関連の株価が急騰する局面では、実需に加えて、短期の値上がりを狙った投機の資金も流れ込む。AI向け需要への期待が高まるなか、各社の思惑が絡み合い、相場は実力以上に膨らみやすい。過去にも、新技術への熱狂が行き過ぎて、のちに調整局面を迎えた例は少なくない。もちろん、成長そのものが幻だったわけではない。投資家には、実需と期待を見分ける冷静さが求められる。",
+    "form": "投機",
+    "en": "When semiconductor-related share prices surge, speculative money aimed at short-term gains also flows in, in addition to real demand. As expectations for AI demand rise, each company's calculations intertwine, and the market tends to inflate beyond fundamentals. There have been not a few past cases in which enthusiasm for a new technology went too far and was later followed by a correction. Of course, it was not that the growth itself was an illusion. Investors are required to have the composure to tell real demand from expectation.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「投機的な資金」「投機に走る」。値上がり益を目的とする売買。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抜本的",
+   "reading": "ばっぽんてき",
+   "pos": "na-adj",
+   "meaning": "drastic, fundamental",
+   "defJa": "根本から根こそぎ改めるさま",
+   "passage": {
+    "ja": "AIの電力消費が膨らみ続けるなか、データセンターの冷却をめぐる小手先の改善では限界が見えてきた。必要なのは、半導体の設計から電源の確保までを見直す抜本的な発想の転換である。省エネ化は急務でありながら、現場では既存の延長で乗り切ろうとする思考停止が根強い。性能を一割上げるより、消費電力を桁で下げる道を探すべきではないか。変えるべきは機械の前に、まず問いの立て方である。",
+    "form": "抜本的",
+    "en": "As AI's power consumption keeps swelling, piecemeal improvements to data-center cooling have begun to show their limits. What is needed is a fundamental shift in thinking that reviews everything from chip design to securing power supply. Energy saving is urgent, yet on site a thoughtless stagnation of trying to muddle through by extending the existing way is deep-rooted. Rather than raising performance by ten percent, should we not seek a path that cuts power consumption by orders of magnitude? What must change, before the machines, is first how we pose the question.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「抜本的な改革」「抜本的に見直す」。小手先でなく根本から変える含み。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "押韻",
+   "reading": "おういん",
+   "pos": "noun",
+   "meaning": "rhyme",
+   "defJa": "詩や歌で語尾などに同じ音を並べること",
+   "passage": {
+    "ja": "ラップって、押韻がすごいじゃないですか。日本語は母音が五つしかないから、英語より韻を踏みやすいって言われるんですよ。最後の母音をそろえるだけで、不思議と耳に残るものがあるんです。でも、ただそろえればいいわけじゃなくて、抑揚と合わさって初めて気持ちよく聞こえるんだと思います。だから上手い人ほど、意味と音のバランスを何度も調整してるんでしょうね。",
+    "form": "押韻",
+    "en": "Rap is amazing for its rhyming, isn't it? They say that because Japanese has only five vowels, it's easier to rhyme than in English. Just matching the final vowel somehow leaves something that sticks in the ear. But it's not enough to simply line them up, I think it only sounds good once it combines with intonation. So the better people probably adjust the balance between meaning and sound over and over.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「押韻する」「押韻を踏む」。同じ響きの音を配して調子を整えること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抽象化",
+   "reading": "ちゅうしょうか",
+   "pos": "noun",
+   "meaning": "abstraction",
+   "defJa": "個々の事例から共通点を取り出すこと",
+   "passage": {
+    "ja": "優秀な人は、目の前の事例を抽象化して、別の場面に応用するのがうまい。たとえば、料理のレシピを「手順の型」として捉え直せば、仕事の段取りにも使えます。逆に、一つの成功例をそのまま真似するだけでは、条件が変わった途端に通用しなくなりかねません。こうした思考法は、遠回りに見えて、実は急がば回れの近道です。具体と抽象を行き来する習慣が、応用力の正体なのです。",
+    "form": "抽象化",
+    "en": "Capable people are good at abstracting the case in front of them and applying it to other situations. For example, if you reframe a recipe as a 'pattern of steps,' you can use it for organizing work too. Conversely, merely copying one success story as it is may stop working the moment conditions change. This way of thinking looks like a detour, but is in fact the shortcut that 'the more haste, the more you should go around' promises. The habit of moving between concrete and abstract is the true source of the ability to apply.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「抽象化する」「抽象化して考える」。具体例から本質を取り出す手つき。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抽象度",
+   "reading": "ちゅうしょうど",
+   "pos": "noun",
+   "meaning": "level of abstraction",
+   "defJa": "物事がどれだけ抽象的かの度合い",
+   "passage": {
+    "ja": "文章の読みやすさは、語彙の難しさより抽象度で決まる面が大きい。「それ」のような指示語や「こうした事態」のように、広い内容を一語でまとめる表現が続くと、読み手は具体例を自力で補わざるを得なくなる。逆に、具体例だけを並べても、主張の骨組みは見えてこない。書き手には、両者の往復を設計する力が求められる。見直す時は、段落ごとに、今どの高さで話しているかを自問してみるとよい。",
+    "form": "抽象度",
+    "en": "How readable a text is depends largely on its level of abstraction rather than the difficulty of its vocabulary. When expressions that sum up broad content in one word, such as demonstratives like 「それ」 or 「こうした事態」, keep coming, readers have no choice but to supply concrete examples themselves. Conversely, merely lining up concrete examples does not reveal the skeleton of the argument. Writers are asked to have the ability to design the movement back and forth between the two. When revising, it is good to ask yourself, paragraph by paragraph, at what height you are speaking now.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「抽象度が高い／低い」と使う。具体と抽象の位置を示す尺度。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "担い手",
+   "reading": "にないて",
+   "pos": "noun",
+   "meaning": "bearer, the one who carries (a role)",
+   "defJa": "ある仕事や役割を引き受けている人や組織",
+   "passage": {
+    "ja": "半導体の製造は、設計、材料、装置、組み立てと、実に多くの工程に分かれ、世界各地の拠点に散らばっています。その担い手は、大手メーカーに限らず、名前の知られていない中堅企業にも広がっています。たとえば露光に使う光源や特殊なガスなど、一社が止まれば世界の生産が滞る部品も少なくありません。表舞台のメーカーだけを見ていると、この産業の本当の姿を見誤ります。",
+    "form": "担い手",
+    "en": "Chip manufacturing is divided into a great many stages, such as design, materials, equipment and assembly, and is scattered across bases around the world. Those who carry it out are not limited to big manufacturers but include little-known mid-sized firms. For example, in components such as the light sources used for exposure or special gases, there are quite a few for which, if one company stops, world production stalls. If you look only at the makers on the public stage, you misjudge the true shape of this industry.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「〜の担い手」で、役割を実際に引き受ける人や組織。「地域の担い手」など。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "拍",
+   "reading": "はく",
+   "pos": "noun",
+   "meaning": "mora; beat",
+   "defJa": "日本語のリズムを数える単位",
+   "passage": {
+    "ja": "俳句の五七五を数える単位は、文字ではなく拍である。「きゃ」のような拗音は前の音とひとまとまりで数え、「っ」や「ん」は独立した一単位になる。この仕組みを知らないと、見た目の文字数と音の数が食い違う句に戸惑うに違いない。たとえば「東京」は文字では二つでも、音の長さでは四つ分に数えられる。日本語のリズムが抑揚ではなく長さの均等で刻まれることを、五七五は静かに教えてくれる。",
+    "form": "拍",
+    "en": "The unit for counting the 5-7-5 of haiku is the mora, not the written character. A contracted sound like 「きゃ」 is counted together with the sound before it, while 「っ」 and 「ん」 become independent units. Without knowing this mechanism, one is sure to be puzzled by verses where the visible character count and the number of sounds differ. For example, 「東京」 is two in characters but counts as four in length of sound. The 5-7-5 quietly teaches that the rhythm of Japanese is kept by an evenness of length rather than by intonation.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「拍」はモーラ。「一拍」「二拍」と数える。音節（シラブル）とは数え方が異なる。",
+    "sense": "モーラ（音の長さの単位）"
+   }
+  },
+  {
+   "term": "拒否権",
+   "reading": "きょひけん",
+   "pos": "noun",
+   "meaning": "veto",
+   "defJa": "決定に反対して成立させない権利",
+   "passage": {
+    "ja": "国連安全保障理事会では、常任理事国の五か国だけが拒否権を持つ。一国でも反対すれば、残りの国々がこぞって賛成していても、決議は成立しない。この制度は、第二次世界大戦の戦勝国が主導した戦後の国際秩序の産物である。各国の思惑が衝突し、紛争への対応をめぐって理事会の機能不全が指摘されてきた。改革の議論は長く続いているものの、常任理事国自身の同意が要るため、実現への道は遠い。",
+    "form": "拒否権",
+    "en": "In the UN Security Council, only the five permanent members hold the veto. If even one country opposes, a resolution does not pass even if all the others are in favor. This system is a product of the postwar international order led by the victors of the Second World War. Amid colliding national calculations, the Council's dysfunction over responses to conflicts has been pointed out. Debate over reform has gone on for a long time, but since the permanent members' own consent is needed, the road to realization is long.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「拒否権を行使する」「拒否権を持つ」。決定を一国だけで止められる権利。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "拗音",
+   "reading": "ようおん",
+   "pos": "noun",
+   "meaning": "contracted sound (ゃゅょ)",
+   "defJa": "小さいゃゅょを添えて一音に数える音",
+   "passage": {
+    "ja": "日本語学習者が「きょう」と「きよう」を聞き分けがたいのは、拗音の小さな「ゃゅょ」が母語にない仕組みだからです。二文字で書いても、これは一拍にまとまるので、「き」と「よ」を別々に言うと途端に不自然になります。この微差を捉えるには、録音して手本と聞き比べるのが近道です。耳が慣れれば、自分の発音の癖も見えてきます。最初は数語だけでも、毎日続けるのがいちばん効きます。",
+    "form": "拗音",
+    "en": "Learners of Japanese find it hard to tell 「きょう」 from 「きよう」 because the small 「ゃゅょ」 of contracted sounds is a mechanism absent from their mother tongue. Although it is written with two characters, it gathers into one mora, so saying 「き」 and 「よ」 separately immediately sounds unnatural. To catch this fine difference, the quickest way is to record yourself and compare with a model. Once your ear gets used to it, your own pronunciation habits will start to show. Even if it is only a few words at first, doing it every day works best.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「拗音」はきゃ・しゅ・ちょなど。二文字で一拍。「ゃゅょ」は小さく書く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "拠点",
+   "reading": "きょてん",
+   "pos": "noun",
+   "meaning": "base, hub",
+   "defJa": "活動の足場となる中心の場所",
+   "passage": {
+    "ja": "TSMCが熊本に工場を構えた意味は、単なる生産拠点の追加にとどまりません。地震や地政学リスクを考えれば、台湾一極に頼る危うさを分散する狙いがあるからです。工場の稼働に伴って、材料や装置を支える担い手も周辺に集まり、地域全体が半導体の集積地へと変わっていきます。そういう街の姿は、かつてのシリコンアイランド九州を思い出させますね。一方で、水や人材の確保といった課題も新たに浮かんでいます。",
+    "form": "拠点",
+    "en": "The meaning of TSMC setting up a factory in Kumamoto goes beyond merely adding a production base. Considering earthquakes and geopolitical risk, the aim is to spread the danger of relying on Taiwan alone. As the plant starts operating, those who support materials and equipment also gather around it, and the whole region turns into a chip cluster. The look of such a town recalls the old Silicon Island of Kyushu. At the same time, new issues such as securing water and talent have also surfaced.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「生産拠点」「海外拠点」「拠点を置く」。活動の足場となる場所。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "拮抗",
+   "reading": "きっこう",
+   "pos": "noun",
+   "meaning": "rivalry; being evenly matched",
+   "defJa": "力が互角で張り合うこと",
+   "passage": {
+    "ja": "歴史を語る時、双方の力が拮抗していた場面ほど、聞き手を引きつける。たとえば関ヶ原の戦いは、東軍と西軍の兵力が互角であるかのように見えたからこそ、小早川秀秋の動向が緊迫感を生む。語り手は、結論を先に言わず、戦況の推移を少しずつ明かすことで、聞き手の期待を高めるのだ。語りの技術とは、情報を出す順番の設計でもある。",
+    "form": "拮抗",
+    "en": "When telling history, the scenes in which both sides' strengths were evenly matched hold listeners most. The Battle of Sekigahara, for example, makes the movements of Kobayakawa Hideaki so tense precisely because the Eastern and Western armies looked as if they were on equal terms in strength. The storyteller raises the listener's anticipation by not stating the conclusion first and revealing the shifts of the battle little by little. The craft of storytelling is also the design of the order in which information is released.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「勢力が拮抗する」「拮抗した試合」。力が互角で優劣がつかない状態。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "指示語",
+   "reading": "しじご",
+   "pos": "noun",
+   "meaning": "demonstrative",
+   "defJa": "これ・それ・あれなど物事を指し示す語",
+   "passage": {
+    "ja": "現代文で、「これ」「その」といった指示語の内容を問う問題は頻出です。直前の一文を見つけたからといって、安心してはいけません。答えをその部分に代入し、文が自然につながるかを確かめる上で、この一手間が差を生みます。思い込みで当たりをつけると、実は前の段落全体を指していた、という落とし穴にはまります。迷ったら、まず「何を指すか」を自分の言葉で十五字ほどにまとめてみましょう。",
+    "form": "指示語",
+    "en": "In modern-Japanese reading, questions asking what a demonstrative such as 「これ」 or 「その」 refers to appear frequently. Just because you have found the sentence right before it, you must not feel reassured. In checking whether the sentence connects naturally when you substitute your answer into that spot, this extra step makes the difference. If you guess by assumption, you fall into the trap that it actually referred to the whole previous paragraph. When in doubt, first try summing up 'what it points to' in your own words in about fifteen characters.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「指示語の指す内容」を問う読解問題が定番。「これ・それ・あれ・どれ」の系列。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "指針",
+   "reading": "ししん",
+   "pos": "noun",
+   "meaning": "guideline",
+   "defJa": "進むべき方向や方針を示すもの",
+   "passage": {
+    "ja": "AIをどう使うかについては、国や企業が相次いで指針を打ち出しています。ただ、文書を作って終わりにしてしまうと、現場では誰も読まない飾りになりがちです。大切なのは、それに沿って、実際に判断に迷った場面で立ち返れるかどうかです。ルールを守るだけで思考停止に陥らず、なぜそうするのかを問い続ける姿勢が欠かせません。そうしてこそ、文書は初めて生きた道しるべになります。",
+    "form": "指針",
+    "en": "On how to use AI, countries and companies are issuing guidelines one after another. Yet if you make a document and leave it at that, it tends to become an ornament nobody reads on the front line. What matters is whether you can go back along it in an actual moment of hesitating over a judgment. An attitude of not falling into thoughtlessness by merely obeying rules, and of continuing to ask why we do it, is indispensable. Only then does the document become a living signpost for the first time.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「指針を示す」「行動指針」「ガイドライン」。方向づけとなる基本方針。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "挫折",
+   "reading": "ざせつ",
+   "pos": "noun",
+   "meaning": "setback; failure",
+   "defJa": "計画や意欲が途中で折れてしまうこと",
+   "passage": {
+    "ja": "一度も挫折したことのない人間を、私は信用しきれない。もちろん、失敗を美化するつもりはないが、倒れた経験があればこそ、人は他者の痛みにも気づけるのだ。立ち上がる忍耐力は、順調な日々からは育たない。怠惰に見える沈黙の時期にも、人は静かに根を張っている。だから、うまくいかない季節にいる人を、急かさずに待てる人でありたいと思う。",
+    "form": "挫折",
+    "en": "I cannot fully trust a person who has never once suffered a setback. Of course I have no intention of glorifying failure, but precisely because one has fallen, one can notice the pain of others. The patience to stand up again is not raised in smooth days. Even in a silent period that looks like idleness, a person is quietly putting down roots. So I want to be someone who can wait, without hurrying them, for people in a season when things are not going well.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「挫折を味わう」「挫折感」。途中で頓挫する経験。成長の文脈で語られやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "振り返り",
+   "reading": "ふりかえり",
+   "pos": "noun",
+   "meaning": "looking back; review",
+   "defJa": "過去の行動や出来事を見直すこと",
+   "passage": {
+    "ja": "近年、企業の研修で、一日の終わりに行う振り返りを導入する動きが広がっている。成果だけでなく、判断に至る過程を言葉にする点が特徴だ。導入した職場からは、会議の質が上がったとの声も聞かれる。ただし、形式的な反省会に終われば、かえって心の余裕を奪いかねない。専門家は、時間を短く区切り、次の一手を一つだけ決めて終えるよう勧めている。",
+    "form": "振り返り",
+    "en": "In recent years, a movement to introduce an end-of-day review into corporate training has been spreading. Its feature is putting into words not just the results but the process leading to the decision. Some workplaces that adopted it report that the quality of their meetings has risen. However, if it ends as a perfunctory post-mortem, it could instead rob people of their peace of mind. Experts recommend keeping it short and finishing by deciding just one next move.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「振り返りを行う」「一日の振り返り」。経験を見直して次に生かす作業。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "授受表現",
+   "reading": "じゅじゅひょうげん",
+   "pos": "noun",
+   "meaning": "giving-receiving expressions",
+   "defJa": "あげる・くれる・もらうなど物の授受を表す語",
+   "passage": {
+    "ja": "「友達が手伝ってくれた」と「友達に手伝ってもらった」は、同じ事実を指しながら、授受表現が違うため、受け手の気持ちの置きどころも変わります。くれるは与え手の厚意を、もらうは受け手の依頼や働きかけを、それぞれ前に出す言い方です。こうした微差を抜きにして、日本語の敬意の仕組みは語れません。留学生がつまずくのも、この点であることが多いです。誰の視点で恩恵を見ているのかを、いつも意識してみましょう。",
+    "form": "授受表現",
+    "en": "「友達が手伝ってくれた」 and 「友達に手伝ってもらった」 point to the same fact, but because the giving-receiving expressions differ, where the receiver's feelings sit also changes. 「くれる」 foregrounds the giver's kindness, while 「もらう」 foregrounds the receiver's request or initiative. Without such fine differences, the mechanism of respect in Japanese cannot be discussed. This is also often where international students stumble. Try always being aware of whose viewpoint you are seeing the favor from.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「あげる／くれる／もらう」と敬語形の総称。誰が恩恵を与えるかの視点が要点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "掌握",
+   "reading": "しょうあく",
+   "pos": "noun",
+   "meaning": "grasp, command",
+   "defJa": "物事を完全に自分の手に収めること",
+   "passage": {
+    "ja": "生成AIの開発競争では、計算資源をどこまで掌握しているかが勝敗を分けつつある。先端半導体を大量に確保できる企業は、新しいモデルを短い周期で投入できるが、持たない企業は提携に頼らざるを得ない。こうした事情から、一部のスタートアップは、独自開発を諦めて撤退を選んだ。計算資源の囲い込みは、競争の公平さをめぐる新たな論点にもなっている。",
+    "form": "掌握",
+    "en": "In the race to develop generative AI, how much computing resource one commands is coming to decide the winners. Companies that can secure large volumes of advanced chips can release new models in short cycles, while those without must rely on partnerships. For these reasons, some startups gave up on in-house development and chose to withdraw. The enclosure of computing resources has also become a new point of debate over fairness in competition.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「実権を掌握する」「状況を掌握する」。握って自由に扱える状態にすること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "掘り下げる",
+   "reading": "ほりさげる",
+   "pos": "verb",
+   "meaning": "to dig into",
+   "defJa": "物事を深く突き詰めて考える",
+   "passage": {
+    "ja": "ことわざの意味を知るだけにとどまらず、「猿も木から落ちる」がなぜ猿なのか、なぜ木なのかと、一語ずつ掘り下げる時、言葉の背後にある暮らしや世界観が姿を現す。そこまで問わなければ、慣用句の学習は暗記という思考停止に終わってしまう。問いを重ねることを通じて、語彙は知識から理解へと変わっていく。遠回りに見えるこの営みこそ、言葉を自分のものにする唯一の道ではないか。",
+    "form": "掘り下げる",
+    "en": "Beyond merely knowing the meaning of a proverb, when we dig into it word by word, asking why 「猿も木から落ちる」 is about a monkey and why a tree, the way of life and worldview behind the words appear. If we do not ask that far, the study of idioms ends in the thoughtlessness of rote memorization. Through piling up questions, vocabulary changes from knowledge into understanding. Is not this seemingly roundabout endeavor the only road to making words one's own?",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「問題を掘り下げる」「テーマを掘り下げて論じる」。表面から深部へ追求する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "掛詞",
+   "reading": "かけことば",
+   "pos": "noun",
+   "meaning": "pivot word (poetic pun)",
+   "defJa": "一つの音に二つの意味をもたせる和歌の技法",
+   "passage": {
+    "ja": "和歌の掛詞は、一つの音に二つの意味を重ねる技法である。在原行平の「立ち別れいなばの山の峰に生ふるまつとし聞かば今帰り来む」では、「まつ」が松と待つを兼ねている。気持ちを直接書かず、音の重なりで心理描写を成立させるのが、この技法の妙だ。歌を味わう上で、この二重の響きに気づけるかどうかが分かれ目になる。百人一首を読み返すと、同じ仕掛けが至るところに潜んでいることに驚く。",
+    "form": "掛詞",
+    "en": "The kakekotoba of waka is a technique that layers two meanings onto one sound. In Ariwara no Yukihira's poem 「立ち別れいなばの山の峰に生ふるまつとし聞かば今帰り来む」, 「まつ」 doubles as both pine and wait. Not writing the feeling directly, but achieving psychological depiction through the overlap of sounds, is the beauty of this technique. In savoring a poem, whether you notice this double resonance is the dividing line. Rereading the Hyakunin Isshu, one is surprised to find the same device lurking everywhere.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "和歌の修辞。「まつ」＝松・待つ、「あき」＝秋・飽きなど。縁語と並べて学ぶ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "探究心",
+   "reading": "たんきゅうしん",
+   "pos": "noun",
+   "meaning": "spirit of inquiry",
+   "defJa": "物事の本質を深く探り究めようとする心",
+   "passage": {
+    "ja": "子どもは、放っておいても「どうして？」を連発します。あの旺盛な探究心は、大人になると薄れるどころか、跡形もなく消えてしまう人もいます。理由の一つは、正解を出すことばかり求められて、思い込みで済ませる癖がつくからです。心の余裕を持って、わからないことを楽しめる人だけが、学びを生涯続けられるのです。まずは、今日一つだけ「なぜ？」を調べてみませんか。",
+    "form": "探究心",
+    "en": "Left alone, children fire off 'why?' again and again. That vigorous spirit of inquiry, far from just fading in adulthood, vanishes without a trace in some people. One reason is that being asked only to produce correct answers builds a habit of settling things with assumptions. Only those who keep some room in the heart and enjoy not knowing can continue learning for life. Why not start by looking up just one 'why?' today?",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「探究心が強い」「探究心を育てる」。「探求」とも書くが、本来は「探究」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "接尾辞",
+   "reading": "せつびじ",
+   "pos": "noun",
+   "meaning": "suffix",
+   "defJa": "語の後ろについて意味を加える要素",
+   "passage": {
+    "ja": "日本語の「〜的」「〜性」「〜化」は、名詞に付いて新しい語を作る接尾辞である。「抽象」に「化」を付ければ動作を表す名詞になり、「的」を付ければ性質を表す形容動詞になる。近年は「〜ぽい」や「〜みが深い」のように、若者の間で生まれた形も広がっている。接頭辞と並んで語彙を支えるこうした部品の働きを知っておくと、語を増やす上でも効率が良い。",
+    "form": "接尾辞",
+    "en": "The Japanese 「〜的」, 「〜性」 and 「〜化」 are suffixes that attach to nouns to make new words. Add 「化」 to 「抽象」 and it becomes a noun expressing a process, add 「的」 and it becomes a quality-expressing na-adjective. In recent years, forms born among young people, like 「〜ぽい」 or 「〜みが深い」, have also spread. Knowing how these parts, which support vocabulary alongside prefixes, work is also efficient for building up words.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「〜的・〜性・〜化・〜さ」などが代表。語の後ろにつく。「接頭辞」の対。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "接頭辞",
+   "reading": "せっとうじ",
+   "pos": "noun",
+   "meaning": "prefix",
+   "defJa": "語の前についてその意味を変える要素",
+   "passage": {
+    "ja": "「未」「非」「不」「無」はどれも打ち消しを表す接頭辞だが、使い分けには微差がある。「未完成」は今後の完成を見込む語感があり、「不完全」は欠けている状態そのものを指す。「非公開」のように、「非」はその範囲に属さないことを示す。公文書をはじめ、報道の見出しでも、この使い分けは意外に厳密に問われる。付ける語の選び方一つで、文の評価が変わってしまうこともある。",
+    "form": "接頭辞",
+    "en": "「未」, 「非」, 「不」 and 「無」 are all prefixes expressing negation, but there are subtle differences in how they are used. 「未完成」 carries the nuance of expecting completion later, while 「不完全」 points to the state of being lacking itself. As in 「非公開」, 「非」 shows that something does not belong to that scope. Beginning with official documents, this distinction is surprisingly strictly demanded even in news headlines. The choice of which one to attach can change how a sentence is judged.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「未・非・不・無・再・超」など。語の前につく。「接尾辞」の対。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "推敲",
+   "reading": "すいこう",
+   "pos": "noun",
+   "meaning": "polishing a text",
+   "defJa": "文章の言葉を練り直すこと",
+   "passage": {
+    "ja": "推敲って、実は「押す」か「敲く」かで悩んだ唐の詩人の話が元なんですよ。賈島が「僧は推す月下の門」にするか「敲く」にするかで迷って、韓愈に相談したという逸話です。結局「敲く」に決まったんですけど、音がある分、夜の静けさが際立つじゃないですか。一語に悩み抜くあの姿勢は、怠惰とは正反対ですよね。私たちも、メールの一行くらい、もう少し粘ってみたいものです。",
+    "form": "推敲",
+    "en": "The word for polishing a text actually comes from a story about a Tang poet who agonized over 'push' or 'knock,' you know. Jia Dao hesitated over whether to write 'the monk pushes the gate beneath the moon' or 'knocks,' and consulted Han Yu, as the anecdote goes. They settled on 'knock,' and because there's a sound, the stillness of the night stands out, doesn't it? That posture of agonizing over a single word is the very opposite of idleness. We too would like to hold out a bit longer, even over a single line of email.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「推敲を重ねる」。詩句の「推す／敲く」の逸話が語源。作品の仕上げに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "推移",
+   "reading": "すいい",
+   "pos": "noun",
+   "meaning": "transition; shift",
+   "defJa": "時とともに状況が移り変わること",
+   "passage": {
+    "ja": "日本の古代国家は、律令に基づいて徴税の仕組みを整えたが、その実態は時代とともに変わっていった。租・庸・調の負担は重く、農民の逃亡が相次いだため、土地制度も変更を余儀なくされた。やがて墾田永年私財法が出され、私有地である荘園が広がっていく。制度の推移を追うと、国家が理想と現実の間で揺れ動いた様子が見えてくる。",
+    "form": "推移",
+    "en": "The ancient Japanese state built its tax-collection system on the ritsuryo codes, but its reality changed with the times. The burdens of rice, labor and goods were heavy and farmers fled one after another, so the land system too was forced to change. Eventually the Law of Perpetual Private Ownership of Newly Opened Land was issued, and private estates called shoen spread. Tracing the course of the system reveals how the state wavered between ideal and reality.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「推移を見守る」「価格の推移」。時間の経過に沿った変化の流れを言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "揚げ足を取る",
+   "reading": "あげあしをとる",
+   "pos": "expression",
+   "meaning": "to trip someone up on words",
+   "defJa": "言い間違いなどを取り上げて相手を責める",
+   "passage": {
+    "ja": "議論の最中に、相手の言い間違いを突いて揚げ足を取る人がいます。内容ではなく言葉尻に反応するので、話は一向に前へ進みません。批判的思考とは本来、相手の主張の弱いところを探すというより、根拠が十分かを一緒に確かめる作業です。言い間違いは誰にでもあるのですから、その場で正しく言い直させてあげる方が、結果として議論は深まります。お互いに心の余裕を持って、言い直せる場をつくりたいものです。",
+    "form": "揚げ足を取る",
+    "en": "In the middle of a debate, there are people who pounce on the other's slip of the tongue and trip them up on words. Because they react to the phrasing rather than the content, the discussion never moves forward. Critical thinking is, at root, less a search for weak points in the other's claim than a joint task of checking whether the evidence is sufficient. Since anyone can misspeak, letting the person restate it correctly on the spot deepens the discussion in the end. I would like us to make a space, with room in our hearts, where we can restate things.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「相手の揚げ足を取る」。内容でなく言葉尻をとらえて責める。否定的な含み。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "換言すれば",
+   "reading": "かんげんすれば",
+   "pos": "expression",
+   "meaning": "in other words (formal)",
+   "defJa": "別の言い方をすれば、という意味の接続表現",
+   "passage": {
+    "ja": "論文に限らず、評論にも「換言すれば」という言葉がよく出てきます。これは、前に述べた内容を別の言い方で言い直す合図です。しかも、言い直しの方が抽象度が高いことも多く、筆者が本当に言いたかったことは、むしろその後ろに隠れています。ですから、読解では、この言葉の直後に注目するのがコツです。同じ働きをする「すなわち」や「要するに」にも、同じ目配りをしておきましょう。",
+    "form": "換言すれば",
+    "en": "Not only in academic papers, the phrase 「換言すれば」 also often appears in critical essays. It is a signal that the content just stated is being rephrased. Moreover, the rephrasing is often higher in abstraction, and what the author really wanted to say is rather hidden behind it. So in reading comprehension, the knack is to pay attention to what comes right after this phrase. Keep the same watchfulness for 「すなわち」 and 「要するに」, which do the same job.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「言い換えれば」の硬い形。前の内容を別の言葉でまとめ直す合図で、直後が要点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "損失回避",
+   "reading": "そんしつかいひ",
+   "pos": "noun",
+   "meaning": "loss aversion",
+   "defJa": "得より損を強く避けようとする心理傾向",
+   "passage": {
+    "ja": "同じ一万円でも、得た喜びより失う痛みの方が大きく感じられる。この非対称を、行動経済学では損失回避と呼ぶ。カーネマンとトベルスキーが示した知見によれば、人は損を避けようとするあまり、合理的でない選択に走ることがある。値上がりを待って売れずにいる投資家の姿は、その典型だろう。快楽を求める力より、痛みを避ける力の方が、人を強く動かしているように思える。",
+    "form": "損失回避",
+    "en": "Even for the same ten thousand yen, the pain of losing feels larger than the joy of gaining. Behavioral economics calls this asymmetry loss aversion. According to the findings of Kahneman and Tversky, people sometimes run to irrational choices out of too great a desire to avoid losses. The investor who keeps waiting for a price rise and cannot sell is a typical example. It seems that the power to avoid pain moves people more strongly than the power to seek pleasure.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "行動経済学の用語。「損失回避の心理」「損失回避バイアス」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "搾取",
+   "reading": "さくしゅ",
+   "pos": "noun",
+   "meaning": "exploitation",
+   "defJa": "他人の労働の成果を不当に取り上げること",
+   "passage": {
+    "ja": "経営者の思惑のもと、産業革命期のイギリスでは、子どもまでが一日十数時間も工場で働かされた。この搾取の実態を伝えたのがエンゲルスであり、『イギリスにおける労働者階級の状態』は、その代表的な記録である。もっとも、この概念をめぐっては、経済学者の間でも評価が分かれてきた。だが、工場法が段階的に整えられていった事実は、現実の痛みが制度を動かしたことを示している。",
+    "form": "搾取",
+    "en": "Under the calculations of managers, in Industrial Revolution Britain even children were made to work in factories for a dozen or more hours a day. It was Engels who conveyed this reality of exploitation, and 'The Condition of the Working Class in England' is its representative record. That said, evaluations of the concept have been divided even among economists. Yet the fact that factory laws were put in place step by step shows that real suffering moved the system.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「労働者を搾取する」「搾取構造」。立場の弱い者の成果を不当に取り上げる意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "摂政",
+   "reading": "せっしょう",
+   "pos": "noun",
+   "meaning": "regent",
+   "defJa": "君主に代わって政治を行う職や人",
+   "passage": {
+    "ja": "六世紀末から七世紀にかけて、聖徳太子は推古天皇の摂政として政治を主導したとされる。天皇に代わって政務を取り仕切るこの役職は、のちに藤原氏が独占し、平安時代には摂関政治という形で定着した。律令国家の枠組みを借りながらも、実権は一族の手に集まったのである。表向きの制度と実際の権力が食い違う例として、日本史でもとりわけ興味深い。",
+    "form": "摂政",
+    "en": "From the end of the sixth century into the seventh, Prince Shotoku is said to have led politics as regent for Empress Suiko. This post, handling government in place of the sovereign, was later monopolized by the Fujiwara clan and became established in the Heian period as regency politics. While borrowing the framework of the ritsuryo state, real power gathered in one family's hands. As an example of official systems diverging from actual power, it is especially interesting even in Japanese history.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「摂政を置く」「摂政に就く」。君主が幼い・病気の時に代理で政務を行う。",
+    "sense": "君主の代理で政治を行う職"
+   }
+  },
+  {
+   "term": "撤退",
+   "reading": "てったい",
+   "pos": "noun",
+   "meaning": "withdrawal, pulling out",
+   "defJa": "進出していた場所や事業から引き上げること",
+   "passage": {
+    "ja": "輸出規制が強まるなか、中国での事業から撤退を迫られる企業が出てくるのは避けられまい。工場を維持するコストが利益を上回れば、経営判断としては引くしかない。しかし、これは単なる損切りではなく、拠点の再配置という戦略の一部でもある。企業は、抜けた先で何を確保するかを同時に問われている。決断が遅れるほど、失うものは大きくなるおそれがある。",
+    "form": "撤退",
+    "en": "As export controls tighten, it is hard to avoid some companies being forced to withdraw from their business in China. If the cost of maintaining a factory exceeds profit, pulling out is the only management decision. But this is not merely cutting losses, it is also part of a strategy of repositioning bases. Companies are simultaneously being asked what they will secure in the place they move to. The later the decision, the more there is a risk that what is lost will grow.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「市場から撤退する」「撤退を決める」。事業や軍が引き上げる意で、経営・軍事の両方で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "撥音",
+   "reading": "はつおん",
+   "pos": "noun",
+   "meaning": "moraic nasal (ん)",
+   "defJa": "「ん」で表される鼻にかかる音",
+   "passage": {
+    "ja": "撥音の「ん」は、日本語の中でもやや特異な存在である。語頭には立たず、後ろの音に応じて、唇を閉じる音にも、舌先を上げる音にも、鼻に抜ける音にも変わる。それでも話者は、どれも同じ「ん」として一拍に数え、違いを意識することはほとんどない。この無意識の了解こそ、母語話者の耳の働きを物語っている。外国人学習者がしばしば苦労するのは、まさにこの見えない一致の部分である。",
+    "form": "撥音",
+    "en": "The moraic nasal 「ん」 is a somewhat peculiar presence even within Japanese. It never stands at the head of a word and, depending on the sound that follows, changes into a sound with closed lips, with the tongue tip raised, or with air passing through the nose. Even so, speakers count all of them as the same 「ん」 in one mora and are hardly aware of the differences. This unconscious understanding speaks for the workings of the native speaker's ear. What foreign learners often struggle with is precisely this invisible part of the agreement.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「撥音便」「撥音の『ん』」。促音・拗音・長音とともに特殊拍の一つ。",
+    "sense": ""
+   }
+  }
+ ]
+}

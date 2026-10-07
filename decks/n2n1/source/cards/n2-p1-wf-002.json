@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "朗らか",
+   "reading": "ほがらか",
+   "pos": "na-adj",
+   "meaning": "cheerful, bright",
+   "defJa": "明るくてのびのびしているさま",
+   "passage": {
+    "ja": "一九五〇年代の写真には、朗らかな表情で働く人々が多く写っている。復興が進み、暮らしに明るい兆しが見え始めた時期だと説明されることが多い。しかし、同じ写真の背景には、粗末な住まいや物資の不足も確認できる。当時の笑顔は、苦しさを知らなかったからではなく、苦しさを抜けつつあったからこそ生まれたと見るべきだろう。写真は時代の証拠でありながら、見る側の読み方次第で、まったく別の顔を見せる。",
+    "form": "朗らか",
+    "en": "Photographs of the 1950s show many people working with cheerful expressions. This is often explained as a period when reconstruction advanced and signs of brightness began to appear in daily life. Yet in the background of the very same photographs, one can also make out shabby dwellings and shortages of goods. The smiles of that time should be seen as born not from ignorance of hardship but precisely from being on the way out of it. A photograph is evidence of its era, yet it shows an entirely different face depending on how the viewer reads it.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "朗らかな笑顔・性格のように、人の表情や気質に使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "観測",
+   "reading": "かんそく",
+   "pos": "noun",
+   "meaning": "observation, measurement",
+   "defJa": "自然や出来事を観察して測ること",
+   "passage": {
+    "ja": "日本語の細かな用法を身につけたいなら、辞書を引くより、実際に使われている文を観測するほうが早い。たとえば「全然おいしい」という言い方は、最近の若者言葉だと思われがちだが、実は明治の小説にも前例がある。用例を集める作業を通じて、学校で「間違い」と教わった表現の来歴が見えてくる。結論を急がず、まず例を十個集めてみよう。その地味な作業の積み重ねが、言葉に対する確かな直感を育ててくれる。",
+    "form": "観測",
+    "en": "If you want to master Japanese usage, observing sentences actually in use is faster than looking things up in a dictionary. For example, the phrase \"zenzen oishii\" tends to be thought of as recent youth slang, but it actually has precedents in Meiji-era novels. Through the work of collecting examples, the history of an expression you were taught at school was \"wrong\" comes into view. Don't rush to a conclusion; first try collecting ten examples. That unglamorous accumulation cultivates your reliable intuition for language.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "天体観測・気象観測のように、事実を見て測る。意見の観測も。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
