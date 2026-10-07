@@ -64,3 +64,9 @@ John's words, 2026-10-07:
 - Never shell-read `~/.dharma/agent_keys.env`.
 
 **The deploy is still blocked.** Every 3-hour battery run fails on one random WebKit flake (`~/.dharma/bunki_review/2026-10-06/ci/FLAKES-OBSERVED.md`). PR #123 is the fix, and John merges it. So "live on his phone" waits on that. Say so honestly.
+
+## Lead's quality notes (2026-10-07, after 1,856 cards)
+- **Grammar endings:** 「〜にほかならない」 closes 28 cards. Cap any one pattern at about 1 in 100. Rotate through grammar-n2n1.txt instead of reaching for the same few.
+- **The 語 register:** it keeps the 「発表で〜を扱うときは」 presentation-tips frame. Vary it: editing a sentence, choosing a word, explaining a nuance to a friend, a translator's dilemma.
+- **The `other` topic was never used.** Give roughly 1 in 8 of the remaining cards a wider-interest subject (science, art, food, nature, cities, craftsmanship).
+- **Remaining work:** the 137 of the top 2,000 without a card get the notes above.
