@@ -1,0 +1,264 @@
+[
+ {
+  "term": "優越感",
+  "ok": false,
+  "why": [
+   "優越感: 電車で席を譲らない人を見て、内心「自分ならそんな… the target 優越感 appears 2 times; it must appear once"
+  ]
+ },
+ {
+  "term": "元老院",
+  "ok": false,
+  "why": [
+   "元老院: ローマの元老院は、共和制の時代には、政策の大きな… 175 characters, 4 sentences: a contract-v2 passage has 4–5 sentences and 180–300 characters"
+  ]
+ },
+ {
+  "term": "先住民",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "先入観",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "先史時代",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "先手を打つ",
+  "ok": false,
+  "why": [
+   "先手を打つ: AI規制の議論って、結局どこの国が先に動くかの競… 164 characters, 4 sentences: a contract-v2 passage has 4–5 sentences and 180–300 characters"
+  ]
+ },
+ {
+  "term": "先行き",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "先行研究",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "先進国",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "先駆け",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "免罪符",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "入植",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "全体主義",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "全盛期",
+  "ok": false,
+  "why": [
+   "全盛期: どんな帝国にも、全盛期というものがある。皮肉なこ… 163 characters, 5 sentences: a contract-v2 passage has 4–5 sentences and 180–300 characters"
+  ]
+ },
+ {
+  "term": "公民権運動",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "共和制",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "共産主義",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "共通語",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "具体例",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "具体化",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "典拠",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "内向型",
+  "ok": false,
+  "why": [
+   "内向型: 職場でおとなしい人が内向型だとは限らない。心理学… the target 内向型 appears 2 times; it must appear once"
+  ]
+ },
+ {
+  "term": "内在",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "内戦",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "内発的動機づけ",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "内省",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "再分配",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "再現性",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "再編",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "再興",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "冗長",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "出典",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "出家",
+  "ok": false,
+  "why": [
+   "出家: ブッダは王族の家に生まれながら、二十九歳のとき、… 179 characters, 5 sentences: a contract-v2 passage has 4–5 sentences and 180–300 characters"
+  ]
+ },
+ {
+  "term": "出遅れ",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "分散学習",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "分水嶺",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "切磋琢磨",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "列強",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "初心忘るべからず",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "判断力",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "制海権",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "制空権",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "刹那",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "前代未聞",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "前頭葉",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "副交感神経",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "割り込み",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "割譲",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "創造性",
+  "ok": true,
+  "why": []
+ },
+ {
+  "term": "功罪",
+  "ok": true,
+  "why": []
+ }
+]
