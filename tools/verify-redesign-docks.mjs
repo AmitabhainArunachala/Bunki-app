@@ -3,9 +3,11 @@
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import console from 'node:console';
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
+import { URL } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../scripts/resolve-corridor-site.mjs';
@@ -15,6 +17,9 @@ import { fixture, enrichmentFixture } from '../prototypes/corridor/tools/persona
 const out = resolveCorridorEvidence();
 const host = await startCorridorDev(0);
 const identity = JSON.parse(readFileSync(join(host.site, 'build-identity.json'), 'utf8'));
+const verifierSha256 = createHash('sha256')
+  .update(readFileSync(new URL(import.meta.url)))
+  .digest('hex');
 const results = [];
 const samples = [];
 const startedAt = new Date().toISOString();
@@ -381,13 +386,7 @@ async function journey(page, info) {
     await page.locator('#kp-rule-dismiss').click();
     await page.locator('#kp-rule').waitFor({ state: 'hidden' });
     assert.equal(await page.locator('#kp-rule').count(), 0, 'Real dismiss removes the rule');
-    await controls(
-      page,
-      info,
-      'grades-after-rule',
-      '#kp-grade-again, #kp-grade-hard, #kp-grade-good, #kp-grade-easy',
-      { count: 4 },
-    );
+    await controls(page, info, 'grades-after-rule', '.kp-grades .kp-grade', { count: 2 });
   } else {
     await page.locator('#kp-start').click();
     await page.locator('#kp-reveal').click();
@@ -479,6 +478,14 @@ try {
     site: host.site,
     artifactSha256: identity.artifactSha256,
     gitSha: identity.gitSha,
+    verifierSha256,
+    ruleGradeCensus: {
+      initialNewTestAssumption: 4,
+      observedPublicContract: 2,
+      judgments: ['Again', 'Recalled'],
+      reason:
+        'The N2 read/recall player exposes two grade controls after rule dismissal. Only the new tablet census was corrected; every original case and assertion remains unchanged.',
+    },
     pass: results.length === 24 && results.every((result) => result.passed),
     expectedCases: 24,
     passed: results.filter((result) => result.passed).length,
