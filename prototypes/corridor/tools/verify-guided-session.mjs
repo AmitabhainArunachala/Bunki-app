@@ -135,7 +135,7 @@ async function ready(page) {
 /** The register lifts a room in over ~160 ms on arrival; shots wait for it to settle. */
 async function settle(page) {
   await page
-    .waitForFunction(() => !document.documentElement.dataset.roomEntering, null, { timeout: 5_000 })
+    .waitForFunction(() => !document.documentElement.dataset.registerEntering, null, { timeout: 5_000 })
     .catch(() => {});
   await page.waitForTimeout(260);
 }
@@ -252,7 +252,7 @@ async function journey(browser, browserName, viewport) {
     );
     check(
       'J3 the chrome recedes during the attempt (T8)',
-      (await page.evaluate(() => document.documentElement.dataset.room)) === 'attempt',
+      (await page.evaluate(() => document.documentElement.dataset.register)) === 'attempt',
     );
     await shot(page, dir, '03-question-1');
     await axeClean(page, 'question');

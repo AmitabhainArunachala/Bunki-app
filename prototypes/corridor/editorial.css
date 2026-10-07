@@ -151,8 +151,8 @@ body:not(.zen) #app > .chrome > button.chrome-search { align-items: center; padd
 body:not(.zen) #app > .chrome > button.chrome-search svg { width: 20px; height: 20px; }
 /* during an attempt the bar still collapses to 戻る · progress · seal (register.css T8): the glass
    doors above must not bring the search, the dojo, the language or the lists back into a test */
-html[data-room='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
-html[data-room='attempt'] body:not(.zen) #app > .chrome > button:last-child { display: none; }
+html[data-register='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
+html[data-register='attempt'] body:not(.zen) #app > .chrome > button:last-child { display: none; }
 /* 戻る wears the iOS back chevron */
 body:not(.zen) #app > .chrome > button#back { padding-left: 6px; }
 body:not(.zen) #app > .chrome > button#back::before {
@@ -245,7 +245,7 @@ main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
 }
 .view-title > .en-inline { display: block; margin: 6px 0 0; font: 400 17px/1.4 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ed-muted); opacity: 1; }
 main h2 { margin-top: 32px; margin-bottom: 12px; font-family: var(--sans); font-weight: 700; line-height: 1.35; letter-spacing: -0.005em; }
-html[data-room='tutor'] body:not(.zen) #app > .chrome { background: var(--glass-solid); }
+html[data-register='tutor'] body:not(.zen) #app > .chrome { background: var(--glass-solid); }
 .eyebrow { font-size: 13px; letter-spacing: 0.04em; color: var(--ed-muted); }
 body.v-depth-layered main > .eyebrow::before,
 body.v-depth-layered .eyebrow.shelf-section::before { content: none; }
@@ -610,11 +610,11 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 
 /* Practice uses a paper and answer register, with the mode clearly outside
  * the question. The source text and official-task sequence stay in the DOM. */
-html[data-room='attempt'] body:not(.zen) #app > main { padding-top: 28px; }
-html[data-room='attempt'] h1.exam-heading { font: 800 26px/1.45 var(--display); color: var(--ed-ink); letter-spacing: 0; margin-bottom: 10px; }
-html[data-room='attempt'] .exam-progress { font: 15px/1.6 var(--sans); color: var(--ed-ink); padding: 12px 0; border-bottom: 1px solid var(--ed-rule); }
-html[data-room='attempt'] .exam-timer { font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; }
-html[data-room='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color: var(--ed-muted); }
+html[data-register='attempt'] body:not(.zen) #app > main { padding-top: 28px; }
+html[data-register='attempt'] h1.exam-heading { font: 800 26px/1.45 var(--display); color: var(--ed-ink); letter-spacing: 0; margin-bottom: 10px; }
+html[data-register='attempt'] .exam-progress { font: 15px/1.6 var(--sans); color: var(--ed-ink); padding: 12px 0; border-bottom: 1px solid var(--ed-rule); }
+html[data-register='attempt'] .exam-timer { font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; }
+html[data-register='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color: var(--ed-muted); }
 .exam-mode-badge { display: inline-flex; align-items: center; padding: 5px 10px; border: 1px solid var(--ed-rule); font: 600 13px/1.5 var(--sans); color: var(--ed-ink); background: var(--ai-wash); }
 .exam-scope-note, .exam-study-help, .exam-bookmark-note { max-width: 68ch; font: 14px/1.75 var(--sans); color: var(--ed-muted); }
 .exam-lookup-assisted { padding: 10px 0; border-bottom: 1px solid var(--ed-rule); font-size: 14px; color: var(--ai); }
@@ -632,8 +632,8 @@ html[data-room='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color
 .exam-task-instruction { font: 17px/1.85 var(--serif); margin: 0; color: var(--ed-ink); }
 .exam-question-number { display: inline-block; margin-right: 12px; font: 700 20px/1.5 var(--sans); font-variant-numeric: tabular-nums; }
 .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em; }
-html[data-room='attempt'] .exam-paper :is(.exam-prompt, .mock-q),
-html[data-room='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)) {
+html[data-register='attempt'] .exam-paper :is(.exam-prompt, .mock-q),
+html[data-register='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)) {
   font: 21px/2 var(--serif);
   color: var(--ed-ink);
   padding: 12px 0 20px;
@@ -643,7 +643,7 @@ html[data-room='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction,
   background: transparent;
   box-shadow: none;
 }
-html[data-room='attempt'] .exam-paper .exam-passage {
+html[data-register='attempt'] .exam-paper .exam-passage {
   padding: 20px 24px;
   margin: 8px 0 24px;
   border: 1px solid var(--ed-rule);
@@ -653,9 +653,9 @@ html[data-room='attempt'] .exam-paper .exam-passage {
   background: transparent;
   box-shadow: none;
 }
-html[data-room='attempt'] .exam-paper .exam-instruction { background: transparent; border: 0; padding: 0 0 12px; color: var(--ed-muted); font-size: 14px; }
-html[data-room='attempt'] .exam-paper .mock-opts,
-html[data-room='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .mock-opts {
+html[data-register='attempt'] .exam-paper .exam-instruction { background: transparent; border: 0; padding: 0 0 12px; color: var(--ed-muted); font-size: 14px; }
+html[data-register='attempt'] .exam-paper .mock-opts,
+html[data-register='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .mock-opts {
   padding: 0;
   margin: 0;
   border: 0;
@@ -682,7 +682,7 @@ html[data-room='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .m
 .exam-option-row:is(.selected, .chosen) .exam-option-number { color: var(--ed-paper); background: var(--ed-ink); border-color: var(--ed-ink); }
 .exam-option-text { min-width: 0; padding: 3px 0; font: 20px/1.9 var(--serif); color: var(--ed-ink); }
 .exam-paper rt { font-size: 0.63em; color: var(--red); }
-html[data-room='attempt'] .exam-paper .mock-opt {
+html[data-register='attempt'] .exam-paper .mock-opt {
   padding: 16px 12px;
   border: 0;
   border-top: 1px solid var(--ed-rule-light);
@@ -692,11 +692,11 @@ html[data-room='attempt'] .exam-paper .mock-opt {
   min-height: 62px;
   background: transparent;
 }
-html[data-room='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: 2px; }
-html[data-room='attempt'] .exam-paper .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
-html[data-room='attempt'] .exam-paper .mock-opt.right { box-shadow: none; border-bottom: 2px solid var(--ai); }
-html[data-room='attempt'] .exam-paper .mock-opt:hover:not(:disabled):not([aria-pressed='true']) { background: var(--ai-wash); }
-html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number {
+html[data-register='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: 2px; }
+html[data-register='attempt'] .exam-paper .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
+html[data-register='attempt'] .exam-paper .mock-opt.right { box-shadow: none; border-bottom: 2px solid var(--ai); }
+html[data-register='attempt'] .exam-paper .mock-opt:hover:not(:disabled):not([aria-pressed='true']) { background: var(--ai-wash); }
+html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number {
   width: 44px;
   min-height: 44px;
   padding: 4px;
@@ -704,11 +704,11 @@ html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number {
   border-radius: 3px;
   font: 600 18px/1 var(--sans);
 }
-html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
-html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
-html[data-room='attempt'] .mock-nav { gap: 16px; margin: 24px 0 16px; }
-html[data-room='attempt'] #exam-flag, html[data-room='attempt'] .chip#exam-flag { min-height: 44px; font-size: 14px; color: var(--ai); }
-html[data-room='attempt'] :is(.exam-question-map summary, .exam-leave-controls .chip) { font-size: 14px; }
+html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
+html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
+html[data-register='attempt'] .mock-nav { gap: 16px; margin: 24px 0 16px; }
+html[data-register='attempt'] #exam-flag, html[data-register='attempt'] .chip#exam-flag { min-height: 44px; font-size: 14px; color: var(--ai); }
+html[data-register='attempt'] :is(.exam-question-map summary, .exam-leave-controls .chip) { font-size: 14px; }
 .assessment-room .exam-form { padding: 22px 0; margin: 0; background: transparent; border: 0; border-top: 1px solid var(--ed-rule); border-radius: 0; box-shadow: none; }
 .assessment-room .exam-form h2 { font-size: 26px; }
 .assessment-room .exam-form :is(.exam-skills, .exam-status) { font-size: 14px; line-height: 1.7; letter-spacing: 0; }
@@ -739,7 +739,7 @@ html[data-room='attempt'] :is(.exam-question-map summary, .exam-leave-controls .
 
 /* The tutor's existing lacquer surface owns local pigments, so the page
  * frame must inherit those instead of placing pale text on a paper ground. */
-html[data-room='tutor'] body:not(.zen) #app > main {
+html[data-register='tutor'] body:not(.zen) #app > main {
   --ed-paper: var(--sheet-ground);
   --ed-ink: var(--sheet-ink);
   --ed-muted: var(--sheet-ink-2);
@@ -747,7 +747,7 @@ html[data-room='tutor'] body:not(.zen) #app > main {
   --ed-rule-light: var(--sheet-line-soft);
   background: var(--sheet-ground);
 }
-html[data-room='tutor'] main button.japanese-lookup-word { border: 0; background: transparent; color: inherit; }
+html[data-register='tutor'] main button.japanese-lookup-word { border: 0; background: transparent; color: inherit; }
 
 /* Narrow pages keep the same hierarchy, with a one-column reading measure. */
 @media (min-width: 900px) {
@@ -801,8 +801,8 @@ html[data-room='tutor'] main button.japanese-lookup-word { border: 0; background
   .assessment-room .exam-paper { padding-top: 22px; }
   .assessment-room .exam-task-heading { font-size: 19px; }
   .exam-task-instruction { font-size: 16px; }
-  html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
-  html[data-room='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: 19px; }
+  html[data-register='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
+  html[data-register='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: 19px; }
   .exam-option-row { gap: 12px; }
   .exam-option-text { font-size: 19px; }
   .stroke-speed-wrap.stroke-corner { width: min(196px, calc((100vw - 88px) / 2)); padding: 10px 8px; gap: 4px 8px; }
@@ -904,8 +904,8 @@ body.v-depth-layered .chip.t-radical { background: var(--fill); color: var(--lab
 body.v-depth-layered .chip.t-idiom { background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
 /* fields: one quiet iOS look — a grey fill, 12px corners, no outline until focus (the tutor's
    lacquer room keeps its own) */
-html:not([data-room='tutor']) body .search-field,
-html:not([data-room='tutor']) body .record-note-input {
+html:not([data-register='tutor']) body .search-field,
+html:not([data-register='tutor']) body .record-note-input {
   border: 0;
   border-radius: var(--r-control);
   background-color: var(--fill);
@@ -914,8 +914,8 @@ html:not([data-room='tutor']) body .record-note-input {
   box-shadow: none;
   transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-html:not([data-room='tutor']) body .search-field:focus,
-html:not([data-room='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
+html:not([data-register='tutor']) body .search-field:focus,
+html:not([data-register='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
 /* the two words of a label centre in the door; the English drops a pixel to sit on the Japanese line */
 body .chip:has(> .l-ja) { flex-direction: row; align-items: center; gap: 6px; }
 body .chip:has(> .l-ja) > .en-sub { position: relative; top: 1px; }
@@ -1040,7 +1040,7 @@ body[data-view='shelf'] main > .eyebrow:first-child { display: none; }
   box-shadow: none;
 }
 /* the look-up field: an iOS search field, a grey fill and a quiet glass */
-html[data-room='shelf'] .search-field {
+html[data-register='shelf'] .search-field {
   min-height: 44px;
   padding: 8px 14px 8px 40px;
   margin: 0 0 var(--s3);
@@ -1052,8 +1052,8 @@ html[data-room='shelf'] .search-field {
   font: 17px/1.4 var(--sans);
   transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-html[data-room='shelf'] .search-field:focus { background-color: var(--surface); box-shadow: 0 0 0 1px var(--separator), var(--shadow-card); outline: none; }
-html[data-room='shelf'] .search-field::placeholder { color: color-mix(in srgb, var(--label) 58%, transparent); }
+html[data-register='shelf'] .search-field:focus { background-color: var(--surface); box-shadow: 0 0 0 1px var(--separator), var(--shadow-card); outline: none; }
+html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srgb, var(--label) 58%, transparent); }
 #shelf-body { display: block; }
 #shelf-body > * { grid-column: auto; }
 
@@ -2002,7 +2002,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
 }
 @media (max-width: 520px) {
   :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
-  html[data-room='shelf'] .search-field { margin-bottom: var(--s2); }
+  html[data-register='shelf'] .search-field { margin-bottom: var(--s2); }
   .shelf-masthead { gap: var(--s2); padding-bottom: 12px; }
   #shelf-body .shelf-masthead h1 { font-size: 34px; }
   #shelf-body .shelf-masthead h1 .en-inline { display: block; margin: 4px 0 0; font-size: 13px; vertical-align: 0; }
@@ -2569,7 +2569,7 @@ body .reference-library .reference-level-unknown { min-height: 0; }
    level colours carry how many tests each level holds, the last score there
    and a progress line; the lengths are one segmented control; each test is a
    raised tile; unreviewed tests wear one 未確認 chip. */
-html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+html[data-register='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   width: calc(100% - 2 * var(--s3));
   max-width: 1040px;
   margin: 0 auto var(--s8);
@@ -2578,13 +2578,13 @@ html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='d
   background: transparent;
   box-shadow: none;
 }
-html[data-room='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(32px, 4vw, 44px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
-html[data-room='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 16px/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
-html[data-room='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: 16px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(32px, 4vw, 44px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+html[data-register='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 16px/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
+html[data-register='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: 16px/1.6 var(--sans); color: var(--text-2); }
 
 /* the level cards */
-html[data-room='jlpt'] .exam-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); margin: 0 0 var(--s3); }
-html[data-room='jlpt'] .exam-levels .chip.exam-level-card {
+html[data-register='jlpt'] .exam-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); margin: 0 0 var(--s3); }
+html[data-register='jlpt'] .exam-levels .chip.exam-level-card {
   position: relative;
   display: grid;
   align-content: start;
@@ -2601,11 +2601,11 @@ html[data-room='jlpt'] .exam-levels .chip.exam-level-card {
   text-align: start;
   transition: box-shadow 180ms ease-out, transform 180ms ease-out;
 }
-@media (hover: hover) { html[data-room='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
-html[data-room='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
-html[data-room='jlpt'] .exam-level-tests { font: 600 14px/1.4 var(--sans); color: var(--text); }
-html[data-room='jlpt'] .exam-level-last { font: 13px/1.4 var(--sans); color: var(--text-2); font-variant-numeric: tabular-nums; }
-html[data-room='jlpt'] .exam-level-progress {
+@media (hover: hover) { html[data-register='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+html[data-register='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
+html[data-register='jlpt'] .exam-level-tests { font: 600 14px/1.4 var(--sans); color: var(--text); }
+html[data-register='jlpt'] .exam-level-last { font: 13px/1.4 var(--sans); color: var(--text-2); font-variant-numeric: tabular-nums; }
+html[data-register='jlpt'] .exam-level-progress {
   position: absolute;
   left: var(--s2);
   right: var(--s2);
@@ -2615,25 +2615,25 @@ html[data-room='jlpt'] .exam-level-progress {
   border-radius: 2px;
   background: color-mix(in srgb, var(--lv) 16%, transparent);
 }
-html[data-room='jlpt'] .exam-level-progress::after {
+html[data-register='jlpt'] .exam-level-progress::after {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--done, 0) * 100%);
   background: var(--lv);
 }
-html[data-room='jlpt'] .exam-levels .chip.exam-level-card[aria-pressed='true'] {
+html[data-register='jlpt'] .exam-levels .chip.exam-level-card[aria-pressed='true'] {
   border-color: var(--lv);
   background: var(--lv);
   box-shadow: 0 2px 4px color-mix(in srgb, var(--lv) 30%, transparent), 0 16px 32px -16px color-mix(in srgb, var(--lv) 70%, transparent);
   color: #fbf7ee;
 }
-html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: #fbf7ee; }
-html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress { background: rgb(255 255 255 / 26%); }
-html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: #fbf7ee; }
+html[data-register='jlpt'] .exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: #fbf7ee; }
+html[data-register='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress { background: rgb(255 255 255 / 26%); }
+html[data-register='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: #fbf7ee; }
 
 /* the lengths: one segmented control */
-html[data-room='jlpt'] .exam-lengths {
+html[data-register='jlpt'] .exam-lengths {
   display: inline-grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
@@ -2644,7 +2644,7 @@ html[data-room='jlpt'] .exam-lengths {
   border-radius: 14px;
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
-html[data-room='jlpt'] .exam-length {
+html[data-register='jlpt'] .exam-length {
   display: grid;
   gap: 2px;
   min-height: 56px;
@@ -2657,35 +2657,35 @@ html[data-room='jlpt'] .exam-length {
   font: 700 16px/1.3 var(--sans);
   text-align: center;
 }
-html[data-room='jlpt'] .exam-length-time { margin: 0; font: 12px/1.3 var(--sans); letter-spacing: 0.01em; color: inherit; opacity: 0.9; }
-html[data-room='jlpt'] .exam-length[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
+html[data-register='jlpt'] .exam-length-time { margin: 0; font: 12px/1.3 var(--sans); letter-spacing: 0.01em; color: inherit; opacity: 0.9; }
+html[data-register='jlpt'] .exam-length[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
 
 /* the guided session: the recommended first step */
-html[data-room='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); border: 0; }
-html[data-room='jlpt'] .study-hall.guided-entry .study-door {
+html[data-register='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); border: 0; }
+html[data-register='jlpt'] .study-hall.guided-entry .study-door {
   padding: 20px var(--s3);
   border: 1px solid var(--raised-edge);
   border-radius: 12px;
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
-@media (hover: hover) { html[data-room='jlpt'] .study-hall.guided-entry .study-door:hover { box-shadow: var(--raised-shadow-hover); background: var(--raised); } }
+@media (hover: hover) { html[data-register='jlpt'] .study-hall.guided-entry .study-door:hover { box-shadow: var(--raised-shadow-hover); background: var(--raised); } }
 
 /* sections and test tiles */
-html[data-room='jlpt'] h2.exam-section-heading {
+html[data-register='jlpt'] h2.exam-section-heading {
   margin: var(--s5) 0 var(--s1);
   padding-top: var(--s2);
   border-top: 2px solid var(--rule-strong);
   font: 800 24px/1.35 var(--display);
   color: var(--text);
 }
-html[data-room='jlpt'] h2.exam-section-heading .en-inline { margin-left: var(--s1); font: 500 15px/1.4 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
-html[data-room='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
-html[data-room='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
-html[data-room='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
-html[data-room='jlpt'] .exam-machine-label { display: flex; align-items: center; gap: var(--s1); margin: 0; font: 13px/1.5 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .exam-written > .exam-status { margin: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .assessment-room .exam-form {
+html[data-register='jlpt'] h2.exam-section-heading .en-inline { margin-left: var(--s1); font: 500 15px/1.4 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+html[data-register='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
+html[data-register='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
+html[data-register='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
+html[data-register='jlpt'] .exam-machine-label { display: flex; align-items: center; gap: var(--s1); margin: 0; font: 13px/1.5 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .exam-written > .exam-status { margin: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .assessment-room .exam-form {
   display: grid;
   align-content: start;
   gap: var(--s1);
@@ -2696,11 +2696,11 @@ html[data-room='jlpt'] .assessment-room .exam-form {
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
-html[data-room='jlpt'] .exam-written .exam-form { margin: 0; }
-html[data-room='jlpt'] .assessment-room .exam-form h2 { margin: 0; font: 800 22px/1.35 var(--display); color: var(--text); }
-html[data-room='jlpt'] .exam-form-meta { margin: 0; font: 600 15px/1.5 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
-html[data-room='jlpt'] .exam-form .exam-skills, html[data-room='jlpt'] .exam-form .exam-status { margin: 0; font: 14px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .exam-form button.take {
+html[data-register='jlpt'] .exam-written .exam-form { margin: 0; }
+html[data-register='jlpt'] .assessment-room .exam-form h2 { margin: 0; font: 800 22px/1.35 var(--display); color: var(--text); }
+html[data-register='jlpt'] .exam-form-meta { margin: 0; font: 600 15px/1.5 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
+html[data-register='jlpt'] .exam-form .exam-skills, html[data-register='jlpt'] .exam-form .exam-status { margin: 0; font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .exam-form button.take {
   justify-self: start;
   min-height: 44px;
   margin-top: var(--s1);
@@ -2712,11 +2712,11 @@ html[data-room='jlpt'] .exam-form button.take {
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
   font: 700 15px/1 var(--sans);
 }
-html[data-room='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
-html[data-room='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
-html[data-room='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
-html[data-room='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
+html[data-register='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
+html[data-register='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
+html[data-register='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
+html[data-register='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .exam-older .entry-row.exam-older-set {
   min-height: 56px;
   margin: 0;
   padding: 10px var(--s2);
@@ -2725,7 +2725,7 @@ html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
   border-radius: 0;
   background: transparent;
 }
-html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
+html[data-register='jlpt'] :is(#exam-legacy, #exam-history) {
   min-height: 44px;
   margin: var(--s2) var(--s2) 0 0;
   padding: 0;
@@ -2740,7 +2740,7 @@ html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
 .exam-review-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
 /* one secondary-button look for the room's quieter actions: the real-test import and the
    confirm sheet's alternatives sit beside the navy Start as outlined buttons, not serif chips */
-html[data-room='jlpt'] .exam-official .exam-official-import,
+html[data-register='jlpt'] .exam-official .exam-official-import,
 .assessment-room .exam-confirm > button:not(.take) {
   display: inline-flex;
   align-items: center;
@@ -2758,30 +2758,30 @@ html[data-room='jlpt'] .exam-official .exam-official-import,
   cursor: pointer;
 }
 @media (hover: hover) {
-  html[data-room='jlpt'] .exam-official .exam-official-import:hover,
+  html[data-register='jlpt'] .exam-official .exam-official-import:hover,
   .assessment-room .exam-confirm > button:not(.take):hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 }
 .assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
-html[data-room='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
+html[data-register='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
 /* the real-paper section is ruled by its heading like every other section, not boxed in hairlines too */
-html[data-room='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
-html[data-room='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
+html[data-register='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
+html[data-register='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
 @media (max-width: 760px) {
-  html[data-room='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
+  html[data-register='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
-  html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  html[data-register='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
   /* five compact cards in one row: the level, its tests, and the last score once there is one */
-  html[data-room='jlpt'] .exam-levels { gap: 6px; }
-  html[data-room='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
-  html[data-room='jlpt'] .exam-level-name { font-size: 24px; }
-  html[data-room='jlpt'] .exam-level-tests { font-size: 12px; }
-  html[data-room='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
-  html[data-room='jlpt'] .exam-level-last { font-size: 11.5px; }
-  html[data-room='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
-  html[data-room='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
-  html[data-room='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
-  html[data-room='jlpt'] h2.exam-section-heading .en-inline { display: block; margin: 4px 0 0; font-size: 14px; }
+  html[data-register='jlpt'] .exam-levels { gap: 6px; }
+  html[data-register='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
+  html[data-register='jlpt'] .exam-level-name { font-size: 24px; }
+  html[data-register='jlpt'] .exam-level-tests { font-size: 12px; }
+  html[data-register='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
+  html[data-register='jlpt'] .exam-level-last { font-size: 11.5px; }
+  html[data-register='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
+  html[data-register='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
+  html[data-register='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
+  html[data-register='jlpt'] h2.exam-section-heading .en-inline { display: block; margin: 4px 0 0; font-size: 14px; }
 }
 
 /* ------------------------------------------------------------------ step 4b
@@ -2790,7 +2790,7 @@ html[data-room='jlpt'] .assessment-room .exam-official > h2.exam-section-heading
    raised paper carrying the 問題 header, the instruction and the numbered
    question; the answer numbers are calm outlined squares that fill indigo
    when chosen. Study and timed behaviour are unchanged. */
-html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+html[data-register='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   width: calc(100% - 2 * var(--s3));
   max-width: 860px;
   margin: 0 auto var(--s8);
@@ -2799,8 +2799,8 @@ html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view
   background: transparent;
   box-shadow: none;
 }
-html[data-room='attempt'] .assessment-room > h1.exam-heading { margin: 0 0 var(--s1); font: 800 28px/1.3 var(--display); color: var(--text); }
-html[data-room='attempt'] .exam-mode-badge {
+html[data-register='attempt'] .assessment-room > h1.exam-heading { margin: 0 0 var(--s1); font: 800 28px/1.3 var(--display); color: var(--text); }
+html[data-register='attempt'] .exam-mode-badge {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -2812,13 +2812,13 @@ html[data-room='attempt'] .exam-mode-badge {
   color: var(--ai);
   font: 700 13px/1 var(--sans);
 }
-html[data-room='attempt'][data-exam-mode='timed'] .exam-mode-badge, html[data-room='attempt'] main[data-exam-mode='timed'] .exam-mode-badge {
+html[data-register='attempt'][data-exam-mode='timed'] .exam-mode-badge, html[data-register='attempt'] main[data-exam-mode='timed'] .exam-mode-badge {
   border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   background: var(--accent-wash);
   color: var(--accent);
 }
-html[data-room='attempt'] .exam-scope-note { display: inline; margin: 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='attempt'] .exam-progress {
+html[data-register='attempt'] .exam-scope-note { display: inline; margin: 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='attempt'] .exam-progress {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2833,7 +2833,7 @@ html[data-room='attempt'] .exam-progress {
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
-html[data-room='attempt'] .exam-timer {
+html[data-register='attempt'] .exam-timer {
   display: inline-flex;
   align-items: center;
   min-height: 34px;
@@ -2845,16 +2845,16 @@ html[data-room='attempt'] .exam-timer {
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
 }
-html[data-room='attempt'] .exam-timer:not(:has(*)):is(:empty) { display: none; }
-html[data-room='attempt'] .assessment-room { display: flex; }
-html[data-room='attempt'] .assessment-room { flex-flow: row wrap; align-items: center; column-gap: var(--s1); }
-html[data-room='attempt'] .assessment-room > * { flex: 1 1 100%; }
-html[data-room='attempt'] .assessment-room > :is(.exam-mode-badge, .exam-scope-note, .exam-machine-label) { flex: 0 0 auto; align-self: center; margin-block: 0; }
-html[data-room='attempt'] .assessment-room > .exam-scope-note { flex: 0 1 auto; min-width: 0; }
-html[data-room='attempt'] .assessment-room > #exam-flag { flex: 0 0 auto; }
-html[data-room='attempt'] .exam-save { order: 1; margin: -16px 0 var(--s2); font: 12px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--text-2); text-align: end; }
-html[data-room='attempt'] .assessment-room > :is(#exam-flag, .exam-bookmark-note, .mock-nav, .exam-question-map, .exam-leave-controls) { order: 2; }
-html[data-room='attempt'] .assessment-room .exam-paper {
+html[data-register='attempt'] .exam-timer:not(:has(*)):is(:empty) { display: none; }
+html[data-register='attempt'] .assessment-room { display: flex; }
+html[data-register='attempt'] .assessment-room { flex-flow: row wrap; align-items: center; column-gap: var(--s1); }
+html[data-register='attempt'] .assessment-room > * { flex: 1 1 100%; }
+html[data-register='attempt'] .assessment-room > :is(.exam-mode-badge, .exam-scope-note, .exam-machine-label) { flex: 0 0 auto; align-self: center; margin-block: 0; }
+html[data-register='attempt'] .assessment-room > .exam-scope-note { flex: 0 1 auto; min-width: 0; }
+html[data-register='attempt'] .assessment-room > #exam-flag { flex: 0 0 auto; }
+html[data-register='attempt'] .exam-save { order: 1; margin: -16px 0 var(--s2); font: 12px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--text-2); text-align: end; }
+html[data-register='attempt'] .assessment-room > :is(#exam-flag, .exam-bookmark-note, .mock-nav, .exam-question-map, .exam-leave-controls) { order: 2; }
+html[data-register='attempt'] .assessment-room .exam-paper {
   margin: 0 0 var(--s3);
   padding: var(--s4) clamp(20px, 5vw, 56px) var(--s3);
   border: 1px solid var(--raised-edge);
@@ -2863,16 +2863,16 @@ html[data-room='attempt'] .assessment-room .exam-paper {
   background: var(--washi) 0 0 / 300px 300px, var(--raised);
   box-shadow: var(--raised-shadow);
 }
-html[data-room='attempt'] .exam-paper-header {
+html[data-register='attempt'] .exam-paper-header {
   margin: 0 0 var(--s3);
   padding: 0 0 var(--s2);
   border-bottom: 2px solid var(--rule-strong);
 }
-html[data-room='attempt'] .exam-paper .exam-skill { margin: 0 0 var(--s1); padding: 0; border: 0; font: 600 13px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--text-2); }
-html[data-room='attempt'] .assessment-room .exam-task-heading { margin: 0 0 var(--s1); font: 800 24px/1.45 var(--display); letter-spacing: 0.02em; color: var(--text); }
-html[data-room='attempt'] .exam-task-instruction { margin: 0; font: 17px/1.9 var(--serif); color: var(--text); }
-html[data-room='attempt'] .exam-paper .exam-prompt { font: 22px/2 var(--serif); color: var(--text); }
-html[data-room='attempt'] .exam-question-number {
+html[data-register='attempt'] .exam-paper .exam-skill { margin: 0 0 var(--s1); padding: 0; border: 0; font: 600 13px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--text-2); }
+html[data-register='attempt'] .assessment-room .exam-task-heading { margin: 0 0 var(--s1); font: 800 24px/1.45 var(--display); letter-spacing: 0.02em; color: var(--text); }
+html[data-register='attempt'] .exam-task-instruction { margin: 0; font: 17px/1.9 var(--serif); color: var(--text); }
+html[data-register='attempt'] .exam-paper .exam-prompt { font: 22px/2 var(--serif); color: var(--text); }
+html[data-register='attempt'] .exam-question-number {
   display: inline-grid;
   place-items: center;
   min-width: 34px;
@@ -2883,11 +2883,11 @@ html[data-room='attempt'] .exam-question-number {
   font: 700 18px/1 var(--sans);
   vertical-align: 4px;
 }
-html[data-room='attempt'] .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.28em; text-decoration-color: var(--text); }
-html[data-room='attempt'] .exam-paper .exam-instruction { padding: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); background: transparent; box-shadow: none; }
-html[data-room='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
-html[data-room='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: 6px; }
-html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number, html[data-room='attempt'] .exam-paper .mock-opt.exam-option-number {
+html[data-register='attempt'] .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.28em; text-decoration-color: var(--text); }
+html[data-register='attempt'] .exam-paper .exam-instruction { padding: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); background: transparent; box-shadow: none; }
+html[data-register='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
+html[data-register='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: 6px; }
+html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number, html[data-register='attempt'] .exam-paper .mock-opt.exam-option-number {
   display: grid;
   place-items: center;
   width: 44px;
@@ -2902,19 +2902,19 @@ html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number, html
   font: 700 18px/1 var(--sans);
   font-variant-numeric: tabular-nums;
 }
-@media (hover: hover) { html[data-room='attempt'] .exam-paper .exam-option-number:hover { border-color: var(--ai); color: var(--ai); background: var(--ai-wash); } }
-html[data-room='attempt'] .exam-paper .exam-option-number:is([aria-checked='true'], [aria-pressed='true']) {
+@media (hover: hover) { html[data-register='attempt'] .exam-paper .exam-option-number:hover { border-color: var(--ai); color: var(--ai); background: var(--ai-wash); } }
+html[data-register='attempt'] .exam-paper .exam-option-number:is([aria-checked='true'], [aria-pressed='true']) {
   border-color: var(--ai);
   background: var(--ai);
   color: var(--raised);
 }
-html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
-html[data-room='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
-html[data-room='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
-html[data-room='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
-html[data-room='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
-html[data-room='attempt'] .mock-nav .take, html[data-room='attempt'] #exam-finish-block {
+html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
+html[data-register='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
+html[data-register='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
+html[data-register='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+html[data-register='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
+html[data-register='attempt'] .mock-nav .take, html[data-register='attempt'] #exam-finish-block {
   min-height: 48px;
   padding: 0 var(--s4);
   border: 1px solid var(--ai);
@@ -2924,15 +2924,15 @@ html[data-room='attempt'] .mock-nav .take, html[data-room='attempt'] #exam-finis
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
   font: 700 16px/1 var(--sans);
 }
-html[data-room='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: 10px; background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
+html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: 10px; background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
 @media (max-width: 520px) {
-  html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
-  html[data-room='attempt'] .assessment-room .exam-paper { padding: var(--s3) var(--s2) var(--s2); }
-  html[data-room='attempt'] .exam-progress { padding: 8px 10px 8px 14px; font-size: 14px; }
-  html[data-room='attempt'] .exam-timer { font-size: 16px; min-height: 30px; padding: 0 10px; }
-  html[data-room='attempt'] .assessment-room .exam-task-heading { font-size: 21px; }
-  html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
-  html[data-room='attempt'] .exam-option-text { font-size: 19px; }
+  html[data-register='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  html[data-register='attempt'] .assessment-room .exam-paper { padding: var(--s3) var(--s2) var(--s2); }
+  html[data-register='attempt'] .exam-progress { padding: 8px 10px 8px 14px; font-size: 14px; }
+  html[data-register='attempt'] .exam-timer { font-size: 16px; min-height: 30px; padding: 0 10px; }
+  html[data-register='attempt'] .assessment-room .exam-task-heading { font-size: 21px; }
+  html[data-register='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
+  html[data-register='attempt'] .exam-option-text { font-size: 19px; }
 }
 
 /* ------------------------------------------------------------------ R4 focus
@@ -3717,9 +3717,9 @@ body.has-primary-tabs:has(#sheet, #stroke-page, .kp-sheet-wrap, [role='dialog'])
 .learn-section { padding-top: var(--space-2); }
 .learn-section + .learn-section { border-top: var(--stroke-relief) solid var(--color-edge-strong); }
 .foundation-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-3); }
-.foundation-doors .foundation-door { min-height: var(--hit-min); margin: 0; }
-.settings-language { display: inline-flex; min-height: var(--hit-min); }
-.settings-language button { min-height: var(--hit-min); padding-inline: var(--space-4); }
+.foundation-doors .foundation-door { min-height: var(--hit); margin: 0; }
+.settings-language { display: inline-flex; min-height: var(--hit); }
+.settings-language button { min-height: var(--hit); padding-inline: var(--space-4); }
 @media (max-width: 520px) {
   body.has-primary-tabs[data-view='reader']:not(.zen) #app::after {
     bottom: var(--nav-clearance);

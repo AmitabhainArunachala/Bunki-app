@@ -28360,16 +28360,30 @@ function renderWordsDoors(main) {
   section.append(doors); main.append(section);
 }
 
-/* The whole-app register (register.css) gives each purpose its own material. It keys on
- * <html data-room>, stamped here after every render from what the room actually drew — the
- * same rules the 2026-09-24 register study walked across 13 rooms — plus the attempt's stage
+/* Rooms expose their purpose independently from the existing material register.
+ * Concepts use data-room; data-register retains the stage-sensitive CSS from
+ * the 2026-09-24 register study — plus the attempt's stage
  * (--stage), whether an answer exists (data-answered), and the shelf's three grades of door. */
+const ROOM_IDS = {
+  drift: 'door', entry: 'entry', shelf: 'shelf', reader: 'reader', tray: 'tray',
+  list: 'list', browse: 'browse', 'srs-stats': 'progress', review: 'review',
+  probe: 'probe', archive: 'archive', dojo: 'learn', deckplay: 'deckplay',
+  contextdeck: 'contextdeck', personaldeck: 'personal', aiquiz: 'quiz',
+  levels: 'reference', ai: 'tutor', lessons: 'lessons', mock: 'jlpt',
+  kagami: 'progress', thesaurus: 'word-web', airead: 'personal-reading',
+  feed: 'feed', publisher: 'publisher', 'source-inbox': 'source-inbox',
+  'source-reader': 'source-reader', 'sentence-practice': 'sentence-practice',
+  kanjidex: 'kanji', yoji: 'idioms', grammar: 'grammar', guided: 'guided',
+  search: 'search', me: 'me', settings: 'settings',
+};
 const REGISTER_ROOM_DOORS = [['いまの日本を読む', 'news & magazines'], ['日本語を持ち込む', 'bring your own text'], ['参考書庫', 'Reference library'], ['レッスン', 'Lessons'], ['JLPT の練習', 'JLPT practice']];
 const REGISTER_LINE_DOORS = [['読み物の好み', 'Reading preferences']];
 function stampRegister() {
   const html = document.documentElement;
   const main = document.querySelector('#app > main');
-  const room = document.body.classList.contains('ginga') || !main ? 'door'
+  const room = ROOM_IDS[S.view] || S.view || 'door';
+  const material = S.view === 'personaldeck' ? 'hall'
+    : document.body.classList.contains('ginga') || !main ? 'door'
     : main.querySelector('.mock-opts, .mock-q, .guided-room[data-stage="question"]') ? 'attempt'
       : main.querySelector('.exam-confirm') ? 'threshold'
         : main.querySelector('.exam-score') ? 'results'
@@ -28377,8 +28391,9 @@ function stampRegister() {
             : main.querySelector('.chat-log') ? 'tutor'
               : main.querySelector('#shelf-body') ? 'shelf'
                 : main.querySelector('.mock-review') ? 'review' : 'hall';
-  if (html.dataset.room !== room) {
+  if (html.dataset.room !== room || html.dataset.register !== material) {
     html.dataset.room = room;
+    html.dataset.register = material;
     // one beat of entrance motion on arrival only (register.css keys the lift on this)
     html.dataset.roomEntering = '1';
     clearTimeout(stampRegister.enterTimer);

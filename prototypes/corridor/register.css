@@ -118,18 +118,18 @@
 }
 
 /* T8 — during an attempt the chrome collapses to 戻る · progress · seal */
-html[data-room="attempt"] .chrome {
+html[data-register="attempt"] .chrome {
   background: var(--ground);
   border-bottom-color: var(--line-soft);
 }
-html[data-room="attempt"] .chrome .chrome-search,
-html[data-room="attempt"] .chrome .chrome-dojo,
-html[data-room="attempt"] .chrome .lang-seg,
-html[data-room="attempt"] .chrome > button:last-child { display: none; }
-html[data-room="attempt"] .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--faint); font-size: 13px; }
+html[data-register="attempt"] .chrome .chrome-search,
+html[data-register="attempt"] .chrome .chrome-dojo,
+html[data-register="attempt"] .chrome .lang-seg,
+html[data-register="attempt"] .chrome > button:last-child { display: none; }
+html[data-register="attempt"] .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--faint); font-size: 13px; }
 
 /* the stage bar — place in the sitting, 3 px of ink under the mast */
-html[data-room="attempt"] .chrome::after {
+html[data-register="attempt"] .chrome::after {
   content: '';
   position: absolute;
   left: 0; right: 0; bottom: -1px;
@@ -183,7 +183,7 @@ main h2 {
 /* ---------------------------------------------------------------- 3 · SHELF
    Three grades of door — rooms as washi plates · tools as stones · a
    preference as a line — so the hall has hierarchy before it has type. */
-html[data-room="shelf"] .search-field {
+html[data-register="shelf"] .search-field {
   background: transparent;
   border: 0;
   border-bottom: var(--rule);
@@ -194,7 +194,7 @@ html[data-room="shelf"] .search-field {
   margin: 0 0 22px;
   color: var(--ink-2);
 }
-html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
+html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
 #shelf-body { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
 /* only the graded doors share a row; everything else on the shelf (reading cards, headings,
    sections, notes) keeps the full measure — in the study every reading card fell into one of
@@ -262,7 +262,7 @@ html[data-room="shelf"] .search-field::placeholder { color: var(--faint); }
 /* ------------------------------------------------------------ 4 · JLPT ROOM
    A room, not a form: bilingual name, five level seals, three lengths as
    sheets with the time beneath, the offered practice as one washi plate. */
-html[data-room="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); margin: 10px 0 18px; }
+html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); margin: 10px 0 18px; }
 .exam-levels { gap: 8px; margin: 0 0 14px; }
 .exam-levels .chip {
   font-family: var(--display);
@@ -322,8 +322,8 @@ html[data-room="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); margi
    the bold title; the stem is the largest reading text; the choices are
    numbered in the margin; the one navy verb is the commit. "Saved" does not
    say so before an answer exists (§8.7). */
-html[data-room="attempt"] main { padding-top: 10px; }
-html[data-room="attempt"] h1.exam-heading {
+html[data-register="attempt"] main { padding-top: 10px; }
+html[data-register="attempt"] h1.exam-heading {
   font-family: var(--sans);
   font-size: 11px;
   letter-spacing: 0.16em;
@@ -331,18 +331,18 @@ html[data-room="attempt"] h1.exam-heading {
   font-weight: 400;
   margin: 8px 0 2px;
 }
-html[data-room="attempt"] .exam-progress {
+html[data-register="attempt"] .exam-progress {
   font-family: var(--sans);
   font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--ink-2);
   margin: 0 0 4px;
 }
-html[data-room="attempt"] .exam-timer { color: var(--red); font-variant-numeric: tabular-nums; }
-html[data-room="attempt"] .exam-save { margin: 0 0 10px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
-html[data-room="attempt"]:not([data-answered]) .exam-save,
-html[data-room="attempt"]:not([data-answered]) .mock-attempt-policy { visibility: hidden; }
-html[data-room="attempt"] .exam-skill {
+html[data-register="attempt"] .exam-timer { color: var(--red); font-variant-numeric: tabular-nums; }
+html[data-register="attempt"] .exam-save { margin: 0 0 10px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
+html[data-register="attempt"]:not([data-answered]) .exam-save,
+html[data-register="attempt"]:not([data-answered]) .mock-attempt-policy { visibility: hidden; }
+html[data-register="attempt"] .exam-skill {
   font-family: var(--display);
   font-size: 13px;
   letter-spacing: 0.06em;
@@ -351,8 +351,8 @@ html[data-room="attempt"] .exam-skill {
   padding-bottom: 6px;
   border-bottom: var(--rule);
 }
-html[data-room="attempt"] .exam-prompt,
-html[data-room="attempt"] .mock-q {
+html[data-register="attempt"] .exam-prompt,
+html[data-register="attempt"] .mock-q {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-bottom: 0;
@@ -364,7 +364,7 @@ html[data-room="attempt"] .mock-q {
   line-height: 1.9;
   color: var(--ink);
 }
-html[data-room="attempt"] .exam-instruction {
+html[data-register="attempt"] .exam-instruction {
   background: var(--ground-0);
   border-inline: var(--paper-edge);
   margin: 0;
@@ -374,8 +374,8 @@ html[data-room="attempt"] .exam-instruction {
   letter-spacing: 0.06em;
   color: var(--faint);
 }
-html[data-room="attempt"] .mock-opts,
-html[data-room="attempt"] .mock-q + .lesson-options {
+html[data-register="attempt"] .mock-opts,
+html[data-register="attempt"] .mock-q + .lesson-options {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-top: 0;
@@ -388,27 +388,27 @@ html[data-room="attempt"] .mock-q + .lesson-options {
 }
 /* audio, an image or a notice can stand between the prompt and the choices: a piece
    that ends or starts the sheet alone keeps its own edge, and a passage is its own paper */
-html[data-room="attempt"] .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)),
-html[data-room="attempt"] .exam-instruction:not(:has(+ .mock-opts)) {
+html[data-register="attempt"] .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)),
+html[data-register="attempt"] .exam-instruction:not(:has(+ .mock-opts)) {
   border-bottom: var(--paper-edge);
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   box-shadow: var(--paper-shadow);
 }
-html[data-room="attempt"] :not(.exam-prompt, .exam-instruction) + .mock-opts {
+html[data-register="attempt"] :not(.exam-prompt, .exam-instruction) + .mock-opts {
   border-top: var(--paper-edge);
   border-radius: 6px;
   margin-top: 12px;
 }
-html[data-room="attempt"] .exam-passage {
+html[data-register="attempt"] .exam-passage {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-radius: 6px;
   box-shadow: var(--paper-shadow);
   padding: 16px 18px;
 }
-html[data-room="attempt"] .mock-opt,
-html[data-room="attempt"] .lesson-option {
+html[data-register="attempt"] .mock-opt,
+html[data-register="attempt"] .lesson-option {
   font-family: var(--serif);
   background: transparent;
   border: 0;
@@ -423,27 +423,27 @@ html[data-room="attempt"] .lesson-option {
   color: var(--ink);
   transition: background 120ms ease-out;
 }
-html[data-room="attempt"] .mock-opt:first-child,
-html[data-room="attempt"] .lesson-option:first-child { border-top: 0; }
+html[data-register="attempt"] .mock-opt:first-child,
+html[data-register="attempt"] .lesson-option:first-child { border-top: 0; }
 @media (hover: hover) {
-  html[data-room="attempt"] .mock-opt:hover,
-  html[data-room="attempt"] .lesson-option:hover { background: var(--ai-wash); }
+  html[data-register="attempt"] .mock-opt:hover,
+  html[data-register="attempt"] .lesson-option:hover { background: var(--ai-wash); }
 }
-html[data-room="attempt"] .mock-opt[aria-pressed="true"],
-html[data-room="attempt"] .mock-opt[aria-checked="true"],
-html[data-room="attempt"] .mock-opt.chosen,
-html[data-room="attempt"] .mock-opt.selected,
-html[data-room="attempt"] .lesson-option.picked {
+html[data-register="attempt"] .mock-opt[aria-pressed="true"],
+html[data-register="attempt"] .mock-opt[aria-checked="true"],
+html[data-register="attempt"] .mock-opt.chosen,
+html[data-register="attempt"] .mock-opt.selected,
+html[data-register="attempt"] .lesson-option.picked {
   background: var(--ink);
   color: var(--ground-0);
   border-radius: 4px;
   border-top-color: transparent;
 }
-html[data-room="attempt"] .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
-html[data-room="attempt"] .mock-opt.right { box-shadow: inset 3px 0 0 var(--ai); }
-html[data-room="attempt"] .mock-nav { display: flex; align-items: center; gap: 12px; }
-html[data-room="attempt"] #exam-flag,
-html[data-room="attempt"] .chip#exam-flag {
+html[data-register="attempt"] .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
+html[data-register="attempt"] .mock-opt.right { box-shadow: inset 3px 0 0 var(--ai); }
+html[data-register="attempt"] .mock-nav { display: flex; align-items: center; gap: 12px; }
+html[data-register="attempt"] #exam-flag,
+html[data-register="attempt"] .chip#exam-flag {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -457,8 +457,8 @@ html[data-room="attempt"] .chip#exam-flag {
   text-underline-offset: 4px;
   text-decoration-color: var(--line);
 }
-html[data-room="attempt"] .exam-question-map summary,
-html[data-room="attempt"] .exam-leave-controls .chip {
+html[data-register="attempt"] .exam-question-map summary,
+html[data-register="attempt"] .exam-leave-controls .chip {
   font-family: var(--sans);
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -466,7 +466,7 @@ html[data-room="attempt"] .exam-leave-controls .chip {
 }
 
 /* the threshold — one sheet, the rule stated, two doors of different weight */
-html[data-room="threshold"] .exam-confirm {
+html[data-register="threshold"] .exam-confirm {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
@@ -474,19 +474,19 @@ html[data-room="threshold"] .exam-confirm {
   padding: 22px 20px;
   margin-top: 12px;
 }
-html[data-room="threshold"] .exam-confirm h1 { font-size: 24px; }
+html[data-register="threshold"] .exam-confirm h1 { font-size: 24px; }
 
 /* ------------------------------------------------------------- 6 · RESULTS
    The number is the headline; two sheets under two section rules; the
    wrong rows keep their red bar — the one screen that already read. */
-html[data-room="results"] .assessment-room > h1.view-title {
+html[data-register="results"] .assessment-room > h1.view-title {
   font-family: var(--sans);
   font-size: 11px;
   letter-spacing: 0.16em;
   color: var(--faint);
   font-weight: 400;
 }
-html[data-room="results"] .exam-score {
+html[data-register="results"] .exam-score {
   font-family: var(--display);
   font-size: 44px;
   line-height: 1.1;
@@ -495,10 +495,10 @@ html[data-room="results"] .exam-score {
   margin: 2px 0 4px;
   font-variant-numeric: tabular-nums;
 }
-html[data-room="results"] .exam-score-note { font-size: 14px; color: var(--ink-2); margin: 0 0 18px; }
-html[data-room="results"] .exam-counts,
-html[data-room="results"] .exam-results-skills,
-html[data-room="results"] .exam-official {
+html[data-register="results"] .exam-score-note { font-size: 14px; color: var(--ink-2); margin: 0 0 18px; }
+html[data-register="results"] .exam-counts,
+html[data-register="results"] .exam-results-skills,
+html[data-register="results"] .exam-official {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
@@ -506,20 +506,20 @@ html[data-room="results"] .exam-official {
   padding: 16px 18px;
   margin: 0 0 14px;
 }
-html[data-room="results"] .exam-counts dt { font-family: var(--sans); font-size: 11px; letter-spacing: 0.14em; color: var(--faint); }
-html[data-room="results"] .exam-counts dd { font-family: var(--display); font-size: 22px; margin: 0; font-variant-numeric: tabular-nums; }
-html[data-room="results"] .exam-results-skills .wrong { box-shadow: inset 3px 0 0 var(--red); padding-inline-start: 12px; }
-html[data-room="results"] .exam-followup { font-size: 15px; color: var(--ink-2); }
-html[data-room="results"] details.exam-answer {
+html[data-register="results"] .exam-counts dt { font-family: var(--sans); font-size: 11px; letter-spacing: 0.14em; color: var(--faint); }
+html[data-register="results"] .exam-counts dd { font-family: var(--display); font-size: 22px; margin: 0; font-variant-numeric: tabular-nums; }
+html[data-register="results"] .exam-results-skills .wrong { box-shadow: inset 3px 0 0 var(--red); padding-inline-start: 12px; }
+html[data-register="results"] .exam-followup { font-size: 15px; color: var(--ink-2); }
+html[data-register="results"] details.exam-answer {
   border-top: var(--rule);
   padding: 10px 0 10px 12px;
   margin: 0;
 }
-html[data-room="results"] details.exam-answer.incorrect { box-shadow: inset 3px 0 0 var(--red); border-inline-start: 0; }
-html[data-room="results"] details.exam-answer.correct summary { color: var(--faint); }
-html[data-room="results"] details.exam-answer summary { font-size: 16px; line-height: 1.7; cursor: pointer; }
-html[data-room="results"] details.exam-answer.incorrect summary { color: var(--ink); }
-html[data-room="results"] #exam-sensei {
+html[data-register="results"] details.exam-answer.incorrect { box-shadow: inset 3px 0 0 var(--red); border-inline-start: 0; }
+html[data-register="results"] details.exam-answer.correct summary { color: var(--faint); }
+html[data-register="results"] details.exam-answer summary { font-size: 16px; line-height: 1.7; cursor: pointer; }
+html[data-register="results"] details.exam-answer.incorrect summary { color: var(--ink); }
+html[data-register="results"] #exam-sensei {
   background: var(--ink);
   color: var(--ground-0);
   border: 0;
@@ -531,23 +531,23 @@ html[data-room="results"] #exam-sensei {
 }
 /* the older sets' review (the N1 検収前 path) is paper too; every row keeps a margin so
    the red bar on a wrong one never sits on its × */
-html[data-room="review"] .mock-review {
+html[data-register="review"] .mock-review {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
   border-radius: 6px;
   padding: 4px 18px;
 }
-html[data-room="review"] .mock-review-row { padding-inline-start: 12px; }
-html[data-room="review"] .mock-review-row.wrong { box-shadow: inset 3px 0 0 var(--red); }
-html[data-room="results"] #exam-undo-additions { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; color: var(--ink-2); }
+html[data-register="review"] .mock-review-row { padding-inline-start: 12px; }
+html[data-register="review"] .mock-review-row.wrong { box-shadow: inset 3px 0 0 var(--red); }
+html[data-register="results"] #exam-undo-additions { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; color: var(--ink-2); }
 
 /* ----------------------------------------------------------- 7 · THE TUTOR
    Understanding is a room of its own material: the lacquer stage, with
    the learner's words and the tutor's on washi cards — the review card's
    two materials, so attempt and understanding feel different. */
-html[data-room="tutor"] body, html[data-room="tutor"] { background: var(--sheet-ground); }
-html[data-room="tutor"] main,
+html[data-register="tutor"] body, html[data-register="tutor"] { background: var(--sheet-ground); }
+html[data-register="tutor"] main,
 .exam-why-sheet {
   background: var(--sheet-ground);
   color: var(--sheet-ink);
@@ -564,21 +564,21 @@ html[data-room="tutor"] main,
   --ground-0: var(--sheet-ground-0);
   --ground-2: var(--sheet-ground-2);
 }
-html[data-room="tutor"] main { min-height: 100vh; }
+html[data-register="tutor"] main { min-height: 100vh; }
 /* the why sheet (T6) is understanding, not the attempt: the tutor's material as a sheet,
    and its verdict red only when the answer was wrong */
 .exam-why-sheet { border-radius: 6px; padding: 18px 18px 14px; margin: 10px 0 16px; }
 .exam-why-verdict { font-family: var(--display); font-size: 22px; }
 .exam-why-verdict[data-verdict="incorrect"] { color: var(--red); }
-html[data-room="tutor"] .chrome { background: var(--sheet-ground); border-bottom-color: var(--sheet-line-soft); }
-html[data-room="tutor"] .chrome > *, html[data-room="tutor"] .chrome .crumb, html[data-room="tutor"] .chrome .lang-seg > * { color: var(--sheet-ink-2); }
-html[data-room="tutor"] .chrome .lang-seg { border-color: var(--sheet-line); }
-html[data-room="tutor"] .chrome > button:first-child, html[data-room="tutor"] .chrome > button:first-child * { color: var(--sheet-ink); }
-html[data-room="tutor"] .chrome > button:first-child small, html[data-room="tutor"] .chrome > button:first-child span:last-child { color: var(--sheet-faint); }
-html[data-room="tutor"] .chrome > button:last-child, html[data-room="tutor"] .chrome > button:last-child * { color: var(--sheet-ink); }
-html[data-room="tutor"] .chrome .lang-seg > [aria-pressed="true"], html[data-room="tutor"] .chrome .lang-seg > .on { background: var(--sheet-ink); color: var(--sheet-ground); }
+html[data-register="tutor"] .chrome { background: var(--sheet-ground); border-bottom-color: var(--sheet-line-soft); }
+html[data-register="tutor"] .chrome > *, html[data-register="tutor"] .chrome .crumb, html[data-register="tutor"] .chrome .lang-seg > * { color: var(--sheet-ink-2); }
+html[data-register="tutor"] .chrome .lang-seg { border-color: var(--sheet-line); }
+html[data-register="tutor"] .chrome > button:first-child, html[data-register="tutor"] .chrome > button:first-child * { color: var(--sheet-ink); }
+html[data-register="tutor"] .chrome > button:first-child small, html[data-register="tutor"] .chrome > button:first-child span:last-child { color: var(--sheet-faint); }
+html[data-register="tutor"] .chrome > button:last-child, html[data-register="tutor"] .chrome > button:last-child * { color: var(--sheet-ink); }
+html[data-register="tutor"] .chrome .lang-seg > [aria-pressed="true"], html[data-register="tutor"] .chrome .lang-seg > .on { background: var(--sheet-ink); color: var(--sheet-ground); }
 /* the sentence under discussion sits on a washi card — the review card's material — on the lacquer stage */
-html[data-room="tutor"] .teacher-context {
+html[data-register="tutor"] .teacher-context {
   background: var(--card-ground);
   color: var(--card-ink);
   --ink: var(--card-ink); --ink-2: var(--card-ink-2); --faint: var(--card-faint); --faint-2: var(--card-faint-2); --line: var(--card-line); --line-soft: var(--card-line-soft); --red: var(--card-red); --red-wash: var(--card-red-wash); --ai: var(--card-ai); --ai-wash: var(--card-ai-wash); --ground-0: var(--card-ground-0); --ground-2: var(--card-ground-2);
@@ -587,11 +587,11 @@ html[data-room="tutor"] .teacher-context {
   margin: 8px 0 18px;
   box-shadow: 0 14px 34px -20px rgba(0,0,0,0.9);
 }
-html[data-room="tutor"] .teacher-context .chip { background: transparent; border: 1px solid var(--card-line); color: var(--card-ink); }
-html[data-room="tutor"] main button:not(.chip) { background: var(--sheet-ground-2); color: var(--sheet-ink); border: 1px solid var(--sheet-line); }
-html[data-room="tutor"] main .view-title { color: var(--sheet-ink); }
-html[data-room="tutor"] .chat-log .chat-row { border: 0; }
-html[data-room="tutor"] .chat-row.tutor, html[data-room="tutor"] .chat-row[data-role="assistant"], html[data-room="tutor"] .chat-row.teacher {
+html[data-register="tutor"] .teacher-context .chip { background: transparent; border: 1px solid var(--card-line); color: var(--card-ink); }
+html[data-register="tutor"] main button:not(.chip) { background: var(--sheet-ground-2); color: var(--sheet-ink); border: 1px solid var(--sheet-line); }
+html[data-register="tutor"] main .view-title { color: var(--sheet-ink); }
+html[data-register="tutor"] .chat-log .chat-row { border: 0; }
+html[data-register="tutor"] .chat-row.tutor, html[data-register="tutor"] .chat-row[data-role="assistant"], html[data-register="tutor"] .chat-row.teacher {
   background: var(--card-ground);
   color: var(--card-ink);
   --ink: var(--card-ink); --ink-2: var(--card-ink-2); --faint: var(--card-faint); --line: var(--card-line); --red: var(--card-red); --ai: var(--card-ai);
@@ -599,25 +599,25 @@ html[data-room="tutor"] .chat-row.tutor, html[data-room="tutor"] .chat-row[data-
   padding: 16px 18px;
   box-shadow: 0 10px 30px -18px rgba(0,0,0,0.8);
 }
-html[data-room="tutor"] .search-field, html[data-room="tutor"] select, html[data-room="tutor"] textarea, html[data-room="tutor"] input {
+html[data-register="tutor"] .search-field, html[data-register="tutor"] select, html[data-register="tutor"] textarea, html[data-register="tutor"] input {
   background: var(--sheet-ground-2);
   color: var(--sheet-ink);
   border-color: var(--sheet-line);
 }
-html[data-room="tutor"] .teacher-note { color: var(--sheet-faint); }
-html[data-room="tutor"] .chat-row { display: flex; gap: 10px; align-items: stretch; }
-html[data-room="tutor"] .chat-row .chat-field { flex: 1 1 auto; border-radius: 6px; }
-html[data-room="tutor"] main button.chat-send, html[data-room="tutor"] main .take { background: var(--sheet-ai); color: var(--sheet-ground); border: 0; border-radius: 6px; font-family: var(--display); min-width: 64px; }
-html[data-room="tutor"] .teacher-context-label, html[data-room="tutor"] label { color: var(--sheet-faint); }
+html[data-register="tutor"] .teacher-note { color: var(--sheet-faint); }
+html[data-register="tutor"] .chat-row { display: flex; gap: 10px; align-items: stretch; }
+html[data-register="tutor"] .chat-row .chat-field { flex: 1 1 auto; border-radius: 6px; }
+html[data-register="tutor"] main button.chat-send, html[data-register="tutor"] main .take { background: var(--sheet-ai); color: var(--sheet-ground); border: 0; border-radius: 6px; font-family: var(--display); min-width: 64px; }
+html[data-register="tutor"] .teacher-context-label, html[data-register="tutor"] label { color: var(--sheet-faint); }
 
 /* ------------------------------------------------------ 8 · THE REPORT LINE
    The report entry lives in each page's own flow (no floating rail since 2026-09-25): two
    quiet text doors on a hairline; fainter during an attempt, ink-on-lacquer in the tutor. */
 #app > .report-line-page, #sheet .report-line-sheet { border-top: var(--rule); padding-top: 12px; }
 .report-line .report-door { font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; }
-html[data-room="attempt"] #app > .report-line-page { opacity: 0.6; }
-html[data-room="attempt"] #app > .report-line-page:hover, html[data-room="attempt"] #app > .report-line-page:focus-within { opacity: 1; }
-html[data-room="tutor"] #app > .report-line-page .report-door { color: var(--sheet-ink-2); }
+html[data-register="attempt"] #app > .report-line-page { opacity: 0.6; }
+html[data-register="attempt"] #app > .report-line-page:hover, html[data-register="attempt"] #app > .report-line-page:focus-within { opacity: 1; }
+html[data-register="tutor"] #app > .report-line-page .report-door { color: var(--sheet-ink-2); }
 
 /* ----------------------------------------------------------------- 9 · MOTION
    Rooms lift in like a sheet set down (120 ms). Reduced motion: appear. */
@@ -625,10 +625,10 @@ html[data-room="tutor"] #app > .report-line-page .report-door { color: var(--she
 /* only on ENTERING a room (stampRegister marks data-room-entering for one beat): a grade, a
    save or a clock tick re-renders main and must never fade the surface in again */
 html[data-room-entering] #app > main > * { animation: kairo-lift 160ms ease-out both; }
-html[data-room-entering][data-room="attempt"] #app > main > * { animation-duration: 120ms; }
+html[data-room-entering][data-register="attempt"] #app > main > * { animation-duration: 120ms; }
 @media (prefers-reduced-motion: reduce) {
   html[data-room-entering] #app > main > * { animation: none; }
-  html[data-room="attempt"] .chrome::after { transition: none; }
+  html[data-register="attempt"] .chrome::after { transition: none; }
 }
 
 /* ------------------------------------------------------------- 10 · WIDE
@@ -636,8 +636,8 @@ html[data-room-entering][data-room="attempt"] #app > main > * { animation-durati
 @media (min-width: 820px) {
   main { max-width: 720px; }
   body:not([data-view="entry"], [data-view="drift"]) .chrome { padding-inline: max(16px, calc((100% - 720px) / 2 + 16px)); }
-  html[data-room="attempt"] .exam-prompt,
-  html[data-room="attempt"] .mock-q { padding: 26px 26px 10px; font-size: 22px; }
-  html[data-room="attempt"] .mock-opt,
-  html[data-room="attempt"] .lesson-option { font-size: 20px; }
+  html[data-register="attempt"] .exam-prompt,
+  html[data-register="attempt"] .mock-q { padding: 26px 26px 10px; font-size: 22px; }
+  html[data-register="attempt"] .mock-opt,
+  html[data-register="attempt"] .lesson-option { font-size: 20px; }
 }
