@@ -348,6 +348,9 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     const active = root.contains(document.activeElement) ? document.activeElement : null;
     const activeSummary = active?.tagName === 'SUMMARY' ? active.textContent : null;
     const activeAnswer = active?.matches('.pc-answer,.pc-quick-answer');
+    // Preserve the live region while replacing room markup; an import notice
+    // belongs beside its preview rather than over the confirmation controls.
+    if (status.parentElement !== root) root.append(status);
     if (previousKey) {
       const remembered = detailStates.get(previousKey) || new Map();
       body.querySelectorAll('details').forEach(detail => remembered.set(detail.querySelector(':scope > summary')?.textContent || '',detail.open));
@@ -355,7 +358,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     }
     lookupNodes = [];
     root.dataset.screen = screen;
-    if (screen==='home' || !record) { paintedViewKey = null; home(); return; }
+    if (screen==='home' || !record) { paintedViewKey = null; home(); placeStatus(); return; }
     body.innerHTML = top(collection().title) + tabs() + (screen==='study'?study():screen==='read'?reading():screen==='connections'?connections():settings());
     paintedViewKey = `${record.id}:${screen}:${screen==='study'?current?.id || 'empty':reader || 'all'}`;
     const remembered = detailStates.get(paintedViewKey);
@@ -367,6 +370,12 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
       if (activeSummary) [...body.querySelectorAll('summary')].find(summary => summary.textContent === activeSummary)?.focus({preventScroll:true});
       else if (activeAnswer) focusAnswer();
     }
+    placeStatus();
+  }
+  function placeStatus() {
+    const preview = body.querySelector('.pc-preview');
+    status.classList.toggle('pc-status-inline', !!preview);
+    if (preview) preview.append(status);
   }
   async function chooseImport(file) {
     if (!file) return;

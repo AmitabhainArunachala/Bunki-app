@@ -1148,7 +1148,7 @@ async function verifyTap(browser, base) {
     }
     check(
       'tap, standalone (study-mcd.html, study.html): no tap target on the front; after the reveal furigana and only this deck’s own words are tappable (the built-in gloss map); a tap shows a small popover — term, reading, definition, English behind 英語 — with no 覚える and a one-line note saying so; a press elsewhere closes it; one lookups[] row, the schedule unchanged',
-      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /覚える/.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
+      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Save to your review cards in Bunki\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
       JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
     );
   } finally {

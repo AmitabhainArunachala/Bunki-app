@@ -119,6 +119,7 @@
 .pc-check input { width:20px; height:20px; flex:none; accent-color:var(--tint,var(--ink)); }
 .pc-status { position:fixed; bottom:calc(125px + env(safe-area-inset-bottom)); left:18px; right:18px; max-width:904px; margin-inline:auto; z-index:30; background:var(--surface,var(--ground)); border:1px solid var(--raised-edge,var(--line)); padding:12px 16px; box-shadow:var(--shadow-float,0 4px 16px #0002); border-radius:var(--r-float,14px); }
 .pc-status:empty { display:none; }
+.pc-status.pc-status-inline { position:static; margin:12px 0 0; max-width:none; }
 .pc[aria-busy='true'] button { opacity:.6; cursor:wait; }
 @media (max-width:999px) {
   .pc-revealed .pc-focus > h2, .pc-revealed .pc-focus > .pc-small { display:none; }

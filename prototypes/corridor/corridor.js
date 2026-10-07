@@ -28251,7 +28251,46 @@ const PRIMARY_TABS = [
   { id: 'words', ja: '辞書', en: 'Words', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
   { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'personaldeck', 'settings'] },
 ];
+let primaryDockObserver;
+/** Keep the report rail above live room controls, including wrapped labels. */
+function observePrimaryDocks() {
+  if (primaryDockObserver) return;
+  const selector = '.kp-grades, .pc-controls, .cd-dock, .listen-row.play-bar, .pc-status:not(:empty):not(.pc-status-inline), .reader-toast';
+  let frame = 0;
+  const watched = new Set();
+  const schedule = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const nodes = new Set(document.querySelectorAll(selector));
+      for (const node of watched) if (!nodes.has(node)) { resize.unobserve(node); watched.delete(node); }
+      for (const node of nodes) if (!watched.has(node)) { resize.observe(node); watched.add(node); }
+      const nav = document.getElementById('primary-tabs');
+      const navHeight = nav?.getBoundingClientRect().height || 0;
+      let clearance = 0;
+      if (document.body.classList.contains('has-primary-tabs')) {
+        for (const node of nodes) {
+          const style = getComputedStyle(node), rect = node.getBoundingClientRect();
+          if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight || style.visibility === 'hidden') continue;
+          if (style.position !== 'fixed' && !(style.position === 'sticky' && rect.bottom >= innerHeight - navHeight - 1)) continue;
+          clearance = Math.max(clearance, Math.ceil(innerHeight - rect.top));
+        }
+      }
+      const value = `${clearance}px`;
+      if (document.body.style.getPropertyValue('--foundation-dock-clearance') !== value) {
+        document.body.style.setProperty('--foundation-dock-clearance', value);
+      }
+    });
+  };
+  const resize = new ResizeObserver(schedule);
+  primaryDockObserver = new MutationObserver(schedule);
+  primaryDockObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
+  window.addEventListener('resize', schedule);
+  window.addEventListener('scroll', schedule, { passive: true });
+  schedule();
+}
 function buildPrimaryTabs(root, { personal = false } = {}) {
+  observePrimaryDocks();
   const show = S.variants.nav === 'tabs' && (S.ready || personal) &&
     !['drift', 'entry'].includes(S.view) && !document.body.classList.contains('zen') &&
     !S.stack.length && !S.strokes;
