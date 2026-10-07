@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "境地",
+   "reading": "きょうち",
+   "pos": "noun",
+   "meaning": "state of mind, stage reached",
+   "defJa": "到達した心や技の段階",
+   "passage": {
+    "ja": "長年の修行の末に、ある境地に至った人は、もはや「悟ろう」とすらしなくなるという。努力の果てに努力が消えるこの逆説は、禅の語録や、芸道の教えにもしばしば現れる。弓を引くときの熟練の射手と同じで、的を狙う意識が消え、ただ弓と体と的がひとつになる瞬間が訪れるのだ。長い歳月、四苦八苦して積み上げた修行が、最後にはその重さを手放すところにこそ、その人の本当の自由があるのだろう。",
+    "form": "境地",
+    "en": "It is said that a person who, after long years of training, has reached a certain state of mind no longer even tries to \"become enlightened.\" This paradox, in which effort vanishes at the end of effort, often appears in the recorded sayings of Zen. As with an archer drawing a bow, the consciousness of aiming at the target disappears and a moment comes when bow, body and target are simply one. Precisely where the training piled up through great hardship finally lets go of its own weight, perhaps, lies that person's true freedom.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「悟りの境地」「無我の境地」。到達した心の段階を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "外向型",
+   "reading": "がいこうがた",
+   "pos": "noun",
+   "meaning": "extrovert (type)",
+   "defJa": "関心が外の世界に向かう性格",
+   "passage": {
+    "ja": "外向型の人は、人と話すことでエネルギーを得て、それが次の会話を生む好循環の中にいるとされる。心理学者ユングが唱えた類型で、関心の向かう先が外の世界にあるのが特徴だ。ただし、会話が上手だとは限らず、聞き手を置き去りにして話し続けてしまう人もいる。近年の研究は、外向と内向のどちらが優れているかではなく、それぞれが力を発揮できる環境をどう整えるかに、関心を移している。",
+    "form": "外向型",
+    "en": "Extroverts are said to gain energy from talking with people and to live inside a virtuous circle in which that energy produces the next conversation. It is a type proposed by Jung, characterized by interest directed toward the outer world. However, they are not necessarily good at conversation, and some keep talking and leave the listener behind. Recent research has shifted its interest from which of extroversion and introversion is superior to how to set up environments where each can show its strength.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「外向型」と「内向型」。エネルギーが外の人づきあいから得られる型。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "外来語",
+   "reading": "がいらいご",
+   "pos": "noun",
+   "meaning": "loanwords",
+   "defJa": "外国語から取り入れた言葉",
+   "passage": {
+    "ja": "日本語って、外来語がほんとに多いんですよね。「コンピューター」「アイデア」みたいに、もう元の言葉が思い出せないくらい定着してるのもあれば、「エビデンス」「コンセンサス」みたいに、仕事の場でだけ浮いてる言葉もある。後者は、意味を濁したいときに便利なぶん、相手に伝わらないリスクも背負ってるんですよ。だから私は、使う前に、和語で言い換えられるかを、ちょっと考えるようにしてます。",
+    "form": "外来語",
+    "en": "Japanese really has a lot of loanwords, you know. Some, like \"computer\" and \"idea,\" are so established that you can no longer recall the original word, while others, like \"evidence\" and \"consensus,\" are words that stand out only in the workplace. The latter are convenient when you want to blur the meaning, but they carry the risk of not getting across. So before I use one, I try to think a little about whether I can rephrase it in native Japanese.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「外来語」はカタカナ語が中心。「和語」「漢語」と並べて語種を考える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "外発的動機づけ",
+   "reading": "がいはつてきどうきづけ",
+   "pos": "noun",
+   "meaning": "extrinsic motivation",
+   "defJa": "外からの報酬や罰による意欲",
+   "passage": {
+    "ja": "外発的動機づけとは、お金、評価、罰といった、自分の外にあるものに動かされるやる気のことです。短期的には強力で、たとえば営業の歩合給は、すぐに成果を押し上げます。しかし、報酬が止まった途端に、行動も止まってしまうのが弱点です。ですから、外から与えるごほうびを、本人の向上心に火がつくまでの足がかりとして使い、続けるうちに、内側から湧く関心へと橋渡ししていくのが賢いやり方です。",
+    "form": "外発的動機づけ",
+    "en": "Extrinsic motivation is drive moved by things outside oneself, such as money, evaluation and punishment. It is powerful in the short term; commission pay in sales, for example, pushes up results quickly. But its weakness is that the moment the reward stops, the behavior stops too. So the wise approach is to use externally given rewards as a stepping stone until the person's own drive to improve catches fire, and to bridge gradually, as they continue, to interest welling up from within.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「外発的動機づけ」と「内発的動機づけ」。報酬・罰など外部要因による意欲。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多極化",
+   "reading": "たきょくか",
+   "pos": "noun",
+   "meaning": "multipolarization",
+   "defJa": "複数の勢力が並び立つこと",
+   "passage": {
+    "ja": "冷戦後の世界は、アメリカが突出した一極の時代から、複数の大国が影響力を競う多極化の時代へと移りつつあるといわれる。中国やインドの経済成長、地域大国の台頭がその背景にある。安全保障の枠組みの運営をめぐって、既存の仕組みの修正を求める声も強まった。ただ、この変化が進めば自動的に不安定になるとは限らず、各国が力の釣り合いをどう設計するかが、世界の安定を左右するとみられる。",
+    "form": "多極化",
+    "en": "The post-Cold War world is said to be shifting from an era of a single pole, with the United States standing out, to an era of multipolarization in which several great powers compete for influence. Behind it are the economic growth of China and India and the rise of regional powers. Voices demanding revisions of existing arrangements have also grown over how to run the security framework. But as this change advances, it does not necessarily become unstable automatically, and how countries design the balance of power is thought to decide the world's stability.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「多極化が進む」。「一極」「二極」と対。複数の大国が力を持つ国際構造。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多民族国家",
+   "reading": "たみんぞくこっか",
+   "pos": "noun",
+   "meaning": "multiethnic state",
+   "defJa": "複数の民族から成る国家",
+   "passage": {
+    "ja": "多民族国家というと、アメリカやインドが思い浮かびますが、実は、世界のほとんどの国が、複数の民族を抱えています。問題は、多様であること自体ではなく、少数の側が政治や経済から取り残されたときに、対立が表面化することです。たとえば、宗主国が民族の分布を無視して境界を引いた国では、独立後に深刻な内戦に至ったケースも少なくありません。多様性を力に変えるには、制度の上で、誰もが同じ国民として扱われる実感を保障することが欠かせません。",
+    "form": "多民族国家",
+    "en": "When people say multiethnic state, the United States and India come to mind, but in fact almost every country in the world holds several ethnic groups. The problem is not diversity itself but that conflict surfaces when the minority side is left out of politics and the economy. In countries where the colonial ruler drew borders ignoring the distribution of peoples, for example, serious civil wars after independence are not rare. To turn diversity into strength, it is indispensable to guarantee, in the system, the sense that everyone is treated as the same citizen.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「多民族国家」の例は米国・インド。多様性が対立か力かは制度しだい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多義語",
+   "reading": "たぎご",
+   "pos": "noun",
+   "meaning": "polysemous word",
+   "defJa": "複数の意味を持つ語",
+   "passage": {
+    "ja": "「かける」は、鍵をかける、電話をかける、時間をかける、迷惑をかけるなど、数十もの用法を持つ多義語として知られる。同音異義語と違って、こちらは意味どうしにつながりがあり、辞書の最初の訳語だけでは太刀打ちできない厄介な存在だ。しかし、各用法の根にある「何かを何かに接触させる」という共通のイメージをつかめば、全体を一つながりのものとして理解できる。語の意味を、点ではなく、広がりを持った円として捉える視点が、語学の上達を後押しするとされる。",
+    "form": "多義語",
+    "en": "\"Kakeru\" is known as a polysemous word with dozens of uses: lock a door, make a phone call, spend time, cause trouble. Unlike homophones, such a word has connections among its meanings, and it is a troublesome thing that cannot be handled with only the dictionary's first translation. But if you grasp the common image at the root of each use, \"bringing something into contact with something,\" you can understand the whole as one connected thing. A perspective that sees a word's meaning not as a point but as a circle with spread is said to boost progress in language learning.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「多義語」の例は「かける」。意味どうしにつながりがある点が同音異義語と違う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多読",
+   "reading": "たどく",
+   "pos": "noun",
+   "meaning": "extensive reading",
+   "defJa": "たくさんの本を読むこと",
+   "passage": {
+    "ja": "外国語を伸ばす方法として、精読ばかりが重視されがちですが、多読の効果は見逃せません。辞書を引かずに、自分に易しい本をとにかくたくさん、楽しみながら読む。それだけで、同じ表現に何度も出会い、意味が自然に染み込んでいくのです。コツは、少しでも難しいと思ったら、迷わず次の本に移ること。咀嚼しきれない内容に粘るより、楽しく読める量を積み重ねるほうが、結果として語彙は定着します。",
+    "form": "多読",
+    "en": "As a way to improve a foreign language, intensive reading alone tends to be stressed, but the effect of extensive reading should not be overlooked. Without looking things up, read as many easy books as you can. Just that makes you meet the same expressions again and again, and meaning soaks in naturally. The knack is to move on to the next book without hesitation the moment something seems even a little hard. Piling up the amount you can enjoy reading beats clinging to content you cannot fully digest, and as a result vocabulary takes hold.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「多読」と「精読」。辞書を引かず易しい本を大量に読む学習法。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大器晩成",
+   "reading": "たいきばんせい",
+   "pos": "noun",
+   "meaning": "great talents mature late",
+   "defJa": "大人物は遅れて才能が開く",
+   "passage": {
+    "ja": "大器晩成という言葉は、遅れて花開く人への慰めや励ましとして使われやすいが、本来の意味はもう少し厳しい。大きな器ほど、できあがるまでに時間がかかる。つまり、周りに比べて早く成果が出ないことを嘆くのではなく、時間のかかる仕事に耐える覚悟こそが問われているのである。向上心を失わず、日々の小さな積み重ねを黙々と怠らない者だけが、ずいぶん遅れてやって来る実りを手にするのだろう。",
+    "form": "大器晩成",
+    "en": "The phrase \"great vessels are late in the making\" is easily used as consolation for those who bloom late, but its original meaning is somewhat sterner. The bigger the vessel, the longer it takes to complete. In other words, what is asked is not lamenting that results are slow but the resolve to endure work that takes time. Only those who do not lose their drive to improve and who do not neglect small daily accumulations will take hold of the fruit that arrives late.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「大器晩成型」。大人物は遅れて成功する。結果が遅い人への慰めだけではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大意",
+   "reading": "たいい",
+   "pos": "noun",
+   "meaning": "general meaning",
+   "defJa": "文章などのおおよその意味",
+   "passage": {
+    "ja": "長い文章を読むとき、一語一語の意味にこだわりすぎると、かえって大意を見失うことってありませんか。試験の読解問題のような場面でも、細部が分からなくても、段落ごとに「何について、どう言ってるか」をひと言で押さえておけば、全体の流れは追えます。少し慣れてきたら、わからない単語は、前後から推測して飛ばす。それだけで、読む速度がぐんと上がって、多読にも気軽に挑戦しやすくなりますよ。",
+    "form": "大意",
+    "en": "When reading a long text, haven't you found that clinging too much to each word's meaning actually makes you lose the gist? Even on exam reading questions, if you grasp in a phrase, paragraph by paragraph, what it is about and what it says, you can follow the overall flow even without the details. Once you get used to it, guess unknown words from context and skip them. Just that makes your reading speed jump and makes it easier to try extensive reading.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「大意をつかむ」。細部ではなく全体のおおよその意味。読解の基本。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大政奉還",
+   "reading": "たいせいほうかん",
+   "pos": "noun",
+   "meaning": "return of power to the emperor",
+   "defJa": "幕府が政権を朝廷に返したこと",
+   "passage": {
+    "ja": "一八六七年、江戸幕府十五代将軍の徳川慶喜は、政権を朝廷に返上する大政奉還を行った。幕府の権力を自ら手放すことで、新しい政治体制のなかでも主導権を保とうとしたと見られている。しかし、その直後に出された王政復古の大号令によって、慶喜は新政府から排除され、やがて戊辰戦争へと事態は進んだ。和平を探る試みが、結果として内戦を避けられなかった経緯は、歴史の皮肉として語られる。",
+    "form": "大政奉還",
+    "en": "In 1867, the fifteenth shogun, Tokugawa Yoshinobu, carried out the restoration of political power, returning authority to the imperial court. By giving up the shogunate's power himself, he is thought to have tried to keep the initiative even within the new political order. But the Restoration of Imperial Rule proclamation issued right afterward excluded Yoshinobu from the new government, and events soon advanced to the Boshin War. That an attempt to seek peace could not, in the end, avoid civil war is told as an irony of history.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "一八六七年。「大政奉還」は幕府が政権を朝廷へ返上。王政復古の大号令へ続く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大脳皮質",
+   "reading": "だいのうひしつ",
+   "pos": "noun",
+   "meaning": "cerebral cortex",
+   "defJa": "脳の表面を覆う灰白質の層",
+   "passage": {
+    "ja": "人間の脳のうち、思考や言語、計画といった高度な働きを担うのは、表面を覆う薄い大脳皮質である。厚さはわずか数ミリだが、広げれば新聞紙一枚ほどの面積になるともいわれ、皺を寄せて頭蓋に折りたたまれている。この折りたたみのおかげで、小さな頭の中に、膨大な神経細胞が収まるのだ。知性とは、体積の大きさではなく、いかに面積を稼ぐかという工夫の産物だという事実は、含蓄に富んでいる。",
+    "form": "大脳皮質",
+    "en": "Of the human brain, what carries out advanced functions like thought, language and planning is the thin cerebral cortex covering the surface. Only a few millimeters thick, it is said to cover an area about that of a sheet of newspaper if spread out, and it is folded into the skull in wrinkles. Thanks to this folding, an enormous number of nerve cells fit inside a small head. The fact that intelligence is the product of an ingenuity for gaining surface area rather than sheer volume is rich in implication.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「大脳皮質」。思考・言語・計画を担う脳の外層。皺で面積を稼ぐ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大航海時代",
+   "reading": "だいこうかいじだい",
+   "pos": "noun",
+   "meaning": "Age of Discovery",
+   "defJa": "十五〜十七世紀の欧州人の海洋進出期",
+   "passage": {
+    "ja": "十五世紀から十七世紀にかけての大航海時代は、ヨーロッパの人々が、未知の海へ乗り出した冒険の時代として語られがちである。だが、その背景には、香辛料を中継貿易の高い値段ではなく、産地から直接手に入れたいという、きわめて現実的な動機があった。羅針盤や造船技術の進歩は、その欲望を実現する手段にすぎなかった。冒険の物語の裏側で、奴隷貿易や植民地支配という暗い歴史が始まっていたことも、忘れてはならない。",
+    "form": "大航海時代",
+    "en": "The Age of Discovery, from the fifteenth to the seventeenth century, tends to be told as an age of adventure in which Europeans set out onto unknown seas. But behind it lay a very practical motive: to obtain spices directly from where they were produced instead of at the high prices of intermediary trade. Advances in the compass and shipbuilding were mere means of realizing that desire. We must not forget that, behind the tale of adventure, the dark history of the slave trade and colonial rule was beginning.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「大航海時代」。香辛料などを求め欧州が海外へ進出。植民地支配の始まりでもある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大英帝国",
+   "reading": "だいえいていこく",
+   "pos": "noun",
+   "meaning": "British Empire",
+   "defJa": "かつて世界に広がった英国の帝国",
+   "passage": {
+    "ja": "大英帝国って、「日の沈まない帝国」って呼ばれてたくらい、世界中にたくさん領土を持ってたんですよね。インドの宗主国としても、オーストラリアやアフリカの一部も、全部ひっくるめて。だけど、広がりすぎたぶん、守るための軍事費も、各地を治める役人のコストも、とんでもなく膨らんじゃった。結局、二度の世界大戦で国力をすり減らして、植民地の独立を、止められなくなっていったんです。",
+    "form": "大英帝国",
+    "en": "The British Empire had territory all over the world, to the point of being called \"the empire on which the sun never sets,\" you know. As colonial master of India, and with Australia and parts of Africa, all lumped together. But because it spread so far, the military costs of defending it and the costs of the officials governing each place swelled enormously. In the end, it wore down its national strength in two world wars and became unable to stop the colonies' independence.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「日の沈まない帝国」。十九世紀の最盛期から二度の大戦を経て衰えた。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大陸国家",
+   "reading": "たいりくこっか",
+   "pos": "noun",
+   "meaning": "continental power",
+   "defJa": "広い陸地に国境を接する国",
+   "passage": {
+    "ja": "ドイツやロシア、中国のように、広い陸地を持ち、周囲に複数の国と国境を接する国は、大陸国家と呼ばれる。こうした国は、地理上、陸からの侵攻に備える必要があり、安全保障の発想も、緩衝地帯をどう確保するかに傾きやすい。これに対し、イギリスや日本のような海洋国家は、海を天然の防壁にできる。国の地理的な条件が外交の選択肢を大きく規定する、という見方は、地政学の基本とされる。",
+    "form": "大陸国家",
+    "en": "A country that has a wide stretch of land and shares borders with several surrounding countries, like Germany, Russia and China, is called a continental power. Such countries must, by geography, prepare against invasion by land, and their security thinking tends to lean toward how to secure buffer zones. By contrast, maritime states like Britain and Japan can make the sea a natural barrier. The view that a country's geographic conditions greatly define its diplomatic options is regarded as basic to geopolitics.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「大陸国家」と「海洋国家」。地政学の基本概念。ロシア・ドイツ・中国など。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "天皇制",
+   "reading": "てんのうせい",
+   "pos": "noun",
+   "meaning": "emperor system",
+   "defJa": "天皇を国家の中心とする制度",
+   "passage": {
+    "ja": "日本史の論述で天皇制を問われたら、「いつの時代に、誰が、何のために、その権威を使ったのか」を軸に整理するのが得策です。古代には、律令国家の中心として、政治の実権を持っていました。中世には、武家が実権を握り、朝廷は儀礼や官位の授与を通じて、権威だけを保ちます。近代になると、大政奉還と明治維新を経て、再び国家の中心に置かれました。時代ごとに役割が変わった点をおさえておくと、答案が一気に立体的になります。",
+    "form": "天皇制",
+    "en": "If asked about the emperor system in a Japanese-history essay, the best approach is to organize it around \"in what era, who used that authority, and for what purpose.\" In antiquity, as the center of the ritsuryo state, the emperor held real political power. In the medieval period, warriors held real power, and the court kept only authority through ceremony and the granting of ranks. In the modern era, after the return of power and the Meiji Restoration, it was placed at the center of the state again. If you keep in mind that its role changed with each era, your answer instantly gains depth.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「天皇制」。時代ごとに役割が違う。論述では時代・主体・目的で整理する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "天賦の才",
+   "reading": "てんぷのさい",
+   "pos": "expression",
+   "meaning": "natural gift",
+   "defJa": "生まれつき備わった才能",
+   "passage": {
+    "ja": "「あの人は天賦の才があるから」って言っちゃうと、自分は努力しなくていい理由を、先に作っちゃってる気がするんですよ。実際、天才って言われる人の話を聞くと、周りが見えてないくらい、特定の分野に打ち込んできた時間が桁違いだったりする。もちろん、生まれつきの向き不向きはあるけど、それは入り口が違うだけで、そこから先は、やっぱり大器晩成の人もいる。才能の話にすり替えて自分を許すのは、ちょっともったいないですよね。",
+    "form": "天賦の才",
+    "en": "When you say \"that person has a natural gift,\" it feels like you are creating in advance a reason you don't have to make an effort. In fact, when you hear about people called geniuses, the time they have poured into a particular field, to the point of not noticing what's around them, is often on another order of magnitude. Of course there are innate aptitudes and non-aptitudes, but they only differ at the entrance; from there on, there are definitely late bloomers too. Switching it into a story about talent and letting yourself off is a bit of a waste, isn't it?",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「天賦の才に恵まれる」。生まれつきの才能。努力を免除する言い訳にしない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "失語症",
+   "reading": "しつごしょう",
+   "pos": "noun",
+   "meaning": "aphasia",
+   "defJa": "脳の損傷で言葉の働きが損なわれる状態",
+   "passage": {
+    "ja": "失語症とは、脳の言語をつかさどる部分が損傷を受けたために、話す、聞く、読む、書くといった能力が、うまく働かなくなる状態です。特徴的なのは、知性や記憶は保たれていることが多い点で、言いたいことは頭の中にあるのに、言葉が出てこないというもどかしさを抱えます。大脳皮質の特定の領域が、それぞれ別の言語機能を担っていることを示す、手がかりにもなりました。周囲の人は、相手を急かさず、短い文で、ゆっくり話しかけることが大切です。",
+    "form": "失語症",
+    "en": "Aphasia is a condition in which, because the part of the brain that governs language has been damaged, abilities such as speaking, listening, reading and writing no longer work well. What is characteristic is that intelligence and memory are often preserved, so the person feels the frustration that what they want to say is in their head but the words will not come. It also became a clue showing that specific regions of the cerebral cortex each handle a different language function. It is important for those around to speak slowly, in short sentences, without rushing the person.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「失語症」。話す・聞く・読む・書くが損なわれる。知性は保たれることが多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "奴隷制",
+   "reading": "どれいせい",
+   "pos": "noun",
+   "meaning": "slavery",
+   "defJa": "人を所有物として扱う制度",
+   "passage": {
+    "ja": "奴隷制は、人間を所有物として扱う制度であり、古代から近代まで、世界各地に存在した。とりわけ、大航海時代以降の大西洋世界では、砂糖や綿花の生産を支える労働力として、アフリカから大規模に人々が送り込まれ、経済の基盤となった。この制度がなぜ長く続いたのかを問うと、そこには、人間の尊厳という理念よりも、利益と習慣が優先された現実が見えてくる。過去の悪を断罪するだけでなく、同じ構造が形を変えて残っていないかを問うことが、歴史を学ぶ意味なのだろう。",
+    "form": "奴隷制",
+    "en": "Slavery is a system that treats human beings as property and existed in various parts of the world from antiquity to the modern era. In the Atlantic world after the Age of Discovery especially, people were sent from Africa on a large scale as the labor supporting sugar and cotton production, and it became the foundation of the economy. Asking why this system lasted so long, one sees the reality in which profit and habit took priority over the ideal of human dignity. The point of studying history is perhaps not only to condemn past evil but to ask whether the same structure remains in changed form.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「奴隷制度」。大西洋世界では砂糖・綿花の生産を支えた労働力の基盤。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "奴隷解放",
+   "reading": "どれいかいほう",
+   "pos": "noun",
+   "meaning": "emancipation of slaves",
+   "defJa": "奴隷を自由の身にすること",
+   "passage": {
+    "ja": "アメリカの奴隷解放を語るとき、リンカーンが一八六三年に出した宣言だけを強調するのは、危ういのです。実際には、この宣言は反乱している南部の州を対象としたもので、すべての奴隷の即時解放を意味していませんでした。奴隷制が最終的に廃止されたのは、一八六五年の憲法修正第十三条によってです。「宣言」と「法」を分けて語るだけで、聞き手が受け取る歴史の像は、ぐっと正確になります。",
+    "form": "奴隷解放",
+    "en": "When speaking of emancipation in America, it is risky to stress only the proclamation Lincoln issued in 1863. In fact, the proclamation targeted the rebelling Southern states and did not mean the immediate freeing of all slaves. Slavery was finally abolished by the Thirteenth Amendment of 1865. Just separating the proclamation from the law in your telling makes the picture of history your listeners receive far more accurate.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「奴隷解放宣言」は一八六三年。制度の廃止は一八六五年の憲法修正十三条。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "奴隷貿易",
+   "reading": "どれいぼうえき",
+   "pos": "noun",
+   "meaning": "slave trade",
+   "defJa": "奴隷を売買する貿易",
+   "passage": {
+    "ja": "十六世紀から十九世紀にかけての大西洋奴隷貿易では、推計で一千万人を超えるアフリカの人々が、新大陸へ強制的に連れていかれたとされる。船内の環境は劣悪で、多くが航海の途中で命を落とした。この取引は、ヨーロッパの商人や宗主国に莫大な利益をもたらし、のちの工業化の資金源の一つにもなったと、歴史学者は分析している。近年、関連する都市や企業が、過去の関与を公に検証する動きが広がっている。",
+    "form": "奴隷貿易",
+    "en": "In the Atlantic slave trade from the sixteenth to the nineteenth century, more than ten million African people are estimated to have been forcibly taken to the New World. Conditions aboard ships were terrible and many died en route. Historians analyze that this trade brought enormous profit to European merchants and colonial powers and became one source of capital for later industrialization. In recent years, moves have spread for related cities and companies to examine their past involvement publicly.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「大西洋奴隷貿易」。十六〜十九世紀、アフリカから新大陸へ人々を強制移送。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "好きこそ物の上手なれ",
+   "reading": "すきこそもののじょうずなれ",
+   "pos": "expression",
+   "meaning": "what one loves, one does well",
+   "defJa": "好きなことは自然に上達する",
+   "passage": {
+    "ja": "「好きこそ物の上手なれ」という言葉は、近年の学習研究が裏づける、かなり実践的な知恵である。好きなことには、人は自然に時間を使い、細部まで観察し、失敗しても投げ出さずに続ける。その積み重ねが、結果として、他者との差を生むのだ。教育の現場では、まず興味を引き出し、そこから基礎へ橋をかける指導が、外発的動機づけに頼る方法より、長続きする傾向があると報告されている。",
+    "form": "好きこそ物の上手なれ",
+    "en": "The saying \"what one loves, one does well\" is quite practical wisdom that recent learning research supports. For things they like, people naturally spend time, observe the details and keep going without giving up even after failures. That accumulation, as a result, creates the gap with others. In education settings, instruction that first draws out interest and builds a bridge from there to the basics is reported to last longer than methods relying on extrinsic motivation.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "ことわざ。好きなことは上達が早い。外から与える動機づけより長続きしやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "好循環",
+   "reading": "こうじゅんかん",
+   "pos": "noun",
+   "meaning": "virtuous circle",
+   "defJa": "良い結果が良い結果を呼ぶ循環",
+   "passage": {
+    "ja": "物事がうまく回り始めるときには、必ず好循環がある。小さな成功が自信を生み、自信が次の挑戦を呼び、その挑戦がまた小さな成功を連れてくる。逆に、悪循環に入った人は、失敗が自信を奪い、自信の欠如がさらに失敗を招く。ここで見落とされがちなのは、循環のどこから手をつけるかである。向上心を奮い立たせようとするより、行動の最も小さな一点を、確実に変えるほうが、全体を回し始める近道なのだ。",
+    "form": "好循環",
+    "en": "When things begin to run smoothly, there is always a virtuous circle. A small success breeds confidence, confidence calls for the next challenge, and that challenge brings another small success. Conversely, a person who has entered a vicious circle has failure rob confidence, and the lack of confidence invites further failure. What tends to be overlooked here is where in the circle to begin. Rather than trying to rouse your drive to improve, reliably changing the smallest single point of your behavior is the shortcut to starting the whole thing turning.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「好循環が生まれる」。「悪循環」の対。結果が原因を強める円環。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "委任統治",
+   "reading": "いにんとうち",
+   "pos": "noun",
+   "meaning": "mandate (League of Nations)",
+   "defJa": "国際連盟が戦勝国に託した統治",
+   "passage": {
+    "ja": "第一次世界大戦のあと、敗戦国だったドイツやオスマン帝国の旧領土は、委任統治という形で、戦勝国に預けられたんです。名目は、「まだ自治できない地域を、国際連盟の代わりに、先進国が面倒を見る」だったけど、実態は、植民地とあんまり変わらなかった。たとえば、中東の国境の多くは、このときの大英帝国やフランスの都合で引かれたもので、今も続く紛争の遠因だと言われます。日本も、太平洋の南洋群島を、この形で統治していたんですよ。",
+    "form": "委任統治",
+    "en": "After the First World War, the former territories of defeated Germany and the Ottoman Empire were entrusted to the victors in the form of mandates. The stated rationale was \"advanced countries look after regions not yet able to govern themselves, on behalf of the League of Nations,\" but in reality it was not much different from colonies. Many borders in the Middle East, for example, were drawn at that time to suit the British Empire and France, and they are said to be a distant cause of conflicts that continue today. Japan too governed the South Sea Islands in the Pacific in this form.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「委任統治領」。第一次大戦後、敗戦国の旧領土を国際連盟の名で統治した制度。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "娑婆",
+   "reading": "しゃば",
+   "pos": "noun",
+   "meaning": "this world of suffering; the outside world",
+   "defJa": "苦しみの多いこの世",
+   "passage": {
+    "ja": "「娑婆」は、サンスクリット語の「サハー」に由来する言葉で、四苦八苦に耐えながら生きる世界、つまり私たちが暮らしているこの世を指します。仏教の世界観では、悟りの彼岸に対して、迷いに満ちたこちら側のことです。日常では、「シャバに出る」のように、自由な外の世界を指して使うこともありますが、これは元の意味と少しずれています。語源を知っておくと、一つの言葉に、苦しみと自由の両方が重なっていることがわかります。",
+    "form": "娑婆",
+    "en": "\"Shaba\" derives from the Sanskrit \"sahā\" and refers to the world in which one lives enduring great hardship, that is, this world where we live. In the Buddhist worldview, it is this side, full of delusion, as against the far shore of enlightenment. In daily life it is also used for the free outside world, as in \"getting out into the shaba,\" but this is a little off from the original meaning. Knowing the etymology, you can see that both suffering and freedom overlap in a single word.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "仏教語。サンスクリットのサハーに由来。苦に満ちたこの世。",
+    "sense": "仏教語としての意味"
+   }
+  },
+  {
+   "term": "婉曲表現",
+   "reading": "えんきょくひょうげん",
+   "pos": "noun",
+   "meaning": "euphemism",
+   "defJa": "直接を避けてやわらかく言う表現",
+   "passage": {
+    "ja": "日本語では、直接的な言い方を避けて、やわらかく伝える婉曲表現が、とくに発達しています。たとえば、「死ぬ」を「亡くなる」、「断る」を「お引き受けしかねます」と言い換えるのが、その典型です。これは、相手の気持ちを傷つけないための配慮ですが、行き過ぎると、何を言いたいのか分からなくなってしまいます。試験では、筆者が婉曲に述べている部分の含意を、はっきりした言葉に言い直す問題が、よく出ます。",
+    "form": "婉曲表現",
+    "en": "In Japanese, euphemistic expressions that avoid direct phrasing and convey things softly are especially developed. Rephrasing \"die\" as \"pass away\" and \"refuse\" as \"I am unable to accept\" is typical. This is consideration to avoid hurting the other person's feelings, but if taken too far you can no longer tell what is being said. On exams, questions asking you to restate in clear words the implication of a passage the author put indirectly come up often.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「婉曲表現を使う」。「亡くなる」など。含意を読み取る問題で問われる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "子音",
+   "reading": "しいん",
+   "pos": "noun",
+   "meaning": "consonant",
+   "defJa": "息の通路をせばめて出す音",
+   "passage": {
+    "ja": "日本語は、子音と母音が交互に並ぶ「開音節」が中心で、「カ」「サ」のように、音の最後に必ず母音がきます。そのため、英語の「strike」のように、頭に三つも音が詰まる語は、日本語話者には発音しにくく、外来語では「ストライク」と、母音を挟んで読んでしまいます。外国語を話すときに、発音を直したいなら、まず母音を挟んでいる場所を意識するだけで、聞き手への伝わり方は、見違えるように変わります。これは、日本語の音の構造を知っておくだけで、すぐ実行できる工夫です。",
+    "form": "子音",
+    "en": "Japanese centers on \"open syllables\" in which consonants and vowels alternate, and a vowel always comes at the end of the sound, as in \"ka\" and \"sa.\" So a word like English \"strike,\" which packs three sounds at the head, is hard for Japanese speakers to pronounce, and in loanwords it is read with vowels inserted, as \"sutoraiku.\" If you want to fix your pronunciation when speaking a foreign language, merely becoming aware of where you insert vowels changes how you come across to listeners beyond recognition. It is a trick you can put into practice right away just by knowing the structure of Japanese sounds.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「子音」と「母音」。日本語は子音のあとに母音が続く開音節が中心。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "字形",
+   "reading": "じけい",
+   "pos": "noun",
+   "meaning": "character shape",
+   "defJa": "文字の形",
+   "passage": {
+    "ja": "手書きで漢字の字形を整えるコツは、細部より先に、全体の骨格をつかむことです。書道の世界では「永」の一字に基本の運筆がすべて含まれると言われ、永字八法として古くから練習されてきました。外枠の形と、画と画の間隔を意識しながら、何度も反復して書けば、手が自然に、バランスのとれた美しい形を覚えてくれます。同音異義語を書き分けるときも、形への自覚があれば、誤字は大きく減ります。",
+    "form": "字形",
+    "en": "The knack for getting the shape of kanji right in handwriting is to grasp the overall skeleton before the details. In calligraphy it is said the single character 永 contains all the basic brush movements, and as the \"eight principles of 永\" it has long been practiced. If you write repeatedly, paying attention to the outer frame and the spacing between strokes, your hand will naturally learn a beautiful form. When you write homophones correctly, awareness of form also greatly reduces mistaken characters.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「字形が整う」。文字の形。「字体」「書体」と区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "季語",
+   "reading": "きご",
+   "pos": "noun",
+   "meaning": "season word",
+   "defJa": "俳句に詠み込む季節を表す言葉",
+   "passage": {
+    "ja": "俳句には、季節を表す言葉を一つ入れるという昔からの約束事があり、これを季語といいます。たとえば「蛙」は春、「蛍」は夏です。その言葉は、単なる季節の記号ではなく、古来の美意識まで一緒に呼び込む装置になっています。国語の試験で俳句が出たら、まず季節の言葉を探し、そこから、季節、情景、作者の心情という順に読むと、わずか十七音の短い句でも、含蓄のある解釈が組み立てられます。",
+    "form": "季語",
+    "en": "Haiku has a convention of including one word that expresses the season, and this is called a season word. \"Frog\" is spring and \"firefly\" is summer, for example. Such a word is not a mere seasonal symbol but a device that also calls in age-old aesthetic sensibilities. If a haiku appears on an exam, find the seasonal word first and read from there in the order of season, scene and the poet's feeling, and even a short verse yields a rich interpretation.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「季語」の例は「蛙」(春)「蛍」(夏)。季節と美意識を呼び込む言葉。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "孤立語",
+   "reading": "こりつご",
+   "pos": "noun",
+   "meaning": "isolating language",
+   "defJa": "語形が変化せず語順で文法を表す言語",
+   "passage": {
+    "ja": "言語の類型には、孤立語、膠着語、屈折語といった分け方がある。その代表は中国語で、単語の形が変化せず、語順などの要素が、文法の役割を担う。これに対して、日本語は、語に助詞や助動詞が次々と膠着していく型に属し、同じ東アジアの言語でありながら、構造は大きく異なる。漢字を共有し、和製漢語が中国語にも入っているために、よく似た言語のように見えるが、それは文字の上の錯覚にすぎない。",
+    "form": "孤立語",
+    "en": "Linguistic typology divides languages into types such as isolating, agglutinative and inflectional. The typical isolating language is Chinese, in which word forms do not change and elements such as word order carry the grammatical roles. Japanese, by contrast, belongs to the type in which particles and auxiliaries attach one after another to a word, and though both are East Asian languages, their structures differ greatly. Because they share kanji and Japan-made Sino-words have entered Chinese too, they look like very similar languages, but that is only an illusion on the level of script.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「孤立語」の代表は中国語。語形変化がなく語順が文法を担う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "安全保障",
+   "reading": "あんぜんほしょう",
+   "pos": "noun",
+   "meaning": "security",
+   "defJa": "国や国民の安全を守ること",
+   "passage": {
+    "ja": "安全保障という言葉は、かつては主に、軍事力で国土を守ることを意味した。しかし今では、エネルギーや食料、半導体のような重要物資の供給、さらにはサイバー空間の防衛まで、概念が大きく広がっている。この拡大により、経済の問題が外交や軍事の問題と切り離せなくなり、国家は、効率よりも、供給が止まらないことを優先して政策を組み立てるようになった。多極化が進む世界で、各国が何を守るべき「安全」と考えるかが、国際関係の新たな火種にもなっている。",
+    "form": "安全保障",
+    "en": "The word \"security\" used to mean mainly defending national territory by military force. Now, however, the concept has widened greatly to include the supply of vital goods such as energy, food and semiconductors, and even the defense of cyberspace. This expansion has made economic problems inseparable from diplomatic and military ones, and states have come to build policy giving priority to supply not stopping over efficiency. In a world of advancing multipolarization, what each country regards as the \"safety\" to be protected is also becoming a new spark in international relations.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「経済安全保障」。軍事だけでなくエネルギー・半導体・サイバーまで広がった。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "安全保障理事会",
+   "reading": "あんぜんほしょうりじかい",
+   "pos": "noun",
+   "meaning": "Security Council",
+   "defJa": "国連で平和と安全に責任を負う機関",
+   "passage": {
+    "ja": "国際連合の安全保障理事会は、世界の平和と安全に主要な責任を負う機関です。常任理事国は、アメリカ、イギリス、フランス、ロシア、中国の五か国で、これらの国には、どんな決議も阻止できる拒否権が認められています。この仕組みは、第二次世界大戦の戦勝国の特権として設けられたもので、七十年以上たった今も、ほとんど変わらず、多極化が進む現在の力関係とのずれが指摘されています。拒否権の乱用で機能が麻痺する場面が増えたことから、改革を求める声が、各国から繰り返し上がっています。",
+    "form": "安全保障理事会",
+    "en": "The United Nations Security Council is the body with primary responsibility for world peace and security. The five permanent members are the United States, the United Kingdom, France, Russia and China, and these countries are granted a veto that can block any resolution. This arrangement was set up as a privilege of the victors of the Second World War, and even after more than seventy years it has hardly changed, and a mismatch with today's increasingly multipolar balance of forces is pointed out. As scenes in which abuse of the veto paralyzes its function have increased, calls for reform keep rising from many countries.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "国連の主要機関。常任理事国五か国は拒否権をもつ。改革論が続く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "完璧主義",
+   "reading": "かんぺきしゅぎ",
+   "pos": "noun",
+   "meaning": "perfectionism",
+   "defJa": "何事も完全でなければ満足しない傾向",
+   "passage": {
+    "ja": "完璧主義の人は、一見すると向上心が強く、仕事にも誠実だと評価されやすい。だが、研究によれば、完璧を求めるあまり、始めることを先送りにしたり、小さな失敗を過度に恐れたりして、かえって成果が出にくくなる傾向がある。背景には、自分の価値を、結果だけで測ってしまう思考の癖がある。対策としては、最初から質の高い成果をめざすのではなく、まず粗いものを世に出して、反応を見ながら磨いていく方法が有効だとされる。",
+    "form": "完璧主義",
+    "en": "Perfectionists tend, at first glance, to be rated as having strong drive to improve and being sincere about their work. But according to research, in their very pursuit of perfection they put off starting or fear small failures excessively, and tend to produce results less readily. Behind this lies a thinking habit of measuring one's own worth by results alone. As a countermeasure, rather than aiming at high-quality results from the start, it is said to be effective first to put out something rough and polish it while watching the response.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「完璧主義に陥る」。完璧を求めすぎて先延ばしや失敗への恐れを生む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宗主国",
+   "reading": "そうしゅこく",
+   "pos": "noun",
+   "meaning": "suzerain; colonial ruler",
+   "defJa": "属国や植民地を支配する国",
+   "passage": {
+    "ja": "植民地を支配していた宗主国は、独立後も、旧植民地と、経済や言語、教育の面で強いつながりを保つことが多い。たとえば、アフリカの一部の国では、フランス語が今も公用語であり、旧支配国の通貨との結びつきが続く例もある。こうした関係は、支援や人的交流という利点をもたらす一方で、真の自立を妨げているという批判も根強い。過去の責任、たとえば奴隷貿易や植民地支配の責任を、どう扱うかは、賠償や謝罪をめぐる、現在進行形の外交課題となっている。",
+    "form": "宗主国",
+    "en": "Colonial rulers that once governed colonies often keep strong ties with their former colonies in economy, language and education even after independence. In some African countries, for example, French is still an official language, and there are cases where links to the former ruler's currency continue. While such relationships bring benefits like aid and human exchange, there is persistent criticism that they impede true independence. How to handle past responsibility, such as for the slave trade and colonial rule, has become an ongoing diplomatic issue over reparations and apology.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「旧宗主国」。植民地・属国を支配する国。独立後も言語・通貨で関係が残る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宗教戦争",
+   "reading": "しゅうきょうせんそう",
+   "pos": "noun",
+   "meaning": "religious war",
+   "defJa": "宗教・宗派の対立による戦争",
+   "passage": {
+    "ja": "十六世紀から十七世紀のヨーロッパは、宗教戦争の時代であった。宗教改革で生まれたプロテスタントとカトリックの対立は、各地で内戦を引き起こし、とくに三十年戦争では、ドイツの人口が大きく減ったとされる。一六四八年のウェストファリア条約は、この戦争を終わらせるとともに、国家が宗教より上位の主権を持つという考え方を広めた。この条約が、のちの国際秩序の出発点とされるのは、信仰の争いを国家間のルールで抑え込もうとした点にある。",
+    "form": "宗教戦争",
+    "en": "Sixteenth- and seventeenth-century Europe was an age of religious wars. The conflict between Protestants and Catholics born of the Reformation provoked civil wars in many places, and in the Thirty Years' War especially, the population of Germany is said to have fallen greatly. The Peace of Westphalia of 1648 ended this war and spread the idea that the state holds sovereignty above religion. The reason this treaty is regarded as the starting point of the later international order lies in its attempt to contain quarrels of faith with rules between states.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「宗教戦争」。十六〜十七世紀の欧州。ウェストファリア条約で終結へ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宗教改革",
+   "reading": "しゅうきょうかいかく",
+   "pos": "noun",
+   "meaning": "the Reformation",
+   "defJa": "カトリック教会への批判から起こった宗教運動",
+   "passage": {
+    "ja": "一五一七年、ルターがヴィッテンベルクで九十五か条の論題を発表したことが、宗教改革の発端とされる。贖宥状の販売に疑問を投げかけたこの行動は、印刷技術の普及に乗って、ドイツ各地に急速に広がった。聖書が民衆の言葉に訳されたことで、信仰の解釈は、教会の独占から、個人へと開かれていった。この動きは、宗派の分裂を生み、のちの宗教戦争の遠因となったが、同時に、近代的な個人の確立にもつながったと評価されている。",
+    "form": "宗教改革",
+    "en": "In 1517, Luther's publication of the Ninety-five Theses at Wittenberg is regarded as the start of the Reformation. This action, which questioned the sale of indulgences, spread rapidly across Germany on the back of the spread of printing. As the Bible was translated into the people's language, interpretation of faith was opened from the Church's monopoly to the individual. This movement produced a split into denominations and became a distant cause of the later religious wars, but is also evaluated as having led to the establishment of the modern individual.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「宗教改革」。一五一七年ルターの論題が発端。宗派分裂と近代的個人の形成へ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宗派",
+   "reading": "しゅうは",
+   "pos": "noun",
+   "meaning": "sect, denomination",
+   "defJa": "同じ宗教内の教えによる分かれ",
+   "passage": {
+    "ja": "仏教って言っても、浄土宗、真言宗、曹洞宗みたいに、日本にはたくさんの宗派があるじゃないですか。同じお釈迦様の教えが出発点なのに、何を一番大事にするかが違うんですよね。念仏を唱えて救いを願う流れもあれば、座禅で境地を深める流れもある。どれが正しいというより、人の性格や状況に応じて、いろんな入り口を用意した結果だと考えると、納得がいきます。それぞれのお寺の雰囲気が違うのも、そのせいなんでしょうね。",
+    "form": "宗派",
+    "en": "Even if you say Buddhism, Japan has many schools, like Jodo, Shingon and Soto, doesn't it? Though the starting point is the same teaching of the Buddha, what each values most differs. There are currents that chant the nenbutsu and pray for salvation, and currents that deepen their state of mind through seated meditation. Rather than any being the right one, it makes sense if you think of them as the result of providing various entrances according to people's temperaments and circumstances. Perhaps that is also why each temple has a different atmosphere.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「宗派」。同じ宗教の中の流れ。浄土宗・真言宗・曹洞宗など。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宗派対立",
+   "reading": "しゅうはたいりつ",
+   "pos": "noun",
+   "meaning": "sectarian conflict",
+   "defJa": "宗派の違いによる対立",
+   "passage": {
+    "ja": "宗派対立という言葉を、ニュースで目にしない日はほとんどありません。しかし、語り手がここで気をつけたいのは、「宗教が原因だ」と、単純に断定してしまわないことです。多くの場合、その背後には、権力や資源の配分、過去の不公平といった、世俗的な問題が絡んでいます。かつての宗教戦争もそうでしたが、信仰の違いは、人々を動員する旗印になりやすいだけで、対立の根そのものとは限りません。この区別を伝えられるかどうかが、話し手の誠実さを分けます。",
+    "form": "宗派対立",
+    "en": "There are almost no days when you do not see the phrase sectarian conflict in the news. But what a speaker should take care about here is not simply asserting \"religion is the cause.\" In many cases, behind it are tangled worldly issues such as the distribution of power and resources and past unfairness. As with the religious wars of old, differences of faith merely tend to become a banner for mobilizing people and are not necessarily the root of the conflict. Whether you can convey this distinction divides the sincerity of speakers.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「宗派対立が激化する」。宗教の違いが旗印になるが、根は権力や資源の問題のことも。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "官僚制",
+   "reading": "かんりょうせい",
+   "pos": "noun",
+   "meaning": "bureaucracy",
+   "defJa": "専門職員が規則に従い行政を担う仕組み",
+   "passage": {
+    "ja": "官僚制は、専門知識を持つ職員が、明確な規則と階層のもとで、行政を担う仕組みである。ドイツの社会学者ウェーバーは、これを、近代国家に欠かせない合理的な組織の型と位置づけた。名君の裁量に頼る統治と違い、恣意的な判断を排し、誰に対しても同じ手順で処理できる点が、その長所である。一方で、規則そのものが目的化し、現場の実情に合わない硬直した運営に陥りやすいという弱点も指摘されてきた。",
+    "form": "官僚制",
+    "en": "Bureaucracy is a system in which staff with specialized knowledge carry out administration under clear rules and a hierarchy. The German sociologist Weber positioned it as a type of rational organization indispensable to the modern state. Unlike rule that relies on the discretion of a wise ruler, its strength is that it excludes arbitrary judgment and can process everyone by the same procedure. On the other hand, a weakness has been pointed out: the rules themselves become the goal and operations easily turn rigid and out of step with the reality on the ground.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「官僚制」。ウェーバーが近代の合理的組織と位置づけた。規則が目的化する弱点も。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "定住",
+   "reading": "ていじゅう",
+   "pos": "noun",
+   "meaning": "permanent settlement",
+   "defJa": "一か所に住み着くこと",
+   "passage": {
+    "ja": "人類の歴史で、定住が始まったのは、およそ一万年前の農耕の開始と重なります。それまでは、食べ物を求めて移動していましたが、作物を育てるには、同じ場所に留まって、世話をし、収穫を待つ必要がありました。やがて、家畜化された動物や、貯蔵された穀物が富となり、財産の差や、国家のような仕組みが生まれていきます。見方を変えれば、それは、人類が自ら選んだというより、暮らしの形が、少しずつ人間を縛っていった過程ともいえます。",
+    "form": "定住",
+    "en": "In human history, the start of settled life coincides with the beginning of farming about ten thousand years ago. Until then, people moved in search of food, but raising crops required staying in the same place, tending them and waiting for the harvest. In time, domesticated animals and stored grain became wealth, and differences in property and state-like structures emerged. Seen another way, it can also be called a process in which the form of life bound humans little by little, rather than something humankind chose.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「定住生活」「定住化」。農耕の開始と結びつき、財産・国家を生む土台になった。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "定着",
+   "reading": "ていちゃく",
+   "pos": "noun",
+   "meaning": "(knowledge) taking hold; retention",
+   "defJa": "しっかり身について残ること",
+   "passage": {
+    "ja": "勉強したことが、頭に定着しないという悩みは、ほとんどの場合、勉強時間の不足ではなく、復習の設計の問題です。たとえば、同じ内容を、翌日、三日後、一週間後と、間隔を空けて思い出すと、記憶は驚くほど長持ちします。こうした分散学習の効果は、心理学で百年以上の実績があります。覚えたい内容を、咀嚼して自分の言葉で説明してみるだけでも、記憶に残る度合いは大きく変わります。",
+    "form": "定着",
+    "en": "The worry that what you studied won't take hold in your head is, in most cases, not a matter of too little study time but of how your review is designed. If you recall the same content at intervals, the next day, three days later, a week later, for example, memory lasts surprisingly long. The effect of such spaced learning has more than a hundred years of record in psychology. Even just digesting the content you want to remember and explaining it in your own words greatly changes how much stays in memory.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「知識の定着」「定着率」。学んだことが身について残ること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "実体",
+   "reading": "じったい",
+   "pos": "noun",
+   "meaning": "substance, true entity",
+   "defJa": "それ自体で存在する本体",
+   "passage": {
+    "ja": "インドの哲学では、物事が、それ自体で存在する「実体」を持つのかどうかをめぐって、学派ごとに大きく立場が分かれる。ニヤーヤ・ヴァイシェーシカ学派は、世界を構成する要素を、地・水・火・風などに分類して、個々の物の実在を認めた。これに対し、仏教の中観派は、あらゆるものは関係によって成り立つので、独立した不変のものなどない、と説いた。この対立は、「自分」という存在をどう捉えるかという問いにも直結し、今日でも、議論の中心的な論点となっている。",
+    "form": "実体",
+    "en": "In Indian philosophy, positions differ greatly from school to school over whether things have a \"substance\" that exists in itself. The Nyaya-Vaisheshika school classified the elements making up the world into earth, water, fire, wind and so on, and recognized the reality of individual things. The Madhyamaka school of Buddhism, by contrast, taught that everything arises from relations and so there is nothing independent and unchanging. This opposition bears directly on the question of how to grasp the existence of \"the self,\" and remains a central point of debate today.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「実体」は独立して存在する本体。インド哲学で学派ごとに立場が分かれる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "実在",
+   "reading": "じつざい",
+   "pos": "noun",
+   "meaning": "reality, real existence",
+   "defJa": "現実にそれがあること",
+   "passage": {
+    "ja": "アドヴァイタ・ヴェーダーンタの学説によれば、本当の意味で実在するのは、ブラフマンただ一つであり、日常で見る多様な世界は、無知が映し出した幻にすぎません。ここで重要なのは、「幻」が「存在しない」という意味ではなく、見えている姿のままでは成り立っていない、ということです。縄を蛇と見間違える例えは、この関係を説明するときに、よく使われます。暗がりで蛇に見えたものが、明かりをつけると縄だったと分かるように、無知が晴れた境地では、世界の本当の姿が現れるというのです。",
+    "form": "実在",
+    "en": "According to the doctrine of Advaita Vedanta, what truly exists is Brahman alone, and the diverse world we see daily is merely an illusion projected by ignorance. What is important here is that \"illusion\" does not mean \"does not exist\" but that it does not hold as it appears. The example of mistaking a rope for a snake is often used to explain this relationship. Just as what looked like a snake in the dark turns out to be a rope when a light is lit, when ignorance clears, the world's true form appears, it is said.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「実在するのはブラフマンのみ」。アドヴァイタの主張。幻とは「見えたままには成り立たない」の意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "実証",
+   "reading": "じっしょう",
+   "pos": "noun",
+   "meaning": "empirical proof",
+   "defJa": "事実や証拠によって確かめること",
+   "passage": {
+    "ja": "AIの性能を評価するとき、「うまくいきそうだ」という印象や、一度だけの成功例だけでは、実証とは言えません。同じ条件で何度も試し、別のデータでも再現できるかを確かめて、はじめて信頼できる結論になります。たとえば、新しい手法が、既存の方法より高い精度を示すという主張には、比較の対象と評価の基準が、はっきり書かれている必要があります。成果の数字に驚く前に、自分の期待を客観視して、その検証の手順に目を向ける習慣が、学ぶ側にも求められます。",
+    "form": "実証",
+    "en": "When evaluating AI performance, an impression that \"it seems to work\" or a single success case is not empirical proof. Only when you try repeatedly under the same conditions and confirm it can be reproduced on other data does it become a trustworthy conclusion. A claim that a new method shows higher accuracy than existing methods, for example, must state clearly the objects of comparison and the criteria of evaluation. Before being astonished by the numbers of the results, a habit of viewing your own expectations objectively and looking at the verification procedure is demanded of learners too.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「実証されている」。印象や一度の成功ではなく、条件を揃えた繰り返しの検証が要る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "実証研究",
+   "reading": "じっしょうけんきゅう",
+   "pos": "noun",
+   "meaning": "empirical research",
+   "defJa": "観察や実験のデータで検証する研究",
+   "passage": {
+    "ja": "「朝活は成功者の習慣」みたいな話って、実証研究で確かめられてるかっていうと、意外とそうでもないんですよね。多くは、成功した人にたまたま早起きが多かった、っていう観察で、因果関係までは分からない。ちゃんとした研究は、人を無作為に二つのグループに分けて、片方だけ早起きさせて、結果を比べる。そこまでやって初めて、「効果あり」と言えるし、自分の体験談だけで決めずに、客観視する目を持つのも大事です。",
+    "form": "実証研究",
+    "en": "As to whether the claim that \"morning activity is a habit of successful people\" is actually confirmed by empirical research, surprisingly, often it is not. Many are just observations that successful people happened to include many early risers, and the causal relationship is not known. Proper research randomly divides people into two groups, makes only one group wake early, and compares the results. Only once you go that far can you say \"it works,\" and it is also important to have an eye that views things objectively rather than deciding from your own anecdotes alone.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「実証研究」。観察やデータで確かめる研究。成功者の習慣の話は因果が曖昧になりやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "客観視",
+   "reading": "きゃっかんし",
+   "pos": "noun",
+   "meaning": "seeing objectively",
+   "defJa": "自分や物事を第三者の目で見ること",
+   "passage": {
+    "ja": "悩んでるときって、頭の中が自分の感情でいっぱいで、状況を客観視できなくなってるんですよね。自分の悩みって、近くにありすぎて、輪郭が見えにくいんですよ。そこで効くのが、「もし友達が同じ相談をしてきたら、なんて答えるか」って考えること。人のことだと、不思議と冷静にアドバイスできるじゃないですか。それを自分に当てはめるだけで、実体のない不安が、案外ちっぽけな問題に見えてきたりします。",
+    "form": "客観視",
+    "en": "When you are troubled, your head is full of your own emotions and you can no longer see the situation objectively. Your own worries are too close, so their outlines are hard to see. What helps then is to think, \"what would I answer if a friend came to me with the same worry?\" About other people, you can strangely give calm advice, can't you? Just applying that to yourself, the substanceless anxiety sometimes starts to look like a surprisingly small problem.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「自分を客観視する」。第三者の目で冷静に見ること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宣教師",
+   "reading": "せんきょうし",
+   "pos": "noun",
+   "meaning": "missionary",
+   "defJa": "宗教を広めるため派遣される人",
+   "passage": {
+    "ja": "十六世紀、大航海時代の流れに乗って、ザビエルをはじめとする宣教師たちが、日本にやってきました。彼らの仕事は、布教だけではなく、現地の言葉を学び、辞書や文法書をつくることでもありました。たとえば、日葡辞書は、当時の日本語を、ポルトガル語で解説した貴重な記録で、今も、国語史の研究に使われています。話し手として歴史を語るなら、「布教」の一面だけでなく、言語や文化の橋渡しという、もう一つの側面にも触れると、聞き手の見方が広がります。",
+    "form": "宣教師",
+    "en": "In the sixteenth century, riding the tide of the Age of Discovery, missionaries led by Xavier came to Japan. Their work was not only preaching but also learning the local language and making dictionaries and grammar books. The Nippo Jisho, for example, explains the Japanese of the time in Portuguese; it is a valuable record still used in research on the history of Japanese. If you tell history as a speaker, touching on another aspect, the bridging of language and culture, not just the side of \"preaching,\" broadens your listeners' view.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「宣教師」の例はザビエル。布教だけでなく辞書作りなど言語・文化の橋渡しも担った。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宥和政策",
+   "reading": "ゆうわせいさく",
+   "pos": "noun",
+   "meaning": "appeasement",
+   "defJa": "相手の要求を受け入れ衝突を避ける政策",
+   "passage": {
+    "ja": "一九三八年のミュンヘン会談で、イギリスとフランスは、ヒトラーの要求を受け入れ、チェコスロバキアの領土の一部を割譲させました。これは宥和政策の典型とされ、和平を願う気持ちからの譲歩が、かえって相手の野心を増長させたと批判されます。では、当時の判断は愚かだったのでしょうか。実際には、国内の厭戦気分や、軍備の遅れという制約が、指導者の選択肢を狭めていました。歴史を語るときは、結果を知る者の目だけで断罪せず、当時の人が何を恐れていたかまで描くことが、語りの深みになります。",
+    "form": "宥和政策",
+    "en": "At the 1938 Munich Conference, Britain and France accepted Hitler's demands and had part of Czechoslovakia's territory ceded. This is regarded as the typical case of appeasement, and the concession born of a wish for peace is criticized for having instead emboldened the other side's ambitions. Was the judgment of the time foolish, then? In fact, constraints such as war-weariness at home and delays in armament narrowed the leaders' options. When telling history, not condemning only with the eyes of those who know the outcome, but also depicting what people of the time feared, gives depth to the telling.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "一九三八年のミュンヘン会談が典型。譲歩が相手を増長させたと批判される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "家畜化",
+   "reading": "かちくか",
+   "pos": "noun",
+   "meaning": "domestication",
+   "defJa": "動物を人が飼い慣らし品種を作ること",
+   "passage": {
+    "ja": "人類が、オオカミを犬に、イノシシを豚に変えていった家畜化の歴史は、実は、人間自身の暮らしの変化と深く結びついています。動物を飼うことで、肉や乳、労働力が安定して手に入り、人は定住の暮らしを深めていきました。その一方で、人と家畜が近くで暮らすことは、動物由来の感染症が広がる原因にもなりました。聞き手に伝えるときは、「人が動物を変えた」だけでなく、「動物が人の暮らしも変えた」という両面を示すと、話に厚みが出ます。",
+    "form": "家畜化",
+    "en": "The history of domestication, in which humans turned wolves into dogs and wild boars into pigs, is in fact deeply tied to changes in human life itself. By keeping animals, meat, milk and labor became reliably available, and people deepened a settled way of life. On the other hand, humans and livestock living close together also became a cause of the spread of animal-derived infectious diseases. When conveying it to listeners, showing both sides, \"humans changed animals\" and \"animals changed human life too,\" gives the talk depth.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「家畜化」。犬・豚・牛など。定住や感染症の拡大とも深く結びつく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "富国強兵",
+   "reading": "ふこくきょうへい",
+   "pos": "noun",
+   "meaning": "rich country, strong army",
+   "defJa": "国を豊かにし軍事力を強めること",
+   "passage": {
+    "ja": "明治政府のスローガンだった富国強兵は、世界史の入試でも、日本史の入試でも頻出です。「富国」とは、殖産興業によって経済力を高めること、「強兵」とは、徴兵制をしいて軍隊を整えることを指し、二つはセットで押さえるのが基本です。背景には、列強に植民地化されかねないという危機感がありました。大政奉還のあと、新政府が中央集権の改革を、猛烈な速度で推し進めた原動力も、この危機感でした。",
+    "form": "富国強兵",
+    "en": "The Meiji government's slogan of enriching the country and strengthening the army is frequent on both world-history and Japanese-history exams. \"Rich country\" means raising economic strength through promoting industry, and \"strong army\" means establishing conscription and equipping the military, and the basic approach is to grasp the two as a set. In the background was a sense of crisis that Japan could be colonized by the great powers. The driving force that propelled the new government's centralizing reforms at breakneck speed after the return of power was also this sense of crisis.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "明治政府の標語。「富国」は殖産興業、「強兵」は徴兵制。セットで覚える。",
+    "sense": ""
+   }
+  }
+ ]
+}
