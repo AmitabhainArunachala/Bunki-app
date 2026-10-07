@@ -1928,7 +1928,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
 .article-facts dd .level-note, .article-facts dd .review-reason { font-size: 14px; color: var(--text-2); }
 body .article-about .note { margin: var(--s1) 0 0; padding: 0; border: 0; border-radius: 0; background: transparent; font: 13px/1.7 var(--sans); color: var(--text-2); }
 .article-about .inline-link { display: inline; min-width: 0; min-height: 0; padding: 0; line-height: inherit; text-align: start; color: var(--ai); }
-body .article-about .note .inline-link { color: var(--text-2); text-decoration-color: var(--hairline); }
+body .article-about .note .inline-link { color: var(--text-2); text-decoration-color: var(--hairline); overflow-wrap: anywhere; }
 body .article-about .note .inline-link:hover { color: var(--ai); text-decoration-color: currentColor; }
 .article-about .details-toggle { min-height: 44px; margin: var(--s1) 0 0; padding: 0; font: 600 13px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--ai); }
 
