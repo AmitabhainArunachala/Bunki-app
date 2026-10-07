@@ -280,6 +280,114 @@ async function journey(page, info) {
       await page.locator('[data-pref="mode:self"]').getAttribute('aria-checked'),
       'true',
     );
+  } else if (info.kind === 'rule') {
+    await page.locator('#kp-start').click();
+    await page.locator('#kp-reveal').click();
+    await page.locator('#kp-rule-dismiss').waitFor({ state: 'visible' });
+    await page.evaluate(
+      () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+    );
+    const sample = await page.evaluate(() => {
+      const node = document.getElementById('kp-rule-dismiss');
+      const r = node.getBoundingClientRect();
+      const cx = r.left + r.width / 2,
+        cy = r.top + r.height / 2;
+      const effectiveBounds = {
+        left: cx - 22,
+        right: cx + 22,
+        top: cy - 22,
+        bottom: cy + 22,
+        width: 44,
+        height: 44,
+      };
+      const report = document.getElementById('bunki-report-bug');
+      const b = report.getBoundingClientRect();
+      const points = [
+        [0, 0],
+        [-21, 0],
+        [21, 0],
+        [0, -21],
+        [0, 21],
+      ].map(([dx, dy]) => {
+        const hit = document.elementFromPoint(cx + dx, cy + dy);
+        return {
+          x: cx + dx,
+          y: cy + dy,
+          owned: hit === node || node.contains(hit),
+          hit: hit && { tag: hit.tagName, id: hit.id },
+        };
+      });
+      return {
+        bounds: {
+          left: r.left,
+          right: r.right,
+          top: r.top,
+          bottom: r.bottom,
+          width: r.width,
+          height: r.height,
+        },
+        effectiveBounds,
+        points,
+        viewport: { width: innerWidth, height: innerHeight },
+        report: { bounds: { left: b.left, right: b.right, top: b.top, bottom: b.bottom } },
+        reportOverlap:
+          Math.max(
+            0,
+            Math.min(effectiveBounds.right, b.right) - Math.max(effectiveBounds.left, b.left),
+          ) *
+          Math.max(
+            0,
+            Math.min(effectiveBounds.bottom, b.bottom) - Math.max(effectiveBounds.top, b.top),
+          ),
+      };
+    });
+    const observation = {
+      ...info,
+      stage: 'rule-touch-target',
+      selector: '#kp-rule-dismiss',
+      ...sample,
+    };
+    samples.push(observation);
+    const detail = JSON.stringify(observation);
+    // The established player contract deliberately paints a compact glyph;
+    // the native pseudo-element hit area, rather than paint, must reach 44px.
+    assert(
+      sample.bounds.width > 0 &&
+        sample.bounds.width < 44 &&
+        sample.bounds.height > 0 &&
+        sample.bounds.height < 44,
+      `Rule dismiss stays painted below 44px: ${detail}`,
+    );
+    assert(
+      sample.points.every((point) => point.owned),
+      `Rule dismiss owns center and all native ±21px hit points: ${detail}`,
+    );
+    assert(
+      sample.effectiveBounds.left >= 0 &&
+        sample.effectiveBounds.right <= sample.viewport.width &&
+        sample.effectiveBounds.top >= 0 &&
+        sample.effectiveBounds.bottom <= sample.viewport.height,
+      `Rule effective hit area remains on screen: ${detail}`,
+    );
+    assert.equal(
+      sample.reportOverlap,
+      0,
+      `Rule effective hit area has zero report collision: ${detail}`,
+    );
+    await page.screenshot({
+      path: join(out, `${info.engine}-${info.lang}-${info.width}-rule-touch-target.png`),
+      fullPage: true,
+    });
+    await page.locator('#kp-rule-dismiss').click();
+    await page.locator('#kp-rule').waitFor({ state: 'hidden' });
+    assert.equal(await page.locator('#kp-rule').count(), 0, 'Real dismiss removes the rule');
+    await controls(
+      page,
+      info,
+      'grades-after-rule',
+      '#kp-grade-again, #kp-grade-hard, #kp-grade-good, #kp-grade-easy',
+      { count: 4 },
+    );
   } else {
     await page.locator('#kp-start').click();
     await page.locator('#kp-reveal').click();
@@ -316,6 +424,7 @@ try {
           ['palette', 390],
           ['sheet', 390],
           ['palette', 320],
+          ['rule', 768],
         ]) {
           const info = {
             engine,
@@ -370,8 +479,8 @@ try {
     site: host.site,
     artifactSha256: identity.artifactSha256,
     gitSha: identity.gitSha,
-    pass: results.length === 20 && results.every((result) => result.passed),
-    expectedCases: 20,
+    pass: results.length === 24 && results.every((result) => result.passed),
+    expectedCases: 24,
     passed: results.filter((result) => result.passed).length,
     failed: results.filter((result) => !result.passed).length,
     results,

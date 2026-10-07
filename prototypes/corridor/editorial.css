@@ -3357,6 +3357,8 @@ body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px);
 body.has-primary-tabs .kp-grades,
 body.has-primary-tabs .pc-controls,
 body.has-primary-tabs .cd-dock { bottom: var(--nav-clearance); }
+/* The deck tip's compact glyph has an expanded touch area below its paint. */
+body.has-primary-tabs .kp-grades { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
 body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
 body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
 .learn-section + .learn-section,
