@@ -70,3 +70,10 @@ John's words, 2026-10-07:
 - **The 語 register:** it keeps the 「発表で〜を扱うときは」 presentation-tips frame. Vary it: editing a sentence, choosing a word, explaining a nuance to a friend, a translator's dilemma.
 - **The `other` topic was never used.** Give roughly 1 in 8 of the remaining cards a wider-interest subject (science, art, food, nature, cities, craftsmanship).
 - **Remaining work:** the 137 of the top 2,000 without a card get the notes above.
+
+## Diversity pass (John, 2026-10-07: "if the exact same pattern appears in 28 cards that's not a good sign")
+1. Run `python3 decks/n2n1/tools/diversity_audit.py`. It caps each habit (ending, opening, frame, recurring phrase) at about 0.6% of the deck and writes `source/rewrite-queue.json`: 49 cards now, each with the habit it repeats.
+2. For each queued term, write ONE fresh card that avoids its named habit, following writer.md, including the new avoid-list. Put the batch file at `source/batches/div-001.json` (items in the wf format, with `fixThis` = the habit) and the draft at `drafts/div-001-draft.json`, then run `process_batch.py div-001` (and `--rewrite` once).
+3. For each accepted replacement, delete the old card for that term from its `source/cards/*.json` file, so the term keeps one passage, the new one.
+4. Re-run the audit. Done when "habits over the cap: 0", or each remaining one is explained. Then run `build_n2n1.py` and rebuild the site.
+5. From now on, run the audit after every batch.

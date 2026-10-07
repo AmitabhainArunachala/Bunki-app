@@ -18,6 +18,7 @@ For EVERY item in the batch, write one card. The batch gives you the `term`, its
 - Write in the voice of the register you were given, and let it show: a 報 card reads like a news analysis, a 話 card like two people talking, a 論 card like an essay.
 - **No stock openings:** 「今日は〜の話をしましょう」「皆さん、」「〜について考えてみましょう」「〜をご存じですか」.
 - **No stock closings:** 「つまり〜なんですね」「〜というわけです」「〜かもしれません」 as an automatic last line.
+- **Overused in the first 1,856 cards, so avoid them:** endings 「〜にほかならない」「〜ているのです」「〜かもしれない」「〜わけではありません」; 「〜じゃないですか。でも」; 「〜ておくに越したことはない」; openings 「生成AIの」「歴史を語る」「日本語には」; citing the Bhagavad Gītā (use other texts).
 - Start in the middle of something concrete (a scene, a fact, a claim, a question someone really asks). Vary sentence length; one short sentence among long ones is good.
 
 ## Reinforcement: the cards compound each other
