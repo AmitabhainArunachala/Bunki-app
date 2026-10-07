@@ -3290,3 +3290,364 @@ body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px
     max-height: calc(100dvh - 15rem);
   }
 }
+
+/* ==========================================================================
+   BEGIN BUNKI DESIGN TOKENS V2 · redesign foundation, 8 October 2026
+
+   Concepts change the named VALUES below; existing rooms consume the legacy
+   aliases in the final bridge. Value rules deliberately have zero specificity
+   so a concept or html[data-room] rule can override them without !important.
+   Keep the public worlds: --world-* snapshots resolve on html BEFORE the
+   body's aliases, avoiding a --ink ↔ --color-ink (or palette) variable cycle.
+   The front-door word sky keeps its original variables and appearance.
+   ========================================================================== */
+:root {
+  --world-ground: var(--ground);
+  --world-ground-2: var(--ground-2);
+  --world-paper: var(--ground-0, #faf6ea);
+  --world-ink: var(--ink);
+  --world-accent: var(--ai);
+  --world-accent-wash: var(--ai-wash);
+  --world-signal: var(--red);
+  --world-signal-wash: var(--red-wash);
+  --world-line: var(--line);
+  --world-line-soft: var(--line-soft);
+  --world-serif: var(--serif);
+  --world-display: var(--display);
+  --world-paper-shadow: var(--paper-shadow);
+  --world-sheet-ground: var(--sheet-ground);
+  --world-sheet-ground-2: var(--sheet-ground-2);
+  --world-sheet-surface: var(--sheet-ground-0);
+  --world-sheet-ink: var(--sheet-ink);
+  --world-sheet-ink-2: var(--sheet-ink-2);
+  --world-sheet-signal: var(--sheet-red);
+  --world-sheet-signal-wash: var(--sheet-red-wash);
+  --world-sheet-line: var(--sheet-line);
+  --world-sheet-line-soft: var(--sheet-line-soft);
+  --world-sheet-quiet: var(--sheet-faint);
+  --world-sheet-muted: var(--sheet-faint-2);
+  --world-sheet-accent: var(--sheet-ai);
+  --world-sheet-accent-wash: var(--sheet-ai-wash);
+  --world-card-ground: var(--card-ground);
+  --world-card-ground-2: var(--card-ground-2);
+  --world-card-surface: var(--card-ground-0);
+  --world-card-ink: var(--card-ink);
+  --world-card-ink-2: var(--card-ink-2);
+  --world-card-signal: var(--card-red);
+  --world-card-signal-wash: var(--card-red-wash);
+  --world-card-line: var(--card-line);
+  --world-card-line-soft: var(--card-line-soft);
+  --world-card-quiet: var(--card-faint);
+  --world-card-muted: var(--card-faint-2);
+  --world-card-accent: var(--card-ai);
+  --world-card-accent-wash: var(--card-ai-wash);
+  --world-zen-ground-deep: var(--zen-stage-deep);
+  --world-zen-ground: var(--zen-stage);
+  --world-zen-surface: var(--zen-stage-crown);
+  --world-zen-ink: var(--zen-text);
+  --world-zen-accent: var(--zen-accent);
+  --world-zen-signal: var(--zen-red);
+  --world-zen-glow: var(--zen-glow);
+}
+
+:where(body:not([data-view='drift'])) {
+  /* Colour roles: the world supplies pigments; the page supplies material. */
+  --color-ground: var(--world-ground);
+  --color-ground-2: var(--world-ground-2);
+  --color-paper: var(--world-paper);
+  --color-page: color-mix(in srgb, var(--color-ground) 22%, #faf9f6);
+  --color-surface: #fff;
+  --color-surface-sunk: color-mix(in srgb, var(--color-ink) 3.5%, var(--color-surface));
+  --color-ink: var(--world-ink);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 74%, var(--color-surface));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 80%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 76%, var(--color-paper));
+  --color-accent: var(--world-accent);
+  --color-accent-wash: var(--world-accent-wash);
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-signal: var(--world-signal);
+  --color-signal-wash: var(--world-signal-wash);
+  --color-seal: var(--color-signal);
+  --color-seal-wash: color-mix(in srgb, var(--color-seal) 9%, transparent);
+  --color-line: var(--world-line);
+  --color-line-soft: var(--world-line-soft);
+  --color-separator: color-mix(in srgb, var(--color-ink) 13%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-ink) 38%, var(--color-paper));
+  --color-rule-soft: color-mix(in srgb, var(--color-ink) 18%, var(--color-paper));
+  --color-fill: rgb(120 120 128 / 12%);
+  --color-fill-strong: rgb(120 120 128 / 20%);
+  --color-glass: rgb(250 250 248 / 80%);
+  --color-glass-solid: #fafaf8;
+  --color-glass-line: rgb(0 0 0 / 16%);
+  --color-art-ground: color-mix(in srgb, var(--color-accent) 58%, #07101d);
+  --color-art-ink: #f3ecdc;
+  --color-focus-wash: color-mix(in srgb, var(--color-signal) 16%, transparent);
+
+  /* The existing lacquer, warm recall card and world-specific zen desk each
+     retain their own material. Concepts can tune these through values too. */
+  --color-sheet-ground: var(--world-sheet-ground);
+  --color-sheet-ground-2: var(--world-sheet-ground-2);
+  --color-sheet-surface: var(--world-sheet-surface);
+  --color-sheet-ink: var(--world-sheet-ink);
+  --color-sheet-ink-2: var(--world-sheet-ink-2);
+  --color-sheet-signal: var(--world-sheet-signal);
+  --color-sheet-signal-wash: var(--world-sheet-signal-wash);
+  --color-sheet-line: var(--world-sheet-line);
+  --color-sheet-line-soft: var(--world-sheet-line-soft);
+  --color-sheet-quiet: var(--world-sheet-quiet);
+  --color-sheet-muted: var(--world-sheet-muted);
+  --color-sheet-accent: var(--world-sheet-accent);
+  --color-sheet-accent-wash: var(--world-sheet-accent-wash);
+  --color-card-ground: var(--world-card-ground);
+  --color-card-ground-2: var(--world-card-ground-2);
+  --color-card-surface: var(--world-card-surface);
+  --color-card-ink: var(--world-card-ink);
+  --color-card-ink-2: var(--world-card-ink-2);
+  --color-card-signal: var(--world-card-signal);
+  --color-card-signal-wash: var(--world-card-signal-wash);
+  --color-card-line: var(--world-card-line);
+  --color-card-line-soft: var(--world-card-line-soft);
+  --color-card-quiet: var(--world-card-quiet);
+  --color-card-muted: var(--world-card-muted);
+  --color-card-accent: var(--world-card-accent);
+  --color-card-accent-wash: var(--world-card-accent-wash);
+  --color-zen-ground-deep: var(--world-zen-ground-deep);
+  --color-zen-ground: var(--world-zen-ground);
+  --color-zen-surface: var(--world-zen-surface);
+  --color-zen-ink: var(--world-zen-ink);
+  --color-zen-accent: var(--world-zen-accent);
+  --color-zen-signal: var(--world-zen-signal);
+  --color-zen-glow: var(--world-zen-glow);
+
+  /* Offline faces only: system UI and the three already bundled ink faces. */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+  --font-reading: var(--world-serif);
+  --font-display: var(--world-display);
+  --font-brush: 'Yuji Syuku', 'Shippori Mincho B1', var(--font-reading);
+  --font-seal: 'Kaisei Tokumin', 'Shippori Mincho B1', var(--font-reading);
+  --type-caption: 12px;
+  --type-label: 13px;
+  --type-chrome: 14px;
+  --type-control: 15px;
+  --type-body: 16px;
+  --type-lead: 18px;
+  --type-reading: 23px;
+  --type-section: 24px;
+  --type-title: 29px;
+  --type-display: 34px;
+  --type-hero: 38px;
+  --type-headword: 42px;
+  --type-seal: 22px;
+  --leading-tight: 1.25;
+  --leading-ui: 1.4;
+  --leading-body: 1.6;
+  --leading-reading: 1.9;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Four-point base, with the current eight-point room rhythm preserved. */
+  --space-0: 0;
+  --space-hair: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --hit: 44px;
+  --size-seal: 56px;
+  --stroke-hairline: 0.5px;
+  --stroke-relief: 1px;
+  --stroke-focus: 2px;
+  --radius-none: 0;
+  --radius-small: 4px;
+  --radius-seal: 5px;
+  --radius-control: 12px;
+  --radius-overlay: 14px;
+  --radius-surface: 16px;
+  --radius-pill: 999px;
+
+  /* Relief remains an edge plus a shadow, independent of a concept's skin. */
+  --elevation-none: none;
+  --elevation-paper: var(--world-paper-shadow);
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 8%);
+  --elevation-lift: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 36px rgb(0 0 0 / 12%);
+  --elevation-float: 0 2px 6px rgb(0 0 0 / 6%), 0 20px 48px rgb(0 0 0 / 16%);
+  --elevation-focus: inset 0 -2px 0 var(--color-ink);
+  --motion-instant: 0ms;
+  --motion-quick: 120ms;
+  --motion-press: 140ms;
+  --motion-fast: 180ms;
+  --motion-standard: 220ms;
+  --motion-room: 240ms;
+  --motion-sheet: 280ms;
+  --motion-long: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-enter: ease-out;
+  --ease-exit: ease-in;
+  --ease-linear: linear;
+}
+
+/* Preserve the current exact default paper and the existing night materials. */
+:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+  --color-page: #f6f5f1;
+}
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+  --color-page: var(--color-ground);
+  --color-surface: var(--color-paper);
+  --color-surface-sunk: color-mix(in srgb, var(--color-paper) 70%, var(--color-ground));
+  --color-separator: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-fill: rgb(120 120 128 / 24%);
+  --color-fill-strong: rgb(120 120 128 / 34%);
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-ground) 72%, transparent);
+  --color-glass-solid: color-mix(in srgb, var(--color-ground) 92%, #fff);
+  --color-glass-line: rgb(255 255 255 / 16%);
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 34%);
+  --elevation-lift: 0 2px 4px rgb(0 0 0 / 34%), 0 16px 36px rgb(0 0 0 / 44%);
+  --elevation-float: 0 2px 6px rgb(0 0 0 / 36%), 0 20px 48px rgb(0 0 0 / 50%);
+}
+@media (max-width: 520px) {
+  /* The shipped contrast variant's body rule keeps the full reading/display
+     sizes; the compact scale applies only when that variant is switched off. */
+  :where(body:not([data-view='drift']):not(.v-contrast-wcag)) {
+    --type-reading: 21px;
+    --type-display: 29px;
+  }
+}
+
+/* Compatibility bridge. Only aliases have the specificity needed to replace
+   the earlier world/body declarations. Room-local pigments remain scoped. */
+:root body:not([data-view='drift']) {
+  --ground: var(--color-ground);
+  --ground-2: var(--color-ground-2);
+  --ground-0: var(--color-paper);
+  --page: var(--color-page);
+  --surface: var(--color-surface);
+  --surface-sunk: var(--color-surface-sunk);
+  --ink: var(--color-ink);
+  --ink-2: var(--color-ink-2);
+  --label: var(--color-ink);
+  --label-2: var(--color-label-2);
+  --faint: var(--color-quiet);
+  --faint-2: var(--color-muted);
+  --text: var(--color-ink);
+  --text-2: var(--color-label-2);
+  --ai: var(--color-accent);
+  --ai-wash: var(--color-accent-wash);
+  --tint: var(--color-accent);
+  --tint-wash: var(--color-tint-wash);
+  --red: var(--color-signal);
+  --red-wash: var(--color-signal-wash);
+  --accent: var(--color-seal);
+  --accent-wash: var(--color-seal-wash);
+  --line: var(--color-line);
+  --line-soft: var(--color-line-soft);
+  --separator: var(--color-separator);
+  --hairline: var(--color-separator);
+  --rule-strong: var(--color-separator);
+  --fill: var(--color-fill);
+  --fill-strong: var(--color-fill-strong);
+  --glass: var(--color-glass);
+  --glass-solid: var(--color-glass-solid);
+  --glass-line: var(--color-glass-line);
+  --raised: var(--color-surface);
+  --raised-edge: var(--color-separator);
+  --raised-edge-strong: var(--color-edge-strong);
+  --chrome: var(--color-glass-solid);
+  --chrome-ink: var(--color-ink);
+  --art-field: var(--color-art-ground);
+  --art-ink: var(--color-art-ink);
+  --focus-wash: var(--color-focus-wash);
+  --focus-ring: var(--elevation-focus);
+  --ed-paper: var(--color-surface);
+  --ed-ink: var(--color-ink);
+  --ed-muted: var(--color-ink-2);
+  --ed-rule: var(--color-rule);
+  --ed-rule-light: var(--color-rule-soft);
+  --ed-mast: var(--color-glass-solid);
+  --ed-mast-ink: var(--color-ink);
+  --sheet-ground: var(--color-sheet-ground);
+  --sheet-ground-2: var(--color-sheet-ground-2);
+  --sheet-ground-0: var(--color-sheet-surface);
+  --sheet-ink: var(--color-sheet-ink);
+  --sheet-ink-2: var(--color-sheet-ink-2);
+  --sheet-red: var(--color-sheet-signal);
+  --sheet-red-wash: var(--color-sheet-signal-wash);
+  --sheet-line: var(--color-sheet-line);
+  --sheet-line-soft: var(--color-sheet-line-soft);
+  --sheet-faint: var(--color-sheet-quiet);
+  --sheet-faint-2: var(--color-sheet-muted);
+  --sheet-ai: var(--color-sheet-accent);
+  --sheet-ai-wash: var(--color-sheet-accent-wash);
+  --card-ground: var(--color-card-ground);
+  --card-ground-2: var(--color-card-ground-2);
+  --card-ground-0: var(--color-card-surface);
+  --card-ink: var(--color-card-ink);
+  --card-ink-2: var(--color-card-ink-2);
+  --card-red: var(--color-card-signal);
+  --card-red-wash: var(--color-card-signal-wash);
+  --card-line: var(--color-card-line);
+  --card-line-soft: var(--color-card-line-soft);
+  --card-faint: var(--color-card-quiet);
+  --card-faint-2: var(--color-card-muted);
+  --card-ai: var(--color-card-accent);
+  --card-ai-wash: var(--color-card-accent-wash);
+  --zen-stage-deep: var(--color-zen-ground-deep);
+  --zen-stage: var(--color-zen-ground);
+  --zen-stage-crown: var(--color-zen-surface);
+  --zen-text: var(--color-zen-ink);
+  --zen-accent: var(--color-zen-accent);
+  --zen-red: var(--color-zen-signal);
+  --zen-glow: var(--color-zen-glow);
+  --sans: var(--font-ui);
+  --serif: var(--font-reading);
+  --display: var(--font-display);
+  --t-body: var(--type-body);
+  --t-label: var(--type-label);
+  --t-chrome: var(--type-chrome);
+  --t-read: var(--type-reading);
+  --t-section: var(--type-section);
+  --t-display: var(--type-display);
+  --t-hero: var(--type-hero);
+  --s-half: var(--space-1);
+  --s1: var(--space-2);
+  --s2: var(--space-4);
+  --s3: var(--space-6);
+  --s4: var(--space-8);
+  --s5: var(--space-10);
+  --s6: var(--space-12);
+  --s8: var(--space-16);
+  --tap: var(--hit);
+  --r-control: var(--radius-control);
+  --r-float: var(--radius-overlay);
+  --r-card: var(--radius-surface);
+  --radius-float: var(--radius-overlay);
+  --radius-card: var(--radius-surface);
+  --seal-radius: var(--radius-seal);
+  --seal-size: var(--size-seal);
+  --seal-font: var(--type-seal);
+  --shadow-card: var(--elevation-card);
+  --shadow-lift: var(--elevation-lift);
+  --shadow-float: var(--elevation-float);
+  --raised-shadow: var(--elevation-card);
+  --raised-shadow-hover: var(--elevation-lift);
+  --float-shadow: var(--elevation-float);
+  --paper-shadow: var(--elevation-paper);
+  --ed-shadow: var(--elevation-card);
+  --paper-edge: var(--stroke-relief) solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --rule: var(--stroke-relief) solid var(--color-line);
+  --dur: var(--motion-standard);
+  --ease: var(--ease-standard);
+}
+/* END BUNKI DESIGN TOKENS V2 =============================================== */
