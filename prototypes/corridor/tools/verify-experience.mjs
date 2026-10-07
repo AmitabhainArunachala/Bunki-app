@@ -256,7 +256,7 @@ try{
   await click('#yoji-link');await page.locator('[data-yoji]').first().waitFor();await click('[data-yoji]');await sleep(850);await shot('idiom-entry','Four-character idiom has a real recursive detail door');await closeSheet();await click('#back');
   await click('#kanjidex-link');await page.locator('[data-kdx-part="木"]').click();await role('by strokes');await click('[data-kdx-st="8"]');await role('by its parts');await shot('shape-wood-eight','Current parts+strokes flow finds 林 without relying on stale controls');
   await check('E13-current-shape-flow','木 and eight total strokes find 林 through actual lenses',async()=>{assert.ok(await visible('[data-kdx-hit="林"]'));return 'Legacy journey omitted the by-strokes lens; selector exists there. Returned to parts for actual combined filter.';});await click('[data-kdx-hit="林"]');await sleep(850);assert.equal(await page.locator('.sheet .hero-glyph').innerText(),'林');await closeSheet();
-  const skip=page.locator('.kdx-lens').filter({hasText:'SKIP'});
+  const skip=page.locator('.kdx-lens').filter({hasText:'by its shape'});
   if(await skip.count()){
    const s=await state();await skip.click();await page.locator('.skip-hit').first().waitFor();await shot('skip-integrated','SKIP is a normal shape-finder lens within the same journey');
    await page.locator('.skip-hit').first().click();await sleep(850);await click('#sheet-search');await page.locator('#nav-search-input').fill('1-3-8');await page.locator('.skip-code').waitFor();await sleep(350);await shot('skip-code-search','Typed SKIP code gives real candidates');
