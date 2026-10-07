@@ -1,0 +1,644 @@
+{
+ "cards": [
+  {
+   "term": "空気を読む",
+   "reading": "くうきをよむ",
+   "pos": "expression",
+   "meaning": "to read the room",
+   "defJa": "場の雰囲気や相手の気持ちを察する",
+   "passage": {
+    "ja": "日本語の会話では、空気を読むことが、言葉の意味そのものより重んじられる場面があります。たとえば「ちょっと難しいですね」は、字面では程度を述べているだけですが、実際には断りの合図として働くことが多いのです。だから、日本語を学ぶ人にとっては、相槌のタイミングや沈黙の長さも、大事な情報になります。もっとも、察しすぎて本音を言えなくなると、今度は会議が前に進みません。結局、察する力と、はっきり言う勇気は、両方そろって初めて意味を持つのです。",
+    "form": "空気を読む",
+    "en": "In Japanese conversation, there are occasions when reading the room is valued more than the meaning of the words themselves. For example, 'it's a little difficult' merely states a degree on its face but in practice often works as a signal of refusal. So for people learning Japanese, the timing of back-channel responses and the length of silences also become important information. That said, if you read the signals too much and can no longer say what you really think, the meeting will in turn go nowhere. In the end, the ability to read between the lines and the courage to speak plainly gain meaning only when both are present.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「空気を読めない」の形でも。察しは大事だが、言うべきことは言う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "立ち直る",
+   "reading": "たちなおる",
+   "pos": "verb",
+   "meaning": "to recover; bounce back",
+   "defJa": "落ち込んだ状態から元に戻る",
+   "passage": {
+    "ja": "失敗したあと、すぐに立ち直る人といつまでも引きずる人の差は、才能より、失敗の語り方にあると私は考えている。「自分はだめだ」という白黒思考の代わりに、「この方法は合わなかった」と、主語を行動に移してみる。それだけで、人格への全否定が、改善できる課題へと姿を変える。話し方の稽古でも、緊張で言葉に詰まった自分を責めず、次の一回のために、気づきを一つだけ持ち帰るようにしたい。",
+    "form": "立ち直る",
+    "en": "I believe that the difference between people who recover quickly after failure and those who keep dragging it along lies in how they talk about the failure, more than in talent. Instead of black-and-white thinking like I am hopeless, try shifting the subject to the action: this method did not suit me. That alone turns a total denial of one's character into a problem that can be improved. Even in speaking practice, I want to avoid blaming myself for freezing from nerves and take home just one realization for the next attempt.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「失敗から立ち直る」。「引きずる」と対にして語る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "立憲君主制",
+   "reading": "りっけんくんしゅせい",
+   "pos": "noun",
+   "meaning": "constitutional monarchy",
+   "defJa": "憲法で君主の権力を制限する政治の仕組み",
+   "passage": {
+    "ja": "立憲君主制とは、君主の権力が憲法によって制限される政治体制である。イギリスでは、清教徒革命と王政復古を経て、名誉革命ののち、議会が王の租税の承認権や立法権を握る原則が確立した。そこでは、君主は国の象徴として存在しつつも、実際の政治は議会と内閣が担う。この仕組みは、王を排除せずに権力を縛るという、歴史の知恵ともいえる折衷であった。多くの国が、のちにこの形を手本にして、王朝の盛衰を乗り越えたのは偶然ではない。",
+    "form": "立憲君主制",
+    "en": "A constitutional monarchy is a political system in which the monarch's power is limited by a constitution. In England, after the Puritan Revolution and the Restoration, following the Glorious Revolution, the principle was established that Parliament holds the king's power to approve taxes and to legislate. There the monarch exists as a symbol of the nation, while actual politics is carried out by Parliament and the cabinet. This arrangement was a compromise, one might call it a piece of historical wisdom, binding power without eliminating the king. It is no accident that many countries later took this form as a model and survived the rise and fall of dynasties.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "イギリスの名誉革命(一六八八年)後に確立。王は象徴、政治は議会。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "端的",
+   "reading": "たんてき",
+   "pos": "na-adj",
+   "meaning": "direct; straightforward",
+   "defJa": "回りくどくなく、要点をそのまま示すさま",
+   "passage": {
+    "ja": "端的な言い方が上手な人は、話が短いのではなく、不要な部分がない人です。たとえば会議で意見を求められたとき、「賛成ですが、予算だけ再検討が必要です」と言い切れば、聞き手は一度で内容をつかめます。逆に、前置きや言い訳から入ると、肝心の結論が最後まで出てきません。短く話すとは、削る勇気そのものだと私は思っています。だから、話す前に、的確な一文に圧縮する練習を、前置きを抜きにしてやってみましょう。",
+    "form": "端的",
+    "en": "People who are good at putting things directly are not people whose talk is short but people with no unnecessary parts. For example, when asked for an opinion in a meeting, if you state flatly, 'I agree, but the budget needs reconsidering,' the listener grasps the content in one go. Conversely, if you start with preambles and excuses, the crucial conclusion does not appear until the very end. Speaking briefly is itself the courage to cut, I think. So before you speak, try compressing it into one precise sentence, doing so without any preamble.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「端的な表現」。回りくどくなく要点をつく。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "端的に言えば",
+   "reading": "たんてきにいえば",
+   "pos": "expression",
+   "meaning": "to put it simply",
+   "defJa": "要するに言えば",
+   "passage": {
+    "ja": "小論文では、結論を急ぐばかりに根拠が薄くなる失敗が目立ちます。この問題を端的に言えば、読み手の疑問に先回りして答えていないということです。たとえば「A社が成功した」と書くだけでは、「なぜ」という疑問が残ります。そこで、一文のあとに「その理由は〜」と理由を足すだけで、説得力は大きく上がります。こうした型を身につけると、試験本番でも、的確に論点を押さえられます。",
+    "form": "端的に言えば",
+    "en": "In short essays, the failure of hurrying to a conclusion so that the grounds grow thin stands out. Putting this problem simply, you are not answering the reader's questions ahead of time. For example, just writing that company A succeeded leaves the question of why. So just adding a reason after a sentence, saying the reason is, greatly raises persuasiveness. Once you master such a pattern, you can pin down the points precisely even on exam day.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "まとめを述べる前置き。論述や説明の一文目に置く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "端緒",
+   "reading": "たんしょ",
+   "pos": "noun",
+   "meaning": "beginning; first step",
+   "defJa": "物事が始まる最初の手がかり",
+   "passage": {
+    "ja": "戦争の端緒を探すとき、歴史家は、最初の発砲という目に見える出来事だけでなく、その前に積み重なった緊張にも目を向ける。第一次世界大戦の始まりを一九一四年のサライェヴォ事件に置く見方は、わかりやすいが、同盟関係や軍備競争を軽く扱う恐れがある。起点とは、因果の鎖のどの輪をそう呼ぶかという、解釈の問題でもある。しかも、事件と結果のあいだの相関関係が、そのまま原因を意味するわけではない。したがって、起点の選び方に、その歴史家の問いが映る。",
+    "form": "端緒",
+    "en": "When searching for the origin of a war, historians look not only at the visible event of the first shot but also at the tensions that built up before it. The view that places the start of the First World War at the 1914 Sarajevo incident is easy to understand but risks treating alliances and the arms race lightly. A starting point is also a matter of interpretation: which link of the chain of causation you choose to call it. Moreover, a correlation between an incident and an outcome does not mean as it stands that it is the cause. Therefore the way a historian chooses the starting point reflects that historian's question.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜の端緒を開く」。発端より硬く、解決や研究の糸口にも使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "競争力",
+   "reading": "きょうそうりょく",
+   "pos": "noun",
+   "meaning": "competitiveness",
+   "defJa": "他と競って勝つ力",
+   "passage": {
+    "ja": "半導体メーカーの競争力は、設計の巧さだけでなく、製造の歩留まりという地味な数字に大きく左右されます。同じ回路を作っても、不良品の割合が低い工場ほど、一枚のウェハーから取れる製品が増えて、原価が下がるからです。そのため、最先端の工程を持つ企業は、稼働率を高く保つために、巨額の投資を続けています。もっとも、投資だけでは優位は維持できず、技術者の確保と、装置メーカーとの連携が欠かせません。精度の追求が、そのまま企業の体力になるのです。",
+    "form": "競争力",
+    "en": "A semiconductor maker's competitiveness depends greatly not just on the cleverness of its design but on the humble figure called manufacturing yield. Even when making the same circuit, the lower a factory's defect rate, the more products can be obtained from a single wafer and the lower the cost. For that reason, companies with cutting-edge processes keep investing huge sums to hold their operating rates high. That said, investment alone cannot sustain an advantage; securing engineers and cooperating with equipment makers are indispensable. The pursuit of precision becomes the company's stamina as it is.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「国際競争力」。歩留まりと投資が半導体の優位を決める。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "符号化",
+   "reading": "ふごうか",
+   "pos": "noun",
+   "meaning": "encoding",
+   "defJa": "情報を記憶できる形に変えること",
+   "passage": {
+    "ja": "記憶の第一段階は、符号化と呼ばれます。これは、目や耳から入った情報を、脳が扱える形に変換する過程です。深く考えながら処理した情報ほど、のちに思い出しやすいことが、多くの実験で示されています。たとえば単語を覚えるときに、文字の形を眺めるより、その意味を自分の生活と結びつけるほうが、長く残ります。意味づけをせずに流すと、短期記憶から消えかねないので、知見に基づいて、情報を一度ことばにして海馬へ渡すのが、勉強の要です。",
+    "form": "符号化",
+    "en": "The first stage of memory is called encoding. It is the process of converting information that enters through the eyes and ears into a form the brain can handle. Many experiments have shown that information processed while thinking deeply is easier to recall later. For example, when memorizing a word, linking its meaning to your own life lasts longer than gazing at the shape of the letters. If you let it flow past without giving it meaning, it may vanish from short-term memory, so the key to studying, based on research findings, is to put information into words once and pass it on to the hippocampus.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "記憶の入口。意味づけして処理するほど残りやすい。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "第一人者",
+   "reading": "だいいちにんしゃ",
+   "pos": "noun",
+   "meaning": "leading authority",
+   "defJa": "その分野で最も優れた人",
+   "passage": {
+    "ja": "ある分野の第一人者とは、論文の数が多い人ではなく、その分野の問いの立て方を変えた人のことだ、と言われる。人工知能の研究でも、ニューラルネットワークが不遇だった時代に研究を続けたヒントンらが、いまの深層学習の礎を築いたと評価される。ただ、権威の言葉であっても、誤りや偏りがないわけではない。報道は、その発言を、他の専門家の知見と並べて伝えることが望ましい。敬意と検証の姿勢は、両立できる。",
+    "form": "第一人者",
+    "en": "It is said that a leading authority in a field is not the person with the most papers but the person who changed how that field poses its questions. In artificial intelligence research too, Hinton and others, who kept on with neural networks in an era when they were out of favor, are credited with laying the foundation of today's deep learning. Still, even an authority's words are not free of error or bias. It is desirable for the press to convey such statements alongside the findings of other experts. An attitude of respect and one of verification can coexist.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「〜分野の第一人者」。肩書きではなく、問いを変えた貢献を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "第三世界",
+   "reading": "だいさんせかい",
+   "pos": "noun",
+   "meaning": "Third World",
+   "defJa": "冷戦期の、どちらの陣営にも属さない国々",
+   "passage": {
+    "ja": "冷戦期の「第三世界」という言葉は、アメリカ陣営でもソ連陣営でもない国々を指した。語るときは、この語が、経済の貧しさを示す言葉としてではなく、もとは政治的な立場を示す語であったことを、先に押さえておくとよい。一九五五年のバンドン会議は、アジアとアフリカの国々が、東西対立の外で連帯を示した象徴的な場だった。発展途上国という現在の呼び方との違いを説明できると、聞き手の理解は一段深まる。",
+    "form": "第三世界",
+    "en": "The Cold War term 'Third World' referred to countries that belonged to neither the American camp nor the Soviet camp. When you talk about it, it is good to establish first that the word was originally a term for a political stance rather than one denoting economic poverty. The 1955 Bandung Conference was a symbolic occasion on which Asian and African countries showed solidarity outside the East-West confrontation. If you can explain the difference from the present-day label developing country, the listener's understanding deepens a step.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "一九五二年にソーヴィが使い始めた語。バンドン会議が象徴的な場。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "筆力",
+   "reading": "ひつりょく",
+   "pos": "noun",
+   "meaning": "writing power",
+   "defJa": "文章で読み手を動かす力",
+   "passage": {
+    "ja": "筆力とは、文字の勢いではなく、読み手を最後まで連れていく文章の推進力のことだ。そのために必要なのは、難しい語彙より、一文ごとに問いと答えを小さく積み重ねる構成である。たとえば、最初の一文で疑問を投げ、二文目で意外な事実を示すだけで、読み手は先を知りたくなる。簡潔明瞭な文を重ねても、方向が定まっていなければ、力は生まれない。書く前に、「読み終えた人にどうなってほしいか」を一行で決めておき、目的意識を失わないようにしたい。",
+    "form": "筆力",
+    "en": "Writing power is not the vigor of the lettering but the driving force of prose that carries the reader to the end. What is needed for that is not difficult vocabulary but a structure that builds small questions and answers sentence by sentence. For example, just throwing out a question in the first sentence and showing a surprising fact in the second makes readers want to know what comes next. Even if you stack clear and concise sentences, no force arises if the direction is not set. Before writing, I want to decide in one line how I want the person who finishes reading to be changed, and not lose my sense of purpose.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「筆力がある」。文章で説得し、読ませる力。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "筆致",
+   "reading": "ひっち",
+   "pos": "noun",
+   "meaning": "style of writing",
+   "defJa": "文章や絵の書きぶりに現れる特徴",
+   "passage": {
+    "ja": "同じ事件を扱った記事でも、筆致が違うと、読後の印象はまったく変わります。淡々と事実を並べる書き方は、読み手に判断を委ね、感情を込めた書き方は、共感を呼びます。どちらが優れているということではなく、書き手の目的意識と、読み手の状況に合うかどうかが基準になります。直喩を多用して温度を上げるのか、あえて抑えるのか。優れた書き手は、その温度を、題材に応じて細かく調整しているのです。",
+    "form": "筆致",
+    "en": "Even in articles dealing with the same incident, the impression after reading changes completely if the writing style differs. A way of writing that sets out facts dispassionately leaves judgment to the reader, while a way of writing that puts in feeling draws sympathy. It is not that one is better; the criterion is whether it suits the writer's sense of purpose and the reader's situation. Do you raise the temperature with frequent similes, or deliberately hold it down? Skilled writers adjust that temperature finely according to the subject.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「軽妙な筆致」「冷静な筆致」。書き手の色や温度を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "筆舌に尽くしがたい",
+   "reading": "ひつぜつにつくしがたい",
+   "pos": "expression",
+   "meaning": "beyond description",
+   "defJa": "言葉ではとても言い表せない",
+   "passage": {
+    "ja": "災害の現場を訪れた記者が、最初に直面するのは、筆舌に尽くしがたい光景をどう言葉にするかという問題である。形容詞を重ねるほど、かえって事実の重みが薄まるため、見えたものを具体的に書く方法が好まれる。たとえば、倒れた本棚と、床に残った子どもの靴という二つの描写だけで、読み手は状況を察する。簡潔明瞭な記述は、感情を押し付けない分、記録としての信頼性を保つ。的確な細部の選び方が、報道文の腕の見せどころだ。",
+    "form": "筆舌に尽くしがたい",
+    "en": "What a reporter visiting a disaster site faces first is the problem of how to put into words a sight beyond description. The more adjectives you pile up, the more the weight of the facts thins, so a method of writing concretely what was seen is preferred. For example, with only two depictions, a fallen bookcase and a child's shoe left on the floor, the reader grasps the situation. Clear and concise description, to the extent it does not push feelings, preserves reliability as a record. The choice of precise details is where news writing shows its skill.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "災害や惨状を前に使う。「筆舌に尽くしがたい苦しみ」など。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "筆順",
+   "reading": "ひつじゅん",
+   "pos": "noun",
+   "meaning": "stroke order",
+   "defJa": "漢字を書くときの画の順序",
+   "passage": {
+    "ja": "文部省が一九五八年にまとめた「筆順指導の手びき」は、学校で漢字を教える際の目安とされてきたが、唯一の正解を定めたものではない。手びき自体が、示した順序以外を誤りとするものではないという趣旨を述べている。それでも、試験や書道の場では、書き順が評価の対象になる場合がある。画数の多い字ほど、無理なく書ける順序を体で覚える意味は大きい。正しさより、再現できる流れを身につけることが先だ。",
+    "form": "筆順",
+    "en": "The 'Handbook for Stroke Order Instruction,' compiled by the Ministry of Education in 1958, has served as a guideline when teaching kanji in schools but does not fix a single correct answer. The handbook itself states the intent that orders other than those it shows are not to be treated as mistakes. Even so, in exams and calligraphy, the order of strokes can become an object of evaluation. The more strokes a character has, the greater the meaning of learning with the body an order you can write without strain. Acquiring a flow you can reproduce comes before correctness.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「筆順指導の手びき」。複数の書き方が認められる字もある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "簡潔明瞭",
+   "reading": "かんけつめいりょう",
+   "pos": "na-adj",
+   "meaning": "clear and concise",
+   "defJa": "簡単で、はっきりわかりやすいさま",
+   "passage": {
+    "ja": "ビジネス文書で求められるのは、簡潔明瞭であることです。一通のメールに依頼を三つ入れると、読み手はどれから手をつけるか迷い、結局どれも後回しにしてしまいます。だから、一通に依頼は一つに限り、件名にも本文の冒頭にもそれを書くのが基本です。そのうえで、期限と、判断に必要な情報だけを添えます。こうして削った文面は、冷たいのではなく、相手の時間への敬意の表れであり、的確な件名がその第一歩になります。",
+    "form": "簡潔明瞭",
+    "en": "What is demanded of business documents is to be clear and concise. If you put three requests in a single email, the reader is unsure where to start and ends up putting all of them off. So the basic rule is to limit each email to one request and to write it in both the subject line and the opening of the body. On top of that, attach only the deadline and the information needed for a decision. A text trimmed this way is not cold but an expression of respect for the other person's time, and a precise subject line is the first step.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "四字熟語。ビジネス文書や説明の理想を言うときに使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "粘り強さ",
+   "reading": "ねばりづよさ",
+   "pos": "noun",
+   "meaning": "tenacity",
+   "defJa": "あきらめずに粘り続ける性質",
+   "passage": {
+    "ja": "長期的な成功を予測する性格特性として、才能よりも、粘り強さが注目されている。心理学者のアンジェラ・ダックワースは、困難があっても目標に向かって努力を続ける力を「グリット」と呼び、研究と著書で広めた。ただし、この概念をめぐっては、他の性格特性との区別が曖昧だという批判もある。また、努力を続ける価値のある目標かどうかを見極める力は、目標設定そのものの質に関わるという指摘もある。",
+    "form": "粘り強さ",
+    "en": "Tenacity, more than talent, is drawing attention as a personality trait that predicts long-term success. The psychologist Angela Duckworth called the power to keep making effort toward a goal even in the face of difficulty 'grit' and popularized it through research and a book. However, there is criticism that the concept is vague in its distinction from other personality traits. There is also a view that the ability to judge whether a goal is worth continuing for relates to the quality of goal setting itself.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "ダックワースのグリット研究で注目。続ける目標の見極めも要る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "粛清",
+   "reading": "しゅくせい",
+   "pos": "noun",
+   "meaning": "purge",
+   "defJa": "対立する者を組織から排除すること",
+   "passage": {
+    "ja": "一九三〇年代のソ連では、スターリンによる大規模な粛清が行われ、党幹部や軍の将校、一般市民に至るまで、多くの人々が逮捕され、処刑された。「大テロル」と呼ばれるこの時期の犠牲者の数は、史料の公開が進んだ現在も、研究者の間で議論が続く。それは、恐怖によって社会の服従を引き出す手段として使われ、人々の間に深い不信を残した。のちに、この時代の記録を掘り起こして新しい知見を加える作業が、歴史家だけでなく、遺族たちによっても続けられてきた。",
+    "form": "粛清",
+    "en": "In the Soviet Union of the 1930s, a large-scale purge by Stalin was carried out, and many people, from party officials and military officers to ordinary citizens, were arrested and executed. The number of victims of this period, called the Great Terror, is still debated among researchers even now that the release of sources has advanced. It was used as a means of drawing obedience from society through fear and left deep distrust among people. Later, the work of digging up records of this era and adding new findings has been carried on not only by historians but also by bereaved families.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "スターリンの大テロル。犠牲者数は史料公開後も議論が続く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "精度",
+   "reading": "せいど",
+   "pos": "noun",
+   "meaning": "precision, accuracy",
+   "defJa": "測定や判断がどれだけ正確かの度合い",
+   "passage": {
+    "ja": "医療画像の診断を支援する人工知能の精度が、熟練した医師に匹敵する水準に達したとする報告が相次いでいる。ただし、研究用のデータで高い性能を示しても、実際の病院では、機器や患者の違いによって性能が落ちることがある。このため、導入に先立って、実環境での検証が欠かせない。専門家は、人工知能を医師の代わりではなく、見落としを減らす第二の目として位置づけるべきだと指摘する。蓄積された知見を、現場の判断と組み合わせることが前提になる。",
+    "form": "精度",
+    "en": "Reports keep coming in that the accuracy of artificial intelligence supporting medical-image diagnosis has reached a level comparable to that of skilled doctors. However, even if it shows high performance on research data, performance can drop in actual hospitals because of differences in equipment and patients. For this reason, verification in the real environment is indispensable before introduction. Experts point out that AI should be positioned not as a substitute for doctors but as a second pair of eyes that reduces oversights. Combining accumulated findings with on-site judgment is the premise.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「精度が高い・上がる」。測定や予測の正確さ。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "精神力",
+   "reading": "せいしんりょく",
+   "pos": "noun",
+   "meaning": "mental strength",
+   "defJa": "精神面での粘り強さや耐える力",
+   "passage": {
+    "ja": "スポーツの世界では、精神力という言葉が、勝敗を分ける要素としてよく語られる。しかし、競技者を対象にした研究では、成功する選手ほど、気合に頼るのではなく、緊張を前提にした手順を持つ傾向が示された。たとえば、試合前の呼吸法や、失敗した直後に切り替える短い合図などである。つまり、それは生まれつきの強さというより、練習で身につけた習慣の総和だと考えられる。目標設定の精密さも、その一部をなす。",
+    "form": "精神力",
+    "en": "In the world of sports, the word mental strength is often discussed as a factor that decides victory or defeat. But in research on athletes, a tendency was shown that the more successful the player, the less they rely on sheer spirit and the more they have procedures that presuppose nervousness. Examples are breathing methods before a match and short cues for switching right after a mistake. In other words, it is thought to be less innate strength than the sum of habits acquired through practice. The precision of goal setting also forms a part of it.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「精神力が強い」。気合ではなく手順や習慣の積み重ね。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "精神疾患",
+   "reading": "せいしんしっかん",
+   "pos": "noun",
+   "meaning": "mental illness",
+   "defJa": "心の働きの不調による病気",
+   "passage": {
+    "ja": "精神疾患は、誰でも一生のうちに罹患しうる身近な病気であり、早い段階で適切な支援につながることが、回復の鍵になるとされる。睡眠負債や過労が重なると、発症のリスクが高まることも知られている。にもかかわらず、偏見を恐れて受診をためらう人は少なくない。周囲の人にできるのは、診断をつけることではなく、話を最後まで聞き、受診を静かに勧めることだ。職場や学校が、休むことを責めない空気を作れるかどうかも、回復の速さを左右する。",
+    "form": "精神疾患",
+    "en": "Mental illness is a familiar disease that anyone can contract in the course of a lifetime, and connecting with appropriate support at an early stage is said to be the key to recovery. It is also known that the risk of onset rises when sleep debt and overwork pile up. Even so, not a few people hesitate to seek treatment for fear of prejudice. What people around them can do is not make a diagnosis but listen to the end and quietly encourage them to get help. Whether workplaces and schools can create an atmosphere that does not blame people for taking time off also affects the speed of recovery.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「精神疾患」。早期の支援と、偏見を減らす理解が大切。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "精緻",
+   "reading": "せいち",
+   "pos": "na-adj",
+   "meaning": "precise; elaborate",
+   "defJa": "細部まで細かく行き届いているさま",
+   "passage": {
+    "ja": "日本語の敬語は、精緻な体系として知られています。尊敬語、謙譲語、丁寧語という三つの区別に加え、近年は美化語や丁重語を含めた五分類が示されました。ところが、この細やかさこそが、母語話者でさえ誤用を恐れる原因になっています。実際の会話では、規則に完全にそろえるより、相手との関係に合った自然な距離感を示すことのほうが重要です。直訳できない配慮を、一語ずつ味わう姿勢が、学習の近道です。",
+    "form": "精緻",
+    "en": "Japanese honorifics are known as an elaborate system. In addition to the three distinctions of respectful, humble, and polite language, a five-way classification including beautifying and courteous language has been presented in recent years. Yet this very fineness is what makes even native speakers fear misuse. In actual conversation, showing a natural sense of distance suited to the relationship matters more than conforming perfectly to the rules. An attitude of savoring, one word at a time, a consideration that cannot be translated literally is the shortcut to learning.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「精緻な分析・体系」。細部まで手が行き届いている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "精読",
+   "reading": "せいどく",
+   "pos": "noun",
+   "meaning": "close reading",
+   "defJa": "文章を細部まで丁寧に読むこと",
+   "passage": {
+    "ja": "小説を読むのって、速さよりも、一文一文をちゃんと味わう精読のほうが、自分には合ってるんだよね。一ページを三十分かけて読むと、作者がなんでこの言葉を選んだのか、って考える余裕が出てくる。そうすると、直喩とか、ちょっとした言い換えの意図が、急に見えてくるんだ。小説に限らず、論文でも同じで、全部の本をそうは読めないけど、年に数冊だけ、じっくり付き合う本があるといいと思う。",
+    "form": "精読",
+    "en": "When it comes to reading novels, close reading, savoring each sentence properly, suits me better than speed. If you spend thirty minutes on a page, you get room to think about why the author chose this word. Then the intent behind similes and little rephrasings suddenly comes into view. It's the same not only with novels but with papers too; I can't read every book that way, but I think it's good to have a few books a year to spend time with.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「精読」は速読の反対。精読のあとに再読もする。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "精進",
+   "reading": "しょうじん",
+   "pos": "noun",
+   "meaning": "devotion; diligence",
+   "defJa": "一つの道にひたすら励むこと",
+   "passage": {
+    "ja": "仏教でいう精進とは、悟りに向かって怠らず努力を続けることで、六波羅蜜の一つに数えられます。ここで大切なのは、苦行のように自分を追い込むのではなく、ほどよい緊張を保ち続けることです。釈迦は、琴の弦を張りすぎても緩めすぎても良い音が出ないと説いたと伝えられます。現代の仕事や勉強にも、この教えは生きており、粘り強さを支えるのは、極端な頑張りではなく、無理のない継続なのです。",
+    "form": "精進",
+    "en": "In Buddhism, shojin means to keep making effort without slacking toward enlightenment and is counted as one of the six perfections. What matters here is not driving yourself as in ascetic practice but keeping a moderate tension. The Buddha is said to have taught that a lute string produces a good sound neither if it is stretched too tight nor if it is too slack. This teaching is alive in modern work and study too: what supports tenacity is not extreme striving but sustainable continuation.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「精進する」。六波羅蜜の一つ。精進料理の「精進」でもある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "系譜",
+   "reading": "けいふ",
+   "pos": "noun",
+   "meaning": "lineage, genealogy",
+   "defJa": "つながりのある思想や血筋の流れ",
+   "passage": {
+    "ja": "インド哲学の系譜をたどると、ヴェーダの時代から、ウパニシャッド、そして六つの正統派哲学へと、思想が少しずつ深まっていくのが見えてきます。仏教やジャイナ教は、そこから離れた別の流れとして、同じ時代に生まれました。大切なのは、これらが互いに影響を与え合い、対話しながら発展した点です。たとえば真理とは何か、自己とは何かという問いは、立場が違っても共有されていました。系統を一本の線で覚えず、対話の網として見ると、全体がつかみやすくなります。",
+    "form": "系譜",
+    "en": "If you trace the lineage of Indian philosophy, you can see thought deepening little by little from the Vedic age to the Upanishads and then the six orthodox schools. Buddhism and Jainism arose in the same period as separate currents departing from it. What matters is that they influenced one another and developed through dialogue. For example, questions such as what truth is and what the self is were shared even across differing positions. If you do not memorize the lineage as one line but see it as a web of dialogue, the whole becomes easier to grasp.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「〜の系譜」。思想・芸術・血筋のつながりをたどる語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "紀元前",
+   "reading": "きげんぜん",
+   "pos": "noun",
+   "meaning": "BC",
+   "defJa": "西暦より前の時代",
+   "passage": {
+    "ja": "紀元前という数え方は、ふつうの年表とは逆向きに進みます。たとえば前三三一年は、前三二〇年より古く、数字が大きいほど過去にさかのぼります。ここで注意したいのは、西暦一年の前が前一年であり、ゼロ年が存在しないことです。暦が作られた時代の欧州に、ゼロの概念がまだ定着していなかったためだとされ、歴史学の知見でもそう説明されます。だから、前三世紀は、前三〇〇年から前二〇一年を指します。",
+    "form": "紀元前",
+    "en": "The BC way of counting runs in the opposite direction from an ordinary chronology. For example, 331 BC is earlier than 320 BC, and the larger the number, the further back in the past. What to note here is that the year before AD 1 is 1 BC and that there is no year zero. This is said to be because the concept of zero had not yet taken hold in Europe when the calendar was made, and historical findings explain it that way too. So the third century BC refers to 300 through 201 BC.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "数字が大きいほど古い。ゼロ年はなく、西暦一年の前が前一年。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "紋切り型",
+   "reading": "もんきりがた",
+   "pos": "noun",
+   "meaning": "stereotyped; formulaic",
+   "defJa": "型にはまっていて新味のない",
+   "passage": {
+    "ja": "紋切り型の表現は、書き手を安心させるが、読み手を眠らせる。「心に残る一日だった」「大きな影響を受けた」といった言い回しは、誰が書いても通用するため、誰にも届かない。その代わりに、場面の具体的な細部、たとえば雨の匂いや、相手の指先の動きを一つだけ書いてみる。すると、同じ内容でも、不思議と書き手の目の存在が立ち上がる。省察の深い文章は、必ず具体的な細部に支えられている。",
+    "form": "紋切り型",
+    "en": "Formulaic expressions reassure the writer but put the reader to sleep. Phrases like 'it was a memorable day' and 'I was greatly influenced' work no matter who writes them, and so reach no one. Instead, try writing just one concrete detail of the scene, such as the smell of rain or a movement of the other person's fingertips. Then, even with the same content, the presence of the writer's eye strangely rises into view. Writing with deep reflection is always supported by concrete details.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「紋切り型の挨拶」。使い古されて個性のない型。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "素質",
+   "reading": "そしつ",
+   "pos": "noun",
+   "meaning": "talent, capability",
+   "defJa": "生まれつき持っている能力の素地",
+   "passage": {
+    "ja": "才能とか素質って言うと、生まれつきのものだって思いがちだけど、それだけじゃないと思うんだよね。同じ練習をしても、伸び方に差が出るのは確かにあるけど、環境や、続けられる性格のほうが効いてくることも多い。私の友達は、最初は音痴って言われてたのに、毎日歌い続けて、数年後にはバンドを組むまでになった。粘り強さって、才能の一つに数えていいんじゃないかな。才能って、できあがったものというより、育てていく途中の名前なんだと思う。",
+    "form": "素質",
+    "en": "When you say talent or aptitude, you tend to think of something you're born with, but I think it's not only that. It's true that even with the same practice, growth differs, but environment and a temperament that can keep going often matter more. A friend of mine was told at first that he was tone-deaf, but he kept singing every day and a few years later even formed a band. I think tenacity can be counted as one of the talents, don't you? I think talent is less a finished thing than a name for something in the middle of being nurtured.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「素質がある」。伸びる可能性としての生まれつきの力。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "経典",
+   "reading": "きょうてん",
+   "pos": "noun",
+   "meaning": "sutra, scripture",
+   "defJa": "仏教や儒教で重んじられる聖典",
+   "passage": {
+    "ja": "経典という言葉は、仏教では「きょうてん」、儒教の古典では「けいてん」と読み分けられることがあります。釈迦の教えを弟子たちが伝えたとされる仏教の聖典は、サンスクリット語やパーリ語から、漢訳を通じて日本に伝わりました。そのため、日本の仏教者は、原典ではなく漢文の書物を読み込んできました。この違いを知ると、「同じ書物でも、国によって読み方が違う」という言い方に、深い意味が見えてきます。目覚めを説く教えが翻訳によって広がったのは、真理を伝えようとした人々の粘り強さの結果でもあります。",
+    "form": "経典",
+    "en": "The word kyoten is sometimes read distinctively, as kyoten in Buddhism and as keiten for the classics of Confucianism. The Buddhist scriptures, said to be the Buddha's teachings handed down by his disciples, reached Japan via Chinese translation from Sanskrit and Pali. For that reason, Japanese Buddhists have studied books in classical Chinese, not the originals. Knowing this difference reveals deep meaning in the phrase “even the same book is read differently depending on the country.” That teachings that preach awakening spread through translation is also the result of the tenacity of people who tried to convey truth.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教は「きょうてん」、儒教の古典は「けいてん」と読み分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "経済制裁",
+   "reading": "けいざいせいさい",
+   "pos": "noun",
+   "meaning": "economic sanctions",
+   "defJa": "経済上の制限で相手国に圧力をかけること",
+   "passage": {
+    "ja": "経済制裁は、武力を使わずに相手国に圧力をかける手段として、二十世紀に広く使われるようになりました。たとえば一九三五年、イタリアがエチオピアに侵攻したとき、国際連盟は、イタリアへの制裁を決めました。しかし、石油が対象外だったため、効果は限定的で、侵攻を止めることはできませんでした。この失敗は、制裁の実効性が、対象となる品目や参加国の足並みに大きく左右されるという教訓を残しました。そして、制裁が戦争の発端になった例もあります。",
+    "form": "経済制裁",
+    "en": "Economic sanctions came to be widely used in the twentieth century as a means of pressuring another country without force. In 1935, for example, when Italy invaded Ethiopia, the League of Nations decided on sanctions against Italy. However, because oil was excluded, the effect was limited and the invasion could not be stopped. This failure left the lesson that the effectiveness of sanctions depends greatly on the items targeted and the unity of the participating countries. And there are also cases where sanctions became the origin of a war.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "一九三五年のイタリア制裁が有名な失敗例。石油は対象外だった。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "経済史",
+   "reading": "けいざいし",
+   "pos": "noun",
+   "meaning": "economic history",
+   "defJa": "経済のしくみや発展の歴史",
+   "passage": {
+    "ja": "経済史の研究では、近年、各国の長期統計を整理し、数百年にわたる所得の推移を比較する試みが進んでいる。産業革命以前の世界では、一人当たりの所得はほとんど伸びなかったことが、複数の推計から示唆されている。産業革命以降の急成長は、人類史の中でも例外的な出来事と位置づけられる。ただ、数字が残る地域は偏っており、発展途上国の長期データは、いまも不足している。そのため、研究者の間では、結論を急がず、推計の誤差を明示する姿勢が重視されている。",
+    "form": "経済史",
+    "en": "In economic history research, attempts have recently advanced to organize long-term statistics of various countries and compare income trends over several centuries. Multiple estimates suggest that in the world before the Industrial Revolution, per-capita income hardly grew. The rapid growth since the Industrial Revolution is regarded as an exceptional event even within human history. However, regions where figures survive are skewed, and long-term data for developing countries is still lacking. For that reason, researchers place importance on not rushing to conclusions and on stating the margin of error in estimates.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "長期統計で所得の推移を比べる。産業革命以降が例外的。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "結晶性知能",
+   "reading": "けっしょうせいちのう",
+   "pos": "noun",
+   "meaning": "crystallized intelligence",
+   "defJa": "経験や学習で蓄えた知識や判断力",
+   "passage": {
+    "ja": "知能は、大きく二つに分けて考えられています。新しい問題を素早く解く力は流動性知能と呼ばれ、二十代でピークを迎えて、その後は緩やかに下がります。一方、結晶性知能は、経験や学習で蓄えた知識と判断力で、六十代になっても伸び続けるとされます。つまり、年齢とともに失われるものばかりではなく、深まる力もあるということです。この違いを知っておくと、知的好奇心を持ち続ける意味が、いっそうはっきり見えてきます。",
+    "form": "結晶性知能",
+    "en": "Intelligence is considered to divide broadly into two. The power to solve new problems quickly is called fluid intelligence, which peaks in the twenties and declines gradually afterward. Crystallized intelligence, on the other hand, is knowledge and judgment accumulated through experience and learning and is said to keep growing even into one's sixties. In other words, it is not that everything is lost with age; some powers deepen. Knowing this difference makes the meaning of keeping up intellectual curiosity even clearer.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「流動性知能」と対。年を重ねても伸びるとされる知能。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "結論から言うと",
+   "reading": "けつろんからいうと",
+   "pos": "expression",
+   "meaning": "to start with the conclusion",
+   "defJa": "まず結論を述べる言い方",
+   "passage": {
+    "ja": "結論から言うと、人の話が長く感じられる最大の原因は、情報の量ではなく、順序にあります。最初に結論を示すと、聞き手は、あとに続く説明を、その結論の理由として整理しながら聞けるからです。逆に、経過から話し始めると、聞き手は、どこへ向かうのかわからないまま、記憶に負担をかけ続けます。この型は、メールや会議に限らず、日常の雑談にも使えます。端的に言えば、順序を変えるだけで、話は驚くほど軽くなるのです。",
+    "form": "結論から言うと",
+    "en": "To start with the conclusion, the biggest reason a person's talk feels long lies not in the amount of information but in the order. If you present the conclusion first, listeners can organize the explanation that follows as reasons for that conclusion while listening. Conversely, if you begin with the course of events, listeners keep burdening their memory without knowing where it is heading. This pattern can be used not only in emails and meetings but also in everyday chat. Put simply, just changing the order makes a talk surprisingly light.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「結論から言うと」で話を始め、理由を後に続ける型。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  }
+ ]
+}
