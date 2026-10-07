@@ -154,7 +154,9 @@ const cases = [
   ['assistance-commit-precedes-hints', async page => {
     await page.evaluate(() => {
       window.annotationFixture.removeMini();
-      const host = document.createElement('p'); host.id = 'assistance-fixture'; document.body.append(host);
+      const host = document.createElement('p'); host.id = 'assistance-fixture';
+      host.style.cssText = 'position:fixed;left:120px;top:150px';
+      document.body.append(host);
       window.annotationGate = { calls: 0 };
       window.annotationFixture.appendJapaneseLookup(host, '電車', { itemId: 'fixture:item', beforeOpen: () => {
         window.annotationGate.calls += 1;

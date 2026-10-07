@@ -50,7 +50,7 @@ const names = new Set([
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
-  'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem',
+  'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem', 'kankenGradeLabel',
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
   // card-system slice 1: the preset buttons, the pacing steppers and the optional break
   'NEW_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_MIN', 'REVIEWS_PER_DAY_MAX', 'RETENTION_MIN', 'RETENTION_MAX',

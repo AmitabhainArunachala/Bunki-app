@@ -1281,7 +1281,7 @@ function defineRows() {
     assert.deepEqual([exact(sameInBoth(kanji), '学校'), exact(sameInBoth(kana), '学校')], [['word:学校'], ['word:学校']]);
     assert.equal(kanji.worker.dictionaryHomographChoices('学校')[0].enabledOnCore, true);
     const sheet = coreSheet(app({ mode: 'main' }), '学校');
-    assert.deepEqual(sheet.title, ['辞書の項目', 'Dictionary entry']);
+    assert.deepEqual(sheet.title, ['Dictionary entry']);
     assert.deepEqual(sheet.doors.map(({ seq, reading, pressed, active }) => [seq, reading, pressed, active]), [['1206730', 'がっこう', 'false', false]]);
     assert.deepEqual(clickRow(kanji, 'word:学校'), { t: 'word', id: '学校' });
   });

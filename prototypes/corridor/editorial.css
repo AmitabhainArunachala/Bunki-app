@@ -2436,6 +2436,11 @@ body .sheet .stroke-door {
 #stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 15px/1 var(--sans); }
 #stroke-page .stroke-back .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 #stroke-page .stroke-btn.stroke-corner { padding: 6px 16px; }
+#stroke-page #stroke-numbers {
+  max-width: min(196px, calc((100vw - 88px) / 2));
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 #stroke-page .stroke-btn.stroke-corner .l-ja { font: 600 14px/1.3 var(--sans); color: var(--text); }
 #stroke-page .stroke-btn.stroke-corner .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 #stroke-page :is(.stroke-back, .stroke-btn, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
@@ -3411,6 +3416,12 @@ body.v-depth-layered .sheet, body .sheet { background: var(--color-paper); }
 /* The reader's opening picture yields the space taken by the navigation dock,
    preserving the first sentence on the initial screen. */
 body.has-primary-tabs[data-view='reader'] #app > main[data-enter] { animation-fill-mode: backwards; }
+/* Keep the publisher's 44px native target floor during fractional room lifts. */
+body[data-view='publisher'] :is(
+  #publisher-back, #publisher-original, #publisher-finished,
+  .publisher-credit-link, .publisher-license, .publisher-details summary,
+  #publisher-context-save, #publisher-context-open
+) { min-height: calc(var(--hit) + 1px); }
 body.has-primary-tabs[data-view='reader'] .reader-picture-img {
   max-height: max(60px, calc(100svh - 740px - var(--nav-clearance)));
 }
