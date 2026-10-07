@@ -28,7 +28,7 @@ Only chrome language and room-material selector pins change. Storage, SRS, ledge
 | Radical-to-kanji header selector, line 1257 | header contains `含む字` → exact `kanji that contain this part` | Select the same translated radical-family section; real kanji-hop assertion remains. |
 | Saved-node chrome count, line 1278 | `覚\s*[1-9]` → `^Lists\s+[1-9][0-9]*$` | EN chrome must retain a positive numeric count. This requires the source to restore `Lists N`; it does not accept a count-free label. |
 | Locked-audio pending label, line 1652 | `音声準備中` → exact `audio coming soon · Kore` | Existing approved-voice pending copy is now English. Zero playback/voice controls, Kore identity and forbidden-device-voice checks remain. |
-| Variant non-ticket row identity, line 1669 | `E 奥行`, `F 触れの段`, `G 衛星の触れ` → `E depth`, `F tap ladder`, `G satellite tap` | The same three A–G identities have English labels. Exact seven-row census and four ticket marker counts remain unchanged. |
+| Variant non-ticket row identity, line 1669 | `E 奥行`, `F 触れの段`, `G 衛星の触れ` → `E depth`, `F tap ladder`, `G satellite tap` | The same three A–G identities have English labels. The four ticket marker counts remain unchanged; F4 later adds one named navigation row to the exact census (eight total), as logged below. |
 | Default EN tray label, line 1688 | contains `lists` → exact `Lists N` with numeric count | Preserve the tray count as well as its translated name. |
 | Default EN chrome language observation, line 1689 | requires `覚` in tray → observes CJK across back and tray | English mode deliberately removes Japanese from chrome; the later condition now rejects CJK and still requires the active EN toggle and back/lists controls. |
 | Default language assertion and diagnostic, lines 1694–1696 | bilingual-default title/condition and Japanese tray presence → English-default title/condition, no CJK, numeric tray label | The intentional language-law behavior supersedes the old bilingual chrome contract. The subsequent Japanese toggle assertions remain unchanged. |
@@ -240,7 +240,7 @@ const UI_TOPICS = { mind: 'Mind and learning', india: 'India and Buddhism', ai: 
 
 39. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1873; occurrences: 1.
    Before: `ladder.swapTo.startsWith(`文章${swapOf('km-064-m01').passage}へ`)`
-   After: `ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage}`)`
+   After: `ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage} `)`
    Reason: EN swap destination label; exact selected passage identity and unchanged repair workflow retained.
 
 40. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1904; occurrences: 1.
@@ -255,7 +255,7 @@ const UI_TOPICS = { mind: 'Mind and learning', india: 'India and Buddhism', ai: 
 
 42. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1948; occurrences: 1.
    Before: `swapTo.startsWith('例文2へ')`
-   After: `swapTo.startsWith('Example 2')`
+   After: `swapTo.startsWith('Example 2 ')`
    Reason: EN sentence-example destination caption; same exact example number.
 
 43. File: `prototypes/corridor/tools/verify-kotoba-mine.mjs`; assertion/source line(s) at edit: 1948; occurrences: 1.
@@ -381,3 +381,5 @@ T13/T14 fixture interception URLs and behavior assertions remain byte-for-byte u
 | `verify-design-reader-shelf.mjs` | G7 active version wait | active label contains `やさしい` → contains `Simplified` | F2 selects the English version label. The switch must still complete, show the alternate article and retain its level/caption checks. |
 
 | `verify-guided-session.mjs` | J19 ready-card count | button matches `復習する · 6` → matches `review what is ready · 6` | F2 changes the active English label. The exact six ready cards remain mandatory; the product restores the count in its EN label rather than relaxing the assertion. |
+
+Numeric boundaries in the two deck swap labels remain required: the space after `Passage N` / `Example 2` rejects `Passage 10` as passage1 and `Example 20` as example2, matching the original Japanese boundary before `へ`. Actual next-card/target identity, FSRS and repair-ledger assertions stay unchanged.

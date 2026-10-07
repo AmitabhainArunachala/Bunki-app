@@ -3347,6 +3347,8 @@ body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
 .primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 body.has-primary-tabs #variants { bottom: var(--nav-clearance); }
 body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(var(--nav-clearance) + 12px); }
+/* The list sheet hides tabs and reserves the original report-button strip. */
+body.has-primary-tabs:has(#vocabulary-list-popover) #bunki-reports-root .br-rail { bottom: 12px; }
 body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px); }
 body.has-primary-tabs .kp-grades,
 body.has-primary-tabs .pc-controls,
@@ -3417,6 +3419,10 @@ body:not([data-view='drift']) .sem-row .sem-note {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* Plain yomi-probe grades use the dark recall dock's own pigments. */
+body.zen .probe-row .grade { color: var(--color-zen-ink); border-color: color-mix(in srgb, var(--color-zen-ink) 45%, transparent); }
+body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 
 /* Counts must not change the header's line count during a word action. */
 @media (max-width: 520px) {

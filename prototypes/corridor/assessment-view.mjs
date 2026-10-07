@@ -751,7 +751,7 @@ export function createAssessmentView(host) {
         'Timed exam mode has no dictionary, furigana, translations or explanations. A finished section cannot be reopened.')));
       section.append(node('p', 'exam-bookmark-note', tx(
         '不正解は「あとで見直す」を押さなくても自動保存し、ほかの練習でその語にまた出会えるようにします。「あとで見直す」は目印です。未確認の問題の結果は、仮のものとして区別します。',
-        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder. Results from unchecked (未確認) questions are kept apart as provisional.')));
+        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder. Results from Unreviewed questions are kept apart as provisional.')));
       section.append(node('p', 'exam-download-note', host.pending()
         ? audio ? tx('問題と音声を保存しています…', 'Downloading questions and audio…') : tx('問題を保存しています…', 'Downloading questions…')
         : audio ? tx('始める前に問題と音声を保存します。保存が終わってから計時を始めます。', 'Questions and audio download before the timer starts.')

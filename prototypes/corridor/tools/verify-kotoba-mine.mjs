@@ -1872,7 +1872,7 @@ async function verifyReview(browser, base) {
       const noLadder = await o.page.locator('#kp-ladder').count();
       check(
         'b) a card with 5 lapses shows the repair ladder after tier one (the definition or usage note) and before the folds, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
-        ladder && ladder.head === 'Difficulty on this sentence: 5 times' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === 'Use another sentence/Add a hint/Pause' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage}`) && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
+        ladder && ladder.head === 'Difficulty on this sentence: 5 times' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === 'Use another sentence/Add a hint/Pause' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage} `) && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
         JSON.stringify({ ladder, second: second.id, noLadder }),
       );
       check(
@@ -1947,7 +1947,7 @@ async function verifyReview(browser, base) {
       const l = await read(o.page, 'kotoba-mine');
       check(
         'b) 保留 (sentence deck): one tap suspends the leech (by leech, logged as suspend) and the next card comes up; on a sentence card the swap names 例文2',
-        swapTo.startsWith('Example 2') && now.id === 'km-065-1' && /Card paused/.test(now.toast) && l.suspended['km-064-1']?.by === 'leech' && l.repairLog.at(-1)[1] === 'suspend' && l.repairs['km-064-1']?.lapses === 6,
+        swapTo.startsWith('Example 2 ') && now.id === 'km-065-1' && /Card paused/.test(now.toast) && l.suspended['km-064-1']?.by === 'leech' && l.repairLog.at(-1)[1] === 'suspend' && l.repairs['km-064-1']?.lapses === 6,
         JSON.stringify({ swapTo, now, suspended: l.suspended, row: l.repairLog.at(-1) }),
       );
     } finally {

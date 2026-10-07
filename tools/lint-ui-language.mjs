@@ -115,7 +115,7 @@ export async function inspectChrome(page) {
     const selector = el => el.id ? '#' + el.id : el.tagName.toLowerCase() +
       [...el.classList].slice(0, 3).map(c => '.' + c).join('');
     const issues = [], inspected = [];
-    const chromeText = 'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note';
+    const chromeText = 'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note, .exam-bookmark-note';
     const nodes = [...document.querySelectorAll(chromeText + ',button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, [aria-label], [title], input[placeholder], textarea[placeholder], select')];
     for (const el of nodes) {
       if (!visible(el)) continue;
