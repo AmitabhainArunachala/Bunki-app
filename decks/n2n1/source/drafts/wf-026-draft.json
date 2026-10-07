@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "他力本願",
+   "reading": "たりきほんがん",
+   "pos": "noun",
+   "meaning": "relying on Amida's vow; relying on others",
+   "defJa": "阿弥陀仏の誓いにすがる教え。人任せ。",
+   "passage": {
+    "ja": "他力本願という言葉は、いまでは人任せの怠け心を叱るときに使われる。だが本来は、阿弥陀仏の誓願に身をゆだねる浄土教の教えであり、決して軽い意味ではなかった。自分の力では悟りに届かないと見極めればこそ、人は深く頭を下げるのである。この徹底した謙虚さは、努力の放棄とは似て非なるものであり、むしろ最も厳しい自己点検といってよい。己の無力を見つめ抜いた末に、信心は静かに立ち上がってくる。",
+    "form": "他力本願",
+    "en": "Today the word tariki hongan is used to scold someone for lazily leaving things to others. Originally, though, it was a Pure Land teaching of entrusting oneself to Amida Buddha's vow, and it carried no such light meaning. Precisely because one has seen that one cannot reach enlightenment by one's own strength, one bows deeply. This thoroughgoing humility is quite different from giving up effort; if anything, it is the harshest form of self-examination. Only after staring down one's own powerlessness does faith quietly rise.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "俗用の「人任せ」と本来の仏教語の意味の落差。「ばこそ」と相性がよい。",
+    "sense": "仏教語としての本義"
+   }
+  },
+  {
+   "term": "代替",
+   "reading": "だいたい",
+   "pos": "noun",
+   "meaning": "substitution, replacement",
+   "defJa": "あるものの代わりをつとめること。",
+   "passage": {
+    "ja": "AIが人間の仕事を奪うと言われますが、実際に起きているのは、仕事そのものではなく作業の代替です。たとえば議事録づくりは、音声認識と要約の技術のおかげで、数分で終わるようになりました。ところが、会議で何を決めるべきかという問いまでは、機械に肩代わりさせるわけにはいきません。置き換わるのは手順であって、判断の責任は人に残るのです。この線引きを間違えると、便利さが倫理の問題にすり替わりかねません。",
+    "form": "代替",
+    "en": "People say AI will take human jobs, but what is actually happening is the replacement of tasks, not of the work itself. Writing up meeting minutes, for example, now takes only minutes thanks to speech recognition and summarization technology. But the question of what a meeting ought to decide is not something we can hand over to a machine. What gets replaced is the procedure; responsibility for judgment stays with people. Get this dividing line wrong, and convenience could slip into becoming a question of ethics.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「代替の＋名詞」「代替案」など。作業の置き換えを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "代理戦争",
+   "reading": "だいりせんそう",
+   "pos": "noun",
+   "meaning": "proxy war",
+   "defJa": "大国が他国を戦わせて争うこと。",
+   "passage": {
+    "ja": "冷戦期の朝鮮半島やベトナムは、しばしば代理戦争の舞台と呼ばれてきた。米ソは直接には砲火を交えず、同盟国や武装勢力に武器と資金を送り込んだのである。核兵器を持つ大国同士が正面衝突しようものなら、人類そのものが危うくなるからだ。たとえ停戦が成立しても、背後にある対立の構図は簡単には消えない。大国の冷静な計算ほど、現地の人々にとって、これほど残酷なものはなかった。",
+    "form": "代理戦争",
+    "en": "The Korean Peninsula and Vietnam of the Cold War era have often been called stages for proxy wars. The United States and the Soviet Union did not exchange fire directly; they poured weapons and funds into allies and armed groups. If two nuclear-armed powers were ever to collide head-on, humanity itself would be in danger. Even when a ceasefire is reached, the structure of rivalry behind it does not vanish easily. For the people on the ground, nothing was as cruel as the cool calculations of the great powers.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜の代理戦争」「代理戦争の舞台」。大国の対立が他国で戦われる形。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "以心伝心",
+   "reading": "いしんでんしん",
+   "pos": "noun",
+   "meaning": "tacit understanding, telepathy-like rapport",
+   "defJa": "言葉なしに心が通じ合うこと。",
+   "passage": {
+    "ja": "日本のビジネス現場では、以心伝心を美徳とする空気が長く続いてきた。言葉にしなくても察し合うことが、円滑な協働の証とみなされたのである。ところが、外国人社員が増えるにつれ、職場のなかで、この暗黙の了解が通用しない場面が目立ち始めた。指示の不透明さによるやり直しを課題に挙げる企業も、少なくない。従来の察する文化を守りながらも、言語化の習慣を意識的に取り入れる動きが広がりつつある。",
+    "form": "以心伝心",
+    "en": "In Japanese workplaces, an atmosphere that prizes tacit understanding has long persisted. Sensing each other's intent without putting it into words was taken as proof of smooth collaboration. But as foreign employees have increased, situations where this unspoken understanding fails to work have become conspicuous. Not a few companies cite rework caused by unclear instructions as a problem. While preserving the traditional culture of intuiting, a movement to adopt the habit of putting things into words is spreading.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「以心伝心で通じる」。日本の職場文化を論じる報道調。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "仮名遣い",
+   "reading": "かなづかい",
+   "pos": "noun",
+   "meaning": "kana orthography",
+   "defJa": "かなの使い方に関する決まり。",
+   "passage": {
+    "ja": "現代仮名遣いでは、「は」「へ」「を」の三つだけが、発音と文字のずれを今も残しています。たとえば「わたしは」の「は」は、実際には「わ」と読みますよね。1946年に告示された現代かなづかいは、昔の表記を大きく簡略化したものの、このずれまでは消しませんでした。古い書物を読むなら、旧来の綴りの知識が欠かせません。万葉仮名から続く表記の歴史を知ると、不思議なずれにも理由があると納得できます。",
+    "form": "仮名遣い",
+    "en": "In modern kana orthography, only the three characters ha, he and wo still preserve a mismatch between sound and writing. For instance, the ha in watashi-wa is actually read as wa, isn't it. The modern kana usage announced in 1946 greatly simplified the old spellings, but it did not erase this mismatch. If you read old books, knowing the traditional spellings is indispensable. Once you learn the history of writing that runs back to man'yogana, you can see there is a reason even for that odd mismatch.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「現代仮名遣い」「歴史的仮名遣い」の形でよく出る。表記の規則を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "仮眠",
+   "reading": "かみん",
+   "pos": "noun",
+   "meaning": "nap",
+   "defJa": "短い時間、ちょっと眠ること。",
+   "passage": {
+    "ja": "昼ご飯を食べたあとって、どうしても眠くなるじゃないですか。そんなときは無理に粘るより、十五分ぐらい仮眠をとったほうが、午後の仕事の効率は、ぐっと上がるんですよ。ただし三十分を超えて寝ちゃうと、かえって頭がぼんやりしてしまいます。体内時計が乱れる原因にもなるので、長く寝るなら夜にまとめるに限りますね。ちなみに僕は、昼休みに机に突っ伏して寝るのがいちばん落ち着きます。",
+    "form": "仮眠",
+    "en": "You get sleepy after lunch no matter what, right? Rather than forcing yourself to push through, taking a fifteen-minute nap will raise your afternoon efficiency. But if you sleep past thirty minutes, your head actually ends up foggy. It can also throw off your body clock, so if you want to sleep long, nothing beats saving it for the night. By the way, during my lunch break I'm most at ease dozing with my head down on the desk.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「仮眠をとる」。短い睡眠。夜の本格的な睡眠とは区別される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "会得",
+   "reading": "えとく",
+   "pos": "noun",
+   "meaning": "grasp, mastery",
+   "defJa": "物事の意味やこつを深く理解すること。",
+   "passage": {
+    "ja": "話し方の上達に、近道はありません。腹式呼吸も間の取り方も、本を読んだだけでは身につかず、何度も声に出して確かめる反復を通じて、ようやく会得できるものです。最初のうちは録音した自分の声を聞くのもつらいのですが、そこを越えると聞き手の反応が見えてきます。伸び悩みを感じる時期こそ、基礎に立ち返る好機にほかなりません。練習の量が、ある日ふっと質に変わる瞬間があるのです。",
+    "form": "会得",
+    "en": "There is no shortcut to improving how you speak. Neither diaphragmatic breathing nor timing can be acquired by reading a book alone; you finally master them only through the repetition of saying them aloud. At first even listening to a recording of your own voice is painful, but once you get past that, the listener's reactions come into view. A period when you feel you have stalled is precisely the chance to return to the basics. There comes a moment when, one day, the quantity of practice suddenly turns into quality.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「コツを会得する」。時間をかけて身につけ、理解すること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "伝承",
+   "reading": "でんしょう",
+   "pos": "noun",
+   "meaning": "tradition, legend",
+   "defJa": "昔からの言い伝えや、受け継がれた事柄。",
+   "passage": {
+    "ja": "日本各地には、一夜にして城が築かれたという伝承が残っています。もちろん史実としては疑わしいのですが、そうした話が語り継がれてきたこと自体が、土地の人々の記憶を映しています。文字を持たない時代ほど、口伝えの物語は歴史の貴重な手がかりになりました。ただし一次史料と突き合わせないまま信じ込むと、事実を取り違えかねません。こうした話は、真偽を問う前に、なぜ語られたのかを問うべき素材なのです。",
+    "form": "伝承",
+    "en": "Across Japan, there remain legends that a castle was built overnight. Of course they are doubtful as history, but the very fact that such tales have been passed down reflects the memory of the local people. The further back in time to an age without writing, the more precious a clue oral stories become to history. Still, if you believe them without checking against primary sources, you might mistake the facts. Such a tale is material about which, before asking whether it is true, we should ask why it was told.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「伝承が残る」「口頭伝承」。語り継がれてきた話。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "伸びしろ",
+   "reading": "のびしろ",
+   "pos": "noun",
+   "meaning": "room for growth",
+   "defJa": "これから成長できる余地。",
+   "passage": {
+    "ja": "仕事でも勉強でも、伸びしろのある人とない人の差は、才能より姿勢に表れます。間違いを指摘されたとき、言い訳を探す人もいれば、まず試してみる人もいます。後者は失敗を材料に次の一手を変えるので、年齢にかかわらず成長の曲線が途切れません。自分にはまだ余白があると信じる人ほど、他人の話にも傾聴の姿勢で向き合います。余白の正体は、才能ではなく、知らないと認める勇気です。",
+    "form": "伸びしろ",
+    "en": "In work and study alike, the gap between those with room to grow and those without shows in attitude more than talent. When mistakes are pointed out, some people hunt for excuses while others first try something. The latter use failure as material to change their next move, so their growth curve does not break, regardless of age. The more a person believes they still have margin, the more they face others' words with an attitude of attentive listening. The real nature of that margin is not talent but the courage to admit what you don't know.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「伸びしろがある／ない」。成長の余地を人や分野について言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "伸び悩み",
+   "reading": "のびなやみ",
+   "pos": "noun",
+   "meaning": "stalling, levelling off",
+   "defJa": "成長が思うように進まないこと。",
+   "passage": {
+    "ja": "努力しているのに結果が出ない。この伸び悩みの時期は、三日坊主で終わる人にも、長く続けた人にも等しく訪れる。多くの人は、結果が出ないからといって才能の限界を疑い、あっさり手を引いてしまう。しかし成長は直線ではなく階段状に進むものであり、平坦に見える期間にも内側では力が蓄えられている。停滞に見えるものが、実は次の跳躍の助走であったと気づくのは、たいてい後になってからだ。",
+    "form": "伸び悩み",
+    "en": "You are trying hard, yet no results appear. This period of stagnation comes equally to those who quit after three days and to those who persisted for a long time. Many people, just because results don't come, doubt the limits of their talent and give up readily. But growth proceeds not in a straight line but in steps, and even in a stretch that looks flat, strength is being stored inside. It is usually only later that we notice what looked like stagnation was in fact a run-up to the next leap.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「伸び悩みの時期」「成績が伸び悩む」。成長が頭打ちになる状態。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "住職",
+   "reading": "じゅうしょく",
+   "pos": "noun",
+   "meaning": "chief priest of a temple",
+   "defJa": "寺を預かる、その寺の長である僧。",
+   "passage": {
+    "ja": "寺の朝は早い。まだ暗いうちに鐘が鳴り、住職は祈りを込めて、冷え切った広い本堂でゆっくりと経を読み始める。参拝者の去った境内を掃き、檀家の悩みに耳を傾ける日課は、一見すると地味であり、派手な出来事など何も起こらない。だが、その繰り返しのなかにこそ、教えが生きていると言えるだろう。僧侶の務めとは、特別な悟りを誇ることではなく、同じ一日を丁寧に重ねることなのである。",
+    "form": "住職",
+    "en": "Mornings at a temple come early. While it is still dark the bell rings, and the head priest begins to chant sutras in the main hall with prayer in his voice. The daily routine of sweeping the grounds once worshippers have gone and lending an ear to the troubles of the temple's parishioners looks modest at first glance, and nothing flashy ever happens. Yet it is precisely within that repetition that the teaching can be said to live. A monk's duty is not to boast of special enlightenment but to lay one ordinary day upon another with care.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「〜寺の住職」。寺の責任者。僧侶一般とは区別される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "体内時計",
+   "reading": "たいないどけい",
+   "pos": "noun",
+   "meaning": "body clock",
+   "defJa": "体にそなわった、時間を測る仕組み。",
+   "passage": {
+    "ja": "久しぶりに海外旅行から帰ってきたら、一週間くらい頭がぼーっとしませんでしたか。あれ、体内時計がまだ現地の時間で動いてるからなんですよね。朝の光を浴びると、この時計はちょっとずつリセットされます。逆に、夜遅くまでスマホをつけっぱなしにしていると、時計が後ろにずれていっちゃうんです。カーテンを開けて朝日を浴びるのを三日坊主で終わらせないことが、いちばんのコツですよ。",
+    "form": "体内時計",
+    "en": "After coming back from overseas travel, didn't your head feel foggy for about a week? That's because your body clock is still running on local time over there. When you take in morning light, this clock is reset little by little. Conversely, if you leave your phone on until late at night, the clock drifts backwards. The biggest trick is not letting the habit of getting morning sun fizzle out after three days.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「体内時計が狂う／リセットされる」。時差ぼけや睡眠の話題で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "体得",
+   "reading": "たいとく",
+   "pos": "noun",
+   "meaning": "mastering through experience",
+   "defJa": "経験を通じて、身につけること。",
+   "passage": {
+    "ja": "自転車の乗り方を、説明書だけで覚えた人はいませんよね。バランスの感覚は、何度も転んで初めて体得できる知識だからです。学習科学では、これを手続き記憶と呼び、言葉で説明できる知識とは別の仕組みで保存されると考えます。試験勉強では、数学に限らず、問題を解く量が決定的に重要になります。修練を重ねるうちに、いつのまにか、頭で考えなくても手が動く段階に入っていくのです。",
+    "form": "体得",
+    "en": "No one has ever learned to ride a bicycle from an instruction manual alone, have they? The sense of balance is knowledge you can only master through experience after falling many times. Learning science calls this procedural memory and holds that it is stored by a different mechanism from knowledge you can put into words. In exam study, not only in math, the sheer volume of problems you solve becomes decisively important. As you pile up training, you enter a stage where your hands move without your head having to think.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「技を体得する」。頭で知るのではなく、体で覚えて自分のものにする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "体現",
+   "reading": "たいげん",
+   "pos": "noun",
+   "meaning": "embodiment",
+   "defJa": "思想などを、実際の行いで形に表すこと。",
+   "passage": {
+    "ja": "ガンジーって、非暴力という思想を頭で語っただけの人じゃないですよね。塩の行進のように、自分の体で動いてみせた人なんです。教えを体現するっていうのは、言葉と行動の一貫性を保つってことなんですよ。インドの哲学でも、理解するだけで終わることなく、生き方に落とし込むことが重んじられてきました。口だけの賢者というより、黙って実践する人のほうが、よっぽど説得力があります。",
+    "form": "体現",
+    "en": "Gandhi wasn't someone who just talked about nonviolence in his head, right? Like the Salt March, he was someone who showed it by moving with his own body. To embody a teaching means keeping words and actions consistent. In Indian philosophy too, it has been valued not to stop at understanding but to bring it down into how one lives. A person who quietly practices is far more persuasive than a sage who is all talk.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「理念を体現する」。思想や教えを行動で形にすること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "体言止め",
+   "reading": "たいげんどめ",
+   "pos": "noun",
+   "meaning": "ending a sentence on a noun",
+   "defJa": "文を名詞で終える表現技法。",
+   "passage": {
+    "ja": "俳句や短歌では、体言止めという技法がよく使われます。たとえば「夏草や兵どもが夢の跡」は、最後を名詞で終えることで、余韻を深く残しています。述語を言い切らない分、読者は情景を自分の想像で補うことになるのです。新聞の見出しが「首相、来月訪米」と短く結ぶのも、同じ仕組みを活用したもので、読み手の目に素早く届きます。ただし多用すると、文章全体が単調になりかねません。",
+    "form": "体言止め",
+    "en": "In haiku and tanka, the technique called ending on a noun is often used. For example, the famous line about summer grass, the traces of warriors' dreams, ends on a noun and so leaves a deep lingering resonance. Because the predicate is not stated outright, the reader supplies the scene from their own imagination. Newspaper headlines that end tersely, as in 'Prime Minister, U.S. visit next month,' use the same mechanism. Used too often, however, the whole text can become monotonous.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "俳句や見出しで余韻や簡潔さを出す技法。使いすぎに注意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "余剰",
+   "reading": "よじょう",
+   "pos": "noun",
+   "meaning": "surplus",
+   "defJa": "必要な分を超えて余っていること。",
+   "passage": {
+    "ja": "歴史の授業で習った話なんですけど、農業が発達して余剰の食べ物が生まれたことが、文明の出発点だったそうですよ。みんなが食料づくりに追われなくなれば、役人や職人、僧侶みたいに、畑に出ない人たちを養えるようになるじゃないですか。余った分があればこそ、文字も都市も税も生まれたわけです。逆に言えば、そうした余裕は決して当たり前ではなく、不作が続いただけで、社会の仕組みは簡単にきしみます。",
+    "form": "余剰",
+    "en": "This is something I learned in a history class, but apparently the origin of civilization was that agriculture developed and a surplus of food came into being. Once everyone is no longer chased by the work of producing food, you can support people who don't go out to the fields, like officials, craftsmen, and monks, right? It's precisely because there was a surplus that writing, cities and taxes came into being. Conversely, a few bad harvests in a row are enough to make the structure of society creak.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「余剰食料」「余剰人員」。必要を超えて余った分。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "余波",
+   "reading": "よは",
+   "pos": "noun",
+   "meaning": "aftermath, ripple effect",
+   "defJa": "大きな出来事のあとに残る影響。",
+   "passage": {
+    "ja": "1929年に始まった世界恐慌の余波は、やがて大西洋を越えて日本にも及んだ。生糸の輸出が急減し、農村では娘の身売りが出るほどの深刻な不況が広がったとされる。各国は自国産業を守るべく関税を引き上げ、保護貿易の壁が世界を分断していった。不況の長期化は、各地で急進的な政治勢力が伸びる土壌ともなった。経済危機が国境を越えて連鎖する構図は、今日の金融不安にも通じるものがある。",
+    "form": "余波",
+    "en": "The aftershocks of the Great Depression that began in 1929 eventually crossed the Atlantic and reached Japan as well. Raw-silk exports plunged, and a severe slump is said to have spread to farming villages, to the point that daughters were sold off. To protect their own industries, countries raised tariffs, and walls of protective trade split the world. The prolonged slump also became fertile ground for radical political forces to grow in various places. The pattern of economic crisis chaining across borders has something in common with financial anxieties today.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「〜の余波を受ける」。大事件のあとに続く影響。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "余談",
+   "reading": "よだん",
+   "pos": "noun",
+   "meaning": "digression",
+   "defJa": "本筋とは別の、ついでの話。",
+   "passage": {
+    "ja": "話の途中で余談を挟むと、聞き手の気持ちがふっとゆるみます。ただし長すぎると本題を見失わせてしまうので、三十秒ほどでおさめるのがコツです。数字の話が続いたあとに、取材先で聞いた小さなエピソードを一つ添えるだけで、空気が変わります。脱線から本題へ戻るときは、「さて」と一言入れるだけで、聞き手の注意が戻ってきます。以心伝心を当てにすることなく、戻る合図を声に出すのです。",
+    "form": "余談",
+    "en": "Slipping a digression into the middle of a talk gently loosens the listener's mood. If it is too long, though, it makes them lose sight of the main topic, so the knack is to keep it to about thirty seconds. After a run of numbers, simply adding one small episode you heard on assignment changes the atmosphere. When you return from the tangent to the main subject, just inserting a single 'well then' brings the listener's attention back. Without counting on telepathic understanding, you say the cue to return out loud.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「余談ですが」。本題から離れた話。聞き手の息抜きにもなる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "余韻",
+   "reading": "よいん",
+   "pos": "noun",
+   "meaning": "lingering resonance",
+   "defJa": "音や事の終わった後に残る味わい。",
+   "passage": {
+    "ja": "いい話し手は、たいてい、最後の一言のあとに、わざと間をあけます。その数秒の長い沈黙のなかで、聞き手は話の内容をかみしめるのです。華やかな修辞を並べるより、沈黙のほうが雄弁なときもあります。最後の最後まで言葉を詰め込んでしまうと、余韻が生まれる隙間すらなくなり、話は聞いたそばから流れていきます。話し終えた直後の静けさや、客席の空気までが、話の一部だといえます。",
+    "form": "余韻",
+    "en": "A good speaker deliberately leaves a pause after the final word. In those few seconds of silence, the listener savors the content of the talk. At times silence is more eloquent than a string of showy rhetoric. If you cram in words right to the end, there is not even a gap left for a lingering resonance to arise. Even the stillness right after a talk ends is part of the talk.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「余韻に浸る／を残す」。終わったあとに残る響きや感じ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "併合",
+   "reading": "へいごう",
+   "pos": "noun",
+   "meaning": "annexation",
+   "defJa": "複数のものを一つに合わせること。",
+   "passage": {
+    "ja": "歴史を語る場面では、一つの言葉の選び方が、聞き手の受け取り方を大きく左右します。たとえば1910年の韓国併合を「合併」と言い換えると、対等な合意があったかのような印象を与えかねません。この語には、一方が他方を自国の領土に組み入れたという力の関係が含まれているのです。だから話し手は、用語の定義を確かめたうえで使う必要があります。言葉の重さに無自覚な語りは、聞き手の信頼を失うだけでなく、話し手の倫理まで疑わせます。",
+    "form": "併合",
+    "en": "When speaking about history, the choice of a single word greatly affects how listeners take it in. If you rephrase the 1910 annexation of Korea as a 'merger,' for instance, you could give the impression that there was an agreement between equals. Within this word is contained a relationship of power, in which one side incorporated the other into its own territory. So a speaker needs to confirm a term's definition before using it. A way of speaking that is unaware of the weight of words not only loses the listener's trust but makes people doubt the speaker's ethics.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「韓国併合」「領土を併合する」。力関係を含む語なので言い換えに注意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "使役",
+   "reading": "しえき",
+   "pos": "noun",
+   "meaning": "causative",
+   "defJa": "他の人にある動作をさせる文法形。",
+   "passage": {
+    "ja": "「子どもに野菜を食べさせる」。この「させる」が、日本語の使役の代表的な形です。これは、誰かに何かをさせる、またはさせてしまう関係を表す文法で、受け身と並んで、学習者がつまずきやすい項目です。面白いのは、「笑わせる」のように、意図せず相手の感情を動かす場合にも使われる点で、俗語では「笑わせるな」が「ばかばかしい」という皮肉にもなります。さらに「させられる」の形にすると、「やらされる」という不満や被害の気持ちまで加わります。",
+    "form": "使役",
+    "en": "'I make my child eat vegetables.' This 'saseru' is the typical form of the Japanese causative. It is grammar that expresses a relationship in which someone makes, or ends up making, someone do something, and along with the passive it is an item learners easily stumble over. What is interesting is that it is also used, as in 'to make someone laugh,' when one moves another's feelings unintentionally, and in slang 'don't make me laugh' becomes a sarcastic 'how ridiculous.' Further, putting it in the 'saserareru' form adds even a feeling of grievance or victimhood, as in 'being made to do it.'",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「させる」の形。させる側と、させられる側の関係を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "使節団",
+   "reading": "しせつだん",
+   "pos": "noun",
+   "meaning": "delegation, mission",
+   "defJa": "国の代表として外国へ派遣される一行。",
+   "passage": {
+    "ja": "岩倉使節団の話を人前でするときは、まず数字を一つだけ示すと、聞き手が一気に引き込まれます。1871年に横浜を出発したこの一行は、二年近くにわたって欧米を回りました。この旅の当初の狙いは不平等条約の改正の下交渉でしたが、成果は思うように上がりませんでした。大久保利通や伊藤博文といった後の指導者が含まれていた点を伝えれば、旅の重みが伝わります。細かな訪問先を並べるよりも、何を見て何を持ち帰ったかを語るほうが、物語として残ります。",
+    "form": "使節団",
+    "en": "When you tell the story of the Iwakura Mission in public, first showing just one number draws listeners in at once. This party, which left Yokohama in 1871, toured Europe and America over nearly two years. The trip's original aim was preliminary negotiation for revising the unequal treaties, but the results did not come as hoped. If you convey that future leaders such as Okubo Toshimichi and Ito Hirobumi were included, the weight of the journey comes across. Rather than listing detailed destinations, telling what they saw and what they brought back stays with people as a story.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「岩倉使節団」。国を代表して派遣される団体。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "供養",
+   "reading": "くよう",
+   "pos": "noun",
+   "meaning": "memorial service, offering",
+   "defJa": "仏や死者に供え物をして祈ること。",
+   "passage": {
+    "ja": "日本の寺では、役目を終えた針や人形、ときには筆まで供養する習わしがあります。その本来の意味は、仏や先祖に食べ物や花や祈りを捧げることでした。ところが日本では、万物に心が宿るという感覚が重なり、感謝を込めて別れを告げる儀式へと広がったのです。インドの仏教がそのままの形で伝わったわけではなく、土地の信仰と溶け合いながら姿を変えました。モノへのそうした祈りは、そうした長い混ざり合いの結果といえます。",
+    "form": "供養",
+    "en": "At Japanese temples there is a custom of holding memorial rites even for needles and dolls that have finished their service, and at times even for brushes. Its original meaning was to offer food, flowers and prayers to the Buddha and ancestors. In Japan, however, a feeling that a spirit dwells in all things overlapped with it, and it spread into a ritual of bidding farewell with gratitude. It is not that Indian Buddhism arrived in its original form; it changed shape while blending with local beliefs. Rites for objects can be called the result of that long mixing.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「先祖を供養する」「人形供養」。祈りと感謝を捧げる儀式。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "依存症",
+   "reading": "いぞんしょう",
+   "pos": "noun",
+   "meaning": "addiction, dependence",
+   "defJa": "やめたくてもやめられない状態の病気。",
+   "passage": {
+    "ja": "スマホをいじる時間が増えるほど、「自分は依存症なのでは」と不安になる人もいるでしょう。けれども、専門家は、これを意志の弱さではなく、脳の報酬系が変化した状態として説明します。気合いで抜け出そうとする発想そのものが、的を外している場合があるのです。必要なのは、本人を責めることではなく、環境を変え、周りが傾聴の姿勢で支えることです。回復には長い停滞期があるものの、積み上げ直す価値は十分にあります。",
+    "form": "依存症",
+    "en": "As your time fiddling with your smartphone grows, some people may worry, 'Am I addicted?' Yet specialists explain it not as weakness of will but as a state in which the brain's reward system has changed. The very idea of escaping by sheer willpower can be off the mark. What is needed is not to blame the person but to change the environment and for those around them to support them by listening attentively. Although recovery has a long plateau, rebuilding step by step is well worth it.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「ギャンブル依存症」。意志の弱さではなく、病気として捉える語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "侵攻",
+   "reading": "しんこう",
+   "pos": "noun",
+   "meaning": "invasion",
+   "defJa": "軍隊が他国に攻め入ること。",
+   "passage": {
+    "ja": "1941年6月、ドイツ軍は独ソ不可侵条約を破り、ソ連への侵攻を開始しました。バルバロッサ作戦と呼ばれたこの作戦は、数百万規模の兵力を動員した、史上最大級の陸戦だったとされています。当初は電撃的に進んだものの、冬の到来と補給線の伸びきりで、ドイツ軍は次第に動きが鈍っていきました。独裁者の判断が現場の声を封じた点も、見逃せません。一党独裁のもとでは、誤りを正す仕組みが働きにくいのです。",
+    "form": "侵攻",
+    "en": "In June 1941, the German army broke the German-Soviet Non-Aggression Pact and began its invasion of the Soviet Union. This operation, called Barbarossa, is said to have been one of the largest land battles in history, mobilizing forces in the millions. Although it advanced like lightning at first, the arrival of winter and overextended supply lines gradually slowed the German army. The fact that the dictator's judgment silenced voices from the front cannot be overlooked either. Under one-party dictatorship, mechanisms for correcting errors are slow to work.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「〜への侵攻」。他国の領土に軍を進めること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "促音",
+   "reading": "そくおん",
+   "pos": "noun",
+   "meaning": "geminate consonant (small tsu)",
+   "defJa": "小さな「っ」で表される、つまる音。",
+   "passage": {
+    "ja": "日本語の促音は、小さな「っ」で表されるが、外国人学習者には聞き分けがたい音である。「さか」と「さっか」のように、わずかな間の違いが意味を分けるからだ。母語にこうした音のない話者は、この無音の長さを一つの音として捉えにくい。日本語教育の現場では、手拍子を打ちながら拍を数える練習が、効果的だとされる。「ベッド」や「バッグ」のような借用語にも現れ、外来語の発音を左右している。",
+    "form": "促音",
+    "en": "The Japanese geminate, written with a small tsu, is a sound that foreign learners find hard to tell apart. A slight difference in pause separates meaning, as in 'saka' and 'sakka.' Speakers whose native language lacks such sounds have trouble perceiving this stretch of silence as a sound in its own right. In Japanese-language teaching, practice of counting beats while clapping is said to be effective. It also appears in loanwords such as 'beddo' and 'baggu,' and shapes the pronunciation of foreign words.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「小さな『っ』」。拍の長さで意味が変わるので、学習者には難しい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "俗語",
+   "reading": "ぞくご",
+   "pos": "noun",
+   "meaning": "slang",
+   "defJa": "日常会話で使う、くだけた言葉。",
+   "passage": {
+    "ja": "試験の長文で「やばい」という言葉が出てきたら、あなたは意味を取れますか。俗語は、辞書の見出しに載りにくいうえに、時代に伴って意味がどんどん変わります。たとえば「やばい」は、本来は危険を表す語でしたが、いまは称賛にも使われますし、「ナイス」のように借用語から生まれた言い回しも少なくありません。ただし作文や面接で使うと、場にそぐわない印象を与えかねないので、読んで分かる語と、自分で使う語は分けておきましょう。",
+    "form": "俗語",
+    "en": "If the word 'yabai' came up in a long reading passage on an exam, could you grasp its meaning? Slang is hard to find in dictionary headwords, and its meaning keeps changing with the times. For example, 'yabai' originally meant danger but is now also used as praise, and there are not a few expressions born of loanwords, like 'nice.' Used in essays or interviews, however, it could give an ill-fitting impression, so keep words you can read separate from words you use yourself.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「俗語的な表現」。話し言葉で使い、書き言葉や面接では避ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "保守主義",
+   "reading": "ほしゅしゅぎ",
+   "pos": "noun",
+   "meaning": "conservatism",
+   "defJa": "伝統や秩序を重んじ、急な変化を避ける立場。",
+   "passage": {
+    "ja": "保守主義の父と呼ばれるのは、18世紀イギリスの政治家エドマンド・バークです。彼はフランス革命を批判し、人間の理性だけで社会を作り直そうとする試みは危うい、と論じました。伝統や慣習には、長い時間をかけて試されてきた知恵が蓄えられている、という考え方です。もっとも、これは何も変えないという意味ではなく、改革は現実に沿って少しずつ進めるべきだという主張でした。彼が求めたのは、過去と現在をつなぐ一貫性だったのです。",
+    "form": "保守主義",
+    "en": "The father of conservatism is said to be Edmund Burke, an eighteenth-century British politician. He criticized the French Revolution and argued that attempts to remake society on human reason alone are dangerous. It is the view that traditions and customs store wisdom that has been tested over a long time. This did not mean changing nothing, though; his claim was that reform should proceed little by little in line with reality. What he sought was a consistency linking past and present.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「バークと保守主義」。伝統を重んじ、改革は漸進的にと考える立場。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "保護主義",
+   "reading": "ほごしゅぎ",
+   "pos": "noun",
+   "meaning": "protectionism",
+   "defJa": "関税などで自国の産業を守る考え方。",
+   "passage": {
+    "ja": "関税の壁を高くして自国産業を守る保護主義は、不況のたびに支持を集める。国内の雇用を守るという目的は、一見すると正当であり、有権者にも分かりやすい。しかし世界恐慌後の経験が示すように、各国が一斉に壁を築けば、世界の貿易は縮み、不況は深まるばかりだ。結局、短期の痛みを避けようとする政策が、長期の損失を招くのである。守るという言葉の甘さを疑うことが、経済を論じる出発点となる。",
+    "form": "保護主義",
+    "en": "Protectionism, which raises tariff walls to shield domestic industry, gains support with every downturn. The aim of protecting domestic jobs is at first glance legitimate and easy for voters to grasp. But as the experience after the Great Depression shows, if every country builds walls at once, world trade shrinks and the slump only deepens. In the end, a policy that tries to avoid short-term pain invites long-term loss. Doubting the sweetness of the word 'protect' is the starting point for discussing economics.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「保護主義に傾く」。関税や規制で国内産業を守る政策思想。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "保護国",
+   "reading": "ほごこく",
+   "pos": "noun",
+   "meaning": "protectorate",
+   "defJa": "外交などを他国に任せている国。",
+   "passage": {
+    "ja": "世界史の試験では、外交権の扱いをめぐる用語が、必ずといっていいほど問われます。保護国とは、外交権などを他国に握られながらも、形式上は国家として存続している国のことです。たとえば1905年の第二次日韓協約で、大韓帝国は外交権を奪われ、事実上、日本の支配下に置かれました。ここで大事なのは、併合とは違い、完全に領土へ組み込まれたわけではない、という点です。用語の違いを押さえておけば、年号の暗記もずっと楽になります。",
+    "form": "保護国",
+    "en": "In world history exams, terms concerning the handling of diplomatic rights are asked almost without fail. A protectorate is a country whose diplomatic and other rights are held by another state while it formally continues to exist as a state. For example, under the Second Japan-Korea Agreement of 1905, the Korean Empire was deprived of its diplomatic rights and was in effect placed under Japanese control. What matters here is that, unlike annexation, it was not completely incorporated into the territory. If you grasp the differences in terms, memorizing the years also becomes much easier.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「〜の保護国となる」。外交権を握られるが、形式上は国のまま。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "保護貿易",
+   "reading": "ほごぼうえき",
+   "pos": "noun",
+   "meaning": "protective trade",
+   "defJa": "関税などで国内産業を守る貿易政策。",
+   "passage": {
+    "ja": "自由貿易と保護貿易の対比は、世界史でも政経でも頻出のテーマです。国が関税を高くして輸入品を割高にし、国内の産業を育てる政策のことを指します。19世紀のドイツの経済学者リストは、育ちきっていない産業を守るために必要だと唱えました。一方、イギリスは先に工業化を終えたからこそ、自由貿易を強く主張したのです。世界恐慌のあとに各国が壁を高くした場面でも、同じ論理が顔を出します。",
+    "form": "保護貿易",
+    "en": "The contrast between free trade and protective trade is a frequent theme in both world history and politics-economics. It refers to a policy in which the state raises tariffs, makes imports expensive and nurtures domestic industry. The nineteenth-century German economist List argued it was necessary to protect industries not yet fully grown. Britain, on the other hand, argued strongly for free trade precisely because it had finished industrializing first. The same logic shows up when countries raised their walls after the Great Depression.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「自由貿易」と対にして覚える。関税で国内産業を育てる政策。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "信心",
+   "reading": "しんじん",
+   "pos": "noun",
+   "meaning": "faith, piety",
+   "defJa": "神仏を信じ、深く敬う心。",
+   "passage": {
+    "ja": "浄土真宗の教えでは、救いは修行の量ではなく、信心によって決まると説かれます。親鸞は、自分の力で悟ろうとする心が、かえって慢心を生みかねないと考えました。そこで、阿弥陀仏への信にすべてを委ねる道を、人々に示したのです。これは他力本願の考え方に通じるもので、努力を否定するのではなく、努力の限界を見つめる態度でした。難しい理屈より、素直に手を合わせる心こそが、大切にされたのです。",
+    "form": "信心",
+    "en": "In the teaching of Jodo Shinshu, salvation is said to be decided not by the amount of practice but by faith. Shinran thought that a mind trying to attain enlightenment by its own power could instead breed arrogance. So he showed people a path of entrusting everything to trust in Amida Buddha. This connected with the idea of reliance on other-power, and was an attitude not of denying effort but of looking squarely at its limits. More than difficult theory, a heart that simply puts its palms together was what was treasured.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「信心深い」。教えを信じて敬う心。親鸞の他力の教えと結びつく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "修練",
+   "reading": "しゅうれん",
+   "pos": "noun",
+   "meaning": "training, discipline",
+   "defJa": "技や心を、繰り返し鍛え磨くこと。",
+   "passage": {
+    "ja": "どんな分野でも、名人と呼ばれる人は、修練の量が桁違いです。ただし、ただ長く続ければいいわけではありません。心理学者エリクソンの研究では、課題の難しさを少しずつ上げながら、フィードバックを受け続ける練習が、上達に結びつくとされています。これは、伸びしろがどこにあるかを見極めて、そこに集中するということでもあります。惰性の反復は、時間だけが過ぎていく作業にすぎません。",
+    "form": "修練",
+    "en": "In any field, those called masters have an overwhelming amount of training. But it is not enough simply to continue for a long time. In the psychologist Ericsson's research, practice that raises task difficulty a little at a time while continuing to receive feedback is said to lead to improvement. This also means identifying where your room for growth lies and concentrating there. Repetition out of inertia is nothing more than work in which only time passes.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「修練を積む」。繰り返し鍛えて技や心を磨くこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "修辞",
+   "reading": "しゅうじ",
+   "pos": "noun",
+   "meaning": "rhetoric, figures of speech",
+   "defJa": "言葉を美しく、効果的に用いる工夫。",
+   "passage": {
+    "ja": "討論番組で人気のコメンテーターの話し方って、実は修辞のかたまりなんですよ。短い切り返しは、相手の主張を、ふっと軽く見せる効果があります。もちろん、三段論法できちんと反論しているわけではなく、言い方の力で空気を変えているんです。こういう技を知っておくと、ニュースのコメントも、少し冷静に聞けるようになります。ただ、同じ手を使いすぎると、聞き手は慣れてしまうんですけどね。",
+    "form": "修辞",
+    "en": "The way popular commentators on debate shows speak is actually a mass of rhetoric. A short comeback has the effect of making the other person's claim seem lightweight. Of course, they're not rebutting properly with a syllogism; they're changing the mood through the power of phrasing. If you know these tricks, you can listen to news commentary a little more calmly. Mind you, if they use the same move too often, listeners get used to it.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「修辞を凝らす」。言葉の飾りや技巧。論理そのものとは別の働き。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "修辞学",
+   "reading": "しゅうじがく",
+   "pos": "noun",
+   "meaning": "rhetoric (as a discipline)",
+   "defJa": "言葉で人を説得する技を研究する学問。",
+   "passage": {
+    "ja": "修辞学って、古代ギリシャで生まれた、説得のための学問なんですよ。アリストテレスは、人を動かす要素を、話し手の人柄、聞き手の感情、話の論理の三つに整理しました。三段論法の基本を作ったのも彼ですしね。どれほど論理だけで押しても人は動かないし、感情だけでも長続きしません。だから二千年以上もたった今でも、ビジネス向けのプレゼンの本は、この古い枠組みをもとにしているわけです。",
+    "form": "修辞学",
+    "en": "Rhetoric is a discipline of persuasion born in ancient Greece, you know. Aristotle sorted the elements that move people into three: the speaker's character, the listener's emotions, and the logic of the talk. He's also the one who laid the basics of the syllogism. Pushing with logic alone doesn't move people, and emotion alone doesn't last. That's why, even two thousand years on, books on presentations are still built on this old framework.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「古代ギリシャの修辞学」。人柄・感情・論理で説得を整理した学問。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "修飾語",
+   "reading": "しゅうしょくご",
+   "pos": "noun",
+   "meaning": "modifier",
+   "defJa": "他の語の意味を詳しく説明する語。",
+   "passage": {
+    "ja": "文章を磨くとは、修飾語を足すことではなく、思い切って削ることである。「とても素晴らしい美しい景色」のように言葉を重ねるほど、かえって情景はぼやけてしまう。名詞や動詞が的確であれば、修辞を凝らさなくても、情景は伝わるからだ。一方で、飾る言葉の位置が一つずれるだけで、文の意味が変わる場合もある。「美しい母の友人」は、美しいのが母なのか友人なのか、読み手を迷わせかねない。",
+    "form": "修飾語",
+    "en": "Polishing prose means not adding modifiers but cutting them. The more you pile on words, as in 'a very wonderful beautiful view,' the more the scene actually blurs. If the nouns and verbs are exact, the scene comes across without any rhetorical elaboration. On the other hand, a shift of just one position in a modifying word can change the meaning of a sentence. 'A beautiful mother's friend' could leave the reader unsure whether it is the mother or the friend who is beautiful.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「修飾語を削る」。名詞・動詞を飾る語。位置次第で意味が変わる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "修養",
+   "reading": "しゅうよう",
+   "pos": "noun",
+   "meaning": "self-cultivation",
+   "defJa": "知識や人格を、努力して磨くこと。",
+   "passage": {
+    "ja": "インドの伝統では、学ぶことと自分を磨くことは、もともと切り離されていませんでした。弟子が師のもとで暮らし、掃除や炊事という日々の修練をこなしながら知を受け取る修養のかたちが、古くから続いてきたのです。教室で知識だけを仕入れる現代の勉強法とは、ずいぶん違いますよね。けれども、自己管理や習慣づくりが注目される今、こうした生活全体を使った学びが、見直されつつあります。試験の点数を超えた学び方を、考え直すきっかけになるでしょう。",
+    "form": "修養",
+    "en": "In the Indian tradition, learning and polishing oneself were originally not separated. A form of self-cultivation, in which a disciple lived with a teacher and received knowledge while carrying out the daily discipline of cleaning and cooking, has continued since ancient times. It's quite different from modern study methods that just stock up on knowledge in a classroom, isn't it? Yet now that self-management and habit-building are drawing attention, this kind of learning that uses the whole of life is being reconsidered. It may become an occasion to rethink ways of learning beyond exam scores.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「人格の修養」。知識だけでなく人格を磨くこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "倒置法",
+   "reading": "とうちほう",
+   "pos": "noun",
+   "meaning": "inversion (rhetorical)",
+   "defJa": "語順を入れ替えて感情を強める表現。",
+   "passage": {
+    "ja": "「美しい、この夜景は」のように、述語を先に置く倒置法は、感情を強く押し出す技法である。演説などでは、「忘れてはならない、この教訓を」といった言い回しが、あえて使われることがある。語順を崩すことで、聞き手の注意は前に置かれた言葉に集まり、余韻も深くなる。ただし多用すれば、文章全体がわざとらしくなりかねない。日常会話での倒置が、とっさの感情の表れであるのとは対照的だ。",
+    "form": "倒置法",
+    "en": "The inversion technique, which puts the predicate first as in 'Beautiful, this night view,' is a device that pushes emotion forward strongly. In speeches and the like, phrasings such as 'We must not forget, this lesson' are sometimes used deliberately. By breaking the word order, the listener's attention gathers on the words placed first, and the lingering resonance deepens too. Overused, however, the whole text can become affected. This contrasts with inversion in everyday talk, which is an outburst of spontaneous feeling.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「倒置法を用いる」。述語を先に出して強調する修辞技法。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "借用語",
+   "reading": "しゃくようご",
+   "pos": "noun",
+   "meaning": "borrowed word, loanword",
+   "defJa": "他の言語から取り入れて使う言葉。",
+   "passage": {
+    "ja": "日本語には、外国語から入ってきた借用語がとても多く、カタカナ語に限らず試験でも頻出です。たとえば「アルバイト」はドイツ語、「パン」はポルトガル語が語源だとされます。英語だと思って使っていた言葉が、実は別の言語に由来すると知ると、覚え方が変わるでしょう。ただし「ノートパソコン」のように、日本で独自に作られた和製英語もあるので、注意が必要です。漢字を音として借りた万葉仮名の昔から、日本語は外の文化を取り込んできました。",
+    "form": "借用語",
+    "en": "Japanese has very many loanwords that came in from foreign languages, and they appear often on exams, not only katakana words. For example, 'arubaito' is said to derive from German and 'pan' from Portuguese. When you learn that a word you thought was English actually comes from another language, the way you remember it will change. But there are also Japan-made English coinages like 'notopasokon,' so caution is needed. Since the days of man'yogana, which borrowed kanji for their sounds, Japanese has been taking in outside culture.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「外来語」とほぼ同じ。語源をたどると記憶に残りやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "倫理",
+   "reading": "りんり",
+   "pos": "noun",
+   "meaning": "ethics",
+   "defJa": "人として守るべき道。善悪の判断の基準。",
+   "passage": {
+    "ja": "AIの話をするとき、倫理という言葉を安易に使うと、聞き手は身構えてしまいます。かといって、AIの影響を語る以上、触れざるを得ません。そこで、聞き手の関心を優先順位の先頭に置き、具体的な場面から話し始めると、抽象的な議論よりずっと伝わりやすくなります。たとえば、採用面接でAIが応募者を選別するとき、誰が責任を取るのか、という問いです。身近な例を一つ挟んでから原則に戻る構成は、難しい話題ほど効果を発揮します。",
+    "form": "倫理",
+    "en": "When talking about AI, using the word ethics too casually makes listeners brace themselves. Yet as long as you speak of AI's effects, you cannot help touching on it. So putting the listener's interest at the top of your priorities and beginning with a concrete scene makes it far easier to get across than abstract argument. For example: when AI screens applicants in a hiring interview, who takes responsibility? A structure that inserts one familiar example and then returns to principle works better the harder the topic.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「AI倫理」「倫理観」。善悪や責任の基準を問う語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "偉業",
+   "reading": "いぎょう",
+   "pos": "noun",
+   "meaning": "great achievement",
+   "defJa": "世にまれな、すばらしい成しとげ。",
+   "passage": {
+    "ja": "1953年5月、エドモンド・ヒラリーとシェルパのテンジン・ノルゲイが、エベレストの初登頂に成功した。標高8800メートルを超える世界最高峰への到達は、当時の登山界にとって比類のない偉業であった。数か月にわたる準備と、七転び八起きで重ねてきた遠征の賜物である。二人のどちらが先に頂上へ立ったのかについては、本人たちが多くを語らなかったことから、長く憶測を呼んだ。協力して成し遂げたという事実こそが、二人の功績の核心にほかならない。",
+    "form": "偉業",
+    "en": "In May 1953, Edmund Hillary and the Sherpa Tenzing Norgay succeeded in the first ascent of Everest. Reaching the world's highest peak, over 8,800 meters in elevation, was an unrivaled feat for the mountaineering world of the time. It was the fruit of months of preparation and of expeditions piled up through repeated falls and recoveries. As for which of the two stood on the summit first, the pair said little themselves, and so it long invited speculation. The fact that they achieved it together is precisely the core of their accomplishment.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「偉業を成し遂げる」。歴史に残るほどの大きな業績。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "停戦",
+   "reading": "ていせん",
+   "pos": "noun",
+   "meaning": "ceasefire",
+   "defJa": "戦いをいったん止めること。",
+   "passage": {
+    "ja": "試験で紛らわしいのが、停戦と終戦と講和の違いです。これは、戦闘行為をいったん止める合意で、戦争そのものが法的に終わるわけではありません。たとえば、冷戦期の代理戦争でもあった朝鮮戦争の休戦協定は、今も平和条約に置き換わっておらず、半島は技術的には戦争状態にあります。一方、講和は、国家間で戦争状態を正式に終える条約を指します。用語を区別したうえで覚えておけば、記述問題でも迷わずに答えられるでしょう。",
+    "form": "停戦",
+    "en": "What tends to be confusing on exams is the difference between ceasefire, end of war, and peace settlement. It is an agreement to halt fighting for the time being, and it does not mean the war itself ends legally. For example, the armistice of the Korean War, which was also a Cold War proxy war, has still not been replaced by a peace treaty, and the peninsula is technically in a state of war. A peace settlement, on the other hand, refers to a treaty that formally ends the state of war between states. If you memorize the terms after distinguishing them, you will be able to answer essay questions without hesitation.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「停戦合意」。戦闘を止めるが、戦争の法的終結ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "停滞期",
+   "reading": "ていたいき",
+   "pos": "noun",
+   "meaning": "plateau, stagnant period",
+   "defJa": "進歩が止まったように見える時期。",
+   "passage": {
+    "ja": "筋力トレーニングを始めて三か月、体重もバーベルの重さも、ぴたりと動かなくなった。いわゆる停滞期である。専門家によれば、体が負荷に慣れ、同じ刺激では変化が起きにくくなる自然な現象であり、才能の限界を意味するわけではない。重さや回数を状態に応じて変え、刺激に変化をつければ、再び成長が動き出すことが多い。ここで手を止めた人ほど、三日坊主の烙印を自分に押してしまうのだ。",
+    "form": "停滞期",
+    "en": "Three months after starting strength training, both body weight and the weight on the barbell stopped moving altogether. It is what is called a plateau. According to specialists, it is a natural phenomenon in which the body gets used to the load and changes become hard to produce with the same stimulus, and it does not mean the limit of your talent. If you vary weight and repetitions according to your condition and change the stimulus, growth often starts moving again. The people who stop here are the ones who brand themselves quitters.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「停滞期に入る」。ダイエットや筋トレで進歩が止まる時期。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "傀儡政権",
+   "reading": "かいらいせいけん",
+   "pos": "noun",
+   "meaning": "puppet government",
+   "defJa": "他国に操られ、実権のない政権。",
+   "passage": {
+    "ja": "1932年、日本は中国東北部に満州国を建て、清朝最後の皇帝・溥儀を元首の座に据えました。形のうえでは独立国家でしたが、実権は関東軍が握っており、典型的な傀儡政権だったと評価されています。国際連盟はリットン調査団を送り、1933年に満州国を認めない勧告を採択しました。日本はこれに反発して、連盟を脱退しています。名目と実態のずれ、そして実態が不透明な国家のからくりを見抜くことが、歴史を読むうえでの基本になります。",
+    "form": "傀儡政権",
+    "en": "In 1932, Japan set up the state of Manchukuo in northeastern China and installed Puyi, the last emperor of the Qing, as head of state. It was an independent state in form, but real power was held by the Kwantung Army, and it is assessed as a typical puppet regime. The League of Nations sent the Lytton Commission and in 1933 adopted a recommendation not to recognize Manchukuo. Japan reacted against this and withdrew from the League. Seeing through the gap between nominal and actual, and through the workings of a state whose reality is opaque, is the basis for reading history.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「傀儡政権を樹立する」。名目上の政府で、実権は別の国が握る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "傍観者効果",
+   "reading": "ぼうかんしゃこうか",
+   "pos": "noun",
+   "meaning": "bystander effect",
+   "defJa": "周りに人がいるほど、人が動かなくなる現象。",
+   "passage": {
+    "ja": "道で人が倒れていても、周りに人が多いほど、誰も助けに行かない。この現象を傍観者効果と呼びます。1964年にニューヨークで起きた事件をきっかけに、心理学者のラタネとダーリーが実験で調べました。結果は、目撃者が多いほど、一人ひとりが責任を感じにくくなり、行動に移すまでの時間が長くなるというものでした。倫理や道徳を説くだけでは行動は変わらず、「そこの青いシャツの方、救急車を呼んでください」と、特定の人を指名して頼むほうが有効だとされます。",
+    "form": "傍観者効果",
+    "en": "Even if a person has collapsed in the street, the more people there are around, the less anyone goes to help. This phenomenon is called the bystander effect. Prompted by an incident in New York in 1964, the psychologists Latane and Darley investigated it through experiments. The result was that the more witnesses there are, the less each individual feels responsible and the longer it takes to act. Merely preaching ethics and morality does not change behavior; it is said to be more effective to single out a particular person and ask, 'You in the blue shirt, call an ambulance.'",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「傍観者効果が働く」。目撃者が多いほど、個人の責任感が薄れる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "債務",
+   "reading": "さいむ",
+   "pos": "noun",
+   "meaning": "debt, obligation",
+   "defJa": "借りたものを返さなければならない義務。",
+   "passage": {
+    "ja": "歴史の語りでは、債務を人の物語に置き換えると、聞き手の理解が一気に深まります。たとえば第一次世界大戦後のドイツの賠償金は、巨額の借金として国民の暮らしを圧迫し、ハイパーインフレの一因ともなりました。当時の日記や物価表といった一次史料をもとに、パンの値段が一日のうちに変わった生活を描くほうが、数字を並べるより胸に迫ります。数字は事実の骨組みであり、物語を通して初めて血が通うのです。",
+    "form": "債務",
+    "en": "In telling history, replacing debt with a human story deepens the listener's understanding all at once. For example, Germany's reparations after the First World War pressed on people's lives as an enormous burden of borrowing and became one cause of hyperinflation. Drawing on primary sources like diaries and price tables of the time, depicting a life in which the price of bread changed within a single day stirs the heart more than lining up figures. Numbers are the skeleton of fact, and only through story does blood flow into them.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「債務を抱える」「債務超過」。返済の義務。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "傾聴",
+   "reading": "けいちょう",
+   "pos": "noun",
+   "meaning": "attentive listening",
+   "defJa": "相手の話に、心を込めて耳を傾けること。",
+   "passage": {
+    "ja": "コーチングの基本は、話すことではなく傾聴にあります。相手の話をさえぎることなく、うなずきや短い相づちで、聞いていることを態度で伝えるのです。以心伝心を期待せず、伝わるように示すことが大切です。人は、自分の考えを言葉にして聞いてもらえたとき、答えを自分で見つけ出すことがよくあります。聞き上手になる近道は、話し上手を目指すことではなく、沈黙を怖がらないことなのです。",
+    "form": "傾聴",
+    "en": "The basis of coaching lies not in speaking but in attentive listening. Without interrupting the other person, you convey through nods and brief responses that you are listening. It is important not to expect telepathic understanding but to show it so it comes across. When people have a chance to put their own thoughts into words and be heard, they often find the answer themselves. The shortcut to becoming a good listener is not aiming to be a good speaker but not fearing silence.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「傾聴の姿勢」。相手の話を遮らず、心から聞くこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "僧侶",
+   "reading": "そうりょ",
+   "pos": "noun",
+   "meaning": "monk, priest",
+   "defJa": "仏の教えを修め、広める出家者。",
+   "passage": {
+    "ja": "仏教の僧侶は、もともとは家を出て、托鉢で食べ物を受けながら修行する人々でした。日本では、鎌倉時代に親鸞が妻帯の道を示して以来、結婚して寺を継ぐ住職も珍しくなくなりました。同じ出家者といっても、戒律の守り方は国や宗派によって大きく違うのです。インドで生まれた教えが各地に広がる過程で、暮らしの形も、土地の風土に合わせて変わっていきました。タイと日本とでは、日常の姿がずいぶん異なります。",
+    "form": "僧侶",
+    "en": "Buddhist monks were originally people who left home and trained while receiving food through alms rounds. In Japan, ever since Shinran showed a path of marrying in the Kamakura period, it has become not uncommon for head priests to marry and inherit a temple. Even among those who have left home, how the precepts are kept differs greatly by country and school. As the teaching born in India spread to various places, the form of daily life also changed to suit the local climate. Their everyday appearance differs considerably between Thailand and Japan.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「僧侶の修行」。出家して仏道を修める人。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "億劫",
+   "reading": "おっくう",
+   "pos": "na-adj",
+   "meaning": "bothersome, a drag",
+   "defJa": "気が進まず、面倒に感じるさま。",
+   "passage": {
+    "ja": "春先になると、朝ふとんから出るのが億劫になる、という声が増える。気温の変化に伴って、日照時間や体内時計が揺らぐためだとされる。仏教に目を向ければ、この語の「劫」は、古代インドで宇宙の始まりから終わりまでを数えた、きわめて長い時間の単位を指す。「億」がつくのだから、途方もない時間を意味し、そこから、面倒で気が進まないという感覚へと意味が移ったとされる。語の旅路を知ると、朝のだるさにも少し余裕を持って向き合える。",
+    "form": "億劫",
+    "en": "As early spring arrives, there is a growing chorus that getting out of the futon in the morning has become a drag. It is said that with changes in temperature, the hours of daylight and the body clock are thrown off. Looking to Buddhism, the 'kalpa' in this word refers to an extremely long unit of time, used in ancient India to count from the start of the universe to its end. Since 'hundred million' is attached, it meant an immense stretch of time, and from there the sense is said to have shifted to a feeling of bother and reluctance. Knowing the word's journey, you can face morning sluggishness with a bit more composure.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「〜するのが億劫だ」。気が重くて動き出すのが面倒なさま。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "優先順位",
+   "reading": "ゆうせんじゅんい",
+   "pos": "noun",
+   "meaning": "order of priority",
+   "defJa": "物事を行う順番を決める、重要さの順。",
+   "passage": {
+    "ja": "やることが多すぎて動けないときは、優先順位をつけるところから始めましょう。有名なのが、緊急度と重要度で仕事を四つに分ける方法で、本当に時間を使うべきなのは、緊急ではないが重要な項目です。たとえば、体調管理や学習の習慣づくりは、今日やらなくても困らない代わりに、後回しにすると大きな損失になります。反対に、通知への即答のような緊急で重要でない作業が、一日を食いつぶしてしまいがちです。三日坊主を恐れず、紙に書き出して眺めるだけで、頭のなかが驚くほど整理されます。",
+    "form": "優先順位",
+    "en": "When there is too much to do and you cannot move, start by setting priorities. A well-known method divides tasks into four by urgency and importance, and what you should truly spend time on is the items that are important but not urgent. For example, managing your health and building study habits will not trouble you if skipped today, but postponing them means a large loss. Conversely, work that is urgent but unimportant, like answering notifications instantly, tends to eat up the day. Without fearing quitting after three days, just writing it out on paper and looking at it tidies up your head surprisingly well.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「優先順位をつける」。重要さや緊急さで物事の順番を決める。",
+    "sense": ""
+   }
+  }
+ ]
+}

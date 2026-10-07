@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "最先端",
+   "reading": "さいせんたん",
+   "pos": "noun",
+   "meaning": "cutting edge",
+   "defJa": "ある分野で一番進んでいる水準",
+   "passage": {
+    "ja": "最先端の研究室って、きっと最新の装置だらけだと思うじゃないですか。ところが私のいた所は、五年前の古い計算機を使い回していましたよ。それでも成果が出たのは、先生の頭の柔軟性があればこそでした。設備を自慢する人ほど、論文は少なかったりするものです。",
+    "form": "最先端",
+    "en": "People assume a cutting-edge lab must be full of the newest equipment, don't they? But the place I worked at kept reusing a computer that was five years old. Even so, results came out, and that was thanks entirely to my supervisor's mental flexibility. The people who boast about their facilities tend to publish fewer papers, funnily enough.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「最先端の+研究・技術・医療」のように、分野の名詞に付く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "最盛期",
+   "reading": "さいせいき",
+   "pos": "noun",
+   "meaning": "peak period",
+   "defJa": "勢いが最も盛んだった時期",
+   "passage": {
+    "ja": "モンゴル帝国の最盛期には、領土はユーラシアの東端から東ヨーロッパにまで及びました。領土の広さにもまして注目したいのは、駅伝制と呼ばれる通信網です。道路と宿場が整っていたからこそ、命令は驚くほどの速さで届きました。しかし栄枯盛衰は世の常で、帝国はやがていくつかの国に分かれていきます。",
+    "form": "最盛期",
+    "en": "At its peak, the Mongol Empire stretched from the eastern edge of Eurasia all the way into Eastern Europe. Even more striking than the sheer size of its territory is the communication network known as the relay-station system. Because roads and post stations were kept in good order, orders travelled with astonishing speed. But rise and fall is the way of the world, and the empire eventually split into several states.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「帝国・王朝・産業の最盛期」など、盛んだった時期を指す。反対は衰退期。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有事",
+   "reading": "ゆうじ",
+   "pos": "noun",
+   "meaning": "emergency, contingency",
+   "defJa": "戦争や災害など、非常の事態が起きること",
+   "passage": {
+    "ja": "台湾をめぐる緊張が高まるなか、半導体の供給網をどう守るかが各国政府の課題になっている。最先端の半導体の大半を一つの地域に頼る現状は、有事の際に世界の産業を止めかねない。そこで企業は、工場を複数の国に分散させる動きを強めている。もっとも、新しい工場が動き出すまでには数年かかるため、当面は不安定な状態が続く見通しだ。",
+    "form": "有事",
+    "en": "As tensions over Taiwan rise, how to protect semiconductor supply chains has become a challenge for governments. Relying on a single region for most cutting-edge chips could halt industry worldwide in an emergency. Companies are therefore speeding up moves to spread their factories across several countries. Still, a new plant takes years to start running, so the situation is expected to stay unstable for the time being.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「有事の際に」「有事に備える」の形で使う。反対は平時。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有史以来",
+   "reading": "ゆうしいらい",
+   "pos": "noun",
+   "meaning": "since recorded history began",
+   "defJa": "文字による記録が始まってから今まで",
+   "passage": {
+    "ja": "人類は有史以来、記憶を外に預ける工夫を重ねてきた。粘土板、巻物、印刷本、そして今のスマートフォンである。道具が増えるにつれて、自分の頭に残す力は弱まるばかりだと言われる。覚えるべきことを絞り、文脈ごと頭に入れる方法が、結局は最も効率のよい勉強法だ。",
+    "form": "有史以来",
+    "en": "Since recorded history began, humans have kept devising ways to store memory outside the head. Clay tablets, scrolls, printed books, and now the smartphone. It is said that as tools multiply, the power to retain things in one's own head only weakens. Narrowing down what must be remembered and absorbing it together with its context is, in the end, the most efficient way to study.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「有史以来初めて」「有史以来の」のように、最大・最古を強調する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有意差",
+   "reading": "ゆういさ",
+   "pos": "noun",
+   "meaning": "significant difference",
+   "defJa": "偶然とは言えない、統計上の違い",
+   "passage": {
+    "ja": "朝活を続ける群と夜型の群の平均点を比べたところ、二点ほどの差が出ました。大事なのは、その差が偶然ではなく、本当に意味のある有意差かどうかを調べることです。人数が少なければ、結論を出すに足る根拠にはなりません。数字を見て飛びつく前に、まず疑ってみる姿勢が欠かせません。",
+    "form": "有意差",
+    "en": "Comparing the average scores of a group that kept up morning routines and a group of night owls, a gap of about two points appeared. What matters is checking whether that gap is not chance but a truly meaningful significant difference. If the number of people is small, it is not solid enough grounds to draw a conclusion. Before jumping at the numbers, a habit of doubting them first is indispensable.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「有意差がある／ない」「有意差が出る」の形で、統計の結果を述べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有能感",
+   "reading": "ゆうのうかん",
+   "pos": "noun",
+   "meaning": "sense of competence",
+   "defJa": "自分にはできるという手ごたえ",
+   "passage": {
+    "ja": "根性論で子どもを励ますより、小さな成功を積ませるほうが、ずっと効果的である。「やればできた」という経験が有能感を育て、次の挑戦への意欲を生むからだ。逆に、難しすぎる課題ばかり与えられると、自信どころか無力感が育ってしまう。勉強の継続は、才能以前に、この感覚にかかっている。",
+    "form": "有能感",
+    "en": "Rather than rallying a child with talk of sheer grit, letting them stack up small successes is far more effective. The experience of \"I did it\" nurtures a sense of competence and creates the drive for the next challenge. Conversely, if a child is given only tasks that are too hard, helplessness grows instead of confidence. Whether studying continues depends, even before talent, on this feeling.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「有能感を育てる／持つ」。学習意欲や自己効力感の話で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有言実行",
+   "reading": "ゆうげんじっこう",
+   "pos": "noun",
+   "meaning": "doing what one says",
+   "defJa": "言ったことを必ずやり遂げること",
+   "passage": {
+    "ja": "うちの部長は、有言実行の人なんですよ。去年の忘年会で「来年は全員で富士山に登る」と言ったら、本当に予約まで済ませてきて。こっちは酔った勢いだと思っていたものだから、正直ちょっと焦りました。結局、山頂までは根性だけで登りきりましたが、言ったことをやり抜く人は信頼されるのだと実感しました。",
+    "form": "有言実行",
+    "en": "My department head is a man of his word. At last year's year-end party he said, \"Next year we're all climbing Mt. Fuji,\" and he actually came back with the reservations already made. I'd assumed it was just the drunken momentum talking, so honestly I panicked a little. In the end I made it to the summit on sheer guts alone, and I came to feel that people who follow through on what they say earn trust.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「有言実行の人」。不言実行と対にして言うことが多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "有酸素運動",
+   "reading": "ゆうさんそうんどう",
+   "pos": "noun",
+   "meaning": "aerobic exercise",
+   "defJa": "酸素を使って続ける、軽めの全身運動",
+   "passage": {
+    "ja": "脳のために運動するなら、まず有酸素運動から始めましょう。週に三回、三十分ほど早歩きをするだけでも、記憶をつかさどる海馬に良い影響があるとする研究があります。大事なのは激しさではなく、続けることです。ちなみに、私は朝活のついでに、近所の川沿いを歩くのを日課にしています。",
+    "form": "有酸素運動",
+    "en": "If you want to exercise for your brain, start with aerobic exercise. There is research suggesting that even brisk walking for thirty minutes three times a week benefits the hippocampus, which governs memory. What matters is not intensity but keeping it up. Incidentally, I make a daily habit of walking along the nearby river as part of my morning routine.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「有酸素運動」は、ウォーキングや水泳など。無酸素運動と対比される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "服従",
+   "reading": "ふくじゅう",
+   "pos": "noun",
+   "meaning": "obedience",
+   "defJa": "命令や権威に逆らわず従うこと",
+   "passage": {
+    "ja": "ミルグラムの実験では、白衣の研究者に促されただけで、多くの参加者が最大の電圧までスイッチを上げ続けた。この結果は、人間が権威への服従にいかに弱いかを示すものとして知られる。とはいえ、これは人の本性が残酷だという意味ではない。状況のしくみが行動を左右することを、彼らは身をもって教えてくれたのである。",
+    "form": "服従",
+    "en": "In Milgram's experiment, merely urged on by a researcher in a white coat, many participants kept raising the switch up to the maximum voltage. The result is known as showing how weak humans are in the face of obedience to authority. That said, this does not mean human nature is cruel. Those participants taught us, from their own experience, that the structure of a situation steers behavior.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「権威への服従」「絶対服従」。反対は反抗・抵抗。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "朝活",
+   "reading": "あさかつ",
+   "pos": "noun",
+   "meaning": "morning activities before work",
+   "defJa": "出勤前の朝の時間に学びや運動をすること",
+   "passage": {
+    "ja": "始業前の時間を自己投資にあてる朝活が、都市部の会社員のあいだで定着しつつある。語学の勉強や有酸素運動はもちろん、読書会を開く人も多い。背景には、在宅勤務の広がりで通勤時間が減り、朝に余裕が生まれたことがある。一方で、睡眠を削ってまで続けると逆効果になる恐れがあると、専門家は注意を促している。",
+    "form": "朝活",
+    "en": "Morning activities, using time before work for self-investment, are taking root among office workers in cities. Many people hold reading groups, not to mention language study and aerobic exercise. Behind this lies the spread of remote work, which cut commuting time and freed up the mornings. On the other hand, experts caution that continuing at the cost of sleep risks backfiring.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「朝活を始める／続ける」。「〜活」は目的のための活動を表す新語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "朝貢",
+   "reading": "ちょうこう",
+   "pos": "noun",
+   "meaning": "tribute; paying tribute",
+   "defJa": "周辺の国が中国の皇帝に貢ぎ物を贈ること",
+   "passage": {
+    "ja": "琉球王国は、中国の皇帝に使者を送って朝貢することで、貿易の特権を得た。形の上では臣下でありながら、実際には自国の政治を保っていたのである。このように、朝貢は単なる服従の儀礼にとどまらず、外交と通商を兼ねた巧みな仕組みでもあった。形式を重んじるふりをして実利を取る知恵に、小国の生存戦略を見る思いがする。",
+    "form": "朝貢",
+    "en": "By sending envoys to the Chinese emperor and paying tribute, the Ryukyu Kingdom gained trading privileges. Formally a vassal, it in fact kept its own government. Tribute, then, was not merely a ritual of submission but also a clever mechanism that combined diplomacy and commerce. In the wisdom of honoring form while taking real gain, one seems to see a small state's strategy for survival.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「中国に朝貢する」「朝貢貿易」。皇帝と周辺国の上下関係を表す語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "未曾有",
+   "reading": "みぞう",
+   "pos": "na-adj",
+   "meaning": "unprecedented",
+   "defJa": "今までに一度も起きたことがないこと",
+   "passage": {
+    "ja": "いま、人工知能の開発には未曾有の規模の計算資源が投じられている。かつての産業革命は数十年をかけて社会を変えたが、今回の変化は数年で世の中の前提を書き換えかねない。ここで問われるのは、技術の優劣ではなく、それを使う側の根幹にある価値観である。道具が強くなるほど、扱う者の思想が結果を決めるからだ。",
+    "form": "未曾有",
+    "en": "Computing resources of unprecedented scale are now being poured into developing artificial intelligence. The earlier Industrial Revolution reshaped society over decades, but this change could rewrite society's assumptions within a few years. What is being tested here is not the merits of the technology but the values at the foundation of those who use it. The stronger the tool, the more the thinking of the one who wields it decides the outcome.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「未曾有の災害／危機／規模」。前例のない大きさを強調する硬い語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本性",
+   "reading": "ほんしょう",
+   "pos": "noun",
+   "meaning": "true nature",
+   "defJa": "その人や物がもともと持つ本当の姿",
+   "passage": {
+    "ja": "アドヴァイタでは、ほんとうの自分、つまりアートマンは、万物の根源であるブラフマンと同じだって言うんですよ。でも普段の私たちは、肩書きや感情ばかり見ていて、自分の本性なんて考えもしないじゃないですか。たとえば、怒っている最中の自分と、それを眺めている自分は、別ものですよね。後者に気づいたが最後、もう元の見方には戻れないと言う人もいます。",
+    "form": "本性",
+    "en": "In Advaita they say that the true self, the atman, is identical to Brahman, the source of all things. But in everyday life we keep looking at our titles and emotions and never even think about our own true nature, do we? Take the self in the middle of being angry and the self watching it: they are different, aren't they? Some people say that once you notice the latter, you can never go back to your old way of seeing.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「本性を現す／見抜く」。人や物の隠れた本当の姿を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本論",
+   "reading": "ほんろん",
+   "pos": "noun",
+   "meaning": "main body (of an argument)",
+   "defJa": "文章や議論の中心となる部分",
+   "passage": {
+    "ja": "文章の良し悪しは、序論よりも本論でこそ決まる。冒頭で読者の関心を引いても、そこが散漫であれば、読み終えたあとには何も残らない。論の筋道を整えるとは、主張と根拠を一本の線でつなぎ、寄り道を惜しみなく削ることにほかならない。文才のある人ほど、実は削る作業に時間を使っているものである。",
+    "form": "本論",
+    "en": "Whether writing is good or bad is decided in the main body rather than the introduction. Even if the opening catches the reader's interest, if that part is scattered, nothing remains once they finish reading. Putting an argument in order means nothing other than joining claim and evidence in a single line and cutting digressions without regret. People with real literary talent in fact spend their time on the work of cutting.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「序論・本論・結論」の三部構成で、中央の主張の部分を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本音と建前",
+   "reading": "ほんねとたてまえ",
+   "pos": "expression",
+   "meaning": "true feelings vs public face",
+   "defJa": "心の中の本心と、表向きの態度",
+   "passage": {
+    "ja": "日本語を勉強していて一番むずかしいのは、本音と建前の見分け方だって、留学生の友だちがよく言うんです。たとえば「ぜひ今度うちに遊びに来てください」は、本当に招いているのか、ただの挨拶なのか。言葉の機微を読めるようになるまで、彼は何度も恥をかいたそうです。でも、そういう失敗を重ねたあげく、今では相手の表情から意図を当てられるようになりました。",
+    "form": "本音と建前",
+    "en": "My friend, an international student, often says the hardest thing about studying Japanese is telling true feelings from public face. Take \"Please do come visit my place sometime\": is the person really inviting you, or is it just a greeting? Before he learned to read the subtleties of language, he embarrassed himself many times, he says. But after piling up failures like that, he can now guess people's intentions from their expressions.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「本音と建前を使い分ける」。日本語の婉曲な物言いを説明するときの定番語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本題",
+   "reading": "ほんだい",
+   "pos": "noun",
+   "meaning": "main subject (of a talk)",
+   "defJa": "話や文章で、中心となる話題",
+   "passage": {
+    "ja": "小論文では、序論に字数をかけすぎて、本題に入れないまま時間切れになる人が少なくない。採点者が知りたいのは、あなたの主張とその根拠である。だから、最初の数行で問いと結論の方向を示し、すぐ本題に移るのが得策だ。ちなみに、段落ごとに改行を入れて読みやすくするのも、立派な構成力のうちである。",
+    "form": "本題",
+    "en": "In short-essay exams, quite a few people spend too many characters on the introduction and run out of time without reaching the main subject. What the grader wants to know is your claim and its grounds. So the smart move is to indicate the question and the direction of your conclusion in the first few lines and move straight to the main subject. Incidentally, inserting a line break for each paragraph to make it readable is also part of real compositional skill.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「本題に入る／移る」。前置きを終えて中心の話に進むときに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "条件づけ",
+   "reading": "じょうけんづけ",
+   "pos": "noun",
+   "meaning": "conditioning",
+   "defJa": "刺激と反応を結びつけて習慣にすること",
+   "passage": {
+    "ja": "パブロフの犬は、ベルの音を聞くたびによだれを流しました。餌を出す前に毎回ベルを鳴らしたところ、音だけで反応するようになったのです。これが古典的な条件づけです。実は私たちも、スマホの通知音が鳴るなり、仕事の手を止めてしまうでしょう。習慣は、根性よりも、こうした仕組みで形づくられている面が大きいんですよ。",
+    "form": "条件づけ",
+    "en": "Pavlov's dogs drooled every time they heard a bell. When the bell was rung before every serving of food, they came to react to the sound alone. This is classical conditioning. In fact, we too stop what we're doing the moment a phone notification sounds. Habits are shaped far more by mechanisms like this than by grit.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「古典的条件づけ」「条件づけられる」。心理学で、学習の仕組みを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "東インド会社",
+   "reading": "ひがしいんどがいしゃ",
+   "pos": "noun",
+   "meaning": "East India Company",
+   "defJa": "アジア貿易のためにできた、ヨーロッパの特許会社",
+   "passage": {
+    "ja": "人前で歴史を語るなら、年号よりも、一つの組織の物語にしぼると伝わりやすい。たとえば東インド会社なら、胡椒を求めた商人の会社が、やがてインドの植民地支配にまで関わるようになった、という流れで話せる。こうした起承転結を意識するだけで、聞き手の頭に像が残る。構成力とは、情報を減らす勇気でもあるのだ。",
+    "form": "東インド会社",
+    "en": "When speaking about history in public, it comes across better if you focus on the story of one organization rather than on dates. With the East India Company, for example, you can tell it as a flow: a merchant firm after pepper that eventually became involved even in colonial rule over India. Merely keeping this four-part arc in mind leaves a picture in the listener's head. Compositional skill is also the courage to reduce information.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "イギリスなどが作った貿易会社。のちに統治にも関わった。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "東西対立",
+   "reading": "とうざいたいりつ",
+   "pos": "noun",
+   "meaning": "East–West confrontation",
+   "defJa": "冷戦期の、西側と東側の陣営の対立",
+   "passage": {
+    "ja": "冷戦期の東西対立は、軍事や経済だけでなく、文化やスポーツの舞台にまで及んだ。オリンピックでは、アメリカとソ連が金メダルの数を競い、国威を示そうとした。一九八〇年のモスクワ大会で多くの西側諸国が参加を見送ったのは、その象徴といえる。核抑止の均衡が保たれる一方で、市民の暮らしにも緊張が影を落としていた。",
+    "form": "東西対立",
+    "en": "The East–West confrontation of the Cold War reached beyond the military and the economy, even to the stage of culture and sport. At the Olympics, the United States and the Soviet Union competed over gold medal counts and tried to display national prestige. That many Western countries stayed away from the 1980 Moscow Games can be called its symbol. While the balance of nuclear deterrence was held, tension also cast a shadow over citizens' lives.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「冷戦下の東西対立」。西側(資本主義)と東側(社会主義)の対立を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "枕詞",
+   "reading": "まくらことば",
+   "pos": "noun",
+   "meaning": "pillow word (poetic epithet)",
+   "defJa": "和歌で、特定の語を導く決まった言葉",
+   "passage": {
+    "ja": "万葉集を読むと、「あしひきの」が山にかかり、「ひさかたの」が光や空にかかる、といった枕詞がたくさん出てきます。意味が当時の人にもはっきりしなくなっていた言葉もあったそうですが、五七調のリズムを整える役目は果たしていました。今でいえば、歌い出しの決まり文句みたいなものですよね。そう思うと、散文では味わえない言葉の遊びが見えてきます。",
+    "form": "枕詞",
+    "en": "Reading the Man'yoshu, you meet plenty of pillow words, such as \"ashihiki no\" attached to mountains and \"hisakata no\" attached to light and sky. Some of them apparently had become unclear in meaning even to people of the time, but they still did their job of shaping the five-seven rhythm. In today's terms, they're like set phrases that open a song, aren't they? Thinking that way, you start to see a play with words that prose can't give you.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「あしひきの→山」のように、決まった語を導く。和歌のリズムも整える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "枢軸国",
+   "reading": "すうじくこく",
+   "pos": "noun",
+   "meaning": "Axis powers",
+   "defJa": "第二次大戦で連合国と戦った日独伊などの国々",
+   "passage": {
+    "ja": "世界史の試験では、第二次世界大戦の枢軸国として、ドイツ、イタリア、日本の三か国が問われる。ただし、三国同盟を結んだ年や、のちに加わったハンガリーなどの国まで覚えておくに越したことはない。年表をただ眺めるより、「なぜ手を組んだのか」と原因から整理するほうが、記憶に定着しやすい。文脈つきで覚える習慣が、結局は得点力につながる。",
+    "form": "枢軸国",
+    "en": "In world-history exams, the three countries of Germany, Italy and Japan are asked about as the Axis powers of the Second World War. But it is best to remember even the year the Tripartite Pact was concluded and countries that joined later, such as Hungary. Sorting things out from the cause, asking \"why did they join hands?\", sticks in memory better than just staring at a timeline. The habit of learning things with their context ultimately leads to higher scores.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「枢軸国と連合国」の対で覚える。日独伊が中心で、のちに他国も加わった。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "柔軟性",
+   "reading": "じゅうなんせい",
+   "pos": "noun",
+   "meaning": "flexibility",
+   "defJa": "状況に応じて考えや行動を変えられること",
+   "passage": {
+    "ja": "頭が硬い人って、予定が一つ狂っただけで、一日じゅう機嫌が悪かったりしますよね。逆に、柔軟性のある人は、電車が止まったら、喫茶店で本を読んじゃおうと切り替えられる。あれは生まれつきというより、小さな楽観主義を日々の習慣にしているだけだと思うんです。失敗しても、まあいいかと笑える人は、結局いちばん強いですよ。",
+    "form": "柔軟性",
+    "en": "People with rigid minds stay in a bad mood all day just because one plan went awry, don't they? By contrast, someone with flexibility, when the train stops, can switch to thinking, \"Well, I'll read a book at a cafe.\" I think that's less an inborn trait than someone simply making small optimism a daily habit. A person who can laugh off a failure with a \"never mind\" is in the end the strongest.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「柔軟性がある／に欠ける」。考え方や体、組織の対応力をほめる語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "栄枯盛衰",
+   "reading": "えいこせいすい",
+   "pos": "noun",
+   "meaning": "rise and fall; ups and downs",
+   "defJa": "栄えたり衰えたりを繰り返す世の移り変わり",
+   "passage": {
+    "ja": "世界史の勉強で苦しいのは、王朝の名前と年代がひたすら続くことだ。けれども、栄枯盛衰のパターンをつかめば、暗記の負担は驚くほど軽くなる。たいてい、強い君主が国を整え、次第に支配層が贅沢に流れ、財政の悪化に伴って滅ぶという同じ筋書きをたどるからだ。型さえ知っておけば、初見の王朝でも流れを予測できる。",
+    "form": "栄枯盛衰",
+    "en": "What makes world-history study painful is the relentless run of dynasty names and dates. But once you grasp the pattern of rise and fall, the burden of memorization lightens astonishingly. Usually the same plot is followed: a strong ruler puts the state in order, the ruling class gradually drifts into luxury, and the dynasty perishes as finances deteriorate. If you know the template, you can predict the course even of a dynasty you've never seen.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "四字熟語。「栄枯盛衰は世の常」と言い、国や会社の浮き沈みに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "校正",
+   "reading": "こうせい",
+   "pos": "noun",
+   "meaning": "proofreading",
+   "defJa": "文字や表記の誤りを見つけて直すこと",
+   "passage": {
+    "ja": "文章を書き終えたら、すぐ提出せず、一晩置いてから校正しよう。書いた直後は、頭の中で補って読んでしまうため、誤字や脱字を見落としやすい。声に出して読むか、縦書きに変えて眺めるだけでも、間違いが目に飛び込んでくる。校閲のプロですら、自分の原稿だけは他人に見てもらうというのだから、素人はなおさらだ。",
+    "form": "校正",
+    "en": "When you finish writing, don't hand it in right away; leave it overnight and then proofread. Right after writing, you read while filling gaps in your head, so typos and omissions are easy to miss. Just reading aloud or switching to vertical text makes mistakes jump out at you. Even professional copyeditors reportedly have others check only their own manuscripts, so amateurs all the more.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「校正する／校正刷り」。誤字脱字・表記ゆれを正す作業を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "校閲",
+   "reading": "こうえつ",
+   "pos": "noun",
+   "meaning": "copyediting; fact-checking",
+   "defJa": "内容の誤りや矛盾まで確かめて直すこと",
+   "passage": {
+    "ja": "出版社の校閲という仕事は、誤字を直すだけではありません。たとえば小説に「三月の満月」と書いてあれば、その年の三月に本当に満月があったかまで調べます。事実関係や文章の整合性を確かめ、書き手が見落とした穴をふさぐのです。校正が文字の誤りを正すのに対し、こちらは中身の正しさを問う仕事だと覚えておきましょう。",
+    "form": "校閲",
+    "en": "The job of copyediting at a publisher is not just fixing typos. For example, if a novel says \"a full moon in March,\" they check whether there really was a full moon that March that year. They verify facts and the consistency of the text, plugging holes the writer overlooked. Remember that where proofreading corrects errors in characters, this job questions the correctness of the content.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "文字の誤りを直す校正に対し、内容の事実や矛盾まで見る作業。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "核心",
+   "reading": "かくしん",
+   "pos": "noun",
+   "meaning": "core; crux",
+   "defJa": "物事の最も大事な中心の部分",
+   "passage": {
+    "ja": "悩みの核心は、たいてい最初に口にした問題の外側にある。「仕事が忙しい」と言う人が本当に恐れているのは、忙しさそのものではなく、休んだら置いていかれるという不安かもしれない。表面の訴えをはぎ取って、根源にある欲求に触れたとき、はじめて人は自分の行動を変えられる。その瞬間にこそ、内省の価値はある。",
+    "form": "核心",
+    "en": "The crux of a worry usually lies outside the problem first voiced. What someone who says \"work is busy\" truly fears may not be the busyness itself but the anxiety of being left behind if they rest. Only when we strip away the surface complaint and touch the desire at the root can a person change their behavior. It is in that moment that reflection has its value.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「核心を突く／に迫る」。問題の一番大事な点を言い当てるときに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "核抑止",
+   "reading": "かくよくし",
+   "pos": "noun",
+   "meaning": "nuclear deterrence",
+   "defJa": "核兵器の報復力で、相手の攻撃を思いとどまらせること",
+   "passage": {
+    "ja": "核抑止という考え方は、「撃てば撃ち返される」という恐怖で相手を踏みとどまらせる論理です。冷戦期の米ソは、互いを何度でも破壊できる数の核兵器を持つことで、かえって直接の戦争を避けてきました。もっとも、これは誤認や誤作動が一度でも起きればそれまでだ、という危うい均衡でもあります。核拡散が進めば、その綱渡りはさらに難しくなるでしょう。",
+    "form": "核抑止",
+    "en": "The idea of nuclear deterrence is the logic of holding an opponent back through the fear that \"if you fire, you'll be fired upon.\" By possessing enough nuclear weapons to destroy each other many times over, the US and USSR in the Cold War ironically avoided direct war. Yet it is also a precarious balance in which a single misjudgment or malfunction would be the end. If nuclear proliferation advances, that tightrope walk will become harder still.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「核抑止力」「拡大核抑止」。持つことで使わせない、という逆説の論理。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "核拡散",
+   "reading": "かくかくさん",
+   "pos": "noun",
+   "meaning": "nuclear proliferation",
+   "defJa": "核兵器を持つ国が増えていくこと",
+   "passage": {
+    "ja": "放送原稿で核拡散という語を使うときは、必ず一文目で意味を添える。核兵器を持つ国が増えていくこと、と短く言い換えるのだ。耳で聞く人は、漢字を目で確かめられないからである。業界用語を並べても聞き手は置いていかれるので、専門の言葉は、老若男女を問わず伝わる形に噛み砕くのが話し言葉の鉄則だ。",
+    "form": "核拡散",
+    "en": "When using the word nuclear proliferation in a broadcast script, always add its meaning in the first sentence. Rephrase it briefly: the growing number of countries that hold nuclear weapons. This is because listeners cannot check the kanji with their eyes. Lining up industry jargon leaves listeners behind, so the iron rule of spoken language is to break specialist terms down into a form that gets across regardless of age or gender.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「核拡散防止条約」。耳で聞く話では、専門語を言い換えて添える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "根幹",
+   "reading": "こんかん",
+   "pos": "noun",
+   "meaning": "core, foundation",
+   "defJa": "物事を支える、最も大事な土台",
+   "passage": {
+    "ja": "ニューラルネットワークの根幹にあるのは、驚くほど単純な操作の繰り返しである。入力に重みをかけて足し合わせ、少しだけ非線形に曲げる。その単純さゆえに、規模を大きくするだけで能力が伸びていった。もっとも、なぜ小さな部品の積み重ねから、文脈を読んでいるかのような振る舞いが生まれるのかは、いまだ十分に説明されていない。",
+    "form": "根幹",
+    "en": "At the foundation of a neural network lies a repetition of astonishingly simple operations. Multiply the inputs by weights, add them up, and bend the result slightly nonlinearly. Because of that simplicity, ability grew just by scaling up. Still, why behavior that looks like reading context emerges from piling up small parts has not yet been adequately explained.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「制度・理論の根幹」「根幹を揺るがす」。枝葉に対し、土台の部分を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "根性",
+   "reading": "こんじょう",
+   "pos": "noun",
+   "meaning": "guts; grit",
+   "defJa": "苦しくてもやり抜こうとする強い心",
+   "passage": {
+    "ja": "アンジェラ・ダックワースの『GRIT』が言いたかったのは、精神論ではありません。才能を否定したわけではないものの、成果を分けるのは、一つの目標に関心を持ち続け、失敗しても練習を重ねる姿勢だと彼女は述べました。それは、朝活のように小さな練習を毎日続けることに近いものです。ですから、根性が足りないと自分を責める前に、目標が本当に好きかどうかを問い直すべきです。",
+    "form": "根性",
+    "en": "What Angela Duckworth's \"Grit\" wanted to say was not mere spiritualism. Although she did not deny talent, she argued that what separates outcomes is an attitude of staying interested in one goal and piling up practice even after failing. That is close to continuing small practice every day, like a morning routine. So before blaming yourself for lacking guts, you should ask again whether you truly love your goal.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「根性がある／を見せる」。昭和的な精神論の響きもある俗な語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "根源",
+   "reading": "こんげん",
+   "pos": "noun",
+   "meaning": "root, ultimate source",
+   "defJa": "物事が生まれてくる大もと",
+   "passage": {
+    "ja": "インドの哲学者たちは、苦しみの根源を、外の世界ではなく人間の内側に求めてきた。仏教は、それを「渇愛」、つまり尽きない欲求にあると説いた。一方、ウパニシャッドの流れをくむ思想では、自己と宇宙の同一性を見失った無知こそが原因だと考える。両者は出発点こそ異なるが、森羅万象への執着を手放すことを説く点では通じ合っている。",
+    "form": "根源",
+    "en": "Indian philosophers have sought the root of suffering not in the outer world but inside the human being. Buddhism taught that it lies in craving, in other words an insatiable desire. In thought descending from the Upanishads, by contrast, the cause is ignorance that has lost sight of the identity of self and cosmos. The two differ in their starting points, but they agree in teaching the letting go of attachment to all phenomena.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「苦しみの根源」「悪の根源」。根幹と違い、発生のもとを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "格言",
+   "reading": "かくげん",
+   "pos": "noun",
+   "meaning": "maxim",
+   "defJa": "人生の教えを短くまとめた、知られた言葉",
+   "passage": {
+    "ja": "「天は自ら助くる者を助く」のような格言は、短いからこそ世代を超えて語り継がれてきた。ところが近年、SNSでは出典のあやしい名言が、偉人の言葉として拡散する例が後を絶たない。専門家は、元の文脈を離れた引用は意味をゆがめかねないと指摘する。気に入った一句ほど、その出どころを確かめる習慣が求められる。",
+    "form": "格言",
+    "en": "Maxims like \"Heaven helps those who help themselves\" have been handed down across generations precisely because they are short. Recently, however, quotes of dubious origin keep spreading on social media as the words of great figures. Experts point out that quotations removed from their original context can distort the meaning. The more a phrase pleases you, the more a habit of checking its source is called for.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「格言を引く」。ことわざと違い、特定の人の言葉として伝わるものも多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "桁違い",
+   "reading": "けたちがい",
+   "pos": "na-adj",
+   "meaning": "an order of magnitude different",
+   "defJa": "規模や程度が何段階も大きく違うこと",
+   "passage": {
+    "ja": "最新の大規模言語モデルの学習に使われる計算量は、十年前と比べて桁違いに増えました。これを支えたのが、回路の線幅を縮め続けてきた半導体の最先端の製造技術です。ただし、それは一社の力で成り立つものではなく、設計と製造が構造化された分業に支えられている一方で、一か所でも止まれば全体が揺らぎます。",
+    "form": "桁違い",
+    "en": "The computation used to train the latest large language models has grown by orders of magnitude compared with ten years ago. What supported this is the cutting-edge semiconductor manufacturing technology that kept shrinking circuit line widths. But it does not stand on the power of one company; while it is supported by a structured division of labor between design and manufacturing, if even one point stops, the whole thing wobbles.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「桁違いに多い／強い」「桁違いの差」。比べて、何倍もの開きがある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "森羅万象",
+   "reading": "しんらばんしょう",
+   "pos": "noun",
+   "meaning": "all things in the universe",
+   "defJa": "宇宙にあるすべてのもの",
+   "passage": {
+    "ja": "森羅万象は一つの実在の現れにすぎない、とアドヴァイタは説く。波が海から離れて存在できないように、個々のものは、それを成り立たせる唯一の根源から切り離せないのだ。私たちが世界を別々の物の集まりと見るのは、名前と形を実体と取り違えているからにほかならない。この見方に立つと、他者への苛立ちさえ、自分の外にあるものではなくなってくる。",
+    "form": "森羅万象",
+    "en": "All phenomena are merely appearances of a single reality, Advaita teaches. Just as a wave cannot exist apart from the sea, individual things cannot be severed from the one source that makes them possible. We see the world as a collection of separate things for no other reason than that we mistake name and form for substance. From this standpoint, even irritation toward others stops being something outside oneself.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "四字熟語。「森羅万象を貫く」「森羅万象に宿る」。この世のすべてを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "植民地支配",
+   "reading": "しょくみんちしはい",
+   "pos": "noun",
+   "meaning": "colonial rule",
+   "defJa": "他国が土地と人々を支配下に置くこと",
+   "passage": {
+    "ja": "植民地支配が終わって数十年たっても、国境に限らず、言語や産業の構造にまで当時の名残は残っている。たとえばアフリカの国境の多くは、民族の分布をほとんど考えず、列強が地図の上で引いた線を土台にしている。宗主国が特定の集団を支配層に取り立て、対立をあおった例もある。試験では、「いつ」よりも「その後にどう影響したか」が問われやすい。",
+    "form": "植民地支配",
+    "en": "Even decades after colonial rule ended, its traces remain not only in borders but in the structure of language and industry. Many African borders, for example, rest on lines that the Great Powers drew on a map with little regard for the distribution of peoples. There are also cases where a colonial power elevated a particular group to the ruling class and stoked conflict. In exams, \"what effect it had afterward\" is more likely to be asked than \"when.\"",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「植民地支配を受ける／から脱する」。支配の影響は独立後も残る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "検閲",
+   "reading": "けんえつ",
+   "pos": "noun",
+   "meaning": "censorship",
+   "defJa": "出版や通信の内容を、権力が調べて制限すること",
+   "passage": {
+    "ja": "対話型の人工知能に政治的な質問をすると、答えを濁されることがある。これは安全のための調整なのか、それとも一種の検閲なのか、線を引くのは簡単ではない。暴力の助長を防ぐ配慮と、不都合な事実を隠す統制とは、外から見れば似た顔をしているからだ。だからこそ、どんな基準で何を答えないのかを公開することが、信頼の核心になる。",
+    "form": "検閲",
+    "en": "Ask a conversational artificial intelligence a political question and it will sometimes blur its answer. Whether that is a safety adjustment or a kind of censorship, drawing the line is not easy. Care that prevents the encouragement of violence and control that hides inconvenient facts look alike from the outside. That is precisely why disclosing by what standard it declines to answer becomes the crux of trust.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「検閲を受ける／検閲する」。権力が発表の前後に内容を制限すること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "業",
+   "reading": "ぎょう",
+   "pos": "other",
+   "meaning": "type of business (suffix)",
+   "defJa": "事業や仕事の種類をあらわす語",
+   "passage": {
+    "ja": "就職の面接に際しては、志望分野の知識より、なぜその仕事なのかを語れるかが問われる。たとえば金融業を志望するなら、数字を扱って人の役に立った経験を具体例に挙げるとよい。固有名詞や数字を入れるだけで、話の説得力は格段に増す。ただし、背伸びした作り話は、すぐに見抜かれてしまう。",
+    "form": "業",
+    "en": "At a job interview, what is tested is whether you can say why you want that work, more than your knowledge of the field. If you aim for the financial industry, for instance, it helps to give a concrete example of an experience where you handled numbers and helped someone. Just adding proper nouns and figures greatly boosts persuasiveness. However, a made-up story that overreaches is seen through immediately.",
+    "register": "学",
+    "topic": "other",
+    "tipJa": "「金融業・製造業・サービス業」のように、語の後ろに付いて業種を表す。",
+    "sense": "接尾語。事業・産業の種類"
+   }
+  },
+  {
+   "term": "業界用語",
+   "reading": "ぎょうかいようご",
+   "pos": "noun",
+   "meaning": "industry jargon",
+   "defJa": "同じ仕事の仲間内だけで通じる言葉",
+   "passage": {
+    "ja": "どんな職場にも、外の人には通じない業界用語があります。テレビ局で「巻く」といえば、進行を急ぐこと。「尺」は番組の長さを指します。こうした言葉は、仲間うちでは便利な一方で、文脈を共有しない聞き手を置き去りにしてしまうのです。視聴者に語りかけるときは、専門の言葉を平易に言い換える配慮が問われます。",
+    "form": "業界用語",
+    "en": "Every workplace has industry jargon that outsiders can't follow. At a TV station, to \"wrap\" something means to speed up the pace. \"Shaku\" refers to the length of a program. Such words are convenient among colleagues, but they leave behind listeners who don't share the context. When addressing viewers, the consideration of rephrasing specialist terms plainly is what counts.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「業界用語を使う／避ける」。仲間には便利だが、外の人には壁になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "極度の貧困",
+   "reading": "きょくどのひんこん",
+   "pos": "expression",
+   "meaning": "extreme poverty",
+   "defJa": "生きるのがやっとの、ひどい貧しさ",
+   "passage": {
+    "ja": "ロンドンの下町には、極度の貧困のために子どもまで働くことを余儀なくされた家庭が、十九世紀に大勢いました。ディケンズの小説は、そうした子どもたちの姿を描き、読者の心をゆさぶったのです。ところが、同じ時代に東インド会社の貿易から莫大な富を得た商人もいました。富の増大と貧困が同時に進むこの矛盾こそが、のちの社会改革の原動力になっていきます。",
+    "form": "極度の貧困",
+    "en": "In nineteenth-century London's working-class districts, there were many families in extreme poverty who were forced to put even their children to work. Dickens's novels portrayed such children and stirred readers' hearts. Yet in the same era there were also merchants who gained enormous wealth from the East India Company's trade. It was precisely this contradiction, wealth and poverty growing together, that became the driving force of later social reform.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「極度の貧困に苦しむ／を脱する」。国際機関の報告でもよく使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "楷書",
+   "reading": "かいしょ",
+   "pos": "noun",
+   "meaning": "regular (block) script",
+   "defJa": "一画一画を崩さずに書く、正しい字体",
+   "passage": {
+    "ja": "一画一画を省かず崩さずに書く楷書は、文字の骨格をそのまま差し出す書体である。行書や草書が書き手の速さと勢いを映すのに対し、こちらには一種の正直さがある。だからこそ、公的な文献は、誤りなく伝えるためにこの書体を用いてきた。端正な字形を前にすると、人は思わず背筋を伸ばしてしまうものだ。",
+    "form": "楷書",
+    "en": "Regular script, written without omitting or breaking any stroke, is a style that hands over the skeleton of the character as it is. Whereas semi-cursive and cursive scripts mirror the writer's speed and momentum, this one has a kind of honesty. That is why official documents have used this script in order to convey things without error. Faced with neat letterforms, one can't help straightening one's back.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「楷書で書く」。行書・草書に対し、崩さない基本の書き方。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "楽観主義",
+   "reading": "らっかんしゅぎ",
+   "pos": "noun",
+   "meaning": "optimism",
+   "defJa": "物事はよくなると考える態度",
+   "passage": {
+    "ja": "マーティン・セリグマンの研究によると、楽観主義は、ただ明るい性格のことじゃないんだって。失敗したとき、「一時的で、この件だけの問題だ」と受け取れるかどうかの習慣なんだよね。悲観的な人は、「いつも、何をやってもだめだ」と考えがち。だから、楽観は生まれつきというより、考え方の癖を変えることで身につけられるって話。",
+    "form": "楽観主義",
+    "en": "According to Martin Seligman's research, optimism isn't just a cheerful personality, apparently. It's a habit of whether you can take a failure as \"temporary, and only about this one matter.\" Pessimistic people tend to think, \"It's always like this, and whatever I do is no good.\" So optimism can be acquired by changing your thinking habits, rather than being something you're born with, so the story goes.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「楽観主義者」。反対は悲観主義。性格より考え方の習慣として説明される。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "構成力",
+   "reading": "こうせいりょく",
+   "pos": "noun",
+   "meaning": "ability to structure",
+   "defJa": "話や文章を、順序よく組み立てる力",
+   "passage": {
+    "ja": "話がうまい人は、情報を足すより先に、順番を決める。結論、理由、具体例の三段で組み立てれば、聞き手は迷わずについてこられる。この構成力は、才能ではなく、練習でいくらでも伸びる技術だ。たとえば五分の話なら、冒頭の三十秒で全体の地図を渡し、その型に沿って話すと、本題がぼやけない。",
+    "form": "構成力",
+    "en": "Good speakers decide the order before they add information. If you build in three steps of conclusion, reason and concrete example, listeners can follow without getting lost. This ability to structure is not a talent but a skill that can grow as far as you like with practice. For a five-minute talk, for example, hand over a map of the whole in the first thirty seconds and speak along that pattern, and the main point won't blur.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「構成力がある／を磨く」。話や文章の全体設計の力を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "構造主義",
+   "reading": "こうぞうしゅぎ",
+   "pos": "noun",
+   "meaning": "structuralism",
+   "defJa": "物事を要素の関係の仕組みでとらえる考え方",
+   "passage": {
+    "ja": "言語学者ソシュールの考えを出発点とする構造主義は、二十世紀の思想に大きな影響を与えた。言葉の意味は、一つ一つの語に宿るのではなく、語と語の違いの関係から生まれるという見方である。この発想は、レヴィ＝ストロースをはじめとする人類学者によって、神話や親族の研究へ広げられた。意味を関係でとらえる姿勢は、今も文脈を重んじる言語研究の土台にある。",
+    "form": "構造主義",
+    "en": "Structuralism, which takes the linguist Saussure's ideas as its starting point, had a large influence on twentieth-century thought. It holds that meaning does not dwell in each individual word but arises from the relations of difference between words. This idea was extended to the study of myth and kinship by anthropologists including Levi-Strauss. The stance of grasping meaning through relations remains a foundation of language research that values context.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「構造主義の影響」。意味を、語どうしの違いの関係で考える立場。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "構造化",
+   "reading": "こうぞうか",
+   "pos": "noun",
+   "meaning": "structuring",
+   "defJa": "ばらばらの内容を、関係のある形に整理すること",
+   "passage": {
+    "ja": "頭の中の考えを紙に書き出し、項目ごとに分類して、関係を線で結ぶ。こうした構造化は、思考の整理に役立つと、教育や心理の分野で広く言われている。書き出せば、頭の中で抱えておく量が減り、考えること自体に集中できるからだ。とはいえ、整理に凝るあまり、核心が薄くなっては本末転倒である。",
+    "form": "構造化",
+    "en": "Writing the thoughts in one's head onto paper, sorting them by item and joining relations with lines. Such structuring is widely said, in education and psychology, to help organize thought. Once written out, the amount held in the head shrinks and one can concentrate on the thinking itself. That said, it would be putting the cart before the horse if, absorbed in tidying, the crux grew thin.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「情報を構造化する」。分類し、関係づけて、使いやすい形にすること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "標準語",
+   "reading": "ひょうじゅんご",
+   "pos": "noun",
+   "meaning": "standard Japanese",
+   "defJa": "国全体で通じるように整えた共通の言葉",
+   "passage": {
+    "ja": "明治に入ると、日本は国としてのまとまりを急ぐなかで、標準語をつくる必要に迫られました。それまで、遠く離れた地域の人どうしは、同じ日本語を話しながら、通じにくいことがあったといいます。東京の山の手の言葉をもとに整えられた標準語は、教科書と、のちにはラジオを通じて全国へ広がりました。方言はその陰で、長く恥ずかしいものとされた時代もあったのです。",
+    "form": "標準語",
+    "en": "On entering the Meiji era, Japan, hurrying to build national unity, was pressed to create a standard language. Until then, people from distant regions are said to have sometimes struggled to understand one another even while speaking the same Japanese. Standard Japanese, shaped on the speech of Tokyo's Yamanote district, spread nationwide through textbooks and later radio. In its shadow, dialects were for a long time treated as something shameful.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「標準語と方言」。明治以後、東京の言葉をもとに整えられた共通語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "機微",
+   "reading": "きび",
+   "pos": "noun",
+   "meaning": "subtleties",
+   "defJa": "表に出ない、微妙な気持ちや事情",
+   "passage": {
+    "ja": "字面には現れない微妙な含みを読み取ることを、言葉の機微という。「結構です」が、断りにも承諾にもなり得るのは、声の調子や場の空気が意味を決めるからだ。翻訳の難しさは、辞書にある意味ではなく、こうした文脈に宿る温度を別の言語へ移すことにあるとよく言われる。人情に通じる者ほど、少ない言葉で多くを伝えられるのだろう。",
+    "form": "機微",
+    "en": "Reading subtle implications that do not show on the surface of the words is called the subtlety of language. \"Kekko desu\" can mean either refusal or acceptance because tone of voice and the atmosphere of the moment decide the meaning. The difficulty of translation is often said to lie not in dictionary meanings but in carrying the warmth that dwells in such context into another language. Those versed in human feeling can probably convey a great deal with few words.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「人情の機微」「心の機微」。微妙な気持ちの動きを読み取るときに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "欲求",
+   "reading": "よっきゅう",
+   "pos": "noun",
+   "meaning": "desire; need",
+   "defJa": "何かを得たい、したいと強く思う気持ち",
+   "passage": {
+    "ja": "人はお腹がすいていても、創作に夢中になれることがありますよね。マズローは、食べたい、眠りたいといった生理的な欲求が満たされて初めて、安全や承認を求めるようになると説明しました。ただ、現実はそんなにきれいな段階になっていない気がします。段階というより、いくつもの願いが同時に引っ張り合っていて、人の本性はもっと入り組んでいるはずです。",
+    "form": "欲求",
+    "en": "Even when hungry, a person can sometimes get absorbed in creating something, can't they? Maslow explained that only once physiological needs, such as wanting to eat and sleep, are satisfied do people come to seek safety and recognition. But I feel reality isn't laid out in such neat stages. Rather than stages, many wishes pull against one another at once, and human nature must be far more tangled.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「欲求を満たす／抑える」。生理的欲求・承認欲求のように複合語にもなる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "正史",
+   "reading": "せいし",
+   "pos": "noun",
+   "meaning": "official history",
+   "defJa": "国が正式に認めて編んだ歴史の記録",
+   "passage": {
+    "ja": "歴史を語るとき、公式の記録だけを材料にすると、どうしても勝者の言い分に偏る。中国には、新しい王朝が前の王朝の歴史を編む習わしがあり、そうして残された記録を正史という。だから話し手は、公式の記録に限らず、民間の文献や個人の日記にも目を向けたい。複数の資料を突き合わせてこそ、聞き手を納得させる語りになる。",
+    "form": "正史",
+    "en": "When talking about history, if you use only official records as material, it inevitably leans toward the victors' account. In China there was a custom of a new dynasty compiling the history of the previous one, and the records left that way are called the standard histories. So a speaker should look not only at official records but also at private documents and personal diaries. Only by cross-checking multiple sources does a narrative become convincing to listeners.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "中国の「二十四史」など。王朝が編んだ公式の歴史で、稗史・野史と対になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "正常性バイアス",
+   "reading": "せいじょうせいばいあす",
+   "pos": "noun",
+   "meaning": "normalcy bias",
+   "defJa": "異常を日常の範囲だと思い込む心の傾き",
+   "passage": {
+    "ja": "災害の警報が鳴っても、「自分だけは大丈夫だろう」と逃げ遅れる人がいる。これは正常性バイアスと呼ばれ、異常な事態を日常の延長として処理しようとする心の働きである。かつては、危険にいちいち反応しないための、脳の省エネ機能だったのかもしれない。ただ、現代の災害では命取りになりかねないため、避難訓練で「まず動く」ことを条件づけておくに越したことはない。",
+    "form": "正常性バイアス",
+    "en": "Even when a disaster warning sounds, some people think, \"Surely I'll be fine,\" and are late in fleeing. This is called normalcy bias, a mental workings that tries to process an abnormal situation as an extension of the everyday. It may once have been an energy-saving function of the brain so as not to react to every danger. But in modern disasters it could prove fatal, so it is best to condition yourself in evacuation drills to move first.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「正常性バイアスが働く」。災害時に逃げ遅れる心理として防災で説かれる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "正統性",
+   "reading": "せいとうせい",
+   "pos": "noun",
+   "meaning": "legitimacy",
+   "defJa": "支配や権威が正しいと認められる根拠",
+   "passage": {
+    "ja": "軍事力だけで人々を従わせても、支配は長くは続き得ない。統治が安定するには、人々が「この支配は正しい」と受け入れる、正統性が欠かせないのである。中世のヨーロッパでは、教皇による戴冠が、その裏づけの役割を果たした。八〇〇年にカール大帝が教皇レオ三世から冠を授けられたのは、剣と祭壇の結びつきを示す出来事だった。",
+    "form": "正統性",
+    "en": "Rule cannot last long if people are made to obey by military force alone. For government to be stable, legitimacy, whereby people accept that \"this rule is just,\" is indispensable. In medieval Europe, coronation by the pope played the role of providing that backing. Charlemagne's receiving a crown from Pope Leo III in the year 800 was an event that showed the bond between sword and altar.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「正統性を主張する／欠く」。支配者や制度が、正しいと認められる根拠。",
+    "sense": ""
+   }
+  }
+ ]
+}

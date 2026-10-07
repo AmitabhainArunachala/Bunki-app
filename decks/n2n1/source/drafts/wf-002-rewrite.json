@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "色",
+   "reading": "～しょく",
+   "pos": "other",
+   "meaning": "-colored (counter for colors)",
+   "defJa": "彩りの数を数えるときに付ける接尾語",
+   "passage": {
+    "ja": "チベットの寺に行くと、山の斜面や屋根の上で風にはためく鮮やかな五色の旗がまず目に入るんですよね。青、白、赤、緑、黄で、それぞれ空、風、火、水、地を表すんだそうです。標高が高いだけあって、風が絶えないので、旗に印刷されたお経が祈りとして空へ運ばれるという考え方なんです。読んでもらうというより、風に預けるわけですね。ちょっと不思議だけど、なんか素直でいいなあって思いません？",
+    "form": "色",
+    "en": "When you visit a Tibetan temple, the first thing that catches your eye is the vivid five-colored flags fluttering in the wind on hillsides and rooftops. They are blue, white, red, green and yellow, and apparently stand for sky, wind, fire, water and earth respectively. Being at high altitude, the wind never stops, so the idea is that the scriptures printed on the flags are carried to the sky as prayers. It is less about being read than about entrusting them to the wind. A bit odd, but somehow honest and nice, don't you think?",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "五色・三色のように、数のあとに付いて色の数を表す接尾語。",
+    "sense": "色の数を数える接尾語"
+   }
+  },
+  {
+   "term": "あっさり",
+   "reading": "あっさり",
+   "pos": "adverb",
+   "meaning": "easily, simply, lightly",
+   "defJa": "こだわらず簡単にするさま",
+   "passage": {
+    "ja": "「彼は反論されると、あっさり引き下がった」という一文は、聞き方によって褒め言葉にも皮肉にもなりうる。たとえ同じ言葉でも、潔さと取るか、粘りのなさと取るかは一概に決められず、前後の文脈と話し手の口調に左右される。日本語には、このように評価の向きが文脈ひとつで反転する副詞が少なくない。辞書の説明は手がかりにすぎず、言葉の意味は、実際に使われる場面の中にこそ息づいている。",
+    "form": "あっさり",
+    "en": "The sentence \"When he was countered, he backed down readily\" can be either praise or sarcasm, depending on how it is heard. Even with the same words, whether it is taken as grace or as lack of tenacity cannot be settled across the board and depends on the surrounding context and the speaker's tone. Japanese has quite a few adverbs whose evaluative direction flips with context alone. A dictionary's explanation is only a clue, and the meaning of a word lives precisely in the situations where it is actually used.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "あっさり負ける・あっさり認めるのように、簡単にあきらめる様子。",
+    "sense": ""
+   }
+  }
+ ]
+}

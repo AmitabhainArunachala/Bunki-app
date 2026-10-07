@@ -1,0 +1,26 @@
+{
+  "cards": [
+    {
+      "term": "交渉",
+      "reading": "こうしょう",
+      "pos": "noun",
+      "meaning": "negotiation",
+      "defJa": "話し合いによって条件をまとめること",
+      "passage": {
+        "ja": "1905年、日露戦争の講和会議がアメリカのポーツマスで開かれました。日本は連戦連勝を重ねていたものの、国力は限界に達しており、早期の講和が急務だったのです。全権の小村寿太郎は賠償金を求めてロシア側と交渉を重ねましたが、相手は最後まで譲りませんでした。結局、賠償金を取れないまま条約は成立し、帰国した小村は国民の激しい非難にさらされます。しかし今振り返ると、疲弊した国家をこれ以上戦わせなかった判断は、正しかったのかもしれません。",
+        "form": "交渉",
+        "en": "In 1905, the peace conference that ended the Russo-Japanese War was held in Portsmouth, in the United States. Japan had won battle after battle, but its national strength had reached its limit, and an early peace was an urgent necessity. The plenipotentiary Komura Jutarō negotiated again and again with the Russian side over an indemnity, but they never gave an inch. In the end, the treaty was concluded without any indemnity, and Komura, on returning home, was met with fierce public criticism. Yet looking back now, the decision not to force an exhausted nation to keep fighting may well have been the right one.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「交渉が決裂する」「交渉を重ねる」が定番。外交やビジネスの話し合いを指す。",
+        "sense": ""
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

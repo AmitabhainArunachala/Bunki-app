@@ -1,0 +1,26 @@
+{
+  "cards": [
+    {
+      "term": "煩わしい",
+      "reading": "わずらわしい",
+      "pos": "i-adj",
+      "meaning": "burdensome, troublesome, tiresome",
+      "defJa": "手間がかかって、うんざりする様子",
+      "passage": {
+        "ja": "日本語の敬語は、外国の方にとって壁だと言われますが、実は話者自身もけっこう消耗しています。場面に応じて丁寧語、尊敬語、謙譲語を使い分ける、この判断が毎回煩わしいんですね。何度も頭を切り替えていると、話す内容そっちのけで形式に気を取られてしまう。だからこそ最近は、シンプルな敬語で十分という考え方も広がっています。形式の負担を減らして、伝えたいことに頭を使う、これが本来の姿というわけです。",
+        "form": "煩わしい",
+        "en": "Japanese honorifics are said to be a wall for learners from abroad, but in fact native speakers themselves find them quietly exhausting. Choosing among polite, respectful, and humble language to fit each situation — that judgment is a burden every single time. When your mind keeps switching modes, you end up fixating on form instead of what you want to say. That's why the view that simple keigo is enough has been spreading lately. Lightening the burden of form so you can spend your mind on the message — that, in the end, is the whole point.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "「手続きが煩わしい」など、面倒で負担に感じる気持ちを表す。やや硬い書き言葉的な語。",
+        "sense": ""
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

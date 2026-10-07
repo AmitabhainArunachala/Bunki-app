@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "両国",
+   "reading": "りょうこく",
+   "pos": "noun",
+   "meaning": "both countries",
+   "defJa": "二つの国",
+   "passage": {
+    "ja": "ニュース原稿を声に出して読むとき、二つの国をまとめて受ける言葉ほど気をつけたい。半導体の輸出規制を伝えるなら、まず「米国と中国」と名前を二つはっきり出し、そのあとで両国と受けるのが基本だ。東京の地名にも聞こえる語なので、前置きなしに置くと、聞き手は一瞬迷ってしまう。文字と違って、耳は読み返せない。だからこそ、指す言葉の直前に必ず手がかりを置くべきである。",
+    "form": "両国",
+    "en": "When reading a news script aloud, take special care with words that pick up two countries together. In reporting semiconductor export controls, the basic move is to state two names clearly first, \"the United States and China,\" and then pick them up with the word for both countries. Because it can also sound like a Tokyo place name, putting it down without a lead-in makes the listener hesitate for a moment. Unlike text, the ear cannot reread. That is exactly why a clue should always be placed right before the referring word.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「両国」は先に出した二国を受ける語。耳で聞くと地名と紛れるので、直前に手がかりを置く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "シャドーイング",
+   "reading": "しゃどーいんぐ",
+   "pos": "noun",
+   "meaning": "shadowing",
+   "defJa": "聞こえる音声を追って声に出す練習",
+   "passage": {
+    "ja": "同時通訳の訓練から広まったとされるシャドーイングは、聞こえてくる音声に一拍ほど遅れてついていき、そのまま声に出す練習法です。コツは、意味を考えすぎず、まず口と耳の連動を作ることにあります。最初はついていけなくても、同じ素材を何度もくり返すうちに、音の切れ目が見えてきます。スピードを無理に上げず、自分が七割ほど追える教材を選ぶのが、続けるための条件です。慣れてきたら、少しずつ難しい素材へ移っていきましょう。",
+    "form": "シャドーイング",
+    "en": "Shadowing, said to have spread from simultaneous-interpreter training, is a practice method where you follow the voice you hear about a beat behind and say it aloud as it is. The knack is not to think too hard about meaning, and first to build a link between mouth and ear. Even if you cannot keep up at first, repeating the same material many times lets you start to see where the sounds break. Choosing material you can follow about seventy percent of, without forcing the speed up, is the condition for keeping it going. Once you get used to it, move on little by little to harder material.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「シャドーイングをする」。聞いた音を一拍遅れで追う練習で、通訳訓練に由来する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "偏る",
+   "reading": "かたよる",
+   "pos": "verb",
+   "meaning": "to be unbalanced",
+   "defJa": "一方にかたよって均衡を欠く",
+   "passage": {
+    "ja": "話し方を磨こうとして、技術ばかり追いかけると、考え方が偏ることがある。声の抑揚や間の取り方、話すスピードに意識が行きすぎて、肝心の中身が薄くなるのだ。元アナウンサーが口をそろえて言うのは、まず伝えたいことを一文で言えるようにせよ、という基本である。そこが固まっていれば、多少ぎこちない話し方でも、聞き手には誠実さとして届く。型は、それを支えるための道具にすぎない。",
+    "form": "偏る",
+    "en": "When you chase only technique in trying to polish your speaking, your way of thinking can become skewed. Attention goes too much to vocal intonation, the placement of pauses and speaking speed, and the all-important content gets thin. What former announcers agree on is the basic rule: first be able to say what you want to convey in one sentence. If that is firm, even a somewhat stiff delivery reaches the listener as sincerity. Forms are nothing more than tools to support that.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「考え方が偏る」「栄養が偏る」。一方に寄って均衡を失うこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "出版社",
+   "reading": "しゅっぱんしゃ",
+   "pos": "noun",
+   "meaning": "publisher",
+   "defJa": "本や雑誌を出版する会社",
+   "passage": {
+    "ja": "本を出したい人に最初にお伝えしたいのは、出版社が見ているのは文章のうまさだけではないという点です。編集者は企画書を読みながら、その本を誰がどんな悩みを抱えたときに手に取るのかを、具体的に思い浮かべています。だから、文章力をアピールするというより、読者の姿とその人の抱える問題を示すことが欠かせません。自分の長所を並べるより、読者の悩みを一行で言い切るほうが、企画は通りやすいのです。",
+    "form": "出版社",
+    "en": "What I want to tell people who want to publish a book first is that what publishers look at is not only how well you write. Editors, while reading a proposal, concretely picture who would pick up the book when troubled by what. So rather than showing off your writing skill, it is essential to show the reader's picture and the problem that person carries. Stating the reader's trouble in one line gets a proposal through more easily than listing your own strengths.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「出版社に企画を持ち込む」。編集者のいる会社で、書き手の相手になる。",
+    "sense": ""
+   }
+  }
+ ]
+}

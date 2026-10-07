@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "頭",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "counter for animals",
+   "defJa": "牛や馬など、大きな動物を数えるときの言い方",
+   "passage": {
+    "ja": "AIに牧場の写真を見せて、そこにいる牛の群れの数を答えさせる実験は、思ったより奥が深い。草原に牛が十二頭写っていても、重なった体や遠くの影のせいで、機械は数を少なく答えることがある。人間なら尻尾の位置や影の向きから数を補えるが、モデルにはその常識が足りない。ついでに言えば、牛を数える専用の言葉まで正しく選べるかどうかが、自然な話し方の分かれ目でもある。これは単なる視力の問題ではなく、世界の仕組みについての知識の問題でもある。",
+    "form": "頭",
+    "en": "An experiment in which an AI is shown a photo of a ranch and asked how many cattle there are is deeper than it sounds. Even when twelve head of cattle are in the pasture, overlapping bodies and distant shadows can make the machine answer ten. A human can fill in the count from the position of tails and the direction of shadows, but the model lacks that common sense. Incidentally, whether it can even choose the special word for counting cattle correctly is also a dividing line for natural speech. This is not a mere problem of eyesight but also one of knowledge about how the world works.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "牛・馬など大きな動物の助数詞。「十二頭」のように数字の後ろにつく。",
+    "sense": "大きな動物を数える助数詞"
+   }
+  },
+  {
+   "term": "過ぎる",
+   "reading": "～すぎる",
+   "pos": "verb",
+   "meaning": "too much ~",
+   "defJa": "程度が限度を超えること。動詞の後ろにつく",
+   "passage": {
+    "ja": "完璧を目指して頑張り過ぎる人ほど、三日もたたないうちに息切れしてしまいます。これは意志が弱いからではなく、脳が急な生活の変化を危険と見なして、元の習慣へ引き戻そうとするからだと言われます。ですから、最初は物足りないと感じるほど小さく始めてこそ、挫折することなく無理なく続けられます。腕立て伏せなら一回だけ、読書なら一ページだけ。そのくらいの小ささなら、疲れた夜でも、つい手が出ます。",
+    "form": "過ぎる",
+    "en": "People who try too hard to be perfect run out of steam in three days. This is said to be not because their willpower is weak but because the brain sees sudden change as a danger and tries to pull you back to the old habit. So it is only by starting small enough to feel unsatisfying that you can keep going without giving up. One push-up, or one page of reading. At that level, your hand reaches out even on a tired night.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "動詞の連用形につき、限度を超える。「頑張り過ぎる」は努力の度が過ぎること。",
+    "sense": "限度を超える"
+   }
+  },
+  {
+   "term": "重量",
+   "reading": "じゅうりょう",
+   "pos": "noun",
+   "meaning": "heavyweight",
+   "defJa": "物の重さ。また、重みや存在感があること",
+   "passage": {
+    "ja": "話し方にも、ボクシングのような階級がある。おとなしい声でも一言一言が重く沈む重量級の話し手は、声を張らなくても、場の空気を静かに支配する。反対に軽量級の話し手は、次々に言葉を繰り出して手数の多さで勝負するが、一発の説得力に欠けることが多い。もちろん、どちらが優れているというより、場面や相手に応じて使い分けられる人が上手な話し手である。重さは、言葉の数ではなく、一語を置く前の間の取り方から生まれる。",
+    "form": "重量",
+    "en": "Ways of speaking also have weight classes, like boxing. A heavyweight speaker, whose every word sinks in even in a quiet voice, commands the room without raising it. A lightweight speaker, by contrast, competes on the number of punches but often lacks the persuasive force of a single blow. Of course, rather than one being better, the skilled speaker is the one who can use each according to the occasion and the listener. The weight comes not from the number of words but from how you pause before placing a single one.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「重量級」は階級の言い方。比喩で、存在感のある人や物にも使う。",
+    "sense": "重量級（階級）"
+   }
+  },
+  {
+   "term": "じきに",
+   "reading": "じきに",
+   "pos": "adverb",
+   "meaning": "soon",
+   "defJa": "それほど時間がかからずに、まもなく",
+   "passage": {
+    "ja": "病院の待合室で、あと十分、じきに順番が来ると分かっているだけで、待つつらさはかなり和らぐという。心理学では、終わりが見える待ち時間は、見えない待ち時間より短く感じられると説明される。遊園地が待ち時間の表示を出すのも、この性質を利用した工夫である。逆に、いつ終わるか分からない待ち時間は、実際の長さ以上に苦痛として記憶されやすい。先の見えない不安こそが、時間を長くしているのだ。",
+    "form": "じきに",
+    "en": "It is said that merely knowing in a hospital waiting room that your turn will come soon, in ten minutes, greatly eases the pain of waiting. In psychology, waiting time with a visible end is explained as feeling shorter than waiting time without one. Amusement parks posting wait times is a device that makes use of this property. Conversely, waiting time with no known end tends to be remembered as more painful than its actual length. It is the anxiety of not seeing ahead that makes time long.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「じきに〜だろう」と、近い先に自然に起こることを見通して言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "農産物",
+   "reading": "のうさんぶつ",
+   "pos": "noun",
+   "meaning": "agricultural produce",
+   "defJa": "田畑で作られる米や野菜、果物などの産物",
+   "passage": {
+    "ja": "大航海時代、アメリカ大陸の農産物がヨーロッパに渡って、食卓を一変させました。ジャガイモやトウモロコシ、トマトは、それまで旧世界にはなかった作物で、船で運ばれた種や苗から少しずつ広がっていきました。とくにジャガイモは痩せた土地でも育つため、アイルランドをはじめ多くの地域で人口を支えました。ただし一つの品種に頼りすぎた結果、十九世紀半ばの疫病で大飢饉が起きたことも、歴史は教えています。",
+    "form": "農産物",
+    "en": "In the Age of Discovery, agricultural products of the Americas crossed to Europe and transformed the dinner table. Potatoes, corn and tomatoes were crops that had not existed in the Old World until then. Potatoes in particular grow even in poor soil, so they supported the population in many regions, starting with Ireland. However, history also teaches that relying too much on a single variety led to a great famine in the mid-nineteenth century because of a blight.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「農産物」は市場に出る作物の総称。「輸出・直売・流通」の文脈で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "軒並み",
+   "reading": "のきなみ",
+   "pos": "adverb",
+   "meaning": "across the board; all alike",
+   "defJa": "同じ状態のものがほとんど例外なくそろうさま",
+   "passage": {
+    "ja": "日本語には、昔の街角の景色から育った言葉が少なくない。家々の軒が連なる様子から生まれた「軒並み」は、一軒ずつ例外なく、という感覚を残して、いまでは株価や物価がそろって動く場面で使われる。古今東西を問わず、目に見える景色を物差しにして抽象的な変化を語る発想は、世界の言語に広く見られる。たとえば「風向きが変わる」も、私たちが何気なく使う、自然の動きを借りた表現にほかならない。",
+    "form": "軒並み",
+    "en": "Japanese has quite a few words that grew out of street-corner scenes. The word for 'all along the row,' born from the sight of eaves lined up house after house, keeps the feeling of 'one house at a time, without exception,' and is now used when stock or commodity prices move together. Across all times and places, the idea of using visible scenery as a yardstick for speaking of abstract change is widespread. 'The wind direction changes,' for example, is nothing other than an expression borrowing the movement of nature.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "家々の軒が並ぶ様子が語源。同じ変化が例外なくそろう場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "閑静",
+   "reading": "かんせい",
+   "pos": "na-adj",
+   "meaning": "quiet, peaceful (area)",
+   "defJa": "ものしずかで落ち着いているようす",
+   "passage": {
+    "ja": "閑静な住宅街にある学校は、子どもの成績も良いはずだと見られがちだ。だが研究者は、静けさそのものより、家庭の経済力や教育への関心の差が結果に影響している可能性を指摘する。静かな環境が集中を助ける面はあるにしても、それだけで成績が決まるわけではない。環境の印象だけで原因を決めつければ、本当の要因を見落としかねない。数字を読むときは、何が何に影響したのかを一つずつ分けて考える必要がある。",
+    "form": "閑静",
+    "en": "Schools in quiet residential neighborhoods tend to be assumed to have children with good grades too. But researchers point out the possibility that differences in family economic power and interest in education, rather than the quiet itself, are affecting the results. Even if a quiet environment helps concentration in some ways, that alone does not decide grades. If you decide a cause on the impression of the environment alone, you may overlook the real factor. When reading numbers, you need to separate what influenced what, one thing at a time.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「閑静な住宅街」が決まった言い方。落ち着いた環境をほめる語。",
+    "sense": ""
+   }
+  }
+ ]
+}

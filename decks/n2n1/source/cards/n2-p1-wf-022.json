@@ -1,0 +1,246 @@
+{
+ "cards": [
+  {
+   "term": "最大",
+   "reading": "さいだい",
+   "pos": "noun",
+   "meaning": "largest; greatest",
+   "defJa": "程度や数量がいちばん大きいこと",
+   "passage": {
+    "ja": "勉強の最大の敵は、才能のなさではなく、始める前の数分間の迷いです。机に向かってしまえば、そこから先は意外にすんなり進みますよね。私も受験生のころは、参考書を買い揃えて安心してしまい、肝心の一ページ目がいつまでも開けないまま、数週間が過ぎていきました。だから私は、決意に頼らなくても済むように、教科書を開いたままにして寝ます。そうしておくと、翌朝は迷うことなく手が動き始めるんです。",
+    "form": "最大",
+    "en": "The biggest enemy of studying is not a lack of talent but the few minutes of hesitation before you start. Once you sit at the desk, things go surprisingly smoothly from there, don't they? When I was an exam candidate myself, I would feel reassured just by buying a full set of reference books, and weeks went by with that crucial first page still unopened. So, to avoid relying on resolve, I go to bed with the textbook left open. Do that, and the next morning your hand starts moving without hesitation.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「最大の〜」の形で名詞を修飾する。「最大限」は別の語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "未使用",
+   "reading": "みしよう",
+   "pos": "noun",
+   "meaning": "unused",
+   "defJa": "まだ一度も使っていないこと",
+   "passage": {
+    "ja": "引っ越しの片づけをしていたら、未使用のグラボが箱に入ったまま出てきたんだよ。しかも保証書まで未開封だったから、買った当時の自分の意気込みがちょっと笑える。AI用に買ったのに、結局、設定が面倒で電源すら入れなかったんだよね。今は中古でも高く売れるとあって、友達にはさっさと売れって言われた。でもさ、地政学のニュースを見るたび、また値上がりしたら手放した自分を恨むに決まってると思っちゃう。",
+    "form": "未使用",
+    "en": "While tidying up for the move, an unused graphics card turned up still in its box. The warranty card was even still sealed, so my enthusiasm back when I bought it is a little funny. I bought it for AI, but in the end the setup was a hassle and I never even powered it on. Since even used ones sell high these days, my friend told me to hurry up and sell it. But every time I see geopolitics news, I think I'd definitely resent myself for letting it go if prices rise again.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「未使用のまま」「未使用品」。新品同様で手つかずの状態を言う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "筆跡",
+   "reading": "ひっせき",
+   "pos": "noun",
+   "meaning": "handwriting",
+   "defJa": "書かれた文字に表れる、書き手の特徴",
+   "passage": {
+    "ja": "古文書の展示で見たんだけど、戦国武将の手紙って、筆跡を見るだけで性格が伝わってくるんだよね。勢いよく走り書きされたものもあれば、几帳面に一字一字そろえたものもあって、人柄が出るってこういうことかと思った。ただ、右筆という書記が代筆した可能性もあるから、本人の直筆かどうかは専門家でも判断が難しいらしいよ。だからこそ、原典に当たって細かい癖まで調べざるを得ないんだって。",
+    "form": "筆跡",
+    "en": "I saw this at an exhibition of old documents: just from the handwriting of Sengoku warlords' letters, their personalities come through. Some were dashed off with vigor, while others had every character neatly aligned, and I thought, so this is what 'character shows' means. But since a scribe called a yuhitsu may have written them, it seems even experts find it hard to judge whether it's the person's own hand. That's exactly why they have no choice but to consult the original and examine even the finest habits.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「筆跡鑑定」「筆跡が違う」。書き手に固有の文字の癖を指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "甥",
+   "reading": "おい",
+   "pos": "noun",
+   "meaning": "nephew",
+   "defJa": "兄弟姉妹の息子",
+   "passage": {
+    "ja": "叙事詩『マハーバーラタ』は、親族どうしが敵味方に分かれて戦う物語として知られる。主人公アルジュナの息子アビマニユは、クリシュナにとって甥にあたる若者だが、戦場で若くして命を落とす。この場面は、戦争が血縁の絆さえ容赦なく断ち切ることを、読者に強く印象づける。開戦に先立って親族の顔ぶれを見渡したアルジュナの動揺が、『バガヴァッド・ギーター』の対話の発端となった。その苦悩は、時代を超えて普遍的な問いとして読み継がれている。",
+    "form": "甥",
+    "en": "The epic Mahabharata is known as a story in which kinsmen split into enemy and ally and fight. Arjuna's son Abhimanyu, a young man who is Krishna's nephew, loses his life on the battlefield while still young. This scene strongly impresses on the reader that war mercilessly severs even bonds of blood. Arjuna's distress on surveying the faces of his relatives before the start of battle became the origin of the dialogue of the Bhagavad Gita. That anguish continues to be read across the ages as a universal question.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「甥と姪」「〜の甥」。「おじ・おば」との対応で覚える親族語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "短期間",
+   "reading": "たんきかん",
+   "pos": "noun",
+   "meaning": "short period",
+   "defJa": "あまり長くない期間",
+   "passage": {
+    "ja": "インドの修行の伝統は、悟りが短期間で得られるものだとは考えてこなかった。ヨーガの古典は、長い年月にわたって、途切れることなく実践を続けることを求めている。悟りという言葉から連想される劇的な瞬間も、日々の積み重ねの結果として語られることが多い。結果を急ぐ心こそが、静けさからもっとも遠いのだと言うこともできる。瞑想アプリに手早い成果を求める現代人の姿は、この教えの対極にある。",
+    "form": "短期間",
+    "en": "The Indian tradition of spiritual practice has not considered enlightenment something obtainable in a short period. The classics of yoga demand that practice be continued without interruption over many years. Even the dramatic moment associated with the word 'enlightenment' is often described as the result of daily accumulation. One could even say that a mind in a hurry for results is farthest from stillness. The modern person seeking quick results from a meditation app stands at the opposite pole of this teaching.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「短期間で〜する」「短期間に」。成果の速さが話題のとき使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "日本式",
+   "reading": "にほんしき",
+   "pos": "noun",
+   "meaning": "Japanese style",
+   "defJa": "日本の流儀や様式にならったやり方",
+   "passage": {
+    "ja": "「無駄を省いて細部を磨く」という日本式の仕事観は、客観的に見れば効率の追求に映る。だが現場の職人に言わせれば、それは効率ではなく、他人の時間への敬意にほかならない。見えない裏側まで根気よく整えるのは、誰かが使うその瞬間を思えばこそだ。たとえば老舗の料理屋では、客の目に触れない包丁の手入れに、毎朝かなりの時間が割かれる。結果として、手間をかけるほど静かな信頼が積み上がっていく。",
+    "form": "日本式",
+    "en": "The Japanese-style view of work, 'trim the waste and polish the details,' looks like a pursuit of efficiency when seen objectively. But ask the craftsmen on site and they will say it is not efficiency but respect for other people's time. They patiently tidy even the unseen back side precisely because they imagine the moment someone will use it. In an old-established restaurant, for example, considerable time is set aside each morning for maintaining knives that customers never see. As a result, the more effort they invest, the more quiet trust accumulates.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「日本式の〜」のように名詞を修飾し、国の流儀を指す。論説文で使いやすい。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "気をつける",
+   "reading": "きをつける",
+   "pos": "verb",
+   "meaning": "to be careful",
+   "defJa": "注意して、悪いことが起きないようにする",
+   "passage": {
+    "ja": "熱中症に気をつけるよう呼びかけるだけでは、人の行動はほとんど変わらないと、行動科学の研究者らは指摘する。脳は抽象的な警告よりも、具体的な手順のほうに素直に従うからだ。抽象的な警告は、読んだ瞬間に分かったつもりになって終わってしまうのだ。たとえば「外出前にコップ一杯の水を飲む」と決めておけば、決意に頼らずとも習慣が自然に回り始める。呼びかけの言葉を磨くより、知見に基づいて行動の仕組みを設計するほうが理にかなっている。",
+    "form": "気をつける",
+    "en": "Researchers in behavioral science point out that merely urging people to be careful about heatstroke hardly changes their behavior. This is because the brain follows concrete procedures more readily than abstract warnings. An abstract warning ends the moment it is read, leaving the reader feeling they have understood it. For example, if you decide on 'drink a glass of water before going out,' the habit starts turning on its own without relying on resolve. Designing the structure of behavior based on findings makes more sense than polishing the wording of the appeal.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「〜に気をつける」「気をつけるよう呼びかける」。対象を取る。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "消費者",
+   "reading": "しょうひしゃ",
+   "pos": "noun",
+   "meaning": "consumer",
+   "defJa": "商品やサービスを買って使う人",
+   "passage": {
+    "ja": "AIが普及して一番得をするのは、作り手ではなく消費者かもしれない、という見方があります。文章や画像をつくるコストが急に下がれば、競争が激しくなり、値段は下がらざるを得ないからです。たとえば翻訳や要約のサービスは、すでに無料に近い水準で使えるものが増えました。ただ、その反面、本物と偽物の見分けがつきにくくなるという問題も出てきます。だから私たちには、情報を鵜呑みにせず、一度客観的に確かめる習慣が必要になるんです。",
+    "form": "消費者",
+    "en": "There is a view that the biggest beneficiary of AI's spread may be not the makers but the consumer. If the cost of producing text and images drops suddenly, competition intensifies and prices can't help but fall. For example, translation and summarization services increasingly come at close to free. On the flip side, though, it becomes harder to tell the genuine from the fake. That's why we need the habit of not swallowing information whole and checking it objectively once.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「消費者の立場」「消費者保護」。「生産者」と対になる語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "現段階",
+   "reading": "げんだんかい",
+   "pos": "noun",
+   "meaning": "present stage",
+   "defJa": "物事が進んでいる、今の時点",
+   "passage": {
+    "ja": "AIが生成した画像や文章の著作権をめぐって、各国の見解は現段階では一致していない。米国の著作権局は、人間の創作的な関与がない部分には保護を認めない立場を示してきた。一方で、日本の著作権法には、AIの学習目的の利用を広く認める規定がある。裁判所の判断もまだ少なく、基準がはっきりしない領域が多いのが実情だ。法整備が技術に追いつくまで、利用者や企業は不確実なルールの中で判断を迫られることになる。",
+    "form": "現段階",
+    "en": "Over the copyright of AI-generated images and text, countries' views do not agree at the present stage. The US Copyright Office has taken the position of not recognizing protection for parts without human creative involvement. On the other hand, Japan's copyright law has a provision broadly permitting use of works for AI training purposes. Court rulings are still few, and the reality is that many areas have no clear standard. Until legislation catches up with the technology, users and companies will be forced to make decisions amid uncertain rules.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「現段階では」の形で多く使い、今後変わりうることを含意する。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "祭り",
+   "reading": "まつり",
+   "pos": "noun",
+   "meaning": "festival",
+   "defJa": "神や先祖をまつる行事。にぎやかな催し",
+   "passage": {
+    "ja": "祭りの夜に、見ず知らずの人と一緒に踊ったり叫んだりして、妙に元気になった経験はないでしょうか。神経科学の研究では、同じリズムで体を動かす集団行動が、脳の報酬系を刺激し、信頼や一体感を高めるといわれています。それは単なる娯楽であるどころか、社会の結びつきを更新するための、とても古い仕組みなのです。そう考えると、日本各地で何百年も途絶えずに続いてきた行事が多い理由も、うなずけます。",
+    "form": "祭り",
+    "en": "Haven't you had the experience on a festival night of dancing and shouting with total strangers and becoming oddly energized? Neuroscience research says that group actions of moving the body to the same rhythm stimulate the brain's reward system and heighten trust and a sense of unity. Far from being mere entertainment, it is a very old mechanism for renewing the bonds of society. Thinking of it that way, one can see why so many events across Japan have continued unbroken for hundreds of years.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「祭りの日」「祭りを開く」。神事から地域の催しまで広く指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "曖昧",
+   "reading": "あいまい",
+   "pos": "na-adj",
+   "meaning": "vague; ambiguous",
+   "defJa": "はっきりせず、どちらとも取れること",
+   "passage": {
+    "ja": "生成AIが的外れな答えを返す原因の一つは、指示の曖昧さにある。たとえば「いい感じにまとめて」という一言は、人間には通じても、モデルには基準が見えない。人間なら文脈から補える言い回しでも、モデルは確率の高い解釈を選んで進むほかない。そのため、利用する企業の間では、目的と条件を具体的に書く訓練が広がりつつある。可塑性の高い人間の側が先に学び方を変えるというのは、皮肉な構図でもある。",
+    "form": "曖昧",
+    "en": "One cause of generative AI returning off-target answers is the vagueness of the instructions. A phrase like 'summarize it nicely,' for instance, gets through to a human, but the model cannot see a standard. Even for phrasing a human could fill in from context, the model has no choice but to pick the most probable interpretation and go on. For that reason, training in writing purposes and conditions concretely is spreading among companies that use it. It is also ironic that it is the highly plastic human side that changes its way of learning first.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「曖昧な表現」「曖昧さ」「曖昧にする」。指示や境界がぼやける場面で使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "蒸発",
+   "reading": "じょうはつ",
+   "pos": "noun",
+   "meaning": "evaporation; vanishing",
+   "defJa": "液体が気体になること。人が行方不明になること",
+   "passage": {
+    "ja": "塩は、古代世界では黄金に匹敵するほどの価値を持つ商品だった。海辺の人々は、浅い池に海水を引き、太陽の熱で水分を蒸発させて結晶を取り出した。ローマ兵に支払われた報酬を意味するサラリーの語源は塩にある、とする説もよく知られている。塩をめぐる交易路はやがて帝国の道となり、ヴェネツィアやリューベックの繁栄を支えた。塩の白い粒には、国家の財布を左右するほどの力が宿っていたのである。",
+    "form": "蒸発",
+    "en": "In the ancient world, salt was a commodity worth as much as gold. People on the coast drew seawater into shallow ponds and let the sun's heat evaporate the water to extract the crystals. There is also a well-known theory that the word salary, meaning pay given to Roman soldiers, derives from salt. The trade routes built around salt eventually became the roads of empires and supported the prosperity of Venice and Lübeck. In those white grains lay power enough to sway the purses of states.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "水を「蒸発させる」の形で、理科・産業の文脈。人が姿を消す意味とは別。",
+    "sense": "液体が気体になること"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

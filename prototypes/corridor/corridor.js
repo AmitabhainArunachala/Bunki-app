@@ -4150,9 +4150,9 @@ async function boot() {
   if (params.get('deck') === 'context' || location.hash === '#context') S.view = 'contextdeck';
   // ?deck=kotoba (or #kotoba) opens 言葉の鉱脈 straight away — a home-screen
   // shortcut that lands on the deck instead of the galaxy
-  if (['kotoba', 'mcd'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
+  if (['kotoba', 'mcd', 'n2', 'n1', 'senmon'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
     S.view = 'deckplay';
-    S.deckPlay = params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+    S.deckPlay = ['n2', 'n1', 'senmon'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
   }
 
   render();
@@ -21732,7 +21732,7 @@ function renderStudyHall(main) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;

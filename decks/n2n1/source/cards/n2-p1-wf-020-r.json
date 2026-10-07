@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "偏る",
+   "reading": "かたよる",
+   "pos": "verb",
+   "meaning": "to be unbalanced",
+   "defJa": "一方にかたよって均衡を欠く",
+   "passage": {
+    "ja": "話し方を磨こうとして、技術ばかり追いかけると、考え方が偏ることがある。声の抑揚や間の取り方、話すスピードに意識が行きすぎて、肝心の中身が薄くなるのだ。元アナウンサーが口をそろえて言うのは、まず伝えたいことを一文で言えるようにせよ、という基本である。そこが固まっていれば、多少ぎこちない話し方でも、聞き手には誠実さとして届く。型は、それを支えるための道具にすぎない。",
+    "form": "偏る",
+    "en": "When you chase only technique in trying to polish your speaking, your way of thinking can become skewed. Attention goes too much to vocal intonation, the placement of pauses and speaking speed, and the all-important content gets thin. What former announcers agree on is the basic rule: first be able to say what you want to convey in one sentence. If that is firm, even a somewhat stiff delivery reaches the listener as sincerity. Forms are nothing more than tools to support that.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「考え方が偏る」「栄養が偏る」。一方に寄って均衡を失うこと。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

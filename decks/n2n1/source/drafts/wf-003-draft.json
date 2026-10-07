@@ -1,0 +1,804 @@
+{
+  "cards": [
+    {
+      "term": "おごる",
+      "reading": "おごる",
+      "pos": "verb",
+      "meaning": "to treat someone (to a meal)",
+      "defJa": "相手の飲食代を自分が払う",
+      "passage": {
+        "ja": "新人のころ、半導体メーカーの先輩に昼ごはんをおごってもらったことがあります。ただし条件つきで、AIはなぜ人間のように賢くなれるのかを、食べ終わるまでの五分で説明しろというのです。私が答えに詰まって黙りこんでいると、先輩は笑ってこう言いました。わからないことを恥じるくらいなら、根拠を持って質問しなさい。あの一言には、二十年たったいまも私の学び方を支えてくれるものがあります。",
+        "form": "おごって",
+        "en": "When I was new, a senior colleague at a semiconductor maker once treated me to lunch. There was a condition, though: he told me to explain, in the five minutes it took to finish eating, why AI can become as smart as a human. When I fell silent, stuck for an answer, he smiled and said this. Rather than be ashamed of what you don't know, ask questions with a reason behind them. Even twenty years later, those words still hold something that supports the way I learn.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「人に昼ごはんをおごる」の形で、ごちそうする意味。「〜てもらう」で受け身にもなる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "おどおど",
+      "reading": "おどおど",
+      "pos": "adverb",
+      "meaning": "nervously, timidly",
+      "defJa": "恐れて落ち着かないさま",
+      "passage": {
+        "ja": "発表の場で終始おどおどした態度をとってしまう人は、決して少なくない。聴衆の視線が自分の欠点を探していると思いこむからだが、実際には、人は他人の話を思うほど細かく採点してはいない。恐れの大半は、現実の観客ではなく、頭の中に描いた観客に向けたものにすぎない。それに気づいたとたん、声の震えは少しずつ静まっていくものである。だから、完璧に話そうとするより、まず一人の聞き手に語りかけるつもりで話しはじめるとよい。",
+        "form": "おどおど",
+        "en": "Plenty of people behave timidly all the way through a presentation. They assume the audience is hunting for their flaws, but in reality people do not grade another person's talk as closely as one imagines. Most of the fear is aimed not at a real audience but at one painted inside the head. The moment one notices this, the trembling of the voice gradually subsides. So rather than trying to speak perfectly, it helps to begin by talking as though to a single listener.",
+        "register": "論",
+        "topic": "mind",
+        "tipJa": "「おどおどした態度」の形で、恐れや自信のなさが見える様子を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "おびただしい",
+      "reading": "おびただしい",
+      "pos": "i-adj",
+      "meaning": "enormous (in number or amount)",
+      "defJa": "数や量が非常に多い",
+      "passage": {
+        "ja": "生成AIの学習には、おびただしい量の文章と画像が使われている。その大半はウェブ上から集められたものであり、著作権をめぐって各国で訴訟が相次いでいる。作家や報道機関が提訴に踏み切った例もあり、開発企業は計算資源を確保する一方で、データの出所を明らかにするよう求められている。学習データの透明性は、技術の信頼性を左右する争点となりつつある。透明性を求める声は、今後さらに強まっていくだろう。",
+        "form": "おびただしい",
+        "en": "An enormous quantity of text and images is used to train generative AI. Most of it was gathered from the web, and lawsuits over copyright are following one another in many countries. Some authors and news organizations have gone as far as filing suit, and developers, while securing computing resources, are being asked to disclose where their data comes from. The transparency of training data is becoming a point of contention that decides how far the technology can be trusted. Calls for transparency will probably grow only stronger from here.",
+        "register": "報",
+        "topic": "ai",
+        "tipJa": "「おびただしい数・量」の形で使い、数や量が驚くほど多いことを示す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "おろそか",
+      "reading": "おろそか",
+      "pos": "na-adj",
+      "meaning": "neglected, careless",
+      "defJa": "注意や努力が足りないさま",
+      "passage": {
+        "ja": "AIツールに頼りすぎて、基礎の勉強がおろそかになっていませんか。最初は便利ですが、答えを写すだけの習慣がつくと、なぜそうなるのかという根拠を考える筋力は、確実に落ちていきます。大切なのは、まず自分の頭で五分考えてから、ツールに答え合わせをさせることです。そうすれば、楽をしながらも、理解の深さはむしろ増していくでしょう。私も、答えを写して満足していた時期には、本番の試験で何も書けませんでした。",
+        "form": "おろそか",
+        "en": "Are you relying on AI tools so much that your grounding in the basics is being neglected? At first they are convenient, but once you fall into the habit of just copying answers, the muscle for thinking about why something is so steadily weakens. What matters is to think on your own for five minutes first and then let the tool check your answer. That way, even while taking it easy, your depth of understanding will if anything grow. In my own case, during the period when I was content to copy answers, I could write nothing in the actual exam.",
+        "register": "学",
+        "topic": "ai",
+        "tipJa": "「勉強がおろそかになる」のように、「〜がおろそかだ」で注意不足を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "かさばる",
+      "reading": "かさばる",
+      "pos": "verb",
+      "meaning": "to be bulky",
+      "defJa": "体積が大きく場所をとる",
+      "passage": {
+        "ja": "紙の辞書は手触りがよくて好きだという人もいますが、長い旅ともなると、あの厚みはどうしてもかさばります。電子辞書なら、ポケットに入るサイズで、語義も用例も一瞬で引き出せます。ただし、引くのが楽になったぶん、一語ずつじっくり向き合う時間は減ってしまいました。単語を覚えたいのなら、手間そのものが記憶を支えていたことも、忘れないでください。それでも旅先では、荷物の軽さが何よりのぜいたくだと感じます。",
+        "form": "かさばり",
+        "en": "Some people love paper dictionaries for the feel of them, but on a long trip that thickness is bound to be bulky. An electronic dictionary fits in your pocket and pulls up meanings and examples in an instant. Yet as looking things up got easier, the time spent facing each word carefully has shrunk. If you want to remember vocabulary, do not forget that the effort itself was what supported memory. Even so, on the road I feel that light luggage is the greatest luxury of all.",
+        "register": "学",
+        "topic": "language",
+        "tipJa": "荷物や本について「かさばる」と言い、重さではなく体積の大きさを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "かなう",
+      "reading": "かなう",
+      "pos": "verb",
+      "meaning": "to come true",
+      "defJa": "願いが実現する",
+      "passage": {
+        "ja": "願いがかなった瞬間のうれしさは、長くは続きません。仏教では、これを渇愛、つまり尽きることのない欲望のはたらきとして説明してきました。ほしいものを手に入れたからといって、心が満たされるとは限らず、満足が外にあると信じているかぎり、人は同じ追いかけっこを続けます。肝心なのは、満たす量を増やすことではなく、欲望に振りまわされなくなることなのです。真の満足は、何かを得た結果ではなく、求めることをやめた静けさの中にあるといいます。",
+        "form": "かなった",
+        "en": "The joy of the moment a wish comes true does not last long. Buddhism has explained this as craving, the workings of a desire that never runs out. Just because you have obtained what you wanted does not mean your heart is filled, and as long as you believe satisfaction lies outside, you keep running the same chase. What matters is not increasing how much you fill but no longer being tossed about by desire. True satisfaction, it is said, lies not in the result of obtaining something but in the stillness of having stopped seeking.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「願い・夢がかなう」の形で、望んだことが実現する意味になる。",
+        "sense": "願いや望みが実現する"
+      }
+    },
+    {
+      "term": "きしむ",
+      "reading": "きしむ",
+      "pos": "verb",
+      "meaning": "to creak, to grate",
+      "defJa": "物がこすれて鋭い音を立てる",
+      "passage": {
+        "ja": "日本語の擬音語は、音を言葉に写し取る言語現象である。たとえば古い木造家屋の床がきしむ音は、「ギシギシ」と書き表され、実際に聞いたことのない人にも情景が浮かぶ。同じ語は比喩としても使われ、組織の緊張や関係の悪化を表す場合もある。辞書の語義は、用例をもとに、音から心理への広がりをたどると、いっそう理解しやすい。音を表す語がそのまま心理を描く例は、ほかの言語にも少なくないが、日本語ではとりわけ豊富である。",
+        "form": "きしむ",
+        "en": "Japanese onomatopoeia is a linguistic phenomenon of transcribing sound into words. For example, the sound of the floor of an old wooden house as it creaks is written as gishigishi, and a scene comes to mind even for those who have never actually heard it. The same word is also used figuratively and can express strain in an organization or a worsening relationship. Dictionary senses become easier to grasp if, drawing on example sentences, one traces the spread from sound to psychology. Cases where a sound word directly depicts a psychological state are not rare in other languages, but Japanese is especially rich in them.",
+        "register": "報",
+        "topic": "language",
+        "tipJa": "「床がきしむ」のように音を表し、「関係がきしむ」と比喩にも広がる。",
+        "sense": "物がこすれて鳴る"
+      }
+    },
+    {
+      "term": "きっちり",
+      "reading": "きっちり",
+      "pos": "adverb",
+      "meaning": "precisely, exactly",
+      "defJa": "寸分の狂いなく正確なさま",
+      "passage": {
+        "ja": "あるヨーガ教室では、始まりの時刻がきっちり守られている。扉が閉まると遅れた人は入室できず、静けさのなかで呼吸の音だけが教室を満たしていく。講師は、集中は規律から生まれるという考えに基づいて運営していると説明する。参加者の多くは、最初こそ戸惑うものの、通ううちに時間の厳しさを心地よく感じるようになるという。静かな時間を確保することが、ここでは何よりも優先されている。",
+        "form": "きっちり",
+        "en": "At one yoga studio, the start time is kept to the minute. Once the door closes, latecomers cannot enter, and in the stillness only the sound of breathing fills the room. The instructor explains that the studio is run on the idea that concentration is born of discipline. Many participants are bewildered at first, but they reportedly come to find the strictness about time pleasant as they keep attending. Securing quiet time takes priority above all else here.",
+        "register": "報",
+        "topic": "india",
+        "tipJa": "「時刻をきっちり守る」のように、ずれのない正確さを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "きっぱり",
+      "reading": "きっぱり",
+      "pos": "adverb",
+      "meaning": "flatly, decisively",
+      "defJa": "態度や言葉がはっきりしたさま",
+      "passage": {
+        "ja": "ブッダは、答えるべきでない問いは、きっぱり退けたと伝えられています。たとえば「世界は永遠か」といった形而上学的な問いです。彼はこれを毒矢のたとえで説明しました。毒矢で射られた人が、矢を放った者の素性を知ってからでないと矢を抜かせないと言うなら、その前に命が尽きてしまうでしょう。肝心なのは、答えの出ない議論に時間を使うことではなく、いま目の前の苦しみを取り除くことだったのです。",
+        "form": "きっぱり",
+        "en": "It is said that the Buddha flatly set aside questions that should not be answered. One example is a metaphysical question such as whether the world is eternal. He explained this with the parable of the poisoned arrow. If a man shot with a poisoned arrow says he will not let it be pulled out until he knows who fired it, he will be dead before then. What mattered was not spending time on endless debate but removing the suffering right in front of him.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「きっぱり断る・退ける」の形で、迷いのない明確な態度を示す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "けなす",
+      "reading": "けなす",
+      "pos": "verb",
+      "meaning": "to disparage, to run down",
+      "defJa": "悪く言って価値を下げる",
+      "passage": {
+        "ja": "新しい技術が出てくると、まず現れるのは、それをけなす人たちです。写真が登場すると、絵画はもう終わりだと言う人もいましたし、文字が普及しはじめたとき、ソクラテスは記憶力が衰えると警告したと、プラトンは伝えています。いま生成AIについて同じことが繰り返されていますが、道具を否定するだけで終わった例は、歴史を見てもほとんどありません。大切なのは、批判を受け止めつつ、使いこなす柔軟さを失わないことです。",
+        "form": "けなす",
+        "en": "When a new technology appears, the first to show up are the people who run it down. When photography arrived, some said painting was finished, and Plato reports that when writing began to spread, Socrates warned that memory would decay. The same thing is being repeated now over generative AI, but in history there are almost no cases that ended with merely rejecting the tool. What matters is to take criticism on board while not losing the flexibility to put the tool to use.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「新技術をけなす」のように、人や物を悪く言う。批判より感情的で否定が強い。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "こじれる",
+      "reading": "こじれる",
+      "pos": "verb",
+      "meaning": "to get complicated, to take a turn for the worse",
+      "defJa": "物事が複雑になり悪化する",
+      "passage": {
+        "ja": "第一次世界大戦は、サラエボでの暗殺事件から始まった、とよく説明されます。ところが実際には、バルカン半島をめぐる列強の対立が長年こじれていて、同盟の網が小さな事件を大戦へと広げてしまいました。猛烈な軍拡競争も不信を深め、各国は動員の準備を進めざるを得なくなったのです。きっかけは小さくても、背景にある不信は一夜にして消えるものではありません。外交の教訓は、小さな不信を放置しないことにあります。",
+        "form": "こじれて",
+        "en": "The First World War is often explained as having begun with an assassination in Sarajevo. In reality, though, the rivalry among the great powers over the Balkans had long been tangled, and the web of alliances spread a small incident into a great war. A fierce arms race also deepened the distrust, and each country had no choice but to press ahead with preparations to mobilize. Even if the trigger is small, the distrust behind it does not vanish overnight. The lesson for diplomacy is not to leave small distrusts unattended.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「関係・事態がこじれる」の形で、話し合いや対立が複雑に悪化する。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "こだわる",
+      "reading": "こだわる",
+      "pos": "verb",
+      "meaning": "to be particular about",
+      "defJa": "細部まで妥協せず執着する",
+      "passage": {
+        "ja": "半導体の世界で、台湾のTSMCは、回路の微細化に徹底してこだわる企業として知られています。最先端の工場では、ナノメートル単位の精度が求められ、ごくわずかな誤差が製品全体の歩留まりを左右します。だからこそ、各国の企業は、少しでも早く最新の生産ラインを確保しようと競っているのです。細部に妥協しない姿勢が、そのまま国の産業力に直結する時代になったと言えるでしょう。",
+        "form": "こだわる",
+        "en": "In the world of semiconductors, Taiwan's TSMC is known as a company that is thoroughly particular about shrinking its circuits. At cutting-edge factories, precision on the scale of nanometers is required, and the slightest error affects the yield of the whole product. That is exactly why companies in many countries are competing to secure the newest production lines even a little sooner. We can say we have entered an age in which an attitude of never compromising on details connects directly to a nation's industrial strength.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「品質にこだわる」のように、「〜にこだわる」で細部への強い執着を表す。",
+        "sense": "細部に強く執着する"
+      }
+    },
+    {
+      "term": "こつ",
+      "reading": "こつ",
+      "pos": "other",
+      "meaning": "knack, trick",
+      "defJa": "うまくやるための要領",
+      "passage": {
+        "ja": "人前で話すこつは、話しはじめる前の一呼吸にあると、元アナウンサーはよく口にします。ヨーガの呼吸法でも、息をゆっくり吐き切ることが、心を静める入り口だとされています。呼吸が深まるのに伴って、緊張で上ずった声は落ち着き、言葉の一つひとつが相手に届きます。肝心なのは、沈黙を怖がらないことです。間は、聞き手がそれまでの内容をかみしめて、次の話を迎える準備をする時間でもあるのですから。",
+        "form": "こつ",
+        "en": "Ex-announcers often say that the knack for speaking in public lies in a single breath before you begin. In yoga breathing too, exhaling slowly and fully is said to be the doorway to calming the mind. As the breath deepens, a voice that rose with nerves settles, and each word reaches the listener. What matters is not to be afraid of silence. A pause is also time for the listener to digest what came before and prepare for what comes next.",
+        "register": "語",
+        "topic": "india",
+        "tipJa": "「〜するこつ」で、うまくやる要領を言う。「こつをつかむ」の形も多い。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ことごとく",
+      "reading": "ことごとく",
+      "pos": "adverb",
+      "meaning": "entirely, without exception",
+      "defJa": "一つ残らず全部",
+      "passage": {
+        "ja": "一九四六年に当用漢字表と現代かなづかいが告示されると、旧字体や歴史的仮名遣いは、公文書からことごとく姿を消した。以後、新聞も教科書も、この方針に沿って表記を改めている。一方で、文学や固有名詞の世界には、旧来の字体が根強く残った。表記をめぐる議論は、日本語の変化を象徴する出来事であり、現在もなお続いている。ただし、基準そのものは、一九八一年の常用漢字表の告示や、二〇一〇年の改定によって、その後も見直されてきた。",
+        "form": "ことごとく",
+        "en": "When the Tōyō kanji list and the modern kana orthography were promulgated in 1946, the old character forms and historical kana usage disappeared entirely from official documents. Since then, newspapers and textbooks have revised their notation in line with this policy. On the other hand, the older forms stubbornly survived in the worlds of literature and proper names. The debate over notation is an event that symbolizes change in Japanese, and it continues even now. The standards themselves, however, have continued to be revised since, through the 1981 promulgation of the Jōyō kanji list and its 2010 revision.",
+        "register": "報",
+        "topic": "language",
+        "tipJa": "「ことごとく失敗する」のように、例外なく全部という強い意味で使う。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "さも",
+      "reading": "さも",
+      "pos": "adverb",
+      "meaning": "as if, with an air of",
+      "defJa": "いかにもそれらしいさま",
+      "passage": {
+        "ja": "人は、知らないことを聞かれると、さも知っているかのように答えてしまうことがあります。心理学では、これを自分の無知を隠そうとする防衛反応のひとつとして説明します。ところが、知ったかぶりを続けていると、学ぶ機会そのものがやせ細っていきます。「それはわかりません」と素直に言える柔軟さのある人ほど、実は成長が早いのです。私自身、会議でうなずいたあと、あわてて調べ直した経験が何度もあります。",
+        "form": "さも",
+        "en": "When asked about something they do not know, people sometimes answer as if they knew it perfectly well. Psychology explains this as one kind of defensive reaction to hide one's own ignorance. But if you keep pretending to know, the very chance to learn grows thin. Those with the flexibility to say honestly, I don't know, are in fact the ones who grow fastest. I myself have often nodded in a meeting and then scrambled to look things up again.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「さも〜かのように」の形で、いかにもそうであるように見せる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "しなやか",
+      "reading": "しなやか",
+      "pos": "na-adj",
+      "meaning": "supple, flexible",
+      "defJa": "柔らかく弾力があるさま",
+      "passage": {
+        "ja": "ロボット工学の分野で、しなやかに動く手の開発が進んでいる。従来の産業用ロボットは硬い金属の部品で作られていたため、卵のように壊れやすい物をつかむには不向きだった。そこで研究者たちは、柔軟な素材と人工筋肉を組み合わせ、人の指に近い動きの再現を目指している。とはいえ、触覚をもとに力加減を判断するAIの精度には、なお課題が残るとされる。実用化にはなお時間がかかるが、介護や調理の現場からの期待は大きい。",
+        "form": "しなやかに",
+        "en": "In robotics, development of hands that move supplely is progressing. Conventional industrial robots were built from hard metal parts, so they were ill suited to grasping fragile things like eggs. Researchers are therefore combining pliable materials with artificial muscles, aiming to reproduce movement close to that of human fingers. That said, challenges are still said to remain in the accuracy of AI that judges how much force to use from the sense of touch. Practical use will still take time, but expectations from nursing care and cooking settings are high.",
+        "register": "報",
+        "topic": "ai",
+        "tipJa": "「しなやかに動く」のように、柔らかさと強さを兼ねた動きや体を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "しぶとい",
+      "reading": "しぶとい",
+      "pos": "i-adj",
+      "meaning": "tenacious, stubborn",
+      "defJa": "粘り強くなかなか屈しない",
+      "passage": {
+        "ja": "恥ずかしい失敗の記憶は何年たってもしぶとく残るのに、覚えたい単語は一週間もすれば消えてしまいます。これは、脳が感情の動いた出来事を優先して保存するためだと言われます。ならば、単語にも感情を結びつけてやればいいのです。好きな歌の歌詞や、旅先で聞いた思いがけない一言と一緒に、そのときの場面ごと覚えるに限ります。ただ同じカードを何度も繰り返すだけでは、時間を浪費しがちです。",
+        "form": "しぶとく",
+        "en": "The memory of an embarrassing failure, even years later, lingers stubbornly, yet a word you want to learn vanishes within a week. This is said to be because the brain preferentially stores events that stirred emotion. In that case, you only need to tie emotion to words as well. Nothing beats learning a word along with its scene, together with a favorite song lyric or an unexpected phrase heard on a trip. Merely repeating the same flashcard over and over tends to waste time.",
+        "register": "学",
+        "topic": "language",
+        "tipJa": "「しぶとく残る」のように、なかなか消えない粘り強さを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "すがすがしい",
+      "reading": "すがすがしい",
+      "pos": "i-adj",
+      "meaning": "refreshing, bracing",
+      "defJa": "さわやかで気持ちがよい",
+      "passage": {
+        "ja": "朝の五時に起きて、まだ人のいない公園を歩くと、頭の中のもやが晴れていくのがわかります。空気は冷たく、鳥の声だけが響き、街が動き出す前の澄んだ静けさに包まれます。そんなすがすがしい時間に考えごとをすると、昨夜まで難問だったことが、意外にすんなり整理されるのです。これは気分転換というより、頭の整理そのものだと私は感じています。夜に考えて行き詰まった問題こそ、朝に持ち越してみる価値があります。",
+        "form": "すがすがしい",
+        "en": "If you get up at five in the morning and walk through a park where no one is about yet, you can feel the fog in your head clearing. The air is cold, only birdsong rings out, and you are wrapped in the clear stillness before the city starts moving. If you think things over in such a refreshing hour, what was a hard problem last night gets sorted out surprisingly smoothly. I feel this is less a change of mood than the very tidying of the mind. A problem you got stuck on at night is exactly the kind worth carrying over to the morning.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "朝の空気や気分に使い、「すがすがしい朝・気分」の形が多い。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "すんなり",
+      "reading": "すんなり",
+      "pos": "adverb",
+      "meaning": "smoothly, without a hitch",
+      "defJa": "抵抗なく円滑に進むさま",
+      "passage": {
+        "ja": "外国語の文法は、ルールを聞いてすんなり納得できることもあれば、何度説明されてもしっくりこないこともあります。後者の場合、多くは、その項目が自分の母語にない発想に基づいているからです。たとえば英語話者にとって、日本語の「は」と「が」の使い分けは、長いあいだ大きな壁でした。そんなときは、理屈を追いかけて時間を浪費するより、例文を声に出して何十回も読むほうが近道です。",
+        "form": "すんなり",
+        "en": "With foreign-language grammar, sometimes you hear a rule and accept it smoothly, and sometimes it will not click no matter how often it is explained. In the latter case, it is mostly because the item rests on an idea that your native language lacks. For English speakers, for example, the distinction between wa and ga in Japanese has long been a big wall. At such times, reading example sentences aloud dozens of times is a shortcut compared with chasing the logic and wasting time.",
+        "register": "学",
+        "topic": "language",
+        "tipJa": "「すんなり受け入れる・通る」の形で、抵抗や手間なく進むことを表す。",
+        "sense": "抵抗なく円滑に進む"
+      }
+    },
+    {
+      "term": "ずらっと",
+      "reading": "ずらっと",
+      "pos": "adverb",
+      "meaning": "in a long row",
+      "defJa": "多くのものが並ぶさま",
+      "passage": {
+        "ja": "書店の自己啓発コーナーには、習慣を扱った本がずらっと並んでいる。なかでも、一日一パーセントの小さな改善を積み重ねれば、一年後には大きな差になると説く『複利で伸びる1つの習慣』は、世界的な売れ行きを記録した。もっとも、読むだけで人が変わることはなく、実践に移せるかどうかが分かれ目である。習慣が人をつくるとはいえ、最初の一歩を踏み出すのは本人以外にない。本棚の前で迷うのも、案外悪くない時間である。",
+        "form": "ずらっと",
+        "en": "In the self-help corner of a bookstore, books on habits stand lined up in long rows. Among them, the book that argues a small improvement of one percent a day adds up to a large gap after a year recorded sales around the world. Still, merely reading does not change a person, and what divides outcomes is whether one can put it into practice. Habits may make the person, but no one other than oneself can take the first step. Dithering in front of the shelves is, surprisingly, not a bad way to spend time.",
+        "register": "報",
+        "topic": "mind",
+        "tipJa": "「ずらっと並ぶ」の形で、同じようなものが長く連なる様子を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "そらす",
+      "reading": "そらす",
+      "pos": "verb",
+      "meaning": "to divert, to turn away",
+      "defJa": "向きを変えてほかへ向ける",
+      "passage": {
+        "ja": "政治学には、対外戦争が、国内問題から国民の関心をそらす効果をもつという仮説がある。国民の目が敵国に向けば、政権への批判は弱まるというのだ。ただし、歴史を見る限り、この理屈がそのまま当てはまった例は、思いのほか多くない。一九八二年のフォークランド紛争に敗れたアルゼンチンの軍事政権は、翌年、権力を手放すことを余儀なくされた。仮説の根拠は、実は思うほど強くなく、むしろ失敗の危険のほうが大きいのである。",
+        "form": "そらす",
+        "en": "Political science has a hypothesis that foreign war has the effect of diverting the public's attention from domestic problems. If the nation's eyes turn toward an enemy, the argument goes, criticism of the government weakens. As far as history shows, however, there are surprisingly few cases where this logic applied as it stands. Argentina's military regime, which lost the 1982 Falklands conflict, was forced to give up power the following year. The grounds for the hypothesis are in fact not as strong as one might think, and the risk of failure is if anything greater.",
+        "register": "報",
+        "topic": "history",
+        "tipJa": "「注意・視線・話をそらす」の形で、向かうはずの方向からほかへ外す。",
+        "sense": "向きをほかへ外す"
+      }
+    },
+    {
+      "term": "ぞんざい",
+      "reading": "ぞんざい",
+      "pos": "na-adj",
+      "meaning": "rude, careless",
+      "defJa": "扱いが雑で礼を欠くさま",
+      "passage": {
+        "ja": "千利休は、茶の湯の席で道具をぞんざいに扱う者を決して許さなかったと伝えられています。小さな茶碗一つにも、客への敬意を込めて選んだ理由があるからです。ところが皮肉なことに、その利休自身が、最後には秀吉の命で切腹を命じられました。人を丁寧にもてなす心と、権力の気まぐれとが、同じ時代に同居していたのです。利休にとって丁寧さとは、作法の問題である以前に、相手と道具に向き合う生き方そのものだったのでしょう。",
+        "form": "ぞんざいに",
+        "en": "It is said that Sen no Rikyu never forgave anyone who handled utensils carelessly at a tea gathering. Even a single small tea bowl has a reason it was chosen, out of respect for the guest. Ironically, though, Rikyu himself was in the end ordered to commit seppuku on Hideyoshi's orders. A heart that entertains people with courtesy and the whims of power coexisted in the same age. For Rikyu, courtesy was probably less a matter of etiquette than a way of life, of facing both the guest and the utensils.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「ぞんざいに扱う・答える」の形で、雑で礼儀に欠ける態度を示す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "たくましい",
+      "reading": "たくましい",
+      "pos": "i-adj",
+      "meaning": "sturdy, resilient",
+      "defJa": "力強く頼もしい",
+      "passage": {
+        "ja": "最近のロボットって、昔の想像よりずっとたくましいと思いませんか。二足歩行で階段を上るし、転んでも自分で起き上がるじゃないですか。しかも、動きの学習はAIがやっているらしくて、人が細かく教えなくても、失敗を繰り返しながら猛烈な勢いで覚えていくんですよ。ちょっと怖いけど、あの粘り強さを見ていると、応援せずにはいられません。あの姿が、人間の仕事を奪うのか、それとも助けてくれるのかは、まだ誰にもわかりません。",
+        "form": "たくましい",
+        "en": "Don't you think recent robots are far more sturdy than we used to imagine? They climb stairs on two legs, and even when they fall they get up by themselves, right? On top of that, apparently AI handles the learning of movement, so even without people teaching them in detail, they learn at a fierce pace while repeating failures. It is a little scary, but watching that persistence, I can't help rooting for them. Whether that figure will take away human jobs or help us, nobody can yet say.",
+        "register": "話",
+        "topic": "ai",
+        "tipJa": "「たくましい体・精神」のように、頑丈さと生きる力の強さを両方ほめる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "たやすい",
+      "reading": "たやすい",
+      "pos": "i-adj",
+      "meaning": "easy, simple",
+      "defJa": "苦労せず簡単にできる",
+      "passage": {
+        "ja": "専門用語を並べて話すのは、案外たやすいものです。本当に難しいのは、同じ内容を中学生にもわかる言葉に置き換えることです。たとえば半導体を「電気の流れを調節する小さな門番」と言えば、予備知識のない人にも情景が浮かびます。そのためには、自分がその仕組みを根っこから理解し、柔軟に言い換えられなければなりません。話し方を磨くとは、結局、考えを磨くことにほかならないのです。",
+        "form": "たやすい",
+        "en": "Stringing together technical terms is surprisingly easy. What is truly hard is to put the same content into words even a middle schooler can follow. If you call a semiconductor a small gatekeeper that regulates the flow of electricity, a picture forms even for someone with no background. For that, you must understand the mechanism from the roots and be able to rephrase it flexibly. Polishing how you speak is, in the end, nothing other than polishing how you think.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "「たやすいことではない」の形が多く、簡単さを少し堅く言う。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "だぶだぶ",
+      "reading": "だぶだぶ",
+      "pos": "adverb",
+      "meaning": "baggy, loose-fitting",
+      "defJa": "衣服が大きすぎてゆるいさま",
+      "passage": {
+        "ja": "一九四〇年代のアメリカで、若者たちはだぶだぶのズートスーツを好んで着た。戦時中は布地の節約が求められていたのに、あえて布を大量に使う派手な色の服を選んだこと自体が、一つの意思表示だった。一九四三年にロサンゼルスで起きた暴動は、服装が社会の対立を映す鏡になりうることを示している。装いは個人の趣味に限らず、時代の緊張を映し出すものなのである。流行の背景には、音楽や街の文化の力もあった。",
+        "form": "だぶだぶの",
+        "en": "In 1940s America, young people liked to wear baggy zoot suits. Although saving fabric was demanded in wartime, deliberately choosing flashy, brightly colored clothes that used a great deal of cloth was itself a statement. The riots that broke out in Los Angeles in 1943 show that clothing can become a mirror of social conflict. Dress is not limited to personal taste; it reflects the tensions of an age. Behind the fashion also lay the power of music and street culture.",
+        "register": "論",
+        "topic": "history",
+        "tipJa": "「だぶだぶの服・ズボン」の形で、体に合わない大きすぎる衣服を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "だるい",
+      "reading": "だるい",
+      "pos": "i-adj",
+      "meaning": "sluggish, languid",
+      "defJa": "体が重く力が入らない",
+      "passage": {
+        "ja": "体がだるい、というときの感覚は、単なる疲労とは少し違う。筋肉の消耗に加えて、頭もぼんやりし、何もする気が起きないという意欲の低下まで含んでいるからだ。英語には、これにぴったり重なる一語が見当たらず、辞書は文脈ごとに訳語を変えている。感覚を言葉にするという営みは、思っている以上に、その言語の文化に左右される。言葉が切り取る範囲は言語ごとに異なり、そこに翻訳の難しさがある。",
+        "form": "だるい",
+        "en": "The sensation when we say the body feels sluggish is a little different from mere fatigue. That is because, in addition to the wearing down of muscles and a fogged head, it includes a drop in motivation, a disinclination to do anything. English has no single word that overlaps with it exactly, and dictionaries change the translation from context to context. The act of putting a sensation into words depends on the culture of the language more than one might think. The range a word carves out differs from language to language, and therein lies the difficulty of translation.",
+        "register": "論",
+        "topic": "language",
+        "tipJa": "「体がだるい」「だるそうな声」の形で、疲れと気力の低下を合わせて表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "つくづく",
+      "reading": "つくづく",
+      "pos": "adverb",
+      "meaning": "deeply, keenly",
+      "defJa": "深く心に感じるさま",
+      "passage": {
+        "ja": "同時通訳者の中には、仕事を重ねるほどに、言葉の裏にある文化の差をつくづく感じると語る人も少なくない。日本語の「検討します」が、英語に直訳されると前向きな約束に聞こえてしまうのが、その一例だ。実際には、断りの婉曲表現である場合も多い。通訳は、単語を置き換えるだけの作業にすぎないと思われがちだが、実際には発言の要旨と意図を運ぶ仕事である。正確さだけでなく、場の空気を読む力も、通訳者には欠かせない。",
+        "form": "つくづく",
+        "en": "Not a few simultaneous interpreters say that the more work they do, the more keenly they feel the cultural differences behind words. The Japanese phrase kentō shimasu, when translated literally into English, sounds like a promise of progress, and that is one example. In reality it is often a euphemistic refusal. Interpreting tends to be seen as merely the work of swapping words, but in fact it is the work of carrying the gist and the intent of what is said. Not only accuracy but also the ability to read the room is indispensable to an interpreter.",
+        "register": "報",
+        "topic": "language",
+        "tipJa": "「つくづく感じる・思う」の形で、経験を重ねて深く実感することを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "てっきり",
+      "reading": "てっきり",
+      "pos": "adverb",
+      "meaning": "surely (and wrongly)",
+      "defJa": "疑いもなくそうだと思うさま",
+      "passage": {
+        "ja": "中世の人々は、てっきり地球は平らだと信じていたのだろう、と私たちは思いこみがちである。しかし、紀元前三世紀のエラトステネスは、二つの都市で測った影の角度の違いをもとに、地球の大きさをほぼ正確に見積もっていた。中世の学者たちも、大地が球であることは疑わなかったのである。確かな根拠のない思いこみこそが、歴史を実際より単純な物語に変えてしまう。歴史の常識を疑うことは、学びの出発点である。",
+        "form": "てっきり",
+        "en": "We tend to assume that people in the Middle Ages surely believed the earth was flat. Yet Eratosthenes, in the third century BC, estimated the size of the earth almost accurately from the difference in the angle of shadows measured in two cities. Medieval scholars too did not doubt that the earth is a sphere. It is assumptions without firm grounds that turn history into a simpler story than it really was. Doubting what passes for common knowledge in history is the starting point of learning.",
+        "register": "論",
+        "topic": "history",
+        "tipJa": "「てっきり〜と思った」の形で、あとで外れた確信を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "とぼける",
+      "reading": "とぼける",
+      "pos": "verb",
+      "meaning": "to play dumb, to feign ignorance",
+      "defJa": "知らないふりをする",
+      "passage": {
+        "ja": "ムガル帝国のアクバル帝に仕えたビールバルは、機知に富んだ廷臣として、数多くの逸話に登場する。皇帝に難題を突きつけられても、彼はとぼけた顔で答え、朗らかな笑いのうちに相手の矛盾を突く。逸話の多くは後世の創作とはいえ、権力に直言できない時代に、笑いが知恵の通路であったことを物語っている。真実を語るには、ときに愚かなふりをする必要があったのだろう。彼の笑いは、弱い者の武器でもあった。",
+        "form": "とぼけた",
+        "en": "Birbal, who served the Mughal emperor Akbar, appears in countless anecdotes as a quick-witted courtier. Even when the emperor sets him a hard problem, he answers with a feigned innocent face and, amid cheerful laughter, pokes at the other's contradiction. Though most of the anecdotes are later inventions, they tell us that in an age when one could not speak plainly to power, laughter was a channel for wisdom. To tell the truth, it was perhaps sometimes necessary to act the fool. His humor was also a weapon of the weak.",
+        "register": "論",
+        "topic": "india",
+        "tipJa": "「とぼけた顔・とぼけた味」の形と、「知らないふりをする」意味がある。",
+        "sense": "知らないふりをする"
+      }
+    },
+    {
+      "term": "どうせ",
+      "reading": "どうせ",
+      "pos": "adverb",
+      "meaning": "anyway, after all (resigned)",
+      "defJa": "結局は同じ結果だという気持ち",
+      "passage": {
+        "ja": "「どうせ無理だ」という口ぐせは、話し方より先に、考え方を縛ってしまう。人は、自分が口にした言葉を、自分の耳でいちばん多く聞いているからだ。言葉を「やってみよう」に置き換えるだけで、声の調子も表情も、心のゆとりと一緒に、少しずつ前向きなものに変わっていく。話す技術を磨く前に、まず自分に聞かせる言葉を整えてみてはどうだろうか。ためしに今日から一週間、口ぐせを一つだけ変えてみるのもよい。",
+        "form": "どうせ",
+        "en": "The verbal habit of saying it's hopeless anyway binds your way of thinking before it binds your way of speaking. This is because people hear the words they utter most often with their own ears. Merely replacing the phrase with let's give it a try gradually turns the tone of voice and the expression more positive, along with some breathing room in the heart. Before polishing speaking technique, why not first tidy the words you let yourself hear? As an experiment, it is also worth changing just one verbal habit for a week starting today.",
+        "register": "語",
+        "topic": "mind",
+        "tipJa": "「どうせ無理だ」のように、あきらめや投げやりな気持ちを前置きする。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "どうやら",
+      "reading": "どうやら",
+      "pos": "adverb",
+      "meaning": "it seems that, apparently",
+      "defJa": "どうも〜らしいと推測するさま",
+      "passage": {
+        "ja": "大規模言語モデルは、一語ずつ次の言葉を予測しているだけだと言われてきました。ところが、内部の仕組みを調べた研究では、詩の行末の韻を先に決めてから、そこへ向かって言葉を選んでいる様子が観察されたそうです。どうやらモデルは、確率の計算に限らず、先を見据えた計画のようなものを内部にもっているらしいのです。ただし、それを「考えている」と呼べるかどうかは、専門家の間でも意見が分かれています。",
+        "form": "どうやら",
+        "en": "Large language models have been said to merely predict the next word one at a time. But in research that examined their inner workings, they were reportedly observed settling the rhyme at the end of a line of a poem first and then choosing words to head toward it. It seems the model has, inside, something like a plan that looks ahead, rather than just a calculation of probabilities. Whether that can be called thinking, however, divides opinion even among experts.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「どうやら〜らしい・ようだ」の形で、確かではないが、そう思われる推測を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "のどか",
+      "reading": "のどか",
+      "pos": "na-adj",
+      "meaning": "tranquil, peaceful",
+      "defJa": "穏やかでのんびりしたさま",
+      "passage": {
+        "ja": "話し方教室で元局アナの講師がまず勧めるのは、のどかな景色を思い浮かべながら声を出すことです。広い草原や、静かな浜辺で波が寄せる様子を頭に描くと、肩の力が抜け、声が自然に低くやわらかくなるといいます。緊張しているときの声は、のどが締まって高くなりがちです。だからこそ、人前に立つに際して、心のなかに穏やかな場所を一つ用意しておくとよいのです。これは、緊張を緩和する、いちばん手軽な準備運動です。",
+        "form": "のどかな",
+        "en": "The first thing the instructor, a former station announcer, recommends at a speaking class is to produce your voice while picturing a tranquil landscape. When you imagine a broad meadow or waves rolling in on a quiet beach, the tension leaves your shoulders and your voice, they say, naturally becomes lower and softer. A nervous voice tends to rise because the throat tightens. That is exactly why, when you stand before people, it is good to prepare one calm place in your mind. This is the easiest warm-up for easing tension.",
+        "register": "語",
+        "topic": "mind",
+        "tipJa": "「のどかな田園・風景」の形で、静かでのんびりした穏やかさを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ひいては",
+      "reading": "ひいては",
+      "pos": "adverb",
+      "meaning": "and by extension, consequently",
+      "defJa": "さらにその結果として",
+      "passage": {
+        "ja": "古代ローマの強さは、軍団だけでは説明できません。アッピア街道に代表される道路網や水道が整い、物資も情報も各地に行き渡ったことが、都市の繁栄、ひいては帝国全体の安定を支えました。逆に、財政の悪化に伴って維持費を払えなくなると、行政の腐敗が進み、地方の統治は揺らぎ始めます。インフラの衰えは、静かに、しかし確実に、帝国の屋台骨を蝕んでいったのです。歴史の盛衰は、こうした地味な土台によって決まることが少なくありません。",
+        "form": "ひいては",
+        "en": "The strength of ancient Rome cannot be explained by its legions alone. Roads such as the Appian Way and aqueducts were in place, and goods and information circulated to every region, which supported the prosperity of cities and, by extension, the stability of the whole empire. Conversely, once it could no longer pay for upkeep as its finances worsened, corruption in administration advanced and provincial rule began to waver. The decay of infrastructure quietly but surely ate away at the empire's backbone. The rise and fall of history is often decided by such unglamorous foundations.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "小さな範囲の原因から、さらに大きな範囲の結果へ話を広げるときに使う。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ふさわしい",
+      "reading": "ふさわしい",
+      "pos": "i-adj",
+      "meaning": "fitting, appropriate",
+      "defJa": "よく釣り合って似合う",
+      "passage": {
+        "ja": "ある時代が英雄とみなした人物は、次の時代には暴君と呼ばれることがある。ナポレオンは、フランスでは法典を整えた改革者として敬われる一方、欧州各地では侵略者として記憶されている。偉人の名にふさわしいかどうかは、人物そのものより、評価する側の立場や根拠に左右されるのだろう。歴史を学ぶとは、一つの肖像を複数の視点から眺め直すことにほかならない。そう考えると、評価の変遷そのものが、歴史の一部だとも言える。",
+        "form": "ふさわしい",
+        "en": "A figure one age regarded as a hero may be called a tyrant by the next. Napoleon is revered in France as a reformer who put the legal code in order, while across Europe he is remembered as an invader. Whether someone is worthy of the name of a great man probably depends less on the person than on the standpoint and grounds of the one judging. To study history is nothing other than to look again at a single portrait from several viewpoints. Seen this way, the shifts in judgment themselves can be called part of history.",
+        "register": "論",
+        "topic": "history",
+        "tipJa": "「〜にふさわしい」の形で、人や物が立場・場面によく合うことを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ふらふら",
+      "reading": "ふらふら",
+      "pos": "adverb",
+      "meaning": "unsteady, dizzy",
+      "defJa": "足もとが定まらないさま",
+      "passage": {
+        "ja": "徹夜で勉強した翌朝って、頭はさえている気がするのに、立つとふらふらするじゃないですか。あれは実は、脳が「もう限界だ」と体に信号を出しているんですよ。体力を消耗した状態では、詰め込んだ内容も定着しにくいという研究があります。だったら、あと一時間粘るよりも、睡眠を確保して思いきって寝たほうが、結局は得なんです。試験の前の晩ほど、勉強の時間を減らしてでも睡眠を優先する勇気が必要ですよ。",
+        "form": "ふらふら",
+        "en": "The morning after an all-night study session, your head feels sharp, yet when you stand up you're unsteady on your feet, right? That's actually your brain sending your body a signal that it has reached its limit. There is research saying that in a state of drained energy, what you crammed in has a hard time sticking. In that case, rather than hanging on for another hour, securing your sleep and boldly going to bed is, in the end, the better deal. The night before an exam especially, you need the courage to put sleep first even at the cost of study time.",
+        "register": "話",
+        "topic": "mind",
+        "tipJa": "「ふらふらする・ふらふら歩く」の形で、体が定まらずふらつく様子を表す。",
+        "sense": "足もとが定まらない"
+      }
+    },
+    {
+      "term": "ぶかぶか",
+      "reading": "ぶかぶか",
+      "pos": "adverb",
+      "meaning": "too big, baggy",
+      "defJa": "大きすぎてゆるいさま",
+      "passage": {
+        "ja": "初めて修行僧の衣をまとった日、ぶかぶかの黄土色の布が足にからまって、まっすぐ歩くのもひと苦労でした。インドの寺院で出会った老僧は、その様子を見てにこにこ笑いながら、布の巻き方を教えてくれたんです。要領がわかると、一枚の布が、暑さも寒さも防ぐ立派な衣になるから不思議です。必要なものはほとんど何もないという彼の暮らしぶりには、頭が下がらずにはいられませんでした。",
+        "form": "ぶかぶか",
+        "en": "On the day I first put on a trainee monk's robe, the baggy ochre cloth tangled around my feet, and it was a struggle just to walk straight. The old monk I met at a temple in India watched me, laughing with a smile, and taught me how to wrap the cloth. Once you get the hang of it, strangely, a single sheet of cloth becomes a fine garment that keeps out both heat and cold. His way of living, needing almost nothing, made me bow my head in respect.",
+        "register": "話",
+        "topic": "india",
+        "tipJa": "「ぶかぶかの服・靴」の形で、体に合わず大きすぎてゆるい様子を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ぶらぶら",
+      "reading": "ぶらぶら",
+      "pos": "adverb",
+      "meaning": "strolling aimlessly",
+      "defJa": "目的もなく歩きまわるさま",
+      "passage": {
+        "ja": "話のネタが尽きない人は、たいてい、日ごろからぶらぶら歩くのを楽しんでいます。目的を決めることなく街を歩くと、看板の言葉や、すれ違う人の会話など、思いがけない素材が目に飛びこんでくるからです。机に向かって考えこんでも出てこなかった話題が、散歩の途中で、ふと形になることも珍しくありません。話す力は、実は、街に漂う空気の中を歩きまわって集めた経験の量に支えられているのです。",
+        "form": "ぶらぶら",
+        "en": "People who never run out of things to talk about usually enjoy strolling around aimlessly in their daily lives. When you walk a town without fixing a purpose, unexpected material leaps into your eyes, such as the words on signs and the conversations of passersby. It is not rare for a topic that would not come while brooding at a desk to take shape suddenly during a walk. The power to speak is in fact supported by the amount of experience gathered by walking around in the air that drifts through a town.",
+        "register": "語",
+        "topic": "mind",
+        "tipJa": "「ぶらぶら歩く」の形で、目的を決めずにゆっくり歩く。足を揺らす意味もある。",
+        "sense": "目的なく歩きまわる"
+      }
+    },
+    {
+      "term": "ぺこぺこ",
+      "reading": "ぺこぺこ",
+      "pos": "adverb",
+      "meaning": "bowing and scraping",
+      "defJa": "何度も頭を下げて媚びるさま",
+      "passage": {
+        "ja": "取引先にぺこぺこ頭を下げる人が、必ずしも丁寧な話し手だとは限りません。本当の丁寧さにとって肝心なのは、姿勢の低さではなく、相手の話を最後まで聞く落ち着きです。これは、AIとの対話でも同じです。機械だからといって乱暴に命令するより、目的を順序立てて伝えるほうが、よい答えが返ってきます。言葉づかいは、相手のためである以上に、自分の思考を整える道具でもあるのです。",
+        "form": "ぺこぺこ",
+        "en": "A person who bows and scrapes to clients is not necessarily a polite speaker. What matters for true politeness is not lowness of posture but the composure to hear the other person out to the end. The same goes for conversations with AI. Even though it is a machine, laying out your purpose in order gets better answers than barking commands. Your choice of words is a tool for ordering your own thinking more than it is for the other party.",
+        "register": "語",
+        "topic": "ai",
+        "tipJa": "「ぺこぺこ頭を下げる」の形で、相手にへつらう様子を表す。空腹の意味もある。",
+        "sense": "何度も頭を下げて媚びる"
+      }
+    },
+    {
+      "term": "ぼつぼつ",
+      "reading": "ぼつぼつ",
+      "pos": "adverb",
+      "meaning": "here and there, bit by bit",
+      "defJa": "あちこちに少しずつ現れるさま",
+      "passage": {
+        "ja": "発掘調査が始まって二か月、地中から土器の破片がぼつぼつと見つかり始めている。調査団によると、これらは周辺の集落が最も栄えた時期に作られたものとみられ、出土した位置から、当時の暮らしの範囲を推定できる可能性がある。今年度の調査を皮切りに、ほかの遺跡で見つかった資料と照合し、年代を絞り込む方針だという。遺跡は文化財に登録される見通しで、成果の公表は年度末になる。",
+        "form": "ぼつぼつと",
+        "en": "Two months after the excavation began, fragments of pottery have started turning up here and there from the ground. According to the survey team, these are thought to have been made when the surrounding settlement was at its most prosperous, and from the positions where they were unearthed it may be possible to estimate the extent of life at the time. Starting with this fiscal year's survey, the team plans to cross-check against materials found at other sites and narrow down the dating. The site is expected to be registered as a cultural property, and the results will be announced at the end of the fiscal year.",
+        "register": "報",
+        "topic": "history",
+        "tipJa": "「ぼつぼつと見つかる」の形で、点々と少しずつ現れる様子を表す。",
+        "sense": "あちこちに少しずつ現れる"
+      }
+    },
+    {
+      "term": "ぼやける",
+      "reading": "ぼやける",
+      "pos": "verb",
+      "meaning": "to become blurred",
+      "defJa": "輪郭がはっきりしなくなる",
+      "passage": {
+        "ja": "瞑想を続けていると、「自分」と「世界」の境目が、だんだんぼやけてくる瞬間があると言います。アドヴァイタ・ヴェーダーンタは、この感覚を錯覚ではなく、本来の姿に気づく入り口だと考えます。この教えによれば、私たちが普段感じている「個」としての自分は、無知によって引かれた仮の線にすぎません。線が消えたあとに残るのは、何も足されていない、ただ在るという事実なのです。この見方は、瞑想が気分転換ではなく、問いの方法であることを教えてくれます。",
+        "form": "ぼやけて",
+        "en": "They say that as you continue meditating, there are moments when the boundary between self and world gradually blurs. Advaita Vedanta regards this sensation not as an illusion but as a doorway to noticing one's original nature. According to this teaching, the self we ordinarily feel as an individual is nothing more than a provisional line drawn by ignorance. What remains after the line disappears is the fact of simply being, with nothing added. This view teaches us that meditation is a method of inquiry, not a change of mood.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「境界・輪郭がぼやける」の形で、はっきりしていたものが曖昧になる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "まみれ",
+      "reading": "まみれ",
+      "pos": "other",
+      "meaning": "covered in, smeared with",
+      "defJa": "一面に汚れが付くこと",
+      "passage": {
+        "ja": "バラナシに行ったとき、いちばん驚いたのは、人も牛も灰色のほこりまみれなのに、誰もそれを気にしていないことでした。朝の沐浴場では、老若男女を問わず、祈る人と洗濯する人と遊ぶ子どもが、同じ川辺で当たり前のように混じり合っているんですよ。汚いとか神聖だとかを分ける線は、あの場所ではあまり意味をもたないのかもしれません。帰国してからも、私の中の「きれい」の基準は、ずっと曖昧なままです。",
+        "form": "まみれ",
+        "en": "When I went to Varanasi, what surprised me most was that people and cows alike were covered in gray dust and nobody minded it. At the bathing ghats in the morning, regardless of age or sex, people praying, people washing clothes, and children playing mingle at the same riverside as a matter of course. The line that separates the dirty from the sacred perhaps carries little meaning in that place. Even since coming home, my own standard of what is clean has stayed vague.",
+        "register": "話",
+        "topic": "india",
+        "tipJa": "「ほこりまみれ・泥まみれ」のように、名詞のあとに付いて汚れた状態を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "もろに",
+      "reading": "もろに",
+      "pos": "adverb",
+      "meaning": "head-on, directly",
+      "defJa": "まともに直接受けるさま",
+      "passage": {
+        "ja": "植民地支配の時代、インドの知識人は、西洋近代の価値観の影響をもろに受けた。ラーム・モーハン・ローイらの改革者は、理性を根拠として、サティー（寡婦殉死）などの慣行を批判する一方で、古い聖典の哲学を再評価しようとした。西洋の枠組みを取り入れることと、自らの伝統を守ることとは、その中でしばしば衝突した。しかし、その緊張から生まれた思想は、いまもインドの自己理解の土台となっている。",
+        "form": "もろに",
+        "en": "In the age of colonial rule, Indian intellectuals took the influence of modern Western values head-on. Reformers such as Ram Mohan Roy, taking reason as their ground, criticized practices such as sati, the self-immolation of widows, while also trying to reassess the philosophy of the old scriptures. Adopting Western frameworks and preserving their own tradition often collided within that effort. Yet the thought born of that tension remains the foundation of India's self-understanding even now.",
+        "register": "論",
+        "topic": "india",
+        "tipJa": "「影響・打撃をもろに受ける」の形で、緩衝なしに直接受けることを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ゆとり",
+      "reading": "ゆとり",
+      "pos": "other",
+      "meaning": "leeway, breathing room",
+      "defJa": "余裕があること",
+      "passage": {
+        "ja": "日本の「ゆとり教育」は、一九八〇年代以降の詰め込み教育への批判を背景に、二〇〇二年度から本格的に導入されました。授業時間と学習内容が削減され、子どもたちが自ら考える時間を確保することが狙いでした。しかし、学力低下を心配する声が高まり、二〇〇〇年代の後半には、方針の見直しを余儀なくされました。このように、教育の改革は、理念だけでなく、社会の期待との折り合いによっても形づくられていきます。",
+        "form": "ゆとり",
+        "en": "Japan's relaxed education was introduced in earnest from fiscal 2002, against a background of criticism of cram-style schooling from the 1980s on. Class hours and content were cut, with the aim of securing time for children to think for themselves. But voices worried about declining academic ability grew, and in the latter half of the 2000s the policy had to be reviewed. In this way, educational reform is shaped not only by ideals but also by compromise with society's expectations.",
+        "register": "学",
+        "topic": "other",
+        "tipJa": "「ゆとりがある・ゆとりを持つ」の形で、時間や心の余裕を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "よみがえる",
+      "reading": "よみがえる",
+      "pos": "verb",
+      "meaning": "to be revived, to come back to life",
+      "defJa": "一度失われたものが戻る",
+      "passage": {
+        "ja": "かつて仏教の学問の中心として栄えたナーランダ僧院は、十二世紀末ごろの侵攻で破壊され、長く廃墟のまま眠っていた。その遺跡は二〇一六年に世界遺産に登録され、発掘と保存が続けられている。その名を受け継ぐ大学が二〇一四年にインド東部のビハール州で授業を始め、古い学びの伝統がよみがえったと受け止める人も多い。ただし、古代の大学の姿をどこまで再現できるかは、なお議論の余地がある。",
+        "form": "よみがえった",
+        "en": "Nalanda Monastery, which once flourished as a center of Buddhist learning, was destroyed in an invasion around the end of the twelfth century and slept for a long time as ruins. The site was registered as a World Heritage Site in 2016, and excavation and conservation continue. A university bearing its name began teaching in 2014 in Bihar state in eastern India, and many take it to mean that the old tradition of learning has come back to life. Still, how far the ancient university can be recreated remains open to debate.",
+        "register": "報",
+        "topic": "india",
+        "tipJa": "「伝統・記憶がよみがえる」の形で、失われたものが再び力を得ることを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "エレガント",
+      "reading": "えれがんと",
+      "pos": "na-adj",
+      "meaning": "elegant",
+      "defJa": "上品で洗練されているさま",
+      "passage": {
+        "ja": "数学の世界では、短く無駄のない証明が、しばしばエレガントだと称賛される。日本語の同じ語は、上品で洗練された振る舞いを指すことが多く、この二つの使い方はかなり距離がある。語源をたどると、英語のもとになったラテン語は、「選び抜く」という動詞と近い関係にあるとされる。外来語は、日本に入るのに伴って、意味の一部が削られ、別の色を帯びるという現象がよく起こる。言葉の旅は、意味の変化をたどる楽しみでもある。",
+        "form": "エレガント",
+        "en": "In the world of mathematics, a short proof without waste is often praised as elegant. The same word in Japanese is mostly used for refined, graceful conduct, and these two usages are quite far apart. Tracing its etymology, the Latin behind the English word is said to be closely related to a verb meaning to choose out. Loanwords often undergo a phenomenon in which, as they enter Japan, part of the meaning is pared away and they take on a different coloring. Tracing the journey of a word is also the pleasure of following how its meaning changes.",
+        "register": "報",
+        "topic": "language",
+        "tipJa": "数学では無駄のない美しさ、日本語では上品さと、語の重なりがずれる例。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "カンニング",
+      "reading": "かんにんぐ",
+      "pos": "other",
+      "meaning": "cheating on an exam",
+      "defJa": "試験で不正に答えを見ること",
+      "passage": {
+        "ja": "試験で他人の答案を盗み見ることを日本語ではカンニングと言いますが、これは英語圏ではあまり通じません。もとになった英語の語が「ずる賢い」という意味であることから、不正行為そのものを指すわけではないのです。試験中に不正が見つかれば、答案は没収されますが、英語ではその行為を別の動詞で表すのが普通です。和製英語は、日本語に入ってから意味がずれていく様子を観察できる、絶好の材料です。",
+        "form": "カンニング",
+        "en": "Peeking at another person's answer sheet during an exam is called kanningu in Japanese, but this is not well understood in the English-speaking world. Because the English word it came from means sly, it does not refer to the act of cheating itself. If cheating is found during an exam the answer sheet is confiscated, but in English the act is usually expressed with a different verb. Japanese-made English is excellent material for watching meanings drift after a word enters Japanese.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "和製英語で、「ずる賢い」という元の意味から、試験の不正へずれた例。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ガレージ",
+      "reading": "がれーじ",
+      "pos": "other",
+      "meaning": "garage",
+      "defJa": "自動車をしまう建物",
+      "passage": {
+        "ja": "起業の歴史を学ぶと、意外なほど多くの物語が、ガレージから始まっていることに気づきます。ヒューレット・パッカードは一九三九年にカリフォルニア州パロアルトの小さな車庫で創業され、その建物は、のちに州の史跡に登録されました。意外なことに、資金も設備も乏しいながらも、彼らは限られた条件を逆手にとって、有望な製品を次々に試していったのです。制約は、ときに最良の教師になります。",
+        "form": "ガレージ",
+        "en": "If you study the history of starting companies, you notice that surprisingly many stories begin in a garage. Hewlett-Packard was founded in 1939 in a small garage in Palo Alto, California, and the building was later registered as a state historical landmark. Surprisingly, though short of funds and equipment, they turned their limited conditions to advantage and tried one promising product after another. Constraints sometimes make the best teachers.",
+        "register": "学",
+        "topic": "ai",
+        "tipJa": "創業の物語でガレージと言えば、小さな出発点を示す象徴になる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "サイズ",
+      "reading": "さいず",
+      "pos": "other",
+      "meaning": "size",
+      "defJa": "物の大きさや寸法",
+      "passage": {
+        "ja": "話の長さにも、ちょうどいいサイズがあります。三分の話を二十分に引き延ばせば、聞き手は途中で集中を失いますが、逆に短すぎると、中身が伝わりません。大切なのは、伝えたい要旨を一つに絞り、それが収まる器を選ぶことです。結婚式のスピーチでも会議の報告でも、まず時間の枠を決めてから中身を削る作業が欠かせません。話し上手な人は、場面に応じて話の寸法を変えられる柔軟さを備えています。",
+        "form": "サイズ",
+        "en": "Talks too have a size that is just right. If you stretch a three-minute talk to twenty minutes, listeners lose focus partway through, but conversely, if it is too short, the content does not get across. What matters is to narrow down the gist you want to convey to one point and choose a container it fits into. Whether a wedding speech or a meeting report, the work of fixing the time frame first and then trimming content is indispensable. Good speakers have the flexibility to change the dimensions of a talk to suit the occasion.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "「話のサイズ」のように、洋服以外でも大きさや規模の意味で広く使う。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "シック",
+      "reading": "しっく",
+      "pos": "na-adj",
+      "meaning": "chic",
+      "defJa": "落ち着いて洗練されたさま",
+      "passage": {
+        "ja": "インドの女性が着るサリーといえば、鮮やかな色の布を想像しがちですが、黒や濃紺を選んだシックな一枚には、見る人を静かに引きつける力があります。話し方にも同じことが言えて、声を張り上げて印象づけるというより、抑えた調子で語るほうが、言葉の重みが伝わることがあります。派手さに頼らず、核心だけを残すに限ります。それが、聞き手の信頼を得る近道なのです。沈黙さえ、うまく使えば、立派な表現になります。",
+        "form": "シック",
+        "en": "When it comes to the sari that Indian women wear, we tend to imagine cloth in vivid colors, but a chic one chosen in black or navy has a power that quietly draws the viewer in. The same can be said of speaking: rather than impressing by raising the voice, speaking in a restrained tone sometimes conveys the weight of words. Without relying on showiness, nothing beats leaving only the core. That is the shortcut to gaining the listener's trust. Even silence, used well, becomes a fine form of expression.",
+        "register": "語",
+        "topic": "other",
+        "tipJa": "「シックな装い・色」の形で、派手さを抑えた落ち着いた上品さを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ジャンル",
+      "reading": "じゃんる",
+      "pos": "other",
+      "meaning": "genre",
+      "defJa": "作品などの種類や分野",
+      "passage": {
+        "ja": "映画のジャンルって、よく考えると、すごく曖昧じゃないですか。ホラーなのに笑えるとか、SFなのに恋愛の話だったりして、一つの箱に収まらない作品のほうが、むしろ記憶に残るんですよね。言葉もそれと同じで、方言か標準語か、書き言葉か話し言葉かなんて、きっぱり分けられない中間のゾーンが、いちばん面白いと思います。標準語はもちろん、方言の色も混ざった言い方には、その人の育ちが出るものです。",
+        "form": "ジャンル",
+        "en": "When you think about it, the genres of films are really vague, aren't they? A film that is horror yet funny, or sci-fi yet a love story, the kind that won't fit in a single box, tends to stay in memory all the more. Language is the same: I think the in-between zone that cannot be cleanly divided into dialect or standard, written or spoken, is the most interesting. Not to mention standard Japanese, a way of speaking tinged with the color of dialect shows where a person was raised.",
+        "register": "話",
+        "topic": "language",
+        "tipJa": "「映画のジャンル」のように、作品や音楽などを種類で分ける言葉。",
+        "sense": ""
+      }
+    }
+  ]
+}

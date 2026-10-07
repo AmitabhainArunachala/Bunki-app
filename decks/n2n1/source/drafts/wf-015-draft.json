@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "基盤",
+   "reading": "きばん",
+   "pos": "noun",
+   "meaning": "foundation, basis",
+   "defJa": "物事を支える土台となるもの",
+   "passage": {
+    "ja": "人間の学習には、実は三階建ての構造があるといわれます。いちばん下の基盤にあたるのが、睡眠と運動という当たり前の土台です。その上に毎日の習慣が乗り、さらにその上に、知識や技術が少しずつ積み上がっていきます。朝の十分間の散歩や、夜ふかしをやめる小さな決心を、軽く見てはいけません。土台が崩れかけているのに、新しい勉強法ばかり磨いても、成果が伸びるわけがありません。",
+    "form": "基盤",
+    "en": "Human learning is said to have a three-story structure. The foundation at the very bottom is the obvious base of sleep and exercise. On top of that sit daily habits, and above them knowledge and skills pile up little by little. Do not underestimate a ten-minute morning walk or the small resolve to stop staying up late. If the footing is already crumbling, there is no way results will grow just from polishing new study methods.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「基盤にあたる」「基盤を築く」のように、物事を支える土台の意味で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "夕闇",
+   "reading": "ゆうやみ",
+   "pos": "noun",
+   "meaning": "dusk, twilight",
+   "defJa": "日が暮れて暗くなりかける頃",
+   "passage": {
+    "ja": "窓の外に夕闇が降りてくる頃、研究室の画面では、学習の誤差がまだ下がり続けていました。この仕組みを知らずに欲張ってモデルを大きくすると、過学習に陥りかねません。止めどきを見極めるのも、立派な技術です。経験を積んだ研究者ほど、派手な新手法を試す前に、この地味な見極めへ時間をかけるものです。夜が更けるにつれ、部屋に残っているのは、計算機の唸りだけになっていきました。",
+    "form": "夕闇",
+    "en": "As dusk settled outside the window, the training error on the lab screen was still dropping. If you enlarge the model greedily without knowing this mechanism, you may well fall into overfitting. Knowing when to stop is also a real skill. The more experienced the researcher, the more time they spend on this plain judgment before trying a flashy new method. As the night deepened, all that remained in the room was the hum of the computers.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「夕闇が迫る・降りる」の形で、日暮れの薄暗さを表す文章語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多岐",
+   "reading": "たき",
+   "pos": "na-adj",
+   "meaning": "wide-ranging, many-branched",
+   "defJa": "いくつにも分かれて広がること",
+   "passage": {
+    "ja": "世界史が苦手だという人は、出来事の膨大さに圧倒されているだけです。たとえば大航海時代ひとつとっても、航海術や香辛料の貿易はもちろん、宗教や銀の流通まで、話題は多岐に及びます。ばらばらに覚えるのではなく、まず大まかな原因と結果の糸でつなぐのがコツです。糸が一本通れば、暗記の量は驚くほど減ります。地図の上で、点ではなく線で歴史を追う癖がつくと、新しい時代に出会っても慌てずに済みます。",
+    "form": "多岐",
+    "en": "People who say they are bad at world history are often simply overwhelmed by the sheer number of events. Take the Age of Discovery alone: the topics range widely, from navigation and the spice trade to religion and the flow of silver. The trick is not to memorize things separately but first to connect them with a rough thread of cause and effect. Once one thread runs through, the amount you have to memorize drops surprisingly. Once you get into the habit of following history as lines rather than points on a map, you will not panic when you meet a new era.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「多岐にわたる」「多岐に及ぶ」の形で、分野や内容の広がりを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大げさ",
+   "reading": "おおげさ",
+   "pos": "na-adj",
+   "meaning": "exaggerated",
+   "defJa": "実際よりも誇張した様子",
+   "passage": {
+    "ja": "話を盛るな、とはよく言われるものの、大げさな言い方を全部やめると、今度は何も伝わらなくなる。大切なのは、誇張の量ではなく、聞き手が笑って許せる範囲かどうかだ。身振りだけ大きくして中身が平凡なら、すぐに見抜かれてしまう。たとえば笑い話では、聞き手が本当だと信じかけたところへ盛りをひと匙足すと、驚きが一番よく生きる。熱は、事実の重みに支えられて初めて、説得力に変わる。",
+    "form": "大げさ",
+    "en": "People often say not to embellish a story, yet if you drop every exaggerated phrasing, nothing gets across at all. What matters is not the amount of exaggeration but whether the listener can laugh and forgive it. If your gestures are big but the content is ordinary, you will be seen through at once. In a funny story, for instance, a spoonful of embellishment added just where the listener is about to believe it brings the surprise most to life. Enthusiasm becomes persuasive only when the weight of the facts supports it.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「大げさな言い方」「大げさに言う」のように、誇張の度合いを問題にする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大まか",
+   "reading": "おおまか",
+   "pos": "na-adj",
+   "meaning": "rough, broad",
+   "defJa": "細部にこだわらず全体をとらえる様子",
+   "passage": {
+    "ja": "辞書が示す語義は、言葉の動きを大まかに区切った地図にすぎない。実際の用法は、その境界を平気でまたぎ、文脈ごとに色を変えていく。地図を暗記したところで、旅をしたことにはならないのと同じである。ゆえに、言葉の習得とは、語義の暗記ではなく、用例の中を巡ることにほかならない。辞書を引く目的は、正解を確かめることより、言葉の輪郭が揺れる場所を見つけることにあるのではないか。",
+    "form": "大まか",
+    "en": "The senses a dictionary lists are merely a map that divides the movement of words roughly. Actual usage casually crosses those borders and changes color with each context. Memorizing a map does not mean you have made a journey. Hence, acquiring a language is not memorizing senses but nothing other than traveling through examples. Perhaps the point of consulting a dictionary lies less in confirming the right answer than in finding the places where a word's outline wavers.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「大まかに区切る」「大まかな流れ」のように、細部を捨てて全体をつかむ意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大惨事",
+   "reading": "だいさんじ",
+   "pos": "noun",
+   "meaning": "catastrophe, disaster",
+   "defJa": "多くの被害や犠牲を出す大きな事故",
+   "passage": {
+    "ja": "失敗の研究では、大惨事ほど一つの原因では片づかないと教えます。1984年にインドのボパールで起きた農薬工場の有毒ガス漏出事故は、その代表例です。安全対策の不備が重なっていたと指摘されています。航空事故の調査報告書が、個人の責任の追及より、仕組みを改める提言に紙面を割くのも、そのためです。勉強の失敗も工場に限らず同じで、小さな穴が三つ重なると、取り返しがつきません。",
+    "form": "大惨事",
+    "en": "Failure studies teach that the worse the catastrophe, the less it can be settled by a single cause. The toxic gas leak at a pesticide plant in Bhopal, India, in 1984 is a representative example. Lapses in safety measures are said to have piled up. That is also why aviation accident reports devote their pages to recommendations for changing the system rather than pursuing individual blame. The same goes for failures in study, not just factories: when three small holes line up, there is no recovering.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「大惨事を招く」「大惨事になる」のように、取り返しのつかない被害に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大規模",
+   "reading": "だいきぼ",
+   "pos": "na-adj",
+   "meaning": "large-scale",
+   "defJa": "仕組みや範囲が大きいこと",
+   "passage": {
+    "ja": "国立国語研究所は、全国各地の方言を記録する大規模な調査を、長年にわたって続けてきた。若い世代ほど方言が薄れているとはいえ、語尾や抑揚には地域差が依然として残る。研究者たちは、消えつつある語彙を録音するとともに、使われ方の変化を追っている。調査の成果は、教育の現場や地域の言葉の保存にも役立てられている。言葉の変化は、辞書の改訂を待たずに、人々の暮らしの中で静かに、しかし確実に進んでいる。",
+    "form": "大規模",
+    "en": "The National Institute for Japanese Language and Linguistics has for many years continued a large-scale survey that records dialects across the country. Although dialects are fading faster among younger generations, regional differences still remain in sentence endings and intonation. The researchers are recording vocabulary that is disappearing while also tracking changes in how it is used. The results are also put to use in schools and in preserving local speech. Language change does not wait for dictionary revisions; it proceeds quietly but surely within people's daily lives.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「大規模な調査・工事・災害」のように、規模の大きさを硬い文で述べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "奇数",
+   "reading": "きすう",
+   "pos": "noun",
+   "meaning": "odd number",
+   "defJa": "二で割り切れない整数",
+   "passage": {
+    "ja": "日本の美意識には、奇数を好む傾向がある。七五三や三三九度のように、祝いごとの場面には、三や五や七といった数が好んで並ぶ。生け花でも、三本の枝を組む型が基本とされ、左右対称の均整より、あえて残した余白が尊ばれる。偶数は二つに割り切れてしまうが、そうでない数は、いつも小さな余りを残す。その余りがあればこそ、見る者の心は、宙に遊ぶように自由でいられるのかもしれない。",
+    "form": "奇数",
+    "en": "Japanese aesthetics tend to favor odd numbers. On auspicious occasions, threes, fives and sevens line up, as in Shichi-Go-San and the sansankudo wedding sake ritual. In ikebana too, a form built from three branches is basic, and a deliberately left blank space is prized over symmetrical balance. Even numbers divide cleanly, but other numbers always leave a remainder. Perhaps it is precisely because of that remainder that the viewer's mind can wander freely.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "「奇数」は偶数の対。二で割れず、余りが出る数を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "妥当",
+   "reading": "だとう",
+   "pos": "na-adj",
+   "meaning": "valid, appropriate",
+   "defJa": "状況に合っていて無理がないこと",
+   "passage": {
+    "ja": "AIに原稿を直させるとき、出てきた案が妥当かどうかを決めるのは、結局のところ書き手自身だ。機械を使いこなす鍵は、もっともらしい言い回しを並べさせることではなく、その場の空気に合うかを自分の耳で確かめることにある。声に出して違和感が残る箇所は、遠慮なく自分の言葉に戻す。直されるそばから鵜呑みにしていては、文章が平均へと近づいていく。平均的に正しい文章は、誰の記憶にも残らない。",
+    "form": "妥当",
+    "en": "When you have an AI revise a draft, it is in the end the writer who decides whether the proposed version is appropriate. The key to mastering the machine lies not in having it line up plausible phrasings but in checking by ear whether they suit the moment. Where something feels off when read aloud, go back to your own words without hesitation. If you swallow each edit the instant it is made, your writing drifts toward the average. A text that is correct on average stays in no one's memory.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「妥当な案・判断」のように、無理がなく筋が通っていることを評価する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "妨げる",
+   "reading": "さまたげる",
+   "pos": "verb",
+   "meaning": "to obstruct, to hinder",
+   "defJa": "物事の進行を邪魔してとめる",
+   "passage": {
+    "ja": "ジャレド・ダイアモンドって人がさ、ユーラシアは東西に長いから作物が広まりやすかった、って言ってるじゃないですか。逆にアフリカやアメリカ大陸は南北に長くて、気候の違いが作物の広がりを妨げたっていうんです。もちろん、東西に長いからといって全部が決まるわけじゃないですけど。でも地図を眺めるだけで仕組みが見えてくるって、面白くないですか？地理は運命ではないにしても、舞台装置として無視はできないんです。",
+    "form": "妨げた",
+    "en": "Jared Diamond, you know, says Eurasia's long east-west axis made it easier for crops to spread. By contrast, Africa and the Americas run north to south, and he says differences in climate hindered the spread of crops. Of course, just because it runs east to west does not mean everything is decided. But isn't it fascinating that you can see the mechanism just by looking at a map? Even if geography is not destiny, you can't ignore it as the stage setting.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「〜を妨げる」で、広がりや進行を邪魔する。主語は条件や障害。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "威張る",
+   "reading": "いばる",
+   "pos": "verb",
+   "meaning": "to swagger, to lord it over",
+   "defJa": "偉そうに振る舞うこと",
+   "passage": {
+    "ja": "古代ローマの属州では、徴税を請け負った民間業者が、取り立ての強引さで住民の反感を買った。権力を笠に着て威張る者が現れれば、不満は一気に広がる。そのため、総督による監督は、統治の安定を左右する課題となっていた。とはいえ、遠い属州で目を光らせ続けるのは、容易ではなかったと考えられる。遠い属州の住民にとって、ローマとは、結局のところ、目の前の徴税人の顔にほかならなかったのだろう。",
+    "form": "威張る",
+    "en": "In the provinces of ancient Rome, private contractors who took on tax collection earned the resentment of residents through their forceful collecting. Once someone who swaggered, trading on his power, appeared, discontent spread all at once. Supervision by the governor therefore became an issue that shaped the stability of rule. Even so, it is thought that keeping a watchful eye in a distant province was not easy. For residents of a far province, Rome may in the end have been nothing other than the face of the tax collector before their eyes.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「権力を笠に着て威張る」のように、地位を盾に偉そうにする悪い意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "安堵",
+   "reading": "あんど",
+   "pos": "noun",
+   "meaning": "relief",
+   "defJa": "心配が消えてほっとすること",
+   "passage": {
+    "ja": "戦国の武将ってさ、勝つ側につくのは命がけだけに、読みを誤れば一族ごと消えるじゃないですか。関ヶ原のあと、領地を取り上げられずに済んだ大名は、心底安堵しただろうなって思うんですよ。逆に、西軍についた毛利は大きく減らされたわけで、この差が後の幕末まで響くんです。勝ち負けの実情は、いつも紙一重なんですよね。歴史の教科書には出てこない、そういう人間くさい感情を想像すると、急に面白くなりませんか？",
+    "form": "安堵",
+    "en": "Warlords of the Sengoku era, you see, risked their lives choosing the winning side, so one misjudgment could wipe out a whole clan. I imagine the daimyo who were not stripped of their domains after Sekigahara felt deep relief. Mori, on the other hand, sided with the Western Army and was cut down sharply, and that gap echoes all the way to the end of the shogunate. The reality of winning and losing is always a hair's breadth apart. Doesn't it suddenly get interesting when you imagine such human feelings that never show up in textbooks?",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「安堵の息をつく」「胸をなで下ろして安堵する」。ほっとする気持ち。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "安易",
+   "reading": "あんい",
+   "pos": "na-adj",
+   "meaning": "easy-going, facile",
+   "defJa": "深く考えず手軽に済ませる様子",
+   "passage": {
+    "ja": "AIに答えをすぐ聞ける今、学習で危ないのは、安易に頼ってしまうことです。答えを自分の中から引き出す過程こそが、記憶を強くすると言われています。まず自力で考え、行き詰まってから使えば、AIは強力な家庭教師になります。答えを丸写しするだけなら、勉強したつもりで終わるおそれがあります。苦労が減ること自体は悪くありませんが、減らしてはいけない苦労まで手放さないよう、注意が必要です。",
+    "form": "安易",
+    "en": "Now that you can ask an AI for the answer instantly, the danger in learning is relying on it too easily. The process of drawing the answer out of yourself is said to be what strengthens memory. If you think on your own first and use it once you are stuck, the AI becomes a powerful tutor. If you just copy the answer, you risk ending with only the feeling of having studied. Less hardship is not bad in itself, but care is needed not to let go of even the hardship that must not be reduced.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「安易に頼る・考える」のように、手軽さへの警告を含む評価語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "完璧",
+   "reading": "かんぺき",
+   "pos": "na-adj",
+   "meaning": "perfect, flawless",
+   "defJa": "欠点がまったくないこと",
+   "passage": {
+    "ja": "ダ・ヴィンチみたいに偉い芸術家でも、完璧を求めすぎて未完成のまま手放した作品がいくつもあるんですよ。《東方三博士の礼拝》なんかもそうです。依頼主を待たせたあげく、結局ミラノへ旅立ってしまったんですね。完成させるより次の興味に移る人だったんでしょうね。理想が高い人に言いたいんですけど、巨匠でさえ未完成と折り合いをつけながら次へ進んでいたんですから、もう少し肩の力を抜いていいと思うんですよ。",
+    "form": "完璧",
+    "en": "Even a great artist like da Vinci left several works unfinished because he demanded perfection. The Adoration of the Magi is one such case. After keeping his client waiting, he ended up leaving for Milan. He was probably the kind of person who moved on to the next interest rather than finish. To those with high ideals, I'd say even a master went on to the next thing while making peace with the unfinished, so I think you can relax your shoulders a little.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「完璧を求める」「完璧主義」。欠点のなさを理想とする語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宙",
+   "reading": "ちゅう",
+   "pos": "noun",
+   "meaning": "midair; left hanging",
+   "defJa": "地面から離れた空中のところ",
+   "passage": {
+    "ja": "技術発表で「精度は九割です」と言ったきり、話が宙に浮いてしまうことがある。聞き手が知りたいのは、残りの一割に隠れた実情だ。数字は、意味とセットで初めて言葉になる。半導体の歩留まりでも、モデルの精度でも、事情は変わらない。たとえば歩留まりが八割だと聞いても、残りの二割が検査で外れた不良品なのか、使えはするが動作の遅いものなのかで、次に打つべき手はまるで違ってくる。",
+    "form": "宙",
+    "en": "In technical talks, someone says \"accuracy is ninety percent\" and then the talk is left hanging in midair. What the audience wants to know is the real situation hidden in the remaining ten percent. A number becomes language only when paired with its meaning. The situation is the same for semiconductor yield and for model accuracy. Even if you hear a yield is eighty percent, the next move to make is wholly different depending on whether the remaining twenty percent are defective chips that failed inspection or chips that work but run slowly.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「宙に浮く」は、決着がつかず中途半端な状態に置かれることも表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "実情",
+   "reading": "じつじょう",
+   "pos": "noun",
+   "meaning": "actual situation",
+   "defJa": "表からは見えにくい本当の事情",
+   "passage": {
+    "ja": "生成AIの普及に伴い、データセンターの電力消費が各国で問題になっている。ただ、実情を正確に示す統計はまだ少なく、事業者ごとの公表も限られる。そのため、電力会社や自治体は、見通しの立てにくい状況での設備計画を余儀なくされている。省エネ型の半導体の開発は、その対策の一つとして期待されている。足元の数字が十分にそろわないうちは、拙速な結論を避け、慎重に議論を進める姿勢が求められる。",
+    "form": "実情",
+    "en": "With the spread of generative AI, power consumption by data centers has become a problem in many countries. Yet statistics that accurately show the actual situation remain scarce, and disclosure by operators is limited. As a result, utilities and municipalities are forced to plan facilities under hard-to-predict conditions. The development of energy-saving semiconductors is expected to be one countermeasure. Until the figures at hand are sufficiently in, an attitude of avoiding hasty conclusions and proceeding carefully with debate is called for.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「実情を把握する・に合わせる」のように、現場の本当の事情を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宣伝",
+   "reading": "せんでん",
+   "pos": "noun",
+   "meaning": "publicity, propaganda",
+   "defJa": "広く知らせて人を引きつけること",
+   "passage": {
+    "ja": "第一次世界大戦では、各国政府がポスターや新聞を通じて盛んに宣伝を行い、国民の戦意を高めようとした。敵国を悪く描く図像は、憎しみをあおる一方で、戦争の終結を難しくしたとも指摘される。国家が情報を管理するやり方は、この戦争を境に大きく変わった。その仕組みは、のちの時代にも受け継がれていく。ポスターに描かれた力強い兵士や母親の姿は、今も各地の戦争博物館で目にすることができる。",
+    "form": "宣伝",
+    "en": "In the First World War, governments carried out lively propaganda through posters and newspapers in an attempt to raise the public's fighting spirit. Images portraying the enemy as evil stirred up hatred while also, it is pointed out, making an end to the war harder. The way states manage information changed greatly from this war onward. That mechanism would be inherited by later eras. The powerful figures of soldiers and mothers drawn on the posters can still be seen today in war museums in various places.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「宣伝を行う」。商品の広告にも、政治的な情報操作にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "寄せる",
+   "reading": "よせる",
+   "pos": "verb",
+   "meaning": "to draw near; to lend (heart)",
+   "defJa": "近くへ移したり向けたりする",
+   "passage": {
+    "ja": "歴史の語りが上手い人は、年表をなぞるより、伝記を読むように人物に心を寄せる。たとえば古い戦いの話なら、勝敗の数字や戦力の比較より先に、一兵士が遠い故郷へ送った手紙から入るに限る。聞き手は、その手紙を書いた人の不安や期待を、いつのまにか自分のものとして感じ始めるからだ。数字や年号は、そのあとで落ち着いて添えればいい。順番を変えるだけで、同じ史実が、まるで別物のように生き生きと響く。",
+    "form": "寄せる",
+    "en": "Those who tell history well draw close to people, as if reading a biography, rather than tracing the timeline. For a story of a battle, for instance, nothing beats entering through a letter one soldier sent home, before any figures of victory or defeat. The listener begins to feel the anxiety and hope of the person who wrote it as their own. Numbers and dates can be added afterward. Changing only the order makes the same facts ring like something else entirely.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「心を寄せる」で、相手に関心や共感を向ける意味になる。",
+    "sense": "心や関心を向ける"
+   }
+  },
+  {
+   "term": "寮",
+   "reading": "りょう",
+   "pos": "noun",
+   "meaning": "dormitory",
+   "defJa": "学生や社員が共同で暮らす宿舎",
+   "passage": {
+    "ja": "旧制高校の寮は、寝泊まりの場であるのみならず、若者が議論と歌声で互いを鍛える共同体であった。そこでは、教師よりも、先輩や同室の仲間から多くを学んだ者が少なくなかったという。伝統的に守られてきた自治の気風も、そうした暮らしの中で育まれた。知識は書物からも得られるが、人との摩擦からしか得られない種類の学びがある。自分の部屋の外にこそ学びの場があることを、昔の学生たちは身をもって知っていたのだろう。",
+    "form": "寮",
+    "en": "The dormitories of the old-system higher schools were not only places to sleep but communities where young men trained one another through debate and song. It is said that not a few learned more from seniors and roommates than from teachers. The spirit of self-government that was traditionally maintained was also nurtured in such daily life. Knowledge can come from books, but there is a kind of learning obtained only through friction with people. Students of old probably knew firsthand that the place for learning lay outside their own rooms.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「寮」は学生や社員の共同の宿舎。「寮生活」「学生寮」など。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "寺院",
+   "reading": "じいん",
+   "pos": "noun",
+   "meaning": "temple",
+   "defJa": "僧が住み修行や礼拝を行う建物",
+   "passage": {
+    "ja": "記憶の宮殿という方法では、よく知っている建物を頭の中で歩き、各部屋に覚えたい物を置いていきます。たとえば、毎年訪れる寺院を思い浮かべ、門、本堂、鐘楼の順に単語を一つずつ置くのです。場所の順番がそのまま思い出す順番になる仕掛けなので、忘れかけた項目も手繰り寄せやすくなります。ただし、細かく作り込みすぎると、準備だけで疲れてしまいます。慣れてくると、旅先の街並みさえ記憶の置き場になります。",
+    "form": "寺院",
+    "en": "In the method of the memory palace, you walk through a familiar building in your head and place things you want to remember in each room. For example, you picture a temple you visit every year and set one word each at the gate, the main hall and the bell tower, in that order. Because the order of places becomes the order of recall, even items you are starting to forget are easier to pull back. However, if you build it too elaborately, preparation alone will wear you out. Once you get used to it, even the streets of a travel destination become a place to store memories.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「寺院」は寺の建物全体を指す硬めの語。本堂・鐘楼などを含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対照的",
+   "reading": "たいしょうてき",
+   "pos": "na-adj",
+   "meaning": "contrasting",
+   "defJa": "二つを比べると違いがはっきりする様子",
+   "passage": {
+    "ja": "AIの規制をめぐる各国の姿勢は、驚くほど対照的だ。欧州連合は、リスクの大きさに応じて用途を分類する包括的な法律を成立させた。一方、米国は、業界の自主的な取り組みを重んじる傾向が強いと言われる。この違いは、速い技術の進歩に法律が追いつけるのか、また規制が新しい技術の芽を摘まないかという、根深い問いの表れでもある。どちらが妥当かという問いへの答えは、まだ出ていない。",
+    "form": "対照的",
+    "en": "The stances of countries over AI regulation are strikingly contrasting. The European Union enacted a comprehensive law that classifies uses according to the size of the risk. The United States, on the other hand, is said to lean strongly toward respecting voluntary industry efforts. This difference also expresses a deep question: whether law can keep up with fast technological progress, and whether regulation might nip new technologies in the bud. The answer to which is appropriate has not yet emerged.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「AとBは対照的だ」「対照的な姿勢」。二つの差を際立たせる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対策",
+   "reading": "たいさく",
+   "pos": "noun",
+   "meaning": "countermeasure",
+   "defJa": "問題や事態に応じて立てる手だて",
+   "passage": {
+    "ja": "世界史の入試対策で、いちばん効くのは年表の暗記ではなく、同時代の出来事を横に並べることです。たとえば十三世紀なら、モンゴル帝国の拡大と、日本の鎌倉幕府を、一枚の紙に書きます。地域をまたいで見ると、ばらばらだった知識が、一本の流れとしてつながり始めます。知識を整理する上で、この作業を週に一度続けるだけでも効果があります。年表より地図と横のつながり、というのが、遠回りに見えて実は最短の道です。",
+    "form": "対策",
+    "en": "In exam preparation for world history, what works best is not memorizing the timeline but lining up contemporaneous events side by side. In the thirteenth century, for example, you write the expansion of the Mongol Empire and Japan's Kamakura shogunate on one sheet. Looking across regions, knowledge that was scattered begins to connect as a single flow. In organizing knowledge, even continuing this task once a week is effective. Putting the map and horizontal links ahead of the timeline looks like a detour but is in fact the shortest path.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「入試対策」「感染症対策」のように、「〜対策」の形で目的を示す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "属する",
+   "reading": "ぞくする",
+   "pos": "verb",
+   "meaning": "to belong to",
+   "defJa": "ある集団や分類に入っていること",
+   "passage": {
+    "ja": "不二一元論は、ヴェーダーンタ学派に属する。ヴェーダーンタは、ヴェーダの権威を認める六つの正統派の一つである。一方、仏教やジャイナ教は、その権威を認めないため、非正統派に分類される。ちなみに、アドヴァイタが説く一元論は、同じヴェーダーンタの中でも、二元論や限定不二論とは異なる立場として区別される。大まかな地図として言えば、分類の線引きは、教えの優劣ではなく、聖典への態度にほかならない。",
+    "form": "属する",
+    "en": "Advaita belongs to the Vedanta school. Vedanta is one of the six orthodox schools that accept the authority of the Vedas. Buddhism and Jainism, by contrast, do not accept that authority and so are classified as heterodox. Incidentally, the monism Advaita teaches is distinguished, even within Vedanta, as a position different from dualism and qualified non-dualism. As a rough map, the dividing line is not the merits of the teachings but nothing other than the attitude toward scripture.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「〜に属する」の形で、集団・分野・学派の一員であることを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "山",
+   "reading": "～さん",
+   "pos": "other",
+   "meaning": "mountain (-san)",
+   "defJa": "高くそびえ立つ大きな地形",
+   "passage": {
+    "ja": "日本の仏教を学ぶとき、比叡山は避けて通れません。中国での修学を経て、天台宗を開いた最澄は、教えを日本に根づかせようとしました。のちに法然、親鸞、道元、日蓮といった人たちが、強い使命感を持ってこの地で修行しています。いま延暦寺を訪れる人は、杉木立に包まれた静けさと、そこに積み重なった歴史の厚みに、思わず足を止めるでしょう。鎌倉仏教の多彩な顔ぶれは、ここから旅立っていきました。",
+    "form": "山",
+    "en": "You cannot avoid Mount Hiei when studying Japanese Buddhism. After studying in China, Saicho, who founded the Tendai school, tried to root the teachings in Japan. Later, figures such as Honen, Shinran, Dogen and Nichiren trained in this place with a strong sense of mission. Those who visit Enryaku-ji today will surely stop in their tracks at the stillness wrapped in cedar groves and the thickness of history piled up there. The varied faces of Kamakura Buddhism set out from here.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「比叡山」「高野山」のように、固有名詞の後ろで「〜さん」と読む。",
+    "sense": "地名の後ろにつく「さん」"
+   }
+  },
+  {
+   "term": "島",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "island (-tou)",
+   "defJa": "海に囲まれた陸地",
+   "passage": {
+    "ja": "1835年、ダーウィンはガラパゴス諸島に立ち寄りました。採集した鳥の違いが重要だと気づいたのは、実は帰国して標本を整理してからです。それぞれの環境に合わせて、少しずつ姿を変えていく生き物たち。この観察をきっかけに、のちの進化論の基盤が形づくられていきます。ちなみに、ダーウィン自身は、五年に及ぶ航海のあいだ、ひどい船酔いに悩まされ続けていたことでも知られています。",
+    "form": "島",
+    "en": "In 1835 Darwin stopped at the Galapagos Islands. He realized the differences among the birds he collected were important only after returning home and sorting the specimens. Living things that change their form little by little to suit each environment. Taking this observation as the occasion, the foundation of the later theory of evolution took shape. Incidentally, Darwin himself is also known to have been plagued by severe seasickness throughout the five-year voyage.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「諸島」「半島」のように、漢語の中では「とう」と読む。",
+    "sense": "漢語の後ろで「とう」と読む"
+   }
+  },
+  {
+   "term": "崩す",
+   "reading": "くずす",
+   "pos": "verb",
+   "meaning": "to destroy, to undermine",
+   "defJa": "まとまった形や状態をこわすこと",
+   "passage": {
+    "ja": "ローマの皇帝たちは、大規模な軍を養うために、銀貨に含まれる銀の量をじりじり減らしました。目先の出費は乗り切れても、貨幣への信頼を崩すことになり、物価は上がり続けます。これが三世紀の混乱の一因だったと考えられています。信用が一度落ちると、立て直すのに何十年もかかりかねません。通貨の信用を守ることは、軍事力を保つことと同じくらい、国家の根幹にかかわる仕事だったのです。",
+    "form": "崩す",
+    "en": "To support a large army, Roman emperors steadily reduced the amount of silver in their coins. They could get through immediate expenses, but this undermined trust in the currency, and prices kept rising. This is thought to have been one cause of the turmoil of the third century. Once credit falls, rebuilding it could take decades. Protecting the credit of the currency was work as basic to the state as maintaining military power.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「信頼を崩す」「バランスを崩す」。まとまりや安定をこわす。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "巡る",
+   "reading": "めぐる",
+   "pos": "verb",
+   "meaning": "to go around, to circulate",
+   "defJa": "ぐるりと回って移動すること",
+   "passage": {
+    "ja": "人前で話すとき、頭の中をさまざまな言葉が巡って、かえって何も言えなくなることがある。そんなときは、伝えたい点を三つだけ紙に書き、あとは捨ててしまうといい。話の基盤が決まれば、不思議と言葉は迷子にならない。実際、人前で話し慣れた人ほど、準備の段階で、あれもこれもと盛り込みたい内容を、思い切って削っているものだ。緊張を消すというより、迷う余地を減らすほうが、ずっと確実だ。",
+    "form": "巡って",
+    "en": "When you speak in public, various words can circle through your head so that you end up unable to say anything. At such times, write down just three points you want to convey and throw away the rest. Once the foundation of the talk is set, the words strangely do not get lost. In fact, people used to speaking in public cut back boldly, at the preparation stage, the content they wanted to cram in. Rather than getting rid of nerves, reducing room for hesitation is far more reliable.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「頭の中を言葉が巡る」「季節が巡る」。ぐるぐる回る動き。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "差し支え",
+   "reading": "さしつかえ",
+   "pos": "noun",
+   "meaning": "hindrance, objection",
+   "defJa": "物事の進行のさまたげになること",
+   "passage": {
+    "ja": "面接で「差し支えなければ、前の職場を辞めた理由を教えてください」って聞かれたら、どう答えます？この言い方って、答えたくなければ断ってもいいですよ、という逃げ道をわざと残しておく仕掛けなんですよね。とはいえ、実際には断りにくい空気があるから、ちょっとずるい敬語でもあるんです。こういう前置きの一言に、日本語の気づかいの形が出るんですよね。ていねいさと圧力が同居してる、面白い表現ですよ。",
+    "form": "差し支え",
+    "en": "If you were asked in an interview, \"If there is no objection, please tell us why you left your previous job,\" how would you answer? This phrasing is a device that deliberately leaves an escape route, saying you may decline if you would rather not answer. Even so, there is in practice an atmosphere that makes declining hard, so it is also a slightly sly kind of polite language. That one phrase of preface shows the shape of Japanese consideration. It is an interesting expression where courtesy and pressure live together.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「差し支えなければ」は、相手に断る余地を残す丁寧な前置き。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平凡",
+   "reading": "へいぼん",
+   "pos": "na-adj",
+   "meaning": "ordinary, commonplace",
+   "defJa": "とくに優れた点がなくありふれた様子",
+   "passage": {
+    "ja": "成功した人の習慣を細かく調べると、意外なほど平凡です。早く起きる、毎日同じ時間に机に向かう、散歩をする。どれも当たり前すぎて、本に書く価値すらないと思われがちです。たとえば小説家の村上春樹さんは、毎朝早くに起きて数時間書き、午後は走るという日課を、長年変えなかったと自著で語っています。ところが、その地味な行いを何年も一日も欠かさず続けられる人は、実はごくわずかなのです。",
+    "form": "平凡",
+    "en": "When you look into the habits of successful people, they are surprisingly ordinary. They wake early, sit at the desk at the same time, and take walks. All of it is so obvious that people tend to think it is not even worth writing in a book. Novelist Haruki Murakami, for example, has said in his own books that he kept for many years a routine of rising early each morning to write for several hours and running in the afternoon. Yet the people who can keep up such plain actions for years without fail are in fact very few.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「平凡な毎日」「平凡な人生」。特別さのないありふれた様子。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "幼児",
+   "reading": "ようじ",
+   "pos": "noun",
+   "meaning": "infant, toddler",
+   "defJa": "まだ幼い、小学校に入る前の子ども",
+   "passage": {
+    "ja": "イタリアの教育者マリア・モンテッソーリは、第二次世界大戦のころ、約七年間をインドで過ごした。現地で幼児の観察を重ね、その観察に基づいて、心が環境を吸い込むように育つという考えをまとめたとされる。この時期の講義は、のちに著書として刊行された。教室を整え、子どもが自分で選べるようにする発想は、今も依然として世界各地に受け継がれている。この考え方は、現代の保育のあり方を考える上でも、重要な出発点になっている。",
+    "form": "幼児",
+    "en": "The Italian educator Maria Montessori spent about seven years in India around the time of the Second World War. She is said to have piled up observations of infants there and, based on them, to have put together the idea that the mind grows by absorbing its environment. The lectures of this period were later published as a book. The idea of arranging the classroom so that children can choose for themselves is still carried on around the world today. This way of thinking has become an important starting point for considering how childcare should be today.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「幼児教育」「幼児期」。小学校に上がる前の小さな子どもを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "幼稚園",
+   "reading": "ようちえん",
+   "pos": "noun",
+   "meaning": "kindergarten",
+   "defJa": "小学校に入る前の子を預かり教える所",
+   "passage": {
+    "ja": "教育心理学の有名なマシュマロ実験は、米国の大学に付属する幼稚園で行われました。目の前のお菓子を我慢できた子は、のちの学業成績も高い傾向があるとされてきました。ところが近年の追試では、家庭環境を考慮すると差は小さくなると報告され、実情はもっと複雑だと分かってきました。我慢する力ばかりに注目すると、環境の影響を見落としかねません。数字を読むときは、誰が、どんな条件で調べたのかまで確かめる癖をつけたいものです。",
+    "form": "幼稚園",
+    "en": "The famous marshmallow experiment in educational psychology was conducted at a kindergarten attached to a US university. Children who could resist the sweet in front of them were said to tend toward higher academic results later. In recent replications, however, the difference has been reported to shrink once home environment is taken into account, and it has become clear that the real situation is more complicated. If you focus only on the power of self-restraint, you may well overlook the influence of environment. When reading figures, one wants to get into the habit of checking even who investigated them and under what conditions.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「幼稚園児」「幼稚園に通う」。学校教育の前の施設を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "廃れる",
+   "reading": "すたれる",
+   "pos": "verb",
+   "meaning": "to fall out of use, to decline",
+   "defJa": "使われなくなって衰えること",
+   "passage": {
+    "ja": "ラジオ体操とか、毎朝やってた習慣って、気づいたら廃れてたりしません？あれ、意志が弱いというより、きっかけがなくなっただけなんですよね。夏休みに公園へ集まるっていう仕掛けがなくなれば、続ける理由も消えるわけで。習慣を残したいなら、気合いより先に、きっかけの置き場所を考えたほうがいいですよ。習慣も言葉も、使う場がなくなると、誰にも気づかれないまま静かに消えていくものなんですよ。",
+    "form": "廃れて",
+    "en": "Things like radio calisthenics, a habit you did every morning, haven't they fallen out of use before you noticed? That is less weak will than the trigger simply being gone. Once the setup of gathering in the park during summer vacation is gone, the reason to continue disappears too. If you want to keep a habit, think about where to place the trigger before you rely on willpower. Habits and words alike, once their place of use is gone, quietly vanish without anyone noticing.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「習慣が廃れる」「伝統が廃れる」。使われず衰えていく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "廃棄物",
+   "reading": "はいきぶつ",
+   "pos": "noun",
+   "meaning": "waste, refuse",
+   "defJa": "使い道がなく捨てられるもの",
+   "passage": {
+    "ja": "十九世紀のロンドンは、人口の急増に伴って、し尿や工場の廃棄物がテムズ川に流れ込む街でした。1858年の夏には、耐えがたい悪臭が議事堂まで届き、「大悪臭」と呼ばれる事態になります。これを機に、技師バザルジェットが大規模な下水道網をつくり、街の衛生は大きく改善しました。この事業は、都市のインフラが人の命を守ることを示した代表的な例です。ロンドンの経験は、衛生が都市の課題として意識される転機となりました。",
+    "form": "廃棄物",
+    "en": "Nineteenth-century London, with its rapidly growing population, was a city where sewage and factory waste flowed into the Thames. In the summer of 1858, an unbearable stench reached Parliament in what came to be called the Great Stink. Taking this as the occasion, the engineer Bazalgette built a large-scale sewer network, and the city's sanitation improved greatly. This project is a representative example showing that urban infrastructure protects human lives. London's experience became a turning point at which sanitation came to be recognized as an urban issue.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「産業廃棄物」「廃棄物処理」。捨てられるものを総称する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引き出す",
+   "reading": "ひきだす",
+   "pos": "verb",
+   "meaning": "to draw out, to elicit",
+   "defJa": "中にあるものを外へ出すこと",
+   "passage": {
+    "ja": "教育を意味する英語は、「引き出す」を意味するラテン語に由来するという説がある。もしそれが正しいなら、教師の使命感は、知識を詰め込むことにではなく、学ぶ者の内に眠る力を外へ導くことに置かれるはずだ。ソクラテスの問答法も、まさにその系譜にあるといえよう。答えを与える者より、問いを育てる者こそが、真の教師なのかもしれない。教える側が先に答えを言わない勇気こそ、この系譜の出発点である。",
+    "form": "引き出す",
+    "en": "There is a theory that the English word for education derives from a Latin word meaning \"to draw out.\" If that is correct, a teacher's sense of mission should lie not in cramming in knowledge but in leading out the power sleeping within the learner. Socrates' method of questioning can be said to stand squarely in that lineage. Perhaps the true teacher is not the one who gives answers but the one who nurtures questions. The courage of the teacher not to give the answer first is the very starting point of this lineage.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「力を引き出す」「答えを引き出す」。内にあるものを外へ出す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引き止める",
+   "reading": "ひきとめる",
+   "pos": "verb",
+   "meaning": "to hold back, to detain",
+   "defJa": "立ち去ろうとするものをとどめる",
+   "passage": {
+    "ja": "勉強をやめたくなる自分を、意志の力だけで引き止めるのは骨が折れます。続かないのは、意志が弱いというより、環境が整っていないからです。スマホを別の部屋に置き、教材を開いたまま寝るといった小さな仕組みのほうが、ずっと長続きします。実際、誘惑を避けられる人は、誘惑に勝つ人ではなく、そもそも誘惑に出会わない場所を選んでいる人だといわれます。気合いは当てにせず、環境に仕事をさせるのが近道です。",
+    "form": "引き止める",
+    "en": "Holding yourself back by willpower alone when you want to quit studying is a hard slog. You fail to keep going less because your will is weak than because your environment is not set up. Small mechanisms, such as putting your phone in another room and falling asleep with your textbook open, last far longer. In fact, people who manage to avoid temptation are said to be not those who beat temptation but those who choose places where they do not meet it in the first place. Do not count on grit; letting the environment do the work is the shortcut.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「友人を引き止める」「衝動を引き止める」。去ろうとするものをとどめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引力",
+   "reading": "いんりょく",
+   "pos": "noun",
+   "meaning": "gravitational attraction",
+   "defJa": "物同士が互いに引き合う力",
+   "passage": {
+    "ja": "ニュートンより千年ほど前、七世紀のインドの数学者ブラーマグプタは、物が落ちるのは大地が物を引きつける性質を持つからだと書いています。今では当たり前に思える落下の理由も、当時は説明が必要でした。数式として整っていたわけではありませんが、引力という発想の先駆けとして、科学史を学ぶ上で覚えておく価値があります。ちなみに、ゼロの扱いを体系的に整理したのも、この人物です。",
+    "form": "引力",
+    "en": "About a thousand years before Newton, the seventh-century Indian mathematician Brahmagupta wrote that things fall because the earth has a nature of attracting them. The reason for falling, which seems obvious today, needed explaining then. It was not organized as a mathematical formula, but as a forerunner of the idea of gravitational attraction, it is worth remembering when studying the history of science. Incidentally, this is also the person who systematically organized the handling of zero.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「引力」は物を引き合う力。「地球の引力」「魅力」の比喩にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "張る",
+   "reading": "はる",
+   "pos": "verb",
+   "meaning": "to stretch, to spread (roots)",
+   "defJa": "根などが広がって定着すること",
+   "passage": {
+    "ja": "仏教は、苦しみの原因を執着に見る。執着は、木が土に根を張るように心の奥へ深く広がり、いったん定着したが最後、簡単には引き抜けなくなる。だからこそ、まだ小さな芽のうちに気づくことが何よりも大切になる。庭の草取りと同じで、根が浅いうちにほんの数分手を入れておくことが、のちの大仕事を未然に防いでくれる。瞑想で自分の心の動きを日ごろから観察するよう心がけるのも、そのためである。",
+    "form": "張る",
+    "en": "Buddhism sees attachment as the cause of suffering. Attachment spreads deep in the mind the way a tree sets roots in soil, and once settled it cannot be easily pulled out. That is exactly why noticing it while it is still a small sprout matters above all. As with weeding a garden, putting in just a few minutes of work while the roots are shallow prevents big jobs later. This is also the reason for making a point of observing the movements of the mind in meditation every day.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「根を張る」は、植物にも比喩にも使う。ほかに「気を張る」など。",
+    "sense": "根などが広がり定着する"
+   }
+  },
+  {
+   "term": "強み",
+   "reading": "つよみ",
+   "pos": "noun",
+   "meaning": "strength, strong point",
+   "defJa": "他より優れている点や頼れる点",
+   "passage": {
+    "ja": "アドヴァイタ・ヴェーダーンタの強みは、日常の当たり前の経験を出発点にしながら、その背後にある唯一の実在へ至る道筋を示す点にある。目の前の縄を蛇と見誤るという例えは、誰にでも通じる。恐れが消えるのは、縄が別の何かに変わったからではなく、見誤りが解けたからである。この比喩が千年以上語り継がれてきたのは、説明の巧みさに加えて、体験に根ざしているからにほかならない。",
+    "form": "強み",
+    "en": "The strength of Advaita Vedanta lies in showing a path from ordinary everyday experience to the single reality behind it. The analogy of mistaking a rope in front of you for a snake is understood by anyone. Fear disappears not because the rope has turned into something else but because the mistake has dissolved. That this metaphor has been passed down for over a thousand years is, in addition to the skill of the explanation, nothing other than because it is rooted in experience.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「〜の強み」で、他より優れて頼りになる点を表す。反対は「弱み」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "強引",
+   "reading": "ごういん",
+   "pos": "na-adj",
+   "meaning": "forcible, high-handed",
+   "defJa": "無理を押し通して物事を進める様子",
+   "passage": {
+    "ja": "生成AIの開発企業が、学習用のデータをウェブから強引に集めてきたとして、著作者による訴訟が各国で相次いでいる。企業側は、公正な利用の範囲内だと主張しており、争点は著作権法の解釈をめぐって割れている。判断が出そろうまでには、なお年単位の時間がかかるとみられる。その間、データの出どころを開示する動きが、業界の対策として広がりつつある。著作者の権利と技術の発展をどう両立させるかが、問われている。",
+    "form": "強引",
+    "en": "Lawsuits by authors are following one after another in many countries, claiming that generative AI developers forcibly collected training data from the web. The companies maintain it falls within fair use, and the points at issue are divided over the interpretation of copyright law. It is expected that it will still take years before judgments are all in. In the meantime, moves to disclose where data comes from are spreading as a countermeasure in the industry. The question is how to reconcile authors' rights with technological development.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「強引に進める」「強引な手法」。相手の事情を無視して押し通す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "当たり前",
+   "reading": "あたりまえ",
+   "pos": "na-adj",
+   "meaning": "obvious, natural",
+   "defJa": "そうなるのが自然で、あたりまえなこと",
+   "passage": {
+    "ja": "顔認証でスマホが開くのが当たり前になって、もう誰も不思議に思わないじゃないですか。でも、あれは赤外線で顔に三万個ほどの点を投げる仕掛けで、凹凸を読み取ってるんですよ。写真だと開かないのは、その立体の情報を見てるからなんです。便利だからといって、中身を知らなくていいわけじゃないですよね。技術の仕組みを少しでも知っていると、AIのニュースの見え方まで、ずいぶん変わってきますよ。",
+    "form": "当たり前",
+    "en": "Unlocking your phone by face recognition has become the norm, and nobody finds it strange anymore, right? But it works by projecting about thirty thousand dots of infrared light onto the face, reading the contours. A photo does not open it because it is looking at that three-dimensional information. Just because it is convenient does not mean you need not know what is inside, does it? If you know even a little about how the technology works, even how AI news looks to you changes quite a lot.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「当たり前になる」「当たり前のこと」。自然で特別でない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "彫刻",
+   "reading": "ちょうこく",
+   "pos": "noun",
+   "meaning": "sculpture, carving",
+   "defJa": "石や木を彫って形をつくる芸術",
+   "passage": {
+    "ja": "ミケランジェロは、石の中にもう像が入っていて、自分はそれを削り出すだけだと言ったって話、聞いたことないですか？本人の言葉かどうかは怪しいですけど、彫刻の発想としては、なかなか捨てがたいものがあります。足すんじゃなくて、余計なものを取り除くっていう考え方です。これ、勉強とか仕事の整理にも使えると思うんですよ。机の上から物を一つ減らすだけでも、頭の中がすっと軽くなる気がしませんか？",
+    "form": "彫刻",
+    "en": "Haven't you heard the story that Michelangelo said the statue is already inside the stone and he just carves it out? Whether those were his words is doubtful, but as an idea about sculpture, it has something hard to discard. It is the thinking of removing what is superfluous rather than adding. I think this can be used for organizing study and work too. Doesn't just removing one thing from your desk make your head feel suddenly lighter?",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「彫刻家」「木彫の彫刻」。石や木を彫って立体をつくる芸術。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "後回し",
+   "reading": "あとまわし",
+   "pos": "noun",
+   "meaning": "putting off, postponement",
+   "defJa": "順番を遅らせてあとにすること",
+   "passage": {
+    "ja": "心理学の研究では、課題を後回しにする傾向は、怠けというより、不安や退屈といった不快な感情から逃れる行動だと考えられている。つまり、時間管理の技術だけでは解決しにくい。課題を細かく区切り、最初の五分だけ着手するという小さな仕掛けは、その感情の壁を低くするとされる。とくに、完璧にこなそうとする人ほど、始める前から気が重くなりやすいという。締め切りに追われて徹夜するあげく、質が落ちる人は少なくない。",
+    "form": "後回し",
+    "en": "In psychological research, the tendency to put tasks off is thought to be less laziness than behavior to escape unpleasant feelings such as anxiety and boredom. In other words, it is hard to solve with time-management techniques alone. The small device of splitting a task finely and starting for just the first five minutes is said to lower the wall of that feeling. Especially those who try to do things perfectly are said to find it heavy going even before they start. Not a few people are chased by deadlines, pull all-nighters, and end up with lower quality.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「後回しにする」の形で、先延ばしの意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "循環",
+   "reading": "じゅんかん",
+   "pos": "noun",
+   "meaning": "circulation, cycle",
+   "defJa": "ひとまわりして元へ戻りくり返すこと",
+   "passage": {
+    "ja": "ことばには、意味が循環する面があります。たとえば「やばい」は、もともと不都合や危険を表す俗語でしたが、今では、すごいという称賛にも使われますよね。称賛の意味が広まるに伴って、本来の悪い意味が目立たなくなり、また別の語が「危険」の役を引き受けます。この入れ替わりのくり返しが、言葉の若さを保つ仕組みなのです。新しい流行語がすぐ消えても、その表現の型は、また形を変えて戻ってくるのです。",
+    "form": "循環",
+    "en": "In language there is an aspect in which meanings circulate. For example, \"yabai\" was originally slang for inconvenience or danger, but now it is also used for the praise \"amazing,\" isn't it? As the praising sense spreads, the original bad sense becomes less noticeable, and another word takes over the role of \"danger.\" This repeated swapping is the mechanism that keeps a language young. Even when a new buzzword soon vanishes, the pattern of expression returns again in a changed form.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「意味が循環する」「血液の循環」。ひと巡りして元に戻る動き。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "心がける",
+   "reading": "こころがける",
+   "pos": "verb",
+   "meaning": "to keep in mind, to make a point of",
+   "defJa": "いつも気をつけて努めること",
+   "passage": {
+    "ja": "ヨーガ・スートラは、心の揺れを静める方法として、修習と離欲の二つを挙げる。修習とは、静けさを保つ努力を、日々の平凡な反復の中で長く続けることである。離欲とは、見聞きするものへの執着から離れようと心がけることにほかならない。どちらか一方だけでは足りず、車の両輪のように働いてこそ、心は落ち着きを得る。修習と離欲の釣り合いという視点は、情報にあふれた現代の暮らしにも、そのまま通じる教えといえよう。",
+    "form": "心がける",
+    "en": "The Yoga Sutras list two methods for stilling the mind's fluctuations: practice and non-attachment. Practice is continuing the effort to keep stillness over a long time in ordinary daily repetition. Non-attachment is nothing other than making a point of leaving behind attachment to what is seen and heard. Neither alone is enough; only when they work like the two wheels of a cart does the mind find calm. The viewpoint of balancing practice and non-attachment can be called a teaching that applies as it is even to modern life, overflowing with information.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「〜しようと心がける」。日ごろから意識して努める。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "応接室",
+   "reading": "おうせつしつ",
+   "pos": "noun",
+   "meaning": "reception room",
+   "defJa": "客を迎えて応対するための部屋",
+   "passage": {
+    "ja": "初対面の相手を応接室で待つ間、人は想像以上に、こちらの様子を観察されている。入室の瞬間に何を言うかより、座る姿勢や資料の置き方、余計な動きの少なさが、印象を左右することも多い。話し方を磨く前に、まず黙っている時間の過ごし方を整えておくといい。入室の前に深呼吸を一つして、手元の資料の順番を確かめるだけで、動作は驚くほど落ち着くものだ。第一声は、その静けさの延長にすぎない。",
+    "form": "応接室",
+    "en": "While waiting in a reception room for someone you meet for the first time, you are being observed more than you imagine. More than what you say the moment you enter, your sitting posture, how you place your documents and how few needless movements you make often sway the impression. Before polishing how you speak, it is good to first prepare how you spend the silent time. Just taking one deep breath before entering and checking the order of your documents makes your movements calm down surprisingly. Your first words are merely an extension of that stillness.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「応接室に通す」。客を迎える部屋。会社や学校で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "忠実",
+   "reading": "ちゅうじつ",
+   "pos": "na-adj",
+   "meaning": "faithful, loyal",
+   "defJa": "元のものに正確に従う様子",
+   "passage": {
+    "ja": "翻訳は、原文に忠実であろうとするほど、訳文が不自然になるという矛盾を抱えている。機械翻訳が進歩した今も、この緊張は依然として消えていない。言葉の意味は、辞書の中ではなく、文化の背景と文脈に宿るがゆえである。本当の正確さとは、単語を一対一で置き換えることではなく、読み手に同じ効果を生むことなのかもしれない。訳者の腕は、辞書に載っていない部分の判断でこそ、いちばん試されるのである。",
+    "form": "忠実",
+    "en": "Translation harbors the contradiction that the more it tries to be faithful to the original, the more unnatural the translated text becomes. Even now that machine translation has advanced, this tension has still not disappeared. This is because the meaning of words dwells not in the dictionary but in cultural background and context. True accuracy may be not replacing words one to one but producing the same effect in the reader. A translator's skill is tested most in judgments about the parts that are not in the dictionary.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「原文に忠実」「事実に忠実」。元のものから離れず正確に従う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "怖がる",
+   "reading": "こわがる",
+   "pos": "verb",
+   "meaning": "to be afraid of",
+   "defJa": "おそろしいと感じて避けようとする",
+   "passage": {
+    "ja": "新しい技術を怖がるのは、人間にとってごく自然な反応です。電卓が教室に入ってきた時代にも、計算力が落ちるのではないかと心配する先生や親の声がありました。恐れるあまり触れずにいると、使いこなす人との差が、気づかないうちに静かに開いていきます。かといって、AIの答えを何でも鵜呑みにするのも、同じくらい危険です。大事なのは、疑う目を持ちながらも、まず手を動かして小さく試してみる姿勢でしょう。",
+    "form": "怖がる",
+    "en": "Being afraid of a new technology is a perfectly natural human reaction. Even in the era when calculators came into classrooms, there were voices of teachers and parents worried that calculation ability would fall. If you avoid touching it out of fear, the gap with those who master it quietly opens without your noticing. That said, swallowing everything an AI says whole is just as dangerous. What matters is probably the attitude of keeping a doubting eye while still trying things out in small ways with your own hands.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「新技術を怖がる」。「怖い」から作る動詞で、人の態度を述べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "怠る",
+   "reading": "おこたる",
+   "pos": "verb",
+   "meaning": "to neglect",
+   "defJa": "やるべきことをしないでおくこと",
+   "passage": {
+    "ja": "2018年、米アリゾナ州で、自動運転の試験車が歩行者をはねて死亡させる事故が起きた。米国の運輸安全委員会は、安全運転手が前方の監視を怠っていたことに加え、運営会社の安全体制にも不備があったと指摘している。機械に任せきりになる心理は、技術が優れているほど強まるとされる。人と機械の役割分担をどう設計するかが、いま改めて問われている。安全は、意識して設計しなければ、技術の進歩だけでは保証されないのである。",
+    "form": "怠って",
+    "en": "In 2018 in Arizona, an autonomous test vehicle struck and killed a pedestrian. The US National Transportation Safety Board pointed out that, in addition to the safety driver neglecting to watch ahead, there were also deficiencies in the operating company's safety system. The tendency to leave everything to the machine is said to grow stronger the better the technology is. How to design the division of roles between people and machines is being asked afresh now. Safety is not guaranteed by technological progress alone unless it is deliberately designed.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「注意を怠る」「確認を怠る」。当然すべきことをしない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "性別",
+   "reading": "せいべつ",
+   "pos": "noun",
+   "meaning": "sex, gender",
+   "defJa": "男か女かという区別",
+   "passage": {
+    "ja": "日本語には、名詞に文法上の性別がない。にもかかわらず、「〜わ」「〜ぜ」といった文末表現が、話し手が男か女かを連想させる。しかも、現実の話し方の実情は、それほど単純ではない。これらは、小説や漫画の中で人物像を伝えるために形づくられた「役割語」の側面が強い。たとえば博士や老人が「〜じゃ」と話すのも、実際の話し方というより、物語の約束事として私たちの耳に染みついたものである。",
+    "form": "性別",
+    "en": "Japanese has no grammatical gender in its nouns. Even so, sentence-final expressions such as \"wa\" and \"ze\" call to mind whether the speaker is male or female. Moreover, the reality of how people actually speak is not that simple. These have a strong aspect of being \"role language,\" shaped in novels and manga to convey a character's image. That a professor or an old man speaks with \"-ja,\" for example, is also something that has soaked into our ears as a convention of stories rather than as actual speech.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「性別」は男女の区別。文法上の性別がない日本語との対比に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "怪しい",
+   "reading": "あやしい",
+   "pos": "i-adj",
+   "meaning": "suspicious, dubious",
+   "defJa": "本当かどうか疑わしい様子",
+   "passage": {
+    "ja": "文章をチェックするとき、いちばん怪しいと感じるのは、読み返してみて、なぜか引っかかった箇所です。主語と述語がねじれていないか、「の」が三つ続いていないか。そういう場所は、たいてい、書き進めながらも、どこか不安だったところです。声に出してゆっくり読めば、違和感のある箇所は耳が先に教えてくれます。見つけたら後回しにせず、その場でさっと直してしまうのが、結局いちばん早いし確実です。",
+    "form": "怪しい",
+    "en": "When checking a text, the most suspicious spot is the one that, on rereading, snagged you for some reason. Are the subject and predicate twisted, do three \"no\" particles run in a row? Such places are usually where, even as you wrote on, you were somehow uneasy. If you read aloud, your ear tells you first where something feels off. If you find one, fixing it on the spot without putting it off is in the end quickest and surest.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「怪しい箇所」「怪しい日本語」。疑わしく、おかしいと感じる様子。",
+    "sense": ""
+   }
+  }
+ ]
+}
