@@ -1,5 +1,6 @@
 /** Browser acceptance for the additive redesign shell, room identity and docking. */
 /* global document, innerWidth */
+import { URL } from 'node:url';
 import assert from 'node:assert/strict';
 import console from 'node:console';
 import process from 'node:process';
@@ -84,6 +85,23 @@ try {
           await page.locator('#tab-read').click();
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'The shell cannot introduce horizontal scrolling');
           if (width === 390) await page.screenshot({ path: join(out, `${engine}-${lang}-shelf.png`) });
+          if (width === 390) {
+            // An in-page locale change must survive the full-document private-deck route.
+            const chosen = lang === 'ja' ? 'bi' : 'ja';
+            await page.locator(`#lang [data-lang="${chosen}"]`).click();
+            await page.locator('#tab-learn').click();
+            await page.locator('[data-deck="personal"]').click();
+            await page.locator('.pc-file').waitFor({ state: 'attached' });
+            assert.equal(new URL(page.url()).searchParams.get('ui'), chosen);
+            assert.equal(await page.locator('html').getAttribute('data-room'), 'personal');
+            assert.equal(await page.locator('#tab-me').getAttribute('aria-current'), 'page');
+            await page.locator('#tab-me').click();
+            await page.locator('#me-settings').waitFor();
+            await page.locator('#back').click();
+            await page.locator('#shelf-body').waitFor();
+            assert.equal(await page.locator('body').getAttribute('data-view'), 'shelf', 'Fresh Me route returns to Read');
+            assert.equal(await page.locator(`#lang [data-lang="${chosen}"]`).getAttribute('aria-pressed'), 'true');
+          }
           checks.push({ engine, width, lang, passed: true, targets });
         }
         assert.deepEqual(errors, [], 'No room render errors');

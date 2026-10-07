@@ -51,7 +51,7 @@ window.__BUNKI_LANGUAGE_TOUR__ = {
   visit: async (view) => {
     S.stack = []; S.strokes = null; S.captureOpen = false; S.navOpen = false;
     if (view === 'reader') {
-      const article = D.passages.find(p => !p.retired) || D.passages[0];
+      const article = D.passages.find(p => !p.retired && storyVersions(p)) || D.passages.find(p => !p.retired) || D.passages[0];
       if (!article) throw new Error('No reader article available');
       await ensureArticle(article); openPassage(article.id); return;
     }
@@ -67,7 +67,7 @@ window.__BUNKI_LANGUAGE_TOUR__ = {
       grammar:{t:'grammar',id:GRAMMARS()[0]?.id},
       particle:{t:'particle',id:PARTICLES[0]?.id} };
     const node = nodes[kind]; if (!node?.id) throw new Error('Missing sheet fixture: ' + kind);
-    go(node); window.scrollTo(0, 0);
+    S.stack=[]; S.strokes=null; go(node); window.scrollTo(0, 0);
   },
   frontNav: () => { S.view='drift'; S.stack=[]; S.navOpen=true; render(); },
   variants: () => { S.view='shelf'; S.stack=[]; S.variantsBar=true; S.debugOpen=true; render(); },
@@ -75,7 +75,7 @@ window.__BUNKI_LANGUAGE_TOUR__ = {
     S.obslog=[...(S.obslog||[]),[Date.now(),'dojo','word:日本',3]]; render(); },
   active: (kind, revealed=false) => {
     S.stack=[]; S.focus=null;
-    if(kind==='review') { S.view='review'; S.review={queue:[{t:'word',id:'日本'}],ix:0,revealed,declared:null,done:{again:0,hard:0,good:0,easy:0},history:[]}; }
+    if(kind==='review') { S.view='review'; S.review={queue:[{t:'word',id:'日本',label:'日本'}],ix:0,revealed,declared:null,done:{again:0,hard:0,good:0,easy:0},history:[]}; }
     if(kind==='probe') { S.view='probe'; S.probe={queue:[{w:'日本',r:'にほん',m:['Japan'],rt:'熟',band:'10級'}],ix:0,right:0,missed:[],minted:0,revealed}; }
     if(kind==='lesson') { S.view='lessons'; startLesson(lessonPlan('word','N5')[0]); if(revealed) S.lessonRun.phase='quiz'; }
     render(); window.scrollTo(0,0);
@@ -115,7 +115,7 @@ export async function inspectChrome(page) {
     const selector = el => el.id ? '#' + el.id : el.tagName.toLowerCase() +
       [...el.classList].slice(0, 3).map(c => '.' + c).join('');
     const issues = [], inspected = [];
-    const chromeText = 'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .gs-eyebrow, .gs-bar-name, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note';
+    const chromeText = 'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note';
     const nodes = [...document.querySelectorAll(chromeText + ',button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, [aria-label], [title], input[placeholder], textarea[placeholder], select')];
     for (const el of nodes) {
       if (!visible(el)) continue;
@@ -167,10 +167,12 @@ async function record(page, room, language) {
   const result = language === 'bi' ? await inspectChrome(page) : { issues: [], inspected: 0 };
   const shell = await page.evaluate(() => ({ view: document.body.dataset.view,
     stamp: document.documentElement.dataset.room, tabs: document.querySelectorAll('#primary-tabs').length,
+    activeTabs: [...document.querySelectorAll('#primary-tabs')].filter(el => el.getClientRects().length &&
+      getComputedStyle(el).visibility !== 'hidden' && !el.closest('[inert], [aria-hidden="true"]')).length,
     quiet: ['drift', 'entry'].includes(document.body.dataset.view) || document.body.classList.contains('zen') || !!document.querySelector('#sheet, #stroke-page') }));
   const contractIssues = [];
   if (!ROOM_STAMPS[shell.view] || shell.stamp !== ROOM_STAMPS[shell.view]) contractIssues.push(`Room stamp ${shell.stamp} for ${shell.view}`);
-  if (shell.tabs !== (shell.quiet ? 0 : 1)) contractIssues.push(`Expected ${shell.quiet ? 0 : 1} tab bar, found ${shell.tabs}`);
+  if (shell.activeTabs !== (shell.quiet ? 0 : 1) || (!shell.quiet && shell.tabs !== 1)) contractIssues.push(`Expected ${shell.quiet ? 0 : 1} active tab bar, found ${shell.activeTabs} (${shell.tabs} mounted)`);
   results.push({ room, language: language === 'bi' ? 'EN' : '日本語', view: shell.view, error, shell, contractIssues, ...result });
   await writeFile(path.join(out, 'report.json'), JSON.stringify({artifact:site,results,errors,issues:results.flatMap(r=>r.issues.map(i=>({room:r.room,...i})))},null,2)+'\n');
   if (screenshots) await page.screenshot({ path: path.join(out, `${room}-${language === 'bi' ? 'en' : 'ja'}.png`), fullPage: false });
@@ -204,6 +206,33 @@ try {
     await record(page,'guided-question',language);
     await page.locator('.guided-room [data-action=explain]').first().click();
     await record(page,'guided-explanation',language);
+    await page.locator('.guided-room [data-action=question]').first().click();
+    await page.locator('.gs-choice input').first().check();
+    await page.locator('.guided-room [data-action=check]').click();
+    await record(page, 'guided-answer', language);
+    await page.locator('.guided-room [data-action=flag]').click();
+    await page.locator('.gs-progress [data-index="2"]').click();
+    await record(page, 'guided-grammar-question', language);
+    await page.locator('.guided-room [data-action=explain]').first().click();
+    await record(page, 'guided-grammar-explanation', language);
+    await page.locator('.gs-branch-links [data-action=branch]').first().click();
+    await record(page, 'guided-branch', language);
+    await page.locator('.guided-room [data-action=close-branch]').click();
+    await page.locator('.gs-word').first().click();
+    await record(page, 'guided-word', language);
+    await page.locator('.guided-room [data-action=close-word]').first().click();
+    await page.locator('.gs-progress [data-index="5"]').click();
+    await page.locator('.gs-choice input').first().check();
+    await page.locator('.guided-room [data-action=check]').click();
+    await page.locator('.guided-room [data-action=next]').click();
+    await record(page, 'guided-summary', language);
+    await page.locator('.guided-room [data-action=finish]').click();
+    await page.locator('.gs-results').waitFor();
+    await record(page, 'guided-results', language);
+    for (const view of ['learn', 'field', 'sensei', 'about']) {
+      await page.locator(`.gs-bar [data-view=${view}]`).click();
+      await record(page, `guided-${view}`, language);
+    }
     await page.evaluate(()=>window.__BUNKI_LANGUAGE_TOUR__.visit('mock'));
     await page.locator('[data-exam-start]').first().click();
     await record(page,'mock-confirm',language);
@@ -226,8 +255,10 @@ try {
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.sheet('word'));
     await page.locator('#sheet-take').click();
     await page.locator('#new-list').waitFor();
+    await page.locator('#sheet .list-picker').scrollIntoViewIfNeeded();
     await record(page, 'word-save-destinations', language);
     await page.locator('#new-list').click();
+    await page.locator('#sheet .list-maker-field').scrollIntoViewIfNeeded();
     await record(page, 'word-new-list', language);
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.variants());
     await record(page, 'variants', language);
@@ -264,6 +295,12 @@ try {
     await record(pp, 'personal-study', language);
     await pp.locator('[data-action=reveal]').click();
     await record(pp, 'personal-answer', language);
+    await pp.locator('.pc-context .pc-token').filter({ hasText: data.lessons[0].term }).first().click();
+    await pp.locator('#sheet').waitFor();
+    await record(pp, 'personal-dictionary', language);
+    await pp.locator('.personal-dictionary-meaning > summary').click();
+    await record(pp, 'personal-dictionary-meanings', language);
+    await pp.locator('#sheet-close').click();
     for (const screen of ['read', 'connections', 'settings']) {
       await pp.locator(`[data-screen=${screen}]`).first().click();
       await record(pp, `personal-${screen}`, language);

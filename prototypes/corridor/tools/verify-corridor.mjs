@@ -1666,7 +1666,7 @@ async function main() {
   // were on the strip, so it passed for any five rows and failed for the right
   // seven. The four Wayfinder tickets keep their own count; every other row the
   // strip is supposed to carry is now named here and must actually be present.
-  const NON_TICKET_ROWS = ['E depth', 'F tap ladder', 'G satellite tap'];
+  const NON_TICKET_ROWS = ['navigation', 'E depth', 'F tap ladder', 'G satellite tap'];
   const rowKeys = await page.evaluate(
     `[...document.querySelectorAll('#variants .vseg button')].map((b) => b.dataset.variant.split(':')[0])
        .filter((k, i, a) => a.indexOf(k) === i)`,

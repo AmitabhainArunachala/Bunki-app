@@ -890,10 +890,10 @@ try {
         caption: document.querySelector('.version-caption')?.textContent ?? null,
       }));
       const shown = await read();
-      assert.deepEqual(shown.choices, [['原文 Original · N1', 'true'], ['やさしい版 Simplified · N3', 'false']], `the switch: ${JSON.stringify(shown.choices)}`);
+      assert.deepEqual(shown.choices, [['Original · N1', 'true'], ['Simplified · N3', 'false']], `the switch: ${JSON.stringify(shown.choices)}`);
       assert.equal(shown.caption, 'The simplified version retells the same article in easier Japanese.');
       await page.locator('.version-toggle .version-choice[aria-pressed="false"]').click();
-      await page.waitForFunction(() => document.querySelector('.version-toggle .version-choice[aria-pressed="true"]')?.innerText.includes('やさしい'));
+      await page.waitForFunction(() => document.querySelector('.version-toggle .version-choice[aria-pressed="true"]')?.innerText.includes('Simplified'));
       await openArticle(page, THREE_PARAS);
       const none = await read();
       assert(none.choices.length === 0 && none.caption === null, `an article without a simplified version shows the switch: ${JSON.stringify(none)}`);

@@ -338,3 +338,44 @@ const UI_TOPICS = { mind: 'Mind and learning', india: 'India and Buddhism', ai: 
    Before: `x.pop.note === 'Save to your review cards in Bunki.'`
    After: `/覚える/.test(x.pop.note)`
    Reason: Supersedes edit 51 after actual run showed this assertion serves unchanged repository release/study*.html, not the redesigned built corridor. Restore its original Japanese expected save note; every standalone behavior check remains exactly as before. This is a correction of an overly broad label expectation change.
+
+## Navigation variant census
+
+| File | Assertion | Before → after | Reason |
+| --- | --- | --- | --- |
+| `verify-corridor.mjs` | Variant non-ticket row census | Three named non-ticket rows, seven total → four named non-ticket rows including `navigation`, eight total | F4 deliberately adds the nav variant. Exact total, every named row, and exactly four ticket markers remain required. |
+
+## Older JLPT door labels
+
+# Doors verifier language-law pin changes
+
+Owned file: `prototypes/corridor/tools/verify-corridor-doors.mjs`.
+
+| Location | Before → after | Reason and retained checks |
+|---|---|---|
+| T10 explanatory comment, line179 | `each marked 未確認` → `each marked Unreviewed` | Describe the default EN label accurately. |
+| T10 explanatory comment, line197 | Japanese-only label/history description → `Unreviewed in English (未確認 in Japanese)` | Name the translated label; no behavior changes. |
+| T10 exact-label comment, line199 | `exactly 未確認` → `exactly Unreviewed` | Document the exact EN pin. |
+| T10 marked-chip predicate, line203 | trimmed chip equals `未確認` → equals `Unreviewed` | The product explicitly translates the status to Unreviewed. Visible client rects, non-hidden visibility, positive opacity, exact label, section/row marking and required set presence remain unchanged. |
+| T10 reworded negative control, line215 | test replacement `確認済` → `Reviewed` | The semantic opposite remains the negative control in English. The control must leave every set unmarked and the original text is restored afterwards. The hidden-chip control also remains. |
+| T10 control assertion description, line219 | `未確認` → `Unreviewed` in both label mentions | State the actual exact label under test. Original chip count, nonempty set count, zero hidden marks and zero reworded marks remain unchanged. |
+| T10 all-sets assertion description, line229 | `marked 未確認` → `marked Unreviewed` | Describe the translated status. Nonempty listed sets and all rows pending remain required. |
+| T11 progress parser, line254 | `(N) / (total) 問` → `Question (N) of (total)` | Match the exact English question counter. Both numeric captures are retained; the started-run condition, real set ID and data-derived total-question equality remain unchanged. |
+
+## Label audit
+
+The complete file was read. These are the only exact Japanese UI-label pins in behavioral predicates. Japanese references in comments and route descriptions do not select product text. Existing bilingual fallback regexes for no-listening and loading-state observations remain unchanged. T0 identity, T1 record-lock/visible-title checks, T3 injected renderer fault/retry, all viewport/route variants, set IDs/question counts, T9 stalled-catalog control, T8 late-rejection control and T6 route behavior are retained.
+
+T13/T14 fixture interception URLs and behavior assertions remain byte-for-byte unchanged, as directed. Their baseline fixture failures are reported independently; this pass does not repair or relax them.
+
+## Verification
+
+- `node --check prototypes/corridor/tools/verify-corridor-doors.mjs`: passed.
+- `git diff --check -- prototypes/corridor/tools/verify-corridor-doors.mjs`: passed.
+- T12/T13/T14 block comparison against HEAD: byte-identical, including fixture intercepts and all behavior assertions.
+- Interim immutable v3 attempt refused behavioral testing at the unchanged T0 clean-build gate (`sourceDirty=true`); exact digest and file-manifest checks passed. Log: `doors-language-v3.log`.
+- Runtime recheck against parent clean rebuilt artifact: pending.
+
+| `verify-design-reader-shelf.mjs` | G7 exact version-switch labels | `原文 Original · N1`, `やさしい版 Simplified · N3` → `Original · N1`, `Simplified · N3` | F2 selects English; both version identities, levels, pressed states and retelling explanation remain required. |
+
+| `verify-design-reader-shelf.mjs` | G7 active version wait | active label contains `やさしい` → contains `Simplified` | F2 selects the English version label. The switch must still complete, show the alternate article and retain its level/caption checks. |

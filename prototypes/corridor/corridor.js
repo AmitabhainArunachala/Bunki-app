@@ -3346,7 +3346,7 @@ async function personalDictionaryBridge(container) {
       if (meanings.length) {
         const entry = S.stack.at(-1);
         const disclosure = el('details', 'personal-dictionary-meaning');
-        disclosure.append(el('summary', null, '意味・英訳を見る / Show meaning & English'));
+        disclosure.append(el('summary', null, tx('意味・英訳を見る', 'Show meaning & English')));
         disclosure.open = !!entry.dictionaryMeaningOpen;
         disclosure.addEventListener('toggle', () => { if (disclosure.isConnected) entry.dictionaryMeaningOpen = disclosure.open; });
         disclosure.append(...meanings);
@@ -4173,6 +4173,10 @@ async function boot() {
   // Private collections leave through the same five destinations on a fresh
   // host page. These are UI routes only, never learner-record state.
   if (PRIMARY_TABS.some(tab => tab.view === params.get('room'))) {
+    if (params.get('room') === 'me') {
+      S.view = 'shelf';
+      keepNavigationReturn('me', null);
+    }
     S.view = params.get('room');
     if (S.view === 'search') S.searchFrom = 'shelf';
   }
@@ -9480,8 +9484,7 @@ function renderReader(main) {
       b.type = 'button';
       b.dataset.version = version.id;
       b.setAttribute('aria-pressed', String(version.id === p.id));
-      b.append(el('span', 'l-ja', ja));
-      if (bi()) b.append(el('span', 'version-name', en));
+      b.append(el('span', 'l-ja', tx(ja, en)));
       const level = version.readingFacets?.jlpt || levelPhrase(version.grading).level;
       if (level) b.append(el('span', 'version-level', `· ${level}`));
       b.addEventListener('click', () => { if (version.id !== p.id) openPassage(version.id); });
@@ -21794,9 +21797,7 @@ function renderDojoDecks(main) {
   };
   if (window.__CORRIDOR_STANDALONE__ !== true) {
     row('personal', tx('私の文脈', 'My contexts'), tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
-      const url = new URL(location.href);
-      url.searchParams.set('deck', 'personal');
-      location.assign(url);
+      openPersonalCollection();
     });
   }
   for (const d of DOJO_DECKS) {
@@ -21810,7 +21811,7 @@ function renderDojoDecks(main) {
         })
         .catch(() => {});
     }
-    const counts = sum ? tx(`復習 ${sum.due} ・ 新しい文 ${sum.fresh}`, `${sum.due} due · ${sum.fresh} new`) : tx(d.en, d.en);
+    const counts = sum ? tx(`復習 ${sum.due} ・ 新しい文 ${sum.fresh}`, `${sum.due} due · ${sum.fresh} new`) : tx('復習と新しい文', d.en);
     row(d.id, tx(d.ja, d.en), counts, () => openDeck(d.id));
   }
   row('context', tx('文脈札', 'Context cards'), tx('一語ごとの段落カード', 'one paragraph per word'), () => {

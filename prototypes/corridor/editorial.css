@@ -3352,8 +3352,7 @@ body.has-primary-tabs .kp-grades,
 body.has-primary-tabs .pc-controls,
 body.has-primary-tabs .cd-dock { bottom: var(--nav-clearance); }
 body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
-body.has-primary-tabs:has(#sheet, #stroke-page, .kp-sheet-wrap, [role='dialog']:not([hidden])) .primary-tabs { display: none; }
-body.has-primary-tabs:has(#sheet, #stroke-page, .kp-sheet-wrap, [role='dialog']:not([hidden])) { --nav-clearance: 0px; }
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
 .learn-section + .learn-section,
 .foundation-section { margin-top: var(--space-8); }
 .learn-section { padding-top: var(--space-2); }
@@ -3403,6 +3402,7 @@ body.v-depth-layered .sheet, body .sheet { background: var(--color-paper); }
 
 /* The reader's opening picture yields the space taken by the navigation dock,
    preserving the first sentence on the initial screen. */
+body.has-primary-tabs[data-view='reader'] #app > main[data-enter] { animation-fill-mode: backwards; }
 body.has-primary-tabs[data-view='reader'] .reader-picture-img {
   max-height: max(60px, calc(100svh - 740px - var(--nav-clearance)));
 }
@@ -3416,6 +3416,24 @@ body:not([data-view='drift']) .sem-row .sem-note {
   flex: 1 1 12ch;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Counts must not change the header's line count during a word action. */
+@media (max-width: 520px) {
+  body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
+  body:not(.zen) #app > .chrome > button.chrome-dojo { padding-inline: 4px; }
+  body:not(.zen) #app > .chrome > .level-chip.chrome-level { padding-inline: 4px; margin-inline: 0 2px; }
+  body:not(.zen) #app > .chrome > button#tray {
+    padding-inline: 4px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  body.has-primary-tabs[data-view='reader'] #reader-tip { margin-bottom: 4px; }
+  body.has-primary-tabs[data-view='reader'] #app > main > .view-title-en { margin-bottom: 4px; }
+  body.has-primary-tabs[data-view='reader'] .reader-head { margin-bottom: 8px; }
+  body.has-primary-tabs[data-view='reader'] #app::after { height: calc(44px + env(safe-area-inset-bottom)); }
+  body.has-primary-tabs[data-view='reader'] .listen-row.play-bar.is-pending { height: 44px; }
+  body.has-primary-tabs[data-view='reader'] .reader-picture { margin-bottom: 8px; }
 }
 
 /* ==========================================================================

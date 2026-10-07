@@ -135,7 +135,7 @@ async function ready(page) {
 /** The register lifts a room in over ~160 ms on arrival; shots wait for it to settle. */
 async function settle(page) {
   await page
-    .waitForFunction(() => !document.documentElement.dataset.registerEntering, null, { timeout: 5_000 })
+    .waitForFunction(() => !document.documentElement.dataset.roomEntering, null, { timeout: 5_000 })
     .catch(() => {});
   await page.waitForTimeout(260);
 }
