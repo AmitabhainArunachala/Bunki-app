@@ -1,0 +1,1004 @@
+{
+ "cards": [
+  {
+   "term": "紙幣",
+   "reading": "しへい",
+   "pos": "noun",
+   "meaning": "paper money, banknote",
+   "defJa": "紙で作られた、お金",
+   "passage": {
+    "ja": "二〇一六年十一月、インド政府は、高額紙幣の流通を突然やめると発表しました。テレビ演説の直後から、市場の屋台に至るまで、現金を頼りにしてきた人々の暮らしは大きく混乱し、銀行や現金自動預け払い機の前には何時間も並ぶ長い列ができました。政府には、不正な資金を洗い出すという狙いがありましたが、実際の効果については、統計を巡って今も評価が分かれています。ただ、現金社会から電子決済へ移るきっかけになったことだけは、多くの専門家が認めるところです。",
+    "form": "紙幣",
+    "en": "In November 2016, the Indian government suddenly announced that it would stop the circulation of high-value banknotes. From right after the televised address, the lives of people who had relied on cash, down to market stalls, were thrown into great confusion, and long lines formed in front of banks and ATMs where people waited for hours. The government had the aim of rooting out illicit funds, but evaluations of the actual effect are still divided over the statistics. Still, many experts agree on at least this much: it became an occasion for moving from a cash society to electronic payment.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「高額紙幣・紙幣を発行する」。硬貨に対し、紙のお金を指す改まった語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "組み立てる",
+   "reading": "くみたてる",
+   "pos": "verb",
+   "meaning": "to assemble, to set up",
+   "defJa": "部品や要素を、順に組んで一つのものにする",
+   "passage": {
+    "ja": "論理を組み立てる作業は、子どもの頃にやった積み木遊びによく似ている。部品となる事実を一つずつ置いていき、前の部品と噛み合わないものは、どれほど気に入っていても外さなければならない。ところが人は、一度気に入った結論に合わせて、事実のほうを都合よく選んでしまう傾向がある。だからこそ、自分で作った議論を他人の目で壊してもらうことが、思考を絶えず鍛える最も確かな方法なのである。",
+    "form": "組み立てる",
+    "en": "Building up an argument is much like playing with blocks. You place facts as parts one at a time, and any piece that does not mesh with the previous ones must be removed, however fond of it you are. Yet people tend to choose the facts conveniently to fit a conclusion they have once taken a liking to. That is exactly why having others break an argument you made, with their eyes, is the surest way to keep training your thinking constantly.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "部品を組み立てる以外に、論理・計画・文章を組み立てる、と抽象的にも使う。",
+    "sense": "部品・論理を組んで形にする"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "統計",
+   "reading": "とうけい",
+   "pos": "noun",
+   "meaning": "statistics",
+   "defJa": "数量を集めて整理した資料や、その学問",
+   "passage": {
+    "ja": "日本語の使い方に関する統計を、世代ごとに見ると、「ら抜き言葉」を使う人の割合は、年代が若いほど高くなる傾向があります。文化庁の調査でも、この傾向は繰り返し確認されてきました。しかし、使う人が多いからといって、すぐに辞書や教科書で正しい形として認められるわけではありません。言葉の変化は、数字の上では静かに進み、ある日気がつくと、辞書の編集者たちに記述を書き換えさせているのです。",
+    "form": "統計",
+    "en": "Looking at statistics on Japanese, the proportion of people who use ra-nuki forms tends to be higher the younger the age group. This tendency has been confirmed repeatedly in surveys by the Agency for Cultural Affairs as well. But just because many people use a form does not mean it is immediately accepted as correct. Change in language advances quietly in the numbers, and one day, before you notice, it has made the dictionary editors rewrite their entries.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「統計を取る／統計によると／統計的」。数字で全体の傾向を示す語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "絶えず",
+   "reading": "たえず",
+   "pos": "adverb",
+   "meaning": "constantly",
+   "defJa": "休むことなく、いつも続けて",
+   "passage": {
+    "ja": "人工知能の分野では、新しい論文が絶えず発表され、半年前の常識が今日はもう古くなっていることも珍しくありません。研究者たちは、毎朝のように新しい手法の解説を読み、自分の仕事に使えるかどうかを見極めています。ただし、情報の波に流されると、肝心の自分の問いを見失いかねません。流行を追うことと、問いを深めることは別の営みだと意識しておくだけで、学び方は大きく変わります。",
+    "form": "絶えず",
+    "en": "In the field of artificial intelligence, new papers are published constantly, and it is not unusual for what was common sense half a year ago to be outdated today. Researchers read explanations of new methods almost every morning and judge whether they can be used in their own work. However, if you are swept away by the wave of information, you could lose sight of your own essential question. Merely being aware that chasing trends and deepening a question are different undertakings changes how you learn greatly.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「絶えず変化する・絶えず努力する」。途切れずに続く状態を言う副詞。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "編集",
+   "reading": "へんしゅう",
+   "pos": "noun",
+   "meaning": "editing, compilation",
+   "defJa": "材料を集めて整理し、書物や番組にまとめること",
+   "passage": {
+    "ja": "歴史書の編集という仕事は、史料を並べることではなく、何を載せ何を捨てるかを決めることにほかならない。八世紀の『日本書紀』も、朝廷の正統性を示すという目的のもとに、複数の伝承が取捨選択されてまとめられたとされる。そのため現代の研究者は、書かれていることだけでなく、書かれなかったことにも注意を払う。表向きは公平な記録に見えても、編纂の意図を読み解くことが、歴史学の出発点である。",
+    "form": "編集",
+    "en": "The work of editing a history book is nothing other than deciding what to include and what to throw away, not simply lining up sources. The eighth-century Nihon Shoki too is said to have been compiled with multiple traditions selected and discarded for the purpose of showing the legitimacy of the imperial court. For that reason, present-day researchers pay attention not only to what is written but also to what was not written. Even if it looks outwardly like a fair record, reading the intent of the compilation is the starting point of historical study.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「編集者・編集部・動画を編集する」。素材を取捨選択してまとめる作業。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "緩い",
+   "reading": "ゆるい",
+   "pos": "i-adj",
+   "meaning": "loose, lenient",
+   "defJa": "しまりがなく、きびしくない様子",
+   "passage": {
+    "ja": "話し言葉の文法は、書き言葉に比べると、ずいぶん緩いものです。「食べれる」「見れる」のように、文字では正しくないとされる形も、会話ではごく自然に、むしろ親しみやすく聞こえます。この緩さは、だらしなさではなく、聞き手が文脈から意味を補う、という互いの信頼の上に成り立っています。だから話し方を磨くときは、正しさだけでなく、相手に負担をかけない、ほどよい緩急を意識してみてください。",
+    "form": "緩い",
+    "en": "The grammar of spoken language is considerably looser than that of written language. Forms regarded as incorrect in writing, such as tabereru and mireru, sound perfectly natural in conversation. This looseness is not sloppiness but rests on trust that the listener will fill in the meaning from context. So when you polish your way of speaking, try to be aware not only of correctness but of a moderate give and take that does not burden the other person.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「緩い規則・緩い坂・緩い服」。きつくない、厳しくない状態を広く表す。",
+    "sense": "きびしくない・しまりがない"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "縮む",
+   "reading": "ちぢむ",
+   "pos": "verb",
+   "meaning": "to shrink, to be contracted",
+   "defJa": "大きさや量が小さくなる",
+   "passage": {
+    "ja": "十四世紀のヨーロッパでは、黒死病によって人口が三分の一以上も縮むという、前例のない出来事が起こりました。働き手が足りなくなった農村では、領主が農民に譲歩せざるを得なくなり、賃金が上がって、身分の秩序が少しずつ崩れていきます。皮肉にも、悲劇的な人口の減少が、中世の社会構造を内側から変え、ヨーロッパの行方そのものを大きく動かしたのです。歴史は、悲しみの中から、思わぬ変化を生み出すことがあります。",
+    "form": "縮む",
+    "en": "In fourteenth-century Europe, the Black Death caused an unprecedented event: the population shrank by more than a third. In farming villages short of workers, lords were forced to make concessions to peasants, wages rose, and the order of social rank gradually crumbled. Ironically, the tragic decline in population changed the structure of medieval society from the inside and moved the very course of Europe greatly. History can sometimes produce unexpected change out of sorrow.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "布・体・人口など、元より小さくなる自動詞。縮める（他動詞）と対になる。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "群れ",
+   "reading": "むれ",
+   "pos": "noun",
+   "meaning": "crowd, flock, herd",
+   "defJa": "同じ種類の動物や人が、大勢集まったもの",
+   "passage": {
+    "ja": "インドの街って、牛の群れがふつうに道を歩いてるじゃないですか。車がけたたましくクラクションを鳴らしても、牛たちはなかなかどかなくて、運転手のほうが諦めて待つんですよね。ヒンドゥー教では牛が神聖な動物だと知ってはいるものの、実際に見ると、信仰が暮らしの中に溶け込んでいるのがよく分かります。街角ごとに、そういう「当たり前」が少しずつ違うのが、旅のいちばんの面白さなんですよね。",
+    "form": "群れ",
+    "en": "In India's towns, herds of cows walk down the road as a matter of course, don't they? Even when cars honk their horns, the cows do not budge easily, and it is the driver who gives up and waits. I knew that cows are sacred animals in Hinduism, but seeing it for real, you can clearly tell how faith has melted into daily life. That 'of course' differs from street corner to street corner is the fun of travel.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "牛・羊・魚などの群れ。人の場合は『人の群れ』と少し否定的な響きが出る。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "職場",
+   "reading": "しょくば",
+   "pos": "noun",
+   "meaning": "workplace",
+   "defJa": "仕事をする場所。働く現場",
+   "passage": {
+    "ja": "職場の敬語って、丁寧にしようと使いすぎると、かえって相手との距離ができちゃうんですよね。「させていただきます」を連発する人って、丁寧なようで、どこか自分の責任から逃げてるような感じがしませんか。もちろん、場面によっては必要な表現ではあるものの、何にでもとりあえずつけておくのは、やっぱり考えものです。結局は、相手との関係や、その場の空気に合った言葉を、自分の頭で選べるかどうかなんですよ。",
+    "form": "職場",
+    "en": "Workplace honorifics, when overused, end up creating distance instead, don't they? People who fire off 'sasete itadakimasu' over and over seem polite but somehow also seem to be running away from responsibility, don't you think? Of course it is an expression that is necessary depending on the occasion, but attaching it to everything is questionable. In the end, it comes down to whether you can choose, yourself, words that suit your relationship with the other person.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「職場の人間関係・職場復帰」。同僚と過ごす、日々の仕事の場を指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "肥料",
+   "reading": "ひりょう",
+   "pos": "noun",
+   "meaning": "fertilizer",
+   "defJa": "作物を育てるために、土に与える栄養分",
+   "passage": {
+    "ja": "「肥料」と「肥やし」の違いを日本語の授業で説明するとき、意味に限らず、使われる場面にも注目すると覚えやすくなります。農業の教科書や化学の授業、草花を育てる園芸の本では、窒素やリンを含む物質として、この語が使われます。一方、肥やしには、堆肥のような、昔ながらの有機物のにおいが残っています。語感の差を意識しながら例文を読むと、類義語の使い分けが、ぐっと身近に、はっきりと感じられるようになりますよ。",
+    "form": "肥料",
+    "en": "When explaining the difference between hiryo and koyashi, it is easier to remember if you pay attention not only to the meaning but also to the situations in which they are used. In agricultural textbooks and chemistry classes, the word hiryo is used for substances containing nitrogen and phosphorus. Koyashi, on the other hand, still carries the smell of traditional organic matter such as compost. If you read example sentences while being conscious of the difference in nuance, the usage of synonyms becomes much closer to you.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「化学肥料・有機肥料」。科学的・産業的な語で、肥やしより硬い。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "肯定",
+   "reading": "こうてい",
+   "pos": "noun",
+   "meaning": "affirmation, positive",
+   "defJa": "そのとおりだと認めること",
+   "passage": {
+    "ja": "日本語には、相手の言うことを肯定しているのか否定しているのか、分かりにくい返事がたくさんあります。「そうですね」は同意に聞こえますが、実は相づちにすぎないことも多く、「はい」でさえ、聞いているという合図にとどまる場合があります。そのため、英語圏の人にとって、日本人の「はい」は、賛成なのか、ただ聞いているだけなのか、見分けにくいといわれます。返事の裏にある気持ちを読む力は、日本語を学ぶうえで、文法と同じくらい大切です。",
+    "form": "肯定",
+    "en": "In Japanese there are many replies that make it hard to tell whether you are affirming or denying what the other person says. “So desu ne” sounds like agreement, but often it is nothing more than a backchannel, and even “hai” can stop at a signal that one is listening. For that reason, it is said that for people from the English-speaking world, a Japanese person's 'hai' is hard to tell apart, whether it means agreement or just listening. The ability to read the feeling behind a reply is as important as grammar in learning Japanese.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "対義語は否定。「肯定的・肯定する」の形で、承認や前向きな見方を表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "脅かす",
+   "reading": "おどかす",
+   "pos": "verb",
+   "meaning": "to threaten, endanger",
+   "defJa": "おびやかして、危険にさらす",
+   "passage": {
+    "ja": "睡眠不足は、個人の気分を損なうだけでなく、判断力そのものを脅かす。疲れた脳は、目の前の誘惑に弱く、長期の利益よりも目先の快楽を選びやすいという。それを知らないまま、意志の弱さを責めても、問題の根は消えない。起床時刻がばらばらな生活を放置しておいて、集中できないと嘆くのは、順序が逆だとも言える。休息を怠けとみなす文化こそが、私たちの生活の質を静かに、しかし確実に蝕んでいるのではないだろうか。",
+    "form": "脅かす",
+    "en": "Sleep deprivation not only spoils an individual's mood but threatens judgment itself. A tired brain is weak against the temptation in front of it and is said to choose short-term pleasure over long-term benefit more easily. Blaming weakness of will without knowing this will not make the root of the problem disappear. To leave a life with scattered wake-up times alone and then lament being unable to concentrate can also be called putting things in the wrong order. Is it not a culture that regards rest as laziness that is quietly but surely eroding the quality of our lives?",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "『平和を脅かす』『地位を脅かす』のように、安全や立場を危うくする意味。",
+    "sense": "安全・地位を危うくする"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "自ら",
+   "reading": "みずから",
+   "pos": "adverb",
+   "meaning": "for one's self, personally",
+   "defJa": "他人に頼らず、自分の意志で",
+   "passage": {
+    "ja": "改まった文章で好まれる「自ら」は、他人に言われたからではなく、主体的に動いたという重みを持っています。同じ意味の「自分で」と比べると、決意や覚悟がにじむ分だけ、書き言葉や演説に向いています。たとえば「名乗り出る」に添えるだけで、強いられたのではないことが、一語で伝わります。日常の会話では、「自分で」のほうがずっと自然ですし、自分の言動に責任を持つ姿勢も、そのほうが気負いなく表せるでしょう。",
+    "form": "自ら",
+    "en": "Mizukara, preferred in formal writing, carries the weight of having acted on one's own initiative, not because someone else said so. Compared with jibun de, which has the same meaning, it suits written language and speeches to the extent that resolve and determination show through. For example, merely adding it to 'come forward' conveys in one word that it was not forced. In everyday conversation jibun de is far more natural, and an attitude of taking responsibility for one's own words and deeds can probably be expressed without strain that way.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "改まった書き言葉で、強いられず進んで行う重みを出す。日常では「自分で」。",
+    "sense": "自分の意志で進んで"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "芸能",
+   "reading": "げいのう",
+   "pos": "noun",
+   "meaning": "public entertainment, performing arts",
+   "defJa": "歌・演劇・お笑いなど、人に見せる娯楽",
+   "passage": {
+    "ja": "最近のテレビや動画サイトの芸能ニュースって、人工知能で作った偽の動画が出回って、本人が慌てて否定する騒ぎが、けっこう多いじゃないですか。顔も声もそっくりだと、見ている側は、つい本物だと信じちゃうんですよね。被害者である本人が自ら訂正しても、一度広まった映像は、なかなか完全には消えてくれないんです。規制を求める声は強まっているものの、法律の整備が追いついていないのが現状なんですよ。",
+    "form": "芸能",
+    "en": "In recent entertainment news, there are quite a lot of uproars in which a fake video made with artificial intelligence circulates and the person himself denies it, aren't there? When the face and voice are identical, the viewer easily believes it is real. Even when the victim personally issues a correction, a video that has once spread does not disappear easily. Voices calling for regulation are growing, but the reality is that the development of laws has not caught up.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「芸能界・芸能人・芸能ニュース」。テレビや舞台で見せる大衆的な娯楽の世界。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "苦情",
+   "reading": "くじょう",
+   "pos": "noun",
+   "meaning": "complaint, grievance",
+   "defJa": "不満や困ったことを、相手に訴えること",
+   "passage": {
+    "ja": "人工知能の自動音声って、苦情を言おうと思って電話したら、延々と「番号を押してください」って言われるやつ、あるじゃないですか。あれ、ほんとに疲れますよね。しかも、やっと人につながったと思ったら、また最初から説明させられたりして。企業側からすれば、コストを減らす狙いなんでしょうけど、客の立場では、問題が解消するどころか、かえって腹が立つんですよ。結局、いちばん困っている人ほど後回しにされてるような気がしてしまうんです。",
+    "form": "苦情",
+    "en": "You know those artificial-intelligence automated voices, where you phone in to lodge a complaint and are told endlessly to 'press a number'? That really wears you out, doesn't it? And when you think you have finally reached a person, you are made to explain everything from the beginning again. From the company's side the aim is presumably to cut costs, but from the customer's standpoint, far from resolving the problem, it makes you angrier instead. In the end, you can't help feeling that the people in the most trouble get put off the most.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「苦情を言う／受ける／処理する」。サービスや迷惑への不満を訴える語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "英語圏",
+   "reading": "えいごけん",
+   "pos": "noun",
+   "meaning": "English-speaking world",
+   "defJa": "英語を母語や公用語として使う国々の地域",
+   "passage": {
+    "ja": "英語圏の人々と話すとき、インド英語のリズムに戸惑うという声をよく耳にします。母語の違う人々が共通語として使うなかで、強勢の置き方も語彙も、長い年月をかけて独自に磨かれてきたからです。相手の発音を直そうとするより、まず聞き取る側の耳を慣らすほうが、相手との距離もずっと自然に近づきます。話し方の上達とは、自分の型を守ることではなく、相手の型にも歩み寄ることなのです。",
+    "form": "英語圏",
+    "en": "When speaking with people from the English-speaking world, one often hears of being thrown off by the rhythm of Indian English. That is because, among people with different mother tongues using it as a common language, the placement of stress and the vocabulary have been polished in their own way. Rather than trying to correct the other person's pronunciation, first accustoming the listening ear makes conversation go far more smoothly. Improving how you speak is not guarding your own mold but also stepping closer to the other person's.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「英語圏の国々／英語圏に留学する」。英語が主要な言語である地域を広く指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "草花",
+   "reading": "くさばな",
+   "pos": "noun",
+   "meaning": "flowering plants",
+   "defJa": "野や庭に生える、草と花",
+   "passage": {
+    "ja": "人工知能に道ばたで撮った植物の写真を見せると、草花の名前を高い精度で当ててくれるアプリが、今ではたくさんあります。仕組みは、大量の画像から、花びらの形や葉の付き方の特徴を学習することです。ただ、よく似た種類の見分けや、地域ごとに違う呼び名の扱いまでは、まだ苦手だと言われています。野山を歩く楽しみは、機械が答えを出す前に、自分の目でじっくりと、絶えず観察する時間にもあるはずです。",
+    "form": "草花",
+    "en": "If you show a plant photo to artificial intelligence, there are now many apps that identify the names of wild flowers with high accuracy. The mechanism is to learn the features of petal shape and leaf arrangement from a large number of images. However, telling similar species apart and even differences in local names are said to be still hard for it. The pleasure of walking in fields and hills must also lie in the time spent observing with your own eyes before a machine gives the answer.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「野の草花・草花を愛でる」。庭や野原の小さな植物を、やさしい語感で言う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "落ちる",
+   "reading": "おちる",
+   "pos": "verb",
+   "meaning": "to decline; fall",
+   "defJa": "程度や数量が下がる。上から下へ移る",
+   "passage": {
+    "ja": "若い世代の間で、新聞を読む習慣が落ちるにつれて、漢字を書く力が低下しているという指摘がある。しかし、文字を手で書く機会が減っても、スマートフォンの変換機能のおかげで、読む力はむしろ保たれているという見方もある。問題は、書けるかどうかではなく、文章全体を最後まで読み通す持久力にあるとの意見も出ている。言語教育の現場では、こうした変化に応える新しい授業の試行が、各地で進んでいる。",
+    "form": "落ちる",
+    "en": "There are pointed remarks that, as the habit of reading newspapers declines among the younger generation, the ability to write kanji is deteriorating. But there is also the view that, even if opportunities to write characters by hand decrease, thanks to the conversion function of smartphones the ability to read is actually maintained. Some opinions say the problem lies not in whether one can write but in the stamina to read a whole text through to the end. In the field of language education, trials of new classes responding to such changes are advancing in various places.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "物が落ちる以外に、成績・人気・食欲などの水準が下がる意味でも使う。",
+    "sense": "水準・程度が下がる"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "蒸す",
+   "reading": "ふす",
+   "pos": "verb",
+   "meaning": "to steam; to be hot and humid",
+   "defJa": "湯気で熱を通す。むし暑くなる",
+   "passage": {
+    "ja": "六月から九月にかけてのインドは、モンスーンの影響で、息苦しいほど蒸す日が続く。気温が連日高いうえに、湿度も非常に高い地域が多く、洗濯物がなかなか乾かない。そのため市場では、蒸し暑さを和らげる冷たい飲み物や果物が、昼間からよく売れるという。一方で、豊富な雨は農家にとって欠かせない恵みでもあり、水や肥料の使い方を左右する気候と暮らしの結びつきの強さが、改めて浮き彫りになる。",
+    "form": "蒸す",
+    "en": "From June to September, India has a run of muggy days under the influence of the monsoon. Besides the high temperatures, humidity is also very high in many regions, and laundry will not dry easily. For that reason, cold drinks that ease the sultry heat are said to sell well at markets. On the other hand, the abundant rain is also an indispensable blessing for farmers, and the strength of the tie between climate and life, which sways how water and fertilizer are used, is thrown into relief once again.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "料理の「蒸す」と天気の「蒸す」の二つの意味。蒸し暑いは後者から。",
+    "sense": "むし暑くなる"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "蒸留",
+   "reading": "じょうりゅう",
+   "pos": "noun",
+   "meaning": "distillation",
+   "defJa": "液体を熱して蒸気にし、冷やして成分を取り出すこと",
+   "passage": {
+    "ja": "人工知能の世界で「蒸留」といえば、巨大なモデルの知識を、小さなモデルに移す技術のことです。お酒づくりで、液体を熱して成分を取り出す工程になぞらえて、そう呼ばれるようになりました。試行を重ねながら、大きなモデルの出力をもとに、小さなモデルが真似て学ぶと、性能をあまり損なわずに、計算量を大きく減らせます。スマートフォンの中で動く人工知能の多くが、こうした工夫に支えられているのです。",
+    "form": "蒸留",
+    "en": "In the world of artificial intelligence, when one speaks of distillation, it means a technique for transferring the knowledge of a huge model to a small one. It came to be called so by analogy with the process in liquor making of heating a liquid to extract its components. When a small model learns by imitating, based on the output of a large model, it can greatly reduce the amount of computation without losing much performance. Much of the artificial intelligence that runs inside smartphones is supported by such ingenuity.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "化学の蒸留が原義で、機械学習では大きなモデルの知識を小さなモデルへ移す比喩に。",
+    "sense": "成分を取り出す操作"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "行方",
+   "reading": "ゆくえ",
+   "pos": "noun",
+   "meaning": "whereabouts; course, outcome",
+   "defJa": "行った先。物事のこれから先の成り行き",
+   "passage": {
+    "ja": "自分のやる気の行方って、気づくと全然違うところに流れてたりしませんか。起床後は勉強するつもりだったのに、スマホを手に取ったが最後、気づけば夕方になってるなんてこと、よくありますよね。意志が弱いんじゃなくて、環境のほうが、注意をさらっていく仕組みになってるんです。だから、最初にスマホを別の部屋に置いて、手の届かないようにするだけで、集中力が案外あっさり戻ってくるんですよ。",
+    "form": "行方",
+    "en": "Doesn't the whereabouts of your motivation, when you notice, often seem to have flowed somewhere entirely different? You meant to study in the morning, but once you pick up your phone, it turns out to be evening before you know it, happens a lot, right? It isn't that your will is weak; the environment is set up so as to snatch away your attention. So just by putting your phone in another room at the start, your concentration comes back surprisingly easily.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「行方不明」の人の居場所のほか、「行方を見守る」のように成り行きの意味もある。",
+    "sense": "行った先・成り行き"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "街角",
+   "reading": "まちかど",
+   "pos": "noun",
+   "meaning": "street corner",
+   "defJa": "町の道が曲がったり交わったりする所",
+   "passage": {
+    "ja": "街角で聞こえる会話は、辞書にはまだ載っていない日本語の宝庫です。「やばい」が褒め言葉にも使われるようになったのは、若者たちの何気ない日常のやりとりの中で、意味の幅が少しずつ広がったからです。言葉の変化を研究する人たちは、教室よりも、電車の中やカフェの席で、絶えず耳を澄ませています。生きた言葉を知りたければ、まず机を離れて、歩き回って、耳を澄ましてみるのが、一番の近道です。",
+    "form": "街角",
+    "en": "Conversations heard on street corners are a treasure house of Japanese not yet listed in dictionaries. That yabai came to be used also as praise is because, in young people's everyday exchanges, its range of meaning broadened little by little. People who study language change keep their ears constantly pricked, in trains and café seats rather than in classrooms. If you want to know living language, the shortest way is first to leave your desk and try walking around.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「街角で声をかける」「街角のカフェ」。人の行き交う町の一角を、親しみを込めて言う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "表向き",
+   "reading": "おもてむき",
+   "pos": "noun",
+   "meaning": "outwardly; officially",
+   "defJa": "外から見える、建前としての面",
+   "passage": {
+    "ja": "古代から続くインド社会の身分制度であるカーストは、表向きには、法律で差別が禁じられています。しかし実際には、結婚や職業の選択において、今も影響が残っていると言われます。憲法は、一九五〇年に施行されて以来、不可触民とされた人々への差別を、はっきりと禁止してきました。それでも、制度と現実の間には、簡単には埋まらない溝が存在しており、統計の数字だけでは見えない現実があるのです。",
+    "form": "表向き",
+    "en": "Caste, the status system of Indian society, is officially prohibited by law as a form of discrimination. In practice, however, its influence is said to remain even now in the choice of marriage and occupation. The constitution has prohibited discrimination against untouchables since it came into force in 1950. Even so, there is a gap between system and reality that cannot be filled easily, and there is a reality that cannot be seen from the numbers in statistics alone.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「表向きは〜だが、実は」の形で、建前と本音のずれを示すことが多い。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "被害者",
+   "reading": "ひがいしゃ",
+   "pos": "noun",
+   "meaning": "victim",
+   "defJa": "災害や犯罪などで、害を受けた人",
+   "passage": {
+    "ja": "人工知能で作られた偽の画像によって、被害者が精神的な苦痛を受ける事例が、各国で報告されている。本人の顔を別の映像に合成する技術は、素人にも扱えるほど簡単になりつつあり、悪用を防ぐ仕組みが追いついていない。苦情や削除要請の手続きを迅速化する動きが広がってはいるが、拡散の速さには遠く及ばないのが実情だ。技術の進歩を止められないとしても、責任の所在を明確にする議論が急がれる。",
+    "form": "被害者",
+    "en": "Cases in which victims suffer mental anguish from fake images made with artificial intelligence are being reported in various countries. The technology for compositing a person's face into another video is becoming easy enough for amateurs to handle, and mechanisms to prevent abuse have not caught up. Moves to speed up the procedure for takedown requests are spreading, but the reality is that they fall far short of the speed of diffusion. Even if the progress of technology cannot be stopped, a discussion clarifying where responsibility lies is urgently needed.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "対義語は加害者。事件・事故・詐欺などで損害を受けた人。「被害を受ける」の名詞形。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "装う",
+   "reading": "よそおう",
+   "pos": "verb",
+   "meaning": "to feign; pretend; dress up as",
+   "defJa": "外見をそれらしく見せる。ふりをする",
+   "passage": {
+    "ja": "言葉は、人が本心を伝えるための道具であると同時に、本心を覆い隠す道具でもある。表向きは丁寧な敬語を装うことで、冷たい拒絶を和らげて聞こえさせる手もあれば、親しげな言い方を装って、相手の警戒心を緩める手もある。大切なのは、言葉の形そのものではなく、その背後にある意図や文脈を読み取る力だ。同じ「検討します」という一言でも、場面や相手が違えば、まったく別の意味を帯びるのである。",
+    "form": "装う",
+    "en": "Language is at once a tool for conveying one's true feelings and a tool for covering them up. There are ways of making a cold refusal sound softer by feigning polite honorifics on the surface, and ways of loosening the other person's guard by feigning a friendly manner. What matters is not the form of the words but the ability to read the intent behind them. Even the same 'I will consider it' takes on a completely different meaning if the situation differs.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「平静を装う」「親切を装う」。内心と違う様子を、わざと外に見せる意味。",
+    "sense": "ふりをする・外見をつくる"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "補う",
+   "reading": "おぎなう",
+   "pos": "verb",
+   "meaning": "to compensate for; make up for",
+   "defJa": "足りない部分に、ほかのものを加えて満たす",
+   "passage": {
+    "ja": "運動不足を補うために、週末にまとめて運動する人は多い。しかし、週末の運動だけでは、平日の座りっぱなしの影響を完全には打ち消せないという報告もある。座っている時間の長さそのものが、心身に悪影響を及ぼす恐れがあるためだ。職場でも、一時間に一度立ち上がって歩くだけで、集中力の低下をかなり防げるとされる。短い時間でも、こまめに体を動かすことのほうが、長い目で見れば健康を支える土台になるらしい。",
+    "form": "補う",
+    "en": "Many people exercise intensively on weekends to make up for lack of exercise. However, there is also a report that weekend exercise alone cannot completely cancel out the effects of sitting around on weekdays. This is because the sheer length of time spent sitting may have a bad effect on body and mind. Even at the workplace, just standing up and walking once an hour is said to prevent a considerable drop in concentration. Even if short, moving the body frequently seems to become, in the long run, the foundation that supports health.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "不足・欠点・赤字などを『補う』。足りないところに別のもので埋め合わせる意味。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "製作",
+   "reading": "せいさく",
+   "pos": "noun",
+   "meaning": "manufacture, production",
+   "defJa": "物や作品を、つくり上げること",
+   "passage": {
+    "ja": "ものを一から製作する人たちは、完成までの長い時間を、たいてい孤独に耐えて過ごします。陶芸家は、窯から出すまで結果が分からず、映画の監督は、公開されるまで観客の反応を知ることができません。先の見えないその不確かさの中で、それでも手を動かし続けられるのは、途中の試行そのものに、喜びを見出しているからです。結果への執着より、過程への静かな没頭こそが、創造を長く支える力になるのです。",
+    "form": "製作",
+    "en": "People who make things spend the long time until completion enduring solitude. A potter does not know the result until it comes out of the kiln, and a film director cannot learn the audience's reaction until it is released. That they can keep moving their hands amid such uncertainty is because they find joy in the trials along the way themselves. Absorption in the process rather than attachment to the result becomes the power that supports creation.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「製作費・映画を製作する」。作品や製品をつくる意味で、制作より産業的。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "見かける",
+   "reading": "みかける",
+   "pos": "verb",
+   "meaning": "to happen to see; spot",
+   "defJa": "偶然、目にする。ときどき目にする",
+   "passage": {
+    "ja": "ここ数年、街角で自動運転のタクシーを見かけるようになったという話を、海外のニュースで目にする機会が増えた。しかし、技術が日常に入り込むとき、人は驚きよりも先に、いつのまにか慣れを覚えてしまう。便利さがすっかり当たり前になった時点で、その技術が抱えるリスクへの感覚も、同時に鈍りかねない。新しいものを前にして、無邪気に喜ぶことと冷静に疑うことを、どう両立させるかが問われている。",
+    "form": "見かける",
+    "en": "Lately, opportunities have grown to see in overseas news stories of people coming to spot self-driving taxis in the streets. But when technology enters daily life, people feel familiarity before they feel surprise. The moment convenience becomes taken for granted, the sense of the risks that the technology carries could become dulled at the same time. Faced with something new, how to reconcile innocently rejoicing with calmly doubting is the question being asked.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「街で見かける」。意図せず目に入る意味で、よく見る・たまに見る両方に使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "見本",
+   "reading": "みほん",
+   "pos": "noun",
+   "meaning": "sample",
+   "defJa": "全体の品質や形を示すために見せる、実物の一部",
+   "passage": {
+    "ja": "江戸時代の商人たちは、遠くの客に商品を売るために、布や紙の見本を持って、街道を歩き回った。実物を見ずに買う客に安心を与えるには、品質の確かな現物を小さく製作して示すことが、信用を築く何よりの第一歩だったのである。現代の通信販売や画面越しの買い物の仕組みも、突き詰めれば、この信頼のやりとりの延長線上にある。商いとは、物を売る以前に、まず誠実さを売る営みなのかもしれない。",
+    "form": "見本",
+    "en": "Merchants of the Edo period walked the highways carrying samples of cloth and paper to sell goods to distant customers. To reassure customers who bought without seeing the real thing, making and showing a small piece of reliable quality was the very first step in building trust. The mechanism of modern mail-order and shopping through a screen, traced to its roots, is on the extension of this exchange of trust. Commerce may be an activity that sells sincerity first, before it sells goods.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「商品見本・見本市」。大量の品の質を示すための手本。お手本の意味にもなる。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "見積もる",
+   "reading": "みつもる",
+   "pos": "verb",
+   "meaning": "to estimate",
+   "defJa": "費用や数量などを、前もっておおよそ計算する",
+   "passage": {
+    "ja": "日本語の「見積もる」は、費用を計算するだけでなく、物事の価値や可能性を予測するときにも使われる。「甘く」や「過小に」のような副詞と結びつくと、判断の傾きや話し手の心づもりまで表すことができる。つまりこの動詞には、統計や数字の計算と、人間の判断の癖とが、一つの語の中で混じり合っているのだ。言葉をじっくり見つめていると、思考の癖までもが、そこに埋め込まれているのが見えてくる。",
+    "form": "見積もる",
+    "en": "The Japanese verb mitsumoru is used not only to calculate costs but also when predicting the value or possibility of things. When it is combined with adverbs such as 'optimistically' or 'too low,' it can express even the tilt of a judgment. In other words, this verb mixes numerical calculation and the habits of human judgment within a single word. If you look closely at words, you begin to see that even the habits of thought are embedded in them.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "費用の見積もりから、将来や能力を見積もる意味まで。副詞と合わせ判断の傾きを示す。",
+    "sense": "おおよそ計算・予測する"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "視力",
+   "reading": "しりょく",
+   "pos": "noun",
+   "meaning": "eyesight, vision",
+   "defJa": "物を見るための、目の力",
+   "passage": {
+    "ja": "人間の視力は、遠くの小さな文字を見分ける力として測られますが、人工知能の側では、見分けられる物の種類の多さや、暗い場所での精度が、その力の指標として語られることが多いです。同じ「見る」という行為でも、人間と機械では、評価の物差しがまるで異なります。話し手としては、この違いを知っておくと、技術を解説するときに、聞き手の誤解を防ぎやすくなります。たとえ話を選ぶ際は、相手の経験に引き寄せることが、何より大切です。",
+    "form": "視力",
+    "en": "Human eyesight is measured as the ability to tell apart small letters at a distance, but the 'eyesight' of artificial intelligence is often described by how many kinds of things it can tell apart and by its accuracy in dark places. Even for the same act of seeing, the yardsticks of evaluation are entirely different for humans and machines. As a speaker, knowing this difference makes it easier to prevent the listener's misunderstanding when you explain technology. When choosing analogies, the most important thing is to draw them close to the other person's experience.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「視力が落ちる・視力検査」。見る能力そのものを指す。測定する数値に使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "解く",
+   "reading": "ほどく",
+   "pos": "verb",
+   "meaning": "to unfasten, to undo",
+   "defJa": "結んであるものを、ゆるめて離す",
+   "passage": {
+    "ja": "固く絡まった結び目を解くには、力任せに引っ張るより、緩いところを探して、少しずつ動かすほうが早い。人間関係のもつれも、これに似ていて、力で押し切ろうとするほど、かえって固く締まってしまうことが多い。心理学者の間では、感情の高ぶりが収まるまで時間を置くことが、誤解や行き違いを晴らす最初の手順とされる。急がず、絡まった糸の端を、深呼吸をしてから静かに探してみたい。",
+    "form": "解く",
+    "en": "To undo a knot, it is faster to look for the loose place and move it little by little than to pull by brute force. Tangles in human relationships are similar, and the more you try to push through by force, the tighter they often become. Among psychologists, leaving time until emotional agitation subsides is regarded as the first step in clearing up a misunderstanding. I would like to search quietly for the end of the tangled thread without hurrying.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "ひもや結び目を『解く』。『とく』と読む解答する意味と区別し、読みで判断。",
+    "sense": "結び目をゆるめて離す"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "解散",
+   "reading": "かいさん",
+   "pos": "noun",
+   "meaning": "breakup, dissolution",
+   "defJa": "集まっていた人々や組織が、ばらばらになること",
+   "passage": {
+    "ja": "戦国時代の終わりに、豊臣秀吉は一五八八年に刀狩令を出して、農民から武器を取り上げた。同時に、武士と農民を分ける身分政策を進めたため、各地の武装集団は解散を余儀なくされた。こうした政策は、社会の安定をもたらした反面、人々の移動や職業を選ぶ自由を狭めることにもなった。歴史の大きな転換点には、必ず得るものと失うものの両面があり、それがその後の行方を長く左右するのである。",
+    "form": "解散",
+    "en": "At the end of the Warring States period, Toyotomi Hideyoshi issued the sword hunt edict and took weapons away from farmers. Because he simultaneously advanced a status policy separating samurai from farmers, armed bands in various regions were forced to disband. Such policies brought social stability but, on the other hand, also narrowed people's freedom of movement and occupation. At the turning points of history there are always both what is gained and what is lost, and they sway the course that follows.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「解散する／解散総選挙」。団体・会が解かれる意味で、議会の場合は政治の語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "解消",
+   "reading": "かいしょう",
+   "pos": "noun",
+   "meaning": "resolution; elimination, dissolving",
+   "defJa": "問題や状態がなくなること、またなくすこと",
+   "passage": {
+    "ja": "インドの電車、時間通りに来ないって有名ですけど、遅れを解消するために、路線の改良が進められているそうです。ただ、駅の改札口で何時間も待つのが当たり前だった人たちにとっては、時間通りに来ること自体が、ちょっとした驚きなんですよね。遅延は絶えず起こるものだって割り切ったほうが、旅行者としては気が楽ですけど。それでも、人々の暮らしに関わる問題だから、改善に向けた動きは、地味でも大事なんです。",
+    "form": "解消",
+    "en": "Indian trains are famous for not coming on time, but I hear that improvements to the lines are being made to eliminate the delays. Still, for people for whom waiting hours at the station gate was taken for granted, the trains coming on time is itself a bit of a surprise. As a traveler, it is easier on the nerves to simply accept that delays are part of the trip. Even so, because it is a problem that concerns people's lives, the movement toward improvement is important, even if unglamorous.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「ストレス解消／問題が解消する」。悪い状態や不満が消えて、なくなる意味。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "解説",
+   "reading": "かいせつ",
+   "pos": "noun",
+   "meaning": "explanation, commentary",
+   "defJa": "物事の意味や背景を、分かりやすく説明すること",
+   "passage": {
+    "ja": "テレビで見る分かりやすいニュースの解説って、理解が深まるどころか、分かった気になるだけで、実はほとんど何も頭に残ってないことが多いんですよ。分かった感じと、本当に分かってる状態は、全然違うんです。たとえば、あとで何も見ずに自分の言葉で説明し直そうとすると、途端に言葉に詰まるじゃないですか。あの詰まる感覚こそ、理解がまだ浅いことを教えてくれる、とても大事なサインなんですよね。",
+    "form": "解説",
+    "en": "With easy-to-follow news commentary, far from deepening your understanding, you often just feel that you've understood and in fact nothing stays in your head. The feeling of understanding and truly understanding are completely different. For example, when you try to explain it again afterward in your own words, you stumble over words right away, don't you? That feeling of stumbling is precisely an important sign telling you your understanding is still shallow.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「解説者・ニュース解説」。ただ説明するだけでなく、背景まで噛み砕いて述べる。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "言動",
+   "reading": "げんどう",
+   "pos": "noun",
+   "meaning": "words and deeds, conduct",
+   "defJa": "口に出すことと、行うこと",
+   "passage": {
+    "ja": "対話型の人工知能の言動に、人間らしさを感じてしまうのは、ただの錯覚だと片付けることもできる。しかし、錯覚であっても、私たちの側の反応は本物であり、その反応が社会の仕組みを変えていく。本当の問題は、機械が心を持っているかどうかではなく、心を持つ者を装う機械に、人間がどこまで依存するかにある。この問いは、技術の進歩とともに、ますます避けて通れないものになっていく。",
+    "form": "言動",
+    "en": "One can dismiss the human-likeness we feel in the words and deeds of artificial intelligence as an illusion. But even if it is an illusion, our own reactions are real, and those reactions change the workings of society. The problem lies not in whether the machine has a mind but in how far humans come to depend on a machine that pretends to have one. This question will become more and more unavoidable as technology advances.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「言動に注意する／言動が一致する」。発言と行為をまとめて、人柄を評する語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "診察室",
+   "reading": "しんさつしつ",
+   "pos": "noun",
+   "meaning": "examination room",
+   "defJa": "医師が患者を診る部屋",
+   "passage": {
+    "ja": "診察室で患者さんに説明するときは、専門用語をそのまま使わず、相手の言葉に置き換えることが大切です。最近は、人工知能が診断を補助する場面も増えましたが、その結果をどう解説するかは、医師の話し方に委ねられています。「この画像では異常の可能性が高いです」と告げるより、「念のため詳しく調べましょう」と言うほうが、不安を与えずに済む場合もあります。話し方とは、情報の正確さと相手の心への配慮を、同時に満たす技術なのです。",
+    "form": "診察室",
+    "en": "When explaining to patients in the examination room, it is important not to use technical terms as they are but to replace them with the other person's words. Recently there are more scenes in which artificial intelligence assists diagnosis, but how to explain the result is left to the doctor's way of speaking. Saying 'Let's investigate in detail, just to be safe' may spare the patient anxiety better than announcing 'The possibility of abnormality in this image is high'. Speaking is a skill that satisfies both the accuracy of information and consideration for the other person's feelings at once.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "病院の診察室。ほかに『診察』『診察券』などと結びつき、医療の場面を表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "証人",
+   "reading": "しょうにん",
+   "pos": "noun",
+   "meaning": "witness",
+   "defJa": "事実を証明する人。立ち会う人",
+   "passage": {
+    "ja": "インドの宗教的な婚礼では、神聖な火を囲んで七歩あるく儀式があり、その火が結婚の証人とされます。人間の立ち会いよりも、神や自然の力に誓うという考え方が、そこには表れています。比較宗教学を学ぶとき、英語圏の婚礼の誓いと並べて、こうした儀式の細部に着目すると、それぞれの社会が何を「確かなもの」とみなすのかが見えてきます。試験では、制度の違いを、価値観の違いと結びつけて説明できると強いです。",
+    "form": "証人",
+    "en": "In Indian religious weddings there is a ritual of walking seven steps around a sacred fire, and that fire is regarded as the witness of the marriage. It expresses the idea of swearing to the power of gods and nature rather than to human attendance. When studying comparative religion, setting them beside English-speaking wedding vows and paying attention to the details of such rituals lets you see what each society regards as 'certain'. In exams, being able to explain differences in institutions by tying them to differences in values is a strong point.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "法廷の証人のほか、儀式や結婚の立会人にも使う。「証人になる・証人喚問」。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "試行",
+   "reading": "しこう",
+   "pos": "noun",
+   "meaning": "trial, attempt",
+   "defJa": "うまくいくかどうか、実際にやってみること",
+   "passage": {
+    "ja": "たとえば毎朝の起床時刻を揃えるような、新しい習慣を始めるときに、最初から完璧にやろうとすると、続かないんですよね。まずは一週間だけ試行する、くらいの軽い気持ちで始めたほうが、結局は長続きします。完璧を目指しただけに、挫折も早いんです。うまくいかなかったら、やり方を変えればいいだけで、自分を責める必要なんてありません。小さな失敗を何度も重ねた人が、最終的には、習慣の達人になっていくんだと思います。",
+    "form": "試行",
+    "en": "When you start a new habit, trying to do it perfectly from the start doesn't last, you know. Starting with a light mind, like trying it out for just one week, ends up lasting longer. Precisely because you aimed at perfection, you give up sooner. If it doesn't go well, you only have to change the way, and there is no need to blame yourself. I think people who pile up small failures many times eventually become masters of habit.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「試行を重ねる」。結果を見る前提で、実際にやってみる意味で、試行錯誤の中心。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "詫びる",
+   "reading": "わびる",
+   "pos": "verb",
+   "meaning": "to apologize",
+   "defJa": "自分の過ちを認め、許しを求める",
+   "passage": {
+    "ja": "人工知能が重大な間違いをしたときに、人間と同じように詫びる必要があるのか、っていう議論があるんですよ。謝ってもらえれば、利用者はたしかに、少しは気持ちが落ち着くかもしれません。でも、機械が謝ることで、被害者が誰に責任を問えばいいのか、ぼやけてしまう恐れもあるんです。本当に謝るべきなのは、システムを作って運営している人間のほうだ、という指摘は、私にはもっともだと思えます。",
+    "form": "詫びる",
+    "en": "There is a debate over whether artificial intelligence needs to apologize like a human when it makes a mistake. If it apologizes, users may indeed feel calmer. But there is also a risk that, with a machine apologizing, it becomes blurry whom the victim should hold responsible. The point that it is the humans who built and operate the system who should truly apologize strikes me as reasonable.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「失敗を詫びる」。『謝る』より改まり、心からの謝罪の気持ちを込めた書き言葉。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "詰まる",
+   "reading": "つまる",
+   "pos": "verb",
+   "meaning": "to be blocked, to be packed",
+   "defJa": "物がいっぱいで通らない。行き止まりになる",
+   "passage": {
+    "ja": "考えが詰まったとき、机にしがみつくことなく、一度その場を離れたほうがいい。散歩の途中や入浴中に、ふと答えが浮かぶという経験は、多くの人にあるはずだ。意識的な思考が止まったあとも、脳は無意識のうちに、情報を整理し続けているからである。思考の泥沼にはまったと感じても、それは深い処理が始まる前触れとさえ言える。焦って画面を眺め続けるより、数分でも歩いて頭を空にするほうが、結局は近道なのだ。",
+    "form": "詰まった",
+    "en": "When your thinking gets stuck, it is better to step away from the spot once, without clinging to the desk. Many people must have had the experience of an answer suddenly coming to mind during a walk or in the bath. This is because, even after conscious thought stops, the brain keeps organizing information unconsciously. Even when you feel you have fallen into a bog of thought, that can even be called a harbinger of deep processing. Rather than staring on at the screen in a panic, walking for even a few minutes and emptying your head is, in the end, the shortcut.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "『言葉が詰まる』『鼻が詰まる』。ふさがって先へ進めない状態。",
+    "sense": "ふさがって通らない"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "語源",
+   "reading": "ごげん",
+   "pos": "noun",
+   "meaning": "word root, etymology",
+   "defJa": "言葉の成り立ち、もとの形や意味",
+   "passage": {
+    "ja": "話に深みを出したいなら、言葉の成り立ちを一つ添えてみてください。たとえば「ありがとう」は、「有ることが難しい」という意味の「有り難し」から来ています。当たり前でないことへの驚きと感謝が、わずか一語に凝縮されているのです。語源を知っていると、同じ言葉を口にするときの響きも、聞き手との距離も、少し変わってきます。聞き手もその由来を耳にして、毎日使う言葉を、少し違った目で見直すはずです。",
+    "form": "語源",
+    "en": "If you want to add depth to your talk, try adding the make-up of one word. For example, arigato comes from arigatashi, meaning that it is difficult to exist. Surprise and gratitude at what is not taken for granted are condensed into a mere single word. If you know the etymology, both the ring of saying the same word and your distance from the listener change a little. Hearing the origin, the listener too will probably look anew at the words used every day.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「語源を調べる／語源は〜」。言葉が生まれた由来を指す。話に深みを添える材料。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "誤作動",
+   "reading": "ごさどう",
+   "pos": "noun",
+   "meaning": "malfunction",
+   "defJa": "機械などが、誤って正しくない働きをすること",
+   "passage": {
+    "ja": "脳にも、機械と同じように、誤作動はある。夜の暗い街角で、木の枝を人影と見間違えて、思わず足を止めて身構えた経験は、誰にでもあるだろう。これは、危険を見逃すよりも、過剰に警戒するほうが生き残りやすかったという、太古の進化の名残だとされる。ただ、現代では、この警戒の仕組みが、必要以上にソーシャルメディアの批判や仕事の失敗にまで反応してしまい、慢性的な不安を生みかねない。",
+    "form": "誤作動",
+    "en": "The brain also has malfunctions. Everyone must have had the experience of mistaking a tree branch for a human figure on a dark road and bracing involuntarily. This is said to be a remnant of evolution, in which over-vigilance was more likely to survive than missing a danger. Today, however, this alarm mechanism reacts even to criticism on social media or failure at work and could produce chronic anxiety.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "機械の誤作動を、脳や感覚の働きの比喩として使うこともできる。「誤作動を起こす」。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "調理師",
+   "reading": "ちょうりし",
+   "pos": "noun",
+   "meaning": "licensed cook, chef",
+   "defJa": "国家資格を持ち、料理をつくる職業の人",
+   "passage": {
+    "ja": "ロボットが調理師の代わりになるって話、ずいぶん前から出てるけど、本当にそうなるのかな。確かに、同じ味を何百回でも毎回正確に再現するのは、機械のほうが得意でしょう。でも、その日の食材の状態を見て、火加減を微妙に調節するあの感覚は、まだ人間にしかできないんじゃないかなって、僕は思うんです。味って、レシピよりも、作る人の長い経験と、毎日の観察の積み重ねで決まるものだと思うんです。",
+    "form": "調理師",
+    "en": "The talk of robots replacing cooks has been around for a while, but will it really come to that? Surely machines are better at reproducing the same taste accurately every time. But that feel of looking at the state of the day's ingredients and subtly adjusting the heat is something only humans can still do, isn't it? I think taste is decided not by recipes but by the accumulation of the maker's experience and observation.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "国家資格を持つ料理人。ふつうの『料理人』より、資格の意味合いが強い。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "調節",
+   "reading": "ちょうせつ",
+   "pos": "noun",
+   "meaning": "regulation, adjustment",
+   "defJa": "程度や量を、ちょうどよいように整えること",
+   "passage": {
+    "ja": "古代エジプトの人たちが、ナイル川の氾濫をうまく利用してたって話、面白いんですよ。毎年だいたい決まった時期に水かさが増えて、肥沃な土が運ばれてくるので、農業の暮らしは、川のリズムに合わせて調節されてたんです。水位を測定する施設も作られていて、その記録をもとに税額まで決めていたと言われます。自然のリズムを丁寧に読んで、暮らしのほうを合わせていく知恵が、文明を長く支えていたんですね。",
+    "form": "調節",
+    "en": "The story of how the ancient Egyptians made good use of the flooding of the Nile is interesting. Because the water rose at a fixed time every year and carried fertile soil, the farming life was regulated to match the rhythm of the river. Facilities to measure the water level were also built, and it is said that even the tax amounts were decided on the basis of those records. The wisdom of reading nature's rhythm and fitting life to it was supporting civilization.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「温度を調節する／調節が利く」。程度を加減してちょうどよく整える。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "謙遜",
+   "reading": "けんそん",
+   "pos": "noun",
+   "meaning": "humility, modesty",
+   "defJa": "自分を低くして、控え目にふるまうこと",
+   "passage": {
+    "ja": "日本人は控え目な態度を美徳とするが、心理学の統計を用いた研究では、過度の謙遜が、自己評価を不当に下げてしまうことが示されている。他人から褒められても、「いえ、そんなことはありません」と打ち消す習慣が続くと、自分の長所に気づく機会が、少しずつ減ってしまうからだ。専門家は、ありがとうと感謝の言葉で受け止める練習を勧めている。控え目な態度と自己否定は別のものだと見極めることが、心の健康を保つうえで欠かせない。",
+    "form": "謙遜",
+    "en": "Japanese people regard humility as a virtue, but psychological research shows that excessive humility unfairly lowers self-evaluation. If the habit of denying 'No, not at all' even when praised by others continues, opportunities to notice one's own strengths decrease. Experts recommend practicing receiving praise with words of thanks. Discerning that a modest attitude and self-denial are different things is essential for mental health.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「謙遜する・謙遜しすぎ」。褒め言葉への打ち消しなど、控え目な態度を指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "起床",
+   "reading": "きしょう",
+   "pos": "noun",
+   "meaning": "rising, getting out of bed",
+   "defJa": "朝、ねどこから起きること",
+   "passage": {
+    "ja": "起床時刻を毎日揃えることは、睡眠の質を高めるうえで、就寝時刻以上に重要だとされる。朝日を浴びることで、体内時計が整い、夜に自然な眠気が訪れるからだ。休日に二時間以上遅く起きると、いわゆる「社会的時差ぼけ」が生じ、週明けの体調不良につながるという。自分に必要な睡眠時間を見積もるより先に、焦って生活全体を変えようとせず、まず起きる時刻から整えていくのが近道である。",
+    "form": "起床",
+    "en": "Keeping the wake-up time the same every day is said to be more important than bedtime for raising sleep quality. This is because exposure to morning sun sets the body clock and brings natural sleepiness at night. Waking more than two hours later on days off produces so-called social jet lag, which is said to lead to poor condition at the start of the week. Rather than rushing to change your life, the shortcut is to set the time you get up first.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「起床時刻・起床する」。就寝の対。改まった場面や規則的な生活を述べる語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "超過",
+   "reading": "ちょうか",
+   "pos": "noun",
+   "meaning": "excess, being over",
+   "defJa": "決まった数や限度を、こえること",
+   "passage": {
+    "ja": "十八世紀のイギリスは、清との茶の貿易で輸入超過に陥り、国内の銀が流出していきました。それを補うために、イギリスは清に対して、インド産のアヘンを売り込み、貿易の均衡を取り戻そうとしたのです。その結果、中国では中毒者が増え、社会が深刻な打撃を受けて、やがてアヘン戦争へとつながっていきます。経済の数字の裏には、いつも人々の暮らしがあることを、歴史は教えてくれます。",
+    "form": "超過",
+    "en": "In the eighteenth century, Britain fell into an import excess through its tea trade with Qing China, and silver flowed out of the country. To make up for it, Britain pushed Indian opium onto the Qing and tried to restore the trade balance. As a result, addicts increased in China, society took a serious blow, and it eventually led to the Opium War. History teaches us that behind economic figures there are always people's lives.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「輸入超過・時間超過」。基準や限度をこえる意味で、数量や時間に使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "距離",
+   "reading": "きょり",
+   "pos": "noun",
+   "meaning": "distance",
+   "defJa": "二つの物の間の、へだたり",
+   "passage": {
+    "ja": "人工知能と人間の距離が、急速に縮むにつれて、対話型のサービスを日常的に使う人が増え、悩み相談の相手として頼る例も出てきた。専門家の間では、機械に心を預けることの利点と危うさをめぐって、議論が深まりつつある。便利さに流されず、どこまでを機械に任せるのかを、利用者自身が見極める必要がある。親しさが増すほどに、どこで線を引くかという責任も、人間の側に重くのしかかってくる。",
+    "form": "距離",
+    "en": "As the distance between artificial intelligence and humans shrinks rapidly, more people use conversational services daily, and cases of relying on them as someone to consult about worries have appeared. Among experts, debate is deepening over the benefits and dangers of entrusting one's heart to a machine. Without being swept away by convenience, users themselves need to judge how much to leave to machines. The greater the closeness, the more heavily the responsibility of where to draw the line also falls on the human side.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "空間的な長さのほか、「心の距離」「距離を置く」など、関係の近さ遠さにも使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  },
+  {
+   "term": "踏み場",
+   "reading": "ふみば",
+   "pos": "noun",
+   "meaning": "place to step",
+   "defJa": "足を置くことのできる場所",
+   "passage": {
+    "ja": "「足の踏み場もない」という慣用句は、清掃を後回しにした部屋のように、床に物が散らばっていて、歩ける場所がないという意味です。ここでの「も」は、一つの例外もないことを表し、否定の言い方と結びついて強い言い切りになります。試験で慣用句を問われたときは、意味だけでなく、助詞や活用の形まで一緒に覚えておくと、取りこぼしが減ります。たとえば「立つ瀬がない」「身の置き所がない」も、同じく否定と結びついた表現で、居場所のなさを言う点が共通しています。",
+    "form": "踏み場",
+    "en": "The idiom 'ashi no fumiba mo nai' means that things are scattered over the floor and there is no place to walk. The 'mo' here expresses that there is not a single exception, and combined with a negative it makes a strong assertion. When you are asked about idioms on an exam, memorizing not only the meaning but also the particles and conjugation together reduces missed points. For example, 'tatsu se ga nai' and 'mi no okidokoro ga nai' are likewise expressions tied to negation, and both speak of having no place to stand.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "『足の踏み場もない』の形で、物が散らかり歩く所さえない状態を言う慣用句。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "writer": "claude-sonnet-5-5"
+  }
+ ]
+}
