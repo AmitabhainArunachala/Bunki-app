@@ -22,6 +22,7 @@ Pass only if ALL hold:
    - `ai`: AI and semiconductors.
    - `history`: world history.
    - `language`: Japanese about Japanese.
+   - `other`: wider interests, including science, art, food, nature, cities, and craftsmanship.
 3. **Level:** the surrounding Japanese is about N2 with N3–N1 grammar mixed naturally, and not stacked with rare words.
 4. **English:** `en` is a faithful translation, with the same number of sentences as `ja`; `meaning` is a correct short gloss.
 

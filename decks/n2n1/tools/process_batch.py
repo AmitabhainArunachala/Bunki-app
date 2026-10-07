@@ -27,6 +27,7 @@ JUDGE = rb.JUDGE
 
 def main() -> int:
     bid, rewrite = ARGS[0], "--rewrite" in ARGS
+    writer = ARGS[ARGS.index("--writer") + 1] if "--writer" in ARGS else "claude-sonnet-5-5"
     batch = json.loads((SRC / "batches" / f"{bid}.json").read_text("utf-8"))
     meta = {i["term"]: i for i in batch["items"]}
     src = SRC / "drafts" / f"{bid}-{'rewrite' if rewrite else 'draft'}.json"
@@ -41,7 +42,7 @@ def main() -> int:
     verdicts, info = rb.ask(JUDGE, rb.PROMPT_J, {"cards": ok}, "verdicts") if ok else ([], {"model": JUDGE})
     v = rb.merge_verdicts(verdicts)
     with log.open("a", encoding="utf-8") as f:
-        f.write(json.dumps({"step": "rewrite" if rewrite else "draft", "mech": mech, **info, "verdicts": verdicts}, ensure_ascii=False) + "\n")
+        f.write(json.dumps({"step": "rewrite" if rewrite else "draft", "writer": writer, "mech": mech, **info, "verdicts": verdicts}, ensure_ascii=False) + "\n")
     kept, fix = [], {}
     for term in want:
         c = next((x for x in cards if x["term"] == term), None)
@@ -55,7 +56,7 @@ def main() -> int:
         if j and j.get("editor") == "pass" and j.get("facts") == "pass":
             m = meta[term]
             c.update({"deck": m["deck"], "field": m.get("field"), "level": m.get("level"), "pass": 1,
-                      "writer": "claude-sonnet-5-5", "judge": JUDGE})
+                      "writer": writer, "judge": JUDGE})
             kept.append(c)
         else:
             fix[term] = " / ".join(x for x in ((j or {}).get("editorWhy"), (j or {}).get("factsWhy")) if x)[:400] or "no verdict"
