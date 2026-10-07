@@ -33,4 +33,4 @@ The brief names `verify-navigation-returns.mjs`; this checkout provides `test-na
 
 The storage suite passed all 26 schema/policy checks, the navigation-return suite passed all four cases, and `tools/sw-shell.test.mjs` passed all seven tests. Browser coverage includes the existing Chromium/WebKit runs where supported by each verifier.
 
-F6 will rerun this exact subset and record the final results in `AFTER.md`. Label/selector changes to verifiers must be itemized in `VERIFIER_CHANGES.md`; behavioral assertions remain intact.
+F6 reran this exact subset; [AFTER.md](AFTER.md) records the final results. Label/selector changes to verifiers must be itemized in `VERIFIER_CHANGES.md`; behavioral assertions remain intact.

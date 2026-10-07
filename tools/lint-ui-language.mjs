@@ -162,8 +162,9 @@ async function writeGallery() {
 const browser = await chromium.launch({ headless: true,
   ...(process.env.KAIRO_CHROMIUM ? { executablePath: process.env.KAIRO_CHROMIUM } : {}) });
 async function record(page, room, language) {
-  // Fonts and asynchronous room modules settle before inspecting the real DOM.
-  await page.waitForTimeout(650);
+  // Wait for real fonts and the final grade ceremony beat (up to 1040ms).
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(1100);
   const error = await page.locator('[data-room-error]').count();
   const result = language === 'bi' ? await inspectChrome(page) : { issues: [], inspected: 0 };
   const shell = await page.evaluate(() => ({ view: document.body.dataset.view,
