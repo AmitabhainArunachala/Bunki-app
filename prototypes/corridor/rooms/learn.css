@@ -15,3 +15,486 @@ html[data-room='learn'] body:not([data-view='drift']) {
   --skin-ground: linear-gradient(180deg, var(--color-lacquer), transparent 220px);
   --skin-light: radial-gradient(60% 34% at 50% 4%, color-mix(in srgb, var(--color-ink) 9%, transparent), transparent 72%);
 }
+
+/* ==========================================================================
+   Learn lane (concept C "the stage" + A's numbered sections).
+   The stage: a 藍-lacquer proscenium holding one lit washi card (the next
+   sitting), the real due count, the deck split and ONE primary. Under it, five
+   numbered blocks, each its own quiet form: 01 a slip, 02 a ledger, 03 chips,
+   04 a slip and three lengths, 05 an index. Signature: the card lifts and its
+   registration marks snap in (transform/opacity only; off under reduced motion).
+   ========================================================================== */
+html[data-room='learn'] body:not([data-view='drift']) {
+  --learn-card: color-mix(in srgb, var(--color-surface) 62%, #efe5cf);
+  --learn-card-ink: var(--color-ink);
+  --learn-card-muted: color-mix(in srgb, var(--color-ink) 66%, transparent);
+  --learn-stage-ink: var(--color-lacquer-ink);
+  --learn-stage-quiet: color-mix(in srgb, var(--color-lacquer-ink) 78%, transparent);
+  --learn-gutter: 34px;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='learn'] body:not([data-view='drift']) {
+  /* the card stays paper under stage light */
+  --learn-card: color-mix(in srgb, var(--color-ink) 86%, #c8b48c);
+  --learn-card-ink: color-mix(in srgb, var(--color-lacquer) 70%, #000);
+  --learn-card-muted: color-mix(in srgb, var(--color-lacquer) 62%, transparent);
+}
+
+/* ---- the stage ---- */
+html[data-room='learn'] body:not([data-view='drift']) #app > main > .learn-stage {
+  position: relative;
+  isolation: isolate;
+  margin: 0 0 30px;
+  padding: 22px 18px 22px;
+  color: var(--learn-stage-ink);
+  border-radius: var(--radius-surface);
+  background:
+    radial-gradient(70% 52% at 50% 40%, rgb(255 238 205 / 11%), transparent 70%),
+    linear-gradient(180deg, var(--color-lacquer-2), var(--color-lacquer));
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 7%), 0 1px 0 color-mix(in srgb, var(--color-seal) 70%, #000), 0 3px 0 var(--color-lacquer);
+}
+@media (max-width: 520px) {
+  /* a band across the phone, under the chrome; the sign hangs on it */
+  html[data-room='learn'] body:not(.zen):not([data-view='drift']) #app > main > .learn-stage {
+    margin: -24px -36px 30px -18px;
+    padding: 20px 46px 22px 18px;
+    border-radius: 0;
+  }
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='learn'] body:not([data-view='drift']) #app > main > .learn-stage {
+  background:
+    radial-gradient(56% 46% at 50% 36%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 72%),
+    linear-gradient(180deg, var(--color-lacquer-2), var(--color-lacquer));
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 6%), 0 1px 0 color-mix(in srgb, var(--color-seal) 55%, transparent);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app > main > .room-sign {
+  color: var(--learn-stage-ink);
+  border-color: color-mix(in srgb, var(--color-lacquer-ink) 30%, transparent);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum { color: var(--learn-stage-quiet); }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage-eyebrow {
+  margin: 0 0 4px;
+  font: 600 11.5px/1.3 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--learn-stage-quiet);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage h1.view-title {
+  margin: 0;
+  font: 800 34px/1.1 var(--font-headword);
+  color: color-mix(in srgb, var(--color-lacquer-ink) 70%, #fff);
+  letter-spacing: 0.01em;
+}
+/* the fan: two ghost cards behind the lit one */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-fan {
+  position: relative;
+  margin: 18px 0 20px;
+  padding: 10px 12px 6px;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-ghost {
+  position: absolute;
+  inset: 22px 30px 4px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--learn-card) 82%, var(--color-lacquer));
+  box-shadow: 0 14px 30px rgb(0 0 0 / 38%);
+  z-index: -1;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-ghost.g0 { transform: translate(-16px, 8px) rotate(-5deg); opacity: 0.62; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-ghost.g1 { transform: translate(18px, 4px) rotate(4deg); opacity: 0.74; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card {
+  position: relative;
+  min-height: 128px;
+  padding: 16px 20px 18px 22px;
+  border-radius: 3px;
+  background: var(--learn-card);
+  color: var(--learn-card-ink);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 45%) inset, 0 1px 0 rgb(0 0 0 / 30%), 0 22px 44px rgb(0 0 0 / 46%);
+  transform: rotate(-0.5deg);
+}
+/* the 朱 rim: this card, now */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 3px 0 0 3px;
+  background: var(--color-seal);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='learn'] body:not([data-view='drift']) #app .learn-card {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold) 30%, transparent), 0 0 40px color-mix(in srgb, var(--color-gold) 22%, transparent), 0 24px 48px rgb(0 0 0 / 60%);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card-meta {
+  margin: 0 0 8px;
+  font: 600 10.5px/1.3 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--learn-card-muted);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card-text {
+  margin: 0;
+  font: 400 18px/2 var(--font-reading);
+  color: var(--learn-card-ink);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  line-break: strict;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card-text.is-word { font: 800 40px/1.3 var(--font-headword); letter-spacing: 0.04em; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card:has(.is-quiet) { min-height: 104px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card-text.is-quiet { font: 400 16px/1.7 var(--font-reading); color: var(--learn-card-muted); }
+/* the asked place: the one live mark on the screen */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-gap {
+  display: inline-block;
+  min-width: 3.2em;
+  margin: 0 0.15em;
+  border-bottom: 2px solid var(--color-live);
+  background: color-mix(in srgb, var(--color-live) 6%, transparent);
+  line-height: 1.4;
+}
+/* registration marks (トンボ), just outside the card's corners */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg::before,
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg::after {
+  content: '';
+  position: absolute;
+  background: color-mix(in srgb, var(--learn-stage-ink) 62%, transparent);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg::before { left: 6px; top: 0; width: 1px; height: 13px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg::after { top: 6px; left: 0; width: 13px; height: 1px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg.tl { top: -10px; left: -10px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg.tr { top: -10px; right: -10px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg.bl { bottom: -10px; left: -10px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-reg.br { bottom: -10px; right: -10px; }
+
+/* the count and the split */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0 2px 16px;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-due { display: flex; align-items: baseline; gap: 10px; margin: 0; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-due-n {
+  font: 800 56px/0.9 var(--font-headword);
+  color: color-mix(in srgb, var(--color-lacquer-ink) 60%, #fff);
+  font-variant-numeric: tabular-nums;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-due-u { font: 500 14px/1.25 var(--font-ui); color: var(--learn-stage-quiet); max-width: 5.6em; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-split {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  text-align: right;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-split-h {
+  font: 600 10.5px/1.2 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--learn-stage-quiet);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-split-line { display: flex; gap: 10px; font: 400 12px/1.2 var(--font-data); color: var(--learn-stage-quiet); }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-split-cell { display: inline-flex; gap: 5px; align-items: baseline; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-split-n { font: 700 13px/1 var(--font-data); color: var(--learn-stage-ink); font-variant-numeric: tabular-nums; }
+
+/* ONE primary: washi on lacquer, a 2px under-edge that presses away */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage :is(.learn-go, .learn-go-quiet) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  padding: 8px 16px;
+  text-align: center;
+  border-radius: var(--radius-control);
+  transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-press) var(--ease-standard);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go {
+  background: var(--learn-card);
+  color: var(--color-lacquer);
+  border: 1px solid color-mix(in srgb, #fff 60%, transparent);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--learn-card) 50%, #4a4232), 0 10px 26px rgb(0 0 0 / 40%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go {
+  color: var(--learn-card-ink);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--learn-card) 40%, #000), 0 0 22px color-mix(in srgb, var(--color-gold) 24%, transparent);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go:active { transform: translateY(2px); box-shadow: 0 0 0 transparent, 0 6px 16px rgb(0 0 0 / 30%); }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go :is(.study-door-t, .learn-go-t) { font: 700 17px/1.25 var(--font-ui); color: inherit; letter-spacing: 0.01em; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go .study-door-sub { font: 500 12px/1.2 var(--font-ui); color: inherit; opacity: 0.74; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-quiet {
+  min-height: 46px;
+  margin-top: 10px;
+  flex-direction: row;
+  gap: 10px;
+  background: transparent;
+  color: var(--learn-stage-ink);
+  border: 1px solid color-mix(in srgb, var(--color-lacquer-ink) 34%, transparent);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 35%);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-t { font: 600 13px/1.2 var(--font-ui); color: inherit; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-sub { font: 400 12px/1.2 var(--font-ui); color: var(--learn-stage-quiet); }
+
+/* ---- the numbered blocks ---- */
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall.learn-hall { display: block; margin: 0; padding: 0; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-section {
+  display: block;
+  margin: 0;
+  padding: 18px 0 24px var(--learn-gutter);
+  border: 0;
+  border-top: var(--stroke-hairline) solid var(--color-separator);
+  background: none;
+  box-shadow: none;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-section:first-child { border-top: 0; padding-top: 4px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-head {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-n {
+  position: absolute;
+  left: calc(-1 * var(--learn-gutter));
+  top: 7px;
+  font: 500 11px/1 var(--font-data);
+  letter-spacing: 0.04em;
+  color: var(--color-seal);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-h {
+  margin: 0;
+  flex: 1;
+  font: 800 21px/1.25 var(--font-headword);
+  color: var(--color-ink);
+  letter-spacing: 0.01em;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-count {
+  font: 500 11.5px/1.2 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-gloss {
+  margin: 0 0 12px;
+  max-width: 34em;
+  font: 400 14px/1.55 var(--font-ui);
+  color: var(--color-ink-2);
+  overflow-wrap: normal;
+  word-break: auto-phrase;
+  line-break: strict;
+  text-wrap: pretty;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-label {
+  margin: 14px 0 6px;
+  font: 600 10.5px/1.2 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* the slips (01 guided, 04 the JLPT door): raised paper with a hairline chevron */
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .study-door {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-height: 64px;
+  margin: 0;
+  padding: 12px 34px 12px 16px;
+  text-align: left;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 26%, transparent);
+  box-shadow: var(--elevation-card);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .study-door::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-top: 1.25px solid var(--color-quiet);
+  border-right: 1.25px solid var(--color-quiet);
+  transform: translateY(-50%) rotate(45deg);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .study-door-t { font: 800 18px/1.25 var(--font-headword); color: var(--color-ink); }
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .study-door-sub { font: 400 13px/1.45 var(--font-ui); color: var(--color-ink-2); }
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .study-door:active { transform: translateY(1px); }
+
+/* 02 the ledger: name and words left, due/new right, a slim hairline of words begun */
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-decks { display: block; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 12px;
+  align-items: center;
+  column-gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  margin: 0;
+  padding: 10px 0 13px;
+  text-align: left;
+  border: 0;
+  border-top: var(--stroke-hairline) solid var(--color-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-ink);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck:first-child { border-top: 0; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck::after {
+  content: '';
+  grid-column: 3;
+  width: 7px;
+  height: 7px;
+  border-top: 1.25px solid var(--color-quiet);
+  border-right: 1.25px solid var(--color-quiet);
+  transform: rotate(45deg);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck { row-gap: 4px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck::after { grid-row: 1 / span 2; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-name { display: contents; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-t { grid-column: 1 / 3; grid-row: 1; font: 600 15px/1.3 var(--font-ui); color: var(--color-ink); }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-sub { grid-column: 1; grid-row: 2; min-width: 0; font: 400 12px/1.35 var(--font-ui); color: var(--color-muted); }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck:not(:has(.dojo-deck-n)) .dojo-deck-sub { grid-column: 1 / 3; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-n { grid-column: 2; grid-row: 2; display: flex; gap: 12px; align-items: baseline; font: 500 11.5px/1 var(--font-ui); color: var(--color-muted); white-space: nowrap; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-n b { margin-right: 2px; font: 800 19px/1 var(--font-headword); color: var(--color-ink); font-variant-numeric: tabular-nums; }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-due:not(.is-due) b { color: var(--color-muted); }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-due.is-due b { color: var(--color-seal); }
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-bar {
+  position: absolute;
+  left: 0;
+  right: 24px;
+  bottom: 5px;
+  height: 2px;
+  background: var(--color-line-soft);
+  overflow: hidden;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform-origin: left center;
+  transform: scaleX(var(--begun, 0));
+}
+
+/* 03 the sitting: hairline length chips, three mode cards, one secondary begin */
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0; }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-chip { min-height: 48px; margin: 0; border-radius: var(--radius-small); }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-chip-n { font: 700 17px/1 var(--font-data); font-variant-numeric: tabular-nums; }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 14px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 4px;
+  min-height: 76px;
+  margin: 0;
+  padding: 10px;
+  text-align: left;
+  border-radius: var(--radius-small);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 22%, transparent);
+  box-shadow: none;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode.on { border-color: var(--color-accent); background: var(--color-tint-wash); box-shadow: inset 3px 0 0 var(--color-accent); }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode-t { font: 700 14px/1.25 var(--font-ui); color: var(--color-ink); }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode-sub { font: 400 11.5px/1.35 var(--font-ui); color: var(--color-muted); text-wrap: pretty; word-break: auto-phrase; }
+html[data-room='learn'] body:not([data-view='drift']) #app .take.focus-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  width: auto;
+  margin: 0;
+  padding: 0 22px;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--color-accent) 30%, transparent);
+  font: 600 15px/1 var(--font-ui);
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .take.focus-start .l-ja { color: inherit; }
+html[data-room='learn'] body:not([data-view='drift']) #app .take.focus-start:active { transform: translateY(2px); box-shadow: none; }
+
+/* 04 the three lengths */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-lengths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 12px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-length {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 9px 2px 4px;
+  border-top: 1.5px solid var(--color-ink);
+  min-width: 0;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-length.is-pending { border-top-color: var(--color-edge-strong); }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-length-t { font: 700 14px/1.2 var(--font-ui); color: var(--color-ink); }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-length-m { font: 400 11.5px/1.2 var(--font-data); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-length-n { font: 400 11px/1.3 var(--font-ui); color: var(--color-muted); }
+html[data-room='learn'] body:not([data-view='drift']) #app .study-hall-note { margin: 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--color-muted); text-wrap: pretty; word-break: auto-phrase; }
+
+/* 05 the index: plain rows, no paper */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-more-list { display: block; }
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door {
+  min-height: 56px;
+  padding: 10px 30px 10px 0;
+  gap: 2px;
+  border: 0;
+  border-top: var(--stroke-hairline) solid var(--color-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door:first-child { border-top: 0; }
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door::after { right: 4px; }
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-t { font: 600 15px/1.3 var(--font-ui); }
+html[data-room='learn'] body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-sub { font-size: 12.5px; color: var(--color-muted); }
+
+/* ---- the signature: the card lifts, the marks snap in (once per arrival;
+   a re-render inside the beat continues it through a negative delay) ---- */
+@keyframes learn-card-lift {
+  from { opacity: 0.01; transform: translateY(16px) rotate(-1.6deg) scale(0.98); }
+  to { opacity: 1; transform: rotate(-0.5deg); }
+}
+@keyframes learn-reg-tl { from { opacity: 0.01; transform: translate(-8px, -8px); } to { opacity: 1; transform: none; } }
+@keyframes learn-reg-tr { from { opacity: 0.01; transform: translate(8px, -8px); } to { opacity: 1; transform: none; } }
+@keyframes learn-reg-bl { from { opacity: 0.01; transform: translate(-8px, 8px); } to { opacity: 1; transform: none; } }
+@keyframes learn-reg-br { from { opacity: 0.01; transform: translate(8px, 8px); } to { opacity: 1; transform: none; } }
+@keyframes learn-float { from { transform: rotate(-0.5deg); } to { transform: translateY(-3px) rotate(-0.25deg); } }
+@media (prefers-reduced-motion: no-preference) {
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-card {
+    animation: learn-float 8s ease-in-out 600ms infinite alternate;
+  }
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-card {
+    animation: learn-card-lift 300ms var(--ease-enter) calc(40ms + var(--learn-t, 0ms)) backwards, learn-float 8s ease-in-out 600ms infinite alternate;
+  }
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg {
+    animation: 170ms var(--ease-ink) calc(300ms + var(--learn-t, 0ms)) backwards;
+  }
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.tl { animation-name: learn-reg-tl; }
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.tr { animation-name: learn-reg-tr; }
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.bl { animation-name: learn-reg-bl; }
+  html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.br { animation-name: learn-reg-br; }
+}

@@ -21686,29 +21686,43 @@ function guidedDoorInJlptRoom(main) {
   lengths.after(row);
 }
 
-/** 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18:
- * "we should have a whole corpus of test from JLPT levels and others, as well
- * as SRS cards. and other options to study here. not sure where they are…
- * please check"). Every study room the app has, behind one door each, with
- * an honest count; what is NOT in the app yet is named, not implied. */
-function renderStudyHall(main) {
-  main.append(withEn(el('p', 'eyebrow', '稽古の間'), 'the study hall — everything you can practise, in one place', 'en-inline'));
-  const hall = el('div', 'study-hall');
-  hall.id = 'study-hall';
-  const forecast = srsForecast();
-  const due = forecast.today + forecast.fresh;
+/** 稽古の間 — the study hall (operator, 2026-09-18: "we should have a whole
+ * corpus of test from JLPT levels and others, as well as SRS cards. and other
+ * options to study here. not sure where they are… please check"). Every study
+ * room the app has, behind one door each, with an honest count; what is NOT in
+ * the app yet is named, not implied.
+ *
+ * Learn lane (2026-10-08, concept C "the stage" + A's numbered sections; John:
+ * "No clusters like the dojo page having everything strewn together"). The
+ * room is one stage and five numbered, distinct blocks:
+ *   the stage — the next sitting: one lit card, the real due count, the deck
+ *               split and ONE primary (the 復習 door, or a deck when none wait)
+ *   01 guided · 02 decks · 03 focus (the pinned [data-learn-section] order)
+ *   04 tests · 05 more practice
+ * #study-hall wraps the five blocks, so every hall door (≥6) is inside it. */
+function learnTestCounts() {
   const mockCount = Array.isArray(D.mock) ? D.mock.length : null;
   if (mockCount === null) ensureMockIndex().then(() => { if (S.view === 'dojo') render(); }).catch(() => {});
   if (!assessmentCatalog && !assessmentOpening) {
     assessmentOpening = true;
     loadAssessmentCatalog().then(() => { if (S.view === 'dojo') render(); }).catch(() => {}).finally(() => { assessmentOpening = false; });
   }
-  const readyTests = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && !['section', 'written'].includes(entry.mode)).length || 0;
-  const readySections = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'section').length || 0;
-  // machine-checked written tests are counted apart: they have no length and still await review
-  const readyWritten = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'written').length || 0;
-  const doors = [
-    ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} cards waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
+  const ready = (assessmentCatalog?.entries || []).filter((entry) => entry.availability?.ready);
+  return {
+    tests: ready.filter((entry) => !['section', 'written'].includes(entry.mode)).length,
+    sections: ready.filter((entry) => entry.mode === 'section').length,
+    // machine-checked written tests are counted apart: they have no length and still await review
+    written: ready.filter((entry) => entry.mode === 'written').length,
+    loaded: !!assessmentCatalog,
+  };
+}
+
+/** The study hall's doors, by id: the same seven rooms and the same entries as ever. */
+function studyHallDoors() {
+  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const { tests: readyTests, sections: readySections, written: readyWritten } = learnTestCounts();
+  const defs = [
+    ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} card${due === 1 ? '' : 's'} waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
@@ -21733,20 +21747,266 @@ function renderStudyHall(main) {
       keepScroll(); pendingReferenceCollection = null; referenceLibrary?.reset(); S.view = 'levels'; render(); window.scrollTo(0, 0);
     }],
   ];
-  for (const [id, ja, en, sub, go] of doors) {
+  const doors = {};
+  for (const [id, ja, en, sub, go] of defs) {
     const b = el('button', 'study-door');
     b.type = 'button';
     b.dataset.studyDoor = id;
-    b.append(withEn(el('span', 'study-door-t', ja), en, 'en-inline'));
+    b.append(el('span', 'study-door-t', tx(ja, en)));
     b.append(el('span', 'study-door-sub', sub));
     b.addEventListener('click', go);
-    hall.append(b);
+    doors[id] = b;
   }
-  main.append(hall);
-  main.append(el('p', 'fine study-hall-note', tx(
+  doors.due = due;
+  return doors;
+}
+
+/** A numbered block head (A's numbered sections, C's 01 in the gutter): the
+ * number, the name, and one live count on the right when there is one. */
+function learnHead(n, ja, en, count) {
+  const head = el('header', 'learn-head');
+  const num = el('span', 'learn-n', n);
+  num.setAttribute('aria-hidden', 'true');
+  head.append(num, el('h2', 'learn-h', tx(ja, en)));
+  if (count) head.append(el('span', 'learn-count', count));
+  return head;
+}
+
+/* the stage's split names the three passage decks in short */
+const LEARN_STAGE_DECKS = [['n2', 'N2', 'N2'], ['n1', 'N1', 'N1'], ['senmon', '専門', 'Fields']];
+const deckSummaryPending = new Set();
+/** A deck's live counts ({ due, fresh, words }), or null while they load (one load per deck). */
+function learnDeckSummary(id) {
+  const sum = deckSummaries[id];
+  if (sum || window.__CORRIDOR_STANDALONE__ === true || deckSummaryPending.has(id)) return sum || null;
+  deckSummaryPending.add(id);
+  loadDeckPlayer()
+    .then((mod) => mod.summary(id))
+    .then((got) => {
+      deckSummaries[id] = got;
+      if (S.view === 'dojo') render();
+    })
+    .catch(() => {})
+    .finally(() => deckSummaryPending.delete(id));
+  return null;
+}
+
+let learnStageAsked = null;
+/** The lit card's face, front-safe (zero-leak): the first waiting word or
+ * kanji of today's queue, shown the way its own front would be — inside its
+ * saved sentence with the word blanked, or bare. No reading, no meaning, no
+ * answer, nothing to tap. Returns null while the sentence's article loads. */
+function learnStageFace(order) {
+  const item = order.find((it) => it.t === 'word' || it.t === 'kanji');
+  if (!item) return { item: null };
+  if (item.t === 'word' && item.ctx) {
+    const cloze = takenContext(item);
+    if (!cloze) {
+      const p = D.passages.find((x) => x.id === item.ctx.p);
+      if (p && !p.tokens && learnStageAsked !== p.id) {
+        learnStageAsked = p.id;
+        ensureArticle(p).then(() => { if (S.view === 'dojo') render(); }).catch(() => {});
+      }
+      return p && !p.tokens ? null : { item, label: item.label || item.id };
+    }
+    const parts = [];
+    let text = '';
+    let seen = 0;
+    for (const token of cloze.tokens) {
+      if (token.b === item.id) {
+        parts.push({ text, at: seen });
+        text = '';
+        seen += 1;
+      } else text += token.s;
+    }
+    if (seen) {
+      parts.push({ text, at: -1 });
+      // open just before the asked place: the gap stays on the card's first lines
+      if (parts[0].text.length > 30) parts[0].text = `…${parts[0].text.slice(-26)}`;
+      return { item, parts, source: cloze.source };
+    }
+  }
+  return { item, label: item.label || item.id };
+}
+
+let learnStageSeen = 0;
+let learnStageArrived = 0;
+/** The stage (concept C): a lacquer proscenium holding one lit washi card. */
+function renderLearnStage(main, doors) {
+  const stage = el('section', 'learn-stage');
+  stage.setAttribute('aria-labelledby', 'learn-stage-title');
+  // the signature plays once per arrival: a re-render inside the beat (counts
+  // landing) continues it from where it is, through a negative delay
+  const now = Date.now();
+  if (now - learnStageSeen > 1500) learnStageArrived = now;
+  learnStageSeen = now;
+  if (now - learnStageArrived < 700) {
+    stage.classList.add('is-arriving');
+    stage.style.setProperty('--learn-t', `${learnStageArrived - now}ms`);
+  }
+  const head = el('header', 'learn-stage-head');
+  head.append(el('p', 'learn-stage-eyebrow', tx('学ぶ・次の稽古', 'Learn · the next sitting')));
+  const title = el('h1', 'view-title', tx('舞台', 'The stage'));
+  title.id = 'learn-stage-title';
+  head.append(title);
+  stage.append(head);
+
+  const due = doors.due;
+  const order = due ? todayQueue().order : [];
+  const face = due ? learnStageFace(order) : { item: null };
+  const fan = el('div', 'learn-fan');
+  for (const k of [0, 1]) {
+    const ghost = el('span', `learn-ghost g${k}`);
+    ghost.setAttribute('aria-hidden', 'true');
+    fan.append(ghost);
+  }
+  const card = el('div', 'learn-card');
+  for (const corner of ['tl', 'tr', 'bl', 'br']) {
+    const reg = el('i', `learn-reg ${corner}`);
+    reg.setAttribute('aria-hidden', 'true');
+    card.append(reg);
+  }
+  const meta = el('p', 'learn-card-meta');
+  const text = el('p', 'learn-card-text');
+  if (face?.parts) {
+    meta.textContent = tx('次の札 · 保存した文から', 'next card · your sentence');
+    text.lang = 'ja';
+    text.dataset.uiContent = 'learning';
+    for (const part of face.parts) {
+      if (part.text) text.append(document.createTextNode(part.text));
+      if (part.at >= 0) {
+        const gap = el('span', 'learn-gap', '　　');
+        gap.setAttribute('aria-label', tx('空欄', 'blank'));
+        text.append(gap);
+      }
+    }
+  } else if (face?.label) {
+    meta.textContent = face.item.t === 'kanji' ? tx('次の札 · 漢字', 'next card · kanji') : tx('次の札 · 語', 'next card · word');
+    text.classList.add('is-word');
+    text.lang = 'ja';
+    text.dataset.uiContent = 'learning';
+    text.textContent = face.label;
+  } else if (due) {
+    meta.textContent = tx('次の札', 'next card');
+    text.classList.add('is-quiet');
+    text.textContent = face === null ? tx('文を開いています…', 'Opening its sentence…') : tx('札はリストで待っている。', 'Your cards wait on the list.');
+  } else {
+    meta.textContent = tx('今日', 'today');
+    text.classList.add('is-quiet');
+    text.textContent = tx('待っている札はない。', 'No saved card is waiting.');
+  }
+  card.prepend(meta);
+  card.append(text);
+  fan.append(card);
+  stage.append(fan);
+
+  // the count and the split: the big number is the sitting the primary opens
+  // (todayQueue, the Line's own number); the decks keep their own ledgers, so
+  // their split is named apart and never added in
+  const row = el('div', 'learn-stage-row');
+  const count = el('p', 'learn-due');
+  count.append(el('b', 'learn-due-n', String(due)));
+  count.append(el('span', 'learn-due-u', tx('枚 復習待ち', due === 1 ? 'card due today' : 'cards due today')));
+  row.append(count);
+  const sums = LEARN_STAGE_DECKS.map(([id, ja, en]) => [id, tx(ja, en), learnDeckSummary(id)]);
+  const loaded = sums.filter(([, , sum]) => sum);
+  if (loaded.length) {
+    const anyDue = loaded.some(([, , sum]) => sum.due);
+    const split = el('p', 'learn-split');
+    split.append(el('span', 'learn-split-h', anyDue ? tx('デッキの復習', 'decks · due') : tx('デッキの新しい札', 'decks · new')));
+    const line = el('span', 'learn-split-line');
+    for (const [id, name, sum] of loaded) {
+      const cell = el('span', 'learn-split-cell');
+      cell.dataset.stageDeck = id;
+      cell.append(el('span', 'learn-split-name', name), el('b', 'learn-split-n', String(anyDue ? sum.due : sum.fresh)));
+      line.append(cell);
+    }
+    split.append(line);
+    row.append(split);
+  }
+  stage.append(row);
+
+  // ONE primary. When saved cards wait, it is the 復習 door (to Today's list,
+  // as it always was). When none wait, the deck with the most due — or new —
+  // passages leads, and the 復習 door stays as a quiet line under it.
+  const review = doors.review;
+  review.classList.add('learn-go');
+  if (due) {
+    review.querySelector('.study-door-t').textContent = tx(`${due} 枚を復習する`, `Review ${due} card${due === 1 ? '' : 's'}`);
+    review.querySelector('.study-door-sub').textContent = tx('今日のリストから始める', 'starts from today’s list');
+    stage.append(review);
+  } else {
+    const best = loaded.slice().sort((a, b) => b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
+    if (best && (best[2].due || best[2].fresh)) {
+      const [id, short, sum] = best;
+      const go = el('button', 'learn-go learn-go-deck');
+      go.type = 'button';
+      go.dataset.stageDeck = id;
+      go.append(el('span', 'learn-go-t', sum.due
+        ? tx(`${short}の ${sum.due} 枚を復習する`, `Review ${sum.due} ${short} card${sum.due === 1 ? '' : 's'}`)
+        : tx(`${short}の新しい札 ${sum.fresh} 枚を始める`, `Begin ${sum.fresh} new ${short} card${sum.fresh === 1 ? '' : 's'}`)));
+      go.addEventListener('click', () => openDeck(id));
+      stage.append(go);
+      review.classList.replace('learn-go', 'learn-go-quiet');
+    }
+    stage.append(review);
+  }
+  main.append(stage);
+}
+
+/** The five numbered blocks under the stage, inside #study-hall. */
+function renderStudyHall(main, doors) {
+  const hall = el('div', 'learn-hall');
+  hall.id = 'study-hall';
+
+  const guided = el('section', 'learn-section');
+  guided.dataset.learnSection = 'guided';
+  guided.append(learnHead('01', '案内つき', 'Guided', tx('6問 · 約15分', '6 questions · ~15 min')));
+  guided.append(el('p', 'learn-gloss', tx('問いごとに解説と語の扉。迷ったらここから。', 'An explanation after every question, a door to every word. Start here when unsure.')));
+  guided.append(doors.guided);
+
+  const decks = el('section', 'learn-section');
+  decks.dataset.learnSection = 'decks';
+  renderDojoDecks(decks);
+
+  const focus = el('section', 'learn-section');
+  focus.dataset.learnSection = 'focus';
+  renderFocusSitting(focus);
+
+  const tests = el('section', 'learn-section learn-tests');
+  const counts = learnTestCounts();
+  const total = counts.tests + counts.sections + counts.written;
+  tests.append(learnHead('04', '試験', 'Tests', counts.loaded ? tx(`${total} 組`, `${total} set${total === 1 ? '' : 's'}`) : ''));
+  tests.append(doors.mock);
+  // the lengths a mock comes in, with how many of each are ready — the catalog's own numbers
+  const entries = assessmentCatalog?.entries || [];
+  const lengths = el('div', 'learn-lengths');
+  for (const [mode, ja, en] of [['short', '短め', 'Short'], ['medium', '中', 'Medium'], ['full', '本番', 'Full']]) {
+    const rows = entries.filter((entry) => entry.mode === mode);
+    if (!rows.length) continue;
+    const readyN = rows.filter((entry) => entry.availability?.ready).length;
+    const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
+    const cell = el('p', 'learn-length' + (readyN ? '' : ' is-pending'));
+    cell.dataset.mockMode = mode;
+    cell.append(el('b', 'learn-length-t', tx(ja, en)));
+    if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
+    cell.append(el('span', 'learn-length-n', readyN ? tx(`${readyN} 組`, `${readyN} ready`) : tx('準備中', 'in preparation')));
+    lengths.append(cell);
+  }
+  if (lengths.childNodes.length) tests.append(lengths);
+  tests.append(el('p', 'fine study-hall-note', tx(
     '模試で見つけた課題は、覚えるリスト・復習・先生との学習につながります。',
     'Use your test results to guide Learn, review cards and your next session with Sensei.',
   )));
+
+  const more = el('section', 'learn-section learn-more');
+  more.append(learnHead('05', 'ほかの稽古', 'More practice', ''));
+  const list = el('div', 'learn-more-list');
+  list.append(doors.lessons, doors.sentence, doors.probe, doors.levels);
+  more.append(list);
+
+  hall.append(guided, decks, focus, tests, more);
+  main.append(hall);
 }
 
 /** The dojo lobby: choose a length and what to drill. */
@@ -21784,14 +22044,47 @@ function openDeck(id) {
   window.scrollTo(0, 0);
 }
 
+/** Words begun in a deck, read (never written) from its own ledger: one per
+ * distinct word id among the scheduled card ids (`<word id>-<card>`). The slim
+ * hairline under a deck row is this over the deck's real word count. */
+function deckWordsBegun(id) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
+    const ids = raw && typeof raw.cards === 'object' && raw.cards ? Object.keys(raw.cards) : [];
+    return new Set(ids.map((cardId) => cardId.replace(/-[^-]+$/, ''))).size;
+  } catch {
+    return 0;
+  }
+}
+
 function renderDojoDecks(main) {
-  main.append(withEn(el('p', 'eyebrow', 'デッキ'), 'SRS decks', 'en-inline'));
   const list = el('div', 'dojo-decks');
-  const row = (id, ja, sub, onClick) => {
+  let totalDue = 0;
+  let totalFresh = 0;
+  let counted = 0;
+  const row = (id, title, sub, onClick, sum = null) => {
     const b = el('button', 'dojo-deck');
     b.type = 'button';
     b.dataset.deck = id;
-    b.append(el('span', 'dojo-deck-t', ja), el('span', 'dojo-deck-sub', sub));
+    const name = el('span', 'dojo-deck-name');
+    name.append(el('span', 'dojo-deck-t', title), el('span', 'dojo-deck-sub', sub));
+    b.append(name);
+    if (sum) {
+      const n = el('span', 'dojo-deck-n');
+      const due = el('span', 'dojo-deck-due' + (sum.due ? ' is-due' : ''));
+      due.append(el('b', '', String(sum.due)), document.createTextNode(` ${tx('復習', 'due')}`));
+      const fresh = el('span', 'dojo-deck-new');
+      fresh.append(el('b', '', String(sum.fresh)), document.createTextNode(` ${tx('新', 'new')}`));
+      n.append(due, fresh);
+      b.append(n);
+      if (sum.words) {
+        const begun = Math.min(sum.words, deckWordsBegun(id));
+        const bar = el('span', 'dojo-deck-bar');
+        bar.setAttribute('aria-hidden', 'true');
+        bar.style.setProperty('--begun', String(begun / sum.words));
+        b.append(bar);
+      }
+    }
     b.addEventListener('click', onClick);
     list.append(b);
   };
@@ -21801,18 +22094,16 @@ function renderDojoDecks(main) {
     });
   }
   for (const d of DOJO_DECKS) {
-    const sum = deckSummaries[d.id];
-    if (!sum && window.__CORRIDOR_STANDALONE__ !== true) {
-      loadDeckPlayer()
-        .then((mod) => mod.summary(d.id))
-        .then((got) => {
-          deckSummaries[d.id] = got;
-          if (S.view === 'dojo') render();
-        })
-        .catch(() => {});
+    const sum = learnDeckSummary(d.id);
+    if (sum) {
+      totalDue += sum.due;
+      totalFresh += sum.fresh;
+      counted += 1;
     }
-    const counts = sum ? tx(`復習 ${sum.due} ・ 新しい文 ${sum.fresh}`, `${sum.due} due · ${sum.fresh} new`) : tx('復習と新しい文', d.en);
-    row(d.id, tx(d.ja, d.en), counts, () => openDeck(d.id));
+    const sub = sum?.words
+      ? tx(`${sum.words.toLocaleString('ja-JP')} 語`, `${sum.words.toLocaleString('en-US')} words`)
+      : tx('復習と新しい文', d.en);
+    row(d.id, tx(d.ja, d.en), sub, () => openDeck(d.id), sum);
   }
   row('context', tx('文脈札', 'Context cards'), tx('一語ごとの段落カード', 'one paragraph per word'), () => {
     keepScroll();
@@ -21829,6 +22120,7 @@ function renderDojoDecks(main) {
     const waiting = srsDueItems().filter((i) => keys.has(srsKey(i.t, i.id))).length;
     row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語 ・ ${waiting} 枚 待っている`, `list · ${items.length} words · ${waiting} waiting`), () => startReview(items));
   }
+  main.append(learnHead('02', 'デッキ', 'Decks', counted ? tx(`復習 ${totalDue} · 新 ${totalFresh}`, `${totalDue} due · ${totalFresh} new`) : ''));
   main.append(list);
 }
 
@@ -21864,34 +22156,32 @@ function renderDeckPlay(main) {
     });
 }
 
+/** 学ぶ — the Learn room: the stage, then the numbered blocks (renderStudyHall). */
 function renderFocus(main) {
-  main.append(withEn(el('h1', 'view-title', '集中道場'), 'the focus dojo', 'en-inline'));
-  const guided = el('section', 'learn-section');
-  guided.dataset.learnSection = 'guided';
-  renderStudyHall(guided);
-  const decks = el('section', 'learn-section');
-  decks.dataset.learnSection = 'decks';
-  renderDojoDecks(decks);
-  const focus = el('section', 'learn-section');
-  focus.dataset.learnSection = 'focus';
-  main.append(guided, decks, focus);
-  focus.append(withEn(el('p', 'eyebrow', '集中'), 'a focus block', 'en-inline'));
+  const doors = studyHallDoors();
+  renderLearnStage(main, doors);
+  renderStudyHall(main, doors);
+}
+
+/** 03 · the focus sitting: choose a length and what to drill, then begin. */
+function renderFocusSitting(focus) {
+  const forecast = srsForecast();
+  const due = forecast.today + forecast.fresh;
+  S.focusMin = S.focusMin || 20;
+  focus.append(learnHead('03', '集中の座', 'Focus sitting', tx(`${S.focusMin} 分`, `${S.focusMin} min`)));
   focus.append(
     el(
       'p',
-      'gloss',
+      'learn-gloss',
       tx(
         '時間を決めて、静かに札と向き合う。時間が来たら、そっと終わる。',
         'Set a length and sit with the cards. When the time is up, the block ends on its own.',
       ),
     ),
   );
-
-
-  focus.append(withEn(el('p', 'eyebrow', '集中ブロック'), 'timed block', 'en-inline'));
-  focus.append(withEn(el('p', 'eyebrow', '時間'), 'how long', 'en-inline'));
+  const pick = el('div', 'learn-focus-pick');
+  pick.append(el('p', 'learn-label', tx('時間', 'how long')));
   const mins = el('div', 'focus-choices');
-  S.focusMin = S.focusMin || 20;
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
     b.type = 'button';
@@ -21905,11 +22195,10 @@ function renderFocus(main) {
     });
     mins.append(b);
   }
-  focus.append(mins);
+  pick.append(mins);
+  focus.append(pick);
 
-  focus.append(withEn(el('p', 'eyebrow', '何を'), 'what to drill', 'en-inline'));
-  const forecast = srsForecast();
-  const due = forecast.today + forecast.fresh;
+  focus.append(el('p', 'learn-label', tx('何を', 'what to drill')));
   const modes = el('div', 'focus-modes');
   const modeDefs = [
     // the sub tells the whole truth (POL-12): the block reviews each waiting
@@ -21923,7 +22212,7 @@ function renderFocus(main) {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
     b.type = 'button';
     b.setAttribute('aria-pressed', String(S.focusMode === id));
-    b.append(withEn(el('span', 'focus-mode-t', ja), en, 'en-inline'));
+    b.append(el('span', 'focus-mode-t', tx(ja, en)));
     b.append(el('span', 'focus-mode-sub', sub));
     b.addEventListener('click', () => {
       S.focusMode = id;
@@ -21947,7 +22236,7 @@ function renderFocus(main) {
     );
   }
 
-  const start = biLabel('button', 'take focus-start', 'はじめる', 'begin the block');
+  const start = biLabel('button', 'take focus-start', `${S.focusMin}分 座る`, `sit for ${S.focusMin} minutes`);
   start.type = 'button';
   start.addEventListener('click', () => startFocus(S.focusMin, S.focusMode));
   focus.append(start);
