@@ -817,6 +817,13 @@ html[data-room='shelf'] #shelf-reading-results > .shelf-review-note {
 html[data-room='shelf'][data-room-entering] #app > main > * { animation-name: read-shelf-hold; }
 html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-color: color-mix(in srgb, var(--color-ink) 9%, var(--color-page, var(--color-paper))); }
 
+/* the reader's entrance: the picture and title rise; the instrument line and the text only fade in, so
+   the words are where they will stay from the first frame (a reader's place never drifts) */
+@keyframes read-text-settle { from { opacity: 0.01; } to { opacity: 1; } }
+html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .version-block, .dials, .listen-row, #reader-tip, #reader, .article-footer) {
+  animation-name: read-text-settle;
+}
+
 /* ---------- the quick look on a phone: centred, its two gutters equal ---------- */
 @media (max-width: 520px) {
   html[data-room='reader'] body #mini {
