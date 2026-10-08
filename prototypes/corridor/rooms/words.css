@@ -361,3 +361,69 @@ html:is([data-room='search'], [data-room='word-web']) :is(.ww-c-r, .ww-c-m) { po
   html[data-room='search'] .search-page:not(.search-page-busy) .skip-search-opener { margin: 4px 0 0; }
   html[data-room='search'] #app > main > .ww { margin-top: 14px; }
 }
+
+/* ---- round 3 (r3-rooms): the search card is a field and one strip, and the web is the room.
+   The strip snaps lens to lens and fades out under its right edge (a lens is never cut hard
+   mid-word); the SKIP wheel's door is a quiet text link under the strip, not a grey slab. ---- */
+@media (max-width: 520px) {
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses {
+    gap: 6px;
+    margin: 8px -12px 0 0;
+    padding: 0 12px 2px 0;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 0 12px;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 64px), rgb(0 0 0 / 0.06) calc(100% - 6px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 64px), rgb(0 0 0 / 0.06) calc(100% - 6px), transparent);
+  }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { scroll-snap-align: start; padding-inline: 12px; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens:last-child { margin-right: 52px; }
+}
+html[data-room='search'] body .search-page .skip-search-opener:not([aria-expanded='true']) {
+  display: flex;
+  align-items: center;
+  width: auto;
+  min-height: 44px;
+  margin: 0 0 -6px auto;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-accent);
+  font: 500 13px/1.3 var(--font-ui);
+  letter-spacing: 0.01em;
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 4px;
+}
+html[data-room='search'] body .search-page .skip-search-opener:not([aria-expanded='true']):hover { color: var(--color-ink); }
+/* on a phone the link rides the search eyebrow's line, so the field and its strip are the card */
+@media (min-width: 360px) and (max-width: 520px) {
+  html[data-room='search'] body #app > main > .search-page { position: relative; }
+  html[data-room='search'] body #app > main > p.eyebrow + .search-page:not(.search-page-busy) > .skip-search-opener:not([aria-expanded='true']) {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    margin: 0;
+  }
+}
+html[data-room='search'] body .search-page .search-page-input::placeholder { color: var(--color-muted); opacity: 1; }
+
+/* ---- round 3 (r3-rooms): the legend is a key, not a caption in capitals: the shapes as the
+   plate draws them, "·" between, and one real stroke number set the way the plate sets it ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-legend {
+  align-items: center; gap: 4px 0;
+  font: 500 11px/1.2 var(--font-ui); letter-spacing: 0.01em; text-transform: none; color: var(--color-muted);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-legend > span + span::before {
+  content: '·'; margin: 0 7px; color: var(--color-rule);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-legend :is(.ww-lg-k, .ww-lg-p) { width: 9px; height: 9px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-legend .ww-lg-st {
+  padding: 0 2px; font: 500 10px/1.3 var(--font-data); font-variant-numeric: tabular-nums; color: var(--color-muted);
+  box-shadow: inset 0 -0.5px 0 var(--color-rule);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-legend .ww-lg-key { gap: 0; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-legend .ww-lg-k {
+  background: transparent; box-shadow: inset 0 0 0 1px var(--color-live);
+}

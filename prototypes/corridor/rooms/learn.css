@@ -248,6 +248,28 @@ html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-g
 html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-t { font: 600 13px/1.2 var(--font-ui); color: inherit; }
 html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-sub { font: 400 12px/1.2 var(--font-ui); color: var(--learn-stage-quiet); }
 
+/* round 3 (r3-rooms): one practice, one home. With Today's queue waiting and a deck ready, the
+   stage is the deck's sitting and the review is one quiet line that points home to Today */
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-quiet.learn-go-home {
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 0 4px;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-home .study-door-t {
+  font: 500 14px/1.3 var(--font-ui);
+  color: var(--learn-stage-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 4px;
+}
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-home .study-door-t::after { content: ' ›'; text-decoration: none; display: inline-block; margin-left: 4px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go-home .study-door-sub:empty { display: none; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card-text.is-deck { font: 800 24px/1.4 var(--font-headword, var(--font-display)); letter-spacing: 0.01em; }
+html[data-room='learn'] body:not([data-view='drift']) #app .learn-card:has(.is-deck) { min-height: 120px; }
+
 /* ---- the numbered blocks ---- */
 html[data-room='learn'] body:not([data-view='drift']) #app #study-hall.learn-hall { display: block; margin: 0; padding: 0; }
 html[data-room='learn'] body:not([data-view='drift']) #app .learn-section {

@@ -649,3 +649,10 @@ html[data-room='review'] body:not(.zen) #app .close-doors button.chip.review-und
 @media (prefers-reduced-motion: reduce) {
   html[data-room='review'] :is(.review-clear, .review-rise-w) { animation: none; }
 }
+
+/* round 3 (r3-rooms): one 朱 on Today, and it is the day's part. The sign's square hangs in ink. */
+html[data-room='tray']:root body:not([data-view='drift']) #app > main > .room-sign::after {
+  background: var(--color-ink);
+  opacity: 0.7;
+  box-shadow: none;
+}
