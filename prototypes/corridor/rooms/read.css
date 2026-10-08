@@ -440,9 +440,11 @@ html[data-room='reader'] body #mini {
   border-radius: 14px;
   background: var(--color-paper);
   box-shadow: var(--elevation-float);
-  animation: read-mini-rise 300ms cubic-bezier(0.34, 1.5, 0.64, 1) backwards;
+  /* the slip rises and settles: a damped spring on translate only. No scale and no overshoot, because
+     placeFloating measures the popup's box as it opens, and a scaled box would be placed too wide */
+  animation: read-mini-rise 280ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
 }
-@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 12px, 0) scale(0.97); } }
+@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
 html[data-room='reader'] body #mini .mini-word { font-family: var(--font-headword); font-weight: 800; color: var(--color-ink); }
 html[data-room='reader'] body #mini .mini-reading { font-family: var(--font-reading); color: var(--color-accent); }
 html[data-room='reader'] body #mini .mini-gloss { font-size: 17px; color: var(--color-ink); }
