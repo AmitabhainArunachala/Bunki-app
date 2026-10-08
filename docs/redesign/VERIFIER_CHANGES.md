@@ -484,3 +484,11 @@ The redesign brief forbids "coming soon" anywhere in the product. No article nar
 | `prototypes/corridor/tools/verify-listening-failures.mjs:105` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only. |
 | `prototypes/corridor/tools/verify-sentence-drafts.mjs:218` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only. |
 | `prototypes/corridor/tools/test-approved-voice.mjs:136–137` | `/音声準備中 · Kore/`, `/voice in preparation\|audio coming soon/` | `/音声未収録 · Kore/`, `/voice in preparation\|no recording yet/` | Label only, in both languages. |
+
+## Integration (2026-10-08, cloud): the 3-key Good check waits for the commit, not a fixed 250 ms
+
+CI's whole-corridor walk failed 258/259 on `9de77237`: `R3-C · the 3 key commits Good as itself — {}`. The last revlog row was read 250 ms after the key press, before the asynchronous native-host commit had landed. The next check, whose undo appears only after card 1 is graded, passed, so the grade did commit. The sister check "Again commits Again" already waits with `waitForAppRecord(… revlog.length === before + 1)`.
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-corridor.mjs` R3-C (c) | `page.waitForTimeout(250)` after pressing `3` | `waitForAppRecord(page, r => r.revlog.length === before + 1)` (10 s timeout; times out = failure) | Timing only. The assertion is unchanged: the newest revlog row must be `word:学校` with rating 3. A commit that never lands still fails, now with a timeout. |

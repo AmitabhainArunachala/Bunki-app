@@ -3181,9 +3181,11 @@ async function main() {
       recalledRow.whens.length === 4 && recalledRow.whens.every(Boolean) &&
       recalledRow.declared === null && recalledRow.reading,
     JSON.stringify(recalledRow));
-  // (c) the 3 key presses Good
+  // (c) the 3 key presses Good; wait for the durable commit itself, as the Again check does
+  const revlogBeforeGood = await evaluateAppRecord(page, `(record.revlog || []).length`);
   await page.keyboard.press('3');
-  await page.waitForTimeout(250);
+  await waitForAppRecord(page, (record) => (record.revlog || []).length === revlogBeforeGood + 1,
+    { description: 'the 3 key commits a grade' });
   const goodCommit = await evaluateAppRecord(page, `(() => {
     const e = record;
     const row = (e.revlog || [])[(e.revlog || []).length - 1] || [];
