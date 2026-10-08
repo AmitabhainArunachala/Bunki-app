@@ -757,7 +757,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * a lighter sheet (#1a2330 on #030406, about 1.29:1 where an iOS dark elevated surface is about 1.23:1),
  * a lit top edge (12% white) and a faint light hairline outside its own. The second panel (the back's
  * grouped folds, the home's tiles) steps up with it so the inset list still reads */
-.kp[data-look='dark'] { --kp-panel: #1a2330; --kp-panel-2: #222d3b; --kp-stage: #030406;
+.kp[data-look='dark'] { --kp-panel: #1a2330; --kp-panel-2: #1f2836; --kp-stage: #030406;
   --kp-study-ground: radial-gradient(130% 40% at 50% 0%, rgba(140, 180, 220, 0.035), transparent 70%), var(--kp-stage);
   --kp-card-depth: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.04); }
 .kp[data-look='light'] { --kp-card-depth: 0 0 0 1px rgba(10, 20, 32, 0.5), 0 22px 44px -16px rgba(0, 0, 0, 0.7); }

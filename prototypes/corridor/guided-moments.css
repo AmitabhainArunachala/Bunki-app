@@ -834,6 +834,9 @@
    drawn by docs/redesign/r4/cards/blood_svg.py; pseudo-elements on the existing stage; transform and
    opacity only; the --samurai-motion law of the forced replay is honoured below. At phone width every
    mark stays inside the frame's line.
+   Age rating: blood on every wrong answer (moments on, playful or dramatic) is likely "Frequent Cartoon
+   or Fantasy Violence", 13+ on Apple's scale; an estimate, to be checked in App Store Connect's
+   questionnaire before a store submission. Quiet mode and the rematch show none.
    ========================================================================== */
 .samurai-effect {
   --se-blood: #9b1422;
