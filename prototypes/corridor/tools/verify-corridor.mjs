@@ -701,6 +701,7 @@ async function main() {
     glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
       JSON.stringify(resulted) === JSON.stringify(billed),
     `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
+  await openShelfTools(page);
   await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
   await page.locator('#shelf-reading-search').press('Enter');
   await page.waitForFunction(() => document.querySelectorAll('#shelf-reading-results .shelf-item').length === 0);

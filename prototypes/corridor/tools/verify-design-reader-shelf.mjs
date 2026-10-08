@@ -25,7 +25,8 @@
  *                         picture slot at all.
  *   T1 tools (glance)   — (glance pass 2026-10-01) the shelf's study tools sit behind ONE visible
  *                         学習ツール Tools button in the title row: as served no tool door is visible,
- *                         and the first story follows the filter chips with no other control between.
+ *                         and the first story follows the filter chips (or, with the filters folded
+ *                         into the Tools sheet, the title block) with no other control between.
  *                         The button opens one panel in which every door keeps its id, is visible
  *                         inside the viewport and names itself in Japanese, on one line, with its English
  *                         gloss (the accessible name says both); a door in it still opens its room.
@@ -451,7 +452,10 @@ try {
         const served = await page.evaluate((ids) => {
           const shown = (n) => !!n && n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden';
           const toggle = document.getElementById('shelf-tools-toggle');
-          const chips = document.querySelector('#shelf-body .shelf-chipbar');
+          // the filters fold into the Tools sheet (fix lane rooms, 2026-10-08): when the chip bar is
+          // not drawn, nothing may stand between the title block and the first story
+          const chipbar = document.querySelector('#shelf-body .shelf-chipbar');
+          const chips = shown(chipbar) ? chipbar : document.querySelector('#shelf-body .shelf-masthead');
           const first = document.querySelector('#shelf-reading-results > [data-passage]');
           // every control drawn between the chip bar's foot and the first story's top
           const between = chips && first ? [...document.querySelectorAll('#shelf-body button, #shelf-body a[href], #shelf-body summary')].filter((n) => {

@@ -500,3 +500,16 @@ Under the foundation's EN/JA law, the focus-mode door reads `yomi probe` in Engl
 | File / assertion | Before | After | Why / retained requirements |
 | --- | --- | --- | --- |
 | `prototypes/corridor/tools/verify-report-entries.mjs:212` | `.focus-mode` `{ hasText: '読み探査' }` | `{ hasText: /読み探査\|yomi probe/u }` | Label selector only. R5 still opens the probe as a learner does, requires `.review-front` and `body.zen`, and checks the page entry sits after the stage. |
+
+## Fix lane rooms (2026-10-08, cloud): the shelf's filters fold into the Tools sheet; the close's way back is "Back to Today"
+
+Review #6 folded the four shelf filters (`#shelf-filter-*`) and the article search (`#shelf-reading-search`) into the existing Tools sheet (`#shelf-tools-panel`), so the shelf opens on its lead woodblock. Review #8 renamed the session close's way back from "back to lists / リストへ" ("Lists" is the old name of Today) to "Back to Today / 今日へ" and made the next door the close's primary. Every id, class and behaviour is kept; only where a control is drawn, and one label, changed.
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-design-reader-shelf.mjs` T1 (`between`) | anchor = `#shelf-body .shelf-chipbar` | anchor = the chip bar when it is drawn, else `#shelf-body .shelf-masthead` | Anchor only. T1 still requires no visible control between the anchor's foot and the first story, the Tools button in the title, closed on arrival, every door hidden until pressed, then every door in the panel, on one line, in view. With the filters folded the anchor is the title block, which is stricter (it covers the space where the chip bar stood). |
+| `verify-corridor.mjs` (editorial search, ~l.704) | fills `#shelf-reading-search` directly | `await openShelfTools(page)` first | Flow only, the same helper the suites already use for the tool doors. The empty-filter and restore-collection assertions are unchanged. |
+| `verify-reader-lookup.mjs` `open()` | fills `#shelf-reading-search` directly | `await openShelfTools(page)` first | Flow only; every lookup assertion unchanged. |
+| `verify-annotation-lookup.mjs` (shelf facet round trip) | focuses `#shelf-filter-topic` directly | `await openShelfTools(page)` first | Flow only; topic/sort/text results and the round-trip retention asserts are unchanged (the panel stays open across the round trip, as for the tool doors). |
+| `verify-vocabulary-chooser.mjs` `reader()` and the shelf-tally check | fills `#shelf-reading-search` directly | `await openShelfTools(page)` first | Flow only; tallies and results unchanged. |
+| `verify-experience.mjs:165`, `verify-journey.mjs:363`, `verify-skip-ui.mjs:229` | button name `/back to lists\|リストへ/` | `/back to lists\|リストへ\|Back to Today\|今日へ/` | Label only. The button is still `.close-doors .take` (pinned by class in many suites), still returns to the tray, and every assertion after the press is unchanged. |

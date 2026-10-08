@@ -10,6 +10,7 @@ import { resolve } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { openShelfTools } from './shelf-tools-support.mjs';
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Choose an existing artifact and its exact digest');
@@ -46,6 +47,7 @@ async function click(page,locator){const at=await center(locator);await page.mou
 async function open(page,dials){
   await page.goto(`${host.origin}/?entry=shelf&dials=${dials}&ui=bi`);
   await page.waitForFunction(()=>document.body.dataset.ready==='1');
+  await openShelfTools(page);
   await page.locator('#shelf-reading-search').fill('やまなし');
   await page.locator('#shelf-reading-search').press('Enter');
   await page.locator('#shelf-reading-results [data-passage="aozora:046605"] .shelf-open').click();

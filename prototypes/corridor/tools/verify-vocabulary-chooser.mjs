@@ -14,6 +14,7 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { openShelfTools } from './shelf-tools-support.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable artifact and exact digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
@@ -46,6 +47,7 @@ async function shelf(page) {
 }
 async function reader(page) {
   await shelf(page);
+  await openShelfTools(page);
   await page.locator('#shelf-reading-search').fill('やまなし');
   await page.locator('#shelf-reading-search').press('Enter');
   await page.locator(`#shelf-reading-results [data-passage="${passageId}"] .shelf-open`).click();
@@ -144,6 +146,7 @@ try {
           ? [`読み物 ${total} 本（うち用語集 ${glossary}）`, `${total} articles, ${glossary} of them short word definitions`]
           : [`読み物 ${total} 本`, `${total} articles`];
         assert(tally(stories.length, glossaryIds.size).includes((await page.locator('.shelf-results-count').textContent()).trim()));
+        await openShelfTools(page);
         await page.locator('#shelf-reading-search').fill('育児休業');
         await page.locator('#shelf-reading-search').press('Enter');
         const filtered = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(node => node.dataset.passage));
