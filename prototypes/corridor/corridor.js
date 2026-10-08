@@ -11070,6 +11070,29 @@ function todayLearning(tag, cls, text) {
   node.dataset.uiContent = 'learning';
   return node;
 }
+/** Japanese that breaks only between phrases, never inside one (「虚構 / か」): a line may end before
+ * a word that begins with kanji, katakana or an opening bracket, unless the word before it opened a
+ * bracket. Pairs with word-break: keep-all in the room's CSS; plain text without Intl.Segmenter. */
+function todayPhrases(node, text) {
+  const s = String(text || '');
+  let seg = null;
+  try {
+    seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
+  } catch {
+    seg = null;
+  }
+  if (!seg) {
+    node.textContent = s;
+    return node;
+  }
+  let prev = '';
+  for (const { segment } of seg.segment(s)) {
+    if (prev && /^[\p{Script=Han}\p{Script=Katakana}「『（(]/u.test(segment) && !/[「『（(\s]$/u.test(prev)) node.append(document.createElement('wbr'));
+    node.append(segment);
+    prev = segment;
+  }
+  return node;
+}
 function todayDateline() {
   const now = new Date();
   const [y, m, d, w] = [now.getFullYear(), now.getMonth(), now.getDate(), now.getDay()];
@@ -11125,11 +11148,14 @@ function todaySkyWord(w) {
   return n >= 2 && n <= 4 && TODAY_JA_WORD.test(w) && TODAY_SKY_WORD.test(w) && !!lookup(w);
 }
 let todaySkyPool = null;
-/** The sky over Today (round 4, T1): a window onto the whole universe of words, never empty. His
- * own saved words come first (due ones brightest), then the day's word's family (words sharing its
- * kanji), then the words of today's reading, then graded words drawn for the date. A word opens
- * that word; open sky opens the universe itself (todayOpenUniverse). Mouse and touch only: the
- * keyboard has the labelled door to the universe and the same saved words in the rows below. */
+/** At most this many stars: a sky, not a scatter (round 4 review). */
+const TODAY_SKY_CAP = 10;
+/** The sky over Today (round 4, T1): a window onto the whole universe of words, never empty, in
+ * its own band between the title and the day's word (the header stays clean). Three lanes, far to
+ * near: far words and two single kanji float by along the top; his due words and the day's
+ * reading sway in the middle; the day's word's family waits nearest the word. A word opens that
+ * word; open sky in the band opens the universe itself (todayOpenUniverse). Mouse and touch only:
+ * the keyboard has the labelled door to the universe and the same saved words in the rows below. */
 function todaySky(dayWord, today, readPick) {
   const sky = el('div', 'today-sky');
   sky.setAttribute('aria-hidden', 'true');
@@ -11160,118 +11186,146 @@ function todaySky(dayWord, today, readPick) {
     }
     return out;
   };
-  const family = take(todayKanji(dayWord).flatMap((c) => (D.kanjiWords?.[c] || []).slice(0, 4)), 4);
-  const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 8);
+  const family = take(todayKanji(dayWord).flatMap((c) => (D.kanjiWords?.[c] || []).slice(0, 4)), 3);
+  const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 4);
   todaySkyPool ||= Object.keys(D.words || {}).filter((w) => D.words[w]?.jlpt && [...w].length <= 3 && TODAY_SKY_WORD.test(w));
-  const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 20);
-  // his due words take the first places; then his other words, the day's word's family, the
-  // reading and far words are dealt in turn, so the sky is a window onto the whole universe (a
-  // mixed field of near and far), never his list alone nor a cluster of one kind
-  const dealt = [];
-  const hands = [rest.slice(0, 6).map((item) => ({ item, kind: 'mine' })), family.map((word) => ({ word, kind: 'kin' })),
-    reading.map((word) => ({ word, kind: 'read' })), fill.map((word) => ({ word, kind: 'far' }))];
-  for (let i = 0; dealt.length < 32 && hands.some((h) => h.length); i += 1) {
-    const hand = hands[[0, 1, 2, 3, 3][i % 5]];
-    if (hand.length) dealt.push(hand.shift());
-  }
+  const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 3);
   // "words and kanji floating by" (his Renzo opening screen): two single kanji from today's
-  // reading drift among the words, large and faint, each one a door to its own page
+  // reading drift with the far words, large and faint, each one a door to its own page
   const glyphs = [...new Set(reading.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2);
-  glyphs.forEach((kanji, i) => dealt.splice(1 + i * 4, 0, { kanji, kind: 'glyph' }));
-  const stars = [...due.slice(0, 6).map((item) => ({ item, kind: 'due' })), ...dealt].slice(0, 44);
-  const layers = [1, 2, 3].map((depth) => {
-    const layer = el('div', 'today-sky-layer');
-    layer.dataset.depth = String(depth);
-    return layer;
+  // five lanes, top to bottom, far and middle depths interleaved so the field reads as a sky, not
+  // rows: two far lanes (a kanji and a far word each) float by; two middle lanes hold his due words
+  // before the day's reading and one of his other words; the day's word's own family waits in the
+  // lane nearest the word. Each lane lists its stars in the order their places are given.
+  const g = glyphs.map((kanji) => ({ kanji, kind: 'glyph' }));
+  const f = fill.map((word) => ({ word, kind: 'far' }));
+  const mid = [...due.slice(0, 3).map((item) => ({ item, kind: 'due' })), ...reading.map((word) => ({ word, kind: 'read' })),
+    ...rest.slice(0, 1).map((item) => ({ item, kind: 'mine' }))];
+  const lanes = [
+    [g[0], f[1], f[2]].filter(Boolean),
+    mid.filter((_, i) => i % 2 === 0),
+    [f[0], g[1]].filter(Boolean),
+    mid.filter((_, i) => i % 2 === 1),
+    family.map((word) => ({ word, kind: 'kin' })),
+  ];
+  sky.todayLanes = lanes.map((list, li) => {
+    const lane = el('div', 'today-sky-lane');
+    lane.dataset.lane = String(li + 1);
+    const stars = list.map(({ item, word, kanji, kind }, i) => {
+      const star = todayLearning('button', `today-star ${kind}`, item ? item.label : word || kanji);
+      star.type = 'button';
+      star.tabIndex = -1;
+      star.hidden = true;
+      star.style.setProperty('--d', `${(i % 4) * 1.7}s`);
+      star.addEventListener('click', () => go(item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word }, { invoker: star }));
+      lane.append(star);
+      return star;
+    });
+    sky.append(lane);
+    return { lane, stars };
   });
-  sky.append(...layers);
-  sky.todayStars = stars.map(({ item, word, kanji, kind }, i) => {
-    const depth = kind === 'due' || kind === 'kin' ? 3 : kind === 'far' || kind === 'glyph' ? 1 : kind === 'read' ? 2 : r() < 0.55 ? 1 : 2;
-    const star = todayLearning('button', `today-star ${kind}${kind === 'due' ? ' due' : ''}`, item ? item.label : word || kanji);
-    star.type = 'button';
-    star.tabIndex = -1;
-    star.dataset.depth = String(depth);
-    star.style.setProperty('--d', `${(i % 7) * 0.9}s`);
-    star.addEventListener('click', () => go(item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word }, { invoker: star }));
-    layers[depth - 1].append(star);
-    return star;
-  });
-  // open sky is the door up: a tap that lands on no word rises into the universe
+  // open sky is the door up: a tap in the band that lands on no word rises into the universe,
+  // and the universe grows out of the point that was touched
   sky.addEventListener('click', (event) => {
     if (event.target.closest('.today-star')) return;
-    todayOpenUniverse();
+    todayOpenUniverse({ x: event.clientX, y: event.clientY });
   });
   return sky;
 }
-/** Up from Today's sky into the whole universe (T1). The drift fades in where its own state left
- * it; the door's Today pill at its foot is the way back down. UI only: no record, no scheduler. */
-function todayOpenUniverse() {
+/** Up from Today's sky into the whole universe (T1). The universe grows out of the touched point
+ * (transform and opacity only, and it takes no touch while it grows); the door's Today pill at its
+ * foot is the way back down. UI only: no record, no scheduler. */
+function todayOpenUniverse(from) {
   keepScroll();
   closeWorldPicker();
   S.captureOpen = false;
   S.stack = [];
   S.navOpen = false;
   S.view = 'drift';
-  document.documentElement.dataset.arrive = 'sky';
+  const root = document.documentElement;
+  if (from && Number.isFinite(from.x) && Number.isFinite(from.y)) {
+    root.style.setProperty('--arrive-x', `${Math.round(from.x)}px`);
+    root.style.setProperty('--arrive-y', `${Math.round(from.y)}px`);
+  }
+  root.dataset.arrive = 'sky';
   render();
   window.scrollTo(0, 0);
   clearTimeout(todayOpenUniverse.settle);
-  todayOpenUniverse.settle = setTimeout(() => { delete document.documentElement.dataset.arrive; }, 900);
+  todayOpenUniverse.settle = setTimeout(() => {
+    delete root.dataset.arrive;
+    root.style.removeProperty('--arrive-x');
+    root.style.removeProperty('--arrive-y');
+  }, 700);
 }
-/** Place the stars around what the room already holds, once it has its measure. */
+/** Lay the lanes into the sky's band once the room has its measure. Places are shared nearest lane
+ * first (the day's family, then his words, then the far field), up to each lane's limit and ten in
+ * all. Each star takes a spot at random in its lane where its 44px touch area meets no other (so
+ * the field scatters across five heights instead of standing in rows), and the far lanes' stars are
+ * set to float by on one ring per lane, so stars of one lane never meet. */
 function todayPlaceSky(hero) {
   const sky = hero.querySelector('.today-sky');
-  if (!sky?.isConnected || !sky.todayStars?.length) return;
-  const R = hero.getBoundingClientRect();
-  if (!R.width) return;
-  const box = (node) => {
-    const b = node.getBoundingClientRect();
-    return { x: b.left - R.left - 8, y: b.top - R.top - 6, w: b.width + 16, h: b.height + 12 };
-  };
-  const reserved = [...hero.querySelectorAll('.today-head > *, .today-universe, .dw-label, .dw-word, .dw-hook, .dw-fam, .dw-go')]
-    .filter((node) => node.getBoundingClientRect().width).map(box);
-  const sign = document.querySelector('#app > main > .room-sign');
-  if (sign) reserved.push(box(sign));
-  // the day's word keeps a clear field: no sky word inside the box from its label to its reading,
-  // widened by a glyph's breadth either side, so the hero is read before the sky
-  const label = hero.querySelector('.dw-label');
-  const word = hero.querySelector('.dw-word');
-  const block = hero.querySelector('.today-dayword');
-  if (R.width < 520 && block?.getBoundingClientRect().width) {
-    // on a phone the day's word owns its full width: the sky floats above it, never in a thin
-    // column at its side (round 4: that column read as a list, not a sky)
-    const b = box(block);
-    const top = label?.getBoundingClientRect().width ? box(label).y : b.y;
-    reserved.push({ x: 0, y: top, w: R.width, h: b.y + b.h - top });
-  } else if (word?.getBoundingClientRect().width) {
-    const w = box(word);
-    const top = label?.getBoundingClientRect().width ? Math.min(box(label).y, w.y) : w.y;
-    const padX = 40;
-    reserved.push({ x: w.x - padX, y: top - 10, w: w.w + padX * 2, h: w.y + w.h - top + 20 });
-  }
+  if (!sky?.isConnected || !sky.todayLanes) return;
+  const R = sky.getBoundingClientRect();
+  if (!R.width || !R.height) return;
   const r = todayRng(todayHash(`${dayKey()}:sky`));
-  const placed = [];
   const W = R.width;
-  // the line card rides over the hero's last 48px and the city's roofs stand above it
-  const H = R.height - 96;
-  for (const star of sky.todayStars) {
-    // three clear sizes, none too small to read: near (due, the day's family), middle, far
-    const size = star.classList.contains('glyph') ? 26 : star.classList.contains('due') ? 19
-      : star.dataset.depth === '3' ? 18 : star.dataset.depth === '2' ? 16 : 14;
-    star.style.fontSize = `${size}px`;
-    const bw = [...star.textContent].length * size + 10;
-    const bh = size + 12;
-    star.hidden = true;
-    for (let k = 0; k < 90; k += 1) {
-      const x = 4 + r() * Math.max(1, W - 8 - bw);
-      const y = 6 + r() * Math.max(1, H - 6 - bh);
-      const b = { x, y, w: bw, h: bh };
-      if ([...reserved, ...placed].some((o) => !(b.x + b.w < o.x || o.x + o.w < b.x || b.y + b.h < o.y || o.y + o.h < b.y))) continue;
-      placed.push(b);
+  const n = sky.todayLanes.length;
+  // lane centres stand 23px inside the band, so every touch area is whole inside it
+  const pitch = (R.height - 46) / Math.max(1, n - 1);
+  // the caption that names the band sits on the near lane's right end; its whole touch area is
+  // taken, so no star's own touch area runs under it
+  const up = hero.querySelector('.today-universe')?.getBoundingClientRect();
+  const nearRight = up?.width ? Math.min(W, up.left - R.left - 6) : W;
+  const caption = up?.width ? [{ x: up.left - R.left - 4, y: up.top - R.top, w: up.width + 8, h: up.height }] : [];
+  const SIZE = { glyph: 26, due: 19, kin: 18, mine: 17, read: 16, far: 15 };
+  // per lane, top to bottom: does it float by, how far it sways each way, how many stars it keeps
+  const FLOAT = [true, false, true, false, false];
+  const SWAY = [0, 12, 0, 14, 4];
+  const LIMIT = [2, 2, 2, 2, 3];
+  const SPEED = [5, 0, 7, 0, 0];
+  const placed = [...caption];
+  let shown = 0;
+  for (const li of [4, 1, 3, 0, 2].filter((i) => i < n)) {
+    const { lane, stars } = sky.todayLanes[li];
+    const cy = 23 + li * pitch;
+    lane.style.top = `${(cy - 22).toFixed(1)}px`;
+    lane.style.height = '44px';
+    const left = FLOAT[li] ? 10 : 8 + SWAY[li];
+    const right = (li === n - 1 ? nearRight : W) - (FLOAT[li] ? 10 : 8 + SWAY[li]);
+    const kept = [];
+    for (const star of stars) {
+      star.hidden = true;
+      if (kept.length >= LIMIT[li] || shown >= TODAY_SKY_CAP) continue;
+      const kind = Object.keys(SIZE).find((k) => star.classList.contains(k)) || 'far';
+      const size = SIZE[kind];
+      const w = [...star.textContent].length * size;
+      // a touch area of at least 44 x 44 around the word that meets no other at rest
+      const hitW = Math.max(44, w + 16);
+      for (let k = 0; k < 48 && right - left >= w; k += 1) {
+        const x = left + r() * (right - left - w);
+        const box = { x: x + w / 2 - hitW / 2, y: cy - 22, w: hitW, h: 44 };
+        if (placed.some((o) => box.x < o.x + o.w && o.x < box.x + box.w && box.y < o.y + o.h && o.y < box.y + box.h)) continue;
+        placed.push(box);
+        kept.push({ star, x, w, size });
+        shown += 1;
+        break;
+      }
+    }
+    const ringW = W + Math.max(0, ...kept.map((s) => s.w)) + 48;
+    for (const { star, x, size } of kept) {
+      star.style.fontSize = `${size}px`;
       star.style.left = `${((x / W) * 100).toFixed(2)}%`;
-      star.style.top = `${y.toFixed(1)}px`;
+      star.style.top = `${(22 - size / 2).toFixed(1)}px`;
+      if (FLOAT[li]) {
+        // one ring for the whole lane: its stars move at one pace and wrap out of sight, so their
+        // spacing never changes; at rest (and with reduced motion) each sits at x
+        const start = W + 24;
+        star.style.setProperty('--from', `${(start - x).toFixed(1)}px`);
+        star.style.setProperty('--to', `${(start - ringW - x).toFixed(1)}px`);
+        star.style.setProperty('--lag', `${(-(start - x) / SPEED[li]).toFixed(2)}s`);
+        star.style.setProperty('--ring', `${(ringW / SPEED[li]).toFixed(2)}s`);
+      }
       star.hidden = false;
-      break;
     }
   }
 }
@@ -11304,13 +11358,14 @@ function renderTodayWord(pick) {
   block.append(line);
   if (hook.family) {
     block.append(el('p', 'dw-fam', hook.mine
-      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji carry it · ${hook.mine} in your words`)
-      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji carry it`)));
+      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji contain it · ${hook.mine} in your words`)
+      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji contain it`)));
   }
+  // plain words (LABELS.md, round 4): the door names where it goes, the kanji that hold this part
   const follow = el('button', 'dw-go');
   follow.type = 'button';
   follow.dataset.uiContentValue = `部品|${hook.part}`;
-  follow.append(el('span', 'dw-go-l', tx('', 'Follow')), pk(), el('span', 'dw-go-l', tx('をたどる', '')));
+  follow.append(el('span', 'dw-go-l', tx('', 'Kanji with')), pk(), el('span', 'dw-go-l', tx('を含む漢字', '')));
   follow.append(el('i', 'today-arrow'));
   follow.addEventListener('click', () => {
     // the word web, centred on the shared part; the part's own sheet when the web isn't ready
@@ -11334,8 +11389,9 @@ function renderTodayLine(today, door, read, pick) {
   const cards = today ? today.order.length : 0;
   if (today) stops.append(stop(cards ? 'stop-cards now' : 'stop-cards', cards, tx('枚のカード', cards === 1 ? 'card' : 'cards')));
   if (read) stops.append(stop(!cards ? 'stop-read now' : 'stop-read', 1, tx('本の記事', 'article')));
-  // plain words (round 4): the stop names what the hero's own door does, "Follow 日"
-  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語をたどる', 'word to follow')));
+  // plain words (round 4): the third stop is the day's word the hero shows, one short name that
+  // sits on one line beside "8 cards" and "1 article" even at 320px
+  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語', 'word')));
   stops.style.setProperty('--stops', String(stops.children.length));
   card.append(stops);
   if (cards) {
@@ -11354,7 +11410,7 @@ function renderTodayLine(today, door, read, pick) {
     const then = el('button', door ? 'today-then' : 'today-then solo');
     then.type = 'button';
     then.append(el('span', 'today-then-l', door ? tx('つづいて', 'Then') : tx('今日の読み物', "Today's reading")),
-      todayLearning('span', 'today-then-title', read.passage.title));
+      todayPhrases(todayLearning('span', 'today-then-title'), read.passage.title));
     if (read.count) then.append(el('span', 'today-then-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
     then.append(el('i', 'today-arrow'));
     then.addEventListener('click', () => openPassage(read.passage.id));
@@ -11392,23 +11448,33 @@ function renderTodayDetail(today) {
   section.append(toggle, body);
   return { section, body };
 }
+/** The entry sheet's one capture button, named once: Today's empty state quotes this same label,
+ * so the two can never disagree about what the button is called (round 4 review, LABELS.md). */
+function sheetTakeLabel() {
+  return tx('覚', 'Save');
+}
 function renderTray(main) {
   const currentSurface = recordViewSurface();
   const trayToday = S.taken.length && scheduler ? todayQueue() : null;
   const pick = todayWordOfDay(trayToday);
   const readPick = todayReadPick();
   const hero = el('section', 'today-hero');
-  if (pick) hero.append(todaySky(pick.word, trayToday, readPick));
   hero.append(todayCity());
   const head = el('header', 'today-head');
   head.append(el('p', 'eyebrow today-date', todayDateline()), el('h1', 'view-title', tx('今日', 'Today')));
   hero.append(head);
-  // the sky's labelled door up (T1): the same rise as a tap on open sky, for every hand and key
+  // the header stands alone; the sky has its own band under it (round 4 review)
+  if (pick) hero.append(todaySky(pick.word, trayToday, readPick));
+  // the sky's labelled door up (T1): the same rise as a tap on open sky, for every hand and key;
+  // it carries the room's own forward arrow, not a mark that reads as leaving the app
   const up = el('button', 'today-universe');
   up.type = 'button';
   up.id = 'today-universe';
-  up.append(el('span', 'today-universe-l', tx('すべての言葉へ', 'Explore all words')), el('i', 'today-up'));
-  up.addEventListener('click', () => todayOpenUniverse());
+  up.append(el('span', 'today-universe-l', tx('すべての言葉へ', 'Explore all words')), el('i', 'today-arrow'));
+  up.addEventListener('click', () => {
+    const b = up.getBoundingClientRect();
+    todayOpenUniverse({ x: b.left + b.width / 2, y: b.top + b.height / 2 });
+  });
   hero.append(up);
   if (pick) hero.append(renderTodayWord(pick));
   main.append(hero);
@@ -11604,8 +11670,8 @@ function renderTray(main) {
         'div',
         'sem-empty',
         tx(
-          '保存した言葉はまだない。語・漢字・熟語のページで「覚」を押すと、ここに並ぶ。',
-          'Nothing saved yet. Tap Save on any word, kanji or idiom, and it comes back here to review.',
+          `保存した言葉はまだない。語・漢字・熟語のページで「${sheetTakeLabel()}」を押すと、ここに並ぶ。`,
+          `Nothing saved yet. Tap ${sheetTakeLabel()} on any word, kanji or idiom, and it comes back here to review.`,
         ),
       ),
     );
@@ -28725,7 +28791,7 @@ function renderSheet(root) {
     // D23: the seal shares the foot button's state, 'taken' only for this identity's card
     const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
     const takenNow = capState ? capState === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
-    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', tx('覚', 'Save'));
+    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', sheetTakeLabel());
     capture.type = 'button';
     capture.id = 'sheet-take';
     if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
