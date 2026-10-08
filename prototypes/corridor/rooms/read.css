@@ -1369,3 +1369,40 @@ html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title { font-size: 23px; line-height: 1.38; }
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: 14px; line-height: 1.4; }
 }
+
+/* =====================================================================================
+   ROUND 4, the shelf's lead (the common thread: separation instead of one beige). The lead story is
+   the reader's own composition in miniature: the woodblock, and in front of it a raised card holding
+   its level, kicker, headline, English line, first sentence and date. Text stays exactly as it was.
+   ===================================================================================== */
+html[data-room='shelf'] body:not([data-view='drift']) {
+  --shelf-card: color-mix(in srgb, var(--color-surface) 30%, #ffffff);
+  --shelf-card-edge: color-mix(in srgb, var(--color-ink) 18%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] body:not([data-view='drift']) {
+  --shelf-card: color-mix(in srgb, var(--color-paper) 94%, #ffffff);
+  --shelf-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 30%, transparent);
+}
+@media (max-width: 760px) {
+  html[data-room='shelf'] #shelf-reading-results > .story-lead .shelf-head {
+    position: relative;
+    z-index: 1;
+    margin: -30px 12px 0;
+    padding: 14px 16px 10px;
+    border: 1px solid var(--shelf-card-edge);
+    border-radius: 14px;
+    background: var(--shelf-card);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
+  }
+  :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-reading-results > .story-lead .shelf-head {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
+  }
+  /* the print's lower registration marks rise clear of the card that overlaps its foot */
+  html[data-room='shelf'] #shelf-body .story-lead .story-picture::after { inset: 12px 12px 42px; }
+  html[data-room='shelf'] #shelf-reading-results > .story-lead + .shelf-review-note { margin-top: 10px; }
+}
+/* the 読 seal: a crisp tile with a keyline; at night a lantern-gold one, so it never melts into the 藍 */
+html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0 0 1px rgb(20 24 34 / 16%), 0 2px 6px -1px rgb(20 24 34 / 28%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold, #e2bd6c) 45%, transparent), 0 2px 8px rgb(0 0 0 / 45%);
+}
