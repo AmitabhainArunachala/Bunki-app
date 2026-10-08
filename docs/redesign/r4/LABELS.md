@@ -14,7 +14,7 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 |---|---|---|---|---|---|
 | `corridor.js` `render()`: `#tray` (bookmark; screen-reader word) | Lists | Lists *(kept: it names the lists that room holds; `verify-corridor` pins `/^Lists N$/`)* | 覚 | リスト | skin |
 | `#tray` count | always shown, "0" | the count shows only when you have saved words; at 0 the bookmark is quiet | 0 | (same) | skin (D7) |
-| `#chrome-dojo` (Learn cap) | Learn | Learn; a small 朱 dot appears when cards are due, and its name says how many ("Learn · 3 due") | 学ぶ | 学ぶ・復習 3 | skin (D7) |
+| `#chrome-dojo` (Learn cap) | Learn | Learn; a small ink dot appears when cards are due, and its name says how many ("Learn · 3 due") | 学ぶ | 学ぶ・復習 3 | skin (D7) |
 | `#theme-seal` and the picker's name | choose a world | Colour theme | 世界を選ぶ | 配色を選ぶ | skin |
 | World picker | ten unnamed stones | the stones in two labelled rows, **Day** and **Night**; Night offers both 金 (藍 night) and 殻 (electric) | — | 昼 · 夜 | skin (D2) |
 | Reader picture credit (`readerPicture`, read lane's function, one string) | Illustration · Bunki | Illustration · 回廊 KAIRO | 挿絵 · Bunki | 挿絵 · 回廊 KAIRO | skin (D3) |

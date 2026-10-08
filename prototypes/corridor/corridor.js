@@ -31187,7 +31187,7 @@ function render() {
     dojoDoor.id = 'chrome-dojo';
     dojoDoor.insertAdjacentHTML('afterbegin', LEARN_DOOR_SVG);
     // D7 (John: "Keep them for now — figure out the smartest way to work with this"): the cap
-    // tells what the bar cannot. Away from Today and Learn (whose rooms show the count), a 朱
+    // tells what the bar cannot. Away from Today and Learn (whose rooms show the count), an ink
     // dot says cards are due, and the door's name says how many.
     const dueHere = !inDojo && !['tray', 'deckplay', 'review'].includes(S.view) && S.taken.length && scheduler
       ? todayQueue().order.length : 0;

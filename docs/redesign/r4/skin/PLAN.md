@@ -30,7 +30,7 @@ Branch `claude/r4-skin-20261009` from `345dba92`. Base build `site-base` (artifa
 ### D7 (The header's Learn / Lists icons): "Keep them for now — figure out the smartest way to work with this"
 - **Kept** in place with their ids, 44px boxes and texts (≈60 verifiers click them).
 - **Quieter:** one small tools group, lower-contrast glyphs, tighter spacing, set off from the preferences by a hairline.
-- **Smarter:** each shows what the tab bar can't. The Learn cap carries a small 朱 dot when cards are due (its name says how many); the Lists bookmark shows its count only when you have saved words, and is a quiet outline at 0. The current room's door is marked.
+- **Smarter:** each shows what the tab bar can't. The Learn cap carries a small ink dot when cards are due (its name says how many); the Lists bookmark shows its count only when you have saved words, and is a quiet outline at 0. The current room's door is marked.
 - **Proof:** `verify-corridor` (`#tray` still reads `Lists N`), `verify-redesign-foundation`, `verify-experience` (header 44px), screenshots.
 
 ### Plain words (the common thread, T2 and T5 named three)

@@ -4770,10 +4770,8 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --elevation-lift: 0 1px 2px rgb(20 22 28 / 8%), 0 8px 18px -8px rgb(20 22 28 / 16%), 0 26px 48px -22px rgb(20 22 28 / 30%);
   --elevation-float: 0 -0.5px 0 rgb(20 22 28 / 8%), 0 -10px 36px rgb(20 22 28 / 16%);
   --elevation-press: 0 1px 0 var(--color-press), 0 6px 14px -8px rgb(20 26 40 / 34%);
-  /* type: tight, the iOS ramp on the system face */
-  --type-caption: 11px;
-  --type-label: 13px;
-  --type-chrome: 15px;
+  /* type: the foundation's sizes stay (one-line pins depend on them); tightness comes from
+     weight, tracking and leading */
   --leading-ui: 1.35;
   --leading-body: 1.55;
   /* motion: short and springy; the sheet curve is the iOS one */
@@ -4910,8 +4908,9 @@ body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .sh
 }
 /* ---- D7 (John: "Keep them for now — figure out the smartest way to work with this"): the
    header's search · Learn · Lists stay, ids and 44px intact, as one quiet tools group. Each
-   says what the bar cannot: the Learn cap carries a 朱 dot when cards are due (away from the
-   rooms that already show the count); the bookmark is an outline with no number at 0 and a
+   says what the bar cannot: the Learn cap carries an ink dot when cards are due (away from the
+   rooms that already show the count; ink, not 朱: the screen's one 朱 belongs to the room, as
+   the Line's due count already does); the bookmark is an outline with no number at 0 and a
    filled mark with its count once words are saved; the door of the room you are in is inked. ---- */
 body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-bar-quiet); }
 body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
@@ -4924,7 +4923,7 @@ body:not(.zen) #app > .chrome > button.chrome-dojo[data-due]::after {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--color-seal);
+  background: var(--color-bar-ink);
   box-shadow: 0 0 0 2px var(--color-bar);
   pointer-events: none;
 }
