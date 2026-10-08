@@ -302,7 +302,7 @@ html[data-room='reader'] main > .reader-hero .reader-picture-caption {
 }
 html[data-room='reader'] body:not(.ui-bi) main > .reader-hero .reader-picture-caption { letter-spacing: 0.08em; }
 /* the title rests on the print's faded foot */
-html[data-room='reader'] main > h1.view-title.on-hero { position: relative; z-index: 1; margin-top: -30px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { position: relative; z-index: 1; margin-top: -30px; }
 html[data-room='reader'] .reader-meta {
   font-family: var(--font-data);
   font-variant-numeric: tabular-nums;
@@ -533,7 +533,7 @@ html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-
     margin: calc(-1 * var(--s2, 16px)) calc(50% - 50vw) 4px;
     border-radius: 0;
   }
-  html[data-room='reader'] main > h1.view-title.on-hero { margin-top: -36px; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { margin-top: -16px; }
   /* the instrument line may take two short lines; it never runs off the page */
   html[data-room='reader'] body[data-view='reader'] #app > main .reader-meta { flex-wrap: wrap; row-gap: 2px; }
   html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { font-size: 23px; line-height: 1.38; }
@@ -640,7 +640,7 @@ html[data-room='shelf'] #shelf-body .shelf-tools-filters .shelf-filter-help > su
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-head {
   position: relative;
   display: block;
-  margin: 4px 0 8px;
+  margin: 0 0 4px;
   padding: 0;
   border: 0;
 }
@@ -703,9 +703,14 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hea
 /* the voice's state: on a phone one muted mark at the line's end (no strip, no fixed foot); on a desk
    the relief-edged row keeps a line of its own under the figures (verify-relief) */
 html[data-room='reader'] body:not([data-view='drift']) #app main .reader-meta > .listen-row.play-bar.is-pending {
-  display: flex;
-  margin: 6px 0 0;
+  display: inline-flex;
+  min-height: 0;
+  margin: 0;
+  padding: 1px 10px;
+  vertical-align: middle;
 }
+html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending { gap: 6px; font: inherit; letter-spacing: inherit; text-transform: none; }
+html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::after { content: none; }
 @media (max-width: 520px) {
   html[data-room='reader'] body:not([data-view='drift']) #app main .reader-meta > .listen-row.play-bar.is-pending {
     position: static;
