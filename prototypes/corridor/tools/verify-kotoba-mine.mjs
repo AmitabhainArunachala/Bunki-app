@@ -440,6 +440,15 @@ const CONTRAST = `(() => {
   return out;
 })()`;
 
+/** a grade pad's wait as fmtWait prints it: a number and a unit, the unit singular exactly when the
+ * number is 1 ("1 day", "2 days", "1 year", "1.5 years"; never "1 days" or "1.0 years") */
+const WAIT = /^([\d.]+) (min|hr|days?|months?|years?)$/;
+const waitOk = (w) => {
+  const m = WAIT.exec(w || '');
+  if (!m || /\.0$/.test(m[1])) return false;
+  return m[2] === 'min' || m[2] === 'hr' || (Number(m[1]) === 1) === !m[2].endsWith('s');
+};
+
 async function verifyDelivery(browser, base) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(SEEDED);
@@ -463,7 +472,7 @@ async function verifyDelivery(browser, base) {
     await page.waitForSelector('.kp-grade');
     const four = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, ids: [...document.querySelectorAll('.kp-grades .kp-grade')].map((b) => b.id).join(), labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), keys: [...document.querySelectorAll('.kp-grade')].map((b) => b.getAttribute('aria-keyshortcuts')).join(), waits: [...document.querySelectorAll('.kp-grade small')].map((s) => s.textContent).join('/'), hint: document.querySelector('.kp-swipehint')?.textContent, position: getComputedStyle(document.querySelector('.kp-grades')).position })`);
     const untouched = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
-    check('the grade bar shows Again · Hard · Good · Easy in that order (ids again, hard, good, easy; keys 1–4), each with an interval, whatever button setting is stored, and stays on screen (fixed)', four.n === 4 && four.ids === 'kp-grade-again,kp-grade-hard,kp-grade-good,kp-grade-easy' && four.labels === 'Again/Hard/Good/Easy' && four.keys === '1,2,3,4' && four.waits.split('/').length === 4 && four.waits.split('/').every((w) => /^[\d.]+ (min|hr|days|months|years)$/.test(w)) && four.hint.includes('Good') && four.position === 'fixed' && untouched, JSON.stringify({ ...four, untouched }));
+    check('the grade bar shows Again · Hard · Good · Easy in that order (ids again, hard, good, easy; keys 1–4), each with an interval, whatever button setting is stored, and stays on screen (fixed)', four.n === 4 && four.ids === 'kp-grade-again,kp-grade-hard,kp-grade-good,kp-grade-easy' && four.labels === 'Again/Hard/Good/Easy' && four.keys === '1,2,3,4' && four.waits.split('/').length === 4 && four.waits.split('/').every(waitOk) && four.hint.includes('Good') && four.position === 'fixed' && untouched, JSON.stringify({ ...four, untouched }));
 
     // swipes: a cancelled gesture or a mostly vertical one never grades; a sideways one does (F34)
     const gesture = (moves, last) =>
@@ -535,12 +544,12 @@ async function verifyDelivery(browser, base) {
     // interval it stores is the one its pad showed (a pad's text, read back as a range, holds the
     // scheduled due minus the review time); then a ledger written by the two-button player (ratings 1
     // and 3 only) loads unchanged and takes a Hard as one more row
-    const UNIT = { min: 60e3, hr: 36e5, days: 864e5, months: 30 * 864e5, years: 365 * 864e5 };
+    const UNIT = { min: 60e3, hr: 36e5, day: 864e5, days: 864e5, month: 30 * 864e5, months: 30 * 864e5, year: 365 * 864e5, years: 365 * 864e5 };
     const holds = (text, ms) => {
-      const m = /^([\d.]+) (min|hr|days|months|years)$/.exec(text || '');
-      if (!m) return false;
+      const m = WAIT.exec(text || '');
+      if (!m || !waitOk(text)) return false;
       const [n, u] = [Number(m[1]), UNIT[m[2]]];
-      const half = m[2] === 'years' ? 0.05 : 0.5;
+      const half = /^years?$/.test(m[2]) ? 0.05 : 0.5;
       return ms >= Math.max(0, n - half) * u - 2000 && ms < (n + half) * u + 2000;
     };
     await page.evaluate(`localStorage.removeItem('bunki-cloze:kotoba-mine'); localStorage.removeItem('bunki-cloze:prefs:v3:kotoba-mine')`);
@@ -1639,7 +1648,7 @@ async function verifyBack(browser, base) {
       const l = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
       check(
         '2) 読んで思い出す (the MCD default) leaves a due 字 card out of the queue — nothing suspended, its record kept; choosing 穴埋め brings it back, blanked with its reading',
-        read.disabled && read.start === 'Done for today' && modeRead === 'true' && self === 'Begin — 1 cards' && shown.id === 'km-064-m02' && shown.blank === '〔ざい〕' && !Object.keys(l.suspended ?? {}).length && l.cards['km-064-m02']?.stability === 20,
+        read.disabled && read.start === 'Done for today' && modeRead === 'true' && self === 'Begin — 1 card' && shown.id === 'km-064-m02' && shown.blank === '〔ざい〕' && !Object.keys(l.suspended ?? {}).length && l.cards['km-064-m02']?.stability === 20,
         JSON.stringify({ read, modeRead, self, shown, suspended: l.suspended ?? {} }),
       );
     } finally {
@@ -2454,9 +2463,11 @@ async function main() {
     await page.waitForFunction(`getComputedStyle(document.querySelector('.kp-home .kp-tiles')).display === 'grid'`, null, { timeout: 5000 }).catch(() => {});
     const tiles = await page.evaluate(`[...document.querySelectorAll('.kp-home .kp-tiles > .kp-tile')].map((n) => ({ n: n.querySelector('b')?.textContent ?? null, label: n.querySelector('span')?.textContent ?? null, color: getComputedStyle(n.querySelector('b')).color, h: Math.round(n.getBoundingClientRect().height), top: Math.round(n.getBoundingClientRect().top) }))`);
     const hue = await page.evaluate(`(() => { const kp = document.querySelector('.kp'); const i = document.createElement('i'); kp.append(i); const tok = (k) => { i.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(i).color; }; const out = { amber: tok('amber'), ink: tok('ink'), green: tok('green'), red: tok('red') }; i.remove(); return out; })()`);
-    const begin = Number(/\d+/.exec(home.start)?.[0]);
+    // figures carry a thousands separator (2,435): read them back without it
+    const num = (x) => Number(String(x).replace(/,/g, ''));
+    const begin = num(/\d[\d,]*/.exec(home.start)?.[0]);
     check('the deck home shows four small tiles in one row, Due · New · Known · Difficult, with the queue’s own counts (due + new is the start button’s number), in amber, ink, green and red (T2)',
-      tiles.length === 4 && tiles.map((x) => x.label).join() === 'Due,New,Known,Difficult' && tiles.every((x) => /^\d+$/.test(x.n)) && Number(tiles[0].n) + Number(tiles[1].n) === begin &&
+      tiles.length === 4 && tiles.map((x) => x.label).join() === 'Due,New,Known,Difficult' && tiles.every((x) => /^\d{1,3}(,\d{3})*$/.test(x.n)) && num(tiles[0].n) + num(tiles[1].n) === begin &&
         new Set(tiles.map((x) => x.top)).size === 1 && tiles.every((x) => x.h <= 72) && tiles[0].color === hue.amber && tiles[1].color === hue.ink && tiles[2].color === hue.green && tiles[3].color === hue.red,
       JSON.stringify({ tiles, begin }));
 

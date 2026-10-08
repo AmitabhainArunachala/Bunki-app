@@ -397,12 +397,17 @@ function btn(cls, label, onClick, attrs = {}) {
 const KANJI = /[㐀-鿿々〆ヵヶ]/;
 const MIN = 60e3;
 const DAY = 864e5;
+/** a count in figures with a thousands separator (2,435), and in English its noun in the right number */
+const fmtN = (n) => Number(n).toLocaleString('en-US');
+const nounEn = (n, one, many = `${one}s`) => `${fmtN(n)} ${n === 1 ? one : many}`;
+/** the wait a grade pad (or the session close) names: 1 day, 2 days, 1 year, 1.5 years; never "1 days" */
 function fmtWait(ms) {
   if (ms < 60 * MIN) return t(`${Math.max(1, Math.round(ms / MIN))}分`, `${Math.max(1, Math.round(ms / MIN))} min`);
   if (ms < DAY) return t(`${Math.round(ms / (60 * MIN))}時間`, `${Math.round(ms / (60 * MIN))} hr`);
-  if (ms < 30 * DAY) return t(`${Math.round(ms / DAY)}日`, `${Math.round(ms / DAY)} days`);
-  if (ms < 365 * DAY) return t(`${Math.round(ms / (30 * DAY))}か月`, `${Math.round(ms / (30 * DAY))} months`);
-  return t(`${(ms / (365 * DAY)).toFixed(1)}年`, `${(ms / (365 * DAY)).toFixed(1)} years`);
+  if (ms < 30 * DAY) return t(`${Math.round(ms / DAY)}日`, nounEn(Math.round(ms / DAY), 'day'));
+  if (ms < 365 * DAY) return t(`${Math.round(ms / (30 * DAY))}か月`, nounEn(Math.round(ms / (30 * DAY)), 'month'));
+  const years = Number((ms / (365 * DAY)).toFixed(1));
+  return t(`${years}年`, `${years} ${years === 1 ? 'year' : 'years'}`);
 }
 const KIND_NAME = { news: 'ニュース', blog: 'ブログ', qa: 'Q&A', company: '企業サイト', gov: '公的機関', literature: '文学', tatoeba: 'Tatoeba', wiki: 'Wikipedia', social: 'SNS', 'example-bank': '例文集', other: 'ウェブ', original: '書き下ろし' };
 const STATUS = {
@@ -630,14 +635,15 @@ function homeScreen() {
   // stays one line (T2): "Words you looked up" over "Sentences · 323 words · 503 cards"
   const [name, form] = titleParts(deck);
   box.append(topBar(name, ctx.onLeave ? () => ctx.onLeave() : null));
-  const counts = t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`);
+  const cardCount = deck.words.reduce((n, w) => n + w.cards.length, 0);
+  const counts = t(`${fmtN(deck.words.length)}語 · ${fmtN(cardCount)}枚`, `${nounEn(deck.words.length, 'word')} · ${nounEn(cardCount, 'card')}`);
   box.append(el('p', 'kp-sub', form ? `${form[0].toUpperCase()}${form.slice(1)} · ${counts}` : counts));
   if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', t(ctx.notice)));
 
   // the deck's state as four small tiles, each number in its own colour: due (amber), new,
   // known (green), difficult (red) — the learner's T2: "the four windows but maybe not so big"
   const tiles = el('div', 'kp-tiles');
-  const tile = (n, ja, en, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
+  const tile = (n, ja, en, cls) => el('div', `kp-tile ${cls}`, el('b', null, fmtN(n)), el('span', null, t(ja, en)));
   tiles.append(
     tile(q.due.length, '復習', 'Due', 'kp-c-due'),
     tile(q.fresh.length, '新規', 'New', 'kp-c-new'),
@@ -647,7 +653,7 @@ function homeScreen() {
   box.append(tiles);
 
   const total = q.queue.length;
-  const start = btn('kp-start', total ? t(`始める — ${total}枚`, `Begin — ${total} cards`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
+  const start = btn('kp-start', total ? t(`始める — ${fmtN(total)}枚`, `Begin — ${nounEn(total, 'card')}`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
   start.disabled = !total;
   box.append(start);
 
@@ -2395,7 +2401,7 @@ function suspendedField() {
   const ids = Object.keys(ctx.state.suspended || {}).filter((id) => ctx.index.cards.has(id));
   const why = {};
   for (const id of ids) why[ctx.state.suspended[id].by] = (why[ctx.state.suspended[id].by] || 0) + 1;
-  const count = el('p', 'kp-sub', ids.length ? t(`${ids.length}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${ids.length} cards (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
+  const count = el('p', 'kp-sub', ids.length ? t(`${fmtN(ids.length)}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${nounEn(ids.length, 'card')} (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
   count.id = 'kp-suspended';
   const back = btn('', t("復元"), () => {
     const nextState = restoreSuspended(ctx.state, new Date(), ids);
