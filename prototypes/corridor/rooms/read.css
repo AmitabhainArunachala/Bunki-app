@@ -1188,7 +1188,8 @@ html[data-room='reader'] body:not([data-view='drift']) {
   --reader-card: color-mix(in srgb, var(--color-surface) 30%, #ffffff);
   --reader-card-edge: color-mix(in srgb, var(--color-ink) 20%, transparent);
   --reader-paper: color-mix(in srgb, var(--color-paper) 62%, #fffdf6);
-  --reader-paper-edge: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  /* the paper's top edge is a real ink line (verify-relief: an edge of at least 25% ink, with a lifting shadow) */
+  --reader-paper-edge: color-mix(in srgb, var(--color-ink) 30%, transparent);
   --reader-ink: color-mix(in srgb, var(--color-ink) 90%, #000000);
   --reader-track: color-mix(in srgb, var(--color-ink) 9%, var(--reader-card));
 }
@@ -1198,7 +1199,7 @@ html[data-room='reader'] body:not([data-view='drift']) {
   --reader-card: color-mix(in srgb, var(--color-paper) 94%, #ffffff);
   --reader-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 32%, transparent);
   --reader-paper: color-mix(in srgb, var(--color-ground) 70%, #000000);
-  --reader-paper-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 24%, transparent);
+  --reader-paper-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 36%, transparent);
   --reader-ink: var(--color-ink);
   --reader-track: color-mix(in srgb, var(--color-ground) 55%, var(--reader-card));
 }
