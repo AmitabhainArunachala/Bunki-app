@@ -5,7 +5,7 @@
 ## How to read this
 
 - **His words are always in quotation marks** and copied exactly, typos kept. Every quote is listed with its source in Appendix A. Anything outside quotation marks is my reading or proposal, and the text says so where it matters ("my reading", "proposal").
-- **Provenance.** Most quotes are his own typed or dictated words (T1 in the banks). A few come from August records, where an agent saved his words (marked *agent record*) or paraphrased them (*agent paraphrase*, direction only, never his wording).
+- **Provenance.** Most quotes are his own typed words (T1 in the banks). Some are his words saved verbatim by an agent (T2, marked *agent record* in Appendix A): this includes **everything from 10-04, the voice note and the typed brief**, and several August records. A few are agent paraphrases (*agent paraphrase*, direction only, never his wording).
 - **Weighting, by his own rule.** Message 1, THE BRIEF, is the frame. Messages 3–5 are "just hints, jsut direction" (message 7): they tune the brief and never replace it. Message 9 is THE BAR, a felt test the whole thing must pass. Message 10 (money) sits inside the brief's "viral hit" and "best japanese learning app on the planet". The lens drafts are inputs, not the frame: where one of them has a pet idea (kintsugi seams, the ink stone, 守破離, strata percentages), it appears here as an option, not a law.
 - **Every section ends with "Consequences"**: things a designer can do, check or refuse on Monday.
 
@@ -62,15 +62,18 @@ THE BRIEF's feeling words come in pairs that seem to pull against each other, an
 - **Calm and alive.** The hint of message 5: "layers of depth, clarity, calm balnced with the engaging soothing crisp and eep detialed recrusive animation of masters". In August: "mesmerizing — recursive hypnosis that pulls you in; extreme focus and concentration but also ease" (08-10, agent record), and the focus room as "a tool for focus and clarity and peace and concentration." (09-23).
 - **Zen, but not soft.** "zen is not softness. Hakuin's stick as much as the still water" (08-11, agent paraphrase). When an answer is wrong: "it needs to be clear, precisse, and crispt and EASILY UNDERSTANABLE, though elegant when an answer is wrong." (09-23).
 - **Fast and deep.** "quick and punchy" and "fluid, fast, quick, clear, sharp" (THE BRIEF), and "like we're in a spaceship that's zooming and we're, everything is super clear and we're learning Japanese incredibly fast with incredible density and retention and recursion and duplication" (10-04, agent record of his dictation).
+- **Alive, popping, fun.** The engaging half is not a garnish; he has asked for it loudly and repeatedly, not only for calm. "THIS IS ALL VERY VERY VERY PLAIN AND BORING!!!! needs to have more pop, more defintion, even art. like readign a newspaper or magazine!!! it shoudl be much much much more alive." (09-29). "more often than not, it needs to be as alive and interactive as possible. even in the SRS sessiions." (09-23). "Bunki still seems very flat and stale on many many dimensions." (09-23). From the founding week: "The experience should be beautiful, fun, and immersive." (07-27, agent record). And on the samurai: "this is a vibe i totally want to iterate, refine and develop 1000x!!" (09-23).
 - **Organized, with some wildness.** "It's multi-layered, it's recursive, it's sophisticated, it's organized, it's logical and it has a systematic way to it, but it's also a bit haywire in some ways as well. So that's okay as long as it's organized." (10-04).
 
 Against all of these stands his most repeated verdict, 26 times since August (`bank-look.md` §2): flat, bland, everything blending. "it all blends together, no reader knwos what is what!!!" (09-29). "It still feels too boring, too confusing to navigate, too, bland." (THE BRIEF).
 
-My reading of how the pairs resolve: **calm is the ground and depth is the relief; the pull is the next door, not a points system.** Layers must read as layers (contrast, edge, shadow, material), so the eye knows what each part is for. The engagement comes from the language opening under your finger, from the half-known word coming back, from small authored surprises, and from content you want to read. "Gamified is not the right word" (08-05, agent record). In the logs searched he never asked for streaks or points, and never against them (`bank-learning.md` Z3); the design should not invent either position for him, so the pull is built from things he has asked for.
+My reading of how the pairs resolve: **calm is the ground and depth is the relief; the surface is alive and the pull is the next door, not a points system.** Both halves get equal design budget: a concept that is serene but does not make you want one more card has failed the brief exactly as much as one that is busy. Layers must read as layers (contrast, edge, shadow, material), so the eye knows what each part is for. The engagement comes from the language opening under your finger, from the half-known word coming back, from small authored surprises, and from content you want to read. "Gamified is not the right word" (08-05, agent record). In the logs searched he never asked for streaks or points, and never against them (`bank-learning.md` Z3); the design should not invent either position for him, so the pull is built from things he has asked for.
 
 **Consequences**
 - **Every screen has visible depth**: at least three distinguishable layers (ground, surface, signal), separated by edge, relief or material, never by a flat grey fill. A screenshot in greyscale must still show which part is which.
-- **One moment of delight per room**, authored, rare and meaningful (the samurai's cut, a word lifting into the sky). Never decorative motion everywhere.
+- **"fill it with little things"** (his method, 09-23): every room carries a layer of small authored responses (at least three per room, listed in the concept's `SPEC.md`): a word that answers touch with weight, a seal that presses, a returning word that glints in a new sentence, a picture that wakes at night. Each is under a second and carries meaning; none is ambient decoration.
+- **One signature moment per room**, bigger and rarer (the samurai's cut, a word lifting into the sky, the 財 dive opening to the cowrie shell). This is where tears are designed: each concept names, per room, the moment meant to move the learner, and a reviewer who has not seen it says whether it did.
+- **The pull, built in, without guilt** (my reading of "engageble and addivtive"): every session ends on a visible next door (tomorrow's first word half-shown, the article that now holds five of today's words); the shelf is fresh every day, never "the same artiles all the time" (09-17); the sky visibly changes with what you did; a run of right answers is felt (the card's pace and sound tighten) without being counted as a score. The test: a tester who finishes a session reaches for one more without being asked.
 - **Rest states are still; meaning moves.** Ambient motion is slow (cycles of six seconds or more); interaction motion is crisp (under 300 ms for chrome). Nothing "erratic and jarring" (08-10, agent paraphrase).
 - **A wrong answer is unmistakable within 300 ms**, then elegant: the verdict, a held beat, the why in one line, the right form inked in.
 - **No guilt mechanics.** No loss-threat copy, no energy meters, no nagging. Any count records what was done.
@@ -82,14 +85,14 @@ My reading of how the pairs resolve: **calm is the ground and depth is the relie
 He asked for three Japans at once: "I want to feel a mixture between ancient japan and cutting edge tech japan and cyberpunk beautiufl createve hyper detail oreinted japan." (THE BRIEF). He has asked for the same fusion since August: "ancient Japan meets anime meets outer space meets obsidian graph meets additive AI study app." (08-05, agent record); "1600 Japan on a 2335 device" (08-20, agent paraphrase). The hint of message 5 names the meeting point: "cyberpunk meets washi".
 
 Two facts from the record shape the world:
-1. **The electric half went missing.** On 08-13 he was shown three cyber worlds (an AKIRA/Ghost-in-the-Shell set he had asked for) and kept one, 殻 攻殻・燐光, phosphor on terminal black. An AI-drafted roster dropped it two days later with no word of his (`bank-founding.md` §3.2). Today's screens (`../reference/`) are cream washi throughout, with no electricity anywhere.
+1. **The electric half went missing.** On 08-13 he was shown three cyber worlds (an AKIRA/Ghost-in-the-Shell set he had asked for, per an agent's note) and kept one, 殻 攻殻・燐光, phosphor on terminal black. An AI-drafted roster dropped it two days later with no word of his (`bank-founding.md` §3.2). Today's screens (`../reference/`) are cream washi throughout, with no electricity anywhere.
 2. **Real over decoration.** "more real, more truth in the mechanism, never more decoration." (08-13, agent record). He warmed to the ink only when it became a real fluid simulation. He chose woodblock pictures: "more refinement, subtley, japanese traditional nihon ga or woodblock style, more sublime." (10-02), then "yeah, the woodblock is kind of nice" (10-02).
 
 My synthesis (built from the world lens, `draft-world.md`, and INSPO's "paper lantern city"): **paper is the ground, signal is the instrument, night is the city.**
 
 - **Ancient Japan, the ground.** Washi with real fibre texture that survives a screenshot; sumi ink with body; 藍 indigo (his default world since 08-13) as structure; one 朱 vermilion that means *this, now*; lacquer only as a frame, never a whole page (he rejected an all-lacquer sheet as "too dark, no other theme options, too hard to read", 08-14, agent record); gold only where something was earned. Shippori Mincho B1 for Japanese content, Kaisei Tokumin for editorial display, Yuji Syuku as a rare human hand, the system sans for chrome.
-- **Cutting-edge tech Japan, the instrument.** Hairlines instead of boxes, print registration marks, transit-map clarity, tabular numerals, buttons with physical travel ("buttons still feel antiquated and not sharp, not crisp or clear.", 10-02), and the iOS crispness he asked for: "fresh, crisp, smooth, elegant, like an apple Ios feel, very smooth, sharp, textured, much more clear and crisp." (10-02).
-- **Cyberpunk Japan, the city at night, and the hyper-detail layer.** Cyberpunk is a light source, not a colour scheme: one signal light per screen by day, the whole atmosphere at night, when the 藍 room glows like Tokyo seen from a quiet window. The woodblock heroes get night states (the same print, lanterns lit, rain), which joins Hasui to Ōtomo in one picture. Hyper-detail lives in the language itself: stroke counts, components, pitch, first-met dates, drawn finely in the margins like the background of an Akira plate, and every one of those marks is real data from his record.
+- **Cutting-edge tech Japan, the instrument.** It is how the app behaves as much as how it looks: instant lookups, spring physics on the sheet and the card (not CSS easing curves), haptic ticks on capture and grade, a voice line synced to the word, sync across devices that just happens, and the native shell's widget. Visually: hairlines instead of boxes, print registration marks, transit-map clarity, tabular numerals, buttons with physical travel ("buttons still feel antiquated and not sharp, not crisp or clear.", 10-02), and the iOS crispness he asked for: "fresh, crisp, smooth, elegant, like an apple Ios feel, very smooth, sharp, textured, much more clear and crisp." (10-02).
+- **Cyberpunk Japan, the city at night, and the hyper-detail layer.** Cyberpunk is a light source, not a colour scheme (proposal, made as concrete as the ancient half): a phosphor signal colour taken from the 殻 world he kept (green on terminal black) or a 藍-compatible cyan, used as emitted light with real falloff, never as a fill; a monospaced tabular face for data (stroke counts, intervals, dates, codes); vertical 縦書き room titles that at night read like a lit sign down a building; rain and wet reflection layers on the night prints; the web drawn as 回路 traces between related words, alive when a dive is in progress; and one signal light per screen by day, the whole atmosphere at night, when the 藍 room glows like Tokyo seen from a quiet window. The woodblock heroes get night states (the same print, lanterns lit, rain), which joins Hasui to Ōtomo in one picture. Hyper-detail lives in the language itself: stroke counts, components, pitch, first-met dates, drawn finely in the margins like the background of an Akira plate, and every one of those marks is real data from his record.
 
 The 80s–90s anime masters and the four Japanese masters of message 9 shape motion and restraint (§10 turns each into a test). "recrusive animation of masters" (message 5) I read as hand-layered depth (multiplane parallax), held frames at the moment of meaning, and the match cut: the same glyph carries you from sentence to kanji to part to family and back, so you never feel you changed page.
 
@@ -98,6 +101,9 @@ What this world must never become (INSPO Part 5): sakura wallpaper, rising-sun r
 **Consequences**
 - **Every screen contains all three Japans** in fixed roles: paper ground, precise signal layer, and (at night or in the detail) the city light. No room is "the cyber room".
 - **One signal light per screen**: exactly one element carries the signal colour or glow (the live card, the word being spoken, the next step).
+- **Three-Japans test, per screen**: a reviewer points to (a) the paper element, (b) the instrument element (a hairline, a tabular number, a crisp control) and (c) the city element (the signal light by day; glow, rain or lit sign by night). Any missing one fails.
+- **Hyper-detail is countable**: the Words plate and every card back show at least five real-data marks (stroke count, components, pitch, first-met date, frequency or JLPT/Kanken grade), set small in the margin, all legible at 390px.
+- **Cutting edge is felt in the hand**: every primary control has press travel and a haptic on native; the word sheet and card move on springs; a lookup answers before the finger lifts (check 20).
 - **Every annotation is real data.** A reviewer can tap any number, date or code and find it in the learner record or the dictionary. Decorative coordinates fail.
 - **Night is a designed state, not an inversion**: every room has day and night; night text is lifted, never sunk; contrast is measured.
 - **Japanese comes from structure (type, paper, ruling, seal), not stickers.** If more than about one element in five is ornament, it is costume and fails.
@@ -298,7 +304,8 @@ He named the precondition himself: he "never got a single clean experience" (10-
 - "Coming soon", "準備中", or any promise of something missing.
 - A robotic voice.
 - A room that changes his colour world, or a page that looks like another page.
-- Confetti, points rain, mascots, guilt notifications, energy meters, fake progress.
+- Guilt notifications, loss-threat copy, energy meters, fake progress.
+- Confetti, points rain, mascots (my reading, not his rule: he never spoke for or against them; they are cheap reward against "subtle, zen, mature, refined aesthitc". The pull is built from the little things instead).
 - Sakura wallpaper, rising-sun rays, fake brush fonts, nonsense kanji, neon pastiche, fake data.
 - Paywalled due reviews.
 - Content without a licence of record.
@@ -375,6 +382,10 @@ Run per concept and per built room, at 390×844 (and 320 for overflow), day and 
 | 19 | Voice | Every article and card in the tour has playable audio | Tour |
 | 20 | Speed (targets) | Lookup <100ms, card flip <100ms, cold start <1.5s on a recent iPhone | Trace |
 | 21 | The bar | Each of the five bar questions answered yes, in writing, per room | Judgement doc |
+| 22 | Three Japans | Paper, instrument and city element each identifiable on every screen, day and night | Reviewer marks all three on the screenshot |
+| 23 | Alive | ≥3 authored micro-responses per room, each <1 s, each tied to a meaning; listed in `SPEC.md` and visible in a screen recording | Recording + SPEC list |
+| 24 | The pull | Every session end shows one concrete next door; on Read the shelf's first three stories differ from yesterday's | Screenshot at session end; two days' shelf screenshots |
+| 25 | Signature moment | Each room's named moment is shown to someone who has not seen it; they react without prompting (record yes/no) | Recorded first viewing |
 
 Plus the behavioural laws of `CLOUD_MISSION.md` §4: storage, SRS, ledgers, offline, zero-leak fronts, 44px and contrast assertions are never weakened.
 
@@ -384,7 +395,7 @@ Retention (day 1, 7, 30), trial-to-paid, churn, share rate, and one learning num
 
 **Consequences**
 - Every concept and every room PR attaches this table, filled in, with screenshots.
-- A single "no" on the bar or on checks 2, 5, 7, 8, 11 or 16 blocks; the rest are fixed before review.
+- A single "no" on the bar or on checks 2, 5, 7, 8, 11 or 16 blocks; the rest are fixed before review. Checks 22–25 (the alive, pull and world half) weigh the same as checks 1–12 (the calm, clean half): a concept cannot pass on restraint alone.
 
 ---
 
@@ -450,6 +461,12 @@ Exact, typos kept. Source keys: **V** = `JOHN_10-08_VERBATIM.md` (message number
 - "Gamified is not the right word" (08-05, agent record; LOOK §1)
 - "it all blends together, no reader knwos what is what!!!" (09-29; LOOK §2 #19)
 - "erratic and jarring" (08-10, agent paraphrase; LOOK §6)
+- "THIS IS ALL VERY VERY VERY PLAIN AND BORING!!!! needs to have more pop, more defintion, even art. like readign a newspaper or magazine!!! it shoudl be much much much more alive." (09-29; LEARN J14)
+- "more often than not, it needs to be as alive and interactive as possible. even in the SRS sessiions." (09-23; LEARN X8)
+- "Bunki still seems very flat and stale on many many dimensions." (09-23; LEARN J15)
+- "The experience should be beautiful, fun, and immersive." (07-27, agent record; FOUND §1)
+- "this is a vibe i totally want to iterate, refine and develop 1000x!!" (09-23; LEARN J11)
+- "same artiles all the time" (09-17; LEARN F1)
 
 **World (LOOK §3, §4, §11; FOUND §3.2)**
 - "ancient Japan meets anime meets outer space meets obsidian graph meets additive AI study app." (08-05, agent record)
@@ -528,7 +545,7 @@ I re-read THE BRIEF sentence by sentence and checked each clause against this do
 | 11 | "engaging" | §3, §6.4 | Daily ritual; little things; voice |
 | 12 | "immersive" | §4, §6.2 | Read-while-listen centre; world of three Japans; full-bleed woodblocks |
 | 13 | "elegant and refined" | §4, §8 | Paper ground, hairlines, restraint; anti-costume rule |
-| 14 | "engageble and addivtive" | §3 | Pull from next door, returning word, authored moments; no guilt; reading of "addivtive" flagged |
+| 14 | "engageble and addivtive" | §3 | ≥3 little things per room, a signature moment per room, a next door at every session end, a daily-fresh shelf (checks 23–25); no guilt; reading of "addivtive" flagged |
 | 15 | "lines cleaner" | §4 | Hairlines instead of boxes; registration and ruling |
 | 16 | "details sharper" | §4, §6.3 | Hyper-detail as real data in margins (check 14); correct glosses and kanji (check 15) |
 | 17 | "the experince more cutting edge" | §4, §7.4 | Instant lookups (check 20), physical buttons, haptics, native shell |
@@ -537,7 +554,7 @@ I re-read THE BRIEF sentence by sentence and checked each clause against this do
 | 20 | "and the culture" | §6.1 | Culture and etymology as links in the web (玄関, 文化財) |
 | 21 | "ancient japan" | §4 | Washi, sumi, 藍, woodblock, Mincho as the ground |
 | 22 | "cutting edge tech japan" | §4 | The instrument layer: hairlines, numerals, transit clarity, iOS crispness |
-| 23 | "cyberpunk beautiufl createve hyper detail oreinted japan" | §4 | One signal light; the night city; detail as real data; 殻 question |
+| 23 | "cyberpunk beautiufl createve hyper detail oreinted japan" | §4 | Phosphor signal light with falloff, mono data face, lit 縦書き titles, rain layers, 回路 traces; ≥5 real-data marks per plate; checks 13, 14, 22; 殻 question |
 | 24 | "quick and punchy" | §3, §5.1 | Crisp motion under 300 ms; one verb on Today; speed targets |
 | 25 | "clean and organized" | §5.1, §5.2 | One job per screen; one home per practice; check 12 |
 | 26 | "Not confusing in the least." | §5.4 | Plain labels; no help boxes in prime space; no placeholders |
@@ -551,7 +568,7 @@ I re-read THE BRIEF sentence by sentence and checked each clause against this do
 | 34 | "fluid" | §4 (motion), §3 | Match cut, held frames, transform/opacity only (check 6) |
 | 35 | "fast, quick" | §5, §10 | Speed targets (check 20); offline first |
 | 36 | "clear, sharp" | §5.1, §10 | Contrast and size (checks 8, 10); plain labels |
-| 37 | "artisically insiring that it will bring tears to the user" | §1, §10.1 | The bar questions per room; tears moments designed |
+| 37 | "artisically insiring that it will bring tears to the user" | §3, §10.1 | One named signature moment per room, tested on a first viewer (check 25); the bar questions per room |
 | 38 | "I want it to be a viral hit!" | §7.2 | Shareable moments built into rooms, awe not scores |
 | 39 | "the best japanese learning app on the planet!" | §7.1 | Positioning: match each rival's strength in our own way, under a higher ceiling |
 | 40 | "can we do that!?" | §7.6, §11 | Yes, with what must be true first: clean end-to-end walk, voiced content, EN purity |
@@ -575,6 +592,8 @@ Also checked: message 3 ("keep the vibe"), 4 ("energetic vibration"), 5 ("layers
 - He never asked for or against streaks; the document says so and does not claim his position, only that no guilt mechanics are used (a design choice grounded in "Gamified is not the right word" and his calm words).
 
 ### Omissions checked and fixed
+
+- Second check (adversarial review, `VISION-REVIEW.md`): strengthened the engaging/addictive half (§3), made the cyberpunk and cutting-edge halves concrete (§4), added checks 22–25, put the ambition into the one-pager, corrected the provenance note.
 
 - Added the sensei as a presence (§6.4), the founding non-negotiable least present on screen.
 - Added the subtle bug button and the voice quality law, which recur in his notes.
