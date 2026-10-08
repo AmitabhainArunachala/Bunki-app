@@ -29418,6 +29418,11 @@ const GINGA_SYMBOL_SVG =
 const SEARCH_SVG =
   '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 
+// the Learn door in the top chrome: the scholar's cap, the plainest "learn" there is (polish lane,
+// 2026-10-08) — two overlapped cards read as "copy"
+const LEARN_DOOR_SVG =
+  '<svg class="chrome-glyph" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.6 18.4 7.6 10 11.6 1.6 7.6Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5.2 9.6v3.8c0 1.3 2.1 2.6 4.8 2.6s4.8-1.3 4.8-2.6V9.6M18.4 7.6v4.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
 /** One forward step: navForward undoes the most recent navBack. */
 function navForward() {
   if (!S.fwd) return;
@@ -29554,6 +29559,9 @@ function renderSearchPage(main) {
     'search-page-hint',
     tx('漢字・かな・ローマ字・英語、または SKIP コード（1-3-8、1-3、1-*-8）。', 'Kanji, kana, romaji or English — or a SKIP code: 1-3-8, 1-3, 1-*-8.'),
   );
+  // the hint is the field's description; a phone shows only the placeholder, so the web stays in view
+  hint.id = 'search-page-hint';
+  input.setAttribute('aria-describedby', hint.id);
   const results = el('div', 'search-page-results');
   const skipOpener = el('button', 'skip-search-opener', tx('形から探す · SKIP ホイール', 'Find by shape · open SKIP wheel'));
   skipOpener.type = 'button';
@@ -30883,50 +30891,8 @@ function render() {
   if (S.view === 'reader' && passage()) chrome.append(levelChip(passage(), 'chrome-level'));
   chrome.append(crumb);
 
-  // the search door — on EVERY surface, one tap from hearing a word to
-  // typing it (operator, 2026-08-27); only the search room itself omits it
-  if (S.view !== 'search') {
-    const quickSearch = el('button', 'chrome-search');
-    quickSearch.type = 'button';
-    quickSearch.id = 'chrome-search';
-    quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
-    quickSearch.innerHTML =
-      SEARCH_SVG;
-    quickSearch.addEventListener('click', () => {
-      openSearchPage();
-    });
-    chrome.append(quickSearch);
-  }
-
-  // the dojo door — on EVERY surface (operator, 2026-09-17: "THE DOJO, or
-  // study room, needs to be accessible from ANY LOCATION WHATSOEVER"). It
-  // used to live only behind the galaxy's tap-to-open nav; now it stands in
-  // the ordinary chrome beside the search door. Inside the dojo family it is
-  // the current room, so it shows as such and does nothing.
-  {
-    const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
-    const dojoDoor = biLabel('button', 'chrome-dojo', '道場', 'dojo');
-    dojoDoor.type = 'button';
-    dojoDoor.id = 'chrome-dojo';
-    dojoDoor.setAttribute('aria-label', tx('集中道場へ', 'go to the focus dojo'));
-    if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
-    dojoDoor.addEventListener('click', () => {
-      if (inDojo) return;
-      if (S.view === 'reader' && S.passageId) {
-        clearTimeout(readerPosTimer);
-        void saveReaderPosition(S.passageId, Math.round(window.scrollY));
-      }
-      keepScroll();
-      S.navOpen = false;
-      S.stack = [];
-      S.view = 'dojo';
-      render();
-      window.scrollTo(0, 0);
-    });
-    chrome.append(dojoDoor);
-  }
-
-  // EN | 日本語 — two visible states, the active one lit
+  // the world seal, then EN | 日本語 — two visible states, the active one lit. The preferences
+  // stand first in the right-hand cluster, the doors (search · Learn · Lists) after them.
   const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'theme-seal';
@@ -30953,6 +30919,52 @@ function render() {
     langSeg.append(b);
   }
   chrome.append(langSeg);
+
+  // the search door — on EVERY surface, one tap from hearing a word to
+  // typing it (operator, 2026-08-27); only the search room itself omits it
+  if (S.view !== 'search') {
+    const quickSearch = el('button', 'chrome-search');
+    quickSearch.type = 'button';
+    quickSearch.id = 'chrome-search';
+    quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
+    quickSearch.innerHTML =
+      SEARCH_SVG;
+    quickSearch.addEventListener('click', () => {
+      openSearchPage();
+    });
+    chrome.append(quickSearch);
+  }
+
+  // the dojo door — on EVERY surface (operator, 2026-09-17: "THE DOJO, or
+  // study room, needs to be accessible from ANY LOCATION WHATSOEVER"). It
+  // used to live only behind the galaxy's tap-to-open nav; now it stands in
+  // the ordinary chrome beside the search door. Inside the dojo family it is
+  // the current room, so it shows as such and does nothing.
+  {
+    const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
+    // the polish lane (2026-10-08): the door is the Learn tab's room, so it carries the tab's
+    // name (to a screen reader) and a quiet card-stack glyph — never a second word in the bar
+    const dojoDoor = biLabel('button', 'chrome-dojo', '学ぶ', 'Learn');
+    dojoDoor.type = 'button';
+    dojoDoor.id = 'chrome-dojo';
+    dojoDoor.insertAdjacentHTML('afterbegin', LEARN_DOOR_SVG);
+    dojoDoor.setAttribute('aria-label', tx('学ぶ', 'Learn'));
+    if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
+    dojoDoor.addEventListener('click', () => {
+      if (inDojo) return;
+      if (S.view === 'reader' && S.passageId) {
+        clearTimeout(readerPosTimer);
+        void saveReaderPosition(S.passageId, Math.round(window.scrollY));
+      }
+      keepScroll();
+      S.navOpen = false;
+      S.stack = [];
+      S.view = 'dojo';
+      render();
+      window.scrollTo(0, 0);
+    });
+    chrome.append(dojoDoor);
+  }
 
   // 覚える — the one capture button, top-right of every capture-eligible
   // surface (operator directive §3). The reader's takes the current thing:
@@ -30998,9 +31010,17 @@ function render() {
     chrome.append(capBtn);
   }
 
+  // Lists: a quiet bookmark and its count. The word stays in the door's text ("Lists 3" /
+  // "覚 3") for a screen reader and the language law; on screen the glyph says it (polish lane)
   const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, `Lists ${S.taken.length}`);
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
+  {
+    const label = trayBtn.querySelector('.l-ja');
+    const word = el('span', 'tray-word', tx('覚', 'Lists'));
+    label.replaceChildren(word, document.createTextNode(' '), el('span', 'tray-count', String(S.taken.length)));
+    trayBtn.dataset.count = String(S.taken.length);
+  }
   trayBtn.addEventListener('click', () => {
     keepScroll();
     S.stack = [];

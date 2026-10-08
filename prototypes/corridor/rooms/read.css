@@ -548,3 +548,12 @@ html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-
   html[data-room='reader'] main > .reader-hero::after,
   html[data-room='reader'] body #mini { animation: none; }
 }
+
+/* ---- polish lane (2026-10-08): the shelf's head, tightened so the lead woodblock rises on a
+   phone. Spacing only: every line, field and pinned note keeps its place and its one line. ---- */
+@media (max-width: 520px) {
+  html[data-room='shelf'] body:not(.zen) #app > main > #search { margin-bottom: 10px; }
+  html[data-room='shelf'] #shelf-body > .shelf-masthead { margin-bottom: 10px; padding-bottom: 4px; }
+  html[data-room='shelf'] body #shelf-body .shelf-masthead .shelf-dateline { margin-bottom: 4px; }
+  html[data-room='shelf'] #shelf-body > .shelf-controls.shelf-chipbar { margin-bottom: 10px; }
+}
