@@ -348,3 +348,5 @@ html:is([data-room='search'], [data-room='word-web']) .ww-st {
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-st { opacity: 0; }
 html:is([data-room='search'], [data-room='word-web']) .ww-lg-g { width: 10px; height: 7px; border-left: 2px solid var(--color-accent); background: var(--color-surface); }
 html:is([data-room='search'], [data-room='word-web']) .ww-lg-st { width: auto; height: auto; font: 500 9.5px/1 var(--font-data); font-style: normal; text-transform: none; color: var(--color-muted); }
+/* the centre's reading and gloss break the ring line behind them, like lettering on a drawing */
+html:is([data-room='search'], [data-room='word-web']) :is(.ww-c-r, .ww-c-m) { position: relative; padding: 0 4px; background: var(--ww-solid); }
