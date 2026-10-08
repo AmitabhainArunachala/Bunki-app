@@ -49,10 +49,6 @@ Per screen: Dōgen, is it the practice itself? Musashi, is anything here of no u
 
 Plus 25 screenshot checks, from *one primary action* to *three Japans on every screen*.
 
-## Questions for you
-
-N1 date · your four fields · the 殻 cyber world for night? · Bunki or 回廊 KAIRO · samurai: paper or blood · the door on return · price.
-
 ---
 
 # What you can see now
