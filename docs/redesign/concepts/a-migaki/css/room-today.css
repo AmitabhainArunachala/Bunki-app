@@ -3,7 +3,7 @@
    Signature motion: the arrival (due words leave the sky and arrive as a train)
    ========================================================================== */
 .room-today { padding-bottom: calc(var(--nav-clearance) + 18px); }
-.room-today .sky { position: absolute; left: 0; right: 0; top: 0; height: 500px; overflow: hidden; pointer-events: none; }
+.room-today .sky { position: absolute; left: 0; right: 0; top: 0; height: 560px; overflow: hidden; pointer-events: none; -webkit-mask-image: linear-gradient(#000 62%, transparent); mask-image: linear-gradient(#000 62%, transparent); }
 .sky-band {
   position: absolute; inset: 0;
   background:
@@ -22,14 +22,14 @@
 .torii { position: absolute; left: 50%; top: 78px; width: 30px !important; margin-left: -15px !important; width: 40px; margin-left: -20px; stroke: var(--color-indigo); stroke-width: 1.4; fill: none; opacity: .55; }
 .torii circle { fill: var(--color-vermilion); stroke: none; }
 
-.t-head { position: relative; z-index: 2; padding: 100px var(--gutter) 0; }
+.t-head { position: relative; z-index: 2; padding: 90px var(--gutter) 0; }
 .t-date { font-family: var(--font-serif); font-size: 15px; color: var(--color-ink-2); letter-spacing: .02em; }
 .t-date span { display: block; font-size: 32px; line-height: 1.12; color: var(--color-ink); font-weight: 600; letter-spacing: -.01em; margin-top: 2px; }
 html[data-lang="ja"] .t-date span { font-family: var(--font-display); font-weight: 800; letter-spacing: .04em; }
 .t-head .data { margin-top: 8px; }
 
 /* the day's word: vertical, inked, a door */
-.dayword { position: relative; z-index: 2; display: block; height: 282px; margin: 4px 0 0; color: inherit; }
+.dayword { position: relative; z-index: 2; display: block; height: 274px; margin: 4px 0 0; color: inherit; }
 .dw-label { position: absolute; left: var(--gutter); top: 14px; }
 .dw-glyph {
   position: absolute; right: 46px; top: 4px; writing-mode: vertical-rl; font-family: var(--font-display); font-weight: 800;
