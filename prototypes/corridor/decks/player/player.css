@@ -455,7 +455,7 @@
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
-.kp .kp-card { position: relative; border-radius: 4px; border-width: 1px 1px 1px 3px; padding: 26px 22px 22px 24px; gap: 16px; }
+.kp .kp-card { position: relative; border-radius: 4px; border-width: 1px 1px 1px 3px; padding: 20px 18px 20px 19px; gap: 14px; }
 .kp .kp-card::before {
   content: ''; position: absolute; inset: 8px; pointer-events: none; opacity: 0.55;
   --reg: color-mix(in srgb, var(--kp-ink) 55%, transparent);
@@ -471,13 +471,12 @@
 .kp-eyebrow { flex: 0 0 100%; order: -1; display: flex; align-items: center; gap: 10px; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--kp-mute); }
 .kp-eyebrow:lang(ja) { font-size: 12px; letter-spacing: 0.22em; text-transform: none; }
 .kp-eyebrow::before { content: ''; width: 18px; height: 2px; background: var(--kp-shu); flex: none; }
-.kp .kp-chip { border-radius: 2px; border-color: transparent; letter-spacing: 0.03em; }
-.kp .kp-chip + .kp-chip:not(.kp-levelchip)::before { content: '·'; margin-right: 6px; color: var(--kp-mute); }
+.kp .kp-chip { border-radius: 2px; border-color: color-mix(in srgb, var(--kp-ink) 16%, transparent); }
 .kp .kp-kindchip, .kp .kp-st-learn, .kp .kp-st-grow, .kp .kp-st-known, .kp .kp-st-hard { border-color: currentColor; }
-.kp .kp-chips .kp-chip + .kp-st-learn::before, .kp .kp-chips .kp-chip + .kp-st-hard::before { content: none; }
+.kp .kp-levelchip { border-color: transparent; }
 
 /* the passage: Mincho, ruled by its line height; readings at 11px or more */
-.kp .kp-sentence { font-family: var(--kp-serif); font-size: clamp(20px, 5.6vw, 28px); font-weight: 500; letter-spacing: 0.04em; }
+.kp .kp-sentence { font-family: var(--kp-serif); font-weight: 500; letter-spacing: 0.04em; }
 /* readings never under 11px; no tracking of their own, so a long reading stretches its base as little as it can */
 .kp .kp-sentence rt { font-family: var(--kp-jp); font-size: max(11px, 0.5em); letter-spacing: -0.02em; }
 /* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
@@ -501,13 +500,12 @@
 }
 @keyframes kp-polish { from { opacity: 1; transform: translateX(-110%) skewX(-8deg); } 70% { opacity: 1; } to { opacity: 0; transform: translateX(200%) skewX(-8deg); } }
 
-/* the back: the headword in Shippori with its reading above it, the Japanese definition in Mincho */
-.kp .kp-answer { gap: 8px; padding-top: 18px; }
-.kp .kp-word { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: 'reading reading pos' 'term term pos'; align-items: end; column-gap: 12px; row-gap: 0; }
-.kp .kp-word .kp-reading { grid-area: reading; font-size: 14px; letter-spacing: 0.18em; color: var(--kp-ink-2); }
-.kp .kp-word .kp-term { grid-area: term; font-family: var(--kp-head); font-weight: 800; font-size: 40px; line-height: 1.15; letter-spacing: 0.04em; }
-.kp .kp-word .kp-pitch { grid-area: reading; justify-self: end; align-self: start; }
-.kp .kp-word .kp-posbadge { grid-area: pos; align-self: end; margin: 0 0 8px; border-radius: 2px; font-size: 11.5px; letter-spacing: 0.08em; }
+/* the back: the headword in Shippori 800 with its reading beside it, the Japanese definition in Mincho */
+.kp .kp-answer { gap: 6px; padding-top: 14px; }
+.kp .kp-word { column-gap: 12px; row-gap: 2px; }
+.kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: 34px; line-height: 1.15; letter-spacing: 0.04em; }
+.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.14em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { margin-left: auto; border-radius: 2px; font-size: 11.5px; letter-spacing: 0.08em; }
 .kp .kp-def { font-family: var(--kp-serif); font-size: 18px; line-height: 1.7; letter-spacing: 0.02em; }
 .kp .kp-note { font-family: var(--kp-serif); }
 /* 英語: the first fold reads as a dashed slip you can lift ("Show English") */
@@ -543,11 +541,11 @@
 .kp .kp-verdict { justify-self: center; padding: 6px 16px; border-radius: 3px; background: var(--kp-panel); }
 .kp .kp-undo { color: var(--kp-stage-mute); }
 .kp .kp-grades { background: var(--kp-stage); column-gap: 10px; }
-.kp .kp-grade { position: relative; min-height: 68px; border-radius: 4px; grid-auto-flow: row; box-shadow: var(--kp-depth); }
+.kp .kp-grade { position: relative; min-height: 64px; border-radius: 4px; grid-auto-flow: row; box-shadow: var(--kp-depth); }
 .kp .kp-grade b { font-size: 17px; letter-spacing: 0.04em; }
 .kp .kp-grade small { font-size: 12.5px; letter-spacing: 0.06em; }
 .kp .kp-again { border-color: var(--kp-line); border-top: 2px solid var(--kp-red); }
-.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: 26px; line-height: 1; justify-self: center; }
+.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: 24px; line-height: 1; justify-self: center; }
 .kp-again .kp-grade-seal { color: var(--kp-red); }
 .kp-good .kp-grade-seal { color: var(--kp-green); }
 /* in 日本語 the seal is the pad's face and the word a quiet caption under it */
@@ -556,7 +554,7 @@
 .kp .kp-rule { color: var(--kp-stage-ink); }
 .kp .kp-rule-x { color: var(--kp-stage-mute); border-color: color-mix(in srgb, var(--kp-stage-ink) 30%, transparent); }
 @media (max-width: 640px) {
-  .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-stage-ink) 16%, transparent); padding-top: 10px; }
+  .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-stage-ink) 16%, transparent); }
   /* the last lines of the passage and the folds stay above the pinned pads: the reserved room is
    * the bar's measured height plus one line of air */
   .kp .kp-study.has-bar { padding-bottom: calc(var(--kp-bar-h, 140px) + 12px); }
