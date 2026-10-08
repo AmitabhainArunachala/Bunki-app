@@ -1,0 +1,30 @@
+/* The word slip (短冊): one sheet, the same in every room. */
+.slip-paper { position: relative; }
+.slip-paper > .reg { display: none; }
+.slip-head { display: grid; grid-template-columns: auto 1fr 44px; gap: 14px; align-items: end; padding-bottom: 12px; border-bottom: 1px solid var(--color-line); }
+.slip-word { font: var(--weight-display) 52px/1 var(--font-display); color: var(--color-ink); letter-spacing: .02em; }
+.slip-meta { display: flex; flex-direction: column; gap: 7px; padding-bottom: 4px; min-width: 0; }
+.slip-reading { font: 600 18px/1 var(--font-serif); letter-spacing: .1em; color: var(--color-ink); }
+.slip-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag { font: 600 10.5px/1 var(--font-sans); padding: 4px 6px; border: 1px solid var(--color-line-strong); color: var(--color-ink-2); border-radius: 2px; white-space: nowrap; }
+.tag-deck { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+.slip-close { width: 44px; height: 44px; align-self: start; font: 300 28px/1 var(--font-sans); color: var(--color-ink-2); }
+.slip-body { padding: 12px 0 4px; display: grid; gap: 4px; }
+.slip-gloss { font: 600 20px/1.3 var(--font-serif); color: var(--color-ink); }
+.slip-def { font: 15px/1.6 var(--font-serif); color: var(--color-ink-2); }
+.slip-kanji { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 10px 0 10px; }
+.ktile { display: grid; grid-template-columns: 46px 1fr; gap: 10px; align-items: center; text-align: left; min-height: 64px; padding: 8px 10px; background: var(--color-ground); box-shadow: 0 0 0 1px var(--color-line-strong); transition: transform var(--motion-tick); }
+.ktile:active { transform: translateY(1px); }
+.ktile-glyph { font: 800 38px/1 var(--font-display); }
+.ktile-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ktile-m { font: 600 13px/1.2 var(--font-sans); }
+.ktile-d { font: 600 11px/1.2 var(--font-sans); color: var(--color-ink-3); }
+.ktile-d span { letter-spacing: .2em; font-size: 13px; color: var(--color-ink-2); }
+.slip-counts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 4px 0 12px; }
+.slip-actions { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.slip-actions .btn-ghost { min-height: 56px; }
+.slip-keep.done { filter: none; }
+.seal { position: absolute; right: 64px; top: 4px; width: 50px; height: 50px; display: grid; place-items: center; border: 2.5px solid var(--world-shu); color: var(--world-shu); font: 800 13px/1 var(--font-sans); letter-spacing: .06em; opacity: 0; transform: scale(1.6) rotate(-12deg); pointer-events: none; }
+html[lang='ja'] .seal { font: 800 26px/1 var(--font-display); }
+.seal.stamped { animation: stamp 260ms cubic-bezier(.2,.8,.2,1) forwards; }
+@keyframes stamp { 0% { opacity: 0; transform: scale(1.6) rotate(-12deg) } 70% { opacity: 1; transform: scale(.94) rotate(-8deg) } 100% { opacity: .92; transform: scale(1) rotate(-8deg) } }
