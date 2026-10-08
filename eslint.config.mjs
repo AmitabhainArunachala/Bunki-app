@@ -312,6 +312,9 @@ export default tseslint.config(
       // Build-evidence harnesses: throwaway measurement scripts committed as
       // audit evidence next to their reports, same class as prototypes/**.
       'docs/build-evidence/**',
+      // 2026-10-08 redesign: standalone concept prototypes, the evidence shooter
+      // and room-lane screenshots, same class as prototypes/** and build evidence.
+      'docs/redesign/**',
       '**/build/**',
       '**/coverage/**',
       '**/.expo/**',
