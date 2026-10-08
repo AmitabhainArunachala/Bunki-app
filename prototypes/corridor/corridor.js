@@ -30234,6 +30234,29 @@ const ME_DECKS = [
   { id: 'n1', ja: 'N1の語彙', en: 'N1 vocabulary', measureJa: '想起で保持 · N1デッキ', measureEn: 'held by recall · N1 deck' },
   { id: 'senmon', ja: 'あなたの専門', en: 'Your fields', measureJa: '想起で保持 · 専門デッキ', measureEn: 'held by recall · fields deck' },
 ];
+/* His horizons (D5, 2026-10-08, in his words): the N1 he sits in July 2027 and his three fields.
+ * The JLPT is held on the first Sunday of July, so the sitting is a date this code derives, and it
+ * is labelled expected until jlpt.jp announces it. Each field counts only what he holds by recall
+ * from the fields deck's own group for it (deck.json words[].group). */
+const ME_N1_SITTING = { year: 2027, month: 6 };
+const ME_FIELDS = [
+  { id: 'mind', ja: '学習心理学', en: 'Learning psychology',
+    noteJa: '神経可塑性・学ぶことを学ぶ・人間の可能性', noteEn: 'Neuroplasticity, learning about learning, human potential' },
+  { id: 'india', ja: 'ヨーガ・仏教・ジャイナ教・ヒンドゥー教の歴史', en: 'Yoga, Buddhism, Jain and Hindu history',
+    noteJa: '日本の歴史に根ざし、現代の脳科学につながる', noteEn: 'Rooted in Japanese history, tied to modern neuroscience' },
+  { id: 'ai', ja: '半導体・AI・投資', en: 'Semiconductors, AI and investing',
+    noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
+];
+/** The July sitting: the first Sunday of July in the goal year, local midnight. */
+function meN1Sitting() {
+  const first = new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1);
+  return new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1 + ((7 - first.getDay()) % 7));
+}
+/** Whole days from today to the sitting: 0 on the day, negative once it has passed. */
+function meDaysToSitting(now = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((meN1Sitting() - today) / 86400000);
+}
 const ME_MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 /** session only: how many months back the seal calendar is turned */
 let meMonthBack = 0;
@@ -30259,8 +30282,12 @@ function meDeckWords(id, onReady) {
       : fetch(new URL(`decks/${id}/deck.json`, document.baseURI)).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`deck ${id} ${r.status}`))));
     meDeckIndex.set(id, got.then((deck) => {
       const cards = new Map();
-      for (const w of deck.words || []) for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '' });
-      const index = { cards, total: (deck.words || []).length };
+      const groups = {};
+      for (const w of deck.words || []) {
+        if (w.group) groups[w.group] = (groups[w.group] || 0) + 1;
+        for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '', group: w.group || '' });
+      }
+      const index = { cards, total: (deck.words || []).length, groups };
       meDeckIndex.set(id, index);
       return index;
     }, () => {
@@ -30331,15 +30358,27 @@ function meReadUnaided() {
 }
 function meHorizons(decks) {
   const rows = [];
-  for (const h of ME_DECKS) {
-    const d = decks.find((x) => x.id === h.id);
+  // words held by recall in a deck's ledger, optionally only the cards a test keeps
+  const heldIn = (d, keep) => {
     const held = new Set();
-    for (const [cardId, rec] of Object.entries(d.ledger?.cards || {})) {
-      const word = d.index?.cards.get(cardId)?.word || cardId.slice(0, cardId.lastIndexOf('-'));
+    for (const [cardId, rec] of Object.entries(d?.ledger?.cards || {})) {
+      const card = d.index?.cards.get(cardId);
+      if (keep && !(card && keep(card))) continue;
+      const word = card?.word || cardId.slice(0, cardId.lastIndexOf('-'));
       if (rec && rec.state === 2 && !owns(d.ledger.suspended || {}, cardId)) held.add(word);
     }
-    rows.push({ id: h.id, ja: h.ja, en: h.en, n: held.size, of: d.index?.total ?? null, begun: !!d.ledger,
-      measure: tx(h.measureJa, h.measureEn) });
+    return held.size;
+  };
+  const [n1Deck, fieldsDeck] = ME_DECKS.map((h) => decks.find((x) => x.id === h.id));
+  rows.push({ id: 'n1', ja: ME_DECKS[0].ja, en: ME_DECKS[0].en, n: heldIn(n1Deck), of: n1Deck?.index?.total ?? null,
+    begun: !!n1Deck?.ledger, measure: tx(ME_DECKS[0].measureJa, ME_DECKS[0].measureEn) });
+  for (const f of ME_FIELDS) {
+    // a begun deck is split by field only once its words have arrived: until then it says so
+    const counting = !!fieldsDeck?.ledger && !fieldsDeck.index;
+    rows.push({ id: `field-${f.id}`, field: f, ja: f.ja, en: f.en, counting,
+      n: counting ? 0 : heldIn(fieldsDeck, (card) => card.group === f.id),
+      of: fieldsDeck?.index?.groups?.[f.id] ?? null, begun: !!fieldsDeck?.ledger,
+      measure: tx(ME_DECKS[1].measureJa, ME_DECKS[1].measureEn) });
   }
   const kk = D.kanken || {};
   const met = new Set();
@@ -30466,40 +30505,88 @@ function meSection(part, ja, en, aside) {
   sec.append(head);
   return sec;
 }
-function meHorizonsPart(decks) {
-  const sec = meSection('horizons', '四つの地平', 'Four horizons');
-  for (const h of meHorizons(decks)) {
-    const row = el('div', 'me-hz');
-    row.dataset.horizon = h.id;
-    if (!h.begun) row.classList.add('not-begun');
-    const top = el('div', 'me-hz-top');
-    top.append(el('span', 'me-hz-name', tx(h.ja, h.en)));
-    const figure = el('span', 'me-hz-n');
-    figure.append(el('b', '', h.begun ? meNum(h.n) : '—'));
-    if (h.of && h.begun) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
-    top.append(figure);
-    const rule = el('div', 'me-hz-rule');
-    rule.setAttribute('aria-hidden', 'true');
-    if (h.of && h.met) {
-      const met = el('i', 'me-hz-met');
-      met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
-      rule.append(met);
-    }
-    const fill = el('i', 'me-hz-fill');
-    fill.style.setProperty('--f', h.of ? Math.min(1, h.n / h.of).toFixed(4) : '0');
-    rule.append(fill);
-    const sub = el('p', 'me-hz-sub');
-    if (!h.begun) sub.textContent = {
-      saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
-      kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
-    }[h.id] || tx('まだ始めていない · 学ぶの部屋にある', 'not begun · the deck is in Learn');
-    else {
-      sub.append(el('span', '', h.measure));
-      if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
-    }
-    row.append(top, rule, sub);
-    sec.append(row);
+/** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー). */
+function meBreakable(tag, cls, text) {
+  const node = el(tag, cls);
+  for (const part of String(text).split(/(?<=[・、])/u)) node.append(part, document.createElement('wbr'));
+  node.lastChild?.remove();
+  return node;
+}
+/** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
+function meHorizonRow(h) {
+  const row = el('div', 'me-hz');
+  row.dataset.horizon = h.id;
+  if (!h.begun) row.classList.add('not-begun');
+  const shown = h.begun && !h.counting;
+  const top = el('div', 'me-hz-top');
+  top.append(meBreakable('span', 'me-hz-name', tx(h.ja, h.en)));
+  const figure = el('span', 'me-hz-n');
+  figure.append(el('b', '', shown ? meNum(h.n) : '—'));
+  if (h.of && shown) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
+  top.append(figure);
+  row.append(top);
+  if (h.field) row.append(meBreakable('p', 'me-hz-note', tx(h.field.noteJa, h.field.noteEn)));
+  const rule = el('div', 'me-hz-rule');
+  rule.setAttribute('aria-hidden', 'true');
+  if (h.of && h.met) {
+    const met = el('i', 'me-hz-met');
+    met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
+    rule.append(met);
   }
+  const fill = el('i', 'me-hz-fill');
+  fill.style.setProperty('--f', h.of && shown ? Math.min(1, h.n / h.of).toFixed(4) : '0');
+  rule.append(fill);
+  const sub = el('p', 'me-hz-sub');
+  if (!h.begun) sub.textContent = {
+    saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
+    kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
+    n1: tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
+  }[h.id] || tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+  else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
+  else {
+    sub.append(el('span', '', h.measure));
+    if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
+  }
+  row.append(rule, sub);
+  return row;
+}
+/** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
+function meN1Plate(h) {
+  const plate = el('div', 'me-n1');
+  const head = el('div', 'me-n1-head');
+  head.append(el('span', 'me-n1-seal', 'N1'),
+    el('span', 'me-n1-when', tx(`${ME_N1_SITTING.year}年${ME_N1_SITTING.month + 1}月`, `${ME_MONTHS_EN[ME_N1_SITTING.month]} ${ME_N1_SITTING.year}`)));
+  plate.append(head);
+  const days = meDaysToSitting();
+  const sitting = meN1Sitting();
+  const count = el('p', 'me-n1-count');
+  if (days > 0) {
+    const n = el('b', 'me-n1-days', meNum(days));
+    if (bi()) count.append(n, el('span', 'me-n1-unit', days === 1 ? 'day to go' : 'days to go'));
+    else count.append(el('span', 'me-n1-unit', 'あと'), n, el('span', 'me-n1-unit', '日'));
+  } else {
+    count.classList.add('is-done');
+    count.append(el('span', 'me-n1-unit', days === 0
+      ? tx('今日が試験の日', 'The sitting is today')
+      : tx(`${ME_N1_SITTING.year}年7月の試験は過ぎた`, `The July ${ME_N1_SITTING.year} sitting has passed`)));
+  }
+  plate.append(count);
+  if (days >= 0) {
+    plate.append(el('p', 'me-n1-date', tx(
+      `7月の試験 · ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
+      `The July sitting · expected Sunday ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()]} ${sitting.getFullYear()}`)));
+  }
+  plate.append(meHorizonRow(h));
+  return plate;
+}
+function meHorizonsPart(decks) {
+  const sec = meSection('horizons', 'あなたの地平', 'Your horizons');
+  const rows = meHorizons(decks);
+  sec.append(meN1Plate(rows.find((h) => h.id === 'n1')));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
+  for (const h of rows) if (h.field) sec.append(meHorizonRow(h));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
+  for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
   return sec;
 }
 function meCameHomePart(decks, active) {
