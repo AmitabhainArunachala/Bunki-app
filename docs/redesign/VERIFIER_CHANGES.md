@@ -532,3 +532,12 @@ Review #6 folded the four shelf filters (`#shelf-filter-*`) and the article sear
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs` (one-tap save, list drawer) | read `.fold-sub` immediately | first `waitForFunction` (≤5 s) for the drawer to include the list name, then read it | Timing only. The assertion is unchanged: the drawer must say `経済ニュース`. A drawer that never updates still fails. |
 
 | `verify-pr77-ports.mjs` crumb-origin (~l.205, r3-rooms) | presses `#back` on the finished plain review | presses `#back` when it is visible, else the close's own `.close-doors .take` | Flow only. With the tab bar the session close hides the chrome Back (REVIEW round 2, new defect 6: three routes to Today). The crumb assertion and `reviewBack === 'tray'` are unchanged; the press goes to whichever control is the way back. |
+
+## Round 4 · today lane (T1, D5), 2026-10-08
+
+No existing verifier, assertion, selector or label pin changed. One behavioural verifier was added.
+
+| File | Assertion | Before → after | Why / retained requirements |
+| --- | --- | --- | --- |
+| `tools/verify-today-sky.mjs` (new) | 32 checks, EN and 日本語, 390×844 | none → new | A fresh Today's sky holds real words (all learned Japanese, none overlapping); a word opens its own entry; open sky and the labelled "Explore all words" door (keyboard) rise into the universe; the door's foot carries one way down named Today and lands on Today; the universe's level rail speaks the interface language; Me leads with N1 · July 2027 and a countdown equal to an independently computed day count to the July test, then his three fields by name. Negative control: a touch on the day's word's hook stays on Today; it fails against the build before the fix, as it should. |
+| `verify-srs-today.mjs` cap-50 home pill, `verify-pr77-ports.mjs` crumb-origin | unchanged | — | The door's `#home-review` now always shows and reads `Today · N due` (was `Review · N due`, shown only with saved words). Both pins hold unchanged: the count is still the pill's first number, and the pill still opens the tray with the galaxy as its origin. |
