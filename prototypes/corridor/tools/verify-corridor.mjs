@@ -2758,6 +2758,12 @@ async function main() {
     JSON.stringify({ listsBeforeSave, ...popoverBits }));
   await page.keyboard.press('Escape');
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  // the old order's last press (覚える, outside the popup) put the popup away before the next step opens it
+  // again; here Escape on the popup does that
+  if (await page.locator('#mini').count()) {
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+  }
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
