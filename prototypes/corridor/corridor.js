@@ -11164,24 +11164,21 @@ function todaySky(dayWord, today, readPick) {
   const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 8);
   todaySkyPool ||= Object.keys(D.words || {}).filter((w) => D.words[w]?.jlpt && [...w].length <= 3 && TODAY_SKY_WORD.test(w));
   const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 20);
-  // his own words take the first places; the rest are dealt in turn (family, reading, far, far),
-  // so the sky is a mixed field of near and far, never a cluster of one kind
+  // his due words take the first places; then his other words, the day's word's family, the
+  // reading and far words are dealt in turn, so the sky is a window onto the whole universe (a
+  // mixed field of near and far), never his list alone nor a cluster of one kind
   const dealt = [];
-  const hands = [family.map((word) => ({ word, kind: 'kin' })), reading.map((word) => ({ word, kind: 'read' })),
-    fill.map((word) => ({ word, kind: 'far' }))];
+  const hands = [rest.slice(0, 6).map((item) => ({ item, kind: 'mine' })), family.map((word) => ({ word, kind: 'kin' })),
+    reading.map((word) => ({ word, kind: 'read' })), fill.map((word) => ({ word, kind: 'far' }))];
   for (let i = 0; dealt.length < 32 && hands.some((h) => h.length); i += 1) {
-    const hand = hands[[0, 1, 2, 2][i % 4]];
+    const hand = hands[[0, 1, 2, 3, 3][i % 5]];
     if (hand.length) dealt.push(hand.shift());
   }
   // "words and kanji floating by" (his Renzo opening screen): two single kanji from today's
   // reading drift among the words, large and faint, each one a door to its own page
   const glyphs = [...new Set(reading.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2);
   glyphs.forEach((kanji, i) => dealt.splice(1 + i * 4, 0, { kanji, kind: 'glyph' }));
-  const stars = [
-    ...due.slice(0, 14).map((item) => ({ item, kind: 'due' })),
-    ...rest.map((item) => ({ item, kind: 'mine' })),
-    ...dealt,
-  ].slice(0, 44);
+  const stars = [...due.slice(0, 6).map((item) => ({ item, kind: 'due' })), ...dealt].slice(0, 44);
   const layers = [1, 2, 3].map((depth) => {
     const layer = el('div', 'today-sky-layer');
     layer.dataset.depth = String(depth);
