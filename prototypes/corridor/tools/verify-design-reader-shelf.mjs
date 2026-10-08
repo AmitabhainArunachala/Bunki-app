@@ -43,8 +43,8 @@
  *                         Control: 7ef0e985, whose phone chip bar and today's six scrolled sideways
  *                         with a chip and a card cut mid-word at the edge.
  *   P1 tip in the page  — (glance pass; reader lane 2026-10-02) at 1368 and 390, on a first visit, the
- *                         one-time hint says, in plain words, "Tap any word to see what it means.
- *                         Right-click (or press and hold) for more." It is a note in the page's flow
+ *                         one-time hint says, in one plain line, "Tap any word for its meaning." (round 4,
+ *                         John T4: the explanation was "too verbose"). It is a note in the page's flow
  *                         (never fixed, sticky or absolute) that ends above the article's first word,
  *                         and at four scroll depths no on-screen word is covered by it. The first word
  *                         that opens its popup makes it disappear without moving the text, and it is
@@ -82,14 +82,18 @@
  *                         first item focused; ↓ moves; Escape closes it and focus returns to the word.
  *                         Enter on the word opens the popup with focus on Save; Escape returns to the word.
  *                         Control: 3166ded3 (no menu).
- *   G5 lists popover    — (John #17) at 1368 "Add to list…" opens a compact non-modal popover beside the
- *                         link (no dialog#vocabulary-list-dialog), whose inline "New list" field makes a
- *                         list holding the word and whose checkbox takes it off again while the card stays;
- *                         at 390 the popover is a short sheet on the screen's foot. Control: 3166ded3.
- *   G6 sentence row     — (John #18) no sentence bar shows when a word is chosen (no sentence action
- *                         shows outside the popup); the popup's last row reads "This sentence: Ask the
- *                         tutor · Practice" (r3 2026-10-08: one Save in the popup), and Ask the tutor opens the tutor with that sentence
- *                         as its active context. Control: 3166ded3, whose bar floated in on the first tap.
+ *   G5 lists popover    — (John #17; round 4 T5, "click save and then add to list from there") the popup
+ *                         offers no list until the word is saved; after Save, at 1368 "Add to a list" opens
+ *                         a compact non-modal popover beside the link (no dialog#vocabulary-list-dialog),
+ *                         whose inline "New list" field makes a list holding the word and whose checkbox
+ *                         takes it off again while the card stays; at 390 the popover is a short sheet
+ *                         on the screen's foot. Control: 3166ded3.
+ *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
+ *                         action shows outside the popup); the popup's last band is one named door,
+ *                         "Study this sentence", showing the sentence's start; it opens the sentence in
+ *                         the card, the word marked, with "Ask the tutor" and "Practice it", and Ask the
+ *                         tutor opens the tutor with that sentence as its active context. Control:
+ *                         3166ded3, whose bar floated in on the first tap.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "The simplified version
  *                         retells the same article in easier Japanese.", and an article without a
@@ -598,7 +602,7 @@ try {
             text: node.innerText.trim() };
         });
         assert(tip, 'no first-visit tip on a first visit');
-        assert.equal(tip.text, 'Tap any word to see what it means. Right-click (or press and hold) for more.', 'the hint is not the plain wording');
+        assert.equal(tip.text, 'Tap any word for its meaning.', 'the hint is not the plain wording');
         assert(['static', 'relative'].includes(tip.position), `the tip is ${tip.position}, not part of the page`);
         assert(tip.bottom <= tip.firstTop, `the tip ends at ${tip.bottom}px, below the first word's top ${tip.firstTop}px`);
         const covered = [];
@@ -841,6 +845,10 @@ try {
       await run(`G5-lists-popover-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
+        // one path (round 4, T5): the popup offers no list before Save; after it, Add to a list stands beside Saved ✓
+        assert.equal(await page.locator('#mini #mini-lists').isVisible(), false, 'the popup offers a list before the word is saved');
+        await page.locator('#mini #mini-take').click();
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
         await page.locator('#mini #mini-lists').click();
         await page.waitForSelector('#vocabulary-list-popover');
         const shape = await page.evaluate(() => {
@@ -874,18 +882,26 @@ try {
       const row = await page.evaluate(() => ({
         bar: [...document.querySelectorAll('.teacher-door, #reader-context-save, #reader-teacher, #reader-sentence-practice')]
           .filter((n) => !n.closest('#mini') && n.getClientRects().length && getComputedStyle(n).visibility !== 'hidden').length,
-        text: document.querySelector('#mini .mini-sentence')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
+        label: document.querySelector('#mini .mini-sentence .mini-sentence-label')?.innerText.trim() ?? null,
+        quote: document.querySelector('#mini .mini-sentence .mini-sentence-quote')?.textContent ?? null,
       }));
       assert.equal(row.bar, 0, 'a sentence bar shows when a word is chosen');
-      // one Save in the popup (review round 2 #13): keeping the sentence is the word menu's "Save the sentence"
-      assert.equal(row.text, 'This sentence: Ask the tutor · Practice', `the popup's sentence row: ${row.text}`);
+      // one named door (round 4, T5): it names itself and shows the sentence's own start
+      assert.equal(row.label, 'Study this sentence', `the popup's sentence door: ${JSON.stringify(row)}`);
+      assert(row.quote?.startsWith('ダマスカス郊外'), `the door does not show its sentence: ${JSON.stringify(row)}`);
+      await page.locator('#mini #mini-sentence-open').click();
+      const pane = await page.evaluate(() => ({
+        marked: document.querySelector('#mini .mini-sentence-pane:not([hidden]) .mini-sentence-full mark')?.textContent ?? null,
+        choices: [...document.querySelectorAll('#mini .mini-sentence-pane .mini-sentence-action-name')].map((n) => n.textContent),
+      }));
+      assert.deepEqual([pane.marked, pane.choices], ['郊外', ['Ask the tutor', 'Practice it']], `the sentence pane: ${JSON.stringify(pane)}`);
       await page.locator('#mini #reader-teacher').click();
       await page.waitForFunction(() => document.body.dataset.view === 'ai');
       const record = await readAppRecord(page);
       const active = record.teacherContexts?.entries?.find((entry) => entry.id === record.teacherContexts.activeRef);
       assert(active?.sourceId === ARTICLE && active.quote.startsWith('ダマスカス郊外') && active.target?.id === '郊外',
         `the tutor did not open on that sentence: ${JSON.stringify(active)}`);
-      return { row: row.text, quote: active.quote.slice(0, 20) };
+      return { door: row.label, pane, quote: active.quote.slice(0, 20) };
     });
 
     await run('G7-version-switch', DESK, async (page) => {

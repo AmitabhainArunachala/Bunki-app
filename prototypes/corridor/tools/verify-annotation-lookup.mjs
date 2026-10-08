@@ -51,10 +51,13 @@ async function openLookup(page, text = '電車') {
   }, text);
   await page.locator('#mini').waitFor();
 }
-// Lists open from the popup's "Add to list…" in a compact popover (reader lane 2026-10-02); Save is the popup's own
-// one-tap button. The big list window is gone.
+// Lists open from the popup's "Add to a list" in a compact popover (reader lane 2026-10-02); Save is the popup's own
+// one-tap button. The big list window is gone. One path (round 4, T5): the popup offers a list only once the word
+// is saved, so a word not yet saved is saved first, by the same capture the list used to make.
 async function chooser(page, text = '電車') {
-  await openLookup(page, text); await page.locator('#mini #mini-lists').click();
+  await openLookup(page, text);
+  if (await page.locator('#mini #mini-take').getAttribute('aria-pressed') !== 'true') await saveInPopup(page);
+  await page.locator('#mini #mini-lists').click();
   await page.locator('#vocabulary-list-popover').waitFor();
   assert.equal(await page.locator('#vocabulary-list-dialog, dialog[open]').count(), 0, 'Lists must not open a modal window');
 }
@@ -137,7 +140,7 @@ const cases = [
     });
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'うわて', 'The explicit JMdict entry must survive the quick look');
     assert.match(await page.locator('#mini .mini-gloss').textContent(), /upper part/);
-    await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
+    await saveInPopup(page); await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
     const saved = await waitForAppRecord(page, record => member(record, 'Exact reading', '上手'));
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');

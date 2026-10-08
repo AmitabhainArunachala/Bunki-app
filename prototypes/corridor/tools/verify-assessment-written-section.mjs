@@ -1669,7 +1669,10 @@ try {
 
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
-      // lists open in a small popover from the popup's "Add to list…" (reader lane 2026-10-02), never a window
+      // lists open in a small popover from the popup's "Add to a list" (reader lane 2026-10-02), never a window;
+      // one path (round 4, T5): the popup offers a list once the word is saved
+      await page.locator('#mini-take').click();
+      await page.waitForFunction(() => document.querySelector('#mini-take')?.getAttribute('aria-pressed') === 'true');
       await page.locator('#mini-lists').click();
       await page.locator('#vocabulary-list-popover').waitFor();
       await page.keyboard.press('Escape');

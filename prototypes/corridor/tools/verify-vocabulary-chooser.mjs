@@ -1,6 +1,7 @@
 /** Real reader popup and optional list-popover journeys against one immutable artifact.
- * Round 1 retired the modal chooser: Save captures immediately; Add to list opens
- * checkboxes, and card context remains available in Full entry.
+ * Round 1 retired the modal chooser: Save captures immediately; Add to a list opens
+ * checkboxes, and card context remains available in Full entry. Round 4 (John T5, "click save
+ * and then add to list from there"): the popup offers a list only once the word is saved.
  * Uses native learner records; review history is a labelled synthetic fixture
  * restored only into this verifier's isolated loopback browser through import.
  * Faults abort real native record writes. No voice or design acceptance claim. */
@@ -61,6 +62,12 @@ async function openPopup(page) {
 }
 async function openChooser(page) {
   await openPopup(page);
+  // one path (round 4, T5): a word not yet saved is saved first; then Add to a list stands beside Saved ✓
+  if (await page.locator('#mini-take').getAttribute('aria-pressed') !== 'true') {
+    assert.equal(await page.locator('#mini-lists').isVisible(), false, 'The popup offers no list before Save');
+    await page.locator('#mini-take').click();
+    await saved(page);
+  }
   await page.locator('#mini-lists').click();
   await dialog(page).waitFor();
   assert.equal(await dialog(page).getAttribute('role'), 'dialog');
@@ -160,12 +167,9 @@ try {
       await check('popup-cancel-direct-save-and-three-context-scopes', async page => {
         await reader(page);
         const before = learning(await readAppRecord(page));
-        await openChooser(page);
-        const mini = await page.locator('#mini').elementHandle();
-        assert.deepEqual(learning(await readAppRecord(page)), before, 'Opening optional lists is not capture');
-        await closeChooser(page);
-        assert.deepEqual(learning(await readAppRecord(page)), before, 'Closing without saving changes no learning roots');
-        assert.equal(await mini.evaluate(node => node.isConnected), true, 'Closing lists preserves the word popup');
+        // one path (round 4, T5): Save first, with no list offered before it
+        await openPopup(page);
+        assert.equal(await page.locator('#mini-lists').isVisible(), false, 'The popup offers no list before Save');
         await page.locator('#mini-take').click();
         const initial = await saved(page);
         assert.equal(await dialog(page).count(), 0, 'One Save captures directly without opening lists');
@@ -174,6 +178,13 @@ try {
         assert.deepEqual(initial.revlog || [], before.revlog);
         assert.deepEqual(initial.lists || {}, before.lists);
         assert.equal(initial.taken.filter(item => item.id === word).length, 1);
+        const afterSave = learning(await readAppRecord(page));
+        await openChooser(page);
+        const mini = await page.locator('#mini').elementHandle();
+        assert.deepEqual(learning(await readAppRecord(page)), afterSave, 'Opening optional lists is not another capture');
+        await closeChooser(page);
+        assert.deepEqual(learning(await readAppRecord(page)), afterSave, 'Closing without choosing a list changes no learning roots');
+        assert.equal(await mini.evaluate(node => node.isConnected), true, 'Closing lists preserves the word popup');
         const original = { ...row(initial) }; delete original.ctx;
         await openContext(page);
         for (const scope of ['word', 'sent', 'para']) {
@@ -275,20 +286,22 @@ try {
       });
       await check('native-write-failures-preserve-draft-and-retry', async page => {
         await reader(page);
-        await openChooser(page);
-        await listName(page).fill('Retry vocabulary');
+        // one path (round 4, T5): the capture is Save's, before any list is offered, so its fault is Save's
+        await openPopup(page);
         const before = learning(await readAppRecord(page));
         await armRecordWriteFailure(page, 'quota', { roots: ['taken'] });
-        await create(page).click();
-        await status(page).filter({ hasText: /Could not save|Could not finish saving|reload/iu }).waitFor();
+        await page.locator('#mini-take').click();
+        await page.locator('#reader-toast').filter({ hasText: /Could not save/iu }).waitFor();
+        await page.locator('#record-reload').waitFor();
         const captureFault = await clearRecordWriteFailure(page);
         assert(captureFault.fired > 0, 'A native capture transaction really failed');
         assert.deepEqual(learning(await readAppRecord(page)), before);
-        assert.equal(await listName(page).inputValue(), 'Retry vocabulary');
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false');
-        assert.equal(await create(page).isDisabled(), true, 'A failed native write protects the host until reload');
-        await recoverProtectedChooser(page);
-        assert.equal(await listName(page).inputValue(), 'Retry vocabulary', 'The required recovery reload preserves the unsaved list name');
+        assert.equal(await page.locator('#mini-lists').isVisible(), false, 'A failed Save offers no list');
+        await recoverRecord(page);
+        assert.deepEqual(learning(await readAppRecord(page)), before, 'The protected reload keeps the record as it was');
+        await openChooser(page);
+        await listName(page).fill('Retry vocabulary');
         await create(page).click();
         await waitForAppRecord(page, value => value.lists?.['Retry vocabulary']?.some(item => item.id === word));
         await status(page).filter({ hasText: 'Added to Retry vocabulary.' }).waitFor();

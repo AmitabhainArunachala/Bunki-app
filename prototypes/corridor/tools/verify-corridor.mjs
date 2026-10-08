@@ -2727,21 +2727,11 @@ async function main() {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  // reader lane 2026-10-02 (John #17): lists open from the word popup's "Add to list…" in a small popover;
-  // opening it enrolls nothing. Save — here the chrome's 覚える, the popup's Save or the menu's Save word — is one tap.
-  await page.waitForSelector('#mini #mini-lists');
-  await tap(page, '#mini-lists');
-  await page.waitForSelector('#vocabulary-list-popover');
-  const popoverBits = await page.evaluate(`(() => ({
-    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
-    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
-    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
-  }))()`);
-  check('R2-B · opening the lists does not enroll the word, and they open as a small popover, not a window',
-    (await readAppRecord(page)).taken.length === envBefore.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
-    JSON.stringify(popoverBits));
-  await page.keyboard.press('Escape');
-  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"): Save — here the
+  // chrome's 覚える, the popup's Save or the menu's Save word — is one tap, and the popup offers a list only once the
+  // word is saved; its "Add to a list" opens a small popover that enrolls nothing more.
+  await page.waitForSelector('#mini #mini-take');
+  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists')?.getClientRects().length`);
   await tap(page, '#reader-take');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit reader save' });
@@ -2754,6 +2744,20 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
+  if (!await page.locator('#mini').count()) await tap(page, '#reader .tok.content', 9);
+  await page.waitForSelector('#mini #mini-lists:not([hidden])');
+  await tap(page, '#mini-lists');
+  await page.waitForSelector('#vocabulary-list-popover');
+  const popoverBits = await page.evaluate(`(() => ({
+    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
+    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
+  }))()`);
+  check('R2-B · the popup offers lists only after Save; they open as a small popover, not a window, and enroll nothing more',
+    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
+    JSON.stringify({ listsBeforeSave, ...popoverBits }));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');

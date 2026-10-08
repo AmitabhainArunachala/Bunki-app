@@ -411,7 +411,7 @@ try {
     await page.locator('[data-passage="wikinews:1403"]').first().click();
     await page.locator('#reader .tok[data-index="18"]').click();
     if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
-    await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const deniedQuestion = 'この文の「世界」の意味を教えてください。', deniedCount = requests.length;
     await page.locator('#chat-input').fill(deniedQuestion); await page.locator('#chat-send').click();
     await page.waitForFunction(() => document.querySelector('#chat-status')?.textContent.includes('not available for tutor processing'));
@@ -425,7 +425,7 @@ try {
     await page.locator('[data-passage="bunki-graded-n5-morning"]').first().click();
     await page.locator('#reader .tok[data-index="0"]').click();
     if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
-    await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const before = await readAppRecord(page), source = before.teacherContexts.entries.find((entry) => entry.id === before.teacherContexts.activeRef);
     assert.ok(source?.quote && source.sourceKind === 'bundled-passage');
     const request = await sendChat('この文の「朝」の意味を教えてください。');

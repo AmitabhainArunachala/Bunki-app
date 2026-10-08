@@ -236,7 +236,7 @@ async function practiceFromSource(fixture, source = SOURCE, { savePlace = false 
     // one tap opens the word's popup again
     await word.click();
   }
-  await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
+  await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
   await page.locator('#sentence-choose-cloze').uncheck(); await page.locator('#sentence-choose-production').check();
   await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
   await listeningPending(page);

@@ -259,7 +259,7 @@ try {
     await page.locator(`[data-passage="${article.id}"]`).first().click();
     const token = page.locator(`#reader .tok[data-index="${index}"][data-word="${word}"]`);
     await token.click();
-    await page.click('#reader-sentence-practice');
+    await page.click('#mini-sentence-open'); await page.click('#reader-sentence-practice');
     await page.locator('#sentence-choose-cloze').check();
     await page.click('#sentence-practice-confirm');
     await page.waitForSelector('#sentence-review-start');
