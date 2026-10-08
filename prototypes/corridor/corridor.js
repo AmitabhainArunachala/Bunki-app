@@ -4181,8 +4181,8 @@ async function boot() {
       S.view = 'shelf';
       keepNavigationReturn('me', null);
     }
+    // no S.tabRoot here: this fresh page keeps a real return (Me → Read, verify-redesign-foundation)
     S.view = params.get('room');
-    S.tabRoot = S.view;
     if (S.view === 'search') S.searchFrom = 'shelf';
   }
 
