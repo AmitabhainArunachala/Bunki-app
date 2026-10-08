@@ -743,3 +743,86 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-tiles .kp-c-due b { color: var(--kp-amber); }
 .kp .kp-tiles .kp-c-known b { color: var(--kp-green); }
 .kp .kp-tiles .kp-c-hard b { color: var(--kp-red); }
+
+/* ---- T8 "More sharp, more depth, more contrast, more distinction" and T9 "more clarity, more
+ * crispness, more tightness": the card, front and back ---- */
+/* the study stage sits deeper than the page so the card stands off it; --kp-card-depth is the card's
+ * own shadow on that stage (the page shadow --kp-depth stays for the home's slips and the sheets) */
+.kp { --kp-card-depth: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.5), 0 22px 44px -18px rgba(0, 0, 0, 0.9); }
+.kp[data-look='dark'] { --kp-stage: #06080c; --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(140, 180, 220, 0.06), transparent 72%), var(--kp-stage); }
+.kp[data-look='light'] { --kp-card-depth: 0 0 0 1px rgba(10, 20, 32, 0.5), 0 22px 44px -16px rgba(0, 0, 0, 0.7); }
+/* 藍 by day: the whole study screen is the 藍漆 lacquer stage. It was a 15rem band over the washi page,
+ * which left the card half on lacquer and half on paper. The card is the lit washi sheet on it and the
+ * pads dock on the lacquer, as 藍 does at night. */
+.kp[data-look='ai'] { --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(233, 226, 210, 0.07), transparent 72%), var(--kp-stage);
+  --kp-card-depth: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 26px 50px -18px rgba(0, 0, 0, 0.85); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai']:has(> .kp-study) { --kp-card-depth: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 26px 50px -18px rgba(0, 0, 0, 0.85); }
+.kp[data-look='washi'] { --kp-card-depth: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 26px 50px -18px rgba(0, 0, 0, 0.85); }
+.kp[data-look='sakura'] { --kp-card-depth: 0 0 0 1px rgba(40, 10, 20, 0.5), 0 24px 46px -16px rgba(20, 0, 8, 0.75); }
+.kp[data-look='contrast'] { --kp-card-depth: none; }
+
+.kp .kp-card { box-shadow: var(--kp-card-depth); border-color: color-mix(in srgb, var(--kp-ink) 12%, transparent); border-left-color: var(--kp-kind); border-radius: 6px; padding: 18px 16px; gap: 14px; }
+/* the トンボ corner marks read as stray crosses at phone size: the card is a clean sheet */
+.kp .kp-card::before { content: none; }
+/* a swipe lights the card's edge in the answer's colour (the card's own shadow had covered that ring) */
+.kp .kp-card[data-swipe='good'] { box-shadow: 0 0 0 2px var(--kp-green), var(--kp-card-depth); }
+.kp .kp-card[data-swipe='again'] { box-shadow: 0 0 0 2px var(--kp-red), var(--kp-card-depth); }
+
+/* the head: the one instruction, then the facts as one quiet line. Only the kind is boxed and the level
+ * keeps its tint; every chip is the same 20px box, so the line stays one line */
+.kp .kp-eyebrow { color: var(--kp-ink-2); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; }
+.kp .kp-eyebrow::before { width: 14px; }
+.kp .kp-chips { gap: 6px 8px; }
+.kp .kp-chip { border: 1px solid transparent; border-radius: 3px; padding: 0; font-size: 11.5px; line-height: 18px; letter-spacing: 0.01em; }
+.kp .kp-kindchip { border-color: currentColor; padding: 0 5px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.kp .kp-levelchip { padding: 0 5px; font-weight: 700; }
+.kp .kp-chip-sm { font-size: 11.5px; padding: 0; }
+@media (max-width: 640px) {
+  .kp .kp-chips { gap: 6px; }
+  .kp .kp-chip, .kp .kp-chip-sm { font-size: 11px; padding-inline: 0; }
+  .kp .kp-kindchip { font-size: 10px; padding-inline: 4px; }
+  .kp .kp-levelchip { padding-inline: 4px; }
+}
+/* the passage: a single sentence is the card's one line and stands heavier; a passage of four or five
+ * sentences stays at reading weight */
+.kp .kp-sentence:not(:has(.kp-s)) { font-weight: 600; }
+.kp .kp-taphint { font-size: 11px; letter-spacing: 0.12em; color: var(--kp-mute); padding-top: 12px; }
+
+/* 答えを見る: one clear key under the card, framed in the deck's accent (the old home's 答えを見る) */
+.kp .kp-reveal { border: 1.5px solid var(--kp-cyan); border-radius: 12px; min-height: 56px; color: var(--kp-cyan); font-weight: 700; letter-spacing: 0.08em;
+  background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
+.kp .kp-next { border-radius: 12px; }
+/* on a lacquer stage (藍, 和紙, 桜 and 白 studying) the key is lit in the stage's own washi ink */
+.kp:is([data-look='ai'], [data-look='washi'], [data-look='sakura'], [data-look='light']) .kp-study > .kp-reveal { border-color: var(--kp-stage-ink); color: var(--kp-stage-ink);
+  background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
+.kp .kp-reveal:active, .kp .kp-next:active { transform: scale(0.985); }
+/* docked at the foot of a long passage, the key stands on a straight band of the dock that runs to both
+ * screen edges (the ring alone drew a rounded frame over the card) */
+.kp .kp-study > .kp-reveal { box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock), -48px 0 0 10px var(--kp-dock), 48px 0 0 10px var(--kp-dock); }
+
+/* the back: the answer under a crisp rule; the word, its reading and part of speech on one line, the
+ * Japanese definition in full ink; the folds one grouped list, every row the same 44px with a chevron */
+.kp .kp-answer { border-top: 1px solid color-mix(in srgb, var(--kp-ink) 22%, transparent); padding-top: 14px; gap: 8px; }
+.kp .kp-word { align-items: baseline; }
+.kp .kp-word .kp-term { font-size: 36px; line-height: 1.1; }
+.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.1em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { align-self: center; border-radius: 3px; border-width: 1.5px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; padding: 0 7px; line-height: 19px; }
+.kp .kp-def { font-size: 18px; line-height: 1.65; font-weight: 600; color: var(--kp-ink); }
+.kp .kp-note { font-size: 15px; line-height: 1.6; }
+.kp .kp-folds { margin-top: 12px; border: 1px solid var(--kp-line); border-radius: 10px; background: var(--kp-panel-2); }
+.kp .kp-fold { border-bottom: 1px solid var(--kp-line); padding: 0 14px; }
+.kp .kp-fold:last-child { border-bottom: 0; }
+.kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: 14px; color: var(--kp-ink); letter-spacing: 0.01em; }
+.kp .kp-fold > summary::before { content: none; }
+.kp .kp-fold > summary::after { content: ''; position: absolute; right: 2px; top: 50%; width: 7px; height: 7px; margin-top: -5px; border-right: 1.5px solid var(--kp-mute); border-bottom: 1.5px solid var(--kp-mute); transform: rotate(-45deg); transition: transform 120ms cubic-bezier(0.2, 0, 0, 1); }
+.kp .kp-fold[open] > summary::after { transform: rotate(45deg); margin-top: -7px; }
+.kp .kp-fold > :not(summary) { margin-bottom: 12px; }
+/* 英語 is the first row of the list, not a dashed slip of its own */
+.kp .kp-f-gloss { border: 0; border-bottom: 1px solid var(--kp-line); border-radius: 0; padding: 0 14px; margin-bottom: 0; }
+.kp .kp-f-gloss > summary { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
+.kp .kp-f-gloss > summary::before { content: none; }
+.kp .kp-see { padding: 10px 14px; border-bottom: 1px solid var(--kp-line); }
+@media (prefers-reduced-motion: reduce) {
+  .kp .kp-reveal:active, .kp .kp-next:active { transform: none; }
+}
