@@ -54,6 +54,12 @@ async function open(page,dials){
   await token(page,1).waitFor();
   assert.equal(await page.locator('.listen-row').getAttribute('data-passage'),'aozora:046605');
 }
+// a tap outside the popup puts it away: the fixed chrome's empty top-left corner is outside it at every
+// scroll (the play row this used to press is now a mark in the instrument line, under the popup)
+async function tapOutside(page){
+  assert.equal(await page.evaluate(()=>{const e=document.elementFromPoint(1,1);return !!e?.closest('.chrome')&&!e.closest('button,a,input,#mini');}),true,'The chrome corner is not a blank outside point');
+  await page.mouse.click(1,1);await page.locator('#mini').waitFor({state:'detached'});
+}
 async function mini(page){return page.locator('#mini').evaluate(node=>({word:node.querySelector('.mini-word')?.textContent,
   reading:node.querySelector('.mini-reading')?.textContent||'',gloss:node.querySelector('.mini-gloss')?.textContent||'',
   role:node.getAttribute('role')}));}
@@ -81,7 +87,7 @@ try{
      assert.equal(await token(page,2).textContent(),neighbour);assert.equal(await page.locator('#sheet').count(),0);
      assert.equal(await named.locator('.tok-en').count(),0,'Lookup must not inject another word’s inline gloss');
      for(const key of ['Enter','Space']){
-      await page.locator('.listen-row').click({position:{x:2,y:2}});await named.focus();await page.keyboard.press(key);
+      await tapOutside(page);await named.focus();await page.keyboard.press(key);
       await page.locator('#mini .mini-reading').waitFor();assert.deepEqual(await mini(page),shown);
      }
      return{dials,shown,labelAfter:await named.getAttribute('aria-label')};
@@ -115,7 +121,7 @@ try{
      await page.locator('#mini .mini-gloss').waitFor();const shown=await mini(page);
      assert.equal(shown.word,'の');assert.equal(shown.gloss,'of · belonging');assert.equal(shown.role,'dialog');
      assert.equal(await page.locator('#sheet').count(),0);assert.equal(await particle.textContent(),before);
-     await page.locator('.listen-row').click({position:{x:2,y:2}});
+     await tapOutside(page);
     }
     // the grammar entry is one choice in the word menu (reader lane 2026-10-02): a right-click, then Full entry
     const at=await center(particle);await page.mouse.click(at.x,at.y,{button:'right'});
