@@ -4623,4 +4623,11 @@ html[data-room='door'] #drift-layer #hint {
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 90%, transparent);
   border: 0.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
 }
+/* night: the door's primary is emitted light (a lit edge and glow on the dark sky), never a solid fill */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #home-review.corner-bubble:not(.quiet) {
+  background: color-mix(in srgb, var(--ground, #0e1626) 82%, transparent);
+  color: var(--ai, #d9b45a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ai, #d9b45a) 85%, transparent),
+    0 0 18px -4px color-mix(in srgb, var(--ai, #d9b45a) 55%, transparent);
+}
 /* END BUNKI SHELL ============================================================ */
