@@ -1241,6 +1241,12 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
   }
 }
 
+/* while the text settings are open the print folds to a slim band on its mat, at every width, so the
+   panel does not push the article's first words under the tab bar (the phone already did this) */
+html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero { padding-bottom: 30px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero .reader-picture-img { height: 44px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero .reader-picture-caption { display: none; }
+
 /* the title card: raised paper in front of the mat */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
   position: relative;
