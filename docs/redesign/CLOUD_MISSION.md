@@ -1,6 +1,8 @@
 # CLOUD MISSION: Bunki, the best Japanese-learning app in the world
 
-You're running in an Anthropic cloud environment. The repo AmitabhainArunachala/Bunki-app is checked out at branch `claude/redesign-20261008`, and `gh` is available.
+You're running in an Anthropic cloud environment. The repo AmitabhainArunachala/Bunki-app is checked out at branch `claude/redesign-20261008`. Use `gh`, or the GitHub tools, if either is available and authenticated; §6 says what to do if neither is.
+
+The quotes in this file are lightly typo-corrected so they read easily. `vision/JOHN_10-08_VERBATIM.md` is the authority, with his typos kept.
 
 John (the owner) is travelling, and **GitHub is the only channel that reaches him.** Run long. Iterate until you are proud of it. **Draft PRs only, never merges, never deploys.**
 
@@ -108,5 +110,13 @@ Build: `node scripts/build-corridor-site.mjs --out <dir>`. Serve: `KAIRO_SITE_DI
 - **Never block on him.** Take the best path and note the question in the PR.
 - **Log** progress in `docs/redesign/CLOUD_LOG.md` with UTC times.
 
+## 6. If the environment fights you (never stop; route around it)
+- **Push to `claude/redesign-20261008` refused:** push to the branch this session is allowed to use. Name it at the top of `CLOUD_LOG.md`, and open (or describe) a draft PR from it.
+- **No `gh` or GitHub tools:** write the PR body to `docs/redesign/PR_BODY.md`, and your phase reports to `CLOUD_LOG.md`, then commit and push them. The pushed branch is what reaches him.
+- **Playwright can't download Chromium:** look for one that's already installed (`ls ~/.cache/ms-playwright`, `which chromium chromium-browser google-chrome`), and point `PLAYWRIGHT_BROWSERS_PATH` or `executablePath` at it. If there's no browser at all, finish all the static work, mark screenshots and verifiers as "not run here", and say so plainly.
+- **`pip install fugashi` fails:** the decks are already built. Don't rebuild cards; only rebuild a deck if a verifier needs it.
+- **Merge conflicts from Astra's branch:** for `decks/n2n1/**` and `prototypes/corridor/decks/{n2,n1,senmon}/**`, take Astra's side, then re-run `verify-n2n1-decks.mjs`.
+- **Running short of context or time:** commit and push. Then write in `CLOUD_LOG.md` exactly where you are, and the next step, so the next run can resume from the repo alone.
+
 ## The standard
-His words: "if it is only pretty it fails, if it is only functional it fails — it must be both." And: "don't stop until you are proud of it."
+His words: "if just pretty it fails, if just functional it fails — it must be both." And: "don`t stok until you are proud of it" (don't stop until you are proud of it).
