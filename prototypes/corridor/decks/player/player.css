@@ -730,3 +730,16 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 @media (prefers-reduced-motion: reduce) {
   .kp .kp-grade:active { transform: none; }
 }
+
+/* ---- T2: the deck home. A plain name, then "the four windows but maybe not so big" in the old home's
+ * colours: due amber, new in ink, known green, difficult red, four small tiles in one row ---- */
+.kp-home .kp-title { font-size: 24px; line-height: 1.25; letter-spacing: 0.01em; }
+.kp-home .kp-sub { font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
+.kp .kp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; border: 0; font-family: inherit; }
+.kp .kp-tile { display: grid; align-content: center; gap: 2px; min-height: 60px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--kp-line); background: var(--kp-panel); box-shadow: var(--kp-depth); }
+.kp .kp-tile + .kp-tile::before { content: none; }
+.kp .kp-tiles .kp-tile b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--kp-ink); }
+.kp .kp-tiles .kp-tile span { font-size: 11.5px; letter-spacing: 0.02em; color: var(--kp-ink-2); white-space: nowrap; }
+.kp .kp-tiles .kp-c-due b { color: var(--kp-amber); }
+.kp .kp-tiles .kp-c-known b { color: var(--kp-green); }
+.kp .kp-tiles .kp-c-hard b { color: var(--kp-red); }

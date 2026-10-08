@@ -96,11 +96,11 @@ SENTENCE_METHOD = [
 ]
 # the two decks built from the same word list, side by side in 集中道場
 DECKS = {
-    "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Real sentences · read and recall",
+    "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Words you looked up · sentences",
                  "defaults": {"look": "dark", "mode": "read", "gloss": "tap"}, "method": SENTENCE_METHOD,
                  "anki": ("anki-sentence", "kotoba-mine-sentence-v3", "Kotoba Mine Sentence", "Read", "kotoba-mine-v3"),
                  "out": ("kotoba-mine.apkg", "kotoba-mine.tsv", "study.html")},
-    "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Massive-context cloze · passages",
+    "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Words you looked up · passages",
             # 読んで思い出す by default (CARD_CONTRACT_V2 §2); 穴埋め, the MCD blank preset, is one switch
             # away in 設定 and brings the 字 cards back into the queue (STANDARD A37)
             "defaults": {"look": "ai", "mode": "read", "gloss": "tap"}, "unlockDays": 3,

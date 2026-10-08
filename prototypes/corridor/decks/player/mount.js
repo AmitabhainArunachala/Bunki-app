@@ -609,6 +609,15 @@ function topBar(title, back) {
   return bar;
 }
 
+/** A deck's English title reads "<what> · <card form>" (N1 vocabulary · passages): the name and the
+ * form. The Japanese title stays whole. */
+function titleParts(deck) {
+  const title = t(deck.titleJa, deck.titleEn);
+  if (ctx.english === false) return [title, ''];
+  const at = title.lastIndexOf(' · ');
+  return at > 0 ? [title.slice(0, at), title.slice(at + 3)] : [title, ''];
+}
+
 function homeScreen() {
   const { deck, state, prefs } = ctx;
   const now = new Date();
@@ -617,18 +626,23 @@ function homeScreen() {
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
   const box = el('section', 'kp-home');
-  box.append(topBar(t(deck.titleJa, deck.titleEn), ctx.onLeave ? () => ctx.onLeave() : null));
-  box.append(el('p', 'kp-sub', t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`)));
+  // the plain name as the title, and what each card is at the head of the line under it, so the title
+  // stays one line (T2): "Words you looked up" over "Sentences · 323 words · 503 cards"
+  const [name, form] = titleParts(deck);
+  box.append(topBar(name, ctx.onLeave ? () => ctx.onLeave() : null));
+  const counts = t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`);
+  box.append(el('p', 'kp-sub', form ? `${form[0].toUpperCase()}${form.slice(1)} · ${counts}` : counts));
   if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', t(ctx.notice)));
 
-  // the deck's state as one quiet mono line (0 due · 15 new · 0 known · 0 difficult), no coloured tiles
-  const tiles = el('p', 'kp-tiles');
-  const tile = (n, ja, en, cls) => el('span', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
+  // the deck's state as four small tiles, each number in its own colour: due (amber), new,
+  // known (green), difficult (red) — the learner's T2: "the four windows but maybe not so big"
+  const tiles = el('div', 'kp-tiles');
+  const tile = (n, ja, en, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
   tiles.append(
-    tile(q.due.length, '復習', 'due', 'kp-c-due'),
-    tile(q.fresh.length, '新', 'new', 'kp-c-new'),
-    tile(known, '定着', 'known', 'kp-c-known'),
-    tile(hard, '苦手', 'difficult', 'kp-c-hard'),
+    tile(q.due.length, '復習', 'Due', 'kp-c-due'),
+    tile(q.fresh.length, '新規', 'New', 'kp-c-new'),
+    tile(known, '定着', 'Known', 'kp-c-known'),
+    tile(hard, '苦手', 'Difficult', 'kp-c-hard'),
   );
   box.append(tiles);
 

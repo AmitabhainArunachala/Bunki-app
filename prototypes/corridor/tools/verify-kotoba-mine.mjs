@@ -2448,6 +2448,14 @@ async function main() {
     check('the deck home leads with the count and topics: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
+    // T2 (the 2026-10-08 tour): "the four windows but maybe not so big", in the old home's colours
+    const tiles = await page.evaluate(`[...document.querySelectorAll('.kp-home .kp-tiles > .kp-tile')].map((n) => ({ n: n.querySelector('b')?.textContent ?? null, label: n.querySelector('span')?.textContent ?? null, color: getComputedStyle(n.querySelector('b')).color, h: Math.round(n.getBoundingClientRect().height), top: Math.round(n.getBoundingClientRect().top) }))`);
+    const hue = await page.evaluate(`(() => { const kp = document.querySelector('.kp'); const i = document.createElement('i'); kp.append(i); const tok = (k) => { i.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(i).color; }; const out = { amber: tok('amber'), ink: tok('ink'), green: tok('green'), red: tok('red') }; i.remove(); return out; })()`);
+    const begin = Number(/\d+/.exec(home.start)?.[0]);
+    check('the deck home shows four small tiles in one row, Due · New · Known · Difficult, with the queue’s own counts (due + new is the start button’s number), in amber, ink, green and red (T2)',
+      tiles.length === 4 && tiles.map((x) => x.label).join() === 'Due,New,Known,Difficult' && tiles.every((x) => /^\d+$/.test(x.n)) && Number(tiles[0].n) + Number(tiles[1].n) === begin &&
+        new Set(tiles.map((x) => x.top)).size === 1 && tiles.every((x) => x.h <= 72) && tiles[0].color === hue.amber && tiles[1].color === hue.ink && tiles[2].color === hue.green && tiles[3].color === hue.red,
+      JSON.stringify({ tiles, begin }));
 
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
