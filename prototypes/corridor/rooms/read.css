@@ -302,7 +302,7 @@ html[data-room='reader'] main > .reader-hero .reader-picture-caption {
 }
 html[data-room='reader'] body:not(.ui-bi) main > .reader-hero .reader-picture-caption { letter-spacing: 0.08em; }
 /* the title rests on the print's faded foot */
-html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { position: relative; z-index: 1; margin-top: -30px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { position: relative; z-index: 1; margin-top: -44px; }
 html[data-room='reader'] .reader-meta {
   font-family: var(--font-data);
   font-variant-numeric: tabular-nums;
@@ -735,6 +735,12 @@ html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::af
   /* the kanji grade is the Tools filter's measure; on a phone the line keeps to provenance, level,
      the record's own figures and the two honest marks, so it stays two short lines */
   html[data-room='reader'] .reader-head > .reader-meta .grade-tag { display: none; }
+}
+
+/* a desk's relief-edged voice row sits close under the head: the text starts a beat sooner */
+@media (min-width: 521px) {
+  html[data-room='reader'] body:not([data-view='drift']) #app > main > .listen-row.play-bar.is-pending { margin: 4px 0 6px; }
+  html[data-room='reader'] body:not([data-view='drift']) #app > main > #reader-tip.reader-tip { margin-bottom: 0; }
 }
 
 /* ---------- the version switch: what the simplified version is waits behind its ⓘ ---------- */
