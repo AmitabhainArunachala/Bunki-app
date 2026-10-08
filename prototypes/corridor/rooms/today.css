@@ -96,7 +96,7 @@ html[data-room='tray'] .today-star[data-depth='3'] { opacity: 0.8; }
 /* a due word is told by weight and full ink, never a 朱 mark: the room keeps one signal (check 13) */
 html[data-room='tray'] .today-star.due {
   opacity: 0.94;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-ink);
   animation: today-breath 7s ease-in-out var(--d, 0s) infinite alternate;
 }
@@ -143,6 +143,8 @@ html[data-room='tray'] .today-dayword {
   text-align: center;
   max-width: 340px;
 }
+/* the sky's caption sits right on the day's word: all the free height above stays sky */
+html[data-room='tray'] .today-universe + .today-dayword { margin-top: 0; }
 html[data-room='tray'] .today-dayword::before {
   content: '';
   position: absolute;
@@ -347,9 +349,13 @@ html[data-room='tray'] .review-start-min {
   white-space: nowrap;
 }
 html[data-room='tray'] .today-then {
-  display: flex;
+  /* the label, then the story named whole with its count beneath, then the arrow */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'l a' 't a' 'n a';
   align-items: center;
-  gap: 8px;
+  column-gap: 12px;
+  row-gap: 3px;
   width: 100%;
   min-height: 44px;
   margin: 6px 0 0;
@@ -361,8 +367,16 @@ html[data-room='tray'] .today-then {
   text-align: left;
   cursor: pointer;
 }
-html[data-room='tray'] .today-then-l { flex: none; }
+html[data-room='tray'] .today-then-l {
+  grid-area: l;
+  font: 600 11px/1.2 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+html[data-room='tray'] body:not(.ui-bi) .today-then-l { letter-spacing: 0.2em; text-transform: none; }
+html[data-room='tray'] .today-then .today-arrow { grid-area: a; }
 html[data-room='tray'] .today-then-title {
+  grid-area: t;
   min-width: 0;
   overflow: hidden;
   /* the day's reading is named whole, up to two lines, never cut to a fragment */
@@ -374,8 +388,7 @@ html[data-room='tray'] .today-then-title {
   color: var(--color-ink-2);
 }
 html[data-room='tray'] .today-then-n {
-  flex: none;
-  margin-left: auto;
+  grid-area: n;
   font: 400 12px/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
@@ -512,10 +525,12 @@ html[data-room='tray'] .today-star.glyph { opacity: 0.24; font-weight: 500; colo
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.far { color: var(--color-ink); opacity: 0.3; }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-universe {
-  position: absolute;
+  /* the sky's own caption: in flow, right under the floating words and just above the day's word,
+     so it never meets the date line however narrow the phone */
+  position: relative;
   z-index: 3;
-  top: 18px;
-  right: 50px;
+  align-self: flex-end;
+  margin: auto -4px -14px 0;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -532,9 +547,7 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero >
 }
 html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 13px/1 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='tray'] #app > main > .today-hero > .today-universe:active { transform: scale(0.97); }
-@media (min-width: 521px) {
-  html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-universe { right: 8px; top: 4px; }
-}
+
 /* an arrow that rises: a corner and its stem, pointing up and out */
 html[data-room='tray'] .today-up {
   position: relative;
