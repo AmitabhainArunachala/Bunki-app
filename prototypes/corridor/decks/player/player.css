@@ -684,7 +684,8 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* ---- the reveal does not move the page (fix round 3). At phone width a passage taller than the room
  * above the word and its definition becomes its own window on the back (mount.js windowPassage): the
  * page stays where it is, the passage scrolls inside the card, and its clipped edges fade (concept C). */
-.kp .kp-sentence.kp-window { max-height: var(--kp-window-h, none); overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+/* it reaches 12px up into the gap above it (padding, not layout), so a first-line word keeps its 44px tap reach inside the window */
+.kp .kp-sentence.kp-window { max-height: var(--kp-window-h, none); overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding-top: 12px; margin-top: -12px; }
 .kp .kp-sentence.kp-window::-webkit-scrollbar { display: none; }
 .kp .kp-sentence.kp-window[data-edge='below'] { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); }
 .kp .kp-sentence.kp-window[data-edge='above'] { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); }

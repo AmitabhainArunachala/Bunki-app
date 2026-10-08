@@ -1828,6 +1828,7 @@ function reveal() {
  * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
  */
 const WINDOW_LINES = 3;
+const WINDOW_REACH = 12;
 function windowPassage(from) {
   const face = ctx.root.querySelector('#kp-card');
   const passage = face?.querySelector('.kp-sentence');
@@ -1852,7 +1853,7 @@ function windowPassage(from) {
     window.scrollTo({ top: from, behavior: 'instant' });
     return;
   }
-  passage.style.setProperty('--kp-window-h', `${Math.floor(box.height - over)}px`);
+  passage.style.setProperty('--kp-window-h', `${Math.floor(box.height - over) + WINDOW_REACH}px`); // + the reach it keeps above its first line (player.css)
   passage.classList.add('kp-window');
   passage.scrollTop = from;
   // the target sentence in the window by the least scroll; a sentence taller than the window shows its marked word
