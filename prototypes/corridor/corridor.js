@@ -17031,6 +17031,12 @@ function wwPlate(model, section) {
       const kind = { word: tx('語', 'word'), kanji: tx('漢字', 'kanji'), part: tx('部品', 'part') }[n.type];
       b.setAttribute('aria-label', tx(`${kind}「${n.key}」を中心に`, `Centre the web on the ${kind} ${n.key}`));
     }
+    // a drafting annotation: the kanji's real stroke count at the disc's shoulder
+    if (n.type === 'kanji' && D.kanji[n.key]?.st) {
+      const st = el('span', 'ww-st', String(D.kanji[n.key].st));
+      st.setAttribute('aria-hidden', 'true');
+      box.append(st);
+    }
     b.append(box);
     if (cap) b.append(capLearn ? wwLearn('span', 'ww-cap', cap) : el('span', 'ww-cap', cap));
     b.addEventListener('click', () => {
@@ -17045,9 +17051,17 @@ function wwPlate(model, section) {
 
   const legend = el('div', 'ww-legend');
   legend.setAttribute('aria-hidden', 'true');
-  for (const [cls, ja, en] of [['k', '漢字', 'kanji'], ['p', '部品', 'part'], ['w', '語', 'word'], ['a', '用例', 'passage']]) {
+  // the legend names only what this plate draws
+  const drawn = new Set(model.nodes.map((n) => n.type));
+  for (const [cls, type, ja, en] of [['k', 'kanji', '漢字', 'kanji'], ['p', 'part', '部品', 'part'], ['w', 'word', '語', 'word'], ['a', 'passage', '用例', 'passage'], ['g', 'grammar', '文法', 'grammar']]) {
+    if (!drawn.has(type)) continue;
     const item = el('span', null);
     item.append(el('i', `ww-lg ww-lg-${cls}`), tx(ja, en));
+    legend.append(item);
+  }
+  if (drawn.has('kanji')) {
+    const item = el('span', null);
+    item.append(el('i', 'ww-lg ww-lg-st', 'n'), tx('画数', 'strokes'));
     legend.append(item);
   }
   plate.append(legend);
