@@ -350,3 +350,14 @@ html:is([data-room='search'], [data-room='word-web']) .ww-lg-g { width: 10px; he
 html:is([data-room='search'], [data-room='word-web']) .ww-lg-st { width: auto; height: auto; font: 500 9.5px/1 var(--font-data); font-style: normal; text-transform: none; color: var(--color-muted); }
 /* the centre's reading and gloss break the ring line behind them, like lettering on a drawing */
 html:is([data-room='search'], [data-room='word-web']) :is(.ww-c-r, .ww-c-m) { position: relative; padding: 0 4px; background: var(--ww-solid); }
+
+/* ---- polish lane (2026-10-08): the web stands in the first screen on a phone. The search card
+   keeps its field, lenses and SKIP door; its long hint stays the field's description for a
+   screen reader (aria-describedby) while the placeholder already names the inputs. ---- */
+@media (max-width: 520px) {
+  html[data-room='search'] body:not(.zen) #app > main > p.eyebrow { margin-top: 0; margin-bottom: 8px; }
+  html[data-room='search'] .search-page:not(.search-page-busy) .search-page-hint { display: none; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses { margin: 8px 0 4px; }
+  html[data-room='search'] .search-page:not(.search-page-busy) .skip-search-opener { margin: 4px 0 0; }
+  html[data-room='search'] #app > main > .ww { margin-top: 14px; }
+}

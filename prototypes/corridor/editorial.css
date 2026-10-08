@@ -4346,3 +4346,126 @@ body:not([data-view='drift']) .focus-chip { border-color: var(--color-line-chip,
   body:not(.zen):not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary, .study-door, .foundation-door) { transition: none; }
 }
 /* END BUNKI SKIN ============================================================ */
+
+/* ==========================================================================
+   BEGIN BUNKI POLISH · the shell, quieted (polish lane, 8 October 2026)
+   John: "too confusing to navigate … clean and organized." The top chrome is one quiet line:
+   back (only when there is somewhere to go), then at the right one compact cluster —
+   the preferences (world seal · EN 日本語) and the doors as glyphs (search · Learn · Lists).
+   The doors that duplicate the tab bar no longer print a second word: #chrome-dojo is the
+   Learn tab's card-stack glyph and #tray a bookmark with its count; both keep their words
+   for a screen reader. The report bug leaves the page: it sits in its own slot at the end of
+   the tab bar, never over a room's controls. Every id, 44px door and pinned text is kept.
+   ========================================================================== */
+body:not(.zen) #app > .chrome {
+  gap: 0;
+  border-bottom: var(--stroke-hairline) solid var(--color-glass-line);
+}
+body:not(.zen) #app > .chrome > button,
+body:not(.zen) #app > .chrome > button.chrome-dojo,
+body:not(.zen) #app > .chrome > button.chrome-search {
+  align-items: center;
+  color: var(--color-ink-2);
+  font: 500 15px/44px var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+}
+body:not(.zen) #app > .chrome > button:hover:not(:disabled) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
+/* back: the chevron and one word, in the tabs' sentence case */
+body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); padding-inline: 4px 10px; }
+body.ui-bi:not(.zen) #app > .chrome > button#back .l-ja { text-transform: capitalize; }
+/* one glyph size for the three doors */
+body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 19px; height: 19px; flex: 0 0 auto; }
+body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo) { width: 44px; min-width: 44px; padding: 0; }
+/* Learn: the glyph on screen, the tab's name to a screen reader */
+body:not(.zen) #app > .chrome > button.chrome-dojo .l-ja {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen):not(.ui-bi) #app > .chrome > button.chrome-dojo { font: 500 15px/44px var(--font-ui); letter-spacing: 0; }
+body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'] { color: var(--color-seal); }
+/* Lists: a bookmark and its count */
+body:not(.zen) #app > .chrome > button#tray,
+body:not(.zen):not(.ui-bi) #app > .chrome > button#tray {
+  min-width: 44px;
+  padding: 0 8px 0 6px;
+  gap: 4px;
+  color: var(--color-ink-2);
+  font: 500 13px/44px var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+body:not(.zen) #app > .chrome > button#tray::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 13px;
+  height: 17px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+body:not(.zen) #app > .chrome > button#tray .tray-word {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen) #app > .chrome > button#tray .l-ja { display: inline-flex; align-items: center; font: inherit; }
+body:not(.zen) #app > .chrome > button#tray[data-count='0'] { color: var(--color-muted); }
+/* the world seal: a small square seal, quieter than a door */
+body:not(.zen) #app > .chrome > button.theme-seal { width: 40px; min-width: 40px; font: 800 12px/1 var(--font-display); }
+body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 11px 9px; }
+/* EN 日本語: two words, the active one inked and underlined — no capsule */
+body:not(.zen) #app > .chrome .lang-seg { margin: 0 2px 0 0; }
+body:not(.zen) #app > .chrome .lang-seg::before { content: none; }
+body:not(.zen) #app > .chrome .lang-seg button {
+  min-width: 44px;
+  padding-inline: 6px;
+  color: var(--color-muted);
+  font: 500 12px/1 var(--font-ui);
+  letter-spacing: 0.02em;
+}
+body:not(.zen) #app > .chrome .lang-seg button::before,
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before {
+  inset: auto 8px 11px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: transparent;
+  box-shadow: none;
+}
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--color-ink); font-weight: 700; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-seal); }
+@media (max-width: 520px) {
+  body:not(.zen) #app > .chrome { padding-inline: 4px; }
+  body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
+}
+/* the narrowest phones keep one line: back keeps its chevron and says its word to a screen reader */
+@media (max-width: 360px) {
+  body:not(.zen) #app > .chrome > button#back { min-width: 44px; padding: 0 10px; }
+  body:not(.zen) #app > .chrome > button#back .l-ja {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+}
+
+/* ---- the report bug: its own slot at the end of the tab bar, never over the page ---- */
+body.has-primary-tabs .primary-tabs {
+  --tabs-end: max(var(--tabs-pad), calc(54px + env(safe-area-inset-right, 0px)));
+  padding-right: var(--tabs-end);
+}
+body.has-primary-tabs .primary-tabs .line-car { width: calc((100% - var(--tabs-pad) - var(--tabs-end)) / 5); }
+body.has-primary-tabs #bunki-reports-root .br-rail {
+  right: calc(4px + env(safe-area-inset-right, 0px));
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  top: auto;
+}
+body.has-primary-tabs #bunki-reports-root .br-rail::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 12px;
+  bottom: 12px;
+  width: var(--stroke-hairline);
+  background: var(--color-rule);
+  pointer-events: none;
+}
+body.has-primary-tabs #bunki-reports-root .br-rail .br-bug { color: color-mix(in srgb, var(--color-muted) 80%, transparent); }
+body.has-primary-tabs #bunki-reports-root .br-rail .br-bug svg { width: 17px; height: 17px; }
+/* a sheet hides the tabs and keeps the original 12px report strip (verify-redesign-docks) */
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail::before { content: none; }
+/* END BUNKI POLISH ========================================================== */
