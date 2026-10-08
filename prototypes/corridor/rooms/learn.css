@@ -6,7 +6,8 @@
    The room's paper darkens toward a lacquer band at the top (the proscenium); the
    working cards stay paper. Values only; build on them. ---- */
 html[data-room='learn'] body:not([data-view='drift']) {
-  --color-page: color-mix(in srgb, var(--color-ground) 70%, #e2dccd);
+  /* r4 skin (T7 "carry on", the contrast pass): the working paper is the shared washi, not a beige */
+  --color-page: color-mix(in srgb, var(--color-ground) 30%, #efede8);
   --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 9%, transparent), transparent 180px);
   --skin-light: radial-gradient(70% 36% at 50% 0%, rgb(255 250 236 / 40%), transparent 70%);
 }
