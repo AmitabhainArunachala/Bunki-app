@@ -739,7 +739,7 @@ html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::af
 
 /* a desk's relief-edged voice row sits close under the head: the text starts a beat sooner */
 @media (min-width: 521px) {
-  html[data-room='reader'] body:not([data-view='drift']) #app > main > .listen-row.play-bar.is-pending { margin: 4px 0 6px; }
+  html[data-room='reader'] body:not([data-view='drift']) #app > main > .listen-row.play-bar { margin: 4px 0 6px; }
   html[data-room='reader'] body:not([data-view='drift']) #app > main > #reader-tip.reader-tip { margin-bottom: 0; }
 }
 
