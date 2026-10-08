@@ -1,0 +1,65 @@
+/* ME 私 — a bound book in late, low gold light. Hanko for days, gold seams for words won back.
+   Night: the book under a desk lamp; gold leaf carries the light. */
+.plate[data-room='me']::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 520px; pointer-events: none;
+  background: linear-gradient(200deg, rgba(214,170,90,.22), transparent 55%); }
+html[data-theme='night'] .plate[data-room='me']::before { background: radial-gradient(90% 60% at 85% 0%, rgba(226,189,106,.14), transparent 65%); }
+.plate[data-room='me'] > *:not(.sign) { position: relative; }
+
+.yearbook { padding: 4px var(--gutter) 0; }
+.yb-title { display: flex; flex-direction: column; gap: 8px; padding-right: 40px; margin-bottom: 14px; }
+.yb-title h1 { margin: 0; font: var(--weight-display) 34px/1 var(--font-display); letter-spacing: -.005em; }
+.yb-hand { margin: 0; font: 15px/1.5 var(--font-hand); color: var(--color-ink-2); letter-spacing: .06em; }
+.yb-page { position: relative; background: var(--color-paper); padding: 14px 12px 12px; box-shadow: 0 0 0 1px var(--color-line-strong), var(--elevation-paper); margin-right: 22px; }
+.yb-page::after { content: ''; position: absolute; top: 0; bottom: 0; right: -10px; width: 10px; background: repeating-linear-gradient(180deg, var(--color-paper) 0 2px, var(--color-line) 2px 3px); box-shadow: 1px 0 0 var(--color-line-strong); }
+.year-months { display: grid; grid-template-columns: repeat(var(--weeks), 1fr); gap: 2px; margin-bottom: 6px; font-size: 9px; letter-spacing: .04em; }
+.year-grid { display: grid; grid-template-columns: repeat(var(--weeks), 1fr); gap: 2px; }
+.wk { display: grid; grid-template-rows: repeat(7, 1fr); gap: 2px; }
+.dy { aspect-ratio: 1; display: block; background: var(--color-line); }
+.dy.out { background: transparent; }
+.dy.l0 { background: var(--color-line); }
+.dy.l1 { background: color-mix(in srgb, var(--world-shu) 32%, var(--color-paper)); }
+.dy.l2 { background: color-mix(in srgb, var(--world-shu) 64%, var(--color-paper)); }
+.dy.l3 { background: var(--world-shu); }
+.dy.gold { background: var(--color-gold-leaf); box-shadow: inset 0 0 0 1px rgba(120,80,10,.5); }
+.dy.today { outline: 1.5px solid var(--color-ink); outline-offset: 1px; }
+.yb-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0 0; text-transform: none; letter-spacing: .02em; font-size: 11px; color: var(--color-ink-2); }
+.yb-legend .k { display: inline-block; width: 9px; height: 9px; margin-right: 6px; vertical-align: -1px; }
+.yb-legend .k.l2 { background: color-mix(in srgb, var(--world-shu) 64%, var(--color-paper)); }
+.yb-legend .k.gold { background: var(--color-gold-leaf); }
+
+.sec-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--color-ink); margin-bottom: 4px; }
+html[data-theme='night'] .sec-h { border-bottom-color: var(--color-line-strong); }
+.sec-h .micro { text-transform: none; letter-spacing: .02em; }
+.horizons, .mended, .settings { padding: 26px var(--gutter) 0; }
+.hz { padding: 12px 0 10px; border-bottom: 1px solid var(--color-line); display: grid; grid-template-columns: 1fr auto; column-gap: 12px; }
+.hz-top { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.hz-label { font: 600 13px/1.3 var(--font-sans); color: var(--color-ink-2); }
+.hz-v { font: 800 20px/1 var(--font-sans); color: var(--color-ink); letter-spacing: -.01em; white-space: nowrap; }
+.hz-v small { font: 600 11px/1 var(--font-sans); color: var(--color-ink-3); }
+.hz-ruler { position: relative; height: 14px; margin-top: 8px; }
+.hz-ticks { position: absolute; left: 0; right: 0; bottom: 0; height: 7px; background: linear-gradient(90deg, var(--color-line-strong) 1px, transparent 1px) 0 100% / 10% 7px repeat-x, linear-gradient(90deg, var(--color-line) 1px, transparent 1px) 0 100% / 2.5% 4px repeat-x; border-bottom: 1px solid var(--color-line-strong); }
+.hz-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--color-ink); transform-origin: left; transform: scaleX(var(--p)); }
+.hz-mark { position: absolute; bottom: -2px; left: calc(var(--p) * 100%); width: 2px; height: 14px; background: var(--color-ink); }
+.hz-pct { align-self: end; padding-bottom: 1px; }
+
+.mend { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 12px; width: 100%; text-align: left; padding: 12px 0 16px; min-height: 64px; position: relative; overflow: hidden; }
+.mend-w { font: 800 24px/1 var(--font-display); grid-row: 1 / 3; align-self: center; min-width: 64px; }
+.mend-r { font: 13px/1 var(--font-serif); color: var(--color-ink-2); align-self: end; }
+.mend-d { text-transform: none; letter-spacing: .02em; align-self: start; margin-top: 4px; }
+.seam { position: absolute; left: 0; right: 0; bottom: -6px; width: 100%; height: 12px; pointer-events: none; opacity: .9; }
+.seam path { fill: none; stroke: var(--color-gold-leaf); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.mend > :not(.seam):not(.cel) { position: relative; z-index: 1; }
+.cel { position: absolute; top: 0; bottom: 0; left: 0; width: 26px; background: linear-gradient(90deg, transparent, rgba(255,240,200,.9), transparent); pointer-events: none; opacity: 0; z-index: 2; }
+
+.me-next { padding: 22px var(--gutter) 0; }
+.next-door { min-height: 64px; }
+.nd { display: flex; flex-direction: column; gap: 5px; text-align: left; }
+.nd b { font: 800 11px/1 var(--font-sans); letter-spacing: var(--tracking-caps); text-transform: uppercase; opacity: .85; }
+.nd span { font: 600 14.5px/1.3 var(--font-sans); }
+.settings { padding-bottom: 40px; }
+.set-row { display: flex; justify-content: space-between; align-items: center; min-height: 60px; border-bottom: 1px solid var(--color-line); }
+.set-l { font: 600 14px/1 var(--font-sans); }
+.seg { display: flex; border: 1px solid var(--color-line-strong); border-radius: var(--radius-control); overflow: hidden; }
+.seg-b { min-height: 44px; min-width: 64px; padding: 0 12px; font: 600 13px/1 var(--font-sans); color: var(--color-ink-2); }
+.seg-b + .seg-b { border-left: 1px solid var(--color-line-strong); }
+.seg-b.on { background: var(--color-ink); color: var(--color-ground); }

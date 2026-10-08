@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-theme="day" data-room="today">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f2ec">
+<title>Bunki · 白紙 Hakushi</title>
+<script>
+  // set theme + language before first paint (no flash)
+  (function () { var q = new URLSearchParams(location.search), h = document.documentElement;
+    h.dataset.theme = q.get('theme') === 'night' ? 'night' : 'day'; h.lang = q.get('lang') === 'ja' ? 'ja' : 'en';
+    var r = (location.hash.replace(/^#\/?/, '').split('/')[0]) || 'today'; h.dataset.room = r; })();
+</script>
+<link rel="stylesheet" href="/prototypes/corridor/fonts.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/rooms/today.css">
+<link rel="stylesheet" href="css/rooms/read.css">
+<link rel="stylesheet" href="css/rooms/learn.css">
+<link rel="stylesheet" href="css/rooms/words.css">
+<link rel="stylesheet" href="css/rooms/me.css">
+<link rel="stylesheet" href="css/slip.css">
+</head>
+<body>
+<main id="stage"></main>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
