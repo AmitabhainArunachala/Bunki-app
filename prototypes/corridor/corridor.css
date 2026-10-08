@@ -70,8 +70,14 @@ body {
   font-family: var(--sans);
   font-size: var(--t-body);
   line-height: 1.6;
-  overscroll-behavior-y: none;
+  /* r4 (T2: "native ios expeirnce is alreayd way smoother"): pages keep the native bounce but
+     never pull-to-refresh (contain); the full-screen door keeps none. The viewport takes its
+     value from the root element, so html carries it too. */
+  overscroll-behavior-y: contain;
 }
+html:has(> body:not([data-view='drift'])) { overscroll-behavior-y: contain; }
+html:has(> body[data-view='drift']),
+body[data-view='drift'] { overscroll-behavior-y: none; }
 
 /* S1 living paper — the per-world procedural ground grown by corridor.js and
  * hung here through --paper-url. A fixed layer painted once and composited,
@@ -2432,6 +2438,8 @@ button.pool-tag.cat-chip {
   height: var(--tap);
   border-radius: 999px;
   border: 2px solid var(--line-soft);
+  /* a fine ring in the panel's own ink, so a dark stone (漆 殻 浪) stays drawn on the night panel */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
   font-family: var(--serif);
   font-size: 17px;
   line-height: 1;
@@ -2441,7 +2449,7 @@ button.pool-tag.cat-chip {
 }
 .world-stone.active {
   border-color: var(--stone-red, var(--red));
-  box-shadow: 0 0 0 1px var(--stone-red, var(--red));
+  box-shadow: 0 0 0 1px var(--stone-red, var(--red)), inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
 }
 .world-stone:active { transform: scale(0.92); }
 

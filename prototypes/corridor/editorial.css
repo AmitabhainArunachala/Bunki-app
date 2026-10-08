@@ -4744,8 +4744,11 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
    only and zero specificity: every room file and html[data-room] rule still wins.
    ========================================================================== */
 :where(body:not([data-view='drift'])) {
-  --color-page: color-mix(in srgb, var(--color-ground) 34%, #f3f1ec);
-  --color-surface: color-mix(in srgb, var(--color-paper) 22%, #fffefb);
+  /* each day world keeps its own paper (柿 stays persimmon, 赤 stays warm): the page is mostly the
+     world's ground, raised paper and the frame are brighter papers tinted from it. The default
+     world, his everyday one, has its own cooler values below. */
+  --color-page: color-mix(in srgb, var(--color-ground) 72%, #f6f4ef);
+  --color-surface: color-mix(in srgb, var(--color-paper) 40%, #fffefb);
   --color-surface-sunk: color-mix(in srgb, var(--color-page) 90%, var(--color-ink) 6%);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
   --color-label-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
@@ -4756,10 +4759,10 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --color-separator: color-mix(in srgb, var(--color-ink) 12%, transparent);
   --color-edge-strong: color-mix(in srgb, var(--color-ink) 28%, transparent);
   /* the frame: its own material, on one hairline */
-  --color-bar: color-mix(in srgb, var(--color-paper) 14%, #fdfcf9);
+  --color-bar: color-mix(in srgb, var(--color-paper) 30%, #fdfcf9);
   --color-bar-line: color-mix(in srgb, var(--color-ink) 17%, transparent);
   --color-bar-ink: var(--color-ink);
-  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 62%, var(--color-bar));
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 68%, var(--color-bar));
   --color-glass: var(--color-bar);
   --color-glass-solid: var(--color-bar);
   --color-glass-line: var(--color-bar-line);
@@ -4829,6 +4832,37 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
   --color-surface: color-mix(in srgb, var(--color-paper) 90%, var(--world-accent) 3%);
 }
+/* deck rooms by day: the frame takes the stage it surrounds (T8 "more distinction", T9 "more
+   crispness"). A dark deck (the default look, 抹茶, 黒板, 高コントラスト) and every deck's study
+   screen sit on a dark stage, so the top line, the Line and the phone's bar become one dark frame
+   on a hairline around it, not a white band at each end. A light deck's home keeps the day frame.
+   The frame's own text and marks are remapped on the frame's elements only (the top line, the
+   Line and the report glyph at its end). */
+:root:not([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='deckplay']:has(.kp:is([data-look='dark'], [data-look='matcha'], [data-look='kokuban'], [data-look='contrast']), .kp > .kp-study) :is(#app > .chrome, #primary-tabs, #bunki-reports-root .br-rail) {
+  color-scheme: dark;
+  --color-bar: #0b0e14;
+  --color-bar-line: rgb(233 240 247 / 13%);
+  --color-bar-ink: #eef2f6;
+  --color-bar-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
+  --color-ink: #eef2f6;
+  --color-ink-2: color-mix(in srgb, #eef2f6 86%, #0b0e14);
+  --color-label: #eef2f6;
+  --color-label-2: color-mix(in srgb, #eef2f6 82%, #0b0e14);
+  --color-muted: color-mix(in srgb, #eef2f6 74%, #0b0e14);
+  --color-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
+  --color-rule: rgb(233 240 247 / 26%);
+  --color-line: rgb(233 240 247 / 16%);
+  --color-edge-strong: rgb(233 240 247 / 30%);
+  --color-glass: #0b0e14;
+  --color-glass-solid: #0b0e14;
+  --color-surface: #161c25;
+  --color-seal: #ef8a78;
+  --color-accent: #8fb7e8;
+  --elevation-bar: 0 0.5px 0 rgb(255 255 255 / 5%), 0 10px 24px -16px rgb(0 0 0 / 80%);
+}
+/* 文脈札 gives html a background of its own, so body's flat ground stopped passing to the canvas
+   and was painted over the page layer: the room read as the old beige. The page shows again. */
+html[data-cd-theme] body:not([data-view='drift']) { background: transparent; }
 
 /* ---- the frame: the top line ---- */
 body:not(.zen) #app > .chrome {
@@ -4850,7 +4884,8 @@ body.has-primary-tabs .primary-tabs {
   font: 600 12px/1 var(--font-ui);
   letter-spacing: 0.01em;
 }
-body:not(.ui-bi) .primary-tabs .primary-tab { font: 700 12px/1 var(--font-display); letter-spacing: 0.06em; }
+/* 日本語: the woodblock face at its full weight and size (tonight's 800 13px), only tracked tighter */
+body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-display); letter-spacing: 0.06em; }
 .primary-tabs .primary-tab[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
 body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
 .primary-tabs .station-node { background: var(--color-bar); }
@@ -4907,26 +4942,13 @@ body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .sh
   body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active { transition: none; }
 }
 /* ---- D7 (John: "Keep them for now — figure out the smartest way to work with this"): the
-   header's search · Learn · Lists stay, ids and 44px intact, as one quiet tools group. Each
-   says what the bar cannot: the Learn cap carries an ink dot when cards are due (away from the
-   rooms that already show the count; ink, not 朱: the screen's one 朱 belongs to the room, as
-   the Line's due count already does); the bookmark is an outline with no number at 0 and a
-   filled mark with its count once words are saved; the door of the room you are in is inked. ---- */
+   header's search · Learn · Lists stay, ids and 44px intact, as one quiet tools group of glyphs.
+   One signal per fact: what is due shows once, on the Line's Today station, where the cards are
+   reviewed, so the Learn cap carries no count of its own; the bookmark is an outline with no
+   number at 0 and a filled mark with its count once words are saved; the door of the room you
+   are in is inked. ---- */
 body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-bar-quiet); }
 body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
-body:not(.zen) #app > .chrome > button.chrome-dojo { position: relative; }
-body:not(.zen) #app > .chrome > button.chrome-dojo[data-due]::after {
-  content: '';
-  position: absolute;
-  top: 11px;
-  right: 10px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-bar-ink);
-  box-shadow: 0 0 0 2px var(--color-bar);
-  pointer-events: none;
-}
 body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'],
 body:not(.zen) #app > .chrome > button#tray[data-here] { color: var(--color-bar-ink); }
 body:not(.zen) #app > .chrome > button#tray[data-count='0'] { width: 44px; padding: 0; justify-content: center; gap: 0; }
@@ -4943,4 +4965,29 @@ body:not(.zen) #app > .chrome > button#tray:not([data-count='0'])::before {
 body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 12px; }
 body:not(.zen) #app > .chrome .lang-seg button { letter-spacing: 0; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-bar-ink); height: 2px; }
+/* ---- the reader's top line holds ONE row at every phone width (T2 "tighter and crisper"; it put
+   the bookmark on a second row at 320px, and at 375px once the count reached three digits). Every
+   door keeps its 44px box and stays reachable, selected or not (verify-corridor counts seven). ---- */
+@media (max-width: 520px) {
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  /* the capture + is always drawn, dim until a word is touched, so its slot is never an empty gap */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: visible; cursor: default; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled::after { opacity: 0.32; }
+  /* the saved count sits at the bookmark's shoulder, so the bookmark is always one 44px door */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray {
+    position: relative; width: 44px; min-width: 44px; padding: 0; justify-content: center; gap: 0;
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray:not([data-count='0']) .l-ja {
+    position: absolute; top: 5px; right: 2px; left: auto;
+    padding: 1px 2px; border-radius: 3px; background: var(--color-bar);
+    font: 650 10px/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0;
+  }
+}
+@media (max-width: 374px) {
+  /* the narrowest phones: the Learn cap yields to the Learn tab one thumb away, as in every room */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
+}
 /* END BUNKI R4 SKIN ======================================================== */
