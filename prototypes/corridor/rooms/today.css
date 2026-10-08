@@ -43,7 +43,7 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero {
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  min-height: clamp(470px, calc(100svh - 360px), 620px);
+  min-height: clamp(510px, calc(100svh - 330px), 650px);
   margin: -24px -18px 0;
   padding: 24px 18px 72px;
   overflow: hidden;
@@ -81,8 +81,9 @@ html[data-room='tray'] .today-star {
   background: none;
   line-height: 1;
   white-space: nowrap;
-  font-family: var(--font-reading);
-  font-weight: 600;
+  /* the universe's own voice: Mincho at reading weight, near and far told by size and ink alone */
+  font-family: var(--font-headword);
+  font-weight: 500;
   color: var(--today-sky-ink);
   pointer-events: auto;
   cursor: pointer;
@@ -91,12 +92,11 @@ html[data-room='tray'] .today-star {
 html[data-room='tray'] .today-star::before { content: ''; position: absolute; inset: -12px -6px; }
 html[data-room='tray'] .today-star[data-depth='1'] { opacity: 0.32; }
 html[data-room='tray'] .today-star[data-depth='2'] { opacity: 0.52; }
-html[data-room='tray'] .today-star[data-depth='3'] { opacity: 0.78; font-family: var(--font-headword); font-weight: 800; }
+html[data-room='tray'] .today-star[data-depth='3'] { opacity: 0.8; }
 /* a due word is told by weight and full ink, never a 朱 mark: the room keeps one signal (check 13) */
 html[data-room='tray'] .today-star.due {
   opacity: 0.94;
-  font-family: var(--font-headword);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-ink);
   animation: today-breath 7s ease-in-out var(--d, 0s) infinite alternate;
 }
@@ -365,8 +365,11 @@ html[data-room='tray'] .today-then-l { flex: none; }
 html[data-room='tray'] .today-then-title {
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* the day's reading is named whole, up to two lines, never cut to a fragment */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.35;
   font: 600 14px/1.3 var(--font-reading);
   color: var(--color-ink-2);
 }
@@ -490,9 +493,91 @@ html[data-room='tray'] .today-detail-body .deck-row.deck-head > span {
 html[data-room='tray'] .today-detail-body .deck-row.deck-all .d-name { font-weight: 600; }
 html[data-room='tray'] .today-detail-body .deck-row:disabled { color: var(--color-ink-2); }
 
+/* ---- round 4 (T1): the sky is the doorway into the whole universe ----
+   Every star is a real word; open sky is the door up; the labelled door says so in words. */
+html[data-room='tray'] .today-sky { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+/* only words and buttons catch a finger: the stacked depth layers and the day's word's wide box let
+   it through, so a far word under a near layer still opens that word, and open sky stays open sky */
+html[data-room='tray'] .today-sky-layer,
+html[data-room='tray'] .today-dayword { pointer-events: none; }
+html[data-room='tray'] .today-dayword :is(.dw-word, .dw-go) { pointer-events: auto; }
+/* the day's word's family burns nearest the word, in the room's ink-blue; the far field is faint */
+html[data-room='tray'] .today-star.kin { opacity: 0.82; font-weight: 500; color: var(--color-accent); }
+html[data-room='tray'] .today-star.read { opacity: 0.6; }
+html[data-room='tray'] .today-star.far { opacity: 0.34; font-weight: 500; color: var(--color-ink-2); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.kin {
+  color: color-mix(in srgb, var(--color-gold) 62%, var(--color-ink));
+  text-shadow: 0 0 10px color-mix(in srgb, var(--color-gold) 38%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.far { color: var(--color-ink); opacity: 0.3; }
+html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-universe {
+  position: absolute;
+  z-index: 3;
+  top: 18px;
+  right: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--color-accent);
+  font: 600 13px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 13px/1 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='tray'] #app > main > .today-hero > .today-universe:active { transform: scale(0.97); }
+@media (min-width: 521px) {
+  html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-universe { right: 8px; top: 4px; }
+}
+/* an arrow that rises: a corner and its stem, pointing up and out */
+html[data-room='tray'] .today-up {
+  position: relative;
+  flex: none;
+  width: 11px;
+  height: 11px;
+  transition: transform var(--motion-quick) var(--ease-standard);
+}
+html[data-room='tray'] .today-up::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7px;
+  height: 7px;
+  border-top: 1.25px solid currentColor;
+  border-right: 1.25px solid currentColor;
+}
+html[data-room='tray'] .today-up::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: -1px;
+  width: 13px;
+  height: 1.25px;
+  background: currentColor;
+  transform: rotate(-45deg);
+}
+html[data-room='tray'] .today-universe:hover .today-up { transform: translate(2px, -2px); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-universe {
+  color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));
+}
+/* the door's invitation in 日本語 is upright: Japanese is never set in a synthetic italic (the shell's
+   italic caption rule outranked its own upright 日本語 rule on specificity) */
+html[data-room='door'] body.ginga:not(.ui-bi) #drift-layer #hint { font-style: normal; letter-spacing: 0.12em; }
+/* rising from Today's sky, the universe fades up instead of cutting in (opacity only: the water's
+   own hit-testing never sees a moving layer) */
+html[data-arrive='sky'] #drift-layer.active { animation: today-universe-rise 360ms var(--ease-enter, ease-out) both; }
+@keyframes today-universe-rise { from { opacity: 0.01; } to { opacity: 1; } }
+
 @media (prefers-reduced-motion: reduce) {
   html[data-room='tray'] :is(.today-sky-layer, .today-star.due, .dw-k, .today-train .car, .today-wins) { animation: none; }
-  html[data-room='tray'] :is(.today-star, .dw-word, .today-arrow, .today-detail-caret) { transition: none; }
+  html[data-room='tray'] :is(.today-star, .dw-word, .today-arrow, .today-detail-caret, .today-up, .today-universe) { transition: none; }
+  html[data-arrive='sky'] #drift-layer.active { animation: none; }
 }
 
 /* ==========================================================================================

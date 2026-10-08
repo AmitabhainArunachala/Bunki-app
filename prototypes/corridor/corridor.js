@@ -11085,10 +11085,19 @@ function todayCity() {
   svg.append(roofs, wins, lamps, horizon);
   return svg;
 }
-/** The sky: up to forty of the learner's own saved words, due ones bright with a 朱 dot, set in
- * three drifting depths around the day's word once the room has its measure. Mouse and touch
- * open the word; the keyboard reaches the same words in the rows below, so the sky is aria-hidden. */
-function todaySky(dayWord, today) {
+/** A content word worth a star: kanji-bearing, two to four characters, and an entry the sheet opens. */
+const TODAY_SKY_WORD = /\p{Script=Han}/u;
+function todaySkyWord(w) {
+  const n = [...String(w || '')].length;
+  return n >= 2 && n <= 4 && TODAY_JA_WORD.test(w) && TODAY_SKY_WORD.test(w) && !!lookup(w);
+}
+let todaySkyPool = null;
+/** The sky over Today (round 4, T1): a window onto the whole universe of words, never empty. His
+ * own saved words come first (due ones brightest), then the day's word's family (words sharing its
+ * kanji), then the words of today's reading, then graded words drawn for the date. A word opens
+ * that word; open sky opens the universe itself (todayOpenUniverse). Mouse and touch only: the
+ * keyboard has the labelled door to the universe and the same saved words in the rows below. */
+function todaySky(dayWord, today, readPick) {
   const sky = el('div', 'today-sky');
   sky.setAttribute('aria-hidden', 'true');
   const dueNow = new Set((today?.order || []).map((item) => srsKey(item.t, item.id)));
@@ -11102,29 +11111,78 @@ function todaySky(dayWord, today) {
     (dueNow.has(srsKey(item.t, item.id)) ? due : rest).push(item);
   }
   const r = todayRng(todayHash(dayKey()));
-  for (let i = rest.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(r() * (i + 1));
-    [rest[i], rest[j]] = [rest[j], rest[i]];
+  const shuffle = (list) => {
+    for (let i = list.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(r() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  };
+  shuffle(rest);
+  const take = (list, n) => {
+    const out = [];
+    for (const w of list) {
+      if (out.length >= n) break;
+      if (!seen.has(w) && todaySkyWord(w)) { seen.add(w); out.push(w); }
+    }
+    return out;
+  };
+  const family = take(todayKanji(dayWord).flatMap((c) => (D.kanjiWords?.[c] || []).slice(0, 4)), 4);
+  const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 8);
+  todaySkyPool ||= Object.keys(D.words || {}).filter((w) => D.words[w]?.jlpt && [...w].length <= 3 && TODAY_SKY_WORD.test(w));
+  const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 20);
+  // his own words take the first places; the rest are dealt in turn (family, reading, far, far),
+  // so the sky is a mixed field of near and far, never a cluster of one kind
+  const dealt = [];
+  const hands = [family.map((word) => ({ word, kind: 'kin' })), reading.map((word) => ({ word, kind: 'read' })),
+    fill.map((word) => ({ word, kind: 'far' }))];
+  for (let i = 0; dealt.length < 32 && hands.some((h) => h.length); i += 1) {
+    const hand = hands[[0, 1, 2, 2][i % 4]];
+    if (hand.length) dealt.push(hand.shift());
   }
-  const stars = [...due.slice(0, 14).map((item) => ({ item, due: true })), ...rest.map((item) => ({ item, due: false }))].slice(0, 40);
+  const stars = [
+    ...due.slice(0, 14).map((item) => ({ item, kind: 'due' })),
+    ...rest.map((item) => ({ item, kind: 'mine' })),
+    ...dealt,
+  ].slice(0, 44);
   const layers = [1, 2, 3].map((depth) => {
     const layer = el('div', 'today-sky-layer');
     layer.dataset.depth = String(depth);
     return layer;
   });
   sky.append(...layers);
-  sky.todayStars = stars.map(({ item, due: isDue }, i) => {
-    const depth = isDue ? 3 : r() < 0.55 ? 1 : 2;
-    const star = todayLearning('button', `today-star${isDue ? ' due' : ''}`, item.label);
+  sky.todayStars = stars.map(({ item, word, kind }, i) => {
+    const depth = kind === 'due' || kind === 'kin' ? 3 : kind === 'far' ? 1 : kind === 'read' ? 2 : r() < 0.55 ? 1 : 2;
+    const star = todayLearning('button', `today-star ${kind}${kind === 'due' ? ' due' : ''}`, item ? item.label : word);
     star.type = 'button';
     star.tabIndex = -1;
     star.dataset.depth = String(depth);
     star.style.setProperty('--d', `${(i % 7) * 0.9}s`);
-    star.addEventListener('click', () => go(learningItemNode(item), { invoker: star }));
+    star.addEventListener('click', () => go(item ? learningItemNode(item) : { t: 'word', id: word }, { invoker: star }));
     layers[depth - 1].append(star);
     return star;
   });
+  // open sky is the door up: a tap that lands on no word rises into the universe
+  sky.addEventListener('click', (event) => {
+    if (event.target.closest('.today-star')) return;
+    todayOpenUniverse();
+  });
   return sky;
+}
+/** Up from Today's sky into the whole universe (T1). The drift fades in where its own state left
+ * it; the door's Today pill at its foot is the way back down. UI only: no record, no scheduler. */
+function todayOpenUniverse() {
+  keepScroll();
+  closeWorldPicker();
+  S.captureOpen = false;
+  S.stack = [];
+  S.navOpen = false;
+  S.view = 'drift';
+  document.documentElement.dataset.arrive = 'sky';
+  render();
+  window.scrollTo(0, 0);
+  clearTimeout(todayOpenUniverse.settle);
+  todayOpenUniverse.settle = setTimeout(() => { delete document.documentElement.dataset.arrive; }, 900);
 }
 /** Place the stars around what the room already holds, once it has its measure. */
 function todayPlaceSky(hero) {
@@ -11136,7 +11194,7 @@ function todayPlaceSky(hero) {
     const b = node.getBoundingClientRect();
     return { x: b.left - R.left - 8, y: b.top - R.top - 6, w: b.width + 16, h: b.height + 12 };
   };
-  const reserved = [...hero.querySelectorAll('.today-head > *, .dw-label, .dw-word, .dw-hook, .dw-fam, .dw-go')]
+  const reserved = [...hero.querySelectorAll('.today-head > *, .today-universe, .dw-label, .dw-word, .dw-hook, .dw-fam, .dw-go')]
     .filter((node) => node.getBoundingClientRect().width).map(box);
   const sign = document.querySelector('#app > main > .room-sign');
   if (sign) reserved.push(box(sign));
@@ -11144,7 +11202,14 @@ function todayPlaceSky(hero) {
   // widened by a glyph's breadth either side, so the hero is read before the sky
   const label = hero.querySelector('.dw-label');
   const word = hero.querySelector('.dw-word');
-  if (word?.getBoundingClientRect().width) {
+  const block = hero.querySelector('.today-dayword');
+  if (R.width < 520 && block?.getBoundingClientRect().width) {
+    // on a phone the day's word owns its full width: the sky floats above it, never in a thin
+    // column at its side (round 4: that column read as a list, not a sky)
+    const b = box(block);
+    const top = label?.getBoundingClientRect().width ? box(label).y : b.y;
+    reserved.push({ x: 0, y: top, w: R.width, h: b.y + b.h - top });
+  } else if (word?.getBoundingClientRect().width) {
     const w = box(word);
     const top = label?.getBoundingClientRect().width ? Math.min(box(label).y, w.y) : w.y;
     const padX = 40;
@@ -11156,7 +11221,8 @@ function todayPlaceSky(hero) {
   // the line card rides over the hero's last 48px and the city's roofs stand above it
   const H = R.height - 96;
   for (const star of sky.todayStars) {
-    const size = star.classList.contains('due') ? 20 : star.dataset.depth === '1' ? 13 : 16;
+    // three clear sizes, none too small to read: near (due, the day's family), middle, far
+    const size = star.classList.contains('due') ? 19 : star.dataset.depth === '3' ? 18 : star.dataset.depth === '2' ? 16 : 14;
     star.style.fontSize = `${size}px`;
     const bw = [...star.textContent].length * size + 10;
     const bh = size + 12;
@@ -11296,11 +11362,18 @@ function renderTray(main) {
   const pick = todayWordOfDay(trayToday);
   const readPick = todayReadPick();
   const hero = el('section', 'today-hero');
-  if (pick) hero.append(todaySky(pick.word, trayToday));
+  if (pick) hero.append(todaySky(pick.word, trayToday, readPick));
   hero.append(todayCity());
   const head = el('header', 'today-head');
   head.append(el('p', 'eyebrow today-date', todayDateline()), el('h1', 'view-title', tx('今日', 'Today')));
   hero.append(head);
+  // the sky's labelled door up (T1): the same rise as a tap on open sky, for every hand and key
+  const up = el('button', 'today-universe');
+  up.type = 'button';
+  up.id = 'today-universe';
+  up.append(el('span', 'today-universe-l', tx('すべての言葉へ', 'Explore all words')), el('i', 'today-up'));
+  up.addEventListener('click', () => todayOpenUniverse());
+  hero.append(up);
   if (pick) hero.append(renderTodayWord(pick));
   main.append(hero);
   requestAnimationFrame(() => todayPlaceSky(hero));
@@ -11495,8 +11568,8 @@ function renderTray(main) {
         'div',
         'sem-empty',
         tx(
-          '覚える項目はまだない。語・漢字・部品・熟語のページの「覚える」から入る。',
-          'No memorizing items yet. The Memorize button on any word, kanji, part, or idiom page adds it — this month’s list fills itself.',
+          '保存した言葉はまだない。語・漢字・熟語のページで「覚」を押すと、ここに並ぶ。',
+          'Nothing saved yet. Tap Save on any word, kanji or idiom, and it comes back here to review.',
         ),
       ),
     );
@@ -29947,11 +30020,14 @@ function buildGingaChrome(root) {
   if (S.sealWake) S.sealWake = false;
 
   // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
-  // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
-  if (S.view === 'drift' && S.taken.length && scheduler && !S.navOpen) {
-    const waiting = todayQueue().order.length;
+  // behind 集中道場) — the pill the 09-23 review asked for, its count when cards wait.
+  // Round 4 (T1, "a clean Today and stable entry point"): it is the door's one way down to
+  // Today, so it is always here and named for where it goes, whether the app just opened or the
+  // learner rose from Today's sky. The count stays its first number (the truthful-count pins).
+  if (S.view === 'drift' && !S.navOpen) {
+    const waiting = S.taken.length && scheduler ? todayQueue().order.length : 0;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
-      waiting ? `復習 ${waiting}` : '復習', waiting ? `Review · ${waiting} due` : 'Review');
+      waiting ? `今日 · 復習 ${waiting}` : '今日', waiting ? `Today · ${waiting} due` : 'Today');
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');

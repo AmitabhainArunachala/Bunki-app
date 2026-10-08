@@ -108,6 +108,20 @@ ${scopedRules.join('\n')}
  * to the corridor's 覚 button, which navigated the whole app away) */
 #drift-layer #radoc { top: 60px; padding-top: 62px; }
 #drift-layer #radoc .x { top: calc(72px + env(safe-area-inset-top)); z-index: 12; }
+
+/* Round 4 (T1, "clean it up a lot"): crisp ink. A word is drawn sharp, never smudged by its own
+ * 1px shadow; only the words that carry meaning (fragile, the bloom's centre and satellites) keep
+ * a soft halo. The paper grain is quieter, and the level rail names its own scale at rest, so a
+ * first-time hand reads it as 自 N1 … N5 rather than an unexplained line. Presentation only. */
+#drift-layer .word .base,
+#drift-layer .glyph .g { text-shadow: none; }
+#drift-layer .word.fragile .base { text-shadow: 0 0 9px var(--halo); }
+#drift-layer .word.bctr .base { text-shadow: 0 0 9px var(--bloomHalo); }
+#drift-layer .word.bsat .base { text-shadow: 0 0 7px var(--bloomHalo); }
+#drift-layer #grain { opacity: calc(var(--grainOp) * 0.45); }
+#drift-layer #lvl { opacity: 0.62; }
+#drift-layer #lvlLabels { opacity: 0.78; font-size: 9.5px; letter-spacing: 0.06em; }
+#drift-layer #lvl.hot #lvlLabels { opacity: 1; }
 `;
 
 /* -------------------------------------------------------------- markup */
@@ -313,6 +327,32 @@ patch(
   'practice priorities join the standing priority',
 );
 
+// Round 4 (T1, the operator 2026-10-08: "a whole explorable UNIVERSE of japanse words … i think we
+// could clean it up a lot"). The universe stays whole and explorable; what changes is only how it is
+// drawn. Quieter paper (no age spots, fewer fibres and specks, a lighter vignette), pigment pools and
+// the wave band down to a whisper and one fine line, every unseen word a fine point instead of a grey
+// square, the word web and the hub suns faint, no word drawn too small to read, the night's red pool
+// turned to 藍, and the ground taken from the host's own world so the door and Today stand on one
+// paper. No gesture, physics, record or judgment path is touched; every anchor is exact-once.
+patch('  for(let i=0;i<240;i++){', '  for(let i=0;i<90;i++){', 'r4 fewer paper fibres');
+patch('const la=th.dark?.028:.05;', 'const la=th.dark?.014:.022;', 'r4 fainter laid lines');
+patch('for(let i=0;i<2600;i++){', 'for(let i=0;i<600;i++){', 'r4 fewer grain specks');
+patch('for(let i=0;i<26;i++){', 'for(let i=0;i<8;i++){', 'r4 fewer heavy kozo strands');
+patch('for(let i=0;i<46;i++){', 'for(let i=0;i<0;i++){', 'r4 no foxing spots');
+patch('g.addColorStop(0,shade(th.ground,f,th.dark?.22:.5));', 'g.addColorStop(0,shade(th.ground,f,th.dark?.14:.26));', 'r4 gentler mottling');
+patch('vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));', 'vg.addColorStop(1,th.dark?"rgba(0,0,0,.36)":rgba(th.ink,.07));', 'r4 lighter vignette');
+patch('ictx.globalAlpha=Math.min(.3,th.blobA*b.a);', 'ictx.globalAlpha=Math.min(.09,th.blobA*b.a*.4);', 'r4 pigment pools a whisper');
+patch('const passes=[[mind()*0.13,.05,th.pig1],[mind()*0.055,.07,th.pig1],[3,.12,th.pig2]];',
+  'const passes=[[1.2,th.dark?.2:.14,th.pig2]];', 'r4 the wave band one fine line');
+patch('const r2=Math.max(1,1.9*cam.z), rr=r2*2;', 'const r2=Math.max(0.7,1.1*cam.z), rr=r2*2;', 'r4 unseen words as fine points');
+patch('draw(eB,0.067*dimF); draw(eD,0.038*dimF);', 'draw(eB,0.03*dimF); draw(eD,0.016*dimF);', 'r4 the word web faint');
+patch('lctx.strokeStyle=rgba(th.pig1,(cz<0.7?0.05:0.032)*(FOCUS.length?0.4:1));',
+  'lctx.strokeStyle=rgba(th.pig1,(cz<0.7?0.026:0.015)*(FOCUS.length?0.4:1));', 'r4 the kanji mesh faint');
+patch('const hubA=cam.z<0.8?0.20:0.10;', 'const hubA=cam.z<0.8?0.1:0.05;', 'r4 hub suns faint');
+patch('const z=fragile?[1,1.22][i%2]:[0.66,0.84,1,1.18][i%4];', 'const z=fragile?[1,1.22][i%2]:[0.8,0.9,1,1.15][i%4];', 'r4 no word too small to read');
+patch('pool:["#113285","#113285","#4C6CB3","#4C6CB3","#E2041B"]', 'pool:["#113285","#113285","#4C6CB3","#4C6CB3","#2B4C8F"]', 'r4 the night pool in 藍');
+patch('themeIx=ix; const t=THEMES[ix];', 'themeIx=ix; const t=THEMES[ix]; adoptHostGround(t);', 'r4 the host world\'s ground');
+
 // 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
 patch(
   '  drawTrail(t);\n  requestAnimationFrame(frame);\n}',
@@ -335,6 +375,19 @@ patch(
 // A receipt is evidence only for its exact command and current local scope.
 // Lazy reuse of the controller codec prevents a second Drift schema here.
 js += `
+// Round 4 (T1): the universe stands on the host world's own paper, by day and by night, so the
+// door and Today share one ground. A host without a hex --ground keeps the donor's palette.
+function hostGround(){
+  try{
+    const g=getComputedStyle(document.documentElement).getPropertyValue("--ground").trim();
+    return /^#[0-9a-f]{6}$/i.test(g)?g.toLowerCase():null;
+  }catch{return null;}
+}
+function adoptHostGround(t){
+  const g=hostGround();
+  if(!g)return;
+  t.ground=g;t.plaque=rgba(g,t.dark?.93:.92);
+}
 function layoutHeldRing(ax,ay){
   const measure=n=>{
     const scale=Math.max(n.s||1,n.ts||1)*cam.z;
@@ -564,9 +617,13 @@ window.__DRIFT__ = {
     document.getElementById('drift-layer').classList.remove('active');
   },
   // the corridor drives the shared nihonga world from its chrome seal; the
-  // drift keeps its own five-theme palette in step (0..4, north-star order)
+  // drift keeps its own five-theme palette in step (0..4, north-star order).
+  // Two worlds can share one drift palette (yoru and kaku are both 夜), so a
+  // changed host ground re-applies it too (round 4: one paper for door and Today)
   setTheme(ix) {
-    if (typeof ix === 'number' && ix >= 0 && ix < THEMES.length && ix !== themeIx) applyTheme(ix);
+    if (typeof ix !== 'number' || ix < 0 || ix >= THEMES.length) return;
+    const g = hostGround();
+    if (ix !== themeIx || (g && g !== THEMES[ix].ground)) applyTheme(ix);
   },
 };
 })();
