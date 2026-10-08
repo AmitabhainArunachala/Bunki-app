@@ -743,13 +743,15 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-tiles .kp-c-due b { color: var(--kp-amber); }
 .kp .kp-tiles .kp-c-known b { color: var(--kp-green); }
 .kp .kp-tiles .kp-c-hard b { color: var(--kp-red); }
+/* one radius per kind of thing: keys 12px (始める, 答えを見る, デッキに戻る), tiles and pads 10px */
+.kp .kp-start, .kp .kp-done .kp-start { border-radius: 12px; }
 
 /* ---- T8 "More sharp, more depth, more contrast, more distinction" and T9 "more clarity, more
  * crispness, more tightness": the card, front and back ---- */
 /* the study stage sits deeper than the page so the card stands off it; --kp-card-depth is the card's
  * own shadow on that stage (the page shadow --kp-depth stays for the home's slips and the sheets) */
 .kp { --kp-card-depth: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.5), 0 22px 44px -18px rgba(0, 0, 0, 0.9); }
-.kp[data-look='dark'] { --kp-stage: #06080c; --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(140, 180, 220, 0.06), transparent 72%), var(--kp-stage); }
+.kp[data-look='dark'] { --kp-panel: #141c27; --kp-stage: #06080c; --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(140, 180, 220, 0.06), transparent 72%), var(--kp-stage); }
 .kp[data-look='light'] { --kp-card-depth: 0 0 0 1px rgba(10, 20, 32, 0.5), 0 22px 44px -16px rgba(0, 0, 0, 0.7); }
 /* 藍 by day: the whole study screen is the 藍漆 lacquer stage. It was a 15rem band over the washi page,
  * which left the card half on lacquer and half on paper. The card is the lit washi sheet on it and the
@@ -773,6 +775,11 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * keeps its tint; every chip is the same 20px box, so the line stays one line */
 .kp .kp-eyebrow { color: var(--kp-ink-2); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; }
 .kp .kp-eyebrow::before { width: 14px; }
+/* on a passage's back the 全文／焦点 toggle takes the instruction's row: its 朱 dash goes with the words */
+.kp .kp-eyebrow:has(> .kp-zoom)::before { content: none; }
+/* every screen's ← (word list, settings, the session close) is the bare mark of the deck home and ✕ */
+.kp section > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp section > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
 .kp .kp-chips { gap: 6px 8px; }
 .kp .kp-chip { border: 1px solid transparent; border-radius: 3px; padding: 0; font-size: 11.5px; line-height: 18px; letter-spacing: 0.01em; }
 .kp .kp-kindchip { border-color: currentColor; padding: 0 5px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
@@ -800,6 +807,15 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* docked at the foot of a long passage, the key stands on a straight band of the dock that runs to both
  * screen edges (the ring alone drew a rounded frame over the card) */
 .kp .kp-study > .kp-reveal { box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock), -48px 0 0 10px var(--kp-dock), 48px 0 0 10px var(--kp-dock); }
+/* the thumb's key is always in one place: on a short front 答えを見る sits at the foot of the screen,
+ * exactly where the four grades come up after the reveal (as on a native card app), and the card keeps
+ * the top. A long passage still scrolls under the docked key as before. */
+@media (max-width: 640px) {
+  .kp .kp-study:has(> .kp-reveal) { display: flex; flex-direction: column; gap: 16px; min-height: calc(100dvh - var(--nav-clearance, 0px) - 84px); }
+  .kp .kp-study > .kp-reveal { order: 2; margin-top: auto; flex: none; }
+  .kp .kp-study > .kp-undo { order: 1; margin-top: auto; align-self: center; }
+  .kp .kp-study:has(> .kp-undo) > .kp-reveal { margin-top: 0; }
+}
 
 /* the back: the answer under a crisp rule; the word, its reading and part of speech on one line, the
  * Japanese definition in full ink; the folds one grouped list, every row the same 44px with a chevron */
