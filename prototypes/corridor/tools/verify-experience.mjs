@@ -162,7 +162,7 @@ try{
   });
   await shot('review-summary','Explicit review produces visible completion summary on correctly restored paper');
   afterReview=await state();await check('E07-review-record','Every explicit grade produces a durable outcome; only the chosen item is scheduled',()=>{assert.equal(afterReview.revlog.length,gradeActions);assert.equal(Object.keys(afterReview.srs).length,1);return `${gradeActions} deliberate grades, including short-learning repeats, on one explicitly enrolled word`;});
-  await role(/back to lists|リストへ/);await check('E07-review-trace','Return to study displays review trace',async()=>{assert.ok(await visible('.srs-trace'));return await page.locator('.srs-trace').innerText();});
+  await role(/back to lists|リストへ|Back to Today|今日へ/);await check('E07-review-trace','Return to study displays review trace',async()=>{assert.ok(await visible('.srs-trace'));return await page.locator('.srs-trace').innerText();});
   const dlPromise=page.waitForEvent('download');await click('#export-store');const dl=await dlPromise;const path=resolve(OUT,'learner-export.json');await dl.saveAs(path);const exported=JSON.parse(readFileSync(path,'utf8'));result.export={filename:dl.suggestedFilename(),file:'learner-export.json',keys:Object.keys(exported)};
   await check('E15-export','Export downloads parseable real learner envelope',()=>{assert.ok(exported&&Object.keys(exported).length);return JSON.stringify(result.export);});
   await shot('study-export-trace','Study after real export: durable trace and export control');await click('#back');

@@ -226,7 +226,7 @@ try {
   const reviewed = await waitForAppRecord(page, record => record.revlog.length === grades);
   check('explicit grades preserve exact identity and one scheduled kanji', grades > 0 &&
     reviewed.revlog.every(row => row[1] === 'kanji:㐆') && Object.keys(reviewed.srs).join() === 'kanji:㐆');
-  await page.getByRole('button', { name: /back to lists|リストへ/ }).click();
+  await page.getByRole('button', { name: /back to lists|リストへ|Back to Today|今日へ/ }).click();
   const exportStarted = Date.now();
   const download = page.waitForEvent('download');
   await page.locator('#export-store').click();

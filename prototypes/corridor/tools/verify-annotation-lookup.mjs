@@ -13,6 +13,7 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+import { openShelfTools } from './shelf-tools-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -211,6 +212,7 @@ const cases = [
     assert(topic, 'The staged library must supply at least one bounded topic fixture');
     const expected = readings.filter(row => row.facets.topics?.includes(topic));
     const ids = () => page.locator('#shelf-reading-results > [data-passage]').evaluateAll(rows => rows.map(row => row.dataset.passage));
+    await openShelfTools(page);
     await page.locator('#shelf-filter-topic').focus();
     await page.locator('#shelf-filter-topic').selectOption(topic);
     await page.waitForFunction(topic => document.getElementById('shelf-filter-topic')?.value === topic &&

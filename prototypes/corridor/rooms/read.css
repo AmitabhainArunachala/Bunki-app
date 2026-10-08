@@ -557,3 +557,75 @@ html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-
   html[data-room='shelf'] body #shelf-body .shelf-masthead .shelf-dateline { margin-bottom: 4px; }
   html[data-room='shelf'] #shelf-body > .shelf-controls.shelf-chipbar { margin-bottom: 10px; }
 }
+
+/* ---- fix lane rooms (2026-10-08, review #6): the shelf opens on its lead woodblock. The four
+   filters and the article search live in the Tools sheet, as its first group; the 未確認 note is
+   one quiet line under the dateline. ---- */
+html[data-room='shelf'] #shelf-body .shelf-study-tools .shelf-tools-filters { grid-column: 1 / -1; }
+html[data-room='shelf'] #shelf-body .shelf-tools-filters .shelf-controls.shelf-chipbar { margin: 0; padding: 0; }
+html[data-room='shelf'] #shelf-body .shelf-tools-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-accent);
+  color: #f7f2e8;
+  font: 600 11px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+}
+html[data-room='shelf'] #shelf-body .shelf-review-note { font-size: 12px; line-height: 1.4; }
+html[data-room='shelf'] #shelf-body .shelf-review-note summary.icon-button { color: var(--color-muted); }
+
+/* ---- fix lane rooms (2026-10-08, review #7): the reader reads as a set page, not a ruled book.
+   A word's 44px touch floor is its ::before (corridor.css button.tok), never its box: a 44px box
+   in a 41px line pushed every line to ~54px at 19px. Off or on-touch readings float in the
+   leading (ruby::before), so the line keeps print leading; always-on ruby still earns its space. ---- */
+html[data-room='reader'] #reader button.tok { min-height: 0; }
+@media (max-width: 520px) {
+  html[data-room='reader'] body #reader.reader:not(.fg-always) { line-height: 2; }
+}
+/* the first-visit tip: one quiet line with its ×, not a boxed callout above the text */
+html[data-room='reader'] body #reader-tip.reader-tip {
+  gap: 2px;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 12.5px/1.4 var(--font-ui); color: var(--color-muted); }
+html[data-room='reader'] body #reader-tip .reader-tip-close { color: var(--color-muted); }
+html[data-room='reader'] body #reader-tip .reader-tip-close .ui-icon { width: 14px; height: 14px; }
+/* no recording yet (phone): a slim quiet caption line at the foot, not a bordered floating pill with a
+   dashed track. It stays at the foot because suites close the word popup by pressing this row
+   (verify-reader-lookup), and only a foot row is never under the popup; a desk keeps the
+   relief-edged row in the page, pinned by verify-relief. */
+@media (max-width: 520px) {
+  /* (#app: the relief rule's :is(…, #reader, …) carries an id's weight) */
+  html[data-room='reader'] body:not([data-view='drift']) #app .listen-row.play-bar.is-pending {
+    left: 0;
+    right: 0;
+    height: 30px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 var(--s2, 16px);
+    border: 0;
+    border-top: 0.5px solid var(--color-rule);
+    border-radius: 0;
+    background: var(--color-page, var(--color-paper));
+    box-shadow: none;
+  }
+  html[data-room='reader'] .listen-row.is-pending .play-pending { flex: 0 1 auto; font: 400 11.5px/1.2 var(--font-data); color: var(--color-muted); }
+  html[data-room='reader'] .listen-row.is-pending .play-pending .ui-icon { width: 13px; height: 13px; }
+  html[data-room='reader'] .listen-row.is-pending .play-pending::after { content: none; }
+}
+/* the quiet line is its own ground: the taller paper strip of the play bar's bed is not drawn over the text */
+@media (max-width: 520px) {
+  html[data-room='reader'] body[data-view='reader']:not(.zen):has(.listen-row.is-pending):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
+}
+/* in the Tools sheet every filter keeps a full 44px touch target, even through the sheet's
+   opening pop (it rises from 0.96 scale): 46px boxes */
+html[data-room='shelf'] #shelf-body .shelf-tools-filters :is(.filter-chip, .filter-search) { min-height: 46px; }
+html[data-room='shelf'] #shelf-body .shelf-tools-filters .shelf-filter-help > summary { width: 46px; height: 46px; }

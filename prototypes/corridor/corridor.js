@@ -5590,7 +5590,15 @@ function renderShelfBody() {
   helpSummary.append(uiIcon('info'));
   help.append(helpSummary);
   help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose an article. JLPT level comes from its vocabulary; school grade from its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
-  main.append(controls);
+  // The filters and the article search fold into the Tools sheet (review 2026-10-08 #6): the shelf
+  // opens on its lead woodblock, not on a wall of fields. Every control keeps its id and behaviour.
+  const filterGroup = el('section', 'shelf-tools-group shelf-tools-filters');
+  filterGroup.dataset.toolsGroup = 'filter';
+  const filterHead = el('h2', 'shelf-tools-heading');
+  filterHead.id = 'shelf-tools-filter';
+  filterHead.append(el('span', 'l-ja', tx('探す・絞る', 'Find & filter')));
+  filterGroup.setAttribute('aria-labelledby', filterHead.id);
+  filterGroup.append(filterHead, controls);
   // The study tools (glance pass, 2026-10-01): thirteen bare text links between the filters and
   // the first story read as clutter. They now sit behind ONE 学習ツール Tools button in the title
   // block, which opens a panel of labelled tiles in four plain groups. Every door keeps its id
@@ -5777,13 +5785,18 @@ function renderShelfBody() {
   // The accessible name follows the same active label as the visible tile.
   for (const door of toolsBox.querySelectorAll('button'))
     door.setAttribute('aria-label', door.textContent.trim());
+  toolsBox.prepend(filterGroup);
+  const filtersSet = ['topic', 'jlpt', 'grade', 'text'].filter((key) => filters[key]).length;
   const toolsToggle = el('button', 'shelf-tools-toggle');
   toolsToggle.type = 'button';
   toolsToggle.id = 'shelf-tools-toggle';
   toolsToggle.setAttribute('aria-controls', toolsBox.id);
   const toolsFace = el('span', 'shelf-tools-toggle-label');
   toolsFace.append(el('span', 'l-ja', tx('学習ツール', 'Tools')));
-  toolsToggle.append(uiIcon('tools'), toolsFace, uiIcon('chevron', 'ui-icon shelf-tools-caret'));
+  toolsToggle.append(uiIcon('tools'), toolsFace);
+  // a filter in force is never invisible: the button says how many are set
+  if (filtersSet) toolsToggle.append(el('span', 'shelf-tools-count', String(filtersSet)));
+  toolsToggle.append(uiIcon('chevron', 'ui-icon shelf-tools-caret'));
   const showTools = (open) => {
     S.shelfToolsOpen = open;
     toolsBox.hidden = !open;
@@ -10981,9 +10994,10 @@ function todayHook(word) {
     part = host?.[1] || null;
   }
   if (!part) return null;
-  const family = D.radicals[part]?.kanjiCount || D.radicals[part]?.kanji?.length || 0;
-  const mineKanji = new Set(S.taken.flatMap((i) => todayKanji(i.label)));
-  const mine = (D.radicals[part]?.kanji || []).filter((c) => mineKanji.has(c)).length;
+  // the word web's own count (wwPartCap over wwMine), so Today and the web it opens say one number
+  const cap = wwPartCap(part, wwMine());
+  const family = cap.count;
+  const mine = cap.mine;
   const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
   return { part, shared, host: host?.[0] || null, count: ks.length, family, mine, meaning };
 }
@@ -21495,7 +21509,7 @@ function startReview(scope) {
   const queue = today.order;
   if (!queue.length) return;
   S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [],
-    deferred: today.held, scope: Array.isArray(scope) ? scope : null, breakAt: 0 };
+    deferred: today.held, scope: Array.isArray(scope) ? scope : null, breakAt: 0, t0: Date.now() };
   S.view = 'review';
   render();
   focusKanjiReadingReview(S.review);
@@ -21652,16 +21666,19 @@ function reviewBack(item) {
   }
   return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')], unrecorded: true };
 }
-/** The session's close (Today lane): one next door, the reading that holds the learner's words,
- * and the first word coming back tomorrow, half-shown. Both from the record; absent when unknown. */
+/** The session's close (Today lane): one next door — the room's primary — the reading that holds
+ * the learner's words, and tomorrow's first word coming back, whole. Both from the record; absent
+ * when unknown. */
 function renderReviewNext(main) {
   const read = todayReadPick();
   const tomorrowStart = startOfDay(new Date()) + 86400000;
   let next = null;
+  let tomorrowCount = 0;
   for (const item of S.taken) {
     const key = srsKey(item.t, item.id);
     const due = Date.parse(S.srs[key]?.due);
     if (S.suspended[key] || !Number.isFinite(due) || due < tomorrowStart) continue;
+    if (due < tomorrowStart + 86400000) tomorrowCount += 1;
     if (!next || due < next.due || (due === next.due && key < next.key)) next = { item, due, key };
   }
   if (!read && !next) return;
@@ -21669,10 +21686,15 @@ function renderReviewNext(main) {
   if (read) {
     const door = el('button', 'review-next-door');
     door.type = 'button';
-    door.append(el('span', 'review-next-l', tx('つぎの扉 · 読む', 'Next door · Read')),
+    const picture = storyPicture(read.passage);
+    picture.classList.add('review-next-pic');
+    const text = el('span', 'review-next-text');
+    text.append(el('span', 'review-next-l', tx('つぎの扉 · 読む', 'Next door · Read')),
       todayLearning('span', 'review-next-title', read.passage.title));
-    if (read.count) door.append(el('span', 'review-next-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
-    door.append(el('i', 'today-arrow'));
+    if (read.count) text.append(el('span', 'review-next-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
+    const go = el('span', 'review-next-go btn-primary', tx('今すぐ読む', 'Read it now'));
+    go.append(el('i', 'today-arrow'));
+    door.append(picture, text, go);
     door.addEventListener('click', () => {
       S.review = null;
       openPassage(read.passage.id);
@@ -21682,7 +21704,9 @@ function renderReviewNext(main) {
   if (next && TODAY_JA_WORD.test(String(next.item.label || ''))) {
     const tomorrow = next.due < tomorrowStart + 86400000;
     const line = el('p', 'review-tomorrow');
-    line.append(el('span', 'review-tomorrow-l', tomorrow ? tx('明日、最初に戻る語', 'Tomorrow, first back') : tx('次に戻る語', 'Next to come back')));
+    line.append(el('span', 'review-tomorrow-l', tomorrow
+      ? tx(`明日 · ${tomorrowCount} 枚 · 最初は`, `Tomorrow · ${tomorrowCount} card${tomorrowCount === 1 ? '' : 's'} · first`)
+      : tx('次に戻る語', 'Next to come back')));
     const word = todayLearning('span', 'review-tomorrow-w', next.item.label);
     line.append(word);
     box.append(line);
@@ -21714,19 +21738,48 @@ function renderReview(main) {
     if (!S.focus) doneTitle.append(el('span', 'review-clear', tx('机の上は、空になった。', 'The surface is clear.')));
     doneTitle.append(el('span', 'review-clear-count', tx(`復習おわり — ${n} 回`, `Session done — ${n} review${n === 1 ? '' : 's'}`)));
     main.append(doneTitle);
-    // the close carries the session's seals, not grey chips: the same
-    // 再難良易 the thumb pressed, each with its count (operator, 2026-08-20:
-    // the ending felt like a scrap pile, not a close)
-    const sum = el('div', 'review-summary');
-    const seals = { again: ['再', 'もう一度', 'again'], hard: ['難', '難しい', 'hard'], good: ['良', 'ふつう', 'good'], easy: ['易', '簡単', 'easy'] };
-    for (const key of ['again', 'hard', 'good', 'easy'])
-      if (rv.done[key]) {
-        const cell = el('span', `sum-seal g-${key}`);
-        cell.setAttribute('aria-label', `${tx(seals[key][1], seals[key][2])} ${rv.done[key]}`);
-        cell.append(el('span', 'g-seal', seals[key][0]));
-        cell.append(el('span', 'sum-n', String(rv.done[key])));
-        sum.append(cell);
+    // the sitting's words rise off the cleared surface: each once, the ones to see again in full ink
+    if (!S.focus) {
+      const seenWords = new Map();
+      for (const h of rv.history || []) {
+        const label = h.item?.label;
+        if (label && TODAY_JA_WORD.test(String(label))) seenWords.set(label, seenWords.get(label) || h.key === 'again');
       }
+      if (!seenWords.size) {
+        for (const item of rv.queue) if (TODAY_JA_WORD.test(String(item.label || ''))) seenWords.set(item.label, false);
+      }
+      if (seenWords.size) {
+        const rise = el('div', 'review-rise');
+        rise.setAttribute('aria-hidden', 'true');
+        [...seenWords].slice(0, 12).forEach(([label, again], i) => {
+          const w = todayLearning('span', again ? 'review-rise-w again' : 'review-rise-w', label);
+          w.style.setProperty('--i', String(i));
+          rise.append(w);
+        });
+        main.append(rise);
+      }
+    }
+    // the close's tally (concept C): kept, again and the sitting's time, each named in the
+    // learner's language, never a bare 再/良 seal (EN purity). A zero-grade close has no cells.
+    const sum = el('dl', 'review-summary');
+    rv.t1 ||= Date.now();
+    const cell = (cls, ja, en, value, label) => {
+      const c = el('div', cls);
+      c.setAttribute('aria-label', label || `${tx(ja, en)} ${value}`);
+      c.append(el('dt', 'sum-l', tx(ja, en)), el('dd', 'sum-n', String(value)));
+      sum.append(c);
+    };
+    if (n) {
+      const kept = rv.done.hard + rv.done.good + rv.done.easy;
+      cell('sum-seal g-good', '覚えた', 'Kept', kept);
+      cell('sum-seal g-again', 'もう一度', 'Again', rv.done.again);
+      if (rv.t0) {
+        const secs = Math.max(1, Math.round((rv.t1 - rv.t0) / 1000));
+        const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+        cell('sum-time', '時間', 'Time', clock,
+          tx(`時間 ${Math.floor(secs / 60)} 分 ${secs % 60} 秒`, `Time ${Math.floor(secs / 60)} min ${secs % 60} s`));
+      }
+    }
     main.append(sum);
     // card-system slice 1 · the day's limit, said out loud: the due reviews it
     // held back, and Anki's custom-study door to take them on today anyway
@@ -21814,7 +21867,7 @@ function renderReview(main) {
     if (!S.focus) renderReviewNext(main);
     // one row of doors: the way on, and the way back one grade
     const doors = el('div', 'close-doors');
-    const out = biLabel('button', 'take', 'リストへ', 'back to lists');
+    const out = biLabel('button', 'take quiet', '今日へ', 'Back to Today');
     out.type = 'button';
     out.addEventListener('click', () => {
       S.review = null;
@@ -21826,6 +21879,7 @@ function renderReview(main) {
     main.append(doors);
     return;
   }
+  rv.t1 = 0;
   // card-system slice 1 · the optional break (ペース 一息, off by default): every N graded
   // cards the glass rests — the count so far, what is left, and the way on
   const pauseEvery = srsPauseEvery();

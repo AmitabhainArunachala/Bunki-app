@@ -360,7 +360,7 @@ try {
   });
 
   await step('9 review trace on the tray', async () => {
-    await page.getByRole('button', { name: /リストへ|back to lists/ }).click();
+    await page.getByRole('button', { name: /リストへ|back to lists|今日へ|Back to Today/ }).click();
     await page.waitForTimeout(300);
     const tr = await page.evaluate(() => document.querySelector('.srs-trace')?.textContent);
     if (!tr) throw new Error('no trace line');
