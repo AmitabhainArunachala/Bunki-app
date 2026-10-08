@@ -96,6 +96,11 @@ def parts_of(c):
     ps = [p for p in ps if p != c]
     for keep, drop in VARIANT_DROP.items():
         if keep in ps and drop in ps: ps.remove(drop)
+    # KanjiVG lists sub-components too; a part already inside another listed part is dropped
+    CONTAINED = {'隹': ['亻', '人'], '复': ['日', '夂', '人', '亻'], '齊': ['斉'], '幵': [], '开': ['幵']}
+    for big, smalls in CONTAINED.items():
+        if big in ps:
+            ps = [p for p in ps if p not in smalls]
     return ps[:4]
 
 KOUT = {}

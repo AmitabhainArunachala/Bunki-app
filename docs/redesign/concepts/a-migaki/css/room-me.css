@@ -1,0 +1,55 @@
+/* ==========================================================================
+   ME 私 · a bound book of your record in late gold light
+   Signature motion: seals stamp in; a mended word's gold seam catches the light; pages turn
+   ========================================================================== */
+.room-me::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(90% 60% at 0% 100%, rgba(214, 170, 80, .22), transparent 70%), radial-gradient(60% 40% at 100% 0%, rgba(255, 240, 210, .4), transparent 70%); }
+html[data-theme="night"] .room-me::before { background: radial-gradient(90% 60% at 0% 100%, rgba(226, 189, 102, .13), transparent 70%); }
+.book { position: relative; margin: 44px 12px 0 16px; padding: 24px 22px 28px 30px; background: var(--color-paper); border-radius: 2px 8px 8px 2px; box-shadow: var(--elevation-2), inset 0 0 0 var(--hair) var(--color-line); animation: bookin var(--motion-breath) var(--ease-settle) both; transform-origin: 0 50%; }
+@keyframes bookin { from { opacity: 0; transform: perspective(1200px) rotateY(-9deg); } to { opacity: 1; transform: none; } }
+.spine { position: absolute; left: 0; top: 0; bottom: 0; width: 16px; background: linear-gradient(90deg, rgba(var(--color-shadow), .16), rgba(var(--color-shadow), .02) 70%, transparent); border-right: var(--hair) solid var(--color-line); }
+.spine::before, .spine::after { content: ""; position: absolute; left: 4px; right: 4px; height: 1px; background: var(--color-line-strong); }
+.spine::before { top: 40px; } .spine::after { bottom: 40px; }
+.edges { position: absolute; right: -5px; top: 5px; bottom: 5px; width: 5px; border-radius: 0 3px 3px 0; background: repeating-linear-gradient(90deg, var(--color-paper-2) 0 1px, var(--color-line) 1px 1.5px); box-shadow: 2px 2px 4px -2px rgba(var(--color-shadow), .3); }
+.m-head h1 { margin: 6px 0 8px; font-family: var(--font-serif); font-size: 38px; line-height: 1.05; font-weight: 600; letter-spacing: -.02em; }
+.book section { margin-top: 22px; padding-top: 14px; border-top: var(--hair) solid var(--color-line-strong); }
+.book h2.eyebrow { margin: 0 0 8px; font-weight: 400; }
+.hz { margin: 12px 0 14px; }
+.hz-top { display: flex; justify-content: space-between; align-items: baseline; }
+.hz-n { font-family: var(--font-serif); font-size: 17px; font-weight: 600; }
+.hz-rule { position: relative; height: 10px; margin: 6px 0 4px; }
+.hz-rule::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; border-top: var(--hair) solid var(--color-line-strong); }
+.hz-rule i { position: absolute; left: 0; right: 0; top: 3.5px; height: 3px; background: linear-gradient(90deg, var(--color-gold), var(--color-gold-leaf)); transform-origin: 0 0; animation: fill 900ms var(--ease-ink) 300ms both; }
+@keyframes fill { from { transform: scaleX(0); } }
+.hz-rule s { position: absolute; top: 2px; width: .5px; height: 7px; background: var(--color-line-strong); }
+.mo-head { display: flex; align-items: center; justify-content: space-between; }
+.mo-head h2 { margin: 0; font-family: var(--font-serif); font-size: 21px; font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
+html[data-lang="ja"] .mo-head h2 { font-family: var(--font-display); font-weight: 800; letter-spacing: .1em; }
+.mo-b { color: var(--color-ink-2); }
+.dow { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin: 6px 0 4px; font-size: 9.5px; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal i { font-style: normal; position: relative; aspect-ratio: 1; display: block; box-shadow: inset 0 0 0 var(--hair) var(--color-line); }
+.cal i.blank { box-shadow: none; }
+.cal i .num { position: absolute; left: 3px; top: 2px; font-family: var(--font-mono); font-size: 8.5px; color: var(--color-ink-3); z-index: 2; }
+.cal i.seal::after { content: ""; position: absolute; inset: 7px 6px 6px 7px; border-radius: 3px; background: var(--color-vermilion); opacity: .88; box-shadow: inset 0 0 0 1.5px var(--color-paper), inset 0 0 0 3px var(--color-vermilion); transform: rotate(-4deg); animation: stamp2 180ms var(--ease-crisp) both; animation-delay: calc(400ms + var(--i) * 22ms); }
+.cal i.seal:nth-child(3n)::after { transform: rotate(3deg); }
+.cal i.seal:nth-child(4n)::after { transform: rotate(-1deg); inset: 5px 6px 6px 5px; }
+@keyframes stamp2 { from { opacity: 0; scale: 1.25; } to { opacity: 1; scale: 1; } }
+.cal i.seal .num { color: var(--color-paper); font-weight: 700; left: auto; right: 0; top: auto; bottom: 0; width: 100%; height: 100%; display: grid; place-items: center; font-size: 11px; z-index: 3; }
+.cal i.today { box-shadow: inset 0 0 0 1.5px var(--color-signal); }
+html[data-theme="night"] .cal i.today { box-shadow: inset 0 0 0 1.5px var(--color-signal), 0 0 14px -2px var(--color-signal-glow); }
+.mo-foot { margin-top: 8px; }
+.kin { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kt { position: relative; display: grid; gap: 2px; align-content: start; padding: 10px 8px 10px; min-height: 112px; background: var(--color-page); box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong); border-radius: 2px; }
+.seam { position: absolute; left: 0; top: 18px; width: 100%; height: 60%; overflow: visible; }
+.seam path { fill: none; stroke: var(--color-gold-leaf); stroke-width: 1.7; stroke-linejoin: round; filter: drop-shadow(0 0 .5px rgba(120, 90, 20, .6)); }
+.kt-w { position: relative; font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.2; }
+.kt-r { position: relative; font-size: 11px; color: var(--color-ink-3); letter-spacing: .08em; }
+.kt .data { position: relative; margin-top: 6px; font-size: 9.5px; line-height: 1.6; }
+.kt .data b { color: var(--color-gold); }
+.hand { margin: 4px 0 8px; font-family: var(--font-hand); font-size: 23px; line-height: 1.75; color: var(--color-ink); }
+.set { display: flex; justify-content: space-between; align-items: center; min-height: 56px; border-bottom: var(--hair) solid var(--color-line); gap: 12px; }
+.set > span { font-size: 15px; font-weight: 550; }
+.seg { display: inline-flex; padding: 2px; border-radius: 9px; box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong); }
+.seg a { min-height: 44px; min-width: 64px; padding: 0 12px; display: grid; place-items: center; border-radius: 7px; font-size: 14px; color: var(--color-ink-2); }
+.seg a.on { background: var(--color-ink); color: var(--color-paper); font-weight: 600; }
+.colophon { margin-top: 14px; line-height: 1.7; }

@@ -1,0 +1,145 @@
+/* ==========================================================================
+   白紙 HAKUSHI — base: page, plate, sign, strip, the Line, controls, slip
+   Motion animates transform + opacity only.
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; background: var(--color-ground); }
+body {
+  margin: 0; min-height: 100dvh; background: var(--color-ground); color: var(--color-ink);
+  font: var(--weight-regular) var(--type-body)/var(--leading-ui) var(--font-sans);
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+  font-feature-settings: "palt" 0;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 2px; }
+[lang='ja'] { font-feature-settings: normal; }
+
+/* washi fibre: two scales, static, survives a screenshot */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 40; opacity: var(--fibre-opacity);
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.018 .22' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .38  0 0 0 .13 0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' seed='3'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .38  0 0 0 0 .35  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  mix-blend-mode: multiply;
+}
+html[data-theme='night'] body::before { mix-blend-mode: screen; }
+
+#stage { position: fixed; inset: 0 0 var(--line-h) 0; overflow: hidden; }
+.plate {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+  max-width: 480px; margin: 0 auto; scrollbar-width: none;
+}
+.plate::-webkit-scrollbar { display: none; }
+.plate.leaving { pointer-events: none; z-index: 0; }
+
+/* ---- the strip: one line of real data at the head of every plate ---- */
+.strip {
+  height: 48px; display: flex; align-items: center; gap: var(--space-3);
+  padding: 0 64px 0 var(--gutter); position: relative; white-space: nowrap;
+}
+.micro, .strip {
+  font: var(--weight-strong) var(--type-micro)/1.2 var(--font-sans); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--color-ink-3); font-variant-numeric: tabular-nums;
+}
+html[lang='ja'] .micro, html[lang='ja'] .strip { letter-spacing: .06em; }
+.strip .sep { width: 1px; height: 10px; background: var(--color-line-strong); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---- the hanging sign (縦看板) ---- */
+.sign { position: absolute; top: 0; right: 14px; z-index: 6; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.sign-chain { width: 1px; height: 12px; background: var(--color-line-strong); }
+.sign-plate {
+  background: var(--color-sign); color: var(--color-on-sign); padding: 9px 0 10px; width: 28px;
+  display: flex; justify-content: center; border-radius: 1px;
+  box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 6px 14px rgba(0,0,0,.12);
+}
+.sign-text {
+  writing-mode: vertical-rl; text-orientation: upright; font: 800 10.5px/1 var(--font-sans); letter-spacing: .2em;
+}
+html[lang='ja'] .sign-text { font: 800 15px/1 var(--font-display); letter-spacing: .3em; }
+html[data-theme='night'] .sign-plate {
+  border: 1px solid rgba(92,240,208,.75); box-shadow: 0 0 14px rgba(92,240,208,.28), inset 0 0 10px rgba(92,240,208,.14);
+}
+html[data-theme='night'] .sign-text { text-shadow: 0 0 6px rgba(92,240,208,.7); }
+html[data-theme='night'][data-room-entering] .sign-plate { animation: ignite 900ms steps(1, end) both; }
+@keyframes ignite { 0% { opacity: 0 } 18% { opacity: .9 } 26% { opacity: .15 } 40% { opacity: 1 } 52% { opacity: .5 } 64%, 100% { opacity: 1 } }
+
+/* ---- registration marks (トンボ) ---- */
+.reg { position: absolute; width: 11px; height: 11px; pointer-events: none; opacity: .7; transition: transform var(--motion-crisp) var(--ease-crisp); }
+.reg::before, .reg::after { content: ''; position: absolute; background: var(--color-ink); }
+.reg::before { width: 11px; height: 1px; } .reg::after { width: 1px; height: 11px; }
+.reg-tl { top: -6px; left: -6px; } .reg-tl::before { top: 5px } .reg-tl::after { left: 5px }
+.reg-tr { top: -6px; right: -6px; } .reg-tr::before { top: 5px } .reg-tr::after { right: 5px }
+.reg-bl { bottom: -6px; left: -6px; } .reg-bl::before { bottom: 5px } .reg-bl::after { left: 5px }
+.reg-br { bottom: -6px; right: -6px; } .reg-br::before { bottom: 5px } .reg-br::after { right: 5px }
+.registered .reg-tl { transform: translate(2px, 2px) } .registered .reg-tr { transform: translate(-2px, 2px) }
+.registered .reg-bl { transform: translate(2px, -2px) } .registered .reg-br { transform: translate(-2px, -2px) }
+
+/* ---- controls: physical, two-layer, 2px travel ---- */
+.btn-primary {
+  min-height: 56px; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 20px; border-radius: var(--radius-control); background: var(--color-signal); color: var(--color-on-signal);
+  font: var(--weight-strong) var(--type-ui)/1 var(--font-sans); letter-spacing: .01em;
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--color-signal) 55%, #000), 0 8px 22px var(--color-signal-glow);
+  transition: transform var(--motion-tick) var(--ease-crisp);
+}
+.btn-primary:active, .btn-primary.pressed { transform: translateY(2px); }
+.btn-primary .arrow { font-family: var(--font-sans); font-size: 18px; }
+.btn-ghost {
+  min-height: var(--hit); min-width: var(--hit); padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid var(--color-line-strong); border-radius: var(--radius-control); color: var(--color-ink);
+  font: var(--weight-strong) 13.5px/1 var(--font-sans); background: var(--color-paper);
+  box-shadow: 0 1px 0 var(--color-line);
+  transition: transform var(--motion-tick) var(--ease-crisp);
+}
+.btn-ghost:active { transform: translateY(1px); }
+.eyebrow { font: var(--weight-strong) var(--type-micro)/1.2 var(--font-sans); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-ink-3); }
+html[lang='ja'] .eyebrow { letter-spacing: .08em; }
+
+/* ---- ruby ---- */
+ruby { ruby-position: over; }
+rt { font: 500 var(--type-ruby)/1 var(--font-sans); color: var(--color-ink-2); letter-spacing: 0; }
+
+/* ---- the Line: five stations on one track ---- */
+.line {
+  position: fixed; left: 0; right: 0; bottom: 0; height: var(--line-h); z-index: 30;
+  background: var(--color-bar); border-top: 1px solid var(--color-line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+html[data-theme='night'] .line { -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
+.line-rail { position: absolute; left: 0; right: 0; top: 0; height: 30px; max-width: 480px; margin: 0 auto; container-type: inline-size; pointer-events: none; }
+.line-track { position: absolute; left: 10%; right: 10%; top: 19px; height: 1px; background: var(--color-line-strong); }
+.line-car {
+  position: absolute; left: 0; top: 13px; width: 13px; height: 13px; margin-left: -6.5px; background: var(--color-ink);
+  transform: translateX(calc(var(--x, 10) * 1cqw)); box-shadow: 0 0 0 3px var(--color-bar);
+}
+.line-car.moving { transition: transform 460ms cubic-bezier(.34,1.25,.5,1); }
+html[data-theme='night'] .line-car { background: var(--color-ink); box-shadow: 0 0 0 3px var(--color-ground), 0 0 10px rgba(236,232,223,.35); }
+.line-stations { display: flex; height: 100%; max-width: 480px; margin: 0 auto; }
+.station { flex: 1; min-height: var(--hit); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15px; gap: 9px; position: relative; color: var(--color-ink-3); }
+.station-node { width: 9px; height: 9px; border: 1.5px solid var(--color-ink-3); background: var(--color-bar); transform: rotate(45deg); transition: transform var(--motion-crisp) var(--ease-crisp); }
+.station.on .station-node { transform: rotate(45deg) scale(0); }
+.station-label { font: 600 12px/1 var(--font-sans); letter-spacing: .02em; }
+html[lang='ja'] .station-label { font: 800 13px/1 var(--font-display); letter-spacing: .08em; }
+.station.on { color: var(--color-ink); }
+.station.on .station-label { font-weight: 800; }
+.station-count { position: absolute; top: 15px; left: calc(50% + 14px); font: 700 9.5px/1 var(--font-sans); font-variant-numeric: tabular-nums; color: var(--color-ink-2); }
+.station:active .station-label { transform: translateY(1px); }
+
+/* ---- the word slip (one sheet, same everywhere) ---- */
+.slip-layer { position: fixed; inset: 0 0 var(--line-h) 0; z-index: 25; pointer-events: none; }
+.slip-layer.open { pointer-events: auto; }
+.slip-scrim { position: absolute; inset: 0; background: var(--color-scrim); opacity: 0; transition: opacity var(--motion-settle) var(--ease-settle); }
+.slip-layer.open .slip-scrim { opacity: 1; }
+.slip {
+  position: absolute; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto;
+  background: var(--color-paper); box-shadow: var(--elevation-sheet); border-top: 1px solid var(--color-line-strong);
+  padding: 14px var(--gutter) 18px; transform: translateY(105%); will-change: transform; visibility: hidden;
+}
+.slip-grab { width: 36px; height: 4px; border-radius: 2px; background: var(--color-line-strong); margin: 0 auto 12px; }
+.cut-ghost { position: fixed; z-index: 60; pointer-events: none; transform-origin: center; display: flex; align-items: center; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 120ms !important; animation-iteration-count: 1 !important; transition-duration: 120ms !important; transition-delay: 0ms !important; }
+}
+html[data-still] *, html[data-still] *::before, html[data-still] *::after { animation: none !important; transition: none !important; }

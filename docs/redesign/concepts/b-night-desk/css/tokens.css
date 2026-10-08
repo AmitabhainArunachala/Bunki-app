@@ -1,0 +1,128 @@
+/* 夜の文机 Night Desk — Tokens v2 (role names from FOUNDATION.md).
+   Day: paper under morning light, crisp instrument lines.
+   Night: a 藍 room at a writing desk; lamp-warm paper, the city glowing through rain. */
+
+:root {
+  /* type */
+  --font-display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif; /* 800 only */
+  --font-reading: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+  --font-data: ui-monospace, "SF Mono", Menlo, "DejaVu Sans Mono", monospace; /* tabular data, HUD */
+  --font-grade: "Kaisei Tokumin", var(--font-display); /* 再 難 良 易 only */
+
+  --type-hud: 10px;
+  --type-caption: 12px;
+  --type-ui: 15px;
+  --type-reading: 19px;
+  --type-ruby: 10.5px;
+  --type-title: 26px;
+  --type-display: 92px;
+  --leading-reading: 2.15;
+  --leading-ui: 1.35;
+  --weight-ui: 500;
+  --weight-strong: 650;
+  --weight-display: 800;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 28px;
+  --space-7: 40px;
+  --gutter: 20px;
+
+  --radius-hair: 2px;
+  --radius-surface: 6px;
+  --radius-control: 10px;
+  --radius-pill: 999px;
+
+  /* motion */
+  --motion-tick: 90ms;
+  --motion-crisp: 160ms;
+  --motion-settle: 280ms;
+  --motion-breath: 480ms;
+  --motion-ink: 720ms;
+  --motion-ma: 320ms;
+  --ease-crisp: cubic-bezier(.2, .8, .2, 1);
+  --ease-settle: cubic-bezier(.22, 1, .36, 1);
+  --ease-ink: cubic-bezier(.65, 0, .35, 1);
+
+  /* ---- DAY: washi in morning light ---- */
+  --color-ground: #f2ede2;
+  --color-paper: #faf7f0;
+  --color-paper-edge: #e3dccd;
+  --color-ink: #1b2130;
+  --color-ink-2: #4a5263;
+  --color-ink-3: #5f6574;
+  --color-ai: #1f3b6e;           /* 藍: structure, links */
+  --color-line: rgba(31, 59, 110, .22);
+  --color-line-strong: rgba(31, 59, 110, .5);
+  --color-grid: rgba(31, 59, 110, .06);
+  --color-signal: #006b7c;       /* the one light per screen */
+  --color-signal-soft: rgba(0, 120, 140, .12);
+  --color-signal-glow: 0 0 0 transparent;
+  --color-shu: #b8361f;          /* 朱: seal, wrong */
+  --color-gold: #8a6514;
+  --color-gold-leaf: #c9a24a;
+  --color-lacquer: #141c2e;      /* stage frame */
+  --color-lacquer-ink: #e9e3d5;
+  --color-lamp: rgba(255, 236, 200, .55);
+  --color-city: rgba(0, 0, 0, 0);
+  --color-city-2: rgba(0, 0, 0, 0);
+  --color-rain: rgba(31, 59, 110, 0);
+  --color-on-primary: #f6f2e8;
+  --color-primary: #1b2130;
+  --color-primary-lip: #000;
+  --color-tab: rgba(250, 247, 240, .97);
+  --elevation-1: 0 1px 0 rgba(27, 33, 48, .06), 0 6px 18px rgba(27, 33, 48, .06);
+  --elevation-2: 0 1px 0 rgba(27, 33, 48, .08), 0 18px 40px rgba(27, 33, 48, .14);
+  --elevation-sheet: 0 -1px 0 rgba(31, 59, 110, .2), 0 -24px 60px rgba(27, 33, 48, .18);
+  --fibre-opacity: .55;
+}
+
+/* ---- NIGHT: the 藍 room, lamp on the desk, the city beyond the glass ---- */
+:root[data-theme="night"] {
+  --color-ground: #0b1322;
+  --color-paper: #121c30;
+  --color-paper-edge: #1e2a42;
+  --color-ink: #ece5d5;
+  --color-ink-2: #c0bcb1;
+  --color-ink-3: #9aa0ad;
+  --color-ai: #8fb0e6;
+  --color-line: rgba(150, 180, 230, .2);
+  --color-line-strong: rgba(150, 180, 230, .45);
+  --color-grid: rgba(93, 242, 220, .05);
+  --color-signal: #5df2dc;
+  --color-signal-soft: rgba(93, 242, 220, .13);
+  --color-signal-glow: 0 0 6px rgba(93, 242, 220, .55);
+  --color-shu: #ff6a4d;
+  --color-gold: #e0bd6a;
+  --color-gold-leaf: #e8c66e;
+  --color-lacquer: #060a13;
+  --color-lacquer-ink: #ece5d5;
+  --color-lamp: rgba(255, 178, 102, .16);
+  --color-city: rgba(0, 220, 200, .10);
+  --color-city-2: rgba(255, 64, 140, .07);
+  --color-rain: rgba(170, 210, 255, .07);
+  --color-on-primary: #08121c;
+  --color-primary: #e9e2d0;
+  --color-primary-lip: #8d846f;
+  --color-tab: #080e1a;
+  --elevation-1: 0 1px 0 rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+  --elevation-2: 0 1px 0 rgba(0, 0, 0, .5), 0 18px 48px rgba(0, 0, 0, .55);
+  --elevation-sheet: 0 -1px 0 rgba(150, 180, 230, .25), 0 -24px 60px rgba(0, 0, 0, .6);
+  --fibre-opacity: .25;
+}
+
+/* ---- per-room material (one world; material and light change) ---- */
+html[data-room="today"] { --room-ground: #efe8da; }
+html[data-room="read"]  { --room-ground: #fbf9f4; }
+html[data-room="learn"] { --room-ground: #e9e3d6; }
+html[data-room="words"] { --room-ground: #edf0ee; --color-grid: rgba(31, 59, 110, .075); }
+html[data-room="me"]    { --room-ground: #f3ead8; }
+html[data-theme="night"][data-room="today"] { --room-ground: #0c1424; }
+html[data-theme="night"][data-room="read"]  { --room-ground: #0a101c; }
+html[data-theme="night"][data-room="learn"] { --room-ground: #070b14; }
+html[data-theme="night"][data-room="words"] { --room-ground: #06101a; --color-grid: rgba(93, 242, 220, .06); }
+html[data-theme="night"][data-room="me"]    { --room-ground: #0f1220; }
