@@ -65,9 +65,9 @@ html:is([data-room='search'], [data-room='word-web']) .ww-why { font: 500 12px/1
 html:is([data-room='search'], [data-room='word-web']) .ww-walk { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; width: 100%; min-height: 48px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-walk-label { margin-right: 6px; font: 600 11px/1 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); }
 body:not(.ui-bi) .ww-walk-label { letter-spacing: 0.06em; text-transform: none; font-size: 12px; }
-html:is([data-room='search'], [data-room='word-web']) .ww-walk-sep { padding: 0 2px; color: var(--color-rule); font: 400 14px/1 var(--font-ui); }
+html:is([data-room='search'], [data-room='word-web']) .ww-walk-sep { padding: 0; color: var(--color-rule); font: 400 13px/1 var(--font-ui); }
 html:is([data-room='search'], [data-room='word-web']) .ww-crumb {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; margin: 0; padding: 0 4px;
+  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; margin: 0; padding: 0 2px;
   border: 0; background: none; color: var(--color-muted); font: 800 19px/1 var(--font-headword, var(--font-display)); cursor: pointer;
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-crumb:hover { color: var(--color-ink); }
@@ -271,6 +271,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-open { min-height: 44p
 /* ---- the re-centre: everything but the chosen glyph steps back ---- */
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-plate :is(.ww-node:not(.ww-chosen), .ww-wires, .ww-centre),
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving:not(.ww-leaving-detail) .ww-detail,
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving-detail .ww-detail > :not(.ww-chosen):not(.ww-family),
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving-detail .ww-fam:not(.ww-chosen) {
   opacity: 0; transition: opacity 120ms var(--ease-exit, ease-in);
 }
@@ -318,3 +319,25 @@ body:not(.ui-bi) .ww-n-word.ww-rel .ww-cap { font-style: normal; }
 html:is([data-room='search'], [data-room='word-web']) .ww-marks > div:last-child:nth-child(3n + 1) { grid-column: span 3; }
 html:is([data-room='search'], [data-room='word-web']) .ww-marks > div:last-child:nth-child(3n + 2) { grid-column: span 2; }
 html:is([data-room='search'], [data-room='word-web']) .ww-meaning { font-size: 15px; }
+
+/* follow the part: the signature door from a word into its shared part's family */
+html:is([data-room='search'], [data-room='word-web']) .ww-follow {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: calc(100% - 16px); min-height: 44px; margin: var(--space-3, 12px) 8px 0; padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-live) 55%, transparent); border-radius: var(--radius-card, 4px);
+  background: var(--color-live-wash, color-mix(in srgb, var(--color-live) 10%, transparent)); color: var(--color-ink); text-align: left; cursor: pointer;
+  transition: transform var(--motion-press, 90ms) var(--ease-standard, ease);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-follow:active { transform: translateY(1px); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; font: 500 15px/1.4 var(--font-ui); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-k { font: 800 21px/1.1 var(--font-headword, var(--font-display)); color: var(--color-accent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-p { display: inline-block; margin-left: 4px; font: 800 28px/1 var(--font-headword, var(--font-display)); color: var(--color-live); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub { font: 500 12px/1.4 var(--font-ui); color: var(--color-muted); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub::after { content: ' →'; color: var(--color-live); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow {
+  box-shadow: 0 0 16px -6px var(--color-live-glow, transparent); background: color-mix(in srgb, var(--color-live) 7%, var(--ww-solid));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow-p { text-shadow: 0 0 10px var(--color-live-glow, transparent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen { border-color: transparent; background: none; box-shadow: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen :is(.ww-follow-line, .ww-follow-sub, .ww-follow-k) { color: transparent; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen .ww-follow-sub::after { content: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen .ww-follow-p { color: var(--color-ink); text-shadow: none; }

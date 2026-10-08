@@ -16851,7 +16851,8 @@ function wwModel(centre, mine) {
     if (siblings.size) marks.push([tx('仲間の語', 'Siblings'), String(siblings.size)]);
     if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
     if (saved?.ts) marks.push([tx('覚え始め', 'Saved'), new Date(saved.ts).toLocaleDateString()]);
-    return { centre: { ...centre, glyph: w, reading: info.reading, gloss: bi() ? wwShort(info.senses[0]) : '', strokes }, nodes, marks, senses: info.senses, examples: ex };
+    const follow = shared.length ? { part: shared[0], kanji: owners.get(shared[0]).map((i) => ks[i]), ...wwPartCap(shared[0], mine) } : null;
+    return { centre: { ...centre, glyph: w, reading: info.reading, gloss: bi() ? wwShort(info.senses[0]) : '', strokes }, nodes, marks, senses: info.senses, examples: ex, follow };
   }
   if (centre.type === 'kanji') {
     const c = centre.key;
@@ -17078,6 +17079,24 @@ function wwDetail(model, section) {
     }
     box.append(dl);
   }
+  if (model.follow) {
+    // the signature: the part two kanji share, and the door into its family
+    const f = model.follow;
+    const b = el('button', 'ww-follow');
+    b.type = 'button';
+    b.dataset.wwKey = f.part;
+    b.dataset.uiContentValue = [...f.kanji, f.part].join('|');
+    const line = el('span', 'ww-follow-line');
+    f.kanji.forEach((k, i) => {
+      if (i) line.append(tx('と', ' and '));
+      line.append(wwLearn('b', 'ww-follow-k', k));
+    });
+    line.append(tx('に共通する部品', ' share one part:'), wwLearn('b', 'ww-follow-p ww-g', f.part));
+    const sub = el('span', 'ww-follow-sub', tx(`この部品の字 ${f.count} · ${f.mine} 字はあなたの語に · たどる`, `${f.count} kanji carry it · ${f.mine} in your words · follow it`));
+    b.append(line, sub);
+    b.addEventListener('click', () => wwRecentre({ type: 'part', key: f.part }, section, b));
+    box.append(b);
+  }
   if (model.senses.length) {
     // dictionary senses are English data in both interfaces, marked as such
     const m = el('p', 'ww-meaning', model.senses.slice(0, 4).join('; '));
@@ -17124,7 +17143,7 @@ function wwDetail(model, section) {
     }
   }
   const act = el('div', 'ww-actions');
-  const open = el('button', 'btn-primary ww-open', tx('項目をすべて見る', 'Open the full entry'));
+  const open = el('button', model.follow ? 'btn-secondary ww-open' : 'btn-primary ww-open', tx('項目をすべて見る', 'Open the full entry'));
   open.type = 'button';
   open.addEventListener('click', () => {
     const t = c.type === 'part' ? (D.radicals?.[c.key] ? 'radical' : 'kanji') : c.type;
@@ -17186,9 +17205,12 @@ function renderWordWeb({ quiet = false } = {}) {
   walk.setAttribute('aria-label', tx('たどった道', 'Your walk'));
   walk.append(el('span', 'ww-walk-label', tx('たどった道', 'Your walk')));
   const trail = wwTrail();
-  trail.forEach((n, i) => {
+  // a phone keeps the walk to one line: the last four steps, the rest folded into …
+  const shown = trail.slice(-4);
+  if (trail.length > shown.length) walk.append(el('span', 'ww-walk-sep ww-walk-fold', '…'));
+  shown.forEach((n, i) => {
     if (i) walk.append(el('span', 'ww-walk-sep', '—'));
-    const here = i === trail.length - 1;
+    const here = i === shown.length - 1;
     const b = el('button', here ? 'ww-crumb ww-here' : 'ww-crumb');
     b.type = 'button';
     b.dataset.uiContentValue = n.key;
@@ -17222,7 +17244,7 @@ function wwRecentre(node, section, invoker) {
     if (!wwReduced() && glyph?.animate) glyph.animate([{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 90, easing: 'cubic-bezier(.22,1,.36,1)' });
     if (hadFocus) next.querySelector('.ww-centre')?.focus({ preventScroll: true });
   };
-  const from = invoker?.querySelector('.ww-g, span');
+  const from = invoker?.querySelector('.ww-g') || invoker?.querySelector('span');
   const to = section.querySelector('.ww-c-glyph');
   if (wwReduced() || !from || !to || !from.animate) {
     swap();
