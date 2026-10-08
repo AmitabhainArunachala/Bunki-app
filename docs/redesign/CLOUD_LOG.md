@@ -14,3 +14,7 @@ Branch: `claude/redesign-20261008` (pushes accepted). Draft PR: #126. Times are 
 | 02:00 | judge | Four judges: C 191.5, A 187.5, B 173, D 163 /240. Choice: **C Living Shelf + A's craft**, grafts from B and D, 10 build gates (JUDGEMENT.md). Phase 2 comment on #126. |
 | 02:05 | ship | 白紙 standalone draft PR **#127** opened from `claude/hakushi-20261008` (base `claude/final-integration-20261007`). |
 | 02:05 | build | Six room stylesheets `rooms/{today,read,learn,words,me,cards}.css` registered in index.html, sw.js SHELL, corridor-assets, build-standalone, sw-shell.test (8/8 pass). |
+| 02:10 | verify | Cloud F1 baseline on the merge: matches Mac 13/14 (doors T13/T14 inherited; verify-corridor and verify-n2n1-decks are container-timing flakes, documented in `cloud-baseline/RESULTS.md`). |
+| 02:15 | build | ROOM_MAP.md and BUILD_BRIEF.md written. Lane 1 (Shell/Skin) launched alone. |
+| 03:05 | build | Skin done (f52e12dd): Tokens v2 skin C+A, "the Line" tab bar with real due count, room signs and frames, private-import buttons kept clear of the report rail. The visual verifiers and the language lint pass (Chromium). CI flagged one WebKit docks case on the pre-skin head; commented on #126. |
+| 03:10 | build | Six room lanes launched in parallel worktrees: today, read, learn, words (word web), me, cards. Branches `claude/redesign-lane-<room>`; the lead merges them in order. |
