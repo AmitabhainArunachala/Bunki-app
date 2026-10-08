@@ -4500,9 +4500,11 @@ body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-g
 body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 12px/1 var(--font-data); font-variant-numeric: tabular-nums; }
 @media (max-width: 360px) {
   /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
-     and Lists becomes its bookmark with the count set small at its shoulder */
+     and Lists becomes its bookmark with the count set small at its shoulder. The reader is the
+     exception: verify-corridor pins >= 7 reachable 44px chrome doors there at 320px beside the
+     capture slot it reserves, which cannot share one 320px row, so its chrome keeps two rows. */
   body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
-  body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs:not(.zen):not([data-view='reader']) #app > .chrome > button.chrome-dojo { display: none; }
   body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
   body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
     position: relative;
