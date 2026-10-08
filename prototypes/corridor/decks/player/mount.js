@@ -860,6 +860,10 @@ function studyScreen() {
     } else {
       if (hintsOn()) face.append(el('p', 'kp-taphint', mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
       face.addEventListener('click', reveal);
+      // the bare stage around the card is the same tap (the card hugs its content: T8, round 4)
+      box.addEventListener('click', (e) => {
+        if (e.target === box) reveal();
+      });
     }
   } else {
     face.append(...backParts(card, word).nodes);

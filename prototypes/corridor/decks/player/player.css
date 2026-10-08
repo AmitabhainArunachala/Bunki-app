@@ -753,7 +753,13 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* the study stage sits deeper than the page so the card stands off it; --kp-card-depth is the card's
  * own shadow on that stage (the page shadow --kp-depth stays for the home's slips and the sheets) */
 .kp { --kp-card-depth: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.5), 0 22px 44px -18px rgba(0, 0, 0, 0.9); }
-.kp[data-look='dark'] { --kp-panel: #141c27; --kp-stage: #06080c; --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(140, 180, 220, 0.06), transparent 72%), var(--kp-stage); }
+/* 墨: on a near-black stage no shadow shows, so the card is lifted by light, as a native dark surface is:
+ * a lighter sheet (#1a2330 on #030406, about 1.29:1 where an iOS dark elevated surface is about 1.23:1),
+ * a lit top edge (12% white) and a faint light hairline outside its own. The second panel (the back's
+ * grouped folds, the home's tiles) steps up with it so the inset list still reads */
+.kp[data-look='dark'] { --kp-panel: #1a2330; --kp-panel-2: #222d3b; --kp-stage: #030406;
+  --kp-study-ground: radial-gradient(130% 40% at 50% 0%, rgba(140, 180, 220, 0.035), transparent 70%), var(--kp-stage);
+  --kp-card-depth: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.04); }
 .kp[data-look='light'] { --kp-card-depth: 0 0 0 1px rgba(10, 20, 32, 0.5), 0 22px 44px -16px rgba(0, 0, 0, 0.7); }
 /* 藍 by day: the whole study screen is the 藍漆 lacquer stage. It was a 15rem band over the washi page,
  * which left the card half on lacquer and half on paper. The card is the lit washi sheet on it and the
@@ -817,10 +823,10 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-study > .kp-reveal { order: 2; margin-top: auto; flex: none; }
   .kp .kp-study > .kp-undo { order: 1; margin-top: auto; align-self: center; }
   .kp .kp-study:has(> .kp-undo) > .kp-reveal { margin-top: 0; }
-  /* the card fills the stage down to the key: the sentence keeps its place at the head of the sheet (the
-   * reveal moves nothing), the tap hint sits at its foot, and the whole sheet is the tap that reveals */
-  .kp .kp-study:has(> .kp-reveal) > .kp-card { flex: 1 0 auto; display: flex; flex-direction: column; }
-  .kp .kp-study:has(> .kp-reveal) > .kp-card > .kp-taphint { margin-top: auto; }
+  /* the card hugs what it holds (a one-sentence front was 60% empty bordered sheet): the sentence keeps
+   * its place at the head, the reveal grows the card downward, and the bare stage between the card and
+   * the key is a tap that reveals too (mount.js studyScreen). docs/redesign/r4/cards/options/front-b.css
+   * is the other way, a tall sheet that reads as paper, for the learner to choose between */
 }
 
 /* the back: the answer under a crisp rule; the word, its reading and part of speech on one line, the
