@@ -35,8 +35,10 @@
  * replaces is kept under bunki-cloze:kotoba-mcd:before-restore. A stored
  * ledger the player cannot read is set aside before anything is saved.
  *
- * Then answering: the grade bar shows もう一度／思い出せた and nothing else, even
- * with an old 難しい・簡単 setting stored; a cancelled or mostly vertical swipe
+ * Then answering: the grade bar shows もう一度・難しい・正解・簡単 (Again · Hard · Good ·
+ * Easy, CARD_CONTRACT_V2 §4 as amended 2026-10-09) whatever setting is stored; each key 1–4
+ * grades its own FSRS rating and schedules the interval its pad showed; a ledger written by the
+ * two-button player loads unchanged and takes a Hard; a cancelled or mostly vertical swipe
  * never grades; 4択 never asks a 字 card; 設定 has labelled controls and radio
  * groups (axe); the done screen keeps ↶ ひとつ戻す; every colour token in the
  * light themes clears 4.5:1.
@@ -416,7 +418,7 @@ const CONTRAST = `(() => {
   const lum = (c) => { const [r, g, b] = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
   const mix = (a, b, t) => a.map((v, i) => Math.round(v * t + b[i] * (1 - t)));
-  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
+  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'blue', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
   const out = {};
   const before = root.dataset.look;
   for (const look of ['light', 'sakura', 'washi']) {
@@ -424,7 +426,7 @@ const CONTRAST = `(() => {
     const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
     const wash = rgba('var(--kp-cyan-wash)');
     // the card panel, the second panel (tiles, kanji boxes; also the darkest texture tint), the page,
-    // the tinted 思い出せた button (12% green over the panel) and the accent wash (答えを見る, chosen settings)
+    // the tinted 正解 (Good) pad (12% green over the panel) and the accent wash (答えを見る, chosen settings)
     const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
     let min = { ratio: 99 };
     for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
@@ -450,19 +452,18 @@ async function verifyDelivery(browser, base) {
   const count = () => page.evaluate(`document.querySelector('.kp-count')?.textContent ?? null`);
   const logLength = (deck) => page.evaluate(`(JSON.parse(localStorage.getItem('bunki-cloze:${deck}') || 'null')?.log ?? []).length`);
   try {
-    // two grade buttons, even with the old four-button setting stored; 2 and 4 do nothing (F10, A05; contract §4)
+    // four grade pads in order, Again · Hard · Good · Easy, whatever button setting is stored (D1, the
+    // learner's 2026-10-08 decision; CARD_CONTRACT_V2 §4 as amended 2026-10-09, STANDARD A53)
     await boot('?deck=kotoba');
-    await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ grades: 'four' }))`);
+    await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ grades: 'two' }))`);
     await boot('?deck=kotoba');
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
-    const two = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), hard: document.querySelectorAll('#kp-grade-hard, #kp-grade-easy').length, hint: document.querySelector('.kp-swipehint')?.textContent, position: getComputedStyle(document.querySelector('.kp-grades')).position })`);
-    await page.keyboard.press('2');
-    await page.keyboard.press('4');
-    const keysIgnored = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
-    check('the grade bar shows もう一度 and 思い出せた only (a stored 難しい・簡単 setting is ignored), stays on screen (fixed), and keys 2 and 4 do nothing', two.n === 2 && two.hard === 0 && two.labels === 'Again/Recalled' && two.hint.includes('Recalled') && two.position === 'fixed' && keysIgnored, JSON.stringify({ ...two, keysIgnored }));
+    const four = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, ids: [...document.querySelectorAll('.kp-grades .kp-grade')].map((b) => b.id).join(), labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), keys: [...document.querySelectorAll('.kp-grade')].map((b) => b.getAttribute('aria-keyshortcuts')).join(), waits: [...document.querySelectorAll('.kp-grade small')].map((s) => s.textContent).join('/'), hint: document.querySelector('.kp-swipehint')?.textContent, position: getComputedStyle(document.querySelector('.kp-grades')).position })`);
+    const untouched = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
+    check('the grade bar shows Again · Hard · Good · Easy in that order (ids again, hard, good, easy; keys 1–4), each with an interval, whatever button setting is stored, and stays on screen (fixed)', four.n === 4 && four.ids === 'kp-grade-again,kp-grade-hard,kp-grade-good,kp-grade-easy' && four.labels === 'Again/Hard/Good/Easy' && four.keys === '1,2,3,4' && four.waits.split('/').length === 4 && four.waits.split('/').every((w) => /^[\d.]+ (min|hr|days|months|years)$/.test(w)) && four.hint.includes('Good') && four.position === 'fixed' && untouched, JSON.stringify({ ...four, untouched }));
 
     // swipes: a cancelled gesture or a mostly vertical one never grades; a sideways one does (F34)
     const gesture = (moves, last) =>
@@ -479,10 +480,10 @@ async function verifyDelivery(browser, base) {
     const vertical = await gesture([[255, 400]], ['pointerup', 255, 400]);
     const afterVertical = { count: await count(), log: await logLength('kotoba-mine') };
     await gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]);
-    const afterSwipe = { count: await count(), log: await logLength('kotoba-mine') };
+    const afterSwipe = { count: await count(), log: await logLength('kotoba-mine'), rating: await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log?.at(-1)?.[1] ?? null`) };
     check(
-      'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 思い出せた',
-      afterCancel.count === '1/15' && afterCancel.log === 0 && cancelled.transform === '' && cancelled.swipe === '' && afterVertical.count === '1/15' && afterVertical.log === 0 && vertical.transform === '' && afterSwipe.log === 1 && afterSwipe.count !== '1/15',
+      'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 正解 (Good, rating 3)',
+      afterCancel.count === '1/15' && afterCancel.log === 0 && cancelled.transform === '' && cancelled.swipe === '' && afterVertical.count === '1/15' && afterVertical.log === 0 && vertical.transform === '' && afterSwipe.log === 1 && afterSwipe.rating === 3 && afterSwipe.count !== '1/15',
       JSON.stringify({ afterCancel, afterVertical, afterSwipe }),
     );
 
@@ -505,7 +506,7 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-start');
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
-    // a new card answered 思い出せた comes back once in the sitting (its 10-minute step); the second answer ends it
+    // a new card answered 正解 (Good) comes back once in the sitting (its 10-minute step); the second answer ends it
     await page.click('#kp-grade-good');
     await page.click('#kp-reveal');
     await page.click('#kp-grade-good');
@@ -528,11 +529,60 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     const grades = await page.locator('.kp-grade').count();
-    check('in 4択 a 字 card shows no choices: hint, 答えを見る and the grade bar instead', kanji.chip === 'Kanji' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 2, JSON.stringify({ ...kanji, grades }));
+    check('in 4択 a 字 card shows no choices: hint, 答えを見る and the four-pad grade bar instead', kanji.chip === 'Kanji' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 4, JSON.stringify({ ...kanji, grades }));
+
+    // each key grades its own FSRS rating (1 Again, 2 Hard, 3 Good, 4 Easy) on its own card, and the
+    // interval it stores is the one its pad showed (a pad's text, read back as a range, holds the
+    // scheduled due minus the review time); then a ledger written by the two-button player (ratings 1
+    // and 3 only) loads unchanged and takes a Hard as one more row
+    const UNIT = { min: 60e3, hr: 36e5, days: 864e5, months: 30 * 864e5, years: 365 * 864e5 };
+    const holds = (text, ms) => {
+      const m = /^([\d.]+) (min|hr|days|months|years)$/.exec(text || '');
+      if (!m) return false;
+      const [n, u] = [Number(m[1]), UNIT[m[2]]];
+      const half = m[2] === 'years' ? 0.05 : 0.5;
+      return ms >= Math.max(0, n - half) * u - 2000 && ms < (n + half) * u + 2000;
+    };
+    await page.evaluate(`localStorage.removeItem('bunki-cloze:kotoba-mine'); localStorage.removeItem('bunki-cloze:prefs:v3:kotoba-mine')`);
+    await boot('?deck=kotoba');
+    await page.click('#kp-start');
+    const graded = [];
+    for (const [key, name] of [['1', 'again'], ['2', 'hard'], ['3', 'good'], ['4', 'easy']]) {
+      await page.waitForSelector('#kp-reveal');
+      await page.click('#kp-reveal');
+      await page.waitForSelector('.kp-grade');
+      const shown = await page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, wait: document.querySelector('#kp-grade-${name} small')?.textContent ?? null, log: (JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log ?? []).length })`);
+      await page.keyboard.press(key);
+      await page.waitForFunction(`(JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log ?? []).length === ${shown.log + 1}`, null, { timeout: 5000 });
+      const stored = await page.evaluate(`(() => { const s = JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine')); const row = s.log.at(-1); return { row, due: s.cards[row[0]]?.due ?? null }; })()`);
+      const ms = Date.parse(stored.due) - Date.parse(stored.row[2]);
+      graded.push({ key, name, card: shown.id, wait: shown.wait, row: stored.row.slice(0, 2), ms, holds: stored.row[0] === shown.id && stored.row[1] === Number(key) && holds(shown.wait, ms) });
+    }
+    check('keys 1–4 each grade their own rating (Again 1, Hard 2, Good 3, Easy 4) on the card on screen, and each stored interval is the one its pad showed', graded.length === 4 && graded.every((g) => g.holds) && new Set(graded.map((g) => g.card)).size === 4, JSON.stringify(graded));
+
+    const OLD = JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: 'kotoba-mine', groupsOff: [],
+      cards: {
+        'km-064-1': { due: '2020-01-01T00:00:00.000Z', stability: 3.2, difficulty: 5.1, elapsed_days: 3, scheduled_days: 3, learning_steps: 0, reps: 3, lapses: 1, state: 2, last_review: '2019-12-29T00:00:00.000Z', introducedAt: '2019-12-20T00:00:00.000Z' },
+        'km-065-1': { due: '2099-01-01T00:00:00.000Z', stability: 30, difficulty: 4.2, elapsed_days: 9, scheduled_days: 30, learning_steps: 0, reps: 2, lapses: 0, state: 2, last_review: '2019-12-28T00:00:00.000Z', introducedAt: '2019-12-20T00:00:00.000Z' },
+      },
+      log: [['km-064-1', 3, '2019-12-20T00:00:00.000Z'], ['km-065-1', 3, '2019-12-20T00:01:00.000Z'], ['km-064-1', 1, '2019-12-26T00:00:00.000Z'], ['km-064-1', 3, '2019-12-29T00:00:00.000Z'], ['km-065-1', 3, '2019-12-28T00:00:00.000Z']] });
+    await page.evaluate(`localStorage.setItem('bunki-cloze:kotoba-mine', ${JSON.stringify(OLD)}); localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ newPerDay: 0 }))`);
+    await boot('?deck=kotoba');
+    const oldHome = await page.evaluate(`({ due: document.querySelector('.kp-tiles .kp-c-due b')?.textContent ?? null, notice: document.querySelectorAll('.kp-notice').length, quarantine: localStorage.getItem('bunki-cloze:kotoba-mine:quarantine') })`);
+    await page.click('#kp-start');
+    await page.click('#kp-reveal');
+    await page.waitForSelector('#kp-grade-hard');
+    await page.keyboard.press('2');
+    await page.waitForFunction(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine')).log.length === 6`, null, { timeout: 5000 });
+    const after = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine'))`);
+    const before = JSON.parse(OLD);
+    check('a ledger written by the two-button player (ratings 1 and 3 only) loads as it is: its due card is counted, nothing is set aside, and a Hard adds one [id, 2, time] row after the old rows, the other record untouched',
+      oldHome.due === '1' && oldHome.notice === 0 && oldHome.quarantine === null && JSON.stringify(after.log.slice(0, 5)) === JSON.stringify(before.log) && after.log[5][0] === 'km-064-1' && after.log[5][1] === 2 && JSON.stringify(after.cards['km-065-1']) === JSON.stringify(before.cards['km-065-1']) && after.cards['km-064-1'].reps === 4,
+      JSON.stringify({ oldHome, last: after.log.at(-1), reps: after.cards['km-064-1']?.reps }));
 
     // every colour token clears 4.5:1 on the surfaces it sits on, in the light themes (F35, A20)
     const contrast = await page.evaluate(CONTRAST);
-    check('light themes: every text colour, the kind colours included, is at least 4.5:1 on the card, the second panel, the page, the 思い出せた button and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
+    check('light themes: every text colour, the kind colours and the four grade hues included, is at least 4.5:1 on the card, the second panel, the page, the 正解 pad and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
   } finally {
     await context.close();
   }
@@ -2073,9 +2123,9 @@ const PAINT = `(() => {
     state: color('.kp-st-new, .kp-st-learn'), target: color('.kp-target'), targetLine: card.querySelector('.kp-target') ? getComputedStyle(card.querySelector('.kp-target')).textDecorationLine : null,
     term: color('.kp-term'), gloss: color('.kp-gloss'), en: color('.kp-en'), tip: color('.kp-tip'),
     tipBar: card.querySelector('.kp-tip') ? getComputedStyle(card.querySelector('.kp-tip')).borderLeftWidth : null,
-    again: color('#kp-grade-again b'), good: color('#kp-grade-good b'),
+    again: color('#kp-grade-again b'), hard: color('#kp-grade-hard b'), good: color('#kp-grade-good b'), easy: color('#kp-grade-easy b'),
     cardTex: getComputedStyle(card).backgroundImage, pageTex: getComputedStyle(kp).backgroundImage,
-    tok: Object.fromEntries(['ink', 'ink-2', 'panel-2', 'kind-go', 'kind-ji', 'red', 'green', 'amber', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'].map((k) => [k, tok(k)])),
+    tok: Object.fromEntries(['ink', 'ink-2', 'panel-2', 'kind-go', 'kind-ji', 'red', 'green', 'amber', 'blue', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'].map((k) => [k, tok(k)])),
   };
   probe.style.color = 'var(--kp-panel-2)';
   out.tok['panel-2'] = getComputedStyle(probe).color;
@@ -2200,9 +2250,9 @@ async function verifyVisual(browser, base) {
       JSON.stringify({ kind: front.kind, edge: front.edge, chip: front.kindChipColor, target: back.target, state: front.state, level: front.level, chips: front.chips }),
     );
     check(
-      `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the grades are red and green`,
-      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && back.again === t.red && back.good === t.green,
-      JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, good: back.good }),
+      `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the four grades are red, amber, green and blue`,
+      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && back.again === t.red && back.hard === t.amber && back.good === t.green && back.easy === t.blue && new Set([t.red, t.amber, t.green, t.blue]).size === 4,
+      JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, hard: back.hard, good: back.good, easy: back.easy }),
     );
     await close(o);
   }
@@ -2292,7 +2342,7 @@ async function verifyVisual(browser, base) {
     const motion = await o.page.evaluate(MOTION);
     check(
       'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in (140 ms after a 40 ms delay, done by 180 ms) and the answer rises in 120–180 ms, opacity and transform only',
-      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 2 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && Math.round(kept.rtMs) <= 180 && motion.longest <= 180,
+      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 4 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && Math.round(kept.rtMs) <= 180 && motion.longest <= 180,
       JSON.stringify({ ...kept, longest: motion.longest }),
     );
     await o.page.evaluate(WATCH);
@@ -2310,7 +2360,7 @@ async function verifyVisual(browser, base) {
     await o.page.waitForSelector('#kp-reveal');
     const again = await o.page.evaluate(`({ seen: window.__kpSeen, advance: document.querySelector('.kp-study').dataset.advance })`);
     check(
-      'e) a grade slides the answered card out its way (思い出せた right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
+      'e) a grade slides the answered card out its way (正解 right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
       after.seen.length === 1 && after.seen[0].cls.includes('kp-out-good') && !after.seen[0].id && after.seen[0].ids === 0 && after.seen[0].hidden === 'true' && after.seen[0].inert && after.advance === 'good' && after.arrive && after.cards === 1 && gone === 0 &&
         again.seen.length === 1 && again.seen[0].cls.includes('kp-out-again') && again.advance === 'again' && rail0 === '0' && Math.abs(after.frac - after.want) < 1e-9 && after.prop === 'transform' && after.ms === 120,
       JSON.stringify({ good: after.seen[0]?.cls, again: again.seen[0]?.cls, gone, rail: [rail0, after.frac, after.prop, after.ms] }),
@@ -2358,7 +2408,7 @@ async function main() {
   verifyPilotData(deck);
   verifyFullRunData(deck);
   const said = (d) => (d.method ?? []).join('');
-  check('the method text names the same two buttons the player shows (もう一度／思い出せた), never 覚えた', said(deck).includes('「もう一度／思い出せた」') && said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
+  check('the method text names the same four grades the player shows (もう一度・難しい・正解・簡単), never the retired 思い出せた button or 覚えた', said(deck).includes('「もう一度・難しい・正解・簡単」') && ['「正解」', '「難しい」', '「簡単」', '「もう一度」'].every((g) => said(sentences).includes(g)) && !said(deck).includes('「思い出せた」') && !said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');

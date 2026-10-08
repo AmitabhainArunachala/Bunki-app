@@ -690,3 +690,43 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-sentence.kp-window[data-edge='below'] { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); }
 .kp .kp-sentence.kp-window[data-edge='above'] { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); }
 .kp .kp-sentence.kp-window[data-edge='both'] { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); }
+
+/* ======================================================================================
+ * Round 4 (2026-10-09), cards lane. The learner's 2026-10-08 tour, in three parts below: D1 (the
+ * four grades), T2 (the deck home), T8 and T9 (the card, front and back). Last in the file, so each
+ * rule wins at equal specificity. Every colour is still a --kp-* token of the look
+ * (tools/contrast-kotoba.mjs measures them); fronts gain no reading, English or answer node; motion
+ * stays transform and opacity, under 180 ms, and none of it runs under reduced motion.
+ * ====================================================================================== */
+
+/* ---- D1: "Four (Again · Hard · Good · Easy) — and color coded" (CARD_CONTRACT_V2 §4, amendment
+ * 2026-10-09). --kp-blue is 簡単's hue (Easy), one per look, read by contrast-kotoba. ---- */
+.kp { --kp-blue: #8fb2ff; }
+.kp[data-look='light'] { --kp-blue: #1f4fae; }
+.kp[data-look='ai'] { --kp-blue: #26518c; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] { --kp-blue: #a3bdf6; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai']:has(> .kp-study) { --kp-blue: #26518c; }
+.kp[data-look='washi'] { --kp-blue: #284f8e; }
+.kp[data-look='sakura'] { --kp-blue: #2a4f9e; }
+.kp[data-look='matcha'] { --kp-blue: #9cc2ff; }
+.kp[data-look='kokuban'] { --kp-blue: #89a6ff; } /* clear of the 字 hue #8fd8ff (ΔE_ok 13.5) */
+.kp[data-look='contrast'] { --kp-blue: #6fb8ff; }
+
+/* four pads in a row: the hue on the word and on a 2px top edge, restrained; only 正解 (Good), the
+ * expected answer, is tinted, as before. Each pad's small line is the interval the scheduler gives
+ * that answer now. A press answers at once (scale, 90 ms). */
+.kp .kp-grades { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 6px; }
+.kp .kp-grade { --kp-hue: var(--kp-ink-2); min-height: 58px; padding: 7px 2px 8px; border-radius: 10px; border: 1px solid var(--kp-line); border-top: 2px solid var(--kp-hue); background: var(--kp-panel); gap: 3px; box-shadow: var(--kp-depth); transition: transform 90ms cubic-bezier(0.2, 0, 0, 1); }
+.kp .kp-grade b { color: var(--kp-hue); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.2; }
+.kp .kp-grade small { font-family: var(--kp-num); font-size: 12px; letter-spacing: 0.02em; color: var(--kp-ink-2); line-height: 1.2; }
+.kp .kp-again { --kp-hue: var(--kp-red); }
+.kp .kp-hard { --kp-hue: var(--kp-amber); }
+.kp .kp-good { --kp-hue: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); }
+.kp .kp-easy { --kp-hue: var(--kp-blue); }
+.kp .kp-grade:active { transform: scale(0.96); }
+/* in 日本語 the seal (再 難 良 易) is the pad's face, in its hue, and the word a caption under it */
+.kp .kp-grade-seal, .kp .kp-again .kp-grade-seal, .kp .kp-good .kp-grade-seal { font-size: 20px; color: var(--kp-hue); }
+.kp .kp-grade:has(.kp-grade-seal) b { font-size: 11px; letter-spacing: 0.04em; }
+@media (prefers-reduced-motion: reduce) {
+  .kp .kp-grade:active { transform: none; }
+}

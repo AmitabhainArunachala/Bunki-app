@@ -259,7 +259,7 @@ const UI_EN = {
   "出典": "Source",
   "もう一度": "Again",
   "思い出せた": "Recalled",
-  "← もう一度　　スワイプ　　思い出せた →": "← Again　　Swipe　　Recalled →",
+  "← もう一度　　スワイプ　　正解 →": "← Again　　Swipe　　Good →",
   "このヒントを閉じる": "Dismiss this hint",
   "おつかれさま": "Session complete",
   "回答": "Answers",
@@ -362,11 +362,11 @@ const UI_EN = {
   "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。": "One passage can supply several cards, with one target per card. As a word settles, the next passage opens with a different context.",
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech and Japanese definition. Open the folds for English meaning, sentence translation, kanji details, other passages and sources.",
   "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。": "Tap words in the revealed passage or Japanese definition to look them up. Bunki can also save them. Lookups do not grade the card or change its schedule.",
-  "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。": "Again and Recalled are sufficient for FSRS-6. Choose Again when unsure.",
+  "判定は「もう一度・難しい・正解・簡単」の四つ（FSRS-6）。迷ったら「もう一度」。": "Four grades: Again, Hard, Good and Easy (FSRS-6). Choose Again when unsure.",
   "N1〜N3 の札は、公開の JLPT 語彙リスト（open-anki-jlpt-decks 系、2010年以前の旧基準）による目安。JLPT は公式の語彙リストを出していない。リストに載っていない語には札がない。": "N1–N3 labels are estimates from public vocabulary lists based on pre-2010 standards. JLPT publishes no official vocabulary list. Words absent from those lists carry no level label.",
   "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。": "This is a targeted sentence-card deck: one sentence, one word.",
   "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。": "The front shows a real Japanese sentence with the target marked. Readings and English stay hidden. Read, recall the meaning, then tap.",
-  "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「思い出せた」、だめなら「もう一度」。": "The back first shows readings, part of speech and a Japanese definition. Open folds for English, sentence translation, kanji details and sources. Choose Recalled if you recalled it; otherwise choose Again.",
+  "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「正解」（時間がかかったら「難しい」、すぐなら「簡単」）、だめなら「もう一度」。": "The back first shows readings, part of speech and a Japanese definition. Open folds for English, sentence translation, kanji details and sources. Choose Good if you recalled it (Hard if it took effort, Easy if it came at once); otherwise choose Again.",
   "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。": "Common words have two or three sentences. Once the first settles, in roughly two weeks, the next sentence opens.",
   "N2・N1 相当の語を、一枚に一つ、4〜5文の文章の中で覚えるデッキです。ふだんは「読んで思い出す」で解きます。": "This deck teaches one N2- or N1-equivalent word per card inside an original passage of four or five sentences. Read and recall is the default.",
   "表：このデッキのために書いた文章。覚える言葉は色つき。読み・英語は出ない。読んで、意味と読みを思い出してからタップ。": "The front shows an original passage with the target marked. Readings and English stay hidden. Read, recall its meaning and reading, then tap.",
@@ -1771,28 +1771,39 @@ function sourceFold(card) {
   return fold('kp-f-src', t("出典"), false, p);
 }
 
-/** もう一度／思い出せた, nothing else (CARD_CONTRACT_V2 §4: Hard and Easy are not shown).
- * Under the bar, once per deck until dismissed or answered, the rule for choosing. */
+/** The four grades, in order (CARD_CONTRACT_V2 §4 as amended 2026-10-09, the learner's D1: "Four
+ * (Again · Hard · Good · Easy) — and color coded"): [name, 日本語, English, seal, key]. The FSRS
+ * rating is RATINGS[name] (1 · 2 · 3 · 4), the key its number. Hard is a pass (recalled, with effort). */
+const GRADES = [
+  ['again', 'もう一度', 'Again', '再', '1'],
+  ['hard', '難しい', 'Hard', '難', '2'],
+  ['good', '正解', 'Good', '良', '3'],
+  ['easy', '簡単', 'Easy', '易', '4'],
+];
+/** Under the bar, once per deck until dismissed or answered, the rule for choosing. */
 const RULE = '答えを見て理解が深まったなら もう一度';
 function gradeBar(id) {
+  // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
   const bar = el('div', 'kp-grades');
-  // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 and 良); English shows the word only
+  // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 難 良 易); English shows the word only
   const seal = (glyph) => {
     if (ctx.english !== false) return null;
     const n = el('span', 'kp-grade-seal', glyph);
     n.setAttribute('aria-hidden', 'true');
     return n;
   };
-  const g = (name, label, cls, key) =>
-    btn(`kp-grade ${cls}`, [seal(name === 'again' ? '再' : '良'), el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
-      id: `kp-grade-${name}`,
-      'aria-keyshortcuts': key,
-    });
-  bar.append(g('again', t("もう一度"), 'kp-again', '1'), g('good', t("思い出せた"), 'kp-good', '3'));
+  for (const [name, ja, en, glyph, key] of GRADES) {
+    bar.append(
+      btn(`kp-grade kp-${name}`, [seal(glyph), el('b', null, t(ja, en)), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
+        id: `kp-grade-${name}`,
+        'aria-keyshortcuts': key,
+      }),
+    );
+  }
   // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
   // pads' way after that)
-  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
+  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　正解 →")));
   if (!ctx.prefs.ruleSeen) {
     const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
@@ -2036,14 +2047,14 @@ function commit(rating, { stay = false } = {}) {
   ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
   ctx.state = nextState;
   ui.done++;
-  if (rating >= RATINGS.good) ui.right++;
+  if (rating >= RATINGS.hard) ui.right++;
   const answered = ctx.index.cards.get(id)?.word;
-  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.good });
+  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard });
   if (stay) {
     paint();
     return;
   }
-  next(rating >= RATINGS.good ? 'good' : 'again');
+  next(rating >= RATINGS.hard ? 'good' : 'again');
 }
 
 /**
@@ -2143,7 +2154,7 @@ function undo() {
 }
 
 /**
- * Swipe right = 思い出せた, left = もう一度. Only the finger that started the
+ * Swipe right = 正解 (Good), left = もう一度 (Again). Only the finger that started the
  * swipe counts; it must travel more than 90px and at least twice as far
  * sideways as up or down, and be lifted (pointerup). A cancelled gesture (the
  * page scrolled, the system took the touch) only puts the card back.
@@ -2203,7 +2214,7 @@ function attachSwipe(face) {
 
 /**
  * The session close: the surface is clear. The words of this sitting rise off the card table
- * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (思い出せた),
+ * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (難しい, 正解, 簡単),
  * again (もう一度) and the time since 始める, the recall rate, when the next review falls due,
  * and one door: back to the deck.
  */
@@ -2473,7 +2484,7 @@ function onKey(e) {
   if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
     if (mode !== 'choice') reveal();
-  } else if (ui.revealed && mode !== 'choice' && (e.key === '1' || e.key === '3')) {
+  } else if (ui.revealed && mode !== 'choice' && ['1', '2', '3', '4'].includes(e.key)) {
     e.preventDefault();
     commit(Number(e.key));
   } else if (ui.revealed && mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {
