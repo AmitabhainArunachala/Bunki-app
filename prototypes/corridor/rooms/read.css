@@ -625,3 +625,6 @@ html[data-room='reader'] body #reader-tip .reader-tip-close .ui-icon { width: 14
 @media (max-width: 520px) {
   html[data-room='reader'] body[data-view='reader']:not(.zen):has(.listen-row.is-pending):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
 }
+/* in the Tools sheet every filter keeps a full 44px touch target */
+html[data-room='shelf'] #shelf-body .shelf-tools-filters :is(.filter-chip, .filter-search, .shelf-filter-help > summary) { min-height: 44px; }
+html[data-room='shelf'] #shelf-body .shelf-tools-filters .shelf-filter-help > summary { min-width: 44px; }
