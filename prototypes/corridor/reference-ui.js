@@ -149,7 +149,7 @@
         )),
         node('p', null, tx(
           'JLPT の級は資料ごとのタグです。現在の試験には公式の語彙・漢字・文法の網羅的な出題一覧はありません。辞書層と語彙層を合わせ、N1 も収録。級が異なる項目は各資料の級に表示し、相違を明記しています。漢字の JLPT タグは別資料です。',
-          'Bunki groups these entries using the level labels in its dictionaries. The JLPT does not publish a complete list of the vocabulary, kanji or grammar that can appear on the exam. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
+          'KAIRO groups these entries using the level labels in its dictionaries. The JLPT does not publish a complete list of the vocabulary, kanji or grammar that can appear on the exam. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
         )),
       );
       const jlptLink = node('a', null, tx('JLPT 公式ガイドブック · Q7–Q8', 'Official JLPT guidebook · Q7–Q8'));

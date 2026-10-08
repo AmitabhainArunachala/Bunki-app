@@ -588,7 +588,7 @@ export function createGuidedSession(host) {
     const returning = state.finished;
     const infos = cardInfo(fieldKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
-    return `<section class="gs-arrival"><div class="gs-intro"><span class="gs-eyebrow">Bunki <span class="gs-dot">/</span> ${bi('生きた糸', 'a living thread')}</span>
+    return `<section class="gs-arrival"><div class="gs-intro"><span class="gs-eyebrow"><span class="gs-brand-mark" lang="ja">回廊</span> KAIRO <span class="gs-dot">/</span> ${bi('案内つきの練習', 'guided practice')}</span>
       <h1 class="gs-title gs-hero" tabindex="-1">${returning ? t('糸の続きを、<br>たどろう。', 'Pick up<br>your thread.') : t('十五分、<br>日本語と<br>ともに。', 'Spend fifteen<br>minutes with<br>Japanese.')}</h1>
       <p class="gs-lede">${
         returning
@@ -645,7 +645,7 @@ export function createGuidedSession(host) {
             'ゆっくり見ていい。必要なら解説がある。',
             'There is time to look closely. An explanation is here if you need it.',
           )
-    }</p>${textBtn(a.flagged ? bi('旗を外す', 'flagged · remove the flag') : bi('あとで見直す', 'flag for another look'), 'flag', `aria-pressed="${a.flagged}"`)}${textBtn(bi('保存して離れる', 'save and leave · your place is kept'), 'leave')}</div><div class="gs-rule"><span class="gs-eyebrow">${t(`問 ${state.index + 1} / ${Q.length}`, `Question ${state.index + 1} of ${Q.length}`)}</span><p>${t('Bunki オリジナル練習', 'Original Bunki practice')}<br>${set.level} · ${t('筆記', 'written')}</p><details class="gs-details"><summary>${bi('出典', 'source details')}</summary><p>${esc(q.source.label)}<br>${t(`元の問題: ${esc(q.source.status)}（AI審査済みの練習）。追加の解説: 下書き。`, `Original item: ${esc(q.source.status)} (AI-reviewed practice). Added teaching copy: authored draft.`)}</p><p class="gs-source-id">${esc(q.source.ref)}</p></details>${state.finished ? textBtn(bi('場へ戻る', 'back to your field'), 'field') : ''}</div></aside>`;
+    }</p>${textBtn(a.flagged ? bi('旗を外す', 'flagged · remove the flag') : bi('あとで見直す', 'flag for another look'), 'flag', `aria-pressed="${a.flagged}"`)}${textBtn(bi('保存して離れる', 'save and leave · your place is kept'), 'leave')}</div><div class="gs-rule"><span class="gs-eyebrow">${t(`問 ${state.index + 1} / ${Q.length}`, `Question ${state.index + 1} of ${Q.length}`)}</span><p>${t('回廊オリジナルの練習', 'Original KAIRO practice')}<br>${set.level} · ${t('筆記', 'written')}</p><details class="gs-details"><summary>${bi('出典', 'source details')}</summary><p>${esc(q.source.label)}<br>${t(`元の問題: ${esc(q.source.status)}（AI審査済みの練習）。追加の解説: 下書き。`, `Original item: ${esc(q.source.status)} (AI-reviewed practice). Added teaching copy: authored draft.`)}</p><p class="gs-source-id">${esc(q.source.ref)}</p></details>${state.finished ? textBtn(bi('場へ戻る', 'back to your field'), 'field') : ''}</div></aside>`;
   }
 
   function choices(options, value, locked, name, correct) {
@@ -837,7 +837,7 @@ export function createGuidedSession(host) {
                 return `<span class="gs-card-line">${deckLine(card.key, card.status, info)}${retry}</span>`;
               })
               .join('')
-          : `<span class="gs-card-line"><span class="gs-card" data-deck="none">${t('この型の札は、まだ Bunki にない。行が元の問題を覚えている。', 'Bunki has no card for this pattern yet. The row keeps your question.')}</span></span>`;
+          : `<span class="gs-card-line"><span class="gs-card" data-deck="none">${t('この型の札は、まだ回廊にない。行が元の問題を覚えている。', 'KAIRO has no card for this pattern yet. The row keeps your question.')}</span></span>`;
         const practise = !row.removed
           ? textBtn(
               row.reviewed ? bi('もう一度', 'revisit practice') : bi('練習', 'practise'),
