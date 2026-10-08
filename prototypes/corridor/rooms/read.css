@@ -1120,6 +1120,23 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
 :root body:not([data-view='drift']) #mini.is-sentence .mini-word { font-size: 24px; }
 :root body:not([data-view='drift']) #mini.is-sentence :is(.mini-reading, .mini-gloss) { margin: 0; font-size: 15px; }
 
+/* a narrow phone (320–360): the same bands, set tighter, so the card still fits above its word; every
+   target keeps its 44px */
+@media (max-width: 360px) {
+  :root body:not([data-view='drift']) #mini .mini-head { padding: 8px 6px 9px 14px; }
+  :root body:not([data-view='drift']) #mini .mini-word { font-size: 26px; }
+  :root body:not([data-view='drift']) #mini :is(.mini-reading, .mini-gloss) { font-size: 15px; }
+  :root body:not([data-view='drift']) #mini .mini-actions { padding: 6px 12px; gap: 6px 10px; }
+  :root body:not([data-view='drift']) #mini .mini-take { min-width: 96px; padding: 0 14px; }
+  :root body:not([data-view='drift']) #mini .mini-take-note { font-size: 12.5px; }
+  :root body:not([data-view='drift']) #mini .mini-web { padding: 0 10px 2px 14px; }
+  :root body:not([data-view='drift']) #mini .mini-band-head { height: 32px; }
+  :root body:not([data-view='drift']) #mini .mini-kanji-row { min-height: 44px; padding: 2px 0; }
+  :root body:not([data-view='drift']) #mini .mini-kanji-glyph { width: 36px; height: 36px; font-size: 21px; }
+  :root body:not([data-view='drift']) #mini .mini-sentence-open { min-height: 46px; padding: 5px 12px 6px 14px; }
+  :root body:not([data-view='drift']) #mini .mini-sentence-quote { font-size: 13px; }
+}
+
 /* press: every control answers the finger at once; focus is a clear ring */
 :root body:not([data-view='drift']) #mini :is(.mini-take, .mini-lists, .mini-entry, .mini-web-open, .mini-sentence-open, .mini-sentence-back, .mini-sentence-action, .mini-kanji-row, .mini-card-word) {
   transition: transform 90ms var(--mini-press), background-color 120ms var(--mini-press);

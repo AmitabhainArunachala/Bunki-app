@@ -8476,6 +8476,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     lists.setAttribute('aria-expanded', 'false');
     lists.addEventListener('click', (event) => {
       event.stopPropagation();
+      // another control was used between two Save presses: the next one is a choice, not a bounce
+      pressedAt = -Infinity;
       openVocabularyListPopover(captureNode, token.b, lists);
     });
     actions.append(lists);
