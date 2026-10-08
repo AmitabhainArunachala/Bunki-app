@@ -16,7 +16,8 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 | `#tray` count | always shown, "0" | the count shows only when you have saved words; at 0 the bookmark is quiet | 0 | (same) | skin (D7) |
 | `#chrome-dojo` (Learn cap) | Learn | Learn; a small ink dot appears when cards are due, and its name says how many ("Learn · 3 due") | 学ぶ | 学ぶ・復習 3 | skin (D7) |
 | `#theme-seal` and the picker's name | choose a world | Colour theme | 世界を選ぶ | 配色を選ぶ | skin |
-| World picker | ten unnamed stones | the stones in two labelled rows, **Day** and **Night**; Night offers both 金 (藍 night) and 殻 (electric) | — | 昼 · 夜 | skin (D2) |
+| World picker | ten unnamed stones | the stones in two labelled rows, **Day** and **Night**; Night offers both 金 (藍 night) and 殻 (electric); a line beneath names the world in words ("Gold on indigo", "Electric phosphor") | — | 昼 · 夜; ベロ藍・浪 … | skin (D2) |
+| Top line crumb on wide screens, in the Today room (`render()`) | lists | Today *(the tray is the Today tab's room)* | リスト | 今日 | skin (`verify-pr77-ports` pin widened, logged) |
 | Reader picture credit (`readerPicture`, read lane's function, one string) | Illustration · Bunki | Illustration · 回廊 KAIRO | 挿絵 · Bunki | 挿絵 · 回廊 KAIRO | skin (D3) |
 | Shelf sort option | New to Bunki | Newly added | 新着 | 新着 | skin (D3) |
 | Grammar that cannot be saved | This grammar pattern is not in Bunki’s list, so it can’t be memorized. | This grammar pattern isn’t in KAIRO’s grammar list yet, so it can’t become a card. | この文法は一覧にないため、覚えられない。 | この文法はまだ一覧にないため、札にできない。 | skin (D3) |
