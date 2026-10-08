@@ -34,7 +34,7 @@ You asked for an app that is "elegant and refined but also engageble and addivti
 
 ## The ambition: "massive money and splash"
 
-Each rival (Duolingo, WaniKani, Bunpro, Satori, Migaku, Renshuu, LingQ) owns one room; none owns the house. Duolingo gets you started; Bunki gets you fluent, and in love. People share awe, never a score: the kanji dive, their sky, *a page I couldn't read last month*. Free forever: dictionary, your cards, due reviews. One tasteful subscription for decks, voices, sensei, mocks. The App Store via the native shell already built; every licence cleared before the first yen. It earns only if it is clean end to end.
+Each rival (Duolingo, WaniKani, Bunpro, Satori, Migaku, Renshuu, LingQ) owns one room; none owns the house. Duolingo gets you started; Bunki gets you fluent, and in love. People share awe, never a score: the kanji dive, their sky, *a page I couldn't read last month*. Free forever: dictionary, your cards, due reviews.  The App Store via the native shell already built; every licence cleared before the first yen. It earns only if it is clean end to end.
 
 ## Two tracks: "show me both"
 
@@ -138,14 +138,15 @@ All runs are Chromium in the cloud plus GitHub CI on the same head. Full table: 
 - **Content:** the tokenizer splits ジャラマナ in the lead story (a content-pipeline fix).
 - **Not built yet:** first-day onboarding, the premium preview, share frames.
 
-# Open decisions for you (nothing is blocked on them)
-1. Grade buttons: the judges' growth lead suggests two by default; four are pinned today.
-2. Night: bring back your 08-13 殻 electric world, or keep 藍 night?
-3. Name: Bunki or 回廊 KAIRO?
-4. Samurai on a wrong answer: paper theatre or blood (this sets the age rating)?
-5. Your N1 date and your four fields (they set the Me horizons).
-6. Price: the vision proposes US$12/month · US$96/year, with a founding lifetime tier.
-7. Retire the header's duplicate Learn/Lists icons (this needs ~60 verifier selector updates)?
+# Your decisions (2026-10-08 22:31 JST) and what they set in motion
+Your words are on #126 and in `docs/redesign/vision/JOHN_10-08_TOUR_FEEDBACK.md`.
+- **D1 Four grades, colour-coded:** being built into the deck player. This is a deliberate change to the deck contract (`docs/srs/CARD_CONTRACT_V2.md`), noted there and in `VERIFIER_CHANGES.md`.
+- **D2 Both night looks:** both stay selectable as worlds: 藍 night and the electric 殻 (`kaku`).
+- **D3 回廊 KAIRO:** the visible name. The remaining "Bunki" captions are being replaced.
+- **D4 Blood:** noted. It raises the age rating (App Store 12+ for realistic violence, likely), so it has to be weighed before the store submission.
+- **D5 N1 July 2027 and your three fields:** these go into Me's horizons.
+- **D6 Price:** removed. No price talk until it's ready.
+- **D7 Keep the Learn/Lists icons for now:** kept, quieter.
 
 ---
 Progress log with UTC times: [`CLOUD_LOG.md`](https://github.com/AmitabhainArunachala/Bunki-app/blob/claude/redesign-20261008/docs/redesign/CLOUD_LOG.md).
