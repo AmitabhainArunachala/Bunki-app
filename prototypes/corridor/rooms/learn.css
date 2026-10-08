@@ -401,13 +401,14 @@ html[data-room='learn'] body:not([data-view='drift']) #app .dojo-deck-bar::befor
 html[data-room='learn'] body:not([data-view='drift']) #app .focus-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0; }
 html[data-room='learn'] body:not([data-view='drift']) #app .focus-chip { min-height: 48px; margin: 0; border-radius: var(--radius-small); }
 html[data-room='learn'] body:not([data-view='drift']) #app .focus-chip-n { font: 700 17px/1 var(--font-data); font-variant-numeric: tabular-nums; }
-html[data-room='learn'] body:not([data-view='drift']) #app .focus-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 14px; }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 0 0 14px; }
 html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   gap: 4px;
+  min-width: 0;
   min-height: 76px;
   margin: 0;
   padding: 10px;
@@ -419,7 +420,7 @@ html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode {
 }
 html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode.on { border-color: var(--color-accent); background: var(--color-tint-wash); box-shadow: inset 3px 0 0 var(--color-accent); }
 html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode-t { font: 700 14px/1.25 var(--font-ui); color: var(--color-ink); }
-html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode-sub { font: 400 11.5px/1.35 var(--font-ui); color: var(--color-muted); text-wrap: pretty; word-break: auto-phrase; }
+html[data-room='learn'] body:not([data-view='drift']) #app .focus-mode-sub { font: 400 11.5px/1.35 var(--font-ui); color: var(--color-muted); text-wrap: pretty; word-break: auto-phrase; overflow-wrap: anywhere; max-width: 100%; }
 html[data-room='learn'] body:not([data-view='drift']) #app .take.focus-start {
   display: inline-flex;
   align-items: center;
