@@ -144,7 +144,7 @@ All runs are Chromium in the cloud plus GitHub CI on the same head. Full table: 
 3. Name: Bunki or 回廊 KAIRO?
 4. Samurai on a wrong answer: paper theatre or blood (this sets the age rating)?
 5. Your N1 date and your four fields (they set the Me horizons).
-6. Price: the vision proposes 2/month · 6/year, with a founding lifetime tier.
+6. Price: the vision proposes US$12/month · US$96/year, with a founding lifetime tier.
 7. Retire the header's duplicate Learn/Lists icons (this needs ~60 verifier selector updates)?
 
 ---
