@@ -87,7 +87,9 @@ describe('sw.js shell', () => {
   });
 
   it('precaches the six room stylesheets, registered once after editorial.css', () => {
-    const rooms = ['today', 'read', 'learn', 'words', 'me', 'cards'].map((room) => `rooms/${room}.css`);
+    const rooms = ['today', 'read', 'learn', 'words', 'me', 'cards'].map(
+      (room) => `rooms/${room}.css`,
+    );
     const shell = shellPaths(SW);
     expect(shell).toEqual(expect.arrayContaining(rooms));
     expect(shell.indexOf('rooms/today.css')).toBe(shell.indexOf('editorial.css') + 1);
