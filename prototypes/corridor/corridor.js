@@ -9621,11 +9621,12 @@ function renderReader(main) {
     S.dialsOpen = !S.dialsOpen;
     render();
   });
-  // the listen door: an article without a recording says so as one muted mark at the end of the
-  // instrument line (音声未収録 · Kore), not a strip of its own; a narrated article's play bar stands
-  // below, where it docks over the text on a phone
+  // the listen door: on a phone an article without a recording says so as one muted mark at the end
+  // of the instrument line (音声未収録 · Kore), not a strip at the foot; a narrated article's play bar,
+  // and a desk's relief-edged row, stand below the head as before
   const listenRow = buildListenRow(p);
-  if (listenRow.classList.contains('is-pending')) meta.append(listenRow);
+  const listenInLine = listenRow.classList.contains('is-pending') && matchMedia('(max-width: 520px)').matches;
+  if (listenInLine) meta.append(listenRow);
   head.append(meta, dialsToggle);
   main.append(head);
   const versions = storyVersions(p);
@@ -9690,7 +9691,7 @@ function renderReader(main) {
   }
 
   // a narrated article's listen door — one tap to hear the article, one tap to stop
-  if (!listenRow.classList.contains('is-pending')) main.append(listenRow);
+  if (!listenInLine) main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
   renderReaderTip(main);
 
