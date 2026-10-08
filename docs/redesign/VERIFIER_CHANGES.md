@@ -522,3 +522,11 @@ Review #6 folded the four shelf filters (`#shelf-filter-*`) and the article sear
 | `verify-vocabulary-chooser.mjs` `reader()` and the shelf-tally check | fills `#shelf-reading-search` directly | `await openShelfTools(page)` first | Flow only; tallies and results unchanged. |
 | `verify-experience.mjs:165`, `verify-journey.mjs:363`, `verify-skip-ui.mjs:229` | button name `/back to lists\|リストへ/` | `/back to lists\|リストへ\|Back to Today\|今日へ/` | Label only. The button is still `.close-doors .take` (pinned by class in many suites), still returns to the tray, and every assertion after the press is unchanged. |
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs` (~l.1561) | check 6, swipe hint in the third sitting | `third.swipe` (the swipe hint under the grade pads shows in the first three sittings) → `!third.swipe` (it shows on the first back of the first sitting only); description updated | Visibility only (fix round 3, deck: no help in prime space). The tap-hint pins for three sittings, `first.swipe` on the first back, the gone-from-the-fourth pins on both decks, `prefs.sittings` counting and the gesture itself (swipe grading checks) are unchanged. `contrast-kotoba.mjs` only gained rows: a `dock` pair for every look and the `ai·night` / `ai·night·study` variants. |
+
+## Integration (2026-10-08, cloud): kotoba-mine reads the list drawer after it redraws
+
+`the sheet then says where the word went` read `#sheet .list-picker .fold-sub` straight after `waitForAppRecord` saw the new list's membership. The app commits first and then re-renders the sheet (`tryMake` → `commitStorePatch` → `render()`), so reading the DOM in the gap between those two steps showed the old "saved to: daily review" line. With the redesigned rooms that gap is wider, and CI failed on `1f1787af`.
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-kotoba-mine.mjs` (one-tap save, list drawer) | read `.fold-sub` immediately | first `waitForFunction` (≤5 s) for the drawer to include the list name, then read it | Timing only. The assertion is unchanged: the drawer must say `経済ニュース`. A drawer that never updates still fails. |

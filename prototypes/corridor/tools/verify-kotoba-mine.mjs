@@ -2465,6 +2465,9 @@ async function main() {
       (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
     check('the new list receives the word, still one card', listed.taken.length === 1 &&
       listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
+    // the commit resolves before the sheet re-renders: wait (bounded) for the drawer to redraw, then read it
+    await page.waitForFunction(() => (document.querySelector('#sheet .list-picker .fold-sub')?.textContent || '').includes('経済ニュース'),
+      null, { timeout: 5000 }).catch(() => {});
     const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
     check('the sheet then says where the word went', where.includes('経済ニュース'), where);
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
