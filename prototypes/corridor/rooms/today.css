@@ -505,6 +505,7 @@ html[data-room='tray'] .today-dayword :is(.dw-word, .dw-go) { pointer-events: au
 html[data-room='tray'] .today-star.kin { opacity: 0.82; font-weight: 500; color: var(--color-accent); }
 html[data-room='tray'] .today-star.read { opacity: 0.6; }
 html[data-room='tray'] .today-star.far { opacity: 0.34; font-weight: 500; color: var(--color-ink-2); }
+html[data-room='tray'] .today-star.glyph { opacity: 0.24; font-weight: 500; color: var(--color-ink); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.kin {
   color: color-mix(in srgb, var(--color-gold) 62%, var(--color-ink));
   text-shadow: 0 0 10px color-mix(in srgb, var(--color-gold) 38%, transparent);

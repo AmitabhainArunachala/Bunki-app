@@ -11140,6 +11140,10 @@ function todaySky(dayWord, today, readPick) {
     const hand = hands[[0, 1, 2, 2][i % 4]];
     if (hand.length) dealt.push(hand.shift());
   }
+  // "words and kanji floating by" (his Renzo opening screen): two single kanji from today's
+  // reading drift among the words, large and faint, each one a door to its own page
+  const glyphs = [...new Set(reading.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2);
+  glyphs.forEach((kanji, i) => dealt.splice(1 + i * 4, 0, { kanji, kind: 'glyph' }));
   const stars = [
     ...due.slice(0, 14).map((item) => ({ item, kind: 'due' })),
     ...rest.map((item) => ({ item, kind: 'mine' })),
@@ -11151,14 +11155,14 @@ function todaySky(dayWord, today, readPick) {
     return layer;
   });
   sky.append(...layers);
-  sky.todayStars = stars.map(({ item, word, kind }, i) => {
-    const depth = kind === 'due' || kind === 'kin' ? 3 : kind === 'far' ? 1 : kind === 'read' ? 2 : r() < 0.55 ? 1 : 2;
-    const star = todayLearning('button', `today-star ${kind}${kind === 'due' ? ' due' : ''}`, item ? item.label : word);
+  sky.todayStars = stars.map(({ item, word, kanji, kind }, i) => {
+    const depth = kind === 'due' || kind === 'kin' ? 3 : kind === 'far' || kind === 'glyph' ? 1 : kind === 'read' ? 2 : r() < 0.55 ? 1 : 2;
+    const star = todayLearning('button', `today-star ${kind}${kind === 'due' ? ' due' : ''}`, item ? item.label : word || kanji);
     star.type = 'button';
     star.tabIndex = -1;
     star.dataset.depth = String(depth);
     star.style.setProperty('--d', `${(i % 7) * 0.9}s`);
-    star.addEventListener('click', () => go(item ? learningItemNode(item) : { t: 'word', id: word }, { invoker: star }));
+    star.addEventListener('click', () => go(item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word }, { invoker: star }));
     layers[depth - 1].append(star);
     return star;
   });
@@ -11222,7 +11226,8 @@ function todayPlaceSky(hero) {
   const H = R.height - 96;
   for (const star of sky.todayStars) {
     // three clear sizes, none too small to read: near (due, the day's family), middle, far
-    const size = star.classList.contains('due') ? 19 : star.dataset.depth === '3' ? 18 : star.dataset.depth === '2' ? 16 : 14;
+    const size = star.classList.contains('glyph') ? 26 : star.classList.contains('due') ? 19
+      : star.dataset.depth === '3' ? 18 : star.dataset.depth === '2' ? 16 : 14;
     star.style.fontSize = `${size}px`;
     const bw = [...star.textContent].length * size + 10;
     const bh = size + 12;
@@ -11299,7 +11304,8 @@ function renderTodayLine(today, door, read, pick) {
   const cards = today ? today.order.length : 0;
   if (today) stops.append(stop(cards ? 'stop-cards now' : 'stop-cards', cards, tx('枚のカード', cards === 1 ? 'card' : 'cards')));
   if (read) stops.append(stop(!cards ? 'stop-read now' : 'stop-read', 1, tx('本の記事', 'article')));
-  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語の散歩', 'word walk')));
+  // plain words (round 4): the stop names what the hero's own door does, "Follow 日"
+  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語をたどる', 'word to follow')));
   stops.style.setProperty('--stops', String(stops.children.length));
   card.append(stops);
   if (cards) {
@@ -30638,19 +30644,19 @@ function meN1Plate(h) {
   const count = el('p', 'me-n1-count');
   if (days > 0) {
     const n = el('b', 'me-n1-days', meNum(days));
-    if (bi()) count.append(n, el('span', 'me-n1-unit', days === 1 ? 'day to go' : 'days to go'));
+    if (bi()) count.append(n, el('span', 'me-n1-unit', days === 1 ? 'day to the test' : 'days to the test'));
     else count.append(el('span', 'me-n1-unit', 'あと'), n, el('span', 'me-n1-unit', '日'));
   } else {
     count.classList.add('is-done');
     count.append(el('span', 'me-n1-unit', days === 0
-      ? tx('今日が試験の日', 'The sitting is today')
-      : tx(`${ME_N1_SITTING.year}年7月の試験は過ぎた`, `The July ${ME_N1_SITTING.year} sitting has passed`)));
+      ? tx('今日が試験の日', 'The test is today')
+      : tx(`${ME_N1_SITTING.year}年7月の試験は過ぎた`, `The July ${ME_N1_SITTING.year} test has passed`)));
   }
   plate.append(count);
   if (days >= 0) {
     plate.append(el('p', 'me-n1-date', tx(
-      `7月の試験 · ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
-      `The July sitting · expected Sunday ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()]} ${sitting.getFullYear()}`)));
+      `試験日 ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
+      `Test expected Sun ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()].slice(0, 3)} ${sitting.getFullYear()}`)));
   }
   plate.append(meHorizonRow(h));
   return plate;
