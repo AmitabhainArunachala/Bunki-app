@@ -7,3 +7,13 @@
 html:is([data-room='deckplay'], [data-room='contextdeck']) body:not([data-view='drift']) {
   --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 8%, transparent), transparent 180px);
 }
+
+/* ---- Cards lane: the deck player fills the room edge to edge. Its page (and, while studying,
+   its stage) runs under the main's side padding and on below the last card to the Line, so no
+   strip of the corridor's washi shows around it: a shadow of its own ground, no layout change,
+   nothing drawn over a control. ---- */
+@media (max-width: 520px) {
+  html[data-room='deckplay'] #app > main > .kp { margin-inline: -18px; padding-inline: 18px; }
+}
+html[data-room='deckplay'] #app > main > .kp { box-shadow: 0 50vh 0 0 var(--kp-bg); }
+html[data-room='deckplay'] #app > main > .kp:has(> .kp-study) { box-shadow: 0 50vh 0 0 var(--kp-stage); }
