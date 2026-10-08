@@ -25,6 +25,7 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 | Guided session credit | Original Bunki practice | Original KAIRO practice | Bunki オリジナル練習 | 回廊オリジナルの練習 | skin (D3) |
 | Guided session, no card | Bunki has no card for this pattern yet. | KAIRO has no card for this pattern yet. | この型の札は、まだ Bunki にない。 | この型の札は、まだ回廊にない。 | skin (D3) |
 | Report sheet, empty | …or an idea for Bunki. | …or an idea for KAIRO. | — | — | skin (D3) |
+| Exported list, its first line (Markdown file) | # name — 分岐 Bunki | # name — 回廊 KAIRO | (same) | (same) | skin (D3) |
 | Reference library note | Bunki groups these entries… | KAIRO groups these entries… | — | — | skin (D3) |
 | Deck player notes (`decks/player/mount.js`, two EN strings) | …in Bunki. / Bunki can also save them. | …in KAIRO. / KAIRO can also save them. | 回廊 (already) | (same) | skin (D3; cards lane's file, two strings only) |
 | Tab bar | Today · Read · Learn · Words · Me | (kept: plain) | 今日 · 読む · 学ぶ · 辞書 · 私 | (kept) | — |
