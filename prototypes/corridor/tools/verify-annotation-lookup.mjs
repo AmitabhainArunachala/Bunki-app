@@ -130,6 +130,29 @@ const cases = [
     await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');
     assert.deepEqual(targetRows((await state(page)).record), targetRows(before.record));
   }],
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', async page => {
+    // A list sheet opened for a word not yet saved (the personal deck's "Add to list…" does this; the popup no longer
+    // does, by round 4's one path) saves the word first, with the same capture as Save. A native fault on that capture
+    // is reported honestly, writes neither a card nor a list, and keeps the typed list name.
+    await page.evaluate(async () => {
+      const f = window.annotationFixture;
+      f.removeMini();
+      await f.ensureDictionaryRowsForForm('電車');
+      document.getElementById('annotation-anchor')?.remove();
+      const anchor = document.createElement('button'); anchor.id = 'annotation-anchor'; anchor.textContent = '電車';
+      anchor.style.cssText = 'position:fixed;left:120px;top:150px'; document.body.append(anchor);
+      f.openVocabularyListPopover({ t: 'word', id: '電車' }, '電車', anchor);
+    });
+    await page.locator('#vocabulary-list-popover').waitFor();
+    const before = await state(page);
+    assert.equal(before.record.taken.some(row => row.t === 'word' && row.id === '電車'), false, 'The fixture word starts unsaved');
+    await armRecordWriteFailure(page, 'quota', { roots: ['taken'] });
+    await createList(page, 'Capture first');
+    await page.waitForFunction(() => /Could not save|Could not finish saving|reload/i.test(document.querySelector('.vocabulary-list-status')?.textContent || ''));
+    const fault = await clearRecordWriteFailure(page); assert(fault.fired > 0, 'The native capture transaction must actually fail');
+    assert.deepEqual((await state(page)).record, before.record, 'A failed capture inside a list writes no card and no list');
+    assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-name').inputValue(), 'Capture first', 'The typed list name stays');
+  }],
   ['exact-entry-mini-and-conflict-protection', async page => {
     await page.evaluate(async () => {
       const f = window.annotationFixture;
