@@ -557,3 +557,11 @@ The tray is the Today tab's room; Review #8 already renamed its way back "Back t
 | --- | --- | --- |
 | `prototypes/corridor/tools/verify-pr77-ports.mjs` quiz-crumb (ea8252a9) | `/リスト\|lists/` → `/リスト\|lists\|今日\|Today/` | Label only. The crumb must still name the tray, and `backTo === 'tray'` is unchanged. |
 | `verify-pr77-ports.mjs` crumb-origin (d9f0b984), plain review | `/(リスト\|lists).*(復習\|review)/` → `/(リスト\|lists\|今日\|Today).*(復習\|review)/` | Label only. The order (tray, then review) and `reviewBack === 'tray'` are unchanged. |
+
+## Round 4 skin: the personal collections' theme row follows the public roster
+
+The private collections player draws one theme button per public world (`PUBLIC_THEME_IDS`, passed in by `corridor.js`). D2 made the roster eleven.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-personal-collections.mjs` (settings, "Every palette comes from Bunki's existing public roster") | `.pc [data-theme]` count `10` → `11` | Roster count only. The `yoru` (金) click, the night screenshot, the no-horizontal-overflow assertion at 390px and every storage, backup and offline assertion are unchanged. |
