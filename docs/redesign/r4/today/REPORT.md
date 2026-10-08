@@ -72,6 +72,8 @@ list; the rest were added because this lane changes the universe, the door's chr
 | `verify-theme-consistency` (added) | PASS · every room wears its world | PASS · every room wears its world |
 | `verify-pr77-ports` (added) | **FAIL** 4 of 56: d9f0b984 · a row marked 未確認 for human review says so, and not with another source's story; d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze; f7cd297c · the review room's × and … read at 4.5:1 in every world; kdx-chip-state · the probe ran to its end | **FAIL** 4 of 56: d9f0b984 · a row marked 未確認 for human review says so, and not with another source's story; d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze; f7cd297c · the review room's × and … read at 4.5:1 in every world; kdx-chip-state · the probe ran to its end |
 
+- **Also run on the final build:** verify-corridor-storage-integrity PASS (26 checks; the protected storage and record
+  markers are untouched) and sw-shell PASS (8 tests).
 - **No regressions.** The two failing verifiers fail identically on the base: every check's outcome matches
   (verify-corridor-doors 52 of 52, verify-pr77-ports 56 of 56).
 - **verify-pr77-ports, the review room's × and …:** this is inherited, and I measured it. At rest both controls are
