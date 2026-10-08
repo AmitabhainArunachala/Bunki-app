@@ -743,6 +743,8 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-tiles .kp-c-due b { color: var(--kp-amber); }
 .kp .kp-tiles .kp-c-known b { color: var(--kp-green); }
 .kp .kp-tiles .kp-c-hard b { color: var(--kp-red); }
+/* the topic rows: tighter, as a native list (still one tap anywhere on the row toggles it) */
+.kp .kp-group { min-height: 50px; padding: 12px 2px 9px; }
 /* one radius per kind of thing: keys 12px (始める, 答えを見る, デッキに戻る), tiles and pads 10px */
 .kp .kp-start, .kp .kp-done .kp-start { border-radius: 12px; }
 
@@ -815,6 +817,10 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-study > .kp-reveal { order: 2; margin-top: auto; flex: none; }
   .kp .kp-study > .kp-undo { order: 1; margin-top: auto; align-self: center; }
   .kp .kp-study:has(> .kp-undo) > .kp-reveal { margin-top: 0; }
+  /* the card fills the stage down to the key: the sentence keeps its place at the head of the sheet (the
+   * reveal moves nothing), the tap hint sits at its foot, and the whole sheet is the tap that reveals */
+  .kp .kp-study:has(> .kp-reveal) > .kp-card { flex: 1 0 auto; display: flex; flex-direction: column; }
+  .kp .kp-study:has(> .kp-reveal) > .kp-card > .kp-taphint { margin-top: auto; }
 }
 
 /* the back: the answer under a crisp rule; the word, its reading and part of speech on one line, the
