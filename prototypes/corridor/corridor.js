@@ -29456,6 +29456,17 @@ function openWorldPicker(anchor) {
   pop.setAttribute('role', 'dialog');
   pop.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   let activeStone = null;
+  const worldName = (t) => tx(t.name, {
+    sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
+    rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
+    akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
+    hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
+  }[t.id]);
+  // the stones are seals; a plain line beneath names the world in words (the current one, or
+  // the one under the pointer or keyboard focus)
+  const current = THEME_UI[themeIx()];
+  const caption = el('p', 'world-picker-name', worldName(current));
+  caption.setAttribute('aria-hidden', 'true');
   const stone = (t) => {
     const b = el('button', 'world-stone', t.seal);
     b.type = 'button';
@@ -29463,12 +29474,9 @@ function openWorldPicker(anchor) {
     b.style.background = t.g;
     b.style.color = t.ink;
     b.style.setProperty('--stone-red', t.red);
-    b.setAttribute('aria-label', tx(t.name, {
-      sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
-      rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
-      akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
-      hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
-    }[t.id]));
+    b.setAttribute('aria-label', worldName(t));
+    for (const ev of ['pointerenter', 'focus']) b.addEventListener(ev, () => { caption.textContent = worldName(t); });
+    for (const ev of ['pointerleave', 'blur']) b.addEventListener(ev, () => { caption.textContent = worldName(current); });
     const active = t.id === themeId();
     b.setAttribute('aria-pressed', String(active));
     if (active) {
@@ -29498,6 +29506,7 @@ function openWorldPicker(anchor) {
     }
     pop.append(row);
   }
+  pop.append(caption);
   worldPickerOpener = anchor;
   scrim.addEventListener('click', closeWorldPicker);
   document.body.append(scrim, pop);

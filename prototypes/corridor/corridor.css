@@ -2413,6 +2413,14 @@ button.pool-tag.cat-chip {
   text-transform: uppercase;
   color: color-mix(in srgb, var(--ink) 72%, transparent);
 }
+.world-picker-name {
+  margin: 2px 2px 0;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--line);
+  font: 500 13px/1.3 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  color: var(--ink);
+  min-height: 1.3em;
+}
 @keyframes world-picker-in {
   from { opacity: 0.01; transform: translateY(-4px) scale(0.98); }
 }
