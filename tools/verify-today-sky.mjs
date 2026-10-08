@@ -113,6 +113,9 @@ try {
             tabs: !!document.getElementById('primary-tabs'),
           }));
           check(`${label} · open sky opens the whole universe`, universe.layer && universe.words >= 20 && !universe.tabs, JSON.stringify(universe));
+          // the level rail names its scale at rest, so its one word obeys the interface language
+          const rail = await page.evaluate(() => document.querySelector('#drift-layer #lvlLabels')?.firstElementChild?.textContent);
+          check(`${label} · the universe's level rail speaks the interface language`, rail === (lang === 'ja' ? '自' : 'auto'), rail);
         }
 
         // the door's one way down is named Today and lands on Today
