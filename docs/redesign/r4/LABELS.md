@@ -55,13 +55,13 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 
 | Deck | Old EN | New EN | Old JA | New JA |
 |---|---|---|---|---|
-| `kotoba-mine` (your 323 words from the Japanese app, one real sentence each) | Real sentences · read and recall | Your words · one real sentence each | 言葉の鉱脈・文 | 言葉の鉱脈・実例文で一語ずつ |
-| `kotoba-mcd` (the same 323 words, a long passage with the word hidden) | massive-context cloze · real and written passages | Your words · fill the gap in a passage | 言葉の鉱脈・MCD | 言葉の鉱脈・長文の穴埋め |
+| `kotoba-mine` (his 323 words exported from his Japanese app, one real sentence each) | Real sentences · read and recall | Your word list · one real sentence each | 言葉の鉱脈・文 | 単語帳・実例文で一語ずつ |
+| `kotoba-mcd` (the same 323 words, a 2–5 sentence passage with the word hidden) | massive-context cloze · real and written passages | Your word list · fill the gap in a passage | 言葉の鉱脈・MCD | 単語帳・長文の穴埋め |
 | `n2` | N2 vocabulary · passages | N2 words · in short passages | N2・文章で覚える | N2の語・短い文章で |
 | `n1` | N1 vocabulary · passages | N1 words · in short passages | N1・文章で覚える | N1の語・短い文章で |
 | `senmon` | Your five fields · master’s level | Your fields · advanced words | 専門・五つの分野 | あなたの分野・上級の語 |
 
-*The skin lane uses these in `DOJO_DECKS` (Learn's list). For cards: `decks/<id>/deck.json` `titleEn/titleJa` (title only; never the ids) so the deck home says the same. John named three fields (D5), so "five" is wrong now.*
+*Status: the two 単語帳 rows are skin (Learn's `DOJO_DECKS`, unpinned). The `n2`, `n1` and `senmon` rows are for cards: `verify-n2n1-decks` pins their Learn titles, so they change together with that pin. For the deck homes, cards sets `decks/<id>/deck.json` `titleEn/titleJa` (title only, never an id) so home and list say the same. John named three fields (D5), so "five" is wrong now. 単語帳 is the name his 323 imported words already carry in the app.*
 
 ## The word popup and the reader (read lane)
 

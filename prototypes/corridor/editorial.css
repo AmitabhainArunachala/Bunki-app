@@ -4879,16 +4879,23 @@ body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: 12px; let
 main h1.view-title, main h1.exam-heading, .assessment-room > h1 { letter-spacing: -0.005em; line-height: 1.12; }
 
 /* ---- press: the touch lands at once (iOS gives :active only with a touch listener,
-   which the shell adds); it lets go in 150ms. Zero specificity: a room's own press wins. ---- */
+   which the shell adds); it lets go in 150ms. Zero specificity: a room's own press wins.
+   Text and glyph controls dim; paper doors and cards press down instead; words in the
+   text (reader tokens, lookup words, web nodes) keep their own selection marks. ---- */
 :where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary) {
   transition-property: opacity;
   transition-duration: var(--motion-quick);
   transition-timing-function: var(--ease-standard);
 }
-:where(body:not([data-view='drift'])) :where(button:not(:disabled), [role='button'], a[href], summary):active {
+:where(body:not([data-view='drift'])) :where(button:not(:disabled), [role='button'], a[href], summary):where(:not(.study-door, .foundation-door, .dojo-deck, .shelf-open, .world-stone, .tok, .japanese-lookup-word, .ww-node, .kp-tok)):active {
   opacity: 0.55;
   transition-duration: 0s;
 }
+/* the page layer is composited once, so a scroll never repaints the paper */
+body:not([data-view='drift'])::before { will-change: transform; }
+/* the full entry rises on the iOS sheet curve: the same 280ms and travel, only the curve
+   changes, so it settles like a native sheet instead of easing in mushily */
+body.v-depth-layered .sheet, body .sheet { animation-timing-function: var(--ease-sheet); }
 body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active {
   transform: scale(0.985);
   transition: transform var(--motion-press) var(--ease-standard);

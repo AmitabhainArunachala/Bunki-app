@@ -23489,7 +23489,11 @@ function renderStudyHall(main, doors) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '単語帳・長文の穴埋め', en: 'Your word list · fill the gap in a passage' }, { id: 'kotoba-mine', ja: '単語帳・実例文で一語ずつ', en: 'Your word list · one real sentence each' }];
+// r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
+// to mean anyhting at all"): the two 言葉の鉱脈 decks are his own 323 words from his Japanese app, so
+// they are named for that. n2/n1/senmon keep their titles here (verify-n2n1-decks pins them; the
+// cards lane owns the deck names). docs/redesign/r4/LABELS.md
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;
