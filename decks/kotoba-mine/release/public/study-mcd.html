@@ -464,7 +464,7 @@
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
-.kp .kp-card { position: relative; border-radius: 4px; border-width: 1px 1px 1px 3px; padding: 20px 18px 20px 19px; gap: 14px; }
+.kp .kp-card { position: relative; border-radius: 4px; border-width: 1px 1px 1px 3px; padding: 16px 18px 16px 19px; gap: 12px; }
 .kp .kp-card::before {
   content: ''; position: absolute; inset: 8px; pointer-events: none; opacity: 0.55;
   --reg: color-mix(in srgb, var(--kp-ink) 55%, transparent);
@@ -510,7 +510,7 @@
 @keyframes kp-polish { from { opacity: 1; transform: translateX(-110%) skewX(-8deg); } 70% { opacity: 1; } to { opacity: 0; transform: translateX(200%) skewX(-8deg); } }
 
 /* the back: the headword in Shippori 800 with its reading beside it, the Japanese definition in Mincho */
-.kp .kp-answer { gap: 6px; padding-top: 14px; }
+.kp .kp-answer { gap: 6px; padding-top: 10px; }
 .kp .kp-word { column-gap: 12px; row-gap: 2px; }
 .kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: 34px; line-height: 1.15; letter-spacing: 0.04em; }
 .kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.14em; color: var(--kp-ink-2); }
