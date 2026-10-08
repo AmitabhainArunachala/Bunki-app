@@ -28299,10 +28299,27 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
   const bar = el('nav', 'primary-tabs');
   bar.id = 'primary-tabs';
   bar.setAttribute('aria-label', tx('主な入口', 'Main destinations'));
+  // the Line (concept D graft): five stations on one hairline track; the car is the one filled
+  // square, and it slides (transform only) from the last station to this one. Stations and the
+  // car carry no text, so each button's text stays exactly its label.
+  const at = PRIMARY_TABS.findIndex((tab) => tab.views.includes(S.view));
+  bar.dataset.station = at < 0 ? '' : PRIMARY_TABS[at].id;
+  // Today's live due count: the same truth the galaxy bar's 復習 N reads (todayQueue), never a guess
+  const due = !personal && S.taken.length && scheduler ? todayQueue().order.length : 0;
   for (const tab of PRIMARY_TABS) {
     const button = el('button', 'primary-tab', tx(tab.ja, tab.en));
     button.type = 'button';
     button.id = `tab-${tab.id}`;
+    const node = el('i', 'station-node');
+    node.setAttribute('aria-hidden', 'true');
+    button.append(node);
+    if (tab.id === 'today' && due) {
+      const count = el('i', 'station-due');
+      count.dataset.due = String(due);
+      count.setAttribute('aria-hidden', 'true');
+      button.append(count);
+      button.setAttribute('aria-label', tx(`今日 · 復習 ${due}`, `Today · ${due} due`));
+    }
     if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
     button.addEventListener('click', () => {
       if (personal) {
@@ -28327,7 +28344,43 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
     });
     bar.append(button);
   }
+  if (at >= 0) {
+    const car = el('span', 'line-car');
+    car.setAttribute('aria-hidden', 'true');
+    car.style.setProperty('--ix', String(at));
+    if (buildPrimaryTabs.lastStation != null && buildPrimaryTabs.lastStation !== at) {
+      car.style.setProperty('--from', String(buildPrimaryTabs.lastStation));
+      car.classList.add('moving');
+    }
+    buildPrimaryTabs.lastStation = at;
+    bar.append(car);
+  }
   root.append(bar);
+}
+
+/* The room sign (縦看板, concepts C/A): each primary room hangs its name at the right edge,
+ * set vertically. In English the word is rotated a quarter turn, never stacked letter by letter;
+ * in 日本語 the kanji stack. One honest datum may hang beneath it (Today's date, Learn's due). */
+const ROOM_SIGNS = {
+  tray: ['今日', 'Today'], shelf: ['読む', 'Read'], dojo: ['学ぶ', 'Learn'], search: ['辞書', 'Words'], me: ['私', 'Me'],
+};
+function buildRoomSign() {
+  const names = ROOM_SIGNS[S.view];
+  if (!names || S.stack.length) return null;
+  const sign = el('div', 'room-sign');
+  sign.setAttribute('aria-hidden', 'true');
+  sign.dataset.script = bi() ? 'latin' : 'kanji';
+  sign.append(el('b', 'room-sign-name', tx(...names)));
+  let datum = '';
+  if (S.view === 'tray') {
+    const now = new Date();
+    datum = `${String(now.getMonth() + 1).padStart(2, '0')}·${String(now.getDate()).padStart(2, '0')}`;
+  } else if (S.view === 'dojo' && S.taken.length && scheduler) {
+    const due = todayQueue().order.length;
+    if (due) datum = String(due);
+  }
+  if (datum) sign.append(el('i', 'room-sign-datum', datum));
+  return sign;
 }
 
 /** Hub doors use the existing return frames, including exact reader positions. */
@@ -28915,6 +28968,8 @@ function render() {
     main.replaceChildren();
     renderRoomError(main, S.view, error);
   }
+  // the room's vertical sign hangs first in the page, floated into its right margin
+  { const sign = main.querySelector('.room-error') ? null : buildRoomSign(); if (sign) main.prepend(sign); }
   // after the room, never inside its stage: the focused stage keeps its composition and every
   // state (probe, unavailable card, error) keeps a report entry one scroll away
   if (maintenanceReports && S.view !== 'drift') root.append(reportEntries('report-line-page'));

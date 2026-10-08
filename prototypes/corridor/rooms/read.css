@@ -1,3 +1,16 @@
 /* Bunki room: read. Loaded after editorial.css (see index.html).
    Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
    (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
+
+/* ---- Skin frame (Skin lane): Read is warm, thick kōzo print paper in a morning window;
+   at night the same paper under lantern light. Values only; build on them. ---- */
+html:is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-room='publisher'], [data-room='source-inbox'], [data-room='source-reader'], [data-room='personal-reading']) body:not([data-view='drift']) {
+  --color-page: color-mix(in srgb, var(--color-ground) 48%, #fbf6ea);
+  --skin-light: radial-gradient(110% 55% at 100% 0%, rgb(255 246 226 / 44%), transparent 65%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-room='publisher'], [data-room='source-inbox'], [data-room='source-reader'], [data-room='personal-reading']) body:not([data-view='drift']) {
+  --color-page: var(--color-ground);
+  --skin-light:
+    radial-gradient(70% 34% at 88% 6%, color-mix(in srgb, var(--color-gold) 13%, transparent), transparent 70%),
+    radial-gradient(120% 40% at 50% 110%, color-mix(in srgb, var(--color-gold) 9%, transparent), transparent 70%);
+}

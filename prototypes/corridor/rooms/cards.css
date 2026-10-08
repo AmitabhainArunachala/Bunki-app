@@ -1,3 +1,9 @@
 /* Bunki room: cards. Loaded after editorial.css (see index.html).
    Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
    (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
+
+/* ---- Skin frame (Skin lane): the deck players share Learn's lacquer stage. Players inject
+   their own sheets later, so tokens only, on body. ---- */
+html:is([data-room='deckplay'], [data-room='contextdeck']) body:not([data-view='drift']) {
+  --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 8%, transparent), transparent 180px);
+}

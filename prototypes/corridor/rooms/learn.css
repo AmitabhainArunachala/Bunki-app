@@ -1,3 +1,17 @@
 /* Bunki room: learn. Loaded after editorial.css (see index.html).
    Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
    (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
+
+/* ---- Skin frame (Skin lane): Learn is a 藍-lacquer stage holding one lit washi card.
+   The room's paper darkens toward a lacquer band at the top (the proscenium); the
+   working cards stay paper. Values only; build on them. ---- */
+html[data-room='learn'] body:not([data-view='drift']) {
+  --color-page: color-mix(in srgb, var(--color-ground) 70%, #e2dccd);
+  --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 9%, transparent), transparent 180px);
+  --skin-light: radial-gradient(70% 36% at 50% 0%, rgb(255 250 236 / 40%), transparent 70%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='learn'] body:not([data-view='drift']) {
+  --color-page: color-mix(in srgb, var(--color-ground) 82%, #000);
+  --skin-ground: linear-gradient(180deg, var(--color-lacquer), transparent 220px);
+  --skin-light: radial-gradient(60% 34% at 50% 4%, color-mix(in srgb, var(--color-ink) 9%, transparent), transparent 72%);
+}

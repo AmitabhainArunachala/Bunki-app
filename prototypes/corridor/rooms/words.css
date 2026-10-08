@@ -1,3 +1,26 @@
 /* Bunki room: words. Loaded after editorial.css (see index.html).
    Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
    (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
+
+/* ---- Skin frame (Skin lane): Words is a drafting plate: vellum over a 10/50px 罫線 grid,
+   even and shadowless; at night a blueprint of phosphor wires. Values only. ---- */
+html:is([data-room='search'], [data-room='kanji'], [data-room='grammar'], [data-room='word-web'], [data-room='idioms'], [data-room='reference']) body:not([data-view='drift']) {
+  --color-page: color-mix(in srgb, var(--color-ground) 40%, #f6f6f1);
+  --skin-ground:
+    linear-gradient(90deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
+    linear-gradient(0deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
+    linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 5%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px,
+    linear-gradient(0deg, color-mix(in srgb, var(--color-accent) 5%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px;
+  --skin-light: none;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='kanji'], [data-room='grammar'], [data-room='word-web'], [data-room='idioms'], [data-room='reference']) body:not([data-view='drift']) {
+  --color-page: var(--color-ground);
+  --color-rule: color-mix(in srgb, var(--color-live) 40%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-live) 12%, transparent);
+  --skin-ground:
+    linear-gradient(90deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
+    linear-gradient(0deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
+    linear-gradient(90deg, color-mix(in srgb, var(--color-live) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px,
+    linear-gradient(0deg, color-mix(in srgb, var(--color-live) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px;
+  --skin-light: radial-gradient(80% 40% at 50% 30%, color-mix(in srgb, var(--color-live) 6%, transparent), transparent 70%);
+}

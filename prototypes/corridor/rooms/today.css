@@ -1,3 +1,17 @@
 /* Bunki room: today. Loaded after editorial.css (see index.html).
    Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
    (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
+
+/* ---- Skin frame (Skin lane): Today is thin washi at dawn, cool left to warm right; at
+   night the city seen from above, its windows glowing low. Values only; build on them. ---- */
+html:is([data-room='tray'], [data-room='list'], [data-room='browse']) body:not([data-view='drift']) {
+  --skin-light:
+    linear-gradient(100deg, rgb(196 214 226 / 34%), transparent 42%, transparent 62%, rgb(240 204 168 / 26%)),
+    radial-gradient(120% 50% at 50% 0%, rgb(255 255 255 / 36%), transparent 70%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='tray'], [data-room='list'], [data-room='browse']) body:not([data-view='drift']) {
+  --skin-light:
+    radial-gradient(140% 36% at 50% 108%, color-mix(in srgb, var(--color-gold) 20%, transparent), transparent 72%),
+    radial-gradient(60% 30% at 82% 100%, color-mix(in srgb, var(--color-live) 9%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 40%);
+}

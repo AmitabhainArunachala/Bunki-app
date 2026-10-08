@@ -3306,54 +3306,113 @@ body { --nav-clearance: 0px; }
 body.has-primary-tabs { --nav-clearance: calc(60px + env(safe-area-inset-bottom, 0px)); }
 body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
 .primary-tabs {
+  /* the Line (concept D graft, skinned C+A): five stations on one hairline track */
+  --tabs-pad: max(8px, env(safe-area-inset-left, 0px));
+  --line-y: 17px;
   position: fixed;
   z-index: 70;
   inset: auto 0 0;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--space-1);
+  gap: 0;
   box-sizing: border-box;
   height: var(--nav-clearance);
-  padding: 6px max(8px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right));
-  border-top: var(--stroke-relief) solid var(--color-edge-strong);
+  padding: 6px var(--tabs-pad) calc(6px + env(safe-area-inset-bottom, 0px));
+  border-top: var(--stroke-hairline) solid var(--color-edge-strong);
   background: var(--color-glass);
   color: var(--color-ink);
-  box-shadow: 0 -6px 20px color-mix(in srgb, var(--color-ink) 7%, transparent);
-  -webkit-backdrop-filter: saturate(160%) blur(20px);
-  backdrop-filter: saturate(160%) blur(20px);
+  box-shadow: 0 -10px 24px color-mix(in srgb, var(--color-ink) 5%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  backdrop-filter: saturate(140%) blur(18px);
 }
 .primary-tabs .primary-tab {
   position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   box-sizing: border-box;
   min-width: 44px;
   min-height: 44px;
   margin: 0;
-  padding: 0 var(--space-1);
+  padding: 0 2px 7px;
   border: 0;
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-small);
   background: transparent;
-  color: var(--color-ink-2);
+  color: var(--color-muted);
   box-shadow: none;
-  font: 600 var(--type-label)/1.2 var(--font-ui);
-  letter-spacing: 0;
-  transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+  font: 600 11.5px/1 var(--font-ui);
+  letter-spacing: 0.04em;
+  transition: color var(--motion-quick) var(--ease-standard);
 }
-.primary-tabs .primary-tab[aria-current='page'] {
-  background: var(--color-tint-wash);
-  color: var(--color-accent);
-}
-.primary-tabs .primary-tab[aria-current='page']::after {
+body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-display); letter-spacing: 0.08em; }
+/* the track: each station draws its own stretch, so the line runs centre to centre */
+.primary-tabs .primary-tab::before {
   content: '';
   position: absolute;
-  inset: auto 24% 3px;
-  height: 2px;
-  border-radius: var(--radius-pill);
-  background: currentColor;
+  top: calc(var(--line-y) - 6px);
+  left: 0;
+  right: 0;
+  height: var(--stroke-hairline);
+  background: var(--color-rule);
+  pointer-events: none;
 }
-.primary-tabs .primary-tab::before { content: none; }
+.primary-tabs .primary-tab:first-child::before { left: 50%; }
+.primary-tabs .primary-tab:nth-child(5)::before { right: 50%; }
+.primary-tabs .primary-tab::after { content: none; }
+.primary-tabs .station-node {
+  position: absolute;
+  top: calc(var(--line-y) - 6px - 4px);
+  left: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-rule);
+  background: var(--color-glass-solid);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.primary-tabs .station-due {
+  position: absolute;
+  top: calc(var(--line-y) - 6px - 13px);
+  left: calc(50% + 9px);
+  padding: 0 3px;
+  background: var(--color-glass-solid);
+  color: var(--color-seal);
+  font: 600 10px/1 var(--font-data);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+.primary-tabs .station-due::after { content: attr(data-due); }
+.primary-tabs .primary-tab[aria-current='page'] { background: transparent; color: var(--color-ink); font-weight: 700; }
+body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
+.primary-tabs .primary-tab[aria-current='page'] .station-node { opacity: 0; }
+.primary-tabs .primary-tab:active { color: var(--color-ink); }
 .primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+/* the car: one filled square that travels the line */
+.primary-tabs .line-car {
+  position: absolute;
+  top: calc(var(--line-y) - 6px);
+  left: var(--tabs-pad);
+  width: calc((100% - 2 * var(--tabs-pad)) / 5);
+  height: 12px;
+  pointer-events: none;
+  transform: translateX(calc(var(--ix, 0) * 100%));
+}
+.primary-tabs .line-car::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(50% - 6px);
+  width: 12px;
+  height: 12px;
+  background: var(--color-ink);
+  box-shadow: 0 0 0 3px var(--color-glass-solid);
+}
+.primary-tabs .line-car.moving { animation: line-car-slide 320ms var(--ease-enter) both; }
+@keyframes line-car-slide { from { transform: translateX(calc(var(--from, 0) * 100%)); } }
 body.has-primary-tabs #variants { bottom: var(--nav-clearance); }
 body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(max(var(--nav-clearance), var(--foundation-dock-clearance, 0px)) + 12px); }
 /* Sheets hide tabs and reserve the original report-button strip. */
@@ -3365,6 +3424,11 @@ body.has-primary-tabs .cd-dock { bottom: var(--nav-clearance); }
 /* The deck tip's compact glyph has an expanded touch area below its paint. */
 body.has-primary-tabs .kp-grades { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
 body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
+/* The private import's confirm/cancel stand one per line, clear of the report rail's column
+   (44px at the right edge), whatever the engine's text metrics. */
+@media (max-width: 520px) {
+  .pc-preview > button { display: flex; width: fit-content; max-width: calc(100vw - 120px); margin-block: 0 var(--space-2); }
+}
 body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
 .learn-section + .learn-section,
 .foundation-section { margin-top: var(--space-8); }
@@ -3386,9 +3450,12 @@ body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sh
   body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 84px); }
 }
 @media (min-width: 521px) {
-  .primary-tabs { padding-inline: max(12px, calc((100vw - 720px) / 2)); }
+  .primary-tabs { --tabs-pad: max(12px, calc((100vw - 720px) / 2)); }
 }
-@media (prefers-reduced-motion: reduce) { .primary-tabs .primary-tab { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .primary-tabs .primary-tab { transition: none; }
+  .primary-tabs .line-car.moving { animation: none; }
+}
 /* END BUNKI NAVIGATION SHELL =============================================== */
 
 /* Baseline repairs: raised study surfaces and world-consistent sheet paper.
@@ -3831,3 +3898,446 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ease: var(--ease-standard);
 }
 /* END BUNKI DESIGN TOKENS V2 =============================================== */
+
+/* ==========================================================================
+   BEGIN BUNKI SKIN · C 生きた本棚 Living Shelf, polished with A 磨き's craft
+   Skin lane, 8 October 2026. Read docs/redesign/build/skin/TOKENS.md.
+
+   Day   = washi under morning light: cream fibre paper, sumi ink, 藍 structure,
+           one 朱 accent (--color-seal/--color-signal: the world's red), and one
+           浅葱 live mark per screen (--color-live).
+   Night = the 藍 room with the city glowing through: lit, never inverted; light
+           is emitted as edges and glows, never a solid phosphor fill.
+
+   Values are zero-specificity (:where), so any room file or html[data-room]
+   rule wins without !important. World GROUNDS are never changed here
+   (verify-theme-consistency, the living-paper law): --color-ground,
+   --color-paper, card and zen grounds stay the world's own; everything
+   derived from them (page, surface, ink ramp, lines, accents, light) moves.
+   ========================================================================== */
+:where(body:not([data-view='drift'])) {
+  /* the page: washi tone between the world's ground and morning light */
+  --color-page: color-mix(in srgb, var(--color-ground) 58%, #fbf8f1);
+  --color-surface: color-mix(in srgb, var(--color-paper) 55%, #fffdf8);
+  --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, var(--color-ink) 4%);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 74%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 74%, var(--color-paper));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 70%, var(--color-paper));
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --color-line: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 13%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-accent) 13%, transparent);
+  --color-fill: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--color-accent) 11%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-page) 88%, transparent);
+  --color-glass-solid: var(--color-page);
+  --color-glass-line: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  /* new roles (C SPEC "new"): the one live mark, earned gold, 藍 lacquer frames */
+  --color-live: #0b6f78;
+  --color-live-wash: rgb(11 111 120 / 12%);
+  --color-live-glow: rgb(11 111 120 / 0%);
+  --color-gold: #94702a;
+  --color-gold-wash: rgb(148 112 42 / 14%);
+  --color-lacquer: #141a28;
+  --color-lacquer-2: #1d2638;
+  --color-lacquer-ink: #e9e2d2;
+  --color-press: color-mix(in srgb, var(--color-accent) 55%, #0b0f18);
+
+  /* type: Shippori B1 800 for display, system Mincho for reading, system sans for
+     chrome, system mono for data. Sizes stay the foundation's (reader ranges are pinned). */
+  --font-data: ui-monospace, 'SF Mono', Menlo, 'Roboto Mono', 'DejaVu Sans Mono', monospace;
+  --font-headword: 'Shippori Mincho B1', var(--world-serif);
+  --weight-display: 800;
+
+  --radius-small: 2px;
+  --radius-seal: 3px;
+  --radius-card: 4px;
+  --radius-control: 6px;
+  --radius-overlay: 18px;
+  --radius-surface: 8px;
+
+  --elevation-paper: 0 1px 0 rgb(25 28 34 / 6%), 0 6px 18px rgb(25 28 34 / 5%);
+  --elevation-card: 0 1px 0 rgb(25 28 34 / 9%), 0 10px 26px -6px rgb(40 30 16 / 16%);
+  --elevation-lift: 0 2px 0 rgb(25 28 34 / 10%), 0 18px 40px -10px rgb(40 30 16 / 26%);
+  --elevation-float: 0 -1px 0 rgb(25 28 34 / 8%), 0 -16px 48px rgb(25 28 34 / 18%);
+  --elevation-press: 0 2px 0 var(--color-press), 0 8px 18px -6px rgb(20 26 40 / 30%);
+
+  --motion-press: 90ms;
+  --motion-quick: 160ms;
+  --motion-room: 280ms;
+  --motion-ma: 120ms;
+  --motion-ambient: 9000ms;
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* washi: two scales of kōzo fibre, painted once on the fixed page layer, never animated */
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .31 0 0 0 0 .23 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  /* room light (rooms/*.css set --skin-light; the default is morning from the upper left) */
+  --skin-light: radial-gradient(120% 60% at 0% 0%, rgb(255 255 255 / 34%), transparent 60%);
+  --skin-ground: none;
+}
+/* ベロ藍・浪, the default world, is the concept's day palette exactly: sumi ink, 藍 structure */
+:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+  --color-ink: #1b1f26;
+  --color-accent: #1f3a5f;
+  --color-accent-wash: rgb(31 58 95 / 8%);
+  --color-page: #f4eee1;
+  --color-surface: #fbf8f1;
+}
+/* night: lit, never inverted. Each night world keeps its own ground and paper; the
+   light that crosses it is the city's (accent, live phosphor, lantern gold). */
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+  --color-page: var(--color-ground);
+  --color-surface: var(--color-paper);
+  --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, #000);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-ground));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 78%, var(--color-ground));
+  --color-muted: color-mix(in srgb, var(--color-ink) 74%, var(--color-ground));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 68%, var(--color-ground));
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-line: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 15%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-live) 36%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-live) 11%, transparent);
+  --color-fill: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-ground) 86%, transparent);
+  --color-glass-solid: var(--color-ground);
+  --color-glass-line: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  --color-live: #5df2d6;
+  --color-live-wash: rgb(93 242 214 / 13%);
+  --color-live-glow: rgb(93 242 214 / 45%);
+  --color-gold: #e2bd6c;
+  --color-gold-wash: rgb(226 189 108 / 14%);
+  --color-lacquer: color-mix(in srgb, var(--color-ground) 45%, #000);
+  --color-lacquer-2: color-mix(in srgb, var(--color-ground) 75%, #000);
+  --color-lacquer-ink: var(--color-ink);
+  --color-glow: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  --elevation-paper: inset 0 1px 0 rgb(255 255 255 / 4%), 0 8px 22px rgb(0 0 0 / 35%);
+  --elevation-card: inset 0 1px 0 rgb(255 255 255 / 5%), 0 14px 32px -8px rgb(0 0 0 / 60%);
+  --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 6%), 0 22px 48px -10px rgb(0 0 0 / 70%);
+  --elevation-float: 0 -1px 0 color-mix(in srgb, var(--color-accent) 16%, transparent), 0 -18px 56px rgb(0 0 0 / 60%);
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  /* the city through the paper: a low glow from below, cool above */
+  --skin-light:
+    radial-gradient(130% 42% at 50% 112%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 70%),
+    radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 70%);
+}
+/* 夜 is the 藍 room itself: its light is 藍 (the world's gold stays as lantern gold) */
+:where(:root[data-theme='yoru'] body:not([data-view='drift'])) { --color-accent: #9db8e6; --color-accent-wash: rgb(157 184 230 / 10%); }
+/* 殻 is already phosphor: its own accent is the live light */
+:where(:root[data-theme='kaku'] body:not([data-view='drift'])) { --color-live: var(--world-accent); --color-live-glow: color-mix(in srgb, var(--world-accent) 45%, transparent); }
+
+/* ---- the page itself: washi over the world's ground, lit per room ---- */
+body:not([data-view='drift'])::before { background: var(--skin-light), var(--skin-ground), var(--texture-washi), var(--page); }
+body:not([data-view='drift']) { color: var(--color-ink); }
+
+/* ---- the page frame: on a phone the room sits ON the washi, not in a white card ---- */
+@media (max-width: 520px) {
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']):not([data-view='reader']) #app > main {
+    background: transparent;
+    border-radius: 0;
+  }
+}
+@media (min-width: 521px) {
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+    border: var(--stroke-hairline) solid var(--color-edge-strong);
+    border-radius: var(--radius-card);
+    box-shadow: var(--elevation-paper);
+  }
+}
+
+/* ---- typography roles ---- */
+main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
+  font-family: var(--font-headword);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+body[data-view='reader'] main > h1.view-title { font-family: var(--font-reading); }
+main h2 { font-family: var(--font-headword); font-weight: 800; letter-spacing: 0.01em; }
+.data, .skin-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ---- section eyebrows: small caps chrome with the 朱 accent rule ---- */
+body:not([data-view='drift']) main .eyebrow,
+body:not([data-view='drift']) #sheet .eyebrow {
+  font: 600 11.5px/1.35 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
+body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: 12px; letter-spacing: 0.2em; text-transform: none; }
+body.v-depth-layered:not([data-view='drift']) .eyebrow.shelf-section::before,
+body:not([data-view='drift']) main > .eyebrow.skin-ruled::before,
+body:not([data-view='drift']) main section > h2.eyebrow::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 2px;
+  margin: 0 0 var(--space-2);
+  background: var(--color-seal);
+}
+
+/* ---- buttons: primary = solid 藍 with physical travel by day; an emitted edge at night ---- */
+body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: #f7f2e8;
+  box-shadow: var(--elevation-press);
+  font: 600 15px/1.25 var(--font-ui);
+  letter-spacing: 0.02em;
+  transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-press) var(--ease-standard);
+}
+body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
+body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--color-press), 0 4px 10px -6px rgb(20 26 40 / 30%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
+  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) .en-sub { color: inherit; }
+
+/* ---- chips: no grey-pill soup. A chip is a hairline-ruled slip of paper; on = 藍 ink. ---- */
+body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom),
+body:not([data-view='drift']) .kdx-lens,
+body:not([data-view='drift']) .focus-chip {
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font-weight: 500;
+}
+body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):hover:not(:disabled),
+body:not([data-view='drift']) .kdx-lens:hover,
+body:not([data-view='drift']) .focus-chip:hover { background: var(--color-fill); }
+body:not([data-view='drift']) .kdx-lens .l-ja { color: inherit; font-weight: 500; }
+body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #f7f2e8;
+}
+body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) .l-ja { color: inherit; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) {
+  background: var(--color-tint-wash);
+  color: var(--color-accent);
+  box-shadow: 0 0 12px -4px var(--color-glow);
+}
+body:not([data-view='drift']) .btn-secondary,
+body:not([data-view='drift']) .chip.btn-secondary {
+  border: var(--stroke-hairline) solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-accent);
+}
+
+/* ---- surfaces with relief: a hairline-and-ink edge plus a two-layer paper shadow ---- */
+body.v-depth-layered:not([data-view='drift']) :is(
+  #shelf-body .grammar-link[data-grade='room'], .search-page, .skip-ui,
+  .study-door, .listen-row, #reader, .foundation-door
+) {
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-card);
+}
+body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
+  background: var(--color-surface);
+  transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-quick) var(--ease-standard);
+}
+body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door):active { transform: translateY(1px); box-shadow: var(--elevation-paper); }
+body:not([data-view='drift']) .foundation-door {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding-inline: var(--space-4);
+  font: 600 16px/1.3 var(--font-ui);
+  color: var(--color-ink);
+  text-align: left;
+}
+body:not([data-view='drift']) .foundation-door > .l-ja { margin-right: auto; text-align: left; }
+body:not([data-view='drift']) .foundation-door::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.55;
+}
+body:not([data-view='drift']) .foundation-doors { gap: var(--space-2); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-accent) 14%, transparent), var(--elevation-card);
+}
+
+/* ---- registration marks (トンボ): "made precisely, for print". Add .skin-reg to a
+   positioned surface; the four corners are drawn in the background, no extra nodes. ---- */
+.skin-reg {
+  --reg: var(--color-edge-strong);
+  background-image:
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg));
+  background-size: 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px;
+  background-position: 0 6px, 6px 0, 100% 6px, calc(100% - 6px) 0, 0 calc(100% - 6px), 6px 100%, 100% calc(100% - 6px), calc(100% - 6px) 100%;
+  background-repeat: no-repeat;
+}
+
+/* ---- the sheet: one raised washi leaf; its ground stays the world's paper ---- */
+body:not([data-view='drift']) .sheet {
+  border-top: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
+  box-shadow: var(--elevation-float);
+}
+body:not([data-view='drift']) .sheet-grip { width: 36px; height: 4px; border-radius: 2px; background: var(--color-edge-strong); }
+body:not([data-view='drift']) .sheet-bar { border-bottom: var(--stroke-hairline) solid var(--color-seal); }
+body:not([data-view='drift']) .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) {
+  border-width: var(--stroke-hairline);
+  border-radius: var(--radius-control);
+  font-family: var(--font-ui);
+}
+body:not([data-view='drift']) .scrim { background: rgb(12 16 26 / 30%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .scrim { background: rgb(0 0 0 / 52%); }
+
+/* ---- the top chrome: clean and quiet. Every door keeps its id, place and 44px. ---- */
+body:not(.zen) #app > .chrome {
+  background: var(--color-glass);
+  border-bottom: var(--stroke-hairline) solid var(--color-glass-line);
+}
+body:not(.zen) #app > .chrome > button,
+body:not(.zen) #app > .chrome > button.chrome-dojo,
+body:not(.zen) #app > .chrome > button.chrome-search {
+  color: var(--color-ink-2);
+  font: 500 15px/44px var(--font-ui);
+  border-radius: var(--radius-control);
+}
+body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); }
+body:not(.zen) #app > .chrome > button#back::before { width: 8px; height: 14px; opacity: 0.8; }
+body:not(.zen) #app > .chrome > button.chrome-dojo { font: 600 12px/44px var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; }
+body:not(.zen):not(.ui-bi) #app > .chrome > button.chrome-dojo { font: 800 15px/44px var(--font-display); letter-spacing: 0.08em; text-transform: none; }
+body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'] { color: var(--color-seal); }
+body:not(.zen) #app > .chrome > button.theme-seal {
+  background: none;
+  color: var(--color-seal);
+  font: 800 14px/1 var(--font-display);
+}
+body:not(.zen) #app > .chrome > button.theme-seal::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-seal) 70%, transparent);
+  border-radius: var(--radius-seal);
+  pointer-events: none;
+}
+body:not(.zen) #app > .chrome > button.theme-seal { position: relative; }
+body:not(.zen) #app > .chrome > button.theme-seal:hover { background: none; }
+body:not(.zen) #app > .chrome .lang-seg::before { inset: 9px 0; border-radius: var(--radius-control); background: transparent; box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
+body:not(.zen) #app > .chrome .lang-seg button { color: var(--color-muted); font: 500 12px/1 var(--font-ui); }
+body:not(.zen) #app > .chrome .lang-seg button::before { inset: 9px 0; border-radius: var(--radius-control); }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--color-ink); font-weight: 700; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-surface); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong), 0 1px 2px rgb(0 0 0 / 8%); }
+body:not(.zen) #app > .chrome > button#tray { color: var(--color-ink); font: 500 13px/44px var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+body:not(.zen):not(.ui-bi) #app > .chrome > button#tray { font: 800 15px/44px var(--font-display); }
+
+/* ---- the room sign (縦看板): a vertical name hanging in the right margin ---- */
+body:not([data-view='drift']) #app > main > .room-sign {
+  /* hung from the page's top edge, in a right margin the room keeps free for it */
+  position: absolute;
+  z-index: 1;
+  top: calc(52px + env(safe-area-inset-top, 0px));
+  right: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 24px;
+  padding: 16px 0 12px;
+  border-inline: var(--stroke-hairline) solid var(--color-rule);
+  color: var(--color-ink);
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 520px) {
+  html:is([data-room='tray'], [data-room='shelf'], [data-room='learn'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
+}
+@media (min-width: 521px) {
+  body:not([data-view='drift']) #app > main > .room-sign { right: max(6px, calc((100vw - 920px) / 2 - 36px)); }
+}
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-name {
+  writing-mode: vertical-rl;
+  text-orientation: mixed; /* Latin turns a quarter, never stacks upright (gate 5) */
+  font: 700 10.5px/1 var(--font-ui);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+body:not([data-view='drift']) #app > main > .room-sign[data-script='kanji'] .room-sign-name {
+  text-orientation: upright;
+  font: 800 14px/1 var(--font-display);
+  letter-spacing: 0.3em;
+  text-transform: none;
+}
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum {
+  writing-mode: vertical-rl;
+  font: 400 9.5px/1 var(--font-data);
+  font-style: normal;
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+body:not([data-view='drift']) #app > main > .room-sign::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--color-seal);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign {
+  border-color: color-mix(in srgb, var(--color-gold) 34%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign .room-sign-name {
+  color: color-mix(in srgb, var(--color-gold) 30%, #fff6e6);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--color-gold) 60%, transparent), 0 0 1px #fff;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign::after { box-shadow: 0 0 8px var(--color-seal); }
+/* the shelf's hidden lead eyebrow stays hidden behind the sign */
+body[data-view='shelf'] main > .room-sign:first-child + .eyebrow { display: none; }
+/* fields and filter capsules: ruled paper, not grey fill */
+html:not([data-register='tutor']) body:not([data-view='drift']) :is(.search-field, .record-note-input),
+body:not([data-view='drift']) .filter-chip {
+  background-color: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong);
+  border-radius: var(--radius-control);
+}
+/* chips and doors: a lighter hairline than the relief edge */
+body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom),
+body:not([data-view='drift']) .kdx-lens,
+body:not([data-view='drift']) .focus-chip { border-color: var(--color-line-chip, color-mix(in srgb, var(--color-ink) 24%, transparent)); }
+
+/* ---- night: the Line's car and the tabs are lit from within ---- */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .line-car::before {
+  box-shadow: 0 0 0 3px var(--color-glass-solid), 0 0 10px color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .station-due { text-shadow: 0 0 6px color-mix(in srgb, var(--color-seal) 60%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  body:not(.zen):not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary, .study-door, .foundation-door) { transition: none; }
+}
+/* END BUNKI SKIN ============================================================ */

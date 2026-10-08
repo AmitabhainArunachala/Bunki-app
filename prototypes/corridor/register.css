@@ -621,13 +621,20 @@ html[data-register="tutor"] #app > .report-line-page .report-door { color: var(-
 
 /* ----------------------------------------------------------------- 9 · MOTION
    Rooms lift in like a sheet set down (120 ms). Reduced motion: appear. */
-@keyframes kairo-lift { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes kairo-lift { from { opacity: 0.01; transform: translateY(var(--lift, 6px)); } to { opacity: 1; transform: none; } }
+@keyframes kairo-sign { from { opacity: 0.01; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
 /* only on ENTERING a room (stampRegister marks data-room-entering for one beat): a grade, a
-   save or a clock tick re-renders main and must never fade the surface in again */
-html[data-room-entering] #app > main > * { animation: kairo-lift 160ms ease-out both; }
-html[data-room-entering][data-register="attempt"] #app > main > * { animation-duration: 120ms; }
+   save or a clock tick re-renders main and must never fade the surface in again.
+   Skin (C+A): hand-layered like a multiplane cel — the first plane settles first, the deeper
+   planes travel a little further and a beat later; all inside the 220ms entering beat. */
+html[data-room-entering] #app > main > * { --lift: 14px; animation: kairo-lift 170ms cubic-bezier(0.22, 1, 0.36, 1) 40ms both; }
+html[data-room-entering] #app > main > :nth-child(-n + 2) { --lift: 8px; animation-delay: 0ms; }
+html[data-room-entering] #app > main > :nth-child(3) { --lift: 11px; animation-delay: 20ms; }
+html[data-room-entering] #app > main > .room-sign { animation: kairo-sign 200ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+html[data-room-entering][data-register="attempt"] #app > main > * { animation-duration: 120ms; animation-delay: 0ms; }
 @media (prefers-reduced-motion: reduce) {
-  html[data-room-entering] #app > main > * { animation: none; }
+  html[data-room-entering] #app > main > *,
+  html[data-room-entering] #app > main > .room-sign { animation: none; }
   html[data-register="attempt"] .chrome::after { transition: none; }
 }
 
