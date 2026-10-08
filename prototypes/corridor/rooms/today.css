@@ -15,3 +15,570 @@ html:is([data-room='tray'], [data-room='list'], [data-room='browse']) body:not([
     radial-gradient(60% 30% at 82% 100%, color-mix(in srgb, var(--color-live) 9%, transparent), transparent 70%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 40%);
 }
+
+/* ==========================================================================================
+   TODAY 今日 · the daily ritual (Today lane). Material: the learner's own words as a sky over
+   dawn washi. Light: the dawn band by day; the city glowing under the word by night.
+   Gesture: one word, one door. Motion: the sky breathes (transform/opacity only), the train
+   of today's cards arrives. Everything is off under prefers-reduced-motion.
+   ========================================================================================== */
+html[data-room='tray'] body:not([data-view='drift']) {
+  --today-sky-ink: var(--color-accent);
+  --today-halo: var(--color-page);
+  --today-roof: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  --today-win: transparent;
+  --today-lamp: transparent;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] body:not([data-view='drift']) {
+  --today-sky-ink: color-mix(in srgb, var(--color-ink) 86%, var(--color-accent));
+  --today-halo: var(--color-ground);
+  --today-roof: color-mix(in srgb, var(--color-ground) 55%, #000);
+  --today-win: var(--color-gold);
+  --today-lamp: var(--color-signal);
+}
+
+/* ---- the hero: full-bleed under the chrome, the sky behind, the word in the middle ---- */
+html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(470px, calc(100svh - 360px), 620px);
+  margin: -24px -36px 0 -18px;
+  padding: 24px 36px 72px 18px;
+  overflow: hidden;
+}
+@media (min-width: 521px) {
+  html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero { margin: 0; padding: 8px 8px 72px; }
+}
+html[data-room='tray'] .today-head { position: relative; z-index: 3; align-self: flex-start; }
+html[data-room='tray'] .today-head .today-date { margin: 0 0 4px; }
+html[data-room='tray'] .today-head .view-title {
+  margin: 0;
+  font: 800 clamp(38px, 11vw, 46px)/1.02 var(--font-headword);
+  letter-spacing: 0.005em;
+  color: var(--color-ink);
+}
+
+/* ---- the sky of the learner's own words: three depths, drifting ---- */
+html[data-room='tray'] .today-sky { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+html[data-room='tray'] .today-sky-layer { position: absolute; inset: 0; }
+html[data-room='tray'] .today-sky-layer[data-depth='1'] { animation: today-drift-1 26s ease-in-out infinite alternate; }
+html[data-room='tray'] .today-sky-layer[data-depth='2'] { animation: today-drift-2 19s ease-in-out infinite alternate; }
+html[data-room='tray'] .today-sky-layer[data-depth='3'] { animation: today-drift-3 14s ease-in-out infinite alternate; }
+@keyframes today-drift-1 { to { transform: translate3d(-7px, 3px, 0); } }
+@keyframes today-drift-2 { to { transform: translate3d(-12px, -4px, 0); } }
+@keyframes today-drift-3 { to { transform: translate3d(-18px, 5px, 0); } }
+html[data-room='tray'] .today-star {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 1;
+  white-space: nowrap;
+  font-family: var(--font-reading);
+  font-weight: 600;
+  color: var(--today-sky-ink);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform var(--motion-quick) var(--ease-standard), opacity var(--motion-quick) var(--ease-standard);
+}
+html[data-room='tray'] .today-star::before { content: ''; position: absolute; inset: -12px -6px; }
+html[data-room='tray'] .today-star[data-depth='1'] { opacity: 0.32; }
+html[data-room='tray'] .today-star[data-depth='2'] { opacity: 0.52; }
+html[data-room='tray'] .today-star[data-depth='3'] { opacity: 0.78; font-family: var(--font-headword); font-weight: 800; }
+html[data-room='tray'] .today-star.due { opacity: 0.94; animation: today-breath 7s ease-in-out var(--d, 0s) infinite alternate; }
+html[data-room='tray'] .today-star.due::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  background: var(--color-seal);
+}
+@keyframes today-breath { from { opacity: 0.94; } to { opacity: 0.66; } }
+html[data-room='tray'] .today-star:hover,
+html[data-room='tray'] .today-star:active { opacity: 1; transform: scale(1.12); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star[data-depth='3'] {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--color-gold) 40%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.due {
+  color: color-mix(in srgb, var(--color-gold) 55%, var(--color-ink));
+  text-shadow: 0 0 12px color-mix(in srgb, var(--color-gold) 55%, transparent);
+}
+
+/* ---- the city under the word: roofs by day, lit windows by night (D's skyline graft) ---- */
+html[data-room='tray'] .today-city {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  bottom: 44px;
+  width: 100%;
+  height: 84px;
+  pointer-events: none;
+}
+html[data-room='tray'] .today-roofs { fill: var(--today-roof); }
+html[data-room='tray'] .today-wins { fill: var(--today-win); opacity: 0.6; }
+html[data-room='tray'] .today-lamps { fill: var(--today-lamp); opacity: 0.8; }
+html[data-room='tray'] .today-horizon { stroke: var(--color-rule); stroke-width: 0.5; fill: none; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-wins {
+  animation: today-windows 9s ease-in-out infinite alternate;
+}
+@keyframes today-windows { from { opacity: 0.6; } to { opacity: 0.42; } }
+
+/* ---- the day's word ---- */
+html[data-room='tray'] .today-dayword {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto auto 0;
+  padding: 26px 20px 4px;
+  text-align: center;
+  max-width: 340px;
+}
+html[data-room='tray'] .today-dayword::before {
+  content: '';
+  position: absolute;
+  inset: -6px -30px -10px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--today-halo) 94%, transparent),
+    color-mix(in srgb, var(--today-halo) 62%, transparent) 64%, transparent);
+  pointer-events: none;
+}
+html[data-room='tray'] .dw-label {
+  margin: 0;
+  font: 600 11.5px/1 var(--font-ui);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-seal);
+}
+html[data-room='tray'] body:not(.ui-bi) .dw-label { letter-spacing: 0.32em; font-size: 12px; }
+html[data-room='tray'] .dw-word {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0 0;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+html[data-room='tray'] .dw-word:active { transform: scale(0.985); }
+html[data-room='tray'] .dw-glyph {
+  display: flex;
+  gap: 0.02em;
+  font: 800 min(98px, calc(74vw / var(--n, 2)))/1.06 var(--font-headword);
+  letter-spacing: 0.02em;
+}
+html[data-room='tray'] .dw-k { display: inline-block; animation: today-ink 520ms var(--ease-ink) both; }
+html[data-room='tray'] .dw-k:nth-child(2) { animation-delay: 60ms; }
+html[data-room='tray'] .dw-k:nth-child(3) { animation-delay: 120ms; }
+html[data-room='tray'] .dw-k:nth-child(n + 4) { animation-delay: 180ms; }
+@keyframes today-ink { from { opacity: 0.01; transform: scale(1.04); } 60% { opacity: 0.9; } to { opacity: 1; transform: none; } }
+html[data-room='tray'] .dw-r {
+  margin: 4px 0 0;
+  font: 500 13px/1 var(--font-ui);
+  letter-spacing: 0.34em;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .dw-hook {
+  margin: 14px 0 0;
+  max-width: 300px;
+  font: 400 15px/1.5 var(--font-ui);
+  color: var(--color-ink-2);
+  text-wrap: balance;
+}
+html[data-room='tray'] .dw-pk {
+  padding: 0 2px;
+  font: 800 19px/1 var(--font-headword);
+  color: var(--color-seal);
+}
+html[data-room='tray'] .dw-fam {
+  margin: 6px 0 0;
+  font: 400 11.5px/1.4 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .dw-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  font: 600 14px/1 var(--font-ui);
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+html[data-room='tray'] .dw-go .dw-pk { font-size: 17px; color: inherit; padding: 0; }
+html[data-room='tray'] .dw-go-l:empty { display: none; }
+html:is([data-room='tray'], [data-room='review']) .today-arrow {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 18px;
+  height: 1px;
+  margin-left: 4px;
+  background: currentColor;
+  transition: transform var(--motion-quick) var(--ease-standard);
+}
+html:is([data-room='tray'], [data-room='review']) .today-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: translateY(-50%) rotate(45deg);
+  transform-origin: 50% 50%;
+}
+html[data-room='tray'] :is(.dw-go, .today-then):hover .today-arrow { transform: translateX(3px); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .dw-glyph {
+  text-shadow: 0 0 24px color-mix(in srgb, var(--color-gold) 30%, transparent);
+}
+
+/* ---- today's line: three stops on a hairline track, the train, the one door ---- */
+html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line {
+  position: relative;
+  z-index: 2;
+  margin: -48px 0 0;
+  padding: 20px 18px 10px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface);
+  box-shadow: var(--elevation-card);
+}
+html[data-room='tray'] .today-stops {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html[data-room='tray'] .today-stops::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 6px;
+  height: 0.5px;
+  background: var(--color-rule);
+}
+html[data-room='tray'] .today-stop {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
+  padding-top: 24px;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .today-stop::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1px solid var(--color-rule);
+  background: var(--color-surface);
+}
+html[data-room='tray'] .today-stop-n { font: 800 28px/1 var(--font-headword); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+html[data-room='tray'] .today-stop-l { font: 500 13px/1.25 var(--font-ui); }
+html[data-room='tray'] .today-stop.now { color: var(--color-ink); }
+html[data-room='tray'] .today-stop.now .today-stop-n { color: var(--color-ink); }
+/* the one live element on Today: where you stand on the line */
+html[data-room='tray'] .today-stop.now::before {
+  border-color: var(--color-live);
+  background: var(--color-live);
+  box-shadow: 0 0 0 4px var(--color-live-wash), 0 0 10px var(--color-live-glow);
+}
+html[data-room='tray'] .today-train { display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 16px; }
+html[data-room='tray'] .today-train .car {
+  width: 3px;
+  height: 14px;
+  background: var(--color-accent);
+  opacity: 0.85;
+  animation: today-arrive 300ms var(--ease-enter) both;
+  animation-delay: calc(140ms + var(--i, 0) * 12ms);
+}
+html[data-room='tray'] .today-train .car.learn { background: var(--color-seal); }
+@keyframes today-arrive { from { opacity: 0.01; transform: translateX(46px); } to { opacity: 0.85; transform: none; } }
+html[data-room='tray'] .today-line #review-start {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  margin: 0;
+  padding: 0 18px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  font: 700 16px/1.2 var(--font-ui);
+  text-align: left;
+}
+html[data-room='tray'] .today-line #review-start > .l-ja { display: inline; flex: 1 1 auto; min-width: 0; }
+html[data-room='tray'] .today-line #review-start.quiet { justify-content: center; margin-top: 18px; font-weight: 600; }
+html[data-room='tray'] .review-start-min {
+  font: 500 13px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  opacity: 0.86;
+  white-space: nowrap;
+}
+html[data-room='tray'] .today-then {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin: 6px 0 0;
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font: 400 13px/1.3 var(--font-ui);
+  text-align: left;
+  cursor: pointer;
+}
+html[data-room='tray'] .today-then-l { flex: none; }
+html[data-room='tray'] .today-then-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 14px/1.3 var(--font-reading);
+  color: var(--color-ink-2);
+}
+html[data-room='tray'] .today-then-n {
+  flex: none;
+  margin-left: auto;
+  font: 400 12px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .today-then .today-arrow { color: var(--color-accent); }
+html[data-room='tray'] .today-then.solo {
+  margin: 18px 0 8px;
+  padding: 0 14px;
+  min-height: 54px;
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  box-shadow: var(--elevation-paper);
+}
+
+/* ---- the deck room, folded under the line: mono numbers on hairlines ---- */
+html[data-room='tray'] .today-detail { margin: 30px 0 8px; }
+html[data-room='tray'] .today-detail-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 2px;
+  border: 0;
+  border-block: var(--stroke-hairline) solid var(--color-line);
+  background: none;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+html[data-room='tray'] .today-detail-name {
+  font: 600 11.5px/1 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='tray'] body:not(.ui-bi) .today-detail-name { letter-spacing: 0.2em; font-size: 12px; }
+html[data-room='tray'] .today-detail-sum {
+  margin-left: auto;
+  font: 400 12px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+}
+html[data-room='tray'] .today-detail-caret {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 4px 3px 2px;
+  border-right: 1px solid var(--color-muted);
+  border-bottom: 1px solid var(--color-muted);
+  transform: rotate(45deg);
+  transition: transform var(--motion-quick) var(--ease-standard);
+}
+html[data-room='tray'] .today-detail-toggle[aria-expanded='false'] .today-detail-caret { transform: rotate(-45deg); }
+html[data-room='tray'] .today-detail-body { padding-top: 4px; }
+html[data-room='tray'] .today-detail-body .deck-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 14px 0 12px;
+}
+html[data-room='tray'] .today-detail-body .deck-count {
+  padding: 4px 0 2px 12px;
+  border: 0;
+  border-left: var(--stroke-hairline) solid var(--color-line);
+  border-radius: 0;
+  background: none;
+  text-align: left;
+}
+html[data-room='tray'] .today-detail-body .deck-count:first-child { padding-left: 2px; border-left: 0; }
+html[data-room='tray'] .today-detail-body .deck-count .deck-count-n {
+  font: 500 26px/1.1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+html[data-room='tray'] .today-detail-body .deck-count .deck-count-l {
+  margin-top: 4px;
+  font: 500 11px/1.2 var(--font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .today-detail-body .deck-count.c-due .deck-count-n { color: var(--color-accent); }
+html[data-room='tray'] .today-detail-body .srs-forecast {
+  margin: 6px 0;
+  font: 400 12px/1.6 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .today-detail-body .srs-held { color: var(--color-ink-2); }
+html[data-room='tray'] .today-detail-body .deck-table { margin: 18px 0 12px; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
+html[data-room='tray'] .today-detail-body .deck-row {
+  min-height: 46px;
+  padding: 8px 2px;
+  border-bottom: var(--stroke-hairline) solid var(--color-line);
+  font: 400 15px/1.3 var(--font-ui);
+  color: var(--color-ink);
+}
+html[data-room='tray'] .today-detail-body .deck-row > span:not(.d-name) {
+  font: 500 14px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+html[data-room='tray'] .today-detail-body .deck-row > span.zero { color: var(--color-quiet); font-weight: 400; }
+html[data-room='tray'] .today-detail-body .deck-row > span.c-due:not(.zero) { color: var(--color-accent); }
+html[data-room='tray'] .today-detail-body .deck-row.deck-head { min-height: 0; padding-block: 8px; }
+html[data-room='tray'] .today-detail-body .deck-row.deck-head > span {
+  font: 500 10.5px/1 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='tray'] .today-detail-body .deck-row.deck-all .d-name { font-weight: 600; }
+html[data-room='tray'] .today-detail-body .deck-row:disabled { color: var(--color-ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='tray'] :is(.today-sky-layer, .today-star.due, .dw-k, .today-train .car, .today-wins) { animation: none; }
+  html[data-room='tray'] :is(.today-star, .dw-word, .today-arrow, .today-detail-caret) { transition: none; }
+}
+
+/* ==========================================================================================
+   The session's close (review room, done): "The surface is clear." One next door, and
+   tomorrow's first word half-shown over the horizon.
+   ========================================================================================== */
+html[data-room='review'] body:not(.zen) .view-title:has(.review-clear) { margin-bottom: 18px; }
+html[data-room='review'] .review-clear {
+  display: block;
+  font: 800 clamp(30px, 9vw, 40px)/1.15 var(--font-headword);
+  color: var(--color-ink);
+  text-wrap: balance;
+  animation: today-ink 600ms var(--ease-ink) both;
+}
+html[data-room='review'] .review-clear + .review-clear-count {
+  display: block;
+  margin-top: 12px;
+  font: 400 13px/1.3 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+}
+html[data-room='review'] .review-next { margin: 26px 0 18px; }
+html[data-room='review'] .review-next-door {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+  width: 100%;
+  min-height: 64px;
+  padding: 14px 16px;
+  border: var(--stroke-relief) solid var(--color-edge-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--elevation-card);
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+html[data-room='review'] .review-next-l {
+  grid-column: 1 / -1;
+  font: 600 11px/1 var(--font-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-seal);
+}
+html[data-room='review'] .review-next-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 17px/1.35 var(--font-reading);
+}
+html[data-room='review'] .review-next-n {
+  grid-column: 1;
+  font: 400 12px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+html[data-room='review'] .review-next-door .today-arrow { grid-column: 2; grid-row: 2 / span 2; color: var(--color-accent); }
+html[data-room='review'] .review-tomorrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 34px 0 30px;
+  text-align: center;
+}
+html[data-room='review'] .review-tomorrow-l {
+  font: 500 11px/1 var(--font-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='review'] .review-tomorrow::after {
+  content: '';
+  width: min(220px, 60%);
+  height: 0.5px;
+  margin-top: -22px;
+  background: var(--color-rule);
+}
+html[data-room='review'] .review-tomorrow-w {
+  margin-top: 10px;
+  font: 800 54px/1 var(--font-headword);
+  color: var(--color-ink);
+  /* half-shown: the top of tomorrow's word rises over the horizon */
+  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 62%);
+  mask-image: linear-gradient(180deg, #000 30%, transparent 62%);
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='review'] .review-clear { animation: none; }
+}
