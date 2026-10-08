@@ -101,3 +101,6 @@ button.node:active { transform: scale(.94); }
 .chip:active { transform: translateY(1px); }
 
 .pulse { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; background: var(--color-signal); box-shadow: 0 0 12px var(--color-signal-glow), 0 0 0 2px var(--color-ground); z-index: 4; pointer-events: none; opacity: 0; }
+/* narrow phones: the plate keeps its drawing, scaled as a whole */
+@media (max-width: 389px) { .field { zoom: .92; } }
+@media (max-width: 359px) { .field { zoom: .82; } }

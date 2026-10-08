@@ -50,4 +50,5 @@
   - Every WAAPI keyframe uses transform or opacity.
   - left and top are set statically only.
   - Ambient cycles (windows, rain) are at least 6 s.
+- **Narrow phones.** At 320 px the word plate overflowed (its drawing is 390 px wide). It now zooms as a whole drawing below 390 px, and there is no horizontal scroll on any route at 320 px or 390 px.
 - **Shooter.** Final re-shoot of the screens and the journey. The shooter prints no page errors.
