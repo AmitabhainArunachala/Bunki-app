@@ -10,3 +10,7 @@ Branch: `claude/redesign-20261008` (pushes accepted). Draft PR: #126. Times are 
 | 01:15 | vision | VISION.md + VISION-ONE-PAGE.md synthesised; self-check against 40 clauses of THE BRIEF. |
 | 01:22 | vision | Independent adversarial review (VISION-REVIEW.md): 11 findings, 3 high, all fixed. Phase 1 comment posted on #126. |
 | 01:25 | concepts | Four concept agents launched in parallel (a-migaki, b-night-desk, c-living-shelf, d-hakushi) with the shared kit (`concepts/_kit`). Verifier baseline running in a pinned worktree. |
+| 01:35–02:00 | concepts | All four concepts finished (each: first build + 3 refinement rounds, SPEC, NOTES, day/night/JA shots, motion journey). Committed. |
+| 02:00 | judge | Four judges: C 191.5, A 187.5, B 173, D 163 /240. Choice: **C Living Shelf + A's craft**, grafts from B and D, 10 build gates (JUDGEMENT.md). Phase 2 comment on #126. |
+| 02:05 | ship | 白紙 standalone draft PR **#127** opened from `claude/hakushi-20261008` (base `claude/final-integration-20261007`). |
+| 02:05 | build | Six room stylesheets `rooms/{today,read,learn,words,me,cards}.css` registered in index.html, sw.js SHELL, corridor-assets, build-standalone, sw-shell.test (8/8 pass). |
