@@ -1908,7 +1908,7 @@ async function verifyReview(browser, base) {
       );
       check(
         `a) ${deck}: after a reload the deleted card is not in the queue; 設定 › 保留中のカード counts it and 復元 puts it back (logged), with the record as it was`,
-        /1 cards/.test(home) && /^1 cards \(Remove 1\)$/.test(counted) && after.text === 'None' && after.disabled && Object.keys(l3.suspended).length === 0 && l3.repairLog.at(-1)[1] === 'restore' && l3.repairLog.at(-1)[0] === a && JSON.stringify(l3.cards[a]) === JSON.stringify(before.cards[a]) && /2 cards/.test(homeAfter),
+        /^Begin — 1 card$/.test(home) && /^1 card \(Remove 1\)$/.test(counted) && after.text === 'None' && after.disabled && Object.keys(l3.suspended).length === 0 && l3.repairLog.at(-1)[1] === 'restore' && l3.repairLog.at(-1)[0] === a && JSON.stringify(l3.cards[a]) === JSON.stringify(before.cards[a]) && /2 cards/.test(homeAfter),
         JSON.stringify({ home, counted, after, homeAfter }),
       );
     } finally {
