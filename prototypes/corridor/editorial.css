@@ -3933,7 +3933,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --color-rule-soft: color-mix(in srgb, var(--color-accent) 13%, transparent);
   --color-fill: color-mix(in srgb, var(--color-accent) 6%, transparent);
   --color-fill-strong: color-mix(in srgb, var(--color-accent) 11%, transparent);
-  --color-glass: color-mix(in srgb, var(--color-page) 88%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-page) 94%, transparent);
   --color-glass-solid: var(--color-page);
   --color-glass-line: color-mix(in srgb, var(--color-ink) 22%, transparent);
   /* new roles (C SPEC "new"): the one live mark, earned gold, 藍 lacquer frames */
@@ -4010,7 +4010,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --color-rule-soft: color-mix(in srgb, var(--color-live) 11%, transparent);
   --color-fill: color-mix(in srgb, var(--color-accent) 10%, transparent);
   --color-fill-strong: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  --color-glass: color-mix(in srgb, var(--color-ground) 86%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-ground) 93%, transparent);
   --color-glass-solid: var(--color-ground);
   --color-glass-line: color-mix(in srgb, var(--color-accent) 24%, transparent);
   --color-live: #5df2d6;
@@ -4161,6 +4161,7 @@ body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door)
   background: var(--color-surface);
   transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-quick) var(--ease-standard);
 }
+body.v-depth-layered:not([data-view='drift']) .study-door { padding: var(--space-4) var(--space-4) var(--space-4); margin: 0 0 var(--space-2); }
 body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door):active { transform: translateY(1px); box-shadow: var(--elevation-paper); }
 body:not([data-view='drift']) .foundation-door {
   display: flex;
@@ -4278,7 +4279,11 @@ body:not([data-view='drift']) #app > main > .room-sign {
   user-select: none;
 }
 @media (max-width: 520px) {
-  html:is([data-room='tray'], [data-room='shelf'], [data-room='learn'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
+  html:is([data-room='tray'], [data-room='learn'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
+  /* the shelf keeps its full measure (its title block is pinned to one-line notes); only the
+     look-up field steps aside, and the sign is cut short above the Tools door */
+  body[data-view='shelf']:not(.zen) #app > main > .room-sign ~ #search { width: calc(100% - 30px); }
+  body[data-view='shelf']:not(.zen) #app > main > .room-sign { padding-block: 10px 8px; gap: 8px; }
 }
 @media (min-width: 521px) {
   body:not([data-view='drift']) #app > main > .room-sign { right: max(6px, calc((100vw - 920px) / 2 - 36px)); }
