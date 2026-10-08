@@ -206,3 +206,76 @@ The two surfaces the redesign did not reach are the front door and the N1 deck p
       - Render the legend as a superscript numeral sample, e.g. `12` with "strokes".
       - Use `D.radicals[p].name` only; skip the kun fallback for parts.
       - Drop the duplicate mark in `wwModel` (around line 17430).
+
+## Round 2 (after the fix lanes)
+
+**Build:** HEAD `d4cfac23` (`/root/.dharma/main/site`, `gitSha d4cfac23`, clean). The method was the same as round 1: 390×844 @2x, reduced motion for the stills, `?ui=bi` / `?ui=ja`, and `kairo-theme` `hokusai` / `yoru`. The fixture was rebuilt and loaded through `restoreAppFixture` → `#import-file`. It holds 26 saved words: 8 are due and 18 are spread over the next 9 days. It also holds 40 timed `revlog` rows from yesterday.
+
+Because the fixture was rebuilt, today's word is now 音楽 instead of 時間.
+
+**Renamed shots.**
+- `session-close-*` is now `today-done-*`.
+- `web-follow-*` is now `words-follow-*`.
+- `learn-decks-*` was dropped.
+
+**Other outputs.**
+- **Contact sheets:** `sheet-after-*.png`, 13 screens each.
+- **Before and after:** `beforeafter-{today,read,learn,words,me,cards}.png`.
+- **Motion:** `motion-frames.png` holds 12 frames, each about 110 ms after a tap. `journey.webm` is 2.9 MB and 17 s long.
+
+### Round-1 defects
+
+| # | Defect | Status | Evidence |
+|---|---|---|---|
+| 1 | Deck player is a different app | **PARTLY** | **Fixed:** deck home is on paper, with one mono line ("0 due · 15 new · 0 known · 0 difficult"), one ← exit and no paper strip. **Still wrong:** front and back keep the navy surround by day (`deck-front-day-en.png`), the checkbox theme rows remain, and deck home has **no night state** (`deck-home-night-en.png`, see N1). |
+| 2 | Nothing to do above the fold on the card front | **FIXED** | "Reveal answer" / 答えを見る is sticky above the tab bar (`deck-front-day-en.png`, `deck-front-night-ja.png`). |
+| 3 | Two navigation systems | **PARTLY** | **Fixed:** `‹ Back` is gone from every tab root. **Still wrong:** the cap `#chrome-dojo` (same place as the Learn tab) still shows at 390 and hides only at 320. The `#tray` bookmark "26" is still in the chrome of every room (`today-day-en.png`, `learn-day-en.png`). |
+| 4 | Front door is the old app | **PARTLY** | **Fixed:** the hint is English ("Touch a word"), the primary is a real button ("Review · 8 due", a lit edge at night). **Still wrong:** the same pale blue-grey word field, torii button and bug glyph. No paper, no skyline, no 朱 (`door-day-en.png`, `door-night-ja.png`). |
+| 5 | Today and the web disagree | **FIXED** | Today says "10 in your words" and the web says "10 already in your words" (`today-day-en.png`, `words-follow-day-en.png`). |
+| 6 | Read opens on a filter wall | **PARTLY** | **Fixed:** the dropdowns and the second search moved into Tools, and the picture starts at y=224 (`read-day-en.png`). **Still wrong:** the "Look up a word" field duplicates the header search, and "Unreviewed · 54 of 120 not yet checked by a person ⓘ" still sits above the picture. |
+| 7 | Reader is triple-spaced with chrome above the text | **PARTLY** | **Fixed:** line pitch fell from about 53px to 38px (2.0× of 19px). **Still wrong:** the version explainer, the tip box, the UNREVIEWED pill and "no recording yet · Kore" are all still there (`reader-day-en.png`). |
+| 8 | Session close: primary on the wrong door, EN seal | **FIXED** | The primary is "Read it now" on the Next-door card. The labels are "KEPT 8 / AGAIN 0" with no bare 良. 毎日 is legible, "Back to Today" is a link, and the report links are gone (`today-done-day-en.png`). |
+| 9 | Reveal jolts the page | **OPEN** | **Mid-transition** (`motion-frames.png` frame 08): the chrome is half scrolled off and the tab bar floats up. **Once settled** (`deck-back-day-en.png`): the card's top is cut off, and its text shows through the translucent chrome. |
+| 10 | Room-to-room motion is a cut | **PARTLY** | **Animates:** the web re-centre (frame 03). **Cuts:** Follow 日 (frame 02), Learn (05), the deck (06), the article (10) and the popup (11, already settled at 110 ms). **Read** (09) shows a blank paper frame, which reads as a load flash, not an entrance. |
+| 11 | The Today sky shouts | **PARTLY** | **Fixed:** the 朱 due dots are gone, and the eyebrow is ink. **Still wrong:** the teal live dot, the 朱 日, the 朱 tab badge and the 朱 spine square remain, and 時間 and 推進 still crowd the hero (`today-day-en.png`). |
+| 12 | Japanese on the card back in EN | **FIXED** | The chip reads "noun" (`deck-back-day-en.png`). |
+| 13 | Popup off-centre, three ways to save | **OPEN** | `#mini` measures left 8 → right 330 at 390, so the right gutter is still 60px. "This sentence: Save" is unchanged, and the chrome gains a ✓ while the popup is open (`popup-day-en.png`). |
+| 14 | Tokenizer splits ジャラマナ | **OPEN** | The reader DOM still holds `tok content` ジャラ + `tok plain` マナ, in the lead story's first line (`reader-day-en.png`). |
+| 15 | Learn overflows at 320 in 日本語 | **FIXED** | `scrollWidth` = 320 in all five rooms at 320, in EN and 日本語. The chrome fits on one row (`learn-320-day-ja.png`). |
+| 16 | Words stacks a search panel above the web | **OPEN** | The lens strip is still cut mid-word ("radica", "手書") with no fade. The "Find by shape · open SKIP wheel" slab is still there. The placeholder got *longer* and is clipped: "kanji · kana · English · SKIP 1-3-(" (`words-day-en.png`). |
+| 17 | Tab bar ghosts the content | **FIXED** | The tab bar background is opaque and `backdrop-filter` is `none` (measured). No ghosting is visible in any shot. |
+| 18 | Word-web details | **OPEN** | The legend still reads "● KANJI n STROKES" / "n 画数", NAME is still "ひ", and "IN YOUR WORDS 10" still repeats the sentence above it (`words-follow-day-en.png`, `words-day-ja.png`). |
+
+**Tally:** 6 fixed (2, 5, 8, 12, 15, 17), 7 partly (1, 3, 4, 6, 7, 10, 11), 5 open (9, 13, 14, 16, 18).
+
+### New defects, most visible first
+
+1. **Deck home has no night.** At night the N1 home is full day paper between the navy chrome and the navy tab bar (`deck-home-night-en.png`, `deck-home-night-ja.png`). By day the player behind the card stays navy (`deck-front-day-en.png`). One deck flow therefore crosses two worlds, and they are inverted by time of day. This fails check 18 outright.
+2. **The card back is a help-box screen.** "Choose Again if seeing the answer improved your understanding. ×" and a "← Again · Swipe · Recalled →" hint row sit under the grades. That makes two instruction rows in prime space, on every card (`deck-back-day-en.png`). It is John's "weird, awkward, not clear" (VISION §5.1).
+3. **The rotated 8 on the Learn spine reads as "∞".** The spine shows "LEARN ∞" / "学ぶ ∞" (`learn-day-en.png`, `learn-320-day-ja.png`). A count turned sideways is a different symbol. This fails check 14 to the eye.
+4. **Read flashes empty.** 110 ms after the Read tab, the frame is bare paper with no shelf (`motion-frames.png` frame 09). It reads as a load gap, not a held frame.
+5. **One practice, two homes.** "Begin · 8 cards" on Today and "Review 8 cards" on Learn start the same queue (`today-day-en.png`, `learn-day-en.png`). This fails check 12's "each practice has one home".
+6. **Three routes to Today at the session close.** The chrome "‹ Back", the "Back to Today" link and the Today tab all go there (`today-done-day-en.png`). This fails check 12.
+7. **The popup still shows part readings in EN.** おおざと and ぼく / た appear beside the parts in EN (`popup-day-en.png`). This is check 2: they are not learned content.
+8. **Today's plan card clips the next story mid-title.** It reads "Then 過去・現在・…" (`today-day-en.png`). The one concrete next door is cut to a fragment.
+9. **The door's "Touch a word" looks like a button but is a hint.** It is a bordered pill with button weight that does nothing (`door-day-en.png`).
+
+### Verdict against VISION §10.2 and THE BAR
+
+The fix lanes did real work. The count disagreement, the session close, the card front, the EN chip, the 320 overflow and the ghosting tab bar are all genuinely closed, and Today, Learn, Me and the word web are now rooms John could be shown without apology. The before→after sheets show the tab rooms are a different, far better app than this morning's.
+
+It does not pass the bar yet:
+
+- **Door (bland).** The first frame of the app is still the old washed-out field. A torii, a bug and a pale cloud of grey words are not a frame an anime director would pause on.
+- **Reader (confusing).** The room he spends the most time in still opens with an explainer sentence, a tip box, an UNREVIEWED pill and "no recording yet · Kore". These are the exact four things he named on 09-23 and 10-02 (help boxes in prime space, a vague "unreviewed", a placeholder).
+- **Words (cluttered).** The room's signature, the web, still sits under a clipped search panel with a grey slab.
+- **Deck (two worlds, bland at home).** The deck now crosses paper and navy, inverted at night. Its home is a settings page of checkboxes, and its back is a help box.
+
+On the checks:
+
+| Status | Checks |
+|---|---|
+| Fail somewhere | 6 (motion: mostly cuts, and the reveal jolt), 10 (unreviewed line, reader tip), 11 (Kore placeholder), 12 (Today vs Learn, close exits, header search vs shelf search, cap vs Learn tab), 13 (Today), 15 (ジャラマナ), 18 (deck home at night), 19 (no voice for the lead story), 21 (door, reader, deck) |
+| Now pass broadly | 1, 2 (bar the popup readings), 3 (bar "SKIP"), 5, 14, 16, 17, 24 |
+
+Would John still call a room boring, bland or confusing? Yes. He would call the door bland, the reader and Words confusing, and the deck home boring. **Not done.**
