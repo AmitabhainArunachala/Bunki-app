@@ -73,16 +73,15 @@
 .kp-sub { margin: 0; color: var(--kp-ink-2); font-size: 14px; line-height: 1.6; }
 .kp-h2 { margin: 8px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
 
-.kp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.kp-done .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.kp-tile { background: var(--kp-panel); border: 1px solid var(--kp-line); border-radius: 14px; padding: 12px 10px; display: grid; gap: 2px; }
-.kp-tile b { font-family: var(--kp-num); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.kp-tile span { font-size: 12px; color: var(--kp-ink-2); }
-.kp-c-due b, .kp-c-due { color: var(--kp-amber); }
-.kp-c-new b { color: var(--kp-ink); }
+.kp-tiles { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; row-gap: 4px; padding: 10px 0; border-block: 1px solid var(--kp-line); font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
+/* the deck's state: one quiet mono line, "0 due · 15 new · 0 known · 0 difficult", no coloured tiles */
+.kp-tile { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.kp-tile + .kp-tile::before { content: '·'; margin: 0 10px; color: var(--kp-mute); }
+.kp-tile b { font-size: 15px; font-weight: 600; color: var(--kp-ink); }
+.kp-tile span { font-size: 12.5px; letter-spacing: 0.04em; color: var(--kp-mute); }
 .kp-c-known b, .kp-verdict.kp-c-known { color: var(--kp-green); }
 .kp-c-hard b, .kp-verdict.kp-c-hard { color: var(--kp-red); }
-.kp-tile span { color: var(--kp-ink-2); }
+.kp-tiles .kp-tile b { color: var(--kp-ink); }
 
 .kp-start { width: 100%; min-height: 56px; border: 0; border-radius: 16px; background: var(--kp-cyan); color: #00131d; font-size: 18px; font-weight: 700; letter-spacing: 0.04em; }
 .kp[data-look='light'] .kp-start { color: #fff; }
@@ -284,7 +283,6 @@
 .kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
 
 @media (max-width: 420px) {
-  .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
   .kp-row .kp-dots { display: none; }
 }
@@ -362,12 +360,16 @@
    * word's brackets, the rail and the slash on もう一度 (never text). Measured: contrast-kotoba stage row */
   --kp-stage: var(--kp-bg); --kp-stage-ink: var(--kp-ink-2); --kp-stage-mute: var(--kp-mute); --kp-shu: #ff6a4d; }
 .kp[data-look='light'] { --kp-on-accent: #fff; --kp-depth: 0 1px 2px rgba(15, 30, 45, 0.08), 0 8px 24px rgba(15, 30, 45, 0.1);
-  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a; }
-.kp[data-look='ai'] { /* 藍 indigo night, gold accent */
-  --kp-bg: #0b1030; --kp-panel: #121a46; --kp-panel-2: #1a2458; --kp-ink: #eef1ff; --kp-ink-2: #b9c1ea; --kp-mute: #929dd0; --kp-line: #2a3672;
-  --kp-cyan: #f2c14e; --kp-cyan-wash: rgba(242, 193, 78, 0.16); --kp-on-accent: #1a1300; --kp-green: #59e0a6; --kp-violet: #9fb4ff; --kp-kind-ji: #7fd6ff; --kp-kind-bun: #b9a6ff;
-  --kp-noun: #f2c14e; --kp-tex: radial-gradient(120% 80% at 0% 0%, rgba(120, 140, 255, 0.12), transparent 60%);
-  color-scheme: dark; }
+  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a;
+  /* the family's study stage: the white sheet on 藍漆 lacquer */
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
+.kp[data-look='ai'] { /* 藍: the room's own family (Bunki C+A): a washi card on a 藍漆 lacquer stage, sumi ink, 藍 accent, 朱 marks */
+  --kp-bg: #f4eee1; --kp-panel: #fbf8f1; --kp-panel-2: #efe8d9; --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #565c66; --kp-line: #dcd3c0;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1; --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.03) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.025) 0 1px, transparent 1px 11px);
+  --kp-depth: 0 1px 0 rgba(25, 28, 34, 0.09), 0 10px 26px -6px rgba(40, 30, 16, 0.16); color-scheme: light;
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
 .kp[data-look='washi'] { /* 和紙 warm paper with fibres */
   --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #4a3e2f; --kp-mute: #5c4f3e; --kp-line: #dccfb5;
   --kp-cyan: #93301a; --kp-cyan-wash: rgba(147, 48, 26, 0.1); --kp-on-accent: #fff; --kp-red: #a82233; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
@@ -380,7 +382,8 @@
   --kp-cyan: #a1264a; --kp-cyan-wash: rgba(161, 38, 74, 0.1); --kp-on-accent: #fff; --kp-red: #ab2333; --kp-amber: #7f4c00; --kp-green: #21613f; --kp-violet: #6a40b8;
   --kp-kind-ji: #5e0b63; /* was #2665a7, the verb's own blue */ --kp-noun: #a1264a; --kp-verb: #2665a7; --kp-adj: #895900; --kp-adv: #7747c6; --kp-expr: #266f49; --kp-sound: #a73882;
   --kp-tex: radial-gradient(60% 40% at 100% 0%, rgba(255, 182, 200, 0.35), transparent 70%);
-  --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light; }
+  --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light;
+  --kp-stage: #2a1a22; --kp-stage-ink: #f3e6ea; --kp-stage-mute: #c7aab4; --kp-shu: #c4304f; }
 .kp[data-look='matcha'] { /* 抹茶 deep green */
   --kp-bg: #0d1a12; --kp-panel: #13261a; --kp-panel-2: #1a3123; --kp-ink: #eef7ef; --kp-ink-2: #b8d1bd; --kp-mute: #8fb097; --kp-line: #24402e;
   --kp-cyan: #a6e06a; --kp-cyan-wash: rgba(166, 224, 106, 0.14); --kp-on-accent: #0d1a05; --kp-noun: #a6e06a; --kp-kind-ji: #ffb3d9; /* was #ff9ad5, ΔE 6.7 from --kp-sound */ --kp-kind-bun: #c3b0ff;
@@ -599,12 +602,11 @@
 .kp-done .kp-start { border-radius: 4px; }
 
 /* the deck home: paper slips, not pills */
-.kp .kp-tile, .kp .kp-group, .kp .kp-row { border-radius: 4px; }
+.kp .kp-group, .kp .kp-row { border-radius: 4px; }
 .kp .kp-start { border-radius: 4px; letter-spacing: 0.06em; box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-cyan) 55%, #000); }
 .kp .kp-start:disabled { box-shadow: none; }
 .kp .kp-start:active { transform: translateY(2px); box-shadow: none; }
 .kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
-.kp .kp-tile b { font-family: var(--kp-head); font-weight: 800; }
 .kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
 
@@ -612,6 +614,22 @@
   .kp-polish, .kp-slash { display: none; }
   .kp .kp-reveal:active, .kp .kp-next:active, .kp .kp-start:active { transform: none; }
 }
+
+/* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
+/* the deck home's ← is bare, like the study ✕: the page's one way out */
+.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp-home > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
+/* 答えを見る (and わからない) is docked at the foot of the screen like the grade pads, so the reveal is
+ * always one tap away on a long passage; its own place in the flow, under the card, is the room the
+ * passage keeps: scrolled to the end, the last line sits above it, never under it. A ring of the
+ * stage frames it as a dock over the passage that scrolls on beneath. */
+.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-stage); }
+body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-clearance) + 10px); }
+/* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
+ * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
+.kp .kp-eyebrow-zoom { min-height: 30px; }
+.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: 12px; }
+.kp .kp-eyebrow:has(> .kp-zoom) > .kp-eyebrow-t { display: none; }
 </style>
 </head>
 <body>
@@ -3694,9 +3712,15 @@ function homeScreen() {
   box.append(el('p', 'kp-sub', t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`)));
   if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', t(ctx.notice)));
 
-  const tiles = el('div', 'kp-tiles');
-  const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
-  tiles.append(tile(q.due.length, t("復習"), 'kp-c-due'), tile(q.fresh.length, t("新しいカード"), 'kp-c-new'), tile(known, t("定着した語"), 'kp-c-known'), tile(hard, t("苦手"), 'kp-c-hard'));
+  // the deck's state as one quiet mono line (0 due · 15 new · 0 known · 0 difficult), no coloured tiles
+  const tiles = el('p', 'kp-tiles');
+  const tile = (n, ja, en, cls) => el('span', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
+  tiles.append(
+    tile(q.due.length, '復習', 'due', 'kp-c-due'),
+    tile(q.fresh.length, '新', 'new', 'kp-c-new'),
+    tile(known, '定着', 'known', 'kp-c-known'),
+    tile(hard, '苦手', 'difficult', 'kp-c-hard'),
+  );
   box.append(tiles);
 
   const total = q.queue.length;
@@ -3749,6 +3773,26 @@ function go(screen) {
   ui.sheet = null;
   paint();
   window.scrollTo(0, 0);
+  frameFront();
+}
+
+/**
+ * A front opens at the top of its card; when the marked word (or the gap) would sit under the
+ * docked 答えを見る, the page scrolls at once (no animation) to bring it to the middle of the space
+ * between the host's header and the dock, so the word and the reveal are both in view.
+ */
+function frameFront() {
+  if (ui.screen !== 'study' || ui.revealed) return;
+  const face = ctx.root.querySelector('#kp-card');
+  const dock = ctx.root.querySelector('.kp-study > .kp-reveal');
+  const target = face?.querySelector('.kp-target, .kp-blank');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
+  const t = target.getBoundingClientRect();
+  const floor = dock.getBoundingClientRect().top - 16;
+  const ceil = topInset() + 16;
+  if (t.bottom <= floor) return;
+  window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
 }
 
 function startSession() {
@@ -3859,7 +3903,7 @@ function studyScreen() {
   if (ui.revealed && passage) {
     const zoom = zoomFor();
     face.dataset.zoom = zoom;
-    chips.append(zoomToggle(zoom));
+    (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
   face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
@@ -3922,14 +3966,16 @@ function studyScreen() {
 function cardEyebrow(card, mode) {
   const ji = card.type === 'kanji';
   const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
-  const n = el('span', 'kp-eyebrow', label);
+  // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
+  // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
+  const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
   n.lang = ctx.english === false ? 'ja' : 'en';
   return n;
 }
 
 const THEMES = [
   ['dark', '墨', '#0a0e13', '#3fd0ff'],
-  ['ai', '藍', '#121a46', '#f2c14e'],
+  ['ai', '藍', '#141a28', '#e9e2d2'],
   ['matcha', '抹茶', '#13261a', '#a6e06a'],
   ['kokuban', '黒板', '#1f2f28', '#ffe066'],
   ['washi', '和紙', '#fbf6ea', '#93301a'],
@@ -3939,6 +3985,9 @@ const THEMES = [
 ];
 const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
 const posKey = (pos) => (POS[pos] || ['noun'])[0];
+/** the part of speech as the interface names it: 名詞 in 日本語, "noun" in EN (never Japanese chrome in EN) */
+const POS_EN = { noun: 'noun', verb: 'verb', 'い-adjective': 'i-adjective', 'な-adjective': 'na-adjective', adverb: 'adverb', expression: 'expression', 'sound word': 'sound word', kanji: 'kanji' };
+const posLabel = (pos) => (ctx?.english !== false ? POS_EN[pos] || 'word' : (POS[pos] || ['', ''])[1] || '語');
 /** item kind → [css key, chip label]: 語 a whole word, 字 one kanji of it, 文法 a grammar point */
 function itemKind(card) {
   if (card.type === 'kanji') return ['ji', '字'];
@@ -4081,9 +4130,10 @@ const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言�
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
-  // Part of speech belongs to the Japanese answer, alongside its definition.
-  const pos = (POS[word.pos] || ['', ''])[1] || word.pos;
-  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
+  // Part of speech is chrome: it names the kind of word in the interface language (EN: noun, 日本語: 名詞)
+  const badge = el('span', 'kp-posbadge', posLabel(word.pos));
+  badge.lang = ctx.english === false ? 'ja' : 'en';
+  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, badge));
   // the definition's words are tap targets like the passage's (STANDARD A44)
   a.append(defLine(card, word));
   // a usage note in Japanese stays in tier one (§3 item 4): the passage's own note (tipJa) when it
@@ -4929,7 +4979,9 @@ function revealInPlace() {
   if (passage) {
     const zoom = zoomFor();
     face.dataset.zoom = zoom;
-    face.querySelector('.kp-chips').append(zoomToggle(zoom));
+    // on the eyebrow's own row, which the front already sized for it: the card does not grow or shift
+    const chips = face.querySelector('.kp-chips');
+    (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) });
   face.querySelector('.kp-sentence').replaceWith(sentence);
@@ -5041,8 +5093,10 @@ function next(dir) {
   resetCard();
   const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
-  // the sitting is over: the close opens at its top, not where the last card's back was scrolled
+  // the sitting is over: the close opens at its top, not where the last card's back was scrolled;
+  // the next front opens at its card's top (or with its marked word above the docked reveal)
   if (ctx.root.querySelector('.kp-done')) window.scrollTo(0, 0);
+  else frameFront();
   arrive(ghost, dir);
 }
 
