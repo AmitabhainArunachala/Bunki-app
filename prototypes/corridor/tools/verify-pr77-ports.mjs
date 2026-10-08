@@ -202,7 +202,9 @@ PROBES['crumb-origin'] = async () => {
   }
   await page.waitForSelector('.close-doors');
   const reviewCrumb = await crumbOf(page);
-  await page.click('#back');
+  // with the tab bar, a finished review hides the chrome's 戻る (one way home, r3-rooms): the
+  // close's own way back is then the door that must reopen the tray
+  await page.click((await page.locator('#back').isVisible()) ? '#back' : '.close-doors .take');
   await settle(page);
   const reviewBack = await page.evaluate(() => document.body.dataset.view);
   check('d9f0b984 · a plain review names the lists tray its 戻る reopens',
