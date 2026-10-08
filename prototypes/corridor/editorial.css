@@ -3378,7 +3378,8 @@ body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-displa
   left: calc(50% + 9px);
   padding: 0 3px;
   background: var(--color-glass-solid);
-  color: var(--color-seal);
+  /* ink, not 朱: the screen keeps one 朱 signal, and it belongs to the room (r3-rooms) */
+  color: var(--color-ink);
   font: 600 10px/1 var(--font-data);
   font-style: normal;
   font-variant-numeric: tabular-nums;
@@ -4308,6 +4309,14 @@ body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum {
   letter-spacing: 0.14em;
   color: var(--color-muted);
 }
+/* numbers stand upright in the column (縦中横): two digits sit across it, longer runs stack */
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum .rs-tcy {
+  -webkit-text-combine: horizontal;
+  text-combine-upright: all;
+  letter-spacing: 0;
+  font-size: 10.5px;
+}
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum .rs-up { text-orientation: upright; letter-spacing: 0; }
 body:not([data-view='drift']) #app > main > .room-sign::after {
   content: '';
   width: 6px;
@@ -4340,7 +4349,7 @@ body:not([data-view='drift']) .focus-chip { border-color: var(--color-line-chip,
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .line-car::before {
   box-shadow: 0 0 0 3px var(--color-glass-solid), 0 0 10px color-mix(in srgb, var(--color-ink) 45%, transparent);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .station-due { text-shadow: 0 0 6px color-mix(in srgb, var(--color-seal) 60%, transparent); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .station-due { text-shadow: none; }
 
 @media (prefers-reduced-motion: reduce) {
   body:not(.zen):not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary, .study-door, .foundation-door) { transition: none; }
@@ -4374,6 +4383,8 @@ body:not(.zen) #app > .chrome > button:hover:not(:disabled) { background: color-
 /* back: the chevron and one word, in the tabs' sentence case */
 body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); padding-inline: 4px 10px; }
 body.ui-bi:not(.zen) #app > .chrome > button#back .l-ja { text-transform: capitalize; }
+/* the session close keeps one way home (the tab bar, and its own "Back to Today") */
+body #app > .chrome > button#back[hidden][data-session-closed] { display: none; }
 /* one glyph size for the three doors */
 body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 19px; height: 19px; flex: 0 0 auto; }
 body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo) { width: 44px; min-width: 44px; padding: 0; }
@@ -4622,6 +4633,92 @@ html[data-room='door'] #drift-layer #hint {
   color: var(--ink);
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 90%, transparent);
   border: 0.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+}
+/* round 3 (r3-rooms): the door joins the family without touching the sky.
+   (a) the invitation is a caption, not a button: no plaque, no edge — quiet words on the sky */
+html[data-room='door'] body.ginga #drift-layer #hint {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font: italic 400 13px/1.3 var(--serif, Georgia, serif);
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--ink, #23303f) 72%, transparent);
+  text-shadow: 0 0 10px var(--ground-0, #f6f1e6), 0 0 2px var(--ground-0, #f6f1e6);
+}
+body.ginga:not(.ui-bi) #drift-layer #hint { font-style: normal; font-family: var(--serif, serif); }
+/* (b) the torii and the bug are seals of the family: a hairline square on thin paper, no lift */
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  isolation: isolate;
+}
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border: 0.5px solid color-mix(in srgb, var(--ink, #23303f) 46%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 70%, transparent);
+}
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol svg { width: 18px; height: 18px; opacity: 0.86; }
+html[data-room='door'] #bunki-reports-root .br-rail .br-bug { color: color-mix(in srgb, var(--ink, #23303f) 62%, transparent); }
+html[data-room='door'] #bunki-reports-root .br-rail .br-bug::before {
+  inset: 9px;
+  border: 0.5px solid color-mix(in srgb, var(--ink, #23303f) 32%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 55%, transparent);
+}
+html[data-room='door'] #bunki-reports-root .br-rail .br-bug svg { width: 16px; height: 16px; }
+/* (c) one family touch outside the frozen layer: a thin washi edge and Today's skyline at the
+   foot of the sky. Above the drift (its layer is one stacking context), under the chrome; it
+   never takes a touch and only fades. The edge is a few px of paper, the city a low band. */
+#door-paper { display: none; }
+html[data-room='door'] body.ginga #door-paper {
+  position: fixed;
+  inset: 0;
+  z-index: 16;
+  display: block;
+  pointer-events: none;
+  animation: door-paper-in 400ms ease-out backwards;
+}
+html[data-room='door'] body.ginga #door-paper .door-washi {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 3px color-mix(in srgb, var(--ground-0, #f6f1e6) 70%, transparent),
+    inset 0 0 22px 2px color-mix(in srgb, #efe3c8 46%, transparent);
+}
+html[data-room='door'] body.ginga #door-paper .door-city {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 44px;
+}
+html[data-room='door'] body.ginga #door-paper .today-roofs { fill: color-mix(in srgb, var(--ink, #23303f) 7%, transparent); }
+html[data-room='door'] body.ginga #door-paper :is(.today-wins, .today-lamps) { fill: transparent; }
+html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .door-washi {
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, #d9b45a 10%, transparent),
+    inset 0 0 26px 4px rgb(0 0 0 / 34%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .today-roofs { fill: rgb(6 8 14 / 62%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .today-wins { fill: #d9b45a; opacity: 0.55; animation: door-windows 9s ease-in-out infinite alternate; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .today-lamps { fill: #e8c77a; opacity: 0.8; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #drift-layer #hint {
+  text-shadow: 0 0 10px rgb(0 0 0 / 70%), 0 0 2px rgb(0 0 0 / 60%);
+}
+@keyframes door-paper-in { from { opacity: 0.01; } to { opacity: 1; } }
+@keyframes door-windows { from { opacity: 0.55; } to { opacity: 0.38; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='door'] body.ginga #door-paper,
+  html[data-room='door'] body.ginga #door-paper .today-wins { animation: none; }
 }
 /* night: the door's primary is emitted light (a lit edge and glow on the dark sky), never a solid fill */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #home-review.corner-bubble:not(.quiet) {
