@@ -215,7 +215,7 @@ async function resumeDraft(fixture, entryId, mode) {
 }
 async function listeningPending(page) {
   const pending = page.locator('#sentence-listening-pending'); await pending.waitFor();
-  assert.match(await pending.innerText(), /^audio coming soon · Kore$/u);
+  assert.match(await pending.innerText(), /^no recording yet · Kore$/u);
   assert.equal(await page.locator('#sentence-add-listening, #sentence-listening-start').count(), 0,
     'No listening control is offered before approved Kore/Charon sentence clips exist');
 }

@@ -1649,7 +1649,7 @@ async function main() {
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
   check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /^audio coming soon · Kore$/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
+    listenBefore.toggles === 0 && /^no recording yet · Kore$/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
       !/device voice|端末の声|F1/u.test(listenBefore.note),
     JSON.stringify(listenBefore));
 

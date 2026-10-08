@@ -14,3 +14,537 @@ html:is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-ro
     radial-gradient(70% 34% at 88% 6%, color-mix(in srgb, var(--color-gold) 13%, transparent), transparent 70%),
     radial-gradient(120% 40% at 50% 110%, color-mix(in srgb, var(--color-gold) 9%, transparent), transparent 70%);
 }
+
+/* =====================================================================================
+   READ LANE (redesign C 生きた本棚 + A 磨き): the shelf as a magazine of woodblocks, the
+   reader as a set page under its woodblock, the quick look as a lifted slip.
+   Values come from the skin's roles; every figure on the page is the record's own.
+   ===================================================================================== */
+
+/* ---------- the shelf: masthead ---------- */
+html[data-room='shelf'] #shelf-body .shelf-masthead h1.view-title {
+  font-family: var(--font-headword);
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  color: var(--color-ink);
+}
+html[data-room='shelf'] body #shelf-body .shelf-dateline {
+  font-size: 13px;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-ink-2);
+}
+html[data-room='shelf'] #shelf-body .shelf-review-note { color: var(--color-muted); }
+/* Japanese datelines keep the reading face: a monospace Latin beside kanji reads as a form field */
+html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-dateline { font-family: var(--font-ui); letter-spacing: 0.01em; }
+/* the shelf's own search: a hairline field like the chips beside it, not a grey capsule */
+html[data-room='shelf'] #shelf-body .shelf-controls .shelf-reading-search {
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ---------- every headline on the shelf is whole: no clamp, broken between phrases, 禁則 kept ---------- */
+html[data-room='shelf'] #shelf-body .story-card .shelf-title {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  font-family: var(--font-headword);
+  font-weight: 800;
+  color: var(--color-ink);
+  word-break: auto-phrase;
+  line-break: strict;
+  text-wrap: pretty;
+}
+html[data-room='shelf'] #shelf-body .story-card .shelf-title-en {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  color: var(--color-ink-2);
+}
+html[data-room='shelf'] #shelf-body .story-date {
+  font-family: var(--font-data);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+}
+
+/* ---------- the instrument line: level · topic · characters · your words ---------- */
+html[data-room='shelf'] #shelf-body .story-instrument {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  margin: 0;
+  font: 500 12.5px/1.4 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+}
+html[data-room='shelf'] #shelf-body .story-instrument > .story-fact::before {
+  content: '·';
+  margin: 0 8px;
+  color: var(--color-muted);
+}
+html[data-room='shelf'] #shelf-body .story-instrument .story-kicker {
+  font: 600 12px/1.3 var(--font-ui);
+  letter-spacing: 0.06em;
+}
+html[data-room='shelf'] #shelf-body .story-instrument .story-mine { color: var(--color-live); font-weight: 600; }
+/* the level is a printer's seal: a hairline 朱 square, never a pill */
+:is(html[data-room='shelf'] #shelf-body .story-instrument, html[data-room='reader'] .reader-meta) .level-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin-right: 10px;
+  padding: 0 6px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-seal);
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-signal);
+  font: 800 13px/1 var(--font-headword);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- the lead: a woodblock at its own 3:2 crop, registration marks at its corners ---------- */
+html[data-room='shelf'] #shelf-body .story-lead .story-picture::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  opacity: 0.8;
+  background:
+    linear-gradient(#fff, #fff) 0 7px / 15px 1px no-repeat,
+    linear-gradient(#fff, #fff) 7px 0 / 1px 15px no-repeat,
+    linear-gradient(#fff, #fff) 100% 7px / 15px 1px no-repeat,
+    linear-gradient(#fff, #fff) calc(100% - 7px) 0 / 1px 15px no-repeat,
+    linear-gradient(#fff, #fff) 0 calc(100% - 7px) / 15px 1px no-repeat,
+    linear-gradient(#fff, #fff) 7px 100% / 1px 15px no-repeat,
+    linear-gradient(#fff, #fff) 100% calc(100% - 7px) / 15px 1px no-repeat,
+    linear-gradient(#fff, #fff) calc(100% - 7px) 100% / 1px 15px no-repeat;
+}
+html[data-room='shelf'] #shelf-body .story-lead .story-lede {
+  font-family: var(--font-reading);
+  color: var(--color-ink-2);
+}
+
+/* ---------- 今日の６本: living spines. Each stands on the shelf, its whole title set vertically ---------- */
+html[data-room='shelf'] #shelf-body .shelf-daily-selection > .shelf-band-head {
+  font: 600 12px/1.3 var(--font-ui);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-daily-selection > .shelf-band-head { font-size: 13px; letter-spacing: 0.2em; }
+html[data-room='shelf'] #shelf-today.shelf-today-strip {
+  align-items: stretch;
+  gap: 18px 12px;
+  padding: 0 0 12px;
+  border-bottom: 2px solid var(--color-ink);
+  box-shadow: 0 8px 12px -12px color-mix(in srgb, var(--color-ink) 70%, transparent);
+}
+html[data-room='shelf'] #shelf-body .story-teaser {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-small) var(--radius-small) 0 0;
+  background: var(--color-surface);
+  box-shadow: var(--elevation-paper);
+}
+html[data-room='shelf'] #shelf-body .story-teaser .shelf-open { flex: 1 1 auto; }
+html[data-room='shelf'] #shelf-body .story-teaser .shelf-head {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-height: 240px;
+  padding: 14px 10px 12px;
+}
+/* the spine's English line: horizontal, at its foot, under a hairline */
+html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .shelf-title-en {
+  margin: 0 10px;
+  padding: 8px 0 10px;
+  border-top: 1px solid var(--color-line-soft);
+}
+html[data-room='shelf'] #shelf-body .story-teaser .shelf-title {
+  font-size: 17px;
+  line-height: 1.45;
+  letter-spacing: 0.06em;
+}
+html[data-room='shelf'] #shelf-body .story-teaser .shelf-title-en { font-size: 12px; line-height: 1.35; letter-spacing: 0.01em; }
+html[data-room='shelf'] #shelf-body .story-teaser .story-kicker { font-size: 11px; letter-spacing: 0.08em; }
+html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .story-foot { margin: 0 10px; padding: 0 0 10px; }
+html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .shelf-title-en + .story-foot { margin-top: -4px; }
+html[data-room='shelf'] #shelf-body .story-teaser > .shelf-open > .shelf-head + .story-foot { padding-top: 8px; border-top: 1px solid var(--color-line-soft); }
+html[data-room='shelf'] #shelf-body .story-teaser .story-date { font-size: 11px; }
+html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
+  top: 6px;
+  right: 6px;
+  min-height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-seal);
+  font: 800 11px/1 var(--font-headword);
+}
+@media (hover: hover) {
+  html[data-room='shelf'] #shelf-body .story-teaser:hover { transform: translateY(-6px); }
+}
+
+/* ---------- a phone: the magazine ---------- */
+@media (max-width: 760px) {
+  html[data-room='shelf'] #shelf-reading-results.shelf-story-grid { row-gap: 0; }
+  /* the lead runs from edge to edge: the woodblock at its natural 3:2, nothing cut from its sides */
+  html[data-room='shelf'] #shelf-reading-results > .story-lead {
+    margin: 0 0 10px;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  html[data-room='shelf'] #shelf-reading-results > .story-lead:hover { transform: none; box-shadow: none; }
+  html[data-room='shelf'] #shelf-body .story-lead .story-picture { border-radius: 0; }
+  html[data-room='shelf'] #shelf-body .story-lead .shelf-head { gap: 8px; padding: 14px 16px 6px; }
+  html[data-room='shelf'] #shelf-body .story-lead .shelf-title { font-size: 26px; line-height: 1.38; letter-spacing: 0.01em; }
+  html[data-room='shelf'] #shelf-body .story-lead .shelf-title-en { font-size: 15px; line-height: 1.45; }
+  html[data-room='shelf'] #shelf-body .story-lead .story-lede { font-size: 15px; line-height: 1.8; }
+
+  /* the seconds and the rest: an index of rows, the picture first, the title whole beside it */
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) {
+    overflow: visible;
+    border: 0;
+    border-bottom: 1px solid var(--color-separator);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid):hover { transform: none; box-shadow: none; }
+  html[data-room='shelf'] #shelf-reading-results > .story-lead + .story-second { border-top: 1px solid var(--color-separator); }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-open {
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    column-gap: 14px;
+    align-items: start;
+    padding: 14px 0;
+  }
+  html[data-room='shelf'] #shelf-reading-results > .story-second .shelf-open { grid-template-columns: 132px minmax(0, 1fr); padding: 16px 0; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-picture {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    margin: 0;
+    border-radius: var(--radius-small);
+    box-shadow: 0 0 0 0.5px var(--color-line);
+  }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-head {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 4px;
+    padding: 0;
+  }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-title { font-size: 17px; line-height: 1.5; }
+  html[data-room='shelf'] #shelf-reading-results > .story-second .shelf-title { font-size: 19px; line-height: 1.45; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-title-en { font-size: 13.5px; line-height: 1.4; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-instrument { font-size: 11.5px; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-instrument .level-chip { min-height: 20px; font-size: 12px; }
+  html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .story-foot { padding-top: 2px; }
+  html[data-room='shelf'] #shelf-reading-results > .shelf-band { margin: 28px 0 18px; }
+  /* the spines stand two to a shelf on a phone (three would set the English sideways in too thin a column) */
+  html[data-room='shelf'] body #shelf-today.shelf-today-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  /* on a phone the lead's woodblock meets both edges of the screen */
+  html[data-room='shelf'] #shelf-reading-results > .story-lead { width: 100vw; max-width: 100vw; margin-inline: calc(50% - 50vw); }
+}
+
+/* ---------- night on the shelf: the prints dim to lamplight; topic colours lift to be read ---------- */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-body .story-img {
+  filter: brightness(0.8) saturate(0.85);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-body .story-kicker {
+  color: color-mix(in srgb, var(--topic, var(--color-accent)) 30%, var(--color-ink-2));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-today.shelf-today-strip {
+  border-bottom-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
+  box-shadow: 0 10px 18px -14px var(--color-gold);
+}
+
+/* ---------- the reader: the woodblock, the instrument line, the set page ---------- */
+html[data-room='reader'] main > .reader-hero {
+  position: relative;
+  margin: 0 0 4px;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, rgb(0 0 0 / 55%) 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 58%, rgb(0 0 0 / 55%) 80%, transparent 100%);
+}
+html[data-room='reader'] body main > .reader-hero .reader-picture-img {
+  width: 100%;
+  height: clamp(132px, calc(100svh - 640px - var(--nav-clearance, 0px)), 300px);
+  max-height: none;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: 50% 62%;
+  border-radius: 0;
+  box-shadow: none;
+}
+html[data-room='reader'] main > .reader-hero .reader-picture-caption {
+  inset: 10px 12px auto auto;
+  padding: 3px 7px;
+  border-radius: var(--radius-small);
+  background: rgb(10 12 16 / 55%);
+  font: 500 9.5px/1.2 var(--font-data);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: none;
+}
+html[data-room='reader'] body:not(.ui-bi) main > .reader-hero .reader-picture-caption { letter-spacing: 0.08em; }
+/* the provenance line rests on the print's faded foot */
+html[data-room='reader'] main > .reader-head.on-hero { position: relative; z-index: 1; margin-top: -34px; }
+html[data-room='reader'] .reader-meta {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+  color: var(--color-ink-2);
+}
+html[data-room='reader'] .reader-meta .reader-fact { flex: 0 0 auto; white-space: nowrap; font-size: 12.5px; text-transform: none; }
+html[data-room='reader'] .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
+html[data-room='reader'] main > h1.view-title {
+  font-family: var(--font-headword);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  word-break: auto-phrase;
+  line-break: strict;
+  text-wrap: pretty;
+}
+html[data-room='reader'] main > .view-title-en { color: var(--color-ink-2); }
+/* one story, two texts: a slim hairline switch, not a capsule */
+html[data-room='reader'] .version-block { margin: 0 0 10px; }
+html[data-room='reader'] .version-toggle {
+  display: flex;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+}
+html[data-room='reader'] .version-toggle .version-choice {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 14px 0 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-muted);
+  font: 600 14px/1.2 var(--font-ui);
+}
+html[data-room='reader'] .version-toggle .version-choice + .version-choice { padding-left: 14px; }
+html[data-room='reader'] .version-toggle .version-choice[aria-pressed='true'] {
+  background: transparent;
+  box-shadow: inset 0 -2px 0 var(--color-ink);
+  color: var(--color-ink);
+}
+html[data-room='reader'] .version-block .version-caption { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--color-muted); }
+/* the set page: a fine double rule over the text (A's typesetting); the words stand on the paper */
+html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
+html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
+  padding-top: 12px;
+  border: 0;
+  border-top: 1px solid var(--color-relief-edge, var(--color-edge-strong));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 0 3px 0 -2px var(--color-line);
+}
+html[data-room='reader'] #reader rt,
+html[data-room='reader'] #reader:not(.fg-always) ruby::before { color: var(--color-accent); letter-spacing: 0.04em; }
+
+/* ---------- the voiced line (B): the play bar is one scan-line; unrecorded, the line waits unlit ---------- */
+html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) .listen-row.play-bar,
+html[data-room='reader'] body .listen-row.play-bar {
+  border: 1px solid var(--color-relief-edge, var(--color-edge-strong));
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  box-shadow: var(--elevation-card);
+}
+html[data-room='reader'] .listen-row .play-toggle { background: var(--color-accent); color: var(--color-surface); }
+html[data-room='reader'] .listen-row .play-track {
+  height: 2px;
+  overflow: visible;
+  border-radius: 0;
+  background: var(--color-line);
+}
+html[data-room='reader'] .listen-row .play-track::after { background: var(--color-live); }
+/* the scan head: a lit tick riding the line where the voice is */
+html[data-room='reader'] .listen-row .play-track::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: calc(var(--played, 0) * 100%);
+  width: 2px;
+  height: 12px;
+  background: var(--color-live);
+  box-shadow: 0 0 8px var(--color-live-glow, transparent);
+}
+html[data-room='reader'] .listen-row .play-voice { font-family: var(--font-data); color: var(--color-ink-2); }
+html[data-room='reader'] body .listen-row.play-bar.is-pending { padding: 0 14px; }
+html[data-room='reader'] .listen-row .play-pending {
+  flex: 1 1 auto;
+  gap: 8px;
+  font: 500 12.5px/1.3 var(--font-data);
+  letter-spacing: 0.03em;
+  color: var(--color-ink-2);
+}
+html[data-room='reader'] .listen-row .play-pending::after {
+  content: '';
+  flex: 1 1 auto;
+  min-width: 24px;
+  height: 0;
+  border-top: 1px dashed var(--color-edge-strong);
+}
+
+/* ---------- night: A's night print. The woodblock darkens, lamplight rises in it, rain crosses it ---------- */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] main > .reader-hero .reader-picture-img {
+  filter: brightness(0.56) saturate(0.7) contrast(1.08);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] main > .reader-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(14% 18% at 30% 70%, rgb(255 196 120 / 42%), transparent 70%),
+    radial-gradient(10% 13% at 66% 64%, rgb(255 206 140 / 34%), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgb(226 189 108 / 16%), transparent 75%);
+  animation: read-lamp 5.2s ease-in-out infinite alternate;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] main > .reader-hero::after {
+  content: '';
+  position: absolute;
+  inset: -60% -10% 0;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(104deg, transparent 0 11px, rgb(214 226 255 / 16%) 11px 12px, transparent 12px 29px);
+  animation: read-rain 1.1s linear infinite;
+}
+@keyframes read-rain { from { transform: translate3d(0, -12%, 0); } to { transform: translate3d(-4%, 0, 0); } }
+@keyframes read-lamp { from { opacity: 0.78; } to { opacity: 1; } }
+
+/* ---------- the quick look: a lifted slip that rises on a spring ---------- */
+html[data-room='reader'] body #mini {
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-paper);
+  box-shadow: var(--elevation-float);
+  /* the slip rises and settles: a damped spring on translate only. No scale and no overshoot, because
+     placeFloating measures the popup's box as it opens, and a scaled box would be placed too wide */
+  animation: read-mini-rise 280ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+}
+@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
+html[data-room='reader'] body #mini .mini-word { font-family: var(--font-headword); font-weight: 800; color: var(--color-ink); }
+html[data-room='reader'] body #mini .mini-reading { font-family: var(--font-reading); color: var(--color-accent); }
+html[data-room='reader'] body #mini .mini-gloss { font-size: 17px; color: var(--color-ink); }
+html[data-room='reader'] body #mini .mini-web { display: grid; gap: 0; margin: 10px 0 0; border-top: 1px solid var(--color-line); }
+html[data-room='reader'] body #mini .mini-kanji { display: grid; }
+html[data-room='reader'] body #mini .mini-kanji-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  min-height: 52px;
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-line-soft);
+  background: transparent;
+  color: var(--color-ink);
+  text-align: start;
+  cursor: pointer;
+}
+html[data-room='reader'] body #mini .mini-kanji-glyph {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  box-shadow: var(--elevation-paper);
+  font: 800 24px/1 var(--font-headword);
+}
+html[data-room='reader'] body #mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
+html[data-room='reader'] body #mini .mini-kanji-meaning { font: 600 14px/1.3 var(--font-ui); }
+html[data-room='reader'] body #mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+html[data-room='reader'] body #mini .mini-kanji-part { font: 500 17px/1.3 var(--font-reading); color: var(--color-accent); }
+html[data-room='reader'] body #mini .mini-kanji-part-name { font: 12.5px/1.3 var(--font-reading); color: var(--color-ink-2); }
+html[data-room='reader'] body #mini .mini-kanji-plus { font: 12px/1 var(--font-data); color: var(--color-muted); }
+html[data-room='reader'] body #mini .mini-cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  margin: 6px 0 0;
+}
+html[data-room='reader'] body #mini .mini-cards-label {
+  margin-right: 4px;
+  font: 600 11px/1.3 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='reader'] body:not(.ui-bi) #mini .mini-cards-label { letter-spacing: 0.08em; }
+html[data-room='reader'] body #mini .mini-card-word {
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 600 17px/1 var(--font-reading);
+  text-decoration: underline;
+  text-decoration-color: var(--color-gold);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+html[data-room='reader'] body #mini .mini-web-open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-live);
+  font: 600 15px/1.2 var(--font-ui);
+  cursor: pointer;
+}
+html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-web-open):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+@media (hover: hover) {
+  html[data-room='reader'] body #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
+  html[data-room='reader'] body #mini .mini-web-open:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+}
+
+@media (max-width: 520px) {
+  /* the woodblock runs to both edges and up to the chrome */
+  html[data-room='reader'] body:not(.zen) #app > main > .reader-hero {
+    margin: calc(-1 * var(--s2, 16px)) calc(50% - 50vw) 4px;
+    border-radius: 0;
+  }
+  html[data-room='reader'] main > .reader-head.on-hero { align-items: flex-end; margin-top: -40px; }
+  /* the instrument line may take two short lines; it never runs off the page */
+  html[data-room='reader'] body[data-view='reader'] #app > main .reader-meta { flex-wrap: wrap; row-gap: 2px; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { font-size: 23px; line-height: 1.38; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .view-title-en { font-size: 14px; line-height: 1.4; }
+  html[data-room='reader'] body #reader-tip.reader-tip { padding-block: 2px; }
+  html[data-room='reader'] body #reader-tip .reader-tip-text { font-size: 13.5px; line-height: 1.4; }
+  html[data-room='reader'] body #reader.reader { padding-top: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='reader'] main > .reader-hero::before,
+  html[data-room='reader'] main > .reader-hero::after,
+  html[data-room='reader'] body #mini { animation: none; }
+}

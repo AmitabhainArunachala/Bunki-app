@@ -191,7 +191,7 @@ async function press(page) { await page.locator('#listen-toggle').click(); }
 /** The shut bar: the quiet pending line, with no play control to press and no picker. */
 const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-toggle') && !document.querySelector('#listen-voice')
   && !!document.querySelector('.listen-row.is-pending #listen-note'));
-const PENDING = /^audio coming soon · Kore$/u;
+const PENDING = /^no recording yet · Kore$/u;
 const FAILED = /could not play|再生できませんでした/u;
 async function counts(page) {
   return page.evaluate(() => ({
@@ -283,7 +283,7 @@ try {
     assert.equal(await barShut(page), true, 'no play control and no picker: the quiet pending line');
     const before = await counts(page);
     assert.match(before.note, PENDING, 'the line names the locked voice');
-    assert.match(before.note, /audio coming soon/u, 'and says, in English, that audio is coming');
+    assert.match(before.note, /no recording yet/u, 'and says, in English, that no recording exists yet');
     await page.locator('#listen-note').click({ force: true });
     await page.waitForTimeout(350);
     const after = await counts(page);
