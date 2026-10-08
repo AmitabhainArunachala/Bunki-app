@@ -1326,9 +1326,8 @@ html[data-room='reader'] body #app > main > .reader-card > #reader-tip.reader-ti
 html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 13px/1.4 var(--font-ui); color: var(--color-ink-2); }
 
 /* the room is the page itself (washi): the mat, the card and the paper lie on it as separate things */
-html[data-room='reader'] body[data-view='reader']:not(.zen) #app > main {
+:root[data-room='reader'] body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
   background: transparent;
-  border-color: transparent;
   box-shadow: none;
 }
 /* the text on its own paper (both selectors: the layered variant's older rule names body.v-depth-layered) */
