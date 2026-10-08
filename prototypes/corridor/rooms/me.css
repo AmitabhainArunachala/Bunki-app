@@ -186,7 +186,8 @@ html[data-room='me'] .me-hz-note {
   color: var(--color-ink-2);
   text-wrap: pretty;
 }
-html[data-room='me'] body:not(.ui-bi) :is(.me-hz-name, .me-hz-note) { word-break: keep-all; line-break: strict; }
+/* each phrase with its closing 中黒 is one piece (meBreakable): lines break only between them */
+html[data-room='me'] .me-nb { display: inline-block; }
 html[data-room='me'] .me-hz:has(.me-hz-note) .me-hz-top { align-items: flex-start; }
 html[data-room='me'] .me-hz:has(.me-hz-note) .me-hz-n { padding-top: 2px; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-n1 {

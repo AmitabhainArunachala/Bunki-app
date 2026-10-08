@@ -30650,11 +30650,11 @@ function meSection(part, ja, en, aside) {
   sec.append(head);
   return sec;
 }
-/** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー). */
+/** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー) and never
+ * before its 中黒 (|・テクノロジー): each phrase, with the mark that ends it, is one unbreakable piece. */
 function meBreakable(tag, cls, text) {
   const node = el(tag, cls);
-  for (const part of String(text).split(/(?<=[・、])/u)) node.append(part, document.createElement('wbr'));
-  node.lastChild?.remove();
+  for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
   return node;
 }
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
