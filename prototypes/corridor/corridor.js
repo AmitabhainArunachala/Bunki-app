@@ -9469,11 +9469,9 @@ function refreshListenRow() {
   if (!row || !p || row.dataset.passage !== p.id) return;
   const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
   const next = buildListenRow(p);
-  // the pending mark lives in the instrument line; a play bar that replaces it stands below the
-  // head, where a narrated article's bar is drawn from the start
-  const anchor = document.querySelector('#app main > #reader-tip, #app main > #reader');
-  if (!next.classList.contains('is-pending') && row.closest('.reader-meta') && anchor) { row.remove(); anchor.before(next); }
-  else row.replaceWith(next);
+  // in place: a play bar that replaces the instrument line's pending mark docks at the foot on a
+  // phone (fixed) and takes the mark's own line on a desk, so the text under it does not move
+  row.replaceWith(next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
 }
 /* One drawn icon set for the reader and the shelf: a 24-unit grid, 1.6 stroke, round joins,

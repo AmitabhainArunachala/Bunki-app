@@ -668,6 +668,7 @@ html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .re
   box-shadow: none;
 }
 html[data-room='reader'] .reader-head > .reader-meta > * { display: inline-block; margin: 0 8px 0 0; vertical-align: middle; white-space: nowrap; text-transform: none; letter-spacing: 0; }
+html[data-room='reader'] .reader-head > .reader-meta > .listen-row { display: flex; white-space: normal; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-source { font: inherit; color: var(--color-ink-2); }
 html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-source { font-family: var(--font-ui); }
 html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
