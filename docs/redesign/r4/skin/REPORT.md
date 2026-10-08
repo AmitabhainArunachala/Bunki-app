@@ -110,7 +110,7 @@ All are roster, selector or label pins. No storage, SRS, ledger, offline, deck-f
 - **Base runs for neighbours** used an export of `345dba92` at `scratchpad/skin/base-src`; `verify-corridor-doors` needs the commit sha passed in there (`KAIRO_EXPECT_GITSHA`), because an export has no git.
 - **Merge order hints:** `corridor.js` changes are in the shell (`render()` top line, `PRIMARY_TABS` neighbourhood, `openWorldPicker`, `setKairoTheme`), the Learn renderers (`studyHallDoors`, the stage, `renderDojoDecks`, `renderFocusSitting`, `DOJO_DECKS`) and four single strings (shelf sort, reader credit, list export, grammar reason). The reader credit is the only line inside a read-lane function.
 
-## Review and refine (9 October, 00:27 → 01:45 JST)
+## Review and refine (9 October, 00:27 → 01:41 JST by the clock)
 
 An independent reviewer checked the first pass (`d68e3630`) against his words, THE BAR and the rules. Verdict **fix**: ten fixes, no rule breaks. I applied nine of them in full and one in part (the splash colour, reason under 10). New build **`5d8f319d`**, artifact `be20a0b5befb…`, clean tree; served on 57101, photographed in day · EN, night · EN and day · 日本語, and stopped.
 
