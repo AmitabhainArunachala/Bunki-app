@@ -29045,6 +29045,7 @@ function setKairoTheme(id) {
   }
   applyPaper(t.id);
   syncDriftTheme();
+  syncThemeColor();
 }
 /** Drift owns five atmospheric families. Map by identity so adding or
  * reordering paper worlds cannot send an unrelated raw index into it. */
@@ -30092,6 +30093,27 @@ function enableTouchPress() {
   if (touchPressReady) return;
   touchPressReady = true;
   document.addEventListener('touchstart', () => {}, { passive: true });
+}
+
+/** The phone's own top (Safari's bar, a home-screen app's status bar) takes the colour of the
+ * frame actually drawn, so the top of the screen reads as one native bar: white paper by day,
+ * the deep frame at night, the zen stage in a review (T2: "native ios … crisper"). It was a
+ * fixed beige for every world and every room. One read per frame, after the room is drawn. */
+let themeColorFrame = 0;
+function syncThemeColor() {
+  if (themeColorFrame) return;
+  themeColorFrame = requestAnimationFrame(() => {
+    themeColorFrame = 0;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta || !document.body) return;
+    const bar = document.querySelector('#app > .chrome');
+    const raw = getComputedStyle(bar || document.body).backgroundColor;
+    const nums = raw.match(/-?[0-9.]+/g)?.map(Number) || [];
+    if (nums.length < 3 || (nums.length > 3 && nums[3] === 0)) return;
+    const scale = raw.startsWith('color(') ? 255 : 1;
+    const hex = '#' + nums.slice(0, 3).map((n) => Math.round(Math.max(0, Math.min(255, n * scale))).toString(16).padStart(2, '0')).join('');
+    if (meta.getAttribute('content') !== hex) meta.setAttribute('content', hex);
+  });
 }
 
 /** The shell has one label table; rooms retain their existing navigation paths. */
@@ -31298,6 +31320,7 @@ function render() {
   if (!heroMode && !zenReview) root.append(chrome);
   enableTouchPress();
   buildPrimaryTabs(root);
+  syncThemeColor();
 
   // the capture panel — anchored under the chrome's top-right seal. It
   // reuses the sheet's own instruments verbatim: the reversible 覚える
