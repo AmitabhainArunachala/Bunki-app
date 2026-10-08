@@ -9944,39 +9944,6 @@ function renderDrift(main) {
   // live behind the single symbol (buildGingaChrome) — the galaxy stays clear.
   main.style.padding = '0';
   window.__DRIFT__?.setPracticePriorities?.(allAssessmentEvidence().priorities);
-  syncDriftLevelLanguage();
-}
-
-/* The universe's level rail names its scale at rest (round 4), so its words keep the EN/JA law:
- * 自 reads "auto" in English, and the line it shows while dragged speaks one language. The layer
- * writes its own text; only these six known lines are mapped, nothing else in it is touched. */
-const DRIFT_LEVEL_INFO = [
-  ['あなたに合わせる — adapts to you', 'あなたに合わせる', 'Adapts to you'],
-  ['N1 · 高校+ · 漢検準2–2級', 'N1 · 高校+ · 漢検準2–2級', 'N1 · high school+ · Kanken pre-2 to 2'],
-  ['N2 · 中学 · 漢検4–3級', 'N2 · 中学 · 漢検4–3級', 'N2 · junior high · Kanken 4 to 3'],
-  ['N3 · 小5–6 · 漢検6–5級', 'N3 · 小5–6 · 漢検6–5級', 'N3 · grades 5–6 · Kanken 6 to 5'],
-  ['N4 · 小3–4 · 漢検8–7級', 'N4 · 小3–4 · 漢検8–7級', 'N4 · grades 3–4 · Kanken 8 to 7'],
-  ['N5 · 小1–2 · 漢検10–9級', 'N5 · 小1–2 · 漢検10–9級', 'N5 · grades 1–2 · Kanken 10 to 9'],
-];
-let driftLevelObserver = null;
-function syncDriftLevelLanguage() {
-  const labels = document.querySelector('#drift-layer #lvlLabels');
-  const info = document.querySelector('#drift-layer #lvlInfo');
-  if (!labels || !info) return;
-  const auto = labels.firstElementChild;
-  if (auto && ['自', 'auto'].includes(auto.textContent)) auto.textContent = tx('自', 'auto');
-  const apply = () => {
-    const text = (info.textContent || '').trim();
-    const row = DRIFT_LEVEL_INFO.find((r) => r.includes(text));
-    if (!row) return;
-    const want = tx(row[1], row[2]);
-    if (text !== want) info.textContent = want;
-  };
-  if (!driftLevelObserver) {
-    driftLevelObserver = new MutationObserver(apply);
-    driftLevelObserver.observe(info, { childList: true, characterData: true, subtree: true });
-  }
-  apply();
 }
 
 /* ------------------------------------------- the Drift card's study door
@@ -30057,8 +30024,8 @@ function renderSearchPage(main) {
  * EN/JA law holds for them too: in EN the layer's own plaque speaks English. Only the
  * invitations are mapped; the layer's record and recovery notices stay exactly as written. */
 const DRIFT_HINTS = [
-  ['ことばに触れて', 'Touch a word'],
-  ['水にふれると戻る', 'Touch the water to surface'],
+  ['ことばに触れて', 'Tap a word'],
+  ['水にふれると戻る', 'Tap the water to surface'],
   ['中心へ戻る · home', 'Back to the centre'],
 ];
 let driftHintObserver = null;

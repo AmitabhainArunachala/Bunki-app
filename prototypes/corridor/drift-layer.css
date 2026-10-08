@@ -207,14 +207,15 @@
 
 /* Round 4 (T1, "clean it up a lot"): crisp ink. A word is drawn sharp, never smudged by its own
  * 1px shadow; only the words that carry meaning (fragile, the bloom's centre and satellites) keep
- * a soft halo. The paper grain is quieter, and the level rail names its own scale at rest, so a
- * first-time hand reads it as 自 N1 … N5 rather than an unexplained line. Presentation only. */
+ * a soft halo. The paper grain is quieter. The level rail keeps the donor's rest: its scale shows
+ * only while a finger is on it (round 4 review: labels at rest were clutter). Presentation only. */
 #drift-layer .word .base,
 #drift-layer .glyph .g { text-shadow: none; }
 #drift-layer .word.fragile .base { text-shadow: 0 0 9px var(--halo); }
 #drift-layer .word.bctr .base { text-shadow: 0 0 9px var(--bloomHalo); }
 #drift-layer .word.bsat .base { text-shadow: 0 0 6px color-mix(in srgb, var(--bloomHalo) 50%, transparent); }
 #drift-layer #grain { opacity: calc(var(--grainOp) * 0.45); }
-#drift-layer #lvl { opacity: 0.62; }
-#drift-layer #lvlLabels { opacity: 0.78; font-size: 9.5px; letter-spacing: 0.06em; }
-#drift-layer #lvl.hot #lvlLabels { opacity: 1; }
+/* the explainer carries both languages and shows the interface's own (round 4 review: the
+ * English setting showed Japanese buttons, and 日本語 showed English prose) */
+body:not(.ui-bi) #drift-layer [data-l='en'],
+body.ui-bi #drift-layer [data-l='ja'] { display: none; }
