@@ -979,3 +979,49 @@
     animation-iteration-count: 1 !important;
   }
 }
+/* the arc: the blade's path written once in blood across the cut, tapered at both ends like a brush
+ * flick, gone as the drops fall (the 80s–90s anime cut) */
+.samurai-effect--incorrect .samurai-effect__scraps::before {
+  content: '';
+  position: absolute;
+  left: -34%;
+  top: 2%;
+  width: 150%;
+  height: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  background: radial-gradient(farthest-side at 50% 100%, transparent 86%, var(--se-blood) 88%, var(--se-blood-deep) 93.5%, transparent 95.5%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 6%, #000 34%, #000 64%, transparent 94%);
+  mask-image: linear-gradient(90deg, transparent 6%, #000 34%, #000 64%, transparent 94%);
+}
+.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__scraps::before {
+  --samurai-motion: 700ms;
+  animation: se-arc 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.samurai-effect--quiet .samurai-effect__scraps::before {
+  display: none;
+}
+@keyframes se-arc {
+  0% {
+    opacity: 0;
+    transform: rotate(-16deg) scaleX(0.5);
+  }
+  22% {
+    opacity: 1;
+    transform: rotate(-4deg) scaleX(1);
+  }
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(2deg) scaleX(1.04) translateY(8%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .samurai-effect--forced .samurai-effect__scraps::before {
+    animation-duration: var(--samurai-motion, 1ms) !important;
+    animation-iteration-count: 1 !important;
+  }
+}
