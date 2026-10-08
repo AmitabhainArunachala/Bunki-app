@@ -28,13 +28,16 @@ html[data-room='shelf'] #shelf-body .shelf-masthead h1.view-title {
   letter-spacing: 0.005em;
   color: var(--color-ink);
 }
-html[data-room='shelf'] #shelf-body .shelf-dateline {
+html[data-room='shelf'] body #shelf-body .shelf-dateline {
+  font-size: 13px;
   font-family: var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-ink-2);
 }
 html[data-room='shelf'] #shelf-body .shelf-review-note { color: var(--color-muted); }
+/* Japanese datelines keep the reading face: a monospace Latin beside kanji reads as a form field */
+html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-dateline { font-family: var(--font-ui); letter-spacing: 0.01em; }
 /* the shelf's own search: a hairline field like the chips beside it, not a grey capsule */
 html[data-room='shelf'] #shelf-body .shelf-controls .shelf-reading-search {
   border: 1px solid var(--color-edge-strong);

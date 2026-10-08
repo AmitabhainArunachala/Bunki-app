@@ -470,3 +470,17 @@ The final Linux reference walk exposed a real writing-room collision: the wider 
 | File / assertion                                | Before                       | After                                | Why / retained requirements                                                                                                                                                                                                                                                                         |
 | ----------------------------------------------- | ---------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `verify-experience.mjs`, E13 SKIP lens selector | `.kdx-lens` with text `SKIP` | `.kdx-lens` with text `by its shape` | F2 intentionally selects the English lens label. Preserve required SKIP coverage, real candidates, exact `1-3-8` search code, Back/input retention, unchanged learning debt and frozen-asset assertions. The Linux run found the stale label, so this selector reaches the same existing SKIP lens. |
+
+## Read lane (2026-10-08): the unrecorded voice no longer says "coming soon"
+
+The redesign brief forbids "coming soon" anywhere in the product. No article narration ships, so every reader showed `audio coming soon · Kore` (JA `音声準備中 · Kore`). The pending play bar now says `no recording yet · Kore` (JA `音声未収録 · Kore`): the same honest state, the same locked voice, no promise. Only the exact label strings changed (cosmetic, class C); every behavioural assertion around them (no play control, no picker, no device voice, no F1 audio request, Kore named) is unchanged.
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-playback.mjs:194` `PENDING` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only. The pending row still has no toggle, no picker and names Kore. |
+| `prototypes/corridor/tools/verify-playback.mjs:286` | `/audio coming soon/u`, "says, in English, that audio is coming" | `/no recording yet/u`, "says, in English, that no recording exists yet" | Label only; still asserts an English pending line. |
+| `prototypes/corridor/tools/verify-corridor.mjs:1652` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only; zero toggles and the Kore check retained. |
+| `prototypes/corridor/tools/verify-bundled-listening.mjs:63` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only. |
+| `prototypes/corridor/tools/verify-listening-failures.mjs:105` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only. |
+| `prototypes/corridor/tools/verify-sentence-drafts.mjs:218` | `/^audio coming soon · Kore$/u` | `/^no recording yet · Kore$/u` | Label only. |
+| `prototypes/corridor/tools/test-approved-voice.mjs:136–137` | `/音声準備中 · Kore/`, `/voice in preparation\|audio coming soon/` | `/音声未収録 · Kore/`, `/voice in preparation\|no recording yet/` | Label only, in both languages. |
