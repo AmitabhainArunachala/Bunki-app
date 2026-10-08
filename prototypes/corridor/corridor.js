@@ -18057,23 +18057,25 @@ function wireParticleGestures(span, particle, index, p) {
     mini.tabIndex = -1;
     mini.setAttribute('role', 'dialog');
     mini.setAttribute('aria-label', tx(`${particle.p} の語釈`, `${particle.p} particle quick look`));
-    mini.append(el('span', 'mini-word', particle.p));
-    mini.append(el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
-    const actions = el('div', 'mini-actions');
+    // the same word band as every word's popup (round 4, T5): the particle, its role, and its entry's door
+    const head = el('div', 'mini-head');
+    const said = el('div', 'mini-head-text');
+    said.append(el('span', 'mini-word', particle.p), el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
     const entry = el('button', 'mini-entry btn-tertiary');
     entry.type = 'button';
-    entry.append(el('span', 'mini-entry-label', tx('助詞の項目', 'Full entry')));
+    const entryLabel = el('span', 'mini-entry-label', tx('助詞の項目', 'Full entry'));
     const chevron = el('span', 'mini-entry-chevron', '›');
     chevron.setAttribute('aria-hidden', 'true');
-    entry.append(chevron);
+    entryLabel.append(chevron);
+    entry.append(entryLabel);
     entry.dataset.action = 'entry.open';
     entry.dataset.targetKind = 'particle';
     entry.addEventListener('click', (event) => {
       event.stopPropagation();
       openFull(event.detail === 0 ? 'keyboard' : 'pointer');
     });
-    actions.append(entry);
-    mini.append(actions, readerSentenceRow(sentence(), index));
+    head.append(said, entry);
+    mini.append(head, readerSentenceRow(sentence(), index));
     mini.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
       event.preventDefault();
