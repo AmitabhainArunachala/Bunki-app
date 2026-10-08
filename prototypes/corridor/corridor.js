@@ -30658,7 +30658,7 @@ function meBreakable(tag, cls, text) {
   return node;
 }
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
-function meHorizonRow(h) {
+function meHorizonRow(h, { quiet = false } = {}) {
   const row = el('div', 'me-hz');
   row.dataset.horizon = h.id;
   if (!h.begun) row.classList.add('not-begun');
@@ -30692,7 +30692,8 @@ function meHorizonRow(h) {
     sub.append(el('span', '', h.measure));
     if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
   }
-  row.append(rule, sub);
+  row.append(rule);
+  if (!quiet) row.append(sub);
   return row;
 }
 /** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
@@ -30725,11 +30726,15 @@ function meN1Plate(h) {
   return plate;
 }
 function meHorizonsPart(decks) {
-  const sec = meSection('horizons', 'あなたの地平', 'Your horizons');
+  const sec = meSection('horizons', '目標', 'Your goals');
   const rows = meHorizons(decks);
   sec.append(meN1Plate(rows.find((h) => h.id === 'n1')));
   sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
-  for (const h of rows) if (h.field) sec.append(meHorizonRow(h));
+  const fields = rows.filter((h) => h.field);
+  // until the fields deck is opened, the three fields say so once, not three times
+  const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
+  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn')));
+  for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
   sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
   for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
   return sec;
@@ -30737,7 +30742,7 @@ function meHorizonsPart(decks) {
 function meCameHomePart(decks, active) {
   const home = meCameHome(decks);
   if (!home.length && !active) return null;
-  const sec = meSection('mended', '戻ってきた言葉', 'Came home', tx('金で継いだ', 'mended in gold'));
+  const sec = meSection('mended', '取り戻した語', 'Words you won back');
   if (!home.length) {
     sec.append(el('p', 'me-quiet', tx('忘れた言葉をもう一度思い出すと、ここに金で継がれる。',
       'When a word slips and you win it back, it is mended here in gold.')));
@@ -30854,7 +30859,7 @@ function meLinePart() {
 }
 /** 奥付: the back of the book — the two everyday switches, then every setting */
 function meBackPart() {
-  const sec = meSection('back', '奥付', 'At the back of the book');
+  const sec = meSection('back', '設定', 'Settings');
   const row = (ja, en, seg) => {
     const r = el('div', 'me-set');
     r.append(el('span', 'me-set-l', tx(ja, en)), seg);
@@ -30957,7 +30962,7 @@ function renderMe(main) {
   book.append(meSealsPart(days, first));
   const line = meLinePart();
   if (line) book.append(line);
-  const contents = meSection('contents', '目次', 'Inside the book');
+  const contents = meSection('contents', 'もっと見る', 'More');
   const doors = el('div', 'foundation-doors me-doors');
   doors.append(
     foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
@@ -30965,7 +30970,7 @@ function renderMe(main) {
     foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
   );
   if (window.__CORRIDOR_STANDALONE__ !== true) {
-    const personal = biLabel('button', 'grammar-link foundation-door', '私の文脈', 'Personal collections');
+    const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
     personal.type = 'button'; personal.id = 'me-personal';
     personal.addEventListener('click', openPersonalCollection); doors.append(personal);
   }
@@ -30990,7 +30995,7 @@ function renderMe(main) {
   }
 }
 function renderSettings(main) {
-  main.append(el('p', 'eyebrow me-kicker', tx('奥付', 'At the back of the book')));
+  main.append(el('p', 'eyebrow me-kicker', tx('私', 'Me')));
   main.append(el('h1', 'view-title', tx('設定', 'Settings')));
   const language = el('section', 'foundation-section');
   language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));

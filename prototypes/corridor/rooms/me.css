@@ -416,3 +416,6 @@ html[data-room='progress'] main .kagami-cell { border-radius: 2px; border-color:
 @media (prefers-reduced-motion: reduce) {
   html[data-room='me'] :is(.me-book, .me-hz-rule i, .me-home, .me-gleam, .me-seal, .me-cal) { animation: none !important; }
 }
+
+/* round 4 review (D5): the fields deck's "not begun" is said once, under the group's name */
+html[data-room='me'] .me-hz-group-note { margin: 4px 0 2px; }
