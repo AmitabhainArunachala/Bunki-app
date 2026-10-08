@@ -283,7 +283,7 @@ html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--col
 /* settings: the back pages of the same book */
 html[data-room='settings'] main .me-kicker { margin: 0 0 var(--space-2); }
 html[data-room='settings'] main > .view-title { font: 800 clamp(28px, 8vw, 36px)/1.1 var(--font-headword); }
-html[data-room='settings'] main .foundation-section { padding-top: var(--space-3); border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
+html[data-room='settings'] main .foundation-section { padding-top: var(--space-3); }
 
 html[data-room='settings'] main .settings-language {
   display: inline-flex; padding: 2px; border: 0; border-radius: 8px; background: transparent;
