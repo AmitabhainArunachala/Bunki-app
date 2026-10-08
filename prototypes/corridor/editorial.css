@@ -4409,8 +4409,8 @@ body:not(.zen) #app > .chrome > button#tray .tray-word {
 body:not(.zen) #app > .chrome > button#tray .l-ja { display: inline-flex; align-items: center; font: inherit; }
 body:not(.zen) #app > .chrome > button#tray[data-count='0'] { color: var(--color-muted); }
 /* the world seal: a small square seal, quieter than a door */
-body:not(.zen) #app > .chrome > button.theme-seal { width: 40px; min-width: 40px; font: 800 12px/1 var(--font-display); }
-body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 11px 9px; }
+body:not(.zen) #app > .chrome > button.theme-seal { width: 44px; min-width: 44px; font: 800 12px/1 var(--font-display); }
+body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 11px; }
 /* EN 日本語: two words, the active one inked and underlined — no capsule */
 body:not(.zen) #app > .chrome .lang-seg { margin: 0 2px 0 0; }
 body:not(.zen) #app > .chrome .lang-seg::before { content: none; }
