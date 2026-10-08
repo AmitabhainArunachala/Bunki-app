@@ -548,3 +548,12 @@ John, on the tour: **D2 (The night look): "Offer both"**. `kaku` (殻, the elect
 | `prototypes/corridor/tools/verify-theme-consistency.mjs` `WORLDS` | ten worlds → eleven (adds `kaku`) | **Strengthened**: the new public world is swept through shelf → tray → review front/back → sheet like the others. |
 
 `verify-corridor-accessibility.mjs` already measured `kaku` (quiet-label contrast and the living-paper law) and is unchanged.
+
+## Round 4 skin: the tray's crumb says Today
+
+The tray is the Today tab's room; Review #8 already renamed its way back "Back to Today / 今日へ" ("Lists" is the old name of Today). On wide screens the top line's crumb still read "lists / リスト" beside Back. It now reads "Today / 今日".
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-pr77-ports.mjs` quiz-crumb (ea8252a9) | `/リスト\|lists/` → `/リスト\|lists\|今日\|Today/` | Label only. The crumb must still name the tray, and `backTo === 'tray'` is unchanged. |
+| `verify-pr77-ports.mjs` crumb-origin (d9f0b984), plain review | `/(リスト\|lists).*(復習\|review)/` → `/(リスト\|lists\|今日\|Today).*(復習\|review)/` | Label only. The order (tray, then review) and `reviewBack === 'tray'` are unchanged. |

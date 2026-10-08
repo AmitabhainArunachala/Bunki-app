@@ -31091,7 +31091,9 @@ function render() {
   if (S.view === 'search') parts.push(tx('検索', 'search'));
   // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
   // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
-  if (viaTray) parts.push(tx('リスト', 'lists'));
+  // the tray is the Today tab's room (Review #8 renamed its way back "Back to Today"); the crumb,
+  // shown on wide screens, names it the same way (r4 plain words)
+  if (viaTray) parts.push(tx('今日', 'Today'));
   if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));

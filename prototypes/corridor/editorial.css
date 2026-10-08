@@ -4891,6 +4891,10 @@ main h1.view-title, main h1.exam-heading, .assessment-room > h1 { letter-spacing
   opacity: 0.55;
   transition-duration: 0s;
 }
+/* type renders as on the phone: greyscale antialiasing (macOS only; iOS already does), and no
+   automatic text inflation when the phone turns */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body:not([data-view='drift']) { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 /* the page layer is composited once, so a scroll never repaints the paper */
 body:not([data-view='drift'])::before { will-change: transform; }
 /* the full entry rises on the iOS sheet curve: the same 280ms and travel, only the curve
