@@ -301,8 +301,8 @@ html[data-room='reader'] main > .reader-hero .reader-picture-caption {
   text-shadow: none;
 }
 html[data-room='reader'] body:not(.ui-bi) main > .reader-hero .reader-picture-caption { letter-spacing: 0.08em; }
-/* the provenance line rests on the print's faded foot */
-html[data-room='reader'] main > .reader-head.on-hero { position: relative; z-index: 1; margin-top: -34px; }
+/* the title rests on the print's faded foot */
+html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { position: relative; z-index: 1; margin-top: -44px; }
 html[data-room='reader'] .reader-meta {
   font-family: var(--font-data);
   font-variant-numeric: tabular-nums;
@@ -533,7 +533,7 @@ html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-
     margin: calc(-1 * var(--s2, 16px)) calc(50% - 50vw) 4px;
     border-radius: 0;
   }
-  html[data-room='reader'] main > .reader-head.on-hero { align-items: flex-end; margin-top: -40px; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title.on-hero { margin-top: -16px; }
   /* the instrument line may take two short lines; it never runs off the page */
   html[data-room='reader'] body[data-view='reader'] #app > main .reader-meta { flex-wrap: wrap; row-gap: 2px; }
   html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { font-size: 23px; line-height: 1.38; }
@@ -629,3 +629,206 @@ html[data-room='reader'] body #reader-tip .reader-tip-close .ui-icon { width: 14
    opening pop (it rises from 0.96 scale): 46px boxes */
 html[data-room='shelf'] #shelf-body .shelf-tools-filters :is(.filter-chip, .filter-search) { min-height: 46px; }
 html[data-room='shelf'] #shelf-body .shelf-tools-filters .shelf-filter-help > summary { width: 46px; height: 46px; }
+
+/* =====================================================================================
+   r3 read fix lane (2026-10-08, review round 2 #6, #7, #10, #13): the reader opens on picture →
+   title → one quiet instrument line → text; the shelf's head is one masthead; the popup is
+   centred with one Save; the shelf arrives as a held frame that rises, never a bare paper flash.
+   ===================================================================================== */
+
+/* ---------- the reader's instrument line: mono, muted, under the title ---------- */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-head {
+  position: relative;
+  display: block;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+}
+/* the title, its English line and the instrument line are one block: no gap the size of a paragraph */
+html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title:has(+ .view-title-en) { margin-bottom: 2px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .view-title-en { margin-bottom: 0; }
+/* the line is set as running text: its figures wrap as words do, and only its first line steps
+   aside for the settings icon (a float), so it keeps to two short lines on a phone */
+html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .reader-meta {
+  display: block;
+  padding-top: 12px;
+  font: 400 11px/1.75 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-muted);
+}
+html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .reader-meta::before {
+  content: '';
+  position: static;
+  float: right;
+  width: 44px;
+  height: 20px;
+  margin: 0;
+  border: 0;
+  /* the eyebrow's accent rule (a painted ::before) must not paint this spacer */
+  background: none !important;
+  box-shadow: none;
+}
+html[data-room='reader'] .reader-head > .reader-meta > * { display: inline-block; margin: 0 8px 0 0; vertical-align: middle; white-space: nowrap; text-transform: none; letter-spacing: 0; }
+html[data-room='reader'] .reader-head > .reader-meta > .listen-row { display: flex; white-space: normal; }
+html[data-room='reader'] .reader-head > .reader-meta .reader-source { font: inherit; color: var(--color-ink-2); }
+html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-source { font-family: var(--font-ui); }
+html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
+html[data-room='reader'] .reader-head > .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
+html[data-room='reader'] .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font-size: 11.5px; line-height: 1.2; }
+/* 未確認 is an honest small mark in the line, not a grey pill */
+html[data-room='reader'] .reader-head > .reader-meta .status-chip {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: lowercase;
+  color: var(--color-signal);
+}
+html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .status-chip { text-transform: none; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-head > .dials-toggle {
+  position: absolute;
+  top: 0;
+  right: -10px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-muted);
+}
+/* the voice's state: on a phone one muted mark at the line's end (no strip, no fixed foot); on a desk
+   the relief-edged row keeps a line of its own under the figures (verify-relief) */
+html[data-room='reader'] body:not([data-view='drift']) #app main .reader-meta > .listen-row.play-bar.is-pending {
+  display: inline-flex;
+  min-height: 0;
+  margin: 0;
+  padding: 1px 10px;
+  vertical-align: middle;
+}
+html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending { gap: 6px; font: inherit; letter-spacing: inherit; text-transform: none; }
+html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::after { content: none; }
+@media (max-width: 520px) {
+  html[data-room='reader'] body:not([data-view='drift']) #app main .reader-meta > .listen-row.play-bar.is-pending {
+    position: static;
+    display: inline-flex;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending { gap: 4px; font: inherit; letter-spacing: inherit; text-transform: none; color: var(--color-muted); }
+  html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending .ui-icon { width: 12px; height: 12px; }
+  html[data-room='reader'] .reader-meta > .listen-row.is-pending .play-pending::after { content: none; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title { margin-bottom: 2px; }
+  /* the kanji grade is the Tools filter's measure; on a phone the line keeps to provenance, level,
+     the record's own figures and the two honest marks, so it stays two short lines */
+  html[data-room='reader'] .reader-head > .reader-meta .grade-tag { display: none; }
+}
+
+/* a desk's relief-edged voice row sits close under the head: the text starts a beat sooner */
+@media (min-width: 521px) {
+  html[data-room='reader'] body:not([data-view='drift']) #app > main > .listen-row.play-bar { margin: 4px 0 6px; }
+  html[data-room='reader'] body:not([data-view='drift']) #app > main > #reader-tip.reader-tip { margin-bottom: 0; }
+}
+
+/* ---------- the version switch: what the simplified version is waits behind its ⓘ ---------- */
+html[data-room='reader'] .version-block { position: relative; }
+html[data-room='reader'] .version-toggle { align-items: center; border-bottom: 0; }
+html[data-room='reader'] .version-toggle .version-help { position: static; margin: 0 0 0 auto; }
+html[data-room='reader'] .version-toggle .version-help > summary {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  list-style: none;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+html[data-room='reader'] .version-toggle .version-help > summary::-webkit-details-marker { display: none; }
+html[data-room='reader'] .version-toggle .version-help > summary .ui-icon { width: 17px; height: 17px; }
+html[data-room='reader'] .version-block .version-help > .version-caption {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% - 2px);
+  right: 0;
+  left: 0;
+  max-width: none;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  box-shadow: var(--elevation-float);
+  font: 400 13px/1.5 var(--font-ui);
+  color: var(--color-ink-2);
+}
+
+/* ---------- the first-visit tip: a quiet caption over the text that fades after the first tap ---------- */
+html[data-room='reader'] body #reader-tip.reader-tip { margin: 0; padding: 0; }
+html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 12px/1.4 var(--font-ui); color: var(--color-muted); }
+@media (max-width: 520px) {
+  html[data-room='reader'] body #reader-tip .reader-tip-text { font-size: 12px; line-height: 1.4; }
+}
+
+/* ---------- the shelf's head: the look-up line is the masthead's top rule, not a second search box ---------- */
+html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #search.search-field {
+  min-height: 44px;
+  margin: 0 0 8px;
+  padding: 8px 4px 8px 28px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-position: 2px 50%;
+  background-size: 16px 16px;
+  box-shadow: inset 0 -1px 0 var(--color-line);
+  font: 400 15px/1.4 var(--font-ui);
+}
+html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #search.search-field:focus {
+  background-color: transparent;
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #search.search-field::placeholder { color: var(--color-muted); }
+/* the 未確認 note: one quiet line under the lead story, across the grid */
+html[data-room='shelf'] #shelf-reading-results > .shelf-review-note {
+  grid-column: 1 / -1;
+  margin: -4px 0 6px;
+  padding: 0;
+}
+@media (max-width: 520px) {
+  html[data-room='shelf'] #shelf-reading-results > .shelf-review-note { margin: -6px 0 10px; }
+}
+/* the shelf arrives as a held frame that rises: its masthead and lead woodblock are drawn on the first
+   painted frame (the old room hands over to a whole shelf, never to bare paper), and only move */
+@keyframes read-shelf-hold { from { transform: translate3d(0, var(--rise, 12px), 0); } to { transform: none; } }
+html[data-room='shelf'][data-room-entering] #app > main > * { animation-name: read-shelf-hold; }
+html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-color: color-mix(in srgb, var(--color-ink) 9%, var(--color-page, var(--color-paper))); }
+
+/* the reader's entrance: the picture and title rise; the instrument line and the text only fade in, so
+   the words are where they will stay from the first frame (a reader's place never drifts) */
+@keyframes read-text-settle { from { opacity: 0.01; } to { opacity: 1; } }
+html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .version-block, .dials, .listen-row, #reader-tip, #reader, .article-footer) {
+  animation-name: read-text-settle;
+}
+
+/* ---------- the quick look on a phone: centred, its two gutters equal ---------- */
+@media (max-width: 520px) {
+  html[data-room='reader'] body #mini {
+    width: calc(100vw - 32px);
+    min-width: 0;
+    max-width: none;
+  }
+}

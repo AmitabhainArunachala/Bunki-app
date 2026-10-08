@@ -87,8 +87,8 @@
  *                         list holding the word and whose checkbox takes it off again while the card stays;
  *                         at 390 the popover is a short sheet on the screen's foot. Control: 3166ded3.
  *   G6 sentence row     — (John #18) no sentence bar shows when a word is chosen (no sentence action
- *                         shows outside the popup); the popup's last row reads "This sentence: Save ·
- *                         Ask the tutor · Practice", and Ask the tutor opens the tutor with that sentence
+ *                         shows outside the popup); the popup's last row reads "This sentence: Ask the
+ *                         tutor · Practice" (r3 2026-10-08: one Save in the popup), and Ask the tutor opens the tutor with that sentence
  *                         as its active context. Control: 3166ded3, whose bar floated in on the first tap.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "The simplified version
@@ -877,7 +877,8 @@ try {
         text: document.querySelector('#mini .mini-sentence')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
       }));
       assert.equal(row.bar, 0, 'a sentence bar shows when a word is chosen');
-      assert.equal(row.text, 'This sentence: Save · Ask the tutor · Practice', `the popup's sentence row: ${row.text}`);
+      // one Save in the popup (review round 2 #13): keeping the sentence is the word menu's "Save the sentence"
+      assert.equal(row.text, 'This sentence: Ask the tutor · Practice', `the popup's sentence row: ${row.text}`);
       await page.locator('#mini #reader-teacher').click();
       await page.waitForFunction(() => document.body.dataset.view === 'ai');
       const record = await readAppRecord(page);

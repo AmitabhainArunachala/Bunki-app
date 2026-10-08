@@ -5535,11 +5535,14 @@ function renderShelfBody() {
     el('span', 'tally-short', bi() ? `${stories.length} articles` : `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
   dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
   title.append(dateline);
-  // 未確認 is said once, here, not on every card; each article still wears it in its meta line.
-  // One short line (glance pass 2026-10-01); what it means waits behind its ⓘ.
+  // 未確認 is said once, not on every card; each article still wears it in its meta line. One short
+  // line (glance pass 2026-10-01); what it means waits behind its ⓘ. It stands under the lead story,
+  // not above its picture (review round 2 #6): the shelf opens on the woodblock.
   const unreviewed = stories.filter(reviewPending).length;
+  let reviewNote = null;
   if (unreviewed) {
     const note = el('div', 'shelf-review-note');
+    reviewNote = note;
     note.append(el('span', 'shelf-review-text', tx(`このうち ${unreviewed} 本は未確認（人の確認前）`,
       `Unreviewed · ${unreviewed} of ${stories.length} not yet checked by a person`)));
     const why = el('details', 'shelf-filter-help shelf-review-help');
@@ -5550,7 +5553,6 @@ function renderShelfBody() {
     why.append(whySummary, el('p', '', tx('人がまだ確認していない読み物です。ふりがなや英訳に誤りがあるかもしれません。記事の見出しの上にも「未確認」と出ます。',
       'A person has not checked these articles yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says Unreviewed at its top.')));
     note.append(why);
-    title.append(note);
   }
   masthead.append(title);
   main.append(masthead);
@@ -5919,8 +5921,11 @@ function renderShelfBody() {
     if (rank >= 3 && inBand.has(p.id)) continue;
     if (rank === 3) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
+    if (rank === 0 && reviewNote) grid.append(reviewNote);
     rank += 1;
   }
+  // a shelf with no lead (every story filtered away) keeps the note in its masthead
+  if (reviewNote && !reviewNote.parentNode) title.append(reviewNote);
   grid.append(...bands);
   if (definitions.length) {
     const band = el('section', 'shelf-definitions shelf-band');
@@ -8493,8 +8498,15 @@ function miniKanjiWeb(word, anchor) {
         const piece = el('span', 'mini-kanji-part', part);
         piece.lang = 'ja'; piece.dataset.uiContent = 'learning';
         set.append(piece);
-        const name = D.radicals?.[part]?.name;
-        if (name) { const n = el('span', 'mini-kanji-part-name', name); n.lang = 'ja'; n.dataset.uiContent = 'learning'; set.append(n); }
+        // the part's name follows the page's language (review round 2 #7): in English its meaning, from
+        // the kanji data; in 日本語 its reading, from the radical names. A part with neither shows none.
+        if (bi()) {
+          const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+          if (meaning) set.append(el('span', 'mini-kanji-part-name mini-kanji-part-meaning', meaning));
+        } else {
+          const name = D.radicals?.[part]?.name;
+          if (name) { const n = el('span', 'mini-kanji-part-name', name); n.lang = 'ja'; n.dataset.uiContent = 'learning'; set.append(n); }
+        }
       });
       what.append(set);
     }
@@ -8567,7 +8579,7 @@ function placeFloating(card, r) {
   };
   const height = window.innerHeight || Infinity;
   const ceiling = Math.max(8, (fixedEdge('#app > .chrome', 'bottom') ?? 0) + 8);
-  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height) - 8;
+  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   let top;
   if (m.height <= roomAbove) top = r.top - 10 - m.height;
@@ -8578,13 +8590,17 @@ function placeFloating(card, r) {
     card.style.overflowY = 'auto';
     top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - room) : r.bottom + 10;
   }
-  card.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
+  // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
+  // a narrower card stays beside its word
+  card.style.left = m.width >= window.innerWidth - 48
+    ? `${Math.max(0, (window.innerWidth - m.width) / 2)}px`
+    : `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   card.style.top = `${top}px`;
 }
 
 /* The popup's quiet last row in an article acts on the word's sentence (John #18: the floating sentence bar
- * "what is the purpose??"). Save keeps the sentence on the tutor page; Ask the tutor opens the tutor with
- * that sentence; Practice opens the sentence practice. Each carries exactly the sentence the bar did. */
+ * "what is the purpose??"). Ask the tutor opens the tutor with that sentence; Practice opens the sentence
+ * practice. Keeping the sentence is the word menu's "Save the sentence", so the popup has one Save. */
 function readerSentenceRow(node, index) {
   const row = el('div', 'mini-sentence');
   row.setAttribute('role', 'group');
@@ -8603,10 +8619,11 @@ function readerSentenceRow(node, index) {
     button.disabled = !recordWritable();
     return button;
   };
-  const save = action('reader-context-save', tx('保存', 'Save'), tx('この文を先生のページに保存', 'Save this sentence for the tutor'));
+  // one way to save in the popup (review round 2 #13): its Save keeps the word. Keeping the sentence
+  // for the tutor stays one press away in the word menu ("Save the sentence"), not a second Save here.
   const ask = action('reader-teacher', tx('先生に聞く', 'Ask the tutor'), tx('この文について先生に聞く', 'Ask the tutor about this sentence'));
-  const buttons = [save, ask];
-  for (const [button, discuss] of [[save, false], [ask, true]]) {
+  const buttons = [ask];
+  for (const [button, discuss] of [[ask, true]]) {
     button.addEventListener('click', async (event) => {
       event.stopPropagation();
       if (button.disabled) return;
@@ -8615,9 +8632,8 @@ function readerSentenceRow(node, index) {
       finally { for (const control of buttons) control.disabled = !recordWritable(); }
     });
   }
-  row.append(label, save);
+  row.append(label, ask);
   const dot = () => { const mark = el('span', 'mini-sentence-dot', '·'); mark.setAttribute('aria-hidden', 'true'); return mark; };
-  row.append(dot(), ask);
   if (sentencePracticeModule) {
     const practice = action('reader-sentence-practice', tx('練習', 'Practice'), tx('この文を練習する', 'Practice this sentence'));
     // coming back from practice reopens this popup with Practice focused (focusLearningSourceCaller)
@@ -9453,6 +9469,8 @@ function refreshListenRow() {
   if (!row || !p || row.dataset.passage !== p.id) return;
   const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
   const next = buildListenRow(p);
+  // in place: a play bar that replaces the instrument line's pending mark docks at the foot on a
+  // phone (fixed) and takes the mark's own line on a desk, so the text under it does not move
   row.replaceWith(next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
 }
@@ -9564,15 +9582,24 @@ function renderReader(main) {
     main.append(door);
     }
   }
-  // The woodblock leads the article at its own crop, the way its shelf card shows it; the provenance
-  // line rests on its faded foot (redesign, Read lane).
+  // The reader opens on picture → title → one quiet instrument line → text (review round 2 #7: the
+  // explainer, the tip box, the UNREVIEWED pill and the voice placeholder were four things between the
+  // reader and the first sentence). The woodblock leads at its own crop, the way its shelf card shows it.
   const picture = readerPicture(p);
   if (picture) { picture.classList.add('reader-hero'); main.append(picture); }
-  // One compact line of provenance — source · date · level — then the headline. Settings are one
-  // icon; nothing else stands between the reader and the first sentence (design pass 2026-09-30).
+  // the reader was the one view in bi mode that dropped the English title —
+  // the handle the learner chose the text by (E3 round-A, reader lens). It
+  // rides BESIDE the heading, the way the shelf card carries it, so the
+  // heading itself still reads as the Japanese title alone.
+  const articleTitle = el('h1', 'view-title', p.title);
+  articleTitle.dataset.uiContent = 'learning';
+  if (picture) articleTitle.classList.add('on-hero');
+  main.append(articleTitle);
+  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
+  // The instrument line, under the title: source · date · level · the record's own figures · a small
+  // honest "unreviewed" · the voice's state. Settings are one icon at its end.
   const head = el('div', 'reader-head');
-  if (picture) head.classList.add('on-hero');
-  const meta = el('p', 'eyebrow reader-meta');
+  const meta = el('div', 'eyebrow reader-meta');
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
   if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
   meta.append(levelChip(p));
@@ -9594,20 +9621,18 @@ function renderReader(main) {
     S.dialsOpen = !S.dialsOpen;
     render();
   });
+  // the listen door: on a phone an article without a recording says so as one muted mark at the end
+  // of the instrument line (音声未収録 · Kore), not a strip at the foot; a narrated article's play bar,
+  // and a desk's relief-edged row, stand below the head as before
+  const listenRow = buildListenRow(p);
+  const listenInLine = listenRow.classList.contains('is-pending') && matchMedia('(max-width: 520px)').matches;
+  if (listenInLine) meta.append(listenRow);
   head.append(meta, dialsToggle);
   main.append(head);
-  // the reader was the one view in bi mode that dropped the English title —
-  // the handle the learner chose the text by (E3 round-A, reader lens). It
-  // rides BESIDE the heading, the way the shelf card carries it, so the
-  // heading itself still reads as the Japanese title alone.
-  const articleTitle = el('h1', 'view-title', p.title);
-  articleTitle.dataset.uiContent = 'learning';
-  main.append(articleTitle);
-  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
   const versions = storyVersions(p);
   if (versions) {
     // one story, two texts: the original and Bunki's N3 rewrite are one switch, never two cards. Each side
-    // says what it is and its level, and one line says what the simplified version is (John #9).
+    // says what it is and its level; what the simplified version is waits behind one ⓘ beside it (John #9)
     const toggle = el('div', 'version-toggle');
     toggle.setAttribute('role', 'group');
     toggle.setAttribute('aria-label', tx('記事の版', 'Article version'));
@@ -9626,8 +9651,15 @@ function renderReader(main) {
       b.addEventListener('click', () => { if (version.id !== p.id) openPassage(version.id); });
       toggle.append(b);
     }
+    const why = el('details', 'version-help');
+    const whySummary = el('summary', 'icon-button');
+    whySummary.setAttribute('aria-label', tx('やさしい版とは', 'What the simplified version is'));
+    whySummary.title = tx('やさしい版とは', 'What the simplified version is');
+    whySummary.append(uiIcon('info'));
+    why.append(whySummary, caption);
+    toggle.append(why);
     const block = el('div', 'version-block');
-    block.append(toggle, caption);
+    block.append(toggle);
     main.append(block);
   }
   if (S.dialsOpen) {
@@ -9658,10 +9690,8 @@ function renderReader(main) {
     main.append(dials);
   }
 
-  // the listen door rides beside the settings fold — one tap to hear the
-  // article, one tap to stop; until the locked Kore clips ship it shows
-  // only its 音声未収録 · Kore pending state
-  main.append(buildListenRow(p));
+  // a narrated article's listen door — one tap to hear the article, one tap to stop
+  if (!listenInLine) main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
   renderReaderTip(main);
 

@@ -532,3 +532,13 @@ Review #6 folded the four shelf filters (`#shelf-filter-*`) and the article sear
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs` (one-tap save, list drawer) | read `.fold-sub` immediately | first `waitForFunction` (≤5 s) for the drawer to include the list name, then read it | Timing only. The assertion is unchanged: the drawer must say `経済ニュース`. A drawer that never updates still fails. |
 
 | `verify-pr77-ports.mjs` crumb-origin (~l.205, r3-rooms) | presses `#back` on the finished plain review | presses `#back` when it is visible, else the close's own `.close-doors .take` | Flow only. With the tab bar the session close hides the chrome Back (REVIEW round 2, new defect 6: three routes to Today). The crumb assertion and `reviewBack === 'tray'` are unchanged; the press goes to whichever control is the way back. |
+
+
+## Fix r3 read (2026-10-08, cloud): the popup has one Save; the voice placeholder is a mark in the instrument line
+
+Review round 2 #13 found three ways to save in the popup. The sentence row's "Save" (`#reader-context-save`, which keeps the sentence on the tutor page) is gone from the popup, and the word's Save is the popup's only Save. Keeping the sentence stays one press away in the word menu ("Save the sentence", `data-menu-action="save-sentence"`, pinned by `verify-reader-lookup`). Review round 2 #7 moved "no recording yet · Kore" (the pending `.listen-row`) from a fixed strip at the phone's foot into the reader's instrument line. That is under the popup, so the step that pressed it to put the popup away needed another outside point.
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-design-reader-shelf.mjs` G6 (≈l.881) | row text `'This sentence: Save · Ask the tutor · Practice'` | `'This sentence: Ask the tutor · Practice'` | Label pin only. G6 still requires no sentence bar outside the popup, and that Ask the tutor opens the tutor with that exact sentence as the active context. |
+| `prototypes/corridor/tools/verify-reader-lookup.mjs` (named-known and particle steps) | `page.locator('.listen-row').click({position:{x:2,y:2}})` to put the popup away | `tapOutside(page)`: asserts that the fixed chrome's top-left corner is a blank point outside the popup, clicks it, then waits for `#mini` to detach | Click target only. It is still a real pointer press outside the popup, now with an added check that the popup closed. Every lookup, keyboard and menu assertion is unchanged, and `open()` still asserts `.listen-row[data-passage]`. |
