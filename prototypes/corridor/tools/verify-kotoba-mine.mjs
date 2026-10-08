@@ -2448,7 +2448,10 @@ async function main() {
     check('the deck home leads with the count and topics: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
-    // T2 (the 2026-10-08 tour): "the four windows but maybe not so big", in the old home's colours
+    // T2 (the 2026-10-08 tour): "the four windows but maybe not so big", in the old home's colours. The
+    // player injects its own stylesheet when it mounts: read the tiles once it has applied (a sheet that
+    // never applies leaves them stacked and uncoloured, and the check fails)
+    await page.waitForFunction(`getComputedStyle(document.querySelector('.kp-home .kp-tiles')).display === 'grid'`, null, { timeout: 5000 }).catch(() => {});
     const tiles = await page.evaluate(`[...document.querySelectorAll('.kp-home .kp-tiles > .kp-tile')].map((n) => ({ n: n.querySelector('b')?.textContent ?? null, label: n.querySelector('span')?.textContent ?? null, color: getComputedStyle(n.querySelector('b')).color, h: Math.round(n.getBoundingClientRect().height), top: Math.round(n.getBoundingClientRect().top) }))`);
     const hue = await page.evaluate(`(() => { const kp = document.querySelector('.kp'); const i = document.createElement('i'); kp.append(i); const tok = (k) => { i.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(i).color; }; const out = { amber: tok('amber'), ink: tok('ink'), green: tok('green'), red: tok('red') }; i.remove(); return out; })()`);
     const begin = Number(/\d+/.exec(home.start)?.[0]);
