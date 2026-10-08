@@ -598,23 +598,30 @@ html[data-room='reader'] body #reader-tip.reader-tip {
 html[data-room='reader'] body #reader-tip .reader-tip-text { font: 400 12.5px/1.4 var(--font-ui); color: var(--color-muted); }
 html[data-room='reader'] body #reader-tip .reader-tip-close { color: var(--color-muted); }
 html[data-room='reader'] body #reader-tip .reader-tip-close .ui-icon { width: 14px; height: 14px; }
-/* no recording yet: a small quiet line in the article's head, never a floating bar over the text */
-/* (#app: the relief rule's :is(…, #reader, …) carries an id's weight) */
-html[data-room='reader'] body:not([data-view='drift']) #app .listen-row.play-bar.is-pending {
-  position: static;
-  height: auto;
-  min-height: 0;
-  margin: 0;
-  padding: 2px 0 6px;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
+/* no recording yet (phone): a slim quiet caption line at the foot, not a bordered floating pill with a
+   dashed track. It stays at the foot because suites close the word popup by pressing this row
+   (verify-reader-lookup), and only a foot row is never under the popup; a desk keeps the
+   relief-edged row in the page, pinned by verify-relief. */
+@media (max-width: 520px) {
+  /* (#app: the relief rule's :is(…, #reader, …) carries an id's weight) */
+  html[data-room='reader'] body:not([data-view='drift']) #app .listen-row.play-bar.is-pending {
+    left: 0;
+    right: 0;
+    height: 30px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 var(--s2, 16px);
+    border: 0;
+    border-top: 0.5px solid var(--color-rule);
+    border-radius: 0;
+    background: var(--color-page, var(--color-paper));
+    box-shadow: none;
+  }
+  html[data-room='reader'] .listen-row.is-pending .play-pending { flex: 0 1 auto; font: 400 11.5px/1.2 var(--font-data); color: var(--color-muted); }
+  html[data-room='reader'] .listen-row.is-pending .play-pending .ui-icon { width: 13px; height: 13px; }
+  html[data-room='reader'] .listen-row.is-pending .play-pending::after { content: none; }
 }
-html[data-room='reader'] .listen-row.is-pending .play-pending { flex: 0 1 auto; font: 400 12px/1.3 var(--font-data); color: var(--color-muted); }
-html[data-room='reader'] .listen-row.is-pending .play-pending .ui-icon { width: 14px; height: 14px; }
-html[data-room='reader'] .listen-row.is-pending .play-pending::after { content: none; }
-/* with nothing floating at the foot, the foot's paper strip (the play bar's bed) is not drawn over the text */
+/* the quiet line is its own ground: the taller paper strip of the play bar's bed is not drawn over the text */
 @media (max-width: 520px) {
   html[data-room='reader'] body[data-view='reader']:not(.zen):has(.listen-row.is-pending):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
 }
