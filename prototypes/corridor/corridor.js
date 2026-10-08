@@ -7613,7 +7613,7 @@ function renderReaderTip(main) {
   tip.dataset.japaneseLookup = 'off';
   tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
   if (seen) tip.setAttribute('aria-hidden', 'true');
-  tip.append(el('p', 'reader-tip-text', tapLadderHint()));
+  tip.append(el('p', 'reader-tip-text', readerTipText()));
   const close = el('button', 'icon-button reader-tip-close');
   close.type = 'button';
   close.setAttribute('aria-label', tx('ヒントを閉じる', 'dismiss this tip'));
@@ -8991,8 +8991,12 @@ function readerGlossLine(token) {
     : el('span', 'tok-en tok-en-miss', '—');
 }
 
-/** How the reader's words work, in plain words: the one-time hint above the text and the text settings
- * say the same thing (John, 2026-10-02 #8). */
+/** The first-visit tip: one plain line (round 4, John T4: the explanation was "too verbose and..
+ * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
+function readerTipText() {
+  return tx('語をタップすると、意味が出ます。', 'Tap any word for its meaning.');
+}
+/** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
   return tx('語をタップすると意味が出ます。右クリック（または長押し）で、ほかの操作も。',
     'Tap any word to see what it means. Right-click (or press and hold) for more.');
@@ -9673,6 +9677,12 @@ function renderReader(main) {
   // reader and the first sentence). The woodblock leads at its own crop, the way its shelf card shows it.
   const picture = readerPicture(p);
   if (picture) { picture.classList.add('reader-hero'); main.append(picture); }
+  // round 4 (John T4: "the top header, the background of the picture, th etitle, the subtitle, the
+  // explanaiton ... and the artile itslef ... are all the exact same ... beige"): the print sits on its
+  // own mat, and the title, its English line, the instrument line, the version switch and the one plain
+  // line of help stand together on a raised title card in front of it; the text has its own paper below
+  const card = el('div', 'reader-card');
+  main.append(card);
   // the reader was the one view in bi mode that dropped the English title —
   // the handle the learner chose the text by (E3 round-A, reader lens). It
   // rides BESIDE the heading, the way the shelf card carries it, so the
@@ -9680,8 +9690,8 @@ function renderReader(main) {
   const articleTitle = el('h1', 'view-title', p.title);
   articleTitle.dataset.uiContent = 'learning';
   if (picture) articleTitle.classList.add('on-hero');
-  main.append(articleTitle);
-  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
+  card.append(articleTitle);
+  if (bi() && p.titleEn) card.append(el('p', 'view-title-en', p.titleEn));
   // The instrument line, under the title: source · date · level · the record's own figures · a small
   // honest "unreviewed" · the voice's state. Settings are one icon at its end.
   const head = el('div', 'reader-head');
@@ -9714,7 +9724,7 @@ function renderReader(main) {
   const listenInLine = listenRow.classList.contains('is-pending') && matchMedia('(max-width: 520px)').matches;
   if (listenInLine) meta.append(listenRow);
   head.append(meta, dialsToggle);
-  main.append(head);
+  card.append(head);
   const versions = storyVersions(p);
   if (versions) {
     // one story, two texts: the original and Bunki's N3 rewrite are one switch, never two cards. Each side
@@ -9746,7 +9756,7 @@ function renderReader(main) {
     toggle.append(why);
     const block = el('div', 'version-block');
     block.append(toggle);
-    main.append(block);
+    card.append(block);
   }
   if (S.dialsOpen) {
     const dials = el('div', 'dials');
@@ -9779,7 +9789,7 @@ function renderReader(main) {
   // a narrated article's listen door — one tap to hear the article, one tap to stop
   if (!listenInLine) main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
-  renderReaderTip(main);
+  renderReaderTip(card);
 
   const reader = el('div', 'reader');
   reader.id = 'reader';

@@ -1154,3 +1154,188 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   :root body:not([data-view='drift']) #mini :is(.mini-lists, .mini-sentence-pane) { animation: none; }
   :root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: none; }
 }
+
+/* =====================================================================================
+   ROUND 4, T4 (John: "the top header, the background of the picture, th etitle, the subtitle, the
+   explanaiton (that is too verbose and.. confusing) and the artile itslef, and the bottom are all the
+   exact same make me wanna puke beige"). Every layer of the reader has its own surface and edge:
+     the print → mounted on a dark lacquer mat with a keyline, never fading into the page;
+     the title card → raised paper in front of the mat: the title in near-black, its English line in
+       藍, the instrument line, the version switch as a segmented control, and one plain line of help;
+     the text → its own smooth paper, edged at the top, under the card.
+   Reading sizes, ruby and leading are the pinned ones; only surfaces, edges and inks change.
+   ===================================================================================== */
+html[data-room='reader'] body:not([data-view='drift']) {
+  --reader-mat: color-mix(in srgb, var(--color-lacquer, #141a28) 90%, var(--color-accent));
+  --reader-mat-edge: rgb(255 255 255 / 16%);
+  --reader-card: color-mix(in srgb, var(--color-surface) 45%, #fffefb);
+  --reader-card-edge: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  --reader-paper: color-mix(in srgb, var(--color-surface) 70%, #fffdf7);
+  --reader-paper-edge: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --reader-ink: color-mix(in srgb, var(--color-ink) 90%, #000000);
+  --reader-track: color-mix(in srgb, var(--color-ink) 9%, var(--reader-card));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) {
+  --reader-mat: color-mix(in srgb, var(--color-ground) 40%, #000000);
+  --reader-mat-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 42%, transparent);
+  --reader-card: color-mix(in srgb, var(--color-paper) 88%, #ffffff);
+  --reader-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 26%, transparent);
+  --reader-paper: color-mix(in srgb, var(--color-paper) 55%, var(--color-ground));
+  --reader-paper-edge: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --reader-ink: var(--color-ink);
+  --reader-track: color-mix(in srgb, var(--color-ground) 55%, var(--reader-card));
+}
+
+/* the print on its mat */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
+  margin: 0 0 4px;
+  padding: 10px 10px 34px;
+  border-radius: var(--radius-card, 8px);
+  background: var(--reader-mat);
+  -webkit-mask-image: none;
+  mask-image: none;
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 6%);
+}
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-img {
+  height: clamp(112px, calc(100svh - 724px - var(--nav-clearance, 0px)), 280px);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--reader-mat-edge), 0 8px 18px -8px rgb(0 0 0 / 70%);
+}
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-caption {
+  inset: 18px 18px auto auto;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: rgb(10 12 18 / 74%);
+  color: #f3ecdd;
+}
+/* night: the lamp and the rain fall on the print, not on its mat */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::before {
+  inset: 10px 10px 34px;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-gold, #e2bd6c) 20%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::after {
+  clip-path: inset(calc(60% + 10px) 10px 34px 10px);
+}
+@media (max-width: 520px) {
+  html[data-room='reader'] body:not(.zen):not([data-view='drift']) #app > main > .reader-hero {
+    margin: calc(-1 * var(--s2, 16px)) calc(50% - 50vw) 0;
+    border-radius: 0;
+  }
+}
+
+/* the title card: raised paper in front of the mat */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 12px;
+  padding: 14px 16px 4px;
+  border: 1px solid var(--reader-card-edge);
+  border-radius: 14px;
+  background: var(--reader-card);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
+  color: var(--reader-ink);
+}
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero + .reader-card { margin-top: -26px; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
+}
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title {
+  position: static;
+  margin: 0 0 4px;
+  font: 800 clamp(26px, 3vw, 34px)/1.4 var(--font-headword);
+  letter-spacing: 0.01em;
+  color: var(--reader-ink);
+  word-break: auto-phrase;
+  line-break: strict;
+  text-wrap: pretty;
+}
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en {
+  margin: 0 0 2px;
+  padding: 1px 0 1px 10px;
+  border-left: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
+  font: 500 15px/1.45 var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-accent);
+}
+/* the instrument line sits under a hairline in the card; the settings icon keeps its corner */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head {
+  position: relative;
+  display: block;
+  margin: 8px 0 4px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
+}
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-head > .reader-meta { padding-top: 8px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head > .dials-toggle {
+  position: absolute;
+  top: 0;
+  right: -10px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-muted);
+}
+/* the version switch: a sunk track and a raised chosen side, its ⓘ at the track's end */
+html[data-room='reader'] #app > main > .reader-card .version-block { margin: 6px 0 8px; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--reader-track);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 12%);
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice {
+  flex: 1 1 0;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-ink-2);
+  font: 600 14px/1.2 var(--font-ui);
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice + .version-choice { padding-left: 8px; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice[aria-pressed='true'] {
+  background: var(--reader-card);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 1px 3px rgb(20 24 34 / 22%), 0 0 0 0.5px rgb(20 24 34 / 12%);
+  color: var(--reader-ink);
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help { flex: 0 0 auto; margin: 0; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help > summary { width: 40px; height: 40px; min-height: 40px; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help > summary::before { content: ''; position: absolute; inset: -2px; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help > summary { position: relative; }
+/* the one plain line of help, at the card's foot */
+html[data-room='reader'] body #app > main > .reader-card > #reader-tip.reader-tip {
+  margin: 0 -16px;
+  padding: 2px 6px 0 16px;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
+}
+html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 13px/1.4 var(--font-ui); color: var(--color-ink-2); }
+
+/* the text on its own paper */
+html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
+  padding: 16px var(--s2, 16px) 28px;
+  border-top: 1px solid var(--reader-paper-edge);
+  border-radius: 0;
+  background: var(--reader-paper);
+  box-shadow: inset 0 10px 12px -12px rgb(20 24 34 / 24%);
+  color: var(--reader-ink);
+}
+@media (max-width: 520px) {
+  html[data-room='reader'] body:not([data-view='drift']) main #reader.reader { margin-inline: calc(50% - 50vw); padding-inline: var(--s2, 16px); }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title { font-size: 23px; line-height: 1.38; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: 14px; line-height: 1.4; }
+}
