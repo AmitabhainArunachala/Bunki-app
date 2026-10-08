@@ -565,3 +565,13 @@ The private collections player draws one theme button per public world (`PUBLIC_
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
 | `prototypes/corridor/tools/verify-personal-collections.mjs` (settings, "Every palette comes from Bunki's existing public roster") | `.pc [data-theme]` count `10` → `11` | Roster count only. The `yoru` (金) click, the night screenshot, the no-horizontal-overflow assertion at 390px and every storage, backup and offline assertion are unchanged. |
+
+## Round 4 skin, review and refine: the crumb pin names Today only; the personal page's station is Learn
+
+The independent review asked for the crumb pin to be replaced rather than widened, so a return of the old "lists" crumb fails again. And the personal collections page ("Your own texts") is a deck: Learn lists it, its back button now reads "← Learn" and leads to Learn, so the Line marks Learn there instead of Me.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-pr77-ports.mjs` quiz-crumb (ea8252a9) | `/リスト\|lists\|今日\|Today/` → `/今日\|Today/`; description "names the lists tray its 戻る reopens" → "names Today, the tray its 戻る reopens" | **Tightened**: the old crumb word now fails. `backTo === 'tray'` is unchanged. |
+| `verify-pr77-ports.mjs` crumb-origin (d9f0b984), plain review | `/(リスト\|lists\|今日\|Today).*(復習\|review)/` → `/(今日\|Today).*(復習\|review)/`; description as above | **Tightened** the same way. The order (Today, then review) and `reviewBack === 'tray'` are unchanged. |
+| `tools/verify-redesign-foundation.mjs` (the private-deck route, ~l.291) | `#tab-me` `aria-current="page"` → `#tab-learn` `aria-current="page"` | Shell label pin (which station the Line marks for one room, `PRIMARY_TABS`). The journey still enters from `#tab-learn`, still requires `ui` to survive the full-document route and `data-room="personal"`, still clicks `#tab-me` and reaches `#me-settings`, then Back to the shelf. Exactly one tab is current (l.88) everywhere else, unchanged. |
