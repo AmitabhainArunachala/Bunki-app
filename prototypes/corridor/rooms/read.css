@@ -644,6 +644,9 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hea
   padding: 0;
   border: 0;
 }
+/* the title, its English line and the instrument line are one block: no gap the size of a paragraph */
+html[data-room='reader'] body[data-view='reader'] #app > main > h1.view-title:has(+ .view-title-en) { margin-bottom: 2px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .view-title-en { margin-bottom: 0; }
 /* the line is set as running text: its figures wrap as words do, and only its first line steps
    aside for the settings icon (a float), so it keeps to two short lines on a phone */
 html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .reader-meta {
