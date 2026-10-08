@@ -14,10 +14,12 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 |---|---|---|---|---|---|
 | `corridor.js` `render()`: `#tray` (bookmark; screen-reader word) | Lists | Lists *(kept: it names the lists that room holds; `verify-corridor` pins `/^Lists N$/`)* | 覚 | リスト | skin |
 | `#tray` count | always shown, "0" | the count shows only when you have saved words; at 0 the bookmark is quiet | 0 | (same) | skin (D7) |
-| `#chrome-dojo` (Learn cap) | Learn | Learn; a small ink dot appears when cards are due, and its name says how many ("Learn · 3 due") | 学ぶ | 学ぶ・復習 3 | skin (D7) |
+| `#chrome-dojo` (Learn cap) | Learn | Learn, a quiet door. What is due shows once, on the Line's Today station, where the cards are reviewed *(the review pass removed the cap's due dot and its "Learn · 3 due" name: two rooms claimed one queue)* | 学ぶ | 学ぶ | skin (D7) |
 | `#theme-seal` and the picker's name | choose a world | Colour theme | 世界を選ぶ | 配色を選ぶ | skin |
 | World picker | ten unnamed stones | the stones in two labelled rows, **Day** and **Night**; Night offers both 金 (藍 night) and 殻 (electric); a line beneath names the world in words ("Gold on indigo", "Electric phosphor") | — | 昼 · 夜; ベロ藍・浪 … | skin (D2) |
-| Top line crumb on wide screens, in the Today room (`render()`) | lists | Today *(the tray is the Today tab's room)* | リスト | 今日 | skin (`verify-pr77-ports` pin widened, logged) |
+| Top line crumb on wide screens, in the Today room (`render()`) | lists | Today *(the tray is the Today tab's room)* | リスト | 今日 | skin (`verify-pr77-ports` now pins 今日/Today only, logged) |
+| Reader's capture button (`#reader-take`, its text and screen-reader name; `readerTakeLabel`) | memorize · memorize 郊外 · memorizing 郊外 — press to remove it from review · touch a word, then memorize it here | Save · Save 郊外 · 郊外 is saved — press again to remove it · Tap a word, then save it here | 覚える · 「郊外」を覚える · … | 保存 · 「郊外」を保存 · 「郊外」は保存済み — もう一度押すと外す · 語をタップすると、ここで保存できる | skin (review pass; the read lane's note handed it to the shell) |
+| Personal collections player (`decks/personal/mount.mjs`, unowned) | ← Bunki · Personal collections · Bunki palette · "Bunki" in five lines · theme names Verdigris, Mineral, Night… (and the raw id `kaku`) | ← Learn · Your own texts · Colour theme · KAIRO · the picker's world names, 殻 included | ← Bunki · 私の文脈 · Bunki の色 · Bunki | ← 学ぶ · 自分の文章 · 配色 · 回廊 | skin (review pass, D3) |
 | Reader picture credit (`readerPicture`, read lane's function, one string) | Illustration · Bunki | Illustration · 回廊 KAIRO | 挿絵 · Bunki | 挿絵 · 回廊 KAIRO | skin (D3) |
 | Shelf sort option | New to Bunki | Newly added | 新着 | 新着 | skin (D3) |
 | Grammar that cannot be saved | This grammar pattern is not in Bunki’s list, so it can’t be memorized. | This grammar pattern isn’t in KAIRO’s grammar list yet, so it can’t become a card. | この文法は一覧にないため、覚えられない。 | この文法はまだ一覧にないため、札にできない。 | skin (D3) |
@@ -41,13 +43,13 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 | Review door | SRS cards · no cards waiting | Review cards · none waiting | 復習 · 待っている札はない | (kept) | skin |
 | Guided door | a guided session · …explanations and word doors | Guided test practice · N2 written · 6 questions · about 15 min · every question explained | 案内つきの稽古 · …解説と語の扉つき | 案内つきの練習 · N2 筆記 6問 · 約15分 · 一問ごとに解説 | skin |
 | Guided gloss | An explanation after every question, a door to every word. Start here when unsure. | Every question is explained, and every word opens its meaning. Start here if you’re unsure. | 問いごとに解説と語の扉。迷ったらここから。 | 一問ごとに解説があり、どの語も意味をひらける。迷ったらここから。 | skin |
-| Deck row: your own texts | My contexts · personal paragraphs · conversations · connections | Your own texts · paragraphs and conversations you add | 私の文脈 · 自分の段落・会話・つながり | 自分の文章 · 自分で加えた段落や会話 | skin |
+| Deck row: your own texts | My contexts · personal paragraphs · conversations · connections | Your own texts · paragraphs and conversations you add *(the room it opens and Me's door now use the same name)* | 私の文脈 · 自分の段落・会話・つながり | 自分の文章 · 自分で加えた段落や会話 | skin |
 | Deck row: context deck | Context cards · one paragraph per word | One word, one paragraph · a short paragraph for each word | 文脈札 · 一語ごとの段落カード | 一語一段落 · 語ごとに短い段落 | skin |
 | Deck row: saved words | My saved cards · words you saved · N waiting | Your saved words · N to review | 覚えるの札 · 覚えた語 ・ N 枚 待っている | 保存した語 · 復習 N 枚 | skin |
 | Focus heading | Focus sitting | Timed practice | 集中の座 | 時間を決めて練習 | skin |
 | Focus gloss | Set a length and sit with the cards. When the time is up, the block ends on its own. | Pick a length and work through your cards. It stops on its own when the time is up. | 時間を決めて、静かに札と向き合う。… | (kept: plain Japanese) | skin (EN) |
 | Focus label | what to drill | what to practise | 何を | 何を練習する | skin |
-| Focus start | sit for 20 minutes | Start 20 minutes | 20分 座る | 20分 始める | skin |
+| Focus start | sit for 20 minutes | Start a 20-minute session | 20分 座る | 20分の練習を始める | skin |
 | Focus mode, due | your due cards · N waiting · after the first lap, practice | proposed: Cards due · N waiting · then extra rounds | — | — | **pinned** (`verify-corridor` filters on "your due cards" and the lap clause) |
 | Focus mode, probe | yomi probe · sound out compounds you never took | proposed: Reading check · read compounds you haven’t saved | 読み探査 | 読みの確認 | **pinned** (`verify-corridor`, `verify-learning-record` filter on "yomi probe") |
 | Tests door | N written tests · awaiting review | proposed: N written tests · not yet checked by a person | 筆記テスト N組 · 検収前 | 人の確認前 | **pinned** (`verify-assessment-written-section`) |
@@ -57,13 +59,13 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 
 | Deck | Old EN | New EN | Old JA | New JA |
 |---|---|---|---|---|
-| `kotoba-mine` (his 323 words exported from his Japanese app, one real sentence each) | Real sentences · read and recall | Your word list · one real sentence each | 言葉の鉱脈・文 | 単語帳・実例文で一語ずつ |
-| `kotoba-mcd` (the same 323 words, a 2–5 sentence passage with the word hidden) | massive-context cloze · real and written passages | Your word list · fill the gap in a passage | 言葉の鉱脈・MCD | 単語帳・長文の穴埋め |
+| `kotoba-mine` (the 323 words he looked up in his Japanese app, one real sentence each) | Real sentences · read and recall | **Words you looked up · sentences** *(the cards lane's title)* | 言葉の鉱脈・文 | 言葉の鉱脈・文 *(kept by cards for now; proposed: 調べた言葉・例文)* |
+| `kotoba-mcd` (the same 323 words, a 2–5 sentence passage with the word hidden) | massive-context cloze · real and written passages | **Words you looked up · passages** *(the cards lane's title)* | 言葉の鉱脈・MCD | 言葉の鉱脈・MCD *(kept by cards for now; proposed: 調べた言葉・長文)* |
 | `n2` | N2 vocabulary · passages | N2 words · in short passages | N2・文章で覚える | N2の語・短い文章で |
 | `n1` | N1 vocabulary · passages | N1 words · in short passages | N1・文章で覚える | N1の語・短い文章で |
 | `senmon` | Your five fields · master’s level | Your fields · advanced words | 専門・五つの分野 | あなたの分野・上級の語 |
 
-*Status: the two 単語帳 rows are skin (Learn's `DOJO_DECKS`, unpinned). The `n2`, `n1` and `senmon` rows are for cards: `verify-n2n1-decks` pins their Learn titles, so they change together with that pin. For the deck homes, cards sets `decks/<id>/deck.json` `titleEn/titleJa` (title only, never an id) so home and list say the same. John named three fields (D5), so "five" is wrong now. 単語帳 is the name his 323 imported words already carry in the app.*
+*Status (review pass): one deck has one name. The cards lane titled the two 言葉の鉱脈 decks in `deck.json` (`titleEn`) and in `DOJO_DECKS`; the skin's `DOJO_DECKS` line is now byte-for-byte the cards lane's, so Learn's row and the deck home it opens say the same thing and the line merges without a conflict. The skin's earlier 単語帳 names are withdrawn. Japanese: "MCD" means nothing to a first-time user, so the proposal is 調べた言葉・例文 / 調べた言葉・長文, changed in `deck.json` `titleJa` and `DOJO_DECKS` together, never one without the other. The `n2`, `n1` and `senmon` rows are for cards: `verify-n2n1-decks` pins their Learn titles, so they change together with that pin. John named three fields (D5), so "five" is wrong now.*
 
 ## The word popup and the reader (read lane)
 
@@ -77,7 +79,7 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 | Reader tip | Tap any word to see what it means. Right-click (or press and hold) for more. | Tap a word for its meaning. Press and hold for more. | — | 語をタップで意味。長押しでほかの操作。 |
 | Reader audio line | no recording yet · Kore | No audio for this article yet *(the voice name stays in Settings; "Kore" is pinned in several verifiers, so change it with a logged pin edit)* | 音声未収録 · Kore | この記事の音声はまだない |
 | Reader place | Reading places · keep this place | Bookmarks · Bookmark this spot | 読書の栞 · ここに栞を置く | 栞 · ここに栞をはさむ |
-| Reader chrome capture (`#reader-take`, screen-reader name) | memorize | Save *(one name for one action)* | 覚える | 保存 |
+| Reader chrome capture (`#reader-take`, screen-reader name) | memorize | Save *(one name for one action; done by the skin in the review pass, see the Shell table)* | 覚える | 保存 |
 | Shelf seal | 永 (read as 水, T3) | a seal that means reading, e.g. 読 | 永 | 読 |
 | Shelf title | bookshelf | Read *(or "Bookshelf", capitalised)* | 本棚 | 読む |
 
@@ -93,7 +95,7 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 | Me: horizons | Four horizons | Your goals *(N1 · July 2027 and his three fields, D5)* | 四つの地平 | 目標 |
 | Me: won-back words | Came home · mended in gold | Words you won back | 戻ってきた言葉 | 取り戻した語 |
 | Me: contents | Inside the book / At the back of the book | More / Settings | 目次 / 奥付 | もっと見る / 設定 |
-| Me: own texts | Personal collections | Your own texts | 私の文脈 | 自分の文章 |
+| Me: own texts | Personal collections | Your own texts *(the skin changed this one string in the Me render in the review pass, so Me's door, Learn's row and the room match)* | 私の文脈 | 自分の文章 |
 | Door hint | Touch a word | Tap a word | — | — |
 
 ## Cards (cards lane)
