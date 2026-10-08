@@ -21906,7 +21906,7 @@ function renderLearnStage(main, doors) {
   const row = el('div', 'learn-stage-row');
   const count = el('p', 'learn-due');
   count.append(el('b', 'learn-due-n', String(due)));
-  count.append(el('span', 'learn-due-u', tx('枚 今日の復習', due === 1 ? 'card due today' : 'cards due today')));
+  count.append(el('span', 'learn-due-u', tx('枚 復習待ち', due === 1 ? 'card due today' : 'cards due today')));
   row.append(count);
   const sums = LEARN_STAGE_DECKS.map(([id, ja, en]) => [id, tx(ja, en), learnDeckSummary(id)]);
   const loaded = sums.filter(([, , sum]) => sum);
