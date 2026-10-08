@@ -434,98 +434,7 @@ html[data-room='reader'] .listen-row .play-pending::after {
 @keyframes read-rain { from { transform: translate3d(0, -12%, 0); } to { transform: translate3d(-4%, 0, 0); } }
 @keyframes read-lamp { from { opacity: 0.78; } to { opacity: 1; } }
 
-/* ---------- the quick look: a lifted slip that rises on a spring ---------- */
-html[data-room='reader'] body #mini {
-  border: 1px solid var(--color-line);
-  border-radius: 14px;
-  background: var(--color-paper);
-  box-shadow: var(--elevation-float);
-  /* the slip rises and settles: a damped spring on translate only. No scale and no overshoot, because
-     placeFloating measures the popup's box as it opens, and a scaled box would be placed too wide */
-  animation: read-mini-rise 280ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
-}
-@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
-html[data-room='reader'] body #mini .mini-word { font-family: var(--font-headword); font-weight: 800; color: var(--color-ink); }
-html[data-room='reader'] body #mini .mini-reading { font-family: var(--font-reading); color: var(--color-accent); }
-html[data-room='reader'] body #mini .mini-gloss { font-size: 17px; color: var(--color-ink); }
-html[data-room='reader'] body #mini .mini-web { display: grid; gap: 0; margin: 10px 0 0; border-top: 1px solid var(--color-line); }
-html[data-room='reader'] body #mini .mini-kanji { display: grid; }
-html[data-room='reader'] body #mini .mini-kanji-row {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  align-items: center;
-  column-gap: 12px;
-  min-height: 52px;
-  padding: 6px 0;
-  border: 0;
-  border-bottom: 1px solid var(--color-line-soft);
-  background: transparent;
-  color: var(--color-ink);
-  text-align: start;
-  cursor: pointer;
-}
-html[data-room='reader'] body #mini .mini-kanji-glyph {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--color-edge-strong);
-  border-radius: var(--radius-small);
-  background: var(--color-surface);
-  box-shadow: var(--elevation-paper);
-  font: 800 24px/1 var(--font-headword);
-}
-html[data-room='reader'] body #mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
-html[data-room='reader'] body #mini .mini-kanji-meaning { font: 600 14px/1.3 var(--font-ui); }
-html[data-room='reader'] body #mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
-html[data-room='reader'] body #mini .mini-kanji-part { font: 500 17px/1.3 var(--font-reading); color: var(--color-accent); }
-html[data-room='reader'] body #mini .mini-kanji-part-name { font: 12.5px/1.3 var(--font-reading); color: var(--color-ink-2); }
-html[data-room='reader'] body #mini .mini-kanji-plus { font: 12px/1 var(--font-data); color: var(--color-muted); }
-html[data-room='reader'] body #mini .mini-cards {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 4px;
-  margin: 6px 0 0;
-}
-html[data-room='reader'] body #mini .mini-cards-label {
-  margin-right: 4px;
-  font: 600 11px/1.3 var(--font-ui);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-html[data-room='reader'] body:not(.ui-bi) #mini .mini-cards-label { letter-spacing: 0.08em; }
-html[data-room='reader'] body #mini .mini-card-word {
-  min-height: 44px;
-  padding: 0 6px;
-  border: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font: 600 17px/1 var(--font-reading);
-  text-decoration: underline;
-  text-decoration-color: var(--color-gold);
-  text-underline-offset: 0.3em;
-  cursor: pointer;
-}
-html[data-room='reader'] body #mini .mini-web-open {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 44px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-live);
-  font: 600 15px/1.2 var(--font-ui);
-  cursor: pointer;
-}
-html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-web-open):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-@media (hover: hover) {
-  html[data-room='reader'] body #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
-  html[data-room='reader'] body #mini .mini-web-open:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-}
+/* the quick look (the word popup) is drawn by the round-4 block at the end of this file, in every room */
 
 @media (max-width: 520px) {
   /* the woodblock runs to both edges and up to the chrome */
@@ -824,11 +733,424 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   animation-name: read-text-settle;
 }
 
-/* ---------- the quick look on a phone: centred, its two gutters equal ---------- */
-@media (max-width: 520px) {
-  html[data-room='reader'] body #mini {
-    width: calc(100vw - 32px);
-    min-width: 0;
-    max-width: none;
-  }
+
+/* =====================================================================================
+   ROUND 4, T5 (John: "it all bledns together! It lacks modularity, it lacks contrast, texture, depth,
+   separtion, user ease, emotional depth, sharp contrast, and stand out clarity"). The word popup is a
+   raised card of separate bands, in every room it opens in:
+     1. the word band: a lacquer cartouche, the word in light ink, its reading in lantern gold, faint
+        青海波 waves for texture, "Full entry ›" in its corner;
+     2. one path: Save (a note says where it goes), then "Add to a list" beside "Saved ✓";
+     3. the kanji band: a sunk band, labelled, its tiles raised on it;
+     4. the sentence band: one named door, "Study this sentence ›", which opens the sentence in the card.
+   Colours are the skin's roles (--color-*) mixed per band; nothing here persists anything.
+   ===================================================================================== */
+:root body:not([data-view='drift']) #mini {
+  --mini-paper: color-mix(in srgb, var(--color-surface) 55%, #fffefb);
+  --mini-band: color-mix(in srgb, var(--color-ground) 36%, var(--mini-paper));
+  --mini-head: var(--color-lacquer, #141a28);
+  --mini-head-2: var(--color-lacquer-2, #1d2638);
+  --mini-head-ink: #f3ecdd;
+  --mini-head-ink-2: color-mix(in srgb, #f3ecdd 78%, var(--mini-head));
+  --mini-gold: #e5c27a;
+  --mini-edge: color-mix(in srgb, var(--color-ink) 26%, transparent);
+  --mini-rule: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --mini-press: cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 360px;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--mini-edge);
+  border-radius: 16px;
+  background: var(--mini-paper);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 2px 4px rgb(20 24 34 / 10%), 0 22px 48px -10px rgb(20 24 34 / 42%);
+  color: var(--color-ink);
+  cursor: auto;
+  /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens) */
+  animation: read-mini-rise 260ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+}
+@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini {
+  --mini-paper: color-mix(in srgb, var(--color-paper) 93%, #ffffff);
+  --mini-band: color-mix(in srgb, var(--color-ground) 64%, var(--mini-paper));
+  --mini-head: color-mix(in srgb, var(--color-ground) 48%, #000000);
+  --mini-head-2: color-mix(in srgb, var(--color-ground) 72%, #000000);
+  --mini-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  --mini-rule: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 24px 56px -8px rgb(0 0 0 / 75%),
+    0 0 36px -12px color-mix(in srgb, var(--color-gold, #e2bd6c) 32%, transparent);
+}
+
+/* 1. the word band */
+:root body:not([data-view='drift']) #mini .mini-head {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 6px;
+  padding: 10px 8px 11px 18px;
+  background-color: var(--mini-head);
+  background-image: linear-gradient(180deg, var(--mini-head-2), var(--mini-head) 72%);
+  color: var(--mini-head-ink);
+  isolation: isolate;
+}
+/* 青海波: Hokusai's waves, faint, behind the band's right; the word stands clear of them */
+:root body:not([data-view='drift']) #mini .mini-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 100% 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
+    radial-gradient(circle at 0 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
+    radial-gradient(circle at 50% 100%, var(--mini-head) 10%, var(--mini-gold) 10% 12%, var(--mini-head) 12% 23%, var(--mini-gold) 23% 25%,
+      var(--mini-head) 25% 36%, var(--mini-gold) 36% 38%, var(--mini-head) 38% 49%, var(--mini-gold) 49% 51%, transparent 51%);
+  background-size: 44px 22px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 40%, #000 94%);
+  mask-image: linear-gradient(100deg, transparent 40%, #000 94%);
+}
+:root body:not([data-view='drift']) #mini .mini-head-text { display: grid; gap: 2px; min-width: 0; }
+:root body:not([data-view='drift']) #mini .mini-word {
+  padding: 0;
+  overflow-wrap: anywhere;
+  font: 800 30px/1.15 var(--font-headword, var(--display));
+  letter-spacing: 0.02em;
+  color: var(--mini-head-ink);
+}
+:root body:not([data-view='drift']) #mini .mini-reading {
+  font: 500 17px/1.3 var(--font-reading, var(--serif));
+  letter-spacing: 0.06em;
+  color: var(--mini-gold);
+}
+:root body:not([data-view='drift']) #mini .mini-gloss {
+  margin: 2px 0 0;
+  font: 500 17px/1.35 var(--font-ui, var(--sans));
+  color: var(--mini-head-ink);
+}
+:root body:not([data-view='drift']) #mini .mini-gloss.mini-miss { font-weight: 400; color: var(--mini-head-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -6px 0 0;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--mini-head-ink);
+  font: 600 14px/1 var(--font-ui, var(--sans));
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry .mini-entry-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--mini-head-ink) 36%, transparent);
+  border-radius: 999px;
+}
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry .mini-entry-chevron { font-weight: 700; }
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry:disabled { color: var(--mini-head-ink-2); cursor: default; }
+
+/* why a word can't be saved here, and the door to the card that holds its spelling: plain lines on paper */
+:root body:not([data-view='drift']) #mini .mini-take-reason { display: block; margin: 0; padding: 12px 18px 0; font: 400 13.5px/1.45 var(--font-ui); color: var(--color-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-take-open { align-self: flex-start; min-height: 44px; margin: 6px 14px 0; }
+
+/* 2. one path: Save, then Add to a list */
+:root body:not([data-view='drift']) #mini .mini-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 8px 14px;
+  background: var(--mini-paper);
+}
+:root body:not([data-view='drift']) #mini .mini-take {
+  position: static;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
+  border-radius: 12px;
+  background: var(--color-accent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 2px 0 color-mix(in srgb, var(--color-accent) 60%, #000000),
+    0 6px 14px -6px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  color: #fbf8f1;
+  font: 650 16px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-take.taken {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--mini-paper));
+  box-shadow: none;
+  color: var(--color-accent);
+}
+:root body:not([data-view='drift']) #mini .mini-take.reader-capture-held {
+  border: 1px dashed var(--mini-edge);
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-ink-2);
+  cursor: help;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini .mini-take:not(.taken):not(.reader-capture-held) {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, #ffffff);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 2px 0 color-mix(in srgb, var(--color-accent) 45%, #000000), 0 0 18px -6px var(--color-accent);
+  color: #0b1220;
+}
+:root body:not([data-view='drift']) #mini .mini-take-note { flex: 1 1 auto; min-width: 0; font: 400 13.5px/1.3 var(--font-ui); color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-lists {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: 1px solid var(--mini-edge);
+  border-radius: 12px;
+  background: var(--mini-paper);
+  box-shadow: 0 1px 0 var(--mini-rule);
+  color: var(--color-ink);
+  font: 600 15px/1 var(--font-ui);
+  text-decoration: none;
+  cursor: pointer;
+  animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+}
+@keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
+:root body:not([data-view='drift']) #mini :is(.mini-lists, .mini-take-note, .mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
+
+/* 3. the kanji band */
+:root body:not([data-view='drift']) #mini .mini-web {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0 12px 4px 16px;
+  border-top: 1px solid var(--mini-rule);
+  border-bottom: 1px solid var(--mini-rule);
+  background: var(--mini-band);
+}
+:root body:not([data-view='drift']) #mini .mini-band-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 36px; }
+:root body:not([data-view='drift']) #mini .mini-band-label {
+  margin: 0;
+  font: 600 11px/1.3 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+:root body:not([data-view='drift']):not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
+:root body:not([data-view='drift']) #mini .mini-kanji { display: grid; }
+:root body:not([data-view='drift']) #mini .mini-kanji-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  min-height: 48px;
+  padding: 3px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mini-rule);
+  background: transparent;
+  color: var(--color-ink);
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-kanji-row:last-child { border-bottom: 0; }
+:root body:not([data-view='drift']) #mini .mini-kanji-glyph {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+  border-radius: 8px;
+  background: var(--mini-paper);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 5px -1px rgb(20 24 34 / 22%);
+  color: var(--color-ink);
+  font: 800 24px/1 var(--font-headword);
+}
+:root body:not([data-view='drift']) #mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
+:root body:not([data-view='drift']) #mini .mini-kanji-meaning { font: 600 14px/1.3 var(--font-ui); }
+:root body:not([data-view='drift']) #mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+:root body:not([data-view='drift']) #mini .mini-kanji-part { font: 500 17px/1.3 var(--font-reading); color: var(--color-accent); }
+:root body:not([data-view='drift']) #mini .mini-kanji-part-name { font: 12.5px/1.3 var(--font-reading); color: var(--color-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-kanji-plus { font: 12px/1 var(--font-data); color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-cards { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; margin: 6px 0 0; }
+:root body:not([data-view='drift']) #mini .mini-cards-label { margin-right: 4px; font: 600 11px/1.3 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-card-word {
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 600 17px/1 var(--font-reading);
+  text-decoration: underline;
+  text-decoration-color: var(--color-gold);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-web-open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin-right: -6px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-accent);
+  font: 600 14.5px/1.2 var(--font-ui);
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-web-open .mini-entry-chevron { font-weight: 700; }
+
+/* 4. the sentence band: one named door; its pane holds the sentence and two plain choices */
+:root body:not([data-view='drift']) #mini .mini-sentence-wrap { margin: 0; padding: 0; border: 0; background: var(--mini-paper); }
+:root body:not([data-view='drift']) #mini .mini-sentence-open {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  padding: 7px 16px 8px 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-open-text { display: grid; gap: 3px; min-width: 0; }
+:root body:not([data-view='drift']) #mini .mini-sentence-label { margin: 0; font: 650 15.5px/1.25 var(--font-ui); color: var(--color-ink); }
+:root body:not([data-view='drift']) #mini .mini-sentence-quote {
+  overflow: hidden;
+  font: 400 14px/1.45 var(--font-reading);
+  color: var(--color-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+:root body:not([data-view='drift']) #mini :is(.mini-sentence-chevron, .mini-sentence-action-chevron) { font: 700 20px/1 var(--font-ui); color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-sentence-pane { padding: 2px 14px 14px 16px; animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards; }
+:root body:not([data-view='drift']) #mini .mini-sentence-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin: 0 0 0 -6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-accent);
+  font: 600 15px/1 var(--font-ui);
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-back-chevron { font: 700 20px/1 var(--font-ui); }
+/* the pane's name is for a screen reader; the quoted sentence shows what it is */
+:root body:not([data-view='drift']) #mini .mini-sentence-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-full {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--mini-band);
+  font: 400 16px/1.7 var(--font-reading);
+  color: var(--color-ink);
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-word {
+  padding: 0 1px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-gold, #94702a) 26%, transparent);
+  box-shadow: inset 0 -2px 0 var(--color-signal);
+  color: inherit;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
+:root body:not([data-view='drift']) #mini .mini-sentence-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'name chevron' 'hint chevron';
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 2px;
+  width: 100%;
+  min-height: 58px;
+  margin: 0;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid var(--mini-edge);
+  border-radius: 12px;
+  background: var(--mini-paper);
+  box-shadow: 0 1px 0 var(--mini-rule), 0 4px 10px -8px rgb(20 24 34 / 40%);
+  color: var(--color-ink);
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-action-name { grid-area: name; font: 650 15.5px/1.2 var(--font-ui); color: var(--color-accent); }
+:root body:not([data-view='drift']) #mini .mini-sentence-action-hint { grid-area: hint; font: 400 13px/1.3 var(--font-ui); color: var(--color-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-sentence-action-chevron { grid-area: chevron; }
+:root body:not([data-view='drift']) #mini .mini-sentence-action:disabled { opacity: 0.55; cursor: default; }
+:root body:not([data-view='drift']) #mini .mini-status { margin: 0; padding: 0 18px; font: 13px/1.5 var(--font-ui); color: var(--color-ink); }
+:root body:not([data-view='drift']) #mini .mini-status:empty { display: none; }
+/* the sentence's own view: the word band stays as context; the word's controls step aside */
+:root body:not([data-view='drift']) #mini.is-sentence :is(.mini-actions, .mini-web, .mini-take-reason, .mini-take-open) { display: none; }
+:root body:not([data-view='drift']) #mini.is-sentence .mini-head { padding-block: 8px; align-items: center; }
+:root body:not([data-view='drift']) #mini.is-sentence .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+:root body:not([data-view='drift']) #mini.is-sentence .mini-word { font-size: 24px; }
+:root body:not([data-view='drift']) #mini.is-sentence :is(.mini-reading, .mini-gloss) { margin: 0; font-size: 15px; }
+
+/* press: every control answers the finger at once; focus is a clear ring */
+:root body:not([data-view='drift']) #mini :is(.mini-take, .mini-lists, .mini-entry, .mini-web-open, .mini-sentence-open, .mini-sentence-back, .mini-sentence-action, .mini-kanji-row, .mini-card-word) {
+  transition: transform 90ms var(--mini-press), background-color 120ms var(--mini-press);
+}
+:root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: scale(0.97); }
+:root body:not([data-view='drift']) #mini :is(.mini-sentence-open, .mini-kanji-row):active:not(:disabled) { transform: none; background-color: var(--mini-rule); }
+:root body:not([data-view='drift']) #mini :is(button, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+:root body:not([data-view='drift']) #mini .mini-head :is(button):focus-visible { outline-color: var(--mini-gold); }
+@media (hover: hover) {
+  :root body:not([data-view='drift']) #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
+  :root body:not([data-view='drift']) #mini :is(.mini-web-open, .mini-sentence-back):hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  :root body:not([data-view='drift']) #mini .mini-head .mini-entry:hover .mini-entry-label { border-color: var(--mini-gold); }
+  :root body:not([data-view='drift']) #mini :is(.mini-sentence-open, .mini-sentence-action):hover { background-color: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
+}
+
+/* the toast is its own lacquer slip: what just happened, and the way back, never melted into the page */
+:root body:not([data-view='drift']) .reader-toast {
+  border: 1px solid color-mix(in srgb, #f3ecdd 16%, transparent);
+  border-radius: 14px;
+  background: var(--color-lacquer, #141a28);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 18%), 0 16px 34px -10px rgb(0 0 0 / 50%);
+  color: #f3ecdd;
+}
+:root body:not([data-view='drift']) .reader-toast .reader-toast-action { color: #e5c27a; text-decoration-color: color-mix(in srgb, #e5c27a 60%, transparent); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .reader-toast {
+  border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 30%, transparent);
+  background: color-mix(in srgb, var(--color-ground) 45%, #000000);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root body:not([data-view='drift']) #mini,
+  :root body:not([data-view='drift']) #mini :is(.mini-lists, .mini-sentence-pane) { animation: none; }
+  :root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: none; }
 }

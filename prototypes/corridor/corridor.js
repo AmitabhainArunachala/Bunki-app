@@ -6520,7 +6520,10 @@ function focusLearningSourceCaller(focusId) {
   if (popup) {
     const word = document.querySelector(`#reader .tok[data-index="${popup[1]}"]`);
     if (word) readerTokenDoors.get(word)?.reopen();
-    (document.getElementById(popup[2]) || word)?.focus({ preventScroll: true });
+    const target = document.getElementById(popup[2]);
+    // a choice inside the popup's sentence pane: the pane opens first, so the reader lands where it left
+    if (target?.closest('.mini-sentence-pane')?.hidden) target.closest('.mini-sentence-wrap')?.openSentence?.();
+    (target || word)?.focus({ preventScroll: true });
     return;
   }
   document.getElementById(focusId)?.focus({ preventScroll: true });
@@ -8093,6 +8096,16 @@ function paintWordSave(button, on) {
   button.setAttribute('aria-pressed', String(on));
   button.title = on ? tx('もう一度押すと復習から外す', 'Press again to remove it from review') : '';
 }
+/** The popup's one path: before Save, a note saying where the word goes; after it, "Add to a list". */
+function paintMiniPath(actions, saved) {
+  const lists = actions?.querySelector('#mini-lists');
+  const note = actions?.querySelector('.mini-take-note');
+  if (!lists) return;
+  if (!saved && lists.getAttribute('aria-expanded') === 'true') closeVocabularyListPopover();
+  lists.hidden = !saved;
+  if (note) note.hidden = saved;
+  actions.classList.toggle('is-saved', saved);
+}
 
 /** What a word's Save stands for: the entry it would capture, and whether it is held (D11: a reader
  * word the core dictionary lacks; D23: another entry's card holds the spelling). The popup and the
@@ -8119,7 +8132,9 @@ function refreshWordSaveControls(node, label) {
   const mini = document.getElementById('mini');
   const seal = mini?.querySelector('#mini-take');
   if (seal && !seal.disabled && mini.querySelector('.mini-word')?.textContent === label) {
-    paintWordSave(seal, wordCaptureState(node) === 'taken');
+    const saved = wordCaptureState(node) === 'taken';
+    paintWordSave(seal, saved);
+    paintMiniPath(mini.querySelector('.mini-actions'), saved);
   }
 }
 
@@ -8366,10 +8381,11 @@ function openVocabularyListPopover(node, label, invoker) {
   (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
 }
 
-/* The word popup (John, 2026-10-02, notes 8, 11, 17 and 18). One tap shows everything at once: the word
- * large, its reading under it, its meaning, then the actions — a filled Save, a small "Add to list…" and a
- * plain "Full entry ›". In an article the last, quiet row acts on the word's sentence (it replaced the
- * floating sentence bar). Escape, or a tap outside, puts it away. */
+/* The word popup (John, 2026-10-02, notes 8, 11, 17 and 18; round 4, T5). One tap shows a raised card
+ * of separate bands: the word band (the word large, its reading, its meaning, and "Full entry ›" in its
+ * corner), then one path, Save, with "Add to a list" appearing beside "Saved ✓" once the word is saved,
+ * then the word's kanji, and in an article one named door into the word's sentence. Escape, or a tap
+ * outside, puts it away. */
 let miniAnchor = null;
 const SAVE_PRESS_MS = 600;
 let readerTakePressedAt = -Infinity;
@@ -8381,10 +8397,15 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   mini.tabIndex = -1;
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
-  mini.append(el('span', 'mini-word', token.b));
-  if (g?.r || token.r) mini.append(el('span', 'mini-reading', g?.r || token.r));
-  if (reader && !g?.m?.[0]) mini.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
-  else mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  // the word band: the word, its reading and its meaning, with the deeper door in its corner
+  const head = el('div', 'mini-head');
+  const said = el('div', 'mini-head-text');
+  said.append(el('span', 'mini-word', token.b));
+  if (g?.r || token.r) said.append(el('span', 'mini-reading', g?.r || token.r));
+  if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
+  else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  head.append(said);
+  mini.append(head);
   const seal = el('button', 'mini-take btn-primary');
   seal.type = 'button';
   seal.id = 'mini-take';
@@ -8425,10 +8446,30 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
     mini.append(open);
   }
+  const entry = el('button', 'mini-entry btn-tertiary');
+  entry.type = 'button';
+  // the label and its chevron are one pill in the word band's corner
+  const entryLabel = el('span', 'mini-entry-label', tx('全項目', 'Full entry'));
+  const chevron = el('span', 'mini-entry-chevron', '›');
+  chevron.setAttribute('aria-hidden', 'true');
+  entryLabel.append(chevron);
+  entry.append(entryLabel);
+  entry.disabled = !entryAvailable;
+  entry.dataset.action = 'entry.open';
+  entry.dataset.targetKind = 'word';
+  entry.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (entry.disabled) return;
+    onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
+  });
+  head.append(entry);
+  // one path (John T5, "click save and then add to list from there"): Save first; once the word is saved,
+  // "Add to a list" stands beside "Saved ✓". Before that a short note says where Save puts the word.
   const actions = el('div', 'mini-actions');
   actions.append(seal);
   if (!held && !identityHeld) {
-    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加…', 'Add to list…'));
+    actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to your reviews')));
+    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに入れる', 'Add to a list'));
     lists.type = 'button';
     lists.id = 'mini-lists';
     lists.setAttribute('aria-haspopup', 'dialog');
@@ -8439,21 +8480,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
     actions.append(lists);
   }
-  const entry = el('button', 'mini-entry btn-tertiary');
-  entry.type = 'button';
-  entry.append(el('span', 'mini-entry-label', tx('全項目', 'Full entry')));
-  const chevron = el('span', 'mini-entry-chevron', '›');
-  chevron.setAttribute('aria-hidden', 'true');
-  entry.append(chevron);
-  entry.disabled = !entryAvailable;
-  entry.dataset.action = 'entry.open';
-  entry.dataset.targetKind = 'word';
-  entry.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (entry.disabled) return;
-    onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
-  });
-  actions.append(entry);
+  paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
   mini.append(actions);
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
   if (reader) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
@@ -8482,6 +8509,11 @@ function miniKanjiWeb(word, anchor) {
   const box = el('div', 'mini-web');
   box.dataset.japaneseLookup = 'off';
   const open = (node) => (event) => { event.stopPropagation(); removeMini(); go(node, { invoker: anchor }); };
+  // the band's head names it, so its tiles read as the word's kanji, not as more words; the door into the
+  // word's web stands at the head's end, the way a list's "See all" does
+  const top = el('div', 'mini-band-head');
+  top.append(el('p', 'mini-band-label', tx('漢字', 'Kanji')));
+  box.append(top);
   const list = el('div', 'mini-kanji');
   for (const c of chars) {
     const k = D.kanji[c];
@@ -8536,10 +8568,11 @@ function miniKanjiWeb(word, anchor) {
     box.append(cards);
   }
   // the web: the Words room's word web when it is there, otherwise the first kanji's own entry (its
-  // parts and family). The door says the same thing either way.
+  // parts and family). The door says what it shows, in plain words (John T5: "Open the web?? what does
+  // that even mean."): the words related to this one through its kanji.
   const web = el('button', 'mini-web-open');
   web.type = 'button';
-  web.append(el('span', 'mini-web-label', tx('つながりをひらく', 'Open the web')));
+  web.append(el('span', 'mini-web-label', tx('関連語', 'Related words')));
   const chevron = el('span', 'mini-entry-chevron', '›');
   chevron.setAttribute('aria-hidden', 'true');
   web.append(chevron);
@@ -8548,7 +8581,7 @@ function miniKanjiWeb(word, anchor) {
     if (typeof window.openWordWeb === 'function') { removeMini(); window.openWordWeb(word); return; }
     open({ t: 'kanji', id: chars[0] })(event);
   });
-  box.append(web);
+  top.append(web);
   return box;
 }
 
@@ -8600,55 +8633,106 @@ function placeFloating(card, r) {
   card.style.top = `${top}px`;
 }
 
-/* The popup's quiet last row in an article acts on the word's sentence (John #18: the floating sentence bar
- * "what is the purpose??"). Ask the tutor opens the tutor with that sentence; Practice opens the sentence
- * practice. Keeping the sentence is the word menu's "Save the sentence", so the popup has one Save. */
+/* The popup's last band in an article: one named door into the word's sentence (John #18: the floating
+ * sentence bar "what is the purpose??"; round 4, T5: "this sentice, save astk the tutor, practice. very very
+ * confusing"). "Study this sentence ›" shows the sentence's own first words. It opens the sentence inside
+ * the card, the word marked in it, with two plain choices side by side: Ask the tutor (get it explained)
+ * and Practice it (fill in the gaps). "‹ Back to the word" returns. Each carries exactly the sentence
+ * the bar did. Keeping the sentence is the word menu's "Save the sentence", so the popup has one Save. */
 function readerSentenceRow(node, index) {
-  const row = el('div', 'mini-sentence');
-  row.setAttribute('role', 'group');
-  const label = el('span', 'mini-sentence-label', tx('この文：', 'This sentence:'));
-  label.id = 'mini-sentence-label';
-  row.setAttribute('aria-labelledby', label.id);
+  const wrap = el('div', 'mini-sentence-wrap');
+  const sentence = teacherSentence(node);
+  const door = el('button', 'mini-sentence mini-sentence-open');
+  door.type = 'button';
+  door.id = 'mini-sentence-open';
+  door.setAttribute('aria-expanded', 'false');
+  door.setAttribute('aria-controls', 'mini-sentence-pane');
+  const doorText = el('span', 'mini-sentence-open-text');
+  doorText.append(el('span', 'mini-sentence-label', tx('この文を学ぶ', 'Study this sentence')));
+  if (sentence?.quote) {
+    const quote = el('span', 'mini-sentence-quote', sentence.quote);
+    quote.lang = 'ja';
+    doorText.append(quote);
+  }
+  const doorChevron = el('span', 'mini-sentence-chevron', '›');
+  doorChevron.setAttribute('aria-hidden', 'true');
+  door.append(doorText, doorChevron);
+  const pane = el('div', 'mini-sentence-pane');
+  pane.id = 'mini-sentence-pane';
+  pane.hidden = true;
+  pane.setAttribute('role', 'group');
+  const back = el('button', 'mini-sentence-back');
+  back.type = 'button';
+  back.id = 'mini-sentence-back';
+  const backChevron = el('span', 'mini-sentence-back-chevron', '‹');
+  backChevron.setAttribute('aria-hidden', 'true');
+  back.append(backChevron, el('span', 'mini-sentence-back-label', tx('語にもどる', 'Back to the word')));
+  const title = el('p', 'mini-sentence-title', tx('この文', 'This sentence'));
+  title.id = 'mini-sentence-title';
+  pane.setAttribute('aria-labelledby', title.id);
+  pane.append(back, title);
+  if (sentence) {
+    // the sentence as it stands in the article, the chosen word marked in it
+    const full = el('p', 'mini-sentence-full');
+    full.lang = 'ja';
+    full.dataset.japaneseLookup = 'off';
+    sentence.p.tokens.slice(sentence.start, sentence.end).forEach((token, i) => {
+      full.append(sentence.start + i === sentence.index ? el('mark', 'mini-sentence-word', token.s) : document.createTextNode(token.s));
+    });
+    pane.append(full);
+  }
   const note = el('p', 'mini-status');
   note.id = 'reader-context-note';
   note.setAttribute('role', 'status');
   const say = (text) => { note.textContent = ''; showReaderToast(text); };
-  const action = (id, text, aria) => {
-    const button = el('button', 'mini-sentence-action', text);
+  const choice = (id, name, hint, aria) => {
+    const button = el('button', 'mini-sentence-action');
     button.type = 'button';
     button.id = id;
+    const chevron = el('span', 'mini-sentence-action-chevron', '›');
+    chevron.setAttribute('aria-hidden', 'true');
+    button.append(el('span', 'mini-sentence-action-name', name), el('span', 'mini-sentence-action-hint', hint), chevron);
     button.setAttribute('aria-label', aria);
     button.disabled = !recordWritable();
     return button;
   };
-  // one way to save in the popup (review round 2 #13): its Save keeps the word. Keeping the sentence
-  // for the tutor stays one press away in the word menu ("Save the sentence"), not a second Save here.
-  const ask = action('reader-teacher', tx('先生に聞く', 'Ask the tutor'), tx('この文について先生に聞く', 'Ask the tutor about this sentence'));
+  const choices = el('div', 'mini-sentence-choices');
+  const ask = choice('reader-teacher', tx('先生に聞く', 'Ask the tutor'), tx('説明してもらう', 'Get it explained'),
+    tx('この文について先生に聞く', 'Ask the tutor about this sentence'));
   const buttons = [ask];
-  for (const [button, discuss] of [[ask, true]]) {
-    button.addEventListener('click', async (event) => {
-      event.stopPropagation();
-      if (button.disabled) return;
-      for (const control of buttons) control.disabled = true;
-      try { await sendSentenceToTutor(node, discuss, () => button.isConnected, say); }
-      finally { for (const control of buttons) control.disabled = !recordWritable(); }
-    });
-  }
-  row.append(label, ask);
-  const dot = () => { const mark = el('span', 'mini-sentence-dot', '·'); mark.setAttribute('aria-hidden', 'true'); return mark; };
+  ask.addEventListener('click', async (event) => {
+    event.stopPropagation();
+    if (ask.disabled) return;
+    for (const control of buttons) control.disabled = true;
+    try { await sendSentenceToTutor(node, true, () => ask.isConnected, say); }
+    finally { for (const control of buttons) control.disabled = !recordWritable(); }
+  });
+  choices.append(ask);
   if (sentencePracticeModule) {
-    const practice = action('reader-sentence-practice', tx('練習', 'Practice'), tx('この文を練習する', 'Practice this sentence'));
-    // coming back from practice reopens this popup with Practice focused (focusLearningSourceCaller)
+    const practice = choice('reader-sentence-practice', tx('練習する', 'Practice it'), tx('穴うめで練習', 'Fill in the gaps'),
+      tx('この文を練習する', 'Practice this sentence'));
+    // coming back from practice reopens this popup on its sentence, Practice focused (focusLearningSourceCaller)
     practice.dataset.returnFocus = `reader-word:${index}:reader-sentence-practice`;
     practice.addEventListener('click', (event) => {
       event.stopPropagation();
       void openBundledSentenceChoice(() => contextFromTeacherNode(node), practice, note, () => practice.isConnected);
     });
     buttons.push(practice);
-    row.append(dot(), practice);
+    choices.append(practice);
   }
-  const wrap = el('div', 'mini-sentence-wrap');
-  wrap.append(row, note);
+  pane.append(choices);
+  // the door and its pane trade places; the card re-seats itself beside the word as its height changes
+  const show = (open, { focus = true } = {}) => {
+    pane.hidden = !open;
+    door.hidden = open;
+    door.setAttribute('aria-expanded', String(open));
+    wrap.closest('#mini')?.classList.toggle('is-sentence', open);
+    if (focus) (open ? buttons.find((button) => !button.disabled) || back : door).focus({ preventScroll: true });
+  };
+  door.addEventListener('click', (event) => { event.stopPropagation(); show(true); });
+  back.addEventListener('click', (event) => { event.stopPropagation(); show(false); });
+  wrap.openSentence = () => show(true, { focus: false });
+  wrap.append(door, pane, note);
   return wrap;
 }
 
