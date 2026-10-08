@@ -44,9 +44,14 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero {
   display: flex;
   flex-direction: column;
   min-height: clamp(470px, calc(100svh - 360px), 620px);
-  margin: -24px -36px 0 -18px;
-  padding: 24px 36px 72px 18px;
+  margin: -24px -18px 0;
+  padding: 24px 18px 72px;
   overflow: hidden;
+}
+/* the room sign keeps a 36px right margin on phones; only then does the hero reach under it.
+   (Under a sheet the sign is gone and main's margin is 18px: a fixed -36px would overflow.) */
+@media (max-width: 520px) {
+  html[data-room='tray'] body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) > .today-hero { margin-right: -36px; padding-right: 36px; }
 }
 @media (min-width: 521px) {
   html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero { margin: 0; padding: 8px 8px 72px; }
