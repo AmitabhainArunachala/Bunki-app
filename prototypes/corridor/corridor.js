@@ -16860,7 +16860,7 @@ function wwModel(centre, mine) {
     const prevParts = prev?.type === 'word' ? new Set(wwKanjiOf(prev.key).filter((x) => x !== c).flatMap((x) => wwParts(x))) : new Set();
     const angles = WW_KANJI_ANGLES[parts.length] || [];
     parts.forEach((p, i) => {
-      const [x, y] = wwP(angles[i], 112, 108);
+      const [x, y] = wwP(angles[i], 124, parts.length > 2 ? 128 : 136);
       const cap = wwPartCap(p, mine);
       nodes.push({ type: 'part', key: p, x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, live: prevParts.has(p) || (prev?.type === 'part' && prev.key === p) });
     });
