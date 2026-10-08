@@ -209,7 +209,7 @@ try {
     await page.goto(origin); await ready(page);
     await page.locator('#ginga-symbol').click();
     await page.locator('.nav-dojo').click();
-    await page.locator('.focus-mode', { hasText: '読み探査' }).click();
+    await page.locator('.focus-mode', { hasText: /読み探査|yomi probe/u }).click();
     await page.locator('.focus-start').click();
     const inProbe = await page.waitForSelector('.review-front', { timeout: 20_000 }).then(() => true, () => false);
     const zen = await page.evaluate(() => document.body.classList.contains('zen'));

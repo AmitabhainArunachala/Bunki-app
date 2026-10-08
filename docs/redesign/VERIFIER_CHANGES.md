@@ -492,3 +492,11 @@ CI's whole-corridor walk failed 258/259 on `9de77237`: `R3-C · the 3 key commit
 | File / assertion | Before | After | Why / retained requirements |
 | --- | --- | --- | --- |
 | `prototypes/corridor/tools/verify-corridor.mjs` R3-C (c) | `page.waitForTimeout(250)` after pressing `3` | `waitForAppRecord(page, r => r.revlog.length === before + 1)` (10 s timeout; times out = failure) | Timing only. The assertion is unchanged: the newest revlog row must be `word:学校` with rating 3. A commit that never lands still fails, now with a timeout. |
+
+## Integration (2026-10-08, cloud): report-entries R5 finds the probe door in either interface language
+
+Under the foundation's EN/JA law, the focus-mode door reads `yomi probe` in English. `verify-report-entries.mjs` R5 waited for the Japanese text and timed out. This was already true at Sol's head `53a7b934`, and this verifier is not in the release battery.
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-report-entries.mjs:212` | `.focus-mode` `{ hasText: '読み探査' }` | `{ hasText: /読み探査\|yomi probe/u }` | Label selector only. R5 still opens the probe as a learner does, requires `.review-front` and `body.zen`, and checks the page entry sits after the stage. |
