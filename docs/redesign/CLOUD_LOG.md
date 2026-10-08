@@ -28,3 +28,48 @@ Branch: `claude/redesign-20261008` (pushes accepted). Draft PR: #126. Times are 
 | 09:40–10:30 | verify | Final F1 on d4cfac23: corridor 259/259, srs-today 32/32 with both mutants caught, accessibility 53/53, lint 0, foundation PASS; GitHub CI green on the head (format-check inherited). `cloud-baseline/FINAL.md`. |
 | 10:30 | ship | Round-2 tour (6 fixed / 7 partly / 5 open + 9 new). PR #126 retitled and body rewritten (`PR_BODY.md`); phase comment posted; push notification sent. |
 | 10:40 | fix round 3 | Three lanes launched: r3-read (reader clutter, popup, Read entry), r3-deck (deck night state, help boxes, reveal jolt), r3-rooms (Words search panel, web legend, door family touch, Learn spine digits, one home for review, session-close routes, Today sky). |
+| 11:00–12:30 | fix round 3 | Merged r3-deck (藍 night variant, theme list as hairline rows, help shown once, passage window instead of page jolt) and r3-rooms (Words search panel + legend + radical names, the door's paper and skyline layer, upright digits in room signs, Learn defers review to Today, session-close Back hidden, Today sky clear zone, one 朱). The kotoba-mine list-drawer check now waits for the redraw (timing only). CI green on e79f6a96. |
+| 13:35 | john | John's tour feedback arrived on #126 and was saved verbatim to `vision/JOHN_10-08_TOUR_FEEDBACK.md`. Three round-4 lanes were launched and stopped a minute later on John's handback instruction ("pull it off the cloud…"). None had commits; their branches were never pushed. |
+| 13:45 | env | Container restarted; the r3-read lane died after 8 commits. They were pushed to `claude/redesign-fix-r3-read` (2ff7e417) and merged (f3cbd6cb) after verification: storage, reader-shelf, reader-lookup, reader-doors, playback, relief, theme-consistency, accessibility 53/53, srs-today 32/32 (2/2 mutants), corridor 259/259, lint 0 issues. |
+
+## RESUME NOTE: where the cloud run stopped (2026-10-08 ~14:30 UTC)
+
+**The Mac session now owns `claude/redesign-20261008`.** The cloud run won't push to it again. The head sha is in the last comment on #126.
+
+**On the branch:**
+- vision;
+- the 4 concepts;
+- the judgement;
+- the skin;
+- the six rooms;
+- the word web;
+- polish;
+- fix rounds 2 and 3, including r3-read (reader opens on picture → title → one instrument line, popup centred with one Save, shelf head, Today's next story whole).
+
+The verification of each step is in `cloud-baseline/FINAL.md` and the lane REPORTs.
+
+**Not started: round 4, John's tour answers.** The three lanes were stopped before any edits; their branches were never pushed. Their reading notes, for whoever picks this up:
+- **r4-skin:**
+  - In the default world the page is `#f4eee1` and the cards are `#fbf8f1`, and the header and tab bar reuse the page colour. That is the "all the same beige".
+  - `verify-theme-consistency` only checks the review body, the review card face and the sheet. The page, header, tab bar and cards can be recoloured freely.
+- **r4-cards (D1, four grades):**
+  - `decks/player/engine.js:25` already has `RATINGS = {again:1, hard:2, good:3, easy:4}`. `preview()` returns all four, and the ledger rows `[cardId, rating, iso]` already accept 2 and 4.
+  - Everything that limits the player to two grades is in `decks/player/mount.js`:
+    - `gradeBar()` (around l.1774; l.1792 adds only again/good, with the 再/良 seals);
+    - the keys at around l.2476 (only 1 and 3);
+    - `commit()` and the close tally (`rating >= good`, so Hard would count as Again: decide this);
+    - `attachSwipe` (around l.2151);
+    - the EN labels and hints (around l.260–369).
+  - The docs to amend: `docs/srs/CARD_CONTRACT_V2.md` §4 (l.63, "Two buttons"), and `docs/srs/STANDARD.md` A29 (l.782). The next amendment number is A53.
+- **r4-today (T1 and D5):**
+  - Today is `renderTray`/`todaySky`/`todayPlaceSky`/`renderTodayLine` (around l.11091–11300). The door is `S.view==='drift'` (room `door`), built by `buildGingaChrome`/`ensureDoorPaper` (around l.29911), with its CSS at the end of `editorial.css`.
+  - The tab bar is hidden on drift, so a "‹ Today" control belongs in `buildGingaChrome`.
+  - Plan: tap the sky, or "Explore the universe of words ›", and the drift view opens with a came-from-Today flag; `back()` returns to Today. Me reads `kairo-goals` from localStorage, defaulting to N1 · July 2027 and John's three fields.
+
+**Known flakes in this container:**
+- the verify-corridor timing checks (R2-A, R4-C, "Lists 0");
+- the n2n1 503 prefetch race;
+- dojo-door ERR_ABORTED;
+- experience E16/E18.
+
+On GitHub CI the decks, corridor, language-law and private-deck checks were green at e79f6a96. The full battery fails only on `format-check`, over protected `decks/n2n1/**` content (inherited).
