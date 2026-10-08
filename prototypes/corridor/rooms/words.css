@@ -1,0 +1,3 @@
+/* Bunki room: words. Loaded after editorial.css (see index.html).
+   Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
+   (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
