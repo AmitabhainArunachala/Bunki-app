@@ -11182,7 +11182,11 @@ function renderTodayWord(pick) {
   follow.dataset.uiContentValue = `部品|${hook.part}`;
   follow.append(el('span', 'dw-go-l', tx('', 'Follow')), pk(), el('span', 'dw-go-l', tx('をたどる', '')));
   follow.append(el('i', 'today-arrow'));
-  follow.addEventListener('click', () => go(D.radicals?.[hook.part] ? { t: 'radical', id: hook.part } : { t: 'kanji', id: hook.part }, { invoker: follow }));
+  follow.addEventListener('click', () => {
+    // the word web, centred on the shared part; the part's own sheet when the web isn't ready
+    if (typeof window.openWordWeb === 'function' && window.openWordWeb(hook.part, { type: 'part', invoker: follow }) !== false) return;
+    go(D.radicals?.[hook.part] ? { t: 'radical', id: hook.part } : { t: 'kanji', id: hook.part }, { invoker: follow });
+  });
   block.append(follow);
   return block;
 }
