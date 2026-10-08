@@ -754,6 +754,8 @@ function cardMode() {
 }
 /** the first sittings of a deck explain the gestures; after HINT_SITTINGS they retire */
 const hintsOn = () => (Number(ctx.prefs.sittings) || 0) <= HINT_SITTINGS;
+/** the swipe hint under the grade pads: the first card of the deck's first sitting only */
+const swipeHintOn = () => (Number(ctx.prefs.sittings) || 0) <= 1 && ui.done === 0;
 
 function choicesFor(word) {
   const pool = ctx.deck.words.filter((w) => w.id !== word.id && w.pos === word.pos && w.term !== word.term);
@@ -1788,7 +1790,9 @@ function gradeBar(id) {
       'aria-keyshortcuts': key,
     });
   bar.append(g('again', t("もう一度"), 'kp-again', '1'), g('good', t("思い出せた"), 'kp-good', '3'));
-  if (hintsOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
+  // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
+  // pads' way after that)
+  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
   if (!ctx.prefs.ruleSeen) {
     const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
@@ -1808,8 +1812,76 @@ function reveal() {
   ui.revealed = true;
   // read before any grade of this sitting: was this card answered on an earlier pass?
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
+  const from = window.scrollY;
   if (!revealInPlace()) paint();
+  windowPassage(from);
   settleBack();
+}
+
+/**
+ * The reveal does not move the page (Bunki fix round 3). At phone width, with the grade pads pinned,
+ * a passage that would push the word and its definition under the pads becomes its own window: its
+ * height is what the room above them leaves (never under WINDOW_LINES lines), and it scrolls inside
+ * the card. The page goes back to its top while the passage takes the same offset, so the text does
+ * not move; only when the target sentence is outside the window does the passage itself scroll to it
+ * (smooth; instant with reduced motion). A fold row the pads would cut is lifted wholly above them.
+ * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
+ */
+const WINDOW_LINES = 3;
+const WINDOW_REACH = 12;
+function windowPassage(from) {
+  const face = ctx.root.querySelector('#kp-card');
+  const passage = face?.querySelector('.kp-sentence');
+  const def = face?.querySelector('.kp-answer > .kp-def');
+  const bar = ctx.root.querySelector('.kp-grades');
+  if (!passage || !def || !bar || ui.screen !== 'study' || getComputedStyle(bar).position !== 'fixed') return;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const tf = getComputedStyle(def.parentElement).transform;
+  const lift = tf && tf !== 'none' ? new DOMMatrixReadOnly(tf).m42 : 0; // kp-rise: measure where it lands
+  const barTop = Math.min(innerHeight, bar.getBoundingClientRect().top);
+  const box = passage.getBoundingClientRect();
+  const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
+  let over = def.getBoundingClientRect().bottom - lift - (barTop - SETTLE_GAP);
+  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+    const r = s.getBoundingClientRect();
+    const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
+    if (!(top < barTop && bottom > barTop)) continue;
+    over += bottom - barTop + 1;
+    break;
+  }
+  if (over < 1 || box.height - over < WINDOW_LINES * line) {
+    window.scrollTo({ top: from, behavior: 'instant' });
+    return;
+  }
+  passage.style.setProperty('--kp-window-h', `${Math.floor(box.height - over) + WINDOW_REACH}px`); // + the reach it keeps above its first line (player.css)
+  passage.classList.add('kp-window');
+  passage.scrollTop = from;
+  // the target sentence in the window by the least scroll; a sentence taller than the window shows its marked word
+  const focus = passage.querySelector('.kp-s[data-focus]');
+  const mark = passage.querySelector('.kp-target, .kp-blank');
+  const view = passage.getBoundingClientRect();
+  const span = (n) => {
+    const r = n.getBoundingClientRect();
+    return [r.top - view.top + passage.scrollTop, r.bottom - view.top + passage.scrollTop];
+  };
+  const h = passage.clientHeight;
+  let want = passage.scrollTop;
+  let [a, b] = focus ? span(focus) : mark ? span(mark) : [want, want];
+  if (b - a > h && mark) [a, b] = span(mark);
+  if (b - a > h) want = (a + b) / 2 - h / 2;
+  else if (a < want) want = a;
+  else if (b > want + h) want = b - h;
+  want = Math.max(0, Math.min(passage.scrollHeight - h, Math.round(want)));
+  const edges = () => {
+    const up = passage.scrollTop > 1;
+    const down = passage.scrollTop + passage.clientHeight < passage.scrollHeight - 1;
+    if (up || down) passage.dataset.edge = up && down ? 'both' : up ? 'above' : 'below';
+    else delete passage.dataset.edge;
+  };
+  passage.addEventListener('scroll', edges, { passive: true });
+  face.addEventListener('click', () => requestAnimationFrame(edges));
+  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: motionOk() ? 'smooth' : 'instant' });
+  edges();
 }
 
 const SETTLE_GAP = 12;
@@ -1834,7 +1906,9 @@ function settleBack() {
   // the answer may still be rising into place (kp-rise, translateY 6px → 0): measure where it lands
   const t = getComputedStyle(answer).transform;
   const lift = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0;
-  const target = face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
+  // a windowed passage (windowPassage) keeps its target sentence inside its own window: the window is what must be in view
+  const windowed = face.querySelector('.kp-sentence.kp-window');
+  const target = windowed || face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
   const top = target.getBoundingClientRect().top;
   const bottom = def.getBoundingClientRect().bottom - lift;
   let dy = 0;

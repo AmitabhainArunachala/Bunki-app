@@ -358,7 +358,13 @@
   /* the study stage (the ground around the card while studying) and its own text: the page by
    * default; 和紙 sets its washi card on a 藍漆 lacquer stage. --kp-shu is the 朱 of the marked
    * word's brackets, the rail and the slash on もう一度 (never text). Measured: contrast-kotoba stage row */
-  --kp-stage: var(--kp-bg); --kp-stage-ink: var(--kp-ink-2); --kp-stage-mute: var(--kp-mute); --kp-shu: #ff6a4d; }
+  --kp-stage: var(--kp-bg); --kp-stage-ink: var(--kp-ink-2); --kp-stage-mute: var(--kp-mute); --kp-shu: #ff6a4d;
+  /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) and its
+   * text: the stage by default; 藍 by day docks on its washi page. --kp-study-ground paints the whole
+   * study screen (藍 by day: washi with the lacquer only as a band behind the card's head).
+   * Measured: contrast-kotoba dock row */
+  --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-tex), var(--kp-stage); }
 .kp[data-look='light'] { --kp-on-accent: #fff; --kp-depth: 0 1px 2px rgba(15, 30, 45, 0.08), 0 8px 24px rgba(15, 30, 45, 0.1);
   --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a;
   /* the family's study stage: the white sheet on 藍漆 lacquer */
@@ -369,7 +375,33 @@
   --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.03) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.025) 0 1px, transparent 1px 11px);
   --kp-depth: 0 1px 0 rgba(25, 28, 34, 0.09), 0 10px 26px -6px rgba(40, 30, 16, 0.16); color-scheme: light;
-  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f;
+  /* by day the study screen is the washi page: the lacquer is only the stage band behind the top bar and
+   * the card's head (concept C), and 答えを見る and the grade pads dock on the page */
+  --kp-dock: var(--kp-bg); --kp-dock-ink: var(--kp-ink-2); --kp-dock-mute: var(--kp-mute);
+  --kp-study-ground: linear-gradient(var(--kp-stage), var(--kp-stage)) 0 0 / 100% 15rem no-repeat, var(--kp-tex), var(--kp-bg); }
+/* 藍 at night (the app's night worlds set html[data-theme]): the deck is a 藍 room. Its home, list,
+ * settings and session close are lit text on 藍; while studying the card stays a lit washi sheet on the
+ * 藍 stage (the block after this one). Same meanings per colour; contrast-kotoba measures both. */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] {
+  --kp-bg: #121a2b; --kp-panel: #1a2437; --kp-panel-2: #222d44; --kp-ink: #ede6d6; --kp-ink-2: #cbc3b2; --kp-mute: #a8a092; --kp-line: #2d3952;
+  --kp-cyan: #a9c4ea; --kp-cyan-wash: rgba(169, 196, 234, 0.12); --kp-on-accent: #0f1626; --kp-red: #f39282; --kp-amber: #efb764; --kp-green: #95d49c; --kp-violet: #bdaaff;
+  --kp-kind-ji: #88f0ff; --kp-noun: #a9c4ea; --kp-verb: #f5a47f; --kp-adj: #ead27c; --kp-adv: #cdb2ff; --kp-expr: #a4dc88; --kp-sound: #ffa3cf;
+  --kp-tex: radial-gradient(90% 50% at 50% 0%, rgba(169, 196, 234, 0.06), transparent 70%);
+  --kp-depth: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 32px -8px rgba(0, 0, 0, 0.6); color-scheme: dark;
+  --kp-stage: #0e1524; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #ff7a5c;
+  --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-stage); }
+/* 藍 at night, studying: the lit washi card on the 藍 stage; the pads dock on the stage */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai']:has(> .kp-study) {
+  --kp-bg: #ebe4d3; --kp-panel: #f2ecdf; --kp-panel-2: #e6dfce; --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #545a64; --kp-line: #d3c9b5;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1; --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #7a4f00; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  --kp-tex: none;
+  --kp-depth: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 18px 44px -12px rgba(0, 0, 0, 0.75), 0 0 64px -18px rgba(233, 226, 210, 0.22); color-scheme: light;
+  --kp-stage: #121a2b; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f;
+  --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-stage); }
 .kp[data-look='washi'] { /* 和紙 warm paper with fibres */
   --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #4a3e2f; --kp-mute: #5c4f3e; --kp-line: #dccfb5;
   --kp-cyan: #93301a; --kp-cyan-wash: rgba(147, 48, 26, 0.1); --kp-on-accent: #fff; --kp-red: #a82233; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
@@ -450,7 +482,7 @@
   --kp-head: var(--font-headword, 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif);
 }
 /* the study stage: the ground around the card (和紙: 藍漆 lacquer; the other looks: their page) */
-.kp:has(> .kp-study) { background-color: var(--kp-stage); }
+.kp:has(> .kp-study) { background: var(--kp-study-ground); }
 .kp[data-host='none'] .kp-top-study { background: var(--kp-stage); }
 
 /* the top bar: ✕, the rail (one segment per card on a short sitting), the count, 削除 */
@@ -551,8 +583,8 @@
 .kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: 4px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: 18px; letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
 .kp .kp-reveal:active, .kp .kp-next:active { transform: translateY(1px); }
 .kp .kp-verdict { justify-self: center; padding: 6px 16px; border-radius: 3px; background: var(--kp-panel); }
-.kp .kp-undo { color: var(--kp-stage-mute); }
-.kp .kp-grades { background: var(--kp-stage); column-gap: 10px; }
+.kp .kp-undo { color: var(--kp-dock-mute); }
+.kp .kp-grades { background: var(--kp-dock); column-gap: 10px; }
 .kp .kp-grade { position: relative; min-height: 64px; border-radius: 4px; grid-auto-flow: row; box-shadow: var(--kp-depth); }
 .kp .kp-grade b { font-size: 17px; letter-spacing: 0.04em; }
 .kp .kp-grade small { font-size: 12.5px; letter-spacing: 0.06em; }
@@ -562,11 +594,13 @@
 .kp-good .kp-grade-seal { color: var(--kp-green); }
 /* in 日本語 the seal is the pad's face and the word a quiet caption under it */
 .kp-grade:has(.kp-grade-seal) b { font-size: 12px; letter-spacing: 0.1em; }
-.kp .kp-swipehint { color: var(--kp-stage-mute); }
-.kp .kp-rule { color: var(--kp-stage-ink); }
-.kp .kp-rule-x { color: var(--kp-stage-mute); border-color: color-mix(in srgb, var(--kp-stage-ink) 30%, transparent); }
+/* the first back of a deck's first sitting only: the gesture as one quiet mono caption, the rule as one
+ * line of small print with a bare ×. No boxes, nothing in the pads' way. */
+.kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: 10.5px; letter-spacing: 0.16em; margin: 0; }
+.kp .kp-rule { color: var(--kp-dock-ink); font-size: 12.5px; line-height: 1.45; gap: 2px; }
+.kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: 15px; }
 @media (max-width: 640px) {
-  .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-stage-ink) 16%, transparent); }
+  .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-dock-ink) 16%, transparent); }
   /* the last lines of the passage and the folds stay above the pinned pads: the reserved room is
    * the bar's measured height plus one line of air */
   .kp .kp-study.has-bar { padding-bottom: calc(var(--kp-bar-h, 140px) + 12px); }
@@ -610,6 +644,31 @@
 .kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
 
+/* the themes: a quiet list, not a page of settings. Hairline rows, the name in Mincho, the count in
+ * mono, a check mark at the end (the row is still the checkbox's label: one tap anywhere toggles it),
+ * the theme's progress a 2px line under its name. */
+.kp .kp-groups { gap: 0; border-top: 1px solid var(--kp-line); }
+.kp .kp-group { grid-template-columns: minmax(0, 1fr) auto 22px; grid-template-rows: auto 2px; column-gap: 14px; row-gap: 6px; min-height: 56px; padding: 14px 2px 10px; background: none; border: 0; border-bottom: 1px solid var(--kp-line); border-radius: 0; box-shadow: none; }
+.kp .kp-group > .kp-gname { grid-column: 1; grid-row: 1; }
+.kp .kp-group > .kp-gcount { grid-column: 2; grid-row: 1; }
+.kp .kp-group > input { grid-column: 3; grid-row: 1; justify-self: end; }
+.kp .kp-gname b { font-family: var(--kp-serif); font-size: 17px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
+.kp .kp-gcount { font-size: 12px; letter-spacing: 0.06em; color: var(--kp-mute); font-variant-numeric: tabular-nums; }
+.kp .kp-group .kp-bar { height: 2px; border-radius: 0; background: transparent; } /* progress only: an untouched theme draws no second line */
+.kp .kp-group input { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--kp-ink) 26%, transparent); background: none; cursor: pointer; }
+.kp .kp-group input:checked {
+  border-color: transparent; background: var(--kp-cyan);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M5 11.5l4 4 8-9' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 22px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M5 11.5l4 4 8-9' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 22px no-repeat;
+}
+.kp .kp-group input:focus-visible { outline: none; }
+.kp .kp-group:has(input:focus-visible) { outline: 2px solid var(--kp-cyan); outline-offset: -2px; }
+.kp .kp-group.is-off { opacity: 1; }
+.kp .kp-group.is-off .kp-gname b, .kp .kp-group.is-off .kp-gcount { color: var(--kp-mute); }
+.kp .kp-group.is-off .kp-bar { opacity: 0.4; }
+/* 藍 at night: 始める is the lit slab (washi ink on the 藍 room), as the card is the lit sheet */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] .kp-start:not(:disabled) { background: var(--kp-ink); color: var(--kp-bg); box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-ink) 35%, #000); }
+
 @media (prefers-reduced-motion: reduce) {
   .kp-polish, .kp-slash { display: none; }
   .kp .kp-reveal:active, .kp .kp-next:active, .kp .kp-start:active { transform: none; }
@@ -623,13 +682,23 @@
  * always one tap away on a long passage; its own place in the flow, under the card, is the room the
  * passage keeps: scrolled to the end, the last line sits above it, never under it. A ring of the
  * stage frames it as a dock over the passage that scrolls on beneath. */
-.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-stage); }
+.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock); }
 body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-clearance) + 10px); }
 /* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
  * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
 .kp .kp-eyebrow-zoom { min-height: 30px; }
 .kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: 12px; }
 .kp .kp-eyebrow:has(> .kp-zoom) > .kp-eyebrow-t { display: none; }
+
+/* ---- the reveal does not move the page (fix round 3). At phone width a passage taller than the room
+ * above the word and its definition becomes its own window on the back (mount.js windowPassage): the
+ * page stays where it is, the passage scrolls inside the card, and its clipped edges fade (concept C). */
+/* it reaches 12px up into the gap above it (padding, not layout), so a first-line word keeps its 44px tap reach inside the window */
+.kp .kp-sentence.kp-window { max-height: var(--kp-window-h, none); overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding-top: 12px; margin-top: -12px; }
+.kp .kp-sentence.kp-window::-webkit-scrollbar { display: none; }
+.kp .kp-sentence.kp-window[data-edge='below'] { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); }
+.kp .kp-sentence.kp-window[data-edge='above'] { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); }
+.kp .kp-sentence.kp-window[data-edge='both'] { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); }
 </style>
 </head>
 <body>
@@ -3845,6 +3914,8 @@ function cardMode() {
 }
 /** the first sittings of a deck explain the gestures; after HINT_SITTINGS they retire */
 const hintsOn = () => (Number(ctx.prefs.sittings) || 0) <= HINT_SITTINGS;
+/** the swipe hint under the grade pads: the first card of the deck's first sitting only */
+const swipeHintOn = () => (Number(ctx.prefs.sittings) || 0) <= 1 && ui.done === 0;
 
 function choicesFor(word) {
   const pool = ctx.deck.words.filter((w) => w.id !== word.id && w.pos === word.pos && w.term !== word.term);
@@ -4879,7 +4950,9 @@ function gradeBar(id) {
       'aria-keyshortcuts': key,
     });
   bar.append(g('again', t("もう一度"), 'kp-again', '1'), g('good', t("思い出せた"), 'kp-good', '3'));
-  if (hintsOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
+  // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
+  // pads' way after that)
+  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
   if (!ctx.prefs.ruleSeen) {
     const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
@@ -4899,8 +4972,76 @@ function reveal() {
   ui.revealed = true;
   // read before any grade of this sitting: was this card answered on an earlier pass?
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
+  const from = window.scrollY;
   if (!revealInPlace()) paint();
+  windowPassage(from);
   settleBack();
+}
+
+/**
+ * The reveal does not move the page (Bunki fix round 3). At phone width, with the grade pads pinned,
+ * a passage that would push the word and its definition under the pads becomes its own window: its
+ * height is what the room above them leaves (never under WINDOW_LINES lines), and it scrolls inside
+ * the card. The page goes back to its top while the passage takes the same offset, so the text does
+ * not move; only when the target sentence is outside the window does the passage itself scroll to it
+ * (smooth; instant with reduced motion). A fold row the pads would cut is lifted wholly above them.
+ * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
+ */
+const WINDOW_LINES = 3;
+const WINDOW_REACH = 12;
+function windowPassage(from) {
+  const face = ctx.root.querySelector('#kp-card');
+  const passage = face?.querySelector('.kp-sentence');
+  const def = face?.querySelector('.kp-answer > .kp-def');
+  const bar = ctx.root.querySelector('.kp-grades');
+  if (!passage || !def || !bar || ui.screen !== 'study' || getComputedStyle(bar).position !== 'fixed') return;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const tf = getComputedStyle(def.parentElement).transform;
+  const lift = tf && tf !== 'none' ? new DOMMatrixReadOnly(tf).m42 : 0; // kp-rise: measure where it lands
+  const barTop = Math.min(innerHeight, bar.getBoundingClientRect().top);
+  const box = passage.getBoundingClientRect();
+  const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
+  let over = def.getBoundingClientRect().bottom - lift - (barTop - SETTLE_GAP);
+  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+    const r = s.getBoundingClientRect();
+    const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
+    if (!(top < barTop && bottom > barTop)) continue;
+    over += bottom - barTop + 1;
+    break;
+  }
+  if (over < 1 || box.height - over < WINDOW_LINES * line) {
+    window.scrollTo({ top: from, behavior: 'instant' });
+    return;
+  }
+  passage.style.setProperty('--kp-window-h', `${Math.floor(box.height - over) + WINDOW_REACH}px`); // + the reach it keeps above its first line (player.css)
+  passage.classList.add('kp-window');
+  passage.scrollTop = from;
+  // the target sentence in the window by the least scroll; a sentence taller than the window shows its marked word
+  const focus = passage.querySelector('.kp-s[data-focus]');
+  const mark = passage.querySelector('.kp-target, .kp-blank');
+  const view = passage.getBoundingClientRect();
+  const span = (n) => {
+    const r = n.getBoundingClientRect();
+    return [r.top - view.top + passage.scrollTop, r.bottom - view.top + passage.scrollTop];
+  };
+  const h = passage.clientHeight;
+  let want = passage.scrollTop;
+  let [a, b] = focus ? span(focus) : mark ? span(mark) : [want, want];
+  if (b - a > h && mark) [a, b] = span(mark);
+  if (b - a > h) want = (a + b) / 2 - h / 2;
+  else if (a < want) want = a;
+  else if (b > want + h) want = b - h;
+  want = Math.max(0, Math.min(passage.scrollHeight - h, Math.round(want)));
+  const edges = () => {
+    const up = passage.scrollTop > 1;
+    const down = passage.scrollTop + passage.clientHeight < passage.scrollHeight - 1;
+    if (up || down) passage.dataset.edge = up && down ? 'both' : up ? 'above' : 'below';
+    else delete passage.dataset.edge;
+  };
+  passage.addEventListener('scroll', edges, { passive: true });
+  face.addEventListener('click', () => requestAnimationFrame(edges));
+  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: motionOk() ? 'smooth' : 'instant' });
+  edges();
 }
 
 const SETTLE_GAP = 12;
@@ -4925,7 +5066,9 @@ function settleBack() {
   // the answer may still be rising into place (kp-rise, translateY 6px → 0): measure where it lands
   const t = getComputedStyle(answer).transform;
   const lift = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0;
-  const target = face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
+  // a windowed passage (windowPassage) keeps its target sentence inside its own window: the window is what must be in view
+  const windowed = face.querySelector('.kp-sentence.kp-window');
+  const target = windowed || face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
   const top = target.getBoundingClientRect().top;
   const bottom = def.getBoundingClientRect().bottom - lift;
   let dy = 0;
