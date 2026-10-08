@@ -4148,7 +4148,11 @@ async function boot() {
         location.assign(url);
       },
     });
+    // r4 skin: this page never runs render(), so it sets the language class the shell's type reads
+    // (its English Line was drawn as Japanese) and colours the phone's bar from its own page
+    document.body.classList.toggle('ui-bi', bi());
     buildPrimaryTabs($('#app'), { personal: true });
+    syncThemeColor();
     stampRegister();
     return;
   }
@@ -20732,10 +20736,10 @@ function holdReaderTakeSeal(btn, cur) {
 }
 
 function readerTakeLabel(cur, takenNow) {
-  if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
+  if (!cur) return tx('語をタップすると、ここで保存できる', 'Tap a word, then save it here');
   return takenNow
-    ? tx(`「${cur.id}」を覚えている — 押すと復習から外す`, `memorizing ${cur.id} — press to remove it from review`)
-    : tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`);
+    ? tx(`「${cur.id}」は保存済み — もう一度押すと外す`, `${cur.id} is saved — press again to remove it`)
+    : tx(`「${cur.id}」を保存`, `Save ${cur.id}`);
 }
 
 /** Remember the word under the learner's finger and repaint the chrome seal
@@ -23489,14 +23493,15 @@ function renderStudyHall(main, doors) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '単語帳・長文の穴埋め', en: 'Your word list · fill the gap in a passage' }, { id: 'kotoba-mine', ja: '単語帳・実例文で一語ずつ', en: 'Your word list · one real sentence each' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'Words you looked up · sentences' }];
 // r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
-// to mean anyhting at all"): the two 言葉の鉱脈 decks are his own 323 words from his Japanese app, so
-// they are named for that. n2/n1/senmon keep their titles here (verify-n2n1-decks pins them; the
-// cards lane owns the deck names). docs/redesign/r4/LABELS.md
+// to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
+// and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and
+// the room it opens never disagree). docs/redesign/r4/LABELS.md
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;
+let deckFrameObserver = null;
 const deckSummaries = {};
 function loadDeckPlayer() {
   if (deckPlayer) return Promise.resolve(deckPlayer);
@@ -23617,6 +23622,11 @@ function renderDeckPlay(main) {
     );
     return;
   }
+  // r4 skin: the frame takes the deck's stage (editorial.css R4), and the player changes screens
+  // without render(), so the phone's bar is re-read whenever the deck repaints
+  deckFrameObserver?.disconnect();
+  deckFrameObserver = new MutationObserver(() => syncThemeColor());
+  deckFrameObserver.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-look'] });
   deckPlayer
     .render(main, {
       deckId: S.deckPlay || DOJO_DECKS[0].id,
@@ -23716,7 +23726,7 @@ function renderFocusSitting(focus) {
     );
   }
 
-  const start = biLabel('button', 'take focus-start', `${S.focusMin}分 始める`, `Start ${S.focusMin} minutes`);
+  const start = biLabel('button', 'take focus-start', `${S.focusMin}分の練習を始める`, `Start a ${S.focusMin}-minute session`);
   start.type = 'button';
   start.addEventListener('click', () => startFocus(S.focusMin, S.focusMode));
   focus.append(start);
@@ -28995,8 +29005,7 @@ const THEME_UI = [
 ];
 // D2 (John, tour 2026-10-08, "The night look: Offer both"): 殻, the electric phosphor
 // night, is public again beside 金 (the 藍 night). The picker shows two named rows, day
-// then night; each row keeps the reference strip's order. Saved ids never change.
-const NIGHT_THEME_IDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
+// then night (ME_NIGHT_WORLDS); each row keeps the reference strip's order. Saved ids never change.
 const PUBLIC_THEME_IDS = [
   'sumi',
   'shu',
@@ -29502,7 +29511,7 @@ function openWorldPicker(anchor) {
     row.append(name);
     for (const id of PUBLIC_THEME_IDS) {
       const t = THEME_UI.find((world) => world.id === id);
-      if (t && NIGHT_THEME_IDS.includes(id) === night) row.append(stone(t));
+      if (t && ME_NIGHT_WORLDS.includes(id) === night) row.append(stone(t));
     }
     pop.append(row);
   }
@@ -30116,7 +30125,10 @@ function syncThemeColor() {
     const meta = document.querySelector('meta[name="theme-color"]');
     if (!meta || !document.body) return;
     const bar = document.querySelector('#app > .chrome');
-    const raw = getComputedStyle(bar || document.body).backgroundColor;
+    // no top line: the personal collections page meets the phone's bar with its page layer
+    const raw = bar ? getComputedStyle(bar).backgroundColor
+      : document.body.dataset.view === 'personaldeck' ? getComputedStyle(document.body, '::before').backgroundColor
+        : getComputedStyle(document.body).backgroundColor;
     const nums = raw.match(/-?[0-9.]+/g)?.map(Number) || [];
     if (nums.length < 3 || (nums.length > 3 && nums[3] === 0)) return;
     const scale = raw.startsWith('color(') ? 255 : 1;
@@ -30129,9 +30141,11 @@ function syncThemeColor() {
 const PRIMARY_TABS = [
   { id: 'today', ja: '今日', en: 'Today', view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
   { id: 'read', ja: '読む', en: 'Read', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
-  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
+  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
   { id: 'words', ja: '辞書', en: 'Words', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
-  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'personaldeck', 'settings'] },
+  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
+  // r4 skin: your own texts are a deck; the page's way back and its Learn row both lead to Learn,
+  // so the Line marks Learn there too (it marked Me while ← Learn left for Learn)
 ];
 let primaryDockObserver;
 /** Keep the report rail above live room controls, including wrapped labels. */
@@ -30799,7 +30813,7 @@ function renderMe(main) {
     foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
   );
   if (window.__CORRIDOR_STANDALONE__ !== true) {
-    const personal = biLabel('button', 'grammar-link foundation-door', '私の文脈', 'Personal collections');
+    const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
     personal.type = 'button'; personal.id = 'me-personal';
     personal.addEventListener('click', openPersonalCollection); doors.append(personal);
   }
@@ -31217,13 +31231,9 @@ function render() {
     dojoDoor.type = 'button';
     dojoDoor.id = 'chrome-dojo';
     dojoDoor.insertAdjacentHTML('afterbegin', LEARN_DOOR_SVG);
-    // D7 (John: "Keep them for now — figure out the smartest way to work with this"): the cap
-    // tells what the bar cannot. Away from Today and Learn (whose rooms show the count), an ink
-    // dot says cards are due, and the door's name says how many.
-    const dueHere = !inDojo && !['tray', 'deckplay', 'review'].includes(S.view) && S.taken.length && scheduler
-      ? todayQueue().order.length : 0;
-    if (dueHere) dojoDoor.dataset.due = String(dueHere);
-    dojoDoor.setAttribute('aria-label', dueHere ? tx(`学ぶ・復習 ${dueHere}`, `Learn · ${dueHere} due`) : tx('学ぶ', 'Learn'));
+    // D7 (John: "Keep them for now — figure out the smartest way to work with this"): a quiet
+    // door. What is due shows once, on the Line's Today station, where the cards are reviewed.
+    dojoDoor.setAttribute('aria-label', tx('学ぶ', 'Learn'));
     if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
     dojoDoor.addEventListener('click', () => {
       if (inDojo) return;
@@ -31251,7 +31261,8 @@ function render() {
   if (S.view === 'reader' && S.passageId) {
     const cur = readerTakeCurrent();
     const curTaken = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
-    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '覚える', 'memorize');
+    // r4 (T5: "Save and add to list are confusing???"): one name for one action, the popup's Save
+    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '保存', 'Save');
     capBtn.type = 'button';
     capBtn.id = 'reader-take';
     capBtn.disabled = !cur;
@@ -31341,7 +31352,7 @@ function render() {
     const panel = el('div', 'capture-panel');
     panel.id = 'capture-panel';
     panel.setAttribute('role', 'group');
-    panel.setAttribute('aria-label', tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`));
+    panel.setAttribute('aria-label', tx(`「${cur.id}」を保存`, `Save ${cur.id}`));
     panel.setAttribute('data-drift-chrome', '');
     const head = el('div', 'capture-head');
     head.append(el('span', 'capture-word', cur.id));
