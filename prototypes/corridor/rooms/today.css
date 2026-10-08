@@ -509,11 +509,10 @@ html[data-room='tray'] .today-detail-body .deck-row:disabled { color: var(--colo
 /* ---- round 4 (T1): the sky is the doorway into the whole universe ----
    Every star is a real word; open sky is the door up; the labelled door says so in words. */
 html[data-room='tray'] .today-sky { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-/* only words and buttons catch a finger: the stacked depth layers and the day's word's wide box let
-   it through, so a far word under a near layer still opens that word, and open sky stays open sky */
-html[data-room='tray'] .today-sky-layer,
-html[data-room='tray'] .today-dayword { pointer-events: none; }
-html[data-room='tray'] .today-dayword :is(.dw-word, .dw-go) { pointer-events: auto; }
+/* the stacked depth layers let a finger through, so a far word under a near layer still opens that
+   word and open sky stays open sky; the day's word, its hook and the title keep their own taps (a
+   touch on the hook is never a trip to the universe) */
+html[data-room='tray'] .today-sky-layer { pointer-events: none; }
 /* the day's word's family burns nearest the word, in the room's ink-blue; the far field is faint */
 html[data-room='tray'] .today-star.kin { opacity: 0.82; font-weight: 500; color: var(--color-accent); }
 html[data-room='tray'] .today-star.read { opacity: 0.6; }

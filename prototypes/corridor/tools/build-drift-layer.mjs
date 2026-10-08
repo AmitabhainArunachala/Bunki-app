@@ -117,7 +117,7 @@ ${scopedRules.join('\n')}
 #drift-layer .glyph .g { text-shadow: none; }
 #drift-layer .word.fragile .base { text-shadow: 0 0 9px var(--halo); }
 #drift-layer .word.bctr .base { text-shadow: 0 0 9px var(--bloomHalo); }
-#drift-layer .word.bsat .base { text-shadow: 0 0 7px var(--bloomHalo); }
+#drift-layer .word.bsat .base { text-shadow: 0 0 6px color-mix(in srgb, var(--bloomHalo) 50%, transparent); }
 #drift-layer #grain { opacity: calc(var(--grainOp) * 0.45); }
 #drift-layer #lvl { opacity: 0.62; }
 #drift-layer #lvlLabels { opacity: 0.78; font-size: 9.5px; letter-spacing: 0.06em; }
