@@ -532,3 +532,19 @@ Review #6 folded the four shelf filters (`#shelf-filter-*`) and the article sear
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs` (one-tap save, list drawer) | read `.fold-sub` immediately | first `waitForFunction` (≤5 s) for the drawer to include the list name, then read it | Timing only. The assertion is unchanged: the drawer must say `経済ニュース`. A drawer that never updates still fails. |
 
 | `verify-pr77-ports.mjs` crumb-origin (~l.205, r3-rooms) | presses `#back` on the finished plain review | presses `#back` when it is visible, else the close's own `.close-doors .take` | Flow only. With the tab bar the session close hides the chrome Back (REVIEW round 2, new defect 6: three routes to Today). The crumb assertion and `reviewBack === 'tray'` are unchanged; the press goes to whichever control is the way back. |
+
+## Round 4 skin (2026-10-09, Mac): D2, both night looks are public; the picker is two named rows
+
+John, on the tour: **D2 (The night look): "Offer both"**. `kaku` (殻, the electric phosphor night) joins `PUBLIC_THEME_IDS` beside `yoru` (金, the 藍 night). The picker now draws two labelled rows, Day (昼) and Night (夜); each row keeps the reference strip's order, so the DOM order of the stones changes from the old ten to: 墨 朱 柿 藍 赤 板 · 漆 金 殻 浪 雷. Saved theme ids are unchanged and a saved `kaku` still loads.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-experience.mjs` E04-palette-roster | exact ten `['墨','朱','柿','漆','金','藍','赤','浪','板','雷']` → exact eleven `['墨','朱','柿','藍','赤','板','漆','金','殻','浪','雷']`; description "Ten public palettes in constitution order" → "Eleven public palettes: the day row, then the night row (D2)" | Roster pin only. It is still an exact, ordered `deepEqual`, so a dead or extra stone still fails. |
+| `verify-experience.mjs` E04 writing segment, E16 settings (3 places) | `.world-stone` `.nth(4)` → `.world-stone` `{ hasText: '金' }` | Selector only. Index 4 was 金 (`yoru`) in the old order; the same world is now chosen by its seal, so E18-palette-reload still requires `data-theme === 'yoru'` after reload. |
+| `verify-experience.mjs` (2 places) | `.world-stone` `.nth(5)` → `{ hasText: '藍' }` | Selector only. Index 5 was 藍, the default world the journey returns to; it is still 藍. |
+| `verify-experience.mjs` shot captions | "Exactly ten public worlds in consistent order" → "Exactly eleven public worlds, day row then night row" | Screenshot caption only. |
+| `prototypes/corridor/tools/verify-writing-room.mjs` `PUBLIC_WORLDS` and its check | the ten in the old order → the eleven in the new order; description updated | Roster pin only. The ordered `JSON.stringify` equality, the one-named-dialog check, the act/persist/re-ink loop over `shu` and `hakuu` are unchanged. |
+| `verify-writing-room.mjs` legacy check description | "the retired public 殻 world still loads as an internal saved theme" → "a saved 殻 preference still loads (殻 is public again, D2)" | Description only; the assertion (stored `kaku` → `data-theme=kaku` after reload) is unchanged. |
+| `prototypes/corridor/tools/verify-theme-consistency.mjs` `WORLDS` | ten worlds → eleven (adds `kaku`) | **Strengthened**: the new public world is swept through shelf → tray → review front/back → sheet like the others. |
+
+`verify-corridor-accessibility.mjs` already measured `kaku` (quiet-label contrast and the living-paper law) and is unchanged.
