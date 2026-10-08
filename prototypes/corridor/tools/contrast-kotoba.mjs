@@ -15,6 +15,8 @@
  *   accent    --kp-cyan on the card, the page and its own wash (答えを見る, chosen settings)
  *   pos       --kp-noun … --kp-sound (the target, the badge) on the card
  *   start     --kp-on-accent on --kp-cyan (the 始める button)
+ *   stage     --kp-stage-ink / --kp-stage-mute (the study top bar's count and 削除, the swipe hint,
+ *             the rule, ↶) on --kp-stage, the ground around the card while studying
  *
  * The page surface is --kp-bg with every translucent layer of --kp-tex stacked on it (the
  * textures live on the page, never on the card: aesthetics.md §5).
@@ -131,6 +133,7 @@ const ROWS = [
   ['accent', 4.5, ['cyan'], ['panel', 'bg', 'accent-wash']],
   ['pos', 4.5, ['noun', 'verb', 'adj', 'adv', 'expr', 'sound'], ['panel']],
   ['start', 4.5, ['on-accent'], ['accent']],
+  ['stage', 4.5, ['stage-ink', 'stage-mute'], ['stage']],
 ];
 
 export function contrastTable(css) {
@@ -152,6 +155,7 @@ export function contrastTable(css) {
       'good-button': [0, 1, 2].map((i) => c('green')[i] * 0.12 + panel[i] * 0.88),
       'accent-wash': over(c('cyan-wash'), bg),
       accent: c('cyan'),
+      stage: over(c('stage'), bg),
     };
     const row = { look };
     for (const [label, floor, texts, on] of ROWS) {

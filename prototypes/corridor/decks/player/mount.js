@@ -110,7 +110,7 @@ export function hostAdapter() {
 const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
 let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
@@ -689,6 +689,8 @@ function startSession() {
   ui.pos = 0;
   ui.done = 0;
   ui.right = 0;
+  ui.log = []; // this sitting's answers, [{ term, ok }]: the session close names them (never stored)
+  ui.started = Date.now();
   ui.undo = null;
   ui.rail = 0;
   refill();
@@ -750,6 +752,8 @@ function studyScreen() {
   const top = el('header', 'kp-top kp-top-study');
   top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' }));
   const prog = el('div', 'kp-progress');
+  // a short sitting draws one segment per card (the rail itself still ticks by transform)
+  if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
   prog.append(rail(ui.pos / total));
   top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
   box.append(top);
@@ -776,6 +780,8 @@ function studyScreen() {
     word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? t("復習") : t("初めて")),
   );
+  // the card's one instruction, as its eyebrow (chrome: it names the task, never the answer)
+  chips.prepend(cardEyebrow(card, mode));
   face.append(chips);
   if (ui.revealed && passage) {
     const zoom = zoomFor();
@@ -837,6 +843,15 @@ function studyScreen() {
   }
   if (ui.undo) box.append(btn('kp-undo', t("↶ ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
+}
+
+/** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */
+function cardEyebrow(card, mode) {
+  const ji = card.type === 'kanji';
+  const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
+  const n = el('span', 'kp-eyebrow', label);
+  n.lang = ctx.english === false ? 'ja' : 'en';
+  return n;
 }
 
 const THEMES = [
@@ -936,8 +951,34 @@ function zoomToggle(zoom) {
 function kanjiAnatomy(word) {
   if (!word.kanji?.length) return null;
   const box = el('div', 'kp-kanji');
+  // each kanji on a plate: glyph, meaning, parts, strokes (deck kanji data: c, m, parts, st). A
+  // part that two of the word's kanji share is lit on both plates and a bracket under the plates
+  // joins them (推進: 隹 in 推 and 進); nothing is guessed when the data has no shared part
+  const holders = new Map();
+  for (const k of word.kanji) for (const p of new Set(k.parts || [])) holders.set(p, new Set([...(holders.get(p) || []), k.c]));
+  const learned = (text, tag = 'span') => {
+    const n = el(tag, null, text);
+    n.lang = 'ja';
+    n.dataset.uiContent = 'learning';
+    return n;
+  };
   for (const k of word.kanji) {
-    box.append(el('div', 'kp-kj', el('b', null, k.c), el('span', null, k.m || ''), el('small', null, [k.parts?.length ? k.parts.join(' ') : '', k.st ? t(`${k.st}画`, `${k.st} strokes`) : ''].filter(Boolean).join(' · '))));
+    const parts = el('small', 'kp-kj-parts');
+    (k.parts || []).forEach((p, i) => {
+      if (i) parts.append('+');
+      const n = learned(p, 'i');
+      if (holders.get(p)?.size > 1) n.dataset.shared = '1';
+      parts.append(n);
+    });
+    if (k.st) parts.append(el('span', null, t(`${k.st}画`, `${k.st} strokes`)));
+    box.append(el('div', 'kp-kj', learned(k.c, 'b'), el('span', null, k.m || ''), parts));
+  }
+  for (const [p, cs] of holders) {
+    if (cs.size < 2) continue;
+    const line = el('p', 'kp-kshare', learned(p, 'b'));
+    [...cs].forEach((c, i) => line.append(i ? '・' : '', learned(c)));
+    line.append(el('span', null, t('の両方にある部分', cs.size === 2 ? 'sits inside both' : 'sits inside each')));
+    box.append(line);
   }
   return box;
 }
@@ -1618,7 +1659,7 @@ function leechLadder(card, word) {
 /** adopt a ledger change made on the card on screen: stored first, then one undo step */
 function adoptRepair(nextState) {
   if (!save(nextState)) return saveFailed();
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
+  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
   ctx.state = nextState;
   return true;
 }
@@ -1702,8 +1743,15 @@ const RULE = '答えを見て理解が深まったなら もう一度';
 function gradeBar(id) {
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
   const bar = el('div', 'kp-grades');
+  // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 and 良); English shows the word only
+  const seal = (glyph) => {
+    if (ctx.english !== false) return null;
+    const n = el('span', 'kp-grade-seal', glyph);
+    n.setAttribute('aria-hidden', 'true');
+    return n;
+  };
   const g = (name, label, cls, key) =>
-    btn(`kp-grade ${cls}`, [el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
+    btn(`kp-grade ${cls}`, [seal(name === 'again' ? '再' : '良'), el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
       id: `kp-grade-${name}`,
       'aria-keyshortcuts': key,
     });
@@ -1819,6 +1867,7 @@ function revealInPlace() {
   if (motionOk()) {
     sentence.classList.add('kp-enter');
     answer.classList.add('kp-enter');
+    polish(face, sentence);
   }
   box.querySelector('#kp-reveal')?.replaceWith(gradeBar(id));
   box.classList.add('has-bar');
@@ -1826,6 +1875,30 @@ function revealInPlace() {
   fitBar();
   fitClamps(face);
   return true;
+}
+
+/**
+ * 研ぎ出し (togidashi): one polish band crosses the card, and each reading surfaces as the band
+ * passes over it: its delay follows its place, left to right and line by line, so the readings
+ * appear in the band's wake. Transform and opacity only, and inside the reveal's 180 ms budget
+ * (band 180 ms; each reading 120 ms after at most 60 ms). Never called under reduced motion.
+ */
+function polish(face, sentence) {
+  const band = el('i', 'kp-polish');
+  band.setAttribute('aria-hidden', 'true');
+  face.append(band);
+  const drop = () => band.remove();
+  band.addEventListener('animationend', drop, { once: true });
+  setTimeout(drop, 400);
+  const box = sentence.getBoundingClientRect();
+  if (!box.width) return;
+  const view = Math.max(1, Math.min(box.height, innerHeight));
+  for (const rt of sentence.querySelectorAll('rt')) {
+    const r = rt.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (r.left - box.left) / box.width));
+    const y = Math.min(1, Math.max(0, (r.top - box.top) / view));
+    rt.style.setProperty('--kp-rt-delay', `${Math.round(x * 36 + y * 24)}ms`);
+  }
 }
 
 /** the rule under the grade bar is shown once: answering the card it sat under retires it.
@@ -1852,10 +1925,12 @@ function commit(rating, { stay = false } = {}) {
   askToKeepStorage();
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
+  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
   ctx.state = nextState;
   ui.done++;
   if (rating >= RATINGS.good) ui.right++;
+  const answered = ctx.index.cards.get(id)?.word;
+  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.good });
   if (stay) {
     paint();
     return;
@@ -1893,6 +1968,8 @@ function next(dir) {
   resetCard();
   const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
+  // the sitting is over: the close opens at its top, not where the last card's back was scrolled
+  if (ctx.root.querySelector('.kp-done')) window.scrollTo(0, 0);
   arrive(ghost, dir);
 }
 
@@ -1917,6 +1994,15 @@ function arrive(ghost, dir) {
   if (dir) box.dataset.advance = dir;
   if (!motionOk()) return;
   box.querySelector('#kp-card')?.classList.add('kp-arrive');
+  // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
+  if (dir === 'again') {
+    const slash = el('i', 'kp-slash');
+    slash.setAttribute('aria-hidden', 'true');
+    box.append(slash);
+    const gone = () => slash.remove();
+    slash.addEventListener('animationend', gone, { once: true });
+    setTimeout(gone, 400);
+  }
   if (!ghost) return;
   const at = box.getBoundingClientRect();
   Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
@@ -1937,6 +2023,7 @@ function undo() {
   ui.pos = ui.undo.pos;
   ui.done = ui.undo.done;
   ui.right = ui.undo.right;
+  ui.log = ui.undo.log || [];
   ui.undo = null;
   resetCard();
   ui.revealed = cardMode() !== 'choice';
@@ -2004,11 +2091,36 @@ function attachSwipe(face) {
   });
 }
 
+/**
+ * The session close: the surface is clear. The words of this sitting rise off the card table
+ * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (思い出せた),
+ * again (もう一度) and the time since 始める, the recall rate, when the next review falls due,
+ * and one door: back to the deck.
+ */
 function doneScreen() {
   const box = el('section', 'kp-done');
   box.append(topBar(t("おつかれさま"), () => go('home')));
+  box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
+  const missed = new Set(ui.log.filter((x) => !x.ok).map((x) => x.term));
+  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, 12);
+  if (words.length) {
+    const rise = el('div', 'kp-rise');
+    rise.setAttribute('aria-hidden', 'true');
+    words.forEach((w, i) => {
+      const n = el('span', `kp-rise-w${missed.has(w) ? ' is-again' : ''}`, w);
+      n.lang = 'ja';
+      n.dataset.uiContent = 'learning';
+      n.style.setProperty('--i', String(i));
+      rise.append(n);
+    });
+    box.append(rise);
+  }
   const pct = ui.done ? Math.round((ui.right / ui.done) * 100) : 0;
-  box.append(el('div', 'kp-tiles', el('div', 'kp-tile kp-c-new', el('b', null, String(ui.done)), el('span', null, t("回答"))), el('div', 'kp-tile kp-c-known', el('b', null, `${pct}%`), el('span', null, t("思い出せた割合")))));
+  const secs = ui.started ? Math.max(0, Math.round((Date.now() - ui.started) / 1000)) : 0;
+  const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+  const cell = (label, value, cls) => el('div', `kp-tally-c ${cls}`, el('span', null, label), el('b', null, value));
+  box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
+  box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
   box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
   box.append(btn('kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
