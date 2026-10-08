@@ -8469,7 +8469,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   actions.append(seal);
   if (!held && !identityHeld) {
     actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to your reviews')));
-    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに入れる', 'Add to a list'));
+    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加', 'Add to a list'));
     lists.type = 'button';
     lists.id = 'mini-lists';
     lists.setAttribute('aria-haspopup', 'dialog');
@@ -9734,8 +9734,8 @@ function renderReader(main) {
     const toggle = el('div', 'version-toggle');
     toggle.setAttribute('role', 'group');
     toggle.setAttribute('aria-label', tx('記事の版', 'Article version'));
-    const caption = el('p', 'version-caption', tx('やさしい版は、同じ記事をやさしい日本語で書き直したものです。',
-      'The simplified version retells the same article in easier Japanese.'));
+    const caption = el('p', 'version-caption', tx('やさしい版：同じ記事を、やさしい日本語で。',
+      'Simplified: the same story in easier Japanese.'));
     caption.id = 'version-caption';
     toggle.setAttribute('aria-describedby', caption.id);
     for (const [version, ja, en] of [[versions.original, '原文', 'Original'], [versions.easy, 'やさしい版', 'Simplified']]) {
@@ -10974,16 +10974,16 @@ function refreshReadingPlacesSurface() {
 function renderReadingPlaces(p = null) {
   const container = el('section', 'reading-places'); container.id = 'record-reading-places';
   if (p) container.dataset.sourceId = `bundled-reading:${p.id}`;
-  container.setAttribute('aria-label', tx('読書の栞', 'Reading places'));
-  container.append(el('h2', 'section-title', tx('読書の栞', 'Reading places')));
+  container.setAttribute('aria-label', tx('栞', 'Bookmarks'));
+  container.append(el('h2', 'section-title', tx('栞', 'Bookmarks')));
   if (p) {
-    const button = biLabel('button', 'chip', 'ここに栞を置く', 'keep this place');
+    const button = biLabel('button', 'chip', 'ここに栞をはさむ', 'Bookmark this spot');
     button.type = 'button'; button.id = 'reader-place-save';
     button.disabled = !readerTakeCurrent() || !recordWritable();
     const actions = el('div', 'reading-place-actions'); actions.append(button);
     const note = el('p', 'teacher-note'); note.id = 'reader-place-note'; note.setAttribute('role', 'status');
-    note.textContent = readerTakeCurrent() ? tx(`「${readerTakeCurrent().id}」の場所に栞を置く。`, `Keep the place where you met ${readerTakeCurrent().id}.`)
-      : tx('文章の語に触れて、栞を置く場所を選ぶ。', 'Touch a word in the reading to choose a place to keep.');
+    note.textContent = readerTakeCurrent() ? tx(`「${readerTakeCurrent().id}」のところに栞をはさむ。`, `Bookmark the spot where you met ${readerTakeCurrent().id}.`)
+      : tx('文章の語をタップして、栞をはさむところを選ぶ。', 'Tap a word in the text to choose where to bookmark.');
     button.addEventListener('click', async () => {
       const target = readerTakeCurrent(); const snapshot = currentRecordNoteView();
       if (button.disabled || !target || !snapshot || target.p !== p.id) return;

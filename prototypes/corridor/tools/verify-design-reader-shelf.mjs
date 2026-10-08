@@ -95,8 +95,8 @@
  *                         tutor opens the tutor with that sentence as its active context. Control:
  *                         3166ded3, whose bar floated in on the first tap.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
- *                         · N1", "やさしい版 Simplified · N3") with the caption "The simplified version
- *                         retells the same article in easier Japanese.", and an article without a
+ *                         · N1", "やさしい版 Simplified · N3") with the caption "Simplified: the same story
+ *                         in easier Japanese." (round 4: shorter), and an article without a
  *                         simplified version shows no switch. Control: 3166ded3 ("easier N3", no caption).
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
@@ -912,7 +912,8 @@ try {
       }));
       const shown = await read();
       assert.deepEqual(shown.choices, [['Original · N1', 'true'], ['Simplified · N3', 'false']], `the switch: ${JSON.stringify(shown.choices)}`);
-      assert.equal(shown.caption, 'The simplified version retells the same article in easier Japanese.');
+      // round 4 (John T4, "the explanaiton (that is too verbose"): the note behind the switch's ⓘ is one short line
+      assert.equal(shown.caption, 'Simplified: the same story in easier Japanese.');
       await page.locator('.version-toggle .version-choice[aria-pressed="false"]').click();
       await page.waitForFunction(() => document.querySelector('.version-toggle .version-choice[aria-pressed="true"]')?.innerText.includes('Simplified'));
       await openArticle(page, THREE_PARAS);
