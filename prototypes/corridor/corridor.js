@@ -7662,10 +7662,11 @@ function shelfCard(p, rank = 'grid') {
   item.style.setProperty('--topic', storyAccent(p));
   const open = el('button', 'shelf-open');
   open.type = 'button';
-  // every article wears a picture slot, its level badge at the picture's top-right
+  // every article wears a picture slot. A spine (今日の６本) keeps its level badge on the picture; the
+  // lead and the index rows carry it in their instrument line, beside the facts it belongs with
   if (!glossary) {
     const picture = storyPicture(p, { eager: rank === 'lead' || rank === 'second' });
-    picture.append(levelChip(p, 'level-badge'));
+    if (rank === 'teaser') picture.append(levelChip(p, 'level-badge'));
     open.append(picture);
   }
   const head = el('div', 'shelf-head');
@@ -7673,13 +7674,16 @@ function shelfCard(p, rank = 'grid') {
     const top = el('div', 'story-topline');
     top.append(storyKicker(p), levelChip(p));
     head.append(top);
-  } else head.append(storyKicker(p));
+  } else if (rank === 'teaser') head.append(storyKicker(p));
+  else head.append(storyInstrument(p, rank === 'lead'));
   const headline = el('div', 'shelf-title', p.title);
   headline.lang = 'ja'; // so a headline breaks between phrases, never inside a word (word-break: auto-phrase)
   head.append(headline);
   // the English title travels with the record (titleEn + titleEnSource in
   // data/articles/index.json), never in a code-side map
-  if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
+  // a spine sets its Japanese title vertically; its English line stays horizontal, at the spine's foot
+  const titleEn = bi() && p.titleEn ? el('div', 'shelf-title-en', p.titleEn) : null;
+  if (titleEn && rank !== 'teaser') head.append(titleEn);
   if (rank === 'lead') {
     const lede = storyLede(p);
     if (lede) {
@@ -7694,11 +7698,42 @@ function shelfCard(p, rank = 'grid') {
   // the shelf remembers with you: finished, or open to your bookmark
   if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', 'finished')));
   else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', 'in progress')));
-  head.append(foot);
+  if (rank !== 'teaser') head.append(foot);
   open.append(head);
+  // a spine's English line and its date stand horizontally at its foot
+  if (rank === 'teaser') {
+    if (titleEn) open.append(titleEn);
+    open.append(foot);
+  }
   open.addEventListener('click', () => openPassage(p.id));
   item.append(open);
   return item;
+}
+
+/** How many of the learner's saved words an article holds: the saved word ids met in the article's
+ * own word forms (readingFacets.forms, from the index). Real data only; 0 when the record has none. */
+function storyYourWords(p) {
+  const forms = p.readingFacets?.forms;
+  if (!Array.isArray(forms) || !forms.length) return 0;
+  const inText = new Set(forms), seen = new Set();
+  for (const t of S.taken) if (t.t === 'word' && inText.has(t.id)) seen.add(t.id);
+  return seen.size;
+}
+/** A story's instrument line: level · topic · characters · your words. Every figure is the record's
+ * own (chars from the index, words from the learner's saved cards); there is no time estimate,
+ * because no real reading timings exist to make one honest. */
+function storyInstrument(p, full = false) {
+  const line = el('div', 'story-instrument');
+  line.append(levelChip(p), storyKicker(p));
+  const fact = (text, cls = '') => {
+    const span = el('span', `story-fact${cls ? ` ${cls}` : ''}`, text);
+    line.append(span);
+    return span;
+  };
+  if (full && p.chars) fact(tx(`${p.chars.toLocaleString('ja-JP')}字`, `${p.chars.toLocaleString('en-GB')} chars`), 'story-chars');
+  const mine = full ? storyYourWords(p) : 0;
+  if (mine) fact(tx(`保存した語 ${mine}`, `${mine} of your words`), 'story-mine');
+  return line;
 }
 
 /** The lead's teaser: the story's own first sentence, from the snippet the record carries. */
@@ -8395,6 +8430,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   });
   actions.append(entry);
   mini.append(actions);
+  // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
+  if (reader) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
   mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
@@ -8408,6 +8445,79 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   keepFloatingBeside(mini, span);
   if (focusEntry) ([seal, entry].find((button) => !button.disabled) || mini).focus({ preventScroll: true });
   return mini;
+}
+
+/** The quick look's kanji line (Read lane, redesign): each kanji of the word with its parts, the saved
+ * words that share one of them, and one door into the web of the word. Every part comes from the
+ * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
+ * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
+function miniKanjiWeb(word, anchor) {
+  const chars = [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))].slice(0, 3);
+  if (!chars.length) return null;
+  const box = el('div', 'mini-web');
+  box.dataset.japaneseLookup = 'off';
+  const open = (node) => (event) => { event.stopPropagation(); removeMini(); go(node, { invoker: anchor }); };
+  const list = el('div', 'mini-kanji');
+  for (const c of chars) {
+    const k = D.kanji[c];
+    const row = el('button', 'mini-kanji-row');
+    row.type = 'button';
+    const glyph = el('span', 'mini-kanji-glyph', c);
+    glyph.lang = 'ja'; glyph.dataset.uiContent = 'learning';
+    row.append(glyph);
+    const what = el('span', 'mini-kanji-what');
+    if (bi() && k.m) what.append(el('span', 'mini-kanji-meaning', k.m));
+    const parts = mainParts(c).filter((part) => part !== c);
+    if (parts.length) {
+      const set = el('span', 'mini-kanji-parts');
+      parts.forEach((part, i) => {
+        if (i) { const plus = el('span', 'mini-kanji-plus', '+'); plus.setAttribute('aria-hidden', 'true'); set.append(plus); }
+        const piece = el('span', 'mini-kanji-part', part);
+        piece.lang = 'ja'; piece.dataset.uiContent = 'learning';
+        set.append(piece);
+        const name = D.radicals?.[part]?.name;
+        if (name) { const n = el('span', 'mini-kanji-part-name', name); n.lang = 'ja'; n.dataset.uiContent = 'learning'; set.append(n); }
+      });
+      what.append(set);
+    }
+    row.append(what);
+    row.addEventListener('click', open({ t: 'kanji', id: c }));
+    list.append(row);
+  }
+  box.append(list);
+  // also in your cards: saved words that share a kanji with this one
+  const kin = [];
+  for (const t of S.taken) {
+    if (t.t !== 'word' || t.id === word || kin.includes(t.id)) continue;
+    if (chars.some((c) => String(t.id).includes(c))) kin.push(t.id);
+    if (kin.length >= 4) break;
+  }
+  if (kin.length) {
+    const cards = el('p', 'mini-cards');
+    cards.append(el('span', 'mini-cards-label', tx('あなたのカードにも', 'Also in your cards')));
+    for (const w of kin) {
+      const b = el('button', 'mini-card-word', w);
+      b.type = 'button'; b.lang = 'ja'; b.dataset.uiContent = 'learning';
+      b.addEventListener('click', open({ t: 'word', id: w }));
+      cards.append(b);
+    }
+    box.append(cards);
+  }
+  // the web: the Words room's word web when it is there, otherwise the first kanji's own entry (its
+  // parts and family). The door says the same thing either way.
+  const web = el('button', 'mini-web-open');
+  web.type = 'button';
+  web.append(el('span', 'mini-web-label', tx('つながりをひらく', 'Open the web')));
+  const chevron = el('span', 'mini-entry-chevron', '›');
+  chevron.setAttribute('aria-hidden', 'true');
+  web.append(chevron);
+  web.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (typeof window.openWordWeb === 'function') { removeMini(); window.openWordWeb(word); return; }
+    open({ t: 'kanji', id: chars[0] })(event);
+  });
+  box.append(web);
+  return box;
 }
 
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
@@ -9352,14 +9462,14 @@ function voicePendingNote(id) {
   pending.id = id;
   // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
   pending.dataset.japaneseLookup = 'off';
-  pending.append(uiIcon('speaker'), el('span', 'l-ja', tx('音声準備中 · Kore', 'audio coming soon · Kore')));
+  pending.append(uiIcon('speaker'), el('span', 'l-ja', tx('音声未収録 · Kore', 'no recording yet · Kore')));
   return pending;
 }
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
  * It carries only the locked narration voice. With no clips for this article in that voice it is
- * a quiet state, 音声準備中 · Kore: no picker, no stand-in voice, no disabled control. */
+ * a quiet state, 音声未収録 · Kore: no picker, no stand-in voice, no disabled control. */
 function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
@@ -9436,13 +9546,23 @@ function renderReader(main) {
     main.append(door);
     }
   }
+  // The woodblock leads the article at its own crop, the way its shelf card shows it; the provenance
+  // line rests on its faded foot (redesign, Read lane).
+  const picture = readerPicture(p);
+  if (picture) { picture.classList.add('reader-hero'); main.append(picture); }
   // One compact line of provenance — source · date · level — then the headline. Settings are one
   // icon; nothing else stands between the reader and the first sentence (design pass 2026-09-30).
   const head = el('div', 'reader-head');
+  if (picture) head.classList.add('on-hero');
   const meta = el('p', 'eyebrow reader-meta');
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
   if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
-  meta.append(levelChip(p), gradeTag(p));
+  meta.append(levelChip(p));
+  // the instrument figures, each the record's own: characters, and the saved words the article holds
+  if (p.chars) meta.append(el('span', 'reader-fact reader-chars', tx(`${p.chars.toLocaleString('ja-JP')}字`, `${p.chars.toLocaleString('en-GB')} chars`)));
+  const mine = storyYourWords(p);
+  if (mine) meta.append(el('span', 'reader-fact reader-mine', tx(`保存した語 ${mine}`, `${mine} of your words`)));
+  meta.append(gradeTag(p));
   if (reviewPending(p)) meta.append(unreviewedChip(p));
   // the dials fold away — the text is the point, the settings one tap away
   const dialsToggle = el('button', 'icon-button dials-toggle');
@@ -9466,8 +9586,6 @@ function renderReader(main) {
   articleTitle.dataset.uiContent = 'learning';
   main.append(articleTitle);
   if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
-  const picture = readerPicture(p);
-  if (picture) main.append(picture);
   const versions = storyVersions(p);
   if (versions) {
     // one story, two texts: the original and Bunki's N3 rewrite are one switch, never two cards. Each side
@@ -9524,7 +9642,7 @@ function renderReader(main) {
 
   // the listen door rides beside the settings fold — one tap to hear the
   // article, one tap to stop; until the locked Kore clips ship it shows
-  // only its 音声準備中 · Kore pending state
+  // only its 音声未収録 · Kore pending state
   main.append(buildListenRow(p));
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
   renderReaderTip(main);

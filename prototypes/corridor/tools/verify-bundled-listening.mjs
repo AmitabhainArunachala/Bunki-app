@@ -60,7 +60,7 @@ const listeningControls = '#sentence-choose-listening, #sentence-add-listening, 
 async function listeningLocked(page, requested) {
   const pending = page.locator('#sentence-listening-pending');
   await pending.waitFor({ timeout: 5000 });
-  assert.match(await pending.innerText(), /^audio coming soon · Kore$/u);
+  assert.match(await pending.innerText(), /^no recording yet · Kore$/u);
   assert.equal(await page.locator(listeningControls).count(), 0, 'No listening control is offered');
   assert.deepEqual(requested.filter(path => path.startsWith('/audio/s/')), [], 'No sentence recording is requested');
 }
