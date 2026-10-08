@@ -621,9 +621,15 @@ function homeScreen() {
   box.append(el('p', 'kp-sub', t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`)));
   if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', t(ctx.notice)));
 
-  const tiles = el('div', 'kp-tiles');
-  const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
-  tiles.append(tile(q.due.length, t("復習"), 'kp-c-due'), tile(q.fresh.length, t("新しいカード"), 'kp-c-new'), tile(known, t("定着した語"), 'kp-c-known'), tile(hard, t("苦手"), 'kp-c-hard'));
+  // the deck's state as one quiet mono line (0 due · 15 new · 0 known · 0 difficult), no coloured tiles
+  const tiles = el('p', 'kp-tiles');
+  const tile = (n, ja, en, cls) => el('span', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
+  tiles.append(
+    tile(q.due.length, '復習', 'due', 'kp-c-due'),
+    tile(q.fresh.length, '新', 'new', 'kp-c-new'),
+    tile(known, '定着', 'known', 'kp-c-known'),
+    tile(hard, '苦手', 'difficult', 'kp-c-hard'),
+  );
   box.append(tiles);
 
   const total = q.queue.length;
@@ -676,6 +682,26 @@ function go(screen) {
   ui.sheet = null;
   paint();
   window.scrollTo(0, 0);
+  frameFront();
+}
+
+/**
+ * A front opens at the top of its card; when the marked word (or the gap) would sit under the
+ * docked 答えを見る, the page scrolls at once (no animation) to bring it to the middle of the space
+ * between the host's header and the dock, so the word and the reveal are both in view.
+ */
+function frameFront() {
+  if (ui.screen !== 'study' || ui.revealed) return;
+  const face = ctx.root.querySelector('#kp-card');
+  const dock = ctx.root.querySelector('.kp-study > .kp-reveal');
+  const target = face?.querySelector('.kp-target, .kp-blank');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
+  const t = target.getBoundingClientRect();
+  const floor = dock.getBoundingClientRect().top - 16;
+  const ceil = topInset() + 16;
+  if (t.bottom <= floor) return;
+  window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
 }
 
 function startSession() {
@@ -786,7 +812,7 @@ function studyScreen() {
   if (ui.revealed && passage) {
     const zoom = zoomFor();
     face.dataset.zoom = zoom;
-    chips.append(zoomToggle(zoom));
+    (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
   face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
@@ -849,14 +875,16 @@ function studyScreen() {
 function cardEyebrow(card, mode) {
   const ji = card.type === 'kanji';
   const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
-  const n = el('span', 'kp-eyebrow', label);
+  // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
+  // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
+  const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
   n.lang = ctx.english === false ? 'ja' : 'en';
   return n;
 }
 
 const THEMES = [
   ['dark', '墨', '#0a0e13', '#3fd0ff'],
-  ['ai', '藍', '#121a46', '#f2c14e'],
+  ['ai', '藍', '#141a28', '#e9e2d2'],
   ['matcha', '抹茶', '#13261a', '#a6e06a'],
   ['kokuban', '黒板', '#1f2f28', '#ffe066'],
   ['washi', '和紙', '#fbf6ea', '#93301a'],
@@ -866,6 +894,9 @@ const THEMES = [
 ];
 const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
 const posKey = (pos) => (POS[pos] || ['noun'])[0];
+/** the part of speech as the interface names it: 名詞 in 日本語, "noun" in EN (never Japanese chrome in EN) */
+const POS_EN = { noun: 'noun', verb: 'verb', 'い-adjective': 'i-adjective', 'な-adjective': 'na-adjective', adverb: 'adverb', expression: 'expression', 'sound word': 'sound word', kanji: 'kanji' };
+const posLabel = (pos) => (ctx?.english !== false ? POS_EN[pos] || 'word' : (POS[pos] || ['', ''])[1] || '語');
 /** item kind → [css key, chip label]: 語 a whole word, 字 one kanji of it, 文法 a grammar point */
 function itemKind(card) {
   if (card.type === 'kanji') return ['ji', '字'];
@@ -1008,9 +1039,10 @@ const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言�
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
-  // Part of speech belongs to the Japanese answer, alongside its definition.
-  const pos = (POS[word.pos] || ['', ''])[1] || word.pos;
-  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
+  // Part of speech is chrome: it names the kind of word in the interface language (EN: noun, 日本語: 名詞)
+  const badge = el('span', 'kp-posbadge', posLabel(word.pos));
+  badge.lang = ctx.english === false ? 'ja' : 'en';
+  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, badge));
   // the definition's words are tap targets like the passage's (STANDARD A44)
   a.append(defLine(card, word));
   // a usage note in Japanese stays in tier one (§3 item 4): the passage's own note (tipJa) when it
@@ -1856,7 +1888,9 @@ function revealInPlace() {
   if (passage) {
     const zoom = zoomFor();
     face.dataset.zoom = zoom;
-    face.querySelector('.kp-chips').append(zoomToggle(zoom));
+    // on the eyebrow's own row, which the front already sized for it: the card does not grow or shift
+    const chips = face.querySelector('.kp-chips');
+    (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) });
   face.querySelector('.kp-sentence').replaceWith(sentence);
@@ -1968,8 +2002,10 @@ function next(dir) {
   resetCard();
   const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
-  // the sitting is over: the close opens at its top, not where the last card's back was scrolled
+  // the sitting is over: the close opens at its top, not where the last card's back was scrolled;
+  // the next front opens at its card's top (or with its marked word above the docked reveal)
   if (ctx.root.querySelector('.kp-done')) window.scrollTo(0, 0);
+  else frameFront();
   arrive(ghost, dir);
 }
 

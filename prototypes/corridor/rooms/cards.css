@@ -17,3 +17,10 @@ html:is([data-room='deckplay'], [data-room='contextdeck']) body:not([data-view='
 }
 html[data-room='deckplay'] #app > main > .kp { box-shadow: 0 50vh 0 0 var(--kp-bg); }
 html[data-room='deckplay'] #app > main > .kp:has(> .kp-study) { box-shadow: 0 50vh 0 0 var(--kp-stage); }
+
+/* ---- Fix round 2: one way out. In the deck the player's own ← (home) and ✕ (study) are the exit;
+   the chrome's Back would leave the same deck by a second door, so it stands down here. ---- */
+html[data-room='deckplay'] body:not(.zen) #app > .chrome > button#back { display: none; }
+/* no strip of the corridor's paper between the chrome and the deck: the player's ground meets the chrome */
+html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp) { padding-top: 0; }
+html[data-room='deckplay'] #app > main > .kp { margin-top: 0; }

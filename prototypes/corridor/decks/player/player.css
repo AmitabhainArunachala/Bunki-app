@@ -64,16 +64,15 @@
 .kp-sub { margin: 0; color: var(--kp-ink-2); font-size: 14px; line-height: 1.6; }
 .kp-h2 { margin: 8px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
 
-.kp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.kp-done .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.kp-tile { background: var(--kp-panel); border: 1px solid var(--kp-line); border-radius: 14px; padding: 12px 10px; display: grid; gap: 2px; }
-.kp-tile b { font-family: var(--kp-num); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.kp-tile span { font-size: 12px; color: var(--kp-ink-2); }
-.kp-c-due b, .kp-c-due { color: var(--kp-amber); }
-.kp-c-new b { color: var(--kp-ink); }
+.kp-tiles { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; row-gap: 4px; padding: 10px 0; border-block: 1px solid var(--kp-line); font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
+/* the deck's state: one quiet mono line, "0 due · 15 new · 0 known · 0 difficult", no coloured tiles */
+.kp-tile { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.kp-tile + .kp-tile::before { content: '·'; margin: 0 10px; color: var(--kp-mute); }
+.kp-tile b { font-size: 15px; font-weight: 600; color: var(--kp-ink); }
+.kp-tile span { font-size: 12.5px; letter-spacing: 0.04em; color: var(--kp-mute); }
 .kp-c-known b, .kp-verdict.kp-c-known { color: var(--kp-green); }
 .kp-c-hard b, .kp-verdict.kp-c-hard { color: var(--kp-red); }
-.kp-tile span { color: var(--kp-ink-2); }
+.kp-tiles .kp-tile b { color: var(--kp-ink); }
 
 .kp-start { width: 100%; min-height: 56px; border: 0; border-radius: 16px; background: var(--kp-cyan); color: #00131d; font-size: 18px; font-weight: 700; letter-spacing: 0.04em; }
 .kp[data-look='light'] .kp-start { color: #fff; }
@@ -275,7 +274,6 @@
 .kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
 
 @media (max-width: 420px) {
-  .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
   .kp-row .kp-dots { display: none; }
 }
@@ -353,12 +351,16 @@
    * word's brackets, the rail and the slash on もう一度 (never text). Measured: contrast-kotoba stage row */
   --kp-stage: var(--kp-bg); --kp-stage-ink: var(--kp-ink-2); --kp-stage-mute: var(--kp-mute); --kp-shu: #ff6a4d; }
 .kp[data-look='light'] { --kp-on-accent: #fff; --kp-depth: 0 1px 2px rgba(15, 30, 45, 0.08), 0 8px 24px rgba(15, 30, 45, 0.1);
-  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a; }
-.kp[data-look='ai'] { /* 藍 indigo night, gold accent */
-  --kp-bg: #0b1030; --kp-panel: #121a46; --kp-panel-2: #1a2458; --kp-ink: #eef1ff; --kp-ink-2: #b9c1ea; --kp-mute: #929dd0; --kp-line: #2a3672;
-  --kp-cyan: #f2c14e; --kp-cyan-wash: rgba(242, 193, 78, 0.16); --kp-on-accent: #1a1300; --kp-green: #59e0a6; --kp-violet: #9fb4ff; --kp-kind-ji: #7fd6ff; --kp-kind-bun: #b9a6ff;
-  --kp-noun: #f2c14e; --kp-tex: radial-gradient(120% 80% at 0% 0%, rgba(120, 140, 255, 0.12), transparent 60%);
-  color-scheme: dark; }
+  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a;
+  /* the family's study stage: the white sheet on 藍漆 lacquer */
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
+.kp[data-look='ai'] { /* 藍: the room's own family (Bunki C+A): a washi card on a 藍漆 lacquer stage, sumi ink, 藍 accent, 朱 marks */
+  --kp-bg: #f4eee1; --kp-panel: #fbf8f1; --kp-panel-2: #efe8d9; --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #565c66; --kp-line: #dcd3c0;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1; --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.03) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.025) 0 1px, transparent 1px 11px);
+  --kp-depth: 0 1px 0 rgba(25, 28, 34, 0.09), 0 10px 26px -6px rgba(40, 30, 16, 0.16); color-scheme: light;
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
 .kp[data-look='washi'] { /* 和紙 warm paper with fibres */
   --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #4a3e2f; --kp-mute: #5c4f3e; --kp-line: #dccfb5;
   --kp-cyan: #93301a; --kp-cyan-wash: rgba(147, 48, 26, 0.1); --kp-on-accent: #fff; --kp-red: #a82233; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
@@ -371,7 +373,8 @@
   --kp-cyan: #a1264a; --kp-cyan-wash: rgba(161, 38, 74, 0.1); --kp-on-accent: #fff; --kp-red: #ab2333; --kp-amber: #7f4c00; --kp-green: #21613f; --kp-violet: #6a40b8;
   --kp-kind-ji: #5e0b63; /* was #2665a7, the verb's own blue */ --kp-noun: #a1264a; --kp-verb: #2665a7; --kp-adj: #895900; --kp-adv: #7747c6; --kp-expr: #266f49; --kp-sound: #a73882;
   --kp-tex: radial-gradient(60% 40% at 100% 0%, rgba(255, 182, 200, 0.35), transparent 70%);
-  --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light; }
+  --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light;
+  --kp-stage: #2a1a22; --kp-stage-ink: #f3e6ea; --kp-stage-mute: #c7aab4; --kp-shu: #c4304f; }
 .kp[data-look='matcha'] { /* 抹茶 deep green */
   --kp-bg: #0d1a12; --kp-panel: #13261a; --kp-panel-2: #1a3123; --kp-ink: #eef7ef; --kp-ink-2: #b8d1bd; --kp-mute: #8fb097; --kp-line: #24402e;
   --kp-cyan: #a6e06a; --kp-cyan-wash: rgba(166, 224, 106, 0.14); --kp-on-accent: #0d1a05; --kp-noun: #a6e06a; --kp-kind-ji: #ffb3d9; /* was #ff9ad5, ΔE 6.7 from --kp-sound */ --kp-kind-bun: #c3b0ff;
@@ -590,12 +593,11 @@
 .kp-done .kp-start { border-radius: 4px; }
 
 /* the deck home: paper slips, not pills */
-.kp .kp-tile, .kp .kp-group, .kp .kp-row { border-radius: 4px; }
+.kp .kp-group, .kp .kp-row { border-radius: 4px; }
 .kp .kp-start { border-radius: 4px; letter-spacing: 0.06em; box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-cyan) 55%, #000); }
 .kp .kp-start:disabled { box-shadow: none; }
 .kp .kp-start:active { transform: translateY(2px); box-shadow: none; }
 .kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
-.kp .kp-tile b { font-family: var(--kp-head); font-weight: 800; }
 .kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
 
@@ -603,3 +605,19 @@
   .kp-polish, .kp-slash { display: none; }
   .kp .kp-reveal:active, .kp .kp-next:active, .kp .kp-start:active { transform: none; }
 }
+
+/* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
+/* the deck home's ← is bare, like the study ✕: the page's one way out */
+.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp-home > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
+/* 答えを見る (and わからない) is docked at the foot of the screen like the grade pads, so the reveal is
+ * always one tap away on a long passage; its own place in the flow, under the card, is the room the
+ * passage keeps: scrolled to the end, the last line sits above it, never under it. A ring of the
+ * stage frames it as a dock over the passage that scrolls on beneath. */
+.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-stage); }
+body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-clearance) + 10px); }
+/* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
+ * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
+.kp .kp-eyebrow-zoom { min-height: 30px; }
+.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: 12px; }
+.kp .kp-eyebrow:has(> .kp-zoom) > .kp-eyebrow-t { display: none; }
