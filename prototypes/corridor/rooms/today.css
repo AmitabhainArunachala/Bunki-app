@@ -265,7 +265,7 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line {
 html[data-room='tray'] .today-stops {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--stops, 3), minmax(0, 1fr));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -376,6 +376,7 @@ html[data-room='tray'] .today-then-n {
   color: var(--color-muted);
 }
 html[data-room='tray'] .today-then .today-arrow { color: var(--color-accent); }
+html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line + .sem-empty { margin-top: 26px; }
 html[data-room='tray'] .today-then.solo {
   margin: 18px 0 8px;
   padding: 0 14px;

@@ -10823,15 +10823,17 @@ function todayWordOfDay(today) {
   const day = dayKey();
   const blocked = todayDueKeys(today);
   const reading = (w) => D.dict?.[w]?.r || D.words?.[w]?.r || '';
+  // a shared part of some weight (隹, 言, 門) makes the best hook; a bare 一 or 八 the weakest
   const tierOf = (w) => {
     const ks = todayKanji(w);
-    return ks.length >= 2 && todaySharedPart(ks) ? 0 : ks.length >= 2 ? 1 : ks.length ? 2 : 3;
+    const part = todaySharedPart(ks);
+    return part && todayPartStrokes(part) >= 4 ? 0 : part ? 1 : ks.length >= 2 ? 2 : ks.length ? 3 : 4;
   };
   const choose = (list, from) => {
     if (!list.length) return null;
     const tiers = list.map((w) => [w, tierOf(w)]);
     const best = Math.min(...tiers.map(([, t]) => t));
-    if (best > 2) return null;
+    if (best > 3) return null;
     const tier = tiers.filter(([, t]) => t === best).map(([w]) => w).sort();
     const word = tier[todayHash(`${day}:${from}`) % tier.length];
     return { word, reading: reading(word), from, item: S.taken.find((i) => i.t === 'word' && i.id === word) || null };
@@ -11081,6 +11083,7 @@ function renderTodayLine(today, door, read, pick) {
   if (today) stops.append(stop(cards ? 'stop-cards now' : 'stop-cards', cards, tx('枚のカード', cards === 1 ? 'card' : 'cards')));
   if (read) stops.append(stop(!cards ? 'stop-read now' : 'stop-read', 1, tx('本の記事', 'article')));
   if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語の散歩', 'word walk')));
+  stops.style.setProperty('--stops', String(stops.children.length));
   card.append(stops);
   if (cards) {
     const train = el('div', 'today-train');
