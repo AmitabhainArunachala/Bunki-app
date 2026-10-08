@@ -451,7 +451,7 @@
 }
 .kp-top-study .kp-progress i { background: var(--kp-stage-ink); }
 .kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: 13px; letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
-.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 30%, transparent); color: var(--kp-stage-ink); border-radius: 3px; font-size: 12px; letter-spacing: 0.06em; padding: 0 10px; }
+.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: 3px; font-size: 12px; letter-spacing: 0.06em; padding: 0 10px; }
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
@@ -596,7 +596,7 @@
 .kp .kp-start:active { transform: translateY(2px); box-shadow: none; }
 .kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
 .kp .kp-tile b { font-family: var(--kp-head); font-weight: 800; }
-.kp .kp-h2 { font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
+.kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
 
 @media (prefers-reduced-motion: reduce) {

@@ -44,7 +44,7 @@
 .pc-japanese { font:400 clamp(20px,2.4vw,26px)/2.1 var(--serif); line-break:strict; word-break:normal; overflow-wrap:anywhere; letter-spacing:.035em; margin:0!important; }
 .pc mark { color:inherit; background:transparent; border-bottom:2px solid var(--red); padding-bottom:3px; }
 .pc ruby { ruby-position:over; }
-.pc rt { font-family:var(--sans); font-size:.52em; letter-spacing:.02em; font-weight:400; color:var(--ink-2); }
+.pc rt { font-family:var(--sans); font-size:max(11px,.52em); letter-spacing:.02em; font-weight:400; color:var(--ink-2); }
 .pc-japanese rt { font-family:var(--sans); font-size:max(11px,.46em); letter-spacing:.025em; color:var(--ink-2); }
 .pc .pc-token { display:inline; min-height:0; padding:0 1px; border:0; border-bottom:1px dotted var(--line); border-radius:0; color:inherit; background:transparent; font:inherit; letter-spacing:inherit; line-height:inherit; vertical-align:baseline; }
 .pc .pc-token:hover:not(:disabled) { color:var(--tint,var(--ink)); border-color:var(--tint,var(--ink)); background:transparent; }
