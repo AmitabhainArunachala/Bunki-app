@@ -500,3 +500,11 @@ Under the foundation's EN/JA law, the focus-mode door reads `yomi probe` in Engl
 | File / assertion | Before | After | Why / retained requirements |
 | --- | --- | --- | --- |
 | `prototypes/corridor/tools/verify-report-entries.mjs:212` | `.focus-mode` `{ hasText: '読み探査' }` | `{ hasText: /読み探査\|yomi probe/u }` | Label selector only. R5 still opens the probe as a learner does, requires `.review-front` and `body.zen`, and checks the page entry sits after the stage. |
+
+## Fix round 2 (2026-10-08, cloud): the deck back's part-of-speech badge is chrome in the interface language
+
+REVIEW.md #12: in EN the card back's part-of-speech chip read 名詞, Japanese chrome in EN (the EN/JA law). It now reads the interface's name for it (EN `noun`, `lang="en"`; 日本語 `名詞`). The tier-one check read the whole `.kp-word` row's text, badge included, against `/[A-Za-z]/`, so an English chrome label would have failed "no English in tier one".
+
+| File / assertion | Before | After | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-kotoba-mine.mjs` `BACK` (≈1219) and check "b) tier one under the passage…" (≈1276) | tier-one text = `textContent` of `.kp-word`, `.kp-def`, `.kp-note` | the same with the `.kp-posbadge` element left out of the text; the check additionally requires the badge (EN run) to read an English name, `lang="en"`, with no kana or kanji | The badge is interface chrome, not answer text. Every other tier-one requirement is unchanged: the headword, reading, definition and note must still carry no Latin (no English meaning before the 英語 fold), the row must still be `kp-term,kp-reading,kp-posbadge`, and the badge is now also pinned to the interface language. |

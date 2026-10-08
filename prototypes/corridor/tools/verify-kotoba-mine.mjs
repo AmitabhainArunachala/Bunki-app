@@ -1216,9 +1216,11 @@ async function verifyBack(browser, base) {
     const ans = card.querySelector('.kp-answer');
     const sentence = card.querySelector('.kp-sentence').cloneNode(true);
     sentence.querySelectorAll('ruby').forEach((r) => r.remove());
-    const tier1 = [...ans.querySelectorAll(':scope > .kp-word, :scope > .kp-def, :scope > .kp-note')].map((n) => n.textContent).join(' ');
+    // the part-of-speech badge is interface chrome (EN: noun, 日本語: 名詞; read as pos below), not the answer's text
+    const tier1 = [...ans.querySelectorAll(':scope > .kp-word, :scope > .kp-def, :scope > .kp-note')].map((n) => { const x = n.cloneNode(true); x.querySelectorAll('.kp-posbadge').forEach((b) => b.remove()); return x.textContent; }).join(' ');
+    const badge = ans.querySelector('.kp-word > .kp-posbadge');
     const fold = (cls) => { const d = card.querySelector('.' + cls); return d ? { open: d.open, text: d.textContent.replace(d.querySelector('summary').textContent, '').trim(), summary: d.querySelector('summary').textContent } : null; };
-    return { order: [...ans.children].map((n) => n.className), word: [...ans.querySelector('.kp-word').children].map((n) => n.className), pitch: !!card.querySelector('.kp-pitch'),
+    return { pos: badge ? { text: badge.textContent, lang: badge.lang } : null, order: [...ans.children].map((n) => n.className), word: [...ans.querySelector('.kp-word').children].map((n) => n.className), pitch: !!card.querySelector('.kp-pitch'),
       bare: ${KANJI_RE}.test(sentence.textContent), rt: card.querySelectorAll('.kp-sentence rt').length, tier1, def: ans.querySelector('.kp-def')?.textContent,
       summaries: [...ans.querySelectorAll('.kp-folds > details > summary')].map((s) => s.textContent), native: [...ans.querySelectorAll('.kp-folds > *')].every((n) => n.tagName === 'DETAILS' || n.id === 'kp-see'),
       gloss: fold('kp-f-gloss'), en: fold('kp-f-en'), kanji: fold('kp-f-kanji'), sem: fold('kp-f-sem'), others: fold('kp-f-others'), src: fold('kp-f-src'),
@@ -1271,9 +1273,11 @@ async function verifyBack(browser, base) {
     const b = await o.page.evaluate(BACK);
     const tier1 = b.order.slice(0, b.order.indexOf('kp-folds'));
     check(
-      'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English',
-      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null,
-      JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare }),
+      'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English; the part-of-speech badge is chrome in the interface language (EN: noun)',
+      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null &&
+        // the badge follows the interface (this run is EN): the English name, marked lang=en, never 名詞 in EN chrome
+        b.pos?.lang === 'en' && /^[a-z -]+$/.test(b.pos.text) && !/[\u3040-\u30ff\u3400-\u9fff]/u.test(b.pos.text),
+      JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare, pos: b.pos }),
     );
     const sibs = w.cards.filter((x) => x.type === 'word' && x.passage !== c.passage);
     check(
