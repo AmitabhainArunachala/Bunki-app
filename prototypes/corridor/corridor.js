@@ -28400,24 +28400,540 @@ function openPersonalCollection() {
   url.searchParams.set('deck', 'personal'); url.searchParams.set('ui', S.lang);
   location.assign(url);
 }
+/* ---- Me: the book of your year (A 磨き's Me book, with C's and D's grafts). Read only: every
+ * figure is counted from the learner's own record (S.stats, S.revlog, S.obslog, S.readDone,
+ * S.taken, S.srs, S.sentencePractice) or a deck's own ledger (bunki-cloze:<id>, read, never
+ * written), and a figure with nothing behind it is left out, never estimated. ---- */
+const ME_NIGHT_WORLDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
+const ME_DECKS = [
+  { id: 'n1', ja: 'N1の語彙', en: 'N1 vocabulary', measureJa: '想起で保持 · N1デッキ', measureEn: 'held by recall · N1 deck' },
+  { id: 'senmon', ja: 'あなたの専門', en: 'Your fields', measureJa: '想起で保持 · 専門デッキ', measureEn: 'held by recall · fields deck' },
+];
+const ME_MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** session only: how many months back the seal calendar is turned */
+let meMonthBack = 0;
+/** deck id → { cards: Map(card id → {word, term, reading}), total } | null (could not load) | a promise */
+const meDeckIndex = new Map();
+function meDeckLedger(id) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
+    // only a ledger the deck player itself would read (its format, version and deck)
+    return raw && raw.format === 'bunki-cloze-state' && raw.version === 1 && raw.deckId === id &&
+      raw.cards && typeof raw.cards === 'object' && !Array.isArray(raw.cards) && Object.keys(raw.cards).length ? raw : null;
+  } catch {
+    return null;
+  }
+}
+/** the deck's words, fetched once and only for a deck the learner has opened */
+function meDeckWords(id, onReady) {
+  const have = meDeckIndex.get(id);
+  if (have === null || (have && !(have instanceof Promise))) return have;
+  if (!have) {
+    const packed = window.__CORRIDOR_BUNDLE__?.[`decks/${id}`] || window.__KP_DECKS__?.[id];
+    const got = packed ? Promise.resolve(packed)
+      : fetch(new URL(`decks/${id}/deck.json`, document.baseURI)).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`deck ${id} ${r.status}`))));
+    meDeckIndex.set(id, got.then((deck) => {
+      const cards = new Map();
+      for (const w of deck.words || []) for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '' });
+      const index = { cards, total: (deck.words || []).length };
+      meDeckIndex.set(id, index);
+      return index;
+    }, () => {
+      meDeckIndex.set(id, null);
+      return null;
+    }));
+  }
+  meDeckIndex.get(id).then(onReady);
+  return undefined;
+}
+const meNum = (n) => Number(n).toLocaleString('en-US');
+function meDate(t, year = false) {
+  const d = new Date(t);
+  return tx(`${year ? `${d.getFullYear()}年` : ''}${d.getMonth() + 1}月${d.getDate()}日`,
+    `${d.getDate()} ${ME_MONTHS_EN[d.getMonth()].slice(0, 3)}${year ? ` ${d.getFullYear()}` : ''}`);
+}
+function meRevoked() {
+  const out = new Set();
+  for (const row of S.revlog || []) if (Array.isArray(row) && row[2] === 0) out.add(row[3]);
+  return out;
+}
+/** every day with real practice: cards (reviews, drills, lessons, papers, deck answers, written
+ * sentences) or reading (a finished article, a tap in the reader) */
+function meDays(decks) {
+  const days = new Map();
+  let first = Infinity;
+  const mark = (t, kind) => {
+    if (!finiteNumber(t) || t <= 0) return;
+    const key = dayKey(new Date(t));
+    const day = days.get(key) || { cards: false, read: false };
+    day[kind] = true;
+    days.set(key, day);
+    if (t < first) first = t;
+  };
+  for (const [key, day] of Object.entries(S.stats || {})) {
+    const [y, m, d] = key.split('-').map(Number);
+    if (day && day.n > 0 && y && m && d) mark(new Date(y, m - 1, d, 12).getTime(), 'cards');
+  }
+  const revoked = meRevoked();
+  (S.revlog || []).forEach((row, i) => { if (Array.isArray(row) && row[2] !== 0 && !revoked.has(i)) mark(row[0], 'cards'); });
+  for (const row of S.obslog || []) {
+    if (!Array.isArray(row)) continue;
+    if (row[1] === 'tap') mark(row[0], 'read');
+    else if (['probe', 'dojo', 'lesson', 'mock'].includes(row[1])) mark(row[0], 'cards');
+  }
+  for (const t of Object.values(S.readDone || {})) mark(t, 'read');
+  for (const r of S.sentencePractice?.responses || []) mark(Date.parse(r.at), 'cards');
+  for (const d of decks) for (const row of d.ledger?.log || []) if (Array.isArray(row)) mark(Date.parse(row[2]), 'cards');
+  return { days, first: Number.isFinite(first) ? new Date(first) : null };
+}
+/** graft D's lead figure: characters of the articles you finished, less the words you tapped for help */
+function meReadUnaided() {
+  const passages = D.passages || [];
+  const finished = passages.filter((p) => owns(S.readDone || {}, p.id) && finiteNumber(p.chars));
+  if (!finished.length) return null;
+  const ids = new Set(finished.map((p) => p.id));
+  const looked = new Set();
+  let helped = 0;
+  for (const row of S.obslog || []) {
+    if (!Array.isArray(row) || row[1] !== 'tap' || !ids.has(row[4]) || typeof row[2] !== 'string') continue;
+    const once = `${row[4]}\u0000${row[2]}`;
+    if (looked.has(once)) continue;
+    looked.add(once);
+    helped += [...row[2].replace(/^word:/, '')].length;
+  }
+  const read = finished.reduce((sum, p) => sum + p.chars, 0);
+  return { n: Math.max(0, read - helped), articles: finished.length, looked: looked.size };
+}
+function meHorizons(decks) {
+  const rows = [];
+  for (const h of ME_DECKS) {
+    const d = decks.find((x) => x.id === h.id);
+    const held = new Set();
+    for (const [cardId, rec] of Object.entries(d.ledger?.cards || {})) {
+      const word = d.index?.cards.get(cardId)?.word || cardId.slice(0, cardId.lastIndexOf('-'));
+      if (rec && rec.state === 2 && !owns(d.ledger.suspended || {}, cardId)) held.add(word);
+    }
+    rows.push({ id: h.id, ja: h.ja, en: h.en, n: held.size, of: d.index?.total ?? null, begun: !!d.ledger,
+      measure: tx(h.measureJa, h.measureEn) });
+  }
+  const kk = D.kanken || {};
+  const met = new Set();
+  const heldK = new Set();
+  const add = (text, held) => {
+    for (const c of String(text || '')) if (owns(kk, c)) { met.add(c); if (held) heldK.add(c); }
+  };
+  let saved = 0;
+  let savedHeld = 0;
+  for (const item of S.taken || []) {
+    const key = srsKey(item.t, item.id);
+    const held = S.srs[key]?.state === 2 && !S.suspended?.[key];
+    saved += 1;
+    if (held) savedHeld += 1;
+    if (['word', 'kanji', 'idiom'].includes(item.t)) add(item.t === 'kanji' ? item.id : item.label || item.id, held);
+  }
+  for (const d of decks) {
+    if (!d.index || !d.ledger) continue;
+    for (const [cardId, rec] of Object.entries(d.ledger.cards)) {
+      const w = d.index.cards.get(cardId);
+      if (w) add(w.term, rec?.state === 2 && !owns(d.ledger.suspended || {}, cardId));
+    }
+  }
+  rows.push({ id: 'kanken', ja: '漢検の漢字', en: 'Kanken kanji', n: heldK.size, of: Object.keys(kk).length, met: met.size, begun: met.size > 0,
+    measure: tx(`想起で保持 · 出会った ${meNum(met.size)} 字`, `held by recall · ${meNum(met.size)} met`) });
+  rows.push({ id: 'saved', ja: '集めた言葉', en: 'Words you saved', n: savedHeld, of: saved, begun: saved > 0,
+    measure: tx('想起で保持 · 自分で集めた札', 'held by recall · cards you saved yourself') });
+  return rows;
+}
+/** 継いだ言葉: a word that lapsed in review and was later recalled again. The corridor's review log
+ * names the state before each grade; a deck's log does not, so a deck card counts only when it
+ * has lapsed (its own lapse count), stands in review again, and was recalled on a later day. */
+function meCameHome(decks) {
+  const rows = [];
+  const revoked = meRevoked();
+  const pending = new Map();
+  const homes = new Map();
+  (S.revlog || []).forEach((row, i) => {
+    if (!Array.isArray(row) || row[2] === 0 || revoked.has(i)) return;
+    if (row[3] === 2 && row[2] === 1) pending.set(row[1], row[0]);
+    else if (row[3] === 2 && row[2] >= 2 && pending.has(row[1])) {
+      homes.set(row[1], { lapsed: pending.get(row[1]), home: row[0] });
+      pending.delete(row[1]);
+    }
+  });
+  const byKey = new Map((S.taken || []).map((item) => [srsKey(item.t, item.id), item]));
+  for (const [key, h] of homes) {
+    const item = byKey.get(key);
+    if (!item || !['word', 'kanji', 'idiom'].includes(item.t)) continue;
+    const answer = item.t === 'word' ? savedAnswerFor(item) : null;
+    rows.push({ surface: item.t === 'kanji' ? item.id : item.label || item.id, reading: answer?.status === 'available' ? answer.reading : '', ...h });
+  }
+  for (const d of decks) {
+    if (!d.index || !d.ledger) continue;
+    const log = new Map();
+    for (const row of d.ledger.log || []) {
+      const t = Array.isArray(row) ? Date.parse(row[2]) : NaN;
+      if (!Number.isFinite(t)) continue;
+      if (!log.has(row[0])) log.set(row[0], []);
+      log.get(row[0]).push([t, row[1]]);
+    }
+    for (const [cardId, rec] of Object.entries(d.ledger.cards)) {
+      if (!rec || !(rec.lapses > 0) || rec.state !== 2) continue;
+      const answers = log.get(cardId) || [];
+      let lapsed = null;
+      for (const [t, g] of answers) if (g === 1) lapsed = t;
+      const home = lapsed == null ? null : answers.find(([t, g]) => g >= 2 && t > lapsed && dayKey(new Date(t)) !== dayKey(new Date(lapsed)));
+      const w = d.index.cards.get(cardId);
+      if (home && w) rows.push({ surface: w.term, reading: w.reading, lapsed, home: home[0] });
+    }
+  }
+  const seen = new Set();
+  return rows.sort((a, b) => b.home - a.home).filter((r) => !seen.has(r.surface) && seen.add(r.surface)).slice(0, 4);
+}
+/** the newest line the learner wrote by hand in sentence practice, else the newest line they kept */
+function meCopiedLine() {
+  const sp = S.sentencePractice;
+  if (!sp) return null;
+  const entries = new Map((sp.entries || []).map((e) => [e.plan?.id, e]));
+  const wrote = (sp.responses || []).filter((r) => r.mode === 'production' && typeof r.text === 'string' && r.text.trim())
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0];
+  if (wrote) return { text: wrote.text.trim(), title: entries.get(wrote.entryId)?.context?.title || '', at: Date.parse(wrote.at), hand: true };
+  const kept = (sp.entries || []).at(-1);
+  if (kept?.context?.quote) return { text: kept.context.quote, title: kept.context.title || '', at: Date.parse(kept.plan?.capture?.occurredAt), hand: false };
+  return null;
+}
+/** a gold seam along the word's own crack: the same word always breaks the same way */
+function meSeam(surface) {
+  let h = 2166136261;
+  for (const c of String(surface)) h = Math.imul(h ^ c.codePointAt(0), 16777619) >>> 0;
+  const next = () => {
+    h = Math.imul(h ^ (h >>> 13), 2246822507) >>> 0;
+    return (h % 1000) / 1000;
+  };
+  // a crack, not a wave: uneven runs, sharp turns, one short branch
+  const pts = [[0, 9 + (next() - 0.5) * 4]];
+  for (let x = 0, up = next() < 0.5; x < 100; up = !up) {
+    x = Math.min(100, x + 7 + next() * 11);
+    pts.push([x, 9 + (up ? -1 : 1) * (1.5 + next() * 5.5)]);
+  }
+  const at = pts[1 + Math.floor(next() * (pts.length - 2))];
+  const branch = [at, [at[0] + 5 + next() * 6, at[1] < 9 ? 1 + next() * 2 : 15 + next() * 2]];
+  const line = (list) => list.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'me-seam');
+  svg.setAttribute('viewBox', '0 0 100 18');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [d, cls] of [[line(pts), 'me-seam-main'], [line(branch), 'me-seam-branch']]) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', cls);
+    path.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.append(path);
+  }
+  return svg;
+}
+function meSection(part, ja, en, aside) {
+  const sec = el('section', `me-part me-${part}`);
+  sec.dataset.mePart = part;
+  const head = el('div', 'me-part-head');
+  head.append(el('h2', 'eyebrow', tx(ja, en)));
+  if (aside) head.append(el('span', 'me-part-aside', aside));
+  sec.append(head);
+  return sec;
+}
+function meHorizonsPart(decks) {
+  const sec = meSection('horizons', '四つの地平', 'Four horizons');
+  for (const h of meHorizons(decks)) {
+    const row = el('div', 'me-hz');
+    row.dataset.horizon = h.id;
+    if (!h.begun) row.classList.add('not-begun');
+    const top = el('div', 'me-hz-top');
+    top.append(el('span', 'me-hz-name', tx(h.ja, h.en)));
+    const figure = el('span', 'me-hz-n');
+    figure.append(el('b', '', h.begun ? meNum(h.n) : '—'));
+    if (h.of && h.begun) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
+    top.append(figure);
+    const rule = el('div', 'me-hz-rule');
+    rule.setAttribute('aria-hidden', 'true');
+    if (h.of && h.met) {
+      const met = el('i', 'me-hz-met');
+      met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
+      rule.append(met);
+    }
+    const fill = el('i', 'me-hz-fill');
+    fill.style.setProperty('--f', h.of ? Math.min(1, h.n / h.of).toFixed(4) : '0');
+    rule.append(fill);
+    const sub = el('p', 'me-hz-sub');
+    if (!h.begun) sub.textContent = {
+      saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
+      kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
+    }[h.id] || tx('まだ始めていない · 学ぶの部屋にある', 'not begun · the deck is in Learn');
+    else {
+      sub.append(el('span', '', h.measure));
+      if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
+    }
+    row.append(top, rule, sub);
+    sec.append(row);
+  }
+  return sec;
+}
+function meCameHomePart(decks, active) {
+  const home = meCameHome(decks);
+  if (!home.length && !active) return null;
+  const sec = meSection('mended', '戻ってきた言葉', 'Came home', tx('金で継いだ', 'mended in gold'));
+  if (!home.length) {
+    sec.append(el('p', 'me-quiet', tx('忘れた言葉をもう一度思い出すと、ここに金で継がれる。',
+      'When a word slips and you win it back, it is mended here in gold.')));
+    return sec;
+  }
+  const list = el('ol', 'me-home-list');
+  home.forEach((h, i) => {
+    const li = el('li', 'me-home');
+    li.style.setProperty('--i', String(i));
+    const word = el('span', 'me-home-w');
+    const surface = el('span', 'me-home-surface', h.surface);
+    surface.lang = 'ja';
+    surface.dataset.uiContent = 'learning';
+    word.append(surface);
+    if (h.reading && h.reading !== h.surface) {
+      const reading = el('span', 'me-home-r', h.reading);
+      reading.lang = 'ja';
+      reading.dataset.uiContent = 'learning';
+      word.append(reading);
+    }
+    const seam = el('span', 'me-home-seam');
+    seam.setAttribute('aria-hidden', 'true');
+    seam.append(meSeam(h.surface), el('i', 'me-gleam'));
+    const when = el('span', 'me-home-when');
+    when.append(el('span', '', tx(`${meDate(h.lapsed)} 失念`, `lapsed ${meDate(h.lapsed)}`)),
+      el('b', '', tx(`${meDate(h.home)} 回復`, `held ${meDate(h.home)}`)));
+    li.append(word, seam, when);
+    list.append(li);
+  });
+  sec.append(list);
+  return sec;
+}
+function meSealsPart(days, first) {
+  const now = new Date();
+  const maxBack = first ? (now.getFullYear() - first.getFullYear()) * 12 + now.getMonth() - first.getMonth() : 0;
+  meMonthBack = Math.min(Math.max(0, meMonthBack), Math.max(0, maxBack));
+  const month = new Date(now.getFullYear(), now.getMonth() - meMonthBack, 1);
+  const y = month.getFullYear();
+  const m = month.getMonth();
+  const length = new Date(y, m + 1, 0).getDate();
+  const sec = el('section', 'me-part me-seals');
+  sec.dataset.mePart = 'seals';
+  const head = el('div', 'me-month');
+  const turn = (step, ja, en, disabled) => {
+    const b = el('button', `me-turn me-turn-${step > 0 ? 'back' : 'on'}`);
+    b.type = 'button';
+    b.setAttribute('aria-label', tx(ja, en));
+    b.disabled = disabled;
+    b.addEventListener('click', () => {
+      meMonthBack += step;
+      const next = meSealsPart(days, first);
+      next.classList.add(step > 0 ? 'turned-back' : 'turned-on');
+      sec.replaceWith(next);
+      const same = next.querySelector(`.me-turn-${step > 0 ? 'back' : 'on'}`);
+      (same && !same.disabled ? same : next.querySelector('.me-turn:not(:disabled)'))?.focus();
+    });
+    return b;
+  };
+  const title = el('h2', 'me-month-title');
+  title.append(el('span', 'me-month-name', tx(`${m + 1}月`, ME_MONTHS_EN[m])), el('span', 'me-month-year', String(y)));
+  head.append(turn(1, '前の月', 'Previous month', meMonthBack >= maxBack), title, turn(-1, '次の月', 'Next month', meMonthBack === 0));
+  const dow = el('div', 'me-dow');
+  dow.setAttribute('aria-hidden', 'true');
+  for (const d of (bi() ? ['S', 'M', 'T', 'W', 'T', 'F', 'S'] : ['日', '月', '火', '水', '木', '金', '土'])) dow.append(el('span', '', d));
+  const grid = el('div', 'me-cal');
+  let practised = 0;
+  for (let i = 0; i < month.getDay(); i += 1) grid.append(el('i', 'me-day blank'));
+  for (let d = 1; d <= length; d += 1) {
+    const key = dayKey(new Date(y, m, d));
+    const day = days.get(key);
+    const cell = el('i', 'me-day');
+    cell.append(el('span', 'me-day-n', String(d)));
+    if (day) {
+      practised += 1;
+      cell.classList.add('seal', day.cards ? 'seal-cards' : 'seal-read');
+      cell.style.setProperty('--i', String(practised));
+      cell.append(el('span', 'me-seal', day.cards ? '習' : '読'));
+    }
+    if (key === dayKey(now)) cell.classList.add('is-today');
+    grid.append(cell);
+  }
+  grid.setAttribute('role', 'img');
+  grid.setAttribute('aria-label', tx(`${y}年${m + 1}月 · 稽古した日 ${practised} 日`, `${ME_MONTHS_EN[m]} ${y}: ${practised} day${practised === 1 ? '' : 's'} practised`));
+  const foot = el('p', 'me-cal-foot');
+  const legend = (glyph, ja, en) => {
+    const k = el('span', 'me-key');
+    const s = el('span', `me-key-seal${glyph === '読' ? ' read' : ''}`, glyph);
+    s.setAttribute('aria-hidden', 'true');
+    k.append(s, el('span', '', tx(ja, en)));
+    return k;
+  };
+  foot.append(legend('習', '札', 'cards'), legend('読', '読むだけ', 'reading only'),
+    el('span', 'me-cal-count', tx(`この月 ${practised} 日`, `${practised} this month`)));
+  sec.append(head, dow, grid, foot);
+  return sec;
+}
+function meLinePart() {
+  const line = meCopiedLine();
+  if (!line) return null;
+  const sec = meSection('line', line.hand ? '書き写した一文' : '書き留めた一文', line.hand ? 'A line you wrote by hand' : 'A line you kept');
+  const text = el('p', 'me-hand', line.text);
+  text.lang = 'ja';
+  text.dataset.uiContent = 'learning';
+  const src = el('p', 'me-line-src');
+  if (line.title) {
+    const t = el('span', 'me-line-title', line.title);
+    t.lang = 'ja';
+    t.dataset.uiContent = 'learning';
+    src.append(el('span', '', tx('出典 ', 'from ')), t);
+  }
+  if (Number.isFinite(line.at)) src.append(el('b', '', `${line.title ? ' · ' : ''}${meDate(line.at)}`));
+  sec.append(text, src);
+  return sec;
+}
+/** 奥付: the back of the book — the two everyday switches, then every setting */
+function meBackPart() {
+  const sec = meSection('back', '奥付', 'At the back of the book');
+  const row = (ja, en, seg) => {
+    const r = el('div', 'me-set');
+    r.append(el('span', 'me-set-l', tx(ja, en)), seg);
+    return r;
+  };
+  const seg = (ja, en) => {
+    const s = el('div', 'me-seg');
+    s.setAttribute('role', 'group');
+    s.setAttribute('aria-label', tx(ja, en));
+    return s;
+  };
+  const language = seg('表示言語', 'Interface language');
+  for (const [id, label] of [['bi', tx('英語', 'English')], ['ja', '日本語']]) {
+    const b = el('button', '', label);
+    b.type = 'button';
+    b.dataset.lang = id;
+    if (id === 'ja') b.lang = 'ja';
+    b.setAttribute('aria-pressed', String(S.lang === id));
+    b.addEventListener('click', () => {
+      if (S.lang === id) return;
+      S.lang = id;
+      render();
+    });
+    language.append(b);
+  }
+  const light = seg('明かり', 'Light');
+  const lights = [];
+  const paintLight = () => {
+    const night = ME_NIGHT_WORLDS.includes(themeId());
+    for (const b of lights) b.setAttribute('aria-pressed', String((b.dataset.light === 'night') === night));
+  };
+  for (const [id, ja, en] of [['day', '昼', 'Day'], ['night', '夜', 'Night']]) {
+    const b = el('button', '', tx(ja, en));
+    b.type = 'button';
+    b.dataset.light = id;
+    b.addEventListener('click', () => {
+      if ((id === 'night') === ME_NIGHT_WORLDS.includes(themeId())) return;
+      setKairoTheme(id === 'night' ? 'yoru' : 'hokusai');
+      S.sealWake = true;
+      applyWorldSwap();
+      paintLight();
+    });
+    lights.push(b);
+    light.append(b);
+  }
+  paintLight();
+  const doors = el('div', 'foundation-doors me-back-doors');
+  doors.append(foundationDoor('me-settings', '設定', 'Settings', 'settings'));
+  sec.append(row('表示言語', 'Interface language', language), row('明かり', 'Light', light), doors);
+  return sec;
+}
 function renderMe(main) {
-  main.append(el('h1', 'view-title', tx('私', 'Me')));
-  main.append(el('p', 'gloss', tx('学びの足跡、集めた言葉、あなたのための設定。', 'Your progress, your collections, and the way you like to learn.')));
-  const doors = el('div', 'foundation-doors');
+  const decks = ME_DECKS.map((d) => ({ id: d.id, ledger: meDeckLedger(d.id), index: undefined }));
+  for (const d of decks) {
+    const known = meDeckIndex.get(d.id);
+    if (d.ledger && known && !(known instanceof Promise)) d.index = known;
+  }
+  const book = el('div', 'me-book');
+  const spine = el('div', 'me-spine');
+  spine.setAttribute('aria-hidden', 'true');
+  const edges = el('div', 'me-edges');
+  edges.setAttribute('aria-hidden', 'true');
+  book.append(spine, edges);
+  const { days, first } = meDays(decks);
+  const now = new Date();
+  const head = el('header', 'me-head');
+  head.append(el('p', 'eyebrow me-kicker', tx('一年の帳', 'The book of your year')));
+  head.append(el('h1', 'view-title', tx('日本語の一年', 'Your year in Japanese')));
+  const dateline = el('p', 'me-dateline');
+  if (first) {
+    const dayN = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(first.getFullYear(), first.getMonth(), first.getDate())) / 86400000) + 1;
+    // each clause holds together; the line breaks only at its dots
+    const clause = (...parts) => {
+      const span = el('span', 'me-clause');
+      span.append(...parts.map((p, i) => (i % 2 ? el('b', '', p) : p)));
+      return span;
+    };
+    const clauses = bi()
+      ? [clause('since ', meDate(first, true)), clause('day ', meNum(dayN)), clause('', meNum(days.size), ` day${days.size === 1 ? '' : 's'} practised`)]
+      : [clause('', meDate(first, true), 'から'), clause('', meNum(dayN), ' 日目'), clause('稽古 ', meNum(days.size), ' 日')];
+    clauses.forEach((c, i) => dateline.append(...(i ? [' · ', c] : [c])));
+  } else {
+    dateline.classList.add('is-blank');
+    dateline.textContent = tx('最初の札か記事から、この帳が始まる。', 'Your book begins with your first card or article.');
+  }
+  head.append(dateline);
+  const reading = meReadUnaided();
+  if (reading) {
+    const lead = el('p', 'me-lead');
+    lead.append(el('b', 'me-lead-n', meNum(reading.n)), el('span', 'me-lead-l', tx('字を自力で読んだ', 'characters read unaided')),
+      el('span', 'me-lead-m', tx(`読み終えた ${reading.articles} 編から、調べた ${reading.looked} 語を除く`,
+        `in ${reading.articles} finished article${reading.articles === 1 ? '' : 's'}, less the ${reading.looked} word${reading.looked === 1 ? '' : 's'} you looked up`)));
+    head.append(lead);
+  }
+  book.append(head);
+  let horizons = meHorizonsPart(decks);
+  let home = meCameHomePart(decks, !!first);
+  book.append(horizons);
+  if (home) book.append(home);
+  book.append(meSealsPart(days, first));
+  const line = meLinePart();
+  if (line) book.append(line);
+  const contents = meSection('contents', '目次', 'Inside the book');
+  const doors = el('div', 'foundation-doors me-doors');
   doors.append(
     foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
     foundationDoor('me-statistics', '復習の統計', 'Review statistics', 'srs-stats'),
     foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
-    foundationDoor('me-settings', '設定', 'Settings', 'settings'),
   );
   if (window.__CORRIDOR_STANDALONE__ !== true) {
     const personal = biLabel('button', 'grammar-link foundation-door', '私の文脈', 'Personal collections');
     personal.type = 'button'; personal.id = 'me-personal';
     personal.addEventListener('click', openPersonalCollection); doors.append(personal);
   }
-  main.append(doors);
+  contents.append(doors);
+  book.append(contents, meBackPart());
+  main.append(book);
+  // a deck the learner has opened brings its words: the horizon's whole, its kanji, its mended words
+  for (const d of decks) {
+    if (!d.ledger || d.index) continue;
+    meDeckWords(d.id, (index) => {
+      if (!index || !book.isConnected || d.index) return;
+      d.index = index;
+      const nextHorizons = meHorizonsPart(decks);
+      nextHorizons.classList.add('me-settle');
+      horizons.replaceWith(nextHorizons);
+      horizons = nextHorizons;
+      const nextHome = meCameHomePart(decks, !!first);
+      if (home && nextHome) home.replaceWith(nextHome);
+      else if (nextHome) horizons.after(nextHome);
+      if (nextHome) home = nextHome;
+    });
+  }
 }
 function renderSettings(main) {
+  main.append(el('p', 'eyebrow me-kicker', tx('奥付', 'At the back of the book')));
   main.append(el('h1', 'view-title', tx('設定', 'Settings')));
   const language = el('section', 'foundation-section');
   language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
