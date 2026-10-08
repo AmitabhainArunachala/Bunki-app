@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "甥",
-   "reading": "おい",
-   "pos": "noun",
-   "meaning": "nephew",
-   "defJa": "兄弟姉妹の息子",
-   "passage": {
-    "ja": "叙事詩『マハーバーラタ』は、親族どうしが敵味方に分かれて戦う物語として知られる。主人公アルジュナの息子アビマニユは、クリシュナにとって甥にあたる若者だが、戦場で若くして命を落とす。この場面は、戦争が血縁の絆さえ容赦なく断ち切ることを、読者に強く印象づける。開戦に先立って親族の顔ぶれを見渡したアルジュナの動揺が、『バガヴァッド・ギーター』の対話の発端となった。その苦悩は、時代を超えて普遍的な問いとして読み継がれている。",
-    "form": "甥",
-    "en": "The epic Mahabharata is known as a story in which kinsmen split into enemy and ally and fight. Arjuna's son Abhimanyu, a young man who is Krishna's nephew, loses his life on the battlefield while still young. This scene strongly impresses on the reader that war mercilessly severs even bonds of blood. Arjuna's distress on surveying the faces of his relatives before the start of battle became the origin of the dialogue of the Bhagavad Gita. That anguish continues to be read across the ages as a universal question.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「甥と姪」「〜の甥」。「おじ・おば」との対応で覚える親族語。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "短期間",
    "reading": "たんきかん",
    "pos": "noun",

@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "流動性知能",
-   "reading": "りゅうどうせいちのう",
-   "pos": "noun",
-   "meaning": "fluid intelligence",
-   "defJa": "新しい問題をその場で解く知的な力",
-   "passage": {
-    "ja": "流動性知能って、初めての問題をその場で解く力のことで、二十代をピークに少しずつ落ちていくと言われるじゃないですか。でも、だからといって、大人になったら何も身につかないわけじゃないんです。経験で積み上げた知識、つまり結晶性知能のほうは、年を重ねても伸び続けるとされています。実際、四十代や五十代で活躍する棋士が多いのは、その好例でしょう。だから学び直しは、遅すぎるどころか、むしろ大人の強みを生かせるやり方なんですよ。",
-    "form": "流動性知能",
-    "en": "Fluid intelligence is the ability to solve unfamiliar problems on the spot, and it is said to decline gradually after peaking in your twenties, right? But that doesn't mean adults can't pick up anything new. Knowledge built up through experience, that is, crystallized intelligence, is said to keep growing as you age. Indeed, the many shogi players still active in their forties and fifties are a good example. So relearning is far from too late; it is in fact a way to make use of an adult's strengths.",
-    "register": "話",
-    "topic": "mind",
-    "tipJa": "「結晶性知能」と対にして語る心理学の用語。年齢による変化の話題に出る。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "暗示",
    "reading": "あんじ",
    "pos": "noun",
@@ -287,28 +265,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "瞑想",
-   "reading": "めいそう",
-   "pos": "noun",
-   "meaning": "meditation",
-   "defJa": "目を閉じて静かに心を集中させること",
-   "passage": {
-    "ja": "瞑想って、座ってなんにも考えない時間だと思われがちじゃないですか。でも実際にやってみると、考えが次々に湧いてきて、むしろ驚くんですよ。大事なのは、それを止めることじゃなくて、「あ、また考えてたな」と気づいて呼吸に戻ることなんです。神経科学の研究でも、続けた人の脳に変化が見られると報告されています。そうして続ければ、頭の中の騒がしさに振り回されることなく過ごせるようになってきます。",
-    "form": "瞑想",
-    "en": "People tend to think meditation is time spent sitting and thinking about nothing, don't they? But when you actually try it, thoughts well up one after another, and you are rather surprised. What matters is not stopping them but noticing 'oh, I was thinking again' and returning to the breath. Neuroscience studies, too, report changes in the brains of people who kept it up. If you continue like that, you come to be able to go about your day without being tossed around by the noise in your head.",
-    "register": "話",
-    "topic": "mind",
-    "tipJa": "「瞑想する」「瞑想にふける」。静かに心を集中させる実践を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "狩猟採集民",
    "reading": "しゅりょうさいしゅうみん",
    "pos": "noun",
@@ -347,28 +303,6 @@
    },
    "deck": "senmon",
    "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "漢語",
-   "reading": "かんご",
-   "pos": "noun",
-   "meaning": "Chinese word, Sino-Japanese word",
-   "defJa": "漢字の音読みで成り立つ語",
-   "passage": {
-    "ja": "「実施する」「開始する」「使用する」と漢語を重ねると、文章は引き締まる反面、どこか冷たい印象を与えてしまいます。そこで「行う」「始める」「使う」といった和語に置き換えると、ぐっと読みやすくなります。「死ぬ」と「死去する」の差を思い浮かべると、感覚がつかみやすいでしょう。ただし、硬い語を避ければいいという話ではありません。論文や公的な文書では、その簡潔さこそが、正確さと客観性を支えているのです。",
-    "form": "漢語",
-    "en": "Piling up Sino-Japanese words like 'jisshi suru,' 'kaishi suru' and 'shiyo suru' tightens the prose but, on the other hand, gives a somewhat cold impression. If you swap them for native words such as 'okonau,' 'hajimeru' and 'tsukau,' it becomes much easier to read. Thinking of the difference between 'shinu' and 'shikyo suru' may help you get a feel for it. However, it isn't simply a matter of avoiding stiff words. In papers and official documents, it is precisely that conciseness that supports accuracy and objectivity.",
-    "register": "語",
-    "topic": "language",
-    "tipJa": "「和語」と対比して使う。硬く簡潔な印象を生む語種のこと。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

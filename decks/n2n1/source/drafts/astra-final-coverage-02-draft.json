@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "締めくくり",
+   "reading": "しめくくり",
+   "pos": "noun",
+   "meaning": "rounding off; conclusion",
+   "defJa": "話や物事をまとめて終えること。",
+   "passage": {
+    "register": "語",
+    "topic": "language",
+    "form": "締めくくり",
+    "sense": "それまでの内容をまとめて終えること。",
+    "tipJa": "動詞「締めくくる」の名詞形。単なる終了より、まとめて区切りを付ける意味がある。",
+    "ja": "議事録の末尾に「終了の言葉」と書いてみたものの、会の内容をまとめたという意味までは伝わりませんでした。そこで、話をまとめて終える動詞「締めくくる」から作った名詞を使い、「会の締めくくり」と書き直します。単に最後の時点を示すのではなく、それまでの話に区切りを付ける働きが前に出ます。ただし、時刻だけを知らせる案内なら、平易な「終了」のほうが合うでしょう。常套句のようにどこにでも置くのではなく、記録する場面に応じて、何を言い表したいかを考えて選びます。",
+    "en": "I tried writing “words at the end” at the end of the minutes, but it did not convey that the content of the meeting had been drawn together. So I use a noun derived from the verb meaning to bring a discussion together and end it, rewriting the phrase as “the rounding off of the meeting.” This foregrounds the act of bringing the preceding discussion to a close rather than simply indicating the final point in time. If the notice only gives a time, however, the plain word for “ending” will be more suitable. Rather than placing the expression everywhere like a stock phrase, I choose it by considering what I want to convey in the particular situation being recorded."
+   }
+  }
+ ]
+}

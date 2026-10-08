@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "です・ます調",
-   "reading": "ですますちょう",
-   "pos": "noun",
-   "meaning": "desu/masu style",
-   "defJa": "文末を丁寧な形で結ぶ文体。",
-   "passage": {
-    "ja": "小論文の試験では、です・ます調で書いてしまって減点された、という話をよく聞きます。採点者が見ているのは、実は丁寧さではなく、文体が最後まで一貫しているかどうかなんですね。どんなに語彙が豊富でも、途中で「だ」と「です」が混ざった答案は、それだけで読みにくい印象を与えます。書き始める前に、どちらで通すのかを決めておくに越したことはありません。ちなみに、この癖は話し言葉にも出るので、普段から意識しておくと楽です。",
-    "form": "です・ます調",
-    "en": "In short-essay exams, I often hear of people losing points for writing in the desu/masu style. What the graders are actually looking at is not politeness but whether the style stays consistent to the end. However rich the vocabulary, an answer that mixes da and desu midway gives a hard-to-read impression for that reason alone. It is best to decide which one you will use before you start writing. Incidentally, this habit shows up in speech too, so being aware of it in daily life makes things easier.",
-    "register": "学",
-    "topic": "language",
-    "tipJa": "「です・ます調で書く」「です・ます調に揃える」。丁寧体という言い方もある。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "エピソード記憶",
    "reading": "えぴそーどきおく",
    "pos": "noun",
@@ -721,28 +699,6 @@
    },
    "deck": "senmon",
    "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "アウトプット",
-   "reading": "あうとぷっと",
-   "pos": "noun",
-   "meaning": "output",
-   "defJa": "学んだ内容を話や文章で外に出すこと。",
-   "passage": {
-    "ja": "勉強ってさ、読んでるときは分かった気になるじゃないですか。でも翌日、人に説明しようとしたところ、頭が真っ白になったんですよね。アウトプットを前提にして読むと、同じ一冊でも、拾える情報の量がまるで違ってきます。だから僕は、読みながらメモ書きするより先に、まず誰かに話すことにしているんです。話す相手がいなければ、ノートに書き出すだけでも、理解の穴がはっきり見えてくるので、ぜひ試してみてください。",
-    "form": "アウトプット",
-    "en": "When you study, you feel like you understand while you are reading, right? But the next day, when I tried to explain it to someone, my mind went blank. If you read with output in mind, even the same book yields a completely different amount of information. That is why I make a point of talking to someone first, before I jot notes while reading. If you have no one to talk to, even just writing it in a notebook makes the gaps in your understanding clearly visible, so please try it.",
-    "register": "話",
-    "topic": "mind",
-    "tipJa": "「アウトプットを前提に読む」「アウトプットする」。学習の話でよく対にされる語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

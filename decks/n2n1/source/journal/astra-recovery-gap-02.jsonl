@@ -1,0 +1,1 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"非難": []}, "model": "deepseek-v4-pro:cloud", "secs": 14, "out": 2172, "verdicts": [{"term": "非難", "editor": "pass", "editorWhy": "自然な話し言葉で、対象語が一度だけ典型的な用法で使われ、定義も適切。", "facts": "pass", "factsWhy": "事実関係・話題・レベル・英訳のいずれも問題なし。"}]}

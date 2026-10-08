@@ -221,28 +221,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "破片",
-   "reading": "はへん",
-   "pos": "noun",
-   "meaning": "fragment; broken piece",
-   "defJa": "こわれて飛び散った小さな部分",
-   "passage": {
-    "ja": "古い言葉は、土の中から出てきた割れた器の破片に似ている。一つひとつは小さくて用をなさないものの、拾い集めて合わせてみると、かつての暮らしの形が、ぼんやりと浮かび上がってくる。「やばい」も「かわいい」も、今の意味に落ち着くまでには、さまざまな意味の層をくぐってきた。語源をたどる作業とは、言葉の断片を手がかりに、失われた全体像を推し量ろうとする試みにほかならない。",
-    "form": "破片",
-    "en": "Old words resemble the fragments of a broken vessel dug out of the earth. Each piece is small and useless on its own, but when you gather them and fit them together, the shape of life as it once was surfaces faintly. Both yabai and kawaii passed through layers of various meanings before settling into their present senses. Tracing etymology is nothing other than an attempt to infer a lost whole from fragments of words.",
-    "register": "論",
-    "topic": "language",
-    "tipJa": "「ガラスの破片」。割れて飛び散った小さな部分。比喩で言葉や記憶にも使う。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "発刊",
    "reading": "はっかん",
    "pos": "noun",

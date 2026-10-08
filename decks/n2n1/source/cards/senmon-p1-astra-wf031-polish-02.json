@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "弾圧",
+   "reading": "だんあつ",
+   "pos": "noun",
+   "meaning": "political repression; crackdown",
+   "defJa": "権力を使い、反対する運動や言論を押さえつけること",
+   "passage": {
+    "ja": "古い新聞を読んでいて、ある時期から政府への批判が急に載らなくなっても、国民が全員賛成したとは言えないよね。もし発言した人が逮捕されたり、集会が禁止されたりしていたなら、弾圧によって声を上げられなくなった可能性を調べる必要がある。専制の時代の資料を見るときは、書かれている意見だけでなく、書くことを許されなかった意見も気になるんだ。もちろん、紙面にない意見を勝手に作るわけにはいかないから、個人の日記に加えて、国外へ送った手紙も探して、残された言葉を少しずつ照らし合わせたい。",
+    "form": "弾圧",
+    "en": "When criticism of the government suddenly disappears from old newspapers at a certain point, it does not mean that everyone in the country agreed. If speakers were being arrested or meetings banned, we need to investigate the possibility that repression prevented people from speaking out. When I examine sources from an autocratic period, I wonder not only about opinions that were written down but also those people were forbidden to write. Of course, we cannot simply invent views missing from the papers, so I want to look for private diaries and letters sent abroad and gradually compare the words that survive.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「言論を弾圧する」「弾圧を受ける」と、権力による強制的な抑制に使います。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

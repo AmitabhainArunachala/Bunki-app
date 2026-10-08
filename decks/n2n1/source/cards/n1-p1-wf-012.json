@@ -199,28 +199,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "開拓",
-   "reading": "かいたく",
-   "pos": "noun",
-   "meaning": "cultivation, pioneering",
-   "defJa": "新しい分野や土地を切り開くこと",
-   "passage": {
-    "ja": "人間の脳は、新しい道を開拓するより、慣れた道を歩くほうを好みます。習慣が強いのは、そのほうがエネルギーを節約できるからです。ところが、成長のためには、あえて不慣れな領域に足を踏み入れざるを得ません。新しい技能を身につけたいなら、まず失敗を許す環境を作ることです。最初は下手でも構わず、未知の道を一度歩いた経験が、次の挑戦への足がかりとなって、脳の地図を少しずつ広げてくれるのです。",
-    "form": "開拓",
-    "en": "The human brain prefers walking familiar paths to pioneering new ones. Habits are strong because that saves energy. For growth, however, you have no choice but to deliberately step into unfamiliar territory. If you want to acquire a new skill, first create an environment that allows failure. Even if you are clumsy at first, the experience of having walked an unknown road once becomes a foothold for the next challenge and gradually widens the map in your brain.",
-    "register": "講",
-    "topic": "mind",
-    "tipJa": "「道を開拓する」「市場を開拓する」のように、未踏の分野を切り開く意味。",
-    "sense": ""
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "露骨",
    "reading": "ろこつ",
    "pos": "na-adj",

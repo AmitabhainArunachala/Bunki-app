@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "災害",
+   "reading": "さいがい",
+   "pos": "noun",
+   "meaning": "disaster",
+   "defJa": "地震や洪水などによって生じる被害。",
+   "passage": {
+    "ja": "大雨で川があふれた場合、住宅の被害に加えて、橋や道路の寸断が地域の暮らしを長く左右する。災害への備えを考える際には、堤防の強化だけでなく、食料や薬をどう届けるかという視点も欠かせない。巨額の工事費を投じても、集落へ通じる道が一本しかなければ、そこが使えなくなったときの対応が必要である。避難先までの距離が同じでも、歩ける人と介助が要る人では移動にかかる時間が違う。地図上の線を引くだけでは、住民が実際に動ける計画にはならない。",
+    "form": "災害",
+    "en": "If heavy rain causes a river to overflow, damage to homes and the severing of bridges and roads can affect local life for a long time. Preparing for a disaster requires attention not only to strengthening levees but also to how food and medicine will be delivered. Even if huge sums are spent on construction, a community with just one access road still needs a response for when that road becomes unusable. Even over the same distance to a shelter, people who can walk and those who need assistance take different amounts of time to travel. Drawing lines on a map alone does not produce a plan residents can actually follow.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "「災害に備える」「災害が発生する」と使う。避難や復旧が伴う規模の被害。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "傍ら",
+   "reading": "かたわら",
+   "pos": "noun",
+   "meaning": "beside; at one’s side",
+   "defJa": "ある物や人のすぐそば。",
+   "passage": {
+    "ja": "机の上を片づけるついでに、いつも傍らに置いていた携帯を、隣の部屋の棚に移してみたんだ。通知が鳴るたびに手を伸ばす癖があって、本を読んでいても話の大意をすぐ見失ってたからさ。最初は何か大事な連絡を逃してる気がして、落ち着かなかったよ。でも、読みかけの一章を最後まで読めた日は、内容を自分の言葉で友達に話せたんだ。多読の冊数を増やすことばかり気にしてたけど、手の届く場所に何を置くかも、僕には大きな問題だったんだね。",
+    "form": "傍ら",
+    "en": "While tidying my desk, I moved the phone I always kept beside me to a shelf in the next room. I had a habit of reaching for it whenever a notification sounded, and I would quickly lose the thread even while reading. At first I felt restless, as if I were missing an important message. But on a day when I finished the chapter I had started, I could tell a friend about it in my own words. I had only been worrying about how many books I could get through, but what I kept within reach turned out to be a big issue for me too.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "場所を表す読みは「かたわら」。「仕事の傍ら」では並行する活動を表す。",
+    "sense": "人や物のすぐそば。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

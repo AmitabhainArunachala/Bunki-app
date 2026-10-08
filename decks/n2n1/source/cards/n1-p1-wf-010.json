@@ -815,28 +815,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "老衰",
-   "reading": "ろうすい",
-   "pos": "noun",
-   "meaning": "senility; death from old age",
-   "defJa": "年をとって心身が弱りきること",
-   "passage": {
-    "ja": "「老衰で亡くなる」という言い方は、病名というより、命が静かに燃え尽きていく過程を指す。インドの伝統では、人生を学生期・家住期・林住期・遊行期の四つに分けて考える。華やかな家住期を経て最後に訪れる遊行期とは、家や財産、名誉への執着を手放し、死を迎える準備をする時期のことだ。衰えゆく命を恐れるのではなく、その時間をどう歩むかという視点が、古い伝統のなかにすでに含まれている。",
-    "form": "老衰",
-    "en": "The expression to die of old age points less to a disease name than to the process of a life quietly burning out. In Indian tradition, a life is divided into four stages: student, householder, forest dweller and renunciant. The final renunciant stage, coming after the splendid householder stage, is a time of letting go of attachment to home, property and honor and preparing to meet death. The old tradition already contains a perspective of asking how to walk that time rather than fearing a life that is fading.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「老衰で亡くなる」は病気ではなく自然な衰弱による死を言う、医療・報道の定型表現。",
-    "sense": ""
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "花壇",
    "reading": "かだん",
    "pos": "noun",

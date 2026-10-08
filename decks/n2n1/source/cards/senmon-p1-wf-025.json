@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "不透明",
-   "reading": "ふとうめい",
-   "pos": "na-adj",
-   "meaning": "unclear; opaque",
-   "defJa": "先行きや中身がはっきり見えないこと",
-   "passage": {
-    "ja": "生成AIの行く末は、一言で言えば不透明です。最先端の半導体を作れる企業はごく限られ、サプライチェーンのどこかが止まれば、世界中の開発計画が狂いかねません。さらに、AIがなぜその答えを出したのか、作った本人たちにも説明しきれない場面があります。こうした状況では、期待に踊らされるのも、恐れて目を閉じるのも危ういでしょう。だからこそ、数字や事実を一つずつ確かめる姿勢が、いっそう重みを増しています。",
-    "form": "不透明",
-    "en": "The future of generative AI is, in a word, opaque. Very few companies can make cutting-edge semiconductors, and if any link in the supply chain stops, development plans around the world could well go awry. Moreover, there are cases where even its makers cannot fully explain why an AI gave a particular answer. In such a situation, being swept away by expectations and closing your eyes in fear are both risky. That is exactly why the attitude of checking numbers and facts one by one carries ever more weight.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "「先行きが不透明」「不透明な情勢」。仕組みが見えない意味でも使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "亡命",
    "reading": "ぼうめい",
    "pos": "verb",
@@ -595,28 +573,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "七五調",
-   "reading": "しちごちょう",
-   "pos": "noun",
-   "meaning": "7-5 syllable meter",
-   "defJa": "七音と五音を繰り返す日本語の調子",
-   "passage": {
-    "ja": "唱歌「荒城の月」の歌詞は、七音と五音を交互に重ねる七五調で書かれている。このリズムは声に出すと口になじみ、丸暗記の強い味方になる。実際、交通標語や商品のキャッチコピーにも、同じ型が好んで使われてきた。古くは平安時代の今様から、近代の唱歌や童謡に至るまで、この調子は日本人の耳に長く愛されてきた。覚えにくい年表を語呂合わせの歌にする学習法も、同じ原理にほかならない。",
-    "form": "七五調",
-    "en": "The lyrics of the school song Kojo no Tsuki are written in 7-5 meter, alternating seven and five syllables. This rhythm sits comfortably in the mouth when spoken aloud and is a strong ally for rote memorization. In fact, the same pattern has been favored in traffic slogans and product catchphrases. From the imayo of the Heian period to modern school songs and nursery rhymes, this rhythm has long been loved by Japanese ears. The study method of turning hard-to-remember chronologies into mnemonic songs is nothing other than the same principle.",
-    "register": "学",
-    "topic": "language",
-    "tipJa": "「七五調で書く」のように文体・リズムを説明する。「五七調」と対になる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "三角貿易",
    "reading": "さんかくぼうえき",
    "pos": "noun",
@@ -793,28 +749,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "不滅",
-   "reading": "ふめつ",
-   "pos": "noun",
-   "meaning": "immortality; indestructibility",
-   "defJa": "いつまでも滅びずに残ること",
-   "passage": {
-    "ja": "バガヴァッド・ギーターには、人間の本質であるアートマンは不滅であり、武器でも切れず、火でも焼けないと説かれている。肉体は衣服のように着替えられるが、魂そのものは生まれも死にもしないというのだ。この世界観は、戦場でためらうアルジュナを励ますべく語られたものである。入試や教養試験でも、輪廻や解脱とあわせて、ギーターの核心として問われることが多い。「死を恐れるな」という励ましの根拠が、ここに据えられているのである。",
-    "form": "不滅",
-    "en": "The Bhagavad Gita teaches that Atman, the essence of a human being, is imperishable, that weapons cannot cut it nor fire burn it. The body can be changed like clothing, it says, but the soul itself is neither born nor dies. This worldview was spoken to encourage Arjuna, who hesitates on the battlefield. In entrance and general-knowledge exams too, it is often asked as the core of the Gita together with samsara and liberation. The ground for the encouragement not to fear death is set right here.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「不滅の魂」「不滅の名声」。ギーターではアートマンの性質として説かれる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "中華思想",
    "reading": "ちゅうかしそう",
    "pos": "noun",
@@ -941,28 +875,6 @@
    },
    "deck": "senmon",
    "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "人名用漢字",
-   "reading": "じんめいようかんじ",
-   "pos": "noun",
-   "meaning": "kanji for personal names",
-   "defJa": "名前に使えると定められた常用漢字以外の字",
-   "passage": {
-    "ja": "赤ちゃんの名前に使える漢字は、常用漢字と法務省が認めた人名用漢字に限られている。「龍」や「澪」のように、常用漢字にはなくても、名づけに使えるものがある。一方で、字の形が美しいからといって、好きな漢字を自由に選べるわけではない。名づけは子どものアイデンティティにもかかわるだけに、出生届の前に法務省の一覧を確認しておくに越したことはない。ちなみに、使える字は時代とともに少しずつ増えてきた。",
-    "form": "人名用漢字",
-    "en": "The kanji usable in a baby's name are limited to the joyo kanji and the kanji for personal names approved by the Ministry of Justice. Some, like the characters for dragon and for waterway, are not in the joyo list yet can be used in naming. On the other hand, just because a character's shape is beautiful does not mean you can freely choose any kanji you like. Since naming also bears on the child's identity, there is nothing better than checking the Ministry of Justice list before filing the birth report. Incidentally, the usable characters have gradually increased over time.",
-    "register": "学",
-    "topic": "language",
-    "tipJa": "「人名用漢字に追加される」。名づけで使える漢字の範囲を示す制度の語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

@@ -705,28 +705,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "圧縮",
-   "reading": "あっしゅく",
-   "pos": "noun",
-   "meaning": "compression, condensation",
-   "defJa": "大きなものを小さくまとめること",
-   "passage": {
-    "ja": "人工知能の世界で「圧縮」と言えば、データ容量を小さくすることだけを指すわけではありません。大規模言語モデルは、膨大な文章をもとに、誤差の勾配をたどって調整された数十億個のパラメータに、規則性を凝縮したものだと見ることもできます。この見方に立てば、学習とは世界の情報を小さな形に畳み込む営みです。人間の勉強も同じで、ノート一冊に要点を畳めたとき、初めて理解したと言えるでしょう。",
-    "form": "圧縮",
-    "en": "In the world of artificial intelligence, “compression” does not refer only to making data smaller. A large language model can also be seen as condensing regularities from vast amounts of text into billions of parameters tuned by following the gradient of error. From this view, learning is the work of folding the world’s information into a small form. Human study is the same: only when you can fold the essentials into a single notebook can you say you have understood.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "「データを圧縮する」から、情報や考えを凝縮する比喩にも広がる",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "回復力",
    "reading": "かいふくりょく",
    "pos": "noun",
@@ -875,28 +853,6 @@
    },
    "deck": "senmon",
    "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "和製英語",
-   "reading": "わせいえいご",
-   "pos": "noun",
-   "meaning": "Japan-made English",
-   "defJa": "日本で作られた英語風の言葉",
-   "passage": {
-    "ja": "「ノートパソコン」「コンセント」「ガソリンスタンド」。いずれも日本ではあたり前に使われながら、英語圏では通じにくい和製英語である。外来語は日本語に入るたびに意味や形が少しずつ変わり、原語とは別の言葉として定着してきた。留学や出張で初めてそのずれに気づき、冷や汗をかき、赤面する人も少なくない。借用の歴史は、和製漢語を大量に生んだ明治以来の翻訳の営みの延長にほかならない。",
-    "form": "和製英語",
-    "en": "“Notebook pasokon,” “konsento,” “gasorin sutando.” All are in everyday use in Japan, yet are Japan-made English that hardly gets through in English-speaking countries. Each time a loanword enters Japanese, its meaning and form shift a little, and it has settled in as a word apart from the original. Not a few people notice that gap for the first time on study abroad or a business trip and break into a cold sweat and blush. The history of borrowing is nothing other than an extension of the translation work since the Meiji era that produced Japan-coined Sino words in bulk.",
-    "register": "報",
-    "topic": "language",
-    "tipJa": "「和製英語」は英語に見えて英語圏では通じにくい語を指す",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

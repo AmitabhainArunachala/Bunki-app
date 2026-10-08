@@ -529,28 +529,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "筆致",
-   "reading": "ひっち",
-   "pos": "noun",
-   "meaning": "style of writing",
-   "defJa": "文章や絵の書きぶりに現れる特徴",
-   "passage": {
-    "ja": "同じ事件を扱った記事でも、筆致が違うと、読後の印象はまったく変わります。淡々と事実を並べる書き方は、読み手に判断を委ね、感情を込めた書き方は、共感を呼びます。どちらが優れているということではなく、書き手の目的意識と、読み手の状況に合うかどうかが基準になります。直喩を多用して温度を上げるのか、あえて抑えるのか。優れた書き手は、その温度を、題材に応じて細かく調整しているのです。",
-    "form": "筆致",
-    "en": "Even in articles dealing with the same incident, the impression after reading changes completely if the writing style differs. A way of writing that sets out facts dispassionately leaves judgment to the reader, while a way of writing that puts in feeling draws sympathy. It is not that one is better; the criterion is whether it suits the writer's sense of purpose and the reader's situation. Do you raise the temperature with frequent similes, or deliberately hold it down? Skilled writers adjust that temperature finely according to the subject.",
-    "register": "講",
-    "topic": "language",
-    "tipJa": "「軽妙な筆致」「冷静な筆致」。書き手の色や温度を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "経済史",
    "reading": "けいざいし",
    "pos": "noun",

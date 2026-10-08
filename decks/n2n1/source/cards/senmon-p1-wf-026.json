@@ -375,28 +375,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "偉業",
-   "reading": "いぎょう",
-   "pos": "noun",
-   "meaning": "great achievement",
-   "defJa": "世にまれな、すばらしい成しとげ。",
-   "passage": {
-    "ja": "1953年5月、エドモンド・ヒラリーとシェルパのテンジン・ノルゲイが、エベレストの初登頂に成功した。標高8800メートルを超える世界最高峰への到達は、当時の登山界にとって比類のない偉業であった。数か月にわたる準備と、七転び八起きで重ねてきた遠征の賜物である。二人のどちらが先に頂上へ立ったのかについては、本人たちが多くを語らなかったことから、長く憶測を呼んだ。協力して成し遂げたという事実こそが、二人の功績の核心にほかならない。",
-    "form": "偉業",
-    "en": "In May 1953, Edmund Hillary and the Sherpa Tenzing Norgay succeeded in the first ascent of Everest. Reaching the world's highest peak, over 8,800 meters in elevation, was an unrivaled feat for the mountaineering world of the time. It was the fruit of months of preparation and of expeditions piled up through repeated falls and recoveries. As for which of the two stood on the summit first, the pair said little themselves, and so it long invited speculation. The fact that they achieved it together is precisely the core of their accomplishment.",
-    "register": "報",
-    "topic": "history",
-    "tipJa": "「偉業を成し遂げる」。歴史に残るほどの大きな業績。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "仮眠",
    "reading": "かみん",
    "pos": "noun",

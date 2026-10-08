@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "内発的動機づけ",
-   "reading": "ないはつてきどうきづけ",
-   "pos": "noun",
-   "meaning": "intrinsic motivation",
-   "defJa": "興味や関心から自然にわく意欲",
-   "passage": {
-    "ja": "ゲームにはまってると、勉強しなさいって言われても、やる気なんて出ないじゃないですか。でも、自分が面白いと思った実験とあれば、誰に言われなくても夜中まで続けちゃうんですよね。この内発的動機づけって、短期の成績より、長続きに効くって言われてます。ごほうびで釣りすぎると、かえって伸び悩みを招くこともあるそうです。やらされる勉強が続かないのは、意志が弱いからというより、仕組みの問題なのかもしれませんね。",
-    "form": "内発的動機づけ",
-    "en": "When you're hooked on a game, motivation to study doesn't show up even if someone tells you to, right? But if it's an experiment you find fascinating, you keep at it past midnight without anyone telling you. This intrinsic motivation is said to work more on staying power than on short-term grades. They say that dangling too many rewards can even backfire and lead to stagnation. Study you're forced into doesn't last, and that may be a problem of the system rather than of weak willpower.",
-    "register": "話",
-    "topic": "mind",
-    "tipJa": "外から与えられる外発的動機づけと対。心理学・教育の基本語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "分水嶺",
    "reading": "ぶんすいれい",
    "pos": "noun",
@@ -369,28 +347,6 @@
    },
    "deck": "senmon",
    "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "出遅れ",
-   "reading": "でおくれ",
-   "pos": "noun",
-   "meaning": "late start; lagging behind",
-   "defJa": "他より動き出しが遅れること",
-   "passage": {
-    "ja": "生成AIの開発競争では、日本企業の出遅れが目立つとの指摘が相次ぐ。計算資源を確保するための投資で、米国や中国に大きく水をあけられたことが一因とされる。一方で、日本語に特化した小型のモデルを磨き、独自の強みを築こうとする動きが、新たな先駆けになるとの期待もある。巨額の資金力では太刀打ちできない分、どこで勝負するかという狙いの精度が、いっそう問われている。後発であっても、用途を絞れば活路は開ける、との見方である。",
-    "form": "出遅れ",
-    "en": "In the race to develop generative AI, one after another points out that Japanese firms' late start stands out. Being left far behind the United States and China in investment to secure computing resources is cited as one cause. On the other hand, there is also hope that efforts to hone small models specialized in Japanese and build a distinctive strength will become a new forerunner. Since they cannot compete on sheer financial power, the precision of aim in choosing where to fight is all the more tested. The view is that even latecomers can find a way forward if they narrow the use case.",
-    "register": "報",
-    "topic": "ai",
-    "tipJa": "「出遅れが目立つ」「出遅れを取り戻す」。競争での初動の遅れを表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",
@@ -787,28 +743,6 @@
    },
    "deck": "senmon",
    "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "再興",
-   "reading": "さいこう",
-   "pos": "noun",
-   "meaning": "revival, restoration",
-   "defJa": "衰えたものを再び盛んにすること",
-   "passage": {
-    "ja": "日本の半導体の再興は、国策だけでは実現しません。かつて全盛期を支えたのは、素材や製造装置といった、地味ながら世界に通用する技術でした。そこに最先端の工場を呼び込み、人材を育てていくことが、復活への現実的な道筋です。伸びしろは大きいものの、時間のかかる挑戦であることは間違いありません。日本が積み上げてきた強みを新しい需要とどうつなぐのか、その設計図こそが、いま問われているのです。",
-    "form": "再興",
-    "en": "Reviving Japan's semiconductors cannot be achieved by national policy alone. What once supported its golden age was technology, plain but world-class, such as materials and manufacturing equipment. Drawing cutting-edge factories into that base and nurturing talent is the realistic path to a comeback. There is plenty of room to grow, but there is no doubt it is a challenge that will take time. How to connect the strengths Japan has built up to new demand, that blueprint is exactly what is being asked of us now.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "「産業の再興」「再興を図る」。一度衰えたものを立て直す硬い語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

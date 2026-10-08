@@ -155,28 +155,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "治外法権",
-   "reading": "ちがいほうけん",
-   "pos": "noun",
-   "meaning": "extraterritoriality",
-   "defJa": "外国人が滞在国の法の支配を受けない特権",
-   "passage": {
-    "ja": "幕末に結ばれた安政の五か国条約には、外国人が日本の法で裁かれない領事裁判権が含まれていた。これは治外法権の一形態として、近代日本の外交上の屈辱とされ、条約改正は明治政府にとって未曾有の課題となった。一八九四年の日英通商航海条約で撤廃が決まり、関税自主権の完全な回復は一九一一年まで待たねばならなかった。法の及ばぬ領域を他国に許すとは、主権を半分手放すことにほかならない。",
-    "form": "治外法権",
-    "en": "The five-nation treaties of the Ansei era concluded at the end of the shogunate included consular jurisdiction, under which foreigners were not tried under Japanese law. As a form of extraterritoriality, this was regarded as a diplomatic humiliation for modern Japan, and treaty revision became an unprecedented task for the Meiji government. Its abolition was decided in the 1894 Anglo-Japanese Treaty of Commerce and Navigation, and the full recovery of tariff autonomy had to wait until 1911. To allow another country a domain beyond the reach of your law is nothing other than giving up half your sovereignty.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "領事裁判権と結びつく。不平等条約の中心的な問題。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "民族浄化",
    "reading": "みんぞくじょうか",
    "pos": "noun",
@@ -881,28 +859,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "歴史は繰り返す",
-   "reading": "れきしはくりかえす",
-   "pos": "expression",
-   "meaning": "history repeats itself",
-   "defJa": "過去と似た出来事がまた起こるということ",
-   "passage": {
-    "ja": "歴史は繰り返すって言うじゃないですか。でもあれ、同じ出来事が起きるというより、同じ「型」が何度も現れるってことだと思うんですよね。チューリップ・バブルも、のちの金融危機も、みんなが浮かれた末に一斉に冷めるという形は変わらない。ここに洞察があるとすれば、過去の失敗を知っておくに越したことはない、ということでしょう。結末より、そこへ向かう途中の空気を読むことのほうが、よほど役に立ちます。",
-    "form": "歴史は繰り返す",
-    "en": "People say that history repeats itself, don't they? But I think it means not that the same events happen again, but that the same pattern shows up over and over. The tulip bubble and the later financial crises alike keep the same shape: everyone gets carried away, and then all at once the mood turns cold. If there is an insight here, it is that it never hurts to know past failures. Reading the mood on the way toward the ending is far more useful than knowing the ending.",
-    "register": "話",
-    "topic": "history",
-    "tipJa": "会話でことわざを引く形。「という型」を言い換える話し方に注目。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "段取り",
    "reading": "だんどり",
    "pos": "noun",
@@ -947,28 +903,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "海洋国家",
-   "reading": "かいようこっか",
-   "pos": "noun",
-   "meaning": "maritime nation",
-   "defJa": "海に面し、海上の活動を基盤とする国",
-   "passage": {
-    "ja": "歴史を語るとき、海洋国家と大陸国家という対比を一本の軸にすると、聞き手は驚くほど整理しやすくなる。たとえばイギリスや日本は、海に守られて貿易で富を築き、ロシアやドイツは陸の国境の防衛に力を割かざるを得なかった。一方で、海上封鎖のように、海の力が相手の暮らしを締めあげる例もある。比較優位の話と合わせて整理すれば、話の筋が太くなる。地図を見る目が変わると、歴史の細部も別の意味を帯びて見えてくる。",
-    "form": "海洋国家",
-    "en": "When talking about history, using the contrast between maritime and continental nations as a single axis makes it surprisingly easy for listeners to organize. For example, Britain and Japan, protected by the sea, built wealth through trade, while Russia and Germany had no choice but to devote strength to defending land borders. On the other hand, there are cases like a naval blockade, where the power of the sea squeezes the other side's livelihood. If you organize it together with comparative advantage, the thread of your talk grows stronger. When the way you look at a map changes, the details of history also take on different meanings.",
-    "register": "語",
-    "topic": "history",
-    "tipJa": "「大陸国家」と対にする分析枠。地政学の語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "歯に衣着せぬ",
    "reading": "はにきぬきせぬ",
    "pos": "expression",
@@ -985,28 +919,6 @@
    },
    "deck": "senmon",
    "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "浮世",
-   "reading": "うきよ",
-   "pos": "noun",
-   "meaning": "the transient, floating world",
-   "defJa": "はかない現世。憂き世",
-   "passage": {
-    "ja": "古文単語の「浮世」は、もとは「憂き世」、つまり苦しみの多いこの世を指しました。仏教の無常観が背景にあるわけです。それが江戸時代ともなると「浮き世」と書かれ、享楽的で移ろいやすい現世という、明るい響きを帯びます。単語を意味だけでなく、時代の変化とセットで覚えると、栄枯盛衰の感覚ごと記憶に残りやすいですよ。たった一語の裏側に、世の中を暗く見るか明るく見るかという、見方の大きな転換が隠れているのです。",
-    "form": "浮世",
-    "en": "The classical word ukiyo originally meant 'the sorrowful world,' that is, this world full of suffering. Behind it lies the Buddhist view of impermanence. By the Edo period it was written 'floating world' and took on a bright ring: a pleasure-seeking, fleeting present life. If you memorize a word together with the changes of its era, not just its meaning, it sticks in memory along with the feel of rise and fall. Behind a single word lies a major shift in outlook: whether to see the world as dark or bright.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "仏教の無常観から、江戸の享楽的な意味へ。浮世絵の「浮世」。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",
