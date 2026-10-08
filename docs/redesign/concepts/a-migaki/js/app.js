@@ -412,7 +412,7 @@
     return `<a class="kplate" href="#/words/k/${encodeURIComponent(k.c)}" data-ui-content-value="${k.c}" aria-label="${T('Open kanji', '漢字を開く')} ${k.c}">
       <svg viewBox="0 0 109 109" class="strokes" aria-hidden="true">${paths}</svg>
       <span class="kp-body"><span class="kp-m">${esc(k.m)}</span><span class="kp-parts">${parts}</span>
-      <span class="data"><b>${k.st}</b>${T(' STR', '画')} · ${T('KANKEN', '漢検')} <b>${KK(k.kk)}</b><br>${T('GR', '学年')} <b>${k.grade ?? '—'}</b> · <b>${k.jlpt || '—'}</b></span></span></a>`;
+      <span class="data"><b>${k.st}</b>${T(' STR', '画')} · ${T('GR', '学年')} <b>${k.grade ?? '—'}</b><br>${T('KANKEN', '漢検')} <b>${KK(k.kk)}</b> · <b>${k.jlpt || '—'}</b></span></span></a>`;
   }
   function viewCard(revealed) {
     S.cardRevealed = revealed;
