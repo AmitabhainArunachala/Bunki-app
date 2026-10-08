@@ -423,6 +423,10 @@ const S = {
    * its own, not a strip squeezed into the bar. searchFrom remembers the
    * view the door was opened from so Back returns there. Session-only. */
   searchFrom: null,
+  /** The tab root (PRIMARY_TABS view) last entered from the tab bar, held while the learner
+   * stays inside that tab's rooms. A tab root reached that way is a peer of the other four,
+   * not a step down from them, so its chrome shows no Back (shell fix, 2026-10-08). UI only. */
+  tabRoot: null,
   // Disposable detours, never learner evidence or scheduler state.
   navigationReturns: [],
   sheetReturnFocus: null,
@@ -4178,6 +4182,7 @@ async function boot() {
       keepNavigationReturn('me', null);
     }
     S.view = params.get('room');
+    S.tabRoot = S.view;
     if (S.view === 'search') S.searchFrom = 'shelf';
   }
 
@@ -29767,6 +29772,32 @@ function renderSearchPage(main) {
 }
 
 /** Build the whole 銀河 chrome (symbol, and when open the bar + bubbles). */
+/* The front door's invitations are written by the frozen drift layer in Japanese. The
+ * EN/JA law holds for them too: in EN the layer's own plaque speaks English. Only the
+ * invitations are mapped; the layer's record and recovery notices stay exactly as written. */
+const DRIFT_HINTS = [
+  ['ことばに触れて', 'Touch a word'],
+  ['水にふれると戻る', 'Touch the water to surface'],
+  ['中心へ戻る · home', 'Back to the centre'],
+];
+let driftHintObserver = null;
+function syncDriftHintLanguage() {
+  const hint = document.querySelector('#drift-layer #hint');
+  if (!hint) return;
+  const apply = () => {
+    const text = (hint.textContent || '').trim();
+    const pair = DRIFT_HINTS.find(([ja, en]) => text === ja || text === en);
+    if (!pair) return;
+    const want = tx(pair[0], pair[1]);
+    if (text !== want) hint.textContent = want;
+  };
+  if (!driftHintObserver) {
+    driftHintObserver = new MutationObserver(apply);
+    driftHintObserver.observe(hint, { childList: true, characterData: true, subtree: true });
+  }
+  apply();
+}
+
 function buildGingaChrome(root) {
   const symbol = el('button', 'nav-symbol' + (S.navOpen ? ' open' : ''));
   symbol.type = 'button';
@@ -29799,7 +29830,7 @@ function buildGingaChrome(root) {
   if (S.view === 'drift' && S.taken.length && scheduler && !S.navOpen) {
     const waiting = todayQueue().order.length;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
-      waiting ? `復習 ${waiting}` : '復習', waiting ? `review · ${waiting} due` : 'review');
+      waiting ? `復習 ${waiting}` : '復習', waiting ? `Review · ${waiting} due` : 'Review');
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');
@@ -29997,6 +30028,7 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       closeWorldPicker();
       S.captureOpen = false;
       S.navOpen = false;
+      S.tabRoot = tab.view;
       if (tab.view === 'search') { openSearchPage(); return; }
       if (tab.view === 'me') keepNavigationReturn('me', button);
       else keepScroll();
@@ -30673,13 +30705,36 @@ function stampRegister() {
     html.dataset.register = material;
     // one beat of entrance motion on arrival only (register.css keys the lift on this)
     html.dataset.roomEntering = '1';
+    html.style.removeProperty('--enter-t');
+    stampRegister.enteredAt = performance.now();
     clearTimeout(stampRegister.enterTimer);
-    stampRegister.enterTimer = setTimeout(() => { delete html.dataset.roomEntering; }, 220);
+    cancelAnimationFrame(stampRegister.enterFrame);
+    // the 220ms beat counts from the first frame the room is drawn in (a heavy room can hold
+    // the main thread for a few frames after its render), so the rise is never cut short
+    const arrival = stampRegister.arrivals = (stampRegister.arrivals || 0) + 1;
+    stampRegister.enterFrame = requestAnimationFrame(() => {
+      if (arrival !== stampRegister.arrivals || !html.dataset.roomEntering) return;
+      stampRegister.enteredAt = performance.now();
+      stampRegister.enterTimer = setTimeout(() => {
+        delete html.dataset.roomEntering;
+        html.style.removeProperty('--enter-t');
+      }, 220);
+    });
   } else if (html.dataset.roomEntering) {
-    // a re-render of the same room (a grade, a save, a tick) clears the marker before style
-    // resolution, so only the arrival render's children animate
-    clearTimeout(stampRegister.enterTimer);
-    delete html.dataset.roomEntering;
+    const elapsed = performance.now() - (stampRegister.enteredAt || 0);
+    if (elapsed < 180) {
+      // the arrival's own follow-up render (its data landing a few frames later) redraws main
+      // mid-rise: the new children continue the same rise from where it is (negative delay),
+      // so the entrance is neither cut nor replayed
+      html.style.setProperty('--enter-t', `${Math.round(elapsed)}ms`);
+    } else {
+      // a re-render of the same room (a grade, a save, a tick) clears the marker before style
+      // resolution, so only the arrival render's children animate
+      clearTimeout(stampRegister.enterTimer);
+      cancelAnimationFrame(stampRegister.enterFrame);
+      delete html.dataset.roomEntering;
+      html.style.removeProperty('--enter-t');
+    }
   }
   // the older sets have no .exam-progress: their counter is the card-kind after the policy line
   const progress = document.querySelector('.exam-progress') ||
@@ -30795,6 +30850,7 @@ function render() {
   document.body.classList.toggle('ginga-open', heroMode && !!S.navOpen);
   if (!heroMode && S.navOpen) S.navOpen = false;
   if (heroMode) buildGingaChrome(root);
+  syncDriftHintLanguage();
 
   // 復習 is zen: while a card is up, the whole world recedes — no top bar, no
   // crumb, no counters. Just the card, the answer, the four honest buttons.
@@ -30819,9 +30875,16 @@ function render() {
   const backBtn = biLabel('button', null, '戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'back';
+  // a tab root entered from the tab bar is a peer of the other tabs: no Back (its target was
+  // the previous tab, which the bar already shows). Leaving that tab's rooms forgets it, so a
+  // root reached through a door (the front door's bubbles, the chrome's Lists/Learn/search,
+  // a room link) keeps its Back to where the learner came from.
+  const tabOfRoot = S.tabRoot ? PRIMARY_TABS.find((tab) => tab.view === S.tabRoot) : null;
+  if (!tabOfRoot || !tabOfRoot.views.includes(S.view)) S.tabRoot = null;
+  const atTabRoot = S.variants.nav === 'tabs' && !!S.tabRoot && S.view === S.tabRoot;
   const atHome =
     !S.stack.length &&
-    (S.view === 'entry' || S.view === 'drift' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
+    (atTabRoot || S.view === 'entry' || S.view === 'drift' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
   backBtn.disabled = atHome;
   backBtn.addEventListener('click', back);
   chrome.append(backBtn);

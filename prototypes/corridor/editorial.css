@@ -4469,3 +4469,156 @@ body.has-primary-tabs #bunki-reports-root .br-rail .br-bug svg { width: 17px; he
 /* a sheet hides the tabs and keeps the original 12px report strip (verify-redesign-docks) */
 body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail::before { content: none; }
 /* END BUNKI POLISH ========================================================== */
+
+/* ==========================================================================
+   BEGIN BUNKI SHELL · one navigation system (shell fix lane, 8 October 2026)
+   REVIEW #3/#4/#10/#15/#17. The tab bar is the navigation. The top chrome holds
+   back (only where it leads somewhere the bar does not), then one right cluster:
+   the preferences (world seal · EN 日本語), a hairline, and a small TOOLS group
+   (search · Learn · Lists) drawn as quiet glyphs, never as a second row of tabs.
+   #chrome-dojo and #tray stay in the chrome — verify-dojo-door/verify-corridor-doors
+   and ~60 verifiers click them in every room — but they read as tools, not stations.
+   ========================================================================== */
+/* the tab bar: an opaque, quiet surface on a hairline — nothing ghosts through it */
+.primary-tabs,
+body.has-primary-tabs .primary-tabs {
+  background: var(--color-glass-solid);
+  border-top: var(--stroke-hairline) solid var(--color-rule);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* the tools group: glyph-only, quieter than the preferences, set off by one hairline */
+body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg {
+  margin-right: 0;
+  padding-right: 7px;
+  background: linear-gradient(var(--color-rule), var(--color-rule)) right 3px center / 1px 16px no-repeat;
+}
+body.has-primary-tabs:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-muted); }
+body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
+body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 12px/1 var(--font-data); font-variant-numeric: tabular-nums; }
+@media (max-width: 360px) {
+  /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
+     and Lists becomes its bookmark with the count set small at its shoulder */
+  body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
+    position: relative;
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja {
+    position: absolute;
+    top: 9px;
+    left: calc(50% + 7px);
+    font-size: 10px;
+  }
+}
+
+/* ---- room entrances: the chrome holds still, the room rises into place (≤216ms).
+   stampRegister marks html[data-room-entering] on arrival; a follow-up render of the same
+   arrival sets --enter-t so the redrawn children continue the rise instead of cutting.
+   Opacity starts at 0.01 and fills backwards only: no control is ever left at 0. ---- */
+@keyframes shell-rise {
+  from { opacity: 0.01; transform: translate3d(0, var(--rise, 12px), 0); }
+  to { opacity: 1; transform: none; }
+}
+html[data-room-entering] body:not([data-view='drift']) #app > main[data-enter] { animation: none; }
+html[data-room-entering] #app > main > * {
+  --rise: 14px;
+  animation: shell-rise 180ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(36ms - var(--enter-t, 0ms)) backwards;
+}
+html[data-room-entering] #app > main > :nth-child(-n + 2) { --rise: 8px; animation-delay: calc(0ms - var(--enter-t, 0ms)); }
+html[data-room-entering] #app > main > :nth-child(3) { --rise: 11px; animation-delay: calc(18ms - var(--enter-t, 0ms)); }
+html[data-room-entering] #app > main > .room-sign {
+  animation: kairo-sign 200ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(0ms - var(--enter-t, 0ms)) backwards;
+}
+html[data-room-entering][data-register='attempt'] #app > main > * { animation-duration: 120ms; animation-delay: calc(0ms - var(--enter-t, 0ms)); }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room-entering] #app > main > *,
+  html[data-room-entering] #app > main > .room-sign { animation: none; }
+}
+
+/* ---- the front door (html[data-room=door]): the sky stays the drift's own; its chrome
+   joins the family — square paper seals, one 藍 slip as the room's single primary. ---- */
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 92%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--ink) 26%, transparent);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 4%), 0 8px 20px -12px rgb(20 26 34 / 45%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol svg { width: 22px; height: 22px; }
+html[data-room='door'] body.ginga #ginga-theme-seal.ginga-seal {
+  width: 44px;
+  height: 44px;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 12px;
+  border-radius: 2px;
+  opacity: 1;
+  color: var(--red, #b23a2a);
+  font: 800 13px/1 var(--display);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: isolate;
+}
+html[data-room='door'] body.ginga #ginga-theme-seal.ginga-seal::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid color-mix(in srgb, var(--red, #b23a2a) 75%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 88%, transparent);
+  z-index: -1;
+}
+html[data-room='door'] body.ginga #ginga-search.ginga-search {
+  width: 44px;
+  height: 44px;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 60px;
+  border-radius: 4px;
+  opacity: 0.72;
+  color: var(--ink);
+}
+/* the room's one primary: a 藍 slip, Shippori, sentence case */
+html[data-room='door'] body.ginga #home-review.corner-bubble {
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--ai, #1f3a5f);
+  color: var(--ground-0, #fbf8f1);
+  font: 800 16px/48px var(--display);
+  letter-spacing: 0.04em;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 14px 30px -16px rgb(16 24 40 / 60%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-room='door'] body.ginga #home-review.corner-bubble.quiet {
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 94%, transparent);
+  color: var(--ai, #1f3a5f);
+  box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--ink) 30%, transparent);
+}
+html[data-room='door'] body.ginga #home-review.corner-bubble .l-ja { font: inherit; letter-spacing: inherit; }
+/* the drift's invitation plaque, in the family's voice (its text is set by corridor.js tx()) */
+html[data-room='door'] #drift-layer #hint {
+  border-radius: 4px;
+  padding: 8px 16px;
+  font: 500 12px/1.2 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 90%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+}
+/* END BUNKI SHELL ============================================================ */
