@@ -16574,8 +16574,13 @@ function thesClusters() {
 }
 
 function renderThesaurus(main) {
-  main.append(withEn(el('p', 'eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('類語辞典', 'Thesaurus')));
+  // the word-web room: the plate first (window.openWordWeb lands here), the
+  // paper thesaurus beneath it as the room's index of hand-written clusters
+  main.append(el('h1', 'view-title ww-room-title', tx('言葉の網', 'The word web')));
+  const web = renderWordWeb();
+  if (web) main.append(web);
+  main.append(withEn(el('p', 'eyebrow thes-eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
+  main.append(el('h2', 'view-title thes-title', tx('類語辞典', 'Thesaurus')));
   const clusters = thesClusters();
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
@@ -16607,6 +16612,808 @@ function renderThesaurus(main) {
     main.append(block);
   }
 }
+
+/* =================================================== BEGIN WORD WEB (Words lane)
+ * 言葉の網 — "the recursive quality of the language", as one drafting plate
+ * (concept C's Words plate, B's light trace, A's typesetting). A word sits in
+ * the middle; its kanji ring it with their parts above; the words that share a
+ * kanji and the hand-written neighbours of D.sem sit below; one real passage
+ * and a grammar point hang at the sides. Tapping any node re-centres the plate
+ * on it — the tapped glyph itself flies to the middle — and the walk stays lit
+ * as a trail: 推進 — 進 — 隹. Every edge is read from data already in memory:
+ * D.dict / D.words, D.kanji[c].parts, D.radicals, D.kanjiWords, D.sem,
+ * findExamples and GRAMMARS(). Nothing here writes the record.
+ *
+ * API for other rooms:
+ *   window.openWordWeb(term, { type: 'word'|'kanji'|'part', invoker })
+ * opens the word-web room (S.view 'thesaurus', data-room 'word-web') centred
+ * on term, with a navigation return so 戻る comes back to the caller. On the
+ * Words tab itself it re-centres the plate in place. */
+const WW_W = 360; // the plate's nominal width: x is placed in % of it
+const WW_H = 404;
+const WW_CX = WW_W / 2;
+const WW_CY = 192;
+const WW_TRAIL_MAX = 7;
+const WW_WALK_KEY = 'bunki-word-web-walk';
+const wordWeb = { trail: null };
+let wwPartIndex = null;
+
+const wwReady = () => !!(D.kanji && D.dict && D.words && D.kanjiWords);
+const wwReduced = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function wwTrail() {
+  if (!wordWeb.trail) {
+    wordWeb.trail = [];
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(WW_WALK_KEY) || '[]');
+      if (Array.isArray(saved)) wordWeb.trail = saved.filter((n) => n && typeof n.key === 'string' && ['word', 'kanji', 'part'].includes(n.type)).slice(-WW_TRAIL_MAX);
+    } catch { /* a private window keeps the walk for this page only */ }
+  }
+  return wordWeb.trail;
+}
+function wwSaveTrail() {
+  try { sessionStorage.setItem(WW_WALK_KEY, JSON.stringify(wordWeb.trail || [])); } catch { /* per-viewer convenience only */ }
+}
+/** Walk to a node: a node already on the walk cuts the walk back to it. */
+function wwPush(node) {
+  const trail = wwTrail();
+  const at = trail.findIndex((n) => n.type === node.type && n.key === node.key);
+  if (at >= 0) trail.splice(at + 1);
+  else trail.push({ type: node.type, key: node.key, why: node.why || null });
+  if (trail.length > WW_TRAIL_MAX) trail.splice(0, trail.length - WW_TRAIL_MAX);
+  wwSaveTrail();
+}
+
+function wwKanjiOf(w) {
+  const k = D.words[w]?.k?.length ? D.words[w].k : D.dict[w]?.k?.length ? D.dict[w].k : [...w];
+  return [...new Set(k)].filter((c) => D.kanji[c]);
+}
+/** part → every kanji whose own parts list names it (the full family in the bundle). */
+function wwPartMembers(p) {
+  if (!wwPartIndex) {
+    wwPartIndex = new Map();
+    for (const [c, k] of Object.entries(D.kanji)) {
+      for (const part of k.parts || []) {
+        let set = wwPartIndex.get(part);
+        if (!set) wwPartIndex.set(part, (set = new Set()));
+        set.add(c);
+      }
+    }
+  }
+  return wwPartIndex.get(p) || new Set();
+}
+/** A kanji's parts from D.kanji[c].parts, minus those another listed part
+ * already implies across the whole data set (亻 inside every 隹 kanji, 人
+ * inside every 亻 one): the decomposition stays the data's, only deduplicated. */
+function wwParts(c) {
+  const parts = [...new Set(D.kanji[c]?.parts || [])].filter((p) => p !== c);
+  const sets = parts.map(wwPartMembers);
+  const kept = parts.filter((p, i) => !parts.some((q, j) => {
+    if (j === i) return false;
+    const a = sets[j];
+    const b = sets[i];
+    if (!a.size || a.size > b.size || (a.size === b.size && j > i)) return false;
+    for (const x of a) if (!b.has(x)) return false;
+    return true;
+  }));
+  // the most telling parts first: a part few kanji share (隹, 40) says more than 亻 (185)
+  const size = new Map(parts.map((p, i) => [p, sets[i].size]));
+  return kept.sort((a, b) => size.get(a) - size.get(b));
+}
+function wwWord(w) {
+  let rec = null;
+  try { rec = lookup(w); } catch { rec = null; }
+  const graded = D.words[w];
+  const senses = rec?.m?.length ? rec.m : graded?.g ? [graded.g] : [];
+  return { reading: rec?.r || graded?.r || '', senses, jlpt: graded?.jlpt || null };
+}
+const wwShort = (s) => String(s || '').replace(/\s*\([^)]*\)/g, '').split(/[;,]/)[0].trim();
+function wwMine() {
+  const words = new Set();
+  const kanji = new Set();
+  for (const row of S.taken) {
+    if (row.t === 'word') {
+      words.add(row.id);
+      for (const c of wwKanjiOf(row.id)) kanji.add(c);
+    } else if (row.t === 'kanji') kanji.add(row.id);
+  }
+  return { words, kanji };
+}
+/** A card the learner holds that reviews today is never the default plate:
+ * the web is the reward after the cards, never the answer before them. */
+function wwDueToday(w) {
+  if (!S.taken.some((row) => row.t === 'word' && row.id === w)) return false;
+  const rec = S.srs[srsKey('word', w)];
+  if (!rec) return true;
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+  return Date.parse(rec.due) <= end.getTime();
+}
+/** The plate's opening word: the walk in progress, else the word last looked
+ * up in a reading (obslog tap rows), else the newest saved word not due today,
+ * else the day's word — a thesaurus head, chosen by date, not yet in your words. */
+function wwDefault() {
+  const trail = wwTrail();
+  if (trail.length) return trail.at(-1);
+  const ok = (w) => w && (D.dict[w] || D.words[w]) && wwKanjiOf(w).length && !wwDueToday(w);
+  const log = S.obslog || [];
+  for (let i = log.length - 1; i >= 0 && i >= log.length - 400; i -= 1) {
+    const row = log[i];
+    if (row[1] === 'tap' && row[3] >= 2 && typeof row[2] === 'string' && row[2].startsWith('word:') && ok(row[2].slice(5))) {
+      return { type: 'word', key: row[2].slice(5), why: 'looked' };
+    }
+  }
+  for (let i = S.taken.length - 1; i >= 0; i -= 1) {
+    const row = S.taken[i];
+    if (row.t === 'word' && ok(row.id)) return { type: 'word', key: row.id, why: 'saved' };
+  }
+  const held = new Set(S.taken.filter((row) => row.t === 'word').map((row) => row.id));
+  const heads = Object.keys(D.sem || {}).filter((w) => !held.has(w) && wwKanjiOf(w).length >= 2 && (D.dict[w] || D.words[w])).sort();
+  if (heads.length) {
+    const now = new Date();
+    const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    return { type: 'word', key: heads[day % heads.length], why: 'day' };
+  }
+  return null;
+}
+
+/* The shelf is indexed once per fetched article (content bases + text), so a
+ * re-centre asks ~130 Set lookups instead of re-walking every token. */
+const wwTokenIndex = new WeakMap();
+function wwPassageIndex(p) {
+  let ix = wwTokenIndex.get(p.tokens);
+  if (!ix) {
+    const bases = new Set();
+    let text = '';
+    for (const t of p.tokens) {
+      if (!t.c) continue;
+      bases.add(t.b);
+      text += t.s;
+    }
+    ix = { bases, text };
+    wwTokenIndex.set(p.tokens, ix);
+  }
+  return ix;
+}
+/** The sentences of one article whose tokens pass test, as findExamples shapes them. */
+function wwSentences(p, test, cap, out) {
+  let sentence = [];
+  let start = 0;
+  let hit = -1;
+  for (const [index, t] of p.tokens.entries()) {
+    sentence.push(t);
+    if (hit < 0 && t.c && test(t)) hit = sentence.length - 1;
+    if ('。！？'.includes(t.s)) {
+      if (hit >= 0 && sentence.length <= 80) {
+        out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start, target: sentence[hit].b });
+        if (out.length >= cap) return;
+      }
+      sentence = [];
+      start = index + 1;
+      hit = -1;
+    }
+  }
+}
+/** The shelf sentences (then fetched bank lines) that hold a word. */
+function wwPassages(w, cap = 2) {
+  const out = [];
+  for (const p of D.passages || []) {
+    if (!p.tokens || !wwPassageIndex(p).bases.has(w)) continue;
+    wwSentences(p, (t) => t.b === w, cap, out);
+    if (out.length >= cap) return out;
+  }
+  for (const ex of D.exampleBank?.get(w) || []) {
+    if (out.length >= cap) break;
+    out.push({ ...ex, target: w });
+  }
+  return out;
+}
+/** A shelf sentence that holds a kanji, from the articles already fetched. */
+function wwKanjiPassage(c) {
+  const out = [];
+  for (const p of D.passages || []) {
+    if (!p.tokens || !wwPassageIndex(p).text.includes(c)) continue;
+    wwSentences(p, (t) => String(t.s).includes(c), 1, out);
+    if (out.length) return out[0];
+  }
+  return null;
+}
+/** A grammar point linked to the word: its pattern, else one of its examples. */
+function wwGrammarFor(w) {
+  if ([...w].length < 2) return null;
+  const norm = (p) => String(p).replace(/[〜～\s（）()]/g, '');
+  const all = GRAMMARS();
+  return all.find((g) => norm(g.p).split('／').includes(w)) || all.find((g) => (g.ex || []).some((e) => String(e.ja || '').includes(w))) || null;
+}
+/** '…学の推進に道…' — a few characters either side of the word. */
+function wwExcerpt(ex, target) {
+  const text = ex.tokens.map((t) => t.s).join('');
+  const ti = ex.tokens.findIndex((t) => t.b === target || String(t.s).includes(target));
+  if (ti < 0) return { before: '', word: text.slice(0, 8), after: '' };
+  const before = ex.tokens.slice(0, ti).map((t) => t.s).join('');
+  const after = ex.tokens.slice(ti + 1).map((t) => t.s).join('');
+  return { before: before.slice(-3), word: ex.tokens[ti].s, after: after.slice(0, 2), full: text, ti };
+}
+/** Walk back into the article at the sentence, or open the bank line on its own page. */
+function wwOpenPassage(ex, target, invoker) {
+  const home = ex.passage && D.passages.some((p) => p.id === ex.passage) ? ex.passage : null;
+  if (home) {
+    keepNavigationReturn('reader', invoker);
+    const from = sentenceSource(ex.tokens, home, ex.start);
+    const ti = ex.tokens.findIndex((t) => t.b === target);
+    openPassage(home, from ? { index: from.index + Math.max(0, ti) } : null);
+    return;
+  }
+  go({ t: 'sent', tokens: ex.tokens, en: ex.en || '', source: ex.source || '', passage: null, start: ex.start, target }, { invoker });
+}
+
+const WW_REL = { syn: ['類義', 'near'], ant: ['対義', 'opposite'], reg: ['語感', 'register'], fam: ['同族', 'family'], col: ['共起', 'goes with'], thm: ['主題', 'theme'] };
+const wwP = (deg, rx, ry = rx) => [WW_CX + rx * Math.cos((deg * Math.PI) / 180), WW_CY + ry * Math.sin((deg * Math.PI) / 180)];
+const wwSpread = (n, a, b) => (n === 1 ? [(a + b) / 2] : Array.from({ length: n }, (_, i) => a + ((b - a) * i) / (n - 1)));
+const WW_RING2_SLOTS = [[180, 304], [66, 262], [294, 262], [108, 350], [252, 350]];
+const WW_RING2_ORDER = { 1: [0], 2: [1, 2], 3: [0, 1, 2], 4: [1, 2, 3, 4], 5: [0, 1, 2, 3, 4] };
+const WW_KANJI_ANGLES = { 1: [-90], 2: [-126, -54], 3: [-150, -90, -30], 4: [-160, -117, -63, -20] };
+
+function wwKanjiCap(c) {
+  const k = D.kanji[c];
+  if (!k) return { en: '', ja: '' };
+  return { en: String(k.m || '').toLowerCase(), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
+}
+function wwPartCap(p, mine) {
+  const members = wwPartMembers(p);
+  const count = D.radicals?.[p]?.kanjiCount || members.size;
+  return {
+    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,
+    ja: D.radicals?.[p]?.name || String((D.kanji[p]?.kun || [])[0] || '').replace(/\..*$/, '') || '',
+    count,
+    mine: [...members].filter((c) => mine.kanji.has(c)).length,
+  };
+}
+
+/** Build the plate's model: centre, nodes with positions, and the data marks. */
+function wwModel(centre, mine) {
+  const nodes = [];
+  const trail = wwTrail();
+  const prev = trail.length > 1 ? trail.at(-2) : null;
+  // ring 2 sits in fixed slots under the centre, so captions never collide
+  const ring2 = (list, from) => {
+    const use = WW_RING2_ORDER[Math.min(list.length, 5)] || [];
+    use.forEach((slot, i) => {
+      const [x, y] = WW_RING2_SLOTS[slot];
+      nodes.push({ ...list[i], x, y, from: [from] });
+    });
+  };
+  if (centre.type === 'word') {
+    const w = centre.key;
+    const info = wwWord(w);
+    const ks = wwKanjiOf(w).slice(0, 4);
+    const angles = WW_KANJI_ANGLES[ks.length] || [];
+    const kpos = ks.map((c, i) => wwP(angles[i], 102, 92));
+    ks.forEach((c, i) => {
+      const cap = wwKanjiCap(c);
+      nodes.push({ type: 'kanji', key: c, x: kpos[i][0], y: kpos[i][1], from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, mine: mine.kanji.has(c) });
+    });
+    // parts: one or two per kanji, a part two kanji share hung between them
+    const owners = new Map();
+    ks.forEach((c, i) => wwParts(c).slice(0, ks.length > 2 ? 1 : 2).forEach((p) => owners.set(p, [...(owners.get(p) || []), i])));
+    const shared = [...owners.entries()].filter(([, o]) => o.length > 1).map(([p]) => p);
+    let placed = 0;
+    for (const [p, o] of owners) {
+      if (placed >= 5) break;
+      let x;
+      let y;
+      if (o.length > 1) {
+        x = o.reduce((s, i) => s + kpos[i][0], 0) / o.length;
+        y = Math.min(...o.map((i) => kpos[i][1])) - 76;
+      } else {
+        const i = o[0];
+        const own = [...owners.entries()].filter(([, oo]) => oo.length === 1 && oo[0] === i).map(([q]) => q);
+        const hasShared = shared.some((q) => owners.get(q).includes(i));
+        const a = angles[i];
+        const side = a < -90 ? -1 : a > -90 ? 1 : 0;
+        let off = 0;
+        if (own.length > 1) off = (own.indexOf(p) ? 1 : -1) * 22;
+        else if (hasShared) off = side * 26;
+        [x, y] = wwP(a + off, ks.length > 2 ? 158 : 164, ks.length > 2 ? 150 : 168);
+      }
+      const cap = wwPartCap(p, mine);
+      nodes.push({ type: 'part', key: p, x, y, from: o.map((i) => kpos[i]), cap: cap.en, capJa: cap.ja, live: o.length > 1 });
+      placed += 1;
+    }
+    // ring 2: hand-written neighbours first, then words that share a kanji
+    const seen = new Set([w]);
+    const below = [];
+    for (const edge of D.sem[w] || []) {
+      if (below.length >= 2) break;
+      if (seen.has(edge.w) || [...edge.w].length > 4) continue;
+      seen.add(edge.w);
+      below.push({ type: 'word', key: edge.w, cap: tx(...(WW_REL[edge.rel] || ['関連', 'related'])), capJa: tx(...(WW_REL[edge.rel] || ['関連', 'related'])), rel: true, hi: ks, mine: mine.words.has(edge.w) });
+    }
+    const lists = ks.map((c) => (D.kanjiWords[c] || []).filter((x) => [...x].length <= 4));
+    const siblings = new Set();
+    for (const list of lists) for (const x of list) if (x !== w) siblings.add(x);
+    for (let round = 0; below.length < 5 && round < 12; round += 1) {
+      for (const list of lists) {
+        const x = list.find((cand) => !seen.has(cand));
+        if (!x || below.length >= 5) continue;
+        seen.add(x);
+        const wi = wwWord(x);
+        below.push({ type: 'word', key: x, cap: wwShort(wi.senses[0]), capJa: wi.reading, hi: ks, mine: mine.words.has(x) });
+      }
+    }
+    ring2(below, [WW_CX, WW_CY]);
+    // side cards: a real passage (left) and a linked grammar point or a second passage (right)
+    const ex = wwPassages(w, 2);
+    const side = [];
+    if (ex[0]) side.push({ type: 'passage', key: `${ex[0].passage || 'bank'}:${ex[0].start}`, ex: ex[0], target: w });
+    const g = wwGrammarFor(w);
+    if (g) side.push({ type: 'grammar', key: g.id, label: g.p, cap: wwShort(g.mEn), capJa: g.lv || '' });
+    else if (ex[1]) side.push({ type: 'passage', key: `${ex[1].passage || 'bank'}:${ex[1].start}`, ex: ex[1], target: w });
+    side.forEach((s, i) => {
+      const [x, y] = wwP(i ? 0 : 180, 136, 0);
+      nodes.push({ ...s, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
+    });
+    const strokes = ks.reduce((s, c) => s + (D.kanji[c]?.st || 0), 0);
+    const kk = ks.map((c) => D.kanji[c]?.kk).filter(Boolean);
+    const kkOrder = (v) => { const n = parseFloat(String(v).replace('準', '')); return (Number.isFinite(n) ? n : 99) + (String(v).startsWith('準') ? 0.5 : 0); };
+    const hardest = kk.sort((a, b) => kkOrder(a) - kkOrder(b))[0];
+    const met = encounterTrail(srsKey('word', w));
+    const saved = S.taken.find((row) => row.t === 'word' && row.id === w);
+    const marks = [];
+    if (info.reading) marks.push([tx('読み', 'Reading'), info.reading, true]);
+    if (info.jlpt) marks.push(['JLPT', `N${info.jlpt}`]);
+    if (ks.length) marks.push([tx('漢字', 'Kanji'), String(ks.length)]);
+    if (strokes) marks.push([tx('画数', 'Strokes'), String(strokes)]);
+    if (hardest) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(hardest) : hardest]);
+    if (shared.length) marks.push([tx('共通部品', 'Shared part'), shared[0], true]);
+    if (siblings.size) marks.push([tx('仲間の語', 'Siblings'), String(siblings.size)]);
+    if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
+    if (saved?.ts) marks.push([tx('覚え始め', 'Saved'), new Date(saved.ts).toLocaleDateString()]);
+    const follow = shared.length ? { part: shared[0], kanji: owners.get(shared[0]).map((i) => ks[i]), ...wwPartCap(shared[0], mine) } : null;
+    return { centre: { ...centre, glyph: w, reading: info.reading, gloss: bi() ? wwShort(info.senses[0]) : '', strokes }, nodes, marks, senses: info.senses, examples: ex, follow };
+  }
+  if (centre.type === 'kanji') {
+    const c = centre.key;
+    const k = D.kanji[c] || {};
+    const parts = wwParts(c).slice(0, 4);
+    const prevParts = prev?.type === 'word' ? new Set(wwKanjiOf(prev.key).filter((x) => x !== c).flatMap((x) => wwParts(x))) : new Set();
+    const angles = WW_KANJI_ANGLES[parts.length] || [];
+    parts.forEach((p, i) => {
+      const [x, y] = wwP(angles[i], 124, parts.length > 2 ? 128 : 136);
+      const cap = wwPartCap(p, mine);
+      nodes.push({ type: 'part', key: p, x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, live: prevParts.has(p) || (prev?.type === 'part' && prev.key === p) });
+    });
+    const words = (D.kanjiWords[c] || []).filter((x) => [...x].length <= 4 && x !== c);
+    const pick = [];
+    if (prev?.type === 'word' && words.includes(prev.key)) pick.push(prev.key);
+    for (const x of words) if (pick.length < 5 && !pick.includes(x)) pick.push(x);
+    ring2(pick.map((x) => { const wi = wwWord(x); return { type: 'word', key: x, cap: wwShort(wi.senses[0]), capJa: wi.reading, hi: [c], mine: mine.words.has(x) }; }), [WW_CX, WW_CY]);
+    const ex = wwKanjiPassage(c);
+    if (ex) {
+      const [x, y] = wwP(180, 136, 0);
+      nodes.push({ type: 'passage', key: `${ex.passage}:${ex.start}`, ex, target: ex.target, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
+    }
+    const rad = k.rad && D.radInfo ? D.radInfo[k.rad] : null;
+    const inMine = [...mine.words].filter((x) => wwKanjiOf(x).includes(c)).length;
+    const met = encounterTrail(srsKey('kanji', c));
+    const marks = [];
+    if (k.st) marks.push([tx('画数', 'Strokes'), String(k.st)]);
+    if (k.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(k.kk) : k.kk]);
+    if (k.on?.length) marks.push([tx('音読み', 'On'), k.on.slice(0, 2).join('・'), true]);
+    if (k.kun?.length) marks.push([tx('訓読み', 'Kun'), k.kun.slice(0, 2).map((r) => r.replace(/\.(.+)$/, '($1)')).join('・'), true]);
+    if (rad) marks.push([tx('部首', 'Radical'), `${rad.c} ${rad.n}`, true]);
+    if (D.kanjiWords[c]?.length) marks.push([tx('この字の語', 'Words with it'), String(D.kanjiWords[c].length)]);
+    marks.push([tx('あなたの語', 'In your words'), String(inMine)]);
+    if (D.kanjiFreq?.[c]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[c])]);
+    if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
+    const cap = wwKanjiCap(c);
+    return { centre: { ...centre, glyph: c, reading: (k.on || [])[0] || '', gloss: bi() ? cap.en : cap.ja, strokes: k.st || 0 }, nodes, marks, senses: k.m ? [k.m] : [], examples: ex ? [ex] : [] };
+  }
+  // a part: its family on one ring — your kanji first, the kanji you came from among them
+  const p = centre.key;
+  const members = [...wwPartMembers(p)];
+  const words = (c) => D.kanjiWords[c]?.length || 0;
+  members.sort((a, b) => (mine.kanji.has(b) - mine.kanji.has(a)) || (words(b) - words(a)) || (a < b ? -1 : 1));
+  if (prev?.type === 'kanji' && members.includes(prev.key)) {
+    members.splice(members.indexOf(prev.key), 1);
+    members.unshift(prev.key);
+  }
+  const ring = members.slice(0, 10);
+  const big = ring.length > 6;
+  wwSpread(ring.length, -90, 270 - 360 / Math.max(ring.length, 1)).forEach((ang, i) => {
+    const [x, y] = wwP(ang, big ? 136 : 112, big ? 142 : 116);
+    const cap = wwKanjiCap(ring[i]);
+    nodes.push({ type: 'kanji', key: ring[i], x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, mine: mine.kanji.has(ring[i]), live: prev?.key === ring[i] });
+  });
+  const cap = wwPartCap(p, mine);
+  const st = D.radicals?.[p]?.st || D.kanji[p]?.st || 0;
+  const rad = D.radByGlyph?.[p] || null;
+  const marks = [];
+  if (cap.ja) marks.push([tx('名前', 'Name'), cap.ja, true]);
+  if (st) marks.push([tx('画数', 'Strokes'), String(st)]);
+  marks.push([tx('この部品の字', 'Kanji with it'), String(cap.count)]);
+  marks.push([tx('あなたの字', 'In your words'), String(cap.mine)]);
+  if (rad) marks.push([tx('部首番号', 'Radical no.'), String(rad.n)]);
+  if (D.kanji[p]?.m && bi()) marks.push(['Meaning', String(D.kanji[p].m).toLowerCase()]);
+  if (D.kanji[p]?.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(D.kanji[p].kk) : D.kanji[p].kk]);
+  return {
+    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? (D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : '') : '', strokes: st },
+    nodes, marks, senses: [], examples: [], family: members, familyCount: cap.count, familyMine: cap.mine,
+  };
+}
+
+const wwSvg = (tag, attrs = {}) => {
+  const n = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+  return n;
+};
+function wwLearn(tag, cls, text) {
+  const n = el(tag, cls, text);
+  n.lang = 'ja';
+  n.dataset.uiContent = 'learning';
+  return n;
+}
+/** A label whose shared kanji are inked in 藍 (concept: siblings ink the shared kanji). */
+function wwInkLabel(text, hi) {
+  const n = wwLearn('span', 'ww-g');
+  for (const ch of [...text]) {
+    if (hi?.includes(ch)) n.append(el('b', null, ch));
+    else n.append(document.createTextNode(ch));
+  }
+  return n;
+}
+
+function wwPlate(model, section) {
+  const plate = el('div', 'ww-plate skin-reg');
+  plate.dataset.wwCentre = `${model.centre.type}:${model.centre.key}`;
+  const inner = el('div', 'ww-plate-in');
+  const svg = wwSvg('svg', { class: 'ww-wires', viewBox: `0 0 ${WW_W} ${WW_H}`, preserveAspectRatio: 'none', 'aria-hidden': 'true', focusable: 'false' });
+  // stroke ticks: one per real stroke of the centre, around its ring
+  const ticks = wwSvg('g', { class: 'ww-ticks' });
+  const st = Math.min(model.centre.strokes || 0, 48);
+  let d = '';
+  for (let i = 0; i < st; i += 1) {
+    const a = (i / st) * Math.PI * 2 - Math.PI / 2;
+    d += `M${(WW_CX + 61 * Math.cos(a)).toFixed(1)} ${(WW_CY + 61 * Math.sin(a)).toFixed(1)}L${(WW_CX + 67 * Math.cos(a)).toFixed(1)} ${(WW_CY + 67 * Math.sin(a)).toFixed(1)}`;
+  }
+  if (d) ticks.append(wwSvg('path', { d }));
+  svg.append(ticks, wwSvg('ellipse', { class: 'ww-ring', cx: WW_CX, cy: WW_CY, rx: 55, ry: 55 }));
+  const clampX = (n) => {
+    const half = n.card ? 58 : n.type === 'word' ? 46 : 34;
+    return Math.max(half + 4, Math.min(WW_W - half - 4, n.x));
+  };
+  model.nodes.forEach((n, i) => {
+    n.x = clampX(n);
+    for (const [fx, fy] of n.from) {
+      let x0 = fx;
+      let y0 = fy;
+      if (fx === WW_CX && fy === WW_CY) {
+        const a = Math.atan2(n.y - fy, n.x - fx);
+        x0 += 58 * Math.cos(a);
+        y0 += 58 * Math.sin(a);
+      }
+      const cls = ['ww-wire', n.live ? 'ww-wire-live' : '', n.rel ? 'ww-wire-rel' : '', n.card ? 'ww-wire-card' : ''].filter(Boolean).join(' ');
+      const path = wwSvg('path', { class: cls, d: `M${x0.toFixed(1)} ${y0.toFixed(1)}L${n.x.toFixed(1)} ${n.y.toFixed(1)}` });
+      path.style.setProperty('--i', String(i));
+      svg.append(path);
+    }
+  });
+  inner.append(svg);
+
+  const c = model.centre;
+  const centre = el('div', `ww-centre ww-c-${c.type}`);
+  centre.tabIndex = -1;
+  centre.style.setProperty('--x', String((WW_CX / WW_W) * 100));
+  centre.style.setProperty('--y', String(WW_CY));
+  if (c.reading) centre.append(wwLearn('span', 'ww-c-r', c.reading));
+  const glyph = wwLearn('span', 'ww-c-glyph', c.glyph);
+  glyph.dataset.len = String(Math.min([...c.glyph].length, 4));
+  centre.append(glyph);
+  if (c.gloss) centre.append(el('span', 'ww-c-m', c.gloss));
+  inner.append(centre);
+
+  const layer = el('div', 'ww-nodes');
+  model.nodes.forEach((n, i) => {
+    const b = el('button', `ww-node ww-n-${n.type}`);
+    b.type = 'button';
+    b.dataset.wwType = n.type;
+    b.dataset.wwKey = n.key;
+    if (n.live) b.classList.add('ww-lit');
+    if (n.mine) b.classList.add('ww-mine');
+    if (n.rel) b.classList.add('ww-rel');
+    b.style.setProperty('--x', String((n.x / WW_W) * 100));
+    b.style.setProperty('--y', String(n.y));
+    b.style.setProperty('--i', String(i));
+    const box = el('span', 'ww-nb');
+    let cap = bi() ? n.cap : n.capJa;
+    let capLearn = !bi() && !n.rel && n.type !== 'passage' && n.type !== 'grammar';
+    if (n.type === 'passage') {
+      const ex = wwExcerpt(n.ex, n.target);
+      const g = wwLearn('span', 'ww-g');
+      g.append(`…${ex.before}`, el('b', null, ex.word), `${ex.after}…`);
+      box.append(g);
+      const home = n.ex.passage && D.passages.some((p) => p.id === n.ex.passage);
+      cap = home ? tx('記事の一行', 'in an article') : tx('用例', 'example');
+      capLearn = false;
+      b.dataset.uiContentValue = n.target;
+      b.setAttribute('aria-label', home ? tx(`記事の「${n.target}」の行へ戻る`, `Return to the line with ${n.target} in its article`) : tx(`「${n.target}」の用例をひらく`, `Open the example with ${n.target}`));
+    } else if (n.type === 'grammar') {
+      box.append(wwLearn('span', 'ww-g', n.label));
+      cap = bi() ? (n.cap || 'grammar') : `文法 ${n.capJa}`.trim();
+      capLearn = false;
+      b.dataset.uiContentValue = n.label;
+      b.setAttribute('aria-label', tx(`文法「${n.label}」をひらく`, `Open the grammar point ${n.label}`));
+    } else {
+      box.append(n.type === 'word' ? wwInkLabel(n.key, n.hi) : wwLearn('span', 'ww-g', n.key));
+      b.dataset.uiContentValue = n.key;
+      const kind = { word: tx('語', 'word'), kanji: tx('漢字', 'kanji'), part: tx('部品', 'part') }[n.type];
+      b.setAttribute('aria-label', tx(`${kind}「${n.key}」を中心に`, `Centre the web on the ${kind} ${n.key}`));
+    }
+    // a drafting annotation: the kanji's real stroke count at the disc's shoulder
+    if (n.type === 'kanji' && D.kanji[n.key]?.st) {
+      const st = el('span', 'ww-st', String(D.kanji[n.key].st));
+      st.setAttribute('aria-hidden', 'true');
+      box.append(st);
+    }
+    b.append(box);
+    if (cap) b.append(capLearn ? wwLearn('span', 'ww-cap', cap) : el('span', 'ww-cap', cap));
+    b.addEventListener('click', () => {
+      if (n.type === 'passage') wwOpenPassage(n.ex, n.target, b);
+      else if (n.type === 'grammar') go({ t: 'grammar', id: n.key }, { invoker: b });
+      else wwRecentre({ type: n.type, key: n.key }, section, b);
+    });
+    layer.append(b);
+  });
+  inner.append(layer);
+  plate.append(inner);
+
+  const legend = el('div', 'ww-legend');
+  legend.setAttribute('aria-hidden', 'true');
+  // the legend names only what this plate draws
+  const drawn = new Set(model.nodes.map((n) => n.type));
+  for (const [cls, type, ja, en] of [['k', 'kanji', '漢字', 'kanji'], ['p', 'part', '部品', 'part'], ['w', 'word', '語', 'word'], ['a', 'passage', '用例', 'passage'], ['g', 'grammar', '文法', 'grammar']]) {
+    if (!drawn.has(type)) continue;
+    const item = el('span', null);
+    item.append(el('i', `ww-lg ww-lg-${cls}`), tx(ja, en));
+    legend.append(item);
+  }
+  if (drawn.has('kanji')) {
+    const item = el('span', null);
+    item.append(el('i', 'ww-lg ww-lg-st', 'n'), tx('画数', 'strokes'));
+    legend.append(item);
+  }
+  plate.append(legend);
+  return plate;
+}
+
+function wwDetail(model, section) {
+  const c = model.centre;
+  const box = el('div', 'ww-detail');
+  if (c.type === 'part') {
+    // the signature: the part's whole family, and how much of it is already yours
+    const line = el('p', 'ww-family-line');
+    line.append(
+      el('b', 'ww-fig', String(model.familyCount)),
+      tx(' 字がこの部品を共有 · ', ' kanji share this part · '),
+      el('b', 'ww-fig ww-fig-mine', String(model.familyMine)),
+      tx(' 字はもうあなたの語に', ' already in your words'),
+    );
+    box.append(line);
+  }
+  if (model.marks.length) {
+    const dl = el('dl', 'ww-marks');
+    for (const [k, v, ja] of model.marks) {
+      const cell = el('div', null);
+      cell.append(el('dt', null, k));
+      const dd = ja ? wwLearn('dd', null, v) : el('dd', null, v);
+      cell.append(dd);
+      dl.append(cell);
+    }
+    box.append(dl);
+  }
+  if (model.follow) {
+    // the signature: the part two kanji share, and the door into its family
+    const f = model.follow;
+    const b = el('button', 'ww-follow');
+    b.type = 'button';
+    b.dataset.wwKey = f.part;
+    b.dataset.uiContentValue = [...f.kanji, f.part].join('|');
+    const line = el('span', 'ww-follow-line');
+    f.kanji.forEach((k, i) => {
+      if (i) line.append(tx('と', ' and '));
+      line.append(wwLearn('b', 'ww-follow-k', k));
+    });
+    line.append(tx('に共通する部品', ' share one part:'), wwLearn('b', 'ww-follow-p ww-g', f.part));
+    const sub = el('span', 'ww-follow-sub', tx(`この部品の字 ${f.count} · ${f.mine} 字はあなたの語に · たどる`, `${f.count} kanji carry it · ${f.mine} in your words · follow it`));
+    b.append(line, sub);
+    b.addEventListener('click', () => wwRecentre({ type: 'part', key: f.part }, section, b));
+    box.append(b);
+  }
+  if (model.senses.length) {
+    // dictionary senses are English data in both interfaces, marked as such
+    const m = el('p', 'ww-meaning', model.senses.slice(0, 4).join('; '));
+    m.lang = 'en';
+    box.append(m);
+  }
+  if (c.type === 'part' && model.family.length) {
+    const grid = el('div', 'ww-family');
+    grid.setAttribute('role', 'group');
+    grid.setAttribute('aria-label', tx('この部品を持つ字', 'Kanji that contain this part'));
+    const mine = wwMine();
+    for (const k of model.family.slice(0, 42)) {
+      const b = el('button', mine.kanji.has(k) ? 'ww-fam ww-mine' : 'ww-fam');
+      b.type = 'button';
+      b.dataset.wwKey = k;
+      b.dataset.uiContentValue = k;
+      b.append(wwLearn('span', null, k));
+      b.setAttribute('aria-label', tx(`漢字「${k}」を中心に`, `Centre the web on the kanji ${k}`));
+      b.addEventListener('click', () => wwRecentre({ type: 'kanji', key: k }, section, b));
+      grid.append(b);
+    }
+    box.append(grid);
+    if (model.family.length > 42) box.append(el('p', 'ww-note', tx(`ほか ${model.family.length - 42} 字`, `and ${model.family.length - 42} more`)));
+  }
+  if (model.examples.length) {
+    box.append(el('h3', 'eyebrow ww-sub', tx('読んだ文の中で', 'Where it occurs')));
+    for (const ex of model.examples.slice(0, 2)) {
+      const target = ex.target || c.key;
+      const row = el('button', 'ww-pass');
+      row.type = 'button';
+      row.dataset.uiContentValue = target;
+      const text = wwLearn('span', 'ww-pass-ja');
+      const cut = wwExcerpt(ex, target);
+      if (cut.full && cut.ti >= 0) {
+        // the word stays inside the three visible lines: a long run-in is cut to its last clause
+        const lead = ex.tokens.slice(0, cut.ti).map((t) => t.s).join('');
+        text.append(lead.length > 26 ? `…${lead.slice(-22)}` : lead, el('b', null, ex.tokens[cut.ti].s), ex.tokens.slice(cut.ti + 1).map((t) => t.s).join(''));
+      } else text.textContent = ex.tokens.map((t) => t.s).join('');
+      row.append(text);
+      const home = ex.passage && D.passages.some((p) => p.id === ex.passage);
+      row.append(el('span', 'ww-pass-go', home ? tx('記事のこの行へ戻る', 'Return to this line in the article') : tx('この文をひらく', 'Open this sentence')));
+      row.addEventListener('click', () => wwOpenPassage(ex, target, row));
+      box.append(row);
+    }
+  }
+  const act = el('div', 'ww-actions');
+  const open = el('button', model.follow ? 'btn-secondary ww-open' : 'btn-primary ww-open', tx('項目をすべて見る', 'Open the full entry'));
+  open.type = 'button';
+  open.addEventListener('click', () => {
+    const t = c.type === 'part' ? (D.radicals?.[c.key] ? 'radical' : 'kanji') : c.type;
+    go({ t, id: c.key }, { invoker: open });
+  });
+  act.append(open);
+  box.append(act);
+  return box;
+}
+
+function wwValid(n) {
+  if (n.type === 'word') return !!(D.dict[n.key] || D.words[n.key]);
+  if (n.type === 'kanji') return !!D.kanji[n.key];
+  return n.type === 'part' && (wwPartMembers(n.key).size > 0 || !!D.radicals?.[n.key]);
+}
+
+/** The shelf warms in the background (prefetchArticles) and bank sentences
+ * arrive lazily; when a sentence for this centre lands, the plate gains its
+ * passage card once, quietly — never while the learner is inside it. */
+function wwWatchPassages(section, tries) {
+  const centre = wwTrail().at(-1);
+  if (!centre || centre.type === 'part' || tries >= 5) return;
+  if (centre.type === 'word' && !D.exampleBank?.has(centre.key)) ensureBankExamples(centre.key).catch(() => {});
+  setTimeout(() => {
+    const now = wwTrail().at(-1);
+    if (!section.isConnected || section.classList.contains('ww-leaving') || section.contains(document.activeElement)) return;
+    if (!now || section.dataset.wwCentre !== `${now.type}:${now.key}`) return;
+    const found = now.type === 'word' ? wwPassages(now.key, 1).length > 0 : !!wwKanjiPassage(now.key);
+    if (!found) {
+      wwWatchPassages(section, tries + 1);
+      return;
+    }
+    const next = renderWordWeb({ quiet: true });
+    if (next) section.replaceWith(next);
+  }, 1800);
+}
+
+/** The whole web: the walk, the plate, the detail plate. Null until data lands. */
+function renderWordWeb({ quiet = false } = {}) {
+  if (!wwReady()) return null;
+  if (wwTrail().length && !wwValid(wwTrail().at(-1))) wordWeb.trail = [];
+  const centre = wwDefault();
+  if (!centre || !wwValid(centre)) return null;
+  if (!wwTrail().length) wwPush(centre);
+  const mine = wwMine();
+  const model = wwModel(centre, mine);
+  const section = el('section', quiet ? 'ww ww-quiet' : 'ww');
+  section.dataset.wwType = centre.type;
+  section.dataset.wwCentre = `${centre.type}:${centre.key}`;
+  section.setAttribute('aria-label', tx('言葉の網', 'The word web'));
+
+  const head = el('div', 'ww-head');
+  const why = wwTrail()[0]?.why;
+  const eyebrow = el('h2', 'eyebrow ww-eyebrow', tx('言葉の網', 'The word web'));
+  head.append(eyebrow);
+  const whyText = { looked: tx('最後に引いた語から', 'from the word you last looked up'), saved: tx('あなたの語から', 'from your words'), day: tx('今日の語から', "from today's word") }[why];
+  if (whyText) head.append(el('span', 'ww-why', whyText));
+  const walk = el('nav', 'ww-walk');
+  walk.setAttribute('aria-label', tx('たどった道', 'Your walk'));
+  walk.append(el('span', 'ww-walk-label', tx('たどった道', 'Your walk')));
+  const trail = wwTrail();
+  // a phone keeps the walk to one line: the last four steps, the rest folded into …
+  const shown = trail.slice(-4);
+  if (trail.length > shown.length) walk.append(el('span', 'ww-walk-sep ww-walk-fold', '…'));
+  shown.forEach((n, i) => {
+    if (i) walk.append(el('span', 'ww-walk-sep', '—'));
+    const here = i === shown.length - 1;
+    const b = el('button', here ? 'ww-crumb ww-here' : 'ww-crumb');
+    b.type = 'button';
+    b.dataset.uiContentValue = n.key;
+    b.append(wwLearn('span', null, n.key));
+    if (here) b.setAttribute('aria-current', 'step');
+    b.setAttribute('aria-label', tx(`「${n.key}」へ戻る`, `Back to ${n.key}`));
+    b.addEventListener('click', () => { if (!here) wwRecentre(n, section, null); });
+    walk.append(b);
+  });
+  head.append(walk);
+  section.append(head, wwPlate(model, section), wwDetail(model, section));
+  if (!model.nodes.some((n) => n.type === 'passage')) wwWatchPassages(section, 0);
+  return section;
+}
+
+/** Re-centre on a node: the tapped glyph flies to the middle while the rest
+ * fade (transform and opacity only, ≤300ms), then only this section is swapped
+ * — the room never re-renders, the scroll and the search field stay put. */
+function wwRecentre(node, section, invoker) {
+  if (!section?.isConnected) return;
+  const swap = () => {
+    wwPush(node);
+    const next = renderWordWeb();
+    if (!next) return;
+    const hadFocus = section.contains(document.activeElement);
+    // read before writing: the new section lands exactly where the old one stood
+    const top = section.getBoundingClientRect().top;
+    section.replaceWith(next);
+    if (top < 0) window.scrollBy(0, top - 64);
+    const glyph = next.querySelector('.ww-c-glyph');
+    if (!wwReduced() && glyph?.animate) glyph.animate([{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 90, easing: 'cubic-bezier(.22,1,.36,1)' });
+    if (hadFocus) next.querySelector('.ww-centre')?.focus({ preventScroll: true });
+  };
+  const from = invoker?.querySelector('.ww-g') || invoker?.querySelector('span');
+  const to = section.querySelector('.ww-c-glyph');
+  if (wwReduced() || !from || !to || !from.animate) {
+    swap();
+    return;
+  }
+  const r0 = from.getBoundingClientRect();
+  const r1 = to.getBoundingClientRect();
+  section.classList.add('ww-leaving');
+  if (invoker.closest('.ww-detail')) section.classList.add('ww-leaving-detail');
+  invoker.classList.add('ww-chosen');
+  const scale = Math.min(3.2, r1.height / Math.max(r0.height, 1));
+  from.animate(
+    [{ transform: 'none' }, { transform: `translate(${(r1.left + r1.width / 2 - (r0.left + r0.width / 2)).toFixed(1)}px, ${(r1.top + r1.height / 2 - (r0.top + r0.height / 2)).toFixed(1)}px) scale(${scale.toFixed(2)})` }],
+    { duration: 200, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
+  );
+  setTimeout(swap, 200);
+}
+
+/** Other rooms' "Open the web" buttons call this. */
+function openWordWeb(term, { type = null, invoker = null } = {}) {
+  const key = String(term || '').trim();
+  if (!key || !wwReady()) return false;
+  const kind = type || (D.dict[key] || D.words[key] ? 'word' : D.kanji[key] ? 'kanji' : D.radicals?.[key] ? 'part' : 'word');
+  const here = document.querySelector('#app > main .ww');
+  if (here && !S.stack.length && (S.view === 'search' || S.view === 'thesaurus')) {
+    wwRecentre({ type: kind, key }, here, null);
+    return true;
+  }
+  wwPush({ type: kind, key });
+  keepNavigationReturn('thesaurus', invoker || document.activeElement);
+  S.view = 'thesaurus';
+  render();
+  window.scrollTo(0, 0);
+  return true;
+}
+window.openWordWeb = openWordWeb;
+/* ===================================================== END WORD WEB (Words lane) */
 
 /* ------------------------------------------------------------- particles
  * The structural law (design doc §4): particles are first-class doors, not
@@ -28382,6 +29189,11 @@ function renderSearchPage(main) {
     kkld: (host) => renderKdxKkld(host),
   };
   const paint = () => {
+    paintRows();
+    // words.css steps the word web aside while rows, a finder or the wheel show
+    wrap.classList.toggle('search-page-busy', !!results.firstChild);
+  };
+  const paintRows = () => {
     if (FINDER_LENSES[S.searchLens]) {
       results.textContent = '';
       skipOpener.hidden = true;
@@ -29364,7 +30176,11 @@ function renderSettings(main) {
   main.append(language, doors);
 }
 function renderWordsDoors(main) {
-  const section = el('section', 'foundation-section');
+  // the Words tab opens on the word web (the last word looked up, else the
+  // day's word); while a query or a finder lens is showing, words.css hides it
+  const web = renderWordWeb();
+  if (web) main.append(web);
+  const section = el('section', 'foundation-section words-index');
   section.append(el('h2', 'eyebrow', tx('言葉のつながりを探す', 'Explore the language')));
   const doors = el('div', 'foundation-doors');
   doors.append(

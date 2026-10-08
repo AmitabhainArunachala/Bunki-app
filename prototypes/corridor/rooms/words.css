@@ -24,3 +24,329 @@ html:is([data-room='search'], [data-room='kanji'], [data-room='grammar'], [data-
     linear-gradient(0deg, color-mix(in srgb, var(--color-live) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px;
   --skin-light: radial-gradient(80% 40% at 50% 30%, color-mix(in srgb, var(--color-live) 6%, transparent), transparent 70%);
 }
+
+/* ==========================================================================
+   Words lane · THE WORD WEB (renderWordWeb, after renderThesaurus in corridor.js)
+   A drafting plate: vellum + 10/50 罫線 by day, a phosphor blueprint at night.
+   One live element per screen: the shared part (the bird) / the kanji you came from.
+   Motion: transform + opacity only; leaders unfold from the centre; a tapped
+   glyph flies to the middle (WAAPI, 200ms) and the plate re-forms (≤300ms).
+   ========================================================================== */
+html:is([data-room='search'], [data-room='word-web']) body:not([data-view='drift']) {
+  --ww-paper: color-mix(in srgb, var(--color-surface) 86%, transparent);
+  --ww-solid: var(--color-surface);
+  --ww-grid: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  --ww-grid-major: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --ww-wire: color-mix(in srgb, var(--color-accent) 46%, transparent);
+  --ww-node-ink: var(--color-accent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) body:not([data-view='drift']) {
+  --ww-paper: color-mix(in srgb, var(--color-ground) 84%, #000);
+  --ww-solid: color-mix(in srgb, var(--color-ground) 84%, #000);
+  --ww-grid: color-mix(in srgb, var(--color-live) 5%, transparent);
+  --ww-grid-major: color-mix(in srgb, var(--color-live) 11%, transparent);
+  --ww-wire: color-mix(in srgb, var(--color-live) 48%, transparent);
+  --ww-node-ink: color-mix(in srgb, var(--color-live) 30%, #eaf6f2);
+}
+
+/* ---- the section: the walk, the plate, the detail plate ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww { position: relative; margin: var(--space-6, 32px) 0 0; contain: layout style; }
+@media (max-width: 520px) {
+  /* the plate is the room's one wide object: it takes the gutters (10px a side) */
+  html:is([data-room='search'], [data-room='word-web']) body:not(.zen) #app > main > .ww { margin-inline: -8px; }
+  html[data-room='search'] body:not(.zen) #app > main:has(> .room-sign) > .ww { margin-right: -26px; }
+}
+/* searching is one job: while rows, a finder lens or the SKIP wheel show, the web steps away */
+html[data-room='search'] #app > main > .search-page.search-page-busy ~ .ww { display: none; }
+
+html:is([data-room='search'], [data-room='word-web']) .ww-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 0 8px 4px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-eyebrow { margin: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-why { font: 500 12px/1.4 var(--font-ui); color: var(--color-muted); }
+html:is([data-room='search'], [data-room='word-web']) .ww-walk { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; width: 100%; min-height: 48px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-walk-label { margin-right: 6px; font: 600 11px/1 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); }
+body:not(.ui-bi) .ww-walk-label { letter-spacing: 0.06em; text-transform: none; font-size: 12px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-walk-sep { padding: 0; color: var(--color-rule); font: 400 13px/1 var(--font-ui); }
+html:is([data-room='search'], [data-room='word-web']) .ww-crumb {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; margin: 0; padding: 0 2px;
+  border: 0; background: none; color: var(--color-muted); font: 800 19px/1 var(--font-headword, var(--font-display)); cursor: pointer;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-crumb:hover { color: var(--color-ink); }
+html:is([data-room='search'], [data-room='word-web']) .ww-crumb:not(.ww-here) span { box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-accent) 50%, transparent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-crumb.ww-here {
+  color: var(--color-ink); font-size: 28px; cursor: default;
+  background: linear-gradient(var(--color-seal), var(--color-seal)) 4px calc(100% - 3px) / calc(100% - 8px) 2.5px no-repeat;
+}
+
+/* ---- the plate ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-plate {
+  position: relative; height: 404px; margin: 0;
+  border: 1px solid var(--color-rule);
+  background-color: var(--ww-paper);
+  background-image:
+    linear-gradient(var(--ww-grid-major) 0.5px, transparent 0.5px), linear-gradient(90deg, var(--ww-grid-major) 0.5px, transparent 0.5px),
+    linear-gradient(var(--ww-grid) 0.5px, transparent 0.5px), linear-gradient(90deg, var(--ww-grid) 0.5px, transparent 0.5px);
+  background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+  background-position: -0.5px -0.5px;
+  contain: layout paint;
+}
+/* registration marks inside the plate's corners */
+html:is([data-room='search'], [data-room='word-web']) .ww-plate::before,
+html:is([data-room='search'], [data-room='word-web']) .ww-plate::after {
+  content: ''; position: absolute; width: 12px; height: 12px; pointer-events: none;
+  border: 0 solid var(--color-edge-strong);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-plate::before { top: 6px; left: 6px; border-width: 1px 0 0 1px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-plate::after { right: 6px; top: 6px; border-width: 1px 1px 0 0; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-plate {
+  border-color: color-mix(in srgb, var(--color-live) 42%, transparent);
+  box-shadow: inset 0 0 60px color-mix(in srgb, var(--color-live) 7%, transparent), 0 0 0 0.5px color-mix(in srgb, var(--color-live) 18%, transparent), 0 18px 40px -24px rgb(0 0 0 / 70%);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-plate-in { position: absolute; inset: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+html:is([data-room='search'], [data-room='word-web']) .ww-wire {
+  fill: none; stroke: var(--ww-wire); stroke-width: 1; vector-effect: non-scaling-stroke;
+  transform-box: view-box; transform-origin: 50% 47.5%;
+  animation: ww-wire 240ms var(--ease-enter) both; animation-delay: calc(var(--i, 0) * 6ms);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-wire-live { stroke: var(--color-live); stroke-width: 1.6; }
+html:is([data-room='search'], [data-room='word-web']) .ww-wire-rel { stroke-dasharray: 3 3; }
+html:is([data-room='search'], [data-room='word-web']) .ww-wire-card { stroke-dasharray: 1 3; stroke-linecap: round; }
+html:is([data-room='search'], [data-room='word-web']) .ww-ticks path { stroke: var(--color-ink); stroke-width: 1; opacity: 0.42; vector-effect: non-scaling-stroke; }
+html:is([data-room='search'], [data-room='word-web']) .ww-ring { fill: none; stroke: var(--color-rule); stroke-width: 0.8; vector-effect: non-scaling-stroke; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-wires {
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--color-live) 55%, transparent));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-ticks path { stroke: var(--color-live); opacity: 0.6; }
+
+/* ---- the centre ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-centre {
+  position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1px); z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 1px; max-width: 120px;
+  transform: translate(-50%, -50%); text-align: center; outline: none; pointer-events: none;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-c-r { font: 500 12px/1.2 var(--font-ui); letter-spacing: 0.14em; color: var(--color-seal); }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
+  display: block; font: 800 50px/1.06 var(--font-headword, var(--font-display)); color: var(--color-ink); white-space: nowrap;
+  animation: ww-ink 300ms var(--ease-ink, ease) both;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='1'] { font-size: 66px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='3'] { font-size: 34px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='4'] { font-size: 26px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-m { max-width: 104px; overflow: hidden; font: 500 11px/1.25 var(--font-data); color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
+  text-shadow: 0 0 18px color-mix(in srgb, var(--color-live) 38%, transparent);
+}
+
+/* ---- nodes ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-nodes { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-node {
+  position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-width: 44px; min-height: 44px; margin: 0; padding: 0;
+  border: 0; background: none; color: var(--color-ink); font: inherit; cursor: pointer; pointer-events: auto;
+  transform: translate(-50%, -50%);
+  animation: ww-node 200ms var(--ease-enter) both; animation-delay: calc(40ms + var(--i, 0) * 5ms);
+  -webkit-tap-highlight-color: transparent;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-node:focus-visible { outline: 2px solid var(--color-live); outline-offset: 2px; border-radius: 4px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-nb { position: relative; display: grid; place-items: center; transition: transform var(--motion-press, 90ms) var(--ease-standard, ease); }
+html:is([data-room='search'], [data-room='word-web']) .ww-node:active .ww-nb { transform: scale(0.94); }
+html:is([data-room='search'], [data-room='word-web']) .ww-g { display: block; }
+html:is([data-room='search'], [data-room='word-web']) .ww-cap {
+  max-width: 92px; padding: 0 3px; overflow: hidden; background: var(--ww-solid);
+  font: 500 10.5px/1.3 var(--font-ui); color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap;
+}
+/* kanji: a 藍 disc by day, a lit ring at night */
+html:is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-nb {
+  width: 46px; height: 46px; border-radius: 50%; background: var(--color-accent); color: #f6f0e3;
+  box-shadow: 0 0 0 3px var(--ww-solid), 0 0 0 3.5px var(--color-rule);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-g { font: 800 25px/1 var(--font-headword, var(--font-display)); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-nb {
+  background: var(--ww-solid); color: var(--ww-node-ink);
+  box-shadow: inset 0 0 0 1px var(--color-live), 0 0 10px color-mix(in srgb, var(--color-live) 32%, transparent), inset 0 0 10px color-mix(in srgb, var(--color-live) 14%, transparent);
+}
+/* parts: a ruled square */
+html:is([data-room='search'], [data-room='word-web']) .ww-n-part .ww-nb {
+  width: 40px; height: 40px; border: 1px solid var(--color-accent); background: var(--ww-solid); color: var(--color-accent);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-n-part .ww-g { font: 800 22px/1 var(--font-headword, var(--font-display)); }
+/* the live element: the part two kanji share (the bird), or the kanji you came from */
+html:is([data-room='search'], [data-room='word-web']) .ww-node.ww-lit .ww-nb {
+  border: 1.5px solid var(--color-live); color: var(--color-live);
+  box-shadow: 0 0 0 4px var(--color-live-wash, color-mix(in srgb, var(--color-live) 12%, transparent)), 0 0 14px var(--color-live-glow, transparent);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-n-kanji.ww-lit .ww-nb { border: 0; background: var(--color-live); color: #f6f0e3; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-n-kanji.ww-lit .ww-nb {
+  border: 1.5px solid var(--color-live); background: var(--ww-solid); color: var(--color-live);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-node.ww-lit .ww-cap { color: var(--color-live); font-weight: 700; }
+/* words: Mincho, the shared kanji inked in 藍 */
+html:is([data-room='search'], [data-room='word-web']) .ww-n-word .ww-g {
+  padding: 1px 4px; background: var(--ww-solid);
+  font: 600 18px/1.15 var(--font-reading); color: var(--color-ink-2, var(--color-ink)); white-space: nowrap;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-n-word .ww-g b { font-weight: 800; color: var(--color-accent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-n-word.ww-rel .ww-cap { font-style: italic; }
+/* yours: a small gold mark (earned, never decoration) */
+html:is([data-room='search'], [data-room='word-web']) .ww-node.ww-mine .ww-nb::after {
+  content: ''; position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--color-gold, #94702a); box-shadow: 0 0 0 2px var(--ww-solid);
+}
+/* side cards: a passage, a grammar point */
+html:is([data-room='search'], [data-room='word-web']) .ww-node:is(.ww-n-passage, .ww-n-grammar) .ww-nb {
+  max-width: 116px; padding: 5px 8px; border: 0.5px solid var(--color-edge-strong); background: var(--color-surface);
+  box-shadow: var(--elevation-paper, none);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-node:is(.ww-n-passage, .ww-n-grammar) .ww-g {
+  max-width: 100px; overflow: hidden; font: 400 13px/1.35 var(--font-reading); color: var(--color-ink); text-overflow: ellipsis; white-space: nowrap;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-n-passage .ww-g b { font-weight: 800; box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--color-seal) 55%, transparent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-n-grammar .ww-nb { border-left: 2px solid var(--color-accent); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-node:is(.ww-n-passage, .ww-n-grammar) .ww-nb {
+  border-color: color-mix(in srgb, var(--color-live) 34%, transparent); background: var(--ww-solid);
+}
+
+/* ---- legend ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-legend {
+  position: absolute; left: 12px; right: 12px; bottom: 9px; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px 10px;
+  font: 500 9.5px/1 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted);
+}
+body:not(.ui-bi) .ww-legend { font-size: 10.5px; letter-spacing: 0.04em; text-transform: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-legend span { display: inline-flex; align-items: center; gap: 5px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg { display: inline-block; width: 8px; height: 8px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg-k { border-radius: 50%; background: var(--color-accent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg-p { border: 1px solid var(--color-accent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg-w { width: 10px; height: 1px; background: var(--color-ink-2, var(--color-ink)); }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg-a { width: 10px; height: 7px; border: 0.5px solid var(--color-edge-strong); background: var(--color-surface); }
+
+/* ---- the detail plate under the web ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-detail { padding: 0 0 var(--space-2, 8px); }
+html:is([data-room='search'], [data-room='word-web']) .ww-marks {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0;
+  border: 1px solid var(--color-rule); border-top: 0; background: var(--ww-paper);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-marks > div { min-width: 0; padding: 9px 8px 10px; border-top: 0.5px solid var(--color-rule-soft); border-left: 0.5px solid var(--color-rule-soft); }
+html:is([data-room='search'], [data-room='word-web']) .ww-marks > div:nth-child(3n + 1) { border-left: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-marks > div:nth-child(-n + 3) { border-top: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-marks dt {
+  overflow: hidden; font: 600 9.5px/1.2 var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap;
+}
+body:not(.ui-bi) .ww-marks dt { font-size: 10.5px; letter-spacing: 0.04em; text-transform: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-marks dd {
+  margin: 5px 0 0; overflow: hidden; font: 500 14px/1.25 var(--font-data); font-variant-numeric: tabular-nums; color: var(--color-ink); text-overflow: ellipsis; white-space: nowrap;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-marks dd[lang='ja'] { font: 700 15px/1.25 var(--font-reading); }
+html:is([data-room='search'], [data-room='word-web']) .ww-meaning { margin: var(--space-4, 16px) 8px var(--space-2, 8px); font: 400 16px/1.55 var(--font-ui); color: var(--color-ink-2, var(--color-ink)); }
+html:is([data-room='search'], [data-room='word-web']) .ww-family-line {
+  margin: 0; padding: 12px 10px 11px; border: 1px solid var(--color-rule); border-top: 0; background: var(--ww-paper);
+  font: 500 14px/1.45 var(--font-ui); color: var(--color-ink-2, var(--color-ink));
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-fig { font: 800 24px/1 var(--font-headword, var(--font-display)); color: var(--color-ink); font-variant-numeric: tabular-nums; }
+html:is([data-room='search'], [data-room='word-web']) .ww-fig-mine { color: var(--color-gold, var(--color-accent)); }
+html:is([data-room='search'], [data-room='word-web']) .ww-family { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin: var(--space-3, 12px) 8px 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-fam {
+  position: relative; display: grid; place-items: center; aspect-ratio: 1; min-height: 44px; margin: 0; padding: 0;
+  border: 0.5px solid var(--color-rule); background: var(--ww-paper); color: var(--color-ink);
+  font: 800 22px/1 var(--font-headword, var(--font-display)); cursor: pointer;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-fam span { display: block; }
+html:is([data-room='search'], [data-room='word-web']) .ww-fam.ww-mine { border-color: var(--color-gold, var(--color-accent)); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--color-gold, var(--color-accent)) 55%, transparent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-note { margin: var(--space-2, 8px) 8px 0; font: 500 12px/1.4 var(--font-ui); color: var(--color-muted); }
+html:is([data-room='search'], [data-room='word-web']) .ww-sub { margin: var(--space-5, 24px) 8px var(--space-2, 8px); }
+html:is([data-room='search'], [data-room='word-web']) .ww-pass {
+  display: block; width: calc(100% - 16px); min-height: 44px; margin: 0 8px 8px; padding: 8px 4px 8px 12px;
+  border: 0; border-left: 2px solid var(--color-rule); background: none; color: inherit; text-align: left; cursor: pointer;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-pass-ja {
+  display: -webkit-box; overflow: hidden; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  font: 400 16px/1.7 var(--font-reading); color: var(--color-ink);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-pass-ja b { font-weight: 800; box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--color-seal) 50%, transparent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-pass-go { display: block; margin-top: 2px; font: 600 12px/1.4 var(--font-ui); color: var(--color-accent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-pass:hover .ww-pass-go { text-decoration: underline; }
+html:is([data-room='search'], [data-room='word-web']) .ww-actions { display: flex; gap: var(--space-2, 8px); margin: var(--space-4, 16px) 8px 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-open { min-height: 44px; padding: 0 18px; }
+
+/* ---- the re-centre: everything but the chosen glyph steps back ---- */
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-plate :is(.ww-node:not(.ww-chosen), .ww-wires, .ww-centre),
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving:not(.ww-leaving-detail) .ww-detail,
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving-detail .ww-detail > :not(.ww-chosen):not(.ww-family),
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving-detail .ww-fam:not(.ww-chosen) {
+  opacity: 0; transition: opacity 120ms var(--ease-exit, ease-in);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen { z-index: 5; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-nb { border-color: transparent; background: transparent; box-shadow: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-nb::after,
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-cap { opacity: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-g { background: none; color: var(--color-ink); }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-fam.ww-chosen { border-color: transparent; background: none; box-shadow: none; }
+
+@keyframes ww-wire { from { opacity: 0.01; transform: scale(0.5); } to { opacity: 1; transform: none; } }
+@keyframes ww-node { from { opacity: 0.01; transform: translate(-50%, -50%) scale(0.6); } to { opacity: 1; transform: translate(-50%, -50%); } }
+@keyframes ww-ink { from { opacity: 0.4; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html:is([data-room='search'], [data-room='word-web']) :is(.ww-wire, .ww-node, .ww-c-glyph) { animation: none; }
+  html:is([data-room='search'], [data-room='word-web']) .ww-leaving * { transition: none; }
+}
+
+/* ---- the search field above the web: the lenses ride one ruled strip on phones ---- */
+@media (max-width: 520px) {
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses {
+    flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    margin: 10px 0 8px; padding-bottom: 2px;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+  }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses::-webkit-scrollbar { display: none; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { flex: none; padding-inline: 13px; }
+  html[data-room='search'] .search-page .search-page-hint { margin: 4px 0 8px; font-size: 13px; line-height: 1.45; }
+}
+
+/* ---- the quiet index under the web: four doors, two by two ---- */
+html[data-room='search'] .words-index { margin-top: var(--space-7, 40px); }
+html[data-room='search'] .words-index .foundation-doors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-room='search'] .words-index .foundation-door { min-height: 52px; font-size: 14.5px; }
+
+/* ---- the word-web room (thesaurus view) ---- */
+html[data-room='word-web'] .ww-room-title { margin-bottom: var(--space-2, 8px); }
+html[data-room='word-web'] .ww { margin-top: var(--space-3, 12px); }
+html[data-room='word-web'] .thes-eyebrow { margin-top: var(--space-8, 48px); }
+html:is([data-room='search'], [data-room='word-web']) .ww-quiet :is(.ww-wire, .ww-node, .ww-c-glyph) { animation: none; }
+html[data-room='word-web'] .ww-eyebrow { display: none; }
+body:not(.ui-bi) .ww-n-word.ww-rel .ww-cap { font-style: normal; }
+/* an odd last mark spans the row instead of leaving a hole in the plate */
+html:is([data-room='search'], [data-room='word-web']) .ww-marks > div:last-child:nth-child(3n + 1) { grid-column: span 3; }
+html:is([data-room='search'], [data-room='word-web']) .ww-marks > div:last-child:nth-child(3n + 2) { grid-column: span 2; }
+html:is([data-room='search'], [data-room='word-web']) .ww-meaning { font-size: 15px; }
+
+/* follow the part: the signature door from a word into its shared part's family */
+html:is([data-room='search'], [data-room='word-web']) .ww-follow {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: calc(100% - 16px); min-height: 44px; margin: var(--space-3, 12px) 8px 0; padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-live) 55%, transparent); border-radius: var(--radius-card, 4px);
+  background: var(--color-live-wash, color-mix(in srgb, var(--color-live) 10%, transparent)); color: var(--color-ink); text-align: left; cursor: pointer;
+  transition: transform var(--motion-press, 90ms) var(--ease-standard, ease);
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-follow:active { transform: translateY(1px); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; font: 500 15px/1.4 var(--font-ui); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-k { font: 800 21px/1.1 var(--font-headword, var(--font-display)); color: var(--color-accent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-p { display: inline-block; margin-left: 4px; font: 800 28px/1 var(--font-headword, var(--font-display)); color: var(--color-live); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub { font: 500 12px/1.4 var(--font-ui); color: var(--color-muted); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub::after { content: ' →'; color: var(--color-live); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow {
+  box-shadow: 0 0 16px -6px var(--color-live-glow, transparent); background: color-mix(in srgb, var(--color-live) 7%, var(--ww-solid));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow-p { text-shadow: 0 0 10px var(--color-live-glow, transparent); }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen { border-color: transparent; background: none; box-shadow: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen :is(.ww-follow-line, .ww-follow-sub, .ww-follow-k) { color: transparent; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen .ww-follow-sub::after { content: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen .ww-follow-p { color: var(--color-ink); text-shadow: none; }
+html:is([data-room='search'], [data-room='word-web']) .ww-st {
+  position: absolute; top: -17px; left: 50%; min-width: 15px; padding: 0 2px; transform: translateX(-50%); background: var(--ww-solid);
+  font: 500 9.5px/1.3 var(--font-data); font-variant-numeric: tabular-nums; color: var(--color-muted); text-align: center;
+}
+html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-st { opacity: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg-g { width: 10px; height: 7px; border-left: 2px solid var(--color-accent); background: var(--color-surface); }
+html:is([data-room='search'], [data-room='word-web']) .ww-lg-st { width: auto; height: auto; font: 500 9.5px/1 var(--font-data); font-style: normal; text-transform: none; color: var(--color-muted); }
+/* the centre's reading and gloss break the ring line behind them, like lettering on a drawing */
+html:is([data-room='search'], [data-room='word-web']) :is(.ww-c-r, .ww-c-m) { position: relative; padding: 0 4px; background: var(--ww-solid); }
