@@ -2373,9 +2373,9 @@ button.pool-tag.cat-chip {
   opacity: 0.6;
 }
 
-/* the ten world-stones — the direct picker. Each stone previews its
- * own world (inline colours from THEME_UI); the active one is ringed in its
- * world's red. */
+/* the eleven world-stones — the direct picker, in two named rows (day, night:
+ * D2, both night looks are offered). Each stone previews its own world (inline
+ * colours from THEME_UI); the active one is ringed in its world's red. */
 /* the stones are a transient modal: they must surface above EVERY overlay —
  * the stroke page rides at z-90 and buried them (operator: "no options to
  * change colors at all"), so the picker tops the whole stack */
@@ -2388,14 +2388,36 @@ button.pool-tag.cat-chip {
 .world-picker {
   position: fixed;
   z-index: 121;
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  gap: 10px;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  max-width: calc(100vw - 16px);
+  padding: 12px 14px 14px;
   background: var(--ground-0);
   border: 1px solid var(--line);
   border-radius: 14px;
-  box-shadow: 0 14px 44px rgba(10, 10, 8, 0.32);
+  box-shadow: 0 1px 2px rgba(10, 10, 8, 0.12), 0 18px 44px -8px rgba(10, 10, 8, 0.36);
+  animation: world-picker-in 180ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
+}
+.world-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.world-row-name {
+  flex: 0 0 100%;
+  margin: 0 0 2px 2px;
+  font: 600 11px/1.2 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+@keyframes world-picker-in {
+  from { opacity: 0.01; transform: translateY(-4px) scale(0.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-picker { animation: none; }
 }
 .world-stone {
   width: var(--tap);
@@ -2413,6 +2435,7 @@ button.pool-tag.cat-chip {
   border-color: var(--stone-red, var(--red));
   box-shadow: 0 0 0 1px var(--stone-red, var(--red));
 }
+.world-stone:active { transform: scale(0.92); }
 
 /* ------------------------------------------------------ bilingual chrome */
 .en-sub {
