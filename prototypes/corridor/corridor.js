@@ -5516,7 +5516,9 @@ function renderShelfBody() {
   // results line below come from the same tally, so they cannot disagree.
   const masthead = el('header', 'shelf-masthead');
   const title = el('div', 'shelf-mast-title');
-  // the 永 brush mark is the bookshelf's own small seal, set with its name — never a picture apart.
+  // the bookshelf's own small seal, set with its name — never a picture apart. It is 読 (yomu, "read"),
+  // the Read tab's own kanji, brushed white on 藍 (round 4, John T3: the old 永 read as 水 and said
+  // nothing about reading). The file keeps its path: the offline gates and the worker pin the path.
   // The standalone build inlines the artwork and names it here; a literal path would break it.
   const art = el('img', 'shelf-art'); art.src = window.__KAIRO_SHELF_ART_URL__ || 'design/ink-hoku-nami.png'; art.alt = ''; art.width = 640; art.height = 640;
   art.setAttribute('aria-hidden', 'true');
