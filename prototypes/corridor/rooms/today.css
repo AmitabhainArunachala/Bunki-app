@@ -755,3 +755,11 @@ html[data-room='tray']:root body:not([data-view='drift']) #app > main > .room-si
   opacity: 0.7;
   box-shadow: none;
 }
+
+/* round 4 review: the door's Today pill is always at the universe's foot now, so while the
+   universe's own card or its radical explainer is open it steps aside (it covered the card's last
+   row), and it returns when the card closes */
+html[data-room='door'] body.ginga:has(#drift-layer #card.open, #drift-layer #radoc.open) #home-review {
+  opacity: 0;
+  pointer-events: none;
+}

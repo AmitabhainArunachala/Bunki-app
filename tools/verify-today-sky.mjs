@@ -228,6 +228,20 @@ try {
             JSON.stringify({ before: rail.handle, ...auto }));
         }
 
+        // the pill steps aside while the universe's own card is open (it covered the card's last row),
+        // and is back once the card closes
+        const aside = await page.evaluate(() => {
+          const card = document.querySelector('#drift-layer #card');
+          const pillNode = document.getElementById('home-review');
+          const look = () => ({ opacity: getComputedStyle(pillNode).opacity, events: getComputedStyle(pillNode).pointerEvents });
+          card.classList.add('open');
+          const open = look();
+          card.classList.remove('open');
+          return { open, closed: look() };
+        });
+        check(`${label} · while the universe's card is open the Today pill steps aside, then returns`,
+          aside.open.opacity === '0' && aside.open.events === 'none' && aside.closed.opacity !== '0' && aside.closed.events !== 'none', JSON.stringify(aside));
+
         // the door's one way down is named Today and lands on Today
         const pill = page.locator('#home-review');
         const pillText = (await pill.textContent()).trim();
