@@ -932,15 +932,18 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
       JSON.stringify({ ...front, text: undefined }),
     );
     // one line at 390px, even with the longest topic chip (インド・仏教) beside a level chip
-    // (km-064-m08): the register chip stands in for the source chip and names the source
+    // (km-064-m08). Round 4 (T8, T2): the front is the sentence, so the register and the source are no
+    // longer bare chips there ("Lecture", "Examples"); the back's 出典 fold names the style in full
     check(
-      `${label}: the register and topic sit as small text chips in the card’s chip row (labelled in full, the register’s label naming the source), the passage’s topic in place of the word’s group and its register in place of the source chip, one row on a phone`,
-      front.chips.includes(UI_REGISTERS[card.register]) && front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === `Register: ${UI_REGISTER_NAMES[card.register]} (Original composition)` && front.rows === 1,
+      `${label}: the topic sits as a small text chip in the card’s chip row in place of the word’s group; no register chip and no source chip on the front; one row on a phone`,
+      front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(UI_REGISTERS[card.register]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === '' && front.rows === 1,
       JSON.stringify({ chips: front.chips, reg: front.reg, rows: front.rows }),
     );
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok', { timeout: 15000 });
+    const style = await page.evaluate(`document.querySelector('#kp-card .kp-f-src .kp-src-style')?.textContent ?? null`);
+    check(`${label}: the back’s 出典 fold names the passage’s style in full (${UI_REGISTER_NAMES[card.register]})`, style === `Style ${UI_REGISTER_NAMES[card.register]}`, JSON.stringify({ style }));
     // on the back the 全文／焦点 toggle may take a line of its own; the chips keep theirs
     const backRows = await page.evaluate(`new Set([...document.querySelectorAll('#kp-card .kp-chips > .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))).size`);
     check(`${label}: on the back the chips still sit on one row`, backRows === 1, JSON.stringify({ backRows }));

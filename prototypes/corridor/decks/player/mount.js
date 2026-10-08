@@ -311,6 +311,7 @@ const UI_EN = {
   "同": "Same kanji",
   "読": "Same reading",
   "文体": "Register",
+  "文体 ": "Style ",
   "話題": "Topic",
   "ニュース": "News",
   "ブログ": "Blog",
@@ -815,15 +816,13 @@ function studyScreen() {
   face.id = 'kp-card';
   face.dataset.card = id;
   face.dataset.kind = kind;
-  const source = t(KIND_NAME[card.kind] || '例文');
-  const written = passageChips(card, source);
   const chips = el(
     'div',
     'kp-chips',
     el('span', 'kp-chip kp-kindchip', t(kindLabel)),
-    // a written passage's register chip names its source too, so the row stays one line at 390px
-    REGISTER[card.register] ? null : el('span', 'kp-chip', source),
-    ...written,
+    // the front is the sentence (T8 "more distinction"): where it comes from and a written passage's
+    // style are named on the back's 出典 fold, not as bare chips here ("Examples", "Lecture": T2)
+    ...passageChips(card),
     TOPIC[card.topic] ? null : el('span', 'kp-chip', t(ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || '', ctx.deck.groups.find((g) => g.id === word.group)?.titleEn || '')),
     word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? t("復習") : t("初めて")),
@@ -936,25 +935,17 @@ function levelChip(level) {
 /** a written passage's register (CARD_CONTRACT_V2 §6) and topic: [chip text, full name] */
 const REGISTER = { 講: ['講義', '講義・本の要約'], 報: ['報道', 'ニュース・解説'], 論: ['論説', 'エッセイ・思想'], 話: ['会話', '話し言葉'], 学: ['学び', '勉強法・学習の話'], 語: ['話し方', '話し方・書き方の話'] };
 const TOPIC = { mind: ['心と学び', '心と学び'], india: ['インド・仏教', 'インド哲学と仏教'], ai: ['AI・半導体', 'AI と半導体'], history: ['世界史', '世界史'], language: ['日本語', '日本語についての話'] };
-/** small text chips for the passage's register and topic (none on a card without them); the
- * passage's topic takes the place of the word's group chip, and its register the place of the
- * source chip (its label names the source), so the row stays one line: kind · register · topic ·
- * level · state (aesthetics.md §4) */
-function passageChips(card, source = '') {
-  const out = [];
-  for (const [table, value, cls, what] of [
-    [REGISTER, card.register, 'kp-regchip', t("文体")],
-    [TOPIC, card.topic, 'kp-topicchip', t("話題")],
-  ]) {
-    const [text, full] = (typeof value === 'string' && table[value]) || [];
-    if (!text) continue;
-    const chip = el('span', `kp-chip kp-chip-sm ${cls}`, t(text));
-    const label = t(`${what}：${full}${table === REGISTER && source ? `（${source}）` : ''}`, `${what}: ${t(full)}${table === REGISTER && source ? ` (${source})` : ''}`);
-    chip.title = label;
-    chip.setAttribute('aria-label', label);
-    out.push(chip);
-  }
-  return out;
+/** a small text chip for the passage's topic (none on a card without one), in place of the word's
+ * group chip, so the row stays one line: kind · topic · level · state (aesthetics.md §4, as amended
+ * 2026-10-09: the source and the register moved to the 出典 fold) */
+function passageChips(card) {
+  const [text, full] = (typeof card.topic === 'string' && TOPIC[card.topic]) || [];
+  if (!text) return [];
+  const chip = el('span', 'kp-chip kp-chip-sm kp-topicchip', t(text));
+  const label = t(`話題：${full}`, `${t("話題")}: ${t(full)}`);
+  chip.title = label;
+  chip.setAttribute('aria-label', label);
+  return [chip];
 }
 /** the progress rail: drawn at where it stood, then ticked to frac on the compositor */
 function rail(frac) {
@@ -1770,6 +1761,9 @@ function otherPassages(card, word) {
 function sourceFold(card) {
   const src = card.src;
   const p = el('p', 'kp-src');
+  // a written passage's style (CARD_CONTRACT_V2 §6), named in full: it left the front's chip row
+  const style = typeof card.register === 'string' && REGISTER[card.register];
+  if (style) p.append(el('span', 'kp-src-line kp-src-style', el('span', 'kp-src-label', t("文体 ")), t(style[1])));
   const who = el('span', 'kp-src-line');
   if (src.author) who.append(src.author, src.translator ? t(`（訳 ${src.translator}）`, `(translation: ${src.translator})`) : '', ' · ');
   const label = src.site || src.label || '';

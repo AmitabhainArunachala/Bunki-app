@@ -152,6 +152,15 @@ Unchanged from `brief-2026-10-04/aesthetics.md`: target coloured by part of spee
 edge and chip by item kind, level as a text chip, English never coloured, textures off the
 card, one reveal transition under 180 ms, reduced motion honoured, grade bar pinned.
 
+> **Amendment, 2026-10-09 (round 4 review, the learner's T2 and T8).** The front's chip row is
+> **kind · topic (or the word's group) · level · state**. The bare source chip (例文集 "Examples",
+> ニュース "News") and a written passage's register chip (講義 "Lecture") leave the front: to a
+> first-time reader they named nothing (T2: "way to generic to mean anyhting at all"), and the front
+> should be the sentence (T8: "more distinction"). The back's 出典 fold names them instead: the site or
+> author as before, and for a written passage its style in full on the first line (文体 講義・本の要約,
+> "Style Lectures and book summaries"). The register codes, their data and the per-register
+> measurement in §10 are unchanged.
+
 ## 10. Measurement
 
 The December 2026 sitting is replaced by the app's own timed N1 mock built from these
