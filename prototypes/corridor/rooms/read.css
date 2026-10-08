@@ -1168,9 +1168,9 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
 html[data-room='reader'] body:not([data-view='drift']) {
   --reader-mat: color-mix(in srgb, var(--color-lacquer, #141a28) 90%, var(--color-accent));
   --reader-mat-edge: rgb(255 255 255 / 16%);
-  --reader-card: color-mix(in srgb, var(--color-surface) 45%, #fffefb);
+  --reader-card: color-mix(in srgb, var(--color-surface) 30%, #ffffff);
   --reader-card-edge: color-mix(in srgb, var(--color-ink) 20%, transparent);
-  --reader-paper: color-mix(in srgb, var(--color-surface) 70%, #fffdf7);
+  --reader-paper: color-mix(in srgb, var(--color-paper) 62%, #fffdf6);
   --reader-paper-edge: color-mix(in srgb, var(--color-ink) 16%, transparent);
   --reader-ink: color-mix(in srgb, var(--color-ink) 90%, #000000);
   --reader-track: color-mix(in srgb, var(--color-ink) 9%, var(--reader-card));
@@ -1178,10 +1178,10 @@ html[data-room='reader'] body:not([data-view='drift']) {
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) {
   --reader-mat: color-mix(in srgb, var(--color-ground) 40%, #000000);
   --reader-mat-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 42%, transparent);
-  --reader-card: color-mix(in srgb, var(--color-paper) 88%, #ffffff);
-  --reader-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 26%, transparent);
-  --reader-paper: color-mix(in srgb, var(--color-paper) 55%, var(--color-ground));
-  --reader-paper-edge: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --reader-card: color-mix(in srgb, var(--color-paper) 94%, #ffffff);
+  --reader-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 32%, transparent);
+  --reader-paper: color-mix(in srgb, var(--color-ground) 70%, #000000);
+  --reader-paper-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 24%, transparent);
   --reader-ink: var(--color-ink);
   --reader-track: color-mix(in srgb, var(--color-ground) 55%, var(--reader-card));
 }
@@ -1325,7 +1325,14 @@ html[data-room='reader'] body #app > main > .reader-card > #reader-tip.reader-ti
 }
 html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 13px/1.4 var(--font-ui); color: var(--color-ink-2); }
 
-/* the text on its own paper */
+/* the room is the page itself (washi): the mat, the card and the paper lie on it as separate things */
+html[data-room='reader'] body[data-view='reader']:not(.zen) #app > main {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+/* the text on its own paper (both selectors: the layered variant's older rule names body.v-depth-layered) */
+html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
 html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
   padding: 16px var(--s2, 16px) 28px;
   border-top: 1px solid var(--reader-paper-edge);
@@ -1335,6 +1342,7 @@ html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
   color: var(--reader-ink);
 }
 @media (max-width: 520px) {
+  html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
   html[data-room='reader'] body:not([data-view='drift']) main #reader.reader { margin-inline: calc(50% - 50vw); padding-inline: var(--s2, 16px); }
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title { font-size: 23px; line-height: 1.38; }
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: 14px; line-height: 1.4; }
