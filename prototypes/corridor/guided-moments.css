@@ -822,3 +822,160 @@
     transition: none !important;
   }
 }
+
+/* ============================================================================
+   Blood (round 4, 2026-10-09; the learner's D4 on the 2026-10-08 tour: "Blood"). On a wrong answer
+   only (never the rematch, never quiet), the cut draws blood: the blade's wake turns crimson past
+   the cut, one dark-red frame flashes inside the blackout, a fan of 臙脂 drops sprays from where the
+   learner stood and falls, the paper scraps carry the stain, and a pool spreads on the ground line.
+   Woodblock colour, flat and crisp-edged like Yoshitoshi's prints; the 80s–90s anime cut (the red
+   frame, the slow drops). No glow, no gore. Pseudo-elements on the existing stage, transform and
+   opacity only; the --samurai-motion law of the forced replay is honoured below.
+   ========================================================================== */
+.samurai-effect {
+  --se-blood: #9b1422;
+  --se-blood-deep: #5c0911;
+}
+/* the wake of the blade: paper-white to the cut, crimson past it */
+.samurai-effect--incorrect .samurai-effect__stroke {
+  background: linear-gradient(90deg, transparent, #f5ebd3 22%, #f5ebd3 52%, var(--se-blood) 74%, transparent);
+}
+/* one dark-red frame inside the cut to black */
+.samurai-effect__blackout::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(75% 65% at 66% 46%, #8e1020 0%, #5c0810 52%, #22040a 100%);
+}
+.samurai-effect--incorrect.samurai-effect--impact .samurai-effect__blackout::after {
+  animation: se-red-frame 0.32s linear both;
+}
+/* the spray: a fan of drops, near the learner's chest, thrown up and along the cut, then falling */
+.samurai-effect--incorrect .samurai-effect__stage::before {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  left: 69%;
+  top: 20%;
+  width: 33%;
+  height: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 12% 72%;
+  background:
+    radial-gradient(circle 6px at 10% 70%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 4px at 19% 57%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 7px at 24% 68%, var(--se-blood-deep) 94%, transparent 100%),
+    radial-gradient(circle 3px at 31% 45%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 5px at 40% 52%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 2.5px at 47% 34%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 4px at 56% 40%, var(--se-blood-deep) 94%, transparent 100%),
+    radial-gradient(circle 2px at 62% 24%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 3px at 70% 30%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 1.8px at 78% 16%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 2.2px at 86% 22%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 1.5px at 94% 9%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(3px 9px at 16% 84%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(2.5px 8px at 33% 77%, var(--se-blood-deep) 94%, transparent 100%),
+    radial-gradient(2px 6px at 50% 64%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(15px 5px at 14% 63%, var(--se-blood-deep) 94%, transparent 100%);
+}
+.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__stage::before {
+  --samurai-motion: 1500ms;
+  animation: se-spray 1.5s cubic-bezier(0.16, 0.7, 0.3, 1) both;
+}
+/* the pool: an ink stain spreading on the ground line where the learner stood */
+.samurai-effect--incorrect .samurai-effect__stage::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  right: 5%;
+  bottom: 7%;
+  width: 30%;
+  height: 5%;
+  pointer-events: none;
+  opacity: 0;
+  transform: scaleX(0.12);
+  transform-origin: 55% 50%;
+  background:
+    radial-gradient(circle 3.5px at 4% 46%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(circle 2.5px at 97% 58%, var(--se-blood) 94%, transparent 100%),
+    radial-gradient(34% 46% at 30% 54%, var(--se-blood) 96%, transparent 100%),
+    radial-gradient(30% 50% at 58% 48%, var(--se-blood) 96%, transparent 100%),
+    radial-gradient(22% 40% at 80% 56%, var(--se-blood-deep) 96%, transparent 100%);
+}
+.samurai-effect--incorrect.samurai-effect--resolve .samurai-effect__stage::after {
+  --samurai-motion: 1100ms;
+  animation: se-pool 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.22s both;
+}
+/* the scraps of the cut paper figure carry the stain on their torn edges */
+.samurai-effect--incorrect .samurai-effect__scraps i {
+  background-image: linear-gradient(128deg, transparent 52%, #8e1220d9 54%, #6b0b16e6 64%, transparent 66%);
+}
+.samurai-effect--incorrect .samurai-effect__scraps i:nth-child(3n) {
+  background-image: radial-gradient(60% 50% at 40% 45%, #8e1220e6 0 46%, transparent 48%);
+}
+.samurai-effect--incorrect .samurai-effect__scraps i:nth-child(5n) {
+  background-image: none;
+}
+/* quiet: no cut, so no blood; the rematch never bleeds (the selectors above are --incorrect only) */
+.samurai-effect--quiet .samurai-effect__stage::before,
+.samurai-effect--quiet .samurai-effect__stage::after,
+.samurai-effect--quiet .samurai-effect__blackout::after {
+  display: none;
+}
+@keyframes se-red-frame {
+  0%,
+  22% {
+    opacity: 0;
+  }
+  34%,
+  52% {
+    opacity: 1;
+  }
+  72%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes se-spray {
+  0% {
+    opacity: 0;
+    transform: translate(-6%, 6%) scale(0.28);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  62% {
+    opacity: 1;
+    transform: translate(2%, 9%) scale(1.03);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(3%, 24%) scale(1.04);
+  }
+}
+@keyframes se-pool {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.12);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+}
+/* a forced replay under reduced motion: the pseudo-elements take the same brief law as every part */
+@media (prefers-reduced-motion: reduce) {
+  .samurai-effect--forced .samurai-effect__stage::before,
+  .samurai-effect--forced .samurai-effect__stage::after,
+  .samurai-effect--forced .samurai-effect__blackout::after {
+    animation-duration: var(--samurai-motion, 1ms) !important;
+    animation-iteration-count: 1 !important;
+  }
+}
