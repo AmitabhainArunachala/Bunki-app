@@ -106,3 +106,8 @@ All are roster, selector or label pins. No storage, SRS, ledger, offline, deck-f
 - **Deck rooms by day:** a dark deck sits inside the white day frame, a hard two-tone. The cards lane can give `deckplay` the night frame through `--color-bar`.
 - **殻 in Learn:** the stage card mixes the surface with cream, so under 殻 it reads mint.
 - **Inherited failures, unchanged:** `verify-corridor-doors` T13; `verify-kotoba-mine` check e) (reduced motion; fails identically on the base); `verify-pr77-ports` four checks (fail on the base too).
+
+## Notes for the lead
+- **The build refused the linked `node_modules`.** `scripts/build-reading-module.mjs` asserts "Build inputs must belong to this checkout", and a `node_modules` symlink into `redesign_20261008` resolves the `@bunki/*` workspace packages outside the worktree. I replaced the symlink with a hardlinked copy (`cp -al …/redesign_20261008/node_modules` plus each `packages/*/node_modules`); it stays git-ignored and the tree stays clean. The other lane worktrees were created with the same symlink.
+- **Base runs for neighbours** used an export of `345dba92` at `scratchpad/skin/base-src`; `verify-corridor-doors` needs the commit sha passed in there (`KAIRO_EXPECT_GITSHA`), because an export has no git.
+- **Merge order hints:** `corridor.js` changes are in the shell (`render()` top line, `PRIMARY_TABS` neighbourhood, `openWorldPicker`, `setKairoTheme`), the Learn renderers (`studyHallDoors`, the stage, `renderDojoDecks`, `renderFocusSitting`, `DOJO_DECKS`) and four single strings (shelf sort, reader credit, list export, grammar reason). The reader credit is the only line inside a read-lane function.
