@@ -54,7 +54,9 @@ His answers are quoted word for word, typos kept. Under each: the change, then t
 - **What changes on the incorrect cut only** (`guided-moments.css`): the blade's wake turns crimson past the cut, a fan of 臙脂 drops sprays from where the learner stood, one dark-red frame flashes inside the blackout, the paper scraps carry the stain, and a pool spreads on the ground line.
 - **The register.** Flat woodblock colour with crisp edges and no glow, in the 80s and 90s anime style: the red frame and the slow drops.
 - **The limits.** Quiet mode and the rematch get no blood. Transform and opacity only. Under reduced motion a forced replay jumps to the still end.
+  *Corrected 2026-10-09 (review and refine): a forced replay under reduced motion is not a still. Only the guided session's replay and demo buttons force one, and each blood part then plays at its own `--samurai-motion` length, 320 ms (the red frame) to 1,000 ms (the pool, which starts 250 ms in). On its own the moment never plays under reduced motion.*
 - **The age rating** (likely 12+, or 13+ on Apple's new scale) is noted in the REPORT.
+  *Corrected 2026-10-09: Apple's scale is now 4+, 9+, 13+, 16+ and 18+, so 12+ no longer exists. Blood on every wrong answer is likely "Frequent Cartoon or Fantasy Violence", which is 13+. That is an estimate, to be checked in App Store Connect's questionnaire before any store submission, and whether to ship it is his call. The note sits beside the blood in `guided-moments.css`.*
 - **Proved by:** verify-guided-session's M checks (the cut still plays, its phases occur and the saved response is untouched), plus frame captures of the cut at 390×844.
 
 ## Carry on (no answer): T7 (Learn), T11 (the 2,000 cards)
