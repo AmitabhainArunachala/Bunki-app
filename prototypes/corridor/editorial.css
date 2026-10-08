@@ -4847,8 +4847,8 @@ body.has-primary-tabs .primary-tabs {
 }
 .primary-tabs .primary-tab {
   color: var(--color-bar-quiet);
-  font: 600 11px/1 var(--font-ui);
-  letter-spacing: 0.02em;
+  font: 600 12px/1 var(--font-ui);
+  letter-spacing: 0.01em;
 }
 body:not(.ui-bi) .primary-tabs .primary-tab { font: 700 12px/1 var(--font-display); letter-spacing: 0.06em; }
 .primary-tabs .primary-tab[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
