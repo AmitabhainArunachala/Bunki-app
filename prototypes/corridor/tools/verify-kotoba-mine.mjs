@@ -1558,8 +1558,8 @@ async function verifyBack(browser, base) {
     }
     const [first, third, fourth, mcdFourth] = seen;
     check(
-      '6) each sitting counts (prefs.sittings); the tap hint and the swipe hint show in the first three sittings of a deck and are gone from the fourth, on both decks',
-      first.stored === 1 && first.front === 'Recall the meaning, then tap' && first.swipe && third.stored === 3 && !!third.front && third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
+      '6) each sitting counts (prefs.sittings); the tap hint shows in the first three sittings of a deck and is gone from the fourth, on both decks; the swipe hint shows on the first back of the first sitting only',
+      first.stored === 1 && first.front === 'Recall the meaning, then tap' && first.swipe && third.stored === 3 && !!third.front && !third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
       JSON.stringify(seen),
     );
   }

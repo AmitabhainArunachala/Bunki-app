@@ -16,7 +16,7 @@ html:is([data-room='deckplay'], [data-room='contextdeck']) body:not([data-view='
   html[data-room='deckplay'] #app > main > .kp { margin-inline: -18px; padding-inline: 18px; }
 }
 html[data-room='deckplay'] #app > main > .kp { box-shadow: 0 50vh 0 0 var(--kp-bg); }
-html[data-room='deckplay'] #app > main > .kp:has(> .kp-study) { box-shadow: 0 50vh 0 0 var(--kp-stage); }
+html[data-room='deckplay'] #app > main > .kp:has(> .kp-study) { box-shadow: 0 50vh 0 0 var(--kp-dock); }
 
 /* ---- Fix round 2: one way out. In the deck the player's own ← (home) and ✕ (study) are the exit;
    the chrome's Back would leave the same deck by a second door, so it stands down here. ---- */
@@ -24,3 +24,7 @@ html[data-room='deckplay'] body:not(.zen) #app > .chrome > button#back { display
 /* no strip of the corridor's paper between the chrome and the deck: the player's ground meets the chrome */
 html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp) { padding-top: 0; }
 html[data-room='deckplay'] #app > main > .kp { margin-top: 0; }
+
+/* ---- Fix round 3: the chrome is opaque over the deck. Nothing of the card shows through it, and with
+   the reveal no longer scrolling the page (decks/player windowPassage) it never moves. ---- */
+html[data-room='deckplay'] body:not(.zen) #app > .chrome { background: var(--color-glass-solid, var(--color-page)); -webkit-backdrop-filter: none; backdrop-filter: none; }
