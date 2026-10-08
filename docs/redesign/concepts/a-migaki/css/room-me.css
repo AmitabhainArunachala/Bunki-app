@@ -40,7 +40,7 @@ html[data-theme="night"] .cal i.today { box-shadow: inset 0 0 0 1.5px var(--colo
 .mo-foot { margin-top: 8px; }
 .kin { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .kt { position: relative; display: grid; gap: 2px; align-content: start; padding: 10px 8px 10px; min-height: 112px; background: var(--color-page); box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong); border-radius: 2px; }
-.seam { position: absolute; left: 0; top: 54px; width: 100%; height: 34%; overflow: visible; }
+.seam { position: absolute; left: 0; top: 38px; width: 100%; height: 34%; overflow: visible; }
 .seam path { fill: none; stroke: var(--color-gold-leaf); stroke-width: 1.7; stroke-linejoin: round; filter: drop-shadow(0 0 .5px rgba(120, 90, 20, .6)); }
 .kt-w { position: relative; font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.2; }
 .kt-r { position: relative; font-size: 11px; color: var(--color-ink-3); letter-spacing: .08em; }
