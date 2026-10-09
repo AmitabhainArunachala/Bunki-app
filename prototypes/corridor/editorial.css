@@ -142,7 +142,7 @@ body:not(.zen) #app > .chrome > button.chrome-search {
   font: 600 16px/44px var(--sans);
   letter-spacing: 0;
   white-space: nowrap;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 body:not(.zen) #app > .chrome > button:hover:not(:disabled) { background: var(--fill); }
 body:not(.zen) #app > .chrome > button :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; font: inherit; letter-spacing: 0; opacity: 1; }
@@ -209,7 +209,7 @@ body:not(.zen) #app > .chrome .lang-seg button::before {
   z-index: -1;
   inset: 8px 2px;
   border-radius: 7px;
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--label); background: transparent; font-weight: 600; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%); }
@@ -285,7 +285,7 @@ body .search-page .nav-search-input {
   background: var(--fill);
   color: var(--label);
   font: 400 19px/1.3 var(--sans);
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 body .search-page .nav-search-input:focus { outline: none; background: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
 body .search-page .kdx-lenses { gap: 8px; margin: 14px 0 10px; }
@@ -301,7 +301,7 @@ body .kdx-lens {
   border-radius: 999px;
   background: var(--fill);
   box-shadow: none;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 body .kdx-lens:hover { background: var(--fill-strong); }
 body .kdx-lens .l-ja { display: inline; font: 600 15px/44px var(--sans); color: var(--label); }
@@ -337,7 +337,7 @@ body .search-page-results .nav-search-row {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  transition: background-color 140ms var(--ease);
+  transition: none;
 }
 body .search-page-results .nav-search-row:last-child { border-bottom: 0; }
 body .search-page-results .nav-search-row:hover { background: var(--fill); }
@@ -357,7 +357,7 @@ body .focus-chip, body.v-depth-layered .focus-mode {
   background: var(--fill);
   box-shadow: none;
   color: var(--label);
-  transition: background-color var(--dur) var(--ease), transform 140ms var(--ease);
+  transition: transform 140ms var(--ease);
 }
 body .focus-chip:hover, body.v-depth-layered .focus-mode:hover { background: var(--fill-strong); }
 body .focus-chip.on { background: var(--tint); box-shadow: none; color: #fff; }
@@ -909,7 +909,7 @@ body .chip, body.v-depth-layered .chip {
   color: var(--tint);
   font: 600 15px/1.25 var(--sans);
   letter-spacing: 0;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), transform 140ms var(--ease);
+  transition: transform 140ms var(--ease);
 }
 body .chip:hover:not(:disabled):not([aria-disabled='true']) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 body .chip:active:not(:disabled):not([aria-disabled='true']) { transform: scale(0.97); }
@@ -929,7 +929,7 @@ html:not([data-register='tutor']) body .record-note-input {
   color: var(--label);
   font-family: var(--sans);
   box-shadow: none;
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 html:not([data-register='tutor']) body .search-field:focus,
 html:not([data-register='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
@@ -982,7 +982,7 @@ body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
   background: transparent;
   cursor: pointer;
   list-style: none;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 .icon-button::-webkit-details-marker { display: none; }
 .icon-button:hover { color: var(--tint); background: var(--fill); }
@@ -1067,7 +1067,7 @@ html[data-register='shelf'] .search-field {
   background: var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23767680' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") 13px 50% / 17px 17px no-repeat;
   box-shadow: none;
   font: 17px/1.4 var(--sans);
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 html[data-register='shelf'] .search-field:focus { background-color: var(--surface); box-shadow: 0 0 0 1px var(--separator), var(--shadow-card); outline: none; }
 html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srgb, var(--label) 58%, transparent); }
@@ -1157,7 +1157,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   white-space: nowrap;
   cursor: pointer;
   list-style: none;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 .filter-chip::-webkit-details-marker { display: none; }
 .filter-chip:hover { background: var(--fill-strong); }
@@ -1216,7 +1216,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   color: var(--label);
   font: 15px/1.4 var(--sans);
   outline: none;
-  transition: width var(--dur) var(--ease);
+  transition: none;
 }
 .shelf-controls .filter-search input::placeholder { color: var(--label-2); }
 .shelf-controls .filter-search input:focus, .shelf-controls .filter-search input:not(:placeholder-shown) { width: 200px; }
@@ -1266,7 +1266,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   font: 600 15px/1 var(--sans);
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--dur) var(--ease);
+  transition: none;
 }
 .shelf-tools-toggle:hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 .shelf-tools-toggle[aria-expanded='true'] { color: #fff; background: var(--tint); }
@@ -1323,7 +1323,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   font: 600 15px/1.3 var(--sans);
   text-align: start;
   white-space: normal;
-  transition: background-color var(--dur) var(--ease);
+  transition: none;
 }
 #shelf-body .shelf-study-tools button.grammar-link:hover { background: var(--tint-wash); }
 /* register.css spaces a door's last span out (0.12em) and can hide it; a tile's name is always shown, set tight */
@@ -1361,7 +1361,7 @@ body #shelf-body .story-card {
   border-radius: var(--r-card);
   background: var(--surface);
   box-shadow: var(--shadow-card);
-  transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease);
 }
 @media (hover: hover) {
   body #shelf-body .story-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-3px); }
@@ -1561,7 +1561,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   font: 600 15px/1.55 var(--sans);
   text-align: start;
   cursor: pointer;
-  transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease);
 }
 .shelf-encounter > strong { font-weight: 600; overflow-wrap: anywhere; }
 .shelf-encounter > span { font: 18px/1.7 var(--serif); color: var(--accent); overflow-wrap: anywhere; }
@@ -1723,7 +1723,7 @@ body .seg button {
   color: var(--label);
   font: 500 14px/1.25 var(--sans);
   letter-spacing: 0;
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 body .seg button :is(.l-ja, .en-sub) { color: inherit; }
 body .seg button .en-sub { font: 500 11px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
@@ -1773,7 +1773,7 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   inset: 0 auto 0 0;
   width: calc(var(--played, 0) * 100%);
   background: var(--accent);
-  transition: width 240ms linear;
+  transition: none;
 }
 .play-voice { font: 600 12px/1 var(--sans); letter-spacing: 0.04em; color: var(--text-2); }
 .play-rate {
@@ -2232,7 +2232,7 @@ body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search
   box-shadow: none;
   color: var(--tint);
   font: 600 16px/1.2 var(--sans);
-  transition: background-color var(--dur) var(--ease);
+  transition: none;
 }
 body .sheet .sheet-bar .sheet-back { display: inline-flex; flex-direction: row; align-items: baseline; gap: 5px; padding: 0 10px 0 6px; line-height: 44px; }
 body .sheet .sheet-bar .sheet-back :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; line-height: 44px; }
@@ -2278,7 +2278,7 @@ body .sheet .entry-row {
   padding: 10px 6px;
   border-bottom: 1px solid var(--hairline);
   border-radius: 0;
-  transition: background-color 120ms ease-out;
+  transition: none;
 }
 body .sheet .entry-row .row-glyph {
   display: grid;
@@ -2567,7 +2567,7 @@ body .reference-library .reference-level {
   border-radius: 10px;
   background: var(--raised);
   box-shadow: var(--raised-shadow);
-  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+  transition: transform 180ms ease-out;
 }
 body .reference-library .reference-level[data-level] {
   background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 9%, var(--raised)) 0%, var(--raised) 70%);
@@ -2623,7 +2623,7 @@ html[data-register='jlpt'] .exam-levels .chip.exam-level-card {
   box-shadow: var(--raised-shadow);
   color: var(--text);
   text-align: start;
-  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+  transition: transform 180ms ease-out;
 }
 @media (hover: hover) { html[data-register='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
 html[data-register='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
@@ -3201,8 +3201,8 @@ body #mini .mini-status:empty { display: none; }
 .vocabulary-list-popover .vocabulary-list-status { min-height: 0; margin: 6px 0 0; font: 13px/1.5 var(--sans); color: var(--ai); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 
-/* the one-time hint fades where it stands once the first word opens, keeping its room for that visit */
-.reader-tip.is-done { visibility: hidden; opacity: 0; transition: opacity 200ms ease, visibility 0s linear 200ms; }
+/* The one-time hint keeps its space after the first word opens. */
+.reader-tip.is-done { visibility: hidden; opacity: 0; transition: opacity 200ms ease; }
 
 /* 原文 / やさしい版: a two-sided switch that says what each side is and its level, and one line on what the
    simplified version is */
@@ -3358,7 +3358,7 @@ body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
   box-shadow: none;
   font: 600 11.5px/1 var(--font-ui);
   letter-spacing: 0.04em;
-  transition: color var(--motion-quick) var(--ease-standard);
+  transition: none;
 }
 body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-display); letter-spacing: 0.08em; }
 /* the track: each station draws its own stretch, so the line runs centre to centre */
@@ -4114,7 +4114,7 @@ body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-
   box-shadow: var(--elevation-press);
   font: 600 15px/1.25 var(--font-ui);
   letter-spacing: 0.02em;
-  transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-press) var(--ease-standard);
+  transition: transform var(--motion-press) var(--ease-standard);
 }
 body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
 body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):active:not(:disabled) {
@@ -4175,7 +4175,7 @@ body.v-depth-layered:not([data-view='drift']) :is(
 }
 body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
   background: var(--color-surface);
-  transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-quick) var(--ease-standard);
+  transition: transform var(--motion-press) var(--ease-standard);
 }
 body.v-depth-layered:not([data-view='drift']) .study-door { padding: var(--space-4) var(--space-4) var(--space-4); margin: 0 0 var(--space-2); }
 body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door):active { transform: translateY(1px); box-shadow: var(--elevation-paper); }
@@ -4568,7 +4568,9 @@ html[data-room-entering] #app > main > .room-sign {
 html[data-room-entering][data-register='attempt'] #app > main > * { animation-duration: 120ms; animation-delay: calc(0ms - var(--enter-t, 0ms)); }
 @media (prefers-reduced-motion: reduce) {
   html[data-room-entering] #app > main > *,
-  html[data-room-entering] #app > main > .room-sign { animation: none; }
+  html[data-room-entering] #app > main > .room-sign { animation: kairo-quiet-enter 80ms linear both; }
+  .reader-word-menu,
+  .vocabulary-list-popover { animation: kairo-quiet-enter 80ms linear both; }
 }
 
 /* ---- the front door (html[data-room=door]): the sky stays the drift's own; its chrome

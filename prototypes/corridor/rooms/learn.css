@@ -221,7 +221,7 @@ html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage :is(.lea
   padding: 8px 16px;
   text-align: center;
   border-radius: var(--radius-control);
-  transition: transform var(--motion-press) var(--ease-standard), box-shadow var(--motion-press) var(--ease-standard);
+  transition: transform var(--motion-press) var(--ease-standard);
 }
 html[data-room='learn'] body:not([data-view='drift']) #app .learn-stage .learn-go {
   background: var(--learn-card);

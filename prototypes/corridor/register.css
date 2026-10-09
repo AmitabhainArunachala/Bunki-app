@@ -135,7 +135,7 @@ html[data-register="attempt"] .chrome::after {
   left: 0; right: 0; bottom: -1px;
   height: 3px;
   background: linear-gradient(to right, var(--ink) 0 calc(var(--stage) * 100%), transparent calc(var(--stage) * 100%));
-  transition: background 240ms ease-out;
+  transition: none;
 }
 .chrome { position: sticky; }
 
@@ -204,7 +204,7 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
 #shelf-body button.grammar-link {
   font-family: var(--display);
   border-radius: 6px;
-  transition: transform 120ms ease-out, box-shadow 120ms ease-out;
+  transition: transform 120ms ease-out;
 }
 #shelf-body button.grammar-link[data-grade="room"] {
   grid-column: span 3;
@@ -421,7 +421,7 @@ html[data-register="attempt"] .lesson-option {
   line-height: 1.6;
   text-align: start;
   color: var(--ink);
-  transition: background 120ms ease-out;
+  transition: none;
 }
 html[data-register="attempt"] .mock-opt:first-child,
 html[data-register="attempt"] .lesson-option:first-child { border-top: 0; }
@@ -620,9 +620,10 @@ html[data-register="attempt"] #app > .report-line-page:hover, html[data-register
 html[data-register="tutor"] #app > .report-line-page .report-door { color: var(--sheet-ink-2); }
 
 /* ----------------------------------------------------------------- 9 · MOTION
-   Rooms lift in like a sheet set down (120 ms). Reduced motion: appear. */
+   Rooms lift in like a sheet set down (120 ms). Reduced motion: crossfade. */
 @keyframes kairo-lift { from { opacity: 0.01; transform: translateY(var(--lift, 6px)); } to { opacity: 1; transform: none; } }
 @keyframes kairo-sign { from { opacity: 0.01; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes kairo-quiet-enter { from { opacity: 0.01; } to { opacity: 1; } }
 /* only on ENTERING a room (stampRegister marks data-room-entering for one beat): a grade, a
    save or a clock tick re-renders main and must never fade the surface in again.
    Skin (C+A): hand-layered like a multiplane cel — the first plane settles first, the deeper
@@ -634,9 +635,11 @@ html[data-room-entering] #app > main > .room-sign { animation: kairo-sign 200ms 
 html[data-room-entering][data-register="attempt"] #app > main > * { animation-duration: 120ms; animation-delay: 0ms; }
 @media (prefers-reduced-motion: reduce) {
   html[data-room-entering] #app > main > *,
-  html[data-room-entering] #app > main > .room-sign { animation: none; }
+  html[data-room-entering] #app > main > .room-sign { animation: kairo-quiet-enter 80ms linear both; }
   html[data-register="attempt"] .chrome::after { transition: none; }
 }
+/* Native room snapshots carry the arrival; keep the live children still. */
+html[data-room-transition] #app > main > * { animation: none !important; }
 
 /* ------------------------------------------------------------- 10 · WIDE
    On a desk the house keeps the phone's measure and centres it. */

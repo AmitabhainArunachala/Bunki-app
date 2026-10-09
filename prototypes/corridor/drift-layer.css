@@ -25,7 +25,7 @@
 #drift-layer{
     background:var(--ground); color:var(--ink);
     font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
-    touch-action:none; transition:background-color 1.2s;
+    touch-action:none; transition:none;
   }
 #drift-layer canvas{display:block}
 #drift-layer #ink{position:fixed;inset:0;z-index:0;width:100%;height:100%}
@@ -39,7 +39,7 @@
 #drift-layer .glyph,
 #drift-layer .part{position:absolute;left:0;top:0;white-space:nowrap;cursor:pointer;
     will-change:transform,opacity;user-select:none;-webkit-user-select:none;
-    text-align:center;transition:filter .9s}
+    text-align:center;transition:none}
 #drift-layer .word .base{display:block;line-height:1.15;text-shadow:0 0 1px currentColor}
 #drift-layer .word .yomi{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     font-size:.44em;letter-spacing:.16em;color:var(--pig2);opacity:0;
@@ -136,19 +136,19 @@
 #drift-layer #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
 #drift-layer #card .rds .kun{color:var(--faint)}
 #drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
-    z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
+    z-index:8;opacity:.4;transition:opacity .4s;touch-action:none}
 #drift-layer #lvl.hot{opacity:1;width:56px}
 #drift-layer #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
-    border-radius:2px;transition:background .25s,width .25s,box-shadow .25s}
+    border-radius:2px;transition:none}
 #drift-layer #lvl.hot #lvlTrack{width:3.5px;background:var(--pig1);box-shadow:0 0 10px var(--halo)}
 #drift-layer #lvlHandle{position:absolute;left:10px;width:12px;height:12px;border-radius:50%;
     background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%;
-    transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s}
+    transition:none}
 #drift-layer #lvl.hot #lvlHandle{left:6px;width:22px;height:22px;margin-top:-11px;
     background:var(--accent);border-width:2px;
     box-shadow:0 0 16px var(--halo),0 3px 12px rgba(0,0,0,.28)}
 #drift-layer #lvlLabels{position:absolute;left:22px;top:0;bottom:0;font-size:10px;color:var(--faint);
-    letter-spacing:.05em;opacity:0;transition:opacity .3s,left .25s,font-size .25s;pointer-events:none}
+    letter-spacing:.05em;opacity:0;transition:opacity .3s;pointer-events:none}
 #drift-layer #lvl.hot #lvlLabels{opacity:1;left:34px;font-size:13px;color:var(--ink);font-weight:600}
 #drift-layer .lvlab{position:absolute;transform:translateY(-50%);white-space:nowrap}
 #drift-layer #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:11px;

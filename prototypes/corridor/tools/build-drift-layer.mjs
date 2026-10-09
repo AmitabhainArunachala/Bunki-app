@@ -41,7 +41,22 @@ const slice = (after, before, label) => {
 // carries a comma there would be sliced into several invalid selectors, and an
 // invalid selector kills its whole rule, silently. Stripping first means the
 // drift source may comment its CSS the way it comments everything else.
-const rawCss = slice('<style>', '</style>', 'style block').replace(/\/\*[\s\S]*?\*\//g, '');
+let rawCss = slice('<style>', '</style>', 'style block').replace(/\/\*[\s\S]*?\*\//g, '');
+// The donor stays frozen. Presentation state changes land immediately; only
+// transform and opacity interpolate in the fused app (VISION §10.2 check 6).
+// Exact-once anchors keep a donor change from silently escaping this policy.
+const cssPatch = (from, to, label) => {
+  const first = rawCss.indexOf(from);
+  if (first < 0 || rawCss.indexOf(from, first + from.length) >= 0)
+    throw new Error(`CSS anchor missing or ambiguous (${label})`);
+  rawCss = rawCss.slice(0, first) + to + rawCss.slice(first + from.length);
+};
+cssPatch('transition:background-color 1.2s', 'transition:none', 'world colour');
+cssPatch('transition:filter .9s', 'transition:none', 'word sharpness');
+cssPatch('transition:opacity .4s,width .25s', 'transition:opacity .4s', 'level rail');
+cssPatch('transition:background .25s,width .25s,box-shadow .25s', 'transition:none', 'level track');
+cssPatch('transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s', 'transition:none', 'level handle');
+cssPatch('transition:opacity .3s,left .25s,font-size .25s', 'transition:opacity .3s', 'level information');
 
 // Scope every rule under #drift-layer. The file has no at-rules (verified
 // below); selectors are :root / * / html,body / body / canvas / #id / .class.

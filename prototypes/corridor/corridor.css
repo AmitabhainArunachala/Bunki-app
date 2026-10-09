@@ -469,8 +469,7 @@ body.ginga #drift-layer #hint.first-cue {
   box-shadow: 0 3px 14px rgba(20, 26, 34, 0.18);
   cursor: pointer;
   transition:
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    color 0.3s ease;
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .nav-symbol svg {
   width: 26px;
@@ -519,9 +518,7 @@ body.ginga #drift-layer #hint.first-cue {
   user-select: none;
   -webkit-user-select: none;
   transition:
-    opacity 0.5s ease,
-    transform 0.3s ease,
-    background 0.3s ease;
+    opacity 0.5s ease, transform 0.3s ease;
 }
 .ginga-seal:hover,
 .ginga-seal:focus-visible,
@@ -611,7 +608,7 @@ body.ginga #drift-layer #hint.first-cue {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: none;
 }
 .nav-arrow:hover:not(:disabled) {
   background: rgb(120 120 128 / 12%);
@@ -651,7 +648,7 @@ body.ginga #drift-layer #hint.first-cue {
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: none;
 }
 .nav-search-door::placeholder {
   color: rgb(60 60 67 / 60%);
@@ -684,7 +681,7 @@ body.ginga #drift-layer #hint.first-cue {
   border-radius: 12px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.14s ease;
+  transition: transform 0.14s ease;
 }
 .nav-review:hover,
 .nav-dojo:hover {
@@ -764,7 +761,7 @@ body.ginga #drift-layer #hint.first-cue {
   font-size: 13px;
   letter-spacing: 0;
   color: var(--ink-2, #55606c);
-  transition: color 0.24s ease;
+  transition: none;
 }
 .lang-knob {
   position: absolute;
@@ -777,8 +774,7 @@ body.ginga #drift-layer #hint.first-cue {
   border-radius: 7px;
   box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%);
   transition:
-    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1),
-    width 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .lang-slide[data-lang='ja'] .lang-knob {
   transform: translateX(39px);
@@ -919,7 +915,7 @@ body.ginga #drift-layer #hint.first-cue {
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px rgb(20 26 34 / 14%);
   cursor: pointer;
   animation: bubble-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  transition: transform 0.14s ease, box-shadow 0.2s ease;
+  transition: transform 0.14s ease;
 }
 .corner-bubble:active {
   transform: scale(0.97);
@@ -4110,8 +4106,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 [data-stroke-chrome] {
   transition:
-    opacity 0.22s ease,
-    visibility 0s linear 0s;
+    opacity 0.22s ease;
 }
 
 .stroke-page[data-chrome='sleeping'] [data-stroke-chrome] {
@@ -4119,8 +4114,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 0.22s ease,
-    visibility 0s linear 0.22s;
+    opacity 0.22s ease;
 }
 
 .stroke-awake-field {
@@ -4148,16 +4142,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 /* the readings open ELEGANTLY — a slow rise and settle, not a pop */
 .stroke-awake-field {
   transition:
-    opacity 0.34s ease,
-    transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1),
-    visibility 0s linear 0s;
+    opacity 0.34s ease, transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .stroke-page[data-chrome='sleeping'] .stroke-awake-field {
   transform: translate(-50%, 16px);
   transition:
-    opacity 0.26s ease,
-    transform 0.26s ease,
-    visibility 0s linear 0.26s;
+    opacity 0.26s ease, transform 0.26s ease;
 }
 
 .stroke-reading-field {
@@ -4223,8 +4213,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
-    opacity 0.22s ease,
-    background-color 0.22s ease;
+    opacity 0.22s ease;
 }
 
 .stroke-chrome-trigger:is(:hover, :focus-visible),
@@ -4294,8 +4283,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.36;
   -webkit-tap-highlight-color: transparent;
   transition:
-    opacity 0.22s ease,
-    background-color 0.22s ease;
+    opacity 0.22s ease;
 }
 .stroke-corner:is(:hover, :focus-visible),
 .stroke-corner[aria-pressed='true'],
@@ -4322,8 +4310,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.36;
   -webkit-tap-highlight-color: transparent;
   transition:
-    opacity 0.22s ease,
-    background-color 0.22s ease;
+    opacity 0.22s ease;
 }
 .stroke-page[data-minimal='on'] #strokes-back:is(:hover, :focus-visible),
 .stroke-page[data-minimal='on'][data-chrome='awake'] #strokes-back {
@@ -6511,7 +6498,7 @@ body.zen main {
   height: 100%;
   background: var(--faint);
   opacity: 0.75;
-  transition: width 0.4s ease;
+  transition: none;
 }
 .zen-exit,
 .zen-more {
@@ -6892,7 +6879,7 @@ body.zen .review-reading {
   position: relative;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: color 200ms ease;
+  transition: none;
 }
 .say.is-speaking {
   color: var(--card-red, #b7282e);
@@ -7103,15 +7090,10 @@ body.zen .review-example {
     from {
       opacity: 0;
       transform: translateY(10px);
-      filter: blur(6px);
-    }
-    60% {
-      filter: blur(1.5px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
     }
   }
   body.zen .reveal.r-1 {
@@ -7144,7 +7126,7 @@ body.zen .review-example {
     transform: translateY(1px) scale(0.94);
   }
   .say.is-speaking svg {
-    animation: kairo-say-breath 2400ms var(--ease-breath) infinite;
+    animation: kairo-say-breath 6s var(--ease-breath) infinite;
   }
   @keyframes kairo-say-breath {
     0%,
@@ -7205,8 +7187,7 @@ body.zen .review-example {
   user-select: none;
   -webkit-user-select: none;
   transition:
-    opacity 0.5s ease,
-    background 0.3s ease;
+    opacity 0.5s ease;
 }
 .ginga-search svg {
   width: 17px;
