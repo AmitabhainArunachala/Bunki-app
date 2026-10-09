@@ -231,7 +231,9 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('.grade.g-easy').click(); await page.locator('.review-summary').waitFor();
     const graded = await snapshot('finite-review'); assert.equal(graded.revlog.length, 1);
     assert.equal(graded.sentencePractice.grades[0].observation.grade, 'easy'); assert.equal(graded.srs[`sentence:${entry.plan.id}`].reps, 1);
-    await page.locator('.close-doors .take').click(); await openSaved();
+    await page.locator('.close-doors .take').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'tray');
+    await openSaved();
     await page.locator('[data-sentence-teacher-response]').first().click(); await page.locator('#chat-input').waitFor();
     const prepared = await page.locator('#chat-input').inputValue(); assert(prepared.startsWith(`${QUESTION}\n\n`)); assert(prepared.includes(PRODUCTION));
     await savedQuestion(page, ref, prepared); assert(await page.locator('#chat-send').isDisabled());
