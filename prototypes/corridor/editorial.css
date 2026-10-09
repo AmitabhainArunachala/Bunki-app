@@ -468,8 +468,9 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 
 /* All inline Japanese uses the same lookup affordance, including quoted
  * passages and practice papers. These are words, never button-shaped chips. */
-.japanese-lookup-text { font: inherit; line-height: inherit; letter-spacing: inherit; }
+.japanese-lookup-text { position: relative; isolation: isolate; font: inherit; line-height: inherit; letter-spacing: inherit; }
 .japanese-lookup-word {
+  position: relative;
   display: inline;
   min-width: 0;
   min-height: 0;
@@ -486,6 +487,20 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   vertical-align: baseline;
   cursor: pointer;
   touch-action: manipulation;
+}
+/* Prose keeps its natural word spacing. A real, transparent hit region carries
+ * the 44px touch floor; it sits below neighbouring ink so a glyph's own button
+ * wins at its centre, just as it does in the reader. The isolated text wrapper
+ * keeps the negative layer above the surrounding paper. */
+.japanese-lookup-word::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap, 44px));
+  height: max(100%, var(--tap, 44px));
+  transform: translate(-50%, -50%);
+  z-index: -1;
 }
 .japanese-lookup-word:hover { text-decoration: underline; text-decoration-color: var(--ai); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
 /* Keyboard focus on a prose word wears the app's one focus token, the same ink underline and
