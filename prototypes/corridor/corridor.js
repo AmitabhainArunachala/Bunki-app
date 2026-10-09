@@ -8666,7 +8666,8 @@ function placeFloating(card, r) {
     return box.height ? box[edge] : null;
   };
   const height = window.innerHeight || Infinity;
-  const ceiling = Math.max(8, (fixedEdge('#app > .chrome', 'bottom') ?? 0) + 8);
+  // A clipped card meets the chrome edge: a gutter here can expose half a title glyph.
+  const ceiling = Math.max(8, fixedEdge('#app > .chrome', 'bottom') ?? 0);
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   // The sentence pane keeps the word card's top edge, including when a long quote is taller.

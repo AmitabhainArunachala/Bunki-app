@@ -1008,7 +1008,9 @@ try {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
         const box = () => page.locator('#mini').evaluate((node) => {
-          const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height };
+          const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height,
+            clipped: !!node.style.maxHeight, side: node.dataset.side,
+            chromeBottom: document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom };
         });
         const focused = () => page.evaluate(() => {
           const mini = document.querySelector('#mini'), active = document.activeElement;
@@ -1026,6 +1028,8 @@ try {
           assert.equal(seen.scrollY, beforeScroll, 'Opening and focusing the sentence must not move the article scroll');
         };
         const word = await box();
+        if (word.clipped && word.side === 'above') assert(Math.abs(word.top - word.chromeBottom) <= 1,
+          'A clipped word card must meet the chrome edge, leaving no strip of cut title glyphs');
         const beforeScroll = await page.evaluate(() => scrollY);
         await page.locator('#mini #mini-sentence-open').click();
         await page.waitForTimeout(200); // ResizeObserver has placed the settled sentence view.
