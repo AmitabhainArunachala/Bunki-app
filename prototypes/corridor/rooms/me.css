@@ -109,7 +109,7 @@ html[data-room='me'] .me-hz-rule {
 html[data-room='me'] .me-hz-rule i {
   position: absolute; left: 0; right: 0; top: 3px; height: 3px;
   transform: scaleX(var(--f, 0)); transform-origin: 0 50%;
-  animation: me-fill 900ms var(--ease-ink) 240ms backwards;
+  animation: me-fill 600ms var(--ease-ink) 160ms backwards;
 }
 html[data-room='me'] .me-hz-rule .me-hz-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--color-gold) 78%, var(--color-ink)), var(--color-gold)); }
 html[data-room='me'] .me-hz-rule .me-hz-met { top: 3.5px; height: 2px; background: color-mix(in srgb, var(--color-gold) 28%, transparent); }
@@ -210,7 +210,7 @@ html[data-room='me'] .me-home {
   padding: var(--space-3) 0;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
   animation: me-rise 360ms var(--ease-enter) backwards;
-  animation-delay: calc(320ms + var(--i, 0) * 90ms);
+  animation-delay: min(240ms, calc(80ms + var(--i, 0) * 40ms));
 }
 html[data-room='me'] .me-home:last-child { border-bottom: 0; }
 html[data-room='me'] .me-home-w { display: grid; gap: 1px; }
@@ -228,11 +228,11 @@ html[data-room='me'] .me-gleam {
   position: absolute; top: 0; bottom: 0; left: 0; width: 28%;
   background: linear-gradient(90deg, transparent, color-mix(in srgb, #fff 70%, var(--color-gold)) 50%, transparent);
   opacity: 0; pointer-events: none;
-  animation: me-gleam 1400ms var(--ease-ink) backwards;
-  animation-delay: calc(700ms + var(--i, 0) * 160ms);
+  animation: me-gleam 340ms var(--ease-ink) backwards;
+  animation-delay: min(240ms, calc(120ms + var(--i, 0) * 40ms));
 }
 @keyframes me-gleam { 0% { opacity: 0; transform: translateX(-100%); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateX(380%); } }
-html[data-room='me'] .me-home .me-gleam { animation-delay: calc(760ms + var(--i, 0) * 160ms); }
+html[data-room='me'] .me-home .me-gleam { animation-delay: min(240ms, calc(160ms + var(--i, 0) * 40ms)); }
 html[data-room='me'] .me-home-when { display: grid; justify-items: end; gap: 2px; font-size: 11px; line-height: 1.35; letter-spacing: 0.04em; color: var(--color-muted); white-space: nowrap; }
 html[data-room='me'] .me-home-when b { color: var(--color-gold); font-weight: 700; }
 @keyframes me-rise { from { opacity: 0.01; transform: translateY(6px); } }
@@ -272,7 +272,7 @@ html[data-room='me'] .me-seal {
   opacity: 0.92;
   transform: rotate(-4deg);
   animation: me-stamp 200ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards;
-  animation-delay: calc(360ms + var(--i, 0) * 28ms);
+  animation-delay: min(240ms, calc(80ms + var(--i, 0) * 14ms));
 }
 html[data-room='me'] .me-day.seal:nth-child(3n) .me-seal { transform: rotate(3deg); }
 html[data-room='me'] .me-day.seal:nth-child(4n) .me-seal { transform: rotate(-1deg); inset: 22% 18% 16% 18%; }
@@ -289,7 +289,7 @@ html[data-room='me'] .me-seals.turned-back .me-cal { animation: me-turn-back 300
 html[data-room='me'] .me-seals.turned-on .me-cal { animation: me-turn-on 300ms var(--ease-enter) backwards; transform-origin: 0 50%; }
 @keyframes me-turn-back { from { opacity: 0.01; transform: perspective(900px) rotateY(50deg); } }
 @keyframes me-turn-on { from { opacity: 0.01; transform: perspective(900px) rotateY(-50deg); } }
-html[data-room='me'] .me-seals:is(.turned-back, .turned-on) .me-seal { animation-delay: calc(120ms + var(--i, 0) * 14ms); }
+html[data-room='me'] .me-seals:is(.turned-back, .turned-on) .me-seal { animation-delay: min(240ms, calc(80ms + var(--i, 0) * 14ms)); }
 
 /* a line you wrote by hand */
 html[data-room='me'] .me-hand {

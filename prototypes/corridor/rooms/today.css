@@ -629,7 +629,7 @@ html[data-room='review'] .review-rise-w {
   color: var(--color-muted);
   opacity: 0.62;
   transform: translateY(calc(var(--i, 0) % 3 * 6px));
-  animation: review-rise 900ms var(--ease-ink, ease-out) calc(var(--i, 0) * 50ms) backwards;
+  animation: review-rise 360ms var(--ease-ink, ease-out) min(240ms, calc(var(--i, 0) * 40ms)) backwards;
 }
 html[data-room='review'] .review-rise-w.again { color: var(--color-ink); opacity: 1; font-family: var(--font-headword); font-weight: 800; }
 @keyframes review-rise { from { opacity: 0.01; transform: translateY(18px); } }
