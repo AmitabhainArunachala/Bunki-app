@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "露光装置",
+   "reading": "ろこうそうち",
+   "pos": "noun",
+   "meaning": "lithography (exposure) tool",
+   "defJa": "光で微細な回路の模様を材料へ転写する機械",
+   "passage": {
+    "ja": "半導体の工程図に光が出てきたら、材料をただ明るく照らす場面だと思わないようにしましょう。露光装置は、光に反応する薄い材料へ回路の模様を転写するため、光の性質と位置合わせを精密に管理する機械です。細かい模様を作るにあたっては、使う光の波長だけでなく、光を導く仕組みや材料の反応も結果に関わります。図には光の進む道に加えて、どこに模様の情報があり、どの面へ写すのかを書き込むと、巨大な機械の各部分が同じ目的を支える関係を追えます。",
+    "form": "露光装置",
+    "en": "When light appears in a semiconductor process diagram, do not think of it as merely illuminating the material. A lithography machine precisely controls light properties and alignment to transfer circuit patterns onto a thin photosensitive material. Producing fine patterns depends not just on wavelength but also on the optical system and material response. Marking where the pattern information resides and which surface receives it, alongside the light path, helps trace how the parts of a large machine support one purpose.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "光源だけでなく、位置合わせや光学系も見る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "量子トンネル効果",
+   "reading": "りょうしとんねるこうか",
+   "pos": "noun",
+   "meaning": "quantum tunneling",
+   "defJa": "粒子が古典的には越えられない障壁を通る現象",
+   "passage": {
+    "ja": "小さな粒子の世界では、普段のボールの動きから想像しにくい現象が現れます。古典的には越えられないエネルギーの障壁の向こうへ粒子が通り抜ける量子トンネル効果は、粒子が壁に物理的な穴を掘るという話ではありません。半導体でも、薄い絶縁膜を通る意図しない電流などを考える際に、この性質が関わります。部品を小さくするに伴って、ただ境界を描けば電気を閉じ込められるという直感が通用しにくくなるので、材料の厚さと電気の流れを別々には決められなくなります。",
+    "form": "量子トンネル効果",
+    "en": "The world of small particles exhibits phenomena difficult to imagine from the motion of an ordinary ball. Quantum tunneling, in which a particle passes through an energy barrier that would be impassable classically, does not mean physically digging a hole in a wall. This property matters in semiconductors when considering effects such as unintended current through thin insulating films. As components shrink, the intuition that drawing a boundary can contain electricity becomes less useful, tying choices about material thickness to electrical flow.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "粒子が壁を削って穴を開けるという意味ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "配線",
+   "reading": "はいせん",
+   "pos": "noun",
+   "meaning": "wiring, interconnect",
+   "defJa": "電気を通す道を部品の間につなぐこと",
+   "passage": {
+    "ja": "回路図を学ぶ最初の段階では、部品を結ぶ線を、電気が瞬時に伝わる理想の道として扱うことがあります。けれども、実際の配線には長さや太さがあり、信号の遅れや電力の損失に関わるため、つながっていれば同じとは言えません。半導体の設計を読むときは、素子を小さくする工夫に加えて、どの道を短くし、どこで混雑を避けるかにも印を付けましょう。線が交わる図を眺めるだけでなく、それぞれを作る層や材料の違いまで対応させると、図面から物としての回路へ理解が進みます。",
+    "form": "配線",
+    "en": "At the beginning of circuit study, connecting lines may be treated as ideal paths that transmit electricity instantly. Actual wiring has length and thickness that affect signal delay and power loss, so connected routes are not all equivalent. When reading semiconductor designs, mark which routes are shortened and where congestion is avoided alongside efforts to shrink devices. Relating the crossing lines to their layers and materials advances understanding from a diagram toward a physical circuit.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "回路図の線を、材料と距離を持つ経路として考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "電力効率",
+   "reading": "でんりょくこうりつ",
+   "pos": "noun",
+   "meaning": "power efficiency",
+   "defJa": "使った電力に対して得られる仕事の量の程度",
+   "passage": {
+    "ja": "計算機を買い替える話で、消費する電力が少ない機種なら必ず得だと思うことはないかな。もし同じ計算を終えるのにずっと長くかかるなら、仕事の量に対する電力効率も見ないと、使うエネルギーの違いを比べにくいんだ。逆に、速い機種が短時間で処理を終えて休める場合には、動作中の電力が大きくても全体の消費を抑えられることがある。同じ作業を同じ条件で測り、待っている時間や周辺装置まで含める範囲をそろえると、数字の小ささだけでは選べない理由が分かるよ。",
+    "form": "電力効率",
+    "en": "When replacing a computer, do you ever assume that a model drawing less power must be the better choice? If it takes much longer to finish the same calculation, comparing energy use also requires looking at work relative to power efficiency. Conversely, a fast machine may finish quickly and rest, reducing total consumption despite higher power while active. Measuring identical work under identical conditions and using consistent boundaries for idle time and peripherals reveals why the smallest number alone cannot decide the choice.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "同じ仕事をどれだけ少ない電力で行えるかを見る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "量子コンピュータ",
+   "reading": "りょうしこんぴゅーた",
+   "pos": "noun",
+   "meaning": "quantum computer",
+   "defJa": "量子的な状態の性質を利用して計算する装置",
+   "passage": {
+    "ja": "「全部の答えを同時に試して一瞬で正解を出す」と書けば、量子コンピュータの説明は魅力的になりますが、大切な条件が抜け落ちます。量子的な状態の性質を利用するにしても、測定で得られる情報には制約があり、役立つ結果が得られるように計算の手順を組む工夫が要ります。普通の計算機より有利とされる問題があることと、あらゆる仕事が速くなることとは別です。記事を直すなら、同時に試すという比喩を強めるより、どんな問題でどの手順を使う話なのかを示し、適用範囲を狭めて正確さを取り戻します。",
+    "form": "量子コンピュータ",
+    "en": "Describing a quantum computer as trying every answer simultaneously and instantly producing the correct one sounds appealing but omits crucial conditions. Even when exploiting quantum states, measurement constrains the information obtained, and the procedure must be designed to yield useful results. Advantages on certain problems do not mean that every task becomes faster. Editing the article should recover precision by identifying the problem and method rather than strengthening the metaphor of simultaneous trials.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "あらゆる計算を速める万能機という表現は避ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "開発競争",
+   "reading": "かいはつきょうそう",
+   "pos": "noun",
+   "meaning": "development race",
+   "defJa": "新しい技術や製品を作る速さや性能を争うこと",
+   "passage": {
+    "ja": "新しい人工知能の発表が続くと、性能表の更新がそのまま産業の前進を示すように見える。だが、開発競争を評価する際には、試験での得点だけでなく、運用する費用や信頼性、利用者が実際に扱える条件も比較の対象となる。先に発表した側が長期にも優位を保つとは限らず、提供後の修正や使い方の整備が成果を左右する場合もある。競争の進み方を追う記事では、発表、利用開始、継続的な運用を異なる段階として記録し、同じ一位という言葉でまとめないことが求められる。",
+    "form": "開発競争",
+    "en": "Repeated announcements of new AI systems can make updates to performance tables look equivalent to industrial progress. Evaluating development competition, however, involves operating costs, reliability, and conditions for actual use as well as test scores. Announcing first does not guarantee a lasting advantage, and subsequent fixes and support for use can shape outcomes. Articles tracking the competition should record announcement, availability, and sustained operation as distinct stages instead of labeling them all with the same notion of first place.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "発表の早さと、実用化の進み方を分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

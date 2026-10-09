@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "pos": "noun",
+   "meaning": "backpropagation",
+   "defJa": "出力側から各変数の誤差への影響を計算する方法",
+   "passage": {
+    "ja": "画像を分類するモデルが答えを外したとき、内部のどの数値を動かせば誤りが減るのでしょうか。誤差逆伝播法は、出力から入力側へと計算をさかのぼり、各段階の数値が損失にどう影響するかを求める方法です。求めた情報をもとに数値を更新しますが、一度の変更で必ず正しい分類になるわけではなく、学習には多くの例と繰り返しが関わります。単に間違いを後ろへ送ると覚えるより、計算の途中にある小さな変化が最後の結果へどう響くかを、つないで調べる仕組みとして捉えてみましょう。",
+    "form": "誤差逆伝播法",
+    "en": "When an image-classification model makes a mistake, which internal values should change to reduce it? Backpropagation works backward from the output toward the input to determine how values at each stage affect the loss. That information guides updates, but one change does not necessarily produce the correct classification, and learning involves many examples and repetitions. Rather than memorizing it as sending errors backward, understand it as tracing how small changes along a computation connect to the final result.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "誤りそのものを逆向きに流す比喩とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
