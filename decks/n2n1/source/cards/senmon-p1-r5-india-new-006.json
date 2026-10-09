@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "呼吸性洞性不整脈",
+   "reading": "こきゅうせいどうせいふせいみゃく",
+   "pos": "noun",
+   "meaning": "respiratory sinus arrhythmia",
+   "defJa": "呼吸に伴って心拍の速さが揺れる現象",
+   "passage": {
+    "ja": "息を吸ったり吐いたりすると、脈の間隔まで少し変わることがあるんだよ。呼吸性洞性不整脈という名前は病気っぽく響くけど、吸うと速く、吐くと遅くなるような、呼吸に伴う生理的な揺らぎを指しているんだ。だから、坐って呼吸を観察する実験でこの揺れが見えても、特別な境地に達した証拠として読むのは飛躍になる。ゆっくり息をする条件と普段の呼吸の条件を分けて記録すれば、心が静まったという感想と、身体で測った変化を重ねて考える材料になるよ。",
+    "form": "呼吸性洞性不整脈",
+    "en": "Breathing in and out can slightly alter the intervals between heartbeats. Respiratory sinus arrhythmia sounds like an illness, but refers to physiological variation with breathing, such as speeding during inhalation and slowing during exhalation. Observing that variation during a seated breathing experiment therefore does not prove the attainment of a special contemplative state. Recording slow-breathing and ordinary-breathing conditions separately provides material for considering reports of calm alongside measured bodily changes.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "語に「不整脈」があっても、ここでは呼吸に伴う生理的な揺らぎを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "心拍変動",
+   "reading": "しんぱくへんどう",
+   "pos": "noun",
+   "meaning": "heart rate variability",
+   "defJa": "一拍ごとの心臓の拍動間隔の揺らぎ",
+   "passage": {
+    "ja": "呼吸をゆっくり整える前後で脈を測るとき、平均の速さだけでは捉えられない変化がある。心拍変動は、一拍ごとの間隔の揺らぎに注目する指標であり、瞑想や呼吸を扱う研究でも用いられる。呼吸の仕方自体がこの揺らぎに関わるため、値が変わったことを、そのまま心の状態全体が改善した証拠とすることはできない。測定を比べる際には、姿勢や呼吸の条件も合わせて記録することで、実践の何に伴う変化なのかを検討するための土台が得られる。",
+    "form": "心拍変動",
+    "en": "When measuring the pulse before and after slowing the breath, some changes escape the average rate alone. Heart rate variability examines fluctuations in beat-to-beat intervals and is also used in meditation and breathing research. Because breathing patterns themselves affect these fluctuations, a changed value cannot simply be treated as proof of an overall improvement in mental state. Recording posture and breathing conditions alongside the measurement provides a basis for examining which aspect of practice accompanies the change.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "平均心拍数と区別し、「拍動間隔の揺らぎ」という測定対象を明示している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "瞑想経験者",
+   "reading": "めいそうけいけんしゃ",
+   "pos": "noun",
+   "meaning": "experienced meditator",
+   "defJa": "瞑想を行った経験を持つ人",
+   "passage": {
+    "ja": "毎朝短く坐る人と、長い合宿で集中的に修行した人とでは、同じ年数でも実践の量や内容が違います。研究論文で瞑想経験者という区分を見たら、何年続けたかに加えて、方法や頻度をどう確かめたかも読んでおきましょう。経験のない人との間に脳の違いが見つかっても、始める前からの特徴や生活習慣が関わっている場合があります。同じ人を時間を追って調べた研究なのか、別々の集団を一度比べた研究なのかを区別すると、結論がどこまで述べられるかを判断しやすくなります。",
+    "form": "瞑想経験者",
+    "en": "Someone who sits briefly each morning and someone who practices intensively on long retreats may accumulate different amounts and kinds of practice over the same number of years. When a study uses the category experienced meditator, examine how it established methods and frequency as well as duration. Brain differences from non-meditators may also relate to prior characteristics or lifestyle. Distinguishing longitudinal research on the same people from a single comparison of separate groups helps determine how far its conclusions can extend.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「瞑想経験者を対象にする」。経験年数だけでなく、選定条件を確認する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "能動対照群",
+   "reading": "のうどうたいしょうぐん",
+   "pos": "noun",
+   "meaning": "active control group",
+   "defJa": "比較のために別の活動を行う実験参加者の集団",
+   "passage": {
+    "ja": "誰かに丁寧に教えてもらい、毎週仲間と集まれば、瞑想の技法以外にも変化を生む要素はある。研究で能動対照群を設けるのは、比較する側にも別の活動を行ってもらい、時間や人との接触などの条件を近づけるためである。何もせずに待つ集団との比較だけでは見えにくい違いが、こうした工夫を通じて浮かぶ。ただし、完全に同じ体験を用意することは難しく、何をそろえ、何を異なるままにしたかを読む作業が、瞑想そのものの効果を論じる際の中心になる。",
+    "form": "能動対照群",
+    "en": "Receiving careful instruction and meeting a group each week introduce potential sources of change beyond a meditation technique itself. An active control group participates in another activity to make conditions such as time and interpersonal contact more comparable. This design can reveal distinctions that a comparison with a waiting group alone cannot clarify. Since perfectly matching experiences is difficult, identifying what was matched and what remained different is central to discussing the effects specific to meditation.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「能動対照群を設ける」。待機するだけの集団との比較を一歩進める語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "注意制御",
+   "reading": "ちゅういせいぎょ",
+   "pos": "noun",
+   "meaning": "attentional control",
+   "defJa": "目的に応じて注意を保ち切り替える働き",
+   "passage": {
+    "ja": "「瞑想で集中力が上がる」という見出しは、読みやすい反面、何が変わったのかを隠してしまいます。注意制御という語を使うなら、目標に意識を保つ、邪魔な刺激から離れる、必要に応じて対象を切り替えるといった働きのうち、どれを調べたのかを添えられます。落ち着いたという感想と、課題で誤りが減ったという結果とは、どちらも大切でも同じ指標ではありません。研究の説明を短くする際は、効果を大きく見せる形容詞より、参加者が何をできるようになったかを示す動詞が役立ちます。",
+    "form": "注意制御",
+    "en": "The headline meditation improves concentration is easy to read but conceals what changed. Using attentional control allows the writer to specify whether the study examined maintaining a goal, disengaging from distractions, or shifting focus as needed. Feeling calmer and making fewer errors on a task can both matter without being the same measure. When shortening a research account, verbs showing what participants became able to do are more useful than adjectives that magnify the effect.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「注意制御が向上する」の内容を、保つ・離れる・切り替えるという動詞で補う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "注意瞬脱",
+   "reading": "ちゅういしゅんだつ",
+   "pos": "noun",
+   "meaning": "attentional blink",
+   "defJa": "続けて現れる二つ目の標的を短時間見落とす現象",
+   "passage": {
+    "ja": "「注意が途切れる」とだけ書くと、授業中にぼんやりする場面が浮かびます。実験でいう注意瞬脱を説明するなら、文字などが次々と現れる中で、一つ目の標的のすぐ後に出た二つ目を見落とす、という具体的な課題を示す方が正確です。集中的な瞑想の訓練を調べた研究でも、この課題の成績と脳波を組み合わせ、限られた注意の配分が検討されました。「集中力が強くなる」と広く言い換えるより、何を見つけやすくなったのかを残すことで、研究の面白さも保てます。",
+    "form": "注意瞬脱",
+    "en": "Simply writing that attention lapses may evoke daydreaming in class. Explaining the experimental attentional blink is more accurate when it describes missing a second target that appears soon after the first within a rapid stream of items such as letters. Research on intensive meditation training combined performance on this task with brain potentials to investigate the allocation of limited attention. Retaining what became easier to detect, rather than broadly paraphrasing it as stronger concentration, preserves the study’s interest as well as its precision.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "専門語を「集中力」に置き換えず、標的の提示順と見落としを説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

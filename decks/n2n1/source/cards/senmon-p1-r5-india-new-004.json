@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "隠元",
+   "reading": "いんげん",
+   "pos": "noun",
+   "meaning": "Ingen Ryuki",
+   "defJa": "江戸時代に来日し宇治の萬福寺を開いた中国僧",
+   "passage": {
+    "ja": "人名から野菜の名前へ話を広げると、聞き手の関心を引くことはできます。ただ、隠元を紹介する文章で、身近な品々を何でもこの僧が伝えたと書けば、確かめにくい由来話が中心になってしまいます。来日した中国僧が宇治に萬福寺を開いたという仕事を軸に、儀礼や建築に残る文化の往来を示す方が、歴史の説明として筋が通ります。覚えやすい逸話を添えるにしても、伝承なのか、資料で確かめられる出来事なのかを言葉の選び方で示せます。",
+    "form": "隠元",
+    "en": "Moving from a person’s name to the name of a vegetable can catch a listener’s interest. But introducing Ingen by attributing every familiar object to him would make difficult-to-verify origin stories the center of the account. Building the explanation around a Chinese monk establishing Manpukuji in Uji and the exchanges preserved in ritual and architecture gives it a clearer historical structure. Even when adding a memorable anecdote, the wording can indicate whether it is a tradition or an event supported by evidence.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「隠元が伝えた」と断定する前に、人物の仕事と由来の伝承を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "檀越",
+   "reading": "だんおつ",
+   "pos": "noun",
+   "meaning": "Buddhist lay donor",
+   "defJa": "寺院や僧の活動を施しによって支える信者",
+   "passage": {
+    "ja": "寺の縁起を読むと、僧の名に並んで、造営や維持を支えた人々の名が現れる。檀越は、寺院や僧に施しを行い、その活動を支える信者を指す呼び名であり、修行する側だけでは成り立たない教団の姿を示す。近世以降の檀家という仕組みを知っていても、古い資料のこの語をそのまま家の固定的な所属に置き換えることはできない。寄進された土地や物、建物の修理の記録を追うにつれて、教えの継承が人々の具体的な支援に支えられていたことが明らかになる。",
+    "form": "檀越",
+    "en": "Reading a temple’s history reveals the names of people who supported construction and maintenance alongside the names of monks. Dan’otsu denotes believers who sustain temples and monastic activities through gifts, showing that religious communities cannot function through practitioners alone. Familiarity with the later danka system does not justify replacing the word in an older source with a fixed hereditary household affiliation. Tracing records of donated land, objects, and building repairs reveals the concrete support underlying the transmission of teachings.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「檀越となる」「檀越の寄進」。寺院を支える側の役割を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "修験道",
+   "reading": "しゅげんどう",
+   "pos": "noun",
+   "meaning": "Shugendo mountain asceticism",
+   "defJa": "山での修行を中心とする日本の宗教的伝統",
+   "passage": {
+    "ja": "山道を歩く身体の動きは同じでも、景色を楽しむ登山と、宗教的な修行とでは、その一歩に込める意味が違います。修験道は、日本の山への信仰と仏教などが重なりながら育った伝統で、山に入る行為が、日常から離れて自分を鍛える実践に結び付いています。地域ごとに伝わる儀礼があり、どの山でも同じ修行をするというものではありません。道の険しさに加えて、どこで祈り、何を聖なる場所と見るのかに目を向けると、山の地図にもう一つの意味が重なります。",
+    "form": "修験道",
+    "en": "Although the body may move similarly along a mountain trail, recreational hiking and religious practice give each step different meanings. Shugendo developed through the interaction of Japanese mountain beliefs, Buddhism, and other traditions, linking entry into the mountains with discipline away from ordinary life. Rituals vary by region, rather than being identical on every mountain. Attending to places of prayer and sacred significance alongside the difficulty of the trail adds another layer of meaning to a mountain map.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「修験道の行者・修行」。山という場所を宗教実践と結び付けている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "悉曇",
+   "reading": "しったん",
+   "pos": "noun",
+   "meaning": "Siddham script and its study",
+   "defJa": "梵字の文字や音を学ぶ伝統的な体系",
+   "passage": {
+    "ja": "卒塔婆や仏像のそばにある見慣れない文字は、絵のように見えても、音を表す仕組みを持っています。日本の仏教で受け継がれた悉曇の学びは、梵字の形だけでなく、その読み方や意味とも関わり、真言や陀羅尼を唱える実践を支えてきました。サンスクリットという言語と、それを書く文字とを区別すると、インドの言葉が中国を経て日本で学ばれた道筋を捉えやすくなります。文字を写す手の動きと声に出す学びが結び付くところに、経典の内容を訳すだけでは伝わらない継承があります。",
+    "form": "悉曇",
+    "en": "The unfamiliar characters near memorial tablets and Buddhist images may look pictorial, but they have a system for representing sound. Siddham learning preserved in Japanese Buddhism concerns not only letter shapes but pronunciation and meaning, supporting the recitation of mantras and dharanis. Distinguishing Sanskrit as a language from the script used to write it clarifies how Indian words were studied in Japan through China. The combination of copying letters and learning through recitation carries a transmission that translating scripture’s meaning alone cannot preserve.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "言語と文字を区別し、「悉曇を学ぶ」という営みを音と形から説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "黄檗宗",
+   "reading": "おうばくしゅう",
+   "pos": "noun",
+   "meaning": "Obaku Zen school",
+   "defJa": "明代の中国禅の伝統を伝える日本の禅宗の一つ",
+   "passage": {
+    "ja": "日本の禅宗を学ぶとき、鎌倉時代だけに注目すると、その後の中国との交流を見落とします。黄檗宗の大本山である宇治の萬福寺は、江戸時代に来日した隠元によって開かれ、儀礼や建築にも中国とのつながりを伝えています。臨済宗や曹洞宗と比べるにあたっては、教義の違いだけでなく、どの時代の文化が、どのような人々を通して届いたかも整理するとよいでしょう。読経の節や境内の配置という具体的な手掛かりを持つと、宗派名が時代の流れの中に収まります。",
+    "form": "黄檗宗",
+    "en": "Focusing only on the Kamakura period when studying Japanese Zen can obscure later exchanges with China. Manpukuji in Uji, the head temple of Obaku Zen, was founded by Ingen after his arrival in the Edo period and preserves connections with China in its rituals and architecture. Comparisons with Rinzai and Soto are clearer when they address not only teachings but which period’s culture arrived through which people. Concrete clues such as chanting melodies and precinct layouts place denomination names within historical development.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "宗派名は、伝来した時代と儀礼や建築の特徴とを合わせて覚える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "寺請制度",
+   "reading": "てらうけせいど",
+   "pos": "noun",
+   "meaning": "temple certification system",
+   "defJa": "寺院に信仰上の所属などを証明させた制度",
+   "passage": {
+    "ja": "昔の人がどのお寺に属していたかって、本人の好みだけでは決まらなかったんだよね。江戸時代の寺請制度では、寺が人々について、禁じられたキリスト教の信者ではないことなどを証明する役割を担っていたんだ。だから、記録に寺の名前があるからといって、その人がどれほど熱心に教えを学んだかまで分かるとは限らない。家族の古い資料を読むときも、信心の深さと、社会の中で必要だった証明とを分けてみると、名前の並んだ紙が当時の暮らしに結び付くよ。",
+    "form": "寺請制度",
+    "en": "A person’s temple affiliation in the past was not decided solely by personal preference. Under the Edo-period temple certification system, temples certified matters such as people not being followers of prohibited Christianity. A temple name in a record therefore does not necessarily reveal how devotedly that person studied its teachings. Separating the depth of faith from socially required certification helps connect old family documents full of names with life at the time.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「寺請制度のもとで証明する」。所属の記録と個人の信心を分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "山伏",
+   "reading": "やまぶし",
+   "pos": "noun",
+   "meaning": "mountain ascetic",
+   "defJa": "山で宗教的な修行を行う修験道の行者",
+   "passage": {
+    "ja": "山中で修行する人の姿は、絵巻や祭りの装束を通じても伝えられてきた。山伏という呼び名は修験道の行者を指し、その活動を理解するには、険しい道を歩く身体的な鍛錬だけでなく、地域に伝わる信仰や儀礼にも目を向ける必要がある。装束は人物を見分ける手掛かりになるものの、外見の特徴を並べるだけでは、その人が地域で担った役割は捉えられない。寺社の記録と土地の伝承を照らし合わせると、山に入る修行と里での暮らしとを結ぶ人々の姿が浮かぶ。",
+    "form": "山伏",
+    "en": "The image of mountain practitioners has also been transmitted through illustrated scrolls and festival clothing. The term yamabushi refers to Shugendo practitioners, whose activities must be understood through local faith and ritual as well as the physical discipline of difficult trails. Clothing can help identify a figure, but listing outward features alone cannot explain that person’s role in a community. Reading temple and shrine records alongside local traditions reveals people linking mountain practice with life in settlements.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「山伏の装束・修行」。外見を入口に地域での役割へ視野を広げる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "五山制度",
+   "reading": "ござんせいど",
+   "pos": "noun",
+   "meaning": "Five Mountains temple ranking system",
+   "defJa": "主要な禅宗寺院を格付けした仕組み",
+   "passage": {
+    "ja": "寺院の序列は、悟りの深さをそのまま並べた順位表ではない。中世日本の五山制度は、主要な禅宗寺院を格付けし、政治権力の保護や統制とも結び付いた仕組みであった。京都と鎌倉の寺々を地図で確かめるときも、五つの山を探すより、どの寺がどの位置に置かれたかを見る方が制度の意味に近づく。信仰の場が公的な秩序に組み込まれることによって、人や文献の交流が支えられる一方、寺の運営には権力との関係も深く入り込む。",
+    "form": "五山制度",
+    "en": "A hierarchy of temples is not a ranking of the depth of their enlightenment. Medieval Japan’s Five Mountains system ranked prominent Zen temples and was connected with political protection and control. When locating the temples of Kyoto and Kamakura, examining each institution’s place in the hierarchy is more revealing than searching for five literal mountains. Bringing religious institutions into a public order supported exchanges of people and texts while also embedding political relationships in their administration.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「五山制度のもとで」。寺格と宗教的達成の評価を混同しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

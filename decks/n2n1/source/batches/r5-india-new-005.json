@@ -1,0 +1,162 @@
+{
+ "batch": "r5-india-new-005",
+ "items": [
+  {
+   "term": "集中瞑想",
+   "reading": "しゅうちゅうめいそう",
+   "gloss": "focused attention meditation",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://www.sciencedirect.com/science/article/pii/S0165178113005192"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Focus on a chosen object such as breath and return when distracted; distinguish open monitoring. No guaranteed brain change.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "開放監視瞑想",
+   "reading": "かいほうかんしめいそう",
+   "gloss": "open monitoring meditation",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Monitor arising experiences without fixing on one object; does not mean unconsciousness or suppressing every thought.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "慈悲瞑想",
+   "reading": "じひめいそう",
+   "gloss": "compassion meditation",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://arxiv.org/abs/1603.06342"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Practice cultivating goodwill/compassion; operational methods vary. Do not claim a simple compassion brain center.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "内受容感覚",
+   "reading": "ないじゅようかんかく",
+   "gloss": "interoception",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://arxiv.org/abs/2010.06078"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Perception of internal bodily signals such as heartbeat/breath; attention to signals and accurate detection differ.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "安静時機能結合",
+   "reading": "あんせいじきのうけつごう",
+   "gloss": "resting-state functional connectivity",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://pubmed.ncbi.nlm.nih.gov/35524072/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Statistical covariation between brain region signals at rest, not direct wiring or guaranteed causal influence; useful in meditation research.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "機能的磁気共鳴画像法",
+   "reading": "きのうてきじききょうめいがぞうほう",
+   "gloss": "functional magnetic resonance imaging",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://pubmed.ncbi.nlm.nih.gov/35524072/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Common blood-oxygen-dependent functional MRI estimates activity indirectly via blood oxygenation, not direct images of thoughts.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  },
+  {
+   "term": "後帯状皮質",
+   "reading": "こうたいじょうひしつ",
+   "gloss": "posterior cingulate cortex",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://arxiv.org/abs/1603.06342"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Region often discussed with default mode network and meditation; observed activity is not a standalone measure of enlightenment.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "島皮質",
+   "reading": "とうひしつ",
+   "gloss": "insular cortex",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://arxiv.org/abs/2010.06078"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Region involved in multiple functions including bodily signal processing; no one-to-one mapping to a contemplative state.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  }
+ ],
+ "weave": [
+  "修行",
+  "執着",
+  "慈悲",
+  "系譜",
+  "戒律",
+  "比較",
+  "注意",
+  "伝来",
+  "解釈",
+  "原典"
+ ],
+ "note": "Use grounded factNote only for historical or scientific claims; ordinary explanatory examples may elaborate without adding invented facts. All topic india. Four sentences, 215–255 chars. Avoid stock endings る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

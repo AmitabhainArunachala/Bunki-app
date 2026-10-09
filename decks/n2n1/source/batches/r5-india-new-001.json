@@ -1,0 +1,162 @@
+{
+ "batch": "r5-india-new-001",
+ "items": [
+  {
+   "term": "ジャイナ教",
+   "reading": "じゃいなきょう",
+   "gloss": "Jainism",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/aboutjainism"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Independent Indian religion emphasizing nonviolence and liberation; do not call it a Buddhist sect.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "マハーヴィーラ",
+   "reading": "まはーゔぃーら",
+   "gloss": "Mahavira",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/KnowYourTrithankar"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Revered as the twenty-fourth tirthankara in Jain tradition; historical dates are disputed, omit them.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  },
+  {
+   "term": "ティールタンカラ",
+   "reading": "てぃーるたんから",
+   "gloss": "Jain ford-maker; spiritual teacher",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/KnowYourTrithankar"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Jain term for an enlightened teacher who establishes a path across rebirth; not a creator god; twenty-four in the current traditional cycle.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "白衣派",
+   "reading": "びゃくえは",
+   "gloss": "Shvetambara Jain tradition",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Jain ascetic tradition whose renunciants wear white; traditions disagree on textual authority.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "空衣派",
+   "reading": "くうえは",
+   "gloss": "Digambara Jain tradition",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Sky-clad Jain tradition; full male ascetics renounce clothing. Do not imply all lay adherents or female renunciants are nude.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "アヒンサー",
+   "reading": "あひんさー",
+   "gloss": "nonviolence; ahimsa",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/PathofLiberation"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Non-harming in Jainism concerns thoughts, speech and action; compare Buddhist precept gently without conflating traditions.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "アパリグラハ",
+   "reading": "あぱりぐらは",
+   "gloss": "non-possession; non-attachment",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/11_17_16_Newsletter"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Jain non-possession/non-attachment; the strict renunciant and lay application differ; not merely trendy decluttering.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "アネーカーンタヴァーダ",
+   "reading": "あねーかーんたゔぁーだ",
+   "gloss": "Jain doctrine of many-sided reality",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/PathofLiberation"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Jain account of reality having multiple aspects; it does not mean every contradictory claim is equally true.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  }
+ ],
+ "weave": [
+  "修行",
+  "執着",
+  "慈悲",
+  "系譜",
+  "戒律",
+  "比較",
+  "注意",
+  "伝来",
+  "解釈",
+  "原典"
+ ],
+ "note": "Use grounded factNote only for historical or scientific claims; ordinary explanatory examples may elaborate without adding invented facts. All topic india. Four sentences, 215–255 chars. Avoid stock endings る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}
