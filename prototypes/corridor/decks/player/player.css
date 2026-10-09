@@ -531,6 +531,10 @@
 
 /* the passage: Mincho, ruled by its line height; readings at 11px or more */
 .kp .kp-sentence { font-family: var(--kp-serif); font-weight: 500; letter-spacing: 0.04em; }
+/* On the answer, keep ruby clear of the preceding word's 44px tap floor.
+ * Fronts have no tap nodes and keep their original compact line spacing. */
+.kp .kp-sentence:has(.kp-tok) { line-height: 2.5; }
+.kp .kp-card[data-zoom='focus'] .kp-sentence:has(.kp-tok) .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 5em; }
 /* readings never under 11px; no tracking of their own, so a long reading stretches its base as little as it can */
 .kp .kp-sentence rt { font-family: var(--kp-jp); font-size: max(11px, 0.5em); letter-spacing: -0.02em; }
 /* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
