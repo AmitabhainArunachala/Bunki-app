@@ -40,7 +40,7 @@ TOPICS = {
 DECKS = {
     "n2": ("N2・文章で覚える", "N2 vocabulary · passages", "ai"),
     "n1": ("N1・文章で覚える", "N1 vocabulary · passages", "ai"),
-    "senmon": ("専門・五つの分野", "Your five fields · master's level", "washi"),
+    "senmon": ("専門・あなたの分野", "Your fields · master's level", "washi"),
     "n2n1-sample": ("N2・N1 見本（20枚）", "N2/N1 sample · 20 cards", "ai"),
 }
 POS = {"noun": "noun", "verb": "verb", "i-adj": "い-adjective", "na-adj": "な-adjective",
