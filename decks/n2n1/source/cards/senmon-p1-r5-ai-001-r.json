@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "歩留まり",
-   "reading": "ぶどまり",
-   "pos": "noun",
-   "meaning": "yield; the share of good chips from a wafer",
-   "defJa": "製品のうち正常に仕上がった品の割合",
-   "passage": {
-    "ja": "半導体工場の朝は、前夜の検査データの確認から始まります。一枚のウエハーから正常なチップが何割取れたか、この数字が急落すれば、工場は出荷計画の見直しを余儀なくされます。ある日、温度管理のわずかな誤差が露光やエッチングと相互作用した結果、不良品が量産されていました。歩留まりが悪化したとき、グラフが教えてくれるのは結果だけで、その裏で動く工程全体の因果関係は数字からは読み取れません。だからベテランは、小さな異常を手がかりに工程の全体像を復元しようとします。",
-    "form": "歩留まり",
-    "en": "The morning at a semiconductor fab begins with checking the previous night's inspection data. If the share of good chips taken from a wafer plunges, the fab is forced to rethink its shipment plans. One day, a slight error in temperature control had interacted with the lithography and etching steps, and defective chips were being mass-produced. When yield worsens, the graph tells you only the result; the causal relationships running behind it through the whole process cannot be read from the numbers. That is why veterans work to reconstruct the full picture of the process, using a single small anomaly as their clue.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "半導体や製造の現場で「歩留まりが上がる・悪化する」のように良品の割合と結びつく語",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "肩を並べる",
    "reading": "かたをならべる",
    "pos": "verb",

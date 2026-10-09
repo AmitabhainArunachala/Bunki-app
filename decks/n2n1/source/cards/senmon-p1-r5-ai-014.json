@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "先端パッケージング",
-   "reading": "せんたんぱっけーじんぐ",
-   "pos": "noun",
-   "meaning": "advanced packaging",
-   "defJa": "複数の半導体などを高密度に接続し実装する技術",
-   "passage": {
-    "ja": "小さな計算機を一枚の巨大な板に描こうとして、私は途中で鉛筆を止めた。別々に作った部分を近くに並べたり、上下に重ねたりして結ぶ方法もあると知ったからだ。先端パッケージングという言葉は、製品をきれいな箱に入れる話だと思っていたが、実際には内部の接続や配置が性能を左右する技術の話だった。図の中で部品を重ねてみると、距離を縮める利点だけでなく、熱をどこへ逃がすかという疑問も生まれた。私は板の輪郭を消し、部品の間をつなぐ線と、熱の出口を描き足した。",
-    "form": "先端パッケージング",
-    "en": "I stopped halfway through drawing a small computer as one enormous board. I had learned that separately made parts can also be connected side by side or stacked. I had thought advanced packaging meant putting products in attractive boxes, but it concerns internal connections and layouts that influence performance. Stacking the parts in my sketch raised questions about removing heat as well as the benefits of shorter distances. I erased the board's outline and added connections between the parts and paths for heat to escape.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "包みの外観ではなく、接続や配置の技術に注目する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "公平性",
    "reading": "こうへいせい",
    "pos": "noun",

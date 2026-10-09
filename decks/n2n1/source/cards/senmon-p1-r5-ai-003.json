@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "頭打ち",
-   "reading": "あたまうち",
-   "pos": "noun",
-   "meaning": "leveling off, hitting a ceiling",
-   "defJa": "伸びが止まって、それ以上上がらない状態",
-   "passage": {
-    "ja": "半導体の微細化は、物理的な制約にぶつかって性能の伸びが頭打ちになると、よく言われます。一方、スマホの出荷が伸び悩むのは、買い替え需要がすでに行き渡った飽和という別物です。どちらのグラフも横ばいに見えるとはいえ、止まり方の中身はまったく違います。片方は上の壁に阻まれて止まり、片方は需要が満たされて自然に止まるのです。原因の側を先に押さえる習慣をつけておくと、似た概念が出てくる経済記事も迷わず読み分けられるようになります。",
-    "form": "頭打ち",
-    "en": "Semiconductor miniaturization, it is often said, sees its performance gains hit a ceiling after running into physical constraints. Sluggish smartphone shipments, on the other hand, are a different thing altogether: saturation, with replacement demand already spread through the market. Granted, both graphs look flat, but what lies behind the flattening is completely different. One stops because a wall blocks it from above; the other stops naturally because demand has been satisfied. Build the habit of pinning down the cause first, and you will find you can read economic articles featuring similar concepts without hesitation.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "成長が頭打ちになる、売上が頭打ちだ、と伸びの停止に使う。下降とは違う点に注意。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "量産",
    "reading": "りょうさん",
    "pos": "noun",

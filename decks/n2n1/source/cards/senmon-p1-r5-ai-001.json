@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "莫大",
-   "reading": "ばくだい",
-   "pos": "na-adj",
-   "meaning": "enormous (of sums and amounts)",
-   "defJa": "金額や数量が非常に大きいこと",
-   "passage": {
-    "ja": "半導体の露光装置は一台で莫大な金額が動く、これが現場の意思決定の前提になります。たとえばある工場の会議では、新型機の導入を巡って、技術部門と経理部門の意見が割れました。それぞれの主張は明快です。技術者は性能を、経理は減価償却を、それぞれの制約として持ち寄りましたが、最先端の製品で戦う以上、導入を決めざるを得なかったという結末です。装置の値段は会計の問題ですが、買うかどうかは、その工場が何年後に何を売りたいかという物語で決まるんです。",
-    "form": "莫大な",
-    "en": "With semiconductor lithography machines, an enormous sum moves on a single unit, and that is the premise of decision-making on the ground. At one plant's meeting, for instance, opinions split between the engineering and accounting departments over introducing a new model. Each side's argument was clear-cut. The engineers brought performance and the accountants brought depreciation, each as their own constraint, but since the plant competes on cutting-edge products, the outcome was that they had no choice but to approve the introduction. The machine's price is an accounting matter, but whether to buy is decided by the story of what that plant wants to sell, years from now.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "「莫大な費用」「莫大な金額」の形で、金額や数量の大きさを強調する語",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "著作権",
    "reading": "ちょさくけん",
    "pos": "noun",
@@ -57,28 +35,6 @@
     "register": "論",
     "topic": "ai",
     "tipJa": "「仮説を検証する」の形が典型。正しさを確かめる行為を硬めに言う語",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "国策",
-   "reading": "こくさく",
-   "pos": "noun",
-   "meaning": "national policy set by the state",
-   "defJa": "国が定めた政治や産業の方針",
-   "passage": {
-    "ja": "半導体ともなると、一つの工場の誘致が国の戦略の核として語られる。だが国策と企業戦略は似て非なる概念である。政府は補助金や税制を通じて特定の産業を支え、その狙いは雇用や技術基盤の保全にある。一方、工場を建てる側の企業は採算を計算しており、その判断が結果として国家の目標と重なったとしても、動機はあくまで利益だ。両者は制約も時間軸も違うのに、報道では同じ枠に置かれがちで、具体例で区別しなければ、補助金の額だけが政策のすべてのように見える。",
-    "form": "国策",
-    "en": "When it comes to semiconductors, the recruitment of a single plant gets narrated as the core of a national strategy. But national policy and corporate strategy are concepts that look alike yet differ. The government supports particular industries through subsidies and tax measures, and its aim lies in protecting employment and the technology base. The company building the plant, meanwhile, calculates profitability, and even if its decision happens to overlap with national goals, its motive is profit and nothing else. The two differ in constraints and time horizon, yet reporting tends to put them in the same frame, and unless you tell them apart with concrete examples, the subsidy figure alone looks like the whole of policy.",
-    "register": "報",
-    "topic": "ai",
-    "tipJa": "「国策として」「国策に沿って」の形で出る硬い報道語。企業戦略と区別して使う",
     "sense": ""
    },
    "deck": "senmon",

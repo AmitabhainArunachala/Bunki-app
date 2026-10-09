@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "破局的",
-   "reading": "はきょくてき",
-   "pos": "na-adj",
-   "meaning": "catastrophic",
-   "defJa": "取り返しのつかない大きな破綻に至るさま",
-   "passage": {
-    "ja": "人工知能の失敗を全部同じ箱に入れると、どこから対策すべきかが分からなくなるよね。文章の誤字と、重要な設備の制御を誤って人命を危険にさらす事態とでは、被害の大きさがまるで違う。破局的な結果を避けるという話なら、ただ間違いの回数を数えるだけでなく、一度の失敗がどこまで広がるのかも考えたいんだ。起こりやすさが低いからといって、回復できないほどの被害を無視していいとは限らないよ。だから、止める手段や人が判断を引き取る仕組みまで含めて、その使い道を検討するんだね。",
-    "form": "破局的",
-    "en": "Putting every AI failure into the same category makes it hard to decide where to begin addressing problems. A typo and incorrect control of critical equipment that endangers lives differ enormously in the scale of harm. Avoiding catastrophic outcomes requires considering how far a single failure could spread, not just counting errors. Low likelihood does not necessarily justify ignoring damage from which recovery would be impossible. That is why an application is assessed together with ways to stop it and arrangements for people to take over decisions.",
-    "register": "話",
-    "topic": "ai",
-    "tipJa": "単に悪いだけでなく、重大な破綻に至る程度を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "示唆に富む",
    "reading": "しさにとむ",
    "pos": "expression",

@@ -21,28 +21,6 @@
    "pass": 1,
    "writer": "glm-5.3:cloud",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "陰陽五行",
-   "reading": "いんようごぎょう",
-   "pos": "noun",
-   "meaning": "yin-yang and the five phases",
-   "defJa": "陰と陽、木火土金水で万物の変化を説く中国の思想",
-   "passage": {
-    "ja": "木・火・土・金・水をひとまとめに「五つの元素」と訳してしまうと、陰陽五行はギリシアの四元素の親類のように聞こえてくる。だが木や火は本来、静止した物質ではなく、互いに生じ合い、打ち克ち合う動きの過程として解釈されてきたのである。歴史をたどると、この枠組みは古代中国で生まれ、日本に渡って暦や方違えといった実践にまで深く組み込まれ、仏教とともに渡来したインドの思想とは系譜を異にする。訳語をめぐっては、「元素」を選ぶか「過程」を選ぶかで、この思想の輪郭そのものが変わってしまう。",
-    "form": "陰陽五行",
-    "en": "When wood, fire, earth, metal, and water are lumped together and translated as 'the five elements,' the doctrine of yin-yang and the five phases comes to sound like a cousin of the Greek four elements. Yet wood and fire are not in essence static substances but have been interpreted as processes of movement that generate one another and overcome one another. Tracing its history, this framework was born in ancient China, crossed to Japan, and was built deeply even into practices such as the calendar and direction-avoidance, following a lineage distinct from the Indian thought that arrived together with Buddhism. Around the choice of translation, whether one settles on 'elements' or on 'phases' changes the very outline of this way of thinking.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "五行は「五つの元素」と訳されがちだが、互いに生じ合う過程を指す中国由来の語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

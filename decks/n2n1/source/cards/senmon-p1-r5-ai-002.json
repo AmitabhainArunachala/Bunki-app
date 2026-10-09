@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "補助金",
-   "reading": "ほじょきん",
-   "pos": "noun",
-   "meaning": "subsidy; government grant to support a policy",
-   "defJa": "政府や自治体が政策のために支給する金銭",
-   "passage": {
-    "ja": "半導体工場への補助金は、出す側と受け取る側とで違うものに見える。政府にとっては雇用と技術を国内に引きつける政策手段であり、企業にとっては立地計算を一変させる初期費用の埋め合わせだ。莫大な税金が投入される一方で、その効果は数年後にしか検証できない。制度を設計する側が合理的な取引と呼ぶものを、利用する側は制約付きの資金として受け取り、工場は支援が続くかぎりその土地に縛られる。同じ金額が、立場しだいで恩恵から鎖へと姿を変えるのである。",
-    "form": "補助金",
-    "en": "A subsidy for a semiconductor plant looks like one thing to the side that pays it and another to the side that receives it. To the government it is a policy tool for drawing jobs and technology into the country; to the company it is compensation for upfront costs that upends the location calculation. Huge amounts of tax money go in, while the effects cannot be verified until years later. What the side that designed the system calls a rational trade, the side that uses it receives as funding with strings attached, and as long as the support continues, the plant is tied to that land. The same sum of money changes shape depending on where one stands, from blessing into chain.",
-    "register": "論",
-    "topic": "ai",
-    "tipJa": "補助金を給付する・投入する・打ち切るなどと組む。出す側と受ける側で意味がずれる語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "近似",
    "reading": "きんじ",
    "pos": "noun",
@@ -80,28 +58,6 @@
     "topic": "ai",
     "tipJa": "実力・本質・得意不得意を見極める。判断材料が揃って初めて使える語。",
     "sense": "最後まで見届ける意ではなく、本質や程度を見抜く意"
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "躍進",
-   "reading": "やくしん",
-   "pos": "noun",
-   "meaning": "rapid advance; a leap forward",
-   "defJa": "勢いに乗って大きく進むこと",
-   "passage": {
-    "ja": "同じAIツールを導入したのに、ある会社は躍進を遂げて市場で群を抜き、別の会社は何も変わらない。人間は便利なツールを見ると買わずにはいられない生き物ですが、買うだけで終わると費用ばかりが積み上がるんです。伸びた側が先にやっていたのは、業務の流れそのものを用途に合わせて組み替える地味な作業でした。便利さと成果の因果関係をいったん疑い、隠れた無駄を見つける労働に時間を投資していたんです。便利な選択の費用は、値段より見落としの方が大きいんですよ。",
-    "form": "躍進",
-    "en": "Even when they bring in the same AI tools, some companies make a leap and stand out in the market while others change not at all. Humans are creatures who cannot help buying a tool the moment it looks convenient, but if buying is where it ends, only the costs pile up. What the side that grew had done first was the unglamorous work of reorganizing the workflow itself to fit the use case. They questioned the causal link between convenience and results, and invested time in the labor of finding hidden waste. With a convenient choice, the cost of what gets overlooked is greater than the price.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "躍進を遂げるが定番の組み合わせ。急成長を表し、人・企業・国に使える。",
-    "sense": ""
    },
    "deck": "senmon",
    "field": "ai",

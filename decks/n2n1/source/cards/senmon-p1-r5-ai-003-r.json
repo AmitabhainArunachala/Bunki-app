@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "過熱",
-   "reading": "かねつ",
-   "pos": "noun",
-   "meaning": "overheating (of machines, markets, debates)",
-   "defJa": "熱が上がりすぎて危険な状態になること",
-   "passage": {
-    "ja": "深夜のデータセンターで大規模な学習を回していたGPUが過熱し、警報が鳴るや否や、担当者は端末に飛びついた。選択肢は二つで、学習を止めて最初からやり直すか、冷却ファンを限界まで回して粘るか。ファンには物理的な制約があり、三十秒迷っている間に損失は膨らむ一方です。こうした場面を文章にするときは、判断の重さをあれこれ説明しないことです。秒数と選択肢だけを書けば、読み手は自分の指の震えを想像しながら、現場の緊迫感まで体感してくれます。",
-    "form": "過熱し",
-    "en": "At midnight in a data center, a GPU running a large-scale training job overheated, and no sooner had the alarm sounded than the operator lunged for the terminal. There were only two options: stop the training and start over from the beginning, or push the cooling fans to their limit and hold out. Fans have physical constraints, and while you hesitate for thirty seconds, the losses keep on swelling. When you put a scene like this into writing, the trick is not to go on explaining how heavy the decision is. Write down only the seconds and the options, and readers will picture their own fingers trembling and feel the tension of the site for themselves.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "機器の過熱は文字どおり熱が上がる意。市場や議論の過熱は比喩で、混ぜないように。",
-    "sense": "機器が実際に熱を持ち、危険な温度に達すること"
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "重み",
    "reading": "おもみ",
    "pos": "noun",

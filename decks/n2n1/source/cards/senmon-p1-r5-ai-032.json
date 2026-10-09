@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "透明性",
-   "reading": "とうめいせい",
-   "pos": "noun",
-   "meaning": "transparency",
-   "defJa": "仕組みや判断の過程を外から確かめられる性質",
-   "passage": {
-    "ja": "人工知能の判断に疑問が生じたとき、利用者はどの情報をもとに調べられるでしょうか。仕組みや運用の過程を外から確かめられる透明性は、単に大量の資料を公開することと同じではありません。用語の説明がなく、何が変更されたかも追えない資料では、情報があるにもかかわらず、必要な確認を進めにくいからです。誰が何を知るための記録なのかを決め、変更の履歴や評価の条件を読み取れる形で示すと、開発者と利用者が同じ根拠を前に議論する足場ができます。",
-    "form": "透明性",
-    "en": "When users question an AI decision, what information can they use to investigate it? Transparency, which allows the mechanism and operational process to be examined externally, is not the same as simply publishing large quantities of documents. Without terminology explanations or traceable changes, available information can still be difficult to use for the required checks. Defining the audience and purpose of records and presenting readable change histories and evaluation conditions gives developers and users a shared basis for discussion.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "資料を公開するだけでなく、調べられる形も問う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "過当競争",
    "reading": "かとうきょうそう",
    "pos": "noun",
