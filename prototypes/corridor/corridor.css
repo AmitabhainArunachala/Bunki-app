@@ -7082,9 +7082,9 @@ body.zen .review-example {
     }
   }
   /* the answer condenses out of the paper like ink soaking in — each zone a
-   * beat of the ritual, the reading legible by ~450ms, seals last */
+   * beat of the ritual, readings first and every grade ready within 340ms */
   body.zen .reveal {
-    animation: kairo-materialize 520ms var(--ease-ceremony) both;
+    animation: kairo-materialize 180ms var(--ease-ceremony) both;
   }
   @keyframes kairo-materialize {
     from {
@@ -7097,29 +7097,29 @@ body.zen .review-example {
     }
   }
   body.zen .reveal.r-1 {
-    animation-delay: 120ms;
+    animation-delay: 40ms;
   }
   body.zen .reveal.r-2 {
-    animation-delay: 210ms;
+    animation-delay: 70ms;
   }
   body.zen .reveal.r-3 {
-    animation-delay: 300ms;
+    animation-delay: 100ms;
   }
   body.zen .reveal.r-4 {
-    animation-delay: 390ms;
+    animation-delay: 130ms;
   }
   body.zen .grade-row .grade {
-    animation: kairo-materialize 380ms var(--ease-ceremony) both;
-    animation-delay: 480ms;
+    animation: kairo-materialize 140ms var(--ease-ceremony) both;
+    animation-delay: 110ms;
   }
   body.zen .grade-row .grade:nth-child(2) {
-    animation-delay: 540ms;
+    animation-delay: 140ms;
   }
   body.zen .grade-row .grade:nth-child(3) {
-    animation-delay: 600ms;
+    animation-delay: 170ms;
   }
   body.zen .grade-row .grade:nth-child(4) {
-    animation-delay: 660ms;
+    animation-delay: 200ms;
   }
   /* the stamp: one crisp gesture in a slow room */
   body.zen .grade.hanko:active .g-seal {

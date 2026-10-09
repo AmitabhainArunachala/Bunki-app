@@ -16,6 +16,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'rooms/read.css',
   'rooms/learn.css',
   'rooms/words.css',
+  'rooms/motion.css',
   'rooms/me.css',
   'rooms/cards.css',
   'corridor.js',

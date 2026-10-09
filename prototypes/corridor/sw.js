@@ -40,6 +40,7 @@ const SHELL = [
   'rooms/read.css',
   'rooms/learn.css',
   'rooms/words.css',
+  'rooms/motion.css',
   'rooms/me.css',
   'rooms/cards.css',
   'design/ink-hoku-nami.png',

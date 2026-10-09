@@ -1,6 +1,7 @@
 /* A room change holds the departing frame while the next room arrives.
    Native group geometry animation is disabled: only opacity/transform move. */
 #app > main { view-transition-name: kairo-room; }
+::view-transition { pointer-events: none; }
 ::view-transition-group(*) { animation: none; }
 ::view-transition-image-pair(*) { isolation: isolate; }
 ::view-transition-old(root), ::view-transition-new(root) {
