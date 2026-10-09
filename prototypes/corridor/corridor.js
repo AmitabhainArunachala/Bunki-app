@@ -29166,9 +29166,36 @@ function renderEncounterTrail(sheet, node) {
   sheet.append(box);
 }
 
+// Data enrichment rebuilds the entry, but belongs to the same arrival. Keep
+// each layer on its original timeline; actual stack navigation starts anew.
+let sheetArrivalVisit = null;
+function continueSheetArrival(sheet, scrim) {
+  const path = JSON.stringify(S.stack.map((node) => [node.t, node.id, String(node.seq || ''), node.reading || '']));
+  if (!sheetArrivalVisit || sheetArrivalVisit.view !== S.view ||
+      sheetArrivalVisit.passageId !== S.passageId || sheetArrivalVisit.stack !== S.stack ||
+      sheetArrivalVisit.path !== path) {
+    sheetArrivalVisit = { view: S.view, passageId: S.passageId, stack: S.stack, path, layers: new Map() };
+  }
+  const visit = sheetArrivalVisit;
+  for (const [key, element] of [['sheet', sheet], ['scrim', scrim]]) {
+    const animation = element.getAnimations({ subtree: false })
+      .find((item) => item.animationName === 'feel-rise' || item.animationName === 'feel-fade');
+    if (!animation) continue;
+    const previous = visit.layers.get(key);
+    const layer = { animation, startedAt: previous?.startedAt ?? document.timeline.currentTime ?? performance.now() };
+    visit.layers.set(key, layer);
+    if (previous) animation.startTime = layer.startedAt;
+    animation.ready.then(() => {
+      if (sheetArrivalVisit === visit && visit.layers.get(key) === layer && animation.startTime != null) {
+        layer.startedAt = animation.startTime;
+      }
+    }, () => {});
+  }
+}
+
 function renderSheet(root) {
   const node = S.stack[S.stack.length - 1];
-  if (!node) return;
+  if (!node) { sheetArrivalVisit = null; return; }
   // A direct UI action may already include the newly arrived data in this
   // render. Do not follow it with a redundant deferred repaint.
   if (wordSheetGesture?.node === node) wordSheetGesture.pending = false;
@@ -29398,6 +29425,7 @@ function renderSheet(root) {
   });
   if (maintenanceReports) sheet.append(reportEntries('report-line-sheet'));
   root.append(sheet);
+  continueSheetArrival(sheet, scrim);
 
   // The sheet keeps its place across a full re-render: 筆順 carries the
   // scrollTop it left with and hands it straight back.
