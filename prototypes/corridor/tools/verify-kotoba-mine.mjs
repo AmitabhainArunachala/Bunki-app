@@ -1009,10 +1009,21 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
  * what a tap must leave exactly as it was */
 const SCHEDULE_OF = (key) => `(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}'); return JSON.stringify({ cards: s.cards || {}, log: s.log || [], groupsOff: s.groupsOff || [], suspended: s.suspended || {}, repairs: s.repairs || {}, repairLog: s.repairLog || [] }); })()`;
 const LOOKUPS_OF = (key) => `(JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}').lookups || [])`;
+const RESTING = `new Promise((ok, fail) => { let last = -1; let same = 0; const started = performance.now(); const tick = () => { if (performance.now() - started > 5000) return fail(new Error('The revealed card did not reach its resting scroll and ink within 5 seconds')); const moving = document.getElementById('kp-card').getAnimations({ subtree: true }).some((a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity); if (scrollY === last) { if (++same >= 6 && !moving) return ok(Math.round(scrollY)); } else { same = 0; last = scrollY; } requestAnimationFrame(tick); }; tick(); })`;
 /** the tap targets' reach: elementFromPoint 21px above and below each sampled word's centre lands on that word */
 const REACH = `(() => {
   const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
-  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => { const r = t.getClientRects(); if (r.length !== 1) return false; const c = (r[0].top + r[0].bottom) / 2; return c > 80 && c < bar - 30; }).slice(0, 12);
+  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => {
+    const r = t.getClientRects(); if (r.length !== 1) return false;
+    const x = (r[0].left + r[0].right) / 2, y = (r[0].top + r[0].bottom) / 2;
+    if (y <= 80 || y >= bar - 30 || x <= 0 || x >= innerWidth) return false;
+    for (let n = t.parentElement; n && n.id !== 'kp-card'; n = n.parentElement) {
+      const cs = getComputedStyle(n), box = n.getBoundingClientRect();
+      if (['hidden', 'clip', 'auto', 'scroll'].includes(cs.overflowY) && (y - 21 < box.top || y + 21 > box.bottom)) return false;
+      if (['hidden', 'clip', 'auto', 'scroll'].includes(cs.overflowX) && (x < box.left || x > box.right)) return false;
+    }
+    return true;
+  }).slice(0, 12);
   const miss = [];
   for (const t of toks) {
     const r = t.getClientRects()[0];
@@ -1093,6 +1104,7 @@ async function verifyTap(browser, base) {
       missing.length === 0 && back.toks.length >= want.length && back.def.length >= 2 && back.target >= 1 && back.roles,
       JSON.stringify({ want: want.length, got: back.toks.length, missing: missing.slice(0, 5), def: back.def, target: back.target }),
     );
+    await page.evaluate(RESTING);
     const reach = await page.evaluate(REACH);
     await page.hover('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
     const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t); return cs.textDecorationLine + ' ' + cs.textDecorationStyle; })()`);
@@ -1456,7 +1468,6 @@ async function verifyBack(browser, base) {
   // 1, e) the longest passage (km-298-m02, 195 characters), seen before (焦点) and with 全文 chosen: at the
   // resting scroll position after the reveal the word and its definition sit above the pinned bar,
   // no fold row is cut by it; 焦点 folds the other sentences to two dimmed lines each with ⋯
-  const RESTING = `new Promise((ok, fail) => { let last = -1; let same = 0; const started = performance.now(); const tick = () => { if (performance.now() - started > 5000) return fail(new Error('The revealed card did not reach its resting scroll and ink within 5 seconds')); const moving = document.getElementById('kp-card').getAnimations({ subtree: true }).some((a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity); if (scrollY === last) { if (++same >= 6 && !moving) return ok(Math.round(scrollY)); } else { same = 0; last = scrollY; } requestAnimationFrame(tick); }; tick(); })`;
   const AT_REST = `(() => { const box = (s) => document.querySelector(s)?.getBoundingClientRect(); const bar = box('.kp-grades'); const t = box('#kp-card .kp-term'); const d = box('#kp-card .kp-def'); const f = box('#kp-card .kp-s[data-focus]') || box('#kp-card .kp-target');
     const rows = [...document.querySelectorAll('#kp-card .kp-folds > details > summary')].map((n) => n.getBoundingClientRect());
     return { y: Math.round(scrollY), bar: Math.round(bar.top), term: Math.round(t.bottom), def: Math.round(d.bottom), sentenceTop: Math.round(f.top), cut: rows.filter((r) => r.top < bar.top - 0.5 && r.bottom > bar.top + 0.5).length }; })()`;
@@ -2185,7 +2196,8 @@ const MOTION = `(() => {
     longest = Math.max(longest, t, a);
     if (cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') moving.push(n.className || n.tagName);
   }
-  return { longest: Math.round(longest * 1000), moving: moving.slice(0, 4), running: document.getAnimations().length };
+  const animations = kp.getAnimations({ subtree: true }).map((a) => ({ name: a.animationName, properties: [...new Set(a.effect.getKeyframes().flatMap((f) => Object.keys(f).filter((k) => !['offset', 'computedOffset', 'easing', 'composite'].includes(k))))] }));
+  return { longest: Math.round(longest * 1000), moving: moving.slice(0, 4), running: document.getAnimations().length, animations, opacityOnly: animations.length > 0 && animations.every((a) => a.properties.length > 0 && a.properties.every((p) => p === 'opacity')) };
 })()`;
 /** records the cards that come and go while a grade is answered */
 const WATCH = `(() => {
@@ -2408,7 +2420,7 @@ async function verifyVisual(browser, base) {
     await close(o);
   }
 
-  // e) prefers-reduced-motion: no transform, no animation, no transition anywhere; swipe does not drag
+  // e) prefers-reduced-motion: a short opacity crossfade, no transform or swipe drag
   {
     const o = await open('?deck=kotoba', 'kotoba-mine', { reduce: true });
     await o.page.evaluate(`window.__kpCard = document.getElementById('kp-card')`);
@@ -2424,9 +2436,9 @@ async function verifyVisual(browser, base) {
       arrive: document.getElementById('kp-card').classList.contains('kp-arrive'), log: JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || '{"log":[]}').log.length }; })()`);
     const moved = await o.page.evaluate(MOTION);
     check(
-      'e) prefers-reduced-motion (emulateMedia): the reveal keeps the card, nothing animates or transitions, no element is transformed; a swipe marks the edge without dragging and still grades; no slide-out, the rail is a plain width',
-      still && revealed.longest === 0 && revealed.moving.length === 0 && revealed.running === 0 && drag.transform === '' && drag.swipe === 'good' && advanced.seen === 0 && !advanced.arrive && advanced.log === 1 && advanced.count.startsWith('2/') &&
-        advanced.rail === 'none' && Math.abs(advanced.width - advanced.track / advanced.total) < 1 && moved.longest === 0 && moved.moving.length === 0 && moved.running === 0,
+      'e) prefers-reduced-motion (emulateMedia): the reveal keeps the card and uses an opacity-only crossfade within 120 ms, no element is transformed; a swipe marks the edge without dragging and still grades; no slide-out, the next card crossfades and the rail is a plain width',
+      still && revealed.longest > 0 && revealed.longest <= 120 && revealed.opacityOnly && revealed.moving.length === 0 && drag.transform === '' && drag.swipe === 'good' && advanced.seen === 0 && advanced.arrive && advanced.log === 1 && advanced.count.startsWith('2/') &&
+        advanced.rail === 'none' && Math.abs(advanced.width - advanced.track / advanced.total) < 1 && moved.longest > 0 && moved.longest <= 120 && moved.opacityOnly && moved.moving.length === 0,
       JSON.stringify({ still, revealed, drag, advanced, moved }),
     );
     await close(o);
