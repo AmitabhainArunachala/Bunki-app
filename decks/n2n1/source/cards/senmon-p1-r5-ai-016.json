@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "受託生産",
+   "reading": "じゅたくせいさん",
+   "pos": "noun",
+   "meaning": "contract manufacturing",
+   "defJa": "他社から依頼を受け、その製品を作ること",
+   "passage": {
+    "ja": "スマホのチップに書いてある会社名を見ても、その会社が工場で全部作ったとは限らないんだよ。半導体では、設計をする会社から製造を請け負う受託生産という仕事があって、図面を作る力と量産する力を別の会社が担うこともあるんだ。ただ図面を渡せば終わりというほど単純でもなく、作れる構造や材料の制約を踏まえて、設計側と製造側が調整する場面もあるよ。製品を調べるときは、誰が設計し、どこで作り、誰が検査するかを分けると、供給のつながりを追いやすいね。",
+    "form": "受託生産",
+    "en": "A company’s name on a smartphone chip does not necessarily mean it made everything in its own factory. Semiconductor contract manufacturing takes production work from design companies, so separate firms may provide design and mass-production capabilities. It is not always as simple as handing over drawings, since designers and manufacturers may coordinate around constraints on structures and materials that can be made. Separating who designs, where production occurs, and who tests a product makes its supply connections easier to follow.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "設計や販売の主体と、製造を請け負う主体を分けて捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "合従連衡",
+   "reading": "がっしょうれんこう",
+   "pos": "noun",
+   "meaning": "shifting corporate alliances",
+   "defJa": "利害に応じて結び付きや組み合わせを変えること",
+   "passage": {
+    "ja": "半導体企業どうしが、ある技術では共同開発し、別の製品では競争することがあります。同じ会社が組む相手を変える合従連衡を、単なる仲直りや裏切りの物語として読むと、事業上の狙いが隠れてしまいます。開発費を分担したいのか、製造能力を確保したいのか、共通の規格を広めたいのかによって、協力する範囲は変わるからです。提携の発表に接したら、参加企業の名前に加えて、何を共有し何を各社に残すのかを図にすると、競争と協力が重なる構造をつかめます。",
+    "form": "合従連衡",
+    "en": "Semiconductor companies may develop one technology together while competing on other products. Reading their shifting alliances as mere stories of reconciliation or betrayal conceals their business aims. The scope of cooperation changes depending on whether firms want to share development costs, secure manufacturing capacity, or spread a common standard. When an alliance is announced, diagramming what is shared and what stays with each company alongside the participants’ names helps reveal the overlap of competition and cooperation.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "企業の提携や再編など、利害に応じた組み合わせに使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "右肩上がり",
+   "reading": "みぎかたあがり",
+   "pos": "noun",
+   "meaning": "a sustained upward trend",
+   "defJa": "数値などが全体として上向きに増えていくこと",
+   "passage": {
+    "ja": "半導体企業の売上を右肩上がりと書くなら、どの期間のどの数字を見ているのかを添えましょう。一年間の合計が伸びていても、各月まで一度も下がらず増えたとは限らず、年と月ではグラフの印象も違います。見出しを短くするあまり、利益や株価まで同じ方向に動いたように読ませると、売上についての記述が別の主張に変わってしまいます。横軸の期間と縦軸の単位を確かめ、途中に落ち込みがあれば、その揺れも一文で残すと増加の実態が伝わります。",
+    "form": "右肩上がり",
+    "en": "When describing a semiconductor company’s sales as trending upward, specify which figures and period you mean. Growth in an annual total does not mean every month increased without a dip, and annual and monthly graphs can look different. Shortening a headline so far that it suggests profit and share prices moved the same way turns a statement about sales into a different claim. Checking the horizontal period and vertical units and retaining a sentence about any interim decline conveys how the growth actually occurred.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "全体の上向きを示す表現で、毎回の増加まで保証する語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "周回遅れ",
+   "reading": "しゅうかいおくれ",
+   "pos": "noun",
+   "meaning": "lagging far behind",
+   "defJa": "競争相手より進展が大きく遅れていること",
+   "passage": {
+    "ja": "新しい半導体技術をめぐり、開発で周回遅れだという評価があっても、それだけでは企業の競争力を測れない。試作品の発表時期、量産の安定性、顧客への納入実績のうち、どの点で遅れているかが示されて初めて、比較の意味が定まる。競走の比喩は距離の大きさを印象づける反面、企業ごとに狙う市場や要求される性能が違うことを見えにくくする。技術の進展を報じる際には、同じ用途と条件で比べられる数値や節目を示し、評価を支える根拠を明らかにする。",
+    "form": "周回遅れ",
+    "en": "A judgment that a company is a lap behind in developing a new semiconductor technology is not enough to measure its competitiveness. The comparison gains meaning only when the delay is specified in terms of prototype announcements, stable mass production, or deliveries to customers. A racing metaphor emphasizes the gap but obscures differences in target markets and required performance. Reporting technological progress should therefore show figures or milestones comparable under the same uses and conditions and make the grounds for the assessment clear.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "ここでは競走の比喩として、開発の大きな遅れを示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "台湾有事",
+   "reading": "たいわんゆうじ",
+   "pos": "noun",
+   "meaning": "a crisis around Taiwan",
+   "defJa": "台湾周辺で武力衝突などの重大な危機が起こる事態",
+   "passage": {
+    "ja": "半導体の供給リスクを学ぶ際に台湾有事を扱うなら、危機が必ず起こると予言する文章と、起きた場合の影響を考える文章を区別しましょう。工場が動くかどうかに加えて、電力、港、輸送、取引の継続といった条件を別々に書き出すと、想定が具体的になります。ひとつの仮説にすべてをまとめず、どの経路で供給が止まり、代替にどれほどの時間がかかるかを資料で確かめます。発生の見込みと発生した場合の損失を分けて整理することが、強い見出しに引かれず議論を読む手掛かりです。",
+    "form": "台湾有事",
+    "en": "When studying semiconductor supply risks through a Taiwan contingency, distinguish predicting that a crisis will certainly occur from examining its consequences if it does. Listing conditions such as electricity, ports, shipping, and continuing transactions separately from whether factories can operate makes the scenario concrete. Instead of combining everything into one hypothesis, consult sources on which routes might interrupt supply and how long substitution would take. Separating the chance of occurrence from losses conditional on occurrence helps one read debates without being led by dramatic headlines.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "起こり得る危機を想定する語で、発生の断定ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "参入障壁",
+   "reading": "さんにゅうしょうへき",
+   "pos": "noun",
+   "meaning": "barrier to market entry",
+   "defJa": "新たな企業が市場へ入るのを難しくする要因",
+   "passage": {
+    "ja": "半導体の工場を建てるには、土地と機械を買うお金だけ用意すればよいのでしょうか。製品を安定して作る技術や、顧客から品質を認めてもらうまでの時間も、参入障壁として新しい企業の前に立ちはだかります。既存の会社と同じ半導体製造装置を導入したからといって、すぐ同じ歩留まりで量産できるとは限らないのですね。資金、技術、人材、取引関係を分けて眺めると、ある市場で企業の数が増えにくい理由を、工場の値段だけに帰さず説明できます。",
+    "form": "参入障壁",
+    "en": "Does building a semiconductor factory require only the money to buy land and machinery? The expertise needed for stable production and the time required to earn customer approval also stand before new firms as barriers to entry. Installing the same manufacturing equipment as an established company does not necessarily mean immediately producing at the same yield. Considering capital, technology, people, and business relationships separately lets us explain why few firms enter a market without attributing it solely to factory costs.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "資金に限らず、技術や信用など市場参入を妨げる条件を含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "収穫逓減",
+   "reading": "しゅうかくていげん",
+   "pos": "noun",
+   "meaning": "diminishing returns",
+   "defJa": "他の条件が同じとき追加投入の効果が次第に小さくなること",
+   "passage": {
+    "ja": "一台の検査装置を使う作業に人を増やし続けても、処理できる量が同じ割合で増えるとは限らない。装置や作業場所を変えずに人員だけを追加したとき、追加分がもたらす成果が小さくなるなら、収穫逓減の例として考えられる。これは努力が無意味だという主張ではなく、変えない条件が何であるかを問う見方である。人をさらに投入する前に、待ちが生じる場所を観察し、設備を増やす場合と手順を改める場合を比べれば、投入量と成果の関係を単純な比例から切り離せる。",
+    "form": "収穫逓減",
+    "en": "Adding people to work using a single inspection machine need not increase throughput in the same proportion. If adding workers while keeping equipment and workspace unchanged yields ever smaller additional output, it is an example of diminishing returns. This is not a claim that effort is pointless, but a way of asking which conditions remain fixed. Observing where waiting occurs and comparing added equipment with changed procedures before adding more people separates the relation between input and output from simple proportionality.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "何を一定に保ち、何を追加したかを明らかにして使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "収益化",
+   "reading": "しゅうえきか",
+   "pos": "noun",
+   "meaning": "monetization",
+   "defJa": "事業やサービスから金銭的な収入を得る仕組みを作ること",
+   "passage": {
+    "ja": "無料の文章生成サービスで利用者が増えても、それだけで運営を続ける資金が得られるとは限らない。有料契約や利用量に応じた課金によって収益化を図る場合、支払いに見合う価値を提供できるかが問われる。売上が生まれた一方で、計算設備や問い合わせ対応の費用がそれを上回れば、利益が出ているという説明にはならない。利用者数、収入、運営費を別々に示すことにより、人気を集める段階から持続可能な事業へ移る際の制約を読み取れる。",
+    "form": "収益化",
+    "en": "Growth in users of a free text-generation service does not by itself supply funds for continued operation. Monetizing through paid subscriptions or usage-based charges raises the question of whether value matches the payment. Revenue does not mean profit if computing and customer-support costs exceed it. Reporting users, income, and operating expenses separately reveals constraints in moving from popularity to a sustainable business.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "収入を得る仕組みづくりであり、黒字化とは同義ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

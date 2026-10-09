@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "技術覇権",
+   "reading": "ぎじゅつはけん",
+   "pos": "noun",
+   "meaning": "technological hegemony",
+   "defJa": "技術を背景に他へ強い支配的影響を及ぼす立場",
+   "passage": {
+    "ja": "技術覇権を争うという見出しを見ると、一番速い機械を作った国が全部勝つ話に聞こえるよね。でも技術の影響力って、性能だけでなく、世界で使われる規格や材料の供給、作るための装置にも関わるんだ。ある分野で先に進んでいても、別の工程を他国に頼っていることはあるから、勝ち負けを一つにまとめると大事な条件が抜けてしまうよ。記事を読むときは、誰が何を握っていて、ほかの人が何に頼っているのかを線で結んでみると、競争の形がはっきりするね。",
+    "form": "技術覇権",
+    "en": "A headline about competing for technological hegemony can sound as if the country with the fastest machine wins everything. But technological influence also involves globally used standards, material supplies, and manufacturing equipment. Leadership in one area can coexist with reliance on other countries at another stage, so one overall win-or-lose label loses key conditions. Drawing links between who controls what and where others depend on them clarifies the structure of competition.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "技術の優秀さだけでなく、他者へ及ぼす支配的な影響を含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

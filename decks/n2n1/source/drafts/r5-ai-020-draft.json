@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "帯域幅",
+   "reading": "たいいきはば",
+   "pos": "noun",
+   "meaning": "data-transfer bandwidth",
+   "defJa": "一定時間に運べるデータ量の上限や能力",
+   "passage": {
+    "ja": "計算装置の性能を道路にたとえるなら、演算の速さと、データを運ぶ道の広さは分けて考えるべきだ。メモリとの帯域幅が不足すれば、演算器が速くても必要な情報を待つ時間が生じ、装置全体の処理は期待ほど進まない。逆に運べる量だけを増やしたところで、計算そのものが遅さの原因であれば、同じだけの改善は得られない。機器を比較する際には、最大の数字を並べるだけでなく、対象の仕事でどこに待ち時間が生まれるかを測ることが、費用と性能の関係を見定める手掛かりとなる。",
+    "form": "帯域幅",
+    "en": "If computing equipment is compared to roads, arithmetic speed and the width of the paths carrying data should be distinguished. Insufficient memory bandwidth leaves even fast processors waiting for information, so overall work proceeds more slowly than expected. Conversely, increasing transfer capacity alone gives limited improvement if computation itself is the bottleneck. Comparing equipment requires measuring where a given task waits, beyond lining up maximum figures, to understand the relation between cost and performance.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "ここでは通信や記憶装置が一定時間に運べる情報量を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "帰納",
+   "reading": "きのう",
+   "pos": "noun",
+   "meaning": "inductive reasoning",
+   "defJa": "個別の事例から一般的な規則を考える推論",
+   "passage": {
+    "ja": "何枚もの部品写真を見て、こういう傷がある物は不良だと考えるのは、個別の例から規則を探す帰納の一例だよ。機械に写真を学ばせるときも、見た例で成り立つ傾向が、まだ見ていない品物でも続くかが気になるよね。ただ、今まで白い背景ばかりだったなら、違う工場の暗い写真で同じ結果が出るとは限らないんだ。例をたくさん集めることに加えて、どんな条件の例が抜けているかを探すと、自分が見つけた規則の頼れる範囲を少しずつ確かめられるよ。",
+    "form": "帰納",
+    "en": "Inferring from many photographs that parts with a certain scratch are defective is an example of induction, finding rules from individual cases. When teaching a machine from photos, we also want to know whether observed tendencies persist for unseen products. But if previous backgrounds were all white, dark photographs from another factory may yield different results. Beyond collecting many examples, looking for missing conditions gradually reveals how far the discovered rule can be trusted.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "個々の事例から一般化する考え方で、必ず正しい結論とは限らない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "広帯域メモリ",
+   "reading": "こうたいいきめもり",
+   "pos": "noun",
+   "meaning": "high-bandwidth memory",
+   "defJa": "積層構造などで高速な情報転送を図る記憶装置",
+   "passage": {
+    "ja": "大量の情報を使う計算では、演算の速さだけでなく、記憶装置から情報を運ぶ速さも重要になります。広帯域メモリは、複数の層を重ねた構造などを用いて、多くの情報を効率よくやり取りできるようにしたものです。ただし、この部品を載せればどんな仕事も同じ割合で速くなるわけではなく、処理が情報の転送をどれほど待つかに効果は左右されます。仕組みを学ぶときは、記憶できる総量と一定時間に運べる量を別々に図に書き、容量と転送能力を混同しないようにしましょう。",
+    "form": "広帯域メモリ",
+    "en": "Computations using large amounts of information depend on moving it from memory as well as processing it quickly. High-bandwidth memory uses structures such as stacked layers to exchange large amounts of information efficiently. It does not accelerate every job by the same proportion, since benefits depend on how much the task waits for data transfer. When studying it, mark total storage and transfer capacity per unit time separately in diagrams to avoid confusing capacity with throughput.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "記憶できる総量の大きさと、情報を運ぶ速さは別の性質。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "強化学習",
+   "reading": "きょうかがくしゅう",
+   "pos": "noun",
+   "meaning": "reinforcement learning",
+   "defJa": "行動の結果に応じた報酬から方策を学ぶ方法",
+   "passage": {
+    "ja": "強化学習でゲームの操作を覚えるという説明の「報酬」は、人がほめる言葉だけを意味するわけではありません。行動の結果に応じて与えられる数値を手掛かりに、どんな選択をすると長い目でよい結果になるかを学ぶ仕組みです。点数の設定が意図とずれていれば、その数値を高める行動が、設計者の望む遊び方や安全な操作と一致するとは限りません。技術を紹介する文章では、何を報酬として与え、どの範囲の行動を認めたのかを添えると、単に試行錯誤すると書くより内容が明確になります。",
+    "form": "強化学習",
+    "en": "In an explanation of reinforcement learning for game control, reward does not refer only to verbal praise. The method uses numerical feedback from actions to learn which choices yield good results over time. If scoring diverges from the intention, maximizing the number may not produce the play style or safe operation the designer wants. Technical descriptions become clearer when they specify the reward and allowed actions rather than merely saying the system learns by trial and error.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「報酬」は学習を導く数値で、人間の満足そのものとは限らない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "後塵を拝する",
+   "reading": "こうじんをはいする",
+   "pos": "expression",
+   "meaning": "to lag behind others",
+   "defJa": "競争で相手より遅れた位置に立つこと",
+   "passage": {
+    "ja": "新しい半導体の開発競争で後塵を拝すると言われる企業を評価する際は、どの競争の話なのかを確かめましょう。発売の時期が遅いことと、製品の品質や費用で劣ることは同じではなく、狙う顧客が違えば判断する尺度も変わります。競争相手の発表を追うあまり、自社の得意な用途を捨ててしまえば、差別化の機会まで失う恐れがあります。比較表には順位だけを書かず、時期、性能、量産の安定性などを分けて置くと、一つの比喩に押し込められた違いを具体的に検討できます。",
+    "form": "後塵を拝する",
+    "en": "When judging a company said to lag behind in developing new semiconductors, clarify which competition is meant. A later release differs from poorer quality or cost, and the criteria also change with target customers. Focusing so much on competitors’ announcements that a firm abandons its strongest applications may cost it opportunities to differentiate. Separating timing, performance, and production stability in comparison tables rather than giving only ranks makes the differences compressed into one metaphor open to examination.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "他者の後を追う比喩なので、比較する相手と尺度を明らかにする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "微調整",
+   "reading": "びちょうせい",
+   "pos": "noun",
+   "meaning": "fine-tuning",
+   "defJa": "既に学んだモデルを追加の学習で用途に合わせること",
+   "passage": {
+    "ja": "文章を扱うモデルを特定の業務へ合わせる微調整では、追加の資料を使ってモデルの内部の値を更新する。指示文に例を添えて答え方を変える方法とは異なり、学習の工程をもう一度行う点が特徴だ。ただし、ある業務の成績が上がったとしても、別の質問への対応が同じ水準に保たれるとは限らない。導入時の評価では、狙った仕事の改善に加え、以前は正しく扱えた例に変化がないかも調べ、追加の学習で得たものと損なわれたものを併せて記録する。",
+    "form": "微調整",
+    "en": "Fine-tuning a text model for a particular task updates its internal values using additional material. Unlike changing responses by adding examples to a prompt, it involves another training stage. Improved performance on one task does not guarantee the same standard on other questions. Deployment evaluation therefore checks previously successful examples alongside intended improvements and records both gains and losses from the extra training.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "ここではモデルの追加学習を指し、指示文を変える操作とは別。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "心の哲学",
+   "reading": "こころのてつがく",
+   "pos": "noun",
+   "meaning": "philosophy of mind",
+   "defJa": "意識や心と身体との関係などを考える哲学分野",
+   "passage": {
+    "ja": "対話する機械に心があるかという問いは、出力の正しさを測る試験だけでは片付かない。心の哲学では、意識や経験とは何か、それが物理的な働きとどう関係するかが論点となり、滑らかな応答を見せる機械もその問いを投げかける。人間らしい言葉を返すからといって、苦痛や喜びを感じていることが確認されたとは言えず、逆の断定にも検討が残る。議論を進めるには、外から観察できる行動と、本人にしか分からないとされる経験を区別し、自分が何を証拠として認めるのかを明らかにしたい。",
+    "form": "心の哲学",
+    "en": "Whether a conversational machine has a mind cannot be settled just by testing output correctness. Philosophy of mind addresses consciousness, experience, and their relation to physical processes, questions also raised by fluently responding machines. Humanlike language does not establish experiences of pain or pleasure, while categorical denial also requires scrutiny. Progress requires distinguishing observable behavior from experience regarded as privately accessible and clarifying what one accepts as evidence.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "機械の能力試験と、意識や経験の有無を問う議論を区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "急落",
+   "reading": "きゅうらく",
+   "pos": "noun",
+   "meaning": "a sharp fall",
+   "defJa": "価格などが短い間に大きく下がること",
+   "passage": {
+    "ja": "半導体の会社が好調だという記事の翌日に株価が急落したら、話が逆だと驚くよね。でも株の値段には先への期待も入っているから、売上が増えたとしても、買っていた人が想像したほどでなければ値下がりすることはあるんだ。もちろん一日の値動きだけで理由を一つに決めるのは難しくて、ほかのニュースや市場全体の動きも一緒に見たいよ。記事の見出しからすぐ結論を出すより、発表された数字と、それまでに期待されていた数字を分けてメモすると読み解きやすいね。",
+    "form": "急落",
+    "en": "A sharp fall in a semiconductor company’s share price the day after a positive article can seem contradictory. But prices include expectations, so even rising sales can accompany a fall if they disappoint what buyers anticipated. Of course, one day’s movement is hard to reduce to one cause, so other news and the broader market also matter. Separately noting reported figures and previously expected ones makes interpretation easier than jumping from a headline to a conclusion.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "値下がりの速さと大きさを表し、原因までは含まない。",
+    "sense": ""
+   }
+  }
+ ]
+}

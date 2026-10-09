@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "教師なし学習",
+   "reading": "きょうしなしがくしゅう",
+   "pos": "noun",
+   "meaning": "unsupervised learning",
+   "defJa": "正解の札を付けずにデータの構造などを学ぶ方法",
+   "passage": {
+    "ja": "教師なし学習という表現の「なし」は、人が一切関わらないことを意味するわけではありません。あらかじめ正解の分類を付けた資料に頼らず、似た事例をまとめるなど、データにある構造を見つける方法を指します。どの資料を集め、何を近さの尺度にするかには人の選択が入り、得られたまとまりがそのまま現実の重要な区分に当たるとは限りません。説明を書く際は、正解を与えないという条件と、目的や設定を選ぶ人の役割を分けると、自動で意味を理解するという誤解を避けられます。",
+    "form": "教師なし学習",
+    "en": "The absence in unsupervised learning does not mean humans have no involvement. It refers to finding structure in data, such as grouping similar cases, without relying on materials labeled with predefined correct categories. Human choices affect collected data and similarity measures, and resulting clusters need not coincide with important real-world distinctions. Separating the absence of supplied answers from human roles in choosing aims and settings avoids suggesting automatic understanding of meaning.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "正解付きの資料を使わないことと、人の関与がないことは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "損失関数",
+   "reading": "そんしつかんすう",
+   "pos": "noun",
+   "meaning": "loss function",
+   "defJa": "予測のずれなどを学習用の数値として表す関数",
+   "passage": {
+    "ja": "機械がどの程度間違えたかを数値にする損失関数は、単なる成績表ではなく、学習の方向を定める役割を持つ。大きな誤差を特に重く扱うか、小さな誤差の積み重ねをどう数えるかによって、調整されるモデルの性質も変わる。数値を小さくすることに成功したとしても、利用者が大切にする失敗をその式が十分に表していなければ、望む改善とはずれる。したがって式を選ぶ作業には、何を誤りとして数え、どの誤りを重く見るかという判断が含まれ、その前提を評価の説明から省くことはできない。",
+    "form": "損失関数",
+    "en": "A loss function quantifying machine errors is not merely a report card but helps direct learning. How it weights large errors and accumulates smaller ones affects the resulting model. Even successful minimization may miss the desired improvement if the formula inadequately represents failures that matter to users. Choosing the function thus entails judgments about what counts as an error and which errors matter more, assumptions that must remain explicit in evaluation explanations.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "学習が小さくしようとする数値で、社会的な良さ全体とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "推論コスト",
+   "reading": "すいろんこすと",
+   "pos": "noun",
+   "meaning": "inference cost",
+   "defJa": "学習済みのモデルを動かして出力を得るための費用",
+   "passage": {
+    "ja": "文章生成サービスの運営では、モデルを作るための支出に加え、利用のたびに生じる推論コストが課題となる。質問や回答の長さ、使う装置、同時に扱う依頼の数などによって、必要な計算や待ち時間は変わる。学習に大きな費用を投じたとしても、運用段階の負担がなくなるわけではなく、利用者の増加が利益の増加へ直結するとは限らない。事業の見通しを示す資料には、利用一回の費用をどんな条件で見積もったかを添え、総額と一件当たりの負担を分けて記載することが重要だ。",
+    "form": "推論コスト",
+    "en": "Running a text-generation service entails inference costs incurred with use, in addition to the spending needed to create the model. Prompt and answer length, hardware, and concurrent requests affect required computation and waiting times. Large training investment does not eliminate operating burdens, and user growth does not necessarily translate directly into profit growth. Business forecasts should state the conditions behind per-use cost estimates and distinguish total spending from cost per request.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "学習の費用と分け、モデルを使う段階の計算負担を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "教師あり学習",
+   "reading": "きょうしありがくしゅう",
+   "pos": "noun",
+   "meaning": "supervised learning",
+   "defJa": "入力と正解の組を使って対応関係を学ぶ方法",
+   "passage": {
+    "ja": "迷惑メールを分ける仕組みを例に、教師あり学習の基本を考えましょう。過去のメールと、それが迷惑メールかどうかを示す正解の組から、文章の特徴と分類の対応を学びますが、正解の付け方に誤りがあれば、その影響も受けます。また、学習に使ったメールで高い正答率を得ても、新しい送り手や違う話題のメールへ同じように対応できるとは限りません。学習用とは別の資料で確かめ、誤って捨てた普通のメールと、見逃した迷惑メールを分けて数えると、失敗の性質を比較できます。",
+    "form": "教師あり学習",
+    "en": "Consider supervised learning through a spam filter. It learns relationships between textual features and categories from past messages paired with correct labels, but labeling errors also affect it. High accuracy on training messages does not guarantee equal performance on new senders or topics. Testing separate material and counting wrongly discarded ordinary mail separately from missed spam allows the types of failure to be compared.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "教師は人が横で教えるという意味ではなく、正解付きの資料を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "文脈内学習",
+   "reading": "ぶんみゃくないがくしゅう",
+   "pos": "noun",
+   "meaning": "in-context learning",
+   "defJa": "入力中の例や説明を手掛かりに課題へ対応すること",
+   "passage": {
+    "ja": "質問文の中に分類の例をいくつか入れる文脈内学習では、その場で示された情報を手掛かりに答え方が変わります。たとえば感想文と評価の組を並べてから新しい感想文を示すと、同じ形式の評価を求めやすくなります。ただし通常の利用では、その応答のためにモデルの内部の値を追加学習で更新しているわけではなく、例の示し方にも結果は左右されます。効果を調べる際には、例の順序や内容を変えた試験も行い、一つの入力でうまくいったことと、安定して対応できることを区別しましょう。",
+    "form": "文脈内学習",
+    "en": "In-context learning changes responses using information such as classification examples placed in the prompt. Pairing reviews with ratings before presenting a new review can help elicit a rating in the same format. In ordinary use this does not update the model’s internal values through further training for that response, and example presentation affects results. Test changes to example order and content to distinguish success with one input from stable performance.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "入力中の例に応じることを指し、通常は内部の重みを更新しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "新興企業",
+   "reading": "しんこうきぎょう",
+   "pos": "noun",
+   "meaning": "an emerging company",
+   "defJa": "新たに成長して市場へ加わってきた企業",
+   "passage": {
+    "ja": "人工知能分野の新興企業を評価する際、資金調達の規模と事業の収益を混同しないことが大切だ。集めた資金は開発や人材確保を進める力になるが、顧客が継続して料金を支払うことを、それだけで示すものではない。技術が優れていたとしても、計算設備の費用や販売に要する期間によって、事業を続けるための条件は変わる。企業紹介の記事には、提供するサービス、主な顧客、売上が生じる仕組みが説明されているかを確かめると、成長への期待と足元の実態を分けて読める。",
+    "form": "新興企業",
+    "en": "When assessing emerging AI firms, distinguish fundraising scale from business earnings. Raised funds enable development and hiring but do not by themselves show that customers will keep paying. Even strong technology faces different conditions for business continuity depending on computing costs and sales timelines. Checking whether profiles explain services, key customers, and revenue mechanisms separates hopes for growth from the current business reality.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "創業の新しさや成長段階を示し、利益や成功を保証する語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "擬人化",
+   "reading": "ぎじんか",
+   "pos": "noun",
+   "meaning": "anthropomorphism",
+   "defJa": "人ではないものを人のように捉えること",
+   "passage": {
+    "ja": "対話する機械が謝ると、悪いと思っているんだなと感じてしまうことがあるよね。そんなふうに人の気持ちを重ねる擬人化は会話を親しみやすくするけれど、言葉の出方から内面まで確かめられたわけではないんだ。たとえば答えを変えたからといって、反省したのか、前の文を手掛かりに別の文を作ったのかは、その場の印象だけでは決められないよ。便利な相手として使いながらも、何ができたかを具体的な作業で確かめると、親しみと能力の評価を分けて考えられるね。",
+    "form": "擬人化",
+    "en": "When a conversational machine apologizes, we may feel it is sorry. Anthropomorphism of that kind can make interaction friendly, but the words do not establish an inner mental state. If it changes an answer, the immediate impression alone cannot decide whether it reflected or produced different text using the preceding conversation. Checking capabilities through concrete tasks while using it as a helpful partner keeps friendliness separate from capability assessment.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "人の感情や意図を重ねて捉えることと、能力の検証を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "指数関数的",
+   "reading": "しすうかんすうてき",
+   "pos": "na-adj",
+   "meaning": "exponential",
+   "defJa": "一定の割合で繰り返し増えたり減ったりする様子",
+   "passage": {
+    "ja": "計算に使う資源が指数関数的に増えるという説明では、毎回同じ量を足す場合との違いを押さえましょう。たとえば同じ期間ごとに二倍になるなら、最初の量が小さくても、繰り返すにつれて一回の増加量は大きくなります。ただし、ある期間の数字がこの形に近いからといって、電力や設備の制約を超えて同じ傾向が永遠に続くとは限りません。推移を読む際には、元の量と増える割合、比較した期間を併せて示すことで、単に急に増えるという印象より正確に変化を伝えられます。",
+    "form": "指数関数的",
+    "en": "An explanation that computing resources grow exponentially should distinguish this from adding the same amount each time. If an amount doubles over equal intervals, each increase grows larger through repetition even from a small starting amount. But resemblance to this pattern over one period does not mean it continues forever beyond power and equipment constraints. Showing the initial amount, growth rate, and comparison period conveys the change more precisely than an impression of rapid growth alone.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "急増の言い換えだけでなく、一定比率の変化という性質を含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

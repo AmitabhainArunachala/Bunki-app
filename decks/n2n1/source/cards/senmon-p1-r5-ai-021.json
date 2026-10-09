@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "成膜",
+   "reading": "せいまく",
+   "pos": "noun",
+   "meaning": "thin-film deposition",
+   "defJa": "表面に薄い材料の層を作る工程",
+   "passage": {
+    "ja": "半導体の工程説明で成膜と書かれている場合、表面に薄い材料の層を作る操作を指します。塗装という身近な作業を思い浮かべると入り口にはなりますが、材料の与え方や反応の仕組みは方式ごとに異なるため、同じ作業だとは言えません。導電性を持たせる層と電気を隔てる層では目的も違い、薄ければ薄いほどよいという単純な比較にもなりません。文章を読む際は、何の材料をどこへ形成し、どんな働きを持たせるのかを順に拾うと、工程名の短さに隠れた設計の条件を捉えられます。",
+    "form": "成膜",
+    "en": "In semiconductor process descriptions, deposition means forming a thin material layer on a surface. Thinking of painting provides an entry point, but material delivery and reaction mechanisms vary by method, so the operations are not equivalent. Conducting layers and electrically isolating layers serve different purposes, and thinner is not automatically better. Reading for the material, placement, and intended role reveals design conditions hidden behind a short process name.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "材料の薄い層を作る工程で、表面を削る工程とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "技術革新",
+   "reading": "ぎじゅつかくしん",
+   "pos": "noun",
+   "meaning": "technological innovation",
+   "defJa": "新しい技術によって生産や利用の仕方が変わること",
+   "passage": {
+    "ja": "工場で新しい検査方法を採り入れる技術革新の例を使い、何が変化したのかを整理しましょう。以前より短い時間で傷を見つけられたとしても、その結果だけでは製品全体の品質が上がったとまでは判断できません。見逃しが減ったのか、正常な品を誤って除く数が増えたのかを分け、別の工程との相互作用も検討します。導入前後の数字を比べる際には、生産量や扱う品物の違いをそろえて考えることで、新しい方法に由来する効果と、ほかの条件の変化を区別しやすくなります。",
+    "form": "技術革新",
+    "en": "Use the example of a factory adopting a new inspection method as technological innovation to organize what changed. Finding scratches faster alone does not establish improved overall product quality. Separate reduced misses from increases in wrongly rejected good products, and examine interactions with other stages. Accounting for differences in production volume and products when comparing before and after makes it easier to distinguish the new method’s effects from changes in other conditions.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "新しさそのものより、技術によって実際の仕組みが変わる点に注目。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "悲観論",
+   "reading": "ひかんろん",
+   "pos": "noun",
+   "meaning": "a pessimistic outlook",
+   "defJa": "将来を悪い方向へ進むと見る考え",
+   "passage": {
+    "ja": "人工知能によって仕事が失われるという悲観論を読む際は、予測の前提を一つずつ確かめましょう。ある作業を機械ができることと、その作業を含む職業全体がなくなることは同じではなく、導入の費用や責任の分担も影響します。反対に、新しい仕事が生まれるはずだと述べるだけでは、移行期に困る人への答えにはなりません。授業では、置き換えられる作業、残る仕事、移行に要する時間を別の欄に書き、明るい予測と暗い予測がどこで異なる条件を置いているか比べましょう。",
+    "form": "悲観論",
+    "en": "When reading pessimistic predictions of AI-driven job loss, check the assumptions one by one. A machine performing a task does not equal the disappearance of the entire occupation containing it, since adoption costs and responsibility also matter. Conversely, simply saying new jobs should appear does not answer people facing difficulty during the transition. In class, separately list replaced tasks, remaining work, and transition time to compare where optimistic and pessimistic predictions use different conditions.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "将来への否定的な見通しを指し、根拠の有無は別に確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "戦略物資",
+   "reading": "せんりゃくぶっし",
+   "pos": "noun",
+   "meaning": "strategic material",
+   "defJa": "安全保障や重要な産業に深く関わる物資",
+   "passage": {
+    "ja": "半導体を戦略物資として扱う議論では、安く買えるかどうかに加え、供給を続けられるかが問われます。自動車や通信の機器などに使われるため、特定の製品が不足すると、別の産業の活動にも影響が及ぶからです。ただし、すべてを国内で作れば問題がなくなるとは限らず、材料や装置の調達、人材の確保などにも制約があります。政策の説明を読むときは、守ろうとする機能と想定する供給停止の条件を分け、どの手段がどの弱点に対応するのかを整理していきましょう。",
+    "form": "戦略物資",
+    "en": "When semiconductors are treated as strategic materials, the question extends from low purchase prices to continuing supply. Because they are used in equipment such as vehicles and communications systems, shortages of particular products can affect other industries. Making everything domestically does not necessarily eliminate problems, since material and equipment procurement and staffing also impose constraints. When reading policy explanations, separate protected functions from assumed disruption conditions and map measures to the weaknesses they address.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "値段だけでなく、供給の維持が社会や安全保障に関わる物資。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "拡散モデル",
+   "reading": "かくさんもでる",
+   "pos": "noun",
+   "meaning": "a diffusion model",
+   "defJa": "雑音を除く過程などを学んでデータを生成するモデル",
+   "passage": {
+    "ja": "画像を作る拡散モデルの説明で、雑音を少しずつ取り除くという表現を読むことがあります。代表的な方法では、画像へ雑音を加える過程に対応する逆向きの変化を学び、雑音から段階的に画像を生成します。ただし、元の一枚を必ず復元する装置という意味ではなく、学習した分布に沿う新たな出力を作る仕組みとして捉える方が適切です。説明文では「ぼやけた写真を直す」とだけ言い換えず、学習時の加工と生成時の操作を分けて書くと、似て見える作業の違いを伝えられます。",
+    "form": "拡散モデル",
+    "en": "Descriptions of image-generating diffusion models sometimes refer to gradually removing noise. Representative methods learn a reverse transformation corresponding to adding noise to images, then generate an image step by step from noise. Rather than necessarily restoring one original image, the system produces new outputs aligned with a learned distribution. Instead of merely paraphrasing this as repairing blurry photos, separating training-time corruption from generation-time operations communicates the difference between superficially similar tasks.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "雑音を除く説明は比喩だけではないが、単なる写真修復とも異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

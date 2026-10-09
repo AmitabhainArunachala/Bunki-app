@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "技術流出",
+   "reading": "ぎじゅつりゅうしゅつ",
+   "pos": "noun",
+   "meaning": "technology leakage",
+   "defJa": "管理すべき技術や知識が外部へ意図せず渡ること",
+   "passage": {
+    "ja": "製造工程の資料を外部と共有する際は、共同研究に必要な情報交換と技術流出への備えを併せて考える。秘密を守るためにすべての資料の共有を止めれば、相手の検証が進まず、協力自体が成り立たなくなる場合もある。一方、共有相手との関係が良好であっても、資料の再利用や別の相手への提供まで自動的に管理できるわけではない。情報の種類ごとに共有の目的、対象者、利用範囲を整理し、合意した条件が実際の保管や受け渡しにも反映されているかを確認することが、現場の課題となる。",
+    "form": "技術流出",
+    "en": "When sharing manufacturing-process documents externally, information exchange for joint research and preparation against technology leakage should be considered together. Blocking all documents for secrecy may prevent partners from validating results and undermine cooperation. Good relationships also do not automatically control reuse or onward disclosure. A practical challenge is to organize purposes, recipients, and permitted uses by information type and check that storage and transfer reflect the agreed conditions.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "共同研究の情報交換とは区別し、管理の範囲から漏れる点を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "技術覇権",
+   "reading": "ぎじゅつはけん",
+   "pos": "noun",
+   "meaning": "technological hegemony",
+   "defJa": "技術を背景に他へ強い支配的影響を及ぼす立場",
+   "passage": {
+    "ja": "技術覇権を争うという見出しを見ると、一番速い機械を作った国が全部勝つ話に聞こえるよね。でも技術の影響力って、性能だけでなく、世界で使われる規格や材料の供給、作るための装置にも関わるんだ。ある分野で先に進んでいても、別の工程を他国に頼っていることはあるから、勝ち負けを一つにまとめると大事な条件が抜けてしまうよ。記事を読むときは、誰が何を握っていて、ほかの人が何に頼っているのかを線で結んでみると、競争の形がはっきりするね。",
+    "form": "技術覇権",
+    "en": "A headline about competing for technological hegemony can sound as if the country with the fastest machine wins everything. But technological influence also involves globally used standards, material supplies, and manufacturing equipment. Leadership in one area can coexist with reliance on other countries at another stage, so one overall win-or-lose label loses key conditions. Drawing links between who controls what and where others depend on them clarifies the structure of competition.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "技術の優秀さだけでなく、他者へ及ぼす支配的な影響を含む。",
+    "sense": ""
+   }
+  }
+ ]
+}

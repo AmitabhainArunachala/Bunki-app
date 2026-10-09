@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "注意機構",
+   "reading": "ちゅういきこう",
+   "pos": "noun",
+   "meaning": "an attention mechanism",
+   "defJa": "入力の各部分の関連に応じて情報を重み付けする仕組み",
+   "passage": {
+    "ja": "文章を扱うモデルの注意機構を、人間が集中する働きとそのまま同じものとして説明するのは避けましょう。これは、入力の各部分などの関連に応じて数値の重みを計算し、必要な情報を組み合わせる仕組みを指す技術用語です。どの単語に大きな重みが付いたかを見ることは手掛かりになりますが、それだけで答えを出した理由が完全に説明されたとは限りません。紹介文では、人に似た名前に頼りすぎず、何と何の関係を計算して情報を集めるのかを一段具体的に書くと、仕組みの輪郭が伝わります。",
+    "form": "注意機構",
+    "en": "Avoid treating attention mechanisms in text models as identical to human concentration. The technical term describes calculating numerical weights from relationships among elements such as input parts and combining information. Seeing which words received large weights can be informative but does not by itself fully explain why an answer was produced. Describing which relationships are computed to gather information conveys the mechanism more concretely than relying on its humanlike name.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "人の集中や意識をそのまま機械に認める語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "水平分業",
+   "reading": "すいへいぶんぎょう",
+   "pos": "noun",
+   "meaning": "horizontal specialization",
+   "defJa": "設計や製造などの工程を別々の企業が担うこと",
+   "passage": {
+    "ja": "半導体の設計と製造を別の企業が担う水平分業では、各社が得意な工程に資源を集中できます。設計会社は自社の工場を持たずに製品を考えられますが、製造側の設備や技術の条件を無視できるわけではありません。工程を分けるほど自動的に効率が上がるとは限らず、仕様の伝達や納期の調整など、会社をまたぐ仕事も生まれます。企業の関係を学ぶ際は、誰がどの作業を行うかに加え、変更があったとき誰と相談するかを図にすると、専門化と調整の両面を捉えられます。",
+    "form": "水平分業",
+    "en": "In horizontal specialization, separate firms handle semiconductor design and manufacture, allowing each to concentrate on its strengths. Design firms can develop products without owning factories, but cannot ignore manufacturers’ equipment and technical conditions. Splitting stages does not automatically increase efficiency, since specifications and deadlines require coordination between firms. Diagramming both who performs each task and who must consult whom over changes reveals specialization and coordination together.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "工程ごとに異なる企業が担う構造で、一社内の工程分担とは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "波及効果",
+   "reading": "はきゅうこうか",
+   "pos": "noun",
+   "meaning": "spillover effects",
+   "defJa": "一つの変化が周囲へ広がって及ぼす影響",
+   "passage": {
+    "ja": "半導体工場の建設による波及効果を考える際は、工場内で生まれる仕事と周辺で増える仕事を分けましょう。材料の輸送や設備の保守などへの需要が生じる一方、人材や土地を取り合うために別の事業へ負担が出る可能性もあります。関連する支出をすべて足せば地域の利益になるとは限らず、どこからの購入か、以前から予定されていた仕事かによって評価は変わります。授業では、お金と人の動きを矢印で描き、増えた取引を二重に数えていないか確認すると、広がりの説明を数字と結び付けられます。",
+    "form": "波及効果",
+    "en": "When considering spillover effects from building a semiconductor factory, separate jobs inside it from additional surrounding work. Demand for transport and equipment maintenance may arise, while competition for staff and land can burden other businesses. Adding all related spending does not equal regional benefit, since purchase locations and previously planned work affect assessment. In class, diagram money and labor flows and check for double counting to connect the spread of effects with figures.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "周囲へ伝わる影響を表し、利益だけを意味するわけではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "汎用性",
+   "reading": "はんようせい",
+   "pos": "noun",
+   "meaning": "generality or versatility",
+   "defJa": "特定の用途に限らず広く使える性質",
+   "passage": {
+    "ja": "文章を作る道具の汎用性は、一つの仕事で得られる最高の成績とは分けて評価すべきだ。要約、分類、下書きなど複数の課題に対応できることは便利だが、それぞれの用途で専門の道具と同じ水準を保つとは限らない。逆に限られた仕事で高い性能を出す道具を、用途が狭いという理由だけで劣ると判断するのも適切ではない。選ぶ側は、必要な仕事の幅と各仕事で許容できる誤りを先に定め、その両方に照らして性能を見ることで、多機能という印象から具体的な適合性へ議論を移せる。",
+    "form": "汎用性",
+    "en": "A text tool’s generality should be evaluated separately from its peak performance on one task. Supporting summarization, classification, and drafting is useful, but does not ensure matching specialist tools in each use. Conversely, a high-performing narrow tool should not be judged inferior simply for its limited scope. Defining the required range of tasks and tolerable errors in each lets users move from an impression of many features to concrete suitability.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "使える範囲の広さを示し、個々の用途での性能の高さとは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "汎用人工知能",
+   "reading": "はんようじんこうちのう",
+   "pos": "noun",
+   "meaning": "artificial general intelligence",
+   "defJa": "幅広い課題に対応できることを目指す人工知能",
+   "passage": {
+    "ja": "汎用人工知能の実現を論じる際、何をもって広く対応できたと認めるかが大きな論点となる。一つの試験で人を上回る成績を得ることと、未知の環境で多様な仕事を安定して進めることは、同じ能力の確認ではない。研究上の定義や評価の範囲には違いがあり、名称を用いた発表だけで、すべての能力が検証済みだと受け取ることはできない。関連する報告を比べるには、対象の課題、人の助けを借りた範囲、失敗した条件を併せて確認し、呼び名と測定結果を分ける視点が欠かせない。",
+    "form": "汎用人工知能",
+    "en": "A central issue in discussing artificial general intelligence is what establishes broad capability. Outperforming humans on one test and reliably performing diverse tasks in unfamiliar settings do not demonstrate the same abilities. Research definitions and evaluation scopes vary, so an announcement using the name does not establish verification of every capability. Comparing reports requires examining tasks, human assistance, and failure conditions while separating labels from measured results.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "幅広い能力を指すが、定義や達成基準は報告ごとに確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "次世代",
+   "reading": "じせだい",
+   "pos": "noun",
+   "meaning": "the next generation",
+   "defJa": "現在のものに続いて登場する新しい世代",
+   "passage": {
+    "ja": "次世代の計算装置という説明を読む際は、現在の装置と比べてどこが変わるのかを確かめましょう。新しいという呼び方だけでは、速さが上がるのか、電力の負担が減るのか、対応する仕事が増えるのかは分かりません。研究段階の試作品でよい数字が得られたとしても、同じ条件を大量の製品で保てるとは限らず、費用や運用の制約も残ります。比較表では世代の名前を並べるだけでなく、測った項目と条件をそろえて書くと、未来を感じさせる言葉と確認できた変化を分けて読めます。",
+    "form": "次世代",
+    "en": "When reading about next-generation computing equipment, establish what changes relative to current devices. The label new alone does not reveal greater speed, reduced power burden, or support for more tasks. Strong prototype results may not hold across mass-produced units, and cost and operating constraints remain. Alongside generation names, matching measurement items and conditions in comparison tables separates future-oriented language from verified changes.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "新しさを示す相対的な語で、何が改善するかは別に説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
