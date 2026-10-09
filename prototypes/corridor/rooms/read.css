@@ -586,7 +586,7 @@ html[data-room='reader'] .reader-head > .reader-meta .reader-source { font: inhe
 html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-source { font-family: var(--font-ui); }
 html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
-html[data-room='reader'] .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font: inherit; line-height: 1.2; }
+html[data-room='reader'] #app > main .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font: inherit; line-height: 1.2; }
 /* 未確認 is an honest small mark in the line, not a grey pill */
 html[data-room='reader'] .reader-head > .reader-meta .status-chip {
   min-height: 0;
@@ -1397,6 +1397,15 @@ html[data-room='reader'] body #app > main > .reader-card > #reader-tip.reader-ti
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
 }
 html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 13px/1.4 var(--font-ui); color: var(--color-ink-2); }
+/* The shared icon style transitions colour; reader highlights change instantly, like the word card. */
+html[data-room='reader'] body #app > main > .reader-card .icon-button {
+  transition: transform 90ms ease-out;
+}
+html[data-room='reader'] body #app > main > .reader-card .icon-button:active { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='reader'] body #app > main > .reader-card .icon-button { transition: none; }
+  html[data-room='reader'] body #app > main > .reader-card .icon-button:active { transform: none; }
+}
 
 /* the room is the page itself (washi): the mat, the card and the paper lie on it as separate things */
 :root[data-room='reader'] body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {

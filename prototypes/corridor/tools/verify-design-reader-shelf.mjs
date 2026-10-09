@@ -95,6 +95,9 @@
  *                         "Save the sentence", which keeps that sentence on the tutor page without making
  *                         it the active one; and Ask the tutor opens the tutor with that sentence as its
  *                         active context. Control: 3166ded3, whose bar floated in on the first tap.
+ *                         At 390 and 320 the sentence view keeps the word card's top within 1px, stays
+ *                         inside the screen, saves one tutor entry without activation or navigation,
+ *                         and Back to the word restores the word's Save.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "Simplified: the same story
  *                         in easier Japanese." (round 4: shorter), and an article without a
@@ -117,9 +120,10 @@
  *   A1 no F1            — with a stored F1 preference and the listen control pressed where one
  *                         exists, no F1 clip is requested and no narration manifest naming F1 loads.
  *
- * Negative controls: every check runs unchanged against the pre-pass artifact (72b8b3ab) and
- * must fail there, except R2's furigana ratio, which that build already met; its control is a
- * scoped style injection (the reading at 0.46em, the corridor.css default) that the check must reject.
+ * Negative controls: the original design checks were run against the pre-pass artifact (72b8b3ab),
+ * except R2's furigana ratio, which that build already met; its control is a scoped style injection
+ * (the reading at 0.46em, the corridor.css default) that the check must reject. The round 4 review's
+ * hit-floor checks target the first pass's 40px version choices, rather than an earlier 44px control.
  * Usage: KAIRO_SITE_DIR=<artifact> KAIRO_ARTIFACT_SHA256=<digest> node verify-design-reader-shelf.mjs
  *        KAIRO_BROWSER=chromium|webkit limits the engines; --control adds the injected control.
  */
@@ -270,7 +274,7 @@ const measureReaderMotion = () => {
     const name = `${node.id || node.className}${pseudo || ''}`;
     const durations = style.transitionDuration.split(',').map(seconds);
     style.transitionProperty.split(',').map((value) => value.trim()).forEach((property, i) => {
-      if (durations[i % durations.length] > 0) {
+      if (property !== 'none' && durations[i % durations.length] > 0) {
         transitions += 1;
         if (!allowed.has(property)) violations.push({ name, kind: 'transition', property });
       }
@@ -1167,7 +1171,7 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row, the version switch',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion, and Japanese punctuation line breaks with source text preserved',
     results,
     passed: results.length === engines.length * 45 && results.every((row) => row.passed),
   };
