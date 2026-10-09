@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "道教",
+   "reading": "どうきょう",
+   "pos": "noun",
+   "meaning": "Daoism",
+   "defJa": "中国で発展した神仙思想や儀礼を持つ宗教",
+   "passage": {
+    "ja": "長生きを願う仙人の物語を仏教の説話と並べると、似た場面でも目指すものが違うと気づきます。中国で育った道教は、インドから伝わった仏教と同じ宗教ではなく、神仙への信仰やさまざまな儀礼を含む伝統です。両者は中国で接触し、時代や地域に応じて影響を与え合ったため、似た語句があっても一方を他方の単なる別名にはできません。日本の寺で出会う習俗の系譜を調べる際にも、どこから伝わり、どの場で意味が変わったのかを追うと、交流の具体像が浮かびます。",
+    "form": "道教",
+    "en": "Placing stories of immortals seeking longevity beside Buddhist tales reveals that similar scenes can have different aims. Daoism, which developed in China, is distinct from Buddhism transmitted from India and includes devotion to immortals and various rituals. The two interacted in China and influenced each other in ways that varied by period and region, so similar wording does not make either a mere alternative name for the other. When tracing the lineage of customs encountered at Japanese temples, following their origins and changes in meaning also reveals the concrete shape of cultural exchange.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教と接触した中国の宗教として、起源と交流を分けて捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "鎌倉仏教",
+   "reading": "かまくらぶっきょう",
+   "pos": "noun",
+   "meaning": "Kamakura-period Buddhism",
+   "defJa": "鎌倉時代に展開した日本仏教の諸潮流",
+   "passage": {
+    "ja": "歴史の要約で鎌倉仏教を「古い宗派に代わる新しい教え」とだけ書くと、時代が変わった瞬間に全員が信仰を乗り換えたように読めます。念仏や禅などの新たな動きを説明する一方で、それ以前からの寺院でも教学や戒律の復興が進んだことを添えましょう。新旧という対立だけで文章を組み立てると、同じ時代に並行して続いた修行や、人々の多様な選択を削り落としてしまいます。「置き換わった」を「活動が重なった」と書き直すだけでも、読者が思い描く歴史の厚みは変わります。",
+    "form": "鎌倉仏教",
+    "en": "Summarizing Kamakura Buddhism merely as “new teachings replacing old schools” can suggest that everyone switched faiths the instant the period changed. Alongside explaining new movements such as nenbutsu and Zen, add that older temples also saw revivals of doctrinal study and discipline. Building an account solely around an opposition between new and old removes practices continuing in parallel and the variety of people’s choices. Even rewriting “were replaced” as “their activities overlapped” changes the depth of history that readers imagine.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "新しい宗派の成立だけでなく、既存の仏教の復興も含めて捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "輪廻転生",
+   "reading": "りんねてんしょう",
+   "pos": "noun",
+   "meaning": "the cycle of rebirth",
+   "defJa": "生き物が死と新たな生を繰り返すこと",
+   "passage": {
+    "ja": "寺で地獄や人間界を描いた絵を見るなら、それぞれの場面を怖い物語として覚えるだけでは不十分です。輪廻転生という死と生の繰り返しを背景に、どのような行いが苦しみにつながると説かれているかも読み取りましょう。信仰として受け止めるにせよ、思想史として学ぶにせよ、仏教がその循環からの解放を目指す点を外すと、世界を巡る旅行のような理解になります。図の名称、行いの説明、解放への道という三つの欄をノートに設ければ、絵の細部と教えの目的を結べます。",
+    "form": "輪廻転生",
+    "en": "When viewing temple paintings of hells and the human realm, memorizing the scenes as frightening stories is not enough. Against the background of repeated death and birth, look also at what actions are taught to lead to suffering. Whether approaching this as faith or intellectual history, leaving out Buddhism’s aim of liberation from that cycle produces an understanding resembling travel through different worlds. Making three columns in your notes for names of scenes, explanations of actions, and the path to liberation connects the picture’s details with the purpose of the teaching.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「繰り返す」「その苦しみを離れる」と結び付ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "鈴木大拙",
+   "reading": "すずきだいせつ",
+   "pos": "noun",
+   "meaning": "Daisetz Suzuki",
+   "defJa": "禅などの仏教思想を海外にも紹介した思想家",
+   "passage": {
+    "ja": "禅を英語で紹介した本を読む際には、誰がどの読者に向けて書いたかを最初に確認しましょう。鈴木大拙は著作や講演を通じて日本の仏教思想を海外に伝えた人物で、その説明は異文化間の理解を考える材料になります。分かりやすい比喩に納得したものの、元の経典や語録では同じ語がどう使われるかまで調べていない、という読み方には注意が要ります。原典の表現、紹介者の解釈、自分の理解をノートで分けると、一冊の本を禅全体の唯一の説明として扱わずに済みます。",
+    "form": "鈴木大拙",
+    "en": "When reading a book introducing Zen in English, first check who wrote it and for which readers. Daisetz Suzuki conveyed Japanese Buddhist thought abroad through writings and lectures, making his explanations material for considering understanding across cultures. Take care if a clear metaphor has persuaded you but you have not checked how the same term is used in the original sutra or recorded sayings. Separating the original wording, the interpreter’s reading, and your own understanding in your notes helps avoid treating a single book as the sole account of all Zen.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "英語で禅を伝えた仕事を、翻訳と解釈の両面から読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "道元",
+   "reading": "どうげん",
+   "pos": "noun",
+   "meaning": "Dogen",
+   "defJa": "坐禅を重んじ、日本に曹洞禅を伝えた僧",
+   "passage": {
+    "ja": "坐禅を紹介する文章に道元の名を添えるなら、単に集中力を高める方法を勧めた人、と要約するのは避けたいですね。日本の曹洞禅を語るうえで重要なこの僧は、修行と悟りを切り離さずに捉え、ただ坐る実践を重んじました。信仰の有無を問わず、現代の読者に分かりやすく書くことと、宗教的な目的を仕事の効率へ置き換えることとは別です。『正法眼蔵』などの原典に触れる一文と、現代の自分がそこから学んだことを述べる一文を分けると、誰の考えかが明確になります。",
+    "form": "道元",
+    "en": "If you add Dogen’s name to an introduction to zazen, avoid summarizing him simply as someone who recommended a way to improve concentration. This monk, central to Japanese Soto Zen, treated practice and awakening as inseparable and valued the practice of simply sitting. Writing clearly for modern readers regardless of faith is different from replacing a religious purpose with workplace efficiency. Separating a sentence about an original text such as the Shobogenzo from a sentence describing what you learn from it today makes the ownership of each idea clear.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "人名を用いて現代の効用を権威づけず、原典の主張を確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "釈迦",
+   "reading": "しゃか",
+   "pos": "noun",
+   "meaning": "Shakyamuni, the Buddha",
+   "defJa": "仏教を開いた古代インドの宗教家",
+   "passage": {
+    "ja": "苦しんでいる人に、考え方を変えればよいと言うのは簡単である。しかし釈迦の教えを学ぶなら、相手の執着を指摘する前に、その苦しみがどのような条件から生じているかにも目を向けたい。個人の気分に限らず、病気や生活の不安、人との関係などが重なるところでは、一言の忠告で事情を片づけることはできない。仏教の言葉を他者の弱さを裁く道具にするとき、苦を理解しようとする姿勢が失われていないかという問いは、教えを語る側自身に返ってくる。",
+    "form": "釈迦",
+    "en": "It is easy to tell someone in distress to change their way of thinking. But when studying the Buddha’s teachings, one should consider the conditions giving rise to another’s suffering before pointing out their attachments. Where illness, insecurity, and relationships overlap with personal feelings, a single piece of advice cannot dispose of the situation. When Buddhist language becomes a tool for judging another’s weakness, the question of whether the wish to understand suffering has been lost returns to the person speaking of the teaching.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "日本語では、仏教の開祖を指す呼び名として使われる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "釈尊",
+   "reading": "しゃくそん",
+   "pos": "noun",
+   "meaning": "Shakyamuni, honorific",
+   "defJa": "仏教の開祖を敬って呼ぶ名称",
+   "passage": {
+    "ja": "仏教史の資料で用いられる釈尊という名称には、教えを開いた人物への敬意が込められている。単なる個人名として読めば、記録を残した人々が抱いた信仰や、その文献の性格を取り落とす。仏教が各地へ広がるのに伴って生まれた伝記や造形には、その土地で尊ばれた理想も映し出されており、すべてを同時代の目撃証言として扱うことはできない。人物の生涯を調べる作業と、後世の人々がその人物をどう受け止めたかを調べる作業は、同じ資料から別の問いを立てる。",
+    "form": "釈尊",
+    "en": "The designation Shakuson in Buddhist historical sources expresses reverence for the founder of the teaching. Reading it simply as a personal name misses the faith of those who made the record and the character of the document. Biographies and images produced as Buddhism spread also reflect ideals valued in particular places, so they cannot all be treated as contemporary eyewitness testimony. Investigating a person’s life and investigating how later generations understood that person pose different questions to the same material.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「尊」の字が、呼び手の敬意を表している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "金剛界",
+   "reading": "こんごうかい",
+   "pos": "noun",
+   "meaning": "the Diamond Realm",
+   "defJa": "密教で、仏の揺るがない智慧を表す世界",
+   "passage": {
+    "ja": "その曼荼羅を見て、宝石がたくさんある世界の絵だと思ったんだってね。金剛界の「金剛」は、何ものにも壊されない堅さになぞらえて、仏の智慧の揺るがなさを表しているんだよ。密教では胎蔵の世界と対にして語られるけど、二枚の図があるからといって、仏たちが別々の国に住んでいるという地図の話ではないんだ。どの仏がどこに描かれているかを解説と照らし合わせながら眺めると、配置そのものが教えを伝える仕組みになっているって気づくね。",
+    "form": "金剛界",
+    "en": "You said you thought that mandala was a picture of a world full of jewels. The “diamond” in the Diamond Realm likens the unshakable character of a Buddha’s wisdom to an indestructible hardness. Esoteric Buddhism discusses it together with the Womb Realm, but having two images does not make them maps showing Buddhas living in separate countries. Looking at which Buddha is depicted where while consulting an explanation reveals how the arrangement itself conveys teachings.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "密教の智慧の世界を表し、地理的な地域名ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "萌芽",
+   "reading": "ほうが",
+   "pos": "noun",
+   "meaning": "the germ of a new development",
+   "defJa": "物事が発展する最初の小さな兆し",
+   "passage": {
+    "ja": "手作業で何度も直していたプログラムに、小さな共通の手順が見つかることがある。そこに新しい設計の萌芽を見るなら、目先の修正をまとめるだけでなく、別の入力でも役立つかを試すところから議論を始めたい。まだ短い試作品にすぎないとはいえ、何を一般化し、どの例外を残すかという問いは、完成後より鮮明に現れる場合がある。成長を約束する美辞麗句として片づけず、成功した例と失敗した例を並べれば、発想が育つ方向を具体的に示せる。",
+    "form": "萌芽",
+    "en": "A small shared procedure may emerge in a program repeatedly corrected by hand. If one sees the germ of a new design there, the discussion should begin by testing whether it helps with different inputs, rather than merely consolidating immediate fixes. Although it is still only a short prototype, the questions of what to generalize and which exceptions to retain may appear more clearly than after completion. Rather than dismissing it as a pretty promise of growth, placing successful and failed examples together can show concretely the direction in which the idea can develop.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "未完成でも発展の始まりとなる兆しを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "胎動",
+   "reading": "たいどう",
+   "pos": "noun",
+   "meaning": "early stirrings of a new development",
+   "defJa": "新しい動きが表面に出る前から起こり始めること",
+   "passage": {
+    "ja": "研究室で試作機が動いたという報告を読み、新しい計算技術の胎動を感じたとしても、それを製品の普及と取り違えないようにしましょう。まだ目立たない研究や試作の段階で、次の展開につながる動きが始まっているという比喩です。生まれようとする命のイメージは印象的ですが、技術に使ったからといって、その研究が必ず商業化に至ると保証されるものではありません。学習メモには比喩だけを残さず、論文の発表、試作品の完成、利用者による検証のうち、記事が何を根拠にしているかを書き添えます。",
+    "form": "胎動",
+    "en": "Even if a report of a working laboratory prototype gives you a sense of the early stirrings of a new computing technology, do not confuse that with widespread product use. The metaphor indicates the beginning of developments that may lead onward while research and prototypes remain inconspicuous. The image of life about to be born is striking, but applying it to technology does not guarantee that the research will reach commercialization. In study notes, retain not only the metaphor but also whether the article bases its claim on a paper, a completed prototype, or testing by users.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "新しい技術などが動き始める段階を、誕生前の動きにたとえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

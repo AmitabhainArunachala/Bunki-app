@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "織り込む",
+   "reading": "おりこむ",
+   "pos": "verb",
+   "meaning": "to price in expected information",
+   "defJa": "予想される材料を価格などに反映させる",
+   "passage": {
+    "ja": "半導体メーカーの利益が増えたのに株価が下がったら、数字を読み間違えたのかと思うよね。市場が好業績を織り込むっていうのは、発表を待たずに、そうなるという予想がすでに価格に反映されることなんだ。だから前年より良かったかに加えて、事前に期待されていた水準と比べてどうだったかも、値動きを考える手掛かりになるよ。ただ、下がった理由を一つに決めつけるのは早くて、同じ日の金利や会社の先行きの説明など、ほかの材料も一緒に確かめたいね。",
+    "form": "織り込む",
+    "en": "If a semiconductor maker’s profits rise but its shares fall, you might think you have misread the figures. A market pricing in strong earnings means the expectation is already reflected in prices before the announcement. Alongside improvement from the previous year, comparison with what had been expected beforehand can therefore help explain price movements. Still, it is too early to settle on a single reason for a fall, and I would also check other factors such as interest rates that day and the company’s outlook.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "投資の文脈では、将来の予想が現在の価格に反映されること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "蓋然性",
+   "reading": "がいぜんせい",
+   "pos": "noun",
+   "meaning": "likelihood",
+   "defJa": "ある事柄が起こると考えられる確かさの程度",
+   "passage": {
+    "ja": "装置の故障を扱った記事で、蓋然性が高いって書いてあると、もう壊れたのかと思ってしまうことがあるよね。だけどそれは、手元の情報から見て起こりそうだという話で、発生を確認したという報告とは違うんだ。温度の上昇や過去の記録が根拠だとしても、必ず壊れると断定するには飛躍があるし、数字がなければ何割なのかまでは分からないよ。記事を書き直すなら、何を観察し、そこから何を推測したのかを分けると、事実と仮説が混ざった説明にならずに済むね。",
+    "form": "蓋然性",
+    "en": "When an article about equipment failure says the likelihood is high, you can find yourself thinking it has already broken. But that means the event seems likely on the available information, not that its occurrence has been confirmed. Even if rising temperatures and past records provide grounds, certainty that it will break is a leap, and without a figure we cannot know the percentage. Rewriting the article to separate observations from inferences helps avoid mixing facts and hypotheses.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「高い」「低い」と結び付き、発生の確認や確実性とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "総当たり",
+   "reading": "そうあたり",
+   "pos": "noun",
+   "meaning": "exhaustive search",
+   "defJa": "考えられる候補をすべて試す方法",
+   "passage": {
+    "ja": "配達先を回る順番を決めるとき、候補を残らず調べれば、与えられた条件の中で最も短い経路を選べる。この総当たりの方法は考え方が明快である反面、訪問先が増えるにつれて候補の数が急激に膨らみ、時間の制約に突き当たる。設計者にとっては最良の答えを保証する仕組みでも、利用者にとって締切の後に届く答えでは使えない。正しさだけを切り離して論じるのではなく、どの範囲を探索し、どこまでの時間を認めるかという合意も、計算の設計に含まれる。",
+    "form": "総当たり",
+    "en": "When choosing the order of deliveries, examining every candidate allows selection of the shortest route within the given conditions. This exhaustive method is conceptually clear, but the number of candidates grows rapidly with more stops and runs into time constraints. What guarantees the best answer for a designer may still give a user an unusable answer arriving after the deadline. Designing computation includes agreement on the search space and allowed time, rather than discussing correctness in isolation.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "競技の対戦方式ではなく、計算で全候補を調べる意味。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "舵を切る",
+   "reading": "かじをきる",
+   "pos": "expression",
+   "meaning": "to change strategic course",
+   "defJa": "方針を新しい方向へ大きく変える",
+   "passage": {
+    "ja": "仮に半導体企業が汎用品の大量生産から特殊用途向けの設計へ舵を切るなら、変わるのは製品の説明文だけではない。顧客ごとの要求を聞く体制、技術者の配置、検証に使う設備まで、新しい方針に沿って組み直すことになる。売上の目標を掲げたとしても、過去の生産方法に合わせた人員や投資が残ったままでは、現場に矛盾した指示が届く。経営判断の実質を読むには、会見での表現と、その後に配分された予算や人材を照合し、方向転換がどこまで進んだかを確かめる。",
+    "form": "舵を切る",
+    "en": "If a semiconductor company changes course from mass-producing generic products to designing for specialized applications, more than product descriptions will change. Arrangements for hearing customer requirements, staffing, and testing equipment will need to be reorganized in line with the new strategy. Even with a revenue target announced, staffing and investment left aligned with old production methods send conflicting instructions to the workplace. Assessing the substance of management’s decision requires comparing press-conference wording with subsequent allocations of money and people to establish how far the shift has progressed.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "船の操作をたとえに、事業などの方針を転換すること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自動化",
+   "reading": "じどうか",
+   "pos": "noun",
+   "meaning": "automation",
+   "defJa": "人が行っていた作業を機械などに任せること",
+   "passage": {
+    "ja": "工場の改善報告に自動化が進んだとだけ書いても、読者には何が変わったのか伝わりません。傷を探す作業を画像認識に任せたのか、製品を運ぶ工程にロボットを入れたのか、まず対象の動作を一つ示しましょう。人の手が減った一方で、装置の調整や誤判定の確認が増えたなら、その仕事も書かなければ現場の負担を正しく比べられません。導入前と後で誰が何を担当するかを同じ順序で並べると、技術の名前よりも、作業の移り変わりを軸にした報告になります。",
+    "form": "自動化",
+    "en": "Writing only that factory automation has advanced does not tell readers what changed. First specify one activity, whether scratch detection was assigned to image recognition or robots were introduced to transport products. If manual work decreased while equipment adjustment and checking misclassifications increased, those tasks must also be described for a fair comparison of workload. Listing who handles what in the same order before and after deployment produces a report centered on changes in work rather than names of technologies.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "対象となる作業を添えて、機械に任せる範囲を明確にする。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自然言語処理",
+   "reading": "しぜんげんごしょり",
+   "pos": "noun",
+   "meaning": "natural language processing",
+   "defJa": "人が使う言葉を計算機で分析や生成する技術",
+   "passage": {
+    "ja": "大量の問い合わせを内容ごとに分けたいとき、文字を保存するだけでは、同じ用件の別の言い方をまとめられません。自然言語処理は、人が使う言葉を計算機で扱い、分類や翻訳、要約などにつなげる技術の分野です。便利な仕組みである反面、否定の表現や省略された主語を取り違えると、文全体としては逆の意味に受け取られる場合もあります。導入を考えるなら、正しく分けられた件数だけでなく、どの言い回しで誤りが生じたかを調べ、実際の利用者の文章で検証します。",
+    "form": "自然言語処理",
+    "en": "When sorting large numbers of inquiries by content, simply storing characters cannot group different phrasings of the same request. Natural language processing is the field of using computers to handle human language for tasks such as classification, translation, and summarization. Despite its convenience, mistakes with negation or an omitted subject can result in an interpretation opposite to the sentence’s meaning. When considering deployment, check which expressions caused errors as well as the number correctly categorized, and test on actual users’ writing.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "文字の保存ではなく、言葉の構造や意味を扱う処理を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

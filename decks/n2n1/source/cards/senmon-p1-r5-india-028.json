@@ -1,0 +1,202 @@
+{
+ "cards": [
+  {
+   "term": "観想",
+   "reading": "かんそう",
+   "pos": "noun",
+   "meaning": "Buddhist visualization practice",
+   "defJa": "仏や浄土などを心に思い描く修行",
+   "passage": {
+    "ja": "経典に並ぶ池や花の描写を読むと、風景の紹介だと思って読み飛ばしたくなることがあります。ところが仏や浄土の姿を心に思い描く観想の文脈では、そうした細部が修行の対象を示す手掛かりになります。単なる飾りだという予想に反して、何をどの順に思い描くかが本文の組み立てを支えている場合もあるのです。学習ノートでは景色の名称だけを抜き出すより、視線や注意の向け先を示す動詞にも印を付けると、描写と実践とのつながりを整理できます。",
+    "form": "観想",
+    "en": "Descriptions of ponds and flowers in a sutra can tempt you to skim them as scenery. In the context of visualization practice, where one pictures Buddhas or pure lands mentally, such details instead identify objects of practice. Contrary to the expectation that they are mere decoration, what to picture and in what order can support the structure of the text. In study notes, marking verbs that direct the gaze or attention, instead of extracting only names of scenery, helps organize the connection between description and practice.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "仏や浄土を対象として心に描く実践を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "観照",
+   "reading": "かんしょう",
+   "pos": "noun",
+   "meaning": "detached contemplation",
+   "defJa": "主観的な執着を離れて対象を静かに見つめること",
+   "passage": {
+    "ja": "禅寺の庭を眺めた感想に「何も考えなかった」と書くと、眠かっただけとも読めてしまいます。対象への執着を離れて静かに見つめる態度を表したいなら、観照という語を選ぶ余地がありますね。ただし美しい庭だったかどうかにかかわらず、その一語だけで悟りの体験まで主張するのは説明の飛躍です。石の配置をすぐに好き嫌いで決めず、影が動くのをしばらく見ていた、と具体的な様子を添えれば、読者は書き手の視線の変化を自分でもたどれます。",
+    "form": "観照",
+    "en": "Writing that you thought of nothing while viewing a Zen temple garden could simply suggest that you were sleepy. If you mean a quiet attitude of looking without attachment to the object, detached contemplation is one possible choice of words. Whether the garden was beautiful or not, however, claiming an experience of enlightenment from that word alone is a leap in the explanation. Add concrete details, such as watching shadows move for a while without immediately liking or disliking the arrangement of stones, and readers can follow the change in your gaze.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "景色の美醜より、それを見る心の姿勢に焦点を当てる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "行者",
+   "reading": "ぎょうじゃ",
+   "pos": "noun",
+   "meaning": "Buddhist practitioner",
+   "defJa": "仏道などの修行に取り組む人",
+   "passage": {
+    "ja": "山を歩いているからといって、その人が登山を楽しんでいるとは限らないよね。古い仏教の文章に出てくる行者も、体を鍛える人というより、教えを実際に身につけようと修行する人なんだ。山に入る場合だけでなく、念仏を唱える実践者を指すこともあるから、服装だけで意味を決めつけると読み違えるよ。その人が何を信じ、どんな行いを続けているのかを前後の文から拾えば、旅の記録なのか信仰の記録なのかも区別できるね。",
+    "form": "行者",
+    "en": "Just because someone is walking in the mountains does not mean they are enjoying a hike. A practitioner appearing in an old Buddhist text is someone training to embody a teaching, rather than simply strengthening their body. The term can refer to someone reciting the nenbutsu as well as someone entering the mountains, so interpreting it from clothing alone can be misleading. Looking in the surrounding sentences for what the person believes and practices helps distinguish a travel account from a record of faith.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "山での苦行に限らず、仏道の実践者を広く指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "西田幾多郎",
+   "reading": "にしだきたろう",
+   "pos": "noun",
+   "meaning": "Nishida Kitaro",
+   "defJa": "純粋経験を論じた日本の近代哲学者",
+   "passage": {
+    "ja": "鐘の音を聞いた瞬間と、それを寺の鐘だと判断する瞬間を、いったん分けて考えてみましょう。西田幾多郎は『善の研究』で、主観と客観の区別に先立つ純粋経験を哲学の出発点に置きました。禅の修行にも取り組んだ人ですが、その著作を仏教の教えの言い換えとして読むだけでは、西洋哲学との対話を取り落とします。自分と世界を初めから別々に置く説明に対して、両者を分ける認識が成立するに至る道筋を問うところに、この本の難しさと面白さがあります。",
+    "form": "西田幾多郎",
+    "en": "Try distinguishing the instant you hear a bell from the instant you judge it to be a temple bell. In An Inquiry into the Good, Nishida Kitaro made pure experience preceding the distinction between subject and object his philosophical starting point. He also practiced Zen, but reading his writings merely as Buddhist teachings rephrased misses their dialogue with Western philosophy. The difficulty and interest of this book lie in asking how the cognition that separates self and world arises, rather than treating them as separate from the outset.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "人名を挙げる際は、著作と中心となる問いを添える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "行脚",
+   "reading": "あんぎゃ",
+   "pos": "noun",
+   "meaning": "pilgrimage seeking Buddhist teachers",
+   "defJa": "仏道を学ぶため各地を巡り歩くこと",
+   "passage": {
+    "ja": "長い距離を歩いた僧の伝記を読んだとき、旅程の暗記だけで学習を終えるのは惜しいですね。行脚には、各地を巡って師や学びの仲間を求め、仏道の修行を深めるという意味があります。地名は覚えたものの、なぜその寺を訪れたのか説明できないなら、出会った人物と教わった内容を地図に書き添えましょう。移動の線に学びの目的を重ねていけば、山越えに費やした労力だけでなく、その人が受け継ごうとした教えの系譜もたどれます。",
+    "form": "行脚",
+    "en": "When reading the biography of a monk who walked long distances, it would be a shame to finish by memorizing only the itinerary. Angya means traveling from place to place in search of teachers and fellow learners to deepen Buddhist practice. If you have learned the place names but cannot explain why a temple was visited, add the people encountered and teachings received to a map. Overlaying the purpose of study on the route lets you trace the lineage of teachings the monk sought to inherit, as well as the effort spent crossing mountains.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「諸国を巡る」「師を求める」と結び付けて覚える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "覚者",
+   "reading": "かくしゃ",
+   "pos": "noun",
+   "meaning": "an awakened one",
+   "defJa": "迷いを離れ、真理に目覚めた人",
+   "passage": {
+    "ja": "仏という字から、亡くなった人だけを思い浮かべると、経典の読み方は初めから狭くなる。インドに由来するブッダという語を意味で訳した覚者は、迷いの眠りから目覚めた者を指し、死者一般の呼び名ではない。音を写した名称が中国語を通じて日本に伝わり、日常語として別の広がりを持ったのである。葬儀での呼び方と教義上の用法を区別すれば、仏教の修行が死後の世界だけでなく、生きている間の認識や執着にも向けられていることが読み取れる。",
+    "form": "覚者",
+    "en": "If the character for Buddha brings only the dead to mind, one’s reading of scripture is narrow from the outset. Kakusha, a translation of the meaning of the Indian term buddha, denotes someone awakened from the sleep of delusion, not the dead in general. A name transcribing its sound reached Japan through Chinese and acquired a further range of everyday meanings. Distinguishing funeral usage from doctrinal usage reveals that Buddhist practice concerns cognition and attachment during life as well as the world after death.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「仏陀」の意味を訳した呼び名として理解する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "袖振り合うも他生の縁",
+   "reading": "そでふりあうもたしょうのえん",
+   "pos": "expression",
+   "meaning": "even brief encounters have karmic ties",
+   "defJa": "ささいな出会いにも前世からの縁があること",
+   "passage": {
+    "ja": "旅先で助けてくれた人への礼状に、袖振り合うも他生の縁という言葉を添えると、偶然の出会いを大切にする気持ちが伝わります。ここでの「他生」は、今の人生とは別の生を指し、前世からのつながりという仏教的な解釈を背景にしています。温かな響きがある一方で、初対面の相手に強い運命の物語を押し付けるような書き方は避けたいですね。まず道案内や親切への具体的なお礼を書き、その後に短く添えれば、ことわざが感謝の余韻を残します。",
+    "form": "袖振り合うも他生の縁",
+    "en": "Adding the saying that even a brush of sleeves reflects ties from another life to a thank-you letter conveys appreciation for a chance encounter with someone who helped you while traveling. Here, tasho means a life other than the present one, drawing on a Buddhist interpretation of connections from past lives. Although the expression sounds warm, you want to avoid wording that imposes a strong story of destiny on someone you have just met. Thank them specifically for directions or kindness first, and a brief use of the proverb afterward will leave a lingering note of gratitude.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「多少」と取り違えず、出会いを大切にする表現として使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "親鸞",
+   "reading": "しんらん",
+   "pos": "noun",
+   "meaning": "Shinran",
+   "defJa": "阿弥陀仏の本願を説いた浄土真宗の宗祖",
+   "passage": {
+    "ja": "念仏って、回数を増やせば増やすほど救いに近づく点数制みたいに思っていたんだ。だけど親鸞の教えを読むと、阿弥陀仏の本願にまかせることが中心で、自分の修行の成果を積み上げて救いを買う話とは違うんだね。努力という言葉に慣れているだけに、何でも自分の達成度で考えてしまう癖には気づきにくいよ。それでも、まかせるというのを他人任せで何もしない態度と取り違えると、自分の思い上がりを問い直すという教えの鋭さが抜けてしまうね。",
+    "form": "親鸞",
+    "en": "I used to think nenbutsu was like a points system in which more recitations brought you closer to salvation. But reading Shinran’s teachings, I find their center is entrusting oneself to Amida’s primal vow, rather than buying salvation by accumulating the achievements of one’s practice. Being so accustomed to the language of effort makes it hard to notice the habit of judging everything by personal achievement. Yet confusing entrusting with doing nothing and leaving everything to others loses the teaching’s sharp challenge to our own conceit.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "法然から学び、本願をよりどころとする教えを示した人物。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "見性",
+   "reading": "けんしょう",
+   "pos": "noun",
+   "meaning": "seeing one’s true nature",
+   "defJa": "禅で、自らの本性を直接見きわめること",
+   "passage": {
+    "ja": "禅の入門書では、見性を自分の本性を直接見きわめることと説明する場合がある。この語を一時的な気分の高揚と訳せば、修行の中で担ってきた宗教的な意味は薄れる。体験者が強い確信を語ったとしても、その証言だけで脳の特定の部位に同じ変化が生じたと結論することはできない。教義上の説明と測定できる現象を区別し、どの系譜の文献がどのような実践について述べているかを確認する作業が、禅と現代科学を結ぶ議論の土台となる。",
+    "form": "見性",
+    "en": "Zen introductions sometimes explain kensho as directly seeing one’s true nature. Translating it as a temporary emotional high weakens the religious meaning it has carried within practice. Even if practitioners express strong conviction, their testimony alone cannot establish that the same change occurred in a particular brain region. Distinguishing doctrinal explanations from measurable phenomena, and checking which lineage’s texts describe which practices, provides a foundation for discussions linking Zen and modern science.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "禅の専門語であり、単なる興奮や気付きとは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

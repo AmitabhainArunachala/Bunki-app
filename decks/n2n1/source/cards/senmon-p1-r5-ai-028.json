@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "絶縁体",
+   "reading": "ぜつえんたい",
+   "pos": "noun",
+   "meaning": "an electrical insulator",
+   "defJa": "電流を通しにくい物質",
+   "passage": {
+    "ja": "電線を覆う樹脂は、金属部分から意図しない経路へ電流が流れるのを防ぐ役割を担う。こうした絶縁体も、加わる電圧や温度などの条件によって性質が変わるため、どんな環境でも電流を完全に遮るとは言えない。電子機器を小さくするに伴って配線間の距離や膜の厚さが変われば、同じ材料名であっても設計上の検証は省けなくなる。厚さという一つの数字だけで安全性を判断せず、使う条件と材料の特性を合わせて確かめることが、部品の選定を支えている。",
+    "form": "絶縁体",
+    "en": "Resin covering an electric wire helps prevent current from the metal from following unintended paths. Such insulators change behavior depending on conditions including applied voltage and temperature, so they cannot be said to block current completely in every environment. When miniaturization changes spacing between conductors or film thickness, design verification cannot be skipped merely because the material has the same name. Component selection depends on checking operating conditions alongside material properties, rather than judging safety from thickness alone.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "電流を通しにくい物質であり、あらゆる条件で完全に遮断するとは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "経済安全保障",
+   "reading": "けいざいあんぜんほしょう",
+   "pos": "noun",
+   "meaning": "economic security",
+   "defJa": "経済上の手段で国民生活や国家の安全を守ること",
+   "passage": {
+    "ja": "半導体が届かなくなった場面を想定し、自動車や通信機器の生産に何が起こるかを図にしてみましょう。重要な物資や技術の安定した確保を考える経済安全保障は、企業一社の利益だけでは説明できない課題です。安い調達先に集中させると費用を抑えられる一方で、その供給が止まった際に代わりを探す時間が長くなる場合があります。国や企業の対策を学ぶときは、依存する相手、代替にかかる期間、追加の費用を別々の欄に書くと、安全と効率の間にある制約を比べられます。",
+    "form": "経済安全保障",
+    "en": "Imagine semiconductor deliveries stopping and diagram what happens to car and communications-equipment production. Economic security, which includes securing stable access to important goods and technologies, cannot be explained only through a single company’s profits. Concentrating on a cheap source may reduce costs, while also lengthening the search for alternatives if supply stops. When studying government or corporate responses, separate the counterparties relied on, replacement lead times, and additional costs into columns to compare constraints between security and efficiency.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "物資の安定供給や重要技術の確保などを含む概念。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "稼働率",
+   "reading": "かどうりつ",
+   "pos": "noun",
+   "meaning": "capacity utilization rate",
+   "defJa": "設備の能力が実際に使われている割合",
+   "passage": {
+    "ja": "半導体工場が忙しいかどうかを読むには、生産能力と実際の生産量を分けて見る視点が欠かせない。例えば一日百枚を処理できる設備で八十枚を処理したなら、同じ条件で能力を測るという前提の下で、稼働率は八割となる。ただし処理した枚数が多いからといって、良品の割合が高いとは限らず、設備の忙しさと製品の品質は別の数字である。受注が増えたという報告に加えて、不良や停止時間の推移まで確かめれば、能力の制約がどこにあるかを絞り込める。",
+    "form": "稼働率",
+    "en": "Assessing how busy a semiconductor factory is requires distinguishing capacity from actual output. For example, if equipment capable of processing one hundred wafers a day processes eighty, utilization is eighty percent, assuming capacity is measured under the same conditions. A high number processed does not necessarily mean a high proportion of good products, since equipment busyness and product quality are separate figures. Checking trends in defects and downtime as well as reports of growing orders helps locate constraints on capacity.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "能力に対する利用の割合で、良品率とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "社会実装",
+   "reading": "しゃかいじっそう",
+   "pos": "noun",
+   "meaning": "deployment in society",
+   "defJa": "研究成果を社会の現場で使える形にすること",
+   "passage": {
+    "ja": "工場の画像から傷を見つける実験に成功しても、そのまま現場で使えるとは限りません。研究成果を社会実装する段階では、照明の違いや製品の汚れに加えて、機械が判断を誤ったときに誰が確認するかまで決めます。正答率だけを高めるのではなく、作業員が無理なく使え、止まった場合にも生産を続けられる仕組みにすることが課題なのですね。試験用の写真で仮説を検証した後は、実際の作業の流れに組み込み、見落としと余計な警報の両方を記録していきます。",
+    "form": "社会実装",
+    "en": "Success in an experiment detecting scratches in factory images does not guarantee that the system is ready for use on site. When deploying research results in society, one must address lighting differences and product dirt as well as decide who checks mistaken judgments. The task is to create a system workers can use comfortably and production can survive without, rather than simply raising accuracy. After testing a hypothesis on experimental photographs, the system is incorporated into real workflows and both missed defects and unnecessary alerts are recorded.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "研究室の成功から、運用や責任を含む現場への導入を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "経験則",
+   "reading": "けいけんそく",
+   "pos": "noun",
+   "meaning": "an empirical rule of thumb",
+   "defJa": "過去の経験から得られた判断の目安",
+   "passage": {
+    "ja": "新しい検査装置の調整で、担当者が以前うまくいった設定から試し始める場面を想像してください。こうした経験則は探索の手間を減らす手掛かりになりますが、材料や温度が変われば同じ結果が出るとは限りません。過去の成功を物理法則のように扱うのではなく、どの条件で役立った目安なのかを記録し、今回も成り立つという仮説として検証します。もし外れたなら、失敗を隠して設定だけを戻すより、違っていた条件を残すほうが次の担当者に渡す情報は豊かになります。",
+    "form": "経験則",
+    "en": "Imagine an operator adjusting a new inspection device by starting with settings that worked previously. Such rules of thumb can reduce search effort, but changes in material or temperature need not produce the same result. Instead of treating past success as a physical law, record the conditions under which the guideline was useful and test whether it holds this time as a hypothesis. If it fails, recording the changed conditions leaves richer information for the next operator than hiding the failure and merely restoring the settings.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "役立つ目安であって、条件に関係なく成り立つ法則とは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "立役者",
+   "reading": "たてやくしゃ",
+   "pos": "noun",
+   "meaning": "a key contributor",
+   "defJa": "ある成果の実現に大きく貢献した人",
+   "passage": {
+    "ja": "新しい半導体の完成を語る記事は、一人の著名な設計者を成功の立役者として描きやすい。しかし設計図が優れていても、製造工程の小さな誤差を減らし続ける人や、異常の原因を切り分ける人がいなければ、製品は安定して届かない。読者が覚えやすい物語を求めるあまり、目立たない仕事を背景に追いやれば、技術が育つ条件まで見誤る。誰を称えるかを考えることは、名前を増やして均等に並べる作業ではなく、完成までの因果関係を具体的にたどり直すことでもある。",
+    "form": "立役者",
+    "en": "An article about a new semiconductor readily portrays a prominent designer as the key figure behind its success. But however good the design, products will not arrive reliably without people who keep reducing small manufacturing errors and isolating causes of abnormalities. Seeking a memorable story so eagerly that less visible work recedes into the background misrepresents the conditions in which technology develops. Deciding whom to credit is not simply adding names in equal order, but also retracing the specific causal chain leading to completion.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "成果を支えた重要人物を表し、役職名とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "経済産業省",
+   "reading": "けいざいさんぎょうしょう",
+   "pos": "noun",
+   "meaning": "Japan’s industry and trade ministry",
+   "defJa": "日本で産業や通商などの政策を担う行政機関",
+   "passage": {
+    "ja": "半導体支援の記事で、経済産業省が計画を認定したという文を、国が成功を保証したと書き換えてはいけません。制度の条件に照らして支援の対象と判断することと、企業の技術や収益の将来を保証することは別だからです。報道文を短くするにしても、申請した主体、判断した機関、認定された内容という三つの要素を残すと、責任の所在がぼやけません。金額を強調する前に、元の公表資料に戻って動詞を確かめれば、「検討する」「決める」「実施する」の違いも正確に伝えられます。",
+    "form": "経済産業省",
+    "en": "In an article on semiconductor support, do not rewrite a statement that METI approved a plan as a government guarantee of success. Deciding that a proposal qualifies for support under a scheme is different from guaranteeing a company’s future technology or earnings. Even when shortening a news item, retaining who applied, which institution decided, and what was approved keeps responsibility clear. Checking the verbs in the original announcement before emphasizing an amount also allows accurate distinctions between considering, deciding, and implementing.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "省庁の発表では、対象と判断の段階を明示する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
