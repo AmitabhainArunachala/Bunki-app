@@ -238,17 +238,17 @@ PROBES['review-reason'] = async () => {
   const freeze = /archive froze/;
   const human = await openRow(page, 'env:press-press_05591');
   check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
-    /未確認/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
+    /Unreviewed/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
     JSON.stringify(human).slice(0, 400));
   await page.click('#back');
   const rights = await openRow(page, 'yasashii:1');
   check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /未確認/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
+    /Unreviewed/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
     JSON.stringify(rights).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
   check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/未確認/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
+    !/Unreviewed/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
     JSON.stringify(approved).slice(0, 300));
   await context.close();
 };
@@ -762,7 +762,7 @@ PROBES['kanji-numerals'] = async () => {
 PROBES['kdx-chip-state'] = async () => {
   const { context, page } = await learner();
   const seen = {};
-  for (const [lens, attr] of [['画数', 'data-kdx-st'], ['部首', 'data-kdx-rad'], ['頻度', 'data-kdx-freq'], ['漢検', 'data-kdx-kk']]) {
+  for (const [lens, attr] of [['by strokes', 'data-kdx-st'], ['by radical', 'data-kdx-rad'], ['by frequency', 'data-kdx-freq'], ['by level', 'data-kdx-kk']]) {
     await open(page, '?entry=shelf&ui=bi');
     await openShelfDoor(page, '#kanjidex-link');
     await page.locator('main .kdx-lens', { hasText: lens }).first().click();
