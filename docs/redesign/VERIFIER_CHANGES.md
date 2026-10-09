@@ -850,3 +850,9 @@ Each changed file and action is recorded below. All existing return branches, bo
 | `verify-ai-adaptation.mjs` | Two optional `#sheet-close` checks/clicks → check the actual visible entry and press its visible Close, preserving eligibility, provider-request and adaptation record assertions. |
 
 Before this fixture commit, the dirty priority-three candidate (`9f50b476`, artifact `06087c4c7619aff3a01f9eae8d1f9957f1bf8d179207cc299e18950c6f3ff388`) passes reader design **49/49 Chromium**, foundation **6/6 Chromium** width/language cases, and seven independent real Close/capture paths. The independent paths cover first-depth Close, nested Back, nested close-all and all four exact durable core capture doors with unchanged learner roots. Reader-gloss rejects this same candidate at its unchanged clean-source identity gate before any behavior runs; no gate is relaxed. Its full clean-artifact result belongs to the final assembly. Receipts are under `~/.dharma/bunki_review/2026-10-10/r5-strict/owned-stage3-*`. The first foundation transition race and O1 receipt-metadata failure remain preserved in the original logs; the explicit sequencing/metadata corrections above pass on the same immutable artifact.
+
+## Round 5: guided external returns await the actual room (2026-10-10)
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `verify-guided-session.mjs`, D1 Hall door, D4 Back to exams, S15 Back to guided | Read immediately after external navigation → wait for `hallDoor`, `.exam-levels`, and the actual `room(page)` respectively to be visible, each bounded at 20 seconds | Native room navigation paints its destination in the scheduled snapshot callback. All original D1/D4/S15 assertions remain unchanged. Internal guided J12/J13 branch-return/focus assertions remain immediate and unchanged; their source behavior is fixed instead of delaying those checks. |
