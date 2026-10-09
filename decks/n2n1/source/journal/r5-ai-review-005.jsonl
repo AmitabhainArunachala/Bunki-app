@@ -1,0 +1,4 @@
+{"step": "editorial_review", "writer": "codex-astra", "reviewOf": {"先端パッケージング": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json"}, "findings": {"先端パッケージング": "Initial judge passed but craft-of-speaking/writing register is not satisfied by an ordinary first-person study narrative; recast as explaining the term accurately to readers."}}
+{"step": "rewrite", "writer": "codex-astra", "mech": {"先端パッケージング": []}, "model": "deepseek-v4-pro:cloud", "secs": 33, "out": 5315, "verdicts": [{"term": "先端パッケージング", "editor": "pass", "editorWhy": "語の文章として自然で、対象語も一度だけ正しい意味で使われている。", "facts": "pass", "factsWhy": "半導体の先端パッケージングに関する記述は正確で、英語訳・レベルも問題ない。"}]}
+{"step": "dropped", "dropped": {}}
+{"step": "superseded", "removed_from_new_sources": ["先端パッケージング"], "custody": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r5-fields/ai/review005-superseded.json", "custody_sha256": "c4c8d459af2f72e8cc4e91250ede52b7f0b3bc19f026a35ea2bf33e9b923108d"}

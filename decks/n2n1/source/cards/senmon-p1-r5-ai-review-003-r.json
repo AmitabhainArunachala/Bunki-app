@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "国策",
+   "reading": "こくさく",
+   "pos": "noun",
+   "meaning": "national policy set by the state",
+   "defJa": "国が定めた政治や産業の方針",
+   "passage": {
+    "ja": "半導体ともなると、一つの工場の誘致が国の戦略の核として語られる。だが国策と企業戦略は似て非なる概念である。政府は補助金や税制を通じて特定の産業を支え、その狙いには雇用や技術基盤の保全などがある。一方、工場を建てる側の企業は採算を重視しており、その判断が国家の目標と重なっても、両者が同じ理由で動いているとは限らない。制約も時間軸も異なる二つの判断を区別すれば、支援の額だけで政策全体を評価せず、何を実現しようとしているかに目を向けられる。",
+    "form": "国策",
+    "en": "Attracting a semiconductor factory can be portrayed as central to national strategy. Yet national policy and corporate strategy differ despite their apparent similarity. Governments support industries through subsidies and tax measures for aims including employment and preserving technical capabilities. Companies building factories emphasize profitability, so overlap with national goals does not establish identical motivations. Distinguishing decisions with different constraints and time horizons allows attention to intended outcomes instead of judging the entire policy by the amount of support.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "企業の採算判断と、政府の政策目標を分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シリコンの盾",
+   "reading": "しりこんのたて",
+   "pos": "expression",
+   "meaning": "\"silicon shield\" (Taiwan's chip leverage)",
+   "defJa": "半導体への依存が軍事的攻撃を抑止するという比喩",
+   "passage": {
+    "ja": "台湾の半導体産業への依存が軍事的な攻撃を思いとどまらせるという考え方を、シリコンの盾と呼びます。供給が途絶えれば攻撃する側にも損失が生じるという点に、この仮説の根拠があります。ただし、経済的な費用があることと、実際に攻撃を防げることは同じではありません。同じ生産の集中は、混乱の影響が広い地域へ及ぶという弱さとして読むこともできます。議論を整理する際は、依存が生む経済的な損失と、それが政治や軍事の判断をどう変えるかを、別々の問いとして書いておきましょう。",
+    "form": "シリコンの盾",
+    "en": "The silicon shield is the idea that dependence on Taiwan's semiconductor industry discourages military attack. It rests on the expectation that disrupted supply would also impose losses on the attacker. Economic costs do not, however, establish that an attack will actually be prevented. The same concentration can be viewed as a vulnerability through which disruption spreads across regions. Separate the economic losses caused by dependence from the question of how those losses alter political and military decisions.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "自動的に安全を保証する仕組みではなく、仮説を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "探索と活用",
+   "reading": "たんさくとかつよう",
+   "pos": "expression",
+   "meaning": "explore vs exploit",
+   "defJa": "未知の選択肢を試すことと既知の成果を利用すること",
+   "passage": {
+    "ja": "推薦システムが利用者へ何を提示するかを決めるとき、探索と活用の配分が問題となる。過去によく選ばれた項目を出せば反応を予測しやすいが、新しい項目を一度も見せなければ、その好まれ方を学べない。試す行動には情報を得る利点がある一方、その場で得られる反応が期待を下回る可能性もある。どちらを重視するかは、利用できる期間や、既に集めた情報の量によって変わる。評価では、直後の反応だけでなく、試した結果が次の選択をどれほど改善したかまで追うことが重要である。",
+    "form": "探索と活用",
+    "en": "A recommender system deciding what to show users faces a balance between exploration and exploitation. Previously popular items offer more predictable responses, but never showing new items prevents learning how they will be received. Trying an option gains information while risking a weaker immediate response than expected. The balance depends on the available horizon and the information already gathered. Evaluation should follow how much the resulting information improves later choices, alongside immediate responses.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "情報を得る行動と、今ある知識で選ぶ行動を対比する。",
+    "sense": "新しい選択肢を試すことと既存の最善を利用することの対立"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "アルゴリズム",
+   "reading": "あるごりずむ",
+   "pos": "noun",
+   "meaning": "algorithm",
+   "defJa": "問題を解く手順を正確に定めたもの",
+   "passage": {
+    "ja": "在庫の一覧から商品番号を何度も探すなら、先に番号順へ並べておく方法が便利だよね。真ん中を調べて候補を半分ずつ減らせば、一回の検索で見る件数をかなり抑えられるんだ。ただ、並べ替えにも時間はかかるから、たった一回しか探さないなら、上から順に見るほうが全体では早い場合もある。アルゴリズムを比べるときは、検索の速さだけでなく、準備にかかる手間も数えたいところだね。何件のデータを何回調べる予定なのかが分かれば、どの方法が目的に合うかを具体的に考えられるよ。",
+    "form": "アルゴリズム",
+    "en": "If you repeatedly search inventory records by product number, sorting them first can be useful. Checking the middle and halving the remaining candidates greatly reduces the records examined per search. Sorting takes time too, so scanning from the top may be faster overall for just one search. Comparing algorithms should include preparation costs as well as search speed. Knowing how many records will be searched and how often makes it possible to assess which approach suits the task.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "同じ結果でも、必要な作業量は手順によって変わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "頭打ち",
+   "reading": "あたまうち",
+   "pos": "noun",
+   "meaning": "leveling off, hitting a ceiling",
+   "defJa": "伸びが止まって、それ以上上がらない状態",
+   "passage": {
+    "ja": "半導体の性能が頭打ちになったという説明は、まず伸びが止まった状態を指します。そこから原因を探ると、消費電力や発熱など、複数の制約が関係している場合があります。一方、製品の出荷が横ばいになった理由は、普及によって需要が満たされたことか、供給する能力が足りないことかで異なります。グラフの形が似ていても、同じ原因とは限らないのですね。記事を読むときは、どの数字の伸びが止まったかを書き出し、その後で示されている原因と、裏付けとなる資料を対応させると理解が深まります。",
+    "form": "頭打ち",
+    "en": "An explanation that semiconductor performance has plateaued first describes a halt in growth. Investigating its causes may reveal several constraints, including power consumption and heat. Flat product shipments, meanwhile, mean different things depending on whether demand has been satisfied or supply capacity is insufficient. Similar graph shapes need not share a cause. When reading, identify which figure stopped growing, then connect the proposed cause to the supporting evidence.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "伸びの停止という状態と、その原因を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "補助金",
+   "reading": "ほじょきん",
+   "pos": "noun",
+   "meaning": "subsidy; government grant to support a policy",
+   "defJa": "政府や自治体が政策のために支給する金銭",
+   "passage": {
+    "ja": "半導体工場への補助金は、出す側と受け取る側で異なる意味を持つ。政府にとっては国内の雇用や技術基盤を支える政策手段であり、企業にとっては投資負担を軽くする資金となる。効果を評価する際は、工事の進捗と、長い期間で現れる技術や雇用への影響を分けて見ることが重要だ。受給にどのような条件が付くかは制度によって異なり、継続的な操業や報告を求める場合もある。支援の金額だけを比べるのではなく、達成すべき事項と企業が負う義務まで読むことで、取引の全体像を捉えられる。",
+    "form": "補助金",
+    "en": "A subsidy for a semiconductor factory has different meanings for payer and recipient. For government it supports domestic employment and technical capabilities, while for a company it reduces the investment burden. Evaluation should distinguish construction progress from longer-term effects on technology and jobs. Conditions vary by program and may require ongoing operations or reporting. Reading the required achievements and the recipient's obligations alongside the amount reveals the fuller arrangement.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "支給額だけでなく、目的や受給条件も確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "EUV露光",
+   "reading": "いーゆーぶいろこう",
+   "pos": "noun",
+   "meaning": "EUV lithography",
+   "defJa": "極端紫外線を使って微細な回路の模様を転写する工程",
+   "passage": {
+    "ja": "半導体の回路を細かく描くには、光の波長と、それを集める光学系の両方が関わる。EUV露光では、波長十三・五ナノメートルの光を利用するが、この数字がそのまま回路の線幅を表すわけではない。光は空気や多くの物質に吸収されやすいため、真空中の光路と多層膜の鏡を用いる。したがって、従来の装置で光源だけを取り替えれば済むという理解は、光を導く仕組みの違いを見落としている。短い波長の利点を実際の加工へつなぐには、光源から基板までを一つの系として設計する必要がある。",
+    "form": "EUV露光",
+    "en": "Drawing fine semiconductor patterns depends on both the wavelength and the optics that collect the light. EUV lithography uses 13.5-nanometer light, but that number is not itself the circuit linewidth. Because air and many materials absorb this light strongly, the optical path operates in vacuum and uses multilayer mirrors. Thinking that one can simply replace the source in a conventional machine overlooks the different light-guiding system. Translating the benefits of a short wavelength into fabrication requires designing the path from source to wafer as an integrated system.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "光の短さだけでなく、それを扱う光学系にも注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
