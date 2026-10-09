@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "戒名",
-   "reading": "かいみょう",
-   "pos": "noun",
-   "meaning": "posthumous Buddhist name",
-   "defJa": "仏教で戒を受け仏弟子となる際に授けられる名",
-   "passage": {
-    "ja": "仏教の名前を学ぶときは、亡くなった後に初めて必要になるものだと決めないようにしましょう。戒名は戒を受けて仏弟子となる際に授けられる名で、生きているうちに受ける場合もあり、葬儀での習慣だけでは意味を説明しきれません。宗派によって名称や考え方が異なるため、同じ役割に見える名前を全て同じ語でまとめないことも大切です。寺の案内や家族の記録を読むときは、誰がいつ、どの教えの中で名を受けたのか整理すると、文字の並びを信仰と人生の関わりとして学べます。",
-    "form": "戒名",
-    "en": "Do not assume a Buddhist religious name becomes relevant only after death. A precept name is given upon receiving precepts as a Buddhist disciple and may be received during life, beyond funeral custom alone. Names and interpretations differ among schools, so apparent similarities should not erase those differences. Identifying who received a name, when, and within which tradition connects its characters with faith and life.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「戒名を授かる」。生前に受ける場合もあり、宗派ごとの名称にも注意する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "托鉢",
    "reading": "たくはつ",
    "pos": "noun",

@@ -111,28 +111,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "裸形修行",
-   "reading": "らぎょうしゅぎょう",
-   "pos": "noun",
-   "meaning": "naked ascetic practice",
-   "defJa": "衣服を身に着けずに行う宗教的な修行",
-   "passage": {
-    "ja": "服を着ないことが、どうして修行になるのかって、写真だけだと分かりにくいよね。ジャイナ教の空衣派で裸形修行をする男性の出家者は、衣服まで手放す姿に、何も所有しないという理想を表しているんだ。だから、珍しい格好として眺めるだけだと、執着を離れようとする教えとのつながりを取り逃がしてしまう。とはいえ、宗派の信者なら誰もがそうするという話ではなく、家庭を持って暮らす人と、生活を丸ごと修行に向ける人とでは、引き受ける誓いが違うんだよ。",
-    "form": "裸形修行",
-    "en": "It is hard to understand from a photograph alone why going without clothes would count as religious practice. Male renunciants practicing naked asceticism in the Digambara Jain tradition express the ideal of owning nothing by giving up even clothing. Looking at it merely as an unusual appearance misses its connection with the teaching of releasing attachment. Yet this is not something every follower does, since householders and people who devote their entire lives to practice undertake different vows.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "「裸形修行をする」。外見と宗教上の誓いを結び付けて説明している。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "耆那",
    "reading": "じな",
    "pos": "noun",

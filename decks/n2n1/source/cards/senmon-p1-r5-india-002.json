@@ -111,28 +111,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "虚無",
-   "reading": "きょむ",
-   "pos": "noun",
-   "meaning": "nothingness, nihility",
-   "defJa": "すべてが無意味で、むなしく感じられること",
-   "passage": {
-    "ja": "枯山水の庭って、白い砂を丹念にならした面に石が数個載っているだけで、遠くから見ると何もないように見えるじゃないですか。砂の紋様は水を、石は島を表すとされるから、あの空白はただの虚無ではなく、見る人の心が自由に描き込む余地なんですよね。仏教でいう空も同じで、単なる無ではなく、ものが縁起で成り立つことを静かに見渡す知恵の側なんです。何も置いていないだけに、一つ一つの石の存在感がかえって際立つわけで、禅寺の庭は本当にうまくできています。",
-    "form": "虚無",
-    "en": "A dry-landscape garden, with just a few stones set on a surface of carefully raked white sand, looks from a distance like nothing at all, doesn't it? Since the raked patterns are said to stand for water and the stones for islands, that blank space is not mere nothingness; it is room for the viewer's mind to paint freely. The emptiness of Buddhism is the same: not mere nothing, but the wisdom that quietly surveys how things come into being through dependent arising. Precisely because nothing has been placed there, the presence of each individual stone stands out all the more; the gardens of Zen temples are truly well made.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "「ただの虚無ではなく」のように単なる無を指し、仏教の「空」と対比される場面が多い",
-    "sense": "無意味で、何もないと感じられる状態"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "餓鬼",
    "reading": "がき",
    "pos": "noun",

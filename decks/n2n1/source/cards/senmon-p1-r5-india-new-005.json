@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "開放監視瞑想",
-   "reading": "かいほうかんしめいそう",
-   "pos": "noun",
-   "meaning": "open monitoring meditation",
-   "defJa": "生じる感覚や思考を対象を絞らず観察する瞑想法",
-   "passage": {
-    "ja": "呼吸だけを見ていたのに、今度は音や考えもそのまま観察していいと言われると、少し戸惑うよね。開放監視瞑想は、一つの対象に注意を固定するより、現れては変わる体験に気付き、そのたびに追いかけすぎないようにする方法なんだ。何も考えなくなるのとは違って、思考が浮かんだこと自体も観察に入るから、頭の中を空っぽにする競争ではないんだよ。研究を読むときも、同じ「瞑想」という名前でまとめる前に、参加者が何をするよう教わったかを確かめると話がつながる。",
-    "form": "開放監視瞑想",
-    "en": "After being told to watch only the breath, being invited to observe sounds and thoughts as well can feel confusing. Open monitoring meditation emphasizes noticing changing experiences without pursuing each one too far, rather than fixing attention on one object. Thoughts arising are themselves included in observation, so it is not a competition to empty the mind. When reading research, checking what participants were instructed to do before grouping everything under meditation helps the account make sense.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "「対象を絞らず観察する」と、注意を一つに固定する方法との差を示す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "安静時機能結合",
    "reading": "あんせいじきのうけつごう",
    "pos": "noun",

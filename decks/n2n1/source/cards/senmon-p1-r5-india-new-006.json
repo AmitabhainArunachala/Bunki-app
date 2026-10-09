@@ -109,28 +109,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "注意瞬脱",
-   "reading": "ちゅういしゅんだつ",
-   "pos": "noun",
-   "meaning": "attentional blink",
-   "defJa": "続けて現れる二つ目の標的を短時間見落とす現象",
-   "passage": {
-    "ja": "「注意が途切れる」とだけ書くと、授業中にぼんやりする場面が浮かびます。実験でいう注意瞬脱を説明するなら、文字などが次々と現れる中で、一つ目の標的のすぐ後に出た二つ目を見落とす、という具体的な課題を示す方が正確です。集中的な瞑想の訓練を調べた研究でも、この課題の成績と脳波を組み合わせ、限られた注意の配分が検討されました。「集中力が強くなる」と広く言い換えるより、何を見つけやすくなったのかを残すことで、研究の面白さも保てます。",
-    "form": "注意瞬脱",
-    "en": "Simply writing that attention lapses may evoke daydreaming in class. Explaining the experimental attentional blink is more accurate when it describes missing a second target that appears soon after the first within a rapid stream of items such as letters. Research on intensive meditation training combined performance on this task with brain potentials to investigate the allocation of limited attention. Retaining what became easier to detect, rather than broadly paraphrasing it as stronger concentration, preserves the study’s interest as well as its precision.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "専門語を「集中力」に置き換えず、標的の提示順と見落としを説明する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

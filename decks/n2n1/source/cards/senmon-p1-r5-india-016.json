@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "実相",
-   "reading": "じっそう",
-   "pos": "noun",
-   "meaning": "the true aspect of reality",
-   "defJa": "仏教で物事のありのままの真実の姿",
-   "passage": {
-    "ja": "仏教の経典に現れる真実の姿という表現は、物の表面を写真のように写すことだけを意味しない。実相は物事のありのままの真実の姿を指し、日常の思い込みや固定した捉え方との対比で論じられる。何を真実と捉えるかは文献の教えに即して読む必要があり、単に目に見える形へ言い換えれば、語の働きが失われる。たとえば変化するものを不変と見なす心の問題と結び付けて読むことで、見えている対象の説明だけでなく、それを捉える側の理解も問いの対象となる。",
-    "form": "実相",
-    "en": "The true character of things in Buddhist scripture does not merely mean photographing their surfaces. Suchness concerns their actual nature, often contrasted with fixed assumptions. Its meaning must be read within a text’s teaching rather than reduced to visible form. Connecting it with treating changing things as permanent brings the perceiver’s understanding into question as well as the object.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「諸法の実相」。見た目だけでなく、教義が示す真実のあり方を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "布施",
    "reading": "ふせ",
    "pos": "noun",
@@ -145,28 +123,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "「寂静の境地」。周囲の無音と、煩悩を離れた静けさを区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "安心立命",
-   "reading": "あんしんりつめい",
-   "pos": "noun",
-   "meaning": "spiritual peace and resignation to fate",
-   "defJa": "心を落ち着かせて揺るがない生き方の拠り所を得ること",
-   "passage": {
-    "ja": "「不安が一つもなくなる」と言い換えると、生き方の拠り所を得るという言葉の深さが伝わりません。安心立命は、心を落ち着かせ、揺るがない立場を得て生きることを表し、禅や宗教的な人生観を語る文章でも使われます。仕事が順調で気分がよいという一時の状態を述べる場合とは違い、困難の中でも何を頼りに生きるかという問いを含ませることができます。読み手に説明する際は、問題がすべて消えたと書くより、出来事に向き合う姿勢がどう定まったのかを示すと、語の重みを保てます。",
-    "form": "安心立命",
-    "en": "Rephrasing it as having no anxiety loses the depth of finding a basis for life. Anjin-ryumyo concerns a settled mind and secure orientation, appearing in discussions of Zen and religious outlook. Unlike temporary satisfaction when work goes well, it can ask what sustains someone through difficulty. Describing how an attitude becomes grounded conveys the term better than claiming every problem disappears.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "一時的な気分の良さより、人生の拠り所が定まることを表す。",
     "sense": ""
    },
    "deck": "senmon",

@@ -82997,12 +82997,12 @@
     "deck": "senmon"
   },
   {
-    "term": "裸形修行",
-    "reading": "らぎょうしゅぎょう",
-    "gloss": "naked ascetic practice",
+    "term": "裸形",
+    "reading": "らぎょう",
+    "gloss": "nakedness; unclothed form",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"],
+    "sources": ["R5-curated:jain-history", "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf", "https://archives.bukkyo-u.ac.jp/rp-contents/HB/A109/HBA1091L001.pdf", "https://dictionary.cegloc.tsukuba.ac.jp/JtoE/index.php?page=36&typedword=RA"],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83195,12 +83195,12 @@
     "deck": "senmon"
   },
   {
-    "term": "開放監視瞑想",
-    "reading": "かいほうかんしめいそう",
+    "term": "オープンモニタリング瞑想",
+    "reading": "おーぷんもにたりんぐめいそう",
     "gloss": "open monitoring meditation",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138"],
+    "sources": ["R5-curated:meditation-neuroscience", "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138", "https://kaken.nii.ac.jp/ja/file/KAKENHI-PROJECT-24650135/24650135seika.pdf"],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83349,12 +83349,12 @@
     "deck": "senmon"
   },
   {
-    "term": "注意瞬脱",
-    "reading": "ちゅういしゅんだつ",
+    "term": "注意の瞬き",
+    "reading": "ちゅういのまばたき",
     "gloss": "attentional blink",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138"],
+    "sources": ["R5-curated:meditation-neuroscience", "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138", "https://www.jstage.jst.go.jp/article/cogpsy/2007/0/2007_0_105/_article/-char/ja", "https://www.jstage.jst.go.jp/article/jsoft/34/2/34_63/_pdf"],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
