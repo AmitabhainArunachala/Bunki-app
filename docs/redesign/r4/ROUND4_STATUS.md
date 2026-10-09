@@ -13,7 +13,7 @@ Merged and tested: **skin, cards, today**. Each was built, checked by its own te
 The fix was half-written when the limit stopped the run. It is saved, **unbuilt and untested**, on `claude/r4-read-refine-wip-20261009`; the lane's first pass is on `claude/r4-read-20261009`. So in this head the shelf seal, the reader's own layers and the word popup are still the cloud's round-3 work under the new skin.
 
 ## Verification of this head
-Chromium, 390×844, the built site's identity checked against the commit.
+Run on the merge commit `751d700b` (Chromium, 390×844, the built site's identity checked against that commit). The commits after it add only documents.
 
 | Result | Verifiers |
 |---|---|
