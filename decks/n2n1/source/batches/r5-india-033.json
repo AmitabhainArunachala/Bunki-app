@@ -1,0 +1,74 @@
+{
+ "batch": "r5-india-033",
+ "items": [
+  {
+   "term": "顕教",
+   "reading": "けんぎょう",
+   "gloss": "exoteric Buddhism",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜に応じて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "顕現",
+   "reading": "けんげん",
+   "gloss": "manifestation",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜に伴って",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "龍樹",
+   "reading": "りゅうじゅ",
+   "gloss": "Nāgārjuna",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜に限らず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

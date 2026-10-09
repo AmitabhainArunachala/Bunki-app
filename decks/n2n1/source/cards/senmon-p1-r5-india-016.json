@@ -1,0 +1,202 @@
+{
+ "cards": [
+  {
+   "term": "実相",
+   "reading": "じっそう",
+   "pos": "noun",
+   "meaning": "the true aspect of reality",
+   "defJa": "仏教で物事のありのままの真実の姿",
+   "passage": {
+    "ja": "仏教の経典に現れる真実の姿という表現は、物の表面を写真のように写すことだけを意味しない。実相は物事のありのままの真実の姿を指し、日常の思い込みや固定した捉え方との対比で論じられる。何を真実と捉えるかは文献の教えに即して読む必要があり、単に目に見える形へ言い換えれば、語の働きが失われる。たとえば変化するものを不変と見なす心の問題と結び付けて読むことで、見えている対象の説明だけでなく、それを捉える側の理解も問いの対象となる。",
+    "form": "実相",
+    "en": "The true character of things in Buddhist scripture does not merely mean photographing their surfaces. Suchness concerns their actual nature, often contrasted with fixed assumptions. Its meaning must be read within a text’s teaching rather than reduced to visible form. Connecting it with treating changing things as permanent brings the perceiver’s understanding into question as well as the object.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「諸法の実相」。見た目だけでなく、教義が示す真実のあり方を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "布施",
+   "reading": "ふせ",
+   "pos": "noun",
+   "meaning": "giving (dāna); offering to monks",
+   "defJa": "見返りに執着せず他者へ財や教えなどを与えること",
+   "passage": {
+    "ja": "寺に渡す金銭をすべてサービスへの支払いと書くと、宗教的な行為としての意味が薄れます。布施は財や教えなどを他者に与える実践を指し、相手から同額の見返りを受け取る取引とは異なる考え方を含んでいます。具体的な金銭のやり取りを説明する文章では、地域や寺の慣習を確かめつつ、教義上の意味と実際の手続きを分けて示すことができます。与えた量だけで信仰の深さを測るような表現を避け、何をどのような心で差し出す行為なのかを書けば、日常語の寄付との重なりも違いも伝わります。",
+    "form": "布施",
+    "en": "Calling every payment to a temple a service fee can obscure its religious meaning. Giving in Buddhism includes material resources and teachings, with a conception distinct from an equal-return transaction. An account of financial practice can distinguish doctrine from local procedures and customs. Describing what is offered and with what intention communicates both overlap and difference with ordinary donation without measuring faith by quantity.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「布施を行う」。取引の対価と異なる意味を持ち、金銭だけに限られない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "存在論",
+   "reading": "そんざいろん",
+   "pos": "noun",
+   "meaning": "ontology",
+   "defJa": "何があり存在するとはどういうことかを問う哲学",
+   "passage": {
+    "ja": "目の前に机があると言うのは簡単だけど、心や時間も同じようにあると言えるのかな。存在論は、何が存在し、あるとはどういうことかを問う哲学の分野で、インドの思想でも自己や世界の捉え方に関わる大事な問題なんだ。仏教が固定した実体を認めないと聞いて、机も心も何もないという意味にすると、条件によって生じるという説明を見落としてしまう。何を否定し、どんな意味であると述べるのかを比べると、普段は疑わない一言が、ずいぶん深い問いにつながっていると分かるね。",
+    "form": "存在論",
+    "en": "Saying a desk exists is easy, but do mind and time exist in the same way? Ontology asks what exists and what existence means, including questions about self and world in Indian philosophy. Reading Buddhism’s rejection of fixed essence as denying everything overlooks its account of conditioned arising. Comparing what is denied and what kind of existence is affirmed reveals the depth of an ordinary word.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「存在論の問題」。物の有無だけでなく、存在をどう捉えるかを問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "守破離",
+   "reading": "しゅはり",
+   "pos": "noun",
+   "meaning": "obey, break, leave (stages of mastery)",
+   "defJa": "型を学び深めて独自の境地へ進む過程",
+   "passage": {
+    "ja": "修行の手順を習うとき、最初から自分流に変えれば、何を受け継ごうとしていたのか分からなくなります。守破離は、まず型を守り、それを深めながら独自の境地へ進む過程を表す言葉で、学びの段階を考える手掛かりになります。禅や芸道を論じる文章で出会っても、仏教全体に共通する固定的な修行階級として覚えるのではなく、その場の比喩として捉えましょう。型を離れることは基礎を忘れることと同じではないと押さえれば、何を学び、どこで工夫を加えるのかという問いを具体的に立てられます。",
+    "form": "守破離",
+    "en": "Changing a practice immediately to suit oneself can obscure what was being transmitted. Shu-ha-ri describes learning forms, developing them, and reaching an independent understanding. In writing on Zen and traditional arts, treat it as a framework for learning rather than a universal Buddhist hierarchy. Distinguishing independence from forgetting foundations clarifies what is learned and where innovation enters.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「守破離の段階」。型を捨てる速さではなく、理解の深まりに着目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "密教",
+   "reading": "みっきょう",
+   "pos": "noun",
+   "meaning": "esoteric Buddhism",
+   "defJa": "儀礼や師からの伝授を重んじる仏教の教え",
+   "passage": {
+    "ja": "秘密という字に引かれて、誰にも話せない不思議な技の集まりだと思わないようにしましょう。密教を学ぶ際は、師からの伝授、印を結ぶ身体、真言を唱える言葉、心の働きが、教えの中でどう結び付くかを押さえることが大切です。日本では真言宗や天台宗の歴史と関わりますが、その源をたどればインドから中国などを経た伝承の道筋があります。像や曼荼羅を眺めるだけで終わらず、どの実践の場で何を示すものなのかを調べると、目に見える形と教えとの関係を学べます。",
+    "form": "密教",
+    "en": "The character meaning secret should not suggest merely a collection of mysterious tricks. Studying esoteric Buddhism involves understanding transmission and the relationships among bodily gestures, mantra, and mind. Its Japanese histories in Shingon and Tendai connect with transmission from India through China and other regions. Relating images and mandalas to their practical settings clarifies their connection with teaching.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「密教の儀礼」。印・真言・心の働きと、師からの伝授に注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "客体",
+   "reading": "きゃくたい",
+   "pos": "noun",
+   "meaning": "object (of perception)",
+   "defJa": "認識や行為の対象となるもの",
+   "passage": {
+    "ja": "呼吸に注意を向けるとき、観察する自分と観察されるものを分けて説明することができる。客体という語はこのように認識や行為の対象となる側を指すが、対象が必ず身体の外にある物だというわけではない。感情や思考も観察の対象になり得るため、瞑想の経験を論じる際には、内側と外側の区別だけでは足りなくなる。観る側と観られる側をどこまで分けられるかという問いは、インド哲学や仏教の説明を比べる入口にもなり、当たり前に置いた自己の輪郭を考え直す契機となる。",
+    "form": "客体",
+    "en": "Attention to breathing can be described through an observer and something observed. An object in this philosophical sense is what cognition or action addresses, without necessarily being outside the body. Feelings and thoughts can also become objects, complicating a simple inner-outer distinction in accounts of meditation. Comparing how Indian philosophies distinguish observer from observed invites reconsideration of assumed boundaries of self.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「認識の客体」。身体の外にある物だけでなく、心の働きも対象になり得る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "寂静",
+   "reading": "じゃくじょう",
+   "pos": "noun",
+   "meaning": "tranquility, serenity",
+   "defJa": "煩悩や乱れを離れた静かなあり方",
+   "passage": {
+    "ja": "山のお寺で音が少ないと、心まで静かになったように感じることがあるよね。でも仏教で寂静というときは、周囲が無音であることだけでなく、煩悩や心の乱れを離れたあり方に関わっているんだ。静かな部屋にいても、言い返せなかった一言を頭の中で繰り返していたら、場所の静けさと心の状態は同じではないと分かる。だから、この言葉を景色の説明として読むのか、修行や悟りを語る文脈で読むのかを確かめると、同じ静かという訳でも伝えたいことの違いに気付けるよ。",
+    "form": "寂静",
+    "en": "A quiet mountain temple can make the mind feel quieter too. In Buddhism, tranquility concerns freedom from affliction and disturbance rather than merely an absence of sound. Replaying an unanswered remark in a silent room reveals the difference between surroundings and mental state. Checking whether the word describes scenery or spiritual practice clarifies what kind of quiet is meant.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「寂静の境地」。周囲の無音と、煩悩を離れた静けさを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "安心立命",
+   "reading": "あんしんりつめい",
+   "pos": "noun",
+   "meaning": "spiritual peace and resignation to fate",
+   "defJa": "心を落ち着かせて揺るがない生き方の拠り所を得ること",
+   "passage": {
+    "ja": "「不安が一つもなくなる」と言い換えると、生き方の拠り所を得るという言葉の深さが伝わりません。安心立命は、心を落ち着かせ、揺るがない立場を得て生きることを表し、禅や宗教的な人生観を語る文章でも使われます。仕事が順調で気分がよいという一時の状態を述べる場合とは違い、困難の中でも何を頼りに生きるかという問いを含ませることができます。読み手に説明する際は、問題がすべて消えたと書くより、出来事に向き合う姿勢がどう定まったのかを示すと、語の重みを保てます。",
+    "form": "安心立命",
+    "en": "Rephrasing it as having no anxiety loses the depth of finding a basis for life. Anjin-ryumyo concerns a settled mind and secure orientation, appearing in discussions of Zen and religious outlook. Unlike temporary satisfaction when work goes well, it can ask what sustains someone through difficulty. Describing how an attitude becomes grounded conveys the term better than claiming every problem disappears.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "一時的な気分の良さより、人生の拠り所が定まることを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "実存",
+   "reading": "じつぞん",
+   "pos": "noun",
+   "meaning": "existence (existential sense)",
+   "defJa": "自分自身の生として引き受けられる具体的な存在",
+   "passage": {
+    "ja": "人間一般について多くを知っていても、自分が明日どう生きるかという問いは残ります。実存という語は、自分自身の生として引き受ける具体的な存在を考える際に用いられ、宗教や哲学を読むときの重要な視点になります。仏教の苦や無常を学ぶ場合にも、定義を正しく述べられることと、喪失や選択を自分の問題として受け止めることには違いがあります。西洋哲学の用語をそのまま仏教の教義と同一視する必要はありませんが、教えが一人の生にどう関わるかを問う入口として、この語を使えます。",
+    "form": "実存",
+    "en": "Knowledge about humanity in general does not settle how one will live tomorrow. Existence understood as one’s own concrete life offers a perspective for reading religion and philosophy. Defining Buddhist suffering or impermanence differs from confronting loss and choice personally. Without identifying a Western philosophical term with Buddhist doctrine, it can open inquiry into how teaching touches an individual life.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「実存の問題」。人間一般の説明と、自分の生を引き受ける問いを分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
