@@ -11076,6 +11076,29 @@ function todayLearning(tag, cls, text) {
   node.dataset.uiContent = 'learning';
   return node;
 }
+/** Japanese that breaks only between phrases, never inside one (「虚構 / か」): a line may end before
+ * a word that begins with kanji, katakana or an opening bracket, unless the word before it opened a
+ * bracket. Pairs with word-break: keep-all in the room's CSS; plain text without Intl.Segmenter. */
+function todayPhrases(node, text) {
+  const s = String(text || '');
+  let seg = null;
+  try {
+    seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
+  } catch {
+    seg = null;
+  }
+  if (!seg) {
+    node.textContent = s;
+    return node;
+  }
+  let prev = '';
+  for (const { segment } of seg.segment(s)) {
+    if (prev && /^[\p{Script=Han}\p{Script=Katakana}「『（(]/u.test(segment) && !/[「『（(\s]$/u.test(prev)) node.append(document.createElement('wbr'));
+    node.append(segment);
+    prev = segment;
+  }
+  return node;
+}
 function todayDateline() {
   const now = new Date();
   const [y, m, d, w] = [now.getFullYear(), now.getMonth(), now.getDate(), now.getDay()];
@@ -11124,10 +11147,22 @@ function todayCity() {
   svg.append(roofs, wins, lamps, horizon);
   return svg;
 }
-/** The sky: up to forty of the learner's own saved words, due ones bright with a 朱 dot, set in
- * three drifting depths around the day's word once the room has its measure. Mouse and touch
- * open the word; the keyboard reaches the same words in the rows below, so the sky is aria-hidden. */
-function todaySky(dayWord, today) {
+/** A content word worth a star: kanji-bearing, two to four characters, and an entry the sheet opens. */
+const TODAY_SKY_WORD = /\p{Script=Han}/u;
+function todaySkyWord(w) {
+  const n = [...String(w || '')].length;
+  return n >= 2 && n <= 4 && TODAY_JA_WORD.test(w) && TODAY_SKY_WORD.test(w) && !!lookup(w);
+}
+let todaySkyPool = null;
+/** At most this many stars: a sky, not a scatter (round 4 review). */
+const TODAY_SKY_CAP = 10;
+/** The sky over Today (round 4, T1): a window onto the whole universe of words, never empty, in
+ * its own band between the title and the day's word (the header stays clean). Three lanes, far to
+ * near: far words and two single kanji float by along the top; his due words and the day's
+ * reading sway in the middle; the day's word's family waits nearest the word. A word opens that
+ * word; open sky in the band opens the universe itself (todayOpenUniverse). Mouse and touch only:
+ * the keyboard has the labelled door to the universe and the same saved words in the rows below. */
+function todaySky(dayWord, today, readPick) {
   const sky = el('div', 'today-sky');
   sky.setAttribute('aria-hidden', 'true');
   const dueNow = new Set((today?.order || []).map((item) => srsKey(item.t, item.id)));
@@ -11141,75 +11176,162 @@ function todaySky(dayWord, today) {
     (dueNow.has(srsKey(item.t, item.id)) ? due : rest).push(item);
   }
   const r = todayRng(todayHash(dayKey()));
-  for (let i = rest.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(r() * (i + 1));
-    [rest[i], rest[j]] = [rest[j], rest[i]];
-  }
-  const stars = [...due.slice(0, 14).map((item) => ({ item, due: true })), ...rest.map((item) => ({ item, due: false }))].slice(0, 40);
-  const layers = [1, 2, 3].map((depth) => {
-    const layer = el('div', 'today-sky-layer');
-    layer.dataset.depth = String(depth);
-    return layer;
+  const shuffle = (list) => {
+    for (let i = list.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(r() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  };
+  shuffle(rest);
+  const take = (list, n) => {
+    const out = [];
+    for (const w of list) {
+      if (out.length >= n) break;
+      if (!seen.has(w) && todaySkyWord(w)) { seen.add(w); out.push(w); }
+    }
+    return out;
+  };
+  const family = take(todayKanji(dayWord).flatMap((c) => (D.kanjiWords?.[c] || []).slice(0, 4)), 3);
+  const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 4);
+  todaySkyPool ||= Object.keys(D.words || {}).filter((w) => D.words[w]?.jlpt && [...w].length <= 3 && TODAY_SKY_WORD.test(w));
+  const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 3);
+  // "words and kanji floating by" (his Renzo opening screen): two single kanji from today's
+  // reading drift with the far words, large and faint, each one a door to its own page
+  const glyphs = [...new Set(reading.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2);
+  // five lanes, top to bottom, far and middle depths interleaved so the field reads as a sky, not
+  // rows: two far lanes (a kanji and a far word each) float by; two middle lanes hold his due words
+  // before the day's reading and one of his other words; the day's word's own family waits in the
+  // lane nearest the word. Each lane lists its stars in the order their places are given.
+  const g = glyphs.map((kanji) => ({ kanji, kind: 'glyph' }));
+  const f = fill.map((word) => ({ word, kind: 'far' }));
+  const mid = [...due.slice(0, 3).map((item) => ({ item, kind: 'due' })), ...reading.map((word) => ({ word, kind: 'read' })),
+    ...rest.slice(0, 1).map((item) => ({ item, kind: 'mine' }))];
+  const lanes = [
+    [g[0], f[1], f[2]].filter(Boolean),
+    mid.filter((_, i) => i % 2 === 0),
+    [f[0], g[1]].filter(Boolean),
+    mid.filter((_, i) => i % 2 === 1),
+    family.map((word) => ({ word, kind: 'kin' })),
+  ];
+  sky.todayLanes = lanes.map((list, li) => {
+    const lane = el('div', 'today-sky-lane');
+    lane.dataset.lane = String(li + 1);
+    const stars = list.map(({ item, word, kanji, kind }, i) => {
+      const star = todayLearning('button', `today-star ${kind}`, item ? item.label : word || kanji);
+      star.type = 'button';
+      star.tabIndex = -1;
+      star.hidden = true;
+      star.style.setProperty('--d', `${(i % 4) * 1.7}s`);
+      star.addEventListener('click', () => go(item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word }, { invoker: star }));
+      lane.append(star);
+      return star;
+    });
+    sky.append(lane);
+    return { lane, stars };
   });
-  sky.append(...layers);
-  sky.todayStars = stars.map(({ item, due: isDue }, i) => {
-    const depth = isDue ? 3 : r() < 0.55 ? 1 : 2;
-    const star = todayLearning('button', `today-star${isDue ? ' due' : ''}`, item.label);
-    star.type = 'button';
-    star.tabIndex = -1;
-    star.dataset.depth = String(depth);
-    star.style.setProperty('--d', `${(i % 7) * 0.9}s`);
-    star.addEventListener('click', () => go(learningItemNode(item), { invoker: star }));
-    layers[depth - 1].append(star);
-    return star;
+  // open sky is the door up: a tap in the band that lands on no word rises into the universe,
+  // and the universe grows out of the point that was touched
+  sky.addEventListener('click', (event) => {
+    if (event.target.closest('.today-star')) return;
+    todayOpenUniverse({ x: event.clientX, y: event.clientY });
   });
   return sky;
 }
-/** Place the stars around what the room already holds, once it has its measure. */
+/** Up from Today's sky into the whole universe (T1). The universe grows out of the touched point
+ * (transform and opacity only, and it takes no touch while it grows); the door's Today pill at its
+ * foot is the way back down. UI only: no record, no scheduler. */
+function todayOpenUniverse(from) {
+  keepScroll();
+  closeWorldPicker();
+  S.captureOpen = false;
+  S.stack = [];
+  S.navOpen = false;
+  S.view = 'drift';
+  const root = document.documentElement;
+  if (from && Number.isFinite(from.x) && Number.isFinite(from.y)) {
+    root.style.setProperty('--arrive-x', `${Math.round(from.x)}px`);
+    root.style.setProperty('--arrive-y', `${Math.round(from.y)}px`);
+  }
+  root.dataset.arrive = 'sky';
+  render();
+  window.scrollTo(0, 0);
+  clearTimeout(todayOpenUniverse.settle);
+  todayOpenUniverse.settle = setTimeout(() => {
+    delete root.dataset.arrive;
+    root.style.removeProperty('--arrive-x');
+    root.style.removeProperty('--arrive-y');
+  }, 700);
+}
+/** Lay the lanes into the sky's band once the room has its measure. Places are shared nearest lane
+ * first (the day's family, then his words, then the far field), up to each lane's limit and ten in
+ * all. Each star takes a spot at random in its lane where its 44px touch area meets no other (so
+ * the field scatters across five heights instead of standing in rows), and the far lanes' stars are
+ * set to float by on one ring per lane, so stars of one lane never meet. */
 function todayPlaceSky(hero) {
   const sky = hero.querySelector('.today-sky');
-  if (!sky?.isConnected || !sky.todayStars?.length) return;
-  const R = hero.getBoundingClientRect();
-  if (!R.width) return;
-  const box = (node) => {
-    const b = node.getBoundingClientRect();
-    return { x: b.left - R.left - 8, y: b.top - R.top - 6, w: b.width + 16, h: b.height + 12 };
-  };
-  const reserved = [...hero.querySelectorAll('.today-head > *, .dw-label, .dw-word, .dw-hook, .dw-fam, .dw-go')]
-    .filter((node) => node.getBoundingClientRect().width).map(box);
-  const sign = document.querySelector('#app > main > .room-sign');
-  if (sign) reserved.push(box(sign));
-  // the day's word keeps a clear field: no sky word inside the box from its label to its reading,
-  // widened by a glyph's breadth either side, so the hero is read before the sky
-  const label = hero.querySelector('.dw-label');
-  const word = hero.querySelector('.dw-word');
-  if (word?.getBoundingClientRect().width) {
-    const w = box(word);
-    const top = label?.getBoundingClientRect().width ? Math.min(box(label).y, w.y) : w.y;
-    const padX = 40;
-    reserved.push({ x: w.x - padX, y: top - 10, w: w.w + padX * 2, h: w.y + w.h - top + 20 });
-  }
+  if (!sky?.isConnected || !sky.todayLanes) return;
+  const R = sky.getBoundingClientRect();
+  if (!R.width || !R.height) return;
   const r = todayRng(todayHash(`${dayKey()}:sky`));
-  const placed = [];
   const W = R.width;
-  // the line card rides over the hero's last 48px and the city's roofs stand above it
-  const H = R.height - 96;
-  for (const star of sky.todayStars) {
-    const size = star.classList.contains('due') ? 20 : star.dataset.depth === '1' ? 13 : 16;
-    star.style.fontSize = `${size}px`;
-    const bw = [...star.textContent].length * size + 10;
-    const bh = size + 12;
-    star.hidden = true;
-    for (let k = 0; k < 90; k += 1) {
-      const x = 4 + r() * Math.max(1, W - 8 - bw);
-      const y = 6 + r() * Math.max(1, H - 6 - bh);
-      const b = { x, y, w: bw, h: bh };
-      if ([...reserved, ...placed].some((o) => !(b.x + b.w < o.x || o.x + o.w < b.x || b.y + b.h < o.y || o.y + o.h < b.y))) continue;
-      placed.push(b);
+  const n = sky.todayLanes.length;
+  // lane centres stand 23px inside the band, so every touch area is whole inside it
+  const pitch = (R.height - 46) / Math.max(1, n - 1);
+  // the caption that names the band sits on the near lane's right end; its whole touch area is
+  // taken, so no star's own touch area runs under it
+  const up = hero.querySelector('.today-universe')?.getBoundingClientRect();
+  const nearRight = up?.width ? Math.min(W, up.left - R.left - 6) : W;
+  const caption = up?.width ? [{ x: up.left - R.left - 4, y: up.top - R.top, w: up.width + 8, h: up.height }] : [];
+  const SIZE = { glyph: 26, due: 19, kin: 18, mine: 17, read: 16, far: 15 };
+  // per lane, top to bottom: does it float by, how far it sways each way, how many stars it keeps
+  const FLOAT = [true, false, true, false, false];
+  const SWAY = [0, 12, 0, 14, 4];
+  const LIMIT = [2, 2, 2, 2, 3];
+  const SPEED = [5, 0, 7, 0, 0];
+  const placed = [...caption];
+  let shown = 0;
+  for (const li of [4, 1, 3, 0, 2].filter((i) => i < n)) {
+    const { lane, stars } = sky.todayLanes[li];
+    const cy = 23 + li * pitch;
+    lane.style.top = `${(cy - 22).toFixed(1)}px`;
+    lane.style.height = '44px';
+    const left = FLOAT[li] ? 10 : 8 + SWAY[li];
+    const right = (li === n - 1 ? nearRight : W) - (FLOAT[li] ? 10 : 8 + SWAY[li]);
+    const kept = [];
+    for (const star of stars) {
+      star.hidden = true;
+      if (kept.length >= LIMIT[li] || shown >= TODAY_SKY_CAP) continue;
+      const kind = Object.keys(SIZE).find((k) => star.classList.contains(k)) || 'far';
+      const size = SIZE[kind];
+      const w = [...star.textContent].length * size;
+      // a touch area of at least 44 x 44 around the word that meets no other at rest
+      const hitW = Math.max(44, w + 16);
+      for (let k = 0; k < 48 && right - left >= w; k += 1) {
+        const x = left + r() * (right - left - w);
+        const box = { x: x + w / 2 - hitW / 2, y: cy - 22, w: hitW, h: 44 };
+        if (placed.some((o) => box.x < o.x + o.w && o.x < box.x + box.w && box.y < o.y + o.h && o.y < box.y + box.h)) continue;
+        placed.push(box);
+        kept.push({ star, x, w, size });
+        shown += 1;
+        break;
+      }
+    }
+    const ringW = W + Math.max(0, ...kept.map((s) => s.w)) + 48;
+    for (const { star, x, size } of kept) {
+      star.style.fontSize = `${size}px`;
       star.style.left = `${((x / W) * 100).toFixed(2)}%`;
-      star.style.top = `${y.toFixed(1)}px`;
+      star.style.top = `${(22 - size / 2).toFixed(1)}px`;
+      if (FLOAT[li]) {
+        // one ring for the whole lane: its stars move at one pace and wrap out of sight, so their
+        // spacing never changes; at rest (and with reduced motion) each sits at x
+        const start = W + 24;
+        star.style.setProperty('--from', `${(start - x).toFixed(1)}px`);
+        star.style.setProperty('--to', `${(start - ringW - x).toFixed(1)}px`);
+        star.style.setProperty('--lag', `${(-(start - x) / SPEED[li]).toFixed(2)}s`);
+        star.style.setProperty('--ring', `${(ringW / SPEED[li]).toFixed(2)}s`);
+      }
       star.hidden = false;
-      break;
     }
   }
 }
@@ -11242,13 +11364,14 @@ function renderTodayWord(pick) {
   block.append(line);
   if (hook.family) {
     block.append(el('p', 'dw-fam', hook.mine
-      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji carry it · ${hook.mine} in your words`)
-      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji carry it`)));
+      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji contain it · ${hook.mine} in your words`)
+      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji contain it`)));
   }
+  // plain words (LABELS.md, round 4): the door names where it goes, the kanji that hold this part
   const follow = el('button', 'dw-go');
   follow.type = 'button';
   follow.dataset.uiContentValue = `部品|${hook.part}`;
-  follow.append(el('span', 'dw-go-l', tx('', 'Follow')), pk(), el('span', 'dw-go-l', tx('をたどる', '')));
+  follow.append(el('span', 'dw-go-l', tx('', 'Kanji with')), pk(), el('span', 'dw-go-l', tx('を含む漢字', '')));
   follow.append(el('i', 'today-arrow'));
   follow.addEventListener('click', () => {
     // the word web, centred on the shared part; the part's own sheet when the web isn't ready
@@ -11272,7 +11395,9 @@ function renderTodayLine(today, door, read, pick) {
   const cards = today ? today.order.length : 0;
   if (today) stops.append(stop(cards ? 'stop-cards now' : 'stop-cards', cards, tx('枚のカード', cards === 1 ? 'card' : 'cards')));
   if (read) stops.append(stop(!cards ? 'stop-read now' : 'stop-read', 1, tx('本の記事', 'article')));
-  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語の散歩', 'word walk')));
+  // plain words (round 4): the third stop is the day's word the hero shows, one short name that
+  // sits on one line beside "8 cards" and "1 article" even at 320px
+  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語', 'word')));
   stops.style.setProperty('--stops', String(stops.children.length));
   card.append(stops);
   if (cards) {
@@ -11291,7 +11416,7 @@ function renderTodayLine(today, door, read, pick) {
     const then = el('button', door ? 'today-then' : 'today-then solo');
     then.type = 'button';
     then.append(el('span', 'today-then-l', door ? tx('つづいて', 'Then') : tx('今日の読み物', "Today's reading")),
-      todayLearning('span', 'today-then-title', read.passage.title));
+      todayPhrases(todayLearning('span', 'today-then-title'), read.passage.title));
     if (read.count) then.append(el('span', 'today-then-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
     then.append(el('i', 'today-arrow'));
     then.addEventListener('click', () => openPassage(read.passage.id));
@@ -11329,17 +11454,34 @@ function renderTodayDetail(today) {
   section.append(toggle, body);
   return { section, body };
 }
+/** The entry sheet's one capture button, named once: Today's empty state quotes this same label,
+ * so the two can never disagree about what the button is called (round 4 review, LABELS.md). */
+function sheetTakeLabel() {
+  return tx('覚', 'Save');
+}
 function renderTray(main) {
   const currentSurface = recordViewSurface();
   const trayToday = S.taken.length && scheduler ? todayQueue() : null;
   const pick = todayWordOfDay(trayToday);
   const readPick = todayReadPick();
   const hero = el('section', 'today-hero');
-  if (pick) hero.append(todaySky(pick.word, trayToday));
   hero.append(todayCity());
   const head = el('header', 'today-head');
   head.append(el('p', 'eyebrow today-date', todayDateline()), el('h1', 'view-title', tx('今日', 'Today')));
   hero.append(head);
+  // the header stands alone; the sky has its own band under it (round 4 review)
+  if (pick) hero.append(todaySky(pick.word, trayToday, readPick));
+  // the sky's labelled door up (T1): the same rise as a tap on open sky, for every hand and key;
+  // it carries the room's own forward arrow, not a mark that reads as leaving the app
+  const up = el('button', 'today-universe');
+  up.type = 'button';
+  up.id = 'today-universe';
+  up.append(el('span', 'today-universe-l', tx('すべての言葉へ', 'Explore all words')), el('i', 'today-arrow'));
+  up.addEventListener('click', () => {
+    const b = up.getBoundingClientRect();
+    todayOpenUniverse({ x: b.left + b.width / 2, y: b.top + b.height / 2 });
+  });
+  hero.append(up);
   if (pick) hero.append(renderTodayWord(pick));
   main.append(hero);
   requestAnimationFrame(() => todayPlaceSky(hero));
@@ -11534,8 +11676,8 @@ function renderTray(main) {
         'div',
         'sem-empty',
         tx(
-          '覚える項目はまだない。語・漢字・部品・熟語のページの「覚える」から入る。',
-          'No memorizing items yet. The Memorize button on any word, kanji, part, or idiom page adds it — this month’s list fills itself.',
+          `保存した言葉はまだない。語・漢字・熟語のページで「${sheetTakeLabel()}」を押すと、ここに並ぶ。`,
+          `Nothing saved yet. Tap ${sheetTakeLabel()} on any word, kanji or idiom, and it comes back here to review.`,
         ),
       ),
     );
@@ -28665,7 +28807,7 @@ function renderSheet(root) {
     // D23: the seal shares the foot button's state, 'taken' only for this identity's card
     const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
     const takenNow = capState ? capState === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
-    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', tx('覚', 'Save'));
+    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', sheetTakeLabel());
     capture.type = 'button';
     capture.id = 'sheet-take';
     if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
@@ -29956,8 +30098,8 @@ function renderSearchPage(main) {
  * EN/JA law holds for them too: in EN the layer's own plaque speaks English. Only the
  * invitations are mapped; the layer's record and recovery notices stay exactly as written. */
 const DRIFT_HINTS = [
-  ['ことばに触れて', 'Touch a word'],
-  ['水にふれると戻る', 'Touch the water to surface'],
+  ['ことばに触れて', 'Tap a word'],
+  ['水にふれると戻る', 'Tap the water to surface'],
   ['中心へ戻る · home', 'Back to the centre'],
 ];
 let driftHintObserver = null;
@@ -30021,11 +30163,14 @@ function buildGingaChrome(root) {
   if (S.sealWake) S.sealWake = false;
 
   // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
-  // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
-  if (S.view === 'drift' && S.taken.length && scheduler && !S.navOpen) {
-    const waiting = todayQueue().order.length;
+  // behind 集中道場) — the pill the 09-23 review asked for, its count when cards wait.
+  // Round 4 (T1, "a clean Today and stable entry point"): it is the door's one way down to
+  // Today, so it is always here and named for where it goes, whether the app just opened or the
+  // learner rose from Today's sky. The count stays its first number (the truthful-count pins).
+  if (S.view === 'drift' && !S.navOpen) {
+    const waiting = S.taken.length && scheduler ? todayQueue().order.length : 0;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
-      waiting ? `復習 ${waiting}` : '復習', waiting ? `Review · ${waiting} due` : 'Review');
+      waiting ? `今日 · 復習 ${waiting}` : '今日', waiting ? `Today · ${waiting} due` : 'Today');
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');
@@ -30344,6 +30489,29 @@ const ME_DECKS = [
   { id: 'n1', ja: 'N1の語彙', en: 'N1 vocabulary', measureJa: '想起で保持 · N1デッキ', measureEn: 'held by recall · N1 deck' },
   { id: 'senmon', ja: 'あなたの専門', en: 'Your fields', measureJa: '想起で保持 · 専門デッキ', measureEn: 'held by recall · fields deck' },
 ];
+/* His horizons (D5, 2026-10-08, in his words): the N1 he sits in July 2027 and his three fields.
+ * The JLPT is held on the first Sunday of July, so the sitting is a date this code derives, and it
+ * is labelled expected until jlpt.jp announces it. Each field counts only what he holds by recall
+ * from the fields deck's own group for it (deck.json words[].group). */
+const ME_N1_SITTING = { year: 2027, month: 6 };
+const ME_FIELDS = [
+  { id: 'mind', ja: '学習心理学', en: 'Learning psychology',
+    noteJa: '神経可塑性・学ぶことを学ぶ・人間の可能性', noteEn: 'Neuroplasticity, learning about learning, human potential' },
+  { id: 'india', ja: 'ヨーガ・仏教・ジャイナ教・ヒンドゥー教の歴史', en: 'Yoga, Buddhism, Jain and Hindu history',
+    noteJa: '日本の歴史に根ざし、現代の脳科学につながる', noteEn: 'Rooted in Japanese history, tied to modern neuroscience' },
+  { id: 'ai', ja: '半導体・AI・投資', en: 'Semiconductors, AI and investing',
+    noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
+];
+/** The July sitting: the first Sunday of July in the goal year, local midnight. */
+function meN1Sitting() {
+  const first = new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1);
+  return new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1 + ((7 - first.getDay()) % 7));
+}
+/** Whole days from today to the sitting: 0 on the day, negative once it has passed. */
+function meDaysToSitting(now = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((meN1Sitting() - today) / 86400000);
+}
 const ME_MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 /** session only: how many months back the seal calendar is turned */
 let meMonthBack = 0;
@@ -30369,8 +30537,12 @@ function meDeckWords(id, onReady) {
       : fetch(new URL(`decks/${id}/deck.json`, document.baseURI)).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`deck ${id} ${r.status}`))));
     meDeckIndex.set(id, got.then((deck) => {
       const cards = new Map();
-      for (const w of deck.words || []) for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '' });
-      const index = { cards, total: (deck.words || []).length };
+      const groups = {};
+      for (const w of deck.words || []) {
+        if (w.group) groups[w.group] = (groups[w.group] || 0) + 1;
+        for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '', group: w.group || '' });
+      }
+      const index = { cards, total: (deck.words || []).length, groups };
       meDeckIndex.set(id, index);
       return index;
     }, () => {
@@ -30441,15 +30613,27 @@ function meReadUnaided() {
 }
 function meHorizons(decks) {
   const rows = [];
-  for (const h of ME_DECKS) {
-    const d = decks.find((x) => x.id === h.id);
+  // words held by recall in a deck's ledger, optionally only the cards a test keeps
+  const heldIn = (d, keep) => {
     const held = new Set();
-    for (const [cardId, rec] of Object.entries(d.ledger?.cards || {})) {
-      const word = d.index?.cards.get(cardId)?.word || cardId.slice(0, cardId.lastIndexOf('-'));
+    for (const [cardId, rec] of Object.entries(d?.ledger?.cards || {})) {
+      const card = d.index?.cards.get(cardId);
+      if (keep && !(card && keep(card))) continue;
+      const word = card?.word || cardId.slice(0, cardId.lastIndexOf('-'));
       if (rec && rec.state === 2 && !owns(d.ledger.suspended || {}, cardId)) held.add(word);
     }
-    rows.push({ id: h.id, ja: h.ja, en: h.en, n: held.size, of: d.index?.total ?? null, begun: !!d.ledger,
-      measure: tx(h.measureJa, h.measureEn) });
+    return held.size;
+  };
+  const [n1Deck, fieldsDeck] = ME_DECKS.map((h) => decks.find((x) => x.id === h.id));
+  rows.push({ id: 'n1', ja: ME_DECKS[0].ja, en: ME_DECKS[0].en, n: heldIn(n1Deck), of: n1Deck?.index?.total ?? null,
+    begun: !!n1Deck?.ledger, measure: tx(ME_DECKS[0].measureJa, ME_DECKS[0].measureEn) });
+  for (const f of ME_FIELDS) {
+    // a begun deck is split by field only once its words have arrived: until then it says so
+    const counting = !!fieldsDeck?.ledger && !fieldsDeck.index;
+    rows.push({ id: `field-${f.id}`, field: f, ja: f.ja, en: f.en, counting,
+      n: counting ? 0 : heldIn(fieldsDeck, (card) => card.group === f.id),
+      of: fieldsDeck?.index?.groups?.[f.id] ?? null, begun: !!fieldsDeck?.ledger,
+      measure: tx(ME_DECKS[1].measureJa, ME_DECKS[1].measureEn) });
   }
   const kk = D.kanken || {};
   const met = new Set();
@@ -30576,46 +30760,99 @@ function meSection(part, ja, en, aside) {
   sec.append(head);
   return sec;
 }
-function meHorizonsPart(decks) {
-  const sec = meSection('horizons', '四つの地平', 'Four horizons');
-  for (const h of meHorizons(decks)) {
-    const row = el('div', 'me-hz');
-    row.dataset.horizon = h.id;
-    if (!h.begun) row.classList.add('not-begun');
-    const top = el('div', 'me-hz-top');
-    top.append(el('span', 'me-hz-name', tx(h.ja, h.en)));
-    const figure = el('span', 'me-hz-n');
-    figure.append(el('b', '', h.begun ? meNum(h.n) : '—'));
-    if (h.of && h.begun) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
-    top.append(figure);
-    const rule = el('div', 'me-hz-rule');
-    rule.setAttribute('aria-hidden', 'true');
-    if (h.of && h.met) {
-      const met = el('i', 'me-hz-met');
-      met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
-      rule.append(met);
-    }
-    const fill = el('i', 'me-hz-fill');
-    fill.style.setProperty('--f', h.of ? Math.min(1, h.n / h.of).toFixed(4) : '0');
-    rule.append(fill);
-    const sub = el('p', 'me-hz-sub');
-    if (!h.begun) sub.textContent = {
-      saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
-      kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
-    }[h.id] || tx('まだ始めていない · 学ぶの部屋にある', 'not begun · the deck is in Learn');
-    else {
-      sub.append(el('span', '', h.measure));
-      if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
-    }
-    row.append(top, rule, sub);
-    sec.append(row);
+/** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー) and never
+ * before its 中黒 (|・テクノロジー): each phrase, with the mark that ends it, is one unbreakable piece. */
+function meBreakable(tag, cls, text) {
+  const node = el(tag, cls);
+  for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
+  return node;
+}
+/** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
+function meHorizonRow(h, { quiet = false } = {}) {
+  const row = el('div', 'me-hz');
+  row.dataset.horizon = h.id;
+  if (!h.begun) row.classList.add('not-begun');
+  const shown = h.begun && !h.counting;
+  const top = el('div', 'me-hz-top');
+  top.append(meBreakable('span', 'me-hz-name', tx(h.ja, h.en)));
+  const figure = el('span', 'me-hz-n');
+  figure.append(el('b', '', shown ? meNum(h.n) : '—'));
+  if (h.of && shown) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
+  top.append(figure);
+  row.append(top);
+  if (h.field) row.append(meBreakable('p', 'me-hz-note', tx(h.field.noteJa, h.field.noteEn)));
+  const rule = el('div', 'me-hz-rule');
+  rule.setAttribute('aria-hidden', 'true');
+  if (h.of && h.met) {
+    const met = el('i', 'me-hz-met');
+    met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
+    rule.append(met);
   }
+  const fill = el('i', 'me-hz-fill');
+  fill.style.setProperty('--f', h.of && shown ? Math.min(1, h.n / h.of).toFixed(4) : '0');
+  rule.append(fill);
+  const sub = el('p', 'me-hz-sub');
+  if (!h.begun) sub.textContent = {
+    saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
+    kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
+    n1: tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
+  }[h.id] || tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+  else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
+  else {
+    sub.append(el('span', '', h.measure));
+    if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
+  }
+  row.append(rule);
+  if (!quiet) row.append(sub);
+  return row;
+}
+/** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
+function meN1Plate(h) {
+  const plate = el('div', 'me-n1');
+  const head = el('div', 'me-n1-head');
+  head.append(el('span', 'me-n1-seal', 'N1'),
+    el('span', 'me-n1-when', tx(`${ME_N1_SITTING.year}年${ME_N1_SITTING.month + 1}月`, `${ME_MONTHS_EN[ME_N1_SITTING.month]} ${ME_N1_SITTING.year}`)));
+  plate.append(head);
+  const days = meDaysToSitting();
+  const sitting = meN1Sitting();
+  const count = el('p', 'me-n1-count');
+  if (days > 0) {
+    const n = el('b', 'me-n1-days', meNum(days));
+    if (bi()) count.append(n, el('span', 'me-n1-unit', days === 1 ? 'day to the test' : 'days to the test'));
+    else count.append(el('span', 'me-n1-unit', 'あと'), n, el('span', 'me-n1-unit', '日'));
+  } else {
+    count.classList.add('is-done');
+    count.append(el('span', 'me-n1-unit', days === 0
+      ? tx('今日が試験の日', 'The test is today')
+      : tx(`${ME_N1_SITTING.year}年7月の試験は過ぎた`, `The July ${ME_N1_SITTING.year} test has passed`)));
+  }
+  plate.append(count);
+  if (days >= 0) {
+    plate.append(el('p', 'me-n1-date', tx(
+      `試験日 ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
+      `Test expected Sun ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()].slice(0, 3)} ${sitting.getFullYear()}`)));
+  }
+  plate.append(meHorizonRow(h));
+  return plate;
+}
+function meHorizonsPart(decks) {
+  const sec = meSection('horizons', '目標', 'Your goals');
+  const rows = meHorizons(decks);
+  sec.append(meN1Plate(rows.find((h) => h.id === 'n1')));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
+  const fields = rows.filter((h) => h.field);
+  // until the fields deck is opened, the three fields say so once, not three times
+  const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
+  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn')));
+  for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
+  for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
   return sec;
 }
 function meCameHomePart(decks, active) {
   const home = meCameHome(decks);
   if (!home.length && !active) return null;
-  const sec = meSection('mended', '戻ってきた言葉', 'Came home', tx('金で継いだ', 'mended in gold'));
+  const sec = meSection('mended', '取り戻した語', 'Words you won back');
   if (!home.length) {
     sec.append(el('p', 'me-quiet', tx('忘れた言葉をもう一度思い出すと、ここに金で継がれる。',
       'When a word slips and you win it back, it is mended here in gold.')));
@@ -30732,7 +30969,7 @@ function meLinePart() {
 }
 /** 奥付: the back of the book — the two everyday switches, then every setting */
 function meBackPart() {
-  const sec = meSection('back', '奥付', 'At the back of the book');
+  const sec = meSection('back', '設定', 'Settings');
   const row = (ja, en, seg) => {
     const r = el('div', 'me-set');
     r.append(el('span', 'me-set-l', tx(ja, en)), seg);
@@ -30835,7 +31072,7 @@ function renderMe(main) {
   book.append(meSealsPart(days, first));
   const line = meLinePart();
   if (line) book.append(line);
-  const contents = meSection('contents', '目次', 'Inside the book');
+  const contents = meSection('contents', 'もっと見る', 'More');
   const doors = el('div', 'foundation-doors me-doors');
   doors.append(
     foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
@@ -30868,7 +31105,7 @@ function renderMe(main) {
   }
 }
 function renderSettings(main) {
-  main.append(el('p', 'eyebrow me-kicker', tx('奥付', 'At the back of the book')));
+  main.append(el('p', 'eyebrow me-kicker', tx('私', 'Me')));
   main.append(el('h1', 'view-title', tx('設定', 'Settings')));
   const language = el('section', 'foundation-section');
   language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
