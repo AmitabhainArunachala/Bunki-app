@@ -1,0 +1,202 @@
+{
+ "cards": [
+  {
+   "term": "上善は水の如し",
+   "reading": "じょうぜんはみずのごとし",
+   "pos": "expression",
+   "meaning": "the highest good is like water",
+   "defJa": "最も優れたあり方を水になぞらえた老子の言葉",
+   "passage": {
+    "ja": "水は高い所を競って奪わず、低い所へ流れ、さまざまなものを潤します。老子の上善は水の如しという言葉は、その姿を手掛かりに、争わずに働くあり方を説く表現です。禅の話と並べて紹介されることもありますが、中国の思想に由来する言葉を、もともと仏典の一節だったかのように扱うことはできません。日本の仏教に親しむ中で似た響きの言葉に出会ったら、共鳴する点を味わうとともに、どの文献から来たかを確かめると、思想同士の対話をより丁寧に楽しめます。",
+    "form": "上善は水の如し",
+    "en": "Water moves toward low places and nourishes things instead of competing for the highest position. Laozi’s expression that the highest good is like water uses that image to describe effective action without contention. Although sometimes presented alongside Zen, it comes from Chinese thought rather than originally being a Buddhist scriptural line. Appreciating resonances while checking sources makes encounters between these traditions more meaningful for readers of Japanese Buddhism.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "出典を老子と示し、禅の言葉との類似と由来の違いを両立させる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "上座部仏教",
+   "reading": "じょうざぶぶっきょう",
+   "pos": "noun",
+   "meaning": "Theravāda Buddhism",
+   "defJa": "パーリ語の経典を重んじる仏教の一系統",
+   "passage": {
+    "ja": "日本の寺院を基準に仏教全体を想像すると、別の地域の実践を例外として扱いがちになる。上座部仏教はスリランカや東南アジアなどに伝わる重要な系統で、パーリ語の経典を重んじ、出家者と在家の人々の関係もそれぞれの社会で育まれてきた。古い教えを受け継ぐという位置付けと、歴史の中で全く変化しなかったという主張とは区別される。日本の大乗仏教と比べるにあたっても、優劣を一言で決めるより、経典、修行、社会との関わりという複数の面から読むことが理解を深める。",
+    "form": "上座部仏教",
+    "en": "Using Japanese temples as the model for all Buddhism can make other regions’ practices seem exceptional. Theravada is a major tradition transmitted in Sri Lanka and Southeast Asia, valuing Pali scriptures and developing local relationships between renunciants and householders. Preserving early teachings differs from claiming complete historical immutability. Comparing scriptures, practices, and social relationships with Japanese Mahayana is more illuminating than ranking the traditions in a single phrase.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「上座部仏教の伝統」。古さと、歴史の中で変化しないことを混同しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不殺生",
+   "reading": "ふせっしょう",
+   "pos": "noun",
+   "meaning": "non-killing (precept)",
+   "defJa": "生き物の命を奪わないという戒め",
+   "passage": {
+    "ja": "虫を見つけたら、すぐ潰す前に外へ逃がそうとする人もいるよね。不殺生は、生き物の命を奪わないという戒めで、仏教やジャイナ教の実践を考えるときにも大事な言葉なんだ。ただ、同じ言葉を大切にしていても、出家者と在家の人では守り方が違うし、宗教ごとに細かな考え方も異なる。食べ物の選び方だけで相手の信仰を全部判断せず、その人がどんな命に注意を向け、生活の中でどう工夫しているかを聞くと、一つの戒めにもいろいろな実践があることが分かるよ。",
+    "form": "不殺生",
+    "en": "Someone finding an insect may try to carry it outside before crushing it. Non-killing is a precept important in both Buddhist and Jain practice. Yet its application differs among religions and between renunciants and householders. Asking which lives people attend to and how they organize daily life reveals more than judging their entire faith by food choices alone.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「不殺生の戒めを守る」。共通する言葉と実践の違いを同時に示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不立文字",
+   "reading": "ふりゅうもんじ",
+   "pos": "noun",
+   "meaning": "not relying on words",
+   "defJa": "悟りを文字の説明だけに依存させないという禅の立場",
+   "passage": {
+    "ja": "「文字は要らない」と見出しにすると、禅寺で経典を読み、語録を残してきた歴史とぶつかります。不立文字を説明する文章では、悟りを文字の説明だけに置き換えないという方向を示せば、読むこと自体の禁止とは区別できます。地図を熟読しても歩いた経験とは同じにならない、という比喩は役立ちますが、それは地図を捨てる命令ではありません。短い紹介文でも、「だけ」をどこに置くかに注意すると、実践を重んじる教えが、知識を軽んじる標語へ変わってしまうのを防げます。",
+    "form": "不立文字",
+    "en": "A headline declaring words unnecessary clashes with Zen’s history of reading scriptures and preserving recorded sayings. Explaining transmission beyond words as refusing to replace awakening with verbal explanation distinguishes it from banning reading itself. A map is not the experience of walking, but that does not instruct anyone to discard maps. Careful placement of only keeps a concise account of practice from becoming a slogan against knowledge.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「文字だけに頼らない」と「文字を使わない」の違いを示している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "中道",
+   "reading": "ちゅうどう",
+   "pos": "noun",
+   "meaning": "the Middle Way",
+   "defJa": "偏った両極端を離れる仏教の実践や考え方",
+   "passage": {
+    "ja": "対立する二つの案の平均を取れば、仏教の教えを実行したことになるわけではない。中道は、快楽への没頭と過酷な苦行など、偏った両極端を離れる道を表し、文献によっては存在についての極端な見方を避ける議論にも用いられる。どの二つを離れるのかを示さず、ほどほどに暮らすという日常の心得だけに縮めると、教義の内容は曖昧になる。修行の説明で使われているのか、ものの存在を論じる文脈なのかを確かめることで、同じ短い語が担う役割の違いを読み取れる。",
+    "form": "中道",
+    "en": "Averaging two opposing proposals does not automatically enact a Buddhist teaching. The middle way avoids extremes such as sensual indulgence and severe asceticism, and some texts also use it to reject extreme views of existence. Reducing it to everyday moderation without naming the extremes obscures the doctrine. Its role becomes clearer by distinguishing practical instruction from arguments about being.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「中道を歩む」。単なる平均や妥協ではなく、離れるべき両極を示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不二一元論",
+   "reading": "ふにいちげんろん",
+   "pos": "noun",
+   "meaning": "Advaita Vedānta, the doctrine of non-dualism",
+   "defJa": "自己と世界の根本の同一性を説くインドの思想",
+   "passage": {
+    "ja": "自分と世界の間にあると思っていた境界を問い直す思想は、日常のものの見方を揺さぶる。不二一元論では、究極の実在であるブラフマンと自己の根底にあるアートマンが同一であると説かれ、その認識が解放と結び付けられる。これは、ただ人々が仲良くすれば一つになれるという道徳上の提案ではなく、存在と認識についての主張である。仏教の無我と対話させるなら、似た瞑想体験の語りだけを並べるのではなく、何を自己として認めるかという、最も近く見えて異なる点に踏み込むことになる。",
+    "form": "不二一元論",
+    "en": "A philosophy questioning the apparent boundary between self and world unsettles ordinary perception. Advaita identifies ultimate Brahman with the underlying atman and connects recognizing that identity with liberation. This is a claim about being and knowledge rather than merely a moral proposal that people should get along. Dialogue with Buddhist no-self therefore involves examining what counts as self, beyond similarities in accounts of meditation.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「不二一元論を説く」。対立を避ける態度ではなく、自己と実在の教説。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "中観派",
+   "reading": "ちゅうがんは",
+   "pos": "noun",
+   "meaning": "the Madhyamaka school",
+   "defJa": "縁起に基づき固定的な実体を否定する大乗仏教の学派",
+   "passage": {
+    "ja": "机を指して、これが何にも頼らずそれだけで存在するのかと問うと、材料や人の働きとの関係が見えてきます。龍樹に結び付けられる中観派は、空の思想を通じて、ものに独立した固定的な本質があるという見方を批判しました。何も存在しないと言い切ることではなく、条件によって現象が成り立つ縁起との関係を押さえることが重要です。日本で親しまれる仏教語を学ぶ際にも、空という一字から空っぽの箱を想像するより、何に依存して成り立つかという問いへ進む方が議論の筋に近づきます。",
+    "form": "中観派",
+    "en": "Asking whether a table exists independently reveals its relations with materials and human work. Madhyamaka, associated with Nagarjuna, uses emptiness to criticize fixed independent essence. Understanding its relationship with dependent arising matters more than declaring that nothing exists. When studying Buddhist vocabulary used in Japan, asking about dependence leads closer to the argument than imagining an empty container.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「中観派の空の思想」。虚無と区別し、縁起との関係を押さえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "主客未分",
+   "reading": "しゅかくみぶん",
+   "pos": "noun",
+   "meaning": "undivided subject and object (Nishida)",
+   "defJa": "知る主体と知られる対象がまだ分かれていないこと",
+   "passage": {
+    "ja": "美しい音に聞き入っている瞬間には、聞く自分と聞かれる音とをわざわざ分けていないことがある。西田哲学で論じられる主客未分という表現は、そうした区別に先立つ経験を考える手掛かりとなる。禅の体験との関係を読むにしても、脳のどこかから自己が消えたという測定上の出来事へ、そのまま置き換えることはできない。後から言葉で経験を述べると、すでに主体と対象の区別を使ってしまうという難しさに、この短い語をめぐる哲学の面白さがある。",
+    "form": "主客未分",
+    "en": "Absorption in a beautiful sound can occur without explicitly separating listener from sound. Nishida’s expression for the undivided subject and object helps examine experience prior to that distinction. Even in relation to Zen, it cannot simply be recast as a measured disappearance of self from a brain region. The difficulty that later verbal description already employs subject and object gives the expression its philosophical interest.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「主客未分の経験」。主体と対象を分ける前という視点で読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不生不滅",
+   "reading": "ふしょうふめつ",
+   "pos": "noun",
+   "meaning": "neither arising nor ceasing",
+   "defJa": "本来的には生じも滅びもしないという仏教の表現",
+   "passage": {
+    "ja": "目の前の花が咲いて散るのに、生まれも消えもしないと言われると矛盾に感じます。大乗仏教の不生不滅を読むときは、日常に見える変化と、ものが独立した実体として成立するかという問いを分けることが手掛かりになります。条件によって生じる現象を否定しているのか、その現象に固定した本体を置く見方を否定しているのかで、理解は大きく違います。文献ごとの説明を確かめながら、まず何が否定されているかを文の中で囲んでおくと、単なる不老不死の話として読む誤りを避けられます。",
+    "form": "不生不滅",
+    "en": "A flower blooming and falling seems to contradict a claim of neither arising nor ceasing. Reading this Mahayana expression benefits from distinguishing ordinary change from independent intrinsic existence. Denying conditional phenomena differs greatly from rejecting a fixed essence behind them. Identifying exactly what each text negates helps avoid mistaking the phrase for a claim of physical immortality.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "変化の否定か、独立した実体の否定かを区別して読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

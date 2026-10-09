@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "一元論",
+   "reading": "いちげんろん",
+   "pos": "noun",
+   "meaning": "monism",
+   "defJa": "世界の根本を一つの原理や実在に求める立場",
+   "passage": {
+    "ja": "多様なものの背後に、究極には一つの根本があると考えると、世界の見取り図は大きく変わる。一元論は、そのように存在の根本を一つに求める立場を指すが、何をその一つとするかまで決めた単独の教義ではない。インドのアドヴァイタを読む際も、この広い分類名と、ブラフマンと自己の関係を説く具体的な議論とは区別したい。同じ分類に収まる思想であっても、日常の違いをどう説明し、どのような修行へ向かうかを比べれば、共有する輪郭の内側にある距離が見えてくる。",
+    "form": "一元論",
+    "en": "Positing a single ultimate ground beneath diversity changes the map of the world. Monism names that general position without itself determining what the single ground is. Reading Indian Advaita requires distinguishing this broad classification from its specific account of Brahman and self. Comparing how different monisms explain ordinary differences and direct practice reveals distances within their shared outline.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「一元論の立場」。分類名と、個別の思想の内容とを分けている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

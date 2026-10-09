@@ -1,0 +1,202 @@
+{
+ "cards": [
+  {
+   "term": "三宝",
+   "reading": "さんぼう",
+   "pos": "noun",
+   "meaning": "the Three Jewels",
+   "defJa": "仏とその教えと修行者の集まりという三つの拠り所",
+   "passage": {
+    "ja": "仏像だけを見て信仰の仕組みを説明すると、教えを伝える言葉と人の集まりが背景に退いてしまう。仏教で帰依の対象となる三宝は、仏、法、僧という三つを指し、目覚めた者と教えと修行する共同体を結び付ける。寺院の活動を調べる際も、建物や像に加えて、何が読まれ、どのように学びが受け継がれているかを見ることが意味を持つ。宗教を個人の心の中だけに置く見方から少し離れると、信仰が言葉と共同体の両方によって支えられている構造が浮かび上がる。",
+    "form": "三宝",
+    "en": "Explaining faith solely through images pushes teachings and communities into the background. Buddhism’s Three Jewels of refuge are Buddha, Dharma, and Sangha, connecting awakening, teaching, and the practicing community. Investigating a temple therefore involves what is read and how learning is transmitted as well as buildings and images. Looking beyond religion as something solely within an individual reveals the roles of language and community.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「三宝に帰依する」。仏・法・僧という三つを一組として捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "三界",
+   "reading": "さんがい",
+   "pos": "noun",
+   "meaning": "the three realms (desire, form, formless)",
+   "defJa": "仏教で欲界と色界と無色界をまとめた呼び名",
+   "passage": {
+    "ja": "仏教の宇宙観を「三つの世界」とだけ訳すと、地図を三つに切ったように読まれることがあります。三界を説明するなら、欲界、色界、無色界という区分を示し、欲望や物質的なあり方との関係で整理された教義上の枠組みだと補えます。現代の天文学が区切る宇宙の領域と同じものとして書けば、文献が何を問題にしているかを外してしまいます。坐禅や瞑想の説明とともに現れる場合も、修行の段階や境地との関係を読み取ってから訳語を選ぶと、空間だけの話に狭まらずに済みます。",
+    "form": "三界",
+    "en": "Translating Buddhist cosmology merely as three worlds may suggest cutting a map into three sections. The three realms of desire, form, and formlessness are clearer when identified as a doctrinal framework related to desire and material existence. Equating them with regions distinguished by astronomy misses the text’s concerns. In accounts of meditation, examining their relationship with contemplative states before choosing a translation avoids reducing them to physical space.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「三界を出る」。天文学上の場所ではなく、教義の区分として説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一切衆生悉有仏性",
+   "reading": "いっさいしゅじょうしつうぶっしょう",
+   "pos": "noun",
+   "meaning": "all sentient beings have buddha-nature",
+   "defJa": "すべての生き物に仏となる性質があるとする教え",
+   "passage": {
+    "ja": "難しい漢字が続く教えは、まず主語と述語を分けると読みやすくなります。一切衆生悉有仏性という大乗仏教の言葉では、すべての生き物が主語になり、仏となる性質を持つという内容が述べられています。ただし、今の行いが何でも正しいとか、修行する意味がないという結論を、そこからすぐ導くことはできません。人を現在の失敗だけで見切らない見方と、その人が現にどう生きるかという問いを並べて考えると、生まれつき備わるものと実践との関係が学習の焦点になります。",
+    "form": "一切衆生悉有仏性",
+    "en": "A teaching composed of difficult characters becomes easier when its subject and predicate are separated. This Mahayana expression states that all living beings possess the nature of Buddhahood. It does not immediately follow that every present action is right or that practice is pointless. Considering both the refusal to judge someone solely by current failures and the question of how they live focuses study on the relationship between what is inherent and what is practiced.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "長い句を、すべての生き物と仏性を有するという構造に分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "三密",
+   "reading": "さんみつ",
+   "pos": "noun",
+   "meaning": "the three mysteries (body, speech, mind)",
+   "defJa": "密教で仏の身と口と意に対応する三つの働き",
+   "passage": {
+    "ja": "手を組み、声を出し、心に像を描くとき、身体と言葉と意識は別々の作業として切り離されてはいない。密教の三密は、身と口と意という三つの働きを、仏の働きとの関係で捉える教えである。姿勢だけをまねれば十分だとも、頭の中で意味を理解すればすべて済むとも言えず、修行ではそれぞれを結び付けることが重視される。身体と心の関係を扱う現代の研究と比較する際にも、共に複数の働きを見るという点と、仏との関わりを説く教義上の意味とは分けて考えたい。",
+    "form": "三密",
+    "en": "Hand gestures, recitation, and visualization connect body, language, and awareness rather than isolating them. The three mysteries of esoteric Buddhism understand bodily, verbal, and mental activity in relation to the Buddha’s activity. Practice therefore emphasizes their integration rather than mere imitation of posture or intellectual comprehension. Comparison with contemporary mind-body research should distinguish shared attention to multiple functions from the doctrine’s specifically Buddhist meaning.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「三密の修行」。身・口・意を仏との関係で捉える語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一即一切",
+   "reading": "いっそくいっさい",
+   "pos": "noun",
+   "meaning": "one is all",
+   "defJa": "一つのものと全体が隔てなく関わるという華厳の教え",
+   "passage": {
+    "ja": "「小さな物にも世界が入っている」と書くと、容器の中へ物を詰め込むような像が浮かびます。華厳の一即一切を紹介するときは、一つの存在を他のすべてとの関係から捉える教えとして、物理的な大きさの話と分けて示すとよいでしょう。たとえば食卓の一椀から、人の働きや土地や水との関わりをたどる説明は、関係を考える入口になります。ただし、その例だけで教義のすべてを言い尽くしたとせず、比喩が何を照らし、何を説明していないかを短く添えると、文章の飛躍を抑えられます。",
+    "form": "一即一切",
+    "en": "Saying the world fits inside a small object can evoke stuffing things into a container. Introducing the Huayan teaching of one being all is clearer when relationships are distinguished from physical size. Tracing a bowl of food through people, land, and water offers an entry into relational thinking. Briefly stating what the analogy illuminates and what it leaves unexplained prevents it from being mistaken for the entire doctrine.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "華厳の表現を、容積の話ではなく一と全体の関係として説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "三法印",
+   "reading": "さんぼういん",
+   "pos": "noun",
+   "meaning": "the three seals of the Dharma",
+   "defJa": "仏教の特徴を示す三つの根本的な教え",
+   "passage": {
+    "ja": "似た名前の教えが続くと、数だけ覚えて中身を取り違えがちです。日本の仏教で三法印を学ぶときは、諸行無常、諸法無我、涅槃寂静という三つを、それぞれ何について述べているかと合わせて整理します。移り変わること、独立して変わらない自己がないこと、煩悩の火が静まることは、同じ意味の言い換えではありません。伝統によってまとめ方に違いがある点も押さえつつ、具体的な経験の例と教義上の説明を別々に書くと、短い漢語の列が思想の見取り図になります。",
+    "form": "三法印",
+    "en": "Similar doctrinal names can tempt learners to remember only their numbers. Studying the three seals in Japanese Buddhism involves distinguishing impermanence, no-self, and the peace of nirvana. Change, the absence of an independent unchanging self, and the calming of defilements are not interchangeable statements. Recognizing differences among traditions while separating experiential examples from doctrinal explanations turns a row of compact terms into a conceptual map.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "三つの教えを同義語として暗記せず、それぞれが何を述べるかを分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一切皆苦",
+   "reading": "いっさいかいく",
+   "pos": "noun",
+   "meaning": "all is suffering",
+   "defJa": "移ろうものは確かな満足の拠り所にならないとの教え",
+   "passage": {
+    "ja": "楽しい時間もあるのに、仏教が何もかも苦しいと言うなら、変な話だと思うよね。一切皆苦は、どんな瞬間にも痛みを感じるという意味に限らず、変わるものに変わらない満足を求めても、その通りにはならないという問題を示すんだ。好きな人と過ごす喜びがあっても、その時間をずっと止めておくことはできないし、失うのが怖くなることもある。喜びそのものを否定する話として閉じず、何に頼って安心しようとしているかという問いに戻すと、教えの向かう先が少し分かるよ。",
+    "form": "一切皆苦",
+    "en": "If Buddhism says everything is painful despite enjoyable moments, that can sound strange. The teaching that all is suffering concerns not only felt pain but the impossibility of securing unchanging satisfaction from changing things. Time with someone beloved can be joyful even though it cannot be frozen and may bring fear of loss. Returning to what we depend on for security, rather than treating the teaching as a denial of joy, clarifies its direction.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「苦」を感覚の痛みに狭めず、満足の不安定さから読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一如",
+   "reading": "いちにょ",
+   "pos": "noun",
+   "meaning": "oneness, non-duality",
+   "defJa": "区別を越えて一つであること",
+   "passage": {
+    "ja": "波を一つずつ数えることはできても、水を離れて波だけを取り出すことはできません。一如という仏教の言葉は、分けて見えるものが究極には隔てられないという意味で使われ、日常の区別をそのまま絶対視しない見方を示します。とはいえ、この比喩から、人々の違いや相手の痛みを無視してよいという結論が出るわけではありません。教えの中でどの区別が問題にされているのかを確かめながら読むと、何でも同じだと言い切る言葉ではなく、分け方を問い直す語として受け取れます。",
+    "form": "一如",
+    "en": "Waves can be counted individually, but a wave cannot be removed from water. Oneness in Buddhist usage points to the ultimate inseparability of what appears divided, questioning the absoluteness of ordinary distinctions. This analogy does not imply that differences among people or another person’s pain may be ignored. Examining which distinction a teaching questions makes the term an inquiry into division rather than a claim that everything is simply identical.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「一如と捉える」。何の区別を越えるのかを文脈から確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "三毒",
+   "reading": "さんどく",
+   "pos": "noun",
+   "meaning": "the three poisons",
+   "defJa": "仏教で貪りと怒りと無知をまとめていう語",
+   "passage": {
+    "ja": "欲しい物が手に入らなくて腹が立つと、相手の事情まで考える余裕がなくなることってあるよね。仏教の三毒は、貪りと怒りと無知という、心を苦しめる三つをまとめた呼び名で、日常の反応を振り返る手掛かりにもなるんだ。怒った自分を責め続けるだけでは、次に同じことが起きたとき、何に気付けばよいかが分からない。何を求め、何に反発し、どこを見落としたかと分けてみると、一つの不機嫌の中にも別々の動きがあることを、少し落ち着いて眺められるよ。",
+    "form": "三毒",
+    "en": "When you cannot get something you want, anger can leave little room for considering another person’s circumstances. Buddhism’s three poisons name greed, anger, and ignorance, offering a way to reflect on everyday reactions. Merely blaming yourself for anger does not show what to notice next time. Separating what you sought, resisted, and overlooked helps reveal different movements within one irritated mood.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「三毒に惑わされる」。三つの要素を身近な反応に分けて示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
