@@ -224,7 +224,7 @@ for (const engine of engines) for (const width of sizes) {
       await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
       const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
       await item.locator('.shelf-open').click(); await page.locator('#reader .tok[data-index="9"][data-word="窓"]').click();
-      await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
+      await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
       await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
       await page.locator('#sentence-production-text').fill('  私の部屋の窓を開けます。\n e\u0301 🚀  ');
       await page.locator('#sentence-production-save').click(); await waitForAppRecord(page, r => r.sentencePractice.responses.length === 1);
@@ -248,7 +248,7 @@ for (const engine of engines) for (const width of sizes) {
     await suggestion('new-context').click(); await atToken(120, '駅で待つ時間');
     // the reader opens on the focused word; Enter opens its popup, whose last row practises the sentence (reader lane 2026-10-02)
     await page.keyboard.press('Enter'); await page.locator('#mini').waitFor();
-    await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('later-choice-neutral')); await page.locator('#sentence-practice-confirm').click();
     await page.locator('#sentence-review-start').waitFor();
     const enrolled = await snapshot('later-explicit-practice');

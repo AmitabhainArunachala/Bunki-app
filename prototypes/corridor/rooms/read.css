@@ -434,98 +434,7 @@ html[data-room='reader'] .listen-row .play-pending::after {
 @keyframes read-rain { from { transform: translate3d(0, -12%, 0); } to { transform: translate3d(-4%, 0, 0); } }
 @keyframes read-lamp { from { opacity: 0.78; } to { opacity: 1; } }
 
-/* ---------- the quick look: a lifted slip that rises on a spring ---------- */
-html[data-room='reader'] body #mini {
-  border: 1px solid var(--color-line);
-  border-radius: 14px;
-  background: var(--color-paper);
-  box-shadow: var(--elevation-float);
-  /* the slip rises and settles: a damped spring on translate only. No scale and no overshoot, because
-     placeFloating measures the popup's box as it opens, and a scaled box would be placed too wide */
-  animation: read-mini-rise 280ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
-}
-@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
-html[data-room='reader'] body #mini .mini-word { font-family: var(--font-headword); font-weight: 800; color: var(--color-ink); }
-html[data-room='reader'] body #mini .mini-reading { font-family: var(--font-reading); color: var(--color-accent); }
-html[data-room='reader'] body #mini .mini-gloss { font-size: 17px; color: var(--color-ink); }
-html[data-room='reader'] body #mini .mini-web { display: grid; gap: 0; margin: 10px 0 0; border-top: 1px solid var(--color-line); }
-html[data-room='reader'] body #mini .mini-kanji { display: grid; }
-html[data-room='reader'] body #mini .mini-kanji-row {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  align-items: center;
-  column-gap: 12px;
-  min-height: 52px;
-  padding: 6px 0;
-  border: 0;
-  border-bottom: 1px solid var(--color-line-soft);
-  background: transparent;
-  color: var(--color-ink);
-  text-align: start;
-  cursor: pointer;
-}
-html[data-room='reader'] body #mini .mini-kanji-glyph {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--color-edge-strong);
-  border-radius: var(--radius-small);
-  background: var(--color-surface);
-  box-shadow: var(--elevation-paper);
-  font: 800 24px/1 var(--font-headword);
-}
-html[data-room='reader'] body #mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
-html[data-room='reader'] body #mini .mini-kanji-meaning { font: 600 14px/1.3 var(--font-ui); }
-html[data-room='reader'] body #mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
-html[data-room='reader'] body #mini .mini-kanji-part { font: 500 17px/1.3 var(--font-reading); color: var(--color-accent); }
-html[data-room='reader'] body #mini .mini-kanji-part-name { font: 12.5px/1.3 var(--font-reading); color: var(--color-ink-2); }
-html[data-room='reader'] body #mini .mini-kanji-plus { font: 12px/1 var(--font-data); color: var(--color-muted); }
-html[data-room='reader'] body #mini .mini-cards {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 4px;
-  margin: 6px 0 0;
-}
-html[data-room='reader'] body #mini .mini-cards-label {
-  margin-right: 4px;
-  font: 600 11px/1.3 var(--font-ui);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-html[data-room='reader'] body:not(.ui-bi) #mini .mini-cards-label { letter-spacing: 0.08em; }
-html[data-room='reader'] body #mini .mini-card-word {
-  min-height: 44px;
-  padding: 0 6px;
-  border: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font: 600 17px/1 var(--font-reading);
-  text-decoration: underline;
-  text-decoration-color: var(--color-gold);
-  text-underline-offset: 0.3em;
-  cursor: pointer;
-}
-html[data-room='reader'] body #mini .mini-web-open {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 44px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-live);
-  font: 600 15px/1.2 var(--font-ui);
-  cursor: pointer;
-}
-html[data-room='reader'] body #mini :is(.mini-kanji-row, .mini-card-word, .mini-web-open):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-@media (hover: hover) {
-  html[data-room='reader'] body #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
-  html[data-room='reader'] body #mini .mini-web-open:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-}
+/* the quick look (the word popup) is drawn by the round-4 block at the end of this file, in every room */
 
 @media (max-width: 520px) {
   /* the woodblock runs to both edges and up to the chrome */
@@ -652,7 +561,8 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .view-title-en {
 html[data-room='reader'] body[data-view='reader'] #app > main .reader-head > .reader-meta {
   display: block;
   padding-top: 12px;
-  font: 400 11px/1.75 var(--font-data);
+  /* one face and one size, in English and in 日本語 (round 4 T4: the line mixed mono and sans) */
+  font: 400 12px/1.7 var(--font-ui);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
   text-transform: none;
@@ -676,7 +586,7 @@ html[data-room='reader'] .reader-head > .reader-meta .reader-source { font: inhe
 html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-source { font-family: var(--font-ui); }
 html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
-html[data-room='reader'] .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font-size: 11.5px; line-height: 1.2; }
+html[data-room='reader'] #app > main .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font: inherit; line-height: 1.2; }
 /* 未確認 is an honest small mark in the line, not a grey pill */
 html[data-room='reader'] .reader-head > .reader-meta .status-chip {
   min-height: 0;
@@ -824,11 +734,802 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   animation-name: read-text-settle;
 }
 
-/* ---------- the quick look on a phone: centred, its two gutters equal ---------- */
+
+/* =====================================================================================
+   ROUND 4, T5 (John: "it all bledns together! It lacks modularity, it lacks contrast, texture, depth,
+   separtion, user ease, emotional depth, sharp contrast, and stand out clarity"). The word popup is a
+   raised card of separate bands, in every room it opens in:
+     1. the word band: a lacquer cartouche, the word in light ink, its reading in lantern gold, faint
+        青海波 waves for texture, "Full entry ›" in its corner;
+     2. one path: Save (a note says where it goes), then "Add to a list" beside "Saved ✓";
+     3. the kanji band: a sunk band, labelled, its tiles raised on it;
+     4. the sentence band: one named door, "Study this sentence ›", which opens the sentence in the card.
+   Colours are the skin's roles (--color-*) mixed per band; nothing here persists anything.
+   ===================================================================================== */
+:root body:not([data-view='drift']) #mini {
+  --mini-paper: color-mix(in srgb, var(--color-surface) 55%, #fffefb);
+  --mini-band: color-mix(in srgb, var(--color-ground) 36%, var(--mini-paper));
+  --mini-head: var(--color-lacquer, #141a28);
+  --mini-head-2: var(--color-lacquer-2, #1d2638);
+  --mini-head-ink: #f3ecdd;
+  --mini-head-ink-2: color-mix(in srgb, #f3ecdd 78%, var(--mini-head));
+  --mini-gold: #e5c27a;
+  --mini-edge: color-mix(in srgb, var(--color-ink) 26%, transparent);
+  --mini-rule: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --mini-press: cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 360px;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--mini-edge);
+  border-radius: 16px;
+  background: var(--mini-paper);
+  /* a tight contact shadow, and a deep shade that falls away from the word the card describes (the card
+     sits 10px from its word; a long drop shadow across it would dim the word and its reading) */
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 0 0 0.5px rgb(20 24 34 / 6%), 0 3px 8px -3px rgb(20 24 34 / 26%),
+    0 14px 40px -12px rgb(20 24 34 / 32%);
+  color: var(--color-ink);
+  cursor: auto;
+  /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens) */
+  animation: read-mini-rise 260ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+}
+@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini {
+  --mini-paper: color-mix(in srgb, var(--color-paper) 93%, #ffffff);
+  --mini-band: color-mix(in srgb, var(--color-ground) 64%, var(--mini-paper));
+  --mini-head: color-mix(in srgb, var(--color-ground) 48%, #000000);
+  --mini-head-2: color-mix(in srgb, var(--color-ground) 72%, #000000);
+  --mini-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  --mini-rule: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
+    0 16px 48px -14px rgb(0 0 0 / 62%);
+}
+/* above its word, the deep shade lifts upward, off the word and its reading */
+:root body:not([data-view='drift']) #mini[data-side='above'] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 0 0 0.5px rgb(20 24 34 / 6%), 0 3px 8px -3px rgb(20 24 34 / 26%),
+    0 -14px 40px -12px rgb(20 24 34 / 32%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini[data-side='above'] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
+    0 -16px 48px -14px rgb(0 0 0 / 62%);
+}
+
+/* 1. the word band */
+:root body[data-view] #mini .mini-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: 6px; }
+:root body[data-view] #mini .mini-head-text { display: grid; gap: 2px; min-width: 0; }
+:root body[data-view] #mini .mini-head .mini-entry .mini-entry-label { display: inline-flex; align-items: center; gap: 5px; }
+:root body:not([data-view='drift']) #mini .mini-head {
+  position: relative;
+  padding: 10px 8px 11px 18px;
+  background-color: var(--mini-head);
+  background-image: linear-gradient(180deg, var(--mini-head-2), var(--mini-head) 72%);
+  color: var(--mini-head-ink);
+  isolation: isolate;
+}
+/* 青海波: Hokusai's waves, faint, behind the band's right; the word stands clear of them */
+:root body:not([data-view='drift']) #mini .mini-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 100% 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
+    radial-gradient(circle at 0 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
+    radial-gradient(circle at 50% 100%, var(--mini-head) 10%, var(--mini-gold) 10% 12%, var(--mini-head) 12% 23%, var(--mini-gold) 23% 25%,
+      var(--mini-head) 25% 36%, var(--mini-gold) 36% 38%, var(--mini-head) 38% 49%, var(--mini-gold) 49% 51%, transparent 51%);
+  background-size: 44px 22px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 40%, #000 94%);
+  mask-image: linear-gradient(100deg, transparent 40%, #000 94%);
+}
+:root body:not([data-view='drift']) #mini .mini-word {
+  padding: 0;
+  overflow-wrap: anywhere;
+  font: 800 30px/1.15 var(--font-headword, var(--display));
+  letter-spacing: 0.02em;
+  color: var(--mini-head-ink);
+}
+:root body:not([data-view='drift']) #mini .mini-reading {
+  font: 500 17px/1.3 var(--font-reading, var(--serif));
+  letter-spacing: 0.06em;
+  color: var(--mini-gold);
+}
+:root body:not([data-view='drift']) #mini .mini-gloss {
+  margin: 2px 0 0;
+  font: 500 17px/1.35 var(--font-ui, var(--sans));
+  color: var(--mini-head-ink);
+}
+:root body:not([data-view='drift']) #mini .mini-gloss.mini-miss { font-weight: 400; color: var(--mini-head-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -6px 0 0;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--mini-head-ink);
+  font: 600 14px/1 var(--font-ui, var(--sans));
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry .mini-entry-label {
+  padding: 7px 10px 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--mini-head-ink) 36%, transparent);
+  border-radius: 999px;
+}
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry .mini-entry-chevron { font-weight: 700; }
+:root body:not([data-view='drift']) #mini .mini-head .mini-entry:disabled { color: var(--mini-head-ink-2); cursor: default; }
+
+/* why a word can't be saved here, and the door to the card that holds its spelling: plain lines on paper */
+:root body:not([data-view='drift']) #mini .mini-take-reason { display: block; margin: 0; padding: 12px 18px 0; font: 400 13.5px/1.45 var(--font-ui); color: var(--color-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-take-open { align-self: flex-start; min-height: 44px; margin: 6px 14px 0; }
+
+/* 2. one path: Save, then Add to a list */
+:root body:not([data-view='drift']) #mini .mini-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 8px 14px;
+  background: var(--mini-paper);
+}
+:root body:not([data-view='drift']) #mini .mini-take {
+  position: static;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
+  border-radius: 12px;
+  background: var(--color-accent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 1px 2px rgb(20 24 34 / 18%);
+  color: #fbf8f1;
+  font: 650 16px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-take.taken {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--mini-paper));
+  box-shadow: none;
+  color: var(--color-accent);
+}
+:root body:not([data-view='drift']) #mini .mini-take.reader-capture-held {
+  border: 1px dashed var(--mini-edge);
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-ink-2);
+  cursor: help;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #mini .mini-take:not(.taken):not(.reader-capture-held) {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, #ffffff);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 1px 2px rgb(0 0 0 / 40%);
+  color: #0b1220;
+}
+:root body:not([data-view='drift']) #mini .mini-take-note { flex: 1 1 auto; min-width: 0; font: 400 13.5px/1.3 var(--font-ui); color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-lists {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: 1px solid var(--mini-edge);
+  border-radius: 12px;
+  background: var(--mini-paper);
+  box-shadow: 0 1px 0 var(--mini-rule);
+  color: var(--color-ink);
+  font: 600 15px/1 var(--font-ui);
+  text-decoration: none;
+  cursor: pointer;
+  animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+}
+@keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
+:root body[data-view] #mini :is(.mini-lists, .mini-take-note, .mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
+
+/* 3. the kanji band */
+:root body:not([data-view='drift']) #mini .mini-web {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0 12px 4px 16px;
+  border-top: 1px solid var(--mini-rule);
+  border-bottom: 1px solid var(--mini-rule);
+  background: var(--mini-band);
+}
+:root body:not([data-view='drift']) #mini .mini-band-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 36px; }
+:root body:not([data-view='drift']) #mini .mini-band-label {
+  margin: 0;
+  font: 600 11px/1.3 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+:root body:not([data-view='drift']):not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
+:root body:not([data-view='drift']) #mini .mini-kanji { display: grid; }
+:root body:not([data-view='drift']) #mini .mini-kanji-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  min-height: 48px;
+  padding: 3px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mini-rule);
+  background: transparent;
+  color: var(--color-ink);
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-kanji-row:last-child { border-bottom: 0; }
+:root body:not([data-view='drift']) #mini .mini-kanji-glyph {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+  border-radius: 8px;
+  background: var(--mini-paper);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 5px -1px rgb(20 24 34 / 22%);
+  color: var(--color-ink);
+  font: 800 24px/1 var(--font-headword);
+}
+:root body:not([data-view='drift']) #mini .mini-kanji-what { display: grid; gap: 2px; min-width: 0; }
+:root body:not([data-view='drift']) #mini .mini-kanji-meaning { font: 600 14px/1.3 var(--font-ui); }
+:root body:not([data-view='drift']) #mini .mini-kanji-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+:root body:not([data-view='drift']) #mini .mini-kanji-part { font: 500 17px/1.3 var(--font-reading); color: var(--color-accent); }
+:root body:not([data-view='drift']) #mini .mini-kanji-part-name { font: 12.5px/1.3 var(--font-reading); color: var(--color-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-kanji-part-name.mini-kanji-part-meaning { font: 500 12.5px/1.3 var(--font-ui); letter-spacing: 0; }
+:root body:not([data-view='drift']) #mini .mini-kanji-plus { font: 12px/1 var(--font-data); color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-cards { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; margin: 6px 0 0; }
+:root body:not([data-view='drift']) #mini .mini-cards-label { margin-right: 4px; font: 600 11px/1.3 var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-card-word {
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 600 17px/1 var(--font-reading);
+  text-decoration: underline;
+  text-decoration-color: var(--color-gold);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-web-open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin-right: -6px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-accent);
+  font: 600 14.5px/1.2 var(--font-ui);
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-web-open .mini-entry-chevron { font-weight: 700; }
+
+/* 4. the sentence band: one named door; its pane holds the sentence and two plain choices */
+:root body:not([data-view='drift']) #mini .mini-sentence-wrap { margin: 0; padding: 0; border: 0; background: var(--mini-paper); }
+:root body:not([data-view='drift']) #mini .mini-sentence-open {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  padding: 7px 16px 8px 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-open-text { display: grid; gap: 3px; min-width: 0; }
+:root body:not([data-view='drift']) #mini .mini-sentence-label { margin: 0; font: 650 15.5px/1.25 var(--font-ui); color: var(--color-ink); }
+:root body:not([data-view='drift']) #mini .mini-sentence-quote {
+  overflow: hidden;
+  font: 400 14px/1.45 var(--font-reading);
+  color: var(--color-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+:root body:not([data-view='drift']) #mini :is(.mini-sentence-chevron, .mini-sentence-action-chevron) { font: 700 20px/1 var(--font-ui); color: var(--color-muted); }
+:root body:not([data-view='drift']) #mini .mini-sentence-pane { padding: 2px 14px 14px 16px; animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards; }
+:root body:not([data-view='drift']) #mini .mini-sentence-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin: 0 0 0 -6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-accent);
+  font: 600 15px/1 var(--font-ui);
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-back-chevron { font: 700 20px/1 var(--font-ui); }
+/* the pane's name is for a screen reader; the quoted sentence shows what it is */
+:root body:not([data-view='drift']) #mini .mini-sentence-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-full {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--mini-band);
+  font: 400 16px/1.7 var(--font-reading);
+  color: var(--color-ink);
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-word {
+  padding: 0 1px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-gold, #94702a) 26%, transparent);
+  box-shadow: inset 0 -2px 0 var(--color-signal);
+  color: inherit;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
+:root body:not([data-view='drift']) #mini .mini-sentence-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'name chevron' 'hint chevron';
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 2px;
+  width: 100%;
+  min-height: 58px;
+  margin: 0;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid var(--mini-edge);
+  border-radius: 12px;
+  background: var(--mini-paper);
+  box-shadow: 0 1px 0 var(--mini-rule), 0 4px 10px -8px rgb(20 24 34 / 40%);
+  color: var(--color-ink);
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-action-name { grid-area: name; font: 650 15.5px/1.2 var(--font-ui); color: var(--color-accent); }
+:root body:not([data-view='drift']) #mini .mini-sentence-action-hint { grid-area: hint; font: 400 13px/1.3 var(--font-ui); color: var(--color-ink-2); text-wrap: balance; }
+:root body:not([data-view='drift']) #mini .mini-sentence-action-chevron { grid-area: chevron; }
+:root body:not([data-view='drift']) #mini .mini-sentence-action:disabled { opacity: 0.55; cursor: default; }
+/* the sentence's own Save: a quiet row under the two choices, one hairline above it */
+:root body:not([data-view='drift']) #mini .mini-sentence-keep {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  width: 100%;
+  min-height: 44px;
+  margin: 10px 0 0;
+  padding: 11px 2px 2px;
+  border: 0;
+  border-top: 1px solid var(--mini-rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-accent);
+  text-align: start;
+  cursor: pointer;
+}
+:root body:not([data-view='drift']) #mini .mini-sentence-keep-name { font: 600 15px/1.25 var(--font-ui); color: var(--color-accent); }
+:root body:not([data-view='drift']) #mini .mini-sentence-keep-hint { font: 400 13px/1.3 var(--font-ui); color: var(--color-ink-2); }
+:root body:not([data-view='drift']) #mini .mini-sentence-keep:disabled { opacity: 0.55; cursor: default; }
+:root body:not([data-view='drift']) #mini .mini-status { margin: 0; padding: 0 18px; font: 13px/1.5 var(--font-ui); color: var(--color-ink); }
+:root body:not([data-view='drift']) #mini .mini-status:empty { display: none; }
+/* the sentence's own view: the word band stays as context; the word's controls step aside */
+:root body:not([data-view='drift']) #mini.is-sentence :is(.mini-actions, .mini-web, .mini-take-reason, .mini-take-open) { display: none; }
+:root body:not([data-view='drift']) #mini.is-sentence .mini-head { padding-block: 8px; align-items: center; }
+:root body:not([data-view='drift']) #mini.is-sentence .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+:root body:not([data-view='drift']) #mini.is-sentence .mini-word { font-size: 24px; }
+:root body:not([data-view='drift']) #mini.is-sentence :is(.mini-reading, .mini-gloss) { margin: 0; font-size: 15px; }
+
+/* a narrow phone (320–360): the same bands, set tighter, so the card still fits above its word; every
+   target keeps its 44px */
+@media (max-width: 360px) {
+  :root body:not([data-view='drift']) #mini .mini-head { padding: 8px 6px 9px 14px; }
+  :root body:not([data-view='drift']) #mini .mini-word { font-size: 26px; }
+  :root body:not([data-view='drift']) #mini :is(.mini-reading, .mini-gloss) { font-size: 15px; }
+  :root body:not([data-view='drift']) #mini .mini-actions { padding: 6px 12px; gap: 6px 10px; }
+  :root body:not([data-view='drift']) #mini .mini-take { min-width: 96px; padding: 0 14px; }
+  :root body:not([data-view='drift']) #mini .mini-take-note { font-size: 12.5px; }
+  :root body:not([data-view='drift']) #mini .mini-web { padding: 0 10px 2px 14px; }
+  :root body:not([data-view='drift']) #mini .mini-band-head { height: 32px; }
+  :root body:not([data-view='drift']) #mini .mini-kanji-row { min-height: 44px; padding: 2px 0; }
+  :root body:not([data-view='drift']) #mini .mini-kanji-glyph { width: 36px; height: 36px; font-size: 21px; }
+  :root body:not([data-view='drift']) #mini .mini-sentence-open { min-height: 46px; padding: 5px 12px 6px 14px; }
+  :root body:not([data-view='drift']) #mini .mini-sentence-quote { font-size: 13px; }
+}
+
+/* press: every control answers the finger at once; focus is a clear ring */
+:root body:not([data-view='drift']) #mini :is(.mini-take, .mini-lists, .mini-entry, .mini-web-open, .mini-sentence-open, .mini-sentence-back, .mini-sentence-action, .mini-sentence-keep, .mini-kanji-row, .mini-card-word) {
+  transition: transform 90ms var(--mini-press);
+}
+:root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: scale(0.97); }
+:root body:not([data-view='drift']) #mini :is(.mini-sentence-open, .mini-kanji-row, .mini-sentence-keep):active:not(:disabled) { transform: none; background-color: var(--mini-rule); }
+:root body:not([data-view='drift']) #mini :is(button, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+:root body:not([data-view='drift']) #mini .mini-head :is(button):focus-visible { outline-color: var(--mini-gold); }
+@media (hover: hover) {
+  :root body:not([data-view='drift']) #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
+  :root body:not([data-view='drift']) #mini :is(.mini-web-open, .mini-sentence-back):hover,
+  :root body:not([data-view='drift']) #mini .mini-sentence-keep:hover .mini-sentence-keep-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  :root body:not([data-view='drift']) #mini .mini-head .mini-entry:hover .mini-entry-label { border-color: var(--mini-gold); }
+  :root body:not([data-view='drift']) #mini :is(.mini-sentence-open, .mini-sentence-action):hover { background-color: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
+}
+
+/* the toast is its own lacquer slip: what just happened, and the way back, never melted into the page */
+:root body:not([data-view='drift']) .reader-toast {
+  border: 1px solid color-mix(in srgb, #f3ecdd 16%, transparent);
+  border-radius: 14px;
+  background: var(--color-lacquer, #141a28);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 18%), 0 16px 34px -10px rgb(0 0 0 / 50%);
+  color: #f3ecdd;
+}
+:root body:not([data-view='drift']) .reader-toast .reader-toast-action { color: #e5c27a; text-decoration-color: color-mix(in srgb, #e5c27a 60%, transparent); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .reader-toast {
+  border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 30%, transparent);
+  background: color-mix(in srgb, var(--color-ground) 45%, #000000);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root body:not([data-view='drift']) #mini,
+  :root body:not([data-view='drift']) #mini :is(.mini-lists, .mini-sentence-pane) { animation: none; }
+  :root body:not([data-view='drift']) #mini :is(button):active:not(:disabled) { transform: none; }
+}
+
+/* =====================================================================================
+   ROUND 4, T4 (John: "the top header, the background of the picture, th etitle, the subtitle, the
+   explanaiton (that is too verbose and.. confusing) and the artile itslef, and the bottom are all the
+   exact same make me wanna puke beige"). Every layer of the reader has its own surface and edge:
+     the print → mounted on a dark lacquer mat with a keyline, never fading into the page;
+     the title card → raised paper in front of the mat: the title in near-black, its English line in
+       藍, the instrument line, the version switch as a segmented control, and one plain line of help;
+     the text → its own smooth paper, edged at the top, under the card.
+   Reading sizes, ruby and leading are the pinned ones; only surfaces, edges and inks change.
+   ===================================================================================== */
+html[data-room='reader'] body:not([data-view='drift']) {
+  --reader-mat: color-mix(in srgb, var(--color-lacquer, #141a28) 90%, var(--color-accent));
+  --reader-mat-edge: rgb(255 255 255 / 16%);
+  --reader-card: color-mix(in srgb, var(--color-surface) 30%, #ffffff);
+  --reader-card-edge: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  --reader-paper: color-mix(in srgb, var(--color-paper) 62%, #fffdf6);
+  /* the paper's top edge is a real ink line (verify-relief: an edge of at least 25% ink, with a lifting shadow) */
+  --reader-paper-edge: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --reader-ink: color-mix(in srgb, var(--color-ink) 90%, #000000);
+  --reader-track: color-mix(in srgb, var(--color-ink) 9%, var(--reader-card));
+  /* the page's own washi, fainter: kōzo fibre and a fine grain on the reading paper, the grain alone on the
+     title card (painted once, never animated; the text keeps its ink-on-paper contrast) */
+  --reader-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .31 0 0 0 0 .23 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .065 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --reader-card-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) {
+  --reader-mat: color-mix(in srgb, var(--color-ground) 40%, #000000);
+  --reader-mat-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 42%, transparent);
+  --reader-card: color-mix(in srgb, var(--color-paper) 94%, #ffffff);
+  --reader-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 32%, transparent);
+  --reader-paper: color-mix(in srgb, var(--color-ground) 70%, #000000);
+  --reader-paper-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 36%, transparent);
+  --reader-ink: var(--color-ink);
+  --reader-track: color-mix(in srgb, var(--color-ground) 55%, var(--reader-card));
+  /* night: a faint fibre of light through the paper */
+  --reader-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --reader-card-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* the print on its mat */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
+  margin: 0 0 4px;
+  padding: 10px 10px 34px;
+  border-radius: var(--radius-card, 8px);
+  background: var(--reader-mat);
+  -webkit-mask-image: none;
+  mask-image: none;
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 6%);
+}
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-img {
+  /* a phone shows the print as a band, never a sliver; the first sentence still opens on the first screen (R3) */
+  height: clamp(136px, calc(100svh - 700px - var(--nav-clearance, 0px)), 280px);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--reader-mat-edge), 0 8px 18px -8px rgb(0 0 0 / 70%);
+}
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-caption {
+  inset: 18px 18px auto auto;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: rgb(10 12 18 / 74%);
+  color: #f3ecdd;
+}
+/* night: the lamp and the rain fall on the print, not on its mat */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::before {
+  inset: 10px 10px 34px;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-gold, #e2bd6c) 20%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero::after {
+  clip-path: inset(calc(60% + 10px) 10px 34px 10px);
+}
 @media (max-width: 520px) {
-  html[data-room='reader'] body #mini {
-    width: calc(100vw - 32px);
-    min-width: 0;
-    max-width: none;
+  html[data-room='reader'] body:not(.zen):not([data-view='drift']) #app > main > .reader-hero {
+    margin: calc(-1 * var(--s2, 16px)) calc(50% - 50vw) 0;
+    border-radius: 0;
+  }
+}
+
+/* while the text settings are open the print folds to a slim band on its mat, at every width, so the
+   panel does not push the article's first words under the tab bar (the phone already did this) */
+html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero { padding-bottom: 30px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero .reader-picture-img { height: 44px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main:has(> .dials) > .reader-hero .reader-picture-caption { display: none; }
+
+/* the title card: raised paper in front of the mat */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 12px;
+  padding: 14px 16px 4px;
+  border: 1px solid var(--reader-card-edge);
+  border-radius: 14px;
+  background: var(--reader-card-grain), var(--reader-card);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
+  color: var(--reader-ink);
+}
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero + .reader-card { margin-top: -26px; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
+}
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title {
+  position: static;
+  margin: 0 0 4px;
+  font: 800 clamp(26px, 3vw, 34px)/1.4 var(--font-headword);
+  letter-spacing: 0.01em;
+  color: var(--reader-ink);
+  word-break: auto-phrase;
+  line-break: strict;
+  text-wrap: pretty;
+}
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en {
+  margin: 0 0 2px;
+  padding: 1px 0 1px 10px;
+  border-left: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
+  font: 500 15px/1.45 var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-accent);
+}
+/* the instrument line sits under a hairline in the card; the settings icon keeps its corner */
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head {
+  position: relative;
+  display: block;
+  margin: 8px 0 4px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
+}
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-head > .reader-meta { padding-top: 8px; }
+html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head > .dials-toggle {
+  position: absolute;
+  top: 0;
+  right: -10px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-muted);
+}
+/* the version switch: a sunk track and a raised chosen side, its ⓘ at the track's end */
+html[data-room='reader'] #app > main > .reader-card .version-block { margin: 6px 0 8px; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--reader-track);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 12%);
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice {
+  flex: 1 1 0;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  /* the brief's 44px floor: each side is a 44px box, so the sunk track stands 48px */
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-ink-2);
+  font: 600 14px/1.2 var(--font-ui);
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice + .version-choice { padding-left: 8px; }
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice[aria-pressed='true'] {
+  background: var(--reader-card);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 1px 3px rgb(20 24 34 / 22%), 0 0 0 0.5px rgb(20 24 34 / 12%);
+  color: var(--reader-ink);
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help { flex: 0 0 auto; margin: 0; }
+/* a narrow phone (320): each side sets its level under its name, so "Simplified · N3" never breaks at its dot */
+@media (max-width: 340px) {
+  html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice { flex-direction: column; flex-wrap: nowrap; gap: 1px; padding: 3px 4px; line-height: 1.15; }
+  html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice .version-level { font-size: 11.5px; line-height: 1.1; }
+  html[data-room='reader'] #app > main > .reader-card .version-toggle .version-choice .version-dot { display: none; }
+}
+html[data-room='reader'] #app > main > .reader-card .version-toggle .version-help > summary { width: 44px; height: 44px; min-height: 44px; }
+/* the one plain line of help, at the card's foot */
+html[data-room='reader'] body #app > main > .reader-card > #reader-tip.reader-tip {
+  margin: 0 -16px;
+  padding: 2px 6px 0 16px;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
+}
+html[data-room='reader'] body #app > main > .reader-card > #reader-tip .reader-tip-text { font: 400 13px/1.4 var(--font-ui); color: var(--color-ink-2); }
+/* The shared control styles transition colour; reader highlights change instantly, like the word card. */
+html[data-room='reader'] body #app > main > .reader-card .icon-button {
+  transition: transform 90ms ease-out;
+}
+html[data-room='reader'] body #app > main > .reader-card .icon-button:active { transform: scale(0.97); }
+html[data-room='reader'] body #app > main .chip { transition: transform 140ms var(--ease); }
+html[data-room='reader'] body:not(.zen) #app > .chrome > button,
+html[data-room='reader'] body:not(.zen) #app > .chrome .lang-seg button::before,
+html[data-room='reader'] body #app > .primary-tabs .primary-tab,
+html[data-room='reader'] body #app > main .seg button { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='reader'] body #app > main > .reader-card .icon-button,
+  html[data-room='reader'] body #app > main .chip { transition: none; }
+  html[data-room='reader'] body #app > main > .reader-card .icon-button:active { transform: none; }
+}
+
+/* the room is the page itself (washi): the mat, the card and the paper lie on it as separate things */
+:root[data-room='reader'] body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main {
+  background: transparent;
+  box-shadow: none;
+}
+/* the text on its own paper (both selectors: the layered variant's older rule names body.v-depth-layered) */
+html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
+html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
+  padding: 16px var(--s2, 16px) 28px;
+  border-top: 1px solid var(--reader-paper-edge);
+  border-radius: 0;
+  background: var(--reader-grain), var(--reader-paper);
+  box-shadow: inset 0 10px 12px -12px rgb(20 24 34 / 24%);
+  color: var(--reader-ink);
+}
+@media (max-width: 520px) {
+  html[data-room='reader'] body.v-depth-layered:not([data-view='drift']) main #reader.reader,
+  html[data-room='reader'] body:not([data-view='drift']) main #reader.reader { margin-inline: calc(50% - 50vw); padding-inline: var(--s2, 16px); }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title { font-size: 23px; line-height: 1.38; }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: 14px; line-height: 1.4; }
+}
+
+/* =====================================================================================
+   ROUND 4, the shelf's lead (the common thread: separation instead of one beige). The lead story is
+   the reader's own composition in miniature: the woodblock, and in front of it a raised card holding
+   its level, kicker, headline, English line, first sentence and date. Text stays exactly as it was.
+   ===================================================================================== */
+html[data-room='shelf'] body:not([data-view='drift']) {
+  --shelf-card: color-mix(in srgb, var(--color-surface) 30%, #ffffff);
+  --shelf-card-edge: color-mix(in srgb, var(--color-ink) 18%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] body:not([data-view='drift']) {
+  --shelf-card: color-mix(in srgb, var(--color-paper) 94%, #ffffff);
+  --shelf-card-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 30%, transparent);
+}
+@media (max-width: 760px) {
+  html[data-room='shelf'] #shelf-reading-results > .story-lead .shelf-head {
+    position: relative;
+    z-index: 1;
+    margin: -30px 12px 0;
+    padding: 14px 16px 10px;
+    border: 1px solid var(--shelf-card-edge);
+    border-radius: 14px;
+    background: var(--shelf-card);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
+  }
+  :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-reading-results > .story-lead .shelf-head {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
+  }
+  /* the print's lower registration marks rise clear of the card that overlaps its foot */
+  html[data-room='shelf'] #shelf-body .story-lead .story-picture::after { inset: 12px 12px 42px; }
+  html[data-room='shelf'] #shelf-reading-results > .story-lead + .shelf-review-note { margin-top: 10px; }
+}
+/* the 読 seal: a crisp tile with a keyline; at night a lantern-gold one, so it never melts into the 藍 */
+html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0 0 1px rgb(20 24 34 / 16%), 0 2px 6px -1px rgb(20 24 34 / 28%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-gold, #e2bd6c) 45%, transparent), 0 2px 8px rgb(0 0 0 / 45%);
+}
+
+/* =====================================================================================
+   ROUND 4, T5's second step: the list sheet that "Add to a list" opens is the same material as
+   the card it came from: its paper, keyline and depth match the card, its title is set in ink,
+   and its Add is the primary button, the way Save is. Its place, size and behaviour are
+   unchanged (G5 pins them).
+   ===================================================================================== */
+:root body:not([data-view='drift']) .vocabulary-list-popover {
+  --list-paper: color-mix(in srgb, var(--color-surface) 55%, #fffefb);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 26%, transparent);
+  background: var(--list-paper);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 2px 4px rgb(20 24 34 / 10%), 0 22px 48px -10px rgb(20 24 34 / 42%);
+  color: var(--color-ink);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .vocabulary-list-popover {
+  --list-paper: color-mix(in srgb, var(--color-paper) 93%, #ffffff);
+  border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 -18px 56px -8px rgb(0 0 0 / 75%);
+}
+:root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-title {
+  margin: 0 0 8px;
+  font: 650 17px/1.35 var(--font-ui);
+  color: var(--color-ink);
+}
+:root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-empty { color: var(--color-muted); }
+:root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-field {
+  border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-ground) 30%, var(--list-paper));
+  box-shadow: inset 0 1px 2px rgb(20 24 34 / 10%);
+  color: var(--color-ink);
+}
+:root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create {
+  min-width: 72px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
+  border-radius: 12px;
+  background: var(--color-accent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 1px 2px rgb(20 24 34 / 18%);
+  color: #fbf8f1;
+  transition: transform 140ms var(--ease);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, #ffffff);
+  color: #0b1220;
+}
+:root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create:disabled { opacity: 0.55; }
+:root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create:active:not(:disabled) { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) {
+  :root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create { transition: none; }
+}
+:root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-choice { min-height: 48px; border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent); border-radius: 0; }
+@media (max-width: 560px) {
+  /* the sheet's grabber: it reads as a sheet that came up from the foot (decoration only) */
+  :root body:not([data-view='drift']) .vocabulary-list-popover { padding-top: 20px; }
+  :root body:not([data-view='drift']) .vocabulary-list-popover::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    margin-left: -18px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+    pointer-events: none;
   }
 }

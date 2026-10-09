@@ -5,22 +5,22 @@ Round 4 is John's 14 answers from the side-by-side tour (`docs/redesign/vision/J
 ## What is in this head
 Merged and tested: **skin, cards, today**. Each was built, checked by its own tests, reviewed by an independent reviewer, and had the review fixes applied. (Today's fix pass stopped while finishing; all its commits are in.)
 
-**Not merged: read** (T3, T4, T5). Its reviewer found three problems in the lane's first pass:
+**Read** (T3, T4, T5) **was finished on 10-10 and merged with the three lanes above**, after the rest of this status was written. Its reviewer had found three problems in the lane's first pass:
 1. Two record-protection assertions were dropped from `verify-vocabulary-chooser.mjs` (a weakened behavioural verifier, which the rules forbid).
 2. The reader's version switch fell to 40px, under the 44px touch floor.
 3. A `background-color` transition (motion is transform and opacity only).
 
-The fix was half-written when the limit stopped the run. It is saved, **unbuilt and untested**, on `claude/r4-read-refine-wip-20261009`; the lane's first pass is on `claude/r4-read-20261009`. So in this head the shelf seal, the reader's own layers and the word popup are still the cloud's round-3 work under the new skin.
+All three are fixed, with the rest of the reviewer's eleven fixes, on `claude/r4-read-final-20261010`, which carries the skin, cards and today head (`3d81031b`) and the read lane together. So in this head the shelf seal, the reader's own layers and the word popup are the read lane's. What was fixed, how it was checked and what is still open are in `docs/redesign/r4/read/REPORT.md`, under "Review and refine".
 
 ## Verification of this head
-Run on the merge commit `751d700b` (Chromium, 390×844, the built site's identity checked against that commit). The commits after it add only documents.
+The table below was run on the merge commit `751d700b`, before the read lane (Chromium, 390×844, the built site's identity checked against that commit). The read lane's merge was verified afterwards on its own build; its table is in `docs/redesign/r4/read/REPORT.md`, under "Final verification".
 
 | Result | Verifiers |
 |---|---|
 | **Pass (24)** | verify-corridor (259 checks), verify-corridor-storage-integrity, verify-corridor-accessibility, lint-ui-language-core, verify-relief, verify-theme-consistency (11 worlds), verify-writing-room, verify-redesign-docks (24/24), verify-redesign-foundation (6 journeys), verify-kotoba-mine, verify-n2n1-decks, verify-personal-collections, verify-dojo-door, verify-guided-session, sw-shell, test-navigation-returns, verify-srs-today, verify-today-sky (81 checks), verify-experience, verify-drift-hunt, verify-design-reader-shelf, verify-reader-doors, verify-reader-lookup, verify-playback |
 | **Fail, inherited (2)** | verify-corridor-doors (T13 only) and verify-pr77-ports (52/56). Both fail the same way on the base build. |
 
-Not run on this head: the WebKit runs, the full 230-state language tour, and GitHub's full battery.
+Not run on `751d700b`: the WebKit runs, the full 230-state language tour, and GitHub's full battery.
 
 ## Contract changes in this round (said here because the standing rule requires it)
 - `docs/srs/CARD_CONTRACT_V2.md` §4: **four grade buttons** (his decision D1), and §9: the front's chip line.
@@ -32,9 +32,9 @@ Not run on this head: the WebKit runs, the full 230-state language tour, and Git
 |---|---|
 | T1 Today and the universe | Done. Today's sky is a window onto the universe; tap the sky or "Explore all words" to rise into it; one Today door at its foot brings you back. |
 | T2 deck home, sharper | Done. "Words you looked up", the old colours and four small tiles; the frame, page and raised paper are three materials; iOS-tight presses and type. |
-| T3 the shelf seal | **Not merged** (read lane: 読 replaces 永). |
-| T4 the reader | **Partly.** The app-wide three materials are in; the reader's own layers are in the unmerged read lane. |
-| T5 the word popup | **Partly.** The top bar now says Save; the popup's redesign is in the unmerged read lane. |
+| T3 the shelf seal | Done. The seal is 読 (read), not 永. |
+| T4 the reader | Done. The app-wide three materials, and the reader's own layers: the picture's mat, the title card, the version switch and the textured reading paper each have their own surface and edge. The tip is one line. |
+| T5 the word popup | Done. The top bar says Save. The popup is a raised card of separate bands with one path (Save, then Add to a list) and one sentence door (Study this sentence). |
 | T8, T9 cards | Done. A sharper, deeper card, front and back. |
 | D1 four grades, colour-coded | Done. Again · Hard · Good · Easy, each showing its real interval. |
 | D2 both night looks | Done. 藍 and 殻 are both public worlds. |
@@ -53,6 +53,5 @@ Not run on this head: the WebKit runs, the full 230-state language tour, and Git
 6. **Small leftovers:** the header bookmark is still named "Lists"; Settings still prints "1 cards".
 
 ## What did not happen
-- The read lane's fixes and its merge.
 - The strict review of the merged build, and the fix round after it.
 - A fresh full run of GitHub's battery.

@@ -215,7 +215,9 @@ async function resumeDraft(fixture, entryId, mode) {
 }
 async function listeningPending(page) {
   const pending = page.locator('#sentence-listening-pending'); await pending.waitFor();
-  assert.match(await pending.innerText(), /^no recording yet · Kore$/u);
+  assert.equal(await pending.innerText(), 'No audio for this sentence yet');
+  assert.equal(await pending.getAttribute('aria-description'), 'Approved voices: Kore (main), Charon (second).',
+    'The pending sentence keeps the locked voice provenance in its accessible description');
   assert.equal(await page.locator('#sentence-add-listening, #sentence-listening-start').count(), 0,
     'No listening control is offered before approved Kore/Charon sentence clips exist');
 }
@@ -236,7 +238,7 @@ async function practiceFromSource(fixture, source = SOURCE, { savePlace = false 
     // one tap opens the word's popup again
     await word.click();
   }
-  await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
+  await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
   await page.locator('#sentence-choose-cloze').uncheck(); await page.locator('#sentence-choose-production').check();
   await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
   await listeningPending(page);

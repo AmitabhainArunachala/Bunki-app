@@ -1640,18 +1640,20 @@ async function main() {
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   // 2026-09-30: the voice is locked (Kore; Charon second). With no Kore clip for this article
-  // the play bar is a quiet 音声準備中 · Kore state: no play control, no picker, no device voice.
+  // the play bar explains the absence; its accessible description names the locked voices.
   await page.waitForSelector('#listen-note', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
     toggles: document.querySelectorAll('#listen-toggle, #listen-voice').length,
     note: document.querySelector('#listen-note')?.textContent ?? '',
+    description: document.querySelector('#listen-note')?.getAttribute('aria-description') ?? '',
   })`);
   // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
   check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /^no recording yet · Kore$/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
-      !/device voice|端末の声|F1/u.test(listenBefore.note),
+    listenBefore.toggles === 0 && /^No audio for this article yet$/u.test(listenBefore.note) &&
+      listenBefore.description === 'Approved voices: Kore (main), Charon (second).' &&
+      !/device voice|端末の声|F1/u.test(`${listenBefore.note} ${listenBefore.description}`),
     JSON.stringify(listenBefore));
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
@@ -2727,21 +2729,11 @@ async function main() {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  // reader lane 2026-10-02 (John #17): lists open from the word popup's "Add to list…" in a small popover;
-  // opening it enrolls nothing. Save — here the chrome's 覚える, the popup's Save or the menu's Save word — is one tap.
-  await page.waitForSelector('#mini #mini-lists');
-  await tap(page, '#mini-lists');
-  await page.waitForSelector('#vocabulary-list-popover');
-  const popoverBits = await page.evaluate(`(() => ({
-    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
-    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
-    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
-  }))()`);
-  check('R2-B · opening the lists does not enroll the word, and they open as a small popover, not a window',
-    (await readAppRecord(page)).taken.length === envBefore.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
-    JSON.stringify(popoverBits));
-  await page.keyboard.press('Escape');
-  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"): Save — here the
+  // chrome's 覚える, the popup's Save or the menu's Save word — is one tap, and the popup offers a list only once the
+  // word is saved; its "Add to a list" opens a small popover that enrolls nothing more.
+  await page.waitForSelector('#mini #mini-take');
+  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists')?.getClientRects().length`);
   await tap(page, '#reader-take');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit reader save' });
@@ -2754,6 +2746,26 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
+  if (!await page.locator('#mini').count()) await tap(page, '#reader .tok.content', 9);
+  await page.waitForSelector('#mini #mini-lists:not([hidden])');
+  await tap(page, '#mini-lists');
+  await page.waitForSelector('#vocabulary-list-popover');
+  const popoverBits = await page.evaluate(`(() => ({
+    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
+    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
+  }))()`);
+  check('R2-B · the popup offers lists only after Save; they open as a small popover, not a window, and enroll nothing more',
+    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
+    JSON.stringify({ listsBeforeSave, ...popoverBits }));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  // the old order's last press (覚える, outside the popup) put the popup away before the next step opens it
+  // again; here Escape on the popup does that
+  if (await page.locator('#mini').count()) {
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+  }
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');

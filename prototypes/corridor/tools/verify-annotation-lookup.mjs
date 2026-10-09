@@ -30,7 +30,8 @@ const fixture = Buffer.concat([original, Buffer.from(shim)]);
 const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
-const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/]];
+const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -51,10 +52,13 @@ async function openLookup(page, text = '電車') {
   }, text);
   await page.locator('#mini').waitFor();
 }
-// Lists open from the popup's "Add to list…" in a compact popover (reader lane 2026-10-02); Save is the popup's own
-// one-tap button. The big list window is gone.
+// Lists open from the popup's "Add to a list" in a compact popover (reader lane 2026-10-02); Save is the popup's own
+// one-tap button. The big list window is gone. One path (round 4, T5): the popup offers a list only once the word
+// is saved, so a word not yet saved is saved first, by the same capture the list used to make.
 async function chooser(page, text = '電車') {
-  await openLookup(page, text); await page.locator('#mini #mini-lists').click();
+  await openLookup(page, text);
+  if (await page.locator('#mini #mini-take').getAttribute('aria-pressed') !== 'true') await saveInPopup(page);
+  await page.locator('#mini #mini-lists').click();
   await page.locator('#vocabulary-list-popover').waitFor();
   assert.equal(await page.locator('#vocabulary-list-dialog, dialog[open]').count(), 0, 'Lists must not open a modal window');
 }
@@ -127,6 +131,47 @@ const cases = [
     await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');
     assert.deepEqual(targetRows((await state(page)).record), targetRows(before.record));
   }],
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', async page => {
+    // A list sheet opened for a word not yet saved (the personal deck's "Add to list…" does this; the popup no longer
+    // does, by round 4's one path) saves the word first, with the same capture as Save. A native fault on that capture
+    // is reported honestly, writes neither a card nor a list, protects the record until reload, and keeps the typed
+    // list name across that reload; the retried list then holds the word with exactly one card. (These are the
+    // assertions verify-vocabulary-chooser held on this path before the popup's one path moved its capture to Save.)
+    const openSheet = () => page.evaluate(async () => {
+      const f = window.annotationFixture;
+      f.removeMini();
+      await f.ensureDictionaryRowsForForm('電車');
+      document.getElementById('annotation-anchor')?.remove();
+      const anchor = document.createElement('button'); anchor.id = 'annotation-anchor'; anchor.textContent = '電車';
+      anchor.style.cssText = 'position:fixed;left:120px;top:150px'; document.body.append(anchor);
+      f.openVocabularyListPopover({ t: 'word', id: '電車' }, '電車', anchor);
+    });
+    await openSheet();
+    await page.locator('#vocabulary-list-popover').waitFor();
+    const before = await state(page);
+    assert.equal(before.record.taken.some(row => row.t === 'word' && row.id === '電車'), false, 'The fixture word starts unsaved');
+    await armRecordWriteFailure(page, 'quota', { roots: ['taken'] });
+    await createList(page, 'Capture first');
+    await page.waitForFunction(() => /Could not save|Could not finish saving|reload/i.test(document.querySelector('.vocabulary-list-status')?.textContent || ''));
+    const fault = await clearRecordWriteFailure(page); assert(fault.fired > 0, 'The native capture transaction must actually fail');
+    assert.deepEqual((await state(page)).record, before.record, 'A failed capture inside a list writes no card and no list');
+    assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-name').inputValue(), 'Capture first', 'The typed list name stays');
+    // A native write fault protects the record until reload, even once the fault is gone.
+    assert.equal(await page.evaluate(() => window.annotationFixture.recordWritable()), false, 'The record must stay read-only until reload');
+    assert.equal(await page.locator('#vocabulary-list-popover .vocabulary-list-form [type="submit"]').isDisabled(), true, 'A failed native write protects the host until reload');
+    assert.match(await page.locator('.vocabulary-list-status').textContent(), /reload/i, 'The notice must say a reload comes before any retry');
+    await closeChooser(page);
+    await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
+    await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+    assert(await page.evaluate(() => window.annotationFixture.recordWritable()), 'Record recovers after reload');
+    assert.deepEqual((await state(page)).record, before.record, 'The protected reload keeps the record as it was');
+    await openSheet();
+    await page.locator('#vocabulary-list-popover').waitFor();
+    assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Capture first', 'The required recovery reload preserves the unsaved list name');
+    await page.locator('#vocabulary-list-popover [type="submit"]').click();
+    const retried = await waitForAppRecord(page, record => member(record, 'Capture first', '電車'));
+    assert.equal(retried.taken.filter(row => row.t === 'word' && row.id === '電車').length, 1, 'The retried list holds the word with exactly one card');
+  }],
   ['exact-entry-mini-and-conflict-protection', async page => {
     await page.evaluate(async () => {
       const f = window.annotationFixture;
@@ -137,7 +182,7 @@ const cases = [
     });
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'うわて', 'The explicit JMdict entry must survive the quick look');
     assert.match(await page.locator('#mini .mini-gloss').textContent(), /upper part/);
-    await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
+    await saveInPopup(page); await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
     const saved = await waitForAppRecord(page, record => member(record, 'Exact reading', '上手'));
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');
