@@ -17,6 +17,7 @@
  * Pin KAIRO_SITE_DIR, KAIRO_ARTIFACT_SHA256 and KAIRO_EXPECT_GITSHA for a prior build.
  */
 
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -280,10 +281,19 @@ async function press(page, selector, options) {
   await page.mouse.click(x, y);
   await delay(150);
 }
-const pressSeal = (page) => press(page, '#reader-take', { scroll: false });
+const dismissMiniForSeal = async (page) => {
+  if (await page.locator('#mini').count()) {
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+  }
+};
+const pressSeal = async (page) => {
+  await dismissMiniForSeal(page);
+  return press(page, '#reader-take', { scroll: false });
+};
 async function closeIfOpen(page) {
   if (!(await page.locator('#sheet').count())) return;
-  await press(page, '#sheet-close');
+  await press(page, await entryCloseSelector(page));
   await page.waitForFunction(() => !document.getElementById('sheet'), null, { timeout: 5_000 });
 }
 const chooserFocus = (page, id) => page.waitForFunction((focusId) => document.querySelector('#sheet #reader-choice')?.dataset.state === 'choose'
@@ -634,7 +644,7 @@ async function matchRun(open, rec) {
 async function captureRun(open, rec) {
   const doors = [
     { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => openPopup(page, CORE) },
-    { door: 'seal', name: 'the chrome seal 覚える', selector: '#reader-take', seal: true, prepare: (page) => tap(page, CORE) },
+    { door: 'seal', name: 'the chrome seal 覚える', selector: '#reader-take', seal: true, prepare: async (page) => { await tap(page, CORE); await dismissMiniForSeal(page); } },
     { door: 'sheet', name: "the entry sheet bar's 覚", selector: '#sheet-take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
     { door: 'foot', name: "the entry foot's 覚える", selector: '#take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
   ];

@@ -16,6 +16,7 @@ import { extname, resolve } from 'node:path';
 import process from 'node:process';
 
 import { chromium } from 'playwright-core';
+import { openShelfTools } from './shelf-tools-support.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
@@ -94,6 +95,7 @@ async function bootShelf(page, base, { clear = false } = {}) {
 
 async function openWritingRoom(page, base, kanji, { clear = false, beforeDoor = null } = {}) {
   await bootShelf(page, base, { clear });
+  await openShelfTools(page);
   await page.locator('#search').fill(kanji);
   const result = page.locator(`[data-result="kanji:${kanji}"]`).first();
   await result.waitFor({ state: 'visible', timeout: 10_000 });

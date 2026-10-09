@@ -14,7 +14,7 @@
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-pr77-ports.mjs [--only probe,probe]
  */
-import { openShelfDoor } from './shelf-tools-support.mjs';
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -310,6 +310,7 @@ PROBES['bunsetsu'] = async () => {
 };
 
 async function openKanjiSheet(page, kanji) {
+  await openShelfTools(page);
   await page.fill('#search', kanji);
   await page.locator(`[data-result="kanji:${kanji}"]`).first().click();
   await page.waitForSelector('#sheet');
@@ -524,6 +525,7 @@ PROBES['chip-focus'] = async () => {
 PROBES['focus-trap'] = async () => {
   const { context, page } = await learner();
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet .headword');
@@ -601,6 +603,7 @@ PROBES['thinking-durable'] = async () => {
 PROBES['failure-line'] = async () => {
   const { context, page, stub } = await learner({ seed: envelope(), tutor: true });
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet .ai-ask');
@@ -784,6 +787,7 @@ PROBES['sheet-summary-tab'] = async () => {
   seed.taken[0].sourceContextRef = `teacher-context:${'a'.repeat(64)}`;
   const { context, page } = await learner({ seed });
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet summary');
@@ -871,6 +875,7 @@ PROBES['eaten-back-strokes'] = async () => {
 PROBES['tutor-sheet-race'] = async () => {
   const { context, page, stub } = await learner({ seed: envelope(), tutor: true });
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet .ai-ask');

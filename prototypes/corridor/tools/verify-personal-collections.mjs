@@ -1,3 +1,4 @@
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
@@ -199,7 +200,7 @@ try {
       await page.locator('#sheet .dictionary-warning').waitFor().catch(error=>{throw new Error(`${name}: dictionary fallback failed; page errors=${JSON.stringify(errors)}`,{cause:error});});
       assert(await page.locator('#sheet .dictionary-retry').isVisible());
       stage='offline grade';
-      await page.locator('#sheet-close').click();await page.locator('#sheet').waitFor({state:'detached'});
+      await page.locator(await entryCloseSelector(page)).click();await page.locator('#sheet').waitFor({state:'detached'});
       await page.locator('[data-grade="3"]').click();
       await page.waitForFunction(()=>document.querySelector('.pc-status').textContent==='Review saved.');
       assert.equal((await stored(page)).progress.events.length,4);

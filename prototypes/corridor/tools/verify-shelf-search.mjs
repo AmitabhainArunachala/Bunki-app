@@ -1,7 +1,7 @@
 /** Real shelf input, current-query results, and delayed real worker replies.
  * Local browser timing is diagnostic evidence; it never certifies an iPhone.
  * A missed strict 100ms lookup budget is a failing row and a nonzero exit. */
-import { openShelfDoor } from './shelf-tools-support.mjs';
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -125,6 +125,7 @@ async function boot(browser) {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${base}/index.html?entry=shelf`);
   await page.waitForFunction(() => document.body.dataset.ready === '1' && document.querySelectorAll('.shelf-item').length >= 24);
+  await openShelfTools(page);
   await page.locator('#search').focus();
   await page.evaluate(() => { window.__shelfSearchTest.inputNode = document.getElementById('search'); });
   await page.waitForFunction(() => window.__KAIRO_DICTIONARY_PERF__?.mode === 'worker', null, { timeout: 30000 });

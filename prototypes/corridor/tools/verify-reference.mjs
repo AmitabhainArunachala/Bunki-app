@@ -3,6 +3,7 @@
  * No application internals are patched or exposed to the test.
  * Usage: node prototypes/corridor/tools/verify-reference.mjs [--shots DIR] [--case pending-route]
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -84,7 +85,7 @@ const boot = async (p, url = `${base}/index.html?entry=shelf`) => {
 const overview = async () => {
   if (await page.locator('.sheet').count()) {
     await page.waitForTimeout(800);
-    await page.click('#sheet-close');
+    await page.click(await entryCloseSelector(page));
   }
   if (await page.locator('#reference-library[data-view="collection"]').count()) {
     await page.click('#reference-back');
@@ -193,7 +194,7 @@ try {
     await page.waitForSelector('.sheet');
     assert.ok((await page.locator('.sheet').innerText()).includes(entryId));
     await page.waitForTimeout(850);
-    await page.click('#sheet-close');
+    await page.click(await entryCloseSelector(page));
     await page.waitForFunction((id) => document.activeElement?.id === id, rowId);
     assert.equal(await page.locator('#reference-results-count').getAttribute('data-page'), '2');
     assert.ok(Math.abs(await page.evaluate(() => window.scrollY) - scrollBefore) <= 3);
@@ -214,7 +215,7 @@ try {
       assert.ok(text.includes(entry.reading || 'Reading not supplied') || text.includes('読み未収録'));
       assert.equal(await page.locator('.sheet .take').count(), 0);
       await page.waitForTimeout(850);
-      await page.click('#sheet-close');
+      await page.click(await entryCloseSelector(page));
     }
   });
 
@@ -233,7 +234,7 @@ try {
       const entry = catalog.collections.find(collection => collection.id === `jlpt:${level}`).entries.find(entry => entry.key === key);
       assert.equal(await page.locator('.sheet').getAttribute('data-node'), entry.canonicalTarget ? 'word:～月' : `reference:${key}`);
       if (!entry.canonicalTarget) assert.equal(await page.locator('.sheet .take').count(), 0);
-      await page.click('#sheet-close');
+      await page.click(await entryCloseSelector(page));
       await page.waitForFunction(id => document.activeElement?.id === id, rowId);
       assert.equal(await page.locator('#reference-search').inputValue(), '～月');
     }
@@ -345,7 +346,7 @@ try {
       assert.ok(held, 'The sidecar request is held until the user cancels the visit');
       await p.click('#reference-back');
       await p.waitForSelector('.sheet[data-node="kanji:学"]');
-      await p.click('#sheet-close');
+      await p.click(await entryCloseSelector(p));
       await p.click('#back');
       await p.waitForSelector('#levels-link', { state: 'attached' });
       const response = p.waitForResponse(reply => reply.url().endsWith('/reference-extra.json') && reply.ok());

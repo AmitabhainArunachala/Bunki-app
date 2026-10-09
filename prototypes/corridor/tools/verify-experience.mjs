@@ -5,6 +5,7 @@
  * --require-skip / EXPERIENCE_REQUIRE_SKIP=1 makes combined SKIP coverage required.
  * Evaluation is READ ONLY: storage/DOM observations, never application interaction.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
@@ -66,14 +67,14 @@ async function recoverShelf(){
  for(let i=0;i<10;i++){
   if(await visible('#stroke-page')){await page.keyboard.press('Escape');await sleep(400);continue;}
   if(await visible('.world-picker')){await page.keyboard.press('Escape');await sleep(300);continue;}
-  if(await visible('.sheet')){await click('#sheet-close');await sleep(650);continue;}
-  if(await visible('#search')){if(await page.locator('#search').inputValue())await page.locator('#search').fill('');return;}
+  if(await visible('.sheet')){await click(await entryCloseSelector(page));await sleep(650);continue;}
+  if(await visible('#shelf-tools-toggle')){await openShelfTools(page);if(await page.locator('#search').inputValue())await page.locator('#search').fill('');return;}
   if(await visible('.nav-symbol')){await click('.nav-symbol');if(await visible('.bubble-shelf')){await click('.bubble-shelf');await sleep(600);}continue;}
   if(await page.getByRole('button',{name:'leave the session',exact:true}).isVisible().catch(()=>false)){await role('leave the session');continue;}
   if(await visible('#back')){await click('#back');continue;}break;
  }
 }
-async function closeSheet(){await sleep(800);await click('#sheet-close');await sleep(350);}
+async function closeSheet(){await sleep(800);await click(await entryCloseSelector(page));await sleep(350);}
 async function sheetHop(name){await role(name);await sleep(850);}
 async function noOverflow(id){await check(id,'No horizontal document overflow',async()=>{const d=await page.evaluate(()=>({w:innerWidth,sw:document.documentElement.scrollWidth}));assert.ok(d.sw<=d.w+1,JSON.stringify(d));return JSON.stringify(d);});}
 let initial,captured,afterReview,lessonBefore,mockBefore,savedMockAttempt;
@@ -84,11 +85,11 @@ try{
  await click('.nav-symbol');await shot('drift-navigation','Expanded normal navigation reveals shelf door');
  await click('.bubble-shelf');await page.locator('.shelf-open').first().waitFor();await shot('shelf-mobile','Bilingual shelf doors and real texts are legible at 390px');
  await segment('E02-search',async()=>{
-  await page.locator('#search').fill('意見');await page.locator('.search-syn .sem-row').first().waitFor();await shot('search-synonyms','Word hits plus semantic neighbors');
+  await openShelfTools(page);await page.locator('#search').fill('意見');await page.locator('.search-syn .sem-row').first().waitFor();await shot('search-synonyms','Word hits plus semantic neighbors');
   await click('.search-syn .sem-row');await sleep(900);await check('E02-neighbor','Semantic-neighbor result opens full entry',async()=>{assert.ok(await visible('.sheet .headword'));return await page.locator('.sheet .headword').innerText();});await closeSheet();
-  await page.locator('#search').fill('<img src=x onerror=alert(1)>');await sleep(600);await shot('search-literal-empty','Malformed-looking input is harmless literal text with honest no-results feedback');
+  await openShelfTools(page);await page.locator('#search').fill('<img src=x onerror=alert(1)>');await sleep(600);await shot('search-literal-empty','Malformed-looking input is harmless literal text with honest no-results feedback');
   await check('E02-literal','Search treats markup-looking text literally',async()=>{assert.equal(await page.locator('main img').count(),0);assert.equal(await page.locator('#search').inputValue(),'<img src=x onerror=alert(1)>');return (await text()).slice(-700);});
-  await page.locator('#search').fill('森林');await sleep(650);await click('main .entry-row');await sleep(850);await shot('word-entry','Correct 森林 full entry, readings, kanji and semantic/provenance content');
+  await openShelfTools(page);await page.locator('#search').fill('森林');await sleep(650);await click('main .entry-row');await sleep(850);await shot('word-entry','Correct 森林 full entry, readings, kanji and semantic/provenance content');
  });
  await segment('E03-recursive',async()=>{
   await sheetHop('森 Forest ›');await shot('kanji-mori','森 kanji detail includes readings, components and compounds');
@@ -96,7 +97,7 @@ try{
   await page.getByRole('button',{name:'林 view as a kanji',exact:true}).click();await sleep(850);await shot('component-to-kanji','Containing-kanji door returns to canonical kanji detail');
   await page.locator('.sheet .compound').first().click();await sleep(850);await shot('kanji-to-compound','A compound reopens full word entry through the same sheet');
   await check('E03-browse-no-debt','Recursive browsing does not enroll or grade',async()=>{assert.equal(debt(await state()),debt(initial));});
-  await closeSheet();await page.locator('#search').fill('森林');await sleep(500);await click('main .entry-row');await sleep(850);await sheetHop('森 Forest ›');
+  await closeSheet();await openShelfTools(page);await page.locator('#search').fill('森林');await sleep(500);await click('main .entry-row');await sleep(850);await sheetHop('森 Forest ›');
  });
  await segment('E04-writing',async()=>{
   page.setDefaultTimeout(20000);await click('#strokes-door');await page.locator('#stroke-page').waitFor();await sleep(1100);await shot('writing-dormant','Current writing room, live glyph, usable return; constitutional/control policy mismatch recorded separately');
@@ -109,7 +110,7 @@ try{
   await page.keyboard.press('Escape');await sleep(350);await page.keyboard.press('Escape');await sleep(600);
   await check('E04-return','Two Escapes return from awake room to originating 森 sheet',async()=>{assert.equal(await page.locator('.sheet .hero-glyph').innerText(),'森');assert.equal(await page.locator('#stroke-page').count(),0);});
   await shot('writing-return-context','Original kanji restored rather than generic home');page.setDefaultTimeout(6500);await closeSheet();
-  await click('#theme-seal');await page.locator('.world-picker .world-stone',{hasText:'藍'}).click();await sleep(400);await page.locator('#search').fill('');
+  await click('#theme-seal');await page.locator('.world-picker .world-stone',{hasText:'藍'}).click();await sleep(400);await openShelfTools(page);await page.locator('#search').fill('');
  });
  await segment('E05-reader-capture',async()=>{
   await click('.details-toggle');await shot('shelf-source-details','Source and difficulty detail disclosure stays distinct from mastery');

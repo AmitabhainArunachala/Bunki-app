@@ -23,7 +23,8 @@
  * Usage: node verify-corridor-ai.mjs
  */
 
-import { openShelfDoor } from './shelf-tools-support.mjs';
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
 import { isDeepStrictEqual } from 'node:util';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
@@ -295,6 +296,7 @@ async function main() {
   };
 
   const openWordSheet = async () => {
+    await openShelfTools(page);
     await page.fill('#search', '学校');
     await page.waitForSelector('[data-result="word:学校"]', { timeout: 15000 });
     await page.click('[data-result="word:学校"]');
@@ -377,7 +379,7 @@ async function main() {
 
   // --------------------------------------- surface 3+4 · quiz and the coach
   console.log('\n— the quiz and the post-review coach');
-  await page.click('#sheet-close');
+  await page.click(await entryCloseSelector(page));
   await page.click('#tray');
   await page.waitForSelector('#aiq-start', { timeout: 8000 });
   await page.click('#aiq-start');

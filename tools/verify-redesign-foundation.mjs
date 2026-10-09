@@ -88,6 +88,7 @@ try {
             assert.equal(await tabs.locator('[aria-current="page"]').count(), 1);
           }
           await page.locator('#tab-learn').click();
+          await page.locator('[data-learn-section="focus"]').waitFor({ state: 'attached' });
           assert.deepEqual(
             await page
               .locator('[data-learn-section]')
@@ -96,8 +97,10 @@ try {
           );
           await page.locator('#tab-me').click();
           await page.locator('#me-settings').click();
+          await page.waitForFunction(() => document.documentElement.dataset.room === 'settings');
           assert.equal(await page.locator('html').getAttribute('data-room'), 'settings');
           await page.locator('#back').click();
+          await page.waitForFunction(() => document.body.dataset.view === 'me');
           assert.equal(
             await page.locator('body').getAttribute('data-view'),
             'me',
@@ -140,11 +143,23 @@ try {
             Math.abs(headerAfter - headerBefore) <= 1,
             `Selecting a word must not shift the header/article: ${engine}/${width}/${lang} ${headerBefore} → ${headerAfter}`,
           );
-          const capture = await page.locator('#reader-take').boundingBox();
+          assert.equal(await page.locator('#reader-take').isVisible(), false,
+            'The popup owns the visible Save while it is open');
+          const capture = await page.locator('#reader-take').evaluate(node => {
+            const r = node.getBoundingClientRect();
+            return { width: r.width, height: r.height };
+          });
           assert(
             capture.width >= 44 && capture.height >= 44,
-            'The retained capture door keeps its touch target',
+            'The retained capture slot keeps its 44px geometry',
           );
+          const popupCapture = await page.locator('#mini-take').boundingBox();
+          assert(popupCapture && popupCapture.width >= 44 && popupCapture.height >= 44,
+            'The visible popup Save keeps its 44px touch target');
+          assert(await page.locator('#mini-take').evaluate(node => {
+            const r = node.getBoundingClientRect();
+            return node.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2));
+          }), 'The popup Save owns its actual centre');
           const dictionary = page.locator('#mini .mini-entry');
           {
             await dictionary.click();
@@ -155,6 +170,10 @@ try {
               'A sheet has no active bottom tabs',
             );
             await page.keyboard.press('Escape');
+            await page.locator('#reader-take').waitFor({ state: 'visible' });
+            const restoredCapture = await page.locator('#reader-take').boundingBox();
+            assert(restoredCapture && restoredCapture.width >= 44 && restoredCapture.height >= 44,
+              'The visible reader Save regains its 44px touch target after closing the entry');
           }
           await page.locator('#tab-read').click();
           const horizontal = await page.evaluate(() => ({

@@ -20,6 +20,7 @@
  * checkout clean (refresh the tracked copy with --report docs/prototype/verification-report.json).
  */
 
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -266,14 +267,14 @@ async function waitForFiniteMotion(page, selector) {
 }
 
 async function sheetViewportGeometry(page) {
-  return page.evaluate(() => {
+  return page.evaluate((closeSelector) => {
     const sheet = document.querySelector('#sheet').getBoundingClientRect();
-    const close = document.querySelector('#sheet-close').getBoundingClientRect();
+    const close = document.querySelector(closeSelector).getBoundingClientRect();
     return { innerWidth, clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       visualWidth: window.visualViewport?.width ?? innerWidth,
       sheet: sheet.toJSON(), close: close.toJSON() };
-  });
+  }, await entryCloseSelector(page));
 }
 
 async function shoot(page, dir, name) {
@@ -1047,7 +1048,7 @@ async function main() {
   // the popup's Full entry → the full entry (from a clean slate: whatever the menu
   // interlude did, close it and re-aim)
   if (await page.locator('#sheet').count()) {
-    await page.locator('#sheet-close').dispatchEvent('click');
+    await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
     await page.waitForTimeout(150);
   }
   await page.evaluate('window.scrollTo(0, 0)');
@@ -1158,7 +1159,7 @@ async function main() {
   for (let step = 0; step < 3; step++) await page.keyboard.press('Tab');
   check('phone kanji header keeps its close in keyboard order',
     await page.evaluate(() => document.activeElement?.id === 'sheet-close'));
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.waitForSelector('#sheet', { state: 'detached' });
   check('phone kanji close dismisses the full entry', await page.locator('#sheet').count() === 0);
 
@@ -1801,6 +1802,7 @@ async function main() {
     ['ばかり', 'grammar:bakari', 'grammar', '〜ばかり', 'N3', 'just did …; nothing but …', null],
   ];
   for (const [q, want, door, word, reading, gloss, seq] of doors) {
+    await openShelfTools(page);
     await page.fill('#search', q);
     await page.waitForTimeout(350);
     const actual = await page.evaluate(() => ({
@@ -1842,6 +1844,7 @@ async function main() {
   check('search · the canonical four doors are counted honestly (B4 gap stated)',
     present >= 1,
     `${present}/4 canonical entry modes present (typed only today; handwriting · radical · SKIP are spec B4)`);
+  await openShelfTools(page);
   await page.fill('#search', 'kaisai');
   await page.waitForTimeout(350);
   await page.locator('[data-result]').first().click();
@@ -1919,6 +1922,7 @@ async function main() {
     .filter({ has: page.locator('.row-reading', { hasText: new RegExp(`^${reading}$`, 'u') }) });
   const d23PageSearch = async () => {
     await open('?entry=shelf');
+    await openShelfTools(page);
     await page.fill('#search', '上手');
     await page.waitForSelector('#search-results [data-result="word:上手:1580400"]', { timeout: 20000 });
     return page.evaluate(() => ({
@@ -2089,11 +2093,14 @@ async function main() {
   // ------------------------------------------ v1.6 · particles as doors
   console.log('\n— v1.6 · particles: no dead pixels');
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', 'wa');
   await page.waitForTimeout(350);
   check('particles · the search knows は',
     await page.evaluate(`[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === 'particle:wa')`),
     '"wa" → particle:wa');
+
+  await openShelfTools(page);
 
   await page.fill('#search', '');
   await page.waitForTimeout(250);
@@ -2338,6 +2345,7 @@ async function main() {
   // ------------------ 用例の蔵 · examples everywhere, sentences that answer
   console.log('\n— the example bank: ≥4 sentences, every token a door');
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result="word:学校"]');
@@ -2399,6 +2407,7 @@ async function main() {
   // the first sense wins — 半島 is the canary (its JMdict entry carries a
   // short minor sense, "Korea", that a shortest-wins gloss once surfaced)
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '半島');
   await page.waitForSelector('[data-result="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result="word:半島"]');
@@ -2590,6 +2599,7 @@ async function main() {
     revlog: [[1754000000000, 'word:学校', 3, 0, null, null, null, null, 3, 5, 1, 1200]],
   })`));
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
@@ -2616,7 +2626,7 @@ async function main() {
   check('R2-B · un-memorize removes the active card; revlog and FSRS state stay whole',
     afterUntake.taken === 0 && afterUntake.revlog === 1 && afterUntake.srsKept,
     JSON.stringify(afterUntake));
-  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForTimeout(200);
@@ -2625,6 +2635,7 @@ async function main() {
     'no review door on an empty deck');
   await tap(page, '#back');
   await page.waitForTimeout(200);
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
@@ -2642,7 +2653,7 @@ async function main() {
     JSON.stringify(reTaken));
 
   // lists are born, renamed and deleted on the lists surface itself
-  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForSelector('#list-maker-field');
@@ -2734,6 +2745,8 @@ async function main() {
   // word is saved; its "Add to a list" opens a small popover that enrolls nothing more.
   await page.waitForSelector('#mini #mini-take');
   const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists')?.getClientRects().length`);
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#mini', { state: 'detached' });
   await tap(page, '#reader-take');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit reader save' });
@@ -2798,7 +2811,7 @@ async function main() {
   }
   captureSheetLoads.dispose();
   await shoot(page, shotsDir, '19-capture-sovereignty');
-  await page.locator('#sheet-close').dispatchEvent('click');
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
   // the popup's "Saved ✓" takes the card back out
   await tap(page, '#reader .tok.content', 9);
@@ -2868,6 +2881,7 @@ async function main() {
 
   // the sentence page carries the seal for the word it is built around
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '半島');
   await page.waitForSelector('[data-result^="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:半島"]');
@@ -3876,6 +3890,7 @@ async function main() {
     ],
   })`));
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
@@ -3902,7 +3917,7 @@ async function main() {
   })()`);
   check('R4-C · reading the ledger writes nothing to the deck',
     trailWordsOnly.srs === 0 && trailWordsOnly.revlog === 0, JSON.stringify(trailWordsOnly));
-  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForSelector('.rest-toggle');

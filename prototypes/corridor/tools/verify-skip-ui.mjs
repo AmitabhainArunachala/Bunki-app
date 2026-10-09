@@ -4,6 +4,7 @@
  * Usage: node prototypes/corridor/tools/verify-skip-ui.mjs [--shots DIR]
  * Requires playwright-core + its Chromium (or CHROMIUM_PATH).
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
@@ -173,7 +174,7 @@ try {
   check('code-free shape door opens nested lookup', await page.locator('.sheet .skip-ui').count() === 1);
   await page.locator('#sheet-back').click();
   check('nested Back returns to same fallback entry', await page.locator('.sheet .hero-glyph').innerText() === '㐆');
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.locator('.theme-seal').first().click();
   await page.locator('.world-stone[aria-label="Gold on indigo"]').click();
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -208,7 +209,7 @@ try {
   check('cold ordinary sheet does not expose SKIP codes or fetch the sidecar', await page.locator('.sheet .skip-code-door-wrap').count() === 0 &&
     await page.evaluate(() => !performance.getEntriesByType('resource').some(entry => entry.name.endsWith('/skip.json'))));
   await page.screenshot({ path: resolve(out, 'skip-cold-captured-sheet.png') });
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.locator('#review-start').click();
   let grades = 0;
   for (; grades < 12 && !(await page.locator('.review-summary').isVisible()); grades++) {
@@ -249,7 +250,7 @@ try {
   await page.locator('.tray-line').filter({ hasText: '㐆' }).click();
   await page.locator('#sheet-take').click();
   await waitForAppRecord(page, record => !record.taken.some(item => item.id === '㐆'));
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await Promise.all([page.waitForEvent('load'), page.setInputFiles('#import-file', backupPath)]);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
   const restored = await readAppRecord(page);

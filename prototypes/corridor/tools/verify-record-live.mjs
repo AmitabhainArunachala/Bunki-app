@@ -4,6 +4,7 @@
  * Native IDB faults are scoped to the actual host-command transaction, and each
  * assertion reads committed rows independently of the app's publication state.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -485,7 +486,7 @@ try {
         const captured = await disk(page);
         assert.equal(captured.record.taken.filter((item) => item.t === 'word' && item.id === word).length, 1);
         preserved(captured);
-        await page.locator('#sheet-close').click();
+        await page.locator(await entryCloseSelector(page)).click();
         await page.locator('#back').click();
         const articleId = await openReading(page);
         await page.locator('#read-fin').click();
@@ -553,7 +554,7 @@ try {
         await page.locator('#sheet .list-maker-field').fill('__proto__');
         await page.locator('#sheet .list-maker-make').click();
         await page.locator('#sheet .list-picker .chip.wide.on-list').filter({ hasText: '__proto__' }).waitFor();
-        await page.locator('#sheet-close').click();
+        await page.locator(await entryCloseSelector(page)).click();
         await page.getByRole('button', { name: 'delete __proto__', exact: true }).click();
         await page.getByRole('button', { name: 'really delete __proto__', exact: true }).click();
         await page.getByRole('button', { name: 'really delete __proto__', exact: true }).waitFor({ state: 'detached' });
@@ -623,7 +624,7 @@ try {
           await page.locator('#sheet .list-picker .fold-head').focus();
           await page.keyboard.press('Enter');
           await page.locator('#sheet .list-picker .fold-head[aria-expanded="true"]').waitFor();
-          await page.locator('#sheet-close').click();
+          await page.locator(await entryCloseSelector(page)).click();
           await deliverHeldResponse(page, examples);
           assert.equal(await page.locator('#sheet').count(), 0, 'A late response never reopens a dismissed entry');
           assert.deepEqual(await disk(page), initial, 'Cancelled activation and late responses write no learner evidence');
@@ -720,7 +721,7 @@ try {
         const word = await openCapture(page);
         await page.locator('#sheet #take').click();
         await page.waitForFunction(() => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true');
-        await page.locator('#sheet-close').click();
+        await page.locator(await entryCloseSelector(page)).click();
         await page.locator('#tray').click();
         const downloaded = page.waitForEvent('download');
         await page.locator('#export-store').click();

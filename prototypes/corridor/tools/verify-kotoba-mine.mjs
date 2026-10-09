@@ -1,3 +1,4 @@
+import { openShelfTools } from './shelf-tools-support.mjs';
 /**
  * 言葉の鉱脈 deck + 覚える one-tap save verifier. Done = this is green.
  *
@@ -2559,6 +2560,7 @@ async function main() {
     // guarded commit at once, and the list drawer opens under the finger so
     // where the word went is right there.
     await boot();
+    await openShelfTools(page);
     await page.fill('#search', '金利');
     await page.waitForSelector('[data-result^="word:金利"]', { timeout: 15000 });
     await page.click('[data-result^="word:金利"]');

@@ -30,7 +30,7 @@
  *   (exits non-zero on station, startup or cleanup failure; screenshots and
  *   results.json are retained in the fresh evidence directory)
  */
-import { openShelfDoor } from './shelf-tools-support.mjs';
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -237,6 +237,7 @@ try {
   });
 
   await step('3 search + synonym cluster + entry', async () => {
+    await openShelfTools(page);
     await page.fill('#search', '意見');
     await page.waitForTimeout(400);
     if (!(await page.$('.search-syn'))) throw new Error('no cluster under the hits');
@@ -244,6 +245,7 @@ try {
     await page.waitForSelector('.sheet .headword', { timeout: 5000 });
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
+    await openShelfTools(page);
     await page.fill('#search', '');
     await page.waitForTimeout(300);
   });

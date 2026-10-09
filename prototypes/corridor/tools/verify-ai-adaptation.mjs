@@ -3,6 +3,7 @@
  * reads are observations; the one negative write test uses the existing host
  * transaction fault. This does not establish provider quality or JLPT ability.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -410,7 +411,7 @@ try {
     await importFixture('source-conversation', fixture()); await openShelf();
     await page.locator('[data-passage="wikinews:1403"]').first().click();
     await page.locator('#reader .tok[data-index="18"]').click();
-    if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
+    if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const deniedQuestion = 'この文の「世界」の意味を教えてください。', deniedCount = requests.length;
     await page.locator('#chat-input').fill(deniedQuestion); await page.locator('#chat-send').click();
@@ -424,7 +425,7 @@ try {
     await openShelf();
     await page.locator('[data-passage="bunki-graded-n5-morning"]').first().click();
     await page.locator('#reader .tok[data-index="0"]').click();
-    if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
+    if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const before = await readAppRecord(page), source = before.teacherContexts.entries.find((entry) => entry.id === before.teacherContexts.activeRef);
     assert.ok(source?.quote && source.sourceKind === 'bundled-passage');

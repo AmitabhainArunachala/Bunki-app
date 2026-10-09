@@ -150,6 +150,7 @@
  * Usage: KAIRO_SITE_DIR=<artifact> KAIRO_ARTIFACT_SHA256=<digest> node verify-design-reader-shelf.mjs
  *        KAIRO_BROWSER=chromium|webkit limits the engines; --control adds the injected control.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -696,29 +697,31 @@ try {
         ['auto', 'scroll'].includes(getComputedStyle(n).overflowX) && n.scrollWidth > n.clientWidth + 1).map(label);
       const field = document.querySelector('#search');
       let hint = null;
-      if (field) {
+      const fieldVisible = !!field && shown(field);
+      if (fieldVisible) {
         const style = getComputedStyle(field);
         const ctx = document.createElement('canvas').getContext('2d');
         ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
         const room = field.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
         hint = { text: field.placeholder, width: Math.ceil(ctx.measureText(field.placeholder).width), room: Math.floor(room) };
       }
-      return { crossing: crossing.slice(0, 4), crossingCount: crossing.length, sideways, pageScroll: document.documentElement.scrollWidth > innerWidth + 1, hint };
+      return { crossing: crossing.slice(0, 4), crossingCount: crossing.length, sideways, pageScroll: document.documentElement.scrollWidth > innerWidth + 1, fieldVisible, hint };
     };
     for (const [label, viewport] of [['320', NARROW], ['390', PHONE], ['1368', DESK]]) {
       await run(`O1-no-clipped-row-${label}`, viewport, async (page) => {
         await open(page);
         const served = await page.evaluate(clippedRows);
-        const toggle = page.locator('#shelf-tools-toggle');
-        if (await toggle.count()) await toggle.click();
+        assert.equal(served.fieldVisible, false, 'the lookup field must wait inside the closed Tools panel at arrival');
+        await openShelfTools(page);
         const tools = await page.evaluate(clippedRows);
+        assert.equal(tools.fieldVisible, true, 'the Tools panel must expose the actual lookup field');
         for (const [state, probe] of [['as served', served], ['tools open', tools]]) {
           assert.equal(probe.crossingCount, 0, `${state}: ${probe.crossingCount} shelf elements cross the screen's side: ${probe.crossing.join(' | ')}`);
           assert.equal(probe.sideways.length, 0, `${state}: rows that scroll sideways: ${probe.sideways.join(', ')}`);
           assert(!probe.pageScroll, `${state}: the page scrolls sideways`);
-          assert(probe.hint && probe.hint.width <= probe.hint.room, `${state}: the look-up hint is cut: ${JSON.stringify(probe.hint)}`);
+          if (probe.fieldVisible) assert(probe.hint && probe.hint.width <= probe.hint.room, `${state}: the look-up hint is cut: ${JSON.stringify(probe.hint)}`);
         }
-        return { hint: served.hint.text, toolsOpened: await toggle.count() > 0 };
+        return { hint: tools.hint.text, toolsOpened: true, fieldHiddenAtArrival: !served.fieldVisible };
       });
     }
 
@@ -834,7 +837,7 @@ try {
       await page.waitForSelector('#sheet #take:not([disabled])');
       await page.locator('#sheet #take').click();
       await page.waitForFunction(() => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-      await page.locator('#sheet-close').click();
+      await page.locator(await entryCloseSelector(page)).click();
       await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 });
       await page.locator('#reader .tok[data-index="0"]').click();
       await page.waitForSelector('#mini #mini-take');

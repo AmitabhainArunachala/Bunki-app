@@ -2,6 +2,7 @@
  * node prototypes/corridor/tools/verify-reference-connections.mjs [--shots DIR] [--case source-return]
  * Covers returns, not full corpus correctness (verify-reference.mjs owns that).
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -161,7 +162,7 @@ try {
     await page.fill('#nav-search-input', '水'); await page.press('#nav-search-input', 'Enter');
     await page.waitForSelector('.sheet'); const resultNode = await page.locator('.sheet').getAttribute('data-node');
     await page.click('#sheet-search'); await page.fill('#nav-search-input', 'zz-no-match-zz'); await page.click('#back');
-    await nodeIs(resultNode); await page.click('#sheet-close'); assert.equal(await page.locator('#nav-search-input').inputValue(), '水');
+    await nodeIs(resultNode); await page.click(await entryCloseSelector(page)); assert.equal(await page.locator('#nav-search-input').inputValue(), '水');
     await page.click('#back'); await nodeIs('kanji:学'); await capture('after-search-return-preserved-sheet');
     await page.click('#sheet-reference-return'); assert.equal(await page.locator('#reference-search').inputValue(), '学校');
   });
@@ -300,7 +301,7 @@ try {
     await capture('review-source-nested-article');
     await page.click('#source-entry-return');
     assert.equal(await page.locator('.sent-reader').innerText(), sentence);
-    await page.click('#sheet-close');
+    await page.click(await entryCloseSelector(page));
     assert.equal(await page.locator('#nav-search-input').inputValue(), word);
     await page.click('#back');
     await page.waitForSelector('#reader');
