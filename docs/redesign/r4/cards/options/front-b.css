@@ -1,0 +1,17 @@
+/* Option (b) for the front at phone width, for the learner to choose against (a), which ships.
+ * (a): the card hugs what it holds, and the bare stage down to the key is a tap that reveals.
+ * (b): the sheet stays tall, down to the key, but the kind stripe and the hairline frame end at the
+ *      head, so the empty part reads as paper rather than as an empty box.
+ * To ship (b), append this block to the round-4 part of prototypes/corridor/decks/player/player.css.
+ * The shots: docs/redesign/r4/cards/shots/options/<mode>/front-a.png and front-b.png. */
+@media (max-width: 640px) {
+  .kp .kp-study:has(> .kp-reveal) > .kp-card { flex: 1 0 auto; display: flex; flex-direction: column; border-color: transparent; }
+  .kp .kp-study:has(> .kp-reveal) > .kp-card > .kp-taphint { margin-top: auto; }
+  /* the frame and the kind stripe, drawn over the sheet and faded out below its head */
+  .kp .kp-study:has(> .kp-reveal) > .kp-card::before {
+    content: ''; position: absolute; inset: -1px; pointer-events: none; opacity: 1; background: none;
+    border: 1px solid color-mix(in srgb, var(--kp-ink) 12%, transparent); border-left: 3px solid var(--kp-kind); border-radius: 6px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 38%, transparent 56%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 38%, transparent 56%);
+  }
+}

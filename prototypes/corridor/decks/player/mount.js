@@ -244,7 +244,7 @@ const UI_EN = {
   "ここで止めよう": "Pause here",
   "この語の日本語の語釈は、まだ辞書にありません": "This word has no Japanese definition in the dictionary yet.",
   "この語は辞書にありません": "This word is not in the dictionary.",
-  "ここでは覚えるに保存できません（回廊でできます）": "Save to your review cards in Bunki.",
+  "ここでは覚えるに保存できません（回廊でできます）": "Save to your review cards in KAIRO.",
   "覚えるの札に入ります — このデッキの予定は変わりません": "Added to your review cards; this deck’s schedule stays the same.",
   "削除": "Remove",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
@@ -259,7 +259,7 @@ const UI_EN = {
   "出典": "Source",
   "もう一度": "Again",
   "思い出せた": "Recalled",
-  "← もう一度　　スワイプ　　思い出せた →": "← Again　　Swipe　　Recalled →",
+  "← もう一度　　スワイプ　　正解 →": "← Again　　Swipe　　Good →",
   "このヒントを閉じる": "Dismiss this hint",
   "おつかれさま": "Session complete",
   "回答": "Answers",
@@ -311,6 +311,7 @@ const UI_EN = {
   "同": "Same kanji",
   "読": "Same reading",
   "文体": "Register",
+  "文体 ": "Style ",
   "話題": "Topic",
   "ニュース": "News",
   "ブログ": "Blog",
@@ -361,12 +362,12 @@ const UI_EN = {
   "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（語ごとに一つの文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。": "Kanji cards hide one character and provide a bracketed reading cue. They appear in fill-the-blank or multiple-choice mode. Read-and-recall mode rests them without deleting their records.",
   "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。": "One passage can supply several cards, with one target per card. As a word settles, the next passage opens with a different context.",
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech and Japanese definition. Open the folds for English meaning, sentence translation, kanji details, other passages and sources.",
-  "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。": "Tap words in the revealed passage or Japanese definition to look them up. Bunki can also save them. Lookups do not grade the card or change its schedule.",
-  "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。": "Again and Recalled are sufficient for FSRS-6. Choose Again when unsure.",
+  "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。": "Tap words in the revealed passage or Japanese definition to look them up. KAIRO can also save them. Lookups do not grade the card or change its schedule.",
+  "判定は「もう一度・難しい・正解・簡単」の四つ（FSRS-6）。迷ったら「もう一度」。": "Four grades: Again, Hard, Good and Easy (FSRS-6). Choose Again when unsure.",
   "N1〜N3 の札は、公開の JLPT 語彙リスト（open-anki-jlpt-decks 系、2010年以前の旧基準）による目安。JLPT は公式の語彙リストを出していない。リストに載っていない語には札がない。": "N1–N3 labels are estimates from public vocabulary lists based on pre-2010 standards. JLPT publishes no official vocabulary list. Words absent from those lists carry no level label.",
   "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。": "This is a targeted sentence-card deck: one sentence, one word.",
   "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。": "The front shows a real Japanese sentence with the target marked. Readings and English stay hidden. Read, recall the meaning, then tap.",
-  "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「思い出せた」、だめなら「もう一度」。": "The back first shows readings, part of speech and a Japanese definition. Open folds for English, sentence translation, kanji details and sources. Choose Recalled if you recalled it; otherwise choose Again.",
+  "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「正解」（時間がかかったら「難しい」、すぐなら「簡単」）、だめなら「もう一度」。": "The back first shows readings, part of speech and a Japanese definition. Open folds for English, sentence translation, kanji details and sources. Choose Good if you recalled it (Hard if it took effort, Easy if it came at once); otherwise choose Again.",
   "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。": "Common words have two or three sentences. Once the first settles, in roughly two weeks, the next sentence opens.",
   "N2・N1 相当の語を、一枚に一つ、4〜5文の文章の中で覚えるデッキです。ふだんは「読んで思い出す」で解きます。": "This deck teaches one N2- or N1-equivalent word per card inside an original passage of four or five sentences. Read and recall is the default.",
   "表：このデッキのために書いた文章。覚える言葉は色つき。読み・英語は出ない。読んで、意味と読みを思い出してからタップ。": "The front shows an original passage with the target marked. Readings and English stay hidden. Read, recall its meaning and reading, then tap.",
@@ -397,12 +398,17 @@ function btn(cls, label, onClick, attrs = {}) {
 const KANJI = /[㐀-鿿々〆ヵヶ]/;
 const MIN = 60e3;
 const DAY = 864e5;
+/** a count in figures with a thousands separator (2,435), and in English its noun in the right number */
+const fmtN = (n) => Number(n).toLocaleString('en-US');
+const nounEn = (n, one, many = `${one}s`) => `${fmtN(n)} ${n === 1 ? one : many}`;
+/** the wait a grade pad (or the session close) names: 1 day, 2 days, 1 year, 1.5 years; never "1 days" */
 function fmtWait(ms) {
   if (ms < 60 * MIN) return t(`${Math.max(1, Math.round(ms / MIN))}分`, `${Math.max(1, Math.round(ms / MIN))} min`);
   if (ms < DAY) return t(`${Math.round(ms / (60 * MIN))}時間`, `${Math.round(ms / (60 * MIN))} hr`);
-  if (ms < 30 * DAY) return t(`${Math.round(ms / DAY)}日`, `${Math.round(ms / DAY)} days`);
-  if (ms < 365 * DAY) return t(`${Math.round(ms / (30 * DAY))}か月`, `${Math.round(ms / (30 * DAY))} months`);
-  return t(`${(ms / (365 * DAY)).toFixed(1)}年`, `${(ms / (365 * DAY)).toFixed(1)} years`);
+  if (ms < 30 * DAY) return t(`${Math.round(ms / DAY)}日`, nounEn(Math.round(ms / DAY), 'day'));
+  if (ms < 365 * DAY) return t(`${Math.round(ms / (30 * DAY))}か月`, nounEn(Math.round(ms / (30 * DAY)), 'month'));
+  const years = Number((ms / (365 * DAY)).toFixed(1));
+  return t(`${years}年`, `${years} ${years === 1 ? 'year' : 'years'}`);
 }
 const KIND_NAME = { news: 'ニュース', blog: 'ブログ', qa: 'Q&A', company: '企業サイト', gov: '公的機関', literature: '文学', tatoeba: 'Tatoeba', wiki: 'Wikipedia', social: 'SNS', 'example-bank': '例文集', other: 'ウェブ', original: '書き下ろし' };
 const STATUS = {
@@ -609,6 +615,15 @@ function topBar(title, back) {
   return bar;
 }
 
+/** A deck's English title reads "<what> · <card form>" (N1 vocabulary · passages): the name and the
+ * form. The Japanese title stays whole. */
+function titleParts(deck) {
+  const title = t(deck.titleJa, deck.titleEn);
+  if (ctx.english === false) return [title, ''];
+  const at = title.lastIndexOf(' · ');
+  return at > 0 ? [title.slice(0, at), title.slice(at + 3)] : [title, ''];
+}
+
 function homeScreen() {
   const { deck, state, prefs } = ctx;
   const now = new Date();
@@ -617,23 +632,29 @@ function homeScreen() {
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
   const box = el('section', 'kp-home');
-  box.append(topBar(t(deck.titleJa, deck.titleEn), ctx.onLeave ? () => ctx.onLeave() : null));
-  box.append(el('p', 'kp-sub', t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`)));
+  // the plain name as the title, and what each card is at the head of the line under it, so the title
+  // stays one line (T2): "Words you looked up" over "Sentences · 323 words · 503 cards"
+  const [name, form] = titleParts(deck);
+  box.append(topBar(name, ctx.onLeave ? () => ctx.onLeave() : null));
+  const cardCount = deck.words.reduce((n, w) => n + w.cards.length, 0);
+  const counts = t(`${fmtN(deck.words.length)}語 · ${fmtN(cardCount)}枚`, `${nounEn(deck.words.length, 'word')} · ${nounEn(cardCount, 'card')}`);
+  box.append(el('p', 'kp-sub', form ? `${form[0].toUpperCase()}${form.slice(1)} · ${counts}` : counts));
   if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', t(ctx.notice)));
 
-  // the deck's state as one quiet mono line (0 due · 15 new · 0 known · 0 difficult), no coloured tiles
-  const tiles = el('p', 'kp-tiles');
-  const tile = (n, ja, en, cls) => el('span', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
+  // the deck's state as four small tiles, each number in its own colour: due (amber), new,
+  // known (green), difficult (red) — the learner's T2: "the four windows but maybe not so big"
+  const tiles = el('div', 'kp-tiles');
+  const tile = (n, ja, en, cls) => el('div', `kp-tile ${cls}`, el('b', null, fmtN(n)), el('span', null, t(ja, en)));
   tiles.append(
-    tile(q.due.length, '復習', 'due', 'kp-c-due'),
-    tile(q.fresh.length, '新', 'new', 'kp-c-new'),
-    tile(known, '定着', 'known', 'kp-c-known'),
-    tile(hard, '苦手', 'difficult', 'kp-c-hard'),
+    tile(q.due.length, '復習', 'Due', 'kp-c-due'),
+    tile(q.fresh.length, '新規', 'New', 'kp-c-new'),
+    tile(known, '定着', 'Known', 'kp-c-known'),
+    tile(hard, '苦手', 'Difficult', 'kp-c-hard'),
   );
   box.append(tiles);
 
   const total = q.queue.length;
-  const start = btn('kp-start', total ? t(`始める — ${total}枚`, `Begin — ${total} cards`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
+  const start = btn('kp-start', total ? t(`始める — ${fmtN(total)}枚`, `Begin — ${nounEn(total, 'card')}`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
   start.disabled = !total;
   box.append(start);
 
@@ -795,15 +816,13 @@ function studyScreen() {
   face.id = 'kp-card';
   face.dataset.card = id;
   face.dataset.kind = kind;
-  const source = t(KIND_NAME[card.kind] || '例文');
-  const written = passageChips(card, source);
   const chips = el(
     'div',
     'kp-chips',
     el('span', 'kp-chip kp-kindchip', t(kindLabel)),
-    // a written passage's register chip names its source too, so the row stays one line at 390px
-    REGISTER[card.register] ? null : el('span', 'kp-chip', source),
-    ...written,
+    // the front is the sentence (T8 "more distinction"): where it comes from and a written passage's
+    // style are named on the back's 出典 fold, not as bare chips here ("Examples", "Lecture": T2)
+    ...passageChips(card),
     TOPIC[card.topic] ? null : el('span', 'kp-chip', t(ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || '', ctx.deck.groups.find((g) => g.id === word.group)?.titleEn || '')),
     word.level ? levelChip(word.level) : null,
     el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? t("復習") : t("初めて")),
@@ -841,6 +860,10 @@ function studyScreen() {
     } else {
       if (hintsOn()) face.append(el('p', 'kp-taphint', mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
       face.addEventListener('click', reveal);
+      // the bare stage around the card is the same tap (the card hugs its content: T8, round 4)
+      box.addEventListener('click', (e) => {
+        if (e.target === box) reveal();
+      });
     }
   } else {
     face.append(...backParts(card, word).nodes);
@@ -916,25 +939,17 @@ function levelChip(level) {
 /** a written passage's register (CARD_CONTRACT_V2 §6) and topic: [chip text, full name] */
 const REGISTER = { 講: ['講義', '講義・本の要約'], 報: ['報道', 'ニュース・解説'], 論: ['論説', 'エッセイ・思想'], 話: ['会話', '話し言葉'], 学: ['学び', '勉強法・学習の話'], 語: ['話し方', '話し方・書き方の話'] };
 const TOPIC = { mind: ['心と学び', '心と学び'], india: ['インド・仏教', 'インド哲学と仏教'], ai: ['AI・半導体', 'AI と半導体'], history: ['世界史', '世界史'], language: ['日本語', '日本語についての話'] };
-/** small text chips for the passage's register and topic (none on a card without them); the
- * passage's topic takes the place of the word's group chip, and its register the place of the
- * source chip (its label names the source), so the row stays one line: kind · register · topic ·
- * level · state (aesthetics.md §4) */
-function passageChips(card, source = '') {
-  const out = [];
-  for (const [table, value, cls, what] of [
-    [REGISTER, card.register, 'kp-regchip', t("文体")],
-    [TOPIC, card.topic, 'kp-topicchip', t("話題")],
-  ]) {
-    const [text, full] = (typeof value === 'string' && table[value]) || [];
-    if (!text) continue;
-    const chip = el('span', `kp-chip kp-chip-sm ${cls}`, t(text));
-    const label = t(`${what}：${full}${table === REGISTER && source ? `（${source}）` : ''}`, `${what}: ${t(full)}${table === REGISTER && source ? ` (${source})` : ''}`);
-    chip.title = label;
-    chip.setAttribute('aria-label', label);
-    out.push(chip);
-  }
-  return out;
+/** a small text chip for the passage's topic (none on a card without one), in place of the word's
+ * group chip, so the row stays one line: kind · topic · level · state (aesthetics.md §4, as amended
+ * 2026-10-09: the source and the register moved to the 出典 fold) */
+function passageChips(card) {
+  const [text, full] = (typeof card.topic === 'string' && TOPIC[card.topic]) || [];
+  if (!text) return [];
+  const chip = el('span', 'kp-chip kp-chip-sm kp-topicchip', t(text));
+  const label = t(`話題：${full}`, `${t("話題")}: ${t(full)}`);
+  chip.title = label;
+  chip.setAttribute('aria-label', label);
+  return [chip];
 }
 /** the progress rail: drawn at where it stood, then ticked to frac on the compositor */
 function rail(frac) {
@@ -1750,6 +1765,9 @@ function otherPassages(card, word) {
 function sourceFold(card) {
   const src = card.src;
   const p = el('p', 'kp-src');
+  // a written passage's style (CARD_CONTRACT_V2 §6), named in full: it left the front's chip row
+  const style = typeof card.register === 'string' && REGISTER[card.register];
+  if (style) p.append(el('span', 'kp-src-line kp-src-style', el('span', 'kp-src-label', t("文体 ")), t(style[1])));
   const who = el('span', 'kp-src-line');
   if (src.author) who.append(src.author, src.translator ? t(`（訳 ${src.translator}）`, `(translation: ${src.translator})`) : '', ' · ');
   const label = src.site || src.label || '';
@@ -1771,28 +1789,39 @@ function sourceFold(card) {
   return fold('kp-f-src', t("出典"), false, p);
 }
 
-/** もう一度／思い出せた, nothing else (CARD_CONTRACT_V2 §4: Hard and Easy are not shown).
- * Under the bar, once per deck until dismissed or answered, the rule for choosing. */
+/** The four grades, in order (CARD_CONTRACT_V2 §4 as amended 2026-10-09, the learner's D1: "Four
+ * (Again · Hard · Good · Easy) — and color coded"): [name, 日本語, English, seal, key]. The FSRS
+ * rating is RATINGS[name] (1 · 2 · 3 · 4), the key its number. Hard is a pass (recalled, with effort). */
+const GRADES = [
+  ['again', 'もう一度', 'Again', '再', '1'],
+  ['hard', '難しい', 'Hard', '難', '2'],
+  ['good', '正解', 'Good', '良', '3'],
+  ['easy', '簡単', 'Easy', '易', '4'],
+];
+/** Under the bar, once per deck until dismissed or answered, the rule for choosing. */
 const RULE = '答えを見て理解が深まったなら もう一度';
 function gradeBar(id) {
+  // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
   const bar = el('div', 'kp-grades');
-  // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 and 良); English shows the word only
+  // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 難 良 易); English shows the word only
   const seal = (glyph) => {
     if (ctx.english !== false) return null;
     const n = el('span', 'kp-grade-seal', glyph);
     n.setAttribute('aria-hidden', 'true');
     return n;
   };
-  const g = (name, label, cls, key) =>
-    btn(`kp-grade ${cls}`, [seal(name === 'again' ? '再' : '良'), el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
-      id: `kp-grade-${name}`,
-      'aria-keyshortcuts': key,
-    });
-  bar.append(g('again', t("もう一度"), 'kp-again', '1'), g('good', t("思い出せた"), 'kp-good', '3'));
+  for (const [name, ja, en, glyph, key] of GRADES) {
+    bar.append(
+      btn(`kp-grade kp-${name}`, [seal(glyph), el('b', null, t(ja, en)), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
+        id: `kp-grade-${name}`,
+        'aria-keyshortcuts': key,
+      }),
+    );
+  }
   // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
   // pads' way after that)
-  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
+  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　正解 →")));
   if (!ctx.prefs.ruleSeen) {
     const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
@@ -2036,14 +2065,14 @@ function commit(rating, { stay = false } = {}) {
   ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
   ctx.state = nextState;
   ui.done++;
-  if (rating >= RATINGS.good) ui.right++;
+  if (rating >= RATINGS.hard) ui.right++;
   const answered = ctx.index.cards.get(id)?.word;
-  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.good });
+  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard });
   if (stay) {
     paint();
     return;
   }
-  next(rating >= RATINGS.good ? 'good' : 'again');
+  next(rating >= RATINGS.hard ? 'good' : 'again');
 }
 
 /**
@@ -2143,7 +2172,7 @@ function undo() {
 }
 
 /**
- * Swipe right = 思い出せた, left = もう一度. Only the finger that started the
+ * Swipe right = 正解 (Good), left = もう一度 (Again). Only the finger that started the
  * swipe counts; it must travel more than 90px and at least twice as far
  * sideways as up or down, and be lifted (pointerup). A cancelled gesture (the
  * page scrolled, the system took the touch) only puts the card back.
@@ -2203,7 +2232,7 @@ function attachSwipe(face) {
 
 /**
  * The session close: the surface is clear. The words of this sitting rise off the card table
- * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (思い出せた),
+ * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (難しい, 正解, 簡単),
  * again (もう一度) and the time since 始める, the recall rate, when the next review falls due,
  * and one door: back to the deck.
  */
@@ -2370,7 +2399,7 @@ function suspendedField() {
   const ids = Object.keys(ctx.state.suspended || {}).filter((id) => ctx.index.cards.has(id));
   const why = {};
   for (const id of ids) why[ctx.state.suspended[id].by] = (why[ctx.state.suspended[id].by] || 0) + 1;
-  const count = el('p', 'kp-sub', ids.length ? t(`${ids.length}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${ids.length} cards (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
+  const count = el('p', 'kp-sub', ids.length ? t(`${fmtN(ids.length)}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${nounEn(ids.length, 'card')} (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
   count.id = 'kp-suspended';
   const back = btn('', t("復元"), () => {
     const nextState = restoreSuspended(ctx.state, new Date(), ids);
@@ -2473,7 +2502,7 @@ function onKey(e) {
   if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
     e.preventDefault();
     if (mode !== 'choice') reveal();
-  } else if (ui.revealed && mode !== 'choice' && (e.key === '1' || e.key === '3')) {
+  } else if (ui.revealed && mode !== 'choice' && ['1', '2', '3', '4'].includes(e.key)) {
     e.preventDefault();
     commit(Number(e.key));
   } else if (ui.revealed && mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {

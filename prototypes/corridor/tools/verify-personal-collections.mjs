@@ -156,8 +156,8 @@ try {
       assert.deepEqual((await stored(otherPage)).progress.events,exported.progress.events);
       assert.equal((await stored(otherPage)).enrichment.enrichmentHash,enrichment.enrichmentHash);
       await other.close();checks.push(name+': complete backup round-trips into a second device context');
-      // Every palette comes from Bunki's existing public roster.
-      assert.equal(await page.locator('.pc [data-theme]').count(),10);
+      // Every palette comes from Bunki's existing public roster (eleven since round 4: D2 made 殻 public).
+      assert.equal(await page.locator('.pc [data-theme]').count(),11);
       await page.locator('[data-theme="yoru"]').click();
       await page.screenshot({path:path.join(out,`${name}-390-settings-night.png`),fullPage:true});
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

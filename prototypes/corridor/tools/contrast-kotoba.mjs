@@ -11,7 +11,8 @@
  *   gloss     --kp-ink-2 (English gloss, 英訳, readings, chips, level chip) on card, panel-2, page
  *   muted     --kp-mute (labels, fold markers, small print) on card, panel-2, page
  *   kind      --kp-kind-go / -ji / -bun (edge + 語・字・文法 chip) on the card
- *   state     --kp-red / -green / -amber (grade buttons, state chips) on the card; 思い出せた on its tint
+ *   state     --kp-red / -amber / -green / -blue (the four grade pads もう一度・難しい・正解・簡単, state
+ *             chips) on the card; 正解 on its tint
  *   accent    --kp-cyan on the card, the page and its own wash (答えを見る, chosen settings)
  *   pos       --kp-noun … --kp-sound (the target, the badge) on the card
  *   start     --kp-on-accent on --kp-cyan (the 始める button)
@@ -148,7 +149,7 @@ const ROWS = [
   ['gloss / chips', 4.5, ['ink-2'], ['panel', 'panel-2', 'bg']],
   ['muted', 4.5, ['mute'], ['panel', 'panel-2', 'bg']],
   ['kind', 4.5, ['kind-go', 'kind-ji', 'kind-bun'], ['panel']],
-  ['state', 4.5, ['red', 'green', 'amber'], ['panel', 'good-button']],
+  ['state', 4.5, ['red', 'amber', 'green', 'blue'], ['panel', 'good-button']],
   ['accent', 4.5, ['cyan'], ['panel', 'bg', 'accent-wash']],
   ['pos', 4.5, ['noun', 'verb', 'adj', 'adv', 'expr', 'sound'], ['panel']],
   ['start', 4.5, ['on-accent'], ['accent']],
@@ -171,7 +172,7 @@ export function contrastTable(css) {
       bg,
       panel,
       'panel-2': over(c('panel-2'), panel),
-      // 思い出せた: 12% of the green over the card panel (player.css .kp-good)
+      // 正解 (Good): 12% of the green over the card panel (player.css .kp-good)
       'good-button': [0, 1, 2].map((i) => c('green')[i] * 0.12 + panel[i] * 0.88),
       'accent-wash': over(c('cyan-wash'), bg),
       accent: c('cyan'),
@@ -210,7 +211,7 @@ export const deltaE = (a, b) => {
   return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 100;
 };
 export const KIND_JI_FLOOR = 10;
-const KIND_JI_OTHERS = ['kind-go', 'kind-bun', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'cyan', 'red', 'green', 'amber'];
+const KIND_JI_OTHERS = ['kind-go', 'kind-bun', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'cyan', 'red', 'green', 'amber', 'blue'];
 /** per theme: the 字 hue, its contrast on the card, and the nearest other hue with its ΔE_ok */
 export function kindJiTable(css) {
   const tokens = themeTokens(css);
