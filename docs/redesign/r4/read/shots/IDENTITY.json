@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "verifiedCodeGitSha": "40806a264fd8f42669bcc8a0d974d5d2209c6e4d",
+  "artifactSha256": "34cf6d10501d730cc305142a83d392cbcb3a0aa5d95d049f51d574541e07d449",
+  "sourceDirty": false,
+  "scope": "Headless Chromium; fresh public UI flows; 390x844 and 320x700, at device scale 2. Not physical-device acceptance or pixel-sampled contrast.",
+  "captureManifest": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/manifest.json",
+  "extraManifest": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/manifest.json",
+  "files": [
+    {
+      "path": "day-en/read.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-en/read.png",
+      "sha256": "f5a94c97ba68e53e0d3053e263e671961b6cf8b933a478aebac1019ee6b88f34"
+    },
+    {
+      "path": "day-en/reader.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-en/reader.png",
+      "sha256": "f3c4e29d09a172cce18709dbf1e57410b3f2df56098371b544db9c42098b9dd1"
+    },
+    {
+      "path": "day-en/popup.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-en/popup.png",
+      "sha256": "471ad9381677ce9ccd721067461f17c779f59205d1bfa3e5dfea09ec89b4c8e5"
+    },
+    {
+      "path": "day-en/list-sheet-empty.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-390/list-sheet-empty.png",
+      "sha256": "6998e2be8df0dfbc24f22a7f4ad9cec6677048dbb1c64a5d0a098854d578fb67"
+    },
+    {
+      "path": "day-en/list-sheet.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-390/list-sheet.png",
+      "sha256": "8017d49338609b44fb873b46417f79c51b0ac7a56b869b29ffaa113fdfb6533f"
+    },
+    {
+      "path": "day-en/popup-saved.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-390/popup-saved.png",
+      "sha256": "34c6ac540160cfeed2ab93f8aaa3da58cf078663cafee389f7d9df0fa0ff8810"
+    },
+    {
+      "path": "day-en/popup-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-390/popup-sentence.png",
+      "sha256": "a480559bb14d18c69721c1f61f37fc7cb976451caec5d7fb8d4190e2928af10b"
+    },
+    {
+      "path": "day-en/reader-scrolled.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-390/reader-scrolled.png",
+      "sha256": "1d9010ff743387e8e45805ceb3485e954902119d08ffed8f9d9d28a65f0a2a8d"
+    },
+    {
+      "path": "day-en/320/list-sheet-empty.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/list-sheet-empty.png",
+      "sha256": "c8e67eedd800f841028cb1752ca1b8b8e03ac2085fda89530264597282d78042"
+    },
+    {
+      "path": "day-en/320/list-sheet.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/list-sheet.png",
+      "sha256": "a9c89ec90940055a0b9b240f45035ece0db81d68478fb9c00418a0bd33270d72"
+    },
+    {
+      "path": "day-en/320/popup-saved.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/popup-saved.png",
+      "sha256": "70c314be484da9690f283377b572c79e760d86d185286ee69a6db58412e6b7e4"
+    },
+    {
+      "path": "day-en/320/popup-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/popup-sentence.png",
+      "sha256": "67f9b84fc5b7b542a5165f5c52c91b24ebe069292627adad0a6f85de66104b1c"
+    },
+    {
+      "path": "day-en/320/popup.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/popup.png",
+      "sha256": "39808a5983c87d18169885b6955ac25ebe54778bb6cb8106e7814e627b8c5044"
+    },
+    {
+      "path": "day-en/320/reader-scrolled.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/reader-scrolled.png",
+      "sha256": "1c13ee6c4cf09f64decb6de17cad3827f4c74d8502fe902e371c22e83c27450f"
+    },
+    {
+      "path": "day-en/320/reader.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/reader.png",
+      "sha256": "40043cb28499a6bc53cd36dfcc0ef92eb269d1ff196681a011681a7292253e7d"
+    },
+    {
+      "path": "day-en/320/short-card-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/short-card-sentence.png",
+      "sha256": "46c26ee90211f04cd5fe48e4ce2d5b12ed6d844483879154f31be54a38dd5733"
+    },
+    {
+      "path": "day-en/320/short-card.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-en-320/short-card.png",
+      "sha256": "09210188867c9fa100031620a921551ceeabb7404242b8e64771427976319ee4"
+    },
+    {
+      "path": "night-en/read.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/night-en/read.png",
+      "sha256": "bd545cc4fade13a08c60a9d3074ff01005a66a7009b4ce2fcc878b22563ed8e5"
+    },
+    {
+      "path": "night-en/reader.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/night-en/reader.png",
+      "sha256": "6ddb2acb7c3bdfea894247feb0b3a4d2f9b972d3169c2c727c3727df78cb986e"
+    },
+    {
+      "path": "night-en/popup.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/night-en/popup.png",
+      "sha256": "b9170cb18a06c15d4d2364f452a9340e3b4ccc5987ec3be17d8c5c4ebe674923"
+    },
+    {
+      "path": "night-en/list-sheet-empty.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-390/list-sheet-empty.png",
+      "sha256": "561742df90a18e7747055a1f1cff0c0b25210ca0d9dc31b50371a94c5121a029"
+    },
+    {
+      "path": "night-en/list-sheet.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-390/list-sheet.png",
+      "sha256": "cee2027c52e9d902f187a618f46bf905b40a949a69ad3f833925fc2353530558"
+    },
+    {
+      "path": "night-en/popup-saved.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-390/popup-saved.png",
+      "sha256": "5276775719f1ba6174e3d90fd43c376e5f3e4d76eac511d34d04a6a3b40a76c6"
+    },
+    {
+      "path": "night-en/popup-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-390/popup-sentence.png",
+      "sha256": "76398e11ea6b121fc427dc1a902f8b92ac87a86f90027b3dedc56b9c40733bde"
+    },
+    {
+      "path": "night-en/reader-scrolled.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-390/reader-scrolled.png",
+      "sha256": "b72c4f7fca597b4b2ba5a563f7abd1f35934da8791955de5a913b000c2aa5502"
+    },
+    {
+      "path": "night-en/320/list-sheet-empty.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/list-sheet-empty.png",
+      "sha256": "e3871909a54c1f72cbd892cdc1b2d08a2e1981ae3ec3840342125bde1971b039"
+    },
+    {
+      "path": "night-en/320/list-sheet.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/list-sheet.png",
+      "sha256": "830096f6698a346f6afa939f971f91def1f12e81d30c9e2cff35b2c4d6b35278"
+    },
+    {
+      "path": "night-en/320/popup-saved.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/popup-saved.png",
+      "sha256": "2ce0edd2bdcb3f1e7b23a505b32385f5926e9b7714571f4767486350379ca42a"
+    },
+    {
+      "path": "night-en/320/popup-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/popup-sentence.png",
+      "sha256": "e258fd4d70ca7b44c941b960fca2f3bdc90ae9ae2fadd89d057c2424e79585ec"
+    },
+    {
+      "path": "night-en/320/popup.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/popup.png",
+      "sha256": "05d32d43e09e11e20924655399874bf5f8edc7e340020d4e3700ab5cf3b35177"
+    },
+    {
+      "path": "night-en/320/reader-scrolled.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/reader-scrolled.png",
+      "sha256": "fe6ecbefa04bf1e6fa915b0948d2b316302df38afb4147b9bc10eda6c41bc0ef"
+    },
+    {
+      "path": "night-en/320/reader.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/reader.png",
+      "sha256": "1f278668d8e6b6e5c256286ba60c31f6ae8094d2215d4e2da72791e090e6a6da"
+    },
+    {
+      "path": "night-en/320/short-card-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/short-card-sentence.png",
+      "sha256": "58a1e44076d1859feb8d17187d8187ca3ce83c46327901b749c69ea178028841"
+    },
+    {
+      "path": "night-en/320/short-card.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/night-en-320/short-card.png",
+      "sha256": "142443d1df9c01bcfb0c7ea92ac2ef35d5acd0bc428932ce45eeeb6703abb068"
+    },
+    {
+      "path": "day-ja/read.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-ja/read.png",
+      "sha256": "929ef58f0e4daa1bf4e309e3d25f55159cad4a845e34e53303294abcf33e8b2d"
+    },
+    {
+      "path": "day-ja/reader.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-ja/reader.png",
+      "sha256": "03552a56d3d8aa62940795c7631ea88194a9c5a27e8e977f146ee8c6aa80289c"
+    },
+    {
+      "path": "day-ja/popup.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-ja/popup.png",
+      "sha256": "742b854de0ead498a920284248b55563a39e391fd955007b4f670fdd8217cc7c"
+    },
+    {
+      "path": "day-ja/list-sheet-empty.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-390/list-sheet-empty.png",
+      "sha256": "e26048cd0062946c26eedf693875ae6bbc9026b59d4004922028a8e4797a4130"
+    },
+    {
+      "path": "day-ja/list-sheet.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-390/list-sheet.png",
+      "sha256": "d4c94d474d91d743723f9811131a1e82add6dee2882a44065993f0304c667a3b"
+    },
+    {
+      "path": "day-ja/popup-saved.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-390/popup-saved.png",
+      "sha256": "989ab016d5c95a3d1c245adc94d2c70f09777eaef5ea104d1035cc6dbd26c481"
+    },
+    {
+      "path": "day-ja/popup-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-390/popup-sentence.png",
+      "sha256": "1b87299f25cc5682b42f6a567bd1b68824afd303505f0cc7c1b293e35cf2e23a"
+    },
+    {
+      "path": "day-ja/reader-scrolled.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-390/reader-scrolled.png",
+      "sha256": "04b435b5b4534494a035b37f7605120a175b2dea1f48987883f4fb8ebc563ff5"
+    },
+    {
+      "path": "day-ja/320/list-sheet-empty.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/list-sheet-empty.png",
+      "sha256": "76d6ac49983036da8db854f259629fd67c1b3772981c43e6535bd03a0f411dd3"
+    },
+    {
+      "path": "day-ja/320/list-sheet.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/list-sheet.png",
+      "sha256": "a7a492ea3d1a5167cb4591a993f2fc3f47ce10d74c76107f2a61176910084338"
+    },
+    {
+      "path": "day-ja/320/popup-saved.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/popup-saved.png",
+      "sha256": "1b3d03930eb2522485feea422d002fe0423e30d446cebd335e2446c34fe0040f"
+    },
+    {
+      "path": "day-ja/320/popup-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/popup-sentence.png",
+      "sha256": "79d4692654e1aa9d8021c4da9c9549f2a50ff676864aaca524e9f81ed00cff60"
+    },
+    {
+      "path": "day-ja/320/popup.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/popup.png",
+      "sha256": "4b8f63bdab1d4974c81de99d02cfa48809eb08f5d5900fd2473c51468bfccf10"
+    },
+    {
+      "path": "day-ja/320/reader-scrolled.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/reader-scrolled.png",
+      "sha256": "1f085137cef753b488121d8378159a79a83f4af44c9c8ba78a39392cde639d22"
+    },
+    {
+      "path": "day-ja/320/reader.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/reader.png",
+      "sha256": "16fa16f13e7df0b7fe832b38f81d6233f18d38171b1756ebd205f5fc73aac43d"
+    },
+    {
+      "path": "day-ja/320/short-card-sentence.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/short-card-sentence.png",
+      "sha256": "784ce7b1709de81158cdde9b659bb062568309977e7362aff2add1e1bae9d96a"
+    },
+    {
+      "path": "day-ja/320/short-card.png",
+      "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/extra/day-ja-320/short-card.png",
+      "sha256": "f24a124e39250f015bd3527e66a70d6ef36f86d67368f845cb2962b7f59b36c6"
+    }
+  ]
+}

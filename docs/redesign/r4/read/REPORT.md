@@ -201,3 +201,95 @@ The lead has these, so LABELS.md can match what ships.
 - `1f0791d3` Verifiers: a capture that fails inside a list creation is still driven (annotation-lookup)
 - `e581b4b7` Read (T4): the text paper's top edge is a real ink line (30%; gold 36% at night)
 - (this report)
+
+## Review and refine
+
+This section supersedes the first-pass verification, photographs and open-item list above. Codex Sol read every draft hunk from `7c1b2036`, created `claude/r4-read-final-20261010`, and merged the verified skin/cards/today head `3d81031b`. The merge was clean; the read surfaces were checked against the merged Tokens v2 and shell. No push or main merge was made.
+
+**Verified product code:** `40806a264fd8f42669bcc8a0d974d5d2209c6e4d`, clean source (`sourceDirty: false`). **Artifact:** `34cf6d10501d730cc305142a83d392cbcb3a0aa5d95d049f51d574541e07d449`. The later documentation/photos commit records those exact tested bytes. The immutable site is under `~/.dharma/bunki_review/2026-10-10/r4-finish/site`; the final battery used its staging name `site-next` before it was moved intact. Logs, receipts and runtime photographs are under that same `r4-finish` directory. The superseded runs and shots are archived separately and are not final evidence.
+
+### The three rule breaks
+
+1. **Protected-record assertions restored.** The first-pass claim that no storage assertion changed was wrong. Its replacement annotation case omitted both capture-failure checks. In `verify-annotation-lookup.mjs`, `failed-capture-inside-a-list-is-honest-and-recoverable` now holds the exact assertions **“A failed native write protects the host until reload”** (disabled submit) and **“The required recovery reload preserves the unsaved list name”** (`Capture first`). It also requires read-only record state, a reload instruction, no durable change through fault/reload, writable recovery, and a retry that creates the list with 電車 and exactly one card. The `list-form-reenabled-before-reload` negative control exercises both capture and list-only failure; both deliberately broken cases are rejected. `verify-vocabulary-chooser` retains the list-only protection/draft recovery and denies another Save after a native capture fault even after its bounce guard expires. The historical REPORT claim is corrected inline; VERIFIER_CHANGES preserves its prior text and appends the correction.
+2. **44px version switch restored.** Both choices have `min-height: 44px`; the help target is 44×44. G7 measures all three targets at 390 and 320 and asserts `box.w >= 44 && box.h >= 44`. Final choice sizes are 134×44 at 390, and 97×44 / 101×44 at 320. An external negative control rejects the actual first-pass 40px buttons at both widths.
+3. **Only transform/opacity animate.** Removed background-colour motion and scoped inherited reader icon colour/background transitions to instantaneous highlights. G8 observes computed positive-duration transitions and named keyframes, including pseudo-elements, with reduced motion disabled; its exact assertions are **“Reader and word popup may animate only transform and opacity”** and **“The sentence popup may animate only transform and opacity”**, each requiring an empty violations array. It proves it observed motion (966 nodes, 911 transition entries and three animations in Chromium). Both widths and both engines pass.
+
+### All eleven review fixes
+
+| # | Result | What now holds |
+|---|---|---|
+| 1 | Done | 44px version choices and help at 390/320, with runtime G7 and a failing first-pass control. |
+| 2 | Done | Both lost record assertions, reload/retry, capture/list negative controls and honest documentation restored, with no product storage change. |
+| 3 | Done | Instant press colour; only transform/opacity transitions or animations in the reader and popup. |
+| 4 | Done | Fine washi on reading paper and title by day; faint fibre by night. The paper remains brighter than its room with a real ink edge; relief and readability checks retain their floors. |
+| 5 | Done | Sentence pane keeps the word card's top within 1px, including short その cards. Tall content scrolls inside its card. Initial Back and later Ask/Practice focus stay visible without article scrolling. A constrained card above its token meets the fixed chrome, eliminating the narrow strip of cut title glyphs. Practice return focus remains visible. |
+| 6 | Done under the finish brief's authorization | Exact glossary copy “No audio for this article yet” / “この記事の音声はまだない”; contextual sentence equivalent. Locked Kore/Charon provenance remains in exact accessible descriptions. All six voice pin edits are logged and silence/no-picker/no-device-voice protections remain. No separate lead reply is claimed. Source/date/level/state/audio use one bundled UI face at 12px; character count is removed from the reader. |
+| 7 | Done | Kinsoku groups keep opening brackets with following words and closing punctuation with preceding words, in title and article, across all three spacing modes. G9 checks actual painted glyph lines, unsplit title lookup words, and exact source title/article text. |
+| 8 | Done | Popup shadow falls away from the touched word. Night ruby is visibly clear in the final photographs; its computed ink/opaque-paper contrast is 9.26:1 (day 10.90:1). This computed number excludes grain/shadow compositing; it is not a pixel-sampled claim. |
+| 9 | Done | “Practice it” says “Recall it or use it” / “思い出す・使う”, matching its choice screen. Quiet “Save the sentence” is inside the sentence pane and keeps exactly one tutor context, without activating it or leaving the reader. A real native abort preserves the record and disables all three actions until reload. |
+| 10 | Done | English part names use UI sans; kana remain Mincho. The popup note says “to review”, matching “Saved to review”. Save, Saved and Add to a list share their button family and lip. |
+| 11 | Done | Rebuilt after the merge, rechecked accessibility/relief, and re-photographed day-en/night-en/day-ja on the exact final artifact. Added 320px, saved popup, sentence/short-card and list-sheet views with byte identities. |
+
+### John's T3, T4 and T5 in the final build
+
+His full lines remain quoted above. T3's mark is padded **読**, legible as a seal, rather than 永. T4's merged white/day or ink/night chrome and footer, lacquer picture mat, taller 136px phone print, raised title/subtitle card, recessed version track, and textured reading paper have distinct surfaces and edges. The version explanation is one plain line behind ⓘ, and the reader tip remains one line. T5's card separates its word, Save, kanji and sentence bands; the real path is **Save → Saved → Add to a list**. “Related words ›”, “Study this sentence ›” and the one-line reader tip are retained exactly as requested. The sentence's Ask/Practice/Save choices live inside that one named door.
+
+### Final verification
+
+The required serial runner battery uses Chromium and the exact final artifact/SHA; root tools use the same environment. Reader design was also run separately in WebKit. Every behavioural assertion was retained or strengthened; cosmetic/path pin edits and the historical protection loss are individually logged in `docs/redesign/VERIFIER_CHANGES.md`.
+
+| Name | Result | Note |
+|---|---|---|
+| `verify-corridor` | Pass | 259/259 |
+| `verify-corridor-storage-integrity` | Pass | Record invariants |
+| `verify-corridor-accessibility` | Pass | 53/53 |
+| `lint-ui-language-core` | Pass | Core EN/JA |
+| `verify-relief` | Pass | Edges ≥25% and lifting shadows |
+| `verify-theme-consistency` | Pass | World sweep |
+| `verify-writing-room` | Pass | 51/51 |
+| `verify-kotoba-mine` | Pass | Deck integrity |
+| `verify-n2n1-decks` | Pass | N2/N1 integrity |
+| `verify-personal-collections` | Pass | 9 cases |
+| `verify-dojo-door` | Pass | 30 room/width journeys |
+| `verify-guided-session` | Pass | 211 checks |
+| `sw-shell` | Pass | Vitest shell checks |
+| `test-navigation-returns` | Pass | Return paths |
+| `verify-srs-today` | Pass | 32/32; 2/2 mutants caught |
+| `verify-experience` | Pass | 42/42; frozen assets |
+| `verify-drift-hunt` | Pass | All hunt regressions green |
+| `verify-design-reader-shelf` | Pass | 45/45 Chromium |
+| `verify-reader-doors` | Pass | 93/93 |
+| `verify-reader-lookup` | Pass | Lookup and roving |
+| `verify-playback` | Pass | Silence/provenance/layout |
+| `verify-annotation-lookup` | Pass | 10/10; both failure controls caught |
+| `verify-shelf-search` | Pass | Query races |
+| `verify-vocabulary-chooser` | Pass | 5/5; protected failure/retry |
+| `verify-corridor-doors` | Inherited fail | T13 only; matches accepted baseline |
+| `verify-pr77-ports` | Inherited fail | 52/56; exact same four accepted failures |
+| `verify-redesign-foundation` | Pass | 6 language/width journeys |
+| `verify-redesign-docks` | Pass | 24/24, Chromium + WebKit |
+| `verify-today-sky` | Pass | 81 checks |
+| `verify-bundled-listening` | Pass | Pending-audio silence/provenance |
+| `verify-listening-failures` | Pass | Native failure silence/provenance |
+| `verify-sentence-drafts` | Pass | 8/8; desktop and phone |
+| `test-approved-voice` | Pass | 11/11, executable fixture |
+| `verify-design-reader-shelf-webkit` | Pass | 45/45 WebKit |
+
+Syntax checks passed for the changed reader JavaScript/verifiers. ESLint exits zero but ignores the three reader verifier files under the repository policy, so it supplies no coverage for them. Their executable and negative-control checks above are the verification. The external final sentence fault/focus probe passed 11/11 assertions.
+
+### Photographs and protected scope
+
+The supplied capture command completed all 36 room photographs in day-en, night-en and day-ja. The extra public-UI capture completed 48 reader/popup/list/short-card images in six fresh 390×844 / 320×700 profiles at 2×. It checks the fetched build identity, font origins, target geometry, one-card Save/list membership, no horizontal overflow, no page or record faults, and no external requests. All 36 room frames were inspected as contact sheets, with full-size reader/popup and narrow/list views inspected separately.
+
+The supplied script probes an absent legacy `build-sha` meta tag, so its `sha` fields are blank. `shots/HOST_IDENTITY.json` records the pinned immutable server identity and the exact extra-capture identity check. `docs/redesign/r4/read/shots/IDENTITY.json` records SHA-256 for each of the 51 copied lane photos; every copied file is byte-identical to its final runtime original. The photo server on 57102 was stopped.
+
+No protected storage marker/function changed. A byte audit against `3d81031b` confirms the entire prefix before `renderShelfBody`, the FSRS pin (`prototypes/corridor/data/fsrs-pin.json`), the shared player engine, and all N2N1 source files: 536 protected files are identical. Card/Anki identities and storage keys are untouched; storage-integrity, SRS, deck, collection, service-worker and navigation checks provide runtime coverage. The real node_modules was used as provided, without replacement or installation. No secrets were read. No push, main merge, history rewrite or stash was performed.
+
+### What remains open
+
+- The accepted inherited failures remain: corridor-doors **T13 only**, and pr77-ports **the same four checks, 52/56**. Their exact failure names were compared to the accepted PR-head logs; JSON comparisons are in the final verify directory. The four ports checks are the 未確認/review reason, the rights-held reason, review-room ×/… contrast, and the kdx-chip-state probe timeout. No verifier was weakened to remove them.
+- These are headless Chromium and Playwright WebKit checks, not acceptance on a physical iPhone. The night ruby figure is computed colour contrast, not pixel-sampled contrast.
+- The full-entry, tutor and source-page sentence chips remain outside this read-lane scope. The old shell “memorize”/bookmark wrap, dense metadata, missing-audio wording and broken approved-voice fixture are resolved here or by the merged skin lane.
+- The first-pass assessment-written-section failure is historical and outside the finish battery; it was not retested in this pass. No claim is made that it is resolved.
+
+The current user's instruction to execute the finish brief authorizes adopting its glossary audio copy. There is no separately obtained lead reply; this report makes the provenance decision explicit without claiming an additional approval.
