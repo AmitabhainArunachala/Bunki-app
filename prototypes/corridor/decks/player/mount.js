@@ -3,7 +3,9 @@
  * word list and settings. The schedule is this deck's own ledger in
  * localStorage (`bunki-cloze:<deck id>`), never the corridor's word queue.
  *
- *   render(main, { deckId, storage, onLeave, openEntry, host })
+ *   render(main, { deckId, storage, onLeave, openEntry, host, autoStart })
+ * autoStart is an ephemeral entry request: true begins the same sitting as the home button,
+ * false opens the deck home, and absent preserves the screen through host re-renders.
  *
  * openEntry({ t: 'grammar', id }) is optional: a host that can show a grammar entry passes it,
  * and the back's 文法 links call it; without it they are plain labels.
@@ -2594,7 +2596,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart } = {}) {
   ensureCss();
   const root = el('div', 'kp');
   const lexicon = hostOf(host);
@@ -2623,18 +2625,22 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
-  if (!sameDeck) {
+  if (!sameDeck || autoStart === false) {
     ui.screen = 'home';
     ui.queue = [];
     ui.sheet = null;
+    ui.pop = null;
   }
   if (!keyBound) {
     document.addEventListener('keydown', onKey);
     window.addEventListener('scroll', () => ui.pop && placePop(), { passive: true });
     keyBound = true;
   }
-  if (ui.screen === 'study') wantTokens();
-  paint();
+  if (autoStart === true) startSession();
+  else {
+    if (ui.screen === 'study') wantTokens();
+    paint();
+  }
 }
 
 /** due count for a deck chooser, without rendering anything */
@@ -2643,5 +2649,5 @@ export async function summary(deckId, storage = window.localStorage) {
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
   const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode) });
-  return { due: q.due.length, fresh: q.fresh.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
+  return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }
