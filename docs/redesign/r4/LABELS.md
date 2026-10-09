@@ -72,12 +72,12 @@ The name is **回廊 KAIRO** (D3). In running English it is **KAIRO**; in runnin
 | Where | Old EN | New EN | Old JA | New JA |
 |---|---|---|---|---|
 | Popup actions | Save · Add to list… | **Save** first; after saving, the same place offers **Add to a list** | 保存 · リストに追加… | 保存 → リストに追加 |
-| Popup link to the web | Open the web › | Kanji & related words › | つながりをひらく › | 漢字と関連語 › |
-| Popup sentence row | This sentence: Save · Ask the tutor · Practice | one action: **Practise this sentence** (saving it and asking the tutor live inside) | この文：保存 · 先生に聞く · 練習 | この文を練習する |
+| Popup link to the web | Open the web › | Related words › *(the read lane's wording: the link sits under the band's own "KANJI" label; proposed: Kanji & related words ›)* | つながりをひらく › | 関連語 › |
+| Popup sentence row | This sentence: Save · Ask the tutor · Practice | one action: **Study this sentence ›** (asking the tutor, practising it and saving it live inside) *(the read lane's wording: the door holds more than practice; proposed: Practise this sentence)* | この文：保存 · 先生に聞く · 練習 | この文を学ぶ › |
 | Full entry, sentence chips | save this sentence · discuss this sentence · practice this sentence | Save sentence · Ask the tutor · Practise sentence | — | 文を保存 · 先生に聞く · 文を練習 |
 | Reader version note | The simplified version retells the same article in easier Japanese. | Simplified: the same story in easier Japanese. | やさしい版は、同じ記事をやさしい日本語で書き直したものです。 | やさしい版：同じ記事を、やさしい日本語で。 |
-| Reader tip | Tap any word to see what it means. Right-click (or press and hold) for more. | Tap a word for its meaning. Press and hold for more. | — | 語をタップで意味。長押しでほかの操作。 |
-| Reader audio line | no recording yet · Kore | No audio for this article yet *(the voice name stays in Settings; "Kore" is pinned in several verifiers, so change it with a logged pin edit)* | 音声未収録 · Kore | この記事の音声はまだない |
+| Reader tip | Tap any word to see what it means. Right-click (or press and hold) for more. | Tap any word for its meaning. *(the read lane's wording: one instruction, one line; the text settings' hint keeps press and hold; proposed: Tap a word for its meaning. Press and hold for more.)* | — | 語をタップすると、意味が出ます。 |
+| Reader audio line | no recording yet · Kore | No audio for this article yet *(done by the read lane: the approved voices, Kore and Charon, are named in the line's accessible description, and each pin edit is logged in `VERIFIER_CHANGES.md`)* | 音声未収録 · Kore | この記事の音声はまだない |
 | Reader place | Reading places · keep this place | Bookmarks · Bookmark this spot | 読書の栞 · ここに栞を置く | 栞 · ここに栞をはさむ |
 | Reader chrome capture (`#reader-take`, screen-reader name) | memorize | Save *(one name for one action; done by the skin in the review pass, see the Shell table)* | 覚える | 保存 |
 | Shelf seal | 永 (read as 水, T3) | a seal that means reading, e.g. 読 | 永 | 読 |
