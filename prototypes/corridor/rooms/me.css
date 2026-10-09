@@ -415,8 +415,11 @@ html[data-room='progress'] main .kagami-cell { border-radius: 2px; border-color:
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='progress'] main .stats-col i { background: var(--color-gold); box-shadow: 0 0 6px -2px var(--color-gold); }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-room='me'] :is(.me-book, .me-hz-rule i, .me-home, .me-gleam, .me-seal, .me-cal) { animation: none !important; }
+  html[data-room='me'] :is(.me-hz-rule i, .me-gleam) { animation: none !important; }
+  html[data-room='me'] #app :is(.me-book, .me-home, .me-seal, .me-cal) { animation: me-fade 80ms linear backwards !important; }
 }
+
+@keyframes me-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* round 4 review (D5): the fields deck's "not begun" is said once, under the group's name */
 html[data-room='me'] .me-hz-group-note { margin: 4px 0 2px; }

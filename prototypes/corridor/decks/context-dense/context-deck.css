@@ -269,15 +269,18 @@ ruby.cd-ruby rt {
 }
 
 .cd-write .cd-ink {
-  animation: cd-write 0.42s ease both;
+  display: inline-block;
+  animation: cd-write 0.24s ease both;
 }
 
 @keyframes cd-write {
   from {
-    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+    transform: translateX(-0.08em);
   }
   to {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -287,11 +290,22 @@ ruby.cd-ruby rt {
 
 @keyframes cd-write-v {
   from {
-    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    transform: translateY(-0.08em);
   }
   to {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+@keyframes cd-ink-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app .cd-room[data-writing] .cd-write .cd-ink { animation: cd-ink-fade 80ms linear both !important; }
 }
 
 .cd-miss .cd-ink,

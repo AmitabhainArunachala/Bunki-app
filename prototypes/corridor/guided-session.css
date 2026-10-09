@@ -1537,8 +1537,8 @@ legend.gs-instruction {
     transition: none !important;
     scroll-behavior: auto !important;
   }
-  .guided-room .gs-feedback,
-  .guided-room .gs-slash path {
+  #app .guided-room .gs-feedback,
+  #app .guided-room .gs-slash path {
     animation: gs-quiet-verdict 80ms linear both !important;
   }
 }

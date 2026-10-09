@@ -807,7 +807,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .samurai-effect {
-    animation: none;
+    animation: se-enter 80ms linear both;
   }
   .samurai-effect--forced * {
     animation-duration: var(--samurai-motion, 1ms) !important;
@@ -818,8 +818,8 @@
     display: none;
   }
   .bunki-moment__message {
-    animation: none;
-    transition: none !important;
+    animation: se-enter 80ms linear both;
+    transition: opacity 80ms linear !important;
   }
 }
 
