@@ -4540,6 +4540,10 @@ function restoreDialogInvoker() {
       target = document.querySelector(
         `#reader .tok[data-index="${key.index}"][data-target-kind="${key.targetKind}"]`,
       );
+      if (!target) {
+        const joined = readerTokenAtIndex(key.index);
+        if (joined?.dataset.indexEnd && joined.dataset.targetKind === key.targetKind) target = joined;
+      }
     } else if (key.kind === 'nav-row') {
       // the deep tier may still be settling; the input is the honest fallback
       target =
@@ -5121,12 +5125,12 @@ function openPassage(id, anchor = null) {
   window.scrollTo(0, S.readerScroll);
   const restoreAnchor = () => {
     if (S.view !== 'reader' || S.passageId !== id || !Number.isInteger(anchor?.index)) return;
-    const token = document.querySelector(`.reader .tok[data-index="${anchor.index}"]`);
+    const token = readerTokenAtIndex(anchor.index);
     if (!token) return;
     token.scrollIntoView({ block: 'center' });
     if (token.matches('button')) token.focus({ preventScroll: true });
     const selected = passage()?.tokens?.[anchor.index];
-    if (anchor.selectTarget !== false && selected?.b && selected.c) setReaderTake(selected.b, anchor.index, id);
+    if (anchor.selectTarget !== false && selected?.b && selected.c && token.classList.contains('content')) setReaderTake(selected.b, anchor.index, id);
     S.readerScroll = window.scrollY;
   };
   requestAnimationFrame(restoreAnchor);
@@ -5426,6 +5430,25 @@ function shelfDateline(day) {
     `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekday]} ${d} ${MONTHS_EN[m - 1]} ${y}`);
 }
 
+function shelfCurrentDay() {
+  let override = null;
+  try { override = localStorage.getItem('kairo-shelf-day'); } catch { /* existing verifier seam */ }
+  return /^\d{4}-\d{2}-\d{2}$/.test(override || '') && Number.isFinite(Date.parse(`${override}T00:00:00Z`))
+    ? override : dayKey();
+}
+
+/** The default opens on three different recent stories each day. An explicit sort or filter
+ * keeps its own order; the source collection and every story's identity stay untouched. */
+function shelfDailyOrder(stories, day) {
+  const recent = stories.filter(p => p.source !== 'isa-yasashii-glossary').slice(0, 12);
+  if (!recent.length) return stories;
+  const ordinal = Math.floor(Date.parse(`${day}T00:00:00Z`) / 86400000);
+  const offset = ((ordinal * 3) % recent.length + recent.length) % recent.length;
+  const leading = Array.from({ length: Math.min(3, recent.length) }, (_, i) => recent[(offset + i) % recent.length]);
+  const heads = new Set(leading.map(p => p.id));
+  return [...leading, ...stories.filter(p => !heads.has(p.id))];
+}
+
 /* ---------------------------------------------------------------- views */
 /** Context-dense deck. Its schedule is its own ledger, loaded on demand. */
 let contextDeckMod = null;
@@ -5500,9 +5523,7 @@ function renderShelfBody(search = null) {
   // one card per story: an N3 rewrite whose original stands on the shelf is that story's
   // やさしい版, reached by the toggle inside the article, never a second card
   const stories = shelfStories(curated);
-  let dayOverride = null;
-  try { dayOverride = localStorage.getItem('kairo-shelf-day'); } catch { /* the verifier's seam only */ }
-  const day = (/^\d{4}-\d{2}-\d{2}$/.test(dayOverride || '') && dayOverride) || new Date().toISOString().slice(0, 10);
+  const day = shelfCurrentDay();
   // A magazine masthead: the room's name, today's date and one honest count. The count and the
   // results line below come from the same tally, so they cannot disagree.
   const masthead = el('header', 'shelf-masthead');
@@ -5517,8 +5538,6 @@ function renderShelfBody(search = null) {
   name.append(art, withEn(el('h1', 'view-title', '本棚'), 'bookshelf', 'en-inline'));
   title.append(name);
   const dateline = el('p', 'shelf-snippet intro shelf-dateline');
-  // the masthead shows the reader's own date; the verifier's day seam overrides it
-  const now = new Date(), localDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const sep = el('span', 'dateline-sep', ' · ');
   sep.setAttribute('aria-hidden', 'true');
   // the tally in full on a desk, in short on a phone (「110本 · 用語10」)
@@ -5526,7 +5545,7 @@ function renderShelfBody(search = null) {
   const glossaryCount = stories.filter((p) => p.source === 'isa-yasashii-glossary').length;
   tally.append(el('span', 'tally-long', shelfTallyText(stories)),
     el('span', 'tally-short', bi() ? `${stories.length} articles` : `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
-  dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
+  dateline.append(el('span', 'dateline-date', shelfDateline(day)), sep, tally);
   title.append(dateline);
   // 未確認 is said once, not on every card; each article still wears it in its meta line. One short
   // line (glance pass 2026-10-01); what it means waits behind its ⓘ. It stands under the lead story,
@@ -5549,7 +5568,8 @@ function renderShelfBody(search = null) {
   }
   masthead.append(title);
   body.append(masthead);
-  const filters = S.shelfFilters ||= { sort: 'latest', topic: '', jlpt: '', grade: '', text: '' };
+  const filters = S.shelfFilters ||= { sort: 'today', topic: '', jlpt: '', grade: '', text: '' };
+  const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
   const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest;
   // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
@@ -5571,7 +5591,7 @@ function renderShelfBody(search = null) {
     input.addEventListener('change', () => change(key, input.value)); chip.append(input); controls.append(chip);
   };
   const topics = [['news','ニュース','News'],['politics','政治','Politics'],['international','国際','World'],['technology','テクノロジー','Technology'],['science','科学','Science'],['economy','経済','Economy'],['environment','環境','Environment'],['culture','文化','Culture'],['literature','文学','Literature'],['sports','スポーツ','Sports'],['health','健康','Health'],['society','社会','Society']];
-  select('sort', tx('並び順', 'Sort'), [['latest', '最新', 'Latest'], ['new', '新着', 'Newly added'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
+  select('sort', tx('並び順', 'Sort'), [['today', '今日の棚', 'For today'], ['latest', '最新', 'Latest'], ['new', '新着', 'Newly added'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
   select('topic', tx('分野', 'Topic'), [['', '分野', 'Topic'], ...topics]);
   select('jlpt', tx('レベル（JLPT語彙の目安）', 'Level (JLPT vocabulary, estimated)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
   select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Secondary+']]);
@@ -5813,11 +5833,12 @@ function renderShelfBody(search = null) {
   name.append(toolsToggle);
   masthead.after(toolsBox);
   body.append(main);
-  const matches = stories.filter(p => {
+  let matches = stories.filter(p => {
     const f=p.readingFacets || {};
     return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
   matches.sort(shelfOrder);
+  if (filters.sort === 'today' && unfiltered) matches = shelfDailyOrder(matches, day);
   const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
   // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
   if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
@@ -5859,9 +5880,8 @@ function renderShelfBody(search = null) {
   const encounters = curated.map(p => ({ passage: p, forms: priorities.map(item => item.form)
     .filter(form => p.readingFacets?.forms?.includes(form)) }))
     .filter(item => item.forms.length).sort((a, b) => b.forms.length - a.forms.length || byNewest(a.passage, b.passage)).slice(0, 3);
-  const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
   // one card per story: the lead and its two seconds head the grid, so today's six never repeat them
-  const heads = new Set(unfiltered ? [...stories].sort(shelfOrder).slice(0, 3).map((p) => p.id) : []);
+  const heads = new Set(unfiltered ? matches.filter(p => p.source !== 'isa-yasashii-glossary').slice(0, 3).map((p) => p.id) : []);
   const picks = [];
   // the bands below ride inside the story grid, after the lead and its two seconds: magazine
   // rhythm, and the lead stays directly under the chip bar on a phone
@@ -6542,7 +6562,7 @@ function restoreLearningSourceCaller(visit) {
 function focusLearningSourceCaller(focusId) {
   const popup = /^reader-word:(\d+):(.+)$/u.exec(focusId || '');
   if (popup) {
-    const word = document.querySelector(`#reader .tok[data-index="${popup[1]}"]`);
+    const word = readerTokenAtIndex(popup[1]);
     const land = () => {
       const target = document.getElementById(popup[2]);
       // a choice inside the popup's sentence pane: the pane opens first, so the reader lands where it left
@@ -8482,7 +8502,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   said.append(el('span', 'mini-word', token.b));
   if (g?.r || token.r) said.append(el('span', 'mini-reading', g?.r || token.r));
   if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
-  else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   head.append(said);
   mini.append(head);
   const seal = el('button', 'mini-take btn-primary');
@@ -8788,7 +8808,7 @@ function revealFloatingFocus(card) {
  * quiet "Save the sentence" (keep it on the tutor page), the word menu's action of the same name. Each
  * view of the card has one Save: the word's, or here the sentence's. "‹ Back to the word" returns. Each
  * carries exactly the sentence the bar did. */
-function readerSentenceRow(node, index) {
+function readerSentenceRow(node, index, sourceEnd = index) {
   const wrap = el('div', 'mini-sentence-wrap');
   const sentence = teacherSentence(node);
   const door = el('button', 'mini-sentence mini-sentence-open');
@@ -8825,8 +8845,12 @@ function readerSentenceRow(node, index) {
     const full = el('p', 'mini-sentence-full');
     full.lang = 'ja';
     full.dataset.japaneseLookup = 'off';
+    const markedEnd = Math.min(sentence.end - 1, Math.max(sentence.index, sourceEnd));
     sentence.p.tokens.slice(sentence.start, sentence.end).forEach((token, i) => {
-      full.append(sentence.start + i === sentence.index ? el('mark', 'mini-sentence-word', token.s) : document.createTextNode(token.s));
+      const at = sentence.start + i;
+      if (at === sentence.index) full.append(el('mark', 'mini-sentence-word',
+        sentence.p.tokens.slice(sentence.index, markedEnd + 1).map(piece => piece.s).join('')));
+      else if (at < sentence.index || at > markedEnd) full.append(document.createTextNode(token.s));
     });
     pane.append(full);
   }
@@ -9157,6 +9181,42 @@ function readerGlossMissText() {
   return tx('この語は簡易辞書にありません。「全項目」で全辞書を引けます。', 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.');
 }
 
+/** Source indices remain those of the original article. A displayed name can cover several
+ * segmenter pieces, so an old bookmark on any of them still finds that same visible word. */
+function readerTokenAtIndex(index, reader = document.getElementById('reader')) {
+  const sourceIndex = Number(index);
+  if (!reader || !Number.isInteger(sourceIndex) || sourceIndex < 0) return null;
+  return reader.querySelector(`.tok[data-index="${sourceIndex}"]`) ||
+    [...reader.querySelectorAll('.tok[data-index-end]')].find(token =>
+      Number(token.dataset.index) <= sourceIndex && sourceIndex <= Number(token.dataset.indexEnd)) || null;
+}
+
+/** A foreign name such as ジャラマナ must not borrow マナ's unrelated dictionary sense.
+ * Join only contiguous noun pieces of at least two Katakana characters where the grader
+ * excluded a piece. Ordinary content compounds and short classical kana stay as authored.
+ * This is a display plan: no original token, paragraph index or source digest is rewritten. */
+function readerRenderedTokens(p, crossRefs) {
+  const result = [];
+  const breaks = new Set(p.paras || []);
+  const katakanaNoun = token => token?.p === '名詞' && /^[\p{Script=Katakana}ー]{2,}$/u.test(token.s || '');
+  const bounded = index => breaks.has(index) || crossRefs?.doors.has(index) || crossRefs?.skip.has(index);
+  for (let index = 0; index < p.tokens.length; index += 1) {
+    const original = p.tokens[index];
+    let end = index;
+    if (katakanaNoun(original) && !crossRefs?.doors.has(index) && !crossRefs?.skip.has(index)) {
+      while (end + 1 < p.tokens.length && !bounded(end + 1) && katakanaNoun(p.tokens[end + 1])) end += 1;
+    }
+    const pieces = p.tokens.slice(index, end + 1);
+    if (end > index && pieces.some(piece => !piece.c)) {
+      const surface = pieces.map(piece => piece.s).join('');
+      result.push({ index, token: { s: surface, b: surface, p: '名詞', r: pieces.map(piece => piece.r || '').join(''),
+        f: [{ t: surface }], c: false, readerSourceEnd: end } });
+      index = end;
+    } else result.push({ index, token: original });
+  }
+  return result;
+}
+
 /** The line under a content word on the ladder's English rung: its gloss
  * exactly as before, or an honest dash when the quick dictionary has none. */
 function readerGlossLine(token) {
@@ -9223,7 +9283,7 @@ function installReaderRoving(reader) {
     if (!byPara.has(tok.dataset.para)) byPara.set(tok.dataset.para, []);
     byPara.get(tok.dataset.para).push(tok);
   }
-  const current = S.readerTake?.p === S.passageId ? reader.querySelector(`button.tok[data-index="${S.readerTake.index}"]`) : null;
+  const current = S.readerTake?.p === S.passageId ? readerTokenAtIndex(S.readerTake.index, reader) : null;
   for (const [para, list] of byPara) (current?.dataset.para === para ? current : list[0]).tabIndex = 0;
   reader.addEventListener('focusin', (event) => {
     const tok = event.target.closest?.('button.tok[data-para]');
@@ -9371,7 +9431,7 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   };
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     if (named) markReaderReading(index);
-    return openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index),
+    return openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
       focusPopup: modality === 'keyboard' }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
   };
   span.addEventListener('click', (event) => {
@@ -10005,7 +10065,7 @@ function renderReader(main) {
   // counter, a 接頭辞 for its stem
   let groupHolds = false;
   let para = 0;
-  for (const [index, token] of p.tokens.entries()) {
+  for (const { index, token } of readerRenderedTokens(p, crossRefs)) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
@@ -10051,6 +10111,10 @@ function renderReader(main) {
     );
     if (interactive) span.type = 'button';
     span.dataset.index = String(index);
+    if (token.readerSourceEnd !== undefined) {
+      span.dataset.indexEnd = String(token.readerSourceEnd);
+      span.dataset.targetKind = 'word';
+    }
     if (token.c) {
       span.dataset.word = token.b;
       span.dataset.action = 'target.activate';
@@ -18658,7 +18722,7 @@ function dictionaryQueryToken(query) {
 }
 
 function shelfBodyToken() {
-  return `${S.query?.trim() || ''}\u0000${dictionaryQueryToken(S.query)}\u0000${JSON.stringify(S.shelfFilters || null)}`;
+  return `${S.query?.trim() || ''}\u0000${dictionaryQueryToken(S.query)}\u0000${JSON.stringify(S.shelfFilters || null)}\u0000${shelfCurrentDay()}`;
 }
 
 let shelfBodyRefreshing = false;
@@ -21215,7 +21279,7 @@ function syncReaderTakeSeal() {
   updateReaderPlaceSave();
   const selected = readerTakeCurrent();
   for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
-  if (selected) document.querySelector(`#reader .tok[data-index="${selected.index}"]`)?.classList.add('tok-current');
+  if (selected) readerTokenAtIndex(selected.index)?.classList.add('tok-current');
   const btn = document.getElementById('reader-take');
   if (!btn) return;
   const cur = readerTakeCurrent();
