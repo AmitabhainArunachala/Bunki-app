@@ -520,7 +520,7 @@ async function chooserFixture(page, once, { fixture, id, choices, pick, pickRow,
   once(`${id}.chooser`, `${at(fixture)}: an explicit chooser of exactly ${choices.map((c) => `${c.head}/${c.reading}#${c.seq}`).join(', ')}, in that order, as native buttons, nothing opened by itself, 覚 held`,
     state?.node === `word:${fixture.token.b}` && state.choiceState === 'choose' && state.noteSeq === null && !state.senses
       && canonical(listed) === canonical(choices) && state.candidates.every((c) => c.tag === 'button' && c.type === 'button')
-      && state.title === CHOOSER_TITLE.ja && state.titleEn === CHOOSER_TITLE.en && state.takeDisabled === true && state.reasonVisible,
+      && state.title === CHOOSER_TITLE.en && state.titleEn === null && state.takeDisabled === true && state.reasonVisible,
     brief(state), observe(state));
   const button = `#reader-choice-${pick.seq}`;
   if ((await page.locator(button).count()) === 1) {

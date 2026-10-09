@@ -328,7 +328,13 @@ function summariesMeetAA(rows) {
 
 async function measureChromeTargets(page) {
   return page.evaluate(() => {
-    const rows = [...document.querySelectorAll('.chrome button')].filter(n => {
+    const headerSave = document.querySelector('#reader-take');
+    const popupSave = document.querySelector('#mini #mini-take');
+    const popupOpen = !!document.querySelector('#mini');
+    const relocatedSave = popupOpen && !!popupSave && !!headerSave && getComputedStyle(headerSave).visibility === 'hidden';
+    const targets = [...document.querySelectorAll('.chrome button')];
+    if (relocatedSave) targets.push(popupSave);
+    const rows = targets.filter(n => {
       const r = n.getBoundingClientRect();
       return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
     }).map(n => {
@@ -343,7 +349,9 @@ async function measureChromeTargets(page) {
       if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
           Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
     }
-    return { width: innerWidth, rows, overlaps, valid: rows.length >= 7 && !overlaps.length &&
+    const saveOwnership = !popupOpen || (!!headerSave && !headerSave.checkVisibility() && !!popupSave && popupSave.checkVisibility()
+      && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44));
+    return { width: innerWidth, rows, overlaps, relocatedSave, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
   });
 }
@@ -1437,7 +1445,7 @@ async function main() {
       placeholder: !!document.querySelector('.note.placeholder'),
     }))()`);
     check(`variant D · ${mode} entry`,
-      mode === 'field' ? landed.field && landed.words > 8 && landed.placeholder : landed.shelf >= 8,
+      mode === 'field' ? landed.field && landed.words > 8 && !landed.placeholder : landed.shelf >= 8,
       mode === 'field' ? `${landed.words} drifting words, placeholder marked=${landed.placeholder}` : `${landed.shelf} texts`);
     variantShots[`D-${mode}`] = await shoot(page, shotsDir, `V-D-entry-${mode}`);
     if (mode === 'field') {
@@ -1652,7 +1660,7 @@ async function main() {
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
   check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /^No audio for this article yet$/u.test(listenBefore.note) &&
+    listenBefore.toggles === 0 && /^No recording for this article$/u.test(listenBefore.note) &&
       listenBefore.description === 'Approved voices: Kore (main), Charon (second).' &&
       !/device voice|端末の声|F1/u.test(`${listenBefore.note} ${listenBefore.description}`),
     JSON.stringify(listenBefore));

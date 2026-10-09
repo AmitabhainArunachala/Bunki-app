@@ -651,21 +651,31 @@ async function main() {
         return {
           animationName: style.animationName,
           animationDuration: style.animationDuration,
+          animations: node.getAnimations().filter(animation => animation.effect?.target === node).map(animation => ({
+            name: animation.animationName,
+            timing: animation.effect.getTiming(),
+            properties: animation.effect.getKeyframes().map(frame => Object.keys(frame).filter(key => !['offset', 'computedOffset', 'easing', 'composite'].includes(key))),
+          })),
           transitionDuration: style.transitionDuration,
           scrollBehavior: style.scrollBehavior,
         };
       };
-      return { sheet: describe('#sheet'), scrim: describe('.scrim'), ruby: describe('#reader rt') };
+      return { sheet: describe('#sheet'), scrim: describe('.scrim'), ruby: describe('#reader rt'),
+        ambient: document.getAnimations().filter(animation => animation.playState === 'running' && animation.effect?.getTiming().iterations === Infinity).length };
     })()`);
-    const still = Object.values(motion)
-      .filter(Boolean)
-      .every(
-        (entry) =>
-          (entry.animationName === 'none' || entry.animationDuration === '0s') &&
-          entry.transitionDuration === '0s' &&
-          entry.scrollBehavior !== 'smooth',
-      );
-    check('reduced-motion removes Corridor animation and transition motion', still, JSON.stringify(motion));
+    const crossfade = entry => entry && entry.animationName === 'feel-fade' && entry.animationDuration === '0.08s'
+      && entry.animations.length === 1 && entry.animations.every(animation =>
+        animation.name === 'feel-fade' && animation.timing.iterations === 1
+        && animation.timing.duration === 80 && animation.timing.delay >= 0
+        && animation.timing.delay + animation.timing.duration <= 80
+        && animation.properties.length >= 2
+        && animation.properties.every(properties => properties.length === 1 && properties[0] === 'opacity'));
+    const stationary = [motion.sheet, motion.scrim, motion.ruby].every(entry => entry
+      && entry.transitionDuration === '0s' && entry.scrollBehavior === 'auto');
+    const still = stationary && crossfade(motion.sheet) && crossfade(motion.scrim)
+      && (motion.ruby.animationName === 'none' || motion.ruby.animationDuration === '0s')
+      && motion.ambient === 0;
+    check('reduced-motion keeps exact short opacity-only dialog crossfades and removes movement', still, JSON.stringify(motion));
     await reducedPage.screenshot({ path: resolve(SHOTS_DIR, '03-reduced-motion-dialog.png') });
     await reducedContext.close();
 
