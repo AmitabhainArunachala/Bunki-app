@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ノンデュアリティ",
-   "reading": "のんでゅありてぃ",
-   "pos": "noun",
-   "meaning": "non-duality, contemporary spiritual-books term",
-   "defJa": "二つでないこと。分離を超えた一元の状態を指す現代の語",
-   "passage": {
-    "ja": "書店の精神世界の棚に限らず、講座の案内文にもノンデュアリティという語が顔を出すようになったが、一枚の看板の下には別々の系譜が並んでいる。インドの不二一元論は、個人の真我と究極の梵とが別ではないと説くことで、非二元の思想を根づけた。仏教は別の道を歩み、恒常な我への執着を疑うことで二元を解体したのであり、同じラベルの下に同じ教えがあるとは限らない。そもそも非二元を意味する語は漢語では不二と訳され、維摩経には不二法門という章もあって、このカタカナ語はラベルとしては二度目の上陸になる。",
-    "form": "ノンデュアリティ",
-    "en": "The word non-duality has lately come to show its face not just on the spirituality shelves of bookstores but in course descriptions, and beneath that single signboard, separate lineages stand side by side. In India, non-dual monism rooted the thought of non-duality by teaching that the individual true self and the ultimate Brahman are not two. Buddhism walked a different path, dissolving duality by casting doubt on clinging to a permanent self, so the same label does not always house the same teaching. In the first place, the word for non-duality was rendered in Chinese as not-two, and the Vimalakirti even has a chapter called the gate of non-duality, so this katakana word amounts, as a label, to a second landing.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "精神世界の本で使われる現代語。不二一元論や仏教の不二とは系譜が違う点に注意",
-    "sense": "ここでは現代書の通俗的な用法で、教義の違いまでは区別しない語"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "バガヴァッド・ギーター",
    "reading": "ばがゔぁっどぎーたー",
    "pos": "noun",

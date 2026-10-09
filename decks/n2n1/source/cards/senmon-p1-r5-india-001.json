@@ -133,28 +133,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "無常",
-   "reading": "むじょう",
-   "pos": "noun",
-   "meaning": "impermanence; transience of all things",
-   "defJa": "万物が移り変わり、永くとどまらないこと",
-   "passage": {
-    "ja": "お寺の本堂で蝋燭に火を灯すとき、その炎は一瞬たりとも同じ形を保たず、刻々と姿を変えていくものだと気づかされる。風の強さや空気の流れに応じて揺れ方は変わり、消えた炎が同じ姿で二度と戻らない点も、よく観察すれば誰にでも確かめられる。仏教はこの観察を無常と呼び、生まれては滅びる流れの外に、永遠に留まって動かないものは一つもないと説いた。原典に学ぶ修行の伝統では、移り変わるものへの執着を手放す糸口として、この単純な事実を大切にしてきた。",
-    "form": "無常",
-    "en": "Light a candle in a temple's main hall and you notice that the flame never holds the same shape for a single instant, changing its form moment by moment. The way it sways shifts with the strength of the wind and the movement of the air, and anyone who watches closely can confirm that a flame once extinguished never returns in the same form. Buddhism called this observation impermanence, teaching that outside the flow of arising and passing away nothing remains forever, fixed and unmoving. Traditions of practice that study the original texts have treasured this simple fact as a starting point for letting go of attachment to what changes.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「諸行無常」の語のように仏教の教えと結びつく。蝋燭の炎や桜など、移り変わるものを例に説かれることが多い。",
-    "sense": "ここでは仏教の根本思想の意。人や世の移り変わるさまにも使う。"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "至福",
    "reading": "しふく",
    "pos": "noun",

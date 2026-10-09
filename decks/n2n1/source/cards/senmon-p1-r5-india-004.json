@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "無明",
-   "reading": "むみょう",
-   "pos": "noun",
-   "meaning": "ignorance (avidyā), root delusion",
-   "defJa": "真理を知らないために迷いを生じさせる、根源的な心の暗さ",
-   "passage": {
-    "ja": "無明はサンスクリットのアヴィディヤーの訳語で、字面の「無知」から知識不足を想像しがちだが、実態はもっと具体的で、物事の見え方の歪みに近い言葉だ。仏教では十二縁起の第一の支として苦の連鎖の出発点に置かれ、ヴェーダーンタでも真実在の見忘れをこの語で説明した。日本では浄土教が、自力ではこの闇を破れないという読み方を発展させた、という系譜がたどれる。現代の注意研究と響き合うように見えるものの、実験で測れるのは選択的注意の限界だけで、教義の意味までは測れない。",
-    "form": "無明",
-    "en": "無明 is a translated word for the Sanskrit avidyā, and its written form, \"without knowledge,\" makes people imagine a mere lack of information, but the reality is more concrete: a word close to a distortion of how things appear. In Buddhism it is placed as the first of the twelve links of dependent origination, the starting point of the chain of suffering, and Vedānta too used this word to explain the forgetting of true reality. In Japan one can trace a lineage in which Pure Land Buddhism developed the reading that this darkness cannot be broken by one's own power. Though it may look as if it resonates with modern attention research, what experiments can measure is only the limits of selective attention; the meaning of the doctrine cannot be measured.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「無知」と字面で読むと知識不足に聞こえるが、教義では見方の歪み。十二縁起の第一支という定番の文脈とともに覚える語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "無我",
    "reading": "むが",
    "pos": "noun",
@@ -102,28 +80,6 @@
     "topic": "india",
     "tipJa": "人名で、「空」と「海」の字面がしばしば解釈される。弘法大師は同じ人物の諡号で、文脈で使い分けられる。",
     "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "真言",
-   "reading": "しんごん",
-   "pos": "noun",
-   "meaning": "mantra; the Shingon school",
-   "defJa": "仏の真実の言葉として唱える、音写された呪のこと",
-   "passage": {
-    "ja": "真言とは、サンスクリットのマントラを、意味を訳さずに音だけで漢字に写し、そのまま唱える「本当の言葉」のことです。密教の原典では、手に印を結び、心に本尊を観じ、口に音を唱えるという三密の修行が説かれ、その口密をこの言葉が担うとされます。弘法大師は長安で恵果和尚からこの密教の法を受け、帰国後に高野山を開くに至ったと伝えられます。大日如来の「オン・アビラウンケン」がその代表で、意味を問わず音のまま保つのは、その音こそが仏の言葉だとみなすからです。",
-    "form": "真言",
-    "en": "真言 refers to \"true words\": Sanskrit mantras transferred into Chinese characters by sound alone, without translating the meaning, and chanted just as they are. In the primary texts of esoteric Buddhism, the practice of the three mysteries is taught — forming seals with the hands, visualizing the principal deity in the mind, chanting sounds with the mouth — and this word is said to carry the oral mystery among them. Tradition holds that Kōbō Daishi received this esoteric teaching from the monk Huiguo in Chang'an and went on to open Mount Kōya after returning to Japan. The mantra of Dainichi Nyorai, \"oṃ a vi ra hūṃ khaṃ,\" is the representative example, and it is kept as pure sound rather than meaning because that very sound is regarded as the Buddha's speech.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「訳さず音写する」が鍵。宗派名の用法は別で、ここではマントラの意。三密の口密とセットで覚えると定着する。",
-    "sense": "密教で唱える聖なる語の意。宗派名としては別義"
    },
    "deck": "senmon",
    "field": "india",

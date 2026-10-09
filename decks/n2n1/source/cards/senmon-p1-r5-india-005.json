@@ -87,28 +87,6 @@
    "pass": 1,
    "writer": "glm-5.3:cloud",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "釈迦如来",
-   "reading": "しゃかにょらい",
-   "pos": "noun",
-   "meaning": "Śākyamuni Buddha (as icon)",
-   "defJa": "歴史上のブッダを、悟りを開いた姿で表した仏",
-   "passage": {
-    "ja": "仏像の区別では、宝冠や飾りをまとう菩薩に対して、如来は剃髪に質素な衣という装飾を排した姿で表されるのが原則である。京都の清涼寺が伝える釈迦如来立像は、その生前の姿を写したという伝承の像を、平安時代に宋から請来した例として知られる。仏教が諸国に広がるにつれて、歴史上の釈迦を超えた永遠の仏の観念も生まれ、大日如来や阿弥陀如来といった別の如来が本尊として信仰を集めるようになった。歴史上の釈迦は、六年の修行の末に悟りを開いた人間として、伝記的な説話とともに語られ続けている。",
-    "form": "釈迦如来",
-    "en": "In the classification of Buddhist images, whereas bodhisattvas wear crowns and ornaments, tathāgatas are rendered, as a rule, in a form stripped of decoration, with shaved heads and a simple robe. The standing Śākyamuni Tathāgata held at Seiryō-ji temple in Kyoto is known as a case in which an image said by tradition to copy his living appearance was brought back from Song China in the Heian period. As Buddhism spread across many lands, there also arose the idea of eternal buddhas transcending the historical Śākyamuni, and other tathāgatas such as Mahāvairocana and Amitābha came to gather faith as principal icons. The historical Śākyamuni continues to be told of as a human who attained awakening at the end of six years of practice, together with the tales of his biography.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "仏像では「釈迦如来立像」のように像名に使い、剃髪の姿で菩薩と区別される。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

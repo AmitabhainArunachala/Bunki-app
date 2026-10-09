@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "サンスクリット語",
-   "reading": "さんすくりっとご",
-   "pos": "noun",
-   "meaning": "Sanskrit, classical literary language of India",
-   "defJa": "古代インドの学問や宗教で使われた古典語",
-   "passage": {
-    "ja": "私たちがお経に出会うとき、サンスクリット語の原典に触れるのに先立って、必ず漢訳というフィルターを通ってるんですよね。たとえば「縁起」は、原語ではすべてが相互依存の連なりで生じるという教えの名前なのに、日本語だと寺のいわれや縁起物、物事の前兆まで意味しちゃう。どっちの意味で使われた語なのかは、漢訳を経た歴史を知らないと見分けがつかなくて、同じ資料でも解釈がまるっと変わってくるわけです。古い記録に「縁起」と出てきただけで教義の話だと思い込むと、実は寺の由緒の話だった、なんて読み違いも普通に起きるんだよね。",
-    "form": "サンスクリット語",
-    "en": "When we come to a sutra, we always pass through the filter of Chinese translation before we ever touch a Sanskrit original. Take engi, dependent arising: in the source language it is the name of the teaching that everything arises through a chain of mutual dependence, yet in Japanese it also covers a temple's founding story, good-luck charms, and omens. Without knowing the history of translation you cannot tell which sense a given word carries, and the reading of the very same document shifts completely. Assume that engi in an old record must be about doctrine, and you end up misreading what was really an account of a temple's origins, and that happens all the time.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "仏教用語は漢訳を経て日本語に入り、原語の意味とずれが生じることがある",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "バラモン",
    "reading": "ばらもん",
    "pos": "noun",
