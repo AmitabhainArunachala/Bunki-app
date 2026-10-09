@@ -6851,10 +6851,12 @@ body.zen .review-front[data-len='8'] {
 /* ------------------------------------- the reading: calligraphy, not UI text */
 body.zen .review-reading-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
+body.zen .review-reading-row > .say { flex-shrink: 0; }
 body.zen .review-reading {
   font-family: 'Yuji Syuku', var(--serif);
   font-size: 27px;
