@@ -8666,13 +8666,20 @@ function placeFloating(card, r) {
   const ceiling = Math.max(8, (fixedEdge('#app > .chrome', 'bottom') ?? 0) + 8);
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
-  // a card that asked to keep its top edge (the sentence pane, which only shortens it) keeps it while it
-  // still stands clear of its word and inside the chrome
+  // The sentence pane keeps the word card's top edge, including when a long quote is taller.
+  // It scrolls within the space on that side rather than exposing a clipped title above it.
   const pinned = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
-  const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinned + m.height <= floor
-    && (pinned + m.height <= r.top - 10 || pinned >= r.bottom + 10);
+  const pinnedRoom = pinned < r.top ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
+  const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinnedRoom >= 96
+    && (pinned < r.top || pinned >= r.bottom + 10);
   let top;
-  if (pinHolds) top = pinned;
+  if (pinHolds) {
+    top = pinned;
+    if (m.height > pinnedRoom) {
+      card.style.maxHeight = `${pinnedRoom}px`;
+      card.style.overflowY = 'auto';
+    }
+  }
   else if (m.height <= roomAbove) top = r.top - 10 - m.height;
   else if (m.height <= roomBelow) top = r.bottom + 10;
   else {
@@ -8798,9 +8805,8 @@ function readerSentenceRow(node, index) {
     finally { for (const control of buttons) control.disabled = !recordWritable(); }
   });
   pane.append(keep);
-  // the door and its pane trade places. The card keeps its top edge while the sentence shows (it only grows
-  // shorter), so nothing above it peeps out between the card and the chrome; back on the word, it sits
-  // beside its word again
+  // The door and pane trade places. Keep the top edge for long quotes too; placeFloating limits
+  // the pane to the available space. Back on the word, the card sits beside its word again.
   const show = (open, { focus = true } = {}) => {
     const card = wrap.closest('#mini');
     if (card && open) card.dataset.pinTop = String(card.getBoundingClientRect().top);

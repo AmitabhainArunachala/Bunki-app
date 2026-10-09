@@ -586,7 +586,7 @@ html[data-room='reader'] .reader-head > .reader-meta .reader-source { font: inhe
 html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-source { font-family: var(--font-ui); }
 html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
-html[data-room='reader'] .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font-size: 11.5px; line-height: 1.2; }
+html[data-room='reader'] .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font: inherit; line-height: 1.2; }
 /* 未確認 is an honest small mark in the line, not a grey pill */
 html[data-room='reader'] .reader-head > .reader-meta .status-chip {
   min-height: 0;

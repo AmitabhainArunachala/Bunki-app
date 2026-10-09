@@ -1,5 +1,7 @@
 # Read lane, round 4: report
 
+The first-pass account below is historical (92e8a341). The **Review and refine** section records the final merged build, corrections and verification.
+
 **Lane:** read (T3, T4, T5).
 **Branch:** `claude/r4-read-20261009` (not pushed).
 **Started from:** `d98cbd3a`. The brief's base was `345dba92`; the cloud's r3-read landed on top of it at 23:13 JST and I fast-forwarded to it.
@@ -151,7 +153,7 @@ Notes on the non-passes:
 - **Added assertions:**
   - G5, vocabulary-chooser and R2-B now also assert that no list is offered before Save.
   - A new annotation-lookup case, `failed-capture-inside-a-list-is-honest-and-recoverable`, still drives the one scenario the popup can no longer produce: a capture failing inside a list creation. The personal deck's list sheet still has that path.
-- **Unchanged:** every assertion about what a control does. That covers list membership, one card per word, context scopes, drafts, protected-record recovery, the tutor's active sentence and the practice return focus. No storage, SRS, ledger, offline, hit-size or contrast assertion changed.
+- **Correction after independent review:** the first pass accidentally dropped two protected-record assertions on the capture-failure path: the disabled create button and the unsaved list name surviving the required reload. The initial replacement annotation case did not restore them. They are restored in the final annotation case; see **Review and refine**. List membership, one card per word, context scopes, SRS, ledgers, offline, tutor context and practice return focus remain protected.
 - **Fixed without loosening the pin:** verify-relief's reader-body edge (at least 25% ink) failed on `6a68998f`, because the paper's hairline was 16%. I fixed the CSS (30%), not the check.
 
 ## Labels, against the glossary (`docs/redesign/r4/LABELS.md`, the skin lane's)
