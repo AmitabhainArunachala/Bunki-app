@@ -1380,7 +1380,7 @@ async function existingCardCase(page, section, log) {
 const machineWritten = catalog.entries.filter((row) => row.availability.ready && row.mode === 'written').length;
 const dojoPracticeLabel = machineWritten
   ? `${machineWritten} written tests · awaiting review`
-  : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · mock tests in preparation`;
+  : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · practice sets available`;
 try {
   for (const engine of engines) {
     for (const section of sections) {
