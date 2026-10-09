@@ -1568,7 +1568,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
 @media (hover: hover) { .shelf-encounter:hover { box-shadow: var(--shadow-lift); transform: translateY(-2px); } }
 
 /* the shelf's foot: the archive door and sources stay quiet text */
-#shelf-body > button#archive-link.grammar-link {
+#shelf-body button#archive-link.grammar-link {
   display: block;
   width: 100%;
   margin: var(--s2) 0 0;
@@ -1582,7 +1582,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   text-align: start;
   color: var(--tint);
 }
-#shelf-body > button#archive-link.grammar-link .en-sub { font: 500 14px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--label-2); }
+#shelf-body button#archive-link.grammar-link .en-sub { font: 500 14px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--label-2); }
 
 @media (prefers-reduced-motion: reduce) {
   body #shelf-body .story-card, .story-picture .story-img, .shelf-encounter { transition: none; }
@@ -5008,3 +5008,10 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
 /* END BUNKI R4 SKIN ======================================================== */
+/* R5: a popup owns Save while it is open. Its reserved chrome slot stays
+   in place; dismissing the popup restores the reader's one-tap Save. */
+body[data-view='reader']:has(#mini) #reader-take { visibility: hidden; pointer-events: none; }
+/* Settings owns its two preferences; the same choices do not repeat above it. */
+body[data-view='settings'] #app > .chrome :is(#lang, #theme-seal) { visibility: hidden; pointer-events: none; }
+/* Read's inline lookup lives in Tools. Exactly one lookup door is visible. */
+body[data-view='shelf']:has(#shelf-tools-panel:not([hidden])) #chrome-search { visibility: hidden; pointer-events: none; }

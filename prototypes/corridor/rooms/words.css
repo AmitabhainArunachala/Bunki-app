@@ -74,7 +74,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-crumb:hover { color: v
 html:is([data-room='search'], [data-room='word-web']) .ww-crumb:not(.ww-here) span { box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-accent) 50%, transparent); }
 html:is([data-room='search'], [data-room='word-web']) .ww-crumb.ww-here {
   color: var(--color-ink); font-size: 28px; cursor: default;
-  background: linear-gradient(var(--color-seal), var(--color-seal)) 4px calc(100% - 3px) / calc(100% - 8px) 2.5px no-repeat;
+  background: linear-gradient(var(--color-ink), var(--color-ink)) 4px calc(100% - 3px) / calc(100% - 8px) 2.5px no-repeat;
 }
 
 /* ---- the plate ---- */
@@ -124,7 +124,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-centre {
   display: flex; flex-direction: column; align-items: center; gap: 1px; max-width: 120px;
   transform: translate(-50%, -50%); text-align: center; outline: none; pointer-events: none;
 }
-html:is([data-room='search'], [data-room='word-web']) .ww-c-r { font: 500 12px/1.2 var(--font-ui); letter-spacing: 0.14em; color: var(--color-seal); }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-r { font: 500 12px/1.2 var(--font-ui); letter-spacing: 0.14em; color: var(--color-muted); }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
   display: block; font: 800 50px/1.06 var(--font-headword, var(--font-display)); color: var(--color-ink); white-space: nowrap;
   animation: ww-ink 300ms var(--ease-ink, ease) both;
@@ -164,7 +164,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-nb {
 html:is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-g { font: 800 25px/1 var(--font-headword, var(--font-display)); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-nb {
   background: var(--ww-solid); color: var(--ww-node-ink);
-  box-shadow: inset 0 0 0 1px var(--color-live), 0 0 10px color-mix(in srgb, var(--color-live) 32%, transparent), inset 0 0 10px color-mix(in srgb, var(--color-live) 14%, transparent);
+  box-shadow: inset 0 0 0 1px var(--color-rule);
 }
 /* parts: a ruled square */
 html:is([data-room='search'], [data-room='word-web']) .ww-n-part .ww-nb {
@@ -323,20 +323,20 @@ html:is([data-room='search'], [data-room='word-web']) .ww-meaning { font-size: 1
 /* follow the part: the signature door from a word into its shared part's family */
 html:is([data-room='search'], [data-room='word-web']) .ww-follow {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: calc(100% - 16px); min-height: 44px; margin: var(--space-3, 12px) 8px 0; padding: 12px 14px;
-  border: 1px solid color-mix(in srgb, var(--color-live) 55%, transparent); border-radius: var(--radius-card, 4px);
-  background: var(--color-live-wash, color-mix(in srgb, var(--color-live) 10%, transparent)); color: var(--color-ink); text-align: left; cursor: pointer;
+  border: 1px solid var(--color-rule); border-radius: var(--radius-card, 4px);
+  background: var(--ww-solid); color: var(--color-ink); text-align: left; cursor: pointer;
   transition: transform var(--motion-press, 90ms) var(--ease-standard, ease);
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow:active { transform: translateY(1px); }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; font: 500 15px/1.4 var(--font-ui); }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-k { font: 800 21px/1.1 var(--font-headword, var(--font-display)); color: var(--color-accent); }
-html:is([data-room='search'], [data-room='word-web']) .ww-follow-p { display: inline-block; margin-left: 4px; font: 800 28px/1 var(--font-headword, var(--font-display)); color: var(--color-live); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-p { display: inline-block; margin-left: 4px; font: 800 28px/1 var(--font-headword, var(--font-display)); color: var(--color-ink); }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub { font: 500 12px/1.4 var(--font-ui); color: var(--color-muted); }
-html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub::after { content: ' →'; color: var(--color-live); }
+html:is([data-room='search'], [data-room='word-web']) .ww-follow-sub::after { content: ' →'; color: var(--color-ink); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow {
-  box-shadow: 0 0 16px -6px var(--color-live-glow, transparent); background: color-mix(in srgb, var(--color-live) 7%, var(--ww-solid));
+  box-shadow: none; background: var(--ww-solid);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow-p { text-shadow: 0 0 10px var(--color-live-glow, transparent); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-follow-p { text-shadow: none; }
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen { border-color: transparent; background: none; box-shadow: none; }
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen :is(.ww-follow-line, .ww-follow-sub, .ww-follow-k) { color: transparent; }
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-follow.ww-chosen .ww-follow-sub::after { content: none; }
@@ -427,3 +427,12 @@ html:is([data-room='search'], [data-room='word-web']) .ww-legend .ww-lg-key { ga
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-legend .ww-lg-k {
   background: transparent; box-shadow: inset 0 0 0 1px var(--color-live);
 }
+/* Search mode is an ink label. The shared part carries the web's one live light. */
+html[data-room='search'] body .search-page .kdx-lens.on {
+  background: var(--color-surface);
+  box-shadow: inset 0 -2px 0 var(--color-ink);
+}
+html[data-room='search'] body .search-page .kdx-lens.on :is(.l-ja, .en-sub) { color: var(--color-ink); }
+html[data-room='search'] .words-index > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+/* The shape-code lens above is the one door to this wheel. */
+html[data-room='search'] .skip-search-opener { display: none; }

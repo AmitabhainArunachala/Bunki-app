@@ -4731,12 +4731,15 @@ function back() {
     }
     return;
   }
-  if (!roomTransitionUpdating && S.view !== 'drift') return roomTransition(() => back());
+  if (!roomTransitionUpdating && !['drift', 'guided'].includes(S.view)) return roomTransition(() => back());
   if (returnFromNavigation()) return;
   // the guided session walks its own layers first (word → sentence, branch → sentence,
   // an inner page → the room's front); from the front it returns through the door it came in
   if (S.view === 'guided') {
     if (guidedRoom?.back()) return;
+    // Internal question layers restore focus synchronously. Leaving the room
+    // holds its old frame, like every other room change.
+    if (!roomTransitionUpdating) return roomTransition(() => back());
     guidedRoom?.suspend();
     S.view = guidedFrom === 'mock' ? 'mock' : 'dojo';
     render();
@@ -5473,6 +5476,7 @@ function renderShelf(main) {
   search.placeholder = tx('ことばをさがす', matchMedia('(max-width: 520px)').matches
     ? 'Look up a word' : 'Look up a word — kanji · kana · romaji · English');
   search.autocomplete = 'off';
+  search.setAttribute('aria-label', tx('ことばをさがす', 'Look up a word'));
   search.value = S.query || '';
   const openFullDictionary = () => ensureDictionaryIndex().catch(() => {});
   search.addEventListener('focus', openFullDictionary, { once: true });
@@ -5483,43 +5487,15 @@ function renderShelf(main) {
     // active-query guards still own slower full-dictionary results.
     refreshShelfBody();
   });
-  main.append(search);
-  main.append(renderShelfBody());
+  main.append(renderShelfBody(search));
 }
 
-function renderShelfBody() {
+function renderShelfBody(search = null) {
+  const body = el('div');
+  body.id = 'shelf-body';
+  body.dataset.renderToken = shelfBodyToken();
   const main = el('div');
-  main.id = 'shelf-body';
-  main.dataset.renderToken = shelfBodyToken();
-  if (S.query?.trim()) {
-    renderSearchResults(main, S.query);
-    if (dictionaryQueryOpening(S.query)) {
-      main.append(
-        el('p', 'dictionary-opening', tx('辞書の奥をひらいています…', 'Opening the rest of the dictionary…')),
-      );
-    } else if (dictionaryQueryError(S.query)) {
-      const retry = biLabel('button', 'dictionary-retry', '辞書をもう一度ひらく', 'try the full dictionary again');
-      retry.type = 'button';
-      retry.addEventListener('click', () => {
-        D.dictionaryError = null;
-        D.dictionarySearchErrors?.delete(dictionaryQueryKey(S.query));
-        ensureDictionaryIndex().catch(() => {});
-        refreshShelfBody();
-      });
-      main.append(
-        el(
-          'p',
-          'dictionary-warning',
-          tx(
-            '手元の小辞書は使えるが、辞書の奥をまだ読めない。',
-            'The immediate dictionary still works, but the full index could not be opened.',
-          ),
-        ),
-        retry,
-      );
-    }
-    return main;
-  }
+  main.id = 'shelf-content';
   const curated = D.passages.filter(p => !String(p.file || '').startsWith('archive/'));
   // one card per story: an N3 rewrite whose original stands on the shelf is that story's
   // やさしい版, reached by the toggle inside the article, never a second card
@@ -5572,11 +5548,13 @@ function renderShelfBody() {
     note.append(why);
   }
   masthead.append(title);
-  main.append(masthead);
+  body.append(masthead);
   const filters = S.shelfFilters ||= { sort: 'latest', topic: '', jlpt: '', grade: '', text: '' };
+  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest;
   // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
   const controls = el('div', 'shelf-controls shelf-chipbar');
+  controls.dataset.filterToken = JSON.stringify(filters);
   controls.setAttribute('role', 'toolbar');
   controls.setAttribute('aria-label', tx('読み物の絞り込み', 'filter the articles'));
   const change = (key, value) => { filters[key] = value; refreshShelfBody(); };
@@ -5617,7 +5595,9 @@ function renderShelfBody() {
   filterHead.id = 'shelf-tools-filter';
   filterHead.append(el('span', 'l-ja', tx('探す・絞る', 'Find & filter')));
   filterGroup.setAttribute('aria-labelledby', filterHead.id);
-  filterGroup.append(filterHead, controls);
+  filterGroup.append(filterHead);
+  if (search) filterGroup.append(search);
+  filterGroup.append(controls);
   // The study tools (glance pass, 2026-10-01): thirteen bare text links between the filters and
   // the first story read as clutter. They now sit behind ONE 学習ツール Tools button in the title
   // block, which opens a panel of labelled tiles in four plain groups. Every door keeps its id
@@ -5829,9 +5809,48 @@ function renderShelfBody() {
     showTools(false);
     toolsToggle.focus();
   });
-  // the button rides the title's own row, so the page reads: search, title, filters, stories
+  // The title and lead story open the room; lookup and filters wait inside Tools.
   name.append(toolsToggle);
   masthead.after(toolsBox);
+  body.append(main);
+  const matches = stories.filter(p => {
+    const f=p.readingFacets || {};
+    return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
+  });
+  matches.sort(shelfOrder);
+  const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
+  // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
+  if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
+  if (Object.values(filters).some((v,i)=>i>0 && v)) { const reset=el('button','chip btn-tertiary shelf-clear',tx('絞り込みを解除','Clear filters'));reset.type='button';reset.addEventListener('click',()=>{S.shelfFilters=null;refreshShelfBody();});controls.append(reset); }
+  if (S.query?.trim()) {
+    renderSearchResults(main, S.query);
+    if (dictionaryQueryOpening(S.query)) {
+      main.append(
+        el('p', 'dictionary-opening', tx('辞書の奥をひらいています…', 'Opening the rest of the dictionary…')),
+      );
+    } else if (dictionaryQueryError(S.query)) {
+      const retry = biLabel('button', 'dictionary-retry', '辞書をもう一度ひらく', 'try the full dictionary again');
+      retry.type = 'button';
+      retry.addEventListener('click', () => {
+        D.dictionaryError = null;
+        D.dictionarySearchErrors?.delete(dictionaryQueryKey(S.query));
+        ensureDictionaryIndex().catch(() => {});
+        refreshShelfBody();
+      });
+      main.append(
+        el(
+          'p',
+          'dictionary-warning',
+          tx(
+            '手元の小辞書は使えるが、辞書の奥をまだ読めない。',
+            'The immediate dictionary still works, but the full index could not be opened.',
+          ),
+        ),
+        retry,
+      );
+    }
+    return body;
+  }
   // A small shelf of real encounters. These selections use saved mistakes to
   // choose context; browsing them never changes a card's grade or due date.
   const priorities = allAssessmentEvidence().priorities.targets
@@ -5841,7 +5860,6 @@ function renderShelfBody() {
     .filter(form => p.readingFacets?.forms?.includes(form)) }))
     .filter(item => item.forms.length).sort((a, b) => b.forms.length - a.forms.length || byNewest(a.passage, b.passage)).slice(0, 3);
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
-  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest;
   // one card per story: the lead and its two seconds head the grid, so today's six never repeat them
   const heads = new Set(unfiltered ? [...stories].sort(shelfOrder).slice(0, 3).map((p) => p.id) : []);
   const picks = [];
@@ -5916,15 +5934,6 @@ function renderShelfBody() {
     selection.append(strip);
   }
 
-  const matches = stories.filter(p => {
-    const f=p.readingFacets || {};
-    return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
-  });
-  matches.sort(shelfOrder);
-  const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
-  // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
-  if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
-  if (Object.values(filters).some((v,i)=>i>0 && v)) { const reset=el('button','chip btn-tertiary shelf-clear',tx('絞り込みを解除','Clear filters'));reset.type='button';reset.addEventListener('click',()=>{S.shelfFilters=null;refreshShelfBody();});controls.append(reset); }
   const grid=el('div','shelf-story-grid');grid.id='shelf-reading-results';
   // rank sets the headline size: the lead, two seconds, then the grid; the bands follow the seconds.
   // A story in today's six stands in that band, not a second time in the grid (one card per story).
@@ -5985,7 +5994,7 @@ function renderShelfBody() {
   });
   main.append(src);
   if (S.sourcesOpen) main.append(licencePanel());
-  return main;
+  return body;
 }
 
 function feedDate(value) {
@@ -12460,6 +12469,7 @@ async function buildImportPlan(value, trustedPolicy) {
 
 function renderPortRow(main) {
   const port = el('div', 'port-row');
+  port.id = 'record-backup';
   const exp = biLabel('button', 'chip', '書き出す', 'export your record');
   exp.type = 'button';
   exp.id = 'export-store';
@@ -17908,6 +17918,7 @@ function wwInkLabel(text, hi) {
 }
 
 function wwPlate(model, section) {
+  const liveNode = model.nodes.find((node) => node.live);
   const plate = el('div', 'ww-plate skin-reg');
   plate.dataset.wwCentre = `${model.centre.type}:${model.centre.key}`;
   const inner = el('div', 'ww-plate-in');
@@ -17936,7 +17947,7 @@ function wwPlate(model, section) {
         x0 += 58 * Math.cos(a);
         y0 += 58 * Math.sin(a);
       }
-      const cls = ['ww-wire', n.live ? 'ww-wire-live' : '', n.rel ? 'ww-wire-rel' : '', n.card ? 'ww-wire-card' : ''].filter(Boolean).join(' ');
+      const cls = ['ww-wire', n === liveNode ? 'ww-wire-live' : '', n.rel ? 'ww-wire-rel' : '', n.card ? 'ww-wire-card' : ''].filter(Boolean).join(' ');
       const path = wwSvg('path', { class: cls, d: `M${x0.toFixed(1)} ${y0.toFixed(1)}L${n.x.toFixed(1)} ${n.y.toFixed(1)}` });
       path.style.setProperty('--i', String(i));
       svg.append(path);
@@ -17962,7 +17973,7 @@ function wwPlate(model, section) {
     b.type = 'button';
     b.dataset.wwType = n.type;
     b.dataset.wwKey = n.key;
-    if (n.live) b.classList.add('ww-lit');
+    if (n === liveNode) b.classList.add('ww-lit');
     if (n.mine) b.classList.add('ww-mine');
     if (n.rel) b.classList.add('ww-rel');
     b.style.setProperty('--x', String((n.x / WW_W) * 100));
@@ -18627,9 +18638,24 @@ function refreshShelfBody() {
   try {
     const focusId = live.contains(document.activeElement) ? document.activeElement.id : null;
     const next = renderShelfBody();
-    live.replaceWith(next);
-    enhanceJapaneseProse(next);
-    if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
+    const content = next.querySelector('#shelf-content');
+    live.querySelector('#shelf-content').replaceWith(content);
+    // The lookup field stays in the connected Tools panel. Worker replies never
+    // detach it, reset its selection or close a phone's native keyboard.
+    const controls = live.querySelector('.shelf-controls');
+    const nextControls = next.querySelector('.shelf-controls');
+    if (controls.dataset.filterToken !== nextControls.dataset.filterToken) {
+      controls.replaceWith(nextControls);
+      live.querySelector('.shelf-tools-count')?.remove();
+      const count = next.querySelector('.shelf-tools-count');
+      if (count) live.querySelector('.shelf-tools-caret').before(count);
+      live.querySelector('.shelf-mast-title > .shelf-review-note')?.remove();
+      const reviewNote = next.querySelector('.shelf-mast-title > .shelf-review-note');
+      if (reviewNote) live.querySelector('.shelf-mast-title').append(reviewNote);
+    }
+    live.dataset.renderToken = next.dataset.renderToken;
+    enhanceJapaneseProse(content);
+    if (focusId && focusId !== 'search') document.getElementById(focusId)?.focus({ preventScroll: true });
   } finally { shelfBodyRefreshing = false; }
   const updated = document.getElementById('shelf-body');
   if (updated && updated.dataset.renderToken !== shelfBodyToken()) queueMicrotask(refreshShelfBody);
@@ -22846,15 +22872,15 @@ function renderDeckTable(main, today) {
     const q = deck.items ? todayQueue(now, deck.items) : today;
     const n = { new: q.new.length, learn: q.learn.length, due: q.review.length };
     const total = n.new + n.learn + n.due;
-    const row = el('button', 'deck-row' + (deck.items ? '' : ' deck-all'));
-    row.type = 'button';
-    row.disabled = !total || !scheduler;
+    // All cards is the summary of Begin above, rather than a second Begin.
+    const row = el(deck.items ? 'button' : 'div', 'deck-row' + (deck.items ? '' : ' deck-all deck-total'));
+    if (deck.items) { row.type = 'button'; row.disabled = !total || !scheduler; }
     row.dataset.deck = deck.items ? deck.name : '*';
     row.setAttribute('aria-label', tx(`${label} — 新規 ${n.new}・学習 ${n.learn}・復習 ${n.due}`,
       `${label} — ${n.new} new, ${n.learn} learning, ${n.due} due`));
     row.append(el('span', 'd-name', label));
     for (const kind of ['new', 'learn', 'due']) row.append(el('span', `c-${kind}${n[kind] ? '' : ' zero'}`, String(n[kind])));
-    row.addEventListener('click', () => (deck.items ? startReview(deck.items) : startReview()));
+    if (deck.items) row.addEventListener('click', () => startReview(deck.items));
     table.append(row);
   }
   main.append(table);
@@ -23722,7 +23748,7 @@ function renderLearnStage(main, doors) {
   const loaded = sums.filter(([, , sum]) => sum);
   const best = loaded.slice().sort((a, b) => b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
   const sitting = best && (best[2].due || best[2].fresh) ? best : null;
-  const deckStage = !!(due && sitting);
+  const deckStage = !!sitting;
   const order = due && !deckStage ? todayQueue().order : [];
   const face = deckStage ? { item: null } : due ? learnStageFace(order) : { item: null };
   const fan = el('div', 'learn-fan');
@@ -23809,9 +23835,8 @@ function renderLearnStage(main, doors) {
   }
   stage.append(row);
 
-  // ONE primary. When saved cards wait, it is the 復習 door (to Today's list,
-  // as it always was). When none wait, the deck with the most due — or new —
-  // passages leads, and the 復習 door stays as a quiet line under it.
+  // The ready deck's primary starts its sitting. Today's saved cards keep their own
+  // quiet door; without a deck sitting, that review door leads the stage.
   const review = doors.review;
   review.classList.add('learn-go');
   if (due && !deckStage) {
@@ -23824,10 +23849,11 @@ function renderLearnStage(main, doors) {
       const go = el('button', 'learn-go learn-go-deck');
       go.type = 'button';
       go.dataset.stageDeck = id;
+      const total = sum.total;
       go.append(el('span', 'learn-go-t', sum.due
-        ? tx(`${short}の ${sum.due} 枚を復習する`, `Review ${sum.due} ${short} card${sum.due === 1 ? '' : 's'}`)
-        : tx(`${short}の新規 ${sum.fresh} 枚を始める`, `Begin ${sum.fresh} new ${short} card${sum.fresh === 1 ? '' : 's'}`)));
-      go.addEventListener('click', () => openDeck(id));
+        ? tx(`${short}の ${total} 枚を始める`, `Begin ${total} ${short} card${total === 1 ? '' : 's'}`)
+        : tx(`${short}の新規 ${total} 枚を始める`, `Begin ${total} new ${short} card${total === 1 ? '' : 's'}`)));
+      go.addEventListener('click', () => openDeck(id, { autoStart: true }));
       stage.append(go);
       review.classList.replace('learn-go', 'learn-go-quiet');
       if (due) {
@@ -23930,9 +23956,11 @@ function loadDeckPlayer() {
   return deckPlayerLoading;
 }
 
-function openDeck(id) {
-  if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id));
+let deckOpenRequest = null;
+function openDeck(id, { autoStart = false } = {}) {
+  if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id, { autoStart }));
   keepScroll();
+  deckOpenRequest = { id, autoStart };
   S.deckPlay = id;
   S.view = 'deckplay';
   render();
@@ -24032,14 +24060,21 @@ function renderDeckPlay(main) {
     );
     return;
   }
+  const entry = deckOpenRequest?.id === S.deckPlay ? deckOpenRequest : null;
+  if (entry) deckOpenRequest = null;
+  const deckId = S.deckPlay || DOJO_DECKS[0].id;
   // r4 skin: the frame takes the deck's stage (editorial.css R4), and the player changes screens
   // without render(), so the phone's bar is re-read whenever the deck repaints
   deckFrameObserver?.disconnect();
-  deckFrameObserver = new MutationObserver(() => syncThemeColor());
+  deckFrameObserver = new MutationObserver(() => {
+    delete deckSummaries[deckId];
+    syncThemeColor();
+  });
   deckFrameObserver.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-look'] });
   deckPlayer
     .render(main, {
-      deckId: S.deckPlay || DOJO_DECKS[0].id,
+      deckId,
+      autoStart: entry?.autoStart,
       english: bi(),
       storage: localStorage, host: deckHost(),
       onLeave() {
@@ -28999,7 +29034,9 @@ function renderSheet(root) {
 
   // the sheet carries its own way out — "NO BACK OPTION" (operator, on-device)
   const bar = el('div', 'sheet-bar');
-  const backBtn = biLabel('button', 'sheet-back', '← 戻る', 'back');
+  const backBtn = S.stack.length === 1
+    ? biLabel('button', 'sheet-back', '閉じる', 'Close')
+    : biLabel('button', 'sheet-back', '← 戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'sheet-back';
   backBtn.dataset.action = 'navigation.back';
@@ -29083,6 +29120,9 @@ function renderSheet(root) {
   const closeBtn = el('button', 'sheet-close', '✕');
   closeBtn.type = 'button';
   closeBtn.id = 'sheet-close';
+  // At the first depth Back and Close have the same return; the left-hand
+  // Close owns it. Nested entries keep Close-all distinct from stepping Back.
+  closeBtn.hidden = S.stack.length === 1;
   closeBtn.title = tx('とじる', 'close');
   closeBtn.setAttribute('aria-label', tx('全項目をとじる', 'close full entry'));
   closeBtn.dataset.action = 'layer.dismiss';
@@ -31389,10 +31429,23 @@ function renderSettings(main) {
   world.type = 'button'; world.id = 'settings-world'; attachWorldPicker(world);
   const doors = el('div', 'foundation-doors');
   doors.append(world,
-    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => { S.srsPrefsOpen = true; }),
+    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => {
+      S.srsPrefsOpen = true;
+      requestAnimationFrame(() => {
+        const section = document.getElementById('today-detail-body');
+        if (section) section.hidden = false;
+        document.querySelector('.today-detail-toggle')?.setAttribute('aria-expanded', 'true');
+        document.getElementById('srs-prefs-toggle')?.scrollIntoView({ block: 'start' });
+      });
+    }),
     foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
     foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
-    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray'),
+    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray', () => {
+      requestAnimationFrame(() => {
+        document.getElementById('record-backup')?.scrollIntoView({ block: 'center' });
+        document.getElementById('export-store')?.focus({ preventScroll: true });
+      });
+    }),
   );
   main.append(language, doors);
 }
@@ -31401,8 +31454,8 @@ function renderWordsDoors(main) {
   // day's word); while a query or a finder lens is showing, words.css hides it
   const web = renderWordWeb();
   if (web) main.append(web);
-  const section = el('section', 'foundation-section words-index');
-  section.append(el('h2', 'eyebrow', tx('言葉のつながりを探す', 'Explore the language')));
+  const section = el('details', 'foundation-section words-index');
+  section.append(el('summary', 'eyebrow', tx('ほかの調べ方', 'More language tools')));
   const doors = el('div', 'foundation-doors');
   doors.append(
     foundationDoor('words-kanji', '漢字を調べる', 'Kanji by shape', 'kanjidex'),
