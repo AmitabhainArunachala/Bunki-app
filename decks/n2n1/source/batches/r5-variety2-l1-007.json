@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "守破離",
+   "reading": "しゅはり",
+   "gloss": "obey, break, leave (stages of mastery)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-fdf7e02130-c2ed3e4d",
+    "wordId": "nn-fdf7e02130"
+   }
+  },
+  {
+   "term": "実相",
+   "reading": "じっそう",
+   "gloss": "the true aspect of reality",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-a3be153f80-c2148680",
+    "wordId": "nn-a3be153f80"
+   }
+  },
+  {
+   "term": "布施",
+   "reading": "ふせ",
+   "gloss": "giving (dāna); offering to monks",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-a5f719a60d-6e7af3c7",
+    "wordId": "nn-a5f719a60d"
+   }
+  },
+  {
+   "term": "戒名",
+   "reading": "かいみょう",
+   "gloss": "Buddhist precept name",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-1f65ecbd62-09a61247",
+    "wordId": "nn-1f65ecbd62"
+   }
+  },
+  {
+   "term": "本尊",
+   "reading": "ほんぞん",
+   "gloss": "the principal object of Buddhist worship",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-019.json",
+    "cardId": "nn-68ecde8f0d-6f5d8162",
+    "wordId": "nn-68ecde8f0d"
+   }
+  },
+  {
+   "term": "法然",
+   "reading": "ほうねん",
+   "gloss": "Honen, founder of the Jodo school",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-021.json",
+    "cardId": "nn-608c055ed6-56d25335",
+    "wordId": "nn-608c055ed6"
+   }
+  },
+  {
+   "term": "浄土真宗",
+   "reading": "じょうどしんしゅう",
+   "gloss": "Jodo Shinshu",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
+    "cardId": "nn-5450ed9060-7c8f8ff4",
+    "wordId": "nn-5450ed9060"
+   }
+  },
+  {
+   "term": "無為自然",
+   "reading": "むいしぜん",
+   "gloss": "non-forcing and naturalness",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023-r.json",
+    "cardId": "nn-91de4928d8-1d879303",
+    "wordId": "nn-91de4928d8"
+   }
+  }
+ ],
+ "weave": [
+  "守破離",
+  "実相",
+  "布施",
+  "戒名",
+  "本尊",
+  "法然",
+  "浄土真宗",
+  "無為自然"
+ ]
+}

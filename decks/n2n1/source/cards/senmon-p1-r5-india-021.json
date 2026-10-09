@@ -153,28 +153,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "法然",
-   "reading": "ほうねん",
-   "pos": "noun",
-   "meaning": "Honen, founder of the Jodo school",
-   "defJa": "念仏を勧め日本の浄土宗を開いた僧",
-   "passage": {
-    "ja": "難しい経典を読めない人にも、救いに向かう道は開かれているのかという問いから、日本の仏教史を読んでみましょう。法然が勧めた称名念仏は、阿弥陀仏の名を唱える実践を中心に据えたもので、浄土宗の教えにつながります。ただし、言葉を唱える行為に注目するだけでは、それが仏の願いへの信頼とどう結び付くのかという宗教上の意味を落としてしまいます。人物名と宗派名を覚えるにとどまらず、どんな人にどんな道を示そうとしたかを整理すると、歴史の選択肢が具体的になります。",
-    "form": "法然",
-    "en": "Try reading Japanese Buddhist history through the question of whether a path to liberation is open to people unable to read difficult scriptures. The recitation promoted by Honen centers on saying Amitabha’s name and underlies the Jodo school’s teaching. Focusing only on the act of speaking, however, misses its religious connection with trust in the Buddha’s vow. Going beyond memorizing a person and school to identify what path was offered to whom makes historical choices concrete.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "浄土宗の開祖。名前とともに称名念仏の実践を結び付けて読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

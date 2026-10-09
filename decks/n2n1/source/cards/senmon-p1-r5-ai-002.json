@@ -65,28 +65,6 @@
    "pass": 1,
    "writer": "glm-5.3:cloud",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "買収",
-   "reading": "ばいしゅう",
-   "pos": "noun",
-   "meaning": "acquisition; buyout of a company or shares",
-   "defJa": "金を払って他の会社や株式を手に入れること",
-   "passage": {
-    "ja": "買収を伝える文章で失敗するパターンは、莫大な金額を冒頭に置くことです。数字が先に来ると、読者は心の距離を置いてしまいます。たとえば半導体企業が競合を丸ごと手に入れる話なら、工場で名札のロゴが替わる朝というごく小さな場面から書き出すといい。読者はそこに自分の経験を重ねるので、巨大な取引が認知の中で急に身近になります。小さな場面を見せた上で、特許や著作権、人材がどう動くかという工程の全体像へ進むと、金額の意味も立体的に伝わります。",
-    "form": "買収",
-    "en": "The pattern of failure in writing about an acquisition is putting the colossal price at the top. When the number comes first, readers hold it at a distance. For a story where a semiconductor company takes a rival over whole, for instance, it works well to open with a tiny scene, like the morning the logo on the factory name tags changes. Readers overlay their own experience on it, and the huge deal suddenly feels close within their cognition. Once you have shown the small scene and move on to the whole picture of how the patents, the copyrights, and the people move, the meaning of the price also comes across with depth.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "会社買収・敵対的買収・買収合戦。経済ニュースの常連で、金で権利ごと取る語。",
-    "sense": "賄賂で人心を収める意ではなく、会社や株式を買い取る意"
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

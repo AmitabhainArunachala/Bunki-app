@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "逼迫",
-   "reading": "ひっぱく",
-   "pos": "noun",
-   "meaning": "tightness, strain",
-   "defJa": "必要な量に対して余裕がほとんどない状態",
-   "passage": {
-    "ja": "半導体の市況を学ぶ練習として、必要な製品の数と、用意できる数を二本の線で描いてみましょう。注文が増える場合だけでなく、供給が減る場合にも、手元の在庫で補えなければ需給が逼迫する可能性があります。需要の急増、工場の停止、在庫の減少を必ず一緒に起きる条件として暗記するより、どの線が先に動いたかを分けて追うほうが、記事の因果関係を検証できます。余裕が失われた理由を特定してから、増産や代替品でどこまで不足を埋められるかを書き足すと、対策の違いまで整理できます。",
-    "form": "逼迫",
-    "en": "As practice in studying semiconductor markets, draw two lines representing the number of products needed and the number available. Supply and demand can become tight not only when orders increase but also when supply falls and inventories cannot cover the gap. Instead of memorizing demand surges, factory stoppages, and falling inventories as conditions that must occur together, tracing which line moved first helps test an article's causal account. After identifying why spare capacity disappeared, adding how far production increases or substitutes could close the gap also clarifies the different responses.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "需要と供給のどちらが動いたかを分けて読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "追い風",
    "reading": "おいかぜ",
    "pos": "noun",

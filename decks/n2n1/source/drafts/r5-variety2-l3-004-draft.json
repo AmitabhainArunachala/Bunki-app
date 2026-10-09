@@ -1,0 +1,284 @@
+{
+ "cards": [
+  {
+   "term": "規模の経済",
+   "reading": "きぼのけいざい",
+   "pos": "noun",
+   "meaning": "economies of scale",
+   "defJa": "生産規模が大きくなると平均費用が下がること",
+   "passage": {
+    "ja": "同じ型の部品を十個だけ作る場合、金型を準備する費用が一個当たりの値段を大きく押し上げます。注文が増えて千個作れるなら、その固定費を多くの製品へ分けられ、規模の経済が働きます。ただし、生産量を増やすにつれて管理の手間や保管場所も必要になるので、大きくするほど際限なく安くなるという話ではありません。工場を拡張する判断には、機械の速さだけでなく、増やした製品を売り切れる需要があるかという見通しも関わります。",
+    "form": "規模の経済",
+    "en": "When making only ten identical parts, the cost of preparing a mold drives up the price per unit substantially. If orders increase enough to make a thousand, that fixed cost can be spread across more products, creating economies of scale. Increasing output also requires more management and storage, however, so expansion does not reduce costs without limit. Decisions to expand a factory therefore involve not only machine speed but also whether demand will absorb the additional products.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "生産規模の拡大に伴って平均費用が下がること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bc2c278c89-0fdd76d4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-bc2c278c89-0fdd76d4",
+    "wordId": "nn-bc2c278c89"
+   }
+  },
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "pos": "noun",
+   "meaning": "provability",
+   "defJa": "定めた公理と規則から結論を導けること",
+   "passage": {
+    "ja": "数についての予想を大量の例で確かめても、まだ試していない数に反例がないとは断定できません。形式的な証明では、採用した公理から決められた推論規則に沿って、目的の命題へ到達する必要があります。この意味での証明可能性は、計算例の多さではなく、その体系の中に有限の証明を組み立てられるかという性質です。公理を変えれば導ける結論も変わり得るため、数学者が問うのは命題の内容だけでなく、どの土台の上でそれを確かめようとしているかでもあります。",
+    "form": "証明可能性",
+    "en": "Checking a conjecture about numbers against many examples cannot rule out a counterexample among untested numbers. A formal proof must reach the target proposition from adopted axioms through specified inference rules. Provability in this sense concerns whether a finite proof can be constructed within that system, rather than how many computational examples are available. Changing the axioms can change what follows, so mathematicians examine both the proposition and the foundations on which they are trying to establish it.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "公理と推論規則を定めた体系の中で証明できるという性質。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c2871109c9-6e2c9db2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-c2871109c9-6e2c9db2",
+    "wordId": "nn-c2871109c9"
+   }
+  },
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "pos": "noun",
+   "meaning": "backpropagation",
+   "defJa": "出力側から各変数の誤差への影響を計算する方法",
+   "passage": {
+    "ja": "手書きの数字を見分けるモデルが、三を八だと判定したとします。正解とのずれを数値にした後、誤差逆伝播法を使うと、出力側から計算をたどり、各重みがそのずれにどう影響するかを求められます。そこで得た勾配をもとに別の更新手続きが重みを調整し、次の予測の誤差を減らすことを目指します。ただし、一つの例に合わせるだけでは未知の字にも対応できるとは限らず、学習用のデータを増やす工夫と、使っていない例での評価が必要になります。",
+    "form": "誤差逆伝播法",
+    "en": "Suppose a model recognizing handwritten digits identifies a three as an eight. After quantifying the discrepancy from the correct answer, backpropagation traces the computation from the output side to determine how each weight affects that discrepancy. A separate update procedure uses the resulting gradients to adjust weights with the aim of reducing error in subsequent predictions. Fitting one example does not guarantee handling unfamiliar handwriting, however, so training-data improvements and evaluation on unused examples are needed.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "誤差への各重みの影響を計算する方法で、重みの更新そのものと区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bc45f91770-e83c05cb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031-r.json",
+    "cardId": "nn-bc45f91770-e83c05cb",
+    "wordId": "nn-bc45f91770"
+   }
+  },
+  {
+   "term": "起死回生",
+   "reading": "きしかいせい",
+   "pos": "noun",
+   "meaning": "dramatic revival",
+   "defJa": "絶望的な状況から立ち直ること",
+   "passage": {
+    "ja": "資金が底をつきかけた架空の会社が、最後に残った加工技術を医療機器の部品へ転用したとします。試験を重ねた末に大口の契約を得て倒産を免れたなら、その受注は起死回生の一手と呼べます。「成功した」よりも、失敗すれば後がない状況から立ち直った切迫感を含む言葉です。ただ、華やかな逆転の陰には、注文が来るまで費用を抑え、顧客の厳しい条件へ工程を合わせた人々の仕事があり、一度のひらめきだけで危機を越えたとする見方には収まりません。",
+    "form": "起死回生",
+    "en": "Suppose a fictional company running out of funds applies its last remaining machining technology to medical-device components. If repeated testing wins a major contract and prevents bankruptcy, that order can be called a dramatic rescue from the brink. The expression conveys more urgency than simple success, since it involves recovery from a position with no room for further failure. Behind the spectacular turnaround, however, are people who controlled spending while waiting for orders and adapted processes to demanding customers, beyond a story of one flash of inspiration overcoming the crisis.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「起死回生の一手」は、絶望的な局面を覆す決定的な手段。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-89b9081580-569ccce1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-89b9081580-569ccce1",
+    "wordId": "nn-89b9081580"
+   }
+  },
+  {
+   "term": "配線",
+   "reading": "はいせん",
+   "pos": "noun",
+   "meaning": "wiring, interconnect",
+   "defJa": "電気を通す道を部品の間につなぐこと",
+   "passage": {
+    "ja": "計算を担う小さな素子をぎっしり並べても、互いに信号を送れなければ一つの回路として働きません。半導体の配線は複数の層にまたがって部品を結び、必要な信号と電力の通り道を作ります。線が細く長くなるにつれて抵抗などの影響が大きくなり、信号の遅れや発熱が設計上の問題になります。素子の数だけを増やすのではなく、どの情報をどこへ運ぶかまで配置と合わせて工夫することで、チップ全体の性能を引き出せるのです。",
+    "form": "配線",
+    "en": "Packing tiny computing elements together does not make a functioning circuit unless they can send signals to one another. Semiconductor interconnects join components across multiple layers, creating paths for signals and power. As lines grow thinner and longer, effects including resistance become greater, making signal delay and heating design concerns. Coordinating routes for information with component placement, instead of merely adding more elements, brings out the performance of the chip as a whole.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "半導体内部で信号や電力を通す接続を指している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f4235c89ba-e92e4701",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-f4235c89ba-e92e4701",
+    "wordId": "nn-f4235c89ba"
+   }
+  },
+  {
+   "term": "露光装置",
+   "reading": "ろこうそうち",
+   "pos": "noun",
+   "meaning": "lithography (exposure) tool",
+   "defJa": "光で微細な回路の模様を材料へ転写する機械",
+   "passage": {
+    "ja": "人の手で一本ずつ線を引いていては、半導体の細かな模様を大量にそろえることはできません。露光装置は光を用い、感光材料へ回路の模様を転写する役割を担います。ただし、光を当てたところで完成ではなく、現像や加工を経て材料に形を作り、さらに別の層を重ねていきます。層ごとの位置がずれると意図した接続にならないため、細い模様を描く能力に加え、前の層へ正確に合わせる能力も製造の成否を左右します。",
+    "form": "露光装置",
+    "en": "Drawing every line by hand could not reproduce fine semiconductor patterns consistently in large quantities. A lithography machine uses light to transfer circuit patterns to photosensitive material. Exposure is not the final step, since development and processing shape the material before further layers are added. Misaligned layers cannot form the intended connections, so accurately aligning to preceding layers matters alongside the ability to produce fine patterns.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "光による模様の転写を担い、その後の加工工程とは役割が違う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6f2afb50e4-9bf92300",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-6f2afb50e4-9bf92300",
+    "wordId": "nn-6f2afb50e4"
+   }
+  },
+  {
+   "term": "オープンモニタリング瞑想",
+   "reading": "おーぷんもにたりんぐめいそう",
+   "pos": "noun",
+   "meaning": "open monitoring meditation",
+   "defJa": "生じる感覚や思考を対象を絞らず観察する瞑想法",
+   "passage": {
+    "ja": "静かに座ってると、外の車の音も、膝の重さも、明日の予定も次々に現れるよね。オープンモニタリング瞑想では、一つの対象だけに注意を固定するかわりに、そうやって移り変わる経験に気づき続けるんだ。考えが浮かんだから失敗だと決めると、それを消そうとする作業に夢中になってしまう。何が出てきても物語を追いかけず、今は音、今は考えというふうに受け止めるのであって、ぼんやりして何も分からなくなる状態を目指してるんじゃない。",
+    "form": "オープンモニタリング瞑想",
+    "en": "Sitting quietly, you notice traffic sounds, heaviness in your knees, and tomorrow’s plans appearing one after another. In open monitoring meditation, instead of fixing attention on one object, you continue noticing that changing experience. Deciding that a thought means failure can absorb you in trying to eliminate it. The practice receives what appears as a sound or a thought without following its story, rather than aiming to become dazed and unaware.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "対象を一つに絞らず、経験の移り変わりに気づく実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ee2ce3cd4b-075a69f7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-ee2ce3cd4b-075a69f7",
+    "wordId": "nn-ee2ce3cd4b"
+   }
+  },
+  {
+   "term": "マーヤー",
+   "reading": "まーやー",
+   "pos": "noun",
+   "meaning": "māyā, cosmic illusion",
+   "defJa": "世界の多様な現れやそれを実在と誤る力を指す語",
+   "passage": {
+    "ja": "薄暗い道で縄を蛇だと思ったら、本当に怖くなるけど、明かりを当てても蛇の死体は残らないよね。見間違いが解けただけで、初めから縄だったんだ。アドヴァイタでマーヤーを考えるときにも、現れを独立した実在として受け取ることと、その土台を知ることの違いが問題になる。ただし、このたとえからといって日々の痛みや責任を全部無視してよいとはならず、経験の世界で生きることと、究極的に何が実在するかという問いは区別されるんだよ。",
+    "form": "マーヤー",
+    "en": "Mistaking a rope for a snake on a dark path can cause real fear, but shining a light leaves no dead snake. The mistake has simply cleared, and it was a rope all along. Considering maya in Advaita likewise raises the distinction between taking appearances as independently real and knowing their basis. This analogy does not permit ignoring everyday pain or responsibility, since living in the experienced world is distinguished from asking what is ultimately real.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "現れを独立した実在と受け取ることをめぐる、思想上の専門語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8a74fd44c3-e5445a7b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-8a74fd44c3-e5445a7b",
+    "wordId": "nn-8a74fd44c3"
+   }
+  },
+  {
+   "term": "一元論",
+   "reading": "いちげんろん",
+   "pos": "noun",
+   "meaning": "monism",
+   "defJa": "世界の根本を一つの原理や実在に求める立場",
+   "passage": {
+    "ja": "世界には石も植物も考える人間もあるが、その根本まで互いに別物なのだろうか。一元論は、この多様さを認めながらも、究極には一つの原理や実在に基づくと考える立場である。アドヴァイタのように究極的実在を問う思想と、物質を根本とする立場とでは、何を一つと認めるかが異なる。見える違いを単に消してしまうのでなく、その違いがいかなる意味で成立するのかを問うところに、同じ「一つ」という答えを持つ思想の間にも深い隔たりが生まれる。",
+    "form": "一元論",
+    "en": "The world contains stones, plants, and thinking humans, but are they fundamentally separate kinds of reality. Monism acknowledges this diversity while holding that it ultimately rests on one principle or reality. Traditions such as Advaita that inquire into ultimate reality differ from materialist positions over what counts as that one basis. Asking how differences exist rather than simply erasing them creates deep divisions even among philosophies that share the answer one.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "世界の根本を一つとする立場で、何を根本とするかには違いがある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-57e15a0394-c3f6745b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007-r.json",
+    "cardId": "nn-57e15a0394-c3f6745b",
+    "wordId": "nn-57e15a0394"
+   }
+  },
+  {
+   "term": "不生不滅",
+   "reading": "ふしょうふめつ",
+   "pos": "noun",
+   "meaning": "neither arising nor ceasing",
+   "defJa": "本来的には生じも滅びもしないという仏教の表現",
+   "passage": {
+    "ja": "花が咲いて散る姿を前にすると、物事が生まれ、消えていくことは疑いようがなく見えます。般若心経に現れる不生不滅は、この変化を目の錯覚として退けるのではなく、物に独立した固定的な本質がないという空の理解に関わります。種や水や温度に依存して咲く花を、条件から切り離された一個の実体として捉えることが問い直されます。日常の変化をそのまま認めつつ、それを変わらぬ何かが誕生し消滅する出来事として扱わないところに、この教えの難しさがあります。",
+    "form": "不生不滅",
+    "en": "Watching a flower bloom and fall makes the arising and passing of things appear undeniable. The expression neither arising nor perishing in the Heart Sutra relates to the understanding of emptiness as the absence of independent, fixed essence, rather than dismissing change as an optical illusion. It challenges treating a flower dependent on seeds, water, and temperature as an entity isolated from its conditions. The difficulty of this teaching lies in acknowledging everyday change without treating it as the birth and destruction of something with an unchanging essence.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "空の理解に関わる仏教語で、日常の変化そのものの否定ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f52ba89ddb-daadec6e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-f52ba89ddb-daadec6e",
+    "wordId": "nn-f52ba89ddb"
+   }
+  }
+ ]
+}

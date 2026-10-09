@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "三界",
-   "reading": "さんがい",
-   "pos": "noun",
-   "meaning": "the three realms (desire, form, formless)",
-   "defJa": "仏教で欲界と色界と無色界をまとめた呼び名",
-   "passage": {
-    "ja": "仏教の宇宙観を「三つの世界」とだけ訳すと、地図を三つに切ったように読まれることがあります。三界を説明するなら、欲界、色界、無色界という区分を示し、欲望や物質的なあり方との関係で整理された教義上の枠組みだと補えます。現代の天文学が区切る宇宙の領域と同じものとして書けば、文献が何を問題にしているかを外してしまいます。坐禅や瞑想の説明とともに現れる場合も、修行の段階や境地との関係を読み取ってから訳語を選ぶと、空間だけの話に狭まらずに済みます。",
-    "form": "三界",
-    "en": "Translating Buddhist cosmology merely as three worlds may suggest cutting a map into three sections. The three realms of desire, form, and formlessness are clearer when identified as a doctrinal framework related to desire and material existence. Equating them with regions distinguished by astronomy misses the text’s concerns. In accounts of meditation, examining their relationship with contemplative states before choosing a translation avoids reducing them to physical space.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「三界を出る」。天文学上の場所ではなく、教義の区分として説明する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "一切衆生悉有仏性",
    "reading": "いっさいしゅじょうしつうぶっしょう",
    "pos": "noun",
@@ -79,28 +57,6 @@
     "register": "論",
     "topic": "india",
     "tipJa": "「三密の修行」。身・口・意を仏との関係で捉える語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "一即一切",
-   "reading": "いっそくいっさい",
-   "pos": "noun",
-   "meaning": "one is all",
-   "defJa": "一つのものと全体が隔てなく関わるという華厳の教え",
-   "passage": {
-    "ja": "「小さな物にも世界が入っている」と書くと、容器の中へ物を詰め込むような像が浮かびます。華厳の一即一切を紹介するときは、一つの存在を他のすべてとの関係から捉える教えとして、物理的な大きさの話と分けて示すとよいでしょう。たとえば食卓の一椀から、人の働きや土地や水との関わりをたどる説明は、関係を考える入口になります。ただし、その例だけで教義のすべてを言い尽くしたとせず、比喩が何を照らし、何を説明していないかを短く添えると、文章の飛躍を抑えられます。",
-    "form": "一即一切",
-    "en": "Saying the world fits inside a small object can evoke stuffing things into a container. Introducing the Huayan teaching of one being all is clearer when relationships are distinguished from physical size. Tracing a bowl of food through people, land, and water offers an entry into relational thinking. Briefly stating what the analogy illuminates and what it leaves unexplained prevents it from being mistaken for the entire doctrine.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "華厳の表現を、容積の話ではなく一と全体の関係として説明する。",
     "sense": ""
    },
    "deck": "senmon",

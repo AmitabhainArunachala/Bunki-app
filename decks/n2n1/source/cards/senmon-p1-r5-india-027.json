@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "衆生",
-   "reading": "しゅじょう",
-   "pos": "noun",
-   "meaning": "sentient beings",
-   "defJa": "仏教でいう生きとし生けるもの",
-   "passage": {
-    "ja": "救いについて書かれた仏教の文章で、対象が自分の仲間だけに限られているかどうかは大きな問題である。衆生という語は、人間の特定の集団を越えて、生きとし生けるものへと視野を開く。そこに動物も含まれると知れば、慈悲を人間同士の思いやりだけで説明することの狭さに気付く。他方で、どの存在をどう位置付けるかには教えごとの違いもあり、現代の生物分類をそのまま当てはめるだけでは読めない。古い言葉を通じて、誰を苦しみから救いたいと願っているのか、その願いの範囲が問い返される。",
-    "form": "衆生",
-    "en": "In Buddhist writing about liberation, it matters greatly whether concern is restricted to one’s own group. The term sentient beings opens the perspective beyond particular human communities to living beings. Recognizing that animals are included reveals the limits of explaining compassion solely as consideration between humans. At the same time, teachings differ in how they classify beings, so modern biological categories alone cannot determine the reading. Through an old word, readers are asked to reconsider whom they wish to free from suffering and how far that wish extends.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "人間の集団だけでなく、広く生きとし生けるものを指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "菩提心",
    "reading": "ぼだいしん",
    "pos": "noun",
@@ -57,94 +35,6 @@
     "register": "論",
     "topic": "india",
     "tipJa": "親切心だけでなく、悟りを求める方向を含む語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "蓮華",
-   "reading": "れんげ",
-   "pos": "noun",
-   "meaning": "lotus flower in Buddhist imagery",
-   "defJa": "仏教で清らかさなどを象徴するハスの花",
-   "passage": {
-    "ja": "仏像の台座を説明する文章では、蓮華という語を添えるだけで、花の形と仏教の象徴とを結び付けられます。ただし、読者の知識を問わず伝わるようにするなら、泥の中から伸びて花を開くハスの姿も一言描くとよいでしょう。「きれいな花」とだけ言い換えると、泥と花の対照が支えている意味を落としてしまいます。また、春の田んぼに咲くレンゲソウを思い浮かべる人もいるので、植物の区別にも気を配ります。短い解説でも、目に見える形を足場にすると、抽象的な象徴が読み手の中で像を結びます。",
-    "form": "蓮華",
-    "en": "In describing the base of a Buddhist statue, the word lotus connects the flower’s shape with Buddhist symbolism. To make this accessible regardless of the reader’s knowledge, briefly depict the lotus rising from mud and opening its flower. Paraphrasing it merely as a beautiful flower loses the meaning carried by the contrast between mud and blossom. Some readers may also imagine the Chinese milk vetch flowering in spring rice fields, so the plants need to be distinguished. Even a short explanation can make an abstract symbol vivid by grounding it in visible form.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "仏教の文脈ではハスの花。春の野草のレンゲソウとは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "融通無碍",
-   "reading": "ゆうずうむげ",
-   "pos": "noun",
-   "meaning": "freely interpenetrating; unobstructed",
-   "defJa": "互いに妨げず自由に通じ合うこと",
-   "passage": {
-    "ja": "華厳の教えを紹介する本で融通無碍という言葉に出会うと、単に要領よく立ち回ることだと思ってしまいそうです。しかし、この文脈では、さまざまな存在が互いを妨げずに関わり合うあり方を表します。日常では状況に応じて柔軟に振る舞う意味でも使いますが、同じ四字熟語でも話の焦点が違うのです。経典の解説を読むときには、誰かの性格をほめているのか、世界のあり方を述べているのかを確かめると、読み違いを減らせます。身近な用法を知っていることが、専門的な文章では思わぬ落とし穴にもなります。",
-    "form": "融通無碍",
-    "en": "Encountering the phrase freely interpenetrating in an introduction to Huayan teaching may tempt one to think it simply means handling situations cleverly. In this context, however, it describes different beings relating without obstructing one another. In everyday usage it can also mean behaving flexibly according to circumstances, but the same expression then has a different focus. When reading a scriptural commentary, checking whether it praises someone’s character or describes the world can reduce misinterpretation. Familiarity with an everyday meaning can unexpectedly become a pitfall in a specialist text.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "華厳の文脈では、存在が互いに妨げず関わる意味で読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "血脈",
-   "reading": "けちみゃく",
-   "pos": "noun",
-   "meaning": "a lineage of Buddhist transmission",
-   "defJa": "師から弟子へ教えを伝えてきた系譜",
-   "passage": {
-    "ja": "仏教の資料で師から弟子へ続く名の列を読む際、家族の系図と取り違えない注意が求められる。血脈はこの場合「けちみゃく」と読み、教えや戒めが受け継がれてきた系譜を指す。伝承に伴って作られる文書は、誰から誰へと受け継いだと位置付けられているかを示す資料になる。ただし、そこに名が連なっていることだけで、各時代の師弟関係がすべて同じ程度に史実として確かめられるわけではない。信仰上の正統性を表す役割と、歴史研究の証拠としての扱いを分ける読み方が要る。",
-    "form": "血脈",
-    "en": "When reading lists of teachers and disciples in Buddhist sources, care is needed not to mistake them for family genealogies. In this context, the term lineage is read kechimyaku and refers to the transmission of teachings or precepts. Documents accompanying that transmission show how a succession from one person to another is represented. Yet a sequence of names alone does not make every teacher–disciple relationship equally verifiable as historical fact. Reading requires distinguishing the documents’ role in expressing religious legitimacy from their use as historical evidence.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "仏教の系譜では「けちみゃく」。血縁関係そのものを意味しない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "華厳経",
-   "reading": "けごんきょう",
-   "pos": "noun",
-   "meaning": "the Avatamsaka Sutra",
-   "defJa": "あらゆる存在の関わりを説く大乗の経典",
-   "passage": {
-    "ja": "奈良の大仏を見た後で華厳経を読むと、巨大な像の背景にある世界の捉え方が気になってきます。東大寺はこの経典を根本とする寺であり、仏像と教えを切り離して覚える必要はありません。多くの存在が互いに関わるという考えを学ぶにせよ、すぐに現代の通信網の仕組みと同じだと結論付けないことが大切です。身近な例は理解の入口になりますが、宗教上の世界観には、その例だけでは捉えきれない広がりもあります。図版を眺めた後、本文で何と何が結び付けられているかを一箇所ずつたどりましょう。",
-    "form": "華厳経",
-    "en": "Reading the Avatamsaka Sutra after seeing Nara’s Great Buddha can prompt curiosity about the worldview behind the enormous statue. Todaiji takes this scripture as its foundation, so there is no need to learn about the statue separately from the teaching. Even when studying the idea that many beings are interrelated, it is important not to immediately identify it with the workings of a modern communications network. Familiar examples offer an entry point, but a religious worldview also extends beyond what a single example can capture. After examining an illustration, trace the connections made in the text one passage at a time.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "経典名。東大寺の大仏と教えの背景を結び付けて読む。",
     "sense": ""
    },
    "deck": "senmon",

@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "京都学派",
-   "reading": "きょうとがくは",
-   "pos": "noun",
-   "meaning": "the Kyoto School",
-   "defJa": "西田幾多郎らに連なる日本の哲学的な思想潮流",
-   "passage": {
-    "ja": "禅や仏教の概念が、西洋哲学の問いと出会うところに、日本の近代思想の一つの展開がある。京都学派と呼ばれる潮流は西田幾多郎らに結び付けられるが、全員が同じ体系を受け入れた一枚岩の集団ではない。無や自己や宗教をめぐる議論を読む際には、思想家ごとの立場に加えて、どの時代の課題に応答した文章なのかも問われる。伝統的な教義をそのまま外国語へ移す作業というより、異なる哲学の語彙の間で問いを組み直した営みとして捉えると、独自の難しさが明らかになる。",
-    "form": "京都学派",
-    "en": "One development in modern Japanese thought arose where Buddhist concepts encountered Western philosophical questions. The Kyoto School is associated with Nishida and others, without constituting a uniform system accepted by everyone. Arguments about nothingness, self, and religion require attention to individual positions and historical concerns. Their distinctive difficulty lies in reformulating questions across philosophical vocabularies rather than simply translating inherited doctrines.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「京都学派の思想家」。一つの固定した教義を持つ宗派とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "二元論",
    "reading": "にげんろん",
    "pos": "noun",
@@ -45,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "仏法",
-   "reading": "ぶっぽう",
-   "pos": "noun",
-   "meaning": "the Buddha's teaching",
-   "defJa": "仏が説いた教えやその示す道理",
-   "passage": {
-    "ja": "「法」という字を見て、まず国が定めた法律を思い浮かべる読者は少なくありません。仏法を説明する文章では、ここでいう法が仏の教えや道理を指すと示すことで、罰則を伴う制度の話との混同を避けられます。寺の歴史に「これを広めた」とあれば、建物を増やしたというだけでなく、教えが伝えられ実践されたという意味も読み取ることになります。古い語を現代語に置き換える際は、身近な同じ漢字に引きずられず、誰が何を受け継ぐ場面かを先に描くと、説明に自然な筋が通ります。",
-    "form": "仏法",
-    "en": "Many readers first associate the character for law with state legislation. Explaining Buddha Dharma as teaching or principle distinguishes it from a system of penalties. A temple history describing its spread refers to transmitting and practicing teachings rather than merely adding buildings. Identifying who transmits what helps prevent a familiar character’s modern meaning from distorting an older expression.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「仏法を広める」。法律の法ではなく、教えや道理を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "五蘊皆空",
    "reading": "ごうんかいくう",
    "pos": "noun",
@@ -79,28 +35,6 @@
     "register": "講",
     "topic": "india",
     "tipJa": "「空」を消滅とせず、独立した実体がないという意味で読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "五戒",
-   "reading": "ごかい",
-   "pos": "noun",
-   "meaning": "the five precepts",
-   "defJa": "在家の仏教徒の基本となる五つの戒め",
-   "passage": {
-    "ja": "仏教の実践を坐って心を静めることだけで考えると、日常の行動を整える教えが抜け落ちます。五戒は、命を奪わない、盗まない、不適切な性的行為をしない、偽りを語らない、酒を慎むという、在家の人の基本的な戒めです。項目を覚える際は、何を禁じるかだけでなく、他者との関係や注意深さをどう支えるかも考えてみましょう。宗派や地域に応じて受け止め方や実践には違いがありますが、瞑想と生活の倫理を別々の箱に入れないことが、教えの全体を学ぶ入口になります。",
-    "form": "五戒",
-    "en": "Viewing Buddhist practice only as sitting quietly omits teachings for everyday conduct. The five precepts guide householders against killing, stealing, sexual misconduct, false speech, and intoxicants. Learning the list also involves considering relationships and attentiveness beyond prohibitions alone. Despite variation in interpretation and observance, keeping meditation connected with ethics helps reveal the teaching’s larger structure.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「五戒を守る」。瞑想だけでなく、在家者の生活を整える教えとして読む。",
     "sense": ""
    },
    "deck": "senmon",

@@ -131,28 +131,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "送電網",
-   "reading": "そうでんもう",
-   "pos": "noun",
-   "meaning": "power grid",
-   "defJa": "発電した電気を各地へ運ぶ設備のつながり",
-   "passage": {
-    "ja": "データセンターの立地を学ぶ例題で、発電所が近いから電力の問題は解決した、と考えないようにしましょう。必要な場所へ電気を運ぶ送電網に余裕がなければ、発電できる量とは別に、実際に届けられる量が制約となります。地図には発電所と建物だけでなく、その間を結ぶ経路と接続の条件も書き込み、どこで量が限られるかを追います。計算資源を増やす計画を読むにあたっては、装置の性能と建設の時期だけでなく、電力を受け入れる準備がいつ整うかも同じ表に置くと、計画の前提を検討できます。",
-    "form": "送電網",
-    "en": "In a data-center-location exercise, do not assume that a nearby power plant solves every electricity issue. If the transmission grid lacks capacity, the amount that can actually be delivered becomes a constraint separate from generation capacity. Add the routes and connection conditions between the power plant and building to the map, tracing where quantities are limited. When reading plans to expand computing resources, putting the timing of power readiness alongside equipment performance and construction dates allows the plan's assumptions to be examined.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "発電量だけでなく、届ける経路の制約も表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

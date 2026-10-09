@@ -1,0 +1,340 @@
+{
+ "cards": [
+  {
+   "term": "前世",
+   "reading": "ぜんせ",
+   "pos": "noun",
+   "meaning": "previous life",
+   "defJa": "今の生を迎えるより前の生涯",
+   "passage": {
+    "ja": "仏教の物語には、釈迦がまだ仏になる前、動物として生きていたという話も出てくるよ。そうした前世の物語では、人間の姿かどうかにかかわらず、他者への思いやりや施しが大切な行いとして描かれるんだ。今の生涯だけを切り取らず、長い修行の積み重ねの中に一人の姿を置いているんだね。だから動物が話す場面も、ただ奇妙な出来事を並べているだけじゃない。昔の生で何を選び、誰を助けたかという筋立てが、教えを親しみやすい物語にしているんだ。",
+    "form": "前世",
+    "en": "Buddhist stories include accounts of the Buddha living as an animal before becoming awakened. In such stories of previous lives, care for others and generosity appear as important actions regardless of whether the character is human. They place a person within a long accumulation of practice rather than isolating the current lifetime. Scenes of talking animals therefore do more than merely line up strange events. Plots about choices made and people helped in earlier lives turn teachings into accessible stories.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "輪廻を背景に、今の生より前に送った生涯を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b28081c4d0-ec7712f3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-b28081c4d0-ec7712f3",
+    "wordId": "nn-b28081c4d0"
+   }
+  },
+  {
+   "term": "回向",
+   "reading": "えこう",
+   "pos": "noun",
+   "meaning": "transferring merit; memorial service",
+   "defJa": "善行や修行の功徳を他者などに振り向けること",
+   "passage": {
+    "ja": "読経を終えた僧が、その功徳を人々の幸せへ向ける願いを唱えます。善い行いや修行の成果を自分だけのものとせず、他者などへ振り向ける回向は、仏教の儀礼の結びにも現れます。亡くなった人の供養に限らず、広く生き物の安らぎを願う場合もあります。誰のために実践するのかという問いは、修行を個人の達成だけで測る考え方を広げます。教えの中では、積み上げた功徳を抱え込むより、それを他者に開く方向へ心を向けることが、行いの意味を変えます。",
+    "form": "回向",
+    "en": "After chanting, a monk recites a wish directing the merit toward people's well-being. Dedication of merit, which turns the fruits of good deeds or practice toward others instead of keeping them solely for oneself, also appears at the close of Buddhist rituals. It may wish peace for living beings broadly, beyond memorial offerings for the dead. Asking for whose sake one practices broadens an outlook that measures practice only as personal achievement. Within the teaching, directing the heart toward sharing rather than holding accumulated merit changes the meaning of one's actions.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "善行や修行の功徳を他者などへ振り向け、願いを結ぶこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5ebdcc6961-fcd9cf49",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-5ebdcc6961-fcd9cf49",
+    "wordId": "nn-5ebdcc6961"
+   }
+  },
+  {
+   "term": "劫",
+   "reading": "こう",
+   "pos": "noun",
+   "meaning": "kalpa, an aeon",
+   "defJa": "仏教などで極めて長い時間を表す単位",
+   "passage": {
+    "ja": "大きな岩を、とても長い間隔を置いて柔らかな布でなでたら、いつすり減るでしょうか。仏教には、その岩がなくなってもまだ及ばないほどの時間を譬えによって示す伝統があります。劫という極めて長い時間の尺度は、世界の成立や変化を、人の一生をはるかに超える広がりの中へ置きます。今日の心配事が消えるわけではなくても、自分の寿命だけを物差しにした景色とは違ってきます。数え切れない年月にわたる修行の物語も、この壮大な時間の感覚を背景にしています。",
+    "form": "劫",
+    "en": "How long would a huge rock take to wear away if brushed with soft cloth at very long intervals? Buddhism has a tradition of using such a comparison to indicate a span not yet exhausted even when the rock is gone. The extremely long timescale called a kalpa places the formation and transformation of worlds within a reach far beyond one human lifetime. Today's worries may remain, but the view differs from one measured only against one's own lifespan. Stories of practice extending over countless years also rest on this immense sense of time.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教などで、人の一生では測れないほどの長い時間を表す単位。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-aa1e988a62-0b30444b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-aa1e988a62-0b30444b",
+    "wordId": "nn-aa1e988a62"
+   }
+  },
+  {
+   "term": "入滅",
+   "reading": "にゅうめつ",
+   "pos": "noun",
+   "meaning": "entering nirvana; death of the Buddha",
+   "defJa": "仏や高僧が亡くなることを表す仏教語",
+   "passage": {
+    "ja": "横たわる釈迦の周りに、嘆く弟子や動物が集まっている。涅槃図に描かれる入滅は、師の死という別れであるとともに、仏教の教えを受け継ぐ者が自ら歩み始める節目でもある。尊い人であれ身体に終わりが来るという事実は、弟子の悲しみを理屈だけで消し去りはしない。それでも、一人の師がいなくなることと、その教えが失われることは同じではない。別れを描いた一枚の絵には、喪失を抱えた共同体が、残された時間をどう生きるかという問いも宿っている。",
+    "form": "入滅",
+    "en": "Grieving disciples and animals gather around the reclining Buddha. His passing depicted in a nirvana painting is both separation through the teacher's death and a turning point at which those inheriting the teaching begin walking for themselves. The fact that even a revered person's body comes to an end does not erase disciples' grief through reasoning alone. Still, a teacher's disappearance and the loss of that teacher's teaching are not identical. A painting of farewell also contains a question of how a community carrying loss lives its remaining time.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏や高僧の死を述べる仏教語で、涅槃と関わる響きを持つ。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a60205c5e9-816de667",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011.json",
+    "cardId": "nn-a60205c5e9-816de667",
+    "wordId": "nn-a60205c5e9"
+   }
+  },
+  {
+   "term": "ウパニシャッド",
+   "reading": "うぱにしゃっど",
+   "pos": "noun",
+   "meaning": "the Upanishads",
+   "defJa": "インドの古い聖典群。師の膝元の教えを意味する語",
+   "passage": {
+    "ja": "水に溶かした塩は見えなくても、口に含めればどこにでも塩味があります。ウパニシャッドの一つに現れる父子の対話では、この身近な現象が、目に見えない根本を考える手がかりになります。父は息子に、感覚で形を捉えられないからといって、それだけで存在を否定できないことを示します。こうした対話を含む古代インドの文献群では、自己とは何か、世界を支えるものは何かという問いが、儀礼の知識に加えて深く探究されています。",
+    "form": "ウパニシャッド",
+    "en": "Salt dissolved in water is invisible, yet a taste reveals its saltiness everywhere. In a father-son dialogue in one of the Upanishads, this familiar phenomenon offers a clue for considering an unseen foundation. The father shows his son that inability to perceive something's shape does not by itself establish its absence. In this group of ancient Indian texts, which includes such dialogues, questions about the self and what supports the world are explored deeply alongside ritual knowledge.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "古代インドの文献群を指し、自己や世界の根本を問う対話も含む。",
+    "sense": "師のそばで伝える密かな教え、およびそれを記す文献"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-67f68ee238-2c22c667",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-005.json",
+    "cardId": "nn-67f68ee238-2c22c667",
+    "wordId": "nn-67f68ee238"
+   }
+  },
+  {
+   "term": "具現",
+   "reading": "ぐげん",
+   "pos": "noun",
+   "meaning": "embodiment, concrete realization",
+   "defJa": "抽象的な考えなどを具体的な形にすること",
+   "passage": {
+    "ja": "寒い日に寺へ来た人に、僧が温かい食事と休む場所を用意したとします。慈悲という理念の具現は、このように他者の苦しみに応じた行為として捉えられます。優しい言葉を口にするだけでなく、相手が今何に困っているかを確かめる必要があります。食事が必要な人もいれば、静かに話を聞いてほしい人もいるからです。仏教の教えを日常で実践するにあたって、抽象的な理想がどのような振る舞いになるかを考えると、一つの理念にも多くの具体的な形があると分かります。",
+    "form": "具現",
+    "en": "Suppose a monk provides a warm meal and a place to rest for someone arriving at a temple on a cold day. The embodiment of compassion can be understood in such actions responding to another person's suffering. It requires finding out what the person currently needs as well as speaking kindly. One person may need food, while another wants someone to listen quietly. Considering what an abstract ideal becomes in actual behavior during everyday Buddhist practice reveals many concrete forms within one ideal.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "抽象的な理念が、物や行為として具体的な形を取ること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c871038b83-08f99975",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-c871038b83-08f99975",
+    "wordId": "nn-c871038b83"
+   }
+  },
+  {
+   "term": "タットヴァールタ・スートラ",
+   "reading": "たっとゔぁーるた・すーとら",
+   "pos": "noun",
+   "meaning": "Tattvartha Sutra",
+   "defJa": "ジャイナの教義を体系的にまとめた経典",
+   "passage": {
+    "ja": "知識を蓄えるだけで、生き方を変えずに解放へ至れるのか。ジャイナ教のタットヴァールタ・スートラは、正しい信念、知識、行いが共に解脱への道をなすと冒頭で示す。対象を正しく知ることと、その理解に沿って行動することは、別々の目標に分かれていない。教義は魂や業の問題へ展開し、なぜ束縛が生じ、どう離れられるかを体系的に扱う。主要な宗派に受け継がれてきた文献であるものの、共通の経典を持つことによって本文や注釈の違いまでなくなるものではない。",
+    "form": "タットヴァールタ・スートラ",
+    "en": "Can someone reach liberation by accumulating knowledge without changing how they live? At its outset, the Jain Tattvartha Sutra states that right faith, knowledge, and conduct together constitute the path to liberation. Knowing correctly and acting in accordance with that understanding are not separate goals. Its doctrine proceeds to souls and karma, systematically addressing how bondage arises and how release is possible. Although handed down in the major sects, a shared scripture does not eliminate differences in text and commentary.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "ジャイナ教の教義を体系化した経典で、信念・知識・行いを結び付ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-10bff03f2b-57fef44c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
+    "cardId": "nn-10bff03f2b-57fef44c",
+    "wordId": "nn-10bff03f2b"
+   }
+  },
+  {
+   "term": "ヨーガ・スートラ",
+   "reading": "よーがすーとら",
+   "pos": "noun",
+   "meaning": "the Yoga Sutras of Patañjali",
+   "defJa": "心の働きを静める道を説く古典ヨーガの文献",
+   "passage": {
+    "ja": "怒りが浮かぶと、その瞬間の心の動きが自分のすべてであるかのように感じられます。ヨーガ・スートラは心の働きを静める修行を説き、観る主体が心の変化に巻き込まれず、本来のあり方にとどまることを目指します。姿勢を整える実践もその道に含まれますが、柔軟な体を作ることだけが目標ではありません。古典ヨーガのこの枠組みでは、観る側と観られる側の区別が重要であり、心が落ち着いたという日常の感想より深い解放の問題につながっています。",
+    "form": "ヨーガ・スートラ",
+    "en": "When anger arises, a momentary movement of the mind can feel like the whole of oneself. The Yoga Sutras teach practice that stills mental activity, aiming for the seer to remain in its own nature without entanglement in mental change. Postural practice is included in that path, but developing a flexible body is not its sole goal. In this framework of classical yoga, the distinction between seer and seen matters and connects to a deeper question of liberation than the everyday feeling of calm.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "心の働きを静め、観る主体と観られるものを区別する古典ヨーガの文献。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-318d11cd78-a5f568c7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-318d11cd78-a5f568c7",
+    "wordId": "nn-318d11cd78"
+   }
+  },
+  {
+   "term": "仏法",
+   "reading": "ぶっぽう",
+   "pos": "noun",
+   "meaning": "the Buddha's teaching",
+   "defJa": "仏が説いた教えやその示す道理",
+   "passage": {
+    "ja": "寺の建物が焼けても、そこで学んだ人が教えを伝え続ければ、失われずに残るものがあります。仏法を受け継ぐという営みは、経典を保管することに加えて、苦しみの原因を問い、実際の生活で教えを生かすことに及びます。ここでの法は、国が罰則を設けて守らせる法律とは異なります。僧から弟子へ、親から子へと伝わる過程では、相手の理解に応じた言葉や実践も必要になります。目に見える文化財と、それを支えてきた教えの働きは、重なりながらも別の形で人々に残ります。",
+    "form": "仏法",
+    "en": "Even if a temple burns down, something survives when those who studied there continue passing on its teaching. Transmitting the Buddha's teaching extends beyond preserving scriptures to questioning the causes of suffering and putting the teaching into daily life. Here, law differs from state laws enforced by penalties. Transmission from monks to disciples and parents to children also requires language and practices suited to the recipient's understanding. Visible cultural treasures and the teaching that has sustained them remain with people in overlapping but distinct ways.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「受け継ぐ」「広める」と結び付き、仏の教えやその道理を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-da2cae7a2c-f6d6f87f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-da2cae7a2c-f6d6f87f",
+    "wordId": "nn-da2cae7a2c"
+   }
+  },
+  {
+   "term": "五戒",
+   "reading": "ごかい",
+   "pos": "noun",
+   "meaning": "the five precepts",
+   "defJa": "在家の仏教徒の基本となる五つの戒め",
+   "passage": {
+    "ja": "瞑想中には穏やかでも、人をだまして利益を得ているなら、生活の中の苦しみは増えかねません。在家の仏教徒が受ける五戒は、命を奪うこと、盗み、不適切な性的行為、偽り、酒による酔いを避ける基本的な戒めです。坐っている時間だけでなく、取引や家族との関係にも実践の場があります。他人を傷つけた後で心だけ静めようとするより、傷つける行動自体を慎むという順序には意味があります。教えを学ぶ生活では、注意を向ける心と日々の行為が切り離せません。",
+    "form": "五戒",
+    "en": "Calm during meditation can coexist with increasing suffering in daily life if one deceives others for gain. The five precepts undertaken by lay Buddhists are basic commitments to avoid killing, theft, sexual misconduct, falsehood, and intoxication through alcohol. Practice occurs in dealings and family relationships as well as while sitting. There is significance in restraining harmful actions themselves rather than only trying to calm the mind after harming others. A life learning the teaching cannot separate attentive awareness from everyday conduct.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "在家の基本的な五つの戒めで、日常の行動を整える実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-de1ba1b137-b72c66cb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-de1ba1b137-b72c66cb",
+    "wordId": "nn-de1ba1b137"
+   }
+  },
+  {
+   "term": "天台宗",
+   "reading": "てんだいしゅう",
+   "pos": "noun",
+   "meaning": "the Tendai school",
+   "defJa": "法華経を重んじ最澄が日本に伝えた仏教の宗派",
+   "passage": {
+    "ja": "比叡山で教えを学ぶ若い僧の前には、海を越えて伝えられた経典があります。日本の天台宗を開いた最澄は、中国の天台教学を受け継ぎ、法華経を重んじる学びと修行の場を築こうとしました。仏教を広めるには、文献を集めるだけでなく、それを担う人を長い時間をかけて育てなければなりません。教団のあり方をめぐる最澄の構想には、どのような戒を授け、どのような環境で僧を養成するかという課題も含まれていました。山上の修学は、教えを社会へ送り出す準備でもあったのです。",
+    "form": "天台宗",
+    "en": "Before a young monk studying on Mount Hiei lie scriptures transmitted across the sea. Saicho, who founded the Japanese Tendai school, inherited Chinese Tiantai learning and sought to build a setting for study and practice centered on the Lotus Sutra. Spreading Buddhism required not only collecting texts but also training people over a long period to carry the teaching. Saicho's vision of the religious community included questions about which precepts to confer and what environment should train monks. Study on the mountain was also preparation for sending the teaching into society.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "法華経を重んじ、中国の天台教学を最澄が日本に伝えた宗派。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-54fbf49f45-35a7b1e7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-54fbf49f45-35a7b1e7",
+    "wordId": "nn-54fbf49f45"
+   }
+  },
+  {
+   "term": "三界",
+   "reading": "さんがい",
+   "pos": "noun",
+   "meaning": "the three realms (desire, form, formless)",
+   "defJa": "仏教で欲界と色界と無色界をまとめた呼び名",
+   "passage": {
+    "ja": "欲しい物に囲まれた暮らしも、深い瞑想によって得られる静かな境地も、仏教では同じ解放への道の途中に置かれます。三界は欲界、色界、無色界をまとめた呼び名で、欲望や物質的な形との関係によって区分された世界です。教義上は、より微細な境地へ生まれたとしても、そこに永遠にとどまれるとはされません。華やかな天の暮らしだけを理想にすれば、生と死を繰り返す範囲からは出られず、その循環そのものを離れるという修行の目的が残ります。",
+    "form": "三界",
+    "en": "In Buddhism, both a life surrounded by desired things and a quiet state attained through deep meditation stand along the way toward liberation. The three realms comprise the desire, form, and formless realms, distinguished by their relations to desire and material form. Doctrinally, even rebirth in a subtler state does not mean one can remain there forever. Making a splendid heavenly life the sole ideal leaves one within repeated birth and death, preserving the further aim of practice to leave that cycle itself.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "欲界・色界・無色界を合わせ、生死の循環にある世界の範囲を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-32325a0b39-149bfbd6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
+    "cardId": "nn-32325a0b39-149bfbd6",
+    "wordId": "nn-32325a0b39"
+   }
+  }
+ ]
+}

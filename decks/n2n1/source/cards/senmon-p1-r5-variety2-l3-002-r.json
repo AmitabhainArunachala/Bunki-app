@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "奇妙なループ",
+   "reading": "きみょうなるーぷ",
+   "pos": "noun",
+   "meaning": "strange loop",
+   "defJa": "階層をたどると自分へ戻る自己言及的な構造",
+   "passage": {
+    "ja": "紙の中の人物が絵を描き、その絵の中の人物が最初の画家を描いている場面を想像してください。外側が内側を生むはずなのに、関係をたどるうちに出発点へ戻る、この階層のねじれが奇妙なループの手がかりです。単に同じ作業を何度も繰り返す循環とは違い、描く側と描かれる側の境界そのものが揺らぎます。ホフスタッターが自己言及を考える際に重視したのも、このように上下の区別を越えて自分自身へ戻ってくる構造でした。",
+    "form": "奇妙なループ",
+    "en": "Imagine a person on paper drawing a picture whose subject is drawing the original artist. Although the outside should generate the inside, following the relationship returns us to the starting point, and this twist in hierarchy offers a clue to a strange loop. Unlike simply repeating the same task, it destabilizes the boundary between the one depicting and the one depicted. Hofstadter emphasized structures that cross distinctions of level and return to themselves when considering self-reference.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "普通の反復と異なり、階層を越えて自己へ戻る構造。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c7fa0fd0d4-d33c2471",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-c7fa0fd0d4-d33c2471",
+    "wordId": "nn-c7fa0fd0d4"
+   }
+  },
+  {
+   "term": "創発",
+   "reading": "そうはつ",
+   "pos": "noun",
+   "meaning": "emergence",
+   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
+   "passage": {
+    "ja": "渋滞の先頭まで進んだのに、事故も工事も見当たらなかった経験はありませんか。車が密集していると、一台の小さな減速が後ろへ伝わるにつれて増幅され、全体に止まっては進む波が生じることがあります。個々の運転手が計画していない集団の動きが現れる点に、創発という見方の面白さがあります。一台ずつの性能を詳しく調べるだけでなく、車間距離や反応の連鎖まで考えに入れると、なぜ全員が前へ進みたいのに列が止まるのかが見えてきます。",
+    "form": "創発",
+    "en": "Have you ever reached the front of a traffic jam without finding an accident or roadworks. When cars are packed together, a small slowdown by one can amplify as it travels backward, producing waves of stopping and starting across the whole group. The interest of emergence lies in collective behavior appearing without individual drivers planning it. Considering following distances and chains of reactions alongside individual vehicle performance reveals why the queue stops even though everyone wants to move forward.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "部分の相互作用から全体に現れる性質に用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-2eb1d177bb-db85825f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
+    "cardId": "nn-2eb1d177bb-db85825f",
+    "wordId": "nn-2eb1d177bb"
+   }
+  },
+  {
+   "term": "実用化",
+   "reading": "じつようか",
+   "pos": "noun",
+   "meaning": "practical deployment",
+   "defJa": "研究成果を現実の用途で使えるようにすること",
+   "passage": {
+    "ja": "研究室で一度動いた装置を、毎朝止まらず働く工場へ持ち込むと、成功の意味が変わります。実用化には性能の高さに加えて、故障した際に直せることや、現場で払える費用に収まることが求められます。「動いた」と「使い続けられる」の間には、温度や振動への対策、部品の調達、作業員の訓練といった仕事が積み重なっています。発明の瞬間ほど目立たなくても、この隙間を埋める工夫によって、新しい技術が日々の生産を担う道具へ変わります。",
+    "form": "実用化",
+    "en": "Moving a device that worked once in a laboratory into a factory that must operate reliably every morning changes what success means. Practical deployment requires not just strong performance but repairability and costs the workplace can afford. Between it worked and we can keep using it lie measures against temperature and vibration, component procurement, and worker training. Though less conspicuous than the moment of invention, closing that gap turns new technology into a tool that sustains daily production.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "研究成果を現場で継続して使える状態へ移すこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-84e41e69ce-cf48f529",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-84e41e69ce-cf48f529",
+    "wordId": "nn-84e41e69ce"
+   }
+  }
+ ]
+}

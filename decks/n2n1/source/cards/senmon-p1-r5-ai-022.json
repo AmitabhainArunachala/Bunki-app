@@ -67,50 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "教師あり学習",
-   "reading": "きょうしありがくしゅう",
-   "pos": "noun",
-   "meaning": "supervised learning",
-   "defJa": "入力と正解の組を使って対応関係を学ぶ方法",
-   "passage": {
-    "ja": "迷惑メールを分ける仕組みを例に、教師あり学習の基本を考えましょう。過去のメールと、それが迷惑メールかどうかを示す正解の組から、文章の特徴と分類の対応を学びますが、正解の付け方に誤りがあれば、その影響も受けます。また、学習に使ったメールで高い正答率を得ても、新しい送り手や違う話題のメールへ同じように対応できるとは限りません。学習用とは別の資料で確かめ、誤って捨てた普通のメールと、見逃した迷惑メールを分けて数えると、失敗の性質を比較できます。",
-    "form": "教師あり学習",
-    "en": "Consider supervised learning through a spam filter. It learns relationships between textual features and categories from past messages paired with correct labels, but labeling errors also affect it. High accuracy on training messages does not guarantee equal performance on new senders or topics. Testing separate material and counting wrongly discarded ordinary mail separately from missed spam allows the types of failure to be compared.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "教師は人が横で教えるという意味ではなく、正解付きの資料を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "文脈内学習",
-   "reading": "ぶんみゃくないがくしゅう",
-   "pos": "noun",
-   "meaning": "in-context learning",
-   "defJa": "入力中の例や説明を手掛かりに課題へ対応すること",
-   "passage": {
-    "ja": "質問文の中に分類の例をいくつか入れる文脈内学習では、その場で示された情報を手掛かりに答え方が変わります。たとえば感想文と評価の組を並べてから新しい感想文を示すと、同じ形式の評価を求めやすくなります。ただし通常の利用では、その応答のためにモデルの内部の値を追加学習で更新しているわけではなく、例の示し方にも結果は左右されます。効果を調べる際には、例の順序や内容を変えた試験も行い、一つの入力でうまくいったことと、安定して対応できることを区別しましょう。",
-    "form": "文脈内学習",
-    "en": "In-context learning changes responses using information such as classification examples placed in the prompt. Pairing reviews with ratings before presenting a new review can help elicit a rating in the same format. In ordinary use this does not update the model’s internal values through further training for that response, and example presentation affects results. Test changes to example order and content to distinguish success with one input from stable performance.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "入力中の例に応じることを指し、通常は内部の重みを更新しない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "新興企業",
    "reading": "しんこうきぎょう",
    "pos": "noun",
@@ -145,28 +101,6 @@
     "register": "話",
     "topic": "ai",
     "tipJa": "人の感情や意図を重ねて捉えることと、能力の検証を分ける。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "指数関数的",
-   "reading": "しすうかんすうてき",
-   "pos": "na-adj",
-   "meaning": "exponential",
-   "defJa": "一定の割合で繰り返し増えたり減ったりする様子",
-   "passage": {
-    "ja": "計算に使う資源が指数関数的に増えるという説明では、毎回同じ量を足す場合との違いを押さえましょう。たとえば同じ期間ごとに二倍になるなら、最初の量が小さくても、繰り返すにつれて一回の増加量は大きくなります。ただし、ある期間の数字がこの形に近いからといって、電力や設備の制約を超えて同じ傾向が永遠に続くとは限りません。推移を読む際には、元の量と増える割合、比較した期間を併せて示すことで、単に急に増えるという印象より正確に変化を伝えられます。",
-    "form": "指数関数的",
-    "en": "An explanation that computing resources grow exponentially should distinguish this from adding the same amount each time. If an amount doubles over equal intervals, each increase grows larger through repetition even from a small starting amount. But resemblance to this pattern over one period does not mean it continues forever beyond power and equipment constraints. Showing the initial amount, growth rate, and comparison period conveys the change more precisely than an impression of rapid growth alone.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "急増の言い換えだけでなく、一定比率の変化という性質を含む。",
     "sense": ""
    },
    "deck": "senmon",

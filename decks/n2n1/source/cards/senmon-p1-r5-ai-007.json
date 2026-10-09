@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "電力需要",
-   "reading": "でんりょくじゅよう",
-   "pos": "noun",
-   "meaning": "electricity demand",
-   "defJa": "使うために必要とされる電気の量",
-   "passage": {
-    "ja": "人工知能を動かす設備が増えても、必要な電気の量は装置の台数だけでは決まらない。電力需要を見積もる際には、処理の内容や稼働時間に加えて、装置の効率や冷却に使う電力も条件となる。一台当たりの効率が改善しても、利用が大きく増えれば全体の消費が増える場合があり、技術の進歩と総量の変化を同じ指標として扱うことはできない。設備計画の数字を読むときは、どの範囲の施設を、どの期間、どれほど使うと想定した推計なのかが、比較の出発点になる。",
-    "form": "電力需要",
-    "en": "As AI infrastructure grows, the electricity required is not determined by the number of machines alone. Estimates of power demand also depend on workload, operating time, equipment efficiency, and cooling power. Even if efficiency per machine improves, overall consumption can rise with substantial growth in use, so technological progress and changes in total volume are different measures. Comparing infrastructure estimates begins by identifying which facilities, period, and utilization assumptions their figures cover.",
-    "register": "報",
-    "topic": "ai",
-    "tipJa": "装置の台数と効率、使い方を合わせて見積もる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "AI半導体",
    "reading": "えーあいはんどうたい",
    "pos": "noun",
@@ -79,28 +57,6 @@
     "register": "講",
     "topic": "ai",
     "tipJa": "光の波長と並び、細部を写す能力に関わる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "アライメント",
-   "reading": "あらいめんと",
-   "pos": "noun",
-   "meaning": "alignment (AI)",
-   "defJa": "人工知能の振る舞いを人の意図や価値に合わせること",
-   "passage": {
-    "ja": "「人の言うことを聞く機械」と書くだけでは、命令同士が食い違う場面や、指示自体が有害な場合が抜け落ちます。アライメントを紹介する文章では、人工知能の振る舞いを人の意図や価値にどう合わせるかという問いを、その難しさごと残したいところです。利用者の希望に沿うことと、周囲の人への影響を考えることは、いつも同じ答えを導くとは限りません。解決済みの機能名のように扱う代わりに、誰のどんな判断を基準に評価したかを添えると、技術の課題を正確に伝えられます。",
-    "form": "アライメント",
-    "en": "Merely describing a machine as obeying people omits conflicting commands and cases where the instructions themselves are harmful. An introduction to alignment should retain both the question of bringing AI behavior into accord with human intentions and values and the difficulty involved. Satisfying a user's wishes and considering effects on others do not always lead to the same answer. Instead of treating alignment as the name of a solved feature, stating whose judgments formed the evaluation criteria communicates the technical challenge more accurately.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "誰の意図をどの状況で満たすかまで言葉にする。",
     "sense": ""
    },
    "deck": "senmon",

@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "法話",
-   "reading": "ほうわ",
-   "pos": "noun",
-   "meaning": "Buddhist sermon, dharma talk",
-   "defJa": "仏教の教えを聞き手に説き伝える話",
-   "passage": {
-    "ja": "寺院では法要の前後などに、僧が聞き手へ教えを説く時間が設けられることがある。法話は仏教の教えを伝える話であり、経典の説明や日常の出来事を通じて、慈悲や無常といった主題を聞き手へ届ける。説教や説法と重なる用法もあるため、語の違いだけから内容や長さを一律に決めることはできない。話の記録を読む際には、どのような場で誰に向けて語られたかも確かめることで、同じ教義が聞き手の生活と結び付けられながら伝えられる過程を捉えられる。",
-    "form": "法話",
-    "en": "Temples may set aside time around ceremonies for clergy to address listeners. A Dharma talk conveys Buddhist teachings through scriptures and everyday events, including themes such as compassion and impermanence. Usage overlaps with related words for preaching, so the label alone cannot fix content or duration. Identifying the setting and audience reveals how doctrine is communicated in relation to listeners’ lives.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「法話を聞く」。説教や説法と重なる用法があり、内容は場に応じて異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "釈迦如来",
    "reading": "しゃかにょらい",
    "pos": "noun",
@@ -84,28 +62,6 @@
    "deck": "senmon",
    "field": "india",
    "level": "N1",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "無明",
-   "reading": "むみょう",
-   "pos": "noun",
-   "meaning": "ignorance (avidyā), root delusion",
-   "defJa": "物事の真実を知らず迷いを生む根本的な無知",
-   "passage": {
-    "ja": "仏教の文章で知らないことが問題にされていても、単に覚えた情報が少ないという意味とは限りません。無明は真実を知らずに迷いを生む根本的な無知を指し、苦が条件に応じて生じることを説く十二因縁にも位置付けられます。知識の量と混同しないために、その文章が何を見誤っていると述べるのか、具体的な説明を探してみましょう。変化するものを変わらないと捉えるなど、見方の問題に注目すると、用語の定義を覚える作業が、自分の理解の仕方を問い直す学びにもつながります。",
-    "form": "無明",
-    "en": "Ignorance in Buddhist writing does not always mean having memorized too little information. Fundamental ignorance gives rise to delusion and has a place in the twelve links describing conditioned suffering. Looking for what a text says is misunderstood distinguishes it from quantity of knowledge. Attention to views such as treating changing things as permanent connects definitions with examination of one’s understanding.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "情報量の不足だけでなく、真実を見誤るという教義上の意味を押さえる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"

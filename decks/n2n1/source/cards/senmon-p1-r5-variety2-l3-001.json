@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "プロセスルール",
+   "reading": "ぷろせするーる",
+   "pos": "noun",
+   "meaning": "process rule (node size)",
+   "defJa": "半導体を製造する技術の世代や設計上の基準",
+   "passage": {
+    "ja": "製造会社の違う二つのチップに同じ数字が付いていても、中の寸法がすべて一致するとは限りません。プロセスルールの名称は製造技術の世代を示す目安ですが、現在では一つの線の幅をそのまま表す物差しにはなっていません。「小さいほど速い」という一言で比べると、消費電力や回路の構成による差が抜け落ちます。設計者は採用に先立って、載せられる回路の密度、必要な性能、費用を照らし合わせ、その製品に使う工程を選びます。",
+    "form": "プロセスルール",
+    "en": "Even when chips from two manufacturers carry the same number, their internal dimensions do not necessarily all match. Process-node names indicate generations of manufacturing technology, but today they are not a ruler directly measuring one line width. Comparing them simply by saying smaller means faster overlooks differences due to power consumption and circuit organization. Before adoption, designers weigh circuit density, required performance, and cost to choose a process for the product.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "製造世代の呼び名であり、数字を実寸と同一視しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-097f926e5b-28b071e7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+    "cardId": "nn-097f926e5b-28b071e7",
+    "wordId": "nn-097f926e5b"
+   }
+  },
+  {
+   "term": "パワー半導体",
+   "reading": "ぱわーはんどうたい",
+   "pos": "noun",
+   "meaning": "power semiconductor",
+   "defJa": "電力の変換や制御を担う半導体素子",
+   "passage": {
+    "ja": "電気自動車のアクセルを踏むと、電池からの電力はそのまま無条件にモーターへ流れ込むのではなく、必要な形に調整されます。その変換や制御を担う素子がパワー半導体で、情報を計算する部品とは仕事が違います。「電気を止める」と言っても故障の話ではなく、素早く切り替える動作を通じて、電力の流れを整えているのです。切り替えや通電に伴って熱が出るため、損失を減らす材料の工夫と、熱を外へ逃がす設計の両方が車の効率を支えます。",
+    "form": "パワー半導体",
+    "en": "When an electric vehicle accelerates, power from the battery does not simply flow unconditionally into the motor but is adjusted into the required form. Power semiconductors are the devices responsible for that conversion and control, with a different job from components that compute information. Stopping electricity here does not mean a failure, since rapid switching regulates the flow of power. Because switching and conduction generate heat, both material improvements that reduce losses and designs that remove heat support the vehicle’s efficiency.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「電力を制御する」と結び付き、情報処理用の素子と役割を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8855de5d35-bc75aa89",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010-r.json",
+    "cardId": "nn-8855de5d35-bc75aa89",
+    "wordId": "nn-8855de5d35"
+   }
+  },
+  {
+   "term": "シリコンサイクル",
+   "reading": "しりこんさいくる",
+   "pos": "noun",
+   "meaning": "the silicon (chip-industry) cycle",
+   "defJa": "半導体の需要や供給と市況が循環する動き",
+   "passage": {
+    "ja": "注文が殺到した時期に着工した工場が、完成した頃には売れ残りを抱えることがある。半導体の需要は短期間で変化する一方、設備の建設と立ち上げには時間がかかり、このずれがシリコンサイクルの一因となる。在庫を減らすため各社が投資を抑えれば、その後に需要が回復しても供給がすぐには追いつかない。もっとも、記憶装置と自動車向けの部品が常に同じ動きをするとは限らず、業界全体の好不況の陰で、個々の工場の稼働状況には差が生じる。",
+    "form": "シリコンサイクル",
+    "en": "A factory begun during a flood of orders can face unsold stock by the time it is completed. Semiconductor demand changes quickly while construction and production startup take time, and this mismatch contributes to the silicon cycle. If companies restrain investment to reduce inventories, supply cannot immediately catch up when demand subsequently recovers. Memory devices and automotive components do not always move together, however, so individual factories can operate at different rates behind the industry-wide business cycle.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "需要と供給の時間差を伴う、市況の循環を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-705b5f5310-2b35f8d8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-705b5f5310-2b35f8d8",
+    "wordId": "nn-705b5f5310"
+   }
+  },
+  {
+   "term": "先端半導体",
+   "reading": "せんたんはんどうたい",
+   "pos": "noun",
+   "meaning": "leading-edge chips",
+   "defJa": "その時点で高度な製造技術などを用いた半導体",
+   "passage": {
+    "ja": "新しい計算機を作る会議で、最も細かな加工技術を使えばすべて解決する、という案が出たとします。先端半導体は高度な計算を支える有力な選択肢ですが、採用にあたっては製造費や発熱にも向き合わなければなりません。回路を小さくできたとしても、記憶装置との情報の往復が詰まれば、期待した速さは出ません。さらに、長く安定して供給できることを重視する製品もあり、設計の目的に応じて異なる世代の部品を組み合わせる余地があります。",
+    "form": "先端半導体",
+    "en": "Suppose a meeting to design a new computer proposes solving everything with the finest fabrication technology. Advanced semiconductors are a strong option for sophisticated computation, but adopting them requires confronting manufacturing costs and heat as well. Even if circuits can be made smaller, bottlenecks in exchanges with memory prevent the expected speed. Some products also prioritize a stable long-term supply, leaving room to combine components from different generations according to the design’s purpose.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "その時点で高度な技術を用いる半導体で、用途ごとの適性とは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-96088cb646-de99aa63",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json",
+    "cardId": "nn-96088cb646-de99aa63",
+    "wordId": "nn-96088cb646"
+   }
+  },
+  {
+   "term": "分散合意",
+   "reading": "ぶんさんごうい",
+   "pos": "noun",
+   "meaning": "distributed consensus",
+   "defJa": "複数の計算機で共通の決定を成立させること",
+   "passage": {
+    "ja": "三台のサーバーが同じ座席の予約を受け付け、通信の遅れで別々の客に最後の一席を渡したら困ります。そこで必要になる分散合意は、離れた計算機の間で、採用する一つの決定を成立させる仕組みです。人間の会議でいう「全員が納得した」とは違い、故障や通信の状態に応じて、どの台数の応答を待つかなどを規則で定めます。返事が来ない機械が止まったのか、単に遅いのか分からない状況では、矛盾を避けるために予約の確定を待たせる設計もあります。",
+    "form": "分散合意",
+    "en": "It would be a problem if three servers accepted reservations for the same seat and communication delays caused different customers to receive the last one. Distributed consensus is the mechanism needed to establish one decision among separate computers. Unlike everyone being convinced in a human meeting, rules specify matters such as how many responses to await under particular failure and communication conditions. When a silent machine may have stopped or may merely be slow, some designs delay confirming reservations to avoid contradictions.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "離れた計算機で一つの決定を成立させるという意味。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-0e4de817c8-167fc0a7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-039-r.json",
+    "cardId": "nn-0e4de817c8-167fc0a7",
+    "wordId": "nn-0e4de817c8"
+   }
+  },
+  {
+   "term": "リスク許容度",
+   "reading": "りすくきょようど",
+   "pos": "noun",
+   "meaning": "risk tolerance",
+   "defJa": "運用でどれほどの損失や変動を受け入れられるか",
+   "passage": {
+    "ja": "同じ額の値下がりでも、来月の学費を置いている口座と、長期間使う予定のない資金とでは受け止め方が変わります。リスク許容度は勇気の強さだけを競う言葉ではなく、損失や価格の揺れをどこまで受け入れられるかを表します。「平気です」と答えた人でも、支払いの日が近づくにつれて、売り急ぐ必要が生じることがあります。気持ちの余裕に加えて、いつ何のために使うお金なのかという条件が、持ち続けられる範囲を左右するのです。",
+    "form": "リスク許容度",
+    "en": "The same fall in value feels different for money reserved for next month’s tuition and funds that will not be needed for a long time. Risk tolerance is not simply a contest of courage but describes how much loss or price fluctuation someone can accept. Even someone who says they are comfortable may need to sell urgently as a payment date approaches. Alongside emotional comfort, when and why the money is needed determines the range they can continue to hold.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「高い・低い」で表すが、心理だけでなく資金の条件も関わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bc17e5f2c0-ddf9a38a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-bc17e5f2c0-ddf9a38a",
+    "wordId": "nn-bc17e5f2c0"
+   }
+  },
+  {
+   "term": "他の追随を許さない",
+   "reading": "たのついずいをゆるさない",
+   "pos": "expression",
+   "meaning": "unrivaled",
+   "defJa": "同業の相手が追いつけないほど優れていること",
+   "passage": {
+    "ja": "架空の部品会社が、極端な温度変化にも耐える小さな接合部を開発したとします。試作品の性能のみならず、大量生産でもばらつきを抑える技術を持てば、その用途で他の追随を許さない地位を築けるでしょう。しかし、顧客が別の接合方式へ移れば、長年の優位を支えた設備が重荷に変わります。競争相手が追いつけないことと、市場の条件が変わらないことは別であり、圧倒的な強みを持つ会社にも、何を捨てて次へ進むかという判断が残るのです。",
+    "form": "他の追随を許さない",
+    "en": "Suppose a fictional component company develops a tiny joint that withstands extreme temperature changes. If it can limit variation in mass production as well as achieve prototype performance, it could establish a position in that application that no rival can match. Yet if customers switch to another joining method, equipment that supported years of advantage becomes a burden. Competitors being unable to catch up is different from market conditions remaining unchanged, and even a company with overwhelming strengths must decide what to abandon in order to move forward.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「地位を築く」とともに、競争相手が及ばない優位を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c82e01a10b-24104ed5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+    "cardId": "nn-c82e01a10b-24104ed5",
+    "wordId": "nn-c82e01a10b"
+   }
+  },
+  {
+   "term": "不完全性定理",
+   "reading": "ふかんぜんせいていり",
+   "pos": "noun",
+   "meaning": "incompleteness theorem",
+   "defJa": "一定の公理系で証明に限界があるとする定理",
+   "passage": {
+    "ja": "数学の規則を十分にそろえたら、正しい命題には必ず証明が付くのでしょうか。ゲーデルの不完全性定理は、自然数の計算を表せる一定の形式体系について、無矛盾で規則が機械的に扱えるなら、その内部で決着しない命題が残ることを示しました。規則を追加したところで、同じ条件を満たす新たな体系にも限界が生じます。これは数学全体の放棄を迫る話ではなく、何を前提にどこまで証明できるかという問いを、数学自身の対象にした出来事です。",
+    "form": "不完全性定理",
+    "en": "If we assemble enough mathematical rules, will every correct proposition necessarily have a proof. Gödel’s incompleteness theorem showed that certain formal systems capable of expressing natural-number arithmetic leave some propositions undecided internally if they are consistent and their rules are mechanically manageable. Even if rules are added, a new system meeting the same conditions faces limits as well. This did not demand abandoning all mathematics but made the question of what can be proved from which assumptions an object of mathematics itself.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一定の形式体系における証明の限界を述べる定理。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-dff15cbcaf-9798f261",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-dff15cbcaf-9798f261",
+    "wordId": "nn-dff15cbcaf"
+   }
+  }
+ ]
+}

@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "基板",
-   "reading": "きばん",
-   "pos": "noun",
-   "meaning": "a substrate or circuit board",
-   "defJa": "回路や部品を載せる土台となる板",
-   "passage": {
-    "ja": "電子工作の図を読むときは、部品の名前だけでなく、それらを支える基板にも注目しましょう。部品を置く位置と電気が流れる道筋は関係しており、同じ部品を集めても、それだけで同じ装置ができるとは限りません。配線の図と完成した写真を並べ、どの接続がどの線に対応するかを追うと、平面の記号と実物の立体的な配置を結び付けられます。授業では電源をつながない模型を使い、電流の経路を色分けしてから、線が交差して見える場所に接続があるかを確かめましょう。",
-    "form": "基板",
-    "en": "When reading an electronics diagram, notice the circuit board supporting the parts as well as their names. Part placement is related to the paths along which electricity flows, and simply collecting identical parts does not produce identical devices. Comparing the wiring diagram with a completed photograph and tracing corresponding connections links flat symbols to the physical arrangement. In class, use an unpowered model, color the current paths, and then check whether apparently crossing lines are actually connected.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "「基盤」と同音だが、こちらは回路などを支える物理的な板。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "技術的特異点",
    "reading": "ぎじゅつてきとくいてん",
    "pos": "noun",
@@ -101,50 +79,6 @@
     "register": "報",
     "topic": "ai",
     "tipJa": "よい見通しを指す語で、実際の効果や根拠の確かさとは別。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "実存的リスク",
-   "reading": "じつぞんてきりすく",
-   "pos": "noun",
-   "meaning": "existential risk",
-   "defJa": "人類の存続や長期的な可能性を永久に損なう危険",
-   "passage": {
-    "ja": "人工知能を巡る議論では、実存的リスクという言葉が、日常の誤回答とは違う規模の危険を指して使われます。人類の絶滅や、将来の可能性が永久に大きく失われる事態を問題にしているので、単に重大な損失が出るという話と分けて読みましょう。そうした事態に至る仮説を示すことと、発生する確率や時期を確定することは別であり、強い表現だけでは予測の根拠になりません。論点を整理する際は、想定された経路、未確認の前提、反対の見解を別々の欄に書き出すと、それぞれの主張を比較できます。",
-    "form": "実存的リスク",
-    "en": "In discussions of artificial intelligence, existential risk refers to danger on a different scale from everyday incorrect answers. It concerns human extinction or a permanent major loss of future potential, so distinguish it from merely substantial losses. Proposing a pathway to such an event is different from establishing its probability or timing, and strong language alone cannot support a forecast. To organize the debate, put proposed pathways, unverified assumptions, and opposing views into separate columns for comparison.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "被害の大きさに加え、人類の長期的な可能性の喪失を含む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "知的財産",
-   "reading": "ちてきざいさん",
-   "pos": "noun",
-   "meaning": "intellectual property",
-   "defJa": "発明や創作などから生まれる無形の財産",
-   "passage": {
-    "ja": "半導体の価値を考えるとき、工場や装置のように目に見えるものだけを数えると、大事な部分が抜け落ちます。回路の発明や設計上の工夫など、創造的な活動から生まれる知的財産も、企業の競争力に関わるからです。ただし、発明の内容を公開して保護を求めることと、情報を秘密として管理することでは、選ぶ仕組みも考え方も異なります。何かを生み出したからといって、すべてを同じ条件で自動的に独占できるとは限りません。技術紹介を読む際は、製品そのものと、その背後で利用が管理されるアイデアや情報とを分けて考えましょう。",
-    "form": "知的財産",
-    "en": "When assessing the value of semiconductors, counting only visible assets such as factories and equipment leaves out something important. Intellectual property arising from creative work, including circuit inventions and design innovations, also contributes to competitiveness. However, disclosing an invention to seek protection and keeping information confidential involve different mechanisms and approaches. Creating something does not automatically grant exclusive control over everything under identical conditions. When reading a technology introduction, distinguish the product itself from the ideas and information behind it whose use is managed.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "目に見える設備とは異なる、発明や創作などによる財産を指す。",
     "sense": ""
    },
    "deck": "senmon",

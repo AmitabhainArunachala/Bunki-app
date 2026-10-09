@@ -21,28 +21,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "解脱",
-   "reading": "げだつ",
-   "pos": "noun",
-   "meaning": "liberation (mokṣa), release from rebirth",
-   "defJa": "煩悩の束縛から抜け出し、輪廻の連鎖を断つこと",
-   "passage": {
-    "ja": "「面倒な役目から解放された」と書くところに、宗教的な語を置くと、文章の重みが急に変わります。解脱は、インドの宗教や仏教で、執着や生死の繰り返しから離れることを指す語であり、少し気分が楽になったという感想とは射程が異なります。比喩に使うにしても、その大きな隔たりを読み手と共有できれば、誇張の面白さが生まれます。逆に、瞑想の体験記で教義上の達成を述べたいなら、一時の安堵と同じ言葉でまとめず、何から離れたと考えるのかを具体的に書く方が伝わります。",
-    "form": "解脱",
-    "en": "Using a religious term where one might write that an annoying duty has ended suddenly changes a sentence’s weight. Liberation in Indian religions and Buddhism refers to release from attachment and recurring birth and death, extending beyond a feeling of temporary relief. Even in metaphor, sharing that large gap with the reader can make the exaggeration interesting. Conversely, an account of meditation claiming a doctrinal attainment should specify what the writer believes has been released instead of merging it with temporary ease.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "宗教的な意味と口語の誇張を分け、文章でどちらを使うかを明らかにする。",
-    "sense": "ここでは輪廻からの解放の教義の意。口語の「解放」の意は別"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

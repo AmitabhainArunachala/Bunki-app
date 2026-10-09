@@ -111,28 +111,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "正法眼蔵",
-   "reading": "しょうぼうげんぞう",
-   "pos": "noun",
-   "meaning": "Dogen’s Shobogenzo",
-   "defJa": "道元の仏教思想と修行を説く著作",
-   "passage": {
-    "ja": "道元の正法眼蔵を紹介する文章では、難しい語が多いという感想だけで終えず、どの巻のどの問いを読むのかを示すと親切です。修行や時間など、扱われる問題を一つ選べば、初めて触れる人にも読む足場ができます。ただし、現代語に直すに当たって、繰り返される言葉を単なる重複として削ると、原文の議論の動きを失う場合があります。読みやすさを優先する箇所と、同じ語が再び出る意味を考える箇所を分けたいところです。短い引用を飾りとして置くより、その前後で何が問われているかを一緒に伝えると、読書への入口になります。",
-    "form": "正法眼蔵",
-    "en": "An introduction to Dogen’s Shobogenzo is more helpful when it identifies which question in which fascicle to read instead of ending with the observation that the vocabulary is difficult. Selecting one issue, such as practice or time, gives newcomers a foothold. However, removing recurring words as mere repetition during modernization can lose the movement of the original argument. We should distinguish where readability takes priority from where the return of the same word deserves attention. Explaining the questions surrounding a short quotation offers a better entry into reading than using it as decoration.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "ここでは道元の著作名。巻ごとの問いと文脈を示して紹介する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "止観",
    "reading": "しかん",
    "pos": "noun",
@@ -145,28 +123,6 @@
     "register": "学",
     "topic": "india",
     "tipJa": "心を静める側面と観察する側面を分けて押さえる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "梵天",
-   "reading": "ぼんてん",
-   "pos": "noun",
-   "meaning": "Brahma as a Buddhist deity",
-   "defJa": "インドの神に由来する仏教の守護神の一つ",
-   "passage": {
-    "ja": "仏像の解説に梵天という名が出てきたら、「仏教を守る神の一つ」と補うと、仏と神を区別する手掛かりになります。インドのブラフマーに由来する存在ですが、宗教が変われば、その位置付けや語られる役割も変わります。インドでの説明をそのまま日本の仏像へ移せば、文脈に合わない解説になるおそれがあります。また、宇宙の根本原理を表すブラフマンとは、似た音に引かれて一つにまとめないようにします。誰なのかを紹介する文章では、名前の由来と、その場所で何を担う存在なのかを分けて書くと明確です。",
-    "form": "梵天",
-    "en": "When Brahma appears in a description of Buddhist sculpture, adding that this is one of Buddhism’s protective deities helps distinguish deities from Buddhas. The figure derives from the Indian Brahma, but status and narrated roles change between religious contexts. Transferring an Indian explanation directly to a Japanese Buddhist statue risks an account that does not fit its context. Nor should the similar sound lead to merging this figure with Brahman, the fundamental principle of the universe. An introduction becomes clearer when it separates the name’s origin from the role the figure plays in that setting.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "インド由来の神の名。ブラフマンという哲学上の原理と区別する。",
     "sense": ""
    },
    "deck": "senmon",

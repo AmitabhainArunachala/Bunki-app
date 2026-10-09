@@ -67,50 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "神仏分離",
-   "reading": "しんぶつぶんり",
-   "pos": "noun",
-   "meaning": "separation of Shinto and Buddhism",
-   "defJa": "神の祭祀と仏教を制度上分けること",
-   "passage": {
-    "ja": "明治の宗教政策を「寺を壊す命令」とだけ書くと、制度と現場の行動が一つになってしまいます。神仏分離を述べる文章では、神社と寺院や、その儀礼を区別する政策と、各地で起きた仏像や寺院の破壊とを分けて示すと、関係を正確に伝えられます。政策の影響を小さく扱うためではなく、どの地域で誰が何をしたかを読み取るための区別です。「廃仏毀釈」という言葉を隣に置く際にも、二つを同義語として結ぶより、出来事が広がる過程を動詞で書く方が明瞭です。",
-    "form": "神仏分離",
-    "en": "Describing Meiji religious policy simply as an order to destroy temples merges institutions with actions on the ground. An account of the separation of Shinto and Buddhism becomes more accurate when it distinguishes the policy separating shrines, temples, and rituals from the destruction of images and temples in particular places. This distinction is intended to identify who did what and where, rather than to diminish the policy’s effects. When also using the term anti-Buddhist destruction, verbs tracing how events unfolded convey the relationship more clearly than treating the two labels as synonyms.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「神仏分離を進める」。政策と破壊運動との関係を、同一視せずに記述する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "鑑真",
-   "reading": "がんじん",
-   "pos": "noun",
-   "meaning": "Jianzhen; Ganjin",
-   "defJa": "日本に戒律を伝え唐招提寺を開いた唐の僧",
-   "passage": {
-    "ja": "「苦難を乗り越えた偉人」という見出しだけでは、なぜ海を渡る必要があったのかが抜け落ちます。鑑真の渡航を語る文章では、日本で正式に戒を授ける師が求められていたことを先に置くと、失敗を重ねても来日を目指した行動の意味が伝わります。唐招提寺も、建築の美しさに加えて、戒律を学ぶ道場として開かれたという役割から紹介できます。人物への感動を強める形容詞を増やすより、その人を迎えた側の課題を一つ示す方が、歴史の中での仕事を描けます。",
-    "form": "鑑真",
-    "en": "A headline about a great man overcoming hardship leaves out why he needed to cross the sea. An account of Ganjin’s voyages becomes clearer when it first explains Japan’s need for a teacher to confer Buddhist precepts formally. Toshodaiji can likewise be introduced not only through its architectural beauty but through its role as a place for studying discipline. Showing one problem faced by those who welcomed him depicts his historical work more effectively than adding adjectives designed to intensify admiration.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "人名を苦労話だけにせず、「戒を授ける」という仕事と結び付けている。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "遣隋使",
    "reading": "けんずいし",
    "pos": "noun",

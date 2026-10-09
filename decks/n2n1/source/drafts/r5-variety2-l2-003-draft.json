@@ -1,0 +1,340 @@
+{
+ "cards": [
+  {
+   "term": "注意機構",
+   "reading": "ちゅういきこう",
+   "pos": "noun",
+   "meaning": "an attention mechanism",
+   "defJa": "入力の各部分の関連に応じて情報を重み付けする仕組み",
+   "passage": {
+    "ja": "長い文の末尾にある動詞を処理する際、離れた場所の主語が重要になることがあります。文中の情報をどれも同じ重さで扱うと、そのつながりを捉えにくくなります。注意機構は、各部分の関係に応じて重みを計算し、必要な情報を取り合わせる仕組みです。同じ単語でも、周囲にどんな語があるかによって取り込む情報は変わります。この名前には人の心を連想させる響きがありますが、重みの計算ができることと、人間と同じ意識を持つことは別の問題です。",
+    "form": "注意機構",
+    "en": "When processing a verb at the end of a long sentence, a distant subject may be important. Treating all the information in the sentence equally makes that connection harder to capture. An attention mechanism calculates weights according to relationships among parts and combines the relevant information. Even the same word draws on different information depending on the words around it. The name evokes the human mind, but calculating weights and possessing human-like consciousness are separate matters.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "入力の部分同士の関係に応じて、情報に重みを付ける仕組み。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-01278539f0-c99f3a28",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-01278539f0-c99f3a28",
+    "wordId": "nn-01278539f0"
+   }
+  },
+  {
+   "term": "演算能力",
+   "reading": "えんざんのうりょく",
+   "pos": "noun",
+   "meaning": "computational capacity",
+   "defJa": "一定の時間に計算を処理できる性能",
+   "passage": {
+    "ja": "速い計算機を買ったのに、実験の待ち時間がほとんど縮まらないことがあります。演算能力が高くても、記憶装置からデータを運ぶ速さが追い付かなければ、計算する部分は仕事を待つことになります。道路が混めば速い車でも進めないのと似ています。新しい装置を選ぶにあたっては、計算の種類や数値の精度をそろえた比較に加え、実際の処理でどこに時間がかかっているかを調べる必要があります。性能表の最大値と、手元の研究が終わる時刻の間には、こうした条件の違いがあります。",
+    "form": "演算能力",
+    "en": "Buying a fast computer sometimes barely shortens the wait for an experiment. High computing capability still leaves the processing units waiting if data cannot arrive quickly enough from storage. It resembles a fast car stuck on a congested road. Selecting new equipment requires both comparisons with matched computation types and numerical precision and an examination of where the actual task spends its time. Such differences in conditions separate a maximum specification from the time one's research finishes.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "単位時間に計算する性能であり、データ移動などの待ち時間とは別に測る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a2ee7ba9ba-b8d2e07e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025-r.json",
+    "cardId": "nn-a2ee7ba9ba-b8d2e07e",
+    "wordId": "nn-a2ee7ba9ba"
+   }
+  },
+  {
+   "term": "牽引",
+   "reading": "けんいん",
+   "pos": "noun",
+   "meaning": "driving or leading growth",
+   "defJa": "全体の発展を先頭に立って引っ張ること",
+   "passage": {
+    "ja": "一社から届いた大量注文をきっかけに、部品工場が設備を増やし、材料会社も人を採り始めました。新しい製品への需要が関連産業の成長を牽引する場面では、最終製品の会社だけに変化がとどまりません。ただし、注文の勢いを永続するものとして扱えば、設備が余る恐れもあります。学習用の事例としてこの流れを追うと、先頭の需要がどの会社へ伝わり、どこで資金や人材が不足するかが見えてきます。成長を引っ張る力と、それを受け止める側の準備は一組の課題です。",
+    "form": "牽引",
+    "en": "A large order from one company prompted a component factory to add equipment and a materials company to begin hiring. When demand for a new product drives growth in related industries, change extends beyond the final-product company. However, treating the pace of orders as permanent risks leaving excess equipment. Following this sequence as a learning case reveals which companies receive the initial demand and where funding or personnel become insufficient. The force driving growth and recipients' readiness form a linked set of challenges.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「成長を牽引する」の形で、発展の先頭に立って引っ張る力を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9ad453dde6-0ee738b3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-026.json",
+    "cardId": "nn-9ad453dde6-0ee738b3",
+    "wordId": "nn-9ad453dde6"
+   }
+  },
+  {
+   "term": "知的財産",
+   "reading": "ちてきざいさん",
+   "pos": "noun",
+   "meaning": "intellectual property",
+   "defJa": "発明や創作などから生まれる無形の財産",
+   "passage": {
+    "ja": "工場を見学しても、壁や機械の値段だけではその会社の強さは分かりません。独自の発明、製品の意匠、取引先から信用されている商標も、事業を支える知的財産です。形のない財産だからといって守り方が一つになるわけではなく、権利の種類によって成立の条件や保護の範囲が異なります。特許として公開して守る道もあれば、製法を秘密のまま管理する道もあります。他社と技術を共有する際には、何を誰に使わせるかという契約が、協力を続ける土台になります。",
+    "form": "知的財産",
+    "en": "A factory visit reveals little about a company's strengths if attention is limited to the price of buildings and machinery. Original inventions, product designs, and trademarks trusted by customers are intellectual property supporting the business. Intangible assets do not all have one method of protection, since conditions and scope differ by type of right. Some techniques can be disclosed and protected by patents, while processes may instead be managed as secrets. In sharing technology, agreements about who may use what provide a foundation for continued cooperation.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "発明や意匠、商標など、形のない事業上の財産をまとめて指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a50bf9fea5-5c852f46",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-a50bf9fea5-5c852f46",
+    "wordId": "nn-a50bf9fea5"
+   }
+  },
+  {
+   "term": "経済産業省",
+   "reading": "けいざいさんぎょうしょう",
+   "pos": "noun",
+   "meaning": "Japan’s industry and trade ministry",
+   "defJa": "日本で産業や通商などの政策を担う行政機関",
+   "passage": {
+    "ja": "半導体工場への支援では、企業が設備を建てる決定と、国が予算を使う判断が接点を持ちます。産業や通商の政策を担う経済産業省は、このような政策に関わる行政機関の一つです。工場が完成すれば終わりというものではなく、人材の育成や材料の供給も事業の継続を左右します。地域の電力需要が増えれば、工場の外でも調整が必要になります。企業の投資計画と公共の支援が結び付くところでは、事業の利益だけでなく、政策の目的と費用の関係も問われます。",
+    "form": "経済産業省",
+    "en": "Support for semiconductor factories brings corporate decisions to build equipment into contact with government decisions to spend public funds. The Ministry of Economy, Trade and Industry is one administrative body involved in such policies, with responsibility for industry and trade. Completion of a factory is not the end, since personnel development and material supply also affect its continued operation. Rising local electricity demand requires coordination outside the factory as well. Where corporate investment and public support meet, the relationship between policy goals and costs matters alongside business profits.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "産業や通商などの政策を担当する日本の行政機関。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9a8b19130f-0245eb11",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-028.json",
+    "cardId": "nn-9a8b19130f-0245eb11",
+    "wordId": "nn-9a8b19130f"
+   }
+  },
+  {
+   "term": "自己言及",
+   "reading": "じこげんきゅう",
+   "pos": "noun",
+   "meaning": "self-reference",
+   "defJa": "言葉や仕組みがそれ自身を指し示すこと",
+   "passage": {
+    "ja": "紙に「この文には漢字が含まれている」とあると、文が自分の中身を指しているよね。こういう自己言及は、必ずしも矛盾を起こすわけじゃなくて、この例なら実際に漢字が見えるから確かめられる。「この文は偽だ」となると事情が変わって、真だとすれば偽、偽だとすれば真になり、単純な判定が回り続けるんだ。自分を指す形が同じでも、何を主張しているかによって問題は違う。自分の状態を表示するプログラムまで全部おかしいと考える必要はないよ。",
+    "form": "自己言及",
+    "en": "A piece of paper saying “This sentence contains kanji” has a sentence pointing to its own contents. Such self-reference need not produce a contradiction, and this example can be checked because kanji are visibly present. With “This sentence is false,” things change, since treating it as true makes it false and treating it as false makes it true, sending a simple verdict around in circles. Even with the same self-directed form, the problem depends on what is asserted. There is no need to regard every program displaying its own status as defective.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "自分自身を対象として指すことで、必ずしも矛盾を生むとは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b73777edb3-60917be6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-b73777edb3-60917be6",
+    "wordId": "nn-b73777edb3"
+   }
+  },
+  {
+   "term": "要諦",
+   "reading": "ようてい",
+   "pos": "noun",
+   "meaning": "the essential point",
+   "defJa": "物事を行ううえで特に重要な点",
+   "passage": {
+    "ja": "答案を見直すと、難しい計算よりも問題の条件を取り違えた失点が目立ちました。練習量を増やす前に誤りを分類したところ、単位をそろえず数値を式に入れる癖が見つかりました。この生徒にとって改善の要諦は、計算を速めることより、式を立てる前に量の意味を確かめることにあります。手順を一つ変えてから、新しい問題で同じ間違いが減るかを確かめます。努力を続けるにしても、どこを変えれば結果が動くかをつかめば、練習の目的ははるかにはっきりします。",
+    "form": "要諦",
+    "en": "Reviewing an answer sheet revealed more lost marks from misreading conditions than from difficult calculations. Classifying errors before increasing practice uncovered a habit of inserting numbers into formulas without aligning units. For this student, the essential point for improvement lies in checking what quantities mean before setting up an equation, more than in calculating faster. After changing that step, the student checks whether the same mistake declines on new problems. Even when continuing to work hard, identifying what change affects results makes the purpose of practice much clearer.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "全体を左右する特に大切な点で、「改善の要諦」のように使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f6b74e6e2e-340b6868",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-f6b74e6e2e-340b6868",
+    "wordId": "nn-f6b74e6e2e"
+   }
+  },
+  {
+   "term": "記号接地問題",
+   "reading": "きごうせっちもんだい",
+   "pos": "noun",
+   "meaning": "symbol grounding problem",
+   "defJa": "記号の意味を他の記号だけでなくどう支えるかの問い",
+   "passage": {
+    "ja": "知らない言語の辞書を渡され、説明もすべてその言語だったら、単語をたどっても意味に届かないことがあります。記号接地問題は、記号の意味を別の記号だけに頼らず、何によって支えられるのかという問いです。機械に「赤い」を扱わせる際も、語と語の関係に加えて、画像や行動との結び付きが論点になります。ただし、カメラをつなげば意味の理解が完成すると決まっているわけではありません。記号をうまく操作する能力と、何を指しているかを理解する能力の関係が問われます。",
+    "form": "記号接地問題",
+    "en": "Given a dictionary in an unfamiliar language whose definitions are all in that language, following words may never bring one to meaning. The symbol grounding problem asks what can support symbols' meanings beyond reliance on other symbols. When getting a machine to handle “red,” connections with images or actions become relevant alongside relations between words. Yet connecting a camera does not establish that understanding is complete. The question concerns the relationship between skillfully manipulating symbols and understanding what they refer to.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "記号同士の対応だけで意味が成立するかを問う問題。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5153041fe0-79e00ad2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-038.json",
+    "cardId": "nn-5153041fe0-79e00ad2",
+    "wordId": "nn-5153041fe0"
+   }
+  },
+  {
+   "term": "試算",
+   "reading": "しさん",
+   "pos": "noun",
+   "meaning": "a provisional calculation",
+   "defJa": "一定の仮定を置いておおよその数値を計算すること",
+   "passage": {
+    "ja": "新しい工場の計画で、担当者は生産量と設備費を表に並べました。試算では黒字になる見込みでも、前提にした販売量が達成できなければ収支は変わります。そこで注文が少ない場合や、材料費が上がる場合も計算し直します。数字を細かく示すほど正確に見えますが、仮定の不確かさが消えるわけではありません。計画に資金を出すかを決めるにあたっては、予想した一つの結果に加え、条件を変えたときに損失へ転じる境目も判断の材料になります。",
+    "form": "試算",
+    "en": "For a new factory plan, the manager tabulated production volumes and equipment costs. An estimate may suggest a profit, but the balance changes if the assumed sales volume is not achieved. Calculations are therefore repeated for fewer orders or higher material costs. Detailed figures may look more precise without removing uncertainty in the assumptions. Deciding whether to fund the plan requires considering the point where changed conditions produce losses, alongside one projected result.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "仮定を置いておおよその数値を求めることで、確定した実績とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b2a785f570-51e15c0b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-b2a785f570-51e15c0b",
+    "wordId": "nn-b2a785f570"
+   }
+  },
+  {
+   "term": "資本集約的",
+   "reading": "しほんしゅうやくてき",
+   "pos": "na-adj",
+   "meaning": "capital-intensive",
+   "defJa": "事業に多額の設備や資金を必要とするさま",
+   "passage": {
+    "ja": "製品を一個も売らないうちに、工場の建設や高価な装置に多額の資金が必要になります。半導体製造のように資本集約的な事業では、売上げがない期間にも設備への支払いが先に進みます。注文が減ったからといって建物を簡単に小さくすることもできません。採算を学ぶには、一個を作る材料費だけでなく、生産量にかかわらず発生する費用を含めて考える必要があります。設備を十分に使えるかが利益を大きく左右するため、技術の優秀さと工場を動かし続ける見通しの両方が問われます。",
+    "form": "資本集約的",
+    "en": "Before selling even one product, a business may need large sums for factory construction and expensive equipment. In capital-intensive businesses such as semiconductor manufacturing, equipment payments proceed during periods without sales. Buildings cannot easily shrink just because orders decline. Learning profitability requires considering costs incurred regardless of output as well as the materials for each unit. Because sufficient equipment utilization strongly affects profits, both technical quality and prospects for continued factory operation matter.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "労働力だけでなく、多額の設備や資金を特に必要とする事業の性質。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-44b2efa702-94e542d4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-44b2efa702-94e542d4",
+    "wordId": "nn-44b2efa702"
+   }
+  },
+  {
+   "term": "逼迫",
+   "reading": "ひっぱく",
+   "pos": "noun",
+   "meaning": "tightness, strain",
+   "defJa": "必要な量に対して余裕がほとんどない状態",
+   "passage": {
+    "ja": "研究室の計算機に予約が集中し、学生が一晩待っても実験を始められなくなりました。計算資源の需給が逼迫すると、処理の速さに加えて、限られた時間を誰に割り当てるかが課題になります。全員の計算を大きくすれば、待ち時間はさらに延びかねません。そこで授業用の短い処理には枠を残し、長い実験は空いた夜間へ移す運用を試します。必要な量と使える量の差を測れば、機械を増やすべきか、まず使い方を変えるべきかを、具体的な条件から判断できます。",
+    "form": "逼迫",
+    "en": "Reservations overwhelmed a laboratory's computers, leaving students unable to begin experiments even after waiting overnight. When supply and demand for computing resources become tight, allocating limited time becomes an issue alongside processing speed. Enlarging everyone's computations could lengthen the wait further. The laboratory therefore tries reserving capacity for short classroom tasks and moving long experiments into available overnight periods. Measuring the gap between needed and available capacity allows a concrete judgment on whether to add machines or first change their use.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「需給が逼迫する」は、供給に余裕がなく需要を満たしにくい状態。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1e1a713a57-8c203d13",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-001-r.json",
+    "cardId": "nn-1e1a713a57-8c203d13",
+    "wordId": "nn-1e1a713a57"
+   }
+  },
+  {
+   "term": "電力需要",
+   "reading": "でんりょくじゅよう",
+   "pos": "noun",
+   "meaning": "electricity demand",
+   "defJa": "使うために必要とされる電気の量",
+   "passage": {
+    "ja": "大規模なデータセンターが新設されると、計算用の機器だけでなく冷却設備にも電気が要る。地域の電力需要が増加しても、発電所や送電網の能力を直ちに増やせるとは限らない。事業者は機器の効率を高めるとともに、接続できる電力の量を確認して立地を決める必要がある。年間の使用量が同じであっても、使用が特定の時間に集中すれば設備への負担は異なる。計算の拠点を増やす計画は、建物の敷地だけでなく、周辺の電力を安定して届ける仕組みと一体である。",
+    "form": "電力需要",
+    "en": "A new large data center requires electricity for cooling equipment as well as computing hardware. An increase in regional electricity demand does not mean generation and transmission capacity can be expanded immediately. Operators must improve equipment efficiency and check how much power can be connected when choosing locations. Even with identical annual consumption, concentration in particular periods changes the burden on infrastructure. Plans to expand computing sites therefore involve both the building site and the surrounding system for reliable electricity delivery.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "電気の使用に必要な量を表し、時間帯による変動も供給設備に関わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9fd754ecc7-5c636687",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-007.json",
+    "cardId": "nn-9fd754ecc7-5c636687",
+    "wordId": "nn-9fd754ecc7"
+   }
+  }
+ ]
+}

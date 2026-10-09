@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "形而上学",
-   "reading": "けいじじょうがく",
-   "pos": "noun",
-   "meaning": "metaphysics",
-   "defJa": "存在や世界の根本原理を問う哲学の分野",
-   "passage": {
-    "ja": "世界の根本に何があるのかという問いは、目の前の物を測る作業だけでは答えが定まりません。形而上学は存在や世界の根本原理を問う哲学の分野で、インド思想の自己や究極的な実在をめぐる議論を読む際にも関わります。難しい話という印象だけで覚えず、何が存在し、何を根本とし、どんな理由でそう考えるのかに分けて整理しましょう。仏教や他の学派を比較するときにも、結論の違いを並べる前に問いの立て方を確かめると、互いの議論がどこで接し、どこですれ違うかを捉えられます。",
-    "form": "形而上学",
-    "en": "Questions about the world’s ultimate ground are not settled solely by measuring nearby objects. Metaphysics investigates fundamental principles of existence and reality, including questions relevant to Indian accounts of self and ultimate being. Separating what exists, what is fundamental, and the supporting reasons makes the subject more than a label for difficult discussion. Comparing questions before conclusions clarifies where philosophical schools meet or diverge.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「形而上学的な問い」。難解という評価ではなく、問う対象を示す語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "心身一如",
    "reading": "しんしんいちにょ",
    "pos": "noun",
@@ -35,28 +13,6 @@
     "register": "語",
     "topic": "india",
     "tipJa": "心身を切り離さない捉え方を示し、個別の科学的な実証とは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "弘法大師",
-   "reading": "こうぼうだいし",
-   "pos": "noun",
-   "meaning": "Kōbō Daishi (Kūkai's title)",
-   "defJa": "空海に後から贈られた尊称",
-   "passage": {
-    "ja": "空海と別の人だと思っていた名前が、同じ人物を指していると分かることがあるよね。弘法大師は空海に後から贈られた尊称で、真言宗の歴史を読むときだけでなく、各地の寺や伝説でもよく出会う名前なんだ。生涯の出来事を調べることと、人々がその後どんな物語を語り継いだかを調べることは、つながっているけれど同じではない。井戸を開いた話などを読んだら、いつ誰が記した伝承なのかにも目を向けると、歴史上の僧と、身近に感じられてきたお大師さまの両方を考えられるよ。",
-    "form": "弘法大師",
-    "en": "A name thought to belong to someone else may turn out to refer to Kukai. Kobo Daishi is a title granted to him afterward, appearing in temple histories and local legends as well as Shingon accounts. Investigating his lifetime and investigating later stories are related but distinct tasks. Asking when and by whom a well-digging legend was recorded illuminates both the historical monk and the beloved master of popular devotion.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "空海の尊称であり、史実と各地に伝わる大師伝説を分けて読む。",
     "sense": ""
    },
    "deck": "senmon",

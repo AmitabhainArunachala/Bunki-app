@@ -89,50 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "即身成仏",
-   "reading": "そくしんじょうぶつ",
-   "pos": "noun",
-   "meaning": "attaining buddhahood in this very body",
-   "defJa": "この身のままで仏となるという真言密教の教え",
-   "passage": {
-    "ja": "よく似た漢字の言葉が並ぶときは、見た目だけで意味をまとめないようにしましょう。即身成仏は、この身のままで仏となるという真言密教の教えであり、修行者の遺体を安置したものを指す語とは区別されます。身体、言葉、心に関わる実践をどう位置付けるかを学ぶと、生きている身を離れた遠い未来だけに悟りを置かない考え方が見えてきます。語の中央にある成という字にも注意し、教義を述べる場合と、寺に安置される姿を説明する場合を分けると、二つの意味を取り違えずに整理できます。",
-    "form": "即身成仏",
-    "en": "Words with similar characters should not be merged on appearance alone. Attaining Buddhahood in this very body is a Shingon teaching, distinct from a term for an enshrined practitioner’s preserved body. Studying practices involving body, speech, and mind reveals an account that does not place awakening only in a distant future apart from embodied life. Attending to the character meaning attain helps distinguish a doctrine from a description of an enshrined figure.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "教義を表す語と、遺体を安置した「即身仏」との違いに注意する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "口伝",
-   "reading": "くでん",
-   "pos": "noun",
-   "meaning": "oral transmission of teachings",
-   "defJa": "言葉を直接交わして教えなどを伝えること",
-   "passage": {
-    "ja": "儀礼の手順をすべて文字にすれば、教えを完全に保存できるとは限りません。口伝という語を使う場面では、師から弟子へ直接伝えることで、声の調子や動作の間、場に応じた判断も学ばれることを示せます。仏教の実践を説明する文章でも、文献があることと、対面での指導が必要なことは、必ずしも矛盾しません。文字に残らないから曖昧なのだと決め付けず、何が文章で共有され、何がその場のやり取りに委ねられるのかを描けば、伝承の方法が具体的に伝わります。",
-    "form": "口伝",
-    "en": "Writing every ritual step down does not necessarily preserve the teaching completely. Oral transmission can convey vocal tone, timing, and situated judgment through direct contact between teacher and student. Buddhist practice can therefore use texts alongside face-to-face guidance without contradiction. Describing what is shared in writing and what is learned through interaction makes transmission concrete without dismissing unwritten knowledge as vague.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「口伝で受け継ぐ」。文字資料の有無と、対面で学ぶ役割を分けて考える。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "四諦",
    "reading": "したい",
    "pos": "noun",
@@ -167,28 +123,6 @@
     "register": "講",
     "topic": "india",
     "tipJa": "「只管」はひたすらという意味で、何も考えられなくする命令ではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "回向",
-   "reading": "えこう",
-   "pos": "noun",
-   "meaning": "transferring merit; memorial service",
-   "defJa": "善行や修行の功徳を他者などに振り向けること",
-   "passage": {
-    "ja": "法要で読経の後に唱えられる文には、その行いを誰のためにするかが示されることがあります。回向は修行や善行の功徳を他者などへ振り向けることで、亡くなった人への供養だけに意味を限定しないことが大切です。仏教の文章を読む際は、誰がどのような行いによって得たものを、誰のために願いとともに向けるのか整理してみましょう。自分一人の成果として蓄えるという読み方から少し離れると、実践が他者との関係に開かれていることを、儀礼の結びの言葉から学べます。",
-    "form": "回向",
-    "en": "A verse after sutra recitation may identify for whom the practice is performed. Dedication directs merit from practice or good deeds toward others and should not be limited to memorial services. Identifying the practitioner, the action, and the intended beneficiaries clarifies the account. The ritual’s concluding words can show practice opening toward others rather than accumulating personal achievements alone.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「功徳を回向する」。対象は亡くなった人に限らず、文脈から読み取る。",
     "sense": ""
    },
    "deck": "senmon",

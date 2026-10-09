@@ -23,50 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "確率分布",
-   "reading": "かくりつぶんぷ",
-   "pos": "noun",
-   "meaning": "probability distribution",
-   "defJa": "各結果や値にどれほどの確率があるかの分布",
-   "passage": {
-    "ja": "言語モデルが次の語を選ぶ場面を、候補の一つだけが正解として光る図で覚えると、仕組みを狭く捉えてしまいます。確率分布は、取り得るそれぞれの候補に、どれほどの確率が割り当てられているかを表します。最も高い候補を選ぶ場合もあれば、この配分に基づいて候補を抽選する場合もあります。ただし、ある語の出やすさを示す数値と、その語を含む文章が事実として正しい確率とは、同じものではありません。勉強用の図を描くなら、候補を幾つか並べた上で、数値が何の起こりやすさを表すのかを欄外に書き添えましょう。",
-    "form": "確率分布",
-    "en": "Picturing a language model’s next-word choice as a diagram with one correct candidate lit up gives an overly narrow view of the mechanism. A probability distribution specifies how much probability is assigned to each possible candidate. A system may choose the highest-probability candidate or sample according to this allocation. However, the likelihood of a word appearing is not the same as the probability that a sentence containing it is factually correct. For a study diagram, list several candidates and add a note identifying exactly which event the numbers describe.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "何が起こる確率なのかを明示する。文章の真偽の保証とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "省人化",
-   "reading": "しょうじんか",
-   "pos": "noun",
-   "meaning": "reducing required staffing",
-   "defJa": "作業に必要な人数を少なくすること",
-   "passage": {
-    "ja": "工場の画像検査に新しい装置を入れた記事で省人化と書くなら、どの作業に必要な人数が減るのかまで示すと具体的です。検査員の負担が軽くなったことと、担当する人数が減ったことは、同じ内容ではありません。また、機械に任せる工程が増えるに伴って、設定や保守を担う仕事が別に生まれる場合もあります。「人がいらなくなる」と一括りにせず、現場の役割の変化を書き分ければ、技術の効果を読み手が検討できます。短い見出しで人数の変化を述べた後は、本文で何を誰が担当するようになったかを補うと伝わります。",
-    "form": "省人化",
-    "en": "When an article calls a new factory image-inspection system staffing reduction, specifying which task needs fewer people makes the claim concrete. A lighter workload for inspectors is not the same as fewer inspectors. As more processes are assigned to machines, other work such as configuration and maintenance may also arise. Describing changes in workplace roles instead of lumping them together as “people are no longer needed” lets readers assess the technology’s effect. After a short headline mentions staffing changes, the body should explain who now handles which tasks.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "必要な人数を減らす意味。負担を減らすだけの省力化と区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "破壊的イノベーション",
    "reading": "はかいてきいのべーしょん",
    "pos": "noun",

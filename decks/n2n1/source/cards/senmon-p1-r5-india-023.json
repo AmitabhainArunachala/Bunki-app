@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "無自性",
-   "reading": "むじしょう",
-   "pos": "noun",
-   "meaning": "absence of independent intrinsic nature",
-   "defJa": "他に依存しない固定した本質がないこと",
-   "passage": {
-    "ja": "大乗仏教で論じられる無自性は、目の前の物がまったく存在しないという意味とは区別される。他のものや条件に依存せず、それだけで成り立つ固定的な本質を認めないという考えである。例えば、器は材料や作る人の働きなどと切り離して成立するものではないが、それを理由に日常の使用まで否定することにはならない。この立場を説明する文章では、独立した実体を認めないことと、通常の生活で物を区別して使うことを分けて記述するのが基本となる。",
-    "form": "無自性",
-    "en": "The absence of independent intrinsic nature discussed in Mahayana Buddhism is distinguished from the claim that things before us do not exist at all. It rejects a fixed essence that exists by itself without depending on other things or conditions. A vessel, for example, does not arise apart from materials and a maker’s work, but this does not entail denying its everyday use. Explanations of this position fundamentally distinguish denying independent entities from distinguishing and using things in ordinary life.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "独立した固定的な本質の否定で、日常の存在を全否定する語ではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "発心",
    "reading": "ほっしん",
    "pos": "noun",
@@ -101,50 +79,6 @@
     "register": "学",
     "topic": "india",
     "tipJa": "悟りへ向かう志を起こすこと。決意の瞬間と継続する実践を分けて読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "盛者必衰",
-   "reading": "じょうしゃひっすい",
-   "pos": "noun",
-   "meaning": "the prosperous inevitably decline",
-   "defJa": "勢いの盛んな者も必ず衰えるということ",
-   "passage": {
-    "ja": "平家物語の冒頭で盛者必衰という四字を読むと、これから語られる栄華の終わりが、あらかじめ文章に織り込まれています。単に負けた人への同情を表す語ではなく、今まさに勢いのある者にも変化が訪れるという見方を示します。仏教の無常と結び付いた響きを残して訳すなら、ある一族だけの不運として説明し切らないことが大切です。華やかな場面を読むときにも終わりの影が重なるという、作品全体の読み方を方向付ける言葉として捉えると、短い表現の働きがよく分かります。",
-    "form": "盛者必衰",
-    "en": "The expression that the prosperous inevitably decline at the opening of The Tale of the Heike already weaves the end of the coming splendor into the narrative. It does not merely express sympathy for the defeated, but presents change as something that also reaches those currently flourishing. A translation retaining its resonance with Buddhist impermanence should not explain it solely as one family’s misfortune. Understanding it as language that shapes reading throughout the work, casting an ending’s shadow even over brilliant scenes, reveals the function of the brief expression.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "栄えている者にも衰えが来るという見方で、敗者への同情だけではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "真如",
-   "reading": "しんにょ",
-   "pos": "noun",
-   "meaning": "suchness; reality as it is",
-   "defJa": "仏教で語られるありのままの真実のあり方",
-   "passage": {
-    "ja": "大乗仏教の論書で用いられる真如は、現実を好き嫌いによって評価した結果ではなく、ありのままの真実のあり方を表す。日常語の「自然体」と似た印象を与えることもあるが、気楽に振る舞う態度の名称に置き換えると、教義上の意味が抜け落ちる。関連する文章では、迷いによる捉え方と真実との関係や、それを知る智慧が論じられる。訳語の説明には、気分や性格を表す語との違いを示すとともに、個々の文献がこの概念をどのように位置付けているかという情報が求められる。",
-    "form": "真如",
-    "en": "In Mahayana treatises, suchness denotes reality as it is rather than the result of evaluating the world through likes and dislikes. Although it may resemble the everyday idea of being natural, substituting a relaxed manner loses its doctrinal meaning. Related writings discuss the relation between deluded apprehension and truth, as well as the wisdom that knows it. An explanation of the translation needs both a distinction from words for mood or personality and information about the place of the concept in a particular text.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "気分や自然な振る舞いではなく、真実のあり方を表す仏教語。",
     "sense": ""
    },
    "deck": "senmon",

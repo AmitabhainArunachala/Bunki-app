@@ -133,28 +133,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "メタ言語",
-   "reading": "めたげんご",
-   "pos": "noun",
-   "meaning": "metalanguage",
-   "defJa": "別の言語の仕組みや表現を記述するための言語",
-   "passage": {
-    "ja": "プログラムの説明に「ここでは文を読む」と書くと、実行する命令のことか、説明書の一文のことかが曖昧になります。対象となる言語を記述するメタ言語と、その対象自体を分けて意識すれば、同じ「文」という語が指すものを整理できます。例えば、命令の書き方を日本語で解説する場合、説明に使う日本語と、引用した命令とは別の役割を担っています。専門的な議論であれ、引用符や「この説明では」という短い補足を置くだけで、読者が言葉の段階を行き来する負担を減らせます。",
-    "form": "メタ言語",
-    "en": "Writing “Read the statement here” in a program explanation can leave it unclear whether one means an executable instruction or a sentence in the manual. Distinguishing the metalanguage used to describe a language from that language itself helps clarify what the same word “statement” refers to. For example, when instructions are explained in Japanese, the explanatory Japanese and the quoted instructions serve different roles. Even in a technical discussion, quotation marks or a short clarification such as “in this explanation” can reduce the burden of moving between levels of language.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "使っている言葉と、説明の対象の言葉を区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "自己相似",
    "reading": "じこそうじ",
    "pos": "noun",

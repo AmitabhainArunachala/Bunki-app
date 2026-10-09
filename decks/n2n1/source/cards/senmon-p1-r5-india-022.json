@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "無の境地",
-   "reading": "むのきょうち",
-   "pos": "noun",
-   "meaning": "a state free from distracting attachment",
-   "defJa": "雑念や執着から離れたとされる心の状態",
-   "passage": {
-    "ja": "瞑想の紹介文に無の境地とあっても、脳が完全に働かなくなることだと受け取ると、宗教的な表現と生理学の説明が混ざります。まずは雑念や執着から離れた心のあり方を表す言葉として、どのような実践の文脈で使われているかを確かめましょう。何も思い浮かばなかったという感想だけで悟りの達成まで判断するのは、体験の報告から大きく踏み出しています。読書ノートには本人の体験、教義による解釈、測定できる現象を別々に記す欄を作ると、一つの言葉に異なる主張を重ねずに整理できます。",
-    "form": "無の境地",
-    "en": "Reading a meditation text’s state of nothingness as a complete cessation of brain activity mixes religious expression with physiology. First consider it as language for a mind free from distracting thoughts or attachment and identify its practical context. Inferring attainment of awakening solely from a report that nothing came to mind goes far beyond describing an experience. Separate columns for personal experience, doctrinal interpretation, and measurable phenomena help organize different claims without piling them into one phrase.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "脳活動の停止ではなく、雑念や執着を離れるという文脈で読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "漢訳",
    "reading": "かんやく",
    "pos": "noun",
@@ -145,28 +123,6 @@
     "register": "語",
     "topic": "india",
     "tipJa": "変化を見る立場を表す。単なる悲しい気分との言い換えにはしない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "浄土真宗",
-   "reading": "じょうどしんしゅう",
-   "pos": "noun",
-   "meaning": "Jodo Shinshu",
-   "defJa": "親鸞の教えを受け継ぐ浄土系の宗派",
-   "passage": {
-    "ja": "親鸞の教えを受け継ぐ浄土真宗を「念仏で自分の功績を積む宗派」と紹介すると、他力を重んじる教えとの関係で誤解を招きます。念仏が阿弥陀仏の本願への信頼や感謝とどう結び付くかを示す方が、宗派の説明として筋が通ります。短い紹介文にするにせよ、行為を数えることで救いを獲得する仕組みのように言い換えると、分かりやすさのために意味を変えてしまいます。似た名前の宗派を一括りにせず、誰の教えを受け継ぎ、その実践をどう位置付けるかを言葉にすると、違いが伝わります。",
-    "form": "浄土真宗",
-    "en": "Introducing Jodo Shinshu, which carries on Shinran’s teaching, as a school for accumulating personal merit through recitation misleads in relation to its emphasis on other-power. Explaining how recitation relates to trust in and gratitude for Amitabha’s original vow better conveys the teaching. Even in a short introduction, describing liberation as something acquired by counting actions changes the meaning for the sake of apparent simplicity. Distinguishing whose teaching a school inherits and how it situates practice communicates differences without lumping together similarly named traditions.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "親鸞の教えを受け継ぐ宗派。功績の積算という説明に置き換えない。",
     "sense": ""
    },
    "deck": "senmon",

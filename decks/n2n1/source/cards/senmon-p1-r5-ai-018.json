@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "学習データ",
-   "reading": "がくしゅうでーた",
-   "pos": "noun",
-   "meaning": "training data",
-   "defJa": "モデルの学習に使われる事例や情報の集まり",
-   "passage": {
-    "ja": "動物の写真を分類する仕組みでは、学習データに何が入っているかが検証の出発点になります。背景が明るい犬の写真と暗い猫の写真ばかりを用意すると、動物の形ではなく背景の違いを手掛かりにしてしまう場合があります。見慣れた写真で正解したからといって、違う場所で撮った写真にも対応できるとは限らないのは、そのためです。背景や撮影条件を変えた例を別に確保し、何を認知してほしいのかと、実際に判断を支えた特徴とのずれを確かめていきましょう。",
-    "form": "学習データ",
-    "en": "For a system classifying animal photographs, what the training data contains is a starting point for testing. If the examples mainly show dogs against bright backgrounds and cats against dark ones, the system may use the background rather than animal shape. That is why correct answers on familiar photographs do not guarantee success on photographs from different settings. Hold out examples with different backgrounds and shooting conditions to examine the gap between what should be recognized and the features actually supporting the decisions.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "学習に使う資料と、成績を確かめるための資料を区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "定式化",
    "reading": "ていしきか",
    "pos": "noun",
@@ -79,50 +57,6 @@
     "register": "話",
     "topic": "ai",
     "tipJa": "曖昧な課題を、計算や検証ができる形へ置き換えること。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "実用化",
-   "reading": "じつようか",
-   "pos": "noun",
-   "meaning": "practical deployment",
-   "defJa": "研究成果を現実の用途で使えるようにすること",
-   "passage": {
-    "ja": "研究室で一度動いた装置を、そのまま実用化に成功したと紹介すると、読み手は現場でも使える段階だと受け取りがちです。試作機の動作確認と、費用や耐久性の制約を満たして日々使える状態とは、同じではありません。たとえ原理が新しくても、使う場所や支える人の条件が明らかでなければ、運用についての主張は控えめにする方が正確です。記事では「試作品で動作を確認した」「工場で試験運用を始めた」など、検証の進んだ段階を具体的に書くことで、成果の位置を伝えられます。",
-    "form": "実用化",
-    "en": "Introducing a device that worked once in a laboratory as successfully deployed leads readers to assume it is ready for real use. Checking a prototype’s operation differs from making it usable every day within cost and durability constraints. Even with a novel principle, claims about operation should be limited unless the setting and supporting staff requirements are clear. An article can locate the achievement by naming the stage reached, such as confirming prototype operation or beginning trial use at a factory.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "試作の成功と、現場で継続して使える段階を区別して使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "基盤モデル",
-   "reading": "きばんもでる",
-   "pos": "noun",
-   "meaning": "a foundation model",
-   "defJa": "多様な用途への応用の土台となる大規模な学習モデル",
-   "passage": {
-    "ja": "幅広い資料で学んだ基盤モデルを、特定の仕事に合わせて使うという説明を読んでみましょう。ここで土台になるとは、あらゆる課題をそのまま正しく処理するという意味ではなく、追加の調整や指示によって複数の用途へ応用できることを指します。文章の分類で役に立ったとしても、専門的な質問への答えが正確だとまでは、その結果だけから言えません。説明文を整える際は、共通の土台として備える能力と、個別の用途で検証した成績を書き分けると、広い可能性と確かめた範囲を区別できます。",
-    "form": "基盤モデル",
-    "en": "Consider the explanation that a foundation model trained on broad material is adapted to a particular task. Being a foundation does not mean correctly handling every task as supplied, but being adaptable to multiple uses through further adjustment or instructions. Success in text classification alone does not establish accuracy on specialized questions. When editing the explanation, separate the capabilities of the shared foundation from performance verified in individual uses to distinguish broad potential from the tested scope.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "汎用的な土台を指し、全用途での正しさを保証する語ではない。",
     "sense": ""
    },
    "deck": "senmon",

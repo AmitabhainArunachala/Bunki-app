@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "右肩上がり",
-   "reading": "みぎかたあがり",
-   "pos": "noun",
-   "meaning": "a sustained upward trend",
-   "defJa": "数値などが全体として上向きに増えていくこと",
-   "passage": {
-    "ja": "半導体企業の売上を右肩上がりと書くなら、どの期間のどの数字を見ているのかを添えましょう。一年間の合計が伸びていても、各月まで一度も下がらず増えたとは限らず、年と月ではグラフの印象も違います。見出しを短くするあまり、利益や株価まで同じ方向に動いたように読ませると、売上についての記述が別の主張に変わってしまいます。横軸の期間と縦軸の単位を確かめ、途中に落ち込みがあれば、その揺れも一文で残すと増加の実態が伝わります。",
-    "form": "右肩上がり",
-    "en": "When describing a semiconductor company’s sales as trending upward, specify which figures and period you mean. Growth in an annual total does not mean every month increased without a dip, and annual and monthly graphs can look different. Shortening a headline so far that it suggests profit and share prices moved the same way turns a statement about sales into a different claim. Checking the horizontal period and vertical units and retaining a sentence about any interim decline conveys how the growth actually occurred.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "全体の上向きを示す表現で、毎回の増加まで保証する語ではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "周回遅れ",
    "reading": "しゅうかいおくれ",
    "pos": "noun",

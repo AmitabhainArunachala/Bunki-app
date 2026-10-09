@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "チューリングテスト",
-   "reading": "ちゅーりんぐてすと",
-   "pos": "noun",
-   "meaning": "the Turing test",
-   "defJa": "対話で相手が人か機械かを見分けられるかの試験",
-   "passage": {
-    "ja": "「人と区別できない返事をしたから、心がある」と書くと、観察した事実から結論へ大きく飛んでしまいます。チューリングテストを説明する文章では、対話を通じて相手が人間か機械かを見分けられるか、という問いをまず明確にします。ある条件の会話で判別しにくいことは、内部でどんな理解や意識があるかを、そのまま証明するものではありません。試験の結果を紹介する際も、誰がどんな条件で判断したかを残し、知性という広い言葉へ置き換える前に、実際に確かめた範囲を示したいところです。",
-    "form": "チューリングテスト",
-    "en": "Writing that a system has a mind because its replies were indistinguishable from a human's makes a large leap from observation to conclusion. An explanation of the Turing test should first make clear its question of whether dialogue allows a human interlocutor to be distinguished from a machine. Difficulty distinguishing them under particular conversational conditions does not directly prove what understanding or consciousness exists internally. Reports of results should retain who judged under which conditions and identify what was actually tested before replacing it with a broad claim about intelligence.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "会話での見分けにくさと、意識の証明を区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "ディープフェイク",
    "reading": "でぃーぷふぇいく",
    "pos": "noun",
@@ -111,28 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "トークン",
-   "reading": "とーくん",
-   "pos": "noun",
-   "meaning": "token",
-   "defJa": "文章などを処理のために分けた単位",
-   "passage": {
-    "ja": "言語モデルの記事で「一語ずつ文章を作る」と書くと、処理する単位が辞書の見出し語と一致するように読めます。トークンは文章を計算に扱える形へ分けた単位で、一つの語が複数に分かれたり、記号が一つの単位になったりする場合があります。分け方は仕組みによって異なるので、文章の長さを比較するにしても、文字数や単語数とそのまま置き換えることはできません。説明を整えるなら、「どのように区切った単位か」を一例添えると、利用量の数字と読者の目に見える長さとの違いまで伝わります。",
-    "form": "トークン",
-    "en": "Saying that a language model creates text one word at a time can suggest that its processing units correspond to dictionary entries. A token is a unit into which text is divided for computation, so one word may span several units and a symbol may form one. Since segmentation varies by system, token counts cannot simply replace character or word counts when comparing lengths. Adding an example of the segmentation helps explain the difference between usage figures and the length visible to a reader.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "単語と必ず一対一に対応するとは限らない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "デカップリング",
    "reading": "でかっぷりんぐ",
    "pos": "noun",
@@ -145,28 +101,6 @@
     "register": "報",
     "topic": "ai",
     "tipJa": "調達先を増やすことと、関係を断つことは別。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "チップレット",
-   "reading": "ちっぷれっと",
-   "pos": "noun",
-   "meaning": "chiplet",
-   "defJa": "複数を組み合わせて使う小さな半導体の単位",
-   "passage": {
-    "ja": "大きな回路を一枚で作る場合と、小さな部分を組み合わせる場合を、二つの図にして比べましょう。チップレットを用いる設計では、機能ごとに作った小さな半導体をつなぎ、全体として必要な働きを実現します。部分によって製造技術を選べる利点がある一方で、部品間の通信や組み立て、熱の管理に新たな条件が加わります。分ければ必ず安くなると覚えるのではなく、作る段階で減る負担と、つなぐ段階で増える負担を表の両側へ書くと、設計の選択を説明する練習になります。",
-    "form": "チップレット",
-    "en": "Compare two diagrams: a large circuit made as one piece and a system assembled from smaller parts. A chiplet design connects small semiconductors made for different functions to provide the required overall behavior. Selecting manufacturing technologies by component offers benefits but introduces conditions involving communication, assembly, and heat management. Listing reduced manufacturing burdens against increased connection burdens provides practice in explaining the choice instead of memorizing that dividing a design always makes it cheaper.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "分けて作る利点と、つなぐ負担を一組で読む。",
     "sense": ""
    },
    "deck": "senmon",

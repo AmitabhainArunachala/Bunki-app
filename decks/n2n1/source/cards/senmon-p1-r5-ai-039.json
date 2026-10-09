@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "計算可能性",
-   "reading": "けいさんかのうせい",
-   "pos": "noun",
-   "meaning": "computability",
-   "defJa": "一定の手順で求める答えに到達できる性質",
-   "passage": {
-    "ja": "新しい問題を解くとき、速い装置を用意すればいつか答えが出ると考える前に、手順そのものが存在するかを問いましょう。計算可能性を学ぶ場面では、必要な時間が長いという事情と、あらゆる入力について正しく答える手順が存在しないという限界を区別します。前者なら計算資源やアルゴリズムの工夫が役立ち得ますが、後者を単なる処理速度の不足として扱うと、問題の性質を取り違えます。練習のノートにも「解けるか」と「どれくらいかかるか」の欄を分け、同じ難しさという言葉でまとめないようにします。",
-    "form": "計算可能性",
-    "en": "Before assuming that faster equipment will eventually solve a new problem, ask whether a procedure exists at all. Studying computability requires distinguishing a long running time from the absence of a procedure that correctly answers for every input. Resources or algorithmic improvements may help in the former case, but treating the latter as merely insufficient speed misidentifies the problem. Keep separate notebook columns for whether a problem can be solved and how long it takes, rather than compressing both into the word difficulty.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "速さの評価より前に、解く手順の存在を問う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "キャッシュ整合性",
    "reading": "きゃっしゅせいごうせい",
    "pos": "noun",

@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "知行合一",
-   "reading": "ちこうごういつ",
-   "pos": "noun",
-   "meaning": "unity of knowing and acting",
-   "defJa": "知ることと行うことを一体と捉える考え",
-   "passage": {
-    "ja": "頭では分かっているけど行動できない、ってよく言うよね。王陽明の知行合一は、本当に知ることと行うことを切り離さずに捉える考えで、ただ約束を守ろうという標語より踏み込んでいるんだ。日本の仏教で、教えを覚えることと修行との関係を読むときにも比較の手掛かりになるけど、もともとの思想の系統は分けておきたいね。同じように実践を重んじていても、何を知ることが目指され、どんな行いに結び付くのかを比べると、似ているところの奥にある違いまで考えられるよ。",
-    "form": "知行合一",
-    "en": "We often say that we understand something intellectually but cannot act on it. Wang Yangming’s unity of knowing and acting treats genuine knowing as inseparable from doing, going further than a slogan about keeping promises. It can provide a comparison when reading about learning teachings and practicing in Japanese Buddhism, but the original intellectual traditions should be distinguished. Even where both value practice, comparing what is to be known and the actions connected with it reveals differences beneath similarities.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "陽明学の語。仏教と比較する場合も、思想の由来を区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "禅",
    "reading": "ぜん",
    "pos": "noun",
@@ -67,50 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "究竟",
-   "reading": "くきょう",
-   "pos": "noun",
-   "meaning": "ultimate completion",
-   "defJa": "仏教で物事が最後まで徹底し完成すること",
-   "passage": {
-    "ja": "仏教の文献で究竟という語に出会ったら、この文脈では「くきょう」と読むことを押さえましょう。物事が最後まで徹底し、完成したあり方を示す語で、修行や悟りの最終的な位置付けを述べるときなどに使われます。単なる強調として「とても」と訳すと、途中の段階との違いや、何を完成とするのかという論点が消えてしまいます。まず後ろに続く語を確かめ、どの過程の終点を示しているかを考えると、難しい漢字の読みを覚えるだけでなく、文章の中での働きまで理解できます。",
-    "form": "究竟",
-    "en": "When encountering the term for ultimate completion in a Buddhist text, note that its reading in this context is kukyo. It indicates something carried through to completion and can describe the ultimate status of practice or awakening. Translating it merely as an intensifier such as very erases both its distinction from intermediate stages and the question of what counts as completion. Checking the word that follows and asking which process reaches its endpoint reveals its role in the passage beyond the reading of difficult characters.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "仏教では「くきょう」と読む。最終的な完成を示す働きに注目する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "神仏習合",
-   "reading": "しんぶつしゅうごう",
-   "pos": "noun",
-   "meaning": "interweaving of kami and Buddhist traditions",
-   "defJa": "日本の神への信仰と仏教が結び付くこと",
-   "passage": {
-    "ja": "寺と神社の歴史を説明する文章で神仏習合を「二つの宗教が混ざったこと」とだけ訳すと、そこで起きた具体的な関係が見えません。日本の神を仏の現れとして捉える考え方もあれば、祭りや土地の管理を通じて寺社が結び付く場合もあります。場所や時代による違いを省いて、全国で同じ教義が共有されていたと書くのは避けたいところです。誰が何を祀り、どの儀礼や組織がつながっていたかを一つ添えると、抽象的な用語が地域の信仰の姿を伝える言葉になります。",
-    "form": "神仏習合",
-    "en": "Translating the interweaving of kami and Buddhist traditions merely as two religions mixing leaves the specific historical relationships invisible. These could include interpreting kami as manifestations of Buddhas or connections between shrines and temples through festivals and land administration. Omitting differences of place and period risks implying that one doctrine was shared nationwide. Adding who worshipped what and which rituals or organizations were connected turns an abstract term into language conveying a community’s religious life.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "一様な教義名ではない。神と仏、儀礼や寺社の具体的な関係を示す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "禅問答",
    "reading": "ぜんもんどう",
    "pos": "noun",
@@ -145,50 +79,6 @@
     "register": "学",
     "topic": "india",
     "tipJa": "インドの僧院を指す。京都の地名や物語上の描写と区別して読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "神秘主義",
-   "reading": "しんぴしゅぎ",
-   "pos": "noun",
-   "meaning": "mysticism",
-   "defJa": "究極の実在との直接的な合一や直観を求める立場",
-   "passage": {
-    "ja": "宗教の比較で神秘主義という言葉が出てきても、不思議な出来事を何でも信じる態度という意味ではありません。言葉や概念だけでは捉え切れない究極の実在に、直接触れたり一体となったりすることを重んじる立場を指します。インドの思想や日本の仏教の体験をこの語で比べる場合、何との一致が語られ、本人がその体験をどう説明するかに注目しましょう。外から付けた分類名が同じでも、修行の目的や世界観まで一致するとは限らず、共通点と相違点の両方を残す説明が必要です。",
-    "form": "神秘主義",
-    "en": "In comparative religion, mysticism does not mean an attitude of believing every strange event. It refers to positions valuing direct contact or union with ultimate reality that cannot be fully captured by words or concepts. When using the term to compare experiences in Indian thought or Japanese Buddhism, attend to what a person describes becoming united with and how the experience is explained. A shared external category does not guarantee identical aims or worldviews, so an account must preserve both similarities and differences.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "不思議な話を信じる態度ではなく、究極の実在への直接的な体験を重んじる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "空即是色",
-   "reading": "くうそくぜしき",
-   "pos": "noun",
-   "meaning": "emptiness is form",
-   "defJa": "固定的実体がないことと現象が別物でないこと",
-   "passage": {
-    "ja": "般若心経の空即是色を「何もない所から物が生まれる」と言い換えると、空という語の意味を取り違えてしまいます。ここでの空は、他から独立した固定的な実体がないことに関わり、現象とは別に広がる空っぽの場所を指すのではありません。目の前のものと、そのようなあり方を二つの別世界に分けない表現として読むことが大切です。説明文では、物が存在する世界と、それを消し去った世界を対比する図より、同じ現象をどう捉えるかという問いを中心に据えると、誤解を避けられます。",
-    "form": "空即是色",
-    "en": "Paraphrasing the Heart Sutra’s “emptiness is form” as things arising from a place containing nothing misconstrues emptiness. Here emptiness concerns the absence of fixed, independently existing entities, rather than an empty space separate from phenomena. The expression should be read as refusing to divide things before us and this way of being into two separate worlds. An explanation centered on how the same phenomena are understood avoids the misconception encouraged by contrasting a world with things and one in which they have been erased.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "無から物が生まれる話ではなく、空と現象を別世界に分けない表現。",
     "sense": ""
    },
    "deck": "senmon",

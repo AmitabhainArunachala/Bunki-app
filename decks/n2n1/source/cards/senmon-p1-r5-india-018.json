@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "日蓮",
-   "reading": "にちれん",
-   "pos": "noun",
-   "meaning": "Nichiren",
-   "defJa": "法華経を重んじ題目を唱える実践を説いた鎌倉時代の僧",
-   "passage": {
-    "ja": "お寺で題目を唱える声を聞いたら、その実践を大切にした僧の生涯も気になるよね。日蓮は鎌倉時代に法華経を重んじ、題目を唱える教えを説いた人で、個人の祈りだけでなく、社会のあり方にも強い関心を向けたんだ。後にさまざまな宗派がその教えを受け継いでいるから、現在の一つの団体の説明だけで生涯や思想を全部分かったことにはできない。本人の文章を読むことと、後世にどう解釈されたかを調べることを分けると、歴史上の人物と今に続く信仰のつながりを追いやすいよ。",
-    "form": "日蓮",
-    "en": "Hearing the daimoku recited can prompt interest in the teacher who emphasized it. Nichiren was a Kamakura-period monk who upheld the Lotus Sutra and title-recitation while also addressing society. Because multiple later schools inherited his teaching, no single modern organization’s account exhausts his life or thought. Distinguishing his own writings from subsequent interpretations helps trace connections between history and living faith.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "本人の生涯や著作と、後世の宗派による解釈を区別して学ぶ。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "教団",
    "reading": "きょうだん",
    "pos": "noun",
@@ -79,28 +57,6 @@
     "register": "語",
     "topic": "india",
     "tipJa": "「托鉢に出る」。施しを受ける修行を、支える側との関係も含めて述べる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "智慧",
-   "reading": "ちえ",
-   "pos": "noun",
-   "meaning": "wisdom (prajñā)",
-   "defJa": "物事の真実を見極め迷いを離れる仏教の理解",
-   "passage": {
-    "ja": "知識をたくさん覚えた人が、必ずしも自分の執着に気付けるとは限りません。仏教の智慧は、物事の真実を見極めて迷いを離れる理解に関わる語で、試験で答えられる情報の量だけでは捉えきれません。経典を学ぶ際には、何を知ったかに加えて、その理解が自己や他者の見方をどう変えると説かれているかを確かめましょう。たとえば変化するものを固定して捉えていたことに気付く場面を考えると、難しい定義の暗記だけで終わらず、教えが示す理解の方向を具体的に整理できます。",
-    "form": "智慧",
-    "en": "Accumulating knowledge does not necessarily reveal one’s own attachments. Buddhist wisdom concerns insight into reality and release from confusion, beyond the amount of information recalled on a test. Study should ask how a text says understanding changes views of self and others. Considering recognition of having treated changing things as fixed makes that direction more concrete than memorized definitions alone.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "知識量の多さだけでなく、真実を見極めて迷いを離れる理解を指す。",
     "sense": ""
    },
    "deck": "senmon",

@@ -1,0 +1,340 @@
+{
+ "cards": [
+  {
+   "term": "陽明学",
+   "reading": "ようめいがく",
+   "pos": "noun",
+   "meaning": "the Wang Yangming school",
+   "defJa": "王陽明の思想を受け継ぐ儒学の一派",
+   "passage": {
+    "ja": "親を大切にするべきだと何度も口にしながら、困っている親を放っておいたら、本当に分かっていると言えるかな。陽明学では、知ることと行うことを切り離さず、道徳的な理解が実際の行いに現れる点を重んじるんだ。王陽明の思想を受け継ぐ儒学の一派で、日本にも影響を与えたよ。実践を大事にするところは禅と比べられるにしても、そのまま仏教と同じ教えになるものじゃない。人との関係で何を善いと知り、その知をどう生きるかという問いが、身近な暮らしへ向けられているね。",
+    "form": "陽明学",
+    "en": "If someone repeatedly says parents should be cared for but abandons a parent in difficulty, can that person really be said to understand? The Wang Yangming school values moral understanding appearing in actual conduct, without separating knowing from doing. It is a Confucian tradition inheriting Wang Yangming's thought and also influenced Japan. Its emphasis on practice can be compared with Zen without making it the same teaching as Buddhism. It directs a question toward everyday life about what one knows as good in relationships and how one lives that knowledge.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "王陽明の思想を受け継ぐ儒学で、知ることと行うことの関係を重んじる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-3e188b9102-2a4a3c99",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-3e188b9102-2a4a3c99",
+    "wordId": "nn-3e188b9102"
+   }
+  },
+  {
+   "term": "血脈",
+   "reading": "けちみゃく",
+   "pos": "noun",
+   "meaning": "a lineage of Buddhist transmission",
+   "defJa": "師から弟子へ教えを伝えてきた系譜",
+   "passage": {
+    "ja": "師の名から弟子の名へ、線がつながっている。仏教で血脈と呼ばれる系譜は、家族の血縁ではなく、教えや戒が誰から誰へ伝えられたかを示すものである。伝授を受けた者は、自分の学びを先人からの長い連なりの中に置くことになる。ただし、文書に名が並ぶことだけをもって、遠い時代の師弟関係が一様に史実として確認されるとはいえない。教団が伝承の正統性を示す役割と、個々の人物の関係を歴史的に検証する作業は、同じ系図を扱いながら異なる目的を持つ。",
+    "form": "血脈",
+    "en": "Lines connect a teacher's name to a disciple's. The lineage called kechimyaku in Buddhism records who transmitted teachings or precepts to whom, rather than a family's biological descent. A recipient of transmission places personal learning within a long succession from predecessors. Names in a document alone do not establish that distant teacher-disciple relationships are uniformly verified historical facts. A religious community's demonstration of legitimate transmission and the historical verification of individual relationships address the same chart with different purposes.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏教の教えの系譜を指し、この用法では「けちみゃく」と読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1da3ae9ca6-de0e75b8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-1da3ae9ca6-de0e75b8",
+    "wordId": "nn-1da3ae9ca6"
+   }
+  },
+  {
+   "term": "苦行",
+   "reading": "くぎょう",
+   "pos": "noun",
+   "meaning": "ascetic practice; austerities",
+   "defJa": "心身に厳しい負担を課す宗教的な修行",
+   "passage": {
+    "ja": "骨ばかりになるほど食事を減らしても、それだけで心の束縛が解けるのでしょうか。釈迦の覚り以前を語る経典には、激しい苦行に取り組んだものの、目指す境地に達せず、その道を離れた経験が述べられています。身体を痛める厳しさと、迷いを離れる確かさは、同じ物差しでは測れません。この転換を経て、欲望にふけることにも自分を傷めることにも偏らない中道の意義が明らかになります。努力の量だけでなく、その努力が何に向かうかが修行の中心に置かれます。",
+    "form": "苦行",
+    "en": "Does reducing food until the body is little more than bones by itself undo mental bondage? Scriptures recounting the Buddha's life before awakening describe severe austerities that failed to reach the intended state and his subsequent departure from that path. The severity of bodily torment and the certainty of freedom from delusion cannot be measured on one scale. This change reveals the significance of a middle way leaning neither toward indulgence nor toward self-torment. Practice centers not only on how much effort is made but also on what it is directed toward.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "宗教上の目的で心身に厳しい負担を課す修行。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a42f8529b5-8efcb212",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-a42f8529b5-8efcb212",
+    "wordId": "nn-a42f8529b5"
+   }
+  },
+  {
+   "term": "西田幾多郎",
+   "reading": "にしだきたろう",
+   "pos": "noun",
+   "meaning": "Nishida Kitaro",
+   "defJa": "純粋経験を論じた日本の近代哲学者",
+   "passage": {
+    "ja": "音が響いた瞬間には、聞く自分と聞かれる音をまだ別々に数えていないことがあります。西田幾多郎は『善の研究』で、主観と客観を分ける以前の純粋経験を、哲学を組み立てる根本に据えました。初めから自分という箱と世界という箱を用意すると、その分け方自体がどう生まれるかを問えなくなります。この発想に基づいて、認識だけでなく善や宗教の問題へと考察が進みます。禅にも親しんだ思想家ですが、その仕事には西洋哲学との対話もあり、宗教の用語だけでは収まらない問いが残ります。",
+    "form": "西田幾多郎",
+    "en": "At the instant a sound resounds, one may not yet count the hearing self and heard sound as separate things. In An Inquiry into the Good, Nishida Kitaro made pure experience prior to the division of subject and object the foundation for constructing a philosophy. Preparing separate boxes called self and world at the outset prevents questioning how that division itself arises. On this basis, the inquiry proceeds beyond knowledge to good and religion. Although familiar with Zen, his work also engages Western philosophy and leaves questions that religious terminology alone cannot contain.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "『善の研究』で純粋経験を出発点に哲学を展開した近代日本の思想家。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-e3eafd61ab-99ebc244",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-e3eafd61ab-99ebc244",
+    "wordId": "nn-e3eafd61ab"
+   }
+  },
+  {
+   "term": "解脱",
+   "reading": "げだつ",
+   "pos": "noun",
+   "meaning": "liberation (mokṣa), release from rebirth",
+   "defJa": "煩悩の束縛から抜け出し、輪廻の連鎖を断つこと",
+   "passage": {
+    "ja": "欲しい物が手に入ると安心しても、失う不安がすぐに始まることがあります。仏教が解脱を目指すとき、問題にするのは一つの願いがかなうことより、執着や無明によって苦しみが繰り返される、その束縛です。心地よい経験を重ねるだけなら、条件が変わるたびにまた満たされなさが生じます。生死の循環から離れるという宗教上の目的は、一時の気晴らしよりはるかに広い射程を持っています。修行の道が長く説かれる背景には、欲望を満たすのとは異なる方向で自由を求める姿勢があります。",
+    "form": "解脱",
+    "en": "Even when obtaining something desired brings relief, fear of losing it may begin immediately. In pursuing liberation, Buddhism addresses the bondage through which attachment and ignorance repeat suffering more than the fulfillment of one wish. Accumulating pleasant experiences alone leaves dissatisfaction arising again whenever conditions change. The religious aim of leaving the cycle of birth and death extends much further than temporary diversion. Lengthy teachings on practice rest on seeking freedom in a direction different from satisfying desire.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "執着などの束縛を離れ、生死の循環から解放されるという宗教上の目的。",
+    "sense": "ここでは輪廻からの解放の教義の意。口語の「解放」の意は別"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-801287ee80-fda394b2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-001-r.json",
+    "cardId": "nn-801287ee80-fda394b2",
+    "wordId": "nn-801287ee80"
+   }
+  },
+  {
+   "term": "輪廻転生",
+   "reading": "りんねてんしょう",
+   "pos": "noun",
+   "meaning": "the cycle of rebirth",
+   "defJa": "生き物が死と新たな生を繰り返すこと",
+   "passage": {
+    "ja": "輪廻転生を説く仏教では、天に生まれて楽しく暮らすことも、生と死の循環の中にあります。地獄から天までを描く世界観は、単に死後の行き先を集めた案内図ではありません。行いとその結果の関係を背景に、どの生も永続しないという問題が置かれています。よりよい生を願うことに加えて、その繰り返し自体から自由になる道が説かれるのは、このためです。目先の幸不幸を一生分だけで区切らない時間の広がりが、教義の中で行為や修行の意味を支えています。",
+    "form": "輪廻転生",
+    "en": "In Buddhism's teaching of rebirth, even a pleasurable heavenly life remains within the cycle of birth and death. Its worldview extending from hells to heavens is more than a guide collecting destinations after death. Behind it stands the relationship between actions and results, together with the problem that no life lasts permanently. This is why a path to freedom from repetition itself is taught alongside aspirations for a better life. A temporal horizon that does not confine fortune and misfortune to one lifetime sustains the meaning of action and practice within the doctrine.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "死と新たな生の繰り返しで、仏教ではその循環からの解放も目指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-767064e71f-489fc916",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-767064e71f-489fc916",
+    "wordId": "nn-767064e71f"
+   }
+  },
+  {
+   "term": "自己探究",
+   "reading": "じこたんきゅう",
+   "pos": "noun",
+   "meaning": "self-inquiry",
+   "defJa": "自分とは何かを内面に向かって問う実践",
+   "passage": {
+    "ja": "仕事の失敗を思い出している最中に、その思いを経験している「私」とは何かと問います。ラマナ・マハルシが説いた自己探究では、出来事の原因を分析し続けるより、その私という感覚の根源へ注意を向けます。別の考えが浮かんでも、それは誰に浮かんだのかという問いへ戻ります。性格や経歴を詳しく並べるだけでは、この実践が目指す問いには届きません。宗教的な解放を目指す教えの中で、自分を一つの物語として説明することから、経験する主体そのものへ関心が移ります。",
+    "form": "自己探究",
+    "en": "While remembering a failure at work, one asks what the “I” experiencing that thought is. In the self-inquiry taught by Ramana Maharshi, attention turns to the source of this sense of “I” rather than continuing to analyze causes of events. When another thought arises, one returns to the question of to whom it arose. Merely listing personality traits or personal history in detail does not reach the question this practice pursues. Within a teaching aimed at religious liberation, interest shifts from explaining oneself as a narrative toward the experiencing subject itself.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "経歴の分析よりも、私という感覚の根源へ注意を向ける実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a254898119-144ecf51",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-a254898119-144ecf51",
+    "wordId": "nn-a254898119"
+   }
+  },
+  {
+   "term": "蓮華",
+   "reading": "れんげ",
+   "pos": "noun",
+   "meaning": "lotus flower in Buddhist imagery",
+   "defJa": "仏教で清らかさなどを象徴するハスの花",
+   "passage": {
+    "ja": "池の底には泥があり、その上でハスの花が開きます。仏像の台座などに見られる蓮華は、この花をかたどり、汚れの中にあっても清らかであるという仏教の象徴を担います。泥から離れた場所で咲くのではなく、泥に根を下ろしている点にも、理想と現実の関係を考える余地があります。人の暮らしに困難があるとしても、そこで清らかさを求める道が閉じるとは限りません。何段も重なる花びらの彫刻には、美しい装飾に加えて、仏のあり方を目に見える形にする働きがあります。",
+    "form": "蓮華",
+    "en": "Mud lies at the bottom of a pond, with lotus flowers opening above it. The lotus forms seen on Buddhist statue pedestals represent these flowers and carry the Buddhist symbolism of purity amid defilement. Their roots being in mud rather than their flowering far from it also invites reflection on the relationship between ideals and reality. Difficulties in human life do not necessarily close the path of seeking purity within it. Carved tiers of petals give visible form to a Buddha's character alongside their decorative beauty.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教の象徴に用いるハスの花で、台座などの意匠にも現れる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-7e0091499e-b1d7a15e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-7e0091499e-b1d7a15e",
+    "wordId": "nn-7e0091499e"
+   }
+  },
+  {
+   "term": "雲水",
+   "reading": "うんすい",
+   "pos": "noun",
+   "meaning": "itinerant Zen monk",
+   "defJa": "禅の修行に励む僧や諸方を巡る修行僧",
+   "passage": {
+    "ja": "夜明け前の僧堂で起きた雲水は、坐禅だけでなく、食事や掃除も修行の時間として過ごします。禅の修行僧を指すこの語には、雲や水のように一所にとらわれず道を求める響きがあります。旅をする姿も連想されますが、道場にとどまって学ぶ僧にも使われます。共同生活では、自分の都合にかかわらず他の人と動きを合わせ、決まった作法に従う場面が続きます。自由に流れる名の印象と厳しい日課が並ぶところに、気ままに過ごすこととは違う、執着を離れる実践の姿があります。",
+    "form": "雲水",
+    "en": "A Zen trainee rising in the meditation hall before dawn treats meals and cleaning as practice as well as seated meditation. The term unsui for such a monk evokes seeking the way without attachment to one place, like clouds and water. It suggests travel but is also used for monks remaining to study at a monastery. Communal life repeatedly calls for coordinating with others and following set manners regardless of personal convenience. The juxtaposition of a freely flowing name with a strict schedule shows a practice of releasing attachment distinct from living on a whim.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "禅の修行僧を指し、旅の途中だけでなく道場で学ぶ僧にも使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-79a6339f13-a9e91373",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-79a6339f13-a9e91373",
+    "wordId": "nn-79a6339f13"
+   }
+  },
+  {
+   "term": "鑑真",
+   "reading": "がんじん",
+   "pos": "noun",
+   "meaning": "Jianzhen; Ganjin",
+   "defJa": "日本に戒律を伝え唐招提寺を開いた唐の僧",
+   "passage": {
+    "ja": "海を越えてまで師を迎えようとしたのは、教えを本で知るだけでは果たせない仕事があったからです。鑑真は度重なる渡航の困難を経て日本に来て、正式に戒を授ける営みに大きな役割を果たしました。どのような手続きを通して僧になるかは、教団の成り立ちに関わる問題でした。後に開かれた唐招提寺も、戒律を学ぶ人々のための道場です。美しい建物が残る背景には、師から直接受け継ぐ実践を根付かせ、それを次の世代へ続けるための長い努力があります。",
+    "form": "鑑真",
+    "en": "A teacher was sought across the sea because some tasks could not be fulfilled merely by knowing teachings from books. Ganjin reached Japan after repeated difficulties at sea and played a major role in formally conferring precepts. The procedures through which someone became a monk concerned the very formation of the religious community. Toshodaiji, founded later, was likewise a training place for those studying monastic discipline. Behind its surviving beautiful buildings lies a long effort to establish directly transmitted practice and continue it into later generations.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "戒を授ける師として来日し、戒律を学ぶ道場を開いた唐の僧。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ca725d819a-85cce922",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-003.json",
+    "cardId": "nn-ca725d819a-85cce922",
+    "wordId": "nn-ca725d819a"
+   }
+  },
+  {
+   "term": "聖徳太子",
+   "reading": "しょうとくたいし",
+   "pos": "noun",
+   "meaning": "Prince Shotoku",
+   "defJa": "日本で仏教の興隆に関わった飛鳥時代の皇族",
+   "passage": {
+    "ja": "寺に残る幼い皇子の像へ、今も人が手を合わせる。聖徳太子は仏教の興隆に関わった飛鳥時代の皇族であるとともに、死後も長く信仰の対象となってきた存在である。政治に携わった一人の人間の生涯を超えて、慈悲や知恵の理想がその姿に託されてきた。伝記に不思議な出来事があるからといって、そのすべてを同時代の事実として扱うことはできない。それでも、歴史上の人物を慕う人々がどのような願いを抱いたかは、像や儀礼の中に具体的な形で残っている。",
+    "form": "聖徳太子",
+    "en": "People still join their hands before statues of a young prince preserved in temples. Prince Shotoku was both an Asuka-period royal involved in the flourishing of Buddhism and a figure long venerated after death. Ideals of compassion and wisdom came to be entrusted to his image beyond one politically active person's lifetime. Wondrous events in biographies cannot all be treated as contemporary facts simply because they are recorded. Yet the wishes of those who revered this historical figure remain in concrete form in images and rituals.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "飛鳥時代の皇族としての姿と、後世の信仰対象としての姿を併せ持つ人物。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-773f79b1d1-a30833ec",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-773f79b1d1-a30833ec",
+    "wordId": "nn-773f79b1d1"
+   }
+  },
+  {
+   "term": "音写",
+   "reading": "おんしゃ",
+   "pos": "noun",
+   "meaning": "phonetic transliteration (into kanji)",
+   "defJa": "言葉の音を別の文字で写し表すこと",
+   "passage": {
+    "ja": "「般若」の漢字二文字は、それぞれの意味を足して選ばれたものではありません。インドの言葉の音を漢字に移す音写によって、仏教の語が中国へ伝えられ、日本でも受け継がれました。同じ原語の内容を表す「智慧」という訳と比べると、音を残す方法と意味を移す方法の違いがはっきりします。音を受け取る側の言語が違えば、元の発音がそのまま保たれるとも限りません。読経で口にする言葉の響きには、教えの伝来に伴って複数の言語を通ってきた歴史も含まれています。",
+    "form": "音写",
+    "en": "The two characters in hannya were not chosen by adding their individual meanings. Buddhist terms reached China and were inherited in Japan through phonetic transcription of Indian words into Chinese characters. Comparison with the semantic translation “wisdom” clarifies the difference between preserving sound and conveying meaning. Different receiving languages do not necessarily preserve the original pronunciation unchanged. The sounds voiced in recitation also contain the history of passing through multiple languages as the teaching spread.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "他言語の音を文字に写すことで、意味を訳す方法とは区別される。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ae829ae63c-e5eff498",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-ae829ae63c-e5eff498",
+    "wordId": "nn-ae829ae63c"
+   }
+  }
+ ]
+}

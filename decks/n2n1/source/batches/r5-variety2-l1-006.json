@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "不立文字",
+   "reading": "ふりゅうもんじ",
+   "gloss": "not relying on words",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-c1f104a22e-3ade12b5",
+    "wordId": "nn-c1f104a22e"
+   }
+  },
+  {
+   "term": "京都学派",
+   "reading": "きょうとがくは",
+   "gloss": "the Kyoto School",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-1fcd2e18aa-1b29f03d",
+    "wordId": "nn-1fcd2e18aa"
+   }
+  },
+  {
+   "term": "儒教",
+   "reading": "じゅきょう",
+   "gloss": "Confucianism",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011-r.json",
+    "cardId": "nn-cfe7fdf604-460727eb",
+    "wordId": "nn-cfe7fdf604"
+   }
+  },
+  {
+   "term": "六派哲学",
+   "reading": "ろっぱてつがく",
+   "gloss": "the six orthodox schools of Indian philosophy",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-64daeceee9-0e51b4ac",
+    "wordId": "nn-64daeceee9"
+   }
+  },
+  {
+   "term": "内観",
+   "reading": "ないかん",
+   "gloss": "introspection; the Naikan method",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "mind",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-2b83b94cf2-0f620148",
+    "wordId": "nn-2b83b94cf2"
+   }
+  },
+  {
+   "term": "加持祈祷",
+   "reading": "かじきとう",
+   "gloss": "incantation and prayer rites",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-0a333818a4-068938a3",
+    "wordId": "nn-0a333818a4"
+   }
+  },
+  {
+   "term": "口伝",
+   "reading": "くでん",
+   "gloss": "oral transmission of teachings",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-c8272ca2a5-7dd1d185",
+    "wordId": "nn-c8272ca2a5"
+   }
+  },
+  {
+   "term": "大日如来",
+   "reading": "だいにちにょらい",
+   "gloss": "Mahāvairocana Buddha",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-2f62565f77-c5b2da1a",
+    "wordId": "nn-2f62565f77"
+   }
+  }
+ ],
+ "weave": [
+  "不立文字",
+  "京都学派",
+  "儒教",
+  "六派哲学",
+  "内観",
+  "加持祈祷",
+  "口伝",
+  "大日如来"
+ ]
+}

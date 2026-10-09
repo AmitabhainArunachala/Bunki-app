@@ -1,50 +1,6 @@
 {
  "cards": [
   {
-   "term": "苦行",
-   "reading": "くぎょう",
-   "pos": "noun",
-   "meaning": "ascetic practice; austerities",
-   "defJa": "心身に厳しい負担を課す宗教的な修行",
-   "passage": {
-    "ja": "釈尊の生涯を学ぶと、厳しい断食などの苦行を経た後に、中道が説かれるという流れに出会います。ここで押さえたいのは、つらさの大きさと悟りへの近さを、そのまま同じ尺度で測っていない点です。努力を認めつつも、体を傷めるほど自分を追い込むことが、必ずしも目的の達成につながるとは限りません。宗教史の記述を読むときには、どんな行為がなされ、何のために行われたのかを分けて整理すると理解が進みます。現代の勉強を「修行」と呼ぶ比喩から、当時の実践へ勝手に話を戻さないことも大事です。",
-    "form": "苦行",
-    "en": "Accounts of the Buddha’s life describe severe austerities such as fasting before the teaching of the middle way. The key point is that intensity of suffering and proximity to awakening are not simply measured on the same scale. While recognizing effort, driving oneself to the point of physical harm does not necessarily achieve the intended goal. When reading religious history, separating the actions performed from their purposes helps understanding. It is also important not to project a modern metaphor of study as “training” back onto those historical practices.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "宗教的な目的で行う厳しい実践を指す用法。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "自己探究",
-   "reading": "じこたんきゅう",
-   "pos": "noun",
-   "meaning": "self-inquiry",
-   "defJa": "自分とは何かを内面に向かって問う実践",
-   "passage": {
-    "ja": "職業や性格を並べても、それを「自分だ」と感じているのは何かという問いは残ります。ラマナ・マハルシの教えでいう自己探究は、経歴の分析に加えて新しい人物像を作ることではなく、その私という感覚の根源に注意を向ける実践です。考えが浮かんだときには、その考えが誰に浮かんでいるのかを問い直します。これは彼の宗教的な教えの中に位置付く方法で、性格検査と同じ目的で行うものではありません。紹介文を読む際にも、考えの内容を調べることと、考える主体を問うことを区別しましょう。",
-    "form": "自己探究",
-    "en": "Even after listing your occupation and personality, the question remains of what experiences them as “me.” Self-inquiry in Ramana Maharshi’s teaching is not an analysis of one’s history followed by construction of a new identity, but a practice of attending to the source of the sense of being oneself. When a thought arises, one asks to whom it has arisen. The method belongs within his religious teaching and does not serve the same purpose as a personality test. When reading an introduction, distinguish investigating the content of thoughts from questioning the subject that thinks.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "ここではラマナの実践を指し、性格の分析とは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "胎蔵界",
    "reading": "たいぞうかい",
    "pos": "noun",
@@ -57,50 +13,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "密教の世界観を表す語で、金剛界と対にして用いられる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "臨済宗",
-   "reading": "りんざいしゅう",
-   "pos": "noun",
-   "meaning": "the Rinzai school of Zen",
-   "defJa": "中国の臨済義玄の系統を引く禅の宗派",
-   "passage": {
-    "ja": "禅宗を覚えるとき、人物名と寺の名前だけを線で結ぶと、そこで何を修行していたのかが抜け落ちます。臨済宗を学ぶなら、中国から日本への伝来に加えて、公案を用いた師弟のやり取りにも目を向けましょう。公案は、知識を増やせば正解できる普通のクイズとは性格が異なります。予想に反して理解できない問答に出会ったら、その問いが修行のどんな場面で使われるのかを調べる手もあります。年表と実践の説明を行き来すると、教科書の宗派名にも具体的な人の営みが結び付きます。",
-    "form": "臨済宗",
-    "en": "When studying Zen schools, simply connecting people’s names with temple names leaves out what was practiced there. To study Rinzai Zen, look at teacher–disciple exchanges involving koans as well as its transmission from China to Japan. A koan differs from an ordinary quiz that accumulated knowledge lets you solve. If an exchange proves unexpectedly hard to understand, one approach is to investigate the setting in which the question is used in practice. Moving between a chronology and accounts of practice connects a textbook’s school names with concrete human activities.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "宗派の名称。公案を普通の知識問題と同一視しない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "草木国土悉皆成仏",
-   "reading": "そうもくこくどしっかいじょうぶつ",
-   "pos": "noun",
-   "meaning": "all plants and lands attain buddhahood",
-   "defJa": "草木や大地まで仏となるとする教え",
-   "passage": {
-    "ja": "日本仏教の自然観を扱う文章で草木国土悉皆成仏という句を見かけたら、まず草木と国土まで含む言い方に注目できます。人間だけを主語にして訳すと、この表現が広げている範囲を狭めてしまいます。一方で、これを植物にも人間と同じ脳があるという主張に置き換えるのも、原文から離れた説明です。宗教上の成仏という考え方と、生物としての構造を論じる言葉とでは、問いの立て方が異なります。読者を問わず分かる言葉に直す場合も、分かりやすさのために教えの射程を削らない工夫が要ります。",
-    "form": "草木国土悉皆成仏",
-    "en": "When encountering the phrase that all plants and lands attain buddhahood in a discussion of Japanese Buddhism’s view of nature, notice its inclusion of vegetation and the land itself. Translating it with only humans as the subject narrows the scope of the expression. On the other hand, replacing it with a claim that plants have the same brains as humans also departs from the text. The religious idea of attaining buddhahood and the language of biological structure ask different kinds of questions. Even when adapting the explanation for a broad audience, care is needed not to reduce the teaching’s scope for the sake of simplicity.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "主語の範囲を保ち、成仏を生物学の説明と取り違えない。",
     "sense": ""
    },
    "deck": "senmon",
@@ -145,28 +57,6 @@
     "register": "報",
     "topic": "india",
     "tipJa": "中観派で問題とされる固有の本質の意味。日常の個性とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "自他不二",
-   "reading": "じたふに",
-   "pos": "noun",
-   "meaning": "nonduality of self and others",
-   "defJa": "自己と他者を根本で切り離さない見方",
-   "passage": {
-    "ja": "仏教の対話で自他不二を「あなたも私も全く同じ」と言い換えると、相手の痛みや立場まで消してしまいそうです。ここでは、自己と他者を根本から切り離された存在として捉えないという意味を、前後の文で補うと伝わります。両者の違いがなくなることと、関わりの中で共に生きていることは、同じ主張ではありません。賛否にかかわらず、まず相手の話を聞く姿勢を例にすれば、抽象的な教えにも接点が生まれます。ただし、現代の会話例は理解の補助であり、それだけで元の思想を言い尽くしたことにはなりません。",
-    "form": "自他不二",
-    "en": "Paraphrasing the Buddhist idea of self–other nonduality as “you and I are completely identical” could erase the other person’s pain or circumstances. The surrounding sentences can clarify that the point is not to regard self and others as fundamentally isolated beings. The disappearance of differences and living together through relationships are different claims. Listening to someone regardless of agreement provides an accessible point of contact with the abstract teaching. Yet a contemporary conversational example aids understanding without exhausting the original idea.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "単なる同一性と誤解されないよう、関係の説明を添える。",
     "sense": ""
    },
    "deck": "senmon",

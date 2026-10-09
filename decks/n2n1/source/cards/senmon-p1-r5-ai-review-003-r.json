@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "シリコンの盾",
-   "reading": "しりこんのたて",
-   "pos": "expression",
-   "meaning": "\"silicon shield\" (Taiwan's chip leverage)",
-   "defJa": "半導体への依存が軍事的攻撃を抑止するという比喩",
-   "passage": {
-    "ja": "台湾の半導体産業への依存が軍事的な攻撃を思いとどまらせるという考え方を、シリコンの盾と呼びます。供給が途絶えれば攻撃する側にも損失が生じるという点に、この仮説の根拠があります。ただし、経済的な費用があることと、実際に攻撃を防げることは同じではありません。同じ生産の集中は、混乱の影響が広い地域へ及ぶという弱さとして読むこともできます。議論を整理する際は、依存が生む経済的な損失と、それが政治や軍事の判断をどう変えるかを、別々の問いとして書いておきましょう。",
-    "form": "シリコンの盾",
-    "en": "The silicon shield is the idea that dependence on Taiwan's semiconductor industry discourages military attack. It rests on the expectation that disrupted supply would also impose losses on the attacker. Economic costs do not, however, establish that an attack will actually be prevented. The same concentration can be viewed as a vulnerability through which disruption spreads across regions. Separate the economic losses caused by dependence from the question of how those losses alter political and military decisions.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "自動的に安全を保証する仕組みではなく、仮説を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "探索と活用",
    "reading": "たんさくとかつよう",
    "pos": "expression",
@@ -84,28 +62,6 @@
    "deck": "senmon",
    "field": "ai",
    "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "頭打ち",
-   "reading": "あたまうち",
-   "pos": "noun",
-   "meaning": "leveling off, hitting a ceiling",
-   "defJa": "伸びが止まって、それ以上上がらない状態",
-   "passage": {
-    "ja": "半導体の性能が頭打ちになったという説明は、まず伸びが止まった状態を指します。そこから原因を探ると、消費電力や発熱など、複数の制約が関係している場合があります。一方、製品の出荷が横ばいになった理由は、普及によって需要が満たされたことか、供給する能力が足りないことかで異なります。グラフの形が似ていても、同じ原因とは限らないのですね。記事を読むときは、どの数字の伸びが止まったかを書き出し、その後で示されている原因と、裏付けとなる資料を対応させると理解が深まります。",
-    "form": "頭打ち",
-    "en": "An explanation that semiconductor performance has plateaued first describes a halt in growth. Investigating its causes may reveal several constraints, including power consumption and heat. Flat product shipments, meanwhile, mean different things depending on whether demand has been satisfied or supply capacity is insufficient. Similar graph shapes need not share a cause. When reading, identify which figure stopped growing, then connect the proposed cause to the supporting evidence.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "伸びの停止という状態と、その原因を区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"

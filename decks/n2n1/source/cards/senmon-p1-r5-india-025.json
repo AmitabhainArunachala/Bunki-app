@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "老師",
-   "reading": "ろうし",
-   "pos": "noun",
-   "meaning": "venerable Zen teacher",
-   "defJa": "禅の修行を導く師への敬称",
-   "passage": {
-    "ja": "禅の修行を扱う本で老師という呼び名に出会ったら、単に年齢の高い先生を想像するだけでは足りません。修行を導く師に敬意を表す語で、相手との関係や宗派の慣習を踏まえて用いられます。年を重ねた人なら誰にでも付ける肩書とは違い、学校の先生を呼ぶ日常語とも響きが異なります。弟子が問いを抱え、師とのやり取りを通じて自分の理解を見直す場面に至ると、その呼び方の重みも感じられるでしょう。人物紹介を読む際には、何を教え、どのように修行者を導く立場なのかにも目を向けてください。",
-    "form": "老師",
-    "en": "When you encounter the title roshi in a book about Zen practice, picturing merely an elderly teacher is not enough. It expresses respect for a teacher who guides practice and is used with regard to relationships and a school’s conventions. It is not a title bestowed on every older person, and it has a different tone from an everyday form of address for a schoolteacher. When a disciple questions their own understanding through exchanges with the teacher, the significance of the title may become clearer. When reading a profile, also consider what the person teaches and how they guide practitioners.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "禅の師への敬称として使い、年齢だけを根拠にはしない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "老荘思想",
    "reading": "ろうそうしそう",
    "pos": "noun",
@@ -67,50 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "空性",
-   "reading": "くうしょう",
-   "pos": "noun",
-   "meaning": "emptiness; absence of inherent existence",
-   "defJa": "他と無関係な固定した本質がないこと",
-   "passage": {
-    "ja": "茶碗は土や火や職人の手があって初めて形になり、使う人との関係に応じて役割も変わります。中観派でいう空性は、そうした条件を離れて、それだけで成り立つ固定した本質はないという見方です。目の前の器が消えてしまうという意味ではなく、その成り立ちをどこまでたどるかが問題になります。何も存在しないと片づけると、物事が条件によって生じるという肝心な論点を取り逃がします。まずは、器を支えている関係を一つずつ挙げるところから始めましょう。",
-    "form": "空性",
-    "en": "A bowl takes shape only through clay, fire, and a craftsperson’s hands, and its role changes according to its relationship with its user. Emptiness in the Madhyamaka school means that there is no fixed essence that exists independently of such conditions. The point is not that the vessel before us disappears, but how far we trace the conditions of its existence. Dismissing this as meaning that nothing exists misses the crucial point that things arise through conditions. Let us begin by identifying the relationships that sustain the vessel one by one.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「ある物の本質が空である」という意味で使う哲学用語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "聖徳太子",
-   "reading": "しょうとくたいし",
-   "pos": "noun",
-   "meaning": "Prince Shotoku",
-   "defJa": "日本で仏教の興隆に関わった飛鳥時代の皇族",
-   "passage": {
-    "ja": "寺の縁起を読むとき、政治に携わった人物の姿と、後世の人々が仰いだ信仰の対象とが重なることがある。聖徳太子も仏教を重んじた飛鳥時代の皇族として知られると同時に、長い歴史の中で信仰を集めてきた存在である。伝記に不思議な出来事が記されているからといって、それをそのまま同時代の記録として扱うことはできない。だが、史実として確かめにくい記述も、どのような理想がその人物に託されたかを読む資料にはなる。歴史と信仰の重なりをほどく作業は、どちらかを消すことではない。",
-    "form": "聖徳太子",
-    "en": "When reading a temple’s origin account, a political figure may overlap with the object of devotion revered by later generations. Prince Shotoku is known both as an imperial family member who valued Buddhism in the Asuka period and as a figure who attracted devotion over a long history. A miraculous event in a biography cannot simply be treated as a contemporary record. Yet an account that is difficult to verify historically can still reveal the ideals invested in that person. Untangling history and devotion does not mean erasing either.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "史実上の人物と、後世に形成された太子信仰を分けて読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "純粋経験",
    "reading": "じゅんすいけいけん",
    "pos": "noun",
@@ -145,28 +79,6 @@
     "register": "語",
     "topic": "india",
     "tipJa": "漢字の意味を組み合わせず、音写された真言として読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "純粋意識",
-   "reading": "じゅんすいいしき",
-   "pos": "noun",
-   "meaning": "pure consciousness",
-   "defJa": "対象や思考内容から区別される気づき",
-   "passage": {
-    "ja": "インドの非二元論を紹介する文章では、見える物や浮かぶ考えと、それらに気づく働きが区別される。そこで純粋意識という語は、特定の思考内容に限定されない気づきを指すために用いられる。ただし、この語の説明は思想や実践の流派に伴って異なり、一つの定義ですべてを覆うことはできない。瞑想中の脳活動を記録した図を添えても、哲学上の概念と測定値が直ちに同じものになるわけではない。資料を比較する際には、まず著者が何を意識の内容から切り離しているかを確かめる。",
-    "form": "純粋意識",
-    "en": "Accounts of Indian nondual thought distinguish visible things and arising thoughts from the awareness of them. In this context, pure consciousness denotes awareness that is not restricted to particular thought content. However, explanations of this term differ across schools of thought and practice, and no single definition covers them all. Adding a diagram of brain activity during meditation does not immediately make the philosophical concept identical to the measurements. When comparing sources, the first task is to establish what each author distinguishes from the contents of consciousness.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "思想上の概念であり、脳活動の測定値をそのまま指す語ではない。",
     "sense": ""
    },
    "deck": "senmon",

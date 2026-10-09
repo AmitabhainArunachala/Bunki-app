@@ -23,50 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "天竺",
-   "reading": "てんじく",
-   "pos": "noun",
-   "meaning": "India (classical name)",
-   "defJa": "日本や中国でかつてインドを指した呼び名",
-   "passage": {
-    "ja": "古い旅の物語に、仏教の教えを求めて遠い土地へ向かう僧が登場することがあります。天竺は日本や中国でかつてインドを指した呼び名ですが、その語が使われた時代の地理観を、現在の国境とそのまま重ねることはできません。経典や人がどの道を通って伝わったかを地図で追うと、物語の目的地が単なる遠国ではなく、教えの源として想像されていたことが分かります。現代の地名へ置き換えて読む際も、その場所に何を求めたのかという当時の視点を残すと、旅の意味が豊かに伝わります。",
-    "form": "天竺",
-    "en": "Old travel narratives depict monks seeking Buddhist teachings in distant lands. Tenjiku was a Chinese and Japanese name for India, though historical geographical concepts do not map exactly onto current borders. Tracing routes of texts and people reveals a destination imagined as a source of teaching. Retaining what travelers sought there preserves the journey’s meaning when translating older place names.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "古いインドの呼称であり、現代の国境を厳密に示す地名とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "天台宗",
-   "reading": "てんだいしゅう",
-   "pos": "noun",
-   "meaning": "the Tendai school",
-   "defJa": "法華経を重んじ最澄が日本に伝えた仏教の宗派",
-   "passage": {
-    "ja": "「日本で生まれた教え」とだけ書くと、その前に他の土地で育まれた思想の系譜が消えてしまいます。天台宗を紹介する場合は、中国の天台教学を背景として、最澄が日本で教えを広めたことを示すと、伝来と展開の関係を伝えられます。法華経を重んじるという特徴に加え、日本でどのような修行や教育の場が作られたかを書くことで、宗派名だけの説明から進めます。起源を一か所に固定するより、何を受け継ぎ、どこで新たな営みが加わったかを区別すれば、短い紹介文にも歴史の流れを残せます。",
-    "form": "天台宗",
-    "en": "Calling a teaching simply Japanese-born can erase its earlier intellectual lineage. Introducing Tendai should connect its Chinese Tiantai background with Saicho’s work in Japan. Describing institutions of practice and education alongside devotion to the Lotus Sutra moves beyond a label. Distinguishing what was inherited from what developed locally preserves historical movement even in a short account.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "中国の教学の系譜と、日本での展開を分けて述べると由来が伝わる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "坐禅",
    "reading": "ざぜん",
    "pos": "noun",
@@ -123,50 +79,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "「大乗仏教の教え」。広い流れの名称であり、内部の多様性にも注意する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "大日如来",
-   "reading": "だいにちにょらい",
-   "pos": "noun",
-   "meaning": "Mahāvairocana Buddha",
-   "defJa": "真言密教で中心となる仏",
-   "passage": {
-    "ja": "寺の中心に置かれた仏像を見たら、どの教えの中でどのような役割を持つか確かめましょう。大日如来は真言密教で中心となる仏で、歴史上の釈迦を別の名前で呼んでいるだけだと理解すると、教義の構造を捉えにくくなります。曼荼羅の中で他の仏がどう配されるかを見ると、一体の像を単独で覚える場合とは違う関係が見えてきます。名前、姿、教えでの位置付けを一組にして学ぶことで、似た姿の仏像に出会っても、同じ意味の像だと急いで決めずに観察を進められます。",
-    "form": "大日如来",
-    "en": "When viewing a temple’s central image, identify its role within the teaching. Mahavairocana occupies a central place in Shingon and cannot be understood simply as another name for the historical Shakyamuni. Its relation to other figures in mandalas reveals connections missed when learning images separately. Studying name, appearance, and doctrinal role together helps distinguish similar-looking figures.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「大日如来を本尊とする」。真言密教での位置付けとともに覚える。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "因陀羅網",
-   "reading": "いんだらもう",
-   "pos": "noun",
-   "meaning": "Indra's net",
-   "defJa": "珠が互いを映す網で関わり合いを示す華厳の譬え",
-   "passage": {
-    "ja": "網の結び目ごとに珠があり、それぞれの珠に他の珠が映っている景色を想像してみましょう。因陀羅網は、華厳の教えで多くの存在が互いに関わり合うあり方を示す譬えで、一つの珠を見ても、その中に全体との関係が現れます。現代の通信網になぞらえる説明もできますが、情報を送る装置を古代に発明したという話ではありません。身近な比喩を入口にしつつ、一つと多くを切り離さずに考えるために元の譬えがどう働くかを見ると、美しい像の背後にある思想へ近づけます。",
-    "form": "因陀羅網",
-    "en": "Imagine a net with a jewel at every knot, each reflecting all the other jewels. Indra’s net illustrates interrelationship in Huayan thought, with the whole reflected through each jewel. Comparisons with modern networks do not imply an ancient invention of telecommunications. Looking beyond the familiar comparison reveals how the image connects one and many.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「因陀羅網の譬え」。現代の通信技術そのものを指す言葉ではない。",
     "sense": ""
    },
    "deck": "senmon",

@@ -133,28 +133,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "生産能力",
-   "reading": "せいさんのうりょく",
-   "pos": "noun",
-   "meaning": "production capacity",
-   "defJa": "一定の条件と期間で製品を作れる量",
-   "passage": {
-    "ja": "工場が一か月に作れる量と、実際に作った量とは、同じ数字とは限りません。生産能力は設備や人員などの条件の下でどれだけ作れるかを表し、受注が少なければ実績はそれを下回ることもあります。また、設備を増やしたからといって、その日から計画通りの量が安定して出るとは限りません。半導体工場なら、装置の調整や品質の確認など、立ち上げに必要な仕事があるためです。投資計画の記事では、作れるようになる見込みの時期と、売り物になる製品が実際に出る時期を分けて読むと、数字の意味を取り違えずに済みます。",
-    "form": "生産能力",
-    "en": "The quantity a factory can make in a month is not necessarily the same as the quantity it actually makes. Production capacity indicates how much can be made under conditions such as available equipment and personnel, while actual output may be lower when orders are weak. Nor does adding equipment guarantee stable output at the planned level from that very day. Semiconductor plants require startup work such as equipment adjustment and quality checks. In investment-plan articles, distinguishing expected capacity availability from actual saleable output helps prevent misreading the figures.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "実際の生産量と区別し、どの条件と期間の数量かを確かめる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "画像認識",
    "reading": "がぞうにんしき",
    "pos": "noun",

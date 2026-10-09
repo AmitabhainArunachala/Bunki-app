@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "資本集約的",
-   "reading": "しほんしゅうやくてき",
-   "pos": "na-adj",
-   "meaning": "capital-intensive",
-   "defJa": "事業に多額の設備や資金を必要とするさま",
-   "passage": {
-    "ja": "半導体工場の経営を学ぶなら、売上と人件費の二つだけで計算を終えないようにしましょう。製造装置や建物に巨額の資金を先に投じる資本集約的な事業では、工場が動き始める前から多くのお金が必要です。注文が減っても設備の費用がすぐ消えるとは限らないため、生産量に伴って増減する支出と、短期には減らしにくい支出を分けて表にします。この区別を付けたうえで稼働率を変えて計算すると、同じ製品を作る工場でも、設備の使われ方で採算が大きく動く理由を追えます。",
-    "form": "資本集約的",
-    "en": "When studying semiconductor factory management, do not finish the calculation after considering only sales and wages. A capital-intensive business that invests heavily in equipment and buildings requires substantial funds before production starts. Because equipment costs do not immediately disappear when orders decline, separate expenses that vary with output from those difficult to reduce in the short term. Changing utilization in a calculation built on that distinction reveals why profitability can vary greatly with equipment use even at factories making the same product.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "人件費の多さとは別の軸で、産業の特徴を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "説明可能性",
    "reading": "せつめいかのうせい",
    "pos": "noun",
@@ -123,28 +101,6 @@
     "register": "話",
     "topic": "ai",
     "tipJa": "値段だけでなく、導入後の仕事も費用に数える。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "起死回生",
-   "reading": "きしかいせい",
-   "pos": "noun",
-   "meaning": "dramatic revival",
-   "defJa": "絶望的な状況から立ち直ること",
-   "passage": {
-    "ja": "赤字の半導体企業が新製品を発表した記事で、起死回生の一手と書けば、読み手は大きな逆転を期待します。けれども、発表した段階では量産の準備も販売の結果も分からないとしたら、その表現は出来事より先へ走っています。「再建を目指す新製品」と直せば、会社の狙いを伝えつつ、成功が決まったかのような響きを抑えられます。見出しの勢いを生かすにしても、危機からどこまで回復したのかを本文の数字と照らし、期待を示す語と実績を述べる語を使い分けたいところです。",
-    "form": "起死回生",
-    "en": "Calling a loss-making semiconductor company's newly announced product a comeback move makes readers expect a dramatic reversal. Yet if neither production readiness nor sales results are known at the announcement, the wording runs ahead of events. Changing it to “a new product intended to support recovery” conveys the company's aim without sounding as though success is settled. Even when preserving a forceful headline, compare the extent of recovery with the figures in the article and distinguish words of expectation from descriptions of results.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "危機の深さと、その後の回復を確かめて使う。",
     "sense": ""
    },
    "deck": "senmon",

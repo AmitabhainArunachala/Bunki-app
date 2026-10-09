@@ -45,50 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "国産化",
-   "reading": "こくさんか",
-   "pos": "noun",
-   "meaning": "domestic production",
-   "defJa": "外国に頼っていた製品などを国内で作ること",
-   "passage": {
-    "ja": "海外から買っていた半導体を国内で作れるようにしても、必要な材料や装置まで国内でそろうとは限りません。国産化の範囲が完成品の製造なのか、設計や部材の供給まで含むのかによって、残る依存関係は違ってきます。供給が止まるという仮説を検証するなら、工場の所在地だけでなく、その工場が何をどこから調達しているかもたどりましょう。国内に拠点を設ける意味を正確につかむには、地図に工場の印を付ける作業と、材料の流れを線で結ぶ作業の両方が役立ちます。",
-    "form": "国産化",
-    "en": "Making previously imported semiconductors domestically does not mean all needed materials and equipment are available domestically too. The dependencies remaining differ according to whether localization covers finished-product manufacture or also design and component supply. To test a supply-interruption hypothesis, trace what a factory buys and where it comes from, not only its location. Understanding the significance of a domestic base benefits from both marking factories on a map and drawing the flow of materials between them.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "国内で作る範囲を明示し、材料や装置の依存関係と分けて使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "基幹産業",
-   "reading": "きかんさんぎょう",
-   "pos": "noun",
-   "meaning": "a core industry",
-   "defJa": "経済や他の多くの産業を支える重要な産業",
-   "passage": {
-    "ja": "半導体の話がスマホだけで終わらないのは、自動車や工場の機械にも使われているからなんだよね。ほかの産業を広く支える基幹産業として見ると、一社の売上が伸びたかどうかとは別に、供給が止まったときの影響も気になるんだ。大きな工場が一つあるというだけでなく、材料を作る会社や装置を直す人など、周りの仕事との相互作用も大きいからさ。経済の記事を読むときは、その産業が売っている物に加えて、誰の仕事を成り立たせているかまで考えるとつながりが分かるね。",
-    "form": "基幹産業",
-    "en": "Discussion of semiconductors does not end with smartphones because they are also used in cars and factory machinery. Viewing the sector as a core industry supporting many others draws attention to the impact of supply interruptions as well as whether one company’s sales grew. It is not just about one large factory, since interactions with surrounding work, such as material suppliers and equipment repairers, also matter. When reading economic articles, considering whose work the industry enables as well as what it sells reveals those connections.",
-    "register": "話",
-    "topic": "ai",
-    "tipJa": "売上の大きさだけでなく、他産業を支える役割を示す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "埋め込み",
    "reading": "うめこみ",
    "pos": "noun",
@@ -111,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "喫緊",
-   "reading": "きっきん",
-   "pos": "noun",
-   "meaning": "pressing and urgent",
-   "defJa": "すぐに取り組むべき差し迫った状態",
-   "passage": {
-    "ja": "工場の制御装置に弱点が見つかり、喫緊の課題として対策が求められる場合を考えてみましょう。急ぐ理由を整理せずに作業を始めると、すべてを同時に直そうとして、かえって重要な箇所への対応が遅れる恐れがあります。学習用の事例では、被害が起こる経路、影響を受ける設備、停止に伴う負担を分けて書き、どの仮説を先に確かめるか決めます。優先順位は声の大きさで選ぶのではなく、時間を置いた場合に何が悪化するのかという説明と組にして残しましょう。",
-    "form": "喫緊",
-    "en": "Consider a case in which a weakness is found in factory-control equipment and action is demanded as a pressing issue. Starting work without organizing why it is urgent may delay attention to critical areas by attempting everything at once. In a training case, separately write down paths to harm, affected equipment, and the costs of stopping operations, then decide which hypothesis to check first. Record priorities together with an explanation of what worsens if action is delayed, rather than selecting them by the loudest voice.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "「喫緊の課題」の形で、対応を急ぐべき問題を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "垂直統合",
    "reading": "すいちょくとうごう",
    "pos": "noun",
@@ -145,28 +79,6 @@
     "register": "報",
     "topic": "ai",
     "tipJa": "事業の連続した工程を自社内にまとめる構造を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "嚆矢",
-   "reading": "こうし",
-   "pos": "noun",
-   "meaning": "a pioneering first instance",
-   "defJa": "ある物事を始める最初の例やきっかけ",
-   "passage": {
-    "ja": "新しい自動検査法の嚆矢となった研究を紹介するなら、何を最初と数えているのかを明示しましょう。原理を提案した論文、試作品を動かした報告、工場へ導入した事例は別々で、すべてを同じ起点にはできません。先行研究を調べた範囲が狭いにもかかわらず、世界初と断定すると、文章の勢いのために事実の確かさを犠牲にしてしまいます。確認できた条件を添えて「この方式の初期の実証例」と言い換える選択もあり、強い語ほど、その根拠を支える説明が問われます。",
-    "form": "嚆矢",
-    "en": "When introducing research as the pioneering first instance of a new automated inspection method, specify what is being counted as first. A paper proposing a principle, a working prototype report, and a factory deployment are distinct and cannot all be treated as the same starting point. Declaring a world first despite a narrow review of prior work sacrifices factual certainty for rhetorical force. One option is to state the verified conditions and call it an early demonstration of this approach, since stronger wording demands stronger support.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "起点を強く示す書き言葉で、単に新しいという意味ではない。",
     "sense": ""
    },
    "deck": "senmon",

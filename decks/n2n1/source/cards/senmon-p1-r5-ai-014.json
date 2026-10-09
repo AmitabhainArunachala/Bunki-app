@@ -111,28 +111,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "先端半導体",
-   "reading": "せんたんはんどうたい",
-   "pos": "noun",
-   "meaning": "leading-edge chips",
-   "defJa": "その時点で高度な製造技術などを用いた半導体",
-   "passage": {
-    "ja": "今日は、先端半導体という言葉だけでは、製品の用途まで分からないことを確認しましょう。細かな回路を作る技術は、限られた面積へ多くの素子を集めるための重要な手段です。しかし、電力を制御する部品や感覚器のような働きをする部品には、別の性能や製造上の条件も関わります。新しい世代だからどの用途でも最適だと考えると、費用や信頼性の比較を飛ばしてしまいますね。製造技術の新しさを表す説明を読んだ後には、その部品が何をするのかを製品図で確かめてください。",
-    "form": "先端半導体",
-    "en": "Today, let us establish that the label leading-edge semiconductor does not by itself identify a product's purpose. Making fine circuits is an important way to fit many devices into a limited area. However, power-control and sensing components also depend on other performance requirements and manufacturing conditions. Assuming the newest generation is best for every use skips comparisons of cost and reliability. After reading about manufacturing advances, check a product diagram to see what the component actually does.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "新しさの基準と、実際の用途を分けて考える。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "先行者利益",
    "reading": "せんこうしゃりえき",
    "pos": "noun",

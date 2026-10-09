@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "タットヴァールタ・スートラ",
-   "reading": "たっとゔぁーるた・すーとら",
-   "pos": "noun",
-   "meaning": "Tattvartha Sutra",
-   "defJa": "ジャイナの教義を体系的にまとめた経典",
-   "passage": {
-    "ja": "宗派が分かれていても、共に尊重する文献があれば、議論を始める足場になる。タットヴァールタ・スートラは、ジャイナ教の主要な宗派に受け入れられてきた、教義を体系的に述べる文献である。ただし、同じ題名の原典を重んじるからといって、その本文や注釈の伝統まで完全に一致するとは限らない。思想史を読む際には、共通の文章が対立を消すと考えるより、何を共有し、どこから解釈が分かれるのかを見比べることで、教団同士の距離を具体的に捉えられる。",
-    "form": "タットヴァールタ・スートラ",
-    "en": "Even where denominations differ, a text respected by both can provide a starting point for discussion. The Tattvartha Sutra is a systematic exposition of doctrine accepted across the major Jain traditions. Respecting a source with the same title, however, does not guarantee complete agreement in textual versions or commentarial traditions. In intellectual history, comparing what is shared and where interpretation diverges makes the distance between communities more concrete than assuming a common text erases disagreements.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "経典名を「教義を体系的に述べる文献」と位置付け、共有と差異を分ける。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "パールシュヴァナータ",
    "reading": "ぱーるしゅゔぁなーた",
    "pos": "noun",
@@ -79,28 +57,6 @@
     "register": "論",
     "topic": "india",
     "tipJa": "古代インドの広い用法と、日本語での仏教的用法を区別している。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "ジーヴァ",
-   "reading": "じーゔぁ",
-   "pos": "noun",
-   "meaning": "living soul in Jain philosophy",
-   "defJa": "ジャイナ思想で個々の生命を担う魂",
-   "passage": {
-    "ja": "「自己」という訳語を続けて使うと、別々の思想が同じものを説いているように響きます。ジャイナ教のジーヴァを説明する文章では、個々に存在する魂という意味を補うことで、仏教の無我や、万物の根本を一つと捉える議論との差を示せます。魂があるという教義を紹介することと、その存在を科学的に確認したと述べることも、文章の上では分けるべきです。主語を「この教えでは」と置くだけで、書き手の断定を避けつつ、比較のための足場を読者に渡せます。",
-    "form": "ジーヴァ",
-    "en": "Repeatedly using self as a translation can make different philosophies sound as though they teach the same thing. When explaining jiva in Jainism, specifying an individually existing soul distinguishes it from Buddhist no-self and accounts of a single foundation for everything. Introducing a doctrine that affirms souls also differs from stating that their existence has been scientifically established. Beginning with a phrase such as in this teaching avoids turning doctrine into the writer’s assertion while giving readers a basis for comparison.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「自己」だけでは曖昧になるため、この伝統で指す存在を補っている。",
     "sense": ""
    },
    "deck": "senmon",

@@ -1,0 +1,166 @@
+{
+ "items": [
+  {
+   "term": "創発",
+   "reading": "そうはつ",
+   "gloss": "emergence",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
+    "cardId": "nn-2eb1d177bb-db85825f",
+    "wordId": "nn-2eb1d177bb"
+   }
+  },
+  {
+   "term": "台湾有事",
+   "reading": "たいわんゆうじ",
+   "gloss": "a crisis around Taiwan",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-016.json",
+    "cardId": "nn-93c24f55ab-a1082fb5",
+    "wordId": "nn-93c24f55ab"
+   }
+  },
+  {
+   "term": "営業キャッシュフロー",
+   "reading": "えいぎょうきゃっしゅふろー",
+   "gloss": "cash flow from operating activities",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-3066501f28-19c47269",
+    "wordId": "nn-3066501f28"
+   }
+  },
+  {
+   "term": "基幹産業",
+   "reading": "きかんさんぎょう",
+   "gloss": "a core industry",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-9d4e3b2985-165a8f29",
+    "wordId": "nn-9d4e3b2985"
+   }
+  },
+  {
+   "term": "奇妙なループ",
+   "reading": "きみょうなるーぷ",
+   "gloss": "strange loop",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-c7fa0fd0d4-d33c2471",
+    "wordId": "nn-c7fa0fd0d4"
+   }
+  },
+  {
+   "term": "実用化",
+   "reading": "じつようか",
+   "gloss": "practical deployment",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-84e41e69ce-cf48f529",
+    "wordId": "nn-84e41e69ce"
+   }
+  },
+  {
+   "term": "屋台骨",
+   "reading": "やたいぼね",
+   "gloss": "a central support or backbone",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+    "wordId": "nn-1ccc6a0eb9"
+   }
+  },
+  {
+   "term": "広帯域メモリ",
+   "reading": "こうたいいきめもり",
+   "gloss": "high-bandwidth memory",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-cec3f949f8-f1aba2d8",
+    "wordId": "nn-cec3f949f8"
+   }
+  },
+  {
+   "term": "悲観論",
+   "reading": "ひかんろん",
+   "gloss": "a pessimistic outlook",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6053cca230-c355360d",
+    "wordId": "nn-6053cca230"
+   }
+  },
+  {
+   "term": "技術覇権",
+   "reading": "ぎじゅつはけん",
+   "gloss": "technological hegemony",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021-r.json",
+    "cardId": "nn-bfa93b3789-a6c1a19e",
+    "wordId": "nn-bfa93b3789"
+   }
+  }
+ ],
+ "weave": [
+  "創発",
+  "台湾有事",
+  "営業キャッシュフロー",
+  "基幹産業",
+  "奇妙なループ",
+  "実用化",
+  "屋台骨",
+  "広帯域メモリ",
+  "悲観論",
+  "技術覇権"
+ ]
+}

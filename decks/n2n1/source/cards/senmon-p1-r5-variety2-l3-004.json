@@ -1,0 +1,172 @@
+{
+ "cards": [
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "pos": "noun",
+   "meaning": "provability",
+   "defJa": "定めた公理と規則から結論を導けること",
+   "passage": {
+    "ja": "数についての予想を大量の例で確かめても、まだ試していない数に反例がないとは断定できません。形式的な証明では、採用した公理から決められた推論規則に沿って、目的の命題へ到達する必要があります。この意味での証明可能性は、計算例の多さではなく、その体系の中に有限の証明を組み立てられるかという性質です。公理を変えれば導ける結論も変わり得るため、数学者が問うのは命題の内容だけでなく、どの土台の上でそれを確かめようとしているかでもあります。",
+    "form": "証明可能性",
+    "en": "Checking a conjecture about numbers against many examples cannot rule out a counterexample among untested numbers. A formal proof must reach the target proposition from adopted axioms through specified inference rules. Provability in this sense concerns whether a finite proof can be constructed within that system, rather than how many computational examples are available. Changing the axioms can change what follows, so mathematicians examine both the proposition and the foundations on which they are trying to establish it.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "公理と推論規則を定めた体系の中で証明できるという性質。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c2871109c9-6e2c9db2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-c2871109c9-6e2c9db2",
+    "wordId": "nn-c2871109c9"
+   }
+  },
+  {
+   "term": "露光装置",
+   "reading": "ろこうそうち",
+   "pos": "noun",
+   "meaning": "lithography (exposure) tool",
+   "defJa": "光で微細な回路の模様を材料へ転写する機械",
+   "passage": {
+    "ja": "人の手で一本ずつ線を引いていては、半導体の細かな模様を大量にそろえることはできません。露光装置は光を用い、感光材料へ回路の模様を転写する役割を担います。ただし、光を当てたところで完成ではなく、現像や加工を経て材料に形を作り、さらに別の層を重ねていきます。層ごとの位置がずれると意図した接続にならないため、細い模様を描く能力に加え、前の層へ正確に合わせる能力も製造の成否を左右します。",
+    "form": "露光装置",
+    "en": "Drawing every line by hand could not reproduce fine semiconductor patterns consistently in large quantities. A lithography machine uses light to transfer circuit patterns to photosensitive material. Exposure is not the final step, since development and processing shape the material before further layers are added. Misaligned layers cannot form the intended connections, so accurately aligning to preceding layers matters alongside the ability to produce fine patterns.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "光による模様の転写を担い、その後の加工工程とは役割が違う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6f2afb50e4-9bf92300",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-6f2afb50e4-9bf92300",
+    "wordId": "nn-6f2afb50e4"
+   }
+  },
+  {
+   "term": "不生不滅",
+   "reading": "ふしょうふめつ",
+   "pos": "noun",
+   "meaning": "neither arising nor ceasing",
+   "defJa": "本来的には生じも滅びもしないという仏教の表現",
+   "passage": {
+    "ja": "花が咲いて散る姿を前にすると、物事が生まれ、消えていくことは疑いようがなく見えます。般若心経に現れる不生不滅は、この変化を目の錯覚として退けるのではなく、物に独立した固定的な本質がないという空の理解に関わります。種や水や温度に依存して咲く花を、条件から切り離された一個の実体として捉えることが問い直されます。日常の変化をそのまま認めつつ、それを変わらぬ何かが誕生し消滅する出来事として扱わないところに、この教えの難しさがあります。",
+    "form": "不生不滅",
+    "en": "Watching a flower bloom and fall makes the arising and passing of things appear undeniable. The expression neither arising nor perishing in the Heart Sutra relates to the understanding of emptiness as the absence of independent, fixed essence, rather than dismissing change as an optical illusion. It challenges treating a flower dependent on seeds, water, and temperature as an entity isolated from its conditions. The difficulty of this teaching lies in acknowledging everyday change without treating it as the birth and destruction of something with an unchanging essence.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "空の理解に関わる仏教語で、日常の変化そのものの否定ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f52ba89ddb-daadec6e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-f52ba89ddb-daadec6e",
+    "wordId": "nn-f52ba89ddb"
+   }
+  },
+  {
+   "term": "オープンモニタリング瞑想",
+   "reading": "おーぷんもにたりんぐめいそう",
+   "pos": "noun",
+   "meaning": "open monitoring meditation",
+   "defJa": "生じる感覚や思考を対象を絞らず観察する瞑想法",
+   "passage": {
+    "ja": "静かに座ってると、外の車の音も、膝の重さも、明日の予定も次々に現れるよね。オープンモニタリング瞑想では、一つの対象だけに注意を固定するかわりに、そうやって移り変わる経験に気づき続けるんだ。考えが浮かんだから失敗だと決めると、それを消そうとする作業に夢中になってしまう。何が出てきても物語を追いかけず、今は音、今は考えというふうに受け止めるのであって、ぼんやりして何も分からなくなる状態を目指してるんじゃない。",
+    "form": "オープンモニタリング瞑想",
+    "en": "Sitting quietly, you notice traffic sounds, heaviness in your knees, and tomorrow’s plans appearing one after another. In open monitoring meditation, instead of fixing attention on one object, you continue noticing that changing experience. Deciding that a thought means failure can absorb you in trying to eliminate it. The practice receives what appears as a sound or a thought without following its story, rather than aiming to become dazed and unaware.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "対象を一つに絞らず、経験の移り変わりに気づく実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ee2ce3cd4b-075a69f7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-ee2ce3cd4b-075a69f7",
+    "wordId": "nn-ee2ce3cd4b"
+   }
+  },
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "pos": "noun",
+   "meaning": "backpropagation",
+   "defJa": "出力側から各変数の誤差への影響を計算する方法",
+   "passage": {
+    "ja": "手書きの数字を見分けるモデルが、三を八だと判定したとします。正解とのずれを数値にした後、誤差逆伝播法を使うと、出力側から計算をたどり、各重みがそのずれにどう影響するかを求められます。そこで得た勾配をもとに別の更新手続きが重みを調整し、次の予測の誤差を減らすことを目指します。ただし、一つの例に合わせるだけでは未知の字にも対応できるとは限らず、学習用のデータを増やす工夫と、使っていない例での評価が必要になります。",
+    "form": "誤差逆伝播法",
+    "en": "Suppose a model recognizing handwritten digits identifies a three as an eight. After quantifying the discrepancy from the correct answer, backpropagation traces the computation from the output side to determine how each weight affects that discrepancy. A separate update procedure uses the resulting gradients to adjust weights with the aim of reducing error in subsequent predictions. Fitting one example does not guarantee handling unfamiliar handwriting, however, so training-data improvements and evaluation on unused examples are needed.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "誤差への各重みの影響を計算する方法で、重みの更新そのものと区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bc45f91770-e83c05cb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031-r.json",
+    "cardId": "nn-bc45f91770-e83c05cb",
+    "wordId": "nn-bc45f91770"
+   }
+  },
+  {
+   "term": "配線",
+   "reading": "はいせん",
+   "pos": "noun",
+   "meaning": "wiring, interconnect",
+   "defJa": "電気を通す道を部品の間につなぐこと",
+   "passage": {
+    "ja": "計算を担う小さな素子をぎっしり並べても、互いに信号を送れなければ一つの回路として働きません。半導体の配線は複数の層にまたがって部品を結び、必要な信号と電力の通り道を作ります。線が細く長くなるにつれて抵抗などの影響が大きくなり、信号の遅れや発熱が設計上の問題になります。素子の数だけを増やすのではなく、どの情報をどこへ運ぶかまで配置と合わせて工夫することで、チップ全体の性能を引き出せるのです。",
+    "form": "配線",
+    "en": "Packing tiny computing elements together does not make a functioning circuit unless they can send signals to one another. Semiconductor interconnects join components across multiple layers, creating paths for signals and power. As lines grow thinner and longer, effects including resistance become greater, making signal delay and heating design concerns. Coordinating routes for information with component placement, instead of merely adding more elements, brings out the performance of the chip as a whole.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "半導体内部で信号や電力を通す接続を指している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f4235c89ba-e92e4701",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-f4235c89ba-e92e4701",
+    "wordId": "nn-f4235c89ba"
+   }
+  }
+ ]
+}

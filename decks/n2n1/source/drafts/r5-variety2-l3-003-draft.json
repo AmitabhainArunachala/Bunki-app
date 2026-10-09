@@ -1,0 +1,284 @@
+{
+ "cards": [
+  {
+   "term": "教師あり学習",
+   "reading": "きょうしありがくしゅう",
+   "pos": "noun",
+   "meaning": "supervised learning",
+   "defJa": "入力と正解の組を使って対応関係を学ぶ方法",
+   "passage": {
+    "ja": "迷惑メールを分ける装置に、件名だけを大量に見せても、どれを迷惑と呼ぶのかは決まりません。教師あり学習では、入力と正解の組を用意し、予測が正解に近づくようにモデルを調整します。ただし、以前の担当者が特定の言葉を含むメールを誤って分類していれば、その判断まで学んでしまう恐れがあります。評価用の例を学習用から分けることに加え、正解として渡した印が何に基づくのかを調べると、点数の高いモデルが現場で役立たない理由に近づけます。",
+    "form": "教師あり学習",
+    "en": "Showing a spam filter large numbers of subject lines alone does not establish which messages count as spam. Supervised learning supplies pairs of inputs and correct answers, adjusting the model so that predictions approach those answers. If a previous operator misclassified messages containing a particular word, however, the model may learn that judgment too. In addition to separating evaluation examples from training examples, examining the basis of the labels supplied as correct answers helps explain why a high-scoring model may fail in practice.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "入力と正解の組を使う学習で、正解側の質も結果を左右する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-167fb28e72-70e889f0",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-167fb28e72-70e889f0",
+    "wordId": "nn-167fb28e72"
+   }
+  },
+  {
+   "term": "最適化",
+   "reading": "さいてきか",
+   "pos": "noun",
+   "meaning": "optimization",
+   "defJa": "条件の下で目的に最も合う状態を探すこと",
+   "passage": {
+    "ja": "配達先を全部回る道を選ぶとき、最短距離の経路が一番早く着く経路とは限りません。渋滞や荷物を下ろせる時間まで条件に入れると、何を小さくしたいのかを先に決める必要があります。最適化は、このように目的と制約を定めた上で、条件に合う最もよい解を探す作業です。燃料を減らす案が残業を増やすこともあり、計算が出した答えを評価するには、装置の性能だけでなく、最初に与えた目的が現場の望みに合っているかも問われます。",
+    "form": "最適化",
+    "en": "When choosing a route to visit every delivery address, the shortest route is not necessarily the quickest. Once traffic and permitted unloading times become conditions, what is to be minimized must be decided first. Optimization seeks the best solution under specified objectives and constraints in this way. A plan that reduces fuel use may increase overtime, so evaluating the computed answer requires examining whether the original objective fits workplace needs as well as assessing the machine’s performance.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "目的と制約を定めて、その条件で最善の解を探すこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-de32ec8669-014956d3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-de32ec8669-014956d3",
+    "wordId": "nn-de32ec8669"
+   }
+  },
+  {
+   "term": "次世代",
+   "reading": "じせだい",
+   "pos": "noun",
+   "meaning": "the next generation",
+   "defJa": "現在のものに続いて登場する新しい世代",
+   "passage": {
+    "ja": "試作品の計算速度が上がったのに、電池がすぐ切れてしまうなら、携帯する道具としては扱いに困ります。次世代の端末を設計するチームは、速さに加えて重さや発熱も調整し、前の製品で不満だった点を一つずつ検討します。新しい部品を入れたからといって、使う人の体験まで自動的によくなるとは限りません。どの作業を何時間続けたいかという具体的な条件を置くと、目立つ一つの数字より、複数の性能の釣り合いが開発の課題として浮かびます。",
+    "form": "次世代",
+    "en": "A faster prototype that quickly drains its battery is inconvenient as a portable tool. A team designing next-generation devices adjusts weight and heat alongside speed, examining complaints about the preceding product one by one. Installing new components does not automatically improve the user’s experience. Specifying which tasks people want to continue for how many hours reveals the balance among multiple capabilities as a development problem, rather than one eye-catching number.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "現在のものに続く世代であり、全性能の優越を保証する語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1aa745f9c2-ef91249c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-1aa745f9c2-ef91249c",
+    "wordId": "nn-1aa745f9c2"
+   }
+  },
+  {
+   "term": "法整備",
+   "reading": "ほうせいび",
+   "pos": "noun",
+   "meaning": "development of a legal framework",
+   "defJa": "社会の変化に合わせて法律や制度を整えること",
+   "passage": {
+    "ja": "自動で契約書を作るサービスが間違えたとき、利用した人と提供した会社のどちらが責任を負うんだろう。約束の内容にもよるけど、今ある決まりだけでは扱いがはっきりしない問題も出てくるよね。そこで法整備を進めるとしても、禁止する範囲を広げれば済む話じゃなくて、被害を受けた人が救済を求める手続きも要る。技術が変わるにつれて、何を認めるかだけでなく、誰が説明し、どこへ異議を申し立てられるかという制度の細部が効いてくるんだ。",
+    "form": "法整備",
+    "en": "If a service that automatically generates contracts makes a mistake, is responsibility borne by the user or the provider. It depends partly on their agreement, but problems can arise that existing rules do not clearly address. Even when developing legislation, expanding prohibitions is not sufficient, since affected people also need procedures for seeking remedies. As technology changes, institutional details such as who must explain decisions and where objections can be lodged matter alongside what is permitted.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "新しい問題に対応できるよう、法律や制度を整えること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-36a1b9d38a-9331c540",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
+    "cardId": "nn-36a1b9d38a-9331c540",
+    "wordId": "nn-36a1b9d38a"
+   }
+  },
+  {
+   "term": "流動性",
+   "reading": "りゅうどうせい",
+   "pos": "noun",
+   "meaning": "market liquidity",
+   "defJa": "値を大きく変えずに売買を成立させやすい度合い",
+   "passage": {
+    "ja": "売りたい値段を画面に入力しても、その値段で買う相手がいなければ取引は成立しません。流動性の低い市場では、まとまった量を急いで売ろうとしただけで、成立する価格が大きく下がることがあります。最後に付いた価格は直前の取引の結果にすぎず、持っている分をすべて同じ値段で換金できる約束ではありません。買い注文の厚みや売買の頻度を考えに入れると、資産の評価額と、今すぐ手元に戻せる現金との差が生じる理由を理解できます。",
+    "form": "流動性",
+    "en": "Entering a desired selling price on a screen does not produce a trade unless someone will buy at that price. In a market with low liquidity, merely trying to sell a substantial quantity quickly can sharply reduce the execution price. The last quoted price is only the result of the preceding trade, not a promise that an entire holding can be converted to cash at the same price. Considering the depth of buy orders and frequency of trading explains why an asset’s valuation may differ from the cash immediately recoverable from it.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "価格を大きく動かさずに売買を成立させやすい度合い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-0f27cb5487-75f98850",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-0f27cb5487-75f98850",
+    "wordId": "nn-0f27cb5487"
+   }
+  },
+  {
+   "term": "演繹",
+   "reading": "えんえき",
+   "pos": "noun",
+   "meaning": "deduction",
+   "defJa": "一般的な前提から個別の結論を導くこと",
+   "passage": {
+    "ja": "「この箱の部品はすべて検査済みで、このねじはその箱から取った」という前提なら、そのねじも検査済みだという結論が出ます。こうして一般的な条件から個別の結論を導く演繹では、推論の筋と前提の確かさを分けて捉えられます。誰かが未検査のねじを箱へ戻したとしたら、最初の前提が崩れるため、同じ結論を保証できません。「筋が通っている」という評価は、出発点まで現実と一致しているという意味ではなく、前提から結論へのつながりについての評価です。",
+    "form": "演繹",
+    "en": "Given the premises that every part in this box has been inspected and this screw came from the box, the conclusion is that the screw has also been inspected. Deduction, which derives particular conclusions from general conditions, allows the logic of inference to be distinguished from the reliability of the premises. If someone returned an uninspected screw to the box, the initial premise would fail and the same conclusion could not be guaranteed. Calling an argument logically sound in its progression evaluates the link from premises to conclusion rather than asserting that its starting point matches reality.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "一般的な前提から結論を導く推論で、前提の真偽とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b433ef562e-3d530a6f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-b433ef562e-3d530a6f",
+    "wordId": "nn-b433ef562e"
+   }
+  },
+  {
+   "term": "生産能力",
+   "reading": "せいさんのうりょく",
+   "pos": "noun",
+   "meaning": "production capacity",
+   "defJa": "一定の条件と期間で製品を作れる量",
+   "passage": {
+    "ja": "工場に新しい装置が届いても、その日のうちに出荷量が倍になるとは限りません。生産能力を増やすには、装置を据え付けるだけでなく、材料の供給や検査、担当者の訓練もそろえる必要があります。前の工程が速くなる一方で最後の検査が詰まれば、仕掛かり品が増えるだけで、完成品は予定どおりに出てきません。一台の機械の速さと工場全体で作れる量を分けて考えると、投資の効果を測るには、どこで流れが細くなっているかを確かめることが欠かせないと分かります。",
+    "form": "生産能力",
+    "en": "The arrival of new equipment does not necessarily double a factory’s shipments that day. Increasing production capacity requires not just installation but material supplies, inspections, and staff training. If earlier processes accelerate while final inspection remains a bottleneck, work in progress grows without finished goods appearing as planned. Distinguishing an individual machine’s speed from total factory output shows why measuring the effect of investment requires identifying where the flow narrows.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "設備一台の速さではなく、一定期間に作れる量として捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8541a7cc2b-108b51cc",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-026.json",
+    "cardId": "nn-8541a7cc2b-108b51cc",
+    "wordId": "nn-8541a7cc2b"
+   }
+  },
+  {
+   "term": "確率分布",
+   "reading": "かくりつぶんぷ",
+   "pos": "noun",
+   "meaning": "probability distribution",
+   "defJa": "各結果や値にどれほどの確率があるかの分布",
+   "passage": {
+    "ja": "同じ平均点の二つのクラスでも、全員が平均の近くにいる場合と、満点と零点に大きく分かれる場合があります。得点を確率変数として扱うなら、各点数がどの程度現れやすいかを示す確率分布によって、その違いを表せます。平均値に加えて散らばり方を確かめると、同じ代表値の背後にある集団の姿が変わって見えます。実際の試験で得た点数の割合は標本による結果なので、それをもとに未知の集団を推測する際には、人数が少ないほど偶然の偏りにも気を配る必要があります。",
+    "form": "確率分布",
+    "en": "Two classes with the same mean score may differ between everyone being near the mean and a sharp split between full marks and zero. Treating scores as a random variable allows that difference to be represented by a probability distribution specifying how likely each score is. Examining spread alongside the mean reveals different group structures behind the same representative value. Actual test-score proportions come from a sample, so inferring an unknown population from them requires greater attention to chance imbalance when the sample is small.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "平均だけでは分からない、各値の現れやすさの全体像。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-4d5ef5002d-563ea4f9",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-4d5ef5002d-563ea4f9",
+    "wordId": "nn-4d5ef5002d"
+   }
+  },
+  {
+   "term": "胎動",
+   "reading": "たいどう",
+   "pos": "noun",
+   "meaning": "early stirrings of a new development",
+   "defJa": "新しい動きが表面に出る前から起こり始めること",
+   "passage": {
+    "ja": "大企業が参入するより前に、小さな研究会で同じ課題を持つ技術者が集まり始めることがあります。完成品はまだなくても、試作品の交換や共通の道具作りが続くなら、新しい産業の胎動が感じられます。こうした動きを調べるには、売上の大きさのみならず、人がどの問題へ集まり、何を試しているかに目を向けるとよいでしょう。ただし、盛んな交流が必ず事業の成功につながるとは言えず、期待を抱くことと、継続して費用を賄える仕組みができることには距離があります。",
+    "form": "胎動",
+    "en": "Before large companies enter a field, engineers sharing a problem may begin gathering in small research groups. Even without a finished product, continuing exchanges of prototypes and construction of shared tools can reveal the first stirrings of a new industry. Investigating such developments calls for attention to which problems attract people and what they are testing, alongside the size of sales. Lively exchanges do not guarantee commercial success, however, and generating enthusiasm is some distance from establishing a sustainable way to cover costs.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "新しい動きが本格化する前に、内側で始まりつつあること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-80f13cee43-fe45b100",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029-r.json",
+    "cardId": "nn-80f13cee43-fe45b100",
+    "wordId": "nn-80f13cee43"
+   }
+  },
+  {
+   "term": "自然言語処理",
+   "reading": "しぜんげんごしょり",
+   "pos": "noun",
+   "meaning": "natural language processing",
+   "defJa": "人が使う言葉を計算機で分析や生成する技術",
+   "passage": {
+    "ja": "問い合わせ窓口へ届く「電源が入らない」と「電源が切れない」は、似た文字を含んでいても求める対応が違います。自然言語処理では、人の使う言葉を計算機が扱える形にし、分類や検索、翻訳などにつなげます。単語を数えるだけでは否定の向きや省略された主語を取り違えかねないため、周囲の文脈を利用する工夫が必要です。大量の問い合わせから担当部署を選ぶ場面でも、言い回しの違いを吸収する力と、似た表現の中の決定的な差を残す力の両方が求められます。",
+    "form": "自然言語処理",
+    "en": "The requests that a device will not turn on and that it will not turn off contain similar wording but require different responses. Natural language processing represents human language in forms computers can handle for tasks such as classification, search, and translation. Simply counting words can misidentify the scope of negation or an omitted subject, making methods that use surrounding context necessary. Even when routing large numbers of inquiries to departments, a system must both accommodate varied wording and preserve crucial differences within similar expressions.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "人の言葉を計算機で扱う技術の総称で、一つの手法名ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a6cde01e02-f5c24024",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-a6cde01e02-f5c24024",
+    "wordId": "nn-a6cde01e02"
+   }
+  }
+ ]
+}

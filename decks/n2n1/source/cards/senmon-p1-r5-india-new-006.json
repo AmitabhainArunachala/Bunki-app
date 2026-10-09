@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "瞑想経験者",
-   "reading": "めいそうけいけんしゃ",
-   "pos": "noun",
-   "meaning": "experienced meditator",
-   "defJa": "瞑想を行った経験を持つ人",
-   "passage": {
-    "ja": "毎朝短く坐る人と、長い合宿で集中的に修行した人とでは、同じ年数でも実践の量や内容が違います。研究論文で瞑想経験者という区分を見たら、何年続けたかに加えて、方法や頻度をどう確かめたかも読んでおきましょう。経験のない人との間に脳の違いが見つかっても、始める前からの特徴や生活習慣が関わっている場合があります。同じ人を時間を追って調べた研究なのか、別々の集団を一度比べた研究なのかを区別すると、結論がどこまで述べられるかを判断しやすくなります。",
-    "form": "瞑想経験者",
-    "en": "Someone who sits briefly each morning and someone who practices intensively on long retreats may accumulate different amounts and kinds of practice over the same number of years. When a study uses the category experienced meditator, examine how it established methods and frequency as well as duration. Brain differences from non-meditators may also relate to prior characteristics or lifestyle. Distinguishing longitudinal research on the same people from a single comparison of separate groups helps determine how far its conclusions can extend.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「瞑想経験者を対象にする」。経験年数だけでなく、選定条件を確認する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "能動対照群",
    "reading": "のうどうたいしょうぐん",
    "pos": "noun",

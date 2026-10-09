@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "内受容感覚",
-   "reading": "ないじゅようかんかく",
-   "pos": "noun",
-   "meaning": "interoception",
-   "defJa": "心拍など身体内部の状態を感じ取る感覚",
-   "passage": {
-    "ja": "「身体の声を聞く」という表現は親しみやすい半面、何を感じるのかが曖昧です。瞑想を説明する文章で内受容感覚という語を使うなら、胸の鼓動や呼吸に伴う内側の変化など、読み手が思い浮かべられる対象を添えると意味が定まります。さらに、身体へ注意を向けたという本人の実感と、その状態をどれほど正確に捉えたかとは、別々に記述できます。二つを一つの「感覚が鋭くなった」で済ませず、何を尋ね、何を測ったかを書くことで、体験の言葉と研究の言葉がつながります。",
-    "form": "内受容感覚",
-    "en": "Listening to the body sounds familiar but leaves what is being sensed unclear. When using interoception in an explanation of meditation, examples such as the heartbeat or internal changes accompanying breathing help readers identify its meaning. A person’s sense of attending to the body and the accuracy with which its state is perceived can also be described separately. Explaining what was asked and what was measured, rather than calling both a sharper sense, connects the language of experience with that of research.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "本人の気付きと測定上の正確さを区別し、感覚の対象を具体的に示す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "機能的磁気共鳴画像法",
    "reading": "きのうてきじききょうめいがぞうほう",
    "pos": "noun",

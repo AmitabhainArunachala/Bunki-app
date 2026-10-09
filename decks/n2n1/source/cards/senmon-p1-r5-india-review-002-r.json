@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "絶対無",
-   "reading": "ぜったいむ",
-   "pos": "noun",
-   "meaning": "absolute nothingness in Nishida’s thought",
-   "defJa": "有と無の対立を超える根本的な立場",
-   "passage": {
-    "ja": "黒板に「ある」と「ない」を並べると、二つの反対語で世界を分けたくなりますね。西田哲学の絶対無は、片方の「ない」をどこまでも大きくしたものとして読むと、かえって分かりにくくなります。難しい概念ではあるものの、まずは有と無の対立自体を成り立たせる根底を問う議論だと押さえましょう。これは机の上に何も置かれていない状態とは、話の次元が違います。読書ノートには日常語の用例と哲学上の用法を分けて書き、本文で対立する二つの立場を探し、その関係を図にしてみましょう。",
-    "form": "絶対無",
-    "en": "A blackboard showing being and nonbeing can tempt us to divide the world between two opposites. Nishida’s absolute nothingness becomes harder to understand if it is treated merely as enlarging the nonbeing side without limit. Though the concept is difficult, first understand it as an inquiry into the ground that makes the opposition of being and nonbeing itself possible. This is different in kind from a desk with nothing on it. In reading notes, distinguish everyday examples from the philosophical use, locate two opposing positions in the text, and draw their relationship.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "単なる不在と区別し、西田哲学の文脈で読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "法要",
    "reading": "ほうよう",
    "pos": "noun",

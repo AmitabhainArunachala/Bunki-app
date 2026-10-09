@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "隠元",
-   "reading": "いんげん",
-   "pos": "noun",
-   "meaning": "Ingen Ryuki",
-   "defJa": "江戸時代に来日し宇治の萬福寺を開いた中国僧",
-   "passage": {
-    "ja": "人名から野菜の名前へ話を広げると、聞き手の関心を引くことはできます。ただ、隠元を紹介する文章で、身近な品々を何でもこの僧が伝えたと書けば、確かめにくい由来話が中心になってしまいます。来日した中国僧が宇治に萬福寺を開いたという仕事を軸に、儀礼や建築に残る文化の往来を示す方が、歴史の説明として筋が通ります。覚えやすい逸話を添えるにしても、伝承なのか、資料で確かめられる出来事なのかを言葉の選び方で示せます。",
-    "form": "隠元",
-    "en": "Moving from a person’s name to the name of a vegetable can catch a listener’s interest. But introducing Ingen by attributing every familiar object to him would make difficult-to-verify origin stories the center of the account. Building the explanation around a Chinese monk establishing Manpukuji in Uji and the exchanges preserved in ritual and architecture gives it a clearer historical structure. Even when adding a memorable anecdote, the wording can indicate whether it is a tradition or an event supported by evidence.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「隠元が伝えた」と断定する前に、人物の仕事と由来の伝承を分ける。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "檀越",
    "reading": "だんおつ",
    "pos": "noun",
@@ -101,28 +79,6 @@
     "register": "学",
     "topic": "india",
     "tipJa": "宗派名は、伝来した時代と儀礼や建築の特徴とを合わせて覚える。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "寺請制度",
-   "reading": "てらうけせいど",
-   "pos": "noun",
-   "meaning": "temple certification system",
-   "defJa": "寺院に信仰上の所属などを証明させた制度",
-   "passage": {
-    "ja": "昔の人がどのお寺に属していたかって、本人の好みだけでは決まらなかったんだよね。江戸時代の寺請制度では、寺が人々について、禁じられたキリスト教の信者ではないことなどを証明する役割を担っていたんだ。だから、記録に寺の名前があるからといって、その人がどれほど熱心に教えを学んだかまで分かるとは限らない。家族の古い資料を読むときも、信心の深さと、社会の中で必要だった証明とを分けてみると、名前の並んだ紙が当時の暮らしに結び付くよ。",
-    "form": "寺請制度",
-    "en": "A person’s temple affiliation in the past was not decided solely by personal preference. Under the Edo-period temple certification system, temples certified matters such as people not being followers of prohibited Christianity. A temple name in a record therefore does not necessarily reveal how devotedly that person studied its teachings. Separating the depth of faith from socially required certification helps connect old family documents full of names with life at the time.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "「寺請制度のもとで証明する」。所属の記録と個人の信心を分けて読む。",
     "sense": ""
    },
    "deck": "senmon",

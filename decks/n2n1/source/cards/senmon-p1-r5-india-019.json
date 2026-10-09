@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "本尊",
-   "reading": "ほんぞん",
-   "pos": "noun",
-   "meaning": "the principal object of Buddhist worship",
-   "defJa": "寺や仏堂で中心として礼拝される対象",
-   "passage": {
-    "ja": "寺の案内文で本尊を「いちばん大きな仏像」と言い換えると、信仰上の役割を大きさの問題にしてしまいます。礼拝の中心となる対象を指すので、像の寸法を比べるだけでは、その位置付けを説明できません。また、仏像に限らず、宗派や寺によっては別の形で表されることもあります。案内を書くなら、名前を示した上で、その寺でどのように大切にされているかを続けると、読者が堂内の配置を理解する助けになります。目立つものを主役と決めつける前に、誰に何を祈る場所なのかを文章の軸に据えましょう。",
-    "form": "本尊",
-    "en": "Paraphrasing a temple’s principal object of worship as its largest Buddhist statue turns a religious role into a question of size. The term refers to the focus of worship, so comparing dimensions alone cannot explain its status. Depending on the school or temple, it may also take a form other than a statue. A guide that names it and explains its importance at that temple helps readers understand the hall’s arrangement. Before treating the most visually prominent object as central, organize the explanation around whom people worship and for what purpose.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "礼拝上の中心という役割を表し、大きさや古さで決まる語ではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "最澄",
    "reading": "さいちょう",
    "pos": "noun",

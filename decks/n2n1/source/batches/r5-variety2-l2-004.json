@@ -1,0 +1,198 @@
+{
+ "items": [
+  {
+   "term": "ウパニシャッド",
+   "reading": "うぱにしゃっど",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the Upanishads",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-005.json",
+    "cardId": "nn-67f68ee238-2c22c667",
+    "wordId": "nn-67f68ee238"
+   }
+  },
+  {
+   "term": "タットヴァールタ・スートラ",
+   "reading": "たっとゔぁーるた・すーとら",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Tattvartha Sutra",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
+    "cardId": "nn-10bff03f2b-57fef44c",
+    "wordId": "nn-10bff03f2b"
+   }
+  },
+  {
+   "term": "ヨーガ・スートラ",
+   "reading": "よーがすーとら",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the Yoga Sutras of Patañjali",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-318d11cd78-a5f568c7",
+    "wordId": "nn-318d11cd78"
+   }
+  },
+  {
+   "term": "三界",
+   "reading": "さんがい",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the three realms (desire, form, formless)",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
+    "cardId": "nn-32325a0b39-149bfbd6",
+    "wordId": "nn-32325a0b39"
+   }
+  },
+  {
+   "term": "五戒",
+   "reading": "ごかい",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the five precepts",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-de1ba1b137-b72c66cb",
+    "wordId": "nn-de1ba1b137"
+   }
+  },
+  {
+   "term": "仏法",
+   "reading": "ぶっぽう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the Buddha's teaching",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-da2cae7a2c-f6d6f87f",
+    "wordId": "nn-da2cae7a2c"
+   }
+  },
+  {
+   "term": "入滅",
+   "reading": "にゅうめつ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "entering nirvana; death of the Buddha",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011.json",
+    "cardId": "nn-a60205c5e9-816de667",
+    "wordId": "nn-a60205c5e9"
+   }
+  },
+  {
+   "term": "具現",
+   "reading": "ぐげん",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "embodiment, concrete realization",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-c871038b83-08f99975",
+    "wordId": "nn-c871038b83"
+   }
+  },
+  {
+   "term": "前世",
+   "reading": "ぜんせ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "previous life",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-b28081c4d0-ec7712f3",
+    "wordId": "nn-b28081c4d0"
+   }
+  },
+  {
+   "term": "劫",
+   "reading": "こう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "kalpa, an aeon",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-aa1e988a62-0b30444b",
+    "wordId": "nn-aa1e988a62"
+   }
+  },
+  {
+   "term": "回向",
+   "reading": "えこう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "transferring merit; memorial service",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-5ebdcc6961-fcd9cf49",
+    "wordId": "nn-5ebdcc6961"
+   }
+  },
+  {
+   "term": "天台宗",
+   "reading": "てんだいしゅう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the Tendai school",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-54fbf49f45-35a7b1e7",
+    "wordId": "nn-54fbf49f45"
+   }
+  }
+ ],
+ "weave": [
+  "ウパニシャッド",
+  "タットヴァールタ・スートラ",
+  "ヨーガ・スートラ",
+  "三界",
+  "五戒",
+  "仏法",
+  "入滅",
+  "具現",
+  "前世",
+  "劫",
+  "回向",
+  "天台宗"
+ ]
+}

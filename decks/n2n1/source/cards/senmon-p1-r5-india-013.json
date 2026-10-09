@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "功徳",
-   "reading": "くどく",
-   "pos": "noun",
-   "meaning": "merit, virtue",
-   "defJa": "善い行いや修行によって得られる宗教上の恵み",
-   "passage": {
-    "ja": "寺の案内で、よい行いを重ねることが勧められていたら、何をよい結果と捉えているのか確かめましょう。仏教の功徳は、善行や修行によって得られる宗教的な恵みを指しますが、支払った金額に応じて商品が届くような仕組みとは異なります。布施や読経の意味を学ぶときも、目に見える成果だけでなく、行う人の心や他者との関わりがどう説明されているかに注目できます。日常語の得という印象に引きずられず、その文献が何を価値あることとしているかを押さえると、宗教語の使われ方を読み取れます。",
-    "form": "功徳",
-    "en": "When a temple guide encourages good deeds, identify what it treats as a good result. Buddhist merit concerns religious benefit associated with good conduct and practice, rather than a commercial exchange guaranteeing a product. Learning about giving or recitation also involves their stated relationship to intention and other people. Attending to a text’s values prevents everyday ideas of material gain from determining the meaning.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「功徳を積む」。金銭的な利益や、必ず得られる見返りと同一視しない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "初期仏教",
    "reading": "しょきぶっきょう",
    "pos": "noun",
@@ -45,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "前世",
-   "reading": "ぜんせ",
-   "pos": "noun",
-   "meaning": "previous life",
-   "defJa": "今の生を迎えるより前の生涯",
-   "passage": {
-    "ja": "初めて来た場所なのに懐かしいと感じて、昔ここに住んでいたのかなと思うことがあるよね。輪廻を説く宗教では、前世は今の生より前の生涯を指すけれど、懐かしさだけで過去の出来事が確かめられたわけではないんだ。仏教の物語を読むときは、ある人物の以前の行いが現在の境遇と結び付けられ、教えを伝える筋道になっていることがある。話の中で何が善い行いとして描かれているかを追うと、歴史上の事実を調べる読み方とは別に、その物語が担っている役割を考えられるよ。",
-    "form": "前世",
-    "en": "An unfamiliar place can feel so familiar that you imagine having lived there before. In religions teaching rebirth, a previous life means a life before the present one, but familiarity alone does not establish past events. Buddhist stories sometimes connect earlier deeds with present circumstances to communicate teachings. Following the actions portrayed as good reveals the story’s role beyond reading it as a historical record.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "「前世の行い」。輪廻を前提とする物語や信仰の文脈で使われる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "加持祈祷",
    "reading": "かじきとう",
    "pos": "noun",
@@ -79,28 +35,6 @@
     "register": "語",
     "topic": "india",
     "tipJa": "「加持祈祷を行う」。願う目的を述べ、結果を保証する表現とは分ける。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "劫",
-   "reading": "こう",
-   "pos": "noun",
-   "meaning": "kalpa, an aeon",
-   "defJa": "仏教などで極めて長い時間を表す単位",
-   "passage": {
-    "ja": "寺の縁起や経典を読むと、人の一生では到底測れない時間が語られることがあります。劫はインドの宗教に由来する非常に長い時間の単位で、仏教でも世界の成立や変化を説明する際に使われます。その長さは大きな岩を布で少しずつすり減らすような譬えで示されることもあり、一つの数字に置き換えるだけでは表現の狙いを捉えきれません。日々の予定とは異なる時間の尺度を置くことで、目の前の変化をどう眺めようとしているのかを考えると、壮大な物語の読み方が広がります。",
-    "form": "劫",
-    "en": "Temple histories and scriptures sometimes describe durations far beyond a human lifetime. A kalpa is an immense time unit of Indian religious traditions, used in Buddhism to discuss worlds forming and changing. Comparisons such as slowly wearing away a huge rock with cloth show why replacing the term with one number can miss its purpose. Considering what this different timescale does broadens the reading of such vast narratives.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「一劫」。非常に長い時間を示す語で、文脈に応じた説明が必要になる。",
     "sense": ""
    },
    "deck": "senmon",

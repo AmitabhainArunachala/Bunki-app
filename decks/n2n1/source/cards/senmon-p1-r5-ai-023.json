@@ -1,50 +1,6 @@
 {
  "cards": [
   {
-   "term": "最適解",
-   "reading": "さいてきかい",
-   "pos": "noun",
-   "meaning": "an optimal solution",
-   "defJa": "定めた条件の中で目的を最もよく満たす答え",
-   "passage": {
-    "ja": "配送計画の最適解を得たという報告では、何を小さくし、どんな条件を守ったのかを添えると意味が明確になります。距離を最短にした答えであっても、配達の遅れを最少にした答えと一致するとは限らず、評価の目的が変われば結論も変わります。また、探索した範囲で最もよかった案と、許された全候補の中で最もよいと保証された案は、言葉の強さを分けたいところです。説明文では「今回比べた案の中で」といった範囲を省かず、計算で確認したこと以上の保証を読み手に与えないようにしましょう。",
-    "form": "最適解",
-    "en": "A report of an optimal delivery plan becomes clearer when it states what was minimized and which conditions were enforced. The shortest-distance answer need not minimize delivery delays, and changing the objective changes the conclusion. The best plan among searched candidates also warrants different wording from a plan guaranteed best among all permitted candidates. Preserve qualifiers such as among the plans compared here so readers receive no stronger guarantee than the computation established.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "目的や許された候補の範囲を示して使い、万能な答えとしない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "時価総額",
-   "reading": "じかそうがく",
-   "pos": "noun",
-   "meaning": "market capitalization",
-   "defJa": "株価に発行済み株式数を掛けた企業価値の指標",
-   "passage": {
-    "ja": "半導体の会社を比べる記事で時価総額が大きいと書かれていても、その金額が会社の金庫にあるわけじゃないよ。株価に発行済みの株式数を掛けた数字だから、工場や現金を単に足した金額とは違って、市場での評価が反映されるんだ。将来への期待で株価が変われば数字も動くので、売上の順位と同じ順番になるとは限らないんだよね。企業の規模を知りたいときは、何の大きさを比べたいのかを先に決めて、売上や利益、持っている資産の数字も横に並べると整理しやすいよ。",
-    "form": "時価総額",
-    "en": "A large market capitalization in a semiconductor-company comparison does not mean that amount sits in the company’s cash box. It is share price multiplied by outstanding shares, reflecting market valuation rather than a simple sum of factories and cash. Changes in expectations move share prices and therefore the figure, so its ranking need not match sales rankings. When comparing company size, first choose what kind of size matters, then place sales, profits, and assets beside it.",
-    "register": "話",
-    "topic": "ai",
-    "tipJa": "会社の保有現金とは異なり、株式市場での評価を示す指標。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "機械学習",
    "reading": "きかいがくしゅう",
    "pos": "noun",
@@ -57,28 +13,6 @@
     "register": "話",
     "topic": "ai",
     "tipJa": "例から学ぶ仕組みであり、未経験の場面での正しさは別に確かめる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "最適化",
-   "reading": "さいてきか",
-   "pos": "noun",
-   "meaning": "optimization",
-   "defJa": "条件の下で目的に最も合う状態を探すこと",
-   "passage": {
-    "ja": "工場の生産計画を最適化する課題では、まず何をよい計画と呼ぶかを決めましょう。製造時間を短くする目的と、電力の使用を抑える目的は常に一致するとは限らず、機械の台数や納期などの制約もあります。目的を一つの数値で表せたとしても、現場で重要な条件を入れ忘れれば、計算上は優れた案が実行できないことも起こります。小さな例で候補を比べ、目的の数値と守る条件を別に表へ書くことで、計算の答えが何を優先し、何を前提としているかを確かめられます。",
-    "form": "最適化",
-    "en": "In optimizing a factory production schedule, first decide what counts as a good plan. Shorter production time and lower power use do not always align, and equipment counts and deadlines impose constraints. Even with a numerical objective, overlooking an important practical condition may make the mathematically superior plan unusable. Comparing small examples with separate columns for objective values and required conditions clarifies the answer’s priorities and assumptions.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "目的と制約を定めたうえで考える語で、無条件の改善ではない。",
     "sense": ""
    },
    "deck": "senmon",

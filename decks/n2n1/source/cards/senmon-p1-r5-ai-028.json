@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "経済安全保障",
-   "reading": "けいざいあんぜんほしょう",
-   "pos": "noun",
-   "meaning": "economic security",
-   "defJa": "経済上の手段で国民生活や国家の安全を守ること",
-   "passage": {
-    "ja": "半導体が届かなくなった場面を想定し、自動車や通信機器の生産に何が起こるかを図にしてみましょう。重要な物資や技術の安定した確保を考える経済安全保障は、企業一社の利益だけでは説明できない課題です。安い調達先に集中させると費用を抑えられる一方で、その供給が止まった際に代わりを探す時間が長くなる場合があります。国や企業の対策を学ぶときは、依存する相手、代替にかかる期間、追加の費用を別々の欄に書くと、安全と効率の間にある制約を比べられます。",
-    "form": "経済安全保障",
-    "en": "Imagine semiconductor deliveries stopping and diagram what happens to car and communications-equipment production. Economic security, which includes securing stable access to important goods and technologies, cannot be explained only through a single company’s profits. Concentrating on a cheap source may reduce costs, while also lengthening the search for alternatives if supply stops. When studying government or corporate responses, separate the counterparties relied on, replacement lead times, and additional costs into columns to compare constraints between security and efficiency.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "物資の安定供給や重要技術の確保などを含む概念。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "稼働率",
    "reading": "かどうりつ",
    "pos": "noun",
@@ -123,28 +101,6 @@
     "register": "論",
     "topic": "ai",
     "tipJa": "成果を支えた重要人物を表し、役職名とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "経済産業省",
-   "reading": "けいざいさんぎょうしょう",
-   "pos": "noun",
-   "meaning": "Japan’s industry and trade ministry",
-   "defJa": "日本で産業や通商などの政策を担う行政機関",
-   "passage": {
-    "ja": "半導体支援の記事で、経済産業省が計画を認定したという文を、国が成功を保証したと書き換えてはいけません。制度の条件に照らして支援の対象と判断することと、企業の技術や収益の将来を保証することは別だからです。報道文を短くするにしても、申請した主体、判断した機関、認定された内容という三つの要素を残すと、責任の所在がぼやけません。金額を強調する前に、元の公表資料に戻って動詞を確かめれば、「検討する」「決める」「実施する」の違いも正確に伝えられます。",
-    "form": "経済産業省",
-    "en": "In an article on semiconductor support, do not rewrite a statement that METI approved a plan as a government guarantee of success. Deciding that a proposal qualifies for support under a scheme is different from guaranteeing a company’s future technology or earnings. Even when shortening a news item, retaining who applied, which institution decided, and what was approved keeps responsibility clear. Checking the verbs in the original announcement before emphasizing an amount also allows accurate distinctions between considering, deciding, and implementing.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "省庁の発表では、対象と判断の段階を明示する。",
     "sense": ""
    },
    "deck": "senmon",

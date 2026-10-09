@@ -89,50 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ブラックボックス",
-   "reading": "ぶらっくぼっくす",
-   "pos": "noun",
-   "meaning": "black box",
-   "defJa": "内部の仕組みが外から把握しにくい対象",
-   "passage": {
-    "ja": "同じ画像を入れると答えが返る装置について、その内部の計算を知らずに使う場面を考えましょう。中で何が起きているかを把握しにくいブラックボックスでも、入力を変えたときの出力を記録すれば、振る舞いの一部は調べられます。ただし、その記録が多いからといって、未知の条件で必ず正しく働くと証明されたことにはなりません。仕組みの説明と、試した範囲での性能確認をノートの別の欄に置くと、何が分かり、どこに仮説が残っているかを整理して学習を進められます。",
-    "form": "ブラックボックス",
-    "en": "Consider using a device that returns an answer for an image without knowing its internal computation. Even for a black box whose internals are hard to grasp, recording how outputs change with inputs reveals part of its behavior. A large record does not, however, prove correct behavior under every unfamiliar condition. Separating explanations of mechanisms from measured performance over tested conditions clarifies what is known and where hypotheses remain.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "入出力を調べることと、内部を理解することを分ける。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "プロセスルール",
-   "reading": "ぷろせするーる",
-   "pos": "noun",
-   "meaning": "process rule (node size)",
-   "defJa": "半導体を製造する技術の世代や設計上の基準",
-   "passage": {
-    "ja": "半導体の記事で「二ナノ」と書かれていても、内部のどの部分も二ナノメートルだという意味にはなりません。プロセスルールを説明する際には、現在の世代名の数字と、実際に測った回路の寸法を区別して示すことが必要です。同じ世代として紹介される技術であれ、会社や用途によって設計や性能の条件は異なります。数字が小さいほど無条件に優れているという文章を、性能、消費電力、面積をどの条件で比べたかという説明に改めると、見出しだけでは分からない技術の違いを伝えられます。",
-    "form": "プロセスルール",
-    "en": "A semiconductor article's reference to two nanometers does not mean every internal part measures two nanometers. Explaining a process node requires distinguishing today's generation labels from measured circuit dimensions. Technologies described as the same generation may differ in design and performance conditions across companies and uses. Replacing the claim that smaller numbers are unconditionally better with comparisons of performance, power, and area under specified conditions communicates differences hidden by headlines.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "世代名の数字を、すべての部品の寸法と同一視しない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "ベイズの法則",
    "reading": "べいずのほうそく",
    "pos": "noun",

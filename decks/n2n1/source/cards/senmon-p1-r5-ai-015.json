@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "加速主義",
-   "reading": "かそくしゅぎ",
-   "pos": "noun",
-   "meaning": "accelerationism",
-   "defJa": "技術などの発展を速めて社会の変化を促す立場",
-   "passage": {
-    "ja": "人工知能の開発を巡る記事では、技術の進歩を速めようとする立場が加速主義と呼ばれることがある。ただし、この名称は異なる思想にも使われており、登場人物が何を推進しているかを確認しなければ、議論の対立点は捉えられない。開発の速度、製品の公開範囲、利用時の管理は、それぞれ別に選べる論点だ。開発を支持する発言から、あらゆる制約を否定する立場だと即断することもできない。記事を比較する際は、呼び名よりも、どの提案に賛成し、その理由をどう説明したかに注目したい。",
-    "form": "加速主義",
-    "en": "Articles about AI development sometimes call efforts to speed technological progress accelerationism. However, the label also applies to different philosophies, so the dispute cannot be understood without examining what each speaker advocates. Development speed, the extent of product release, and controls on use are distinct choices. Supporting development does not by itself imply opposition to every constraint. When comparing articles, focus on which proposals people support and their reasons rather than on labels alone.",
-    "register": "報",
-    "topic": "ai",
-    "tipJa": "異なる思想が同じ名称で呼ばれるため、主張を確認する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "内製化",
    "reading": "ないせいか",
    "pos": "noun",
@@ -79,28 +57,6 @@
     "register": "学",
     "topic": "ai",
     "tipJa": "設計から製造まで、どの工程を指すかを確かめる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "創発",
-   "reading": "そうはつ",
-   "pos": "noun",
-   "meaning": "emergence",
-   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
-   "passage": {
-    "ja": "今日は、人工知能の規模を増やしたときに能力が急に現れたように見えるグラフを考えます。このような変化を創発と呼ぶ議論がありますが、まず採点の仕方を調べましょう。完全な正解だけを一点と数えると、少しずつ改善していた途中の変化が、得点に出ない場合があります。別の尺度で測れば滑らかな伸びが見えることもあるので、急な上昇だけから内部に新しい仕組みが生まれたと断定はできません。同じ回答を二つの方法で採点し、グラフの形がどれだけ変わるかを比べてみましょう。",
-    "form": "創発",
-    "en": "Today we will examine a graph in which an ability seems to appear suddenly as an AI system grows. Such changes are discussed as emergence, but first inspect the scoring method. Awarding a point only for a completely correct answer can conceal gradual improvements along the way. Another measure may reveal smooth progress, so a sharp rise alone does not establish that a new internal mechanism appeared. Score the same answers in two ways and compare the resulting graph shapes.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "急な変化が本物か、測り方による見え方かを確かめる。",
     "sense": ""
    },
    "deck": "senmon",

@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ヨーガ",
-   "reading": "よーが",
-   "pos": "noun",
-   "meaning": "yoga (scholarly spelling)",
-   "defJa": "心身を整え解放を目指すインド由来の実践",
-   "passage": {
-    "ja": "体を柔らかくする運動だと思って本を開くと、姿勢以外の教えが多いことに驚くはずです。古典的なヨーガでは、呼吸や集中に加えて、日常の行為を律することも修行の中に位置付けられています。現代の教室の内容と古典の体系を比べる際は、どちらかをすぐ偽物と決めず、何を目的として、どの部分を取り出しているのかを整理しましょう。仏教の瞑想とも共通する課題はありますが、身体の動きが似ていることと、自己や解放について同じ教義を持つこととは別々に確かめられます。",
-    "form": "ヨーガ",
-    "en": "Opening a book expecting flexibility exercises can reveal surprisingly extensive teaching beyond posture. Classical yoga places breathing and concentration alongside disciplines for everyday conduct. Comparing a contemporary class with a classical system involves examining its aims and selections rather than immediately dismissing either. Shared concerns with Buddhist meditation do not make similar movements proof of identical doctrines about self and liberation.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「ヨーガを実践する」。姿勢だけでなく、修行の体系として読んでいる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "ブラフマン",
    "reading": "ぶらふまん",
    "pos": "noun",
@@ -145,28 +123,6 @@
     "register": "講",
     "topic": "india",
     "tipJa": "「バラモン教の祭式」。経典の権威と儀礼の担い手を合わせて捉える。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "ヨーガ・スートラ",
-   "reading": "よーがすーとら",
-   "pos": "noun",
-   "meaning": "the Yoga Sutras of Patañjali",
-   "defJa": "心の働きを静める道を説く古典ヨーガの文献",
-   "passage": {
-    "ja": "「心を無にする本」と紹介すれば短く済みますが、古典の内容を別の教えに重ねてしまう恐れがあります。ヨーガ・スートラを説明するなら、心の働きを静める実践に加えて、観る主体と観られる世界を区別する思想上の枠組みも示せます。これを仏教の無我や、自己と世界の根本の一致を説く不二一元論と、同じ一文で要約するのは無理があります。書名の後に何を目指す修行の文献かを補い、比較する思想ごとの違いを一つ残すだけでも、紹介文の正確さは変わります。",
-    "form": "ヨーガ・スートラ",
-    "en": "Calling it a book about emptying the mind is brief but risks overlaying another teaching onto the text. An introduction to the Yoga Sutras can explain both calming mental activity and the distinction between the observing subject and the observed world. The work cannot be summarized identically with Buddhist no-self or Advaita’s unity of self and ultimate reality. Specifying the aim of its practice and preserving one relevant philosophical distinction improves a short introduction.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "書名の紹介では、瞑想の方法と思想の前提を混同しない。",
     "sense": ""
    },
    "deck": "senmon",

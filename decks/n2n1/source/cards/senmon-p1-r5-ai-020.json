@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "後塵を拝する",
-   "reading": "こうじんをはいする",
-   "pos": "expression",
-   "meaning": "to lag behind others",
-   "defJa": "競争で相手より遅れた位置に立つこと",
-   "passage": {
-    "ja": "新しい半導体の開発競争で後塵を拝すると言われる企業を評価する際は、どの競争の話なのかを確かめましょう。発売の時期が遅いことと、製品の品質や費用で劣ることは同じではなく、狙う顧客が違えば判断する尺度も変わります。競争相手の発表を追うあまり、自社の得意な用途を捨ててしまえば、差別化の機会まで失う恐れがあります。比較表には順位だけを書かず、時期、性能、量産の安定性などを分けて置くと、一つの比喩に押し込められた違いを具体的に検討できます。",
-    "form": "後塵を拝する",
-    "en": "When judging a company said to lag behind in developing new semiconductors, clarify which competition is meant. A later release differs from poorer quality or cost, and the criteria also change with target customers. Focusing so much on competitors’ announcements that a firm abandons its strongest applications may cost it opportunities to differentiate. Separating timing, performance, and production stability in comparison tables rather than giving only ranks makes the differences compressed into one metaphor open to examination.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "他者の後を追う比喩なので、比較する相手と尺度を明らかにする。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "微調整",
    "reading": "びちょうせい",
    "pos": "noun",
@@ -89,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "広帯域メモリ",
-   "reading": "こうたいいきめもり",
-   "pos": "noun",
-   "meaning": "high-bandwidth memory",
-   "defJa": "積層構造などで高速な情報転送を図る記憶装置",
-   "passage": {
-    "ja": "大量の情報を使う計算では、演算の速さだけでなく、記憶装置から情報を運ぶ速さも重要になります。広帯域メモリは、複数の層を重ねた構造などを用いて、多くの情報を効率よくやり取りできるようにしたものです。ただし、この部品を載せればどんな仕事も同じ割合で速くなるわけではなく、処理が情報の転送をどれほど待つかに効果は左右されます。仕組みを学ぶときは、記憶できる総量と一定時間に運べる量を別々に図に書き、容量と転送能力を混同しないようにしましょう。",
-    "form": "広帯域メモリ",
-    "en": "Computations using large amounts of information depend on moving it from memory as well as processing it quickly. High-bandwidth memory uses structures such as stacked layers to exchange large amounts of information efficiently. It does not accelerate every job by the same proportion, since benefits depend on how much the task waits for data transfer. When studying it, mark total storage and transfer capacity per unit time separately in diagrams to avoid confusing capacity with throughput.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "記憶できる総量の大きさと、情報を運ぶ速さは別の性質。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "帰納",
    "reading": "きのう",
    "pos": "noun",
@@ -145,28 +101,6 @@
     "register": "論",
     "topic": "ai",
     "tipJa": "ここでは通信や記憶装置が一定時間に運べる情報量を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "強化学習",
-   "reading": "きょうかがくしゅう",
-   "pos": "noun",
-   "meaning": "reinforcement learning",
-   "defJa": "行動の結果に応じた報酬から方策を学ぶ方法",
-   "passage": {
-    "ja": "強化学習でゲームの操作を覚えるという説明の「報酬」は、人がほめる言葉だけを意味するわけではありません。行動の結果に応じて与えられる数値を手掛かりに、どんな選択をすると長い目でよい結果になるかを学ぶ仕組みです。点数の設定が意図とずれていれば、その数値を高める行動が、設計者の望む遊び方や安全な操作と一致するとは限りません。技術を紹介する文章では、何を報酬として与え、どの範囲の行動を認めたのかを添えると、単に試行錯誤すると書くより内容が明確になります。",
-    "form": "強化学習",
-    "en": "In an explanation of reinforcement learning for game control, reward does not refer only to verbal praise. The method uses numerical feedback from actions to learn which choices yield good results over time. If scoring diverges from the intention, maximizing the number may not produce the play style or safe operation the designer wants. Technical descriptions become clearer when they specify the reward and allowed actions rather than merely saying the system learns by trial and error.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "「報酬」は学習を導く数値で、人間の満足そのものとは限らない。",
     "sense": ""
    },
    "deck": "senmon",

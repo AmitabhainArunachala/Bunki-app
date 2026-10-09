@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "空衣派",
-   "reading": "くうえは",
-   "pos": "noun",
-   "meaning": "Digambara Jain tradition",
-   "defJa": "衣服も所有しない男性修行者を理想とする一派",
-   "passage": {
-    "ja": "裸の修行者の写真を見たら、まず、その姿が誰の生活を示しているかを確かめましょう。ジャイナ教の空衣派では、正式な男性の出家者が衣服を含む所有を離れる一方で、一般の信者まで同じ姿で暮らすという意味ではありません。宗派の理想を、そこに属する全員の日常と重ねると、家族を持つ人々の生活が見えなくなります。修行の厳しさを比べる前に、出家者、女性の修行者、在家の信者という立場を分けて読むと、写真一枚から生まれる誤解を減らせます。",
-    "form": "空衣派",
-    "en": "When looking at a photograph of a naked ascetic, first establish whose way of life it depicts. In the Digambara tradition of Jainism, fully renounced male ascetics give up possessions including clothing, but ordinary adherents do not all live that way. Equating a tradition’s ideal with every member’s daily life obscures the lives of people with families. Before comparing the severity of practices, distinguishing male renunciants, female ascetics, and householders reduces misunderstandings drawn from a single photograph.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「空衣」は空間を衣とするという呼称で、全信者の服装を指さない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "白衣派",
    "reading": "びゃくえは",
    "pos": "noun",

@@ -45,50 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "流動性",
-   "reading": "りゅうどうせい",
-   "pos": "noun",
-   "meaning": "market liquidity",
-   "defJa": "値を大きく変えずに売買を成立させやすい度合い",
-   "passage": {
-    "ja": "画面に株価が表示されていても、その値段で大量の株をすぐ売れるとは限りません。希望する数量に対して買い手が少なければ、価格を下げざるを得ず、売買のしやすさを表す流動性の低さが表面化します。これは企業が良い製品を作っているかどうかとは別の問題で、優れた半導体技術を持つ会社の株でも起こり得ます。運用の成績を計算する際には、表示された価格だけでなく、実際に取引できる数量と、売買に伴う価格のずれにも目を配りましょう。",
-    "form": "流動性",
-    "en": "A share price displayed on a screen does not necessarily mean that a large holding can be sold immediately at that price. If there are few buyers for the desired quantity, the seller may be forced to lower the price, revealing low liquidity. This is separate from whether the company makes good products and can also occur with shares in a company possessing excellent semiconductor technology. When calculating investment performance, consider not only the displayed price but also the quantity that can actually be traded and the price differences associated with trading.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "すぐ売れることと、望む価格で売れることを結ぶ語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "割引現在価値",
-   "reading": "わりびきげんざいかち",
-   "pos": "noun",
-   "meaning": "discounted present value",
-   "defJa": "将来の金額を利率に応じ今の額へ換算した値",
-   "passage": {
-    "ja": "一年後にもらえる百万円と、今すぐ受け取る百万円を比べる練習をしてみましょう。今あるお金を運用できることを考慮し、将来の金額を一定の利率で今の金額へ引き直したものが割引現在価値です。利率が高くなるに伴って、同じ将来の受取額でも、今の価値として計算される額は小さくなります。半導体工場への投資を評価する場合も、何年後に収益が入るかという時間の軸を表に加えると、将来の売上額だけを並べた比較で抜け落ちていた条件に気づけます。",
-    "form": "割引現在価値",
-    "en": "Try comparing a million yen received a year from now with a million yen received immediately. Discounted present value accounts for the ability to invest money available now by converting a future amount into a current amount using a specified rate. As that rate increases, the current value calculated for the same future receipt decreases. When evaluating investment in a semiconductor factory, adding a timeline showing when returns arrive reveals conditions overlooked by a comparison listing only future sales amounts.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "受取時期と利率をそろえて比べる際に使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "インデックス投資",
    "reading": "いんでっくすとうし",
    "pos": "noun",
@@ -145,28 +101,6 @@
     "register": "話",
     "topic": "ai",
     "tipJa": "利息の率と、買う値段を含む収益率は別。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "リスク許容度",
-   "reading": "りすくきょようど",
-   "pos": "noun",
-   "meaning": "risk tolerance",
-   "defJa": "運用でどれほどの損失や変動を受け入れられるか",
-   "passage": {
-    "ja": "「値下がりは平気です」という答えだけでは、その人がお金の損失にどこまで耐えられるかは読み取れません。資産運用の記事でリスク許容度を説明するなら、気持ちの強さに加えて、収入や近く必要になる支出も関係すると補いたいところです。たとえ本人が強気であっても、来月の生活費まで値動きの大きな資産に置けるとは限りません。「怖がりかどうか」という性格の話へ縮めず、損をしても暮らしを維持できる条件を描けば、読者が自分の状況と照らせる文章になります。",
-    "form": "リスク許容度",
-    "en": "The answer “Price declines do not bother me” alone does not reveal how much financial loss someone can withstand. When explaining risk tolerance in an investment article, it helps to add that income and upcoming expenses matter alongside emotional resilience. Even a confident person cannot necessarily place next month's living expenses in volatile assets. Rather than reducing the issue to whether someone is timid, describing the conditions under which they could sustain their life despite losses allows readers to compare the discussion with their own circumstances.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "好みだけでなく、生活への影響も含めて表す。",
     "sense": ""
    },
    "deck": "senmon",

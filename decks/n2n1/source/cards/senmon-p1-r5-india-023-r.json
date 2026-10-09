@@ -21,28 +21,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "無為自然",
-   "reading": "むいしぜん",
-   "pos": "noun",
-   "meaning": "non-forcing and naturalness",
-   "defJa": "作為を離れ物事のおのずからの姿に従うこと",
-   "passage": {
-    "ja": "日本の禅と老荘思想の無為自然を比べるなら、まず修行の目的を別々に確かめましょう。後者は人の作為を離れる生き方を表しますが、その意味を仏教の悟りや執着からの解放へそのまま置き換えると、異なる思想の区別が曖昧になります。どちらも何もしないことを勧めるのだと片付けず、仏教の側では日々の実践が心のあり方とどう結び付くかを読んでいきます。似た表現をきっかけに比較しながらも、戒律や師弟の関係を含む宗教の文脈へ戻ることで、日本の寺院に伝わる実践をより具体的に理解できます。",
-    "form": "無為自然",
-    "en": "When comparing Japanese Zen with non-forcing and naturalness in Lao-Zhuang thought, first examine their practical aims separately. The latter describes living apart from contrivance, but directly replacing its meaning with Buddhist awakening or freedom from attachment blurs distinctions between different traditions. Rather than reducing both to recommendations to do nothing, read how daily Buddhist practice relates to the condition of mind. Comparing through similar expressions while returning to religious contexts, including precepts and teacher-student relationships, makes practices transmitted at Japanese temples more concrete.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "老荘思想の文脈を押さえ、禅の実践と安易に同一視しない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

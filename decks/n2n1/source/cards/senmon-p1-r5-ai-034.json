@@ -131,50 +131,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "株価収益率",
-   "reading": "かぶかしゅうえきりつ",
-   "pos": "noun",
-   "meaning": "price-to-earnings ratio",
-   "defJa": "株価が一株当たり利益の何倍かを示す数値",
-   "passage": {
-    "ja": "一株当たりの利益が同じ二社でも、株価が同じとは限りません。株価をその利益で割った株価収益率を見ると、利益に対してどれだけの価格が付いているかを比べられます。ただし、工場の売却などによる一時的な利益が分母を押し上げた場合、数字が低いからといって、本業まで割安だとは判断できません。半導体企業の決算を読むときも、実績と予想のどちらを使った指標なのかをそろえたうえで、利益が増減した理由を本文へ戻って確かめましょう。",
-    "form": "株価収益率",
-    "en": "Two companies with the same earnings per share do not necessarily have the same share price. The price-to-earnings ratio, calculated by dividing the price by those earnings, lets us compare the price placed on earnings. However, if a one-time gain such as a factory sale raises the denominator, a low ratio alone does not establish that the operating business is cheap. When reading semiconductor companies' results, first ensure that the ratios use a consistent basis of actual or forecast earnings, then return to the text to check why earnings changed.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "利益を分母に置くので、その期間と性質も確かめる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "分散投資",
-   "reading": "ぶんさんとうし",
-   "pos": "noun",
-   "meaning": "investment diversification",
-   "defJa": "資金を異なる複数の運用先に振り分けること",
-   "passage": {
-    "ja": "半導体の会社を十社選べば、一社だけに資金を預ける場合と同じではありません。けれども、全社が同じ需要の落ち込みにさらされるなら、分散投資をしたつもりでも、資産全体が似た動きをする可能性があります。練習用の表に会社名だけでなく、業種、地域、収益を左右する条件も書き込み、重なりを探してみましょう。個別企業の失敗による影響を小さくする働きと、市場全体の下落まで防げるという思い込みを切り離すと、銘柄を増やす目的が明確になります。",
-    "form": "分散投資",
-    "en": "Choosing ten semiconductor companies is different from putting all your money into one. However, if they all face the same decline in demand, your assets may move similarly even though you think you have diversified your investments. In a practice table, list not only company names but also industries, regions, and the conditions affecting their earnings, then look for overlap. Separating the reduction of exposure to one company's failure from the mistaken belief that it prevents a market-wide decline clarifies the purpose of adding holdings.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "銘柄数だけでなく、値動きの共通要因も見る。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

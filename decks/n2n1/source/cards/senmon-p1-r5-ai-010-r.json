@@ -21,28 +21,6 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "パワー半導体",
-   "reading": "ぱわーはんどうたい",
-   "pos": "noun",
-   "meaning": "power semiconductor",
-   "defJa": "電力の変換や制御を担う半導体素子",
-   "passage": {
-    "ja": "半導体を紹介する記事で、すべての部品を「計算を速くするもの」と書くと、電力を扱う仕事が消えてしまいます。パワー半導体は、電圧や電流を制御し、必要な形へ電力を変換するための部品として説明すると、その役割が伝わります。車のモーターや電源装置を例にすれば、情報を計算する仕事と、実際に大きな電力を扱う仕事を区別できます。微細な回路の寸法だけを性能の尺度にするのではなく、どんな電圧や熱の条件で使うのかも添えると、同じ産業にある異なる技術を読み分けられます。",
-    "form": "パワー半導体",
-    "en": "Describing every semiconductor as making calculations faster erases the work of handling electrical power. A power semiconductor's role becomes clearer when presented as controlling voltage and current and converting power into the required form. Examples such as vehicle motors and power supplies distinguish processing information from handling substantial electrical power. Including operating voltage and thermal conditions rather than judging only circuit dimensions helps readers distinguish different technologies within the industry.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "計算の速さを競う半導体と、役割を分けて述べる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

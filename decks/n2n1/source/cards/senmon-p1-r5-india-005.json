@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ウパニシャッド",
-   "reading": "うぱにしゃっど",
-   "pos": "noun",
-   "meaning": "the Upanishads",
-   "defJa": "インドの古い聖典群。師の膝元の教えを意味する語",
-   "passage": {
-    "ja": "ウパニシャッドという語を説明するとき、「師の近くに座り込むこと」という原義を一つ添えておくと、読者はそこから入っていける。もともと師の膝元で弟子が受ける密かな教えを指す語で、その伝え方のありさまが、そのまま文献の題名として定着した。とはいえ原典の中では、この語は儀礼と宇宙とを結ぶ隠れた対応を指すという解釈が有力で、題名の意味とも少しずれる。だから紹介文では「近くに座って聞く学び」という一言を添えるだけで、硬い響きの奥の情景まで伝わって、文章に厚みが出る。",
-    "form": "ウパニシャッド",
-    "en": "When you explain the word Upanishad, if you add a single note of its original meaning, 'sitting down close beside the teacher,' readers can enter from there. It was originally a word for the secret teaching a disciple received at the master's knee, and the very manner of its transmission became fixed as the title of texts. That said, within the original texts the reading is persuasive that the word refers to a hidden correspondence linking ritual and cosmos, which also shifts somewhat from the meaning of the title. So if, in an introductory passage, you add just one line such as 'the learning heard sitting close by,' the scene behind the stiff sound comes through, and the writing gains depth.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「ウパニシャッドを読む」のように文献名として使うのが普通。語源は「近くに座る」。",
-    "sense": "師のそばで伝える密かな教え、およびそれを記す文献"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "高野山",
    "reading": "こうやさん",
    "pos": "noun",

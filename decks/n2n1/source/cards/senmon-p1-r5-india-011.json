@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "入滅",
-   "reading": "にゅうめつ",
-   "pos": "noun",
-   "meaning": "entering nirvana; death of the Buddha",
-   "defJa": "仏や高僧が亡くなることを表す仏教語",
-   "passage": {
-    "ja": "同じ死を伝える文章でも、選ばれる言葉によって、その人と共同体との関係が表れる。入滅は仏や高僧の死を述べる仏教の語であり、苦や迷いを離れる教義上の意味とも重なりながら使われる。釈迦の最後を描く涅槃図には、弟子やさまざまな生き物の姿が配され、別れを受け止める側の世界まで描き込まれる。出来事の日付だけを拾って読む一方で、何を終わりとし、何を教えとして受け継ぐかにも目を向けると、死を表す一語が伝記の結び以上の役割を持つことが分かる。",
-    "form": "入滅",
-    "en": "Words chosen to announce a death express the relationship between a person and a community. Entering nirvana is a Buddhist expression for the death of the Buddha or a great teacher, overlapping with doctrinal release from suffering and delusion. Images of Shakyamuni’s final passing include disciples and other beings, depicting the world receiving the loss. Considering what ends and what is transmitted as teaching reveals more than a biographical closing date.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "「入滅する」。仏や高僧の死を、敬意と教義を伴って表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "仏陀",
    "reading": "ぶっだ",
    "pos": "noun",
@@ -79,28 +57,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "「侘び寂びを感じる」。美意識と仏教の教義を一つにまとめない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "個我",
-   "reading": "こが",
-   "pos": "noun",
-   "meaning": "individual self (jīva)",
-   "defJa": "他と区別された個々の自己",
-   "passage": {
-    "ja": "「私」という言葉が出てきたら、身体や性格だけを指すのか、もっと根本の自己を指すのかを確かめましょう。インド哲学で個我を論じる際は、個々の存在と、世界の究極の根本との関係が問題になり、学派によってその説明は異なります。不二一元論が両者の究極的な一致を説くのに対して、別の立場では個別性の捉え方が変わります。同じ自己という訳語を使っていても、仏教の無我やジャイナ教の魂の議論へそのまま置き換えず、何を認め何を否定するかを表にすると、比較の軸が定まります。",
-    "form": "個我",
-    "en": "When a text says I, check whether it means body and personality or a more fundamental self. Indian discussions of the individual self examine its relationship with ultimate reality, with explanations varying among schools. Advaita affirms ultimate identity, while other positions understand individuality differently. Mapping what each view affirms and denies prevents confusion with Buddhist no-self or Jain accounts of souls.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「個我と普遍的な実在」。自己という訳語の意味を学派ごとに分ける。",
     "sense": ""
    },
    "deck": "senmon",

@@ -1,50 +1,6 @@
 {
  "cards": [
   {
-   "term": "六派哲学",
-   "reading": "ろっぱてつがく",
-   "pos": "noun",
-   "meaning": "the six orthodox schools of Indian philosophy",
-   "defJa": "ヴェーダの権威を認めるインドの六つの哲学体系",
-   "passage": {
-    "ja": "同じ聖なる文献を尊重していても、世界の成り立ちや知識の得方について一致するとは限らない。インドの六派哲学は、ヴェーダの権威を認める六つの体系をまとめた呼び名であり、神や自己について単一の答えを共有する集団ではない。仏教やジャイナ教を含む思想史を読む際は、何を権威とするかという分類の軸と、個々の議論の内容を分けることが役立つ。分類表の中で隣り合っているから似た教えだと決めず、何を問題として問い、どう論証するかまで追うと、同じ枠の内側にも対話や対立が現れる。",
-    "form": "六派哲学",
-    "en": "Respect for the same sacred literature does not guarantee agreement about reality or knowledge. The six orthodox Indian systems accept Vedic authority while offering different answers about self and divinity. Distinguishing that classificatory criterion from specific arguments aids comparison with Buddhism and Jainism. Following questions and reasoning reveals debate within a shared category.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "共通の権威を認める分類であり、六つが同一の教義を持つ意味ではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "内観",
-   "reading": "ないかん",
-   "pos": "noun",
-   "meaning": "introspection; the Naikan method",
-   "defJa": "自分の経験や心の働きを内に向かって省みること",
-   "passage": {
-    "ja": "「自分の心を見る」と訳すだけでは、どのように振り返る実践なのかが伝わりません。内観には広く自己を省みる意味がありますが、日本で発展した方法の名として使う場合は、人との関係を具体的に振り返る枠組みが重要になります。してもらったこと、して返したこと、迷惑をかけたことという観点を示せば、ただ気分を眺める話との違いを書けます。仏教に関わる修養と現代の実践を紹介する文章でも、一般語として使うのか、特定の方法を指すのかに応じて説明を添えると、言葉の幅を保ったまま意味が定まります。",
-    "form": "内観",
-    "en": "Translating it merely as looking within does not explain the practice. Introspection has a broad meaning, while the Japanese method called Naikan uses a specific framework for reviewing relationships. Describing what one received, returned, and caused as trouble distinguishes it from simply observing mood. Clarifying whether the general word or the particular method is intended preserves its range without leaving the meaning vague.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "一般的な自己省察と、日本の特定の実践方法とを区別して使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "六波羅蜜",
    "reading": "ろくはらみつ",
    "pos": "noun",
@@ -57,28 +13,6 @@
     "register": "報",
     "topic": "india",
     "tipJa": "「六波羅蜜を修める」。六項目を互いに関わる菩薩の実践として読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "具現",
-   "reading": "ぐげん",
-   "pos": "noun",
-   "meaning": "embodiment, concrete realization",
-   "defJa": "抽象的な考えなどを具体的な形にすること",
-   "passage": {
-    "ja": "慈悲という言葉を知っていても、目の前の人にどう関わるかは、別に考えなければなりません。具現とは、抽象的な考えを具体的な形にすることで、仏教の教えを彫刻や儀礼、日々の行為に表す場面でも使えます。たとえば仏像の手の形を学ぶとき、その意味と、見る人にどのような働きを伝えるかを結び付けると、名称の暗記から一歩進めます。文章でこの語に出会ったら、何という理念が、どの物や行動に表されたのかを二つの欄に書くと、抽象語のまま読み流さずに内容をつかめます。",
-    "form": "具現",
-    "en": "Knowing the word compassion does not determine how to respond to a person before us. Embodiment means giving concrete form to an abstract idea and can describe Buddhist sculpture, ritual, or conduct. Connecting a statue’s hand gesture with its meaning moves learning beyond names. Identifying which ideal takes form in which object or action makes the abstract verb concrete.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「教えを具現する」。理念と、それが表れた形を一組にして読む。",
     "sense": ""
    },
    "deck": "senmon",
@@ -167,28 +101,6 @@
     "register": "講",
     "topic": "india",
     "tipJa": "「公案を参究する」。知識の正解を当てる問題との違いを示す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "八百万の神",
-   "reading": "やおよろずのかみ",
-   "pos": "noun",
-   "meaning": "the myriad kami",
-   "defJa": "数え切れないほど多くの神々",
-   "passage": {
-    "ja": "数字をそのまま訳すと、神の総数を調査して数えた表現のように伝わってしまいます。八百万の神という日本語では、数の大きさが、数え切れないほど多様な神々の存在を示す働きをしています。神仏習合を説明する文章でも、この語を仏の種類を数えた言葉として扱わず、土地や暮らしに結び付く神々と、仏教の信仰とがどう関わるかを示せます。訳す際に数を残すか、無数とするかは文脈に応じて選べますが、数量の正確さを主張する語ではないという点を読み手と共有したいところです。",
-    "form": "八百万の神",
-    "en": "A literal numerical translation can suggest that someone surveyed the total number of deities. Japan’s myriad kami uses a large number to express innumerable diversity. Accounts of kami-Buddha syncretism should distinguish these locally connected deities from a count of Buddhist figures. Whether retaining the number or translating it as countless, the wording should convey abundance rather than numerical precision.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "八百万という数は、多数を表す慣用的な言い方として読む。",
     "sense": ""
    },
    "deck": "senmon",

@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "虚空",
-   "reading": "こくう",
-   "pos": "noun",
-   "meaning": "empty space, the void",
-   "defJa": "何もなく、ただ広がりだけがある空間のこと",
-   "passage": {
-    "ja": "瞑想を学ぶとき、教義の主張と観察できる経験を区別する癖をつけておくと、あとあと理解が速い。仏典は心を虚空にたとえるけれど、これはあらゆるものを包み込み、どちらにも偏らないという教えであって、測定の結果ではない。語感から想像される完全な空白に反して、坐禅の修行を続けた人の報告では、音や体の感覚がむしろ鮮明に浮かび上がるという。教義が何を説くか、経験が何を示すか、この二つを別の欄に書き分けておくと、原典と研究のどちらを読んでも混乱しない。",
-    "form": "虚空",
-    "en": "When you study meditation, getting into the habit of separating doctrinal claims from observable experience will speed up your understanding later. The Buddhist scriptures liken the mind to empty space, but this is a teaching, that the mind embraces all things without leaning to either side, and not the result of a measurement. Contrary to the total blank the sound of the word suggests, reports from people who have kept up zazen practice say that sounds and bodily sensations surface all the more vividly. If you write down what the doctrine teaches and what experience shows in separate columns, you will not get confused, whether you are reading the original texts or the research.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "仏典では心の広がりのたとえとして「〜にたとえる」の形で現れることが多い",
-    "sense": "仏教で、ものを包み込む広大な空を指す語"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "glm-5.3:cloud",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "識別",
    "reading": "しきべつ",
    "pos": "noun",

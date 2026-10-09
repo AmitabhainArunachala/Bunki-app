@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "布施",
-   "reading": "ふせ",
-   "pos": "noun",
-   "meaning": "giving (dāna); offering to monks",
-   "defJa": "見返りに執着せず他者へ財や教えなどを与えること",
-   "passage": {
-    "ja": "寺に渡す金銭をすべてサービスへの支払いと書くと、宗教的な行為としての意味が薄れます。布施は財や教えなどを他者に与える実践を指し、相手から同額の見返りを受け取る取引とは異なる考え方を含んでいます。具体的な金銭のやり取りを説明する文章では、地域や寺の慣習を確かめつつ、教義上の意味と実際の手続きを分けて示すことができます。与えた量だけで信仰の深さを測るような表現を避け、何をどのような心で差し出す行為なのかを書けば、日常語の寄付との重なりも違いも伝わります。",
-    "form": "布施",
-    "en": "Calling every payment to a temple a service fee can obscure its religious meaning. Giving in Buddhism includes material resources and teachings, with a conception distinct from an equal-return transaction. An account of financial practice can distinguish doctrine from local procedures and customs. Describing what is offered and with what intention communicates both overlap and difference with ordinary donation without measuring faith by quantity.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「布施を行う」。取引の対価と異なる意味を持ち、金銭だけに限られない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "存在論",
    "reading": "そんざいろん",
    "pos": "noun",
@@ -35,50 +13,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "「存在論の問題」。物の有無だけでなく、存在をどう捉えるかを問う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "守破離",
-   "reading": "しゅはり",
-   "pos": "noun",
-   "meaning": "obey, break, leave (stages of mastery)",
-   "defJa": "型を学び深めて独自の境地へ進む過程",
-   "passage": {
-    "ja": "修行の手順を習うとき、最初から自分流に変えれば、何を受け継ごうとしていたのか分からなくなります。守破離は、まず型を守り、それを深めながら独自の境地へ進む過程を表す言葉で、学びの段階を考える手掛かりになります。禅や芸道を論じる文章で出会っても、仏教全体に共通する固定的な修行階級として覚えるのではなく、その場の比喩として捉えましょう。型を離れることは基礎を忘れることと同じではないと押さえれば、何を学び、どこで工夫を加えるのかという問いを具体的に立てられます。",
-    "form": "守破離",
-    "en": "Changing a practice immediately to suit oneself can obscure what was being transmitted. Shu-ha-ri describes learning forms, developing them, and reaching an independent understanding. In writing on Zen and traditional arts, treat it as a framework for learning rather than a universal Buddhist hierarchy. Distinguishing independence from forgetting foundations clarifies what is learned and where innovation enters.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「守破離の段階」。型を捨てる速さではなく、理解の深まりに着目する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "密教",
-   "reading": "みっきょう",
-   "pos": "noun",
-   "meaning": "esoteric Buddhism",
-   "defJa": "儀礼や師からの伝授を重んじる仏教の教え",
-   "passage": {
-    "ja": "秘密という字に引かれて、誰にも話せない不思議な技の集まりだと思わないようにしましょう。密教を学ぶ際は、師からの伝授、印を結ぶ身体、真言を唱える言葉、心の働きが、教えの中でどう結び付くかを押さえることが大切です。日本では真言宗や天台宗の歴史と関わりますが、その源をたどればインドから中国などを経た伝承の道筋があります。像や曼荼羅を眺めるだけで終わらず、どの実践の場で何を示すものなのかを調べると、目に見える形と教えとの関係を学べます。",
-    "form": "密教",
-    "en": "The character meaning secret should not suggest merely a collection of mysterious tricks. Studying esoteric Buddhism involves understanding transmission and the relationships among bodily gestures, mantra, and mind. Its Japanese histories in Shingon and Tendai connect with transmission from India through China and other regions. Relating images and mandalas to their practical settings clarifies their connection with teaching.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「密教の儀礼」。印・真言・心の働きと、師からの伝授に注目する。",
     "sense": ""
    },
    "deck": "senmon",
@@ -123,28 +57,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "「寂静の境地」。周囲の無音と、煩悩を離れた静けさを区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "実存",
-   "reading": "じつぞん",
-   "pos": "noun",
-   "meaning": "existence (existential sense)",
-   "defJa": "自分自身の生として引き受けられる具体的な存在",
-   "passage": {
-    "ja": "人間一般について多くを知っていても、自分が明日どう生きるかという問いは残ります。実存という語は、自分自身の生として引き受ける具体的な存在を考える際に用いられ、宗教や哲学を読むときの重要な視点になります。仏教の苦や無常を学ぶ場合にも、定義を正しく述べられることと、喪失や選択を自分の問題として受け止めることには違いがあります。西洋哲学の用語をそのまま仏教の教義と同一視する必要はありませんが、教えが一人の生にどう関わるかを問う入口として、この語を使えます。",
-    "form": "実存",
-    "en": "Knowledge about humanity in general does not settle how one will live tomorrow. Existence understood as one’s own concrete life offers a perspective for reading religion and philosophy. Defining Buddhist suffering or impermanence differs from confronting loss and choice personally. Without identifying a Western philosophical term with Buddhist doctrine, it can open inquiry into how teaching touches an individual life.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「実存の問題」。人間一般の説明と、自分の生を引き受ける問いを分ける。",
     "sense": ""
    },
    "deck": "senmon",

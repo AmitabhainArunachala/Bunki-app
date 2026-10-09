@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "アライメント",
+   "reading": "あらいめんと",
+   "gloss": "alignment (AI)",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-007.json",
+    "cardId": "nn-c91dba124b-ef98fe46",
+    "wordId": "nn-c91dba124b"
+   }
+  },
+  {
+   "term": "ゲーム理論",
+   "reading": "げーむりろん",
+   "gloss": "game theory",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008-r.json",
+    "cardId": "nn-db97555b26-76d157cc",
+    "wordId": "nn-db97555b26"
+   }
+  },
+  {
+   "term": "チップレット",
+   "reading": "ちっぷれっと",
+   "gloss": "chiplet",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-69ede98142-03b6baf7",
+    "wordId": "nn-69ede98142"
+   }
+  },
+  {
+   "term": "トークン",
+   "reading": "とーくん",
+   "gloss": "token",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-5be7ec4422-bbf6d34e",
+    "wordId": "nn-5be7ec4422"
+   }
+  },
+  {
+   "term": "ファブレス",
+   "reading": "ふぁぶれす",
+   "gloss": "fabless (design-only) company",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010.json",
+    "cardId": "nn-2d5a055221-d3b3eb63",
+    "wordId": "nn-2d5a055221"
+   }
+  },
+  {
+   "term": "ムーアの法則",
+   "reading": "むーあのほうそく",
+   "gloss": "Moore's law",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-012.json",
+    "cardId": "nn-6deb93ae43-bfcccd22",
+    "wordId": "nn-6deb93ae43"
+   }
+  },
+  {
+   "term": "一強",
+   "reading": "いっきょう",
+   "gloss": "sole dominant player",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-012.json",
+    "cardId": "nn-2e5a2cb8e1-6c446309",
+    "wordId": "nn-2e5a2cb8e1"
+   }
+  },
+  {
+   "term": "不純物添加",
+   "reading": "ふじゅんぶつてんか",
+   "gloss": "semiconductor doping",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-040.json",
+    "cardId": "nn-c9ce878610-7bcb554a",
+    "wordId": "nn-c9ce878610"
+   }
+  }
+ ],
+ "weave": [
+  "アライメント",
+  "ゲーム理論",
+  "チップレット",
+  "トークン",
+  "ファブレス",
+  "ムーアの法則",
+  "一強",
+  "不純物添加"
+ ]
+}

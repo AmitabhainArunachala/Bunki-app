@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "一強",
-   "reading": "いっきょう",
-   "pos": "noun",
-   "meaning": "sole dominant player",
-   "defJa": "一つの勢力だけが他を大きく上回る状態",
-   "passage": {
-    "ja": "ある半導体市場で一社が大きな割合を占めると、その分野は一強だと表現されることがあります。けれども、売上の規模が大きいことと、あらゆる用途で技術が優れていることは、同じ意味ではありません。市場を広く取るか狭く取るかによっても見え方が変わるため、どの製品を数えた比較なのかが重要です。企業の記事を読むときは、強いという評価をそのまま受け取るのに加えて、売上、利益、性能のどれで比べた話かを確認すると、大きな見出しの中にある条件を取り出せます。",
-    "form": "一強",
-    "en": "When one company accounts for a large share of a semiconductor market, the sector may be described as dominated by a single player. Large sales do not mean technological superiority for every use, however. The picture also changes with how broadly the market is defined, making the products included in the comparison important. Checking whether an article compares sales, profits, or performance extracts the conditions behind a bold headline about corporate strength.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "何の市場で、どの尺度により強いかを補う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "ロジック半導体",
    "reading": "ろじっくはんどうたい",
    "pos": "noun",
@@ -101,50 +79,6 @@
     "register": "論",
     "topic": "ai",
     "tipJa": "主役を独占するのでなく、他の役割との分担を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "ムーアの法則",
-   "reading": "むーあのほうそく",
-   "pos": "noun",
-   "meaning": "Moore's law",
-   "defJa": "集積される素子数が一定期間で倍増するとの経験則",
-   "passage": {
-    "ja": "半導体の歴史を学ぶとき、部品が増えるグラフと、計算が速くなるグラフを同じものとして覚えないようにしましょう。ムーアの法則は、集積されるトランジスタの数が一定の期間で倍増する傾向を述べたもので、すべての処理速度が必ず同じ割合で伸びるという物理法則ではありません。素子が増えても、電力や熱、データの移動が制約となれば、実際の速さは別の条件に左右されます。グラフの縦軸を読む習慣を付けると、技術の進歩を示す数字が、何を数えた結果なのかを確認して理解できます。",
-    "form": "ムーアの法則",
-    "en": "When studying semiconductor history, do not treat a graph of component counts as identical to one of computing speed. Moore's law describes a tendency for integrated transistor counts to double over a certain period, not a physical law guaranteeing the same improvement in every processing speed. Even with more devices, actual speed depends on other conditions when power, heat, or data movement constrains it. A habit of reading the vertical axis helps identify what the figures describing technological progress actually count.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "処理速度が必ず同じ比率で伸びる物理法則ではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "不可逆",
-   "reading": "ふかぎゃく",
-   "pos": "na-adj",
-   "meaning": "irreversible",
-   "defJa": "元の状態へそのまま戻すことができない性質",
-   "passage": {
-    "ja": "画像を圧縮する仕組みを学ぶとき、容量が減ったことだけでなく、何の情報を残したかを確かめましょう。細かな違いを捨てる不可逆な変換では、見た目がよく似ていても、元のデータを完全に取り戻せるとは限りません。これは処理を逆の順序で行えば済むという問題ではなく、区別に必要だった情報が結果の中に残っていないことに関わります。練習用の小さな画像を用意し、保存前と後でどこが変わったかを比べると、ファイルを開けることと、元の情報が保たれていることを分けて理解できます。",
-    "form": "不可逆",
-    "en": "When learning image compression, check what information remains as well as how much storage shrinks. An irreversible transformation that discards fine differences may preserve a similar appearance without allowing exact recovery of the original data. Reversing the order of operations is not enough when information needed to distinguish originals is no longer present in the result. Comparing a small practice image before and after saving separates the ability to open a file from preservation of the original information.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "操作を戻すボタンと、情報が残ることを区別する。",
     "sense": ""
    },
    "deck": "senmon",

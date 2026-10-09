@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "不立文字",
-   "reading": "ふりゅうもんじ",
-   "pos": "noun",
-   "meaning": "not relying on words",
-   "defJa": "悟りを文字の説明だけに依存させないという禅の立場",
-   "passage": {
-    "ja": "「文字は要らない」と見出しにすると、禅寺で経典を読み、語録を残してきた歴史とぶつかります。不立文字を説明する文章では、悟りを文字の説明だけに置き換えないという方向を示せば、読むこと自体の禁止とは区別できます。地図を熟読しても歩いた経験とは同じにならない、という比喩は役立ちますが、それは地図を捨てる命令ではありません。短い紹介文でも、「だけ」をどこに置くかに注意すると、実践を重んじる教えが、知識を軽んじる標語へ変わってしまうのを防げます。",
-    "form": "不立文字",
-    "en": "A headline declaring words unnecessary clashes with Zen’s history of reading scriptures and preserving recorded sayings. Explaining transmission beyond words as refusing to replace awakening with verbal explanation distinguishes it from banning reading itself. A map is not the experience of walking, but that does not instruct anyone to discard maps. Careful placement of only keeps a concise account of practice from becoming a slogan against knowledge.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "「文字だけに頼らない」と「文字を使わない」の違いを示している。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "中道",
    "reading": "ちゅうどう",
    "pos": "noun",
@@ -167,28 +145,6 @@
     "register": "論",
     "topic": "india",
     "tipJa": "「主客未分の経験」。主体と対象を分ける前という視点で読む。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "不生不滅",
-   "reading": "ふしょうふめつ",
-   "pos": "noun",
-   "meaning": "neither arising nor ceasing",
-   "defJa": "本来的には生じも滅びもしないという仏教の表現",
-   "passage": {
-    "ja": "目の前の花が咲いて散るのに、生まれも消えもしないと言われると矛盾に感じます。大乗仏教の不生不滅を読むときは、日常に見える変化と、ものが独立した実体として成立するかという問いを分けることが手掛かりになります。条件によって生じる現象を否定しているのか、その現象に固定した本体を置く見方を否定しているのかで、理解は大きく違います。文献ごとの説明を確かめながら、まず何が否定されているかを文の中で囲んでおくと、単なる不老不死の話として読む誤りを避けられます。",
-    "form": "不生不滅",
-    "en": "A flower blooming and falling seems to contradict a claim of neither arising nor ceasing. Reading this Mahayana expression benefits from distinguishing ordinary change from independent intrinsic existence. Denying conditional phenomena differs greatly from rejecting a fixed essence behind them. Identifying exactly what each text negates helps avoid mistaking the phrase for a claim of physical immortality.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "変化の否定か、独立した実体の否定かを区別して読む。",
     "sense": ""
    },
    "deck": "senmon",

@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "諸法無我",
-   "reading": "しょほうむが",
-   "pos": "noun",
-   "meaning": "all phenomena are without a fixed self",
-   "defJa": "どの存在にも不変で独立した本体はないという教え",
-   "passage": {
-    "ja": "仏教の説明文で諸法無我を「私は存在しない」とだけ言い換えると、日常の人間まで消えるような誤解を招きます。ここで問題にされるのは、条件や関係から独立して、いつまでも変わらずにある実体を想定することです。たとえ短い紹介文とはいえ、「自分なんて無価値だ」という自己否定と、存在の成り立ちを問う教えとを混ぜてはいけません。縁起とのつながりを一言添え、周囲との関係を離れた固定的な自分を探しても見つからない、と書けば論点が絞れます。",
-    "form": "諸法無我",
-    "en": "In an explanation of Buddhism, paraphrasing the teaching that all phenomena lack a self merely as “I do not exist” invites the misunderstanding that ordinary people disappear. The issue is the assumption of an entity that remains unchanged forever, independent of conditions and relationships. Even in a short introduction, one must not mix self-rejection such as “I am worthless” with a teaching that questions how existence is constituted. Adding its connection to dependent arising and writing that a fixed self cannot be found apart from its relationships narrows the point.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "無価値や虚無の意味にせず、固定的な実体の否定として説明する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "説法",
    "reading": "せっぽう",
    "pos": "noun",
@@ -101,28 +79,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "僧などが人に教えを伝える営みで、単なる叱責とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "誓願",
-   "reading": "せいがん",
-   "pos": "noun",
-   "meaning": "a solemn Buddhist vow",
-   "defJa": "救済や悟りの実現を固く願い誓うこと",
-   "passage": {
-    "ja": "望みを口にすることと、その実現のために生き方を定めることは同じではない。菩薩が人々の救済を誓う誓願には、目の前の利益を願うだけでは捉えきれない、実践を支える方向づけがある。慈悲をめぐって立派な言葉を並べても、困っている他者との関わりを避け続けるなら、その言葉は行動から切り離される。経典に記された大きな願いを読む際には、壮大さに圧倒されるだけでなく、誰の苦しみに向かって修行が開かれているのかを問いたい。",
-    "form": "誓願",
-    "en": "Expressing a wish is not the same as shaping one’s life toward its realization. A bodhisattva’s vow to save others gives practice a direction that cannot be captured by merely wishing for immediate benefits. However admirable one’s words about compassion, they become detached from action if one continually avoids engaging with others in need. When reading great aspirations recorded in sutras, one should ask toward whose suffering practice is directed, instead of simply being overwhelmed by their grandeur.",
-    "register": "論",
-    "topic": "india",
-    "tipJa": "「立てる」「果たす」と結び付き、実践を伴う強い願いを表す。",
     "sense": ""
    },
    "deck": "senmon",

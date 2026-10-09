@@ -1,0 +1,312 @@
+{
+ "cards": [
+  {
+   "term": "自業自得",
+   "reading": "じごうじとく",
+   "pos": "noun",
+   "meaning": "reaping what one sows; self-inflicted result",
+   "defJa": "自分の行いの報いを、自分が受けること",
+   "passage": {
+    "ja": "約束を何度も破った人が信用を失うと、周囲は自業自得だと片付けることがあります。自分の行いの結果を自分が受けるという筋はあっても、今その人が抱える困難のすべてを一つの原因で説明できるとは限りません。仏教の業をめぐる考えに触れるときも、原因と結果の問題を、苦しむ人には助けが不要だという結論へ飛躍させない注意が要ります。責任を認めることと立ち直る道を閉ざすことを分ければ、本人が過去の行為を引き受けながら、他者の支援を得る余地も残ります。",
+    "form": "自業自得",
+    "en": "When someone loses trust after repeatedly breaking promises, others may dismiss it as their own doing. Although one can trace consequences back to personal actions, that does not mean every present difficulty has a single cause. Buddhist discussions of karma likewise require care against jumping from cause and effect to the conclusion that someone suffering needs no help. Distinguishing responsibility from closing off recovery allows people to acknowledge past actions while still receiving support from others.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "行いの報いを本人が受ける意味で、現代では非難の響きも強い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-36774f5ff4-76df6b43",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-001.json",
+    "cardId": "nn-36774f5ff4-76df6b43",
+    "wordId": "nn-36774f5ff4"
+   }
+  },
+  {
+   "term": "開祖",
+   "reading": "かいそ",
+   "pos": "noun",
+   "meaning": "founder (of a sect)",
+   "defJa": "一つの宗教や宗派を初めて開いた人物",
+   "passage": {
+    "ja": "親鸞の教えは弟子や後の人々によって受け継がれ、寺院や教団の組織へと展開した。浄土真宗の開祖として位置付けられる人物の生涯だけをたどっても、現在につながる制度のすべてがその時点で完成していたことにはならない。教えを伝えることに加え、文書を集め、門徒の結び付きを保ち、寺を運営する仕事が世代を越えて続いた。宗派の成立には出発点となる人物がいる一方、その後の共同体が何を継承し、どのように形を整えたかという長い過程も含まれる。",
+    "form": "開祖",
+    "en": "Shinran’s teachings were transmitted by disciples and later generations, developing into temples and organized religious communities. Tracing the life of the figure recognized as the founder of Jodo Shinshu does not imply that every institution leading to the present was completed during his lifetime. Alongside transmitting teachings, people continued collecting writings, maintaining ties among followers, and running temples across generations. A denomination’s formation includes both a founding figure and the long process through which subsequent communities chose what to inherit and how to organize it.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "宗派を開いた人物で、後代の組織の発展を担う人々とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-2b69e7cbf4-cca1e732",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-031.json",
+    "cardId": "nn-2b69e7cbf4-cca1e732",
+    "wordId": "nn-2b69e7cbf4"
+   }
+  },
+  {
+   "term": "誓願",
+   "reading": "せいがん",
+   "pos": "noun",
+   "meaning": "a solemn Buddhist vow",
+   "defJa": "救済や悟りの実現を固く願い誓うこと",
+   "passage": {
+    "ja": "自分一人が静かな場所で安らげても、外で続く他者の苦しみは消えない。菩薩が衆生を救おうと立てる誓願は、自分の完成だけを目的とせず、修行を他者へ開く方向を定める。目の前の一人に手を差し伸べるだけで世界の苦が尽きるはずはないが、それを理由に何もしなければ、壮大な願いは言葉のまま残る。果たし切れないほどの願いを抱くことは、一度の善行で役割を終えたと満足する姿勢を揺さぶり、次の出会いへと実践をつなぐ力にもなり得る。",
+    "form": "誓願",
+    "en": "Even if one finds peace alone in a quiet place, other people’s suffering outside does not disappear. A bodhisattva’s vow to liberate sentient beings directs practice toward others rather than making personal perfection its sole aim. Helping one person cannot end all the world’s suffering, but doing nothing on that account leaves a grand aspiration merely verbal. Holding an aspiration too vast to exhaust can challenge satisfaction after a single good deed and sustain practice into the next encounter.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「立てる」と結び付き、実践の方向を定める固い宗教的な願い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b4126fd0c6-14281899",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-029.json",
+    "cardId": "nn-b4126fd0c6-14281899",
+    "wordId": "nn-b4126fd0c6"
+   }
+  },
+  {
+   "term": "衆生",
+   "reading": "しゅじょう",
+   "pos": "noun",
+   "meaning": "sentient beings",
+   "defJa": "仏教でいう生きとし生けるもの",
+   "passage": {
+    "ja": "人の苦しみには敏感なのに、庭へ入った小さな生き物には邪魔だという感情しか起きないことがある。仏教が救済の対象とする衆生には人間だけでなく動物も含まれ、慈悲の範囲は自分に似た者へ限られない。もちろん、生活の中で命を傷つけずに済む場面ばかりではなく、現実との間に難しい緊張が残る。その緊張を消すために相手の苦しみを初めから数に入れないのでなく、姿や大きさにかかわらず苦を抱える存在として見ることが、実践の出発点となる。",
+    "form": "衆生",
+    "en": "One may be sensitive to human suffering yet feel only annoyance toward a small creature entering the garden. Sentient beings, the objects of Buddhist liberation, include animals as well as humans, so compassion extends beyond beings resembling oneself. Daily life does not always allow harm to be avoided, and a difficult tension with reality remains. The starting point for practice is to see beings of any size or form as subject to suffering rather than excluding their pain in advance to eliminate that tension.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏教で、人間を越えて救済や慈悲の対象となる生きもの。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1934884b32-677777ed",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-1934884b32-677777ed",
+    "wordId": "nn-1934884b32"
+   }
+  },
+  {
+   "term": "虚空",
+   "reading": "こくう",
+   "pos": "noun",
+   "meaning": "empty space, the void",
+   "defJa": "何もなく、ただ広がりだけがある空間のこと",
+   "passage": {
+    "ja": "雲が空を覆っても、空そのものまで狭くなったと考える必要はありません。仏教では、何ものにも妨げられない広がりを示す虚空が、心や教えのあり方を捉える譬えに用いられます。瞑想中に怒りや不安が現れたとしても、それを心の全体と決めつけず、現れては変わるものとして眺める余地があります。ただし、このような譬えは心の働きに向き合うためのものであり、頭の中に物理的な空間が広がっていると測定した話とは区別されます。",
+    "form": "虚空",
+    "en": "Clouds covering the sky need not imply that the sky itself has grown smaller. In Buddhism, empty space with an unobstructed expanse serves as a metaphor for aspects of mind and teaching. Even when anger or anxiety appears during meditation, it can be viewed as something arising and changing rather than the entirety of the mind. Such a metaphor concerns how to engage with mental activity and must be distinguished from a measurement of physical space inside the head.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "妨げのない広がりを持つ空間で、仏教では譬えにも使われる。",
+    "sense": "仏教で、ものを包み込む広大な空を指す語"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-dbf1a5d7a7-9fcb64e5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-002.json",
+    "cardId": "nn-dbf1a5d7a7-9fcb64e5",
+    "wordId": "nn-dbf1a5d7a7"
+   }
+  },
+  {
+   "term": "隠元",
+   "reading": "いんげん",
+   "pos": "noun",
+   "meaning": "Ingen Ryuki",
+   "defJa": "江戸時代に来日し宇治の萬福寺を開いた中国僧",
+   "passage": {
+    "ja": "宇治の萬福寺に入ると、建物の姿からも中国とのつながりを感じ取れます。江戸時代に中国から来日した隠元は、この寺を開き、弟子たちとともに禅の実践や文化を日本へ伝えました。信仰の移動に伴って渡ってくるのは教義だけでなく、儀礼の音や食事の作法、建物をどう配置するかという生活の形でもあります。一人の僧の旅が残した足跡は、人名の記憶にとどまらず、異なる土地の文化が出会い、日々の動作として受け継がれる場所に今も刻まれています。",
+    "form": "隠元",
+    "en": "Entering Manpukuji in Uji, one can sense its connection with China in the buildings themselves. Ingen came from China during the Edo period, founded the temple, and transmitted Zen practice and culture to Japan with his disciples. The movement of faith carries not just doctrine but forms of life such as ritual sounds, dining etiquette, and building arrangements. The traces of one monk’s journey remain beyond the memory of his name in a place where cultures from different lands meet and are transmitted through everyday actions.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "中国から来日し、宇治の萬福寺を開いた僧の名。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-3f9835670d-aa179fd4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-004.json",
+    "cardId": "nn-3f9835670d-aa179fd4",
+    "wordId": "nn-3f9835670d"
+   }
+  },
+  {
+   "term": "霊性",
+   "reading": "れいせい",
+   "pos": "noun",
+   "meaning": "spirituality, spiritual nature",
+   "defJa": "宗教的な深みや精神の根底に関わる性質",
+   "passage": {
+    "ja": "寺の静けさの中で、いつも急いで追い求めていたものが、急に小さく感じられることがあります。こうした場で問われる霊性は、単なる気分転換よりも、生の根底や宗教的な深みに関わる性質を指します。仏教の実践に触れた人が、損得を超えて他者との関わりを捉え直すなら、安らいだという感想だけでは尽くせない変化が含まれます。ただし、その深さを一つの数値で比べることは難しく、同じ場所に来た人が同じ意味を受け取ると決めることもできません。",
+    "form": "霊性",
+    "en": "In a temple’s stillness, what one has hurriedly pursued can suddenly seem small. Spirituality in such a setting concerns religious depth and the foundations of life more than a simple change of mood. If encountering Buddhist practice leads someone to reconsider relationships beyond personal gain, that change cannot be exhausted by saying they felt relaxed. Such depth is difficult to compare through a single numerical measure, however, and visitors to the same place cannot be assumed to receive the same meaning.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "宗教や生の根底に関わる精神的な深みを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-dabc3baf91-496b9dd1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-dabc3baf91-496b9dd1",
+    "wordId": "nn-dabc3baf91"
+   }
+  },
+  {
+   "term": "草木国土悉皆成仏",
+   "reading": "そうもくこくどしっかいじょうぶつ",
+   "pos": "noun",
+   "meaning": "all plants and lands attain buddhahood",
+   "defJa": "草木や大地まで仏となるとする教え",
+   "passage": {
+    "ja": "山の木をただ建材として眺める人と、仏の世界に関わる存在として向き合う人では、同じ森の意味が変わります。草木国土悉皆成仏という日本仏教の表現は、人間に限らず草木や大地にまで成仏の範囲を広げます。これは植物に人間と同じ意識があると測定した結果ではなく、仏となることと自然のあり方をめぐる宗教的な問いです。人間の救いだけを自然から切り離して考える姿勢に対し、生きる場所そのものを含んだ世界を示すところに、この言葉の大胆さがあります。",
+    "form": "草木国土悉皆成仏",
+    "en": "The same forest means different things to someone seeing its trees only as building materials and someone approaching them as participants in the Buddha’s world. The Japanese Buddhist expression that all plants and lands attain buddhahood extends its scope beyond humans to vegetation and the earth. This is a religious inquiry into buddhahood and nature, rather than a measurement establishing that plants have humanlike consciousness. The expression’s boldness lies in presenting a world including the very place of life, challenging the separation of human salvation from nature.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "成仏の範囲を草木や大地へ広げる、日本仏教の表現。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ab46e85ba1-f846096a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-ab46e85ba1-f846096a",
+    "wordId": "nn-ab46e85ba1"
+   }
+  },
+  {
+   "term": "見性",
+   "reading": "けんしょう",
+   "pos": "noun",
+   "meaning": "seeing one’s true nature",
+   "defJa": "禅で、自らの本性を直接見きわめること",
+   "passage": {
+    "ja": "禅の修行で重視されるのは、教義を正確に暗唱する能力だけではない。自らの本性を直接見きわめる見性は、特に臨済禅の実践を考える上で重要な概念である。公案に取り組む修行者の理解は師とのやり取りで問い直され、一度強い体験を得たからといって、その後の日常の実践が不要になるとはされない。体験の珍しさや快さよりも、自己の捉え方がどのように変わり、それが継続する修行にどう結び付くかに、伝統の中での関心が向けられてきた。",
+    "form": "見性",
+    "en": "Zen practice values more than the ability to recite doctrine accurately. Kensho, directly discerning one’s true nature, is an important concept particularly for understanding Rinzai practice. A practitioner’s understanding while working with koans is challenged through exchanges with a teacher, and a powerful initial experience is not taken to remove the need for subsequent everyday practice. Within the tradition, attention has focused on changes in the understanding of self and their relation to continuing practice rather than merely the novelty or pleasure of an experience.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "禅で本性を直接見きわめることを指し、その後も修行は続く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-eeebb89a7d-b8d608c6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-eeebb89a7d-b8d608c6",
+    "wordId": "nn-eeebb89a7d"
+   }
+  },
+  {
+   "term": "鈴木大拙",
+   "reading": "すずきだいせつ",
+   "pos": "noun",
+   "meaning": "Daisetz Suzuki",
+   "defJa": "禅などの仏教思想を海外にも紹介した思想家",
+   "passage": {
+    "ja": "鎌倉の円覚寺で禅を学んだ青年が、海を渡ってアメリカの出版社で働き、仏教を英語で伝える仕事へ進みました。鈴木大拙は、その後も著作や講義を通じて、禅をはじめとする思想を広く海外へ紹介した人物です。異なる文化の間を行き来する仕事では、同じ語を置き換えるだけでなく、相手が何を疑問に思うかに応じて入口を作る必要が生じます。彼の活動は、教えが国境を越える際に、受け継いだ伝統と新しい聞き手との出会いから、別の理解の場が生まれることを示しています。",
+    "form": "鈴木大拙",
+    "en": "A young man who studied Zen at Engakuji in Kamakura crossed the ocean to work for an American publisher and began conveying Buddhism in English. Daisetz Suzuki subsequently introduced Zen and other traditions widely abroad through books and lectures. Work between cultures requires not merely substituting words but creating points of entry according to the audience’s questions. His activities show how teachings crossing borders create new settings for understanding through encounters between inherited traditions and new audiences.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "禅などの仏教思想を英語の著作や講義でも海外に紹介した人物。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-46496c3379-27c95ba5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-46496c3379-27c95ba5",
+    "wordId": "nn-46496c3379"
+   }
+  },
+  {
+   "term": "臨済宗",
+   "reading": "りんざいしゅう",
+   "pos": "noun",
+   "meaning": "the Rinzai school of Zen",
+   "defJa": "中国の臨済義玄の系統を引く禅の宗派",
+   "passage": {
+    "ja": "禅の道場で問いを与えられた修行者が、知識を並べて答えたのに認められないことがあります。中国の臨済義玄の系統を引く臨済宗では、公案に取り組み、師の指導を受けながら自己を究める修行が重視されてきました。問いは正解の文句を暗記する試験というより、いつもの分別に頼る自分のあり方を揺さぶる働きを持ちます。日本での展開には白隠らによる工夫もあり、一つの体験を得たらすべて終わりとするのでなく、その後の実践を含む修行の道が伝えられています。",
+    "form": "臨済宗",
+    "en": "A practitioner given a question in a Zen training hall may offer a knowledgeable answer and still find it unaccepted. Rinzai Zen, descended from the lineage of Linji Yixuan in China, has emphasized investigating the self through koans under a teacher’s guidance. Such questions act less as tests of memorized answers than as challenges to one’s reliance on habitual discriminations. The Japanese tradition includes developments by Hakuin and others, transmitting a path of practice that continues after an initial experience rather than ending there.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "中国の臨済義玄につながる禅の宗派で、公案の修行を重んじる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-63dca114c0-83a3fb84",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-63dca114c0-83a3fb84",
+    "wordId": "nn-63dca114c0"
+   }
+  }
+ ]
+}

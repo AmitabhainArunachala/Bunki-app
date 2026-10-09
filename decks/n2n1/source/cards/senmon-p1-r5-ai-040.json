@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "不純物添加",
-   "reading": "ふじゅんぶつてんか",
-   "pos": "noun",
-   "meaning": "semiconductor doping",
-   "defJa": "別の元素を少量加えて材料の性質を変えること",
-   "passage": {
-    "ja": "半導体の材料を学ぶとき、「不純物はすべて悪い」と覚えてしまうと、製造工程の説明でつまずきます。不純物添加では、別の元素を狙った量と場所に加えることで、電流を運ぶ電子や穴のような働きをするものの数を調整します。勝手に混ざった汚れを取り除く工程とは目的が異なるので、材料を清浄にする作業と矛盾すると考える必要はありません。工程図を読む際には、「何を減らすか」と「何を制御して加えるか」を色分けすると、同じ材料から異なる電気的性質を作る流れを整理できます。",
-    "form": "不純物添加",
-    "en": "When learning semiconductor materials, memorizing that every impurity is bad creates problems when reading manufacturing explanations. Doping adjusts the population of electrons and hole-like charge carriers by adding another element at chosen concentrations and locations. Its purpose differs from removing accidental contamination, so it need not be seen as contradicting purification. Color-coding what is removed and what is deliberately added in a process diagram helps organize how different electrical properties are produced from the same material.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "取り除くべき混入と、狙って加える操作を分ける。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "ゲート絶縁膜",
    "reading": "げーとぜつえんまく",
    "pos": "noun",
@@ -101,28 +79,6 @@
     "register": "話",
     "topic": "ai",
     "tipJa": "動作していないように見える回路の消費にも関わる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "化学機械研磨",
-   "reading": "かがくきかいけんま",
-   "pos": "noun",
-   "meaning": "chemical mechanical polishing",
-   "defJa": "薬液の作用と物理的な摩擦で表面を平らにする加工",
-   "passage": {
-    "ja": "製造工程の記事で「表面を磨く」とだけ書くと、見た目をつややかにする作業だと受け取られがちです。化学機械研磨を説明するなら、薬液の化学的な作用と物理的な摩擦を組み合わせ、薄い層の表面を平らに整える加工だと補います。半導体では次の層を正確に作るためにも平坦さが関わるので、家具を磨く比喩を使うにしても、その目的の違いを残したいところです。削り過ぎや場所による差を抑えるという一節を添えれば、単に強くこすれば済む工程ではないことまで伝わります。",
-    "form": "化学機械研磨",
-    "en": "Writing only that a surface is polished in a manufacturing article can suggest a cosmetic task intended to make it shiny. An explanation of chemical mechanical polishing should describe combining chemical action from a liquid with physical friction to flatten a thin layer's surface. Because flatness helps subsequent semiconductor layers form accurately, even a furniture-polishing analogy should preserve the difference in purpose. Adding a phrase about controlling excessive removal and variation across locations conveys why the process is more than rubbing harder.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "削るだけの比喩にせず、二つの作用を示す。",
     "sense": ""
    },
    "deck": "senmon",

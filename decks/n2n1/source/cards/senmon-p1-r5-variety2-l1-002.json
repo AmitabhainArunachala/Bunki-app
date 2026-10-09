@@ -1,0 +1,200 @@
+{
+ "cards": [
+  {
+   "term": "基板",
+   "reading": "きばん",
+   "pos": "noun",
+   "meaning": "a substrate or circuit board",
+   "defJa": "回路や部品を載せる土台となる板",
+   "passage": {
+    "ja": "電子機器のふたを開けると、小さな部品が板の上に整然と並んでいます。この基板は部品を支えるだけでなく、表面や内部の配線を通して電気を必要な場所へ運ぶ役目を担います。部品を同じものにそろえても、配置や配線が違えば、信号の伝わり方や熱の逃げ方が変わります。そのため、回路図どおりにつながっているかに加えて、実際の板の上で部品同士がどのくらい離れ、どんな経路で結ばれるかが、安定して動く製品を作るうえで重要です。",
+    "form": "基板",
+    "en": "Opening an electronic device reveals small components neatly arranged on a board. This circuit board not only supports them but carries electricity where it is needed through wiring on its surface and inside it. Even identical components transmit signals and release heat differently when placement and wiring change. Building a reliable product therefore requires attention to physical spacing and routing on the board as well as whether the connections match the circuit diagram.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "部品を載せ、配線によって電気的につなぐ板状の土台。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f2ff749724-64ec98f6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-f2ff749724-64ec98f6",
+    "wordId": "nn-f2ff749724"
+   }
+  },
+  {
+   "term": "再帰",
+   "reading": "さいき",
+   "pos": "noun",
+   "meaning": "recursion",
+   "defJa": "同じ仕組みを自分の一部の処理にも使うこと",
+   "passage": {
+    "ja": "箱の中に小箱が入り、その小箱にも別の箱が入っているとき、全部の品物を数えるにはどうしますか。箱を開けて品物を数え、さらに箱があれば同じ手順を適用する方法が、再帰の分かりやすい例です。底の箱に着いて初めて数が確定し、その結果を使って一つ外側の箱の合計を出せます。単純な操作を繰り返すように見えても、途中の計算が内側の結果を待っている点に特徴があり、どこで分解を止めるかを決めておかないと処理が終わりません。",
+    "form": "再帰",
+    "en": "How would you count every item when a box contains smaller boxes that contain still more boxes? Opening a box, counting its items, and applying the same procedure to any boxes inside is an accessible example of recursion. Only on reaching the innermost box does a count become final, allowing that result to be used for the total one level out. Although it resembles repetition of a simple operation, each unfinished calculation waits for an inner result, so the procedure will not finish unless a stopping point is defined.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "小さな部分へ同じ処理を適用し、その結果を外側へ返す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-4138b9ed53-6ce4e738",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-4138b9ed53-6ce4e738",
+    "wordId": "nn-4138b9ed53"
+   }
+  },
+  {
+   "term": "停止問題",
+   "reading": "ていしもんだい",
+   "pos": "noun",
+   "meaning": "halting problem",
+   "defJa": "任意のプログラムが実行を終えるかを問う問題",
+   "passage": {
+    "ja": "画面が固まったとき、計算が長引いているのか、永久に終わらないのかは、少し待つだけでは決まりません。停止問題は、与えられたプログラムと入力について、その実行がいつか終わるかを問います。個別に答えられる例はあっても、あらゆる組合せに必ず正しく答える一般的な手順は存在しません。「この処理は終わる」と確認できた一例から、すべての処理を判定できると広げてしまうと、計算に時間がかかる問題と、原理的な限界との区別が失われます。",
+    "form": "停止問題",
+    "en": "When a screen freezes, waiting briefly cannot determine whether the calculation is merely slow or will never end. The halting problem asks whether execution of a given program on a given input will eventually finish. Although individual cases can be decided, no general procedure always gives the correct answer for every combination. Extending one confirmed terminating case to a claim that all computations can be decided erases the distinction between a time-consuming problem and a fundamental limit.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "特定の計算の長さと、すべての計算を判定できるかという問いは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-41b7b83f1e-94e1a9e2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-41b7b83f1e-94e1a9e2",
+    "wordId": "nn-41b7b83f1e"
+   }
+  },
+  {
+   "term": "嚆矢",
+   "reading": "こうし",
+   "pos": "noun",
+   "meaning": "a pioneering first instance",
+   "defJa": "ある物事を始める最初の例やきっかけ",
+   "passage": {
+    "ja": "最初の実演で装置が動いても、そのまま街中へ広がるとは限りません。ある試作品が新しい産業の嚆矢となるには、後から続く人々が技術を受け継ぎ、使い道や製造の仕組みを育てる必要があります。「最初に作った」という功績と、「普及させた」という功績の持ち主が違うこともあります。一台の機械を起点に長い変化が始まるという見方は、発明者の名をたたえるだけでなく、その後に重なった無数の改良にも目を向けさせます。",
+    "form": "嚆矢",
+    "en": "A device working at its first demonstration does not guarantee it will spread through society. For a prototype to become the starting point of a new industry, others must inherit its technology and develop applications and manufacturing systems. The people credited with inventing and popularizing it may be different. Viewing one machine as the beginning of a long transformation draws attention not only to the inventor but also to countless subsequent improvements.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「嚆矢となる」。後へ続く動きの最初の例や起点を硬い調子で表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-38272dfd4e-e6cfa4e4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-38272dfd4e-e6cfa4e4",
+    "wordId": "nn-38272dfd4e"
+   }
+  },
+  {
+   "term": "右肩上がり",
+   "reading": "みぎかたあがり",
+   "pos": "noun",
+   "meaning": "a sustained upward trend",
+   "defJa": "数値などが全体として上向きに増えていくこと",
+   "passage": {
+    "ja": "売上が右肩上がりでも、手元の現金が増えるとは限りません。例えば、注文の増加に応じて材料を先に買い、代金を受け取るまでの期間が長ければ、忙しい会社ほど支払いに追われます。「売れているから安心だ」という経営者の言葉に対し、経理担当者が気にするのは、入金日より前に来る仕入れ代金の期限です。成長を示す線の傾きと資金繰りは別の問題であり、利益を計上した会社が、その利益を現金として使えるまでには時間の隔たりがあります。",
+    "form": "右肩上がり",
+    "en": "Even when sales rise steadily, cash on hand does not necessarily increase. If materials are purchased in response to rising orders well before customers pay, a busy company can face mounting payment pressure. While an owner says strong sales provide reassurance, the accountant worries about supplier payments due before customer receipts arrive. The slope of a growth chart and cash flow are different matters, with a gap between recognizing profit and being able to spend it as cash.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "数値の全体的な増加を表し、利益や資金繰りの健全さまでは保証しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-aeec7671c1-7fb5d3aa",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-016.json",
+    "cardId": "nn-aeec7671c1-7fb5d3aa",
+    "wordId": "nn-aeec7671c1"
+   }
+  },
+  {
+   "term": "学習データ",
+   "reading": "がくしゅうでーた",
+   "pos": "noun",
+   "meaning": "training data",
+   "defJa": "モデルの学習に使われる事例や情報の集まり",
+   "passage": {
+    "ja": "昼間の道路の写真ばかりで訓練した画像認識モデルに、雨の夜の写真を見せたとします。学習データに少なかった条件では、路面の反射や暗さが手掛かりを変え、昼には見分けられた対象でも間違えることがあります。写真の枚数を増やせば済むというより、使う場所で起こる変化をどれほど含むかが問題になります。さらに同じ画像が評価用の資料に紛れ込めば、未知の場面への対応力を測ったつもりでも、見覚えのある例への成績を数えてしまいます。",
+    "form": "学習データ",
+    "en": "Suppose an image-recognition model trained mostly on daytime road photographs is shown a rainy nighttime scene. Under conditions poorly represented in the training data, reflections and darkness alter the cues, so it may misidentify objects it recognized by day. The issue is less simply increasing image counts than covering the variations encountered where the model will be used. If the same images also enter the evaluation material, a supposed test of unfamiliar situations instead counts performance on familiar examples.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "量に加えて、利用場面の条件と評価用資料との分離が重要。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-483cb9c58f-4b0fc1ac",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-483cb9c58f-4b0fc1ac",
+    "wordId": "nn-483cb9c58f"
+   }
+  },
+  {
+   "term": "加速主義",
+   "reading": "かそくしゅぎ",
+   "pos": "noun",
+   "meaning": "accelerationism",
+   "defJa": "技術などの発展を速めて社会の変化を促す立場",
+   "passage": {
+    "ja": "人工知能の開発を急ぐべきかという対立には、製品の発売日だけでなく、社会を変える速さへの判断が含まれる。技術の発展を積極的に速め、その力で社会変革を促そうとする立場は、加速主義と呼ばれることがある。ただし、この名称に属する思想は一様ではなく、市場への態度や望む社会像にも違いがある。技術への期待を共有しているからといって、利益の配分や開発を止める条件まで一致するとは限らず、速度への賛否だけでは立場の全体像は決まらない。",
+    "form": "加速主義",
+    "en": "Disagreement over accelerating AI development includes judgments about the pace of social change, not merely product release dates. A position that actively speeds technological development to drive social transformation is sometimes called accelerationism. Ideas grouped under this name are not uniform, however, and differ in their attitudes toward markets and the societies they seek. Shared technological optimism does not guarantee agreement on distributing benefits or conditions for stopping development, so views on speed alone do not define the whole position.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "技術や社会の変化を速めようとする立場で、内部にも思想の違いがある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-cb13400b49-88b5cc02",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
+    "cardId": "nn-cb13400b49-88b5cc02",
+    "wordId": "nn-cb13400b49"
+   }
+  }
+ ]
+}

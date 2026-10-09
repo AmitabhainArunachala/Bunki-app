@@ -1,0 +1,144 @@
+{
+ "cards": [
+  {
+   "term": "後塵を拝する",
+   "reading": "こうじんをはいする",
+   "pos": "expression",
+   "meaning": "to lag behind others",
+   "defJa": "競争で相手より遅れた位置に立つこと",
+   "passage": {
+    "ja": "優れた設計図があっても、予定どおり量産できなければ製品は店に並びません。半導体の競争で後塵を拝する企業には、計算上の性能では勝っていながら、製造の安定性で先行企業に届かない場合もあります。試作品を一つ動かすことと、同じ品質の品を大量に送り出すことの間には、設備や検査、人の経験に関わる大きな距離があります。巻き返しを図るには、新機能の発表に加えて、不良の原因を地道につぶし、顧客が安心して注文できる生産体制を整える必要があります。",
+    "form": "後塵を拝する",
+    "en": "Even an excellent design cannot reach store shelves if mass production does not proceed on schedule. A company trailing others in semiconductor competition may lead in theoretical performance yet fall short of established rivals in manufacturing stability. A large gap involving equipment, inspection, and human experience separates making one prototype work from delivering many items of consistent quality. Catching up requires steadily eliminating causes of defects and creating a production system customers can confidently order from, as well as announcing new features.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "競争相手に先を越され、遅れた位置にいることを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-d906b6d23e-6f1c2663",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-d906b6d23e-6f1c2663",
+    "wordId": "nn-d906b6d23e"
+   }
+  },
+  {
+   "term": "時価総額",
+   "reading": "じかそうがく",
+   "pos": "noun",
+   "meaning": "market capitalization",
+   "defJa": "株価に発行済み株式数を掛けた企業価値の指標",
+   "passage": {
+    "ja": "会社の株価が高いからといって、その会社全体が一番高く評価されているとは限らないよ。株価に発行済み株式数を掛けた時価総額なら、株の枚数も含めて、市場が株式全体に付けた値段を比べられるんだ。たとえば株式を二分割して枚数が二倍、株価が半分になれば、掛け算の結果は変わらない。工場や現金を全部売ったときの金額とは違うし、期待によっても日々動くから、会社の規模をつかむ物差しの一つとして扱うと位置付けがはっきりするね。",
+    "form": "時価総額",
+    "en": "A high share price does not necessarily mean a company as a whole has the highest valuation. Market capitalization multiplies the share price by the number of issued shares, letting us compare the market's price for all its shares while accounting for their number. For example, if a two-for-one split doubles the share count and halves the price, the product does not change. This differs from the proceeds of selling all its factories and cash and also changes daily with expectations, so its role is clearer when treated as one measure of company size.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "一株の価格ではなく、発行された株式全体の市場での評価額。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5621e81683-994ee96b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-5621e81683-994ee96b",
+    "wordId": "nn-5621e81683"
+   }
+  },
+  {
+   "term": "株価収益率",
+   "reading": "かぶかしゅうえきりつ",
+   "pos": "noun",
+   "meaning": "price-to-earnings ratio",
+   "defJa": "株価が一株当たり利益の何倍かを示す数値",
+   "passage": {
+    "ja": "同じ二千円の株でも、一株当たりの利益が百円の会社と二百円の会社では、利益との関係が違います。株価収益率は株価を一株当たり利益で割った指標で、この例ではそれぞれ二十倍と十倍になります。低い値ほど必ず有利だと考えがちですが、利益が一時的に膨らんでいたり、今後の減益が見込まれていたりする場合もあります。業種の違いに加えて実績と予想のどちらの利益を使うかでも数値は変わるので、比較の条件をそろえて初めて、その差の意味が見えてきます。",
+    "form": "株価収益率",
+    "en": "Two shares both priced at two thousand yen stand in different relationships to earnings if their companies earn one hundred and two hundred yen per share. The price-to-earnings ratio divides the share price by earnings per share, giving twenty and ten times in this example. A lower figure may seem necessarily favorable, but earnings could be temporarily inflated or expected to decline. Industry differences and the use of actual or forecast earnings change the figure, so its significance becomes clear only when comparison conditions are aligned.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "株価と利益の関係を「何倍」で示し、実績か予想かによっても変わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6586533b09-2b9bc08c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-034.json",
+    "cardId": "nn-6586533b09-2b9bc08c",
+    "wordId": "nn-6586533b09"
+   }
+  },
+  {
+   "term": "指数関数的",
+   "reading": "しすうかんすうてき",
+   "pos": "na-adj",
+   "meaning": "exponential",
+   "defJa": "一定の割合で繰り返し増えたり減ったりする様子",
+   "passage": {
+    "ja": "毎回十個ずつ増える箱と、毎回中身が二倍になる箱では、最初の数回が似ていても先の姿は大きく違います。後者のような指数関数的な増加では、増えた分も次の増加の土台に加わるため、一回ごとの増分まで大きくなります。ただし、現実の工場や計算機には資金、材料、電力といった制約があり、同じ割合をいつまでも保てるとは限りません。急な伸びを見た際に確かめたいのは、今の勢いだけでなく、その割合を支える条件がどこまで続くかという点です。",
+    "form": "指数関数的",
+    "en": "A box gaining ten items each round and one whose contents double each round can develop very differently even if their first few rounds look similar. With exponential growth of the latter kind, additions become part of the base for the next increase, so the absolute increment also grows. Actual factories and computers face constraints such as funding, materials, and electricity, however, so the same rate cannot necessarily continue forever. When observing rapid growth, the relevant question is how long the conditions supporting that rate will last, as well as its current pace.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一定額ではなく一定の割合で変化し、増分自体も変わる様子を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-d7514a4814-839e6e76",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-d7514a4814-839e6e76",
+    "wordId": "nn-d7514a4814"
+   }
+  },
+  {
+   "term": "対角線論法",
+   "reading": "たいかくせんろんぽう",
+   "pos": "noun",
+   "meaning": "diagonal argument",
+   "defJa": "一覧の各項と異なるものを作って限界を示す方法",
+   "passage": {
+    "ja": "零と一を無限に並べた列を、すべて一覧にできたと仮定します。一番目の列の一桁目、二番目の列の二桁目という具合に数字を拾い、零なら一へ、一なら零へ変えて新しい列を作るのが対角線論法の仕掛けです。この列は一覧の何番目と比べても、その番号に当たる桁が違うため、一覧のどこにもありません。全部を並べたはずなのに必ず漏れが生じることから、どれほど長く番号を付け続けても、この種の列をすべて数え上げることはできないと分かります。",
+    "form": "対角線論法",
+    "en": "Suppose every infinite sequence of zeros and ones could be placed in a list. The diagonal argument takes the first digit of the first sequence, the second of the second, and so on, then constructs a new sequence by swapping each zero for one and each one for zero. Whichever entry it is compared with, the new sequence differs at the digit matching that entry's number, so it is absent from the list. Since something is necessarily missing from a supposedly complete list, continuing to number entries can never enumerate all such sequences.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一覧の各項と必ず違う対象を構成し、一覧では尽くせないことを示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b0f0e76a81-317df859",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-b0f0e76a81-317df859",
+    "wordId": "nn-b0f0e76a81"
+   }
+  }
+ ]
+}

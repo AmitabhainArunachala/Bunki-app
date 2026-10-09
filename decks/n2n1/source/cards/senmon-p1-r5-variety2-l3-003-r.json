@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "教師あり学習",
+   "reading": "きょうしありがくしゅう",
+   "pos": "noun",
+   "meaning": "supervised learning",
+   "defJa": "入力と正解の組を使って対応関係を学ぶ方法",
+   "passage": {
+    "ja": "迷惑メールを分ける装置に、件名だけを大量に見せても、どれを迷惑と呼ぶのかは決まりません。教師あり学習では、入力と正解の組を用意し、予測が正解に近づくようにモデルを調整します。ただし、以前の担当者が特定の言葉を含むメールを誤って分類していれば、その判断まで学んでしまう恐れがあります。評価用の例を学習用から分けることに加え、正解として渡した印が何に基づくのかを調べると、点数の高いモデルが現場で役立たない理由が見えてきます。",
+    "form": "教師あり学習",
+    "en": "Showing a spam filter large numbers of subject lines alone does not establish which messages count as spam. Supervised learning supplies pairs of inputs and correct answers, adjusting the model so that predictions approach those answers. If a previous operator misclassified messages containing a particular word, however, the model may learn that judgment too. In addition to separating evaluation examples from training examples, examining the basis of the labels supplied as correct answers helps explain why a high-scoring model may fail in practice.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "入力と正解の組を使う学習で、正解側の質も結果を左右する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-167fb28e72-70e889f0",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-167fb28e72-70e889f0",
+    "wordId": "nn-167fb28e72"
+   }
+  },
+  {
+   "term": "演繹",
+   "reading": "えんえき",
+   "pos": "noun",
+   "meaning": "deduction",
+   "defJa": "一般的な前提から個別の結論を導くこと",
+   "passage": {
+    "ja": "「この箱の部品はすべて検査済みで、このねじはその箱から取った」という前提なら、そのねじも検査済みだという結論が出ます。こうして一般的な条件から個別の結論を導く演繹では、推論の筋と前提の確かさを分けて捉えられます。誰かが未検査のねじを箱へ戻したとしたら、最初の前提が崩れるため、同じ結論を保証できません。「筋が通っている」という評価は、出発点まで現実と一致しているという意味ではなく、前提から結論へのつながりについての評価です。",
+    "form": "演繹",
+    "en": "Given the premises that every part in this box has been inspected and this screw came from the box, the conclusion is that the screw has also been inspected. Deduction, which derives particular conclusions from general conditions, allows the logic of inference to be distinguished from the reliability of the premises. If someone returned an uninspected screw to the box, the initial premise would fail and the same conclusion could not be guaranteed. Calling an argument logically sound in its progression evaluates the link from premises to conclusion rather than asserting that its starting point matches reality.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一般的な前提から結論を導く推論で、前提の真偽とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b433ef562e-3d530a6f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-b433ef562e-3d530a6f",
+    "wordId": "nn-b433ef562e"
+   }
+  },
+  {
+   "term": "法整備",
+   "reading": "ほうせいび",
+   "pos": "noun",
+   "meaning": "development of a legal framework",
+   "defJa": "社会の変化に合わせて法律や制度を整えること",
+   "passage": {
+    "ja": "自動で契約書を作るサービスが間違えたとき、利用した人と提供した会社のどちらが責任を負うんだろう。約束の内容にもよるけど、今ある決まりだけでは扱いがはっきりしない問題も出てくるよね。そこで法整備を進めるとしても、禁止する範囲を広げれば済む話じゃなくて、被害を受けた人が救済を求める手続きも要る。技術が変わるにつれて、何を認めるかだけでなく、誰が説明し、どこへ異議を申し立てられるかという制度の細部が効いてくるんだ。",
+    "form": "法整備",
+    "en": "If a service that automatically generates contracts makes a mistake, is responsibility borne by the user or the provider? It depends partly on their agreement, but problems can arise that existing rules do not clearly address. Even when developing legislation, expanding prohibitions is not sufficient, since affected people also need procedures for seeking remedies. As technology changes, institutional details such as who must explain decisions and where objections can be lodged matter alongside what is permitted.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "新しい問題に対応できるよう、法律や制度を整えること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-36a1b9d38a-9331c540",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
+    "cardId": "nn-36a1b9d38a-9331c540",
+    "wordId": "nn-36a1b9d38a"
+   }
+  }
+ ]
+}

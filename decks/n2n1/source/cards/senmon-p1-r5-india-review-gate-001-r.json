@@ -1,50 +1,6 @@
 {
  "cards": [
   {
-   "term": "安心立命",
-   "reading": "あんしんりつめい",
-   "pos": "noun",
-   "meaning": "spiritual peace and resignation to fate",
-   "defJa": "心を落ち着かせて揺るがない生き方の拠り所を得ること",
-   "passage": {
-    "ja": "「不安が一つもなくなる」と言い換えると、生き方の拠り所を得るという言葉の深さが伝わりません。安心立命は、心を落ち着かせ、揺るがない立場を得て生きることを表し、禅や宗教的な人生観を語る文章でも使われます。仕事が順調で気分がよいという一時の状態を述べる場合とは違い、困難の中でも何を頼りに生きるかという問いを含ませることができます。読み手に説明する際は、問題がすべて消えたと書くより、出来事に向き合う姿勢がどう定まったのかを示すと、語の重みを保てます。",
-    "form": "安心立命",
-    "en": "Rephrasing it as having no anxiety loses the depth of finding a basis for life. Anshin-ritsumei concerns a settled mind and secure orientation, appearing in discussions of Zen and religious outlook. Unlike temporary satisfaction when work goes well, it can ask what sustains someone through difficulty. Describing how an attitude becomes grounded conveys the term better than claiming every problem disappears.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "一時的な気分の良さより、人生の拠り所が定まることを表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "戒名",
-   "reading": "かいみょう",
-   "pos": "noun",
-   "meaning": "Buddhist precept name",
-   "defJa": "仏教で戒を受け仏弟子となる際に授けられる名",
-   "passage": {
-    "ja": "仏教の名前を学ぶときは、亡くなった後に初めて必要になるものだと決めないようにしましょう。戒名は戒を受けて仏弟子となる際に授けられる名で、生きているうちに受ける場合もあり、葬儀での習慣だけでは意味を説明しきれません。宗派によって名称や考え方が異なるため、同じ役割に見える名前を全て同じ語でまとめないことも大切です。寺の案内や家族の記録を読むときは、誰がいつ、どの教えの中で名を受けたのか整理すると、文字の並びを信仰と人生の関わりとして学べます。",
-    "form": "戒名",
-    "en": "Do not assume a Buddhist religious name becomes relevant only after death. A precept name is given upon receiving precepts as a Buddhist disciple and may be received during life, beyond funeral custom alone. Names and interpretations differ among schools, so apparent similarities should not erase those differences. Identifying who received a name, when, and within which tradition connects its characters with faith and life.",
-    "register": "学",
-    "topic": "india",
-    "tipJa": "「戒名を授かる」。生前に受ける場合もあり、宗派ごとの名称にも注意する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "虚無",
    "reading": "きょむ",
    "pos": "noun",
@@ -67,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "注意の瞬き",
-   "reading": "ちゅういのまばたき",
-   "pos": "noun",
-   "meaning": "attentional blink",
-   "defJa": "続けて現れる二つ目の標的を短時間見落とす現象",
-   "passage": {
-    "ja": "「注意が途切れる」とだけ書くと、授業中にぼんやりする場面が浮かびます。実験でいう注意の瞬きを説明するなら、文字などが次々と現れる中で、一つ目の標的のすぐ後に出た二つ目を見落とす、という具体的な課題を示す方が正確です。集中的な瞑想の訓練を調べた研究でも、この課題の成績と脳波を組み合わせ、限られた注意の配分が検討されました。「集中力が強くなる」と広く言い換えるより、何を見つけやすくなったのかを残すことで、研究の面白さも保てます。",
-    "form": "注意の瞬き",
-    "en": "Simply writing that attention lapses may evoke daydreaming in class. Explaining the experimental attentional blink is more accurate when it describes missing a second target that appears soon after the first within a rapid stream of items such as letters. Research on intensive meditation training combined performance on this task with brain potentials to investigate the allocation of limited attention. Retaining what became easier to detect, rather than broadly paraphrasing it as stronger concentration, preserves the study’s interest as well as its precision.",
-    "register": "語",
-    "topic": "india",
-    "tipJa": "専門語を「集中力」に置き換えず、標的の提示順と見落としを説明する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "裸形",
    "reading": "らぎょう",
    "pos": "noun",
@@ -101,50 +35,6 @@
     "register": "話",
     "topic": "india",
     "tipJa": "ここでは出家者の姿を指し、所有を離れる誓いと結び付けている。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "オープンモニタリング瞑想",
-   "reading": "おーぷんもにたりんぐめいそう",
-   "pos": "noun",
-   "meaning": "open monitoring meditation",
-   "defJa": "生じる感覚や思考を対象を絞らず観察する瞑想法",
-   "passage": {
-    "ja": "呼吸だけを見ていたのに、今度は音や考えもそのまま観察していいと言われると、少し戸惑うよね。オープンモニタリング瞑想は、一つの対象に注意を固定するより、現れては変わる体験に気付き、そのたびに追いかけすぎないようにする方法なんだ。何も考えなくなるのとは違って、思考が浮かんだこと自体も観察に入るから、頭の中を空っぽにする競争ではないんだよ。研究を読むときも、同じ「瞑想」という名前でまとめる前に、参加者が何をするよう教わったかを確かめると話がつながる。",
-    "form": "オープンモニタリング瞑想",
-    "en": "After being told to watch only the breath, being invited to observe sounds and thoughts as well can feel confusing. Open monitoring meditation emphasizes noticing changing experiences without pursuing each one too far, rather than fixing attention on one object. Thoughts arising are themselves included in observation, so it is not a competition to empty the mind. When reading research, checking what participants were instructed to do before grouping everything under meditation helps the account make sense.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "「対象を絞らず観察する」と、注意を一つに固定する方法との差を示す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "実相",
-   "reading": "じっそう",
-   "pos": "noun",
-   "meaning": "the true aspect of reality",
-   "defJa": "仏教で物事のありのままの真実の姿",
-   "passage": {
-    "ja": "仏教の経典に現れる真実の姿という表現は、物の表面を写真のように写すことだけを意味しない。実相は物事のありのままの真実の姿を指し、日常の思い込みや固定した捉え方との対比で論じられる。何を真実と捉えるかは文献の教えに即して読む必要があり、単に目に見える形へ言い換えれば、語の働きが失われる。たとえば変化するものを不変と見なす心の問題と結び付けて読むことで、見えている対象の説明だけでなく、それを捉える側の理解も問いの対象となる。",
-    "form": "実相",
-    "en": "The true character of things in Buddhist scripture does not merely mean photographing their surfaces. The true aspect of things concerns their actual nature, often contrasted with fixed assumptions. Its meaning must be read within a text’s teaching rather than reduced to visible form. Connecting it with treating changing things as permanent brings the perceiver’s understanding into question as well as the object.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "「諸法の実相」。見た目だけでなく、教義が示す真実のあり方を指す。",
     "sense": ""
    },
    "deck": "senmon",

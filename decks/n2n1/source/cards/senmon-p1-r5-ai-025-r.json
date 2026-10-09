@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "演算能力",
-   "reading": "えんざんのうりょく",
-   "pos": "noun",
-   "meaning": "computational capacity",
-   "defJa": "一定の時間に計算を処理できる性能",
-   "passage": {
-    "ja": "計算機の資料に、一秒間に行える浮動小数点演算の回数が示されていることがあります。この数字で表される演算能力は、足し算や掛け算などをどれだけ速く処理できるかを見るための指標です。ただし、読み出すデータを待っている時間が長ければ、計算用の回路を十分に働かせられません。理論上の最大値が高いからといって、手元の学習課題が同じ割合で速く終わるとは限らないのです。性能を比べる練習では、まず同じ課題を同じ条件で実行し、終わるまでの時間と仕様表の数字とを並べて記録しましょう。",
-    "form": "演算能力",
-    "en": "Computer documentation sometimes lists the number of floating-point operations performed per second. Computational capacity expressed by this number indicates how quickly operations such as addition and multiplication can be processed. However, long waits for data prevent the computing circuits from being fully utilized. A higher theoretical maximum therefore does not guarantee a proportional reduction in the time needed for your training task. When practicing performance comparisons, first run the same task under the same conditions and record its completion time alongside the specification figures.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "計算する性能を表す語で、実際の処理時間とは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "演算",
    "reading": "えんざん",
    "pos": "noun",

@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "盛者必衰",
+   "reading": "じょうしゃひっすい",
+   "pos": "noun",
+   "meaning": "the prosperous inevitably decline",
+   "defJa": "勢いの盛んな者も必ず衰えるということ",
+   "passage": {
+    "ja": "昨日まで人が集まっていた権力者の屋敷が、地位を失った途端に静まり返る場面を考えてみてください。平家物語の冒頭にも響く盛者必衰は、どれほど勢いのある者も衰えを免れないという、無常を捉える言葉です。周囲の支持に頼って保たれていた力を、自分だけの永久の持ち物と取り違えれば、変化の兆しにすら気づけなくなります。誰かの没落を外から眺めるだけでなく、今の安定を当然と思う自分にも同じ時間が流れていると気づかせるところに、この言葉の重さがあります。",
+    "form": "盛者必衰",
+    "en": "Imagine the residence of a powerful person, crowded until yesterday, falling silent as soon as that person loses status. The inevitability of the mighty declining, echoed in the opening of The Tale of the Heike, expresses impermanence through the inability of even the powerful to escape decline. Mistaking power sustained by others’ support for a permanent personal possession can obscure even signs of change. The expression’s weight lies not only in viewing someone else’s downfall but also in recognizing that the same time passes for oneself while taking current stability for granted.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "勢いの盛んな者も衰えるという、無常を表す四字熟語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-0f6a0c5d20-504990fd",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-0f6a0c5d20-504990fd",
+    "wordId": "nn-0f6a0c5d20"
+   }
+  }
+ ]
+}

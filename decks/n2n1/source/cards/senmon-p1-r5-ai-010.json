@@ -23,28 +23,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ファブレス",
-   "reading": "ふぁぶれす",
-   "pos": "noun",
-   "meaning": "fabless (design-only) company",
-   "defJa": "製造工場を持たず回路の設計などを担う企業",
-   "passage": {
-    "ja": "高性能のチップを売る会社が、そのチップを作る工場まで持っているとは限りません。ファブレスは、回路の設計などを担いながら製造を外部へ委ねる事業の形で、工場への巨額の投資を自社で抱えない選択でもあります。ただし、設計が製造工程の条件から自由になるわけではなく、委託先が作れる形や確保できる生産量との調整が要ります。会社の事業を読むときは、何を自社で決め、何を他社の能力に頼るのかを分けると、設備の少なさと技術的な依存の関係を理解できます。",
-    "form": "ファブレス",
-    "en": "A company selling high-performance chips does not necessarily own the factory making them. A fabless business handles activities such as circuit design while outsourcing manufacturing, avoiding ownership of the factory's large capital investment. Design is not thereby freed from manufacturing constraints; it must fit the supplier's process capabilities and available capacity. Separating decisions made internally from capabilities supplied by others clarifies the relationship between limited owned equipment and technological dependence.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "工場がないことと、製造の知識が不要なことは別。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "バイアス",
    "reading": "ばいあす",
    "pos": "noun",
@@ -101,28 +79,6 @@
     "register": "論",
     "topic": "ai",
     "tipJa": "意図的なうそと決めつけず、内容を確かめる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "パラメータ",
-   "reading": "ぱらめーた",
-   "pos": "noun",
-   "meaning": "parameter",
-   "defJa": "モデルの働きを決める調整可能な数値",
-   "passage": {
-    "ja": "機械学習を学ぶ最初の練習では、入力に掛ける数を少し変え、出力がどう動くかを表にしてみましょう。モデルの内部で働きを調整するパラメータを、名前だけでなく、自分で動かせる数として捉えるためです。学習では誤差などの指標に基づいてこうした値を更新しますが、値の個数が多いほど、どんな問題にも強くなるとは限りません。使うデータやモデルの構造、学習の方法も結果に関わるので、二つのモデルを比べるときは、数値の個数と実際に確かめた成績を別の欄へ記録します。",
-    "form": "パラメータ",
-    "en": "For an initial machine-learning exercise, slightly change a number multiplying an input and tabulate the output changes. This makes a parameter that adjusts a model's behavior something you can manipulate rather than just a name. Learning updates such values using measures such as error, but having more values does not guarantee stronger performance on every problem. Because data, architecture, and learning methods also matter, record parameter count separately from measured performance when comparing two models.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "数の多さだけで、性能の高さは決まらない。",
     "sense": ""
    },
    "deck": "senmon",
