@@ -1376,17 +1376,17 @@ async function existingCardCase(page, section, log) {
   return { first: first.attemptId, second: second.attemptId, mark: second.mark };
 }
 
-// Machine-checked written tests, when published, name themselves on the door as awaiting review.
+// Machine-checked written tests name that a person has not yet checked them.
 const machineWritten = catalog.entries.filter((row) => row.availability.ready && row.mode === 'written').length;
 const dojoPracticeLabel = machineWritten
-  ? `${machineWritten} written tests · awaiting review`
+  ? `${machineWritten} written tests · not yet checked by a person`
   : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · practice sets available`;
 try {
   for (const engine of engines) {
     for (const section of sections) {
     const { entry, pin, form, formPath, deliveryPath, items, suffix } = section;
     await run(engine, `public-catalog-and-dojo-practice-labels${suffix}`, async (page) => {
-      await page.locator('#chrome-dojo').click();
+      await page.locator('#tab-learn').click();
       const door = page.locator('[data-study-door="mock"]');
       await page.waitForFunction(
         (label) =>
