@@ -11,12 +11,14 @@ the bunki-cloze-deck format the player already plays.
 The leaf tools are kotoba-mine's own: furigana and the target marker (_ordered_for), the
 target sentence's English (target_sentence_en), kanji anatomy, level labels and the tokens
 side file (tokens_file). Ids are content-keyed, so a rebuild never renumbers a card: a word is
-nn-<sha1(term|reading)[:10]>, a card is <word id>-<sha1(ja)[:8]>.
+nn-<sha1(term|reading)[:10]>, a card is <word id>-<sha1(ja)[:8]>. An editorial
+replacement may carry the original `cardId` to preserve its review identity.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -71,9 +73,16 @@ def load_cards(folder: Path) -> list[dict]:
 def build(deck_id: str, cards: list[dict], tagger, table: dict[str, str]) -> dict:
     title_ja, title_en, look = DECKS[deck_id]
     words: dict[str, dict] = {}
+    card_ids: set[str] = set()
     for c in cards:
         wid = "nn-" + sha(f"{c['term']}|{c['reading']}", 10)
         p = c["passage"]
+        cid = c.get("cardId", f"{wid}-{sha(p['ja'], 8)}")
+        if not isinstance(cid, str) or not re.fullmatch(re.escape(wid) + r"-[0-9a-f]{8}", cid):
+            raise SystemExit(f"{c['term']}: cardId must belong to the unchanged word identity")
+        if cid in card_ids:
+            raise SystemExit(f"{c['term']}: duplicate card ID {cid}")
+        card_ids.add(cid)
         w = words.get(wid)
         if w is None:
             level = c.get("level") if c.get("level") in ("N1", "N2") else km.level_for(c["term"], c["reading"])
@@ -86,7 +95,7 @@ def build(deck_id: str, cards: list[dict], tagger, table: dict[str, str]) -> dic
         if "".join(seg[0] for seg in ruby) != p["ja"]:
             raise SystemExit(f"{c['term']}: ruby does not spell the passage")
         ti = next(i for i, seg in enumerate(ruby) if len(seg) > 2)
-        card = {"id": f"{wid}-{sha(p['ja'], 8)}", "lv": len(w["cards"]) + 1, "type": "word", "ja": p["ja"],
+        card = {"id": cid, "lv": len(w["cards"]) + 1, "type": "word", "ja": p["ja"],
                 "form": p["form"], "en": p["en"], "kind": "original",
                 "src": {"site": "書き下ろし（このデッキ用）", "licence": "Bunki original"},
                 "passage": len(w["cards"]) + 1, "register": p["register"], "topic": p["topic"], "ruby": ruby}
