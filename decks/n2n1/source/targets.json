@@ -82925,7 +82925,7 @@
     "gloss": "renunciant ascetic",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/page/JainFundamentals"],
+    "sources": ["R5-curated:jain-history", "https://www.jaina.org/page/JainFundamentals", "https://cir.nii.ac.jp/crid/1920583859638810752"],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -82969,7 +82969,7 @@
     "gloss": "five great Jain ascetic vows",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/page/PathofLiberation"],
+    "sources": ["R5-curated:jain-history", "https://www.jaina.org/page/PathofLiberation", "https://www.bukkyo-u.ac.jp/museum/uploads/ondemand_endonkai.pdf"],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83178,7 +83178,7 @@
     "gloss": "Buddhist lay donor",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.todaiji.or.jp/history/"],
+    "sources": ["R5-curated:japanese-transmission", "https://www.todaiji.or.jp/history/", "https://jodoshuzensho.jp/daijiten/index.php/%E6%AA%80%E8%B6%8A"],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"

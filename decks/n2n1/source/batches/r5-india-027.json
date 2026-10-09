@@ -18,7 +18,8 @@
    "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
    "grammarSuggestion": "〜に基づいて",
    "factNote": "Chinese thought distinct from Buddhism; comparison permissible without claiming direct derivation.",
-   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence.",
+   "topicConnection": "Mandatory scope: connect this Chinese-origin term to Japanese Buddhism or compare its meaning with Buddhist practice; do NOT write a wholly unrelated Chinese history passage. Clearly distinguish traditions, never fabricate direct influence. A careful conceptual comparison is enough."
   },
   {
    "term": "菩提",

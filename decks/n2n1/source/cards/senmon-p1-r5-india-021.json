@@ -89,28 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "法要",
-   "reading": "ほうよう",
-   "pos": "noun",
-   "meaning": "a Buddhist service or observance",
-   "defJa": "仏を敬い教えに関わって営む仏教の儀式",
-   "passage": {
-    "ja": "寺で営まれる法要と聞くと、亡くなった人の供養だけを思い浮かべるかもしれませんが、それに限られるわけではありません。仏の誕生を祝う行事などにも、僧や参列者が教えと向き合う儀式があり、目的に応じて内容は異なります。読経が聞こえたというだけで何のための集まりかを決めず、行事の名前や寺の説明を確かめると、その日の意味が分かります。儀式をただ同じ動作の繰り返しとして眺めるより、誰が何を祈り、何を記念しているかを見ることで、寺と人々の時間のつながりを考えられます。",
-    "form": "法要",
-    "en": "A Buddhist service may bring memorial rites for the dead to mind, but it is not limited to those. Events celebrating the Buddha’s birth also include rituals through which clergy and participants engage with the teaching, and their content varies with their purpose. Rather than identifying a gathering’s purpose solely from the sound of chanting, consult its name and the temple’s explanation. Looking at who prays for what and what is commemorated reveals the temporal connections between temples and people beyond repeated ritual movements.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "追善供養だけに限らず、さまざまな仏教の儀式を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "法身",
    "reading": "ほっしん",
    "pos": "noun",

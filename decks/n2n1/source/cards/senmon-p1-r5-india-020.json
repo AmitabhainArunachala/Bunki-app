@@ -45,28 +45,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "梵字",
-   "reading": "ぼんじ",
-   "pos": "noun",
-   "meaning": "Sanskrit letters in Japanese Buddhist use",
-   "defJa": "インド由来の文字で日本の仏教にも使うもの",
-   "passage": {
-    "ja": "石塔に漢字とも仮名とも違う一文字が刻まれていると、模様だと思って通り過ぎてしまうことがあります。日本の仏教で目にする梵字には、インド由来の文字が中国を経て伝わった歴史があります。その一文字が特定の仏を表す場合もあり、単に読めない飾りというわけではありません。ただし、形が似ているからといって、文字の種類や意味を確かめずに同じものと判断するのは避けたいところです。まず図録などで形と読みを照合すると、石の上の小さな印が、言語と信仰を運んだ道筋の入口になります。",
-    "form": "梵字",
-    "en": "A character carved on a stone monument that resembles neither kanji nor kana may be passed over as decoration. Sanskrit letters encountered in Japanese Buddhism have a history of transmission from India through China. A single character can represent a particular Buddha rather than being merely an unreadable ornament. Similar-looking forms should nevertheless not be identified as the same without checking the script and meaning. Comparing the form and pronunciation with a catalogue makes a small mark on stone an entry point into the transmission of language and devotion.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "文字そのものを指す語。一字で仏を表す使い方もある。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "栄西",
    "reading": "えいさい",
    "pos": "noun",

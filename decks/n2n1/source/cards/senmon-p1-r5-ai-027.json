@@ -1,28 +1,6 @@
 {
  "cards": [
   {
-   "term": "知的財産",
-   "reading": "ちてきざいさん",
-   "pos": "noun",
-   "meaning": "intellectual property",
-   "defJa": "発明や創作などから生まれる無形の財産",
-   "passage": {
-    "ja": "半導体の価値を考えるとき、工場や装置のように目に見えるものだけを数えると、大事な部分が抜け落ちます。回路の発明や設計上の工夫など、創造的な活動から生まれる知的財産も、企業の競争力に関わるからです。ただし、発明の内容を公開して保護を求めることと、情報を秘密として管理することでは、選ぶ仕組みも考え方も異なります。何かを生み出したからといって、すべてが同じ条件で自動的に独占できるわけではありません。技術紹介を読む際は、製品そのものと、その背後で利用が管理されるアイデアや情報とを分けて考えましょう。",
-    "form": "知的財産",
-    "en": "When assessing the value of semiconductors, counting only visible assets such as factories and equipment leaves out something important. Intellectual property arising from creative work, including circuit inventions and design innovations, also contributes to competitiveness. However, disclosing an invention to seek protection and keeping information confidential involve different mechanisms and approaches. Creating something does not automatically grant exclusive control over everything under identical conditions. When reading a technology introduction, distinguish the product itself from the ideas and information behind it whose use is managed.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "目に見える設備とは異なる、発明や創作などによる財産を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "破局的",
    "reading": "はきょくてき",
    "pos": "na-adj",
