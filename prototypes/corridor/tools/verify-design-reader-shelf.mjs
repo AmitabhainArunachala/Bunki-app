@@ -1129,6 +1129,8 @@ try {
         await page.waitForTimeout(200); // ResizeObserver has placed the settled sentence view.
         const sentence = await box();
         const focus = await focused();
+        assert.equal(await page.locator('#mini #mini-sentence-open').isVisible(), false,
+          'The sentence door is hidden while its pane is open');
         assert(Math.abs(sentence.top - word.top) <= 1, `opening the sentence moved the card's top edge: ${JSON.stringify({ word, sentence })}`);
         assert(sentence.bottom <= viewport.height, `the sentence card falls outside the screen: ${JSON.stringify(sentence)}`);
         assertFocus(focus, beforeScroll);

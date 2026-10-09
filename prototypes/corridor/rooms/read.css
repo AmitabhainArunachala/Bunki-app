@@ -942,7 +942,7 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
 }
 @keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
-:root body #mini :is(.mini-lists, .mini-take-note, .mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
+:root body[data-view] #mini :is(.mini-lists, .mini-take-note, .mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
 
 /* 3. the kanji band */
 :root body:not([data-view='drift']) #mini .mini-web {
