@@ -112,8 +112,22 @@ const guidedSprite = readFileSync(resolve(CORRIDOR, 'guided/samurai-sprites-v2.p
 // file the single-file build would not carry.
 const cssSiblingRefs = (css) => [...css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gu)].map((match) => match[2])
   .filter((ref) => !ref.startsWith('data:'));
+// Keep every bundled face and its original style, variable weight and Unicode
+// range. Only the local source address changes: a handoff has no font siblings.
+const fontAssets = new Map();
+const fontStyles = read('fonts.css').replace(/url\(\s*(['"]?)(.*?)\1\s*\)/gu, (_match, _quote, path) => {
+  assert(/^fonts\/[a-zA-Z0-9_-]+\.woff2$/u.test(path), 'Standalone fonts must name bundled local WOFF2 bytes');
+  if (!fontAssets.has(path)) {
+    const bytes = readFileSync(resolve(CORRIDOR, path));
+    fontAssets.set(path, { bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'),
+      dataUrl: 'data:font/woff2;base64,' + bytes.toString('base64') });
+  }
+  return `url('${fontAssets.get(path).dataUrl}')`;
+});
+assert(fontAssets.size > 0, 'Standalone must carry the bundled fonts');
+assert.deepEqual(cssSiblingRefs(fontStyles), [], 'Standalone fonts must have no sibling references');
 assert.deepEqual(cssSiblingRefs(read('editorial.css')), [], 'Standalone editorial stylesheet gained a sibling reference');
-for (const room of ['today', 'read', 'learn', 'words', 'me', 'cards']) {
+for (const room of ['today', 'read', 'learn', 'words', 'me', 'cards', 'motion']) {
   assert.deepEqual(cssSiblingRefs(read(`rooms/${room}.css`)), [], `Standalone room stylesheet ${room} gained a sibling reference`);
 }
 const shelfArt = readFileSync(resolve(CORRIDOR, 'design/ink-hoku-nami.png'));
@@ -359,6 +373,7 @@ ${appScript}
 // skeleton themselves.
 const fragmentHtml = `<title>回廊 KAIRO</title>
 <style>
+${fontStyles}
 ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
@@ -372,6 +387,7 @@ ${read('rooms/learn.css')}
 ${read('rooms/words.css')}
 ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
+${read('rooms/motion.css')}
 </style>
 ${BODY}
 `;
@@ -387,6 +403,7 @@ const html = `<!doctype html>
 <link rel="icon" href="${FAVICON}">
 <title>回廊 KAIRO</title>
 <style>
+${fontStyles}
 ${read('corridor.css')}
 ${read('reference-ui.css')}
 ${read('drift-layer.css')}
@@ -400,6 +417,7 @@ ${read('rooms/learn.css')}
 ${read('rooms/words.css')}
 ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
+${read('rooms/motion.css')}
 </style>
 </head>
 <body>
@@ -424,6 +442,9 @@ writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORR
   recordModuleTransport: 'blob', inlinedModuleTransport: 'blob', driftSharesRecordRuntime: true,
   inkModuleSha256: digest(inkBytes), builderSha256: digest(readFileSync(fileURLToPath(import.meta.url))),
   guidedSessionSha256: digest(guidedSessionBytes), guidedMomentsSha256: digest(guidedMomentsBytes),
+  fontStyleSha256: digest(read('fonts.css')), embeddedFontStyleSha256: digest(fontStyles),
+  fontAssets: [...fontAssets].map(([path, { bytes, sha256 }]) => ({ path, bytes, sha256 })),
+  motionStyleSha256: digest(read('rooms/motion.css')),
   editorialStyleSha256: digest(read('editorial.css')), shelfArtSha256: digest(shelfArt),
   guidedSets: guidedIndex.sets.map((entry) => entry.path),
   compiler: { name: 'esbuild', version }, selfContainedController: true,
