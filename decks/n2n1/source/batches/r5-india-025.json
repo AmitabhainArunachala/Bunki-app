@@ -1,0 +1,179 @@
+{
+ "batch": "r5-india-025",
+ "items": [
+  {
+   "term": "空性",
+   "reading": "くうしょう",
+   "gloss": "emptiness (śūnyatā)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜に応じて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "純粋意識",
+   "reading": "じゅんすいいしき",
+   "gloss": "pure consciousness",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜に伴って"
+  },
+  {
+   "term": "純粋経験",
+   "reading": "じゅんすいけいけん",
+   "gloss": "pure experience (Nishida)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜に限らず",
+   "factNote": "Nishida discussion of experience before subject-object division; not proof self disappears in brain scans."
+  },
+  {
+   "term": "結跏趺坐",
+   "reading": "けっかふざ",
+   "gloss": "full lotus posture",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜からといって"
+  },
+  {
+   "term": "絶対無",
+   "reading": "ぜったいむ",
+   "gloss": "absolute nothingness (Nishida)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜ものの",
+   "factNote": "Nishida philosophical concept, not literal total nonexistence."
+  },
+  {
+   "term": "羯諦羯諦",
+   "reading": "ぎゃていぎゃてい",
+   "gloss": "\"gone, gone\" (Heart Sutra mantra)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜一方で",
+   "factNote": "Heart Sutra transliteration; interpretation varies, do not pretend one translation exhausts its religious use."
+  },
+  {
+   "term": "老師",
+   "reading": "ろうし",
+   "gloss": "Zen master, venerable teacher",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜に至る",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "老荘思想",
+   "reading": "ろうそうしそう",
+   "gloss": "Lao-Zhuang (Taoist) thought",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜としても"
+  },
+  {
+   "term": "聖徳太子",
+   "reading": "しょうとくたいし",
+   "gloss": "Prince Shōtoku",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜を通じて",
+   "factNote": "Distinguish received cult and attributed writings from firm historical biography."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

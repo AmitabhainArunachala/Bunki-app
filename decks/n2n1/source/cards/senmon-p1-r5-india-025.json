@@ -1,0 +1,202 @@
+{
+ "cards": [
+  {
+   "term": "老師",
+   "reading": "ろうし",
+   "pos": "noun",
+   "meaning": "venerable Zen teacher",
+   "defJa": "禅の修行を導く師への敬称",
+   "passage": {
+    "ja": "禅の修行を扱う本で老師という呼び名に出会ったら、単に年齢の高い先生を想像するだけでは足りません。修行を導く師に敬意を表す語で、相手との関係や宗派の慣習を踏まえて用いられます。年を重ねた人なら誰にでも付ける肩書とは違い、学校の先生を呼ぶ日常語とも響きが異なります。弟子が問いを抱え、師とのやり取りを通じて自分の理解を見直す場面に至ると、その呼び方の重みも感じられるでしょう。人物紹介を読む際には、何を教え、どのように修行者を導く立場なのかにも目を向けてください。",
+    "form": "老師",
+    "en": "When you encounter the title roshi in a book about Zen practice, picturing merely an elderly teacher is not enough. It expresses respect for a teacher who guides practice and is used with regard to relationships and a school’s conventions. It is not a title bestowed on every older person, and it has a different tone from an everyday form of address for a schoolteacher. When a disciple questions their own understanding through exchanges with the teacher, the significance of the title may become clearer. When reading a profile, also consider what the person teaches and how they guide practitioners.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "禅の師への敬称として使い、年齢だけを根拠にはしない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "老荘思想",
+   "reading": "ろうそうしそう",
+   "pos": "noun",
+   "meaning": "the thought of Laozi and Zhuangzi",
+   "defJa": "老子と荘子に代表される中国の思想",
+   "passage": {
+    "ja": "中国に伝わった仏教を読むには、インドの教えだけでなく、受け入れた側の言葉にも目を向ける必要がある。老荘思想は老子と荘子に代表され、作為への批判や、固定した区別を問い直す見方を含んでいる。仏典の受容を考える際には、こうした思想と仏教の語り方がどこで近づき、どこで異なるかが論点となる。似た表現があるとしても、両者を同じ教えと見なせば、それぞれの問題意識が見えなくなる。中国を経て日本に伝わった言葉には、翻訳と解釈が重なってきた歴史がある。",
+    "form": "老荘思想",
+    "en": "Reading Buddhism as it developed in China requires attention to the receiving culture’s language as well as to Indian teachings. The thought of Laozi and Zhuangzi includes criticism of contrivance and perspectives that question fixed distinctions. Studying the reception of Buddhist texts involves asking where this thought and Buddhist discourse converge and where they differ. Even when expressions are similar, treating the two as the same teaching obscures their respective concerns. Words that reached Japan through China carry a history of accumulated translation and interpretation.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "老子と荘子の思想をまとめて指すが、仏教そのものとは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "結跏趺坐",
+   "reading": "けっかふざ",
+   "pos": "noun",
+   "meaning": "full lotus posture",
+   "defJa": "左右の足を反対側のももに載せる座法",
+   "passage": {
+    "ja": "仏像と同じ形で座ろうとして、片方の足を上げただけで膝が痛くなることってあるよね。左右の足をそれぞれ反対側のももに載せる結跏趺坐は、坐禅で用いられる座り方の一つなんだ。でも、形が整ったからといって、そのまま深い集中まで保証されるという話にはならないよ。体の柔らかさも違うし、痛みを我慢して無理に足を組むのは避けたいところだね。寺の坐禅会に参加するなら、足の位置だけをまねする前に、別の座り方も含めて指導する人に相談してみよう。",
+    "form": "結跏趺坐",
+    "en": "You can try to sit like a Buddhist statue and find your knee hurts after lifting just one foot. Full lotus, with each foot placed on the opposite thigh, is one posture used in seated meditation. But getting the shape right does not automatically guarantee deep concentration. Flexibility varies, and forcing your legs into position through pain is something to avoid. If you join a temple meditation session, consult the instructor about alternative postures before simply copying the position of the feet.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "足の組み方を表す語で、集中の深さを表す語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "空性",
+   "reading": "くうしょう",
+   "pos": "noun",
+   "meaning": "emptiness; absence of inherent existence",
+   "defJa": "他と無関係な固定した本質がないこと",
+   "passage": {
+    "ja": "茶碗は土や火や職人の手があって初めて形になり、使う人との関係に応じて役割も変わります。中観派でいう空性は、そうした条件を離れて、それだけで成り立つ固定した本質はないという見方です。目の前の器が消えてしまうという意味ではなく、その成り立ちをどこまでたどるかが問題になります。何も存在しないと片づけると、物事が条件によって生じるという肝心な論点を取り逃がします。まずは、器を支えている関係を一つずつ挙げるところから始めましょう。",
+    "form": "空性",
+    "en": "A bowl takes shape only through clay, fire, and a craftsperson’s hands, and its role changes according to its relationship with its user. Emptiness in the Madhyamaka school means that there is no fixed essence that exists independently of such conditions. The point is not that the vessel before us disappears, but how far we trace the conditions of its existence. Dismissing this as meaning that nothing exists misses the crucial point that things arise through conditions. Let us begin by identifying the relationships that sustain the vessel one by one.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「ある物の本質が空である」という意味で使う哲学用語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "絶対無",
+   "reading": "ぜったいむ",
+   "pos": "noun",
+   "meaning": "absolute nothingness in Nishida’s thought",
+   "defJa": "有と無の対立を超える根本的な立場",
+   "passage": {
+    "ja": "黒板に「ある」と「ない」を並べると、二つの反対語で世界を分けたくなりますね。西田哲学の絶対無は、片方の「ない」をどこまでも大きくしたものとして読むと、かえって分かりにくくなります。難しい概念ではあるものの、まずは有と無の対立自体を成り立たせる根底を問う議論だと押さえましょう。これは机の上に何も置かれていない状態とは、話の次元が違います。読書ノートには日常語の用例と哲学上の用法を分けて書き、本文で対立する二つの立場を探すと議論を追いやすくなります。",
+    "form": "絶対無",
+    "en": "When “being” and “nonbeing” are written on a blackboard, it is tempting to divide the world between the two opposites. Nishida’s absolute nothingness becomes harder to understand if it is read as an unlimited enlargement of the second term. Although the concept is difficult, begin by recognizing it as an inquiry into the ground that makes the opposition of being and nonbeing possible. This is a different level of discussion from a desk with nothing on it. Separating everyday examples from the philosophical usage in your notes and locating the opposing positions in the text makes the argument easier to follow.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "単なる不在と区別し、西田哲学の文脈で読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "聖徳太子",
+   "reading": "しょうとくたいし",
+   "pos": "noun",
+   "meaning": "Prince Shotoku",
+   "defJa": "日本で仏教の興隆に関わった飛鳥時代の皇族",
+   "passage": {
+    "ja": "寺の縁起を読むとき、政治に携わった人物の姿と、後世の人々が仰いだ信仰の対象とが重なることがある。聖徳太子も仏教を重んじた飛鳥時代の皇族として知られると同時に、長い歴史の中で信仰を集めてきた存在である。伝記に不思議な出来事が記されているからといって、それをそのまま同時代の記録として扱うことはできない。だが、史実として確かめにくい記述も、どのような理想がその人物に託されたかを読む資料にはなる。歴史と信仰の重なりをほどく作業は、どちらかを消すことではない。",
+    "form": "聖徳太子",
+    "en": "When reading a temple’s origin account, a political figure may overlap with the object of devotion revered by later generations. Prince Shotoku is known both as an imperial family member who valued Buddhism in the Asuka period and as a figure who attracted devotion over a long history. A miraculous event in a biography cannot simply be treated as a contemporary record. Yet an account that is difficult to verify historically can still reveal the ideals invested in that person. Untangling history and devotion does not mean erasing either.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "史実上の人物と、後世に形成された太子信仰を分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "純粋経験",
+   "reading": "じゅんすいけいけん",
+   "pos": "noun",
+   "meaning": "pure experience in Nishida’s philosophy",
+   "defJa": "主客の区別や判断が加わる前の経験",
+   "passage": {
+    "ja": "鐘の音に聞き入っている瞬間を、後から「私が鐘を聞いた」と言い表すと、そこには聞く者と聞かれる物の区別がある。西田幾多郎の初期の哲学は、その区別が生じる前の直接的なあり方を純粋経験として考察した。この問いは坐禅に限らず、音楽や日常の動作に没頭する場面を考える手掛かりにもなる。ただし、ぼんやりして判断を失った状態と同一視すれば、経験そのものから出発しようとする議論の狙いが薄れる。心を空白にする方法を探すより、区別がどこで立ち上がるかを問いたい。",
+    "form": "純粋経験",
+    "en": "When a moment of absorption in a bell’s sound is later described as “I heard the bell,” the listener is distinguished from what was heard. Nishida Kitaro’s early philosophy examined the immediate condition before that distinction as pure experience. This question offers a way to think about absorption in music or everyday actions as well as seated meditation. Equating it with a dazed loss of judgment, however, obscures the argument’s aim of starting from experience itself. Rather than seeking a method for emptying the mind, we should ask where the distinction arises.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "西田の初期哲学では、単に素朴な体験という意味ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "羯諦羯諦",
+   "reading": "ぎゃていぎゃてい",
+   "pos": "noun",
+   "meaning": "gate gate; a Heart Sutra mantra phrase",
+   "defJa": "経末の真言で原語の音を写した句",
+   "passage": {
+    "ja": "写経の説明に出てくる羯諦羯諦を、漢字の意味だけで訳そうとすると、なかなか筋の通る日本語になりません。般若心経の末尾にあるこの部分は、原語の音を漢字で写した真言の一節だからです。漢字は意味を担う一方で、外国語の響きを伝えるためにも使われてきました。案内文では、字ごとの直訳を並べるよりも、音写であることと、唱えられる箇所であることを先に説明すると親切です。読み方を示すふりがなにも、教えの内容を説明する訳文とは別の役割があります。",
+    "form": "羯諦羯諦",
+    "en": "Trying to translate gate gate in an explanation of sutra copying solely through the meanings of its Chinese characters does not readily produce coherent Japanese. This section at the end of the Heart Sutra is part of a mantra that uses characters to transcribe sounds from the source language. While Chinese characters carry meanings, they have also been used to transmit the sounds of foreign languages. In a guide, it is helpful to explain first that the phrase is a transcription intended for chanting instead of listing literal translations of individual characters. Pronunciation guides also serve a different purpose from translations that explain the teaching.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "漢字の意味を組み合わせず、音写された真言として読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "純粋意識",
+   "reading": "じゅんすいいしき",
+   "pos": "noun",
+   "meaning": "pure consciousness",
+   "defJa": "対象や思考内容から区別される気づき",
+   "passage": {
+    "ja": "インドの非二元論を紹介する文章では、見える物や浮かぶ考えと、それらに気づく働きが区別される。そこで純粋意識という語は、特定の思考内容に限定されない気づきを指すために用いられる。ただし、この語の説明は思想や実践の流派に伴って異なり、一つの定義ですべてを覆うことはできない。瞑想中の脳活動を記録した図を添えても、哲学上の概念と測定値が直ちに同じものになるわけではない。資料を比較する際には、まず著者が何を意識の内容から切り離しているかを確かめる。",
+    "form": "純粋意識",
+    "en": "Accounts of Indian nondual thought distinguish visible things and arising thoughts from the awareness of them. In this context, pure consciousness denotes awareness that is not restricted to particular thought content. However, explanations of this term differ across schools of thought and practice, and no single definition covers them all. Adding a diagram of brain activity during meditation does not immediately make the philosophical concept identical to the measurements. When comparing sources, the first task is to establish what each author distinguishes from the contents of consciousness.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "思想上の概念であり、脳活動の測定値をそのまま指す語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
