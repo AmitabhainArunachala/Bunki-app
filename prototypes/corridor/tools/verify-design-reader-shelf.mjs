@@ -1136,6 +1136,7 @@ try {
             control: { top: r.top, bottom: r.bottom, left: r.left, right: r.right },
             popup: { top: m.top, bottom: m.bottom, left: m.left, right: m.right } };
         });
+        const revealFrames = () => page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
         const assertFocus = (seen, beforeScroll, expectedId = null) => {
           assert(seen.inside, `the focused sentence control must be inside the popup: ${JSON.stringify(seen)}`);
           if (expectedId) assert.equal(seen.id, expectedId, 'The sentence control keeps the intended focus');
@@ -1158,6 +1159,7 @@ try {
         assert(sentence.bottom <= viewport.height, `the sentence card falls outside the screen: ${JSON.stringify(sentence)}`);
         assertFocus(focus, beforeScroll);
         await page.keyboard.press('Tab');
+        await revealFrames();
         const askFocus = await focused();
         assertFocus(askFocus, beforeScroll, 'reader-teacher');
         assert.equal(await page.locator('#mini .mini-sentence-full mark').textContent(), '郊外');
@@ -1182,9 +1184,11 @@ try {
         assert(Math.abs(shortSentence.top - shortWord.top) <= 1, `the shorter word card's sentence moved its top: ${JSON.stringify({ shortWord, shortSentence })}`);
         assertFocus(shortFocus, shortScroll);
         await page.keyboard.press('Tab');
+        await revealFrames();
         const shortAskFocus = await focused();
         assertFocus(shortAskFocus, shortScroll, 'reader-teacher');
         await page.keyboard.press('Tab');
+        await revealFrames();
         const practiceFocus = await focused();
         assertFocus(practiceFocus, shortScroll, 'reader-sentence-practice');
         await page.locator('#mini #reader-sentence-practice').click();

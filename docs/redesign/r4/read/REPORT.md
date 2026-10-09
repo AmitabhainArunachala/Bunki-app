@@ -341,4 +341,30 @@ The gate then reviewed `7a48cd77` (product code `76c40528`, artifact `0ef83749�
 
 Logs, receipts and the photographs `galaxy-popup-before-0ef.png` and `galaxy-popup-after-fix.png` are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-fix-01M4GQMR/`. Nothing earlier under `r4-finish` was changed. The worktree had no `node_modules`; the lane worktree's was cloned into it for the build, where git ignores it, and removed afterwards.
 
-**Limits of this round.** The reviewed build was reproduced in Chromium only. The one WebKit failure is read as timing under load, because it did not recur alone and the reader's computed styles are unchanged, but it was re-run once and not investigated further. No other suite was run on the fixed code. The galaxy popup was measured and photographed at 390 wide by day in the English interface, on 動画; night, 日本語 and other widths were not. In the galaxy the "to review" note stands close beside Save, as it did before this change; it was not part of the finding and is left as it is.
+**Limits of this round.** The reviewed build was reproduced in Chromium only. The one WebKit failure was first read here as timing under load. That reading was wrong about the cause: it was a race in the verifier, which measured the focused control before the popup's one-frame focus reveal had run. The next section records it and its repair. No other suite was run on the fixed code. The galaxy popup was measured and photographed at 390 wide by day in the English interface, on 動画; night, 日本語 and other widths were not. In the galaxy the "to review" note stands close beside Save, as it did before this change; it was not part of the finding and is left as it is.
+
+### Third gate review: a race in the verifier's focus check
+
+The gate then reviewed `b0104ffc` and selected one finding, in the verifier. **No product file changes in this round**, so the product bytes are those of `b0104ffc`. The full battery, the photographs and `shots/IDENTITY.json` are still owed on a clean build of the final commit, as the section above says.
+
+| Finding | What was wrong | Fix | What holds it |
+|---|---|---|---|
+| Focus measured before the reveal | The popup reveals a newly focused control one animation frame after `focusin`, by scrolling inside the pinned card. `G6-sentence-pane-seat` pressed Tab and measured at once. In WebKit a measurement could land before that frame, which is the 47/48 recorded above: "Ask the tutor" focused at 386.7 to 444.7px, the card ending at 326.6px. The product was behaving as designed. | After each of the three Tab presses the case waits two of the page's own animation frames, then measures. No fixed sleep was added. | Every assertion, floor and tolerance of the case is unchanged, and the count stays 48 per engine. |
+
+**What was run in this round.** Only `verify-design-reader-shelf`, and a probe of the window itself.
+
+| Build | Engine | Result |
+|---|---|---|
+| Worktree on `b0104ffc`, `sourceDirty: true` (verifier and documents only), digest `ddaf5370…`, the same product bytes as the build above | Probe, WebKit | At `focusin`, before any frame, "Ask the tutor" stands at 386.7 to 444.7px with the card ending at 326.6px and not scrolled: the figures of the logged failure. Two frames later it stands at 260.7 to 318.7px, inside the card. |
+| Same build | Probe, Chromium | Already inside the card at `focusin`: that engine scrolls a focused control into view at once, so only WebKit showed the race. |
+| Same build, both engines run at the same time | Chromium | 48/48 |
+| Same build, both engines run at the same time | WebKit | 48/48 |
+
+Logs, receipts and the probe are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-fix-r6-1/`. Nothing earlier under `r4-finish` was changed. As in the round before, the lane worktree's `node_modules` was cloned into this worktree, where git ignores it, and removed afterwards; the supplied one was not touched.
+
+**Limits of this round.** The verifier's own failure depends on when its measurement lands, so it was not made to fail again on demand; the probe shows the window it fell into, and the suite was run once under the same two-engine load that produced the logged failure. The probe was run at 320 wide on その only. No other suite was run.
+
+**Follow-ups recorded, not fixed.**
+
+- When Practice fails, its message is written into the sentence pane's note, the last element of the pane, below "Save the sentence". In a pinned, clipped card nothing scrolls that note into view, because the reveal follows only the focused control, so a sighted reader may not see it without scrolling the card. "Ask the tutor" and "Save the sentence" report through the toast instead. This is derived from the source and was not reproduced at runtime; no verifier reads the note. The note is a `role="status"` region, so a screen reader still hears it, and the card still scrolls by hand. It is a corner of the accepted pinned-card tradeoff. Sending Practice's failure through the toast would close it, but that changes where a message appears, so it is left as a choice for later.
+- The older reader rules that select the title, the English line, the instrument line, the version block and the tip as direct children of `main` can no longer match, now that those sit inside the title card, and `renderReader` still adds an `on-hero` class that nothing styles. No behaviour depends on them. They are left for a later cleanup.
