@@ -101,6 +101,12 @@
  *                         simplified version shows no switch. Control: 3166ded3 ("easier N3", no caption).
  *                         On a phone (390 and 320) each side of the switch and its ⓘ is a box at least
  *                         44px tall and wide (the brief's hit floor; added in round 4's review).
+ *   G8 motion            — at 390 and 320, computed nonzero transitions and animation keyframes on the
+ *                         reader's controls and word/sentence popup use transform and opacity only,
+ *                         with reduced motion disabled so the rule cannot pass by suppressing motion.
+ *   G9 Japanese breaks   — at 390 and 320, the source title and article text survive unchanged, opening
+ *                         brackets share a painted line with the following glyph, closing punctuation
+ *                         shares one with the preceding glyph, and title lookup words do not split.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -138,6 +144,7 @@ assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 const withControl = process.argv.includes('--control');
 
 const ARTICLE = 'global-voices:2026-09-28-65726'; // 「ダマスカス 郊外 ジャラマナ」, 「正 反対」, 「「 連帯 の 畑 」」
+const fixtureArticle = JSON.parse(readFileSync(resolve(site, 'data/articles/global-voices-2026-09-28-65726.json'), 'utf8'));
 const NARRATED = 'aozora:000628';
 const THREE_PARAS = 'real-hojoki'; // 方丈記 · 冒頭: three paragraphs // ごん狐: the pre-pass build carried F1 narration for it
 const DESK = { width: 1368, height: 900 }, PHONE = { width: 390, height: 844 };
@@ -204,6 +211,80 @@ const measureGaps = (count) => {
     if (gap > worst.gap) worst = { gap: Math.round(gap * 100) / 100, pair: `${a.text}|${b.text}`, at: a.index };
   }
   return { tokens: boxes.length, worst, strayWhitespace: stray.length };
+};
+
+/** The rendered base glyphs, rather than wrapper names, establish Japanese line-breaking behavior. */
+const measureJapaneseBreaks = (selector) => {
+  const node = document.querySelector(selector);
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => n.parentElement.closest('rt, .tok-en') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+  });
+  const glyphs = [];
+  let text = '';
+  while (walker.nextNode()) {
+    const current = walker.currentNode;
+    text += current.textContent;
+    let offset = 0;
+    for (const char of current.textContent) {
+      const range = document.createRange();
+      range.setStart(current, offset); offset += char.length; range.setEnd(current, offset);
+      const rect = [...range.getClientRects()].find((box) => box.width > 0 && box.height > 0);
+      if (rect && !/\s/u.test(char)) glyphs.push({ char, y: rect.top + rect.height / 2 });
+    }
+  }
+  const opening = /[「『（〈《〔［｛]/u, closing = /[、。，．！？」』）〉》〕］｝]/u;
+  const violations = [];
+  let openings = 0, closings = 0;
+  for (let i = 0; i < glyphs.length; i += 1) {
+    const here = glyphs[i];
+    const neighbor = opening.test(here.char) ? glyphs[i + 1] : closing.test(here.char) ? glyphs[i - 1] : null;
+    if (opening.test(here.char)) openings += 1;
+    if (closing.test(here.char)) closings += 1;
+    if (neighbor && Math.abs(here.y - neighbor.y) > 3) violations.push({ mark: here.char, neighbor: neighbor.char, gap: +Math.abs(here.y - neighbor.y).toFixed(1) });
+  }
+  const splitWords = [...node.querySelectorAll('.japanese-lookup-word')].flatMap((word) => {
+    const range = document.createRange(); range.selectNodeContents(word);
+    const centers = [...range.getClientRects()].filter((box) => box.width > 0 && box.height > 0).map((box) => box.top + box.height / 2);
+    return centers.length && Math.max(...centers) - Math.min(...centers) > 3 ? [word.textContent] : [];
+  });
+  return { text, glyphs: glyphs.length, openings, closings, violations, splitWords };
+};
+
+/** Read the actual cascade and named keyframes, including pseudo-elements, with motion enabled. */
+const measureReaderMotion = () => {
+  const allowed = new Set(['transform', 'opacity']);
+  const definitions = new Map();
+  const collect = (rules) => {
+    for (const rule of rules) {
+      if (rule.type === CSSRule.KEYFRAMES_RULE) definitions.set(rule.name, [...rule.cssRules].flatMap((frame) => [...frame.style]));
+      else if (rule.cssRules) collect(rule.cssRules);
+    }
+  };
+  for (const sheet of document.styleSheets) collect(sheet.cssRules);
+  const seconds = (value) => parseFloat(value) * (value.trim().endsWith('ms') ? 0.001 : 1);
+  const violations = [];
+  let transitions = 0, animations = 0;
+  const nodes = [...document.querySelectorAll('.reader-card button, .reader-card summary, #reader button, #mini, #mini *')];
+  for (const node of nodes) for (const pseudo of [null, '::before', '::after']) {
+    const style = getComputedStyle(node, pseudo);
+    const name = `${node.id || node.className}${pseudo || ''}`;
+    const durations = style.transitionDuration.split(',').map(seconds);
+    style.transitionProperty.split(',').map((value) => value.trim()).forEach((property, i) => {
+      if (durations[i % durations.length] > 0) {
+        transitions += 1;
+        if (!allowed.has(property)) violations.push({ name, kind: 'transition', property });
+      }
+    });
+    const animationDurations = style.animationDuration.split(',').map(seconds);
+    style.animationName.split(',').map((value) => value.trim()).forEach((animation, i) => {
+      if (animation === 'none' || !(animationDurations[i % animationDurations.length] > 0)) return;
+      animations += 1;
+      const properties = definitions.get(animation);
+      if (!properties) violations.push({ name, kind: 'animation', animation, property: 'missing keyframes' });
+      for (const property of new Set(properties || [])) if (!allowed.has(property)) violations.push({ name, kind: 'animation', animation, property });
+    });
+  }
+  return { nodes: nodes.length, transitions, animations, violations };
 };
 
 /** WCAG contrast of a node's text against the first opaque background behind it. */
@@ -915,6 +996,34 @@ try {
       return { door: row.label, pane, quote: active.quote.slice(0, 20) };
     });
 
+    for (const [label, viewport] of [['390', PHONE], ['320', NARROW]]) {
+      await run(`G6-sentence-pane-seat-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        await tapToken(page, SUBURB);
+        const box = () => page.locator('#mini').evaluate((node) => {
+          const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height };
+        });
+        const word = await box();
+        await page.locator('#mini #mini-sentence-open').click();
+        await page.waitForTimeout(200); // ResizeObserver has placed the settled sentence view.
+        const sentence = await box();
+        assert(Math.abs(sentence.top - word.top) <= 1, `opening the sentence moved the card's top edge: ${JSON.stringify({ word, sentence })}`);
+        assert(sentence.bottom <= viewport.height, `the sentence card falls outside the screen: ${JSON.stringify(sentence)}`);
+        assert.equal(await page.locator('#mini .mini-sentence-full mark').textContent(), '郊外');
+        assert.equal(await page.locator('#mini #mini-take').isVisible(), false, 'The sentence view still offers the word Save');
+        const before = await readAppRecord(page);
+        await page.locator('#mini #reader-context-save').click();
+        const kept = await waitForAppRecord(page, (r) => (r.teacherContexts?.entries || []).some((entry) => entry.sourceId === ARTICLE && entry.quote?.startsWith('ダマスカス郊外')));
+        assert.equal(kept.teacherContexts.entries.filter((entry) => entry.sourceId === ARTICLE && entry.quote?.startsWith('ダマスカス郊外')).length, 1, 'Save the sentence keeps exactly one tutor entry');
+        assert.equal(kept.teacherContexts.activeRef ?? null, before.teacherContexts?.activeRef ?? null, 'Save the sentence must not activate it');
+        assert.equal(await page.evaluate(() => document.body.dataset.view), 'reader', 'Save the sentence must stay in the reader');
+        await page.locator('#mini #mini-sentence-back').click();
+        assert.equal(await page.locator('#mini #mini-take').isVisible(), true, 'Back to the word restores its Save');
+        assert.equal(await page.locator('#mini .mini-sentence-pane').isVisible(), false, 'Back to the word hides the sentence view');
+        return { word, sentence, kept: 1, activeRef: kept.teacherContexts.activeRef ?? null };
+      });
+    }
+
     await run('G7-version-switch', DESK, async (page) => {
       await openArticle(page, ARTICLE);
       const read = () => page.evaluate(() => ({
@@ -941,6 +1050,35 @@ try {
         assert.equal(boxes.length, 3, `the switch's controls: ${JSON.stringify(boxes)}`);
         for (const box of boxes) assert(box.w >= 44 && box.h >= 44, `a control of the version switch is under 44px: ${JSON.stringify(box)}`);
         return boxes;
+      });
+    }
+
+    for (const [label, viewport] of [['390', PHONE], ['320', NARROW]]) {
+      await run(`G8-reader-popup-motion-${label}`, viewport, async (page) => {
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+        await openArticle(page, ARTICLE);
+        await tapToken(page, SUBURB);
+        const word = await page.evaluate(measureReaderMotion);
+        assert(word.nodes > 100 && word.transitions > 0 && word.animations > 0, `motion check did not observe the reader and popup: ${JSON.stringify(word)}`);
+        assert.deepEqual(word.violations, [], 'Reader and word popup may animate only transform and opacity');
+        await page.locator('#mini #mini-sentence-open').click();
+        const sentence = await page.evaluate(measureReaderMotion);
+        assert.deepEqual(sentence.violations, [], 'The sentence popup may animate only transform and opacity');
+        return { word, sentence };
+      });
+
+      await run(`G9-japanese-line-breaks-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        await page.evaluate(() => document.fonts.ready);
+        const title = await page.evaluate(measureJapaneseBreaks, '.reader-card h1.view-title');
+        const article = await page.evaluate(measureJapaneseBreaks, '#reader');
+        assert.equal(title.text, fixtureArticle.title, 'Lookup preserves the exact Japanese title');
+        assert.equal(article.text, fixtureArticle.tokens.map((token) => token.s).join(''), 'Kinsoku preserves the exact article text');
+        assert(title.openings > 0 && title.closings > 0 && article.openings > 0 && article.closings > 0, 'The fixture must exercise opening brackets and closing punctuation in both title and article');
+        assert.deepEqual(title.violations, [], 'Title punctuation must stay on the painted line of its neighboring word');
+        assert.deepEqual(article.violations, [], 'Article punctuation must stay on the painted line of its neighboring word');
+        assert.deepEqual(title.splitWords, [], 'Japanese lookup words in the title must not split across lines');
+        return { title: { glyphs: title.glyphs, openings: title.openings, closings: title.closings }, article: { glyphs: article.glyphs, openings: article.openings, closings: article.closings } };
       });
     }
 
@@ -1031,7 +1169,7 @@ try {
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
     scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row, the version switch',
     results,
-    passed: results.length === engines.length * 37 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 45 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

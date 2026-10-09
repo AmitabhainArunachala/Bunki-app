@@ -31,7 +31,7 @@ const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabl
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
 const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
-  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /must stay disabled until reload/]];
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -158,7 +158,7 @@ const cases = [
     assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-name').inputValue(), 'Capture first', 'The typed list name stays');
     // A native write fault protects the record until reload, even once the fault is gone.
     assert.equal(await page.evaluate(() => window.annotationFixture.recordWritable()), false, 'The record must stay read-only until reload');
-    assert.equal(await page.locator('#vocabulary-list-popover .vocabulary-list-form [type="submit"]').isDisabled(), true, 'The list form must stay disabled until reload');
+    assert.equal(await page.locator('#vocabulary-list-popover .vocabulary-list-form [type="submit"]').isDisabled(), true, 'A failed native write protects the host until reload');
     assert.match(await page.locator('.vocabulary-list-status').textContent(), /reload/i, 'The notice must say a reload comes before any retry');
     await closeChooser(page);
     await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
