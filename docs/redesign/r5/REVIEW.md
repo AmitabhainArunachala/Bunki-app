@@ -336,13 +336,13 @@ Five fresh Chromium contexts at 390×844, service worker blocked, measured after
 |---|---:|---:|
 | Cold navigation → observed body ready | 332.0 | 326.9–332.6 |
 | Lookup click → two RAF paint opportunities | 32.5 | 30.8–34.9 |
-| Lookup click → actual dictionary meaning visible | 234.8 | 222.5–250.7 |
+| Lookup click → locator-observed full-senses upper bound | 234.8 | 222.5–250.7 |
 | Lookup click → all finite page animations settled | 832.1 | 814.9–833.1 |
 | N1 Reveal click → two RAF paint opportunities | 32.9 | 31.8–42.9 |
-| N1 Reveal click → actual answer visible | 35.8 | 35.2–50.7 |
+| N1 Reveal click → locator-observed answer upper bound | 35.8 | 35.2–50.7 |
 | N1 Reveal click → all finite page animations settled | 250.0 | 248.5–250.6 |
 
-The Mac opening-frame responses meet 100ms, and observed startup meets 1.5s. Actual lookup meaning takes roughly 235ms, above the 100ms lookup target on this Mac; card content appears in roughly 36ms, while authored settling takes 250ms. The lookup's global settling figure includes finite animations elsewhere on the page. **Check 20 remains partial in every state** because the required recent iPhone has not been measured. The slower meaning-ready path needs profiling and device validation; fast opening-frame numbers do not prove the lookup target.
+The Mac opening-frame responses meet 100ms, and observed startup meets 1.5s. The content observations above include Playwright locator polling and protocol overhead; they are upper bounds, not exact insertion or painting times. The lookup witness is the full dictionary senses, not its initial core gloss. A separate single passive diagnostic on this same pre-font build records core gloss insertion at 20.1ms, full-sense insertion at 228.1ms and a first full-sense geometry RAF at 228.6ms. That one sample is not the five-context median, and a geometry RAF precedes paint. The actual full-entry path includes first dictionary initialization; the diagnostic retains its event and resource timings. The lookup's global settling figure includes finite animations elsewhere on the page. **Check 20 remains partial in every state** because the required recent iPhone has not been measured. A fresh five-context passive observation on the repaired build will replace these old-build observations at final delivery; fast opening-frame numbers alone do not prove the lookup target.
 
 ### Files and invariant boundaries
 
