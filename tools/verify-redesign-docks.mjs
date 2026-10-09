@@ -271,7 +271,7 @@ async function journey(page, info) {
   } else if (info.kind === 'palette') {
     await page.locator('#kp-to-settings').click();
     await controls(page, info, 'palettes', '.kp-swatch', {
-      count: 8,
+      count: 9,
       textInside: true,
       scroll: true,
     });
