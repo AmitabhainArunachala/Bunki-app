@@ -435,4 +435,4 @@ html[data-room='search'] body .search-page .kdx-lens.on {
 html[data-room='search'] body .search-page .kdx-lens.on :is(.l-ja, .en-sub) { color: var(--color-ink); }
 html[data-room='search'] .words-index > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
 /* The shape-code lens above is the one door to this wheel. */
-html[data-room='search'] .skip-search-opener { display: none; }
+html[data-room='search'] body .search-page #search-skip-opener { display: none; }
