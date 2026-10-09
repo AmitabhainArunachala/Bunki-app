@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "追随",
+   "reading": "ついずい",
+   "pos": "noun",
+   "meaning": "following, keeping pace",
+   "defJa": "先行するものの後を追って進むこと",
+   "passage": {
+    "ja": "「他社の追随を許さない」って記事に書くと、ちょっと先に出ただけでも圧倒的に強い会社に見えるよね。でも、二社のチップが特定の試験でほぼ同じ成績なら、その表現は数字と釣り合わないと思うんだ。「この試験ではわずかに上回った」と書けば、差の大きさも比べた範囲も残るから、読者が自分で判断する材料になる。半導体の性能は消費電力や処理する内容によって評価が変わるだけに、勢いのある言葉を選ぶ前に、何を条件として測った結果なのかを確認したいね。",
+    "form": "追随",
+    "en": "Writing that a company “leaves competitors unable to follow” can make a slight lead sound overwhelming. If two chips perform almost equally in a particular test, that expression does not fit the figures. Saying “slightly exceeded it in this test” preserves both the size of the difference and the scope of comparison, giving readers material for their own judgment. Because semiconductor performance is evaluated differently according to power consumption and workload, it is worth checking the measurement conditions before choosing forceful language.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "許さないとの組み合わせは、大きな差を含意する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "需給",
+   "reading": "じゅきゅう",
+   "pos": "noun",
+   "meaning": "supply and demand",
+   "defJa": "必要とされる量と供給される量との関係",
+   "passage": {
+    "ja": "一つの工場で装置が止まったと聞いても、それだけで市場全体が品薄になるとは言えないよね。半導体の需給を考えるなら、その工場の生産量だけでなく、他の会社の供給や在庫、買う側の注文がどう動くかも合わせて見ることになる。一部の工程が詰まれば出荷が遅れる場合はあるけれど、どの製品にどれほど影響するかは、その工場の作り方や余力によって違うんだ。小さな故障から大きな値動きまで一本の線で結ぶ前に、間にある条件を一つずつ置くと、ニュースの読み方が落ち着くよ。",
+    "form": "需給",
+    "en": "Hearing that equipment stopped at one factory does not by itself establish a market-wide shortage. Considering semiconductor supply and demand requires examining other companies' output and inventories and changes in customers' orders, not just that factory's production. A bottleneck in part of the process may delay shipments, but which products are affected and how much depends on the factory's organization and spare capacity. Placing the intervening conditions one by one before linking a small failure directly to a large price change makes for a more measured reading of the news.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "工場の出来事と市場全体の関係を区別して読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "逼迫",
+   "reading": "ひっぱく",
+   "pos": "noun",
+   "meaning": "tightness, strain",
+   "defJa": "必要な量に対して余裕がほとんどない状態",
+   "passage": {
+    "ja": "半導体の市況を学ぶ練習として、必要な製品の数と、用意できる数を二本の線で描いてみましょう。注文が増える場合だけでなく、供給が減る場合にも、手元の在庫で補えなければ需給が逼迫する可能性があります。需要の急増、工場の停止、在庫の減少を必ず一緒に起きる条件として暗記するより、どの線が先に動いたかを分けて追うほうが、記事の因果関係を検証できます。余裕が失われた理由を特定してから、増産や代替品でどこまで不足を埋められるかを書き足すと、対策の違いまで整理できます。",
+    "form": "逼迫",
+    "en": "As practice in studying semiconductor markets, draw two lines representing the number of products needed and the number available. Supply and demand can become tight not only when orders increase but also when supply falls and inventories cannot cover the gap. Instead of memorizing demand surges, factory stoppages, and falling inventories as conditions that must occur together, tracing which line moved first helps test an article's causal account. After identifying why spare capacity disappeared, adding how far production increases or substitutes could close the gap also clarifies the different responses.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "需要と供給のどちらが動いたかを分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "追い風",
+   "reading": "おいかぜ",
+   "pos": "noun",
+   "meaning": "tailwind",
+   "defJa": "物事の進展を有利にする外部の状況",
+   "passage": {
+    "ja": "投資の成績が良かった理由を考えるとき、自分が選んだ企業の強みだけを数え上げてしまうことがある。しかし、その業種全体への需要拡大が追い風となっていれば、利益のすべてを個別銘柄の選び方に帰すことはできない。同じ期間の市場や近い業種の値動きと比較したうえで、引き受けた危険の違いも考えると、見かけの好成績を別の角度から読み直せる。環境の助けを認めることは判断を放棄することではなく、条件が変わった後にも持ち出せる判断と、その場限りの幸運を分ける作業である。",
+    "form": "追い風",
+    "en": "When considering good investment performance, one may list only the strengths of the companies one selected. But if expanding demand across the industry provided a tailwind, not all the gains can be attributed to stock selection. Comparing market or similar-industry movements over the same period while considering differences in risk allows apparently strong results to be reread from another angle. Recognizing help from the environment does not abandon judgment; it separates decisions that remain useful when conditions change from luck confined to that moment.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "本人の実力と、外部環境による助けを分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

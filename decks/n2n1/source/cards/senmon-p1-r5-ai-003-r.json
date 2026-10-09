@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "過熱",
+   "reading": "かねつ",
+   "pos": "noun",
+   "meaning": "overheating (of machines, markets, debates)",
+   "defJa": "熱が上がりすぎて危険な状態になること",
+   "passage": {
+    "ja": "深夜のデータセンターで大規模な学習を回していたGPUが過熱し、警報が鳴るや否や、担当者は端末に飛びついた。選択肢は二つで、学習を止めて最初からやり直すか、冷却ファンを限界まで回して粘るか。ファンには物理的な制約があり、三十秒迷っている間に損失は膨らむ一方です。こうした場面を文章にするときは、判断の重さをあれこれ説明しないことです。秒数と選択肢だけを書けば、読み手は自分の指の震えを想像しながら、現場の緊迫感まで体感してくれます。",
+    "form": "過熱し",
+    "en": "At midnight in a data center, a GPU running a large-scale training job overheated, and no sooner had the alarm sounded than the operator lunged for the terminal. There were only two options: stop the training and start over from the beginning, or push the cooling fans to their limit and hold out. Fans have physical constraints, and while you hesitate for thirty seconds, the losses keep on swelling. When you put a scene like this into writing, the trick is not to go on explaining how heavy the decision is. Write down only the seconds and the options, and readers will picture their own fingers trembling and feel the tension of the site for themselves.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "機器の過熱は文字どおり熱が上がる意。市場や議論の過熱は比喩で、混ぜないように。",
+    "sense": "機器が実際に熱を持ち、危険な温度に達すること"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "重み",
+   "reading": "おもみ",
+   "pos": "noun",
+   "meaning": "weight (in a neural network); importance",
+   "defJa": "学習のたびに更新され、入力の効き方を決める数値",
+   "passage": {
+    "ja": "ニューラルネットが賢くなる仕組みは案外素朴で、何億個もの重みが学習のたびに少しずつ更新され、誤差を減らしていくのです。ところが、実際にそれを使う人には、何が更新されているのかすら見えていません。画面に出てくる答えが当てになるか、月額は見合うか、使い心地はどうか、その外側だけが判断材料です。設計者は内部の数値から、利用者は外の挙動から、同じ一つの仕組みを眺めているわけです。この二つの視線が交差するのは、答えが外れて「なぜ」と問われる瞬間なんです。",
+    "form": "重み",
+    "en": "The mechanism by which a neural network grows smarter is surprisingly plain: with each round of training, hundreds of millions of weights are updated little by little, whittling the error down. Yet the people who actually use these systems cannot even see what is being updated. Whether the answers on screen hold up, whether the monthly fee is worth it, how it feels to use — only that outer surface is their material for judgment. The designer gazes at one and the same mechanism from the numbers inside; the user, from the behavior outside. The two lines of sight cross at the moment an answer misses and someone demands to know why.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "機械学習では、学習のたびに更新される数値を指す。物の重さではなく効き方の強さ。",
+    "sense": "ここでは物の重さではなく、学習で更新される数値の意"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

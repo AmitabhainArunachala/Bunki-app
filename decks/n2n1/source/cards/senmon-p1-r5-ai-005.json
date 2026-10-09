@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "探索と活用",
+   "reading": "たんさくとかつよう",
+   "pos": "expression",
+   "meaning": "explore vs exploit",
+   "defJa": "新しい選択肢を試すか既存の最善を取るか",
+   "passage": {
+    "ja": "探索と活用のトレードオフは、投資家が未知の銘柄を買うか既存の勝ち筋に資金を注ぐかという問いにそのまま重なる。同じ利回りの数字を見ても、過去の検証だけで選ぶ人は活用に偏り、新しい市場を試す人は探索に賭けている。両者の差は認知の枠組みそのものに根ざしており、片方を正解と呼ぶわけにはいかない。次にポートフォリオを見直すとき、今の配分がどちらに傾いているか一つの数字で書き出してみてください。",
+    "form": "探索と活用",
+    "en": "The trade-off between exploration and exploitation maps directly onto the question of whether an investor should buy unknown stocks or pour funds into an existing winning formula. Even looking at the same yield figure, a person who chooses based on past verification is biased toward exploitation, while one who tries a new market is betting on exploration. The difference between the two is rooted in the framework of cognition itself, and one cannot call either the correct answer. Next time you review your portfolio, try writing down in a single number which way the current allocation leans.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "投資判断の意思決定を「探索と活用」の枠組みで読み解く用法を示した。",
+    "sense": "新しい選択肢を試すことと既存の最善を利用することの対立"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.2:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

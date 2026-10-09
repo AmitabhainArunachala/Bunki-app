@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "頭打ち",
+   "reading": "あたまうち",
+   "pos": "noun",
+   "meaning": "leveling off, hitting a ceiling",
+   "defJa": "伸びが止まって、それ以上上がらない状態",
+   "passage": {
+    "ja": "半導体の微細化は、物理的な制約にぶつかって性能の伸びが頭打ちになると、よく言われます。一方、スマホの出荷が伸び悩むのは、買い替え需要がすでに行き渡った飽和という別物です。どちらのグラフも横ばいに見えるとはいえ、止まり方の中身はまったく違います。片方は上の壁に阻まれて止まり、片方は需要が満たされて自然に止まるのです。原因の側を先に押さえる習慣をつけておくと、似た概念が出てくる経済記事も迷わず読み分けられるようになります。",
+    "form": "頭打ち",
+    "en": "Semiconductor miniaturization, it is often said, sees its performance gains hit a ceiling after running into physical constraints. Sluggish smartphone shipments, on the other hand, are a different thing altogether: saturation, with replacement demand already spread through the market. Granted, both graphs look flat, but what lies behind the flattening is completely different. One stops because a wall blocks it from above; the other stops naturally because demand has been satisfied. Build the habit of pinning down the cause first, and you will find you can read economic articles featuring similar concepts without hesitation.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "成長が頭打ちになる、売上が頭打ちだ、と伸びの停止に使う。下降とは違う点に注意。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "量産",
+   "reading": "りょうさん",
+   "pos": "noun",
+   "meaning": "mass production",
+   "defJa": "同じ物を大量に作ること",
+   "passage": {
+    "ja": "試作チップが動いた時点では、半導体の新技術はまだ半分しか成功していない。量産に入るまでに、工場ごとに異なる工程条件の調整と、歩留まりと呼ばれる良品率の安定化が待っている。露光や成膜の条件は設備ごとに微妙にずれ、研究室で出た数値をそのまま転用できない。この壁の高さゆえに、設計で追随する企業は多くても、生産技術で躍進できる企業は限られる。先端チップの報道も、設計の話と生産の話を分けて読むようにすると、見通しが急に立ってくる。",
+    "form": "量産",
+    "en": "At the point when a prototype chip runs, a new semiconductor technology is still only half a success. Before mass production can begin, there await the tuning of process conditions that differ from fab to fab, and the stabilization of the good-chip ratio known as yield. Conditions for exposure and film deposition drift subtly from tool to tool, so figures obtained in the lab cannot simply be carried over. Because this wall is so high, companies able to follow along in design are many, while those able to leap ahead in production technology are few. Even reporting on leading-edge chips suddenly comes into focus once you make a habit of reading design stories and production stories separately.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "量産に入る、量産化する、量産体制と組む。試作との対比で使われることが多い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

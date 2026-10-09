@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "群を抜く",
+   "reading": "ぐんをぬく",
+   "pos": "verb",
+   "meaning": "to stand out from the rest, tower above",
+   "defJa": "他を大きく引き離して際立つこと",
+   "passage": {
+    "ja": "講義で聞き流したアルゴリズムも、小さな例を手で追うと急に身近になります。小さい順に並んだ七個の数字から一つを探すとき、端から順に見る方法は最悪で七回の比較が必要です。一方、半分ずつ候補を潰していく方法なら、最悪でも三回で絞り込めます。この差を図に描いて検証したところ、整列されたデータという制約さえ満たせば、二分探索が群を抜いて速いという話が実感に変わりました。候補が比較のたびに半分になっていくとわかれば、十億個のデータでも最悪三十回で済む理由が腑に落ちます。",
+    "form": "群を抜いて",
+    "en": "An algorithm you only half-absorbed in a lecture suddenly feels close at hand when you trace a small example yourself. When you search for one number among seven arranged in ascending order, scanning from one end takes seven comparisons at worst. The method that eliminates half the candidates at a time, by contrast, narrows it down in three at worst. When I verified this gap by drawing it as a diagram, the claim that binary search towers above the rest for speed, provided the constraint of sorted data is met, turned into something I could feel. Once you see that the candidates halve with each comparison, the reason a billion items take at most thirty comparisons falls neatly into place.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「群を抜いて速い」のように他との差を強調する比喩的な慣用句",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "歩留まり",
+   "reading": "ぶどまり",
+   "pos": "noun",
+   "meaning": "yield; the share of good chips from a wafer",
+   "defJa": "製品のうち正常に仕上がった品の割合",
+   "passage": {
+    "ja": "半導体工場の朝は、前夜の検査データの確認から始まります。一枚のウエハーから正常なチップが何割取れたか、この数字が急落すれば、工場は出荷計画の見直しを余儀なくされます。ある日、温度管理のわずかな誤差が露光やエッチングと相互作用した結果、不良品が量産されていました。歩留まりが悪化したとき、グラフが教えてくれるのは結果だけで、その裏で動く工程全体の因果関係は数字からは読み取れません。だからベテランは、小さな異常を手がかりに工程の全体像を復元しようとします。",
+    "form": "歩留まり",
+    "en": "The morning at a semiconductor fab begins with checking the previous night's inspection data. If the share of good chips taken from a wafer plunges, the fab is forced to rethink its shipment plans. One day, a slight error in temperature control had interacted with the lithography and etching steps, and defective chips were being mass-produced. When yield worsens, the graph tells you only the result; the causal relationships running behind it through the whole process cannot be read from the numbers. That is why veterans work to reconstruct the full picture of the process, using a single small anomaly as their clue.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "半導体や製造の現場で「歩留まりが上がる・悪化する」のように良品の割合と結びつく語",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "肩を並べる",
+   "reading": "かたをならべる",
+   "pos": "verb",
+   "meaning": "to rank alongside; be on a par with",
+   "defJa": "実力などが同じ水準に達すること",
+   "passage": {
+    "ja": "原稿の赤入れをしていると、数字の誤りよりも、事実より大きく書かれた表現のほうが気になる。先日は「日本の半導体技術は世界の頂点に立つ」という一文で手が止まった。素材や装置といった特定の分野なら世界と肩を並べる水準にあるが、全工程を通じて頂点とまでは言えない。そこで「頂点に立つ」を「一部の分野で世界と並ぶ」に改め、範囲を正確にした。強い表現は人を引く一方で、範囲を曖昧にしたまま出すと、読み手の認知は誇張を事実として受け取ってしまう。",
+    "form": "肩を並べる",
+    "en": "When I am marking up a manuscript, what bothers me is less an error in the figures than wording that has been written larger than the fact. The other day my pen stopped at a line claiming that Japan's semiconductor technology stands at the summit of the world. In particular fields such as materials and equipment it ranks alongside the world, but you cannot call it the summit across the entire process. So I changed 'stands at the summit' to 'ranks alongside the world in some fields' and made the scope exact. Strong wording draws people in, but if you let it go out with its scope blurred, the reader's cognition takes the exaggeration as fact.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「〜と肩を並べる」の形で、実力や地位が同じ水準に達したと表す",
+    "sense": "比喩で、実力や地位が同等になる"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

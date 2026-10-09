@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "EUV露光",
+   "reading": "いーゆーぶいろこう",
+   "pos": "noun",
+   "meaning": "EUV lithography",
+   "defJa": "最も波長の短い光で基板に微細な回路を描く工程",
+   "passage": {
+    "ja": "薄暗い部屋で撮った写真がぶれるのは、像の良し悪しがまず光で決まるからだ。半導体の微細加工も同じ理屈で、線を細かく描くには波長の短い光が要り、波長を詰めるほど解像度は飛躍的に上がる。ここまでは素朴だが、EUV露光が難しいのはその先にある。波長十三・五ナノメートルの光は空気にもレンズにも吸われるゆえ、装置は真空の中の鏡だけで組み上げられている。条件を一つずつ切り分けてみると、壁は光そのものではなく、光を扱える世界の狭さだと分かる。",
+    "form": "EUV露光",
+    "en": "A photograph taken in a dim room blurs because the quality of an image is decided, first of all, by the light. The microfabrication of semiconductors follows the same logic: drawing finer lines requires light of a shorter wavelength, and the more the wavelength is tightened, the more dramatically resolution rises. That much is plain; what makes EUV lithography hard lies beyond it. Because light with a wavelength of 13.5 nanometers is absorbed by air and by lenses alike, the machine is built from mirrors alone, inside a vacuum. Sort out the conditions one by one, and you see that the wall was never the light itself but the narrowness of the world that can handle it.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "半導体業界の専門語で、装置や技術の名と結びつく。波長十三・五ナノメートルの光には鏡と真空が要る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シリコンの盾",
+   "reading": "しりこんのたて",
+   "pos": "expression",
+   "meaning": "\"silicon shield\" (Taiwan's chip leverage)",
+   "defJa": "半導体への依存が戦争のコストを上げ、攻撃を防ぐという比喩",
+   "passage": {
+    "ja": "世界が台湾の半導体に依存している、この事実そのものを盾と読む考え方が「シリコンの盾」です。ただし戦争を自動的に防ぐ保証ではなく、あくまで一つの仮説にすぎません。先端チップの製造が一つの島に集中している、この事実を抑止の根拠と読めば、攻める側も損をするという計算が立ちます。同じ集中を逆から読めば、一地域の混乱が全世界の供給を止めるという脆弱性になります。答案では、この仮説を検証できる問いの形に書き直す練習をしておきましょう。",
+    "form": "シリコンの盾",
+    "en": "The 'silicon shield' is the idea that the very fact of the world's dependence on Taiwan's semiconductors can be read as a shield. It is no guarantee that war is automatically prevented, however, but strictly one hypothesis. Read the fact that leading-edge chip production is concentrated on a single island as grounds for deterrence, and a calculation emerges in which an attacker suffers too. Read the same concentration from the opposite side, and it becomes a vulnerability in which turmoil in one region halts supply for the entire world. For exam answers, practice rewriting this hypothesis into the form of a question you can verify.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "比喩なので「盾が機能する」とは言い切れない。同じ集中を抑止と脆弱性の両面から読む訓練に向く語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "アルゴリズム",
+   "reading": "あるごりずむ",
+   "pos": "noun",
+   "meaning": "algorithm",
+   "defJa": "問題を解く手順を正確に定めたもの",
+   "passage": {
+    "ja": "昨日、後輩が五十万件の在庫データから特定の商品番号を探すのに、上から順に全部見ると言い出してさ。それ、先に並べ替えを済ませばいいものを、と思わず割って入ったんだよ。真ん中を開いて、いらない半分を捨てて、また真ん中を開く、この手順に切り替えたら、手数は桁違いに減った。アルゴリズムの選択って、機械の性能の話より先に、コードを書く前の現場の意思決定なんだよね。後輩はそれ以来、何かを探す前にまずデータの並びを検証するくせがついた。",
+    "form": "アルゴリズム",
+    "en": "Yesterday my junior colleague announced that to find one specific product number in five hundred thousand inventory records, he would look through them all from the top. Just sort the data first — I couldn't help cutting in on the spot. Open the middle, throw away the half you don't need, open the middle again: once we switched to that procedure, the number of steps dropped by an order of magnitude. Choosing an algorithm is a decision made on the spot before any code is written, before you even get to the machine's performance. Ever since, he has formed the habit of checking how the data is ordered before searching for anything.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "話し言葉でも「アルゴリズムを選ぶ」「アルゴリズムを変える」と軽く使われる。手順の選択という身近な意味で動く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "21世紀の石油",
+   "reading": "にじゅういっせいきのせきゆ",
+   "pos": "expression",
+   "meaning": "\"the oil of the 21st century\" (chips)",
+   "defJa": "半導体など、経済に欠かせないものを燃料資源にたとえた呼び名",
+   "passage": {
+    "ja": "半導体は「21世紀の石油」と呼ばれ、経済報道の定番の表現となって久しい。ただし原油は燃やせば消えるものの、チップは使い切らず、工場と材料があれば再生産できる。この比喩が伝えるのはあくまで経済的な重要性であって、物質としての性質ではない。先端工程を担う工場は世界でもごく少数で、需給が一地域の制約に左右されるため、供給が乱れれば世界の生産が揺れる。記事の語句を正せば、各国が争う対象は埋蔵量ではなく製造能力そのものである。",
+    "form": "21世紀の石油",
+    "en": "Semiconductors have long been called the oil of the 21st century, a stock phrase of business reporting. While oil vanishes once it is burned, however, chips are never used up, and can be reproduced as long as factories and materials exist. What the metaphor conveys is strictly economic importance, not the properties of a substance. The factories handling leading-edge processes are only a handful worldwide, and because supply and demand hinge on the constraints of a single region, any disruption there shakes production around the world. Set the article's wording straight, and what countries compete over is not reserves but manufacturing capacity itself.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "比喩は経済上の重要性を指す。原油と違いチップは使い切らず再生産できる点を、報道分析では押さえたい。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

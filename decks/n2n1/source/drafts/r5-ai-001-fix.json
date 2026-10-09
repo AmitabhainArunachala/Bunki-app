@@ -1,0 +1,6 @@
+{
+ "歩留まり": "「誤差が露光やエッチングに相互作用し」は不自然。「露光やエッチングと相互作用し」などに修正。 / 半導体の歩留まりの説明として事実関係は問題なし。",
+ "群を抜く": "学習指南の文体で自然。 / 8要素の二分探索は最悪4回比較が必要（例: 8を探す場合）。「三回で答えに当たります」は誤り。7要素にするか「最悪四回」に修正。",
+ "肩を並べる": "肩を並べる: 原稿の添削をしていると、事実の正確さだけでなく、… the English has 3 sentences, the Japanese 5: they must match",
+ "礎": "礎: この前、友達に「スマホってなんであんな速く計算で… the English has 4 sentences, the Japanese 5: they must match / defJa must be one Japanese line of at most 32 characters without the term: '物事の基礎となる大事な部分'"
+}
