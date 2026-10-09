@@ -4728,3 +4728,266 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
     0 0 18px -4px color-mix(in srgb, var(--ai, #d9b45a) 55%, transparent);
 }
 /* END BUNKI SHELL ============================================================ */
+
+/* ==========================================================================
+   BEGIN BUNKI R4 SKIN · separation, ink, crispness (round 4, 9 October 2026)
+   John, on the tour (8 Oct): "it all blends together" · "the top header, the background
+   of the picture, th etitle … and the bottom are all the exact same make me wanna puke
+   beige" · "why do i feel that native ios expeirnce is alreayd way smoother and tighter
+   and crisper than almost everythign we have?"
+   Three materials instead of one beige, each with its own tone, edge and depth:
+     FRAME  the top line and the Line: bright 胡粉 paper by day, the deep frame by night,
+            on one crisp hairline — never the page's colour
+     PAGE   washi, cooler and less yellow, with a finer fibre (formation, fibre, tooth)
+     RAISED clean paper with a defined edge and a contact + ambient shadow
+   Ink is near-black sumi; the quiet ramp moves up so nothing reads washed out. Values
+   only and zero specificity: every room file and html[data-room] rule still wins.
+   ========================================================================== */
+:where(body:not([data-view='drift'])) {
+  /* each day world keeps its own paper (柿 stays persimmon, 赤 stays warm): the page is mostly the
+     world's ground, raised paper and the frame are brighter papers tinted from it. The default
+     world, his everyday one, has its own cooler values below. */
+  --color-page: color-mix(in srgb, var(--color-ground) 72%, #f6f4ef);
+  --color-surface: color-mix(in srgb, var(--color-paper) 40%, #fffefb);
+  --color-surface-sunk: color-mix(in srgb, var(--color-page) 90%, var(--color-ink) 6%);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 78%, var(--color-paper));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 74%, var(--color-paper));
+  --color-line: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 28%, transparent);
+  /* the frame: its own material, on one hairline */
+  --color-bar: color-mix(in srgb, var(--color-paper) 30%, #fdfcf9);
+  --color-bar-line: color-mix(in srgb, var(--color-ink) 17%, transparent);
+  --color-bar-ink: var(--color-ink);
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 68%, var(--color-bar));
+  --color-glass: var(--color-bar);
+  --color-glass-solid: var(--color-bar);
+  --color-glass-line: var(--color-bar-line);
+  --elevation-bar: 0 0.5px 0 color-mix(in srgb, var(--color-ink) 6%, transparent), 0 6px 16px -14px color-mix(in srgb, var(--color-ink) 40%, transparent);
+  /* depth: a tight contact shadow plus a soft ambient one */
+  --elevation-paper: 0 0.5px 1px rgb(20 22 28 / 7%), 0 2px 6px -2px rgb(20 22 28 / 7%);
+  --elevation-card: 0 1px 1px rgb(20 22 28 / 6%), 0 3px 8px -3px rgb(20 22 28 / 10%), 0 16px 32px -18px rgb(20 22 28 / 24%);
+  --elevation-lift: 0 1px 2px rgb(20 22 28 / 8%), 0 8px 18px -8px rgb(20 22 28 / 16%), 0 26px 48px -22px rgb(20 22 28 / 30%);
+  --elevation-float: 0 -0.5px 0 rgb(20 22 28 / 8%), 0 -10px 36px rgb(20 22 28 / 16%);
+  --elevation-press: 0 1px 0 var(--color-press), 0 6px 14px -8px rgb(20 26 40 / 34%);
+  /* type: the foundation's sizes stay (one-line pins depend on them); tightness comes from
+     weight, tracking and leading */
+  --leading-ui: 1.35;
+  --leading-body: 1.55;
+  /* motion: short and springy; the sheet curve is the iOS one */
+  --motion-press: 80ms;
+  --motion-quick: 150ms;
+  --motion-standard: 200ms;
+  --motion-room: 240ms;
+  --motion-sheet: 320ms;
+  --ease-standard: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  /* washi, truer: soft formation, short fibres (no long streaks), and a fine tooth */
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .38 0 0 0 0 .3 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .32 0 0 0 0 .25 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5' numOctaves='1' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .24 0 0 0 0 .17 0 0 0 1 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 0 0 0 0 0 .28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --skin-light: radial-gradient(120% 50% at 0% 0%, rgb(255 255 255 / 22%), transparent 60%);
+}
+/* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
+:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+  --color-ink: #14171d;
+  --color-page: #efece5;
+  --color-surface: #fffefb;
+  --color-bar: #fcfbf8;
+}
+/* night: the frame is the deepest tone, the page the world's ground, raised paper steps up
+   in light with a lit top edge. Light is emitted (edges, glows), never a solid phosphor fill. */
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+  --color-page: var(--color-ground);
+  --color-surface: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink) 4%);
+  --color-surface-sunk: color-mix(in srgb, var(--color-ground) 78%, #000);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-ground));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-ground));
+  --color-muted: color-mix(in srgb, var(--color-ink) 76%, var(--color-ground));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 72%, var(--color-ground));
+  --color-line: color-mix(in srgb, var(--color-ink) 15%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --color-bar: color-mix(in srgb, var(--color-ground) 62%, #000);
+  --color-bar-line: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 64%, var(--color-bar));
+  --elevation-bar: 0 0.5px 0 color-mix(in srgb, var(--color-accent) 10%, transparent), 0 10px 24px -16px rgb(0 0 0 / 80%);
+  --elevation-paper: inset 0 0.5px 0 rgb(255 255 255 / 6%), 0 6px 18px -6px rgb(0 0 0 / 50%);
+  --elevation-card: inset 0 1px 0 rgb(255 255 255 / 7%), 0 1px 2px rgb(0 0 0 / 45%), 0 16px 32px -14px rgb(0 0 0 / 75%);
+  --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 8%), 0 2px 4px rgb(0 0 0 / 45%), 0 26px 48px -18px rgb(0 0 0 / 80%);
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .7 0 0 0 0 .78 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .85 0 0 0 0 1 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+/* 殻 · the electric night: terminal black, phosphor edges */
+:where(:root[data-theme='kaku'] body:not([data-view='drift'])) {
+  --color-bar: color-mix(in srgb, var(--color-ground) 70%, #000);
+  --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
+  --color-surface: color-mix(in srgb, var(--color-paper) 90%, var(--world-accent) 3%);
+}
+/* deck rooms by day: the frame takes the stage it surrounds (T8 "more distinction", T9 "more
+   crispness"). A dark deck (the default look, 抹茶, 黒板, 高コントラスト) and every deck's study
+   screen sit on a dark stage, so the top line, the Line and the phone's bar become one dark frame
+   on a hairline around it, not a white band at each end. A light deck's home keeps the day frame.
+   The frame's own text and marks are remapped on the frame's elements only (the top line, the
+   Line and the report glyph at its end). */
+:root:not([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='deckplay']:has(.kp:is([data-look='dark'], [data-look='matcha'], [data-look='kokuban'], [data-look='contrast']), .kp > .kp-study) :is(#app > .chrome, #primary-tabs, #bunki-reports-root .br-rail) {
+  color-scheme: dark;
+  --color-bar: #0b0e14;
+  --color-bar-line: rgb(233 240 247 / 13%);
+  --color-bar-ink: #eef2f6;
+  --color-bar-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
+  --color-ink: #eef2f6;
+  --color-ink-2: color-mix(in srgb, #eef2f6 86%, #0b0e14);
+  --color-label: #eef2f6;
+  --color-label-2: color-mix(in srgb, #eef2f6 82%, #0b0e14);
+  --color-muted: color-mix(in srgb, #eef2f6 74%, #0b0e14);
+  --color-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
+  --color-rule: rgb(233 240 247 / 26%);
+  --color-line: rgb(233 240 247 / 16%);
+  --color-edge-strong: rgb(233 240 247 / 30%);
+  --color-glass: #0b0e14;
+  --color-glass-solid: #0b0e14;
+  --color-surface: #161c25;
+  --color-seal: #ef8a78;
+  --color-accent: #8fb7e8;
+  --elevation-bar: 0 0.5px 0 rgb(255 255 255 / 5%), 0 10px 24px -16px rgb(0 0 0 / 80%);
+}
+/* 文脈札 gives html a background of its own, so body's flat ground stopped passing to the canvas
+   and was painted over the page layer: the room read as the old beige. The page shows again. */
+html[data-cd-theme] body:not([data-view='drift']) { background: transparent; }
+
+/* ---- the frame: the top line ---- */
+body:not(.zen) #app > .chrome {
+  background: var(--color-bar);
+  border-bottom: var(--stroke-hairline) solid var(--color-bar-line);
+  box-shadow: var(--elevation-bar);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* ---- the frame: the Line ---- */
+.primary-tabs,
+body.has-primary-tabs .primary-tabs {
+  background: var(--color-bar);
+  border-top: var(--stroke-hairline) solid var(--color-bar-line);
+  box-shadow: 0 -0.5px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+.primary-tabs .primary-tab {
+  color: var(--color-bar-quiet);
+  font: 600 12px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+}
+/* 日本語: the woodblock face at its full weight and size (tonight's 800 13px), only tracked tighter */
+body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-display); letter-spacing: 0.06em; }
+.primary-tabs .primary-tab[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
+body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
+.primary-tabs .station-node { background: var(--color-bar); }
+.primary-tabs .line-car::before { box-shadow: 0 0 0 3px var(--color-bar); }
+
+/* ---- raised paper: a defined edge plus contact and ambient shadow ---- */
+body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
+  background: var(--color-surface);
+  border: 1px solid var(--color-edge-strong);
+  box-shadow: var(--elevation-card);
+}
+
+/* ---- section eyebrows: tight small caps, weight instead of tracking ---- */
+body:not([data-view='drift']) main .eyebrow,
+body:not([data-view='drift']) #sheet .eyebrow {
+  font: 650 11px/1.3 var(--font-ui);
+  letter-spacing: 0.07em;
+  color: var(--color-muted);
+}
+body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
+body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: 12px; letter-spacing: 0.1em; }
+
+/* ---- titles: the woodblock voice, set tight ---- */
+main h1.view-title, main h1.exam-heading, .assessment-room > h1 { letter-spacing: -0.005em; line-height: 1.12; }
+
+/* ---- press: the touch lands at once (iOS gives :active only with a touch listener,
+   which the shell adds); it lets go in 150ms. Zero specificity: a room's own press wins.
+   Text and glyph controls dim; paper doors and cards press down instead; words in the
+   text (reader tokens, lookup words, web nodes) keep their own selection marks. ---- */
+:where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary) {
+  transition-property: opacity;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--ease-standard);
+}
+:where(body:not([data-view='drift'])) :where(button:not(:disabled), [role='button'], a[href], summary):where(:not(.study-door, .foundation-door, .dojo-deck, .shelf-open, .world-stone, .tok, .japanese-lookup-word, .ww-node, .kp-tok)):active {
+  opacity: 0.55;
+  transition-duration: 0s;
+}
+/* type renders as on the phone: greyscale antialiasing (macOS only; iOS already does), and no
+   automatic text inflation when the phone turns */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body:not([data-view='drift']) { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+/* the page layer is composited once, so a scroll never repaints the paper */
+body:not([data-view='drift'])::before { will-change: transform; }
+/* the full entry rises on the iOS sheet curve: the same 280ms and travel, only the curve
+   changes, so it settles like a native sheet instead of easing in mushily */
+body.v-depth-layered .sheet, body .sheet { animation-timing-function: var(--ease-sheet); }
+body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active {
+  transform: scale(0.985);
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary),
+  body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active { transition: none; }
+}
+/* ---- D7 (John: "Keep them for now — figure out the smartest way to work with this"): the
+   header's search · Learn · Lists stay, ids and 44px intact, as one quiet tools group of glyphs.
+   One signal per fact: what is due shows once, on the Line's Today station, where the cards are
+   reviewed, so the Learn cap carries no count of its own; the bookmark is an outline with no
+   number at 0 and a filled mark with its count once words are saved; the door of the room you
+   are in is inked. ---- */
+body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-bar-quiet); }
+body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
+body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'],
+body:not(.zen) #app > .chrome > button#tray[data-here] { color: var(--color-bar-ink); }
+body:not(.zen) #app > .chrome > button#tray[data-count='0'] { width: 44px; padding: 0; justify-content: center; gap: 0; }
+body:not(.zen) #app > .chrome > button#tray[data-count='0'] .tray-count {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen) #app > .chrome > button#tray:not([data-count='0']) { color: var(--color-bar-ink); }
+body:not(.zen) #app > .chrome > button#tray:not([data-count='0'])::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='black' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='black' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* the preferences: the world seal a little smaller; EN | 日本語 tighter, the active one inked
+   (the screen's one 朱 belongs to the room, and the seal already carries it) */
+body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 12px; }
+body:not(.zen) #app > .chrome .lang-seg button { letter-spacing: 0; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-bar-ink); height: 2px; }
+/* ---- the reader's top line holds ONE row at every phone width (T2 "tighter and crisper"; it put
+   the bookmark on a second row at 320px, and at 375px once the count reached three digits). Every
+   door keeps its 44px box and stays reachable, selected or not (verify-corridor counts seven). ---- */
+@media (max-width: 520px) {
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  /* the capture + is always drawn, dim until a word is touched, so its slot is never an empty gap */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: visible; cursor: default; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled::after { opacity: 0.32; }
+  /* the saved count sits at the bookmark's shoulder, so the bookmark is always one 44px door */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray {
+    position: relative; width: 44px; min-width: 44px; padding: 0; justify-content: center; gap: 0;
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray:not([data-count='0']) .l-ja {
+    position: absolute; top: 5px; right: 2px; left: auto;
+    padding: 1px 2px; border-radius: 3px; background: var(--color-bar);
+    font: 650 10px/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0;
+  }
+}
+@media (max-width: 374px) {
+  /* the narrowest phones: the Learn cap yields to the Learn tab one thumb away, as in every room */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
+}
+/* END BUNKI R4 SKIN ======================================================== */

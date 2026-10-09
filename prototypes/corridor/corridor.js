@@ -4148,7 +4148,11 @@ async function boot() {
         location.assign(url);
       },
     });
+    // r4 skin: this page never runs render(), so it sets the language class the shell's type reads
+    // (its English Line was drawn as Japanese) and colours the phone's bar from its own page
+    document.body.classList.toggle('ui-bi', bi());
     buildPrimaryTabs($('#app'), { personal: true });
+    syncThemeColor();
     stampRegister();
     return;
   }
@@ -5576,7 +5580,7 @@ function renderShelfBody() {
     input.addEventListener('change', () => change(key, input.value)); chip.append(input); controls.append(chip);
   };
   const topics = [['news','ニュース','News'],['politics','政治','Politics'],['international','国際','World'],['technology','テクノロジー','Technology'],['science','科学','Science'],['economy','経済','Economy'],['environment','環境','Environment'],['culture','文化','Culture'],['literature','文学','Literature'],['sports','スポーツ','Sports'],['health','健康','Health'],['society','社会','Society']];
-  select('sort', tx('並び順', 'Sort'), [['latest', '最新', 'Latest'], ['new', '新着', 'New to Bunki'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
+  select('sort', tx('並び順', 'Sort'), [['latest', '最新', 'Latest'], ['new', '新着', 'Newly added'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
   select('topic', tx('分野', 'Topic'), [['', '分野', 'Topic'], ...topics]);
   select('jlpt', tx('レベル（JLPT語彙の目安）', 'Level (JLPT vocabulary, estimated)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
   select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Secondary+']]);
@@ -7666,7 +7670,12 @@ function readerPicture(p) {
   if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
   img.decoding = 'async';
   img.addEventListener('error', () => figure.remove(), { once: true });
-  figure.append(img, el('figcaption', 'reader-picture-caption', tx('挿絵 · Bunki', 'Illustration · Bunki')));
+  // D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language
+  const credit = el('figcaption', 'reader-picture-caption', tx('挿絵 · ', 'Illustration · '));
+  const mark = el('span', 'kairo-mark', '回廊');
+  mark.lang = 'ja';
+  credit.append(mark, ' KAIRO');
+  figure.append(img, credit);
   return figure;
 }
 
@@ -11880,7 +11889,7 @@ function listGloss(item) {
 }
 
 function listToMarkdown(name, items) {
-  const lines = [`# ${name} — 分岐 Bunki`, '', `${items.length} 件 · ${dayKey()}`, ''];
+  const lines = [`# ${name} — 回廊 KAIRO`, '', `${items.length} 件 · ${dayKey()}`, ''];
   for (const item of items) {
     const r = listReading(item);
     const g = listGloss(item);
@@ -20757,10 +20766,10 @@ function holdReaderTakeSeal(btn, cur) {
 }
 
 function readerTakeLabel(cur, takenNow) {
-  if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
+  if (!cur) return tx('語をタップすると、ここで保存できる', 'Tap a word, then save it here');
   return takenNow
-    ? tx(`「${cur.id}」を覚えている — 押すと復習から外す`, `memorizing ${cur.id} — press to remove it from review`)
-    : tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`);
+    ? tx(`「${cur.id}」は保存済み — もう一度押すと外す`, `${cur.id} is saved — press again to remove it`)
+    : tx(`「${cur.id}」を保存`, `Save ${cur.id}`);
 }
 
 /** Remember the word under the learner's finger and repaint the chrome seal
@@ -23048,7 +23057,7 @@ function guidedCardStatus(node) {
   if (word && !D.dict?.[node.id]) return { state: 'held', reason: readerCaptureReasonText(node.id) };
   if (word && state !== 'take') return { state: 'held', reason: wordCaptureHeldText(node, { route: false }) };
   if (node.t === 'grammar' && !GRAMMARS().some((g) => g.id === node.id))
-    return { state: 'held', reason: tx('この文法は一覧にないため、覚えられない。', 'This grammar pattern is not in Bunki’s list, so it can’t be memorized.') };
+    return { state: 'held', reason: tx('この文法はまだ一覧にないため、札にできない。', 'This grammar pattern isn’t in KAIRO’s grammar list yet, so it can’t become a card.') };
   if (!word && node.t !== 'grammar') return { state: 'held', reason: tx('この種類の札は、ここでは覚えられない。', 'This kind of card can’t be memorized here.') };
   return { state: 'take' };
 }
@@ -23155,7 +23164,7 @@ function guidedDoorInJlptRoom(main) {
   const door = el('button', 'study-door');
   door.type = 'button';
   door.dataset.guidedDoor = 'mock';
-  door.append(withEn(el('span', 'study-door-t', '案内つきの稽古'), 'a guided session', 'en-inline'));
+  door.append(withEn(el('span', 'study-door-t', '案内つきの練習'), 'Guided test practice', 'en-inline'));
   door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の意味つき', 'N2 written · 6 questions · about 15 min · explanations and word meanings as you go')));
   door.addEventListener('click', () => openGuidedRoom('mock'));
   row.append(door);
@@ -23198,7 +23207,7 @@ function studyHallDoors() {
   const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
   const { tests: readyTests, sections: readySections, written: readyWritten } = learnTestCounts();
   const defs = [
-    ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} card${due === 1 ? '' : 's'} waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
+    ['review', '復習', 'Review cards', due ? tx(`${due} 枚 待っている`, `${due} card${due === 1 ? '' : 's'} waiting`) : tx('待っている札はない', 'none waiting'), () => {
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
@@ -23208,7 +23217,7 @@ function studyHallDoors() {
         : tx('新しい模試を準備中 · 以前の練習も使えます', 'New mocks in preparation · earlier exercises available'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
-    ['guided', '案内つきの稽古', 'a guided session', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors'),
+    ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 約15分 · 一問ごとに解説', 'N2 written · 6 questions · about 15 min · every question explained'),
       () => openGuidedRoom('dojo')],
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
@@ -23321,8 +23330,8 @@ function renderLearnStage(main, doors) {
     stage.style.setProperty('--learn-t', `${learnStageArrived - now}ms`);
   }
   const head = el('header', 'learn-stage-head');
-  head.append(el('p', 'learn-stage-eyebrow', tx('学ぶ・次の稽古', 'Learn · the next sitting')));
-  const title = el('h1', 'view-title', tx('舞台', 'The stage'));
+  head.append(el('p', 'learn-stage-eyebrow', tx('学ぶ・今日', 'Learn · today')));
+  const title = el('h1', 'view-title', tx('次の稽古', 'Up next'));
   title.id = 'learn-stage-title';
   head.append(title);
   stage.append(head);
@@ -23382,7 +23391,7 @@ function renderLearnStage(main, doors) {
   } else {
     meta.textContent = tx('今日', 'today');
     text.classList.add('is-quiet');
-    text.textContent = tx('待っている札はない。', 'No saved card is waiting.');
+    text.textContent = tx('復習を待つ札はまだない。', 'No saved words to review yet.');
   }
   card.prepend(meta);
   card.append(text);
@@ -23409,7 +23418,7 @@ function renderLearnStage(main, doors) {
   if (loaded.length) {
     const anyDue = loaded.some(([, , sum]) => sum.due);
     const split = el('p', 'learn-split');
-    split.append(el('span', 'learn-split-h', anyDue ? tx('デッキの復習', 'decks · due') : tx('デッキの新しい札', 'decks · new')));
+    split.append(el('span', 'learn-split-h', anyDue ? tx('今日の復習', 'due today') : tx('今日の新しい札', 'new today')));
     const line = el('span', 'learn-split-line');
     for (const [id, name, sum] of loaded) {
       const cell = el('span', 'learn-split-cell');
@@ -23463,7 +23472,7 @@ function renderStudyHall(main, doors) {
   const guided = el('section', 'learn-section');
   guided.dataset.learnSection = 'guided';
   guided.append(learnHead('01', '案内つき', 'Guided', tx('6問 · 約15分', '6 questions · ~15 min')));
-  guided.append(el('p', 'learn-gloss', tx('問いごとに解説と語の扉。迷ったらここから。', 'An explanation after every question, a door to every word. Start here when unsure.')));
+  guided.append(el('p', 'learn-gloss', tx('一問ごとに解説があり、どの語も意味をひらける。迷ったらここから。', 'Every question is explained, and every word opens its meaning. Start here if you’re unsure.')));
   guided.append(doors.guided);
 
   const decks = el('section', 'learn-section');
@@ -23497,7 +23506,7 @@ function renderStudyHall(main, doors) {
   if (lengths.childNodes.length) tests.append(lengths);
   tests.append(el('p', 'fine study-hall-note', tx(
     '模試で見つけた課題は、覚えるリスト・復習・先生との学習につながります。',
-    'Use your test results to guide Learn, review cards and your next session with Sensei.',
+    'Use your test results to guide Learn, your review cards and your next session with the tutor.',
   )));
 
   const more = el('section', 'learn-section learn-more');
@@ -23514,10 +23523,15 @@ function renderStudyHall(main, doors) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'Words you looked up · sentences' }];
+// r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
+// to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
+// and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and
+// the room it opens never disagree). docs/redesign/r4/LABELS.md
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;
+let deckFrameObserver = null;
 const deckSummaries = {};
 function loadDeckPlayer() {
   if (deckPlayer) return Promise.resolve(deckPlayer);
@@ -23590,7 +23604,7 @@ function renderDojoDecks(main) {
     list.append(b);
   };
   if (window.__CORRIDOR_STANDALONE__ !== true) {
-    row('personal', tx('私の文脈', 'My contexts'), tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
+    row('personal', tx('自分の文章', 'Your own texts'), tx('自分で加えた段落や会話', 'paragraphs and conversations you add'), () => {
       openPersonalCollection();
     });
   }
@@ -23606,14 +23620,14 @@ function renderDojoDecks(main) {
       : tx('復習と新しい文', d.en);
     row(d.id, tx(d.ja, d.en), sub, () => openDeck(d.id), sum);
   }
-  row('context', tx('文脈札', 'Context cards'), tx('一語ごとの段落カード', 'one paragraph per word'), () => {
+  row('context', tx('一語一段落', 'One word, one paragraph'), tx('語ごとに短い段落', 'a short paragraph for each word'), () => {
     keepScroll();
     S.view = 'contextdeck';
     render();
     window.scrollTo(0, 0);
   });
   const forecast = srsForecast();
-  row('mine', tx('覚えるの札', 'My saved cards'), tx(`覚えた語 ・ ${forecast.today + forecast.fresh} 枚 待っている`, `words you saved · ${forecast.today + forecast.fresh} waiting`), () => startReview());
+  row('mine', tx('保存した語', 'Your saved words'), tx(`復習 ${forecast.today + forecast.fresh} 枚`, `${forecast.today + forecast.fresh} to review`), () => startReview());
   for (const name of Object.keys(S.lists || {})) {
     const items = S.lists[name];
     if (!items.length) continue;
@@ -23638,6 +23652,11 @@ function renderDeckPlay(main) {
     );
     return;
   }
+  // r4 skin: the frame takes the deck's stage (editorial.css R4), and the player changes screens
+  // without render(), so the phone's bar is re-read whenever the deck repaints
+  deckFrameObserver?.disconnect();
+  deckFrameObserver = new MutationObserver(() => syncThemeColor());
+  deckFrameObserver.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-look'] });
   deckPlayer
     .render(main, {
       deckId: S.deckPlay || DOJO_DECKS[0].id,
@@ -23669,14 +23688,14 @@ function renderFocusSitting(focus) {
   const forecast = srsForecast();
   const due = forecast.today + forecast.fresh;
   S.focusMin = S.focusMin || 20;
-  focus.append(learnHead('03', '集中の座', 'Focus sitting', tx(`${S.focusMin} 分`, `${S.focusMin} min`)));
+  focus.append(learnHead('03', '時間を決めて練習', 'Timed practice', tx(`${S.focusMin} 分`, `${S.focusMin} min`)));
   focus.append(
     el(
       'p',
       'learn-gloss',
       tx(
         '時間を決めて、静かに札と向き合う。時間が来たら、そっと終わる。',
-        'Set a length and sit with the cards. When the time is up, the block ends on its own.',
+        'Pick a length and work through your cards. It stops on its own when the time is up.',
       ),
     ),
   );
@@ -23699,7 +23718,7 @@ function renderFocusSitting(focus) {
   pick.append(mins);
   focus.append(pick);
 
-  focus.append(el('p', 'learn-label', tx('何を', 'what to drill')));
+  focus.append(el('p', 'learn-label', tx('何を練習する', 'what to practise')));
   const modes = el('div', 'focus-modes');
   const modeDefs = [
     // the sub tells the whole truth (POL-12): the block reviews each waiting
@@ -23737,7 +23756,7 @@ function renderFocusSitting(focus) {
     );
   }
 
-  const start = biLabel('button', 'take focus-start', `${S.focusMin}分 座る`, `sit for ${S.focusMin} minutes`);
+  const start = biLabel('button', 'take focus-start', `${S.focusMin}分の練習を始める`, `Start a ${S.focusMin}-minute session`);
   start.type = 'button';
   start.addEventListener('click', () => startFocus(S.focusMin, S.focusMode));
   focus.append(start);
@@ -28005,7 +28024,7 @@ function renderStrokePage(root) {
   seal.id = 'stroke-world-seal';
   // NOT part of the sleeping-inert chrome sweep: the seal is the top-right
   // corner of the quiet room (operator spec) and must answer while sleeping
-  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   attachWorldPicker(seal);
   bar.append(seal);
   // The bar mounts in BOTH modes. In the quiet room CSS pares it to one
@@ -29014,18 +29033,20 @@ const THEME_UI = [
   // 攻殻・燐光 — phosphor on terminal black
   { id: 'kaku', seal: '殻', name: '攻殻・燐光', g: '#050d12', ink: '#d8efe9', red: '#ff6b4a', paper: 'terminal' },
 ];
-// Every public picker follows the reference strip exactly. 殻 remains a
-// complete internal world so an existing saved preference never breaks.
+// D2 (John, tour 2026-10-08, "The night look: Offer both"): 殻, the electric phosphor
+// night, is public again beside 金 (the 藍 night). The picker shows two named rows, day
+// then night (ME_NIGHT_WORLDS); each row keeps the reference strip's order. Saved ids never change.
 const PUBLIC_THEME_IDS = [
   'sumi',
   'shu',
   'iwa',
-  'rokusho',
-  'yoru',
   'hokusai',
   'akafuji',
-  'nami',
   'keyblock',
+  'rokusho',
+  'yoru',
+  'kaku',
+  'nami',
   'hakuu',
 ];
 const THEME_STORE = 'kairo-theme';
@@ -29063,6 +29084,7 @@ function setKairoTheme(id) {
   }
   applyPaper(t.id);
   syncDriftTheme();
+  syncThemeColor();
 }
 /** Drift owns five atmospheric families. Map by identity so adding or
  * reordering paper worlds cannot send an unrelated raw index into it. */
@@ -29471,23 +29493,29 @@ function openWorldPicker(anchor) {
   const scrim = el('div', 'world-picker-scrim');
   const pop = el('div', 'world-picker');
   pop.setAttribute('role', 'dialog');
-  pop.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  pop.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   let activeStone = null;
-  for (const id of PUBLIC_THEME_IDS) {
-    const t = THEME_UI.find((world) => world.id === id);
-    if (!t) continue;
+  const worldName = (t) => tx(t.name, {
+    sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
+    rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
+    akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
+    hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
+  }[t.id]);
+  // the stones are seals; a plain line beneath names the world in words (the current one, or
+  // the one under the pointer or keyboard focus)
+  const current = THEME_UI[themeIx()];
+  const caption = el('p', 'world-picker-name', worldName(current));
+  caption.setAttribute('aria-hidden', 'true');
+  const stone = (t) => {
     const b = el('button', 'world-stone', t.seal);
     b.type = 'button';
     // each stone previews its own world — the colours mirror corridor.css
     b.style.background = t.g;
     b.style.color = t.ink;
     b.style.setProperty('--stone-red', t.red);
-    b.setAttribute('aria-label', tx(t.name, {
-      sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
-      rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
-      akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
-      hakuu: 'Lightning below the summit', kaku: 'Phosphor',
-    }[t.id]));
+    b.setAttribute('aria-label', worldName(t));
+    for (const ev of ['pointerenter', 'focus']) b.addEventListener(ev, () => { caption.textContent = worldName(t); });
+    for (const ev of ['pointerleave', 'blur']) b.addEventListener(ev, () => { caption.textContent = worldName(current); });
     const active = t.id === themeId();
     b.setAttribute('aria-pressed', String(active));
     if (active) {
@@ -29500,8 +29528,24 @@ function openWorldPicker(anchor) {
       S.sealWake = true; // the 銀河 seal plays its wake on a world change
       applyWorldSwap();
     });
-    pop.append(b);
+    return b;
+  };
+  // two named rows, day then night: both night looks sit side by side (D2)
+  for (const [rowId, rowName, night] of [['day', tx('昼', 'Day'), false], ['night', tx('夜', 'Night'), true]]) {
+    const row = el('div', 'world-row');
+    row.dataset.row = rowId;
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', rowName);
+    const name = el('span', 'world-row-name', rowName);
+    name.setAttribute('aria-hidden', 'true');
+    row.append(name);
+    for (const id of PUBLIC_THEME_IDS) {
+      const t = THEME_UI.find((world) => world.id === id);
+      if (t && ME_NIGHT_WORLDS.includes(id) === night) row.append(stone(t));
+    }
+    pop.append(row);
   }
+  pop.append(caption);
   worldPickerOpener = anchor;
   scrim.addEventListener('click', closeWorldPicker);
   document.body.append(scrim, pop);
@@ -29512,7 +29556,7 @@ function openWorldPicker(anchor) {
   pop.style.left = `${Math.round(Math.min(Math.max(8, rect.right - pw), window.innerWidth - pw - 8))}px`;
   document.addEventListener('keydown', worldPickerEsc, true);
   worldPickerEls = [scrim, pop];
-  (activeStone || pop.firstChild).focus();
+  (activeStone || pop.querySelector('.world-stone')).focus();
 }
 const WORLD_PICKER_HOLD_MS = 480;
 /** A seal button opens the stones on TAP; a hold opens them early. */
@@ -29971,7 +30015,7 @@ function buildGingaChrome(root) {
   const seal = el('button', 'ginga-seal' + (S.sealWake ? ' awake' : ''), THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'ginga-theme-seal';
-  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   attachWorldPicker(seal);
   root.append(seal);
   if (S.sealWake) S.sealWake = false;
@@ -30089,13 +30133,49 @@ function buildGingaChrome(root) {
   root.append(shelf, sensei);
 }
 
+/** iOS Safari applies :active only where a touch listener exists. One passive listener on the
+ * document lets every control show its press at touch-down, as native controls do (T2: "native
+ * ios expeirnce is alreayd way smoother and tighter and crisper"). It never blocks a scroll. */
+let touchPressReady = false;
+function enableTouchPress() {
+  if (touchPressReady) return;
+  touchPressReady = true;
+  document.addEventListener('touchstart', () => {}, { passive: true });
+}
+
+/** The phone's own top (Safari's bar, a home-screen app's status bar) takes the colour of the
+ * frame actually drawn, so the top of the screen reads as one native bar: white paper by day,
+ * the deep frame at night, the zen stage in a review (T2: "native ios … crisper"). It was a
+ * fixed beige for every world and every room. One read per frame, after the room is drawn. */
+let themeColorFrame = 0;
+function syncThemeColor() {
+  if (themeColorFrame) return;
+  themeColorFrame = requestAnimationFrame(() => {
+    themeColorFrame = 0;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta || !document.body) return;
+    const bar = document.querySelector('#app > .chrome');
+    // no top line: the personal collections page meets the phone's bar with its page layer
+    const raw = bar ? getComputedStyle(bar).backgroundColor
+      : document.body.dataset.view === 'personaldeck' ? getComputedStyle(document.body, '::before').backgroundColor
+        : getComputedStyle(document.body).backgroundColor;
+    const nums = raw.match(/-?[0-9.]+/g)?.map(Number) || [];
+    if (nums.length < 3 || (nums.length > 3 && nums[3] === 0)) return;
+    const scale = raw.startsWith('color(') ? 255 : 1;
+    const hex = '#' + nums.slice(0, 3).map((n) => Math.round(Math.max(0, Math.min(255, n * scale))).toString(16).padStart(2, '0')).join('');
+    if (meta.getAttribute('content') !== hex) meta.setAttribute('content', hex);
+  });
+}
+
 /** The shell has one label table; rooms retain their existing navigation paths. */
 const PRIMARY_TABS = [
   { id: 'today', ja: '今日', en: 'Today', view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
   { id: 'read', ja: '読む', en: 'Read', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
-  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
+  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
   { id: 'words', ja: '辞書', en: 'Words', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
-  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'personaldeck', 'settings'] },
+  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
+  // r4 skin: your own texts are a deck; the page's way back and its Learn row both lead to Learn,
+  // so the Line marks Learn there too (it marked Me while ← Learn left for Learn)
 ];
 let primaryDockObserver;
 /** Keep the report rail above live room controls, including wrapped labels. */
@@ -30763,7 +30843,7 @@ function renderMe(main) {
     foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
   );
   if (window.__CORRIDOR_STANDALONE__ !== true) {
-    const personal = biLabel('button', 'grammar-link foundation-door', '私の文脈', 'Personal collections');
+    const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
     personal.type = 'button'; personal.id = 'me-personal';
     personal.addEventListener('click', openPersonalCollection); doors.append(personal);
   }
@@ -31086,7 +31166,9 @@ function render() {
   if (S.view === 'search') parts.push(tx('検索', 'search'));
   // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
   // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
-  if (viaTray) parts.push(tx('リスト', 'lists'));
+  // the tray is the Today tab's room (Review #8 renamed its way back "Back to Today"); the crumb,
+  // shown on wide screens, names it the same way (r4 plain words)
+  if (viaTray) parts.push(tx('今日', 'Today'));
   if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
@@ -31127,7 +31209,7 @@ function render() {
   const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'theme-seal';
-  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   attachWorldPicker(seal);
   chrome.append(seal);
 
@@ -31179,6 +31261,8 @@ function render() {
     dojoDoor.type = 'button';
     dojoDoor.id = 'chrome-dojo';
     dojoDoor.insertAdjacentHTML('afterbegin', LEARN_DOOR_SVG);
+    // D7 (John: "Keep them for now — figure out the smartest way to work with this"): a quiet
+    // door. What is due shows once, on the Line's Today station, where the cards are reviewed.
     dojoDoor.setAttribute('aria-label', tx('学ぶ', 'Learn'));
     if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
     dojoDoor.addEventListener('click', () => {
@@ -31207,7 +31291,8 @@ function render() {
   if (S.view === 'reader' && S.passageId) {
     const cur = readerTakeCurrent();
     const curTaken = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
-    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '覚える', 'memorize');
+    // r4 (T5: "Save and add to list are confusing???"): one name for one action, the popup's Save
+    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '保存', 'Save');
     capBtn.type = 'button';
     capBtn.id = 'reader-take';
     capBtn.disabled = !cur;
@@ -31248,9 +31333,11 @@ function render() {
   trayBtn.id = 'tray';
   {
     const label = trayBtn.querySelector('.l-ja');
-    const word = el('span', 'tray-word', tx('覚', 'Lists'));
+    const word = el('span', 'tray-word', tx('リスト', 'Lists'));
     label.replaceChildren(word, document.createTextNode(' '), el('span', 'tray-count', String(S.taken.length)));
     trayBtn.dataset.count = String(S.taken.length);
+    // D7: the bookmark marks its own room, and its count appears only once there is something saved
+    if (S.view === 'tray') trayBtn.dataset.here = '';
   }
   trayBtn.addEventListener('click', () => {
     keepScroll();
@@ -31281,7 +31368,9 @@ function render() {
   });
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+  enableTouchPress();
   buildPrimaryTabs(root);
+  syncThemeColor();
 
   // the capture panel — anchored under the chrome's top-right seal. It
   // reuses the sheet's own instruments verbatim: the reversible 覚える
@@ -31293,7 +31382,7 @@ function render() {
     const panel = el('div', 'capture-panel');
     panel.id = 'capture-panel';
     panel.setAttribute('role', 'group');
-    panel.setAttribute('aria-label', tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`));
+    panel.setAttribute('aria-label', tx(`「${cur.id}」を保存`, `Save ${cur.id}`));
     panel.setAttribute('data-drift-chrome', '');
     const head = el('div', 'capture-head');
     head.append(el('span', 'capture-word', cur.id));

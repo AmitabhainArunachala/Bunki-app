@@ -288,7 +288,8 @@ try {
             await page.locator('.pc-file').waitFor({ state: 'attached' });
             assert.equal(new URL(page.url()).searchParams.get('ui'), chosen);
             assert.equal(await page.locator('html').getAttribute('data-room'), 'personal');
-            assert.equal(await page.locator('#tab-me').getAttribute('aria-current'), 'page');
+            // r4 skin: your own texts are a deck; the Line marks Learn there, where its ← leads
+            assert.equal(await page.locator('#tab-learn').getAttribute('aria-current'), 'page');
             await page.locator('#tab-me').click();
             await page.locator('#me-settings').waitFor();
             await page.locator('#back').click();

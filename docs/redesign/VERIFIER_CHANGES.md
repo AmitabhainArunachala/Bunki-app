@@ -542,3 +542,46 @@ Review round 2 #13 found three ways to save in the popup. The sentence row's "Sa
 | --- | --- | --- | --- |
 | `prototypes/corridor/tools/verify-design-reader-shelf.mjs` G6 (≈l.881) | row text `'This sentence: Save · Ask the tutor · Practice'` | `'This sentence: Ask the tutor · Practice'` | Label pin only. G6 still requires no sentence bar outside the popup, and that Ask the tutor opens the tutor with that exact sentence as the active context. |
 | `prototypes/corridor/tools/verify-reader-lookup.mjs` (named-known and particle steps) | `page.locator('.listen-row').click({position:{x:2,y:2}})` to put the popup away | `tapOutside(page)`: asserts that the fixed chrome's top-left corner is a blank point outside the popup, clicks it, then waits for `#mini` to detach | Click target only. It is still a real pointer press outside the popup, now with an added check that the popup closed. Every lookup, keyboard and menu assertion is unchanged, and `open()` still asserts `.listen-row[data-passage]`. |
+
+## Round 4 skin (2026-10-09, Mac): D2, both night looks are public; the picker is two named rows
+
+John, on the tour: **D2 (The night look): "Offer both"**. `kaku` (殻, the electric phosphor night) joins `PUBLIC_THEME_IDS` beside `yoru` (金, the 藍 night). The picker now draws two labelled rows, Day (昼) and Night (夜); each row keeps the reference strip's order, so the DOM order of the stones changes from the old ten to: 墨 朱 柿 藍 赤 板 · 漆 金 殻 浪 雷. Saved theme ids are unchanged and a saved `kaku` still loads.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-experience.mjs` E04-palette-roster | exact ten `['墨','朱','柿','漆','金','藍','赤','浪','板','雷']` → exact eleven `['墨','朱','柿','藍','赤','板','漆','金','殻','浪','雷']`; description "Ten public palettes in constitution order" → "Eleven public palettes: the day row, then the night row (D2)" | Roster pin only. It is still an exact, ordered `deepEqual`, so a dead or extra stone still fails. |
+| `verify-experience.mjs` E04 writing segment, E16 settings (3 places) | `.world-stone` `.nth(4)` → `.world-stone` `{ hasText: '金' }` | Selector only. Index 4 was 金 (`yoru`) in the old order; the same world is now chosen by its seal, so E18-palette-reload still requires `data-theme === 'yoru'` after reload. |
+| `verify-experience.mjs` (2 places) | `.world-stone` `.nth(5)` → `{ hasText: '藍' }` | Selector only. Index 5 was 藍, the default world the journey returns to; it is still 藍. |
+| `verify-experience.mjs` shot captions | "Exactly ten public worlds in consistent order" → "Exactly eleven public worlds, day row then night row" | Screenshot caption only. |
+| `prototypes/corridor/tools/verify-writing-room.mjs` `PUBLIC_WORLDS` and its check | the ten in the old order → the eleven in the new order; description updated | Roster pin only. The ordered `JSON.stringify` equality, the one-named-dialog check, the act/persist/re-ink loop over `shu` and `hakuu` are unchanged. |
+| `verify-writing-room.mjs` legacy check description | "the retired public 殻 world still loads as an internal saved theme" → "a saved 殻 preference still loads (殻 is public again, D2)" | Description only; the assertion (stored `kaku` → `data-theme=kaku` after reload) is unchanged. |
+| `prototypes/corridor/tools/verify-theme-consistency.mjs` `WORLDS` | ten worlds → eleven (adds `kaku`) | **Strengthened**: the new public world is swept through shelf → tray → review front/back → sheet like the others. |
+
+`verify-corridor-accessibility.mjs` already measured `kaku` (quiet-label contrast and the living-paper law) and is unchanged.
+
+## Round 4 skin: the tray's crumb says Today
+
+The tray is the Today tab's room; Review #8 already renamed its way back "Back to Today / 今日へ" ("Lists" is the old name of Today). On wide screens the top line's crumb still read "lists / リスト" beside Back. It now reads "Today / 今日".
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-pr77-ports.mjs` quiz-crumb (ea8252a9) | `/リスト\|lists/` → `/リスト\|lists\|今日\|Today/` | Label only. The crumb must still name the tray, and `backTo === 'tray'` is unchanged. |
+| `verify-pr77-ports.mjs` crumb-origin (d9f0b984), plain review | `/(リスト\|lists).*(復習\|review)/` → `/(リスト\|lists\|今日\|Today).*(復習\|review)/` | Label only. The order (tray, then review) and `reviewBack === 'tray'` are unchanged. |
+
+## Round 4 skin: the personal collections' theme row follows the public roster
+
+The private collections player draws one theme button per public world (`PUBLIC_THEME_IDS`, passed in by `corridor.js`). D2 made the roster eleven.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-personal-collections.mjs` (settings, "Every palette comes from Bunki's existing public roster") | `.pc [data-theme]` count `10` → `11` | Roster count only. The `yoru` (金) click, the night screenshot, the no-horizontal-overflow assertion at 390px and every storage, backup and offline assertion are unchanged. |
+
+## Round 4 skin, review and refine: the crumb pin names Today only; the personal page's station is Learn
+
+The independent review asked for the crumb pin to be replaced rather than widened, so a return of the old "lists" crumb fails again. And the personal collections page ("Your own texts") is a deck: Learn lists it, its back button now reads "← Learn" and leads to Learn, so the Line marks Learn there instead of Me.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-pr77-ports.mjs` quiz-crumb (ea8252a9) | `/リスト\|lists\|今日\|Today/` → `/今日\|Today/`; description "names the lists tray its 戻る reopens" → "names Today, the tray its 戻る reopens" | **Tightened**: the old crumb word now fails. `backTo === 'tray'` is unchanged. |
+| `verify-pr77-ports.mjs` crumb-origin (d9f0b984), plain review | `/(リスト\|lists\|今日\|Today).*(復習\|review)/` → `/(今日\|Today).*(復習\|review)/`; description as above | **Tightened** the same way. The order (Today, then review) and `reviewBack === 'tray'` are unchanged. |
+| `tools/verify-redesign-foundation.mjs` (the private-deck route, ~l.291) | `#tab-me` `aria-current="page"` → `#tab-learn` `aria-current="page"` | Shell label pin (which station the Line marks for one room, `PRIMARY_TABS`). The journey still enters from `#tab-learn`, still requires `ui` to survive the full-document route and `data-room="personal"`, still clicks `#tab-me` and reaches `#me-settings`, then Back to the shelf. Exactly one tab is current (l.88) everywhere else, unchanged. |

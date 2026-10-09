@@ -21,7 +21,7 @@ const UI_JA = {
   "Library": "一覧",
   "Collection": "コレクション",
   "Import collection or progress backup": "コレクション・学習記録を読み込む",
-  "Bunki collection backup": "Bunki のバックアップ",
+  "KAIRO collection backup": "回廊のバックアップ",
   "Backup shared.": "バックアップを共有しました。",
   "This collection could not be read.": "このコレクションを読み取れませんでした。",
   "Backup prepared with this collection and its complete review history.": "コレクションとすべての復習履歴のバックアップを用意しました。",
@@ -32,14 +32,14 @@ const UI_JA = {
   "The collection stays on this device. Reading does not create review evidence. Choose Study when you are ready.": "コレクションはこの端末に保存します。読むだけでは復習記録は増えません。準備ができたら学習を選んでください。",
   "Import on this device": "この端末に読み込む",
   "Cancel": "取り消す",
-  "Bring your own paragraphs into Bunki. One focused question, with room for the whole idea.": "自分の文章を Bunki に持ち込む。一つの問いから、文脈全体へ。",
+  "Bring your own paragraphs into KAIRO. One focused question, with room for the whole idea.": "自分の文章を回廊に持ち込む。一つの問いから、文脈全体へ。",
   "Import your collection": "コレクションを読み込む",
-  "Choose the collection JSON saved in Files or Downloads. A Bunki backup also restores its compatible review history.": "ファイルやダウンロードに保存したコレクション JSON を選びます。Bunki のバックアップは対応する復習履歴も復元します。",
+  "Choose the collection JSON saved in Files or Downloads. A KAIRO backup also restores its compatible review history.": "ファイルやダウンロードに保存したコレクション JSON を選びます。回廊のバックアップは対応する復習履歴も復元します。",
   "Choose a JSON file": "JSON ファイルを選ぶ",
-  "On iPhone, install Bunki on your Home Screen first, then import inside that app. On Mac, import inside the Bunki window you use for study.": "iPhone ではホーム画面に Bunki を追加し、そのアプリで読み込んでください。Mac では学習に使う Bunki の画面で読み込みます。",
+  "On iPhone, install KAIRO on your Home Screen first, then import inside that app. On Mac, import inside the KAIRO window you use for study.": "iPhone ではホーム画面に回廊を追加し、そのアプリで読み込んでください。Mac では学習に使う回廊の画面で読み込みます。",
   "Open collection": "コレクションを開く",
   "Export stored data": "保存データを書き出す",
-  "Content and progress stay in Bunki’s device storage. There is no automatic cloud sync. Export before moving devices or clearing browser data; Files, iCloud Drive, or AirDrop can carry your backup.": "文章と学習記録はこの端末に保存します。自動クラウド同期はありません。端末の変更やブラウザーのデータ消去の前に書き出し、ファイル・iCloud Drive・AirDrop などでバックアップを移してください。",
+  "Content and progress stay in KAIRO’s storage on this device. There is no automatic cloud sync. Export before moving devices or clearing browser data; Files, iCloud Drive, or AirDrop can carry your backup.": "文章と学習記録はこの端末に保存します。自動クラウド同期はありません。端末の変更やブラウザーのデータ消去の前に書き出し、ファイル・iCloud Drive・AirDrop などでバックアップを移してください。",
   "Sources, conversation thread & connections": "出典・会話の流れ・つながり",
   "Dictionary preparation is unavailable. The paragraph and review remain available.": "辞書の準備ができませんでした。文章と復習は引き続き使えます。",
   "Close English support": "英語の補助を閉じる",
@@ -105,11 +105,12 @@ const UI_JA = {
   "Tasks in review": "復習する問い",
   "Themes in review": "復習するテーマ",
   "Save study settings": "学習設定を保存",
-  "Export here, then import that file inside Bunki on the other device. Keep one device as your active study device until you transfer the latest backup.": "ここで書き出し、別の端末の Bunki で読み込みます。最新のバックアップを移すまでは、一台を学習用にしてください。",
+  "Export here, then import that file inside KAIRO on the other device. Keep one device as your active study device until you transfer the latest backup.": "ここで書き出し、別の端末の回廊で読み込みます。最新のバックアップを移すまでは、一台を学習用にしてください。",
   "Export collection & progress": "コレクションと学習記録を書き出す",
   "Share backup": "バックアップを共有",
   "Import a JSON file": "JSON ファイルを読み込む",
-  "Bunki palette": "Bunki の色",
+  "Colour theme": "配色",
+  "← Learn": "← 学ぶ",
   "About this collection": "このコレクションについて",
   "FSRS-6 · ts-fsrs 5.4.1 · retention 0.90 · 1m/10m learning · 10m relearning. Each answer stays learner-graded. Views and lookups never count as mastery.": "FSRS-6・ts-fsrs 5.4.1・目標記憶率 0.90・学習 1分/10分・再学習 10分。答えは自分で採点します。表示や検索だけで習得とは判定しません。",
   "Private content stays on this device unless you export or share it. Browser storage can be cleared; keep backups. Native iPhone and Mac packaging is separate from this installed web app.": "書き出しや共有をしない限り、自分の文章はこの端末に留まります。ブラウザーの保存領域が消えることもあるため、バックアップを保管してください。iPhone・Mac のネイティブ版は、このウェブアプリとは別です。",
@@ -158,7 +159,8 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     status.textContent = !english && notSaved ? '保存できませんでした。記録は変更していません。' : tx(message);
     if (!notSaved) noticeTimer = setTimeout(() => { status.textContent = ''; }, 5000);
   };
-  const themeNames = {hokusai:'Prussian blue · wave',sumi:'Ink · kozo',shu:'Vermilion',iwa:'Mineral',rokusho:'Verdigris',yoru:'Night',akafuji:'Red Fuji',nami:'Wave',keyblock:'Keyblock',hakuu:'White rain'};
+  // the shell picker's names (corridor.js openWorldPicker), so one world has one name; 殻 is public since r4 (D2)
+  const themeNames = {hokusai:'Hokusai Prussian blue',sumi:'Ink on kozo paper',shu:'Vermilion on shell white',iwa:'Umber on persimmon paper',rokusho:'Shell white on black lacquer',yoru:'Gold on indigo',akafuji:'Red Fuji',nami:'The Great Wave',keyblock:'Woodblock ink',hakuu:'Lightning below the summit',kaku:'Electric phosphor'};
   const collection = () => record.collection;
   const worldFor = id => collection().worlds.find(w => w.id === id);
   const resetCard = () => { current = null; revealed = false; englishOpen = false; briefEnglishOpen = false; bridge?.close?.(); };
@@ -179,7 +181,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     if (share && navigator.canShare) {
       const file = new File([JSON.stringify(value,null,2)],name,{type:'application/json'});
       if (navigator.canShare({files:[file]})) {
-        try { await navigator.share({files:[file],title:tx("Bunki collection backup")}); notice(tx("Backup shared.")); return; }
+        try { await navigator.share({files:[file],title:tx("KAIRO collection backup")}); notice(tx("Backup shared.")); return; }
         catch (e) { if (e.name === 'AbortError') return; }
       }
     }
@@ -207,7 +209,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     finally { busy = false; root.removeAttribute('aria-busy'); }
   }
   function top(title) {
-    return `<header class="pc-top">${button('← Bunki','data-action="leave"')}<span class="pc-kicker">${text("Personal collections", "私の文脈")}</span></header><h1 tabindex="-1" ${record?'data-ui-content="learning"':''}>${esc(title)}</h1>`;
+    return `<header class="pc-top">${button('← Learn','data-action="leave"')}<span class="pc-kicker">${text("Your own texts", "自分の文章")}</span></header><h1 tabindex="-1" ${record?'data-ui-content="learning"':''}>${esc(title)}</h1>`;
   }
   function tabs() {
     return `<nav aria-label="${text("Collection")}">${[['study',tx("Study")],['read',tx("Read")],['connections',tx("Threads")],['settings',tx("Settings")],['home',tx("Library")]].map(([id,label]) => button(label,`data-screen="${id}" aria-current="${screen===id?'page':'false'}"`)).join('')}</nav>`;
@@ -217,7 +219,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     return `<section class="pc-panel pc-preview" aria-label="${text("Import preview")}"><h2>${text("Ready to import")}</h2><p data-ui-content="learning">${esc(pending.collection.title)}</p><p>${text(`${pending.collection.lessons.length} paragraphs · ${pending.collection.lessons.length*4} focused cards · ${pending.added} additional review events`, `${pending.collection.lessons.length} 段落・${pending.collection.lessons.length*4} 枚の札・追加の復習 ${pending.added} 件`)}</p>${pending.enrichment?`<p>${text(`${pending.enrichment.lessons.length} Japanese answer guides with paragraph readings · revision ${pending.enrichment.revision}. Your original paragraphs and review identities stay the same.`, `日本語の説明・段落の読み ${pending.enrichment.lessons.length} 件・改訂 ${pending.enrichment.revision}。元の文章と復習の識別はそのまま保ちます。`)}</p>`:''}<p>${pending.existing?tx("Your current collection and settings will be retained. Compatible review history can only grow."):tx("The collection stays on this device. Reading does not create review evidence. Choose Study when you are ready.")}</p>${button(tx("Import on this device"),'data-action="confirm-import"','pc-primary')} ${button(tx("Cancel"),'data-action="cancel-import"')}</section>`;
   }
   function home() {
-    body.innerHTML = top(tx('Personal collections', '私の文脈')) + `<p class="pc-lead">${text("Bring your own paragraphs into Bunki. One focused question, with room for the whole idea.")}</p><section class="pc-panel"><h2>${text("Import your collection")}</h2><p>${text("Choose the collection JSON saved in Files or Downloads. A Bunki backup also restores its compatible review history.")}</p>${button(tx("Choose a JSON file"),'data-action="import"','pc-primary')}<p class="pc-small">${text("On iPhone, install Bunki on your Home Screen first, then import inside that app. On Mac, import inside the Bunki window you use for study.")}</p></section>${preview()}<div class="pc-grid">${list.map(r => `<section class="pc-panel"><h2 data-ui-content="learning">${esc(r.collection?.title || r.id)}</h2><p>${text(`${r.collection?.lessons?.length || 0} paragraphs · ${r.progress?.events?.length || 0} preserved events`, `${r.collection?.lessons?.length || 0} 段落・履歴 ${r.progress?.events?.length || 0} 件`)}</p><div class="pc-actions">${button(tx("Open collection"),`data-open="${esc(r.id)}"`)}${button(tx("Export stored data"),`data-raw="${esc(r.id)}"`)}</div></section>`).join('')}</div><p class="pc-small">${text("Content and progress stay in Bunki’s device storage. There is no automatic cloud sync. Export before moving devices or clearing browser data; Files, iCloud Drive, or AirDrop can carry your backup.")}</p>${fatal?`<p role="alert">${esc(fatal)}</p>`:''}`;
+    body.innerHTML = top(tx('Your own texts', '自分の文章')) + `<p class="pc-lead">${text("Bring your own paragraphs into KAIRO. One focused question, with room for the whole idea.")}</p><section class="pc-panel"><h2>${text("Import your collection")}</h2><p>${text("Choose the collection JSON saved in Files or Downloads. A KAIRO backup also restores its compatible review history.")}</p>${button(tx("Choose a JSON file"),'data-action="import"','pc-primary')}<p class="pc-small">${text("On iPhone, install KAIRO on your Home Screen first, then import inside that app. On Mac, import inside the KAIRO window you use for study.")}</p></section>${preview()}<div class="pc-grid">${list.map(r => `<section class="pc-panel"><h2 data-ui-content="learning">${esc(r.collection?.title || r.id)}</h2><p>${text(`${r.collection?.lessons?.length || 0} paragraphs · ${r.progress?.events?.length || 0} preserved events`, `${r.collection?.lessons?.length || 0} 段落・履歴 ${r.progress?.events?.length || 0} 件`)}</p><div class="pc-actions">${button(tx("Open collection"),`data-open="${esc(r.id)}"`)}${button(tx("Export stored data"),`data-raw="${esc(r.id)}"`)}</div></section>`).join('')}</div><p class="pc-small">${text("Content and progress stay in KAIRO’s storage on this device. There is no automatic cloud sync. Export before moving devices or clearing browser data; Files, iCloud Drive, or AirDrop can carry your backup.")}</p>${fatal?`<p role="alert">${esc(fatal)}</p>`:''}`;
   }
   function provenance(l) {
     const c = collection(), w = worldFor(l.world), thread = c.threads?.find(t => t.id === w.thread), guide = record.enrichment?.provenance;
@@ -340,7 +342,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
   }
   function settings() {
     const s = record.progress.settings;
-    return `<section class="pc-panel"><h2>${text("Make room for your day")}</h2><form id="pc-settings"><label>${text("New cards per day")} <input name="limit" type="number" min="0" max="60" value="${s.newLimit}" required></label><p class="pc-small">${text("Default 6 across all selected themes and types. Due cards come first. A related card waits until another Japan study day.")}</p><fieldset><legend>${text("Tasks in review")}</legend>${Object.entries(labels).map(([id,label]) => `<label class="pc-check"><input type="checkbox" name="kind" value="${id}" ${s.kinds.includes(id)?'checked':''}>${label}${['reading','apply'].includes(id)?text(' · optional','・任意'):''}</label>`).join('')}</fieldset><fieldset><legend>${text("Themes in review")}</legend>${collection().worlds.map(w => `<label class="pc-check"><input type="checkbox" name="world" value="${esc(w.id)}" ${s.worlds.includes(w.id)?'checked':''}>${esc(worldName(w))}</label>`).join('')}</fieldset><button type="submit" class="pc-primary">${text("Save study settings")}</button></form></section><section class="pc-panel"><h2>iPhone ↔ Mac</h2><p>${text("Export here, then import that file inside Bunki on the other device. Keep one device as your active study device until you transfer the latest backup.")}</p><div class="pc-actions">${button(tx("Export collection & progress"),'data-action="export"')}${button(tx("Share backup"),'data-action="share"')}${button(tx("Import a JSON file"),'data-action="import"')}</div><p class="pc-small">${text(`${record.progress.events.length} preserved events. Older files cannot remove reviews; histories that branched on both devices stay untouched. There is no automatic iCloud sync. Progress from the standalone edition can be imported here; Anki has its own schedule.`, `${record.progress.events.length} 件の履歴を保っています。古いファイルで復習は消えず、両端末で分かれた履歴も保ちます。iCloud の自動同期はありません。単独版の記録も読み込めます。Anki の予定は独立しています。`)}</p>${preview()}</section>${themes.length?`<section class="pc-panel"><h2>${text("Bunki palette")}</h2><div class="pc-actions">${themes.map(t=>button(`${english ? themeNames[t.id] || t.id : `${t.seal} ${t.name}`}`,`data-theme="${esc(t.id)}" aria-pressed="${currentTheme===t.id}"`)).join('')}</div></section>`:''}<section class="pc-panel"><h2>${text("About this collection")}</h2><p>${esc(collection().scope)}</p><p>${esc(collection().level)}</p><p>${text(`${collection().lessons.length} original paragraphs · ${engine.cards.length} independently scheduled tasks. Meaning and grammar are the default; reading and application are optional.`, `${collection().lessons.length} の書き下ろし段落・${engine.cards.length} の独立した問い。意味と文法を標準に、読みと応用は任意です。`)}</p><p class="pc-small">${text("FSRS-6 · ts-fsrs 5.4.1 · retention 0.90 · 1m/10m learning · 10m relearning. Each answer stays learner-graded. Views and lookups never count as mastery.")}</p><p class="pc-small">${text("Private content stays on this device unless you export or share it. Browser storage can be cleared; keep backups. Native iPhone and Mac packaging is separate from this installed web app.")}</p></section>`;
+    return `<section class="pc-panel"><h2>${text("Make room for your day")}</h2><form id="pc-settings"><label>${text("New cards per day")} <input name="limit" type="number" min="0" max="60" value="${s.newLimit}" required></label><p class="pc-small">${text("Default 6 across all selected themes and types. Due cards come first. A related card waits until another Japan study day.")}</p><fieldset><legend>${text("Tasks in review")}</legend>${Object.entries(labels).map(([id,label]) => `<label class="pc-check"><input type="checkbox" name="kind" value="${id}" ${s.kinds.includes(id)?'checked':''}>${label}${['reading','apply'].includes(id)?text(' · optional','・任意'):''}</label>`).join('')}</fieldset><fieldset><legend>${text("Themes in review")}</legend>${collection().worlds.map(w => `<label class="pc-check"><input type="checkbox" name="world" value="${esc(w.id)}" ${s.worlds.includes(w.id)?'checked':''}>${esc(worldName(w))}</label>`).join('')}</fieldset><button type="submit" class="pc-primary">${text("Save study settings")}</button></form></section><section class="pc-panel"><h2>iPhone ↔ Mac</h2><p>${text("Export here, then import that file inside KAIRO on the other device. Keep one device as your active study device until you transfer the latest backup.")}</p><div class="pc-actions">${button(tx("Export collection & progress"),'data-action="export"')}${button(tx("Share backup"),'data-action="share"')}${button(tx("Import a JSON file"),'data-action="import"')}</div><p class="pc-small">${text(`${record.progress.events.length} preserved events. Older files cannot remove reviews; histories that branched on both devices stay untouched. There is no automatic iCloud sync. Progress from the standalone edition can be imported here; Anki has its own schedule.`, `${record.progress.events.length} 件の履歴を保っています。古いファイルで復習は消えず、両端末で分かれた履歴も保ちます。iCloud の自動同期はありません。単独版の記録も読み込めます。Anki の予定は独立しています。`)}</p>${preview()}</section>${themes.length?`<section class="pc-panel"><h2>${text("Colour theme")}</h2><div class="pc-actions">${themes.map(t=>button(`${english ? themeNames[t.id] || t.id : `${t.seal} ${t.name}`}`,`data-theme="${esc(t.id)}" aria-pressed="${currentTheme===t.id}"`)).join('')}</div></section>`:''}<section class="pc-panel"><h2>${text("About this collection")}</h2><p>${esc(collection().scope)}</p><p>${esc(collection().level)}</p><p>${text(`${collection().lessons.length} original paragraphs · ${engine.cards.length} independently scheduled tasks. Meaning and grammar are the default; reading and application are optional.`, `${collection().lessons.length} の書き下ろし段落・${engine.cards.length} の独立した問い。意味と文法を標準に、読みと応用は任意です。`)}</p><p class="pc-small">${text("FSRS-6 · ts-fsrs 5.4.1 · retention 0.90 · 1m/10m learning · 10m relearning. Each answer stays learner-graded. Views and lookups never count as mastery.")}</p><p class="pc-small">${text("Private content stays on this device unless you export or share it. Browser storage can be cleared; keep backups. Native iPhone and Mac packaging is separate from this installed web app.")}</p></section>`;
   }
   function paint() {
     if (disposed) return;
