@@ -206,13 +206,13 @@ The lead has these, so LABELS.md can match what ships.
 
 This section supersedes the first-pass verification, photographs and open-item list above. Codex Sol read every draft hunk from `7c1b2036`, created `claude/r4-read-final-20261010`, and merged the verified skin/cards/today head `3d81031b`. The merge was clean; the read surfaces were checked against the merged Tokens v2 and shell. No push or main merge was made.
 
-**Verified product code:** `76c40528c724008b6a7321cc6026f6779f466ed4`, clean source (`sourceDirty: false`). **Artifact:** `0ef8374974d6085151484c96074b6437af9fc88defe38ebdf2596c09022ee570`. The later documentation/photos commit records those exact tested bytes. The immutable site is under `~/.dharma/bunki_review/2026-10-10/r4-finish/site`; the final battery used its staging name `site-release` before it was moved intact. Logs, receipts and runtime photographs are under that same `r4-finish` directory. The superseded runs and shots are archived separately and are not final evidence.
+**Verified product code:** `6ca33a4e3203906611ac211cc0c0e338a8ac1f1c`, clean source (`sourceDirty: false`). **Artifact:** `cb8d61c82b83194a5ae059803949a6f75752c337283b81817f0976e2e429578c`; source-asset SHA-256 `4427e50c53322ae9cefec1fd6974d23b4e84930207b847fcafdd96c07fdf77cc`. The later documentation/photos commit records those exact tested bytes. The immutable site is under `~/.dharma/bunki_review/2026-10-10/r4-finish/site`. Every final suite and photograph uses this canonical build, including the galaxy structure, focus-check race and exact below-word seat repairs described below. Logs, receipts and runtime photographs are under that same `r4-finish` directory. Prior builds are archived; `site-release` and `shots-release` retain their historical `76c40528` identity and are not final evidence.
 
 ### The three rule breaks
 
 1. **Protected-record assertions restored.** The first-pass claim that no storage assertion changed was wrong. Its replacement annotation case omitted both capture-failure checks. In `verify-annotation-lookup.mjs`, `failed-capture-inside-a-list-is-honest-and-recoverable` now holds the exact assertions **“A failed native write protects the host until reload”** (disabled submit) and **“The required recovery reload preserves the unsaved list name”** (`Capture first`). It also requires read-only record state, a reload instruction, no durable change through fault/reload, writable recovery, and a retry that creates the list with 電車 and exactly one card. The `list-form-reenabled-before-reload` negative control exercises both capture and list-only failure; both deliberately broken cases are rejected. `verify-vocabulary-chooser` retains the list-only protection/draft recovery and denies another Save after a native capture fault even after its bounce guard expires. The historical REPORT claim is corrected inline; VERIFIER_CHANGES preserves its prior text and appends the correction.
 2. **44px version switch restored.** Both choices have `min-height: 44px`; the help target is 44×44. G7 measures all three targets at 390 and 320 and asserts `box.w >= 44 && box.h >= 44`. Final choice sizes are 134×44 at 390, and 97×44 / 101×44 at 320. An external negative control rejects the actual first-pass 40px buttons at both widths.
-3. **Only transform/opacity animate.** Removed background-colour motion and scoped inherited reader icon colour/background transitions to instantaneous highlights. G8 observes computed positive-duration transitions and named keyframes, including pseudo-elements, with reduced motion disabled; its exact assertions are **“Reader and word popup may animate only transform and opacity”** and **“The sentence popup may animate only transform and opacity”**, each requiring an empty violations array. The expanded observer covers the whole reader room (`#app`), popup, menu, toast and list sheet across word, sentence, Save/toast, list, settings and menu stages. Both phone widths and both engines pass. An additional motion-enabled audit passes 54/54 stages across day-en/night-en/day-ja at 320, 390 and 1368 widths, observing 3,904–4,005 nodes and 1,614–1,669 positive-duration transition entries, with no disallowed properties.
+3. **Only transform/opacity animate.** Removed background-colour motion and scoped inherited reader icon colour/background transitions to instantaneous highlights. G8 observes computed positive-duration transitions and named keyframes, including pseudo-elements, with reduced motion disabled; its exact assertions are **“Reader and word popup may animate only transform and opacity”** and **“The sentence popup may animate only transform and opacity”**, each requiring an empty violations array. The expanded observer covers the whole reader room (`#app`), popup, menu, toast and list sheet across word, sentence, Save/toast, list, settings and menu stages. Both phone widths and both engines pass. An additional motion-enabled audit passes 54/54 stages across day-en/night-en/day-ja at 320, 390 and 1368 widths, with no disallowed properties. The fresh final receipt is `r4-finish/motion-extra-final/motion-extra.json`; fetched identity and four served runtime hashes match before and after all 54 stages.
 
 ### All eleven review fixes
 
@@ -222,7 +222,7 @@ This section supersedes the first-pass verification, photographs and open-item l
 | 2 | Done | Both lost record assertions, reload/retry, capture/list negative controls and honest documentation restored, with no product storage change. |
 | 3 | Done | Instant press colour; only transform/opacity transitions or animations in the reader and popup. |
 | 4 | Done | Fine washi on reading paper and title by day; faint fibre by night. The paper remains brighter than its room with a real ink edge; relief and readability checks retain their floors. |
-| 5 | Done | Sentence pane keeps the word card's top within 1px, including short その cards. Tall content scrolls inside its card. Initial Back and later Ask/Practice focus stay visible without article scrolling. A constrained card above its token meets the fixed chrome, eliminating the narrow strip of cut title glyphs. Practice return focus remains visible. |
+| 5 | Done | Sentence pane keeps the word card's top within 1px, including short その cards and the below-word 大丈夫 fixture. The exact raw placement top survives CSS serialization: the formerly 336.625px Chromium jump is now 0px in both engines, with article scroll and token anchor unchanged. Tall content scrolls inside its card. Initial Back and later Ask/Practice focus stay visible without article scrolling. A constrained card above its token meets the fixed chrome, eliminating the narrow strip of cut title glyphs. Practice return focus remains visible. |
 | 6 | Done under the finish brief's authorization | Exact glossary copy “No audio for this article yet” / “この記事の音声はまだない”; contextual sentence equivalent. Locked Kore/Charon provenance remains in exact accessible descriptions. All six voice pin edits are logged and silence/no-picker/no-device-voice protections remain. No separate lead reply is claimed. Source/date/level/state/audio use one bundled UI face at 12px; character count is removed from the reader. |
 | 7 | Done | Kinsoku groups keep opening brackets with following words and closing punctuation with preceding words, in title and article, across all three spacing modes. G9 checks actual painted glyph lines, unsplit title lookup words, and exact source title/article text. |
 | 8 | Done | Popup shadow falls away from the touched word. Night ruby is visibly clear in the final photographs; its computed ink/opaque-paper contrast is 9.26:1 (day 10.90:1). This computed number excludes grain/shadow compositing; it is not a pixel-sampled claim. |
@@ -236,7 +236,7 @@ His full lines remain quoted above. T3's mark is padded **読**, legible as a se
 
 ### Final verification
 
-Two disjoint runner groups each run their suites serially against the same frozen Chromium artifact/SHA; root tools use the same environment. Reader design was also run separately in WebKit. Every behavioural assertion was retained or strengthened; cosmetic/path pin edits and the historical protection loss are individually logged in `docs/redesign/VERIFIER_CHANGES.md`.
+Two disjoint runner groups each ran their suites serially against the same frozen Chromium artifact/SHA; the core corridor check ran alone and root tools used the same environment. Reader design also ran in WebKit. All 29 required checks meet the brief's bar: 27 pass and two fail exactly as accepted on the PR head. All five supplementary checks pass. Dojo initially failed at `390/reader: no passage card on the shelf`; one unchanged isolated retry, after the other browser work ended, passed all 30 journeys. Both attempts are retained; no specific cause is claimed. Every behavioural assertion was retained or strengthened; cosmetic/path pin edits and the historical protection loss are individually logged in `docs/redesign/VERIFIER_CHANGES.md`.
 
 | Name | Result | Note |
 |---|---|---|
@@ -250,17 +250,17 @@ Two disjoint runner groups each run their suites serially against the same froze
 | `verify-kotoba-mine` | Pass | Deck integrity |
 | `verify-n2n1-decks` | Pass | N2/N1 integrity |
 | `verify-personal-collections` | Pass | 9 cases |
-| `verify-dojo-door` | Pass | 30 room/width journeys |
+| `verify-dojo-door` | Pass | 30 journeys on unchanged isolated retry; first shelf-start failure retained |
 | `verify-guided-session` | Pass | 211 checks |
-| `sw-shell` | Pass | Vitest shell checks |
+| `sw-shell` | Pass | 8/8 Vitest shell checks |
 | `test-navigation-returns` | Pass | Return paths |
 | `verify-srs-today` | Pass | 32/32; 2/2 mutants caught |
 | `verify-experience` | Pass | 42/42; frozen assets |
 | `verify-drift-hunt` | Pass | All hunt regressions green |
-| `verify-design-reader-shelf` | Pass | 48/48 Chromium |
+| `verify-design-reader-shelf` | Pass | 49/49 Chromium; public below-seat regression added |
 | `verify-reader-doors` | Pass | 93/93 |
 | `verify-reader-lookup` | Pass | Lookup and roving |
-| `verify-playback` | Pass | Silence/provenance/layout |
+| `verify-playback` | Pass | 22/22; silence/provenance/layout |
 | `verify-annotation-lookup` | Pass | 10/10; both failure controls caught |
 | `verify-shelf-search` | Pass | Query races |
 | `verify-vocabulary-chooser` | Pass | 5/5; protected failure/retry |
@@ -273,15 +273,15 @@ Two disjoint runner groups each run their suites serially against the same froze
 | `verify-listening-failures` | Pass | Native failure silence/provenance |
 | `verify-sentence-drafts` | Pass | 8/8; desktop and phone |
 | `test-approved-voice` | Pass | 11/11, executable fixture |
-| `verify-design-reader-shelf-webkit` | Pass | 48/48 WebKit |
+| `verify-design-reader-shelf-webkit` | Pass | 49/49 WebKit |
 
-Syntax checks passed for the changed reader JavaScript/verifiers. ESLint exits zero but ignores the three reader verifier files under the repository policy, so it supplies no coverage for them. Their executable and negative-control checks above are the verification. The final external audit passes 25/25 named assertions (18 runtime and seven protected-scope): quiet Save, native abort, content/particle/asynchronous dictionary Practice return, four 320px short-pane cases, exact seat and article position, plus protected byte contracts. Receipt: `r4-finish/draft-audit/release/release-audit-76c40528-summary.json`.
+Syntax checks passed for the changed reader JavaScript/verifiers. ESLint exits zero but ignores the three reader verifier files under the repository policy, so it supplies no coverage for them. Their executable and negative-control checks above are the verification. Fresh final supplemental receipts pass 15/15 public below-seat assertions (8 Chromium, 7 WebKit), seven protected-byte assertions, and 54/54 motion stages. The reader suite passes all prior 48 cases plus the new public below-seat case in both engines. The earlier 25/25 runtime/protected audit (`r4-finish/draft-audit/release/release-audit-76c40528-summary.json`) belongs to `76c40528` and is historical evidence only; it is not misattributed to the new final build.
 
 ### Photographs and protected scope
 
-The supplied capture command completed all 36 room photographs in day-en, night-en and day-ja. The extra public-UI capture completed 48 reader/popup/list/short-card images in six fresh 390×844 / 320×700 profiles at 2×. It checks the fetched build identity, font origins, target geometry, one-card Save/list membership, no horizontal overflow, no page or record faults, and no external requests. All 36 room frames were inspected as contact sheets, with full-size reader/popup and narrow/list views inspected separately.
+The supplied capture command completed all 36 room photographs in day-en, night-en and day-ja. The extra public-UI capture completed 48 reader/popup/list/short-card images in six fresh 390×844 / 320×700 profiles at 2×. It checks the fetched build identity, font origins, target geometry, one-card Save/list membership, no horizontal overflow, no page or record faults, and no external requests. All 36 room frames were inspected as contact sheets, with full-size reader/popup and narrow/list views inspected separately. The fresh 36 + 48 captures are pinned to `6ca33a4e` / `cb8d61c8…`; the visual-review receipt is `r4-finish/visual-review-final/review.json`.
 
-The supplied script probes an absent legacy `build-sha` meta tag, so its `sha` fields are blank. `shots/HOST_IDENTITY.json` records the pinned immutable server identity and the exact extra-capture identity check. `docs/redesign/r4/read/shots/IDENTITY.json` records SHA-256 for each of the 51 copied lane photos; every copied file is byte-identical to its final runtime original. The photo server on 57102 was stopped.
+The supplied script probes an absent legacy `build-sha` meta tag, so its `sha` fields are blank. `shots/HOST_IDENTITY.json` records the pinned immutable server identity and the exact extra-capture identity check. `docs/redesign/r4/read/shots/IDENTITY.json` records SHA-256 for each of the 51 copied lane photos; every copied file is byte-identical to its final runtime original. One PNG changed relative to the earlier set; the other fresh frames are byte-identical to their earlier counterparts. The photo server on 57102 was stopped.
 
 No protected storage marker/function changed. A byte audit against `3d81031b` confirms the entire prefix before `renderShelfBody`, the FSRS pin (`prototypes/corridor/data/fsrs-pin.json`), the shared player engine, and all N2N1 source files: 536 protected files are identical. Card/Anki identities and storage keys are untouched; storage-integrity, SRS, deck, collection, service-worker and navigation checks provide runtime coverage. The real node_modules was used as provided, without replacement or installation. No secrets were read. No push, main merge, history rewrite or stash was performed.
 
@@ -292,12 +292,13 @@ No protected storage marker/function changed. A byte audit against `3d81031b` co
 - These are headless Chromium and Playwright WebKit checks, not acceptance on a physical iPhone. The night ruby figure is computed colour contrast, not pixel-sampled contrast.
 - The full-entry, tutor and source-page sentence chips remain outside this read-lane scope. The old shell “memorize”/bookmark wrap, dense metadata, missing-audio wording and broken approved-voice fixture are resolved here or by the merged skin lane.
 - The first-pass assessment-written-section failure is historical and outside the finish battery; it was not retested in this pass. No claim is made that it is resolved.
+- The gate recorded an informational, source-derived Practice-failure note that may begin below the card viewport, and unused legacy reader CSS/class cleanup. Neither was a reproduced final failure or a blocking finding; details and limits are preserved in the third review below.
 
 The current user's instruction to execute the finish brief authorizes adopting its glossary audio copy. There is no separately obtained lead reply; this report makes the provenance decision explicit without claiming an additional approval.
 
 ### Gate review history, before the final verification
 
-The gate reviewed `890cd522` and found four defects. The four defects were reproduced and fixed; the details below retain the intermediate evidence. These fixes change product bytes (`prototypes/corridor/corridor.js` and `prototypes/corridor/rooms/read.css`). The final table and photographs above now describe the clean `76c40528` build, including all four fixes and the hidden-selector follow-up. The superseded `40806a26`/`34cf6d10…` evidence is archived under `r4-finish/archive/`.
+The gate reviewed `890cd522` and found four defects. The four defects were reproduced and fixed; the details below retain the intermediate evidence. These fixes change product bytes (`prototypes/corridor/corridor.js` and `prototypes/corridor/rooms/read.css`). The final table and photographs above now describe the clean `6ca33a4e` build, including all four fixes, the hidden-selector follow-up and the later repairs. The superseded `40806a26`/`34cf6d10…` evidence is archived under `r4-finish/archive/`.
 
 | Finding | What was wrong on `890cd522` | Fix | Check that now holds it |
 |---|---|---|---|
@@ -324,7 +325,7 @@ The first AXI run ended `failed`: its fix/review window reached 30 minutes while
 
 ### Second gate review: the galaxy popup's word band
 
-The gate then reviewed `7a48cd77` (product code `76c40528`, artifact `0ef83749…`) and found one defect. Its fix changes product bytes (`prototypes/corridor/rooms/read.css` only). **The final verification table, the photographs and `shots/IDENTITY.json` above describe `76c40528` and predate this change.** The full battery and the photographs have to be run again on a clean build of the commit that holds this fix before they can be cited for it.
+The gate then reviewed `7a48cd77` (product code `76c40528`, artifact `0ef83749…`) and found one defect. Its fix changes product bytes (`prototypes/corridor/rooms/read.css` only). At that point the verification table and photographs described `76c40528` and predated this change. The fresh full battery and photographs on clean `6ca33a4e`, recorded above, now include this fix; the intermediate results below remain historical.
 
 | Finding | What was wrong on `76c40528` | Fix | Check that now holds it |
 |---|---|---|---|
@@ -345,7 +346,7 @@ Logs, receipts and the photographs `galaxy-popup-before-0ef.png` and `galaxy-pop
 
 ### Third gate review: a race in the verifier's focus check
 
-The gate then reviewed `b0104ffc` and selected one finding, in the verifier. **No product file changes in this round**, so the product bytes are those of `b0104ffc`. The full battery, the photographs and `shots/IDENTITY.json` are still owed on a clean build of the final commit, as the section above says.
+The gate then reviewed `b0104ffc` and selected one finding, in the verifier. **No product file changes in this round**, so the product bytes are those of `b0104ffc`. A fresh full battery and photographs were owed at that point. The final clean `6ca33a4e` results and identities above now fulfill that requirement.
 
 | Finding | What was wrong | Fix | What holds it |
 |---|---|---|---|
@@ -372,12 +373,12 @@ Logs, receipts and the probe are under `~/.dharma/bunki_review/2026-10-10/r4-fin
 
 ### Fourth review: preserve the exact below-word seat
 
-The second AXI run ended `failed` after the test agent reached its30-minute limit. It preserved `b0104ffc` and `98f29059`; the offered `axi sync --recover` returned both commits to this branch by fast-forward. That run is not claimed passed. Its partial test receipts, including a repeated corridor walk-through failure, are diagnostic only; the final battery must pass independently except for the two exact accepted inherited failures.
+The second AXI run ended `failed` after the test agent reached its 30-minute limit. It preserved `b0104ffc` and `98f29059`; the offered `axi sync --recover` returned both commits to this branch by fast-forward. That run is not claimed passed. Its partial test receipts, including a repeated corridor walk-through failure, are diagnostic only; the final battery has since passed independently on clean `6ca33a4e`, except for the two exact accepted inherited failures.
 
 The last review's source-derived `read-r7-1` was reproduced through the public UI on the clean `98f2905933f2a36f04f1989959b9573c3b719fb3` artifact `ddaf53700a17269b9141a63178514953801eb5cff4e8a3952fc8830859c547d7`. In やまなし (`aozora:046605`), tapping token816 大丈夫 at390×844 and article scroll4716 places the word card below its word at394.578125px. Chromium serializes its CSS top as394.578px; the sentence pin then falls0.000125px short of the safe below-word boundary. Opening Study this sentence moves the card above the word to57.953125px: a336.625px jump, without moving the article or anchor. The external public regression fails6/8, exactly the final side and top assertions. The same fixture in WebKit retains full precision and passes7/7 with0px movement. Neither uses injected learner records or styles.
 
 Placement now retains its finite raw numeric top on the card, separately from CSS serialization. The sentence pin uses that exact number with the prior fallback for missing/nonfinite values. All viewport, chrome, side-gap,96px room and safe-placement guards remain unchanged. New cards start fresh; ResizeObserver placement refreshes the cache, Back clears the sentence pin and places again, and removal destroys the card. No storage or record code changes.
 
-A public G6 regression is added for this below-word path, retaining all previous48cases and the1px placement tolerance. Repaired results, final clean identity, full checks and refreshed photographs are recorded below after they run. Direct before evidence and the minimal proposal/harness are under `r4-finish/below-seat-audit/`; the earlier evidence remains intact.
+A public G6 regression is added for this below-word path, retaining all previous48cases and the1px placement tolerance. The repaired clean candidate is `6ca33a4e`, artifact `cb8d61c8…`: 49/49 reader checks in Chromium and 49/49 in WebKit. A separate public probe passes 15/15 assertions, with 0px movement in both engines and exactly unchanged article scroll and token anchor. All 34 finish suites and the fresh 36 + 48 photographs are complete on this build, as recorded above. Direct before evidence and the minimal proposal/harness are under `r4-finish/below-seat-audit/`; the earlier evidence remains intact.
 
-The actual updated reader suite was also run alone against the clean `98f29059` control: **48/49**, with every prior case passing and only `G6-sentence-below-seat-390` failing on the same336.625px jump. The new case contains11 assertions over the public rendered behavior; it does not pin the cache or CSS serialization shape. Both engine checks on the repaired candidate follow.
+The actual updated reader suite was also run alone against the clean `98f29059` control: **48/49**, with every prior case passing and only `G6-sentence-below-seat-390` failing on the same336.625px jump. The new case contains11 assertions over the public rendered behavior; it does not pin the cache or CSS serialization shape. Both engine checks on the repaired candidate now pass 49/49. The paired before/after public photographs were visually inspected. Fixed receipts: `r4-finish/below-seat-audit/fixed-6ca33a4e-summary.json`; clean protected-byte proof: `r4-finish/protected-scope-audit-6ca33a4e.json`.

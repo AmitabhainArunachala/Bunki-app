@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "verifiedCodeGitSha": "76c40528c724008b6a7321cc6026f6779f466ed4",
-  "artifactSha256": "0ef8374974d6085151484c96074b6437af9fc88defe38ebdf2596c09022ee570",
+  "verifiedCodeGitSha": "6ca33a4e3203906611ac211cc0c0e338a8ac1f1c",
+  "artifactSha256": "cb8d61c82b83194a5ae059803949a6f75752c337283b81817f0976e2e429578c",
   "sourceDirty": false,
   "scope": "Headless Chromium; fresh public UI flows; 390x844 and 320x700, at device scale 2. Not physical-device acceptance or pixel-sampled contrast.",
   "captureManifest": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/manifest.json",
@@ -105,7 +105,7 @@
     {
       "path": "night-en/popup.png",
       "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/night-en/popup.png",
-      "sha256": "b9170cb18a06c15d4d2364f452a9340e3b4ccc5987ec3be17d8c5c4ebe674923"
+      "sha256": "7e2ed58328555ba55c8cd9b5c63afadd06d0a1fe567bd450f36e79af1b15b066"
     },
     {
       "path": "night-en/list-sheet-empty.png",
