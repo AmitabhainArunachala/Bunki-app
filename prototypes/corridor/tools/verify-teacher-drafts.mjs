@@ -144,7 +144,7 @@ async function createTopic(fixture, { articleId = 'bunki-graded-n3-river', index
   await source.click();
   const token = fixture.page.locator(`#reader .tok[data-index="${index}"]`); await token.waitFor();
   const word = await token.getAttribute('data-word'); assert(word, 'Fixture chooses a real content word');
-  await token.click(); await fixture.page.locator('#reader-teacher').click();
+  await token.click(); await fixture.page.locator('#mini-sentence-open').click(); await fixture.page.locator('#reader-teacher').click();
   await fixture.page.locator('#teacher-context-select').waitFor();
   await waitForAppRecord(fixture.page, (record) => record.teacherContexts?.entries.some((entry) => entry.sourceId === articleId && entry.index === index), { description: 'normal source-context save' });
   const native = await readAppRecordSnapshot(fixture.page);

@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "二元論",
+   "reading": "にげんろん",
+   "pos": "noun",
+   "meaning": "dualism",
+   "defJa": "世界を二つの根本的な原理から説明する立場",
+   "passage": {
+    "ja": "ヨーガって、心と体を一つにする話だと思っていたら、古典では観る側と観られる側を分けるんだね。二元論という分類は根本に二つの原理を置く考え方を指すけど、その二つが何かを確かめないと、別の哲学と混ざってしまうんだ。古典ヨーガの説明では、観る主体と、心の働きも含む自然との区別が大事になるから、単純に心対身体とは言い換えられない。同じ瞑想という名前で実践をまとめても、それをどう説明するかは一通りではなくて、背景を読むほど方法の見え方も変わるよ。",
+    "form": "二元論",
+    "en": "I expected yoga to concern uniting mind and body, but its classical philosophy distinguishes observer from observed. Dualism posits two fundamental principles, yet their identity must be checked before comparing philosophies. Classical yoga distinguishes the observer from nature, which includes mental processes, rather than simply separating mind from body. Reading the background reveals different explanations even for practices grouped under meditation.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「二元論の立場」。何と何を根本として分けるのかを明示する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "五蘊皆空",
+   "reading": "ごうんかいくう",
+   "pos": "noun",
+   "meaning": "the five aggregates are all empty",
+   "defJa": "人を構成する五つの要素に固定した実体がないこと",
+   "passage": {
+    "ja": "怒りを感じた瞬間、その感情こそが自分の全部だと思ってしまうことがあります。般若心経の五蘊皆空という句は、人を成り立たせる身体や心の働きに、独立して変わらない実体がないと説くものです。身体が消えるとか、感情が存在しないという話ではなく、それらが条件に応じて生じ、変化することへ注意を向ける手掛かりになります。経典の一節を日常に引き寄せるにしても、嫌な気分をすぐなくす方法として受け取るより、何を固定した自分と見なしているかを問い直すと、教えの焦点に近づけます。",
+    "form": "五蘊皆空",
+    "en": "In anger, a feeling can seem to constitute the whole self. The Heart Sutra’s phrase that the five aggregates are empty denies independent unchanging essence in bodily and mental processes. It does not mean bodies disappear or feelings do not occur, but directs attention to their conditional and changing character. Relating the teaching to daily life means examining what is treated as a fixed self rather than expecting a quick technique for eliminating unpleasant moods.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「空」を消滅とせず、独立した実体がないという意味で読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "仏典",
+   "reading": "ぶってん",
+   "pos": "noun",
+   "meaning": "Buddhist scriptures",
+   "defJa": "仏教の教えを伝える経や律や論などの文献",
+   "passage": {
+    "ja": "同じ教えを読んでいるつもりでも、手にする言語や版によって、目に入る表現は変わる。仏典は長い時間をかけて伝えられ、翻訳や注釈を通じて、日本の人々にも多様な形で読まれてきた。原典に近づこうとする努力は重要だが、一つの訳を開けば歴史の隔たりがすべて消えるというものでもない。語の選び方や文章の区切りに立ち止まることは、信仰の深さを疑うためではなく、いま自分がどのような伝承の上で教えを受け取っているかを知るための読書となる。",
+    "form": "仏典",
+    "en": "Reading the same teaching in different languages or editions changes the expressions encountered. Buddhist texts have reached Japanese readers through long transmission, translation, and commentary. Seeking earlier sources matters, but opening one translation cannot erase every historical distance. Attending to word choices and divisions helps readers recognize the transmission through which they encounter a teaching.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「仏典を読む・漢訳する」。内容とともに伝承や翻訳の過程にも目を向ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "仏性",
+   "reading": "ぶっしょう",
+   "pos": "noun",
+   "meaning": "buddha-nature",
+   "defJa": "仏となる可能性や本来のあり方を示す大乗の概念",
+   "passage": {
+    "ja": "失敗ばかりする人にも、仏になる性質があると言われたら、少し見方が変わるよね。大乗仏教の仏性という言葉は、そうした可能性や本来のあり方を論じるときに使われるけど、今していることが何でも正しいという意味ではないんだ。すでに備わっているものを説きながら、なぜ修行をするのかという問いは、教えを読むうえで大事なところになる。同じ言葉でも説明は一通りではないから、人を簡単に見切らない姿勢と、行いを変えていく実践とが、どう結び付けられているかを追ってみよう。",
+    "form": "仏性",
+    "en": "Being told that even someone who repeatedly fails has the nature of Buddhahood can change how you see them. Buddha-nature in Mahayana concerns such potential or fundamental nature, without endorsing every present action. Why practice is needed if something is already inherent becomes an important question. Following how texts connect refusing to write someone off with changing conduct reveals differences in interpretation.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「仏性を有する」。可能性を認めることと、現在の行為を肯定することを分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

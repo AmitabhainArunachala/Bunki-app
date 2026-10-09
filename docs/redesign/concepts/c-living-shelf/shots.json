@@ -1,0 +1,179 @@
+{
+ "title": "C 生きた本棚 Living Shelf",
+ "screens": [
+  {
+   "name": "today",
+   "path": "index.html#/today"
+  },
+  {
+   "name": "read",
+   "path": "index.html#/read"
+  },
+  {
+   "name": "article",
+   "path": "index.html#/read/article"
+  },
+  {
+   "name": "popup",
+   "path": "index.html#/read/popup"
+  },
+  {
+   "name": "learn",
+   "path": "index.html#/learn"
+  },
+  {
+   "name": "front",
+   "path": "index.html#/learn/front"
+  },
+  {
+   "name": "back",
+   "path": "index.html#/learn/back"
+  },
+  {
+   "name": "done",
+   "path": "index.html#/learn/done"
+  },
+  {
+   "name": "words",
+   "path": "index.html#/words"
+  },
+  {
+   "name": "me",
+   "path": "index.html#/me"
+  },
+  {
+   "name": "today-ja",
+   "path": "index.html?lang=ja#/today"
+  },
+  {
+   "name": "learn-ja",
+   "path": "index.html?lang=ja#/learn"
+  },
+  {
+   "name": "back-ja",
+   "path": "index.html?lang=ja#/learn/back"
+  }
+ ],
+ "journey": [
+  {
+   "go": "index.html#/today"
+  },
+  {
+   "wait": 900
+  },
+  {
+   "frame": "1 Today: the sky of your words breathes"
+  },
+  {
+   "click": ".dayword"
+  },
+  {
+   "wait": 130
+  },
+  {
+   "frame": "2 match-cut: 推進 flies into its web"
+  },
+  {
+   "wait": 520
+  },
+  {
+   "frame": "3 the web: one bird 隹 inside both kanji"
+  },
+  {
+   "click": ".node.n-k[data-key='推']"
+  },
+  {
+   "wait": 650
+  },
+  {
+   "frame": "4 kanji 推: hand + bird, strokes inked"
+  },
+  {
+   "click": ".node.n-p[data-key='隹']"
+  },
+  {
+   "wait": 110
+  },
+  {
+   "frame": "5 re-centring mid-cut"
+  },
+  {
+   "wait": 600
+  },
+  {
+   "frame": "6 part 隹: the bird's family"
+  },
+  {
+   "click": "[data-go=read]"
+  },
+  {
+   "wait": 500
+  },
+  {
+   "click": ".lead"
+  },
+  {
+   "wait": 700
+  },
+  {
+   "click": ".w[data-b='反復']"
+  },
+  {
+   "wait": 120
+  },
+  {
+   "frame": "7 tap 反復: the sheet rises on a spring"
+  },
+  {
+   "wait": 600
+  },
+  {
+   "frame": "8 the word sheet: kanji, parts, other cards"
+  },
+  {
+   "click": ".kt-glyph[data-k='復']"
+  },
+  {
+   "wait": 650
+  },
+  {
+   "click": ".node.n-a"
+  },
+  {
+   "wait": 500
+  },
+  {
+   "frame": "9 back into the passage, same line glints"
+  },
+  {
+   "click": "[data-go=learn]"
+  },
+  {
+   "wait": 500
+  },
+  {
+   "click": ".proscenium .btn-primary"
+  },
+  {
+   "wait": 700
+  },
+  {
+   "frame": "10 card front: still, nothing leaks"
+  },
+  {
+   "click": ".reveal"
+  },
+  {
+   "wait": 230
+  },
+  {
+   "frame": "11 the reveal: held beat, furigana rising"
+  },
+  {
+   "wait": 700
+  },
+  {
+   "frame": "12 card back: the web on the card"
+  }
+ ]
+}

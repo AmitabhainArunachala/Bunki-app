@@ -963,7 +963,7 @@ try {
       const mark = page.locator('main > .mock-review-mark');
       assert.equal(await mark.count(), 1);
       assert.equal(await mark.isVisible(), true);
-      assert.equal(await mark.locator('.status-chip').innerText(), '未確認');
+      assert.equal(await mark.locator('.status-chip').innerText(), 'Unreviewed');
       assert.equal(await mark.locator('.exam-review-reason').innerText(), 'answers not yet checked by a person');
       assert.equal(await page.locator('[data-mock-set] .status-chip').count(), 0);
       assert.match(await page.locator('main').innerText(), /No listening and no time limit\./u);

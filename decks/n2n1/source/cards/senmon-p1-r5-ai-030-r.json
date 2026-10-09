@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "計算量",
+   "reading": "けいさんりょう",
+   "pos": "noun",
+   "meaning": "computational complexity",
+   "defJa": "処理に必要な計算の回数や記憶領域の量",
+   "passage": {
+    "ja": "計算機を速い作業員にたとえると、機械を買い替えればどんな問題でも解決するように思えてしまう。だが入力の数が増えるに伴って手順がどれほど増えるかを表す計算量は、装置の速度だけとは別の問題である。一覧を一度読む処理と、項目の組み合わせをすべて比べる処理では、同じ件数の増加でも必要な仕事の増え方が異なる。小さな例で速かったという観察結果を大規模な運用へそのまま当てはめる前に、データが増えたとき何を繰り返すのかを数える視点が、設計の前提を変える。",
+    "form": "計算量",
+    "en": "Comparing a computer to a fast worker can make it seem that replacing the machine will solve any problem. Computational complexity, describing how the required operations grow as inputs increase, is a different issue from device speed alone. A single pass through a list and comparing all combinations of its entries have different growth in required work for the same increase in entries. Before extending an observation of speed on a small example directly to large-scale operation, counting what repeats as data grows changes the premises of design.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "ここでは処理時間の実測値ではなく、入力に応じた手順の増え方に注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

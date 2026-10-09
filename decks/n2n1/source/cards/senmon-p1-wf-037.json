@@ -133,28 +133,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "異端",
-   "reading": "いたん",
-   "pos": "noun",
-   "meaning": "heresy",
-   "defJa": "正統とされる教えに反する考え",
-   "passage": {
-    "ja": "歴史を語るとき、異端という言葉は慎重に扱ったほうがいい。それは、ある時点で多数派が少数派に貼ったレッテルであり、後世の評価とは一致しないことが多いからだ。たとえばガリレオは、当時は教会の教えに反する説を唱えた人物として扱われたが、いまでは近代科学の祖の一人に数えられる。話す側が、どの立場から語るのかを意識しておけば、レッテルという比喩の押し付けがましさを聞き手に与えずにすむ。",
-    "form": "異端",
-    "en": "When talking about history, it is better to handle the word heresy with care. It is a label that the majority stuck on a minority at a given moment, and it often does not match later evaluation. Galileo, for example, was treated at the time as a person who advocated a theory contrary to the church's teaching, but is now counted among the founders of modern science. If the speaker is conscious of which standpoint they speak from, they can avoid imposing on listeners the heavy-handedness of the metaphor of the label.",
-    "register": "語",
-    "topic": "history",
-    "tipJa": "正統の側が貼るレッテル。時代で評価が逆転することがある。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "特権階級",
    "reading": "とっけんかいきゅう",
    "pos": "noun",
@@ -375,28 +353,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "献身",
-   "reading": "けんしん",
-   "pos": "noun",
-   "meaning": "devotion, self-sacrifice",
-   "defJa": "見返りを求めず身を尽くすこと",
-   "passage": {
-    "ja": "バガヴァッド・ギーターには、行為の結果に執着せずに務めを果たす、という教えがあります。戦場で迷うアルジュナに、クリシュナは、成果を求めずに行うことが修行になると説きます。ここでいう献身とは、誰かに尽くすことに限らず、自分の行為を、神あるいは大きな全体への捧げものとして行うことです。無私の態度は、現代の仕事観にも示唆を与えます。結果への不安が、行動の質を下げてしまうからです。",
-    "form": "献身",
-    "en": "The Bhagavad Gita has a teaching of fulfilling one's duty without clinging to the results of action. To Arjuna, wavering on the battlefield, Krishna teaches that acting without seeking outcomes becomes a discipline. Devotion here is not limited to serving someone but means doing your own action as an offering to God or to a greater whole. An attitude of selflessness offers suggestions for the modern view of work as well. This is because anxiety about results lowers the quality of action.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "ギーターの行為の教えと結びつく。見返りを求めない尽くし方。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "生産性",
    "reading": "せいさんせい",
    "pos": "noun",
@@ -523,28 +479,6 @@
    },
    "deck": "senmon",
    "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "環境設計",
-   "reading": "かんきょうせっけい",
-   "pos": "noun",
-   "meaning": "designing one's environment",
-   "defJa": "行動しやすくなるよう身の回りを整えること",
-   "passage": {
-    "ja": "意志の力だけに頼る習慣づくりは、どうしても長続きしにくい。そこで注目されるのが環境設計である。誘惑になる物を視界から遠ざけ、やりたい行動の入口に道具を置いておけば、決断の回数そのものを減らせる。たとえば朝活を続けたいなら、前夜のうちに運動着と本を枕元へ並べておくだけでよい。人を変える前に人を取り巻く配置を変えるという、この順序の逆転こそが、習慣の科学の出発点にほかならない。",
-    "form": "環境設計",
-    "en": "Habit-building that relies on willpower is hard to sustain. What draws attention here is environment design. If you move tempting things out of sight and put tools at the entrance of the behavior you want to do, you can reduce the number of decisions themselves. For example, if you want to keep up a morning routine, it is enough to line up your workout clothes and a book by your pillow the night before. This reversal of order, changing the arrangement surrounding a person before changing the person, is nothing other than the starting point of the science of habit.",
-    "register": "論",
-    "topic": "mind",
-    "tipJa": "意志に頼らず、配置で行動を変える。習慣づくりの発想。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",
@@ -793,50 +727,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "熟字訓",
-   "reading": "じゅくじくん",
-   "pos": "noun",
-   "meaning": "whole-word kun reading",
-   "defJa": "漢字二字以上の語全体に当てる訓読み",
-   "passage": {
-    "ja": "「今日」を「きょう」、「大人」を「おとな」と読むとき、私たちは漢字一字ずつではなく、語全体に読みを当てている。これが熟字訓である。「明日」や「果物」のような身近な語に多く、書き言葉の豊かさを支える一方で、外国人学習者にとっては最大の難所の一つになる。教える側は、規則で説明しようとするよりも、頻出語を一語ずつ、場面とともに覚えさせるほうが近道だと心得ておくに越したことはない。",
-    "form": "熟字訓",
-    "en": "When we read the characters for today as kyo and for adult as otona, we are assigning the reading not to each kanji one at a time but to the whole word. This is jukujikun. It is common in familiar words like tomorrow and fruit, and while it supports the richness of the written language, it becomes one of the biggest hurdles for foreign learners. It never hurts for teachers to bear in mind that having learners memorize frequent words one at a time, together with their contexts, is a shortcut compared with trying to explain by rules.",
-    "register": "語",
-    "topic": "language",
-    "tipJa": "「今日」「大人」など、語全体で読みが決まる当て字的な訓。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "熟達者",
-   "reading": "じゅくたつしゃ",
-   "pos": "noun",
-   "meaning": "expert",
-   "defJa": "ある分野に熟達した人",
-   "passage": {
-    "ja": "熟達者は、初心者より多くを知っているのではなく、同じ一瞬に、ずっと多くを見ている。チェスの名人は盤面を駒の配置ではなく、意味のあるまとまりとして捉えるという古典的な研究がある。このまとまりが、判断を速くし、思考の負担を軽くする。裏を返せば、型を知らないうちは、どれほど努力しても、同じ景色が違って見えないのだろう。熟慮の速さは、実は蓄積された無意識の整理にほかならない。",
-    "form": "熟達者",
-    "en": "An expert does not know more than a novice but sees far more in the same instant. There is classic research showing that chess masters perceive the board not as the arrangement of pieces but as meaningful chunks. These chunks speed up judgment and lighten the burden of thinking. Conversely, as long as you do not know the patterns, no matter how hard you try, the same scenery will not look different. The speed of careful thought is nothing other than the organization of accumulated unconscious knowledge.",
-    "register": "論",
-    "topic": "mind",
-    "tipJa": "「初心者」と対にして使う。学習研究の用語でもある。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "熾烈",
    "reading": "しれつ",
    "pos": "na-adj",
@@ -1003,28 +893,6 @@
     "register": "論",
     "topic": "history",
     "tipJa": "『論語』由来の四字熟語。昔を読み直して今に生かす態度。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "王道",
-   "reading": "おうどう",
-   "pos": "noun",
-   "meaning": "royal road; rule by virtue",
-   "defJa": "徳によって国を治める道。転じて正攻法",
-   "passage": {
-    "ja": "ビジネス書の世界では、成功の王道といえば、基本の反復だとされる。しかし史書をひもとくと、この言葉は本来、力で支配する覇道に対し、徳によって人を治める道を指した。孟子の思想に由来し、東アジアの政治思想の根幹をなす、古い考え方である。現在では、近道のない正攻法、つまり地道な基本の積み重ねという意味でも広く使われる。語の意味の広がりは、言葉が時代の潮流に合わせて生き続けている証にほかならない。",
-    "form": "王道",
-    "en": "In the world of business books, the royal road to success is said to be the repetition of fundamentals. Yet when you open the histories, this word originally pointed to the way of governing people by virtue, in contrast to the way of ruling by force. It derives from Mencius's thought and is an idea at the root of East Asian political thought. Today it is also widely used in the sense of a straightforward method with no shortcuts, that is, steady accumulation of the basics. The broadening of a word's meaning is nothing other than proof that a language keeps living along with the currents of the times.",
-    "register": "報",
-    "topic": "history",
-    "tipJa": "孟子の「王道」と「覇道」。今は「王道の方法」など正攻法の意。",
     "sense": ""
    },
    "deck": "senmon",

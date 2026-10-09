@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "足",
+   "reading": "～そく",
+   "pos": "other",
+   "meaning": "counter for pairs of footwear",
+   "defJa": "靴や靴下などの組を数える語。",
+   "passage": {
+    "ja": "靴屋で二足を試したいと伝えるとき、数えているのは左右がそろった組であって、片方だけではありません。日本語の数え方では、物の形だけでなく、どう使うものかという見方も表れます。たとえば手袋は組という単位でも数えられますが、何でも同じ言い方に置き換えられるとは限りません。単位を誤ることを恐れるあまり、数字だけを口にすると、かえって何を求めているのか伝わりにくくなります。買い物の場面ごとに、品物と数え方をひとまとめに覚えると実際に使いやすいですよ。",
+    "form": "足",
+    "en": "When you say in a shoe shop that you want to try two pairs, you are counting a matching left and right shoe, not one shoe alone. Japanese ways of counting reflect not only an object’s shape but also how it is used. Gloves, for example, can be counted in sets, but that does not mean the same wording can be substituted for every object. If fear of using the wrong counter makes you say only the number, it can actually become harder to convey what you want. Learning an item together with its counter in particular shopping situations makes the expression easier to use in practice.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "ここでは「そく」と読み、左右そろった靴の組を数えます。",
+    "sense": "靴など左右一組のものを数える助数詞。"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

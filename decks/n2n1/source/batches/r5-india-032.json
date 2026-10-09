@@ -1,0 +1,182 @@
+{
+ "batch": "r5-india-032",
+ "items": [
+  {
+   "term": "陽明学",
+   "reading": "ようめいがく",
+   "gloss": "the Wang Yangming school",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜に際して",
+   "topicConnection": "Mandatory scope: connect this Chinese-origin term to Japanese Buddhism or compare its meaning with Buddhist practice; do NOT write a wholly unrelated Chinese history passage. Clearly distinguish traditions, never fabricate direct influence. A careful conceptual comparison is enough."
+  },
+  {
+   "term": "離欲",
+   "reading": "りよく",
+   "gloss": "dispassion, freedom from desire (vairāgya)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Explore the choice of this word in translation or an everyday explanation; avoid presentation advice and the phrase 発表で.",
+   "grammarSuggestion": "〜つつ",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "雲水",
+   "reading": "うんすい",
+   "gloss": "itinerant Zen monk",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Trace one idea or artifact across cultures, with attribution of traditions and no invented chronology.",
+   "grammarSuggestion": "〜とはいえ",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "霊性",
+   "reading": "れいせい",
+   "gloss": "spirituality, spiritual nature",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜に基づいて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "霊験",
+   "reading": "れいげん",
+   "gloss": "miraculous efficacy",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜をもとに",
+   "factNote": "Explain perceived/reputed efficacy as belief or reported experience; do not promise a cure.",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "霊魂",
+   "reading": "れいこん",
+   "gloss": "soul, spirit",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜からには",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "静慮",
+   "reading": "じょうりょ",
+   "gloss": "dhyāna, meditative absorption",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜に先立って",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "非二元",
+   "reading": "ひにげん",
+   "gloss": "non-duality",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜にせよ"
+  },
+  {
+   "term": "音写",
+   "reading": "おんしゃ",
+   "gloss": "phonetic transliteration (into kanji)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜を問わず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

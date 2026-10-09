@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "脱中心化",
+   "reading": "だつちゅうしんか",
+   "pos": "noun",
+   "meaning": "decentering",
+   "defJa": "思考を事実や自己そのものとせず観察すること",
+   "passage": {
+    "ja": "「失敗するに違いない」と思ったとき、その言葉を未来の事実として扱うと、行動の幅まで狭まります。脱中心化は、そこで生じた考えを心の中の出来事として捉え、考えた内容と現実とを少し離して見ることを指します。瞑想を含む実践の説明にも使われますが、考えを無理に消すことでも、自分への関心を完全に失うことでもありません。同じ不安が浮かんでも、今そう考えていると気付いたうえで次の行動を選ぶという違いに注目すると、抽象的な語が日常の小さな場面につながります。",
+    "form": "脱中心化",
+    "en": "When a thought says failure is certain, treating it as a future fact can restrict action. Decentering means recognizing the thought as a mental event and creating some distance between its content and reality. The term appears in accounts of practices including meditation, but means neither forcibly erasing thoughts nor losing all concern for oneself. Noticing the difference between obeying an anxious thought and recognizing it before choosing the next action connects this abstract word with an everyday moment.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「脱中心化を促す」。思考を消すことと、思考との距離を取ることを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

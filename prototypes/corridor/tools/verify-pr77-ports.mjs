@@ -171,8 +171,9 @@ PROBES['quiz-crumb'] = async () => {
   await page.click('#back');
   await settle(page);
   const backTo = await page.evaluate(() => document.body.dataset.view);
-  check('ea8252a9 · the quiz crumb names the lists tray its 戻る reopens',
-    /リスト|lists/.test(crumb) && backTo === 'tray', JSON.stringify({ crumb, backTo }));
+  // r4: the tray is the Today tab's room, so its crumb names it 今日 / Today, and only that (VERIFIER_CHANGES.md)
+  check('ea8252a9 · the quiz crumb names Today, the tray its 戻る reopens',
+    /今日|Today/.test(crumb) && backTo === 'tray', JSON.stringify({ crumb, backTo }));
   await context.close();
 };
 
@@ -202,11 +203,13 @@ PROBES['crumb-origin'] = async () => {
   }
   await page.waitForSelector('.close-doors');
   const reviewCrumb = await crumbOf(page);
-  await page.click('#back');
+  // with the tab bar, a finished review hides the chrome's 戻る (one way home, r3-rooms): the
+  // close's own way back is then the door that must reopen the tray
+  await page.click((await page.locator('#back').isVisible()) ? '#back' : '.close-doors .take');
   await settle(page);
   const reviewBack = await page.evaluate(() => document.body.dataset.view);
-  check('d9f0b984 · a plain review names the lists tray its 戻る reopens',
-    /(リスト|lists).*(復習|review)/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
+  check('d9f0b984 · a plain review names Today, the tray its 戻る reopens',
+    /(今日|Today).*(復習|review)/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
   await context.close();
 };
 

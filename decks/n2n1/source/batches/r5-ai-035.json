@@ -1,0 +1,179 @@
+{
+ "batch": "r5-ai-035",
+ "items": [
+  {
+   "term": "配当利回り",
+   "reading": "はいとうりまわり",
+   "gloss": "dividend yield",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "自己資本利益率",
+   "reading": "じこしほんりえきりつ",
+   "gloss": "return on equity",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "割引現在価値",
+   "reading": "わりびきげんざいかち",
+   "gloss": "discounted present value",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "リスク許容度",
+   "reading": "りすくきょようど",
+   "gloss": "risk tolerance",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "流動性",
+   "reading": "りゅうどうせい",
+   "gloss": "market liquidity",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "リバランス",
+   "reading": "りばらんす",
+   "gloss": "portfolio rebalancing",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "インデックス投資",
+   "reading": "いんでっくすとうし",
+   "gloss": "index investing",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "工場の小さな異常から工程の全体像へ",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "債券利回り",
+   "reading": "さいけんりまわり",
+   "gloss": "bond yield",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "分散投資",
+  "資産配分",
+  "株価収益率",
+  "株価純資産倍率",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

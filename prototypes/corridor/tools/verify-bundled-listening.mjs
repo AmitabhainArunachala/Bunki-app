@@ -1,6 +1,6 @@
 /** Bundled reading and explicit text practice through normal controls, and the sentence
  * listening lock: the voice is Kore (Charon second), so a bundled Ami cue is never offered or
- * requested and the listening mode shows the reader's quiet 音声準備中 · Kore state. A negative
+ * requested and the listening mode explains the absence with Kore/Charon in its accessible description. A negative
  * control re-allows Ami in a copy of the staged corridor.js and must fail the same lock check.
  * Persistent profiles, real record output, no injected learner state or provider responses.
  * This is a scoped technical subjourney. */
@@ -60,7 +60,9 @@ const listeningControls = '#sentence-choose-listening, #sentence-add-listening, 
 async function listeningLocked(page, requested) {
   const pending = page.locator('#sentence-listening-pending');
   await pending.waitFor({ timeout: 5000 });
-  assert.match(await pending.innerText(), /音声準備中 · Kore/u);
+  assert.equal(await pending.innerText(), 'No audio for this sentence yet');
+  assert.equal(await pending.getAttribute('aria-description'), 'Approved voices: Kore (main), Charon (second).',
+    'The pending sentence keeps the locked voice provenance in its accessible description');
   assert.equal(await page.locator(listeningControls).count(), 0, 'No listening control is offered');
   assert.deepEqual(requested.filter(path => path.startsWith('/audio/s/')), [], 'No sentence recording is requested');
 }
@@ -169,7 +171,7 @@ for (const engine of engines) for (const width of sizes) {
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup
     assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await sourceToken(page).click();
-    await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('reader-choice-neutral')); await page.locator('#sentence-practice-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
     const surfaces = await page.locator('#reader .tok[data-index]').evaluateAll(nodes => nodes.map(node => {
@@ -246,7 +248,7 @@ for (const engine of engines) for (const width of sizes) {
     await listeningLocked(page, requested); await screenshot('listening-pending-kore');
     unchanged(beforeListening, await snapshot('listening-pending'), ['taken', 'srs', 'revlog', 'sentencePractice']);
     assert(requested.includes('/audio/sentence-cues.json'), 'The bundled cue catalog was consulted');
-    result.observations.push({ name: 'sentence-listening-locked-to-kore-charon', pendingKoreVisible: true,
+    result.observations.push({ name: 'sentence-listening-locked-to-kore-charon', pendingKoreDescribed: true,
       listeningOffered: false, sentenceRecordingRequests: 0 });
 
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await openSaved();
@@ -311,7 +313,7 @@ for (const engine of engines) {
     page.on('pageerror', error => result.errors.push(error.message));
     await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     await page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) }).locator('.shelf-open').click();
-    await sourceToken(page).click(); await page.locator('#reader-sentence-practice').click();
+    await sourceToken(page).click(); await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click();
     await page.locator('#sentence-choose-listening').check();
     await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-listening-start').waitFor();
     let lockFailure = null;

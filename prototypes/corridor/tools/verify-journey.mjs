@@ -301,7 +301,7 @@ try {
     await page.click('#back');
     await page.waitForSelector(JOURNEY_TEXT, { timeout: 5000 });
     const t = await page.evaluate((sel) => document.querySelector(`${sel} .read-tag`)?.textContent || '', JOURNEY_TEXT);
-    if (!t.includes('途中')) throw new Error('tag: ' + JSON.stringify(t));
+    if (!t.includes('in progress')) throw new Error('tag: ' + JSON.stringify(t));
   });
 
   await step('7 JLPT lesson end to end', async () => {
@@ -360,7 +360,7 @@ try {
   });
 
   await step('9 review trace on the tray', async () => {
-    await page.getByRole('button', { name: /リストへ|back to lists/ }).click();
+    await page.getByRole('button', { name: /リストへ|back to lists|今日へ|Back to Today/ }).click();
     await page.waitForTimeout(300);
     const tr = await page.evaluate(() => document.querySelector('.srs-trace')?.textContent);
     if (!tr) throw new Error('no trace line');

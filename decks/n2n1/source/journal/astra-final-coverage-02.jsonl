@@ -1,0 +1,1 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"締めくくり": []}, "model": "deepseek-v4-pro:cloud", "secs": 27, "out": 3599, "verdicts": [{"term": "締めくくり", "editor": "pass", "editorWhy": "自然で、ターゲットは「会の締めくくり」として一度だけ使われ、文脈から意味が明確。", "facts": "pass", "factsWhy": "言語用法の説明に事実誤りはなく、レベル・英訳も適切。"}]}

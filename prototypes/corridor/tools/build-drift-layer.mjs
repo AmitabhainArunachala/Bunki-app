@@ -108,10 +108,45 @@ ${scopedRules.join('\n')}
  * to the corridor's 覚 button, which navigated the whole app away) */
 #drift-layer #radoc { top: 60px; padding-top: 62px; }
 #drift-layer #radoc .x { top: calc(72px + env(safe-area-inset-top)); z-index: 12; }
+
+/* Round 4 (T1, "clean it up a lot"): crisp ink. A word is drawn sharp, never smudged by its own
+ * 1px shadow; only the words that carry meaning (fragile, the bloom's centre and satellites) keep
+ * a soft halo. The paper grain is quieter. The level rail keeps the donor's rest: its scale shows
+ * only while a finger is on it (round 4 review: labels at rest were clutter). Presentation only. */
+#drift-layer .word .base,
+#drift-layer .glyph .g { text-shadow: none; }
+#drift-layer .word.fragile .base { text-shadow: 0 0 9px var(--halo); }
+#drift-layer .word.bctr .base { text-shadow: 0 0 9px var(--bloomHalo); }
+#drift-layer .word.bsat .base { text-shadow: 0 0 6px color-mix(in srgb, var(--bloomHalo) 50%, transparent); }
+#drift-layer #grain { opacity: calc(var(--grainOp) * 0.45); }
+/* the explainer carries both languages and shows the interface's own (round 4 review: the
+ * English setting showed Japanese buttons, and 日本語 showed English prose) */
+body:not(.ui-bi) #drift-layer [data-l='en'],
+body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 `;
 
 /* -------------------------------------------------------------- markup */
 let markup = slice('</style>\n', '<script>', 'markup fragment').trim();
+// Round 4 review (T1): markup patches are exact-once too, so a reshaped donor fails the build.
+const markupPatch = (from, to, label) => {
+  const first = markup.indexOf(from);
+  if (first < 0 || markup.indexOf(from, first + 1) >= 0) throw new Error(`markup anchor missing or ambiguous (${label})`);
+  markup = markup.slice(0, first) + to + markup.slice(first + from.length);
+};
+markupPatch('<button class="x" id="radocX">閉じる ×</button><div class="wrap">\n<h2>部首 — radicals</h2>',
+  '<button class="x" id="radocX"><span data-l="ja">閉じる ×</span><span data-l="en">Close ×</span></button><div class="wrap">' +
+  '<div data-l="en">\n<h2>Radicals</h2>', 'the explainer: English half');
+markupPatch("travel to it and keep exploring.</p>\n</div></div>",
+  "travel to it and keep exploring.</p>\n</div>" +
+  '<div data-l="ja" lang="ja">\n<h2>部首</h2><div class="sub">漢字が分けられる形</div>' +
+  '<p>どの漢字も、くり返し現れる小さな形でできている。そのうち一つが、その字の<b>部首</b>に選ばれる。辞書は漢字を部首で分けて並べる。英語の辞書が単語を最初の文字で並べるのと同じだ。古典の部首（康熙部首）は <b>214</b> あり、部首を見分けられるようになると、画数の壁が、なじみの部品の組み合わせに変わる。</p>' +
+  '<p>部首はしばしば意味を運ぶ。さんずい「氵」は水にかかわる字に、木へん「木」は木や植物にかかわる字に多い。部首は索引であり、手がかりでもある。</p>' +
+  '<p><b>部首と部品のちがい。</b>一つの漢字には部品がいくつも含まれるが、正式な部首は一つだけだ。この辞書はその区別を守り、古典の部首番号があるときだけ「部首」と書き、それ以外は「この字を含む」と書く。こちらは、ゆるやかだが正直な仲間の集まりだ。</p>' +
+  '<div class="rex"><span class="rc">氵</span><span class="rt"><b>水</b>（さんずい）· 海 · 泳 · 池 · 河</span></div>' +
+  '<div class="rex"><span class="rc">木</span><span class="rt"><b>木</b>（きへん）· 林 · 森 · 柱 · 校</span></div>' +
+  '<div class="rex"><span class="rc">言</span><span class="rt"><b>ことば</b>（ごんべん）· 語 · 話 · 読 · 記</span></div>' +
+  '<p style="color:var(--faint);font-size:13px">部首の仲間の一覧にある字をタップすると、その字へ移って、さらにたどれる。</p>\n</div></div></div>',
+  'the explainer: Japanese half');
 
 /* -------------------------------------------------------------- script */
 let js = slice('<script>\n', '\n</script>', 'script block');
@@ -226,12 +261,12 @@ patch(
 // preserved artwork remains byte-untouched.
 patch(
   'const radoc=document.getElementById("radoc");',
-  'const radoc=document.getElementById("radoc");let radocReturnFocus=null;radoc.inert=true;radoc.hidden=true;radoc.setAttribute("aria-hidden","true");radoc.setAttribute("role","dialog");radoc.setAttribute("aria-label","部首 — radicals");radoc.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeRadoc();}});',
+  'const radoc=document.getElementById("radoc");let radocReturnFocus=null;radoc.inert=true;radoc.hidden=true;radoc.setAttribute("aria-hidden","true");radoc.setAttribute("role","dialog");radoc.setAttribute("aria-label",uiT("部首","Radicals"));radoc.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeRadoc();}});',
   'radoc rests inert',
 );
 patch(
   'function openRadoc(){ radoc.classList.add("open"); }',
-  'function openRadoc(){ radocReturnFocus=document.activeElement;radoc.hidden=false;radoc.inert=false;radoc.setAttribute("aria-hidden","false");radoc.classList.add("open");document.getElementById("radocX").focus(); }',
+  'function openRadoc(){ radocReturnFocus=document.activeElement;radoc.setAttribute("aria-label",uiT("部首","Radicals"));radoc.hidden=false;radoc.inert=false;radoc.setAttribute("aria-hidden","false");radoc.classList.add("open");document.getElementById("radocX").focus(); }',
   'radoc wakes focusable',
 );
 patch(
@@ -313,6 +348,80 @@ patch(
   'practice priorities join the standing priority',
 );
 
+// Round 4 (T1, the operator 2026-10-08: "a whole explorable UNIVERSE of japanse words … i think we
+// could clean it up a lot"). The universe stays whole and explorable; what changes is only how it is
+// drawn. Quieter paper (no age spots, fewer fibres and specks, a lighter vignette), pigment pools and
+// the wave band down to a whisper and one fine line, every unseen word a fine point instead of a grey
+// square, the word web and the hub suns faint, no word drawn too small to read, the night's red pool
+// turned to 藍, and the ground taken from the host's own world so the door and Today stand on one
+// paper. No gesture, physics, record or judgment path is touched; every anchor is exact-once.
+patch('  for(let i=0;i<240;i++){', '  for(let i=0;i<90;i++){', 'r4 fewer paper fibres');
+patch('const la=th.dark?.028:.05;', 'const la=th.dark?.014:.022;', 'r4 fainter laid lines');
+patch('for(let i=0;i<2600;i++){', 'for(let i=0;i<600;i++){', 'r4 fewer grain specks');
+patch('for(let i=0;i<26;i++){', 'for(let i=0;i<8;i++){', 'r4 fewer heavy kozo strands');
+patch('for(let i=0;i<46;i++){', 'for(let i=0;i<0;i++){', 'r4 no foxing spots');
+patch('g.addColorStop(0,shade(th.ground,f,th.dark?.22:.5));', 'g.addColorStop(0,shade(th.ground,f,th.dark?.14:.26));', 'r4 gentler mottling');
+patch('vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));', 'vg.addColorStop(1,th.dark?"rgba(0,0,0,.36)":rgba(th.ink,.07));', 'r4 lighter vignette');
+patch('ictx.globalAlpha=Math.min(.3,th.blobA*b.a);', 'ictx.globalAlpha=th.dark?Math.min(.09,th.blobA*b.a*.4):Math.min(.2,th.blobA*b.a*.8);', 'r4 pools a whisper by night, a cool mist by day');
+patch('pool:["#1E50A2","#1E50A2","#165E83","#165E83","#EB6101"]', 'pool:["#1E50A2","#1E50A2","#165E83","#165E83","#6E87A6"]', 'r4 the day mist stays cool (北斎)');
+patch('pool:["#595857","#9FA0A0","#595857","#7D7D7D","#EB6101"]', 'pool:["#595857","#9FA0A0","#595857","#7D7D7D","#9FA0A0"]', 'r4 the day mist stays cool (墨)');
+patch('const passes=[[mind()*0.13,.05,th.pig1],[mind()*0.055,.07,th.pig1],[3,.12,th.pig2]];',
+  'const passes=[[1.2,th.dark?.2:.14,th.pig2]];', 'r4 the wave band one fine line');
+patch('const r2=Math.max(1,1.9*cam.z), rr=r2*2;', 'const r2=Math.max(0.7,1.1*cam.z), rr=r2*2;', 'r4 unseen words as fine points');
+patch('draw(eB,0.067*dimF); draw(eD,0.038*dimF);', 'draw(eB,0.03*dimF); draw(eD,0.016*dimF);', 'r4 the word web faint');
+patch('lctx.strokeStyle=rgba(th.pig1,(cz<0.7?0.05:0.032)*(FOCUS.length?0.4:1));',
+  'lctx.strokeStyle=rgba(th.pig1,(cz<0.7?0.026:0.015)*(FOCUS.length?0.4:1));', 'r4 the kanji mesh faint');
+patch('const hubA=cam.z<0.8?0.20:0.10;', 'const hubA=cam.z<0.8?0.1:0.05;', 'r4 hub suns faint');
+patch('const z=fragile?[1,1.22][i%2]:[0.66,0.84,1,1.18][i%4];', 'const z=fragile?[1,1.22][i%2]:[0.8,0.9,1,1.15][i%4];', 'r4 no word too small to read');
+patch('pool:["#113285","#113285","#4C6CB3","#4C6CB3","#E2041B"]', 'pool:["#113285","#113285","#4C6CB3","#4C6CB3","#2B4C8F"]', 'r4 the night pool in 藍');
+patch('themeIx=ix; const t=THEMES[ix];', 'themeIx=ix; const t=THEMES[ix]; adoptHostGround(t);', 'r4 the ground and inks, guarded');
+
+// Round 4 review (T1, fix 4): the universe's own card speaks the interface language, and its
+// prototype notes ("実物では…") become true sentences in both languages.
+patch("const label='この'+(kind==='word'?'語':'字')+'を学ぶ →';", "const label=uiT('全項目 →','Full entry →');", 'r4 the card door, one name');
+patch("studyHtml('word',n.w,'実物では、ここから完全な辞書へ — in the real app this opens the full entry.')",
+  "studyHtml('word',n.w,uiT('この語の全項目は、まだない。','No full entry for this word yet.'))", 'r4 a word without an entry says so');
+patch('\'</div><div class="note">実物では、ここから助詞ページへ — opens the full particle page.</div>\'',
+  '\'</div><div class="note">\'+uiT(\'助詞のページは、まだない。\',\'Particles have no page of their own yet.\')+\'</div>\'', 'r4 a particle says so');
+patch("studyHtml('kanji',n.ch,'実物では、ここから漢字ページへ — opens the full kanji page.')",
+  "studyHtml('kanji',n.ch,uiT('この字の漢字ページは、まだない。','No kanji page for this character yet.'))", 'r4 a kanji without a page says so');
+patch("(num?(\"部首 \"+num+\"：この部首をもつ \"):\"この字を含む \")+\n      fam.length+'字 <button class=\"radq\" id=\"radQ\">部首とは？</button></div>'",
+  "(num?uiT(\"部首 \"+num+\"：この部首をもつ \"+fam.length+\"字\",\"Radical \"+num+\" · \"+fam.length+\" kanji have it\"):uiT(\"この字を含む \"+fam.length+\"字\",fam.length+\" kanji contain it\"))+\n      ' <button class=\"radq\" id=\"radQ\">'+uiT('部首とは？','What is a radical?')+'</button></div>'", 'r4 the family head');
+patch("(num?(' · 部首 '+num):\"\")", "(num?(uiT(' · 部首 ',' · radical ')+num):\"\")", 'r4 the radical number');
+patch("'<button class=\"bt\" id=\"strokeBtn\">もう一度</button>'", "'<button class=\"bt\" id=\"strokeBtn\">'+uiT('もう一度','Replay')+'</button>'", 'r4 replay the strokes');
+patch('(words.length?("appears in "+words.length+" words here"):\n        (fam?("builds "+fam.length+" kanji"):("builds "+kin.length+" kanji here")))',
+  '(words.length?uiT("ここでは "+words.length+" 語に出てくる","appears in "+words.length+" words here"):\n        (fam?uiT(fam.length+" 字の部品になる","builds "+fam.length+" kanji"):uiT("ここでは "+kin.length+" 字の部品になる","builds "+kin.length+" kanji here")))', 'r4 the kanji line');
+
+// Round 4 review (T1, fix 5): the level rail keeps no promise it cannot keep. 自 is not measured
+// yet, so it says so; releasing on it keeps the current level and the handle returns to it. Each
+// stop's line speaks the interface language.
+patch(`const STOPS=[
+ {k:"自",info:"あなたに合わせる — adapts to you"},
+ {k:"N1",lv:1,info:"N1 · 高校+ · 漢検準2–2級"},
+ {k:"N2",lv:2,info:"N2 · 中学 · 漢検4–3級"},
+ {k:"N3",lv:3,info:"N3 · 小5–6 · 漢検6–5級"},
+ {k:"N4",lv:4,info:"N4 · 小3–4 · 漢検8–7級"},
+ {k:"N5",lv:5,info:"N5 · 小1–2 · 漢検10–9級"}];`, `const STOPS=[
+ {k:"自",info:"自 · あなたの段階は、まだ測っていない",en:"auto · your level isn't measured yet"},
+ {k:"N1",lv:1,info:"N1 · 高校+ · 漢検準2–2級",en:"N1 · high school+ · Kanken pre-2 to 2"},
+ {k:"N2",lv:2,info:"N2 · 中学 · 漢検4–3級",en:"N2 · junior high · Kanken 4 to 3"},
+ {k:"N3",lv:3,info:"N3 · 小5–6 · 漢検6–5級",en:"N3 · grades 5–6 · Kanken 6 to 5"},
+ {k:"N4",lv:4,info:"N4 · 小3–4 · 漢検8–7級",en:"N4 · grades 3–4 · Kanken 8 to 7"},
+ {k:"N5",lv:5,info:"N5 · 小1–2 · 漢検10–9級",en:"N5 · grades 1–2 · Kanken 10 to 9"}];`, 'r4 the rail speaks both languages');
+patch(`  lvlInfo.textContent=s.info;
+  if(commit){
+    if(s.lv&&s.lv!==level){level=s.lv;tideChange();}
+    if(!s.lv) setHint("実物では、AI評価・SRS・模試から現在地を推定");
+  }`, `  lvlInfo.textContent=uiT(s.info,s.en||s.info);
+  if(lvlLabels.firstChild) lvlLabels.firstChild.textContent=uiT("自","auto");
+  if(commit){
+    if(s.lv&&s.lv!==level){level=s.lv;tideChange();}
+    if(!s.lv){
+      setHint(uiT("段階はまだ測っていない。N1〜N5 から選ぶ。","Your level isn't measured yet. Choose N1 to N5."));
+      lvlSet(Math.max(0,STOPS.findIndex(x=>x.lv===level)),false);
+    }
+  }`, 'r4 auto keeps its word');
+
 // 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
 patch(
   '  drawTrail(t);\n  requestAnimationFrame(frame);\n}',
@@ -335,6 +444,42 @@ patch(
 // A receipt is evidence only for its exact command and current local scope.
 // Lazy reuse of the controller codec prevents a second Drift schema here.
 js += `
+// Round 4 review (T1): the universe speaks the interface language the corridor set on <body>.
+function uiT(ja,en){return document.body&&document.body.classList.contains("ui-bi")?en:ja;}
+// Round 4 review (T1, fix 2): by day the universe keeps a sky of its own (the donor's own cool
+// ground), and by night it stands on the host world's ground only when every word ink keeps its
+// contrast there: at least 3:1, and never below the donor's own lowest ink where that is under
+// 4.5:1. Any ink still under 3:1 on its ground is deepened toward the palette's ink until it holds.
+function lumaOf(h){const c=rgbOf(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*c[0]+.7152*c[1]+.0722*c[2];}
+function contrastOf(a,b){const x=lumaOf(a),y=lumaOf(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+function lowestInk(inks,g){return Math.min.apply(null,inks.map(c=>contrastOf(c,g)));}
+function mixHex(a,b,f){const x=rgbOf(a),y=rgbOf(b);return "#"+x.map((v,i)=>Math.round(v+(y[i]-v)*f).toString(16).padStart(2,"0")).join("");}
+function hostGround(){
+  try{
+    const g=getComputedStyle(document.documentElement).getPropertyValue("--ground").trim();
+    return /^#[0-9a-f]{6}$/i.test(g)?g.toLowerCase():null;
+  }catch{return null;}
+}
+function groundFor(t){
+  const base=t.base||t;
+  if(!base.dark)return base.ground;
+  const h=hostGround();
+  if(!h)return base.ground;
+  const floor=Math.max(3,Math.min(lowestInk(base.wcol,base.ground),4.5));
+  return lowestInk(base.wcol,h)>=floor?h:base.ground;
+}
+function inkFloor(c,g,toward){
+  let out=c;
+  for(let i=1;i<=20&&contrastOf(out,g)<3;i+=1)out=mixHex(c,toward,i*.05);
+  return out;
+}
+function adoptHostGround(t){
+  if(!t.base)t.base={ground:t.ground,plaque:t.plaque,wcol:t.wcol.slice(),dark:t.dark};
+  const g=groundFor(t);
+  t.ground=g;
+  t.plaque=g===t.base.ground?t.base.plaque:rgba(g,t.dark?.93:.92);
+  t.wcol=t.base.wcol.map(c=>inkFloor(c,g,t.ink));
+}
 function layoutHeldRing(ax,ay){
   const measure=n=>{
     const scale=Math.max(n.s||1,n.ts||1)*cam.z;
@@ -564,9 +709,12 @@ window.__DRIFT__ = {
     document.getElementById('drift-layer').classList.remove('active');
   },
   // the corridor drives the shared nihonga world from its chrome seal; the
-  // drift keeps its own five-theme palette in step (0..4, north-star order)
+  // drift keeps its own five-theme palette in step (0..4, north-star order).
+  // Two night worlds share one drift palette (yoru and kaku are both 夜), so a
+  // changed ground re-applies it too; by day the ground is the donor's own
   setTheme(ix) {
-    if (typeof ix === 'number' && ix >= 0 && ix < THEMES.length && ix !== themeIx) applyTheme(ix);
+    if (typeof ix !== 'number' || ix < 0 || ix >= THEMES.length) return;
+    if (ix !== themeIx || groundFor(THEMES[ix]) !== THEMES[ix].ground) applyTheme(ix);
   },
 };
 })();

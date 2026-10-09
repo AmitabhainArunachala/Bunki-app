@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "再帰",
+   "reading": "さいき",
+   "pos": "noun",
+   "meaning": "recursion",
+   "defJa": "同じ仕組みを自分の一部の処理にも使うこと",
+   "passage": {
+    "ja": "箱の中に小箱が入り、その小箱にも別の箱が入っているとき、全部の品物を数えるにはどうしますか。箱を開けて品物を数え、さらに箱があれば同じ手順を適用する方法が、再帰の分かりやすい例です。底の箱に着いて初めて数が確定し、その結果を使って一つ外側の箱の合計を出せます。単純な操作を繰り返すように見えても、途中の計算が内側の結果を待っている点に特徴があり、どこで分解を止めるかを決めておかないと処理が終わりません。",
+    "form": "再帰",
+    "en": "How would you count every item when a box contains smaller boxes that contain still more boxes? Opening a box, counting its items, and applying the same procedure to any boxes inside is an accessible example of recursion. Only on reaching the innermost box does a count become final, allowing that result to be used for the total one level out. Although it resembles repetition of a simple operation, each unfinished calculation waits for an inner result, so the procedure will not finish unless a stopping point is defined.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "小さな部分へ同じ処理を適用し、その結果を外側へ返す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-4138b9ed53-6ce4e738",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-4138b9ed53-6ce4e738",
+    "wordId": "nn-4138b9ed53"
+   }
+  },
+  {
+   "term": "停止問題",
+   "reading": "ていしもんだい",
+   "pos": "noun",
+   "meaning": "halting problem",
+   "defJa": "任意のプログラムが実行を終えるかを問う問題",
+   "passage": {
+    "ja": "画面が固まったとき、計算が長引いているのか、永久に終わらないのかは、少し待つだけでは決まりません。停止問題は、与えられたプログラムと入力について、その実行がいつか終わるかを問います。個別に答えられる例はあっても、あらゆる組合せに必ず正しく答える一般的な手順は存在しません。「この処理は終わる」と確認できた一例から、すべての処理を判定できると広げてしまうと、計算に時間がかかる問題と、原理的な限界との区別が失われます。",
+    "form": "停止問題",
+    "en": "When a screen freezes, waiting briefly cannot determine whether the calculation is merely slow or will never end. The halting problem asks whether execution of a given program on a given input will eventually finish. Although individual cases can be decided, no general procedure always gives the correct answer for every combination. Extending one confirmed terminating case to a claim that all computations can be decided erases the distinction between a time-consuming problem and a fundamental limit.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "特定の計算の長さと、すべての計算を判定できるかという問いは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-41b7b83f1e-94e1a9e2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-41b7b83f1e-94e1a9e2",
+    "wordId": "nn-41b7b83f1e"
+   }
+  }
+ ]
+}

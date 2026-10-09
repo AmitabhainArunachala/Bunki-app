@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "菩提僊那",
+   "reading": "ぼだいせんな",
+   "pos": "noun",
+   "meaning": "Bodhisena",
+   "defJa": "東大寺の大仏開眼で導師を務めたインド僧",
+   "passage": {
+    "ja": "奈良の大仏を見上げるとき、日本国内の技術や権力だけでその歴史を考えてしまいがちです。ところが、七五二年の開眼供養で導師を務めたのは、インドから来た僧の菩提僊那でした。仏教伝来を国から国へ経典が移る出来事として覚えるだけでなく、儀礼を担う人が実際に海を渡ったことにも注目すると、交流の姿が具体的になります。像を造った人、資金を集めた人、式を執り行った人を分けて整理すれば、一つの文化財に重なる複数の役割を読み取れます。",
+    "form": "菩提僊那",
+    "en": "Looking up at Nara’s Great Buddha, it is easy to consider its history solely through Japanese technology and political power. Yet the officiant at its eye-opening ceremony in the year seven hundred fifty-two was Bodhisena, a monk from India. Alongside remembering Buddhist transmission as scriptures moving between countries, attending to the people who crossed the sea to perform rituals makes that exchange concrete. Distinguishing those who made the statue, gathered resources, and officiated at the ceremony reveals the multiple roles embodied in one cultural object.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「導師を務める」という役割を添え、人物と仏教伝来を結び付ける。",
+    "sense": ""
+   }
+  }
+ ]
+}

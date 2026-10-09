@@ -35,8 +35,10 @@
  * replaces is kept under bunki-cloze:kotoba-mcd:before-restore. A stored
  * ledger the player cannot read is set aside before anything is saved.
  *
- * Then answering: the grade bar shows もう一度／思い出せた and nothing else, even
- * with an old 難しい・簡単 setting stored; a cancelled or mostly vertical swipe
+ * Then answering: the grade bar shows もう一度・難しい・正解・簡単 (Again · Hard · Good ·
+ * Easy, CARD_CONTRACT_V2 §4 as amended 2026-10-09) whatever setting is stored; each key 1–4
+ * grades its own FSRS rating and schedules the interval its pad showed; a ledger written by the
+ * two-button player loads unchanged and takes a Hard; a cancelled or mostly vertical swipe
  * never grades; 4択 never asks a 字 card; 設定 has labelled controls and radio
  * groups (axe); the done screen keeps ↶ ひとつ戻す; every colour token in the
  * light themes clears 4.5:1.
@@ -295,7 +297,7 @@ async function verifyGradePath(browser, base) {
       const after = await page.evaluate(`({ ledger: localStorage.getItem(${JSON.stringify(LEDGER)}), count: document.querySelector('.kp-count')?.textContent, card: !!document.querySelector('#kp-card'), grades: !!document.querySelector('#kp-grade-good'), backup: !!document.querySelector('#kp-to-backup'), text: document.querySelector('.kp').innerText })`);
       check(
         'when storage refuses the write, the card stays (1/N), the ledger is unchanged and the page says 保存できませんでした',
-        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.backup && after.ledger === before.ledger && after.text.includes('保存できませんでした'),
+        /^1\//.test(after.count || '') && after.count === before.count && after.card && after.grades && after.backup && after.ledger === before.ledger && after.text.includes('Could not save.'),
         JSON.stringify({ count: after.count, card: after.card, grades: after.grades, backup: after.backup, ledgerUnchanged: after.ledger === before.ledger }),
       );
     } finally {
@@ -372,7 +374,7 @@ async function verifyRestore(browser, base) {
     const empty = await restore('{}');
     check(
       '復元 with {} leaves the ledger bytes as they were and says no card records are in it',
-      (await raw(LEDGER)) === current && empty.msg.includes('入っていません') && !empty.msg.includes('復元しました') && empty.button === '復元',
+      (await raw(LEDGER)) === current && empty.msg.includes('This backup has no card records.') && !empty.msg.includes('Restored') && empty.button === 'Restore',
       empty.msg,
     );
 
@@ -383,7 +385,7 @@ async function verifyRestore(browser, base) {
     const now = JSON.parse(await raw(LEDGER));
     check(
       'an older backup with fewer cards: the first tap shows both counts and asks again (置き換える); the second replaces and keeps the old ledger aside',
-      first.msg.includes('このバックアップ：1枚・1回答') && first.msg.includes('いまの記録：2枚・2回答') && first.msg.includes('いまより少ない') && first.button === '置き換える' && untouched && Object.keys(now.cards).length === 1 && now.log.length === 1 && (await raw(`${LEDGER}:before-restore`)) === current && done.includes('復元しました'),
+      first.msg.includes('Backup: 1 cards · 1 answers') && first.msg.includes('Current record: 2 cards · 2 answers') && first.msg.includes('fewer records') && first.button === 'Replace' && untouched && Object.keys(now.cards).length === 1 && now.log.length === 1 && (await raw(`${LEDGER}:before-restore`)) === current && done.includes('Restored'),
       JSON.stringify({ first: first.msg, button: first.button, untouched, done }),
     );
 
@@ -392,7 +394,7 @@ async function verifyRestore(browser, base) {
     await page.evaluate(`localStorage.setItem(${JSON.stringify(LEDGER)}, ${JSON.stringify(broken)})`);
     await bootMcd();
     const home = await page.evaluate(`document.querySelector('.kp-notice')?.textContent || ''`);
-    check('an unreadable stored ledger is copied to bunki-cloze:kotoba-mcd:quarantine and the deck home says so', (await raw(`${LEDGER}:quarantine`)) === broken && home.includes('別に保管しました'), home);
+    check('an unreadable stored ledger is copied to bunki-cloze:kotoba-mcd:quarantine and the deck home says so', (await raw(`${LEDGER}:quarantine`)) === broken && home.includes('kept separately'), home);
   } finally {
     await context.close();
   }
@@ -416,7 +418,7 @@ const CONTRAST = `(() => {
   const lum = (c) => { const [r, g, b] = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
   const mix = (a, b, t) => a.map((v, i) => Math.round(v * t + b[i] * (1 - t)));
-  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
+  const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'blue', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
   const out = {};
   const before = root.dataset.look;
   for (const look of ['light', 'sakura', 'washi']) {
@@ -424,7 +426,7 @@ const CONTRAST = `(() => {
     const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
     const wash = rgba('var(--kp-cyan-wash)');
     // the card panel, the second panel (tiles, kanji boxes; also the darkest texture tint), the page,
-    // the tinted 思い出せた button (12% green over the panel) and the accent wash (答えを見る, chosen settings)
+    // the tinted 正解 (Good) pad (12% green over the panel) and the accent wash (答えを見る, chosen settings)
     const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
     let min = { ratio: 99 };
     for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
@@ -438,6 +440,15 @@ const CONTRAST = `(() => {
   return out;
 })()`;
 
+/** a grade pad's wait as fmtWait prints it: a number and a unit, the unit singular exactly when the
+ * number is 1 ("1 day", "2 days", "1 year", "1.5 years"; never "1 days" or "1.0 years") */
+const WAIT = /^([\d.]+) (min|hr|days?|months?|years?)$/;
+const waitOk = (w) => {
+  const m = WAIT.exec(w || '');
+  if (!m || /\.0$/.test(m[1])) return false;
+  return m[2] === 'min' || m[2] === 'hr' || (Number(m[1]) === 1) === !m[2].endsWith('s');
+};
+
 async function verifyDelivery(browser, base) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(SEEDED);
@@ -450,19 +461,18 @@ async function verifyDelivery(browser, base) {
   const count = () => page.evaluate(`document.querySelector('.kp-count')?.textContent ?? null`);
   const logLength = (deck) => page.evaluate(`(JSON.parse(localStorage.getItem('bunki-cloze:${deck}') || 'null')?.log ?? []).length`);
   try {
-    // two grade buttons, even with the old four-button setting stored; 2 and 4 do nothing (F10, A05; contract §4)
+    // four grade pads in order, Again · Hard · Good · Easy, whatever button setting is stored (D1, the
+    // learner's 2026-10-08 decision; CARD_CONTRACT_V2 §4 as amended 2026-10-09, STANDARD A53)
     await boot('?deck=kotoba');
-    await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ grades: 'four' }))`);
+    await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ grades: 'two' }))`);
     await boot('?deck=kotoba');
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
-    const two = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), hard: document.querySelectorAll('#kp-grade-hard, #kp-grade-easy').length, hint: document.querySelector('.kp-swipehint')?.textContent, position: getComputedStyle(document.querySelector('.kp-grades')).position })`);
-    await page.keyboard.press('2');
-    await page.keyboard.press('4');
-    const keysIgnored = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
-    check('the grade bar shows もう一度 and 思い出せた only (a stored 難しい・簡単 setting is ignored), stays on screen (fixed), and keys 2 and 4 do nothing', two.n === 2 && two.hard === 0 && two.labels === 'もう一度/思い出せた' && two.hint.includes('思い出せた') && two.position === 'fixed' && keysIgnored, JSON.stringify({ ...two, keysIgnored }));
+    const four = await page.evaluate(`({ n: document.querySelectorAll('.kp-grade').length, ids: [...document.querySelectorAll('.kp-grades .kp-grade')].map((b) => b.id).join(), labels: [...document.querySelectorAll('.kp-grade b')].map((b) => b.textContent).join('/'), keys: [...document.querySelectorAll('.kp-grade')].map((b) => b.getAttribute('aria-keyshortcuts')).join(), waits: [...document.querySelectorAll('.kp-grade small')].map((s) => s.textContent).join('/'), hint: document.querySelector('.kp-swipehint')?.textContent, position: getComputedStyle(document.querySelector('.kp-grades')).position })`);
+    const untouched = (await count()) === '1/15' && (await logLength('kotoba-mine')) === 0;
+    check('the grade bar shows Again · Hard · Good · Easy in that order (ids again, hard, good, easy; keys 1–4), each with an interval, whatever button setting is stored, and stays on screen (fixed)', four.n === 4 && four.ids === 'kp-grade-again,kp-grade-hard,kp-grade-good,kp-grade-easy' && four.labels === 'Again/Hard/Good/Easy' && four.keys === '1,2,3,4' && four.waits.split('/').length === 4 && four.waits.split('/').every(waitOk) && four.hint.includes('Good') && four.position === 'fixed' && untouched, JSON.stringify({ ...four, untouched }));
 
     // swipes: a cancelled gesture or a mostly vertical one never grades; a sideways one does (F34)
     const gesture = (moves, last) =>
@@ -479,10 +489,10 @@ async function verifyDelivery(browser, base) {
     const vertical = await gesture([[255, 400]], ['pointerup', 255, 400]);
     const afterVertical = { count: await count(), log: await logLength('kotoba-mine') };
     await gesture([[200, 105], [260, 110]], ['pointerup', 260, 110]);
-    const afterSwipe = { count: await count(), log: await logLength('kotoba-mine') };
+    const afterSwipe = { count: await count(), log: await logLength('kotoba-mine'), rating: await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log?.at(-1)?.[1] ?? null`) };
     check(
-      'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 思い出せた',
-      afterCancel.count === '1/15' && afterCancel.log === 0 && cancelled.transform === '' && cancelled.swipe === '' && afterVertical.count === '1/15' && afterVertical.log === 0 && vertical.transform === '' && afterSwipe.log === 1 && afterSwipe.count !== '1/15',
+      'a cancelled swipe and a mostly vertical one (dx 105, dy 300) never grade and put the card back; a sideways swipe grades 正解 (Good, rating 3)',
+      afterCancel.count === '1/15' && afterCancel.log === 0 && cancelled.transform === '' && cancelled.swipe === '' && afterVertical.count === '1/15' && afterVertical.log === 0 && vertical.transform === '' && afterSwipe.log === 1 && afterSwipe.rating === 3 && afterSwipe.count !== '1/15',
       JSON.stringify({ afterCancel, afterVertical, afterSwipe }),
     );
 
@@ -490,13 +500,13 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-quit');
     await page.click('#kp-to-settings');
     await page.waitForSelector('#kp-backup');
-    await page.waitForFunction(`document.getElementById('kp-persist')?.textContent.includes('：')`);
+    await page.waitForFunction(`document.getElementById('kp-persist')?.textContent.includes('Device storage:')`);
     const settings = await page.evaluate(`({ label: document.querySelector('label[for="kp-backup"]')?.textContent, groups: document.querySelectorAll('.kp-settings [role="radiogroup"][aria-label]').length, checked: document.querySelectorAll('.kp-settings [role="radio"][aria-checked="true"]').length, persist: document.getElementById('kp-persist').textContent, gone: document.querySelectorAll('[data-pref^="grades:"], [data-pref^="furigana:"], [data-pref^="hint:"]').length,
-      reset: [...document.querySelectorAll('.kp-settings button')].filter((b) => /記録を消す|消えます/.test(b.textContent)).length + document.querySelectorAll('.kp-danger').length, backup: [...document.getElementById('kp-backup').closest('.kp-field').querySelectorAll('button')].map((b) => b.textContent) })`);
+      reset: [...document.querySelectorAll('.kp-settings button')].filter((b) => /記録を消す|消えます|erase.*record|delete.*record|reset.*record|clear.*record/i.test(b.textContent)).length + document.querySelectorAll('.kp-danger').length, backup: [...document.getElementById('kp-backup').closest('.kp-field').querySelectorAll('button')].map((b) => b.textContent) })`);
     const axe = await new AxeBuilder({ page }).include('.kp').analyze();
     const aria = axe.violations.filter((v) => v.id === 'label' || v.id.startsWith('aria-') || v.id === 'button-name').map((v) => v.id);
-    check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no ヒント row: the front has no hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'バックアップの文字列' && settings.groups === 4 && settings.checked === 4 && settings.gone === 0 && /^端末の保存領域：(確保済み|未確保|不明)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
-    check('3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'コピー,復元', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
+    check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no ヒント row: the front has no hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'Backup text' && settings.groups === 4 && settings.checked === 4 && settings.gone === 0 && /^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
+    check('3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'Copy,Restore', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
 
     // the done screen keeps ↶ ひとつ戻す (F37)
     await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ ...JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine')), newPerDay: 1 }))`);
@@ -505,7 +515,7 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-start');
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
-    // a new card answered 思い出せた comes back once in the sitting (its 10-minute step); the second answer ends it
+    // a new card answered 正解 (Good) comes back once in the sitting (its 10-minute step); the second answer ends it
     await page.click('#kp-grade-good');
     await page.click('#kp-reveal');
     await page.click('#kp-grade-good');
@@ -517,7 +527,7 @@ async function verifyDelivery(browser, base) {
       await page.waitForSelector('.kp-grade');
       back = { count: await count(), log: await logLength('kotoba-mine') };
     }
-    check('the done screen keeps ↶ ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('思い出せた割合') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
+    check('the done screen keeps ↶ ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
 
     // 4択 never asks a 字 card: it is answered as 穴埋め (F38)
     await page.evaluate(DUE_KANJI);
@@ -528,11 +538,60 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     const grades = await page.locator('.kp-grade').count();
-    check('in 4択 a 字 card shows no choices: hint, 答えを見る and the grade bar instead', kanji.chip === '字' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 2, JSON.stringify({ ...kanji, grades }));
+    check('in 4択 a 字 card shows no choices: hint, 答えを見る and the four-pad grade bar instead', kanji.chip === 'Kanji' && kanji.choices === 0 && kanji.reveal && kanji.blank === '〔ざい〕' && grades === 4, JSON.stringify({ ...kanji, grades }));
+
+    // each key grades its own FSRS rating (1 Again, 2 Hard, 3 Good, 4 Easy) on its own card, and the
+    // interval it stores is the one its pad showed (a pad's text, read back as a range, holds the
+    // scheduled due minus the review time); then a ledger written by the two-button player (ratings 1
+    // and 3 only) loads unchanged and takes a Hard as one more row
+    const UNIT = { min: 60e3, hr: 36e5, day: 864e5, days: 864e5, month: 30 * 864e5, months: 30 * 864e5, year: 365 * 864e5, years: 365 * 864e5 };
+    const holds = (text, ms) => {
+      const m = WAIT.exec(text || '');
+      if (!m || !waitOk(text)) return false;
+      const [n, u] = [Number(m[1]), UNIT[m[2]]];
+      const half = /^years?$/.test(m[2]) ? 0.05 : 0.5;
+      return ms >= Math.max(0, n - half) * u - 2000 && ms < (n + half) * u + 2000;
+    };
+    await page.evaluate(`localStorage.removeItem('bunki-cloze:kotoba-mine'); localStorage.removeItem('bunki-cloze:prefs:v3:kotoba-mine')`);
+    await boot('?deck=kotoba');
+    await page.click('#kp-start');
+    const graded = [];
+    for (const [key, name] of [['1', 'again'], ['2', 'hard'], ['3', 'good'], ['4', 'easy']]) {
+      await page.waitForSelector('#kp-reveal');
+      await page.click('#kp-reveal');
+      await page.waitForSelector('.kp-grade');
+      const shown = await page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, wait: document.querySelector('#kp-grade-${name} small')?.textContent ?? null, log: (JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log ?? []).length })`);
+      await page.keyboard.press(key);
+      await page.waitForFunction(`(JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || 'null')?.log ?? []).length === ${shown.log + 1}`, null, { timeout: 5000 });
+      const stored = await page.evaluate(`(() => { const s = JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine')); const row = s.log.at(-1); return { row, due: s.cards[row[0]]?.due ?? null }; })()`);
+      const ms = Date.parse(stored.due) - Date.parse(stored.row[2]);
+      graded.push({ key, name, card: shown.id, wait: shown.wait, row: stored.row.slice(0, 2), ms, holds: stored.row[0] === shown.id && stored.row[1] === Number(key) && holds(shown.wait, ms) });
+    }
+    check('keys 1–4 each grade their own rating (Again 1, Hard 2, Good 3, Easy 4) on the card on screen, and each stored interval is the one its pad showed', graded.length === 4 && graded.every((g) => g.holds) && new Set(graded.map((g) => g.card)).size === 4, JSON.stringify(graded));
+
+    const OLD = JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: 'kotoba-mine', groupsOff: [],
+      cards: {
+        'km-064-1': { due: '2020-01-01T00:00:00.000Z', stability: 3.2, difficulty: 5.1, elapsed_days: 3, scheduled_days: 3, learning_steps: 0, reps: 3, lapses: 1, state: 2, last_review: '2019-12-29T00:00:00.000Z', introducedAt: '2019-12-20T00:00:00.000Z' },
+        'km-065-1': { due: '2099-01-01T00:00:00.000Z', stability: 30, difficulty: 4.2, elapsed_days: 9, scheduled_days: 30, learning_steps: 0, reps: 2, lapses: 0, state: 2, last_review: '2019-12-28T00:00:00.000Z', introducedAt: '2019-12-20T00:00:00.000Z' },
+      },
+      log: [['km-064-1', 3, '2019-12-20T00:00:00.000Z'], ['km-065-1', 3, '2019-12-20T00:01:00.000Z'], ['km-064-1', 1, '2019-12-26T00:00:00.000Z'], ['km-064-1', 3, '2019-12-29T00:00:00.000Z'], ['km-065-1', 3, '2019-12-28T00:00:00.000Z']] });
+    await page.evaluate(`localStorage.setItem('bunki-cloze:kotoba-mine', ${JSON.stringify(OLD)}); localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ newPerDay: 0 }))`);
+    await boot('?deck=kotoba');
+    const oldHome = await page.evaluate(`({ due: document.querySelector('.kp-tiles .kp-c-due b')?.textContent ?? null, notice: document.querySelectorAll('.kp-notice').length, quarantine: localStorage.getItem('bunki-cloze:kotoba-mine:quarantine') })`);
+    await page.click('#kp-start');
+    await page.click('#kp-reveal');
+    await page.waitForSelector('#kp-grade-hard');
+    await page.keyboard.press('2');
+    await page.waitForFunction(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine')).log.length === 6`, null, { timeout: 5000 });
+    const after = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine'))`);
+    const before = JSON.parse(OLD);
+    check('a ledger written by the two-button player (ratings 1 and 3 only) loads as it is: its due card is counted, nothing is set aside, and a Hard adds one [id, 2, time] row after the old rows, the other record untouched',
+      oldHome.due === '1' && oldHome.notice === 0 && oldHome.quarantine === null && JSON.stringify(after.log.slice(0, 5)) === JSON.stringify(before.log) && after.log[5][0] === 'km-064-1' && after.log[5][1] === 2 && JSON.stringify(after.cards['km-065-1']) === JSON.stringify(before.cards['km-065-1']) && after.cards['km-064-1'].reps === 4,
+      JSON.stringify({ oldHome, last: after.log.at(-1), reps: after.cards['km-064-1']?.reps }));
 
     // every colour token clears 4.5:1 on the surfaces it sits on, in the light themes (F35, A20)
     const contrast = await page.evaluate(CONTRAST);
-    check('light themes: every text colour, the kind colours included, is at least 4.5:1 on the card, the second panel, the page, the 思い出せた button and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
+    check('light themes: every text colour, the kind colours and the four grade hues included, is at least 4.5:1 on the card, the second panel, the page, the 正解 pad and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
   } finally {
     await context.close();
   }
@@ -540,8 +599,9 @@ async function verifyDelivery(browser, base) {
 
 /* ------------------------- the back hierarchy (CARD_CONTRACT_V2 §2–§4) */
 const KANJI_RE = /[㐀-鿿々〆ヵヶ]/;
-const FOLD_ORDER = ['英語', '英訳', '漢字の形と意味', '類語', 'この語の他の文', '出典'];
+const FOLD_ORDER = ['English', 'Translation', 'Kanji form and meaning', 'Related words', 'Other sentences for this word', 'Source'];
 const RULE_TEXT = '答えを見て理解が深まったなら もう一度';
+const UI_RULE_TEXT = 'Choose Again if seeing the answer improved your understanding.';
 /** where each sentence of a passage ends — the rule build.py and the player share */
 function sentenceEnds(ja) {
   const out = [];
@@ -747,6 +807,9 @@ const REGISTERS = { 講: '講義', 報: '報道', 論: '論説', 話: '会話', 
 // the register chip's full name (its title and aria-label, mount.js REGISTER)
 const REGISTER_NAMES = { 講: '講義・本の要約', 報: 'ニュース・解説', 論: 'エッセイ・思想', 話: '話し言葉', 学: '勉強法・学習の話', 語: '話し方・書き方の話' };
 const TOPICS = { mind: '心と学び', india: 'インド・仏教', ai: 'AI・半導体', history: '世界史', language: '日本語' };
+const UI_REGISTERS = { 講: 'Lecture', 報: 'Reporting', 論: 'Essay', 話: 'Conversation', 学: 'Learning', 語: 'Expression' };
+const UI_REGISTER_NAMES = { 講: 'Lectures and book summaries', 報: 'News and commentary', 論: 'Essays and ideas', 話: 'Spoken language', 学: 'Study and learning', 語: 'Speaking and writing' };
+const UI_TOPICS = { mind: 'Mind and learning', india: 'India and Buddhism', ai: 'AI and semiconductors', history: 'World history', language: 'Japanese' };
 const PILOT_CARD = 'km-240-m06'; // 習得, 講 / history: 『解体新書』の蘭学者たち
 // two full-run cards (source/mcd/v2-2026-10-05-b*.json), other registers than the pilot card's
 const FULL_RUN_CARDS = ['km-064-m08', 'km-110-m07']; // 財政, 論 / india: 寺の財政 · 利率, 話 / ai: ローンの比較
@@ -869,15 +932,18 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
       JSON.stringify({ ...front, text: undefined }),
     );
     // one line at 390px, even with the longest topic chip (インド・仏教) beside a level chip
-    // (km-064-m08): the register chip stands in for the source chip and names the source
+    // (km-064-m08). Round 4 (T8, T2): the front is the sentence, so the register and the source are no
+    // longer bare chips there ("Lecture", "Examples"); the back's 出典 fold names the style in full
     check(
-      `${label}: the register and topic sit as small text chips in the card’s chip row (labelled in full, the register’s label naming the source), the passage’s topic in place of the word’s group and its register in place of the source chip, one row on a phone`,
-      front.chips.includes(REGISTERS[card.register]) && front.chips.includes(TOPICS[card.topic]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleJa) && !front.chips.includes('書き下ろし') && front.reg === `文体：${REGISTER_NAMES[card.register]}（書き下ろし）` && front.rows === 1,
+      `${label}: the topic sits as a small text chip in the card’s chip row in place of the word’s group; no register chip and no source chip on the front; one row on a phone`,
+      front.chips.includes(UI_TOPICS[card.topic]) && !front.chips.includes(UI_REGISTERS[card.register]) && !front.chips.includes(deck.groups.find((g) => g.id === card.word.group)?.titleEn) && !front.chips.includes('Original composition') && front.reg === '' && front.rows === 1,
       JSON.stringify({ chips: front.chips, reg: front.reg, rows: front.rows }),
     );
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok', { timeout: 15000 });
+    const style = await page.evaluate(`document.querySelector('#kp-card .kp-f-src .kp-src-style')?.textContent ?? null`);
+    check(`${label}: the back’s 出典 fold names the passage’s style in full (${UI_REGISTER_NAMES[card.register]})`, style === `Style ${UI_REGISTER_NAMES[card.register]}`, JSON.stringify({ style }));
     // on the back the 全文／焦点 toggle may take a line of its own; the chips keep theirs
     const backRows = await page.evaluate(`new Set([...document.querySelectorAll('#kp-card .kp-chips > .kp-chip')].map((n) => Math.round(n.getBoundingClientRect().top))).size`);
     check(`${label}: on the back the chips still sit on one row`, backRows === 1, JSON.stringify({ backRows }));
@@ -1071,7 +1137,7 @@ async function verifyTap(browser, base) {
     const self = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, indeck: s.querySelector('.kp-sheet-indeck')?.textContent, take: s.querySelectorAll('#kp-take, #kp-chooser, .kp-take').length, full: !!s.querySelector('#kp-sheet-full'), defToks: [...s.querySelectorAll('.kp-sheet-def .kp-tok')].map((n) => n.textContent), stop: !!s.querySelector('.kp-sheet-stop') }; })()`);
     check(
       'tap: the card’s own word (a word enrolled in this deck) shows 「このデッキにあります」 and no 覚える',
-      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'このデッキにあります' && self.take === 0 && !self.full && !self.stop && self.defToks.includes('利息'),
+      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'Already in this deck' && self.take === 0 && !self.full && !self.stop && self.defToks.includes('利息'),
       JSON.stringify(self),
     );
     await page.click('#kp-sheet .kp-sheet-def .kp-tok[data-deck-word="km-113"]');
@@ -1079,7 +1145,7 @@ async function verifyTap(browser, base) {
     const deep = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, stop: s.querySelector('.kp-sheet-stop')?.textContent, toks: s.querySelectorAll('.kp-tok').length, def: s.querySelector('.kp-sheet-def')?.textContent, indeck: !!s.querySelector('.kp-sheet-indeck'), back: !!s.querySelector('#kp-sheet-back') }; })()`);
     check(
       'tap: a word in the sheet’s definition opens one more sheet (depth 2: 利息, also this deck’s), which says 「ここで止めよう」 and has nothing left to tap; ← goes back',
-      deep.term === '利息' && deep.stop === 'ここで止めよう' && deep.toks === 0 && !!deep.def && deep.indeck && deep.back,
+      deep.term === '利息' && deep.stop === 'Pause here' && deep.toks === 0 && !!deep.def && deep.indeck && deep.back,
       JSON.stringify(deep),
     );
     await page.click('#kp-sheet-back');
@@ -1144,7 +1210,7 @@ async function verifyTap(browser, base) {
     }
     check(
       'tap, standalone (study-mcd.html, study.html): no tap target on the front; after the reveal furigana and only this deck’s own words are tappable (the built-in gloss map); a tap shows a small popover — term, reading, definition, English behind 英語 — with no 覚える and a one-line note saying so; a press elsewhere closes it; one lookups[] row, the schedule unchanged',
-      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /覚える/.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
+      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Save to your review cards in Bunki\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
       JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
     );
   } finally {
@@ -1200,6 +1266,8 @@ async function verifyBack(browser, base) {
     const card = document.getElementById('kp-card');
     const rest = card.cloneNode(true);
     rest.querySelectorAll('.kp-chips, .kp-sentence').forEach((n) => n.remove());
+    rest.querySelectorAll('.kp-taphint').forEach((n) => { if (['Recall the meaning, then tap', 'Tap to reveal the answer'].includes(n.textContent)) n.textContent = ''; });
+    rest.querySelectorAll('.kp-rhint-label').forEach((n) => { if (n.textContent === 'Hint') n.textContent = ''; });
     return { rt: card.querySelectorAll('rt, ruby').length, taps: card.querySelectorAll('.kp-sentence :is(button, a, [role="button"], [tabindex], .kp-tapword)').length, tapwords: document.querySelectorAll('.kp-tapword').length,
       rhint: card.querySelectorAll('.kp-rhint').length, repaired: card.dataset.repaired ?? null,
       latin: /[A-Za-z]/.test(rest.textContent), folds: card.querySelectorAll('details').length, text: card.textContent, hint: card.querySelector('.kp-hint')?.textContent ?? null, zoom: !!card.querySelector('.kp-zoom') || !!card.dataset.zoom,
@@ -1210,16 +1278,18 @@ async function verifyBack(browser, base) {
     const ans = card.querySelector('.kp-answer');
     const sentence = card.querySelector('.kp-sentence').cloneNode(true);
     sentence.querySelectorAll('ruby').forEach((r) => r.remove());
-    const tier1 = [...ans.querySelectorAll(':scope > .kp-word, :scope > .kp-def, :scope > .kp-note')].map((n) => n.textContent).join(' ');
+    // the part-of-speech badge is interface chrome (EN: noun, 日本語: 名詞; read as pos below), not the answer's text
+    const tier1 = [...ans.querySelectorAll(':scope > .kp-word, :scope > .kp-def, :scope > .kp-note')].map((n) => { const x = n.cloneNode(true); x.querySelectorAll('.kp-posbadge').forEach((b) => b.remove()); return x.textContent; }).join(' ');
+    const badge = ans.querySelector('.kp-word > .kp-posbadge');
     const fold = (cls) => { const d = card.querySelector('.' + cls); return d ? { open: d.open, text: d.textContent.replace(d.querySelector('summary').textContent, '').trim(), summary: d.querySelector('summary').textContent } : null; };
-    return { order: [...ans.children].map((n) => n.className), word: [...ans.querySelector('.kp-word').children].map((n) => n.className), pitch: !!card.querySelector('.kp-pitch'),
+    return { pos: badge ? { text: badge.textContent, lang: badge.lang } : null, order: [...ans.children].map((n) => n.className), word: [...ans.querySelector('.kp-word').children].map((n) => n.className), pitch: !!card.querySelector('.kp-pitch'),
       bare: ${KANJI_RE}.test(sentence.textContent), rt: card.querySelectorAll('.kp-sentence rt').length, tier1, def: ans.querySelector('.kp-def')?.textContent,
       summaries: [...ans.querySelectorAll('.kp-folds > details > summary')].map((s) => s.textContent), native: [...ans.querySelectorAll('.kp-folds > *')].every((n) => n.tagName === 'DETAILS' || n.id === 'kp-see'),
       gloss: fold('kp-f-gloss'), en: fold('kp-f-en'), kanji: fold('kp-f-kanji'), sem: fold('kp-f-sem'), others: fold('kp-f-others'), src: fold('kp-f-src'),
       srcLink: card.querySelector('.kp-f-src a')?.getAttribute('href') ?? null, licenceLang: card.querySelector('.kp-licence [lang]')?.lang ?? null };
   })()`;
   const inOrder = (summaries) => {
-    const at = summaries.map((t) => FOLD_ORDER.findIndex((k) => t.startsWith(k)));
+    const at = summaries.map((t) => FOLD_ORDER.findIndex((k) => t.replace(/^Other passages for this word/, 'Other sentences for this word').startsWith(k)));
     return at.every((i) => i >= 0) && at.every((i, k) => k === 0 || i > at[k - 1]);
   };
   const close = async (o) => {
@@ -1265,25 +1335,27 @@ async function verifyBack(browser, base) {
     const b = await o.page.evaluate(BACK);
     const tier1 = b.order.slice(0, b.order.indexOf('kp-folds'));
     check(
-      'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English',
-      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null,
-      JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare }),
+      'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English; the part-of-speech badge is chrome in the interface language (EN: noun)',
+      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null &&
+        // the badge follows the interface (this run is EN): the English name, marked lang=en, never 名詞 in EN chrome
+        b.pos?.lang === 'en' && /^[a-z -]+$/.test(b.pos.text) && !/[\u3040-\u30ff\u3400-\u9fff]/u.test(b.pos.text),
+      JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare, pos: b.pos }),
     );
     const sibs = w.cards.filter((x) => x.type === 'word' && x.passage !== c.passage);
     check(
       'c) tier two: native folds in order 英語 → 英訳 → 漢字の形と意味 → (類語) → other passages → 出典, the folds last in the answer; 英語 is closed by default and holds the gloss',
-      b.native && inOrder(b.summaries) && b.summaries[0] === '英語' && b.summaries.at(-1) === '出典' && b.order.at(-1) === 'kp-folds' && b.gloss && !b.gloss.open && b.gloss.text.startsWith(w.meaning),
+      b.native && inOrder(b.summaries) && b.summaries[0] === 'English' && b.summaries.at(-1) === 'Source' && b.order.at(-1) === 'kp-folds' && b.gloss && !b.gloss.open && b.gloss.text.startsWith(w.meaning),
       JSON.stringify({ summaries: b.summaries, last: b.order.slice(-2), gloss: b.gloss?.open }),
     );
     const s = c.src;
     check(
       '4) 出典 is the last fold, closed: the site (a link when the record has a URL), the licence from card.src.licence (lang="en"), the author when there is one, and which passage of the word this is',
-      b.src && !b.src.open && b.src.text.includes(s.site) && b.src.text.includes(s.licence) && b.src.text.includes(`文章${c.passage}`) && (!s.author || b.src.text.includes(s.author)) && b.srcLink === (s.url ?? null) && b.licenceLang === 'en',
+      b.src && !b.src.open && b.src.text.includes(s.site) && b.src.text.includes(s.licence) && b.src.text.includes(`Passage ${c.passage}`) && (!s.author || b.src.text.includes(s.author)) && b.srcLink === (s.url ?? null) && b.licenceLang === 'en',
       JSON.stringify({ card: c.id, src: b.src?.text, link: b.srcLink }),
     );
     check(
       'c) 英訳 is the target sentence only (not the passage); 漢字 closed on a 語 card; 類語 absent on a new card; other passages are titles only',
-      b.en?.text === c.enTarget && c.enTarget !== c.en && b.kanji && !b.kanji.open && !b.sem && b.others?.summary === `この語の他の文章（${sibs.length}）` && !b.others.open && sibs.every((x) => !b.others.text.includes(x.ja.slice(0, 10))),
+      b.en?.text === c.enTarget && c.enTarget !== c.en && b.kanji && !b.kanji.open && !b.sem && b.others?.summary === `Other passages for this word (${sibs.length})` && !b.others.open && sibs.every((x) => !b.others.text.includes(x.ja.slice(0, 10))),
       JSON.stringify({ en: b.en?.text?.slice(0, 50), kanji: b.kanji?.open, sem: !!b.sem, others: b.others?.summary }),
     );
     const zoom = async () =>
@@ -1295,10 +1367,10 @@ async function verifyBack(browser, base) {
     await o.page.click('.kp-f-en > summary');
     const z1 = await zoom();
     const lang = await o.page.evaluate(`(() => { const ans = document.querySelector('#kp-card .kp-answer');
-      const ja = [...ans.querySelectorAll('.kp-folds summary, .kp-tip-label')].every((n) => n.closest('[lang]').lang === 'ja');
+      const chrome = [...ans.querySelectorAll('.kp-folds summary, .kp-tip-label')].every((n) => n.closest('[lang]').lang === 'en');
       const en = [...ans.querySelectorAll('.kp-gloss, .kp-en')].every((n) => n.lang === 'en');
-      return { ja, en, details: [...ans.querySelectorAll('details')].every((d) => !d.hasAttribute('lang')) }; })()`);
-    check('c) screen readers: the fold summaries read as Japanese, only the English text inside carries lang="en"', lang.ja && lang.en && lang.details, JSON.stringify(lang));
+      return { chrome, en, details: [...ans.querySelectorAll('details')].every((d) => !d.hasAttribute('lang')) }; })()`);
+    check('c) screen readers: EN fold summaries and English content carry lang="en", while native details add no language override', lang.chrome && lang.en && lang.details, JSON.stringify(lang));
     // 44px touch targets on the zoom toggle and the rule's ×, though they are drawn smaller
     const hits = await o.page.evaluate(`['kp-zoom-focus', 'kp-zoom-full', 'kp-rule-dismiss'].map((id) => { const n = document.getElementById(id); if (id !== 'kp-rule-dismiss') n.scrollIntoView({ block: 'center' }); const r = n.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const at = (dy) => document.elementFromPoint(cx, cy + dy) === n; return { id, h: Math.round(r.height), reach: at(-21) && at(21) }; })`);
@@ -1317,13 +1389,13 @@ async function verifyBack(browser, base) {
 
     // e) the grade bar is fixed to the screen bottom and carries the rule once
     const bar = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const g = document.getElementById('kp-grade-good').getBoundingClientRect();
-      const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null }; })()`);
+      const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); const t = document.getElementById('primary-tabs')?.getBoundingClientRect(); const tabs = t?.height > 0 ? t : null; return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), expectedBottom: Math.round(tabs?.top ?? innerHeight), tabsBottom: tabs ? Math.round(tabs.bottom) : null, viewport: innerHeight, noOverlap: b.bottom <= (tabs?.top ?? innerHeight), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null }; })()`);
     await o.page.click('#kp-rule-dismiss');
     await o.page.waitForSelector('#kp-grade-good');
     const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
     check(
       'e) the grade bar is pinned to the bottom of the phone screen and shows 「答えを見て理解が深まったなら もう一度」 until dismissed; dismissing is remembered in prefs and keeps an open fold open',
-      bar.position === 'fixed' && bar.bottom === 844 && bar.hit && bar.rule?.includes(RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
+      bar.position === 'fixed' && bar.bottom === bar.expectedBottom && bar.viewport === 844 && (bar.tabsBottom === null || bar.tabsBottom === 844) && bar.noOverlap && bar.hit && bar.rule?.includes(UI_RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
       JSON.stringify({ ...bar, dismissed }),
     );
     await close(o);
@@ -1336,7 +1408,7 @@ async function verifyBack(browser, base) {
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
     const b = await o.page.evaluate(BACK);
-    check('c) a passage with no matched sentence (km-109-m05) keeps the 英訳 fold in its place, saying 未対応, never the whole translation', c.id === 'km-109-m05' && c.enTarget == null && b.summaries[1] === '英訳' && b.en?.text.includes('未対応') && !b.en.text.includes(c.en.slice(0, 20)) && inOrder(b.summaries), JSON.stringify({ id: c.id, summaries: b.summaries, en: b.en?.text }));
+    check('c) a passage with no matched sentence (km-109-m05) keeps the 英訳 fold in its place, saying 未対応, never the whole translation', c.id === 'km-109-m05' && c.enTarget == null && b.summaries[1] === 'Translation' && b.en?.text.includes('unavailable') && !b.en.text.includes(c.en.slice(0, 20)) && inOrder(b.summaries), JSON.stringify({ id: c.id, summaries: b.summaries, en: b.en?.text }));
     await close(o);
   }
 
@@ -1520,11 +1592,11 @@ async function verifyBack(browser, base) {
     await o.page.waitForSelector('.kp-grade');
     await o.page.evaluate(RESTING);
     await o.page.evaluate('window.scrollTo({ top: 0, behavior: "instant" })');
-    const top = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const g = document.getElementById('kp-grade-again').getBoundingClientRect(); return { bottom: Math.round(b.bottom), inView: g.top >= 0 && g.bottom <= innerHeight, hit: !!document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)?.closest('#kp-grade-again') }; })()`);
+    const top = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const g = document.getElementById('kp-grade-again').getBoundingClientRect(); const t = document.getElementById('primary-tabs')?.getBoundingClientRect(); const tabs = t?.height > 0 ? t : null; return { bottom: Math.round(b.bottom), expectedBottom: Math.round(tabs?.top ?? innerHeight), tabsBottom: tabs ? Math.round(tabs.bottom) : null, viewport: innerHeight, noOverlap: b.bottom <= (tabs?.top ?? innerHeight), inView: g.top >= 0 && g.bottom <= innerHeight, hit: !!document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)?.closest('#kp-grade-again') }; })()`);
     await o.page.evaluate('window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" })');
     const end = await o.page.evaluate(`(() => { const b = document.querySelector('.kp-grades').getBoundingClientRect(); const s = document.querySelector('#kp-card .kp-f-src > summary').getBoundingClientRect(); return { src: Math.round(s.bottom), bar: Math.round(b.top) }; })()`);
     const z = await o.page.evaluate(`document.getElementById('kp-card').dataset.zoom`);
-    check('e) the longest passage (195 characters): the grade bar is on screen at the top of the page and the 出典 fold scrolls clear of it; a card seen before opens in 焦点', id === 'km-298-m02' && top.bottom === 844 && top.inView && top.hit && end.src <= end.bar && z === 'focus', JSON.stringify({ id, top, end, zoom: z }));
+    check('e) the longest passage (195 characters): the grade bar is on screen at the top of the page and the 出典 fold scrolls clear of it; a card seen before opens in 焦点', id === 'km-298-m02' && top.bottom === top.expectedBottom && top.viewport === 844 && (top.tabsBottom === null || top.tabsBottom === 844) && top.noOverlap && top.inView && top.hit && end.src <= end.bar && z === 'focus', JSON.stringify({ id, top, end, zoom: z }));
     await close(o);
   }
 
@@ -1548,8 +1620,8 @@ async function verifyBack(browser, base) {
     }
     const [first, third, fourth, mcdFourth] = seen;
     check(
-      '6) each sitting counts (prefs.sittings); the tap hint and the swipe hint show in the first three sittings of a deck and are gone from the fourth, on both decks',
-      first.stored === 1 && first.front === '意味を思い出してからタップ' && first.swipe && third.stored === 3 && !!third.front && third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
+      '6) each sitting counts (prefs.sittings); the tap hint shows in the first three sittings of a deck and is gone from the fourth, on both decks; the swipe hint shows on the first back of the first sitting only',
+      first.stored === 1 && first.front === 'Recall the meaning, then tap' && first.swipe && third.stored === 3 && !!third.front && !third.swipe && fourth.stored === 4 && fourth.front === null && !fourth.swipe && mcdFourth.stored === 4 && mcdFourth.front === null && !mcdFourth.swipe,
       JSON.stringify(seen),
     );
   }
@@ -1579,7 +1651,7 @@ async function verifyBack(browser, base) {
       const l = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
       check(
         '2) 読んで思い出す (the MCD default) leaves a due 字 card out of the queue — nothing suspended, its record kept; choosing 穴埋め brings it back, blanked with its reading',
-        read.disabled && /今日はここまで/.test(read.start) && modeRead === 'true' && /1枚/.test(self) && shown.id === 'km-064-m02' && shown.blank === '〔ざい〕' && !Object.keys(l.suspended ?? {}).length && l.cards['km-064-m02']?.stability === 20,
+        read.disabled && read.start === 'Done for today' && modeRead === 'true' && self === 'Begin — 1 card' && shown.id === 'km-064-m02' && shown.blank === '〔ざい〕' && !Object.keys(l.suspended ?? {}).length && l.cards['km-064-m02']?.stability === 20,
         JSON.stringify({ read, modeRead, self, shown, suspended: l.suspended ?? {} }),
       );
     } finally {
@@ -1605,8 +1677,8 @@ async function verifyBack(browser, base) {
     const z = await o.page.evaluate(`({ zoom: document.querySelectorAll('.kp-zoom, .kp-s').length, data: document.getElementById('kp-card').dataset.zoom ?? null })`);
     check(
       'c, d, 4, 7) sentence deck: 英語 stays open with 設定 › いつも開いておく, 英訳 is the sentence, the same fold order with 「この語の他の文」 and 出典 (site, licence, no passage number) last, and no zoom',
-      b.gloss?.open === true && b.gloss.text.startsWith(w.meaning) && b.en?.text === c.en && inOrder(b.summaries) && b.order.at(-1) === 'kp-folds' && b.summaries.at(-1) === '出典' &&
-        (w.cards.length > 1 ? b.others?.summary === `この語の他の文（${w.cards.length - 1}）` : !b.others) && b.src?.text.includes(c.src.site) && b.src.text.includes(c.src.licence) && !/文章\d/.test(b.src.text) && z.zoom === 0 && z.data === null && !b.bare,
+      b.gloss?.open === true && b.gloss.text.startsWith(w.meaning) && b.en?.text === c.en && inOrder(b.summaries) && b.order.at(-1) === 'kp-folds' && b.summaries.at(-1) === 'Source' &&
+        (w.cards.length > 1 ? b.others?.summary === `Other sentences for this word (${w.cards.length - 1})` : !b.others) && b.src?.text.includes(c.src.site) && b.src.text.includes(c.src.licence) && !/(?:文章|Passage )\d/.test(b.src.text) && z.zoom === 0 && z.data === null && !b.bare,
       JSON.stringify({ card: c.id, summaries: b.summaries, gloss: b.gloss?.open, src: b.src?.text, zoom: z }),
     );
     await close(o);
@@ -1829,14 +1901,14 @@ async function verifyReview(browser, base) {
       const lastRow = l1.repairLog?.at(-1) ?? [];
       check(
         `a) ${deck}: 削除 at the right end of the study top bar (one tap, 44px reach) takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
-        tools.inTop && tools.lastInTop && tools.h >= 44 && tools.reach && tools.label === '削除' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /削除しました/.test(gone.toast) &&
+        tools.inTop && tools.lastInTop && tools.h >= 44 && tools.reach && tools.label === 'Remove' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /Card removed/.test(gone.toast) &&
           l1.suspended?.[a]?.by === 'delete' && JSON.stringify(l1.cards[a]) === JSON.stringify(before.cards[a]) && lastRow[0] === a && lastRow[1] === 'delete' && !l1.suspended?.[b] &&
           back.id === a && back.revealed && back.count === '1/2' && !l2.suspended?.[a],
         JSON.stringify({ tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
       );
       check(
         `a) ${deck}: after a reload the deleted card is not in the queue; 設定 › 保留中のカード counts it and 復元 puts it back (logged), with the record as it was`,
-        /1枚/.test(home) && /^1枚（削除 1）$/.test(counted) && after.text === 'ありません' && after.disabled && Object.keys(l3.suspended).length === 0 && l3.repairLog.at(-1)[1] === 'restore' && l3.repairLog.at(-1)[0] === a && JSON.stringify(l3.cards[a]) === JSON.stringify(before.cards[a]) && /2枚/.test(homeAfter),
+        /^Begin — 1 card$/.test(home) && /^1 card \(Remove 1\)$/.test(counted) && after.text === 'None' && after.disabled && Object.keys(l3.suspended).length === 0 && l3.repairLog.at(-1)[1] === 'restore' && l3.repairLog.at(-1)[0] === a && JSON.stringify(l3.cards[a]) === JSON.stringify(before.cards[a]) && /2 cards/.test(homeAfter),
         JSON.stringify({ home, counted, after, homeAfter }),
       );
     } finally {
@@ -1866,7 +1938,7 @@ async function verifyReview(browser, base) {
       const noLadder = await o.page.locator('#kp-ladder').count();
       check(
         'b) a card with 5 lapses shows the repair ladder after tier one (the definition or usage note) and before the folds, in order 別の文に替える → ヒントを付ける → 保留 (and このまま続ける); a card with 4 does not',
-        ladder && ladder.head === 'この文で5回つまずいています' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === '別の文に替える/ヒントを付ける/保留' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith(`文章${swapOf('km-064-m01').passage}へ`) && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
+        ladder && ladder.head === 'Difficulty on this sentence: 5 times' && ladder.steps.join() === 'swap,hint,suspend' && ladder.labels.join('/') === 'Use another sentence/Add a hint/Pause' && ladder.enabled.every(Boolean) && ladder.swapTo.startsWith(`Passage ${swapOf('km-064-m01').passage} `) && ladder.afterTierOne && ladder.beforeFolds && ladder.inAnswer && ladder.keep && second.id === 'km-065-m01' && noLadder === 0,
         JSON.stringify({ ladder, second: second.id, noLadder }),
       );
       check(
@@ -1897,7 +1969,7 @@ async function verifyReview(browser, base) {
       const f2 = await o.page.evaluate(`({ id: document.getElementById('kp-card').dataset.card, repaired: document.getElementById('kp-card').dataset.repaired ?? null, hint: document.querySelectorAll('#kp-card .kp-rhint').length })`);
       check(
         'b) the hint shows on the front of the repaired card only (marked data-repaired, gone after the reveal); the next card has none; no ladder until it lapses again',
-        f1.id === 'km-064-m01' && f1.repaired === 'hint' && f1.hint === 'ヒントざ○○○' && b1.rhint === 0 && !b1.ladder && f2.id === 'km-065-m01' && f2.repaired === null && f2.hint === 0,
+        f1.id === 'km-064-m01' && f1.repaired === 'hint' && f1.hint === 'Hintざ○○○' && b1.rhint === 0 && !b1.ladder && f2.id === 'km-065-m01' && f2.repaired === null && f2.hint === 0,
         JSON.stringify({ f1, b1, f2 }),
       );
     } finally {
@@ -1921,7 +1993,7 @@ async function verifyReview(browser, base) {
       const target = swapOf('km-064-m01');
       check(
         'b) 別の文に替える: one tap suspends the leech (record and the word\'s other progress kept), logs the swap, and puts the word\'s next unseen passage on screen, due at once — still first after a reload',
-        now.id === target.id && !now.revealed && now.count === '1/1' && /別の文に替えました/.test(now.toast) && now.undo && l.suspended['km-064-m01']?.by === 'swap' && l.repairs['km-064-m01']?.swap === target.id && JSON.stringify(l.cards['km-064-m01']) === JSON.stringify(before.cards['km-064-m01']) && !l.cards[target.id] && l.repairLog.at(-1).join('|').startsWith(`km-064-m01|swap|`) && l.repairLog.at(-1)[3] === target.id && reloaded.id === target.id && reloaded.count === '1/1',
+        now.id === target.id && !now.revealed && now.count === '1/1' && /Changed to another sentence/.test(now.toast) && now.undo && l.suspended['km-064-m01']?.by === 'swap' && l.repairs['km-064-m01']?.swap === target.id && JSON.stringify(l.cards['km-064-m01']) === JSON.stringify(before.cards['km-064-m01']) && !l.cards[target.id] && l.repairLog.at(-1).join('|').startsWith(`km-064-m01|swap|`) && l.repairLog.at(-1)[3] === target.id && reloaded.id === target.id && reloaded.count === '1/1',
         JSON.stringify({ now, reloaded: reloaded.id, target: target.id, suspended: l.suspended, repairs: l.repairs }),
       );
     } finally {
@@ -1941,7 +2013,7 @@ async function verifyReview(browser, base) {
       const l = await read(o.page, 'kotoba-mine');
       check(
         'b) 保留 (sentence deck): one tap suspends the leech (by leech, logged as suspend) and the next card comes up; on a sentence card the swap names 例文2',
-        swapTo.startsWith('例文2へ') && now.id === 'km-065-1' && /保留にしました/.test(now.toast) && l.suspended['km-064-1']?.by === 'leech' && l.repairLog.at(-1)[1] === 'suspend' && l.repairs['km-064-1']?.lapses === 6,
+        swapTo.startsWith('Example 2 ') && now.id === 'km-065-1' && /Card paused/.test(now.toast) && l.suspended['km-064-1']?.by === 'leech' && l.repairLog.at(-1)[1] === 'suspend' && l.repairs['km-064-1']?.lapses === 6,
         JSON.stringify({ swapTo, now, suspended: l.suspended, row: l.repairLog.at(-1) }),
       );
     } finally {
@@ -1959,7 +2031,7 @@ async function verifyReview(browser, base) {
       const kept = { ladder: await o.page.locator('#kp-ladder').count(), r: (await read(o.page, 'kotoba-mcd')).repairs['km-064-m02'] };
       check(
         'b) a 字 card has no passage to swap to (step disabled, said so) and its hint is the kanji\'s parts; このまま続ける closes the ladder until the next lapse (logged as keep)',
-        ji.swap === true && ji.why === '替えられる文がありません' && ji.hint === '表に「貝＋才」' && kept.ladder === 0 && kept.r?.keep === true && kept.r.lapses === 5,
+        ji.swap === true && ji.why === 'No alternative sentence available' && ji.hint === 'Show “貝＋才” on the front' && kept.ladder === 0 && kept.r?.keep === true && kept.r.lapses === 5,
         JSON.stringify({ ji, kept }),
       );
     } finally {
@@ -1992,7 +2064,7 @@ async function verifyReview(browser, base) {
         JSON.stringify(shape) === JSON.stringify(want) && JSON.stringify(shape) === JSON.stringify([{ c: '財', same: ['財閥'], read: ['自由自在'] }, { c: '政', same: [], read: ['制圧'] }]) && fam[0].r === 'ざい' && fam[1].r === 'せい' && famReach,
         JSON.stringify(fam),
       );
-      check('c) each family word opens its row in 語の一覧, and ← returns to the card, still revealed', list.title === '語の一覧' && list.open === 'km-188' && list.detail && back.id === 'km-064-m01' && back.revealed, JSON.stringify({ list, back }));
+      check('c) each family word opens its row in 語の一覧, and ← returns to the card, still revealed', list.title === 'Word list' && list.open === 'km-188' && list.detail && back.id === 'km-064-m01' && back.revealed, JSON.stringify({ list, back }));
     } finally {
       await close(o);
     }
@@ -2035,7 +2107,7 @@ async function verifyReview(browser, base) {
       const opened = await o.page.evaluate(`document.querySelector('.kp-row.is-open')?.dataset.word`);
       check(
         'd) a see-also and a grammar id in the deck show as one line right after the kanji fold: 参照 links to a deck word (語の一覧) and shows a word outside the deck as text; in the corridor the grammar point opens the corridor’s grammar sheet through the host adapter',
-        see && see.inFolds && see.prev === 'kp-fold kp-f-kanji' && see.labels.join() === '参照,文法' && see.links.join() === 'km-188,grammar:n4-nagara' && see.items.join() === '国家予算' && /^grammar:/.test(sheet.node || '') && /ながら/.test(sheet.head || '') && opened === 'km-188',
+        see && see.inFolds && see.prev === 'kp-fold kp-f-kanji' && see.labels.join() === 'See also,Grammar' && see.links.join() === 'km-188,grammar:n4-nagara' && see.items.join() === '国家予算' && /^grammar:/.test(sheet.node || '') && /ながら/.test(sheet.head || '') && opened === 'km-188',
         JSON.stringify({ see, sheet, opened }),
       );
     } finally {
@@ -2063,9 +2135,9 @@ const PAINT = `(() => {
     state: color('.kp-st-new, .kp-st-learn'), target: color('.kp-target'), targetLine: card.querySelector('.kp-target') ? getComputedStyle(card.querySelector('.kp-target')).textDecorationLine : null,
     term: color('.kp-term'), gloss: color('.kp-gloss'), en: color('.kp-en'), tip: color('.kp-tip'),
     tipBar: card.querySelector('.kp-tip') ? getComputedStyle(card.querySelector('.kp-tip')).borderLeftWidth : null,
-    again: color('#kp-grade-again b'), good: color('#kp-grade-good b'),
+    again: color('#kp-grade-again b'), hard: color('#kp-grade-hard b'), good: color('#kp-grade-good b'), easy: color('#kp-grade-easy b'),
     cardTex: getComputedStyle(card).backgroundImage, pageTex: getComputedStyle(kp).backgroundImage,
-    tok: Object.fromEntries(['ink', 'ink-2', 'panel-2', 'kind-go', 'kind-ji', 'red', 'green', 'amber', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'].map((k) => [k, tok(k)])),
+    tok: Object.fromEntries(['ink', 'ink-2', 'panel-2', 'kind-go', 'kind-ji', 'red', 'green', 'amber', 'blue', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound'].map((k) => [k, tok(k)])),
   };
   probe.style.color = 'var(--kp-panel-2)';
   out.tok['panel-2'] = getComputedStyle(probe).color;
@@ -2167,7 +2239,7 @@ async function verifyVisual(browser, base) {
     const set = await o.page.evaluate(`(() => { const m = document.querySelector('.kp-settings #kp-method'); return { method: !!m, summary: m?.querySelector('summary')?.textContent, lines: m ? m.querySelectorAll('p').length : 0, groups: document.querySelectorAll('.kp-settings [role="radiogroup"]').length }; })()`);
     check(
       'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method',
-      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'このデッキのしくみ' && set.lines === mcd.method.length && set.groups === 4,
+      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'How this deck works' && set.lines === mcd.method.length && set.groups === 4,
       JSON.stringify({ home, set }),
     );
     await close(o);
@@ -2184,15 +2256,15 @@ async function verifyVisual(browser, base) {
     const w = mcd.words.find((x) => x.id === 'km-064');
     check(
       `a, b) ${look}: the 語 card's edge and first chip are the 語 colour (no level 1–3 edge, no topic hue), the target and term its noun colour and underlined, 初めて in ink-2, the level chip N1 monochrome with its 目安 label`,
-      front.kind === 'go' && !/kp-lv\d|kp-topic/.test(front.classes) && !front.topicVar && front.edge === t['kind-go'] && front.kindChip === '語' && front.kindChipColor === t['kind-go'] &&
+      front.kind === 'go' && !/kp-lv\d|kp-topic/.test(front.classes) && !front.topicVar && front.edge === t['kind-go'] && front.kindChip === 'Word' && front.kindChipColor === t['kind-go'] &&
         back.target === t.noun && back.targetLine.includes('underline') && back.term === t.noun && front.state === t['ink-2'] &&
-        w.level === 'N1' && front.level === 'N1' && front.levelLabel === 'N1相当（公開リストによる目安）' && front.levelColor === t['ink-2'] && front.levelBg === t['panel-2'],
+        w.level === 'N1' && front.level === 'N1' && front.levelLabel === 'N1 equivalent (estimated from public lists)' && front.levelColor === t['ink-2'] && front.levelBg === t['panel-2'],
       JSON.stringify({ kind: front.kind, edge: front.edge, chip: front.kindChipColor, target: back.target, state: front.state, level: front.level, chips: front.chips }),
     );
     check(
-      `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the grades are red and green`,
-      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && back.again === t.red && back.good === t.green,
-      JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, good: back.good }),
+      `b) ${look}: English is never coloured (gloss, 英訳 and the note in ink-2, no amber bar on the note); the four grades are red, amber, green and blue`,
+      back.gloss === t['ink-2'] && back.en === t['ink-2'] && back.tip === t['ink-2'] && back.tipBar === '0px' && back.again === t.red && back.hard === t.amber && back.good === t.green && back.easy === t.blue && new Set([t.red, t.amber, t.green, t.blue]).size === 4,
+      JSON.stringify({ gloss: back.gloss, en: back.en, tip: back.tip, tipBar: back.tipBar, again: back.again, hard: back.hard, good: back.good, easy: back.easy }),
     );
     await close(o);
   }
@@ -2210,8 +2282,8 @@ async function verifyVisual(browser, base) {
     await close(q);
     check(
       'b) 字 card: edge and chip in the 字 colour; a word with no level (利回り) has no level chip; the sentence deck says 語 and its source, never a "3/1" count',
-      ji.kind === 'ji' && ji.kindChip === '字' && ji.edge === ji.tok['kind-ji'] && ji.kindChipColor === ji.tok['kind-ji'] && ji.edge !== ji.tok['kind-go'] && ji.state === ji.tok.amber &&
-        none.level === null && !none.chips.some((c) => /^N\d$/.test(c)) && s.kindChip === '語' && s.edge === s.tok['kind-go'] && !s.chips.some((c) => /\d+\/\d+/.test(c)) && s.level === 'N1',
+      ji.kind === 'ji' && ji.kindChip === 'Kanji' && ji.edge === ji.tok['kind-ji'] && ji.kindChipColor === ji.tok['kind-ji'] && ji.edge !== ji.tok['kind-go'] && ji.state === ji.tok.amber &&
+        none.level === null && !none.chips.some((c) => /^N\d$/.test(c)) && s.kindChip === 'Word' && s.edge === s.tok['kind-go'] && !s.chips.some((c) => /\d+\/\d+/.test(c)) && s.level === 'N1',
       JSON.stringify({ ji: [ji.kind, ji.kindChip, ji.edge], none: none.chips, sentence: s.chips }),
     );
   }
@@ -2282,7 +2354,7 @@ async function verifyVisual(browser, base) {
     const motion = await o.page.evaluate(MOTION);
     check(
       'e) the reveal keeps the card node, its chips and the screen (no rebuild): the readings fade in (140 ms after a 40 ms delay, done by 180 ms) and the answer rises in 120–180 ms, opacity and transform only',
-      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 2 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && Math.round(kept.rtMs) <= 180 && motion.longest <= 180,
+      kept.card && kept.study && kept.top && kept.chips && kept.cards === 1 && !kept.reveal && kept.grades === 4 && kept.answer === 'kp-rise' && kept.answerMs >= 120 && kept.answerMs <= 180 && kept.rt === 'kp-fade' && Math.round(kept.rtMs) <= 180 && motion.longest <= 180,
       JSON.stringify({ ...kept, longest: motion.longest }),
     );
     await o.page.evaluate(WATCH);
@@ -2300,7 +2372,7 @@ async function verifyVisual(browser, base) {
     await o.page.waitForSelector('#kp-reveal');
     const again = await o.page.evaluate(`({ seen: window.__kpSeen, advance: document.querySelector('.kp-study').dataset.advance })`);
     check(
-      'e) a grade slides the answered card out its way (思い出せた right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
+      'e) a grade slides the answered card out its way (正解 right, もう一度 left; an inert copy without ids, gone after the slide) while the next card settles; the rail ticks by transform in 120 ms',
       after.seen.length === 1 && after.seen[0].cls.includes('kp-out-good') && !after.seen[0].id && after.seen[0].ids === 0 && after.seen[0].hidden === 'true' && after.seen[0].inert && after.advance === 'good' && after.arrive && after.cards === 1 && gone === 0 &&
         again.seen.length === 1 && again.seen[0].cls.includes('kp-out-again') && again.advance === 'again' && rail0 === '0' && Math.abs(after.frac - after.want) < 1e-9 && after.prop === 'transform' && after.ms === 120,
       JSON.stringify({ good: after.seen[0]?.cls, again: again.seen[0]?.cls, gone, rail: [rail0, after.frac, after.prop, after.ms] }),
@@ -2348,7 +2420,7 @@ async function main() {
   verifyPilotData(deck);
   verifyFullRunData(deck);
   const said = (d) => (d.method ?? []).join('');
-  check('the method text names the same two buttons the player shows (もう一度／思い出せた), never 覚えた', said(deck).includes('「もう一度／思い出せた」') && said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
+  check('the method text names the same four grades the player shows (もう一度・難しい・正解・簡単), never the retired 思い出せた button or 覚えた', said(deck).includes('「もう一度・難しい・正解・簡単」') && ['「正解」', '「難しい」', '「簡単」', '「もう一度」'].every((g) => said(sentences).includes(g)) && !said(deck).includes('「思い出せた」') && !said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
   check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');
@@ -2388,6 +2460,19 @@ async function main() {
     check('the deck home leads with the count and topics: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
     check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
+    // T2 (the 2026-10-08 tour): "the four windows but maybe not so big", in the old home's colours. The
+    // player injects its own stylesheet when it mounts: read the tiles once it has applied (a sheet that
+    // never applies leaves them stacked and uncoloured, and the check fails)
+    await page.waitForFunction(`getComputedStyle(document.querySelector('.kp-home .kp-tiles')).display === 'grid'`, null, { timeout: 5000 }).catch(() => {});
+    const tiles = await page.evaluate(`[...document.querySelectorAll('.kp-home .kp-tiles > .kp-tile')].map((n) => ({ n: n.querySelector('b')?.textContent ?? null, label: n.querySelector('span')?.textContent ?? null, color: getComputedStyle(n.querySelector('b')).color, h: Math.round(n.getBoundingClientRect().height), top: Math.round(n.getBoundingClientRect().top) }))`);
+    const hue = await page.evaluate(`(() => { const kp = document.querySelector('.kp'); const i = document.createElement('i'); kp.append(i); const tok = (k) => { i.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(i).color; }; const out = { amber: tok('amber'), ink: tok('ink'), green: tok('green'), red: tok('red') }; i.remove(); return out; })()`);
+    // figures carry a thousands separator (2,435): read them back without it
+    const num = (x) => Number(String(x).replace(/,/g, ''));
+    const begin = num(/\d[\d,]*/.exec(home.start)?.[0]);
+    check('the deck home shows four small tiles in one row, Due · New · Known · Difficult, with the queue’s own counts (due + new is the start button’s number), in amber, ink, green and red (T2)',
+      tiles.length === 4 && tiles.map((x) => x.label).join() === 'Due,New,Known,Difficult' && tiles.every((x) => /^\d{1,3}(,\d{3})*$/.test(x.n)) && num(tiles[0].n) + num(tiles[1].n) === begin &&
+        new Set(tiles.map((x) => x.top)).size === 1 && tiles.every((x) => x.h <= 72) && tiles[0].color === hue.amber && tiles[1].color === hue.ink && tiles[2].color === hue.green && tiles[3].color === hue.red,
+      JSON.stringify({ tiles, begin }));
 
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
@@ -2455,6 +2540,9 @@ async function main() {
       (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
     check('the new list receives the word, still one card', listed.taken.length === 1 &&
       listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
+    // the commit resolves before the sheet re-renders: wait (bounded) for the drawer to redraw, then read it
+    await page.waitForFunction(() => (document.querySelector('#sheet .list-picker .fold-sub')?.textContent || '').includes('経済ニュース'),
+      null, { timeout: 5000 }).catch(() => {});
     const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
     check('the sheet then says where the word went', where.includes('経済ニュース'), where);
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));

@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "不動明王",
+   "reading": "ふどうみょうおう",
+   "pos": "other",
+   "meaning": "Acala, the Immovable Wisdom King",
+   "defJa": "大日如来の使者とされる密教の尊格",
+   "passage": {
+    "ja": "密教の原典では、不動明王は大日如来の命を受けた使者として描かれ、求道者のそばに常に侍って護るのだとされる。不空訳と伝わる教典をもとに読むと、右手の剣は煩悩を断つ切っ先、左手の縄は救うべき者を取り逃がさぬ道具だと読める。忿怒の相は敵意の表現ではなく、求道者を煩悩から引き戻すための慈悲が、あえて恐ろしい姿をとったものだと古くから説かれてきた。信仰の現場では、炎を背に岩に座して動じぬ姿が「揺るがぬ心の見取り図」として、今も絵解きで語り継がれている。",
+    "form": "不動明王",
+    "en": "In the esoteric Buddhist texts, Acala, the Immovable Wisdom King, is depicted as a messenger who has received Vairocana's command, and is said to attend constantly at the seeker's side and offer protection. Reading the scriptures transmitted as Amoghavajra's translations, one can read the sword in his right hand as the edge that cuts off defilements, and the rope in his left as a tool for letting no one who should be saved slip away. The wrathful aspect has long been explained not as an expression of hostility but as compassion that pulls seekers back from their defilements, deliberately taking on a terrifying form. In the living world of faith, the figure seated motionless on rock with flames at his back is still passed down today in picture-explanations as a blueprint of an unshakable mind.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "『不動明王を彫る』『を祀る』と使う尊格の名。剣・縄・炎・岩が定番の取り合わせで、慈悲と結ばれて語られる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "唯識",
+   "reading": "ゆいしき",
+   "pos": "noun",
+   "meaning": "Consciousness-only (Yogācāra) doctrine",
+   "defJa": "外の世界は心の働きにすぎないとする仏教の立場",
+   "passage": {
+    "ja": "唯識ってさ、「世界は全部、心の現れなんです」っていう教えじゃん。でもこれ、教義としての主張と、実際に観察できる話とをきちんと分けて考えないと、なんか変になっちゃうよね。原典のほうは、認識の仕組みを八つの識に分解して、世界がどう構成されるかを説いてるわけで、心の働きを観察するに先立って、まず観察する主体のほうから分析していくんだ。だから「悟った」って報告と「識の転換が起きた」って説明がまざると、体験と教義の区別がだんだん消えちゃうんだよね。",
+    "form": "唯識",
+    "en": "Yuishiki, you know, is that teaching which says the whole world is a manifestation of mind. But unless you keep the doctrinal claim and what you can actually observe properly apart, things somehow get strange. The original texts break the mechanism of cognition down into eight consciousnesses and explain how the world gets constructed, and before observing the workings of mind, they start by analyzing the very subject that does the observing. So when a report of having awakened gets mixed with an explanation that a transformation of consciousness occurred, the line between experience and doctrine gradually blurs away.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "話し言葉では『唯識ってさ』と気軽に持ち出せる。原典・認識・識などと並ぶと教義の話になる。",
+    "sense": "教義の名で、唯識派という宗派の意もある"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

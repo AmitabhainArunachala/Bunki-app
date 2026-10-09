@@ -113,6 +113,9 @@ const guidedSprite = readFileSync(resolve(CORRIDOR, 'guided/samurai-sprites-v2.p
 const cssSiblingRefs = (css) => [...css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gu)].map((match) => match[2])
   .filter((ref) => !ref.startsWith('data:'));
 assert.deepEqual(cssSiblingRefs(read('editorial.css')), [], 'Standalone editorial stylesheet gained a sibling reference');
+for (const room of ['today', 'read', 'learn', 'words', 'me', 'cards']) {
+  assert.deepEqual(cssSiblingRefs(read(`rooms/${room}.css`)), [], `Standalone room stylesheet ${room} gained a sibling reference`);
+}
 const shelfArt = readFileSync(resolve(CORRIDOR, 'design/ink-hoku-nami.png'));
 function moduleUrlExpression(dataUrl) {
   const prefix = 'data:text/javascript;base64,';
@@ -363,6 +366,12 @@ ${read('skip-ui.css')}
 ${read('register.css')}
 ${read('maintenance/report-client.css')}
 ${read('editorial.css')}
+${read('rooms/today.css')}
+${read('rooms/read.css')}
+${read('rooms/learn.css')}
+${read('rooms/words.css')}
+${read('rooms/me.css')}
+${read('rooms/cards.css')}
 </style>
 ${BODY}
 `;
@@ -385,6 +394,12 @@ ${read('skip-ui.css')}
 ${read('register.css')}
 ${read('maintenance/report-client.css')}
 ${read('editorial.css')}
+${read('rooms/today.css')}
+${read('rooms/read.css')}
+${read('rooms/learn.css')}
+${read('rooms/words.css')}
+${read('rooms/me.css')}
+${read('rooms/cards.css')}
 </style>
 </head>
 <body>

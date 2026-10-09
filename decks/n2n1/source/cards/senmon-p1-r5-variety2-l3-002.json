@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "基幹産業",
+   "reading": "きかんさんぎょう",
+   "pos": "noun",
+   "meaning": "a core industry",
+   "defJa": "経済や他の多くの産業を支える重要な産業",
+   "passage": {
+    "ja": "半導体って、スマホのためだけに作ってると思うと、その広がりを見落とすよね。自動車の制御にも工場の機械にも入り込んでいて、供給が詰まると別の業界まで止まりかねないから、経済を支える基幹産業として扱われるんだ。もちろん、チップを作る会社だけが頑張れば成り立つ仕事でもなくて、材料や製造装置を作る会社にも支えられてる。目立つ完成品の裏をたどると、普段は名前を聞かない会社の小さな部品が、ずいぶん大きな仕事をしてるんだな。",
+    "form": "基幹産業",
+    "en": "Thinking semiconductors are made only for smartphones misses how widely they are used. They are embedded in vehicle controls and factory equipment, and a supply bottleneck can stop other industries, which makes them a core industry supporting the economy. Of course, chipmakers cannot sustain that work alone but depend on companies producing materials and manufacturing equipment. Tracing what lies behind familiar finished products reveals how much work is done by tiny components from companies whose names we rarely hear.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "広く他の産業と経済を支える分野を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9d4e3b2985-165a8f29",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-9d4e3b2985-165a8f29",
+    "wordId": "nn-9d4e3b2985"
+   }
+  },
+  {
+   "term": "技術覇権",
+   "reading": "ぎじゅつはけん",
+   "pos": "noun",
+   "meaning": "technological hegemony",
+   "defJa": "技術を背景に他へ強い支配的影響を及ぼす立場",
+   "passage": {
+    "ja": "一番速いチップを作れた国が、そのまま世界の主導権を握るとは限らないよね。設計用の道具や製造装置、部品をつなぐ規格まで他の国に頼っていたら、自分だけで決められる範囲は狭いままだ。技術覇権をめぐる争いでは、製品の性能だけじゃなく、誰の仕組みをみんなが使うかも大事になる。いったん広く使われた仕組みを替えるには費用も手間もかかるから、便利だから選ばれたものが、後から交渉力の差を生むことだってあるんだよ。",
+    "form": "技術覇権",
+    "en": "The country making the fastest chip does not necessarily take global leadership automatically. If it depends on other countries for design tools, manufacturing equipment, and standards connecting components, its independent room for decision remains limited. Competition for technological dominance concerns not only product performance but whose systems everyone uses. Replacing a widely adopted system takes money and effort, so something originally selected for convenience can later create unequal bargaining power.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "単なる技術力の高さでなく、他へ及ぼす支配的な影響を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bfa93b3789-a6c1a19e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021-r.json",
+    "cardId": "nn-bfa93b3789-a6c1a19e",
+    "wordId": "nn-bfa93b3789"
+   }
+  }
+ ]
+}

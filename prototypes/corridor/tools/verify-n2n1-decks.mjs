@@ -11,7 +11,8 @@ import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.
 import { cardTokens, defTokens, validateDeck } from '../decks/player/engine.js';
 
 const ids = ['n2', 'n1', 'senmon'];
-const titles = ['N2・文章で覚える', 'N1・文章で覚える', '専門・五つの分野'];
+const chromeTitles = ['N2 vocabulary · passages', 'N1 vocabulary · passages', 'Your fields · master\'s level'];
+const titles = ['N2・文章で覚える', 'N1・文章で覚える', '専門・あなたの分野'];
 const out = resolveCorridorEvidence();
 const host = await startCorridorDev(0);
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
@@ -67,7 +68,7 @@ try {
       await page.locator(`[data-deck="${id}"]`).waitFor();
       const rows = await page.locator('.dojo-deck').evaluateAll((nodes) => nodes.map((n) => n.dataset.deck));
       assert.deepEqual(rows, ['personal', ...ids, 'kotoba-mcd', 'kotoba-mine', 'context', 'mine']);
-      assert.equal(await page.locator(`[data-deck="${id}"] .dojo-deck-t`).textContent(), titles[i]);
+      assert.equal(await page.locator(`[data-deck="${id}"] .dojo-deck-t`).textContent(), chromeTitles[i]);
       await page.locator(`[data-deck="${id}"]`).click();
       await page.locator('#kp-start').waitFor();
       await page.locator('#kp-to-settings').click();

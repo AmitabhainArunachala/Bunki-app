@@ -73,16 +73,15 @@
 .kp-sub { margin: 0; color: var(--kp-ink-2); font-size: 14px; line-height: 1.6; }
 .kp-h2 { margin: 8px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
 
-.kp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.kp-done .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.kp-tile { background: var(--kp-panel); border: 1px solid var(--kp-line); border-radius: 14px; padding: 12px 10px; display: grid; gap: 2px; }
-.kp-tile b { font-family: var(--kp-num); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.kp-tile span { font-size: 12px; color: var(--kp-ink-2); }
-.kp-c-due b, .kp-c-due { color: var(--kp-amber); }
-.kp-c-new b { color: var(--kp-ink); }
+.kp-tiles { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; row-gap: 4px; padding: 10px 0; border-block: 1px solid var(--kp-line); font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
+/* the deck's state: one quiet mono line, "0 due · 15 new · 0 known · 0 difficult", no coloured tiles */
+.kp-tile { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.kp-tile + .kp-tile::before { content: '·'; margin: 0 10px; color: var(--kp-mute); }
+.kp-tile b { font-size: 15px; font-weight: 600; color: var(--kp-ink); }
+.kp-tile span { font-size: 12.5px; letter-spacing: 0.04em; color: var(--kp-mute); }
 .kp-c-known b, .kp-verdict.kp-c-known { color: var(--kp-green); }
 .kp-c-hard b, .kp-verdict.kp-c-hard { color: var(--kp-red); }
-.kp-tile span { color: var(--kp-ink-2); }
+.kp-tiles .kp-tile b { color: var(--kp-ink); }
 
 .kp-start { width: 100%; min-height: 56px; border: 0; border-radius: 16px; background: var(--kp-cyan); color: #00131d; font-size: 18px; font-weight: 700; letter-spacing: 0.04em; }
 .kp[data-look='light'] .kp-start { color: #fff; }
@@ -242,8 +241,10 @@
 .kp-again { border-color: var(--kp-red); } .kp-again b { color: var(--kp-red); }
 .kp-good { border-color: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); } .kp-good b { color: var(--kp-green); }
 .kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: 11px; color: var(--kp-mute); letter-spacing: 0.1em; }
-.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
-.kp-rule-x { position: relative; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 13px; color: var(--kp-ink-2); text-align: left; }
+.kp-rule > span { flex: 1; min-width: 0; }
+/* The report control occupies the lower-right corner; keep the rule dismissal on the left. */
+.kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
 /* phones: the grade bar is pinned to the bottom of the screen, so a long passage never hides it */
 @media (max-width: 640px) {
   .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
@@ -275,14 +276,13 @@
 /* settings */
 .kp-field { display: grid; gap: 8px; }
 .kp-seg { display: flex; flex-wrap: wrap; gap: 6px; }
-.kp-seg button { min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 14px; }
+.kp-seg button { min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 14px; }
 .kp-seg button.is-on { border-color: var(--kp-cyan); color: var(--kp-cyan); background: var(--kp-cyan-wash); font-weight: 700; }
 .kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: 11px; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 10px; padding: 8px; }
 .kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: 12px; padding: 10px 16px; font-size: 14px; line-height: 1.5; }
 .kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
 
 @media (max-width: 420px) {
-  .kp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
   .kp-row .kp-dots { display: none; }
 }
@@ -290,7 +290,8 @@
  * slides the old card out in its direction while the next one settles. Opacity and
  * transform only, 120–180 ms. */
 .kp-sentence.kp-enter .kp-target { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) both; }
-.kp-sentence.kp-enter rt { animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) 0.04s both; }
+/* 研ぎ出し: each reading surfaces as the polish band passes it (mount.js polish() sets --kp-rt-delay, 0–60 ms, by place) */
+.kp-sentence.kp-enter rt { animation: kp-fade 0.12s cubic-bezier(0.2, 0, 0, 1) var(--kp-rt-delay, 0.04s) both; }
 .kp-answer.kp-enter { animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-card.kp-arrive { animation: kp-arrive 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-study { position: relative; }
@@ -353,26 +354,68 @@
  * Each deck picks its own default; 設定 › 色 switches. Every theme keeps the
  * same meaning per colour (accent = the asked word, red/green = again/good). */
 .kp { --kp-on-accent: #00131d; --kp-tex: none; --kp-depth: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 30px rgba(0, 0, 0, 0.35);
-  --kp-noun: var(--kp-cyan); --kp-verb: #ff8a5c; --kp-adj: #ffd24a; --kp-adv: #c59bff; --kp-expr: #5ee6b0; --kp-sound: #ff7ac8; }
+  --kp-noun: var(--kp-cyan); --kp-verb: #ff8a5c; --kp-adj: #ffd24a; --kp-adv: #c59bff; --kp-expr: #5ee6b0; --kp-sound: #ff7ac8;
+  /* the study stage (the ground around the card while studying) and its own text: the page by
+   * default; 和紙 sets its washi card on a 藍漆 lacquer stage. --kp-shu is the 朱 of the marked
+   * word's brackets, the rail and the slash on もう一度 (never text). Measured: contrast-kotoba stage row */
+  --kp-stage: var(--kp-bg); --kp-stage-ink: var(--kp-ink-2); --kp-stage-mute: var(--kp-mute); --kp-shu: #ff6a4d;
+  /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) and its
+   * text: the stage by default; 藍 by day docks on its washi page. --kp-study-ground paints the whole
+   * study screen (藍 by day: washi with the lacquer only as a band behind the card's head).
+   * Measured: contrast-kotoba dock row */
+  --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-tex), var(--kp-stage); }
 .kp[data-look='light'] { --kp-on-accent: #fff; --kp-depth: 0 1px 2px rgba(15, 30, 45, 0.08), 0 8px 24px rgba(15, 30, 45, 0.1);
-  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a; }
-.kp[data-look='ai'] { /* 藍 indigo night, gold accent */
-  --kp-bg: #0b1030; --kp-panel: #121a46; --kp-panel-2: #1a2458; --kp-ink: #eef1ff; --kp-ink-2: #b9c1ea; --kp-mute: #929dd0; --kp-line: #2a3672;
-  --kp-cyan: #f2c14e; --kp-cyan-wash: rgba(242, 193, 78, 0.16); --kp-on-accent: #1a1300; --kp-green: #59e0a6; --kp-violet: #9fb4ff; --kp-kind-ji: #7fd6ff; --kp-kind-bun: #b9a6ff;
-  --kp-noun: #f2c14e; --kp-tex: radial-gradient(120% 80% at 0% 0%, rgba(120, 140, 255, 0.12), transparent 60%);
-  color-scheme: dark; }
+  --kp-verb: #b24110; --kp-adj: #885e00; --kp-adv: #6a3fc8; --kp-expr: #246a44; --kp-sound: #b8237a;
+  /* the family's study stage: the white sheet on 藍漆 lacquer */
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
+.kp[data-look='ai'] { /* 藍: the room's own family (Bunki C+A): a washi card on a 藍漆 lacquer stage, sumi ink, 藍 accent, 朱 marks */
+  --kp-bg: #f4eee1; --kp-panel: #fbf8f1; --kp-panel-2: #efe8d9; --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #565c66; --kp-line: #dcd3c0;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1; --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.03) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.025) 0 1px, transparent 1px 11px);
+  --kp-depth: 0 1px 0 rgba(25, 28, 34, 0.09), 0 10px 26px -6px rgba(40, 30, 16, 0.16); color-scheme: light;
+  --kp-stage: #141a28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f;
+  /* by day the study screen is the washi page: the lacquer is only the stage band behind the top bar and
+   * the card's head (concept C), and 答えを見る and the grade pads dock on the page */
+  --kp-dock: var(--kp-bg); --kp-dock-ink: var(--kp-ink-2); --kp-dock-mute: var(--kp-mute);
+  --kp-study-ground: linear-gradient(var(--kp-stage), var(--kp-stage)) 0 0 / 100% 15rem no-repeat, var(--kp-tex), var(--kp-bg); }
+/* 藍 at night (the app's night worlds set html[data-theme]): the deck is a 藍 room. Its home, list,
+ * settings and session close are lit text on 藍; while studying the card stays a lit washi sheet on the
+ * 藍 stage (the block after this one). Same meanings per colour; contrast-kotoba measures both. */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] {
+  --kp-bg: #121a2b; --kp-panel: #1a2437; --kp-panel-2: #222d44; --kp-ink: #ede6d6; --kp-ink-2: #cbc3b2; --kp-mute: #a8a092; --kp-line: #2d3952;
+  --kp-cyan: #a9c4ea; --kp-cyan-wash: rgba(169, 196, 234, 0.12); --kp-on-accent: #0f1626; --kp-red: #f39282; --kp-amber: #efb764; --kp-green: #95d49c; --kp-violet: #bdaaff;
+  --kp-kind-ji: #88f0ff; --kp-noun: #a9c4ea; --kp-verb: #f5a47f; --kp-adj: #ead27c; --kp-adv: #cdb2ff; --kp-expr: #a4dc88; --kp-sound: #ffa3cf;
+  --kp-tex: radial-gradient(90% 50% at 50% 0%, rgba(169, 196, 234, 0.06), transparent 70%);
+  --kp-depth: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 32px -8px rgba(0, 0, 0, 0.6); color-scheme: dark;
+  --kp-stage: #0e1524; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #ff7a5c;
+  --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-stage); }
+/* 藍 at night, studying: the lit washi card on the 藍 stage; the pads dock on the stage */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai']:has(> .kp-study) {
+  --kp-bg: #ebe4d3; --kp-panel: #f2ecdf; --kp-panel-2: #e6dfce; --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #545a64; --kp-line: #d3c9b5;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1; --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #7a4f00; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  --kp-tex: none;
+  --kp-depth: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 18px 44px -12px rgba(0, 0, 0, 0.75), 0 0 64px -18px rgba(233, 226, 210, 0.22); color-scheme: light;
+  --kp-stage: #121a2b; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f;
+  --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-stage); }
 .kp[data-look='washi'] { /* 和紙 warm paper with fibres */
   --kp-bg: #efe7d6; --kp-panel: #fbf6ea; --kp-panel-2: #f3ead6; --kp-ink: #2a2117; --kp-ink-2: #4a3e2f; --kp-mute: #5c4f3e; --kp-line: #dccfb5;
   --kp-cyan: #93301a; --kp-cyan-wash: rgba(147, 48, 26, 0.1); --kp-on-accent: #fff; --kp-red: #a82233; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-violet: #5f46a8;
   --kp-kind-ji: #64075b; /* was #1e5da4, the verb's own blue */ --kp-noun: #93301a; --kp-verb: #1e5da4; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.035) 0 2px, transparent 2px 7px), repeating-linear-gradient(7deg, rgba(120, 90, 50, 0.03) 0 1px, transparent 1px 11px);
-  --kp-depth: 0 1px 1px rgba(80, 60, 30, 0.12), 0 10px 28px rgba(80, 60, 30, 0.14); color-scheme: light; }
+  --kp-depth: 0 1px 1px rgba(80, 60, 30, 0.12), 0 10px 28px rgba(80, 60, 30, 0.14); color-scheme: light;
+  --kp-stage: #151b28; --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c; --kp-shu: #c4401f; }
 .kp[data-look='sakura'] { /* 桜 soft pink */
   --kp-bg: #fbf1f3; --kp-panel: #ffffff; --kp-panel-2: #fde7ec; --kp-ink: #2b1a20; --kp-ink-2: #523842; --kp-mute: #664c55; --kp-line: #f1d3dc;
   --kp-cyan: #a1264a; --kp-cyan-wash: rgba(161, 38, 74, 0.1); --kp-on-accent: #fff; --kp-red: #ab2333; --kp-amber: #7f4c00; --kp-green: #21613f; --kp-violet: #6a40b8;
   --kp-kind-ji: #5e0b63; /* was #2665a7, the verb's own blue */ --kp-noun: #a1264a; --kp-verb: #2665a7; --kp-adj: #895900; --kp-adv: #7747c6; --kp-expr: #266f49; --kp-sound: #a73882;
   --kp-tex: radial-gradient(60% 40% at 100% 0%, rgba(255, 182, 200, 0.35), transparent 70%);
-  --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light; }
+  --kp-depth: 0 1px 2px rgba(120, 40, 60, 0.08), 0 10px 26px rgba(120, 40, 60, 0.12); color-scheme: light;
+  --kp-stage: #2a1a22; --kp-stage-ink: #f3e6ea; --kp-stage-mute: #c7aab4; --kp-shu: #c4304f; }
 .kp[data-look='matcha'] { /* 抹茶 deep green */
   --kp-bg: #0d1a12; --kp-panel: #13261a; --kp-panel-2: #1a3123; --kp-ink: #eef7ef; --kp-ink-2: #b8d1bd; --kp-mute: #8fb097; --kp-line: #24402e;
   --kp-cyan: #a6e06a; --kp-cyan-wash: rgba(166, 224, 106, 0.14); --kp-on-accent: #0d1a05; --kp-noun: #a6e06a; --kp-kind-ji: #ffb3d9; /* was #ff9ad5, ΔE 6.7 from --kp-sound */ --kp-kind-bun: #c3b0ff;
@@ -410,7 +453,7 @@
 
 /* theme swatches in 設定 */
 .kp-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
-.kp-swatch { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--kp-line); display: grid; place-items: center; font-size: 13px; }
+.kp button.kp-swatch { width: auto; min-width: 44px; min-height: 44px; max-width: 100%; padding: 6px 10px; border-radius: 12px; border: 2px solid var(--kp-line); display: grid; place-items: center; font-size: 13px; line-height: 1.3; white-space: normal; overflow-wrap: anywhere; }
 .kp-swatch.is-on { border-color: var(--kp-cyan); box-shadow: 0 0 0 2px var(--kp-cyan-wash); }
 .kp-pos-noun .kp-posbadge { color: var(--kp-noun); }
 .kp-pos-verb .kp-posbadge { color: var(--kp-verb); }
@@ -420,6 +463,242 @@
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
 /* a written passage's register and topic (CARD_CONTRACT_V2 §6): text chips, a size down, no hue */
 .kp-chip-sm { font-size: 11px; padding: 2px 6px; }
+
+/* Full English metadata stays on one phone row without abbreviating the labels. */
+@media (max-width: 640px) {
+  .kp-chips { gap: 3px; }
+  .kp-chip { font-size: 11px; padding-inline: 2px; }
+  .kp-chip-sm { padding-inline: 0; }
+}
+
+/* ======================================================================================
+ * The card as a sheet of washi on the study stage (Bunki redesign: C 生きた本棚 with A 磨き's
+ * craft). Structure and type only: every colour below is a --kp-* token of the look, so the
+ * eight themes keep their meaning and contrast-kotoba still measures them. Fronts never gain
+ * a reading, English or an answer node here: no display/visibility rule on rt, .kp-answer or [hidden].
+ * ====================================================================================== */
+.kp {
+  --kp-serif: var(--font-reading, 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'Noto Serif JP', serif);
+  --kp-head: var(--font-headword, 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif);
+}
+/* the study stage: the ground around the card (和紙: 藍漆 lacquer; the other looks: their page) */
+.kp:has(> .kp-study) { background: var(--kp-study-ground); }
+.kp[data-host='none'] .kp-top-study { background: var(--kp-stage); }
+
+/* the top bar: ✕, the rail (one segment per card on a short sitting), the count, 削除 */
+.kp-top-study .kp-icon { background: transparent; border-color: transparent; color: var(--kp-stage-ink); font-size: 20px; font-weight: 300; }
+.kp-top-study .kp-icon:focus-visible { border-color: var(--kp-stage-ink); }
+.kp-top-study .kp-progress { height: 3px; border-radius: 0; background: color-mix(in srgb, var(--kp-stage-ink) 24%, transparent); }
+.kp-top-study .kp-progress[style*='--kp-n'] {
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--kp-n) - 4px), transparent 0 calc(100% / var(--kp-n)));
+  mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--kp-n) - 4px), transparent 0 calc(100% / var(--kp-n)));
+}
+.kp-top-study .kp-progress i { background: var(--kp-stage-ink); }
+.kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: 13px; letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
+.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: 3px; font-size: 12px; letter-spacing: 0.06em; padding: 0 10px; }
+
+/* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
+ * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
+.kp .kp-card { position: relative; border-radius: 4px; border-width: 1px 1px 1px 3px; padding: 16px 18px 16px 19px; gap: 12px; }
+.kp .kp-card::before {
+  content: ''; position: absolute; inset: 8px; pointer-events: none; opacity: 0.55;
+  --reg: color-mix(in srgb, var(--kp-ink) 55%, transparent);
+  background:
+    linear-gradient(var(--reg), var(--reg)) 0 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) 5px 0 / 1px 11px no-repeat,
+    linear-gradient(var(--reg), var(--reg)) 100% 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) calc(100% - 5px) 0 / 1px 11px no-repeat,
+    linear-gradient(var(--reg), var(--reg)) 0 calc(100% - 5px) / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) 5px 100% / 1px 11px no-repeat,
+    linear-gradient(var(--reg), var(--reg)) 100% calc(100% - 5px) / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) calc(100% - 5px) 100% / 1px 11px no-repeat;
+}
+
+/* the card's head: its one instruction as an eyebrow, then the facts as a quiet slip line */
+.kp-chips { align-items: center; row-gap: 8px; }
+.kp-eyebrow { flex: 0 0 100%; order: -1; display: flex; align-items: center; gap: 10px; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--kp-mute); }
+.kp-eyebrow:lang(ja) { font-size: 12px; letter-spacing: 0.22em; text-transform: none; }
+.kp-eyebrow::before { content: ''; width: 18px; height: 2px; background: var(--kp-shu); flex: none; }
+.kp .kp-chip { border-radius: 2px; border-color: color-mix(in srgb, var(--kp-ink) 16%, transparent); }
+.kp .kp-kindchip, .kp .kp-st-learn, .kp .kp-st-grow, .kp .kp-st-known, .kp .kp-st-hard { border-color: currentColor; }
+.kp .kp-levelchip { border-color: transparent; }
+
+/* the passage: Mincho, ruled by its line height; readings at 11px or more */
+.kp .kp-sentence { font-family: var(--kp-serif); font-weight: 500; letter-spacing: 0.04em; }
+/* readings never under 11px; no tracking of their own, so a long reading stretches its base as little as it can */
+.kp .kp-sentence rt { font-family: var(--kp-jp); font-size: max(11px, 0.5em); letter-spacing: -0.02em; }
+/* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
+ * reach it has as a tap target on the back); its own colour stays its part of speech */
+.kp .kp-target {
+  padding: 0 0.16em; margin: 0 0.04em; text-decoration-thickness: 1.5px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  background:
+    linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 2px 0.36em no-repeat,
+    linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 2px 0.36em no-repeat,
+    color-mix(in srgb, var(--kp-shu) 10%, transparent);
+}
+.kp .kp-blank { border-bottom-color: var(--kp-shu); background: color-mix(in srgb, var(--kp-shu) 9%, transparent); border-radius: 2px 2px 0 0; }
+.kp .kp-taphint { font-size: 11.5px; letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }
+
+/* 研ぎ出し: one polish band crosses the card on the reveal (transform and opacity only; removed after) */
+.kp-polish { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 1; }
+.kp-polish::before {
+  content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 55%; opacity: 0;
+  background: linear-gradient(100deg, transparent 0 26%, color-mix(in srgb, var(--kp-shu) 12%, transparent) 38%, color-mix(in srgb, var(--kp-ink) 14%, transparent) 47%, color-mix(in srgb, var(--kp-ink) 6%, transparent) 56%, transparent 70%);
+  animation: kp-polish 0.18s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@keyframes kp-polish { from { opacity: 1; transform: translateX(-110%) skewX(-8deg); } 70% { opacity: 1; } to { opacity: 0; transform: translateX(200%) skewX(-8deg); } }
+
+/* the back: the headword in Shippori 800 with its reading beside it, the Japanese definition in Mincho */
+.kp .kp-answer { gap: 6px; padding-top: 10px; }
+.kp .kp-word { column-gap: 12px; row-gap: 2px; }
+.kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: 34px; line-height: 1.15; letter-spacing: 0.04em; }
+.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.14em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { margin-left: auto; border-radius: 2px; font-size: 11.5px; letter-spacing: 0.08em; }
+.kp .kp-def { font-family: var(--kp-serif); font-size: 18px; line-height: 1.7; letter-spacing: 0.02em; }
+.kp .kp-note { font-family: var(--kp-serif); }
+/* 英語: the first fold reads as a dashed slip you can lift ("Show English") */
+.kp .kp-folds { margin-top: 10px; border-top: 0; gap: 0; }
+.kp .kp-f-gloss { border: 1px dashed color-mix(in srgb, var(--kp-ink) 30%, transparent); border-radius: 3px; padding: 0 14px; margin-bottom: 8px; }
+.kp .kp-f-gloss > summary { min-height: 44px; font-size: 14px; color: var(--kp-ink); font-weight: 600; letter-spacing: 0.02em; }
+.kp .kp-f-gloss > summary::before { content: '＋'; color: var(--kp-mute); }
+.kp .kp-f-gloss[open] > summary::before { content: '－'; }
+.kp .kp-fold > summary { min-height: 44px; }
+.kp .kp-gloss { font-family: var(--kp-serif); font-style: italic; font-size: 16px; }
+
+/* 漢字の形と意味: each kanji on a 田字格 plate (glyph, meaning, strokes, parts); a part two of the
+ * word's kanji share is lit, and the bracket under the plates joins them (deck kanji data only) */
+.kp .kp-kanji { gap: 8px; }
+.kp .kp-kanji > * { flex: 1 1 100%; min-width: 0; }
+.kp .kp-kj { border-radius: 3px; grid-template-columns: 58px 1fr; padding: 8px 10px 8px 8px; gap: 2px 10px; background: color-mix(in srgb, var(--kp-panel-2) 70%, transparent); }
+.kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: 40px; border: 1px solid var(--kp-line);
+  background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
+.kp .kp-kj > span { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
+.kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 12px; color: var(--kp-mute); }
+.kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink); padding: 0 3px; border-radius: 2px; }
+.kp-kj-parts i[data-shared] { color: var(--kp-cyan); box-shadow: 0 0 0 1px currentColor; }
+.kp-kshare { position: relative; margin: 6px 0 2px; padding: 12px 10px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-kshare::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; border: 1.5px solid var(--kp-cyan); border-top: 0; border-radius: 0 0 3px 3px; opacity: 0.8; }
+.kp-kshare b { font-family: var(--kp-head); font-weight: 800; font-size: 20px; color: var(--kp-cyan); }
+.kp-kshare span[lang='ja'] { font-family: var(--kp-head); font-weight: 800; font-size: 16px; color: var(--kp-ink); }
+.kp .kp-kfam-c { font-family: var(--kp-head); font-weight: 800; }
+.kp .kp-fam, .kp .kp-see-link { border-radius: 3px; font-family: var(--kp-serif); }
+
+/* under the card: 答えを見る as a washi slab; the grade pads */
+.kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: 4px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: 18px; letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
+.kp .kp-reveal:active, .kp .kp-next:active { transform: translateY(1px); }
+.kp .kp-verdict { justify-self: center; padding: 6px 16px; border-radius: 3px; background: var(--kp-panel); }
+.kp .kp-undo { color: var(--kp-dock-mute); }
+.kp .kp-grades { background: var(--kp-dock); column-gap: 10px; }
+.kp .kp-grade { position: relative; min-height: 64px; border-radius: 4px; grid-auto-flow: row; box-shadow: var(--kp-depth); }
+.kp .kp-grade b { font-size: 17px; letter-spacing: 0.04em; }
+.kp .kp-grade small { font-size: 12.5px; letter-spacing: 0.06em; }
+.kp .kp-again { border-color: var(--kp-line); border-top: 2px solid var(--kp-red); }
+.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: 24px; line-height: 1; justify-self: center; }
+.kp-again .kp-grade-seal { color: var(--kp-red); }
+.kp-good .kp-grade-seal { color: var(--kp-green); }
+/* in 日本語 the seal is the pad's face and the word a quiet caption under it */
+.kp-grade:has(.kp-grade-seal) b { font-size: 12px; letter-spacing: 0.1em; }
+/* the first back of a deck's first sitting only: the gesture as one quiet mono caption, the rule as one
+ * line of small print with a bare ×. No boxes, nothing in the pads' way. */
+.kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: 10.5px; letter-spacing: 0.16em; margin: 0; }
+.kp .kp-rule { color: var(--kp-dock-ink); font-size: 12.5px; line-height: 1.45; gap: 2px; }
+.kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: 15px; }
+@media (max-width: 640px) {
+  .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-dock-ink) 16%, transparent); }
+  /* the last lines of the passage and the folds stay above the pinned pads: the reserved room is
+   * the bar's measured height plus one line of air */
+  .kp .kp-study.has-bar { padding-bottom: calc(var(--kp-bar-h, 140px) + 12px); }
+}
+
+/* もう一度: a brief 朱 slash crosses the screen as the answered card leaves (transform and opacity only) */
+.kp-slash {
+  position: fixed; left: 4%; right: 4%; top: 44%; height: 3px; z-index: 3; pointer-events: none; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--kp-shu) 10%, var(--kp-shu) 85%, transparent);
+  transform-origin: left center; transform: rotate(-12deg) scaleX(0); opacity: 0;
+  animation: kp-slash 0.18s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@keyframes kp-slash { from { transform: rotate(-12deg) scaleX(0); opacity: 1; } 55% { transform: rotate(-12deg) scaleX(1); opacity: 1; } to { transform: rotate(-12deg) scaleX(1); opacity: 0; } }
+
+/* the session close: the surface is clear */
+.kp-done { gap: 18px; }
+.kp .kp-done .kp-title { font-family: var(--kp-jp); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kp-mute); }
+.kp .kp-done .kp-title:lang(ja) { text-transform: none; letter-spacing: 0.24em; }
+.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
+.kp-rise { position: relative; display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 4px 2px 8px; }
+.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink-2); animation: kp-rise-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) calc(120ms + var(--i, 0) * 60ms) backwards; }
+.kp-rise-w.is-again { color: var(--kp-red); }
+@keyframes kp-rise-up { from { opacity: 0.01; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.kp-tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--kp-line); }
+.kp-tally-c { display: grid; gap: 6px; padding: 14px 12px 12px; }
+.kp-tally-c + .kp-tally-c { border-left: 1px solid var(--kp-line); }
+.kp-tally-c span { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--kp-mute); }
+.kp-tally-c b { font-family: var(--kp-head); font-weight: 800; font-size: 38px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--kp-ink); }
+.kp-tally-again b { color: var(--kp-red); }
+.kp-done-rate { margin: 0; display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-done-rate b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; color: var(--kp-ink); }
+.kp-done-rate span + b + span { margin-left: auto; font-family: var(--kp-num); font-size: 12.5px; color: var(--kp-mute); }
+.kp-done .kp-start { border-radius: 4px; }
+
+/* the deck home: paper slips, not pills */
+.kp .kp-group, .kp .kp-row { border-radius: 4px; }
+.kp .kp-start { border-radius: 4px; letter-spacing: 0.06em; box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-cyan) 55%, #000); }
+.kp .kp-start:disabled { box-shadow: none; }
+.kp .kp-start:active { transform: translateY(2px); box-shadow: none; }
+.kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
+.kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
+.kp .kp-h2:lang(ja) { text-transform: none; }
+
+/* the themes: a quiet list, not a page of settings. Hairline rows, the name in Mincho, the count in
+ * mono, a check mark at the end (the row is still the checkbox's label: one tap anywhere toggles it),
+ * the theme's progress a 2px line under its name. */
+.kp .kp-groups { gap: 0; border-top: 1px solid var(--kp-line); }
+.kp .kp-group { grid-template-columns: minmax(0, 1fr) auto 22px; grid-template-rows: auto 2px; column-gap: 14px; row-gap: 6px; min-height: 56px; padding: 14px 2px 10px; background: none; border: 0; border-bottom: 1px solid var(--kp-line); border-radius: 0; box-shadow: none; }
+.kp .kp-group > .kp-gname { grid-column: 1; grid-row: 1; }
+.kp .kp-group > .kp-gcount { grid-column: 2; grid-row: 1; }
+.kp .kp-group > input { grid-column: 3; grid-row: 1; justify-self: end; }
+.kp .kp-gname b { font-family: var(--kp-serif); font-size: 17px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
+.kp .kp-gcount { font-size: 12px; letter-spacing: 0.06em; color: var(--kp-mute); font-variant-numeric: tabular-nums; }
+.kp .kp-group .kp-bar { height: 2px; border-radius: 0; background: transparent; } /* progress only: an untouched theme draws no second line */
+.kp .kp-group input { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--kp-ink) 26%, transparent); background: none; cursor: pointer; }
+.kp .kp-group input:checked {
+  border-color: transparent; background: var(--kp-cyan);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M5 11.5l4 4 8-9' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 22px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M5 11.5l4 4 8-9' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 22px no-repeat;
+}
+.kp .kp-group input:focus-visible { outline: none; }
+.kp .kp-group:has(input:focus-visible) { outline: 2px solid var(--kp-cyan); outline-offset: -2px; }
+.kp .kp-group.is-off { opacity: 1; }
+.kp .kp-group.is-off .kp-gname b, .kp .kp-group.is-off .kp-gcount { color: var(--kp-mute); }
+.kp .kp-group.is-off .kp-bar { opacity: 0.4; }
+/* 藍 at night: 始める is the lit slab (washi ink on the 藍 room), as the card is the lit sheet */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] .kp-start:not(:disabled) { background: var(--kp-ink); color: var(--kp-bg); box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-ink) 35%, #000); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kp-polish, .kp-slash { display: none; }
+  .kp .kp-reveal:active, .kp .kp-next:active, .kp .kp-start:active { transform: none; }
+}
+
+/* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
+/* the deck home's ← is bare, like the study ✕: the page's one way out */
+.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp-home > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
+/* 答えを見る (and わからない) is docked at the foot of the screen like the grade pads, so the reveal is
+ * always one tap away on a long passage; its own place in the flow, under the card, is the room the
+ * passage keeps: scrolled to the end, the last line sits above it, never under it. A ring of the
+ * stage frames it as a dock over the passage that scrolls on beneath. */
+.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock); }
+body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-clearance) + 10px); }
+/* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
+ * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
+.kp .kp-eyebrow-zoom { min-height: 30px; }
+.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: 12px; }
+.kp .kp-eyebrow:has(> .kp-zoom) > .kp-eyebrow-t { display: none; }
+
+/* ---- the reveal does not move the page (fix round 3). At phone width a passage taller than the room
+ * above the word and its definition becomes its own window on the back (mount.js windowPassage): the
+ * page stays where it is, the passage scrolls inside the card, and its clipped edges fade (concept C). */
+/* it reaches 12px up into the gap above it (padding, not layout), so a first-line word keeps its 44px tap reach inside the window */
+.kp .kp-sentence.kp-window { max-height: var(--kp-window-h, none); overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding-top: 12px; margin-top: -12px; }
+.kp .kp-sentence.kp-window::-webkit-scrollbar { display: none; }
+.kp .kp-sentence.kp-window[data-edge='below'] { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); }
+.kp .kp-sentence.kp-window[data-edge='above'] { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); }
+.kp .kp-sentence.kp-window[data-edge='both'] { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); }
 </style>
 </head>
 <body>
@@ -2991,7 +3270,7 @@ function hostAdapter() {
 const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
 let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
@@ -3075,10 +3354,192 @@ function saveFailed() {
   return false;
 }
 
+
+/** UI chrome follows the host language; Japanese learning data is never translated. */
+const UI_EN = {
+  "前の記録を読み取れなかったので、別に保管しました。": "The previous record could not be read, so it was kept separately.",
+  "保存できませんでした。設定のバックアップから記録をコピーして保管してください。": "Could not save. Copy and keep your record from Settings → Backup.",
+  "前の文をすべて表示": "Show all preceding sentences",
+  "後の文をすべて表示": "Show all following sentences",
+  "バックアップへ": "Go to backup",
+  "元に戻す": "Undo",
+  "戻る": "Back",
+  "復習": "Review",
+  "新しいカード": "New cards",
+  "定着した語": "Known words",
+  "苦手": "Difficult",
+  "今日はここまで": "Done for today",
+  "テーマ": "Themes",
+  "語の一覧": "Word list",
+  "設定": "Settings",
+  "終わる": "End session",
+  "例文": "Example",
+  "初めて": "New",
+  "ヒント": "Hint",
+  "意味を思い出してからタップ": "Recall the meaning, then tap",
+  "タップして答えを見る": "Tap to reveal the answer",
+  "正解": "Correct",
+  "次へ →": "Next →",
+  "わからない": "I don’t know",
+  "答えを見る": "Reveal answer",
+  "↶ ひとつ戻す": "↶ Undo last answer",
+  "文章の表示": "Passage view",
+  "全文": "Full passage",
+  "焦点": "Focus",
+  "英語": "English",
+  "注 ": "Note ",
+  "英訳": "Translation",
+  "漢字の形と意味": "Kanji form and meaning",
+  "類語": "Related words",
+  "同じ字・同じ読みの、学習中の語": "Study words sharing a kanji or reading",
+  "参照": "See also",
+  "前の語に戻る": "Back to the previous word",
+  "閉じる": "Close",
+  "辞書の全項目を開く": "Open the full dictionary entry",
+  "✓ 覚えるの札にあります": "✓ Saved to your review cards",
+  "リストに追加…": "Add to a list…",
+  "覚える": "Memorize",
+  "保存できませんでした": "Could not save",
+  "このデッキにあります": "Already in this deck",
+  "ここで止めよう": "Pause here",
+  "この語の日本語の語釈は、まだ辞書にありません": "This word has no Japanese definition in the dictionary yet.",
+  "この語は辞書にありません": "This word is not in the dictionary.",
+  "ここでは覚えるに保存できません（回廊でできます）": "Save to your review cards in Bunki.",
+  "覚えるの札に入ります — このデッキの予定は変わりません": "Added to your review cards; this deck’s schedule stays the same.",
+  "削除": "Remove",
+  "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
+  "別の文に替える": "Use another sentence",
+  "替えられる文がありません": "No alternative sentence available",
+  "ヒントを付ける": "Add a hint",
+  "ヒントはもう付いています": "A hint is already attached",
+  "保留": "Pause",
+  "このカードを休ませる": "Rest this card",
+  "このまま続ける": "Continue with this card",
+  "ライセンス ": "License ",
+  "出典": "Source",
+  "もう一度": "Again",
+  "思い出せた": "Recalled",
+  "← もう一度　　スワイプ　　思い出せた →": "← Again　　Swipe　　Recalled →",
+  "このヒントを閉じる": "Dismiss this hint",
+  "おつかれさま": "Session complete",
+  "回答": "Answers",
+  "思い出せた割合": "Recall rate",
+  "今日の分は終わり。また明日。": "Today’s work is done. Return tomorrow.",
+  "デッキに戻る": "Back to the deck",
+  "検索 — 漢字・かな・英語": "Search — kanji, kana or English",
+  "該当する語はありません。": "No matching words.",
+  "このデッキのしくみ": "How this deck works",
+  "一日の新しいカード": "New cards per day",
+  "答え方": "Answer mode",
+  "読んで思い出す": "Read and recall",
+  "穴埋め": "Fill the blank",
+  "4択": "Multiple choice",
+  "英語の意味（答えの「英語」）": "English meaning on the answer",
+  "タップで開く": "Open on tap",
+  "いつも開いておく": "Always open",
+  "色（テーマ）": "Colors (theme)",
+  "バックアップの文字列": "Backup text",
+  "端末の保存領域：不明": "Device storage: unknown",
+  "バックアップ": "Backup",
+  "記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。": "Your record is saved on this device. Copy and keep a backup; paste it on another device to restore.",
+  "コピー": "Copy",
+  "コピーしました。": "Copied.",
+  "選択しました。手動でコピーしてください。": "Selected. Copy the text manually.",
+  "復元": "Restore",
+  "ありません": "None",
+  "保留中のカード": "Paused cards",
+  "削除したカードと、つまずきが続いて休ませたカード。記録は消えていません。": "Removed cards and cards paused after repeated difficulty. Their records are preserved.",
+  "読み取れません。バックアップの文字列をそのまま貼り付けてください。": "Could not read this backup. Paste the complete backup text.",
+  "このデッキのバックアップではありません。": "This is not a backup for this deck.",
+  "カードの記録が入っていません。": "This backup has no card records.",
+  "壊れた記録が含まれています。": "This backup contains damaged records.",
+  "保存領域がいっぱいで、置き換えられませんでした。": "Storage is full. The record could not be replaced.",
+  "置き換える": "Replace",
+  "読み込み中…": "Loading…",
+  "このカードを削除しました（設定 › 保留中のカード から戻せます）。": "Card removed. Restore it from Settings → Paused cards.",
+  "別の文に替えました。前の文は保留にしました。": "Changed to another sentence. The previous sentence is paused.",
+  "保留にしました（設定 › 保留中のカード から戻せます）。": "Card paused. Restore it from Settings → Paused cards.",
+  "答えを見て理解が深まったなら もう一度": "Choose Again if seeing the answer improved your understanding.",
+  "この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）": "A translation of this sentence is unavailable because the sentence boundaries do not match.",
+  "未": "New",
+  "学習中": "Learning",
+  "定着中": "Growing",
+  "定着": "Known",
+  "語": "Word",
+  "字": "Kanji",
+  "文法": "Grammar",
+  "同": "Same kanji",
+  "読": "Same reading",
+  "文体": "Register",
+  "話題": "Topic",
+  "ニュース": "News",
+  "ブログ": "Blog",
+  "企業サイト": "Company site",
+  "公的機関": "Public institution",
+  "文学": "Literature",
+  "SNS": "Social media",
+  "例文集": "Examples",
+  "ウェブ": "Web",
+  "書き下ろし": "Original composition",
+  "墨": "Ink",
+  "藍": "Indigo",
+  "抹茶": "Matcha",
+  "黒板": "Chalkboard",
+  "和紙": "Washi",
+  "桜": "Cherry blossom",
+  "白": "White",
+  "高": "High contrast",
+  "講義": "Lecture",
+  "講義・本の要約": "Lectures and book summaries",
+  "報道": "Reporting",
+  "ニュース・解説": "News and commentary",
+  "論説": "Essay",
+  "エッセイ・思想": "Essays and ideas",
+  "会話": "Conversation",
+  "話し言葉": "Spoken language",
+  "学び": "Learning",
+  "勉強法・学習の話": "Study and learning",
+  "話し方": "Expression",
+  "話し方・書き方の話": "Speaking and writing",
+  "心と学び": "Mind and learning",
+  "インド・仏教": "India and Buddhism",
+  "インド哲学と仏教": "Indian philosophy and Buddhism",
+  "AI・半導体": "AI and semiconductors",
+  "AI と半導体": "AI and semiconductors",
+  "世界史": "World history",
+  "日本語": "Japanese",
+  "日本語についての話": "Japanese language",
+  "対義語": "Opposites",
+  "同じ字": "Same kanji",
+  "言い換え": "Paraphrase",
+  "よく一緒に": "Common pairing",
+  "関連": "Related",
+  "別の文に替えた": "Changed sentence",
+  "このデッキは AJATT の MCD（Massive-Context Cloze Deletion）の文章でできています。ふだんは「読んで思い出す」で解きます。": "This deck uses AJATT’s Massive-Context Cloze Deletion passages. Read and recall is the default mode.",
+  "表：ニュース・ウィキペディア・文学から取った本物の文章と、このデッキのために書いた文章（2〜5文）。覚える言葉は色つき。読み・英語・ヒントは出ない。読んで、意味と読みを思い出してからタップ。": "The front shows real passages from news, Wikipedia and literature, plus original passages of two to five sentences. The target is marked. Readings, English and hints stay hidden; recall the meaning and reading before tapping.",
+  "設定 › 答え方 › 穴埋め にすると MCD の穴埋めになる。「語」カードは単語まるごとが穴（同じ言葉が二度出てくる文章では、両方とも空欄）。": "Choose Settings → Answer mode → Fill the blank for MCD. Word cards hide the whole target, including repeated occurrences.",
+  "「字」カードは単語の漢字ひとつが穴。〔 〕の読みを手がかりに、その字を思い出す（語ごとに一つの文章で）。穴埋めと4択のときだけ出てくる（読んで思い出すでは休み。記録は消えない）。": "Kanji cards hide one character and provide a bracketed reading cue. They appear in fill-the-blank or multiple-choice mode. Read-and-recall mode rests them without deleting their records.",
+  "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。": "One passage can supply several cards, with one target per card. As a word settles, the next passage opens with a different context.",
+  "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech and Japanese definition. Open the folds for English meaning, sentence translation, kanji details, other passages and sources.",
+  "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。": "Tap words in the revealed passage or Japanese definition to look them up. Bunki can also save them. Lookups do not grade the card or change its schedule.",
+  "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。": "Again and Recalled are sufficient for FSRS-6. Choose Again when unsure.",
+  "N1〜N3 の札は、公開の JLPT 語彙リスト（open-anki-jlpt-decks 系、2010年以前の旧基準）による目安。JLPT は公式の語彙リストを出していない。リストに載っていない語には札がない。": "N1–N3 labels are estimates from public vocabulary lists based on pre-2010 standards. JLPT publishes no official vocabulary list. Words absent from those lists carry no level label.",
+  "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。": "This is a targeted sentence-card deck: one sentence, one word.",
+  "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。": "The front shows a real Japanese sentence with the target marked. Readings and English stay hidden. Read, recall the meaning, then tap.",
+  "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「思い出せた」、だめなら「もう一度」。": "The back first shows readings, part of speech and a Japanese definition. Open folds for English, sentence translation, kanji details and sources. Choose Recalled if you recalled it; otherwise choose Again.",
+  "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。": "Common words have two or three sentences. Once the first settles, in roughly two weeks, the next sentence opens.",
+  "N2・N1 相当の語を、一枚に一つ、4〜5文の文章の中で覚えるデッキです。ふだんは「読んで思い出す」で解きます。": "This deck teaches one N2- or N1-equivalent word per card inside an original passage of four or five sentences. Read and recall is the default.",
+  "表：このデッキのために書いた文章。覚える言葉は色つき。読み・英語は出ない。読んで、意味と読みを思い出してからタップ。": "The front shows an original passage with the target marked. Readings and English stay hidden. Read, recall its meaning and reading, then tap.",
+  "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
+  "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
+};
+const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
+
 /* ------------------------------------------------------------- helpers */
 function el(tag, cls, ...kids) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
+  if (/(?:^| )(?:kp-word|kp-def|kp-note|kp-sheet-def|kp-pop-def)(?: |$)/.test(cls || '')) node.lang = 'ja';
   for (const kid of kids.flat()) {
     if (kid == null || kid === false) continue;
     node.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
@@ -3088,6 +3549,7 @@ function el(tag, cls, ...kids) {
 function btn(cls, label, onClick, attrs = {}) {
   const b = el('button', cls, label);
   b.type = 'button';
+  if (/(?:^| )(?:kp-choice|kp-row|kp-fam|kp-see-link)(?: |$)/.test(cls || '')) b.dataset.uiContent = 'learning';
   for (const [k, v] of Object.entries(attrs)) b.setAttribute(k, v);
   b.addEventListener('click', onClick);
   return b;
@@ -3096,11 +3558,11 @@ const KANJI = /[㐀-鿿々〆ヵヶ]/;
 const MIN = 60e3;
 const DAY = 864e5;
 function fmtWait(ms) {
-  if (ms < 60 * MIN) return `${Math.max(1, Math.round(ms / MIN))}分`;
-  if (ms < DAY) return `${Math.round(ms / (60 * MIN))}時間`;
-  if (ms < 30 * DAY) return `${Math.round(ms / DAY)}日`;
-  if (ms < 365 * DAY) return `${Math.round(ms / (30 * DAY))}か月`;
-  return `${(ms / (365 * DAY)).toFixed(1)}年`;
+  if (ms < 60 * MIN) return t(`${Math.max(1, Math.round(ms / MIN))}分`, `${Math.max(1, Math.round(ms / MIN))} min`);
+  if (ms < DAY) return t(`${Math.round(ms / (60 * MIN))}時間`, `${Math.round(ms / (60 * MIN))} hr`);
+  if (ms < 30 * DAY) return t(`${Math.round(ms / DAY)}日`, `${Math.round(ms / DAY)} days`);
+  if (ms < 365 * DAY) return t(`${Math.round(ms / (30 * DAY))}か月`, `${Math.round(ms / (30 * DAY))} months`);
+  return t(`${(ms / (365 * DAY)).toFixed(1)}年`, `${(ms / (365 * DAY)).toFixed(1)} years`);
 }
 const KIND_NAME = { news: 'ニュース', blog: 'ブログ', qa: 'Q&A', company: '企業サイト', gov: '公的機関', literature: '文学', tatoeba: 'Tatoeba', wiki: 'Wikipedia', social: 'SNS', 'example-bank': '例文集', other: 'ウェブ', original: '書き下ろし' };
 const STATUS = {
@@ -3238,7 +3700,7 @@ function clampContext(out) {
     if (!nodes.length) return null;
     const box = el('span', 'kp-ctx', el('span', 'kp-ctx-in', el('span', 'kp-ctx-flow', nodes)));
     box.dataset.side = side;
-    const label = side === 'before' ? '前の文をすべて表示' : '後の文をすべて表示';
+    const label = side === 'before' ? t("前の文をすべて表示") : t("後の文をすべて表示");
     const more = btn('kp-more', '⋯', (e) => {
       e.stopPropagation();
       const open = box.dataset.open !== '1';
@@ -3272,11 +3734,11 @@ function paint() {
   const screens = { home: homeScreen, study: studyScreen, list: listScreen, settings: settingsScreen };
   if (ui.toast) {
     const undoable = UNDOABLE.includes(ui.toast) && ui.undo && ui.screen === 'study';
-    const toast = el('div', `kp-toast${undoable ? ' is-info' : ''}`, el('span', null, ui.toast));
+    const toast = el('div', `kp-toast${undoable ? ' is-info' : ''}`, el('span', null, t(ui.toast)));
     toast.setAttribute('role', undoable ? 'status' : 'alert');
-    if (ui.toast === SAVE_FAILED && ui.screen !== 'settings') toast.append(btn('kp-toast-btn', 'バックアップへ', () => go('settings'), { id: 'kp-to-backup' }));
+    if (ui.toast === SAVE_FAILED && ui.screen !== 'settings') toast.append(btn('kp-toast-btn', t("バックアップへ"), () => go('settings'), { id: 'kp-to-backup' }));
     // a delete or a ladder step is reversible for the rest of the sitting (CARD_CONTRACT_V2 §4)
-    if (undoable) toast.append(btn('kp-toast-btn', '元に戻す', undo, { id: 'kp-toast-undo' }));
+    if (undoable) toast.append(btn('kp-toast-btn', t("元に戻す"), undo, { id: 'kp-toast-undo' }));
     root.append(toast);
   }
   root.append((screens[ui.screen] || homeScreen)());
@@ -3302,7 +3764,7 @@ function savePrefQuiet(patch) {
 
 function topBar(title, back) {
   const bar = el('header', 'kp-top');
-  if (back) bar.append(btn('kp-icon', '←', back, { 'aria-label': '戻る' }));
+  if (back) bar.append(btn('kp-icon', '←', back, { 'aria-label': t("戻る") }));
   bar.append(el('h1', 'kp-title', title));
   return bar;
 }
@@ -3315,21 +3777,27 @@ function homeScreen() {
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
   const box = el('section', 'kp-home');
-  box.append(topBar(deck.titleJa, ctx.onLeave ? () => ctx.onLeave() : null));
-  box.append(el('p', 'kp-sub', `${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚 · ${deck.titleEn}`));
-  if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', ctx.notice));
+  box.append(topBar(t(deck.titleJa, deck.titleEn), ctx.onLeave ? () => ctx.onLeave() : null));
+  box.append(el('p', 'kp-sub', t(`${deck.words.length}語 · ${deck.words.reduce((n, w) => n + w.cards.length, 0)}枚`, `${deck.words.length} words · ${deck.words.reduce((n, w) => n + w.cards.length, 0)} cards`)));
+  if (ctx.notice) box.append(el('p', 'kp-sub kp-notice', t(ctx.notice)));
 
-  const tiles = el('div', 'kp-tiles');
-  const tile = (n, label, cls) => el('div', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, label));
-  tiles.append(tile(q.due.length, '復習', 'kp-c-due'), tile(q.fresh.length, '新しいカード', 'kp-c-new'), tile(known, '定着した語', 'kp-c-known'), tile(hard, '苦手', 'kp-c-hard'));
+  // the deck's state as one quiet mono line (0 due · 15 new · 0 known · 0 difficult), no coloured tiles
+  const tiles = el('p', 'kp-tiles');
+  const tile = (n, ja, en, cls) => el('span', `kp-tile ${cls}`, el('b', null, String(n)), el('span', null, t(ja, en)));
+  tiles.append(
+    tile(q.due.length, '復習', 'due', 'kp-c-due'),
+    tile(q.fresh.length, '新', 'new', 'kp-c-new'),
+    tile(known, '定着', 'known', 'kp-c-known'),
+    tile(hard, '苦手', 'difficult', 'kp-c-hard'),
+  );
   box.append(tiles);
 
   const total = q.queue.length;
-  const start = btn('kp-start', total ? `始める — ${total}枚` : '今日はここまで', () => startSession(), { id: 'kp-start' });
+  const start = btn('kp-start', total ? t(`始める — ${total}枚`, `Begin — ${total} cards`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
   start.disabled = !total;
   box.append(start);
 
-  box.append(el('h2', 'kp-h2', 'テーマ'));
+  box.append(el('h2', 'kp-h2', t("テーマ")));
   const off = new Set(state.groupsOff);
   const list = el('div', 'kp-groups');
   for (const g of deck.groups) {
@@ -3357,13 +3825,13 @@ function homeScreen() {
       Object.assign(el('i', 'kp-c-grow'), { style: `width:${share('growing')}%` }),
       Object.assign(el('i', 'kp-c-learn'), { style: `width:${share('learning') + share('hard')}%` }),
     );
-    row.append(box2, el('span', 'kp-gname', el('b', null, g.titleJa), el('small', null, g.titleEn)), el('span', 'kp-gcount', `${st.filter((x) => x === 'known').length}/${words.length}`), bar);
+    row.append(box2, el('span', 'kp-gname', el('b', null, t(g.titleJa, g.titleEn))), el('span', 'kp-gcount', `${st.filter((x) => x === 'known').length}/${words.length}`), bar);
     list.append(row);
   }
   box.append(list);
 
   const foot = el('div', 'kp-foot');
-  foot.append(btn('kp-link', '語の一覧', () => go('list'), { id: 'kp-to-list' }), btn('kp-link', '設定', () => go('settings'), { id: 'kp-to-settings' }));
+  foot.append(btn('kp-link', t("語の一覧"), () => go('list'), { id: 'kp-to-list' }), btn('kp-link', t("設定"), () => go('settings'), { id: 'kp-to-settings' }));
   box.append(foot);
   return box;
 }
@@ -3374,6 +3842,26 @@ function go(screen) {
   ui.sheet = null;
   paint();
   window.scrollTo(0, 0);
+  frameFront();
+}
+
+/**
+ * A front opens at the top of its card; when the marked word (or the gap) would sit under the
+ * docked 答えを見る, the page scrolls at once (no animation) to bring it to the middle of the space
+ * between the host's header and the dock, so the word and the reveal are both in view.
+ */
+function frameFront() {
+  if (ui.screen !== 'study' || ui.revealed) return;
+  const face = ctx.root.querySelector('#kp-card');
+  const dock = ctx.root.querySelector('.kp-study > .kp-reveal');
+  const target = face?.querySelector('.kp-target, .kp-blank');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
+  const t = target.getBoundingClientRect();
+  const floor = dock.getBoundingClientRect().top - 16;
+  const ceil = topInset() + 16;
+  if (t.bottom <= floor) return;
+  window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
 }
 
 function startSession() {
@@ -3387,6 +3875,8 @@ function startSession() {
   ui.pos = 0;
   ui.done = 0;
   ui.right = 0;
+  ui.log = []; // this sitting's answers, [{ term, ok }]: the session close names them (never stored)
+  ui.started = Date.now();
   ui.undo = null;
   ui.rail = 0;
   refill();
@@ -3424,6 +3914,8 @@ function cardMode() {
 }
 /** the first sittings of a deck explain the gestures; after HINT_SITTINGS they retire */
 const hintsOn = () => (Number(ctx.prefs.sittings) || 0) <= HINT_SITTINGS;
+/** the swipe hint under the grade pads: the first card of the deck's first sitting only */
+const swipeHintOn = () => (Number(ctx.prefs.sittings) || 0) <= 1 && ui.done === 0;
 
 function choicesFor(word) {
   const pool = ctx.deck.words.filter((w) => w.id !== word.id && w.pos === word.pos && w.term !== word.term);
@@ -3446,8 +3938,10 @@ function studyScreen() {
   const mode = cardMode();
   const total = ui.queue.length;
   const top = el('header', 'kp-top kp-top-study');
-  top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': '終わる', id: 'kp-quit' }));
+  top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' }));
   const prog = el('div', 'kp-progress');
+  // a short sitting draws one segment per card (the rail itself still ticks by transform)
+  if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
   prog.append(rail(ui.pos / total));
   top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
   box.append(top);
@@ -3461,24 +3955,26 @@ function studyScreen() {
   face.id = 'kp-card';
   face.dataset.card = id;
   face.dataset.kind = kind;
-  const source = KIND_NAME[card.kind] || '例文';
+  const source = t(KIND_NAME[card.kind] || '例文');
   const written = passageChips(card, source);
   const chips = el(
     'div',
     'kp-chips',
-    el('span', 'kp-chip kp-kindchip', kindLabel),
+    el('span', 'kp-chip kp-kindchip', t(kindLabel)),
     // a written passage's register chip names its source too, so the row stays one line at 390px
     REGISTER[card.register] ? null : el('span', 'kp-chip', source),
     ...written,
-    TOPIC[card.topic] ? null : el('span', 'kp-chip', ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || ''),
+    TOPIC[card.topic] ? null : el('span', 'kp-chip', t(ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || '', ctx.deck.groups.find((g) => g.id === word.group)?.titleEn || '')),
     word.level ? levelChip(word.level) : null,
-    el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? '復習' : '初めて'),
+    el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? t("復習") : t("初めて")),
   );
+  // the card's one instruction, as its eyebrow (chrome: it names the task, never the answer)
+  chips.prepend(cardEyebrow(card, mode));
   face.append(chips);
   if (ui.revealed && passage) {
     const zoom = zoomFor();
     face.dataset.zoom = zoom;
-    chips.append(zoomToggle(zoom));
+    (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
   face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
@@ -3488,7 +3984,7 @@ function studyScreen() {
   if (!ui.revealed) {
     // a leech repaired with a hint (§4 ladder step two): this card only, marked as repaired; the
     // only hint a front ever shows
-    if (repaired) face.append(el('p', 'kp-rhint', el('span', 'kp-rhint-label', 'ヒント'), repaired));
+    if (repaired) face.append(el('p', 'kp-rhint', el('span', 'kp-rhint-label', t("ヒント")), repaired));
     if (mode === 'choice') {
       const opts = el('div', 'kp-choices');
       for (const w of choicesFor(word)) {
@@ -3503,7 +3999,7 @@ function studyScreen() {
       }
       face.append(opts);
     } else {
-      if (hintsOn()) face.append(el('p', 'kp-taphint', mode === 'read' ? '意味を思い出してからタップ' : 'タップして答えを見る'));
+      if (hintsOn()) face.append(el('p', 'kp-taphint', mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
       face.addEventListener('click', reveal);
     }
   } else {
@@ -3514,8 +4010,8 @@ function studyScreen() {
   if (ui.revealed) {
     if (mode === 'choice') {
       const ok = ui.picked === word.id;
-      box.append(el('p', `kp-verdict ${ok ? 'kp-c-known' : 'kp-c-hard'}`, ok ? '正解' : `不正解 — 正しくは ${word.term}`));
-      box.append(btn('kp-next', '次へ →', () => next(), { id: 'kp-next' }));
+      box.append(el('p', `kp-verdict ${ok ? 'kp-c-known' : 'kp-c-hard'}`, ok ? t("正解") : t(`不正解 — 正しくは ${word.term}`, `Incorrect — the answer is ${word.term}`)));
+      box.append(btn('kp-next', t("次へ →"), () => next(), { id: 'kp-next' }));
     } else {
       box.append(gradeBar(id));
       box.classList.add('has-bar');
@@ -3523,7 +4019,7 @@ function studyScreen() {
     attachSwipe(face);
   } else if (mode === 'choice') {
     box.append(
-      btn('kp-reveal', 'わからない', () => {
+      btn('kp-reveal', t("わからない"), () => {
         ui.picked = null;
         ui.seen = !!ctx.state.cards[id];
         ui.revealed = true;
@@ -3531,15 +4027,26 @@ function studyScreen() {
       }, { id: 'kp-dunno' }),
     );
   } else {
-    box.append(btn('kp-reveal', '答えを見る', reveal, { id: 'kp-reveal' }));
+    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }));
   }
-  if (ui.undo) box.append(btn('kp-undo', '↶ ひとつ戻す', undo, { id: 'kp-undo' }));
+  if (ui.undo) box.append(btn('kp-undo', t("↶ ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
+}
+
+/** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */
+function cardEyebrow(card, mode) {
+  const ji = card.type === 'kanji';
+  const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
+  // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
+  // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
+  const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
+  n.lang = ctx.english === false ? 'ja' : 'en';
+  return n;
 }
 
 const THEMES = [
   ['dark', '墨', '#0a0e13', '#3fd0ff'],
-  ['ai', '藍', '#121a46', '#f2c14e'],
+  ['ai', '藍', '#141a28', '#e9e2d2'],
   ['matcha', '抹茶', '#13261a', '#a6e06a'],
   ['kokuban', '黒板', '#1f2f28', '#ffe066'],
   ['washi', '和紙', '#fbf6ea', '#93301a'],
@@ -3549,6 +4056,9 @@ const THEMES = [
 ];
 const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
 const posKey = (pos) => (POS[pos] || ['noun'])[0];
+/** the part of speech as the interface names it: 名詞 in 日本語, "noun" in EN (never Japanese chrome in EN) */
+const POS_EN = { noun: 'noun', verb: 'verb', 'い-adjective': 'i-adjective', 'な-adjective': 'na-adjective', adverb: 'adverb', expression: 'expression', 'sound word': 'sound word', kanji: 'kanji' };
+const posLabel = (pos) => (ctx?.english !== false ? POS_EN[pos] || 'word' : (POS[pos] || ['', ''])[1] || '語');
 /** item kind → [css key, chip label]: 語 a whole word, 字 one kanji of it, 文法 a grammar point */
 function itemKind(card) {
   if (card.type === 'kanji') return ['ji', '字'];
@@ -3558,7 +4068,7 @@ function itemKind(card) {
 /** the word's level from a public JLPT-style list (build.py, wbig.json): text only, never a hue */
 function levelChip(level) {
   const chip = el('span', 'kp-chip kp-levelchip', level);
-  const note = `${level}相当（公開リストによる目安）`;
+  const note = t(`${level}相当（公開リストによる目安）`, `${level} equivalent (estimated from public lists)`);
   chip.title = note;
   chip.setAttribute('aria-label', note);
   return chip;
@@ -3573,13 +4083,13 @@ const TOPIC = { mind: ['心と学び', '心と学び'], india: ['インド・仏
 function passageChips(card, source = '') {
   const out = [];
   for (const [table, value, cls, what] of [
-    [REGISTER, card.register, 'kp-regchip', '文体'],
-    [TOPIC, card.topic, 'kp-topicchip', '話題'],
+    [REGISTER, card.register, 'kp-regchip', t("文体")],
+    [TOPIC, card.topic, 'kp-topicchip', t("話題")],
   ]) {
     const [text, full] = (typeof value === 'string' && table[value]) || [];
     if (!text) continue;
-    const chip = el('span', `kp-chip kp-chip-sm ${cls}`, text);
-    const label = `${what}：${full}${table === REGISTER && source ? `（${source}）` : ''}`;
+    const chip = el('span', `kp-chip kp-chip-sm ${cls}`, t(text));
+    const label = t(`${what}：${full}${table === REGISTER && source ? `（${source}）` : ''}`, `${what}: ${t(full)}${table === REGISTER && source ? ` (${source})` : ''}`);
     chip.title = label;
     chip.setAttribute('aria-label', label);
     out.push(chip);
@@ -3615,8 +4125,8 @@ function zoomFor() {
 function zoomToggle(zoom) {
   const wrap = el('span', 'kp-zoom');
   wrap.setAttribute('role', 'group');
-  wrap.setAttribute('aria-label', '文章の表示');
-  for (const [value, label] of [['full', '全文'], ['focus', '焦点']]) {
+  wrap.setAttribute('aria-label', t("文章の表示"));
+  for (const [value, label] of [['full', t("全文")], ['focus', t("焦点")]]) {
     const b = btn('kp-zoom-btn', label, (e) => {
       e.stopPropagation();
       if (zoomFor() === value || !savePrefQuiet({ zoom: value })) return;
@@ -3634,15 +4144,43 @@ function zoomToggle(zoom) {
 function kanjiAnatomy(word) {
   if (!word.kanji?.length) return null;
   const box = el('div', 'kp-kanji');
+  // each kanji on a plate: glyph, meaning, parts, strokes (deck kanji data: c, m, parts, st). A
+  // part that two of the word's kanji share is lit on both plates and a bracket under the plates
+  // joins them (推進: 隹 in 推 and 進); nothing is guessed when the data has no shared part
+  const holders = new Map();
+  for (const k of word.kanji) for (const p of new Set(k.parts || [])) holders.set(p, new Set([...(holders.get(p) || []), k.c]));
+  const learned = (text, tag = 'span') => {
+    const n = el(tag, null, text);
+    n.lang = 'ja';
+    n.dataset.uiContent = 'learning';
+    return n;
+  };
   for (const k of word.kanji) {
-    box.append(el('div', 'kp-kj', el('b', null, k.c), el('span', null, k.m || ''), el('small', null, [k.parts?.length ? k.parts.join(' ') : '', k.st ? `${k.st}画` : ''].filter(Boolean).join(' · '))));
+    const parts = el('small', 'kp-kj-parts');
+    (k.parts || []).forEach((p, i) => {
+      if (i) parts.append('+');
+      const n = learned(p, 'i');
+      if (holders.get(p)?.size > 1) n.dataset.shared = '1';
+      parts.append(n);
+    });
+    if (k.st) parts.append(el('span', null, t(`${k.st}画`, `${k.st} strokes`)));
+    box.append(el('div', 'kp-kj', learned(k.c, 'b'), el('span', null, k.m || ''), parts));
+  }
+  for (const [p, cs] of holders) {
+    if (cs.size < 2) continue;
+    const line = el('p', 'kp-kshare', learned(p, 'b'));
+    [...cs].forEach((c, i) => line.append(i ? '・' : '', learned(c)));
+    line.append(el('span', null, t('の両方にある部分', cs.size === 2 ? 'sits inside both' : 'sits inside each')));
+    box.append(line);
   }
   return box;
 }
 
 /** one tier-two fold: a native disclosure, closed unless open is set */
 function fold(cls, title, open, ...kids) {
-  const d = el('details', `kp-fold ${cls}`, el('summary', null, title), ...kids);
+  const summary = el('summary', null, title);
+  summary.lang = ctx.english === false ? 'ja' : 'en';
+  const d = el('details', `kp-fold ${cls}`, summary, ...kids);
   d.open = !!open;
   d.addEventListener('click', (e) => e.stopPropagation());
   return d;
@@ -3663,8 +4201,10 @@ const SEM_REL = { syn: '類語', ant: '対義語', fam: '同じ字', reg: '言�
 function answerBlock(card, word) {
   const a = el('div', 'kp-answer');
   a.lang = 'ja';
-  const pos = (POS[word.pos] || ['', ''])[1] || word.pos;
-  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, el('span', 'kp-posbadge', pos)));
+  // Part of speech is chrome: it names the kind of word in the interface language (EN: noun, 日本語: 名詞)
+  const badge = el('span', 'kp-posbadge', posLabel(word.pos));
+  badge.lang = ctx.english === false ? 'ja' : 'en';
+  a.append(el('div', 'kp-word', el('span', 'kp-term', word.term), el('span', 'kp-reading', word.reading), word.pitch != null ? el('span', 'kp-pitch', String(word.pitch)) : null, badge));
   // the definition's words are tap targets like the passage's (STANDARD A44)
   a.append(defLine(card, word));
   // a usage note in Japanese stays in tier one (§3 item 4): the passage's own note (tipJa) when it
@@ -3677,37 +4217,41 @@ function answerBlock(card, word) {
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
 
   const folds = el('div', 'kp-folds');
-  // English text carries lang='en'; the summaries and labels stay Japanese for screen readers
+  // Learning text carries its language; chrome follows the active interface language.
   const english = (tag, cls, text) => {
     const n = el(tag, cls, text);
     n.lang = 'en';
     return n;
   };
-  const gloss = fold('kp-f-gloss', '英語', ctx.prefs.gloss === 'show', english('p', 'kp-gloss', word.meaning));
-  if (word.tip && !jaNote) gloss.append(el('p', 'kp-tip', el('span', 'kp-tip-label', '注 '), english('span', null, word.tip)));
+  const gloss = fold('kp-f-gloss', t("英語"), ctx.prefs.gloss === 'show', english('p', 'kp-gloss', word.meaning));
+  if (word.tip && !jaNote) {
+    const label = el('span', 'kp-tip-label', t("注 "));
+    label.lang = ctx.english === false ? 'ja' : 'en';
+    gloss.append(el('p', 'kp-tip', label, english('span', null, word.tip)));
+  }
   folds.append(gloss);
   // a passage translates only the sentence holding the target (enTarget, from build.py), never
   // the whole passage; when its sentences could not be matched the fold says so, so the slot
   // stays in the same place on every card
   const en = card.type ? card.enTarget : card.en;
-  if (en || card.type) folds.append(fold('kp-f-en', '英訳', false, en ? english('p', 'kp-en', en) : el('p', 'kp-en kp-en-none', EN_NONE)));
+  if (en || card.type) folds.append(fold('kp-f-en', t("英訳"), false, en ? english('p', 'kp-en', en) : el('p', 'kp-en kp-en-none', t(EN_NONE))));
   const anatomy = kanjiAnatomy(word);
-  if (anatomy) folds.append(fold('kp-f-kanji', '漢字の形と意味', card.type === 'kanji', anatomy, kanjiFamily(word)));
+  if (anatomy) folds.append(fold('kp-f-kanji', t("漢字の形と意味"), card.type === 'kanji', anatomy, kanjiFamily(word)));
   // see-also and grammar from the deck, as one link line after the kanji fold; no data, no line
   const see = seeAlsoLine(card, word);
   if (see) folds.append(see);
   // synonyms interfere with a word still being learned (R13): only on a card in review state
   if (word.sem?.length && ctx.state.cards[card.id]?.state === 2) {
     const list = el('ul', 'kp-sem');
-    for (const e of word.sem) list.append(el('li', null, el('b', null, e.w), el('span', 'kp-sem-rel', SEM_REL[e.rel] || e.rel), e.note ? el('small', null, e.note) : null));
-    folds.append(fold('kp-f-sem', '類語', false, list));
+    for (const e of word.sem) list.append(el('li', null, el('b', null, e.w), el('span', 'kp-sem-rel', t(SEM_REL[e.rel] || e.rel)), e.note ? el('small', null, e.note) : null));
+    folds.append(fold('kp-f-sem', t("類語"), false, list));
   }
   const others = otherPassages(card, word);
   if (others.length) {
     const list = el('ul', 'kp-others');
-    for (const c of others) list.append(el('li', null, c.type ? `文章${c.passage}` : `例文${c.lv}`, el('span', null, ` · ${KIND_NAME[c.kind] || '例文'}${c.src?.site ? ` · ${c.src.site}` : ''}`)));
+    for (const c of others) list.append(el('li', null, c.type ? t(`文章${c.passage}`, `Passage ${c.passage}`) : t(`例文${c.lv}`, `Example ${c.lv}`), el('span', null, ` · ${t(KIND_NAME[c.kind] || '例文')}${c.src?.site ? ` · ${c.src.site}` : ''}`)));
     // a passage deck lists 文章, the one-sentence deck 文
-    folds.append(fold('kp-f-others', `${card.type ? 'この語の他の文章' : 'この語の他の文'}（${others.length}）`, false, list));
+    folds.append(fold('kp-f-others', t(`${card.type ? 'この語の他の文章' : 'この語の他の文'}（${others.length}）`, `Other ${card.type ? 'passages' : 'sentences'} for this word (${others.length})`), false, list));
   }
   if (card.src) folds.append(sourceFold(card));
   a.append(folds);
@@ -3757,21 +4301,21 @@ function kanjiFamily(word) {
   const rows = familyOf(word);
   if (!rows.length) return null;
   const list = el('ul', 'kp-kfam');
-  list.setAttribute('aria-label', '同じ字・同じ読みの、学習中の語');
+  list.setAttribute('aria-label', t("同じ字・同じ読みの、学習中の語"));
   for (const { k, same, read } of rows) {
     const li = el('li', null, el('b', 'kp-kfam-c', k.c, k.r ? el('small', null, k.r) : null));
-    for (const w of same) li.append(familyLink(w, '同', `${k.c}を含む`));
-    for (const w of read.slice(0, FAMILY_READ_MAX)) li.append(familyLink(w, '読', `${k.r}と読む字を含む`));
-    if (read.length > FAMILY_READ_MAX) li.append(el('span', 'kp-fam-more', `ほか${read.length - FAMILY_READ_MAX}語`));
+    for (const w of same) li.append(familyLink(w, '同', t(`${k.c}を含む`, `contains ${k.c}`)));
+    for (const w of read.slice(0, FAMILY_READ_MAX)) li.append(familyLink(w, '読', t(`${k.r}と読む字を含む`, `contains a kanji read ${k.r}`)));
+    if (read.length > FAMILY_READ_MAX) li.append(el('span', 'kp-fam-more', t(`ほか${read.length - FAMILY_READ_MAX}語`, `${read.length - FAMILY_READ_MAX} more words`)));
     list.append(li);
   }
   return list;
 }
 function familyLink(w, mark, why) {
-  return btn('kp-fam', [el('span', 'kp-fam-mark', mark), w.term], (e) => {
+  return btn('kp-fam', [el('span', 'kp-fam-mark', t(mark)), w.term], (e) => {
     e.stopPropagation();
     openWord(w.id);
-  }, { 'data-word': w.id, 'data-mark': mark, 'aria-label': `${mark} ${w.term}（${why}）・語の一覧で開く` });
+  }, { 'data-word': w.id, 'data-mark': mark, 'aria-label': t(`${mark} ${w.term}（${why}）・語の一覧で開く`, `${t(mark)} ${w.term} (${why}); open in the word list`) });
 }
 /** open a word in 語の一覧; its ← comes back to the card on screen */
 function openWord(wid) {
@@ -3793,7 +4337,7 @@ function seeAlsoLine(card, word) {
   const line = el('p', 'kp-see');
   line.id = 'kp-see';
   if (see.length) {
-    line.append(el('span', 'kp-see-label', '参照'));
+    line.append(el('span', 'kp-see-label', t("参照")));
     for (const t of see) {
       const w = ctx.deck.words.find((x) => x.term === t);
       line.append(
@@ -3807,7 +4351,7 @@ function seeAlsoLine(card, word) {
     }
   }
   if (grammar.length) {
-    line.append(el('span', 'kp-see-label', '文法'));
+    line.append(el('span', 'kp-see-label', t('文法')));
     for (const g of grammar) {
       line.append(
         ctx.openEntry
@@ -4109,7 +4653,7 @@ function sheetNode() {
   });
   const sheet = el('div', 'kp-sheet');
   sheet.id = 'kp-sheet';
-  sheet.lang = 'ja';
+  sheet.lang = ctx.english !== false ? 'en' : 'ja';
   sheet.setAttribute('role', 'dialog');
   sheet.setAttribute('aria-modal', 'true');
   sheet.setAttribute('aria-labelledby', 'kp-sheet-term');
@@ -4120,29 +4664,32 @@ function sheetNode() {
     top.append(btn('kp-icon kp-sheet-back', '←', () => {
       ui.sheet = { ...ui.sheet, stack: stack.slice(0, -1), note: '' };
       drawSheet();
-    }, { id: 'kp-sheet-back', 'aria-label': '前の語に戻る' }));
+    }, { id: 'kp-sheet-back', 'aria-label': t("前の語に戻る") }));
   }
   const term = el('h2', 'kp-sheet-term', f.label);
+  term.lang = 'ja';
   term.id = 'kp-sheet-term';
+  term.dataset.uiContent = 'learning';
   term.tabIndex = -1;
   const head = el('div', 'kp-sheet-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-sheet-reading', f.reading) : null);
-  const chips = el('div', 'kp-sheet-chips', f.kind ? el('span', 'kp-chip', f.kind) : null, f.level ? levelChip(f.level) : null);
-  top.append(head, chips, btn('kp-icon kp-sheet-x', '×', closeSheet, { id: 'kp-sheet-close', 'aria-label': '閉じる' }));
+  const chips = el('div', 'kp-sheet-chips', f.kind ? el('span', 'kp-chip', t(f.kind)) : null, f.level ? levelChip(f.level) : null);
+  top.append(head, chips, btn('kp-icon kp-sheet-x', '×', closeSheet, { id: 'kp-sheet-close', 'aria-label': t("閉じる") }));
   sheet.append(top);
   // the Japanese sense first; its words open one more sheet, down to SHEET_DEPTH
   if (f.ja) {
     const def = el('p', 'kp-sheet-def');
+    def.lang = 'ja';
     const units = depth < SHEET_DEPTH && f.word ? defUnits(f.word) : null;
     def.append(...tapText(f.ja, units, (u, node) => tapped(u, node, { card: currentCard(), where: 's', depth: depth + 1 })));
     sheet.append(def);
-  } else sheet.append(el('p', 'kp-sheet-none', f.word || f.entry ? NO_JA : NOT_FOUND));
-  if (f.en) sheet.append(fold('kp-f-gloss kp-sheet-en', '英語', ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
-  if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', STOP_HERE));
-  if (f.word) sheet.append(el('p', 'kp-sheet-indeck', IN_DECK));
+  } else sheet.append(el('p', 'kp-sheet-none', t(f.word || f.entry ? NO_JA : NOT_FOUND)));
+  if (f.en) sheet.append(fold('kp-f-gloss kp-sheet-en', t("英語"), ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
+  if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', t(STOP_HERE)));
+  if (f.word) sheet.append(el('p', 'kp-sheet-indeck', t(IN_DECK)));
   else if (f.entry) {
     sheet.append(takeBlock(f));
     // the corridor's own entry: every sense, examples, its kanji (it leaves the card for a moment)
-    sheet.append(btn('kp-link kp-sheet-full', '辞書の全項目を開く', () => {
+    sheet.append(btn('kp-link kp-sheet-full', t("辞書の全項目を開く"), () => {
       const entry = f.entry;
       closeSheet();
       ctx.host.open(entry);
@@ -4159,16 +4706,16 @@ function takeBlock(f) {
   const box = el('div', 'kp-take-box');
   if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
   if (safely(() => !!ctx.host.isTaken(f.entry), false)) {
-    box.append(el('p', 'kp-sheet-taken', '✓ 覚えるの札にあります'));
+    box.append(el('p', 'kp-sheet-taken', t("✓ 覚えるの札にあります")));
     if (typeof ctx.host.addToList === 'function') {
-      const add = btn('kp-link kp-take-list', 'リストに追加…', () => {
+      const add = btn('kp-link kp-take-list', t("リストに追加…"), () => {
         safely(() => ctx.host.addToList(f.entry, add), null);
       }, { id: 'kp-take-list', 'aria-haspopup': 'dialog' });
       box.append(add);
     }
     return box;
   }
-  const take = btn('kp-take', '覚える', async () => {
+  const take = btn('kp-take', t("覚える"), async () => {
     if (ui.sheet?.busy) return;
     const sheetNow = ui.sheet;
     sheetNow.busy = true;
@@ -4176,10 +4723,10 @@ function takeBlock(f) {
     const ok = await takeEntry(f.entry);
     sheetNow.busy = false;
     if (ui.sheet !== sheetNow) return; // the sheet closed or moved on while the corridor saved
-    ui.sheet.note = ok ? '' : '保存できませんでした';
+    ui.sheet.note = ok ? '' : t("保存できませんでした");
     drawSheet({ focus: false });
   }, { id: 'kp-take' });
-  box.append(take, el('p', 'kp-take-note', TAKE_NOTE));
+  box.append(take, el('p', 'kp-take-note', t(TAKE_NOTE)));
   return box;
 }
 /** 覚えるの札, through the host (the corridor's guarded one-tap save) */
@@ -4206,16 +4753,17 @@ function drawPop() {
   const f = ui.pop.frame;
   const pop = el('div', 'kp-pop');
   pop.id = 'kp-pop';
-  pop.lang = 'ja';
+  pop.lang = ctx.english !== false ? 'en' : 'ja';
   pop.setAttribute('role', 'dialog');
   pop.setAttribute('aria-labelledby', 'kp-pop-term');
   pop.dataset.key = f.key;
   const term = el('b', 'kp-pop-term', f.label);
   term.id = 'kp-pop-term';
-  pop.append(el('div', 'kp-pop-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-pop-reading', f.reading) : null, btn('kp-pop-x', '×', closePop, { id: 'kp-pop-close', 'aria-label': '閉じる' })));
+  term.dataset.uiContent = 'learning';
+  pop.append(el('div', 'kp-pop-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-pop-reading', f.reading) : null, btn('kp-pop-x', '×', closePop, { id: 'kp-pop-close', 'aria-label': t("閉じる") })));
   if (f.ja) pop.append(el('p', 'kp-pop-def', f.ja));
-  if (f.en) pop.append(fold('kp-pop-en', '英語', ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
-  pop.append(el('p', 'kp-pop-note', NO_TAKE_HERE));
+  if (f.en) pop.append(fold('kp-pop-en', t("英語"), ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
+  pop.append(el('p', 'kp-pop-note', t(NO_TAKE_HERE)));
   pop.addEventListener('click', (e) => e.stopPropagation());
   pop.addEventListener('toggle', placePop, true);
   ctx.root.append(pop);
@@ -4253,10 +4801,10 @@ function backParts(card, word) {
 /** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
  * from the toast or ↶ for the rest of the sitting */
 function deleteButton() {
-  return btn('kp-delete', '削除', (e) => {
+  return btn('kp-delete', t("削除"), (e) => {
     e.stopPropagation();
     deleteCard();
-  }, { id: 'kp-delete', 'aria-label': 'このカードを削除（保留にする・あとで戻せる）' });
+  }, { id: 'kp-delete', 'aria-label': t("このカードを削除（保留にする・あとで戻せる）") });
 }
 
 /** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the
@@ -4277,9 +4825,9 @@ function leechLadder(card, word) {
   box.id = 'kp-ladder';
   box.setAttribute('role', 'group');
   const lapses = ctx.state.cards[card.id]?.lapses ?? 0;
-  const head = `この文で${lapses}回つまずいています`;
+  const head = t(`この文で${lapses}回つまずいています`, `This sentence has caused difficulty ${lapses} times`);
   box.setAttribute('aria-label', head);
-  box.append(el('p', 'kp-ladder-head', `この文で`, el('span', 'kp-chip kp-st-learn kp-ladder-n', `${lapses}回`), 'つまずいています'));
+  box.append(el('p', 'kp-ladder-head', t('この文で', 'Difficulty on this sentence: '), el('span', 'kp-chip kp-st-learn kp-ladder-n', t(`${lapses}回`, `${lapses} times`)), t('つまずいています', '')));
   const target = swapTarget(word, card, ctx.state);
   const hint = ctx.state.repairs?.[card.id]?.hint ? '' : repairHint(card, word);
   const steps = el('ol', 'kp-ladder-steps');
@@ -4288,13 +4836,14 @@ function leechLadder(card, word) {
       e.stopPropagation();
       onClick();
     }, { id: `kp-ladder-${name}`, 'data-step': name });
+    if (name === 'hint' && hint) b.dataset.uiContentValue = hint;
     if (!onClick) b.disabled = true;
     steps.append(el('li', null, b));
   };
-  step('swap', '別の文に替える', target ? `${target.type ? `文章${target.passage}` : `例文${target.lv}`}へ（進み具合はそのまま）` : '替えられる文がありません', target && (() => ladderSwap(card, word)));
-  step('hint', 'ヒントを付ける', hint ? `表に「${hint}」` : 'ヒントはもう付いています', hint && (() => ladderHint(card, hint)));
-  step('suspend', '保留', 'このカードを休ませる', () => ladderSuspend(card));
-  box.append(steps, btn('kp-link kp-ladder-keep', 'このまま続ける', (e) => {
+  step('swap', t("別の文に替える"), target ? t(`${target.type ? `文章${target.passage}` : `例文${target.lv}`}へ（進み具合はそのまま）`, `${target.type ? `Passage ${target.passage}` : `Example ${target.lv}`} (keep your progress)`) : t("替えられる文がありません"), target && (() => ladderSwap(card, word)));
+  step('hint', t("ヒントを付ける"), hint ? t(`表に「${hint}」`, `Show “${hint}” on the front`) : t("ヒントはもう付いています"), hint && (() => ladderHint(card, hint)));
+  step('suspend', t("保留"), t("このカードを休ませる"), () => ladderSuspend(card));
+  box.append(steps, btn('kp-link kp-ladder-keep', t("このまま続ける"), (e) => {
     e.stopPropagation();
     ladderKeep(card);
   }, { id: 'kp-ladder-keep' }));
@@ -4304,7 +4853,7 @@ function leechLadder(card, word) {
 /** adopt a ledger change made on the card on screen: stored first, then one undo step */
 function adoptRepair(nextState) {
   if (!save(nextState)) return saveFailed();
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
+  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
   ctx.state = nextState;
   return true;
 }
@@ -4362,7 +4911,7 @@ function sourceFold(card) {
   const src = card.src;
   const p = el('p', 'kp-src');
   const who = el('span', 'kp-src-line');
-  if (src.author) who.append(src.author, src.translator ? `（訳 ${src.translator}）` : '', ' · ');
+  if (src.author) who.append(src.author, src.translator ? t(`（訳 ${src.translator}）`, `(translation: ${src.translator})`) : '', ' · ');
   const label = src.site || src.label || '';
   if (src.url) {
     const a = el('a', null, label);
@@ -4372,14 +4921,14 @@ function sourceFold(card) {
     a.addEventListener('click', (e) => e.stopPropagation());
     who.append(a);
   } else who.append(label);
-  if (card.type) who.append(` · 文章${card.passage}`);
+  if (card.type) who.append(t(` · 文章${card.passage}`, ` · Passage ${card.passage}`));
   p.append(who);
   if (src.licence) {
     const lic = el('span', null, src.licence);
     lic.lang = 'en';
-    p.append(el('span', 'kp-src-line kp-licence', el('span', 'kp-src-label', 'ライセンス '), lic));
+    p.append(el('span', 'kp-src-line kp-licence', el('span', 'kp-src-label', t("ライセンス ")), lic));
   }
-  return fold('kp-f-src', '出典', false, p);
+  return fold('kp-f-src', t("出典"), false, p);
 }
 
 /** もう一度／思い出せた, nothing else (CARD_CONTRACT_V2 §4: Hard and Easy are not shown).
@@ -4388,22 +4937,31 @@ const RULE = '答えを見て理解が深まったなら もう一度';
 function gradeBar(id) {
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
   const bar = el('div', 'kp-grades');
+  // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 and 良); English shows the word only
+  const seal = (glyph) => {
+    if (ctx.english !== false) return null;
+    const n = el('span', 'kp-grade-seal', glyph);
+    n.setAttribute('aria-hidden', 'true');
+    return n;
+  };
   const g = (name, label, cls, key) =>
-    btn(`kp-grade ${cls}`, [el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
+    btn(`kp-grade ${cls}`, [seal(name === 'again' ? '再' : '良'), el('b', null, label), el('small', null, fmtWait(pv[name]))], () => commit(RATINGS[name]), {
       id: `kp-grade-${name}`,
       'aria-keyshortcuts': key,
     });
-  bar.append(g('again', 'もう一度', 'kp-again', '1'), g('good', '思い出せた', 'kp-good', '3'));
-  if (hintsOn()) bar.append(el('p', 'kp-swipehint', '← もう一度　　スワイプ　　思い出せた →'));
+  bar.append(g('again', t("もう一度"), 'kp-again', '1'), g('good', t("思い出せた"), 'kp-good', '3'));
+  // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
+  // pads' way after that)
+  if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　思い出せた →")));
   if (!ctx.prefs.ruleSeen) {
-    const rule = el('p', 'kp-rule', el('span', null, RULE));
+    const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
     const dismiss = () => {
       if (!savePrefQuiet({ ruleSeen: true })) return;
       rule.remove();
       fitBar();
     };
-    rule.append(btn('kp-rule-x', '×', dismiss, { id: 'kp-rule-dismiss', 'aria-label': 'このヒントを閉じる' }));
+    rule.append(btn('kp-rule-x', '×', dismiss, { id: 'kp-rule-dismiss', 'aria-label': t("このヒントを閉じる") }));
     bar.append(rule);
   }
   return bar;
@@ -4414,8 +4972,76 @@ function reveal() {
   ui.revealed = true;
   // read before any grade of this sitting: was this card answered on an earlier pass?
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
+  const from = window.scrollY;
   if (!revealInPlace()) paint();
+  windowPassage(from);
   settleBack();
+}
+
+/**
+ * The reveal does not move the page (Bunki fix round 3). At phone width, with the grade pads pinned,
+ * a passage that would push the word and its definition under the pads becomes its own window: its
+ * height is what the room above them leaves (never under WINDOW_LINES lines), and it scrolls inside
+ * the card. The page goes back to its top while the passage takes the same offset, so the text does
+ * not move; only when the target sentence is outside the window does the passage itself scroll to it
+ * (smooth; instant with reduced motion). A fold row the pads would cut is lifted wholly above them.
+ * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
+ */
+const WINDOW_LINES = 3;
+const WINDOW_REACH = 12;
+function windowPassage(from) {
+  const face = ctx.root.querySelector('#kp-card');
+  const passage = face?.querySelector('.kp-sentence');
+  const def = face?.querySelector('.kp-answer > .kp-def');
+  const bar = ctx.root.querySelector('.kp-grades');
+  if (!passage || !def || !bar || ui.screen !== 'study' || getComputedStyle(bar).position !== 'fixed') return;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const tf = getComputedStyle(def.parentElement).transform;
+  const lift = tf && tf !== 'none' ? new DOMMatrixReadOnly(tf).m42 : 0; // kp-rise: measure where it lands
+  const barTop = Math.min(innerHeight, bar.getBoundingClientRect().top);
+  const box = passage.getBoundingClientRect();
+  const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
+  let over = def.getBoundingClientRect().bottom - lift - (barTop - SETTLE_GAP);
+  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+    const r = s.getBoundingClientRect();
+    const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
+    if (!(top < barTop && bottom > barTop)) continue;
+    over += bottom - barTop + 1;
+    break;
+  }
+  if (over < 1 || box.height - over < WINDOW_LINES * line) {
+    window.scrollTo({ top: from, behavior: 'instant' });
+    return;
+  }
+  passage.style.setProperty('--kp-window-h', `${Math.floor(box.height - over) + WINDOW_REACH}px`); // + the reach it keeps above its first line (player.css)
+  passage.classList.add('kp-window');
+  passage.scrollTop = from;
+  // the target sentence in the window by the least scroll; a sentence taller than the window shows its marked word
+  const focus = passage.querySelector('.kp-s[data-focus]');
+  const mark = passage.querySelector('.kp-target, .kp-blank');
+  const view = passage.getBoundingClientRect();
+  const span = (n) => {
+    const r = n.getBoundingClientRect();
+    return [r.top - view.top + passage.scrollTop, r.bottom - view.top + passage.scrollTop];
+  };
+  const h = passage.clientHeight;
+  let want = passage.scrollTop;
+  let [a, b] = focus ? span(focus) : mark ? span(mark) : [want, want];
+  if (b - a > h && mark) [a, b] = span(mark);
+  if (b - a > h) want = (a + b) / 2 - h / 2;
+  else if (a < want) want = a;
+  else if (b > want + h) want = b - h;
+  want = Math.max(0, Math.min(passage.scrollHeight - h, Math.round(want)));
+  const edges = () => {
+    const up = passage.scrollTop > 1;
+    const down = passage.scrollTop + passage.clientHeight < passage.scrollHeight - 1;
+    if (up || down) passage.dataset.edge = up && down ? 'both' : up ? 'above' : 'below';
+    else delete passage.dataset.edge;
+  };
+  passage.addEventListener('scroll', edges, { passive: true });
+  face.addEventListener('click', () => requestAnimationFrame(edges));
+  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: motionOk() ? 'smooth' : 'instant' });
+  edges();
 }
 
 const SETTLE_GAP = 12;
@@ -4440,7 +5066,9 @@ function settleBack() {
   // the answer may still be rising into place (kp-rise, translateY 6px → 0): measure where it lands
   const t = getComputedStyle(answer).transform;
   const lift = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0;
-  const target = face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
+  // a windowed passage (windowPassage) keeps its target sentence inside its own window: the window is what must be in view
+  const windowed = face.querySelector('.kp-sentence.kp-window');
+  const target = windowed || face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
   const top = target.getBoundingClientRect().top;
   const bottom = def.getBoundingClientRect().bottom - lift;
   let dy = 0;
@@ -4494,7 +5122,9 @@ function revealInPlace() {
   if (passage) {
     const zoom = zoomFor();
     face.dataset.zoom = zoom;
-    face.querySelector('.kp-chips').append(zoomToggle(zoom));
+    // on the eyebrow's own row, which the front already sized for it: the card does not grow or shift
+    const chips = face.querySelector('.kp-chips');
+    (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) });
   face.querySelector('.kp-sentence').replaceWith(sentence);
@@ -4505,6 +5135,7 @@ function revealInPlace() {
   if (motionOk()) {
     sentence.classList.add('kp-enter');
     answer.classList.add('kp-enter');
+    polish(face, sentence);
   }
   box.querySelector('#kp-reveal')?.replaceWith(gradeBar(id));
   box.classList.add('has-bar');
@@ -4512,6 +5143,30 @@ function revealInPlace() {
   fitBar();
   fitClamps(face);
   return true;
+}
+
+/**
+ * 研ぎ出し (togidashi): one polish band crosses the card, and each reading surfaces as the band
+ * passes over it: its delay follows its place, left to right and line by line, so the readings
+ * appear in the band's wake. Transform and opacity only, and inside the reveal's 180 ms budget
+ * (band 180 ms; each reading 120 ms after at most 60 ms). Never called under reduced motion.
+ */
+function polish(face, sentence) {
+  const band = el('i', 'kp-polish');
+  band.setAttribute('aria-hidden', 'true');
+  face.append(band);
+  const drop = () => band.remove();
+  band.addEventListener('animationend', drop, { once: true });
+  setTimeout(drop, 400);
+  const box = sentence.getBoundingClientRect();
+  if (!box.width) return;
+  const view = Math.max(1, Math.min(box.height, innerHeight));
+  for (const rt of sentence.querySelectorAll('rt')) {
+    const r = rt.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (r.left - box.left) / box.width));
+    const y = Math.min(1, Math.max(0, (r.top - box.top) / view));
+    rt.style.setProperty('--kp-rt-delay', `${Math.round(x * 36 + y * 24)}ms`);
+  }
 }
 
 /** the rule under the grade bar is shown once: answering the card it sat under retires it.
@@ -4538,10 +5193,12 @@ function commit(rating, { stay = false } = {}) {
   askToKeepStorage();
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right };
+  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
   ctx.state = nextState;
   ui.done++;
   if (rating >= RATINGS.good) ui.right++;
+  const answered = ctx.index.cards.get(id)?.word;
+  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.good });
   if (stay) {
     paint();
     return;
@@ -4579,6 +5236,10 @@ function next(dir) {
   resetCard();
   const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
+  // the sitting is over: the close opens at its top, not where the last card's back was scrolled;
+  // the next front opens at its card's top (or with its marked word above the docked reveal)
+  if (ctx.root.querySelector('.kp-done')) window.scrollTo(0, 0);
+  else frameFront();
   arrive(ghost, dir);
 }
 
@@ -4603,6 +5264,15 @@ function arrive(ghost, dir) {
   if (dir) box.dataset.advance = dir;
   if (!motionOk()) return;
   box.querySelector('#kp-card')?.classList.add('kp-arrive');
+  // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
+  if (dir === 'again') {
+    const slash = el('i', 'kp-slash');
+    slash.setAttribute('aria-hidden', 'true');
+    box.append(slash);
+    const gone = () => slash.remove();
+    slash.addEventListener('animationend', gone, { once: true });
+    setTimeout(gone, 400);
+  }
   if (!ghost) return;
   const at = box.getBoundingClientRect();
   Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
@@ -4623,6 +5293,7 @@ function undo() {
   ui.pos = ui.undo.pos;
   ui.done = ui.undo.done;
   ui.right = ui.undo.right;
+  ui.log = ui.undo.log || [];
   ui.undo = null;
   resetCard();
   ui.revealed = cardMode() !== 'choice';
@@ -4690,15 +5361,40 @@ function attachSwipe(face) {
   });
 }
 
+/**
+ * The session close: the surface is clear. The words of this sitting rise off the card table
+ * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (思い出せた),
+ * again (もう一度) and the time since 始める, the recall rate, when the next review falls due,
+ * and one door: back to the deck.
+ */
 function doneScreen() {
   const box = el('section', 'kp-done');
-  box.append(topBar('おつかれさま', () => go('home')));
+  box.append(topBar(t("おつかれさま"), () => go('home')));
+  box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
+  const missed = new Set(ui.log.filter((x) => !x.ok).map((x) => x.term));
+  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, 12);
+  if (words.length) {
+    const rise = el('div', 'kp-rise');
+    rise.setAttribute('aria-hidden', 'true');
+    words.forEach((w, i) => {
+      const n = el('span', `kp-rise-w${missed.has(w) ? ' is-again' : ''}`, w);
+      n.lang = 'ja';
+      n.dataset.uiContent = 'learning';
+      n.style.setProperty('--i', String(i));
+      rise.append(n);
+    });
+    box.append(rise);
+  }
   const pct = ui.done ? Math.round((ui.right / ui.done) * 100) : 0;
-  box.append(el('div', 'kp-tiles', el('div', 'kp-tile kp-c-new', el('b', null, String(ui.done)), el('span', null, '回答')), el('div', 'kp-tile kp-c-known', el('b', null, `${pct}%`), el('span', null, '思い出せた割合'))));
+  const secs = ui.started ? Math.max(0, Math.round((Date.now() - ui.started) / 1000)) : 0;
+  const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+  const cell = (label, value, cls) => el('div', `kp-tally-c ${cls}`, el('span', null, label), el('b', null, value));
+  box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
+  box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
-  box.append(el('p', 'kp-sub', soon ? `次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。` : '今日の分は終わり。また明日。'));
-  box.append(btn('kp-start', 'デッキに戻る', () => go('home'), { id: 'kp-home' }));
-  if (ui.undo) box.append(btn('kp-undo', '↶ ひとつ戻す', undo, { id: 'kp-undo' }));
+  box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
+  box.append(btn('kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
+  if (ui.undo) box.append(btn('kp-undo', t("↶ ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
 
@@ -4706,7 +5402,7 @@ function listScreen() {
   const box = el('section', 'kp-list');
   // opened from a card (the kanji family, 参照): ← goes back to that card, as it was
   box.append(
-    topBar('語の一覧', () => {
+    topBar(t("語の一覧"), () => {
       const back = ui.from === 'study' && ui.queue[ui.pos] ? 'study' : 'home';
       ui.from = null;
       go(back);
@@ -4715,7 +5411,7 @@ function listScreen() {
   const input = el('input', 'kp-search');
   input.type = 'search';
   input.id = 'kp-search';
-  input.placeholder = '検索 — 漢字・かな・英語';
+  input.placeholder = t("検索 — 漢字・かな・英語");
   input.value = ui.q;
   box.append(input);
   const rows = el('div', 'kp-rows');
@@ -4731,7 +5427,7 @@ function listScreen() {
         el('span', 'kp-rw', el('b', null, w.term), el('small', null, w.reading)),
         el('span', 'kp-rm', w.meaning),
         el('span', 'kp-dots', w.cards.map((c) => el('i', ctx.state.cards[c.id]?.state === 2 ? 'on' : ctx.state.cards[c.id] ? 'half' : ''))),
-        el('span', `kp-chip ${cls}`, label),
+        el('span', `kp-chip ${cls}`, t(label)),
       ], () => {
         ui.open = ui.open === w.id ? null : w.id;
         draw();
@@ -4746,7 +5442,7 @@ function listScreen() {
         rows.append(det);
       }
     }
-    if (!rows.childNodes.length) rows.append(el('p', 'kp-sub', '該当する語はありません。'));
+    if (!rows.childNodes.length) rows.append(el('p', 'kp-sub', t("該当する語はありません。")));
   };
   input.addEventListener('input', () => {
     ui.q = input.value;
@@ -4758,12 +5454,12 @@ function listScreen() {
 
 function settingsScreen() {
   const box = el('section', 'kp-settings');
-  box.append(topBar('設定', () => go('home')));
+  box.append(topBar(t("設定"), () => go('home')));
   if (ctx.deck.method?.length) {
     const how = el('details', 'kp-method');
     how.id = 'kp-method';
-    how.append(el('summary', null, 'このデッキのしくみ'));
-    for (const line of ctx.deck.method) how.append(el('p', null, line));
+    how.append(el('summary', null, t("このデッキのしくみ")));
+    for (const line of ctx.deck.method) how.append(el('p', null, t(line)));
     box.append(how);
   }
   const seg = (title, key, options) => {
@@ -4781,18 +5477,18 @@ function settingsScreen() {
     wrap.append(row);
     return wrap;
   };
-  box.append(seg('一日の新しいカード', 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
-  box.append(seg('答え方', 'mode', [['read', '読んで思い出す'], ['self', '穴埋め'], ['choice', '4択']]));
-  box.append(seg('英語の意味（答えの「英語」）', 'gloss', [['tap', 'タップで開く'], ['show', 'いつも開いておく']]));
-  const themes = el('div', 'kp-field', el('h2', 'kp-h2', '色（テーマ）'));
+  box.append(seg(t("一日の新しいカード"), 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
+  box.append(seg(t("答え方"), 'mode', [['read', t("読んで思い出す")], ['self', t("穴埋め")], ['choice', t("4択")]]));
+  box.append(seg(t("英語の意味（答えの「英語」）"), 'gloss', [['tap', t("タップで開く")], ['show', t("いつも開いておく")]]));
+  const themes = el('div', 'kp-field', el('h2', 'kp-h2', t("色（テーマ）")));
   const sw = el('div', 'kp-swatches');
   sw.setAttribute('role', 'radiogroup');
-  sw.setAttribute('aria-label', '色（テーマ）');
+  sw.setAttribute('aria-label', t("色（テーマ）"));
   for (const [value, label, bg, ink] of THEMES) {
     const on = ctx.prefs.look === value;
-    const b = btn(`kp-swatch${on ? ' is-on' : ''}`, label, () => {
+    const b = btn(`kp-swatch${on ? ' is-on' : ''}`, t(label), () => {
       savePrefs({ ...ctx.prefs, look: value });
-    }, { 'data-pref': `look:${value}`, 'aria-label': label, role: 'radio', 'aria-checked': String(on), style: `background:${bg};color:${ink}` });
+    }, { 'data-pref': `look:${value}`, 'aria-label': t(label), role: 'radio', 'aria-checked': String(on), style: `background:${bg};color:${ink}` });
     sw.append(b);
   }
   themes.append(sw);
@@ -4804,21 +5500,21 @@ function settingsScreen() {
   ta.spellcheck = false;
   const msg = el('p', 'kp-sub');
   msg.id = 'kp-backup-msg';
-  const taLabel = el('label', 'kp-sub', 'バックアップの文字列');
+  const taLabel = el('label', 'kp-sub', t("バックアップの文字列"));
   taLabel.htmlFor = 'kp-backup';
-  const kept = el('p', 'kp-sub', '端末の保存領域：不明');
+  const kept = el('p', 'kp-sub', t("端末の保存領域：不明"));
   kept.id = 'kp-persist';
   navigator.storage?.persisted?.().then(
-    (yes) => (kept.textContent = `端末の保存領域：${yes ? '確保済み' : '未確保'}`),
+    (yes) => (kept.textContent = t(`端末の保存領域：${yes ? '確保済み' : '未確保'}`, `Device storage: ${yes ? 'persistent' : 'not persistent'}`)),
     () => {},
   );
   box.append(
-    el('div', 'kp-field', el('h2', 'kp-h2', 'バックアップ'), el('p', 'kp-sub', '記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。'), kept, taLabel, ta,
+    el('div', 'kp-field', el('h2', 'kp-h2', t("バックアップ")), el('p', 'kp-sub', t("記録はこの端末だけに保存されます。コピーして保管し、別の端末で貼り付けて復元できます。")), kept, taLabel, ta,
       el('div', 'kp-seg',
-        btn('', 'コピー', () => {
+        btn('', t("コピー"), () => {
           ta.value = JSON.stringify(ctx.state);
           ta.select();
-          navigator.clipboard?.writeText(ta.value).then(() => (msg.textContent = 'コピーしました。'), () => (msg.textContent = '選択しました。手動でコピーしてください。'));
+          navigator.clipboard?.writeText(ta.value).then(() => (msg.textContent = t("コピーしました。")), () => (msg.textContent = t("選択しました。手動でコピーしてください。")));
         }),
         // whole-deck reset is not offered (CARD_CONTRACT_V2 §4, STANDARD A34): a card leaves
         // through 削除 (undone by 保留中のカード › 復元), a topic through テーマ
@@ -4834,18 +5530,18 @@ function suspendedField() {
   const ids = Object.keys(ctx.state.suspended || {}).filter((id) => ctx.index.cards.has(id));
   const why = {};
   for (const id of ids) why[ctx.state.suspended[id].by] = (why[ctx.state.suspended[id].by] || 0) + 1;
-  const count = el('p', 'kp-sub', ids.length ? `${ids.length}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）` : 'ありません');
+  const count = el('p', 'kp-sub', ids.length ? t(`${ids.length}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${ids.length} cards (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
   count.id = 'kp-suspended';
-  const back = btn('', '復元', () => {
+  const back = btn('', t("復元"), () => {
     const nextState = restoreSuspended(ctx.state, new Date(), ids);
     if (!save(nextState)) return saveFailed();
     ctx.state = nextState;
     ui.undo = null;
     ui.toast = '';
     paint();
-  }, { id: 'kp-unsuspend', 'aria-label': `保留中の${ids.length}枚をすべて戻す` });
+  }, { id: 'kp-unsuspend', 'aria-label': t(`保留中の${ids.length}枚をすべて戻す`, `Restore all ${ids.length} paused cards`) });
   back.disabled = !ids.length;
-  return el('div', 'kp-field', el('h2', 'kp-h2', '保留中のカード'), el('p', 'kp-sub', '削除したカードと、つまずきが続いて休ませたカード。記録は消えていません。'), count, el('div', 'kp-seg', back));
+  return el('div', 'kp-field', el('h2', 'kp-h2', t("保留中のカード")), el('p', 'kp-sub', t("削除したカードと、つまずきが続いて休ませたカード。記録は消えていません。")), count, el('div', 'kp-seg', back));
 }
 
 const RESTORE_REFUSED = {
@@ -4867,32 +5563,32 @@ const RESTORE_NO_ROOM = '保存領域がいっぱいで、置き換えられま�
  */
 function restoreButton(ta, msg) {
   let staged = null;
-  const b = btn('', '復元', () => {
+  const b = btn('', t("復元"), () => {
     if (staged && staged.text === ta.value) return replace();
     disarm();
     let raw;
     try {
       raw = JSON.parse(ta.value);
     } catch {
-      msg.textContent = RESTORE_REFUSED.json;
+      msg.textContent = t(RESTORE_REFUSED.json);
       return;
     }
     const seen = inspectState(raw, ctx.deck);
     if (!seen.ok) {
-      msg.textContent = RESTORE_REFUSED[seen.reason] || RESTORE_REFUSED['wrong-format'];
+      msg.textContent = t(RESTORE_REFUSED[seen.reason] || RESTORE_REFUSED['wrong-format']);
       return;
     }
     const nowCards = Object.keys(ctx.state.cards).length;
     const nowLog = ctx.state.log.length;
-    msg.textContent = `このバックアップ：${seen.cards}枚・${seen.log}回答／いまの記録：${nowCards}枚・${nowLog}回答` + (seen.cards < nowCards ? '　いまより少ない記録です。' : '');
+    msg.textContent = t(`このバックアップ：${seen.cards}枚・${seen.log}回答／いまの記録：${nowCards}枚・${nowLog}回答` + (seen.cards < nowCards ? '　いまより少ない記録です。' : ''), `Backup: ${seen.cards} cards · ${seen.log} answers / Current record: ${nowCards} cards · ${nowLog} answers${seen.cards < nowCards ? ' This backup has fewer records.' : ''}`);
     staged = { text: ta.value, raw };
     b.dataset.arm = '1';
-    b.textContent = '置き換える';
+    b.textContent = t("置き換える");
   }, { id: 'kp-restore' });
   function disarm() {
     staged = null;
     delete b.dataset.arm;
-    b.textContent = '復元';
+    b.textContent = t("復元");
   }
   function replace() {
     const { raw } = staged;
@@ -4905,18 +5601,18 @@ function restoreButton(ta, msg) {
       current = null;
     }
     if (!writeRaw(ctx.storage, beforeRestoreKey(ctx.deck.id), current ?? JSON.stringify(ctx.state))) {
-      msg.textContent = RESTORE_NO_ROOM;
+      msg.textContent = t(RESTORE_NO_ROOM);
       return;
     }
     const next = normalizeState(raw, ctx.deck);
     if (!save(next)) {
-      msg.textContent = RESTORE_NO_ROOM;
+      msg.textContent = t(RESTORE_NO_ROOM);
       return;
     }
     ctx.state = next;
     ctx.notice = '';
     ui.undo = null;
-    msg.textContent = `復元しました（${Object.keys(next.cards).length}枚・${next.log.length}回答）。`;
+    msg.textContent = t(`復元しました（${Object.keys(next.cards).length}枚・${next.log.length}回答）。`, `Restored (${Object.keys(next.cards).length} cards · ${next.log.length} answers).`);
   }
   ta.addEventListener('input', () => staged && disarm());
   return b;
@@ -4957,18 +5653,20 @@ function ensureCss() {
   document.head.append(link);
 }
 
-async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null } = {}) {
+async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true } = {}) {
   ensureCss();
   const root = el('div', 'kp');
   const lexicon = hostOf(host);
   // which lexicon this player answers taps from: the corridor's, or none (the standalone pages)
+  root.lang = english ? 'en' : 'ja';
   root.dataset.host = lexicon ? String(lexicon.name || 'host') : 'none';
-  root.append(el('p', 'kp-sub', '読み込み中…'));
+  root.append(el('p', 'kp-sub', english ? 'Loading…' : '読み込み中…'));
   main.append(root);
   const { deck, index } = await loadDeck(deckId);
   const sameDeck = ctx?.deck?.id === deck.id;
   ctx = {
     root,
+    english,
     deck,
     deckKey: deckId,
     index,

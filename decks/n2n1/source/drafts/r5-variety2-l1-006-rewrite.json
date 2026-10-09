@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "六派哲学",
+   "reading": "ろっぱてつがく",
+   "pos": "noun",
+   "meaning": "the six orthodox schools of Indian philosophy",
+   "defJa": "ヴェーダの権威を認めるインドの六つの哲学体系",
+   "passage": {
+    "ja": "同じ聖典の権威を認めても、世界が何から成り、どうすれば人が解放されるかについては一致しない。インドの六派哲学は、そのような違いを保ちながらヴェーダの権威を認める、六つの主要な体系をまとめた呼び名である。例えば、正しい推論の条件を重視する立場もあれば、心の働きを静める実践を重視する立場もある。共通の土台を持つがゆえに、相手の主張を無視するだけでは済まず、知識の確かさや自己のあり方をめぐる議論が、体系の境界を越えて続いた。",
+    "form": "六派哲学",
+    "en": "Accepting the authority of the same sacred texts does not ensure agreement about the world's constitution or human liberation. The label of six orthodox systems of Indian philosophy groups six major traditions that acknowledge Vedic authority while retaining such differences. Some emphasize conditions for valid reasoning, while others emphasize practices that still mental activity. Precisely because they shared a foundation, they could not simply ignore one another, and debates over knowledge and selfhood continued across the systems' boundaries.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "ヴェーダの権威を認める主要な六体系の総称で、教義は一様ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-64daeceee9-0e51b4ac",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-64daeceee9-0e51b4ac",
+    "wordId": "nn-64daeceee9"
+   }
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+  "title": "D 白紙 Hakushi",
+  "screens": [
+    { "name": "today", "path": "index.html#/today", "settle": 2200 },
+    { "name": "read", "path": "index.html#/read", "settle": 1600 },
+    { "name": "article", "path": "index.html#/read/article", "settle": 1400 },
+    { "name": "popup", "path": "index.html#/read/popup", "settle": 1600 },
+    { "name": "learn", "path": "index.html#/learn", "settle": 1600 },
+    { "name": "front", "path": "index.html#/learn/front", "settle": 1400 },
+    { "name": "back", "path": "index.html#/learn/back", "settle": 1400 },
+    { "name": "words", "path": "index.html#/words", "settle": 1800 },
+    { "name": "me", "path": "index.html#/me", "settle": 2200 },
+    { "name": "today-ja", "path": "index.html?lang=ja#/today", "settle": 2200 },
+    { "name": "learn-ja", "path": "index.html?lang=ja#/learn/back", "settle": 1400 }
+  ],
+  "journey": [
+    { "go": "index.html#/today" }, { "wait": 620 }, { "frame": "Today · the day's word inks in (mid)" },
+    { "wait": 1500 }, { "frame": "Today · the line has arrived" },
+    { "click": ".dayword" }, { "wait": 240 }, { "frame": "match-cut · 推進 flies into the web (mid)" },
+    { "wait": 1100 }, { "click": ".node[data-key='進']" }, { "wait": 260 }, { "frame": "re-centre · 進 travels to the centre (mid)" },
+    { "wait": 900 }, { "click": ".node[data-key='隹']" }, { "wait": 1100 }, { "frame": "part · 隹 and the kanji built on it" },
+    { "click": "[data-go=read]" }, { "wait": 1100 }, { "frame": "Read · the shelf" },
+    { "click": ".story-lead" }, { "wait": 1000 }, { "frame": "the reader · picture became the hero" },
+    { "eval": "[...document.querySelectorAll('.tk')].find(n=>n.textContent.startsWith('反復')).click()" }, { "wait": 200 }, { "frame": "tap 反復 · the slip springs up (mid)" },
+    { "wait": 900 }, { "click": ".slip-keep" }, { "wait": 400 }, { "frame": "Keep · the seal presses" },
+    { "click": "[data-go=learn]" }, { "wait": 400 }, { "click": ".lstage .btn-primary" }, { "wait": 900 }, { "frame": "Learn · a card on the stage" },
+    { "click": ".reveal" }, { "wait": 380 }, { "frame": "reveal · target lifts, readings ink in (mid)" },
+    { "wait": 1200 }, { "frame": "the back · held frame, then grades" }
+  ]
+}

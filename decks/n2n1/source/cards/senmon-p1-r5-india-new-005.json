@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "機能的磁気共鳴画像法",
+   "reading": "きのうてきじききょうめいがぞうほう",
+   "pos": "noun",
+   "meaning": "functional magnetic resonance imaging",
+   "defJa": "血流などの変化から脳活動を調べる画像計測法",
+   "passage": {
+    "ja": "瞑想中の脳を色分けした画像は、心の状態を直接撮影した写真ではない。機能的磁気共鳴画像法で広く用いられる計測は、血液中の酸素の状態に関わる信号の変化を手掛かりに、脳の働きを間接的に捉える。したがって、ある部分に色が付いたという説明だけでは、何と比較して差があったのか、どのような課題を行ったのかが抜け落ちる。坐禅と別の活動を比べる図を読むに際しても、鮮やかな色の印象に加えて、実験の条件と分析の基準を確認することが解釈を支える。",
+    "form": "機能的磁気共鳴画像法",
+    "en": "A color-coded image of the meditating brain is not a direct photograph of a mental state. A widely used form of functional magnetic resonance imaging infers brain function indirectly from changes in signals related to blood oxygenation. Merely stating that a region became colored therefore omits what it was compared with and which task was performed. When reading a comparison between zazen and another activity, experimental conditions and analytic criteria support interpretation alongside the visual impact of the colors.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「画像法で計測する」。脳活動そのものと、それを推定する信号を分けている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "島皮質",
+   "reading": "とうひしつ",
+   "pos": "noun",
+   "meaning": "insular cortex",
+   "defJa": "大脳の外側の溝の奥にある皮質の領域",
+   "passage": {
+    "ja": "瞑想の本で脳の名前が出てくると、その場所さえ鍛えればいいと思いたくなるよね。島皮質は身体の内側の感覚などと関わるけれど、それだけを担当する単純な窓口ではなく、いろいろな働きに参加しているんだ。呼吸に注意を向ける課題で活動が違ったとしても、そこから直ちに、その人が自分の身体を正確に理解したとまでは言えない。だから、どこが働いたかという図と、本人が何を感じたかという報告を並べて、重なるところも、まだ説明できないところも見ていこう。",
+    "form": "島皮質",
+    "en": "When a meditation book names a brain region, it is tempting to think that training that spot will be enough. The insular cortex is involved in internal bodily sensations, among other things, but participates in multiple functions rather than serving as a simple dedicated gateway. Even a difference in activity during a breath-attention task does not immediately establish that the person perceived the body accurately. Putting activity diagrams alongside reports of experience lets us examine both their overlap and what remains unexplained.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「島皮質の活動」。身体感覚との関連を、専用の中枢という断定にしない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "安静時機能結合",
+   "reading": "あんせいじきのうけつごう",
+   "pos": "noun",
+   "meaning": "resting-state functional connectivity",
+   "defJa": "安静時の脳領域間の信号の連動を表す指標",
+   "passage": {
+    "ja": "脳の図で二つの場所が線で結ばれていても、そこに新しい神経の束が見つかったとは限りません。安静時機能結合は、特定の課題をしていないときに、離れた領域の信号がどれほど一緒に変動するかを調べるための指標です。瞑想経験のある人とない人を比べる研究でも、この線は活動の統計的な関係を示しており、解剖で確かめた配線図とは役割が異なります。線が強くなったという説明に出会ったら、何の信号を、どの時間に、どの集団で比較したかへ目を戻すと、図を具体的に読めます。",
+    "form": "安静時機能結合",
+    "en": "A line connecting two places in a brain diagram does not necessarily mean a new bundle of nerve fibers was discovered there. Resting-state functional connectivity measures how closely signals in separate regions fluctuate together when no specific task is being performed. In studies comparing meditators with non-meditators, these lines indicate statistical relationships in activity and serve a different purpose from anatomical wiring diagrams. When a connection is described as stronger, returning to which signals, times, and groups were compared makes the diagram interpretable.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「機能結合が強い」は信号の関係を述べる表現で、神経線維の本数を指さない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "集中瞑想",
+   "reading": "しゅうちゅうめいそう",
+   "pos": "noun",
+   "meaning": "focused attention meditation",
+   "defJa": "選んだ対象に注意を保ち戻す瞑想法",
+   "passage": {
+    "ja": "息を追っていたはずなのに、気付けば明日の予定を組み立てている。集中瞑想では、こうした逸れに気付き、選んだ対象へ注意を戻す働きが実践の一部となるのであって、雑念が一度も生じないことだけを成功の条件にはできない。坐る時間が長くなるにつれて、考えの内容より、注意が移った瞬間を見つけることに関心が向く場合もある。脳や認知の研究と結び付けるなら、静かに見える姿の内側で、注意を保つことと戻すことをどう区別して調べるかが具体的な問いとなる。",
+    "form": "集中瞑想",
+    "en": "While supposedly following the breath, the mind may already be planning tomorrow. In focused attention meditation, noticing this wandering and returning attention to the chosen object are part of practice, so success cannot be defined solely as having no distracting thoughts. As sitting time grows, interest may shift from the content of thoughts to detecting the moment attention moves. Connecting the practice with brain and cognitive research raises the concrete question of how to distinguish maintaining attention from returning it within an outwardly still posture.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「集中瞑想を行う」。注意を保つ働きと、逸れた注意を戻す働きを描く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "後帯状皮質",
+   "reading": "こうたいじょうひしつ",
+   "pos": "noun",
+   "meaning": "posterior cingulate cortex",
+   "defJa": "脳の内側で帯状回の後方に位置する皮質",
+   "passage": {
+    "ja": "自分のことを考え続ける時間と、呼吸へ注意を向ける時間とでは、体験の手触りが違う。その差を扱う瞑想研究で後帯状皮質が取り上げられることがあるが、一つの領域を「自我の場所」と呼ぶだけでは、問いが粗くなる。この領域は他の場所と結び付いて働くため、活動の変化から何を読み取れるかは、比較した課題や分析の仕方に応じて変わる。自分へのこだわりが薄れたという語りを大切にしながらも、その体験の意味を一枚の脳画像だけに預けない読み方が求められる。",
+    "form": "後帯状皮質",
+    "en": "Time spent absorbed in thoughts about oneself feels different from time spent attending to the breath. Meditation research sometimes examines the posterior cingulate cortex in connection with this contrast, but calling one region the seat of the ego makes the question crude. Because it operates in relation to other regions, what changes in its activity mean depends on the compared tasks and the analysis. A reading can respect reports of reduced self-preoccupation while declining to entrust the meaning of that experience to a single brain image.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "部位名と心の働きを一対一で結ばず、他領域との関係を含めて記述する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "慈悲瞑想",
+   "reading": "じひめいそう",
+   "pos": "noun",
+   "meaning": "compassion meditation",
+   "defJa": "自他の幸せや苦痛の軽減を願う心を育てる瞑想",
+   "passage": {
+    "ja": "呼吸を数える練習と、誰かの幸せを願う練習では、同じように坐っていても心の向け先が違います。慈悲瞑想では、自分や他者に温かな願いを向ける実践を通じて、人との関わり方を育てようとします。ただし、研究で用いる手順には違いがあるため、誰を思い浮かべ、どのような言葉やイメージを使ったのかを読むことが大切です。脳活動の図だけで学習の中身を判断せず、実際の課題や参加者の報告も合わせて見ると、何が変化したと述べているのかを整理できます。",
+    "form": "慈悲瞑想",
+    "en": "Counting breaths and wishing someone well direct the mind differently even when both involve sitting still. Compassion meditation seeks to cultivate ways of relating through practices that direct warm wishes toward oneself and others. Because research protocols vary, it matters whom participants imagined and which words or images they used. Considering the actual tasks and participants’ reports alongside brain activity diagrams clarifies what kind of change is being claimed.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「慈悲瞑想の実践」。名称だけでなく、願いを向ける対象と手順を示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

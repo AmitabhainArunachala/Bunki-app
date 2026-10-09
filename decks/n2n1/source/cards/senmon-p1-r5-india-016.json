@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "存在論",
+   "reading": "そんざいろん",
+   "pos": "noun",
+   "meaning": "ontology",
+   "defJa": "何があり存在するとはどういうことかを問う哲学",
+   "passage": {
+    "ja": "目の前に机があると言うのは簡単だけど、心や時間も同じようにあると言えるのかな。存在論は、何が存在し、あるとはどういうことかを問う哲学の分野で、インドの思想でも自己や世界の捉え方に関わる大事な問題なんだ。仏教が固定した実体を認めないと聞いて、机も心も何もないという意味にすると、条件によって生じるという説明を見落としてしまう。何を否定し、どんな意味であると述べるのかを比べると、普段は疑わない一言が、ずいぶん深い問いにつながっていると分かるね。",
+    "form": "存在論",
+    "en": "Saying a desk exists is easy, but do mind and time exist in the same way? Ontology asks what exists and what existence means, including questions about self and world in Indian philosophy. Reading Buddhism’s rejection of fixed essence as denying everything overlooks its account of conditioned arising. Comparing what is denied and what kind of existence is affirmed reveals the depth of an ordinary word.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「存在論の問題」。物の有無だけでなく、存在をどう捉えるかを問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "客体",
+   "reading": "きゃくたい",
+   "pos": "noun",
+   "meaning": "object (of perception)",
+   "defJa": "認識や行為の対象となるもの",
+   "passage": {
+    "ja": "呼吸に注意を向けるとき、観察する自分と観察されるものを分けて説明することができる。客体という語はこのように認識や行為の対象となる側を指すが、対象が必ず身体の外にある物だというわけではない。感情や思考も観察の対象になり得るため、瞑想の経験を論じる際には、内側と外側の区別だけでは足りなくなる。観る側と観られる側をどこまで分けられるかという問いは、インド哲学や仏教の説明を比べる入口にもなり、当たり前に置いた自己の輪郭を考え直す契機となる。",
+    "form": "客体",
+    "en": "Attention to breathing can be described through an observer and something observed. An object in this philosophical sense is what cognition or action addresses, without necessarily being outside the body. Feelings and thoughts can also become objects, complicating a simple inner-outer distinction in accounts of meditation. Comparing how Indian philosophies distinguish observer from observed invites reconsideration of assumed boundaries of self.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「認識の客体」。身体の外にある物だけでなく、心の働きも対象になり得る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "寂静",
+   "reading": "じゃくじょう",
+   "pos": "noun",
+   "meaning": "tranquility, serenity",
+   "defJa": "煩悩や乱れを離れた静かなあり方",
+   "passage": {
+    "ja": "山のお寺で音が少ないと、心まで静かになったように感じることがあるよね。でも仏教で寂静というときは、周囲が無音であることだけでなく、煩悩や心の乱れを離れたあり方に関わっているんだ。静かな部屋にいても、言い返せなかった一言を頭の中で繰り返していたら、場所の静けさと心の状態は同じではないと分かる。だから、この言葉を景色の説明として読むのか、修行や悟りを語る文脈で読むのかを確かめると、同じ静かという訳でも伝えたいことの違いに気付けるよ。",
+    "form": "寂静",
+    "en": "A quiet mountain temple can make the mind feel quieter too. In Buddhism, tranquility concerns freedom from affliction and disturbance rather than merely an absence of sound. Replaying an unanswered remark in a silent room reveals the difference between surroundings and mental state. Checking whether the word describes scenery or spiritual practice clarifies what kind of quiet is meant.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「寂静の境地」。周囲の無音と、煩悩を離れた静けさを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

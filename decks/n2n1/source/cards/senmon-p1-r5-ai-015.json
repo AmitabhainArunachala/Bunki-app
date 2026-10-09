@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "半導体不足",
+   "reading": "はんどうたいぶそく",
+   "pos": "noun",
+   "meaning": "chip shortage",
+   "defJa": "必要とされる半導体を十分に調達できない状態",
+   "passage": {
+    "ja": "半導体不足を扱う記事は、すべての種類の生産量が同時に足りなくなったという意味で読んではいけない。ある車載部品が足りなくても、別の用途向けの記憶用部品には在庫が多い場合がある。製造設備や認証の条件が異なるため、余っている製品を必要な製品へ直ちに置き換えることも難しい。状況を学ぶには、部品の種類と用途を表の別々の列に置き、注文から納入までの期間を比較するとよい。見出しの大きな言葉を具体的な製品へ分解する作業が、需要と供給のずれを読む練習になる。",
+    "form": "半導体不足",
+    "en": "An article about a chip shortage should not be read as saying that every type is simultaneously underproduced. One automotive component may be scarce while memory products for another use have plentiful inventory. Differences in manufacturing equipment and certification also make it difficult to immediately replace needed products with surplus ones. To study the situation, list component types and applications in separate columns and compare order-to-delivery times. Breaking a broad headline into specific products provides practice in reading mismatches between supply and demand.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "部品の種類、用途、時期を分けて供給量を読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "勾配降下法",
+   "reading": "こうばいこうかほう",
+   "pos": "noun",
+   "meaning": "gradient descent",
+   "defJa": "傾きの情報を使って値が小さくなる方向へ更新する方法",
+   "passage": {
+    "ja": "機械学習で誤差を減らす際、現在の設定からどちらへ動けば目的の値が下がるかを調べる方法がある。勾配降下法は、微分で得られる傾きの情報を使い、その反対方向へ設定を少しずつ更新する。坂を下る比喩は方向を理解する助けになるが、一歩が大きすぎれば谷を飛び越して値が増える場合もある。また、複雑な地形では、到達した低い場所が全体で最も低い地点とは限らない。したがって、更新回数だけを増やすのではなく、歩幅に当たる量と目的の値の推移を併せて観察することが重要である。",
+    "form": "勾配降下法",
+    "en": "When reducing error in machine learning, one can examine which direction from the current settings lowers the objective. Gradient descent uses derivative-based slope information to update the settings gradually in the opposite direction. Walking downhill helps explain the direction, but an excessively large step can overshoot a valley and increase the value. In a complex landscape, a low point reached need not be the lowest point overall. It is therefore important to monitor both the step size and the objective's trajectory rather than merely increasing the number of updates.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "進む方向だけでなく、一回に動かす幅にも注意する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "内製化",
+   "reading": "ないせいか",
+   "pos": "noun",
+   "meaning": "bringing production in-house",
+   "defJa": "外部に任せていた仕事を自社で行うようにすること",
+   "passage": {
+    "ja": "半導体事業を学ぶ際には、設計と製造を一つの仕事として扱わないことが大切である。機器の会社が設計を内製化しても、実際に回路を作る工程は外部の工場へ委託する場合がある。そのため、新聞の見出しに「自社開発」とあっても、工場まで自前で持つと読み替えてはならない。仕事の境界を図にして、仕様を決める人、回路を設計する人、製造する人を分けると、責任の所在を整理できる。費用や強みを比較する前に、記事がどの工程の変更を伝えているかを図の中に示す。",
+    "form": "内製化",
+    "en": "When studying the semiconductor business, it is important not to treat design and manufacturing as one activity. An equipment company may bring design in-house while contracting the actual fabrication of circuits to an outside factory. A headline about internal development therefore does not necessarily imply owning a factory. Mapping who specifies, designs, and manufactures a product clarifies responsibility. Before comparing costs or strengths, mark the process change described by the article on that map.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "設計から製造まで、どの工程を指すかを確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "創発",
+   "reading": "そうはつ",
+   "pos": "noun",
+   "meaning": "emergence",
+   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
+   "passage": {
+    "ja": "今日は、人工知能の規模を増やしたときに能力が急に現れたように見えるグラフを考えます。このような変化を創発と呼ぶ議論がありますが、まず採点の仕方を調べましょう。完全な正解だけを一点と数えると、少しずつ改善していた途中の変化が、得点に出ない場合があります。別の尺度で測れば滑らかな伸びが見えることもあるので、急な上昇だけから内部に新しい仕組みが生まれたと断定はできません。同じ回答を二つの方法で採点し、グラフの形がどれだけ変わるかを比べてみましょう。",
+    "form": "創発",
+    "en": "Today we will examine a graph in which an ability seems to appear suddenly as an AI system grows. Such changes are discussed as emergence, but first inspect the scoring method. Awarding a point only for a completely correct answer can conceal gradual improvements along the way. Another measure may reveal smooth progress, so a sharp rise alone does not establish that a new internal mechanism appeared. Score the same answers in two ways and compare the resulting graph shapes.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "急な変化が本物か、測り方による見え方かを確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

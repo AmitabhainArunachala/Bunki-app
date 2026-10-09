@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "演算",
+   "reading": "えんざん",
+   "pos": "noun",
+   "meaning": "computation; arithmetic or logical operation",
+   "defJa": "数や記号に定められた規則で処理を行うこと",
+   "passage": {
+    "ja": "スマホで写真を明るくするだけでも、中ではたくさんの数字が書き換えられているんだよね。画素の値を足したり、掛けたり、値を比較したりする演算が、その処理を支えているんだ。画面では一瞬に見えるからといって、内部でも一つの作業しかしていないということにはならないよ。どんな順番で処理するかによって、同じ画像を作るにも必要な計算の回数や時間が変わってくる。だから、速いチップを選ぶ話と、無駄の少ない手順を考える話は、写真を加工するときにもつながっているんだね。",
+    "form": "演算",
+    "en": "Even just brightening a smartphone photo involves changing many numbers internally. Operations such as adding, multiplying, and comparing pixel values support that processing. The fact that it looks instantaneous on screen does not mean there is only one internal operation. The order of processing can change the number of calculations and the time needed to produce the same image. That is why choosing a fast chip and designing an efficient procedure are connected even in photo editing.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "数値の計算だけでなく、比較などの論理的な処理も含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "減産",
+   "reading": "げんさん",
+   "pos": "noun",
+   "meaning": "production cuts",
+   "defJa": "製品を作る量をこれまでより減らすこと",
+   "passage": {
+    "ja": "半導体の注文が減り、倉庫に製品が積み上がっている場面を考えたい。工場が減産に踏み切れば、売れない製品を作り続けることは避けられるが、設備を維持する費用まで消えるわけではない。一方で、注文が戻ったときに必要な量を供給できるかという問題も残る。今の在庫だけを見て生産を絞りすぎれば、次の需要を取り逃がすおそれがある。経営の難しさは、目の前の余剰を解消する判断と、先の回復に備える判断とを、先行きを確実には読めない中で両立させる点にある。",
+    "form": "減産",
+    "en": "Consider a situation in which semiconductor orders fall and products accumulate in warehouses. Cutting production avoids continuing to make unsold products, but does not eliminate the cost of maintaining equipment. There is also the question of whether sufficient quantities can be supplied when orders return. Restricting output too sharply on the basis of current inventories risks missing the next wave of demand. The difficulty of management lies in balancing the reduction of today’s surplus with preparation for recovery when the outlook cannot be predicted with certainty.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「に踏み切る」「を決める」など、生産量を減らす判断と結び付く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

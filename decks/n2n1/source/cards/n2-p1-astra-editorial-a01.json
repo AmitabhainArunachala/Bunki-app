@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "高学歴",
+   "reading": "こうがくれき",
+   "pos": "noun",
+   "meaning": "advanced educational background",
+   "defJa": "大学院など、高い段階の教育を受けていること",
+   "passage": {
+    "ja": "読書会に博士号を持つ人が来ると聞いて、会う前から何を聞いても答えてくれそうだと期待したことがあるんだ。高学歴だからといって、専門外の本まで詳しく知っているとは限らないのに、経歴から勝手に人物像を作っていたんだね。逆に、相手が専門用語を使わずに話すだけで、内容も簡単なんだろうと思うのも先入観だと思う。どこで何を学んだかは会話のきっかけにできるけど、実際にどんな問いを持っているかは、その人の言葉を聞いてから知りたいよね。",
+    "form": "高学歴",
+    "en": "Once, on hearing that someone with a doctorate was coming to a reading group, I expected before meeting them that they could answer anything I asked. Although advanced education does not mean knowing all about books outside one's specialty, I had built an image of the person from their background. Conversely, assuming that content is simple just because someone speaks without technical terms also seems like a preconception. Where and what someone studied can start a conversation, but I want to learn what questions they actually have by listening to their own words.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "受けた教育の段階を表す語で、専門外の知識や人格を直接示すものではありません。",
+    "sense": "高い段階の教育を受けていること"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "製作",
+   "reading": "せいさく",
+   "pos": "noun",
+   "meaning": "making; manufacture",
+   "defJa": "道具や材料を用いて、品物を作り上げること",
+   "passage": {
+    "ja": "椅子の製作を職人に頼むなら、気に入った写真を渡すだけでなく、どんな机で誰が使うかも伝えると相談が具体的になります。机の高さに応じて座面の位置を考え、部屋の広さと使う人の体格から寸法を確かめます。木を切り始める前に模型や仮の部材で座り心地を試せば、図面だけでは判断しづらかった点に気づく場合もあります。材料を選ぶところから仕上げまでの工程を共有すると、依頼した人も、見た目の希望と丈夫さのための工夫をすり合わせながら完成を待てます。",
+    "form": "製作",
+    "en": "When commissioning a craftsperson to make a chair, explaining who will use it and at what desk makes the discussion more concrete than merely handing over a photograph you like. The seat height can be considered according to the desk, and dimensions checked against the room's size and the user's build. Trying a model or temporary components before cutting the wood may reveal points that were difficult to judge from drawings alone. Sharing the stages from material selection to finishing lets the client await completion while reconciling visual preferences with measures needed for strength.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「椅子の製作」「模型を製作する」のように、具体的な品物を作る際に使います。",
+    "sense": "道具や材料を使って品物を作ること"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "偏る",
+   "reading": "かたよる",
+   "pos": "verb",
+   "meaning": "to be skewed; to be one-sided",
+   "defJa": "一方に集中して、全体の釣り合いを欠く",
+   "passage": {
+    "ja": "賛否が分かれる題材で小論文を書くとき、引用する意見が賛成側に偏ると、反対の理由を知らないまま結論を出しかねません。推敲では、文章の流れを整える前に、どの立場の根拠を拾い、何を取り上げなかったかを点検しましょう。ただし、両側から同じ数の意見を並べれば公平になるとも限らず、資料の確かさや論点との関係も重要です。自分と異なる意見を都合よく弱めずに紹介し、その上でどこに賛成できないのかを示すと、読み手が判断の道筋を確かめられます。",
+    "form": "偏る",
+    "en": "When writing a short essay on a divisive subject, quoting views skewed toward support risks reaching a conclusion without knowing the reasons for opposition. During revision, before smoothing the prose, examine whose evidence you selected and what you left out. However, equal numbers of views from both sides do not necessarily make an account fair, since the reliability of sources and their relevance also matter. Presenting opposing views without conveniently weakening them and then specifying where you disagree lets readers examine the path of your judgment.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「意見が一方に偏る」のように、配分や視点が片側に寄ることを表します。",
+    "sense": "意見や材料が一方に集中し、釣り合いを欠く"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

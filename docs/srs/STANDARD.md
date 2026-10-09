@@ -1092,3 +1092,17 @@ work offline after one online sitting; a deck still opens offline on a first vis
 SHELL file before a new release can activate, and the release verifier
 (`verify-later-encounters.mjs`) gives that install 30 seconds; the extra weight put WebKit runners
 at risk of missing it.
+
+**A53 → S27 (2026-10-09, the learner's decision D1; amends A29 and A05).** Replaces A29's "The
+scheduled grade bar is もう一度／思い出せた only, on both decks. The four-button setting and keys 2
+and 4 are removed." with: "The scheduled grade bar is four buttons, もう一度 · 難しい · 正解 · 簡単
+(Again · Hard · Good · Easy), on every deck the player opens. They grade FSRS 1–4, keys 1–4 press them,
+and each shows the interval the pinned scheduler gives its answer. No setting changes the set." The
+rule 「答えを見て理解が深まったなら もう一度」 and its dismissal (`prefs.ruleSeen`) stay. The method
+text names the four buttons (A05). Hard counts as a recall in the sitting's tally. The ledger format,
+the `bunki-cloze:*` keys, card ids and `data/fsrs-pin.json` are unchanged; a two-button ledger (ratings 1
+and 3) loads as it is. Held by verify-kotoba-mine (the four pads in order, each key's rating and its
+stored interval against its pad, a two-button ledger taking a Hard), verify-redesign-docks (the four
+pads' hit areas above the tab bar) and tools/contrast-kotoba.mjs (each hue on its pad). Why: the
+2026-10-08 tour, D1: "Four (Again · Hard · Good · Easy) — and color coded"; CARD_CONTRACT_V2 §4,
+amendment 2026-10-09.

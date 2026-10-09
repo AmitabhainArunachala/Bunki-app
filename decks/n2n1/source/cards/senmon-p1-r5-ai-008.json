@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "スケーリング則",
+   "reading": "すけーりんぐそく",
+   "pos": "noun",
+   "meaning": "scaling law",
+   "defJa": "規模の変化と性能などの関係を表す経験的な規則",
+   "passage": {
+    "ja": "モデルを大きくしたら、どれくらい成績がよくなるかを、毎回当てずっぽうで決めたくはないよね。スケーリング則は、モデルやデータ、計算に使う量を変えたときの性能の傾向を、実験から捉えるための手がかりなんだ。ただし、観測した範囲で関係がきれいに見えたからといって、どこまでも同じ割合で賢くなるという保証にはならない。使うデータの質や評価する仕事が変われば話も変わるので、線を未来へ延ばす前に、何を測って得た線なのかを確かめると、予想と事実を混ぜずに済むよ。",
+    "form": "スケーリング則",
+    "en": "It would be useful not to guess every time how much a larger model will improve. Scaling laws help capture experimentally observed performance trends as model size, data, or computation changes. But a clear relationship within the observed range does not guarantee that intelligence will improve at the same rate indefinitely. Since data quality and the evaluated task can change the situation, checking what was measured before extending the line into the future keeps predictions distinct from facts.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "実験で確かめた範囲と、将来への予測を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シンギュラリティ",
+   "reading": "しんぎゅらりてぃ",
+   "pos": "noun",
+   "meaning": "the singularity",
+   "defJa": "技術の変化が予測困難になると想定される転換点",
+   "passage": {
+    "ja": "技術の進歩を一本の上向きの線で描けば、その先に人間の予測が及ばなくなる地点を置きたくなる。シンギュラリティという概念は、人工知能などの発展が社会を大きく変える転換点を想定する議論で使われるが、到来する時期が確定した出来事ではない。処理速度の伸びを、そのまま知性や社会の変化の速さへ置き換えるには、間にある多くの仮定を検討しなければならない。未来の大きな言葉に引かれるときこそ、どの観測からどこまで推論し、何をまだ知らないのかを分ける作業が、議論の足場を作る。",
+    "form": "シンギュラリティ",
+    "en": "Drawing technological progress as one ascending line makes it tempting to posit a point beyond human prediction. The singularity is a concept used in discussions imagining a transformative threshold in developments such as AI, not an event with an established arrival date. Turning gains in processing speed directly into gains in intelligence or rates of social change requires examining many intervening assumptions. When drawn to grand language about the future, distinguishing observations, inferences, and unknowns provides a foundation for discussion.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "実証された予定日ではなく、将来を論じる概念。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "キャッシュ",
+   "reading": "きゃっしゅ",
+   "pos": "noun",
+   "meaning": "cache",
+   "defJa": "よく使う情報を近くに置いて再利用する記憶",
+   "passage": {
+    "ja": "同じ地図を何度も開くなら、毎回遠くから全部取り寄せるより、近くに写しがあったほうが速いよね。計算機のキャッシュも、使う情報を取り出しやすい場所に置き、待ち時間を減らすための仕組みなんだ。ただし、元の地図が更新されたのに写しが古いままなら、便利さが間違った案内につながることもある。速くする工夫を考えるときは、何を保存するかに加えて、いつ捨て、いつ取り直すかも一緒に決めると、同じ情報を持っているつもりの機械同士で話が合わない理由も分かるよ。",
+    "form": "キャッシュ",
+    "en": "If you open the same map repeatedly, a nearby copy is faster than retrieving everything from far away each time. A computer cache similarly reduces waiting by keeping information in an accessible location. But if the original map changes while the copy remains old, that convenience can produce wrong directions. Deciding when to discard and refetch information alongside what to store helps explain why machines that supposedly hold the same information can disagree.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "速く取り出す利点と、古い情報が残る問題を結ぶ。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

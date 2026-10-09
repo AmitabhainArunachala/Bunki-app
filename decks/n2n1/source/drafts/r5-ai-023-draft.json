@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "日の丸半導体",
+   "reading": "ひのまるはんどうたい",
+   "pos": "noun",
+   "meaning": "Japan’s semiconductor industry",
+   "defJa": "日本の半導体産業を国の象徴に重ねた呼び方",
+   "passage": {
+    "ja": "日の丸半導体の復活を掲げる議論では、企業の事業と国家への期待が重なって語られる。だが国内に工場を置くこと、日本の企業が設計すること、国内の材料を使うことは、それぞれ異なる条件であり、一つの呼び名でまとめるだけでは実態が曖昧になる。国の象徴を用いた表現には関心を集める力がある一方、工程をまたいだ国際的な分業が見えにくくなる面もある。政策や投資を論じる際には、何の能力をどこに残したいのかを具体的に記すことが、期待を検証できる目標へ置き換える第一歩となる。",
+    "form": "日の丸半導体",
+    "en": "Calls to revive Japan’s semiconductor industry under the national flag combine corporate business with national expectations. But locating a factory in Japan, having Japanese companies design products, and using domestic materials are distinct conditions that one label can obscure. National symbolism attracts attention while potentially hiding international specialization across stages. Specifying which capabilities should be retained where is a first step in translating expectations into verifiable goals when discussing policy or investment.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "国の象徴を用いた呼び方なので、具体的な生産や所有の条件を補う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "時価総額",
+   "reading": "じかそうがく",
+   "pos": "noun",
+   "meaning": "market capitalization",
+   "defJa": "株価に発行済み株式数を掛けた企業価値の指標",
+   "passage": {
+    "ja": "半導体の会社を比べる記事で時価総額が大きいと書かれていても、その金額が会社の金庫にあるわけじゃないよ。株価に発行済みの株式数を掛けた数字だから、工場や現金を単に足した金額とは違って、市場での評価が反映されるんだ。将来への期待で株価が変われば数字も動くので、売上の順位と同じ順番になるとは限らないんだよね。企業の規模を知りたいときは、何の大きさを比べたいのかを先に決めて、売上や利益、持っている資産の数字も横に並べると整理しやすいよ。",
+    "form": "時価総額",
+    "en": "A large market capitalization in a semiconductor-company comparison does not mean that amount sits in the company’s cash box. It is share price multiplied by outstanding shares, reflecting market valuation rather than a simple sum of factories and cash. Changes in expectations move share prices and therefore the figure, so its ranking need not match sales rankings. When comparing company size, first choose what kind of size matters, then place sales, profits, and assets beside it.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "会社の保有現金とは異なり、株式市場での評価を示す指標。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "最適化",
+   "reading": "さいてきか",
+   "pos": "noun",
+   "meaning": "optimization",
+   "defJa": "条件の下で目的に最も合う状態を探すこと",
+   "passage": {
+    "ja": "工場の生産計画を最適化する課題では、まず何をよい計画と呼ぶかを決めましょう。製造時間を短くする目的と、電力の使用を抑える目的は常に一致するとは限らず、機械の台数や納期などの制約もあります。目的を一つの数値で表せたとしても、現場で重要な条件を入れ忘れれば、計算上は優れた案が実行できないことも起こります。小さな例で候補を比べ、目的の数値と守る条件を別に表へ書くことで、計算の答えが何を優先し、何を前提としているかを確かめられます。",
+    "form": "最適化",
+    "en": "In optimizing a factory production schedule, first decide what counts as a good plan. Shorter production time and lower power use do not always align, and equipment counts and deadlines impose constraints. Even with a numerical objective, overlooking an important practical condition may make the mathematically superior plan unusable. Comparing small examples with separate columns for objective values and required conditions clarifies the answer’s priorities and assumptions.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "目的と制約を定めたうえで考える語で、無条件の改善ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "最適解",
+   "reading": "さいてきかい",
+   "pos": "noun",
+   "meaning": "an optimal solution",
+   "defJa": "定めた条件の中で目的を最もよく満たす答え",
+   "passage": {
+    "ja": "配送計画の最適解を得たという報告では、何を小さくし、どんな条件を守ったのかを添えると意味が明確になります。距離を最短にした答えであっても、配達の遅れを最少にした答えと一致するとは限らず、評価の目的が変われば結論も変わります。また、探索した範囲で最もよかった案と、許された全候補の中で最もよいと保証された案は、言葉の強さを分けたいところです。説明文では「今回比べた案の中で」といった範囲を省かず、計算で確認したこと以上の保証を読み手に与えないようにしましょう。",
+    "form": "最適解",
+    "en": "A report of an optimal delivery plan becomes clearer when it states what was minimized and which conditions were enforced. The shortest-distance answer need not minimize delivery delays, and changing the objective changes the conclusion. The best plan among searched candidates also warrants different wording from a plan guaranteed best among all permitted candidates. Preserve qualifiers such as among the plans compared here so readers receive no stronger guarantee than the computation established.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "目的や許された候補の範囲を示して使い、万能な答えとしない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "期待値",
+   "reading": "きたいち",
+   "pos": "noun",
+   "meaning": "expected value",
+   "defJa": "各結果の値を起こる確率で重み付けして足した値",
+   "passage": {
+    "ja": "故障検知の仕組みを比べるために期待値を使うなら、起こり得る結果とその確率を組にして考えます。たとえば半分の確率で処理時間が一秒、残りの半分で三秒になる簡単な模型では、確率で重みを付けた平均は二秒です。ただし一回の処理が必ず二秒で終わるわけではなく、平均が同じ二つの仕組みでも、極端に遅い結果の出やすさは異なり得ます。装置を選ぶ説明では、この平均に加えて時間のばらつきや許容できる遅れも示すと、数値を実際の運用条件へ結び付けられます。",
+    "form": "期待値",
+    "en": "Using expected value to compare fault-detection systems pairs possible outcomes with their probabilities. In a simple model taking one second half the time and three seconds the other half, the probability-weighted average is two seconds. But individual runs need not last two seconds, and systems with equal averages may differ in their chance of extreme delays. Equipment comparisons connect figures to operating conditions better by including variability and tolerable delays alongside the average.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "日常語の「期待する額」と違い、確率で重みを付けた平均を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "楽観論",
+   "reading": "らっかんろん",
+   "pos": "noun",
+   "meaning": "an optimistic outlook",
+   "defJa": "将来をよい方向へ進むと見る考え",
+   "passage": {
+    "ja": "人工知能の導入で生産性が高まるという楽観論には、作業の短縮がほかの価値ある仕事へつながるという期待がある。だが下書きを速く作れても、確認や修正に多くの時間がかかれば、全体の負担が同じ割合で減るとは限らない。効果を調べる際は、導入前後の作業時間に加え、成果物の品質や担当者に移った新しい仕事も対象となる。将来の利益を説明する資料には、どの業務で何を省けるのか、残る工程にどの程度の費用がかかるのかという前提を示すことが、予測の比較を可能にする。",
+    "form": "楽観論",
+    "en": "Optimistic views that AI will raise productivity assume time saved will translate into other valuable work. But faster drafts may not reduce total burdens proportionally if checking and revision take substantial time. Evaluating effects requires looking at output quality and new tasks shifted to workers as well as before-and-after working time. Forecasts become comparable when they state which tasks can be removed in which operations and how much the remaining stages cost.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "よい見通しを指す語で、実際の効果や根拠の確かさとは別。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "機会費用",
+   "reading": "きかいひよう",
+   "pos": "noun",
+   "meaning": "opportunity cost",
+   "defJa": "ある選択のために諦めた最善の代案から得られた価値",
+   "passage": {
+    "ja": "研究予算を新しい計算装置へ振り向けるとき、請求書に載る金額だけが判断の対象ではない。同じ資金で専門家を雇い、既存の手法を検証できたなら、その代案から得られたはずの価値が機会費用となる。ただし、実行しなかった案の成果はそのまま観察できないため、想定した効果や実現の確かさを明示せずに比較すると、都合のよい数字を作りやすい。予算案には選んだ設備の利点だけでなく、退けた有力な案とその前提を添えることで、資金をどこへ置く判断だったのかを後から検討できる。",
+    "form": "機会費用",
+    "en": "When directing research funds toward new computing equipment, the invoice amount is not the only consideration. If the same funds could hire experts to test existing methods, the value forgone from that alternative is an opportunity cost. Because unrealized results cannot simply be observed, comparisons can become convenient inventions unless assumptions about effects and feasibility are explicit. Recording the strongest rejected alternative and its assumptions alongside equipment benefits lets the allocation decision be examined later.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "支払った金額ではなく、選ばなかった最善の代案の価値を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "機械学習",
+   "reading": "きかいがくしゅう",
+   "pos": "noun",
+   "meaning": "machine learning",
+   "defJa": "データから規則や判断の仕方を学ぶ技術",
+   "passage": {
+    "ja": "写真を見分ける規則を一つずつ人が書く代わりに、例を使って機械に学ばせるのが機械学習の考え方なんだ。犬と猫の写真を分ける場合でも、何を手掛かりにしたかは人が想像したとおりとは限らないから、別の写真で試すことが大事になるよ。見たことのある例だけでよい成績が出ても、新しい場面で使えるかはまだ分からないんだよね。失敗した写真を並べて、暗さや角度など共通する条件を探すと、学ぶ仕組みを作ることと、使える範囲を確かめることの違いがつかめるよ。",
+    "form": "機械学習",
+    "en": "Machine learning teaches machines through examples instead of having people write every rule for recognizing photographs. Even in separating dog and cat photos, the clues used may differ from what people imagine, making tests with other photographs important. Good performance only on familiar examples does not establish usability in new settings. Comparing failed photographs for conditions such as darkness and angle helps distinguish building a learning system from determining where it can be used.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "例から学ぶ仕組みであり、未経験の場面での正しさは別に確かめる。",
+    "sense": ""
+   }
+  }
+ ]
+}

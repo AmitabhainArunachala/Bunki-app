@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "買収",
+   "reading": "ばいしゅう",
+   "pos": "noun",
+   "meaning": "acquisition; buyout of a company or shares",
+   "defJa": "金を払って他の会社や株式を手に入れること",
+   "passage": {
+    "ja": "技術力のある小さな会社が大手の傘下に入れば、研究費や販売網を得られる可能性がある。買収によって会社を手に入れる側も、自社だけでは育てるのに時間がかかる技術や人材を確保できる。ただし、契約が成立したからといって、別々の組織が翌日から同じように動くとは限らない。意思決定の手順や報酬の仕組みが合わず、中心となる技術者が去ってしまえば、取得したはずの価値が失われるため、統合後に人が働き続ける条件まで問われる。",
+    "form": "買収",
+    "en": "A small technically capable company joining a larger group may gain research funding and sales channels. The acquiring company can obtain technologies and personnel that would take time to develop internally. Closing the deal, however, does not mean two organizations will operate in the same way the next day. If incompatible decision processes or compensation systems drive key engineers away, the expected value can disappear, making the conditions for retaining people after integration crucial.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "対価を払って会社や株式を取得する意味で、統合後の運営も重要になる。",
+    "sense": "賄賂で人心を収める意ではなく、会社や株式を買い取る意"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ef5a460db5-78ed34b8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-002.json",
+    "cardId": "nn-ef5a460db5-78ed34b8",
+    "wordId": "nn-ef5a460db5"
+   }
+  },
+  {
+   "term": "一即一切",
+   "reading": "いっそくいっさい",
+   "pos": "noun",
+   "meaning": "one is all",
+   "defJa": "一つのものと全体が隔てなく関わるという華厳の教え",
+   "passage": {
+    "ja": "茶碗の中の米粒を一つ見ても、土や水、育てた人の仕事を切り離すことはできません。華厳の一即一切という教えは、一つの存在を孤立したものとしてではなく、全体と隔てなく関わるものとして捉えます。米の例は身近な入口にすぎませんが、手元の小さなものにも広い関係が重なっていることは感じ取れます。一つを大切にすることが全体への配慮と結び付くという見方からは、数が少ないから無視してよいという発想とは異なる、ものへの接し方が生まれます。",
+    "form": "一即一切",
+    "en": "Even a single grain of rice in a bowl cannot be separated from soil, water, and the work of those who grew it. The Huayan teaching that one is all sees an individual existence as inseparably related to the whole rather than isolated. Rice provides only a familiar entry point, but it makes a wide web of relations in a small object perceptible. Seeing care for one thing as connected to care for the whole encourages a different attitude from dismissing something because its quantity is small.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "華厳で、一つの存在と全体との隔てのない関わりを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ec60c3add4-48ef71ea",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
+    "cardId": "nn-ec60c3add4-48ef71ea",
+    "wordId": "nn-ec60c3add4"
+   }
+  },
+  {
+   "term": "ジーヴァ",
+   "reading": "じーゔぁ",
+   "pos": "noun",
+   "meaning": "living soul in Jain philosophy",
+   "defJa": "ジャイナ思想で個々の生命を担う魂",
+   "passage": {
+    "ja": "小さな虫にも魂があるとすれば、一歩を踏み出すことさえ倫理上の重みを持ちます。ジャイナ思想のジーヴァは、個々の生命を担う存在として捉えられ、人間だけに限られません。この伝統では、魂が業による束縛を離れることが解脱であり、他の生命を傷つけない実践が大きな意味を持ちます。目に見える体の大小にかかわらず生命への配慮を求める立場は、生き物を人間の役に立つかどうかだけで分ける態度に、根本から問いを投げかけます。",
+    "form": "ジーヴァ",
+    "en": "If even a tiny insect has a soul, a single step carries ethical weight. In Jain thought, jiva is the entity underlying individual life and is not limited to humans. In this tradition, liberation means the soul's release from karmic bondage, giving great importance to practices that avoid harming other lives. Calling for concern regardless of visible body size fundamentally challenges treating creatures solely according to their usefulness to humans.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "ジャイナ思想では、業からの解放を目指す個々の魂を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-243d48671a-dd447f58",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
+    "cardId": "nn-243d48671a-dd447f58",
+    "wordId": "nn-243d48671a"
+   }
+  }
+ ]
+}

@@ -86,6 +86,18 @@ describe('sw.js shell', () => {
     }
   });
 
+  it('precaches the six room stylesheets, registered once after editorial.css', () => {
+    const rooms = ['today', 'read', 'learn', 'words', 'me', 'cards'].map(
+      (room) => `rooms/${room}.css`,
+    );
+    const shell = shellPaths(SW);
+    expect(shell).toEqual(expect.arrayContaining(rooms));
+    expect(shell.indexOf('rooms/today.css')).toBe(shell.indexOf('editorial.css') + 1);
+    for (const room of rooms) expect(CORRIDOR_REQUIRED_ROOTS).toContain(room);
+    const html = readFileSync(resolve(CORRIDOR, 'index.html'), 'utf8');
+    for (const room of rooms) expect(html.split(`href="${room}"`).length - 1).toBe(1);
+  });
+
   it('lists only files that exist under prototypes/corridor/', () => {
     const missing = shell.filter((path) => path !== '.' && !existsSync(resolve(CORRIDOR, path)));
     expect(missing).toEqual([]);

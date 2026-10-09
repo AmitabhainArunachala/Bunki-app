@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "評価指標",
+   "reading": "ひょうかしひょう",
+   "gloss": "evaluation metric",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-51dab0d6ad-20244cd9",
+    "wordId": "nn-51dab0d6ad"
+   }
+  },
+  {
+   "term": "買収",
+   "reading": "ばいしゅう",
+   "gloss": "acquisition; buyout of a company or shares",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-002.json",
+    "cardId": "nn-ef5a460db5-78ed34b8",
+    "wordId": "nn-ef5a460db5"
+   }
+  },
+  {
+   "term": "送電網",
+   "reading": "そうでんもう",
+   "gloss": "power grid",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-032.json",
+    "cardId": "nn-4df5acf04c-0179f6d5",
+    "wordId": "nn-4df5acf04c"
+   }
+  },
+  {
+   "term": "開発競争",
+   "reading": "かいはつきょうそう",
+   "gloss": "development race",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-49f5606bcf-910755b7",
+    "wordId": "nn-49f5606bcf"
+   }
+  },
+  {
+   "term": "頭打ち",
+   "reading": "あたまうち",
+   "gloss": "leveling off, hitting a ceiling",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "register": "学",
+   "preferTopic": "mind",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-003-r.json",
+    "cardId": "nn-5d37b60e93-dd2051ac",
+    "wordId": "nn-5d37b60e93"
+   }
+  },
+  {
+   "term": "ジーヴァ",
+   "reading": "じーゔぁ",
+   "gloss": "living soul in Jain philosophy",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
+    "cardId": "nn-243d48671a-dd447f58",
+    "wordId": "nn-243d48671a"
+   }
+  },
+  {
+   "term": "ヨーガ",
+   "reading": "よーが",
+   "gloss": "yoga (scholarly spelling)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-79c37337bc-aeb552a7",
+    "wordId": "nn-79c37337bc"
+   }
+  },
+  {
+   "term": "一即一切",
+   "reading": "いっそくいっさい",
+   "gloss": "one is all",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
+    "cardId": "nn-ec60c3add4-48ef71ea",
+    "wordId": "nn-ec60c3add4"
+   }
+  }
+ ],
+ "weave": [
+  "評価指標",
+  "買収",
+  "送電網",
+  "開発競争",
+  "頭打ち",
+  "ジーヴァ",
+  "ヨーガ",
+  "一即一切"
+ ]
+}

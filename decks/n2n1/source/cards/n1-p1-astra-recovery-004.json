@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "かねがね",
+   "reading": "かねがね",
+   "pos": "adverb",
+   "meaning": "for a long time; all along",
+   "defJa": "以前から長い間ずっと。",
+   "passage": {
+    "ja": "昔の手紙で、かねがねお会いしたいと願っておりましたって書いてあると、初対面でも急に思いついた訪問ではないんだなと分かるよね。その人は相手の仕事を前から知っていて、会う機会を待っていたと読める。ただし、丁寧な挨拶でもあるだけに、その一文だけで二人の深い交流まで想像するのは早いよ。前後の手紙の順序を確かめると、紹介を頼んだ人や、実際に訪ねた日が見えてくることもある。挨拶の言葉を入り口にして、人がどうつながっていったかを追うのが面白いんだ。",
+    "form": "かねがね",
+    "en": "When an old letter says that the writer has long wished to meet someone, you can tell that the visit was not a sudden idea even if it was their first encounter. You can read it as indicating that the writer knew of the other person’s work beforehand and had been awaiting a chance to meet. But precisely because it is also a polite greeting, that sentence alone is not enough to imagine a close relationship between them. Checking the sequence of surrounding letters can sometimes reveal whom they asked for an introduction or the day they actually visited. The interesting part is using a greeting as a starting point to trace how people became connected.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "以前から続いていた願いを表し、改まった挨拶によく使われます。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "よほど",
+   "reading": "よほど",
+   "pos": "adverb",
+   "meaning": "to a remarkable degree; very",
+   "defJa": "程度が並外れて大きいさま。",
+   "passage": {
+    "ja": "友人が普段は早く帰る店で、閉店まで陶器を眺めていたとします。それを見て、よほど気に入ったのだろうと書けば、いつもの行動と比べて関心が強かったという推測が伝わります。単に好きだったと述べるより、そう判断した理由が背後ににじむ言い方です。ただし、外から見た様子をもとにしている限り、本人の気持ちを聞いた事実とは区別しておきたいですね。文章を読み返す際には、見たこととそこから考えたことの境目が、語の選び方に表れているかを点検します。",
+    "form": "よほど",
+    "en": "Suppose a friend who normally leaves a shop quickly stays until closing time looking at pottery. Writing that they must have liked it a great deal conveys the inference that their interest was unusually strong compared with their normal behaviour. More than simply saying they liked it, the wording hints at a reason behind that judgment. As long as it is based on externally observed behaviour, however, it should be distinguished from actually hearing how the person felt. When rereading the text, check whether your word choices show the boundary between what you saw and what you inferred.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "普段との違いを根拠に、程度が特に大きいと推測する使い方です。",
+    "sense": "程度が格別に大きいこと。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

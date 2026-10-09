@@ -342,7 +342,7 @@ async function main() {
   // ----------------------------------- surface 1+2 · word tutor and examples
   console.log('\n— word-sheet tutor and graded examples');
   await openWordSheet();
-  await page.locator('#sheet .ai-ask', { hasText: '先生に聞く' }).click();
+  await page.locator('#sheet .ai-ask', { hasText: 'ask the tutor' }).click();
   await page.waitForFunction(
     () => /stub reply/.test(document.querySelector('#sheet .ai-answer')?.textContent || ''),
     null,
@@ -356,7 +356,7 @@ async function main() {
     `${tutorRows.length} rows, contextRef=${tutorRows[0]?.contextRef}`,
   );
 
-  await page.locator('#sheet .ai-ask', { hasText: '例文をつくる' }).click();
+  await page.locator('#sheet .ai-ask', { hasText: 'write examples at my level' }).click();
   await page.waitForFunction(() => document.querySelectorAll('#sheet .ai-ex').length >= 4, null, {
     timeout: 8000,
   });
@@ -674,7 +674,7 @@ async function main() {
   const tutorT0 = Date.now();
   await open('?entry=shelf');
   await openWordSheet();
-  await page.locator('#sheet .ai-ask', { hasText: '先生に聞く' }).click();
+  await page.locator('#sheet .ai-ask', { hasText: 'ask the tutor' }).click();
   await page.waitForFunction(
     () => (document.querySelector('#sheet .ai-answer')?.textContent || '').includes('thinking'),
     null,

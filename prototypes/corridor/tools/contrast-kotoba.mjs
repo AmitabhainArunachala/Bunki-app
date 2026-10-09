@@ -11,10 +11,17 @@
  *   gloss     --kp-ink-2 (English gloss, 英訳, readings, chips, level chip) on card, panel-2, page
  *   muted     --kp-mute (labels, fold markers, small print) on card, panel-2, page
  *   kind      --kp-kind-go / -ji / -bun (edge + 語・字・文法 chip) on the card
- *   state     --kp-red / -green / -amber (grade buttons, state chips) on the card; 思い出せた on its tint
+ *   state     --kp-red / -amber / -green / -blue (the four grade pads もう一度・難しい・正解・簡単, state
+ *             chips) on the card; 正解 on its tint
  *   accent    --kp-cyan on the card, the page and its own wash (答えを見る, chosen settings)
  *   pos       --kp-noun … --kp-sound (the target, the badge) on the card
  *   start     --kp-on-accent on --kp-cyan (the 始める button)
+ *   stage     --kp-stage-ink / --kp-stage-mute (the study top bar's count and 削除, the swipe hint,
+ *             the rule, ↶) on --kp-stage, the ground around the card while studying
+ *   dock      --kp-dock-ink / --kp-dock-mute (the swipe hint, the rule and its ×, ↶) on --kp-dock, the ground
+ *             under 答えを見る and the grade pads (the stage, or 藍's washi page by day)
+ *
+ * VARIANTS are measured like themes: 藍 by night (home and study) follows the app's night worlds.
  *
  * The page surface is --kp-bg with every translucent layer of --kp-tex stacked on it (the
  * textures live on the page, never on the card: aesthetics.md §5).
@@ -35,6 +42,16 @@ import { fileURLToPath } from 'node:url';
 
 const CSS_PATH = resolve(dirname(fileURLToPath(import.meta.url)), '../decks/player/player.css');
 export const THEMES = ['dark', 'ai', 'matcha', 'kokuban', 'washi', 'sakura', 'light', 'contrast'];
+/** a look's variants, measured as themes of their own: [name, look, the blocks layered on the look in
+ * cascade order]. 藍 follows the app's night worlds (html[data-theme]): its home, list, settings and
+ * close are lit text on 藍, and while studying the lit washi card sits on the 藍 stage. */
+const NIGHT = ":root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])";
+export const VARIANTS = [
+  ['ai·night', 'ai', [`${NIGHT} .kp[data-look='ai']`]],
+  ['ai·night·study', 'ai', [`${NIGHT} .kp[data-look='ai']`, `${NIGHT} .kp[data-look='ai']:has(> .kp-study)`]],
+];
+const SHEETS = [...THEMES, ...VARIANTS.map(([name]) => name)];
+const norm = (sel) => sel.replace(/"/g, "'").replace(/\s+/g, ' ').trim();
 
 /** every rule as [selector, body]; tokens are only ever declared on `.kp` and `.kp[data-look=…]`,
  * never inside @media, so the innermost-block scan is enough */
@@ -69,6 +86,11 @@ export function themeTokens(css = readFileSync(CSS_PATH, 'utf8')) {
     const t = { ...base };
     for (const [sel, body] of all) if (sel.replace(/"/g, "'") === `.kp[data-look='${look}']`) Object.assign(t, props(body));
     out[look] = t;
+  }
+  for (const [name, look, layers] of VARIANTS) {
+    const t = { ...out[look] };
+    for (const layer of layers) for (const [sel, body] of all) if (norm(sel) === norm(layer)) Object.assign(t, props(body));
+    out[name] = t;
   }
   return out;
 }
@@ -127,17 +149,19 @@ const ROWS = [
   ['gloss / chips', 4.5, ['ink-2'], ['panel', 'panel-2', 'bg']],
   ['muted', 4.5, ['mute'], ['panel', 'panel-2', 'bg']],
   ['kind', 4.5, ['kind-go', 'kind-ji', 'kind-bun'], ['panel']],
-  ['state', 4.5, ['red', 'green', 'amber'], ['panel', 'good-button']],
+  ['state', 4.5, ['red', 'amber', 'green', 'blue'], ['panel', 'good-button']],
   ['accent', 4.5, ['cyan'], ['panel', 'bg', 'accent-wash']],
   ['pos', 4.5, ['noun', 'verb', 'adj', 'adv', 'expr', 'sound'], ['panel']],
   ['start', 4.5, ['on-accent'], ['accent']],
+  ['stage', 4.5, ['stage-ink', 'stage-mute'], ['stage']],
+  ['dock', 4.5, ['dock-ink', 'dock-mute'], ['dock']],
 ];
 
 export function contrastTable(css) {
   const tokens = themeTokens(css);
   const rows = [];
   const failures = [];
-  for (const look of THEMES) {
+  for (const look of SHEETS) {
     const t = tokens[look];
     const c = (k) => colour(`var(--kp-${k})`, t);
     // the page under its texture: every translucent layer of --kp-tex stacked where they overlap
@@ -148,10 +172,12 @@ export function contrastTable(css) {
       bg,
       panel,
       'panel-2': over(c('panel-2'), panel),
-      // 思い出せた: 12% of the green over the card panel (player.css .kp-good)
+      // 正解 (Good): 12% of the green over the card panel (player.css .kp-good)
       'good-button': [0, 1, 2].map((i) => c('green')[i] * 0.12 + panel[i] * 0.88),
       'accent-wash': over(c('cyan-wash'), bg),
       accent: c('cyan'),
+      stage: over(c('stage'), bg),
+      dock: over(c('dock'), bg),
     };
     const row = { look };
     for (const [label, floor, texts, on] of ROWS) {
@@ -185,13 +211,13 @@ export const deltaE = (a, b) => {
   return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 100;
 };
 export const KIND_JI_FLOOR = 10;
-const KIND_JI_OTHERS = ['kind-go', 'kind-bun', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'cyan', 'red', 'green', 'amber'];
+const KIND_JI_OTHERS = ['kind-go', 'kind-bun', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'cyan', 'red', 'green', 'amber', 'blue'];
 /** per theme: the 字 hue, its contrast on the card, and the nearest other hue with its ΔE_ok */
 export function kindJiTable(css) {
   const tokens = themeTokens(css);
   const rows = [];
   const failures = [];
-  for (const look of THEMES) {
+  for (const look of SHEETS) {
     const t = tokens[look];
     const c = (k) => colour(`var(--kp-${k})`, t);
     const ji = c('kind-ji');
@@ -209,10 +235,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const failures = [...low, ...ji.failures];
   const cols = Object.keys(floors);
   const pad = (s, n) => String(s).padEnd(n);
-  console.log(`${pad('theme', 9)}${cols.map((c) => pad(`${c} ≥${floors[c]}`, 20)).join('')}`);
-  for (const r of rows) console.log(`${pad(r.look, 9)}${cols.map((c) => pad(r[c].toFixed(2), 20)).join('')}`);
+  console.log(`${pad('theme', 16)}${cols.map((c) => pad(`${c} ≥${floors[c]}`, 20)).join('')}`);
+  for (const r of rows) console.log(`${pad(r.look, 16)}${cols.map((c) => pad(r[c].toFixed(2), 20)).join('')}`);
   console.log(`\n字 hue (--kp-kind-ji): nearest other hue, ΔE_ok ≥ ${KIND_JI_FLOOR}`);
-  for (const r of ji.rows) console.log(`${pad(r.look, 9)}${pad(r.value, 10)}on card ${pad(r.onCard.toFixed(2), 7)}nearest ${pad(r.nearest, 9)}ΔE ${r.deltaE.toFixed(1)}`);
+  for (const r of ji.rows) console.log(`${pad(r.look, 16)}${pad(r.value, 10)}on card ${pad(r.onCard.toFixed(2), 7)}nearest ${pad(r.nearest, 9)}ΔE ${r.deltaE.toFixed(1)}`);
   console.log(failures.length ? `\n${failures.length} pair(s) under the floor:\n  ${failures.join('\n  ')}` : '\nevery pair clears its floor');
   process.exit(failures.length ? 1 : 0);
 }

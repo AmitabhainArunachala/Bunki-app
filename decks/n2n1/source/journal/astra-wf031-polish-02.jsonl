@@ -1,0 +1,1 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"弾圧": []}, "model": "deepseek-v4-pro:cloud", "secs": 12, "out": 1712, "verdicts": [{"term": "弾圧", "editor": "pass", "editorWhy": "自然な話し言葉で、弾圧が一度だけ正しい意味で使われ、文脈から意味が明確。定義も正確。", "facts": "pass", "factsWhy": "歴史資料の読み方に関する一般的な内容で事実誤認がなく、トピック・レベル・英訳も適切。"}]}

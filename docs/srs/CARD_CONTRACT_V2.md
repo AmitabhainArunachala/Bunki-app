@@ -61,7 +61,36 @@ words already enrolled. Recursion stops when the kanji give the meaning (Khatz's
 ## 4. Grading and repair
 
 - Two buttons, Again and Good. Hard and Easy are not shown. Grade only the target. On an
-  MCD card a reviewed alternative filler counts as Good.
+  MCD card a reviewed alternative filler counts as Good. *(Superseded on 2026-10-09 by the
+  amendment below: four buttons.)*
+
+> **Amendment, 2026-10-09: four grades (the learner's decision D1).** On the 2026-10-08 tour
+> he answered "Four (Again · Hard · Good · Easy) — and color coded"
+> (`docs/redesign/vision/JOHN_10-08_TOUR_FEEDBACK.md`). The first bullet above becomes:
+>
+> - Four buttons in this order: **Again · Hard · Good · Easy** (日本語 もう一度 · 難しい · 正解 ·
+>   簡単, with the seals 再 · 難 · 良 · 易). They grade FSRS ratings 1 · 2 · 3 · 4, and keys 1–4
+>   press them. Grade only the target. On an MCD card a reviewed alternative filler still counts
+>   as Good.
+> - Each button shows the interval its answer would schedule now: the engine's `preview()` under
+>   the pinned parameters (`data/fsrs-pin.json`, fuzz off), so the label is the real interval.
+> - Colour-coded with restraint. The hue goes on the word and on a 2px top edge: Again red,
+>   Hard amber, Good green, Easy blue (`--kp-red`, `--kp-amber`, `--kp-green`, `--kp-blue` of the
+>   deck's look). Only Good, the expected answer, is tinted. Each hue clears 4.5:1 on its button
+>   (`tools/contrast-kotoba.mjs`).
+> - Hard is a pass: in FSRS it means "recalled, with effort", not a lapse. The sitting's Kept
+>   count and its recall rate include it, and an answered card slides out to the right. Only
+>   Again slides left.
+> - Swipe right is Good and swipe left is Again, as before. The TheMoeWay rule below stays.
+> - **Storage does not change.** A log row was always `[cardId, rating, iso]` with a rating of
+>   1–4 (`engine.js` `grade`; RATINGS has always held all four). A ledger written by the
+>   two-button player, with ratings 1 and 3 only, loads unchanged, and the next answer adds one
+>   row after the old ones. The `bunki-cloze:<deckId>` keys, card ids, Anki identities,
+>   `data/fsrs-pin.json` and the engine's unlock constants are untouched.
+> - The deck's method text in 設定 names the four buttons (A05: "the method text, the grade
+>   bar and the keyboard map describe the same button set").
+> - The standard's matching amendment is A53 (`STANDARD.md`). It replaces A29's "もう一度／思い出せた
+>   only".
 - On-screen rule (TheMoeWay): if the back made you understand the target better, Again.
 - Delete is one tap during review and reversible for the session. Leech threshold 5;
   repair ladder in order: swap in the next-ranked passage, add a hint, suspend. Bulk culls
@@ -122,6 +151,15 @@ allows derivative audio.
 Unchanged from `brief-2026-10-04/aesthetics.md`: target coloured by part of speech, card
 edge and chip by item kind, level as a text chip, English never coloured, textures off the
 card, one reveal transition under 180 ms, reduced motion honoured, grade bar pinned.
+
+> **Amendment, 2026-10-09 (round 4 review, the learner's T2 and T8).** The front's chip row is
+> **kind · topic (or the word's group) · level · state**. The bare source chip (例文集 "Examples",
+> ニュース "News") and a written passage's register chip (講義 "Lecture") leave the front: to a
+> first-time reader they named nothing (T2: "way to generic to mean anyhting at all"), and the front
+> should be the sentence (T8: "more distinction"). The back's 出典 fold names them instead: the site or
+> author as before, and for a written passage its style in full on the first line (文体 講義・本の要約,
+> "Style Lectures and book summaries"). The register codes, their data and the per-register
+> measurement in §10 are unchanged.
 
 ## 10. Measurement
 

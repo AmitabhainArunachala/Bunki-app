@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "顕現",
+   "reading": "けんげん",
+   "pos": "noun",
+   "meaning": "manifestation",
+   "defJa": "隠れていたものや神聖な存在が姿を現すこと",
+   "passage": {
+    "ja": "神や仏が人の前に姿を現したとする物語は、寺社の由来を語る資料にも見られる。顕現という語は、こうした神聖な存在が現れる場面を表す際に用いられ、単に人が到着したという説明より宗教的な意味を強く帯びる。史料の文章を要約する場合、そこに記された信仰上の出来事と、記録の成立を調べる歴史研究とは、扱う問いを分けることができる。誰に、どこで、どのような姿を示したと語られるかを読み取れば、その土地が聖なる場所とされた理由も具体的になる。",
+    "form": "顕現",
+    "en": "Stories of kami or Buddhas appearing before people occur in sources describing the origins of temples and shrines. Manifestation is used for such appearances of sacred beings and carries stronger religious significance than simply saying someone arrived. Summarizing a source can distinguish its narrated religious event from historical research into the making of the record. Reading who was said to see which form and where makes the place’s sacred status more concrete.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「神仏が顕現する」。信仰上の出現を記述する、硬い文体の語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "顕教",
+   "reading": "けんぎょう",
+   "pos": "noun",
+   "meaning": "exoteric Buddhism",
+   "defJa": "教えを明らかな言葉で説くものを指す密教側の分類",
+   "passage": {
+    "ja": "同じ仏教でも、どの立場から全体を分類するかによって、地図の描き方は変わります。顕教という呼び名は、教えを明らかな言葉で説く側を、密教との対比で位置付ける語であり、特定の一宗派の名前ではありません。密教の文献にこの区別が出てきたら、説明の仕方や修行の伝え方について、書き手が何を重視しているかを見ると理解が進みます。外からすべてを同じ基準で分けた一覧だと思わず、分類そのものにも教義上の視点が含まれると押さえることが、原典を読む手掛かりになります。",
+    "form": "顕教",
+    "en": "Even within Buddhism, the map changes depending on the standpoint from which its traditions are classified. Exoteric teaching positions openly articulated teachings in contrast with esoteric Buddhism rather than naming one particular denomination. When this distinction appears in an esoteric text, examining what the author values in explanation and transmission clarifies its purpose. Recognizing that the classification itself contains a doctrinal perspective helps readers avoid mistaking it for a neutral external inventory.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「顕教と密教」。分類する側の立場を含む語で、一宗派の固有名ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "龍樹",
+   "reading": "りゅうじゅ",
+   "pos": "noun",
+   "meaning": "Nāgārjuna",
+   "defJa": "縁起と空を論じたインド大乗仏教の思想家",
+   "passage": {
+    "ja": "何もかも存在しないと言うだけなら、日々の行為や他者への責任まで足場を失ってしまう。龍樹の空をめぐる議論は、ものが他に依存せず独立して成り立つという見方を問い、縁起と切り離せない形で読まれてきた。ある物の性質を説明するにも、その物だけを取り出して済ませず、条件や関係に目を向けるところに思考の転換がある。日本の仏教で使われる「空」を、ただの虚無という訳語に閉じ込めないためにも、否定されるのが何であるかを丁寧に追う読書が意味を持つ。",
+    "form": "龍樹",
+    "en": "Simply declaring that nothing exists would undermine everyday action and responsibility toward others. Nagarjuna’s arguments about emptiness question independent existence and have been read as inseparable from dependent arising. A shift in thinking occurs when explaining a thing’s properties involves its conditions and relationships rather than isolating it. Carefully following what is being denied helps prevent the Buddhist term emptiness used in Japan from being confined to mere nothingness.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「龍樹の思想」。空を虚無と同一視せず、縁起との関係から述べる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

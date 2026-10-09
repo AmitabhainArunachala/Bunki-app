@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "聖地",
+   "reading": "せいち",
+   "pos": "noun",
+   "meaning": "sacred site; holy place",
+   "defJa": "宗教上、特別に神聖とされる土地",
+   "passage": {
+    "ja": "巡礼に行きたいと思いながら、何年も足が向かないでいる、という小さなためらいの中に、案外大きな問いが潜んでいる。聖地に限らず、座る場所はどこでも修行の場になりうる、という考えは、禅の伝統にも古くから見出せる。けれども、特定の土地へ身体ごと移動するという行為が、信仰に確かな形を与えてきたこともまた、動かしがたい事実である。大切なのは、場所そのものの効力を信じるか否かではなく、自らの注意をどこへ向けるかを、その土地が問いかけてくれる点にある。",
+    "form": "聖地",
+    "en": "Within the small hesitation of wanting to go on pilgrimage yet never setting out for years, a surprisingly large question lies hidden. The thought that any place where one sits can become a site of practice, not only sacred sites, can be found in the Zen tradition as well. Yet it is also an undeniable fact that the act of moving one's whole body to a particular place has given faith a definite form. What matters is not whether one believes in the power of the place itself, but the point that the land keeps posing the question of where one directs one's own attention.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「聖地巡礼」「聖地に足を運ぶ」のように「巡礼」と結びつく。信仰の対象となる土地を指す硬めの語。",
+    "sense": "宗教上の神聖な土地の意。転じて、作品の舞台を訪れる用法もある。"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "聖者",
+   "reading": "せいじゃ",
+   "pos": "noun",
+   "meaning": "saint; holy person",
+   "defJa": "徳が高く、神聖な人格とされる人",
+   "passage": {
+    "ja": "この前さ、インド哲学の本を読んでたら、悟った人の呼び方がいくつも出てきて、頭の中がごちゃごちゃになったんだよね。修行を積んだ人を指す言葉が、覚者とか尊者とかずらっと並んでて、どれも似たような感じに見えるんだけどさ。でも聖者だからといって、空を飛ぶとか奇跡を起こすとかいう話じゃなくて、要は執着が薄れて悟りに近づいた人を指す言葉らしいよ。言葉の幅が広いぶん、使いどころはけっこう難しそうで、書くときは文脈をちゃんと見ないと変になりそうだよね。",
+    "form": "聖者",
+    "en": "So the other day I was reading a book on Indian philosophy, and all these names for enlightened people kept coming up, and my head turned into a jumble. Terms for those who have accumulated practice, like the awakened one and the revered one, lined up in a row, and they all look pretty much the same. But just because someone is called a saint, it does not mean the term implies flying through the sky or working miracles; apparently it basically points to a person whose attachments have thinned and who has drawn close to awakening. Since the word covers so much ground, finding the right moment to use it seems tricky, and if you write it without watching the context, it can come out strange.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「聖者だからといって」のように理由を打ち消す文脈でも使われ、悟りや徳と結びつく硬い呼称である。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "聖典",
+   "reading": "せいてん",
+   "pos": "noun",
+   "meaning": "scripture; sacred text",
+   "defJa": "宗教で、教えのよりどころとされる神聖な書物",
+   "passage": {
+    "ja": "仏教の経典をめぐる研究では、聖典として信仰の対象に置く読み方と、歴史資料として成立過程を調べる読み方を、まず区別する。この区別がないと、同じ原典の一文が「仏陀の言葉」なのか「後代の編集によるもの」なのか、議論がかみ合わなくなる。文献学の進展に伴って、個々の経の成立年代の見直しが進み、定説だった解釈がいくつも書き改められてきた。一方で、信仰の側もまた、自らの読みが歴史の中で形づくられたことを知ったうえで、教えの意味を問い直す余地を残している。",
+    "form": "聖典",
+    "en": "In the study of Buddhist scriptures, scholars first distinguish between reading the texts as sacred scripture, an object of faith, and reading them as historical sources whose process of formation can be examined. Without this distinction, debate over whether a given line of the original text represents the Buddha's own words or later editing simply fails to connect. As philology has advanced, the dating of individual sutras has been repeatedly revised, and interpretations once accepted as established have been rewritten one after another. The side of faith, meanwhile, retains room to reconsider the meaning of the teachings, knowing that its own readings took shape within history.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「聖典として読む」「聖典の権威」のように、信仰や権威と結び付けて使われる硬い言葉である。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "菩薩",
+   "reading": "ぼさつ",
+   "pos": "noun",
+   "meaning": "bodhisattva; one who seeks awakening for all",
+   "defJa": "悟りを求め、人々を救う道の実践者",
+   "passage": {
+    "ja": "同じ仏教の言葉でも、どの文献を開くかによって、その使われ方がまるで違うということがある。初期の経典では、菩薩はほぼ専ら、悟りを開く前の釈尊を指す語で、本生譚の主人公もその一人だった。ところが大乗の経典群を通じて、この語の射程は一気に広がり、数えきれない存在がその名で呼ばれ、衆生を救う慈悲の誓いの担い手となっていく。このずれを押さえることは、後代の像を原典に読み込む読み違えを避けることでもあり、大乗という運動の志向を知る手がかりでもある。",
+    "form": "菩薩",
+    "en": "Even within the same Buddhist vocabulary, which text you open can make the usage of a word entirely different. In the early scriptures, bodhisattva was a term referring almost exclusively to Shakyamuni before his awakening, and the heroes of the birth stories were among its referents. Through the Mahayana scriptures, however, the range of the word expanded at a stroke: countless beings came to be called by this name, becoming bearers of the vow of compassion to save all beings. Grasping this shift both avoids the misreading that reads later images back into the original texts and offers a clue to what the movement called Mahayana aspired to.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏教の尊格を指す硬い語で、「菩薩行」「菩薩像」のように使う。慈悲と誓いと結びつくのがこの語の中心。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "至福",
+   "reading": "しふく",
+   "pos": "noun",
+   "meaning": "supreme bliss, perfect happiness",
+   "defJa": "この上なく満ち足りた、深い幸せ",
+   "passage": {
+    "ja": "サンスクリットの「アーナンダ」という語は、深く静かな喜びを意味し、日本語ではしばしば至福と訳される。ウパニシャッドの伝統では、自己の最も内側の層を、純粋な喜びからできた鞘として描き、存在の芯に歓びを置いた。後の不二一元論は、ブラフマンを「存在・意識・歓喜」という三つの語で表し、この系譜をさらに深めていった。瞑想を重ねた修行者の記録には、感覚の快さをはるかに超えた、言葉では形容できない境地に至るという描写が、時代を越えて繰り返し現れる。",
+    "form": "至福",
+    "en": "The Sanskrit word ānanda means a deep, quiet joy, and in Japanese it is often rendered as bliss. In the Upanishadic tradition, the innermost layer of the self was depicted as a sheath made of pure joy, placing delight at the core of being. Later nondualism expressed Brahman with the three words being, consciousness, and joy, deepening this lineage further. In the records of practitioners who accumulated meditation, descriptions of reaching a state beyond words, far surpassing the pleasantness of the senses, appear again and again across the ages.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「至福の瞬間」「至福に浸る」のように、深い幸せを静かに言う語。宗教や哲学の訳語としても定着している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

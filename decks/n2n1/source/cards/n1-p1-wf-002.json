@@ -199,28 +199,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "ありのまま",
-   "reading": "ありのまま",
-   "pos": "adverb",
-   "meaning": "as it is, frankly",
-   "defJa": "手を加えず事実のとおりであるさま",
-   "passage": {
-    "ja": "「ありのままの自分を受け入れよう」という言葉は、聞こえはよいものの、実行するのは難しい。事実を見るには、見たくない部分から目をそらさない力が要る。ところが私たちは、自分に都合のよい物語を頭の中で編集し、それを事実だと思い込む。仏教の瞑想が教えるのは、一切の評価を加えずに、起きていることをただ眺めるという地味な技術だ。それを続けるうちに、心の動きは、少しずつ見えるようになる。",
-    "form": "ありのまま",
-    "en": "The phrase \"let's accept ourselves as we are\" sounds nice, but it is hard to practice. To see the facts, one needs the strength not to look away from the parts one does not want to see. Yet we edit a story convenient to ourselves in our heads and take it to be fact. What Buddhist meditation teaches is the plain skill of merely watching what is happening without adding any evaluation. As you continue, the movements of the mind gradually become visible.",
-    "register": "論",
-    "topic": "mind",
-    "tipJa": "ありのままの姿・ありのまま話すのように、飾らず事実どおり。",
-    "sense": ""
-   },
-   "deck": "n1",
-   "field": null,
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "あくどい",
    "reading": "あくどい",
    "pos": "i-adj",

@@ -66,8 +66,11 @@
     const focus = (id) => {
       requestAnimationFrame(() => document.getElementById(id)?.focus({ preventScroll: true }));
     };
+    const levelName = value => value === 'unknown' ? tx('級未設定', 'No level given')
+      : tx(value, value === '配当外' ? 'Outside assigned grades' : String(value).includes('級')
+        ? `Grade ${String(value).replaceAll('準', 'pre-').replaceAll('級', '')}` : value);
     const collectionName = (collection) => {
-      const level = collection.level === 'unknown' ? tx('級未設定', 'No level given') : collection.level;
+      const level = levelName(collection.level);
       if (collection.family === 'kanken') return `${tx('漢検', 'Kanji Kentei')} · ${level}`;
       return `JLPT · ${level} · ${collection.kind === 'kanji' ? tx('漢字', 'Kanji') : tx('語彙', 'Vocabulary')}`;
     };
@@ -120,11 +123,11 @@
       [tx('公式：各レベルの目安', 'Official: what each level means'), 'https://www.jlpt.jp/e/about/levelsummary.html'],
       [tx('公式：試験の科目と時間', 'Official: test sections and timing'), 'https://www.jlpt.jp/e/guideline/testsections.html'],
     ]);
-    const kankenExplainer = () => explainer('kankenInfoOpen', tx('漢検とは？', 'What is Kanji Kentei (漢検)?'), [
+    const kankenExplainer = () => explainer('kankenInfoOpen', tx('漢検とは？', 'What is Kanji Kentei?'), [
       tx('日本漢字能力検定（漢検）は、漢字の読み・書き・意味を測る日本の検定です。10級がいちばんやさしく、1級がいちばん難しい級です。「準2級」「準1級」は、その級の一つ手前の段階です。',
-        'The Japan Kanji Aptitude Test (漢検, Kanji Kentei) checks reading, writing and the meaning of kanji. 10級 is the easiest grade and 1級 the hardest. 準 means “one step before”: 準1級 comes just before 1級.'),
+        'The Japan Kanji Aptitude Test (Kanji Kentei) checks reading, writing and the meaning of kanji. Grade 10 is the easiest and grade 1 the hardest. A pre-grade is one step before that grade: pre-1 comes just before grade 1.'),
       tx('10級から5級は、日本の小学1年生から6年生で習う漢字にあたります。JLPT とは別の検定で、級どうしは対応しません。',
-        'Grades 10級 to 5級 match the kanji taught in Japanese elementary school, years 1 to 6. It is a separate test from the JLPT, and the two sets of levels do not line up.'),
+        'Grades 10 to 5 match the kanji taught in Japanese elementary school, years 1 to 6. It is a separate test from the JLPT, and the two sets of levels do not line up.'),
     ], [
       [tx('公式：各級の程度と漢字の数', 'Official: each grade and its kanji'), 'https://www.kanken.or.jp/kanken/grades/overview/'],
     ]);
@@ -146,7 +149,7 @@
         )),
         node('p', null, tx(
           'JLPT の級は資料ごとのタグです。現在の試験には公式の語彙・漢字・文法の網羅的な出題一覧はありません。辞書層と語彙層を合わせ、N1 も収録。級が異なる項目は各資料の級に表示し、相違を明記しています。漢字の JLPT タグは別資料です。',
-          'Bunki groups these entries using the level labels in its dictionaries. The JLPT does not publish a complete list of the vocabulary, kanji or grammar that can appear on the exam. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
+          'KAIRO groups these entries using the level labels in its dictionaries. The JLPT does not publish a complete list of the vocabulary, kanji or grammar that can appear on the exam. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
         )),
       );
       const jlptLink = node('a', null, tx('JLPT 公式ガイドブック · Q7–Q8', 'Official JLPT guidebook · Q7–Q8'));
@@ -156,7 +159,7 @@
       body.append(jlptLink);
       body.append(node('p', null, tx(
         '従来のアプリ内の配当表は 2,453 字ですが、参考書庫では拡張された収録資料も統合し、異体字・字形未収録の記録も残しています。各級の数はその級に配当された記録で、下の級を含む累計ではありません。準1級・1級の公式範囲すべての保証ではありません。1/準1級、準1級、配当外、級未設定などの資料上の区分は、推測で再分類せず残しています。',
-        'The original app’s Kentei table contains 2,453 characters; this reference adds the extended committed Kentei corpus, including variant forms and source records without a Unicode glyph. Counts are distinct records assigned to a grade, not cumulative exam targets. They are not proof of official exam completeness (approximately 3,000 characters at 準1級 and 6,000 at 1級). Explicit source bins, including 1/準1級, 準1級, 配当外, and unassigned metadata, remain separate; no grade is guessed.',
+        'The original app’s Kentei table contains 2,453 characters; this reference adds the extended committed Kentei corpus, including variant forms and source records without a Unicode glyph. Counts are distinct records assigned to a grade, not cumulative exam targets. They are not proof of official exam completeness (approximately 3,000 characters at pre-1 and 6,000 at grade 1). Explicit source bins, including grade 1/pre-1, pre-1, outside assigned grades, and unassigned metadata, remain separate; no grade is guessed.',
       )));
       const kankenLink = node('a', null, tx('日本漢字能力検定 · 各級の概要', 'Official Kanji Kentei grade overview'));
       kankenLink.href = 'https://www.kanken.or.jp/kanken/grades/overview/';
@@ -211,7 +214,7 @@
       if (collection.level === 'unknown') card.classList.add('reference-level-unknown');
       // the level's own colour (shared with the JLPT room): N5 green → N1 crimson
       if (/^N[1-5]$/u.test(collection.level)) card.dataset.level = collection.level;
-      const name = collection.level === 'unknown' ? tx('級未設定', 'No level given') : collection.level;
+      const name = levelName(collection.level);
       const heading = node('span', 'reference-level-name', name);
       const count = node('span', 'reference-level-count', number(collection.count));
       count.append(node('span', 'reference-count-unit', collection.kind === 'kanji' ? tx('件', 'kanji') : tx('語', 'words')));
@@ -229,7 +232,7 @@
 
     function overview(root) {
       const head = node('header', 'reference-heading');
-      head.append(node('p', 'reference-eyebrow', tx('参考書庫', '参考書庫 / REFERENCE')));
+      head.append(node('p', 'reference-eyebrow', tx('参考書庫', 'REFERENCE')));
       const title = node('h1', 'reference-title', tx('JLPT と 漢検の参考書庫', 'Reference library'));
       title.id = 'reference-title';
       title.tabIndex = -1;

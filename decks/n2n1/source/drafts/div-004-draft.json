@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "不透明",
+   "reading": "ふとうめい",
+   "pos": "na-adj",
+   "meaning": "unclear; opaque",
+   "defJa": "事情や先行きがはっきり分からないこと",
+   "passage": {
+    "ja": "文章を自動で作るサービスが安く使えても、来年の利用条件まで同じとは限りません。料金の決まり方やデータの扱いが不透明なまま仕事の中心に置くと、条件が変わった際に移行の費用が膨らむ恐れがあります。導入時には今の便利さに目が向きがちですが、保存した文章を取り出せるか、別の仕組みでも続きを進められるかも確認したいところです。見通せない部分を無理に予測で埋めるより、何が決まったら計画を見直すのかを先に決めるほうが、判断を整理できます。",
+    "form": "不透明",
+    "en": "Even if a service for automatically generating text is inexpensive now, its terms of use may not be the same next year. Making it central to work while its pricing and data practices remain unclear risks increasing migration costs when the terms change. Convenience tends to attract attention at introduction, but it is also worth checking whether saved text can be retrieved and work continued in another system. Rather than filling unknowns with forced predictions, deciding what developments would trigger a review can make decisions more orderly.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "ここでは光を通さない意味ではなく、先を見通せないことです。",
+    "sense": "事情や将来の見通しがはっきりしないこと"
+   }
+  },
+  {
+   "term": "主導権",
+   "reading": "しゅどうけん",
+   "pos": "noun",
+   "meaning": "initiative; leadership",
+   "defJa": "物事の進め方を中心となって決める力や立場",
+   "passage": {
+    "ja": "便利な開発道具に仕事を集めるほど、その提供元が仕様を変えたときの影響も大きくなる。道具を選んでいるつもりでも、データを別の場所へ移せなければ、実際には提供元が事業の主導権を握る場面が生まれ得る。利用する企業は契約を結ぶに先立って、成果物を取り出す権利や、サービス終了時の対応まで確かめる必要がある。技術の選択を速度や価格だけで比べず、将来も自分たちで進路を決められるかという観点を加えることで、依存の深さが見えてくる。",
+    "form": "主導権",
+    "en": "The more work is concentrated in a convenient development tool, the greater the impact when its provider changes the specifications. Even if a company thinks it is choosing its tools, being unable to move its data elsewhere can create situations in which the provider effectively holds the initiative in its business. Before signing a contract, user companies need to check their right to retrieve work products and arrangements for service termination. Comparing technologies not only by speed and price but also by whether the company can keep choosing its own direction reveals the depth of its dependence.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「主導権を握る」は、相手に従うのでなく進め方を決めること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "出遅れ",
+   "reading": "でおくれ",
+   "pos": "noun",
+   "meaning": "late start; lagging behind",
+   "defJa": "周囲より取り掛かりが遅くなること",
+   "passage": {
+    "ja": "半導体の新たな製造技術を導入する際、設備を買いそろえただけで、安定した量産が始まるとは限らない。競合への出遅れを取り戻そうと急ぐあまり、試験工程で見つかった問題を残せば、後の修正に時間がかかる恐れがある。装置の条件を合わせる作業と、異常の原因を判断できる人材の育成は、並行して進める必要がある。投資の規模だけを比べるのでなく、試作で得た経験を次の工程へどう引き継ぐかを見ることが、生産体制の実力を評価する手掛かりとなる。",
+    "form": "出遅れ",
+    "en": "Introducing new semiconductor manufacturing technology does not necessarily lead to stable mass production simply by purchasing the equipment. In excessive haste to make up for a late start against competitors, leaving problems found during testing unresolved risks time-consuming corrections later. Adjusting equipment conditions and developing people who can diagnose abnormalities need to proceed in parallel. Looking at how experience from trial production is passed to the next stage, rather than comparing investment size alone, provides a clue to the production system’s actual capabilities.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「出遅れを取り戻す」は、開始の遅さによる差を埋めること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "急務",
+   "reading": "きゅうむ",
+   "pos": "noun",
+   "meaning": "urgent task",
+   "defJa": "他より優先して急いで取り組むべき仕事",
+   "passage": {
+    "ja": "社内文書を検索する仕組みが誤った回答を返し、それを確かめずに顧客へ送る状況を想定してみる。こうした運用では、検索の速度を上げること以上に、回答の根拠を検証する手順の整備が急務となる。利用範囲の拡大に伴って、誰が誤りを発見し、どこへ報告するのかが曖昧なままでは、同じ間違いが別の部署にも広がり得る。責任の所在を決めるだけで安心せず、訂正された内容が次の回答へ反映されるところまで、仕事の流れをつなぐ必要がある。",
+    "form": "急務",
+    "en": "Imagine an internal document search system returning an incorrect answer that is then sent to a customer without checking. In such an operation, establishing a procedure to verify the answer’s basis becomes more urgent than increasing search speed. As use expands, leaving unclear who detects errors and where to report them can let the same mistake spread to other departments. Assigning responsibility alone should not be reassuring; the workflow needs to extend through to having corrected information reflected in subsequent answers.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「対応が急務となる」のように、先延ばしできない課題をいう。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "掌握",
+   "reading": "しょうあく",
+   "pos": "noun",
+   "meaning": "grasp, command",
+   "defJa": "人や組織を意のままに動かせる状態に置くこと",
+   "passage": {
+    "ja": "王が代わったという知らせだけでは、その国の政治が誰の意向で動くようになったかは分からない。新しい王が権力を掌握したと言えるかどうかは、軍を動かし、役人を任命し、財源を確保する命令が実際に届く範囲を調べて判断すべきである。立派な称号を持つ一方で、地方の有力者が反対すれば何も決められない場合も考えられる。王位の継承を記した短い一行の背後には、命令を受け入れさせるための交渉や、従来の取り決めを変える長い過程が隠れている。",
+    "form": "掌握",
+    "en": "News that a king has changed does not tell us whose wishes now drive the country’s politics. Whether the new king can be said to have seized power should be judged by examining how far his orders to move troops, appoint officials, and secure revenue actually reach. A ruler may hold an impressive title yet be unable to decide anything if local power holders object. Behind a brief line recording succession to the throne lie negotiations to secure obedience and a long process of changing existing arrangements.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「権力を掌握する」は、実際に支配する力を手中に収めること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "未曾有",
+   "reading": "みぞう",
+   "pos": "na-adj",
+   "meaning": "unprecedented",
+   "defJa": "これまで一度もなかったこと",
+   "passage": {
+    "ja": "災害の記録を読んでいると、書き手が被害の大きさに圧倒され、過去の出来事と比べる言葉を失う場面に出会います。「未曾有の事態」と記された箇所を引用するに際しては、それが当時の人の受け止め方なのか、資料を比べた上での判断なのかを区別しましょう。残っている記録が少ない時代まで含めて、史上最大だったと断定するには慎重さが必要です。驚きの強さを伝える表現と、被害の規模を示す情報を分けて読むと、文章の切実さを保ちながら根拠も確かめられます。",
+    "form": "未曾有",
+    "en": "Reading disaster records, we encounter moments when writers are overwhelmed by the damage and lose the words to compare it with past events. When quoting a description of an unprecedented situation, distinguish whether it expresses how contemporaries experienced it or a judgment based on comparison of sources. Declaring something the greatest ever requires caution when the claim includes eras with few surviving records. Reading expressions of profound shock separately from information about the damage’s scale lets us check the evidence while preserving the text’s urgency.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「未曾有の災害」のように、前例のない規模や事態を表します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "名場面",
+   "reading": "めいばめん",
+   "pos": "noun",
+   "meaning": "famous scene, memorable scene",
+   "defJa": "作品や出来事の中で特に印象深く優れた一場面",
+   "passage": {
+    "ja": "舞台で父と娘が向かい合い、長い沈黙のあとに片方が椅子を少し引くだけで、客席の空気が変わることがある。何が語られたかだけを数えていては、こうした名場面がなぜ心に残るのかを説明しきれない。それまで席を譲らなかった人物が相手のために場所を空けたと分かれば、小さな動作にも関係の変化を読み取れる。強い言葉を並べるかわりに、観客が覚えている以前の振る舞いと今の動きを響かせることで、舞台には台詞の量を超えた余韻が生まれる。",
+    "form": "名場面",
+    "en": "On stage, a father and daughter may face one another, and after a long silence one of them merely moves a chair slightly, changing the atmosphere in the audience. Counting only what was said cannot fully explain why such memorable scenes stay with us. If we understand that a person who previously refused to yield a seat has now made room for the other, even a small movement reveals a change in their relationship. Letting the present action resonate with earlier behavior remembered by the audience, instead of piling up powerful words, gives the stage a lingering effect beyond the quantity of dialogue.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "物語や試合などで、心に残る優れた場面をいう。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引き受ける",
+   "reading": "ひきうける",
+   "pos": "verb",
+   "meaning": "to undertake, to take on",
+   "defJa": "頼まれた仕事や責任を自分の担当として受け持つ",
+   "passage": {
+    "ja": "町内の読書会で司会を頼まれたとき、好きな本の話ならできると思って、詳しい段取りを聞かずに返事をしそうになったんだ。仕事を引き受けるからには責任があるし、当日しゃべる以外に、会場の準備や参加者への連絡も必要なのかを確かめたいよね。苦手な調整まで一人で抱えてから困るより、どこまで自分が担当して、どこを手伝ってもらうか、先に話しておくほうがやりやすい。頼みを断らないことと、約束した役割を最後まで果たせることは、分けて考えたいんだ。",
+    "form": "引き受ける",
+    "en": "When I was asked to host the neighborhood book club, I thought I could talk about books I liked and almost agreed without asking about the arrangements. Taking on a job brings responsibility, so I want to check whether it includes preparing the venue and contacting participants as well as speaking on the day. It is easier to discuss in advance what I will handle and where I will need help than to struggle after taking on all the coordination I find difficult. I want to distinguish never refusing a request from being able to fulfill an agreed role to the end.",
+    "register": "話",
+    "topic": "other",
+    "tipJa": "「仕事を引き受ける」は、自分が担当すると承諾すること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "甥",
+   "reading": "おい",
+   "pos": "noun",
+   "meaning": "nephew",
+   "defJa": "自分の兄弟姉妹の息子",
+   "passage": {
+    "ja": "兄の息子が遊びに来ると、最近学校で覚えた言葉を次々に教えてくれて、こっちが意味を尋ねる側になるんだ。小さいころから知っている甥とはいえ、使う語尾や話の間の取り方には、家族と過ごすだけでは身につかないものが増えているんだよね。僕が子供のころ使っていた方言を話すと、今度は向こうが面白がって、どんなときに言うのか詳しく聞いてくる。同じ土地の言葉でも、世代が違えば知らない表現があるから、教える役を交代しながら話すのが楽しいんだ。",
+    "form": "甥",
+    "en": "When my brother’s son visits, he tells me one new expression after another that he has learned at school, leaving me to ask what they mean. Although I have known my nephew since he was little, his sentence endings and conversational timing increasingly include things he would not acquire solely with family. When I use dialect expressions from my own childhood, he is the one who gets interested and asks in detail when people say them. Even in the language of the same area, different generations have unfamiliar expressions, so it is fun to take turns teaching each other.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "兄弟の息子にも姉妹の息子にも使い、年齢は問いません。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "不滅",
+   "reading": "ふめつ",
+   "pos": "noun",
+   "meaning": "immortality; indestructibility",
+   "defJa": "いつまでも滅びず、存在し続けること",
+   "passage": {
+    "ja": "いつまでも生きられる登場人物を置くと、物語から死の恐ろしさが消えるように思える。ところが、不滅の存在であればこそ、出会った人との別れを何度も経験し、変わり続ける世界に取り残される寂しさを描くこともできる。神話を読む際は、長く生きる力が褒美として与えられているのか、逃れられない重荷として描かれているのかに目を向けたい。寿命の長さをうらやむだけでは見落とす問いが、その人物が誰の名を覚え、誰を待ち続けているかという細部から浮かび上がる。",
+    "form": "不滅",
+    "en": "Introducing a character who can live forever seems as though it would remove the terror of death from a story. Yet precisely because the character is imperishable, a story can depict repeated partings with those they meet and the loneliness of being left behind in an ever-changing world. When reading myths, we should attend to whether long life is bestowed as a reward or portrayed as an inescapable burden. Questions we miss by merely envying longevity emerge from details of whose names the character remembers and whom they keep waiting for.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "「不滅の存在」は消えたり死んだりしない存在を表す。",
+    "sense": ""
+   }
+  }
+ ]
+}

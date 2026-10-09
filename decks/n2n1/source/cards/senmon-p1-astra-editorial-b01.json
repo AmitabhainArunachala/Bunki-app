@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "心理言語学",
+   "reading": "しんりげんごがく",
+   "pos": "noun",
+   "meaning": "psycholinguistics",
+   "defJa": "言葉の理解や産出を心の働きから調べる学問。",
+   "passage": {
+    "ja": "日本語の文を読むとき、助詞が一つ変わるだけで、誰が何をしたのかという理解が変わることがあります。そうした理解の過程を、心の働きとして調べる分野が心理言語学です。たとえば、文の条件をそろえた上で、読み終えるまでの時間や内容への答えを比べる実験を考えられます。時間の微差が出た場合にも、その原因をすぐ一つに決めず、語の難しさなど別の条件を確かめます。自分には自然に読めるという感覚を入り口にしながら、確かめられる問いへ変えていくところに、この分野の面白さがあります。",
+    "form": "心理言語学",
+    "en": "When reading a Japanese sentence, changing a single particle can alter our understanding of who did what. Psycholinguistics studies such processes of understanding as functions of the mind. For example, one could design an experiment comparing reading times and answers about content while matching the conditions of the sentences. Even if a small timing difference appears, other conditions such as word difficulty must be checked rather than immediately assigning it a single cause. The appeal of the field lies in taking a feeling such as finding something natural to read and turning it into a testable question.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "言葉を理解したり話したりする過程を、実験や観察で調べる学問です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

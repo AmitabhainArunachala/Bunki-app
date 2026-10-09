@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "老子",
+   "reading": "ろうし",
+   "pos": "noun",
+   "meaning": "Laozi, Daoist sage; also the Daodejing itself",
+   "defJa": "道家の祖とされる人物、またはその教えを記した書の名",
+   "passage": {
+    "ja": "中国の老子が残したと伝えられる『道徳経』は、水を手本に掲げ、争わず低い所へ流れるものがすべてを養うと説く。この教えは、干渉を減らせば民は自ずから治まるという統治の主張だが、経験に照らすと、職人の手が考えを挟まず動く瞬間に、無為に近いものは観察できる。他方、インドの古典ヨーガは、心の作用が静まれば見る者は自らの本性に安住するという教説を、坐法から呼吸、注意の統一へと段階を組んだ修行に仕上げた。ただ、瞑想研究を通じて測定できるのは心が落ち着く際の脳や身体の変化で、教説の語る治世や本性は実験の外にとどまる。",
+    "form": "老子",
+    "en": "The Daodejing, said to have been left by the Chinese sage Laozi, holds water up as its model, teaching that what flows without contending into the low places nourishes everything. This teaching is a claim about governance, that when interference lessens the people settle into order of themselves, yet in experience something close to non-action can be observed, as when a craftsman's hands move without a thought being inserted. Classical yoga in India, by contrast, took its doctrine, that when the movements of the mind grow still the seer abides in its own nature, and refined it into a training organized in stages, from posture to breath to the unifying of attention. What can be measured through meditation research, though, is only the change in brain and body that appears as the mind settles, and the self-ordering realm and the seer's own nature of which the doctrines speak remain outside the experiment.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "人物と書物の両義がある語で、荘子と並べて老荘思想と呼ばれる系譜の祖。伝記は不確実で、『道徳経』の作者として文脈から特定する。",
+    "sense": "ここでは『道徳経』を残したとされる人物を指し、書名としての用法は別義"
+   }
+  },
+  {
+   "term": "般若心経",
+   "reading": "はんにゃしんぎょう",
+   "pos": "noun",
+   "meaning": "the Heart Sutra, shortest of the chanted sutras",
+   "defJa": "空の智慧を説く、二百六十二文字の短い経典の名",
+   "passage": {
+    "ja": "葬式でお経が始まると、意味は分からなくても、信仰の有無にかかわらずみんな知ってる部分が出てくるじゃないですか、色即是空のところ。あれが般若心経で、全部でたった二百六十二文字しかなくて、唱えるお経の中じゃ最短クラスなんだって。般若は智慧の訳語で、心は核心の心だから、膨大な般若経典のエッセンスを一巻に絞り込んだって意味の題なんだよね。中身は、ものはぜんぶ縁起で成り立ってて固定した実体はないよ、という話で、短いだけに朝の勤行でも法事でも写経の修行でも定番なんだよね。",
+    "form": "般若心経",
+    "en": "At a funeral, when the sutra chanting starts, even without understanding the meaning, there is one part that everyone knows, whatever their faith, and that is the phrase that form is emptiness. That is the Heart Sutra, and with only two hundred sixty-two characters in all, it is said to be among the shortest of the sutras that people chant. 般若 is the translated word for wisdom, and 心 here means the core, so the title carries the sense that the essence of the vast Prajñā scriptures has been condensed into a single scroll. The content is the claim that everything arises through dependent origination and has no fixed substance, and precisely because it is short, it is a fixture of morning services, memorial rites, and sutra-copying practice alike.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "葬式や勤行で誰もが耳にする定番のお経。題は智慧を意味する般若に核心の心と経を重ねた組み合わせで、二百六十二文字の短さが普及の鍵。",
+    "sense": ""
+   }
+  }
+ ]
+}

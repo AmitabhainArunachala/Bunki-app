@@ -1,0 +1,1 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"辛抱": []}, "model": "deepseek-v4-pro:cloud", "secs": 25, "out": 3452, "verdicts": [{"term": "辛抱", "editor": "pass", "editorWhy": "自然で、ターゲットは1回だけ適切に使われ、文脈と定義も正しい。", "facts": "pass", "factsWhy": "事実関係に問題なく、言語トピック・講義調でレベル・英訳も適切。"}]}

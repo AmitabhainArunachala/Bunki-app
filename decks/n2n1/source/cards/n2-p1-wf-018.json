@@ -89,28 +89,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "製作",
-   "reading": "せいさく",
-   "pos": "noun",
-   "meaning": "production, manufacture",
-   "defJa": "ものを作り上げること。",
-   "passage": {
-    "ja": "理解したつもりでも、実際に作ろうとすると手が止まることがあります。模型の製作を一度でも経験した人なら、この感覚に覚えがあるはずです。図面を眺めているだけでは見えなかった部品の隙間や順序の矛盾が、手を動かした途端に姿を現すからです。学習も同じで、読んで分かった気になったことを、自分の言葉で組み立てることで、はじめて本当の理解に変わるのです。ものづくりの現場でやってみなければ分からないと言われるのは、このためです。",
-    "form": "製作",
-    "en": "Even when you think you understand, your hands can stop when you actually try to make something. Anyone who has ever built a model should recognize this feeling. This is because gaps between parts and contradictions in order that you could not see by merely looking at the blueprint appear the moment you move your hands. Study is the same: only by building in your own words what you felt you understood by reading does it turn into real understanding. That is why on the manufacturing floor they say you cannot know until you try.",
-    "register": "講",
-    "topic": "mind",
-    "tipJa": "「模型の製作」「映画の製作」のように、ものを作り上げる過程と結びつく。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "解く",
    "reading": "ほどく",
    "pos": "verb",
@@ -343,28 +321,6 @@
     "register": "報",
     "topic": "mind",
     "tipJa": "「不足を補う」「欠点を補う」のように、足りない部分を別のもので満たす。",
-    "sense": ""
-   },
-   "deck": "n2",
-   "field": null,
-   "level": "N2",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "見本",
-   "reading": "みほん",
-   "pos": "noun",
-   "meaning": "sample, model",
-   "defJa": "全体の品質や形を示すための実物。",
-   "passage": {
-    "ja": "古代アテネは、民主政治の見本としてしばしば引き合いに出される。だが、政治に加われたのは成人男性の市民に限られ、女性や奴隷、外国生まれの住民は最初から数に入っていなかった。理想を過去に求めるとき、私たちは都合のよい部分だけを切り取り、無条件にたたえてしまいがちである。歴史から学ぶとは、栄光をなぞることではなく、その陰に何があったのかを見抜くことにほかならない。",
-    "form": "見本",
-    "en": "Ancient Athens is often cited as a model of democratic politics. But only adult male citizens could take part in politics, and women, slaves, and foreign-born residents were not counted from the start. When we seek an ideal in the past, we tend to cut out only the convenient parts and praise them unconditionally. To learn from history is nothing other than seeing through to what lay in the shadow of glory, not tracing that glory.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "「政治の見本」「商品の見本」のように、手本や標本の意。比喩にも使う。",
     "sense": ""
    },
    "deck": "n2",

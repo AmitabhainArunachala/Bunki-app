@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "胎蔵界",
+   "reading": "たいぞうかい",
+   "pos": "noun",
+   "meaning": "the Womb Realm in esoteric Buddhism",
+   "defJa": "密教で仏の慈悲などを表す世界",
+   "passage": {
+    "ja": "この曼荼羅、真ん中の花の周りにたくさんの仏さまが並んでいて、最初はどこから見ればいいか迷うね。胎蔵界は密教で大日如来の慈悲などを表す世界で、金剛界と対にして説明されるんだ。名前に「胎」の字があるだけに、お腹の中の絵を思い浮かべそうだけど、人体の図ではないんだよ。仏たちの配置も、ただ空いた場所を埋めるために決められているわけじゃない。まず中心の大日如来を見つけて、その周りがどうまとまっているかを図録の解説と照らし合わせてみよう。",
+    "form": "胎蔵界",
+    "en": "With so many Buddhas arranged around the central flower in this mandala, it is hard to know where to look first. The Womb Realm represents aspects such as Mahavairocana’s compassion in esoteric Buddhism and is explained alongside the Diamond Realm. The character for womb may bring an image of the inside of a belly to mind, but this is not an anatomical diagram. Nor were the Buddhas arranged merely to fill empty spaces. First find Mahavairocana at the center, then compare the surrounding arrangement with the catalogue’s explanation.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "密教の世界観を表す語で、金剛界と対にして用いられる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "臨済宗",
+   "reading": "りんざいしゅう",
+   "pos": "noun",
+   "meaning": "the Rinzai school of Zen",
+   "defJa": "中国の臨済義玄の系統を引く禅の宗派",
+   "passage": {
+    "ja": "禅宗を覚えるとき、人物名と寺の名前だけを線で結ぶと、そこで何を修行していたのかが抜け落ちます。臨済宗を学ぶなら、中国から日本への伝来に加えて、公案を用いた師弟のやり取りにも目を向けましょう。公案は、知識を増やせば正解できる普通のクイズとは性格が異なります。予想に反して理解できない問答に出会ったら、その問いが修行のどんな場面で使われるのかを調べる手もあります。年表と実践の説明を行き来すると、教科書の宗派名にも具体的な人の営みが結び付きます。",
+    "form": "臨済宗",
+    "en": "When studying Zen schools, simply connecting people’s names with temple names leaves out what was practiced there. To study Rinzai Zen, look at teacher–disciple exchanges involving koans as well as its transmission from China to Japan. A koan differs from an ordinary quiz that accumulated knowledge lets you solve. If an exchange proves unexpectedly hard to understand, one approach is to investigate the setting in which the question is used in practice. Moving between a chronology and accounts of practice connects a textbook’s school names with concrete human activities.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "宗派の名称。公案を普通の知識問題と同一視しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "自他不二",
+   "reading": "じたふに",
+   "pos": "noun",
+   "meaning": "nonduality of self and others",
+   "defJa": "自己と他者を根本で切り離さない見方",
+   "passage": {
+    "ja": "仏教の対話で自他不二を「あなたも私も全く同じ」と言い換えると、相手の痛みや立場まで消してしまいそうです。ここでは、自己と他者を根本から切り離された存在として捉えないという意味を、前後の文で補うと伝わります。両者の違いがなくなることと、関わりの中で共に生きていることは、同じ主張ではありません。賛否にかかわらず、まず相手の話を聞く姿勢を例にすれば、抽象的な教えにも接点が生まれます。ただし、現代の会話例は理解の補助であり、それだけで元の思想を言い尽くしたことにはなりません。",
+    "form": "自他不二",
+    "en": "Paraphrasing the Buddhist idea of self–other nonduality as “you and I are completely identical” could erase the other person’s pain or circumstances. The surrounding sentences can clarify that the point is not to regard self and others as fundamentally isolated beings. The disappearance of differences and living together through relationships are different claims. Listening to someone regardless of agreement provides an accessible point of contact with the abstract teaching. Yet a contemporary conversational example aids understanding without exhausting the original idea.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "単なる同一性と誤解されないよう、関係の説明を添える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "自己探究",
+   "reading": "じこたんきゅう",
+   "pos": "noun",
+   "meaning": "self-inquiry",
+   "defJa": "自分とは何かを内面に向かって問う実践",
+   "passage": {
+    "ja": "職業や性格を並べても、それを「自分だ」と感じているのは何かという問いは残ります。ラマナ・マハルシの教えでいう自己探究は、経歴の分析に加えて新しい人物像を作ることではなく、その私という感覚の根源に注意を向ける実践です。考えが浮かんだときには、その考えが誰に浮かんでいるのかを問い直します。これは彼の宗教的な教えの中に位置付く方法で、性格検査と同じ目的で行うものではありません。紹介文を読む際にも、考えの内容を調べることと、考える主体を問うことを区別しましょう。",
+    "form": "自己探究",
+    "en": "Even after listing your occupation and personality, the question remains of what experiences them as “me.” Self-inquiry in Ramana Maharshi’s teaching is not an analysis of one’s history followed by construction of a new identity, but a practice of attending to the source of the sense of being oneself. When a thought arises, one asks to whom it has arisen. The method belongs within his religious teaching and does not serve the same purpose as a personality test. When reading an introduction, distinguish investigating the content of thoughts from questioning the subject that thinks.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "ここではラマナの実践を指し、性格の分析とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "自性",
+   "reading": "じしょう",
+   "pos": "noun",
+   "meaning": "inherent nature; svabhava",
+   "defJa": "他の条件に依存せず成り立つ固有の本質",
+   "passage": {
+    "ja": "中観派の議論では、物が他の条件に依存せず、それだけで成り立つ固有の本質を持つのかが問われる。この文脈で検討される自性は、日常語でいう個性や、その人らしい性格と同じ意味ではない。器の材料や作り方をたどるにつれて、独立した本質という想定と、条件から生じる物の姿との隔たりが論点になる。ただし、別の仏教文献にも同じ漢字があるからといって、常に全く同じ用法とは限らない。訳語を比較する作業では、どの学派が何を肯定し、何を否定しているかを読み分けることが欠かせない。",
+    "form": "自性",
+    "en": "Madhyamaka arguments ask whether things possess an intrinsic essence that exists by itself without depending on other conditions. In this context, inherent nature does not mean individuality or a person’s characteristic personality. Tracing a vessel’s materials and production brings into focus the gap between an assumed independent essence and things arising from conditions. However, the same Chinese characters in another Buddhist text do not guarantee exactly the same usage. Comparing translations requires distinguishing which school affirms or denies what.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "中観派で問題とされる固有の本質の意味。日常の個性とは異なる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "般若",
+   "reading": "はんにゃ",
+   "pos": "noun",
+   "meaning": "prajna; wisdom into reality",
+   "defJa": "物事の真実のあり方を見抜く智慧",
+   "passage": {
+    "ja": "仏教の学びでは、経典の語句を多く覚えたことと、その教えが自分の見方を変えることとは区別される。般若という語が指す智慧も、知識の量を競うための物差しではなく、物事のあり方を見抜く働きに関わる。何をもって真実を見るとするかをめぐって、学派ごとの説明には違いがある。それでも、言葉を暗記するだけで理解が完成すると考えれば、執着や思い込みを問い直すという実践の側面を落としてしまう。知っているはずの一文が、ある経験の後で違って響くこともあるのだ。",
+    "form": "般若",
+    "en": "Buddhist study distinguishes memorizing many scriptural phrases from having the teaching transform one’s perspective. The wisdom called prajna is likewise not a measure for competing over quantities of knowledge, but concerns insight into how things are. Schools differ in their accounts of what it means to see reality. Still, assuming that memorization completes understanding neglects the practical aspect of questioning attachments and assumptions. A sentence one thought familiar can sound different after a particular experience.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "知識量よりも、物事の真実を見抜く智慧を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "色即是空",
+   "reading": "しきそくぜくう",
+   "pos": "noun",
+   "meaning": "form is emptiness",
+   "defJa": "形あるものに独立した実体はないという教え",
+   "passage": {
+    "ja": "お経に色即是空と出てくると、目の前の物は全部まぼろしなのかって思いたくなるね。でも、この場合の「色」は赤や青のことだけじゃなくて、物質的なあり方を指しているんだ。その意味を確認するに際して、器なら土や作る人に支えられている、という関係から考えてみると入口になるよ。他との関係を離れて、それだけで成り立つ固定した実体があるのかを問うわけで、器を落としても何も起きないという話じゃない。文字の印象だけで日常の因果関係まで消してしまわないようにしたいね。",
+    "form": "色即是空",
+    "en": "When a sutra says “form is emptiness,” it is tempting to think that everything before us is an illusion. But form here does not simply mean colors such as red and blue; it refers to material existence. In clarifying the meaning, thinking about how a vessel depends on clay and its maker offers a starting point. The question concerns whether there is a fixed entity existing independently of other relationships, not whether dropping a vessel has no consequences. We should avoid letting the impression of the words erase ordinary causal relationships.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「色」は物質的なあり方。「空」は単なる無ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "苦行",
+   "reading": "くぎょう",
+   "pos": "noun",
+   "meaning": "ascetic practice; austerities",
+   "defJa": "心身に厳しい負担を課す宗教的な修行",
+   "passage": {
+    "ja": "釈尊の生涯を学ぶと、厳しい断食などの苦行を経た後に、中道が説かれるという流れに出会います。ここで押さえたいのは、つらさの大きさと悟りへの近さを、そのまま同じ尺度で測っていない点です。努力を認めつつも、体を傷めるほど自分を追い込むことが、必ずしも目的の達成につながるとは限りません。宗教史の記述を読むときには、どんな行為がなされ、何のために行われたのかを分けて整理すると理解が進みます。現代の勉強を「修行」と呼ぶ比喩から、当時の実践へ勝手に話を戻さないことも大事です。",
+    "form": "苦行",
+    "en": "Accounts of the Buddha’s life describe severe austerities such as fasting before the teaching of the middle way. The key point is that intensity of suffering and proximity to awakening are not simply measured on the same scale. While recognizing effort, driving oneself to the point of physical harm does not necessarily achieve the intended goal. When reading religious history, separating the actions performed from their purposes helps understanding. It is also important not to project a modern metaphor of study as “training” back onto those historical practices.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "宗教的な目的で行う厳しい実践を指す用法。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "草木国土悉皆成仏",
+   "reading": "そうもくこくどしっかいじょうぶつ",
+   "pos": "noun",
+   "meaning": "all plants and lands attain buddhahood",
+   "defJa": "草木や大地まで仏となるとする教え",
+   "passage": {
+    "ja": "日本仏教の自然観を扱う文章で草木国土悉皆成仏という句を見かけたら、まず草木と国土まで含む言い方に注目できます。人間だけを主語にして訳すと、この表現が広げている範囲を狭めてしまいます。一方で、これを植物にも人間と同じ脳があるという主張に置き換えるのも、原文から離れた説明です。宗教上の成仏という考え方と、生物としての構造を論じる言葉とでは、問いの立て方が異なります。読者を問わず分かる言葉に直す場合も、分かりやすさのために教えの射程を削らない工夫が要ります。",
+    "form": "草木国土悉皆成仏",
+    "en": "When encountering the phrase that all plants and lands attain buddhahood in a discussion of Japanese Buddhism’s view of nature, notice its inclusion of vegetation and the land itself. Translating it with only humans as the subject narrows the scope of the expression. On the other hand, replacing it with a claim that plants have the same brains as humans also departs from the text. The religious idea of attaining buddhahood and the language of biological structure ask different kinds of questions. Even when adapting the explanation for a broad audience, care is needed not to reduce the teaching’s scope for the sake of simplicity.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "主語の範囲を保ち、成仏を生物学の説明と取り違えない。",
+    "sense": ""
+   }
+  }
+ ]
+}

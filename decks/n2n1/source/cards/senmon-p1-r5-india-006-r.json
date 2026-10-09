@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "バラモン",
+   "reading": "ばらもん",
+   "pos": "noun",
+   "meaning": "Brahmin, Vedic priestly class of India",
+   "defJa": "ヴェーダの祭祀を司ったインドの祭司階層の名",
+   "passage": {
+    "ja": "古い寺に立ち寄ると、本尊の両脇に梵天と帝釈天が対になって並んでいるのに気づくことがあります。この梵は、祭司階層バラモンと同根の原語を一字で当てた仏典の表記で、階層の名は婆羅門と音写されました。彼らは犠牲の祭式を司る専門家として、ヴェーダの原典を暗誦によって代々守った一方で、奥義書と呼ばれる哲学の文献群を生んだのも同じ階層の人びとです。梵天の原語がブラフマーだと知れば、インドの神々が仏教の守護に組み込まれた経緯まで像の並びから読めて、語の系譜が一望できるんですよ。",
+    "form": "バラモン",
+    "en": "When you stop at an old temple, you sometimes notice Bonten and Taishakuten standing as a pair on either side of the principal image. This bon is a Buddhist-scriptural notation in which a single character stands for a word sharing its root with the priestly class of Brahmins, whose name was transcribed phonetically as baramon. While they were specialists who presided over sacrificial rites and preserved the Vedic originals through recitation, generation after generation, the philosophical corpus known as the Upanishads was also produced by people from the same class. Once you know that the word behind Bonten is Brahmā, the arrangement of the statues lets you read how Indian deities were taken in as Buddhist guardians, and the lineage of the word comes into view at a glance.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "梵天や梵語の梵はこの階層と同根の原語の一字表記。音写は婆羅門",
+    "sense": "祭司階層の意。教えや宗教全体を指す用法は別"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "バクティ",
+   "reading": "ばくてぃ",
+   "pos": "noun",
+   "meaning": "bhakti, loving devotion to a deity in Hinduism",
+   "defJa": "神への献身的な愛。原典では聞くなどの行為として数えられる",
+   "passage": {
+    "ja": "語学の学びはまず聞くことから始まりますが、ヒンドゥー教のバクティも、原典では聞くことから数え始めるんです。後期のプラーナ文献では、聞くこと、唱えること、思い出すこと、足に仕えること、礼拝することなど、九つの行為として数え上げられます。一見、情熱的な愛の語に見えるものの、原典の使い方は行為の目録で組み立てられており、愛は行為を積むなかで深まると読めます。後世の信仰運動が聖者の物語を聞かせる集会や歌で広がったのは、リストの上位二つ、聞くことと唱えることをそのまま使った形なんです。",
+    "form": "バクティ",
+    "en": "Language learning begins with listening, and bhakti in Hinduism, too, starts being counted from hearing in the primary texts. In the later Purana literature it is counted out as nine acts: hearing, chanting, remembering, serving the feet, worshiping, and so on. It looks at first like a word for passionate love, yet the primary texts build its usage as a catalog of deeds, and one can read it as love deepening through the piling up of those acts. That later devotional movements spread through gatherings where saints' stories were told, and through song, is a form that puts the top two items of the list, hearing and chanting, straight to work.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "信心と訳されがちだが、原典では聞く・唱えるなど九つの行為の語として使われる",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "タントラ",
+   "reading": "たんとら",
+   "pos": "noun",
+   "meaning": "tantra, esoteric Indian scriptures and practices",
+   "defJa": "中世インドで生まれた経典と実践の一群の総称",
+   "passage": {
+    "ja": "この前言ってたタントラの訳し方ね、あれ、「密教」の二文字では済まないんだよね。インドでは仏教に限らず、ヒンドゥー教のシヴァや女神を祀る流れにも同じ呼び名の経典と修行の一群があって、伝統を問わず中世に広がったものなんです。日本の真言宗が繋がるのはその仏教側の系譜で、日本語の「密教」も仏教だけを指すから、訳語に選んだ瞬間に範囲が半分に狭まるわけ。だから初出では「中世インドの経典と修行の一群」って注を付けておいて、場面に応じて密教を当てるのが僕のやり方なんだよね。",
+    "form": "タントラ",
+    "en": "About that way of translating tantra I mentioned the other day, the two characters of mikkyō just will not cover it. In India, not only Buddhism but the currents of Hinduism that worship Śiva and the goddess also had a body of scriptures and practices going by the same name, and they spread across traditions in the medieval period. Japanese Shingon connects to the Buddhist side of that lineage, and since the word mikkyō in Japanese refers only to Buddhism, the moment you choose it as your translation the scope shrinks by half. So my way is to add a note at first mention, saying a body of medieval Indian scriptures and practices, and then apply mikkyō as the setting demands.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "仏教だけでなくヒンドゥー教にも共通する語で、密教と訳すと範囲が狭まる点に注意",
+    "sense": "経典と実践の一群を指す本来の意味で使用"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シャンカラ",
+   "reading": "しゃんから",
+   "pos": "noun",
+   "meaning": "Śaṅkara, 8th-century Advaita philosopher",
+   "defJa": "八世紀のインドで不二一元論を説いた哲人",
+   "passage": {
+    "ja": "瞑想でも勉強でも、毎日何かを続けている人は、「目的地が最初から一つなら、練習は何のためにあるのか」という問いに一度はぶつかります。八世紀の哲人シャンカラは、すべては一つの実在だと説きながら、真理を慣習と究極の二段階に分けることで、この問いに答えました。究極のレベルでは何も欠けていないにせよ、日々の暮らしは慣習のレベルで動いているから、心を整える修行はそこで意味を持つ、という整理です。結論を知っていることと、認識として根付くことの間には距離があり、勉強とはこの距離を埋める作業だと捉え直せます。",
+    "form": "シャンカラ",
+    "en": "Anyone who keeps something up daily, whether meditation or study, eventually runs into the question of what practice is for if the destination is one from the very start. The eighth-century philosopher Śaṅkara answered this question by dividing truth into two levels, conventional and ultimate, while teaching that everything is one reality. The idea is that even if nothing is lacking at the ultimate level, daily life runs at the conventional level, and that is where the practice of steadying the mind carries meaning. There is a gap between knowing a conclusion and having it take root as understanding, and studying can be reframed as the work of closing that gap.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "真理を慣習と究極の二段階に分け、日々の修行に意味を残した整理が特徴",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

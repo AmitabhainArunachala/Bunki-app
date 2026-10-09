@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "実装",
+   "reading": "じっそう",
+   "pos": "noun",
+   "meaning": "implementation",
+   "defJa": "設計した機能を実際に動く形へ作り込むこと",
+   "passage": {
+    "ja": "検索の方法を紙の上で説明できても、それだけでは利用者が使える道具にはなりません。設計をプログラムとして動かす実装では、入力の受け取り方や結果の表示に加え、想定外の値が来た場合の処理も決めます。理論上は正しい手順であっても、文字の扱いや記憶容量の制約によって、作った道具が意図どおりに動かないことがあるからです。小さな例を使った動作試験から始め、設計の誤りと書いた処理の誤りを分けて記録すると、どこへ戻って直すべきかを判断しやすくなります。",
+    "form": "実装",
+    "en": "Explaining a search method on paper does not yet give users a usable tool. Implementing the design as software requires deciding how to handle unexpected values as well as input and result display. Even theoretically correct procedures may behave differently because of text handling or memory constraints. Starting with tests on small examples and separately recording design errors and coding errors makes it easier to decide where revisions belong.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "ここでは機能をプログラムにする意味で、部品の取り付けとは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

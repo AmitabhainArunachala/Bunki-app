@@ -1,0 +1,176 @@
+{
+ "batch": "r5-india-014",
+ "items": [
+  {
+   "term": "南無阿弥陀仏",
+   "reading": "なむあみだぶつ",
+   "gloss": "\"I take refuge in Amida Buddha\"",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜に先立って"
+  },
+  {
+   "term": "即身成仏",
+   "reading": "そくしんじょうぶつ",
+   "gloss": "attaining buddhahood in this very body",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜にせよ"
+  },
+  {
+   "term": "口伝",
+   "reading": "くでん",
+   "gloss": "oral transmission of teachings",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜を問わず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "只管打坐",
+   "reading": "しかんたざ",
+   "gloss": "just sitting",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜に応じて"
+  },
+  {
+   "term": "同行二人",
+   "reading": "どうぎょうににん",
+   "gloss": "\"two travelling together\" (pilgrim with Kūkai)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜に伴って"
+  },
+  {
+   "term": "四国遍路",
+   "reading": "しこくへんろ",
+   "gloss": "the Shikoku 88-temple pilgrimage",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜に限らず"
+  },
+  {
+   "term": "四諦",
+   "reading": "したい",
+   "gloss": "the Four Noble Truths",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜からといって",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "回向",
+   "reading": "えこう",
+   "gloss": "transferring merit; memorial service",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜ものの",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "因果応報",
+   "reading": "いんがおうほう",
+   "gloss": "karmic retribution",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜一方で"
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

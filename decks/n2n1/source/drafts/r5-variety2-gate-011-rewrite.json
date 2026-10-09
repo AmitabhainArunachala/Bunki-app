@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "口伝",
+   "reading": "くでん",
+   "pos": "noun",
+   "meaning": "oral transmission of teachings",
+   "defJa": "言葉を直接交わして教えなどを伝えること",
+   "passage": {
+    "ja": "お供えを終えた後、若い僧が師に儀礼の意味を尋ねたとするよ。順番は覚えていても、なぜその動作をするのかまでは分からなかったので、自分が迷った所を話し、師からその場に合った答えを直接受け取るんだ。こうした口伝は、教えを声で受け渡す営みなんだね。弟子の問いに応じて、伝える内容も深まっていく。次に同じ儀礼をする日、その僧は前と同じ手順を踏みながらも、師と交わした言葉を思い出して、供物にそっと手を添えるんだ。",
+    "form": "口伝",
+    "en": "Suppose a young monk asks his teacher about the meaning of a ritual after making an offering. Although he remembers the sequence, he does not yet understand why the movements are performed, so he describes what puzzled him and directly receives an answer suited to that situation. Oral transmission like this passes teachings from one voice to another. What is conveyed grows deeper in response to the disciple's questions. On the next occasion that he performs the same ritual, the monk follows the same steps but recalls the words exchanged with his teacher and gently places a hand on the offering.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "師と弟子が言葉を直接交わして、教えを受け渡すこと。",
+    "sense": ""
+   },
+   "cardId": "nn-c8272ca2a5-7dd1d185",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-c8272ca2a5-7dd1d185",
+    "wordId": "nn-c8272ca2a5"
+   }
+  },
+  {
+   "term": "開発競争",
+   "reading": "かいはつきょうそう",
+   "pos": "noun",
+   "meaning": "development race",
+   "defJa": "新しい技術や製品を作る速さや性能を争うこと",
+   "passage": {
+    "ja": "人工知能向けの半導体を設計する企業が、新製品で処理速度を高めても、電力消費が大幅に増えるなら、冷却や電源の費用を負担する顧客は採用をためらう。速さだけでは決まらない。競合企業は同じ仕事をより少ない電力で処理する設計を示し、運用費の低さを訴える。開発競争の焦点は、計算の速さから電力効率にも広がる。購入側の比較表には装置の価格とともに使用時の費用が並び、設計側も消費電力を減らすために回路の構成を見直す。",
+    "form": "開発競争",
+    "en": "Even if a company designing chips for artificial intelligence raises processing speed in a new product, sharply higher power consumption can make customers paying for cooling and power supplies hesitate to adopt it. Speed alone does not decide the matter. A competitor presents a design performing the same task with less electricity and stresses lower operating costs. The focus of the development race expands from computing speed to power efficiency. Buyers' comparison tables list operating costs alongside equipment prices, and designers also revise circuit structures to reduce electricity consumption.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "新しい技術や製品の性能を競い合い、開発の焦点が変わる場面で用いる。",
+    "sense": ""
+   },
+   "cardId": "nn-49f5606bcf-910755b7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-49f5606bcf-910755b7",
+    "wordId": "nn-49f5606bcf"
+   }
+  },
+  {
+   "term": "儒教",
+   "reading": "じゅきょう",
+   "pos": "noun",
+   "meaning": "Confucianism",
+   "defJa": "人倫や社会の秩序を重んじる中国由来の思想と伝統",
+   "passage": {
+    "ja": "日本の中世の禅寺では、仏典のほかに中国の詩文や思想も学ばれ、僧たちは海を越えて伝わった幅広い知識を吸収しながら、漢文を用いた学問を発展させた。学ぶ対象は一宗派の教えに収まらない。儒教もその学問と関わり、人の振る舞いや社会の秩序を考える材料となった。仏教とは異なる伝統の書物でも、僧が手に取ることはあった。禅の修行を行う寺の中で、中国の古典をめぐる講義が開かれ、弟子たちは師から言葉の意味を学んだ。",
+    "form": "儒教",
+    "en": "In medieval Japanese Zen temples, monks studied Chinese poetry and thought alongside Buddhist texts, absorbing a wide range of knowledge transmitted across the sea and developing scholarship in classical Chinese. Their studies were not confined to one denomination's teachings. Confucianism also formed part of this learning, providing material for considering human conduct and social order. Monks sometimes took up books from traditions other than Buddhism. Within temples devoted to Zen training, lectures on Chinese classics were held and disciples learned the meaning of their words from teachers.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "人倫や社会秩序を重んじる伝統で、東アジアの仏教とも学問を通じて接触した。",
+    "sense": ""
+   },
+   "cardId": "nn-cfe7fdf604-460727eb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011-r.json",
+    "cardId": "nn-cfe7fdf604-460727eb",
+    "wordId": "nn-cfe7fdf604"
+   }
+  },
+  {
+   "term": "草木国土悉皆成仏",
+   "reading": "そうもくこくどしっかいじょうぶつ",
+   "pos": "noun",
+   "meaning": "all plants and lands attain buddhahood",
+   "defJa": "草木や大地まで仏となるとする教え",
+   "passage": {
+    "ja": "草木国土悉皆成仏という教えを前にすると、寺の石段さえ、人が仏を拝むための足場という役割には収まりきらなくなる。踏まれる側にも目が向く。草木や大地まで仏となるという宗教的な広がりは、人の心だけを切り離して救いを求める姿勢とは異なり、生きる場所そのものを問いの中へ招き入れる。草履についた土を払い、雨でぬれた石段を上るとき、仏となる世界の外を通り過ぎているのではなく、その世界に足を置いているのだとすれば、礼拝は本堂の扉より手前から始まっている。",
+    "form": "草木国土悉皆成仏",
+    "en": "Faced with the teaching that all plants and lands attain buddhahood, even temple steps exceed the role of a footing from which people worship a Buddha. Attention turns toward what is trodden on. A religious vision in which even plants and earth become Buddhas draws the place of living itself into the question, unlike an approach that seeks salvation by isolating the human mind. If brushing soil from one’s sandals and climbing rain-wet steps means placing one's feet within the world becoming Buddha rather than passing outside it, worship has begun before the main hall's doors.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "成仏の範囲を人間に限らず、草木や大地にまで広げる教え。",
+    "sense": ""
+   },
+   "cardId": "nn-ab46e85ba1-f846096a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-ab46e85ba1-f846096a",
+    "wordId": "nn-ab46e85ba1"
+   }
+  },
+  {
+   "term": "ウパニシャッド",
+   "reading": "うぱにしゃっど",
+   "pos": "noun",
+   "meaning": "the Upanishads",
+   "defJa": "インドの古い聖典群。師の膝元の教えを意味する語",
+   "passage": {
+    "ja": "世界中の財産が自分のものになれば、死を超えられるでしょうか？家を離れる前に財産を分けようとする夫へ、妻のマイトレーイーはこの問いを向け、豊かに暮らせても財産によって不死にはなれないという答えを聞きます。ウパニシャッドに含まれるこの対話は、何を持つかという話から、自己の本質を知る探究へ進みます。望むものが富では得られないと分かった妻は、財産の話を続けるかわりに、夫の知る教えを自分にも伝えてほしいと求めます。",
+    "form": "ウパニシャッド",
+    "en": "Could we transcend death if all the world's wealth became ours? Maitreyi poses this question to her husband as he prepares to divide his property before leaving home, and hears that wealth can provide a prosperous life but cannot confer immortality. This dialogue in the Upanishads proceeds from what one possesses to inquiry into the nature of the self. Realizing that wealth cannot give her what she seeks, the wife asks her husband to share his teaching rather than continuing the discussion of property.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "自己や世界の根本を探究する古代インドの文献群で、対話の形でも教えを伝える。",
+    "sense": "師のそばで伝える密かな教え、およびそれを記す文献"
+   },
+   "cardId": "nn-67f68ee238-2c22c667",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-005.json",
+    "cardId": "nn-67f68ee238-2c22c667",
+    "wordId": "nn-67f68ee238"
+   }
+  },
+  {
+   "term": "雲水",
+   "reading": "うんすい",
+   "pos": "noun",
+   "meaning": "itinerant Zen monk",
+   "defJa": "禅の修行に励む僧や諸方を巡る修行僧",
+   "passage": {
+    "ja": "禅寺の修行には、僧が町へ出て鉢を持ち、人々から施しを受ける托鉢も含まれ、生活を支える食べ物や金銭が寺の外から届けられる。修行の場は山門の内側に限らない。雲水と呼ばれる修行僧も、こうした実践を通じて地域の人と接する。差し出された物を受け取る側と、教えを支えようとする側が、路上で向き合う。僧の手元にある鉢には、人々が自分の暮らしから分けた物が入り、僧はそれを受けて次の家の前へと進んでいく。",
+    "form": "雲水",
+    "en": "Zen monastic training includes going into town with bowls to receive alms, through which food and money supporting life come from outside the temple. Practice is not confined within its gates. Trainee monks called unsui also meet local people through such practice. Those receiving offerings and those wishing to support the teaching face one another in the street. People place things shared from their own lives into the bowl in a monk's hands, and he receives them and proceeds to the next house.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "禅の修行僧を指し、托鉢などを通じて寺の外でも実践を行う。",
+    "sense": ""
+   },
+   "cardId": "nn-79a6339f13-a9e91373",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-79a6339f13-a9e91373",
+    "wordId": "nn-79a6339f13"
+   }
+  },
+  {
+   "term": "分散合意",
+   "reading": "ぶんさんごうい",
+   "pos": "noun",
+   "meaning": "distributed consensus",
+   "defJa": "複数の計算機で共通の決定を成立させること",
+   "passage": {
+    "ja": "分散合意を用いるシステムでは、離れたサーバーが設定変更を共通の決定として扱う。例えば多数のサーバーの確認を取ってから決定する方式では、変更案を送った機械だけが新しい値を勝手に確定することを避け、通信の遅れや故障に備えつつ記録をそろえる。全員の返事を待つ必要はない。通信が途切れ、規則で定めた応答を集められない側では新たな変更の確定を保留し、別々の設定を同時に正しいものとして進める事態を防ぐ。",
+    "form": "分散合意",
+    "en": "In systems using distributed consensus, separate servers treat a configuration change as a common decision. For example, a method that decides after confirmation from a majority avoids allowing the proposing machine alone to finalize a new value, aligning records while accounting for communication delays and failures. It need not wait for everyone's reply. A side that loses communication and cannot gather the responses required by the rules holds off finalizing new changes, preventing different settings from simultaneously being treated as authoritative.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "複数の計算機が、共通の決定を成立させる仕組み。",
+    "sense": ""
+   },
+   "cardId": "nn-0e4de817c8-167fc0a7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-039-r.json",
+    "cardId": "nn-0e4de817c8-167fc0a7",
+    "wordId": "nn-0e4de817c8"
+   }
+  },
+  {
+   "term": "鑑真",
+   "reading": "がんじん",
+   "pos": "noun",
+   "meaning": "Jianzhen; Ganjin",
+   "defJa": "日本に戒律を伝え唐招提寺を開いた唐の僧",
+   "passage": {
+    "ja": "鑑真が開いた唐招提寺は、戒律を学ぶ人々の修行の場として始まった。当初から今の伽藍がそろっていたのではない。はじめは講堂や、以前の建物を改造した経蔵などがあるだけだった。現在残る金堂は弟子の如宝の尽力によって完成したとされ、師が築いた学びの場を受け継ぐ人々が、修行を続けるとともに寺の姿も整えていった。寺の境内には、教えを授けた師の仕事と、それを残すために動いた弟子たちの仕事が、建物の歴史として重なっている。",
+    "form": "鑑真",
+    "en": "Toshodaiji, founded by Ganjin, began as a training place for people studying monastic discipline. Its present buildings were not all in place from the beginning. Initially there were only a lecture hall and facilities such as a scripture repository made by adapting an earlier building. The surviving main hall is said to have been completed through the efforts of his disciple Nyoho, as those inheriting the teacher's place of learning continued practice and developed the temple's physical form. Within its grounds, the work of the teacher who transmitted the teaching and the disciples who acted to preserve it overlap in the history of the buildings.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "唐招提寺を開いて戒律を伝え、弟子たちへ学びの場を残した唐の僧。",
+    "sense": ""
+   },
+   "cardId": "nn-ca725d819a-85cce922",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-003.json",
+    "cardId": "nn-ca725d819a-85cce922",
+    "wordId": "nn-ca725d819a"
+   }
+  }
+ ]
+}

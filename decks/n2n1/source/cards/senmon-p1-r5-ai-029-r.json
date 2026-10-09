@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "萌芽",
+   "reading": "ほうが",
+   "pos": "noun",
+   "meaning": "the germ of a new development",
+   "defJa": "物事が発展する最初の小さな兆し",
+   "passage": {
+    "ja": "手作業で何度も直していたプログラムに、小さな共通の手順が見つかることがある。そこに新しい設計の萌芽を見るなら、目先の修正をまとめるだけでなく、別の入力でも役立つかを試すところから議論を始めたい。まだ短い試作品にすぎないとはいえ、何を一般化し、どの例外を残すかという問いは、完成後より鮮明に現れる場合がある。成長を約束する美辞麗句として片づけず、成功した例と失敗した例を並べれば、発想が育つ方向を具体的に示せる。",
+    "form": "萌芽",
+    "en": "A small shared procedure may emerge in a program repeatedly corrected by hand. If one sees the germ of a new design there, the discussion should begin by testing whether it helps with different inputs, rather than merely consolidating immediate fixes. Although it is still only a short prototype, the questions of what to generalize and which exceptions to retain may appear more clearly than after completion. Rather than dismissing it as a pretty promise of growth, placing successful and failed examples together can show concretely the direction in which the idea can develop.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "未完成でも発展の始まりとなる兆しを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

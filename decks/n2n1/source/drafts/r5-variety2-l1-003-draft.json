@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "寵児",
+   "reading": "ちょうじ",
+   "pos": "noun",
+   "meaning": "a darling of the age",
+   "defJa": "時代の流れに乗って特に注目される人や企業",
+   "passage": {
+    "ja": "新興企業が次々と資金を集める局面では、赤字であっても将来性を理由に高く評価される場合がある。投資家の期待を一身に集めた企業が時代の寵児となれば、経営者の発言そのものが注目を浴び、人材や取引先も集まりやすくなる。しかし、期待に応えて成長を続けるには、資金を集める力だけでは足りない。顧客が繰り返し対価を払う製品を作れなければ、華やかな評価が実際の事業を追い越したままになり、資金調達の環境が変わった瞬間に弱さが表に出る。",
+    "form": "寵児",
+    "en": "When startups are raising funds rapidly, even loss-making companies may receive high valuations for their prospects. Once a company becomes the darling of its era, attracting investors' hopes, its executives' remarks draw attention and recruitment and partnerships become easier. Yet sustained growth that meets those expectations requires more than fundraising ability. Without products customers repeatedly pay for, glowing valuations can outpace the underlying business, exposing weakness as soon as funding conditions change.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「時代の寵児」。ある時代の期待や人気を特に集める存在。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-110450b46f-ffd5eddf",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-110450b46f-ffd5eddf",
+    "wordId": "nn-110450b46f"
+   }
+  },
+  {
+   "term": "巨大IT企業",
+   "reading": "きょだいあいてぃーきぎょう",
+   "pos": "noun",
+   "meaning": "Big Tech companies",
+   "defJa": "情報技術分野で大きな影響力を持つ企業群",
+   "passage": {
+    "ja": "写真の保存も店の予約も同じ会社のサービスで済ませると、別のサービスへ移る際の手間が増える。巨大IT企業の強みには、一つの製品の性能に加えて、複数の利用場面を結び付けられる点がある。利用者には便利な反面、新規参入の企業は単独の機能を良くするだけでは、既存の習慣を変えてもらいにくい。データの持ち出しや他社との接続が容易かどうかは、技術上の細部に見えて、利用者が選択肢を保てるかを左右する競争条件でもある。",
+    "form": "巨大IT企業",
+    "en": "Using one company's services for both photo storage and restaurant bookings increases the effort of switching elsewhere. Large technology companies gain strength from linking different activities as well as from individual product performance. This benefits users, but makes it difficult for newcomers to change established habits merely by improving one function. Whether data can be exported and services connected to competitors may seem like technical detail, yet it is also a condition of competition that affects users' ability to retain choices.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "複数のサービスや基盤を通じて広い影響力を持つ企業群。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-734f254221-0e409518",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-734f254221-0e409518",
+    "wordId": "nn-734f254221"
+   }
+  },
+  {
+   "term": "強化学習",
+   "reading": "きょうかがくしゅう",
+   "pos": "noun",
+   "meaning": "reinforcement learning",
+   "defJa": "行動の結果に応じた報酬から方策を学ぶ方法",
+   "passage": {
+    "ja": "迷路を進む機械に、出口へ到達したときだけ点を与えたとします。強化学習では、このような行動の結果から得られる報酬を手掛かりに、どの状態で何をするかという方策を改善します。まだ知らない通路を試せば遠回りにもなりますが、慣れた道ばかり選んでいては近道を発見できません。目先の点だけを追う行動と、将来より良い結果を得るための探索との釣合いが必要であり、何に点を与えるかによって、身に付く振る舞いも変わってきます。",
+    "form": "強化学習",
+    "en": "Suppose a machine navigating a maze receives points only upon reaching the exit. Reinforcement learning uses rewards from the outcomes of actions to improve a policy specifying what to do in each state. Trying an unfamiliar passage may cause a detour, but choosing only familiar routes prevents the discovery of shortcuts. Pursuing immediate rewards must be balanced against exploration for better future outcomes, and the behavior learned changes with what is rewarded.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "行動の結果に応じた報酬から、行動の選び方を改善する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-302b075c29-5e13bb13",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-302b075c29-5e13bb13",
+    "wordId": "nn-302b075c29"
+   }
+  },
+  {
+   "term": "成膜",
+   "reading": "せいまく",
+   "pos": "noun",
+   "meaning": "thin-film deposition",
+   "defJa": "表面に薄い材料の層を作る工程",
+   "passage": {
+    "ja": "鏡のように光る半導体の表面にも、働きの異なる薄い層が重なっています。成膜では、電気を通す材料や電気を隔てる材料などを、目的に応じて表面に薄く形成します。同じ材料であっても厚さがそろわなければ回路の性質にばらつきが出るため、目に見えないほど小さな差が問題になります。さらに深い溝の底や側面まで覆う必要がある場合には、平らな場所へ材料を載せるときとは違う難しさがあり、形と厚さの両方を満たす方法が選ばれます。",
+    "form": "成膜",
+    "en": "Even a mirror-like semiconductor surface contains stacked thin layers with different functions. Film deposition forms thin layers of conducting, insulating, or other materials on a surface according to their purpose. Uneven thickness can produce inconsistent circuit properties even with the same material, making differences too small to see significant. Covering the bottom and sides of deep trenches also presents challenges unlike coating a flat surface, so methods are chosen to satisfy both shape and thickness requirements.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "薄い材料の層を作る工程で、厚さや表面形状に応じた制御が要る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-eb09033600-072e1d36",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-eb09033600-072e1d36",
+    "wordId": "nn-eb09033600"
+   }
+  },
+  {
+   "term": "技術革新",
+   "reading": "ぎじゅつかくしん",
+   "pos": "noun",
+   "meaning": "technological innovation",
+   "defJa": "新しい技術によって生産や利用の仕方が変わること",
+   "passage": {
+    "ja": "道具だけ新しくしても、工場の仕事は意外と変わらないんだよね。技術革新が生産の仕方まで変えるには、機械を置く場所や人の役割、注文の受け方も組み直す必要があるんだ。例えば、部品を速く作れるようになったのに検査が追いつかなければ、完成品は増えずに途中の在庫ばかり積み上がる。せっかく高い設備を入れたからには、それを動かす担当者だけでなく、前後の工程を受け持つ人も一緒に流れを変えないと、期待した効果は出にくいよ。",
+    "form": "技術革新",
+    "en": "New tools alone often change surprisingly little about factory work. For technological innovation to transform production, machine placement, people's roles, and how orders are handled also need reorganizing. If parts can be made faster but inspection cannot keep up, unfinished inventory piles up without an increase in completed products. After investing in expensive equipment, the people handling preceding and subsequent processes need to change the workflow together with its operators for the expected benefits to emerge.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "新技術の導入に伴い、生産や利用の仕組みも変わること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6f817dd058-3edc1df7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6f817dd058-3edc1df7",
+    "wordId": "nn-6f817dd058"
+   }
+  },
+  {
+   "term": "文脈内学習",
+   "reading": "ぶんみゃくないがくしゅう",
+   "pos": "noun",
+   "meaning": "in-context learning",
+   "defJa": "入力中の例や説明を手掛かりに課題へ対応すること",
+   "passage": {
+    "ja": "入力欄に「大きい→小さい」「長い→短い」と並べ、その後に「明るい→」だけを置く場面を想像してください。言語モデルが例の関係を手掛かりに続きを答えるような働きが、文脈内学習の一例です。この場合、入力中の例を利用しているのであって、その応答のためにモデルの重みを更新しているとは限りません。似た例を足しただけで答えが改善することもある一方で、例の選び方や順番に左右されることもあり、短い入力が課題の条件を大きく変えます。",
+    "form": "文脈内学習",
+    "en": "Imagine entering “large → small” and “long → short,” followed only by “bright →”. A language model using the relationship in those examples to provide the continuation illustrates in-context learning. It is using examples in the input, without necessarily updating its model weights for that response. Adding similar examples can improve an answer, while example selection and ordering can also affect it, giving a short input considerable influence over the task's conditions.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "入力中の例を利用する働きで、重みを更新する訓練とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-593530a7d0-700f5948",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-593530a7d0-700f5948",
+    "wordId": "nn-593530a7d0"
+   }
+  },
+  {
+   "term": "最適解",
+   "reading": "さいてきかい",
+   "pos": "noun",
+   "meaning": "an optimal solution",
+   "defJa": "定めた条件の中で目的を最もよく満たす答え",
+   "passage": {
+    "ja": "配達先をすべて回る最短経路が、その日の仕事で最も良い経路になるとは限らない。昼までに届ける荷物や、通行できない道があれば、距離だけを縮めた案は使えないからである。最適解とは、何を良さの尺度とし、どんな制約を置くかを定めたうえで、その条件を最もよく満たす答えを指す。条件を外して数字だけを競えば計算は華やかになるが、玄関で荷物を待つ人にとって重要な約束が失われ、数式の中の成功と現場の成功が離れてしまう。",
+    "form": "最適解",
+    "en": "The shortest route visiting every delivery address is not necessarily the best route for that day's work. Packages due by noon and impassable roads can make a distance-minimizing proposal unusable. An optimal solution is the answer that best satisfies the conditions after objectives and constraints have been specified. Competing only on numbers while discarding constraints may make the calculation impressive, but it loses promises important to recipients, separating mathematical success from practical success.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "目的と制約を定めた条件の中で、最も良い答えを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6964993348-e88f534a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-6964993348-e88f534a",
+    "wordId": "nn-6964993348"
+   }
+  },
+  {
+   "term": "欺瞞",
+   "reading": "ぎまん",
+   "pos": "noun",
+   "meaning": "deception",
+   "defJa": "相手に事実と異なる理解をさせるように欺くこと",
+   "passage": {
+    "ja": "都合の悪い試験結果を隠し、成功した例だけを投資家へ示せば、表に載った数字が正しくても全体像はゆがむ。欺瞞は、虚偽の一文を述べる行為に限らず、事実の選び方や伏せ方によって相手を誤った理解へ誘う場合にも成り立つ。ただの説明不足か、意図的に誤解させたのかを判断するには、何を知りながら省いたのかが問われる。聞き手が誤認すると分かっていた条件を伏せたまま、「嘘は一つも言っていない」と弁明しても、誠実さを取り戻すことは難しい。",
+    "form": "欺瞞",
+    "en": "Hiding unfavorable test results while showing investors only successful examples distorts the overall picture even when the reported numbers are accurate. Deception can involve selecting or withholding facts to mislead, rather than only stating a false sentence. Distinguishing inadequate explanation from intentional deception requires examining what was knowingly omitted. If conditions were withheld despite knowing listeners would misunderstand, insisting that no lies were told does little to restore credibility.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "虚偽だけでなく、相手を誤認へ誘う情報の隠し方にも使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c03dd05187-d8061609",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
+    "cardId": "nn-c03dd05187-d8061609",
+    "wordId": "nn-c03dd05187"
+   }
+  }
+ ]
+}

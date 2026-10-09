@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "集積回路",
+   "reading": "しゅうせきかいろ",
+   "pos": "noun",
+   "meaning": "integrated circuit",
+   "defJa": "多数の素子や接続を一つの基板上に作った回路",
+   "passage": {
+    "ja": "小さな部品をただ箱に詰めれば、計算機が際限なく小さくなるわけではない。多数の素子とそれらを結ぶ道を一つの基板上に作る集積回路は、個別の部品をつなぎ合わせる発想から、接続も含めて一体として作る発想への転換を含んでいる。もっとも、詰め込む数を増やすに伴って、熱や電力、信号を運ぶ距離の問題も姿を変える。小さいこと自体を目的と見るより、限られた面積で何を実現し、そのためにどの条件を調整したかを読むと、完成品の寸法の背後にある設計の選択が浮かぶ。",
+    "form": "集積回路",
+    "en": "Simply packing small components into a box does not make a computer shrink without limit. An integrated circuit, which forms many devices and their connections on one substrate, embodies a shift from assembling individual parts to manufacturing their connections as a unified whole. Increasing the number packed together also changes problems involving heat, power, and signal travel distance. Reading what was achieved in limited area and which conditions were adjusted reveals the design choices behind the dimensions, rather than treating smallness itself as the goal.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "部品を寄せるだけでなく、一体として作る点に注目する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "頑健性",
+   "reading": "がんけんせい",
+   "pos": "noun",
+   "meaning": "robustness",
+   "defJa": "条件の変化や乱れがあっても性能を保つ性質",
+   "passage": {
+    "ja": "人工知能の紹介文で「頑健性が高い」とだけ書かれていても、読者には何に強いのかが伝わりません。画像の明るさが変わっても分類を保てるのか、入力に小さな誤りが混ざっても答えが崩れにくいのかを補うと、評価した条件が具体的になります。ある試験で安定していたからといって、別の環境でも必ず同じ働きをするとは言えないので、試した変化の範囲も残したいところです。「強いモデル」という曖昧な褒め言葉を、条件と結果の組に書き換えることが、技術記事の検証可能性を支えます。",
+    "form": "頑健性",
+    "en": "An AI description that merely claims high robustness does not tell readers what the system withstands. Specifying whether classification survives brightness changes or answers resist small input errors makes the evaluated conditions concrete. Stability in one test does not guarantee the same behavior elsewhere, so the range of changes tested should also remain visible. Replacing a vague compliment such as “a strong model” with a pairing of conditions and results supports verification of a technical article.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "何を変えたときに、何を保つのかを明示する。",
+    "sense": ""
+   }
+  }
+ ]
+}

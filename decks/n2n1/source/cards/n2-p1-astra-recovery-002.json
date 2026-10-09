@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "警備",
+   "reading": "けいび",
+   "pos": "noun",
+   "meaning": "security; guarding",
+   "defJa": "事故や犯罪を防ぐために見張ること。",
+   "passage": {
+    "ja": "催しの案内文では、会場の安全を守る人と、入場券を確認する人が、まとめて係員と表記されることがある。警備を担当する者への連絡を求める場面でこの語だけを使うと、来場者は誰に知らせるべきか迷う。服装や立っている場所を示す情報に加えて、異常を見つけた場合の連絡先を明記すれば、案内の役割が明確になる。注意を促す表現を誇張して重ねても、行動の指示が曖昧なままでは役立たない。安全に関わる文章ほど、読み手が次に取る行動まで見える言葉が必要である。",
+    "form": "警備",
+    "en": "Event notices sometimes use the single label staff for both people responsible for venue safety and those checking tickets. If that label alone is used when people need to contact security personnel, visitors may be unsure whom to notify. Specifying a contact for reporting irregularities, alongside information about clothing or location, clarifies the notice’s function. Repeating exaggerated calls for caution is of little use while the instructions for action remain vague. Writing concerned with safety particularly needs wording that makes the reader’s next action clear.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「警備を担当する」は、事故や犯罪の防止を受け持つことです。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "活躍",
+   "reading": "かつやく",
+   "pos": "noun",
+   "meaning": "active contribution; success",
+   "defJa": "力を発揮して目立った働きをすること。",
+   "passage": {
+    "ja": "仲間の成長を記録する文章で、すごい人だと褒めるだけでは、その人が何をしたのか見えてきません。大会での活躍を振り返るなら、得点だけでなく、苦しい場面で周囲にかけた言葉も書き留めてみます。明朗な性格という印象を具体的な行動に言い換えると、読み手にもその働きが伝わります。本人なりに工夫したことを尋ねれば、結果の陰にあった練習への姿勢も分かるでしょう。褒め言葉を増やすより、見ていた場面を丁寧に描くことが、努力を認める文章につながります。",
+    "form": "活躍",
+    "en": "In writing that records a teammate’s growth, merely praising them as amazing does not show what they actually did. When looking back on their performance in a tournament, try recording not only their scores but also the words they offered others in difficult moments. Translating an impression such as a cheerful personality into concrete actions communicates their contribution to readers. Asking what they personally worked out can also reveal the attitude to practice behind the result. Describing the scenes you witnessed carefully, rather than adding more praise, produces writing that acknowledges effort.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「大会での活躍」は、力を発揮して目立った働きをしたことを表します。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

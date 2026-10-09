@@ -1,0 +1,224 @@
+{
+ "cards": [
+  {
+   "term": "虚空",
+   "reading": "こくう",
+   "pos": "noun",
+   "meaning": "empty space, the void",
+   "defJa": "何もなく、ただ広がりだけがある空間のこと",
+   "passage": {
+    "ja": "仏教では慈悲の広がりが虚空に譬えられます。壁で区切られた部屋と違い、何ものにも遮られず果てしなく広がる空間を思い浮かべると、親しい相手にしか向かわない思いやりとの隔たりが際立ちます。好き嫌いで範囲を決めない慈悲です。相手から礼を返してもらえないとしても、苦しむ人への願いをそこで打ち切りません。心の中に引いていた境界を外せば、今まで遠ざけていた相手も、安らかであってほしいと願う人の輪に入ってきます。",
+    "form": "虚空",
+    "en": "In Buddhism, the reach of compassion is compared to boundless space. Imagining space that extends endlessly without obstruction, unlike a walled room, brings out its distance from kindness directed only toward people close to us. This is compassion whose reach is not set by likes and dislikes. Even without receiving thanks, one does not end one's wishes for a suffering person there. Removing a boundary drawn in the mind brings someone previously kept at a distance into the circle of people one wishes to be at peace.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "何ものにも妨げられない空間の広がりが、慈悲の譬えに使われている。",
+    "sense": "仏教で、ものを包み込む広大な空を指す語"
+   },
+   "cardId": "nn-dbf1a5d7a7-9fcb64e5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-002.json",
+    "cardId": "nn-dbf1a5d7a7-9fcb64e5",
+    "wordId": "nn-dbf1a5d7a7"
+   }
+  },
+  {
+   "term": "老師",
+   "reading": "ろうし",
+   "pos": "noun",
+   "meaning": "venerable Zen teacher",
+   "defJa": "禅の修行を導く師への敬称",
+   "passage": {
+    "ja": "禅の修行を始めた友人が、師に会う前からやけに緊張してるんだ。年上の人と話すからというだけでもなさそうだよ。老師と呼んで敬っているその師には、自分では順調だと思っていた修行のことも率直に尋ねられるので、友人はうまく答えようと考えるあまり、昨夜はあれこれ頭を悩ませたらしいんだ。ようやく会えた日は、用意していた立派な答えを途中でやめて、今いちばん困っていることをそのまま話したって言ってたよ。",
+    "form": "老師",
+    "en": "A friend who has begun Zen training is already terribly nervous before meeting his teacher. It seems to be more than simply talking to someone older. His venerable Zen teacher, whom he addresses respectfully as roshi, asks directly even about practice he thought was going well, and apparently my friend worried over all sorts of things last night in his eagerness to answer well. He said that when they finally met, he abandoned his polished answer halfway through and simply talked about what was troubling him most.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "禅の修行を導く師を敬って呼ぶ語で、単なる年長者の呼び名ではない。",
+    "sense": ""
+   },
+   "cardId": "nn-a4ddeda7d1-780ddb66",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-a4ddeda7d1-780ddb66",
+    "wordId": "nn-a4ddeda7d1"
+   }
+  },
+  {
+   "term": "基板",
+   "reading": "きばん",
+   "pos": "noun",
+   "meaning": "a substrate or circuit board",
+   "defJa": "回路や部品を載せる土台となる板",
+   "passage": {
+    "ja": "基板が割れた電子機器って、部品が無事ならそのまま使えると思う？その板には、部品同士をつなぐ細い配線も通ってるんだよ。途中で切れたら、電気は届かないよね。見た目の割れが小さくても、内部の配線まで傷んでいると、外から眺めただけじゃ場所を特定できない。修理する人が切れた所を探してつなぎ直すと、同じ部品のままでも信号が通るようになって、消えていた画面がまた点灯することもあるんだ。",
+    "form": "基板",
+    "en": "Do you think an electronic device with a cracked circuit board will still work as it is if its components are intact? That board also carries fine wiring connecting its components. If a connection breaks, electricity cannot get through. Even a small visible crack can involve damaged internal wiring whose location cannot be identified just by looking from outside. When a repairer finds and reconnects a break, signals may pass again with the same components, and a screen that had gone dark can light up once more.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "部品を載せる板で、回路の配線を支える役割もある。",
+    "sense": ""
+   },
+   "cardId": "nn-f2ff749724-64ec98f6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-f2ff749724-64ec98f6",
+    "wordId": "nn-f2ff749724"
+   }
+  },
+  {
+   "term": "知的財産",
+   "reading": "ちてきざいさん",
+   "pos": "noun",
+   "meaning": "intellectual property",
+   "defJa": "発明や創作などから生まれる無形の財産",
+   "passage": {
+    "ja": "半導体の会社なのに、売り物が完成したチップじゃなくて設計だって聞くと、少し意外だよね。製造する工場は、取引先が用意するんだ。こうした商売では、独自の回路設計などの知的財産が収入を支えているよ。物を運ばなくても、使う許可が取引になるんだね。契約に応じて設計の使える範囲や支払い方を決めた後、買った会社はその設計を自分たちの製品に組み込み、売った会社には利用料が入る、という流れになるんだ。",
+    "form": "知的財産",
+    "en": "It seems a little surprising to hear that a semiconductor company sells designs rather than finished chips. The customer provides the manufacturing facility. Intellectual property such as original circuit designs supports revenue in this kind of business. Permission to use something can be traded without shipping an object. After the permitted scope of use and payment terms are set by contract, the purchasing company incorporates the design into its products and the selling company receives licensing fees.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "発明や設計などの形のない財産で、利用を許すことも取引になる。",
+    "sense": ""
+   },
+   "cardId": "nn-a50bf9fea5-5c852f46",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-a50bf9fea5-5c852f46",
+    "wordId": "nn-a50bf9fea5"
+   }
+  },
+  {
+   "term": "鈴木大拙",
+   "reading": "すずきだいせつ",
+   "pos": "noun",
+   "meaning": "Daisetz Suzuki",
+   "defJa": "禅などの仏教思想を海外にも紹介した思想家",
+   "passage": {
+    "ja": "禅を海外へ伝えた仕事は、著作の題名にも刻まれている。英語で禅の経験や日本文化との関わりを論じる活動を続けるかたわら、浄土真宗にも関心を寄せ、日本の仏教を異なる角度から海外へ届ける作業が進められた。鈴木大拙の仕事である。その関心は、単独の宗派の紹介に収まらなかった。日本語で『日本的霊性』を著したこの思想家は、晩年にも親鸞の思想と向き合い、『教行信証』の英訳を完成させた。",
+    "form": "鈴木大拙",
+    "en": "The work of bringing Zen overseas is reflected even in the titles of his books. Alongside sustained activity discussing Zen experience and its relationship to Japanese culture in English, an interest in Shin Buddhism led to work presenting Japanese Buddhism overseas from another angle. This was the work of Daisetz Suzuki. His interests exceeded the introduction of a single denomination. The thinker who wrote Japanese Spirituality in Japanese continued engaging with Shinran's thought late in life and completed an English translation of Kyogyoshinsho.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "禅の海外紹介に加え、浄土真宗にも関心を寄せた近代の仏教思想家。",
+    "sense": ""
+   },
+   "cardId": "nn-46496c3379-27c95ba5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-46496c3379-27c95ba5",
+    "wordId": "nn-46496c3379"
+   }
+  },
+  {
+   "term": "寺請制度",
+   "reading": "てらうけせいど",
+   "pos": "noun",
+   "meaning": "temple certification system",
+   "defJa": "寺院に信仰上の所属などを証明させた制度",
+   "passage": {
+    "ja": "江戸期の宗門人別帳には、人々の名や年齢とともに所属する寺も記された。単なる参拝者の名簿ではない。寺請制度の下で、寺院は檀家がキリシタンではないことを証明する役割を担った。人々の宗教上の所属が、村や町の住民を把握する仕組みと結び付いていたのである。本人がどれほど熱心に祈っていたかにかかわらず、行政の記録では人は家ごとの構成員として並べられ、それぞれの暮らしに寺との制度上のつながりが付いて回った。",
+    "form": "寺請制度",
+    "en": "Edo-period religious population registers recorded people's affiliated temples along with names and ages. They were not merely lists of temple visitors. Under the temple certification system, temples certified that their parishioners were not Christians. Religious affiliation thus became linked with systems for identifying village and town residents. Regardless of how fervently individuals prayed, administrative records listed them as members of households, and institutional ties to a temple accompanied their lives.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "寺院の証明を通して、人々の宗教上の所属を統治の仕組みに組み込んだ制度。",
+    "sense": ""
+   },
+   "cardId": "nn-5736afad8a-9cc8b1a2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-004.json",
+    "cardId": "nn-5736afad8a-9cc8b1a2",
+    "wordId": "nn-5736afad8a"
+   }
+  },
+  {
+   "term": "戒名",
+   "reading": "かいみょう",
+   "pos": "noun",
+   "meaning": "Buddhist precept name",
+   "defJa": "仏教で戒を受け仏弟子となる際に授けられる名",
+   "passage": {
+    "ja": "おばあちゃんが元気なうちに、お寺で仏弟子としての名前を授かることにしたんだって。家族は最初、もうお葬式の準備を始めるのかと驚いたそうだよ。住職から戒を受けて仏の教えに沿って生きようと決めた人が授かる名前だから、亡くなった後に限るものじゃないと聞いて、みんな安心したらしいんだ。新しい戒名を受け取ったおばあちゃんは、これから毎日お参りするときに、その名前を見て自分の誓いを思い出したいって話してるよ。",
+    "form": "戒名",
+    "en": "Apparently my grandmother has decided to receive a name as a disciple of the Buddha at her temple while she is still healthy. At first the family was surprised, thinking she was already beginning funeral preparations. Everyone apparently felt reassured on hearing that the name is for someone who receives precepts from the priest and resolves to live by the Buddha's teaching, so it is not restricted to after death. Having received her new Buddhist precept name, she says she wants to look at it during her daily prayers from now on and remember her vow.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "戒を受け仏弟子となった際に授かる名で、生前に受ける場合もある。",
+    "sense": ""
+   },
+   "cardId": "nn-1f65ecbd62-09a61247",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-1f65ecbd62-09a61247",
+    "wordId": "nn-1f65ecbd62"
+   }
+  },
+  {
+   "term": "悲観論",
+   "reading": "ひかんろん",
+   "pos": "noun",
+   "meaning": "a pessimistic outlook",
+   "defJa": "将来を悪い方向へ進むと見る考え",
+   "passage": {
+    "ja": "人工知能の会社は赤字から抜け出せないっていう悲観論を聞いたんだ。モデルの開発費が重いうえに、利用者が増えるたびに計算の費用もかかるから、売上げが伸びても利益につながりにくいという見立てなんだよね。それはまだ予測だよ。計算の効率や料金が変われば収支も動くし、今の赤字だけから先の結果を決めるのは早いと思う。友人はその話を聞いた後、次の決算では売上げと費用がそれぞれどう変わったかを確かめると言っていたよ。",
+    "form": "悲観論",
+    "en": "I heard a pessimistic outlook claiming that artificial intelligence companies cannot escape losses. The view is that heavy model-development expenses and computing costs that rise with additional users make revenue growth difficult to turn into profit. That is still a prediction. Changing computational efficiency or prices would also change the balance, and I think it is too early to decide the future from current losses alone. After hearing this, a friend said he would check how revenue and costs had each changed in the next earnings announcement.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "将来の悪化を見込む考えで、現在の損失という事実とは区別する。",
+    "sense": ""
+   },
+   "cardId": "nn-6053cca230-c355360d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6053cca230-c355360d",
+    "wordId": "nn-6053cca230"
+   }
+  },
+  {
+   "term": "指数関数的",
+   "reading": "しすうかんすうてき",
+   "pos": "na-adj",
+   "meaning": "exponential",
+   "defJa": "一定の割合で繰り返し増えたり減ったりする様子",
+   "passage": {
+    "ja": "数字だけの暗証番号は、桁を増やすと候補が急増する。短い番号なら、試せる候補も少ない。各桁で同じ数の数字から選べるとすれば、桁が増えるたびに候補の総数にその数を掛けることになり、増え方は前の候補数を基礎としてさらに大きくなる。計算機が順に照合する仕事も膨らむ。候補を試す速さが変わらない限り、桁数に対して指数関数的に増える組合せが、照合を終えるまでの待ち時間を引き延ばしていく。",
+    "form": "指数関数的",
+    "en": "For a numeric passcode, adding digits rapidly increases the number of candidates. A short code has fewer candidates to try. If each position offers the same number of digits, every added position multiplies the total by that number, making the increase itself grow from the previous total. The work of sequential checking by a computer also expands. As long as the checking rate stays constant, combinations that increase exponentially with the number of digits stretch the wait until checking is finished.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "同じ倍率で増え、前の増加分も次の増加の土台となる様子。",
+    "sense": ""
+   },
+   "cardId": "nn-d7514a4814-839e6e76",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-d7514a4814-839e6e76",
+    "wordId": "nn-d7514a4814"
+   }
+  },
+  {
+   "term": "苦行",
+   "reading": "くぎょう",
+   "pos": "noun",
+   "meaning": "ascetic practice; austerities",
+   "defJa": "心身に厳しい負担を課す宗教的な修行",
+   "passage": {
+    "ja": "苦行に耐えた日々は、修行者にとって誇りにもなり得る。つらかった記憶ほど手放しにくい。仏教が自らを痛めることへの偏りを退けるとき、問われるのは努力をしたかどうかより、その努力を自分の価値の証拠として抱え込み、新たな執着にしていないかという点でもある。痛みは消えても、他人と比べる心が残る。寒さをしのぐ衣を前にしても、かつて薄着で耐えた自分を誇り続けるなら、その人は今、何から自由になろうとしているのだろうか？",
+    "form": "苦行",
+    "en": "Days of enduring austerities can become a source of pride for a practitioner. Painful memories can be especially hard to release. When Buddhism rejects an inclination toward self-torment, it also asks whether effort is being held as proof of personal worth and made into a new attachment, rather than merely whether effort was made. Pain may disappear while the impulse to compare oneself with others remains. If someone facing a garment that would ward off the cold still takes pride in having endured with thin clothing, what is that person now trying to become free of?",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "心身に厳しい負担を課す宗教的実践で、その厳しさ自体が執着の対象にもなる。",
+    "sense": ""
+   },
+   "cardId": "nn-a42f8529b5-8efcb212",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-a42f8529b5-8efcb212",
+    "wordId": "nn-a42f8529b5"
+   }
+  }
+ ]
+}

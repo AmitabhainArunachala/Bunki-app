@@ -309,28 +309,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "宣教師",
-   "reading": "せんきょうし",
-   "pos": "noun",
-   "meaning": "missionary",
-   "defJa": "宗教を広めるために派遣された人",
-   "passage": {
-    "ja": "大航海時代の波に乗って十六世紀に来日した宣教師ザビエルは、布教すべく、まず日本語の習得に力を注いだ。しかし日本語の敬語や発音は難しく、初めは「大日」という言葉を神の訳語に使ってしまうなど、誤解も多かったという。そこで彼は、相手の言葉を使うだけでなく、相手の価値観に寄り添う話し方を学んでいった。伝える側が歩み寄る姿勢こそが、異文化で言葉を届ける第一歩なのである。",
-    "form": "宣教師",
-    "en": "Xavier, a missionary who came to Japan in the sixteenth century riding the wave of the Age of Discovery, first devoted himself to learning Japanese in order to spread his faith. But Japanese honorifics and pronunciation were hard, and there were many misunderstandings, such as initially using the word Dainichi as a translation for God. So he came to learn a way of speaking that not only used the other party's words but also drew close to their values. The attitude of the speaker moving toward the listener is the first step in delivering words across cultures.",
-    "register": "語",
-    "topic": "history",
-    "tipJa": "布教のために派遣される人。ザビエルのような歴史的人物と結びつく。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "大脳皮質",
    "reading": "だいのうひしつ",
    "pos": "noun",
@@ -563,28 +541,6 @@
     "register": "語",
     "topic": "language",
     "tipJa": "「母音」と対。話し方では子音の明瞭さが聞き取りやすさを左右する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "多読",
-   "reading": "たどく",
-   "pos": "noun",
-   "meaning": "extensive reading",
-   "defJa": "大量の本をやさしく読み進める学習法",
-   "passage": {
-    "ja": "語学の達人たちが口をそろえて勧めるのが、多読です。難しい本を辞書と格闘しながら読むのではなく、やさしい本を止まることなく大量に読みます。意味が分からない語があっても飛ばして進み、前後の文脈から大意をつかむのがコツです。一冊読み終えるころには、同じ語が三度も四度も出てきて、勝手に頭に残っているんですよ。しかも、楽しんで読めるので、勉強という意識がないまま、気づけば語彙も読む速度も伸びているんです。",
-    "form": "多読",
-    "en": "What language masters all recommend with one voice is extensive reading. Instead of wrestling with a hard book and a dictionary, you read lots of easy books without stopping. Even if there are words you don't understand, you skip ahead and grasp the gist from the context before and after; that's the knack. By the time you finish a book, the same word has shown up three or four times and has stuck in your head on its own. What is more, it is fun to read, so without any sense of studying, you notice that your vocabulary and reading speed have grown.",
-    "register": "講",
-    "topic": "language",
-    "tipJa": "「精読」と対になる。量を重視する読み方で、語学学習の講義でよく使う。",
     "sense": ""
    },
    "deck": "senmon",

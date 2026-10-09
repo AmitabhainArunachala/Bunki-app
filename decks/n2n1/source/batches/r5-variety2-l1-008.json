@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "真如",
+   "reading": "しんにょ",
+   "gloss": "suchness; reality as it is",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-8efb88e205-45904b42",
+    "wordId": "nn-8efb88e205"
+   }
+  },
+  {
+   "term": "神仏分離",
+   "reading": "しんぶつぶんり",
+   "gloss": "separation of Shinto and Buddhism",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-003.json",
+    "cardId": "nn-fc6558f9c3-14802c43",
+    "wordId": "nn-fc6558f9c3"
+   }
+  },
+  {
+   "term": "究竟",
+   "reading": "くきょう",
+   "gloss": "ultimate completion",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-6b01be4faa-348be317",
+    "wordId": "nn-6b01be4faa"
+   }
+  },
+  {
+   "term": "空衣派",
+   "reading": "くうえは",
+   "gloss": "Digambara Jain tradition",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-001.json",
+    "cardId": "nn-82fadd5be4-8e2177d0",
+    "wordId": "nn-82fadd5be4"
+   }
+  },
+  {
+   "term": "老師",
+   "reading": "ろうし",
+   "gloss": "venerable Zen teacher",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-a4ddeda7d1-780ddb66",
+    "wordId": "nn-a4ddeda7d1"
+   }
+  },
+  {
+   "term": "自他不二",
+   "reading": "じたふに",
+   "gloss": "nonduality of self and others",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-6a2db8b67d-5298c076",
+    "wordId": "nn-6a2db8b67d"
+   }
+  },
+  {
+   "term": "苦",
+   "reading": "く",
+   "gloss": "suffering; pain (Buddhist duhkha)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-001.json",
+    "cardId": "nn-1d9de78d51-baf26bb1",
+    "wordId": "nn-1d9de78d51"
+   }
+  },
+  {
+   "term": "華厳経",
+   "reading": "けごんきょう",
+   "gloss": "the Avatamsaka Sutra",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-934c031e5f-9679736f",
+    "wordId": "nn-934c031e5f"
+   }
+  }
+ ],
+ "weave": [
+  "真如",
+  "神仏分離",
+  "究竟",
+  "空衣派",
+  "老師",
+  "自他不二",
+  "苦",
+  "華厳経"
+ ]
+}

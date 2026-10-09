@@ -397,28 +397,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "未曾有",
-   "reading": "みぞう",
-   "pos": "na-adj",
-   "meaning": "unprecedented",
-   "defJa": "今までに一度もなかったこと",
-   "passage": {
-    "ja": "生成AIの登場は、言葉を扱う仕事の世界に、未曾有の変化をもたらしている。かつては人間にしかできないと思われていた文章の下書きや翻訳が、数秒で行われるようになったからだ。この事態を、職を奪う脅威と見るか、新しい創造の道具と見るかで、人々の態度は大きく割れている。いずれの立場に立つにせよ、校正や校閲のように、責任をもって判断する役割の重みは、むしろ増していくだろう。",
-    "form": "未曾有",
-    "en": "The arrival of generative AI is bringing unprecedented change to the world of work that deals with words. This is because drafting and translating text, once thought possible only for humans, can now be done in seconds. People's attitudes are sharply split over whether to see this situation as a threat that takes away jobs or as a new tool for creation. Whichever position one takes, the weight of roles that judge with responsibility, like proofreading and copyediting, will if anything increase.",
-    "register": "論",
-    "topic": "ai",
-    "tipJa": "「未曾有の災害」「前代未聞」とも。「みぞうゆう」とは読まない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "機微",
    "reading": "きび",
    "pos": "noun",
@@ -941,28 +919,6 @@
    },
    "deck": "senmon",
    "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "本論",
-   "reading": "ほんろん",
-   "pos": "noun",
-   "meaning": "main body",
-   "defJa": "論文などの中心となる部分",
-   "passage": {
-    "ja": "論文の構成で最もよく見られる失敗は、序論ばかりが長くなり、本論に入る前に読者が疲れてしまうことである。背景の説明は大切だが、問いと答えの見通しを示したら、すみやかに主張の核心へ移るべきだ。この部分では、主張を支える根拠を、強い順または時間の順など、読者にとって追いやすい順序で並べるのがよい。構成力とは、結局のところ、読み手の理解の流れを予測し、その上に文章の骨組みを組み立てる力にほかならない。",
-    "form": "本論",
-    "en": "The most common failure in structuring a paper is that the introduction grows long and the reader tires before reaching the main body. Explaining the background is important, but once you have shown the outlook of the question and answer, you should move promptly to the heart of the claim. In this part, it is good to arrange the evidence supporting your claim in an order easy for readers to follow, such as strongest first or chronological. Compositional skill is, in the end, nothing other than the ability to predict the reader's flow of understanding and build the framework of the text on it.",
-    "register": "論",
-    "topic": "language",
-    "tipJa": "対は「序論」「結論」。論文・論述の中心となる部分。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

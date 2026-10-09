@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "自己言及",
+   "reading": "じこげんきゅう",
+   "pos": "noun",
+   "meaning": "self-reference",
+   "defJa": "言葉や仕組みがそれ自身を指し示すこと",
+   "passage": {
+    "ja": "紙に「この文には漢字が含まれている」とあると、文が自分の中身を指しているよね。こういう自己言及は、必ずしも矛盾を起こすわけじゃなくて、この例なら実際に漢字が見えるから確かめられる。「この文は偽だ」となると事情が変わって、真だとすれば偽、偽だとすれば真になり、単純な判定が回り続けるんだ。自分を指す形が同じでも、何を主張しているかによって問題は違う。自分の状態を表示するプログラムまで全部おかしいと考える必要はないよ。",
+    "form": "自己言及",
+    "en": "A piece of paper saying “This sentence contains kanji” has a sentence pointing to its own contents. Such self-reference need not produce a contradiction, and this example can be checked because kanji are visibly present. With “This sentence is false,” things change, since treating it as true makes it false and treating it as false makes it true, sending a simple verdict around in circles. Even with the same self-directed form, the problem depends on what is asserted. There is no need to regard every program displaying its own status as defective.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "自分自身を対象として指すことで、必ずしも矛盾を生むとは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b73777edb3-60917be6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-b73777edb3-60917be6",
+    "wordId": "nn-b73777edb3"
+   }
+  }
+ ]
+}

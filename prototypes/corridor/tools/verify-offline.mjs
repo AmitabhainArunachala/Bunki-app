@@ -664,7 +664,7 @@ try {
     state.online = false;
     await launch(profile);
     await context.setOffline(true);
-    let app = await newPage(base, `${APP}?entry=shelf&ui=bi`);
+    let app = await newPage(base, `${APP}?entry=shelf&ui=ja`);
     const booted = await ready(app, 'first app startup after browser restart works offline');
     check(
       'offline startup uses the installed worker',
@@ -705,6 +705,9 @@ try {
         offlineLook.word.border === 'none' && offlineLook.word.background === 'rgba(0, 0, 0, 0)' &&
         offlineLook.word.padding === '0px' && offlineLook.word.minWidth === '0px' && offlineLook.word.minHeight === '0px',
       JSON.stringify(offlineLook));
+    await app.locator('#lang [data-lang="bi"]').click();
+    check('cold offline style fixture returns to active English before the remaining journey',
+      await app.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed') === 'true');
     for (const path of ['editorial.css', 'design/ink-hoku-nami.png']) {
       const cached = await fetchOutcome(app, `${base}${APP}${path}`);
       check(`offline ${path} bytes match the installed artifact`,

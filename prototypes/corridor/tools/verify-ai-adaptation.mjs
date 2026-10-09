@@ -166,7 +166,7 @@ async function send(surface, trigger) {
 }
 const wordRequest = async (form = words.n5) => {
   await openWord(form);
-  const request = await send('word-tutor', () => page.locator('#sheet .ai-ask').filter({ hasText: '先生に聞く' }).click());
+  const request = await send('word-tutor', () => page.locator('#sheet .ai-ask').filter({ hasText: 'ask the tutor' }).click());
   assert.ok(request.archive.every((row) => row.contextRef === `word:${form}`));
   return request;
 };
@@ -246,7 +246,7 @@ try {
     check('selected N1 cards without judged evidence remain four sparse dimensions', () => assert.ok(teaching(tutor).bands.every((entry) => entry.evidence === 'sparse' && entry.workingBand === null && entry.cells.length === 0)));
     await openWord(words.unknown);
     let before = learning(await readAppRecord(page));
-    const examples = await send('examples', () => page.locator('#sheet .ai-ask').filter({ hasText: '例文をつくる' }).click());
+    const examples = await send('examples', () => page.locator('#sheet .ai-ask').filter({ hasText: 'write examples at my level' }).click());
     await page.locator('#sheet .ai-ex').first().waitFor();
     const learningAfterExamples = learning(await readAppRecord(page));
     check('unknown source word classification stays unknown in actual examples request', () => assert.ok(examples.body.messages.at(-1).content.includes('Source word JLPT classification: not recorded')));
@@ -411,7 +411,7 @@ try {
     await page.locator('[data-passage="wikinews:1403"]').first().click();
     await page.locator('#reader .tok[data-index="18"]').click();
     if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
-    await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const deniedQuestion = 'この文の「世界」の意味を教えてください。', deniedCount = requests.length;
     await page.locator('#chat-input').fill(deniedQuestion); await page.locator('#chat-send').click();
     await page.waitForFunction(() => document.querySelector('#chat-status')?.textContent.includes('not available for tutor processing'));
@@ -425,7 +425,7 @@ try {
     await page.locator('[data-passage="bunki-graded-n5-morning"]').first().click();
     await page.locator('#reader .tok[data-index="0"]').click();
     if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
-    await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const before = await readAppRecord(page), source = before.teacherContexts.entries.find((entry) => entry.id === before.teacherContexts.activeRef);
     assert.ok(source?.quote && source.sourceKind === 'bundled-passage');
     const request = await sendChat('この文の「朝」の意味を教えてください。');

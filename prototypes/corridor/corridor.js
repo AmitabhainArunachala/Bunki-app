@@ -76,6 +76,12 @@ function levelPhrase(grading) {
  * (2026-08-07): more separation between layers, and navigation a learner can
  * read before they can read Japanese. */
 const VARIANTS = {
+  nav: {
+    ticket: null,
+    label: 'ナビゲーション',
+    en: 'navigation',
+    options: [['tabs', '五つの入口', 'five destinations'], ['legacy', '従来の入口', 'legacy doors']],
+  },
   cards: {
     ticket: 38,
     label: 'A 札の形 #38',
@@ -417,6 +423,10 @@ const S = {
    * its own, not a strip squeezed into the bar. searchFrom remembers the
    * view the door was opened from so Back returns there. Session-only. */
   searchFrom: null,
+  /** The tab root (PRIMARY_TABS view) last entered from the tab bar, held while the learner
+   * stays inside that tab's rooms. A tab root reached that way is a peer of the other four,
+   * not a step down from them, so its chrome shows no Back (shell fix, 2026-10-08). UI only. */
+  tabRoot: null,
   // Disposable detours, never learner evidence or scheduler state.
   navigationReturns: [],
   sheetReturnFocus: null,
@@ -427,6 +437,7 @@ const S = {
   dials: { kanji: 0, furigana: 1, spacing: 0 },
   // entry: 'drift' — The Walk's first step is arriving in the living universe
   variants: {
+    nav: 'tabs',
     cards: 'mcd',
     difficulty: 'three',
     contrast: 'wcag',
@@ -3339,7 +3350,7 @@ async function personalDictionaryBridge(container) {
       if (meanings.length) {
         const entry = S.stack.at(-1);
         const disclosure = el('details', 'personal-dictionary-meaning');
-        disclosure.append(el('summary', null, '意味・英訳を見る / Show meaning & English'));
+        disclosure.append(el('summary', null, tx('意味・英訳を見る', 'Show meaning & English')));
         disclosure.open = !!entry.dictionaryMeaningOpen;
         disclosure.addEventListener('toggle', () => { if (disclosure.isConnected) entry.dictionaryMeaningOpen = disclosure.open; });
         disclosure.append(...meanings);
@@ -4026,19 +4037,25 @@ window.__KAIRO_INTERACTION__ = Object.freeze({
 
 /* ------------------------------------------------------------ ui language */
 const bi = () => S.lang === 'bi';
-/** Pick one rendering for prose: English when the chrome is bilingual,
- * the Japanese original in 日本語のみ mode. */
-const tx = (ja, en) => (bi() && en != null ? en : ja);
-/** Append a small english sub-label to a control or heading (bi mode only). */
-function withEn(node, en, cls = 'en-sub') {
-  if (bi() && en) node.append(el('span', cls, en));
+const kankenGradeLabel = value => String(value) === '配当外' ? 'Outside assigned grades'
+  : `grade ${String(value).replaceAll('準', 'pre-').replaceAll('級', '')}`;
+/** Chrome has one active language. Learning passages and dictionary forms
+ * never pass through this helper; every chrome label supplies both versions. */
+const tx = (ja, en) => {
+  if (!bi()) return ja;
+  if (en == null) throw new Error(`Missing English UI label: ${ja}`);
+  return en;
+};
+/** Existing call sites name the Japanese label and its explicit translation.
+ * Select the active label instead of exposing both in English chrome. */
+function withEn(node, en) {
+  if (bi()) node.textContent = tx(node.textContent, en);
   return node;
 }
-/** A label that stacks 日本語 over english inside buttons. */
+/** One visible, accessible label in the chosen interface language. */
 function biLabel(tag, cls, ja, en) {
   const node = el(tag, cls);
-  node.append(el('span', 'l-ja', ja));
-  if (bi() && en) node.append(el('span', 'en-sub', en));
+  node.append(el('span', 'l-ja', tx(ja, en)));
   return node;
 }
 
@@ -4078,7 +4095,7 @@ async function boot() {
       // Choosing a front door must never summon the operator debug strip —
       // the fixed strip swallows taps (filed by three review lanes). The
       // strip remains reachable explicitly via ?variants=1.
-      if (key !== 'entry') anyVariantParam = true;
+      if (key !== 'entry' && key !== 'nav') anyVariantParam = true;
     }
   }
   S.variantsBar = anyVariantParam;
@@ -4119,6 +4136,7 @@ async function boot() {
     const personal = await import('./decks/personal/mount.mjs');
     const bridge = await personalDictionaryBridge($('#app'));
     await personal.mount($('#app'), {
+      english: bi(),
       bridge,
       themes: PUBLIC_THEME_IDS.map((id) => THEME_UI.find((t) => t.id === id)),
       currentTheme: themeId(),
@@ -4130,6 +4148,12 @@ async function boot() {
         location.assign(url);
       },
     });
+    // r4 skin: this page never runs render(), so it sets the language class the shell's type reads
+    // (its English Line was drawn as Japanese) and colours the phone's bar from its own page
+    document.body.classList.toggle('ui-bi', bi());
+    buildPrimaryTabs($('#app'), { personal: true });
+    syncThemeColor();
+    stampRegister();
     return;
   }
   if (params.get('dials')) {
@@ -4153,6 +4177,17 @@ async function boot() {
   if (['kotoba', 'mcd', 'n2', 'n1', 'senmon'].includes(params.get('deck')) || ['#kotoba', '#mcd'].includes(location.hash)) {
     S.view = 'deckplay';
     S.deckPlay = ['n2', 'n1', 'senmon'].includes(params.get('deck')) ? params.get('deck') : params.get('deck') === 'mcd' || location.hash === '#mcd' ? 'kotoba-mcd' : 'kotoba-mine';
+  }
+  // Private collections leave through the same five destinations on a fresh
+  // host page. These are UI routes only, never learner-record state.
+  if (PRIMARY_TABS.some(tab => tab.view === params.get('room'))) {
+    if (params.get('room') === 'me') {
+      S.view = 'shelf';
+      keepNavigationReturn('me', null);
+    }
+    // no S.tabRoot here: this fresh page keeps a real return (Me → Read, verify-redesign-foundation)
+    S.view = params.get('room');
+    if (S.view === 'search') S.searchFrom = 'shelf';
   }
 
   render();
@@ -4392,7 +4427,7 @@ function renderArchive(main) {
     toggle.setAttribute('aria-expanded', String(S.archiveYears.has(y)));
     toggle.type = 'button';
     toggle.dataset.year = y;
-    toggle.textContent = `${open ? '▾' : '▸'} ${y} 年 · ${list.length} ${tx('本', '')}`.trim();
+    toggle.textContent = `${open ? '▾' : '▸'} ${tx(`${y} 年`, String(y))} · ${list.length} ${tx('本', 'articles')}`.trim();
     toggle.addEventListener('click', () => {
       if (S.archiveYears.has(y)) S.archiveYears.delete(y);
       else S.archiveYears.add(y);
@@ -5322,9 +5357,9 @@ function renderSignals(grading, { compact = false } = {}) {
     scale.append(span);
     const legend = el('div', 'band-legend');
     legend.append(
-      el('span', null, tx('易', '易 easy')),
-      el('span', null, tx('中', '中 mid')),
-      el('span', null, tx('難', '難 hard')),
+      el('span', null, tx('易', 'easy')),
+      el('span', null, tx('中', 'mid')),
+      el('span', null, tx('難', 'hard')),
     );
     box.append(withEn(el('div', 'sig-name', '難易度の帯'), 'difficulty band'), scale, legend);
     if (grading.disagreement.flag) {
@@ -5485,7 +5520,9 @@ function renderShelfBody() {
   // results line below come from the same tally, so they cannot disagree.
   const masthead = el('header', 'shelf-masthead');
   const title = el('div', 'shelf-mast-title');
-  // the 永 brush mark is the bookshelf's own small seal, set with its name — never a picture apart.
+  // the bookshelf's own small seal, set with its name — never a picture apart. It is 読 (yomu, "read"),
+  // the Read tab's own kanji, brushed white on 藍 (round 4, John T3: the old 永 read as 水 and said
+  // nothing about reading). The file keeps its path: the offline gates and the worker pin the path.
   // The standalone build inlines the artwork and names it here; a literal path would break it.
   const art = el('img', 'shelf-art'); art.src = window.__KAIRO_SHELF_ART_URL__ || 'design/ink-hoku-nami.png'; art.alt = ''; art.width = 640; art.height = 640;
   art.setAttribute('aria-hidden', 'true');
@@ -5504,22 +5541,24 @@ function renderShelfBody() {
     el('span', 'tally-short', bi() ? `${stories.length} articles` : `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
   dateline.append(el('span', 'dateline-date', shelfDateline(dayOverride ? day : localDay)), sep, tally);
   title.append(dateline);
-  // 未確認 is said once, here, not on every card; each article still wears it in its meta line.
-  // One short line (glance pass 2026-10-01); what it means waits behind its ⓘ.
+  // 未確認 is said once, not on every card; each article still wears it in its meta line. One short
+  // line (glance pass 2026-10-01); what it means waits behind its ⓘ. It stands under the lead story,
+  // not above its picture (review round 2 #6): the shelf opens on the woodblock.
   const unreviewed = stories.filter(reviewPending).length;
+  let reviewNote = null;
   if (unreviewed) {
     const note = el('div', 'shelf-review-note');
+    reviewNote = note;
     note.append(el('span', 'shelf-review-text', tx(`このうち ${unreviewed} 本は未確認（人の確認前）`,
-      `未確認 · ${unreviewed} of ${stories.length} not yet checked by a person`)));
+      `Unreviewed · ${unreviewed} of ${stories.length} not yet checked by a person`)));
     const why = el('details', 'shelf-filter-help shelf-review-help');
     const whySummary = el('summary', 'icon-button');
-    whySummary.setAttribute('aria-label', tx('未確認とは', 'What 未確認 means'));
-    whySummary.title = tx('未確認とは', 'What 未確認 means');
+    whySummary.setAttribute('aria-label', tx('未確認とは', 'What Unreviewed means'));
+    whySummary.title = tx('未確認とは', 'What Unreviewed means');
     whySummary.append(uiIcon('info'));
     why.append(whySummary, el('p', '', tx('人がまだ確認していない読み物です。ふりがなや英訳に誤りがあるかもしれません。記事の見出しの上にも「未確認」と出ます。',
-      'A person has not checked these articles yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says 未確認 at its top.')));
+      'A person has not checked these articles yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says Unreviewed at its top.')));
     note.append(why);
-    title.append(note);
   }
   masthead.append(title);
   main.append(masthead);
@@ -5535,16 +5574,15 @@ function renderShelfBody() {
     const chosen = options.find(([value]) => value === filters[key]) || options[0];
     if (key !== 'sort' && filters[key]) chip.classList.add('is-set');
     const face = el('span', 'filter-chip-label');
-    face.append(el('span', 'l-ja', chosen[1]));
-    if (bi() && chosen[2]) face.append(el('span', 'en-sub', chosen[2]));
+    face.append(el('span', 'l-ja', tx(chosen[1], chosen[2] || chosen[1])));
     chip.append(face, uiIcon('chevron', 'ui-icon filter-chip-caret'));
     const input = el('select'); input.id = `shelf-filter-${key}`;
     input.setAttribute('aria-label', label);
-    for (const [value, ja, en] of options) { const option = el('option', '', bi() && en ? `${ja} · ${en}` : ja); option.value = value; option.selected = filters[key] === value; input.append(option); }
+    for (const [value, ja, en] of options) { const option = el('option', '', tx(ja, en || ja)); option.value = value; option.selected = filters[key] === value; input.append(option); }
     input.addEventListener('change', () => change(key, input.value)); chip.append(input); controls.append(chip);
   };
   const topics = [['news','ニュース','News'],['politics','政治','Politics'],['international','国際','World'],['technology','テクノロジー','Technology'],['science','科学','Science'],['economy','経済','Economy'],['environment','環境','Environment'],['culture','文化','Culture'],['literature','文学','Literature'],['sports','スポーツ','Sports'],['health','健康','Health'],['society','社会','Society']];
-  select('sort', tx('並び順', 'Sort'), [['latest', '最新', 'Latest'], ['new', '新着', 'New to Bunki'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
+  select('sort', tx('並び順', 'Sort'), [['latest', '最新', 'Latest'], ['new', '新着', 'Newly added'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
   select('topic', tx('分野', 'Topic'), [['', '分野', 'Topic'], ...topics]);
   select('jlpt', tx('レベル（JLPT語彙の目安）', 'Level (JLPT vocabulary, estimated)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
   select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Secondary+']]);
@@ -5560,7 +5598,15 @@ function renderShelfBody() {
   helpSummary.append(uiIcon('info'));
   help.append(helpSummary);
   help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose an article. JLPT level comes from its vocabulary; school grade from its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
-  main.append(controls);
+  // The filters and the article search fold into the Tools sheet (review 2026-10-08 #6): the shelf
+  // opens on its lead woodblock, not on a wall of fields. Every control keeps its id and behaviour.
+  const filterGroup = el('section', 'shelf-tools-group shelf-tools-filters');
+  filterGroup.dataset.toolsGroup = 'filter';
+  const filterHead = el('h2', 'shelf-tools-heading');
+  filterHead.id = 'shelf-tools-filter';
+  filterHead.append(el('span', 'l-ja', tx('探す・絞る', 'Find & filter')));
+  filterGroup.setAttribute('aria-labelledby', filterHead.id);
+  filterGroup.append(filterHead, controls);
   // The study tools (glance pass, 2026-10-01): thirteen bare text links between the filters and
   // the first story read as clutter. They now sit behind ONE 学習ツール Tools button in the title
   // block, which opens a panel of labelled tiles in four plain groups. Every door keeps its id
@@ -5576,8 +5622,7 @@ function renderShelfBody() {
     section.dataset.toolsGroup = key;
     const heading = el('h2', 'shelf-tools-heading');
     heading.id = `shelf-tools-${key}`;
-    heading.append(el('span', 'l-ja', ja));
-    if (bi()) heading.append(el('span', 'en-sub', en));
+    heading.append(el('span', 'l-ja', tx(ja, en)));
     const grid = el('div', 'shelf-tools-grid');
     section.setAttribute('aria-labelledby', heading.id);
     section.append(heading, grid);
@@ -5604,7 +5649,7 @@ function renderShelfBody() {
   const lanes = el('button', 'grammar-link');
   lanes.type = 'button';
   lanes.id = 'levels-link';
-  lanes.append(el('span', 'l-ja', '参考書庫'), el('span', 'en-sub', bi() ? 'reference library' : 'JLPT・漢検'));
+  lanes.append(el('span', 'l-ja', tx('参考書庫', 'reference library')));
   lanes.addEventListener('click', () => {
     keepScroll();
     pendingReferenceCollection = null;
@@ -5617,7 +5662,7 @@ function renderShelfBody() {
   const les = el('button', 'grammar-link');
   les.type = 'button';
   les.id = 'lessons-link';
-  les.append(el('span', 'l-ja', 'レッスン'), el('span', 'en-sub', bi() ? 'lessons' : ''));
+  les.append(el('span', 'l-ja', tx('レッスン', 'lessons')));
   les.addEventListener('click', () => {
     keepScroll();
     S.view = 'lessons';
@@ -5628,7 +5673,7 @@ function renderShelfBody() {
   const mock = el('button', 'grammar-link');
   mock.type = 'button';
   mock.id = 'mock-link';
-  mock.append(el('span', 'l-ja', 'JLPT の練習'), el('span', 'en-sub', bi() ? 'JLPT practice' : ''));
+  mock.append(el('span', 'l-ja', tx('JLPT の練習', 'JLPT practice')));
   mock.addEventListener('click', () => {
     keepScroll();
     S.view = 'mock';
@@ -5652,7 +5697,7 @@ function renderShelfBody() {
   const mirror = el('button', 'grammar-link');
   mirror.type = 'button';
   mirror.id = 'kagami-link';
-  mirror.append(el('span', 'l-ja', '鏡'), el('span', 'en-sub', bi() ? 'your progress' : ''));
+  mirror.append(el('span', 'l-ja', tx('鏡', 'your progress')));
   mirror.addEventListener('click', () => {
     keepScroll();
     S.view = 'kagami';
@@ -5663,7 +5708,7 @@ function renderShelfBody() {
   const gram = el('button', 'grammar-link');
   gram.type = 'button';
   gram.id = 'grammar-link';
-  gram.append(el('span', 'l-ja', '文法'), el('span', 'en-sub', bi() ? 'grammar' : ''));
+  gram.append(el('span', 'l-ja', tx('文法', 'grammar')));
   gram.addEventListener('click', () => {
     keepScroll();
     S.view = 'grammar';
@@ -5674,7 +5719,7 @@ function renderShelfBody() {
   const contextDeck = el('button', 'grammar-link');
   contextDeck.type = 'button';
   contextDeck.id = 'context-deck-link';
-  contextDeck.append(el('span', 'l-ja', '文脈札'), el('span', 'en-sub', bi() ? 'context deck' : ''));
+  contextDeck.append(el('span', 'l-ja', tx('文脈札', 'context deck')));
   contextDeck.addEventListener('click', () => {
     keepScroll();
     S.view = 'contextdeck';
@@ -5685,7 +5730,7 @@ function renderShelfBody() {
   const thes = el('button', 'grammar-link');
   thes.type = 'button';
   thes.id = 'thesaurus-link';
-  thes.append(el('span', 'l-ja', '類語'), el('span', 'en-sub', bi() ? 'synonyms' : ''));
+  thes.append(el('span', 'l-ja', tx('類語', 'synonyms')));
   thes.addEventListener('click', () => {
     keepScroll();
     S.view = 'thesaurus';
@@ -5696,7 +5741,7 @@ function renderShelfBody() {
   const yj = el('button', 'grammar-link');
   yj.type = 'button';
   yj.id = 'yoji-link';
-  yj.append(el('span', 'l-ja', '四字熟語'), el('span', 'en-sub', bi() ? 'idioms' : ''));
+  yj.append(el('span', 'l-ja', tx('四字熟語', 'idioms')));
   yj.addEventListener('click', () => {
     keepScroll();
     S.view = 'yoji';
@@ -5707,7 +5752,7 @@ function renderShelfBody() {
   const kdx = el('button', 'grammar-link');
   kdx.type = 'button';
   kdx.id = 'kanjidex-link';
-  kdx.append(el('span', 'l-ja', '字引'), el('span', 'en-sub', bi() ? 'kanji by shape' : ''));
+  kdx.append(el('span', 'l-ja', tx('字引', 'kanji by shape')));
   kdx.addEventListener('click', () => {
     keepScroll();
     S.view = 'kanjidex';
@@ -5718,7 +5763,7 @@ function renderShelfBody() {
   const ai = el('button', 'grammar-link');
   ai.type = 'button';
   ai.id = 'ai-link';
-  ai.append(el('span', 'l-ja', aiKey() ? '先生' : '先生を招く'), el('span', 'en-sub', bi() ? (aiKey() ? 'tutor' : 'set up the tutor') : ''));
+  ai.append(el('span', 'l-ja', tx(aiKey() ? '先生' : '先生を招く', aiKey() ? 'tutor' : 'set up the tutor')));
   ai.addEventListener('click', () => {
     keepScroll();
     S.view = 'ai';
@@ -5734,8 +5779,7 @@ function renderShelfBody() {
     aread.type = 'button';
     aread.id = 'airead-link';
     const hasReading = aiKey() || S.aiReading || S.aiReadings.length;
-    aread.append(el('span', 'l-ja', hasReading ? '私の読み物' : '読み物の好み'),
-      el('span', 'en-sub', bi() ? (hasReading ? 'an article written for you' : 'reading preferences') : ''));
+    aread.append(el('span', 'l-ja', tx(hasReading ? '私の読み物' : '読み物の好み', hasReading ? 'an article written for you' : 'reading preferences')));
     aread.addEventListener('click', () => {
       keepScroll();
       S.view = 'airead';
@@ -5746,19 +5790,21 @@ function renderShelfBody() {
   }
 
   toolsBox.append(...toolGroups.filter((section) => section.querySelector('button')));
-  // each tile names its door in Japanese with its English underneath; the accessible name says both
-  for (const door of toolsBox.querySelectorAll('button')) {
-    const en = door.querySelector('.en-sub')?.textContent;
-    if (en) door.setAttribute('aria-label', `${door.querySelector('.l-ja')?.textContent || ''} · ${en}`);
-  }
+  // The accessible name follows the same active label as the visible tile.
+  for (const door of toolsBox.querySelectorAll('button'))
+    door.setAttribute('aria-label', door.textContent.trim());
+  toolsBox.prepend(filterGroup);
+  const filtersSet = ['topic', 'jlpt', 'grade', 'text'].filter((key) => filters[key]).length;
   const toolsToggle = el('button', 'shelf-tools-toggle');
   toolsToggle.type = 'button';
   toolsToggle.id = 'shelf-tools-toggle';
   toolsToggle.setAttribute('aria-controls', toolsBox.id);
   const toolsFace = el('span', 'shelf-tools-toggle-label');
-  toolsFace.append(el('span', 'l-ja', '学習ツール'));
-  if (bi()) toolsFace.append(el('span', 'en-sub', 'Tools'));
-  toolsToggle.append(uiIcon('tools'), toolsFace, uiIcon('chevron', 'ui-icon shelf-tools-caret'));
+  toolsFace.append(el('span', 'l-ja', tx('学習ツール', 'Tools')));
+  toolsToggle.append(uiIcon('tools'), toolsFace);
+  // a filter in force is never invisible: the button says how many are set
+  if (filtersSet) toolsToggle.append(el('span', 'shelf-tools-count', String(filtersSet)));
+  toolsToggle.append(uiIcon('chevron', 'ui-icon shelf-tools-caret'));
   const showTools = (open) => {
     S.shelfToolsOpen = open;
     toolsBox.hidden = !open;
@@ -5842,7 +5888,7 @@ function renderShelfBody() {
     }
     const selection = el('section', 'shelf-daily-selection shelf-band');
     selection.setAttribute('aria-labelledby', 'shelf-today-head');
-    const todayHead = withEn(el('h2', 'shelf-band-head', '今日の６本'), 'six picks for today', 'en-inline');
+    const todayHead = withEn(el('h2', 'shelf-band-head eyebrow shelf-section', '今日の６本'), 'six picks for today', 'en-inline');
     todayHead.id = 'shelf-today-head';
     selection.append(todayHead);
     bands.unshift(selection);
@@ -5881,8 +5927,11 @@ function renderShelfBody() {
     if (rank >= 3 && inBand.has(p.id)) continue;
     if (rank === 3) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
+    if (rank === 0 && reviewNote) grid.append(reviewNote);
     rank += 1;
   }
+  // a shelf with no lead (every story filtered away) keeps the note in its masthead
+  if (reviewNote && !reviewNote.parentNode) title.append(reviewNote);
   grid.append(...bands);
   if (definitions.length) {
     const band = el('section', 'shelf-definitions shelf-band');
@@ -5903,10 +5952,7 @@ function renderShelfBody() {
     const arc = el('button', 'grammar-link');
     arc.type = 'button';
     arc.id = 'archive-link';
-    arc.append(
-      el('span', 'l-ja', '過去のニュース · 新聞アーカイブ'),
-      el('span', 'en-sub', bi() ? 'older news · the 2005–2026 archive, newest first' : 'ウィキニュース 2005–2026 · 新しい順'),
-    );
+    arc.append(el('span', 'l-ja', tx('過去のニュース · 新聞アーカイブ', 'older news · the 2005–2026 archive, newest first')));
     arc.addEventListener('click', () => {
       keepScroll();
       S.view = 'archive';
@@ -6477,8 +6523,18 @@ function focusLearningSourceCaller(focusId) {
   const popup = /^reader-word:(\d+):(.+)$/u.exec(focusId || '');
   if (popup) {
     const word = document.querySelector(`#reader .tok[data-index="${popup[1]}"]`);
-    if (word) readerTokenDoors.get(word)?.reopen();
-    (document.getElementById(popup[2]) || word)?.focus({ preventScroll: true });
+    const land = () => {
+      const target = document.getElementById(popup[2]);
+      // a choice inside the popup's sentence pane: the pane opens first, so the reader lands where it left
+      if (target?.closest('.mini-sentence-pane')?.hidden) target.closest('.mini-sentence-wrap')?.openSentence?.();
+      (target || word)?.focus({ preventScroll: true });
+    };
+    const reopened = word ? readerTokenDoors.get(word)?.reopen() : null;
+    if (typeof reopened?.then !== 'function') { land(); return; }
+    word.focus({ preventScroll: true });
+    void reopened.then(() => {
+      if (word.isConnected && miniAnchor === word && document.activeElement === word) land();
+    });
     return;
   }
   document.getElementById(focusId)?.focus({ preventScroll: true });
@@ -7436,10 +7492,10 @@ function reviewReason(p) {
 }
 /** 未確認 — one small chip for unreviewed text, its reason in the tooltip. */
 function unreviewedChip(p) {
-  const chip = el('span', 'status-chip', '未確認');
+  const chip = el('span', 'status-chip', tx('未確認', 'Unreviewed'));
   const reason = reviewReason(p);
-  chip.title = `未確認 — ${reason}`;
-  chip.setAttribute('aria-label', `未確認 — ${reason}`);
+  chip.title = `${tx('未確認', 'Unreviewed')} — ${reason}`;
+  chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
   return chip;
 }
 /** The level a learner filters by: the JLPT vocabulary estimate, with the sentence band beside it. */
@@ -7532,8 +7588,7 @@ function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
 function storyKicker(p) {
   const [ja, en] = storyTopic(p);
   const kicker = el('span', 'story-kicker');
-  kicker.append(el('span', 'l-ja', ja));
-  if (bi()) kicker.append(el('span', 'en-sub', en));
+  kicker.append(el('span', 'l-ja', tx(ja, en)));
   return kicker;
 }
 /** An original and its N3 rewrite are one story with two versions (adaptation.basedOn). */
@@ -7569,7 +7624,7 @@ function renderReaderTip(main) {
   tip.dataset.japaneseLookup = 'off';
   tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
   if (seen) tip.setAttribute('aria-hidden', 'true');
-  tip.append(el('p', 'reader-tip-text', tapLadderHint()));
+  tip.append(el('p', 'reader-tip-text', readerTipText()));
   const close = el('button', 'icon-button reader-tip-close');
   close.type = 'button';
   close.setAttribute('aria-label', tx('ヒントを閉じる', 'dismiss this tip'));
@@ -7605,7 +7660,7 @@ function gradeTag(p) {
   if (!grade) return document.createTextNode('');
   const ja = grade === 'secondary' ? '中学以上' : `小${grade}`;
   const en = grade === 'secondary' ? 'secondary+' : `grade ${grade}`;
-  const tag = el('span', 'grade-tag', `漢字 ${ja}`);
+  const tag = el('span', 'grade-tag', tx(`漢字 ${ja}`, `Kanji ${en}`));
   // a label, like the level beside it: not prose to look up
   tag.dataset.japaneseLookup = 'off';
   tag.title = tx(`使われている漢字の学年: ${ja}`, `kanji up to school ${en}`);
@@ -7627,7 +7682,12 @@ function readerPicture(p) {
   if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
   img.decoding = 'async';
   img.addEventListener('error', () => figure.remove(), { once: true });
-  figure.append(img, el('figcaption', 'reader-picture-caption', tx('挿絵 · Bunki', 'Illustration · Bunki')));
+  // D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language
+  const credit = el('figcaption', 'reader-picture-caption', tx('挿絵 · ', 'Illustration · '));
+  const mark = el('span', 'kairo-mark', '回廊');
+  mark.lang = 'ja';
+  credit.append(mark, ' KAIRO');
+  figure.append(img, credit);
   return figure;
 }
 
@@ -7646,10 +7706,11 @@ function shelfCard(p, rank = 'grid') {
   item.style.setProperty('--topic', storyAccent(p));
   const open = el('button', 'shelf-open');
   open.type = 'button';
-  // every article wears a picture slot, its level badge at the picture's top-right
+  // every article wears a picture slot. A spine (今日の６本) keeps its level badge on the picture; the
+  // lead and the index rows carry it in their instrument line, beside the facts it belongs with
   if (!glossary) {
     const picture = storyPicture(p, { eager: rank === 'lead' || rank === 'second' });
-    picture.append(levelChip(p, 'level-badge'));
+    if (rank === 'teaser') picture.append(levelChip(p, 'level-badge'));
     open.append(picture);
   }
   const head = el('div', 'shelf-head');
@@ -7657,13 +7718,16 @@ function shelfCard(p, rank = 'grid') {
     const top = el('div', 'story-topline');
     top.append(storyKicker(p), levelChip(p));
     head.append(top);
-  } else head.append(storyKicker(p));
+  } else if (rank === 'teaser') head.append(storyKicker(p));
+  else head.append(storyInstrument(p, rank === 'lead'));
   const headline = el('div', 'shelf-title', p.title);
   headline.lang = 'ja'; // so a headline breaks between phrases, never inside a word (word-break: auto-phrase)
   head.append(headline);
   // the English title travels with the record (titleEn + titleEnSource in
   // data/articles/index.json), never in a code-side map
-  if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
+  // a spine sets its Japanese title vertically; its English line stays horizontal, at the spine's foot
+  const titleEn = bi() && p.titleEn ? el('div', 'shelf-title-en', p.titleEn) : null;
+  if (titleEn && rank !== 'teaser') head.append(titleEn);
   if (rank === 'lead') {
     const lede = storyLede(p);
     if (lede) {
@@ -7676,13 +7740,44 @@ function shelfCard(p, rank = 'grid') {
   const date = storyDate(p, rank === 'teaser');
   if (date) foot.append(date);
   // the shelf remembers with you: finished, or open to your bookmark
-  if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', '読了 finished')));
-  else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', '途中 in progress')));
-  head.append(foot);
+  if (owns(S.readDone, p.id)) foot.append(el('span', 'read-tag', tx('読了', 'finished')));
+  else if ((S.readerPos[p.id] || 0) > 300) foot.append(el('span', 'read-tag', tx('途中', 'in progress')));
+  if (rank !== 'teaser') head.append(foot);
   open.append(head);
+  // a spine's English line and its date stand horizontally at its foot
+  if (rank === 'teaser') {
+    if (titleEn) open.append(titleEn);
+    open.append(foot);
+  }
   open.addEventListener('click', () => openPassage(p.id));
   item.append(open);
   return item;
+}
+
+/** How many of the learner's saved words an article holds: the saved word ids met in the article's
+ * own word forms (readingFacets.forms, from the index). Real data only; 0 when the record has none. */
+function storyYourWords(p) {
+  const forms = p.readingFacets?.forms;
+  if (!Array.isArray(forms) || !forms.length) return 0;
+  const inText = new Set(forms), seen = new Set();
+  for (const t of S.taken) if (t.t === 'word' && inText.has(t.id)) seen.add(t.id);
+  return seen.size;
+}
+/** A story's instrument line: level · topic · characters · your words. Every figure is the record's
+ * own (chars from the index, words from the learner's saved cards); there is no time estimate,
+ * because no real reading timings exist to make one honest. */
+function storyInstrument(p, full = false) {
+  const line = el('div', 'story-instrument');
+  line.append(levelChip(p), storyKicker(p));
+  const fact = (text, cls = '') => {
+    const span = el('span', `story-fact${cls ? ` ${cls}` : ''}`, text);
+    line.append(span);
+    return span;
+  };
+  if (full && p.chars) fact(tx(`${p.chars.toLocaleString('ja-JP')}字`, `${p.chars.toLocaleString('en-GB')} chars`), 'story-chars');
+  const mine = full ? storyYourWords(p) : 0;
+  if (mine) fact(tx(`保存した語 ${mine}`, `${mine} of your words`), 'story-mine');
+  return line;
 }
 
 /** The lead's teaser: the story's own first sentence, from the snippet the record carries. */
@@ -7943,6 +8038,39 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   });
 }
 
+/* 禁則処理 (round 4, T4: "more polished … clarity"). A word you can tap is a button, an atomic box, and CSS
+ * allows a line break beside an atomic box even where Japanese forbids one, so 、 could open a line and 「
+ * end one (the sentence cards fixed this for closing marks with .kinsoku-glue). Here a closing mark joins
+ * the box before it, and an opening bracket waits in its no-break span for the word after it. */
+const KINSOKU_CLOSING = /^[、。，．！？」』）〉》〕］｝ー〜…‥・]+$/u;
+const KINSOKU_OPENING = /^[「『（〈《〔［｛]+$/u;
+function placeKinsoku(container, node, surface) {
+  const last = container.lastChild;
+  const glue = last?.nodeType === 1 && last.classList.contains('kinsoku-glue') ? last : null;
+  if (glue?.classList.contains('kinsoku-open')) {
+    glue.append(node);
+    if (!KINSOKU_OPENING.test(surface)) glue.classList.remove('kinsoku-open');
+    return;
+  }
+  if (KINSOKU_OPENING.test(surface)) {
+    const open = el('span', 'kinsoku-glue kinsoku-open');
+    open.append(node);
+    container.append(open);
+    return;
+  }
+  // a closing mark clings to the box before it: a word, or a glue already holding one (never a paragraph's break)
+  if (KINSOKU_CLOSING.test(surface) && last?.nodeType === 1 && !last.matches('.para-break, .sent-door')) {
+    if (glue) glue.append(node);
+    else {
+      const joined = el('span', 'kinsoku-glue');
+      container.replaceChild(joined, last);
+      joined.append(last, node);
+    }
+    return;
+  }
+  container.append(node);
+}
+
 function appendJapaneseLookup(container, text, context = {}) {
   const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
   const segments = segmenter ? [...segmenter.segment(String(text))].map(part => part.segment)
@@ -7957,7 +8085,9 @@ function appendJapaneseLookup(container, text, context = {}) {
   const help = japaneseLookupHelpId();
   for (const segment of segments) {
     if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
-      wrapper.append(document.createTextNode(segment)); continue;
+      if (context.kinsoku) placeKinsoku(wrapper, document.createTextNode(segment), segment);
+      else wrapper.append(document.createTextNode(segment));
+      continue;
     }
     // The visible word is its own accessible name; the shared help says what it does.
     const word = el('button', 'japanese-lookup-word', segment);
@@ -7970,7 +8100,8 @@ function appendJapaneseLookup(container, text, context = {}) {
     word.addEventListener('click', event => { event.stopPropagation(); void openJapaneseLookup(word, segment, context); });
     word.addEventListener('keydown', event => lookupWordKey(event, word));
     word.addEventListener('focus', () => setLookupStop(word));
-    wrapper.append(word);
+    if (context.kinsoku) placeKinsoku(wrapper, word, segment);
+    else wrapper.append(word);
   }
   container.append(wrapper);
   return wrapper;
@@ -7986,7 +8117,9 @@ function enhanceJapaneseProse(root) {
     if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
     // A word looked up in a guided question is saved as help on that question before it shows.
     const question = S.view === 'guided' ? parent.closest('.guided-room [data-question]')?.dataset.question : null;
-    const context = { ...(question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent };
+    // the reader's title card keeps Japanese line breaks (禁則処理): its marks cling to their words
+    const context = { ...(question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent,
+      ...(parent.closest?.('.reader-card') ? { kinsoku: true } : {}) };
     const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
     const textNodes = [];
     while (walker.nextNode()) {
@@ -8017,6 +8150,16 @@ function paintWordSave(button, on) {
   button.setAttribute('aria-pressed', String(on));
   button.title = on ? tx('もう一度押すと復習から外す', 'Press again to remove it from review') : '';
 }
+/** The popup's one path: before Save, a note saying where the word goes; after it, "Add to a list". */
+function paintMiniPath(actions, saved) {
+  const lists = actions?.querySelector('#mini-lists');
+  const note = actions?.querySelector('.mini-take-note');
+  if (!lists) return;
+  if (!saved && lists.getAttribute('aria-expanded') === 'true') closeVocabularyListPopover();
+  lists.hidden = !saved;
+  if (note) note.hidden = saved;
+  actions.classList.toggle('is-saved', saved);
+}
 
 /** What a word's Save stands for: the entry it would capture, and whether it is held (D11: a reader
  * word the core dictionary lacks; D23: another entry's card holds the spelling). The popup and the
@@ -8043,7 +8186,9 @@ function refreshWordSaveControls(node, label) {
   const mini = document.getElementById('mini');
   const seal = mini?.querySelector('#mini-take');
   if (seal && !seal.disabled && mini.querySelector('.mini-word')?.textContent === label) {
-    paintWordSave(seal, wordCaptureState(node) === 'taken');
+    const saved = wordCaptureState(node) === 'taken';
+    paintWordSave(seal, saved);
+    paintMiniPath(mini.querySelector('.mini-actions'), saved);
   }
 }
 
@@ -8290,10 +8435,11 @@ function openVocabularyListPopover(node, label, invoker) {
   (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
 }
 
-/* The word popup (John, 2026-10-02, notes 8, 11, 17 and 18). One tap shows everything at once: the word
- * large, its reading under it, its meaning, then the actions — a filled Save, a small "Add to list…" and a
- * plain "Full entry ›". In an article the last, quiet row acts on the word's sentence (it replaced the
- * floating sentence bar). Escape, or a tap outside, puts it away. */
+/* The word popup (John, 2026-10-02, notes 8, 11, 17 and 18; round 4, T5). One tap shows a raised card
+ * of separate bands: the word band (the word large, its reading, its meaning, and "Full entry ›" in its
+ * corner), then one path, Save, with "Add to a list" appearing beside "Saved ✓" once the word is saved,
+ * then the word's kanji, and in an article one named door into the word's sentence. Escape, or a tap
+ * outside, puts it away. */
 let miniAnchor = null;
 const SAVE_PRESS_MS = 600;
 let readerTakePressedAt = -Infinity;
@@ -8305,10 +8451,15 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   mini.tabIndex = -1;
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
-  mini.append(el('span', 'mini-word', token.b));
-  if (g?.r || token.r) mini.append(el('span', 'mini-reading', g?.r || token.r));
-  if (reader && !g?.m?.[0]) mini.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
-  else mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  // the word band: the word, its reading and its meaning, with the deeper door in its corner
+  const head = el('div', 'mini-head');
+  const said = el('div', 'mini-head-text');
+  said.append(el('span', 'mini-word', token.b));
+  if (g?.r || token.r) said.append(el('span', 'mini-reading', g?.r || token.r));
+  if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
+  else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  head.append(said);
+  mini.append(head);
   const seal = el('button', 'mini-take btn-primary');
   seal.type = 'button';
   seal.id = 'mini-take';
@@ -8349,26 +8500,14 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
     mini.append(open);
   }
-  const actions = el('div', 'mini-actions');
-  actions.append(seal);
-  if (!held && !identityHeld) {
-    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加…', 'Add to list…'));
-    lists.type = 'button';
-    lists.id = 'mini-lists';
-    lists.setAttribute('aria-haspopup', 'dialog');
-    lists.setAttribute('aria-expanded', 'false');
-    lists.addEventListener('click', (event) => {
-      event.stopPropagation();
-      openVocabularyListPopover(captureNode, token.b, lists);
-    });
-    actions.append(lists);
-  }
   const entry = el('button', 'mini-entry btn-tertiary');
   entry.type = 'button';
-  entry.append(el('span', 'mini-entry-label', tx('全項目', 'Full entry')));
+  // the label and its chevron are one pill in the word band's corner
+  const entryLabel = el('span', 'mini-entry-label', tx('全項目', 'Full entry'));
   const chevron = el('span', 'mini-entry-chevron', '›');
   chevron.setAttribute('aria-hidden', 'true');
-  entry.append(chevron);
+  entryLabel.append(chevron);
+  entry.append(entryLabel);
   entry.disabled = !entryAvailable;
   entry.dataset.action = 'entry.open';
   entry.dataset.targetKind = 'word';
@@ -8377,8 +8516,31 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (entry.disabled) return;
     onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
   });
-  actions.append(entry);
+  head.append(entry);
+  // one path (John T5, "click save and then add to list from there"): Save first; once the word is saved,
+  // "Add to a list" stands beside "Saved ✓". Before that a short note says where Save puts the word.
+  const actions = el('div', 'mini-actions');
+  actions.append(seal);
+  if (!held && !identityHeld) {
+    // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
+    actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
+    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加', 'Add to a list'));
+    lists.type = 'button';
+    lists.id = 'mini-lists';
+    lists.setAttribute('aria-haspopup', 'dialog');
+    lists.setAttribute('aria-expanded', 'false');
+    lists.addEventListener('click', (event) => {
+      event.stopPropagation();
+      // another control was used between two Save presses: the next one is a choice, not a bounce
+      pressedAt = -Infinity;
+      openVocabularyListPopover(captureNode, token.b, lists);
+    });
+    actions.append(lists);
+  }
+  paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
   mini.append(actions);
+  // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
+  if (reader) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
   mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
@@ -8394,9 +8556,98 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   return mini;
 }
 
+/** The quick look's kanji line (Read lane, redesign): each kanji of the word with its parts, the saved
+ * words that share one of them, and one door into the web of the word. Every part comes from the
+ * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
+ * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
+function miniKanjiWeb(word, anchor) {
+  const chars = [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))].slice(0, 3);
+  if (!chars.length) return null;
+  const box = el('div', 'mini-web');
+  box.dataset.japaneseLookup = 'off';
+  const open = (node) => (event) => { event.stopPropagation(); removeMini(); go(node, { invoker: anchor }); };
+  // the band's head names it, so its tiles read as the word's kanji, not as more words; the door into the
+  // word's web stands at the head's end, the way a list's "See all" does
+  const top = el('div', 'mini-band-head');
+  top.append(el('p', 'mini-band-label', tx('漢字', 'Kanji')));
+  box.append(top);
+  const list = el('div', 'mini-kanji');
+  for (const c of chars) {
+    const k = D.kanji[c];
+    const row = el('button', 'mini-kanji-row');
+    row.type = 'button';
+    const glyph = el('span', 'mini-kanji-glyph', c);
+    glyph.lang = 'ja'; glyph.dataset.uiContent = 'learning';
+    row.append(glyph);
+    const what = el('span', 'mini-kanji-what');
+    if (bi() && k.m) what.append(el('span', 'mini-kanji-meaning', k.m));
+    const parts = mainParts(c).filter((part) => part !== c);
+    if (parts.length) {
+      const set = el('span', 'mini-kanji-parts');
+      parts.forEach((part, i) => {
+        if (i) { const plus = el('span', 'mini-kanji-plus', '+'); plus.setAttribute('aria-hidden', 'true'); set.append(plus); }
+        const piece = el('span', 'mini-kanji-part', part);
+        piece.lang = 'ja'; piece.dataset.uiContent = 'learning';
+        set.append(piece);
+        // the part's name follows the page's language (review round 2 #7): in English its meaning, from
+        // the kanji data; in 日本語 its reading, from the radical names. A part with neither shows none.
+        if (bi()) {
+          const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+          if (meaning) set.append(el('span', 'mini-kanji-part-name mini-kanji-part-meaning', meaning));
+        } else {
+          const name = D.radicals?.[part]?.name;
+          if (name) { const n = el('span', 'mini-kanji-part-name', name); n.lang = 'ja'; n.dataset.uiContent = 'learning'; set.append(n); }
+        }
+      });
+      what.append(set);
+    }
+    row.append(what);
+    row.addEventListener('click', open({ t: 'kanji', id: c }));
+    list.append(row);
+  }
+  box.append(list);
+  // also in your cards: saved words that share a kanji with this one
+  const kin = [];
+  for (const t of S.taken) {
+    if (t.t !== 'word' || t.id === word || kin.includes(t.id)) continue;
+    if (chars.some((c) => String(t.id).includes(c))) kin.push(t.id);
+    if (kin.length >= 4) break;
+  }
+  if (kin.length) {
+    const cards = el('p', 'mini-cards');
+    cards.append(el('span', 'mini-cards-label', tx('あなたのカードにも', 'Also in your cards')));
+    for (const w of kin) {
+      const b = el('button', 'mini-card-word', w);
+      b.type = 'button'; b.lang = 'ja'; b.dataset.uiContent = 'learning';
+      b.addEventListener('click', open({ t: 'word', id: w }));
+      cards.append(b);
+    }
+    box.append(cards);
+  }
+  // the web: the Words room's word web when it is there, otherwise the first kanji's own entry (its
+  // parts and family). The door says what it shows, in plain words (John T5: "Open the web?? what does
+  // that even mean."): the words related to this one through its kanji.
+  const web = el('button', 'mini-web-open');
+  web.type = 'button';
+  web.append(el('span', 'mini-web-label', tx('関連語', 'Related words')));
+  const chevron = el('span', 'mini-entry-chevron', '›');
+  chevron.setAttribute('aria-hidden', 'true');
+  web.append(chevron);
+  web.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (typeof window.openWordWeb === 'function') { removeMini(); window.openWordWeb(word); return; }
+    open({ t: 'kanji', id: chars[0] })(event);
+  });
+  top.append(web);
+  return box;
+}
+
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor) {
   placeFloating(card, anchor.getBoundingClientRect());
+  card.addEventListener('focusin', () => {
+    requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
+  });
   if (typeof ResizeObserver !== 'function') return;
   let last = card.getBoundingClientRect().height;
   const watch = new ResizeObserver(() => {
@@ -8422,11 +8673,25 @@ function placeFloating(card, r) {
     return box.height ? box[edge] : null;
   };
   const height = window.innerHeight || Infinity;
-  const ceiling = Math.max(8, (fixedEdge('#app > .chrome', 'bottom') ?? 0) + 8);
-  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height) - 8;
+  // A clipped card meets the chrome edge: a gutter here can expose half a title glyph.
+  const ceiling = Math.max(8, fixedEdge('#app > .chrome', 'bottom') ?? 0);
+  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
+  // The sentence pane keeps the word card's top edge, including when a long quote is taller.
+  // It scrolls within the space on that side rather than exposing a clipped title above it.
+  const pinned = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
+  const pinnedRoom = pinned < r.top ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
+  const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinnedRoom >= 96
+    && (pinned < r.top || pinned >= r.bottom + 10);
   let top;
-  if (m.height <= roomAbove) top = r.top - 10 - m.height;
+  if (pinHolds) {
+    top = pinned;
+    if (m.height > pinnedRoom) {
+      card.style.maxHeight = `${pinnedRoom}px`;
+      card.style.overflowY = 'auto';
+    }
+  }
+  else if (m.height <= roomAbove) top = r.top - 10 - m.height;
   else if (m.height <= roomBelow) top = r.bottom + 10;
   else {
     const room = Math.max(roomAbove, roomBelow, 96);
@@ -8434,59 +8699,158 @@ function placeFloating(card, r) {
     card.style.overflowY = 'auto';
     top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - room) : r.bottom + 10;
   }
-  card.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
+  // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
+  // a narrower card stays beside its word
+  card.style.left = m.width >= window.innerWidth - 48
+    ? `${Math.max(0, (window.innerWidth - m.width) / 2)}px`
+    : `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   card.style.top = `${top}px`;
+  // CSS rounds fractional positions; retain the exact calculated seat for the sentence pin.
+  if (Number.isFinite(top)) card.dataset.floatingTop = String(top);
+  else delete card.dataset.floatingTop;
+  // which side of its word the card stands on: its shade falls away from the word, never across it
+  card.dataset.side = top < r.top ? 'above' : 'below';
+  revealFloatingFocus(card);
 }
 
-/* The popup's quiet last row in an article acts on the word's sentence (John #18: the floating sentence bar
- * "what is the purpose??"). Save keeps the sentence on the tutor page; Ask the tutor opens the tutor with
- * that sentence; Practice opens the sentence practice. Each carries exactly the sentence the bar did. */
+/** Reveal a focused control inside a clipped card without scrolling the article or moving the card. */
+function revealFloatingFocus(card) {
+  const control = document.activeElement;
+  if (!control || control === card || !card.contains(control)) return;
+  const box = card.getBoundingClientRect(), focus = control.getBoundingClientRect();
+  if (!focus.height) return;
+  if (focus.bottom > box.bottom - 8) card.scrollTop += focus.bottom - (box.bottom - 8);
+  else if (focus.top < box.top + 8) card.scrollTop -= box.top + 8 - focus.top;
+}
+
+/* The popup's last band in an article: one named door into the word's sentence (John #18: the floating
+ * sentence bar "what is the purpose??"; round 4, T5: "this sentice, save astk the tutor, practice. very very
+ * confusing"). "Study this sentence ›" shows the sentence's own first words. It opens the sentence inside
+ * the card, the word marked in it, with two plain choices side by side: Ask the tutor (get it explained)
+ * and Practice it (recall it or use it, the two practices its screen always offers), and under them a
+ * quiet "Save the sentence" (keep it on the tutor page), the word menu's action of the same name. Each
+ * view of the card has one Save: the word's, or here the sentence's. "‹ Back to the word" returns. Each
+ * carries exactly the sentence the bar did. */
 function readerSentenceRow(node, index) {
-  const row = el('div', 'mini-sentence');
-  row.setAttribute('role', 'group');
-  const label = el('span', 'mini-sentence-label', tx('この文：', 'This sentence:'));
-  label.id = 'mini-sentence-label';
-  row.setAttribute('aria-labelledby', label.id);
+  const wrap = el('div', 'mini-sentence-wrap');
+  const sentence = teacherSentence(node);
+  const door = el('button', 'mini-sentence mini-sentence-open');
+  door.type = 'button';
+  door.id = 'mini-sentence-open';
+  door.setAttribute('aria-expanded', 'false');
+  door.setAttribute('aria-controls', 'mini-sentence-pane');
+  const doorText = el('span', 'mini-sentence-open-text');
+  doorText.append(el('span', 'mini-sentence-label', tx('この文を学ぶ', 'Study this sentence')));
+  if (sentence?.quote) {
+    const quote = el('span', 'mini-sentence-quote', sentence.quote);
+    quote.lang = 'ja';
+    doorText.append(quote);
+  }
+  const doorChevron = el('span', 'mini-sentence-chevron', '›');
+  doorChevron.setAttribute('aria-hidden', 'true');
+  door.append(doorText, doorChevron);
+  const pane = el('div', 'mini-sentence-pane');
+  pane.id = 'mini-sentence-pane';
+  pane.hidden = true;
+  pane.setAttribute('role', 'group');
+  const back = el('button', 'mini-sentence-back');
+  back.type = 'button';
+  back.id = 'mini-sentence-back';
+  const backChevron = el('span', 'mini-sentence-back-chevron', '‹');
+  backChevron.setAttribute('aria-hidden', 'true');
+  back.append(backChevron, el('span', 'mini-sentence-back-label', tx('語にもどる', 'Back to the word')));
+  const title = el('p', 'mini-sentence-title', tx('この文', 'This sentence'));
+  title.id = 'mini-sentence-title';
+  pane.setAttribute('aria-labelledby', title.id);
+  pane.append(back, title);
+  if (sentence) {
+    // the sentence as it stands in the article, the chosen word marked in it
+    const full = el('p', 'mini-sentence-full');
+    full.lang = 'ja';
+    full.dataset.japaneseLookup = 'off';
+    sentence.p.tokens.slice(sentence.start, sentence.end).forEach((token, i) => {
+      full.append(sentence.start + i === sentence.index ? el('mark', 'mini-sentence-word', token.s) : document.createTextNode(token.s));
+    });
+    pane.append(full);
+  }
   const note = el('p', 'mini-status');
   note.id = 'reader-context-note';
   note.setAttribute('role', 'status');
   const say = (text) => { note.textContent = ''; showReaderToast(text); };
-  const action = (id, text, aria) => {
-    const button = el('button', 'mini-sentence-action', text);
+  const choice = (id, name, hint, aria) => {
+    const button = el('button', 'mini-sentence-action');
     button.type = 'button';
     button.id = id;
+    const chevron = el('span', 'mini-sentence-action-chevron', '›');
+    chevron.setAttribute('aria-hidden', 'true');
+    button.append(el('span', 'mini-sentence-action-name', name), el('span', 'mini-sentence-action-hint', hint), chevron);
     button.setAttribute('aria-label', aria);
     button.disabled = !recordWritable();
     return button;
   };
-  const save = action('reader-context-save', tx('保存', 'Save'), tx('この文を先生のページに保存', 'Save this sentence for the tutor'));
-  const ask = action('reader-teacher', tx('先生に聞く', 'Ask the tutor'), tx('この文について先生に聞く', 'Ask the tutor about this sentence'));
-  const buttons = [save, ask];
-  for (const [button, discuss] of [[save, false], [ask, true]]) {
-    button.addEventListener('click', async (event) => {
-      event.stopPropagation();
-      if (button.disabled) return;
-      for (const control of buttons) control.disabled = true;
-      try { await sendSentenceToTutor(node, discuss, () => button.isConnected, say); }
-      finally { for (const control of buttons) control.disabled = !recordWritable(); }
-    });
-  }
-  row.append(label, save);
-  const dot = () => { const mark = el('span', 'mini-sentence-dot', '·'); mark.setAttribute('aria-hidden', 'true'); return mark; };
-  row.append(dot(), ask);
+  const choices = el('div', 'mini-sentence-choices');
+  const ask = choice('reader-teacher', tx('先生に聞く', 'Ask the tutor'), tx('説明してもらう', 'Get it explained'),
+    tx('この文について先生に聞く', 'Ask the tutor about this sentence'));
+  const buttons = [ask];
+  ask.addEventListener('click', async (event) => {
+    event.stopPropagation();
+    if (ask.disabled) return;
+    for (const control of buttons) control.disabled = true;
+    try { await sendSentenceToTutor(node, true, () => ask.isConnected, say); }
+    finally { for (const control of buttons) control.disabled = !recordWritable(); }
+  });
+  choices.append(ask);
   if (sentencePracticeModule) {
-    const practice = action('reader-sentence-practice', tx('練習', 'Practice'), tx('この文を練習する', 'Practice this sentence'));
-    // coming back from practice reopens this popup with Practice focused (focusLearningSourceCaller)
+    const practice = choice('reader-sentence-practice', tx('練習する', 'Practice it'), tx('思い出す・使う', 'Recall it or use it'),
+      tx('この文を練習する', 'Practice this sentence'));
+    // coming back from practice reopens this popup on its sentence, Practice focused (focusLearningSourceCaller)
     practice.dataset.returnFocus = `reader-word:${index}:reader-sentence-practice`;
     practice.addEventListener('click', (event) => {
       event.stopPropagation();
       void openBundledSentenceChoice(() => contextFromTeacherNode(node), practice, note, () => practice.isConnected);
     });
     buttons.push(practice);
-    row.append(dot(), practice);
+    choices.append(practice);
   }
-  const wrap = el('div', 'mini-sentence-wrap');
-  wrap.append(row, note);
+  pane.append(choices);
+  // keeping the sentence for later (the glossary: the sentence's own actions live inside its pane): the word
+  // menu's "Save the sentence", one guarded write, set quieter than the two choices
+  const keep = el('button', 'mini-sentence-keep');
+  keep.type = 'button';
+  keep.id = 'reader-context-save';
+  keep.append(el('span', 'mini-sentence-keep-name', tx('この文を保存', 'Save the sentence')),
+    el('span', 'mini-sentence-keep-hint', tx('先生のページに残す', 'Keep it on the tutor page')));
+  keep.disabled = !recordWritable();
+  buttons.push(keep);
+  keep.addEventListener('click', async (event) => {
+    event.stopPropagation();
+    if (keep.disabled) return;
+    for (const control of buttons) control.disabled = true;
+    try { await sendSentenceToTutor(node, false, () => keep.isConnected, say); }
+    finally { for (const control of buttons) control.disabled = !recordWritable(); }
+  });
+  pane.append(keep);
+  // The door and pane trade places. Keep the top edge for long quotes too; placeFloating limits
+  // the pane to the available space. Back on the word, the card sits beside its word again.
+  const show = (open, { focus = true } = {}) => {
+    const card = wrap.closest('#mini');
+    if (card && open) {
+      const exactTop = card.dataset.floatingTop;
+      card.dataset.pinTop = exactTop !== undefined && Number.isFinite(Number(exactTop))
+        ? exactTop : String(parseFloat(card.style.top));
+    } else if (card) delete card.dataset.pinTop;
+    pane.hidden = !open;
+    door.hidden = open;
+    door.setAttribute('aria-expanded', String(open));
+    card?.classList.toggle('is-sentence', open);
+    if (card && miniAnchor?.isConnected) placeFloating(card, miniAnchor.getBoundingClientRect());
+    if (focus) (open ? back : door).focus({ preventScroll: true });
+    if (card) revealFloatingFocus(card);
+  };
+  door.addEventListener('click', (event) => { event.stopPropagation(); show(true); });
+  back.addEventListener('click', (event) => { event.stopPropagation(); show(false); });
+  wrap.openSentence = () => show(true, { focus: false });
+  wrap.append(door, pane, note);
   return wrap;
 }
 
@@ -8745,8 +9109,12 @@ function readerGlossLine(token) {
     : el('span', 'tok-en tok-en-miss', '—');
 }
 
-/** How the reader's words work, in plain words: the one-time hint above the text and the text settings
- * say the same thing (John, 2026-10-02 #8). */
+/** The first-visit tip: one plain line (round 4, John T4: the explanation was "too verbose and..
+ * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
+function readerTipText() {
+  return tx('語をタップすると、意味が出ます。', 'Tap any word for its meaning.');
+}
+/** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
   return tx('語をタップすると意味が出ます。右クリック（または長押し）で、ほかの操作も。',
     'Tap any word to see what it means. Right-click (or press and hold) for more.');
@@ -8946,7 +9314,7 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   };
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     if (named) markReaderReading(index);
-    void openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index),
+    return openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index),
       focusPopup: modality === 'keyboard' }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
   };
   span.addEventListener('click', (event) => {
@@ -9018,8 +9386,8 @@ function glossaryCrossRefPlan(p) {
 
 /* 聞く — the reader's play bar. The voice is decided: the operator's blind audition
  * (2026-09-29) locked Google Gemini TTS Kore, with Charon as the second speaker. No approved
- * recording means no playable audio: until Kore clips ship, the bar shows a quiet 音声準備中 · Kore
- * state and nothing plays — no device voice, no interim voice. Nothing here writes learner state. */
+ * recording means no playable audio: the bar explains that this article has no audio yet, with
+ * the locked voices in its accessible description. Nothing here writes learner state. */
 // failed: null, or { pid, voice } — the failure belongs to the article and voice that failed, so a
 // different article or a new voice choice never inherits its note
 const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0, total: 0, rate: 1 };
@@ -9027,8 +9395,8 @@ const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0
  * reads, Charon is the second speaker. JVNV F1 was rated 1/5 and withdrawn; it never plays.
  * Narration ships as audio/article-narration.json ({ v: 1, voice, articles: { id: { clips } } })
  * and is fetched only when index.html raises __KAIRO_NARRATION__. Until the Kore clips exist the
- * flag stays down and the reader's play bar shows its visible 音声準備中 · Kore pending state with
- * nothing to play: no picker, no stand-in voice. */
+ * flag stays down and the reader's play bar explains its pending state with nothing to play:
+ * no picker, no stand-in voice. Its accessible description retains the locked voice provenance. */
 const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };
 const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
@@ -9309,6 +9677,8 @@ function refreshListenRow() {
   if (!row || !p || row.dataset.passage !== p.id) return;
   const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
   const next = buildListenRow(p);
+  // in place: a play bar that replaces the instrument line's pending mark docks at the foot on a
+  // phone (fixed) and takes the mark's own line on a desk, so the text under it does not move
   row.replaceWith(next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
 }
@@ -9336,15 +9706,20 @@ function voicePendingNote(id) {
   pending.id = id;
   // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
   pending.dataset.japaneseLookup = 'off';
-  pending.append(uiIcon('speaker'), el('span', 'l-ja', '音声準備中 · Kore'));
-  if (bi()) pending.append(el('span', 'en-sub', 'audio coming soon'));
+  pending.setAttribute('aria-description', tx('音声は Kore、第二話者は Charon に固定されています。',
+    'Approved voices: Kore (main), Charon (second).'));
+  const sentence = id === 'sentence-listening-pending';
+  pending.append(uiIcon('speaker'), el('span', 'l-ja', sentence
+    ? tx('この文の音声はまだない', 'No audio for this sentence yet')
+    : tx('この記事の音声はまだない', 'No audio for this article yet')));
   return pending;
 }
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
  * It carries only the locked narration voice. With no clips for this article in that voice it is
- * a quiet state, 音声準備中 · Kore: no picker, no stand-in voice, no disabled control. */
+ * a quiet absence label with voice provenance in its accessible description: no picker,
+ * no stand-in voice, no disabled control. */
 function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
@@ -9421,18 +9796,43 @@ function renderReader(main) {
     main.append(door);
     }
   }
-  // One compact line of provenance — source · date · level — then the headline. Settings are one
-  // icon; nothing else stands between the reader and the first sentence (design pass 2026-09-30).
+  // The reader opens on picture → title → one quiet instrument line → text (review round 2 #7: the
+  // explainer, the tip box, the UNREVIEWED pill and the voice placeholder were four things between the
+  // reader and the first sentence). The woodblock leads at its own crop, the way its shelf card shows it.
+  const picture = readerPicture(p);
+  if (picture) { picture.classList.add('reader-hero'); main.append(picture); }
+  // round 4 (John T4: "the top header, the background of the picture, th etitle, the subtitle, the
+  // explanaiton ... and the artile itslef ... are all the exact same ... beige"): the print sits on its
+  // own mat, and the title, its English line, the instrument line, the version switch and the one plain
+  // line of help stand together on a raised title card in front of it; the text has its own paper below
+  const card = el('div', 'reader-card');
+  main.append(card);
+  // the reader was the one view in bi mode that dropped the English title —
+  // the handle the learner chose the text by (E3 round-A, reader lens). It
+  // rides BESIDE the heading, the way the shelf card carries it, so the
+  // heading itself still reads as the Japanese title alone.
+  const articleTitle = el('h1', 'view-title', p.title);
+  articleTitle.dataset.uiContent = 'learning';
+  if (picture) articleTitle.classList.add('on-hero');
+  card.append(articleTitle);
+  if (bi() && p.titleEn) card.append(el('p', 'view-title-en', p.titleEn));
+  // The instrument line, under the title: source · date · level · saved words · a small
+  // honest "unreviewed" · the voice's state. Settings are one icon at its end.
   const head = el('div', 'reader-head');
-  const meta = el('p', 'eyebrow reader-meta');
+  const meta = el('div', 'eyebrow reader-meta');
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
   if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
-  meta.append(levelChip(p), gradeTag(p));
+  meta.append(levelChip(p));
+  // the record's own figure: the saved words the article holds. (Its length is the shelf's: the lead
+  // story's facts and the "shortest first" sort. While reading it is of no use, round 4 T4.)
+  const mine = storyYourWords(p);
+  if (mine) meta.append(el('span', 'reader-fact reader-mine', tx(`保存した語 ${mine}`, `${mine} of your words`)));
+  meta.append(gradeTag(p));
   if (reviewPending(p)) meta.append(unreviewedChip(p));
   // the dials fold away — the text is the point, the settings one tap away
   const dialsToggle = el('button', 'icon-button dials-toggle');
   dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
-  dialsToggle.setAttribute('aria-label', tx('文字設定', 'text settings 文字設定'));
+  dialsToggle.setAttribute('aria-label', tx('文字設定', 'text settings'));
   dialsToggle.title = tx('文字設定', 'text settings');
   dialsToggle.type = 'button';
   dialsToggle.id = 'dials-toggle';
@@ -9441,25 +9841,23 @@ function renderReader(main) {
     S.dialsOpen = !S.dialsOpen;
     render();
   });
+  // the listen door: on a phone an article without a recording says so as one muted mark at the end
+  // of the instrument line (この記事の音声はまだない), not a strip at the foot; a narrated article's play bar,
+  // and a desk's relief-edged row, stand below the head as before
+  const listenRow = buildListenRow(p);
+  const listenInLine = listenRow.classList.contains('is-pending') && matchMedia('(max-width: 520px)').matches;
+  if (listenInLine) meta.append(listenRow);
   head.append(meta, dialsToggle);
-  main.append(head);
-  // the reader was the one view in bi mode that dropped the English title —
-  // the handle the learner chose the text by (E3 round-A, reader lens). It
-  // rides BESIDE the heading, the way the shelf card carries it, so the
-  // heading itself still reads as the Japanese title alone.
-  main.append(el('h1', 'view-title', p.title));
-  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
-  const picture = readerPicture(p);
-  if (picture) main.append(picture);
+  card.append(head);
   const versions = storyVersions(p);
   if (versions) {
     // one story, two texts: the original and Bunki's N3 rewrite are one switch, never two cards. Each side
-    // says what it is and its level, and one line says what the simplified version is (John #9).
+    // says what it is and its level; what the simplified version is waits behind one ⓘ beside it (John #9)
     const toggle = el('div', 'version-toggle');
     toggle.setAttribute('role', 'group');
     toggle.setAttribute('aria-label', tx('記事の版', 'Article version'));
-    const caption = el('p', 'version-caption', tx('やさしい版は、同じ記事をやさしい日本語で書き直したものです。',
-      'The simplified version retells the same article in easier Japanese.'));
+    const caption = el('p', 'version-caption', tx('やさしい版：同じ記事を、やさしい日本語で。',
+      'Simplified: the same story in easier Japanese.'));
     caption.id = 'version-caption';
     toggle.setAttribute('aria-describedby', caption.id);
     for (const [version, ja, en] of [[versions.original, '原文', 'Original'], [versions.easy, 'やさしい版', 'Simplified']]) {
@@ -9467,16 +9865,23 @@ function renderReader(main) {
       b.type = 'button';
       b.dataset.version = version.id;
       b.setAttribute('aria-pressed', String(version.id === p.id));
-      b.append(el('span', 'l-ja', ja));
-      if (bi()) b.append(el('span', 'version-name', en));
+      b.append(el('span', 'l-ja', tx(ja, en)));
       const level = version.readingFacets?.jlpt || levelPhrase(version.grading).level;
-      if (level) b.append(el('span', 'version-level', `· ${level}`));
+      // the dot is its own span: a narrow phone sets the level under the name and drops it
+      if (level) { const tag = el('span', 'version-level'); tag.append(el('span', 'version-dot', '· '), level); b.append(tag); }
       b.addEventListener('click', () => { if (version.id !== p.id) openPassage(version.id); });
       toggle.append(b);
     }
+    const why = el('details', 'version-help');
+    const whySummary = el('summary', 'icon-button');
+    whySummary.setAttribute('aria-label', tx('やさしい版とは', 'What the simplified version is'));
+    whySummary.title = tx('やさしい版とは', 'What the simplified version is');
+    whySummary.append(uiIcon('info'));
+    why.append(whySummary, caption);
+    toggle.append(why);
     const block = el('div', 'version-block');
-    block.append(toggle, caption);
-    main.append(block);
+    block.append(toggle);
+    card.append(block);
   }
   if (S.dialsOpen) {
     const dials = el('div', 'dials');
@@ -9506,12 +9911,10 @@ function renderReader(main) {
     main.append(dials);
   }
 
-  // the listen door rides beside the settings fold — one tap to hear the
-  // article, one tap to stop; until the locked Kore clips ship it shows
-  // only its 音声準備中 · Kore pending state
-  main.append(buildListenRow(p));
+  // a narrated article's listen door — one tap to hear the article, one tap to stop
+  if (!listenInLine) main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
-  renderReaderTip(main);
+  renderReaderTip(card);
 
   const reader = el('div', 'reader');
   reader.id = 'reader';
@@ -9655,13 +10058,18 @@ function renderReader(main) {
       const numeral = /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u.test(String(token.s || ''));
       const opens = (token.c || namedReading || numeral || prefix) && !suffix && !groupHolds;
       if (opens || !group) {
+        // an opening bracket still waiting for its word goes with that word into the new phrase
+        const held = group?.lastChild?.classList?.contains('kinsoku-open') ? group.lastChild : null;
+        const left = group;
         group = el('span', 'bunsetsu');
         reader.append(group);
+        if (held) { group.append(held); if (!left.childNodes.length) left.remove(); }
       }
       groupHolds = numeral || prefix;
-      group.append(rendered);
+      placeKinsoku(group, rendered, token.s);
     } else {
-      reader.append(rendered);
+      // 禁則処理: a closing mark clings to the word before it, an opening bracket to the word after it
+      placeKinsoku(reader, rendered, token.s);
     }
   }
   main.append(readerHelp(), reader);
@@ -9707,7 +10115,7 @@ function renderReader(main) {
   fact('出典', 'source', learnerSourceLabel(p) || p.source);
   if (shelfDay(p)) fact('日付', 'date', dateStamp(shelfDay(p), 'shelf-date'));
   const lv = levelPhrase(p.grading);
-  fact('レベル', 'level', levelChip(p), el('span', 'level-note', bi() ? ` ${lv.level} · ${lv.ja}${lv.note}` : ` ${lv.ja}${lv.noteJa}`));
+  fact('レベル', 'level', levelChip(p), el('span', 'level-note', bi() ? ` ${lv.level}${lv.note}` : ` ${lv.ja}${lv.noteJa}`));
   const licence = p.licenceUrl ? el('a', 'inline-link', p.licence) : el('span', null, p.licence);
   if (p.licenceUrl) { licence.href = p.licenceUrl; licence.rel = 'noreferrer'; licence.target = '_blank'; }
   fact('利用条件', 'licence', licence);
@@ -9721,7 +10129,7 @@ function renderReader(main) {
       `Excerpt — the first ${p.text.length} characters of the source, cut at a sentence boundary.`,
     );
     if (p.url) {
-      const a = el('a', null, tx(' 原典', ' source 原典'));
+      const a = el('a', null, tx(' 原典', ' source'));
       a.href = p.url;
       a.rel = 'noreferrer';
       a.target = '_blank';
@@ -9850,7 +10258,7 @@ function renderEntry(main) {
     node.addEventListener('click', () => go({ t: 'word', id: word }));
     field.append(node);
   });
-  const enter = el('button', 'field-enter', tx('棚へ　→', '棚へ　to the shelf →'));
+  const enter = el('button', 'field-enter', tx('棚へ　→', 'to the shelf →'));
   enter.type = 'button';
   enter.id = 'enter-shelf';
   enter.addEventListener('click', () => {
@@ -9963,7 +10371,7 @@ function renderSrsPrefs(main) {
   toggle.type = 'button';
   toggle.id = 'srs-prefs-toggle';
   toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
-  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース — 1日に覚える数', 'ペース pace · how many cards a day');
+  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース — 1日に覚える数', 'pace · how many cards a day');
   toggle.addEventListener('click', () => {
     S.srsPrefsOpen = !S.srsPrefsOpen;
     render();
@@ -10694,16 +11102,16 @@ function refreshReadingPlacesSurface() {
 function renderReadingPlaces(p = null) {
   const container = el('section', 'reading-places'); container.id = 'record-reading-places';
   if (p) container.dataset.sourceId = `bundled-reading:${p.id}`;
-  container.setAttribute('aria-label', tx('読書の栞', 'Reading places'));
-  container.append(el('h2', 'section-title', tx('読書の栞', 'Reading places')));
+  container.setAttribute('aria-label', tx('栞', 'Bookmarks'));
+  container.append(el('h2', 'section-title', tx('栞', 'Bookmarks')));
   if (p) {
-    const button = biLabel('button', 'chip', 'ここに栞を置く', 'keep this place');
+    const button = biLabel('button', 'chip', 'ここに栞をはさむ', 'Bookmark this spot');
     button.type = 'button'; button.id = 'reader-place-save';
     button.disabled = !readerTakeCurrent() || !recordWritable();
     const actions = el('div', 'reading-place-actions'); actions.append(button);
     const note = el('p', 'teacher-note'); note.id = 'reader-place-note'; note.setAttribute('role', 'status');
-    note.textContent = readerTakeCurrent() ? tx(`「${readerTakeCurrent().id}」の場所に栞を置く。`, `Keep the place where you met ${readerTakeCurrent().id}.`)
-      : tx('文章の語に触れて、栞を置く場所を選ぶ。', 'Touch a word in the reading to choose a place to keep.');
+    note.textContent = readerTakeCurrent() ? tx(`「${readerTakeCurrent().id}」のところに栞をはさむ。`, `Bookmark the spot where you met ${readerTakeCurrent().id}.`)
+      : tx('文章の語をタップして、栞をはさむところを選ぶ。', 'Tap a word in the text to choose where to bookmark.');
     button.addEventListener('click', async () => {
       const target = readerTakeCurrent(); const snapshot = currentRecordNoteView();
       if (button.disabled || !target || !snapshot || target.p !== p.id) return;
@@ -10755,17 +11163,551 @@ function refreshRecordNotesSurface() {
   if (container?.isConnected) updateRecordNotesContainer(container);
 }
 
+/* ---------------------------------------------------------------- Today: the daily ritual
+ * (redesign 2026-10-08, concept C 生きた本棚 with A's craft). The room opens on the learner's own
+ * saved words drifting as a quiet sky, the day's word large in the middle with one line of wonder
+ * built from real kanji parts (D.kanji[c].parts, D.radicals), and today's line: cards, a reading,
+ * the word walk, under one primary door (#review-start). The deck counts stay, folded below.
+ * Honest data only: every number is read from the record or computed from it; the day's word is
+ * never a card due today; minutes appear only when the learner's own review timings support them. */
+function todayHash(text) {
+  let h = 2166136261;
+  for (const ch of String(text)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function todayRng(seed) {
+  let s = seed >>> 0 || 1;
+  return () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296);
+}
+const TODAY_JA_WORD = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々〆ヶ]{1,7}$/u;
+function todayKanji(word) {
+  return [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))];
+}
+function todayPartStrokes(part) {
+  return D.radicals?.[part]?.st || D.kanji?.[part]?.st || 0;
+}
+/** The one part every kanji of the word carries, from D.kanji parts only; the part with the most
+ * strokes wins, so 隹 outranks the 亻 hiding inside it. */
+function todaySharedPart(ks) {
+  if (ks.length < 2) return null;
+  const lists = ks.map((c) => D.kanji[c].parts || []);
+  const shared = [...new Set(lists[0])]
+    .filter((p) => !ks.includes(p) && D.radicals?.[p] && lists.slice(1).every((l) => l.includes(p)));
+  shared.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
+  return shared[0] || null;
+}
+function todayLargestPart(c) {
+  const parts = [...new Set(D.kanji?.[c]?.parts || [])].filter((p) => p !== c && D.radicals?.[p]);
+  parts.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
+  return parts[0] || null;
+}
+/** Every card the learner meets today: today's queue plus anything whose due falls before midnight. */
+function todayDueKeys(today) {
+  const keys = new Set((today?.order || []).map((item) => srsKey(item.t, item.id)));
+  const end = startOfDay(new Date()) + 86400000;
+  for (const [key, rec] of Object.entries(S.srs || {})) if (Date.parse(rec?.due) < end) keys.add(key);
+  return keys;
+}
+let todayFreshPool = null;
+/** The day's word: one of the learner's saved words that is NOT due today (gate 1), else a fresh
+ * graded word they have not saved. Deterministic per date; words whose kanji share a part first. */
+function todayWordOfDay(today) {
+  const day = dayKey();
+  const blocked = todayDueKeys(today);
+  const reading = (w) => D.dict?.[w]?.r || D.words?.[w]?.r || '';
+  // a shared part of some weight (隹, 言, 門) makes the best hook; a bare 一 or 八 the weakest
+  const tierOf = (w) => {
+    const ks = todayKanji(w);
+    const part = todaySharedPart(ks);
+    return part && todayPartStrokes(part) >= 4 ? 0 : part ? 1 : ks.length >= 2 ? 2 : ks.length ? 3 : 4;
+  };
+  const choose = (list, from) => {
+    if (!list.length) return null;
+    const tiers = list.map((w) => [w, tierOf(w)]);
+    const best = Math.min(...tiers.map(([, t]) => t));
+    if (best > 3) return null;
+    const tier = tiers.filter(([, t]) => t === best).map(([w]) => w).sort();
+    const word = tier[todayHash(`${day}:${from}`) % tier.length];
+    return { word, reading: reading(word), from, item: S.taken.find((i) => i.t === 'word' && i.id === word) || null };
+  };
+  const savedIds = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
+  const saved = [...savedIds].filter((w) => !blocked.has(srsKey('word', w)) && TODAY_JA_WORD.test(w) && reading(w));
+  const fromSaved = choose(saved, 'saved');
+  if (fromSaved) return fromSaved;
+  todayFreshPool ||= Object.keys(D.words || {}).filter((w) => TODAY_JA_WORD.test(w) && todaySharedPart(todayKanji(w)));
+  return choose(todayFreshPool.filter((w) => !savedIds.has(w)), 'fresh');
+}
+/** The hook of wonder, from data: the part the word's kanji share, how many kanji carry it, and
+ * how many of those already stand in the learner's own words. */
+function todayHook(word) {
+  const ks = todayKanji(word);
+  let part = todaySharedPart(ks);
+  const shared = !!part;
+  let host = null;
+  if (!part) {
+    host = ks.map((c) => [c, todayLargestPart(c)]).filter(([, p]) => p)
+      .sort((a, b) => todayPartStrokes(b[1]) - todayPartStrokes(a[1]))[0] || null;
+    part = host?.[1] || null;
+  }
+  if (!part) return null;
+  // the word web's own count (wwPartCap over wwMine), so Today and the web it opens say one number
+  const cap = wwPartCap(part, wwMine());
+  const family = cap.count;
+  const mine = cap.mine;
+  const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+  return { part, shared, host: host?.[0] || null, count: ks.length, family, mine, meaning };
+}
+/** Seconds a card takes this learner: the median gap between consecutive grades in their own
+ * review log (gaps over two minutes are breaks, not cards). Null until there are enough to say. */
+function todaySecondsPerCard() {
+  const times = (S.revlog || []).filter((row) => Array.isArray(row) && row[2] >= 1 && row[2] <= 4)
+    .map((row) => row[0]).sort((a, b) => a - b).slice(-400);
+  const gaps = [];
+  for (let i = 1; i < times.length; i += 1) {
+    const gap = times[i] - times[i - 1];
+    if (gap >= 1500 && gap <= 120000) gaps.push(gap);
+  }
+  if (gaps.length < 10) return null;
+  gaps.sort((a, b) => a - b);
+  return gaps[Math.floor(gaps.length / 2)] / 1000;
+}
+/** The reading on today's line: the unread shelf story holding the most of the learner's saved
+ * words (readingFacets.forms), else the shelf's newest approved story. */
+function todayReadPick() {
+  const curated = (D.passages || []).filter((p) => !String(p.file || '').startsWith('archive/'));
+  const pool = shelfStories(curated).filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
+  if (!pool.length) return null;
+  const mine = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
+  let best = null;
+  for (const p of pool) {
+    const count = mine.size ? (p.readingFacets?.forms || []).filter((f) => mine.has(f)).length : 0;
+    if (!best || count > best.count || (count === best.count && byNewest(p, best.passage) < 0)) best = { passage: p, count };
+  }
+  if (best.count) return best;
+  const approved = pool.filter((p) => p.review === 'approved');
+  return { passage: [...(approved.length ? approved : pool)].sort(byNewest)[0], count: 0 };
+}
+function todayLearning(tag, cls, text) {
+  const node = el(tag, cls, text);
+  node.lang = 'ja';
+  node.dataset.uiContent = 'learning';
+  return node;
+}
+/** Japanese that breaks only between phrases, never inside one (「虚構 / か」): a line may end before
+ * a word that begins with kanji, katakana or an opening bracket, unless the word before it opened a
+ * bracket. Pairs with word-break: keep-all in the room's CSS; plain text without Intl.Segmenter. */
+function todayPhrases(node, text) {
+  const s = String(text || '');
+  let seg = null;
+  try {
+    seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
+  } catch {
+    seg = null;
+  }
+  if (!seg) {
+    node.textContent = s;
+    return node;
+  }
+  let prev = '';
+  for (const { segment } of seg.segment(s)) {
+    if (prev && /^[\p{Script=Han}\p{Script=Katakana}「『（(]/u.test(segment) && !/[「『（(\s]$/u.test(prev)) node.append(document.createElement('wbr'));
+    node.append(segment);
+    prev = segment;
+  }
+  return node;
+}
+function todayDateline() {
+  const now = new Date();
+  const [y, m, d, w] = [now.getFullYear(), now.getMonth(), now.getDate(), now.getDay()];
+  return tx(`${y}年${m + 1}月${d}日（${'日月火水木金土'[w]}）`,
+    `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][w]} · ${d} ${MONTHS_EN[m]} ${y}`);
+}
+/** A horizon of roofs under the word; by night its windows are lit (the city through the paper). */
+function todayCity() {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'today-city');
+  svg.setAttribute('viewBox', '0 0 400 80');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMax slice');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  const roofs = document.createElementNS(NS, 'path');
+  roofs.setAttribute('class', 'today-roofs');
+  const wins = document.createElementNS(NS, 'path');
+  wins.setAttribute('class', 'today-wins');
+  const lamps = document.createElementNS(NS, 'path');
+  lamps.setAttribute('class', 'today-lamps');
+  const r = todayRng(9);
+  let roof = '';
+  let win = '';
+  let lamp = '';
+  for (let x = 0, n = 0; x < 400; n += 1) {
+    const w = 14 + Math.floor(r() * 26);
+    const h = 10 + Math.floor(r() * (x > 130 && x < 270 ? 16 : 40));
+    roof += `M${x} 80V${80 - h}h${w - 1}V80z`;
+    for (let wy = 80 - h + 4; wy < 77; wy += 5) {
+      for (let wx = x + 3; wx < x + w - 4; wx += 4) {
+        if (r() > 0.62) {
+          if ((n + wx + wy) % 11 === 0) lamp += `M${wx} ${wy}h1.6v2h-1.6z`;
+          else win += `M${wx} ${wy}h1.6v2h-1.6z`;
+        }
+      }
+    }
+    x += w;
+  }
+  roofs.setAttribute('d', roof);
+  wins.setAttribute('d', win);
+  lamps.setAttribute('d', lamp);
+  const horizon = document.createElementNS(NS, 'path');
+  horizon.setAttribute('class', 'today-horizon');
+  horizon.setAttribute('d', 'M0 79.5H400');
+  svg.append(roofs, wins, lamps, horizon);
+  return svg;
+}
+/** A content word worth a star: kanji-bearing, two to four characters, and an entry the sheet opens. */
+const TODAY_SKY_WORD = /\p{Script=Han}/u;
+function todaySkyWord(w) {
+  const n = [...String(w || '')].length;
+  return n >= 2 && n <= 4 && TODAY_JA_WORD.test(w) && TODAY_SKY_WORD.test(w) && !!lookup(w);
+}
+let todaySkyPool = null;
+/** At most this many stars: a sky, not a scatter (round 4 review). */
+const TODAY_SKY_CAP = 10;
+/** The sky over Today (round 4, T1): a window onto the whole universe of words, never empty, in
+ * its own band between the title and the day's word (the header stays clean). Three lanes, far to
+ * near: far words and two single kanji float by along the top; his due words and the day's
+ * reading sway in the middle; the day's word's family waits nearest the word. A word opens that
+ * word; open sky in the band opens the universe itself (todayOpenUniverse). Mouse and touch only:
+ * the keyboard has the labelled door to the universe and the same saved words in the rows below. */
+function todaySky(dayWord, today, readPick) {
+  const sky = el('div', 'today-sky');
+  sky.setAttribute('aria-hidden', 'true');
+  const dueNow = new Set((today?.order || []).map((item) => srsKey(item.t, item.id)));
+  const seen = new Set([dayWord]);
+  const due = [];
+  const rest = [];
+  for (const item of S.taken) {
+    const label = String(item.label || '');
+    if (seen.has(label) || !TODAY_JA_WORD.test(label)) continue;
+    seen.add(label);
+    (dueNow.has(srsKey(item.t, item.id)) ? due : rest).push(item);
+  }
+  const r = todayRng(todayHash(dayKey()));
+  const shuffle = (list) => {
+    for (let i = list.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(r() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  };
+  shuffle(rest);
+  const take = (list, n) => {
+    const out = [];
+    for (const w of list) {
+      if (out.length >= n) break;
+      if (!seen.has(w) && todaySkyWord(w)) { seen.add(w); out.push(w); }
+    }
+    return out;
+  };
+  const family = take(todayKanji(dayWord).flatMap((c) => (D.kanjiWords?.[c] || []).slice(0, 4)), 3);
+  const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 4);
+  todaySkyPool ||= Object.keys(D.words || {}).filter((w) => D.words[w]?.jlpt && [...w].length <= 3 && TODAY_SKY_WORD.test(w));
+  const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 3);
+  // "words and kanji floating by" (his Renzo opening screen): two single kanji from today's
+  // reading drift with the far words, large and faint, each one a door to its own page
+  const glyphs = [...new Set(reading.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2);
+  // five lanes, top to bottom, far and middle depths interleaved so the field reads as a sky, not
+  // rows: two far lanes (a kanji and a far word each) float by; two middle lanes hold his due words
+  // before the day's reading and one of his other words; the day's word's own family waits in the
+  // lane nearest the word. Each lane lists its stars in the order their places are given.
+  const g = glyphs.map((kanji) => ({ kanji, kind: 'glyph' }));
+  const f = fill.map((word) => ({ word, kind: 'far' }));
+  const mid = [...due.slice(0, 3).map((item) => ({ item, kind: 'due' })), ...reading.map((word) => ({ word, kind: 'read' })),
+    ...rest.slice(0, 1).map((item) => ({ item, kind: 'mine' }))];
+  const lanes = [
+    [g[0], f[1], f[2]].filter(Boolean),
+    mid.filter((_, i) => i % 2 === 0),
+    [f[0], g[1]].filter(Boolean),
+    mid.filter((_, i) => i % 2 === 1),
+    family.map((word) => ({ word, kind: 'kin' })),
+  ];
+  sky.todayLanes = lanes.map((list, li) => {
+    const lane = el('div', 'today-sky-lane');
+    lane.dataset.lane = String(li + 1);
+    const stars = list.map(({ item, word, kanji, kind }, i) => {
+      const star = todayLearning('button', `today-star ${kind}`, item ? item.label : word || kanji);
+      star.type = 'button';
+      star.tabIndex = -1;
+      star.hidden = true;
+      star.style.setProperty('--d', `${(i % 4) * 1.7}s`);
+      star.addEventListener('click', () => go(item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word }, { invoker: star }));
+      lane.append(star);
+      return star;
+    });
+    sky.append(lane);
+    return { lane, stars };
+  });
+  // open sky is the door up: a tap in the band that lands on no word rises into the universe,
+  // and the universe grows out of the point that was touched
+  sky.addEventListener('click', (event) => {
+    if (event.target.closest('.today-star')) return;
+    todayOpenUniverse({ x: event.clientX, y: event.clientY });
+  });
+  return sky;
+}
+/** Up from Today's sky into the whole universe (T1). The universe grows out of the touched point
+ * (transform and opacity only, and it takes no touch while it grows); the door's Today pill at its
+ * foot is the way back down. UI only: no record, no scheduler. */
+function todayOpenUniverse(from) {
+  keepScroll();
+  closeWorldPicker();
+  S.captureOpen = false;
+  S.stack = [];
+  S.navOpen = false;
+  S.view = 'drift';
+  const root = document.documentElement;
+  if (from && Number.isFinite(from.x) && Number.isFinite(from.y)) {
+    root.style.setProperty('--arrive-x', `${Math.round(from.x)}px`);
+    root.style.setProperty('--arrive-y', `${Math.round(from.y)}px`);
+  }
+  root.dataset.arrive = 'sky';
+  render();
+  window.scrollTo(0, 0);
+  clearTimeout(todayOpenUniverse.settle);
+  todayOpenUniverse.settle = setTimeout(() => {
+    delete root.dataset.arrive;
+    root.style.removeProperty('--arrive-x');
+    root.style.removeProperty('--arrive-y');
+  }, 700);
+}
+/** Lay the lanes into the sky's band once the room has its measure. Places are shared nearest lane
+ * first (the day's family, then his words, then the far field), up to each lane's limit and ten in
+ * all. Each star takes a spot at random in its lane where its 44px touch area meets no other (so
+ * the field scatters across five heights instead of standing in rows), and the far lanes' stars are
+ * set to float by on one ring per lane, so stars of one lane never meet. */
+function todayPlaceSky(hero) {
+  const sky = hero.querySelector('.today-sky');
+  if (!sky?.isConnected || !sky.todayLanes) return;
+  const R = sky.getBoundingClientRect();
+  if (!R.width || !R.height) return;
+  const r = todayRng(todayHash(`${dayKey()}:sky`));
+  const W = R.width;
+  const n = sky.todayLanes.length;
+  // lane centres stand 23px inside the band, so every touch area is whole inside it
+  const pitch = (R.height - 46) / Math.max(1, n - 1);
+  // the caption that names the band sits on the near lane's right end; its whole touch area is
+  // taken, so no star's own touch area runs under it
+  const up = hero.querySelector('.today-universe')?.getBoundingClientRect();
+  const nearRight = up?.width ? Math.min(W, up.left - R.left - 6) : W;
+  const caption = up?.width ? [{ x: up.left - R.left - 4, y: up.top - R.top, w: up.width + 8, h: up.height }] : [];
+  const SIZE = { glyph: 26, due: 19, kin: 18, mine: 17, read: 16, far: 15 };
+  // per lane, top to bottom: does it float by, how far it sways each way, how many stars it keeps
+  const FLOAT = [true, false, true, false, false];
+  const SWAY = [0, 12, 0, 14, 4];
+  const LIMIT = [2, 2, 2, 2, 3];
+  const SPEED = [5, 0, 7, 0, 0];
+  const placed = [...caption];
+  let shown = 0;
+  for (const li of [4, 1, 3, 0, 2].filter((i) => i < n)) {
+    const { lane, stars } = sky.todayLanes[li];
+    const cy = 23 + li * pitch;
+    lane.style.top = `${(cy - 22).toFixed(1)}px`;
+    lane.style.height = '44px';
+    const left = FLOAT[li] ? 10 : 8 + SWAY[li];
+    const right = (li === n - 1 ? nearRight : W) - (FLOAT[li] ? 10 : 8 + SWAY[li]);
+    const kept = [];
+    for (const star of stars) {
+      star.hidden = true;
+      if (kept.length >= LIMIT[li] || shown >= TODAY_SKY_CAP) continue;
+      const kind = Object.keys(SIZE).find((k) => star.classList.contains(k)) || 'far';
+      const size = SIZE[kind];
+      const w = [...star.textContent].length * size;
+      // a touch area of at least 44 x 44 around the word that meets no other at rest
+      const hitW = Math.max(44, w + 16);
+      for (let k = 0; k < 48 && right - left >= w; k += 1) {
+        const x = left + r() * (right - left - w);
+        const box = { x: x + w / 2 - hitW / 2, y: cy - 22, w: hitW, h: 44 };
+        if (placed.some((o) => box.x < o.x + o.w && o.x < box.x + box.w && box.y < o.y + o.h && o.y < box.y + box.h)) continue;
+        placed.push(box);
+        kept.push({ star, x, w, size });
+        shown += 1;
+        break;
+      }
+    }
+    const ringW = W + Math.max(0, ...kept.map((s) => s.w)) + 48;
+    for (const { star, x, size } of kept) {
+      star.style.fontSize = `${size}px`;
+      star.style.left = `${((x / W) * 100).toFixed(2)}%`;
+      star.style.top = `${(22 - size / 2).toFixed(1)}px`;
+      if (FLOAT[li]) {
+        // one ring for the whole lane: its stars move at one pace and wrap out of sight, so their
+        // spacing never changes; at rest (and with reduced motion) each sits at x
+        const start = W + 24;
+        star.style.setProperty('--from', `${(start - x).toFixed(1)}px`);
+        star.style.setProperty('--to', `${(start - ringW - x).toFixed(1)}px`);
+        star.style.setProperty('--lag', `${(-(start - x) / SPEED[li]).toFixed(2)}s`);
+        star.style.setProperty('--ring', `${(ringW / SPEED[li]).toFixed(2)}s`);
+      }
+      star.hidden = false;
+    }
+  }
+}
+/** The day's word, large, with its reading, its hook and the door that follows its part. */
+function renderTodayWord(pick) {
+  const block = el('div', 'today-dayword');
+  block.append(el('p', 'dw-label', tx('今日のことば', "Today's word")));
+  const word = el('button', 'dw-word');
+  word.type = 'button';
+  word.dataset.uiContentValue = `語|${pick.word}`;
+  const glyph = todayLearning('span', 'dw-glyph');
+  for (const ch of pick.word) glyph.append(el('span', 'dw-k', ch));
+  glyph.style.setProperty('--n', String(Math.max(2, [...pick.word].length)));
+  word.append(glyph);
+  if (pick.reading) word.append(todayLearning('span', 'dw-r', pick.reading));
+  word.addEventListener('click', () => go(pick.item ? learningItemNode(pick.item) : { t: 'word', id: pick.word }, { invoker: word }));
+  block.append(word);
+  const hook = todayHook(pick.word);
+  if (!hook) return block;
+  const pk = () => todayLearning('span', 'dw-pk', hook.part);
+  const line = el('p', 'dw-hook');
+  const gloss = hook.meaning ? ` “${hook.meaning}”` : '';
+  if (hook.shared) {
+    const howMany = hook.count === 2 ? tx('二つの', 'both') : tx(`${hook.count}つの`, `all ${hook.count}`);
+    line.append(tx(`${howMany}漢字に、同じ部品 `, 'One part, '), pk(), tx(' が隠れている。', `${gloss}, hides inside ${howMany} kanji.`));
+  } else {
+    line.append(tx('', 'Inside '), todayLearning('span', 'dw-pk', hook.host), tx(' の中に、部品 ', ' hides '), pk(),
+      tx(' が隠れている。', `${gloss}.`));
+  }
+  block.append(line);
+  if (hook.family) {
+    block.append(el('p', 'dw-fam', hook.mine
+      ? tx(`この部品の漢字 ${hook.family} 字・うち ${hook.mine} 字はあなたの語に`, `${hook.family} kanji contain it · ${hook.mine} in your words`)
+      : tx(`この部品の漢字 ${hook.family} 字`, `${hook.family} kanji contain it`)));
+  }
+  // plain words (LABELS.md, round 4): the door names where it goes, the kanji that hold this part
+  const follow = el('button', 'dw-go');
+  follow.type = 'button';
+  follow.dataset.uiContentValue = `部品|${hook.part}`;
+  follow.append(el('span', 'dw-go-l', tx('', 'Kanji with')), pk(), el('span', 'dw-go-l', tx('を含む漢字', '')));
+  follow.append(el('i', 'today-arrow'));
+  follow.addEventListener('click', () => {
+    // the word web, centred on the shared part; the part's own sheet when the web isn't ready
+    if (typeof window.openWordWeb === 'function' && window.openWordWeb(hook.part, { type: 'part', invoker: follow }) !== false) return;
+    go(D.radicals?.[hook.part] ? { t: 'radical', id: hook.part } : { t: 'kanji', id: hook.part }, { invoker: follow });
+  });
+  block.append(follow);
+  return block;
+}
+/** Today's line: three stops on a hairline track, the train of today's cards, the one primary door
+ * (#review-start, built by renderTray) and the reading that follows it. */
+function renderTodayLine(today, door, read, pick) {
+  const card = el('section', 'today-line skin-reg');
+  card.setAttribute('aria-label', tx('今日の路線', "Today's line"));
+  const stops = el('ol', 'today-stops');
+  const stop = (cls, n, label) => {
+    const li = el('li', `today-stop ${cls}`);
+    li.append(el('b', 'today-stop-n', String(n)), el('span', 'today-stop-l', label));
+    return li;
+  };
+  const cards = today ? today.order.length : 0;
+  if (today) stops.append(stop(cards ? 'stop-cards now' : 'stop-cards', cards, tx('枚のカード', cards === 1 ? 'card' : 'cards')));
+  if (read) stops.append(stop(!cards ? 'stop-read now' : 'stop-read', 1, tx('本の記事', 'article')));
+  // plain words (round 4): the third stop is the day's word the hero shows, one short name that
+  // sits on one line beside "8 cards" and "1 article" even at 320px
+  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語', 'word')));
+  stops.style.setProperty('--stops', String(stops.children.length));
+  card.append(stops);
+  if (cards) {
+    const train = el('div', 'today-train');
+    train.setAttribute('aria-hidden', 'true');
+    const learnSet = new Set([...today.learn, ...today.new].map((i) => srsKey(i.t, i.id)));
+    today.order.slice(0, 36).forEach((item, i) => {
+      const car = el('i', learnSet.has(srsKey(item.t, item.id)) ? 'car learn' : 'car');
+      car.style.setProperty('--i', String(i));
+      train.append(car);
+    });
+    card.append(train);
+  }
+  if (door) card.append(door);
+  if (read) {
+    const then = el('button', door ? 'today-then' : 'today-then solo');
+    then.type = 'button';
+    then.append(el('span', 'today-then-l', door ? tx('つづいて', 'Then') : tx('今日の読み物', "Today's reading")),
+      todayPhrases(todayLearning('span', 'today-then-title'), read.passage.title));
+    if (read.count) then.append(el('span', 'today-then-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
+    then.append(el('i', 'today-arrow'));
+    then.addEventListener('click', () => openPassage(read.passage.id));
+    card.append(then);
+  }
+  return card;
+}
+const TODAY_DETAIL_KEY = 'bunki-today-detail';
+/** The deck room, folded under the line: the counts, the forecast, the deck rows, the doors and
+ * the pace. Open by default; a learner who folds it finds it folded next time (this device only). */
+function renderTodayDetail(today) {
+  const section = el('section', 'today-detail');
+  section.id = 'today-detail';
+  let open = true;
+  try { open = localStorage.getItem(TODAY_DETAIL_KEY) !== 'closed'; } catch { /* storage may be blocked */ }
+  const toggle = el('button', 'today-detail-toggle');
+  toggle.type = 'button';
+  toggle.setAttribute('aria-controls', 'today-detail-body');
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.append(el('span', 'today-detail-name', tx('デッキ', 'Decks')));
+  if (today) {
+    toggle.append(el('span', 'today-detail-sum', tx(`新規 ${today.new.length}・学習 ${today.learn.length}・復習 ${today.review.length}`,
+      `${today.new.length} new · ${today.learn.length} learning · ${today.review.length} due`)));
+  }
+  toggle.append(el('i', 'today-detail-caret'));
+  const body = el('div', 'today-detail-body');
+  body.id = 'today-detail-body';
+  body.hidden = !open;
+  toggle.addEventListener('click', () => {
+    const next = body.hidden;
+    body.hidden = !next;
+    toggle.setAttribute('aria-expanded', String(next));
+    try { localStorage.setItem(TODAY_DETAIL_KEY, next ? 'open' : 'closed'); } catch { /* per-device convenience only */ }
+  });
+  section.append(toggle, body);
+  return { section, body };
+}
+/** The entry sheet's one capture button, named once: Today's empty state quotes this same label,
+ * so the two can never disagree about what the button is called (round 4 review, LABELS.md). */
+function sheetTakeLabel() {
+  return tx('覚', 'Save');
+}
 function renderTray(main) {
   const currentSurface = recordViewSurface();
-  main.append(withEn(el('p', 'eyebrow', '復習'), 'review · your cards', 'en-inline'));
-  main.append(
-    el('h1', 'view-title', tx(`覚える ${S.taken.length} 件`, `Memorizing ${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)),
-  );
+  const trayToday = S.taken.length && scheduler ? todayQueue() : null;
+  const pick = todayWordOfDay(trayToday);
+  const readPick = todayReadPick();
+  const hero = el('section', 'today-hero');
+  hero.append(todayCity());
+  const head = el('header', 'today-head');
+  head.append(el('p', 'eyebrow today-date', todayDateline()), el('h1', 'view-title', tx('今日', 'Today')));
+  hero.append(head);
+  // the header stands alone; the sky has its own band under it (round 4 review)
+  if (pick) hero.append(todaySky(pick.word, trayToday, readPick));
+  // the sky's labelled door up (T1): the same rise as a tap on open sky, for every hand and key;
+  // it carries the room's own forward arrow, not a mark that reads as leaving the app
+  const up = el('button', 'today-universe');
+  up.type = 'button';
+  up.id = 'today-universe';
+  up.append(el('span', 'today-universe-l', tx('すべての言葉へ', 'Explore all words')), el('i', 'today-arrow'));
+  up.addEventListener('click', () => {
+    const b = up.getBoundingClientRect();
+    todayOpenUniverse({ x: b.left + b.width / 2, y: b.top + b.height / 2 });
+  });
+  hero.append(up);
+  if (pick) hero.append(renderTodayWord(pick));
+  main.append(hero);
+  requestAnimationFrame(() => todayPlaceSky(hero));
+  let lineDoor = null;
   // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
     // card-system slice 1 · the number is the truth: the button, the three counts and every
     // deck row read todayQueue, the same function the session serves
-    const today = todayQueue();
+    const today = trayToday;
     const due = today.order;
     const f = srsForecast();
     // the two lines must tell one story: when nothing is due at this moment
@@ -10779,19 +11721,31 @@ function renderTray(main) {
       'button',
       due.length ? 'take review-start' : 'take review-start quiet',
       due.length
-        ? `復習する — ${due.length} 件`
+        ? `はじめる · ${due.length} 枚`
         : capped ? '復習する — 今日の上限まで済んだ' : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
       due.length
-        ? `review now — ${due.length} due`
+        ? `Begin · ${due.length} card${due.length === 1 ? '' : 's'}`
         : capped ? "today's limit reached" : laterToday ? 'nothing due right now' : 'nothing due yet',
     );
     btn.type = 'button';
     btn.id = 'review-start';
     btn.disabled = !due.length;
     btn.addEventListener('click', () => startReview());
-    main.append(deckCounts(today), btn);
+    // minutes only from the learner's own pace (gate 3); without enough timings, none are shown
+    const perCard = due.length ? todaySecondsPerCard() : null;
+    if (perCard) {
+      const minutes = Math.max(1, Math.round((due.length * perCard) / 60));
+      const pace = el('span', 'review-start-min', tx(` 約 ${minutes} 分`, ` ${minutes} min`));
+      pace.title = tx(`あなたのペース：1枚 約 ${Math.round(perCard)} 秒`, `your own pace: about ${Math.round(perCard)} s a card`);
+      btn.append(pace);
+    }
+    lineDoor = btn;
+    const detail = renderTodayDetail(today);
+    main.append(renderTodayLine(today, lineDoor, readPick, pick), detail.section);
+    const fold = detail.body;
+    fold.append(deckCounts(today));
     if (today.held) {
-      main.append(
+      fold.append(
         el(
           'p',
           'srs-forecast srs-held',
@@ -10805,7 +11759,7 @@ function renderTray(main) {
       // never hidden and never turned into due cards by anyone but the learner
       const unstartedJa = f.unstarted ? ` ・ 未着手 ${f.unstarted}` : '';
       const unstartedEn = f.unstarted ? ` · not started ${f.unstarted}` : '';
-      main.append(
+      fold.append(
         el(
           'p',
           'srs-forecast',
@@ -10824,7 +11778,7 @@ function renderTray(main) {
         const d = new Date(Date.now() - i * 86400000);
         days.push(S.stats[dayKey(d)]?.n || 0);
       }
-      main.append(
+      fold.append(
         el(
           'p',
           'srs-forecast srs-trace',
@@ -10832,9 +11786,9 @@ function renderTray(main) {
         ),
       );
     }
-    renderDeckTable(main, today);
-    renderDeckDoors(main);
-    renderSrsPrefs(main);
+    renderDeckTable(fold, today);
+    renderDeckDoors(fold);
+    renderSrsPrefs(fold);
     // one layer of the tutor's testing — absent without a key, and folded
     // away while an unfinished quiz still holds the room (POL-13)
     if (!S.aiQuiz && aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
@@ -10869,9 +11823,11 @@ function renderTray(main) {
         }
         qb.disabled = false;
       });
-      main.append(qb, note);
+      fold.append(qb, note);
     }
   }
+  // no cards yet (or no scheduler): the line still offers the reading and the word walk
+  if (!lineDoor && (readPick || pick)) main.append(renderTodayLine(null, null, readPick, pick));
   renderSentencePracticeLibrary(main);
   // The stable global live region owns storage errors. This surface adds only
   // the quiet backup reminder when the record itself is healthy.
@@ -10887,11 +11843,11 @@ function renderTray(main) {
           last
             ? tx(
                 '最後の書き出しから二週間以上。下の「書き出す」で、記録の控えをひとつのファイルに残せる。',
-                'It has been over two weeks since you last saved a copy. 書き出す (export) below saves everything to one file.',
+                'It has been over two weeks since you last saved a copy. Export below saves everything to one file.',
               )
             : tx(
                 '記録はこの端末だけにある。下の「書き出す」で、控えをひとつのファイルに残せる。',
-                'Your cards are saved only on this device. To keep a copy, use 書き出す (export) below.',
+                'Your cards are saved only on this device. To keep a copy, use Export below.',
               ),
         ),
       );
@@ -10937,8 +11893,8 @@ function renderTray(main) {
         'div',
         'sem-empty',
         tx(
-          '覚える項目はまだない。語・漢字・部品・熟語のページの「覚える」から入る。',
-          'No memorizing items yet. The 覚える memorize button on any word, kanji, part, or idiom page adds it — this month’s list fills itself.',
+          `保存した言葉はまだない。語・漢字・熟語のページで「${sheetTakeLabel()}」を押すと、ここに並ぶ。`,
+          `Nothing saved yet. Tap ${sheetTakeLabel()} on any word, kanji or idiom, and it comes back here to review.`,
         ),
       ),
     );
@@ -11191,10 +12147,10 @@ function trayLine(item, dueKeys) {
     const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
     line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
   }
-  if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
+  if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', 'struggling')));
   // provenance, not authority: the tutor made this row, and saying so is
   // what keeps its autonomy honest (operator's word, 2026-08-24)
-  if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', '先生 tutor-made')));
+  if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', 'tutor-made')));
   const when = el('span', 'when', srsWhen(item));
   // red is for NOW — a whole column of red "due" was noise wearing urgency
   if (dueKeys.has(key)) when.classList.add('due-now');
@@ -11292,7 +12248,7 @@ function listGloss(item) {
 }
 
 function listToMarkdown(name, items) {
-  const lines = [`# ${name} — 分岐 Bunki`, '', `${items.length} 件 · ${dayKey()}`, ''];
+  const lines = [`# ${name} — 回廊 KAIRO`, '', `${items.length} 件 · ${dayKey()}`, ''];
   for (const item of items) {
     const r = listReading(item);
     const g = listGloss(item);
@@ -11889,8 +12845,8 @@ function renderLessons(main) {
       if (!next.length) main.append(el('p', 'card-kind', tx('この級はぜんぶ終わった。', 'Every lesson at this level is done.')));
     };
     for (const lvl of JLPT_LANES) section('word', lvl, lvl);
-    main.append(withEn(el('p', 'eyebrow', '漢検 — 字のレッスン'), 'kanji lessons, by 漢検 grade', 'en-inline'));
-    for (const lvl of KANKEN_LANES) section('kanji', lvl, `漢検 ${lvl}`);
+    main.append(withEn(el('p', 'eyebrow', '漢検 — 字のレッスン'), 'kanji lessons, by Kanji Kentei grade', 'en-inline'));
+    for (const lvl of KANKEN_LANES) section('kanji', lvl, tx(`漢検 ${lvl}`, `Kanji Kentei ${kankenGradeLabel(lvl)}`));
     return;
   }
   // learn phase: one word at a time, plainly
@@ -13416,9 +14372,9 @@ function renderMock(main) {
     if (allUnchecked) {
       const mark = el('p', 'exam-machine-label mock-review-mark');
       const reason = tx('答えはまだ人が確認していない', 'answers not yet checked by a person');
-      const chip = el('span', 'status-chip', '未確認');
+      const chip = el('span', 'status-chip', tx('未確認', 'Unreviewed'));
       chip.title = reason;
-      chip.setAttribute('aria-label', `未確認 — ${reason}`);
+      chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
       mark.append(chip, ' ', el('span', 'exam-review-reason', reason));
       main.append(mark);
     }
@@ -13439,7 +14395,7 @@ function renderMock(main) {
         row.append(el('span', 'row-glyph', String(set.setId.split('-')[1] || '')));
         const mid = el('span', 'row-main');
         mid.append(document.createTextNode(`${set.title.ja} — ${set.items} 問`));
-        if (!set.approved && !allUnchecked) mid.append(el('span', 'status-chip', '未確認'));
+        if (!set.approved && !allUnchecked) mid.append(el('span', 'status-chip', tx('未確認', 'Unreviewed')));
         const prior = latest.get(set.setId);
         const latestRun = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).run : null;
         const pinned = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).flat : null;
@@ -14111,8 +15067,7 @@ function renderKagami(main) {
     const block = el('div', 'kagami-band');
     block.dataset.band = id;
     const head = el('p', 'eyebrow list-head');
-    head.append(document.createTextNode(ja));
-    if (bi()) head.append(el('span', 'en-inline', en));
+    head.append(document.createTextNode(tx(ja, en)));
     block.append(head);
     if (!band.evidence) {
       block.append(el('p', 'kagami-thin', tx('まだ記録がない。', 'no evidence yet')));
@@ -15524,10 +16479,12 @@ function openReferenceCollection(collectionId) {
   window.scrollTo(0, 0);
 }
 function referenceCollectionChip(label, collectionId) {
-  const chip = el('button', 'pool-tag cat-chip', label);
+  const translated = collectionId.startsWith('kanken:') ? `Kanji Kentei ${kankenGradeLabel(collectionId.slice(7))}` : label;
+  const shown = tx(label, translated);
+  const chip = el('button', 'pool-tag cat-chip', shown);
   chip.type = 'button';
   chip.dataset.referenceDoor = collectionId;
-  chip.setAttribute('aria-label', tx(`${label} の参考書庫をひらく`, `open ${label} in the reference library`));
+  chip.setAttribute('aria-label', tx(`${label} の参考書庫をひらく`, `open ${shown} in the reference library`));
   chip.addEventListener('click', () => openReferenceCollection(collectionId));
   return chip;
 }
@@ -15552,7 +16509,7 @@ function renderReferenceNode(sheet, node) {
   }
   renderReferenceMetadata(sheet, entry);
   renderReferenceConnections(sheet, entry);
-  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${source.level}`).join(' · ')));
+  sheet.append(el('p', 'sense-pos', (entry.levelSources || []).map((source) => `${source.source}: ${/級/u.test(source.level) ? tx(source.level, kankenGradeLabel(source.level)) : source.level}`).join(' · ')));
   for (const source of entry.sourceRecords || []) {
     const info = el('p', 'sense-pos', `${source.sourceId} · ${source.form || ''} · ${source.level || ''}`);
     // Consult the source only on an explicit link. No glyph images or
@@ -15578,7 +16535,7 @@ function renderReferenceNode(sheet, node) {
  * opens the same idiom entry the kanji pages open. */
 function renderYoji(main) {
   main.append(withEn(el('p', 'eyebrow', '四字熟語'), 'four-character idioms', 'en-inline'));
-  main.append(el('h1', 'view-title', '四字熟語'));
+  main.append(el('h1', 'view-title', tx('四字熟語', 'Four-character idioms')));
   const all = Object.values(D.idioms)
     .filter((i) => i.yoji)
     .sort((a, b) => (a.r < b.r ? -1 : a.r > b.r ? 1 : 0));
@@ -15645,7 +16602,7 @@ function renderKanjidex(main) {
   if (typeof S.kdx.mode !== 'string') S.kdx.mode = 'parts';
   if (!Array.isArray(S.kdx.parts)) S.kdx.parts = S.kdx.part ? [S.kdx.part] : [];
   main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji you cannot read', 'en-inline'));
-  main.append(el('h1', 'view-title', '字引'));
+  main.append(el('h1', 'view-title', tx('字引', 'Kanji finder')));
 
   // one door, several lenses (operator 2026-08-10, KKLD tab model): the parts
   // picker, a draw canvas, reading, meaning, and stroke count — every hit
@@ -15670,8 +16627,7 @@ function renderKanjidex(main) {
     // The state is spoken now; the CSS carries the contrast.
     b.setAttribute('aria-pressed', String(S.kdx.mode === id));
     b.type = 'button';
-    b.append(el('span', 'l-ja', ja));
-    if (bi()) b.append(el('span', 'en-sub', en));
+    b.append(el('span', 'l-ja', tx(ja, en)));
     b.addEventListener('click', () => {
       S.kdx.mode = id;
       render();
@@ -15790,6 +16746,7 @@ function renderKdxParts(main) {
     const chosen = el('div', 'kdx-chosen');
     for (const p of S.kdx.parts) {
       const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
+      b.dataset.uiContentValue = p;
       b.type = 'button';
       // the chosen row is a REMOVE control, not a toggle, and says so (PR #77 007479d0)
       b.setAttribute('aria-label', tx(`${p} を外す`, `remove ${p}`));
@@ -15859,6 +16816,7 @@ function kdxPartGrid(coPresent) {
       b.type = 'button';
       // which one is chosen is STATE, not only a class and a colour (PR #77 007479d0)
       b.setAttribute('aria-pressed', String(sel));
+      b.dataset.uiContent = 'learning';
       b.dataset.kdxPart = r.c; // the journey verifier's seam (c76edfb4's contract)
       if (r.name) b.setAttribute('aria-label', r.name);
       if (dead) b.disabled = true;
@@ -15912,6 +16870,7 @@ function renderKdxRadical(main) {
     const on = S.kdx.rad === n;
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', glyph);
     b.type = 'button';
+    b.dataset.uiContent = 'learning';
     b.dataset.kdxRad = String(n);
     b.setAttribute('aria-pressed', String(on));
     b.setAttribute('aria-label', `${n} ${r?.c || ''} ${r?.name || ''}`.trim());
@@ -16008,11 +16967,11 @@ function kankenLevels() {
   return [...seen].sort((a, b) => order(b) - order(a));
 }
 function renderKdxLevel(main) {
-  main.append(withEn(el('p', 'eyebrow', '漢検'), 'by Kanji Kentei level — 10級 first, 1級 last', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', '漢検'), 'by Kanji Kentei level — grade 10 first, grade 1 last', 'en-inline'));
   const row = el('div', 'kdx-row');
   for (const lv of kankenLevels()) {
     const on = S.kdx.kk === lv;
-    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', lv);
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', tx(lv, kankenGradeLabel(lv)));
     b.type = 'button';
     b.dataset.kdxKk = lv;
     b.setAttribute('aria-pressed', String(on));
@@ -16437,8 +17396,13 @@ function thesClusters() {
 }
 
 function renderThesaurus(main) {
-  main.append(withEn(el('p', 'eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
-  main.append(el('h1', 'view-title', '類語辞典'));
+  // the word-web room: the plate first (window.openWordWeb lands here), the
+  // paper thesaurus beneath it as the room's index of hand-written clusters
+  main.append(el('h1', 'view-title ww-room-title', tx('言葉の網', 'The word web')));
+  const web = renderWordWeb();
+  if (web) main.append(web);
+  main.append(withEn(el('p', 'eyebrow thes-eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
+  main.append(el('h2', 'view-title thes-title', tx('類語辞典', 'Thesaurus')));
   const clusters = thesClusters();
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
@@ -16462,7 +17426,7 @@ function renderThesaurus(main) {
       row.type = 'button';
       row.dataset.thesRow = edge.w;
       row.append(el('span', 'sem-word', edge.w));
-      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', REL[edge.rel][0]));
+      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', tx(...REL[edge.rel])));
       row.append(el('span', 'sem-note', edge.note));
       row.addEventListener('click', () => go({ t: 'word', id: edge.w }));
       block.append(row);
@@ -16470,6 +17434,823 @@ function renderThesaurus(main) {
     main.append(block);
   }
 }
+
+/* =================================================== BEGIN WORD WEB (Words lane)
+ * 言葉の網 — "the recursive quality of the language", as one drafting plate
+ * (concept C's Words plate, B's light trace, A's typesetting). A word sits in
+ * the middle; its kanji ring it with their parts above; the words that share a
+ * kanji and the hand-written neighbours of D.sem sit below; one real passage
+ * and a grammar point hang at the sides. Tapping any node re-centres the plate
+ * on it — the tapped glyph itself flies to the middle — and the walk stays lit
+ * as a trail: 推進 — 進 — 隹. Every edge is read from data already in memory:
+ * D.dict / D.words, D.kanji[c].parts, D.radicals, D.kanjiWords, D.sem,
+ * findExamples and GRAMMARS(). Nothing here writes the record.
+ *
+ * API for other rooms:
+ *   window.openWordWeb(term, { type: 'word'|'kanji'|'part', invoker })
+ * opens the word-web room (S.view 'thesaurus', data-room 'word-web') centred
+ * on term, with a navigation return so 戻る comes back to the caller. On the
+ * Words tab itself it re-centres the plate in place. */
+const WW_W = 360; // the plate's nominal width: x is placed in % of it
+const WW_H = 404;
+const WW_CX = WW_W / 2;
+const WW_CY = 192;
+const WW_TRAIL_MAX = 7;
+const WW_WALK_KEY = 'bunki-word-web-walk';
+const wordWeb = { trail: null };
+let wwPartIndex = null;
+
+const wwReady = () => !!(D.kanji && D.dict && D.words && D.kanjiWords);
+const wwReduced = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function wwTrail() {
+  if (!wordWeb.trail) {
+    wordWeb.trail = [];
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(WW_WALK_KEY) || '[]');
+      if (Array.isArray(saved)) wordWeb.trail = saved.filter((n) => n && typeof n.key === 'string' && ['word', 'kanji', 'part'].includes(n.type)).slice(-WW_TRAIL_MAX);
+    } catch { /* a private window keeps the walk for this page only */ }
+  }
+  return wordWeb.trail;
+}
+function wwSaveTrail() {
+  try { sessionStorage.setItem(WW_WALK_KEY, JSON.stringify(wordWeb.trail || [])); } catch { /* per-viewer convenience only */ }
+}
+/** Walk to a node: a node already on the walk cuts the walk back to it. */
+function wwPush(node) {
+  const trail = wwTrail();
+  const at = trail.findIndex((n) => n.type === node.type && n.key === node.key);
+  if (at >= 0) trail.splice(at + 1);
+  else trail.push({ type: node.type, key: node.key, why: node.why || null });
+  if (trail.length > WW_TRAIL_MAX) trail.splice(0, trail.length - WW_TRAIL_MAX);
+  wwSaveTrail();
+}
+
+function wwKanjiOf(w) {
+  const k = D.words[w]?.k?.length ? D.words[w].k : D.dict[w]?.k?.length ? D.dict[w].k : [...w];
+  return [...new Set(k)].filter((c) => D.kanji[c]);
+}
+/** part → every kanji whose own parts list names it (the full family in the bundle). */
+function wwPartMembers(p) {
+  if (!wwPartIndex) {
+    wwPartIndex = new Map();
+    for (const [c, k] of Object.entries(D.kanji)) {
+      for (const part of k.parts || []) {
+        let set = wwPartIndex.get(part);
+        if (!set) wwPartIndex.set(part, (set = new Set()));
+        set.add(c);
+      }
+    }
+  }
+  return wwPartIndex.get(p) || new Set();
+}
+/** A kanji's parts from D.kanji[c].parts, minus those another listed part
+ * already implies across the whole data set (亻 inside every 隹 kanji, 人
+ * inside every 亻 one): the decomposition stays the data's, only deduplicated. */
+function wwParts(c) {
+  const parts = [...new Set(D.kanji[c]?.parts || [])].filter((p) => p !== c);
+  const sets = parts.map(wwPartMembers);
+  const kept = parts.filter((p, i) => !parts.some((q, j) => {
+    if (j === i) return false;
+    const a = sets[j];
+    const b = sets[i];
+    if (!a.size || a.size > b.size || (a.size === b.size && j > i)) return false;
+    for (const x of a) if (!b.has(x)) return false;
+    return true;
+  }));
+  // the most telling parts first: a part few kanji share (隹, 40) says more than 亻 (185)
+  const size = new Map(parts.map((p, i) => [p, sets[i].size]));
+  return kept.sort((a, b) => size.get(a) - size.get(b));
+}
+function wwWord(w) {
+  let rec = null;
+  try { rec = lookup(w); } catch { rec = null; }
+  const graded = D.words[w];
+  const senses = rec?.m?.length ? rec.m : graded?.g ? [graded.g] : [];
+  return { reading: rec?.r || graded?.r || '', senses, jlpt: graded?.jlpt || null };
+}
+const wwShort = (s) => String(s || '').replace(/\s*\([^)]*\)/g, '').split(/[;,]/)[0].trim();
+function wwMine() {
+  const words = new Set();
+  const kanji = new Set();
+  for (const row of S.taken) {
+    if (row.t === 'word') {
+      words.add(row.id);
+      for (const c of wwKanjiOf(row.id)) kanji.add(c);
+    } else if (row.t === 'kanji') kanji.add(row.id);
+  }
+  return { words, kanji };
+}
+/** A card the learner holds that reviews today is never the default plate:
+ * the web is the reward after the cards, never the answer before them. */
+function wwDueToday(w) {
+  if (!S.taken.some((row) => row.t === 'word' && row.id === w)) return false;
+  const rec = S.srs[srsKey('word', w)];
+  if (!rec) return true;
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+  return Date.parse(rec.due) <= end.getTime();
+}
+/** The plate's opening word: the walk in progress, else the word last looked
+ * up in a reading (obslog tap rows), else the newest saved word not due today,
+ * else the day's word — a thesaurus head, chosen by date, not yet in your words. */
+function wwDefault() {
+  const trail = wwTrail();
+  if (trail.length) return trail.at(-1);
+  const ok = (w) => w && (D.dict[w] || D.words[w]) && wwKanjiOf(w).length && !wwDueToday(w);
+  const log = S.obslog || [];
+  for (let i = log.length - 1; i >= 0 && i >= log.length - 400; i -= 1) {
+    const row = log[i];
+    if (row[1] === 'tap' && row[3] >= 2 && typeof row[2] === 'string' && row[2].startsWith('word:') && ok(row[2].slice(5))) {
+      return { type: 'word', key: row[2].slice(5), why: 'looked' };
+    }
+  }
+  for (let i = S.taken.length - 1; i >= 0; i -= 1) {
+    const row = S.taken[i];
+    if (row.t === 'word' && ok(row.id)) return { type: 'word', key: row.id, why: 'saved' };
+  }
+  const held = new Set(S.taken.filter((row) => row.t === 'word').map((row) => row.id));
+  const heads = Object.keys(D.sem || {}).filter((w) => !held.has(w) && wwKanjiOf(w).length >= 2 && (D.dict[w] || D.words[w])).sort();
+  if (heads.length) {
+    const now = new Date();
+    const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    return { type: 'word', key: heads[day % heads.length], why: 'day' };
+  }
+  return null;
+}
+
+/* The shelf is indexed once per fetched article (content bases + text), so a
+ * re-centre asks ~130 Set lookups instead of re-walking every token. */
+const wwTokenIndex = new WeakMap();
+function wwPassageIndex(p) {
+  let ix = wwTokenIndex.get(p.tokens);
+  if (!ix) {
+    const bases = new Set();
+    let text = '';
+    for (const t of p.tokens) {
+      if (!t.c) continue;
+      bases.add(t.b);
+      text += t.s;
+    }
+    ix = { bases, text };
+    wwTokenIndex.set(p.tokens, ix);
+  }
+  return ix;
+}
+/** The sentences of one article whose tokens pass test, as findExamples shapes them. */
+function wwSentences(p, test, cap, out) {
+  let sentence = [];
+  let start = 0;
+  let hit = -1;
+  for (const [index, t] of p.tokens.entries()) {
+    sentence.push(t);
+    if (hit < 0 && t.c && test(t)) hit = sentence.length - 1;
+    if ('。！？'.includes(t.s)) {
+      if (hit >= 0 && sentence.length <= 80) {
+        out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start, target: sentence[hit].b });
+        if (out.length >= cap) return;
+      }
+      sentence = [];
+      start = index + 1;
+      hit = -1;
+    }
+  }
+}
+/** The shelf sentences (then fetched bank lines) that hold a word. */
+function wwPassages(w, cap = 2) {
+  const out = [];
+  for (const p of D.passages || []) {
+    if (!p.tokens || !wwPassageIndex(p).bases.has(w)) continue;
+    wwSentences(p, (t) => t.b === w, cap, out);
+    if (out.length >= cap) return out;
+  }
+  for (const ex of D.exampleBank?.get(w) || []) {
+    if (out.length >= cap) break;
+    out.push({ ...ex, target: w });
+  }
+  return out;
+}
+/** A shelf sentence that holds a kanji, from the articles already fetched. */
+function wwKanjiPassage(c) {
+  const out = [];
+  for (const p of D.passages || []) {
+    if (!p.tokens || !wwPassageIndex(p).text.includes(c)) continue;
+    wwSentences(p, (t) => String(t.s).includes(c), 1, out);
+    if (out.length) return out[0];
+  }
+  return null;
+}
+/** A grammar point linked to the word: its pattern, else one of its examples. */
+function wwGrammarFor(w) {
+  if ([...w].length < 2) return null;
+  const norm = (p) => String(p).replace(/[〜～\s（）()]/g, '');
+  const all = GRAMMARS();
+  return all.find((g) => norm(g.p).split('／').includes(w)) || all.find((g) => (g.ex || []).some((e) => String(e.ja || '').includes(w))) || null;
+}
+/** '…学の推進に道…' — a few characters either side of the word. */
+function wwExcerpt(ex, target) {
+  const text = ex.tokens.map((t) => t.s).join('');
+  const ti = ex.tokens.findIndex((t) => t.b === target || String(t.s).includes(target));
+  if (ti < 0) return { before: '', word: text.slice(0, 8), after: '' };
+  const before = ex.tokens.slice(0, ti).map((t) => t.s).join('');
+  const after = ex.tokens.slice(ti + 1).map((t) => t.s).join('');
+  return { before: before.slice(-3), word: ex.tokens[ti].s, after: after.slice(0, 2), full: text, ti };
+}
+/** Walk back into the article at the sentence, or open the bank line on its own page. */
+function wwOpenPassage(ex, target, invoker) {
+  const home = ex.passage && D.passages.some((p) => p.id === ex.passage) ? ex.passage : null;
+  if (home) {
+    keepNavigationReturn('reader', invoker);
+    const from = sentenceSource(ex.tokens, home, ex.start);
+    const ti = ex.tokens.findIndex((t) => t.b === target);
+    openPassage(home, from ? { index: from.index + Math.max(0, ti) } : null);
+    return;
+  }
+  go({ t: 'sent', tokens: ex.tokens, en: ex.en || '', source: ex.source || '', passage: null, start: ex.start, target }, { invoker });
+}
+
+const WW_REL = { syn: ['類義', 'near'], ant: ['対義', 'opposite'], reg: ['語感', 'register'], fam: ['同族', 'family'], col: ['共起', 'goes with'], thm: ['主題', 'theme'] };
+const wwP = (deg, rx, ry = rx) => [WW_CX + rx * Math.cos((deg * Math.PI) / 180), WW_CY + ry * Math.sin((deg * Math.PI) / 180)];
+const wwSpread = (n, a, b) => (n === 1 ? [(a + b) / 2] : Array.from({ length: n }, (_, i) => a + ((b - a) * i) / (n - 1)));
+const WW_RING2_SLOTS = [[180, 304], [66, 262], [294, 262], [108, 350], [252, 350]];
+const WW_RING2_ORDER = { 1: [0], 2: [1, 2], 3: [0, 1, 2], 4: [1, 2, 3, 4], 5: [0, 1, 2, 3, 4] };
+const WW_KANJI_ANGLES = { 1: [-90], 2: [-126, -54], 3: [-150, -90, -30], 4: [-160, -117, -63, -20] };
+
+function wwKanjiCap(c) {
+  const k = D.kanji[c];
+  if (!k) return { en: '', ja: '' };
+  return { en: String(k.m || '').toLowerCase(), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
+}
+/** A part's name, never a reading posing as one: the official 部首 name (radicals214: 日 → ひへん),
+ * else the part table's own name when it is more than the kanji's kun or on reading; else none. */
+function wwPartName(p) {
+  const official = D.radByGlyph?.[p]?.name;
+  if (official) return official;
+  const named = String(D.radicals?.[p]?.name || '');
+  if (!named) return '';
+  const k = D.kanji[p];
+  const readings = new Set([...(k?.kun || []), ...(k?.on || [])].map((r) => String(r).replace(/\..*$/, '').replace(/-/g, '')));
+  const kata = named.replace(/[\u3041-\u3096]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+  return readings.has(named) || readings.has(kata) ? '' : named;
+}
+function wwPartCap(p, mine) {
+  const members = wwPartMembers(p);
+  const count = D.radicals?.[p]?.kanjiCount || members.size;
+  return {
+    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,
+    ja: wwPartName(p),
+    count,
+    mine: [...members].filter((c) => mine.kanji.has(c)).length,
+  };
+}
+
+/** Build the plate's model: centre, nodes with positions, and the data marks. */
+function wwModel(centre, mine) {
+  const nodes = [];
+  const trail = wwTrail();
+  const prev = trail.length > 1 ? trail.at(-2) : null;
+  // ring 2 sits in fixed slots under the centre, so captions never collide
+  const ring2 = (list, from) => {
+    const use = WW_RING2_ORDER[Math.min(list.length, 5)] || [];
+    use.forEach((slot, i) => {
+      const [x, y] = WW_RING2_SLOTS[slot];
+      nodes.push({ ...list[i], x, y, from: [from] });
+    });
+  };
+  if (centre.type === 'word') {
+    const w = centre.key;
+    const info = wwWord(w);
+    const ks = wwKanjiOf(w).slice(0, 4);
+    const angles = WW_KANJI_ANGLES[ks.length] || [];
+    const kpos = ks.map((c, i) => wwP(angles[i], 102, 92));
+    ks.forEach((c, i) => {
+      const cap = wwKanjiCap(c);
+      nodes.push({ type: 'kanji', key: c, x: kpos[i][0], y: kpos[i][1], from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, mine: mine.kanji.has(c) });
+    });
+    // parts: one or two per kanji, a part two kanji share hung between them
+    const owners = new Map();
+    ks.forEach((c, i) => wwParts(c).slice(0, ks.length > 2 ? 1 : 2).forEach((p) => owners.set(p, [...(owners.get(p) || []), i])));
+    const shared = [...owners.entries()].filter(([, o]) => o.length > 1).map(([p]) => p);
+    let placed = 0;
+    for (const [p, o] of owners) {
+      if (placed >= 5) break;
+      let x;
+      let y;
+      if (o.length > 1) {
+        x = o.reduce((s, i) => s + kpos[i][0], 0) / o.length;
+        y = Math.min(...o.map((i) => kpos[i][1])) - 76;
+      } else {
+        const i = o[0];
+        const own = [...owners.entries()].filter(([, oo]) => oo.length === 1 && oo[0] === i).map(([q]) => q);
+        const hasShared = shared.some((q) => owners.get(q).includes(i));
+        const a = angles[i];
+        const side = a < -90 ? -1 : a > -90 ? 1 : 0;
+        let off = 0;
+        if (own.length > 1) off = (own.indexOf(p) ? 1 : -1) * 22;
+        else if (hasShared) off = side * 26;
+        [x, y] = wwP(a + off, ks.length > 2 ? 158 : 164, ks.length > 2 ? 150 : 168);
+      }
+      const cap = wwPartCap(p, mine);
+      nodes.push({ type: 'part', key: p, x, y, from: o.map((i) => kpos[i]), cap: cap.en, capJa: cap.ja, live: o.length > 1 });
+      placed += 1;
+    }
+    // ring 2: hand-written neighbours first, then words that share a kanji
+    const seen = new Set([w]);
+    const below = [];
+    for (const edge of D.sem[w] || []) {
+      if (below.length >= 2) break;
+      if (seen.has(edge.w) || [...edge.w].length > 4) continue;
+      seen.add(edge.w);
+      below.push({ type: 'word', key: edge.w, cap: tx(...(WW_REL[edge.rel] || ['関連', 'related'])), capJa: tx(...(WW_REL[edge.rel] || ['関連', 'related'])), rel: true, hi: ks, mine: mine.words.has(edge.w) });
+    }
+    const lists = ks.map((c) => (D.kanjiWords[c] || []).filter((x) => [...x].length <= 4));
+    const siblings = new Set();
+    for (const list of lists) for (const x of list) if (x !== w) siblings.add(x);
+    for (let round = 0; below.length < 5 && round < 12; round += 1) {
+      for (const list of lists) {
+        const x = list.find((cand) => !seen.has(cand));
+        if (!x || below.length >= 5) continue;
+        seen.add(x);
+        const wi = wwWord(x);
+        below.push({ type: 'word', key: x, cap: wwShort(wi.senses[0]), capJa: wi.reading, hi: ks, mine: mine.words.has(x) });
+      }
+    }
+    ring2(below, [WW_CX, WW_CY]);
+    // side cards: a real passage (left) and a linked grammar point or a second passage (right)
+    const ex = wwPassages(w, 2);
+    const side = [];
+    if (ex[0]) side.push({ type: 'passage', key: `${ex[0].passage || 'bank'}:${ex[0].start}`, ex: ex[0], target: w });
+    const g = wwGrammarFor(w);
+    if (g) side.push({ type: 'grammar', key: g.id, label: g.p, cap: wwShort(g.mEn), capJa: g.lv || '' });
+    else if (ex[1]) side.push({ type: 'passage', key: `${ex[1].passage || 'bank'}:${ex[1].start}`, ex: ex[1], target: w });
+    side.forEach((s, i) => {
+      const [x, y] = wwP(i ? 0 : 180, 136, 0);
+      nodes.push({ ...s, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
+    });
+    const strokes = ks.reduce((s, c) => s + (D.kanji[c]?.st || 0), 0);
+    const kk = ks.map((c) => D.kanji[c]?.kk).filter(Boolean);
+    const kkOrder = (v) => { const n = parseFloat(String(v).replace('準', '')); return (Number.isFinite(n) ? n : 99) + (String(v).startsWith('準') ? 0.5 : 0); };
+    const hardest = kk.sort((a, b) => kkOrder(a) - kkOrder(b))[0];
+    const met = encounterTrail(srsKey('word', w));
+    const saved = S.taken.find((row) => row.t === 'word' && row.id === w);
+    const marks = [];
+    if (info.reading) marks.push([tx('読み', 'Reading'), info.reading, true]);
+    if (info.jlpt) marks.push(['JLPT', `N${info.jlpt}`]);
+    if (ks.length) marks.push([tx('漢字', 'Kanji'), String(ks.length)]);
+    if (strokes) marks.push([tx('画数', 'Strokes'), String(strokes)]);
+    if (hardest) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(hardest) : hardest]);
+    if (shared.length) marks.push([tx('共通部品', 'Shared part'), shared[0], true]);
+    if (siblings.size) marks.push([tx('仲間の語', 'Siblings'), String(siblings.size)]);
+    if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
+    if (saved?.ts) marks.push([tx('覚え始め', 'Saved'), new Date(saved.ts).toLocaleDateString()]);
+    const follow = shared.length ? { part: shared[0], kanji: owners.get(shared[0]).map((i) => ks[i]), ...wwPartCap(shared[0], mine) } : null;
+    return { centre: { ...centre, glyph: w, reading: info.reading, gloss: bi() ? wwShort(info.senses[0]) : '', strokes }, nodes, marks, senses: info.senses, examples: ex, follow };
+  }
+  if (centre.type === 'kanji') {
+    const c = centre.key;
+    const k = D.kanji[c] || {};
+    const parts = wwParts(c).slice(0, 4);
+    const prevParts = prev?.type === 'word' ? new Set(wwKanjiOf(prev.key).filter((x) => x !== c).flatMap((x) => wwParts(x))) : new Set();
+    const angles = WW_KANJI_ANGLES[parts.length] || [];
+    parts.forEach((p, i) => {
+      const [x, y] = wwP(angles[i], 124, parts.length > 2 ? 128 : 136);
+      const cap = wwPartCap(p, mine);
+      nodes.push({ type: 'part', key: p, x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, live: prevParts.has(p) || (prev?.type === 'part' && prev.key === p) });
+    });
+    const words = (D.kanjiWords[c] || []).filter((x) => [...x].length <= 4 && x !== c);
+    const pick = [];
+    if (prev?.type === 'word' && words.includes(prev.key)) pick.push(prev.key);
+    for (const x of words) if (pick.length < 5 && !pick.includes(x)) pick.push(x);
+    ring2(pick.map((x) => { const wi = wwWord(x); return { type: 'word', key: x, cap: wwShort(wi.senses[0]), capJa: wi.reading, hi: [c], mine: mine.words.has(x) }; }), [WW_CX, WW_CY]);
+    const ex = wwKanjiPassage(c);
+    if (ex) {
+      const [x, y] = wwP(180, 136, 0);
+      nodes.push({ type: 'passage', key: `${ex.passage}:${ex.start}`, ex, target: ex.target, x, y: y - 4, from: [[WW_CX, WW_CY]], card: true });
+    }
+    const rad = k.rad && D.radInfo ? D.radInfo[k.rad] : null;
+    const inMine = [...mine.words].filter((x) => wwKanjiOf(x).includes(c)).length;
+    const met = encounterTrail(srsKey('kanji', c));
+    const marks = [];
+    if (k.st) marks.push([tx('画数', 'Strokes'), String(k.st)]);
+    if (k.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(k.kk) : k.kk]);
+    if (k.on?.length) marks.push([tx('音読み', 'On'), k.on.slice(0, 2).join('・'), true]);
+    if (k.kun?.length) marks.push([tx('訓読み', 'Kun'), k.kun.slice(0, 2).map((r) => r.replace(/\.(.+)$/, '($1)')).join('・'), true]);
+    if (rad) marks.push([tx('部首', 'Radical'), `${rad.c} ${rad.n}`, true]);
+    if (D.kanjiWords[c]?.length) marks.push([tx('この字の語', 'Words with it'), String(D.kanjiWords[c].length)]);
+    marks.push([tx('あなたの語', 'In your words'), String(inMine)]);
+    if (D.kanjiFreq?.[c]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[c])]);
+    if (met) marks.push([tx('初めて', 'First met'), new Date(met.first).toLocaleDateString()]);
+    const cap = wwKanjiCap(c);
+    return { centre: { ...centre, glyph: c, reading: (k.on || [])[0] || '', gloss: bi() ? cap.en : cap.ja, strokes: k.st || 0 }, nodes, marks, senses: k.m ? [k.m] : [], examples: ex ? [ex] : [] };
+  }
+  // a part: its family on one ring — your kanji first, the kanji you came from among them
+  const p = centre.key;
+  const members = [...wwPartMembers(p)];
+  const words = (c) => D.kanjiWords[c]?.length || 0;
+  members.sort((a, b) => (mine.kanji.has(b) - mine.kanji.has(a)) || (words(b) - words(a)) || (a < b ? -1 : 1));
+  if (prev?.type === 'kanji' && members.includes(prev.key)) {
+    members.splice(members.indexOf(prev.key), 1);
+    members.unshift(prev.key);
+  }
+  const ring = members.slice(0, 10);
+  const big = ring.length > 6;
+  wwSpread(ring.length, -90, 270 - 360 / Math.max(ring.length, 1)).forEach((ang, i) => {
+    const [x, y] = wwP(ang, big ? 136 : 112, big ? 142 : 116);
+    const cap = wwKanjiCap(ring[i]);
+    nodes.push({ type: 'kanji', key: ring[i], x, y, from: [[WW_CX, WW_CY]], cap: cap.en, capJa: cap.ja, mine: mine.kanji.has(ring[i]), live: prev?.key === ring[i] });
+  });
+  const cap = wwPartCap(p, mine);
+  const st = D.radicals?.[p]?.st || D.kanji[p]?.st || 0;
+  const rad = D.radByGlyph?.[p] || null;
+  const marks = [];
+  if (cap.ja) marks.push([tx('名前', 'Name'), cap.ja, true]);
+  if (st) marks.push([tx('画数', 'Strokes'), String(st)]);
+  // the family line above the marks already carries the count and how many are yours; the
+  // marks hold only what it does not say
+  if (rad) marks.push([tx('部首番号', 'Radical no.'), String(rad.n)]);
+  if (D.kanji[p]?.m && bi()) marks.push(['Meaning', String(D.kanji[p].m).toLowerCase()]);
+  if (D.kanji[p]?.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(D.kanji[p].kk) : D.kanji[p].kk]);
+  if (D.kanjiFreq?.[p]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[p])]);
+  return {
+    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? (D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : '') : '', strokes: st },
+    nodes, marks, senses: [], examples: [], family: members, familyCount: cap.count, familyMine: cap.mine,
+  };
+}
+
+const wwSvg = (tag, attrs = {}) => {
+  const n = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+  return n;
+};
+function wwLearn(tag, cls, text) {
+  const n = el(tag, cls, text);
+  n.lang = 'ja';
+  n.dataset.uiContent = 'learning';
+  return n;
+}
+/** A label whose shared kanji are inked in 藍 (concept: siblings ink the shared kanji). */
+function wwInkLabel(text, hi) {
+  const n = wwLearn('span', 'ww-g');
+  for (const ch of [...text]) {
+    if (hi?.includes(ch)) n.append(el('b', null, ch));
+    else n.append(document.createTextNode(ch));
+  }
+  return n;
+}
+
+function wwPlate(model, section) {
+  const plate = el('div', 'ww-plate skin-reg');
+  plate.dataset.wwCentre = `${model.centre.type}:${model.centre.key}`;
+  const inner = el('div', 'ww-plate-in');
+  const svg = wwSvg('svg', { class: 'ww-wires', viewBox: `0 0 ${WW_W} ${WW_H}`, preserveAspectRatio: 'none', 'aria-hidden': 'true', focusable: 'false' });
+  // stroke ticks: one per real stroke of the centre, around its ring
+  const ticks = wwSvg('g', { class: 'ww-ticks' });
+  const st = Math.min(model.centre.strokes || 0, 48);
+  let d = '';
+  for (let i = 0; i < st; i += 1) {
+    const a = (i / st) * Math.PI * 2 - Math.PI / 2;
+    d += `M${(WW_CX + 61 * Math.cos(a)).toFixed(1)} ${(WW_CY + 61 * Math.sin(a)).toFixed(1)}L${(WW_CX + 67 * Math.cos(a)).toFixed(1)} ${(WW_CY + 67 * Math.sin(a)).toFixed(1)}`;
+  }
+  if (d) ticks.append(wwSvg('path', { d }));
+  svg.append(ticks, wwSvg('ellipse', { class: 'ww-ring', cx: WW_CX, cy: WW_CY, rx: 55, ry: 55 }));
+  const clampX = (n) => {
+    const half = n.card ? 58 : n.type === 'word' ? 46 : 34;
+    return Math.max(half + 4, Math.min(WW_W - half - 4, n.x));
+  };
+  model.nodes.forEach((n, i) => {
+    n.x = clampX(n);
+    for (const [fx, fy] of n.from) {
+      let x0 = fx;
+      let y0 = fy;
+      if (fx === WW_CX && fy === WW_CY) {
+        const a = Math.atan2(n.y - fy, n.x - fx);
+        x0 += 58 * Math.cos(a);
+        y0 += 58 * Math.sin(a);
+      }
+      const cls = ['ww-wire', n.live ? 'ww-wire-live' : '', n.rel ? 'ww-wire-rel' : '', n.card ? 'ww-wire-card' : ''].filter(Boolean).join(' ');
+      const path = wwSvg('path', { class: cls, d: `M${x0.toFixed(1)} ${y0.toFixed(1)}L${n.x.toFixed(1)} ${n.y.toFixed(1)}` });
+      path.style.setProperty('--i', String(i));
+      svg.append(path);
+    }
+  });
+  inner.append(svg);
+
+  const c = model.centre;
+  const centre = el('div', `ww-centre ww-c-${c.type}`);
+  centre.tabIndex = -1;
+  centre.style.setProperty('--x', String((WW_CX / WW_W) * 100));
+  centre.style.setProperty('--y', String(WW_CY));
+  if (c.reading) centre.append(wwLearn('span', 'ww-c-r', c.reading));
+  const glyph = wwLearn('span', 'ww-c-glyph', c.glyph);
+  glyph.dataset.len = String(Math.min([...c.glyph].length, 4));
+  centre.append(glyph);
+  if (c.gloss) centre.append(el('span', 'ww-c-m', c.gloss));
+  inner.append(centre);
+
+  const layer = el('div', 'ww-nodes');
+  model.nodes.forEach((n, i) => {
+    const b = el('button', `ww-node ww-n-${n.type}`);
+    b.type = 'button';
+    b.dataset.wwType = n.type;
+    b.dataset.wwKey = n.key;
+    if (n.live) b.classList.add('ww-lit');
+    if (n.mine) b.classList.add('ww-mine');
+    if (n.rel) b.classList.add('ww-rel');
+    b.style.setProperty('--x', String((n.x / WW_W) * 100));
+    b.style.setProperty('--y', String(n.y));
+    b.style.setProperty('--i', String(i));
+    const box = el('span', 'ww-nb');
+    let cap = bi() ? n.cap : n.capJa;
+    let capLearn = !bi() && !n.rel && n.type !== 'passage' && n.type !== 'grammar';
+    if (n.type === 'passage') {
+      const ex = wwExcerpt(n.ex, n.target);
+      const g = wwLearn('span', 'ww-g');
+      g.append(`…${ex.before}`, el('b', null, ex.word), `${ex.after}…`);
+      box.append(g);
+      const home = n.ex.passage && D.passages.some((p) => p.id === n.ex.passage);
+      cap = home ? tx('記事の一行', 'in an article') : tx('用例', 'example');
+      capLearn = false;
+      b.dataset.uiContentValue = n.target;
+      b.setAttribute('aria-label', home ? tx(`記事の「${n.target}」の行へ戻る`, `Return to the line with ${n.target} in its article`) : tx(`「${n.target}」の用例をひらく`, `Open the example with ${n.target}`));
+    } else if (n.type === 'grammar') {
+      box.append(wwLearn('span', 'ww-g', n.label));
+      cap = bi() ? (n.cap || 'grammar') : `文法 ${n.capJa}`.trim();
+      capLearn = false;
+      b.dataset.uiContentValue = n.label;
+      b.setAttribute('aria-label', tx(`文法「${n.label}」をひらく`, `Open the grammar point ${n.label}`));
+    } else {
+      box.append(n.type === 'word' ? wwInkLabel(n.key, n.hi) : wwLearn('span', 'ww-g', n.key));
+      b.dataset.uiContentValue = n.key;
+      const kind = { word: tx('語', 'word'), kanji: tx('漢字', 'kanji'), part: tx('部品', 'part') }[n.type];
+      b.setAttribute('aria-label', tx(`${kind}「${n.key}」を中心に`, `Centre the web on the ${kind} ${n.key}`));
+    }
+    // a drafting annotation: the kanji's real stroke count at the disc's shoulder
+    if (n.type === 'kanji' && D.kanji[n.key]?.st) {
+      const st = el('span', 'ww-st', String(D.kanji[n.key].st));
+      st.setAttribute('aria-hidden', 'true');
+      box.append(st);
+    }
+    b.append(box);
+    if (cap) b.append(capLearn ? wwLearn('span', 'ww-cap', cap) : el('span', 'ww-cap', cap));
+    b.addEventListener('click', () => {
+      if (n.type === 'passage') wwOpenPassage(n.ex, n.target, b);
+      else if (n.type === 'grammar') go({ t: 'grammar', id: n.key }, { invoker: b });
+      else wwRecentre({ type: n.type, key: n.key }, section, b);
+    });
+    layer.append(b);
+  });
+  inner.append(layer);
+  plate.append(inner);
+
+  const legend = el('div', 'ww-legend');
+  legend.setAttribute('aria-hidden', 'true');
+  // the legend names only what this plate draws
+  const drawn = new Set(model.nodes.map((n) => n.type));
+  for (const [cls, type, ja, en] of [['k', 'kanji', '漢字', 'kanji'], ['p', 'part', '部品', 'part'], ['w', 'word', '語', 'word'], ['a', 'passage', '用例', 'passage'], ['g', 'grammar', '文法', 'grammar']]) {
+    if (!drawn.has(type)) continue;
+    const item = el('span', null);
+    item.append(el('i', `ww-lg ww-lg-${cls}`), tx(ja, en));
+    legend.append(item);
+  }
+  // the small number over a kanji is its stroke count: say so with one the plate really shows
+  const counted = model.nodes.find((n) => n.type === 'kanji' && D.kanji[n.key]?.st);
+  if (counted) {
+    const item = el('span', 'ww-lg-key');
+    item.append(el('i', 'ww-lg ww-lg-st', String(D.kanji[counted.key].st)), tx(' = 画数', ' = strokes'));
+    legend.append(item);
+  }
+  plate.append(legend);
+  return plate;
+}
+
+function wwDetail(model, section) {
+  const c = model.centre;
+  const box = el('div', 'ww-detail');
+  if (c.type === 'part') {
+    // the signature: the part's whole family, and how much of it is already yours
+    const line = el('p', 'ww-family-line');
+    line.append(
+      el('b', 'ww-fig', String(model.familyCount)),
+      tx(' 字がこの部品を共有 · ', ' kanji share this part · '),
+      el('b', 'ww-fig ww-fig-mine', String(model.familyMine)),
+      tx(' 字はもうあなたの語に', ' already in your words'),
+    );
+    box.append(line);
+  }
+  if (model.marks.length) {
+    const dl = el('dl', 'ww-marks');
+    for (const [k, v, ja] of model.marks) {
+      const cell = el('div', null);
+      cell.append(el('dt', null, k));
+      const dd = ja ? wwLearn('dd', null, v) : el('dd', null, v);
+      cell.append(dd);
+      dl.append(cell);
+    }
+    box.append(dl);
+  }
+  if (model.follow) {
+    // the signature: the part two kanji share, and the door into its family
+    const f = model.follow;
+    const b = el('button', 'ww-follow');
+    b.type = 'button';
+    b.dataset.wwKey = f.part;
+    b.dataset.uiContentValue = [...f.kanji, f.part].join('|');
+    const line = el('span', 'ww-follow-line');
+    f.kanji.forEach((k, i) => {
+      if (i) line.append(tx('と', ' and '));
+      line.append(wwLearn('b', 'ww-follow-k', k));
+    });
+    line.append(tx('に共通する部品', ' share one part:'), wwLearn('b', 'ww-follow-p ww-g', f.part));
+    const sub = el('span', 'ww-follow-sub', tx(`この部品の字 ${f.count} · ${f.mine} 字はあなたの語に · たどる`, `${f.count} kanji carry it · ${f.mine} in your words · follow it`));
+    b.append(line, sub);
+    b.addEventListener('click', () => wwRecentre({ type: 'part', key: f.part }, section, b));
+    box.append(b);
+  }
+  if (model.senses.length) {
+    // dictionary senses are English data in both interfaces, marked as such
+    const m = el('p', 'ww-meaning', model.senses.slice(0, 4).join('; '));
+    m.lang = 'en';
+    box.append(m);
+  }
+  if (c.type === 'part' && model.family.length) {
+    const grid = el('div', 'ww-family');
+    grid.setAttribute('role', 'group');
+    grid.setAttribute('aria-label', tx('この部品を持つ字', 'Kanji that contain this part'));
+    const mine = wwMine();
+    for (const k of model.family.slice(0, 42)) {
+      const b = el('button', mine.kanji.has(k) ? 'ww-fam ww-mine' : 'ww-fam');
+      b.type = 'button';
+      b.dataset.wwKey = k;
+      b.dataset.uiContentValue = k;
+      b.append(wwLearn('span', null, k));
+      b.setAttribute('aria-label', tx(`漢字「${k}」を中心に`, `Centre the web on the kanji ${k}`));
+      b.addEventListener('click', () => wwRecentre({ type: 'kanji', key: k }, section, b));
+      grid.append(b);
+    }
+    box.append(grid);
+    if (model.family.length > 42) box.append(el('p', 'ww-note', tx(`ほか ${model.family.length - 42} 字`, `and ${model.family.length - 42} more`)));
+  }
+  if (model.examples.length) {
+    box.append(el('h3', 'eyebrow ww-sub', tx('読んだ文の中で', 'Where it occurs')));
+    for (const ex of model.examples.slice(0, 2)) {
+      const target = ex.target || c.key;
+      const row = el('button', 'ww-pass');
+      row.type = 'button';
+      row.dataset.uiContentValue = target;
+      const text = wwLearn('span', 'ww-pass-ja');
+      const cut = wwExcerpt(ex, target);
+      if (cut.full && cut.ti >= 0) {
+        // the word stays inside the three visible lines: a long run-in is cut to its last clause
+        const lead = ex.tokens.slice(0, cut.ti).map((t) => t.s).join('');
+        text.append(lead.length > 26 ? `…${lead.slice(-22)}` : lead, el('b', null, ex.tokens[cut.ti].s), ex.tokens.slice(cut.ti + 1).map((t) => t.s).join(''));
+      } else text.textContent = ex.tokens.map((t) => t.s).join('');
+      row.append(text);
+      const home = ex.passage && D.passages.some((p) => p.id === ex.passage);
+      row.append(el('span', 'ww-pass-go', home ? tx('記事のこの行へ戻る', 'Return to this line in the article') : tx('この文をひらく', 'Open this sentence')));
+      row.addEventListener('click', () => wwOpenPassage(ex, target, row));
+      box.append(row);
+    }
+  }
+  const act = el('div', 'ww-actions');
+  const open = el('button', model.follow ? 'btn-secondary ww-open' : 'btn-primary ww-open', tx('項目をすべて見る', 'Open the full entry'));
+  open.type = 'button';
+  open.addEventListener('click', () => {
+    const t = c.type === 'part' ? (D.radicals?.[c.key] ? 'radical' : 'kanji') : c.type;
+    go({ t, id: c.key }, { invoker: open });
+  });
+  act.append(open);
+  box.append(act);
+  return box;
+}
+
+function wwValid(n) {
+  if (n.type === 'word') return !!(D.dict[n.key] || D.words[n.key]);
+  if (n.type === 'kanji') return !!D.kanji[n.key];
+  return n.type === 'part' && (wwPartMembers(n.key).size > 0 || !!D.radicals?.[n.key]);
+}
+
+/** The shelf warms in the background (prefetchArticles) and bank sentences
+ * arrive lazily; when a sentence for this centre lands, the plate gains its
+ * passage card once, quietly — never while the learner is inside it. */
+function wwWatchPassages(section, tries) {
+  const centre = wwTrail().at(-1);
+  if (!centre || centre.type === 'part' || tries >= 5) return;
+  if (centre.type === 'word' && !D.exampleBank?.has(centre.key)) ensureBankExamples(centre.key).catch(() => {});
+  setTimeout(() => {
+    const now = wwTrail().at(-1);
+    if (!section.isConnected || section.classList.contains('ww-leaving') || section.contains(document.activeElement)) return;
+    if (!now || section.dataset.wwCentre !== `${now.type}:${now.key}`) return;
+    const found = now.type === 'word' ? wwPassages(now.key, 1).length > 0 : !!wwKanjiPassage(now.key);
+    if (!found) {
+      wwWatchPassages(section, tries + 1);
+      return;
+    }
+    const next = renderWordWeb({ quiet: true });
+    if (next) section.replaceWith(next);
+  }, 1800);
+}
+
+/** The whole web: the walk, the plate, the detail plate. Null until data lands. */
+function renderWordWeb({ quiet = false } = {}) {
+  if (!wwReady()) return null;
+  if (wwTrail().length && !wwValid(wwTrail().at(-1))) wordWeb.trail = [];
+  const centre = wwDefault();
+  if (!centre || !wwValid(centre)) return null;
+  if (!wwTrail().length) wwPush(centre);
+  const mine = wwMine();
+  const model = wwModel(centre, mine);
+  const section = el('section', quiet ? 'ww ww-quiet' : 'ww');
+  section.dataset.wwType = centre.type;
+  section.dataset.wwCentre = `${centre.type}:${centre.key}`;
+  section.setAttribute('aria-label', tx('言葉の網', 'The word web'));
+
+  const head = el('div', 'ww-head');
+  const why = wwTrail()[0]?.why;
+  const eyebrow = el('h2', 'eyebrow ww-eyebrow', tx('言葉の網', 'The word web'));
+  head.append(eyebrow);
+  const whyText = { looked: tx('最後に引いた語から', 'from the word you last looked up'), saved: tx('あなたの語から', 'from your words'), day: tx('今日の語から', "from today's word") }[why];
+  if (whyText) head.append(el('span', 'ww-why', whyText));
+  const walk = el('nav', 'ww-walk');
+  walk.setAttribute('aria-label', tx('たどった道', 'Your walk'));
+  walk.append(el('span', 'ww-walk-label', tx('たどった道', 'Your walk')));
+  const trail = wwTrail();
+  // a phone keeps the walk to one line: the last four steps, the rest folded into …
+  const shown = trail.slice(-4);
+  if (trail.length > shown.length) walk.append(el('span', 'ww-walk-sep ww-walk-fold', '…'));
+  shown.forEach((n, i) => {
+    if (i) walk.append(el('span', 'ww-walk-sep', '—'));
+    const here = i === shown.length - 1;
+    const b = el('button', here ? 'ww-crumb ww-here' : 'ww-crumb');
+    b.type = 'button';
+    b.dataset.uiContentValue = n.key;
+    b.append(wwLearn('span', null, n.key));
+    if (here) b.setAttribute('aria-current', 'step');
+    b.setAttribute('aria-label', tx(`「${n.key}」へ戻る`, `Back to ${n.key}`));
+    b.addEventListener('click', () => { if (!here) wwRecentre(n, section, null); });
+    walk.append(b);
+  });
+  head.append(walk);
+  section.append(head, wwPlate(model, section), wwDetail(model, section));
+  if (!model.nodes.some((n) => n.type === 'passage')) wwWatchPassages(section, 0);
+  return section;
+}
+
+/** Re-centre on a node: the tapped glyph flies to the middle while the rest
+ * fade (transform and opacity only, ≤300ms), then only this section is swapped
+ * — the room never re-renders, the scroll and the search field stay put. */
+function wwRecentre(node, section, invoker) {
+  if (!section?.isConnected) return;
+  const swap = () => {
+    wwPush(node);
+    const next = renderWordWeb();
+    if (!next) return;
+    const hadFocus = section.contains(document.activeElement);
+    // read before writing: the new section lands exactly where the old one stood
+    const top = section.getBoundingClientRect().top;
+    section.replaceWith(next);
+    if (top < 0) window.scrollBy(0, top - 64);
+    const glyph = next.querySelector('.ww-c-glyph');
+    if (!wwReduced() && glyph?.animate) glyph.animate([{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 90, easing: 'cubic-bezier(.22,1,.36,1)' });
+    if (hadFocus) next.querySelector('.ww-centre')?.focus({ preventScroll: true });
+  };
+  const from = invoker?.querySelector('.ww-g') || invoker?.querySelector('span');
+  const to = section.querySelector('.ww-c-glyph');
+  if (wwReduced() || !from || !to || !from.animate) {
+    swap();
+    return;
+  }
+  const r0 = from.getBoundingClientRect();
+  const r1 = to.getBoundingClientRect();
+  section.classList.add('ww-leaving');
+  if (invoker.closest('.ww-detail')) section.classList.add('ww-leaving-detail');
+  invoker.classList.add('ww-chosen');
+  const scale = Math.min(3.2, r1.height / Math.max(r0.height, 1));
+  from.animate(
+    [{ transform: 'none' }, { transform: `translate(${(r1.left + r1.width / 2 - (r0.left + r0.width / 2)).toFixed(1)}px, ${(r1.top + r1.height / 2 - (r0.top + r0.height / 2)).toFixed(1)}px) scale(${scale.toFixed(2)})` }],
+    { duration: 200, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
+  );
+  setTimeout(swap, 200);
+}
+
+/** Other rooms' "Open the web" buttons call this. */
+function openWordWeb(term, { type = null, invoker = null } = {}) {
+  const key = String(term || '').trim();
+  if (!key || !wwReady()) return false;
+  const kind = type || (D.dict[key] || D.words[key] ? 'word' : D.kanji[key] ? 'kanji' : D.radicals?.[key] ? 'part' : 'word');
+  const here = document.querySelector('#app > main .ww');
+  if (here && !S.stack.length && (S.view === 'search' || S.view === 'thesaurus')) {
+    wwRecentre({ type: kind, key }, here, null);
+    return true;
+  }
+  wwPush({ type: kind, key });
+  keepNavigationReturn('thesaurus', invoker || document.activeElement);
+  S.view = 'thesaurus';
+  render();
+  window.scrollTo(0, 0);
+  return true;
+}
+window.openWordWeb = openWordWeb;
+/* ===================================================== END WORD WEB (Words lane) */
 
 /* ------------------------------------------------------------- particles
  * The structural law (design doc §4): particles are first-class doors, not
@@ -16507,7 +18288,9 @@ function renderParticleNode(sheet, node) {
   sheet.append(head);
   if (pt.r !== pt.p) sheet.append(el('p', 'reading', pt.r));
   sheet.append(el('p', 'sense-pos', bi() ? pt.role : pt.roleJa));
-  sheet.append(el('p', 'gloss', bi() ? pt.exp : pt.exp));
+  const explanation = el('p', 'gloss', pt.exp);
+  explanation.dataset.uiContentValue = (pt.exp.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+/gu) || []).join('|');
+  sheet.append(explanation);
   sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
   for (const ex of pt.ex) {
     const line = el('div', 'example');
@@ -16521,7 +18304,7 @@ function renderParticleNode(sheet, node) {
     const row = el('button', 'entry-row');
     row.type = 'button';
     row.append(el('span', 'row-glyph', '文'));
-    row.append(el('span', 'row-main', `${g.p} — ${bi() ? g.mEn : g.mJa}`));
+    row.append(el('span', 'row-main grammar-related-content', `${g.p} — ${bi() ? g.mEn : g.mJa}`));
     row.append(el('span', 'row-go', '›'));
     row.addEventListener('click', () => go({ t: 'grammar', id: g.id }));
     sheet.append(row);
@@ -16544,23 +18327,25 @@ function wireParticleGestures(span, particle, index, p) {
     mini.tabIndex = -1;
     mini.setAttribute('role', 'dialog');
     mini.setAttribute('aria-label', tx(`${particle.p} の語釈`, `${particle.p} particle quick look`));
-    mini.append(el('span', 'mini-word', particle.p));
-    mini.append(el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
-    const actions = el('div', 'mini-actions');
+    // the same word band as every word's popup (round 4, T5): the particle, its role, and its entry's door
+    const head = el('div', 'mini-head');
+    const said = el('div', 'mini-head-text');
+    said.append(el('span', 'mini-word', particle.p), el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
     const entry = el('button', 'mini-entry btn-tertiary');
     entry.type = 'button';
-    entry.append(el('span', 'mini-entry-label', tx('助詞の項目', 'Full entry')));
+    const entryLabel = el('span', 'mini-entry-label', tx('助詞の項目', 'Full entry'));
     const chevron = el('span', 'mini-entry-chevron', '›');
     chevron.setAttribute('aria-hidden', 'true');
-    entry.append(chevron);
+    entryLabel.append(chevron);
+    entry.append(entryLabel);
     entry.dataset.action = 'entry.open';
     entry.dataset.targetKind = 'particle';
     entry.addEventListener('click', (event) => {
       event.stopPropagation();
       openFull(event.detail === 0 ? 'keyboard' : 'pointer');
     });
-    actions.append(entry);
-    mini.append(actions, readerSentenceRow(sentence(), index));
+    head.append(said, entry);
+    mini.append(head, readerSentenceRow(sentence(), index));
     mini.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
       event.preventDefault();
@@ -17223,7 +19008,7 @@ function renderSearchResults(main, query) {
       row.type = 'button';
       row.dataset.searchSyn = edge.w;
       row.append(el('span', 'sem-word', edge.w));
-      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', REL[edge.rel][0]));
+      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', tx(...REL[edge.rel])));
       row.append(el('span', 'sem-note', edge.note));
       row.addEventListener('click', () => go({ t: 'word', id: edge.w }));
       wrap.append(row);
@@ -17300,7 +19085,7 @@ function renderGrammarNode(sheet, node) {
   sheet.append(el('h2', 'headword', g.p));
   sheet.append(el('p', 'sense-pos', g.lv));
   const meaning = bi() ? (g.mJa ? `${g.mEn} — ${g.mJa}` : g.mEn) : g.mJa || g.mEn;
-  sheet.append(el('p', 'gloss', meaning));
+  sheet.append(el('p', 'gloss grammar-meaning', meaning));
   sheet.append(withEn(el('p', 'eyebrow', '接続'), 'formation', 'en-inline'));
   sheet.append(el('p', 'formation', g.form));
   sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
@@ -17329,7 +19114,7 @@ function nodeTitle(node) {
   if (node.t === 'reference') return node.referenceEntry?.text || node.id;
   // the crumb idiom for a content-shaped node: 日本語 first, english beside
   // it — never a stray lowercase 'sentence' standing alone mid-crumb
-  if (node.t === 'sent') return tx('文', '文 sentence');
+  if (node.t === 'sent') return tx('文', 'sentence');
   return '';
 }
 
@@ -17403,13 +19188,13 @@ function sentenceDoor(ex, target) {
  * The same node opens the same way everywhere the chip appears. */
 function catalogLabel(by, value) {
   if (by === 'strokes') return tx(`${value} 画`, `${value} strokes`);
-  if (by === 'kanken') return `漢検 ${value}`;
+  if (by === 'kanken') return tx(`漢検 ${value}`, `Kanji Kentei ${kankenGradeLabel(value)}`);
   if (by === 'jlpt') return `JLPT ${value}`;
   return String(value);
 }
 function catalogEn(by, value) {
   if (by === 'strokes') return `${value}-stroke kanji`;
-  if (by === 'kanken') return `Kanken ${value} kanji`;
+  if (by === 'kanken') return `Kanji Kentei ${kankenGradeLabel(value)} kanji`;
   if (by === 'jlpt') return `JLPT ${value} kanji`;
   return '';
 }
@@ -19342,10 +21127,10 @@ function holdReaderTakeSeal(btn, cur) {
 }
 
 function readerTakeLabel(cur, takenNow) {
-  if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
+  if (!cur) return tx('語をタップすると、ここで保存できる', 'Tap a word, then save it here');
   return takenNow
-    ? tx(`「${cur.id}」を覚えている — 押すと復習から外す`, `memorizing ${cur.id} — press to remove it from review`)
-    : tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`);
+    ? tx(`「${cur.id}」は保存済み — もう一度押すと外す`, `${cur.id} is saved — press again to remove it`)
+    : tx(`「${cur.id}」を保存`, `Save ${cur.id}`);
 }
 
 /** Remember the word under the learner's finger and repaint the chrome seal
@@ -20149,7 +21934,7 @@ function startReview(scope) {
   const queue = today.order;
   if (!queue.length) return;
   S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [],
-    deferred: today.held, scope: Array.isArray(scope) ? scope : null, breakAt: 0 };
+    deferred: today.held, scope: Array.isArray(scope) ? scope : null, breakAt: 0, t0: Date.now() };
   S.view = 'review';
   render();
   focusKanjiReadingReview(S.review);
@@ -20306,6 +22091,53 @@ function reviewBack(item) {
   }
   return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')], unrecorded: true };
 }
+/** The session's close (Today lane): one next door — the room's primary — the reading that holds
+ * the learner's words, and tomorrow's first word coming back, whole. Both from the record; absent
+ * when unknown. */
+function renderReviewNext(main) {
+  const read = todayReadPick();
+  const tomorrowStart = startOfDay(new Date()) + 86400000;
+  let next = null;
+  let tomorrowCount = 0;
+  for (const item of S.taken) {
+    const key = srsKey(item.t, item.id);
+    const due = Date.parse(S.srs[key]?.due);
+    if (S.suspended[key] || !Number.isFinite(due) || due < tomorrowStart) continue;
+    if (due < tomorrowStart + 86400000) tomorrowCount += 1;
+    if (!next || due < next.due || (due === next.due && key < next.key)) next = { item, due, key };
+  }
+  if (!read && !next) return;
+  const box = el('div', 'review-next');
+  if (read) {
+    const door = el('button', 'review-next-door');
+    door.type = 'button';
+    const picture = storyPicture(read.passage);
+    picture.classList.add('review-next-pic');
+    const text = el('span', 'review-next-text');
+    text.append(el('span', 'review-next-l', tx('つぎの扉 · 読む', 'Next door · Read')),
+      todayLearning('span', 'review-next-title', read.passage.title));
+    if (read.count) text.append(el('span', 'review-next-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
+    const go = el('span', 'review-next-go btn-primary', tx('今すぐ読む', 'Read it now'));
+    go.append(el('i', 'today-arrow'));
+    door.append(picture, text, go);
+    door.addEventListener('click', () => {
+      S.review = null;
+      openPassage(read.passage.id);
+    });
+    box.append(door);
+  }
+  if (next && TODAY_JA_WORD.test(String(next.item.label || ''))) {
+    const tomorrow = next.due < tomorrowStart + 86400000;
+    const line = el('p', 'review-tomorrow');
+    line.append(el('span', 'review-tomorrow-l', tomorrow
+      ? tx(`明日 · ${tomorrowCount} 枚 · 最初は`, `Tomorrow · ${tomorrowCount} card${tomorrowCount === 1 ? '' : 's'} · first`)
+      : tx('次に戻る語', 'Next to come back')));
+    const word = todayLearning('span', 'review-tomorrow-w', next.item.label);
+    line.append(word);
+    box.append(line);
+  }
+  main.append(box);
+}
 function renderReview(main) {
   const rv = S.review;
   // a focus block keeps the queue full: when the cards run dry before the
@@ -20326,20 +22158,53 @@ function renderReview(main) {
     // count grades pressed, not queue rows — re-inserted learning passes
     // would otherwise inflate the goodbye number
     const n = rv.done.again + rv.done.hard + rv.done.good + rv.done.easy;
-    main.append(el('h1', 'view-title', tx(`復習おわり — ${n} 回`, `Session done — ${n} review${n === 1 ? '' : 's'}`)));
-    // the close carries the session's seals, not grey chips: the same
-    // 再難良易 the thumb pressed, each with its count (operator, 2026-08-20:
-    // the ending felt like a scrap pile, not a close)
-    const sum = el('div', 'review-summary');
-    const seals = { again: ['再', 'もう一度', 'again'], hard: ['難', '難しい', 'hard'], good: ['良', 'ふつう', 'good'], easy: ['易', '簡単', 'easy'] };
-    for (const key of ['again', 'hard', 'good', 'easy'])
-      if (rv.done[key]) {
-        const cell = el('span', `sum-seal g-${key}`);
-        cell.setAttribute('aria-label', `${tx(seals[key][1], seals[key][2])} ${rv.done[key]}`);
-        cell.append(el('span', 'g-seal', seals[key][0]));
-        cell.append(el('span', 'sum-n', String(rv.done[key])));
-        sum.append(cell);
+    const doneTitle = el('h1', 'view-title');
+    // the close (concept C): the surface is clear, then the honest count beneath it
+    if (!S.focus) doneTitle.append(el('span', 'review-clear', tx('机の上は、空になった。', 'The surface is clear.')));
+    doneTitle.append(el('span', 'review-clear-count', tx(`復習おわり — ${n} 回`, `Session done — ${n} review${n === 1 ? '' : 's'}`)));
+    main.append(doneTitle);
+    // the sitting's words rise off the cleared surface: each once, the ones to see again in full ink
+    if (!S.focus) {
+      const seenWords = new Map();
+      for (const h of rv.history || []) {
+        const label = h.item?.label;
+        if (label && TODAY_JA_WORD.test(String(label))) seenWords.set(label, seenWords.get(label) || h.key === 'again');
       }
+      if (!seenWords.size) {
+        for (const item of rv.queue) if (TODAY_JA_WORD.test(String(item.label || ''))) seenWords.set(item.label, false);
+      }
+      if (seenWords.size) {
+        const rise = el('div', 'review-rise');
+        rise.setAttribute('aria-hidden', 'true');
+        [...seenWords].slice(0, 12).forEach(([label, again], i) => {
+          const w = todayLearning('span', again ? 'review-rise-w again' : 'review-rise-w', label);
+          w.style.setProperty('--i', String(i));
+          rise.append(w);
+        });
+        main.append(rise);
+      }
+    }
+    // the close's tally (concept C): kept, again and the sitting's time, each named in the
+    // learner's language, never a bare 再/良 seal (EN purity). A zero-grade close has no cells.
+    const sum = el('dl', 'review-summary');
+    rv.t1 ||= Date.now();
+    const cell = (cls, ja, en, value, label) => {
+      const c = el('div', cls);
+      c.setAttribute('aria-label', label || `${tx(ja, en)} ${value}`);
+      c.append(el('dt', 'sum-l', tx(ja, en)), el('dd', 'sum-n', String(value)));
+      sum.append(c);
+    };
+    if (n) {
+      const kept = rv.done.hard + rv.done.good + rv.done.easy;
+      cell('sum-seal g-good', '覚えた', 'Kept', kept);
+      cell('sum-seal g-again', 'もう一度', 'Again', rv.done.again);
+      if (rv.t0) {
+        const secs = Math.max(1, Math.round((rv.t1 - rv.t0) / 1000));
+        const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+        cell('sum-time', '時間', 'Time', clock,
+          tx(`時間 ${Math.floor(secs / 60)} 分 ${secs % 60} 秒`, `Time ${Math.floor(secs / 60)} min ${secs % 60} s`));
+      }
+    }
     main.append(sum);
     // card-system slice 1 · the day's limit, said out loud: the due reviews it
     // held back, and Anki's custom-study door to take them on today anyway
@@ -20424,9 +22289,10 @@ function renderReview(main) {
       }
     }
     renderAiCoach(main, rv);
+    if (!S.focus) renderReviewNext(main);
     // one row of doors: the way on, and the way back one grade
     const doors = el('div', 'close-doors');
-    const out = biLabel('button', 'take', 'リストへ', 'back to lists');
+    const out = biLabel('button', 'take quiet', '今日へ', 'Back to Today');
     out.type = 'button';
     out.addEventListener('click', () => {
       S.review = null;
@@ -20438,6 +22304,7 @@ function renderReview(main) {
     main.append(doors);
     return;
   }
+  rv.t1 = 0;
   // card-system slice 1 · the optional break (ペース 一息, off by default): every N graded
   // cards the glass rests — the count so far, what is left, and the way on
   const pauseEvery = srsPauseEvery();
@@ -20837,10 +22704,10 @@ function renderReview(main) {
     b.type = 'button';
     b.disabled = !!rv.pending || !recordWritable();
     b.dataset.gradeKey = String(grades.findIndex((g) => g[1] === key) + 1);
-    b.title = `${rating} (${b.dataset.gradeKey})`;
+    b.title = tx(`${ja} (${b.dataset.gradeKey})`, `${rating} (${b.dataset.gradeKey})`);
     b.append(el('span', 'g-when', when));
     b.append(el('span', 'g-label', tx(ja, rating)));
-    b.append(el('span', 'g-sub', tx(rating, ja)));
+    b.append(el('span', 'g-sub', b.dataset.gradeKey));
     b.addEventListener('click', async () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || !rv.revealed) return;
       const pressedNow = new Date();
@@ -21551,7 +23418,7 @@ function guidedCardStatus(node) {
   if (word && !D.dict?.[node.id]) return { state: 'held', reason: readerCaptureReasonText(node.id) };
   if (word && state !== 'take') return { state: 'held', reason: wordCaptureHeldText(node, { route: false }) };
   if (node.t === 'grammar' && !GRAMMARS().some((g) => g.id === node.id))
-    return { state: 'held', reason: tx('この文法は一覧にないため、覚えられない。', 'This grammar pattern is not in Bunki’s list, so it can’t be memorized.') };
+    return { state: 'held', reason: tx('この文法はまだ一覧にないため、札にできない。', 'This grammar pattern isn’t in KAIRO’s grammar list yet, so it can’t become a card.') };
   if (!word && node.t !== 'grammar') return { state: 'held', reason: tx('この種類の札は、ここでは覚えられない。', 'This kind of card can’t be memorized here.') };
   return { state: 'take' };
 }
@@ -21658,36 +23525,50 @@ function guidedDoorInJlptRoom(main) {
   const door = el('button', 'study-door');
   door.type = 'button';
   door.dataset.guidedDoor = 'mock';
-  door.append(withEn(el('span', 'study-door-t', '案内つきの稽古'), 'a guided session', 'en-inline'));
+  door.append(withEn(el('span', 'study-door-t', '案内つきの練習'), 'Guided test practice', 'en-inline'));
   door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の意味つき', 'N2 written · 6 questions · about 15 min · explanations and word meanings as you go')));
   door.addEventListener('click', () => openGuidedRoom('mock'));
   row.append(door);
   lengths.after(row);
 }
 
-/** 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18:
- * "we should have a whole corpus of test from JLPT levels and others, as well
- * as SRS cards. and other options to study here. not sure where they are…
- * please check"). Every study room the app has, behind one door each, with
- * an honest count; what is NOT in the app yet is named, not implied. */
-function renderStudyHall(main) {
-  main.append(withEn(el('p', 'eyebrow', '稽古の間'), 'the study hall — everything you can practise, in one place', 'en-inline'));
-  const hall = el('div', 'study-hall');
-  hall.id = 'study-hall';
-  const forecast = srsForecast();
-  const due = forecast.today + forecast.fresh;
+/** 稽古の間 — the study hall (operator, 2026-09-18: "we should have a whole
+ * corpus of test from JLPT levels and others, as well as SRS cards. and other
+ * options to study here. not sure where they are… please check"). Every study
+ * room the app has, behind one door each, with an honest count; what is NOT in
+ * the app yet is named, not implied.
+ *
+ * Learn lane (2026-10-08, concept C "the stage" + A's numbered sections; John:
+ * "No clusters like the dojo page having everything strewn together"). The
+ * room is one stage and five numbered, distinct blocks:
+ *   the stage — the next sitting: one lit card, the real due count, the deck
+ *               split and ONE primary (the 復習 door, or a deck when none wait)
+ *   01 guided · 02 decks · 03 focus (the pinned [data-learn-section] order)
+ *   04 tests · 05 more practice
+ * #study-hall wraps the five blocks, so every hall door (≥6) is inside it. */
+function learnTestCounts() {
   const mockCount = Array.isArray(D.mock) ? D.mock.length : null;
   if (mockCount === null) ensureMockIndex().then(() => { if (S.view === 'dojo') render(); }).catch(() => {});
   if (!assessmentCatalog && !assessmentOpening) {
     assessmentOpening = true;
     loadAssessmentCatalog().then(() => { if (S.view === 'dojo') render(); }).catch(() => {}).finally(() => { assessmentOpening = false; });
   }
-  const readyTests = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && !['section', 'written'].includes(entry.mode)).length || 0;
-  const readySections = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'section').length || 0;
-  // machine-checked written tests are counted apart: they have no length and still await review
-  const readyWritten = assessmentCatalog?.entries.filter(entry => entry.availability?.ready && entry.mode === 'written').length || 0;
-  const doors = [
-    ['review', '復習', 'SRS cards', due ? tx(`${due} 枚 待っている`, `${due} cards waiting`) : tx('待っている札はない', 'no cards waiting'), () => {
+  const ready = (assessmentCatalog?.entries || []).filter((entry) => entry.availability?.ready);
+  return {
+    tests: ready.filter((entry) => !['section', 'written'].includes(entry.mode)).length,
+    sections: ready.filter((entry) => entry.mode === 'section').length,
+    // machine-checked written tests are counted apart: they have no length and still await review
+    written: ready.filter((entry) => entry.mode === 'written').length,
+    loaded: !!assessmentCatalog,
+  };
+}
+
+/** The study hall's doors, by id: the same seven rooms and the same entries as ever. */
+function studyHallDoors() {
+  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const { tests: readyTests, sections: readySections, written: readyWritten } = learnTestCounts();
+  const defs = [
+    ['review', '復習', 'Review cards', due ? tx(`${due} 枚 待っている`, `${due} card${due === 1 ? '' : 's'} waiting`) : tx('待っている札はない', 'none waiting'), () => {
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
@@ -21697,7 +23578,7 @@ function renderStudyHall(main) {
         : tx('新しい模試を準備中 · 以前の練習も使えます', 'New mocks in preparation · earlier exercises available'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
-    ['guided', '案内つきの稽古', 'a guided session', tx('N2 筆記 6問 · 約15分 · 解説と語の扉つき', 'N2 written · 6 questions · about 15 min · explanations and word doors'),
+    ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 約15分 · 一問ごとに解説', 'N2 written · 6 questions · about 15 min · every question explained'),
       () => openGuidedRoom('dojo')],
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
@@ -21712,30 +23593,306 @@ function renderStudyHall(main) {
       keepScroll(); pendingReferenceCollection = null; referenceLibrary?.reset(); S.view = 'levels'; render(); window.scrollTo(0, 0);
     }],
   ];
-  for (const [id, ja, en, sub, go] of doors) {
+  const doors = {};
+  for (const [id, ja, en, sub, go] of defs) {
     const b = el('button', 'study-door');
     b.type = 'button';
     b.dataset.studyDoor = id;
-    b.append(withEn(el('span', 'study-door-t', ja), en, 'en-inline'));
+    b.append(el('span', 'study-door-t', tx(ja, en)));
     b.append(el('span', 'study-door-sub', sub));
     b.addEventListener('click', go);
-    hall.append(b);
+    doors[id] = b;
   }
-  main.append(hall);
-  main.append(el('p', 'fine study-hall-note', tx(
+  doors.due = due;
+  return doors;
+}
+
+/** A numbered block head (A's numbered sections, C's 01 in the gutter): the
+ * number, the name, and one live count on the right when there is one. */
+function learnHead(n, ja, en, count) {
+  const head = el('header', 'learn-head');
+  const num = el('span', 'learn-n', n);
+  num.setAttribute('aria-hidden', 'true');
+  head.append(num, el('h2', 'learn-h', tx(ja, en)));
+  if (count) head.append(el('span', 'learn-count', count));
+  return head;
+}
+
+/* the stage's split names the three passage decks in short */
+const LEARN_STAGE_DECKS = [['n2', 'N2', 'N2'], ['n1', 'N1', 'N1'], ['senmon', '専門', 'Fields']];
+const deckSummaryPending = new Set();
+/** A deck's live counts ({ due, fresh, words }), or null while they load (one load per deck). */
+function learnDeckSummary(id) {
+  const sum = deckSummaries[id];
+  if (sum || window.__CORRIDOR_STANDALONE__ === true || deckSummaryPending.has(id)) return sum || null;
+  deckSummaryPending.add(id);
+  loadDeckPlayer()
+    .then((mod) => mod.summary(id))
+    .then((got) => {
+      deckSummaries[id] = got;
+      if (S.view === 'dojo') render();
+    })
+    .catch(() => {})
+    .finally(() => deckSummaryPending.delete(id));
+  return null;
+}
+
+let learnStageAsked = null;
+/** The lit card's face, front-safe (zero-leak): the first waiting word or
+ * kanji of today's queue, shown the way its own front would be — inside its
+ * saved sentence with the word blanked, or bare. No reading, no meaning, no
+ * answer, nothing to tap. Returns null while the sentence's article loads. */
+function learnStageFace(order) {
+  const item = order.find((it) => it.t === 'word' || it.t === 'kanji');
+  if (!item) return { item: null };
+  if (item.t === 'word' && item.ctx) {
+    const cloze = takenContext(item);
+    if (!cloze) {
+      const p = D.passages.find((x) => x.id === item.ctx.p);
+      if (p && !p.tokens && learnStageAsked !== p.id) {
+        learnStageAsked = p.id;
+        ensureArticle(p).then(() => { if (S.view === 'dojo') render(); }).catch(() => {});
+      }
+      return p && !p.tokens ? null : { item, label: item.label || item.id };
+    }
+    const parts = [];
+    let text = '';
+    let seen = 0;
+    for (const token of cloze.tokens) {
+      if (token.b === item.id) {
+        parts.push({ text, at: seen });
+        text = '';
+        seen += 1;
+      } else text += token.s;
+    }
+    if (seen) {
+      parts.push({ text, at: -1 });
+      // open just before the asked place: the gap stays on the card's first lines
+      if (parts[0].text.length > 30) parts[0].text = `…${parts[0].text.slice(-26)}`;
+      return { item, parts, source: cloze.source };
+    }
+  }
+  return { item, label: item.label || item.id };
+}
+
+let learnStageSeen = 0;
+let learnStageArrived = 0;
+/** The stage (concept C): a lacquer proscenium holding one lit washi card. */
+function renderLearnStage(main, doors) {
+  const stage = el('section', 'learn-stage');
+  stage.setAttribute('aria-labelledby', 'learn-stage-title');
+  // the signature plays once per arrival: a re-render inside the beat (counts
+  // landing) continues it from where it is, through a negative delay
+  const now = Date.now();
+  if (now - learnStageSeen > 1500) learnStageArrived = now;
+  learnStageSeen = now;
+  if (now - learnStageArrived < 700) {
+    stage.classList.add('is-arriving');
+    stage.style.setProperty('--learn-t', `${learnStageArrived - now}ms`);
+  }
+  const head = el('header', 'learn-stage-head');
+  head.append(el('p', 'learn-stage-eyebrow', tx('学ぶ・今日', 'Learn · today')));
+  const title = el('h1', 'view-title', tx('次の稽古', 'Up next'));
+  title.id = 'learn-stage-title';
+  head.append(title);
+  stage.append(head);
+
+  const due = doors.due;
+  // one practice, one home: Today's queue is reviewed on Today. When it holds cards and a deck
+  // has a sitting ready, the stage belongs to that deck (the one with the most due, then new),
+  // and the review stays one quiet line pointing home
+  const sums = LEARN_STAGE_DECKS.map(([id, ja, en]) => [id, tx(ja, en), learnDeckSummary(id)]);
+  const loaded = sums.filter(([, , sum]) => sum);
+  const best = loaded.slice().sort((a, b) => b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
+  const sitting = best && (best[2].due || best[2].fresh) ? best : null;
+  const deckStage = !!(due && sitting);
+  const order = due && !deckStage ? todayQueue().order : [];
+  const face = deckStage ? { item: null } : due ? learnStageFace(order) : { item: null };
+  const fan = el('div', 'learn-fan');
+  for (const k of [0, 1]) {
+    const ghost = el('span', `learn-ghost g${k}`);
+    ghost.setAttribute('aria-hidden', 'true');
+    fan.append(ghost);
+  }
+  const card = el('div', 'learn-card');
+  for (const corner of ['tl', 'tr', 'bl', 'br']) {
+    const reg = el('i', `learn-reg ${corner}`);
+    reg.setAttribute('aria-hidden', 'true');
+    card.append(reg);
+  }
+  const meta = el('p', 'learn-card-meta');
+  const text = el('p', 'learn-card-text');
+  if (deckStage) {
+    const deck = DOJO_DECKS.find((d) => d.id === sitting[0]);
+    meta.textContent = tx('次の一席 · デッキ', 'next sitting · deck');
+    text.classList.add('is-deck');
+    text.textContent = deck ? tx(deck.ja, deck.en) : sitting[1];
+  } else if (face?.parts) {
+    meta.textContent = tx('次の札 · 保存した文から', 'next card · your sentence');
+    text.lang = 'ja';
+    text.dataset.uiContent = 'learning';
+    for (const part of face.parts) {
+      if (part.text) text.append(document.createTextNode(part.text));
+      if (part.at >= 0) {
+        const gap = el('span', 'learn-gap', '　　');
+        gap.setAttribute('aria-label', tx('空欄', 'blank'));
+        text.append(gap);
+      }
+    }
+  } else if (face?.label) {
+    meta.textContent = face.item.t === 'kanji' ? tx('次の札 · 漢字', 'next card · kanji') : tx('次の札 · 語', 'next card · word');
+    text.classList.add('is-word');
+    text.lang = 'ja';
+    text.dataset.uiContent = 'learning';
+    text.textContent = face.label;
+  } else if (due) {
+    meta.textContent = tx('次の札', 'next card');
+    text.classList.add('is-quiet');
+    text.textContent = face === null ? tx('文を開いています…', 'Opening its sentence…') : tx('札はリストで待っている。', 'Your cards wait on the list.');
+  } else {
+    meta.textContent = tx('今日', 'today');
+    text.classList.add('is-quiet');
+    text.textContent = tx('復習を待つ札はまだない。', 'No saved words to review yet.');
+  }
+  card.prepend(meta);
+  card.append(text);
+  fan.append(card);
+  stage.append(fan);
+
+  // the count and the split: the big number is the sitting the primary opens
+  // (todayQueue, the Line's own number); the decks keep their own ledgers, so
+  // their split is named apart and never added in
+  const row = el('div', 'learn-stage-row');
+  const count = el('p', 'learn-due');
+  if (deckStage) {
+    const [, short, sum] = sitting;
+    const n = sum.due || sum.fresh;
+    count.append(el('b', 'learn-due-n', String(n)));
+    count.append(el('span', 'learn-due-u', sum.due
+      ? tx(`枚 · ${short} 復習待ち`, `${short} card${n === 1 ? '' : 's'} due`)
+      : tx(`枚 · ${short} 新規`, `new ${short} card${n === 1 ? '' : 's'}`)));
+  } else {
+    count.append(el('b', 'learn-due-n', String(due)));
+    count.append(el('span', 'learn-due-u', tx('枚 復習待ち', due === 1 ? 'card due today' : 'cards due today')));
+  }
+  row.append(count);
+  if (loaded.length) {
+    const anyDue = loaded.some(([, , sum]) => sum.due);
+    const split = el('p', 'learn-split');
+    split.append(el('span', 'learn-split-h', anyDue ? tx('今日の復習', 'due today') : tx('今日の新しい札', 'new today')));
+    const line = el('span', 'learn-split-line');
+    for (const [id, name, sum] of loaded) {
+      const cell = el('span', 'learn-split-cell');
+      cell.dataset.stageDeck = id;
+      cell.append(el('span', 'learn-split-name', name), el('b', 'learn-split-n', String(anyDue ? sum.due : sum.fresh)));
+      line.append(cell);
+    }
+    split.append(line);
+    row.append(split);
+  }
+  stage.append(row);
+
+  // ONE primary. When saved cards wait, it is the 復習 door (to Today's list,
+  // as it always was). When none wait, the deck with the most due — or new —
+  // passages leads, and the 復習 door stays as a quiet line under it.
+  const review = doors.review;
+  review.classList.add('learn-go');
+  if (due && !deckStage) {
+    review.querySelector('.study-door-t').textContent = tx(`${due} 枚を復習する`, `Review ${due} card${due === 1 ? '' : 's'}`);
+    review.querySelector('.study-door-sub').textContent = tx('今日のリストから始める', 'starts from today’s list');
+    stage.append(review);
+  } else {
+    if (sitting) {
+      const [id, short, sum] = sitting;
+      const go = el('button', 'learn-go learn-go-deck');
+      go.type = 'button';
+      go.dataset.stageDeck = id;
+      go.append(el('span', 'learn-go-t', sum.due
+        ? tx(`${short}の ${sum.due} 枚を復習する`, `Review ${sum.due} ${short} card${sum.due === 1 ? '' : 's'}`)
+        : tx(`${short}の新規 ${sum.fresh} 枚を始める`, `Begin ${sum.fresh} new ${short} card${sum.fresh === 1 ? '' : 's'}`)));
+      go.addEventListener('click', () => openDeck(id));
+      stage.append(go);
+      review.classList.replace('learn-go', 'learn-go-quiet');
+      if (due) {
+        // Today's queue keeps its one home; here it is a line that points there
+        review.classList.add('learn-go-home');
+        review.querySelector('.study-door-t').textContent = tx(`今日に ${due} 枚が待っている`, `${due} card${due === 1 ? '' : 's'} waiting on Today`);
+        review.querySelector('.study-door-sub').textContent = '';
+      }
+    }
+    stage.append(review);
+  }
+  main.append(stage);
+}
+
+/** The five numbered blocks under the stage, inside #study-hall. */
+function renderStudyHall(main, doors) {
+  const hall = el('div', 'learn-hall');
+  hall.id = 'study-hall';
+
+  const guided = el('section', 'learn-section');
+  guided.dataset.learnSection = 'guided';
+  guided.append(learnHead('01', '案内つき', 'Guided', tx('6問 · 約15分', '6 questions · ~15 min')));
+  guided.append(el('p', 'learn-gloss', tx('一問ごとに解説があり、どの語も意味をひらける。迷ったらここから。', 'Every question is explained, and every word opens its meaning. Start here if you’re unsure.')));
+  guided.append(doors.guided);
+
+  const decks = el('section', 'learn-section');
+  decks.dataset.learnSection = 'decks';
+  renderDojoDecks(decks);
+
+  const focus = el('section', 'learn-section');
+  focus.dataset.learnSection = 'focus';
+  renderFocusSitting(focus);
+
+  const tests = el('section', 'learn-section learn-tests');
+  const counts = learnTestCounts();
+  const total = counts.tests + counts.sections + counts.written;
+  tests.append(learnHead('04', '試験', 'Tests', counts.loaded ? tx(`${total} 組`, `${total} set${total === 1 ? '' : 's'}`) : ''));
+  tests.append(doors.mock);
+  // the lengths a mock comes in, with how many of each are ready — the catalog's own numbers
+  const entries = assessmentCatalog?.entries || [];
+  const lengths = el('div', 'learn-lengths');
+  for (const [mode, ja, en] of [['short', '短め', 'Short'], ['medium', '中', 'Medium'], ['full', '本番', 'Full']]) {
+    const rows = entries.filter((entry) => entry.mode === mode);
+    if (!rows.length) continue;
+    const readyN = rows.filter((entry) => entry.availability?.ready).length;
+    const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
+    const cell = el('p', 'learn-length' + (readyN ? '' : ' is-pending'));
+    cell.dataset.mockMode = mode;
+    cell.append(el('b', 'learn-length-t', tx(ja, en)));
+    if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
+    cell.append(el('span', 'learn-length-n', readyN ? tx(`${readyN} 組`, `${readyN} ready`) : tx('準備中', 'in preparation')));
+    lengths.append(cell);
+  }
+  if (lengths.childNodes.length) tests.append(lengths);
+  tests.append(el('p', 'fine study-hall-note', tx(
     '模試で見つけた課題は、覚えるリスト・復習・先生との学習につながります。',
-    'Use your test results to guide Learn, review cards and your next session with Sensei.',
+    'Use your test results to guide Learn, your review cards and your next session with the tutor.',
   )));
+
+  const more = el('section', 'learn-section learn-more');
+  more.append(learnHead('05', 'ほかの稽古', 'More practice', ''));
+  const list = el('div', 'learn-more-list');
+  list.append(doors.lessons, doors.sentence, doors.probe, doors.levels);
+  more.append(list);
+
+  hall.append(guided, decks, focus, tests, more);
+  main.append(hall);
 }
 
 /** The dojo lobby: choose a length and what to drill. */
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・五つの分野', en: 'Your five fields · master’s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'massive-context cloze · real and written passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'real sentences · read and recall' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'Words you looked up · sentences' }];
+// r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
+// to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
+// and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and
+// the room it opens never disagree). docs/redesign/r4/LABELS.md
 let deckPlayer = null;
 let deckPlayerLoading = null;
 let deckPlayerError = false;
+let deckFrameObserver = null;
 const deckSummaries = {};
 function loadDeckPlayer() {
   if (deckPlayer) return Promise.resolve(deckPlayer);
@@ -21763,46 +23920,75 @@ function openDeck(id) {
   window.scrollTo(0, 0);
 }
 
+/** Words begun in a deck, read (never written) from its own ledger: one per
+ * distinct word id among the scheduled card ids (`<word id>-<card>`). The slim
+ * hairline under a deck row is this over the deck's real word count. */
+function deckWordsBegun(id) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
+    const ids = raw && typeof raw.cards === 'object' && raw.cards ? Object.keys(raw.cards) : [];
+    return new Set(ids.map((cardId) => cardId.replace(/-[^-]+$/, ''))).size;
+  } catch {
+    return 0;
+  }
+}
+
 function renderDojoDecks(main) {
-  main.append(withEn(el('p', 'eyebrow', 'デッキ'), 'SRS decks', 'en-inline'));
   const list = el('div', 'dojo-decks');
-  const row = (id, ja, sub, onClick) => {
+  let totalDue = 0;
+  let totalFresh = 0;
+  let counted = 0;
+  const row = (id, title, sub, onClick, sum = null) => {
     const b = el('button', 'dojo-deck');
     b.type = 'button';
     b.dataset.deck = id;
-    b.append(el('span', 'dojo-deck-t', ja), el('span', 'dojo-deck-sub', sub));
+    const name = el('span', 'dojo-deck-name');
+    name.append(el('span', 'dojo-deck-t', title), el('span', 'dojo-deck-sub', sub));
+    b.append(name);
+    if (sum) {
+      const n = el('span', 'dojo-deck-n');
+      const due = el('span', 'dojo-deck-due' + (sum.due ? ' is-due' : ''));
+      due.append(el('b', '', String(sum.due)), document.createTextNode(` ${tx('復習', 'due')}`));
+      const fresh = el('span', 'dojo-deck-new');
+      fresh.append(el('b', '', String(sum.fresh)), document.createTextNode(` ${tx('新', 'new')}`));
+      n.append(due, fresh);
+      b.append(n);
+      if (sum.words) {
+        const begun = Math.min(sum.words, deckWordsBegun(id));
+        const bar = el('span', 'dojo-deck-bar');
+        bar.setAttribute('aria-hidden', 'true');
+        bar.style.setProperty('--begun', String(begun / sum.words));
+        b.append(bar);
+      }
+    }
     b.addEventListener('click', onClick);
     list.append(b);
   };
   if (window.__CORRIDOR_STANDALONE__ !== true) {
-    row('personal', '私の文脈', tx('自分の段落・会話・つながり', 'personal paragraphs · conversations · connections'), () => {
-      const url = new URL(location.href);
-      url.searchParams.set('deck', 'personal');
-      location.assign(url);
+    row('personal', tx('自分の文章', 'Your own texts'), tx('自分で加えた段落や会話', 'paragraphs and conversations you add'), () => {
+      openPersonalCollection();
     });
   }
   for (const d of DOJO_DECKS) {
-    const sum = deckSummaries[d.id];
-    if (!sum && window.__CORRIDOR_STANDALONE__ !== true) {
-      loadDeckPlayer()
-        .then((mod) => mod.summary(d.id))
-        .then((got) => {
-          deckSummaries[d.id] = got;
-          if (S.view === 'dojo') render();
-        })
-        .catch(() => {});
+    const sum = learnDeckSummary(d.id);
+    if (sum) {
+      totalDue += sum.due;
+      totalFresh += sum.fresh;
+      counted += 1;
     }
-    const counts = sum ? tx(`復習 ${sum.due} ・ 新しい文 ${sum.fresh}`, `${sum.due} due · ${sum.fresh} new`) : tx(d.en, d.en);
-    row(d.id, d.ja, counts, () => openDeck(d.id));
+    const sub = sum?.words
+      ? tx(`${sum.words.toLocaleString('ja-JP')} 語`, `${sum.words.toLocaleString('en-US')} words`)
+      : tx('復習と新しい文', d.en);
+    row(d.id, tx(d.ja, d.en), sub, () => openDeck(d.id), sum);
   }
-  row('context', '文脈札', tx('一語ごとの段落カード', 'one paragraph per word'), () => {
+  row('context', tx('一語一段落', 'One word, one paragraph'), tx('語ごとに短い段落', 'a short paragraph for each word'), () => {
     keepScroll();
     S.view = 'contextdeck';
     render();
     window.scrollTo(0, 0);
   });
   const forecast = srsForecast();
-  row('mine', '覚えるの札', tx(`覚えた語 ・ ${forecast.today + forecast.fresh} 枚 待っている`, `words you saved · ${forecast.today + forecast.fresh} waiting`), () => startReview());
+  row('mine', tx('保存した語', 'Your saved words'), tx(`復習 ${forecast.today + forecast.fresh} 枚`, `${forecast.today + forecast.fresh} to review`), () => startReview());
   for (const name of Object.keys(S.lists || {})) {
     const items = S.lists[name];
     if (!items.length) continue;
@@ -21810,6 +23996,7 @@ function renderDojoDecks(main) {
     const waiting = srsDueItems().filter((i) => keys.has(srsKey(i.t, i.id))).length;
     row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語 ・ ${waiting} 枚 待っている`, `list · ${items.length} words · ${waiting} waiting`), () => startReview(items));
   }
+  main.append(learnHead('02', 'デッキ', 'Decks', counted ? tx(`復習 ${totalDue} · 新 ${totalFresh}`, `${totalDue} due · ${totalFresh} new`) : ''));
   main.append(list);
 }
 
@@ -21826,9 +24013,15 @@ function renderDeckPlay(main) {
     );
     return;
   }
+  // r4 skin: the frame takes the deck's stage (editorial.css R4), and the player changes screens
+  // without render(), so the phone's bar is re-read whenever the deck repaints
+  deckFrameObserver?.disconnect();
+  deckFrameObserver = new MutationObserver(() => syncThemeColor());
+  deckFrameObserver.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-look'] });
   deckPlayer
     .render(main, {
       deckId: S.deckPlay || DOJO_DECKS[0].id,
+      english: bi(),
       storage: localStorage, host: deckHost(),
       onLeave() {
         delete deckSummaries[S.deckPlay];
@@ -21844,27 +24037,32 @@ function renderDeckPlay(main) {
     });
 }
 
+/** 学ぶ — the Learn room: the stage, then the numbered blocks (renderStudyHall). */
 function renderFocus(main) {
-  main.append(withEn(el('h1', 'view-title', '集中道場'), 'the focus dojo', 'en-inline'));
-  renderStudyHall(main);
-  main.append(withEn(el('p', 'eyebrow', '集中'), 'a focus block', 'en-inline'));
-  main.append(
+  const doors = studyHallDoors();
+  renderLearnStage(main, doors);
+  renderStudyHall(main, doors);
+}
+
+/** 03 · the focus sitting: choose a length and what to drill, then begin. */
+function renderFocusSitting(focus) {
+  const forecast = srsForecast();
+  const due = forecast.today + forecast.fresh;
+  S.focusMin = S.focusMin || 20;
+  focus.append(learnHead('03', '時間を決めて練習', 'Timed practice', tx(`${S.focusMin} 分`, `${S.focusMin} min`)));
+  focus.append(
     el(
       'p',
-      'gloss',
+      'learn-gloss',
       tx(
         '時間を決めて、静かに札と向き合う。時間が来たら、そっと終わる。',
-        'Set a length and sit with the cards. When the time is up, the block ends on its own.',
+        'Pick a length and work through your cards. It stops on its own when the time is up.',
       ),
     ),
   );
-
-  renderDojoDecks(main);
-
-  main.append(withEn(el('p', 'eyebrow', '集中ブロック'), 'timed block', 'en-inline'));
-  main.append(withEn(el('p', 'eyebrow', '時間'), 'how long', 'en-inline'));
+  const pick = el('div', 'learn-focus-pick');
+  pick.append(el('p', 'learn-label', tx('時間', 'how long')));
   const mins = el('div', 'focus-choices');
-  S.focusMin = S.focusMin || 20;
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
     b.type = 'button';
@@ -21878,11 +24076,10 @@ function renderFocus(main) {
     });
     mins.append(b);
   }
-  main.append(mins);
+  pick.append(mins);
+  focus.append(pick);
 
-  main.append(withEn(el('p', 'eyebrow', '何を'), 'what to drill', 'en-inline'));
-  const forecast = srsForecast();
-  const due = forecast.today + forecast.fresh;
+  focus.append(el('p', 'learn-label', tx('何を練習する', 'what to practise')));
   const modes = el('div', 'focus-modes');
   const modeDefs = [
     // the sub tells the whole truth (POL-12): the block reviews each waiting
@@ -21896,7 +24093,7 @@ function renderFocus(main) {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
     b.type = 'button';
     b.setAttribute('aria-pressed', String(S.focusMode === id));
-    b.append(withEn(el('span', 'focus-mode-t', ja), en, 'en-inline'));
+    b.append(el('span', 'focus-mode-t', tx(ja, en)));
     b.append(el('span', 'focus-mode-sub', sub));
     b.addEventListener('click', () => {
       S.focusMode = id;
@@ -21904,10 +24101,10 @@ function renderFocus(main) {
     });
     modes.append(b);
   }
-  main.append(modes);
+  focus.append(modes);
 
   if (S.focusEmpty) {
-    main.append(
+    focus.append(
       el(
         'div',
         'sem-empty',
@@ -21920,10 +24117,10 @@ function renderFocus(main) {
     );
   }
 
-  const start = biLabel('button', 'take focus-start', 'はじめる', 'begin the block');
+  const start = biLabel('button', 'take focus-start', `${S.focusMin}分の練習を始める`, `Start a ${S.focusMin}-minute session`);
   start.type = 'button';
   start.addEventListener('click', () => startFocus(S.focusMin, S.focusMode));
-  main.append(start);
+  focus.append(start);
 }
 
 /* ------------------------------------------------------------- 読み探査
@@ -22211,7 +24408,7 @@ function renderProbe(main) {
     face.append(el('div', 'review-reading', it.r));
     face.append(el('div', 'review-sense', it.m.slice(0, 3).join('; ')));
     const rt = YOMI_RT_LABEL[it.rt] || YOMI_RT_LABEL['熟'];
-    face.append(el('div', 'probe-meta', `漢検${it.band} · ${tx(rt[0], rt[1])}`));
+    face.append(el('div', 'probe-meta', `${tx(`漢検${it.band}`, `Kanji Kentei ${kankenGradeLabel(it.band)}`)} · ${tx(rt[0], rt[1])}`));
   }
   main.append(face);
 
@@ -22301,7 +24498,6 @@ function renderProbe(main) {
 function renderSchedule(container) {
   const preview = schedulePreview();
   container.append(
-    withEn(
       // the scheduler is named for the learner; its internal parameter-set
       // slug (bunki-fsrs6-…) is provenance and stays in exports/debug —
       // it leaked into every entry footer (P2, full-instrument review).
@@ -22314,8 +24510,6 @@ function renderSchedule(container) {
           ' — FSRS-6' +
           (srsCustom ? tx('・自分の記録で調整済み', ' · tuned from your record') : ''),
       ),
-      null,
-    ),
   );
   if (!preview) {
     container.append(el('div', 'sem-empty', tx('スケジューラを読み込めなかった。', 'The scheduler failed to load.')));
@@ -23627,7 +25821,7 @@ async function generatePersonalReading(settings) {
 
 function renderAiReading(main) {
   main.append(withEn(el('p', 'eyebrow', '先生の読み物'), 'original articles for you', 'en-inline'));
-  main.append(el('h1', 'view-title', '私の読み物'));
+  main.append(el('h1', 'view-title', tx('私の読み物', 'My readings')));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
     '興味のあることを、自分に合う長さと文体で。語彙・読み・文法などの学習記録を参考にする。証拠が少ないときは、実力を決めつけない。',
@@ -24874,7 +27068,7 @@ function componentLabel(c) {
   if (r?.name) return r.name;
   const n = r?.kanjiCount;
   if (n) return tx(`部品 — ${n} 字に使われる`, `component — used in ${n} kanji`);
-  return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the 漢検 radical table');
+  return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the Kanji Kentei radical table');
 }
 
 /* まぎらわしい字 — the margin note every paper kanji dictionary keeps:
@@ -24945,7 +27139,7 @@ function renderKanjiNode(sheet, node) {
   const chips = el('div', 'shelf-meta');
   if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk)
-    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `漢検 ${D.kanken[k.c].kk}`, 'kanken', D.kanken[k.c].kk, node.from));
+    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `Kanji Kentei ${kankenGradeLabel(D.kanken[k.c].kk)}`, 'kanken', D.kanken[k.c].kk, node.from));
   if (D.kmeta?.[k.c]?.jlpt)
     chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
   // the entry number in the operator's paper dictionary (Kodansha KKLD),
@@ -24994,7 +27188,7 @@ function renderKanjiNode(sheet, node) {
     const text = el('span', 'rad-text');
     text.append(el('span', 'rad-name', rad.name));
     const posLabel =
-      rad.pos === '独立' ? tx('独立', 'stands alone') : tx(rad.pos, `${rad.pos} · ${rad.posEn}`);
+      rad.pos === '独立' ? tx('独立', 'stands alone') : tx(rad.pos, rad.posEn || 'position not supplied');
     text.append(el('span', 'rad-sub', tx(`${posLabel}・部首 ${rad.n}`, `${posLabel} · radical ${rad.n}`)));
     door.append(text);
     door.append(el('span', 'row-go', '›'));
@@ -25090,8 +27284,7 @@ function renderKanjiNode(sheet, node) {
   const idioms = D.idiomsByKanji[k.c] || [];
   if (idioms.length) {
     const heading = el('p', 'eyebrow');
-    heading.append(document.createTextNode(`熟語・慣用句 — ${idioms.length}　`));
-    if (bi()) heading.append(el('span', 'en-inline', 'idioms and set phrases'));
+    heading.textContent = tx(`熟語・慣用句 — ${idioms.length}`, `${idioms.length} idioms and set phrases`);
     sheet.append(heading);
     sheet.append(
       chipsFor(
@@ -25331,8 +27524,7 @@ function strokeControl(id, ja, en) {
   const btn = el('button', 'stroke-btn');
   btn.type = 'button';
   btn.id = id;
-  btn.append(el('span', 'l-ja', ja));
-  if (bi() && en) btn.append(el('span', 'en-sub', en));
+  btn.append(el('span', 'l-ja', tx(ja, en)));
   if (!bi()) btn.setAttribute('aria-label', ja);
   return btn;
 }
@@ -25347,8 +27539,7 @@ function displayKunReading(reading) {
 
 function strokeReadingRow(ja, en, values, kind = 'on') {
   const row = el('div', 'stroke-reading-row');
-  const label = el('span', 'stroke-reading-label', ja);
-  label.append(el('span', 'en-sub', en));
+  const label = el('span', 'stroke-reading-label', tx(ja, en));
   const raw = values?.length ? values : [];
   const value = el(
     'span',
@@ -26194,7 +28385,7 @@ function renderStrokePage(root) {
   seal.id = 'stroke-world-seal';
   // NOT part of the sleeping-inert chrome sweep: the seal is the top-right
   // corner of the quiet room (operator spec) and must answer while sleeping
-  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   attachWorldPicker(seal);
   bar.append(seal);
   // The bar mounts in BOTH modes. In the quiet room CSS pares it to one
@@ -26451,7 +28642,7 @@ function renderStrokePage(root) {
       };
       const links = [];
       if (D.kanken[st.id]?.kk)
-        links.push(metaLink(`漢検 ${D.kanken[st.id].kk}`, 'kanken', D.kanken[st.id].kk));
+        links.push(metaLink(tx(`漢検 ${D.kanken[st.id].kk}`, `Kanji Kentei ${kankenGradeLabel(D.kanken[st.id].kk)}`), 'kanken', D.kanken[st.id].kk));
       if (D.kmeta?.[st.id]?.jlpt)
         links.push(metaLink(`JLPT ${D.kmeta[st.id].jlpt}`, 'jlpt', D.kmeta[st.id].jlpt));
       links.push(
@@ -26598,7 +28789,7 @@ function renderRadicalNode(sheet, node) {
     el(
       'div',
       'hero-mean',
-      (official && official.name) || r.name || tx('（名称は漢検の部首表にない部品）', '(a part with no name in the 漢検 radical table)'),
+      (official && official.name) || r.name || tx('（名称は漢検の部首表にない部品）', '(a part with no name in the Kanji Kentei radical table)'),
     ),
   );
   const chips = el('div', 'shelf-meta');
@@ -26647,7 +28838,7 @@ function renderRadicalNode(sheet, node) {
   );
   sheet.append(
     chipsFor(
-      r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
+      r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
       (item) => go({ t: 'kanji', id: item.label, from: node.from }),
       null,
       'kanji',
@@ -26676,7 +28867,7 @@ function renderIdiomNode(sheet, node) {
   sheet.append(withEn(el('p', 'eyebrow', '字へ'), 'into the kanji', 'en-inline'));
   sheet.append(
     chipsFor(
-      idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
+      idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk ? tx(D.kanken[c].kk, kankenGradeLabel(D.kanken[c].kk)) : '' })),
       (item) => go({ t: 'kanji', id: item.label, from: node.from }),
       null,
       'kanji',
@@ -26779,6 +28970,7 @@ function renderSheet(root) {
   const sheet = el('div', 'sheet');
   sheet.id = 'sheet';
   sheet.dataset.node = `${node.t}:${node.id}`;
+  sheet.dataset.uiContentValue = nodeTitle(node);
   sheet.tabIndex = -1;
   sheet.setAttribute('role', 'dialog');
   sheet.setAttribute('aria-modal', 'true');
@@ -26834,7 +29026,7 @@ function renderSheet(root) {
     // D23: the seal shares the foot button's state, 'taken' only for this identity's card
     const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
     const takenNow = capState ? capState === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
-    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', '覚');
+    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', sheetTakeLabel());
     capture.type = 'button';
     capture.id = 'sheet-take';
     if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
@@ -26920,7 +29112,7 @@ function renderSheet(root) {
     const summary = el('summary', null, tx('この項目の資料・級タグ', 'Sources & level tags for this entry'));
     notes.append(summary);
     for (const source of node.referenceEntry.levelSources) {
-      notes.append(el('p', null, `${source.source}: ${source.level}`));
+      notes.append(el('p', null, `${source.source}: ${/級/u.test(source.level) ? tx(source.level, kankenGradeLabel(source.level)) : source.level}`));
     }
     renderReferenceMetadata(notes, node.referenceEntry);
     notes.append(el('p', null, tx('辞書についている級の目安です。公式の出題一覧でも、あなたが覚えたかどうかの記録でもありません。',
@@ -27074,8 +29266,8 @@ function renderVariants(root) {
     const body = el('div', 'vbody');
     for (const [key, spec] of Object.entries(VARIANTS)) {
       const row = el('div', 'vrow');
-      const label = el('span', 'vlabel', spec.label);
-      if (bi()) label.append(el('span', 'en-sub', spec.en));
+      const label = el('span', 'vlabel', tx(spec.label,
+        `${spec.label.match(/^[A-G] /u)?.[0] || ''}${spec.en}${spec.ticket ? ` #${spec.ticket}` : key === 'depth' ? ' v1.1' : ''}`));
       row.append(label);
       const seg = el('div', 'vseg');
       for (const [id, ja, en] of spec.options) {
@@ -27202,18 +29394,20 @@ const THEME_UI = [
   // 攻殻・燐光 — phosphor on terminal black
   { id: 'kaku', seal: '殻', name: '攻殻・燐光', g: '#050d12', ink: '#d8efe9', red: '#ff6b4a', paper: 'terminal' },
 ];
-// Every public picker follows the reference strip exactly. 殻 remains a
-// complete internal world so an existing saved preference never breaks.
+// D2 (John, tour 2026-10-08, "The night look: Offer both"): 殻, the electric phosphor
+// night, is public again beside 金 (the 藍 night). The picker shows two named rows, day
+// then night (ME_NIGHT_WORLDS); each row keeps the reference strip's order. Saved ids never change.
 const PUBLIC_THEME_IDS = [
   'sumi',
   'shu',
   'iwa',
-  'rokusho',
-  'yoru',
   'hokusai',
   'akafuji',
-  'nami',
   'keyblock',
+  'rokusho',
+  'yoru',
+  'kaku',
+  'nami',
   'hakuu',
 ];
 const THEME_STORE = 'kairo-theme';
@@ -27251,6 +29445,7 @@ function setKairoTheme(id) {
   }
   applyPaper(t.id);
   syncDriftTheme();
+  syncThemeColor();
 }
 /** Drift owns five atmospheric families. Map by identity so adding or
  * reordering paper worlds cannot send an unrelated raw index into it. */
@@ -27659,18 +29854,29 @@ function openWorldPicker(anchor) {
   const scrim = el('div', 'world-picker-scrim');
   const pop = el('div', 'world-picker');
   pop.setAttribute('role', 'dialog');
-  pop.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  pop.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   let activeStone = null;
-  for (const id of PUBLIC_THEME_IDS) {
-    const t = THEME_UI.find((world) => world.id === id);
-    if (!t) continue;
+  const worldName = (t) => tx(t.name, {
+    sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
+    rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
+    akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
+    hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
+  }[t.id]);
+  // the stones are seals; a plain line beneath names the world in words (the current one, or
+  // the one under the pointer or keyboard focus)
+  const current = THEME_UI[themeIx()];
+  const caption = el('p', 'world-picker-name', worldName(current));
+  caption.setAttribute('aria-hidden', 'true');
+  const stone = (t) => {
     const b = el('button', 'world-stone', t.seal);
     b.type = 'button';
     // each stone previews its own world — the colours mirror corridor.css
     b.style.background = t.g;
     b.style.color = t.ink;
     b.style.setProperty('--stone-red', t.red);
-    b.setAttribute('aria-label', t.name);
+    b.setAttribute('aria-label', worldName(t));
+    for (const ev of ['pointerenter', 'focus']) b.addEventListener(ev, () => { caption.textContent = worldName(t); });
+    for (const ev of ['pointerleave', 'blur']) b.addEventListener(ev, () => { caption.textContent = worldName(current); });
     const active = t.id === themeId();
     b.setAttribute('aria-pressed', String(active));
     if (active) {
@@ -27683,8 +29889,24 @@ function openWorldPicker(anchor) {
       S.sealWake = true; // the 銀河 seal plays its wake on a world change
       applyWorldSwap();
     });
-    pop.append(b);
+    return b;
+  };
+  // two named rows, day then night: both night looks sit side by side (D2)
+  for (const [rowId, rowName, night] of [['day', tx('昼', 'Day'), false], ['night', tx('夜', 'Night'), true]]) {
+    const row = el('div', 'world-row');
+    row.dataset.row = rowId;
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', rowName);
+    const name = el('span', 'world-row-name', rowName);
+    name.setAttribute('aria-hidden', 'true');
+    row.append(name);
+    for (const id of PUBLIC_THEME_IDS) {
+      const t = THEME_UI.find((world) => world.id === id);
+      if (t && ME_NIGHT_WORLDS.includes(id) === night) row.append(stone(t));
+    }
+    pop.append(row);
   }
+  pop.append(caption);
   worldPickerOpener = anchor;
   scrim.addEventListener('click', closeWorldPicker);
   document.body.append(scrim, pop);
@@ -27695,7 +29917,7 @@ function openWorldPicker(anchor) {
   pop.style.left = `${Math.round(Math.min(Math.max(8, rect.right - pw), window.innerWidth - pw - 8))}px`;
   document.addEventListener('keydown', worldPickerEsc, true);
   worldPickerEls = [scrim, pop];
-  (activeStone || pop.firstChild).focus();
+  (activeStone || pop.querySelector('.world-stone')).focus();
 }
 const WORLD_PICKER_HOLD_MS = 480;
 /** A seal button opens the stones on TAP; a hold opens them early. */
@@ -27739,6 +29961,11 @@ const GINGA_SYMBOL_SVG =
 // bar, ginga ghost, nav bar, top chrome)
 const SEARCH_SVG =
   '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+// the Learn door in the top chrome: the scholar's cap, the plainest "learn" there is (polish lane,
+// 2026-10-08) — two overlapped cards read as "copy"
+const LEARN_DOOR_SVG =
+  '<svg class="chrome-glyph" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.6 18.4 7.6 10 11.6 1.6 7.6Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5.2 9.6v3.8c0 1.3 2.1 2.6 4.8 2.6s4.8-1.3 4.8-2.6V9.6M18.4 7.6v4.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /** One forward step: navForward undoes the most recent navBack. */
 function navForward() {
@@ -27868,7 +30095,9 @@ function renderSearchPage(main) {
   });
   input.type = 'search';
   input.id = 'nav-search-input';
-  input.placeholder = tx('ことば・SKIP 1-3-8', 'kanji · kana · English · SKIP 1-3-8');
+  // short enough to sit whole in the field at 320px; the SKIP codes and other inputs are named in
+  // the field's description (#search-page-hint), which a screen reader hears with the field
+  input.placeholder = tx('語・漢字を探す', 'Look up a word or kanji');
   input.setAttribute('aria-label', tx('検索', 'search'));
   input.autocomplete = 'off';
   const hint = el(
@@ -27876,6 +30105,9 @@ function renderSearchPage(main) {
     'search-page-hint',
     tx('漢字・かな・ローマ字・英語、または SKIP コード（1-3-8、1-3、1-*-8）。', 'Kanji, kana, romaji or English — or a SKIP code: 1-3-8, 1-3, 1-*-8.'),
   );
+  // the hint is the field's description; a phone shows only the placeholder, so the web stays in view
+  hint.id = 'search-page-hint';
+  input.setAttribute('aria-describedby', hint.id);
   const results = el('div', 'search-page-results');
   const skipOpener = el('button', 'skip-search-opener', tx('形から探す · SKIP ホイール', 'Find by shape · open SKIP wheel'));
   skipOpener.type = 'button';
@@ -27914,8 +30146,7 @@ function renderSearchPage(main) {
     b.type = 'button';
     b.dataset.searchLens = id;
     b.setAttribute('aria-pressed', String(S.searchLens === id));
-    b.append(el('span', 'l-ja', ja));
-    if (bi()) b.append(el('span', 'en-sub', en));
+    b.append(el('span', 'l-ja', tx(ja, en)));
     b.addEventListener('click', () => {
       S.searchLens = id;
       if (id === 'skip') {
@@ -27949,6 +30180,11 @@ function renderSearchPage(main) {
     kkld: (host) => renderKdxKkld(host),
   };
   const paint = () => {
+    paintRows();
+    // words.css steps the word web aside while rows, a finder or the wheel show
+    wrap.classList.toggle('search-page-busy', !!results.firstChild);
+  };
+  const paintRows = () => {
     if (FINDER_LENSES[S.searchLens]) {
       results.textContent = '';
       skipOpener.hidden = true;
@@ -28077,6 +30313,47 @@ function renderSearchPage(main) {
 }
 
 /** Build the whole 銀河 chrome (symbol, and when open the bar + bubbles). */
+/* The front door's invitations are written by the frozen drift layer in Japanese. The
+ * EN/JA law holds for them too: in EN the layer's own plaque speaks English. Only the
+ * invitations are mapped; the layer's record and recovery notices stay exactly as written. */
+const DRIFT_HINTS = [
+  ['ことばに触れて', 'Tap a word'],
+  ['水にふれると戻る', 'Tap the water to surface'],
+  ['中心へ戻る · home', 'Back to the centre'],
+];
+let driftHintObserver = null;
+function syncDriftHintLanguage() {
+  const hint = document.querySelector('#drift-layer #hint');
+  if (!hint) return;
+  const apply = () => {
+    const text = (hint.textContent || '').trim();
+    const pair = DRIFT_HINTS.find(([ja, en]) => text === ja || text === en);
+    if (!pair) return;
+    const want = tx(pair[0], pair[1]);
+    if (text !== want) hint.textContent = want;
+  };
+  if (!driftHintObserver) {
+    driftHintObserver = new MutationObserver(apply);
+    driftHintObserver.observe(hint, { childList: true, characterData: true, subtree: true });
+  }
+  apply();
+}
+
+/** The front door's one family touch, outside the frozen drift layer: a thin washi edge around
+ * the sky and, along its foot, Today's own skyline (roofs by day, lit windows by night). One
+ * node for the app's life, shown only on the door (CSS keys it on html[data-room=door] and
+ * body.ginga); it is decoration under the chrome and never takes a touch. */
+function ensureDoorPaper() {
+  if (document.getElementById('door-paper')) return;
+  const paper = el('div', 'door-paper');
+  paper.id = 'door-paper';
+  paper.setAttribute('aria-hidden', 'true');
+  const city = todayCity();
+  city.classList.add('door-city');
+  paper.append(el('i', 'door-washi'), city);
+  document.body.append(paper);
+}
+
 function buildGingaChrome(root) {
   const symbol = el('button', 'nav-symbol' + (S.navOpen ? ' open' : ''));
   symbol.type = 'button';
@@ -28099,17 +30376,20 @@ function buildGingaChrome(root) {
   const seal = el('button', 'ginga-seal' + (S.sealWake ? ' awake' : ''), THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'ginga-theme-seal';
-  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   attachWorldPicker(seal);
   root.append(seal);
   if (S.sealWake) S.sealWake = false;
 
   // one tap from home into review (operator, 2026-09-28: the SRS hid four doors deep,
-  // behind 集中道場) — the pill the 09-23 review asked for, 復習 N when cards wait
-  if (S.view === 'drift' && S.taken.length && scheduler && !S.navOpen) {
-    const waiting = todayQueue().order.length;
+  // behind 集中道場) — the pill the 09-23 review asked for, its count when cards wait.
+  // Round 4 (T1, "a clean Today and stable entry point"): it is the door's one way down to
+  // Today, so it is always here and named for where it goes, whether the app just opened or the
+  // learner rose from Today's sky. The count stays its first number (the truthful-count pins).
+  if (S.view === 'drift' && !S.navOpen) {
+    const waiting = S.taken.length && scheduler ? todayQueue().order.length : 0;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
-      waiting ? `復習 ${waiting}` : '復習', waiting ? `review · ${waiting} due` : 'review');
+      waiting ? `今日 · 復習 ${waiting}` : '今日', waiting ? `Today · ${waiting} due` : 'Today');
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');
@@ -28173,7 +30453,7 @@ function buildGingaChrome(root) {
   review.type = 'button';
   review.id = 'nav-review';
   if (due) review.append(el('span', 'nav-count', String(due)));
-  review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `復習 review — ${due} due today`) : tx('復習', '復習 review'));
+  review.setAttribute('aria-label', due ? tx(`復習 — 今日 ${due} 枚`, `review — ${due} due today`) : tx('復習', 'review'));
   review.addEventListener('click', () => {
     S.navOpen = false;
     keepScroll();
@@ -28217,16 +30497,897 @@ function buildGingaChrome(root) {
   root.append(shelf, sensei);
 }
 
-/* The whole-app register (register.css) gives each purpose its own material. It keys on
- * <html data-room>, stamped here after every render from what the room actually drew — the
- * same rules the 2026-09-24 register study walked across 13 rooms — plus the attempt's stage
+/** iOS Safari applies :active only where a touch listener exists. One passive listener on the
+ * document lets every control show its press at touch-down, as native controls do (T2: "native
+ * ios expeirnce is alreayd way smoother and tighter and crisper"). It never blocks a scroll. */
+let touchPressReady = false;
+function enableTouchPress() {
+  if (touchPressReady) return;
+  touchPressReady = true;
+  document.addEventListener('touchstart', () => {}, { passive: true });
+}
+
+/** The phone's own top (Safari's bar, a home-screen app's status bar) takes the colour of the
+ * frame actually drawn, so the top of the screen reads as one native bar: white paper by day,
+ * the deep frame at night, the zen stage in a review (T2: "native ios … crisper"). It was a
+ * fixed beige for every world and every room. One read per frame, after the room is drawn. */
+let themeColorFrame = 0;
+function syncThemeColor() {
+  if (themeColorFrame) return;
+  themeColorFrame = requestAnimationFrame(() => {
+    themeColorFrame = 0;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta || !document.body) return;
+    const bar = document.querySelector('#app > .chrome');
+    // no top line: the personal collections page meets the phone's bar with its page layer
+    const raw = bar ? getComputedStyle(bar).backgroundColor
+      : document.body.dataset.view === 'personaldeck' ? getComputedStyle(document.body, '::before').backgroundColor
+        : getComputedStyle(document.body).backgroundColor;
+    const nums = raw.match(/-?[0-9.]+/g)?.map(Number) || [];
+    if (nums.length < 3 || (nums.length > 3 && nums[3] === 0)) return;
+    const scale = raw.startsWith('color(') ? 255 : 1;
+    const hex = '#' + nums.slice(0, 3).map((n) => Math.round(Math.max(0, Math.min(255, n * scale))).toString(16).padStart(2, '0')).join('');
+    if (meta.getAttribute('content') !== hex) meta.setAttribute('content', hex);
+  });
+}
+
+/** The shell has one label table; rooms retain their existing navigation paths. */
+const PRIMARY_TABS = [
+  { id: 'today', ja: '今日', en: 'Today', view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
+  { id: 'read', ja: '読む', en: 'Read', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
+  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
+  { id: 'words', ja: '辞書', en: 'Words', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
+  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
+  // r4 skin: your own texts are a deck; the page's way back and its Learn row both lead to Learn,
+  // so the Line marks Learn there too (it marked Me while ← Learn left for Learn)
+];
+let primaryDockObserver;
+/** Keep the report rail above live room controls, including wrapped labels. */
+function observePrimaryDocks() {
+  if (primaryDockObserver) return;
+  const selector = '.kp-grades, .pc-controls, .cd-dock, .listen-row.play-bar, .pc-status:not(:empty):not(.pc-status-inline), .reader-toast';
+  let frame = 0;
+  const watched = new Set();
+  const schedule = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const nodes = new Set(document.querySelectorAll(selector));
+      for (const node of watched) if (!nodes.has(node)) { resize.unobserve(node); watched.delete(node); }
+      for (const node of nodes) if (!watched.has(node)) { resize.observe(node); watched.add(node); }
+      const nav = document.getElementById('primary-tabs');
+      const navHeight = nav?.getBoundingClientRect().height || 0;
+      let clearance = 0;
+      if (document.body.classList.contains('has-primary-tabs')) {
+        for (const node of nodes) {
+          const style = getComputedStyle(node), rect = node.getBoundingClientRect();
+          if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight || style.visibility === 'hidden') continue;
+          if (style.position !== 'fixed' && !(style.position === 'sticky' && rect.bottom >= innerHeight - navHeight - 1)) continue;
+          clearance = Math.max(clearance, Math.ceil(innerHeight - rect.top));
+        }
+      }
+      const value = `${clearance}px`;
+      if (document.body.style.getPropertyValue('--foundation-dock-clearance') !== value) {
+        document.body.style.setProperty('--foundation-dock-clearance', value);
+      }
+    });
+  };
+  const resize = new ResizeObserver(schedule);
+  primaryDockObserver = new MutationObserver(schedule);
+  primaryDockObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
+  window.addEventListener('resize', schedule);
+  window.addEventListener('scroll', schedule, { passive: true });
+  schedule();
+}
+function buildPrimaryTabs(root, { personal = false } = {}) {
+  observePrimaryDocks();
+  const show = S.variants.nav === 'tabs' && (S.ready || personal) &&
+    !['drift', 'entry'].includes(S.view) && !document.body.classList.contains('zen') &&
+    !S.stack.length && !S.strokes;
+  document.body.classList.toggle('has-primary-tabs', show);
+  if (!show) return;
+  const bar = el('nav', 'primary-tabs');
+  bar.id = 'primary-tabs';
+  bar.setAttribute('aria-label', tx('主な入口', 'Main destinations'));
+  // the Line (concept D graft): five stations on one hairline track; the car is the one filled
+  // square, and it slides (transform only) from the last station to this one. Stations and the
+  // car carry no text, so each button's text stays exactly its label.
+  const at = PRIMARY_TABS.findIndex((tab) => tab.views.includes(S.view));
+  bar.dataset.station = at < 0 ? '' : PRIMARY_TABS[at].id;
+  // Today's live due count: the same truth the galaxy bar's 復習 N reads (todayQueue), never a guess
+  const due = !personal && S.taken.length && scheduler ? todayQueue().order.length : 0;
+  for (const tab of PRIMARY_TABS) {
+    const button = el('button', 'primary-tab', tx(tab.ja, tab.en));
+    button.type = 'button';
+    button.id = `tab-${tab.id}`;
+    const node = el('i', 'station-node');
+    node.setAttribute('aria-hidden', 'true');
+    button.append(node);
+    if (tab.id === 'today' && due) {
+      const count = el('i', 'station-due');
+      count.dataset.due = String(due);
+      count.setAttribute('aria-hidden', 'true');
+      button.append(count);
+      button.setAttribute('aria-label', tx(`今日 · 復習 ${due}`, `Today · ${due} due`));
+    }
+    if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
+    button.addEventListener('click', () => {
+      if (personal) {
+        const url = new URL(location.href);
+        url.searchParams.delete('deck'); url.searchParams.delete('dojo');
+        url.searchParams.set('entry', 'shelf'); url.searchParams.set('room', tab.view);
+        url.searchParams.set('ui', S.lang);
+        location.assign(url); return;
+      }
+      if (S.view === tab.view) return;
+      closeWorldPicker();
+      S.captureOpen = false;
+      S.navOpen = false;
+      S.tabRoot = tab.view;
+      if (tab.view === 'search') { openSearchPage(); return; }
+      if (tab.view === 'me') keepNavigationReturn('me', button);
+      else keepScroll();
+      if (tab.view === 'tray') S.trayFrom = { view: S.view, scroll: Math.round(window.scrollY) };
+      S.stack = [];
+      S.view = tab.view;
+      render();
+      window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
+    });
+    bar.append(button);
+  }
+  if (at >= 0) {
+    const car = el('span', 'line-car');
+    car.setAttribute('aria-hidden', 'true');
+    car.style.setProperty('--ix', String(at));
+    if (buildPrimaryTabs.lastStation != null && buildPrimaryTabs.lastStation !== at) {
+      car.style.setProperty('--from', String(buildPrimaryTabs.lastStation));
+      car.classList.add('moving');
+    }
+    buildPrimaryTabs.lastStation = at;
+    bar.append(car);
+  }
+  root.append(bar);
+}
+
+/* The room sign (縦看板, concepts C/A): each primary room hangs its name at the right edge,
+ * set vertically. In English the word is rotated a quarter turn, never stacked letter by letter;
+ * in 日本語 the kanji stack. One honest datum may hang beneath it (Today's date, Learn's due). */
+const ROOM_SIGNS = {
+  tray: ['今日', 'Today'], shelf: ['読む', 'Read'], dojo: ['学ぶ', 'Learn'], search: ['辞書', 'Words'], me: ['私', 'Me'],
+};
+function buildRoomSign() {
+  const names = ROOM_SIGNS[S.view];
+  if (!names || S.stack.length) return null;
+  const sign = el('div', 'room-sign');
+  sign.setAttribute('aria-hidden', 'true');
+  sign.dataset.script = bi() ? 'latin' : 'kanji';
+  sign.append(el('b', 'room-sign-name', tx(...names)));
+  let datum = '';
+  if (S.view === 'tray') {
+    const now = new Date();
+    datum = `${String(now.getMonth() + 1).padStart(2, '0')}·${String(now.getDate()).padStart(2, '0')}`;
+  } else if (S.view === 'dojo' && S.taken.length && scheduler) {
+    const due = todayQueue().order.length;
+    if (due) datum = String(due);
+  }
+  if (datum) {
+    // a number in a vertical sign stands upright (縦中横): a count turned on its side reads as
+    // another symbol (8 → ∞). Runs of up to two digits sit across the column; longer runs stack.
+    const node = el('i', 'room-sign-datum');
+    for (const run of datum.match(/[0-9]+|[^0-9]+/g)) {
+      node.append(/[0-9]/.test(run) ? el('span', run.length <= 2 ? 'rs-tcy' : 'rs-up', run) : document.createTextNode(run));
+    }
+    sign.append(node);
+  }
+  return sign;
+}
+
+/** Hub doors use the existing return frames, including exact reader positions. */
+function foundationDoor(id, ja, en, view, before) {
+  const button = biLabel('button', 'grammar-link foundation-door', ja, en);
+  button.type = 'button'; button.id = id;
+  button.addEventListener('click', () => {
+    keepNavigationReturn(view, button);
+    before?.();
+    S.view = view; render(); window.scrollTo(0, 0);
+  });
+  return button;
+}
+function openPersonalCollection() {
+  const url = new URL(location.href);
+  url.searchParams.delete('room'); url.searchParams.delete('dojo');
+  url.searchParams.set('deck', 'personal'); url.searchParams.set('ui', S.lang);
+  location.assign(url);
+}
+/* ---- Me: the book of your year (A 磨き's Me book, with C's and D's grafts). Read only: every
+ * figure is counted from the learner's own record (S.stats, S.revlog, S.obslog, S.readDone,
+ * S.taken, S.srs, S.sentencePractice) or a deck's own ledger (bunki-cloze:<id>, read, never
+ * written), and a figure with nothing behind it is left out, never estimated. ---- */
+const ME_NIGHT_WORLDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
+const ME_DECKS = [
+  { id: 'n1', ja: 'N1の語彙', en: 'N1 vocabulary', measureJa: '想起で保持 · N1デッキ', measureEn: 'held by recall · N1 deck' },
+  { id: 'senmon', ja: 'あなたの専門', en: 'Your fields', measureJa: '想起で保持 · 専門デッキ', measureEn: 'held by recall · fields deck' },
+];
+/* His horizons (D5, 2026-10-08, in his words): the N1 he sits in July 2027 and his three fields.
+ * The JLPT is held on the first Sunday of July, so the sitting is a date this code derives, and it
+ * is labelled expected until jlpt.jp announces it. Each field counts only what he holds by recall
+ * from the fields deck's own group for it (deck.json words[].group). */
+const ME_N1_SITTING = { year: 2027, month: 6 };
+const ME_FIELDS = [
+  { id: 'mind', ja: '学習心理学', en: 'Learning psychology',
+    noteJa: '神経可塑性・学ぶことを学ぶ・人間の可能性', noteEn: 'Neuroplasticity, learning about learning, human potential' },
+  { id: 'india', ja: 'ヨーガ・仏教・ジャイナ教・ヒンドゥー教の歴史', en: 'Yoga, Buddhism, Jain and Hindu history',
+    noteJa: '日本の歴史に根ざし、現代の脳科学につながる', noteEn: 'Rooted in Japanese history, tied to modern neuroscience' },
+  { id: 'ai', ja: '半導体・AI・投資', en: 'Semiconductors, AI and investing',
+    noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
+];
+/** The July sitting: the first Sunday of July in the goal year, local midnight. */
+function meN1Sitting() {
+  const first = new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1);
+  return new Date(ME_N1_SITTING.year, ME_N1_SITTING.month, 1 + ((7 - first.getDay()) % 7));
+}
+/** Whole days from today to the sitting: 0 on the day, negative once it has passed. */
+function meDaysToSitting(now = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((meN1Sitting() - today) / 86400000);
+}
+const ME_MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** session only: how many months back the seal calendar is turned */
+let meMonthBack = 0;
+/** deck id → { cards: Map(card id → {word, term, reading}), total } | null (could not load) | a promise */
+const meDeckIndex = new Map();
+function meDeckLedger(id) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(`bunki-cloze:${id}`) || 'null');
+    // only a ledger the deck player itself would read (its format, version and deck)
+    return raw && raw.format === 'bunki-cloze-state' && raw.version === 1 && raw.deckId === id &&
+      raw.cards && typeof raw.cards === 'object' && !Array.isArray(raw.cards) && Object.keys(raw.cards).length ? raw : null;
+  } catch {
+    return null;
+  }
+}
+/** the deck's words, fetched once and only for a deck the learner has opened */
+function meDeckWords(id, onReady) {
+  const have = meDeckIndex.get(id);
+  if (have === null || (have && !(have instanceof Promise))) return have;
+  if (!have) {
+    const packed = window.__CORRIDOR_BUNDLE__?.[`decks/${id}`] || window.__KP_DECKS__?.[id];
+    const got = packed ? Promise.resolve(packed)
+      : fetch(new URL(`decks/${id}/deck.json`, document.baseURI)).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`deck ${id} ${r.status}`))));
+    meDeckIndex.set(id, got.then((deck) => {
+      const cards = new Map();
+      const groups = {};
+      for (const w of deck.words || []) {
+        if (w.group) groups[w.group] = (groups[w.group] || 0) + 1;
+        for (const c of w.cards || []) cards.set(c.id, { word: w.id, term: w.term, reading: w.reading || '', group: w.group || '' });
+      }
+      const index = { cards, total: (deck.words || []).length, groups };
+      meDeckIndex.set(id, index);
+      return index;
+    }, () => {
+      meDeckIndex.set(id, null);
+      return null;
+    }));
+  }
+  meDeckIndex.get(id).then(onReady);
+  return undefined;
+}
+const meNum = (n) => Number(n).toLocaleString('en-US');
+function meDate(t, year = false) {
+  const d = new Date(t);
+  return tx(`${year ? `${d.getFullYear()}年` : ''}${d.getMonth() + 1}月${d.getDate()}日`,
+    `${d.getDate()} ${ME_MONTHS_EN[d.getMonth()].slice(0, 3)}${year ? ` ${d.getFullYear()}` : ''}`);
+}
+function meRevoked() {
+  const out = new Set();
+  for (const row of S.revlog || []) if (Array.isArray(row) && row[2] === 0) out.add(row[3]);
+  return out;
+}
+/** every day with real practice: cards (reviews, drills, lessons, papers, deck answers, written
+ * sentences) or reading (a finished article, a tap in the reader) */
+function meDays(decks) {
+  const days = new Map();
+  let first = Infinity;
+  const mark = (t, kind) => {
+    if (!finiteNumber(t) || t <= 0) return;
+    const key = dayKey(new Date(t));
+    const day = days.get(key) || { cards: false, read: false };
+    day[kind] = true;
+    days.set(key, day);
+    if (t < first) first = t;
+  };
+  for (const [key, day] of Object.entries(S.stats || {})) {
+    const [y, m, d] = key.split('-').map(Number);
+    if (day && day.n > 0 && y && m && d) mark(new Date(y, m - 1, d, 12).getTime(), 'cards');
+  }
+  const revoked = meRevoked();
+  (S.revlog || []).forEach((row, i) => { if (Array.isArray(row) && row[2] !== 0 && !revoked.has(i)) mark(row[0], 'cards'); });
+  for (const row of S.obslog || []) {
+    if (!Array.isArray(row)) continue;
+    if (row[1] === 'tap') mark(row[0], 'read');
+    else if (['probe', 'dojo', 'lesson', 'mock'].includes(row[1])) mark(row[0], 'cards');
+  }
+  for (const t of Object.values(S.readDone || {})) mark(t, 'read');
+  for (const r of S.sentencePractice?.responses || []) mark(Date.parse(r.at), 'cards');
+  for (const d of decks) for (const row of d.ledger?.log || []) if (Array.isArray(row)) mark(Date.parse(row[2]), 'cards');
+  return { days, first: Number.isFinite(first) ? new Date(first) : null };
+}
+/** graft D's lead figure: characters of the articles you finished, less the words you tapped for help */
+function meReadUnaided() {
+  const passages = D.passages || [];
+  const finished = passages.filter((p) => owns(S.readDone || {}, p.id) && finiteNumber(p.chars));
+  if (!finished.length) return null;
+  const ids = new Set(finished.map((p) => p.id));
+  const looked = new Set();
+  let helped = 0;
+  for (const row of S.obslog || []) {
+    if (!Array.isArray(row) || row[1] !== 'tap' || !ids.has(row[4]) || typeof row[2] !== 'string') continue;
+    const once = `${row[4]}\u0000${row[2]}`;
+    if (looked.has(once)) continue;
+    looked.add(once);
+    helped += [...row[2].replace(/^word:/, '')].length;
+  }
+  const read = finished.reduce((sum, p) => sum + p.chars, 0);
+  return { n: Math.max(0, read - helped), articles: finished.length, looked: looked.size };
+}
+function meHorizons(decks) {
+  const rows = [];
+  // words held by recall in a deck's ledger, optionally only the cards a test keeps
+  const heldIn = (d, keep) => {
+    const held = new Set();
+    for (const [cardId, rec] of Object.entries(d?.ledger?.cards || {})) {
+      const card = d.index?.cards.get(cardId);
+      if (keep && !(card && keep(card))) continue;
+      const word = card?.word || cardId.slice(0, cardId.lastIndexOf('-'));
+      if (rec && rec.state === 2 && !owns(d.ledger.suspended || {}, cardId)) held.add(word);
+    }
+    return held.size;
+  };
+  const [n1Deck, fieldsDeck] = ME_DECKS.map((h) => decks.find((x) => x.id === h.id));
+  rows.push({ id: 'n1', ja: ME_DECKS[0].ja, en: ME_DECKS[0].en, n: heldIn(n1Deck), of: n1Deck?.index?.total ?? null,
+    begun: !!n1Deck?.ledger, measure: tx(ME_DECKS[0].measureJa, ME_DECKS[0].measureEn) });
+  for (const f of ME_FIELDS) {
+    // a begun deck is split by field only once its words have arrived: until then it says so
+    const counting = !!fieldsDeck?.ledger && !fieldsDeck.index;
+    rows.push({ id: `field-${f.id}`, field: f, ja: f.ja, en: f.en, counting,
+      n: counting ? 0 : heldIn(fieldsDeck, (card) => card.group === f.id),
+      of: fieldsDeck?.index?.groups?.[f.id] ?? null, begun: !!fieldsDeck?.ledger,
+      measure: tx(ME_DECKS[1].measureJa, ME_DECKS[1].measureEn) });
+  }
+  const kk = D.kanken || {};
+  const met = new Set();
+  const heldK = new Set();
+  const add = (text, held) => {
+    for (const c of String(text || '')) if (owns(kk, c)) { met.add(c); if (held) heldK.add(c); }
+  };
+  let saved = 0;
+  let savedHeld = 0;
+  for (const item of S.taken || []) {
+    const key = srsKey(item.t, item.id);
+    const held = S.srs[key]?.state === 2 && !S.suspended?.[key];
+    saved += 1;
+    if (held) savedHeld += 1;
+    if (['word', 'kanji', 'idiom'].includes(item.t)) add(item.t === 'kanji' ? item.id : item.label || item.id, held);
+  }
+  for (const d of decks) {
+    if (!d.index || !d.ledger) continue;
+    for (const [cardId, rec] of Object.entries(d.ledger.cards)) {
+      const w = d.index.cards.get(cardId);
+      if (w) add(w.term, rec?.state === 2 && !owns(d.ledger.suspended || {}, cardId));
+    }
+  }
+  rows.push({ id: 'kanken', ja: '漢検の漢字', en: 'Kanken kanji', n: heldK.size, of: Object.keys(kk).length, met: met.size, begun: met.size > 0,
+    measure: tx(`想起で保持 · 出会った ${meNum(met.size)} 字`, `held by recall · ${meNum(met.size)} met`) });
+  rows.push({ id: 'saved', ja: '集めた言葉', en: 'Words you saved', n: savedHeld, of: saved, begun: saved > 0,
+    measure: tx('想起で保持 · 自分で集めた札', 'held by recall · cards you saved yourself') });
+  return rows;
+}
+/** 継いだ言葉: a word that lapsed in review and was later recalled again. The corridor's review log
+ * names the state before each grade; a deck's log does not, so a deck card counts only when it
+ * has lapsed (its own lapse count), stands in review again, and was recalled on a later day. */
+function meCameHome(decks) {
+  const rows = [];
+  const revoked = meRevoked();
+  const pending = new Map();
+  const homes = new Map();
+  (S.revlog || []).forEach((row, i) => {
+    if (!Array.isArray(row) || row[2] === 0 || revoked.has(i)) return;
+    if (row[3] === 2 && row[2] === 1) pending.set(row[1], row[0]);
+    else if (row[3] === 2 && row[2] >= 2 && pending.has(row[1])) {
+      homes.set(row[1], { lapsed: pending.get(row[1]), home: row[0] });
+      pending.delete(row[1]);
+    }
+  });
+  const byKey = new Map((S.taken || []).map((item) => [srsKey(item.t, item.id), item]));
+  for (const [key, h] of homes) {
+    const item = byKey.get(key);
+    if (!item || !['word', 'kanji', 'idiom'].includes(item.t)) continue;
+    const answer = item.t === 'word' ? savedAnswerFor(item) : null;
+    rows.push({ surface: item.t === 'kanji' ? item.id : item.label || item.id, reading: answer?.status === 'available' ? answer.reading : '', ...h });
+  }
+  for (const d of decks) {
+    if (!d.index || !d.ledger) continue;
+    const log = new Map();
+    for (const row of d.ledger.log || []) {
+      const t = Array.isArray(row) ? Date.parse(row[2]) : NaN;
+      if (!Number.isFinite(t)) continue;
+      if (!log.has(row[0])) log.set(row[0], []);
+      log.get(row[0]).push([t, row[1]]);
+    }
+    for (const [cardId, rec] of Object.entries(d.ledger.cards)) {
+      if (!rec || !(rec.lapses > 0) || rec.state !== 2) continue;
+      const answers = log.get(cardId) || [];
+      let lapsed = null;
+      for (const [t, g] of answers) if (g === 1) lapsed = t;
+      const home = lapsed == null ? null : answers.find(([t, g]) => g >= 2 && t > lapsed && dayKey(new Date(t)) !== dayKey(new Date(lapsed)));
+      const w = d.index.cards.get(cardId);
+      if (home && w) rows.push({ surface: w.term, reading: w.reading, lapsed, home: home[0] });
+    }
+  }
+  const seen = new Set();
+  return rows.sort((a, b) => b.home - a.home).filter((r) => !seen.has(r.surface) && seen.add(r.surface)).slice(0, 4);
+}
+/** the newest line the learner wrote by hand in sentence practice, else the newest line they kept */
+function meCopiedLine() {
+  const sp = S.sentencePractice;
+  if (!sp) return null;
+  const entries = new Map((sp.entries || []).map((e) => [e.plan?.id, e]));
+  const wrote = (sp.responses || []).filter((r) => r.mode === 'production' && typeof r.text === 'string' && r.text.trim())
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0];
+  if (wrote) return { text: wrote.text.trim(), title: entries.get(wrote.entryId)?.context?.title || '', at: Date.parse(wrote.at), hand: true };
+  const kept = (sp.entries || []).at(-1);
+  if (kept?.context?.quote) return { text: kept.context.quote, title: kept.context.title || '', at: Date.parse(kept.plan?.capture?.occurredAt), hand: false };
+  return null;
+}
+/** a gold seam along the word's own crack: the same word always breaks the same way */
+function meSeam(surface) {
+  let h = 2166136261;
+  for (const c of String(surface)) h = Math.imul(h ^ c.codePointAt(0), 16777619) >>> 0;
+  const next = () => {
+    h = Math.imul(h ^ (h >>> 13), 2246822507) >>> 0;
+    return (h % 1000) / 1000;
+  };
+  // a crack, not a wave: uneven runs, sharp turns, one short branch
+  const pts = [[0, 9 + (next() - 0.5) * 4]];
+  for (let x = 0, up = next() < 0.5; x < 100; up = !up) {
+    x = Math.min(100, x + 7 + next() * 11);
+    pts.push([x, 9 + (up ? -1 : 1) * (1.5 + next() * 5.5)]);
+  }
+  const at = pts[1 + Math.floor(next() * (pts.length - 2))];
+  const branch = [at, [at[0] + 5 + next() * 6, at[1] < 9 ? 1 + next() * 2 : 15 + next() * 2]];
+  const line = (list) => list.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'me-seam');
+  svg.setAttribute('viewBox', '0 0 100 18');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [d, cls] of [[line(pts), 'me-seam-main'], [line(branch), 'me-seam-branch']]) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', cls);
+    path.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.append(path);
+  }
+  return svg;
+}
+function meSection(part, ja, en, aside) {
+  const sec = el('section', `me-part me-${part}`);
+  sec.dataset.mePart = part;
+  const head = el('div', 'me-part-head');
+  head.append(el('h2', 'eyebrow', tx(ja, en)));
+  if (aside) head.append(el('span', 'me-part-aside', aside));
+  sec.append(head);
+  return sec;
+}
+/** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー) and never
+ * before its 中黒 (|・テクノロジー): each phrase, with the mark that ends it, is one unbreakable piece. */
+function meBreakable(tag, cls, text) {
+  const node = el(tag, cls);
+  for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
+  return node;
+}
+/** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
+function meHorizonRow(h, { quiet = false } = {}) {
+  const row = el('div', 'me-hz');
+  row.dataset.horizon = h.id;
+  if (!h.begun) row.classList.add('not-begun');
+  const shown = h.begun && !h.counting;
+  const top = el('div', 'me-hz-top');
+  top.append(meBreakable('span', 'me-hz-name', tx(h.ja, h.en)));
+  const figure = el('span', 'me-hz-n');
+  figure.append(el('b', '', shown ? meNum(h.n) : '—'));
+  if (h.of && shown) figure.append(el('span', 'me-hz-of', ` / ${meNum(h.of)}`));
+  top.append(figure);
+  row.append(top);
+  if (h.field) row.append(meBreakable('p', 'me-hz-note', tx(h.field.noteJa, h.field.noteEn)));
+  const rule = el('div', 'me-hz-rule');
+  rule.setAttribute('aria-hidden', 'true');
+  if (h.of && h.met) {
+    const met = el('i', 'me-hz-met');
+    met.style.setProperty('--f', Math.min(1, h.met / h.of).toFixed(4));
+    rule.append(met);
+  }
+  const fill = el('i', 'me-hz-fill');
+  fill.style.setProperty('--f', h.of && shown ? Math.min(1, h.n / h.of).toFixed(4) : '0');
+  rule.append(fill);
+  const sub = el('p', 'me-hz-sub');
+  if (!h.begun) sub.textContent = {
+    saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
+    kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
+    n1: tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
+  }[h.id] || tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+  else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
+  else {
+    sub.append(el('span', '', h.measure));
+    if (h.of) sub.append(el('b', '', ` · ${((h.n / h.of) * 100).toFixed(1)}%`));
+  }
+  row.append(rule);
+  if (!quiet) row.append(sub);
+  return row;
+}
+/** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
+function meN1Plate(h) {
+  const plate = el('div', 'me-n1');
+  const head = el('div', 'me-n1-head');
+  head.append(el('span', 'me-n1-seal', 'N1'),
+    el('span', 'me-n1-when', tx(`${ME_N1_SITTING.year}年${ME_N1_SITTING.month + 1}月`, `${ME_MONTHS_EN[ME_N1_SITTING.month]} ${ME_N1_SITTING.year}`)));
+  plate.append(head);
+  const days = meDaysToSitting();
+  const sitting = meN1Sitting();
+  const count = el('p', 'me-n1-count');
+  if (days > 0) {
+    const n = el('b', 'me-n1-days', meNum(days));
+    if (bi()) count.append(n, el('span', 'me-n1-unit', days === 1 ? 'day to the test' : 'days to the test'));
+    else count.append(el('span', 'me-n1-unit', 'あと'), n, el('span', 'me-n1-unit', '日'));
+  } else {
+    count.classList.add('is-done');
+    count.append(el('span', 'me-n1-unit', days === 0
+      ? tx('今日が試験の日', 'The test is today')
+      : tx(`${ME_N1_SITTING.year}年7月の試験は過ぎた`, `The July ${ME_N1_SITTING.year} test has passed`)));
+  }
+  plate.append(count);
+  if (days >= 0) {
+    plate.append(el('p', 'me-n1-date', tx(
+      `試験日 ${sitting.getFullYear()}年${sitting.getMonth() + 1}月${sitting.getDate()}日（日）の見込み`,
+      `Test expected Sun ${sitting.getDate()} ${ME_MONTHS_EN[sitting.getMonth()].slice(0, 3)} ${sitting.getFullYear()}`)));
+  }
+  plate.append(meHorizonRow(h));
+  return plate;
+}
+function meHorizonsPart(decks) {
+  const sec = meSection('horizons', '目標', 'Your goals');
+  const rows = meHorizons(decks);
+  sec.append(meN1Plate(rows.find((h) => h.id === 'n1')));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの三つの分野', 'Your three fields')));
+  const fields = rows.filter((h) => h.field);
+  // until the fields deck is opened, the three fields say so once, not three times
+  const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
+  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn')));
+  for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
+  sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
+  for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
+  return sec;
+}
+function meCameHomePart(decks, active) {
+  const home = meCameHome(decks);
+  if (!home.length && !active) return null;
+  const sec = meSection('mended', '取り戻した語', 'Words you won back');
+  if (!home.length) {
+    sec.append(el('p', 'me-quiet', tx('忘れた言葉をもう一度思い出すと、ここに金で継がれる。',
+      'When a word slips and you win it back, it is mended here in gold.')));
+    return sec;
+  }
+  const list = el('ol', 'me-home-list');
+  home.forEach((h, i) => {
+    const li = el('li', 'me-home');
+    li.style.setProperty('--i', String(i));
+    const word = el('span', 'me-home-w');
+    const surface = el('span', 'me-home-surface', h.surface);
+    surface.lang = 'ja';
+    surface.dataset.uiContent = 'learning';
+    word.append(surface);
+    if (h.reading && h.reading !== h.surface) {
+      const reading = el('span', 'me-home-r', h.reading);
+      reading.lang = 'ja';
+      reading.dataset.uiContent = 'learning';
+      word.append(reading);
+    }
+    const seam = el('span', 'me-home-seam');
+    seam.setAttribute('aria-hidden', 'true');
+    seam.append(meSeam(h.surface), el('i', 'me-gleam'));
+    const when = el('span', 'me-home-when');
+    when.append(el('span', '', tx(`${meDate(h.lapsed)} 失念`, `lapsed ${meDate(h.lapsed)}`)),
+      el('b', '', tx(`${meDate(h.home)} 回復`, `held ${meDate(h.home)}`)));
+    li.append(word, seam, when);
+    list.append(li);
+  });
+  sec.append(list);
+  return sec;
+}
+function meSealsPart(days, first) {
+  const now = new Date();
+  const maxBack = first ? (now.getFullYear() - first.getFullYear()) * 12 + now.getMonth() - first.getMonth() : 0;
+  meMonthBack = Math.min(Math.max(0, meMonthBack), Math.max(0, maxBack));
+  const month = new Date(now.getFullYear(), now.getMonth() - meMonthBack, 1);
+  const y = month.getFullYear();
+  const m = month.getMonth();
+  const length = new Date(y, m + 1, 0).getDate();
+  const sec = el('section', 'me-part me-seals');
+  sec.dataset.mePart = 'seals';
+  const head = el('div', 'me-month');
+  const turn = (step, ja, en, disabled) => {
+    const b = el('button', `me-turn me-turn-${step > 0 ? 'back' : 'on'}`);
+    b.type = 'button';
+    b.setAttribute('aria-label', tx(ja, en));
+    b.disabled = disabled;
+    b.addEventListener('click', () => {
+      meMonthBack += step;
+      const next = meSealsPart(days, first);
+      next.classList.add(step > 0 ? 'turned-back' : 'turned-on');
+      sec.replaceWith(next);
+      const same = next.querySelector(`.me-turn-${step > 0 ? 'back' : 'on'}`);
+      (same && !same.disabled ? same : next.querySelector('.me-turn:not(:disabled)'))?.focus();
+    });
+    return b;
+  };
+  const title = el('h2', 'me-month-title');
+  title.append(el('span', 'me-month-name', tx(`${m + 1}月`, ME_MONTHS_EN[m])), el('span', 'me-month-year', String(y)));
+  head.append(turn(1, '前の月', 'Previous month', meMonthBack >= maxBack), title, turn(-1, '次の月', 'Next month', meMonthBack === 0));
+  const dow = el('div', 'me-dow');
+  dow.setAttribute('aria-hidden', 'true');
+  for (const d of (bi() ? ['S', 'M', 'T', 'W', 'T', 'F', 'S'] : ['日', '月', '火', '水', '木', '金', '土'])) dow.append(el('span', '', d));
+  const grid = el('div', 'me-cal');
+  let practised = 0;
+  for (let i = 0; i < month.getDay(); i += 1) grid.append(el('i', 'me-day blank'));
+  for (let d = 1; d <= length; d += 1) {
+    const key = dayKey(new Date(y, m, d));
+    const day = days.get(key);
+    const cell = el('i', 'me-day');
+    cell.append(el('span', 'me-day-n', String(d)));
+    if (day) {
+      practised += 1;
+      cell.classList.add('seal', day.cards ? 'seal-cards' : 'seal-read');
+      cell.style.setProperty('--i', String(practised));
+      cell.append(el('span', 'me-seal', day.cards ? '習' : '読'));
+    }
+    if (key === dayKey(now)) cell.classList.add('is-today');
+    grid.append(cell);
+  }
+  grid.setAttribute('role', 'img');
+  grid.setAttribute('aria-label', tx(`${y}年${m + 1}月 · 稽古した日 ${practised} 日`, `${ME_MONTHS_EN[m]} ${y}: ${practised} day${practised === 1 ? '' : 's'} practised`));
+  const foot = el('p', 'me-cal-foot');
+  const legend = (glyph, ja, en) => {
+    const k = el('span', 'me-key');
+    const s = el('span', `me-key-seal${glyph === '読' ? ' read' : ''}`, glyph);
+    s.setAttribute('aria-hidden', 'true');
+    k.append(s, el('span', '', tx(ja, en)));
+    return k;
+  };
+  foot.append(legend('習', '札', 'cards'), legend('読', '読むだけ', 'reading only'),
+    el('span', 'me-cal-count', tx(`この月 ${practised} 日`, `${practised} this month`)));
+  sec.append(head, dow, grid, foot);
+  return sec;
+}
+function meLinePart() {
+  const line = meCopiedLine();
+  if (!line) return null;
+  const sec = meSection('line', line.hand ? '書き写した一文' : '書き留めた一文', line.hand ? 'A line you wrote by hand' : 'A line you kept');
+  const text = el('p', 'me-hand', line.text);
+  text.lang = 'ja';
+  text.dataset.uiContent = 'learning';
+  const src = el('p', 'me-line-src');
+  if (line.title) {
+    const t = el('span', 'me-line-title', line.title);
+    t.lang = 'ja';
+    t.dataset.uiContent = 'learning';
+    src.append(el('span', '', tx('出典 ', 'from ')), t);
+  }
+  if (Number.isFinite(line.at)) src.append(el('b', '', `${line.title ? ' · ' : ''}${meDate(line.at)}`));
+  sec.append(text, src);
+  return sec;
+}
+/** 奥付: the back of the book — the two everyday switches, then every setting */
+function meBackPart() {
+  const sec = meSection('back', '設定', 'Settings');
+  const row = (ja, en, seg) => {
+    const r = el('div', 'me-set');
+    r.append(el('span', 'me-set-l', tx(ja, en)), seg);
+    return r;
+  };
+  const seg = (ja, en) => {
+    const s = el('div', 'me-seg');
+    s.setAttribute('role', 'group');
+    s.setAttribute('aria-label', tx(ja, en));
+    return s;
+  };
+  const language = seg('表示言語', 'Interface language');
+  for (const [id, label] of [['bi', tx('英語', 'English')], ['ja', '日本語']]) {
+    const b = el('button', '', label);
+    b.type = 'button';
+    b.dataset.lang = id;
+    if (id === 'ja') b.lang = 'ja';
+    b.setAttribute('aria-pressed', String(S.lang === id));
+    b.addEventListener('click', () => {
+      if (S.lang === id) return;
+      S.lang = id;
+      render();
+    });
+    language.append(b);
+  }
+  const light = seg('明かり', 'Light');
+  const lights = [];
+  const paintLight = () => {
+    const night = ME_NIGHT_WORLDS.includes(themeId());
+    for (const b of lights) b.setAttribute('aria-pressed', String((b.dataset.light === 'night') === night));
+  };
+  for (const [id, ja, en] of [['day', '昼', 'Day'], ['night', '夜', 'Night']]) {
+    const b = el('button', '', tx(ja, en));
+    b.type = 'button';
+    b.dataset.light = id;
+    b.addEventListener('click', () => {
+      if ((id === 'night') === ME_NIGHT_WORLDS.includes(themeId())) return;
+      setKairoTheme(id === 'night' ? 'yoru' : 'hokusai');
+      S.sealWake = true;
+      applyWorldSwap();
+      paintLight();
+    });
+    lights.push(b);
+    light.append(b);
+  }
+  paintLight();
+  const doors = el('div', 'foundation-doors me-back-doors');
+  doors.append(foundationDoor('me-settings', '設定', 'Settings', 'settings'));
+  sec.append(row('表示言語', 'Interface language', language), row('明かり', 'Light', light), doors);
+  return sec;
+}
+function renderMe(main) {
+  const decks = ME_DECKS.map((d) => ({ id: d.id, ledger: meDeckLedger(d.id), index: undefined }));
+  for (const d of decks) {
+    const known = meDeckIndex.get(d.id);
+    if (d.ledger && known && !(known instanceof Promise)) d.index = known;
+  }
+  const book = el('div', 'me-book');
+  const spine = el('div', 'me-spine');
+  spine.setAttribute('aria-hidden', 'true');
+  const edges = el('div', 'me-edges');
+  edges.setAttribute('aria-hidden', 'true');
+  book.append(spine, edges);
+  const { days, first } = meDays(decks);
+  const now = new Date();
+  const head = el('header', 'me-head');
+  head.append(el('p', 'eyebrow me-kicker', tx('一年の帳', 'The book of your year')));
+  head.append(el('h1', 'view-title', tx('日本語の一年', 'Your year in Japanese')));
+  const dateline = el('p', 'me-dateline');
+  if (first) {
+    const dayN = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(first.getFullYear(), first.getMonth(), first.getDate())) / 86400000) + 1;
+    // each clause holds together; the line breaks only at its dots
+    const clause = (...parts) => {
+      const span = el('span', 'me-clause');
+      span.append(...parts.map((p, i) => (i % 2 ? el('b', '', p) : p)));
+      return span;
+    };
+    const clauses = bi()
+      ? [clause('since ', meDate(first, true)), clause('day ', meNum(dayN)), clause('', meNum(days.size), ` day${days.size === 1 ? '' : 's'} practised`)]
+      : [clause('', meDate(first, true), 'から'), clause('', meNum(dayN), ' 日目'), clause('稽古 ', meNum(days.size), ' 日')];
+    clauses.forEach((c, i) => dateline.append(...(i ? [' · ', c] : [c])));
+  } else {
+    dateline.classList.add('is-blank');
+    dateline.textContent = tx('最初の札か記事から、この帳が始まる。', 'Your book begins with your first card or article.');
+  }
+  head.append(dateline);
+  const reading = meReadUnaided();
+  if (reading) {
+    const lead = el('p', 'me-lead');
+    lead.append(el('b', 'me-lead-n', meNum(reading.n)), el('span', 'me-lead-l', tx('字を自力で読んだ', 'characters read unaided')),
+      el('span', 'me-lead-m', tx(`読み終えた ${reading.articles} 編から、調べた ${reading.looked} 語を除く`,
+        `in ${reading.articles} finished article${reading.articles === 1 ? '' : 's'}, less the ${reading.looked} word${reading.looked === 1 ? '' : 's'} you looked up`)));
+    head.append(lead);
+  }
+  book.append(head);
+  let horizons = meHorizonsPart(decks);
+  let home = meCameHomePart(decks, !!first);
+  book.append(horizons);
+  if (home) book.append(home);
+  book.append(meSealsPart(days, first));
+  const line = meLinePart();
+  if (line) book.append(line);
+  const contents = meSection('contents', 'もっと見る', 'More');
+  const doors = el('div', 'foundation-doors me-doors');
+  doors.append(
+    foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
+    foundationDoor('me-statistics', '復習の統計', 'Review statistics', 'srs-stats'),
+    foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
+  );
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
+    personal.type = 'button'; personal.id = 'me-personal';
+    personal.addEventListener('click', openPersonalCollection); doors.append(personal);
+  }
+  contents.append(doors);
+  book.append(contents, meBackPart());
+  main.append(book);
+  // a deck the learner has opened brings its words: the horizon's whole, its kanji, its mended words
+  for (const d of decks) {
+    if (!d.ledger || d.index) continue;
+    meDeckWords(d.id, (index) => {
+      if (!index || !book.isConnected || d.index) return;
+      d.index = index;
+      const nextHorizons = meHorizonsPart(decks);
+      nextHorizons.classList.add('me-settle');
+      horizons.replaceWith(nextHorizons);
+      horizons = nextHorizons;
+      const nextHome = meCameHomePart(decks, !!first);
+      if (home && nextHome) home.replaceWith(nextHome);
+      else if (nextHome) horizons.after(nextHome);
+      if (nextHome) home = nextHome;
+    });
+  }
+}
+function renderSettings(main) {
+  main.append(el('p', 'eyebrow me-kicker', tx('私', 'Me')));
+  main.append(el('h1', 'view-title', tx('設定', 'Settings')));
+  const language = el('section', 'foundation-section');
+  language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
+  const choices = el('div', 'lang-seg settings-language');
+  choices.setAttribute('role', 'group'); choices.setAttribute('aria-label', tx('表示言語', 'Interface language'));
+  for (const [id, ja, en] of [['bi', '英語', 'English'], ['ja', '日本語', 'Japanese']]) {
+    const button = el('button', '', tx(ja, en)); button.type = 'button'; button.dataset.lang = id;
+    button.setAttribute('aria-pressed', String(S.lang === id));
+    button.addEventListener('click', () => { S.lang = id; render(); }); choices.append(button);
+  }
+  language.append(choices);
+  const world = biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
+  world.type = 'button'; world.id = 'settings-world'; attachWorldPicker(world);
+  const doors = el('div', 'foundation-doors');
+  doors.append(world,
+    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => { S.srsPrefsOpen = true; }),
+    foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
+    foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
+    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray'),
+  );
+  main.append(language, doors);
+}
+function renderWordsDoors(main) {
+  // the Words tab opens on the word web (the last word looked up, else the
+  // day's word); while a query or a finder lens is showing, words.css hides it
+  const web = renderWordWeb();
+  if (web) main.append(web);
+  const section = el('section', 'foundation-section words-index');
+  section.append(el('h2', 'eyebrow', tx('言葉のつながりを探す', 'Explore the language')));
+  const doors = el('div', 'foundation-doors');
+  doors.append(
+    foundationDoor('words-kanji', '漢字を調べる', 'Kanji by shape', 'kanjidex'),
+    foundationDoor('words-grammar', '文法', 'Grammar', 'grammar'),
+    foundationDoor('words-web', '言葉のつながり', 'Word web', 'thesaurus'),
+    foundationDoor('words-idioms', '四字熟語', 'Four-character idioms', 'yoji'),
+  );
+  section.append(doors); main.append(section);
+}
+
+/* Rooms expose their purpose independently from the existing material register.
+ * Concepts use data-room; data-register retains the stage-sensitive CSS from
+ * the 2026-09-24 register study — plus the attempt's stage
  * (--stage), whether an answer exists (data-answered), and the shelf's three grades of door. */
-const REGISTER_ROOM_DOORS = ['いまの日本を読む', '日本語を持ち込む', '参考書庫', 'レッスン', 'JLPT の練習'];
-const REGISTER_LINE_DOORS = ['読み物の好み'];
+const ROOM_IDS = {
+  drift: 'door', entry: 'entry', shelf: 'shelf', reader: 'reader', tray: 'tray',
+  list: 'list', browse: 'browse', 'srs-stats': 'progress', review: 'review',
+  probe: 'probe', archive: 'archive', dojo: 'learn', deckplay: 'deckplay',
+  contextdeck: 'contextdeck', personaldeck: 'personal', aiquiz: 'quiz',
+  levels: 'reference', ai: 'tutor', lessons: 'lessons', mock: 'jlpt',
+  kagami: 'progress', thesaurus: 'word-web', airead: 'personal-reading',
+  feed: 'feed', publisher: 'publisher', 'source-inbox': 'source-inbox',
+  'source-reader': 'source-reader', 'sentence-practice': 'sentence-practice',
+  kanjidex: 'kanji', yoji: 'idioms', grammar: 'grammar', guided: 'guided',
+  search: 'search', me: 'me', settings: 'settings',
+};
+const REGISTER_ROOM_DOORS = [['いまの日本を読む', 'news & magazines'], ['日本語を持ち込む', 'bring your own text'], ['参考書庫', 'Reference library'], ['レッスン', 'Lessons'], ['JLPT の練習', 'JLPT practice']];
+const REGISTER_LINE_DOORS = [['読み物の好み', 'Reading preferences']];
 function stampRegister() {
   const html = document.documentElement;
   const main = document.querySelector('#app > main');
-  const room = document.body.classList.contains('ginga') || !main ? 'door'
+  const room = ROOM_IDS[S.view] || S.view || 'door';
+  const material = S.view === 'personaldeck' ? 'hall'
+    : document.body.classList.contains('ginga') || !main ? 'door'
     : main.querySelector('.mock-opts, .mock-q, .guided-room[data-stage="question"]') ? 'attempt'
       : main.querySelector('.exam-confirm') ? 'threshold'
         : main.querySelector('.exam-score') ? 'results'
@@ -28234,17 +31395,41 @@ function stampRegister() {
             : main.querySelector('.chat-log') ? 'tutor'
               : main.querySelector('#shelf-body') ? 'shelf'
                 : main.querySelector('.mock-review') ? 'review' : 'hall';
-  if (html.dataset.room !== room) {
+  if (html.dataset.room !== room || html.dataset.register !== material) {
     html.dataset.room = room;
+    html.dataset.register = material;
     // one beat of entrance motion on arrival only (register.css keys the lift on this)
     html.dataset.roomEntering = '1';
+    html.style.removeProperty('--enter-t');
+    stampRegister.enteredAt = performance.now();
     clearTimeout(stampRegister.enterTimer);
-    stampRegister.enterTimer = setTimeout(() => { delete html.dataset.roomEntering; }, 220);
+    cancelAnimationFrame(stampRegister.enterFrame);
+    // the 220ms beat counts from the first frame the room is drawn in (a heavy room can hold
+    // the main thread for a few frames after its render), so the rise is never cut short
+    const arrival = stampRegister.arrivals = (stampRegister.arrivals || 0) + 1;
+    stampRegister.enterFrame = requestAnimationFrame(() => {
+      if (arrival !== stampRegister.arrivals || !html.dataset.roomEntering) return;
+      stampRegister.enteredAt = performance.now();
+      stampRegister.enterTimer = setTimeout(() => {
+        delete html.dataset.roomEntering;
+        html.style.removeProperty('--enter-t');
+      }, 220);
+    });
   } else if (html.dataset.roomEntering) {
-    // a re-render of the same room (a grade, a save, a tick) clears the marker before style
-    // resolution, so only the arrival render's children animate
-    clearTimeout(stampRegister.enterTimer);
-    delete html.dataset.roomEntering;
+    const elapsed = performance.now() - (stampRegister.enteredAt || 0);
+    if (elapsed < 180) {
+      // the arrival's own follow-up render (its data landing a few frames later) redraws main
+      // mid-rise: the new children continue the same rise from where it is (negative delay),
+      // so the entrance is neither cut nor replayed
+      html.style.setProperty('--enter-t', `${Math.round(elapsed)}ms`);
+    } else {
+      // a re-render of the same room (a grade, a save, a tick) clears the marker before style
+      // resolution, so only the arrival render's children animate
+      clearTimeout(stampRegister.enterTimer);
+      cancelAnimationFrame(stampRegister.enterFrame);
+      delete html.dataset.roomEntering;
+      html.style.removeProperty('--enter-t');
+    }
   }
   // the older sets have no .exam-progress: their counter is the card-kind after the policy line
   const progress = document.querySelector('.exam-progress') ||
@@ -28257,8 +31442,8 @@ function stampRegister() {
   else delete html.dataset.answered;
   for (const door of document.querySelectorAll('#shelf-body button.grammar-link:not([data-grade])')) {
     const label = (door.textContent || '').replace(/\s+/g, ' ').trim();
-    door.dataset.grade = REGISTER_ROOM_DOORS.some((name) => label.startsWith(name)) ? 'room'
-      : REGISTER_LINE_DOORS.some((name) => label.startsWith(name)) ? 'line' : 'tool';
+    door.dataset.grade = REGISTER_ROOM_DOORS.some((names) => label.toLowerCase().startsWith(tx(...names).toLowerCase())) ? 'room'
+      : REGISTER_LINE_DOORS.some((names) => label.toLowerCase().startsWith(tx(...names).toLowerCase())) ? 'line' : 'tool';
   }
 }
 
@@ -28360,6 +31545,8 @@ function render() {
   document.body.classList.toggle('ginga-open', heroMode && !!S.navOpen);
   if (!heroMode && S.navOpen) S.navOpen = false;
   if (heroMode) buildGingaChrome(root);
+  syncDriftHintLanguage();
+  ensureDoorPaper();
 
   // 復習 is zen: while a card is up, the whole world recedes — no top bar, no
   // crumb, no counters. Just the card, the answer, the four honest buttons.
@@ -28384,10 +31571,25 @@ function render() {
   const backBtn = biLabel('button', null, '戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'back';
+  // a tab root entered from the tab bar is a peer of the other tabs: no Back (its target was
+  // the previous tab, which the bar already shows). Leaving that tab's rooms forgets it, so a
+  // root reached through a door (the front door's bubbles, the chrome's Lists/Learn/search,
+  // a room link) keeps its Back to where the learner came from.
+  const tabOfRoot = S.tabRoot ? PRIMARY_TABS.find((tab) => tab.view === S.tabRoot) : null;
+  if (!tabOfRoot || !tabOfRoot.views.includes(S.view)) S.tabRoot = null;
+  const atTabRoot = S.variants.nav === 'tabs' && !!S.tabRoot && S.view === S.tabRoot;
   const atHome =
     !S.stack.length &&
-    (S.view === 'entry' || S.view === 'drift' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
+    (atTabRoot || S.view === 'entry' || S.view === 'drift' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
   backBtn.disabled = atHome;
+  // a finished review is a close, not a room: the tab bar and its own "Back to Today" are the
+  // ways home, so the chrome's Back steps aside (one route, not three)
+  const sessionClosed = S.view === 'review' && !S.focus && !S.stack.length && S.variants.nav === 'tabs' &&
+    !!S.review && S.review.ix >= S.review.queue.length;
+  if (sessionClosed) {
+    backBtn.hidden = true;
+    backBtn.dataset.sessionClosed = '';
+  }
   backBtn.addEventListener('click', back);
   chrome.append(backBtn);
 
@@ -28420,7 +31622,9 @@ function render() {
   if (S.view === 'search') parts.push(tx('検索', 'search'));
   // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
   // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
-  if (viaTray) parts.push(tx('リスト', 'lists'));
+  // the tray is the Today tab's room (Review #8 renamed its way back "Back to Today"); the crumb,
+  // shown on wide screens, names it the same way (r4 plain words)
+  if (viaTray) parts.push(tx('今日', 'Today'));
   if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
@@ -28448,6 +31652,7 @@ function render() {
   if (S.view === 'deckplay') parts.push(tx('集中道場', 'focus'), tx('デッキ', 'deck'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
+  if (S.stack.length) crumb.dataset.uiContentValue = S.stack.map(nodeTitle).join('|');
   crumb.setAttribute('aria-label', crumb.title);
   crumb.append(el('b', null, parts.at(-1) || ''));
   crumb.dataset.currentRoom = S.view;
@@ -28455,54 +31660,12 @@ function render() {
   if (S.view === 'reader' && passage()) chrome.append(levelChip(passage(), 'chrome-level'));
   chrome.append(crumb);
 
-  // the search door — on EVERY surface, one tap from hearing a word to
-  // typing it (operator, 2026-08-27); only the search room itself omits it
-  if (S.view !== 'search') {
-    const quickSearch = el('button', 'chrome-search');
-    quickSearch.type = 'button';
-    quickSearch.id = 'chrome-search';
-    quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
-    quickSearch.innerHTML =
-      SEARCH_SVG;
-    quickSearch.addEventListener('click', () => {
-      openSearchPage();
-    });
-    chrome.append(quickSearch);
-  }
-
-  // the dojo door — on EVERY surface (operator, 2026-09-17: "THE DOJO, or
-  // study room, needs to be accessible from ANY LOCATION WHATSOEVER"). It
-  // used to live only behind the galaxy's tap-to-open nav; now it stands in
-  // the ordinary chrome beside the search door. Inside the dojo family it is
-  // the current room, so it shows as such and does nothing.
-  {
-    const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
-    const dojoDoor = biLabel('button', 'chrome-dojo', '道場', 'dojo');
-    dojoDoor.type = 'button';
-    dojoDoor.id = 'chrome-dojo';
-    dojoDoor.setAttribute('aria-label', tx('集中道場へ', 'go to the focus dojo'));
-    if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
-    dojoDoor.addEventListener('click', () => {
-      if (inDojo) return;
-      if (S.view === 'reader' && S.passageId) {
-        clearTimeout(readerPosTimer);
-        void saveReaderPosition(S.passageId, Math.round(window.scrollY));
-      }
-      keepScroll();
-      S.navOpen = false;
-      S.stack = [];
-      S.view = 'dojo';
-      render();
-      window.scrollTo(0, 0);
-    });
-    chrome.append(dojoDoor);
-  }
-
-  // EN | 日本語 — two visible states, the active one lit
+  // the world seal, then EN | 日本語 — two visible states, the active one lit. The preferences
+  // stand first in the right-hand cluster, the doors (search · Learn · Lists) after them.
   const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'theme-seal';
-  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   attachWorldPicker(seal);
   chrome.append(seal);
 
@@ -28526,6 +31689,54 @@ function render() {
   }
   chrome.append(langSeg);
 
+  // the search door — on EVERY surface, one tap from hearing a word to
+  // typing it (operator, 2026-08-27); only the search room itself omits it
+  if (S.view !== 'search') {
+    const quickSearch = el('button', 'chrome-search');
+    quickSearch.type = 'button';
+    quickSearch.id = 'chrome-search';
+    quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
+    quickSearch.innerHTML =
+      SEARCH_SVG;
+    quickSearch.addEventListener('click', () => {
+      openSearchPage();
+    });
+    chrome.append(quickSearch);
+  }
+
+  // the dojo door — on EVERY surface (operator, 2026-09-17: "THE DOJO, or
+  // study room, needs to be accessible from ANY LOCATION WHATSOEVER"). It
+  // used to live only behind the galaxy's tap-to-open nav; now it stands in
+  // the ordinary chrome beside the search door. Inside the dojo family it is
+  // the current room, so it shows as such and does nothing.
+  {
+    const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
+    // the polish lane (2026-10-08): the door is the Learn tab's room, so it carries the tab's
+    // name (to a screen reader) and a quiet card-stack glyph — never a second word in the bar
+    const dojoDoor = biLabel('button', 'chrome-dojo', '学ぶ', 'Learn');
+    dojoDoor.type = 'button';
+    dojoDoor.id = 'chrome-dojo';
+    dojoDoor.insertAdjacentHTML('afterbegin', LEARN_DOOR_SVG);
+    // D7 (John: "Keep them for now — figure out the smartest way to work with this"): a quiet
+    // door. What is due shows once, on the Line's Today station, where the cards are reviewed.
+    dojoDoor.setAttribute('aria-label', tx('学ぶ', 'Learn'));
+    if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
+    dojoDoor.addEventListener('click', () => {
+      if (inDojo) return;
+      if (S.view === 'reader' && S.passageId) {
+        clearTimeout(readerPosTimer);
+        void saveReaderPosition(S.passageId, Math.round(window.scrollY));
+      }
+      keepScroll();
+      S.navOpen = false;
+      S.stack = [];
+      S.view = 'dojo';
+      render();
+      window.scrollTo(0, 0);
+    });
+    chrome.append(dojoDoor);
+  }
+
   // 覚える — the one capture button, top-right of every capture-eligible
   // surface (operator directive §3). The reader's takes the current thing:
   // the word last touched, carrying the sentence it was met in; its panel
@@ -28536,7 +31747,8 @@ function render() {
   if (S.view === 'reader' && S.passageId) {
     const cur = readerTakeCurrent();
     const curTaken = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
-    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '覚える', 'memorize');
+    // r4 (T5: "Save and add to list are confusing???"): one name for one action, the popup's Save
+    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '保存', 'Save');
     capBtn.type = 'button';
     capBtn.id = 'reader-take';
     capBtn.disabled = !cur;
@@ -28570,9 +31782,19 @@ function render() {
     chrome.append(capBtn);
   }
 
-  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, 'lists');
+  // Lists: a quiet bookmark and its count. The word stays in the door's text ("Lists 3" /
+  // "覚 3") for a screen reader and the language law; on screen the glyph says it (polish lane)
+  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, `Lists ${S.taken.length}`);
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
+  {
+    const label = trayBtn.querySelector('.l-ja');
+    const word = el('span', 'tray-word', tx('リスト', 'Lists'));
+    label.replaceChildren(word, document.createTextNode(' '), el('span', 'tray-count', String(S.taken.length)));
+    trayBtn.dataset.count = String(S.taken.length);
+    // D7: the bookmark marks its own room, and its count appears only once there is something saved
+    if (S.view === 'tray') trayBtn.dataset.here = '';
+  }
   trayBtn.addEventListener('click', () => {
     keepScroll();
     S.stack = [];
@@ -28602,6 +31824,9 @@ function render() {
   });
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+  enableTouchPress();
+  buildPrimaryTabs(root);
+  syncThemeColor();
 
   // the capture panel — anchored under the chrome's top-right seal. It
   // reuses the sheet's own instruments verbatim: the reversible 覚える
@@ -28613,7 +31838,7 @@ function render() {
     const panel = el('div', 'capture-panel');
     panel.id = 'capture-panel';
     panel.setAttribute('role', 'group');
-    panel.setAttribute('aria-label', tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`));
+    panel.setAttribute('aria-label', tx(`「${cur.id}」を保存`, `Save ${cur.id}`));
     panel.setAttribute('data-drift-chrome', '');
     const head = el('div', 'capture-head');
     head.append(el('span', 'capture-word', cur.id));
@@ -28707,12 +31932,16 @@ function render() {
     else if (S.view === 'grammar') renderGrammar(main);
     else if (S.view === 'guided') renderGuided(main);
     else if (S.view === 'contextdeck') renderContextDeck(main);
-    else if (S.view === 'search') renderSearchPage(main);
+    else if (S.view === 'search') { renderSearchPage(main); renderWordsDoors(main); }
+    else if (S.view === 'me') renderMe(main);
+    else if (S.view === 'settings') renderSettings(main);
     else renderShelf(main);
   } catch (error) {
     main.replaceChildren();
     renderRoomError(main, S.view, error);
   }
+  // the room's vertical sign hangs first in the page, floated into its right margin
+  { const sign = main.querySelector('.room-error') ? null : buildRoomSign(); if (sign) main.prepend(sign); }
   // after the room, never inside its stage: the focused stage keeps its composition and every
   // state (probe, unavailable card, error) keeps a report entry one scroll away
   if (maintenanceReports && S.view !== 'drift') root.append(reportEntries('report-line-page'));

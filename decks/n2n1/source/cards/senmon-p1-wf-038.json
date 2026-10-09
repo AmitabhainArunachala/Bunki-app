@@ -155,28 +155,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "目標設定",
-   "reading": "もくひょうせってい",
-   "pos": "noun",
-   "meaning": "goal setting",
-   "defJa": "達成したい目標を決めること",
-   "passage": {
-    "ja": "目標設定の研究が一貫して示すのは、曖昧な「頑張る」より、具体的で挑戦的な目標のほうが、成果につながりやすいということである。しかし、目標が高すぎると、達成の見通しが立たず、かえって意欲を失う場合もある。重要なのは、最終的な到達点を示しつつ、そこへ至る小さな段階を設けることだ。段階ごとに「できた」という実感を積み重ねれば、気力は枯れにくくなる。目的意識と日々の行動をつなぐのは、この細やかな設計にほかならない。",
-    "form": "目標設定",
-    "en": "What research on goal setting consistently shows is that specific and challenging goals lead to results more readily than a vague 'do my best'. However, if a goal is too high, no prospect of achievement appears, and in some cases you rather lose motivation. What matters is to set small stages leading to it while indicating the final destination. If you build up the sense of 'I did it' at each stage, your energy is less likely to dry up. What connects a sense of purpose with daily action is nothing other than this delicate design.",
-    "register": "論",
-    "topic": "mind",
-    "tipJa": "「具体的で挑戦的な目標」を立てること。段階に分けると続く。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "発想力",
    "reading": "はっそうりょく",
    "pos": "noun",
@@ -941,50 +919,6 @@
    },
    "deck": "senmon",
    "field": "history",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "知能",
-   "reading": "ちのう",
-   "pos": "noun",
-   "meaning": "intelligence",
-   "defJa": "物事を理解し、考え、対応する力",
-   "passage": {
-    "ja": "機械が賢くなったという話をするとき、知能という言葉をどう定義するかで、議論は大きく変わる。計算の速さを指すのか、新しい状況に適応する力を指すのか、あるいは他者の意図を読む力を指すのか。話し手が定義を曖昧にしたままだと、聞き手は別々のものを思い浮かべて、会話がすれ違う。汎用的な賢さを論じたいのか、特定の課題の得意さを論じたいのかでも、話の筋は変わる。だから、講演の冒頭で、この語をこの意味で使うと一文で断っておくことが、語りの礼儀にほかならない。",
-    "form": "知能",
-    "en": "When talking about machines having grown smart, the debate changes greatly depending on how you define the word intelligence. Does it mean speed of computation, the power to adapt to new situations, or the ability to read others' intentions? If the speaker leaves the definition vague, listeners imagine different things and the conversation misses. The thread of the talk also changes depending on whether you want to discuss general-purpose cleverness or skill at particular tasks. So stating in one sentence at the start of a lecture that you are using the word in this sense is nothing other than the courtesy of speaking.",
-    "register": "語",
-    "topic": "ai",
-    "tipJa": "計算力・適応力・他者理解など、定義で意味が変わる語。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "相関関係",
-   "reading": "そうかんかんけい",
-   "pos": "noun",
-   "meaning": "correlation",
-   "defJa": "二つの事柄が連動して変わる関係",
-   "passage": {
-    "ja": "統計の勉強で最初につまずくのが、相関関係と因果関係の区別です。アイスクリームの売り上げと水難事故の件数は、夏になると両方増えるため、強い相関を示しますが、アイスが事故を起こすわけではありません。背後に「気温」という第三の要因があるからです。ある結果を見たら、「他に隠れた原因はないか」と一度は疑う癖をつけましょう。確証バイアスに流されないための、データを読むうえでの最初の防御線になります。",
-    "form": "相関関係",
-    "en": "The first stumbling block in studying statistics is the distinction between correlation and causation. Ice cream sales and the number of drowning accidents both increase in summer and so show a strong correlation, but the ice cream does not cause the accidents. This is because a third factor, temperature, lies behind them. When you see a result, form the habit of asking once whether there is some other hidden cause. It becomes the first line of defense in reading data so you are not swept along by confirmation bias.",
-    "register": "学",
-    "topic": "mind",
-    "tipJa": "「相関と因果は別」。第三の要因があるかを疑う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "mind",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",

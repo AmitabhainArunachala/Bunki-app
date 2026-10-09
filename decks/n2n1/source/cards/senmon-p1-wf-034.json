@@ -639,28 +639,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "文語体",
-   "reading": "ぶんごたい",
-   "pos": "noun",
-   "meaning": "classical literary style",
-   "defJa": "古文の書き言葉の文体",
-   "passage": {
-    "ja": "古文の授業で習う文語体は、平安時代の話し言葉をもとにしながら、のちに書き言葉として固定されたものです。そのため、実際の会話とは違い、動詞の活用や助動詞の使い方が、時代が下っても大きく変わりませんでした。明治時代になると、新聞や法律も、長く同じ文体で書かれましたが、やがて話し言葉に近い口語体への移行が進みます。今も、短歌や俳句、祝詞など、特定の場面では古い言葉づかいが生きているのです。",
-    "form": "文語体",
-    "en": "The classical literary style learned in classical Japanese class was based on the spoken language of the Heian period but later became fixed as a written language. For that reason, unlike actual conversation, the conjugation of verbs and the use of auxiliary verbs did not change much even as the ages went on. In the Meiji period, newspapers and laws too were long written in the same style, but the shift to the colloquial style, closer to spoken language, gradually progressed. Even now, in specific settings such as tanka, haiku, and Shinto liturgy, the old way of speaking remains alive.",
-    "register": "講",
-    "topic": "language",
-    "tipJa": "対は「口語体」。古文の文章に使う書きぶり。今も短歌などに残る。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "教義",
    "reading": "きょうぎ",
    "pos": "noun",
@@ -677,28 +655,6 @@
    },
    "deck": "senmon",
    "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "日清戦争",
-   "reading": "にっしんせんそう",
-   "pos": "noun",
-   "meaning": "First Sino-Japanese War",
-   "defJa": "一八九四年に始まった日本と清の戦争",
-   "passage": {
-    "ja": "一八九四年に始まった日清戦争は、日本にとって、近代国家としての実力を内外に示す機会となった。朝鮮への影響力をめぐる清との対立が発端であったが、結果として日本は、台湾の割譲と巨額の賠償金を得て、アジアの新興国から帝国主義の列強へと歩み出す。他方、この勝利が、のちの日露戦争へと続く道を整え、軍部の発言力を高めたことも見逃せない。戦争の成果を称える声の影に、見えにくくなった代償について、現代の私たちは考える必要がある。",
-    "form": "日清戦争",
-    "en": "The First Sino-Japanese War, which began in 1894, became for Japan an opportunity to show its strength as a modern state at home and abroad. It started from a confrontation with Qing over influence in Korea, but as a result Japan gained the cession of Taiwan and a huge indemnity and stepped from an emerging Asian nation toward the imperialist great powers. At the same time, we cannot overlook that this victory paved the way to the later Russo-Japanese War and raised the military's voice. We today need to think about the costs that became hard to see in the shadow of voices praising the war's gains.",
-    "register": "論",
-    "topic": "history",
-    "tipJa": "一八九四〜九五年。下関条約で終結。日露戦争へつながる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "history",
    "level": "N1",
    "pass": 1,
    "writer": "claude-sonnet-5-5",
@@ -937,28 +893,6 @@
     "register": "報",
     "topic": "language",
     "tipJa": "「ふわふわ」「きょろきょろ」など。音を出さない様子を表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "language",
-   "level": "N1",
-   "pass": 1,
-   "writer": "claude-sonnet-5-5",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
-   "term": "文才",
-   "reading": "ぶんさい",
-   "pos": "noun",
-   "meaning": "literary talent",
-   "defJa": "文章を書く才能",
-   "passage": {
-    "ja": "文才は生まれつきの才能だと思われがちだが、作家の経歴を調べると、必ずしもそうではない。夏目漱石は小説家として世に出る前から、数多くの漢詩や俳句を作っており、書く訓練を長年積んでいたことが知られている。文章力を支えるのは、ひらめきよりも、読んだ量と書いた量の積み重ねだというのが、多くの編集者の実感である。ただ、その積み重ねを続けられること自体が、一つの才能と呼べるのかもしれない。",
-    "form": "文才",
-    "en": "Literary talent tends to be thought of as an inborn gift, but looking into writers' careers, that is not necessarily so. Natsume Sōseki is known to have composed many Chinese poems and haiku before emerging as a novelist, having built up years of writing training. Many editors feel that what supports writing skill is the accumulation of what one has read and written rather than flashes of inspiration. Still, being able to keep up that accumulation may itself be called a kind of talent.",
-    "register": "報",
-    "topic": "language",
-    "tipJa": "「文才がある」。文章を書く才能。「画才」「商才」と同じ「〜才」の型。",
     "sense": ""
    },
    "deck": "senmon",

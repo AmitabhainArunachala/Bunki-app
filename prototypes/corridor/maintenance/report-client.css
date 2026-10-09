@@ -92,3 +92,8 @@
   #bunki-reports-root .br-sheet[open] { animation: br-sheet-enter 180ms cubic-bezier(.16, 1, .3, 1); }
   @keyframes br-sheet-enter { from { transform: translateY(14px); } to { transform: translateY(0); } }
 }
+/* reduced motion: the report button's colour change is instant too (its 200 ms colour transition was
+   the one animation still running in the deck under prefers-reduced-motion: verify-kotoba-mine e) */
+@media (prefers-reduced-motion: reduce) {
+  #bunki-reports-root .br-rail .br-bug, #bunki-reports-root .br-rail .br-bug::before { transition: none; }
+}

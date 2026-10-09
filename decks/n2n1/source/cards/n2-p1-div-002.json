@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "何となく",
+   "reading": "なんとなく",
+   "pos": "adverb",
+   "meaning": "somehow",
+   "defJa": "はっきりした理由や意識がないまま",
+   "passage": {
+    "ja": "友達が書いた案内文を読んで、何となく引っかかったんだけど、最初はどこが変なのか自分でも言えなかったんだ。声に出してみたところ、集合する場所を説明している途中で持ち物の話に移っていて、頭の中で場面が切り替わらなかったんだよね。単語や語順は間違っていなくても、情報の並び方だけで読む人は立ち止まることがあるんだなって思った。違和感をすぐに正解か不正解かへ分けずに、どの言葉のあとで迷ったのかを探すと、直し方も見えてくるよ。",
+    "form": "何となく",
+    "en": "Something vaguely bothered me when I read the notice my friend had written, but at first I could not say what was odd about it. When I read it aloud, I found it switched to what to bring halfway through explaining the meeting place, and I could not make the scene shift in my head. It made me realize that even with correct vocabulary and word order, the arrangement of information alone can stop a reader. If you do not immediately reduce that uneasy feeling to right or wrong but look for the words after which you got lost, you can see how to revise it.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "理由を言葉にできない感じや行動に添える表現です。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
