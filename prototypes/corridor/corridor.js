@@ -8022,6 +8022,39 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   });
 }
 
+/* 禁則処理 (round 4, T4: "more polished … clarity"). A word you can tap is a button, an atomic box, and CSS
+ * allows a line break beside an atomic box even where Japanese forbids one, so 、 could open a line and 「
+ * end one (the sentence cards fixed this for closing marks with .kinsoku-glue). Here a closing mark joins
+ * the box before it, and an opening bracket waits in its no-break span for the word after it. */
+const KINSOKU_CLOSING = /^[、。，．！？」』）〉》〕］｝ー〜…‥・]+$/u;
+const KINSOKU_OPENING = /^[「『（〈《〔［｛]+$/u;
+function placeKinsoku(container, node, surface) {
+  const last = container.lastChild;
+  const glue = last?.nodeType === 1 && last.classList.contains('kinsoku-glue') ? last : null;
+  if (glue?.classList.contains('kinsoku-open')) {
+    glue.append(node);
+    if (!KINSOKU_OPENING.test(surface)) glue.classList.remove('kinsoku-open');
+    return;
+  }
+  if (KINSOKU_OPENING.test(surface)) {
+    const open = el('span', 'kinsoku-glue kinsoku-open');
+    open.append(node);
+    container.append(open);
+    return;
+  }
+  // a closing mark clings to the box before it: a word, or a glue already holding one (never a paragraph's break)
+  if (KINSOKU_CLOSING.test(surface) && last?.nodeType === 1 && !last.matches('.para-break, .sent-door')) {
+    if (glue) glue.append(node);
+    else {
+      const joined = el('span', 'kinsoku-glue');
+      container.replaceChild(joined, last);
+      joined.append(last, node);
+    }
+    return;
+  }
+  container.append(node);
+}
+
 function appendJapaneseLookup(container, text, context = {}) {
   const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
   const segments = segmenter ? [...segmenter.segment(String(text))].map(part => part.segment)
@@ -8036,7 +8069,9 @@ function appendJapaneseLookup(container, text, context = {}) {
   const help = japaneseLookupHelpId();
   for (const segment of segments) {
     if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
-      wrapper.append(document.createTextNode(segment)); continue;
+      if (context.kinsoku) placeKinsoku(wrapper, document.createTextNode(segment), segment);
+      else wrapper.append(document.createTextNode(segment));
+      continue;
     }
     // The visible word is its own accessible name; the shared help says what it does.
     const word = el('button', 'japanese-lookup-word', segment);
@@ -8049,7 +8084,8 @@ function appendJapaneseLookup(container, text, context = {}) {
     word.addEventListener('click', event => { event.stopPropagation(); void openJapaneseLookup(word, segment, context); });
     word.addEventListener('keydown', event => lookupWordKey(event, word));
     word.addEventListener('focus', () => setLookupStop(word));
-    wrapper.append(word);
+    if (context.kinsoku) placeKinsoku(wrapper, word, segment);
+    else wrapper.append(word);
   }
   container.append(wrapper);
   return wrapper;
@@ -8065,7 +8101,9 @@ function enhanceJapaneseProse(root) {
     if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
     // A word looked up in a guided question is saved as help on that question before it shows.
     const question = S.view === 'guided' ? parent.closest('.guided-room [data-question]')?.dataset.question : null;
-    const context = { ...(question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent };
+    // the reader's title card keeps Japanese line breaks (禁則処理): its marks cling to their words
+    const context = { ...(question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent,
+      ...(parent.closest?.('.reader-card') ? { kinsoku: true } : {}) };
     const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
     const textNodes = [];
     while (walker.nextNode()) {
@@ -8468,7 +8506,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const actions = el('div', 'mini-actions');
   actions.append(seal);
   if (!held && !identityHeld) {
-    actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to your reviews')));
+    // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
+    actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
     const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加', 'Add to a list'));
     lists.type = 'button';
     lists.id = 'mini-lists';
@@ -8618,8 +8657,14 @@ function placeFloating(card, r) {
   const ceiling = Math.max(8, (fixedEdge('#app > .chrome', 'bottom') ?? 0) + 8);
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
+  // a card that asked to keep its top edge (the sentence pane, which only shortens it) keeps it while it
+  // still stands clear of its word and inside the chrome
+  const pinned = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
+  const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinned + m.height <= floor
+    && (pinned + m.height <= r.top - 10 || pinned >= r.bottom + 10);
   let top;
-  if (m.height <= roomAbove) top = r.top - 10 - m.height;
+  if (pinHolds) top = pinned;
+  else if (m.height <= roomAbove) top = r.top - 10 - m.height;
   else if (m.height <= roomBelow) top = r.bottom + 10;
   else {
     const room = Math.max(roomAbove, roomBelow, 96);
@@ -8633,14 +8678,18 @@ function placeFloating(card, r) {
     ? `${Math.max(0, (window.innerWidth - m.width) / 2)}px`
     : `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   card.style.top = `${top}px`;
+  // which side of its word the card stands on: its shade falls away from the word, never across it
+  card.dataset.side = top < r.top ? 'above' : 'below';
 }
 
 /* The popup's last band in an article: one named door into the word's sentence (John #18: the floating
  * sentence bar "what is the purpose??"; round 4, T5: "this sentice, save astk the tutor, practice. very very
  * confusing"). "Study this sentence ›" shows the sentence's own first words. It opens the sentence inside
  * the card, the word marked in it, with two plain choices side by side: Ask the tutor (get it explained)
- * and Practice it (fill in the gaps). "‹ Back to the word" returns. Each carries exactly the sentence
- * the bar did. Keeping the sentence is the word menu's "Save the sentence", so the popup has one Save. */
+ * and Practice it (recall it or use it, the two practices its screen always offers), and under them a
+ * quiet "Save the sentence" (keep it on the tutor page), the word menu's action of the same name. Each
+ * view of the card has one Save: the word's, or here the sentence's. "‹ Back to the word" returns. Each
+ * carries exactly the sentence the bar did. */
 function readerSentenceRow(node, index) {
   const wrap = el('div', 'mini-sentence-wrap');
   const sentence = teacherSentence(node);
@@ -8711,7 +8760,7 @@ function readerSentenceRow(node, index) {
   });
   choices.append(ask);
   if (sentencePracticeModule) {
-    const practice = choice('reader-sentence-practice', tx('練習する', 'Practice it'), tx('穴うめで練習', 'Fill in the gaps'),
+    const practice = choice('reader-sentence-practice', tx('練習する', 'Practice it'), tx('思い出す・使う', 'Recall it or use it'),
       tx('この文を練習する', 'Practice this sentence'));
     // coming back from practice reopens this popup on its sentence, Practice focused (focusLearningSourceCaller)
     practice.dataset.returnFocus = `reader-word:${index}:reader-sentence-practice`;
@@ -8723,12 +8772,34 @@ function readerSentenceRow(node, index) {
     choices.append(practice);
   }
   pane.append(choices);
-  // the door and its pane trade places; the card re-seats itself beside the word as its height changes
+  // keeping the sentence for later (the glossary: the sentence's own actions live inside its pane): the word
+  // menu's "Save the sentence", one guarded write, set quieter than the two choices
+  const keep = el('button', 'mini-sentence-keep');
+  keep.type = 'button';
+  keep.id = 'reader-context-save';
+  keep.append(el('span', 'mini-sentence-keep-name', tx('この文を保存', 'Save the sentence')),
+    el('span', 'mini-sentence-keep-hint', tx('先生のページに残す', 'Keep it on the tutor page')));
+  keep.disabled = !recordWritable();
+  buttons.push(keep);
+  keep.addEventListener('click', async (event) => {
+    event.stopPropagation();
+    if (keep.disabled) return;
+    for (const control of buttons) control.disabled = true;
+    try { await sendSentenceToTutor(node, false, () => keep.isConnected, say); }
+    finally { for (const control of buttons) control.disabled = !recordWritable(); }
+  });
+  pane.append(keep);
+  // the door and its pane trade places. The card keeps its top edge while the sentence shows (it only grows
+  // shorter), so nothing above it peeps out between the card and the chrome; back on the word, it sits
+  // beside its word again
   const show = (open, { focus = true } = {}) => {
+    const card = wrap.closest('#mini');
+    if (card && open) card.dataset.pinTop = String(card.getBoundingClientRect().top);
+    else if (card) delete card.dataset.pinTop;
     pane.hidden = !open;
     door.hidden = open;
     door.setAttribute('aria-expanded', String(open));
-    wrap.closest('#mini')?.classList.toggle('is-sentence', open);
+    card?.classList.toggle('is-sentence', open);
     if (focus) (open ? buttons.find((button) => !button.disabled) || back : door).focus({ preventScroll: true });
   };
   door.addEventListener('click', (event) => { event.stopPropagation(); show(true); });
@@ -9701,8 +9772,8 @@ function renderReader(main) {
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
   if (shelfDay(p)) meta.append(readerDateStamp(shelfDay(p)));
   meta.append(levelChip(p));
-  // the instrument figures, each the record's own: characters, and the saved words the article holds
-  if (p.chars) meta.append(el('span', 'reader-fact reader-chars', tx(`${p.chars.toLocaleString('ja-JP')}字`, `${p.chars.toLocaleString('en-GB')} chars`)));
+  // the record's own figure: the saved words the article holds. (Its length is the shelf's: the lead
+  // story's facts and the "shortest first" sort. While reading it is of no use, round 4 T4.)
   const mine = storyYourWords(p);
   if (mine) meta.append(el('span', 'reader-fact reader-mine', tx(`保存した語 ${mine}`, `${mine} of your words`)));
   meta.append(gradeTag(p));
@@ -9745,7 +9816,8 @@ function renderReader(main) {
       b.setAttribute('aria-pressed', String(version.id === p.id));
       b.append(el('span', 'l-ja', tx(ja, en)));
       const level = version.readingFacets?.jlpt || levelPhrase(version.grading).level;
-      if (level) b.append(el('span', 'version-level', `· ${level}`));
+      // the dot is its own span: a narrow phone sets the level under the name and drops it
+      if (level) { const tag = el('span', 'version-level'); tag.append(el('span', 'version-dot', '· '), level); b.append(tag); }
       b.addEventListener('click', () => { if (version.id !== p.id) openPassage(version.id); });
       toggle.append(b);
     }
@@ -9935,13 +10007,18 @@ function renderReader(main) {
       const numeral = /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u.test(String(token.s || ''));
       const opens = (token.c || namedReading || numeral || prefix) && !suffix && !groupHolds;
       if (opens || !group) {
+        // an opening bracket still waiting for its word goes with that word into the new phrase
+        const held = group?.lastChild?.classList?.contains('kinsoku-open') ? group.lastChild : null;
+        const left = group;
         group = el('span', 'bunsetsu');
         reader.append(group);
+        if (held) { group.append(held); if (!left.childNodes.length) left.remove(); }
       }
       groupHolds = numeral || prefix;
-      group.append(rendered);
+      placeKinsoku(group, rendered, token.s);
     } else {
-      reader.append(rendered);
+      // 禁則処理: a closing mark clings to the word before it, an opening bracket to the word after it
+      placeKinsoku(reader, rendered, token.s);
     }
   }
   main.append(readerHelp(), reader);

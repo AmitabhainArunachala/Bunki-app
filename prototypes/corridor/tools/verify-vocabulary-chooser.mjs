@@ -298,6 +298,12 @@ try {
         assert.deepEqual(learning(await readAppRecord(page)), before);
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false');
         assert.equal(await page.locator('#mini-lists').isVisible(), false, 'A failed Save offers no list');
+        // the fault protects the record until reload: a second Save, past its bounce guard, is refused and writes nothing
+        await page.waitForTimeout(650);
+        await page.locator('#mini-take').click();
+        await page.locator('#reader-toast').filter({ hasText: /not ready/iu }).waitFor();
+        assert.deepEqual(learning(await readAppRecord(page)), before, 'A failed native write protects the host until reload');
+        assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false');
         await recoverRecord(page);
         assert.deepEqual(learning(await readAppRecord(page)), before, 'The protected reload keeps the record as it was');
         await openChooser(page);
@@ -316,6 +322,7 @@ try {
         assert(listFault.fired > 0);
         assert.deepEqual(learning(await readAppRecord(page)), captured);
         assert.equal(await listName(page).inputValue(), 'Second retry list');
+        assert.equal(await create(page).isDisabled(), true, 'A failed native write protects the host until reload');
         await recoverProtectedChooser(page);
         assert.equal(await listName(page).inputValue(), 'Second retry list', 'List-only recovery also preserves the unsaved list name');
         await create(page).click();

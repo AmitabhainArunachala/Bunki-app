@@ -91,13 +91,16 @@
  *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
  *                         action shows outside the popup); the popup's last band is one named door,
  *                         "Study this sentence", showing the sentence's start; it opens the sentence in
- *                         the card, the word marked, with "Ask the tutor" and "Practice it", and Ask the
- *                         tutor opens the tutor with that sentence as its active context. Control:
- *                         3166ded3, whose bar floated in on the first tap.
+ *                         the card, the word marked, with "Ask the tutor" and "Practice it" and a quiet
+ *                         "Save the sentence", which keeps that sentence on the tutor page without making
+ *                         it the active one; and Ask the tutor opens the tutor with that sentence as its
+ *                         active context. Control: 3166ded3, whose bar floated in on the first tap.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "Simplified: the same story
  *                         in easier Japanese." (round 4: shorter), and an article without a
  *                         simplified version shows no switch. Control: 3166ded3 ("easier N3", no caption).
+ *                         On a phone (390 and 320) each side of the switch and its ⓘ is a box at least
+ *                         44px tall and wide (the brief's hit floor; added in round 4's review).
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
  *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
@@ -893,8 +896,16 @@ try {
       const pane = await page.evaluate(() => ({
         marked: document.querySelector('#mini .mini-sentence-pane:not([hidden]) .mini-sentence-full mark')?.textContent ?? null,
         choices: [...document.querySelectorAll('#mini .mini-sentence-pane .mini-sentence-action-name')].map((n) => n.textContent),
+        keep: document.querySelector('#mini .mini-sentence-pane #reader-context-save .mini-sentence-keep-name')?.textContent ?? null,
       }));
-      assert.deepEqual([pane.marked, pane.choices], ['郊外', ['Ask the tutor', 'Practice it']], `the sentence pane: ${JSON.stringify(pane)}`);
+      assert.deepEqual([pane.marked, pane.choices, pane.keep], ['郊外', ['Ask the tutor', 'Practice it'], 'Save the sentence'], `the sentence pane: ${JSON.stringify(pane)}`);
+      // the sentence's own Save keeps it on the tutor page, in the reader, without making it the active sentence
+      const unkept = await readAppRecord(page);
+      await page.locator('#mini #reader-context-save').click();
+      const kept = await waitForAppRecord(page, (r) => (r.teacherContexts?.entries || []).some((entry) => entry.sourceId === ARTICLE && entry.quote?.startsWith('ダマスカス郊外')),
+        { description: 'the sentence kept on the tutor page' });
+      assert.equal(kept.teacherContexts.activeRef ?? null, unkept.teacherContexts?.activeRef ?? null, 'Save the sentence made it the active sentence');
+      assert.equal(await page.evaluate(() => document.body.dataset.view), 'reader', 'Save the sentence left the reader');
       await page.locator('#mini #reader-teacher').click();
       await page.waitForFunction(() => document.body.dataset.view === 'ai');
       const record = await readAppRecord(page);
@@ -921,6 +932,17 @@ try {
       assert(none.choices.length === 0 && none.caption === null, `an article without a simplified version shows the switch: ${JSON.stringify(none)}`);
       return shown;
     });
+    // round 4 review: on a phone each side of the switch and its ⓘ keep the 44px hit floor
+    for (const [label, viewport] of [['390', PHONE], ['320', NARROW]]) {
+      await run(`G7-version-switch-hit-${label}`, viewport, async (page) => {
+        await openArticle(page, ARTICLE);
+        const boxes = await page.evaluate(() => [...document.querySelectorAll('.version-toggle .version-choice, .version-toggle .version-help > summary')]
+          .map((n) => { const r = n.getBoundingClientRect(); return { name: n.innerText.replace(/\s+/gu, ' ').trim() || n.getAttribute('aria-label'), w: +r.width.toFixed(1), h: +r.height.toFixed(1) }; }));
+        assert.equal(boxes.length, 3, `the switch's controls: ${JSON.stringify(boxes)}`);
+        for (const box of boxes) assert(box.w >= 44 && box.h >= 44, `a control of the version switch is under 44px: ${JSON.stringify(box)}`);
+        return boxes;
+      });
+    }
 
     await run('J1-jlpt-room-wording', DESK, async (page) => {
       await open(page);

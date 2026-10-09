@@ -30,7 +30,8 @@ const fixture = Buffer.concat([original, Buffer.from(shim)]);
 const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
-const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/]];
+const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /must stay disabled until reload/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -133,8 +134,10 @@ const cases = [
   ['failed-capture-inside-a-list-is-honest-and-recoverable', async page => {
     // A list sheet opened for a word not yet saved (the personal deck's "Add to list…" does this; the popup no longer
     // does, by round 4's one path) saves the word first, with the same capture as Save. A native fault on that capture
-    // is reported honestly, writes neither a card nor a list, and keeps the typed list name.
-    await page.evaluate(async () => {
+    // is reported honestly, writes neither a card nor a list, protects the record until reload, and keeps the typed
+    // list name across that reload; the retried list then holds the word with exactly one card. (These are the
+    // assertions verify-vocabulary-chooser held on this path before the popup's one path moved its capture to Save.)
+    const openSheet = () => page.evaluate(async () => {
       const f = window.annotationFixture;
       f.removeMini();
       await f.ensureDictionaryRowsForForm('電車');
@@ -143,6 +146,7 @@ const cases = [
       anchor.style.cssText = 'position:fixed;left:120px;top:150px'; document.body.append(anchor);
       f.openVocabularyListPopover({ t: 'word', id: '電車' }, '電車', anchor);
     });
+    await openSheet();
     await page.locator('#vocabulary-list-popover').waitFor();
     const before = await state(page);
     assert.equal(before.record.taken.some(row => row.t === 'word' && row.id === '電車'), false, 'The fixture word starts unsaved');
@@ -152,6 +156,21 @@ const cases = [
     const fault = await clearRecordWriteFailure(page); assert(fault.fired > 0, 'The native capture transaction must actually fail');
     assert.deepEqual((await state(page)).record, before.record, 'A failed capture inside a list writes no card and no list');
     assert.equal(await page.locator('#vocabulary-list-popover #vocabulary-list-name').inputValue(), 'Capture first', 'The typed list name stays');
+    // A native write fault protects the record until reload, even once the fault is gone.
+    assert.equal(await page.evaluate(() => window.annotationFixture.recordWritable()), false, 'The record must stay read-only until reload');
+    assert.equal(await page.locator('#vocabulary-list-popover .vocabulary-list-form [type="submit"]').isDisabled(), true, 'The list form must stay disabled until reload');
+    assert.match(await page.locator('.vocabulary-list-status').textContent(), /reload/i, 'The notice must say a reload comes before any retry');
+    await closeChooser(page);
+    await Promise.all([page.waitForEvent('load'), page.locator('#record-reload').click()]);
+    await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+    assert(await page.evaluate(() => window.annotationFixture.recordWritable()), 'Record recovers after reload');
+    assert.deepEqual((await state(page)).record, before.record, 'The protected reload keeps the record as it was');
+    await openSheet();
+    await page.locator('#vocabulary-list-popover').waitFor();
+    assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Capture first', 'The required recovery reload preserves the unsaved list name');
+    await page.locator('#vocabulary-list-popover [type="submit"]').click();
+    const retried = await waitForAppRecord(page, record => member(record, 'Capture first', '電車'));
+    assert.equal(retried.taken.filter(row => row.t === 'word' && row.id === '電車').length, 1, 'The retried list holds the word with exactly one card');
   }],
   ['exact-entry-mini-and-conflict-protection', async page => {
     await page.evaluate(async () => {
