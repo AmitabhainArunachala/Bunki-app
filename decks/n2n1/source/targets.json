@@ -82870,7 +82870,10 @@
     "gloss": "Shvetambara Jain tradition",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"],
+    "sources": [
+      "R5-curated:jain-history",
+      "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -82881,7 +82884,10 @@
     "gloss": "Digambara Jain tradition",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"],
+    "sources": [
+      "R5-curated:jain-history",
+      "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -82925,7 +82931,11 @@
     "gloss": "renunciant ascetic",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/page/JainFundamentals", "https://cir.nii.ac.jp/crid/1920583859638810752"],
+    "sources": [
+      "R5-curated:jain-history",
+      "https://www.jaina.org/page/JainFundamentals",
+      "https://cir.nii.ac.jp/crid/1920583859638810752"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -82969,7 +82979,11 @@
     "gloss": "five great Jain ascetic vows",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/page/PathofLiberation", "https://www.bukkyo-u.ac.jp/museum/uploads/ondemand_endonkai.pdf"],
+    "sources": [
+      "R5-curated:jain-history",
+      "https://www.jaina.org/page/PathofLiberation",
+      "https://www.bukkyo-u.ac.jp/museum/uploads/ondemand_endonkai.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -82991,7 +83005,10 @@
     "gloss": "Shravanabelagola Jain pilgrimage site",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"],
+    "sources": [
+      "R5-curated:jain-history",
+      "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83002,7 +83019,12 @@
     "gloss": "nakedness; unclothed form",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:jain-history", "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf", "https://archives.bukkyo-u.ac.jp/rp-contents/HB/A109/HBA1091L001.pdf", "https://dictionary.cegloc.tsukuba.ac.jp/JtoE/index.php?page=36&typedword=RA"],
+    "sources": [
+      "R5-curated:jain-history",
+      "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf",
+      "https://archives.bukkyo-u.ac.jp/rp-contents/HB/A109/HBA1091L001.pdf",
+      "https://dictionary.cegloc.tsukuba.ac.jp/JtoE/index.php?page=36&typedword=RA"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83035,7 +83057,10 @@
     "gloss": "Japanese missions to Sui China",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.mofa.go.jp/mofaj/area/china/pdfs/rekishi_kk_c_translate.pdf"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.mofa.go.jp/mofaj/area/china/pdfs/rekishi_kk_c_translate.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83046,7 +83071,10 @@
     "gloss": "Japanese missions to Tang China",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.koyasan.or.jp/sp/shingonshu/kobodaishi.html"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.koyasan.or.jp/sp/shingonshu/kobodaishi.html"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83079,7 +83107,10 @@
     "gloss": "Buddhist temple associated with a shrine",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.mlit.go.jp/kankocho/content/001998181.pdf"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83090,7 +83121,10 @@
     "gloss": "separation of Shinto and Buddhism",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.mlit.go.jp/kankocho/content/001998181.pdf"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83101,7 +83135,10 @@
     "gloss": "Shugendo mountain asceticism",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.mlit.go.jp/kankocho/content/001998181.pdf"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83112,7 +83149,10 @@
     "gloss": "mountain ascetic",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.mlit.go.jp/kankocho/content/001998181.pdf"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83134,7 +83174,10 @@
     "gloss": "temple certification system",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://jpsearch.go.jp/en/item/adeac-R100000094_I1611452"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://jpsearch.go.jp/en/item/adeac-R100000094_I1611452"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83167,7 +83210,10 @@
     "gloss": "Siddham script and its study",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://dglb01.ninjal.ac.jp/ninjaldl/cv/sittanzo/"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://dglb01.ninjal.ac.jp/ninjaldl/cv/sittanzo/"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83178,7 +83224,11 @@
     "gloss": "Buddhist lay donor",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:japanese-transmission", "https://www.todaiji.or.jp/history/", "https://jodoshuzensho.jp/daijiten/index.php/%E6%AA%80%E8%B6%8A"],
+    "sources": [
+      "R5-curated:japanese-transmission",
+      "https://www.todaiji.or.jp/history/",
+      "https://jodoshuzensho.jp/daijiten/index.php/%E6%AA%80%E8%B6%8A"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83189,7 +83239,10 @@
     "gloss": "focused attention meditation",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://www.sciencedirect.com/science/article/pii/S0165178113005192"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://www.sciencedirect.com/science/article/pii/S0165178113005192"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83200,7 +83253,11 @@
     "gloss": "open monitoring meditation",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138", "https://kaken.nii.ac.jp/ja/file/KAKENHI-PROJECT-24650135/24650135seika.pdf"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138",
+      "https://kaken.nii.ac.jp/ja/file/KAKENHI-PROJECT-24650135/24650135seika.pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83288,7 +83345,10 @@
     "gloss": "attentional control",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://www.sciencedirect.com/science/article/pii/S0165178113005192"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://www.sciencedirect.com/science/article/pii/S0165178113005192"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83299,7 +83359,10 @@
     "gloss": "decentering",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://www.jstage.jst.go.jp/article/personality/22/2/22_108/_pdf"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://www.jstage.jst.go.jp/article/personality/22/2/22_108/_pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83310,7 +83373,10 @@
     "gloss": "heart rate variability",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://www.jstage.jst.go.jp/article/jje/56/Supplement/56_2G1-02/_pdf"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://www.jstage.jst.go.jp/article/jje/56/Supplement/56_2G1-02/_pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83321,7 +83387,10 @@
     "gloss": "active control group",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://pmc.ncbi.nlm.nih.gov/articles/PMC9122316/"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC9122316/"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83332,7 +83401,10 @@
     "gloss": "respiratory sinus arrhythmia",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://imis.igaku-shoin.co.jp/journal/404/50/3/1404902441/?lang=ja"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://imis.igaku-shoin.co.jp/journal/404/50/3/1404902441/?lang=ja"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
@@ -83354,7 +83426,12 @@
     "gloss": "attentional blink",
     "level": "N1+",
     "field": "india",
-    "sources": ["R5-curated:meditation-neuroscience", "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138", "https://www.jstage.jst.go.jp/article/cogpsy/2007/0/2007_0_105/_article/-char/ja", "https://www.jstage.jst.go.jp/article/jsoft/34/2/34_63/_pdf"],
+    "sources": [
+      "R5-curated:meditation-neuroscience",
+      "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138",
+      "https://www.jstage.jst.go.jp/article/cogpsy/2007/0/2007_0_105/_article/-char/ja",
+      "https://www.jstage.jst.go.jp/article/jsoft/34/2/34_63/_pdf"
+    ],
     "pastTests": 0,
     "priority": 2,
     "deck": "senmon"
