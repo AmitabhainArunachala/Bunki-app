@@ -154,7 +154,7 @@ const QUARANTINED = '前の記録を読み取れなかったので、別に保�
  * the next save cannot erase it; notice then says so.
  */
 function loadState(storage, deck) {
-  let text = null;
+  let text;
   try {
     text = storage.getItem(stateKey(deck.id));
   } catch {
@@ -2367,7 +2367,7 @@ function attachSwipe(face) {
  */
 function doneScreen() {
   const box = el('section', 'kp-done');
-  box.append(topBar(t("おつかれさま"), () => go('home')));
+  box.append(topBar(t("おつかれさま")));
   box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
   const missed = new Set(ui.log.filter((x) => !x.ok).map((x) => x.term));
   const words = [...new Set(ui.log.map((x) => x.term))].slice(0, 12);
@@ -2593,7 +2593,7 @@ function restoreButton(ta, msg) {
     const { raw } = staged;
     disarm();
     const key = stateKey(ctx.deck.id);
-    let current = null;
+    let current;
     try {
       current = ctx.storage.getItem(key);
     } catch {
