@@ -104,7 +104,7 @@
 .kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1); }
 .kp-count { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 
-.kp-card { --kp-kind: var(--kp-kind-go); background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-kind); border-radius: 18px; padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s, box-shadow 0.12s; min-height: 220px; }
+.kp-card { --kp-kind: var(--kp-kind-go); background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-kind); border-radius: 18px; padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s; min-height: 220px; }
 /* item kind: the left edge and the kind chip, nothing else */
 .kp-kind-ji { --kp-kind: var(--kp-kind-ji); }
 .kp-kind-bun { --kp-kind: var(--kp-kind-bun); }
@@ -283,18 +283,23 @@
 .kp-sentence.kp-enter rt { animation: kp-fade 0.12s cubic-bezier(0.2, 0, 0, 1) var(--kp-rt-delay, 0.04s) both; }
 .kp-answer.kp-enter { animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-card.kp-arrive { animation: kp-arrive 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
-.kp-study { position: relative; }
+.kp-study { position: relative; overflow-anchor: none; }
+.kp .kp-study.kp-reveal-hold { position: fixed; z-index: 5; margin: 0; pointer-events: none; background: var(--kp-stage); animation: kp-fade-out 140ms linear both; }
+.kp-reveal-hold *, .kp-reveal-hold *::before, .kp-reveal-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
 .kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; }
 .kp-ghost.kp-out-good { animation: kp-out-good 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
 .kp-ghost.kp-out-again { animation: kp-out-again 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
 @keyframes kp-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes kp-fade-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes kp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes kp-arrive { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: none; } }
 @keyframes kp-out-good { to { opacity: 0; transform: translateX(24px); } }
 @keyframes kp-out-again { to { opacity: 0; transform: translateX(-24px); } }
-/* reduced motion: nothing moves, nothing fades — every change is instant */
+/* Reduced motion keeps the held frame, with a short opacity crossfade and no movement. */
 @media (prefers-reduced-motion: reduce) {
   .kp *, .kp *::before, .kp *::after { animation: none !important; transition: none !important; }
+  :is(#app, .kp) .kp-sentence.kp-enter :is(.kp-target, rt), :is(#app, .kp) .kp-answer.kp-enter, :is(#app, .kp) .kp-card.kp-arrive, :is(#app, .kp) .kp-sheet, :is(#app, .kp) .kp-pop { animation: kp-fade 100ms linear both !important; transform: none !important; }
+  :is(#app, .kp) .kp-study.kp-reveal-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
   .kp-progress i { transform: none; width: calc(var(--kp-frac, 0) * 100%); }
   .kp-ghost { display: none; }
 }

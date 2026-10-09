@@ -1879,9 +1879,42 @@ function reveal() {
   // read before any grade of this sitting: was this card answered on an earlier pass?
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
   const from = window.scrollY;
+  const held = holdStudy(ctx.root.querySelector('.kp-study'));
   if (!revealInPlace()) paint();
   windowPassage(from);
   settleBack();
+  showHeldStudy(held);
+}
+
+/** Hold the actual front frame while the back finds its final layout. The copy carries no
+ * ids, card identity or interaction, and fades away without moving the reader's chrome. */
+function holdStudy(study) {
+  if (!study) return null;
+  const rect = study.getBoundingClientRect();
+  const node = study.cloneNode(true);
+  const reveal = study.querySelector('.kp-reveal');
+  const copy = node.querySelector('.kp-reveal');
+  if (reveal && copy && getComputedStyle(reveal).position === 'fixed') {
+    const key = reveal.getBoundingClientRect();
+    Object.assign(copy.style, { position: 'absolute', inset: 'auto', left: `${key.left - rect.left}px`, top: `${key.top - rect.top}px`, width: `${key.width}px`, height: `${key.height}px` });
+  }
+  node.removeAttribute('id');
+  for (const child of node.querySelectorAll('[id]')) child.removeAttribute('id');
+  for (const child of node.querySelectorAll('[data-card]')) delete child.dataset.card;
+  for (const child of node.querySelectorAll('.kp-ghost, .kp-polish, .kp-slash')) child.remove();
+  for (const child of node.querySelectorAll('.kp-enter, .kp-arrive')) child.classList.remove('kp-enter', 'kp-arrive');
+  node.classList.add('kp-reveal-hold');
+  node.setAttribute('aria-hidden', 'true');
+  node.inert = true;
+  Object.assign(node.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
+  return node;
+}
+function showHeldStudy(node) {
+  if (!node) return;
+  ctx.root.append(node);
+  const drop = () => node.remove();
+  node.addEventListener('animationend', drop, { once: true });
+  setTimeout(drop, 240);
 }
 
 /**
@@ -1890,7 +1923,7 @@ function reveal() {
  * height is what the room above them leaves (never under WINDOW_LINES lines), and it scrolls inside
  * the card. The page goes back to its top while the passage takes the same offset, so the text does
  * not move; only when the target sentence is outside the window does the passage itself scroll to it
- * (smooth; instant with reduced motion). A fold row the pads would cut is lifted wholly above them.
+ * before the held front fades. A fold row the pads would cut is lifted wholly above them.
  * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
  */
 const WINDOW_LINES = 3;
@@ -1946,7 +1979,7 @@ function windowPassage(from) {
   };
   passage.addEventListener('scroll', edges, { passive: true });
   face.addEventListener('click', () => requestAnimationFrame(edges));
-  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: motionOk() ? 'smooth' : 'instant' });
+  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: 'instant' });
   edges();
 }
 
@@ -1996,7 +2029,7 @@ function settleBack() {
     break;
   }
   if (Math.abs(dy) < 1) return;
-  window.scrollTo({ top: window.scrollY + dy, behavior: motionOk() ? 'smooth' : 'instant' });
+  window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
  * none, the study top bar pins itself (player.css, data-host none): where it rests once stuck */
@@ -2038,11 +2071,9 @@ function revealInPlace() {
   face.removeEventListener('click', reveal);
   const { nodes, answer } = backParts(card, word);
   face.append(...nodes);
-  if (motionOk()) {
-    sentence.classList.add('kp-enter');
-    answer.classList.add('kp-enter');
-    polish(face, sentence);
-  }
+  sentence.classList.add('kp-enter');
+  answer.classList.add('kp-enter');
+  if (motionOk()) polish(face, sentence);
   box.querySelector('#kp-reveal')?.replaceWith(gradeBar(id));
   box.classList.add('has-bar');
   attachSwipe(face);
@@ -2129,9 +2160,10 @@ function askToKeepStorage() {
 }
 
 /** the next card. dir ('good' | 'again'): the answered card slides out that way while the
- * next one settles in (none with reduced motion) */
+ * next one settles in (an opacity crossfade with reduced motion) */
 function next(dir) {
   const id = ui.queue[ui.pos];
+  const held = !motionOk() ? holdStudy(ctx.root.querySelector('.kp-study')) : null;
   refill();
   ui.pos++;
   // a learning step due within the sitting comes back after a few cards
@@ -2147,6 +2179,7 @@ function next(dir) {
   if (ctx.root.querySelector('.kp-done')) window.scrollTo(0, 0);
   else frameFront();
   arrive(ghost, dir);
+  showHeldStudy(held);
 }
 
 /** a copy of the answered card, inert and without ids, to slide out over the next one */
@@ -2168,8 +2201,10 @@ function arrive(ghost, dir) {
   const box = ctx.root.querySelector('.kp-study');
   if (!box) return; // the done screen
   if (dir) box.dataset.advance = dir;
+  const card = box.querySelector('#kp-card');
+  card?.classList.add('kp-arrive');
+  setTimeout(() => card?.classList.remove('kp-arrive'), 200);
   if (!motionOk()) return;
-  box.querySelector('#kp-card')?.classList.add('kp-arrive');
   // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
   if (dir === 'again') {
     const slash = el('i', 'kp-slash');
