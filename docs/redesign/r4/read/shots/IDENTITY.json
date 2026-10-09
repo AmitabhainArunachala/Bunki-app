@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "verifiedCodeGitSha": "40806a264fd8f42669bcc8a0d974d5d2209c6e4d",
-  "artifactSha256": "34cf6d10501d730cc305142a83d392cbcb3a0aa5d95d049f51d574541e07d449",
+  "verifiedCodeGitSha": "76c40528c724008b6a7321cc6026f6779f466ed4",
+  "artifactSha256": "0ef8374974d6085151484c96074b6437af9fc88defe38ebdf2596c09022ee570",
   "sourceDirty": false,
   "scope": "Headless Chromium; fresh public UI flows; 390x844 and 320x700, at device scale 2. Not physical-device acceptance or pixel-sampled contrast.",
   "captureManifest": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/manifest.json",
@@ -10,7 +10,7 @@
     {
       "path": "day-en/read.png",
       "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-en/read.png",
-      "sha256": "f5a94c97ba68e53e0d3053e263e671961b6cf8b933a478aebac1019ee6b88f34"
+      "sha256": "a06f1908a920208a6ca69c95748ccc4fe88174fe9cababb88d4a95f1290a71d1"
     },
     {
       "path": "day-en/reader.png",
@@ -95,7 +95,7 @@
     {
       "path": "night-en/read.png",
       "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/night-en/read.png",
-      "sha256": "bd545cc4fade13a08c60a9d3074ff01005a66a7009b4ce2fcc878b22563ed8e5"
+      "sha256": "99da91c13cdf7441c19d4bd580759e69e2a8c1cd54fde663c3c09c69cc8cdd7a"
     },
     {
       "path": "night-en/reader.png",
@@ -180,7 +180,7 @@
     {
       "path": "day-ja/read.png",
       "runtimeSource": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r4-finish/shots/day-ja/read.png",
-      "sha256": "929ef58f0e4daa1bf4e309e3d25f55159cad4a845e34e53303294abcf33e8b2d"
+      "sha256": "915f658aa852df001cc7151b6eac4779837d5d9b473a3b7a5536b00fe7e67237"
     },
     {
       "path": "day-ja/reader.png",

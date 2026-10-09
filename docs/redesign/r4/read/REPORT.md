@@ -206,13 +206,13 @@ The lead has these, so LABELS.md can match what ships.
 
 This section supersedes the first-pass verification, photographs and open-item list above. Codex Sol read every draft hunk from `7c1b2036`, created `claude/r4-read-final-20261010`, and merged the verified skin/cards/today head `3d81031b`. The merge was clean; the read surfaces were checked against the merged Tokens v2 and shell. No push or main merge was made.
 
-**Verified product code:** `40806a264fd8f42669bcc8a0d974d5d2209c6e4d`, clean source (`sourceDirty: false`). **Artifact:** `34cf6d10501d730cc305142a83d392cbcb3a0aa5d95d049f51d574541e07d449`. The later documentation/photos commit records those exact tested bytes. The immutable site is under `~/.dharma/bunki_review/2026-10-10/r4-finish/site`; the final battery used its staging name `site-next` before it was moved intact. Logs, receipts and runtime photographs are under that same `r4-finish` directory. The superseded runs and shots are archived separately and are not final evidence.
+**Verified product code:** `76c40528c724008b6a7321cc6026f6779f466ed4`, clean source (`sourceDirty: false`). **Artifact:** `0ef8374974d6085151484c96074b6437af9fc88defe38ebdf2596c09022ee570`. The later documentation/photos commit records those exact tested bytes. The immutable site is under `~/.dharma/bunki_review/2026-10-10/r4-finish/site`; the final battery used its staging name `site-release` before it was moved intact. Logs, receipts and runtime photographs are under that same `r4-finish` directory. The superseded runs and shots are archived separately and are not final evidence.
 
 ### The three rule breaks
 
 1. **Protected-record assertions restored.** The first-pass claim that no storage assertion changed was wrong. Its replacement annotation case omitted both capture-failure checks. In `verify-annotation-lookup.mjs`, `failed-capture-inside-a-list-is-honest-and-recoverable` now holds the exact assertions **“A failed native write protects the host until reload”** (disabled submit) and **“The required recovery reload preserves the unsaved list name”** (`Capture first`). It also requires read-only record state, a reload instruction, no durable change through fault/reload, writable recovery, and a retry that creates the list with 電車 and exactly one card. The `list-form-reenabled-before-reload` negative control exercises both capture and list-only failure; both deliberately broken cases are rejected. `verify-vocabulary-chooser` retains the list-only protection/draft recovery and denies another Save after a native capture fault even after its bounce guard expires. The historical REPORT claim is corrected inline; VERIFIER_CHANGES preserves its prior text and appends the correction.
 2. **44px version switch restored.** Both choices have `min-height: 44px`; the help target is 44×44. G7 measures all three targets at 390 and 320 and asserts `box.w >= 44 && box.h >= 44`. Final choice sizes are 134×44 at 390, and 97×44 / 101×44 at 320. An external negative control rejects the actual first-pass 40px buttons at both widths.
-3. **Only transform/opacity animate.** Removed background-colour motion and scoped inherited reader icon colour/background transitions to instantaneous highlights. G8 observes computed positive-duration transitions and named keyframes, including pseudo-elements, with reduced motion disabled; its exact assertions are **“Reader and word popup may animate only transform and opacity”** and **“The sentence popup may animate only transform and opacity”**, each requiring an empty violations array. It proves it observed motion (966 nodes, 911 transition entries and three animations in Chromium). Both widths and both engines pass.
+3. **Only transform/opacity animate.** Removed background-colour motion and scoped inherited reader icon colour/background transitions to instantaneous highlights. G8 observes computed positive-duration transitions and named keyframes, including pseudo-elements, with reduced motion disabled; its exact assertions are **“Reader and word popup may animate only transform and opacity”** and **“The sentence popup may animate only transform and opacity”**, each requiring an empty violations array. The expanded observer covers the whole reader room (`#app`), popup, menu, toast and list sheet across word, sentence, Save/toast, list, settings and menu stages. Both phone widths and both engines pass. An additional motion-enabled audit passes 54/54 stages across day-en/night-en/day-ja at 320, 390 and 1368 widths, observing 3,904–4,005 nodes and 1,614–1,669 positive-duration transition entries, with no disallowed properties.
 
 ### All eleven review fixes
 
@@ -236,7 +236,7 @@ His full lines remain quoted above. T3's mark is padded **読**, legible as a se
 
 ### Final verification
 
-The required serial runner battery uses Chromium and the exact final artifact/SHA; root tools use the same environment. Reader design was also run separately in WebKit. Every behavioural assertion was retained or strengthened; cosmetic/path pin edits and the historical protection loss are individually logged in `docs/redesign/VERIFIER_CHANGES.md`.
+Two disjoint runner groups each run their suites serially against the same frozen Chromium artifact/SHA; root tools use the same environment. Reader design was also run separately in WebKit. Every behavioural assertion was retained or strengthened; cosmetic/path pin edits and the historical protection loss are individually logged in `docs/redesign/VERIFIER_CHANGES.md`.
 
 | Name | Result | Note |
 |---|---|---|
@@ -257,7 +257,7 @@ The required serial runner battery uses Chromium and the exact final artifact/SH
 | `verify-srs-today` | Pass | 32/32; 2/2 mutants caught |
 | `verify-experience` | Pass | 42/42; frozen assets |
 | `verify-drift-hunt` | Pass | All hunt regressions green |
-| `verify-design-reader-shelf` | Pass | 45/45 Chromium |
+| `verify-design-reader-shelf` | Pass | 48/48 Chromium |
 | `verify-reader-doors` | Pass | 93/93 |
 | `verify-reader-lookup` | Pass | Lookup and roving |
 | `verify-playback` | Pass | Silence/provenance/layout |
@@ -273,9 +273,9 @@ The required serial runner battery uses Chromium and the exact final artifact/SH
 | `verify-listening-failures` | Pass | Native failure silence/provenance |
 | `verify-sentence-drafts` | Pass | 8/8; desktop and phone |
 | `test-approved-voice` | Pass | 11/11, executable fixture |
-| `verify-design-reader-shelf-webkit` | Pass | 45/45 WebKit |
+| `verify-design-reader-shelf-webkit` | Pass | 48/48 WebKit |
 
-Syntax checks passed for the changed reader JavaScript/verifiers. ESLint exits zero but ignores the three reader verifier files under the repository policy, so it supplies no coverage for them. Their executable and negative-control checks above are the verification. The external final sentence fault/focus probe passed 11/11 assertions.
+Syntax checks passed for the changed reader JavaScript/verifiers. ESLint exits zero but ignores the three reader verifier files under the repository policy, so it supplies no coverage for them. Their executable and negative-control checks above are the verification. The final external audit passes 25/25 named assertions (18 runtime and seven protected-scope): quiet Save, native abort, content/particle/asynchronous dictionary Practice return, four 320px short-pane cases, exact seat and article position, plus protected byte contracts. Receipt: `r4-finish/draft-audit/release/release-audit-76c40528-summary.json`.
 
 ### Photographs and protected scope
 
@@ -288,15 +288,16 @@ No protected storage marker/function changed. A byte audit against `3d81031b` co
 ### What remains open
 
 - The accepted inherited failures remain: corridor-doors **T13 only**, and pr77-ports **the same four checks, 52/56**. Their exact failure names were compared to the accepted PR-head logs; JSON comparisons are in the final verify directory. The four ports checks are the 未確認/review reason, the rights-held reason, review-room ×/… contrast, and the kdx-chip-state probe timeout. No verifier was weakened to remove them.
+- Tall sentence quotes and actions scroll inside the pinned card. At short-card/320 sizes, actions begin below the initial visible quote; the normal night preview can clip at its lower scroll boundary. Keyboard focus reveals controls without scrolling the article.
 - These are headless Chromium and Playwright WebKit checks, not acceptance on a physical iPhone. The night ruby figure is computed colour contrast, not pixel-sampled contrast.
 - The full-entry, tutor and source-page sentence chips remain outside this read-lane scope. The old shell “memorize”/bookmark wrap, dense metadata, missing-audio wording and broken approved-voice fixture are resolved here or by the merged skin lane.
 - The first-pass assessment-written-section failure is historical and outside the finish battery; it was not retested in this pass. No claim is made that it is resolved.
 
 The current user's instruction to execute the finish brief authorizes adopting its glossary audio copy. There is no separately obtained lead reply; this report makes the provenance decision explicit without claiming an additional approval.
 
-### Gate review, after the verified artifact
+### Gate review history, before the final verification
 
-The gate reviewed `890cd522` and found four defects. All four were reproduced on that code and are fixed. **These fixes change product bytes** (`prototypes/corridor/corridor.js` and `prototypes/corridor/rooms/read.css`), so artifact `34cf6d10…` does not contain them. The verification table and photographs above describe `40806a26` and nothing later. The required battery and the photographs have to be run again on a clean build of the commit that carries these fixes.
+The gate reviewed `890cd522` and found four defects. The four defects were reproduced and fixed; the details below retain the intermediate evidence. These fixes change product bytes (`prototypes/corridor/corridor.js` and `prototypes/corridor/rooms/read.css`). The final table and photographs above now describe the clean `76c40528` build, including all four fixes and the hidden-selector follow-up. The superseded `40806a26`/`34cf6d10…` evidence is archived under `r4-finish/archive/`.
 
 | Finding | What was wrong on `890cd522` | Fix | Check that now holds it |
 |---|---|---|---|
@@ -305,7 +306,7 @@ The gate reviewed `890cd522` and found four defects. All four were reproduced on
 | 3. Return from Practice on a lookup word | A name, kana run or ending opens its popup after its dictionary rows load. Returning from Practice looked for the Practice button before that popup existed, so the reader landed on the word with the sentence pane closed. | The lookup door's reopen returns its promise. The return focuses the word, then opens the pane and focuses Practice once the popup is there, provided the word is still on the page, the popup is its own and focus has not moved. The particle popup now shares the same focus reveal as the word popup. | `G6-sentence-return-motion-390` and `-320`, with motion enabled, on の (a particle), ダマスカス (a lookup word) and その (a content word). |
 | 4. The pinned seat | The sentence pane pinned itself to the card's painted box, which includes the entrance animation's offset. On return from Practice, or on a quick second tap, the card sat up to 10px low with 10px less room. | The pin is the laid-out top that placement already wrote. | The same two cases: the returned card and a card opened while rising sit within 1px of the word card's seat. |
 
-Fix 3's row in the table above is true of what G8 measured at the time. It holds for the whole reader room only from this round.
+The expanded G8 now holds fix 3 for the whole reader room, including the inherited shell controls.
 
 **What was run in this round.** Only `verify-design-reader-shelf`, as the focused check for the changed files.
 
@@ -315,8 +316,8 @@ Fix 3's row in the table above is true of what G8 measured at the time. It holds
 | Fixed worktree, `sourceDirty: true`, digest `67d67bed…` | Chromium | 48/48 |
 | Fixed worktree, same build | WebKit | 48/48 |
 
-Logs and receipts are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-fix-01M4GJ26/`. The canonical site, logs, receipts and photographs under `r4-finish` were not touched.
+Logs and receipts are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-fix-01M4GJ26/`. That intermediate gate round left the earlier site, logs, receipts and photographs intact; they were subsequently archived for the final release run.
 
-**Still open from this round.** The particle popup's shared focus reveal is covered by the return case but was not shown failing before the fix: on `890cd522` の's Practice was already visible on return. The reviewed build was reproduced in Chromium only. No other suite was run on the fixed code here: the storage, accessibility, relief, reader-doors, reader-lookup, annotation-lookup and corridor suites last passed on `40806a26`. Night worlds, the 日本語 interface and the 1368 width were not measured by the new motion stages. The galaxy case reaches its entry through whichever kanji word the sky offers first inside the safe area (触れる in both engines here).
+**Limits of that intermediate round (superseded by final checks above).** The particle popup's shared focus reveal is covered by the return case but was not shown failing before the fix: on `890cd522` の's Practice was already visible on return. The reviewed build was reproduced in Chromium only. No other suite was run on the fixed code here: the storage, accessibility, relief, reader-doors, reader-lookup, annotation-lookup and corridor suites last passed on `40806a26`. Night worlds, the 日本語 interface and the 1368 width were not measured by the new motion stages. The galaxy case reaches its entry through whichever kanji word the sky offers first inside the safe area (触れる in both engines here).
 
-The first AXI run ended `failed`: its fix/review window reached30 minutes while the review agent was still active. Commit `6fe6e3d0` was preserved and recovered by the offered `axi sync --recover` action, without a push or history rewrite. The fix review had identified a specificity regression: widening the hidden rule lowered its strength. A320px runtime probe reproduced a painted “Study this sentence” door despite `hidden:true`. The follow-up retains the original selector strength in every app view and G6 now asserts the door's actual invisibility while its pane is open. The gate is not claimed passed; final verification and a fresh gate follow this fix.
+The first AXI run ended `failed`: its fix/review window reached 30 minutes while the review agent was still active. Commit `6fe6e3d0` was preserved and recovered by the offered `axi sync --recover` action, without a push or history rewrite. The fix review had identified a specificity regression: widening the hidden rule lowered its strength. A 320px runtime probe reproduced a painted “Study this sentence” door despite `hidden:true`. The follow-up retains the original selector strength in every app view and G6 now asserts the door's actual invisibility while its pane is open. That first run is not claimed passed. After the final required checks and photo/documentation commit, a fresh AXI run validates delivery with rebase, push, PR and CI explicitly skipped under the brief’s no-push rule. Its outcome is reported separately in the final handoff.

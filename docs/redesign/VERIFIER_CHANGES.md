@@ -716,3 +716,10 @@ The checks were first run, unchanged, against a rebuild of `890cd522` (same dige
 | `verify-design-reader-shelf.mjs` receipt count | 45 per engine → 48 per engine. | Three added cases. |
 
 | `verify-design-reader-shelf.mjs` G6 hidden sentence door | Logical pane/door state alone → also assert `#mini-sentence-open` is not visible while the pane is open, at 390 and320. | The gate fix removed a specificity component from the shared hidden rule. A real320px probe on its `67d67bed…` regression build finds `hidden:true`, `display:grid`, and a painted door. `body[data-view]` restores the original strength while matching every app view. No case or existing assertion is removed; count stays48 per engine. |
+
+
+## Round 4 read: final verified release (2026-10-10, Codex Sol)
+
+The preceding gate entries describe intermediate builds. Final product code is clean `76c40528c724008b6a7321cc6026f6779f466ed4`, artifact `0ef8374974d6085151484c96074b6437af9fc88defe38ebdf2596c09022ee570`. The full finish battery and new photographs now use this build, including the gate fixes and the hidden-rule specificity follow-up. Reader design passes 48/48 in Chromium and 48/48 in WebKit. No additional verifier source changed in this final documentation round.
+
+An external motion observer adds day-en/night-en/day-ja at 320, 390 and 1368 widths across the six existing G8 stages: 54/54, zero disallowed properties, with reduced motion disabled. A separate public-flow/native-abort audit passes 18 runtime and seven protected-byte assertions. These receipts supplement the executable repository verifiers; no existing behavioural floor or assertion is removed. Runtime receipts live under `~/.dharma/bunki_review/2026-10-10/r4-finish/`, not in the repository.
