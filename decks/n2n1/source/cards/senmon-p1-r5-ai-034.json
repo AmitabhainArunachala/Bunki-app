@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "黎明期",
+   "reading": "れいめいき",
+   "pos": "noun",
+   "meaning": "dawn, early period",
+   "defJa": "新しい技術や文化が生まれ始める時期",
+   "passage": {
+    "ja": "昔の計算機の写真を見ると、部屋いっぱいの装置にまず驚くよね。でも、その大きさだけで未熟だと決めつけると、当時は何を実現するだけでも難しかったのか、見えなくなってしまう。コンピュータの黎明期には、計算を機械に任せるための仕組みや使い方を、装置と一緒に組み立てていく面があったんだ。今の便利さを基準に採点するより、限られた部品でどんな課題に挑み、次の世代へ何を渡したのかをたどると、あの巨大な箱の見方も変わるよ。",
+    "form": "黎明期",
+    "en": "Old photographs of computers first surprise you with machines filling an entire room. But if you dismiss them as immature just because of their size, you lose sight of what was difficult to achieve at the time. In the dawn of computing, people were developing methods and ways of using machines alongside the machines themselves. Rather than grading them against today's convenience, tracing the problems they tackled with limited components and what they passed to the next generation changes how you see those enormous boxes.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "日の出の比喩から、技術の始まりを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "高次元",
+   "reading": "こうじげん",
+   "pos": "noun",
+   "meaning": "high-dimensional",
+   "defJa": "多くの独立した成分で表されること",
+   "passage": {
+    "ja": "商品の価格と重さだけなら、二本の軸を持つ図に各商品を配置できる。材質、色、利用頻度などの特徴を次々に加えた高次元のデータは、一枚の図では関係を把握しにくくなる。機械学習ではこうした情報を扱うため、表示用に軸を減らす手法も使われるが、その過程で元の違いが失われる場合がある。画面上で近くに並ぶ点を同じ種類と見なすに先立って、どの特徴を残し、何を捨てて作った図なのかを確認することが、結果の検証に直結する。",
+    "form": "高次元",
+    "en": "If price and weight are the only features, products can be placed on a chart with two axes. Relationships in high-dimensional data containing additional features such as material, color, and frequency of use are harder to grasp in a single chart. Machine learning uses methods that reduce the axes for display, but some original differences may be lost in the process. Before treating nearby points on the screen as the same type, checking which features the chart retains and discards directly supports verification of the results.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "数の大きさではなく、特徴を表す軸の多さを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "頭脳流出",
+   "reading": "ずのうりゅうしゅつ",
+   "pos": "noun",
+   "meaning": "brain drain",
+   "defJa": "専門知識を持つ人材が国外などへ移ること",
+   "passage": {
+    "ja": "工場を建てても、装置の異常を見抜く技術者まで一緒にそろうとは限りません。研究者や熟練した設計者が海外へ移り、国内に蓄積した知識が引き継がれにくくなる現象を、頭脳流出と呼びます。ただし、移った人が共同研究を続けたり、経験を携えて戻ったりする経路もあるので、人数の減少だけで損失を測るのは早計です。半導体産業の競争力を考えるなら、給与に加えて、若手が挑戦できる研究環境や帰国後の受け皿にも目を向けたいところです。",
+    "form": "頭脳流出",
+    "en": "Building a factory does not automatically bring the engineers who can detect equipment problems. Brain drain refers to researchers and experienced designers moving abroad, making it harder to pass on knowledge accumulated at home. Yet those who move may continue joint research or return with experience, so measuring the loss solely by the decline in numbers is premature. When considering the competitiveness of the semiconductor industry, we should examine not only salaries but also research environments where young people can take on challenges and opportunities available after they return.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "人材の移動を受け入れ側と送り出し側から見る語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "株価純資産倍率",
+   "reading": "かぶかじゅんしさんばいりつ",
+   "pos": "noun",
+   "meaning": "price-to-book ratio",
+   "defJa": "株価が一株当たり純資産の何倍かを示す数値",
+   "passage": {
+    "ja": "工場や設備を多く持つ企業を比較する際、株価純資産倍率は株式市場の評価と帳簿上の純資産を結び付ける指標となる。一株当たりの純資産で株価を割るため、一倍を下回れば、株価はその帳簿上の値より低い。ただし、それをもって、会社を解散すれば投資額以上の現金が戻ると断言することはできない。設備の売却価格は帳簿上の値と一致するとは限らず、事業が今後生む利益も市場の評価を左右するため、数字の低さと投資の魅力は分けて検討される。",
+    "form": "株価純資産倍率",
+    "en": "When comparing companies that own many factories and equipment, the price-to-book ratio connects the stock market's valuation with book net assets. Because it divides the share price by book value per share, a ratio below one means that the price is below that book figure. This does not establish that dissolving the company would return more cash than was invested. Equipment may sell for amounts different from its book value, and future earnings also affect market valuations, so a low ratio and an attractive investment are assessed separately.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "帳簿の値と、売却できる値を混同しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "高純度",
+   "reading": "こうじゅんど",
+   "pos": "noun",
+   "meaning": "high purity",
+   "defJa": "混じっている別の物質が非常に少ない状態",
+   "passage": {
+    "ja": "半導体の材料は、きれいであればあるほど完成品に近づくという単純なものではない。高純度の結晶を出発点としながらも、電気の流れ方を調整する工程では、狙った場所に別の元素を少量加える。避けたいのは意図しない混入であり、設計に沿った添加までなくしてしまえば、必要な性質を作り分けられない。何も混ざっていないことと、混ざるものを正確に管理できることの違いに、材料を磨き上げる仕事と回路を成立させる仕事の接点がある。",
+    "form": "高純度",
+    "en": "Semiconductor materials do not simply approach the finished product as they become cleaner. Although a high-purity crystal is the starting point, small amounts of other elements are added to selected locations to control electrical behavior. Unintended contamination is what must be avoided, and removing even deliberate additions would prevent engineers from creating the required properties. The distinction between having no admixtures and precisely controlling them connects the work of refining materials with the work of making circuits function.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "材料の清浄さと、必要な添加とを区別して使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "資産配分",
+   "reading": "しさんはいぶん",
+   "pos": "noun",
+   "meaning": "asset allocation",
+   "defJa": "財産を種類ごとにどの割合で持つかの決め方",
+   "passage": {
+    "ja": "運用方針に「安全を重視する」とだけ書かれていても、読み手には具体的な持ち方が伝わりません。株式、債券、現金をどの割合で保有するかを示す資産配分の説明なら、抽象的な方針を数字に落とせます。ただし、同じ割合であれ、近く使う資金と長く置いておける資金とでは、その構成を選ぶ理由が異なります。文章を整える際には、商品名の羅列を増やすよりも、お金を使う時期と値下がりへの備えを一文添え、比率の背後にある判断を読み取れる形にします。",
+    "form": "資産配分",
+    "en": "An investment policy that merely says it emphasizes safety does not tell readers how the assets will actually be held. An explanation of asset allocation showing the proportions of stocks, bonds, and cash translates that abstract policy into numbers. Yet even identical proportions may be chosen for different reasons depending on whether the money will be needed soon or can remain invested for a long time. When editing the text, adding a sentence about when the money will be used and how declines are addressed makes the reasoning behind the ratios clearer than a longer list of products would.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "割合を示す語なので、対象と比率を添える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "株価収益率",
+   "reading": "かぶかしゅうえきりつ",
+   "pos": "noun",
+   "meaning": "price-to-earnings ratio",
+   "defJa": "株価が一株当たり利益の何倍かを示す数値",
+   "passage": {
+    "ja": "一株当たりの利益が同じ二社でも、株価が同じとは限りません。株価をその利益で割った株価収益率を見ると、利益に対してどれだけの価格が付いているかを比べられます。ただし、工場の売却などによる一時的な利益が分母を押し上げた場合、数字が低いからといって、本業まで割安だとは判断できません。半導体企業の決算を読むときも、実績と予想のどちらを使った指標なのかをそろえたうえで、利益が増減した理由を本文へ戻って確かめましょう。",
+    "form": "株価収益率",
+    "en": "Two companies with the same earnings per share do not necessarily have the same share price. The price-to-earnings ratio, calculated by dividing the price by those earnings, lets us compare the price placed on earnings. However, if a one-time gain such as a factory sale raises the denominator, a low ratio alone does not establish that the operating business is cheap. When reading semiconductor companies' results, first ensure that the ratios use a consistent basis of actual or forecast earnings, then return to the text to check why earnings changed.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "利益を分母に置くので、その期間と性質も確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "分散投資",
+   "reading": "ぶんさんとうし",
+   "pos": "noun",
+   "meaning": "investment diversification",
+   "defJa": "資金を異なる複数の運用先に振り分けること",
+   "passage": {
+    "ja": "半導体の会社を十社選べば、一社だけに資金を預ける場合と同じではありません。けれども、全社が同じ需要の落ち込みにさらされるなら、分散投資をしたつもりでも、資産全体が似た動きをする可能性があります。練習用の表に会社名だけでなく、業種、地域、収益を左右する条件も書き込み、重なりを探してみましょう。個別企業の失敗による影響を小さくする働きと、市場全体の下落まで防げるという思い込みを切り離すと、銘柄を増やす目的が明確になります。",
+    "form": "分散投資",
+    "en": "Choosing ten semiconductor companies is different from putting all your money into one. However, if they all face the same decline in demand, your assets may move similarly even though you think you have diversified your investments. In a practice table, list not only company names but also industries, regions, and the conditions affecting their earnings, then look for overlap. Separating the reduction of exposure to one company's failure from the mistaken belief that it prevents a market-wide decline clarifies the purpose of adding holdings.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "銘柄数だけでなく、値動きの共通要因も見る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

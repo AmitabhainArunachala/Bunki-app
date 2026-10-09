@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "営業キャッシュフロー",
+   "reading": "えいぎょうきゃっしゅふろー",
+   "pos": "noun",
+   "meaning": "cash flow from operating activities",
+   "defJa": "本業の取引によって出入りした現金の差額",
+   "passage": {
+    "ja": "製品を売って利益が出ても、代金がまだ入金されていなければ、その利益を今すぐ支払いに使うことはできません。本業に伴う現金の出入りを見る営業キャッシュフローは、損益計算書の利益とは違う角度から会社を映します。在庫を積み増すために現金を使えば、売上が伸びつつある会社でも、手元の資金に余裕がなくなることがあります。半導体の需要拡大を読むときは、工場から製品が出る流れと、取引先からお金が戻る流れを別々に追うと、成長の途中にある資金の詰まりを発見できます。",
+    "form": "営業キャッシュフロー",
+    "en": "Even when products are sold at a profit, that profit cannot immediately pay bills if the proceeds have not arrived. Operating cash flow, which tracks cash moving in and out through the business, shows a different side of the company from the profit on its income statement. Cash spent building inventories can leave a growing company short of available funds. When examining expanding semiconductor demand, tracing the flow of products out of the factory separately from payments returning from customers can reveal financing bottlenecks during growth.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "帳簿上の利益と、現金の動きを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "安全余裕",
+   "reading": "あんぜんよゆう",
+   "pos": "noun",
+   "meaning": "margin of safety in valuation",
+   "defJa": "価値の見積もりと購入価格の間に設ける余地",
+   "passage": {
+    "ja": "企業の価値を細かく計算しても、将来の売上や利益を正確に知ることはできない。見積もった価値より十分低い価格で買おうとする安全余裕の考え方は、その不確実性を購入時の判断に組み込むものである。だが、見積もり自体が過大であれば、計算上の差が広いからといって、損失から守られるとは限らない。半導体需要の楽観的な予想を一つ採るだけで終えず、需要が弱い場合や設備の稼働が遅れる場合にも値を出し直すと、余裕がどこに依存しているかが露わになる。",
+    "form": "安全余裕",
+    "en": "Even a detailed valuation cannot reveal future sales and earnings with certainty. The concept of a margin of safety incorporates that uncertainty into the purchase decision by seeking a price well below estimated value. Yet if the estimate itself is excessive, a wide calculated gap does not necessarily protect against losses. Recalculating under weaker semiconductor demand or delayed factory operation, instead of relying on a single optimistic forecast, exposes what the apparent cushion depends on.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "見積もりの誤差を吸収する考え方で、保証ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "フリーキャッシュフロー",
+   "reading": "ふりーきゃっしゅふろー",
+   "pos": "noun",
+   "meaning": "free cash flow",
+   "defJa": "事業と必要な投資の後に残る現金の余力",
+   "passage": {
+    "ja": "半導体工場の新設は、決算の利益とは異なる時間軸で多額の現金を動かす。営業活動で得た現金から設備への支出などを差し引くフリーキャッシュフローは、投資後に残る資金の余力を読む手がかりとなる。ただし、計算に含める項目は資料によって異なるため、会社間で比較するにあたっては、指標の定義をそろえる作業が欠かせない。値が一時的にマイナスでも、それだけで経営不振とは断定できず、何に支出し、将来どのように回収する計画なのかが検討の焦点となる。",
+    "form": "フリーキャッシュフロー",
+    "en": "Building a semiconductor factory moves large amounts of cash on a different timeline from reported profit. Free cash flow, which subtracts spending such as capital investment from operating cash generated, helps reveal the funds remaining after investment. However, because the included items vary across documents, comparisons between companies require consistent definitions. A temporarily negative value alone does not establish poor business performance; attention turns to what was purchased and how the spending is expected to be recovered.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "計算の範囲が資料ごとに異なるため定義を確認する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "信用リスク",
+   "reading": "しんようりすく",
+   "pos": "noun",
+   "meaning": "credit risk",
+   "defJa": "相手が約束どおり支払えず損失が生じる危険",
+   "passage": {
+    "ja": "債券の仕組みを覚えるとき、満期にお金が戻るという説明だけで思考を止めないでください。発行した会社が経営難に陥れば、約束した利息や元本を支払えず、信用リスクが現実の損失につながる場合があります。価格の上がり下がりを予想する練習に加えて、誰が支払いを約束しているか、その資金をどう用意するかも図に書くと、別の種類の危険が浮かびます。半導体工場への巨額の投資を債券で賄う例なら、完成する時期と収益が入る時期を分けて追う練習にもなります。",
+    "form": "信用リスク",
+    "en": "When learning how bonds work, do not stop thinking at the explanation that money comes back at maturity. If the issuing company encounters financial trouble, it may fail to pay promised interest or principal, turning credit risk into an actual loss. Besides practicing predictions of price changes, diagramming who promises payment and how they will fund it reveals another kind of risk. The example of financing a major semiconductor factory investment through bonds also provides practice in separately tracing completion and the arrival of earnings.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "価格変動とは別に、支払う側の能力を問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自己言及",
+   "reading": "じこげんきゅう",
+   "pos": "noun",
+   "meaning": "self-reference",
+   "defJa": "言葉や仕組みがそれ自身を指し示すこと",
+   "passage": {
+    "ja": "「この文は日本語で書かれている」って読むと、文が外の出来事ではなく、自分自身を話題にしていると分かるよね。こうした自己言及は、ただ同じ言葉を繰り返すこととは違って、指す側と指される側が重なるところに特徴があるんだ。ホフスタッターの本を読むときも、この小さな仕掛けを意識すると、記号を扱う仕組みが自分の働きへ目を向けるという議論を追いやすくなる。もっとも、文が自分を指したからといって意識が生まれると結論できるわけではなく、その間にどんな説明があるかを探すのが面白いんだ。",
+    "form": "自己言及",
+    "en": "Reading “This sentence is written in Japanese,” you can see that the sentence discusses itself rather than an outside event. Such self-reference differs from merely repeating the same words because the referring entity and its referent overlap. Keeping this small device in mind when reading Hofstadter helps you follow discussions of a symbol-processing system turning toward its own activity. Of course, a sentence referring to itself does not establish that consciousness arises, and looking for the explanation connecting the two is part of the interest.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "指す側と指される側が重なる場面で使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "再帰",
+   "reading": "さいき",
+   "pos": "noun",
+   "meaning": "recursion",
+   "defJa": "同じ仕組みを自分の一部の処理にも使うこと",
+   "passage": {
+    "ja": "箱の中にさらに箱が入っている構造を、紙に三段だけ描いてみましょう。中身を調べる手順に「小さな箱があれば、その箱にも同じ手順を行う」と書くと、再帰という仕組みを具体的に追えます。ただし、箱がなくなったときの終わり方を決めないまま手順を増やしても、いつ処理を返せばよいかが定まりません。プログラムを覚えるに先立って、どこで問題が小さくなり、どの状態ならその場で答えられるかを図に書くと、呼び出しの行きと帰りを区別して練習できます。",
+    "form": "再帰",
+    "en": "Draw just three levels of boxes nested inside other boxes on paper. Writing a procedure that says to apply the same procedure to any smaller box lets you follow recursion concretely. However, adding steps without specifying how to finish when no box remains leaves it unclear when processing should return. Before memorizing the program, marking where the problem shrinks and which states can be answered immediately lets you practice distinguishing the outward calls from their returns.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "問題を小さくする操作と停止の条件を組にする。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "奇妙なループ",
+   "reading": "きみょうなるーぷ",
+   "pos": "noun",
+   "meaning": "strange loop",
+   "defJa": "階層をたどると自分へ戻る自己言及的な構造",
+   "passage": {
+    "ja": "ホフスタッターの議論を紹介する文章で、奇妙なループを単に「同じことの繰り返し」と言い換えると、肝心な仕掛けが消えてしまいます。区別されていたはずの階層をたどっていくうちに、出発した自分自身へ戻ってくるという構造を、説明の中心に置きたいところです。彼はこの発想を自己の成り立ちを考えるためにも用いますが、その提案をもって意識の仕組みが実験で証明されたとは書けません。比喩が読者を引き付けるほど、構造の説明と心についての仮説との境目を、文の主語や述語で丁寧に示します。",
+    "form": "奇妙なループ",
+    "en": "When introducing Hofstadter's ideas, paraphrasing a strange loop as merely repeating the same thing removes its essential device. The explanation should center on following supposedly distinct levels until one returns to the referring self. He also uses this idea to explore the formation of the self, but that proposal does not establish that experiments have proved how consciousness works. The more engaging the metaphor becomes, the more carefully subjects and predicates should mark the boundary between describing a structure and proposing a hypothesis about the mind.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "ホフスタッターの議論では階層の越境が要点。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "決算短信",
+   "reading": "けっさんたんしん",
+   "pos": "noun",
+   "meaning": "earnings report summary",
+   "defJa": "企業が決算の概要を速やかに伝える開示資料",
+   "passage": {
+    "ja": "「利益が倍増した」という見出しを直すなら、何と比べた数字なのかをまず補います。上場会社が決算の概要を知らせる決算短信には、売上高や利益に加えて、業績予想などが記載され、見出しを裏付ける手がかりが集まっています。ただし、実績と予想を同じ文に並べる際には、どこから先が会社の見通しなのかを明示しないと、まだ得ていない利益まで確定した事実のように読めてしまいます。半導体の市況を論じる短い記事であっても、比較した期間と数字の性格は省かずに残します。",
+    "form": "決算短信",
+    "en": "When editing a headline saying that profit doubled, first specify what it was compared with. An earnings report summary issued by a listed company provides sales, profits, forecasts, and other information that can support the headline. However, when actual results and forecasts appear in the same sentence, failing to identify where the company's outlook begins may make unearned profits sound like established facts. Even in a short article discussing semiconductor market conditions, retain the comparison period and the nature of the figures.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "見出しの数字を、本文の対象期間と結び付ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,183 @@
+{
+ "batch": "r5-ai-037",
+ "items": [
+  {
+   "term": "不完全性定理",
+   "reading": "ふかんぜんせいていり",
+   "gloss": "incompleteness theorem",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "工場の小さな異常から工程の全体像へ",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Incompleteness requires effectively axiomatized, consistent, sufficiently strong arithmetic theories. Never claim all formal systems incomplete or that no truths are provable. Distinguish truth from provability in a specified system."
+  },
+  {
+   "term": "ゲーデル数",
+   "reading": "げーでるすう",
+   "gloss": "Gödel number",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "形式体系",
+   "reading": "けいしきたいけい",
+   "gloss": "formal system",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Naturally name ホフスタッター where useful. His strange loops return through levels to the referring system, not just ordinary repetition or circular process; his account of self/consciousness is a proposal, not an experimentally established mechanism."
+  },
+  {
+   "term": "無矛盾性",
+   "reading": "むむじゅんせい",
+   "gloss": "consistency of a formal system",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Incompleteness requires effectively axiomatized, consistent, sufficiently strong arithmetic theories. Never claim all formal systems incomplete or that no truths are provable. Distinguish truth from provability in a specified system."
+  },
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "gloss": "provability",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Incompleteness requires effectively axiomatized, consistent, sufficiently strong arithmetic theories. Never claim all formal systems incomplete or that no truths are provable. Distinguish truth from provability in a specified system."
+  },
+  {
+   "term": "停止問題",
+   "reading": "ていしもんだい",
+   "gloss": "halting problem",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "対角線論法",
+   "reading": "たいかくせんろんぽう",
+   "gloss": "diagonal argument",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "固定点",
+   "reading": "こていてん",
+   "gloss": "fixed point",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "安全余裕",
+  "自己言及",
+  "再帰",
+  "奇妙なループ",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

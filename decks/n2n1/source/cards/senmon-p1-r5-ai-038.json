@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "基底条件",
+   "reading": "きていじょうけん",
+   "pos": "noun",
+   "meaning": "base case in recursion",
+   "defJa": "処理をさらに繰り返さず答えを返す条件",
+   "passage": {
+    "ja": "ある計算を小さな問題へ分けて解くプログラムでは、これ以上分けずに答えを返せる場合を先に定める。再帰処理の基底条件が抜けていれば、似た処理を呼ぶ動作だけが続き、想定した終了に届かない場合がある。一方で、終了する場合を書いたとしても、各段階の入力がそこへ近づく設計でなければ、それだけで停止は保証されない。実装の検証では、空のデータや最小の入力を試すとともに、問題の大きさがどう減るかを追い、終点とそこまでの道筋を一組として確認する。",
+    "form": "基底条件",
+    "en": "A program that solves a calculation by dividing it into smaller problems first specifies cases where it can return an answer without further division. If the base case is missing from recursion, calls to similar processing may continue without reaching the intended end. Conversely, merely writing a terminating case does not guarantee termination unless successive inputs are designed to approach it. Verification tests empty data and minimal inputs while tracing how problem size decreases, checking the endpoint together with the path leading to it.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "小さい問題へ分ける手順の終点を明示する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "動的計画法",
+   "reading": "どうてきけいかくほう",
+   "pos": "noun",
+   "meaning": "dynamic programming",
+   "defJa": "重なる小問題の解を蓄えて全体を解く方法",
+   "passage": {
+    "ja": "目的地までの道をすべて別々に調べると、途中の同じ地点から先の計算を何度も繰り返してしまうことがある。重なる小問題の答えを保存し、それらを組み合わせて全体を解く動的計画法は、この重複に目を向ける。もっとも、保存する項目を増やすだけで効率が上がるわけではなく、何をひとつの状態とし、どの答えから次を求めるかを定めなければならない。速さの工夫に見える手法の中心に、問題をどう切り分け、過去の結果をどの単位で引き継ぐかという表現の選択が潜んでいる。",
+    "form": "動的計画法",
+    "en": "Examining every route to a destination separately can repeat the same calculation for the remaining journey from a shared intermediate point. Dynamic programming addresses this duplication by saving answers to overlapping subproblems and combining them to solve the whole. Simply storing more items does not necessarily improve efficiency; one must define a state and specify which answers produce the next. At the heart of what looks like a speed optimization lies a choice of representation: how to divide the problem and in what units to carry earlier results forward.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "同じ小問題を何度も解かず、結果を組み合わせる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "メモ化",
+   "reading": "めもか",
+   "pos": "noun",
+   "meaning": "memoization",
+   "defJa": "一度求めた計算結果を保存して再利用すること",
+   "passage": {
+    "ja": "同じ入力の計算を何度も頼まれるなら、前の答えを置いておけば、毎回最初から解き直さずに済むよね。このメモ化という工夫は、同じ小問題が繰り返し現れるプログラムで、計算の重複を減らすのに役立つんだ。ただし、保存するぶんだけ記憶領域を使うし、外部の状態で結果が変わる処理なら、前の答えをそのまま返してよいか慎重に考えたい。同じ依頼に見えても時刻や在庫が違えば答えも変わるとしたら、何を入力として記録するかが、速さ以上に大事になることもあるよ。",
+    "form": "メモ化",
+    "en": "If the same calculation is requested repeatedly with the same input, keeping the earlier answer avoids solving it from scratch every time. Memoization reduces duplicate computation in programs where identical subproblems recur. However, storing results consumes memory, and if external state affects a result, one must carefully consider whether reusing an earlier answer is valid. When apparently identical requests produce different answers because the time or inventory has changed, deciding what to record as input can matter even more than speed.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "同じ入力なら同じ結果になるかも確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "階層構造",
+   "reading": "かいそうこうぞう",
+   "pos": "noun",
+   "meaning": "hierarchical structure",
+   "defJa": "複数の段階が上下の関係で組み合わさる構成",
+   "passage": {
+    "ja": "画面上の一つの操作も、その下では命令の処理や電気信号の変化に支えられている。異なる説明の段階を重ねた階層構造は、複雑な計算機を理解する助けになる一方で、ある段で使った比喩を別の段へ持ち込む危うさも生む。ホフスタッターの議論で段階の境界を越える仕掛けが印象に残るのは、まず境界を明確なものとして描く習慣があるからだろう。上にある説明が下の仕組みを不要にするのでもなく、部品を列挙すれば画面上の意味が尽くされるのでもないという緊張が、読みを深める。",
+    "form": "階層構造",
+    "en": "A single on-screen action is supported underneath by instruction processing and changes in electrical signals. A hierarchical structure layering different levels of explanation helps us understand a complex computer, while also creating the risk of carrying a metaphor from one level into another. Devices that cross levels in Hofstadter's discussions may be memorable partly because we are accustomed to drawing those boundaries clearly in the first place. Reading deepens through the tension between higher-level explanations not making lower-level mechanisms unnecessary and lists of components not exhausting the meaning of what appears on screen.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "段の高さが優劣を意味するとは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "記号接地問題",
+   "reading": "きごうせっちもんだい",
+   "pos": "noun",
+   "meaning": "symbol grounding problem",
+   "defJa": "記号の意味を他の記号だけでなくどう支えるかの問い",
+   "passage": {
+    "ja": "知らない言語の辞書を、その言語の説明だけで読もうとする場面を想像してみましょう。語を引くたびに別の未知の語が出てくれば、記号を並べ替えることと意味を理解することの隔たりを実感できます。こうした隔たりから、記号の意味を外の対象や経験とどう結び付けるかを問う記号接地問題へ進むと、人工知能をめぐる議論の焦点がつかめます。ただし、画像を入力できるようにしたからといって、その問いがすべて解決したとは言えず、どんな結び付きが成立したのかを具体例で検討します。",
+    "form": "記号接地問題",
+    "en": "Imagine trying to read a dictionary in an unfamiliar language using only explanations in that language. If each lookup yields more unknown words, you can experience the gap between rearranging symbols and understanding meaning. Moving from that gap to the symbol grounding problem, which asks how meanings connect to external objects or experience, helps identify a focus of debates about artificial intelligence. Adding image input alone does not settle every part of the question, so examine concrete examples of what connections have actually been established.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "辞書の循環と、対象との結び付きの違いを考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "再帰呼び出し",
+   "reading": "さいきよびだし",
+   "pos": "noun",
+   "meaning": "recursive call",
+   "defJa": "関数が処理の途中で自分自身を実行すること",
+   "passage": {
+    "ja": "フォルダの中身を調べる関数が、子のフォルダを見つけたら、自分と同じ関数にその中身の調査を任せるとします。このような再帰呼び出しでは、任せた処理が終わった後、元の続きへ戻るための情報も保持されます。箱を開ける動作だけを思い浮かべがちですが、開け終えて戻る道を記録する点にも、処理の仕組みが表れています。深い構造を扱うともなれば、その記録が多くなるため、正しい結果が出ることに加えて、使える記憶領域の範囲で動くかも確かめます。",
+    "form": "再帰呼び出し",
+    "en": "Suppose a function inspecting a folder delegates inspection of any child folder to the same function. With such a recursive call, information is retained so execution can return to the original continuation after the delegated work finishes. Although it is easy to imagine only opening boxes, recording the route back also reveals how the processing works. Deep structures require more records, so besides producing the correct result, the program must be checked for operation within available memory.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "戻る場所を保ちながら、小さい問題を処理する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "メタ言語",
+   "reading": "めたげんご",
+   "pos": "noun",
+   "meaning": "metalanguage",
+   "defJa": "別の言語の仕組みや表現を記述するための言語",
+   "passage": {
+    "ja": "プログラムの説明に「ここでは文を読む」と書くと、実行する命令のことか、説明書の一文のことかが曖昧になります。対象となる言語を記述するメタ言語と、その対象自体を分けて意識すれば、同じ「文」という語が指すものを整理できます。例えば、命令の書き方を日本語で解説する場合、説明に使う日本語と、引用した命令とは別の役割を担っています。専門的な議論であれ、引用符や「この説明では」という短い補足を置くだけで、読者が言葉の段階を行き来する負担を減らせます。",
+    "form": "メタ言語",
+    "en": "Writing “Read the statement here” in a program explanation can leave it unclear whether one means an executable instruction or a sentence in the manual. Distinguishing the metalanguage used to describe a language from that language itself helps clarify what the same word “statement” refers to. For example, when instructions are explained in Japanese, the explanatory Japanese and the quoted instructions serve different roles. Even in a technical discussion, quotation marks or a short clarification such as “in this explanation” can reduce the burden of moving between levels of language.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "使っている言葉と、説明の対象の言葉を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自己相似",
+   "reading": "じこそうじ",
+   "pos": "noun",
+   "meaning": "self-similarity",
+   "defJa": "部分に全体と同じか似た形が現れる性質",
+   "passage": {
+    "ja": "枝の先を拡大したら、元の木に似た枝分かれが見えるという図を描いたことあるかな。部分に全体と似た形が現れる自己相似を、コンピュータの画面で試すなら、同じ描き方を縮めながら繰り返すと様子を追えるよ。ただし、本物の木がどこまでも完全に同じ形を繰り返すわけではないし、画面にも細かさの限界があるんだ。似た模様が見えたことだけで自然の仕組みを説明し終えたと思わず、どの大きさの範囲まで似ているのかを確かめると、図から立てる仮説が少し具体的になるね。",
+    "form": "自己相似",
+    "en": "Have you ever drawn a tree whose magnified branch tips resemble the branching of the whole tree? To experiment with self-similarity on a computer screen, you can repeat the same drawing procedure at progressively smaller scales. However, a real tree does not repeat an identical shape indefinitely, and a screen also has limits of detail. Rather than treating a similar pattern as a complete explanation of nature, checking the scales over which the resemblance holds makes the hypothesis drawn from the image more specific.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "繰り返しの中でも、縮尺を変えた形の対応を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

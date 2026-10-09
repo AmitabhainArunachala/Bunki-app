@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "分散合意",
+   "reading": "ぶんさんごうい",
+   "pos": "noun",
+   "meaning": "distributed consensus",
+   "defJa": "複数の計算機で共通の決定を成立させること",
+   "passage": {
+    "ja": "複数のサーバーが同じ注文を扱う説明で、「みんなで多数決をする」とだけ書くと、届かない連絡や遅れた返事が見落とされます。分散合意を紹介するなら、別々の計算機が障害や通信の遅れに備えながら、同じ決定を共有するための仕組みだと補います。採る方式に応じて前提も保証も変わるため、すべての装置がいつでも同時に同じ状態になると描くのは正確ではありません。比喩を残す場合も、「誰の返事を待つか」「途中で連絡が切れたらどうするか」を添えると、技術の問いに近づけます。",
+    "form": "分散合意",
+    "en": "Describing multiple servers handling one order as merely taking a majority vote overlooks messages that never arrive and delayed replies. An introduction to distributed consensus should explain mechanisms through which separate computers share the same decision while accounting for failures and communication delays. Assumptions and guarantees vary by method, so depicting every machine as always reaching the same state simultaneously is inaccurate. Even when retaining a metaphor, adding questions about whose response to await and what happens when communication breaks brings it closer to the technical problem.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "多数決という比喩だけで通信障害を片付けない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

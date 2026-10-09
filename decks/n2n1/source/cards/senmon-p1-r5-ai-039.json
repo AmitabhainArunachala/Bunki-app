@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "不変条件",
+   "reading": "ふへんじょうけん",
+   "pos": "noun",
+   "meaning": "invariant",
+   "defJa": "処理の各段階で成り立ち続けるべき性質",
+   "passage": {
+    "ja": "探索する範囲が狭まるたびに、変数の値は変わっていく。それでも「目的の値が存在するなら、この範囲内にある」という不変条件を保てれば、処理が何を保証しながら進むかを説明できる。変わらないものを探すという発想は、動きを止めるためではなく、変化の途中で失ってはならない関係を見つけるためにある。プログラムの正しさを論じる際には、最初に成り立つこと、各操作で保たれること、終了時に欲しい結論へつながることを結び、長い手順に一本の筋を通す。",
+    "form": "不変条件",
+    "en": "As a search range narrows, the variables change. Yet maintaining the invariant that the target lies within the range if it exists explains what the procedure guarantees as it advances. Looking for something unchanged is not about stopping movement but identifying a relationship that must survive it. A correctness argument connects the initial validity of the condition, its preservation by every operation, and its implication for the desired conclusion at termination, giving a long procedure a coherent thread.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "値が動かないことではなく、関係が保たれること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "型推論",
+   "reading": "かたすいろん",
+   "pos": "noun",
+   "meaning": "type inference",
+   "defJa": "式や使われ方から値の種類を導く処理",
+   "passage": {
+    "ja": "変数の種類を一つずつ書かなくても、周囲の式や使われ方から必要な型を導く言語処理系がある。この型推論によって記述を簡潔にできる一方で、どこまで自動的に判断できるかは、言語が採る規則によって異なる。例えば、数値を足す式として扱われる場所に文字列を渡す場合、型の条件が合わないことを実行前に検出できる仕組みもある。ただし、型の検査を通っただけで計算の目的まで正しいとは言えず、金額の足し忘れのような論理上の誤りには、別の検証が求められる。",
+    "form": "型推論",
+    "en": "Some language implementations derive the required types from surrounding expressions and usage without explicit annotations on every variable. Type inference can make programs more concise, but its automatic reach depends on the language's rules. For example, some systems detect before execution that passing a string where numeric addition is expected violates type constraints. Passing type checks does not establish that a calculation achieves its intended purpose; logical mistakes such as omitting an amount still require other verification.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "型を書かないことと、型がないことを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "計算可能性",
+   "reading": "けいさんかのうせい",
+   "pos": "noun",
+   "meaning": "computability",
+   "defJa": "一定の手順で求める答えに到達できる性質",
+   "passage": {
+    "ja": "新しい問題を解くとき、速い装置を用意すればいつか答えが出ると考える前に、手順そのものが存在するかを問いましょう。計算可能性を学ぶ場面では、必要な時間が長いという事情と、あらゆる入力について正しく答える手順が存在しないという限界を区別します。前者なら計算資源やアルゴリズムの工夫が役立ち得ますが、後者を単なる処理速度の不足として扱うと、問題の性質を取り違えます。練習のノートにも「解けるか」と「どれくらいかかるか」の欄を分け、同じ難しさという言葉でまとめないようにします。",
+    "form": "計算可能性",
+    "en": "Before assuming that faster equipment will eventually solve a new problem, ask whether a procedure exists at all. Studying computability requires distinguishing a long running time from the absence of a procedure that correctly answers for every input. Resources or algorithmic improvements may help in the former case, but treating the latter as merely insufficient speed misidentifies the problem. Keep separate notebook columns for whether a problem can be solved and how long it takes, rather than compressing both into the word difficulty.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "速さの評価より前に、解く手順の存在を問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "キャッシュ整合性",
+   "reading": "きゃっしゅせいごうせい",
+   "pos": "noun",
+   "meaning": "cache coherence",
+   "defJa": "複数の保存写しが矛盾しないように扱う性質",
+   "passage": {
+    "ja": "複数の処理装置が同じデータの写しを近くに置くと、毎回遠くの記憶装置まで読みに行く手間を減らせます。ただし、一つの装置が値を書き換えた後も別の装置が古い写しを使えば、計算結果が食い違う原因になります。キャッシュ整合性を学ぶときは、写しを更新する場合と、古い写しを無効にして取り直させる場合を、小さな図で比べると仕組みを追えます。単に保存場所を増やすだけでは済まない点に着目し、読み出す順序や更新の通知を矢印で加えると、速さを支える通信の仕事も見えます。",
+    "form": "キャッシュ整合性",
+    "en": "Keeping local copies of the same data near multiple processors reduces repeated trips to more distant memory. However, if one processor changes a value while another uses an old copy, the calculations may disagree. When studying cache coherence, small diagrams comparing updates to copies with invalidation and refetching help make the mechanism traceable. Focusing on why adding storage alone is insufficient, and drawing arrows for read order and update notifications, also reveals the communication supporting the speed.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "更新や無効化により、古い写しの利用を調整する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ハッシュ関数",
+   "reading": "はっしゅかんすう",
+   "pos": "noun",
+   "meaning": "hash function",
+   "defJa": "データを一定の規則で所定範囲の値に変える関数",
+   "passage": {
+    "ja": "たくさんの名前を探すたびに全部読み直すのは、名簿が長くなるほど大変だよね。ハッシュ関数で名前から置き場所の目印になる値を計算すれば、探す先を絞る仕組みを作れるんだ。ただし、置き場所の数が限られる以上、違う名前から同じ値が出る場合もあるので、そこで名前を見比べるなど、衝突への備えを省けない。値が一致したからといって中身まで同じだと決めつけず、候補を見つける仕事と本人を確かめる仕事を分けると、便利さと限界が一緒に理解できるよ。",
+    "form": "ハッシュ関数",
+    "en": "Rereading every name whenever you search becomes harder as a directory grows. Using a hash function to calculate a value that identifies a storage location from a name can narrow the search. Because there are finitely many locations, however, different names can produce the same value, so collision handling such as comparing the actual names cannot be omitted. Separating the work of finding candidates from verifying identity helps explain both the benefits and limits without assuming equal values mean equal contents.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "異なる入力が同じ値になる可能性も含めて考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "スタック",
+   "reading": "すたっく",
+   "pos": "noun",
+   "meaning": "stack data structure",
+   "defJa": "最後に入れたものから取り出す記憶の仕組み",
+   "passage": {
+    "ja": "皿を上へ積み重ね、使うときも一番上から取る様子を思い浮かべてください。計算機のスタックも、最後に入れた情報を先に取り出すという順序を持ち、処理の途中で戻る場所を覚える際などに使われます。ある関数が別の関数を呼べば、後から始まった処理を終えてから、前の続きへ戻る流れをこの順序で管理できます。ただし、積める量には限りがあるため、呼び出しを深く重ねる設計では、計算の答えだけでなく、記録が置き場を使い切らないかという制約も考えます。",
+    "form": "スタック",
+    "en": "Imagine stacking plates upward and taking the top one when needed. A computer stack likewise removes the most recently inserted information first and is used for tasks such as remembering where execution should return. When one function calls another, this order manages the flow of finishing the later operation before resuming the earlier one. Because the available capacity is limited, deeply nested calls require considering not only the answer but also whether their records exhaust the storage space.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "後入れ先出しという順序を、入れ物の比喩で示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "二分探索",
+   "reading": "にぶんたんさく",
+   "pos": "noun",
+   "meaning": "binary search",
+   "defJa": "整列した範囲を半分ずつ絞って探す方法",
+   "passage": {
+    "ja": "「真ん中を見ると速く探せる」という説明だけでは、ばらばらに置かれた番号札にも使える方法だと思われます。二分探索を紹介する文なら、番号順に並んだ範囲の中央を調べ、目的の番号との大小関係で残す半分を決める、と前提を添えます。範囲が狭まるたびに同じ判断を繰り返すので、端から一つずつ調べる方法との違いも具体的になります。速さを強調するにしても、並べ替えに必要な手間と、目的の値が存在しない場合の終わり方まで一緒に示すと、手順の使いどころが正確に伝わります。",
+    "form": "二分探索",
+    "en": "Saying only that looking in the middle makes searching faster may suggest that the method works on randomly arranged numbered cards. An explanation of binary search should state the premise: inspect the center of an ordered range and retain the half determined by comparing it with the target. Repeating the same decision as the range shrinks also makes the contrast with checking entries one by one concrete. Even when emphasizing speed, including sorting costs and how the search ends when the value is absent accurately communicates where the procedure applies.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "整列済みという前提を説明から落とさない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
