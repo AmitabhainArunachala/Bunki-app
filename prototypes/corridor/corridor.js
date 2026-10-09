@@ -9735,8 +9735,8 @@ function voicePendingNote(id) {
     'Approved voices: Kore (main), Charon (second).'));
   const sentence = id === 'sentence-listening-pending';
   pending.append(uiIcon('speaker'), el('span', 'l-ja', sentence
-    ? tx('この文の音声はまだない', 'No audio for this sentence yet')
-    : tx('この記事の音声はまだない', 'No audio for this article yet')));
+    ? tx('この文の収録音声はありません', 'No recording for this sentence')
+    : tx('この記事の収録音声はありません', 'No recording for this article')));
   return pending;
 }
 
