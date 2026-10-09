@@ -114,6 +114,9 @@
  *                         (ダマスカス, whose popup opens after its dictionary rows load) and a content word
  *                         (その); each returned card, and a card whose sentence is opened while it is still
  *                         rising, sits on the word card's seat within 1px. Control: 890cd522.
+ *                         A word card below 大丈夫 in やまなし at 390×844 keeps that below seat and its
+ *                         top within 1px when its shorter sentence opens; the anchor and article scroll
+ *                         stay unchanged, with no page errors. Control: 98f29059.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "Simplified: the same story
  *                         in easier Japanese." (round 4: shorter), and an article without a
@@ -1120,6 +1123,51 @@ try {
       return { door: row.label, pane, quote: active.quote.slice(0, 20) };
     });
 
+    await run('G6-sentence-below-seat-390', PHONE, async (page) => {
+      const pageErrors = [];
+      page.on('pageerror', (error) => pageErrors.push(error.message));
+      await open(page);
+      await page.locator('#shelf-body [data-passage="aozora:046605"] .shelf-open').first().click();
+      const token = page.locator('#reader .tok[data-index="816"]');
+      await token.waitFor();
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(500);
+      await page.evaluate(() => window.scrollTo(0, 4716));
+      await token.click();
+      await page.waitForSelector('#mini #mini-sentence-open');
+      await page.waitForTimeout(400);
+      const seat = () => page.evaluate(() => {
+        const anchor = document.querySelector('#reader .tok[data-index="816"]').getBoundingClientRect();
+        const mini = document.querySelector('#mini'), card = mini.getBoundingClientRect();
+        return {
+          word: mini.querySelector('.mini-word')?.textContent,
+          anchor: { top: anchor.top, bottom: anchor.bottom, left: anchor.left, right: anchor.right },
+          card: { top: card.top, bottom: card.bottom,
+            side: card.top >= anchor.bottom ? 'below' : card.bottom <= anchor.top ? 'above' : 'overlap' },
+          sentence: mini.querySelector('.mini-sentence-pane')?.hidden === false,
+          quote: mini.querySelector('.mini-sentence-full')?.textContent,
+          scrollY,
+        };
+      });
+      const word = await seat();
+      assert.equal(word.word, '大丈夫', 'token 816 of やまなし opens its own word');
+      assert.equal(word.scrollY, 4716, 'The public below-word fixture uses article scroll 4716');
+      assert.equal(word.card.side, 'below', `the public fixture must start with the word card below its anchor: ${JSON.stringify(word)}`);
+      assert.equal(word.sentence, false, 'The public fixture starts on the word view');
+      await page.locator('#mini #mini-sentence-open').click();
+      await page.waitForTimeout(400);
+      const sentence = await seat();
+      assert.equal(sentence.sentence, true, 'Study this sentence opens the sentence view');
+      assert.equal(sentence.quote, '大丈夫だ、安心しろ。', 'The sentence view carries the chosen public sentence');
+      assert.equal(sentence.card.side, 'below', `opening a shorter sentence must keep the below-word seat: ${JSON.stringify({ word, sentence })}`);
+      assert(Math.abs(sentence.card.top - word.card.top) <= 1,
+        `opening a shorter sentence moved the below-word card's top: ${JSON.stringify({ word, sentence })}`);
+      assert.equal(sentence.scrollY, word.scrollY, 'Opening the below-word sentence must not move the article scroll');
+      assert.deepEqual(sentence.anchor, word.anchor, 'Opening the below-word sentence must not move its token anchor');
+      assert.deepEqual(pageErrors, [], 'The public below-word sentence path must have no page errors');
+      return { article: 'aozora:046605', index: 816, word, sentence, pageErrors };
+    });
+
     for (const [label, viewport] of [['390', PHONE], ['320', NARROW]]) {
       await run(`G6-sentence-pane-seat-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
@@ -1436,9 +1484,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, and Japanese punctuation line breaks with source text preserved',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
     results,
-    passed: results.length === engines.length * 48 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 49 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

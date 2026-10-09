@@ -8705,6 +8705,9 @@ function placeFloating(card, r) {
     ? `${Math.max(0, (window.innerWidth - m.width) / 2)}px`
     : `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   card.style.top = `${top}px`;
+  // CSS rounds fractional positions; retain the exact calculated seat for the sentence pin.
+  if (Number.isFinite(top)) card.dataset.floatingTop = String(top);
+  else delete card.dataset.floatingTop;
   // which side of its word the card stands on: its shade falls away from the word, never across it
   card.dataset.side = top < r.top ? 'above' : 'below';
   revealFloatingFocus(card);
@@ -8831,8 +8834,11 @@ function readerSentenceRow(node, index) {
   // the pane to the available space. Back on the word, the card sits beside its word again.
   const show = (open, { focus = true } = {}) => {
     const card = wrap.closest('#mini');
-    if (card && open) card.dataset.pinTop = String(parseFloat(card.style.top));
-    else if (card) delete card.dataset.pinTop;
+    if (card && open) {
+      const exactTop = card.dataset.floatingTop;
+      card.dataset.pinTop = exactTop !== undefined && Number.isFinite(Number(exactTop))
+        ? exactTop : String(parseFloat(card.style.top));
+    } else if (card) delete card.dataset.pinTop;
     pane.hidden = !open;
     door.hidden = open;
     door.setAttribute('aria-expanded', String(open));
