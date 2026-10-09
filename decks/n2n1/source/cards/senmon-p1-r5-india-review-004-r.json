@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "法話",
+   "reading": "ほうわ",
+   "pos": "noun",
+   "meaning": "Buddhist sermon, dharma talk",
+   "defJa": "仏教の教えを聞き手に説き伝える話",
+   "passage": {
+    "ja": "寺院では法要の前後などに、僧が聞き手へ教えを説く時間が設けられることがある。法話は仏教の教えを伝える話であり、経典の説明や日常の出来事を通じて、慈悲や無常といった主題を聞き手へ届ける。説教や説法と重なる用法もあるため、語の違いだけから内容や長さを一律に決めることはできない。話の記録を読む際には、どのような場で誰に向けて語られたかも確かめることで、同じ教義が聞き手の生活と結び付けられながら伝えられる過程を捉えられる。",
+    "form": "法話",
+    "en": "Temples may set aside time around ceremonies for clergy to address listeners. A Dharma talk conveys Buddhist teachings through scriptures and everyday events, including themes such as compassion and impermanence. Usage overlaps with related words for preaching, so the label alone cannot fix content or duration. Identifying the setting and audience reveals how doctrine is communicated in relation to listeners’ lives.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「法話を聞く」。説教や説法と重なる用法があり、内容は場に応じて異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "釈迦如来",
+   "reading": "しゃかにょらい",
+   "pos": "noun",
+   "meaning": "Śākyamuni Buddha (as icon)",
+   "defJa": "悟りを開いた釈迦を仏として呼ぶ名",
+   "passage": {
+    "ja": "日本の仏像を調べる際には、歴史上の人物と信仰の中で伝えられた姿との関係が手掛かりとなる。釈迦如来は悟りを開いた釈迦を仏として呼ぶ名であり、京都の清凉寺には宋からもたらされた立像が伝わる。この像は釈迦が生きていたときの姿を写したという信仰を集め、日本でもその姿にならった像が多く作られた。実際の容貌が確認されたという意味ではなく、伝承が像の受け止め方や模像の制作にどう関わったかを見ることで、一体の仏像から文化の伝わる道筋を追うことができる。",
+    "form": "釈迦如来",
+    "en": "Japanese Buddhist images invite attention to the relationship between historical figures and forms transmitted through devotion. Shakyamuni Buddha names the awakened Shakyamuni, and Kyoto’s Seiryoji preserves a standing image brought from Song China. Revered as conveying his appearance during life, it inspired many Japanese copies. This does not establish his actual features but shows how devotional tradition shaped reception and reproduction across cultures.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏としての釈迦を指す名で、像に関わる伝承と歴史的な確認を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "真言",
+   "reading": "しんごん",
+   "pos": "noun",
+   "meaning": "mantra; the Shingon school",
+   "defJa": "密教で仏の真実の言葉として唱える語句",
+   "passage": {
+    "ja": "密教の儀礼では、日常の会話とは異なる音の連なりが、繰り返し唱えられることがあります。真言は仏の真実の言葉として受け継がれる語句で、インドに由来する音を保ちながら唱える実践と深く結び付いています。身体で印を結ぶことや心に仏を観じることと合わせて、声を出す行いが修行の中に位置付けられます。音を伝えることと意味を学ぶことは同じ作業ではありませんが、意味を考えてはいけないということでもなく、誰からどのように学び、何を表す言葉として唱えるかに目を向けると理解が深まります。",
+    "form": "真言",
+    "en": "Esoteric rituals may repeat sound sequences unlike ordinary conversation. Mantras are transmitted as true words of Buddhas, with recitation preserving sounds originating in India. Vocal practice is situated alongside bodily gestures and visualizing the Buddha. Transmitting sound differs from studying meaning without forbidding it, and attention to how words are learned and understood deepens interpretation.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏の言葉として唱える語句を指し、特定の文字表記だけに限定しない。",
+    "sense": "密教で唱える聖なる語の意。宗派名としては別義"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "無常",
+   "reading": "むじょう",
+   "pos": "noun",
+   "meaning": "impermanence; transience of all things",
+   "defJa": "条件によって生じたものが移り変わること",
+   "passage": {
+    "ja": "蝋燭の炎は同じ場所に灯っていても、空気の流れや燃える蝋に応じて形を変え続けます。仏教の無常は、条件によって生じたものが変化し、同じままではとどまらないことを示す教えです。大切な人との関係や自分の気分にも変化があると知ることは、それらを無価値と決めることとは違います。今日あるものが当然明日も同じだと考える心を見直すとき、移り変わりの観察は、失う不安だけを強める話ではなく、いま目の前の人や出来事にどう関わるかを考える手掛かりになります。",
+    "form": "無常",
+    "en": "A candle flame changes with air and burning wax even while remaining in one place. Buddhist impermanence describes the changing character of things arising through conditions. Recognizing change in relationships or moods does not declare them worthless. Questioning the assumption that tomorrow must preserve today can guide present engagement rather than merely intensify fear of loss.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "条件によって生じたものの変化を述べ、その価値を否定する言葉とは分ける。",
+    "sense": "ここでは仏教の根本思想の意。人や世の移り変わるさまにも使う。"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "無明",
+   "reading": "むみょう",
+   "pos": "noun",
+   "meaning": "ignorance (avidyā), root delusion",
+   "defJa": "物事の真実を知らず迷いを生む根本的な無知",
+   "passage": {
+    "ja": "仏教の文章で知らないことが問題にされていても、単に覚えた情報が少ないという意味とは限りません。無明は真実を知らずに迷いを生む根本的な無知を指し、苦が条件に応じて生じることを説く十二因縁にも位置付けられます。知識の量と混同しないために、その文章が何を見誤っていると述べるのか、具体的な説明を探してみましょう。変化するものを変わらないと捉えるなど、見方の問題に注目すると、用語の定義を覚える作業が、自分の理解の仕方を問い直す学びにもつながります。",
+    "form": "無明",
+    "en": "Ignorance in Buddhist writing does not always mean having memorized too little information. Fundamental ignorance gives rise to delusion and has a place in the twelve links describing conditioned suffering. Looking for what a text says is misunderstood distinguishes it from quantity of knowledge. Attention to views such as treating changing things as permanent connects definitions with examination of one’s understanding.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "情報量の不足だけでなく、真実を見誤るという教義上の意味を押さえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ノンデュアリティ",
+   "reading": "のんでゅありてぃ",
+   "pos": "noun",
+   "meaning": "non-duality, contemporary spiritual-books term",
+   "defJa": "二つに分かれたものと見ない非二元の捉え方",
+   "passage": {
+    "ja": "見る自分と見られる世界を、初めから完全に切り離してよいのだろうか。ノンデュアリティは非二元を表す語だが、インドのアドヴァイタと仏教の議論では、自己や実在をめぐる説明が同じとは限らない。一つの究極的な実在を認める立場も、固定した自己を問い直す立場も、似た言葉で紹介されるため、体験の印象だけでは違いを見分けにくい。どの伝統が何を二つとせず、何を根拠にそう述べるのかを読むことで、共通の看板の下にある思想の距離を保ったまま、対話の可能性を考えられる。",
+    "form": "ノンデュアリティ",
+    "en": "Should the observing self and observed world be assumed completely separate from the outset? Nonduality names a nondual understanding, but Advaita and Buddhist discussions do not necessarily offer the same accounts of self and reality. Similar language can introduce both a single ultimate reality and challenges to fixed selfhood, so experiential impressions alone obscure differences. Examining what each tradition refuses to divide and why permits dialogue without erasing philosophical distance.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "非二元を指す広い語で、全ての用法を同一の一元論にまとめない。",
+    "sense": "ここでは現代書の通俗的な用法で、教義の違いまでは区別しない語"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不二一元",
+   "reading": "ふにいちげん",
+   "pos": "noun",
+   "meaning": "non-dual monism (Advaita)",
+   "defJa": "自己と世界の究極の根本を別としないインドの立場",
+   "passage": {
+    "ja": "自分と世界は別々だという見方を、究極のところから問い直すインドの哲学があります。不二一元はアドヴァイタの考え方を表し、個人の根底にある自己と、世界の究極の根本であるブラフマンとは別々ではないと説きます。日常の性格や持ち物がすべて同じになるという話ではなく、何を本当の自己や実在と捉えるかが議論の中心です。仏教の無我と比べる場合にも、似た瞑想を行うから同じ結論になると考えず、それぞれが何を認め何を否定しているかを確かめることで、思想の違いを明確にできます。",
+    "form": "不二一元",
+    "en": "An Indian philosophical approach questions the separation of self and world at the ultimate level. Advaita holds that the self underlying the individual is not separate from Brahman, the ultimate ground of reality. The issue is what counts as true self and reality rather than making everyday personalities and possessions identical. Comparison with Buddhist no-self requires examining each teaching’s affirmations and denials instead of inferring identical conclusions from similar practices.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "アドヴァイタの立場を示し、日常の違いが全て消えるという説明とは分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "曼荼羅",
+   "reading": "まんだら",
+   "pos": "noun",
+   "meaning": "mandala",
+   "defJa": "仏や菩薩の配置などで教えの世界を表すもの",
+   "passage": {
+    "ja": "複雑な人間関係を描いた図を、宗教の言葉で比喩的に呼ぶことがあります。曼荼羅をそのように使う場合でも、仏や菩薩の配置などによって教えの世界を表し、密教の儀礼や観想と関わるものだという背景を押さえておくと、連想の根拠が伝わります。絵として描かれたものや立体的に構成されたものなど形はさまざまで、全てを人が歩き入る地図として説明することはできません。比喩で用いる際は、複雑さだけを強調するのか、配置によって関係を示す点を借りるのかを明らかにすると、言葉の働きが具体的になります。",
+    "form": "曼荼羅",
+    "en": "A diagram of complex human relationships may receive a religious term metaphorically. A mandala represents a teaching’s world through arrangements of Buddhas and bodhisattvas and relates to esoteric ritual and contemplation. Forms include paintings and three-dimensional arrangements, so they cannot all be described as maps physically entered. Clarifying whether a metaphor borrows complexity or relational arrangement makes its purpose concrete.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "比喩で使う場合も、図や配置が教えを表すという元の意味を押さえる。",
+    "sense": "密教の儀礼図の意と、現代の比喩用法とがある"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
