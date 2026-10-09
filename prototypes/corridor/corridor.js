@@ -8730,15 +8730,36 @@ function placeFloating(card, r) {
   const ceiling = Math.max(8, fixedEdge('#app > .chrome', 'bottom') ?? 0);
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
-  // The sentence pane keeps the word card's top edge, including when a long quote is taller.
-  // It scrolls within the space on that side rather than exposing a clipped title above it.
+  const sentence = card.classList.contains('is-sentence');
+  let seatHeight = m.height;
+  // Reserve the real sentence view's space before the word popup appears. The inert
+  // measuring copy is removed synchronously, so its layout never becomes a frame or a control.
+  if (window.innerWidth <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
+    const measure = card.cloneNode(true);
+    measure.classList.add('is-sentence');
+    measure.inert = true;
+    measure.setAttribute('aria-hidden', 'true');
+    delete measure.dataset.flow;
+    Object.assign(measure.style, { position: 'fixed', top: '0', left: '0', width: `${m.width}px`, maxHeight: 'none',
+      overflow: 'visible', visibility: 'hidden', pointerEvents: 'none', animation: 'none', transform: 'none' });
+    for (const node of measure.querySelectorAll('*')) { node.removeAttribute('id'); node.style.animation = 'none'; }
+    measure.querySelector('.mini-sentence-pane').hidden = false;
+    measure.querySelector('.mini-sentence-open').hidden = true;
+    try {
+      card.parentElement.append(measure);
+      const expanded = measure.getBoundingClientRect().height;
+      if (expanded <= floor - ceiling) seatHeight = Math.max(seatHeight, expanded);
+    } finally { measure.remove(); }
+  }
+  // The sentence pane replaces the word card and keeps its top edge. It may grow past
+  // the former word's anchor, using the whole screen below that saved edge.
   const pinned = card.dataset.pinTop ? Number(card.dataset.pinTop) : NaN;
-  const pinnedRoom = pinned < r.top ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
+  const pinnedRoom = !sentence && pinned < r.top ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
   const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinnedRoom >= 96
-    && (pinned < r.top || pinned >= r.bottom + 10);
+    && (sentence || pinned < r.top || pinned >= r.bottom + 10);
   // A long sentence is a full document card on a phone: the page carries its text and actions.
   // Keep the short word card's fixed seat, and restore that reading position on Back.
-  const documentFlow = window.innerWidth <= 520 && card.classList.contains('is-sentence')
+  const documentFlow = window.innerWidth <= 520 && sentence
     && (wasDocument || m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96)));
   if (documentFlow) {
     if (!wasDocument) card.dataset.flowScroll = String(window.scrollY);
@@ -8759,8 +8780,17 @@ function placeFloating(card, r) {
       card.style.overflowY = 'auto';
     }
   }
-  else if (m.height <= roomAbove) top = r.top - 10 - m.height;
-  else if (m.height <= roomBelow) top = r.bottom + 10;
+  else if (seatHeight <= roomAbove) top = r.top - 10 - seatHeight;
+  else if (seatHeight <= roomBelow) top = r.bottom + 10;
+  else if (seatHeight > m.height && seatHeight <= floor - ceiling) {
+    top = ceiling;
+    // The word view still ends before its anchor; only the expanded sentence uses
+    // the reserved room below it. The next printed word stays available to tap.
+    if (m.height > roomAbove) {
+      card.style.maxHeight = `${Math.max(96, roomAbove)}px`;
+      card.style.overflowY = 'auto';
+    }
+  }
   else {
     const room = Math.max(roomAbove, roomBelow, 96);
     card.style.maxHeight = `${room}px`;
