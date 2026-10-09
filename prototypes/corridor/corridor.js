@@ -11441,7 +11441,7 @@ function todayLearning(tag, cls, text) {
  * bracket. Pairs with word-break: keep-all in the room's CSS; plain text without Intl.Segmenter. */
 function todayPhrases(node, text) {
   const s = String(text || '');
-  let seg = null;
+  let seg;
   try {
     seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
   } catch {
@@ -11698,7 +11698,9 @@ function todayPlaceSky(hero) {
 /** The day's word, large, with its reading, its hook and the door that follows its part. */
 function renderTodayWord(pick) {
   const block = el('div', 'today-dayword');
-  block.append(el('p', 'dw-label', tx('今日のことば', "Today's word")));
+  const label = el('p', 'dw-label', tx('今日のことば', "Today's word"));
+  label.dataset.japaneseLookup = 'off';
+  block.append(label);
   const word = el('button', 'dw-word');
   word.type = 'button';
   word.dataset.uiContentValue = `語|${pick.word}`;
@@ -17668,7 +17670,7 @@ function wwParts(c) {
   return kept.sort((a, b) => size.get(a) - size.get(b));
 }
 function wwWord(w) {
-  let rec = null;
+  let rec;
   try { rec = lookup(w); } catch { rec = null; }
   const graded = D.words[w];
   const senses = rec?.m?.length ? rec.m : graded?.g ? [graded.g] : [];
@@ -29508,25 +29510,94 @@ let lastRenderedView = null;
  * Search stays synchronous so iOS can open its keyboard from the original tap. */
 let roomTransitionUpdating = false;
 let activeRoomTransition = null;
+let activeRoomArrival = null;
+/** A late dictionary/audio redraw keeps the same fade and its elapsed time. */
+function continueRoomArrival(main) {
+  const arrival = activeRoomArrival;
+  if (!arrival || arrival.view !== S.view || !main) return;
+  const elapsed = Math.max(0, performance.now() - arrival.startedAt);
+  arrival.main = main;
+  if (elapsed >= arrival.duration) {
+    arrival.animations = [];
+    arrival.done = Promise.resolve();
+    return;
+  }
+  main.style.viewTransitionName = 'none';
+  main.style.setProperty('--room-arrival-delay', `${-elapsed}ms`);
+  main.dataset.roomArrival = '1';
+  arrival.animations = (main.getAnimations?.({ subtree: false }) || [])
+    .filter((animation) => animation.animationName === 'kairo-room-arrive');
+  arrival.done = Promise.all(arrival.animations.map((animation) => animation.finished.catch(() => {})));
+  const animation = arrival.animations[0];
+  animation?.ready.then(() => {
+    if (activeRoomArrival === arrival && arrival.animations[0] === animation) {
+      arrival.startedAt = performance.now() - elapsed - (Number(animation.currentTime) || 0);
+    }
+  }, () => {});
+}
 function roomTransition(change) {
   if (roomTransitionUpdating) return change();
-  if (!S.ready || !document.startViewTransition || document.hidden) {
+  if (!S.ready || document.hidden) {
     roomTransitionUpdating = true;
     try { return change(); } finally { roomTransitionUpdating = false; }
   }
   activeRoomTransition?.skipTransition();
   const html = document.documentElement;
+  const departing = document.querySelector('#app > main');
+  // Capture only the departing room. Captured incoming DOM cannot receive a
+  // pointer until the native transition finishes, so the next room stays live.
+  departing?.removeAttribute('data-room-arrival');
+  departing?.removeAttribute('data-enter');
+  departing?.style.removeProperty('--room-arrival-delay');
+  if (departing && document.startViewTransition) departing.style.viewTransitionName = 'kairo-room';
   html.dataset.roomTransition = '1';
-  const transition = document.startViewTransition(() => {
+  let incoming = null;
+  let arrival = null;
+  const update = () => {
     roomTransitionUpdating = true;
-    try { return change(); } finally { roomTransitionUpdating = false; }
-  });
-  activeRoomTransition = transition;
-  transition.finished.catch(() => {}).finally(() => {
+    try { return change(); } finally {
+      incoming = document.querySelector('#app > main');
+      if (departing !== incoming) departing?.style.removeProperty('view-transition-name');
+      if (incoming) {
+        // With no departing snapshot (for example the universe), native
+        // finished can settle first. Keep the live fade for its actual length.
+        arrival = { view: S.view, main: incoming, startedAt: performance.now(),
+          duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 80 : 220,
+          animations: [], done: Promise.resolve() };
+        activeRoomArrival = arrival;
+        continueRoomArrival(incoming);
+      }
+      roomTransitionUpdating = false;
+    }
+  };
+  const arrivalDone = async () => {
+    while (arrival && activeRoomArrival === arrival) {
+      const latest = arrival.done;
+      await latest;
+      if (latest === arrival.done) return;
+    }
+  };
+  const clear = (transition) => {
     if (activeRoomTransition !== transition) return;
     activeRoomTransition = null;
+    const lastMain = arrival?.main || incoming;
+    lastMain?.removeAttribute('data-room-arrival');
+    lastMain?.style.removeProperty('view-transition-name');
+    lastMain?.style.removeProperty('--room-arrival-delay');
+    if (activeRoomArrival === arrival) activeRoomArrival = null;
     delete html.dataset.roomTransition;
-  });
+  };
+  if (!document.startViewTransition) {
+    // Unsupported browsers still change routes and restore focus synchronously.
+    // Only their arriving, live room fades; no native snapshot is needed.
+    const fallback = { skipTransition: () => arrival?.animations.forEach((animation) => animation.cancel()) };
+    activeRoomTransition = fallback;
+    try { return update(); } finally { arrivalDone().finally(() => clear(fallback)); }
+  }
+  const transition = document.startViewTransition(update);
+  activeRoomTransition = transition;
+  transition.ready.catch(() => {});
+  transition.finished.catch(() => {}).then(arrivalDone).finally(() => clear(transition));
   return transition;
 }
 /* ------------------------------------------------------ corridor paper worlds
@@ -30600,7 +30671,7 @@ function buildGingaChrome(root) {
   if (S.view === 'drift' && !S.navOpen) {
     const waiting = S.taken.length && scheduler ? todayQueue().order.length : 0;
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
-      waiting ? `今日 · 復習 ${waiting}` : '今日', waiting ? `Today · ${waiting} due` : 'Today');
+      waiting ? `今日 · ${waiting}枚` : '今日', waiting ? `Today · ${waiting} card${waiting === 1 ? '' : 's'}` : 'Today');
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');
@@ -30819,7 +30890,7 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       count.dataset.due = String(due);
       count.setAttribute('aria-hidden', 'true');
       button.append(count);
-      button.setAttribute('aria-label', tx(`今日 · 復習 ${due}`, `Today · ${due} due`));
+      button.setAttribute('aria-label', tx(`今日 · ${due}枚`, `Today · ${due} card${due === 1 ? '' : 's'}`));
     }
     if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
     // A finished sitting is still Today's current station. Its explicit return above the
@@ -32102,6 +32173,8 @@ function render() {
   // a page change cross-fades in (FEEL pass 2026-10-02); a re-render of the same room never fades
   if (lastRenderedView && lastRenderedView !== S.view) main.dataset.enter = '1';
   root.append(main);
+
+  if (!roomTransitionUpdating) continueRoomArrival(main);
 
   if (!S.ready) {
     main.append(el('div', 'loading', tx('回廊 をひらいています…', 'opening the corridor…')));

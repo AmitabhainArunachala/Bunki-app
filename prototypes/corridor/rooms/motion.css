@@ -1,29 +1,28 @@
-/* A room change holds the departing frame while the next room arrives.
-   Native group geometry animation is disabled: only opacity/transform move. */
-#app > main { view-transition-name: kairo-room; }
+/* The departing frame fades over the live incoming room. Capturing the new
+   room would disable its hit testing until the native transition finishes. */
+:root, #app > main { view-transition-name: none; }
+html[data-room-transition] #app > main[data-room-arrival] {
+  animation: kairo-room-arrive 220ms ease both !important;
+  animation-delay: var(--room-arrival-delay, 0ms) !important;
+}
 #primary-tabs .primary-tab:disabled { opacity: 1; cursor: default; }
 ::view-transition { pointer-events: none; }
 ::view-transition-group(*) { animation: none; }
 ::view-transition-image-pair(*) { isolation: isolate; }
-::view-transition-old(root), ::view-transition-new(root) {
-  mix-blend-mode: normal;
-  animation: kairo-room-fade-out 220ms ease both;
-}
-::view-transition-new(root) { animation-name: kairo-room-fade-in; }
-::view-transition-old(kairo-room), ::view-transition-new(kairo-room) {
+::view-transition-old(kairo-room) {
   mix-blend-mode: normal;
   animation: kairo-room-leave 220ms cubic-bezier(.22, 1, .36, 1) both;
 }
-::view-transition-new(kairo-room) { animation-name: kairo-room-arrive; }
 @keyframes kairo-room-fade-out { to { opacity: 0; } }
-@keyframes kairo-room-fade-in { from { opacity: 0; } }
 @keyframes kairo-room-leave { to { opacity: 0; transform: translateY(-6px); } }
-@keyframes kairo-room-arrive { from { opacity: 0; transform: translateY(10px); } }
+/* Opacity keeps fixed reader/card docks anchored to the viewport. */
+@keyframes kairo-room-arrive { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root), ::view-transition-old(kairo-room) {
+  ::view-transition-old(kairo-room) {
     animation: kairo-room-fade-out 80ms linear both;
   }
-  ::view-transition-new(root), ::view-transition-new(kairo-room) {
-    animation: kairo-room-fade-in 80ms linear both;
+  html[data-room-transition] #app > main[data-room-arrival] {
+    animation: kairo-room-arrive 80ms linear both !important;
+    animation-delay: var(--room-arrival-delay, 0ms) !important;
   }
 }

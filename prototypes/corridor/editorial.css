@@ -2091,6 +2091,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
     content: '';
     position: fixed;
     z-index: 40;
+    pointer-events: none;
     left: 0;
     right: 0;
     bottom: 0;
@@ -5015,3 +5016,21 @@ body[data-view='reader']:has(#mini) #reader-take { visibility: hidden; pointer-e
 body[data-view='settings'] #app > .chrome :is(#lang, #theme-seal) { visibility: hidden; pointer-events: none; }
 /* Read's inline lookup lives in Tools. Exactly one lookup door is visible. */
 body[data-view='shelf']:has(#shelf-tools-panel:not([hidden])) #chrome-search { visibility: hidden; pointer-events: none; }
+/* Words already owns the focused search field. Keep the chrome's slot quiet. */
+body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: none; }
+
+/* Revealing the shelf tools answers the press without moving the reading lead. */
+#shelf-tools-panel:not([hidden]) { animation: feel-fade 160ms ease-out; }
+
+/* A reduced-motion response is a short change of ink, rather than a hard cut.
+   These explicit surfaces override corridor.css's older blanket zero-duration
+   rule; ambient loops and unrelated children remain still. */
+@media (prefers-reduced-motion: reduce) {
+  body #app :is(.sheet, .scrim, .nav-bar, .corner-bubble, .shelf-study-tools:not([hidden]), .review-face, .review-clear, .review-rise-w, .reveal, .grade-row .grade),
+  body > :is(.sheet, .scrim, .world-picker, .world-picker-scrim),
+  body #mini,
+  body .reader-toast:not([hidden]) {
+    animation: feel-fade 80ms linear both !important;
+    animation-delay: 0ms !important;
+  }
+}
