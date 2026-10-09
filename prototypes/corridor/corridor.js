@@ -6523,11 +6523,18 @@ function focusLearningSourceCaller(focusId) {
   const popup = /^reader-word:(\d+):(.+)$/u.exec(focusId || '');
   if (popup) {
     const word = document.querySelector(`#reader .tok[data-index="${popup[1]}"]`);
-    if (word) readerTokenDoors.get(word)?.reopen();
-    const target = document.getElementById(popup[2]);
-    // a choice inside the popup's sentence pane: the pane opens first, so the reader lands where it left
-    if (target?.closest('.mini-sentence-pane')?.hidden) target.closest('.mini-sentence-wrap')?.openSentence?.();
-    (target || word)?.focus({ preventScroll: true });
+    const land = () => {
+      const target = document.getElementById(popup[2]);
+      // a choice inside the popup's sentence pane: the pane opens first, so the reader lands where it left
+      if (target?.closest('.mini-sentence-pane')?.hidden) target.closest('.mini-sentence-wrap')?.openSentence?.();
+      (target || word)?.focus({ preventScroll: true });
+    };
+    const reopened = word ? readerTokenDoors.get(word)?.reopen() : null;
+    if (typeof reopened?.then !== 'function') { land(); return; }
+    word.focus({ preventScroll: true });
+    void reopened.then(() => {
+      if (word.isConnected && miniAnchor === word && document.activeElement === word) land();
+    });
     return;
   }
   document.getElementById(focusId)?.focus({ preventScroll: true });
@@ -8542,9 +8549,6 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     removeMini();
     span.focus({ preventScroll: true });
   });
-  mini.addEventListener('focusin', () => {
-    requestAnimationFrame(() => { if (mini.isConnected) revealFloatingFocus(mini); });
-  });
   document.body.append(mini);
   miniAnchor = span;
   keepFloatingBeside(mini, span);
@@ -8641,6 +8645,9 @@ function miniKanjiWeb(word, anchor) {
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor) {
   placeFloating(card, anchor.getBoundingClientRect());
+  card.addEventListener('focusin', () => {
+    requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
+  });
   if (typeof ResizeObserver !== 'function') return;
   let last = card.getBoundingClientRect().height;
   const watch = new ResizeObserver(() => {
@@ -8824,7 +8831,7 @@ function readerSentenceRow(node, index) {
   // the pane to the available space. Back on the word, the card sits beside its word again.
   const show = (open, { focus = true } = {}) => {
     const card = wrap.closest('#mini');
-    if (card && open) card.dataset.pinTop = String(card.getBoundingClientRect().top);
+    if (card && open) card.dataset.pinTop = String(parseFloat(card.style.top));
     else if (card) delete card.dataset.pinTop;
     pane.hidden = !open;
     door.hidden = open;
@@ -9301,7 +9308,7 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   };
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     if (named) markReaderReading(index);
-    void openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index),
+    return openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index),
       focusPopup: modality === 'keyboard' }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
   };
   span.addEventListener('click', (event) => {

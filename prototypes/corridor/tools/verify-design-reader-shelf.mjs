@@ -88,6 +88,10 @@
  *                         whose inline "New list" field makes a list holding the word and whose checkbox
  *                         takes it off again while the card stays; at 390 the popover is a short sheet
  *                         on the screen's foot. Control: 3166ded3.
+ *                         In the galaxy, where a word's entry opens over the sky and a word of its example
+ *                         sentences opens the same popup, the path is the same: no list before Save, the
+ *                         list beside "Saved ✓", and none again after Undo. Control: 890cd522, which
+ *                         showed "Add to a list" beside an unsaved Save there.
  *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
  *                         action shows outside the popup); the popup's last band is one named door,
  *                         "Study this sentence", showing the sentence's start; it opens the sentence in
@@ -101,15 +105,24 @@
  *                         the popup and article scroll stays still on opening, Tab to Ask/Practice,
  *                         and return from Practice, including a shorter kana-word card whose sentence
  *                         needs more room than its word view.
+ *                         With motion enabled (390 and 320), return from Practice lands on the sentence
+ *                         pane with Practice focused and wholly visible for a particle (の), a lookup word
+ *                         (ダマスカス, whose popup opens after its dictionary rows load) and a content word
+ *                         (その); each returned card, and a card whose sentence is opened while it is still
+ *                         rising, sits on the word card's seat within 1px. Control: 890cd522.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "Simplified: the same story
  *                         in easier Japanese." (round 4: shorter), and an article without a
  *                         simplified version shows no switch. Control: 3166ded3 ("easier N3", no caption).
  *                         On a phone (390 and 320) each side of the switch and its ⓘ is a box at least
  *                         44px tall and wide (the brief's hit floor; added in round 4's review).
- *   G8 motion            — at 390 and 320, computed nonzero transitions and animation keyframes on the
- *                         reader's controls and word/sentence popup use transform and opacity only,
- *                         with reduced motion disabled so the rule cannot pass by suppressing motion.
+ *   G8 motion            — at 390 and 320, computed nonzero transitions and animation keyframes use
+ *                         transform and opacity only, with reduced motion disabled so the rule cannot
+ *                         pass by suppressing motion, across the reader room (#app: the top bar, the tab
+ *                         bar, the title card, bookmarks, the play bar, the article and its footer), its
+ *                         text settings, the word menu, the word/sentence popup, the Save toast, and the
+ *                         list sheet reached by Save, then Add to a list. Control: 890cd522, whose chips,
+ *                         top bar, tab bar and settings choices animated colour.
  *   G9 Japanese breaks   — at 390 and 320, the source title and article text survive unchanged, opening
  *                         brackets share a painted line with the following glyph, closing punctuation
  *                         shares one with the preceding glyph, and title lookup words do not split.
@@ -271,7 +284,11 @@ const measureReaderMotion = () => {
   const seconds = (value) => parseFloat(value) * (value.trim().endsWith('ms') ? 0.001 : 1);
   const violations = [];
   let transitions = 0, animations = 0;
-  const nodes = [...document.querySelectorAll('.reader-card button, .reader-card summary, #reader button, #mini, #mini *')];
+  const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #reader-word-menu, #reader-word-menu *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
+  const groups = { topBar: '#app > .chrome button', tabBar: '#primary-tabs .primary-tab', titleCard: '.reader-card button, .reader-card summary',
+    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader button', finished: '#read-fin', settings: '.dials .seg button',
+    menu: '#reader-word-menu', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
+  const covered = Object.fromEntries(Object.entries(groups).map(([group, selector]) => [group, nodes.filter((node) => node.matches(selector)).length]));
   for (const node of nodes) for (const pseudo of [null, '::before', '::after']) {
     const style = getComputedStyle(node, pseudo);
     const name = `${node.id || node.className}${pseudo || ''}`;
@@ -291,7 +308,7 @@ const measureReaderMotion = () => {
       for (const property of new Set(properties || [])) if (!allowed.has(property)) violations.push({ name, kind: 'animation', animation, property });
     });
   }
-  return { nodes: nodes.length, transitions, animations, violations };
+  return { nodes: nodes.length, transitions, animations, violations, covered };
 };
 
 /** WCAG contrast of a node's text against the first opaque background behind it. */
@@ -329,6 +346,22 @@ async function tapToken(page, index) {
   await page.mouse.click(box.x, box.y);
   await page.waitForTimeout(250);
 }
+
+/** The popup's painted box and which of its views is open. */
+const popupSeat = (page) => page.locator('#mini').evaluate((node) => {
+  const r = node.getBoundingClientRect();
+  return { top: r.top, bottom: r.bottom, word: node.querySelector('.mini-word')?.textContent ?? null,
+    sentence: node.querySelector('.mini-sentence-pane')?.hidden === false, scrollY };
+});
+
+/** The focused control, and whether it lies wholly inside the popup's painted box. */
+const popupFocus = (page) => page.evaluate(() => {
+  const mini = document.querySelector('#mini'), active = document.activeElement;
+  if (!mini || !active) return { id: active?.id ?? null, inside: false, shown: false, scrollY };
+  const r = active.getBoundingClientRect(), m = mini.getBoundingClientRect();
+  return { id: active.id, inside: mini.contains(active), scrollY,
+    shown: r.height > 0 && r.top >= m.top - 1 && r.bottom <= m.bottom + 1 && r.left >= m.left - 1 && r.right <= m.right + 1 };
+});
 
 try {
   for (const engine of engines) {
@@ -967,6 +1000,67 @@ try {
       });
     }
 
+    // the galaxy's own way to a word's entry is its tap ladder; the entry's example words open the same popup
+    await run('G5-galaxy-one-path', PHONE, async (page) => {
+      await page.goto(`${host.origin}/?entry=drift&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await page.waitForSelector('#drift-layer.active .word');
+      await page.waitForTimeout(2300);
+      let taps = 0;
+      for (; taps < 12 && !(await page.locator('#sheet').count()); taps += 1) {
+        const at = await page.evaluate(() => {
+          let word = document.querySelector('#drift-layer .word[data-one-path]');
+          if (!word?.getBoundingClientRect().width) {
+            word = [...document.querySelectorAll('#drift-layer .word')].find((node) => {
+              const r = node.getBoundingClientRect();
+              return r.width && /[\u4e00-\u9fff]/u.test(node.textContent) && parseFloat(node.style.opacity || '1') > 0.5
+                && r.left > 60 && r.right < innerWidth - 60 && r.top > 260 && r.bottom < innerHeight - 200;
+            });
+            if (word) word.dataset.onePath = '1';
+          }
+          const r = word?.getBoundingClientRect();
+          return r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+        });
+        if (at) await page.mouse.click(at.x, at.y);
+        await page.waitForTimeout(700);
+      }
+      const entry = await page.evaluate(() => ({ view: document.body.dataset.view, node: document.querySelector('#sheet')?.dataset.node ?? null }));
+      assert(entry.view === 'drift' && entry.node?.startsWith('word:'), `the galaxy's taps did not open a word's entry over the sky: ${JSON.stringify({ taps, entry })}`);
+      await page.waitForFunction(() => document.querySelectorAll('#sheet .example .sentence-tok').length > 0);
+      await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8_000 }).catch(() => {});
+      await page.waitForTimeout(400);
+      const path = () => page.evaluate(() => {
+        const mini = document.getElementById('mini'), take = mini?.querySelector('#mini-take'), lists = mini?.querySelector('#mini-lists');
+        const shown = (node) => !!node && node.getClientRects().length > 0 && getComputedStyle(node).visibility !== 'hidden';
+        return { view: document.body.dataset.view, word: mini?.querySelector('.mini-word')?.textContent ?? null, save: take?.textContent ?? null,
+          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasList: !!lists, list: shown(lists), note: shown(mini?.querySelector('.mini-take-note')) };
+      });
+      // a word of an example sentence whose Save is live and not yet pressed
+      let before = null;
+      const tokens = page.locator('#sheet .example .sentence-tok');
+      for (let i = 0, n = Math.min(await tokens.count(), 30); i < n && !before; i += 1) {
+        await tokens.nth(i).scrollIntoViewIfNeeded();
+        await tokens.nth(i).click();
+        await page.waitForTimeout(250);
+        const seen = await path();
+        if (seen.hasList && seen.held === false && seen.pressed === 'false') before = seen;
+        else await page.keyboard.press('Escape');
+      }
+      assert(before, 'no example word in the galaxy entry offers a live, unpressed Save');
+      assert(before.view === 'drift' && before.save === 'Save' && !before.list && before.note, `the galaxy popup offers a list before the word is saved: ${JSON.stringify(before)}`);
+      await page.locator('#mini #mini-take').click();
+      await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
+      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 1, { description: 'the galaxy popup saved one card' });
+      const saved = await path();
+      assert(saved.save === 'Saved ✓' && saved.list && !saved.note, `after Save the galaxy popup does not offer the list: ${JSON.stringify(saved)}`);
+      await page.locator('#reader-toast-action').click();
+      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Undo takes the card out' });
+      await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 });
+      const undone = await path();
+      assert(undone.save === 'Save' && !undone.list && undone.note, `after Undo the galaxy popup still offers a list: ${JSON.stringify(undone)}`);
+      return { taps, entry: entry.node, word: before.word, before, saved, undone };
+    });
+
     await run('G6-sentence-row', DESK, async (page) => {
       await openArticle(page, ARTICLE);
       await tapToken(page, SUBURB);
@@ -1077,6 +1171,67 @@ try {
         assertFocus(returnedFocus, shortScroll, 'reader-sentence-practice');
         return { word, sentence, focus, askFocus, shortWord, shortSentence, shortFocus, shortAskFocus, practiceFocus, returnedFocus, kept: 1, activeRef: kept.teacherContexts.activeRef ?? null };
       });
+
+      await run(`G6-sentence-return-motion-${label}`, viewport, async (page) => {
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+        await openArticle(page, ARTICLE);
+        const putAway = async () => {
+          if (!await page.locator('#mini').count()) return;
+          await page.locator('#mini').focus();
+          await page.keyboard.press('Escape');
+        };
+        // の is a particle; ダマスカス is a name, whose popup opens through the lookup door once its dictionary
+        // rows are in; その is a content word. All three must come back the same way.
+        const problems = [], returns = {};
+        for (const [index, text] of [[4, 'の'], [0, 'ダマスカス'], [12, 'その']]) {
+          await tapToken(page, index);
+          await page.waitForSelector('#mini #mini-sentence-open');
+          await page.waitForTimeout(400); // the card has finished rising
+          const left = await popupSeat(page);
+          assert.equal(left.word, text, `token ${index} of the fixture article`);
+          await page.locator('#mini #mini-sentence-open').click();
+          await page.locator('#mini #reader-sentence-practice').click();
+          await page.waitForFunction(() => document.body.dataset.view === 'sentence-practice');
+          await page.locator('#sentence-practice-back').click();
+          await page.waitForFunction(() => document.body.dataset.view === 'reader');
+          await page.waitForFunction(() => document.activeElement?.id === 'reader-sentence-practice', null, { timeout: 5_000 })
+            .catch(() => {});
+          await page.waitForTimeout(400);
+          const focus = await popupFocus(page);
+          const returned = await page.locator('#mini').count() ? await popupSeat(page) : null;
+          returns[text] = { focus, returned };
+          if (focus.id !== 'reader-sentence-practice' || !focus.inside || !focus.shown) problems.push(`${text}: Practice is not focused and wholly visible inside the popup: ${JSON.stringify(focus)}`);
+          if (focus.scrollY !== left.scrollY) problems.push(`${text}: the article moved from ${left.scrollY} to ${focus.scrollY}`);
+          if (!returned?.sentence || returned.word !== text) problems.push(`${text}: its sentence pane did not reopen: ${JSON.stringify(returned)}`);
+          else {
+            await page.locator('#mini #mini-sentence-back').click();
+            await page.waitForTimeout(200);
+            const word = await popupSeat(page);
+            returns[text].word = word;
+            if (word.sentence || Math.abs(returned.top - word.top) > 1) problems.push(`${text}: the returned sentence card is off the word card's seat: ${JSON.stringify({ returned, word })}`);
+          }
+          await putAway();
+        }
+        // その once more: its sentence is opened by a second tap while the card is still rising
+        await tapToken(page, 12);
+        await page.waitForSelector('#mini #mini-sentence-open');
+        await page.waitForTimeout(400);
+        const settled = await popupSeat(page);
+        await putAway();
+        const point = (selector) => page.locator(selector).evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+        const tok = await point('#reader .tok[data-index="12"]');
+        await page.mouse.click(tok.x, tok.y);
+        const door = await point('#mini #mini-sentence-open');
+        await page.mouse.click(door.x, door.y);
+        await page.waitForFunction(() => document.querySelector('#mini .mini-sentence-pane')?.hidden === false);
+        await page.waitForTimeout(500);
+        const rising = await popupSeat(page);
+        if (rising.scrollY !== settled.scrollY || !rising.sentence || Math.abs(rising.top - settled.top) > 1) {
+          problems.push(`その: a sentence opened while the card rises is off the word card's seat: ${JSON.stringify({ settled, rising })}`);
+        }
+        assert.deepEqual(problems, [], 'Returning from Practice, and opening a sentence while the card rises, must land on the sentence pane at the word card\'s seat');
+        return { returns, settled, rising };
+      });
     }
 
     await run('G7-version-switch', DESK, async (page) => {
@@ -1115,11 +1270,41 @@ try {
         await tapToken(page, SUBURB);
         const word = await page.evaluate(measureReaderMotion);
         assert(word.nodes > 100 && word.transitions > 0 && word.animations > 0, `motion check did not observe the reader and popup: ${JSON.stringify(word)}`);
+        for (const group of ['topBar', 'tabBar', 'titleCard', 'bookmark', 'playBar', 'words', 'finished', 'popup']) {
+          assert(word.covered[group] > 0, `motion check did not observe the reader's ${group}: ${JSON.stringify(word.covered)}`);
+        }
         assert.deepEqual(word.violations, [], 'Reader and word popup may animate only transform and opacity');
         await page.locator('#mini #mini-sentence-open').click();
         const sentence = await page.evaluate(measureReaderMotion);
         assert.deepEqual(sentence.violations, [], 'The sentence popup may animate only transform and opacity');
-        return { word, sentence };
+        // the popup's own path, by its public controls: Save, its toast, then Add to a list and the sheet's Add
+        await page.locator('#mini #mini-sentence-back').click();
+        await page.locator('#mini #mini-take').click();
+        await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
+        await page.waitForSelector('#reader-toast:not([hidden])');
+        const saved = await page.evaluate(measureReaderMotion);
+        assert(saved.covered.toast === 1 && saved.animations > word.animations - 1, `motion check did not observe the Save toast: ${JSON.stringify(saved.covered)}`);
+        assert.deepEqual(saved.violations, [], 'The saved popup and its toast may animate only transform and opacity');
+        await page.locator('#mini #mini-lists').click();
+        await page.waitForSelector('#vocabulary-list-popover #vocabulary-list-create');
+        const lists = await page.evaluate(measureReaderMotion);
+        assert.equal(lists.covered.listAdd, 1, `motion check did not observe the list sheet's Add: ${JSON.stringify(lists.covered)}`);
+        assert.deepEqual(lists.violations, [], 'The list sheet may animate only transform and opacity');
+        await page.keyboard.press('Escape');
+        await page.keyboard.press('Escape');
+        await page.locator('#dials-toggle').click();
+        await page.waitForSelector('.dials .seg button');
+        const settings = await page.evaluate(measureReaderMotion);
+        assert(settings.covered.settings > 0, `motion check did not observe the text settings: ${JSON.stringify(settings.covered)}`);
+        assert.deepEqual(settings.violations, [], 'The text settings may animate only transform and opacity');
+        await page.locator('#dials-toggle').click();
+        await page.locator(`#reader .tok[data-index="${SUBURB}"]`).focus();
+        await page.keyboard.press('Shift+F10');
+        await page.waitForSelector('#reader-word-menu');
+        const menu = await page.evaluate(measureReaderMotion);
+        assert.equal(menu.covered.menu, 1, `motion check did not observe the word menu: ${JSON.stringify(menu.covered)}`);
+        assert.deepEqual(menu.violations, [], 'The word menu may animate only transform and opacity');
+        return { word, sentence, saved, lists, settings, menu };
       });
 
       await run(`G9-japanese-line-breaks-${label}`, viewport, async (page) => {
@@ -1222,9 +1407,9 @@ try {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion, and Japanese punctuation line breaks with source text preserved',
+    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, and Japanese punctuation line breaks with source text preserved',
     results,
-    passed: results.length === engines.length * 45 && results.every((row) => row.passed),
+    passed: results.length === engines.length * 48 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

@@ -293,3 +293,28 @@ No protected storage marker/function changed. A byte audit against `3d81031b` co
 - The first-pass assessment-written-section failure is historical and outside the finish battery; it was not retested in this pass. No claim is made that it is resolved.
 
 The current user's instruction to execute the finish brief authorizes adopting its glossary audio copy. There is no separately obtained lead reply; this report makes the provenance decision explicit without claiming an additional approval.
+
+### Gate review, after the verified artifact
+
+The gate reviewed `890cd522` and found four defects. All four were reproduced on that code and are fixed. **These fixes change product bytes** (`prototypes/corridor/corridor.js` and `prototypes/corridor/rooms/read.css`), so artifact `34cf6d10…` does not contain them. The verification table and photographs above describe `40806a26` and nothing later. The required battery and the photographs have to be run again on a clean build of the commit that carries these fixes.
+
+| Finding | What was wrong on `890cd522` | Fix | Check that now holds it |
+|---|---|---|---|
+| 1. One path in the galaxy | In the galaxy, a word's entry opens over the sky and its example words open the same popup. There "Add to a list" stood beside an unsaved Save, because the one rule that honours the path's `hidden` attribute excluded that view and a shared rule gave the button a display of its own. | That one rule now applies in every view. No galaxy styling was added. | `G5-galaxy-one-path`: real taps to the entry, then no list before Save, the list after it with one card, and none after Undo. |
+| 2. Motion outside the title card | Fix 3 above claimed transform and opacity only "in the reader and popup", but G8 measured only the title card, the article's words and the popup. The top bar, the 日本語 / EN switch, the tab bar, the bookmark and finished chips, the text settings choices and the list sheet's Add still animated colour through shared rules. | Scoped overrides in `rooms/read.css`, in the reader room and on the list sheet's Add: colour changes at once, and a chip's press keeps its 140ms transform. No skin token or shell rule was edited. Outside the reader room the only change is the list sheet's Add, which this lane already restyles. | G8 measures all of `#app` in the reader room, the word menu, the popup, the toast and the list sheet, across six stages, and names the groups it must have seen. |
+| 3. Return from Practice on a lookup word | A name, kana run or ending opens its popup after its dictionary rows load. Returning from Practice looked for the Practice button before that popup existed, so the reader landed on the word with the sentence pane closed. | The lookup door's reopen returns its promise. The return focuses the word, then opens the pane and focuses Practice once the popup is there, provided the word is still on the page, the popup is its own and focus has not moved. The particle popup now shares the same focus reveal as the word popup. | `G6-sentence-return-motion-390` and `-320`, with motion enabled, on の (a particle), ダマスカス (a lookup word) and その (a content word). |
+| 4. The pinned seat | The sentence pane pinned itself to the card's painted box, which includes the entrance animation's offset. On return from Practice, or on a quick second tap, the card sat up to 10px low with 10px less room. | The pin is the laid-out top that placement already wrote. | The same two cases: the returned card and a card opened while rising sit within 1px of the word card's seat. |
+
+Fix 3's row in the table above is true of what G8 measured at the time. It holds for the whole reader room only from this round.
+
+**What was run in this round.** Only `verify-design-reader-shelf`, as the focused check for the changed files.
+
+| Build | Engine | Result |
+|---|---|---|
+| Rebuild of `890cd522`, clean source, digest `34cf6d10…` (identical to the verified artifact) | Chromium | 43/48. The five failures are the three new cases and the two widened G8 cases, which is the reproduction. The return cases report ダマスカス on its word view, and の, その and the rising その each 10px below the seat. |
+| Fixed worktree, `sourceDirty: true`, digest `67d67bed…` | Chromium | 48/48 |
+| Fixed worktree, same build | WebKit | 48/48 |
+
+Logs and receipts are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-fix-01M4GJ26/`. The canonical site, logs, receipts and photographs under `r4-finish` were not touched.
+
+**Still open from this round.** The particle popup's shared focus reveal is covered by the return case but was not shown failing before the fix: on `890cd522` の's Practice was already visible on return. The reviewed build was reproduced in Chromium only. No other suite was run on the fixed code here: the storage, accessibility, relief, reader-doors, reader-lookup, annotation-lookup and corridor suites last passed on `40806a26`. Night worlds, the 日本語 interface and the 1368 width were not measured by the new motion stages. The galaxy case reaches its entry through whichever kanji word the sky offers first inside the safe area (触れる in both engines here).
