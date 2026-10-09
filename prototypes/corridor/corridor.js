@@ -8542,6 +8542,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     removeMini();
     span.focus({ preventScroll: true });
   });
+  mini.addEventListener('focusin', () => {
+    requestAnimationFrame(() => { if (mini.isConnected) revealFloatingFocus(mini); });
+  });
   document.body.append(mini);
   miniAnchor = span;
   keepFloatingBeside(mini, span);
@@ -8696,6 +8699,17 @@ function placeFloating(card, r) {
   card.style.top = `${top}px`;
   // which side of its word the card stands on: its shade falls away from the word, never across it
   card.dataset.side = top < r.top ? 'above' : 'below';
+  revealFloatingFocus(card);
+}
+
+/** Reveal a focused control inside a clipped card without scrolling the article or moving the card. */
+function revealFloatingFocus(card) {
+  const control = document.activeElement;
+  if (!control || control === card || !card.contains(control)) return;
+  const box = card.getBoundingClientRect(), focus = control.getBoundingClientRect();
+  if (!focus.height) return;
+  if (focus.bottom > box.bottom - 8) card.scrollTop += focus.bottom - (box.bottom - 8);
+  else if (focus.top < box.top + 8) card.scrollTop -= box.top + 8 - focus.top;
 }
 
 /* The popup's last band in an article: one named door into the word's sentence (John #18: the floating
@@ -8815,7 +8829,9 @@ function readerSentenceRow(node, index) {
     door.hidden = open;
     door.setAttribute('aria-expanded', String(open));
     card?.classList.toggle('is-sentence', open);
-    if (focus) (open ? buttons.find((button) => !button.disabled) || back : door).focus({ preventScroll: true });
+    if (card && miniAnchor?.isConnected) placeFloating(card, miniAnchor.getBoundingClientRect());
+    if (focus) (open ? back : door).focus({ preventScroll: true });
+    if (card) revealFloatingFocus(card);
   };
   door.addEventListener('click', (event) => { event.stopPropagation(); show(true); });
   back.addEventListener('click', (event) => { event.stopPropagation(); show(false); });

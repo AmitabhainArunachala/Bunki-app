@@ -97,7 +97,10 @@
  *                         active context. Control: 3166ded3, whose bar floated in on the first tap.
  *                         At 390 and 320 the sentence view keeps the word card's top within 1px, stays
  *                         inside the screen, saves one tutor entry without activation or navigation,
- *                         and Back to the word restores the word's Save.
+ *                         and Back to the word restores the word's Save. Focus stays wholly inside
+ *                         the popup and article scroll stays still on opening, Tab to Ask/Practice,
+ *                         and return from Practice, including a shorter kana-word card whose sentence
+ *                         needs more room than its word view.
  *   G7 version switch   — (John #9) the 原文 / やさしい版 switch names each side and its level ("原文 Original
  *                         · N1", "やさしい版 Simplified · N3") with the caption "Simplified: the same story
  *                         in easier Japanese." (round 4: shorter), and an article without a
@@ -1007,12 +1010,33 @@ try {
         const box = () => page.locator('#mini').evaluate((node) => {
           const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height };
         });
+        const focused = () => page.evaluate(() => {
+          const mini = document.querySelector('#mini'), active = document.activeElement;
+          const r = active.getBoundingClientRect(), m = mini.getBoundingClientRect();
+          return { id: active.id, inside: mini.contains(active), scrollY,
+            control: { top: r.top, bottom: r.bottom, left: r.left, right: r.right },
+            popup: { top: m.top, bottom: m.bottom, left: m.left, right: m.right } };
+        });
+        const assertFocus = (seen, beforeScroll, expectedId = null) => {
+          assert(seen.inside, `the focused sentence control must be inside the popup: ${JSON.stringify(seen)}`);
+          if (expectedId) assert.equal(seen.id, expectedId, 'The sentence control keeps the intended focus');
+          assert(seen.control.top >= seen.popup.top - 1 && seen.control.bottom <= seen.popup.bottom + 1
+            && seen.control.left >= seen.popup.left - 1 && seen.control.right <= seen.popup.right + 1,
+          `the focused sentence action must be wholly visible inside the popup: ${JSON.stringify(seen)}`);
+          assert.equal(seen.scrollY, beforeScroll, 'Opening and focusing the sentence must not move the article scroll');
+        };
         const word = await box();
+        const beforeScroll = await page.evaluate(() => scrollY);
         await page.locator('#mini #mini-sentence-open').click();
         await page.waitForTimeout(200); // ResizeObserver has placed the settled sentence view.
         const sentence = await box();
+        const focus = await focused();
         assert(Math.abs(sentence.top - word.top) <= 1, `opening the sentence moved the card's top edge: ${JSON.stringify({ word, sentence })}`);
         assert(sentence.bottom <= viewport.height, `the sentence card falls outside the screen: ${JSON.stringify(sentence)}`);
+        assertFocus(focus, beforeScroll);
+        await page.keyboard.press('Tab');
+        const askFocus = await focused();
+        assertFocus(askFocus, beforeScroll, 'reader-teacher');
         assert.equal(await page.locator('#mini .mini-sentence-full mark').textContent(), '郊外');
         assert.equal(await page.locator('#mini #mini-take').isVisible(), false, 'The sentence view still offers the word Save');
         const before = await readAppRecord(page);
@@ -1024,7 +1048,30 @@ try {
         await page.locator('#mini #mini-sentence-back').click();
         assert.equal(await page.locator('#mini #mini-take').isVisible(), true, 'Back to the word restores its Save');
         assert.equal(await page.locator('#mini .mini-sentence-pane').isVisible(), false, 'Back to the word hides the sentence view');
-        return { word, sentence, kept: 1, activeRef: kept.teacherContexts.activeRef ?? null };
+        // その has no kanji band: its shorter word card exposes the sentence view's clipped-focus regression.
+        await tapToken(page, 12); // tapToken centers the real article token before opening its word popup.
+        const shortWord = await box();
+        const shortScroll = await page.evaluate(() => scrollY);
+        await page.locator('#mini #mini-sentence-open').click();
+        await page.waitForTimeout(200);
+        const shortSentence = await box();
+        const shortFocus = await focused();
+        assert(Math.abs(shortSentence.top - shortWord.top) <= 1, `the shorter word card's sentence moved its top: ${JSON.stringify({ shortWord, shortSentence })}`);
+        assertFocus(shortFocus, shortScroll);
+        await page.keyboard.press('Tab');
+        const shortAskFocus = await focused();
+        assertFocus(shortAskFocus, shortScroll, 'reader-teacher');
+        await page.keyboard.press('Tab');
+        const practiceFocus = await focused();
+        assertFocus(practiceFocus, shortScroll, 'reader-sentence-practice');
+        await page.locator('#mini #reader-sentence-practice').click();
+        await page.waitForFunction(() => document.body.dataset.view === 'sentence-practice');
+        await page.locator('#sentence-practice-back').click();
+        await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
+        await page.waitForTimeout(200);
+        const returnedFocus = await focused();
+        assertFocus(returnedFocus, shortScroll, 'reader-sentence-practice');
+        return { word, sentence, focus, askFocus, shortWord, shortSentence, shortFocus, shortAskFocus, practiceFocus, returnedFocus, kept: 1, activeRef: kept.teacherContexts.activeRef ?? null };
       });
     }
 
