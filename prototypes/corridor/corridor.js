@@ -3239,6 +3239,15 @@ function monthKey(ts) {
   return `${d.getFullYear()}年${d.getMonth() + 1}月`;
 }
 
+/** Localised display only: automatic list identities remain the original month keys. */
+function monthLabel(key) {
+  const match = String(key).match(/^(\d{4})年(\d{1,2})月$/u);
+  if (!match || !bi()) return key;
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return key;
+  return `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month - 1]} ${match[1]}`;
+}
+
 /** Full dictionary record for a written form: kotobako (all senses, most
  * common first) with the original 6,687-word layer as fallback. */
 function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
@@ -8115,6 +8124,11 @@ function enhanceJapaneseProse(root) {
   for (const parent of parents) {
     // The writing room's own hints are room chrome above the popup's layer, not text to study.
     if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
+    // Interface Japanese is a label, not study prose. Turning a date or the Learn
+    // heading into word buttons created tiny, surprising controls in Japanese mode.
+    // Dictionary explanations and actual article/headline content keep their lookup doors.
+    if (parent.closest('.eyebrow,.shelf-masthead,.shelf-dateline,.reader-meta,.reader-tip,.version-toggle,.learn-stage-head,.learn-card-meta,.learn-card-text.is-quiet,.learn-stage-row,.learn-gloss,.learn-lengths,.study-hall-note,.focus-label,.focus-mode-sub,.focus-gloss,.me-book,.foundation-section,.kv')) continue;
+    if (parent.matches('h1,h2,h3,.view-title') && !parent.closest('#sheet,.reader-card')) continue;
     // A word looked up in a guided question is saved as help on that question before it shows.
     const question = S.view === 'guided' ? parent.closest('.guided-room [data-question]')?.dataset.question : null;
     // the reader's title card keeps Japanese line breaks (禁則処理): its marks cling to their words
@@ -10269,14 +10283,6 @@ function renderEntry(main) {
   field.append(enter);
   main.append(field);
 
-  const note = el('div', 'note placeholder');
-  note.innerHTML = tx(
-    '<b>仮置き</b> — これは入口の位置を比べるための最小の野であって、Drift そのものではない。' +
-      'Drift の物理とジェスチャ文法は #46 で未決のまま、触っていない。本物の Drift はサイトの root にある。',
-    '<b>placeholder</b> — a minimal field for comparing where you land, not Drift itself. ' +
-      "Drift's physics and gesture grammar stay untouched (#46). The real Drift lives at the site root.",
-  );
-  main.append(note);
 }
 
 /* ペース — the learner's own review pacing, folded away until asked for (the
@@ -11978,13 +11984,14 @@ function renderTray(main) {
   // lists it makes; the sections loop appends it after the last row.
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   for (const sec of sections) {
+    const label = sec.manual ? sec.name : monthLabel(sec.name);
     const head = el('p', 'eyebrow list-head');
     // the name is a door: every list, named or monthly, opens to its own
     // page with its rows, its review, and its export (operator, 2026-08-27)
     const openList = el('button', 'list-open');
     openList.type = 'button';
-    openList.setAttribute('aria-label', tx(`「${sec.name}」のページをひらく`, `open the ${sec.name} list page`));
-    openList.append(document.createTextNode(`${sec.name} — ${sec.items.length}`));
+    openList.setAttribute('aria-label', tx(`「${label}」のページをひらく`, `open the ${label} list page`));
+    openList.append(document.createTextNode(`${label} — ${sec.items.length}`));
     openList.append(el('span', 'list-open-arrow', '›'));
     openList.addEventListener('click', () => {
       S.listOpen = { name: sec.name, manual: sec.manual };
@@ -12287,7 +12294,7 @@ function renderListPage(main) {
     el(
       'h1',
       'view-title',
-      tx(`${open.name} — ${items.length} 件`, `${open.name} — ${items.length} item${items.length === 1 ? '' : 's'}`),
+      tx(`${open.name} — ${items.length} 件`, `${open.manual ? open.name : monthLabel(open.name)} — ${items.length} item${items.length === 1 ? '' : 's'}`),
     ),
   );
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
@@ -22810,7 +22817,7 @@ function srsDecks() {
   }
   return [
     ...Object.entries(S.lists).map(([name, items]) => ({ name, items })),
-    ...[...buckets.entries()].map(([name, items]) => ({ name, items })),
+    ...[...buckets.entries()].map(([name, items]) => ({ name, label: monthLabel(name), items })),
   ];
 }
 function renderDeckTable(main, today) {
@@ -22825,6 +22832,7 @@ function renderDeckTable(main, today) {
   }
   table.append(head);
   for (const deck of [{ name: tx('すべての札', 'All cards'), items: null }, ...srsDecks()]) {
+    const label = deck.label || deck.name;
     // a deck row is todayQueue scoped to that deck, under the same day's room — the session it opens
     const q = deck.items ? todayQueue(now, deck.items) : today;
     const n = { new: q.new.length, learn: q.learn.length, due: q.review.length };
@@ -22833,9 +22841,9 @@ function renderDeckTable(main, today) {
     row.type = 'button';
     row.disabled = !total || !scheduler;
     row.dataset.deck = deck.items ? deck.name : '*';
-    row.setAttribute('aria-label', tx(`${deck.name} — 新規 ${n.new}・学習 ${n.learn}・復習 ${n.due}`,
-      `${deck.name} — ${n.new} new, ${n.learn} learning, ${n.due} due`));
-    row.append(el('span', 'd-name', deck.name));
+    row.setAttribute('aria-label', tx(`${label} — 新規 ${n.new}・学習 ${n.learn}・復習 ${n.due}`,
+      `${label} — ${n.new} new, ${n.learn} learning, ${n.due} due`));
+    row.append(el('span', 'd-name', label));
     for (const kind of ['new', 'learn', 'due']) row.append(el('span', `c-${kind}${n[kind] ? '' : ' zero'}`, String(n[kind])));
     row.addEventListener('click', () => (deck.items ? startReview(deck.items) : startReview()));
     table.append(row);
@@ -23574,8 +23582,8 @@ function studyHallDoors() {
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
       ? tx(`${readyTests}組 · 級と長さを選ぶ`, `${readyTests} tests · choose a level and length`)
       : readyWritten ? tx(`筆記テスト ${readyWritten}組 · 検収前`, `${readyWritten} written tests · awaiting review`)
-      : readySections ? tx(`${readySections}組の練習 · 模試は準備中`, `${readySections} practice set${readySections === 1 ? '' : 's'} · mock tests in preparation`)
-        : tx('新しい模試を準備中 · 以前の練習も使えます', 'New mocks in preparation · earlier exercises available'), () => {
+      : readySections ? tx(`${readySections}組の練習`, `${readySections} practice set${readySections === 1 ? '' : 's'} · practice sets available`)
+        : tx('以前の練習', 'Earlier practice exercises'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
     ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 約15分 · 一問ごとに解説', 'N2 written · 6 questions · about 15 min · every question explained'),
@@ -23856,12 +23864,13 @@ function renderStudyHall(main, doors) {
     const rows = entries.filter((entry) => entry.mode === mode);
     if (!rows.length) continue;
     const readyN = rows.filter((entry) => entry.availability?.ready).length;
+    if (!readyN) continue;
     const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
     const cell = el('p', 'learn-length' + (readyN ? '' : ' is-pending'));
     cell.dataset.mockMode = mode;
     cell.append(el('b', 'learn-length-t', tx(ja, en)));
     if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
-    cell.append(el('span', 'learn-length-n', readyN ? tx(`${readyN} 組`, `${readyN} ready`) : tx('準備中', 'in preparation')));
+    cell.append(el('span', 'learn-length-n', tx(`${readyN} 組`, `${readyN} ready`)));
     lengths.append(cell);
   }
   if (lengths.childNodes.length) tests.append(lengths);
