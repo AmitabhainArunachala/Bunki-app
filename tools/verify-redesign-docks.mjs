@@ -386,7 +386,8 @@ async function journey(page, info) {
     await page.locator('#kp-rule-dismiss').click();
     await page.locator('#kp-rule').waitFor({ state: 'hidden' });
     assert.equal(await page.locator('#kp-rule').count(), 0, 'Real dismiss removes the rule');
-    await controls(page, info, 'grades-after-rule', '.kp-grades .kp-grade', { count: 2 });
+    // four pads since the learner's D1 (Again · Hard · Good · Easy; CARD_CONTRACT_V2 §4 as amended 2026-10-09)
+    await controls(page, info, 'grades-after-rule', '.kp-grades .kp-grade', { count: 4 });
   } else {
     await page.locator('#kp-start').click();
     await page.locator('#kp-reveal').click();

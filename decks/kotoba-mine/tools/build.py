@@ -90,17 +90,17 @@ TITLE_EN = "My mined words"
 SENTENCE_METHOD = [
     "このデッキは「1文1語」の読みカードです（Tatsumoto の Targeted Sentence Card）。",
     "表：本物の日本語の文。覚える語は色つき。英語も読みも出ない。読んで、意味を思い出してからタップ。",
-    "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「思い出せた」、だめなら「もう一度」。",
+    "裏：まず読み・品詞・ふりがな・日本語の説明。英語の意味、文の英訳、漢字の形と意味、出典はタップで開く。思い出せたら「正解」（時間がかかったら「難しい」、すぐなら「簡単」）、だめなら「もう一度」。",
     "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。",
     "よく使う語は文が2〜3つ。一つ目が定着すると（約2週間）、次の文が開く。",
 ]
 # the two decks built from the same word list, side by side in 集中道場
 DECKS = {
-    "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Real sentences · read and recall",
+    "sentence": {"id": "kotoba-mine", "titleJa": "言葉の鉱脈・文", "titleEn": "Words you looked up · sentences",
                  "defaults": {"look": "dark", "mode": "read", "gloss": "tap"}, "method": SENTENCE_METHOD,
                  "anki": ("anki-sentence", "kotoba-mine-sentence-v3", "Kotoba Mine Sentence", "Read", "kotoba-mine-v3"),
                  "out": ("kotoba-mine.apkg", "kotoba-mine.tsv", "study.html")},
-    "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Massive-context cloze · passages",
+    "mcd": {"id": "kotoba-mcd", "titleJa": "言葉の鉱脈・MCD", "titleEn": "Words you looked up · passages",
             # 読んで思い出す by default (CARD_CONTRACT_V2 §2); 穴埋め, the MCD blank preset, is one switch
             # away in 設定 and brings the 字 cards back into the queue (STANDARD A37)
             "defaults": {"look": "ai", "mode": "read", "gloss": "tap"}, "unlockDays": 3,
@@ -563,7 +563,7 @@ METHOD = [
     "ひとつの文章から何枚もカードができる（1枚に未知はひとつ）。慣れたら次の文章が開き、同じ言葉に別の文脈で出会う。",
     "裏：ふりがな付きの全文、読み、品詞、日本語の説明。英語の意味、その文の英訳、漢字の形と意味、ほかの文章、出典はタップで開く。",
     "裏の文章と日本語の説明は、言葉をタップすると意味が出る（回廊では覚えるにも保存できる）。タップは採点に入らず、予定も変わらない。",
-    "判定は「もう一度／思い出せた」の二つで十分（FSRS-6）。迷ったら「もう一度」。",
+    "判定は「もう一度・難しい・正解・簡単」の四つ（FSRS-6）。迷ったら「もう一度」。",
 ]
 
 
