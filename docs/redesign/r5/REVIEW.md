@@ -19,7 +19,7 @@ P = demonstrated pass, ~ = partial or a material unproved part, F = demonstrated
 | # | Check | Door | Today | Today after | Close | Shelf | Reader | Learn | Words | Me | Settings |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | One primary | P | P | P | P | P | P | P | P | P | P |
-| 2 | EN purity | **F** | **F** | **F** | P | P | P | P | P | P | P |
+| 2 | EN purity | P | **F** | **F** | P | P | P | P | P | P | P |
 | 3 | JA purity | P | P | P | P | P | P | P | P | P | P |
 | 4 | Room identity | P | P | P | P | P | P | P | P | P | ~ |
 | 5 | Tap depth | P | P | P | P | P | P | P | P | P | P |
@@ -70,14 +70,14 @@ P = demonstrated pass, ~ = partial or a material unproved part, F = demonstrated
 | 23 | Alive | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ |
 | 24 | The pull | P | P | P | P | P | P | P | P | P |
 
-Baseline: 294 P, 93 partial, 69 F across 456 room/check cells, including non-applicable P cells. No single percentage is a substitute for the blocking failures.
+Corrected baseline: 295 P, 93 partial, 68 F across 456 room/check cells, including non-applicable P cells. The first review commit recorded 69 F. A subsequent shipped-source comparison and runtime display probe proved its Door/check-2 failure was mistaken: both baseline and candidate display **Radicals** in EN, with the Japanese heading hidden. The mixed heading is only in the unshipped donor. Evidence: `R5/shelf-onejob/radicals.json` and `source.json`. This correction is not counted as a fixed failure. No single percentage is a substitute for the blocking failures.
 
 ## Evidence for the scores
 
 | Check | Evidence and limitation |
 |---|---|
 | 1 | B/S/C screenshots: one principal review/reveal/Save door; sentence practice and tutor compete at equal weight; Settings and Words lack a clear principal task. |
-| 2 | S Today table and saved-month strip show `2026年10月` in EN. The universe's own word-card radical label mixes languages. Core language suite misses these states. C deck POS labels are correctly English. |
+| 2 | S Today table and saved-month strip show `2026年10月` in EN. The universe heading was rechecked and is pure EN in the shipped baseline; the donor is not shipped. Core language suite misses the saved-month state. C deck POS labels are correctly English. |
 | 3 | JA screenshots and core language pass; dictionary English meanings are learning content, not interface labels. Acronyms in finder/deck labels remain a plain-language concern. |
 | 4 | B thumbnail sheet distinguishes the universe, stage, technical web, magazine and yearbook; kotoba home reads as a different cyan app. |
 | 5 | C real click trace: own target 財政/交渉 opens a sheet saying only “Already in this deck”; no kanji door. Another word requires full entry then kanji (two taps from the word sheet). Reader popup kanji/part doors and one-step return work. |
@@ -106,7 +106,7 @@ Baseline: 294 P, 93 partial, 69 F across 456 room/check cells, including non-app
 1. **Cards — a different world.** Kotoba is cyan on black even by day, while N1 uses separate AI paper. Global day/night does not govern the complete flow. Breaks check 18 and John's T8/T9 call for distinction and crispness inside one app.
 2. **Cards — the word-to-kanji path is blocked.** A card's own target has no dictionary/kanji route; other words take two taps from their word sheet. Breaks blocking check 5 and the recursive depth of THE BRIEF.
 3. **Japanese shelf/Learn — interface text becomes tiny study controls.** The prose enhancer treats headings, dates and labels as study words. Breaks blocking check 7 and “clean and organized”. Deck home controls also miss 44px. Focus dims readable text below the contrast floor (check 8). Inline learned-token touch widths need an explicit remedy, not a verifier exception.
-4. **Today/universe — mixed interface languages.** Automatic month names show Japanese in EN, and the universe's radical label is bilingual. Breaks blocking check 2 and “No silly contraditions like the English setting showing japanese buttons”.
+4. **Today/universe — mixed interface languages.** Automatic month names show Japanese in EN. The claimed universe label failure was retracted after checking the shipped artifact. Breaks blocking check 2 and “No silly contraditions like the English setting showing japanese buttons”.
 5. **Learn — promised rooms that do not exist.** “In preparation” rows remain shipped. Breaks blocking check 11.
 6. **Journey — cuts and a reveal jolt.** Follow, tab/room changes and article opens lack a held transition; reveal changes document scroll. Disallowed CSS properties and fast ambient loops remain. Breaks checks 6/23 and “connected and flowing”.
 7. **Sentence study — a small window inside a phone window.** At 320, `#mini` is 330px high with 472px of content; Save/Practice are below an internal scrollbar. Breaks the known leftover and the bar's whole practice.
