@@ -4,9 +4,11 @@
 usage: python3 decks/n2n1/tools/diversity_audit.py [--cap 0.006] [--out FILE]
        Add --new-since REF to also audit the words added since a baseline deck build.
 
-Exact openings, endings, clauses and ten-character phrases retain the 0.6% cap.
-The broader frame families have separate 2%, 2%, 2%, 1% and 6% caps. Counts are
-per card, including when a pattern occurs more than once. Exit 1 on any overage.
+Exact openings, endings, clauses and ten-character phrases retain the 0.6% cap
+(at least 3 cards). The broader frame families have separate 2%, 2%, 2%, 1% and
+6% caps. Counts are per card, including when a pattern occurs more than once.
+Cards past a cap, earliest kept, go with the reason to the rewrite queue at --out
+(default source/rewrite-queue.json, a tracked file). Exit 1 on any overage.
 Grammar coverage is informational. --cards DIR supports isolated corpus checks.
 """
 from __future__ import annotations
