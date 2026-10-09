@@ -62,6 +62,16 @@ async function walk(width, height, hasTouch) {
       current: d.getAttribute('aria-current') === 'page',
       chromeOverflow: chrome ? chrome.scrollWidth > chrome.clientWidth + 1 : null };
   })()`);
+  // a service-worker takeover can abort a navigation that is already under way (net::ERR_ABORTED);
+  // go again instead of failing the run on the harness's own timing
+  const gotoShelf = async () => {
+    for (let attempt = 0; ; attempt += 1) {
+      try { await page.goto(`${base}/?entry=shelf`); return; } catch (err) {
+        if (attempt >= 2 || !/ERR_ABORTED|interrupted by another navigation/.test(String(err?.message))) throw err;
+        await page.waitForLoadState('load').catch(() => {});
+      }
+    }
+  };
   const expectDoorThenDojo = async (room) => {
     const before = await view();
     const st = await doorState();
@@ -80,11 +90,11 @@ async function walk(width, height, hasTouch) {
     await shot(`${room}-dojo`);
   };
 
-  await page.goto(`${base}/?entry=shelf`);
+  await gotoShelf();
   await page.waitForSelector('#tray', { timeout: 30000 });
   await expectDoorThenDojo('shelf');
   for (const [room, sel] of ROOM_LINKS) {
-    await page.goto(`${base}/?entry=shelf`);
+    await gotoShelf();
     await page.waitForSelector('#tray', { timeout: 30000 });
     const link = await page.$(sel);
     if (!link) {
@@ -100,20 +110,22 @@ async function walk(width, height, hasTouch) {
     await expectDoorThenDojo(room);
   }
   // the tray and the search room are chrome doors, not shelf links
-  await page.goto(`${base}/?entry=shelf`);
+  await gotoShelf();
   await page.waitForSelector('#tray', { timeout: 30000 });
   await page.click('#tray');
   await page.waitForTimeout(400);
   await expectDoorThenDojo('tray');
-  await page.goto(`${base}/?entry=shelf`);
+  await gotoShelf();
   await page.waitForSelector('#tray', { timeout: 30000 });
   await page.click('#chrome-search');
   await page.waitForTimeout(400);
   await expectDoorThenDojo('search');
   // the reader: the crowded chrome (search · seal · lang · 覚える · 覚 N · 道場)
-  await page.goto(`${base}/?entry=shelf`);
+  await gotoShelf();
   await page.waitForSelector('#tray', { timeout: 30000 });
-  const card = await page.$('#shelf-body [data-passage]');
+  // the chrome's #tray can paint a beat before the shelf's cards do (measured: up to ~150ms), so wait for the
+  // card instead of sampling the instant #tray appears; a shelf with no passage card still fails
+  const card = await page.waitForSelector('#shelf-body [data-passage]', { timeout: 10000 }).catch(() => null);
   if (!card) failures.push(`${width}/reader: no passage card on the shelf`);
   else {
     await card.click();

@@ -656,3 +656,11 @@ The independent review's fixes changed this lane's own new verifier. No other ve
 | `prototypes/corridor/tools/verify-n2n1-decks.mjs` | dojo deck title equality for `senmon` (`chromeTitles`) | `Your five fields · master’s level` → `Your fields · master's level` | The exact English title follows the requested rename in the single `DOJO_DECKS` line. Deck-list equality, card integrity, furigana, definitions, English disclosure, tap-to-define and offline checks are unchanged. |
 
 This verifier has no pinned word or card totals; its totals are measured from the built decks. No count assertion or behavioural check was changed.
+
+## Lead, 2026-10-10: verify-dojo-door, timing only
+- **File:** `prototypes/corridor/tools/verify-dojo-door.mjs`, the reader step.
+- **Before → after:** `page.$('#shelf-body [data-passage]')` sampled the instant `#tray` appeared → `page.waitForSelector('#shelf-body [data-passage]', { timeout: 10000 })`. The failure message and the requirement (a passage card must be on the shelf) are unchanged.
+- **Why:** the chrome's `#tray` can paint up to about 150 ms before the shelf's cards. Measured in one session over 14 loads: 2 of 14 loads had no card yet at `#tray`, on the build before the new fields cards (751d700b) and on the build after (dd25b9cd) alike. The check failed twice in a row on dd25b9cd and passed on 751d700b by timing alone.
+- **Not changed:** no assertion was removed or loosened; a shelf without a passage card still fails after 10 s.
+- **Also, the same file:** its five `page.goto('?entry=shelf')` calls go through `gotoShelf()`, which goes again (up to twice) when the navigation is aborted with `net::ERR_ABORTED` or "interrupted by another navigation". This is the flake the cloud run and Astra both reported. No assertion changed.
+
