@@ -286,6 +286,10 @@
 .kp-study { position: relative; overflow-anchor: none; }
 .kp .kp-study.kp-reveal-hold { position: fixed; z-index: 5; margin: 0; pointer-events: none; background: var(--kp-stage); animation: kp-fade-out 140ms linear both; }
 .kp-reveal-hold *, .kp-reveal-hold *::before, .kp-reveal-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
+.kp .kp-screen-hold { position: fixed; z-index: 5; overflow: hidden; pointer-events: none; animation: kp-fade-out 140ms linear both; }
+.kp-screen-hold *, .kp-screen-hold *::before, .kp-screen-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
+.kp .kp-screen-enter { animation: kp-fade 180ms cubic-bezier(0.2, 0, 0, 1) both; }
+.kp .kp-answer .kp-fold[open] > :not(summary) { animation: kp-rise 160ms cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; }
 .kp-ghost.kp-out-good { animation: kp-out-good 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
 .kp-ghost.kp-out-again { animation: kp-out-again 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
@@ -300,6 +304,9 @@
   .kp *, .kp *::before, .kp *::after { animation: none !important; transition: none !important; }
   :is(#app, .kp) .kp-sentence.kp-enter :is(.kp-target, rt), :is(#app, .kp) .kp-answer.kp-enter, :is(#app, .kp) .kp-card.kp-arrive, :is(#app, .kp) .kp-sheet, :is(#app, .kp) .kp-pop { animation: kp-fade 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-study.kp-reveal-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
+  :is(#app, .kp) .kp-screen-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
+  :is(#app, .kp) .kp-screen-enter { animation: kp-fade 100ms linear both !important; transform: none !important; }
+  :is(#app, .kp) .kp-answer .kp-fold[open] > :not(summary) { animation: kp-fade 100ms linear both !important; transform: none !important; }
   .kp-progress i { transform: none; width: calc(var(--kp-frac, 0) * 100%); }
   .kp-ghost { display: none; }
 }

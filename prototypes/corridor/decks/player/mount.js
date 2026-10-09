@@ -186,7 +186,7 @@ function savePrefs(prefs) {
   if (!writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) return saveFailed();
   ctx.prefs = prefs;
   ui.toast = '';
-  paint();
+  paintResponse({ hold: false });
 }
 const SAVE_FAILED = '保存できませんでした。設定のバックアップから記録をコピーして保管してください。';
 /** nothing changed: say so and keep the screen as it is */
@@ -661,7 +661,18 @@ function homeScreen() {
   start.disabled = !total;
   box.append(start);
 
-  box.append(el('h2', 'kp-h2', t("テーマ")));
+  const foot = el('div', 'kp-foot');
+  foot.append(btn('kp-link', t("語の一覧"), () => go('list'), { id: 'kp-to-list' }), btn('kp-link', t("設定"), () => go('settings'), { id: 'kp-to-settings' }));
+  box.append(foot);
+  return box;
+}
+
+/** Optional topic selection lives with the deck's other settings. The same ledger controls
+ * the queue; moving these rows does not change their identities, counts or exclusion rules. */
+function topicSettings() {
+  const { deck, state } = ctx;
+  const box = el('div', 'kp-field');
+  box.append(el('h2', 'kp-h2', t('練習するテーマ', 'Topics to study')));
   const off = new Set(state.groupsOff);
   const list = el('div', 'kp-groups');
   for (const g of deck.groups) {
@@ -681,7 +692,7 @@ function homeScreen() {
       if (!save(nextState)) return saveFailed();
       ctx.state = nextState;
       ui.toast = '';
-      paint();
+      paintResponse({ hold: false });
     });
     const bar = el('span', 'kp-bar');
     bar.append(
@@ -694,9 +705,6 @@ function homeScreen() {
   }
   box.append(list);
 
-  const foot = el('div', 'kp-foot');
-  foot.append(btn('kp-link', t("語の一覧"), () => go('list'), { id: 'kp-to-list' }), btn('kp-link', t("設定"), () => go('settings'), { id: 'kp-to-settings' }));
-  box.append(foot);
   return box;
 }
 
@@ -704,9 +712,7 @@ function go(screen) {
   ui.screen = screen;
   ui.toast = '';
   ui.sheet = null;
-  paint();
-  window.scrollTo(0, 0);
-  frameFront();
+  paintResponse({ resetScroll: true, front: true });
 }
 
 /**
@@ -1763,7 +1769,7 @@ function deleteCard() {
   dropFromQueue(id);
   ui.toast = DELETED;
   resetCard();
-  paint();
+  paintResponse({ front: true });
 }
 function ladderSwap(card, word) {
   const done = swapCard(word, card, ctx.state, new Date());
@@ -1918,7 +1924,54 @@ function showHeldStudy(node) {
   ctx.root.append(node);
   const drop = () => node.remove();
   node.addEventListener('animationend', drop, { once: true });
-  setTimeout(drop, 240);
+  setTimeout(drop, motionOk() ? 180 : 120);
+}
+
+/** Capture the screen that was touched. The outgoing copy has no identity or input; its
+ * resolved palette stays with it when home and the sitting use different paper and stage colors. */
+function holdScreen() {
+  const screen = ctx.root.querySelector(':scope > :is(.kp-home, .kp-study, .kp-list, .kp-settings, .kp-done)');
+  if (!screen) return null;
+  const rect = screen.getBoundingClientRect(), copy = screen.cloneNode(true);
+  const hold = el('div', 'kp-screen-hold');
+  const palette = getComputedStyle(ctx.root);
+  for (const key of palette) if (key.startsWith('--kp-')) hold.style.setProperty(key, palette.getPropertyValue(key));
+  hold.style.backgroundColor = palette.backgroundColor;
+  hold.style.color = palette.color;
+  const originals = [...screen.querySelectorAll('*')], copies = [...copy.querySelectorAll('*')];
+  originals.forEach((node, index) => {
+    if (getComputedStyle(node).position !== 'fixed') return;
+    const box = node.getBoundingClientRect();
+    Object.assign(copies[index].style, { position: 'absolute', inset: 'auto', left: `${box.left - rect.left}px`, top: `${box.top - rect.top}px`, width: `${box.width}px`, height: `${box.height}px` });
+  });
+  for (const node of [copy, ...copies]) {
+    node.removeAttribute('id');
+    for (const name of ['card', 'pref', 'group', 'word', 'kanji', 'deckWord', 'returnFocus']) delete node.dataset[name];
+    for (const attr of [...node.attributes]) if (attr.name.startsWith('data-ui-')) node.removeAttribute(attr.name);
+    node.classList.remove('kp-enter', 'kp-arrive', 'kp-screen-enter');
+  }
+  for (const node of copy.querySelectorAll('.kp-ghost, .kp-polish, .kp-slash')) node.remove();
+  Object.assign(copy.style, { margin: '0', position: 'absolute', top: '0', left: '0', width: `${rect.width}px` });
+  Object.assign(hold.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${Math.max(0, innerHeight - rect.top)}px` });
+  hold.setAttribute('aria-hidden', 'true');
+  hold.inert = true;
+  hold.append(copy);
+  return hold;
+}
+
+/** State and storage change synchronously. Only their visible response crossfades after the
+ * new screen reaches its final scroll position, leaving the real controls ready immediately. */
+function paintResponse({ resetScroll = false, front = false, hold = true } = {}) {
+  const held = hold ? holdScreen() : null;
+  paint();
+  if (resetScroll) window.scrollTo({ top: 0, behavior: 'instant' });
+  if (front) frameFront();
+  const screen = ctx.root.querySelector(':scope > :is(.kp-home, .kp-study, .kp-list, .kp-settings, .kp-done)');
+  screen?.classList.add('kp-screen-enter');
+  const clear = () => screen?.classList.remove('kp-screen-enter');
+  screen?.addEventListener('animationend', clear, { once: true });
+  setTimeout(clear, 240);
+  showHeldStudy(held);
 }
 
 /**
@@ -2400,6 +2453,7 @@ function listScreen() {
 function settingsScreen() {
   const box = el('section', 'kp-settings');
   box.append(topBar(t("設定"), () => go('home')));
+  box.append(topicSettings());
   if (ctx.deck.method?.length) {
     const how = el('details', 'kp-method');
     how.id = 'kp-method';
