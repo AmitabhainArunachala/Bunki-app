@@ -23665,7 +23665,7 @@ function guidedDoorInJlptRoom(main) {
   door.type = 'button';
   door.dataset.guidedDoor = 'mock';
   door.append(withEn(el('span', 'study-door-t', '案内つきの練習'), 'Guided test practice', 'en-inline'));
-  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 約15分 · 解説と語の意味つき', 'N2 written · 6 questions · about 15 min · explanations and word meanings as you go')));
+  door.append(el('span', 'study-door-sub', tx('N2 筆記 6問 · 解説と語の意味つき', 'N2 written · 6 questions · explanations and word meanings as you go')));
   door.addEventListener('click', () => openGuidedRoom('mock'));
   row.append(door);
   lengths.after(row);
@@ -23717,7 +23717,7 @@ function studyHallDoors() {
         : tx('以前の練習', 'Earlier practice exercises'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
-    ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 約15分 · 一問ごとに解説', 'N2 written · 6 questions · about 15 min · every question explained'),
+    ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 一問ごとに解説', 'N2 written · 6 questions · every question explained'),
       () => openGuidedRoom('dojo')],
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
@@ -23971,7 +23971,7 @@ function renderStudyHall(main, doors) {
 
   const guided = el('section', 'learn-section');
   guided.dataset.learnSection = 'guided';
-  guided.append(learnHead('01', '案内つき', 'Guided', tx('6問 · 約15分', '6 questions · ~15 min')));
+  guided.append(learnHead('01', '案内つき', 'Guided', tx('6問', '6 questions')));
   guided.append(el('p', 'learn-gloss', tx('一問ごとに解説があり、どの語も意味をひらける。迷ったらここから。', 'Every question is explained, and every word opens its meaning. Start here if you’re unsure.')));
   guided.append(doors.guided);
 
