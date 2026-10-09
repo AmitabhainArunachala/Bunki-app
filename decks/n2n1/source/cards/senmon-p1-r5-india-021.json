@@ -1,0 +1,202 @@
+{
+ "cards": [
+  {
+   "term": "此岸",
+   "reading": "しがん",
+   "pos": "noun",
+   "meaning": "this shore; the world of suffering",
+   "defJa": "苦しみや迷いのある現実の世界",
+   "passage": {
+    "ja": "川の両岸を思い浮かべると、仏教が迷いと悟りをどう言い表してきたかを考える入口になります。此岸は苦しみや迷いのあるこちら側の世界を指し、向こう岸を意味する彼岸と対にして用いられます。ただし、地図上でどこかの川を渡りさえすれば悟れるという話ではなく、岸の比喩を通じて生き方の変化を表しているのです。日常の悩みを語る文にこの語が置かれていたら、場所の移動ではなく、何から離れようとしているのかを読むと意味がつながります。",
+    "form": "此岸",
+    "en": "Picturing two riverbanks offers an entry into how Buddhism expresses delusion and awakening. This shore denotes the world of suffering and delusion on our side and is paired with the other shore. It does not mean that crossing a river on a map produces awakening; the banks serve as a metaphor for a change in how one lives. When the term appears alongside everyday troubles, asking what someone seeks to leave behind rather than where they move connects the meaning.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "彼岸と対になる仏教語。ここでは実際の川岸ではなく迷いの世界。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "法華経",
+   "reading": "ほけきょう",
+   "pos": "noun",
+   "meaning": "the Lotus Sutra",
+   "defJa": "すべての人に成仏の道を開くと説く大乗経典",
+   "passage": {
+    "ja": "燃える家から子供を連れ出す譬えが法華経に出てきたら、物語の面白さに加えて、なぜ異なる導き方が用いられるのかにも目を向けられます。読者に紹介する際は、細かな登場物を列挙するより、譬えが教えのどんな問いを担っているかを一つ示すと筋が通ります。ただし、現代の学校教育の話に置き換えるだけでは、成仏へ導くという経典の目的から離れてしまうおそれがあります。身近な比較を添える場合にも、元の物語へ戻る言葉を残しておくと、分かりやすさと文脈の両方を保てます。",
+    "form": "法華経",
+    "en": "When encountering the Lotus Sutra’s parable of leading children out of a burning house, look beyond the story’s interest to why different means of guidance are used. An introduction is clearer when it identifies one doctrinal question carried by the parable rather than listing every object in it. Replacing the story entirely with an account of modern schooling, however, risks losing the scripture’s aim of guiding beings toward buddhahood. Even when adding a familiar comparison, retaining a path back to the original story preserves both accessibility and context.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "経典名。譬えを紹介する際も、成仏へ導くという文脈を保つ。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "比叡山",
+   "reading": "ひえいざん",
+   "pos": "noun",
+   "meaning": "Mount Hiei",
+   "defJa": "京都と滋賀の境にある天台仏教の拠点の山",
+   "passage": {
+    "ja": "一つの山が多くの宗派の歴史に姿を現すことは、宗教を別々の箱に分ける見方を揺さぶる。比叡山は天台の学びと修行の拠点であると同時に、後に異なる道を歩んだ僧たちが学んだ場所でもあった。山を離れた後の主張に注目するにせよ、その前に何を共有していたかを知れば、違いの意味も深まる。寺の名前を年表の点として覚えるだけでなく、人が集まり、学び、やがて別の場所へ出ていく場として捉えると、日本仏教の歴史にはつながりと分岐の両方が見えてくる。",
+    "form": "比叡山",
+    "en": "The appearance of one mountain in many schools’ histories challenges the tendency to place religions in separate boxes. Mount Hiei was both a center of Tendai study and practice and a place where monks who later took different paths had trained. Even when focusing on their later claims, understanding what they previously shared deepens the meaning of their differences. Seeing a temple as a place where people gather, study, and depart rather than merely a point on a timeline reveals both connections and divergences in Japanese Buddhist history.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "天台の拠点という場所の意味から、僧たちの学びと分岐を読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "汎神論",
+   "reading": "はんしんろん",
+   "pos": "noun",
+   "meaning": "pantheism",
+   "defJa": "神と世界全体を同一と見る立場",
+   "passage": {
+    "ja": "インドの思想を読んで、世界の全部が神だという説明に出会うと、神がたくさんいる話なのかと迷うことがあるよね。汎神論は神と世界全体を同じものと見る立場の呼び名で、神々の数が多いという話とは区別するんだ。ただし、似た説明があるからといって、インドのいろいろな学派を全部その一語にまとめると、それぞれの違いを消してしまうよ。どの文献が神と世界の関係をどう述べているかを確かめてから名前を当てはめると、便利な分類に引っ張られすぎずに読めるね。",
+    "form": "汎神論",
+    "en": "When reading Indian thought and encountering an account that everything in the world is God, it can be unclear whether this means many gods. Pantheism names the view that God and the whole world are identical and differs from the idea of numerous deities. Yet gathering diverse Indian schools under that one label simply because their explanations resemble it erases their differences. Checking how a specific text describes the relation between God and world before applying a label helps prevent convenient classifications from dominating the reading.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "神と世界の同一性を表す立場。神々の多さをいう多神教とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "法要",
+   "reading": "ほうよう",
+   "pos": "noun",
+   "meaning": "a Buddhist service or observance",
+   "defJa": "仏を敬い教えに関わって営む仏教の儀式",
+   "passage": {
+    "ja": "寺で営まれる法要と聞くと、亡くなった人の供養だけを思い浮かべるかもしれませんが、それに限られるわけではありません。仏の誕生を祝う行事などにも、僧や参列者が教えと向き合う儀式があり、目的に応じて内容は異なります。読経が聞こえたというだけで何のための集まりかを決めず、行事の名前や寺の説明を確かめると、その日の意味が分かります。儀式をただ同じ動作の繰り返しとして眺めるより、誰が何を祈り、何を記念しているかを見ることで、寺と人々の時間のつながりを考えられます。",
+    "form": "法要",
+    "en": "A Buddhist service may bring memorial rites for the dead to mind, but it is not limited to those. Events celebrating the Buddha’s birth also include rituals through which clergy and participants engage with the teaching, and their content varies with their purpose. Rather than identifying a gathering’s purpose solely from the sound of chanting, consult its name and the temple’s explanation. Looking at who prays for what and what is commemorated reveals the temporal connections between temples and people beyond repeated ritual movements.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "追善供養だけに限らず、さまざまな仏教の儀式を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "法身",
+   "reading": "ほっしん",
+   "pos": "noun",
+   "meaning": "dharmakaya; the Buddha as truth",
+   "defJa": "真理そのものとして捉えられる仏のあり方",
+   "passage": {
+    "ja": "仏教では、歴史の中で姿を現した釈尊だけでなく、仏を真理そのものとしてどう捉えるかも論じられる。法身という語はそのような仏のあり方に関わり、人間の体を大きくしたものとして理解するのは適切ではない。関連する説明は学派や経典に応じて異なるため、同じ語を見つけただけで、すべて同一の説明だと判断することも避けるべきである。仏像を通じて教えを紹介する際には、目に見える姿と、その姿を通して表そうとする真理との関係が、読むべき論点となる。",
+    "form": "法身",
+    "en": "Buddhism discusses not only the historical Shakyamuni but also how to understand Buddha as truth itself. Dharmakaya concerns that dimension of buddhahood and is not appropriately understood as an enlarged human body. Explanations differ by school and scripture, so the presence of the same term does not establish an identical account. When teaching is introduced through Buddhist sculpture, the relationship between visible form and the truth it expresses becomes an issue to examine.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "肉体の大きさではなく、真理としての仏のあり方に関わる語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "法輪",
+   "reading": "ほうりん",
+   "pos": "noun",
+   "meaning": "the Dharma wheel",
+   "defJa": "仏の教えとその広まりを車輪にたとえたもの",
+   "passage": {
+    "ja": "教えが人から人へ届くことを、ただ情報が移動する出来事として捉えると、その言葉が生き方を変える面を見落とす。仏教で法輪を転ずるという表現は、仏が教えを説く働きを車輪の動きにたとえ、そこに伝達だけではない意味を与えている。輪の図柄を寺で見かけたとしても、飾りの形を確認するだけでなく、その場で何を象徴するかまで考えたい。動く輪の比喩は、教えが保存されるだけでなく、聞く人に届き、受け取られ、また次の人へ語られるという営みへ注意を向けさせる。",
+    "form": "法輪",
+    "en": "Treating the passage of teaching between people merely as information transfer overlooks its power to change how they live. The Buddhist expression of turning the Dharma wheel likens the Buddha’s teaching activity to a moving wheel and gives it significance beyond transmission alone. When encountering a wheel design in a temple, consider what it symbolizes rather than simply identifying its decorative shape. The moving-wheel metaphor directs attention to teachings reaching listeners, being received, and being spoken onward rather than merely being preserved.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「を転ずる」は教えを説く意味。車輪は仏の教えの象徴となる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "死生観",
+   "reading": "しせいかん",
+   "pos": "noun",
+   "meaning": "views of life and death",
+   "defJa": "生と死をどう捉えるかという考え方",
+   "passage": {
+    "ja": "葬送の記録には、儀式の順番だけでなく、人が死後をどう考え、生きる者が何を願ったかも表れる。仏教の伝来や各地域の習俗との関わりを通じて、日本の死生観も一様ではない形で語られてきた。宗派名が同じだからといって、すべての人が同じ気持ちで死を受け止めたと推測することはできず、個人の記録と教義の説明を分けて読む視点が要る。死についての考えは、残された時間を何に使うかという生の選択にも関わるため、墓や葬儀だけに閉じた話題ではない。",
+    "form": "死生観",
+    "en": "Funerary records reveal not only ritual sequences but also ideas about the afterlife and the wishes of the living. Japanese views of life and death have been expressed in diverse ways through Buddhist transmission and interaction with local customs. A shared school name does not establish that everyone received death with the same feelings, making it necessary to distinguish personal records from doctrinal explanations. Ideas about death also affect choices about how to spend one’s remaining time, so the topic extends beyond graves and funerals.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "死だけでなく、生き方とも結び付いた考え方を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "法然",
+   "reading": "ほうねん",
+   "pos": "noun",
+   "meaning": "Honen, founder of the Jodo school",
+   "defJa": "念仏を勧め日本の浄土宗を開いた僧",
+   "passage": {
+    "ja": "難しい経典を読めない人にも、救いに向かう道は開かれているのかという問いから、日本の仏教史を読んでみましょう。法然が勧めた称名念仏は、阿弥陀仏の名を唱える実践を中心に据えたもので、浄土宗の教えにつながります。ただし、言葉を唱える行為に注目するだけでは、それが仏の願いへの信頼とどう結び付くのかという宗教上の意味を落としてしまいます。人物名と宗派名を覚えるにとどまらず、どんな人にどんな道を示そうとしたかを整理すると、歴史の選択肢が具体的になります。",
+    "form": "法然",
+    "en": "Try reading Japanese Buddhist history through the question of whether a path to liberation is open to people unable to read difficult scriptures. The recitation promoted by Honen centers on saying Amitabha’s name and underlies the Jodo school’s teaching. Focusing only on the act of speaking, however, misses its religious connection with trust in the Buddha’s vow. Going beyond memorizing a person and school to identify what path was offered to whom makes historical choices concrete.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "浄土宗の開祖。名前とともに称名念仏の実践を結び付けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
