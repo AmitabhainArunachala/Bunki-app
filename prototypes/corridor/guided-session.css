@@ -900,7 +900,7 @@ legend.gs-instruction {
   color: var(--faint);
 }
 .gs-source-id {
-  font-family: ui-monospace, Menlo, monospace;
+  font-family: 'Roboto Mono', 'Noto Sans JP', ui-monospace, Menlo, monospace;
   font-size: 11px;
   color: var(--ink-2);
   word-break: break-all;

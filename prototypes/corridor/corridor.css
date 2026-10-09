@@ -31,9 +31,9 @@
   --faint: rgba(28, 47, 66, 0.42); /* depth-by-fade, as Drift ships it */
   --faint-2: rgba(28, 47, 66, 0.3);
 
-  --serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Noto Serif CJK JP',
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif CJK JP',
     'Source Han Serif JP', 'Songti SC', serif;
-  --sans: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+  --sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
 
   /* typographic scale — focused first */
   --t-read: 21px;
@@ -62,6 +62,11 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+}
+
+/* A control with no face of its own takes the room's bundled face, never the browser's default. */
+:where(button, input, select, textarea) {
+  font-family: inherit;
 }
 
 body {
@@ -574,7 +579,7 @@ body.ginga #drift-layer #hint.first-cue {
   border: 0.5px solid rgb(0 0 0 / 12%);
   border-radius: 18px;
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 18px 44px rgb(20 26 34 / 16%);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
   transform-origin: top center;
   animation: nav-drop 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -901,7 +906,7 @@ body.ginga #drift-layer #hint.first-cue {
   gap: 6px;
   min-height: 52px;
   padding: 0 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
   font-size: 17px;
   font-weight: 600;
   line-height: 52px;
@@ -2410,7 +2415,7 @@ button.pool-tag.cat-chip {
 .world-row-name {
   flex: 0 0 100%;
   margin: 0 0 2px 2px;
-  font: 600 11px/1.2 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  font: 600 11px/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--ink) 72%, transparent);
@@ -2419,7 +2424,7 @@ button.pool-tag.cat-chip {
   margin: 2px 2px 0;
   padding-top: 10px;
   border-top: 0.5px solid var(--line);
-  font: 500 13px/1.3 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  font: 500 13px/1.3 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
   color: var(--ink);
   min-height: 1.3em;
 }
@@ -4111,10 +4116,13 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .stroke-page[data-chrome='sleeping'] [data-stroke-chrome] {
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
   transition:
     opacity 0.22s ease;
+}
+
+.stroke-page[data-chrome='sleeping'] [data-stroke-chrome][data-faded] {
+  visibility: hidden;
 }
 
 .stroke-awake-field {
@@ -4406,7 +4414,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .review-sense {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-style: italic;
   color: var(--ink-2);
   font-size: 15px;
@@ -4609,7 +4617,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .ai-tutor .ai-answer {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-size: 14px;
   color: var(--ink-2);
   white-space: pre-wrap;
@@ -4641,7 +4649,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .lesson-option {
   font: inherit;
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   text-align: left;
   padding: 12px 14px;
   border: 1px solid var(--line);
@@ -5231,6 +5239,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   width: max(100%, var(--tap));
   height: max(100%, var(--tap));
   transform: translate(-50%, -50%);
+}
+
+.rest-toggle .rest-icon {
+  display: block;
+  width: 11px;
+  height: 11px;
 }
 
 .rest-toggle.resting {
@@ -5875,6 +5889,7 @@ body.zen .probe-context {
   cursor: pointer;
   vertical-align: baseline;
   position: relative;
+  z-index: 1;
 }
 
 .sent-door::before {
@@ -5885,6 +5900,13 @@ body.zen .probe-context {
   width: max(100%, var(--tap));
   height: max(100%, var(--tap));
   transform: translate(-50%, -50%);
+}
+
+/* The reveal fade gives this line a stacking context; let its sentence
+ * target stay above the following printed headword without moving either. */
+.review-cloze:has(.sent-door) {
+  position: relative;
+  z-index: 1;
 }
 
 /* the answer face's example lines — quieter than the cloze, still living */
@@ -6897,7 +6919,7 @@ body.zen .review-reading {
 
 /* ------------------------------------------------ one sense decides the grade */
 body.zen .review-sense-primary {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-style: normal;
   font-size: 18px;
   line-height: 1.5;
@@ -6905,7 +6927,7 @@ body.zen .review-sense-primary {
   max-width: 34ch;
 }
 body.zen .review-sense-rest {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-size: 13.5px;
   line-height: 1.5;
   color: var(--card-ink-2);

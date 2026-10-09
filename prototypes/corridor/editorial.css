@@ -31,7 +31,7 @@ body, body.v-contrast-wcag {
   --r-control: 12px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur: 220ms;
-  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+  --sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
   /* the reader's page only: a 2–3% grain, fine fibre, never on chrome */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='240' height='240' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.27 0 0 0 0 0.2 0 0 0 1.4 -0.62'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='0.26'/%3E%3C/svg%3E");
   --ed-paper: var(--surface);
@@ -3203,7 +3203,8 @@ body #mini .mini-status:empty { display: none; }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 
 /* The one-time hint keeps its space after the first word opens. */
-.reader-tip.is-done { visibility: hidden; opacity: 0; transition: opacity 200ms ease; }
+.reader-tip.is-done { opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
+.reader-tip.is-done[data-faded] { visibility: hidden; }
 
 /* 原文 / やさしい版: a two-sided switch that says what each side is and its level, and one line on what the
    simplified version is */
@@ -3685,8 +3686,9 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --color-zen-signal: var(--world-zen-signal);
   --color-zen-glow: var(--world-zen-glow);
 
-  /* Offline faces only: system UI and the three already bundled ink faces. */
-  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+  /* Bundled faces first (fonts.css): Noto Sans JP for the interface beside the three ink faces;
+     the system names after it only stand in while a chunk is still on its way. */
+  --font-ui: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
   --font-reading: var(--world-serif);
   --font-display: var(--world-display);
   --font-brush: 'Yuji Syuku', 'Shippori Mincho B1', var(--font-reading);
@@ -3964,9 +3966,9 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --color-lacquer-ink: #e9e2d2;
   --color-press: color-mix(in srgb, var(--color-accent) 55%, #0b0f18);
 
-  /* type: Shippori B1 800 for display, system Mincho for reading, system sans for
-     chrome, system mono for data. Sizes stay the foundation's (reader ranges are pinned). */
-  --font-data: ui-monospace, 'SF Mono', Menlo, 'Roboto Mono', 'DejaVu Sans Mono', monospace;
+  /* type: Shippori B1 800 for display, Noto Serif JP for reading, Noto Sans JP for
+     chrome, Roboto Mono for data. Sizes stay the foundation's (reader ranges are pinned). */
+  --font-data: 'Roboto Mono', 'Noto Sans JP', ui-monospace, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace;
   --font-headword: 'Shippori Mincho B1', var(--world-serif);
   --weight-display: 800;
 
@@ -4646,7 +4648,7 @@ html[data-room='door'] body.ginga #home-review.corner-bubble .l-ja { font: inher
 html[data-room='door'] #drift-layer #hint {
   border-radius: 4px;
   padding: 8px 16px;
-  font: 500 12px/1.2 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  font: 500 12px/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
   letter-spacing: 0.06em;
   color: var(--ink);
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 90%, transparent);
@@ -4660,7 +4662,7 @@ html[data-room='door'] body.ginga #drift-layer #hint {
   border-radius: 0;
   background: none;
   box-shadow: none;
-  font: italic 400 13px/1.3 var(--serif, Georgia, serif);
+  font: italic 400 13px/1.3 'Noto Serif', var(--serif, serif);
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--ink, #23303f) 72%, transparent);
   text-shadow: 0 0 10px var(--ground-0, #f6f1e6), 0 0 2px var(--ground-0, #f6f1e6);

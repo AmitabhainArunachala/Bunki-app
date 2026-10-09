@@ -18,7 +18,7 @@
    ========================================================================== */
 
 :root {
-  --display: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  --display: 'Shippori Mincho B1', 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --paper-shadow: 0 1px 0 rgba(28, 47, 66, 0.06), 0 6px 18px -12px rgba(28, 47, 66, 0.35);
   --paper-edge: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
   --rule: 1px solid var(--line);

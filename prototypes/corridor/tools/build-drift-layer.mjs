@@ -58,6 +58,23 @@ cssPatch('transition:background .25s,width .25s,box-shadow .25s', 'transition:no
 cssPatch('transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s', 'transition:none', 'level handle');
 cssPatch('transition:opacity .3s,left .25s,font-size .25s', 'transition:opacity .3s', 'level information');
 
+// Bundled text faces precede native fallbacks in the fused layer. Preserve the
+// donor's reading/italic roles and all metrics without changing the donor.
+cssPatch('font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif',
+  'font-family:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif', 'bundled Japanese reading');
+cssPatch('font-size:.4em;font-style:italic;font-family:Georgia,serif',
+  'font-size:.4em;font-style:italic;font-family:"Noto Serif","Noto Serif JP",Georgia,serif', 'bundled word gloss');
+cssPatch('display:block;font-size:11px;font-family:Georgia,serif;font-style:italic',
+  'display:block;font-size:11px;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic', 'bundled part gloss');
+cssPatch('#card .gloss{font-family:Georgia,serif',
+  '#card .gloss{font-family:"Noto Serif","Noto Serif JP",Georgia,serif', 'bundled card gloss');
+cssPatch('font-size:11px;color:var(--faint);font-family:Georgia,serif;font-style:italic',
+  'font-size:11px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic', 'bundled card kanji gloss');
+cssPatch('font-family:Georgia,serif;font-style:italic}',
+  'font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}', 'bundled card note');
+cssPatch('font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic',
+  'font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic', 'bundled radical gloss');
+
 // Scope every rule under #drift-layer. The file has no at-rules (verified
 // below); selectors are :root / * / html,body / body / canvas / #id / .class.
 if (/@(keyframes|media|font-face|import)/.test(rawCss)) {

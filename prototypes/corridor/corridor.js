@@ -563,6 +563,10 @@ const S = {
   srsPrefs: { newPerDay: 20 },
   /** whether the quiet ペース row on the lists surface is unfolded */
   srsPrefsOpen: false,
+  /** a door that leads inside Today's Decks fold holds it open for that visit, whatever the device remembers */
+  todayDetailHeld: false,
+  /** whether the Words room's other-tools disclosure is open: a return from one of its doors finds it so */
+  wordsIndexOpen: false,
   /** articles marked finished: { passageId: ts } */
   readDone: {},
   /** where you left each article: { passageId: scrollY } */
@@ -2408,8 +2412,11 @@ function restoreRetryRoute() {
   if (!record) return;
   const drop = () => { try { sessionStorage.removeItem(RECORD_RETRY_ROUTE_KEY); } catch { /* best effort */ } };
   if (record.view === 'reader') {
-    if (D.passages?.some((row) => row.id === record.passageId)) openPassage(record.passageId);
-    return drop();
+    const known = !!D.passages?.some((row) => row.id === record.passageId);
+    // boot has no room to leave: the saved article is drawn in place, never after the default door
+    if (known) withoutRoomTransition(() => openPassage(record.passageId));
+    drop();
+    return known;
   }
   if (record.view === 'mock') {
     if (record.attemptId && recordWritable()) {
@@ -4436,7 +4443,7 @@ function renderArchive(main) {
     toggle.setAttribute('aria-expanded', String(S.archiveYears.has(y)));
     toggle.type = 'button';
     toggle.dataset.year = y;
-    toggle.textContent = `${open ? '▾' : '▸'} ${tx(`${y} 年`, String(y))} · ${list.length} ${tx('本', 'articles')}`.trim();
+    toggle.textContent = `${open ? '▼' : '▶'} ${tx(`${y} 年`, String(y))} · ${list.length} ${tx('本', 'articles')}`.trim();
     toggle.addEventListener('click', () => {
       if (S.archiveYears.has(y)) S.archiveYears.delete(y);
       else S.archiveYears.add(y);
@@ -6007,7 +6014,7 @@ function renderShelfBody(search = null) {
   src.setAttribute('aria-expanded', String(!!S.sourcesOpen));
   src.type = 'button';
   src.id = 'sources-toggle';
-  src.textContent = (S.sourcesOpen ? '▾ ' : '▸ ') + tx('出典と licence', 'sources & licences');
+  src.textContent = (S.sourcesOpen ? '▼ ' : '▶ ') + tx('出典と licence', 'sources & licences');
   src.addEventListener('click', () => {
     S.sourcesOpen = !S.sourcesOpen;
     render();
@@ -7663,7 +7670,7 @@ function renderReaderTip(main) {
   // the note is the app speaking about itself, not prose to look up
   tip.dataset.japaneseLookup = 'off';
   tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
-  if (seen) tip.setAttribute('aria-hidden', 'true');
+  if (seen) { tip.setAttribute('aria-hidden', 'true'); tip.inert = true; tip.dataset.faded = ''; }
   tip.append(el('p', 'reader-tip-text', readerTipText()));
   const close = el('button', 'icon-button reader-tip-close');
   close.type = 'button';
@@ -7690,8 +7697,10 @@ function retireReaderTip() {
   if (!tip) return;
   tip.classList.add('is-done');
   tip.setAttribute('aria-hidden', 'true');
+  tip.inert = true;
   const close = tip.querySelector('.reader-tip-close');
   if (close) close.tabIndex = -1;
+  settleFade(tip, true);
 }
 
 /** The kanji school grade an article's characters reach (the 学年 filter's measure), as a quiet tag. */
@@ -10105,7 +10114,7 @@ function renderReader(main) {
     if (crossRefs) {
       const refTarget = crossRefs.doors.get(index);
       if (refTarget) {
-        const refDoor = el('button', 'sent-door glossary-ref', '▹');
+        const refDoor = el('button', 'sent-door glossary-ref', '▷');
         refDoor.type = 'button';
         refDoor.dataset.glossaryRef = refTarget.id;
         refDoor.setAttribute(
@@ -10326,7 +10335,7 @@ function renderReader(main) {
   details.type = 'button';
   details.dataset.details = p.id;
   details.setAttribute('aria-expanded', String(!!S.detailsOpen?.has(p.id)));
-  details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('難しさの内訳', 'how the level was measured');
+  details.textContent = (S.detailsOpen?.has(p.id) ? '▼ ' : '▶ ') + tx('難しさの内訳', 'how the level was measured');
   details.addEventListener('click', () => {
     (S.detailsOpen ||= new Set());
     if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
@@ -10514,7 +10523,7 @@ function renderSrsPrefs(main) {
   toggle.type = 'button';
   toggle.id = 'srs-prefs-toggle';
   toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
-  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース — 1日に覚える数', 'pace · how many cards a day');
+  toggle.textContent = (S.srsPrefsOpen ? '▼ ' : '▶ ') + tx('ペース — 1日に覚える数', 'pace · how many cards a day');
   toggle.addEventListener('click', () => {
     S.srsPrefsOpen = !S.srsPrefsOpen;
     render();
@@ -11794,6 +11803,7 @@ function renderTodayDetail(today) {
   section.id = 'today-detail';
   let open = true;
   try { open = localStorage.getItem(TODAY_DETAIL_KEY) !== 'closed'; } catch { /* storage may be blocked */ }
+  open ||= S.todayDetailHeld;
   const toggle = el('button', 'today-detail-toggle');
   toggle.type = 'button';
   toggle.setAttribute('aria-controls', 'today-detail-body');
@@ -11809,6 +11819,7 @@ function renderTodayDetail(today) {
   body.hidden = !open;
   toggle.addEventListener('click', () => {
     const next = body.hidden;
+    S.todayDetailHeld = false;
     body.hidden = !next;
     toggle.setAttribute('aria-expanded', String(next));
     try { localStorage.setItem(TODAY_DETAIL_KEY, next ? 'open' : 'closed'); } catch { /* per-device convenience only */ }
@@ -12333,7 +12344,8 @@ function trayLine(item, dueKeys) {
     line.append(start);
   } else {
     // rest / wake — the card stays on the list, reviews skip it
-    const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
+    const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '');
+    if (!S.suspended[key]) rest.append(uiIcon('pause', 'rest-icon'));
     rest.type = 'button';
     rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
     rest.title = S.suspended[key] ? tx('この札を復習にもどす', 'resume this card in reviews') : tx('この札を休ませる（復習で出さない）', 'pause this card: reviews skip it');
@@ -16892,7 +16904,7 @@ function renderKdxParts(main) {
   if (S.kdx.parts.length) {
     const chosen = el('div', 'kdx-chosen');
     for (const p of S.kdx.parts) {
-      const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
+      const b = el('button', 'kdx-chip kdx-part on-list', `${p} ×`);
       b.dataset.uiContentValue = p;
       b.type = 'button';
       // the chosen row is a REMOVE control, not a toggle, and says so (PR #77 007479d0)
@@ -19331,7 +19343,7 @@ function renderSentenceNode(sheet, node) {
 
 /** The quiet door every example line carries into its own reading page. */
 function sentenceDoor(ex, target) {
-  const door = el('button', 'sent-door', '▹');
+  const door = el('button', 'sent-door', '▷');
   door.type = 'button';
   door.setAttribute('aria-label', tx('この文だけをひらく', 'open this sentence on its own page'));
   door.addEventListener('click', (ev) => {
@@ -21459,7 +21471,7 @@ function renderListPicker(sheet, node, label) {
       ),
     ),
   );
-  head.append(el('span', 'fold-arrow', open ? '▾' : '▸'));
+  head.append(el('span', 'fold-arrow', open ? '▼' : '▶'));
   head.addEventListener('click', () => {
     S.listMenuFor = open ? null : menuKey;
     render();
@@ -22682,7 +22694,7 @@ function renderReview(main) {
       say.id = 'card-say';
       say.setAttribute('aria-label', tx('読み上げ — Kore・Charon の収録音声', 'speak the reading (Kore or Charon recording)'));
       say.innerHTML =
-        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
+        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="Noto Serif JP, serif">音</text></svg>';
       say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
       row.append(say);
       // a tap that cannot play says why, visibly and to assistive tech — never a silent no-op
@@ -22721,7 +22733,7 @@ function renderReview(main) {
       const parts = [];
       if (exs.length) parts.push(tx(`例文 ${exs.length}`, `${exs.length} sentence${exs.length === 1 ? '' : 's'}`));
       if (lateSenses) parts.push(tx(`語義 +${lateSenses}`, `+${lateSenses} more sense${lateSenses === 1 ? '' : 's'}`));
-      fold.textContent = `${rv.moreOpen ? '▾' : '▸'} ${tx('詳しく', 'more')} · ${parts.join(' · ')}`;
+      fold.textContent = `${rv.moreOpen ? '▼' : '▶'} ${tx('詳しく', 'more')} · ${parts.join(' · ')}`;
       fold.addEventListener('click', () => {
         rv.moreOpen = !rv.moreOpen;
         render();
@@ -24752,7 +24764,7 @@ function renderStudyFold(sheet, node, variantTarget) {
         : tx('まだ記録なし', 'no history yet'),
     ),
   );
-  head.append(el('span', 'fold-arrow', open ? '▾' : '▸'));
+  head.append(el('span', 'fold-arrow', open ? '▼' : '▶'));
   head.addEventListener('click', () => {
     S.studyOpen = open ? null : key;
     render();
@@ -28463,6 +28475,23 @@ async function mountInkRoom(room2, ch, paths, reduced) {
   }
 }
 
+/** A node that fades out leaves sight by opacity alone. It is taken out of the page (data-faded:
+ * visibility) only once that fade has ended, or straight away when nothing is fading; showing it
+ * again first cancels the leaving. The caller makes it inert at once. */
+const FADE_REST_LIMIT_MS = 600;
+const fadeTurns = new WeakMap();
+function settleFade(node, hidden) {
+  const turn = {};
+  fadeTurns.set(node, turn);
+  delete node.dataset.faded;
+  if (!hidden) return;
+  const rest = () => { if (fadeTurns.get(node) === turn) node.dataset.faded = ''; };
+  const fades = (node.getAnimations?.() || []).filter((animation) => animation.transitionProperty === 'opacity');
+  if (!fades.length) { rest(); return; }
+  const limit = new Promise((resolve) => { setTimeout(resolve, FADE_REST_LIMIT_MS); });
+  Promise.race([Promise.allSettled(fades.map((animation) => animation.finished)), limit]).then(rest);
+}
+
 /** Sleep or wake the quiet room's single allowed field. Visibility alone is
  * not enough: inert + aria-hidden remove the sleeping controls from keyboard
  * and screen-reader navigation while the kanji stands by itself. */
@@ -28484,6 +28513,7 @@ function setStrokeChrome(page, awake) {
     field.inert = !S.strokeChromeAwake;
     if (S.strokeChromeAwake) field.removeAttribute('aria-hidden');
     else field.setAttribute('aria-hidden', 'true');
+    settleFade(field, !S.strokeChromeAwake);
   }
   requestAnimationFrame(() => {
     if (inkRoom?.page === page && inkRoom.syncLift) inkRoom.syncLift();
@@ -29245,7 +29275,7 @@ function renderSheet(root) {
     }
     bar.append(capture);
   }
-  const closeBtn = el('button', 'sheet-close', '✕');
+  const closeBtn = el('button', 'sheet-close', '×');
   closeBtn.type = 'button';
   closeBtn.id = 'sheet-close';
   // At the first depth Back and Close have the same return; the left-hand
@@ -29431,7 +29461,7 @@ function renderVariants(root) {
   const bar = el('div');
   bar.id = 'variants';
   const top = el('div', 'vbar');
-  const toggle = biLabel('button', 'vtoggle', S.debugOpen ? '変異 ▾' : '変異 ▴', 'variants');
+  const toggle = biLabel('button', 'vtoggle', S.debugOpen ? '変異 ▼' : '変異 ▲', 'variants');
   toggle.type = 'button';
   toggle.id = 'variants-toggle';
   toggle.addEventListener('click', () => {
@@ -29535,12 +29565,13 @@ function continueRoomArrival(main) {
     }
   }, () => {});
 }
+function withoutRoomTransition(change) {
+  roomTransitionUpdating = true;
+  try { return change(); } finally { roomTransitionUpdating = false; }
+}
 function roomTransition(change) {
   if (roomTransitionUpdating) return change();
-  if (!S.ready || document.hidden) {
-    roomTransitionUpdating = true;
-    try { return change(); } finally { roomTransitionUpdating = false; }
-  }
+  if (!S.ready || document.hidden) return withoutRoomTransition(change);
   activeRoomTransition?.skipTransition();
   const html = document.documentElement;
   const departing = document.querySelector('#app > main');
@@ -31635,12 +31666,8 @@ function renderSettings(main) {
   doors.append(world,
     foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => {
       S.srsPrefsOpen = true;
-      requestAnimationFrame(() => {
-        const section = document.getElementById('today-detail-body');
-        if (section) section.hidden = false;
-        document.querySelector('.today-detail-toggle')?.setAttribute('aria-expanded', 'true');
-        document.getElementById('srs-prefs-toggle')?.scrollIntoView({ block: 'start' });
-      });
+      S.todayDetailHeld = true;
+      requestAnimationFrame(() => document.getElementById('srs-prefs-toggle')?.scrollIntoView({ block: 'start' }));
     }),
     foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
     foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
@@ -31659,6 +31686,8 @@ function renderWordsDoors(main) {
   const web = renderWordWeb();
   if (web) main.append(web);
   const section = el('details', 'foundation-section words-index');
+  section.open = S.wordsIndexOpen;
+  section.addEventListener('toggle', () => { if (section.isConnected) S.wordsIndexOpen = section.open; });
   section.append(el('summary', 'eyebrow', tx('ほかの調べ方', 'More language tools')));
   const doors = el('div', 'foundation-doors');
   doors.append(
@@ -31778,6 +31807,7 @@ function render() {
   // A pending collection belongs to this visit; a nested return frame may
   // retain it, but leaving the room cannot redirect a later overview visit.
   if (S.view !== 'levels') pendingReferenceCollection = null;
+  if (S.view !== 'tray') S.todayDetailHeld = false;
   // the word menu belongs to a word this render replaces
   closeReaderWordMenu();
   stopSentenceListening();
@@ -32088,12 +32118,16 @@ function render() {
     chrome.append(capBtn);
   }
 
-  // Today: a quiet bookmark and its saved-word count. The accessible name carries the count.
-  // The on-screen bookmark stays quiet; its name states the room it opens.
+  // Today: a quiet bookmark and its saved-word count. The on-screen bookmark stays quiet; its
+  // name states the room it opens and that the number is saved words, not today's cards.
   const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   {
+    const saved = S.taken.length;
+    const name = tx(`今日 · 保存した語 ${saved}`, `Today · ${saved} saved word${saved === 1 ? '' : 's'}`);
+    trayBtn.setAttribute('aria-label', name);
+    trayBtn.title = name;
     const label = trayBtn.querySelector('.l-ja');
     const word = el('span', 'tray-word', tx('今日', 'Today'));
     label.replaceChildren(word, document.createTextNode(' '), el('span', 'tray-count', String(S.taken.length)));

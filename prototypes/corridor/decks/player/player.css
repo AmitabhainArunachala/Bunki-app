@@ -24,8 +24,8 @@
   --kp-kind-go: var(--kp-cyan);
   --kp-kind-ji: #ffb0ea; /* was #ff8fd8, ΔE 4.4 from --kp-sound (STANDARD A40) */
   --kp-kind-bun: var(--kp-violet);
-  --kp-jp: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', system-ui, sans-serif;
-  --kp-num: ui-monospace, 'SF Mono', 'Menlo', monospace;
+  --kp-jp: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
+  --kp-num: 'Roboto Mono', 'Noto Sans JP', ui-monospace, 'SF Mono', 'Menlo', monospace;
   color-scheme: dark;
   background: var(--kp-bg);
   background-image: var(--kp-tex);
@@ -59,7 +59,9 @@
 .kp button:focus-visible, .kp input:focus-visible, .kp textarea:focus-visible { outline: 2px solid var(--kp-cyan); outline-offset: 2px; }
 
 .kp-top { display: flex; align-items: center; gap: 12px; min-height: 44px; }
-.kp-icon { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 18px; flex: none; }
+.kp-icon { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 18px; flex: none; position: relative; }
+/* Keep the rounded mark while its transparent square owns the whole tap floor. */
+.kp-icon::before { content: ''; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
 .kp-title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; }
 .kp-sub { margin: 0; color: var(--kp-ink-2); font-size: 14px; line-height: 1.6; }
 .kp-h2 { margin: 8px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
@@ -147,8 +149,8 @@
 .kp-fold { border-bottom: 1px solid var(--kp-line); }
 .kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--kp-ink-2); letter-spacing: .04em; }
 .kp-fold > summary::-webkit-details-marker { display: none; }
-.kp-fold > summary::before { content: '▸'; color: var(--kp-mute); font-size: 11px; width: 1em; }
-.kp-fold[open] > summary::before { content: '▾'; }
+.kp-fold > summary::before { content: '▶'; color: var(--kp-mute); font-size: 11px; width: 1em; }
+.kp-fold[open] > summary::before { content: '▼'; }
 .kp-fold > :not(summary) { margin-bottom: 10px; }
 .kp-gloss { margin: 0; font-size: 15px; line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
 .kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--kp-ink-2); }
@@ -486,8 +488,8 @@
  * a reading, English or an answer node here: no display/visibility rule on rt, .kp-answer or [hidden].
  * ====================================================================================== */
 .kp {
-  --kp-serif: var(--font-reading, 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'Noto Serif JP', serif);
-  --kp-head: var(--font-headword, 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif);
+  --kp-serif: var(--font-reading, 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', serif);
+  --kp-head: var(--font-headword, 'Shippori Mincho B1', 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif);
 }
 /* the study stage: the ground around the card (和紙: 藍漆 lacquer; the other looks: their page) */
 .kp:has(> .kp-study) { background: var(--kp-study-ground); }

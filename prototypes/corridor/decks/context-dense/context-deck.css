@@ -26,9 +26,9 @@ html[data-cd-focus='1'] .ginga-seal {
   --cd-persimmon: #c4622d;
   --cd-moss: #2f6a45;
   --cd-rule: rgba(28, 22, 18, 0.28);
-  --serif: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  --serif: 'Shippori Mincho B1', 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --brush: 'Yuji Syuku', 'Shippori Mincho B1', serif;
-  --sans: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
   --seal: 'Kaisei Tokumin', 'Shippori Mincho B1', serif;
   color: var(--cd-ink);
   background: transparent;
@@ -348,7 +348,7 @@ ruby.cd-ruby rt {
 .cd-en {
   display: block;
   margin-top: 0.35rem;
-  font-family: 'Iowan Old Style', Palatino, 'Palatino Linotype', serif;
+  font-family: 'Noto Serif', 'Iowan Old Style', Palatino, 'Palatino Linotype', serif;
   font-style: italic;
   font-size: 0.92rem;
   color: var(--cd-faint);

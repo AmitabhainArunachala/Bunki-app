@@ -808,7 +808,7 @@ function studyScreen() {
   const mode = cardMode();
   const total = ui.queue.length;
   const top = el('header', 'kp-top kp-top-study');
-  top.append(btn('kp-icon', '✕', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' }));
+  top.append(btn('kp-icon', '×', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' }));
   const prog = el('div', 'kp-progress');
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));

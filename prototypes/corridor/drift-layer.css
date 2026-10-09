@@ -24,7 +24,7 @@
 #drift-layer{height:100%;overflow:hidden;overscroll-behavior:none}
 #drift-layer{
     background:var(--ground); color:var(--ink);
-    font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+    font-family:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
     touch-action:none; transition:none;
   }
 #drift-layer canvas{display:block}
@@ -45,7 +45,7 @@
     font-size:.44em;letter-spacing:.16em;color:var(--pig2);opacity:0;
     transition:opacity .5s;padding-bottom:.12em;pointer-events:none}
 #drift-layer .word .gloss{position:absolute;top:100%;left:50%;transform:translateX(-50%);
-    font-size:.4em;font-style:italic;font-family:Georgia,serif;color:var(--faint);
+    font-size:.4em;font-style:italic;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;color:var(--faint);
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
 #drift-layer .word.unfolded .yomi{opacity:1}
 #drift-layer .word.glossed .yomi,
@@ -67,7 +67,7 @@
 #drift-layer .glyph.comp .g{font-size:24px;color:var(--pig2);border:1px solid var(--line);
     border-radius:6px;padding:2px 7px;background:var(--plaque)}
 #drift-layer .glyph small,
-#drift-layer .part small{display:block;font-size:11px;font-family:Georgia,serif;font-style:italic;
+#drift-layer .part small{display:block;font-size:11px;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     color:var(--faint);letter-spacing:.03em;opacity:0;transition:opacity .5s}
 #drift-layer .glyph.center small,
 #drift-layer .glyph.unfolded small,
@@ -109,13 +109,13 @@
 #drift-layer #card.open{transform:translateY(0)}
 #drift-layer #card .yomi{font-size:13px;letter-spacing:.2em;color:var(--pig2)}
 #drift-layer #card h1{font-size:42px;font-weight:500;margin:2px 0 4px}
-#drift-layer #card .gloss{font-family:Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
+#drift-layer #card .gloss{font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
 #drift-layer #card .row{display:flex;gap:10px;margin-top:14px}
 #drift-layer #card .row div{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
 #drift-layer #card .row .k{font-size:24px}
-#drift-layer #card .row .kg{font-size:11px;color:var(--faint);font-family:Georgia,serif;font-style:italic}
+#drift-layer #card .row .kg{font-size:11px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
 #drift-layer #card .note{margin-top:13px;font-size:11px;color:var(--faint);text-align:center;
-    font-family:Georgia,serif;font-style:italic}
+    font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
 #drift-layer #card .kx{display:flex;align-items:center;gap:14px}
 #drift-layer #card .kx h1{margin:0}
 #drift-layer #card .bt{margin-left:auto;font-size:12px;letter-spacing:.1em;color:var(--pig2);
@@ -156,7 +156,7 @@
     background:var(--plaque);border:1px solid var(--line);border-radius:8px;padding:5px 10px;
     pointer-events:none}
 #drift-layer #lvl.hot #lvlInfo{opacity:1}
-#drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic;
+#drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 #drift-layer #card .study{display:block;width:100%;box-sizing:border-box;margin-top:13px;
     min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
