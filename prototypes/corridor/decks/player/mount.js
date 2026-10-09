@@ -121,8 +121,8 @@ const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
 /** a stored ledger this player could not read, set aside before anything is saved over it */
 const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
-function prefsFor(storage, deck) {
-  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
+function prefsFor(storage, deck, followWorld = false) {
+  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(followWorld ? { look: 'world' } : {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
 }
 function readJson(storage, key) {
   try {
@@ -326,6 +326,7 @@ const UI_EN = {
   "書き下ろし": "Original composition",
   "墨": "Ink",
   "藍": "Indigo",
+  "全体のテーマ": "App theme",
   "抹茶": "Matcha",
   "黒板": "Chalkboard",
   "和紙": "Washi",
@@ -910,6 +911,7 @@ function cardEyebrow(card, mode) {
 }
 
 const THEMES = [
+  ['world', '全体のテーマ', '#fbf8f1', '#1f3a5f'],
   ['dark', '墨', '#0a0e13', '#3fd0ff'],
   ['ai', '藍', '#141a28', '#e9e2d2'],
   ['matcha', '抹茶', '#13261a', '#a6e06a'],
@@ -2427,7 +2429,7 @@ function settingsScreen() {
   const sw = el('div', 'kp-swatches');
   sw.setAttribute('role', 'radiogroup');
   sw.setAttribute('aria-label', t("色（テーマ）"));
-  for (const [value, label, bg, ink] of THEMES) {
+  for (const [value, label, bg, ink] of THEMES.filter(([value]) => ctx.host || value !== 'world')) {
     const on = ctx.prefs.look === value;
     const b = btn(`kp-swatch${on ? ' is-on' : ''}`, t(label), () => {
       savePrefs({ ...ctx.prefs, look: value });
@@ -2523,7 +2525,7 @@ function restoreButton(ta, msg) {
     }
     const nowCards = Object.keys(ctx.state.cards).length;
     const nowLog = ctx.state.log.length;
-    msg.textContent = t(`このバックアップ：${seen.cards}枚・${seen.log}回答／いまの記録：${nowCards}枚・${nowLog}回答` + (seen.cards < nowCards ? '　いまより少ない記録です。' : ''), `Backup: ${seen.cards} cards · ${seen.log} answers / Current record: ${nowCards} cards · ${nowLog} answers${seen.cards < nowCards ? ' This backup has fewer records.' : ''}`);
+    msg.textContent = t(`このバックアップ：${seen.cards}枚・${seen.log}回答／いまの記録：${nowCards}枚・${nowLog}回答` + (seen.cards < nowCards ? '　いまより少ない記録です。' : ''), `Backup: ${nounEn(seen.cards, 'card')} · ${nounEn(seen.log, 'answer')} / Current record: ${nounEn(nowCards, 'card')} · ${nounEn(nowLog, 'answer')}${seen.cards < nowCards ? ' This backup has fewer records.' : ''}`);
     staged = { text: ta.value, raw };
     b.dataset.arm = '1';
     b.textContent = t("置き換える");
@@ -2555,7 +2557,7 @@ function restoreButton(ta, msg) {
     ctx.state = next;
     ctx.notice = '';
     ui.undo = null;
-    msg.textContent = t(`復元しました（${Object.keys(next.cards).length}枚・${next.log.length}回答）。`, `Restored (${Object.keys(next.cards).length} cards · ${next.log.length} answers).`);
+    msg.textContent = t(`復元しました（${Object.keys(next.cards).length}枚・${next.log.length}回答）。`, `Restored (${nounEn(Object.keys(next.cards).length, 'card')} · ${nounEn(next.log.length, 'answer')}).`);
   }
   ta.addEventListener('input', () => staged && disarm());
   return b;
@@ -2621,7 +2623,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     // one, the page's built-in gloss map of this deck's own words (STANDARD A44)
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
-    prefs: prefsFor(storage, deck),
+    prefs: prefsFor(storage, deck, !!lexicon),
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));

@@ -39,6 +39,11 @@ html[data-room='learn'] body:not([data-view='drift']) {
   --learn-card-ink: color-mix(in srgb, var(--color-lacquer) 70%, #000);
   --learn-card-muted: color-mix(in srgb, var(--color-lacquer) 62%, transparent);
 }
+:root[data-theme='kaku'][data-room='learn'] body:not([data-view='drift']) {
+  --learn-card: #f3eee2;
+  --learn-card-ink: #18251f;
+  --learn-card-muted: #475348;
+}
 
 /* ---- the stage ---- */
 html[data-room='learn'] body:not([data-view='drift']) #app > main > .learn-stage {

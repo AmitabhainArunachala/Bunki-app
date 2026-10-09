@@ -8684,10 +8684,18 @@ function keepFloatingBeside(card, anchor) {
   watch.observe(card);
 }
 
-/** A floating card beside the word it belongs to: above when it fits there, otherwise below, and never
- * under the fixed chrome at the top or the reader's foot (the play bar's dock on a phone). It never covers
- * its own word: when neither side holds it whole it takes the roomier side and scrolls inside itself. */
+/** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
+ * phone becomes a full document card below its word, with the page carrying the text and actions. */
 function placeFloating(card, r) {
+  const wasDocument = card.dataset.flow === 'document';
+  if (wasDocument && !card.classList.contains('is-sentence')) {
+    const before = window.scrollY;
+    delete card.dataset.flow;
+    window.scrollTo({ top: Number(card.dataset.flowScroll) || 0, behavior: 'instant' });
+    const moved = window.scrollY - before;
+    r = { ...r, top: r.top - moved, bottom: r.bottom - moved, left: r.left, width: r.width };
+    delete card.dataset.flowScroll;
+  }
   card.style.maxHeight = '';
   card.style.overflowY = '';
   const m = card.getBoundingClientRect();
@@ -8708,6 +8716,21 @@ function placeFloating(card, r) {
   const pinnedRoom = pinned < r.top ? Math.min(floor, r.top - 10) - pinned : floor - pinned;
   const pinHolds = Number.isFinite(pinned) && pinned >= ceiling && pinnedRoom >= 96
     && (pinned < r.top || pinned >= r.bottom + 10);
+  // A long sentence is a full document card on a phone: the page carries its text and actions.
+  // Keep the short word card's fixed seat, and restore that reading position on Back.
+  const documentFlow = window.innerWidth <= 520 && card.classList.contains('is-sentence')
+    && (wasDocument || m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96)));
+  if (documentFlow) {
+    if (!wasDocument) card.dataset.flowScroll = String(window.scrollY);
+    card.dataset.flow = 'document';
+    card.style.left = `${Math.max(0, (window.innerWidth - m.width) / 2)}px`;
+    card.style.top = `${r.bottom + 10 + window.scrollY}px`;
+    delete card.dataset.floatingTop;
+    card.dataset.side = 'below';
+    revealFloatingFocus(card);
+    return;
+  }
+  delete card.dataset.flow;
   let top;
   if (pinHolds) {
     top = pinned;
@@ -8738,12 +8761,21 @@ function placeFloating(card, r) {
   revealFloatingFocus(card);
 }
 
-/** Reveal a focused control inside a clipped card without scrolling the article or moving the card. */
+/** Reveal a focused control using the page for a full sentence card, or its own scroll for a small popup. */
 function revealFloatingFocus(card) {
   const control = document.activeElement;
   if (!control || control === card || !card.contains(control)) return;
   const box = card.getBoundingClientRect(), focus = control.getBoundingClientRect();
   if (!focus.height) return;
+  if (card.dataset.flow === 'document') {
+    const chrome = document.querySelector('#app > .chrome')?.getBoundingClientRect();
+    const tabs = document.querySelector('#primary-tabs')?.getBoundingClientRect();
+    const ceiling = Math.max(8, chrome?.bottom || 0) + 8;
+    const floor = Math.min(window.innerHeight, tabs?.top || window.innerHeight) - 8;
+    if (focus.bottom > floor) window.scrollBy({ top: focus.bottom - floor, behavior: 'instant' });
+    else if (focus.top < ceiling) window.scrollBy({ top: focus.top - ceiling, behavior: 'instant' });
+    return;
+  }
   if (focus.bottom > box.bottom - 8) card.scrollTop += focus.bottom - (box.bottom - 8);
   else if (focus.top < box.top + 8) card.scrollTop -= box.top + 8 - focus.top;
 }

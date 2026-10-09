@@ -861,3 +861,49 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 @media (prefers-reduced-motion: reduce) {
   .kp .kp-reveal:active, .kp .kp-next:active { transform: none; }
 }
+
+/* Hosted decks begin in the app's selected world. An explicit saved card look retains
+ * its own palette; selecting App theme returns home, list, settings and the sitting to this family. */
+.kp[data-look='world'] {
+  --kp-bg: var(--color-page, #f4eee1); --kp-panel: #fbf8f1; --kp-panel-2: #efe8d9;
+  --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #565c66; --kp-line: #dcd3c0;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1;
+  --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-blue: #26518c; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #805300;
+  --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  --kp-tex: repeating-linear-gradient(97deg, rgba(120, 90, 50, 0.03) 0 2px, transparent 2px 7px);
+  --kp-depth: 0 1px 0 rgba(25, 28, 34, 0.09), 0 10px 26px -6px rgba(40, 30, 16, 0.16);
+  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: #e9e2d2; --kp-stage-mute: #b5ad9c;
+  --kp-shu: #c4401f; --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
+  --kp-study-ground: var(--kp-stage); --kp-card-depth: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 26px 50px -18px rgba(0, 0, 0, 0.75);
+  color-scheme: light;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='world'] {
+  --kp-bg: var(--color-page, #121a2b); --kp-panel: #1a2437; --kp-panel-2: #222d44;
+  --kp-ink: #ede6d6; --kp-ink-2: #cbc3b2; --kp-mute: #a8a092; --kp-line: #2d3952;
+  --kp-cyan: #a9c4ea; --kp-cyan-wash: rgba(169, 196, 234, 0.12); --kp-on-accent: #0f1626;
+  --kp-red: #f39282; --kp-amber: #efb764; --kp-green: #95d49c; --kp-blue: #a3bdf6; --kp-violet: #bdaaff;
+  --kp-kind-ji: #88f0ff; --kp-noun: #a9c4ea; --kp-verb: #f5a47f; --kp-adj: #ead27c;
+  --kp-adv: #cdb2ff; --kp-expr: #a4dc88; --kp-sound: #ffa3cf;
+  --kp-tex: none; --kp-depth: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 32px -8px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='world']:has(> .kp-study) {
+  --kp-bg: #ebe4d3; --kp-panel: #f2ecdf; --kp-panel-2: #e6dfce;
+  --kp-ink: #1b1f26; --kp-ink-2: #3a404a; --kp-mute: #545a64; --kp-line: #d3c9b5;
+  --kp-cyan: #1f3a5f; --kp-cyan-wash: rgba(31, 58, 95, 0.08); --kp-on-accent: #fbf8f1;
+  --kp-red: #a3301f; --kp-amber: #7a4700; --kp-green: #2e5f20; --kp-blue: #26518c; --kp-violet: #5f46a8;
+  --kp-kind-ji: #64075b; --kp-noun: #1f3a5f; --kp-verb: #93301a; --kp-adj: #7a4f00;
+  --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
+  color-scheme: light;
+}
+:root[data-theme='kaku'] .kp[data-look='world'] {
+  --kp-panel: #14201b; --kp-panel-2: #1c2c24; --kp-ink: #eee9de; --kp-ink-2: #c9d5cd; --kp-mute: #a0b4a7; --kp-line: #30483a;
+  --kp-cyan: #93ddba; --kp-cyan-wash: rgba(147, 221, 186, 0.12); --kp-noun: #93ddba; --kp-kind-ji: #88f0ff;
+}
+:root[data-theme='kaku'] .kp[data-look='world']:has(> .kp-study) {
+  --kp-bg: #f3eee2; --kp-panel: #f3eee2; --kp-panel-2: #e7e0d1; --kp-ink: #18251f; --kp-ink-2: #3a4b40; --kp-mute: #475348; --kp-line: #c9c9b8;
+  --kp-cyan: #24543f; --kp-cyan-wash: rgba(36, 84, 63, 0.08); --kp-on-accent: #f3eee2; --kp-noun: #24543f; --kp-kind-ji: #64075b;
+}
+.kp[data-look='world'] .kp-study > .kp-reveal { border-color: var(--kp-stage-ink); color: var(--kp-stage-ink); background: var(--kp-dock); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='world'] .kp-start:not(:disabled) { background: var(--kp-ink); color: var(--kp-bg); }
