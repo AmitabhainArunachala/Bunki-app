@@ -30000,12 +30000,12 @@ function openWorldPicker(anchor) {
       b.classList.add('active');
       activeStone = b;
     }
-    b.addEventListener('click', () => {
+    b.addEventListener('click', () => roomTransition(() => {
       closeWorldPicker();
       setKairoTheme(t.id);
       S.sealWake = true; // the 銀河 seal plays its wake on a world change
       applyWorldSwap();
-    });
+    }));
     return b;
   };
   // two named rows, day then night: both night looks sit side by side (D2)
@@ -31330,8 +31330,7 @@ function meBackPart() {
     b.setAttribute('aria-pressed', String(S.lang === id));
     b.addEventListener('click', () => {
       if (S.lang === id) return;
-      S.lang = id;
-      render();
+      roomTransition(() => { S.lang = id; render(); });
     });
     language.append(b);
   }
@@ -31347,10 +31346,12 @@ function meBackPart() {
     b.dataset.light = id;
     b.addEventListener('click', () => {
       if ((id === 'night') === ME_NIGHT_WORLDS.includes(themeId())) return;
-      setKairoTheme(id === 'night' ? 'yoru' : 'hokusai');
-      S.sealWake = true;
-      applyWorldSwap();
-      paintLight();
+      roomTransition(() => {
+        setKairoTheme(id === 'night' ? 'yoru' : 'hokusai');
+        S.sealWake = true;
+        applyWorldSwap();
+        paintLight();
+      });
     });
     lights.push(b);
     light.append(b);
@@ -31454,7 +31455,9 @@ function renderSettings(main) {
   for (const [id, ja, en] of [['bi', '英語', 'English'], ['ja', '日本語', 'Japanese']]) {
     const button = el('button', '', tx(ja, en)); button.type = 'button'; button.dataset.lang = id;
     button.setAttribute('aria-pressed', String(S.lang === id));
-    button.addEventListener('click', () => { S.lang = id; render(); }); choices.append(button);
+    button.addEventListener('click', () => {
+      if (S.lang !== id) roomTransition(() => { S.lang = id; render(); });
+    }); choices.append(button);
   }
   language.append(choices);
   const world = biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
