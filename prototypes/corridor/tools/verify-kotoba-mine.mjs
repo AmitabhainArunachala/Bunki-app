@@ -2498,9 +2498,20 @@ async function main() {
 
     await page.click('[data-deck="kotoba-mcd"]');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
-    check('the deck home leads with the count and topics: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
+    check('the deck home leads with the count: no method panel there, no 見て覚えるコツ panel', (await page.locator('#kp-method, #kp-tips, .kp-tips').count()) === 0);
     const home = await page.evaluate(`({ start: document.getElementById('kp-start').textContent, groups: document.querySelectorAll('.kp-group').length })`);
-    check('the deck home shows today’s count and the 12 topics', /15/.test(home.start) && home.groups === 12, JSON.stringify(home));
+    const beforeTopics = await page.evaluate(`({ ledger: localStorage.getItem('bunki-cloze:kotoba-mcd'), prefs: localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') })`);
+    await page.click('#kp-to-settings');
+    await page.waitForSelector('.kp-settings .kp-group');
+    const topics = await page.evaluate(`[...document.querySelectorAll('.kp-settings .kp-group')].map(n => ({ id: n.querySelector('input[data-group]')?.dataset.group, count: n.querySelector('.kp-gcount')?.textContent }))`);
+    const expectedTopics = deck.groups.map(g => ({ id: g.id, count: `0/${deck.words.filter(w => w.group === g.id).length}` }));
+    await page.click('.kp-icon');
+    await page.waitForSelector('#kp-start');
+    const afterTopics = await page.evaluate(`({ ledger: localStorage.getItem('bunki-cloze:kotoba-mcd'), prefs: localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') })`);
+    check('the deck home shows today’s count and its 12 exact topics remain in Settings, with their source counts and no preference or ledger change on return',
+      /15/.test(home.start) && home.groups === 0 && topics.length === 12 && JSON.stringify(topics) === JSON.stringify(expectedTopics) &&
+        JSON.stringify(beforeTopics) === JSON.stringify(afterTopics) && await page.locator('#kp-start').textContent() === home.start,
+      JSON.stringify({ home, topics, expectedTopics, beforeTopics, afterTopics }));
     // T2 (the 2026-10-08 tour): "the four windows but maybe not so big", in the old home's colours. The
     // player injects its own stylesheet when it mounts: read the tiles once it has applied (a sheet that
     // never applies leaves them stacked and uncoloured, and the check fails)

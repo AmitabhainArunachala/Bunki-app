@@ -892,7 +892,7 @@ try {
       check(`G2 ${lang}: one tap shows the honest dictionary miss in the popup`,
         mini?.word === IU.token.b && mini.reading === IU.token.r
           && mini.gloss === `<span class="mini-gloss mini-miss">${MISS[lang]}</span>`
-          && !/no gloss yet|語釈なし/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
+          && !/no gloss yet|語釈なし|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
       check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
         one?.surface === IU.token.s && one.lines === 0 && !one.hasEn
           && one.label === `${IU.token.s} · ${WORD[lang]} · ${HINT[lang]}`, JSON.stringify(one), { id: `G2.${lang}.prose` });

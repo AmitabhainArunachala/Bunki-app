@@ -106,7 +106,7 @@ try{
      await click(page,ending);await page.locator('#mini').waitFor();
      const shown=await mini(page);
      assert.equal(shown.word,'ます');assert.equal(shown.reading,'ます');
-     assert.equal(shown.gloss,'(no gloss yet)','A polite ending must not borrow 升 or 増す');
+     assert.equal(shown.gloss,'No dictionary entry for this spelling.','A polite ending must not borrow 升 or 増す');
      assert.equal(await page.locator('#mini-take').isDisabled(),true);
      assert.equal(await page.locator('#mini .mini-entry').isDisabled(),true,
       'An unresolved full-entry door must not reopen the rejected dictionary row');

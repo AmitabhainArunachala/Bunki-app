@@ -235,7 +235,7 @@ async function openQuickLook(page, preferredIndex = 0) {
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '',
       };
     });
-    if (quick?.word && quick.gloss && !/語釈なし|no gloss/.test(quick.gloss)) {
+    if (quick?.word && quick.gloss && !/語釈なし|no gloss|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/.test(quick.gloss)) {
       return quick;
     }
     await page.evaluate(() => document.getElementById('mini')?.remove());
