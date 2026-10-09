@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "不純物",
+   "reading": "ふじゅんぶつ",
+   "pos": "noun",
+   "meaning": "impurity; dopant",
+   "defJa": "目的とする物質の中に混じった別の物質",
+   "passage": {
+    "ja": "半導体の材料に別の物質が混ざると聞けば、すべて取り除いたほうがよいと感じるかもしれません。けれども、不純物には意図せず入ったものだけでなく、電気の流れ方を調整するため、狙って加えた元素も含まれます。大事なのは、混ざっているかどうかだけでなく、何が、どれだけ、どの場所にあるかを制御できることです。材料の清浄さを保つ工程と、必要な性質を作る工程を分けて読むと、同じ言葉が厄介な混入と役に立つ添加の両方を指す理由が理解できます。",
+    "form": "不純物",
+    "en": "Hearing that another substance is mixed into a semiconductor material may suggest that all of it should be removed. But impurities include not only accidental contamination but also elements deliberately added to adjust electrical behavior. What matters is controlling what is present, how much, and where, not simply whether something is mixed in. Distinguishing purification from processes that create useful properties explains why the same word can refer both to unwanted contamination and beneficial additions.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "取り除く対象にも、制御して加える対象にもなる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "並列処理",
+   "reading": "へいれつしょり",
+   "pos": "noun",
+   "meaning": "parallel processing",
+   "defJa": "複数の計算や作業を同時に進める方式",
+   "passage": {
+    "ja": "一つの大きな計算を複数の装置に分ければ、同時に仕事を進められる部分が増える。並列処理はこの性質を利用するが、装置の台数を二倍にすれば必ず時間が半分になるというものではない。分けられない作業に加えて、データを配り、結果を受け取り、他の処理を待つ時間も必要になるためだ。性能を評価する際には、計算そのものの速さだけでなく、全体のどこで待ち時間が生じるかを確認し、台数を増やしても改善しにくい部分を特定することが求められる。",
+    "form": "並列処理",
+    "en": "Dividing a large computation among several machines increases the portions that can proceed simultaneously. Parallel processing exploits this, but doubling the number of machines does not necessarily halve the time. Some tasks cannot be divided, while distributing data, collecting results, and waiting for other work also takes time. Performance evaluation therefore examines where waiting occurs across the whole process, identifying portions that gain little from adding machines rather than measuring calculation speed alone.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "分ける手間や待ち合わせが、速さの限界になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "中国語の部屋",
+   "reading": "ちゅうごくごのへや",
+   "pos": "noun",
+   "meaning": "the Chinese Room argument",
+   "defJa": "記号の操作と意味の理解の違いを問う思考実験",
+   "passage": {
+    "ja": "規則どおりに文字を並べ、外から見れば自然な返答ができたとしても、その意味を理解していると言えるのか。中国語の部屋は、言葉を知らない人が規則に従って記号を扱う場面を通じ、計算と理解の関係を問い直す思考実験である。人工知能が流暢に応答する時代にもこの問いは響くが、それをもって、どのような人工の仕組みにも理解は不可能だと実証されたことにはならない。部屋の中の人と仕組み全体のどちらへ理解を帰すかなど、反論の位置をたどることで、問いの輪郭が見えてくる。",
+    "form": "中国語の部屋",
+    "en": "If symbols arranged by rules produce natural replies from the outside, does the system understand their meaning? The Chinese room is a thought experiment questioning the relationship between computation and understanding through a person manipulating symbols according to rules without knowing the language. The question remains relevant to fluent AI systems, but it does not constitute empirical proof that understanding is impossible for every artificial system. Following objections, including whether understanding belongs to the person or the whole system, clarifies the question's boundaries.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "結論が確定した実験結果としては扱わない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "中央演算処理装置",
+   "reading": "ちゅうおうえんざんしょりそうち",
+   "pos": "noun",
+   "meaning": "CPU",
+   "defJa": "命令を読み取り計算や制御を担う主要な装置",
+   "passage": {
+    "ja": "パソコンの中にいろんな部品があると、どれが何を決めているのか混乱するよね。中央演算処理装置は、プログラムの命令を読み取り、計算をしたり他の処理を制御したりする中心的な部品なんだ。ただし、画像などの大量の計算を別の部品が受け持つこともあるから、これ一つが何でも全部やると考えると、役割分担を見落とす。作業の流れを図にして、どこから命令やデータを受け取り、どこへ結果を渡すかを描くと、頭脳という比喩だけよりも、装置同士の関係を追えるようになるよ。",
+    "form": "中央演算処理装置",
+    "en": "The variety of parts inside a computer can make it difficult to tell which one controls what. The central processing unit is a main component that reads program instructions, performs calculations, and controls other processing. Other components may handle large computations such as graphics, however, so treating it as doing everything misses the division of work. Diagramming where instructions and data arrive from and where results go makes relationships between components easier to trace than the metaphor of a brain alone.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "頭脳という比喩より、命令を実行する役割に注目する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "事前学習",
+   "reading": "じぜんがくしゅう",
+   "pos": "noun",
+   "meaning": "pre-training",
+   "defJa": "個別の用途へ適用する前に広いデータで学ぶこと",
+   "passage": {
+    "ja": "言語モデルに質問したとき、毎回答えを探してインターネットを読んでいると考えないようにしましょう。事前学習は、個別の利用に先立って多くのデータから表現や傾向を学ぶ段階で、質問のたびに新しい資料を調べる処理とは異なります。そのため、学んだ内容だけで返答する場合と、外部の検索結果も使う場合とでは、答えの根拠を確かめる方法も変わります。仕組みを読む練習では、いつ何を学び、利用時にどの情報を渡したのかを分けて書くと、過去の知識と今の資料が混ざりにくくなります。",
+    "form": "事前学習",
+    "en": "Do not assume that a language model searches the internet for an answer whenever it is asked a question. Pretraining is a stage of learning representations and patterns from large amounts of data before particular use, distinct from consulting fresh material on every query. Accordingly, checking the basis of an answer differs between responses relying only on learned information and those also using external search results. Recording what was learned when and what information was supplied during use helps keep prior knowledge distinct from current reference material.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "学習した段階と、利用時に参照する情報を分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "二極化",
+   "reading": "にきょくか",
+   "pos": "noun",
+   "meaning": "polarization",
+   "defJa": "中間が薄くなり二つの側へ分かれること",
+   "passage": {
+    "ja": "半導体企業の業績記事に「二極化が進む」と書くなら、強い会社と弱い会社があるだけでは説明が足りません。中間にいた企業が減り、好調な側と低迷する側へ分かれるような動きなのかを示すと、二つの極という言葉に対応した内容になります。売上規模の差なのか利益率の差なのかによっても図の意味は変わるので、比較する指標を途中で入れ替えないことが大切です。「格差がある」という一文で済ませるのではなく、どの集まりがどちらへ動いたかを添えると、変化を表す記事になります。",
+    "form": "二極化",
+    "en": "An article claiming that semiconductor firms are polarizing needs more than the existence of strong and weak companies. Describing a thinning middle and separation into successful and struggling groups gives content to the idea of two poles. The chart also means different things depending on whether it compares sales scale or profit margins, so the measure should remain consistent. Adding which groups moved in which direction turns a mere statement of disparity into an account of change.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "単なる差の拡大と、二つへの分かれ方を区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "他の追随を許さない",
+   "reading": "たのついずいをゆるさない",
+   "pos": "expression",
+   "meaning": "unrivaled",
+   "defJa": "同業の相手が追いつけないほど優れていること",
+   "passage": {
+    "ja": "半導体の広告で他の追随を許さないと書かれていれば、どの性能で、誰と比べたのかを確かめたくなります。一つの試験で少し上回っただけなのに、その表現を使うと、大きく引き離した差があるように伝わるからです。高い評価を否定する必要はありませんが、処理の内容や消費電力の条件が違えば、順位が変わる場合もあります。性能表を読むときは、強い言葉を数値へ戻し、同じ条件でどれだけ差があるかを調べると、宣伝の勢いと実際に確かめられた優位を切り分けられます。",
+    "form": "他の追随を許さない",
+    "en": "A semiconductor advertisement claiming superiority that competitors cannot match prompts questions about the metric and the comparison group. Using that expression for a slight lead on one test makes it sound like a large gap. Strong evaluations need not be dismissed, but rankings may change with workload or power conditions. Returning the language to figures and examining differences under comparable conditions separates promotional force from demonstrated advantage.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "強い評価なので、比較した条件と根拠を添える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "付加価値",
+   "reading": "ふかかち",
+   "pos": "noun",
+   "meaning": "added value",
+   "defJa": "加工やサービスによって新たに加えられた価値",
+   "passage": {
+    "ja": "同じ部品を使う機器でも、使いやすい設定や保守の仕組みが整えば、利用者にとっての便益は変わる。付加価値を考える際には、材料を組み立てた後に何が新たな働きとして加わったのかを具体化することが重要となる。半導体企業でも、素子の性能だけでなく、設計を助ける道具や利用を支える情報が、製品を選ぶ理由になる場合がある。ただし、価格が高いことをもって価値が高いと循環的に説明せず、どの手間が減り、どの成果が得られるかを示すことが、事業の強みを比較する土台となる。",
+    "form": "付加価値",
+    "en": "Devices using identical components can offer different benefits when configuration and maintenance are easier. Considering added value requires specifying what new function has been created beyond assembling the materials. For semiconductor companies, design tools and information supporting use may motivate product choice alongside device performance. Comparing business strengths therefore requires showing which burdens are reduced and which outcomes are achieved rather than circularly treating a high price as proof of high value.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "単に価格が高いことと、加えた働きを区別する。",
+    "sense": ""
+   }
+  }
+ ]
+}

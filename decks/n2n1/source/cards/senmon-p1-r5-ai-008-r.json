@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "ゲーム理論",
+   "reading": "げーむりろん",
+   "pos": "noun",
+   "meaning": "game theory",
+   "defJa": "互いの選択が結果に影響する状況を分析する理論",
+   "passage": {
+    "ja": "二つの半導体企業が同じ製品の値下げを考えているとき、自社だけの費用を計算すれば判断できるでしょうか。ゲーム理論は、相手が何を選ぶかによって自分の結果も変わる状況を、選択肢と利得の関係から分析するための道具です。一社が価格を下げた場合と両社が下げた場合を分けると、個々には合理的な行動でも、全体では利益が減る可能性を検討できます。ただし、現実の企業の目的を一つの数字で表すのは単純化にすぎないため、計算の結論を使う前に、何を利得として置いたかを確かめましょう。",
+    "form": "ゲーム理論",
+    "en": "When two semiconductor companies consider cutting the price of the same product, can either decide by calculating only its own costs? Game theory analyzes situations where one's outcome depends on another's choice through relationships between options and payoffs. Separating cases where one company cuts prices from those where both do allows examination of how individually rational actions might reduce combined profit. Representing actual corporate objectives with one number is only a simplification, so check what was counted as payoff before applying the conclusion.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "相手の反応を含めて、自分の選択を考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
