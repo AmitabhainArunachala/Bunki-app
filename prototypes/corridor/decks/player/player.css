@@ -93,7 +93,7 @@
 .kp-bar .kp-c-learn { background: var(--kp-amber); }
 
 .kp-foot { display: flex; gap: 20px; justify-content: center; }
-.kp-link { background: none; border: 0; color: var(--kp-ink-2); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; padding: 8px; }
+.kp-link { min-height: 44px; background: none; border: 0; color: var(--kp-ink-2); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; padding: 8px; }
 
 /* study */
 .kp-top-study { gap: 10px; }
@@ -201,7 +201,7 @@
 .kp-rule-x::after { inset: -7px; } /* from inside the 1px border: 30 + 14 */
 .kp-zoom-btn[aria-pressed='true'] { background: var(--kp-cyan-wash); color: var(--kp-cyan); font-weight: 700; }
 .kp-s { transition: opacity 0.16s cubic-bezier(0.2, 0, 0, 1); }
-.kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.38; }
+.kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.8; }
 /* 焦点 on a long passage (STANDARD A38): the sentences before and after the target fold to two
  * dimmed lines each — the before group shows its last two, the after group its first two — with
  * ⋯ to open a group that runs longer. 全文 lays the groups out inline, as if they were not there. */
@@ -211,8 +211,6 @@
 .kp-card[data-zoom='focus'] .kp-ctx-in { display: block; max-height: 4.1em; overflow: hidden; }
 .kp-card[data-zoom='focus'] .kp-ctx[data-side='before'] .kp-ctx-in { display: flex; flex-direction: column; justify-content: flex-end; }
 .kp-card[data-zoom='focus'] .kp-ctx-flow { display: block; }
-.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'][data-side='before']:not([data-open='1']) .kp-ctx-in { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 1.4em); mask-image: linear-gradient(to bottom, transparent, #000 1.4em); }
-.kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'][data-side='after']:not([data-open='1']) .kp-ctx-in { -webkit-mask-image: linear-gradient(to top, transparent, #000 1.4em); mask-image: linear-gradient(to top, transparent, #000 1.4em); }
 .kp-card[data-zoom='focus'] .kp-ctx[data-open='1'] .kp-ctx-in { max-height: none; }
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-more { display: inline-flex; }
 /* the ⋯ keeps its own gutter (44px pill + gap), open or folded, so it never sits on a glyph */
@@ -308,15 +306,18 @@
 /* tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44). A word of the
  * passage or of the definition looks like the text around it: no colour, no box, no underline
  * until hover or keyboard focus, when a dotted underline says it can be opened. Its reach is
- * 44px tall across the word's width (the line keeps its own height). */
+ * at least 44px in both dimensions (the line keeps its own typography). */
 .kp-tok { position: relative; cursor: pointer; border-radius: 3px; -webkit-tap-highlight-color: transparent; }
-.kp-tok::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
+.kp-tok::before { content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%); }
 .kp-tok:focus { outline: none; }
 .kp-tok:hover, .kp-tok:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 0.3em; }
 .kp-target.kp-tok:hover, .kp-target.kp-tok:focus-visible { text-decoration: underline dotted 2px; }
 /* the entry sheet (with a host): a bottom sheet over the card and the grade bar */
 .kp-sheet-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.42); }
 .kp-sheet { width: 100%; max-width: 40rem; max-height: min(78vh, 640px); overflow-y: auto; overscroll-behavior: contain; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 10px; box-shadow: var(--kp-depth); animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-sheet-kanji { display: flex; flex-wrap: wrap; gap: 8px; }
+.kp-sheet-kanji-door { min-width: 44px; min-height: 44px; padding: 4px 8px; border: 1px solid var(--kp-line); border-radius: 4px; background: var(--kp-panel-2); color: var(--kp-ink); cursor: pointer; }
+.kp-sheet-kanji-glyph { font-family: var(--kp-head); font-size: 24px; line-height: 1.3; }
 .kp-sheet-top { display: flex; align-items: flex-start; gap: 10px; }
 .kp-sheet-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; min-width: 0; flex: 1; padding-top: 4px; }
 .kp-sheet-term { margin: 0; font-size: 26px; line-height: 1.25; font-weight: 700; color: var(--kp-ink); outline: none; }
@@ -690,6 +691,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-sentence.kp-window[data-edge='below'] { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 2.4em), transparent); }
 .kp .kp-sentence.kp-window[data-edge='above'] { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to top, #000 calc(100% - 2.4em), transparent); }
 .kp .kp-sentence.kp-window[data-edge='both'] { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); mask-image: linear-gradient(to bottom, transparent, #000 2.4em, #000 calc(100% - 2.4em), transparent); }
+.kp .kp-card[data-zoom='focus'] .kp-sentence.kp-window { -webkit-mask-image: none; mask-image: none; }
 
 /* ======================================================================================
  * Round 4 (2026-10-09), cards lane. The learner's 2026-10-08 tour, in three parts below: D1 (the

@@ -238,7 +238,7 @@ const UI_EN = {
   "辞書の全項目を開く": "Open the full dictionary entry",
   "✓ 覚えるの札にあります": "✓ Saved to your review cards",
   "リストに追加…": "Add to a list…",
-  "覚える": "Memorize",
+  "覚える": "Save",
   "保存できませんでした": "Could not save",
   "このデッキにあります": "Already in this deck",
   "ここで止めよう": "Pause here",
@@ -1347,9 +1347,27 @@ function tapNode(node, unit, onTap) {
   node.tabIndex = 0;
   node.setAttribute('aria-haspopup', 'dialog');
   if (unit.word) node.dataset.deckWord = unit.word.id;
+  node.kpTap = () => onTap(unit, node);
   node.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (!dragged(e)) onTap(unit, node);
+    if (dragged(e)) return;
+    // Transparent 44px reaches can overlap in prose. A pointer still chooses the printed
+    // word nearest its point, rather than whichever neighbouring reach paints last.
+    let chosen = node;
+    if (e.detail && Number.isFinite(e.clientX) && Number.isFinite(e.clientY)) {
+      const prose = node.closest('.kp-sentence, .kp-def, .kp-sheet-def');
+      let best = Infinity;
+      for (const candidate of prose?.querySelectorAll('.kp-tok') || []) {
+        for (const box of candidate.getClientRects()) {
+          if (!box.width || !box.height) continue;
+          const dx = Math.max(box.left - e.clientX, 0, e.clientX - box.right);
+          const dy = Math.max(box.top - e.clientY, 0, e.clientY - box.bottom);
+          const distance = dx * dx + dy * dy;
+          if (distance < best) { best = distance; chosen = candidate; }
+        }
+      }
+    }
+    chosen.kpTap();
   });
   node.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -1539,6 +1557,25 @@ function sheetNode() {
     sheet.append(def);
   } else sheet.append(el('p', 'kp-sheet-none', t(f.word || f.entry ? NO_JA : NOT_FOUND)));
   if (f.en) sheet.append(fold('kp-f-gloss kp-sheet-en', t("英語"), ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
+  // A word of this deck keeps its no-save/no-full-entry contract, but its kanji are
+  // still one tap away. These doors work at either word depth without extending
+  // the recursive word-definition chain beyond its existing two-sheet limit.
+  const kanji = [...new Set([...(f.label || '')].filter((glyph) => /\p{Script=Han}/u.test(glyph)))];
+  const entries = kanji.map((glyph) => safely(() => ctx.host?.lookup({ s: glyph, ref: glyph, k: '字' }), null)).filter((entry) => entry?.t === 'kanji');
+  if (entries.length) {
+    const band = el('nav', 'kp-sheet-kanji');
+    band.setAttribute('aria-label', t('この語の漢字', 'Kanji in this word'));
+    for (const entry of entries) {
+      const glyph = el('span', 'kp-sheet-kanji-glyph', entry.label || entry.id);
+      glyph.lang = 'ja';
+      glyph.dataset.uiContent = 'learning';
+      band.append(btn('kp-sheet-kanji-door', glyph, () => {
+        closeSheet();
+        ctx.host.open(entry);
+      }, { 'data-kanji': entry.id, 'aria-label': t(`${entry.id}の漢字の項目を開く`, `Open ${entry.id} kanji entry`) }));
+    }
+    sheet.append(band);
+  }
   if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', t(STOP_HERE)));
   if (f.word) sheet.append(el('p', 'kp-sheet-indeck', t(IN_DECK)));
   else if (f.entry) {
@@ -1570,7 +1607,7 @@ function takeBlock(f) {
     }
     return box;
   }
-  const take = btn('kp-take', t("覚える"), async () => {
+  const take = btn('kp-take', t('保存', 'Save'), async () => {
     if (ui.sheet?.busy) return;
     const sheetNow = ui.sheet;
     sheetNow.busy = true;
