@@ -92,6 +92,10 @@
  *                         sentences opens the same popup, the path is the same: no list before Save, the
  *                         list beside "Saved ✓", and none again after Undo. Control: 890cd522, which
  *                         showed "Add to a list" beside an unsaved Save there.
+ *                         That popup's word band is laid out there too: the word, its reading and its meaning
+ *                         each stand on a row of their own, and "Full entry" sits beside the word in the band's
+ *                         corner, at least 44px each way, inside the card and the screen, and not covered.
+ *                         Control: 76c40528, whose galaxy popup ran the three together on one line.
  *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
  *                         action shows outside the popup); the popup's last band is one named door,
  *                         "Study this sentence", showing the sentence's start; it opens the sentence in
@@ -1048,6 +1052,25 @@ try {
       }
       assert(before, 'no example word in the galaxy entry offers a live, unpressed Save');
       assert(before.view === 'drift' && before.save === 'Save' && !before.list && before.note, `the galaxy popup offers a list before the word is saved: ${JSON.stringify(before)}`);
+      const band = await page.evaluate(() => {
+        const mini = document.getElementById('mini'), entry = mini.querySelector('.mini-entry');
+        const box = (node) => { const r = node.getBoundingClientRect(); return { top: r.top, right: r.right, bottom: r.bottom, left: r.left, width: r.width, height: r.height }; };
+        const e = box(entry), hit = document.elementFromPoint(e.left + e.width / 2, e.top + e.height / 2);
+        return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, entry: e, entryName: entry.innerText.trim(), entryOnTop: !!hit && entry.contains(hit),
+          rows: ['.mini-word', '.mini-reading', '.mini-gloss'].map((selector) => mini.querySelector(selector)).filter(Boolean)
+            .map((node) => ({ part: node.classList[0], text: node.textContent, ...box(node) })) };
+      });
+      assert(band.rows.length >= 2 && band.rows.every((row) => row.width > 0 && row.height > 0), `the galaxy popup's word band is missing a line: ${JSON.stringify(band.rows)}`);
+      const runOn = band.rows.slice(1).map((row, i) => [band.rows[i], row]).filter(([above, below]) => below.top < above.bottom - 1).map(([above, below]) => `${above.part} and ${below.part}`);
+      assert.equal(runOn.length, 0, `the galaxy popup runs its word, reading and meaning together on one line (${runOn.join('; ')}): ${JSON.stringify(band.rows)}`);
+      const word = band.rows[0];
+      assert(band.entry.width >= 44 && band.entry.height >= 44, `the galaxy popup's Full entry is under 44px: ${JSON.stringify(band.entry)}`);
+      assert(/^Full entry/u.test(band.entryName) && band.entryOnTop, `the galaxy popup's Full entry is covered or unnamed: ${JSON.stringify({ name: band.entryName, onTop: band.entryOnTop })}`);
+      assert(band.entry.left >= band.card.left - 1 && band.entry.right <= band.card.right + 1 && band.entry.top >= band.card.top - 1 && band.entry.bottom <= band.card.bottom + 1
+        && band.entry.left >= 0 && band.entry.right <= band.screen.width && band.entry.top >= 0 && band.entry.bottom <= band.screen.height,
+        `the galaxy popup's Full entry leaves its card or the screen: ${JSON.stringify(band)}`);
+      assert(band.entry.left >= word.right - 1 && band.entry.top < word.bottom && band.card.right - band.entry.right < band.entry.left - band.card.left,
+        `the galaxy popup's Full entry is not beside the word in the band's corner: ${JSON.stringify({ entry: band.entry, word, card: band.card })}`);
       await page.locator('#mini #mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 1, { description: 'the galaxy popup saved one card' });
@@ -1058,7 +1081,7 @@ try {
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 });
       const undone = await path();
       assert(undone.save === 'Save' && !undone.list && undone.note, `after Undo the galaxy popup still offers a list: ${JSON.stringify(undone)}`);
-      return { taps, entry: entry.node, word: before.word, before, saved, undone };
+      return { taps, entry: entry.node, word: before.word, before, saved, undone, band: { rows: band.rows.map((row) => `${row.part}@${Math.round(row.top)}`), entry: [Math.round(band.entry.width), Math.round(band.entry.height)] } };
     });
 
     await run('G6-sentence-row', DESK, async (page) => {

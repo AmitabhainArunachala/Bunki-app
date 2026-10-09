@@ -321,3 +321,24 @@ Logs and receipts are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-
 **Limits of that intermediate round (superseded by final checks above).** The particle popup's shared focus reveal is covered by the return case but was not shown failing before the fix: on `890cd522` の's Practice was already visible on return. The reviewed build was reproduced in Chromium only. No other suite was run on the fixed code here: the storage, accessibility, relief, reader-doors, reader-lookup, annotation-lookup and corridor suites last passed on `40806a26`. Night worlds, the 日本語 interface and the 1368 width were not measured by the new motion stages. The galaxy case reaches its entry through whichever kanji word the sky offers first inside the safe area (触れる in both engines here).
 
 The first AXI run ended `failed`: its fix/review window reached 30 minutes while the review agent was still active. Commit `6fe6e3d0` was preserved and recovered by the offered `axi sync --recover` action, without a push or history rewrite. The fix review had identified a specificity regression: widening the hidden rule lowered its strength. A 320px runtime probe reproduced a painted “Study this sentence” door despite `hidden:true`. The follow-up retains the original selector strength in every app view and G6 now asserts the door's actual invisibility while its pane is open. That first run is not claimed passed. After the final required checks and photo/documentation commit, a fresh AXI run validates delivery with rebase, push, PR and CI explicitly skipped under the brief’s no-push rule. Its outcome is reported separately in the final handoff.
+
+### Second gate review: the galaxy popup's word band
+
+The gate then reviewed `7a48cd77` (product code `76c40528`, artifact `0ef83749…`) and found one defect. Its fix changes product bytes (`prototypes/corridor/rooms/read.css` only). **The final verification table, the photographs and `shots/IDENTITY.json` above describe `76c40528` and predate this change.** The full battery and the photographs have to be run again on a clean build of the commit that holds this fix before they can be cited for it.
+
+| Finding | What was wrong on `76c40528` | Fix | Check that now holds it |
+|---|---|---|---|
+| The word band in the galaxy | The popup's word, reading and meaning now sit in a word band with "Full entry" in its corner, in every view. The rules that lay that band out excluded the galaxy. There a word of an entry's example sentence opened a popup whose word, reading and meaning ran together on one line, with "Full entry" alone on a row at the left. At the PR head each had its own row and "Full entry" stood at the right. | The band's structure applies in every view: three rules, moved out of the rooms' rule and not duplicated (the band's two columns, the text column's rows, and the gap between "Full entry" and its chevron). The lacquer, the colours and the type stay the rooms' own, so the galaxy popup keeps its own paper, palette and fonts. Computed styles outside the galaxy are unchanged. | `G5-galaxy-one-path` now also measures the painted rows and the "Full entry" target before Save. |
+
+**What was run in this round.** Only `verify-design-reader-shelf`, as the focused check for the changed files, and a probe that photographs the galaxy popup on both builds.
+
+| Build | Engine | Result |
+|---|---|---|
+| Final site `76c40528`, clean source, digest `0ef83749…` | Chromium | 47/48. The one failure is `G5-galaxy-one-path`, which is the reproduction: 動画, どうが and "video (esp. digital)" on one line. |
+| Fixed worktree on `7a48cd77`, `sourceDirty: true`, digest `ddaf5370…` | Chromium | 48/48 |
+| Fixed worktree, same build, run beside the Chromium run and the probe | WebKit | 47/48. `G6-sentence-pane-seat-320` failed its focus reveal (the focused "Ask the tutor" lay below the card). `G5-galaxy-one-path` passed. |
+| Fixed worktree, same build, run again alone | WebKit | 48/48 |
+
+Logs, receipts and the photographs `galaxy-popup-before-0ef.png` and `galaxy-popup-after-fix.png` are under `~/.dharma/bunki_review/2026-10-10/r4-finish/review-fix-01M4GQMR/`. Nothing earlier under `r4-finish` was changed. The worktree had no `node_modules`; the lane worktree's was cloned into it for the build, where git ignores it, and removed afterwards.
+
+**Limits of this round.** The reviewed build was reproduced in Chromium only. The one WebKit failure is read as timing under load, because it did not recur alone and the reader's computed styles are unchanged, but it was re-run once and not investigated further. No other suite was run on the fixed code. The galaxy popup was measured and photographed at 390 wide by day in the English interface, on 動画; night, 日本語 and other widths were not. In the galaxy the "to review" note stands close beside Save, as it did before this change; it was not part of the finding and is left as it is.
