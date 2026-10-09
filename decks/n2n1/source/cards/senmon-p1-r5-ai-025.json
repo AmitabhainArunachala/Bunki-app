@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "消費電力",
+   "reading": "しょうひでんりょく",
+   "pos": "noun",
+   "meaning": "power consumption",
+   "defJa": "機器が単位時間に消費する電気エネルギー",
+   "passage": {
+    "ja": "同じ仕事をする二台の計算機を比べるとき、処理の速さだけでは運用の違いを説明しきれません。動作中の消費電力が大きければ、それだけ電源や冷却の条件も検討することになります。ただし、短時間で仕事を終える機器と、少ない電力で長く動く機器のどちらが省エネかは、この値だけでは決まりません。ワットで示す値に加えて、実際に何時間動かしたかを見れば、使った電力量を考えられます。半導体の性能を読むときには、速さと電気を使う速さ、そして仕事が終わるまでの時間を区別しましょう。",
+    "form": "消費電力",
+    "en": "When comparing two computers doing the same job, processing speed alone does not explain differences in their operation. Higher operating power consumption also makes the power supply and cooling conditions relevant. However, this value alone does not determine whether a machine that finishes quickly or one that runs longer at lower power is more energy-efficient. Considering operating duration as well as the value in watts lets us assess the electrical energy used. When reading about semiconductor performance, distinguish speed, the rate of energy use, and the time needed to finish the job.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "ワットで示す値と、動作時間を含めた電力量を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "深層学習",
+   "reading": "しんそうがくしゅう",
+   "pos": "noun",
+   "meaning": "deep learning",
+   "defJa": "多層の神経回路モデルで特徴を学ぶ手法",
+   "passage": {
+    "ja": "画像の中の傷を見つけるには、明るさや形が異なる製品をどう扱うかが課題となる。深層学習では、複数の層を持つニューラルネットワークが、入力を段階的に変換しながら判断に役立つ特徴を学ぶ。人がすべての形の規則を書き込む方法とは異なるが、どんなデータで訓練するかという設計上の判断は残る。訓練用の画像で高い成績が出たからといって、別の工場の照明でも同じ精度が出るとは限らない。導入の評価には、学習に使っていない条件での検証が含まれる。",
+    "form": "深層学習",
+    "en": "Finding defects in images involves deciding how to handle products that differ in brightness and shape. In deep learning, a neural network with multiple layers learns useful features while progressively transforming its input. This differs from having people write every shape rule, but decisions about which data to train on remain. Strong results on training images do not guarantee the same accuracy under another factory’s lighting. Evaluation for deployment includes testing under conditions not used in training.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "層を重ねたモデルで特徴を学ぶ手法。訓練と検証は別の仕事。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "潜在空間",
+   "reading": "せんざいくうかん",
+   "pos": "noun",
+   "meaning": "latent space",
+   "defJa": "データの特徴を数値の組合せで表す空間",
+   "passage": {
+    "ja": "画像を生成するモデルの解説には、写真そのものではなく、その特徴を表す数の並びを動かす図が出てきます。この潜在空間で近い位置に置かれた表現が、どのような画像に対応するかを調べると、モデルの表現の仕方を考えられます。ただし、数の一つ一つに「笑顔」や「年齢」といった分かりやすい意味が必ず割り当てられるとは限りません。学習方法に応じて、同じように見える画像でも内部の表し方は異なります。図の点を実在する場所だと思うより、特徴を扱うために用意した座標として読むと、説明の筋道を追えます。",
+    "form": "潜在空間",
+    "en": "Explanations of image-generating models include diagrams that move sequences of feature-representing numbers rather than photographs themselves. Examining which images correspond to nearby representations in this latent space helps us consider how the model represents data. However, each number does not necessarily have an easily understood meaning such as smile or age. Depending on the training method, images that look similar may be represented differently internally. Reading the plotted points as coordinates for handling features rather than physical locations helps make sense of the explanation.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "学習された特徴の表現を扱う空間で、物理的な場所ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "牙城",
+   "reading": "がじょう",
+   "pos": "noun",
+   "meaning": "a firmly held stronghold",
+   "defJa": "他者が容易に崩せない強固な支配領域",
+   "passage": {
+    "ja": "半導体市場で長く使われた設計には、それに対応するソフトウェアや技術者の知識が積み重なっている。後発企業が高性能な製品を示したとしても、利用者が既存の仕組みを一度に置き換えるとは限らない。既存企業の牙城を崩すには、単体の性能差に加えて、移行の費用や互換性という壁も越えることになる。利用者の選択は、目の前の価格だけでなく、これまでの投資とも結び付いている。そのため、競争の行方を読む際には、新製品の数値と、それを受け入れる周辺の環境の両方が検討対象となる。",
+    "form": "牙城",
+    "en": "Semiconductor designs used over many years accumulate compatible software and engineers’ expertise. Even if a later entrant demonstrates a high-performance product, users do not necessarily replace existing systems all at once. Breaking an incumbent’s stronghold involves overcoming migration costs and compatibility barriers as well as offering better individual performance. Users’ choices are connected to previous investments, not just the price before them. Assessing the course of competition therefore involves both new-product figures and the surrounding environment that would adopt it.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "比喩的に「を崩す」と用い、強い市場支配の領域を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "演繹",
+   "reading": "えんえき",
+   "pos": "noun",
+   "meaning": "deduction",
+   "defJa": "一般的な前提から個別の結論を導くこと",
+   "passage": {
+    "ja": "プログラムの正しさを説明する文章では、例がいくつか動いたことと、前提から必ず結果が導かれることを分けて書きます。「この条件を満たすすべての入力に規則が当てはまる」と示してから、一つの入力に結論を適用するのが演繹の形です。実行例を増やすだけでは、まだ試していない入力に対する保証まで得られるとは限りません。証明を書くに当たっては、どの前提を使ったのかを省略せず、結論とのつながりを見せると筋道が伝わります。「試した結果」と「論理的に導いた結果」は、同じ成功報告でも根拠の種類が違います。",
+    "form": "演繹",
+    "en": "An explanation of program correctness distinguishes a few successful examples from a result that necessarily follows from premises. Establishing that a rule applies to every input satisfying a condition and then applying its conclusion to a particular input has the form of deduction. More execution examples alone do not necessarily guarantee behavior for inputs not yet tested. When writing a proof, making the premises and their connection with the conclusion explicit communicates the reasoning. “Observed in testing” and “derived logically” describe different kinds of grounds even when both report success.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "前提から結論を導くこと。例から一般化する帰納と対になる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "物理的限界",
+   "reading": "ぶつりてきげんかい",
+   "pos": "noun",
+   "meaning": "physical limits",
+   "defJa": "自然法則や物質の性質が課す制約",
+   "passage": {
+    "ja": "半導体を小さくすれば性能がいつまでも伸び続ける、という図式には慎重でありたい。部品の寸法が変わるにつれて、電流の漏れや熱の扱いなど、無視できない条件も変わってくる。物理的限界とは、予算を増やしたり宣伝を工夫したりするだけでは消せない、自然法則や物質の性質に由来する制約である。ただし、ある方法が行き詰まることと、計算機を改善するすべての道が閉ざされることは同じではない。材料や構造、処理の分担を変える試みは、何が動かせない条件で、何が設計上の選択なのかを問い直す。",
+    "form": "物理的限界",
+    "en": "We should be cautious about the idea that shrinking semiconductors will improve performance indefinitely. As component dimensions change, conditions such as leakage current and heat management also change. Physical limits are constraints arising from natural laws or material properties that cannot be removed merely by increasing budgets or improving publicity. Yet the failure of one approach does not mean every route to better computing is closed. Attempts to change materials, structures, or the division of processing reconsider which conditions are fixed and which are design choices.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "資金や制度だけでなく、自然法則などに由来する制約を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "監視社会",
+   "reading": "かんししゃかい",
+   "pos": "noun",
+   "meaning": "a surveillance society",
+   "defJa": "人々の行動が広く継続的に観察される社会",
+   "passage": {
+    "ja": "街のカメラに顔を見分ける機能が付いたら、落とし物を探すのにも役立ちそうだよね。でも、便利だからといって、誰がいつどこを歩いたかをずっと記録してよいのかは、別に考えたいんだ。監視社会という言葉が問題にするのは、カメラの台数だけじゃなくて、人の行動が広く追い続けられる暮らしのあり方だよ。保存した情報を誰が見られるのか、間違って別人と判断されたときに訂正できるのかも、気になるところだね。新しい機能の説明を聞くなら、できることだけでなく、記録を消す仕組みまで知りたいな。",
+    "form": "監視社会",
+    "en": "If street cameras could distinguish faces, that might even help in finding lost belongings. But convenience alone does not settle whether it is acceptable to keep recording who walked where and when. A surveillance society concerns not merely the number of cameras but a way of life in which people’s behavior is widely and continually tracked. Who can access stored information and whether mistaken identification can be corrected are also concerns. When hearing about a new feature, I would want to learn how records are deleted as well as what the system can do.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "人々の行動が継続的に把握される社会のあり方を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "特徴量",
+   "reading": "とくちょうりょう",
+   "pos": "noun",
+   "meaning": "feature used in machine learning",
+   "defJa": "予測や判別に使う対象の性質を表す値",
+   "passage": {
+    "ja": "工場の部品が良品かどうかを判定したいなら、写真を集める前に、何を手掛かりにするかも考えたいね。例えば、表面の明るさや傷の長さを数値にしたものが、機械学習で使う特徴量になるんだ。同じ部品でも照明が変わるだけで数字が大きく動くなら、傷そのものを見分ける手掛かりとしては不安が残るよ。数字をたくさん並べさえすれば、判断が正しくなるとは限らないからね。何を測るかに加えて、どんな条件で値が変わるのかを確かめるところにも、モデルを作る人の仕事があるんだ。",
+    "form": "特徴量",
+    "en": "To decide whether a factory component is acceptable, it is worth considering what clues to use before collecting photographs. Numerical measures such as surface brightness or scratch length become features used in machine learning. If the numbers change greatly with lighting even for the same component, their usefulness for identifying scratches remains uncertain. Merely listing many numbers does not guarantee correct decisions. The model designer’s work includes checking under what conditions the values change as well as deciding what to measure.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "対象のどの性質を判断材料として表すか、という文脈で使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "産業政策",
+   "reading": "さんぎょうせいさく",
+   "pos": "noun",
+   "meaning": "industrial policy",
+   "defJa": "産業の育成や構造に政府が働きかける政策",
+   "passage": {
+    "ja": "半導体の供給を安定させるには、企業の設備投資だけでなく、人材や研究の基盤も関わる。政府が補助金や研究支援などを通じて産業の育成に働きかける産業政策では、何を支援の対象とするかが主要な論点となる。国内の工場を増やすにしても、その工場が必要とする材料や装置まで国内で全て賄えるとは限らない。支援額の大きさとともに、供給網のどの部分が変わるのかを検討する必要がある。政策の評価には、発表時の期待だけでなく、費用に見合う成果が出たかを確かめる視点も含まれる。",
+    "form": "産業政策",
+    "en": "Stable semiconductor supply involves workforce and research foundations as well as corporate investment in equipment. In industrial policy, through which governments support industrial development with measures such as subsidies and research assistance, deciding what to support is a central issue. Even more domestic factories would not necessarily mean that all their materials and equipment could be sourced domestically. Assessment must consider which parts of the supply chain change along with the amount of support. Evaluating policy includes examining whether results justify costs, beyond the expectations voiced at announcement.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "政府による産業への働きかけを指し、個々の企業の経営方針と区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "牽引",
+   "reading": "けんいん",
+   "pos": "noun",
+   "meaning": "driving or leading growth",
+   "defJa": "全体の発展を先頭に立って引っ張ること",
+   "passage": {
+    "ja": "半導体産業の記事で、ある用途が成長を牽引すると書かれていたら、その用途が全体を押し上げる力になっていると読めます。数字を読む練習では、全体の売上だけでなく、用途別の増減にも注目すると、その表現の根拠を考えられます。一部の用途で注文が伸びる一方で、別の用途では減っているという場合もあるからです。伸び率が高いだけでなく、もとの市場の大きさも確認すれば、全体への影響を比べる手掛かりになります。記事の勢いのある言葉と、その言葉を支える内訳とを往復する読み方を身に付けましょう。",
+    "form": "牽引",
+    "en": "When a semiconductor article says that a particular application drives growth, it presents that application as a force lifting the whole industry. In practicing numerical reading, looking at changes by application as well as total sales helps examine the basis for that expression. Orders may grow in one application while falling in another. Checking the original market size as well as the growth rate provides a basis for comparing overall influence. Develop the habit of moving between an article’s forceful wording and the breakdown supporting it.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「成長を」「産業を」と結び付く、発展を引っ張る比喩的用法。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "生態系",
+   "reading": "せいたいけい",
+   "pos": "noun",
+   "meaning": "a technological ecosystem",
+   "defJa": "技術を支える企業や利用者の関係のまとまり",
+   "passage": {
+    "ja": "新しい半導体の紹介文で生態系という比喩を使うなら、何がつながっているのかを具体的に示したいところです。設計を助ける道具、動作するソフトウェア、利用者の知識などを挙げれば、チップ単体の話ではないと伝わります。「関係するもの全部」とだけ説明すると、それぞれがどう支え合うのかという比喩の働きが弱まります。読者の立場に応じて、ある道具が使えないと開発のどこが困るのかまで描くと、つながりを想像できます。自然界の言葉を借りる際にも、企業が競争する具体的な仕組みを曖昧にしない書き方が必要です。",
+    "form": "生態系",
+    "en": "When using ecosystem as a metaphor in an introduction to a new semiconductor, specify what is connected. Listing design tools, compatible software, and users’ knowledge makes clear that the subject extends beyond the chip itself. Explaining it merely as “everything related” weakens the metaphor’s account of mutual support. Showing where development becomes difficult without a particular tool helps readers picture the connections according to their perspective. Even when borrowing a term from nature, the writing should keep the concrete mechanisms of business competition clear.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "ここでは企業、道具、利用者などの結び付きを表す比喩。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "生産能力",
+   "reading": "せいさんのうりょく",
+   "pos": "noun",
+   "meaning": "production capacity",
+   "defJa": "一定の条件と期間で製品を作れる量",
+   "passage": {
+    "ja": "工場が一か月に作れる量と、実際に作った量とは、同じ数字とは限りません。生産能力は設備や人員などの条件の下でどれだけ作れるかを表し、受注が少なければ実績はそれを下回ることもあります。また、設備を増やしたからといって、その日から計画通りの量が安定して出るとは限りません。半導体工場なら、装置の調整や品質の確認など、立ち上げに必要な仕事があるためです。投資計画の記事では、作れるようになる見込みの時期と、売り物になる製品が実際に出る時期を分けて読むと、数字の意味を取り違えずに済みます。",
+    "form": "生産能力",
+    "en": "The quantity a factory can make in a month is not necessarily the same as the quantity it actually makes. Production capacity indicates how much can be made under conditions such as available equipment and personnel, while actual output may be lower when orders are weak. Nor does adding equipment guarantee stable output at the planned level from that very day. Semiconductor plants require startup work such as equipment adjustment and quality checks. In investment-plan articles, distinguishing expected capacity availability from actual saleable output helps prevent misreading the figures.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "実際の生産量と区別し、どの条件と期間の数量かを確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "画像認識",
+   "reading": "がぞうにんしき",
+   "pos": "noun",
+   "meaning": "image recognition",
+   "defJa": "画像から対象や特徴を判別する技術",
+   "passage": {
+    "ja": "写真の中の犬を正しく分類できることと、その犬が何を欲しがっているかを理解することは、別の問題である。画像認識のモデルが高い成績を示しても、そこから人間と同じ見方をしていると結論付けるのは早い。学習した写真に特定の背景が多ければ、動物そのものより背景を判断の手掛かりにしてしまう場合もある。分類の正しさを確かめるだけでなく、背景を変えたときに結果がどう変わるかを調べることで、見えてくる弱点がある。機械が何を見たのかという問いは、出力された名前を眺めるだけでは尽くせない。",
+    "form": "画像認識",
+    "en": "Correctly classifying a dog in a photograph and understanding what that dog wants are different problems. A high-performing image-recognition model does not immediately justify the conclusion that it sees as humans do. If a particular background is common in training images, the model may rely on the background rather than the animal itself. Testing how results change with different backgrounds can reveal weaknesses beyond simply checking classification accuracy. The question of what the machine relied on cannot be answered solely by looking at its output label.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "画像の対象などを判別する技術で、意図の理解まで含むとは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
