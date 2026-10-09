@@ -22643,8 +22643,11 @@ function renderReview(main) {
     btn.disabled = !!rv.pending;
     btn.addEventListener('click', () => {
       if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || rv.revealed) return;
-      rv.revealed = true;
-      render();
+      roomTransition(() => {
+        if (rv.pending || S.review !== rv || rv.queue[rv.ix] !== item || rv.revealed) return;
+        rv.revealed = true;
+        render();
+      });
     });
     // the dojo's card itself also turns over — drilling early is its point
     if (S.focus) face.addEventListener('click', () => btn.click());
