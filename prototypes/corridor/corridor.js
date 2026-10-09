@@ -9350,8 +9350,8 @@ function glossaryCrossRefPlan(p) {
 
 /* 聞く — the reader's play bar. The voice is decided: the operator's blind audition
  * (2026-09-29) locked Google Gemini TTS Kore, with Charon as the second speaker. No approved
- * recording means no playable audio: until Kore clips ship, the bar shows a quiet 音声準備中 · Kore
- * state and nothing plays — no device voice, no interim voice. Nothing here writes learner state. */
+ * recording means no playable audio: the bar explains that this article has no audio yet, with
+ * the locked voices in its accessible description. Nothing here writes learner state. */
 // failed: null, or { pid, voice } — the failure belongs to the article and voice that failed, so a
 // different article or a new voice choice never inherits its note
 const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0, total: 0, rate: 1 };
@@ -9359,8 +9359,8 @@ const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0
  * reads, Charon is the second speaker. JVNV F1 was rated 1/5 and withdrawn; it never plays.
  * Narration ships as audio/article-narration.json ({ v: 1, voice, articles: { id: { clips } } })
  * and is fetched only when index.html raises __KAIRO_NARRATION__. Until the Kore clips exist the
- * flag stays down and the reader's play bar shows its visible 音声準備中 · Kore pending state with
- * nothing to play: no picker, no stand-in voice. */
+ * flag stays down and the reader's play bar explains its pending state with nothing to play:
+ * no picker, no stand-in voice. Its accessible description retains the locked voice provenance. */
 const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };
 const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
@@ -9670,14 +9670,20 @@ function voicePendingNote(id) {
   pending.id = id;
   // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
   pending.dataset.japaneseLookup = 'off';
-  pending.append(uiIcon('speaker'), el('span', 'l-ja', tx('音声未収録 · Kore', 'no recording yet · Kore')));
+  pending.setAttribute('aria-description', tx('音声は Kore、第二話者は Charon に固定されています。',
+    'Approved voices: Kore (main), Charon (second).'));
+  const sentence = id === 'sentence-listening-pending';
+  pending.append(uiIcon('speaker'), el('span', 'l-ja', sentence
+    ? tx('この文の音声はまだない', 'No audio for this sentence yet')
+    : tx('この記事の音声はまだない', 'No audio for this article yet')));
   return pending;
 }
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
  * It carries only the locked narration voice. With no clips for this article in that voice it is
- * a quiet state, 音声未収録 · Kore: no picker, no stand-in voice, no disabled control. */
+ * a quiet absence label with voice provenance in its accessible description: no picker,
+ * no stand-in voice, no disabled control. */
 function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
@@ -9774,7 +9780,7 @@ function renderReader(main) {
   if (picture) articleTitle.classList.add('on-hero');
   card.append(articleTitle);
   if (bi() && p.titleEn) card.append(el('p', 'view-title-en', p.titleEn));
-  // The instrument line, under the title: source · date · level · the record's own figures · a small
+  // The instrument line, under the title: source · date · level · saved words · a small
   // honest "unreviewed" · the voice's state. Settings are one icon at its end.
   const head = el('div', 'reader-head');
   const meta = el('div', 'eyebrow reader-meta');
@@ -9800,7 +9806,7 @@ function renderReader(main) {
     render();
   });
   // the listen door: on a phone an article without a recording says so as one muted mark at the end
-  // of the instrument line (音声未収録 · Kore), not a strip at the foot; a narrated article's play bar,
+  // of the instrument line (この記事の音声はまだない), not a strip at the foot; a narrated article's play bar,
   // and a desk's relief-edged row, stand below the head as before
   const listenRow = buildListenRow(p);
   const listenInLine = listenRow.classList.contains('is-pending') && matchMedia('(max-width: 520px)').matches;

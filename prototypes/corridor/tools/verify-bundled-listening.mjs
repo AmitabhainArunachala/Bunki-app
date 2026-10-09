@@ -1,6 +1,6 @@
 /** Bundled reading and explicit text practice through normal controls, and the sentence
  * listening lock: the voice is Kore (Charon second), so a bundled Ami cue is never offered or
- * requested and the listening mode shows the reader's quiet 音声準備中 · Kore state. A negative
+ * requested and the listening mode explains the absence with Kore/Charon in its accessible description. A negative
  * control re-allows Ami in a copy of the staged corridor.js and must fail the same lock check.
  * Persistent profiles, real record output, no injected learner state or provider responses.
  * This is a scoped technical subjourney. */
@@ -60,7 +60,9 @@ const listeningControls = '#sentence-choose-listening, #sentence-add-listening, 
 async function listeningLocked(page, requested) {
   const pending = page.locator('#sentence-listening-pending');
   await pending.waitFor({ timeout: 5000 });
-  assert.match(await pending.innerText(), /^no recording yet · Kore$/u);
+  assert.equal(await pending.innerText(), 'No audio for this sentence yet');
+  assert.equal(await pending.getAttribute('aria-description'), 'Approved voices: Kore (main), Charon (second).',
+    'The pending sentence keeps the locked voice provenance in its accessible description');
   assert.equal(await page.locator(listeningControls).count(), 0, 'No listening control is offered');
   assert.deepEqual(requested.filter(path => path.startsWith('/audio/s/')), [], 'No sentence recording is requested');
 }
@@ -246,7 +248,7 @@ for (const engine of engines) for (const width of sizes) {
     await listeningLocked(page, requested); await screenshot('listening-pending-kore');
     unchanged(beforeListening, await snapshot('listening-pending'), ['taken', 'srs', 'revlog', 'sentencePractice']);
     assert(requested.includes('/audio/sentence-cues.json'), 'The bundled cue catalog was consulted');
-    result.observations.push({ name: 'sentence-listening-locked-to-kore-charon', pendingKoreVisible: true,
+    result.observations.push({ name: 'sentence-listening-locked-to-kore-charon', pendingKoreDescribed: true,
       listeningOffered: false, sentenceRecordingRequests: 0 });
 
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await openSaved();
