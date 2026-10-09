@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "如来",
+   "reading": "にょらい",
+   "pos": "noun",
+   "meaning": "tathāgata, a buddha",
+   "defJa": "悟りを開いた仏に用いられる称号",
+   "passage": {
+    "ja": "寺の仏像を分類する際には、姿の違いだけでなく、名称に含まれる称号も手掛かりとなる。如来は悟りを開いた仏に用いられる呼び名で、釈迦や阿弥陀などの名に付けられる一方、菩薩という呼称とは区別される。すべての像を同じ意味の仏様としてまとめると、教義上の位置付けや、像が担う役割の違いを読み取りにくくなる。展示で名前を確かめながら、どの経典や信仰と関わる姿なのかを調べることで、一見似た像の間にも異なる歴史と人々の願いが見出される。",
+    "form": "如来",
+    "en": "Classifying Buddhist images involves titles as well as visual appearance. Tathagata is a title for an awakened Buddha, used with names such as Shakyamuni and Amida and distinguished from bodhisattva. Grouping every figure under one undifferentiated label obscures doctrinal roles. Connecting names with scriptures and devotional histories reveals different histories and wishes behind similar-looking images.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「如来」と「菩薩」は像の呼称を読み分ける手掛かりになる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "天竺",
+   "reading": "てんじく",
+   "pos": "noun",
+   "meaning": "India (classical name)",
+   "defJa": "日本や中国でかつてインドを指した呼び名",
+   "passage": {
+    "ja": "古い旅の物語に、仏教の教えを求めて遠い土地へ向かう僧が登場することがあります。天竺は日本や中国でかつてインドを指した呼び名ですが、その語が使われた時代の地理観を、現在の国境とそのまま重ねることはできません。経典や人がどの道を通って伝わったかを地図で追うと、物語の目的地が単なる遠国ではなく、教えの源として想像されていたことが分かります。現代の地名へ置き換えて読む際も、その場所に何を求めたのかという当時の視点を残すと、旅の意味が豊かに伝わります。",
+    "form": "天竺",
+    "en": "Old travel narratives depict monks seeking Buddhist teachings in distant lands. Tenjiku was a Chinese and Japanese name for India, though historical geographical concepts do not map exactly onto current borders. Tracing routes of texts and people reveals a destination imagined as a source of teaching. Retaining what travelers sought there preserves the journey’s meaning when translating older place names.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "古いインドの呼称であり、現代の国境を厳密に示す地名とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "天台宗",
+   "reading": "てんだいしゅう",
+   "pos": "noun",
+   "meaning": "the Tendai school",
+   "defJa": "法華経を重んじ最澄が日本に伝えた仏教の宗派",
+   "passage": {
+    "ja": "「日本で生まれた教え」とだけ書くと、その前に他の土地で育まれた思想の系譜が消えてしまいます。天台宗を紹介する場合は、中国の天台教学を背景として、最澄が日本で教えを広めたことを示すと、伝来と展開の関係を伝えられます。法華経を重んじるという特徴に加え、日本でどのような修行や教育の場が作られたかを書くことで、宗派名だけの説明から進めます。起源を一か所に固定するより、何を受け継ぎ、どこで新たな営みが加わったかを区別すれば、短い紹介文にも歴史の流れを残せます。",
+    "form": "天台宗",
+    "en": "Calling a teaching simply Japanese-born can erase its earlier intellectual lineage. Introducing Tendai should connect its Chinese Tiantai background with Saicho’s work in Japan. Describing institutions of practice and education alongside devotion to the Lotus Sutra moves beyond a label. Distinguishing what was inherited from what developed locally preserves historical movement even in a short account.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "中国の教学の系譜と、日本での展開を分けて述べると由来が伝わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "坐禅",
+   "reading": "ざぜん",
+   "pos": "noun",
+   "meaning": "seated meditation",
+   "defJa": "姿勢を整えて坐り心身を調える禅の実践",
+   "passage": {
+    "ja": "静かに座る人の姿は、外から見ると何もしていない時間に見える。坐禅を続ける中では、姿勢や呼吸を整えながら、次々に浮かぶ思いに気付くという、見た目では捉えにくい経験がある。思考をすべて消せたかどうかだけで成否を測れば、浮かぶものを追い払うこと自体に心を奪われかねない。教え方や位置付けは宗派によって異なるとしても、何かを獲得する速さばかりを問う生活の中で、坐るという行為をどう引き受けるかは、実践を考える一つの入り口となる。",
+    "form": "坐禅",
+    "en": "A seated person can appear from outside to be doing nothing. Zazen involves posture, breathing, and awareness of thoughts in ways that are not externally visible. Measuring success solely by eliminating thought can itself lead to preoccupation with suppression. Although teaching and interpretation vary among schools, considering sitting within a life focused on rapid acquisition opens one approach to practice.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「坐禅を組む」。見た目の静止と、実践の中で経験することを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "在家",
+   "reading": "ざいけ",
+   "pos": "noun",
+   "meaning": "lay (householder) life",
+   "defJa": "出家せずに家庭や社会で生活する仏教徒の立場",
+   "passage": {
+    "ja": "仏教を支えてきた人々の歴史には、寺で修行する僧だけでなく、社会で生活する信者の活動がある。在家という区分は出家との対比で用いられ、家にいる時間が長いという日常的な意味ではない。布施や戒めの実践、法会への参加などを通じて教えに関わる形は、地域や時代によってさまざまであった。寺院の建立を記す史料でも、教えを説いた僧の名前だけでなく、寄進した人々や日々の維持を担った人々に目を向けることで、信仰を支える社会の広がりを捉えられる。",
+    "form": "在家",
+    "en": "Buddhist history includes believers living in society as well as monastics training in temples. Lay status contrasts with renunciation rather than meaning spending much time at home. Giving, observance, and participation in ceremonies have varied across places and periods. Attention to donors and those sustaining temples reveals the wider society supporting religious life.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「在家の信者」。住居や職業の説明ではなく、出家との対比で用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "大乗仏教",
+   "reading": "だいじょうぶっきょう",
+   "pos": "noun",
+   "meaning": "Mahāyāna Buddhism",
+   "defJa": "菩薩の道と広く人々の救済を重んじる仏教の流れ",
+   "passage": {
+    "ja": "自分だけが苦しみから離れればそれで終わり、と考えない教えが仏教にはあるんだ。大乗仏教では、菩薩の道や広く人々を救うことが大切にされるけれど、一人がある日に作った一枚岩の団体を指すわけではないよ。インドからさまざまな土地へ伝わる中で、読まれる経典や実践の形も広がり、日本の仏教にも深く関わっている。同じ大きな流れに属していても、念仏や禅や密教の説明を全部一つにまとめず、どの教えが何を重んじるかを比べると、共通点も違いもつかみやすいね。",
+    "form": "大乗仏教",
+    "en": "Some Buddhist teachings do not treat personal release from suffering as the end of the path. Mahayana emphasizes the bodhisattva path and broad liberation, without naming a uniform organization founded by one person on one day. Scriptures and practices developed as it spread from India, deeply shaping Japanese Buddhism. Comparing priorities among Pure Land, Zen, and esoteric traditions reveals differences within that larger current.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「大乗仏教の教え」。広い流れの名称であり、内部の多様性にも注意する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "大日如来",
+   "reading": "だいにちにょらい",
+   "pos": "noun",
+   "meaning": "Mahāvairocana Buddha",
+   "defJa": "真言密教で中心となる仏",
+   "passage": {
+    "ja": "寺の中心に置かれた仏像を見たら、どの教えの中でどのような役割を持つか確かめましょう。大日如来は真言密教で中心となる仏で、歴史上の釈迦を別の名前で呼んでいるだけだと理解すると、教義の構造を捉えにくくなります。曼荼羅の中で他の仏がどう配されるかを見ると、一体の像を単独で覚える場合とは違う関係が見えてきます。名前、姿、教えでの位置付けを一組にして学ぶことで、似た姿の仏像に出会っても、同じ意味の像だと急いで決めずに観察を進められます。",
+    "form": "大日如来",
+    "en": "When viewing a temple’s central image, identify its role within the teaching. Mahavairocana occupies a central place in Shingon and cannot be understood simply as another name for the historical Shakyamuni. Its relation to other figures in mandalas reveals connections missed when learning images separately. Studying name, appearance, and doctrinal role together helps distinguish similar-looking figures.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「大日如来を本尊とする」。真言密教での位置付けとともに覚える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "因陀羅網",
+   "reading": "いんだらもう",
+   "pos": "noun",
+   "meaning": "Indra's net",
+   "defJa": "珠が互いを映す網で関わり合いを示す華厳の譬え",
+   "passage": {
+    "ja": "網の結び目ごとに珠があり、それぞれの珠に他の珠が映っている景色を想像してみましょう。因陀羅網は、華厳の教えで多くの存在が互いに関わり合うあり方を示す譬えで、一つの珠を見ても、その中に全体との関係が現れます。現代の通信網になぞらえる説明もできますが、情報を送る装置を古代に発明したという話ではありません。身近な比喩を入口にしつつ、一つと多くを切り離さずに考えるために元の譬えがどう働くかを見ると、美しい像の背後にある思想へ近づけます。",
+    "form": "因陀羅網",
+    "en": "Imagine a net with a jewel at every knot, each reflecting all the other jewels. Indra’s net illustrates interrelationship in Huayan thought, with the whole reflected through each jewel. Comparisons with modern networks do not imply an ancient invention of telecommunications. Looking beyond the familiar comparison reveals how the image connects one and many.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「因陀羅網の譬え」。現代の通信技術そのものを指す言葉ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "功徳",
+   "reading": "くどく",
+   "pos": "noun",
+   "meaning": "merit, virtue",
+   "defJa": "善い行いや修行によって得られる宗教上の恵み",
+   "passage": {
+    "ja": "寺の案内で、よい行いを重ねることが勧められていたら、何をよい結果と捉えているのか確かめましょう。仏教の功徳は、善行や修行によって得られる宗教的な恵みを指しますが、支払った金額に応じて商品が届くような仕組みとは異なります。布施や読経の意味を学ぶときも、目に見える成果だけでなく、行う人の心や他者との関わりがどう説明されているかに注目できます。日常語の得という印象に引きずられず、その文献が何を価値あることとしているかを押さえると、宗教語の使われ方を読み取れます。",
+    "form": "功徳",
+    "en": "When a temple guide encourages good deeds, identify what it treats as a good result. Buddhist merit concerns religious benefit associated with good conduct and practice, rather than a commercial exchange guaranteeing a product. Learning about giving or recitation also involves their stated relationship to intention and other people. Attending to a text’s values prevents everyday ideas of material gain from determining the meaning.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「功徳を積む」。金銭的な利益や、必ず得られる見返りと同一視しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "初期仏教",
+   "reading": "しょきぶっきょう",
+   "pos": "noun",
+   "meaning": "early Buddhism",
+   "defJa": "仏教成立後の比較的早い時期の教えや実践",
+   "passage": {
+    "ja": "仏教が成立して間もない時期の教えを探る研究では、後代に伝えられた文献を比較する作業が欠かせない。初期仏教という呼称はその時代の思想や実践を扱う際に用いられるが、釈迦の発言を同時に録音した資料が残るという意味ではない。異なる伝承に共通する内容や、語り方の違いを検討し、どの範囲まで遡って論じられるかが問われる。後の教えと異なる点を見つけるだけでなく、苦や修行をめぐる問いがどのように受け継がれたかを追うことで、成立と展開の関係を考察できる。",
+    "form": "初期仏教",
+    "en": "Research into Buddhism’s earliest period requires comparing texts transmitted in later periods. Early Buddhism names the thought and practice of that period, without implying the survival of contemporary recordings of the Buddha. Scholars examine agreements and differences across traditions to assess how far their conclusions reach back. Following the transmission of questions about suffering and practice clarifies development as well as difference.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「初期仏教の研究」。成立期の教えと、それを伝える史料の年代を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "前世",
+   "reading": "ぜんせ",
+   "pos": "noun",
+   "meaning": "previous life",
+   "defJa": "今の生を迎えるより前の生涯",
+   "passage": {
+    "ja": "初めて来た場所なのに懐かしいと感じて、昔ここに住んでいたのかなと思うことがあるよね。輪廻を説く宗教では、前世は今の生より前の生涯を指すけれど、懐かしさだけで過去の出来事が確かめられたわけではないんだ。仏教の物語を読むときは、ある人物の以前の行いが現在の境遇と結び付けられ、教えを伝える筋道になっていることがある。話の中で何が善い行いとして描かれているかを追うと、歴史上の事実を調べる読み方とは別に、その物語が担っている役割を考えられるよ。",
+    "form": "前世",
+    "en": "An unfamiliar place can feel so familiar that you imagine having lived there before. In religions teaching rebirth, a previous life means a life before the present one, but familiarity alone does not establish past events. Buddhist stories sometimes connect earlier deeds with present circumstances to communicate teachings. Following the actions portrayed as good reveals the story’s role beyond reading it as a historical record.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「前世の行い」。輪廻を前提とする物語や信仰の文脈で使われる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "加持祈祷",
+   "reading": "かじきとう",
+   "pos": "noun",
+   "meaning": "incantation and prayer rites",
+   "defJa": "仏の力をよりどころとして願いを祈ること",
+   "passage": {
+    "ja": "寺の儀礼を紹介するとき、「病気が治る」とだけ書けば、結果を確約した説明に読まれます。加持祈祷は仏の力をよりどころに願いを祈る営みであり、文章では何を願って行われるかを示すことで、儀礼の目的を具体的に伝えられます。たとえば病気平癒を願うと書けば、参加者の祈りを記述しながら、治療効果が確認されたという別の主張を持ち込まずに済みます。宗教の言葉を紹介する際は、その営みに寄せられる願いと、書き手が事実として述べる範囲を整理すると、信仰への敬意と説明の明確さが両立します。",
+    "form": "加持祈祷",
+    "en": "Introducing a temple rite merely as curing illness can sound like a guarantee. Buddhist blessing and prayer rely on the power of Buddhas, and specifying the wish describes the ritual’s purpose. Saying that participants pray for recovery conveys their intention without claiming established treatment effects. Distinguishing those wishes from the writer’s factual claims combines respect for faith with clarity.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「加持祈祷を行う」。願う目的を述べ、結果を保証する表現とは分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "劫",
+   "reading": "こう",
+   "pos": "noun",
+   "meaning": "kalpa, an aeon",
+   "defJa": "仏教などで極めて長い時間を表す単位",
+   "passage": {
+    "ja": "寺の縁起や経典を読むと、人の一生では到底測れない時間が語られることがあります。劫はインドの宗教に由来する非常に長い時間の単位で、仏教でも世界の成立や変化を説明する際に使われます。その長さは大きな岩を布で少しずつすり減らすような譬えで示されることもあり、一つの数字に置き換えるだけでは表現の狙いを捉えきれません。日々の予定とは異なる時間の尺度を置くことで、目の前の変化をどう眺めようとしているのかを考えると、壮大な物語の読み方が広がります。",
+    "form": "劫",
+    "en": "Temple histories and scriptures sometimes describe durations far beyond a human lifetime. A kalpa is an immense time unit of Indian religious traditions, used in Buddhism to discuss worlds forming and changing. Comparisons such as slowly wearing away a huge rock with cloth show why replacing the term with one number can miss its purpose. Considering what this different timescale does broadens the reading of such vast narratives.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「一劫」。非常に長い時間を示す語で、文脈に応じた説明が必要になる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "十二因縁",
+   "reading": "じゅうにいんねん",
+   "pos": "noun",
+   "meaning": "the twelve links of dependent origination",
+   "defJa": "苦の生起を十二の条件のつながりで示す教え",
+   "passage": {
+    "ja": "苦しみが生じる過程を、一つの悪い原因だけで説明しない枠組みが仏教にはある。十二因縁は無明から老死に至る十二の支分によって、条件に依存して苦が生起するつながりを示す教えである。その解釈には幅があり、人生の時間に沿う説明だけでなく、経験がどのように成り立つかを読む立場もある。項目を暗記するだけでは運命の順番表に見えるが、条件が変われば生起のあり方も変わるという点を押さえることで、苦の終息を目指す実践との関係が明確になる。",
+    "form": "十二因縁",
+    "en": "Buddhism offers a framework that does not reduce suffering to one bad cause. The twelve links of dependent origination trace conditioned arising from ignorance to aging and death. Interpretations vary, including accounts across lifetimes and readings concerned with the formation of experience. Understanding the dependence on conditions, rather than memorizing a fatalistic sequence, clarifies its connection with ending suffering.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "十二項目の順番だけでなく、条件によって生じるという関係に注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "写経",
+   "reading": "しゃきょう",
+   "pos": "noun",
+   "meaning": "copying sutras",
+   "defJa": "経典の文章を書き写す仏教の実践",
+   "passage": {
+    "ja": "経典の一字を紙に写すとき、読むだけなら通り過ぎていた線や言葉に立ち止まることがあります。写経は仏教の経典を書き写す実践で、教えを伝える営みであるとともに、祈りや供養とも結び付いてきました。文字を美しく整えることに集中する人もいますが、書道の上達だけを目的とする活動として説明すると、その宗教的な背景が抜け落ちます。寺で取り組む場合には、何の経をどのような願いとともに写すのかを知ることで、手を動かす時間と、受け継がれてきた教えとのつながりが深まります。",
+    "form": "写経",
+    "en": "Copying a scriptural character can draw attention to lines and words overlooked in ordinary reading. Sutra copying transmits Buddhist teachings and has also been associated with prayer and dedication. Although some focus on beautiful handwriting, describing it solely as calligraphy training omits its religious background. Learning which scripture is copied and with what intention connects the activity with inherited teachings.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「写経をする」。文字の練習に限らず、経典の継承や祈りに関わる実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "南無妙法蓮華経",
+   "reading": "なむみょうほうれんげきょう",
+   "pos": "noun",
+   "meaning": "\"Homage to the Lotus Sutra\"",
+   "defJa": "法華経に帰依する心を表す題目",
+   "passage": {
+    "ja": "短い言葉を繰り返し唱える行為には、長い経典をどう受け止めるかという姿勢が凝縮される。南無妙法蓮華経は法華経への帰依を表す題目であり、日蓮に連なる仏教の実践で重んじられてきた。音の連なりとして覚えるだけでなく、経の名を唱えることにどのような意味が与えられているかを問うと、言葉と行為の関係が現れる。ただし、その意味付けは各宗派の説明に即して読む必要があり、同じ句を唱える人々を一つの考え方にまとめずに理解する余地が残されている。",
+    "form": "南無妙法蓮華経",
+    "en": "Repeatedly reciting a short phrase can condense an attitude toward an entire scripture. Namu Myoho Renge Kyo expresses devotion to the Lotus Sutra and is central in traditions associated with Nichiren. Asking what meaning is assigned to reciting the scripture’s title reveals connections between words and practice. Explanations should still be read within each school rather than assuming one interpretation among all who recite it.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "法華経への帰依を表す題目であり、意味付けは宗派の説明に即して読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "儒教",
+   "reading": "じゅきょう",
+   "pos": "noun",
+   "meaning": "Confucianism",
+   "defJa": "人倫や社会の秩序を重んじる中国由来の思想と伝統",
+   "passage": {
+    "ja": "先祖を敬う行為を見ただけで、すべて仏教の教えから説明すると、文章の視野が狭くなります。儒教は中国に由来し、人との関係や社会の秩序を重んじる伝統で、日本の暮らしや思想の中でも仏教と接してきました。二つを比べる文章では、儀礼の形が似ていても、その行為に与える意味は異なる場合があると説明できます。宗教や思想の名前を一つ選んで原因にするより、家族、寺院、教育といった場を具体的に示すと、異なる教えが重なって働く様子を伝えられます。",
+    "form": "儒教",
+    "en": "Explaining every act of honoring ancestors solely through Buddhism narrows an account. Confucianism originated in China, emphasizing relationships and social order, and has interacted with Buddhism in Japanese life and thought. Similar rituals can still receive different meanings. Describing families, temples, and education concretely reveals overlapping traditions more clearly than assigning one label as the sole cause.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「儒教の影響」。似た行為の存在と、教えの由来を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
