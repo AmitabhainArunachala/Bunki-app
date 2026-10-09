@@ -67,28 +67,6 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
-   "term": "電力効率",
-   "reading": "でんりょくこうりつ",
-   "pos": "noun",
-   "meaning": "power efficiency",
-   "defJa": "使った電力に対して得られる仕事の量の程度",
-   "passage": {
-    "ja": "計算機を買い替える話で、消費する電力が少ない機種なら必ず得だと思うことはないかな。もし同じ計算を終えるのにずっと長くかかるなら、仕事の量に対する電力効率も見ないと、使うエネルギーの違いを比べにくいんだ。逆に、速い機種が短時間で処理を終えて休める場合には、動作中の電力が大きくても全体の消費を抑えられることがある。同じ作業を同じ条件で測り、待っている時間や周辺装置まで含める範囲をそろえると、数字の小ささだけでは選べない理由が分かるよ。",
-    "form": "電力効率",
-    "en": "When replacing a computer, do you ever assume that a model drawing less power must be the better choice? If it takes much longer to finish the same calculation, comparing energy use also requires looking at work relative to power efficiency. Conversely, a fast machine may finish quickly and rest, reducing total consumption despite higher power while active. Measuring identical work under identical conditions and using consistent boundaries for idle time and peripherals reveals why the smallest number alone cannot decide the choice.",
-    "register": "話",
-    "topic": "ai",
-    "tipJa": "同じ仕事をどれだけ少ない電力で行えるかを見る。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud"
-  },
-  {
    "term": "量子コンピュータ",
    "reading": "りょうしこんぴゅーた",
    "pos": "noun",
