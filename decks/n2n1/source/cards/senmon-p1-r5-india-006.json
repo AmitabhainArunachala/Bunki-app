@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "チャクラ",
+   "reading": "ちゃくら",
+   "pos": "noun",
+   "meaning": "chakra, subtle-body center in yoga (not anatomy)",
+   "defJa": "体内に観想される微細身の中心を指す語。解剖上の器官ではない",
+   "passage": {
+    "ja": "ヨガ教室の流行に伴って、チャクラという語は日本語の日常にすっかり浸透したが、原義との距離は広がる一方である。もとの語は車輪を意味し、密教的なヨガの伝統では、体内に観想される微細身の地図上の中心を指した。解剖図に描ける器官ではなく、瞑想の実践のなかで位置づけられる概念的な図式であり、訳語も解釈も定まらずカタカナのまま広まった。そもそも伝承ごとに数や配置の描き方が異なるため、一枚の図で全体を語る通俗的な説明は、原典の多様さを隠してしまう。",
+    "form": "チャクラ",
+    "en": "As yoga classes boomed, the word chakra seeped into everyday Japanese, but the distance from its original meaning keeps widening. The source word means wheel, and in the esoteric yoga traditions it denoted a center on the map of the subtle body visualized within the body. It is not an organ you could draw in an anatomy chart but a conceptual schema located within meditation practice, and with neither translation nor interpretation settled, it spread in katakana as it was. Since traditions differ in how many centers they depict and where, popular explanations that tell the whole story with a single diagram end up hiding the diversity of the original texts.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "車輪を意味する原語で、微細身の観想図上の中心。解剖の器官としては扱わない",
+    "sense": "伝統では微細身の中心。日常語としては通俗的な用法も広がる"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "チベット仏教",
+   "reading": "ちべっとぶっきょう",
+   "pos": "noun",
+   "meaning": "Tibetan Buddhism",
+   "defJa": "チベットで発展した密教系の仏教。転生ラマの制度で知られる",
+   "passage": {
+    "ja": "後継者を息子に継がせる日本の多くのお寺と違って、チベット仏教には亡き師を探して歩くという仕組みがあるんです。亡くなった高位のラマは、慈悲ゆえに、導く相手に応じてさまざまな姿で再び現れるとされていて、その現れ先を探す儀礼が転生ラマの制度です。候補の子どもが前世の持ち物を見分ける試験を経て、幼い頃から寺院の教育と修行を受けながら後継者として育てられます。実はこの捜索からはダライ・ラマの系譜も出ていて、宗派を超えて広がった制度なんです。",
+    "form": "チベット仏教",
+    "en": "Unlike many Japanese temples, where the son inherits the leadership, Tibetan Buddhism has a system that involves searching for a departed master. A deceased high lama is said, out of compassion, to reappear in various forms suited to those he guides, and the rite of searching for where he has appeared is the institution of the reincarnate lama. A child candidate passes a test of picking out the previous incarnation's belongings, and is then raised as the successor while receiving the monastery's education and training from an early age. In fact, from this searching came the lineage of the Dalai Lama as well, an institution that spread across sectarian lines.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "転生ラマの制度が有名で、後継者を捜す儀礼と修行の体系が特徴",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ノンデュアリティ",
+   "reading": "のんでゅありてぃ",
+   "pos": "noun",
+   "meaning": "non-duality, contemporary spiritual-books term",
+   "defJa": "二つでないこと。分離を超えた一元の状態を指す現代の語",
+   "passage": {
+    "ja": "書店の精神世界の棚に限らず、講座の案内文にもノンデュアリティという語が顔を出すようになったが、一枚の看板の下には別々の系譜が並んでいる。インドの不二一元論は、個人の真我と究極の梵とが別ではないと説くことで、非二元の思想を根づけた。仏教は別の道を歩み、恒常な我への執着を疑うことで二元を解体したのであり、同じラベルの下に同じ教えがあるとは限らない。そもそも非二元を意味する語は漢語では不二と訳され、維摩経には不二法門という章もあって、このカタカナ語はラベルとしては二度目の上陸になる。",
+    "form": "ノンデュアリティ",
+    "en": "The word non-duality has lately come to show its face not just on the spirituality shelves of bookstores but in course descriptions, and beneath that single signboard, separate lineages stand side by side. In India, non-dual monism rooted the thought of non-duality by teaching that the individual true self and the ultimate Brahman are not two. Buddhism walked a different path, dissolving duality by casting doubt on clinging to a permanent self, so the same label does not always house the same teaching. In the first place, the word for non-duality was rendered in Chinese as not-two, and the Vimalakirti even has a chapter called the gate of non-duality, so this katakana word amounts, as a label, to a second landing.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "精神世界の本で使われる現代語。不二一元論や仏教の不二とは系譜が違う点に注意",
+    "sense": "ここでは現代書の通俗的な用法で、教義の違いまでは区別しない語"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "バガヴァッド・ギーター",
+   "reading": "ばがゔぁっどぎーたー",
+   "pos": "noun",
+   "meaning": "the Bhagavad Gita (scripture in the Mahabharata)",
+   "defJa": "マハーバーラタの中の対話形式の聖典",
+   "passage": {
+    "ja": "バガヴァッド・ギーターって、よく「結果への執着を捨てて義務を果たせ」の一行に要約されてるけど、実際に開くと話はもっと生々しいんだよね。戦場で弓を置いて座り込むアルジュナに、クリシュナが章を追うごとに答えのレベルを変えながら語りかける構成で、アルジュナも何度も異議を挟む。一行にまとめられるからといって、読み飛ばしていい本かというと、そうは思えない。原典をゆっくり読むと、途中でアルジュナが心は風のように抑えがたいと再び問いを返す場面に当たるから、要約だけでは拾えない動きが確かにある。",
+    "form": "バガヴァッド・ギーター",
+    "en": "The Bhagavad Gita often gets boiled down to a single line, drop your clinging to results and do your duty, but when you actually open it, the story is far more vivid. Krishna answers Arjuna, who has set down his bow and sunk to the ground on the battlefield, shifting the level of his answer chapter by chapter, and Arjuna keeps raising objections. Just because it can be summed up in one line does not mean it is a book you may skim through. When you read the original slowly, you come upon the scene where Arjuna again throws back a question, that the mind is as hard to curb as the wind, so there really is movement that a summary cannot pick up.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "一行の要約で広まる聖典。問答が重なる構成は、読み込むほど動きが出る",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

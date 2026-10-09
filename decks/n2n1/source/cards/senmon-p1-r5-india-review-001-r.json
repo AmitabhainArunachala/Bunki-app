@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "梵我一如",
+   "reading": "ぼんがいちにょ",
+   "pos": "noun",
+   "meaning": "identity of Brahman and ātman",
+   "defJa": "宇宙の根本原理と個人の自我が同一だとする見方",
+   "passage": {
+    "ja": "自分の身体や気分は日ごとに変わるのに、その奥に変わらないものがあるとしたら、何なのでしょうか。ウパニシャッドを重んじる不二一元論では、個人の根底にある自己と、世界の究極の根本とは別々のものではないと説き、この一致を梵我一如と表します。目に見える性格を宇宙全体と同じだと言っているのではなく、何を本当の自己と考えるかが議論の出発点です。仏教の無我と比べるにあたっても、似た修行の姿から教義まで同じだと決めず、それぞれが自己をどう論じるかを読むと違いが明瞭になります。",
+    "form": "梵我一如",
+    "en": "If something unchanging lies beneath a body and moods that change daily, what might it be. Advaita, which reveres the Upanishads, teaches that the self underlying the individual and the ultimate foundation of the world are not separate, expressing this as the unity of Brahman and atman. The argument starts with what counts as the true self, rather than equating visible personality with the entire universe. Comparing it with Buddhist no-self becomes clearer by examining each account of self rather than assuming similar-looking practices imply identical doctrines.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「梵我一如を説く」。自己と世界の根本の一致を、特定の教義として説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "解脱",
+   "reading": "げだつ",
+   "pos": "noun",
+   "meaning": "liberation (mokṣa), release from rebirth",
+   "defJa": "煩悩の束縛から抜け出し、輪廻の連鎖を断つこと",
+   "passage": {
+    "ja": "「面倒な役目から解放された」と書くところに、宗教的な語を置くと、文章の重みが急に変わります。解脱は、インドの宗教や仏教で、執着や生死の繰り返しから離れることを指す語であり、少し気分が楽になったという感想とは射程が異なります。比喩に使うにしても、その大きな隔たりを読み手と共有できれば、誇張の面白さが生まれます。逆に、瞑想の体験記で教義上の達成を述べたいなら、一時の安堵と同じ言葉でまとめず、何から離れたと考えるのかを具体的に書く方が伝わります。",
+    "form": "解脱",
+    "en": "Using a religious term where one might write that an annoying duty has ended suddenly changes a sentence’s weight. Liberation in Indian religions and Buddhism refers to release from attachment and recurring birth and death, extending beyond a feeling of temporary relief. Even in metaphor, sharing that large gap with the reader can make the exaggeration interesting. Conversely, an account of meditation claiming a doctrinal attainment should specify what the writer believes has been released instead of merging it with temporary ease.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "宗教的な意味と口語の誇張を分け、文章でどちらを使うかを明らかにする。",
+    "sense": "ここでは輪廻からの解放の教義の意。口語の「解放」の意は別"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "無明",
+   "reading": "むみょう",
+   "pos": "noun",
+   "meaning": "ignorance (avidyā), root delusion",
+   "defJa": "真理を知らないために迷いを生じさせる、根源的な心の暗さ",
+   "passage": {
+    "ja": "無明はサンスクリットのアヴィディヤーの訳語で、字面の「無知」から知識不足を想像しがちだが、実態はもっと具体的で、物事の見え方の歪みに近い言葉だ。仏教では十二縁起の第一の支として苦の連鎖の出発点に置かれ、ヴェーダーンタでも真実在の見忘れをこの語で説明した。日本では浄土教が、自力ではこの闇を破れないという読み方を発展させた、という系譜がたどれる。現代の注意研究と響き合うように見えるものの、実験で測れるのは選択的注意の限界だけで、教義の意味までは測れない。",
+    "form": "無明",
+    "en": "無明 is a translated word for the Sanskrit avidyā, and its written form, \"without knowledge,\" makes people imagine a mere lack of information, but the reality is more concrete: a word close to a distortion of how things appear. In Buddhism it is placed as the first of the twelve links of dependent origination, the starting point of the chain of suffering, and Vedānta too used this word to explain the forgetting of true reality. In Japan one can trace a lineage in which Pure Land Buddhism developed the reading that this darkness cannot be broken by one's own power. Though it may look as if it resonates with modern attention research, what experiments can measure is only the limits of selective attention; the meaning of the doctrine cannot be measured.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「無知」と字面で読むと知識不足に聞こえるが、教義では見方の歪み。十二縁起の第一支という定番の文脈とともに覚える語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "無我",
+   "reading": "むが",
+   "pos": "noun",
+   "meaning": "non-self (anātman); selflessness",
+   "defJa": "永続する実体は存在しないという仏教の立場",
+   "passage": {
+    "ja": "座禅の教室に来たばかりの人から「無我って、自分が消えるという意味ですか」ってよく聞かれるんだよね。伝統側の答えはこうで、不変で独立した魂は、注意を向けてよく分析してもどうしても見つからない、という話なんだ。ウパニシャドの伝統が永続するアートマンを説いたのに対して、初期仏教はその前提そのものを手放した、という解釈が通説だよ。だからといって個人がいなくなるんじゃなくて、執着の相手が最初から見つからないと気づくこと、そこがこの教えの肝なんだよ。",
+    "form": "無我",
+    "en": "At the zazen class, newcomers often ask whether 無我 means that their own self disappears. The tradition's answer goes like this: an unchanging, independent soul cannot be found, no matter how carefully you direct your attention and analyze. While the Upanishadic tradition taught a permanent ātman, early Buddhism let go of that very premise, or so the standard interpretation goes. That does not mean the individual vanishes; the point is to notice that the object of our clinging was never there to begin with, and that is the heart of the teaching.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "仏教教理の用語で、「無我夢中」の熱中とは別義。アートマンや執着と対比される文脈で、教理の話題に現れる。",
+    "sense": "ここでは教義の意。「無我の境地」の熱中の意は別"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "真我",
+   "reading": "しんが",
+   "pos": "noun",
+   "meaning": "the true Self (ātman)",
+   "defJa": "変化の中で消えない、究極の自己とされる実体",
+   "passage": {
+    "ja": "自己啓発の記事だと真我は「ありのままの自分を大切にすればいい」という一行に簡単に縮められがちだ。ところが原典に戻ると話は逆で、ウパニシャドの修行では「これは我ではない、あれも違う」と、観察できるものを一つずつ外していくらしい。性格も記憶も感情も外し尽くした果てに、観察する側として残るものを、伝統はそう呼んでいるという具合だ。肯定の響きに聞こえる一方で、実際は否定をくぐり抜けた先の呼び名だから、書き手はこの落差を先に示すしかないだろう。",
+    "form": "真我",
+    "en": "In self-improvement articles, 真我 tends to be easily compressed into a single line: \"just treasure your authentic self.\" Return to the primary texts, though, and the story reverses: in Upanishadic practice, one is said to strip away, one by one, everything observable, on the grounds that this is not the self and neither is that. What remains on the side of the observer, after personality, memory, and emotion have all been stripped away, is what the tradition calls by that name. Because the word sounds affirmative while it is actually a name earned by passing through negation, the writer has no choice but to show that gap first.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "自己啓発の「自分らしさ」とは別物で、否定の修行をくぐった先の呼び名。原典に戻ると用法が逆になる語。",
+    "sense": "仮の我と区別される、永続的な究極の自己の意"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "観音菩薩",
+   "reading": "かんのんぼさつ",
+   "pos": "noun",
+   "meaning": "Avalokiteśvara, bodhisattva of compassion",
+   "defJa": "苦しむ者に慈悲を注ぎ、救いの手を差し伸べる菩薩の名",
+   "passage": {
+    "ja": "資料の中で観音菩薩に出会うとき、まず立てておく区別は、像のイメージと経典の記述とを分けて読むことだ。現代の日本の感覚に反して、インドの原典や初期の図像では、この菩薩は王子の姿をした男性として描かれるのが普通だった。経典は三十三の姿に変わって救済に現れると説き、慈悲を働きとして描くのであって、性別は本質ではない、という読み方もできる。この区別を立てないと、像が時代とともに女性形へ移っていった筋道や、信仰が広がった理由を誤読しかねない。",
+    "form": "観音菩薩",
+    "en": "When you come upon Avalokiteśvara in a source, the first distinction to set up is to read the statue's image and the description in the sutra separately. Contrary to the modern Japanese sensibility, in Indian primary texts and early iconography this bodhisattva was ordinarily depicted as a male in princely form. The sutra teaches that he appears transformed into thirty-three forms to bring salvation and depicts compassion as an activity, so a reading is also possible in which gender is not the essence. Without this distinction, one risks misreading the course by which the images shifted toward female forms over the centuries, and the reasons the faith spread.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "原典と図像で姿が違う点が解釈の鍵。慈悲を働きとして説く経典の記述と、後代の像とを区別して読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "空海",
+   "reading": "くうかい",
+   "pos": "noun",
+   "meaning": "Kūkai (774–835), founder of Shingon",
+   "defJa": "平安初期の僧で、唐で密教を学び、高野山を開いた人物",
+   "passage": {
+    "ja": "和歌山県の高野山では、奥之院へ続く参道に諸国大名から庶民までの墓碑が立ち並び、参拝者の足が絶えない。その開山である空海は、九世紀の初めに唐で密教の修行を積んだ僧であり、満濃池の改修を指揮した技術者でもあった。名前の由来は定かでないものの、「空」と「海」を重ねた字面は、密教の虚空と広大さをそのまま写しているように見える。信仰の対象としても歴史上の僧としても、この名は今も山全体を覆っており、御廟では大師への供養が毎日続けられている。",
+    "form": "空海",
+    "en": "At Mount Kōya in Wakayama Prefecture, gravestones of everyone from provincial lords to commoners line the approach to Okunoin, and the flow of visitors never ceases. The founder, Kūkai, was a monk who trained in esoteric Buddhism in Tang China early in the ninth century, and also an engineer who directed the reconstruction of the Mannō irrigation pond. Although the origin of his name is not certain, the written form, pairing \"sky\" and \"sea,\" seems to mirror the void and vastness of esoteric Buddhism itself. Whether as an object of faith or as a monk of history, the name still covers the entire mountain, and offerings to the Daishi continue at the mausoleum every day.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "人名で、「空」と「海」の字面がしばしば解釈される。弘法大師は同じ人物の諡号で、文脈で使い分けられる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "真言",
+   "reading": "しんごん",
+   "pos": "noun",
+   "meaning": "mantra; the Shingon school",
+   "defJa": "仏の真実の言葉として唱える、音写された呪のこと",
+   "passage": {
+    "ja": "真言とは、サンスクリットのマントラを、意味を訳さずに音だけで漢字に写し、そのまま唱える「本当の言葉」のことです。密教の原典では、手に印を結び、心に本尊を観じ、口に音を唱えるという三密の修行が説かれ、その口密をこの言葉が担うとされます。弘法大師は長安で恵果和尚からこの密教の法を受け、帰国後に高野山を開くに至ったと伝えられます。大日如来の「オン・アビラウンケン」がその代表で、意味を問わず音のまま保つのは、その音こそが仏の言葉だとみなすからです。",
+    "form": "真言",
+    "en": "真言 refers to \"true words\": Sanskrit mantras transferred into Chinese characters by sound alone, without translating the meaning, and chanted just as they are. In the primary texts of esoteric Buddhism, the practice of the three mysteries is taught — forming seals with the hands, visualizing the principal deity in the mind, chanting sounds with the mouth — and this word is said to carry the oral mystery among them. Tradition holds that Kōbō Daishi received this esoteric teaching from the monk Huiguo in Chang'an and went on to open Mount Kōya after returning to Japan. The mantra of Dainichi Nyorai, \"oṃ a vi ra hūṃ khaṃ,\" is the representative example, and it is kept as pure sound rather than meaning because that very sound is regarded as the Buddha's speech.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「訳さず音写する」が鍵。宗派名の用法は別で、ここではマントラの意。三密の口密とセットで覚えると定着する。",
+    "sense": "密教で唱える聖なる語の意。宗派名としては別義"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

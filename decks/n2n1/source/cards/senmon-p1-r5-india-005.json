@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "カルマ",
+   "reading": "かるま",
+   "pos": "noun",
+   "meaning": "karma",
+   "defJa": "行為とその結果が次の生を縛るという考え",
+   "passage": {
+    "ja": "インドのワーラーナシーでは、ガートが夜明けから沐浴する人で埋まり、少し上流へ歩けば火葬の煙が絶えない岸に着く。その岸でカルマという語を思い返すと、もともと「行為」を意味し、善い行いも悪い行いもその結果が次の生を縛るという見方として輪廻の観念と結びついた語だと分かる。仏教は永遠の自我を認めないまま、行為の力を縁起の連鎖で説明し直した点が、個人的に実に面白い。ジャイナ教は、業は微細な物質として魂に付着するという解釈に基づいて、断食や苦行でそれを焼き落とす実践に向かった。",
+    "form": "カルマ",
+    "en": "In Varanasi in India, the ghats are filled from dawn with people bathing, and a short walk upstream brings you to a bank where the smoke of cremation never ceases. When you call to mind the word karma on that bank, you can see that it originally meant 'action,' and that it became bound up with the idea of rebirth through the view that the results of good and bad deeds alike bind the next life. What I personally find genuinely fascinating is that Buddhism, while denying any eternal self, re-explained the power of deeds through the chain of dependent origination. Jainism, resting on the interpretation that karma adheres to the soul as a fine substance, turned toward the practice of burning it away through fasting and austerities.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「カルマが回る」のように日常でも使うが、原義は「行為」。学派で説明が分かれる。",
+    "sense": "日常では運命のような意味にも転じる"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ウパニシャッド",
+   "reading": "うぱにしゃっど",
+   "pos": "noun",
+   "meaning": "the Upanishads",
+   "defJa": "インドの古い聖典群。師の膝元の教えを意味する語",
+   "passage": {
+    "ja": "ウパニシャッドという語を説明するとき、「師の近くに座り込むこと」という原義を一つ添えておくと、読者はそこから入っていける。もともと師の膝元で弟子が受ける密かな教えを指す語で、その伝え方のありさまが、そのまま文献の題名として定着した。とはいえ原典の中では、この語は儀礼と宇宙とを結ぶ隠れた対応を指すという解釈が有力で、題名の意味とも少しずれる。だから紹介文では「近くに座って聞く学び」という一言を添えるだけで、硬い響きの奥の情景まで伝わって、文章に厚みが出る。",
+    "form": "ウパニシャッド",
+    "en": "When you explain the word Upanishad, if you add a single note of its original meaning, 'sitting down close beside the teacher,' readers can enter from there. It was originally a word for the secret teaching a disciple received at the master's knee, and the very manner of its transmission became fixed as the title of texts. That said, within the original texts the reading is persuasive that the word refers to a hidden correspondence linking ritual and cosmos, which also shifts somewhat from the meaning of the title. So if, in an introductory passage, you add just one line such as 'the learning heard sitting close by,' the scene behind the stiff sound comes through, and the writing gains depth.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「ウパニシャッドを読む」のように文献名として使うのが普通。語源は「近くに座る」。",
+    "sense": "師のそばで伝える密かな教え、およびそれを記す文献"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "高野山",
+   "reading": "こうやさん",
+   "pos": "noun",
+   "meaning": "Mt. Kōya",
+   "defJa": "和歌山にある空海の開いた真言密教の山",
+   "passage": {
+    "ja": "高野山ってさ、和歌山の山奥にある修行の山なんだけど、山全体が一つの曼荼羅だって言われるんだよ。空海が唐で学んだ密教の宇宙観を、伽藍の配置まで使って山ごと再現したって解釈が昔から伝わっててさ。開山に際して土地の神さまが峰を明け渡したって伝承も残ってて、インド由来の仏と日本の神が同じ山に住み着く形になったんだよね。で、奥之院の参道には大名や武将の墓がずらっと並んでてさ、聖地への信仰が権力者たちの記憶まで山の中に引き込んじゃった結果なんだよ。",
+    "form": "高野山",
+    "en": "Kōya is a mountain of practice deep in the mountains of Wakayama, and people say the entire mountain forms a single mandala. An interpretation has been passed down since long ago that Kūkai reproduced, with the whole mountain, the esoteric Buddhist view of the cosmos he had studied in Tang China, down to the placement of the temple halls. A tradition also remains that, upon the mountain's founding, the local deity handed over the peak, and so a buddha of Indian origin and a Japanese god came to dwell on the same mountain. And along the approach to Okunoin the graves of lords and warriors stand in a row, the result of faith in the sacred ground drawing even the memories of the powerful into the mountain.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「開山に際して」のように出来事と結びつき、伝承・解釈と共に語りやすい固有名詞。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "カースト制度",
+   "reading": "かーすとせいど",
+   "pos": "noun",
+   "meaning": "the caste system",
+   "defJa": "身分を生まれで定めるインドの社会的仕組み",
+   "passage": {
+    "ja": "カースト制度をめぐる議論がずれるとき、たいてい教義の四分類と現場の実態が混ざっている。原典の上では、リグ・ヴェーダの宇宙原人の讃歌が四つの身分をその口・腕・腿・足から生まれたと歌い、序列を宇宙論に根づかせた。実際の結婚や職業を縛るのは地域ごとのジャーティであり、植民地期の人口調査をもとに枠組みが固定化した側面も研究で指摘されてきた。独立後の憲法は不可触民への差別を禁じ、公職や大学に留保枠を設けたが、結婚をめぐる身分の意識は今も残り、教義・慣行・法は別々の系譜のまま動いている。",
+    "form": "カースト制度",
+    "en": "When debate over the caste system goes astray, the fourfold classification of doctrine and the reality on the ground have usually been mixed together. On the level of the original texts, the hymn of the cosmic man in the Rigveda sings that the four estates were born from his mouth, arms, thighs, and feet, rooting the hierarchy in a cosmology. What actually binds marriage and occupation is the jāti of each region, and scholarship has also pointed out the aspect in which the framework was fixed on the basis of colonial-era population surveys. The constitution after independence outlawed discrimination against untouchables and set reservation quotas in public office and universities, yet the awareness of estate still lingers around marriage, and doctrine, custom, and law keep moving along separate lineages.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「カースト制度を批判する」のように社会問題の語。教義の四分類と実態の区別に注意。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "釈迦如来",
+   "reading": "しゃかにょらい",
+   "pos": "noun",
+   "meaning": "Śākyamuni Buddha (as icon)",
+   "defJa": "歴史上のブッダを、悟りを開いた姿で表した仏",
+   "passage": {
+    "ja": "仏像の区別では、宝冠や飾りをまとう菩薩に対して、如来は剃髪に質素な衣という装飾を排した姿で表されるのが原則である。京都の清涼寺が伝える釈迦如来立像は、その生前の姿を写したという伝承の像を、平安時代に宋から請来した例として知られる。仏教が諸国に広がるにつれて、歴史上の釈迦を超えた永遠の仏の観念も生まれ、大日如来や阿弥陀如来といった別の如来が本尊として信仰を集めるようになった。歴史上の釈迦は、六年の修行の末に悟りを開いた人間として、伝記的な説話とともに語られ続けている。",
+    "form": "釈迦如来",
+    "en": "In the classification of Buddhist images, whereas bodhisattvas wear crowns and ornaments, tathāgatas are rendered, as a rule, in a form stripped of decoration, with shaved heads and a simple robe. The standing Śākyamuni Tathāgata held at Seiryō-ji temple in Kyoto is known as a case in which an image said by tradition to copy his living appearance was brought back from Song China in the Heian period. As Buddhism spread across many lands, there also arose the idea of eternal buddhas transcending the historical Śākyamuni, and other tathāgatas such as Mahāvairocana and Amitābha came to gather faith as principal icons. The historical Śākyamuni continues to be told of as a human who attained awakening at the end of six years of practice, together with the tales of his biography.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏像では「釈迦如来立像」のように像名に使い、剃髪の姿で菩薩と区別される。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

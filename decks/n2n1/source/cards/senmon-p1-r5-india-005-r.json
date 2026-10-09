@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "輪廻",
+   "reading": "りんね",
+   "pos": "noun",
+   "meaning": "saṃsāra, the cycle of rebirth",
+   "defJa": "生死の世界を繰り返し巡ること",
+   "passage": {
+    "ja": "輪廻というと美しい生まれ変わりの物語を思い浮かべがちだが、インドの思想ではむしろ執着に縛られる側の話である。善い行いも悪い行いも、その結果が消えない限り、生死を繰り返す仕組み全体が延々と回り続けるとされる。この鎖の解き方は学派ごとに分かれ、仏教は縁起という条件の連なりで読み解き、ジャイナ教は魂に付着する業で説明してきた。解脱の議論に加えて、この循環から抜けるための修行や儀礼までが技術として体系化されてきた点にこそ、欧米の生まれ変わりイメージとの大きな温度差がある。",
+    "form": "輪廻",
+    "en": "Saṃsāra tends to call to mind a beautiful story of rebirth, but in Indian thought it is rather the story of the side that is bound by clinging. Good deeds and bad deeds alike, so long as their results do not vanish, are said to keep the whole mechanism of repeated birth and death turning on and on. How this chain is read differs from school to school: Buddhism reads it as a sequence of conditions called dependent origination, while Jainism has explained it through karma that adheres to the soul. In addition to the debates over liberation, even the practices and rites for escaping this cycle were systematized as techniques, and it is precisely there that the great difference in tone from the Western image of rebirth emerges.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「輪廻から解脱する」のように、抜け出す対象として語られるのが典型。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "陰陽五行",
+   "reading": "いんようごぎょう",
+   "pos": "noun",
+   "meaning": "yin-yang and the five phases",
+   "defJa": "陰と陽、木火土金水で万物の変化を説く中国の思想",
+   "passage": {
+    "ja": "木・火・土・金・水をひとまとめに「五つの元素」と訳してしまうと、陰陽五行はギリシアの四元素の親類のように聞こえてくる。だが木や火は本来、静止した物質ではなく、互いに生じ合い、打ち克ち合う動きの過程として解釈されてきたのである。歴史をたどると、この枠組みは古代中国で生まれ、日本に渡って暦や方違えといった実践にまで深く組み込まれ、仏教とともに渡来したインドの思想とは系譜を異にする。訳語をめぐっては、「元素」を選ぶか「過程」を選ぶかで、この思想の輪郭そのものが変わってしまう。",
+    "form": "陰陽五行",
+    "en": "When wood, fire, earth, metal, and water are lumped together and translated as 'the five elements,' the doctrine of yin-yang and the five phases comes to sound like a cousin of the Greek four elements. Yet wood and fire are not in essence static substances but have been interpreted as processes of movement that generate one another and overcome one another. Tracing its history, this framework was born in ancient China, crossed to Japan, and was built deeply even into practices such as the calendar and direction-avoidance, following a lineage distinct from the Indian thought that arrived together with Buddhism. Around the choice of translation, whether one settles on 'elements' or on 'phases' changes the very outline of this way of thinking.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "五行は「五つの元素」と訳されがちだが、互いに生じ合う過程を指す中国由来の語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
