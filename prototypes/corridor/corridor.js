@@ -4731,6 +4731,7 @@ function back() {
     }
     return;
   }
+  if (!roomTransitionUpdating && S.view !== 'drift') return roomTransition(() => back());
   if (returnFromNavigation()) return;
   // the guided session walks its own layers first (word → sentence, branch → sentence,
   // an inner page → the room's front); from the front it returns through the door it came in
@@ -5093,6 +5094,7 @@ function openAssessmentResult(attemptId) {
 function openPassage(id, anchor = null) {
   // no id means no reading: callers show their own "source unavailable" note
   if (id == null) throw new Error('source-unavailable');
+  if (!roomTransitionUpdating && (S.view !== 'reader' || S.passageId !== id)) return roomTransition(() => openPassage(id, anchor));
   keepScroll();
   learningSourceVisit = anchor?.visit || null;
   // a running 聞く belongs to the passage it was started in: the glossary
@@ -18217,7 +18219,10 @@ function wwRecentre(node, section, invoker) {
     section.replaceWith(next);
     if (top < 0) window.scrollBy(0, top - 64);
     const glyph = next.querySelector('.ww-c-glyph');
-    if (!wwReduced() && glyph?.animate) glyph.animate([{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 90, easing: 'cubic-bezier(.22,1,.36,1)' });
+    if (glyph?.animate) glyph.animate(wwReduced()
+      ? [{ opacity: 0.35 }, { opacity: 1 }]
+      : [{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }],
+      { duration: wwReduced() ? 80 : 90, easing: 'cubic-bezier(.22,1,.36,1)' });
     if (hadFocus) next.querySelector('.ww-centre')?.focus({ preventScroll: true });
   };
   const from = invoker?.querySelector('.ww-g') || invoker?.querySelector('span');
@@ -18249,6 +18254,7 @@ function openWordWeb(term, { type = null, invoker = null } = {}) {
     wwRecentre({ type: kind, key }, here, null);
     return true;
   }
+  if (!roomTransitionUpdating) { roomTransition(() => openWordWeb(term, { type, invoker })); return true; }
   wwPush({ type: kind, key });
   keepNavigationReturn('thesaurus', invoker || document.activeElement);
   S.view = 'thesaurus';
@@ -23922,6 +23928,7 @@ function loadDeckPlayer() {
 }
 
 function openDeck(id) {
+  if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id));
   keepScroll();
   S.deckPlay = id;
   S.view = 'deckplay';
@@ -29327,6 +29334,32 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
+/** Capture the departing room before changing it. The callback owns the whole
+ * navigation, including scroll/focus restoration; learner writes are unchanged.
+ * Search stays synchronous so iOS can open its keyboard from the original tap. */
+let roomTransitionUpdating = false;
+let activeRoomTransition = null;
+function roomTransition(change) {
+  if (roomTransitionUpdating) return change();
+  if (!S.ready || !document.startViewTransition || document.hidden) {
+    roomTransitionUpdating = true;
+    try { return change(); } finally { roomTransitionUpdating = false; }
+  }
+  activeRoomTransition?.skipTransition();
+  const html = document.documentElement;
+  html.dataset.roomTransition = '1';
+  const transition = document.startViewTransition(() => {
+    roomTransitionUpdating = true;
+    try { return change(); } finally { roomTransitionUpdating = false; }
+  });
+  activeRoomTransition = transition;
+  transition.finished.catch(() => {}).finally(() => {
+    if (activeRoomTransition !== transition) return;
+    activeRoomTransition = null;
+    delete html.dataset.roomTransition;
+  });
+  return transition;
+}
 /* ------------------------------------------------------ corridor paper worlds
  * The restored ten public worlds from the carousel (2026-08-15,
  * "keep 墨・楮紙; default 藍 ベロ藍・浪") — three families, one token law,
@@ -30402,7 +30435,7 @@ function buildGingaChrome(root) {
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');
-    pill.addEventListener('click', () => {
+    pill.addEventListener('click', () => roomTransition(() => {
       S.navOpen = false;
       keepScroll();
       S.stack = [];
@@ -30410,7 +30443,7 @@ function buildGingaChrome(root) {
       S.view = 'tray';
       render();
       window.scrollTo(0, 0);
-    });
+    }));
     root.append(pill);
   }
 
@@ -30629,6 +30662,7 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
         location.assign(url); return;
       }
       if (S.view === tab.view) return;
+      const navigate = () => {
       closeWorldPicker();
       S.captureOpen = false;
       S.navOpen = false;
@@ -30641,6 +30675,9 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       S.view = tab.view;
       render();
       window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
+      };
+      if (tab.view === 'search') navigate();
+      else roomTransition(navigate);
     });
     bar.append(button);
   }
@@ -30695,11 +30732,11 @@ function buildRoomSign() {
 function foundationDoor(id, ja, en, view, before) {
   const button = biLabel('button', 'grammar-link foundation-door', ja, en);
   button.type = 'button'; button.id = id;
-  button.addEventListener('click', () => {
+  button.addEventListener('click', () => roomTransition(() => {
     keepNavigationReturn(view, button);
     before?.();
     S.view = view; render(); window.scrollTo(0, 0);
-  });
+  }));
   return button;
 }
 function openPersonalCollection() {
@@ -31730,7 +31767,7 @@ function render() {
     // door. What is due shows once, on the Line's Today station, where the cards are reviewed.
     dojoDoor.setAttribute('aria-label', tx('学ぶ', 'Learn'));
     if (inDojo) dojoDoor.setAttribute('aria-current', 'page');
-    dojoDoor.addEventListener('click', () => {
+    dojoDoor.addEventListener('click', () => roomTransition(() => {
       if (inDojo) return;
       if (S.view === 'reader' && S.passageId) {
         clearTimeout(readerPosTimer);
@@ -31742,7 +31779,7 @@ function render() {
       S.view = 'dojo';
       render();
       window.scrollTo(0, 0);
-    });
+    }));
     chrome.append(dojoDoor);
   }
 
@@ -31804,7 +31841,7 @@ function render() {
     // D7: the bookmark marks its own room, and its count appears only once there is something saved
     if (S.view === 'tray') trayBtn.dataset.here = '';
   }
-  trayBtn.addEventListener('click', () => {
+  trayBtn.addEventListener('click', () => roomTransition(() => {
     keepScroll();
     S.stack = [];
     // the tray remembers its door — WHICHEVER door it was. It is the one
@@ -31830,7 +31867,7 @@ function render() {
     // EVERY surface did not, so the tray opened at the previous surface's
     // offset — often past its own end (E3 round-A, dead-ends lens)
     window.scrollTo(0, 0);
-  });
+  }));
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
   enableTouchPress();
