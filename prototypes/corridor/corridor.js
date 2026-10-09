@@ -9485,7 +9485,7 @@ async function playNarratedExcerpt(text, button) {
     clips = article.clips.filter((clip,index) => { const begin = position; position += source[index].length; return position > at && begin < at + quote.length; });
     break;
   }
-  if (!clips?.length) { button.textContent = tx('この引用の音声を準備中', 'Narration for this excerpt is not available yet'); return; }
+  if (!clips?.length) { button.textContent = tx('この引用の収録音声はありません', 'No recording for this excerpt'); return; }
   stopReadAloud();
   excerptControl = button;
   button.classList.add('is-speaking'); button.textContent = tx(`止める · ${narrationVoiceName()}`, `Stop · ${narrationVoiceName()}`);
@@ -9685,7 +9685,7 @@ function speakCardReading(text, btn, word) {
     // no recording in the approved voice yet: say so where it can be seen, never fall back to the device voice
     const voice = NARRATION_VOICES[pref];
     const reason = !m ? tx('この版には収録音声がありません', 'This build has no recorded voices')
-      : tx(`${voice} の声を準備中です`, `The ${voice} voice is on its way`);
+      : tx(`${voice} の収録音声はありません`, `No ${voice} recording`);
     if (btn) {
       btn.dataset.voiceUnavailable = !m ? 'no-recordings' : 'not-recorded';
       btn.title = reason;
@@ -16636,7 +16636,7 @@ function renderKanjidex(main) {
     ['radical', '部首', 'by radical'],
     ['freq', '頻度', 'by frequency'],
     ['level', '漢検', 'by level'],
-    ['kkld', 'Kodansha', 'by KKLD number'],
+    ['kkld', '講談社番号', 'Kodansha number'],
   ];
   const lensRow = el('div', 'kdx-lenses');
   for (const [id, ja, en] of LENSES) {
@@ -18191,8 +18191,8 @@ function renderWordWeb({ quiet = false } = {}) {
   const whyText = { looked: tx('最後に引いた語から', 'from the word you last looked up'), saved: tx('あなたの語から', 'from your words'), day: tx('今日の語から', "from today's word") }[why];
   if (whyText) head.append(el('span', 'ww-why', whyText));
   const walk = el('nav', 'ww-walk');
-  walk.setAttribute('aria-label', tx('たどった道', 'Your walk'));
-  walk.append(el('span', 'ww-walk-label', tx('たどった道', 'Your walk')));
+  walk.setAttribute('aria-label', tx('たどった語', 'Words you visited'));
+  walk.append(el('span', 'ww-walk-label', tx('たどった語', 'Words you visited')));
   const trail = wwTrail();
   // a phone keeps the walk to one line: the last four steps, the rest folded into …
   const shown = trail.slice(-4);
@@ -23616,7 +23616,7 @@ function studyHallDoors() {
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
       ? tx(`${readyTests}組 · 級と長さを選ぶ`, `${readyTests} tests · choose a level and length`)
-      : readyWritten ? tx(`筆記テスト ${readyWritten}組 · 検収前`, `${readyWritten} written tests · awaiting review`)
+      : readyWritten ? tx(`筆記テスト ${readyWritten}組 · 人の確認前`, `${readyWritten} written tests · not yet checked by a person`)
       : readySections ? tx(`${readySections}組の練習`, `${readySections} practice set${readySections === 1 ? '' : 's'} · practice sets available`)
         : tx('以前の練習', 'Earlier practice exercises'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
@@ -23629,7 +23629,7 @@ function studyHallDoors() {
     ['sentence', '文の練習', 'sentence practice', tx('保存した文で作る', 'from the sentences you saved'), () => {
       keepScroll(); S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
     }],
-    ['probe', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took'), () => {
+    ['probe', '読みの確認', 'Reading check', tx('まだ保存していない熟語を読む', 'read compounds you haven’t saved'), () => {
       S.focusMode = 'yomi'; render(); window.scrollTo(0, 0);
     }],
     ['levels', '参考書庫', 'reference library', tx('JLPT・漢検の一覧', 'JLPT and Kanji Kentei lists'), () => {
@@ -23928,7 +23928,7 @@ function renderStudyHall(main, doors) {
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
-const DOJO_DECKS = [{ id: 'n2', ja: 'N2・文章で覚える', en: 'N2 vocabulary · passages' }, { id: 'n1', ja: 'N1・文章で覚える', en: 'N1 vocabulary · passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-mcd', ja: '言葉の鉱脈・MCD', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '言葉の鉱脈・文', en: 'Words you looked up · sentences' }];
+const DOJO_DECKS = [{ id: 'n2', ja: 'N2の語・短い文章で', en: 'N2 words · in short passages' }, { id: 'n1', ja: 'N1の語・短い文章で', en: 'N1 words · in short passages' }, { id: 'senmon', ja: '専門・あなたの分野', en: 'Your fields · master\'s level' }, { id: 'kotoba-mcd', ja: '調べた言葉・長文', en: 'Words you looked up · passages' }, { id: 'kotoba-mine', ja: '調べた言葉・例文', en: 'Words you looked up · sentences' }];
 // r4 (John, T2: "*Real Sentences read and recall.. is just very confusing, obtuse and way to generic
 // to mean anyhting at all"): the two 言葉の鉱脈 decks are the words he looked up in his Japanese app,
 // and this list names them exactly as their own deck homes do (the cards lane's titles, so a row and
@@ -24138,9 +24138,9 @@ function renderFocusSitting(focus) {
   const modeDefs = [
     // the sub tells the whole truth (POL-12): the block reviews each waiting
     // card once; when the clock outlasts the pool, further laps are practice
-    ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている ・ 二周目からは稽古`, `${due} waiting · after the first lap, practice`)],
+    ['due', '復習の札', 'Cards due', tx(`${due} 枚 待っている ・ その後は追加の練習`, `${due} waiting · then extra rounds`)],
     ['kanji', '漢字だけ', 'kanji only', tx('やさしい順に', 'easiest first')],
-    ['yomi', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took')],
+    ['yomi', '読みの確認', 'Reading check', tx('まだ保存していない熟語を読む', 'read compounds you haven’t saved')],
   ];
   S.focusMode = S.focusMode || 'due';
   for (const [id, ja, en, sub] of modeDefs) {
@@ -24394,7 +24394,7 @@ function renderProbe(main) {
     if (more.length) pr.queue.push(...more);
   }
   if (pr.ix >= pr.queue.length) {
-    main.append(withEn(el('p', 'eyebrow', '読み探査'), 'yomi probe', 'en-inline'));
+    main.append(withEn(el('p', 'eyebrow', '読みの確認'), 'Reading check', 'en-inline'));
     const n = pr.right + pr.missed.length;
     main.append(el('h1', 'view-title', tx(`探査おわり — ${n} 語`, `Probe done — ${n} word${n === 1 ? '' : 's'}`)));
     const sum = el('div', 'review-summary');
@@ -30194,7 +30194,7 @@ function renderSearchPage(main) {
   hint.id = 'search-page-hint';
   input.setAttribute('aria-describedby', hint.id);
   const results = el('div', 'search-page-results');
-  const skipOpener = el('button', 'skip-search-opener', tx('形から探す · SKIP ホイール', 'Find by shape · open SKIP wheel'));
+  const skipOpener = el('button', 'skip-search-opener', tx('形から漢字を探す', 'Find a kanji by its shape'));
   skipOpener.type = 'button';
   skipOpener.id = 'search-skip-opener';
   skipOpener.dataset.entry = 'skip';
@@ -30211,7 +30211,7 @@ function renderSearchPage(main) {
   if (typeof S.searchLens !== 'string') S.searchLens = 'words';
   const SEARCH_LENSES = [
     ['words', 'ことば', 'words'],
-    ['skip', 'SKIP', 'shape code'],
+    ['skip', '形から', 'Find by shape'],
     ['parts', '部品', 'parts'],
     ['radical', '部首', 'radical'],
     ['draw', '手書き', 'draw'],
@@ -30220,7 +30220,7 @@ function renderSearchPage(main) {
     ['strokes', '画数', 'strokes'],
     ['freq', '頻度', 'frequency'],
     ['level', '漢検', 'level'],
-    ['kkld', 'Kodansha', 'KKLD number'],
+    ['kkld', '講談社番号', 'Kodansha number'],
   ];
   const lensRow = el('div', 'kdx-lenses search-lenses');
   lensRow.id = 'search-lenses';
@@ -30295,7 +30295,7 @@ function renderSearchPage(main) {
     skipOpener.setAttribute('aria-expanded', String(!!showSkip));
     skipOpener.textContent = showSkip
       ? tx('SKIP を閉じる · ことばを探す', 'Close SKIP · search words')
-      : tx('形から探す · SKIP ホイール', 'Find by shape · open SKIP wheel');
+      : tx('形から漢字を探す', 'Find a kanji by its shape');
     hint.hidden = !!q;
     if (showSkip) {
       renderSkipLookup(results, {
@@ -31731,7 +31731,7 @@ function render() {
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
-  if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読み探査', 'yomi probe'));
+  if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読みの確認', 'Reading check'));
   if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
   if (S.view === 'levels') parts.push(tx('参考書庫', 'reference library'));
@@ -31884,14 +31884,14 @@ function render() {
     chrome.append(capBtn);
   }
 
-  // Lists: a quiet bookmark and its count. The word stays in the door's text ("Lists 3" /
-  // "覚 3") for a screen reader and the language law; on screen the glyph says it (polish lane)
-  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, `Lists ${S.taken.length}`);
+  // Today: a quiet bookmark and its saved-word count. The accessible name carries the count.
+  // The on-screen bookmark stays quiet; its name states the room it opens.
+  const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   {
     const label = trayBtn.querySelector('.l-ja');
-    const word = el('span', 'tray-word', tx('リスト', 'Lists'));
+    const word = el('span', 'tray-word', tx('今日', 'Today'));
     label.replaceChildren(word, document.createTextNode(' '), el('span', 'tray-count', String(S.taken.length)));
     trayBtn.dataset.count = String(S.taken.length);
     // D7: the bookmark marks its own room, and its count appears only once there is something saved
