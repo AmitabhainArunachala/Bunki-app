@@ -7894,6 +7894,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 .report-line { display: flex; flex-wrap: wrap; gap: .25rem 1rem; justify-content: center; margin: 3rem 0 1.5rem; }
 .report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
+body.zen #app > .report-line-page .report-door { color: var(--zen-text); }
 .report-line-sheet { margin: 2rem 0 .5rem; }
 /* The waking field supplies its own gap; page margins push it over the glyph. */
 .stroke-awake-field .report-line-stroke { margin: 0; }
@@ -7901,6 +7902,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 
 /* the 音 door's reason when it cannot play — visible and announced, never a silent tap */
 .say-note { display: block; flex-basis: 100%; margin-top: .25rem; font-size: .82rem; color: var(--faint); }
+body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .say-note:empty { display: none; }
 
 /* D11 · the reader's honest gloss (2026-09-25). A content word the quick
