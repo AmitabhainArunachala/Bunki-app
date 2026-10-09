@@ -60,7 +60,7 @@ const listeningControls = '#sentence-choose-listening, #sentence-add-listening, 
 async function listeningLocked(page, requested) {
   const pending = page.locator('#sentence-listening-pending');
   await pending.waitFor({ timeout: 5000 });
-  assert.equal(await pending.innerText(), 'No audio for this sentence yet');
+  assert.equal(await pending.innerText(), 'No recording for this sentence');
   assert.equal(await pending.getAttribute('aria-description'), 'Approved voices: Kore (main), Charon (second).',
     'The pending sentence keeps the locked voice provenance in its accessible description');
   assert.equal(await page.locator(listeningControls).count(), 0, 'No listening control is offered');

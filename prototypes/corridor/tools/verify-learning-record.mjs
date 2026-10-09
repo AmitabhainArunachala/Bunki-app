@@ -1149,14 +1149,14 @@ async function browserChecks() {
         });
         await journey('probe-rejection-keeps-card-and-evidence-unminted', async (page) => {
           await boot(page, null, 'drift'); await page.locator('#ginga-symbol').click(); await page.locator('.nav-dojo').click();
-          await page.locator('.focus-mode').filter({ hasText: 'yomi probe' }).click(); await page.locator('.focus-start').click();
+          await page.locator('.focus-mode').filter({ hasText: 'Reading check' }).click(); await page.locator('.focus-start').click();
           await page.locator('#probe-reveal').click(); const word = await page.locator('.review-front').textContent(); const before = await fault(page, 'obslog');
           await page.locator('[data-probe="wrong"]').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
           assert.equal(await page.locator('.review-front').textContent(), word); assert.equal(await page.locator('[data-probe="wrong"]').count(), 1);
         });
         await journey('probe-miss-atomically-mints-one-card-and-one-observation', async (page) => {
           await boot(page, null, 'drift'); await page.locator('#ginga-symbol').click(); await page.locator('.nav-dojo').click();
-          await page.locator('.focus-mode').filter({ hasText: 'yomi probe' }).click(); await page.locator('.focus-start').click();
+          await page.locator('.focus-mode').filter({ hasText: 'Reading check' }).click(); await page.locator('.focus-start').click();
           await page.locator('#probe-reveal').click(); const word = await page.locator('.review-front').textContent(); const before = await disk(page);
           await page.locator('[data-probe="wrong"]').evaluate((node) => { node.click(); node.click(); });
           const after = await pollDisk(page, (state) => state.obslog.some((row) => row[1] === 'probe'));

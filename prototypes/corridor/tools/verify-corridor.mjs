@@ -1277,7 +1277,7 @@ async function main() {
   console.log('\n— step 5 · 覚える');
   await tap(page, '#take');
   const taken = await page.locator('#tray').textContent();
-  check('any node can be taken into study', /^Lists\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
+  check('any node can be taken into study', /^Today\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
     const p = document.querySelector('.list-picker .fold-sub');
     return p ? p.textContent : null;
@@ -1689,7 +1689,7 @@ async function main() {
   await open('?entry=shelf');
   const biChrome = await page.evaluate(`(() => ({
     backEn: /back/i.test(document.querySelector('#back')?.textContent ?? ''),
-    trayEn: /^Lists [0-9]+$/u.test(document.querySelector('#tray')?.textContent ?? ''),
+    trayEn: /^Today [0-9]+$/u.test(document.querySelector('#tray')?.textContent ?? ''),
     chromeCjk: /[\\u3040-\\u30ff\\u3400-\\u9fff]/u.test(['#back', '#tray'].map((sel) => document.querySelector(sel)?.textContent ?? '').join(' ')),
     segEn: document.querySelector('#lang [data-lang="bi"]')?.textContent === 'EN',
     segJa: document.querySelector('#lang [data-lang="ja"]')?.textContent === '日本語',
@@ -2181,7 +2181,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: 'yomi probe' }).click();
+  await page.locator('.focus-mode', { hasText: 'Reading check' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   const probeZen = await page.evaluate(`document.body.classList.contains('zen')`);
@@ -4171,13 +4171,13 @@ async function main() {
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
   const dueModeSub = await page.evaluate(`(() => {
-    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('your due cards'));
+    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('Cards due'));
     return mode?.querySelector('.focus-mode-sub')?.textContent ?? '';
   })()`);
-  check('R4-B · the due-mode copy says what the refill does — after the first lap, practice',
-    /稽古|practice/.test(dueModeSub) && dueModeSub.includes('2'),
+  check('R4-B · the due-mode copy says what the refill does — then extra rounds',
+    /追加の練習|then extra rounds/.test(dueModeSub) && dueModeSub.includes('2'),
     `sub "${dueModeSub}"`);
-  await page.locator('.focus-mode', { hasText: 'your due cards' }).click();
+  await page.locator('.focus-mode', { hasText: 'Cards due' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   for (let i = 0; i < 2; i += 1) {

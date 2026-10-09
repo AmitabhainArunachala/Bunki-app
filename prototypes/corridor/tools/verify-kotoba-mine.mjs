@@ -386,7 +386,7 @@ async function verifyRestore(browser, base) {
     const now = JSON.parse(await raw(LEDGER));
     check(
       'an older backup with fewer cards: the first tap shows both counts and asks again (置き換える); the second replaces and keeps the old ledger aside',
-      first.msg.includes('Backup: 1 cards · 1 answers') && first.msg.includes('Current record: 2 cards · 2 answers') && first.msg.includes('fewer records') && first.button === 'Replace' && untouched && Object.keys(now.cards).length === 1 && now.log.length === 1 && (await raw(`${LEDGER}:before-restore`)) === current && done.includes('Restored'),
+      first.msg.includes('Backup: 1 card · 1 answer') && first.msg.includes('Current record: 2 cards · 2 answers') && first.msg.includes('fewer records') && first.button === 'Replace' && untouched && Object.keys(now.cards).length === 1 && now.log.length === 1 && (await raw(`${LEDGER}:before-restore`)) === current && done.includes('Restored'),
       JSON.stringify({ first: first.msg, button: first.button, untouched, done }),
     );
 
@@ -2554,7 +2554,7 @@ async function main() {
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
     const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
-    check('?deck=kotoba opens 言葉の鉱脈・文: a real sentence with the word marked, in its own theme', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
+    check('?deck=kotoba opens the sentence deck: a real sentence with the word marked, in the current app world', sent.blank === 0 && sent.look === 'world', JSON.stringify(sent));
 
     // 覚える is one tap (round-1 save path): the row is written through the
     // guarded commit at once, and the list drawer opens under the finger so

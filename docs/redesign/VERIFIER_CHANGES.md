@@ -856,3 +856,33 @@ Before this fixture commit, the dirty priority-three candidate (`9f50b476`, arti
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
 | `verify-guided-session.mjs`, D1 Hall door, D4 Back to exams, S15 Back to guided | Read immediately after external navigation → wait for `hallDoor`, `.exam-levels`, and the actual `room(page)` respectively to be visible, each bounded at 20 seconds | Native room navigation paints its destination in the scheduled snapshot callback. All original D1/D4/S15 assertions remain unchanged. Internal guided J12/J13 branch-return/focus assertions remain immediate and unchanged; their source behavior is fixed instead of delaying those checks. |
+
+## Round 5: accurate singular backup labels (2026-10-10)
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `verify-kotoba-mine.mjs`, smaller-backup confirmation | `Backup: 1 cards · 1 answers` → `Backup: 1 card · 1 answer` | Strict check 13 requires natural count grammar. The exact one-card/one-answer backup and two-card/two-answer current-record counts, unchanged first-tap ledger, explicit second Replace tap, exact resulting ledger sizes, preserved before-restore ledger bytes and successful restore remain required. The app also fixes its one-card/one-answer success label; that existing assertion still requires “Restored.” Japanese and record formats are unchanged. |
+
+
+## Round 5: header bookmark names its Today destination (2026-10-10)
+
+The quiet header bookmark remains `#tray` and opens the same Today room. John kept this icon in D7; the strict brief requires its visible name to describe that destination. All other `#tray` journeys retain their existing selector and behavior. These are the only two assertions pinning the former visible name; numeric patterns are identical apart from the word.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-corridor.mjs`, “any node can be taken into study” | `/^Lists\s+[1-9][0-9]*$/u` → `/^Today\s+[1-9][0-9]*$/u` | Name the existing Today destination. The exact anchored label, whitespace, positive integer count, Save action and real record/collection observations remain required. |
+| `prototypes/corridor/tools/verify-corridor.mjs`, default English `biChrome.trayEn` | `/^Lists [0-9]+$/u` → `/^Today [0-9]+$/u` | The default-English header is labelled Today. Exactly one separating space, a numeric count, English-language purity, active EN state and the later Japanese toggle assertions remain unchanged. |
+
+## Round 5: plain labels and present-tense recording absence (2026-10-10)
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `verify-corridor.mjs`, reading-check selector; `verify-learning-record.mjs`, its two reading-check selectors; `verify-report-entries.mjs`, reading-check regex | `yomi probe` / `読み探査` → `Reading check` / `読みの確認` | Name the same existing sampling activity plainly. The queue, stratified coverage, exact card identities, authored readings, observation ledger, timing, return and report-entry assertions remain unchanged. |
+| `verify-corridor.mjs`, two due-mode selectors and subtitle check | `your due cards` → `Cards due`; `稽古|practice` subtitle → `追加の練習|then extra rounds` | The same initial two due cards and extra practice rounds are named plainly. The exact subtitle count `2`, committed versus ephemeral-grade behavior, undo history and grade/scheduler assertions remain unchanged. |
+| `verify-playback.mjs`, `PENDING` and missing-Kore card assertion | `No audio for this article yet` → `No recording for this article`; promised Kore voice → `No Kore recording` / `Kore の収録音声はありません` | State the actual recording absence without a future promise. The anchored exact article text, approved Kore/Charon accessible description, zero device-voice calls, no playback of retired voices, untouched stored preference, native playback/error/interrupt and learner-record invariants remain unchanged. |
+| `verify-bundled-listening.mjs`, exact pending sentence text | `No audio for this sentence yet` → `No recording for this sentence` | Preserve the same exact absence observation and every cue/source/record assertion. |
+| `verify-listening-failures.mjs`, exact pending sentence text | `No audio for this sentence yet` → `No recording for this sentence` | Preserve exact absence and all native failure/retry/cleanup and learner-state assertions. |
+| `verify-sentence-drafts.mjs`, exact pending sentence text | `No audio for this sentence yet` → `No recording for this sentence` | Preserve exact absence and all sentence capture/draft/practice/source assertions. |
+| `verify-experience.mjs`, optional SKIP segment | Search for absent `.kdx-lens` text `by its shape` after the earlier room return → open the actual `#chrome-search` door and select its `[data-search-lens=skip]` | The old combined journey could skip this segment because the prior return was to the shelf. This real path exercises the integrated search lens. Existing real candidate tap, canonical `1-3-8` query, exact code preservation after entry Back and unchanged learner-record assertions remain required. Dedicated Kanji-finder `by its shape` pins remain unchanged because that separate visible label is unchanged. |
+| `verify-n2n1-decks.mjs`, exact deck and chrome title arrays | `N2/N1・文章で覚える` → `N2/N1の語・短い文章で`; `N2/N1 vocabulary · passages` → `N2/N1 words · in short passages` | These are the accepted tour's plain Japanese/English titles. The exact array positions, deck IDs, specialist title, full deck validation, card/token identity equality, Japanese definitions, ruby, single focus span, offline answer and explicit saved-look assertions remain unchanged. |
+| `verify-kotoba-mine.mjs`, fresh host sentence-deck look | Require the data default `dark` → require host look `world` when no look was saved | Fresh app cards now inherit the selected room world. The same real marked sentence and zero blank count remain required. All explicit saved-look cases and standalone deck-default metadata assertions remain unchanged; no learner preference or theme is discarded. |

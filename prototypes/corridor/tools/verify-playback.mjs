@@ -191,7 +191,7 @@ async function press(page) { await page.locator('#listen-toggle').click(); }
 /** The shut bar: the quiet pending line, with no play control to press and no picker. */
 const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-toggle') && !document.querySelector('#listen-voice')
   && !!document.querySelector('.listen-row.is-pending #listen-note'));
-const PENDING = /^No audio for this article yet$/u;
+const PENDING = /^No recording for this article$/u;
 const PENDING_VOICES = 'Approved voices: Kore (main), Charon (second).';
 const FAILED = /could not play|再生できませんでした/u;
 async function counts(page) {
@@ -532,7 +532,7 @@ try {
       || window.__playbackFixture.clips.length > 0, null, { timeout: 5000 });
     const after = await cardState(page);
     assert.equal(after.clips.length, 0, 'a word recorded only in interim voices never plays');
-    assert.match(after.sayNote, /Kore の声を準備中|The Kore voice is on its way/u, 'the card names the voice it waits for');
+    assert.match(after.sayNote, /Kore の収録音声はありません|No Kore recording/u, 'the card names the approved voice with no recording');
     assert.equal(await page.evaluate(() => localStorage.getItem('kairo-rec-voice-v1')), 'ami', 'the old stored choice is left intact');
   }, { learnerRecord: 'graded' });
   await check('an-invalid-stored-voice-reads-as-kore', 'card-invalid', async ({ page }) => {

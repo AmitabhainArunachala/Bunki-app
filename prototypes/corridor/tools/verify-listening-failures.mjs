@@ -102,7 +102,7 @@ for (const engine of engines) {
     const before=await snapshot('before-armed-fault');const count=fault.served;fault.corruptAudio=true;
     await page.locator('#sentence-practice-confirm').click();await page.locator('#sentence-production-text').waitFor();
     const pending=page.locator('#sentence-listening-pending');await pending.waitFor();
-    assert.equal(await pending.innerText(),'No audio for this sentence yet');
+    assert.equal(await pending.innerText(),'No recording for this sentence');
     assert.equal(await pending.getAttribute('aria-description'),'Approved voices: Kore (main), Charon (second).',
       'The pending sentence keeps the locked voice provenance in its accessible description');
     assert.equal(await page.locator('#sentence-add-listening, #sentence-listening-start, #sentence-listening-play').count(),0);

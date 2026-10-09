@@ -11,8 +11,8 @@ import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.
 import { cardTokens, defTokens, validateDeck } from '../decks/player/engine.js';
 
 const ids = ['n2', 'n1', 'senmon'];
-const chromeTitles = ['N2 vocabulary · passages', 'N1 vocabulary · passages', 'Your fields · master\'s level'];
-const titles = ['N2・文章で覚える', 'N1・文章で覚える', '専門・あなたの分野'];
+const chromeTitles = ['N2 words · in short passages', 'N1 words · in short passages', 'Your fields · master\'s level'];
+const titles = ['N2の語・短い文章で', 'N1の語・短い文章で', '専門・あなたの分野'];
 const out = resolveCorridorEvidence();
 const host = await startCorridorDev(0);
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
