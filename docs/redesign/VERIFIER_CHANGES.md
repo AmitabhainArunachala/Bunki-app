@@ -647,3 +647,12 @@ The independent review's fixes changed this lane's own new verifier. No other ve
 | `tools/verify-today-sky.mjs` | new: Me's fields say "not begun" once | none → one group note, no per-field line, while the fields deck is unopened | Review fix 9. |
 | `tools/verify-today-sky.mjs` | engines | Chromium only in the logged run → Chromium and WebKit (the runner's `KAIRO_BROWSER=chromium` still limits a battery run; the WebKit run is logged separately) | Review fix 10: his phone runs iOS Safari. After a word's sheet opens, the walk waits for its example fetches before it navigates, because WebKit reports an aborted fetch as a page error. |
 | `tools/verify-today-sky.mjs` | new: the Today pill and the universe's card | none → while `#drift-layer #card` is open the door's `#home-review` has opacity 0 and takes no touch, and both come back when it closes | Found in this pass's own evidence: verify-drift-hunt's card photos showed the always-present pill over the card's last row. The check sets the card's `open` class directly, so it guards the style contract; the hunt's photos show the real card. |
+
+## Round 5 · fields expansion, 2026-10-10
+
+| File | Assertion | Before → after | Why / retained requirements |
+| --- | --- | --- | --- |
+| `prototypes/corridor/tools/verify-n2n1-decks.mjs` | `deck.titleJa` equality for `senmon` | `専門・五つの分野` → `専門・あなたの分野` | John named three fields; the requested deck name describes his fields without asserting five. The exact-title assertion, deck id and all data validation remain. |
+| `prototypes/corridor/tools/verify-n2n1-decks.mjs` | dojo deck title equality for `senmon` (`chromeTitles`) | `Your five fields · master’s level` → `Your fields · master's level` | The exact English title follows the requested rename in the single `DOJO_DECKS` line. Deck-list equality, card integrity, furigana, definitions, English disclosure, tap-to-define and offline checks are unchanged. |
+
+This verifier has no pinned word or card totals; its totals are measured from the built decks. No count assertion or behavioural check was changed.

@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "評価指標",
+   "reading": "ひょうかしひょう",
+   "pos": "noun",
+   "meaning": "evaluation metric",
+   "defJa": "成果や性能を測り比べるための基準となる数値",
+   "passage": {
+    "ja": "百件のメールのうち迷惑メールが一件だけなら、全部を普通のメールと判定しても正解率は高くなります。しかし、利用者が止めてほしい一件は、そのまま受信箱へ届きます。評価指標を正解率だけにすると、少数の重要な失敗が平均の陰に隠れる場合があるのです。迷惑メールの見逃しを減らすにしても、必要な連絡まで消す頻度が上がれば困ります。何を見つけたいのか、どんな間違いの負担が大きいのかに応じて尺度を選ぶことが、性能を測る出発点になります。",
+    "form": "評価指標",
+    "en": "If only one of a hundred emails is spam, labeling all of them ordinary mail still produces high accuracy. Yet the one message the user wants blocked reaches the inbox. Using accuracy as the sole evaluation metric can hide a few important failures behind an average. Reducing missed spam is also problematic if it increases the frequency of deleting necessary messages. Choosing measures according to what should be detected and which errors are costly is the starting point for assessing performance.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "何を成果として数えるかを定める尺度で、平均だけでは見えない失敗もある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-51dab0d6ad-20244cd9",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-51dab0d6ad-20244cd9",
+    "wordId": "nn-51dab0d6ad"
+   }
+  },
+  {
+   "term": "買収",
+   "reading": "ばいしゅう",
+   "pos": "noun",
+   "meaning": "acquisition; buyout of a company or shares",
+   "defJa": "金を払って他の会社や株式を手に入れること",
+   "passage": {
+    "ja": "技術力のある小さな会社が大手の傘下に入れば、研究費や販売網を得られる可能性がある。買収によって会社を手に入れる側も、自社だけでは育てるのに時間がかかる技術や人材を確保できる。ただし、契約が成立したからといって、別々の組織が翌日から同じように動くとは限らない。意思決定の手順や報酬の仕組みが合わず、中心となる技術者が去ってしまえば、取得したはずの価値が失われるため、統合後に人が働き続ける条件まで問われる。",
+    "form": "買収",
+    "en": "A small technically capable company joining a larger group may gain research funding and sales channels. The acquiring company can obtain technologies and personnel that would take time to develop internally. Closing the deal, however, does not mean two organizations will operate in the same way the next day. If incompatible decision processes or compensation systems drive key engineers away, the expected value can disappear, making the conditions for retaining people after integration crucial.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "対価を払って会社や株式を取得する意味で、統合後の運営も重要になる。",
+    "sense": "賄賂で人心を収める意ではなく、会社や株式を買い取る意"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ef5a460db5-78ed34b8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-002.json",
+    "cardId": "nn-ef5a460db5-78ed34b8",
+    "wordId": "nn-ef5a460db5"
+   }
+  },
+  {
+   "term": "送電網",
+   "reading": "そうでんもう",
+   "pos": "noun",
+   "meaning": "power grid",
+   "defJa": "発電した電気を各地へ運ぶ設備のつながり",
+   "passage": {
+    "ja": "風の強い場所で電気を作っても、工場や住宅へ運ぶ道が足りなければ十分に利用できません。送電網は発電所と需要地を結ぶ設備のつながりであり、発電設備を増やすだけでは解消しない制約を持っています。電線には安全に流せる量の限界があり、離れた地域同士を結ぶ設備にも容量があります。そのため、需要が別の場所にあるからといって余った電気を無制限に回すことはできず、どこで作り、どこへ届けるかを一組にした計画が必要になります。",
+    "form": "送電網",
+    "en": "Generating electricity in a windy location is insufficient if there are not enough routes to factories and homes. The transmission grid connects power plants with demand centers and has constraints that adding generation alone cannot resolve. Power lines have safe flow limits, and connections between distant regions also have limited capacity. Surplus electricity therefore cannot be transferred without limit simply because demand exists elsewhere, so planning must link generation locations with destinations.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "発電所と需要地を結ぶ設備網で、輸送できる電気の量にも制約がある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-4df5acf04c-0179f6d5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-032.json",
+    "cardId": "nn-4df5acf04c-0179f6d5",
+    "wordId": "nn-4df5acf04c"
+   }
+  },
+  {
+   "term": "開発競争",
+   "reading": "かいはつきょうそう",
+   "pos": "noun",
+   "meaning": "development race",
+   "defJa": "新しい技術や製品を作る速さや性能を争うこと",
+   "passage": {
+    "ja": "新製品の発表が相次ぐ市場では、発売の遅れが顧客を失う危険に直結する。開発競争が激しくなるに伴って、企業は試作品を早く市場へ出すよう迫られるが、試験を省けば発売後の修正に追われる恐れもある。速さと品質は、いつも単純な二者択一になるとは限らない。設計の初期から試験を組み込み、不具合を小さいうちに見つける体制が整っていれば、後戻りする時間を減らせるため、開発期間の短縮を支えるのは担当者の長時間労働だけではない。",
+    "form": "開発競争",
+    "en": "In markets with frequent product announcements, release delays directly risk losing customers. As development competition intensifies, companies are pressed to bring prototypes to market earlier, yet skipping tests can leave them occupied with post-release repairs. Speed and quality do not always form a simple either-or choice. Building tests into early design and catching small defects can reduce rework, so shortening development does not depend solely on longer working hours.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "技術や製品の開発速度、性能などを企業同士で競うこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-49f5606bcf-910755b7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-49f5606bcf-910755b7",
+    "wordId": "nn-49f5606bcf"
+   }
+  },
+  {
+   "term": "頭打ち",
+   "reading": "あたまうち",
+   "pos": "noun",
+   "meaning": "leveling off, hitting a ceiling",
+   "defJa": "伸びが止まって、それ以上上がらない状態",
+   "passage": {
+    "ja": "毎晩同じ単語帳を見ているのに、小テストの点数が動かなくなりました。勉強時間を増やしても成績が頭打ちなら、何時間座ったかより、どこで答えを取り違えたかに目を向ける余地があります。意味は分かるのに取り出せない語と、似た語との違いが曖昧な語では、必要な練習が違います。間違いを分類したうえで、前者には手掛かりを減らした想起の練習、後者には対照的な例を用意すれば、同じ作業を長く続けるだけでは見つからなかった改善点を探れます。",
+    "form": "頭打ち",
+    "en": "Despite reviewing the same vocabulary book every evening, a learner's quiz scores stop changing. When performance plateaus despite increased study time, there is room to examine where answers go wrong rather than hours spent seated. Words whose meanings are known but cannot be recalled require different practice from words confused with similar ones. Classifying errors and using reduced-cue recall for the former and contrasting examples for the latter can reveal improvements that simply repeating the same activity longer did not uncover.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "上昇や成長が止まり、それ以上伸びにくくなった状態。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5d37b60e93-dd2051ac",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-003-r.json",
+    "cardId": "nn-5d37b60e93-dd2051ac",
+    "wordId": "nn-5d37b60e93"
+   }
+  },
+  {
+   "term": "ジーヴァ",
+   "reading": "じーゔぁ",
+   "pos": "noun",
+   "meaning": "living soul in Jain philosophy",
+   "defJa": "ジャイナ思想で個々の生命を担う魂",
+   "passage": {
+    "ja": "小さな虫にも魂があるとすれば、一歩を踏み出すことさえ倫理上の重みを持ちます。ジャイナ思想のジーヴァは、個々の生命を担う存在として捉えられ、人間だけに限られません。この伝統では、魂が業による束縛を離れることが解脱であり、他の生命を傷つけない実践が大きな意味を持ちます。目に見える体の大小にかかわらず生命への配慮を求める立場は、生き物を人間の役に立つかどうかだけで分ける態度に、根本から問いを投げかけます。",
+    "form": "ジーヴァ",
+    "en": "If even a tiny insect has a soul, a single step carries ethical weight. In Jain thought, jiva is the entity underlying individual life and is not limited to humans. In this tradition, liberation means the soul's release from karmic bondage, giving great importance to practices that avoid harming other lives. Calling for concern regardless of visible body size fundamentally challenges treating creatures solely according to their usefulness to humans.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "ジャイナ思想では、業からの解放を目指す個々の魂を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-243d48671a-dd447f58",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
+    "cardId": "nn-243d48671a-dd447f58",
+    "wordId": "nn-243d48671a"
+   }
+  },
+  {
+   "term": "ヨーガ",
+   "reading": "よーが",
+   "pos": "noun",
+   "meaning": "yoga (scholarly spelling)",
+   "defJa": "心身を整え解放を目指すインド由来の実践",
+   "passage": {
+    "ja": "姿勢を整えて座っても、心は昨日の失敗や明日の予定へと走ります。古典的なヨーガでは、体を柔らかくすることだけでなく、このような心の動きと向き合い、束縛からの解放を目指す実践が重視されます。呼吸や姿勢に加えて、日々の行動を律する教えも、その広い体系の一部です。現代の教室には運動や健康を主な目的とするものもあり、同じ名で行われる活動でも、何を到達点に置くかによって、実践の意味や重視する手順は異なってきます。",
+    "form": "ヨーガ",
+    "en": "Even while seated with good posture, the mind races toward yesterday's failures and tomorrow's plans. Classical yoga values practices aimed at confronting such mental activity and attaining liberation from bondage, beyond making the body flexible. Teachings governing daily conduct are part of this broader system alongside breathing and posture. Some modern classes chiefly pursue exercise or health, so activities bearing the same name differ in meaning and priorities according to their intended goal.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "姿勢だけでなく、心の働きや行動を含む解放への実践としても使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-79c37337bc-aeb552a7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-79c37337bc-aeb552a7",
+    "wordId": "nn-79c37337bc"
+   }
+  },
+  {
+   "term": "一即一切",
+   "reading": "いっそくいっさい",
+   "pos": "noun",
+   "meaning": "one is all",
+   "defJa": "一つのものと全体が隔てなく関わるという華厳の教え",
+   "passage": {
+    "ja": "茶碗の中の米粒を一つ見ても、土や水、育てた人の仕事を切り離すことはできません。華厳の一即一切という教えは、一つの存在を孤立したものとしてではなく、全体と隔てなく関わるものとして捉えます。米の例は身近な入口にすぎませんが、手元の小さなものにも広い関係が重なっていることは感じ取れます。一つを大切にすることが全体への配慮と結び付くという見方からは、数が少ないから無視してよいという発想とは異なる、ものへの接し方が生まれます。",
+    "form": "一即一切",
+    "en": "Even a single grain of rice in a bowl cannot be separated from soil, water, and the work of those who grew it. The Huayan teaching that one is all sees an individual existence as inseparably related to the whole rather than isolated. Rice provides only a familiar entry point, but it makes a wide web of relations in a small object perceptible. Seeing care for one thing as connected to care for the whole encourages a different attitude from dismissing something because its quantity is small.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "華厳で、一つの存在と全体との隔てのない関わりを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ec60c3add4-48ef71ea",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
+    "cardId": "nn-ec60c3add4-48ef71ea",
+    "wordId": "nn-ec60c3add4"
+   }
+  }
+ ]
+}

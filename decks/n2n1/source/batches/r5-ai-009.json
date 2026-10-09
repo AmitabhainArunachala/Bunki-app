@@ -1,0 +1,156 @@
+{
+ "batch": "r5-ai-009",
+ "items": [
+  {
+   "term": "チップレット",
+   "reading": "ちっぷれっと",
+   "gloss": "chiplet",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "チューリングテスト",
+   "reading": "ちゅーりんぐてすと",
+   "gloss": "the Turing test",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "ディープフェイク",
+   "reading": "でぃーぷふぇいく",
+   "gloss": "deepfake",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "デカップリング",
+   "reading": "でかっぷりんぐ",
+   "gloss": "decoupling",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "データセンター",
+   "reading": "でーたせんたー",
+   "gloss": "data center",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "トランジスタ",
+   "reading": "とらんじすた",
+   "gloss": "transistor",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "トランスフォーマー",
+   "reading": "とらんすふぉーまー",
+   "gloss": "Transformer (architecture)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Original paper https://arxiv.org/abs/1706.03762: attention-based architecture; training can parallelize sequence work, but autoregressive text generation typically proceeds token by token. No claim of humanlike consciousness."
+  },
+  {
+   "term": "トークン",
+   "reading": "とーくん",
+   "gloss": "token",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "ゲーム理論",
+  "シリコンサイクル",
+  "シンギュラリティ",
+  "スケーリング則",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

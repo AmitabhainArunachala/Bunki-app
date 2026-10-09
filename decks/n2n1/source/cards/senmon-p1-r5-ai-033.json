@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "量子トンネル効果",
+   "reading": "りょうしとんねるこうか",
+   "pos": "noun",
+   "meaning": "quantum tunneling",
+   "defJa": "粒子が古典的には越えられない障壁を通る現象",
+   "passage": {
+    "ja": "小さな粒子の世界では、普段のボールの動きから想像しにくい現象が現れます。古典的には越えられないエネルギーの障壁の向こうへ粒子が通り抜ける量子トンネル効果は、粒子が壁に物理的な穴を掘るという話ではありません。半導体でも、薄い絶縁膜を通る意図しない電流などを考える際に、この性質が関わります。部品を小さくするに伴って、ただ境界を描けば電気を閉じ込められるという直感が通用しにくくなるので、材料の厚さと電気の流れを別々には決められなくなります。",
+    "form": "量子トンネル効果",
+    "en": "The world of small particles exhibits phenomena difficult to imagine from the motion of an ordinary ball. Quantum tunneling, in which a particle passes through an energy barrier that would be impassable classically, does not mean physically digging a hole in a wall. This property matters in semiconductors when considering effects such as unintended current through thin insulating films. As components shrink, the intuition that drawing a boundary can contain electricity becomes less useful, tying choices about material thickness to electrical flow.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "粒子が壁を削って穴を開けるという意味ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "量子コンピュータ",
+   "reading": "りょうしこんぴゅーた",
+   "pos": "noun",
+   "meaning": "quantum computer",
+   "defJa": "量子的な状態の性質を利用して計算する装置",
+   "passage": {
+    "ja": "「全部の答えを同時に試して一瞬で正解を出す」と書けば、量子コンピュータの説明は魅力的になりますが、大切な条件が抜け落ちます。量子的な状態の性質を利用するにしても、測定で得られる情報には制約があり、役立つ結果が得られるように計算の手順を組む工夫が要ります。普通の計算機より有利とされる問題があることと、あらゆる仕事が速くなることとは別です。記事を直すなら、同時に試すという比喩を強めるより、どんな問題でどの手順を使う話なのかを示し、適用範囲を狭めて正確さを取り戻します。",
+    "form": "量子コンピュータ",
+    "en": "Describing a quantum computer as trying every answer simultaneously and instantly producing the correct one sounds appealing but omits crucial conditions. Even when exploiting quantum states, measurement constrains the information obtained, and the procedure must be designed to yield useful results. Advantages on certain problems do not mean that every task becomes faster. Editing the article should recover precision by identifying the problem and method rather than strengthening the metaphor of simultaneous trials.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "あらゆる計算を速める万能機という表現は避ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

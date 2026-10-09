@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "前帯状皮質",
+   "reading": "ぜんたいじょうひしつ",
+   "pos": "noun",
+   "meaning": "anterior cingulate cortex",
+   "defJa": "脳の内側で帯状回の前方に位置する皮質",
+   "passage": {
+    "ja": "目標に注意を向けたいのに、別の刺激に引かれる場面を想像してみましょう。こうした注意の調整を扱う研究では前帯状皮質が調べられることがありますが、この部位は一つの課題だけを担う装置ではありません。瞑想の訓練前後を比べるにあたっても、反応の速さや誤りの数と脳の指標を合わせて見ると、研究がどの変化を問題にしているかが分かります。部位の名前を覚えた後は、それを結論として置くより、課題、行動、計測という三つの欄をつないで図にすると理解が進みます。",
+    "form": "前帯状皮質",
+    "en": "Imagine wanting to attend to a goal while another stimulus draws attention away. Research on this kind of attentional adjustment sometimes examines the anterior cingulate cortex, but the region is not a device that serves only one task. Comparing reaction times and errors alongside brain measures before and after meditation training clarifies which changes a study addresses. After learning the region’s name, connecting task, behavior, and measurement in a diagram advances understanding more than treating the name as a conclusion.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "部位名の暗記に加え、どの課題と行動を調べたかを結び付けている。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "脱中心化",
+   "reading": "だつちゅうしんか",
+   "pos": "noun",
+   "meaning": "decentering",
+   "defJa": "思考を事実や自己そのものとせず観察すること",
+   "passage": {
+    "ja": "「失敗するに違いない」と思ったとき、その言葉を未来の事実として扱うと、行動の幅まで狭まります。脱中心化は、そこで生じた考えを心の中の出来事として捉え、考えた内容と現実とを少し離して見ることを指します。瞑想を含む実践の説明にも使われますが、考えを無理に消すことでも、自分への関心を完全に失うことでもありません。同じ不安が浮かんでも、今そう考えていると気付いたうえで次の行動を選ぶという違いに注目すると、抽象的な語が日常の小さな場面につながります。",
+    "form": "脱中心化",
+    "en": "When a thought says failure is certain, treating it as a future fact can restrict action. Decentering means recognizing the thought as a mental event and creating some distance between its content and reality. The term appears in accounts of practices including meditation, but means neither forcibly erasing thoughts nor losing all concern for oneself. Noticing the difference between obeying an anxious thought and recognizing it before choosing the next action connects this abstract word with an everyday moment.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「脱中心化を促す」。思考を消すことと、思考との距離を取ることを区別する。",
+    "sense": ""
+   }
+  }
+ ]
+}

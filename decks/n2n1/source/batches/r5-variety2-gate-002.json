@@ -1,0 +1,183 @@
+{
+ "batch": "r5-variety2-gate-002",
+ "items": [
+  {
+   "term": "輪廻転生",
+   "reading": "りんねてんしょう",
+   "gloss": "the cycle of rebirth",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-767064e71f-489fc916",
+    "wordId": "nn-767064e71f"
+   }
+  },
+  {
+   "term": "空衣派",
+   "reading": "くうえは",
+   "gloss": "Digambara Jain tradition",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-001.json",
+    "cardId": "nn-82fadd5be4-8e2177d0",
+    "wordId": "nn-82fadd5be4"
+   }
+  },
+  {
+   "term": "ヨーガ",
+   "reading": "よーが",
+   "gloss": "yoga (scholarly spelling)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-79c37337bc-aeb552a7",
+    "wordId": "nn-79c37337bc"
+   }
+  },
+  {
+   "term": "対角線論法",
+   "reading": "たいかくせんろんぽう",
+   "gloss": "diagonal argument",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-b0f0e76a81-317df859",
+    "wordId": "nn-b0f0e76a81"
+   }
+  },
+  {
+   "term": "西田幾多郎",
+   "reading": "にしだきたろう",
+   "gloss": "Nishida Kitaro",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-e3eafd61ab-99ebc244",
+    "wordId": "nn-e3eafd61ab"
+   }
+  },
+  {
+   "term": "先端半導体",
+   "reading": "せんたんはんどうたい",
+   "gloss": "leading-edge chips",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json",
+    "cardId": "nn-96088cb646-de99aa63",
+    "wordId": "nn-96088cb646"
+   }
+  },
+  {
+   "term": "資本集約的",
+   "reading": "しほんしゅうやくてき",
+   "gloss": "capital-intensive",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-44b2efa702-94e542d4",
+    "wordId": "nn-44b2efa702"
+   }
+  },
+  {
+   "term": "技術革新",
+   "reading": "ぎじゅつかくしん",
+   "gloss": "technological innovation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6f817dd058-3edc1df7",
+    "wordId": "nn-6f817dd058"
+   }
+  }
+ ],
+ "reviewOf": {
+  "輪廻転生": {
+   "source": "cards/senmon-p1-r5-variety2-l2-006.json",
+   "cardId": "nn-767064e71f-489fc916",
+   "batch": "r5-variety2-l2-006",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 1, longest sentence 5, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "空衣派": {
+   "source": "cards/senmon-p1-r5-variety2-l1-008.json",
+   "cardId": "nn-82fadd5be4-8e2177d0",
+   "batch": "r5-variety2-l1-008",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-new-001.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "ヨーガ": {
+   "source": "cards/senmon-p1-r5-variety2-l1-005.json",
+   "cardId": "nn-79c37337bc-aeb552a7",
+   "batch": "r5-variety2-l1-005",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "対角線論法": {
+   "source": "cards/senmon-p1-r5-variety2-l2-002.json",
+   "cardId": "nn-b0f0e76a81-317df859",
+   "batch": "r5-variety2-l2-002",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "西田幾多郎": {
+   "source": "cards/senmon-p1-r5-variety2-l2-006.json",
+   "cardId": "nn-e3eafd61ab-99ebc244",
+   "batch": "r5-variety2-l2-006",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 5, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "先端半導体": {
+   "source": "cards/senmon-p1-r5-variety2-l3-001.json",
+   "cardId": "nn-96088cb646-de99aa63",
+   "batch": "r5-variety2-l3-001",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "資本集約的": {
+   "source": "cards/senmon-p1-r5-variety2-l2-003.json",
+   "cardId": "nn-44b2efa702-94e542d4",
+   "batch": "r5-variety2-l2-003",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 5, register 学). It receives its one editorial rewrite with a different structure."
+  },
+  "技術革新": {
+   "source": "cards/senmon-p1-r5-variety2-l1-003.json",
+   "cardId": "nn-6f817dd058-3edc1df7",
+   "batch": "r5-variety2-l1-003",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 話). It receives its one editorial rewrite with a different structure."
+  }
+ }
+}

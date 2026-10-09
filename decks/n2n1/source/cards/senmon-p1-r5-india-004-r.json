@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "老子",
+   "reading": "ろうし",
+   "pos": "noun",
+   "meaning": "Laozi, Daoist sage; also the Daodejing itself",
+   "defJa": "道家の祖とされる人物、またはその教えを記した書の名",
+   "passage": {
+    "ja": "中国の老子が残したと伝えられる『道徳経』は、水を手本に掲げ、争わず低い所へ流れるものがすべてを養うと説く。この教えは、干渉を減らせば民は自ずから治まるという統治の主張だが、経験に照らすと、職人の手が考えを挟まず動く瞬間に、無為に近いものは観察できる。他方、インドの古典ヨーガは、心の作用が静まれば見る者は自らの本性に安住するという教説を、坐法から呼吸、注意の統一へと段階を組んだ修行に仕上げた。ただ、瞑想研究を通じて測定できるのは心が落ち着く際の脳や身体の変化で、教説の語る治世や本性は実験の外にとどまる。",
+    "form": "老子",
+    "en": "The Daodejing, said to have been left by the Chinese sage Laozi, holds water up as its model, teaching that what flows without contending into the low places nourishes everything. This teaching is a claim about governance, that when interference lessens the people settle into order of themselves, yet in experience something close to non-action can be observed, as when a craftsman's hands move without a thought being inserted. Classical yoga in India, by contrast, took its doctrine, that when the movements of the mind grow still the seer abides in its own nature, and refined it into a training organized in stages, from posture to breath to the unifying of attention. What can be measured through meditation research, though, is only the change in brain and body that appears as the mind settles, and the self-ordering realm and the seer's own nature of which the doctrines speak remain outside the experiment.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "人物と書物の両義がある語で、荘子と並べて老荘思想と呼ばれる系譜の祖。伝記は不確実で、『道徳経』の作者として文脈から特定する。",
+    "sense": "ここでは『道徳経』を残したとされる人物を指し、書名としての用法は別義"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

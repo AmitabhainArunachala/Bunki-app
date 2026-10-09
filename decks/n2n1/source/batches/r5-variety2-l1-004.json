@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "波及効果",
+   "reading": "はきゅうこうか",
+   "gloss": "spillover effects",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-910a5ed112-1e0142c6",
+    "wordId": "nn-910a5ed112"
+   }
+  },
+  {
+   "term": "消費電力",
+   "reading": "しょうひでんりょく",
+   "gloss": "power consumption",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-7b0ed95780-2b7e376d",
+    "wordId": "nn-7b0ed95780"
+   }
+  },
+  {
+   "term": "牙城",
+   "reading": "がじょう",
+   "gloss": "a firmly held stronghold",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-91eb393f37-72ed71af",
+    "wordId": "nn-91eb393f37"
+   }
+  },
+  {
+   "term": "省人化",
+   "reading": "しょうじんか",
+   "gloss": "reducing required staffing",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-119f380d56-1fb87653",
+    "wordId": "nn-119f380d56"
+   }
+  },
+  {
+   "term": "経済安全保障",
+   "reading": "けいざいあんぜんほしょう",
+   "gloss": "economic security",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-028.json",
+    "cardId": "nn-bee6b210d3-026673e3",
+    "wordId": "nn-bee6b210d3"
+   }
+  },
+  {
+   "term": "自動化",
+   "reading": "じどうか",
+   "gloss": "automation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-f703a9b237-635c5343",
+    "wordId": "nn-f703a9b237"
+   }
+  },
+  {
+   "term": "蓋然性",
+   "reading": "がいぜんせい",
+   "gloss": "likelihood",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-521b3cb009-94a94af7",
+    "wordId": "nn-521b3cb009"
+   }
+  },
+  {
+   "term": "計算可能性",
+   "reading": "けいさんかのうせい",
+   "gloss": "computability",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-039.json",
+    "cardId": "nn-f2b554f67d-fed42923",
+    "wordId": "nn-f2b554f67d"
+   }
+  }
+ ],
+ "weave": [
+  "波及効果",
+  "消費電力",
+  "牙城",
+  "省人化",
+  "経済安全保障",
+  "自動化",
+  "蓋然性",
+  "計算可能性"
+ ]
+}

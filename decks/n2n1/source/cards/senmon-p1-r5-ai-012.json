@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "ロジック半導体",
+   "reading": "ろじっくはんどうたい",
+   "pos": "noun",
+   "meaning": "logic chip",
+   "defJa": "計算や論理的な処理を担う半導体",
+   "passage": {
+    "ja": "「半導体は情報を保存する部品」とだけ書いた説明では、計算を進める役割が抜け落ちます。ロジック半導体を紹介するなら、数値を計算したり、条件に応じて処理を選んだりする部品として、情報を保持する役割との違いを示します。ただし、実際の製品には計算と記憶の機能が近接して組み込まれる場合もあるため、分類がすべて別々の箱に分かれているようには描けません。何をする機能なのかと、どのように製品へまとめるかを別の文にすると、用途の分類と物の構造を混同せずに伝えられます。",
+    "form": "ロジック半導体",
+    "en": "An explanation saying that semiconductors store information omits their computational role. Introducing logic semiconductors as components that calculate values or select processing according to conditions distinguishes them from storage functions. Actual products may integrate computation and memory closely, however, so classifications should not be depicted as always occupying separate boxes. Separate sentences for function and product integration communicate the difference between classifications of use and physical structure.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "記憶する部品との違いを役割から説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不確実性",
+   "reading": "ふかくじつせい",
+   "pos": "noun",
+   "meaning": "uncertainty",
+   "defJa": "結果や状態をはっきり見通せない性質",
+   "passage": {
+    "ja": "企業の見通しに「不確実性が高い」と書くだけでは、読み手は何を判断できないのかをつかめません。半導体の需要を論じるなら、顧客の注文がまだ決まらないのか、工場の完成時期が読めないのかを分けて示すと、言葉の中身が具体的になります。あらゆる未知を一つの危険としてまとめるより、条件が変わった場合の見通しを並べるほうが、予測の幅を説明できます。断言を避けるための曖昧な語で終わらせず、何が分かれば評価を変えるのかまで添えることが、分析の文章を前へ進めます。",
+    "form": "不確実性",
+    "en": "Merely saying that a company's outlook has high uncertainty leaves readers unable to identify what cannot be judged. A discussion of semiconductor demand becomes clearer by distinguishing undecided customer orders from an unpredictable factory completion date. Presenting outlooks under changed conditions explains a range of forecasts better than grouping every unknown into one danger. Adding what information would change the assessment moves analysis forward instead of ending with a vague word used to avoid commitment.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "分からない対象と、その理由を添えて使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一線を画す",
+   "reading": "いっせんをかくす",
+   "pos": "expression",
+   "meaning": "to draw a clear line, stand apart",
+   "defJa": "性質などを明確に区別して異なるものとする",
+   "passage": {
+    "ja": "人工知能を使う端末の評価では、計算の速さだけでなく、情報をどこで処理するかも製品の特徴となる。仮に音声を外へ送らず端末内で扱う設計なら、通信を前提とした製品とは一線を画す方針だと説明できる。ただし、その違いをもって、あらゆる面で性能や安全性が上回ると結論することはできない。処理できる仕事の範囲や電力の条件も合わせて示すことで、明確な設計上の違いと、製品全体の優劣を混同しない比較が可能となる。",
+    "form": "一線を画す",
+    "en": "In evaluating an AI-enabled device, where information is processed matters alongside computational speed. A hypothetical design that handles speech locally without transmitting it could be described as taking a clearly distinct approach from products requiring communication. That difference alone does not establish superiority in every aspect of performance or safety. Including supported tasks and power constraints allows comparison without confusing a clear design distinction with overall product superiority.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "程度の差よりも、特徴の明確な違いを強調する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一翼を担う",
+   "reading": "いちよくをになう",
+   "pos": "expression",
+   "meaning": "to play a part",
+   "defJa": "全体の仕事のうち重要な一部分を受け持つ",
+   "passage": {
+    "ja": "新しい半導体が発表されると、設計した会社や製造した工場に光が当たりやすい。だが、材料の純度を測る検査や、不良を見付ける技術も、安定した生産の一翼を担う。目立つ成果だけを数える見方では、問題を早く発見して損失を防いだ仕事が、何も起こらなかった出来事として消えてしまう。誰が最も偉大かを決める前に、それぞれの働きがどの段階を支え、どこへ結果を渡しているかをたどると、一枚のチップに重なった分業の厚みが現れる。",
+    "form": "一翼を担う",
+    "en": "When a new semiconductor is announced, attention tends to focus on its designer or manufacturing plant. Yet material-purity inspection and defect-detection technology also play an important part in stable production. Counting only visible achievements makes work that caught problems early and prevented losses disappear as if nothing happened. Tracing which stage each role supports and where it passes its results reveals the depth of collaboration behind a chip before asking who deserves the most credit.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "主役を独占するのでなく、他の役割との分担を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "三次元積層",
+   "reading": "さんじげんせきそう",
+   "pos": "noun",
+   "meaning": "3D stacking",
+   "defJa": "部品や層を高さの方向にも重ねて組むこと",
+   "passage": {
+    "ja": "机の上に物を横へ並べきれないとき、棚を使って上にも置く発想ってあるよね。半導体の三次元積層も、平面の広さだけに頼らず、高さの方向を使う工夫として見ると入口は分かりやすいんだ。ただし、ただ重ねれば済むわけじゃなくて、層の間で信号や電力をどう渡し、内側の熱をどう逃がすかという課題も出てくる。小さくまとまった形だけを見るのに加えて、重ねた後に試験できる範囲や壊れた部分の扱いまで考えると、棚の比喩では説明し切れない設計の仕事が見つかるよ。",
+    "form": "三次元積層",
+    "en": "When objects no longer fit across a desk, using shelves adds vertical space. Three-dimensional stacking in semiconductors is similarly accessible as an idea that uses height rather than relying only on planar area. But stacking alone is insufficient; signals and power must cross layers and heat must escape from inside. Considering testability after assembly and how faulty parts are handled reveals design work that the shelf metaphor cannot fully explain.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "面積の節約と、接続や放熱の条件を一緒に考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "露光装置",
+   "reading": "ろこうそうち",
+   "pos": "noun",
+   "meaning": "lithography (exposure) tool",
+   "defJa": "光で微細な回路の模様を材料へ転写する機械",
+   "passage": {
+    "ja": "半導体工場を見学用の窓からのぞくと、ある部屋だけ照明が黄色いことに気づきます。そこで扱うウエハーには光に反応する薬剤が塗られていて、白い照明に含まれる波長の短い光が当たると、回路を写す前に感光してしまう恐れがあるからです。ここで行う作業は、写真の焼き付けに似ています。回路の原版に光を当て、その模様を縮小してウエハーの上に写し取ります。この工程を受け持つ露光装置のうち、最先端の機種を製造できるのはオランダの企業だけで、その輸出には政府の許可が要ります。",
+    "form": "露光装置",
+    "en": "If you look into a semiconductor factory through the visitors' window, you notice that one room alone is lit in yellow. That is because the wafers handled there are coated with a chemical that reacts to light, and if the short-wavelength light contained in white lighting falls on them, there is a risk that they will be exposed before the circuit is transferred. The work done here resembles making a photographic print. Light is shone on the master pattern of the circuit, and that pattern is reduced in size and transferred onto the wafer. Of the lithography (exposure) tools that handle this step, the most advanced models can be manufactured only by a Dutch company, and exporting them requires government permission.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "回路の模様を光で写す機械。「最先端の露光装置」「露光装置を製造する」と続くことが多い。",
+    "sense": ""
+   },
+   "cardId": "nn-6f2afb50e4-9bf92300",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-6f2afb50e4-9bf92300",
+    "wordId": "nn-6f2afb50e4"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "瞑想経験者",
+   "reading": "めいそうけいけんしゃ",
+   "pos": "noun",
+   "meaning": "experienced meditator",
+   "defJa": "瞑想を行った経験を持つ人",
+   "passage": {
+    "ja": "長年にわたって瞑想を続けてきた僧の脳では、注意に関わる領域の活動が一般の人と異なるという報告が相次いだ。だが、これを訓練の成果と決めつけるのはまだ早い。もともと集中力の高い人ほど修行を長く続けやすい、という可能性が残るからだ。差が先にあったのか後から生じたのかは、一度きりの比較では分からない。そこで近年は、瞑想経験者と未経験者を並べて比べるのではなく、未経験の参加者を無作為に二つのグループに分け、一方だけに数週間の訓練を受けてもらって前後の変化を追う研究が目立つようになった。",
+    "form": "瞑想経験者",
+    "en": "A series of reports found that in the brains of monks who had kept up meditation over many years, activity in regions involved in attention differed from that of ordinary people. But it is still too early to conclude that this is the result of training. That is because the possibility remains that people who had strong concentration to begin with are the ones who find it easier to keep up the practice for a long time. Whether the difference was there first or arose afterward cannot be known from a one-time comparison. So in recent years, rather than setting experienced meditators beside people with no experience and comparing them, studies that randomly divide inexperienced participants into two groups, have only one of them undergo several weeks of training, and follow the changes before and after have become more prominent.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「瞑想経験者と未経験者を比べる」のように、研究の対象となる集団を指して使う。",
+    "sense": ""
+   },
+   "cardId": "nn-d1be9b3cb2-9e906c6e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-006.json",
+    "cardId": "nn-d1be9b3cb2-9e906c6e",
+    "wordId": "nn-d1be9b3cb2"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "臨済宗",
+   "reading": "りんざいしゅう",
+   "pos": "noun",
+   "meaning": "the Rinzai school of Zen",
+   "defJa": "中国の臨済義玄の系統を引く禅の宗派",
+   "passage": {
+    "ja": "曹洞宗の僧は壁に向かって坐る。坐ることそのものが修行であり、何かを得るための手段ではないとされる。同じ禅でも、栄西が宋から伝えた臨済宗では、修行者は壁を背にして互いに向かい合って坐り、師から公案と呼ばれる問いを与えられる。答えは師の部屋で示すが、知識を並べたにすぎないものは何度でも退けられる。江戸時代に白隠が考え出し、今も入門したばかりの修行者に与えられることの多い公案は、両手を打てば音がする、では片手の音を聞いてこい、というものである。",
+    "form": "臨済宗",
+    "en": "Monks of the Soto school sit facing the wall. Sitting itself is held to be the practice, not a means of gaining something. Even within the same Zen, in the Rinzai school of Zen, which Eisai brought from Song China, practitioners sit with their backs to the wall, facing one another, and are given questions called koans by their teacher. They present their answers in the teacher's room, but ones that merely line up knowledge are rejected again and again. A koan that Hakuin devised in the Edo period, and that is still often given to practitioners who have just entered training, runs like this: clapping both hands makes a sound, so now go and hear the sound of one hand.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「臨済宗では公案を与えられる」。壁に向かって坐る曹洞宗と対比して語られることが多い禅の宗派。",
+    "sense": ""
+   },
+   "cardId": "nn-63dca114c0-83a3fb84",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-63dca114c0-83a3fb84",
+    "wordId": "nn-63dca114c0"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "経済安全保障",
+   "reading": "けいざいあんぜんほしょう",
+   "pos": "noun",
+   "meaning": "economic security",
+   "defJa": "経済上の手段で国民生活や国家の安全を守ること",
+   "passage": {
+    "ja": "かつて半導体は、最も安く作れる場所で作ればよい製品と考えられていた。その前提が崩れた。最先端の製品の生産が台湾など一部の地域に集中した結果、災害や紛争で供給が止まれば、自動車からデータセンターまで幅広い産業が打撃を受けかねないことが明らかになったからだ。日米欧の政府は半導体の確保を、暮らしと産業を守る経済安全保障の柱と位置づけ、巨額の補助金を出して工場の誘致を競っている。熊本では、畑の広がる町に建った台湾の半導体大手の工場がすでに稼働している。",
+    "form": "経済安全保障",
+    "en": "Semiconductors were once thought of as products that could simply be made wherever they could be made most cheaply. That assumption has collapsed. This is because production of the most advanced products became concentrated in a few places such as Taiwan, and as a result it became clear that if supply stopped because of a disaster or a conflict, a wide range of industries, from cars to data centers, could be hit hard. The governments of Japan, the United States and Europe have positioned securing semiconductors as a pillar of the economic security that protects daily life and industry, and are competing to attract factories by paying out huge subsidies. In Kumamoto, a factory of a major Taiwanese chipmaker, built in a town of spreading farm fields, is already in operation.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「経済安全保障の柱と位置づける」のように、物資の確保を国の安全の問題として語る報道の語。",
+    "sense": ""
+   },
+   "cardId": "nn-bee6b210d3-026673e3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-028.json",
+    "cardId": "nn-bee6b210d3-026673e3",
+    "wordId": "nn-bee6b210d3"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "逼迫",
+   "reading": "ひっぱく",
+   "pos": "noun",
+   "meaning": "tightness, strain",
+   "defJa": "必要な量に対して余裕がほとんどない状態",
+   "passage": {
+    "ja": "金を払っても、半導体が手に入らない。2023年、対話型の人工知能が急速に広まると、開発各社が性能を競って学習の規模を拡大したため、計算に使う画像処理半導体の注文が特定のメーカーに集中し、製造を請け負う工場の生産能力では追いつかなくなった。需給の逼迫を受けて、納期は大幅に延びた。クラウド事業者が貸し出す計算資源にも、順番待ちの列ができた。資金の乏しい新興企業の中には、必要な計算時間を確保できず、開発の先送りを余儀なくされるところも出た。",
+    "form": "逼迫",
+    "en": "Even if you pay, you cannot get the chips. In 2023, as conversational artificial intelligence spread rapidly, developers competed on performance and expanded the scale of training, so orders for the graphics chips used in the computation concentrated on a particular maker, and the production capacity of the factories contracted to manufacture them could no longer keep up. As a result of the tightness in supply and demand, delivery times grew much longer. Queues also formed for the computing resources that cloud providers rent out. Among startups short on funds, some could not secure the computing time they needed and were forced to postpone development.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「需給の逼迫」「需給が逼迫する」の形で、供給に余裕がなくなった状態を表す硬い語。",
+    "sense": ""
+   },
+   "cardId": "nn-1e1a713a57-8c203d13",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-001-r.json",
+    "cardId": "nn-1e1a713a57-8c203d13",
+    "wordId": "nn-1e1a713a57"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "最適化",
+   "reading": "さいてきか",
+   "pos": "noun",
+   "meaning": "optimization",
+   "defJa": "条件の下で目的に最も合う状態を探すこと",
+   "passage": {
+    "ja": "前の会社で、おすすめ動画の表示順を最適化する仕事をしてたんですよ。目標は単純で、クリックされる回数をいちばん多くすること。数字はすぐ伸びました。でも、それしか見てなかったものだから、上に並ぶのが大げさなタイトルの動画ばっかりになっちゃって。プログラムは言われたとおりにいちばんいい答えを出してただけなので、「最後まで見てもらえたか」も条件に入れて計算し直したら、クリックは少し減ったのに、見てもらえる時間はちゃんと長くなったんです。",
+    "form": "最適化",
+    "en": "At my last company, my job was the optimization of the display order of recommended videos. The goal was simple: to get the largest possible number of clicks. The numbers went up right away. But because that was all we were looking at, the videos lined up at the top ended up being nothing but ones with exaggerated titles. The program was only producing the best answer exactly as it had been told to, so when we recalculated with whether people had watched to the end also included as a condition, clicks fell a little, yet the time people spent watching really did get longer.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「表示順を最適化する」のように、目標と条件を決めて最もよい答えを計算で探す場面に使う。",
+    "sense": ""
+   },
+   "cardId": "nn-de32ec8669-014956d3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-de32ec8669-014956d3",
+    "wordId": "nn-de32ec8669"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "嚆矢",
+   "reading": "こうし",
+   "pos": "noun",
+   "meaning": "a pioneering first instance",
+   "defJa": "ある物事を始める最初の例やきっかけ",
+   "passage": {
+    "ja": "日本の電卓メーカー、ビジコンが新しい電卓に使うチップの開発をインテルに依頼したのは、1969年のことだ。両社の技術者による設計を経て、1971年に「4004」が完成した。計算の中心となる回路を一つのチップに収め、プログラムを替えれば電卓以外にも使えるこの製品は、マイクロプロセッサの嚆矢とされ、今日のパソコンやスマートフォンの頭脳へとつながっていく。一度に扱えるデータはわずか4ビットだった。それでもインテルは同じ年、このチップをビジコン以外の企業にも売り出した。",
+    "form": "嚆矢",
+    "en": "It was in 1969 that Busicom, a Japanese calculator maker, asked Intel to develop chips for a new calculator. After design work by engineers from both companies, the 4004 was completed in 1971. This product, which put the circuitry at the heart of computation onto a single chip and could be used for things other than calculators if its program was changed, is regarded as the pioneering first instance of the microprocessor, and it would lead on to the brains of today's personal computers and smartphones. It could handle only 4 bits of data at a time. Even so, in that same year Intel put the chip on sale to companies other than Busicom as well.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「〜の嚆矢とされる」の形で、後に続く流れの最初の例を指す。硬い書き言葉で、先駆けに近い。",
+    "sense": ""
+   },
+   "cardId": "nn-38272dfd4e-e6cfa4e4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-38272dfd4e-e6cfa4e4",
+    "wordId": "nn-38272dfd4e"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "華厳経",
+   "reading": "けごんきょう",
+   "pos": "noun",
+   "meaning": "the Avatamsaka Sutra",
+   "defJa": "あらゆる存在の関わりを説く大乗の経典",
+   "passage": {
+    "ja": "善財童子と呼ばれる少年は、文殊菩薩の勧めに従って南へ旅立ち、僧はもちろん、商人や船乗り、王、子どもに至るまで、五十人を超える師を次々に訪ねて教えを求めます。師の身分や職業は問われません。訪ねた相手はそれぞれ自分の知る範囲のことを語り、次に会うべき人の名を告げて少年を送り出します。旅の終わりに少年が出会うのは、普賢菩薩です。あらゆるものが互いに関わり合うと説く華厳経は、その長い教えを、この少年の旅の物語で締めくくっています。",
+    "form": "華厳経",
+    "en": "A boy called Sudhana sets out for the south on the advice of the bodhisattva Manjushri and visits more than fifty teachers one after another to ask for their teaching, monks of course, but also merchants, sailors, kings and even children. The rank or occupation of a teacher does not matter. Each person he visits tells him what lies within their own knowledge, gives him the name of the next person he should meet, and sends the boy on his way. The one the boy meets at the end of his journey is the bodhisattva Samantabhadra. The Avatamsaka Sutra, which teaches that all things are bound up with one another, closes its long teaching with the story of this boy's journey.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「華厳経は〜と説く」の形。善財童子の旅の物語を最後の章に置く大乗の経典の名。",
+    "sense": ""
+   },
+   "cardId": "nn-934c031e5f-9679736f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-934c031e5f-9679736f",
+    "wordId": "nn-934c031e5f"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

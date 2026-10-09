@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "織り込む",
+   "reading": "おりこむ",
+   "pos": "verb",
+   "meaning": "to price in expected information",
+   "defJa": "予想される材料を価格などに反映させる",
+   "passage": {
+    "ja": "半導体メーカーの利益が増えたのに株価が下がったら、数字を読み間違えたのかと思うよね。市場が好業績を織り込むっていうのは、発表を待たずに、そうなるという予想がすでに価格に反映されることなんだ。だから前年より良かったかに加えて、事前に期待されていた水準と比べてどうだったかも、値動きを考える手掛かりになるよ。ただ、下がった理由を一つに決めつけるのは早くて、同じ日の金利や会社の先行きの説明など、ほかの材料も一緒に確かめたいね。",
+    "form": "織り込む",
+    "en": "If a semiconductor maker’s profits rise but its shares fall, you might think you have misread the figures. A market pricing in strong earnings means the expectation is already reflected in prices before the announcement. Alongside improvement from the previous year, comparison with what had been expected beforehand can therefore help explain price movements. Still, it is too early to settle on a single reason for a fall, and I would also check other factors such as interest rates that day and the company’s outlook.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "投資の文脈では、将来の予想が現在の価格に反映されること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "総当たり",
+   "reading": "そうあたり",
+   "pos": "noun",
+   "meaning": "exhaustive search",
+   "defJa": "考えられる候補をすべて試す方法",
+   "passage": {
+    "ja": "配達先を回る順番を決めるとき、候補を残らず調べれば、与えられた条件の中で最も短い経路を選べる。この総当たりの方法は考え方が明快である反面、訪問先が増えるにつれて候補の数が急激に膨らみ、時間の制約に突き当たる。設計者にとっては最良の答えを保証する仕組みでも、利用者にとって締切の後に届く答えでは使えない。正しさだけを切り離して論じるのではなく、どの範囲を探索し、どこまでの時間を認めるかという合意も、計算の設計に含まれる。",
+    "form": "総当たり",
+    "en": "When choosing the order of deliveries, examining every candidate allows selection of the shortest route within the given conditions. This exhaustive method is conceptually clear, but the number of candidates grows rapidly with more stops and runs into time constraints. What guarantees the best answer for a designer may still give a user an unusable answer arriving after the deadline. Designing computation includes agreement on the search space and allowed time, rather than discussing correctness in isolation.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "競技の対戦方式ではなく、計算で全候補を調べる意味。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "舵を切る",
+   "reading": "かじをきる",
+   "pos": "expression",
+   "meaning": "to change strategic course",
+   "defJa": "方針を新しい方向へ大きく変える",
+   "passage": {
+    "ja": "仮に半導体企業が汎用品の大量生産から特殊用途向けの設計へ舵を切るなら、変わるのは製品の説明文だけではない。顧客ごとの要求を聞く体制、技術者の配置、検証に使う設備まで、新しい方針に沿って組み直すことになる。売上の目標を掲げたとしても、過去の生産方法に合わせた人員や投資が残ったままでは、現場に矛盾した指示が届く。経営判断の実質を読むには、会見での表現と、その後に配分された予算や人材を照合し、方向転換がどこまで進んだかを確かめる。",
+    "form": "舵を切る",
+    "en": "If a semiconductor company changes course from mass-producing generic products to designing for specialized applications, more than product descriptions will change. Arrangements for hearing customer requirements, staffing, and testing equipment will need to be reorganized in line with the new strategy. Even with a revenue target announced, staffing and investment left aligned with old production methods send conflicting instructions to the workplace. Assessing the substance of management’s decision requires comparing press-conference wording with subsequent allocations of money and people to establish how far the shift has progressed.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "船の操作をたとえに、事業などの方針を転換すること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

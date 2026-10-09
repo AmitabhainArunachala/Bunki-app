@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "過熱",
+   "reading": "かねつ",
+   "pos": "noun",
+   "meaning": "overheating (of machines, markets, debates)",
+   "defJa": "熱が上がりすぎて危険な状態になること",
+   "passage": {
+    "ja": "深夜のデータセンターで大規模な学習を回していたGPUが過熱し、警報が鳴るや否や、担当者は端末に飛びついた。選択肢は二つで、学習を止めて最初からやり直すか、冷却ファンを限界まで回して粘るか。ファンには物理的な制約があり、三十秒迷っている間に損失は膨らむ一方です。こうした場面を文章にするときは、判断の重さをあれこれ説明しないことです。秒数と選択肢だけを書けば、読み手は自分の指の震えを想像しながら、現場の緊迫感まで体感してくれます。",
+    "form": "過熱し",
+    "en": "At midnight in a data center, a GPU running a large-scale training job overheated, and no sooner had the alarm sounded than the operator lunged for the terminal. There were only two options: stop the training and start over from the beginning, or push the cooling fans to their limit and hold out. Fans have physical constraints, and while you hesitate for thirty seconds, the losses keep on swelling. When you put a scene like this into writing, the trick is not to go on explaining how heavy the decision is. Write down only the seconds and the options, and readers will picture their own fingers trembling and feel the tension of the site for themselves.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "機器の過熱は文字どおり熱が上がる意。市場や議論の過熱は比喩で、混ぜないように。",
+    "sense": "機器が実際に熱を持ち、危険な温度に達すること"
+   }
+  },
+  {
+   "term": "重み",
+   "reading": "おもみ",
+   "pos": "noun",
+   "meaning": "weight (in a neural network); importance",
+   "defJa": "学習のたびに更新され、入力の効き方を決める数値",
+   "passage": {
+    "ja": "ニューラルネットが賢くなる仕組みは案外素朴で、何億個もの重みが学習のたびに少しずつ更新され、誤差を減らしていくのです。ところが、実際にそれを使う人には、何が更新されているのかすら見えていません。画面に出てくる答えが当てになるか、月額は見合うか、使い心地はどうか、その外側だけが判断材料です。設計者は内部の数値から、利用者は外の挙動から、同じ一つの仕組みを眺めているわけです。この二つの視線が交差するのは、答えが外れて「なぜ」と問われる瞬間なんです。",
+    "form": "重み",
+    "en": "The mechanism by which a neural network grows smarter is surprisingly plain: with each round of training, hundreds of millions of weights are updated little by little, whittling the error down. Yet the people who actually use these systems cannot even see what is being updated. Whether the answers on screen hold up, whether the monthly fee is worth it, how it feels to use — only that outer surface is their material for judgment. The designer gazes at one and the same mechanism from the numbers inside; the user, from the behavior outside. The two lines of sight cross at the moment an answer misses and someone demands to know why.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "機械学習では、学習のたびに更新される数値を指す。物の重さではなく効き方の強さ。",
+    "sense": "ここでは物の重さではなく、学習で更新される数値の意"
+   }
+  },
+  {
+   "term": "鍵を握る",
+   "reading": "かぎをにぎる",
+   "pos": "expression",
+   "meaning": "to hold the key (to an outcome)",
+   "defJa": "物事の成否を左右する立場にあること",
+   "passage": {
+    "ja": "極紫外の露光装置を作れるメーカーは世界に一社しかなく、他社の追随を許していない。経済誌はその企業を「半導体の鍵を握る者」に仕立てて、見出しを飾りたがる。比喩は現実の粗い近似にすぎないが、地球規模の供給網を一人の主人公に凝縮し、読み手に小さな物語を渡してくれる。ただし装置の中を開けば、鏡を磨く協力企業から何千もの部品を納める業者まで、鍵は幾つにも割れている。誰かが一つ回せば全部が開く、そんな都合のいい扉は最初から想定されていないのである。",
+    "form": "鍵を握る",
+    "en": "Only one company in the world can build extreme-ultraviolet lithography machines, and it has allowed no rival to follow. Business magazines love to cast that company as 'the one holding the key to semiconductors' and dress their headlines with it. A metaphor is no more than a coarse approximation of reality, yet by condensing a planet-scale supply network into a single protagonist, it hands readers a small story. Open the machine up, though, and the key lies split into many pieces, from the partner firm that polishes the mirrors to the suppliers delivering thousands of components. A door that swings wide open the moment someone turns a single key was never part of the design in the first place.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "物事の成否を左右する者に使う比喩。主導権を握る、解決の鍵などと組む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "飛躍的",
+   "reading": "ひやくてき",
+   "pos": "na-adj",
+   "meaning": "dramatic, by leaps and bounds",
+   "defJa": "段階を飛ばすほど大きく伸びるさま",
+   "passage": {
+    "ja": "「大幅な進歩」と書いた原稿が、「どこがどう進んだのか」との一言で戻ってきたことがあります。大幅は大きさしか語らず、その変化が一段一段登ったのか、段を飛ばしたのかを伝えません。例えば露光装置が波長を一桁以上縮めれば、半導体の微細化は、従来の物差しでは測れない躍進を遂げることになります。こうした進歩には、跳躍の絵を備えた飛躍的な向上という言い方がぴったりです。跳んだ距離を先に数値で示した上で、この語をその集約として置くことです。",
+    "form": "飛躍的",
+    "en": "A manuscript of mine that said 'substantial progress' once came back with a single line: 'What advanced, and how?' 'Substantial' speaks only of size; it never conveys whether the change climbed the steps one by one or skipped them outright. If a lithography machine were to shrink its wavelength by more than a full order of magnitude, semiconductor miniaturization would achieve a leap that no old yardstick can measure. For progress of this kind, improvement 'by leaps and bounds' — a phrase whose very picture is a jump — is the perfect fit. Show the distance of the jump in numbers first, and only then set this word down as its summation.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "飛躍的な進歩・向上と組む。単なる大きさではなく、段を飛ばした跳躍を含意する。",
+    "sense": ""
+   }
+  }
+ ]
+}

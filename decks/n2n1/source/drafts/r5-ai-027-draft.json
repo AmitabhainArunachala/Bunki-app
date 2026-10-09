@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "相乗効果",
+   "reading": "そうじょうこうか",
+   "pos": "noun",
+   "meaning": "synergy",
+   "defJa": "組合せによって互いの働きが高まること",
+   "passage": {
+    "ja": "半導体の設計とソフトウェアの改良を一緒に進めたら、性能が上がったという説明を読んだとします。それを相乗効果と呼ぶなら、それぞれを別々に変えた場合以上に、組合せが力を発揮したのかを確かめたいところです。単に二つの改善が同時に起きただけでは、互いを強めたという根拠として十分とは言えません。条件をそろえつつ、設計だけを変えた場合、ソフトだけを変えた場合、両方を変えた場合を比べると、説明を検討できます。便利な言葉ほど、どんな比較で支えられているかまで読み取る練習になります。",
+    "form": "相乗効果",
+    "en": "Suppose you read that performance improved when semiconductor design and software were developed together. Calling this synergy invites checking whether the combination achieved more than the separate changes. Merely observing two improvements at once does not sufficiently establish that they reinforced each other. Comparing a design-only change, a software-only change, and both together under controlled conditions helps assess the explanation. The more convenient an expression, the more useful it is to practice identifying the comparisons supporting it.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "改善が同時に起きただけでなく、互いの働きを高める関係を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "省人化",
+   "reading": "しょうじんか",
+   "pos": "noun",
+   "meaning": "reducing required staffing",
+   "defJa": "作業に必要な人数を少なくすること",
+   "passage": {
+    "ja": "工場の画像検査に新しい装置を入れた記事で省人化と書くなら、どの作業に必要な人数が減るのかまで示すと具体的です。検査員の負担が軽くなったことと、担当する人数が減ったことは、同じ内容ではありません。また、機械に任せる工程が増えるに伴って、設定や保守を担う仕事が別に生まれる場合もあります。「人がいらなくなる」と一括りにせず、現場の役割の変化を書き分ければ、技術の効果を読み手が検討できます。短い見出しで人数の変化を述べた後は、本文で何を誰が担当するようになったかを補うと伝わります。",
+    "form": "省人化",
+    "en": "When an article calls a new factory image-inspection system staffing reduction, specifying which task needs fewer people makes the claim concrete. A lighter workload for inspectors is not the same as fewer inspectors. As more processes are assigned to machines, other work such as configuration and maintenance may also arise. Describing changes in workplace roles instead of lumping them together as “people are no longer needed” lets readers assess the technology’s effect. After a short headline mentions staffing changes, the body should explain who now handles which tasks.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "必要な人数を減らす意味。負担を減らすだけの省力化と区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "知的財産",
+   "reading": "ちてきざいさん",
+   "pos": "noun",
+   "meaning": "intellectual property",
+   "defJa": "発明や創作などから生まれる無形の財産",
+   "passage": {
+    "ja": "半導体の価値を考えるとき、工場や装置のように目に見えるものだけを数えると、大事な部分が抜け落ちます。回路の発明や設計上の工夫など、創造的な活動から生まれる知的財産も、企業の競争力に関わるからです。ただし、発明の内容を公開して保護を求めることと、情報を秘密として管理することでは、選ぶ仕組みも考え方も異なります。何かを生み出したからといって、すべてが同じ条件で自動的に独占できるわけではありません。技術紹介を読む際は、製品そのものと、その背後で利用が管理されるアイデアや情報とを分けて考えましょう。",
+    "form": "知的財産",
+    "en": "When assessing the value of semiconductors, counting only visible assets such as factories and equipment leaves out something important. Intellectual property arising from creative work, including circuit inventions and design innovations, also contributes to competitiveness. However, disclosing an invention to seek protection and keeping information confidential involve different mechanisms and approaches. Creating something does not automatically grant exclusive control over everything under identical conditions. When reading a technology introduction, distinguish the product itself from the ideas and information behind it whose use is managed.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "目に見える設備とは異なる、発明や創作などによる財産を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "知能爆発",
+   "reading": "ちのうばくはつ",
+   "pos": "noun",
+   "meaning": "a hypothetical intelligence explosion",
+   "defJa": "自己改良で知能が急激に高まるという仮説",
+   "passage": {
+    "ja": "人工知能が自らの設計を改善し、その結果として改良する力まで増すとしたら、変化はどこまで速くなるのか。知能爆発は、そうした自己改良の循環によって知能が急激に高まるという仮説を指す。これは既に起きた出来事の名称ではなく、実現の可能性や条件をめぐって議論される将来像である。改良案を作れても、計算資源や実験の時間が必要なら、能力の向上が直ちに無制限の加速へつながるとは限らない。仮説の検討では、循環のどの部分を自動化でき、何がその速さを制約するのかが問われる。",
+    "form": "知能爆発",
+    "en": "If artificial intelligence improved its own design and thereby increased its ability to improve itself, how fast could change become? An intelligence explosion is the hypothesis of a rapid increase in intelligence through such a cycle of self-improvement. It names a debated future possibility and its conditions rather than an event that has already occurred. Even if improvement proposals can be generated, the need for computing resources and experimental time means that increased capability need not immediately produce unlimited acceleration. Assessing the hypothesis involves asking which parts of the cycle can be automated and what constrains its speed.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "再帰的な自己改良をめぐる仮説で、実現済みの事実として扱わない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "破壊的イノベーション",
+   "reading": "はかいてきいのべーしょん",
+   "pos": "noun",
+   "meaning": "disruptive innovation",
+   "defJa": "低価格帯や新市場から既存勢力を覆す革新",
+   "passage": {
+    "ja": "新しい技術が高性能だというだけで破壊的イノベーションと呼ぶと、クリステンセンが論じた競争の筋道を見失う。もともとの議論では、既存企業が十分に応じていない低価格帯や、それまで利用できなかった人々の市場に足場を築く過程が重要である。最初から最高性能を求める顧客を奪う話とは、出発点が異なる。新しい人工知能サービスを評価するにしても、性能の数字だけでなく、誰がどんな価格と使い方で利用できるようになったかを見る必要がある。驚くような発明と、市場の競争関係を変える過程とは、重なり得ても同じ概念ではない。",
+    "form": "破壊的イノベーション",
+    "en": "Calling a technology disruptive innovation merely because it performs well loses sight of the competitive process Christensen described. His theory emphasizes gaining a foothold among underserved low-end customers or people previously unable to use the service. That starting point differs from immediately winning customers seeking the highest performance. Even when evaluating a new AI service, assessment must consider who gains access, at what price, and in what manner, as well as performance figures. A startling invention and a process that changes market competition may overlap, but they are not identical concepts.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "単なる画期的発明ではなく、市場への入り方を含む経営学の概念。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "破局的",
+   "reading": "はきょくてき",
+   "pos": "na-adj",
+   "meaning": "catastrophic",
+   "defJa": "取り返しのつかない大きな破綻に至るさま",
+   "passage": {
+    "ja": "人工知能の失敗を全部同じ箱に入れると、どこから対策すべきかが分からなくなるよね。文章の誤字と、重要な設備の制御を誤って人命を危険にさらす事態とでは、被害の大きさがまるで違う。破局的な結果を避けるという話なら、ただ間違いの回数を数えるだけでなく、一度の失敗がどこまで広がるのかも考えたいんだ。起こりやすさが低いからといって、回復できないほどの被害を無視していいとは限らないよ。だから、止める手段や人が判断を引き取る仕組みまで含めて、その使い道を検討するんだね。",
+    "form": "破局的",
+    "en": "Putting every AI failure into the same category makes it hard to decide where to begin addressing problems. A typo and incorrect control of critical equipment that endangers lives differ enormously in the scale of harm. Avoiding catastrophic outcomes requires considering how far a single failure could spread, not just counting errors. Low likelihood does not necessarily justify ignoring damage from which recovery would be impossible. That is why an application is assessed together with ways to stop it and arrangements for people to take over decisions.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "単に悪いだけでなく、重大な破綻に至る程度を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "確率分布",
+   "reading": "かくりつぶんぷ",
+   "pos": "noun",
+   "meaning": "probability distribution",
+   "defJa": "各結果や値にどれほどの確率があるかの分布",
+   "passage": {
+    "ja": "言語モデルが次の語を選ぶ場面を、候補の一つだけが正解として光る図で覚えると、仕組みを狭く捉えてしまいます。確率分布は、取り得るそれぞれの候補に、どれほどの確率が割り当てられているかを表します。最も高い候補を選ぶ場合もあれば、この配分に基づいて候補を抽選する場合もあります。ただし、ある語の出やすさを示す数値と、その語を含む文章が事実として正しい確率とは、同じものではありません。勉強用の図を描くなら、候補を幾つか並べた上で、数値が何の起こりやすさを表すのかを欄外に書き添えましょう。",
+    "form": "確率分布",
+    "en": "Picturing a language model’s next-word choice as a diagram with one correct candidate lit up gives an overly narrow view of the mechanism. A probability distribution specifies how much probability is assigned to each possible candidate. A system may choose the highest-probability candidate or sample according to this allocation. However, the likelihood of a word appearing is not the same as the probability that a sentence containing it is factually correct. For a study diagram, list several candidates and add a note identifying exactly which event the numbers describe.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "何が起こる確率なのかを明示する。文章の真偽の保証とは異なる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "示唆に富む",
+   "reading": "しさにとむ",
+   "pos": "expression",
+   "meaning": "rich in insights; suggestive",
+   "defJa": "考えを深める手掛かりを多く含む",
+   "passage": {
+    "ja": "半導体企業の失敗事例を読んだ感想に示唆に富むと書けば、単に面白かったという以上の評価を伝えられます。ただ、その一言で終えると、何が次の判断につながるのかは読み手に残されます。例えば、技術が優れていても顧客の移行費用が障害になる点に気付いたなら、その気付きを続けて書くと内容が具体的になります。一社の事例に基づいて業界全体を断定するのではなく、他の事例にも確かめたい問いとして示す書き方ができます。評価の言葉に、そこから生まれた問いを添えると、読書の感想が考察へと進みます。",
+    "form": "示唆に富む",
+    "en": "Describing a semiconductor company’s failure case as rich in insights conveys more than simply finding it interesting. But stopping there leaves the reader to work out what might inform a later decision. For example, if you noticed that customers’ migration costs can obstruct superior technology, stating that insight makes the response concrete. Instead of generalizing about an entire industry from one company, you can present a question to examine in other cases. Adding the question generated by an evaluative phrase turns a reading response into analysis.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "得られる手掛かりや問いを具体的に添えると評価の中身が伝わる。",
+    "sense": ""
+   }
+  }
+ ]
+}

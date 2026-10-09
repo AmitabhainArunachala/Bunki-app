@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "四国遍路",
+   "reading": "しこくへんろ",
+   "pos": "noun",
+   "meaning": "the Shikoku 88-temple pilgrimage",
+   "defJa": "四国の八十八の霊場を巡る巡礼",
+   "passage": {
+    "ja": "長い道を歩く意味は、目的地へ早く着くことだけでは測れない。四国遍路は八十八の札所を巡る巡礼であり、弘法大師への信仰と結び付きながら、今日ではさまざまな動機を持つ人が旅に出る。全てを一度に歩く人ばかりではなく、区切って巡る人や乗り物を使う人もいるため、一つの体験を旅の正しい形とすることは難しい。道で受ける接待や、寺ごとに手を合わせる時間に目を向けると、巡礼は個人の達成だけでなく、地域の人々との関係の中で成り立つ行為としても見えてくる。",
+    "form": "四国遍路",
+    "en": "The meaning of a long journey cannot be measured solely by speed of arrival. The Shikoku pilgrimage visits eighty-eight temples, connecting devotion to Kobo Daishi with varied contemporary motivations. Some travel in stages or use transport, so no single experience represents every pilgrim. Hospitality and prayer at each temple also reveal a practice sustained through relationships with local people.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「四国遍路に出る」。札所を巡る信仰と、現在の多様な旅の形を併せて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "南無阿弥陀仏",
+   "reading": "なむあみだぶつ",
+   "pos": "noun",
+   "meaning": "\"I take refuge in Amida Buddha\"",
+   "defJa": "阿弥陀仏への帰依を表す念仏の言葉",
+   "passage": {
+    "ja": "お寺で同じ短い言葉が繰り返されるのを聞くと、一つ一つの字は何を意味するのか気になるよね。南無阿弥陀仏の最初の二文字は、方角の南と何もないことを並べた説明ではなく、帰依するという意味の音を漢字で写したものなんだ。阿弥陀仏に心を寄せる言葉だけど、唱える行為をどう捉えるかは、浄土教の中でも教えによって違いがある。声に出した回数だけを見るより、何を頼みとし、どんな心持ちで唱えると説かれているかを読むと、短い句の中にある問いが広がるよ。",
+    "form": "南無阿弥陀仏",
+    "en": "Hearing a short phrase repeated in a temple can make you wonder what its characters mean. The first two characters of Namu Amida Butsu transcribe a sound expressing devotion, rather than literally combining south with nothingness. The phrase directs devotion to Amida, while interpretations of recitation vary within Pure Land traditions. Reading what practitioners rely on and how recitation is understood opens questions beyond counting repetitions.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「南無」は音を写した表記であり、二つの漢字の字義を足して解釈しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "同行二人",
+   "reading": "どうぎょうににん",
+   "pos": "noun",
+   "meaning": "\"two travelling together\" (pilgrim with Kūkai)",
+   "defJa": "遍路で弘法大師と共に歩むとする信仰の言葉",
+   "passage": {
+    "ja": "四国の遍路道では、一人で歩く人の笠にも、二人を示す文字が記されることがある。同行二人は、巡礼者が弘法大師と共に歩むという信仰を表し、実際の参加人数を数える言葉ではない。札所を巡る旅には歩行以外の方法もあるが、大師を身近な存在と捉えるこの表現は、移動手段とは別の次元で旅を支えている。宿や道で交わされる言葉とともに読むことで、物理的には単独で進む道のりが、信仰の上では伴侶のある旅として受け止められていることが分かる。",
+    "form": "同行二人",
+    "en": "On Shikoku pilgrimage routes, even a solitary walker’s hat can bear characters referring to two people. The expression means that the pilgrim walks with Kobo Daishi rather than counting physical participants. Although pilgrims use different means of transport, this sense of the master’s presence supports the journey on another level. Read alongside exchanges on the road, it presents a physically solitary journey as accompanied in faith.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "人数の報告ではなく、弘法大師と共に巡るという信仰を表す言葉。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "因果応報",
+   "reading": "いんがおうほう",
+   "pos": "noun",
+   "meaning": "karmic retribution",
+   "defJa": "善悪の行いに応じて報いがあるとする考え",
+   "passage": {
+    "ja": "人の不幸を見て「以前の行いが悪かったからだ」と書けば、根拠なくその人を責める文章になります。因果応報は行いに応じた報いを説く考えを表しますが、目の前の被害から本人の過去の行いを逆算できるという意味にはなりません。仏教の物語を紹介するなら、登場人物の行為と結果がどう結び付けられているかを、その物語の構成として説明できます。教えを述べる言葉と、現実の誰かの責任を断定する言葉を分けることで、宗教的な因果の捉え方を紹介しながら、無用な決め付けを避けられます。",
+    "form": "因果応報",
+    "en": "Attributing another person’s misfortune to earlier wrongdoing blames them without evidence. Karmic retribution names an account of consequences corresponding to actions, not a license to infer past misconduct from present harm. A Buddhist story can be explained through its narrative connections between deeds and results. Distinguishing doctrinal description from accusations against actual people avoids unwarranted judgments.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "考え方を説明する用法と、他者の不幸を本人の責任と決め付ける用法を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "四諦",
+   "reading": "したい",
+   "pos": "noun",
+   "meaning": "the Four Noble Truths",
+   "defJa": "苦とその原因や滅と道を示す四つの真理",
+   "passage": {
+    "ja": "仏教は苦の話ばかりだと聞くと、何をしてもつらいままなのかと思ってしまうよね。四諦は、苦、その生じる原因、苦の滅、そこへ向かう道という四つから教えを捉えるもので、苦を述べて終わる話ではないんだ。原因を問い、終息の可能性を示し、実践の道へ進むという関係を押さえると、項目がばらばらな暗記の対象ではなくなる。難しい名前を覚える前に、いま何が問題で、どう生じ、どう変わり得るのかという問いの流れを追ってみると、教えの組み立てが分かりやすくなるよ。",
+    "form": "四諦",
+    "en": "Hearing that Buddhism talks about suffering can make it sound as though nothing will improve. The four noble truths concern suffering, its origin, cessation, and the path, rather than ending with suffering alone. Connecting causes, the possibility of cessation, and practice makes the list more than separate items to memorize. Following how the problem arises and can change clarifies the teaching’s structure.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "苦・集・滅・道を、問題から実践へ進む関係として説明している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "只管打坐",
+   "reading": "しかんたざ",
+   "pos": "noun",
+   "meaning": "just sitting",
+   "defJa": "ただひたすら坐ることを説く曹洞禅の実践",
+   "passage": {
+    "ja": "何かを得るために座るのだと考えていると、目に見える成果がない時間は無駄に感じられるかもしれません。曹洞宗で説く只管打坐は、ひたすら坐る実践であり、坐ることを別の目標へ到達するための手段だけにしないところに特徴があります。頭に思いが浮かんだことを失敗と決めて追い払おうとすれば、かえって思いとの争いを増やしてしまいます。姿勢や呼吸を整えて坐るという具体的な行いに戻るとき、成果を獲得する自分ばかりを中心に置かない修行の捉え方に触れられます。",
+    "form": "只管打坐",
+    "en": "If sitting is viewed solely as a way to obtain something, time without visible results can seem wasted. Soto Zen’s wholehearted sitting does not reduce sitting to a means toward another goal. Treating every arising thought as failure and fighting it can create further struggle. Returning to posture, breathing, and sitting introduces practice less centered on a self accumulating achievements.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「只管」はひたすらという意味で、何も考えられなくする命令ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

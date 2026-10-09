@@ -1,0 +1,198 @@
+{
+ "items": [
+  {
+   "term": "喫緊",
+   "reading": "きっきん",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "pressing and urgent",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-29d99da149-c1cbf3dc",
+    "wordId": "nn-29d99da149"
+   }
+  },
+  {
+   "term": "国産化",
+   "reading": "こくさんか",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "domestic production",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-dcf5f12732-25ccc62e",
+    "wordId": "nn-dcf5f12732"
+   }
+  },
+  {
+   "term": "基盤モデル",
+   "reading": "きばんもでる",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "a foundation model",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-7741c9f6f9-268c0d2c",
+    "wordId": "nn-7741c9f6f9"
+   }
+  },
+  {
+   "term": "実存的リスク",
+   "reading": "じつぞんてきりすく",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "existential risk",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-f7775d45d1-c8f76f2e",
+    "wordId": "nn-f7775d45d1"
+   }
+  },
+  {
+   "term": "対角線論法",
+   "reading": "たいかくせんろんぽう",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "diagonal argument",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-b0f0e76a81-317df859",
+    "wordId": "nn-b0f0e76a81"
+   }
+  },
+  {
+   "term": "差別化",
+   "reading": "さべつか",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "differentiation",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-8219ad3580-a9573555",
+    "wordId": "nn-8219ad3580"
+   }
+  },
+  {
+   "term": "後塵を拝する",
+   "reading": "こうじんをはいする",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "to lag behind others",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-d906b6d23e-6f1c2663",
+    "wordId": "nn-d906b6d23e"
+   }
+  },
+  {
+   "term": "戦略物資",
+   "reading": "せんりゃくぶっし",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "strategic material",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-a6ada40bc8-dcc22aa2",
+    "wordId": "nn-a6ada40bc8"
+   }
+  },
+  {
+   "term": "指数関数的",
+   "reading": "しすうかんすうてき",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "exponential",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-d7514a4814-839e6e76",
+    "wordId": "nn-d7514a4814"
+   }
+  },
+  {
+   "term": "時価総額",
+   "reading": "じかそうがく",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "market capitalization",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-5621e81683-994ee96b",
+    "wordId": "nn-5621e81683"
+   }
+  },
+  {
+   "term": "株価収益率",
+   "reading": "かぶかしゅうえきりつ",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "price-to-earnings ratio",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-034.json",
+    "cardId": "nn-6586533b09-2b9bc08c",
+    "wordId": "nn-6586533b09"
+   }
+  },
+  {
+   "term": "決算短信",
+   "reading": "けっさんたんしん",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "earnings report summary",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-40d453db4b-a545691e",
+    "wordId": "nn-40d453db4b"
+   }
+  }
+ ],
+ "weave": [
+  "喫緊",
+  "国産化",
+  "基盤モデル",
+  "実存的リスク",
+  "対角線論法",
+  "差別化",
+  "後塵を拝する",
+  "戦略物資",
+  "指数関数的",
+  "時価総額",
+  "株価収益率",
+  "決算短信"
+ ]
+}

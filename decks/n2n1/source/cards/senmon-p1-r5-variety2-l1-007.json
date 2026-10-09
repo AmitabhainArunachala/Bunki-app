@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "本尊",
+   "reading": "ほんぞん",
+   "pos": "noun",
+   "meaning": "the principal object of Buddhist worship",
+   "defJa": "寺や仏堂で中心として礼拝される対象",
+   "passage": {
+    "ja": "堂の中央に置かれた像へ人々が手を合わせるとき、その像は展示室の作品とは違う位置を占めています。寺や仏堂で礼拝の中心となる本尊は、人々の祈りや儀礼が向かう対象です。姿の美しさや制作年代に加えて、どのような信仰のもとで迎えられ、守られてきたかも、その場所での意味に関わります。ふだんは扉の内側にあり、特定の機会にだけ姿を見せる場合もあって、常に見えることより、見えない間も礼拝の中心であり続けることが重んじられます。",
+    "form": "本尊",
+    "en": "When people pray before a statue at a hall's center, it occupies a different role from an artwork in a gallery. The honzon is the central focus of worship in a temple or Buddhist hall and the object toward which prayers and rituals are directed. Beyond beauty and date of creation, the faith under which it was received and protected shapes its meaning there. Some remain behind doors and are shown only on special occasions, with their continued centrality to worship while unseen valued more than constant visibility.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "寺や仏堂で中心として礼拝される対象で、鑑賞物という見方だけでは足りない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-68ecde8f0d-6f5d8162",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-019.json",
+    "cardId": "nn-68ecde8f0d-6f5d8162",
+    "wordId": "nn-68ecde8f0d"
+   }
+  },
+  {
+   "term": "守破離",
+   "reading": "しゅはり",
+   "pos": "noun",
+   "meaning": "obey, break, leave (stages of mastery)",
+   "defJa": "型を学び深めて独自の境地へ進む過程",
+   "passage": {
+    "ja": "包丁の持ち方を習い始めた人が、最初から独自の型を作ろうとしても、刃が安定しません。師の型を身に付け、その意味を確かめて工夫し、やがて自分の働き方へ進む過程を、守破離という言葉で捉えられます。言われたとおりに繰り返す段階にも、手首の角度や食材の変化に注意を向ける学びがあります。型を破るにしても、何を守るための型だったかが分からなければ単なる崩れに終わり、自由な動きを支えるのは、基本を十分に試した経験です。",
+    "form": "守破離",
+    "en": "A beginner learning to hold a kitchen knife cannot stabilize the blade by inventing a personal style immediately. Shu-ha-ri describes learning a teacher's form, examining its purpose and adapting it, then reaching one's own way of working. Even repetition as instructed involves learning to notice wrist angles and changes in the ingredients. Departing from form without understanding what it protected can produce mere deterioration, while freedom of movement rests on thorough experience with the basics.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "型を守って学び、工夫を経て独自の境地へ進む過程。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-fdf7e02130-c2ed3e4d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-fdf7e02130-c2ed3e4d",
+    "wordId": "nn-fdf7e02130"
+   }
+  },
+  {
+   "term": "浄土真宗",
+   "reading": "じょうどしんしゅう",
+   "pos": "noun",
+   "meaning": "Jodo Shinshu",
+   "defJa": "親鸞の教えを受け継ぐ浄土系の宗派",
+   "passage": {
+    "ja": "念仏を何回唱えたかを数え、その数を救いと交換する点数のように扱えば、阿弥陀仏に身を任せるという方向から離れてしまう。親鸞の教えを受け継ぐ浄土真宗では、自ら積み上げた功績よりも、阿弥陀仏の本願のはたらきが重んじられる。念仏は、救いを買い取るための代金というより、そのはたらきへの感謝や応答として位置付けられる。努力の量で他人と自分を比べる習慣の中にいる者にとって、支えられることを受け入れる教えは、優劣の物差しそのものを問い返す。",
+    "form": "浄土真宗",
+    "en": "Counting nenbutsu recitations as points exchangeable for salvation departs from entrusting oneself to Amida Buddha. Jodo Shinshu, inheriting Shinran's teachings, emphasizes the working of Amida's primal vow over personally accumulated merit. Recitation is placed as gratitude or response to that working rather than payment to purchase salvation. For someone accustomed to comparing personal effort with others, accepting support challenges the very scale of superiority and inferiority.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "親鸞の教えを受け継ぎ、阿弥陀仏の本願のはたらきを重んじる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5450ed9060-7c8f8ff4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
+    "cardId": "nn-5450ed9060-7c8f8ff4",
+    "wordId": "nn-5450ed9060"
+   }
+  }
+ ]
+}

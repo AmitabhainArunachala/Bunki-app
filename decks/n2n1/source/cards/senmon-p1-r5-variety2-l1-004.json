@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "牙城",
+   "reading": "がじょう",
+   "pos": "noun",
+   "meaning": "a firmly held stronghold",
+   "defJa": "他者が容易に崩せない強固な支配領域",
+   "passage": {
+    "ja": "長年使われてきた業務ソフトには、操作に慣れた人材と、その形式で蓄積された大量の資料がある。競合製品の性能が上回っても、研修やデータ移行に費用がかかるため、既存企業の牙城を崩すのは容易ではない。新規参入側は価格を下げるだけでなく、古い資料を移す仕組みや利用者への支援を用意せざるを得ない。購入時の機能比較には表れにくい移行の負担が、次の購入先を事実上決めることもあり、強固な地位は製品の外側にも支えを持っている。",
+    "form": "牙城",
+    "en": "Long-established business software has both trained users and large archives stored in its format. Even superior competing products struggle to breach the incumbent's stronghold because retraining and data migration cost money. New entrants must provide migration tools and user support as well as lower prices. Switching burdens that barely appear in feature comparisons can effectively determine the next purchase, giving a dominant position support beyond the product itself.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「牙城を崩す」。容易には奪えない強固な支配領域を城にたとえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-91eb393f37-72ed71af",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-91eb393f37-72ed71af",
+    "wordId": "nn-91eb393f37"
+   }
+  },
+  {
+   "term": "蓋然性",
+   "reading": "がいぜんせい",
+   "pos": "noun",
+   "meaning": "likelihood",
+   "defJa": "ある事柄が起こると考えられる確かさの程度",
+   "passage": {
+    "ja": "「起こる可能性はある」って言われても、どのくらいありそうなのかは分からないよね。蓋然性が高いという判断なら、単にゼロではないという話より、手元の証拠から見て起こる見込みが強いという意味になる。ただ、似た例が続いたからといって、次も同じだと決められるとは限らない。前提が変わっていないか、新しい情報が増えていないかを気にしながら判断を更新する必要があって、確実だと言い切る手前にも、見込みの強弱には幅があるんだ。",
+    "form": "蓋然性",
+    "en": "Being told something is possible does not tell you how likely it is. Judging its probability to be high means the available evidence makes it strongly expected, beyond merely having a nonzero chance. Still, a run of similar cases does not guarantee the next will be the same. Judgments need updating as assumptions and information change, and there is a range of likelihood short of certainty.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "単なる可能性の有無ではなく、起こる見込みの確かさの程度。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-521b3cb009-94a94af7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-521b3cb009-94a94af7",
+    "wordId": "nn-521b3cb009"
+   }
+  }
+ ]
+}

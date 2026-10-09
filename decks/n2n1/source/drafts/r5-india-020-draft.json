@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "栄西",
+   "reading": "えいさい",
+   "pos": "noun",
+   "meaning": "Eisai, a pioneer of Japanese Rinzai Zen",
+   "defJa": "日本に臨済禅を伝え茶の普及にも努めた僧",
+   "passage": {
+    "ja": "禅の歴史を調べていたはずなのに、急にお茶の話が出てくると、話題が飛んだように感じるよね。栄西は中国で学んだ禅を日本に伝えた人物だけど、お茶を勧める書物を残したことでも知られているんだ。教えに加えて、人が何を飲み、どう暮らすかまで海を越えて伝わったと考えると、つながりが見えるよ。ただ、日本にお茶が初めて入ったのもこの人のおかげだ、と話を広げすぎるのは注意したいところだね。一人の僧の足跡から、思想と日常の習慣が別々には運ばれなかった歴史をたどれるのが面白いな。",
+    "form": "栄西",
+    "en": "When a history of Zen suddenly turns to tea, it can seem like a change of subject. Eisai transmitted Zen he had studied in China to Japan and is also known for leaving a book recommending tea. The connection becomes clearer if we consider how daily habits such as drinking crossed the sea along with teachings. But it would go too far to say that he was also responsible for tea’s very first arrival in Japan. One monk’s career offers an interesting route through a history in which ideas and everyday customs did not travel separately.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "禅の伝来と茶の普及に関わる僧。茶の初伝とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "梵",
+   "reading": "ぼん",
+   "pos": "noun",
+   "meaning": "Brahman; ultimate reality",
+   "defJa": "インド思想で宇宙の根本原理とされるもの",
+   "passage": {
+    "ja": "インド哲学の本で梵という一字に出会ったら、まずその箇所で何を指しているかを確かめます。ウパニシャッドなどの文脈では、宇宙の根本原理であるブラフマンを表す語として使われます。人格を持った神の名前と混同すると、自分の本質との関係をめぐる議論が追いにくくなるからです。同じような音の名前が出てきたとしても、物語の登場者なのか、存在の根底を表す概念なのかを分けてノートに書くと整理できます。短い訳語ほど多くの背景を背負っているので、漢字一つを覚えたところから読書が始まります。",
+    "form": "梵",
+    "en": "When encountering the single character bon in a book on Indian philosophy, first establish what it denotes in that passage. In contexts such as the Upanishads, it can represent Brahman, the fundamental principle of the universe. Confusing it with the name of a personal deity makes arguments about its relation to the essence of oneself harder to follow. Even when names sound similar, notes can distinguish characters in a narrative from concepts referring to the ground of existence. Short translations carry extensive backgrounds, so learning one character can be the beginning of reading.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "ここでは宇宙の根本原理を指す用法。人格神の名と取り違えない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "梵天",
+   "reading": "ぼんてん",
+   "pos": "noun",
+   "meaning": "Brahma as a Buddhist deity",
+   "defJa": "インドの神に由来する仏教の守護神の一つ",
+   "passage": {
+    "ja": "仏像の解説に梵天という名が出てきたら、「仏教を守る神の一つ」と補うと、仏と神を区別する手掛かりになります。インドのブラフマーに由来する存在ですが、宗教が変われば、その位置付けや語られる役割も変わります。インドでの説明をそのまま日本の仏像へ移せば、文脈に合わない解説になるおそれがあります。また、宇宙の根本原理を表すブラフマンとは、似た音に引かれて一つにまとめないようにします。誰なのかを紹介する文章では、名前の由来と、その場所で何を担う存在なのかを分けて書くと明確です。",
+    "form": "梵天",
+    "en": "When Brahma appears in a description of Buddhist sculpture, adding that this is one of Buddhism’s protective deities helps distinguish deities from Buddhas. The figure derives from the Indian Brahma, but status and narrated roles change between religious contexts. Transferring an Indian explanation directly to a Japanese Buddhist statue risks an account that does not fit its context. Nor should the similar sound lead to merging this figure with Brahman, the fundamental principle of the universe. An introduction becomes clearer when it separates the name’s origin from the role the figure plays in that setting.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "インド由来の神の名。ブラフマンという哲学上の原理と区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "梵字",
+   "reading": "ぼんじ",
+   "pos": "noun",
+   "meaning": "Sanskrit letters in Japanese Buddhist use",
+   "defJa": "インド由来の文字で日本の仏教にも使うもの",
+   "passage": {
+    "ja": "石塔に漢字とも仮名とも違う一文字が刻まれていると、模様だと思って通り過ぎてしまうことがあります。日本の仏教で目にする梵字には、インド由来の文字が中国を経て伝わった歴史があります。その一文字が特定の仏を表す場合もあり、単に読めない飾りというわけではありません。ただし、形が似ているからといって、文字の種類や意味を確かめずに同じものと判断するのは避けたいところです。まず図録などで形と読みを照合すると、石の上の小さな印が、言語と信仰を運んだ道筋の入口になります。",
+    "form": "梵字",
+    "en": "A character carved on a stone monument that resembles neither kanji nor kana may be passed over as decoration. Sanskrit letters encountered in Japanese Buddhism have a history of transmission from India through China. A single character can represent a particular Buddha rather than being merely an unreadable ornament. Similar-looking forms should nevertheless not be identified as the same without checking the script and meaning. Comparing the form and pronunciation with a catalogue makes a small mark on stone an entry point into the transmission of language and devotion.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "文字そのものを指す語。一字で仏を表す使い方もある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "梵語",
+   "reading": "ぼんご",
+   "pos": "noun",
+   "meaning": "Sanskrit",
+   "defJa": "インドの古典語であるサンスクリット語",
+   "passage": {
+    "ja": "仏典の訳語を調べると、同じ概念に対して異なる漢字が使われている場合がある。梵語の語形や意味を参照すれば、音を写したのか、内容を訳したのかを区別する手掛かりになる。ただし、インドの仏教文献がすべて同じ言語で書かれたわけではなく、この語を原典の言語全般の呼び名として使うのは正確ではない。比較する文献に応じて、パーリ語など別の言語との関係も検討される。日本語の短い仏教語の背後には、一つの漢字の意味だけではたどれない、複数の言語の往来がある。",
+    "form": "梵語",
+    "en": "Investigating Buddhist translations can reveal different Chinese characters used for the same concept. Consulting Sanskrit forms and meanings helps distinguish sound transcription from translation of content. However, Indian Buddhist texts were not all written in one language, so using this term for every source language is inaccurate. Depending on the texts being compared, relationships with other languages such as Pali are also considered. Behind short Japanese Buddhist terms lies traffic among several languages that cannot be traced through the meaning of a single character alone.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "サンスクリット語を指し、インドの仏典の言語全般とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "極楽浄土",
+   "reading": "ごくらくじょうど",
+   "pos": "noun",
+   "meaning": "Amitabha’s Pure Land",
+   "defJa": "阿弥陀仏がいるとされる苦しみのない仏国土",
+   "passage": {
+    "ja": "苦しみのない世界を願う心を、快適な暮らしへの欲求だけで説明することはできない。阿弥陀仏の極楽浄土は、日本の仏教で多くの人々が往生を願ってきた場所であり、救いへの願いと結び付いている。経典に描かれる美しい姿に注目するにせよ、豪華な楽園の観光案内として読めば、その宗教的な意味を取り逃がす。そこに生まれることが悟りへの道とどう関わるかは、教えの文脈の中で考えるべき問いである。遠い世界を描く言葉が、死を迎える人や見送る人の、現在の時間を支えてきたことにも目を向けたい。",
+    "form": "極楽浄土",
+    "en": "The wish for a world without suffering cannot be explained solely as a desire for comfortable living. Amitabha’s Pure Land has been a place where many in Japanese Buddhism hoped to be reborn, connecting it with aspirations for liberation. Even when attending to the beauty described in scriptures, reading them as a tourist guide to a luxurious paradise misses their religious significance. How birth there relates to the path toward awakening must be considered within the teaching’s context. Language depicting a distant world has also supported the present lives of those approaching death and those seeing them off.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "阿弥陀仏の仏国土。日常語の快適な場所という比喩とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "檀家",
+   "reading": "だんか",
+   "pos": "noun",
+   "meaning": "a household affiliated with a temple",
+   "defJa": "特定の寺に属して支える信徒の家",
+   "passage": {
+    "ja": "お寺との付き合いを聞かれて、うちは祖父の代から同じ寺だよ、と答える家もあるよね。檀家というのは、特定のお寺と結び付き、その運営や仏事を支える信徒の家を指す言葉なんだ。ただ、一度お参りしただけで、その寺に属する家になるという話ではないよ。地域や時代に応じて付き合い方には違いがあるし、葬儀や法事だけでは説明しきれない関係もある。だから、古い村の記録にこの仕組みが出てきたら、誰がお寺を支え、お寺が人々の暮らしのどこに関わっていたかまで見ていくと面白いんだ。",
+    "form": "檀家",
+    "en": "Some households explain their temple relationship by saying they have attended the same temple since their grandfather’s time. A danka is a household of lay supporters connected with a particular temple and supporting its operation and Buddhist observances. A single visit does not automatically make a household affiliated with that temple. Relationships vary by region and period and can extend beyond funerals and memorial services. When this system appears in old village records, it is interesting to examine who supported the temple and where it participated in people’s lives.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "寺に属する家を指し、一度訪れた参拝者全般とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "止観",
+   "reading": "しかん",
+   "pos": "noun",
+   "meaning": "calming and insight practice",
+   "defJa": "心を静めて物事のあり方を観察する修行",
+   "passage": {
+    "ja": "天台の修行を学ぶとき、止観の二文字をどちらも「何も考えないこと」とまとめて覚えると、働きの違いが抜け落ちます。心を静めることと、整えられた心で物事を観察することを区別して押さえると、実践の説明を追えます。ただし、現代の注意研究で使う分類と似て見えるからといって、そのまま一対一に対応すると断定はできません。教えが目指す悟りと、実験で測る課題の成績とでは、目的も評価の仕方も異なるからです。比較のノートには似ている動作に加えて、何のために行うかを書く欄を設けると、関係を丁寧に検討できます。",
+    "form": "止観",
+    "en": "When studying Tendai practice, memorizing both parts of calming and insight as simply “thinking about nothing” loses their different functions. Distinguishing the calming of mind from observation with a settled mind helps follow accounts of practice. Yet resemblance to classifications in modern attention research does not establish an exact one-to-one correspondence. The awakening sought in a teaching and performance measured on an experimental task differ in both aim and evaluation. A comparison notebook with a column for purpose as well as similar actions helps examine the relationship carefully.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "心を静める側面と観察する側面を分けて押さえる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "正法眼蔵",
+   "reading": "しょうぼうげんぞう",
+   "pos": "noun",
+   "meaning": "Dogen’s Shobogenzo",
+   "defJa": "道元の仏教思想と修行を説く著作",
+   "passage": {
+    "ja": "道元の正法眼蔵を紹介する文章では、難しい語が多いという感想だけで終えず、どの巻のどの問いを読むのかを示すと親切です。修行や時間など、扱われる問題を一つ選べば、初めて触れる人にも読む足場ができます。ただし、現代語に直すに当たって、繰り返される言葉を単なる重複として削ると、原文の議論の動きを失う場合があります。読みやすさを優先する箇所と、同じ語が再び出る意味を考える箇所を分けたいところです。短い引用を飾りとして置くより、その前後で何が問われているかを一緒に伝えると、読書への入口になります。",
+    "form": "正法眼蔵",
+    "en": "An introduction to Dogen’s Shobogenzo is more helpful when it identifies which question in which fascicle to read instead of ending with the observation that the vocabulary is difficult. Selecting one issue, such as practice or time, gives newcomers a foothold. However, removing recurring words as mere repetition during modernization can lose the movement of the original argument. We should distinguish where readability takes priority from where the return of the same word deserves attention. Explaining the questions surrounding a short quotation offers a better entry into reading than using it as decoration.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "ここでは道元の著作名。巻ごとの問いと文脈を示して紹介する。",
+    "sense": ""
+   }
+  }
+ ]
+}

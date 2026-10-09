@@ -31,8 +31,8 @@ Pass only if ALL hold:
 1. **Facts:** every checkable claim (dates, names, numbers, attributions, how a technology or doctrine works) is true. If you're not sure, it fails.
 2. **Topic and register:** the passage is really about its `topic`, in its `register`. Topics:
    - `mind`: the mind, learning, habits.
-   - `india`: Indian philosophy and Buddhism wherever it lives (India, China, Japan), Advaita Vedanta, and the East Asian thought it shaped. A Japanese Buddhist rite counts.
-   - `ai`: AI and semiconductors.
+   - `india`: Yoga, Buddhist, Jain and Hindu history and philosophy wherever they live (India, China, Japan), Advaita Vedanta, and the East Asian thought they shaped; the neuroscience of meditation and attention. A Japanese Buddhist rite counts. Do not equate a religious doctrine with a demonstrated neurological finding.
+   - `ai`: Semiconductors, AI, investing, computer science and technology, including Hofstadter, self-reference and recursion. Investing concepts belong here; unsupported predictions or personalized recommendations do not pass.
    - `history`: world history.
    - `language`: Japanese about Japanese.
    - `other`: wider interests, including science, art, food, nature, cities, and craftsmanship.

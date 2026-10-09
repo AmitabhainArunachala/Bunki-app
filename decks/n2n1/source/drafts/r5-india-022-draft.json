@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "浄土",
+   "reading": "じょうど",
+   "pos": "noun",
+   "meaning": "a Buddha’s pure land",
+   "defJa": "仏がいるとされる清らかな世界",
+   "passage": {
+    "ja": "仏教の本で浄土と出てくると、いつも阿弥陀仏の世界だけを指すと思いたくなるけど、言葉の範囲はそれより広いんだ。仏がいる清らかな世界を表す語だから、どの仏について書かれた文なのかを確かめると、話の舞台がはっきりするよ。もちろん、日本の信仰では極楽を願う話がよく出てくるからといって、その身近な用法だけで別の経典まで読み切れるとは限らない。知っている名前に出会ったときほど、その先にどんな説明が続くのかを急がず読むと、世界観の違いが面白くなってくるね。",
+    "form": "浄土",
+    "en": "When a Buddhist book mentions a pure land, it is tempting to assume that it always means Amitabha’s realm, but the term has a broader scope. Since it denotes a pure realm associated with a Buddha, identifying which Buddha the passage concerns clarifies the setting. The prominence of aspirations toward Amitabha’s paradise in Japanese devotion does not make that familiar usage sufficient for reading every other scripture. Slowing down to read what follows a familiar name makes differences between worldviews more interesting.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "阿弥陀仏の極楽だけに限定せず、どの仏の世界かを確かめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "浄土宗",
+   "reading": "じょうどしゅう",
+   "pos": "noun",
+   "meaning": "the Jodo school",
+   "defJa": "法然を宗祖とし称名念仏を勧める宗派",
+   "passage": {
+    "ja": "法然を宗祖とする浄土宗を学ぶときは、南無阿弥陀仏と唱える実践を中心に据えて、教えの筋道を整理できます。難しい行を自分の力で完成させることだけに目を向けず、阿弥陀仏の願いを信頼して念仏するという関係を押さえることが大切です。ただし、宗派を比較するに当たって、唱える回数だけで違いを説明すると、何を信じ、どのような救いを求めるかという内容が抜けます。比較表には行為の名前とともに、その行為が教えの中でどんな意味を持つかを書く欄も作ると、暗記した名前が理解につながります。",
+    "form": "浄土宗",
+    "en": "When studying the Jodo school founded by Honen, organize the teaching around the practice of reciting Namu Amida Butsu. Rather than focusing only on completing difficult practices through one’s own strength, grasp the relationship between recitation and trust in Amitabha’s vow. Explaining differences between schools solely through numbers of recitations, however, omits what is trusted and what liberation is sought. A comparison table that records a practice’s meaning within the teaching alongside its name connects memorization with understanding.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "法然の宗派名。念仏の動作だけでなく教えとの関係を学ぶ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "浄土真宗",
+   "reading": "じょうどしんしゅう",
+   "pos": "noun",
+   "meaning": "Jodo Shinshu",
+   "defJa": "親鸞の教えを受け継ぐ浄土系の宗派",
+   "passage": {
+    "ja": "親鸞の教えを受け継ぐ浄土真宗を「念仏で自分の功績を積む宗派」と紹介すると、他力を重んじる教えとの関係で誤解を招きます。念仏が阿弥陀仏の本願への信頼や感謝とどう結び付くかを示す方が、宗派の説明として筋が通ります。短い紹介文にするにせよ、行為を数えることで救いを獲得する仕組みのように言い換えると、分かりやすさのために意味を変えてしまいます。似た名前の宗派を一括りにせず、誰の教えを受け継ぎ、その実践をどう位置付けるかを言葉にすると、違いが伝わります。",
+    "form": "浄土真宗",
+    "en": "Introducing Jodo Shinshu, which carries on Shinran’s teaching, as a school for accumulating personal merit through recitation misleads in relation to its emphasis on other-power. Explaining how recitation relates to trust in and gratitude for Amitabha’s original vow better conveys the teaching. Even in a short introduction, describing liberation as something acquired by counting actions changes the meaning for the sake of apparent simplicity. Distinguishing whose teaching a school inherits and how it situates practice communicates differences without lumping together similarly named traditions.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "親鸞の教えを受け継ぐ宗派。功績の積算という説明に置き換えない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "涅槃寂静",
+   "reading": "ねはんじゃくじょう",
+   "pos": "noun",
+   "meaning": "the peace of nirvana",
+   "defJa": "煩悩が消え悟りの境地が安らかなこと",
+   "passage": {
+    "ja": "騒音が止んでほっとすることと、仏教が語る根本的な安らぎとは、同じ条件で成り立つものではありません。涅槃寂静は、煩悩が消えた悟りの境地が安らかであることを表し、周囲が静かな場所を探す話とは区別されます。静かな部屋に移ったとしても、心が怒りや欲望に振り回されれば落ち着かないという身近な経験を考えると、その違いの入口をつかめます。ただし、日常の落ち着きと悟りを同一視せず、何から解き放たれた安らぎなのかを確かめると、教えの焦点を読み違えずに済みます。",
+    "form": "涅槃寂静",
+    "en": "Relief when noise stops and the fundamental peace described in Buddhism do not depend on identical conditions. The peace of nirvana refers to the tranquility of awakening when afflictions are extinguished and differs from searching for quiet surroundings. The familiar experience of remaining unsettled by anger or desire even in a quiet room provides an entry into this distinction. Keeping everyday calm distinct from awakening and asking what one is freed from helps preserve the teaching’s focus.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "環境の静けさではなく、煩悩から離れた境地の安らぎを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "渇愛",
+   "reading": "かつあい",
+   "pos": "noun",
+   "meaning": "craving in Buddhist thought",
+   "defJa": "満足を求めてやまない強い欲望",
+   "passage": {
+    "ja": "仏教が苦しみの生起を論じる際、手に入れても満足が続かず、さらに求める心の動きが取り上げられる。渇愛は、喉が渇いて水を欲するように、対象に満足を求め続ける強い欲望を表す語である。必要な水分を取る行為そのものを否定する説明ではなく、どのような求め方が執着や苦しみと結び付くかが論点となる。現代の消費行動と比較する場合にも、似た事例を挙げるだけで両者を同一視せず、宗教的な解脱を目指す議論と、観察される行動の記述とを区別する視点が求められる。",
+    "form": "渇愛",
+    "en": "In discussing the arising of suffering, Buddhism examines a mind that keeps seeking because satisfaction does not last after acquisition. Craving expresses an intense desire that continually seeks fulfillment in objects, like thirst seeking water. This does not condemn taking necessary fluids; it concerns how patterns of seeking connect with attachment and suffering. Comparisons with modern consumer behavior should distinguish arguments aimed at religious liberation from descriptions of observed behavior rather than equating them through similar examples alone.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "比喩的な渇きとして、執着を伴う強い欲望を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "漢訳",
+   "reading": "かんやく",
+   "pos": "noun",
+   "meaning": "translation into Chinese",
+   "defJa": "他言語の文章を中国語に訳すこと",
+   "passage": {
+    "ja": "インドの教えが日本に届く道をたどると、言葉を別の言葉へ移す仕事の大きさに気付く。仏典の漢訳は、原文を単に漢字へ置き換える操作ではなく、異なる思想の背景を持つ読者に意味を伝える営みでもあった。原語の響きを残すか、近い意味の語を選ぶかに応じて、後に日本で読まれる仏教語の形も変わる。訳文に見慣れた漢字が並んでいても、その組合せを当たり前だと思わず、別の訳し方では何が見えたのかと問えば、伝来の歴史は言葉の選択の歴史としても立ち上がる。",
+    "form": "漢訳",
+    "en": "Tracing the route by which Indian teachings reached Japan reveals the scale of the work of moving between languages. Translating Buddhist scriptures into Chinese was not merely substituting characters for an original text, but also conveying meaning to readers with different intellectual backgrounds. Choices between retaining source-language sounds and selecting words with similar meanings shaped Buddhist vocabulary later read in Japan. Questioning familiar character combinations and asking what alternative translations might reveal brings the history of transmission into view as a history of linguistic choices.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "翻訳先が中国語であることを表す。日本語を漢字だけで書くことではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "灌頂",
+   "reading": "かんじょう",
+   "pos": "noun",
+   "meaning": "abhisheka; esoteric Buddhist initiation",
+   "defJa": "頭に水を注ぐなどして仏との縁を結ぶ密教儀礼",
+   "passage": {
+    "ja": "お寺の行事案内に灌頂と書いてあっても、字面だけでは何をするのか想像しにくいよね。密教で、頭に水を注ぐなどして仏との縁を結んだり、教えを受け継ぐ位置付けを示したりする儀式だけど、その種類や参加する立場によって意味も違うんだ。誰でも案内に従って参加できるものもあるからといって、すべて同じ資格や役割を得る行事だとは考えない方がいいよ。行ってみたいなら、まずその寺の説明で、何のための儀式で、参加者に何が求められるのかを確かめるところからだね。",
+    "form": "灌頂",
+    "en": "Seeing the term abhisheka in a temple’s event notice does not make it easy to picture the ritual. In esoteric Buddhism, acts such as pouring water on the head establish a connection with a Buddha or mark transmission of teachings, but the meaning varies with the ritual and participants’ roles. The existence of publicly accessible forms does not mean that every ceremony confers identical qualifications or responsibilities. If you want to attend, begin by checking the temple’s explanation of the ceremony’s purpose and what participation involves.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "密教の儀礼名。種類による目的や参加者の位置付けの違いを確かめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "無の境地",
+   "reading": "むのきょうち",
+   "pos": "noun",
+   "meaning": "a state free from distracting attachment",
+   "defJa": "雑念や執着から離れたとされる心の状態",
+   "passage": {
+    "ja": "瞑想の紹介文に無の境地とあっても、脳が完全に働かなくなることだと受け取ると、宗教的な表現と生理学の説明が混ざります。まずは雑念や執着から離れた心のあり方を表す言葉として、どのような実践の文脈で使われているかを確かめましょう。何も思い浮かばなかったという感想だけで悟りの達成まで判断するのは、体験の報告から大きく踏み出しています。読書ノートには本人の体験、教義による解釈、測定できる現象を別々に記す欄を作ると、一つの言葉に異なる主張を重ねずに整理できます。",
+    "form": "無の境地",
+    "en": "Reading a meditation text’s state of nothingness as a complete cessation of brain activity mixes religious expression with physiology. First consider it as language for a mind free from distracting thoughts or attachment and identify its practical context. Inferring attainment of awakening solely from a report that nothing came to mind goes far beyond describing an experience. Separate columns for personal experience, doctrinal interpretation, and measurable phenomena help organize different claims without piling them into one phrase.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "脳活動の停止ではなく、雑念や執着を離れるという文脈で読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "無常観",
+   "reading": "むじょうかん",
+   "pos": "noun",
+   "meaning": "a sense of impermanence",
+   "defJa": "物事が絶えず移り変わると捉える見方",
+   "passage": {
+    "ja": "古い寺の崩れた石段を描いて無常観を表したいなら、「寂しい」という感想だけでなく、かつての姿と今の姿の隔たりを文章に残すと伝わります。仏教に関わるこの言葉は、物事が移り変わるという見方を含むため、暗い気分の言い換えだけでは意味が狭まります。明るい季節の花を描く場合でも、その盛りが留まらないことに目を向ければ、同じ見方を文章へ織り込めます。題材が悲しいかどうかにかかわらず、時間によって何が変わるのかを具体的に示すことが、抽象的な語を生かす手掛かりになります。",
+    "form": "無常観",
+    "en": "To convey impermanence through an old temple’s worn stone steps, preserve the gap between their earlier and present appearance rather than simply calling them melancholy. This Buddhist-related term includes a view of things as changing, so treating it only as a gloomy mood narrows its meaning. Even a description of bright seasonal flowers can convey the same view by attending to the passing of their peak. Regardless of whether the subject is sad, specifying what time changes gives life to an abstract term.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "変化を見る立場を表す。単なる悲しい気分との言い換えにはしない。",
+    "sense": ""
+   }
+  }
+ ]
+}

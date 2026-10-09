@@ -1,0 +1,161 @@
+{
+ "batch": "r5-ai-review-002",
+ "items": [
+  {
+   "term": "ガバナンス",
+   "reading": "がばなんす",
+   "gloss": "governance",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "基板",
+   "reading": "きばん",
+   "gloss": "substrate, circuit board",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "実存的リスク",
+   "reading": "じつぞんてきりすく",
+   "gloss": "existential risk",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "技術的特異点",
+   "reading": "ぎじゅつてきとくいてん",
+   "gloss": "technological singularity",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "楽観論",
+   "reading": "らっかんろん",
+   "gloss": "optimistic view",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "知的財産",
+   "reading": "ちてきざいさん",
+   "gloss": "intellectual property",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "計算資源",
+   "reading": "けいさんしげん",
+   "gloss": "compute resources",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "reviewOf": {
+  "ガバナンス": {
+   "batch": "r5-ai-008",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated opening 人工知能の",
+   "source": "cards/senmon-p1-r5-ai-008.json"
+  },
+  "基板": {
+   "batch": "r5-ai-018",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated phrase わけではありません。",
+   "source": "cards/senmon-p1-r5-ai-018.json"
+  },
+  "実存的リスク": {
+   "batch": "r5-ai-018",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated closing …すくなります",
+   "source": "cards/senmon-p1-r5-ai-018.json"
+  },
+  "技術的特異点": {
+   "batch": "r5-ai-021",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated opening 人工知能の",
+   "source": "cards/senmon-p1-r5-ai-021.json"
+  },
+  "楽観論": {
+   "batch": "r5-ai-023",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated opening 人工知能の",
+   "source": "cards/senmon-p1-r5-ai-023.json"
+  },
+  "知的財産": {
+   "batch": "r5-ai-027",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated phrase わけではありません。",
+   "source": "cards/senmon-p1-r5-ai-027.json"
+  },
+  "計算資源": {
+   "batch": "r5-ai-030",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated opening 人工知能の",
+   "source": "cards/senmon-p1-r5-ai-030.json"
+  }
+ }
+}

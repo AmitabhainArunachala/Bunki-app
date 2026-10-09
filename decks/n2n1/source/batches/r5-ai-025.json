@@ -1,0 +1,155 @@
+{
+ "batch": "r5-ai-025",
+ "items": [
+  {
+   "term": "消費電力",
+   "reading": "しょうひでんりょく",
+   "gloss": "power consumption",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "深層学習",
+   "reading": "しんそうがくしゅう",
+   "gloss": "deep learning",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "減産",
+   "reading": "げんさん",
+   "gloss": "production cut",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "演算",
+   "reading": "えんざん",
+   "gloss": "computation, operation",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "演算能力",
+   "reading": "えんざんのうりょく",
+   "gloss": "computing power",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "工場の小さな異常から工程の全体像へ",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "演繹",
+   "reading": "えんえき",
+   "gloss": "deduction",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "潜在空間",
+   "reading": "せんざいくうかん",
+   "gloss": "latent space",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "牙城",
+   "reading": "がじょう",
+   "gloss": "stronghold",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "汎用性",
+  "法整備",
+  "波及効果",
+  "注意機構",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

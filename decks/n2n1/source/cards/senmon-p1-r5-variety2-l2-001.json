@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "メタ言語",
+   "reading": "めたげんご",
+   "pos": "noun",
+   "meaning": "metalanguage",
+   "defJa": "別の言語の仕組みや表現を記述するための言語",
+   "passage": {
+    "ja": "「猫が眠る」の「猫」は動物を指しますが、「猫は名詞だ」の「猫」は一つの単語を指します。後の文では、同じ日本語が日本語そのものを対象としており、このように言語を扱うための言語をメタ言語と呼びます。特別な記号を使わなくても、主語や助詞といった語で文の仕組みを確かめる場面には、この働きがあります。対象となる言葉と、それを分析する言葉の層を分けることによって、動物の性質と単語の性質を混同せずに済みます。",
+    "form": "メタ言語",
+    "en": "In “The cat sleeps,” “cat” refers to an animal, whereas in “Cat is a noun,” it refers to a word. In the latter sentence, Japanese takes Japanese itself as its object, and language used to deal with language is called metalanguage. This function appears when terms such as subject or particle are used to examine sentence structure, even without special symbols. Separating the layer of language being examined from the language used to analyze it avoids confusing properties of animals with properties of words.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "同じ日本語でも、言葉自体を対象とすれば一段上の記述に使える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-4786bade8f-5e3a6031",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-038.json",
+    "cardId": "nn-4786bade8f-5e3a6031",
+    "wordId": "nn-4786bade8f"
+   }
+  }
+ ]
+}

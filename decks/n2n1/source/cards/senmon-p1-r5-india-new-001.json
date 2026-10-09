@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "アヒンサー",
+   "reading": "あひんさー",
+   "pos": "noun",
+   "meaning": "nonviolence; ahimsa",
+   "defJa": "生き物を傷つけないことを重んじる原則",
+   "passage": {
+    "ja": "「暴力を振るわない」と訳しただけでは、手を出さなければ十分だと読まれる余地があります。ジャイナ教のアヒンサーを伝えるなら、行動に限らず、言葉や心の向け方までが問われるという広がりを、短い例で補うとよいでしょう。相手を殴らなくても、弱みを知ったうえで言葉を選び、傷つけようとすることはできます。訳語を長い説明に置き換えるより、身体への攻撃から一歩離れた場面を添えることで、この教えが求める注意の細かさが伝わります。",
+    "form": "アヒンサー",
+    "en": "Translating it simply as refraining from violence leaves room for readers to think that not striking someone is enough. To explain ahimsa in Jainism, a brief example can show how its scope extends beyond actions to speech and attitudes. Even without hitting someone, one can choose words with knowledge of their vulnerabilities and intend to hurt them. Instead of replacing the translation with a long definition, adding a scene beyond physical assault conveys the fineness of attention this teaching demands.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "訳語「不殺生」「非暴力」の範囲を、言葉による害の例で補っている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ティールタンカラ",
+   "reading": "てぃーるたんから",
+   "pos": "noun",
+   "meaning": "Jain ford-maker; spiritual teacher",
+   "defJa": "ジャイナ教で解脱への道を示す完成者",
+   "passage": {
+    "ja": "川を渡る場所を知っている者は、後から来る人に道を示せる。ジャイナ教のティールタンカラという呼び名には、その渡り場を開く者のイメージがあり、輪廻からの解脱を説く師の役割が重ねられている。尊像が祈りの対象になるからといって、その人物が世界を造り、願いのままに運命を変える神だということにはならない。先に道を極めた者を仰ぎながら、歩む責任は自分で引き受けるという関係に、この信仰の一つの輪郭が表れている。",
+    "form": "ティールタンカラ",
+    "en": "Someone who knows where to cross a river can show the way to those who follow. The Jain title tirthankara evokes a maker of such a crossing, expressing the role of a teacher who shows liberation from rebirth. The fact that an image is venerated does not make its subject a creator god who changes fate on request. One feature of this faith emerges in the relationship between honoring someone who has completed the path and accepting responsibility for walking it oneself.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「渡り場を開く者」という語のイメージから宗教的役割を捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "白衣派",
+   "reading": "びゃくえは",
+   "pos": "noun",
+   "meaning": "Shvetambara Jain tradition",
+   "defJa": "白い衣を着る出家者を持つジャイナ教の一派",
+   "passage": {
+    "ja": "あの白い服の修行者を見て、服装だけの違いだと思ったんだよね。ところが、ジャイナ教の白衣派を調べると、衣を着てよいかという問題に加えて、どの経典を受け継いでいると考えるかにも宗派の違いがあるんだ。同じ不殺生を大切にしていても、昔の師の教えをどう残すかという点では、別の道を歩んできたわけだね。写真の色だけで覚えていた名前に、教団の歴史や、修行を支える文章の話がつながると、お寺の見方もちょっと変わるよ。",
+    "form": "白衣派",
+    "en": "When I saw those ascetics in white, I thought the difference was just clothing. But looking into the Shvetambara tradition of Jainism shows that sectarian differences concern not only whether clothes are permitted but also which scriptures are considered preserved. Even while both traditions value nonviolence, they have followed different paths in preserving earlier teachers’ teachings. Once a name remembered only through a color in a photograph connects with institutional history and texts supporting practice, temples start to look a little different.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「白衣派の出家者」。衣服の名から経典の継承へ理解を広げる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ジャイナ教",
+   "reading": "じゃいなきょう",
+   "pos": "noun",
+   "meaning": "Jainism",
+   "defJa": "生き物を傷つけぬ実践を重んじるインドの宗教",
+   "passage": {
+    "ja": "食卓で肉を避ける理由を聞いても、答えが健康のためとは限りません。ジャイナ教では、目に見える動物に限らず、小さな生き物を傷つける行為にも注意を向け、食事を日々の修行と結び付けてきました。出家者と家庭を持つ信者とでは守り方に違いがあり、同じ教えがそれぞれの生活に応じて実践されます。仏教と生まれた地域や時代が近くても、個々の魂を認める教義には大きな違いがあり、菜食という共通点だけで両者を一つにはできません。",
+    "form": "ジャイナ教",
+    "en": "Avoiding meat at the table is not always motivated by health. In Jainism, attention extends beyond visible animals to actions that harm tiny living beings, linking meals with daily religious practice. Renunciants and householders observe the teaching differently, putting it into practice according to their circumstances. Although Buddhism arose in a nearby region and period, their doctrines differ greatly over individual souls, so a shared practice of vegetarianism cannot make them one religion.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「ジャイナ教の教義・信者」。食習慣から教えの違いへ話を広げている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "アパリグラハ",
+   "reading": "あぱりぐらは",
+   "pos": "noun",
+   "meaning": "non-possession; non-attachment",
+   "defJa": "所有や所有物への執着を離れる原則",
+   "passage": {
+    "ja": "物を捨てた部屋にも、「何も持たない自分」への誇りが残ることがあります。ジャイナ教のアパリグラハを考えるときは、持ち物の数だけでなく、それを手放せない心にも目を向けると、修行の意味が深まります。出家者に求められる徹底した無所有と、家族を養う人が暮らしの中で欲を抑える実践とは、同じ形にはなりません。収納を整える話にとどまらず、必要な物を使いながら何に縛られているのかを問い直すところに、この原則の難しさがあります。",
+    "form": "アパリグラハ",
+    "en": "Even a room emptied of possessions can retain pride in being someone who owns nothing. When considering aparigraha in Jainism, attending not only to the number of possessions but also to the mind unable to release them deepens the meaning of practice. The radical non-possession required of renunciants differs from a householder’s efforts to limit desire while supporting a family. The difficulty of this principle extends beyond organizing storage to questioning what binds us while we continue to use necessary things.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "所有物の少なさだけでなく、「執着を離れる」という方向を示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "アネーカーンタヴァーダ",
+   "reading": "あねーかーんたゔぁーだ",
+   "pos": "noun",
+   "meaning": "Jain doctrine of many-sided reality",
+   "defJa": "実在には多様な側面があるとするジャイナの説",
+   "passage": {
+    "ja": "一つの出来事について、立つ場所によって異なる説明が生まれることは珍しくない。ジャイナ思想のアネーカーンタヴァーダは、実在が多くの側面を持つという考えを示し、一つの見方だけで全体を言い尽くす態度を問い直す。とはいえ、あらゆる主張を無条件に正しいと認めるなら、何を根拠に述べた言葉なのかという検討まで失われる。相手の説明を聞くことと、その説明が成り立つ条件を調べることを組み合わせてこそ、異なる視点を並べる意味が生まれる。",
+    "form": "アネーカーンタヴァーダ",
+    "en": "Different accounts of an event often arise from different standpoints. The Jain doctrine of anekantavada describes reality as having many aspects and challenges the attempt to exhaust the whole through a single view. Yet accepting every claim as unconditionally correct would also erase inquiry into the grounds on which it was made. Bringing together the act of hearing another account and examining the conditions under which it holds gives meaning to placing perspectives alongside one another.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「多面的」と「何でも正しい」を区別し、主張が成り立つ条件を示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "マハーヴィーラ",
+   "reading": "まはーゔぃーら",
+   "pos": "noun",
+   "meaning": "Mahavira",
+   "defJa": "ジャイナ教で二十四番目の救済者とされる人物",
+   "passage": {
+    "ja": "宗教の歴史を年表にすると、教えを整えた人物の名前が、そのまま創始者の欄に収まりやすい。だが、ジャイナ教でマハーヴィーラは、伝統上、二十四番目のティールタンカラとして位置付けられ、それ以前の師たちの系譜を継ぐ存在である。研究上の歴史像と、信者が受け継ぐ聖なる歴史とは、用いる資料も時間の捉え方も異なる。略歴を一行に縮めるに際しては、その人物が何を始めたとする記述なのかを確かめることで、単なる名前と年代の暗記を越えられる。",
+    "form": "マハーヴィーラ",
+    "en": "When religious history becomes a timeline, the person who organized a teaching can easily end up in the founder column. In Jain tradition, however, Mahavira occupies the position of the twenty-fourth tirthankara, continuing a lineage of earlier teachers. Scholarly historical accounts and the sacred history inherited by believers differ in their sources and their understanding of time. When reducing a biography to one line, checking what the account says this person actually began takes the reader beyond memorizing names and dates.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "人名は「教えを説く」「系譜を継ぐ」と結び付けると役割が明確になる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

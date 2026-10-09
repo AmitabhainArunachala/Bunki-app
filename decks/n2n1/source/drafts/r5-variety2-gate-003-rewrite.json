@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "ブラックボックス",
+   "reading": "ぶらっくぼっくす",
+   "pos": "noun",
+   "meaning": "black box",
+   "defJa": "内部の仕組みが外から把握しにくい対象",
+   "passage": {
+    "ja": "過去の応募書類と合否の記録を、まず人工知能に学習させる。そうして新しい書類に点数を付けさせ、その結果を新卒採用の書類選考に使う企業が増えている。しかし、深層学習のモデルは膨大な数のパラメータを自動で調整して作られるため、なぜその点数になったのかは、開発した技術者でさえ説明しにくい。中身がブラックボックスのままでは、過去の合否判断に含まれていた偏りをモデルが引き継いでいても、外からは確かめようがない。不採用の通知を受け取った応募者には、書類のどの記述が点数を下げたのかを知る手だてがなく、企業の側もその根拠を示せないまま、翌年の選考が始まる。",
+    "form": "ブラックボックス",
+    "en": "First, an AI is trained on past application documents and the record of who passed and who failed. More and more companies then have it score new documents and use the results to screen applications in new-graduate hiring. However, because a deep learning model is built by automatically adjusting a vast number of parameters, even the engineers who developed it find it hard to explain why a given score came out. As long as its inner workings remain a black box, there is no way to check from outside whether the model has inherited biases contained in past pass-or-fail decisions. An applicant who receives a rejection notice has no way of knowing which statement in the documents lowered the score, and the next year's screening begins with the company itself still unable to show the basis for it.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「中身がブラックボックスだ」「ブラックボックス化する」の形で、仕組みが外から見えない状態を言う。",
+    "sense": "飛行記録装置ではなく、中の仕組みが見えないものの意"
+   },
+   "cardId": "nn-795b2d8270-d42b912e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+    "cardId": "nn-795b2d8270-d42b912e",
+    "wordId": "nn-795b2d8270"
+   }
+  },
+  {
+   "term": "割引現在価値",
+   "reading": "わりびきげんざいかち",
+   "pos": "noun",
+   "meaning": "discounted present value",
+   "defJa": "将来の金額を利率に応じ今の額へ換算した値",
+   "passage": {
+    "ja": "まだ赤字の人工知能ベンチャーに高い株価が付いてるの、不思議に思いません？あれは、投資家が何年も先の利益まで見込んで値段を付けてるからなんですよ。ただ、十年後に入ってくる百億円は今の百億円と同じ価値じゃないので、金利を使って割引現在価値に直してから足し合わせるんです。だから金利次第で話が変わるんですよね。遠い将来の利益ほど大きく割り引かれて今の値打ちが小さくなるから、業績は全然変わってないのに、金利が上がっただけでこういう成長株が一斉に売られたりするんですよ。",
+    "form": "割引現在価値",
+    "en": "Don't you find it strange that AI start-ups still in the red command such high share prices? That is because investors set the price counting on profits many years ahead. But ten billion yen coming in ten years from now isn't worth the same as ten billion yen today, so you use the interest rate to convert it into a discounted present value before adding everything up. That's why the story changes depending on interest rates. The further off the profits are, the more heavily they are discounted and the smaller their worth today becomes, so even though nothing at all about the business has changed, growth stocks like these can be sold off all at once just because interest rates have gone up.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「割引現在価値に直す・を求める」と使う。将来の金額を金利で割り戻し、今の額にそろえて比べる考え方。",
+    "sense": ""
+   },
+   "cardId": "nn-1bfa81faff-f2bd90e3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-1bfa81faff-f2bd90e3",
+    "wordId": "nn-1bfa81faff"
+   }
+  },
+  {
+   "term": "クリーンルーム",
+   "reading": "くりーんるーむ",
+   "pos": "noun",
+   "meaning": "clean room",
+   "defJa": "微粒子などの量を管理した清浄な作業室",
+   "passage": {
+    "ja": "半導体工場の製造エリアには、化粧をしたままでは立ち入れない。作業者は全身を覆う専用の服に着替える。手袋とマスクを着け、エアシャワーと呼ばれる小部屋で強い風を浴びて、服の表面に付いたちりを吹き飛ばしてからでないと、奥の扉は開かない仕組みだ。回路の線は髪の毛よりはるかに細く、目に見えないほどのちり一つが不良の原因になるからだ。天井から床へ絶えず清浄な空気が流れるクリーンルームの中で、最大の汚染源は今も人間である。",
+    "form": "クリーンルーム",
+    "en": "No one can enter the production area of a semiconductor plant while wearing makeup. Workers change into special garments that cover the whole body. They put on gloves and a mask, and the inner door is designed not to open until they have stood in a strong blast of air in a small chamber called an air shower and blown off the dust on the surface of their clothing. This is because the circuit lines are far thinner than a human hair, and a single speck of dust too small to see can cause a defect. Inside the clean room, where clean air flows constantly from ceiling to floor, the biggest source of contamination is still the human being.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「クリーンルームに入る」「クリーンルームの中で」と使う。半導体工場などの、ちりを管理した部屋。",
+    "sense": ""
+   },
+   "cardId": "nn-07fcfacecd-34c211e2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-07fcfacecd-34c211e2",
+    "wordId": "nn-07fcfacecd"
+   }
+  },
+  {
+   "term": "自動化",
+   "reading": "じどうか",
+   "pos": "noun",
+   "meaning": "automation",
+   "defJa": "人が行っていた作業を機械などに任せること",
+   "passage": {
+    "ja": "うちの開発チーム、去年テストの自動化を一気に進めたんですよ。それまでは新しい機能を出すたびに、三人がかりで画面を一つずつ開いて、ボタンを押して、結果を表に記録してたのが、今はコードを変えた瞬間に全部のテストが勝手に走るんです。楽になったでしょって、よく言われます。それが、画面のデザインがちょっと変わっただけで、テストのほうが動かなくなるんですよね。手間が減るどころか、今じゃ壊れたテストを直すのが仕事のほとんど、という人までいます。",
+    "form": "自動化",
+    "en": "Our development team pushed ahead with test automation all at once last year. Until then, every time we released a new feature, three people would open the screens one by one, press the buttons and record the results in a table, but now every test runs by itself the moment someone changes the code. People often tell me it must have made things easier. The thing is, if the screen design changes even a little, it is the tests that stop working. Far from the workload going down, we now even have someone whose job is mostly fixing broken tests.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「〜の自動化を進める・図る」が典型。動詞は「自動化する」。人手の作業を機械や仕組みに任せること。",
+    "sense": ""
+   },
+   "cardId": "nn-f703a9b237-635c5343",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-f703a9b237-635c5343",
+    "wordId": "nn-f703a9b237"
+   }
+  },
+  {
+   "term": "欺瞞",
+   "reading": "ぎまん",
+   "pos": "noun",
+   "meaning": "deception",
+   "defJa": "相手に事実と異なる理解をさせるように欺くこと",
+   "passage": {
+    "ja": "対話型の人工知能は、実在しない論文をもっともらしく引用することがある。人間が同じことをすれば嘘つきと呼ばれるだろうが、人工知能には相手をだまそうという意図がなく、学習した言葉の並びから確率の高い続きを出力しているにすぎない、と説明されるのが普通である。この説明に誤りはない。だが、たとえ誤った答えであれ、迷いなく言い切るほうが利用者に信頼されると知りながら、企業がそのまま製品を売り続けるとしたらどうか。だます意図は機械になくとも、それは利用者に対する欺瞞ではないのか。",
+    "form": "欺瞞",
+    "en": "Conversational AI sometimes cites, quite plausibly, papers that do not exist. A human who did the same would be called a liar, but the usual explanation is that the AI has no intention of deceiving anyone and is merely outputting a highly probable continuation based on the sequences of words it has learned. There is nothing wrong with this explanation. But what if a company keeps selling its product as it is, knowing that users trust an answer more when it is stated without hesitation, even if the answer is wrong? Even if the machine has no intention to deceive, is that not a deception practiced on its users?",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「欺瞞に満ちた」「自己欺瞞」「〜に対する欺瞞」と使う硬い語。相手に誤った理解をさせる行為を指す。",
+    "sense": ""
+   },
+   "cardId": "nn-c03dd05187-d8061609",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
+    "cardId": "nn-c03dd05187-d8061609",
+    "wordId": "nn-c03dd05187"
+   }
+  },
+  {
+   "term": "演算能力",
+   "reading": "えんざんのうりょく",
+   "pos": "noun",
+   "meaning": "computational capacity",
+   "defJa": "一定の時間に計算を処理できる性能",
+   "passage": {
+    "ja": "米国政府は二〇二二年十月、人工知能の学習に使われる先端半導体と半導体製造装置について、中国への輸出を大幅に制限する新たな規制を発表した。線引きの基準となったのは、半導体の性能である。基準を超える製品は、政府の許可がなければ輸出できない。米国の半導体大手は性能を抑えた中国向け製品を投入したが、翌年には基準が見直され、それも規制の対象となった。規制の狙いは、個々の製品というより、中国が手にする演算能力そのものにあった。",
+    "form": "演算能力",
+    "en": "In October 2022 the United States government announced new regulations sharply restricting exports to China of the advanced semiconductors used to train AI and of semiconductor manufacturing equipment. The line was drawn according to the performance of the chips. Products exceeding the threshold cannot be exported without government permission. A leading American chipmaker brought out products for China with reduced performance, but the threshold was revised the following year and those too became subject to the regulations. The aim of the regulations lay not so much in individual products as in the very computational capacity that China could obtain.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「演算能力を持つ・高める・確保する」と使う。半導体や計算機が一定時間にこなせる計算の量を言う。",
+    "sense": ""
+   },
+   "cardId": "nn-a2ee7ba9ba-b8d2e07e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025-r.json",
+    "cardId": "nn-a2ee7ba9ba-b8d2e07e",
+    "wordId": "nn-a2ee7ba9ba"
+   }
+  },
+  {
+   "term": "究竟",
+   "reading": "くきょう",
+   "pos": "noun",
+   "meaning": "ultimate completion",
+   "defJa": "仏教で物事が最後まで徹底し完成すること",
+   "passage": {
+    "ja": "悟りと聞くと、多くの人は山の頂のような終点を思い浮かべる。そこに着けば、もう歩く必要はないはずだ。だが、伝承によれば、釈迦は菩提樹の下で悟りを開いた後もそこにとどまることなく、亡くなるまで数十年にわたって各地を歩き、出会う人々に教えを説き続けた。行き着く先は山の頂ではなく、人々の中にあったことになる。空海の開いた真言宗がよりどころとする経典も、悟りを求める心を出発点とし、慈悲を根本とし、人々を救う手立てである方便を究竟とする、と説く。",
+    "form": "究竟",
+    "en": "When they hear the word enlightenment, many people picture an end point like a mountain summit. Once you arrive there, there should be no further need to walk. But according to tradition, even after attaining enlightenment under the Bodhi tree, the Buddha did not remain there, but walked from place to place for several decades until his death and kept teaching the people he met. It follows that the destination lay not on the summit but among people. A scripture relied on by the Shingon school that Kukai founded likewise teaches that the mind seeking enlightenment is the starting point, compassion is the root, and skillful means, the ways of saving people, are the ultimate completion.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「方便を究竟とす」「究竟の悟り」のように、仏教で最終の到達点を表す。読みは「くきょう」。",
+    "sense": "仏教語で、物事が最後に行き着くところの意"
+   },
+   "cardId": "nn-6b01be4faa-348be317",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-6b01be4faa-348be317",
+    "wordId": "nn-6b01be4faa"
+   }
+  },
+  {
+   "term": "ゲーム理論",
+   "reading": "げーむりろん",
+   "pos": "noun",
+   "meaning": "game theory",
+   "defJa": "互いの選択が結果に影響する状況を分析する理論",
+   "passage": {
+    "ja": "メモリー半導体って、値段がどんどん下がってるのに各社が増産をやめなかった時期があるんですよ。普通に考えたら変ですよね。自分だけ生産を減らしたらシェアを取られるし、みんなが作り続けたら値崩れして全員赤字になるって分かってても、先に降りたほうが負けなので、誰もやめられなかったんです。ゲーム理論でいう「チキンゲーム」そのもので、当時の報道でも実際にそう呼ばれてました。そのあげく、日本のエルピーダメモリを含めて何社も脱落して、勝ち残った数社が今の市場を分け合ってます。",
+    "form": "ゲーム理論",
+    "en": "With memory chips, there was a time when the makers would not stop increasing output even though prices kept falling. It seems odd if you think about it in the ordinary way. If you alone cut production you lose market share, and although everyone knew that if they all kept producing, prices would collapse and all of them would end up in the red, whoever backed down first lost, so nobody could stop. It was exactly what game theory calls a \"chicken game,\" and news reports of the time actually called it that. After all that, a number of companies dropped out, including Japan's Elpida Memory, and the few that survived now share the market among themselves.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「ゲーム理論でいう〜」「ゲーム理論で分析する」と使う。囚人のジレンマやチキンゲームが代表例。",
+    "sense": ""
+   },
+   "cardId": "nn-db97555b26-76d157cc",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008-r.json",
+    "cardId": "nn-db97555b26-76d157cc",
+    "wordId": "nn-db97555b26"
+   }
+  }
+ ]
+}

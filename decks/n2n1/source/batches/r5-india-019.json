@@ -1,0 +1,177 @@
+{
+ "batch": "r5-india-019",
+ "items": [
+  {
+   "term": "最澄",
+   "reading": "さいちょう",
+   "gloss": "Saichō, founder of Tendai",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜に基づいて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "未来永劫",
+   "reading": "みらいえいごう",
+   "gloss": "for all eternity",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜をもとに"
+  },
+  {
+   "term": "末法思想",
+   "reading": "まっぽうしそう",
+   "gloss": "belief in the Dharma's decline",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜からには"
+  },
+  {
+   "term": "末那識",
+   "reading": "まなしき",
+   "gloss": "manas, the self-clinging mind",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜に先立って"
+  },
+  {
+   "term": "本地垂迹",
+   "reading": "ほんじすいじゃく",
+   "gloss": "buddhas manifesting as kami",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜にせよ",
+   "factNote": "Japanese theory interpreting kami as local manifestations of Buddhas/bodhisattvas; forms differed historically."
+  },
+  {
+   "term": "本尊",
+   "reading": "ほんぞん",
+   "gloss": "principal image of worship",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜を問わず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "本来無一物",
+   "reading": "ほんらいむいちもつ",
+   "gloss": "originally, not a single thing exists",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜に応じて"
+  },
+  {
+   "term": "本覚思想",
+   "reading": "ほんがくしそう",
+   "gloss": "doctrine of original enlightenment",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜に伴って"
+  },
+  {
+   "term": "来世",
+   "reading": "らいせ",
+   "gloss": "next life",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Explore the choice of this word in translation or an everyday explanation; avoid presentation advice and the phrase 発表で.",
+   "grammarSuggestion": "〜に限らず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

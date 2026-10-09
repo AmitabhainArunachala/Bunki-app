@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "加持祈祷",
+   "reading": "かじきとう",
+   "pos": "noun",
+   "meaning": "incantation and prayer rites",
+   "defJa": "仏の力をよりどころとして願いを祈ること",
+   "passage": {
+    "ja": "病気の家族の無事を願って寺を訪れる人にとって、手を合わせる時間は日常の不安と切り離されていません。加持祈祷は、仏の力をよりどころとして願いを祈る宗教的な実践です。治療を受ける生活のかたわら、祈りを通して願いを託したり、家族との結び付きを確かめたりする人もいます。そこに見いだされる支えを尊重することと、祈った結果として病気が治ると保証することは別であり、信仰上の意味を、そのまま医学的な効能の証明にはできません。",
+    "form": "加持祈祷",
+    "en": "For someone visiting a temple to pray for a sick relative, the time spent praying is connected to everyday anxiety. Kaji kito is a religious practice of praying for wishes with reliance on a Buddha's power. Alongside medical treatment, some people entrust their hopes to prayer or reaffirm their family bonds through it. Respecting the support found there differs from guaranteeing recovery through prayer, and religious significance does not itself demonstrate medical efficacy.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏の力によりどころを求め、願いを祈る宗教的な実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-0a333818a4-068938a3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-0a333818a4-068938a3",
+    "wordId": "nn-0a333818a4"
+   }
+  }
+ ]
+}

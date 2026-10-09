@@ -46,8 +46,8 @@ His fields come first: mind and learning, Indian and Buddhist philosophy and Adv
 ## Topics
 
 - `mind`: the mind, learning, habits.
-- `india`: Indian and Buddhist philosophy, Advaita.
-- `ai`: AI and semiconductors.
+- `india`: Yoga, Buddhist, Jain and Hindu history and philosophy; their transmission to and development in Japan; the neuroscience of meditation and attention. Distinguish historical doctrines from modern empirical claims.
+- `ai`: Semiconductors, AI, investing, computer science and technology, including Hofstadter, self-reference and recursion. Explain investing concepts without personalized recommendations or invented returns.
 - `history`: world history.
 - `language`: Japanese about Japanese.
 

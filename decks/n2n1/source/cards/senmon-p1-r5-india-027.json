@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "菩提",
+   "reading": "ぼだい",
+   "pos": "noun",
+   "meaning": "bodhi; awakening",
+   "defJa": "仏教で真理を悟ること、またその悟り",
+   "passage": {
+    "ja": "仏教文献の翻訳では、原語の音を漢字に写した言葉と、意味を日本語で説明した言葉が並んで現れる。菩提は悟りを指す語であり、音だけからその内容を推測するのは難しい。語の成り立ちをもとに意味を確かめる作業は有用だが、辞書の短い説明だけで各文献の議論が尽くされるわけではない。誰が何を悟り、それが実践の中でどう位置付けられているかによって、読むべき文脈は変わる。日本の寺で耳にする漢字の響きにも、インドから続く翻訳の道筋が刻まれている。",
+    "form": "菩提",
+    "en": "Translations of Buddhist texts place terms that transcribe the source language in Chinese characters alongside terms explaining meanings in Japanese. Bodhi denotes awakening, but its content is difficult to infer from its sound alone. Investigating a word’s formation helps clarify its meaning, yet a short dictionary explanation does not exhaust each text’s argument. The relevant context changes with who awakens to what and how that awakening is situated within practice. Even the sounds of characters heard in Japanese temples bear traces of a translation route extending from India.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "悟りを表す音写語。語の響きと意味を分けて確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "菩提心",
+   "reading": "ぼだいしん",
+   "pos": "noun",
+   "meaning": "the aspiration to awaken for all beings",
+   "defJa": "自他のために悟りを求める心",
+   "passage": {
+    "ja": "困っている人を助けたいという願いは尊いが、その願いを仏教のどの言葉で表すかには注意が要る。大乗仏教の菩提心は、他者への思いやりを含みつつ、悟りを求める方向を持った心である。単に親切な気持ちと訳してしまえば、修行の目標との結び付きが抜け落ちる。自分も他者も苦しみから離れる道を求めるからには、目先の満足だけで行為の意味を測ることはできない。助ける側の自分に執着していないかという問いも、その願いを深める過程に入り込んでくる。",
+    "form": "菩提心",
+    "en": "Wanting to help someone in difficulty is valuable, but care is needed in choosing a Buddhist term for that wish. In Mahayana Buddhism, bodhicitta includes concern for others while being directed toward awakening. Translating it simply as kindness loses its connection with the goal of practice. Seeking a path by which both self and others leave suffering behind means that an action cannot be assessed only by immediate satisfaction. Questioning attachment to oneself as the helper also becomes part of deepening that aspiration.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "親切心だけでなく、悟りを求める方向を含む語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "荘子",
+   "reading": "そうし",
+   "pos": "noun",
+   "meaning": "Zhuangzi, the Chinese philosopher",
+   "defJa": "固定した区別を問い直した中国の思想家",
+   "passage": {
+    "ja": "蝶になった夢から覚めた後、自分が蝶の夢を見たのか、蝶が自分の夢を見ているのかを問う物語があります。中国の思想家、荘子に結び付くこの話は、当たり前に思っている自分と世界の区別を揺さぶります。自分の立場に基づいて現実を決めているのではないか、という問いとして読めるのです。禅の話と似た響きを感じても、それだけでインドの仏教から生まれた思想だと考えてはいけません。異なる伝統を比べる面白さは、似ているところを見つけた後に、違いを確かめる作業にもあります。",
+    "form": "荘子",
+    "en": "There is a story in which someone awakens from a dream of being a butterfly and asks whether he dreamed of the butterfly or the butterfly is dreaming of him. This story associated with the Chinese thinker Zhuangzi unsettles the seemingly obvious distinction between self and world. It can be read as questioning whether we determine reality from our own standpoint. Even if it sounds similar to a Zen story, that alone does not make it an idea originating in Indian Buddhism. Part of the pleasure of comparing traditions lies in examining differences after discovering similarities.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "ここでは書名ではなく、中国の思想家の名として用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "菩提樹",
+   "reading": "ぼだいじゅ",
+   "pos": "noun",
+   "meaning": "bodhi tree; sacred fig or temple linden",
+   "defJa": "釈尊の悟りに結び付けられる木の呼称",
+   "passage": {
+    "ja": "日本の寺で見かける菩提樹と、釈尊がその下で悟ったと伝えられるインドの木は、同じ種類とは限らないんだ。インドのものはイチジクの仲間で、日本でよく植えられるのはシナノキの仲間なんだって。見学に先立って葉や花の特徴を調べておくと、名前だけで同じ木だと決めつけずに済むよ。仏教が土地を越えて伝わる中では、信仰を担う名前と、そこに育つ植物の種類がずれることもあるんだね。案内板を読んだら、木そのものにも目を向けて、どうしてその名が付いているかを確かめたいな。",
+    "form": "菩提樹",
+    "en": "The tree called bodhi at a Japanese temple is not necessarily the same species as the Indian tree under which the Buddha is said to have awakened. The Indian one is a kind of fig, whereas the one commonly planted in Japan is a kind of linden. Checking leaf and flower characteristics before visiting helps avoid assuming that the same name means the same tree. As Buddhism spreads across regions, a name carrying religious significance may refer to different plant species. After reading the sign, I would like to examine the tree itself and find out why it bears that name.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "日本の寺の木とインドの聖樹では、植物の種類が異なることがある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "ヴェーダ",
+   "reading": "ゔぇーだ",
+   "pos": "noun",
+   "meaning": "the Vedas",
+   "defJa": "古代インドで受け継がれた聖なる文献群",
+   "passage": {
+    "ja": "宗教の文献は、書かれた文字だけによって保存されてきたとは限らない。古代インドのヴェーダは、聖なる言葉として口頭で受け継がれ、音の形や唱え方を保つことにも大きな価値が置かれた。仏教やジャイナ教の成立を考える際には、この文献群の権威を認めるかどうかが、思想の立場を分ける重要な軸となる。現代の読者が印刷された訳を手にする一方で、声を通して継承する営みがあったことを押さえると、経典という語から想像する姿にも幅が生まれる。",
+    "form": "ヴェーダ",
+    "en": "Religious texts have not always been preserved solely through writing. Ancient India’s Vedas were transmitted orally as sacred speech, placing great value on preserving sound and recitation. Acceptance of their authority forms an important distinction when considering the emergence of Buddhism and Jainism. Remembering oral transmission alongside today’s printed translations broadens what readers imagine a scripture to be.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「ヴェーダの権威」。文献の内容だけでなく、音の伝承にも注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "マーヤー",
+   "reading": "まーやー",
+   "pos": "noun",
+   "meaning": "māyā, cosmic illusion",
+   "defJa": "世界の多様な現れやそれを実在と誤る力を指す語",
+   "passage": {
+    "ja": "映画に夢中になると、画面の出来事だと知っていても、つい身体に力が入るよね。インド哲学のマーヤーを説明するときにも、見えている姿と、その姿をどう受け取るかという違いが手掛かりになるんだ。ただ、不二一元論でいう世界の現れを、何も起きていないという話に縮めると、日々の行為や修行の意味まで取り違えてしまう。たとえ話は入口として使いつつ、どの立場から何を本当だと考えるのかを読んでいくと、単なる手品の種明かしとは違う問いが見つかるよ。",
+    "form": "マーヤー",
+    "en": "An absorbing film can make your body tense even while you know it is on a screen. Explaining maya in Indian philosophy likewise benefits from distinguishing appearances from how they are received. Reducing Advaita’s account of appearances to nothing happening would misrepresent everyday action and practice. Using the analogy as an entry point and then examining what counts as real from which standpoint reveals a question beyond exposing a magic trick.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「幻影」という訳だけで済ませず、現れと実在の関係を読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ヴィパッサナー瞑想",
+   "reading": "ゔぃぱっさなーめいそう",
+   "pos": "noun",
+   "meaning": "vipassanā (insight) meditation",
+   "defJa": "心身に生じる現象を観察して洞察を深める瞑想",
+   "passage": {
+    "ja": "座っている間にも、足の感覚や呼吸、浮かぶ考えは少しずつ変わっています。ヴィパッサナー瞑想は、そうした心身の現象を観察して洞察を深める実践として知られ、伝統や指導法によって具体的な手順には違いがあります。快い状態を長く保とうとするだけでなく、変化や反応の仕方そのものに注意を向けるところが、説明の重要な点です。現代の注意研究で取り上げられる場合も、宗教上の意味と実験で測る課題の成績を分けると、一つの実践を異なる角度から調べていることが分かります。",
+    "form": "ヴィパッサナー瞑想",
+    "en": "Even while sitting, sensations in the legs, breathing, and thoughts gradually change. Vipassana meditation is known as a practice of observing mental and bodily phenomena to develop insight, with procedures varying by tradition and instruction. Its explanation concerns attention to change and response rather than merely prolonging a pleasant state. Distinguishing religious meaning from task performance in attention research shows how the same practice can be examined from different perspectives.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「観察する」対象を心身の変化とし、手順の多様さも示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ブラフマン",
+   "reading": "ぶらふまん",
+   "pos": "noun",
+   "meaning": "Brahman, the absolute reality",
+   "defJa": "ヴェーダーンタで世界の究極の根本とされるもの",
+   "passage": {
+    "ja": "川や山や人の姿が異なっていても、その違いの根底に一つの実在を考える思想がある。不二一元論で説かれるブラフマンは、目に見える物の一つとして並べられる存在ではなく、世界の究極の根本として論じられる。したがって、巨大な人格を持つ神を想像するだけでは、個人の自己との一致を説く議論の意味に届かない。仏教の空と比べるにしても、日常の区別を問い直すという共通点から先へ進み、何を究極の実在として認めるかという相違を読むことが重要となる。",
+    "form": "ブラフマン",
+    "en": "Some philosophies posit one reality beneath the differing forms of rivers, mountains, and people. In Advaita, Brahman is discussed as the ultimate ground of the world rather than another visible object within it. Imagining merely a vast personal god therefore misses the argument identifying it with the individual’s underlying self. Comparison with Buddhist emptiness must move beyond their shared questioning of ordinary distinctions to what each accepts as ultimate reality.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「ブラフマンを究極の実在とする」。梵天という神名とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ヒンドゥー教",
+   "reading": "ひんどぅーきょう",
+   "pos": "noun",
+   "meaning": "Hinduism",
+   "defJa": "インドで育った多様な信仰や思想を含む宗教",
+   "passage": {
+    "ja": "一人の開祖と一冊の経典を探す方法では、インドの宗教の広がりを捉えきれない。ヒンドゥー教には、異なる神への信仰や多様な哲学の伝統が含まれ、祭りや家庭での祈りも地域によって姿を変える。仏教との関係を調べる際も、共通する言葉があることに加えて、その言葉が各々の教えで何を意味するかを確認する作業が欠かせない。日本の寺で見かける神々のインドでの背景をたどれば、同じ名の存在が別の宗教の中で新たな役割を与えられた歴史にも出会う。",
+    "form": "ヒンドゥー教",
+    "en": "Searching for one founder and one scripture cannot capture India’s religious breadth. Hinduism encompasses diverse devotional and philosophical traditions, with festivals and domestic worship varying by region. Comparing it with Buddhism requires examining what shared words mean within each teaching. Tracing the Indian background of deities found in Japanese temples also reveals how familiar figures acquired new roles in another religion.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「ヒンドゥー教の諸伝統」。一つの均質な教義として扱わない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "バラモン教",
+   "reading": "ばらもんきょう",
+   "pos": "noun",
+   "meaning": "Brahmanism",
+   "defJa": "ヴェーダの権威や祭式を重んじた古代インドの宗教",
+   "passage": {
+    "ja": "火を囲んで言葉を唱える儀礼は、参加する人々の願いだけでなく、世界の秩序を保つ働きとも結び付けられていました。バラモン教を理解するには、ヴェーダという聖なる文献と、祭式を担う人々の役割を合わせて見ることが大切です。古代インドでは、その権威を当然としない修行者たちも現れ、仏教やジャイナ教が育つ背景となりました。後のヒンドゥー教へ続く変化も含めて読むと、古い宗教がある日消え、別の宗教に丸ごと置き換わったという単純な年表では収まらなくなります。",
+    "form": "バラモン教",
+    "en": "Rituals around a fire were associated with sustaining cosmic order as well as participants’ wishes. Understanding Brahmanism requires considering the sacred Vedas together with the people responsible for sacrifice. Ancient India also saw renunciants who did not take that authority for granted, forming part of the setting in which Buddhism and Jainism developed. Changes leading toward later Hinduism complicate a simple timeline in which one religion suddenly replaces another.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「バラモン教の祭式」。経典の権威と儀礼の担い手を合わせて捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}
