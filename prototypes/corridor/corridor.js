@@ -22365,11 +22365,11 @@ function renderReview(main) {
     const doors = el('div', 'close-doors');
     const out = biLabel('button', 'take quiet', '今日へ', 'Back to Today');
     out.type = 'button';
-    out.addEventListener('click', () => {
+    out.addEventListener('click', () => roomTransition(() => {
       S.review = null;
       S.view = 'tray';
       render();
-    });
+    }));
     doors.append(out);
     renderReviewUndo(doors, rv);
     main.append(doors);
@@ -30728,6 +30728,10 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       button.setAttribute('aria-label', tx(`今日 · 復習 ${due}`, `Today · ${due} due`));
     }
     if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
+    // A finished sitting is still Today's current station. Its explicit return above the
+    // dock owns the exit; the active station remains visible without repeating that action.
+    if (tab.id === 'today' && S.view === 'review' && S.review
+      && S.review.ix >= S.review.queue.length) button.disabled = true;
     button.addEventListener('click', () => {
       if (personal) {
         const url = new URL(location.href);
