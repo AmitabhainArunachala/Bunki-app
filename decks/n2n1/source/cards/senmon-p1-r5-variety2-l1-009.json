@@ -1,34 +1,6 @@
 {
  "cards": [
   {
-   "term": "霊験",
-   "reading": "れいげん",
-   "pos": "noun",
-   "meaning": "miraculous efficacy",
-   "defJa": "神仏の不思議な力が現れたとされる効き目",
-   "passage": {
-    "ja": "危難を免れた旅人の話が巡礼先で語られれば、その土地へ向かう人々の期待も変わる。寺社の霊験を伝える物語は、神仏の力が助けをもたらしたという信仰を、人から人へ受け渡してきた。聞き手の願いは、旅の安全、病からの回復、家族の無事など多様である。そうした願いに応じて同じ場所の意味が重なり、参詣や寄進を支える理由になった。奇跡の事実性を示す記録としてだけ扱うより、人々が何を恐れ、どこに望みを託したかを示す資料としても、これらの伝承には価値がある。",
-    "form": "霊験",
-    "en": "A story of a traveler escaping danger, told at a pilgrimage site, changes the expectations of people heading there. Accounts of miraculous efficacy at temples and shrines have transmitted faith in divine or Buddhist assistance from person to person. Listeners' hopes range from safe travel and recovery from illness to their families' well-being. Those hopes layer meanings onto the same place and become reasons supporting visits and donations. Beyond treating them solely as evidence that miracles occurred, these traditions have value as sources for what people feared and where they placed their hopes.",
-    "register": "報",
-    "topic": "india",
-    "tipJa": "神仏の不思議な力による効き目として語られるもの。信仰の伝承にも使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-017c0d850f-61a4eade",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
-    "cardId": "nn-017c0d850f-61a4eade",
-    "wordId": "nn-017c0d850f"
-   }
-  },
-  {
    "term": "諸法無我",
    "reading": "しょほうむが",
    "pos": "noun",
@@ -54,34 +26,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-029.json",
     "cardId": "nn-abcb494194-dc375cbf",
     "wordId": "nn-abcb494194"
-   }
-  },
-  {
-   "term": "行脚",
-   "reading": "あんぎゃ",
-   "pos": "noun",
-   "meaning": "pilgrimage seeking Buddhist teachers",
-   "defJa": "仏道を学ぶため各地を巡り歩くこと",
-   "passage": {
-    "ja": "山道を越えた僧が寺の門をたたくとき、旅の目的は遠い土地を見物することだけではありません。師を求めて諸国を行脚することは、今いる場所では得られない教えや、共に修行する仲間を探す営みです。移動には時間も体力も要ります。それでも、自分の理解に疑問が生じたからこそ、直接会って問いを差し出すために歩くのです。いくつもの土地を経て結ばれる師弟の関係は、教えが一つの寺に閉じず、人の移動とともに受け継がれていく道筋にもなります。",
-    "form": "行脚",
-    "en": "When a monk crosses mountain paths and knocks at a temple gate, sightseeing is not the journey's only purpose. Traveling through the provinces in search of a teacher is a pursuit of teachings and fellow practitioners unavailable in one's current place. Travel takes time and strength. Yet it is precisely doubts about one's understanding that can prompt walking to put questions to a teacher in person. Teaching relationships formed across several regions also create routes through which teachings travel with people rather than remaining confined to one temple.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "「諸国を行脚する」。師や教えを求めて各地を巡り歩く。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-2ce990bb42-64e39e47",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
-    "cardId": "nn-2ce990bb42-64e39e47",
-    "wordId": "nn-2ce990bb42"
    }
   },
   {
@@ -138,34 +82,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
     "cardId": "nn-bdf7aa72af-1288d798",
     "wordId": "nn-bdf7aa72af"
-   }
-  },
-  {
-   "term": "離欲",
-   "reading": "りよく",
-   "pos": "noun",
-   "meaning": "dispassion, freedom from desire (vairāgya)",
-   "defJa": "欲望や対象への執着から離れること",
-   "passage": {
-    "ja": "好きな音楽が終わったとき、もう一度聴きたい気持ちが起きても、それにすぐ従う必要はありません。仏教で離欲を目指すとは、快い感覚を持つ能力を消すというより、その対象を手放せず追い続ける執着から離れる方向を指します。音が止まったという出来事と、止まってほしくないという反応を分けると、何に心が引かれているかが明確になります。心地よさが戻るまで落ち着けない状態を当然とせず、欲する気持ちが移り変わる様子を観察することにも、実践の入口があります。",
-    "form": "離欲",
-    "en": "When favorite music ends, wanting to hear it again does not require immediately acting on that desire. In Buddhism, aiming for dispassion points toward release from compulsively pursuing an object, rather than removing the capacity for pleasant sensation. Distinguishing the sound ending from the reaction of not wanting it to end clarifies what attracts the mind. Observing how desire changes, instead of accepting inability to settle until pleasure returns as inevitable, can provide an entry into practice.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "対象を欲して追い続ける執着から離れる意味で、感覚を失うことではない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-3b3c10b161-3bb1eb76",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
-    "cardId": "nn-3b3c10b161-3bb1eb76",
-    "wordId": "nn-3b3c10b161"
    }
   },
   {

@@ -57,34 +57,6 @@
    }
   },
   {
-   "term": "欺瞞",
-   "reading": "ぎまん",
-   "pos": "noun",
-   "meaning": "deception",
-   "defJa": "相手に事実と異なる理解をさせるように欺くこと",
-   "passage": {
-    "ja": "都合の悪い試験結果を隠し、成功した例だけを投資家へ示せば、表に載った数字が正しくても全体像はゆがむ。欺瞞は、虚偽の一文を述べる行為に限らず、事実の選び方や伏せ方によって相手を誤った理解へ誘う場合にも成り立つ。ただの説明不足か、意図的に誤解させたのかを判断するには、何を知りながら省いたのかが問われる。聞き手が誤認すると分かっていた条件を伏せたまま、「嘘は一つも言っていない」と弁明しても、誠実さを取り戻すことは難しい。",
-    "form": "欺瞞",
-    "en": "Hiding unfavorable test results while showing investors only successful examples distorts the overall picture even when the reported numbers are accurate. Deception can involve selecting or withholding facts to mislead, rather than only stating a false sentence. Distinguishing inadequate explanation from intentional deception requires examining what was knowingly omitted. If conditions were withheld despite knowing listeners would misunderstand, insisting that no lies were told does little to restore credibility.",
-    "register": "論",
-    "topic": "ai",
-    "tipJa": "虚偽だけでなく、相手を誤認へ誘う情報の隠し方にも使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-c03dd05187-d8061609",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
-    "cardId": "nn-c03dd05187-d8061609",
-    "wordId": "nn-c03dd05187"
-   }
-  },
-  {
    "term": "最適解",
    "reading": "さいてきかい",
    "pos": "noun",
@@ -113,34 +85,6 @@
    }
   },
   {
-   "term": "文脈内学習",
-   "reading": "ぶんみゃくないがくしゅう",
-   "pos": "noun",
-   "meaning": "in-context learning",
-   "defJa": "入力中の例や説明を手掛かりに課題へ対応すること",
-   "passage": {
-    "ja": "入力欄に「大きい→小さい」「長い→短い」と並べ、その後に「明るい→」だけを置く場面を想像してください。言語モデルが例の関係を手掛かりに続きを答えるような働きが、文脈内学習の一例です。この場合、入力中の例を利用しているのであって、その応答のためにモデルの重みを更新しているとは限りません。似た例を足しただけで答えが改善することもある一方で、例の選び方や順番に左右されることもあり、短い入力が課題の条件を大きく変えます。",
-    "form": "文脈内学習",
-    "en": "Imagine entering “large → small” and “long → short,” followed only by “bright →”. A language model using the relationship in those examples to provide the continuation illustrates in-context learning. It is using examples in the input, without necessarily updating its model weights for that response. Adding similar examples can improve an answer, while example selection and ordering can also affect it, giving a short input considerable influence over the task's conditions.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "入力中の例を利用する働きで、重みを更新する訓練とは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-593530a7d0-700f5948",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
-    "cardId": "nn-593530a7d0-700f5948",
-    "wordId": "nn-593530a7d0"
-   }
-  },
-  {
    "term": "巨大IT企業",
    "reading": "きょだいあいてぃーきぎょう",
    "pos": "noun",
@@ -166,34 +110,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
     "cardId": "nn-734f254221-0e409518",
     "wordId": "nn-734f254221"
-   }
-  },
-  {
-   "term": "技術革新",
-   "reading": "ぎじゅつかくしん",
-   "pos": "noun",
-   "meaning": "technological innovation",
-   "defJa": "新しい技術によって生産や利用の仕方が変わること",
-   "passage": {
-    "ja": "道具だけ新しくしても、工場の仕事は意外と変わらないんだよね。技術革新が生産の仕方まで変えるには、機械を置く場所や人の役割、注文の受け方も組み直す必要があるんだ。例えば、部品を速く作れるようになったのに検査が追いつかなければ、完成品は増えずに途中の在庫ばかり積み上がる。せっかく高い設備を入れたからには、それを動かす担当者だけでなく、前後の工程を受け持つ人も一緒に流れを変えないと、期待した効果は出にくいよ。",
-    "form": "技術革新",
-    "en": "New tools alone often change surprisingly little about factory work. For technological innovation to transform production, machine placement, people's roles, and how orders are handled also need reorganizing. If parts can be made faster but inspection cannot keep up, unfinished inventory piles up without an increase in completed products. After investing in expensive equipment, the people handling preceding and subsequent processes need to change the workflow together with its operators for the expected benefits to emerge.",
-    "register": "話",
-    "topic": "ai",
-    "tipJa": "新技術の導入に伴い、生産や利用の仕組みも変わること。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-6f817dd058-3edc1df7",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
-    "cardId": "nn-6f817dd058-3edc1df7",
-    "wordId": "nn-6f817dd058"
    }
   }
  ]

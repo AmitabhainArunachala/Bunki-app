@@ -29,62 +29,6 @@
    }
   },
   {
-   "term": "悲観論",
-   "reading": "ひかんろん",
-   "pos": "noun",
-   "meaning": "a pessimistic outlook",
-   "defJa": "将来を悪い方向へ進むと見る考え",
-   "passage": {
-    "ja": "ある工場への注文が急に減ったとき、担当者の一人は、この産業全体が衰退へ向かうと判断しました。別の担当者は、顧客が抱えていた在庫を減らしている途中にすぎないと見ています。前者のような悲観論を検討するには、最悪の結果を想像するだけでなく、その結果へ至る条件が実際に続いているかを確かめる必要があります。もし別の用途から注文が増え始めたなら、初めの見通しに反して状況が変わった可能性も含め、判断の根拠を組み直すことになります。",
-    "form": "悲観論",
-    "en": "When orders to a factory suddenly fell, one manager concluded that the entire industry was heading into decline. Another saw it as nothing more than customers working down their inventories. Examining a pessimistic outlook such as the first requires more than imagining the worst outcome, since the conditions leading to it must actually persist. If orders from another application begin growing, the basis of the judgment must be reconstructed to allow for conditions changing contrary to the initial outlook.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "将来が悪化するとみる立場であり、慎重さ一般とは異なる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-6053cca230-c355360d",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
-    "cardId": "nn-6053cca230-c355360d",
-    "wordId": "nn-6053cca230"
-   }
-  },
-  {
-   "term": "広帯域メモリ",
-   "reading": "こうたいいきめもり",
-   "pos": "noun",
-   "meaning": "high-bandwidth memory",
-   "defJa": "積層構造などで高速な情報転送を図る記憶装置",
-   "passage": {
-    "ja": "計算する装置だけを速くしても、必要なデータが届かなければ待ち時間が増えます。広帯域メモリは、記憶用のチップを積み重ね、多くの接続を使うことで、大量の情報をやり取りできるようにしたものです。倉庫を大きくするのが容量の増加だとすれば、荷物を出し入れする道を広げることが転送の速さに対応します。ただし、積み重ねれば熱や製造の難しさも伴うため、計算側との接続に至るまで一体として設計する必要があります。",
-    "form": "広帯域メモリ",
-    "en": "Speeding up only the computing device increases waiting time if the data it needs cannot arrive. High-bandwidth memory stacks memory chips and uses many connections to exchange large amounts of information. If increasing capacity is like enlarging a warehouse, widening the routes for moving goods in and out corresponds to transfer speed. Stacking also brings heat and manufacturing challenges, however, so the design must integrate everything through the connections with the computing side.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "容量ではなく、主に情報を大量に転送できる構造へ注目する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-cec3f949f8-f1aba2d8",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
-    "cardId": "nn-cec3f949f8-f1aba2d8",
-    "wordId": "nn-cec3f949f8"
-   }
-  },
-  {
    "term": "技術覇権",
    "reading": "ぎじゅつはけん",
    "pos": "noun",
@@ -110,62 +54,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021-r.json",
     "cardId": "nn-bfa93b3789-a6c1a19e",
     "wordId": "nn-bfa93b3789"
-   }
-  },
-  {
-   "term": "屋台骨",
-   "reading": "やたいぼね",
-   "pos": "noun",
-   "meaning": "a central support or backbone",
-   "defJa": "組織や事業を根本で支えるもの",
-   "passage": {
-    "ja": "新製品の発表会が華やかでも、会社の毎月の支払いを支えているのは昔からの保守契約、という場合があります。その事業が収益の屋台骨を支えているなら、売上の伸びが小さいからといって、役割まで小さいとは言えません。契約を維持する技術者や、顧客の設備を知り尽くした担当者が去れば、目立たなかった弱点が一気に表面へ出ます。事業を学ぶ際には、新しさだけで順位を付けず、ほかの挑戦が失敗しても組織を立たせておける収入源に注目すると、違う輪郭が見えてきます。",
-    "form": "屋台骨",
-    "en": "Even when a new-product launch is glamorous, longstanding maintenance contracts may fund the company’s monthly payments. If that business forms the backbone of earnings, low sales growth alone does not make its role small. Departures of engineers who maintain contracts or staff intimately familiar with customers’ equipment can suddenly expose hidden weaknesses. Studying which income sources keep an organization standing even when other ventures fail, instead of ranking businesses solely by novelty, reveals a different outline.",
-    "register": "学",
-    "topic": "ai",
-    "tipJa": "「収益の屋台骨を支える」のように、存立の土台を比喩的に表す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-1ccc6a0eb9-df0e6e7b",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
-    "cardId": "nn-1ccc6a0eb9-df0e6e7b",
-    "wordId": "nn-1ccc6a0eb9"
-   }
-  },
-  {
-   "term": "営業キャッシュフロー",
-   "reading": "えいぎょうきゃっしゅふろー",
-   "pos": "noun",
-   "meaning": "cash flow from operating activities",
-   "defJa": "本業の取引によって出入りした現金の差額",
-   "passage": {
-    "ja": "売上が増えたのに、仕入れ先へ払うお金が足りない会社を想像してください。商品を引き渡しても代金の回収が先なら、帳簿の利益と手元の現金は一致せず、営業キャッシュフローが悪化することもあります。注文に応えて在庫を積み増す間にも、仕入れや人件費の支払いは続きます。黒字という結果に安心する前に、本業から入る現金と出ていく現金の時期を合わせて捉えると、成長している会社が資金繰りに苦しむ理由が分かります。",
-    "form": "営業キャッシュフロー",
-    "en": "Imagine a company whose sales rise but that lacks money to pay its suppliers. If payment will be collected later even after goods are delivered, accounting profit and cash on hand diverge, and operating cash flow can worsen. Payments for supplies and labor continue while the company builds inventory to meet orders. Understanding the timing of cash entering and leaving the core business before taking comfort in a profit explains why a growing company can struggle to fund its operations.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "本業による現金の出入りを表し、帳簿上の利益と区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-3066501f28-19c47269",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
-    "cardId": "nn-3066501f28-19c47269",
-    "wordId": "nn-3066501f28"
    }
   }
  ]

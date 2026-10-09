@@ -29,34 +29,6 @@
    }
   },
   {
-   "term": "演繹",
-   "reading": "えんえき",
-   "pos": "noun",
-   "meaning": "deduction",
-   "defJa": "一般的な前提から個別の結論を導くこと",
-   "passage": {
-    "ja": "「この箱の部品はすべて検査済みで、このねじはその箱から取った」という前提なら、そのねじも検査済みだという結論が出ます。こうして一般的な条件から個別の結論を導く演繹では、推論の筋と前提の確かさを分けて捉えられます。誰かが未検査のねじを箱へ戻したとしたら、最初の前提が崩れるため、同じ結論を保証できません。「筋が通っている」という評価は、出発点まで現実と一致しているという意味ではなく、前提から結論へのつながりについての評価です。",
-    "form": "演繹",
-    "en": "Given the premises that every part in this box has been inspected and this screw came from the box, the conclusion is that the screw has also been inspected. Deduction, which derives particular conclusions from general conditions, allows the logic of inference to be distinguished from the reliability of the premises. If someone returned an uninspected screw to the box, the initial premise would fail and the same conclusion could not be guaranteed. Calling an argument logically sound in its progression evaluates the link from premises to conclusion rather than asserting that its starting point matches reality.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "一般的な前提から結論を導く推論で、前提の真偽とは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-b433ef562e-3d530a6f",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
-    "cardId": "nn-b433ef562e-3d530a6f",
-    "wordId": "nn-b433ef562e"
-   }
-  },
-  {
    "term": "法整備",
    "reading": "ほうせいび",
    "pos": "noun",

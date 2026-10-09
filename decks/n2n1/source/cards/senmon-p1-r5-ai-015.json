@@ -65,6 +65,28 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "創発",
+   "reading": "そうはつ",
+   "pos": "noun",
+   "meaning": "emergence",
+   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
+   "passage": {
+    "ja": "今日は、人工知能の規模を増やしたときに能力が急に現れたように見えるグラフを考えます。このような変化を創発と呼ぶ議論がありますが、まず採点の仕方を調べましょう。完全な正解だけを一点と数えると、少しずつ改善していた途中の変化が、得点に出ない場合があります。別の尺度で測れば滑らかな伸びが見えることもあるので、急な上昇だけから内部に新しい仕組みが生まれたと断定はできません。同じ回答を二つの方法で採点し、グラフの形がどれだけ変わるかを比べてみましょう。",
+    "form": "創発",
+    "en": "Today we will examine a graph in which an ability seems to appear suddenly as an AI system grows. Such changes are discussed as emergence, but first inspect the scoring method. Awarding a point only for a completely correct answer can conceal gradual improvements along the way. Another measure may reveal smooth progress, so a sharp rise alone does not establish that a new internal mechanism appeared. Score the same answers in two ways and compare the resulting graph shapes.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "急な変化が本物か、測り方による見え方かを確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

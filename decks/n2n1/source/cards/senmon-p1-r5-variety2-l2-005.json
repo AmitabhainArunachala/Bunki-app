@@ -29,34 +29,6 @@
    }
   },
   {
-   "term": "瞑想経験者",
-   "reading": "めいそうけいけんしゃ",
-   "pos": "noun",
-   "meaning": "experienced meditator",
-   "defJa": "瞑想を行った経験を持つ人",
-   "passage": {
-    "ja": "瞑想経験者を一つの集団にまとめても、毎朝十分坐る人と長い合宿に参加した人では、実践の内容が違います。脳や注意の働きを調べる研究では、経験年数に加えて方法や頻度を確かめることが、集団を比べる前提になります。経験のない人との違いがあったとしても、それが練習を始める前からの特徴かどうかは別に検討しなければなりません。同じ人を時間を追って調べる設計なら変化を捉えやすくなりますが、比較する条件を整える仕事はなお残ります。",
-    "form": "瞑想経験者",
-    "en": "Grouping meditation practitioners together still combines different practices, such as ten minutes each morning and participation in long retreats. Research on brain function or attention requires checking methods and frequency along with years of experience before comparing groups. Even if practitioners differ from nonpractitioners, whether that difference predates practice needs separate investigation. Following the same people over time makes change easier to detect, but work remains to align the comparison conditions.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "瞑想した経験を持つ人で、経験量や方法まで一様とは限らない。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-d1be9b3cb2-9e906c6e",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-006.json",
-    "cardId": "nn-d1be9b3cb2-9e906c6e",
-    "wordId": "nn-d1be9b3cb2"
-   }
-  },
-  {
    "term": "無自性",
    "reading": "むじしょう",
    "pos": "noun",
@@ -82,118 +54,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
     "cardId": "nn-1660c24079-0ad333df",
     "wordId": "nn-1660c24079"
-   }
-  },
-  {
-   "term": "空即是色",
-   "reading": "くうそくぜしき",
-   "pos": "noun",
-   "meaning": "emptiness is form",
-   "defJa": "固定的実体がないことと現象が別物でないこと",
-   "passage": {
-    "ja": "花を生かしている水や土、光をすべて取り去って、花だけを残すことはできません。般若心経の空即是色は、独立した実体がないというあり方と、現にある形を別世界に分けない表現です。何もない場所から突然花が飛び出す、という意味ではありません。条件の中で咲く花を消してから別の真理へ進むのではなく、その花のあり方自体が問題になります。目の前の現象に加えて、さらに奥に空という物が隠れていると考えると、教えが退ける固定的な実体をもう一つ作ってしまいます。",
-    "form": "空即是色",
-    "en": "A flower cannot be left intact after all the water, soil, and light sustaining it are taken away. The Heart Sutra's “emptiness is form” does not place the absence of independent essence and existing forms in separate worlds. It does not mean a flower suddenly springs from an empty place. The issue is the very way the flower exists within conditions, rather than erasing it before proceeding to another truth. Imagining an additional thing called emptiness hidden behind phenomena creates another fixed essence of the kind the teaching rejects.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "空を現象と別の存在にせず、同じもののあり方として捉える表現。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-0f3a2735ee-df2e3dba",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
-    "cardId": "nn-0f3a2735ee-df2e3dba",
-    "wordId": "nn-0f3a2735ee"
-   }
-  },
-  {
-   "term": "梵天",
-   "reading": "ぼんてん",
-   "pos": "noun",
-   "meaning": "Brahma as a Buddhist deity",
-   "defJa": "インドの神に由来する仏教の守護神の一つ",
-   "passage": {
-    "ja": "東寺の講堂では、中央の仏たちを守るように神々の像が配されています。梵天もその一つで、インドのブラフマーに由来し、仏教では教えを守る神として位置付けられます。もとの宗教で知られた名前であっても、別の宗教の中では他の尊像との関係が変わります。仏像が並ぶ場に神の姿もあるのは、仏教が広がる過程で多様な存在を取り込んできたためです。像の配置には、ただ彫刻を美しく見せるだけでなく、それぞれの役割によって仏の世界を形にする意図があります。",
-    "form": "梵天",
-    "en": "In Toji's lecture hall, divine figures are arranged as though protecting the central Buddhas. Brahma is one of them, derived from the Indian deity and positioned in Buddhism as a protector of the teaching. Even a name familiar from its original religion can stand in different relationships to other sacred figures within another tradition. Gods appear alongside Buddhist images because Buddhism incorporated diverse beings as it spread. The arrangement seeks to give form to the Buddhist world through each figure's role, as well as displaying sculpture beautifully.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "インド由来の神で、仏教では教えを守る役割を持つ。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-105610172d-cbd05045",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-020.json",
-    "cardId": "nn-105610172d-cbd05045",
-    "wordId": "nn-105610172d"
-   }
-  },
-  {
-   "term": "無の境地",
-   "reading": "むのきょうち",
-   "pos": "noun",
-   "meaning": "a state free from distracting attachment",
-   "defJa": "雑念や執着から離れたとされる心の状態",
-   "passage": {
-    "ja": "坐っている間に考えが少なくなった人が、それを無の境地と感じることがあります。ただ、雑念や執着から離れた心を指すこの表現は、脳の活動が停止したという測定結果ではありません。静かな体験の後にも、音を聞き、姿勢を保つ働きは続いています。仏教の修行を学ぶ場合、何も考えなかったという感想と、教義上の悟りを得たという判断を同一にすると、実践の目的を取り違えかねません。体験の印象だけに頼らず、そこから日々の行動がどう変わるかも大切な問いです。",
-    "form": "無の境地",
-    "en": "Someone whose thoughts diminish while sitting may experience it as a state of emptiness. Yet this expression for a mind free of distracting thoughts or attachment is not a measurement showing that brain activity has stopped. Hearing sounds and maintaining posture continue even after a quiet experience. In studying Buddhist practice, equating a feeling of having no thoughts with a doctrinal judgment of awakening risks misunderstanding the aim of practice. Beyond the impression of the experience itself, how daily behavior changes is also an important question.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "雑念や執着から離れた心を表す言葉で、意識消失とは区別する。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-7ccc86a7e7-4348dfe7",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
-    "cardId": "nn-7ccc86a7e7-4348dfe7",
-    "wordId": "nn-7ccc86a7e7"
-   }
-  },
-  {
-   "term": "安心立命",
-   "reading": "あんしんりつめい",
-   "pos": "noun",
-   "meaning": "spiritual peace and resignation to fate",
-   "defJa": "心を落ち着かせて揺るがない生き方の拠り所を得ること",
-   "passage": {
-    "ja": "安心立命を求めて禅の門をたたく人にとって、願いは単に今夜ぐっすり眠ることだけではありません。身近な人を失い、仕事も思いどおりにならない中で、それでも何を頼りに生きるかという問いがあります。出来事をすべて自分の都合に合わせることはできなくても、向き合う立場が定まれば、困難の意味も変わります。心が落ち着くことと、世の中から問題がなくなることは別です。揺れる暮らしの中に生き方の拠り所を得るという、この言葉の重みはそこにあります。",
-    "form": "安心立命",
-    "en": "For someone entering Zen in search of settled peace and a firm basis for life, the wish is more than simply sleeping well tonight. Amid bereavement and work that refuses to go as planned, there is the question of what to rely on in living. Even without making every event suit one's wishes, establishing a stance toward events changes what difficulties mean. A settled mind and a world without problems are different things. The expression's weight lies in finding a basis for living within an unsettled life.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "心を落ち着かせ、生き方の揺るがない拠り所を得ること。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-55168eea5d-6b971c30",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
-    "cardId": "nn-55168eea5d-6b971c30",
-    "wordId": "nn-55168eea5d"
    }
   },
   {
@@ -225,34 +85,6 @@
    }
   },
   {
-   "term": "神仏習合",
-   "reading": "しんぶつしゅうごう",
-   "pos": "noun",
-   "meaning": "interweaving of kami and Buddhist traditions",
-   "defJa": "日本の神への信仰と仏教が結び付くこと",
-   "passage": {
-    "ja": "日本の神に仏教の名が添えられ、寺を守る存在として祀られることがあります。神仏習合の歴史では、神への信仰と仏教が、儀礼や建物、教義を通じてさまざまに結び付きました。八幡神が仏教と深く関わってきたことも、その一例です。別々の宗教がそのまま横に並ぶだけでなく、神を仏の現れとする考え方も育ちました。時代や土地によって結び付きの形は異なるものの、寺と神社を完全に別の世界とみなすだけでは捉えきれない信仰の暮らしがあったのです。",
-    "form": "神仏習合",
-    "en": "Japanese deities are sometimes given Buddhist names and worshiped as temple protectors. In the history of Shinto-Buddhist syncretism, indigenous divine worship and Buddhism became linked in diverse ways through rituals, buildings, and doctrine. Hachiman's deep ties with Buddhism are one example. The traditions did not merely stand side by side, as ideas of gods as manifestations of Buddhas also developed. Although forms of connection varied across time and place, religious life existed that cannot be captured by treating temples and shrines as entirely separate worlds.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "神への信仰と仏教が、教義や儀礼などで結び付く歴史的なあり方。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-83d486716f-b716c467",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
-    "cardId": "nn-83d486716f-b716c467",
-    "wordId": "nn-83d486716f"
-   }
-  },
-  {
    "term": "法話",
    "reading": "ほうわ",
    "pos": "noun",
@@ -278,62 +110,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-004-r.json",
     "cardId": "nn-19a1f0c1f4-c7e8aaf6",
     "wordId": "nn-19a1f0c1f4"
-   }
-  },
-  {
-   "term": "密教",
-   "reading": "みっきょう",
-   "pos": "noun",
-   "meaning": "esoteric Buddhism",
-   "defJa": "儀礼や師からの伝授を重んじる仏教の教え",
-   "passage": {
-    "ja": "手で印を結び、口で真言を唱え、心を仏へ向ける実践では、体と言葉と心が一緒に働きます。密教はこうした実践や師からの伝授を重んじ、日本では真言宗や天台宗の歴史に深く関わっています。儀礼の手順を外から眺めただけでは、その意味を十分にはつかめません。師に学ぶ過程を通して、動作がどの教えと結び付くかを身に付けていくからです。曼荼羅に描かれた多くの仏も、単なる飾りとしてではなく、修行や仏の世界を表す教義の中で位置を与えられています。",
-    "form": "密教",
-    "en": "In practices involving hand gestures, spoken mantras, and directing the mind toward a Buddha, body, speech, and mind work together. Esoteric Buddhism values these practices and transmission from a teacher and is closely tied to the history of Shingon and Tendai in Japan. Merely watching ritual procedures from outside does not fully reveal their meaning. Studying with a teacher develops an understanding of which teaching each action connects to. The many Buddhas pictured in mandalas likewise have places within practice and teachings depicting the Buddhist world, beyond decoration.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "師からの伝授と、体・言葉・心を結び付ける実践を重んじる教え。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-8d4df6f214-fe89f6b2",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
-    "cardId": "nn-8d4df6f214-fe89f6b2",
-    "wordId": "nn-8d4df6f214"
-   }
-  },
-  {
-   "term": "日蓮",
-   "reading": "にちれん",
-   "pos": "noun",
-   "meaning": "Nichiren",
-   "defJa": "法華経を重んじ題目を唱える実践を説いた鎌倉時代の僧",
-   "passage": {
-    "ja": "日蓮が生きた鎌倉の時代には、地震や飢饉、疫病が人々の暮らしを脅かしていたんだ。法華経を重んじたこの僧は、題目を唱える実践を説くとともに、社会の安穏を宗教上の重要な問題と考えた。『立正安国論』では、客と主人の対話を通じて、国の苦難と信仰のあり方を結び付けているよ。災害が起きる仕組みを現代の科学で調べることとは、問いの立て方が違う。自分一人の救いにとどまらず、人々が暮らす社会全体へ教えを向けようとした姿勢が、ここにはあるんだね。",
-    "form": "日蓮",
-    "en": "Earthquakes, famine, and epidemics threatened people's lives in Kamakura during Nichiren's lifetime. This monk, who valued the Lotus Sutra, taught the chanting of its title and regarded social peace as a significant religious concern. In Rissho Ankoku Ron, a dialogue between a guest and host connects the country's hardships with the character of its faith. The questions differ from modern scientific investigation of how disasters occur. Here is an effort to direct the teaching toward the whole society people inhabit, beyond personal salvation alone.",
-    "register": "話",
-    "topic": "india",
-    "tipJa": "法華経を重んじ、題目の実践と社会への働きかけを行った鎌倉時代の僧。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-7ac742ba51-f8f1898c",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-018.json",
-    "cardId": "nn-7ac742ba51-f8f1898c",
-    "wordId": "nn-7ac742ba51"
    }
   }
  ]

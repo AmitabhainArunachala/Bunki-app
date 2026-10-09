@@ -1,0 +1,183 @@
+{
+ "batch": "r5-variety2-gate-001",
+ "items": [
+  {
+   "term": "広帯域メモリ",
+   "reading": "こうたいいきめもり",
+   "gloss": "high-bandwidth memory",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-cec3f949f8-f1aba2d8",
+    "wordId": "nn-cec3f949f8"
+   }
+  },
+  {
+   "term": "無為自然",
+   "reading": "むいしぜん",
+   "gloss": "non-forcing and naturalness",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023-r.json",
+    "cardId": "nn-91de4928d8-1d879303",
+    "wordId": "nn-91de4928d8"
+   }
+  },
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "gloss": "backpropagation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031-r.json",
+    "cardId": "nn-bc45f91770-e83c05cb",
+    "wordId": "nn-bc45f91770"
+   }
+  },
+  {
+   "term": "学習データ",
+   "reading": "がくしゅうでーた",
+   "gloss": "training data",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-483cb9c58f-4b0fc1ac",
+    "wordId": "nn-483cb9c58f"
+   }
+  },
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "gloss": "provability",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-c2871109c9-6e2c9db2",
+    "wordId": "nn-c2871109c9"
+   }
+  },
+  {
+   "term": "個我",
+   "reading": "こが",
+   "gloss": "individual self (jīva)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011.json",
+    "cardId": "nn-8396c1e0b9-3ee69a31",
+    "wordId": "nn-8396c1e0b9"
+   }
+  },
+  {
+   "term": "離欲",
+   "reading": "りよく",
+   "gloss": "dispassion, freedom from desire (vairāgya)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-3b3c10b161-3bb1eb76",
+    "wordId": "nn-3b3c10b161"
+   }
+  },
+  {
+   "term": "注意機構",
+   "reading": "ちゅういきこう",
+   "gloss": "an attention mechanism",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-01278539f0-c99f3a28",
+    "wordId": "nn-01278539f0"
+   }
+  }
+ ],
+ "reviewOf": {
+  "広帯域メモリ": {
+   "source": "cards/senmon-p1-r5-variety2-l3-002.json",
+   "cardId": "nn-cec3f949f8-f1aba2d8",
+   "batch": "r5-variety2-l3-002",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 2, register 学). It receives its one editorial rewrite with a different structure."
+  },
+  "無為自然": {
+   "source": "cards/senmon-p1-r5-variety2-l1-007.json",
+   "cardId": "nn-91de4928d8-1d879303",
+   "batch": "r5-variety2-l1-007",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-023-r.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "誤差逆伝播法": {
+   "source": "cards/senmon-p1-r5-variety2-l3-004.json",
+   "cardId": "nn-bc45f91770-e83c05cb",
+   "batch": "r5-variety2-l3-004",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-031-r.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "学習データ": {
+   "source": "cards/senmon-p1-r5-variety2-l1-002.json",
+   "cardId": "nn-483cb9c58f-4b0fc1ac",
+   "batch": "r5-variety2-l1-002",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "証明可能性": {
+   "source": "cards/senmon-p1-r5-variety2-l3-004.json",
+   "cardId": "nn-c2871109c9-6e2c9db2",
+   "batch": "r5-variety2-l3-004",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 3, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "個我": {
+   "source": "cards/senmon-p1-r5-variety2-l3-005.json",
+   "cardId": "nn-8396c1e0b9-3ee69a31",
+   "batch": "r5-variety2-l3-005",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-011.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: Previous English mistranslated 「昨日の失敗を思い出している人」 as \"the person who failed yesterday\". Keep the English exactly faithful."
+  },
+  "離欲": {
+   "source": "cards/senmon-p1-r5-variety2-l1-009.json",
+   "cardId": "nn-3b3c10b161-3bb1eb76",
+   "batch": "r5-variety2-l1-009",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 2, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "注意機構": {
+   "source": "cards/senmon-p1-r5-variety2-l2-003.json",
+   "cardId": "nn-01278539f0-c99f3a28",
+   "batch": "r5-variety2-l2-003",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 3, longest sentence 5, register 講). It receives its one editorial rewrite with a different structure."
+  }
+ }
+}

@@ -113,34 +113,6 @@
    }
   },
   {
-   "term": "虚空",
-   "reading": "こくう",
-   "pos": "noun",
-   "meaning": "empty space, the void",
-   "defJa": "何もなく、ただ広がりだけがある空間のこと",
-   "passage": {
-    "ja": "雲が空を覆っても、空そのものまで狭くなったと考える必要はありません。仏教では、何ものにも妨げられない広がりを示す虚空が、心や教えのあり方を捉える譬えに用いられます。瞑想中に怒りや不安が現れたとしても、それを心の全体と決めつけず、現れては変わるものとして眺める余地があります。ただし、このような譬えは心の働きに向き合うためのものであり、頭の中に物理的な空間が広がっていると測定した話とは区別されます。",
-    "form": "虚空",
-    "en": "Clouds covering the sky need not imply that the sky itself has grown smaller. In Buddhism, empty space with an unobstructed expanse serves as a metaphor for aspects of mind and teaching. Even when anger or anxiety appears during meditation, it can be viewed as something arising and changing rather than the entirety of the mind. Such a metaphor concerns how to engage with mental activity and must be distinguished from a measurement of physical space inside the head.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "妨げのない広がりを持つ空間で、仏教では譬えにも使われる。",
-    "sense": "仏教で、ものを包み込む広大な空を指す語"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-dbf1a5d7a7-9fcb64e5",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-002.json",
-    "cardId": "nn-dbf1a5d7a7-9fcb64e5",
-    "wordId": "nn-dbf1a5d7a7"
-   }
-  },
-  {
    "term": "隠元",
    "reading": "いんげん",
    "pos": "noun",
@@ -197,34 +169,6 @@
    }
   },
   {
-   "term": "草木国土悉皆成仏",
-   "reading": "そうもくこくどしっかいじょうぶつ",
-   "pos": "noun",
-   "meaning": "all plants and lands attain buddhahood",
-   "defJa": "草木や大地まで仏となるとする教え",
-   "passage": {
-    "ja": "山の木をただ建材として眺める人と、仏の世界に関わる存在として向き合う人では、同じ森の意味が変わります。草木国土悉皆成仏という日本仏教の表現は、人間に限らず草木や大地にまで成仏の範囲を広げます。これは植物に人間と同じ意識があると測定した結果ではなく、仏となることと自然のあり方をめぐる宗教的な問いです。人間の救いだけを自然から切り離して考える姿勢に対し、生きる場所そのものを含んだ世界を示すところに、この言葉の大胆さがあります。",
-    "form": "草木国土悉皆成仏",
-    "en": "The same forest means different things to someone seeing its trees only as building materials and someone approaching them as participants in the Buddha’s world. The Japanese Buddhist expression that all plants and lands attain buddhahood extends its scope beyond humans to vegetation and the earth. This is a religious inquiry into buddhahood and nature, rather than a measurement establishing that plants have humanlike consciousness. The expression’s boldness lies in presenting a world including the very place of life, challenging the separation of human salvation from nature.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "成仏の範囲を草木や大地へ広げる、日本仏教の表現。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-ab46e85ba1-f846096a",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
-    "cardId": "nn-ab46e85ba1-f846096a",
-    "wordId": "nn-ab46e85ba1"
-   }
-  },
-  {
    "term": "見性",
    "reading": "けんしょう",
    "pos": "noun",
@@ -250,62 +194,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
     "cardId": "nn-eeebb89a7d-b8d608c6",
     "wordId": "nn-eeebb89a7d"
-   }
-  },
-  {
-   "term": "鈴木大拙",
-   "reading": "すずきだいせつ",
-   "pos": "noun",
-   "meaning": "Daisetz Suzuki",
-   "defJa": "禅などの仏教思想を海外にも紹介した思想家",
-   "passage": {
-    "ja": "鎌倉の円覚寺で禅を学んだ青年が、海を渡ってアメリカの出版社で働き、仏教を英語で伝える仕事へ進みました。鈴木大拙は、その後も著作や講義を通じて、禅をはじめとする思想を広く海外へ紹介した人物です。異なる文化の間を行き来する仕事では、同じ語を置き換えるだけでなく、相手が何を疑問に思うかに応じて入口を作る必要が生じます。彼の活動は、教えが国境を越える際に、受け継いだ伝統と新しい聞き手との出会いから、別の理解の場が生まれることを示しています。",
-    "form": "鈴木大拙",
-    "en": "A young man who studied Zen at Engakuji in Kamakura crossed the ocean to work for an American publisher and began conveying Buddhism in English. Daisetz Suzuki subsequently introduced Zen and other traditions widely abroad through books and lectures. Work between cultures requires not merely substituting words but creating points of entry according to the audience’s questions. His activities show how teachings crossing borders create new settings for understanding through encounters between inherited traditions and new audiences.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "禅などの仏教思想を英語の著作や講義でも海外に紹介した人物。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-46496c3379-27c95ba5",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
-    "cardId": "nn-46496c3379-27c95ba5",
-    "wordId": "nn-46496c3379"
-   }
-  },
-  {
-   "term": "臨済宗",
-   "reading": "りんざいしゅう",
-   "pos": "noun",
-   "meaning": "the Rinzai school of Zen",
-   "defJa": "中国の臨済義玄の系統を引く禅の宗派",
-   "passage": {
-    "ja": "禅の道場で問いを与えられた修行者が、知識を並べて答えたのに認められないことがあります。中国の臨済義玄の系統を引く臨済宗では、公案に取り組み、師の指導を受けながら自己を究める修行が重視されてきました。問いは正解の文句を暗記する試験というより、いつもの分別に頼る自分のあり方を揺さぶる働きを持ちます。日本での展開には白隠らによる工夫もあり、一つの体験を得たらすべて終わりとするのでなく、その後の実践を含む修行の道が伝えられています。",
-    "form": "臨済宗",
-    "en": "A practitioner given a question in a Zen training hall may offer a knowledgeable answer and still find it unaccepted. Rinzai Zen, descended from the lineage of Linji Yixuan in China, has emphasized investigating the self through koans under a teacher’s guidance. Such questions act less as tests of memorized answers than as challenges to one’s reliance on habitual discriminations. The Japanese tradition includes developments by Hakuin and others, transmitting a path of practice that continues after an initial experience rather than ending there.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "中国の臨済義玄につながる禅の宗派で、公案の修行を重んじる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-63dca114c0-83a3fb84",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
-    "cardId": "nn-63dca114c0-83a3fb84",
-    "wordId": "nn-63dca114c0"
    }
   }
  ]

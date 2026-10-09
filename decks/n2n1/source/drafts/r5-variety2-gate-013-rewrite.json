@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "注意の瞬き",
+   "reading": "ちゅういのまばたき",
+   "pos": "noun",
+   "meaning": "attentional blink",
+   "defJa": "続けて現れる二つ目の標的を短時間見落とす現象",
+   "passage": {
+    "ja": "目標の記号を単独で見せれば答えられる人でも、短い間隔で続けて示された標的を両方答える課題では、先の標的を処理している間に後の標的を見落とし、答えに詰まります。まぶたを閉じる動作とは別です。注意の瞬きが生じるのは、目に届く光が遮られるからではなく、情報を取り込む注意の働きに一時的な制約があるからです。標的の間隔を長く取ると後の標的への正答率が回復し、両方を答えられる試行が増えます。",
+    "form": "注意の瞬き",
+    "en": "Even someone who can identify a target symbol presented alone may struggle to report both targets presented close together, missing the later one while still processing the earlier one. This is separate from closing the eyelids. The attentional blink occurs not because light reaching the eyes is blocked but because attention temporarily limits the intake of information. When targets are spaced farther apart, accuracy on the later target recovers and more trials produce reports of both.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "目の瞬きではなく、後続の標的を捉えにくくなる注意の現象。",
+    "sense": ""
+   },
+   "cardId": "nn-1761024b9d-6b0d4d15",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-1761024b9d-6b0d4d15",
+    "wordId": "nn-1761024b9d"
+   }
+  },
+  {
+   "term": "不完全性定理",
+   "reading": "ふかんぜんせいていり",
+   "pos": "noun",
+   "meaning": "incompleteness theorem",
+   "defJa": "一定の公理系で証明に限界があるとする定理",
+   "passage": {
+    "ja": "ある命題の証明と反証を同時に探すプログラムを動かし、先に見つかった方を答えとして表示させます。待てば必ず表示されるのでしょうか？ゲーデルの不完全性定理は、公理と規則を決めても、その中では決着しない命題が残り得ることを示します。証明が長いというだけの問題ではありません。自然数の計算を表せるほど強く、規則を機械的に扱える無矛盾な体系では、そのような命題を選んで探索を続けたとしても、証明も反証も見つからず、画面に答えが出ないまま計算が続きます。",
+    "form": "不完全性定理",
+    "en": "A program searches simultaneously for a proof and a disproof of a proposition, displaying whichever it finds first as the answer. Will an answer necessarily appear if we wait? Gödel’s incompleteness theorem shows that fixing axioms and rules can still leave propositions undecidable within them. The problem is not merely that the proof is long. In a consistent system strong enough to express natural-number arithmetic and whose rules are mechanically manageable, searching for such a proposition produces neither proof nor disproof, and computation continues without an answer appearing on the screen.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一定の体系では、証明も反証もできない命題が残ることを示す。",
+    "sense": ""
+   },
+   "cardId": "nn-dff15cbcaf-9798f261",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-dff15cbcaf-9798f261",
+    "wordId": "nn-dff15cbcaf"
+   }
+  },
+  {
+   "term": "三界",
+   "reading": "さんがい",
+   "pos": "noun",
+   "meaning": "the three realms (desire, form, formless)",
+   "defJa": "仏教で欲界と色界と無色界をまとめた呼び名",
+   "passage": {
+    "ja": "仏教の世界観では、人間の暮らす世界から微細な境地の天に至るまで、生まれ変わりが及ぶ範囲を区分します。天に生まれても終点ではありません。欲望や物質的な形との関わりによって分けられる欲界・色界・無色界を合わせて、三界と呼びます。教義上、欲望を離れた天や物質的な形を持たない世界に生まれたとしても、そこは依然として輪廻の内側にあるので、その生を支える条件が尽きれば、その境地を離れて再び生まれ変わることになります。",
+    "form": "三界",
+    "en": "Buddhist cosmology divides the range of rebirth from the human world through heavens associated with subtler states. Birth in heaven is not the endpoint. The desire, form, and formless realms, distinguished by their relation to desire and material form, are collectively called the three realms. According to the doctrine, even rebirth in a heaven beyond sensual desire or a world without material form remains within the cycle, so when the conditions sustaining that life are exhausted, one leaves that state and is reborn again.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "欲界・色界・無色界を含む輪廻の範囲で、解脱はその外へ離れること。",
+    "sense": ""
+   },
+   "cardId": "nn-32325a0b39-149bfbd6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
+    "cardId": "nn-32325a0b39-149bfbd6",
+    "wordId": "nn-32325a0b39"
+   }
+  },
+  {
+   "term": "加速主義",
+   "reading": "かそくしゅぎ",
+   "pos": "noun",
+   "meaning": "accelerationism",
+   "defJa": "技術などの発展を速めて社会の変化を促す立場",
+   "passage": {
+    "ja": "人工知能の開発で加速主義を掲げるなら、技術の進歩を何のために急ぐのかが問われる。新製品の公開が早ければよいのか？技術の発展を通じて社会の変革を促す立場にも、どのような社会を目指すかをめぐって違いがあり、市場への信頼や利益の配分まで同じ考えにそろうとは限らない。検証を速める案と、検証を省いて公開を急ぐ案では、利用者が負う結果も変わり得る。速度を支持する者同士でも、公開の可否を決める会議では賛成と反対に票が割れる。",
+    "form": "加速主義",
+    "en": "Invoking accelerationism in artificial-intelligence development raises the question of why technological progress should be hastened. Is earlier release of new products enough? Positions seeking social transformation through technological development differ over the society they aim for and need not agree on trust in markets or distribution of benefits. Accelerating testing and skipping testing to hasten release can lead to different consequences for users. Even supporters of speed can split their votes for and against release when the decision is put to a meeting.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "ここでは技術の発展を速めて社会変革を促す立場を指す。",
+    "sense": ""
+   },
+   "cardId": "nn-cb13400b49-88b5cc02",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
+    "cardId": "nn-cb13400b49-88b5cc02",
+    "wordId": "nn-cb13400b49"
+   }
+  },
+  {
+   "term": "空即是色",
+   "reading": "くうそくぜしき",
+   "pos": "noun",
+   "meaning": "emptiness is form",
+   "defJa": "固定的実体がないことと現象が別物でないこと",
+   "passage": {
+    "ja": "紙を裂いても、奥から「空」という物は出てこない。般若心経における空は、目に見える形の背後へ隠された、もう一つの実体ではない。物が他との関係を離れた固定的本質を持たないことと、その物が現に姿を取っていることは両立する。空即是色は、空と形ある現象を別々の世界へ引き離す考えを退ける。机の上に広げた紙も、繊維を組み合わせて作られ、湿り気や手の動きに応じて形を変えながら、荷物を包めば包み紙となり、光を遮ればその向こうに影を作る。",
+    "form": "空即是色",
+    "en": "Tearing paper does not reveal an object called emptiness hidden inside. Emptiness in the Heart Sutra is not another substance concealed behind visible form. Lacking a fixed essence independent of relationships is compatible with something actually taking form. Emptiness is form rejects separating emptiness and formed phenomena into different worlds. The paper spread on the desk, made by combining fibers and changing shape with moisture and hand movements, becomes wrapping when placed around a parcel and casts a shadow when it blocks light.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "空と形ある現象が切り離された別物ではないことを表す。",
+    "sense": ""
+   },
+   "cardId": "nn-0f3a2735ee-df2e3dba",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-0f3a2735ee-df2e3dba",
+    "wordId": "nn-0f3a2735ee"
+   }
+  },
+  {
+   "term": "リスク許容度",
+   "reading": "りすくきょようど",
+   "pos": "noun",
+   "meaning": "risk tolerance",
+   "defJa": "運用でどれほどの損失や変動を受け入れられるか",
+   "passage": {
+    "ja": "買った株が気になって、夜中に何度も画面を開いてしまうんだよね。始める前は値下がりしても待てると思ってたけど、収入が減って生活費に回せるお金が少なくなったら、同じ金額を持ち続けるのも急に重く感じるようになったんだ。値下がりより眠れないのがきつい。リスク許容度って、気持ちの強さだけじゃなく、損失を受け止められる暮らしの余裕とも関わってるんだね。朝になって、買い増す予定だった注文を取り消したよ。",
+    "form": "リスク許容度",
+    "en": "I keep opening the screen at night because I am worried about the shares I bought. Before starting, I thought I could wait through a fall in prices, but after my income dropped and less money remained for living expenses, continuing to hold the same amount suddenly felt burdensome. Losing sleep is harder than the falling price. Risk tolerance concerns not only emotional resilience but also the financial room in one’s life to absorb losses. In the morning, I canceled the order I had planned to place to buy more.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "損失や価格変動を受け入れられる範囲で、心理と資金の条件に関わる。",
+    "sense": ""
+   },
+   "cardId": "nn-bc17e5f2c0-ddf9a38a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-bc17e5f2c0-ddf9a38a",
+    "wordId": "nn-bc17e5f2c0"
+   }
+  }
+ ]
+}

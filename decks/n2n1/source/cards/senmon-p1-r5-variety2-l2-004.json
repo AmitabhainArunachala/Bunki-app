@@ -113,34 +113,6 @@
    }
   },
   {
-   "term": "ウパニシャッド",
-   "reading": "うぱにしゃっど",
-   "pos": "noun",
-   "meaning": "the Upanishads",
-   "defJa": "インドの古い聖典群。師の膝元の教えを意味する語",
-   "passage": {
-    "ja": "水に溶かした塩は見えなくても、口に含めればどこにでも塩味があります。ウパニシャッドの一つに現れる父子の対話では、この身近な現象が、目に見えない根本を考える手がかりになります。父は息子に、感覚で形を捉えられないからといって、それだけで存在を否定できないことを示します。こうした対話を含む古代インドの文献群では、自己とは何か、世界を支えるものは何かという問いが、儀礼の知識に加えて深く探究されています。",
-    "form": "ウパニシャッド",
-    "en": "Salt dissolved in water is invisible, yet a taste reveals its saltiness everywhere. In a father-son dialogue in one of the Upanishads, this familiar phenomenon offers a clue for considering an unseen foundation. The father shows his son that inability to perceive something's shape does not by itself establish its absence. In this group of ancient Indian texts, which includes such dialogues, questions about the self and what supports the world are explored deeply alongside ritual knowledge.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "古代インドの文献群を指し、自己や世界の根本を問う対話も含む。",
-    "sense": "師のそばで伝える密かな教え、およびそれを記す文献"
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-67f68ee238-2c22c667",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-005.json",
-    "cardId": "nn-67f68ee238-2c22c667",
-    "wordId": "nn-67f68ee238"
-   }
-  },
-  {
    "term": "具現",
    "reading": "ぐげん",
    "pos": "noun",
@@ -253,34 +225,6 @@
    }
   },
   {
-   "term": "五戒",
-   "reading": "ごかい",
-   "pos": "noun",
-   "meaning": "the five precepts",
-   "defJa": "在家の仏教徒の基本となる五つの戒め",
-   "passage": {
-    "ja": "瞑想中には穏やかでも、人をだまして利益を得ているなら、生活の中の苦しみは増えかねません。在家の仏教徒が受ける五戒は、命を奪うこと、盗み、不適切な性的行為、偽り、酒による酔いを避ける基本的な戒めです。坐っている時間だけでなく、取引や家族との関係にも実践の場があります。他人を傷つけた後で心だけ静めようとするより、傷つける行動自体を慎むという順序には意味があります。教えを学ぶ生活では、注意を向ける心と日々の行為が切り離せません。",
-    "form": "五戒",
-    "en": "Calm during meditation can coexist with increasing suffering in daily life if one deceives others for gain. The five precepts undertaken by lay Buddhists are basic commitments to avoid killing, theft, sexual misconduct, falsehood, and intoxication through alcohol. Practice occurs in dealings and family relationships as well as while sitting. There is significance in restraining harmful actions themselves rather than only trying to calm the mind after harming others. A life learning the teaching cannot separate attentive awareness from everyday conduct.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "在家の基本的な五つの戒めで、日常の行動を整える実践。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-de1ba1b137-b72c66cb",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
-    "cardId": "nn-de1ba1b137-b72c66cb",
-    "wordId": "nn-de1ba1b137"
-   }
-  },
-  {
    "term": "天台宗",
    "reading": "てんだいしゅう",
    "pos": "noun",
@@ -306,34 +250,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
     "cardId": "nn-54fbf49f45-35a7b1e7",
     "wordId": "nn-54fbf49f45"
-   }
-  },
-  {
-   "term": "三界",
-   "reading": "さんがい",
-   "pos": "noun",
-   "meaning": "the three realms (desire, form, formless)",
-   "defJa": "仏教で欲界と色界と無色界をまとめた呼び名",
-   "passage": {
-    "ja": "欲しい物に囲まれた暮らしも、深い瞑想によって得られる静かな境地も、仏教では同じ解放への道の途中に置かれます。三界は欲界、色界、無色界をまとめた呼び名で、欲望や物質的な形との関係によって区分された世界です。教義上は、より微細な境地へ生まれたとしても、そこに永遠にとどまれるとはされません。華やかな天の暮らしだけを理想にすれば、生と死を繰り返す範囲からは出られず、その循環そのものを離れるという修行の目的が残ります。",
-    "form": "三界",
-    "en": "In Buddhism, both a life surrounded by desired things and a quiet state attained through deep meditation stand along the way toward liberation. The three realms comprise the desire, form, and formless realms, distinguished by their relations to desire and material form. Doctrinally, even rebirth in a subtler state does not mean one can remain there forever. Making a splendid heavenly life the sole ideal leaves one within repeated birth and death, preserving the further aim of practice to leave that cycle itself.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "欲界・色界・無色界を合わせ、生死の循環にある世界の範囲を指す。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-32325a0b39-149bfbd6",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-008.json",
-    "cardId": "nn-32325a0b39-149bfbd6",
-    "wordId": "nn-32325a0b39"
    }
   }
  ]

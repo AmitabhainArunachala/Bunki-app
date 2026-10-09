@@ -1,32 +1,3 @@
 {
- "cards": [
-  {
-   "term": "成膜",
-   "reading": "せいまく",
-   "pos": "noun",
-   "meaning": "thin-film deposition",
-   "defJa": "表面に薄い材料の層を作る工程",
-   "passage": {
-    "ja": "鏡のように光る半導体の表面にも、働きの異なる薄い層が重なっています。成膜では、電気を通す材料や電気を隔てる材料などを、目的に応じて表面に薄く形成します。同じ材料であっても厚さがそろわなければ回路の性質にばらつきが出るため、目に見えないほど小さな差が問題になります。さらに深い溝の底や側面まで覆う必要がある場合には、平らな場所へ材料を載せるときとは違う難しさがあり、形と厚さの両方を満たす方法が選ばれます。",
-    "form": "成膜",
-    "en": "Even a mirror-like semiconductor surface contains stacked thin layers with different functions. Film deposition forms thin layers of conducting, insulating, or other materials on a surface according to their purpose. Uneven thickness can produce inconsistent circuit properties even with the same material, so even differences too small to see can matter. Covering the bottom and sides of deep trenches also presents challenges unlike coating a flat surface, so methods are chosen to satisfy both shape and thickness requirements.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "薄い材料の層を作る工程で、厚さや表面形状に応じた制御が要る。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-eb09033600-072e1d36",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
-    "cardId": "nn-eb09033600-072e1d36",
-    "wordId": "nn-eb09033600"
-   }
-  }
- ]
+ "cards": []
 }

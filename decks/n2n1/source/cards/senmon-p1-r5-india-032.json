@@ -23,6 +23,28 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
+   "term": "霊験",
+   "reading": "れいげん",
+   "pos": "noun",
+   "meaning": "miraculous efficacy",
+   "defJa": "神仏の不思議な力が現れたとされる効き目",
+   "passage": {
+    "ja": "寺社の縁起には、祈りによって病が癒えた、危難を免れたとする物語が収められている。霊験を伝えるこうした記述は、その場所がなぜ信仰を集めたかを知る資料となる一方、現代の治療効果の記録と同じ条件で書かれたものではない。物語を歴史資料として読む際は、いつ、誰が、どのような目的で語りを残したかを検討することが意味を持つ。出来事の真偽だけを急いで決めるより、願いがどのような言葉で共有されたかを追うことで、巡礼や寄進を支えた人々の世界に近づける。",
+    "form": "霊験",
+    "en": "Temple and shrine histories contain stories of illness healed or danger escaped through prayer. Accounts of miraculous efficacy help explain a place’s devotional appeal, while differing in how they were produced from modern records of treatment effects. Reading them as historical sources makes their date, authorship, and purpose significant. Following how hopes were shared in language, rather than rushing only to decide whether each event happened, brings readers closer to the world supporting pilgrimage and donations.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「霊験を伝える」「霊験あらたか」。伝承の内容を効能の保証にしない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
    "term": "霊魂",
    "reading": "れいこん",
    "pos": "noun",

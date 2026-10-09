@@ -1,6 +1,50 @@
 {
  "cards": [
   {
+   "term": "成膜",
+   "reading": "せいまく",
+   "pos": "noun",
+   "meaning": "thin-film deposition",
+   "defJa": "表面に薄い材料の層を作る工程",
+   "passage": {
+    "ja": "半導体の工程説明で成膜と書かれている場合、表面に薄い材料の層を作る操作を指します。塗装という身近な作業を思い浮かべると入り口にはなりますが、材料の与え方や反応の仕組みは方式ごとに異なるため、同じ作業だとは言えません。導電性を持たせる層と電気を隔てる層では目的も違い、薄ければ薄いほどよいという単純な比較にもなりません。文章を読む際は、何の材料をどこへ形成し、どんな働きを持たせるのかを順に拾うと、工程名の短さに隠れた設計の条件を捉えられます。",
+    "form": "成膜",
+    "en": "In semiconductor process descriptions, deposition means forming a thin material layer on a surface. Thinking of painting provides an entry point, but material delivery and reaction mechanisms vary by method, so the operations are not equivalent. Conducting layers and electrically isolating layers serve different purposes, and thinner is not automatically better. Reading for the material, placement, and intended role reveals design conditions hidden behind a short process name.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "材料の薄い層を作る工程で、表面を削る工程とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "戦略物資",
+   "reading": "せんりゃくぶっし",
+   "pos": "noun",
+   "meaning": "strategic material",
+   "defJa": "安全保障や重要な産業に深く関わる物資",
+   "passage": {
+    "ja": "半導体を戦略物資として扱う議論では、安く買えるかどうかに加え、供給を続けられるかが問われます。自動車や通信の機器などに使われるため、特定の製品が不足すると、別の産業の活動にも影響が及ぶからです。ただし、すべてを国内で作れば問題がなくなるとは限らず、材料や装置の調達、人材の確保などにも制約があります。政策の説明を読むときは、守ろうとする機能と想定する供給停止の条件を分け、どの手段がどの弱点に対応するのかを整理していきましょう。",
+    "form": "戦略物資",
+    "en": "When semiconductors are treated as strategic materials, the question extends from low purchase prices to continuing supply. Because they are used in equipment such as vehicles and communications systems, shortages of particular products can affect other industries. Making everything domestically does not necessarily eliminate problems, since material and equipment procurement and staffing also impose constraints. When reading policy explanations, separate protected functions from assumed disruption conditions and map measures to the weaknesses they address.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "値段だけでなく、供給の維持が社会や安全保障に関わる物資。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
    "term": "拡散モデル",
    "reading": "かくさんもでる",
    "pos": "noun",

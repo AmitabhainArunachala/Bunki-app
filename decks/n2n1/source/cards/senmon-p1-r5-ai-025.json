@@ -43,6 +43,28 @@
    "pass": 1,
    "writer": "codex-astra",
    "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "演繹",
+   "reading": "えんえき",
+   "pos": "noun",
+   "meaning": "deduction",
+   "defJa": "一般的な前提から個別の結論を導くこと",
+   "passage": {
+    "ja": "プログラムの正しさを説明する文章では、例がいくつか動いたことと、前提から必ず結果が導かれることを分けて書きます。「この条件を満たすすべての入力に規則が当てはまる」と示してから、一つの入力に結論を適用するのが演繹の形です。実行例を増やすだけでは、まだ試していない入力に対する保証まで得られるとは限りません。証明を書くに当たっては、どの前提を使ったのかを省略せず、結論とのつながりを見せると筋道が伝わります。「試した結果」と「論理的に導いた結果」は、同じ成功報告でも根拠の種類が違います。",
+    "form": "演繹",
+    "en": "An explanation of program correctness distinguishes a few successful examples from a result that necessarily follows from premises. Establishing that a rule applies to every input satisfying a condition and then applying its conclusion to a particular input has the form of deduction. More execution examples alone do not necessarily guarantee behavior for inputs not yet tested. When writing a proof, making the premises and their connection with the conclusion explicit communicates the reasoning. “Observed in testing” and “derived logically” describe different kinds of grounds even when both report success.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "前提から結論を導くこと。例から一般化する帰納と対になる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
   }
  ]
 }

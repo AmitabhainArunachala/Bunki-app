@@ -1,0 +1,183 @@
+{
+ "batch": "r5-variety2-gate-005",
+ "items": [
+  {
+   "term": "事前学習",
+   "reading": "じぜんがくしゅう",
+   "gloss": "pre-training",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+    "cardId": "nn-4cd6f93eb3-914bb137",
+    "wordId": "nn-4cd6f93eb3"
+   }
+  },
+  {
+   "term": "行脚",
+   "reading": "あんぎゃ",
+   "gloss": "pilgrimage seeking Buddhist teachers",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-2ce990bb42-64e39e47",
+    "wordId": "nn-2ce990bb42"
+   }
+  },
+  {
+   "term": "胎動",
+   "reading": "たいどう",
+   "gloss": "early stirrings of a new development",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029-r.json",
+    "cardId": "nn-80f13cee43-fe45b100",
+    "wordId": "nn-80f13cee43"
+   }
+  },
+  {
+   "term": "評価指標",
+   "reading": "ひょうかしひょう",
+   "gloss": "evaluation metric",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-51dab0d6ad-20244cd9",
+    "wordId": "nn-51dab0d6ad"
+   }
+  },
+  {
+   "term": "大日如来",
+   "reading": "だいにちにょらい",
+   "gloss": "Mahāvairocana Buddha",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-2f62565f77-c5b2da1a",
+    "wordId": "nn-2f62565f77"
+   }
+  },
+  {
+   "term": "無の境地",
+   "reading": "むのきょうち",
+   "gloss": "a state free from distracting attachment",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
+    "cardId": "nn-7ccc86a7e7-4348dfe7",
+    "wordId": "nn-7ccc86a7e7"
+   }
+  },
+  {
+   "term": "空性",
+   "reading": "くうしょう",
+   "gloss": "emptiness; absence of inherent existence",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-d11596b336-6f752956",
+    "wordId": "nn-d11596b336"
+   }
+  },
+  {
+   "term": "密教",
+   "reading": "みっきょう",
+   "gloss": "esoteric Buddhism",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-8d4df6f214-fe89f6b2",
+    "wordId": "nn-8d4df6f214"
+   }
+  }
+ ],
+ "reviewOf": {
+  "事前学習": {
+   "source": "cards/senmon-p1-r5-variety2-l2-001.json",
+   "cardId": "nn-4cd6f93eb3-914bb137",
+   "batch": "r5-variety2-l2-001",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 学). It receives its one editorial rewrite with a different structure."
+  },
+  "行脚": {
+   "source": "cards/senmon-p1-r5-variety2-l1-009.json",
+   "cardId": "nn-2ce990bb42-64e39e47",
+   "batch": "r5-variety2-l1-009",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 5, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "胎動": {
+   "source": "cards/senmon-p1-r5-variety2-l3-003.json",
+   "cardId": "nn-80f13cee43-fe45b100",
+   "batch": "r5-variety2-l3-003",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-029-r.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 学). It receives its one editorial rewrite with a different structure."
+  },
+  "評価指標": {
+   "source": "cards/senmon-p1-r5-variety2-l1-005.json",
+   "cardId": "nn-51dab0d6ad-20244cd9",
+   "batch": "r5-variety2-l1-005",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 3, longest sentence 5, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "大日如来": {
+   "source": "cards/senmon-p1-r5-variety2-l1-006.json",
+   "cardId": "nn-2f62565f77-c5b2da1a",
+   "batch": "r5-variety2-l1-006",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 3, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "無の境地": {
+   "source": "cards/senmon-p1-r5-variety2-l2-005.json",
+   "cardId": "nn-7ccc86a7e7-4348dfe7",
+   "batch": "r5-variety2-l2-005",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 1, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "空性": {
+   "source": "cards/senmon-p1-r5-variety2-l3-006.json",
+   "cardId": "nn-d11596b336-6f752956",
+   "batch": "r5-variety2-l3-006",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure."
+  },
+  "密教": {
+   "source": "cards/senmon-p1-r5-variety2-l2-005.json",
+   "cardId": "nn-8d4df6f214-fe89f6b2",
+   "batch": "r5-variety2-l2-005",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 5, register 講). It receives its one editorial rewrite with a different structure."
+  }
+ }
+}

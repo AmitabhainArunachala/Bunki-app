@@ -1,34 +1,6 @@
 {
  "cards": [
   {
-   "term": "布施",
-   "reading": "ふせ",
-   "pos": "noun",
-   "meaning": "giving (dāna); offering to monks",
-   "defJa": "見返りに執着せず他者へ財や教えなどを与えること",
-   "passage": {
-    "ja": "誰にも知られずに食べ物を届けたのに、心のどこかで相手からの礼を待っている自分に気付くことがあります。仏教の布施では、財や教えを与える行為とともに、見返りや自分の功績への執着が問われます。相手を助けたからといって、その人を自分の思いどおりに動かしてよいことにはなりません。渡した物を手放せても、「与えた私」という誇りは残りやすく、受け取る側の尊厳を保ちながら与えることには、物の量だけでは測れない難しさがあります。",
-    "form": "布施",
-    "en": "After delivering food anonymously, one may notice a part of oneself still waiting for thanks. Buddhist giving concerns attachment to repayment and personal merit alongside the act of offering material goods or teachings. Helping someone does not entitle the giver to control that person's behavior. Even after possessions are relinquished, pride in having given can remain, and giving while preserving the recipient's dignity involves difficulties that quantities alone cannot measure.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "見返りへの執着を離れて財や教えなどを与える仏教の実践。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-a5f719a60d-6e7af3c7",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
-    "cardId": "nn-a5f719a60d-6e7af3c7",
-    "wordId": "nn-a5f719a60d"
-   }
-  },
-  {
    "term": "本尊",
    "reading": "ほんぞん",
    "pos": "noun",
@@ -85,62 +57,6 @@
    }
   },
   {
-   "term": "戒名",
-   "reading": "かいみょう",
-   "pos": "noun",
-   "meaning": "Buddhist precept name",
-   "defJa": "仏教で戒を受け仏弟子となる際に授けられる名",
-   "passage": {
-    "ja": "葬儀で初めて目にした名を、亡くなった人だけに付けるものと思う人もいます。けれども戒名は、本来、戒を受けて仏弟子となる際に授けられる名であり、生前に受ける場合もあります。日常の名前とは別に、仏道を歩む者としての立場を示す働きがあるのです。宗派によっては別の呼び名を使うため、すべての仏教徒に同じ形式があると考えるのは早計です。葬送の場で出会う習慣の背景には、死後の扱いにとどまらず、生きている間の信仰との結び付きがあります。",
-    "form": "戒名",
-    "en": "Some people first encountering a name at a funeral assume it is bestowed only on the dead. A kaimyo originally names someone as a Buddhist disciple upon receiving precepts and can be bestowed during life. Alongside an everyday name, it marks a person's position as one following the Buddhist path. Some schools use other terms, so assuming a single format for all Buddhists is premature. Behind a custom encountered at funerals lies a connection to faith during life, extending beyond treatment after death.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "本来は受戒して仏弟子となる際の名で、生前に授かる場合もある。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-1f65ecbd62-09a61247",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
-    "cardId": "nn-1f65ecbd62-09a61247",
-    "wordId": "nn-1f65ecbd62"
-   }
-  },
-  {
-   "term": "無為自然",
-   "reading": "むいしぜん",
-   "pos": "noun",
-   "meaning": "non-forcing and naturalness",
-   "defJa": "作為を離れ物事のおのずからの姿に従うこと",
-   "passage": {
-    "ja": "庭の木を思いどおりの形にしようとして、伸びる枝を片端から切れば、木を弱らせることもあります。老荘思想の無為自然は、人の都合を無理に押し付けず、物事のおのずからのあり方に従う姿勢を表します。何もせず放置するというより、過剰な働き掛けが、かえって本来の動きを妨げることへの注意が含まれています。人を育てる場でも、先回りしてすべてを決めれば本人が試す余地を奪うため、関わる力だけでなく、手を出すのを控える判断にも意味が生まれます。",
-    "form": "無為自然",
-    "en": "Cutting every new branch to force a garden tree into a desired shape can weaken it. The Daoist principle of naturalness without forced action means following things' own course rather than imposing human preferences. More than simply neglecting everything, it includes awareness that excessive intervention can obstruct natural functioning. In helping people grow, deciding everything ahead of them removes room for experimentation, giving significance to restraint as well as the ability to intervene.",
-    "register": "講",
-    "topic": "other",
-    "tipJa": "老荘思想の立場で、作為を強めず物事のおのずからのあり方に従う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-91de4928d8-1d879303",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023-r.json",
-    "cardId": "nn-91de4928d8-1d879303",
-    "wordId": "nn-91de4928d8"
-   }
-  },
-  {
    "term": "浄土真宗",
    "reading": "じょうどしんしゅう",
    "pos": "noun",
@@ -166,34 +82,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
     "cardId": "nn-5450ed9060-7c8f8ff4",
     "wordId": "nn-5450ed9060"
-   }
-  },
-  {
-   "term": "法然",
-   "reading": "ほうねん",
-   "pos": "noun",
-   "meaning": "Honen, founder of the Jodo school",
-   "defJa": "念仏を勧め日本の浄土宗を開いた僧",
-   "passage": {
-    "ja": "難しい教えを理解し、厳しい修行を重ねられる人だけに、救いへの道が開かれているのでしょうか。法然は、阿弥陀仏の名を称える念仏を勧め、日本の浄土宗を開きました。その教えでは、学識や修行の能力にかかわらず、念仏によって浄土への往生を目指す道が示されます。これは現世での生活を放棄する勧めではなく、自分の力だけで煩悩を断ち切れない人にも仏道への入口を開くものであり、実践の担い手を限られた修行者の範囲から広く捉え直すことにつながります。",
-    "form": "法然",
-    "en": "Is the path to salvation open only to those able to master difficult teachings and demanding disciplines? Honen encouraged chanting Amida Buddha's name and founded Japan's Jodo school. His teaching presents a path toward birth in the Pure Land through nenbutsu regardless of learning or ability in religious practice. Rather than advocating abandonment of ordinary life, it opens Buddhist practice to those unable to overcome afflictions through their own power, broadening its participants beyond a limited circle of disciplined practitioners.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "日本の浄土宗を開き、阿弥陀仏の名を称える念仏を勧めた僧。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-608c055ed6-56d25335",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-021.json",
-    "cardId": "nn-608c055ed6-56d25335",
-    "wordId": "nn-608c055ed6"
    }
   }
  ]

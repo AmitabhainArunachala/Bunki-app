@@ -1,34 +1,6 @@
 {
  "cards": [
   {
-   "term": "評価指標",
-   "reading": "ひょうかしひょう",
-   "pos": "noun",
-   "meaning": "evaluation metric",
-   "defJa": "成果や性能を測り比べるための基準となる数値",
-   "passage": {
-    "ja": "百件のメールのうち迷惑メールが一件だけなら、全部を普通のメールと判定しても正解率は高くなります。しかし、利用者が止めてほしい一件は、そのまま受信箱へ届きます。評価指標を正解率だけにすると、少数の重要な失敗が平均の陰に隠れる場合があるのです。迷惑メールの見逃しを減らすにしても、必要な連絡まで消す頻度が上がれば困ります。何を見つけたいのか、どんな間違いの負担が大きいのかに応じて尺度を選ぶことが、性能を測る出発点になります。",
-    "form": "評価指標",
-    "en": "If only one of a hundred emails is spam, labeling all of them ordinary mail still produces high accuracy. Yet the one message the user wants blocked reaches the inbox. Using accuracy as the sole evaluation metric can hide a few important failures behind an average. Reducing missed spam is also problematic if it increases the frequency of deleting necessary messages. Choosing measures according to what should be detected and which errors are costly is the starting point for assessing performance.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "何を成果として数えるかを定める尺度で、平均だけでは見えない失敗もある。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-51dab0d6ad-20244cd9",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
-    "cardId": "nn-51dab0d6ad-20244cd9",
-    "wordId": "nn-51dab0d6ad"
-   }
-  },
-  {
    "term": "買収",
    "reading": "ばいしゅう",
    "pos": "noun",
@@ -54,62 +26,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-002.json",
     "cardId": "nn-ef5a460db5-78ed34b8",
     "wordId": "nn-ef5a460db5"
-   }
-  },
-  {
-   "term": "開発競争",
-   "reading": "かいはつきょうそう",
-   "pos": "noun",
-   "meaning": "development race",
-   "defJa": "新しい技術や製品を作る速さや性能を争うこと",
-   "passage": {
-    "ja": "新製品の発表が相次ぐ市場では、発売の遅れが顧客を失う危険に直結する。開発競争が激しくなるに伴って、企業は試作品を早く市場へ出すよう迫られるが、試験を省けば発売後の修正に追われる恐れもある。速さと品質は、いつも単純な二者択一になるとは限らない。設計の初期から試験を組み込み、不具合を小さいうちに見つける体制が整っていれば、後戻りする時間を減らせるため、開発期間の短縮を支えるのは担当者の長時間労働だけではない。",
-    "form": "開発競争",
-    "en": "In markets with frequent product announcements, release delays directly risk losing customers. As development competition intensifies, companies are pressed to bring prototypes to market earlier, yet skipping tests can leave them occupied with post-release repairs. Speed and quality do not always form a simple either-or choice. Building tests into early design and catching small defects can reduce rework, so shortening development does not depend solely on longer working hours.",
-    "register": "報",
-    "topic": "ai",
-    "tipJa": "技術や製品の開発速度、性能などを企業同士で競うこと。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-49f5606bcf-910755b7",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
-    "cardId": "nn-49f5606bcf-910755b7",
-    "wordId": "nn-49f5606bcf"
-   }
-  },
-  {
-   "term": "ヨーガ",
-   "reading": "よーが",
-   "pos": "noun",
-   "meaning": "yoga (scholarly spelling)",
-   "defJa": "心身を整え解放を目指すインド由来の実践",
-   "passage": {
-    "ja": "姿勢を整えて座っても、心は昨日の失敗や明日の予定へと走ります。古典的なヨーガでは、体を柔らかくすることだけでなく、このような心の動きと向き合い、束縛からの解放を目指す実践が重視されます。呼吸や姿勢に加えて、日々の行動を律する教えも、その広い体系の一部です。現代の教室には運動や健康を主な目的とするものもあり、同じ名で行われる活動でも、何を到達点に置くかによって、実践の意味や重視する手順は異なってきます。",
-    "form": "ヨーガ",
-    "en": "Even while seated with good posture, the mind races toward yesterday's failures and tomorrow's plans. Classical yoga values practices aimed at confronting such mental activity and attaining liberation from bondage, beyond making the body flexible. Teachings governing daily conduct are part of this broader system alongside breathing and posture. Some modern classes chiefly pursue exercise or health, so activities bearing the same name differ in meaning and priorities according to their intended goal.",
-    "register": "講",
-    "topic": "india",
-    "tipJa": "姿勢だけでなく、心の働きや行動を含む解放への実践としても使う。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "india",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-79c37337bc-aeb552a7",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
-    "cardId": "nn-79c37337bc-aeb552a7",
-    "wordId": "nn-79c37337bc"
    }
   },
   {
@@ -166,34 +82,6 @@
     "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
     "cardId": "nn-243d48671a-dd447f58",
     "wordId": "nn-243d48671a"
-   }
-  },
-  {
-   "term": "頭打ち",
-   "reading": "あたまうち",
-   "pos": "noun",
-   "meaning": "leveling off, hitting a ceiling",
-   "defJa": "伸びが止まって、それ以上上がらない状態",
-   "passage": {
-    "ja": "毎晩同じ単語帳を見ているのに、小テストの点数が動かなくなりました。勉強時間を増やしても成績が頭打ちなら、何時間座ったかより、どこで答えを取り違えたかに目を向ける余地があります。意味は分かるのに取り出せない語と、似た語との違いが曖昧な語では、必要な練習が違います。間違いを分類したうえで、前者には手掛かりを減らした想起の練習、後者には対照的な例を用意すれば、同じ作業を長く続けるだけでは見つからなかった改善点を探れます。",
-    "form": "頭打ち",
-    "en": "Despite reviewing the same vocabulary book every evening, a learner's quiz scores stop changing. When performance plateaus despite increased study time, there is room to examine where answers go wrong rather than hours spent seated. Words whose meanings are known but cannot be recalled require different practice from words confused with similar ones. Classifying errors and using reduced-cue recall for the former and contrasting examples for the latter can reveal improvements that simply repeating the same activity longer did not uncover.",
-    "register": "学",
-    "topic": "mind",
-    "tipJa": "上昇や成長が止まり、それ以上伸びにくくなった状態。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-5d37b60e93-dd2051ac",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-003-r.json",
-    "cardId": "nn-5d37b60e93-dd2051ac",
-    "wordId": "nn-5d37b60e93"
    }
   }
  ]

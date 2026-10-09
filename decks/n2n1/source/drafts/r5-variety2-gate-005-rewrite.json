@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "事前学習",
+   "reading": "じぜんがくしゅう",
+   "pos": "noun",
+   "meaning": "pre-training",
+   "defJa": "個別の用途へ適用する前に広いデータで学ぶこと",
+   "passage": {
+    "ja": "事前学習を終えたばかりの言語モデルは、まだ特定の仕事は何一つ教わっていません。この段階で重ねてきたのは、多くの場合、大量の文書を相手に、次に来る言葉を予測する練習だけです。正解は文書の続きそのものなので、人が答えを用意することなく学習を進められます。予測と正解のずれに応じて、内部の数値がわずかに修正されます。これを膨大な回数繰り返すうちに、言葉の使い方が幅広く身に付くので、その後は比較的少ないデータで調整するだけで、問い合わせへの対応や契約書の要約といった個別の用途に使えるようになります。",
+    "form": "事前学習",
+    "en": "A language model that has just finished pre-training has not yet been taught a single specific job. In most cases, all it has done at this stage is practice predicting the word that comes next across a vast number of documents. Because the correct answer is simply the continuation of the document itself, the training can proceed without anyone preparing answers. The internal numbers are corrected slightly according to the gap between the prediction and the correct answer. As this is repeated an enormous number of times, the model acquires a broad command of how language is used, so afterward it can be put to individual uses such as answering inquiries or summarizing contracts simply by being adjusted with a comparatively small amount of data.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「事前学習を終える・行う」の形で使い、その後の「調整」と対になる機械学習の用語。",
+    "sense": ""
+   },
+   "cardId": "nn-4cd6f93eb3-914bb137",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+    "cardId": "nn-4cd6f93eb3-914bb137",
+    "wordId": "nn-4cd6f93eb3"
+   }
+  },
+  {
+   "term": "行脚",
+   "reading": "あんぎゃ",
+   "pos": "noun",
+   "meaning": "pilgrimage seeking Buddhist teachers",
+   "defJa": "仏道を学ぶため各地を巡り歩くこと",
+   "passage": {
+    "ja": "昔の禅僧って、一つの寺でずっと修行するとは限らなかったんですよ。この師匠のもとでは悟れそうにないと思ったら、荷物をまとめて何日も歩いて別の寺を訪ねて、そこでもだめならまた次へ向かうっていうのを、何年も続けるんです。道元もそうでした。宋に渡ってから如浄っていう師匠に出会うまで、二年ほどかかってます。そうやって師匠を探して各地を行脚した末に受け継いだ教えを日本に持ち帰って、のちに永平寺を開くことになるんです。",
+    "form": "行脚",
+    "en": "Zen monks in the old days did not necessarily stay and train at one temple the whole time, you know. If a monk felt he was never going to reach awakening under his current teacher, he would pack up his things, walk for days to visit another temple, and if that one was no good either, head for the next, and he would keep that up for years. Dōgen was the same. After he crossed to Song China, it took him about two years to meet the teacher called Rujing. After a pilgrimage like that from place to place in search of a teacher, he brought the teaching he had inherited back to Japan and would later go on to found Eiheiji.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「各地を行脚する」「行脚に出る」の形で、僧が師や教えを求めて歩いて回る旅を表す。",
+    "sense": "僧が修行のために諸国を巡り歩くこと"
+   },
+   "cardId": "nn-2ce990bb42-64e39e47",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-2ce990bb42-64e39e47",
+    "wordId": "nn-2ce990bb42"
+   }
+  },
+  {
+   "term": "胎動",
+   "reading": "たいどう",
+   "pos": "noun",
+   "meaning": "early stirrings of a new development",
+   "defJa": "新しい動きが表面に出る前から起こり始めること",
+   "passage": {
+    "ja": "深層学習の時代はいつ始まったのかと問われれば、多くの人は、この手法を用いた研究チームが画像認識の精度を競う国際大会で二位以下を大きく引き離して優勝した2012年を挙げるだろう。だが、それは花が開いた年にすぎない。画像処理用の半導体で計算を速める試みも、大量の画像を集めて整理する地道な作業も、その数年前から進んでおり、変革の胎動はすでに始まっていた。いま注目を浴びていない研究室では、何が動き始めているのだろうか。",
+    "form": "胎動",
+    "en": "Asked when the age of deep learning began, most people would probably name 2012, the year a research team using this method won an international competition in image recognition accuracy by a wide margin over second place and below. But that was merely the year the flower opened. Attempts to speed up computation with chips made for graphics processing and the painstaking work of collecting and organizing huge numbers of images had both been under way for several years before that, and the early stirrings of the transformation had already begun. In the laboratories that draw no attention today, what is beginning to stir?",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「変革の胎動」「胎動が始まる」のように、表に出る前の動きを比喩的に言う硬い表現。",
+    "sense": "新しい物事が内部で動き始めること"
+   },
+   "cardId": "nn-80f13cee43-fe45b100",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029-r.json",
+    "cardId": "nn-80f13cee43-fe45b100",
+    "wordId": "nn-80f13cee43"
+   }
+  },
+  {
+   "term": "評価指標",
+   "reading": "ひょうかしひょう",
+   "pos": "noun",
+   "meaning": "evaluation metric",
+   "defJa": "成果や性能を測り比べるための基準となる数値",
+   "passage": {
+    "ja": "「点数は上がったのに、訳が変なんです」って、翻訳モデルを作ってる後輩が相談に来たんです。採点の仕方を聞いたら、原因はすぐ分かりました。人が訳したお手本と単語の並びがどれだけ重なるかだけを数えてたから、意味は合ってるのに言い回しが違うだけの訳まで減点されてたんですよ。それで、意味の近さを測る別の評価指標も並べて見るようにして、最後は人が実際に読み比べた上で判断することにしたら、点数と訳の質が食い違うことが、やっとなくなったそうです。",
+    "form": "評価指標",
+    "en": "\"The score went up, but the translations are strange,\" said a junior colleague who builds translation models when he came to me for advice. When I asked how the scoring was done, the cause was clear right away. He had been counting nothing but how much the word sequences overlapped with model translations done by people, so even translations that got the meaning right and merely phrased it differently were losing points. So he started looking at another evaluation metric alongside it, one that measures closeness of meaning, and decided to make the final judgment only after people had actually read and compared the translations, and apparently the score and the quality of the translations finally stopped contradicting each other.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「評価指標を選ぶ・決める・見る」の形で使う。何を測る数値なのかを示す語と一緒に現れる。",
+    "sense": ""
+   },
+   "cardId": "nn-51dab0d6ad-20244cd9",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-51dab0d6ad-20244cd9",
+    "wordId": "nn-51dab0d6ad"
+   }
+  },
+  {
+   "term": "大日如来",
+   "reading": "だいにちにょらい",
+   "pos": "noun",
+   "meaning": "Mahāvairocana Buddha",
+   "defJa": "真言密教で中心となる仏",
+   "passage": {
+    "ja": "太陽は、照らす相手を選ばない。草であれ石であれ、善人であれ悪人であれ、同じように光を注ぐこの天体になぞらえて、インドの密教は、宇宙の真理そのものを一つの仏の姿として思い描いた。歴史上の人物である釈迦と違い、この仏には生まれた年も亡くなった年もない。大日如来と呼ばれるこの仏が曼荼羅の中心に描かれ、周りを多くの仏や菩薩が囲むのは、どの仏もその現れとされるからである。京都の東寺の講堂でも、ずらりと並ぶ仏像の中央に座り、胸の前で静かに印を結んでいる。",
+    "form": "大日如来",
+    "en": "The sun does not choose whom it shines on. Likening it to this heavenly body, which pours its light equally on grass and stone, on the good and the wicked alike, Indian esoteric Buddhism pictured the truth of the universe itself in the form of a single buddha. Unlike Shakyamuni, who was a historical person, this buddha has neither a year of birth nor a year of death. This buddha, known as Mahāvairocana Buddha, is painted at the center of the mandala with many buddhas and bodhisattvas surrounding him because every buddha is regarded as a manifestation of him. In the lecture hall of Tōji in Kyoto, too, he sits at the center of the long rows of statues, quietly forming a mudra in front of his chest.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「曼荼羅の中心に描かれる」のように、密教であらゆる仏の根本とされる仏として語られる。",
+    "sense": ""
+   },
+   "cardId": "nn-2f62565f77-c5b2da1a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-2f62565f77-c5b2da1a",
+    "wordId": "nn-2f62565f77"
+   }
+  },
+  {
+   "term": "無の境地",
+   "reading": "むのきょうち",
+   "pos": "noun",
+   "meaning": "a state free from distracting attachment",
+   "defJa": "雑念や執着から離れたとされる心の状態",
+   "passage": {
+    "ja": "初めて座禅会に行ったとき、今日は何も考えないぞって、かなり力んでました。でも、座りっぱなしで足は痛いし、昼ご飯のことは気になるしで、頭の中はかえって騒がしいんです。終わってから、指導してくれたお坊さんに正直にそう話しました。そしたら、にこにこしながら聞いてくれたんです。無の境地に達しようと頑張るのも執着のうちだから、考えが浮かんでも追いかけずに放っておけばいいって言われて、すっと肩の力が抜けたんですよね。",
+    "form": "無の境地",
+    "en": "The first time I went to a zazen session, I was quite tensed up, telling myself that today I would not think about anything. But my legs hurt from sitting the whole time and I kept worrying about lunch, so the inside of my head was actually noisier than ever. When it was over, I honestly told the priest who had been guiding us just that. And he listened to me with a big smile. He told me that straining to reach a state of nothingness free from distracting attachment is itself a kind of attachment, so when a thought comes up I can just leave it alone without chasing it, and the tension went right out of my shoulders.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「無の境地に達する・至る」の形が典型。座禅の話題で、雑念や執着を離れた心を指す。",
+    "sense": ""
+   },
+   "cardId": "nn-7ccc86a7e7-4348dfe7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
+    "cardId": "nn-7ccc86a7e7-4348dfe7",
+    "wordId": "nn-7ccc86a7e7"
+   }
+  },
+  {
+   "term": "空性",
+   "reading": "くうしょう",
+   "pos": "noun",
+   "meaning": "emptiness; absence of inherent existence",
+   "defJa": "他と無関係な固定した本質がないこと",
+   "passage": {
+    "ja": "すべてのものに固定した本質がないのなら、修行も悟りも、仏の教えさえも成り立たないことになるではないかという批判を、インドの僧、龍樹は主著『中論』の中で自ら取り上げている。彼の答えは、その逆だった。龍樹が空性を説いたのは、何も存在しないと言うためではなく、どんなものも他のものに支えられて初めて成り立つことを示すためであった。だからこそ種は芽を出し、迷う者も悟りに至ることができる。仮に種が固定した本質を持っているとしたら、いつまでたっても種のままだろう。",
+    "form": "空性",
+    "en": "If nothing has a fixed essence, then surely practice, awakening and even the Buddha's teaching itself can no longer hold: this is the criticism that the Indian monk Nāgārjuna himself takes up in his principal work, the Fundamental Verses on the Middle Way. His answer was the opposite. Nāgārjuna taught emptiness not in order to say that nothing exists, but to show that anything at all comes to be only when supported by other things. That is precisely why a seed sprouts and why even a deluded person can arrive at awakening. If a seed did have a fixed essence, it would remain a seed forever.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「空性を説く・悟る」の形で使う。何もないという意味ではなく、縁起と結び付けて語られる。",
+    "sense": ""
+   },
+   "cardId": "nn-d11596b336-6f752956",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-d11596b336-6f752956",
+    "wordId": "nn-d11596b336"
+   }
+  },
+  {
+   "term": "密教",
+   "reading": "みっきょう",
+   "pos": "noun",
+   "meaning": "esoteric Buddhism",
+   "defJa": "儀礼や師からの伝授を重んじる仏教の教え",
+   "passage": {
+    "ja": "天台宗を開いた最澄は、年下の空海に教えを請うてまで密教を学ぼうとしました。ところが、ある経典の注釈書を貸してほしいという頼みを空海は断り、この教えの最も深い部分は書物を写して身に付くものではなく、師が弟子と向き合って直接授けるものだと手紙で答えたとされます。印の結び方や真言の唱え方に至るまで、弟子は師から一つずつ教わります。真言宗の僧は今も、自分の師からその師へとさかのぼれば空海に行き着く系譜を受け継いでいます。",
+    "form": "密教",
+    "en": "Saichō, who founded the Tendai school, sought to learn esoteric Buddhism even to the point of asking the younger Kūkai to teach him. However, Kūkai is said to have refused his request to borrow a commentary on a certain sutra, answering in a letter that the deepest part of this teaching is not something acquired by copying books but something a master confers directly, face to face with a disciple. Everything down to how to form the mudras and how to chant the mantras is learned by the disciple from the master one item at a time. Even today, Shingon priests inherit a lineage that, traced back from their own master to that master's master, arrives at Kūkai.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「密教を学ぶ・伝える」の形で使う。師から弟子への伝授や、印・真言とともに語られる。",
+    "sense": ""
+   },
+   "cardId": "nn-8d4df6f214-fe89f6b2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-8d4df6f214-fe89f6b2",
+    "wordId": "nn-8d4df6f214"
+   }
+  }
+ ]
+}

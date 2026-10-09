@@ -29,34 +29,6 @@
    }
   },
   {
-   "term": "創発",
-   "reading": "そうはつ",
-   "pos": "noun",
-   "meaning": "emergence",
-   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
-   "passage": {
-    "ja": "渋滞の先頭まで進んだのに、事故も工事も見当たらなかった経験はありませんか。車が密集していると、一台の小さな減速が後ろへ伝わるにつれて増幅され、全体に止まっては進む波が生じることがあります。個々の運転手が計画していない集団の動きが現れる点に、創発という見方の面白さがあります。一台ずつの性能を詳しく調べるだけでなく、車間距離や反応の連鎖まで考えに入れると、なぜ全員が前へ進みたいのに列が止まるのかが見えてきます。",
-    "form": "創発",
-    "en": "Have you ever reached the front of a traffic jam without finding an accident or roadworks. When cars are packed together, a small slowdown by one can amplify as it travels backward, producing waves of stopping and starting across the whole group. The interest of emergence lies in collective behavior appearing without individual drivers planning it. Considering following distances and chains of reactions alongside individual vehicle performance reveals why the queue stops even though everyone wants to move forward.",
-    "register": "講",
-    "topic": "other",
-    "tipJa": "部分の相互作用から全体に現れる性質に用いる。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-2eb1d177bb-db85825f",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
-    "cardId": "nn-2eb1d177bb-db85825f",
-    "wordId": "nn-2eb1d177bb"
-   }
-  },
-  {
    "term": "実用化",
    "reading": "じつようか",
    "pos": "noun",

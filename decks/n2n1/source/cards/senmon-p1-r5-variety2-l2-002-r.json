@@ -29,34 +29,6 @@
    }
   },
   {
-   "term": "戦略物資",
-   "reading": "せんりゃくぶっし",
-   "pos": "noun",
-   "meaning": "strategic material",
-   "defJa": "安全保障や重要な産業に深く関わる物資",
-   "passage": {
-    "ja": "平時には容易に買える半導体でも、輸出が止まれば通信や輸送の設備を動かせなくなる恐れがあります。安全保障や重要な産業を支える戦略物資は、値段の安さだけで仕入れ先を選べない品です。国産化には時間も資金もかかるため、政府や企業は供給先の分散、在庫の確保、代わりの材料の開発などを組み合わせて備えます。必要な物をすべて一国で作ろうとするより、途絶した際に何が止まるかを具体的に確かめることが、対策の優先順位を決める出発点です。",
-    "form": "戦略物資",
-    "en": "Even semiconductors easily purchased in peacetime may leave communications or transport equipment unusable if exports stop. Strategic materials support security or essential industries, so low price alone cannot determine suppliers. Because domestic production takes time and money, governments and companies prepare through combinations of diversified suppliers, inventories, and substitute materials. Identifying exactly what would stop in a disruption provides a starting point for setting priorities, rather than trying to make every necessary item within one country.",
-    "register": "講",
-    "topic": "ai",
-    "tipJa": "安全保障や基幹産業への重要性から、安定供給が政策上の課題となる物資。",
-    "sense": ""
-   },
-   "deck": "senmon",
-   "field": "ai",
-   "level": "N1+",
-   "pass": 1,
-   "writer": "codex-astra",
-   "judge": "deepseek-v4-pro:cloud",
-   "cardId": "nn-a6ada40bc8-dcc22aa2",
-   "reviewOf": {
-    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
-    "cardId": "nn-a6ada40bc8-dcc22aa2",
-    "wordId": "nn-a6ada40bc8"
-   }
-  },
-  {
    "term": "実存的リスク",
    "reading": "じつぞんてきりすく",
    "pos": "noun",
