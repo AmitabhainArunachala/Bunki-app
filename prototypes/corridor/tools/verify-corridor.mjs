@@ -349,7 +349,7 @@ async function measureChromeTargets(page) {
       if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
           Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
     }
-    const saveOwnership = !popupOpen || (!!headerSave && !headerSave.checkVisibility() && !!popupSave && popupSave.checkVisibility()
+    const saveOwnership = !popupOpen || (!!headerSave && getComputedStyle(headerSave).visibility === 'hidden' && !!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
       && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44));
     return { width: innerWidth, rows, overlaps, relocatedSave, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
