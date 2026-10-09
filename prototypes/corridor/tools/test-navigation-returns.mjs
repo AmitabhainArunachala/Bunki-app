@@ -37,7 +37,7 @@ function app() {
     try { context.renderUntilDOM(); }
     catch (error) { if (error !== drawingBoundary) throw error; }
   };
-  vm.runInContext(['roomTransition', 'keepNavigationReturn', 'returnFromNavigation', 'openPassage',
+  vm.runInContext(['withoutRoomTransition', 'roomTransition', 'keepNavigationReturn', 'returnFromNavigation', 'openPassage',
     'openReferenceCollection', 'restoreLearningSourceCaller', 'resumeLearningSource']
     .map(actualFunction).join('\n'), context);
   return { context, positions };
