@@ -167,6 +167,7 @@ for (const engine of engines) for (const width of sizes) {
     assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
     await page.locator('#back').click();
     const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
+    await item.waitFor({ state: 'visible', timeout: 20_000 });
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup

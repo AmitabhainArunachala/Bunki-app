@@ -88,7 +88,13 @@ try{
   await openShelfTools(page);await page.locator('#search').fill('意見');await page.locator('.search-syn .sem-row').first().waitFor();await shot('search-synonyms','Word hits plus semantic neighbors');
   await click('.search-syn .sem-row');await sleep(900);await check('E02-neighbor','Semantic-neighbor result opens full entry',async()=>{assert.ok(await visible('.sheet .headword'));return await page.locator('.sheet .headword').innerText();});await closeSheet();
   await openShelfTools(page);await page.locator('#search').fill('<img src=x onerror=alert(1)>');await sleep(600);await shot('search-literal-empty','Malformed-looking input is harmless literal text with honest no-results feedback');
-  await check('E02-literal','Search treats markup-looking text literally',async()=>{assert.equal(await page.locator('main img').count(),0);assert.equal(await page.locator('#search').inputValue(),'<img src=x onerror=alert(1)>');return (await text()).slice(-700);});
+  await check('E02-literal','Search treats markup-looking text literally',async()=>{
+   const images=await page.locator('main img').evaluateAll(nodes=>nodes.map(n=>({className:n.className,src:n.getAttribute('src'),alt:n.getAttribute('alt'),width:n.getAttribute('width'),height:n.getAttribute('height'),hidden:n.getAttribute('aria-hidden'),parent:n.parentElement?.className})));
+   const owned=images.filter(n=>n.className==='shelf-art'&&n.src==='design/ink-hoku-nami.png'&&n.alt===''&&n.width==='640'&&n.height==='640'&&n.hidden==='true'&&n.parent==='shelf-mast-name');
+   assert.equal(owned.length,1,'The only allowed image is the exact owned fixed masthead decoration');
+   assert.equal(images.length-owned.length,0,'No unexpected or input-created image may enter main');
+   assert.equal(await page.locator('#search').inputValue(),'<img src=x onerror=alert(1)>');return (await text()).slice(-700);
+  });
   await openShelfTools(page);await page.locator('#search').fill('森林');await sleep(650);await click('main .entry-row');await sleep(850);await shot('word-entry','Correct 森林 full entry, readings, kanji and semantic/provenance content');
  });
  await segment('E03-recursive',async()=>{

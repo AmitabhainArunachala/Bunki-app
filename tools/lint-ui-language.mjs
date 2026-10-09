@@ -12,6 +12,7 @@ import path from 'node:path';
 import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../scripts/resolve-corridor-site.mjs';
 import { fixture, enrichmentFixture } from '../prototypes/corridor/tools/personal-fixture.mjs';
+import { entryCloseSelector } from '../prototypes/corridor/tools/sheet-navigation-support.mjs';
 
 export const ROOMS = [
   'drift',
@@ -584,7 +585,7 @@ try {
     await record(pp, 'personal-dictionary', language);
     await pp.locator('.personal-dictionary-meaning > summary').click();
     await record(pp, 'personal-dictionary-meanings', language);
-    await pp.locator('#sheet-close').click();
+    await pp.locator(await entryCloseSelector(pp)).click();
     for (const screen of ['read', 'connections', 'settings']) {
       await pp.locator(`[data-screen=${screen}]`).first().click();
       await record(pp, `personal-${screen}`, language);
