@@ -18,6 +18,7 @@
  * rejected each one, and a stopped worker resumes the fill on its next fetch
  * (owner ruling R5-32).
  */
+/* global Buffer, Headers, Response, TextDecoder, TextEncoder, setTimeout */
 import { createHash, webcrypto } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
