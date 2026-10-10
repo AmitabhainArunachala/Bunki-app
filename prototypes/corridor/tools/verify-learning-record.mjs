@@ -62,6 +62,7 @@ const names = new Set([
   'reviewAnswerAvailable', 'reviewCardBack', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'owns',
   'wordPresentationKey', 'presentReviewAnswer', 'assertWordAnswerPresented',
   'wordCapturePlan', 'wordCardIdentity', 'sameWordIdentity', 'wordAnswerIdentity', 'wordStudied',
+  'roomTransition', 'withoutRoomTransition', 'roomTransitionUpdating', 'activeRoomTransition',
 ]);
 if (referenceMode) names.add('pinnedSchedulerInput');
 const selected = ast.statements.filter((statement) => {

@@ -97,8 +97,9 @@ function defineRows() {
     'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
     // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
-    'wordSaveFacts', 'paintWordSave', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
+    'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
     'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
+    'miniKanjiWeb', 'revealFloatingFocus',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -193,6 +194,13 @@ function defineRows() {
       assert.match(selector, /^[a-z]+$/u, 'the fake DOM answers tag selectors only');
       const found = [], walk = (node) => { for (const child of node.children || []) { if (child.tag === selector) found.push(child); walk(child); } };
       walk(this); return found;
+    }
+    querySelector(selector) {
+      assert.match(selector, /^[#.][a-z-]+$/u, 'the fake DOM answers one id or one class selector only');
+      const name = selector.slice(1);
+      const hit = (node) => selector[0] === '#' ? node.id === name : !!node.classList?.contains(name);
+      const walk = (node) => { for (const child of node.children || []) { const found = hit(child) ? child : walk(child); if (found) return found; } return null; };
+      return walk(this);
     }
     showModal() { this.open = true; }
     close() { this.open = false; this.listeners.close?.(); }

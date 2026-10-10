@@ -132,8 +132,8 @@ export const idSchema = z
   .string()
   .min(1)
   .max(200)
-  .refine(wellFormed)
   .regex(/^\S+$/u)
+  .refine(wellFormed)
   .refine((value) =>
     [...value].every((character) => {
       const code = character.charCodeAt(0);

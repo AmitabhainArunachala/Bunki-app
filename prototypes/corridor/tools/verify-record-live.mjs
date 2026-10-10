@@ -767,7 +767,7 @@ try {
         assert.deepEqual(reloaded.record, backup.record);
         assert.deepEqual(reloaded.archive, backup.archive);
         await destination.locator('#tray').click();
-        assert.match(await destination.locator('.view-title').textContent(), /2/u);
+        assert.match(await destination.locator('#tray').getAttribute('aria-label'), /^(?:今日 · 保存した語 2|Today · 2 saved words)$/u);
         await fullPageScreenshot(destination, resolve(caseOut, 'restored.png'));
         details.download = 'synthetic-record.json';
         details.sourceDatabaseName = initial.installation.databaseName;
@@ -818,7 +818,8 @@ try {
               assert.equal(await page.locator('#read-fin').evaluate((node) => node.classList.contains('finished')), mode === 'uncertain');
             } else {
               await page.locator('#tray').click();
-              assert.match(await page.locator('.view-title').textContent(), mode === 'uncertain' ? /2/u : /1/u);
+              assert.match(await page.locator('#tray').getAttribute('aria-label'),
+                mode === 'uncertain' ? /^(?:今日 · 保存した語 2|Today · 2 saved words)$/u : /^(?:今日 · 保存した語 1|Today · 1 saved word)$/u);
             }
             details.fault = fault;
             details.id = id;

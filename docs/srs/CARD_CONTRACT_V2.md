@@ -61,8 +61,8 @@ words already enrolled. Recursion stops when the kanji give the meaning (Khatz's
 ## 4. Grading and repair
 
 - Two buttons, Again and Good. Hard and Easy are not shown. Grade only the target. On an
-  MCD card a reviewed alternative filler counts as Good. *(Superseded on 2026-10-09 by the
-  amendment below: four buttons.)*
+  MCD card a reviewed alternative filler counts as Good. _(Superseded on 2026-10-09 by the
+  amendment below: four buttons.)_
 
 > **Amendment, 2026-10-09: four grades (the learner's decision D1).** On the 2026-10-08 tour
 > he answered "Four (Again · Hard · Good · Easy) — and color coded"
@@ -91,6 +91,7 @@ words already enrolled. Recursion stops when the kanji give the meaning (Khatz's
 >   bar and the keyboard map describe the same button set").
 > - The standard's matching amendment is A53 (`STANDARD.md`). It replaces A29's "もう一度／思い出せた
 >   only".
+
 - On-screen rule (TheMoeWay): if the back made you understand the target better, Again.
 - Delete is one tap during review and reversible for the session. Leech threshold 5;
   repair ladder in order: swap in the next-ranked passage, add a hint, suspend. Bulk culls
