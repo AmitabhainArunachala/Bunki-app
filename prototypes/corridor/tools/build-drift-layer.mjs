@@ -355,6 +355,7 @@ patch(
   '(function () {\n"use strict";\n' +
     'const __layer = document.createElement("div");\n' +
     '__layer.id = "drift-layer";\n' +
+    '__layer.inert = true;\n' +
     '__layer.dataset.recordState = "loading";\n' +
     `__layer.innerHTML = ${'__MARKUP_JSON__'};\n` +
     'document.body.prepend(__layer);\n' +
@@ -410,7 +411,8 @@ patch(
 patch(
   '  nodes.push(n); nodeOf.set(el,n);\n  return n;\n}\nfunction spawnGlyph',
   '  nodes.push(n); nodeOf.set(el,n);\n' +
-    '  el.setAttribute("role","button");el.tabIndex=0;\n' +
+    '  el.setAttribute("role","button");el.tabIndex=-1;\n' +
+    '  el.dataset.uiContent="learning";el.querySelector(".base").lang="ja";el.querySelector(".yomi").lang="ja";el.querySelector(".gloss").lang="en";\n' +
     '  el.addEventListener("keydown",e=>{\n' +
     '    if(e.key!=="Enter"&&e.key!==" ")return;\n' +
     '    e.preventDefault();e.stopPropagation();\n' +
@@ -420,6 +422,16 @@ patch(
     '  });\n' +
     '  return n;\n}\nfunction spawnGlyph',
   'word keyboard activation shares the pointer tap ladder',
+);
+
+// The keyboard order follows the renderer's final rounded opacity, including
+// the existing viewport/chrome dissolve. No paint or gesture calculation changes.
+patch(
+  '    const opStr=outOp.toFixed(3);\n    if(n._lop!==opStr){n._lop=opStr;n.el.style.opacity=opStr;}',
+  '    const opStr=outOp.toFixed(3);\n' +
+    '    if(n.kind==="word"){const tab=DRIFT_ON&&!n.gone&&!n.removed&&n.el.isConnected&&Number(opStr)>0?0:-1;if(n.el.tabIndex!==tab)n.el.tabIndex=tab;}\n' +
+    '    if(n._lop!==opStr){n._lop=opStr;n.el.style.opacity=opStr;}',
+  'word Tab eligibility follows actual painted presence',
 );
 
 // 2b · hidden-layer tab discipline: the radical explainer rests at opacity:0
@@ -494,7 +506,7 @@ for (const name of ['refreshActive()', 'clearBloom(keep)', 'collapseUnfold()', '
   patch(`function ${name}{`, `function ${name}{\n  if(recordPending.size)return;`, `pending judgment preserves ${name}`);
 }
 patch('function removeNode(n,delay){\n  const el=n.el;\n  setTimeout(function(){',
-  'function removeNode(n,delay){\n  const el=n.el;\n  setTimeout(function(){\n    if(n.recordPending)return;', 'pending node cannot be removed by a prior timer');
+  'function removeNode(n,delay){\n  const el=n.el;\n  if(n.kind==="word")el.tabIndex=-1;\n  setTimeout(function(){\n    if(n.recordPending)return;', 'pending node cannot be removed by a prior timer');
 patch('function tapNode(n){', 'function tapNode(n){\n  if(recordPending.size){setHint("判断を保存しています。");return;}', 'pending judgment keeps taps from rebuilding the field');
 patch('lvlEl.addEventListener("pointerdown",e=>{\n  e.stopPropagation();',
   'lvlEl.addEventListener("pointerdown",e=>{\n  if(recordPending.size)return;\n  e.stopPropagation();', 'pending judgment preserves the level tide');
@@ -916,12 +928,14 @@ window.__DRIFT__ = {
   show() {
     if(recordBridge)void refreshRecord();
     DRIFT_ON = true;
+    __layer.inert = false;
     document.getElementById('drift-layer').classList.add('active');
     sizeCanvases();
     if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
     DRIFT_ON = false;
+    __layer.inert = true;
     document.getElementById('drift-layer').classList.remove('active');
   },
   // the corridor drives the shared nihonga world from its chrome seal; the

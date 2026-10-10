@@ -1178,4 +1178,12 @@ Four actual file consumers, normal/reduced for both pages, pass front answer sec
 | --- | --- | --- |
 | `tools/verify-today-sky.mjs:227`, exact English Auto label | `'auto'` → `'Auto'`; Japanese remains `'自'` | The keyboard/level repair prints plain English Auto in the actual consumer. Frozen clean v14 fails only this casing comparison (80/81), with the exact original handle and unmeasured-level hint already correct. Both behavior equalities, Japanese wording, actual trusted rail release and all other assertions remain unchanged. |
 
-The failed clean v14 receipt remains in `verify/direct-v14/evidence/today-sky-final-v14/today-sky.json`. Verification of the deliberately changed label pin follows on the assembled successor.
+The failed clean v14 receipt remains in `verify/direct-v14/evidence/today-sky-final-v14/today-sky.json`. The deliberately changed pin passes all81 checks against that same immutable v14 UI in `today-auto-pin-v15/`; assembled-source verification follows.
+
+## Round 5: painted word Tab order and truthful learning semantics (2026-10-11)
+
+The frozen clean v14 battery exposed a regression from adding word button semantics:35 opacity-zero words were still in the Tab order (accessibility52/53), and the unchanged core language tour counted192 learned Japanese word buttons as operating chrome. Their exact failing receipts remain in `verify/{blocking,root}-v14`. No accessibility or language predicate, selector, delay or threshold changes.
+
+The extractor now starts words outside the Tab order and derives eligibility from the renderer's existing final rounded opacity and node liveness, writing only when the actual tabIndex differs. Departing words leave the order immediately; the hidden whole layer is inert. Real Japanese base/reading and English gloss spans carry their actual languages, and the word uses the existing learning-content marker. Paint, physics, pointer/keyboard ladder, grade effects and record behavior stay intact.
+
+The exact final owned hashes and96-patch generator checks are in `tab-content-v15/source-pins.json`. Both dirty candidates pass the unchanged53/53 accessibility suite; final-source candidate2 also passes all54 actual keyboard assertions and15 level assertions, with owned resources closed. The earlier immutable candidate1 core language tour passes83 visits with zero issues; its full tour is separately pinned and does not certify candidate2. The clean assembled full battery follows. Generated CSS and the donor remain byte-identical; no protected data or storage contract changes.
