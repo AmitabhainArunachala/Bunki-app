@@ -25,6 +25,9 @@ Run from the repo root:  python3 decks/kotoba-mine/tools/build.py
 Needs: pip install fugashi unidic-lite==1.0.8 genanki
 
 Flags
+  --study-only    rebuild only the two private release HTML pages from their existing
+                  deck/gloss payloads and current player, motion and bundled fonts;
+                  update display titles only, never ids, cards, APKG or TSV
   --frozen        never write ids.json; fail, naming the key, if a card has no id
   --out <dir>     write only <dir>/<deck id>/deck.json for both decks (no apkg/tsv/html)
   --mcd <path>    read the MCD passages from <path> instead of source/mcd.json
@@ -44,6 +47,7 @@ the deck, grouped by site, with licence, author/translator, URLs and passage cou
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import html
 import json
@@ -97,10 +101,12 @@ SENTENCE_METHOD = [
 # the two decks built from the same word list, side by side in 集中道場
 DECKS = {
     "sentence": {"id": "kotoba-mine", "titleJa": "調べた言葉・例文", "titleEn": "Words you looked up · sentences",
+                 "ankiRoot": "言葉の鉱脈・文 Kotoba Mine",
                  "defaults": {"look": "dark", "mode": "read", "gloss": "tap"}, "method": SENTENCE_METHOD,
                  "anki": ("anki-sentence", "kotoba-mine-sentence-v3", "Kotoba Mine Sentence", "Read", "kotoba-mine-v3"),
                  "out": ("kotoba-mine.apkg", "kotoba-mine.tsv", "study.html")},
     "mcd": {"id": "kotoba-mcd", "titleJa": "調べた言葉・長文", "titleEn": "Words you looked up · passages",
+            "ankiRoot": "言葉の鉱脈・MCD Kotoba Mine",
             # 読んで思い出す by default (CARD_CONTRACT_V2 §2); 穴埋め, the MCD blank preset, is one switch
             # away in 設定 and brings the 字 cards back into the queue (STANDARD A37)
             "defaults": {"look": "ai", "mode": "read", "gloss": "tap"}, "unlockDays": 3,
@@ -1284,7 +1290,8 @@ def build_anki(deck: dict, spec: dict, out_dir: Path = RELEASE) -> None:
         def guid(self):
             return genanki.guid_for(self.fields[0], deck["id"])
 
-    root = f"{deck['titleJa']} Kotoba Mine"
+    # The UI title can change without renaming the learner's existing Anki decks.
+    root = spec["ankiRoot"]
     decks = {}
     for g in deck["groups"]:
         d = genanki.Deck(stable_id(f"{deck_key}-{g['id']}"), f"{root}::{g['titleJa']}")
@@ -1328,11 +1335,42 @@ def build_study(deck: dict, out: Path | None = None, gloss: dict | None = None) 
     page = (HERE / "study-shell.html").read_text("utf-8")
     deck_json = json.dumps(deck, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     pin = (CORRIDOR / "data" / "fsrs-pin.json").read_text("utf-8").strip()
-    css = (player / "player.css").read_text("utf-8")
+    fonts = (CORRIDOR / "fonts.css").read_text("utf-8")
+    def inline_font(match):
+        path = CORRIDOR / match.group(1)
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        return f'url("data:font/woff2;base64,{encoded}")'
+    fonts, font_count = re.subn(r'url\([\"\']?(fonts/[^)\"\']+\.woff2)[\"\']?\)', inline_font, fonts)
+    if font_count != fonts.count("@font-face") or re.search(r"url\((?![\"']?data:)|@import|local\(", fonts):
+        raise SystemExit("study export: every bundled font face must be self-contained")
+    css = "\n".join([fonts, (player / "player.css").read_text("utf-8"),
+                       (CORRIDOR / "rooms" / "motion.css").read_text("utf-8")])
     gloss_json = json.dumps(gloss, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     page = page.replace("__CSS__", css).replace("__PIN__", pin).replace("__GLOSS__", gloss_json).replace("__DECK__", deck_json)
     page = page.replace("__CODE__", code.replace("</script", "<\\/script"))
+    page = page.replace("__TITLE__", html.escape(deck["titleEn"]))
     (out or RELEASE / "study.html").write_text(page, "utf-8")
+
+
+def rebuild_study_only() -> None:
+    """Export the shipped private study payloads without rebuilding learning content."""
+    decoder = json.JSONDecoder()
+    for spec in DECKS.values():
+        out = RELEASE / spec["out"][2]
+        page = out.read_text("utf-8")
+        bundle = page[page.index("window.__CORRIDOR_BUNDLE__ = {"):]
+        def payload(key):
+            marker = f"'{key}': "
+            return decoder.raw_decode(bundle[bundle.index(marker) + len(marker):])[0]
+        deck = payload("decks/kotoba-mine")
+        gloss = payload("decks/kotoba-mine/gloss")
+        shipped = json.loads((CORRIDOR / "decks" / spec["id"] / "deck.json").read_text("utf-8"))
+        if deck["id"] != spec["id"] or shipped["id"] != spec["id"]:
+            raise SystemExit(f"study export: wrong deck identity in {out}")
+        for key in ("titleJa", "titleEn"):
+            deck[key] = shipped[key]
+        build_study(deck, out, gloss)
+        print(f"· HTML only: {spec['id']} → {out.relative_to(REPO)}")
 
 
 # ------------------------------------------------------------------ profiles and attribution
@@ -1414,6 +1452,9 @@ def attribution_md(deck: dict, profile: str) -> str:
 
 
 def main() -> int:
+    if "--study-only" in sys.argv:
+        rebuild_study_only()
+        return 0
     mods = load()
     if "--preview" in sys.argv:
         ids = IdManifest(IDS_PATH, frozen=False)  # new passages get ids in memory; save() is never called

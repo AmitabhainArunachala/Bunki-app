@@ -70,7 +70,9 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  *   d) textures on the page, never on the card under the ruby;
  *   e) the reveal keeps the card node and fades the answer in (opacity/transform, ≤ 180 ms);
  *      a grade slides the old card out in its direction and the rail ticks on the compositor;
- *      with prefers-reduced-motion nothing moves or fades, and a swipe does not drag the card.
+ *      with prefers-reduced-motion only a finite opacity crossfade (≤ 120 ms) is allowed;
+ *      declarations and effects are checked even after settling, with no ambient motion,
+ *      smooth autoscroll, transformed card or swipe drag.
  *
  * Then the review loop (CARD_CONTRACT_V2 §3.7, §4), both decks where it applies:
  *   a) 削除 in the study top bar is one tap: the card leaves the sitting and every later queue, its FSRS
@@ -185,6 +187,34 @@ function check(name, pass, detail = '') {
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
 }
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
+
+/** Actual renderer fonts on visible study-page text, plus self-contained face declarations. */
+async function studyFontEvidence(page) {
+  const census = await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const faces = [...document.styleSheets].flatMap((sheet) => [...sheet.cssRules]).filter((rule) => rule.type === 5 /* FONT_FACE_RULE */);
+    const nodes = [...document.querySelectorAll('.kp *')].filter((node) =>
+      [...node.childNodes].some((child) => child.nodeType === Node.TEXT_NODE && child.textContent.trim()) &&
+      (() => { const r = node.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(node).visibility === 'visible'; })());
+    nodes.forEach((node, i) => node.setAttribute('data-kp-font-probe', String(i)));
+    return { faces: faces.length, embedded: faces.every((rule) => /^url\(["']?data:font\/woff2;base64,/.test(rule.style.getPropertyValue('src'))), registered: document.fonts.size, status: document.fonts.status, textNodes: nodes.length };
+  });
+  const cdp = await page.context().newCDPSession(page);
+  try {
+    await cdp.send('DOM.enable');
+    await cdp.send('CSS.enable');
+    const { root } = await cdp.send('DOM.getDocument');
+    const { nodeIds } = await cdp.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector: '[data-kp-font-probe]' });
+    const fonts = [];
+    for (const nodeId of nodeIds) fonts.push(...(await cdp.send('CSS.getPlatformFontsForNode', { nodeId })).fonts);
+    return { ...census, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
+  } finally {
+    await page.evaluate(() => { for (const node of document.querySelectorAll('[data-kp-font-probe]')) node.removeAttribute('data-kp-font-probe'); });
+    await cdp.detach();
+  }
+}
+const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.textNodes > 0 && f.glyphs > 0 && f.nativeGlyphs === 0;
 
 /* ------------------------------------------------- half one: the deck */
 function verifyDeck() {
@@ -710,12 +740,23 @@ function verifyBackParity() {
   const posOf = new Map(readJson(DECK_PATH).words.flatMap((w) => w.cards.map((c) => [c.id, w.pos])));
   const wrongPos = tsv.slice(3).map((l) => l.split('\t')).filter((r) => (posOf.get(r[0]) === 'な-adjective') !== (r[cols.indexOf('POS')] === 'adjna')).map((r) => r[0]);
   if (wrongPos.length) bad.push(`kotoba-mcd.tsv POS: な-adjectives are not adjna: ${wrongPos.slice(0, 3).join(', ')}`);
+  // This is packaging parity, not a behavioral assertion: the separately served
+  // release outputs must actually contain the player from the built site under test.
+  const playerCss = readFileSync(resolve(CORRIDOR_DIR, 'decks/player/player.css'), 'utf8');
+  const roomMotion = readFileSync(resolve(CORRIDOR_DIR, 'rooms/motion.css'), 'utf8');
+  const mount = readFileSync(resolve(CORRIDOR_DIR, 'decks/player/mount.js'), 'utf8')
+    .replace(/import\s*\{([^}]*)\}\s*from\s*'\.\/engine\.js';/u, 'const {$1} = __KP_ENGINE__;')
+    .replace(/^export /gmu, '').replaceAll('import.meta.url', 'location.href').replaceAll('</script', '<\\/script');
+  const releaseParity = [];
   for (const page of ['study.html', 'study-mcd.html']) {
     const html = readFileSync(resolve(release, page), 'utf8');
+    releaseParity.push({ page, css: html.includes(playerCss), mount: html.includes(mount), roomMotion: html.includes(roomMotion), fonts: (html.match(/@font-face\s*\{/gu) || []).length });
     if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
     if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
     if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
   }
+  check('parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
+    releaseParity.length === 2 && releaseParity.every((x) => x.css && x.mount && x.roomMotion && x.fonts === 451), JSON.stringify(releaseParity));
   check('parity: the study pages bundle this player; the Anki fronts show no readings, English or hint; the Anki backs keep the same order (英語 and 英訳 closed, 漢字 open on 字 cards, 出典 the last fold) and translate only the target sentence; Anki edges and first chips by item kind (the retuned 字 hue), 形容動詞 on な-adjectives', bad.length === 0, bad.slice(0, 3).join(' | ') || 'anki, anki-sentence, study.html, study-mcd.html, kotoba-mcd.tsv');
 }
 
@@ -817,7 +858,8 @@ async function verifyHost(browser, base) {
       await p.goto(`${release.base}/${page}`, { waitUntil: 'load' });
       await p.waitForSelector('#kp-start', { timeout: 30000 });
       const host = await p.evaluate(`document.querySelector('.kp')?.dataset.host`);
-      seen.push({ page, host, tokens: asked.filter((a) => a.includes('tokens')).length });
+      const fonts = await studyFontEvidence(p);
+      seen.push({ page, host, tokens: asked.filter((a) => a.includes('tokens')).length, fonts });
       await context.close();
     }
   } finally {
@@ -829,6 +871,8 @@ async function verifyHost(browser, base) {
     seen.every((x) => x.host === 'none' && x.tokens === 0) && html.every((t) => !t.includes('createHost') && !t.includes('bunki-cloze-tokens","version') && !/"tokens":"tokens/.test(t) && t.includes('function hostAdapter')),
     JSON.stringify(seen),
   );
+  check('host: both actual release study pages embed all 451 font faces and paint visible home text entirely with bundled fonts',
+    seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ page, fonts }) => ({ page, fonts }))));
 }
 
 /* ------------------------------------- the passage pilot (STANDARD A46, CARD_CONTRACT_V2 §2–§7) */
@@ -1235,7 +1279,8 @@ async function verifyTap(browser, base) {
       const closed = await page.evaluate(`!document.getElementById('kp-pop')`);
       await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
       const self = await page.evaluate(`document.getElementById('kp-pop')?.dataset.key`);
-      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed });
+      const fonts = await studyFontEvidence(page);
+      seen.push({ file, shown, front, toks, pop, self, lookups: lookups.length, same, closed, fonts });
       if (errors.length) check(`no page errors on ${file}`, false, errors.slice(0, 2).join(' | '));
       await context.close();
     }
@@ -1244,6 +1289,8 @@ async function verifyTap(browser, base) {
       seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Save to your review cards in Bunki\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
       JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
     );
+    check('tap, standalone: both actual release backs and their word popovers use bundled fonts for every visible text glyph',
+      seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ file, fonts }) => ({ file, fonts }))));
   } finally {
     release.server.close();
   }
@@ -1414,7 +1461,7 @@ async function verifyBack(browser, base) {
     const stored = await o.page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').zoom`);
     check(
       'd) a new passage card opens 全文 after the reveal (no zoom on the front); 焦点 in the card header dims the other sentences, keeps them, and is remembered for the deck',
-      z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x <= 0.8) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.text.min >= 4.5 && z2.contrast.ruby.count > 0 && z2.contrast.ruby.min >= 4.5 && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
+      z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x < 0.5) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.text.min >= 4.5 && z2.contrast.ruby.count > 0 && z2.contrast.ruby.min >= 4.5 && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
       JSON.stringify({ before: { zoom: z1.zoom, n: z1.n, dim: z1.dim }, after: { zoom: z2.zoom, dim: z2.dim, contrast: z2.contrast }, stored }),
     );
 
@@ -1540,7 +1587,7 @@ async function verifyBack(browser, base) {
     );
     check(
       '1) 焦点 folds the sentences before and after the target to two dimmed lines each (never removed: the passage text is whole), with ⋯ (aria-expanded) on a group that runs longer, which opens it; 全文 lays the groups out inline with no ⋯',
-      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim <= 0.8 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && g.contrast.text.min >= 4.5 && (!g.contrast.ruby.count || g.contrast.ruby.min >= 4.5) && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
+      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim < 0.5 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && g.contrast.text.min >= 4.5 && (!g.contrast.ruby.count || g.contrast.ruby.min >= 4.5) && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
         f.text === c.ja && full.text === c.ja && full.groups.every((g) => g.display === 'contents' && !g.more && g.dim === 1),
       JSON.stringify({ focus: f.groups, opened: f.opened, full: full.groups.map((g) => [g.side, g.display, g.more]) }),
     );
@@ -2190,6 +2237,102 @@ const MOTION = `(() => {
   const animations = kp.getAnimations({ subtree: true }).map((a) => ({ name: a.animationName, properties: [...new Set(a.effect.getKeyframes().flatMap((f) => Object.keys(f).filter((k) => !['offset', 'computedOffset', 'easing', 'composite'].includes(k))))] }));
   return { longest: Math.round(longest * 1000), moving: moving.slice(0, 4), running: document.getAnimations().length, animations, opacityOnly: animations.length > 0 && animations.every((a) => a.properties.length > 0 && a.properties.every((p) => p === 'opacity')) };
 })()`;
+/** Inspect the browser's effective declarations, including completed CSS animations,
+ * and retain every forbidden effect seen during the actual action. No source-text pins. */
+function reducedMotionProbe(mode = 'read') {
+  if (mode === 'stop') {
+    window.__kpReducedMotion?.stop();
+    delete window.__kpReducedMotion;
+    return;
+  }
+  const create = () => {
+    const kp = document.querySelector('.kp');
+    const faults = new Set();
+    const declared = new Map();
+    const effects = new Map();
+    const keyframes = new Map();
+    const label = (n, pseudo = '') => `${n.id ? `#${n.id}` : n.className || n.tagName}${pseudo}`;
+    const split = (v) => v.split(',').map((x) => x.trim());
+    const ms = (v) => parseFloat(v) * (v.endsWith('ms') ? 1 : 1000);
+    const indexed = (values, i) => values[i % values.length];
+    const properties = (frames) => [...new Set(frames.flatMap((f) => Object.keys(f).filter((p) => !['offset', 'computedOffset', 'easing', 'composite'].includes(p))))];
+    const finiteOpacity = (props, duration, delay, iterations = 1, endDelay = 0) =>
+      props.length > 0 && props.every((p) => p === 'opacity') && Number.isFinite(duration) && duration > 0 && delay >= 0 && endDelay >= 0 && iterations === 1 && duration + delay + endDelay <= 120;
+    const inspectEffect = (animation) => {
+      const effect = animation.effect;
+      if (!effect) { faults.add('animation has no effect'); return; }
+      const timing = effect.getTiming(), props = properties(effect.getKeyframes());
+      const row = { where: label(effect.target || document.documentElement, effect.pseudoElement || ''), properties: props, duration: timing.duration, delay: timing.delay, endDelay: timing.endDelay, iterations: timing.iterations, playState: animation.playState };
+      effects.set(JSON.stringify(row), row);
+      if (!finiteOpacity(props, timing.duration, timing.delay, timing.iterations, timing.endDelay)) faults.add(`${row.where}: active effect ${props.join('/')} ${timing.duration}+${timing.delay}ms ×${timing.iterations}`);
+    };
+    const rules = (list) => {
+      for (const rule of list) {
+        if (rule.type === 7 /* CSSRule.KEYFRAMES_RULE */) {
+          keyframes.set(rule.name, [...new Set([...rule.cssRules].flatMap((frame) => [...frame.style]))]);
+        } else if (rule.cssRules && (rule.type !== 4 /* CSSRule.MEDIA_RULE */ || matchMedia(rule.conditionText).matches)) rules(rule.cssRules);
+      }
+    };
+    const snapshot = () => {
+      keyframes.clear();
+      for (const sheet of document.styleSheets) {
+        try { rules(sheet.cssRules); } catch { faults.add('unreadable stylesheet'); }
+      }
+      const moving = [];
+      let longest = 0;
+      for (const n of [document.documentElement, document.body, kp, ...kp.querySelectorAll('*')]) {
+        for (const pseudo of ['', '::before', '::after']) {
+          const cs = getComputedStyle(n, pseudo || null);
+          const where = label(n, pseudo);
+          const held = n.closest('.kp-screen-hold[aria-hidden="true"], .kp-reveal-hold[aria-hidden="true"]');
+          if (cs.scrollBehavior === 'smooth') faults.add(`${where}: smooth scroll`);
+          if (!pseudo && kp.contains(n) && cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') { moving.push(where); faults.add(`${where}: transformed element`); }
+          const names = split(cs.animationName), durations = split(cs.animationDuration), delays = split(cs.animationDelay), iterations = split(cs.animationIterationCount);
+          names.forEach((name, i) => {
+            if (name === 'none') return;
+            const duration = ms(indexed(durations, i)), delay = ms(indexed(delays, i)), iteration = Number(indexed(iterations, i));
+            const props = keyframes.get(name) || [];
+            longest = Math.max(longest, duration + Math.max(0, delay));
+            const row = { where, kind: 'animation', name, properties: props, duration, delay, iterations: iteration };
+            declared.set(JSON.stringify(row), row);
+            if (!finiteOpacity(props, duration, delay, iteration)) faults.add(`${where}: animation ${name} ${props.join('/')} ${duration}+${delay}ms ×${iteration}`);
+            if (held && held !== n) faults.add(`${where}: held descendant restarts an animation`);
+          });
+          const transitions = split(cs.transitionProperty), times = split(cs.transitionDuration), waits = split(cs.transitionDelay);
+          transitions.forEach((property, i) => {
+            const duration = ms(indexed(times, i)), delay = ms(indexed(waits, i));
+            if (property === 'none' || duration === 0) return;
+            longest = Math.max(longest, duration + Math.max(0, delay));
+            const row = { where, kind: 'transition', properties: [property], duration, delay };
+            declared.set(JSON.stringify(row), row);
+            if (!finiteOpacity([property], duration, delay)) faults.add(`${where}: transition ${property} ${duration}+${delay}ms`);
+            if (held && held !== n) faults.add(`${where}: held descendant has a transition`);
+          });
+        }
+      }
+      for (const animation of document.getAnimations()) inspectEffect(animation);
+      return { longest, moving, running: document.getAnimations().filter((a) => a.playState === 'running' || a.playState === 'pending').length,
+        faults: [...faults], declared: [...declared.values()], effects: [...effects.values()], opacityOnly: faults.size === 0 };
+    };
+    let raf;
+    const frame = () => { snapshot(); raf = requestAnimationFrame(frame); };
+    const observer = new MutationObserver(snapshot);
+    observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+    const events = ['animationstart', 'animationend', 'transitionrun', 'transitionend'];
+    for (const event of events) document.addEventListener(event, snapshot, true);
+    const originalAnimate = Element.prototype.animate;
+    const observedAnimate = function (...args) { const animation = originalAnimate.apply(this, args); inspectEffect(animation); return animation; };
+    Element.prototype.animate = observedAnimate;
+    raf = requestAnimationFrame(frame);
+    return { snapshot, stop: () => { cancelAnimationFrame(raf); observer.disconnect(); for (const event of events) document.removeEventListener(event, snapshot, true); if (Element.prototype.animate === observedAnimate) Element.prototype.animate = originalAnimate; } };
+  };
+  if (mode === 'start') {
+    window.__kpReducedMotion?.stop();
+    window.__kpReducedMotion = create();
+  }
+  return window.__kpReducedMotion.snapshot();
+}
+const REDUCED_MOTION = (mode = 'read') => `(${reducedMotionProbe.toString()})(${JSON.stringify(mode)})`;
 /** records the cards that come and go while a grade is answered */
 const WATCH = `(() => {
   window.__kpSeen = [];
@@ -2414,24 +2557,59 @@ async function verifyVisual(browser, base) {
   // e) prefers-reduced-motion: a short opacity crossfade, no transform or swipe drag
   {
     const o = await open('?deck=kotoba', 'kotoba-mine', { reduce: true });
+    await o.page.waitForTimeout(200);
+    const baseline = await o.page.evaluate(REDUCED_MOTION('start'));
     await o.page.evaluate(`window.__kpCard = document.getElementById('kp-card')`);
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
     const still = await o.page.evaluate(`document.getElementById('kp-card') === window.__kpCard`);
-    const revealed = await o.page.evaluate(MOTION);
+    const revealed = await o.page.evaluate(REDUCED_MOTION());
+    await o.page.locator('#kp-card .kp-folds > details > summary').first().click();
+    const foldOpen = await o.page.evaluate(`document.querySelector('#kp-card .kp-folds > details').open`);
     await o.page.evaluate(WATCH);
     const drag = await o.page.evaluate(`(() => { const n = document.getElementById('kp-card'); const ev = (type, x, y) => n.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, pointerId: 9, bubbles: true }));
       ev('pointerdown', 100, 100); ev('pointermove', 160, 102); const mid = { transform: n.style.transform, swipe: n.dataset.swipe }; ev('pointermove', 230, 104); ev('pointerup', 230, 104); return mid; })()`);
     await o.page.waitForSelector('#kp-reveal');
     const advanced = await o.page.evaluate(`(() => { const i = document.querySelector('.kp-progress i'); return { seen: window.__kpSeen.length, count: document.querySelector('.kp-count').textContent, total: +document.querySelector('.kp-count').textContent.split('/')[1], rail: getComputedStyle(i).transform, width: i.getBoundingClientRect().width, track: i.parentElement.getBoundingClientRect().width,
       arrive: document.getElementById('kp-card').classList.contains('kp-arrive'), log: JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mine') || '{"log":[]}').log.length }; })()`);
-    const moved = await o.page.evaluate(MOTION);
+    const moved = await o.page.evaluate(REDUCED_MOTION());
+    await o.page.waitForTimeout(200);
+    const settled = await o.page.evaluate(REDUCED_MOTION());
     check(
-      'e) prefers-reduced-motion (emulateMedia): the reveal keeps the card and uses an opacity-only crossfade within 120 ms, no element is transformed; a swipe marks the edge without dragging and still grades; no slide-out, the next card crossfades and the rail is a plain width',
-      still && revealed.longest > 0 && revealed.longest <= 120 && revealed.opacityOnly && revealed.moving.length === 0 && drag.transform === '' && drag.swipe === 'good' && advanced.seen === 0 && advanced.arrive && advanced.log === 1 && advanced.count.startsWith('2/') &&
-        advanced.rail === 'none' && Math.abs(advanced.width - advanced.track / advanced.total) < 1 && moved.longest > 0 && moved.longest <= 120 && moved.opacityOnly && moved.moving.length === 0,
-      JSON.stringify({ still, revealed, drag, advanced, moved }),
+      'e) prefers-reduced-motion (emulateMedia): no ambient motion or smooth autoscroll; every declared animation, idle transition and observed effect is opacity-only within 120 ms, including after settling; reveal keeps the card, swipe never drags or slides out, next card crossfades and rail uses plain width',
+      baseline.opacityOnly && baseline.running === 0 && baseline.moving.length === 0 && still && foldOpen && revealed.longest > 0 && revealed.longest <= 120 && revealed.opacityOnly && revealed.moving.length === 0 && drag.transform === '' && drag.swipe === 'good' && advanced.seen === 0 && advanced.arrive && advanced.log === 1 && advanced.count.startsWith('2/') &&
+        advanced.rail === 'none' && Math.abs(advanced.width - advanced.track / advanced.total) < 1 && moved.longest > 0 && moved.longest <= 120 && moved.opacityOnly && moved.moving.length === 0 && settled.opacityOnly && settled.running === 0 && settled.moving.length === 0,
+      JSON.stringify({ baseline, still, foldOpen, revealed, drag, advanced, moved, settled }),
     );
+    // Independent browser mutations must be rejected even when a forbidden animation
+    // has already finished, or a transition has never started. Restore each mutation.
+    const rejected = [];
+    for (const [name, css] of [
+      ['idle transform transition', '#kp-card { transition: transform 100ms !important; }'],
+      ['idle color transition', '#kp-card { transition: color 100ms !important; }'],
+      ['finished transform animation', '@keyframes kp-test-transform { from { transform: translateX(1px); } to { transform: none; } } #kp-card { animation: kp-test-transform 1ms linear both !important; }'],
+      ['finished stroke animation', '@keyframes kp-test-stroke { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } } #kp-card { animation: kp-test-stroke 1ms linear both !important; }'],
+      ['ambient opacity animation', '@keyframes kp-test-ambient { from { opacity: .99; } to { opacity: 1; } } #kp-card { animation: kp-test-ambient 100ms linear infinite !important; }'],
+      ['smooth autoscroll', '#kp-card { scroll-behavior: smooth !important; }'],
+    ]) {
+      await o.page.evaluate(REDUCED_MOTION('start'));
+      await o.page.evaluate((text) => { const style = document.createElement('style'); style.id = 'kp-motion-mutant'; style.textContent = text; document.head.append(style); }, css);
+      await o.page.waitForTimeout(150);
+      const mutant = await o.page.evaluate(REDUCED_MOTION());
+      rejected.push({ name, rejected: !mutant.opacityOnly, faults: mutant.faults });
+      await o.page.evaluate(`document.getElementById('kp-motion-mutant').remove()`);
+    }
+    await o.page.evaluate(REDUCED_MOTION('start'));
+    await o.page.evaluate(() => document.getElementById('kp-card').animate([{ transform: 'translateX(1px)' }, { transform: 'none' }], { duration: 1 }));
+    await o.page.waitForTimeout(150);
+    const finishedEffect = await o.page.evaluate(REDUCED_MOTION());
+    rejected.push({ name: 'finished Web Animations transform', rejected: !finishedEffect.opacityOnly, faults: finishedEffect.faults });
+    await o.page.evaluate(REDUCED_MOTION('start'));
+    const restored = await o.page.evaluate(REDUCED_MOTION());
+    check('e) reduced-motion probe rejects idle transform/color transitions, finished CSS and Web Animations transform/stroke effects, ambient fades and smooth autoscroll; removing the mutations restores a passing baseline',
+      rejected.length === 7 && rejected.every((x) => x.rejected) && restored.opacityOnly && restored.running === 0,
+      JSON.stringify({ rejected, restored }));
+    await o.page.evaluate(REDUCED_MOTION('stop'));
     await close(o);
   }
 }
