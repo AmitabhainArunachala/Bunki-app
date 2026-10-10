@@ -1171,3 +1171,11 @@ The existing study-only workflow refreshes the two real `decks/kotoba-mine/relea
 Four actual file consumers, normal/reduced for both pages, pass front answer secrecy, current KAIRO popovers,451 registered faces, nonempty visible glyphs with native0, loaded status before/after the census, errorFaces0, open-fold grade and durable reload. Twelve injected learning-answer negatives fail correctly. The first runtime-only consumer's overbroad `[lang=en]` front census mistook 'Recall the marked word' operating chrome for an answer; its exact script, failed result and explicit content-based refinement remain. The committed main FRONT predicate already removes the chips containing that instruction and is unchanged. This is a scope correction, not permission for hidden answers or interactive fronts.
 
 `index.html` comments now distinguish local font fetches, successful install caching, embedded standalone bytes and the all451-unavailable/empty-cache failure. That negative observed six native DOM glyphs after4.3s and zero unready canvas labels; it remains a font-only failure condition, not an approved system-font design. No additional font architecture is claimed. Final ready receipt: `exports-v14/SOURCE_READY.json`; all owned consumer resources are closed. Full clean assembly follows these narrow checks.
+
+## Round 5: plain Auto label casing pin (2026-10-11)
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `tools/verify-today-sky.mjs:227`, exact English Auto label | `'auto'` → `'Auto'`; Japanese remains `'自'` | The keyboard/level repair prints plain English Auto in the actual consumer. Frozen clean v14 fails only this casing comparison (80/81), with the exact original handle and unmeasured-level hint already correct. Both behavior equalities, Japanese wording, actual trusted rail release and all other assertions remain unchanged. |
+
+The failed clean v14 receipt remains in `verify/direct-v14/evidence/today-sky-final-v14/today-sky.json`. Verification of the deliberately changed label pin follows on the assembled successor.

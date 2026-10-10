@@ -224,7 +224,7 @@ try {
           }));
           check(`${label} · auto keeps the level it cannot measure, and says so`,
             auto.handle === rail.handle && auto.hint === (lang === 'ja' ? '段階はまだ測っていない。N1〜N5 から選ぶ。' : "Your level isn't measured yet. Choose N1 to N5.")
-              && auto.label === (lang === 'ja' ? '自' : 'auto'),
+              && auto.label === (lang === 'ja' ? '自' : 'Auto'),
             JSON.stringify({ before: rail.handle, ...auto }));
         }
 
