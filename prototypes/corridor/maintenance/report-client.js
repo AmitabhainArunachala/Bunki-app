@@ -56,6 +56,15 @@
     root.innerHTML = `<div class="br-rail" aria-label="Report support"><button type="button" id="bunki-report-bug" class="br-bug" data-br="open" aria-label="Report a problem on this screen" title="Report a problem on this screen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7.5V6a4 4 0 0 1 8 0v1.5M9 3 7 1M15 3l2-2M8 10H3M16 10h5M8 14H2M16 14h6M8.5 18 5 21M15.5 18l3.5 3"/><rect x="7" y="7" width="10" height="14" rx="5"/><path d="M12 8v12"/></svg><span class="br-count" aria-hidden="true"></span></button></div>
       <dialog class="br-sheet" aria-labelledby="br-title"><header class="br-heading"><h2 id="br-title">Report a problem</h2><button type="button" class="br-close" data-br="close" aria-label="Close reports and return to learning">Close</button></header><nav class="br-nav" aria-label="Reports"><button type="button" data-br="new" aria-current="page">Report a problem</button><button type="button" data-br="list">My reports</button></nav><div class="br-body"></div></dialog><div class="br-sr" role="status" aria-live="polite" id="br-live"></div>`;
     document.body.append(root);
+    function syncEntryLocale() {
+      const ja = (options.locale || options.getContext?.()?.locale) === 'ja';
+      const label = ja ? 'この画面の問題を報告' : 'Report a problem on this screen';
+      const button = root.querySelector('#bunki-report-bug');
+      root.querySelector('.br-rail').setAttribute('aria-label', ja ? '問題の報告' : 'Report support');
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+    syncEntryLocale();
     // Embedders can still opt out; Bunki keeps one visible bug entry in every room.
     const railless = options.rail === false;
     if (railless) root.querySelector('.br-rail').style.display = 'none';
@@ -748,6 +757,7 @@
         const nextService = normalizeService(next.serviceUrl === undefined ? service : next.serviceUrl);
         if (nextService !== service) { configError = 'The configured service changed. Reload this page to connect it; saved reports retain their original service identity.'; return; }
         options = { ...options, ...next };
+        syncEntryLocale();
       },
       unmount() {
         if (unmountPromise) return unmountPromise;

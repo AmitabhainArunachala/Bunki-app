@@ -589,6 +589,10 @@
 .kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 12px; color: var(--kp-mute); }
 .kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink); padding: 0 3px; border-radius: 2px; }
 .kp-kj-parts i[data-shared] { color: var(--kp-cyan); box-shadow: 0 0 0 1px currentColor; }
+.kp .kp-anatomy-door { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.kp .kp-anatomy-kanji { grid-row: span 2; width: 58px; height: 58px; }
+.kp .kp-anatomy-component { vertical-align: middle; }
+.kp .kp-anatomy-door:focus-visible { outline: 2px solid var(--kp-cyan); outline-offset: 2px; }
 .kp-kshare { position: relative; margin: 6px 0 2px; padding: 12px 10px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 13px; color: var(--kp-ink-2); }
 .kp-kshare::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; border: 1.5px solid var(--kp-cyan); border-top: 0; border-radius: 0 0 3px 3px; opacity: 0.8; }
 .kp-kshare b { font-family: var(--kp-head); font-weight: 800; font-size: 20px; color: var(--kp-cyan); }

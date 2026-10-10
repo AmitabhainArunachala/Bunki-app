@@ -24216,6 +24216,7 @@ function renderDeckPlay(main) {
       deckId,
       autoStart: entry?.autoStart,
       english: bi(),
+      presentation: deckPresentation,
       storage: localStorage, host: deckHost(),
       onLeave() {
         delete deckSummaries[S.deckPlay];
@@ -29843,6 +29844,8 @@ function applyWorldSwap() {
   for (const node of document.querySelectorAll('#theme-seal, .ginga-seal')) {
     node.textContent = glyph;
   }
+  const selectedWorld = document.querySelector('#settings-world .settings-world-value');
+  if (selectedWorld) selectedWorld.textContent = worldName(THEME_UI[themeIx()]);
   const ginga = document.querySelector('.ginga-seal');
   if (ginga) {
     // play the wake exactly as a rebuild would — and only where the galaxy
@@ -29852,6 +29855,7 @@ function applyWorldSwap() {
     ginga.classList.add('awake');
     S.sealWake = false;
   }
+  if (S.view === 'deckplay') deckPlayer?.refitPresentation();
 }
 // (the old tap-to-cycle retired 2026-08-14 — the worlds are direct choices;
 // wants the stones one tap away on every screen; see attachWorldPicker)
@@ -30229,6 +30233,14 @@ function closeWorldPicker() {
   if (worldPickerOpener && document.contains(worldPickerOpener)) worldPickerOpener.focus();
   worldPickerOpener = null;
 }
+function worldName(t) {
+  return tx(t.name, {
+    sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
+    rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
+    akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
+    hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
+  }[t.id]);
+}
 function openWorldPicker(anchor) {
   closeWorldPicker();
   const scrim = el('div', 'world-picker-scrim');
@@ -30236,12 +30248,6 @@ function openWorldPicker(anchor) {
   pop.setAttribute('role', 'dialog');
   pop.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
   let activeStone = null;
-  const worldName = (t) => tx(t.name, {
-    sumi: 'Ink on kozo paper', shu: 'Vermilion on shell white', iwa: 'Umber on persimmon paper',
-    rokusho: 'Shell white on black lacquer', yoru: 'Gold on indigo', hokusai: 'Hokusai Prussian blue',
-    akafuji: 'Red Fuji', nami: 'The Great Wave', keyblock: 'Woodblock ink',
-    hakuu: 'Lightning below the summit', kaku: 'Electric phosphor',
-  }[t.id]);
   // the stones are seals; a plain line beneath names the world in words (the current one, or
   // the one under the pointer or keyboard focus)
   const current = THEME_UI[themeIx()];
@@ -31729,6 +31735,9 @@ function renderSettings(main) {
   language.append(choices);
   const world = biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
   world.type = 'button'; world.id = 'settings-world'; attachWorldPicker(world);
+  const worldText = el('span', 'settings-world-text');
+  worldText.append(...world.childNodes, el('span', 'settings-world-value', worldName(THEME_UI[themeIx()])));
+  world.append(worldText);
   const doors = el('div', 'foundation-doors');
   doors.append(world,
     foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => {
@@ -31923,6 +31932,8 @@ function render() {
     return { sel, ix, text: unique ? text : null };
   })();
   const root = $('#app');
+  const playerPresentation = deckPlayer?.capturePresentation();
+  if (playerPresentation) deckPresentation = playerPresentation;
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
   document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
@@ -31932,6 +31943,7 @@ function render() {
   if (window.__DRIFT_TAP__)
     window.__DRIFT_TAP__.set({ ladder: S.variants.ladder, satTap: S.variants.sattap });
   document.body.classList.toggle('ui-bi', bi());
+  maintenanceReports?.update({ locale: S.lang === 'ja' ? 'ja' : 'en' });
   // the reading measure is per-view: a column for the texts, the full window
   // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.
   document.body.dataset.view = S.view;
@@ -32012,6 +32024,7 @@ function render() {
     (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
   if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
   else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
+  else if (S.view === 'settings') parts.push(tx('私', 'Me'), tx('設定', 'Settings'));
   else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
@@ -32427,6 +32440,7 @@ function maintenanceContext() {
   };
 }
 let maintenanceReports = null;
+let deckPresentation = null;
 let olderStartToken = 0;
 /** The report entry lives in the page's own flow — never a layer over its controls. */
 function reportEntries(className) {
@@ -32443,6 +32457,7 @@ function mountMaintenanceReports() {
   if (!window.BunkiReports) return;
   maintenanceReports = window.BunkiReports.mount({
     rail: true,
+    locale: S.lang === 'ja' ? 'ja' : 'en',
     serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
     getContext: maintenanceContext,
     clockNotice: () => {
@@ -32493,6 +32508,7 @@ function deckHost() {
     deckHostAdapter = deckHostModule.createHost({
       word: (id, reading) => lookup(id, null, reading),
       kanji: (glyph) => D.kanji?.[glyph] || null,
+      component: (glyph) => D.radicals?.[glyph] ? { t: 'radical', id: glyph } : D.kanji?.[glyph] ? { t: 'kanji', id: glyph } : null,
       grammar: (id, pattern) =>
         GRAMMARS().find((g) => g.id === id) || (pattern ? GRAMMARS().find((g) => norm(g.p) === norm(pattern)) : null) || null,
       open: (node) => go(node),

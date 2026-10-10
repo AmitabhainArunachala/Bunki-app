@@ -114,6 +114,83 @@ const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap',
 const HINT_SITTINGS = 3;
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
 let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
+let mountRequest = 0;
+
+/** Transient reading state belongs to one face, never to the learner ledger. */
+export function capturePresentation({ includeInert = false } = {}) {
+  if (!includeInert && ctx?.root?.closest('[inert]')) return null;
+  const face = ctx?.root?.isConnected && ctx.root.querySelector('#kp-card');
+  const passage = face?.querySelector('.kp-sentence');
+  if (!passage || ui.screen !== 'study') return null;
+  return {
+    deck: ctx.deckKey, card: face.dataset.card, revealed: ui.revealed,
+    folds: [...face.querySelectorAll('.kp-fold')].map(n => ({ key: [...n.classList].find(c => c.startsWith('kp-f-')), open: n.open })),
+    context: [...passage.querySelectorAll('.kp-ctx')].map(n => ({ side: n.dataset.side, open: n.dataset.open || '' })),
+    windowed: passage.classList.contains('kp-window'), height: passage.style.getPropertyValue('--kp-window-h'),
+    inner: passage.scrollTop, anchor: passage.getBoundingClientRect().top, page: window.scrollY,
+  };
+}
+
+function presentationMatches(saved) {
+  return saved && ctx?.root?.isConnected && saved.deck === ctx.deckKey && saved.card === ui.queue[ui.pos] && saved.revealed === ui.revealed && ui.screen === 'study';
+}
+function externalSheet() {
+  return ctx.root.closest('[inert]') || document.querySelector('#sheet, #stroke-page, dialog[open]');
+}
+function restorePresentation(saved, { seat = true } = {}) {
+  if (!presentationMatches(saved)) return;
+  const face = ctx.root.querySelector('#kp-card');
+  const passage = face?.querySelector('.kp-sentence');
+  if (!passage) return;
+  for (const fold of saved.folds) {
+    const node = fold.key && face.querySelector(`.${fold.key}`);
+    if (node) node.open = fold.open;
+  }
+  for (const part of saved.context) {
+    const node = passage.querySelector(`.kp-ctx[data-side="${part.side}"]`);
+    if (!node) continue;
+    node.dataset.open = part.open;
+    node.querySelector('.kp-more')?.setAttribute('aria-expanded', String(part.open === '1'));
+  }
+  if (saved.windowed) {
+    passage.classList.add('kp-window');
+    passage.style.setProperty('--kp-window-h', saved.height);
+    watchWindowEdges(passage, face);
+  }
+  passage.scrollTop = saved.inner;
+  fitClamps(face);
+  if (!seat || externalSheet()) return;
+  window.scrollTo({ top: Math.max(0, window.scrollY + passage.getBoundingClientRect().top - saved.anchor), behavior: 'instant' });
+  refitBack(saved.inner);
+}
+
+/** World fonts can reflow in place. Refit only when the reading controls no longer fit. */
+function refitBack(from) {
+  if (!ui.revealed || externalSheet()) return;
+  const face = ctx.root.querySelector('#kp-card');
+  const toggle = face?.querySelector('.kp-zoom');
+  const target = face?.querySelector('.kp-target');
+  const passage = face?.querySelector('.kp-sentence');
+  const def = face?.querySelector('.kp-answer > .kp-def');
+  const bar = ctx.root.querySelector('.kp-grades');
+  if (!toggle || !target || !def || !bar || getComputedStyle(bar).position !== 'fixed') return;
+  const top = topInset() + SETTLE_GAP, bottom = bar.getBoundingClientRect().top - SETTLE_GAP;
+  const mark = target.getBoundingClientRect();
+  const view = passage.getBoundingClientRect();
+  const windowed = passage.classList.contains('kp-window');
+  const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
+  if (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1 && clearTarget && def.getBoundingClientRect().bottom <= bottom + 1) return;
+  windowPassage(from);
+  settleBack();
+}
+export async function refitPresentation() {
+  const saved = capturePresentation(), owner = ctx;
+  if (!saved || externalSheet()) return;
+  await document.fonts.ready;
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (ctx !== owner || !presentationMatches(saved)) return;
+  refitBack(saved.inner);
+}
 
 const stateKey = (id) => `bunki-cloze:${id}`;
 /** the ledger as it was just before a restore replaced it */
@@ -462,13 +539,33 @@ function sentenceEnds(ja) {
  * two dimmed lines with a ⋯ to open it (STANDARD A38); taps (the back only, STANDARD A44):
  * { units, onTap } — each unit ({ at, len }, tapUnits) becomes one .kp-tok tap target over its
  * characters, and the target itself opens the card's own word (unit { self: true }) */
+const KOMURA_PASSAGE = '1905年、日露戦争の講和会議がアメリカのポーツマスで開かれました。日本は連戦連勝を重ねていたものの、国力は限界に達しており、早期の講和が急務だったのです。全権の小村寿太郎は賠償金を求めてロシア側と交渉を重ねましたが、相手は最後まで譲りませんでした。結局、賠償金を取れないまま条約は成立し、帰国した小村は国民の激しい非難にさらされます。しかし今振り返ると、疲弊した国家をこれ以上戦わせなかった判断は、正しかったのかもしれません。';
+function komuraContext(card) {
+  return card.id === 'nn-67f6fe4a2f-ca1c2c4f' && card.ja === KOMURA_PASSAGE && card.ja.slice(81, 86) === '小村寿太郎' && card.ja.slice(149, 151) === '小村';
+}
+/** Display projection only: this repeat names the person introduced in this exact passage. */
+function displayRuby(card) {
+  if (!komuraContext(card)) return card.ruby;
+  let at = 0;
+  return card.ruby.map(row => {
+    const start = at;
+    at += row[0].length;
+    return start === 149 && row[0] === '小村' && row[1] === 'しょうそん' ? [row[0], 'こむら', ...row.slice(2)] : row;
+  });
+}
+function displayUnits(card, units) {
+  if (!komuraContext(card)) return units;
+  return units.map(unit => unit.at === 149 && unit.len === 2 && unit.tok?.s === '小村'
+    ? { ...unit, word: null, tok: { ...unit.tok, r: 'こむら', personContext: 'komura-jutaro' } } : unit);
+}
+
 export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
     ruby = 'none';
     clamp = false;
     taps = null; // the front has nothing to tap, whatever is asked
   }
-  const cover = taps ? coverOf(card.ja.length, taps.units) : null;
+  const cover = taps ? coverOf(card.ja.length, displayUnits(card, taps.units)) : null;
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
@@ -504,7 +601,7 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     const u = cover?.[a];
     return u && u.at + u.len >= a + len ? u : null;
   };
-  card.ruby.forEach(([text, reading, isTarget]) => {
+  displayRuby(card).forEach(([text, reading, isTarget]) => {
     const len = text.length;
     if (isTarget === 1 && blank) return put(el('span', 'kp-blank', card.hint ? `〔${card.hint}〕` : '　'.repeat(Math.min(6, Math.max(2, [...text].length)))), 1, len);
     // the word again later in the passage: blanked too, without the hint
@@ -1001,6 +1098,7 @@ function zoomToggle(zoom) {
       if (face) face.dataset.zoom = value;
       for (const x of wrap.querySelectorAll('.kp-zoom-btn')) x.setAttribute('aria-pressed', String(x === b));
       if (face) fitClamps(face);
+      refitPresentation();
     }, { id: `kp-zoom-${value}`, 'aria-pressed': String(zoom === value) });
     wrap.append(b);
   }
@@ -1021,16 +1119,24 @@ function kanjiAnatomy(word) {
     n.dataset.uiContent = 'learning';
     return n;
   };
+  const door = (glyph, node, kind) => {
+    const entry = safely(() => ctx.host?.lookup({ s: glyph, ref: glyph, k: kind === 'kanji' ? '字' : '部品' }), null);
+    if (!entry || !['kanji', 'radical'].includes(entry.t)) return node;
+    return btn(`kp-anatomy-door kp-anatomy-${kind}`, node, (event) => {
+      event.stopPropagation();
+      ctx.host.open(entry);
+    }, { [`data-${kind}`]: glyph, 'aria-label': kind === 'kanji' ? t(`${glyph}の漢字の項目を開く`, `Open ${glyph} kanji entry`) : t(`${glyph}の部品の項目を開く`, `Open ${glyph} component entry`) });
+  };
   for (const k of word.kanji) {
     const parts = el('small', 'kp-kj-parts');
     (k.parts || []).forEach((p, i) => {
       if (i) parts.append('+');
       const n = learned(p, 'i');
       if (holders.get(p)?.size > 1) n.dataset.shared = '1';
-      parts.append(n);
+      parts.append(door(p, n, 'component'));
     });
     if (k.st) parts.append(el('span', null, t(`${k.st}画`, `${k.st} strokes`)));
-    box.append(el('div', 'kp-kj', learned(k.c, 'b'), el('span', null, k.m || ''), parts));
+    box.append(el('div', 'kp-kj', door(k.c, learned(k.c, 'b'), 'kanji'), el('span', null, k.m || ''), parts));
   }
   for (const [p, cs] of holders) {
     if (cs.size < 2) continue;
@@ -1421,7 +1527,7 @@ function upgradeTaps() {
   if (!taps) return;
   const passage = !!card.type;
   const old = face.querySelector('.kp-sentence');
-  const from = old.classList.contains('kp-window') ? old.scrollTop : window.scrollY;
+  const presentation = capturePresentation({ includeInert: true });
   const opened = [...old.querySelectorAll('.kp-ctx')].map((b) => b.dataset.open || '');
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps });
   [...sentence.querySelectorAll('.kp-ctx')].forEach((b, i) => {
@@ -1432,15 +1538,17 @@ function upgradeTaps() {
   old.replaceWith(sentence);
   face.querySelector('.kp-answer > .kp-def')?.replaceWith(defLine(card, word));
   fitClamps(face);
-  // Token loading can finish after Reveal. The replacement must take the same
-  // reading seat as the revealed passage, including its window and grade bar.
-  windowPassage(from);
-  settleBack();
+  // Async enrichment keeps the learner's chosen offset, including while an external sheet
+  // is open. Only a newly obstructed target/control asks for a minimal refit.
+  restorePresentation(presentation);
 }
 
 /** what a tap shows: a word of this deck from the deck, anything else from the host lexicon */
 function frameOf(unit) {
   const tok = unit.tok || null;
+  // No dictionary identity is asserted for this named person: use the existing missing-entry
+  // frame with the passage reading, rather than the unrelated "small village" entry.
+  if (tok?.personContext === 'komura-jutaro') return { label: tok.s, reading: tok.r, ja: '', en: '', key: '', kind: '', level: '', surface: tok.s };
   const word = unit.word || (tok ? deckWordOf(tok) : null);
   if (word) return { word, label: word.term, reading: word.reading, ja: word.defJa || '', en: word.meaning || '', key: `deck:${word.id}`, kind: '語', level: word.level || '', surface: tok?.s || word.term };
   const entry = safely(() => ctx.host?.lookup(tok) || null, null);
@@ -1997,13 +2105,19 @@ function windowPassage(from) {
   const def = face?.querySelector('.kp-answer > .kp-def');
   const bar = ctx.root.querySelector('.kp-grades');
   if (!passage || !def || !bar || ui.screen !== 'study' || getComputedStyle(bar).position !== 'fixed') return;
+  passage.classList.remove('kp-window');
+  passage.style.removeProperty('--kp-window-h');
   window.scrollTo({ top: 0, behavior: 'instant' });
   const tf = getComputedStyle(def.parentElement).transform;
   const lift = tf && tf !== 'none' ? new DOMMatrixReadOnly(tf).m42 : 0; // kp-rise: measure where it lands
   const barTop = Math.min(innerHeight, bar.getBoundingClientRect().top);
   const box = passage.getBoundingClientRect();
   const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
-  let over = def.getBoundingClientRect().bottom - lift - (barTop - SETTLE_GAP);
+  // Keep the Full/Focus row above the window as well as the word and definition below it.
+  const chips = face.querySelector('.kp-chips');
+  const head = chips?.getBoundingClientRect() || box;
+  const seat = head.top - topInset() - SETTLE_GAP;
+  let over = def.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
   for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
     const r = s.getBoundingClientRect();
     const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
@@ -2034,20 +2148,28 @@ function windowPassage(from) {
   else if (a < want) want = a;
   else if (b > want + h) want = b - h;
   want = Math.max(0, Math.min(passage.scrollHeight - h, Math.round(want)));
+  const edges = watchWindowEdges(passage, face);
+  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: 'instant' });
+  edges();
+  // Put a long reading window at the top of the reading area. Its clipped
+  // earlier lines then stay behind the chrome, rather than under card controls.
+  if (seat > 0) window.scrollTo({ top: window.scrollY + seat, behavior: 'instant' });
+}
+
+function watchWindowEdges(passage, face) {
   const edges = () => {
     const up = passage.scrollTop > 1;
     const down = passage.scrollTop + passage.clientHeight < passage.scrollHeight - 1;
     if (up || down) passage.dataset.edge = up && down ? 'both' : up ? 'above' : 'below';
     else delete passage.dataset.edge;
   };
-  passage.addEventListener('scroll', edges, { passive: true });
-  face.addEventListener('click', () => requestAnimationFrame(edges));
-  if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: 'instant' });
+  if (!passage.kpEdges) {
+    passage.addEventListener('scroll', edges, { passive: true });
+    face.addEventListener('click', () => requestAnimationFrame(edges));
+    passage.kpEdges = true;
+  }
   edges();
-  // Put a long reading window at the top of the reading area. Its clipped
-  // earlier lines then stay behind the chrome, rather than under card controls.
-  const seat = passage.getBoundingClientRect().top - topInset() - SETTLE_GAP;
-  if (seat > 0) window.scrollTo({ top: window.scrollY + seat, behavior: 'instant' });
+  return edges;
 }
 
 const SETTLE_GAP = 12;
@@ -2079,7 +2201,8 @@ function settleBack() {
   const marked = face.querySelector('.kp-target');
   let target = face.querySelector('.kp-s[data-focus]') || marked || face.querySelector('.kp-sentence');
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
-  const top = target.getBoundingClientRect().top;
+  const toggle = windowed && face.querySelector('.kp-zoom');
+  const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
   const bottom = def.getBoundingClientRect().bottom - lift;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
@@ -2666,7 +2789,8 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null } = {}) {
+  const request = ++mountRequest;
   ensureCss();
   const root = el('div', 'kp');
   const lexicon = hostOf(host);
@@ -2676,6 +2800,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   root.append(el('p', 'kp-sub', english ? 'Loading…' : '読み込み中…'));
   main.append(root);
   const { deck, index } = await loadDeck(deckId);
+  if (request !== mountRequest || !root.isConnected) return;
   const sameDeck = ctx?.deck?.id === deck.id;
   ctx = {
     root,
@@ -2710,6 +2835,11 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   else {
     if (ui.screen === 'study') wantTokens();
     paint();
+    restorePresentation(presentation, { seat: false });
+    await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    if (request !== mountRequest || ctx.root !== root || !root.isConnected) return;
+    restorePresentation(presentation);
   }
 }
 

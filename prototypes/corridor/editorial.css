@@ -4193,6 +4193,8 @@ body:not([data-view='drift']) .foundation-door {
   text-align: left;
 }
 body:not([data-view='drift']) .foundation-door > .l-ja { margin-right: auto; text-align: left; }
+.settings-world-text { display: grid; gap: 4px; min-width: 0; }
+.settings-world-value { font-size: 13px; font-weight: 400; line-height: 1.4; color: var(--color-ink); }
 body:not([data-view='drift']) .foundation-door::after {
   content: '';
   width: 7px;

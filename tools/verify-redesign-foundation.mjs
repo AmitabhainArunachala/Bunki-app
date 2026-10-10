@@ -99,6 +99,22 @@ try {
           await page.locator('#me-settings').click();
           await page.waitForFunction(() => document.documentElement.dataset.room === 'settings');
           assert.equal(await page.locator('html').getAttribute('data-room'), 'settings');
+          assert.equal(await page.locator('.crumb').getAttribute('title'), lang === 'ja' ? '私 › 設定' : 'Me › Settings');
+          for (const [theme, en, ja] of [
+            ['sumi', 'Ink on kozo paper', '墨・楮紙'],
+            ['yoru', 'Gold on indigo', '紺紙金泥'],
+            ['kaku', 'Electric phosphor', '攻殻・燐光'],
+          ]) {
+            const name = lang === 'ja' ? ja : en;
+            await page.locator('#settings-world').click();
+            await page.getByRole('button', { name, exact: true }).click();
+            await page.waitForFunction((id) => document.documentElement.dataset.theme === id, theme);
+            assert.equal(await page.locator('#settings-world .settings-world-value').textContent(), name,
+              'The live selection is recognizable without reopening its picker');
+            const worldRect = await page.locator('#settings-world').boundingBox();
+            assert(worldRect.height >= 44 && worldRect.x >= 0 && worldRect.x + worldRect.width <= width,
+              'The selected world fits the actual Settings control');
+          }
           await page.locator('#back').click();
           await page.waitForFunction(() => document.body.dataset.view === 'me');
           assert.equal(

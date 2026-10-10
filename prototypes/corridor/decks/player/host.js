@@ -26,6 +26,7 @@
  * deps, all from the corridor:
  *   word(id, reading)     its lookup(): the boot core, the opened deep tier, the 覚える snapshots
  *   kanji(glyph)          a kanji.json record
+ *   component?(glyph)    an available existing radical node, else kanji node, else null
  *   grammar(id, pattern)  a grammar entry by id, else by pattern
  *   open(node)            push an entry sheet
  *   taken()               the 覚えるの札 rows
@@ -97,6 +98,10 @@ export function createHost(deps) {
     name: 'corridor',
     lookup(token) {
       if (!token?.s) return null;
+      if (token.k === '部品') {
+        const node = deps.component?.(token.s);
+        return node ? { ...node, label: token.s, token } : null;
+      }
       if (token.k === '文法') return grammarEntry(deps, token) || wordEntry(deps, token);
       if (token.k === '字') return kanjiEntry(deps, token);
       if (token.k === '語') return wordEntry(deps, token) || (token.s.length === 1 ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
