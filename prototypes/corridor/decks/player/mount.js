@@ -1420,6 +1420,7 @@ function upgradeTaps() {
   if (!taps) return;
   const passage = !!card.type;
   const old = face.querySelector('.kp-sentence');
+  const from = old.classList.contains('kp-window') ? old.scrollTop : window.scrollY;
   const opened = [...old.querySelectorAll('.kp-ctx')].map((b) => b.dataset.open || '');
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps });
   [...sentence.querySelectorAll('.kp-ctx')].forEach((b, i) => {
@@ -1430,6 +1431,10 @@ function upgradeTaps() {
   old.replaceWith(sentence);
   face.querySelector('.kp-answer > .kp-def')?.replaceWith(defLine(card, word));
   fitClamps(face);
+  // Token loading can finish after Reveal. The replacement must take the same
+  // reading seat as the revealed passage, including its window and grade bar.
+  windowPassage(from);
+  settleBack();
 }
 
 /** what a tap shows: a word of this deck from the deck, anything else from the host lexicon */
