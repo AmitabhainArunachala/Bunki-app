@@ -1270,3 +1270,10 @@ R5-17 is fixed in the product and REACH is unchanged. A fitted reading window no
 
 
 These entries supersede the R5-28 conditional kept-pose fallback and add painted-ink evidence to the R5-31 hit-ownership oracle. The original unconditional fitted-after predicates and all native hit checks remain mandatory. Runtime evidence is recorded externally against the final packaged artifact.
+
+
+### R6 final scoped observations
+
+- External `deck-look-regression.mjs`: day-theme/preferences seed on every document initialization → seed once per disposable session; actual public night-world changes and explicit preferences must survive reload. The first diagnostic failed because its own setup overwrote the world on reload; its complete failed receipt is preserved. Same final assertions then pass for implicit default, stored light and selected world; the exact prior mount bytes reproduce the sticky-dark default as a controlled negative. No product code changed for this fixture repair.
+
+The clean `4d63ebb7` artifact (`157a00bb…`, source/assets `94d72d78…`) passes presentation127/127, Undo80/80 plus both held-fold cases and painted-overpaint negative, all Kotoba checks, saved-answer87/87, service-worker17/17, live-record14/14 per engine, and WebKit backup7/7. Actual module probes pass6/6, including trusted scroll/fold preservation through delayed fonts and inert identity-free normal/reduced clone families. The day home/front screenshots were visually inspected. These scoped observations supersede the earlier unverified claims for those exact cases; they do not stand in for the full release battery. Evidence is external under `~/.dharma/bunki_review/2026-10-11/r6-gates/`.
