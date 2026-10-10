@@ -1980,12 +1980,12 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
 }
 
 /**
- * The reveal does not move the page (Bunki fix round 3). At phone width, with the grade pads pinned,
+ * At phone width, with the grade pads pinned,
  * a passage that would push the word and its definition under the pads becomes its own window: its
  * height is what the room above them leaves (never under WINDOW_LINES lines), and it scrolls inside
- * the card. The page goes back to its top while the passage takes the same offset, so the text does
- * not move; only when the target sentence is outside the window does the passage itself scroll to it
- * before the held front fades. A fold row the pads would cut is lifted wholly above them.
+ * the card. The passage keeps the previous reading offset, then takes the least inner scroll
+ * that shows its target sentence. The page seats that window below the chrome before the held
+ * front fades. A fold row the pads would cut is lifted wholly above them.
  * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
  */
 const WINDOW_LINES = 3;
@@ -2043,6 +2043,10 @@ function windowPassage(from) {
   face.addEventListener('click', () => requestAnimationFrame(edges));
   if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: 'instant' });
   edges();
+  // Put a long reading window at the top of the reading area. Its clipped
+  // earlier lines then stay behind the chrome, rather than under card controls.
+  const seat = passage.getBoundingClientRect().top - topInset() - SETTLE_GAP;
+  if (seat > 0) window.scrollTo({ top: window.scrollY + seat, behavior: 'instant' });
 }
 
 const SETTLE_GAP = 12;
@@ -2067,9 +2071,13 @@ function settleBack() {
   // the answer may still be rising into place (kp-rise, translateY 6px → 0): measure where it lands
   const t = getComputedStyle(answer).transform;
   const lift = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0;
-  // a windowed passage (windowPassage) keeps its target sentence inside its own window: the window is what must be in view
+  // windowPassage already keeps the target inside its reading window. Protect
+  // that sentence (or its marked word if too tall), so clearing a fold row does
+  // not pull clipped, earlier text back down beneath the card controls.
   const windowed = face.querySelector('.kp-sentence.kp-window');
-  const target = windowed || face.querySelector('.kp-s[data-focus]') || face.querySelector('.kp-target') || face.querySelector('.kp-sentence');
+  const marked = face.querySelector('.kp-target');
+  let target = face.querySelector('.kp-s[data-focus]') || marked || face.querySelector('.kp-sentence');
+  if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const top = target.getBoundingClientRect().top;
   const bottom = def.getBoundingClientRect().bottom - lift;
   let dy = 0;

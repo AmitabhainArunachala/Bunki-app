@@ -986,3 +986,35 @@ After the visible-owner actor correction, the unchanged `public-catalog-and-dojo
 Result of the restored `REACH` on the repaired gate build (`sourceDirty: true`, on `0612ef26`): it FAILS, 12 sampled, 9 misses (世 ↑↓, 時代 ↑↓, フランス ↑↓, 重なる ↑, 戦争 ↑, 特に ↑). The product geometry is not repaired in this round, so R5-16 stays open: the collapsed Focus group clips these words, and the fix belongs in the player's fold geometry, not in this fixture. In the same run check "5) at the resting position after the reveal no fold row is cut by the pinned bar" also failed; the machine was running a build and a second browser probe at the time, and its cause is not established. 156 other checks passed. Log: `~/.dharma/bunki_review/2026-10-10/r5-strict/gate-room-repair-v8/fix-095146/logs/verify-kotoba-mine.log`.
 
 R5-12 is a production fix with no verifier pin changed. Its probe samples main and child opacity every frame for at least 1200 ms after arrival, for Read→Me, Me→Today and Today→Learn, in normal and reduced motion, with and without `document.startViewTransition`: 12/12 with zero resets on the repaired build (`~/.dharma/bunki_review/2026-10-10/r5-strict/gate-room-repair-v8/fix-095146/room-continuity-after-2.json`). The first repair attempt, which retired the markers only when the arrival mask was removed, still failed Read→Me in normal motion (2/12), because the mask deferred the Me book's own entrance; that receipt is kept as `room-continuity-after.json`.
+
+## Round 5: resolve the failures exposed by the restored pins
+
+No assertion, sample, wait, threshold or selector changed in this follow-up. The
+original viewport-centre `REACH`, minimum of five, exact ±21px ownership, both
+0.8 Focus ceilings and the complete resting-position predicates remain intact.
+
+The nine misses above were reproduced in **Full**, not collapsed Focus: words
+above the internal passage clip still had glyph rectangles below the header.
+The reading window now seats below the chrome; settling protects the actual
+target sentence, or its marked word when the sentence cannot fit. The page can
+clear a fold row without lowering the clip onto those hidden rectangles. The
+window, text, target, inner scrolling and two-line Focus groups remain. The
+read-only five-case and exact gate-fixture demonstrations retain every original
+predicate and trusted marked-word lookup/return. They are under
+`~/.dharma/bunki_review/2026-10-10/r5-strict/kotoba-restored-reach-diagnosis/`.
+
+The resting-position failure also exposed a separate reproducible race: late
+token loading replaced the sentence without restoring its reading window. The
+real word/definition bottoms moved from 588/627px to 1371/1411px under a 640px
+bar. `upgradeTaps` now restores the same revealed card's window and reading seat.
+The actual public-interface regression holds only the unchanged token response:
+it fails on the previous build and passes after the repair, with word/definition
+still at 588/627px and unchanged text, card and ledger. Receipts are in
+`~/.dharma/bunki_review/2026-10-10/r5-strict/late-token-repair-v9/`.
+
+After these production repairs the complete, restored `verify-kotoba-mine`
+passes (exit 0, 84s); the preserved dirty-source candidate receipt is
+`~/.dharma/bunki_review/2026-10-10/r5-strict/verify/card-seat-v10/`. This supersedes
+the claim above that the geometry was not repaired. The original two failures
+and all intermediate unsuccessful demonstrations remain preserved. A new clean
+build and full verifier run follow; this narrow receipt is not their substitute.
