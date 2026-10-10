@@ -241,7 +241,7 @@
   .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
   .kp-study.has-bar { padding-bottom: var(--kp-bar-h, 140px); }
 }
-.kp-undo { justify-self: center; background: none; border: 0; color: var(--kp-mute); font-size: 13px; padding: 8px; }
+.kp-undo { justify-self: center; min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--kp-mute); font-size: 13px; padding: 8px; }
 .kp-verdict { margin: 0; text-align: center; font-size: 18px; font-weight: 700; }
 
 .kp-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -847,6 +847,9 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-study > .kp-reveal { order: 2; margin-top: auto; flex: none; }
   .kp .kp-study > .kp-undo { order: 1; margin-top: auto; align-self: center; }
   .kp .kp-study:has(> .kp-undo) > .kp-reveal { margin-top: 0; }
+  /* A removal notice can push this stage below the viewport. Keep Undo above
+   * the sticky 56px Reveal key, with its 10px clearance and the 16px gap. */
+  .kp .kp-study:has(> .kp-reveal) > .kp-undo { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 82px + env(safe-area-inset-bottom, 0px)); z-index: 2; }
   /* the card hugs what it holds (a one-sentence front was 60% empty bordered sheet): the sentence keeps
    * its place at the head, the reveal grows the card downward, and the bare stage between the card and
    * the key is a tap that reveals too (mount.js studyScreen). docs/redesign/r4/cards/options/front-b.css

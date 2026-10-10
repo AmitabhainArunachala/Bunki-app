@@ -41,7 +41,7 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  * grades its own FSRS rating and schedules the interval its pad showed; a ledger written by the
  * two-button player loads unchanged and takes a Hard; a cancelled or mostly vertical swipe
  * never grades; 4択 never asks a 字 card; 設定 has labelled controls and radio
- * groups (axe); the done screen keeps ↶ ひとつ戻す; every colour token in the
+ * groups (axe); the done screen keeps ひとつ戻す; every colour token in the
  * light themes clears 4.5:1.
  *
  * Then the back hierarchy (docs/srs/CARD_CONTRACT_V2.md §2–§4), both decks:
@@ -537,7 +537,7 @@ async function verifyDelivery(browser, base) {
     check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no ヒント row: the front has no hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'Backup text' && settings.groups === 4 && settings.checked === 4 && settings.gone === 0 && /^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
     check('3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'Copy,Restore', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
 
-    // the done screen keeps ↶ ひとつ戻す (F37)
+    // the done screen keeps ひとつ戻す (F37)
     await page.evaluate(`localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mine', JSON.stringify({ ...JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine')), newPerDay: 1 }))`);
     await page.evaluate(`localStorage.removeItem('bunki-cloze:kotoba-mine')`);
     await boot('?deck=kotoba');
@@ -556,7 +556,7 @@ async function verifyDelivery(browser, base) {
       await page.waitForSelector('.kp-grade');
       back = { count: await count(), log: await logLength('kotoba-mine') };
     }
-    check('the done screen keeps ↶ ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
+    check('the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
 
     // 4択 never asks a 字 card: it is answered as 穴埋め (F38)
     await page.evaluate(DUE_KANJI);

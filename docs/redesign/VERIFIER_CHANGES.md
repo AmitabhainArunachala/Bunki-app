@@ -1018,3 +1018,49 @@ passes (exit 0, 84s); the preserved dirty-source candidate receipt is
 the claim above that the geometry was not repaired. The original two failures
 and all intermediate unsuccessful demonstrations remain preserved. A new clean
 build and full verifier run follow; this narrow receipt is not their substitute.
+
+## Round 5: plain Undo label and bundled-glyph miss
+
+The settled v7 and fresh c14 response receipts exposed a missed hard rule: the
+Undo label's U+21B6 arrow was drawn by native Apple SD Gothic Neo, even with the
+font set loaded (13 prior samples; 17 fresh samples). A declared unicode range
+in bundled Noto Serif did not prove that its actual cmap contained this glyph;
+a real isolated-span probe still used the native face. Earlier settled world
+and 52-state font probes did not cover this revealed Undo state. Their zero
+native counts remain bounded observations, not proof of every control.
+
+Production now uses plain `ひとつ戻す` / `Undo last answer` in both actual Undo
+consumers. The button ID, callback and scheduling behavior remain. It also has
+44px minimum dimensions: the live diagnostic exposed a 41.59375px height.
+Removing the decorative symbol keeps every remaining EN/JA label glyph in the
+existing bundled Noto Sans JP. No font bytes, fallback guess or substitute asset
+is introduced.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-kotoba-mine.mjs`, F37 description and two comments | “keeps ↶ ひとつ戻す” → “keeps ひとつ戻す” | Cosmetic description only, matching the actual plain label. The expression is exactly unchanged: one Undo, Recall rate still present, restored count 2/2 and exactly one remaining log. No selector, wait, threshold or behavior predicate changed. |
+
+Runtime proof is under `cards-final-v11/responses/undo-plain-label-diagnostic.json`:
+four trusted EN/JA grade/remove Undo actions restore the exact prior card and
+ledger and leave zero native glyphs. This diagnostic changes only live text;
+the following candidate and clean-source checks verify production separately.
+
+The additional min44-only diagnostic exposed a real removal-state occlusion:
+Undo was below the sticky Reveal button and, at 320, also below the tabs. That
+failed receipt remains. The mobile front now seats Undo above Reveal with the
+existing 16px gap, only where that actual direct-child Reveal exists. The live
+docked diagnostic passes all40 real centre/corner clicks across EN/JA ×320/390
+×grade/remove, at scrollY0, with exact card/ledger restoration and zero native
+glyphs/overflow. It retains the running reduced-motion fades. Actual candidate
+and final clean-source receipts follow separately; CSS minimum size alone is
+not treated as evidence of a working target.
+
+Production candidate verification: `undo-production-v12/summary.json` reports
+40/40 owned points, trusted callbacks and exact card/ledger restorations at
+scrollY0; minimum actual height44px, gap16px, native glyphs0, overflow0. The
+runner performs no text or CSS injection. Candidate source is c14 dirty,
+source/assets `4d0609348043656cd46317f44d3b99c87e852a6c21c300c0a3ddd36fb6691cdd`,
+artifact `c9bf8817b4f74c6c109f20048b2acb60311ab347e58435d8406c03b91743747e`.
+The complete restored Kotoba suite passes84s on that candidate. Both earlier
+min44-only and first plain-label candidate receipts remain; the final clean
+build must pass independently.

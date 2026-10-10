@@ -224,7 +224,7 @@ const UI_EN = {
   "次へ →": "Next →",
   "わからない": "I don’t know",
   "答えを見る": "Reveal answer",
-  "↶ ひとつ戻す": "↶ Undo last answer",
+  "ひとつ戻す": "Undo last answer",
   "文章の表示": "Passage view",
   "全文": "Full passage",
   "焦点": "Focus",
@@ -901,7 +901,7 @@ function studyScreen() {
   } else {
     box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }));
   }
-  if (ui.undo) box.append(btn('kp-undo', t("↶ ひとつ戻す"), undo, { id: 'kp-undo' }));
+  if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
 
@@ -1706,7 +1706,7 @@ function backParts(card, word) {
 }
 
 /** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
- * from the toast or ↶ for the rest of the sitting */
+ * from the toast or Undo for the rest of the sitting */
 function deleteButton() {
   return btn('kp-delete', t("削除"), (e) => {
     e.stopPropagation();
@@ -2405,7 +2405,7 @@ function doneScreen() {
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
   box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
   box.append(btn('kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
-  if (ui.undo) box.append(btn('kp-undo', t("↶ ひとつ戻す"), undo, { id: 'kp-undo' }));
+  if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
 
