@@ -151,6 +151,14 @@ ${scopedRules.join('\n')}
 #drift-layer .word.fragile .base { text-shadow: 0 0 9px var(--halo); }
 #drift-layer .word.bctr .base { text-shadow: 0 0 9px var(--bloomHalo); }
 #drift-layer .word.bsat .base { text-shadow: 0 0 6px color-mix(in srgb, var(--bloomHalo) 50%, transparent); }
+#drift-layer .word:focus-visible,
+#drift-layer #lvl:focus-visible {
+  outline: 2px solid var(--pig1);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+#drift-layer #lvl:focus-visible #lvlLabels,
+#drift-layer #lvl:focus-visible #lvlInfo { opacity: 1; }
 #drift-layer #grain { opacity: calc(var(--grainOp) * 0.45); }
 /* the explainer carries both languages and shows the interface's own (round 4 review: the
  * English setting showed Japanese buttons, and 日本語 showed English prose) */
@@ -396,6 +404,24 @@ patch(
   'gate main pointerup',
 );
 
+// A spawned word is the same door for a keyboard as for a pointer. Resolve
+// its current node at activation time so recycling, departure and hidden
+// layers cannot leave a stale keyboard action. tapNode owns every rung.
+patch(
+  '  nodes.push(n); nodeOf.set(el,n);\n  return n;\n}\nfunction spawnGlyph',
+  '  nodes.push(n); nodeOf.set(el,n);\n' +
+    '  el.setAttribute("role","button");el.tabIndex=0;\n' +
+    '  el.addEventListener("keydown",e=>{\n' +
+    '    if(e.key!=="Enter"&&e.key!==" ")return;\n' +
+    '    e.preventDefault();e.stopPropagation();\n' +
+    '    const node=nodeOf.get(el);\n' +
+    '    if(e.repeat||!DRIFT_ON||!node||node.gone||node.removed||!el.isConnected)return;\n' +
+    '    tapNode(node);\n' +
+    '  });\n' +
+    '  return n;\n}\nfunction spawnGlyph',
+  'word keyboard activation shares the pointer tap ladder',
+);
+
 // 2b · hidden-layer tab discipline: the radical explainer rests at opacity:0
 // + pointer-events:none, which hides it from fingers but NOT from the Tab
 // key — in the fused document its 閉じる × was the drift home's FIRST tab
@@ -579,6 +605,37 @@ patch(`  lvlInfo.textContent=s.info;
       lvlSet(Math.max(0,STOPS.findIndex(x=>x.lv===level)),false);
     }
   }`, 'r4 auto keeps its word');
+
+// The rail's visible text and accessible value share the existing stop
+// selection. Host language can settle after parse-time setup, so refresh
+// that presentation without committing another tide or learner record.
+patch('let lvlHotTimer=0;',
+  'let lvlHotTimer=0,lvlIx=3;\n' +
+  'lvlEl.tabIndex=0;lvlEl.setAttribute("role","slider");\n' +
+  'lvlEl.setAttribute("aria-orientation","vertical");\n' +
+  'lvlEl.setAttribute("aria-valuemin","0");lvlEl.setAttribute("aria-valuemax",String(STOPS.length-1));',
+  'level rail exposes slider semantics');
+patch('  const s=STOPS[ix];\n  lvlHandle.style.top=',
+  '  const s=STOPS[ix];lvlIx=ix;\n' +
+  '  lvlEl.setAttribute("aria-label",uiT("学習段階","Learning level")+" · "+uiT(s.info,s.en||s.info));\n' +
+  '  lvlEl.setAttribute("aria-valuenow",String(ix));\n' +
+  '  lvlEl.setAttribute("aria-valuetext",uiT(s.info,s.en||s.info));\n' +
+  '  lvlHandle.style.top=', 'level rail announces the actual selected stop');
+patch('lvlLabels.firstChild.textContent=uiT("自","auto");',
+  'lvlLabels.firstChild.textContent=uiT("自","Auto");', 'plain English level rail label');
+patch('lvlSet(3,false);\n\n// ---- hint ----',
+  'lvlSet(3,false);\n' +
+  'lvlEl.addEventListener("keydown",e=>{\n' +
+  '  const step={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];\n' +
+  '  if(step===undefined&&e.key!=="Home"&&e.key!=="End")return;\n' +
+  '  e.preventDefault();e.stopPropagation();\n' +
+  '  if(!DRIFT_ON||recordPending.size)return;\n' +
+  '  const next=e.key==="Home"?0:e.key==="End"?STOPS.length-1:clamp(lvlIx+step,0,STOPS.length-1);\n' +
+  '  lvlEl.classList.add("hot");clearTimeout(lvlHotTimer);lvlSet(next,true);\n' +
+  '  lvlHotTimer=setTimeout(()=>lvlEl.classList.remove("hot"),1600);\n' +
+  '});\n' +
+  'new MutationObserver(()=>lvlSet(lvlIx,false)).observe(document.body,{attributes:true,attributeFilter:["class"]});\n\n' +
+  '// ---- hint ----', 'level keyboard and settled host language share lvlSet');
 
 // 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
 patch(
