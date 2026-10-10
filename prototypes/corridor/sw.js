@@ -1,7 +1,10 @@
 /* 回廊's service worker: a successful install includes the complete boot core
- * and every bundled font. First installation downloads about 21 MB of fonts;
- * offline type is ready after navigator.serviceWorker.ready resolves. The
- * first online screen stays usable while the worker installs in parallel.
+ * and no bundled font. Each font is verified and cached the first time a page
+ * requests it. After activation a background fill copies the fonts whose
+ * digests match this release from the previous version's cache, then fetches
+ * the rest a few at a time. That fill holds no install, activation or update
+ * promise, and a font it cannot get is left for its first request, so offline
+ * type is complete only once the fill or the pages have fetched it.
  *
  * The boot shell and data stay on one installed version, online or offline.
  * A new worker waits for the old app's windows to close before activation;
@@ -33,6 +36,7 @@ const IDENTITY_PATH = 'build-identity.json';
 const MAX_MANIFEST_BYTES = 16 * 1024 * 1024;
 const MAX_MANIFEST_FILES = 100000;
 const DIGEST = /^[a-f0-9]{64}$/;
+const FONT_FILL_LANES = 4;
 const SHELL = [
   '.',
   'index.html',
@@ -348,17 +352,8 @@ self.addEventListener('install', (event) => {
     (async () => {
       if (!STAMPED) {
         // Explicit development fallback: no production generation guarantee.
-        // Use the same declared font paths as the app instead of maintaining
-        // a partial subset that silently falls through to platform type.
-        const fontCss = await networkAsset(assetUrl('fonts.css'));
-        if (!fontCss.ok) throw new Error('bundled font stylesheet unavailable');
-        const fontPaths = [...(await fontCss.text()).matchAll(/url\(\s*['"]?(fonts\/[^\s'"()]+\.woff2)['"]?\s*\)/g)]
-          .map((match) => match[1]);
-        if (!fontPaths.length || fontPaths.some((path) => !fontAsset(path)))
-          throw new Error('bundled font paths missing or invalid');
         const cache = await caches.open(CACHE_NAME);
-        const urls = new Set([...PRECACHE_URLS, ...fontPaths.map(assetUrl)]);
-        await cache.addAll([...urls].map((url) => new Request(url, { cache: 'reload' })));
+        await cache.addAll([...PRECACHE_URLS].map((url) => new Request(url, { cache: 'reload' })));
         return;
       }
       const [identity, worker] = await Promise.all([
@@ -367,11 +362,9 @@ self.addEventListener('install', (event) => {
       ]);
       const release = await validateRelease(identity, worker);
       const guided = [...release.entries.values()].map((entry) => entry.path).filter(guidedAsset);
-      const fonts = [...release.entries.values()].map((entry) => entry.path).filter(fontAsset);
-      if (!fonts.length) throw new Error('release bundled fonts missing');
       const urls = [
         ...new Set(
-          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided, ...fonts].map(
+          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided].map(
             assetUrl,
           ),
         ),
@@ -400,22 +393,74 @@ self.addEventListener('install', (event) => {
   );
 });
 
+async function reusedFont(previous, url, entry) {
+  for (const cache of previous) {
+    const reused = await Promise.resolve()
+      .then(() => cache.match(url))
+      .then((hit) => hit && verifiedResponse(hit, entry))
+      .catch(() => undefined);
+    if (reused) return reused;
+  }
+  return undefined;
+}
+
+async function fetchedFont(url, entry) {
+  return verifiedResponse(await networkAsset(url), entry);
+}
+
+/** Never awaited by a lifecycle event. Every font is settled on its own. */
+async function fillFonts(previous) {
+  const cache = await caches.open(CACHE_NAME);
+  const release = await readInstalledRelease(cache);
+  const missing = [];
+  for (const [url, entry] of release.entries) {
+    if (!fontAsset(entry.path)) continue;
+    const held = await Promise.resolve()
+      .then(() => cache.match(url))
+      .catch(() => undefined);
+    if (held) continue;
+    const reused = await reusedFont(previous, url, entry);
+    const stored = reused
+      ? await cache.put(url, reused).then(
+          () => true,
+          () => false,
+        )
+      : false;
+    if (!stored) missing.push([url, entry]);
+  }
+  const lane = async () => {
+    for (let next = missing.shift(); next; next = missing.shift()) {
+      const [url, entry] = next;
+      await fetchedFont(url, entry)
+        .then((response) => cache.put(url, response))
+        .catch(() => {});
+    }
+  };
+  await Promise.all(Array.from({ length: FONT_FILL_LANES }, lane));
+}
+
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      // CacheStorage is origin-wide. Even another KAIRO installation on a
-      // different Pages subpath owns its own cache. Legacy unscoped keys are
-      // left alone because this worker cannot prove exclusive ownership.
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
-            .map((key) => caches.delete(key)),
-        ),
-      )
-      .then(() => self.clients.claim()),
-  );
+  // CacheStorage is origin-wide. Even another KAIRO installation on a
+  // different Pages subpath owns its own cache. Legacy unscoped keys are
+  // left alone because this worker cannot prove exclusive ownership.
+  const older = caches
+    .keys()
+    .then((keys) => keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME));
+  // A Cache opened before its name is deleted stays readable, so the older
+  // generations' fonts outlive the deletion without delaying activation.
+  const previous = STAMPED
+    ? older.then((keys) => Promise.all(keys.map((key) => caches.open(key)))).catch(() => [])
+    : Promise.resolve([]);
+  const activated = previous
+    .then(() => older)
+    .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+    .then(() => self.clients.claim());
+  event.waitUntil(activated);
+  if (STAMPED)
+    activated
+      .then(() => previous)
+      .then(fillFonts)
+      .catch(() => {});
 });
 
 function fetchAndStore(request, cache) {
