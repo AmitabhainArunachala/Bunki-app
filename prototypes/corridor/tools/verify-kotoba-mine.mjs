@@ -1452,7 +1452,7 @@ async function verifyBack(browser, base) {
       o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const s = [...card.querySelectorAll('.kp-s')]; const focusContrast = ${FOCUS_CONTRAST};
         const text = s.map((n) => { const k = n.cloneNode(true); k.querySelectorAll('rt').forEach((r) => r.remove()); return k.textContent; }).join('');
         return { zoom: card.dataset.zoom, n: s.length, focus: s.filter((n) => n.dataset.focus).length, dim: s.filter((n) => !n.dataset.focus).map((n) => +getComputedStyle(n).opacity), bright: s.filter((n) => n.dataset.focus).map((n) => +getComputedStyle(n).opacity), text,
-          contrast: focusContrast(s.filter((n) => !n.dataset.focus)), full: document.getElementById('kp-zoom-full')?.getAttribute('aria-pressed'), focusBtn: document.getElementById('kp-zoom-focus')?.getAttribute('aria-pressed'), inChips: !!card.querySelector('.kp-chips .kp-zoom') }; })()`);
+          contrast: focusContrast(s.filter((n) => !n.dataset.focus)), focused: focusContrast(s.filter((n) => n.dataset.focus)), passage: focusContrast(s), full: document.getElementById('kp-zoom-full')?.getAttribute('aria-pressed'), focusBtn: document.getElementById('kp-zoom-focus')?.getAttribute('aria-pressed'), inChips: !!card.querySelector('.kp-chips .kp-zoom') }; })()`);
     // the learner opens 英訳, then switches the zoom: the fold stays open (no repaint)
     await o.page.click('.kp-f-en > summary');
     const z1 = await zoom();
@@ -1473,8 +1473,8 @@ async function verifyBack(browser, base) {
     const stored = await o.page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').zoom`);
     check(
       'd) a new passage card opens 全文 after the reveal (no zoom on the front); 焦点 in the card header dims the other sentences, keeps them, and is remembered for the deck',
-      z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x < 0.5) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.text.min >= 4.5 && z2.contrast.ruby.count > 0 && z2.contrast.ruby.min >= 4.5 && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
-      JSON.stringify({ before: { zoom: z1.zoom, n: z1.n, dim: z1.dim }, after: { zoom: z2.zoom, dim: z2.dim, contrast: z2.contrast }, stored }),
+      z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.passage.text.count > 0 && z1.passage.text.min >= 4.5 && (!z1.passage.ruby.count || z1.passage.ruby.min >= 4.5) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x < 0.5) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.ruby.count > 0 && z2.focused.text.count > 0 && z2.focused.text.min >= 4.5 && (!z2.focused.ruby.count || z2.focused.ruby.min >= 4.5) && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
+      JSON.stringify({ before: { zoom: z1.zoom, n: z1.n, dim: z1.dim, passage: z1.passage }, after: { zoom: z2.zoom, dim: z2.dim, contrast: z2.contrast, focused: z2.focused }, stored }),
     );
 
     // e) the grade bar is fixed to the screen bottom and carries the rule once
@@ -1523,6 +1523,7 @@ async function verifyBack(browser, base) {
     return { y: Math.round(scrollY), bar: Math.round(bar.top), term: Math.round(t.bottom), def: Math.round(d.bottom), sentenceTop: Math.round(f.top), cut: rows.filter((r) => r.top < bar.top - 0.5 && r.bottom > bar.top + 0.5).length }; })()`;
   const CLAMP = `(() => { const card = document.getElementById('kp-card'); const focusContrast = ${FOCUS_CONTRAST}; return [...card.querySelectorAll('.kp-ctx')].map((g) => { const inner = g.querySelector('.kp-ctx-in'); const more = g.querySelector('.kp-more'); const s = g.querySelector('.kp-s');
     return { side: g.dataset.side, display: getComputedStyle(g).display, clip: g.dataset.clip, h: Math.round(inner.getBoundingClientRect().height), line: parseFloat(getComputedStyle(card.querySelector('.kp-sentence')).lineHeight), more: getComputedStyle(more).display !== 'none', expanded: more.getAttribute('aria-expanded'), dim: +getComputedStyle(s).opacity, contrast: focusContrast([...g.querySelectorAll('.kp-s')]) }; }); })()`;
+  const PASSAGE_INK = `(() => { const card = document.getElementById('kp-card'); const focusContrast = ${FOCUS_CONTRAST}; return { focused: focusContrast([...card.querySelectorAll('.kp-s[data-focus]')]), passage: focusContrast([...card.querySelectorAll('.kp-s')]) }; })()`;
   // every glyph of a 焦点 context group that is visible (inside the group's clip box and the viewport)
   // must stay clear of its ⋯: { glyphs, hits, at: the first glyph it covers }
   const PILL_CLEAR = `(() => { const out = []; for (const g of document.querySelectorAll('#kp-card .kp-ctx')) { const more = g.querySelector('.kp-more'); if (getComputedStyle(more).display === 'none') continue;
@@ -1577,6 +1578,7 @@ async function verifyBack(browser, base) {
       await o.page.evaluate(RESTING);
       const rest = await o.page.evaluate(AT_REST);
       const groups = await o.page.evaluate(CLAMP);
+      const ink = await o.page.evaluate(PASSAGE_INK);
       const text = await o.page.evaluate(SENTENCE);
       let opened = null;
       if (label === '焦点') {
@@ -1586,7 +1588,7 @@ async function verifyBack(browser, base) {
           opened = (await o.page.evaluate(CLAMP))[g];
         }
       }
-      seen[label] = { id, rest, groups, text, opened };
+      seen[label] = { id, rest, groups, ink, text, opened };
       await close(o);
     }
     const f = seen['焦点'];
@@ -1599,9 +1601,10 @@ async function verifyBack(browser, base) {
     );
     check(
       '1) 焦点 folds the sentences before and after the target to two dimmed lines each (never removed: the passage text is whole), with ⋯ (aria-expanded) on a group that runs longer, which opens it; 全文 lays the groups out inline with no ⋯',
-      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim < 0.5 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && g.contrast.text.min >= 4.5 && (!g.contrast.ruby.count || g.contrast.ruby.min >= 4.5) && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
+      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim < 0.5 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
+        f.ink.focused.text.count > 0 && f.ink.focused.text.min >= 4.5 && (!f.ink.focused.ruby.count || f.ink.focused.ruby.min >= 4.5) && full.ink.passage.text.count > 0 && full.ink.passage.text.min >= 4.5 && (!full.ink.passage.ruby.count || full.ink.passage.ruby.min >= 4.5) &&
         f.text === c.ja && full.text === c.ja && full.groups.every((g) => g.display === 'contents' && !g.more && g.dim === 1),
-      JSON.stringify({ focus: f.groups, opened: f.opened, full: full.groups.map((g) => [g.side, g.display, g.more]) }),
+      JSON.stringify({ focus: f.groups, focused: f.ink.focused, opened: f.opened, full: full.groups.map((g) => [g.side, g.display, g.more]), fullPassage: full.ink.passage }),
     );
   }
 

@@ -172,6 +172,7 @@ body.ui-bi #drift-layer [data-l='ja'] { display: none; }
   #drift-layer #veil,
   #drift-layer #hint,
   #drift-layer #lvl,
+  #drift-layer #lvlLabels,
   #drift-layer #lvlInfo,
   #drift-layer #depth,
   #drift-layer #radoc,

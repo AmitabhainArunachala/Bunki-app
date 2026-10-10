@@ -30,6 +30,7 @@ const census = () => {
   const header = document.querySelector('.chrome');
   return { card: face?.dataset.card, zoom: face?.dataset.zoom, windowed: p?.classList.contains('kp-window'), inner: p?.scrollTop, height: p?.clientHeight, page: scrollY, anchor: rect(p), toggle: rect(face?.querySelector('.kp-zoom')), target: rect(face?.querySelector('.kp-target')), def: rect(face?.querySelector('.kp-answer>.kp-def')), bar: rect(document.querySelector('.kp-grades')), header: rect(header), folds: [...face.querySelectorAll('.kp-fold')].map(n => [n.className, n.open]), context: [...p.querySelectorAll('.kp-ctx')].map(n => [n.dataset.side, n.dataset.open || '']), overflow: document.documentElement.scrollWidth - innerWidth, ledger: localStorage.getItem('bunki-cloze:n1'), ruby: [...p.querySelectorAll('ruby')].filter(n => n.firstChild.textContent === '小村').map(n => n.querySelector('rt')?.textContent) };
 };
+const seated = (s, context) => s.windowed === true && s.inner > 0 && (!context || s.context.some(([, open]) => open === '1'));
 const fits = s => s.toggle.top >= s.header.bottom && s.target.top >= Math.max(s.header.bottom, s.windowed ? s.anchor.top : s.header.bottom) && s.target.bottom <= Math.min(s.bar.top, s.windowed ? s.anchor.bottom : s.bar.top) && s.def.bottom <= s.bar.top && s.toggle.bottom <= s.bar.top && s.overflow === 0;
 async function labels(page, cdp, lang) {
   const { root } = await cdp.send('DOM.getDocument', { depth: 0 });
@@ -65,11 +66,14 @@ try {
       await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, initial.page - await page.evaluate(() => scrollY)); await page.waitForTimeout(100);
       if (zoom === 'focus') {
         const more = page.locator('.kp-ctx[data-side=before] .kp-more');
-        if (await more.isVisible()) { await more.click(); await resting(page); await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, initial.page - await page.evaluate(() => scrollY)); await page.waitForTimeout(100); }
+        const offered = await more.isVisible();
+        check(`${width}/${zoom} folded context before the passage offers its opener before the compared actions`, offered, { offered, context: (await page.evaluate(census)).context });
+        if (offered) { await more.click(); await resting(page); await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, initial.page - await page.evaluate(() => scrollY)); await page.waitForTimeout(100); }
       }
       await page.locator('.kp-sentence').hover(); await page.mouse.wheel(0, 20); await page.waitForTimeout(100);
       let before = await page.evaluate(census);
       const ledger = before.ledger;
+      check(`${width}/${zoom} compared state is non-default before language switches: windowed, inner seat moved by the wheel${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
       check(`${width}/${zoom} actual reveal surname`, JSON.stringify(before.ruby) === JSON.stringify(['こむら', 'こむら']), before.ruby);
       for (const lang of ['ja', 'bi']) {
         await page.locator(`#lang [data-lang=${lang}]`).click(); await resting(page);
@@ -78,6 +82,7 @@ try {
         check(`${width}/${zoom} native language ${lang} preserves face/window/folds/context/ledger and reading controls`, same && fits(after), { before, after });
         await labels(page, cdp, lang); before = after;
       }
+      check(`${width}/${zoom} compared state is non-default before world switches: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
       for (const seal of ['金', '墨']) {
         await page.locator('#theme-seal').click(); await page.locator('.world-stone', { hasText: seal }).click(); await resting(page);
         const after = await page.evaluate(census);
@@ -87,6 +92,7 @@ try {
       await page.locator('#kp-card .kp-target').click();
       const lookupLedger = await page.evaluate(() => localStorage.getItem('bunki-cloze:n1'));
       const seat = await page.evaluate(census);
+      check(`${width}/${zoom} compared state is non-default before 交 depth: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(seat, zoom === 'focus'), { windowed: seat.windowed, inner: seat.inner, context: seat.context });
       await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click();
       await page.locator('#sheet').waitFor();
       const underSheet = await page.evaluate(() => ({ page: scrollY, inert: !!document.querySelector('.kp').closest('[inert]') }));
@@ -121,7 +127,9 @@ try {
     await page.locator('.kp-f-gloss>summary').click(); await resting(page);
     await page.mouse.move(386, 200); await page.mouse.wheel(0, 79 - await page.evaluate(() => scrollY)); await page.waitForTimeout(100);
     await page.locator('.kp-sentence').hover(); await page.mouse.wheel(0, 20); await page.waitForTimeout(100);
-    const pre = await page.evaluate(census); release(); await page.locator('.kp-sentence .kp-tok').first().waitFor(); await resting(page);
+    const pre = await page.evaluate(census);
+    check('late-token compared state is non-default before tokens arrive: windowed, inner seat moved by the wheel', seated(pre, false), { windowed: pre.windowed, inner: pre.inner });
+    release(); await page.locator('.kp-sentence .kp-tok').first().waitFor(); await resting(page);
     const late = await page.evaluate(census);
     check('late-token actual consumer surname and manually chosen window/fold/inner/page seat', JSON.stringify(pre.ruby) === JSON.stringify(['こむら', 'こむら']) && JSON.stringify(late.ruby) === JSON.stringify(pre.ruby) && late.windowed === pre.windowed && late.height === pre.height && Math.abs(late.inner - pre.inner) < 1 && Math.abs(late.anchor.top - pre.anchor.top) < 1 && JSON.stringify(late.folds) === JSON.stringify(pre.folds) && JSON.stringify(late.context) === JSON.stringify(pre.context) && fits(late), { pre, late });
     const repeat = page.locator('.kp-sentence .kp-tok').filter({ has: page.locator('rt', { hasText: 'こむら' }) }).last();
