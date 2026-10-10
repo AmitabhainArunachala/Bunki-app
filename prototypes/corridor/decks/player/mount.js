@@ -115,6 +115,7 @@ const HINT_SITTINGS = 3;
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
 let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
 let mountRequest = 0;
+let pendingStart = null;
 
 /** Transient reading state belongs to one face, never to the learner ledger. */
 export function capturePresentation({ includeInert = false } = {}) {
@@ -128,6 +129,7 @@ export function capturePresentation({ includeInert = false } = {}) {
     context: [...passage.querySelectorAll('.kp-ctx')].map(n => ({ side: n.dataset.side, open: n.dataset.open || '' })),
     windowed: passage.classList.contains('kp-window'), height: passage.style.getPropertyValue('--kp-window-h'),
     inner: passage.scrollTop, anchor: passage.getBoundingClientRect().top, page: window.scrollY,
+    fitted: backFits(),
   };
 }
 
@@ -161,26 +163,33 @@ function restorePresentation(saved, { seat = true } = {}) {
   fitClamps(face);
   if (!seat || externalSheet()) return;
   window.scrollTo({ top: Math.max(0, window.scrollY + passage.getBoundingClientRect().top - saved.anchor), behavior: 'instant' });
-  refitBack(saved.inner);
+  refitBack(saved);
 }
 
-/** World fonts can reflow in place. Refit only when the reading controls no longer fit. */
-function refitBack(from) {
-  if (!ui.revealed || externalSheet()) return;
+/** Whether the revealed card's reading controls sit between the header and the grade bar;
+ * null when that question does not apply (the front, or no pinned bar). */
+function backFits() {
+  if (!ui.revealed) return null;
   const face = ctx.root.querySelector('#kp-card');
   const toggle = face?.querySelector('.kp-zoom');
   const target = face?.querySelector('.kp-target');
   const passage = face?.querySelector('.kp-sentence');
   const def = face?.querySelector('.kp-answer > .kp-def');
   const bar = ctx.root.querySelector('.kp-grades');
-  if (!toggle || !target || !def || !bar || getComputedStyle(bar).position !== 'fixed') return;
+  if (!toggle || !target || !passage || !def || !bar || getComputedStyle(bar).position !== 'fixed') return null;
   const top = topInset() + SETTLE_GAP, bottom = bar.getBoundingClientRect().top - SETTLE_GAP;
   const mark = target.getBoundingClientRect();
   const view = passage.getBoundingClientRect();
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
-  if (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1 && clearTarget && def.getBoundingClientRect().bottom <= bottom + 1) return;
-  windowPassage(from);
+  return toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1 && clearTarget && def.getBoundingClientRect().bottom <= bottom + 1;
+}
+
+/** World fonts can reflow in place. Refit only when reading controls that fitted no longer do. */
+function refitBack(saved) {
+  if (!ui.revealed || externalSheet()) return;
+  if (saved.fitted !== true || backFits() !== false) return;
+  windowPassage(saved.inner, window.scrollY);
   settleBack();
 }
 export async function refitPresentation() {
@@ -189,7 +198,7 @@ export async function refitPresentation() {
   await document.fonts.ready;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   if (ctx !== owner || !presentationMatches(saved)) return;
-  refitBack(saved.inner);
+  refitBack(saved);
 }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
@@ -2060,7 +2069,7 @@ function holdScreen() {
   });
   for (const node of [copy, ...copies]) {
     node.removeAttribute('id');
-    for (const name of ['card', 'pref', 'group', 'word', 'kanji', 'deckWord', 'returnFocus']) delete node.dataset[name];
+    for (const name of ['card', 'pref', 'group', 'word', 'kanji', 'component', 'deckWord', 'returnFocus']) delete node.dataset[name];
     for (const attr of [...node.attributes]) if (attr.name.startsWith('data-ui-')) node.removeAttribute(attr.name);
     node.classList.remove('kp-enter', 'kp-arrive', 'kp-screen-enter');
   }
@@ -2099,7 +2108,7 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  */
 const WINDOW_LINES = 3;
 const WINDOW_REACH = 12;
-function windowPassage(from) {
+function windowPassage(from, page = from) {
   const face = ctx.root.querySelector('#kp-card');
   const passage = face?.querySelector('.kp-sentence');
   const def = face?.querySelector('.kp-answer > .kp-def');
@@ -2126,7 +2135,7 @@ function windowPassage(from) {
     break;
   }
   if (over < 1 || box.height - over < WINDOW_LINES * line) {
-    window.scrollTo({ top: from, behavior: 'instant' });
+    window.scrollTo({ top: page, behavior: 'instant' });
     return;
   }
   passage.style.setProperty('--kp-window-h', `${Math.floor(box.height - over) + WINDOW_REACH}px`); // + the reach it keeps above its first line (player.css)
@@ -2821,6 +2830,7 @@ function ensureCss() {
 
 export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null } = {}) {
   const request = ++mountRequest;
+  if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
   const root = el('div', 'kp');
   const lexicon = hostOf(host);
@@ -2830,7 +2840,10 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   root.append(el('p', 'kp-sub', english ? 'Loading…' : '読み込み中…'));
   main.append(root);
   const { deck, index } = await loadDeck(deckId);
-  if (request !== mountRequest || !root.isConnected) return;
+  if (request !== mountRequest) return;
+  const start = pendingStart?.deckId === deckId ? pendingStart.autoStart : undefined;
+  pendingStart = null;
+  if (!root.isConnected) return;
   const sameDeck = ctx?.deck?.id === deck.id;
   ctx = {
     root,
@@ -2850,7 +2863,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
-  if (!sameDeck || autoStart === false) {
+  if (!sameDeck || start === false) {
     ui.screen = 'home';
     ui.queue = [];
     ui.sheet = null;
@@ -2861,14 +2874,19 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     window.addEventListener('scroll', () => ui.pop && placePop(), { passive: true });
     keyBound = true;
   }
-  if (autoStart === true) startSession();
+  if (start === true) startSession();
   else {
     if (ui.screen === 'study') wantTokens();
     paint();
     restorePresentation(presentation, { seat: false });
+    let touched = false;
+    const touch = () => { touched = true; };
+    const inputs = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
+    for (const type of inputs) window.addEventListener(type, touch, { capture: true, passive: true });
     await document.fonts.ready;
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    if (request !== mountRequest || ctx.root !== root || !root.isConnected) return;
+    for (const type of inputs) window.removeEventListener(type, touch, { capture: true });
+    if (touched || request !== mountRequest || ctx.root !== root || !root.isConnected) return;
     restorePresentation(presentation);
   }
 }
