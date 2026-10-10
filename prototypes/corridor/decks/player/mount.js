@@ -717,7 +717,7 @@ function go(screen) {
 
 /**
  * A front opens at the top of its card; when the marked word (or the gap) would sit under the
- * docked 答えを見る, the page scrolls at once (no animation) to bring it to the middle of the space
+ * docked controls, the page scrolls at once (no animation) to bring it to the middle of the space
  * between the host's header and the dock, so the word and the reveal are both in view.
  */
 function frameFront() {
@@ -728,7 +728,8 @@ function frameFront() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
   const t = target.getBoundingClientRect();
-  const floor = dock.getBoundingClientRect().top - 16;
+  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
+  const floor = Math.min(dock.getBoundingClientRect().top, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top : Infinity) - 16;
   const ceil = topInset() + 16;
   if (t.bottom <= floor) return;
   window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
@@ -2118,7 +2119,7 @@ function topInset() {
 /**
  * The reveal keeps the card node (no rebuild of the screen): the passage gains its readings,
  * the answer comes in under it, and 答えを見る becomes the grade bar. Only opacity and
- * transform animate (aesthetics.md §5); with reduced motion nothing does. False when the
+ * transform animate (aesthetics.md §5); reduced motion keeps only a short opacity crossfade. False when the
  * card on screen is not the one to reveal (the caller repaints).
  */
 function revealInPlace() {

@@ -203,7 +203,7 @@
 .kp-rule-x::after { inset: -7px; } /* from inside the 1px border: 30 + 14 */
 .kp-zoom-btn[aria-pressed='true'] { background: var(--kp-cyan-wash); color: var(--kp-cyan); font-weight: 700; }
 .kp-s { transition: opacity 0.16s cubic-bezier(0.2, 0, 0, 1); }
-.kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.8; }
+.kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.38; }
 /* 焦点 on a long passage (STANDARD A38): the sentences before and after the target fold to two
  * dimmed lines each — the before group shows its last two, the after group its first two — with
  * ⋯ to open a group that runs longer. 全文 lays the groups out inline, as if they were not there. */
@@ -312,7 +312,10 @@
   :is(#app, .kp) .kp-rise-w { animation: kp-fade 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) :is(.kp-screen-hold, .kp-reveal-hold)[aria-hidden='true'] *,
   :is(#app, .kp) :is(.kp-screen-hold, .kp-reveal-hold)[aria-hidden='true'] *::before,
-  :is(#app, .kp) :is(.kp-screen-hold, .kp-reveal-hold)[aria-hidden='true'] *::after { animation: none !important; transition: none !important; }
+  :is(#app, .kp) :is(.kp-screen-hold, .kp-reveal-hold)[aria-hidden='true'] *::after,
+  /* An open fold keeps its state in the held frame. Its live fade must not
+   * restart inside that frame while the frame itself fades away. */
+  :is(#app, .kp) :is(.kp-screen-hold, .kp-reveal-hold)[aria-hidden='true'] .kp-answer .kp-fold[open] > :not(summary) { animation: none !important; transition: none !important; }
   .kp-progress i { transform: none; width: calc(var(--kp-frac, 0) * 100%); }
   .kp-ghost { display: none; }
 }
@@ -849,7 +852,11 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-study:has(> .kp-undo) > .kp-reveal { margin-top: 0; }
   /* A removal notice can push this stage below the viewport. Keep Undo above
    * the sticky 56px Reveal key, with its 10px clearance and the 16px gap. */
-  .kp .kp-study:has(> .kp-reveal) > .kp-undo { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 82px + env(safe-area-inset-bottom, 0px)); z-index: 2; }
+  .kp .kp-study:has(> .kp-reveal) > .kp-undo { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 82px + env(safe-area-inset-bottom, 0px)); z-index: 2; background: var(--kp-dock); }
+  body.has-primary-tabs .kp .kp-study:has(> .kp-reveal) > .kp-undo { bottom: calc(var(--nav-clearance) + 82px); }
+  /* The small label keeps its own hit area, on an opaque band of the same dock
+   * as Reveal. A long passage can scroll beneath it without overprinting ink. */
+  .kp .kp-study:has(> .kp-reveal) > .kp-undo::before { content: ''; position: absolute; top: -8px; bottom: -8px; left: calc((100% - 100vw) / 2); right: calc((100% - 100vw) / 2); z-index: -1; background: var(--kp-dock); pointer-events: none; }
   /* the card hugs what it holds (a one-sentence front was 60% empty bordered sheet): the sentence keeps
    * its place at the head, the reveal grows the card downward, and the bare stage between the card and
    * the key is a tap that reveals too (mount.js studyScreen). docs/redesign/r4/cards/options/front-b.css
