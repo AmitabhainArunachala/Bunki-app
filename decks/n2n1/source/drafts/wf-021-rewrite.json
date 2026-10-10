@@ -1,0 +1,52 @@
+{
+ "cards": [
+  {
+   "term": "思いつく",
+   "reading": "おもいつく",
+   "pos": "verb",
+   "meaning": "to think of, to hit upon",
+   "defJa": "ふとある考えが頭に浮かぶ",
+   "passage": {
+    "ja": "インドの数学者ラマヌジャンは、新しい公式を思いつくたびに、ナマギリ女神が夢で示してくれたのだと語っていたという。学習科学の立場から見れば、これは無意識の処理が実を結んだ例と読める。夢の話そのものは検証できないが、行き詰まったとき、一度課題から離れて息抜きをすると、解決に近づくことがあるからだ。メタ認知を働かせて、自分がどんな時間帯にひらめきやすいかを知っておくに越したことはない。",
+    "form": "思いつく",
+    "en": "The Indian mathematician Ramanujan is said to have told people that each time he hit upon a new formula, the goddess Namagiri had shown it to him in a dream. From the standpoint of learning science, this can be read as an example of unconscious processing bearing fruit. The dream story itself cannot be verified, but when stuck, stepping away from the problem for a break can sometimes bring one closer to a solution. It is best to use metacognition to know at what time of day one is likely to have flashes of insight.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「新案を思いつく」と使う。ふと頭に浮かぶ発想を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "整列",
+   "reading": "せいれつ",
+   "pos": "noun",
+   "meaning": "sorting, lining up in order",
+   "defJa": "順序よく一列に並べること",
+   "passage": {
+    "ja": "アルゴリズムを人前で説明するなら、ソートがいちばん手ごろな題材です。ばらばらの数字を小さい順に整列する、と言えば、数学が苦手な人にも何をする処理かがすぐに伝わります。細かい仕組みに先立って、まず何をする処理なのかを一言で示すのが、聞き手を置いていかないコツです。そこから「どうやって」を一段ずつ足していけば、一斉に全部を話すよりも、はるかに理解されやすくなります。",
+    "form": "整列",
+    "en": "If you explain algorithms in front of people, sorting is the handiest material. If you say you arrange scattered numbers in order from smallest, even people who are weak at math will immediately understand what the process does. Before the fine mechanism, the trick to not leaving listeners behind is to first state in a phrase what the process does. If you then add the \"how\" one step at a time, it is far easier to understand than talking about everything at once.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "データや人を順序よく並べる意味。「小さい順に整列する」と使う。",
+    "sense": "データなどを順序よく並べること"
+   }
+  },
+  {
+   "term": "好きになる",
+   "reading": "すきになる",
+   "pos": "expression",
+   "meaning": "to come to like, to fall for",
+   "defJa": "好意を持つようになる",
+   "passage": {
+    "ja": "歴史の話を年表から始める人は、とても多いですよね。けれども聞き手がその人物を好きになるのは、年号を聞いたときではなく、迷いや失敗が見えた瞬間です。たとえば桶狭間の名場面を語るなら、年号を並べることなく、雨の音、泥のにおい、息を殺した兵の顔を描写してみてください。そうして年表の人物が血の通った一人の人間に変わったとき、聞き手の想像はようやく自分の力で動きはじめます。",
+    "form": "好きになる",
+    "en": "Plenty of people start a talk about history with a chronology, don't they? But the moment listeners come to like a person is not when they hear the dates but when they see his hesitation and failures. If you tell the famous scene of Okehazama, for example, try describing the sound of rain, the smell of mud and the faces of soldiers holding their breath, without lining up dates. When the figure in the chronology turns into a flesh-and-blood human being that way, the listener's imagination at last starts to move under its own power.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「〜を好きになる」と、気持ちの変化を表す。聞き手の心が動く瞬間を語る語。",
+    "sense": ""
+   }
+  }
+ ]
+}

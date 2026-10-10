@@ -29,6 +29,9 @@ on:
       - 'decks/**'
       - 'tools/kotoba-*'
       - 'tools/sw-shell.test.mjs'
+      - 'tools/lint-ui-language.mjs'
+      - 'tools/verify-redesign-foundation.mjs'
+      - 'tools/verify-redesign-docks.mjs'
       - '.github/workflows/corridor-gate.yml'
   push:
     branches: [main]
@@ -38,6 +41,9 @@ on:
       - 'decks/**'
       - 'tools/kotoba-*'
       - 'tools/sw-shell.test.mjs'
+      - 'tools/lint-ui-language.mjs'
+      - 'tools/verify-redesign-foundation.mjs'
+      - 'tools/verify-redesign-docks.mjs'
       - '.github/workflows/corridor-gate.yml'
   workflow_dispatch:
 
@@ -108,6 +114,8 @@ jobs:
         run: python3 decks/kotoba-mine/tools/test_gloss_ja.py
       - name: Passage rules and fields (test_export_mcd.py)
         run: python3 decks/kotoba-mine/tools/test_export_mcd.py
+      - name: Segment lexicon (test_segment_overrides.py)
+        run: python3 prototypes/corridor/tools/test_segment_overrides.py
       - name: Verify the deck and player (verify-kotoba-mine.mjs)
         run: node prototypes/corridor/tools/verify-kotoba-mine.mjs
       - name: Deck and player unit tests
@@ -119,3 +127,42 @@ jobs:
           tools/kotoba-deck-ruby.test.mjs
           tools/kotoba-player-engine.test.mjs
           tools/sw-shell.test.mjs
+
+  redesign-foundation:
+    name: language law and navigation / EN + Japanese room screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Use Ubuntu archive with bounded package requests
+        run: |
+          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' "$source"
+          done
+          printf '%s\n' 'Acquire::http::Timeout "30";' 'Acquire::https::Timeout "30";' 'Acquire::Retries "2";' | sudo tee /etc/apt/apt.conf.d/99-bunki-network
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Build the clean foundation candidate
+        run: |
+          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/foundation-site" >> "$GITHUB_ENV"
+          echo "KAIRO_EVIDENCE_DIR=$RUNNER_TEMP/foundation-evidence" >> "$GITHUB_ENV"
+          node scripts/build-corridor-site.mjs --out "$RUNNER_TEMP/foundation-site"
+      - name: Inspect every room and retain both language tours at 390 by 844
+        run: node tools/lint-ui-language.mjs --screenshots --both-languages
+      - name: Exercise navigation, room stamps and docking in both browsers
+        run: node tools/verify-redesign-foundation.mjs
+      - name: Verify report clearance, live imports and palette targets in both browsers
+        run: node tools/verify-redesign-docks.mjs
+      - name: Retain the room gallery and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-redesign-foundation-EN-JA-390x844
+          path: ${{ runner.temp }}/foundation-evidence
+          retention-days: 14
+          if-no-files-found: error

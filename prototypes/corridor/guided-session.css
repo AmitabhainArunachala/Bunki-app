@@ -772,7 +772,9 @@ legend.gs-instruction {
 .gs-slash path {
   fill: var(--red);
   opacity: 0.9;
-  clip-path: inset(0 100% 0 0);
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
 }
 .gs-choice.is-wrong.cut .gs-choice-num {
   display: inline-block;
@@ -787,13 +789,12 @@ legend.gs-instruction {
   }
   .gs-choice {
     transition:
-      border-color 0.12s,
-      background 0.12s;
+      none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .gs-slash path {
-    clip-path: none;
+    transform: none;
   }
   .gs-choice.is-wrong.cut .gs-choice-num {
     transform: translate(2px, 10px) rotate(60deg);
@@ -802,7 +803,7 @@ legend.gs-instruction {
 }
 @keyframes gs-slash {
   to {
-    clip-path: inset(0 0 0 0);
+    transform: scaleX(1);
   }
 }
 @keyframes gs-numfall {
@@ -899,7 +900,7 @@ legend.gs-instruction {
   color: var(--faint);
 }
 .gs-source-id {
-  font-family: ui-monospace, Menlo, monospace;
+  font-family: 'Roboto Mono', 'Noto Sans JP', ui-monospace, Menlo, monospace;
   font-size: 11px;
   color: var(--ink-2);
   word-break: break-all;
@@ -1536,4 +1537,9 @@ legend.gs-instruction {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+  #app .guided-room .gs-feedback,
+  #app .guided-room .gs-slash path {
+    animation: gs-quiet-verdict 80ms linear both !important;
+  }
 }
+@keyframes gs-quiet-verdict { from { opacity: 0; } }

@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "当たり前",
+   "reading": "あたりまえ",
+   "pos": "na-adj",
+   "meaning": "obvious, natural",
+   "defJa": "そうなるのが自然で、特別ではないこと",
+   "passage": {
+    "ja": "顔認証でスマホが開くのが当たり前になって、もう誰も不思議に思わないじゃないですか。でも、あれは赤外線で顔に三万個ほどの点を投げる仕掛けで、凹凸を読み取ってるんですよ。写真だと開かないのは、その立体の情報を見てるからなんです。便利だからといって、中身を知らなくていいわけじゃないですよね。技術の仕組みを少しでも知っていると、AIのニュースの見え方まで、ずいぶん変わってきますよ。",
+    "form": "当たり前",
+    "en": "Unlocking your phone by face recognition has become the norm, and nobody finds it strange anymore, right? But it works by projecting about thirty thousand dots of infrared light onto the face, reading the contours. A photo does not open it because it is looking at that three-dimensional information. Just because it is convenient does not mean you need not know what is inside, does it? If you know even a little about how the technology works, even how AI news looks to you changes quite a lot.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「当たり前になる」「当たり前のこと」。自然で特別でない。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "大げさ",
+   "reading": "おおげさ",
+   "pos": "na-adj",
+   "meaning": "exaggerated",
+   "defJa": "実際よりも誇張した様子",
+   "passage": {
+    "ja": "話し方の悩みの多くは、実は技術よりも、日ごろの心の癖から来ている。言い間違えを、取り返しのつかない一生の失態のように大げさに受け止めてしまうのが、その典型だ。聞き手は、聞き流した言い間違いのほとんどを、数秒で忘れてしまう。言い間違えるのは当たり前だと、話す前に言い聞かせるだけでも、声は驚くほどやわらかく変わる。失敗を小さく見積もれる人ほど、次の一言を落ち着いて選べるのだ。",
+    "form": "大げさ",
+    "en": "Many worries about speaking come, in fact, from mental habits rather than technique. Taking a slip of the tongue exaggeratedly, as if it were a lifelong blunder, is the typical case. Listeners forget most slips within a few seconds. Merely telling yourself before you speak that slipping is natural changes your voice surprisingly. The people who can estimate a failure as small are the ones who can choose their next words calmly.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「大げさに受け止める」。事実より大きく扱う悪い癖を言う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "引力",
+   "reading": "いんりょく",
+   "pos": "noun",
+   "meaning": "gravitational pull; attraction",
+   "defJa": "物同士が互いに引き合う力",
+   "passage": {
+    "ja": "仏教心理の解説では、執着を、心に働く引力にたとえて説明することがあります。重いものほど周りを強く引き寄せるように、強い欲望は、注意を一点へ縛りつけて簡単には離しません。ただし、この力は消すものではなく、向きを知って付き合うものです。思いが頭の中を巡るたびに、引き戻される感覚をそっと眺めて観察する。坐禅で呼吸に意識を戻し続けるのは、その練習にほかならないのです。",
+    "form": "引力",
+    "en": "Explanations of Buddhist psychology sometimes liken attachment to a gravitational pull acting on the mind. Just as heavier things pull their surroundings harder, a strong desire ties attention to a single point and will not let go. But this force is not something to eliminate; it is something to live with by knowing its direction. Each time thoughts circle through your head, you quietly observe the sensation of being pulled back. Continually returning awareness to the breath in seated meditation is nothing other than practice for that.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "物理の引力のほか、心を引きつける力の比喩にも使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

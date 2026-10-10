@@ -1,0 +1,164 @@
+{
+ "batch": "r5-india-new-002",
+ "items": [
+  {
+   "term": "沙門",
+   "reading": "しゃもん",
+   "gloss": "renunciant ascetic",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/JainFundamentals",
+    "https://cir.nii.ac.jp/crid/1920583859638810752"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Indian renunciant milieu includes Buddhists and Jains; Japanese Buddhism uses the term for a monk too.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "耆那",
+   "reading": "じな",
+   "gloss": "Jina; conqueror of inner passions",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/aboutjainism"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Chinese transcription of Jina, the victor over passions, underlying the name Jainism; no military conquest.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "パールシュヴァナータ",
+   "reading": "ぱーるしゅゔぁなーた",
+   "gloss": "Parshvanatha",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/KnowYourTrithankar"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Twenty-third tirthankara in Jain tradition, predecessor of Mahavira; date and legendary biography not presented as confirmed history.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "ジーヴァ",
+   "reading": "じーゔぁ",
+   "gloss": "living soul in Jain philosophy",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/PathofLiberation"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "In Jain doctrine individual living souls are distinct from nonliving entities; differs from Buddhist no-self and from a single universal self.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "五大誓戒",
+   "reading": "ごだいせいかい",
+   "gloss": "five great Jain ascetic vows",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/page/PathofLiberation",
+    "https://www.bukkyo-u.ac.jp/museum/uploads/ondemand_endonkai.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Five great renunciant vows: nonviolence, truth, nonstealing, celibacy, nonpossession; lay vows are less absolute.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "タットヴァールタ・スートラ",
+   "reading": "たっとゔぁーるた・すーとら",
+   "gloss": "Tattvartha Sutra",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://jainpedia.org/?id=297"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Systematic Jain text accepted across major Jain sects; versions and commentaries differ. Avoid exact date/authorship controversy.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  },
+  {
+   "term": "シュラヴァナベラゴラ",
+   "reading": "しゅらゔぁなべらごら",
+   "gloss": "Shravanabelagola Jain pilgrimage site",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Jain pilgrimage site in Karnataka known for a monumental standing Bahubali figure. Do not call figure Mahavira or a Buddha.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "裸形修行",
+   "reading": "らぎょうしゅぎょう",
+   "gloss": "naked ascetic practice",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "In Digambara Jainism the naked male ascetic renounces possessions including clothes; not exhibitionism nor a rule for every follower.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  }
+ ],
+ "weave": [
+  "修行",
+  "執着",
+  "慈悲",
+  "系譜",
+  "戒律",
+  "比較",
+  "注意",
+  "伝来",
+  "解釈",
+  "原典"
+ ],
+ "note": "Use grounded factNote only for historical or scientific claims; ordinary explanatory examples may elaborate without adding invented facts. All topic india. Four sentences, 215–255 chars. Avoid stock endings る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

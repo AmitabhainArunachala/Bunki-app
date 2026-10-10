@@ -13,6 +13,14 @@ export async function openShelfTools(page) {
   await page.locator(SHELF_TOOLS_PANEL).waitFor({ state: 'visible' });
 }
 
+/** Close the actual panel before using the header's lookup door. */
+export async function closeShelfTools(page) {
+  const toggle = page.locator(SHELF_TOOLS_TOGGLE);
+  await toggle.waitFor({ state: 'visible' });
+  if ((await toggle.getAttribute('aria-expanded')) === 'true') await toggle.click();
+  await page.locator(SHELF_TOOLS_PANEL).waitFor({ state: 'hidden' });
+}
+
 /** Open the panel, then press one of its doors. */
 export async function openShelfDoor(page, selector) {
   await openShelfTools(page);

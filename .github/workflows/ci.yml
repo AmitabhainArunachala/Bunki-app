@@ -94,6 +94,14 @@ jobs:
       - name: Install corpus test dependencies
         run: python3 -m pip install './corpus[dev,wikinews,aozora,snow,grading]'
 
+      - name: Use Ubuntu archive with bounded package requests
+        run: |
+          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' "$source"
+          done
+          printf '%s\n' 'Acquire::http::Timeout "30";' 'Acquire::https::Timeout "30";' 'Acquire::Retries "2";' | sudo tee /etc/apt/apt.conf.d/99-bunki-network
+
       - name: Install the pinned browser and system libraries
         run: npx playwright install --with-deps chromium webkit
 
@@ -163,7 +171,13 @@ jobs:
                       'decks/personal/store.mjs' \
                       'decks/personal/personal.css' \
                       'decks/kotoba-mine/deck.json' \
-                      'decks/kotoba-mcd/deck.json'; do
+                      'decks/kotoba-mcd/deck.json' \
+                      'decks/n2/deck.json' \
+                      'decks/n2/tokens.json' \
+                      'decks/n1/deck.json' \
+                      'decks/n1/tokens.json' \
+                      'decks/senmon/deck.json' \
+                      'decks/senmon/tokens.json'; do
             code=""
             for _ in 1 2 3 4 5; do
               code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$port/$path" || true)

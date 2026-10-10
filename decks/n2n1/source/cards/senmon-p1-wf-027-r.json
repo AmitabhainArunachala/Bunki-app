@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "具体化",
+   "reading": "ぐたいか",
+   "pos": "noun",
+   "meaning": "making concrete",
+   "defJa": "考えや計画を実際の形にすること",
+   "passage": {
+    "ja": "目標は、具体化しない限り、ただの願望で終わります。「日本語が上手になりたい」ではなく、「三か月後に、五分間の自己紹介をやり遂げる」と決めるのです。ここまで絞り込めば、今日やるべきことが、おのずと見えてきます。そうして一歩ずつ体得したものは、のちの伸びしろにもなっていくでしょう。曖昧な夢に期限と数字を与えるだけで、頭の中の景色は驚くほど鮮明になり、行動のハードルも下がっていきます。",
+    "form": "具体化",
+    "en": "A goal ends up as a mere wish unless you make it concrete. Instead of 'I want to get good at Japanese,' you decide, 'in three months, I will carry off a five-minute self-introduction'. Once you narrow it down this far, what you should do today comes into view naturally. What you master step by step in that way will also become room for further growth later. Merely giving a vague dream a deadline and a number makes the scenery in your head astonishingly clear, and the hurdle to action drops as well.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「計画を具体化する」「構想の具体化」。「〜化」でサ変動詞的に働く名詞。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "免罪符",
+   "reading": "めんざいふ",
+   "pos": "noun",
+   "meaning": "indulgence (papal); get-out-of-blame card",
+   "defJa": "罪の償いを軽くするとして教会が売った証書",
+   "passage": {
+    "ja": "16世紀、ローマ教会が売り出した免罪符は、聖堂の建設資金を集める手段でもあった。これに疑問を投げかけたルターが、1517年に九十五か条の論題を発表する。ルターの怒りは、信仰の証が金で買えるかのように扱われる風潮そのものに向けられていた。論題を皮切りに改革の動きは各地へ広がり、その余波は欧州全体に及んだ。現代では、「これさえあれば責任を問われない」という口実の意味で、この語が比喩的にも使われる。",
+    "form": "免罪符",
+    "en": "In the sixteenth century, the indulgences the Roman Church put on sale were also a means of raising funds to build a cathedral. Luther, who questioned this, published his Ninety-Five Theses in 1517. Luther's anger was aimed at the very climate in which a token of faith was treated as something money could buy. Starting with the theses, the reform movement spread to many places, and its aftershocks reached all of Europe. Today the word is also used figuratively to mean an excuse of the kind, 'with this alone, no one can hold me responsible'.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "本来は宗教改革の語。「〜は免罪符にならない」と比喩で使う用法も多い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "割り込み",
+   "reading": "わりこみ",
+   "pos": "noun",
+   "meaning": "interruption",
+   "defJa": "進行中の作業の途中に入ること",
+   "passage": {
+    "ja": "勉強の最中に通知が入ると、元の集中状態へ戻るまでに二十分ほどかかるといわれます。小さな割り込みでも、頭の中の作業メモリは確実に消耗するのです。そのため、効率のいい人ほど、机に向かう前にスマホを別の部屋に置いてしまいます。創造性を要する課題ほど、途切れない時間の確保が成果を分けるでしょう。通知を切る、机の上を片づける、そんな小さな環境づくりが、最も確実な集中の技術なのです。",
+    "form": "割り込み",
+    "en": "It is said that when a notification arrives in the middle of studying, it takes about twenty minutes to return to the original state of concentration. Even a small interruption reliably drains the working memory in your head. That is why efficient people put their phones in another room before sitting at the desk. The more a task demands creativity, the more securing uninterrupted time will decide the result. Turning off notifications and tidying the desk, such small environment-building is the most reliable technique for concentration.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "名詞「割り込み」。「割り込みが入る」。機械の割り込み処理とも同じ語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

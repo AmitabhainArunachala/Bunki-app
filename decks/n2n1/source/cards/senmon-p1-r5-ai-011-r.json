@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "ベクトル",
+   "reading": "べくとる",
+   "pos": "noun",
+   "meaning": "vector",
+   "defJa": "向きと大きさや、複数の数の組で表す量",
+   "passage": {
+    "ja": "言葉の関係を計算で扱うために、一つの語をいくつもの数の組へ置き換えることがある。こうしたベクトルとしての表現では、数の間の距離や向きを使い、語や文章の類似度を調べる手がかりを作れる。だが、二つの表現が近いという結果をもって、人間が感じる意味の近さをあらゆる場面で言い尽くしたことにはならない。何を学習し、どの尺度で比べるかによって関係の見え方も変わるため、数の並びを意味の実体と見るより、ある目的に沿って作った見取り図として読むほうが慎重である。",
+    "form": "ベクトル",
+    "en": "To compute relationships between words, a word may be represented by a collection of numbers. Such vector representations use distances and directions to provide clues about similarities among words or texts. But closeness between two representations does not exhaust every human sense of semantic similarity in every context. Because learned data and comparison measures affect the relationships displayed, it is more cautious to read the numbers as a map made for a purpose than as meaning itself.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "言語処理では、意味そのものではなく数による表現。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

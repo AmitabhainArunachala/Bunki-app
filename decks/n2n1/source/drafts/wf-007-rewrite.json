@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "強制",
+   "reading": "きょうせい",
+   "pos": "noun",
+   "meaning": "compulsion, forcing",
+   "defJa": "相手の意思に関係なく従わせること",
+   "passage": {
+    "ja": "通知を切ったのに、気づけばスマホを開いている。それは意志が弱いからというより、アプリの設計が人の注意を半ば強制しているからだ。次の動画が自動で流れるだけで、「やめる」という決断の手間は、いつのまにか利用者の側に押しつけられる。学習中は、スマホを物理的に遠ざけるといった手軽な工夫のほうが、気合いより確実に効く。意志の力に頼るより、誘惑の側を設計し直すほうが、はるかに現実的だ。",
+    "form": "強制",
+    "en": "I turned the notifications off, yet I find myself opening my phone anyway. It is less that my willpower is weak than that the app's design half forces my attention. Just by playing the next video automatically, it pushes the effort of deciding to stop onto the user. While studying, a simple measure such as physically moving the phone away works more reliably than sheer determination. Redesigning the temptation is far more realistic than relying on willpower.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「注意を強制する」「強制される」など、意思に反して従わせる場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "応募",
+   "reading": "おうぼ",
+   "pos": "noun",
+   "meaning": "applying, application",
+   "defJa": "募集に応じて申し込むこと",
+   "passage": {
+    "ja": "履歴書の志望動機は、応募先の言葉をなぞるだけでは読まれない。「情熱があります」といった抽象的な言葉は避け、まず自分が何に手を動かしてきたかを一文で示すとよい。そのうえで相手の事業とのつながりを語る。たとえば半導体の設計に興味があるなら、独学で作った小さな回路の話から入るほうが、熱意は雄弁に伝わる。提出書類は、限られた字数で相手の貴重な時間を借りる、いわば小さな交渉の場でもある。",
+    "form": "応募",
+    "en": "A statement of motivation on a résumé will not be read if it merely echoes the words of the company you are applying to. Avoid abstract phrases such as \"I am passionate,\" and first show in one sentence what you have actually been working on with your own hands. After that, speak about the connection to their business. If you are interested in semiconductor design, for example, opening with the story of a small circuit you built on your own will convey your enthusiasm more eloquently. A submitted document is, so to speak, also a small negotiation in which you borrow the other person's valuable time within a limited number of characters.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「応募先」「〜に応募する」のように、募集に申し込む場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "応急",
+   "reading": "おうきゅう",
+   "pos": "noun",
+   "meaning": "emergency, first-aid",
+   "defJa": "急場をしのぐために間に合わせること",
+   "passage": {
+    "ja": "試験の最中に頭が真っ白になったら、まず深呼吸を三回して、解ける問題から応急的に片づけていくとよい。焦りは判断力を奪う一方で、手を動かし始めると不思議と落ち着いてくる。だから本番の前に、白紙になったときの手順を決めておくことが何よりの備えになる。慌てない人は、運がいいのではなく、手際のいい型を持っているだけだ。この手順を一つ知っているだけでも、試験前の不安はずいぶん軽くなるものだ。",
+    "form": "応急",
+    "en": "If your mind goes blank in the middle of an exam, first take three deep breaths and then knock off the questions you can solve as a stopgap. Panic robs you of judgment, yet strangely, once you start moving your hand you begin to calm down. So deciding on a procedure for when your mind goes blank, before the real thing, is the best preparation. People who don't panic are not lucky; they simply have a well-practiced routine. Just knowing this one procedure lightens the anxiety before an exam considerably.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「応急処置」「応急的に」のように、とりあえず急場をしのぐ手当てを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "怪獣",
+   "reading": "かいじゅう",
+   "pos": "noun",
+   "meaning": "monster (kaiju)",
+   "defJa": "巨大で不思議な力を持つ、想像上の生き物",
+   "passage": {
+    "ja": "優れた物語は、怪獣を単なる怪物のままで終わらせない。一九五四年の『ゴジラ』は、巨大な生き物の姿を通して水爆実験への恐れを形にし、観客が言葉にできなかった不安を見せつけた。書き手の意図は、説明するほど弱まり、象徴に預けるほど深く届くものだ。文章を書くときも、結論を叫ぶのではなく、読み手が自分で気づく余白を残したい。名作が半世紀以上たった今も語り継がれるのは、そうした余白の深さのおかげだろう。",
+    "form": "怪獣",
+    "en": "A great story does not leave its kaiju as a mere monster. Godzilla, in 1954, gave form to the fear of hydrogen bomb tests through the figure of a giant creature, and showed audiences an anxiety they could not put into words. A writer's intention weakens the more it is explained and reaches deeper the more it is entrusted to a symbol. In writing too, rather than shouting a conclusion, I want to leave room for the reader to notice it on their own. That the masterpiece is still talked about more than half a century later is probably thanks to the depth of such margins.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「怪獣映画」のように、巨大な怪物を指す。物語では象徴にもなる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "愚か",
+   "reading": "おろか",
+   "pos": "na-adj",
+   "meaning": "foolish",
+   "defJa": "考えが浅く、判断を誤るさま",
+   "passage": {
+    "ja": "歴史を振り返ると、当時の人々の判断を愚かと笑いたくなることがある。しかし、彼らも目の前の情報の範囲で最善を尽くしていたにすぎない。第一次世界大戦の前夜、指導者たちの多くが長期の全面戦争を予想していなかったとされる。連鎖する同盟と、体面を重んじる名誉の論理の末に、取り返しのつかない結果へ踏み込んだ事実は、賢い人々でも破局を招きうることを教えている。過去の失敗を笑うより、同じ構造が今にもないかを問うほうが、歴史は役に立つ。",
+    "form": "愚か",
+    "en": "Looking back at history, we are sometimes tempted to laugh at the judgment of people at the time as foolish. Yet they too were merely doing their best within the information in front of them. On the eve of the First World War, many leaders are said not to have anticipated a long, total war. The fact that, after a chain of alliances and a logic of honor that prized saving face, they stepped into an irreversible outcome teaches us that even wise people can bring on catastrophe. History is more useful when we ask whether the same structure exists today than when we laugh at past failures.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「愚かさ」「愚かな選択」のように、判断の浅さや誤りを言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "手掛かり",
+   "reading": "てがかり",
+   "pos": "noun",
+   "meaning": "clue, lead",
+   "defJa": "解き明かす糸口になる事柄",
+   "passage": {
+    "ja": "インダス文明の文字は、百年近くたった今も解読されていません。数千点の印章が見つかっていても、文が極端に短く、対照できる二言語の碑文もないため、読み方を確かめようがないのです。ロゼッタストーンのような手掛かりが一つあれば、状況は一変するでしょう。それでも研究者たちは、印章の並び方を統計で調べるなどして、少しずつ推測を重ねています。もし解読されれば、四千年以上前の人々の暮らしが、初めて彼ら自身の言葉で語られるでしょう。",
+    "form": "手掛かり",
+    "en": "Even now, nearly a century later, the script of the Indus civilization has not been deciphered. Although several thousand seals have been found, the texts are extremely short and there are no bilingual inscriptions to compare, so there is no way to confirm how to read them. If there were just one clue like the Rosetta Stone, the situation would change completely. Even so, researchers are building up conjectures bit by bit, for example by statistically examining how the signs on the seals are arranged. If it were deciphered, the lives of people more than four thousand years ago would be told for the first time in their own words.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「手掛かりを探す」「手掛かりとなる」のように、解明の糸口を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "扶養",
+   "reading": "ふよう",
+   "pos": "noun",
+   "meaning": "support of dependents",
+   "defJa": "家族などの生活を養い助けること",
+   "passage": {
+    "ja": "「扶養」という語は、支え助ける意味の「扶」と、食べさせて育てる意味の「養」を重ねた熟語である。税や社会保険の話題では、この語がしばしば「入る」「外れる」という動きの言葉と結びつき、家族を一つの生計の単位として捉える発想がにじむ。近年は働き方の多様化に伴って、その枠組みが実態に合わないとの声も出ている。言葉の成り立ちを知ると、制度の背後にある考え方まで見えてくる。漢字の組み合わせに目を向けるだけで、ニュースの理解はずっと深まる。",
+    "form": "扶養",
+    "en": "The word fuyou is a compound that pairs fu, meaning to support and help, with you, meaning to feed and raise. In discussions of taxes and social insurance, the word is often linked with verbs of motion such as \"enter\" and \"drop out of,\" and the idea of treating a family as one unit of livelihood seeps through. In recent years, as ways of working diversify, voices are also saying that this framework no longer fits reality. Knowing how a word is built lets you see even the thinking behind a system. Just paying attention to how kanji combine will deepen your understanding of the news.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「扶養に入る」「扶養から外れる」のように、家族の生計を支える枠組みを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抑制",
+   "reading": "よくせい",
+   "pos": "noun",
+   "meaning": "restraint, suppression",
+   "defJa": "勢いや感情をおさえとどめること",
+   "passage": {
+    "ja": "人工知能の書く文章には、感情の抑制が利きすぎて平板になるか、逆に大げさな言葉を重ねすぎるか、どちらかに偏る傾向がある。人間の書き手は、悲しい場面では形容を抜きにして事実だけを置き、読み手の想像を引き出す。同じ出来事でも、「胸が張り裂けそうだった」と書くより、「何も言えず、ただ靴紐を結び直した」と書くほうが、悲しみは深く伝わる。語りの技は、足し算ではなく、何を書かずに残すかの選択にある。",
+    "form": "抑制",
+    "en": "Text written by artificial intelligence tends to lean one of two ways: so restrained in emotion that it turns flat, or so piled with exaggerated words that it overshoots. A human writer, in a sad scene, sets down just the facts without adjectives and draws out the reader's imagination. Even for the same event, writing \"I couldn't say a word and just retied my shoelaces\" conveys the sadness more deeply than writing \"my heart felt like it would burst.\" The craft of narration lies not in addition but in choosing what to leave unwritten.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「感情の抑制」「抑制がきく」のように、表に出さず保つ意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "拒否",
+   "reading": "きょひ",
+   "pos": "noun",
+   "meaning": "refusal, rejection",
+   "defJa": "要求や申し出を受け入れず断ること",
+   "passage": {
+    "ja": "日本語には、「いいえ」と言わずに拒否の意思を伝える言い方が数多くある。「検討します」「難しいですね」「ちょっと…」などがその代表だろう。これらは相手の面目を保つためのものであり、聞き手は言葉の内容よりも、間の取り方や声の調子を通して話し手の意図を読み取る。外国語として学ぶ者にとっては、文法を理解しても、同意なのか婉曲な断りなのかを見分けるのは難しい。言葉の裏を読む力は、外国語の習得で最後まで残る難所である。",
+    "form": "拒否",
+    "en": "Japanese has many ways of conveying an intention to refuse without ever saying no. Phrases like \"I'll consider it,\" \"That's difficult,\" and \"Well, um\" are probably the representative ones. These exist to save the other person's face, and listeners read the speaker's intent through the timing of pauses and tone of voice rather than the content of the words. For those learning it as a foreign language, even understanding the grammar, it is hard to tell whether something is agreement or an oblique refusal. The ability to read between the lines is the hurdle that remains to the very end in acquiring a foreign language.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「要求を拒否する」のように、はっきり断る意味。日本語では婉曲に言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "控える",
+   "reading": "ひかえる",
+   "pos": "verb",
+   "meaning": "to jot down; to hold back",
+   "defJa": "あとで見返せるよう書きとめる",
+   "passage": {
+    "ja": "歴史の授業で、年号をノートに控えておくだけじゃ、全然頭に残らないんですよね。僕は、出来事の原因と結果を一本の線でつないで話す練習をしたところ、急に覚えられるようになって。たとえばフランス革命なら、財政難から三部会、国民議会、バスティーユ襲撃っていう流れを口で説明してみるんです。友達と一緒にやると、同感だって笑いながらお互いの穴を指摘できて、楽しいですよ。覚えるときは、ノートに書くより、口に出して人に教えるほうが効くんですよ。",
+    "form": "控えておく",
+    "en": "Just jotting dates in your notebook in history class doesn't make anything stick in your head at all. When I practiced linking the cause and effect of events into one line and talking it through, I suddenly started remembering them. For the French Revolution, for example, I try explaining aloud the flow from the fiscal crisis to the Estates-General, the National Assembly and the storming of the Bastille. If you do it with a friend, you can point out each other's gaps while laughing and agreeing, and it's fun. When memorizing, explaining aloud to someone works better than writing in a notebook.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「発言を控える」「メモを控える」のように、抑える意味と書き留める意味がある。",
+    "sense": "書き留める"
+   }
+  }
+ ]
+}

@@ -5,6 +5,7 @@
  * --require-skip / EXPERIENCE_REQUIRE_SKIP=1 makes combined SKIP coverage required.
  * Evaluation is READ ONLY: storage/DOM observations, never application interaction.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
@@ -66,14 +67,14 @@ async function recoverShelf(){
  for(let i=0;i<10;i++){
   if(await visible('#stroke-page')){await page.keyboard.press('Escape');await sleep(400);continue;}
   if(await visible('.world-picker')){await page.keyboard.press('Escape');await sleep(300);continue;}
-  if(await visible('.sheet')){await click('#sheet-close');await sleep(650);continue;}
-  if(await visible('#search')){if(await page.locator('#search').inputValue())await page.locator('#search').fill('');return;}
+  if(await visible('.sheet')){await click(await entryCloseSelector(page));await sleep(650);continue;}
+  if(await visible('#shelf-tools-toggle')){await openShelfTools(page);if(await page.locator('#search').inputValue())await page.locator('#search').fill('');return;}
   if(await visible('.nav-symbol')){await click('.nav-symbol');if(await visible('.bubble-shelf')){await click('.bubble-shelf');await sleep(600);}continue;}
   if(await page.getByRole('button',{name:'leave the session',exact:true}).isVisible().catch(()=>false)){await role('leave the session');continue;}
   if(await visible('#back')){await click('#back');continue;}break;
  }
 }
-async function closeSheet(){await sleep(800);await click('#sheet-close');await sleep(350);}
+async function closeSheet(){await sleep(800);await click(await entryCloseSelector(page));await sleep(350);}
 async function sheetHop(name){await role(name);await sleep(850);}
 async function noOverflow(id){await check(id,'No horizontal document overflow',async()=>{const d=await page.evaluate(()=>({w:innerWidth,sw:document.documentElement.scrollWidth}));assert.ok(d.sw<=d.w+1,JSON.stringify(d));return JSON.stringify(d);});}
 let initial,captured,afterReview,lessonBefore,mockBefore,savedMockAttempt;
@@ -84,11 +85,17 @@ try{
  await click('.nav-symbol');await shot('drift-navigation','Expanded normal navigation reveals shelf door');
  await click('.bubble-shelf');await page.locator('.shelf-open').first().waitFor();await shot('shelf-mobile','Bilingual shelf doors and real texts are legible at 390px');
  await segment('E02-search',async()=>{
-  await page.locator('#search').fill('意見');await page.locator('.search-syn .sem-row').first().waitFor();await shot('search-synonyms','Word hits plus semantic neighbors');
+  await openShelfTools(page);await page.locator('#search').fill('意見');await page.locator('.search-syn .sem-row').first().waitFor();await shot('search-synonyms','Word hits plus semantic neighbors');
   await click('.search-syn .sem-row');await sleep(900);await check('E02-neighbor','Semantic-neighbor result opens full entry',async()=>{assert.ok(await visible('.sheet .headword'));return await page.locator('.sheet .headword').innerText();});await closeSheet();
-  await page.locator('#search').fill('<img src=x onerror=alert(1)>');await sleep(600);await shot('search-literal-empty','Malformed-looking input is harmless literal text with honest no-results feedback');
-  await check('E02-literal','Search treats markup-looking text literally',async()=>{assert.equal(await page.locator('main img').count(),0);assert.equal(await page.locator('#search').inputValue(),'<img src=x onerror=alert(1)>');return (await text()).slice(-700);});
-  await page.locator('#search').fill('森林');await sleep(650);await click('main .entry-row');await sleep(850);await shot('word-entry','Correct 森林 full entry, readings, kanji and semantic/provenance content');
+  await openShelfTools(page);await page.locator('#search').fill('<img src=x onerror=alert(1)>');await sleep(600);await shot('search-literal-empty','Malformed-looking input is harmless literal text with honest no-results feedback');
+  await check('E02-literal','Search treats markup-looking text literally',async()=>{
+   const images=await page.locator('main img').evaluateAll(nodes=>nodes.map(n=>({className:n.className,src:n.getAttribute('src'),alt:n.getAttribute('alt'),width:n.getAttribute('width'),height:n.getAttribute('height'),hidden:n.getAttribute('aria-hidden'),parent:n.parentElement?.className})));
+   const owned=images.filter(n=>n.className==='shelf-art'&&n.src==='design/ink-hoku-nami.png'&&n.alt===''&&n.width==='640'&&n.height==='640'&&n.hidden==='true'&&n.parent==='shelf-mast-name');
+   assert.equal(owned.length,1,'The only allowed image is the exact owned fixed masthead decoration');
+   assert.equal(images.length-owned.length,0,'No unexpected or input-created image may enter main');
+   assert.equal(await page.locator('#search').inputValue(),'<img src=x onerror=alert(1)>');return (await text()).slice(-700);
+  });
+  await openShelfTools(page);await page.locator('#search').fill('森林');await sleep(650);await click('main .entry-row');await sleep(850);await shot('word-entry','Correct 森林 full entry, readings, kanji and semantic/provenance content');
  });
  await segment('E03-recursive',async()=>{
   await sheetHop('森 Forest ›');await shot('kanji-mori','森 kanji detail includes readings, components and compounds');
@@ -96,20 +103,20 @@ try{
   await page.getByRole('button',{name:'林 view as a kanji',exact:true}).click();await sleep(850);await shot('component-to-kanji','Containing-kanji door returns to canonical kanji detail');
   await page.locator('.sheet .compound').first().click();await sleep(850);await shot('kanji-to-compound','A compound reopens full word entry through the same sheet');
   await check('E03-browse-no-debt','Recursive browsing does not enroll or grade',async()=>{assert.equal(debt(await state()),debt(initial));});
-  await closeSheet();await page.locator('#search').fill('森林');await sleep(500);await click('main .entry-row');await sleep(850);await sheetHop('森 Forest ›');
+  await closeSheet();await openShelfTools(page);await page.locator('#search').fill('森林');await sleep(500);await click('main .entry-row');await sleep(850);await sheetHop('森 Forest ›');
  });
  await segment('E04-writing',async()=>{
   page.setDefaultTimeout(20000);await click('#strokes-door');await page.locator('#stroke-page').waitFor();await sleep(1100);await shot('writing-dormant','Current writing room, live glyph, usable return; constitutional/control policy mismatch recorded separately');
   observations.push({type:'writing-room-governance',note:'Constitution §6 kanji+ellipsis differs from later inline operator redirects dated 2026-08-15 and 2026-08-24: visible back, world seal and corner controls. Main directs testing usability, not declaring a definitive bug from older constitution.',controls:await page.locator('#stroke-page button:visible').allTextContents()});
   const wakeStart=Date.now();const wakeBox=await page.locator('.stroke-chrome-trigger').boundingBox();await page.mouse.click(wakeBox.x+wakeBox.width/2,wakeBox.y+wakeBox.height/2);await page.locator('.stroke-chrome-trigger[aria-expanded="true"]').waitFor();observations.push({type:'writing-wake-latency',milliseconds:Date.now()-wakeStart,note:'Headless software-rendered living ink; diagnostic, not physical-device latency signoff'});await shot('writing-awake','Awake room exposes complete readings and controls');
-  await click('#stroke-world-seal');await check('E04-palette-roster','Ten public palettes in constitution order',async()=>{const seals=(await page.locator('.world-picker .world-stone').allTextContents()).map(x=>x.trim());assert.deepEqual(seals,['墨','朱','柿','漆','金','藍','赤','浪','板','雷']);return seals.join(' ');});
-  await page.locator('.world-picker .world-stone').nth(4).click();await sleep(600);
+  await click('#stroke-world-seal');await check('E04-palette-roster','Eleven public palettes: the day row, then the night row (D2)',async()=>{const seals=(await page.locator('.world-picker .world-stone').allTextContents()).map(x=>x.trim());assert.deepEqual(seals,['墨','朱','柿','藍','赤','板','漆','金','殻','浪','雷']);return seals.join(' ');});
+  await page.locator('.world-picker .world-stone',{hasText:'金'}).click();await sleep(600);
   const numbers=page.locator('#stroke-numbers');if(await numbers.count()){await numbers.click();}else{await page.getByRole('button',{name:/stroke numbers|筆順の番号|numbers/}).first().click();}await sleep(500);
   await shot('writing-dark-numbers','Dark world, readable glyph and working number control');
   await page.keyboard.press('Escape');await sleep(350);await page.keyboard.press('Escape');await sleep(600);
   await check('E04-return','Two Escapes return from awake room to originating 森 sheet',async()=>{assert.equal(await page.locator('.sheet .hero-glyph').innerText(),'森');assert.equal(await page.locator('#stroke-page').count(),0);});
   await shot('writing-return-context','Original kanji restored rather than generic home');page.setDefaultTimeout(6500);await closeSheet();
-  await click('#theme-seal');await page.locator('.world-picker .world-stone').nth(5).click();await sleep(400);await page.locator('#search').fill('');
+  await click('#theme-seal');await page.locator('.world-picker .world-stone',{hasText:'藍'}).click();await sleep(400);await openShelfTools(page);await page.locator('#search').fill('');
  });
  await segment('E05-reader-capture',async()=>{
   await click('.details-toggle');await shot('shelf-source-details','Source and difficulty detail disclosure stays distinct from mastery');
@@ -162,7 +169,7 @@ try{
   });
   await shot('review-summary','Explicit review produces visible completion summary on correctly restored paper');
   afterReview=await state();await check('E07-review-record','Every explicit grade produces a durable outcome; only the chosen item is scheduled',()=>{assert.equal(afterReview.revlog.length,gradeActions);assert.equal(Object.keys(afterReview.srs).length,1);return `${gradeActions} deliberate grades, including short-learning repeats, on one explicitly enrolled word`;});
-  await role(/back to lists|リストへ/);await check('E07-review-trace','Return to study displays review trace',async()=>{assert.ok(await visible('.srs-trace'));return await page.locator('.srs-trace').innerText();});
+  await role(/back to lists|リストへ|Back to Today|今日へ/);await check('E07-review-trace','Return to study displays review trace',async()=>{assert.ok(await visible('.srs-trace'));return await page.locator('.srs-trace').innerText();});
   const dlPromise=page.waitForEvent('download');await click('#export-store');const dl=await dlPromise;const path=resolve(OUT,'learner-export.json');await dl.saveAs(path);const exported=JSON.parse(readFileSync(path,'utf8'));result.export={filename:dl.suggestedFilename(),file:'learner-export.json',keys:Object.keys(exported)};
   await check('E15-export','Export downloads parseable real learner envelope',()=>{assert.ok(exported&&Object.keys(exported).length);return JSON.stringify(result.export);});
   await shot('study-export-trace','Study after real export: durable trace and export control');await click('#back');
@@ -254,9 +261,10 @@ try{
   await click('#grammar-link');await page.locator('[data-grammar]').first().waitFor();await shot('grammar-index','Grammar is reachable with useful named entries');await click('[data-grammar]');await sleep(850);await shot('grammar-entry','Grammar detail has explanation, examples and same close/back model');await closeSheet();await click('#back');
   await click('#thesaurus-link');await page.locator('.thes-block').first().waitFor();await shot('thesaurus','Semantic differences can be compared side by side');await click('#back');
   await click('#yoji-link');await page.locator('[data-yoji]').first().waitFor();await click('[data-yoji]');await sleep(850);await shot('idiom-entry','Four-character idiom has a real recursive detail door');await closeSheet();await click('#back');
-  await click('#kanjidex-link');await page.locator('[data-kdx-part="木"]').click();await role('画数 by strokes');await click('[data-kdx-st="8"]');await role('部品 by its parts');await shot('shape-wood-eight','Current parts+strokes flow finds 林 without relying on stale controls');
+  await click('#kanjidex-link');await page.locator('[data-kdx-part="木"]').click();await role('by strokes');await click('[data-kdx-st="8"]');await role('by its parts');await shot('shape-wood-eight','Current parts+strokes flow finds 林 without relying on stale controls');
   await check('E13-current-shape-flow','木 and eight total strokes find 林 through actual lenses',async()=>{assert.ok(await visible('[data-kdx-hit="林"]'));return 'Legacy journey omitted the by-strokes lens; selector exists there. Returned to parts for actual combined filter.';});await click('[data-kdx-hit="林"]');await sleep(850);assert.equal(await page.locator('.sheet .hero-glyph').innerText(),'林');await closeSheet();
-  const skip=page.locator('.kdx-lens').filter({hasText:'SKIP'});
+  await click('#chrome-search');
+  const skip=page.locator('[data-search-lens=skip]');
   if(await skip.count()){
    const s=await state();await skip.click();await page.locator('.skip-hit').first().waitFor();await shot('skip-integrated','SKIP is a normal shape-finder lens within the same journey');
    await page.locator('.skip-hit').first().click();await sleep(850);await click('#sheet-search');await page.locator('#nav-search-input').fill('1-3-8');await page.locator('.skip-code').waitFor();await sleep(350);await shot('skip-code-search','Typed SKIP code gives real candidates');
@@ -265,8 +273,8 @@ try{
   await click('#kagami-link');await shot('learner-mirror','Mirror reflects honest practice/retrieval dimensions without assigning false level');await check('E14-mirror','Mirror explicitly distinguishes evidence from qualification',async()=>{assert.match(await text(),/evidence|record|記録/);return (await page.locator('main').innerText()).slice(0,1200);});await click('#back');
  });
  await segment('E16-settings',async()=>{
-  await click('#theme-seal');await shot('world-picker','Exactly ten public worlds in consistent order');await page.locator('.world-picker .world-stone').nth(4).click();await sleep(450);await shot('shelf-dark','Dark world changes the whole shelf with legible controls');
-  await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.equal(await page.locator('.shelf-mast-title .en-inline').innerText(),'bookshelf');assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
+  await click('#theme-seal');await shot('world-picker','Exactly eleven public worlds, day row then night row');await page.locator('.world-picker .world-stone',{hasText:'金'}).click();await sleep(450);await shot('shelf-dark','Dark world changes the whole shelf with legible controls');
+  await role('日本語');await shot('shelf-japanese','Japanese-only chrome is deliberate and reversible');await role('EN');await check('E16-language-cycle','EN → 日本語 → EN preserves usable shelf',async()=>{assert.equal(await page.locator('.shelf-mast-title .view-title').innerText(),'bookshelf');assert.equal(await page.getByRole('button',{name:'EN',exact:true}).getAttribute('aria-pressed'),'true');});
   await page.keyboard.press('Tab');await shot('keyboard-focus-dark','Keyboard focus remains perceivable in dark palette');await page.setViewportSize({width:1280,height:900});await shot('shelf-desktop-dark','Desktop dark shelf has coherent hierarchy');await noOverflow('E19-shelf-desktop');await page.setViewportSize({width:390,height:844});
   await page.reload({waitUntil:'load'});await sleep(1200);await check('E18-palette-reload','Chosen dark world survives reload',async()=>assert.equal(await page.locator('html').getAttribute('data-theme'),'yoru'));await recoverShelf();await click('#tray');await shot('study-reloaded','Personal evidence and cards survive normal reload');
   await check('E18-state-reload','Review, lesson, exact submitted practice attempt and chosen card persist',async()=>{const s=await state();assert.equal(s.taken.length,1);assert.equal(s.revlog.length,afterReview.revlog.length);assert.ok(Object.keys(s.lessonsDone).length);assert.ok(savedMockAttempt);assert.deepEqual(submittedAttempts(s).find(attempt=>attempt.attemptId===savedMockAttempt.attemptId),savedMockAttempt);return `1 chosen item, ${s.revlog.length} review, ${Object.keys(s.lessonsDone).length} lesson, ${submittedAttempts(s).length} exact submitted practice attempt`;});await click('#back');
@@ -275,7 +283,7 @@ try{
   await click('#ai-link');await shot('tutor-unconfigured','No key means honest setup, not a fabricated conversation');const before=await state();await click('#ai-key-save');await check('E17-empty-key','Empty tutor-key action cannot enable AI or alter learning state',async()=>{assert.equal(debt(await state()),debt(before));assert.ok(await visible('#ai-key-save'));assert.equal(await page.locator('#ai-key-input').inputValue(),'');assert.equal(await page.locator('#chat-send').isDisabled(),true);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('kairo-ai-provider-v1')).credential.key),'');assert.equal(await page.evaluate(()=>localStorage.getItem('kairo-ai-key')),null);assert.equal(requests.length,0);return 'Device settings save returns to the tutor with an empty bound credential; no provider request or fabricated response';});
   await context.setOffline(true);await click('#ai-key-save');await shot('tutor-offline-no-key','Offline/unconfigured tutor stays safe; no provider reliability claim');await check('E17-offline-safe','No-key offline tutor action leaves canonical state unchanged',async()=>{assert.equal(debt(await state()),debt(before));assert.equal(await page.locator('#ai-key-input').inputValue(),'');assert.equal(await page.locator('#chat-send').isDisabled(),true);assert.equal(requests.length,0);});await click('#back');
   await click('#levels-link');await click('[data-reference-collection="jlpt:N3"]');await page.locator('#reference-search').fill('water');await shot('offline-reference-warm','Warm loaded reference remains usable while network is disabled');await check('E18-warm-offline','Reference search works offline from already loaded assets',async()=>assert.ok(await visible('#reference-results-count')));
-  await context.setOffline(false);await click('#reference-back');await click('#back');await click('#theme-seal');await page.locator('.world-picker .world-stone').nth(5).click();await sleep(400);
+  await context.setOffline(false);await click('#reference-back');await click('#back');await click('#theme-seal');await page.locator('.world-picker .world-stone',{hasText:'藍'}).click();await sleep(400);
   await page.setViewportSize({width:320,height:844});await noOverflow('E19-shelf-320');await shot('shelf-narrow-final','Narrow header retains 44px controls and unwrapped language labels');await check('E19-header-44','At 320px each language segment has a 44px touch height and a single line',async()=>{const dims=await page.locator('#lang button').evaluateAll(es=>es.map(e=>({text:e.textContent,h:e.getBoundingClientRect().height,whiteSpace:getComputedStyle(e).whiteSpace})));assert.ok(dims.length===2);for(const d of dims){assert.ok(d.h>=44);assert.equal(d.whiteSpace,'nowrap');}return JSON.stringify(dims);});await page.setViewportSize({width:390,height:844});await click('#back');await page.locator('#drift-layer.active').waitFor();await shot('home-return','Whole continuous journey closes at Drift with personal state retained');await check('E18-home','Return home succeeds after learning/reference/settings/offline work',async()=>assert.ok(await visible('#drift-layer.active')));
  });
  await check('E20-no-page-errors','No uncaught JavaScript errors during whole journey',()=>{assert.deepEqual(errors,[]);return 'No uncaught page exceptions';});

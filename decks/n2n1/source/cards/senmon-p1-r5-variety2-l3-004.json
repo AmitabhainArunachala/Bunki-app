@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "オープンモニタリング瞑想",
+   "reading": "おーぷんもにたりんぐめいそう",
+   "pos": "noun",
+   "meaning": "open monitoring meditation",
+   "defJa": "生じる感覚や思考を対象を絞らず観察する瞑想法",
+   "passage": {
+    "ja": "静かに座ってると、外の車の音も、膝の重さも、明日の予定も次々に現れるよね。オープンモニタリング瞑想では、一つの対象だけに注意を固定するかわりに、そうやって移り変わる経験に気づき続けるんだ。考えが浮かんだから失敗だと決めると、それを消そうとする作業に夢中になってしまう。何が出てきても物語を追いかけず、今は音、今は考えというふうに受け止めるのであって、ぼんやりして何も分からなくなる状態を目指してるんじゃない。",
+    "form": "オープンモニタリング瞑想",
+    "en": "Sitting quietly, you notice traffic sounds, heaviness in your knees, and tomorrow’s plans appearing one after another. In open monitoring meditation, instead of fixing attention on one object, you continue noticing that changing experience. Deciding that a thought means failure can absorb you in trying to eliminate it. The practice receives what appears as a sound or a thought without following its story, rather than aiming to become dazed and unaware.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "対象を一つに絞らず、経験の移り変わりに気づく実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ee2ce3cd4b-075a69f7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-ee2ce3cd4b-075a69f7",
+    "wordId": "nn-ee2ce3cd4b"
+   }
+  }
+ ]
+}

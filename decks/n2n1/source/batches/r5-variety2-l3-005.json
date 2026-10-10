@@ -1,0 +1,166 @@
+{
+ "items": [
+  {
+   "term": "五蘊",
+   "reading": "ごうん",
+   "gloss": "the five aggregates (skandhas)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010-r.json",
+    "cardId": "nn-5814636254-735e68d7",
+    "wordId": "nn-5814636254"
+   }
+  },
+  {
+   "term": "個我",
+   "reading": "こが",
+   "gloss": "individual self (jīva)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011.json",
+    "cardId": "nn-8396c1e0b9-3ee69a31",
+    "wordId": "nn-8396c1e0b9"
+   }
+  },
+  {
+   "term": "八百万の神",
+   "reading": "やおよろずのかみ",
+   "gloss": "the myriad kami",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-6d3423ec75-b86d133b",
+    "wordId": "nn-6d3423ec75"
+   }
+  },
+  {
+   "term": "内受容感覚",
+   "reading": "ないじゅようかんかく",
+   "gloss": "interoception",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-005.json",
+    "cardId": "nn-7cc7b18b07-63cf3b05",
+    "wordId": "nn-7cc7b18b07"
+   }
+  },
+  {
+   "term": "功徳",
+   "reading": "くどく",
+   "gloss": "merit, virtue",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-5a9f7f2600-0a1be56d",
+    "wordId": "nn-5a9f7f2600"
+   }
+  },
+  {
+   "term": "即身成仏",
+   "reading": "そくしんじょうぶつ",
+   "gloss": "attaining buddhahood in this very body",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-f80abb4fcd-c909d0ef",
+    "wordId": "nn-f80abb4fcd"
+   }
+  },
+  {
+   "term": "因陀羅網",
+   "reading": "いんだらもう",
+   "gloss": "Indra's net",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-213946c36b-14180ed7",
+    "wordId": "nn-213946c36b"
+   }
+  },
+  {
+   "term": "天竺",
+   "reading": "てんじく",
+   "gloss": "India (classical name)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-b53dd35cbd-149f66d3",
+    "wordId": "nn-b53dd35cbd"
+   }
+  },
+  {
+   "term": "実存",
+   "reading": "じつぞん",
+   "gloss": "existence (existential sense)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-57e6dab18f-be727d9e",
+    "wordId": "nn-57e6dab18f"
+   }
+  },
+  {
+   "term": "寺請制度",
+   "reading": "てらうけせいど",
+   "gloss": "temple certification system",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-004.json",
+    "cardId": "nn-5736afad8a-9cc8b1a2",
+    "wordId": "nn-5736afad8a"
+   }
+  }
+ ],
+ "weave": [
+  "五蘊",
+  "個我",
+  "八百万の神",
+  "内受容感覚",
+  "功徳",
+  "即身成仏",
+  "因陀羅網",
+  "天竺",
+  "実存",
+  "寺請制度"
+ ]
+}

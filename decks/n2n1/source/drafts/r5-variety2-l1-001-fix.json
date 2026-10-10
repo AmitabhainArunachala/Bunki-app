@@ -1,0 +1,7 @@
+{
+ "アライメント": "register mismatch: 語 should be craft of speaking/writing, but this is AI-safety analysis. / register mismatch: passage is not in 語 voice.",
+ "トークン": "register mismatch: 語 should be craft of speaking/writing, not tool-usage advice. / register mismatch: not in 語 voice.",
+ "チップレット": "register mismatch: 学 should be learning/study coaching, not semiconductor explanation. / register mismatch: not in 学 voice.",
+ "ムーアの法則": "register mismatch: 学 should be learning/study coaching, not tech explanation. / register mismatch: not in 学 voice.",
+ "不純物添加": "register mismatch: 学 should be learning/study coaching, not semiconductor explanation. / register mismatch: not in 学 voice."
+}

@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "歯に衣着せぬ",
+   "reading": "はにきぬきせぬ",
+   "pos": "expression",
+   "meaning": "outspoken; blunt",
+   "defJa": "遠慮せず、思ったことをはっきり言うさま",
+   "passage": {
+    "ja": "歯に衣着せぬ物言いで知られる評論家が、先週の番組で新しい敬語指針を痛烈に批判した。「敬語は相手を敬う道具のはずが、いまや自分を守る盾になっている」という発言は、放送直後から流行語のように拡散し、賛否を呼んでいる。ただ、その主張には言語学者からも一定の理解が寄せられている。言葉の丁寧さと誠実さは必ずしも比例しないという指摘にほかならないからだ。敬語をどう使うかは、結局、相手との距離をどう測るかという問題でもある。",
+    "form": "歯に衣着せぬ",
+    "en": "A critic known for his outspoken way of talking sharply attacked the new guidelines on honorific language on a program last week. His remark that honorifics, which should be a tool for respecting others, have now become a shield to protect oneself has spread like a buzzword since the broadcast and drawn both praise and criticism. Still, linguists, too, have expressed a degree of understanding for his claim. After all, it is nothing other than a reminder that politeness and sincerity do not necessarily go hand in hand. How to use honorifics is, in the end, also a question of how to gauge one's distance from the other person.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「歯に衣着せぬ物言い・発言」の形で使う。遠慮のない率直さを肯定寄りに言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "歴史は繰り返す",
+   "reading": "れきしはくりかえす",
+   "pos": "expression",
+   "meaning": "history repeats itself",
+   "defJa": "過去と似た出来事がまた起こるということ",
+   "passage": {
+    "ja": "歴史は繰り返すって言うじゃないですか。でもあれ、同じ出来事が起きるというより、同じ「型」が何度も現れるってことだと思うんですよね。チューリップ・バブルも、のちの金融危機も、みんなが浮かれた末に一斉に冷めるという形は変わらない。ここに洞察があるとすれば、過去の失敗を知っておくに越したことはない、ということでしょう。結末より、そこへ向かう途中の空気を読むことのほうが、よほど役に立ちます。",
+    "form": "歴史は繰り返す",
+    "en": "People say that history repeats itself, don't they? But I think it means not that the same events happen again, but that the same pattern shows up over and over. The tulip bubble and the later financial crises alike keep the same shape: everyone gets carried away, and then all at once the mood turns cold. If there is an insight here, it is that it never hurts to know past failures. Reading the mood on the way toward the ending is far more useful than knowing the ending.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "会話でことわざを引く形。「という型」を言い換える話し方に注目。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "歴史的仮名遣い",
+   "reading": "れきしてきかなづかい",
+   "pos": "noun",
+   "meaning": "historical kana orthography",
+   "defJa": "古い仮名の綴り方で、現代のものと違う",
+   "passage": {
+    "ja": "うちのおじいちゃんの手紙、読んでびっくりしたんだよ。「思ふ」とか「てふてふ」とか、墨の筆文字でずらっと歴史的仮名遣いで書いてあってさ。最初は暗号かと思ったけど、声に出してゆっくり追うと意外と読める。戦後に現代仮名遣いへ変わったのは、発音に近づけるためだったと聞く。それでも、注釈なしで味わえる一行があるから、古い文章に触れずにはいられない人がいるのもわかる気がする。",
+    "form": "歴史的仮名遣い",
+    "en": "I was startled when I read my grandfather's letter. It was written in historical kana orthography, with spellings like omofu and tefutefu in brush-written lines. At first I thought it was a code, but when you read it aloud it turns out to be surprisingly readable. I hear that the switch to modern kana usage after the war was meant to bring spelling closer to pronunciation. Even so, since there are lines you can savor without any annotation, I can understand why some people cannot help turning to old texts.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "旧仮名遣いの総称。現代仮名遣いと対にして出る語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "歴史的必然",
+   "reading": "れきしてきひつぜん",
+   "pos": "noun",
+   "meaning": "historical inevitability",
+   "defJa": "歴史の流れとして避けられなかったこと",
+   "passage": {
+    "ja": "「歴史的必然だった」という一文は、書き手を楽にするが、読み手を遠ざけやすい。結果を知っている者が過去を振り返ると、偶然の積み重ねは簡単に一本の道に見えてしまうからだ。それは分析というより、結果からの逆算にすぎない。当時の人々に見えていた選択肢を一つでも示せば、たとえば清朝末期の改革派の迷いを描くだけで、文章は一気に立体的になる。結果から線を引くのは簡単だが、その線の手前には、いつも分かれ道があった。",
+    "form": "歴史的必然",
+    "en": "The sentence 'it was historical inevitability' makes things easy for the writer but tends to push the reader away. When someone who knows the outcome looks back, a pile of coincidences easily looks like a single road. That is less analysis than mere backward calculation from the result. If you show even one of the options that people of the time could see, for instance just by describing the hesitation of the reformers in the late Qing, the writing instantly gains depth. Drawing a line back from the result is easy, but before that line there was always a fork in the road.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「〜は歴史的必然だった」の形が多い。後知恵の語りを疑う文脈で引かれる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "歴史言語学",
+   "reading": "れきしげんごがく",
+   "pos": "noun",
+   "meaning": "historical linguistics",
+   "defJa": "言語の変化や系統を歴史的に研究する学問",
+   "passage": {
+    "ja": "語彙を覚えるのが苦手な人は、歴史言語学の視点を少し借りてみるといいですよ。英語のナイトとドイツ語のナハトのように、同じ祖先から分かれた言葉には音の対応があって、規則を一つ知れば複数の単語が一度に頭に入ります。丸暗記を繰り返すより、関連づけて覚えるほうが記憶に残りやすいことは、多くの研究が示しています。派生語の仕組みを通じて語彙を増やすのも、同じ発想です。単語は孤立した点ではなく、家系図の上に並んでいると考えれば、覚えるのが少し楽しくなります。",
+    "form": "歴史言語学",
+    "en": "If you struggle to memorize vocabulary, try borrowing a little from the perspective of historical linguistics. Words that split from the same ancestor, like English night and German Nacht, show sound correspondences, so learning one rule puts several words into your head at once. Many studies show that linking things together makes them stick better than repeating rote memorization. Expanding your vocabulary through the mechanics of derived words rests on the same idea. If you think of words not as isolated points but as lined up on a family tree, memorizing them becomes a little more fun.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "語の「祖先」を意識すると単語が結びつく、という学習法の話。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "殖産興業",
+   "reading": "しょくさんこうぎょう",
+   "pos": "noun",
+   "meaning": "promotion of new industry",
+   "defJa": "明治政府の工業育成政策",
+   "passage": {
+    "ja": "明治の日本って、殖産興業って言葉を掲げて一気に工業国を目指したんだよね。官営の富岡製糸場なんかが、その象徴だったって学校で習った。でも冷静に考えると、お金も技術もない時期に、外国人技師を高い給料で雇ってまでやったわけでしょ。そりゃ国の財政は苦しくなるはずだし、失敗したら取り返しがつかない。当時の世界の最先端の機械を何としても入れようとしたあの必死さには、胸を打つものがある。",
+    "form": "殖産興業",
+    "en": "In Meiji Japan, they went all out to become an industrial country under the banner of shokusan kogyo, didn't they? I learned that government-run places like the Tomioka Silk Mill were the symbol of it. But thinking about it calmly, they did it at a time with no money and no technology, even hiring foreign engineers at high salaries. No wonder the national finances got tight, and if they had failed there would have been no way back. That desperation to bring in the most advanced machines of the day has something moving about it.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "明治政府の富国強兵とセットで出る。官営工場が典型例。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "段取り",
+   "reading": "だんどり",
+   "pos": "noun",
+   "meaning": "arrangements; plan of steps",
+   "defJa": "物事を進める前の手順や準備",
+   "passage": {
+    "ja": "話し方が上手い人は、話す前の段取りがすでに違う。まず結論を一行で決め、次に、聞き手が最初に抱きそうな疑問を三つ想定しておく。本題に入る前の雑談でさえ、その流れの一部として計算されているのだ。逆に言えば、準備を抜きにして即興で話そうとすると、気が散って、肝心の主張が埋もれてしまう。準備の質は、話す内容よりも先に、聞き手の頭の中をどこまで具体的に想像できたかで決まるのである。",
+    "form": "段取り",
+    "en": "People who speak well already differ in how they plan before they speak. First they settle the conclusion in a single line, then anticipate the three questions the listener is likely to raise first. Even the small talk before the main subject is calculated as part of that flow. Conversely, if you try to improvise without preparation, your attention scatters and the point that matters gets buried. The quality of preparation is decided, before the content of what you say, by how concretely you could imagine what is in the listener's head.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「段取りを組む・つける」「段取りが良い」が典型。仕事の手順づくりに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "母語",
+   "reading": "ぼご",
+   "pos": "noun",
+   "meaning": "mother tongue",
+   "defJa": "幼い時から自然に身につけた最初の言語",
+   "passage": {
+    "ja": "外国語学習の効率は、母語との距離で大きく変わります。日本語話者にとって韓国語は、語順が近く、しかも漢語が共通しているため、入り口が低い。一方、英語は語順も母音の数も異なるので、同じ時間をかけても進みが遅く感じられるでしょう。とはいえ、遅いからといって才能がないわけではなく、出発点が遠いだけです。大切なのは、自分の出発点を正確に測ったうえで、近い要素から順に手をつけていくことです。",
+    "form": "母語",
+    "en": "The efficiency of learning a foreign language changes greatly with its distance from your mother tongue. For Japanese speakers, Korean has similar word order and shares Sino-derived vocabulary, so the entry barrier is low. English, on the other hand, differs in both word order and the number of vowels, so progress will feel slow even with the same time invested. Still, being slow does not mean you lack talent; your starting point is simply farther away. What matters is to measure your starting point accurately and then work on the closest elements first.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「母国語」と区別して使われる。言語学では母語が標準語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "母語話者",
+   "reading": "ぼごわしゃ",
+   "pos": "noun",
+   "meaning": "native speaker",
+   "defJa": "その言語を母語とする人",
+   "passage": {
+    "ja": "母語話者の直感は、文法書よりも古い。彼らは「この言い方は変だ」と即座に感じるが、なぜ変なのかを問われると口ごもらずにはいられない。そこにあるのは規則の知識ではなく、膨大な接触が沈殿してできた感覚である。だとすれば、外国語を学ぶ私たちが目指すべきは、規則の暗記よりも、その感覚を自分の中へ浸透させることではないか。何気なく選ばれた一語の背後には、長い年月の聞き取りが積み重なっている。",
+    "form": "母語話者",
+    "en": "A native speaker's intuition is older than any grammar book. They instantly feel that a given way of saying something is odd, but when asked why, they cannot help but stammer. What lies there is not knowledge of rules but a sense formed by sediment from enormous exposure. If so, what we who study a foreign language should aim for is not memorizing rules but letting that sense permeate us. Behind a word chosen without a thought lie long years of accumulated listening.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「ネイティブ」の言い換え。非母語話者と対にして論じられる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "母音",
+   "reading": "ぼいん",
+   "pos": "noun",
+   "meaning": "vowel",
+   "defJa": "あ・い・う・え・おなど、息が妨げられずに出る音",
+   "passage": {
+    "ja": "日本語の母音は、あ・い・う・え・おの五つしかありません。これは世界の言語の中でも少ないほうで、英語は方言によっては十数種類を区別するといわれます。だから日本人は、英語の聞き分けに苦労するのです。ここを深掘りすると、ネイティブの発音を真似るより先に、口の形と舌の位置を意識して自分の耳を鍛えるに限ります。練習には、短い録音を何度も聞いては口に出す、シャドーイングのような地味な方法が意外に効きます。",
+    "form": "母音",
+    "en": "Japanese has only five vowels: a, i, u, e and o. That is on the small side among the world's languages, and English is said to distinguish a dozen or so depending on the dialect. That is why Japanese people struggle to tell English sounds apart. Digging deeper here, before imitating a native speaker's pronunciation, nothing beats paying attention to the shape of your mouth and the position of your tongue and training your ears. For practice, an unglamorous method like shadowing, listening to a short recording over and over and repeating it aloud, works surprisingly well.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "子音と対にして音声学の基本語。五母音は日本語の特徴。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "比喩",
+   "reading": "ひゆ",
+   "pos": "noun",
+   "meaning": "figure of speech; metaphor",
+   "defJa": "あるものを別のものにたとえて表す表現",
+   "passage": {
+    "ja": "ある閣僚の演説で「船出」という比喩が使われたことが、報道各社の見出しで目立った。この種の表現は聞き手の感情を動かしやすい反面、とりわけ政治の言葉では、事実関係をぼかす恐れがある。専門家は、政策の中身を数字で示さずに印象だけを語る手法に懸念を示している。言葉の選び方一つで世論の受け止めが大きく変わることを、改めて示した形だ。本題の説明より見出しが先に流行語になるのも、その一例だろう。",
+    "form": "比喩",
+    "en": "The use of the metaphor 'setting sail' in a cabinet minister's speech stood out in the headlines of news outlets. Such expressions readily move a listener's emotions, but on the flip side, especially in political language, they risk blurring the facts. Experts have voiced concern about a technique that conveys only an impression without giving the substance of a policy in numbers. It shows once again that public reception changes greatly with a single choice of words. The headline becoming a buzzword before the actual explanation is one example.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「比喩を用いる」。効果と危うさの両面を語るときに出る語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "比較優位",
+   "reading": "ひかくゆうい",
+   "pos": "noun",
+   "meaning": "comparative advantage",
+   "defJa": "他国より相対的に有利に生産できること",
+   "passage": {
+    "ja": "リカードが唱えた比較優位とは、各国が得意な分野に特化すれば、全体の生産が増えるという考えです。たとえばイギリスは毛織物を、ポルトガルはワインを作るほうが、お互いに得をする、と彼は説明しました。たとえ片方の国がどちらの生産でも勝っていても、この理屈は成り立つのがおもしろいところです。海洋国家イギリスの貿易政策も、二世紀にわたってこの考えに支えられてきました。貿易を敵味方の取り合いではなく、分業の話として捉え直す視点を与えてくれるのです。",
+    "form": "比較優位",
+    "en": "Comparative advantage, as Ricardo proposed it, is the idea that if each country specializes in what it does best, total output increases. For example, he explained, it is better for both if England makes woolen cloth and Portugal makes wine. What is interesting is that this logic holds even if one country is better at producing both. The trade policy of Britain, a maritime nation, has been supported by this idea for two centuries. It gives us a perspective that recasts trade not as a contest between friend and foe but as a story of division of labor.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「絶対優位」と対。リカードの例が定番で、二国の得意の相対差が鍵。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "比較言語学",
+   "reading": "ひかくげんごがく",
+   "pos": "noun",
+   "meaning": "comparative linguistics",
+   "defJa": "言語の系統関係を比較して調べる学問",
+   "passage": {
+    "ja": "ウィリアム・ジョーンズがサンスクリット語とラテン語、ギリシャ語の類似を指摘したのは、一七八六年のことだった。この洞察が比較言語学の出発点となり、のちに印欧語族という大きな系統の存在が明らかにされた。今日では、語彙や音の対応を統計的に分析する研究も進んでいる。ただし、系統の古さに関しては、専門家の間でも慎重な意見が根強い。文字記録のない時代の言葉を、音の規則だけでたどり直す作業には、推理小説のような面白さがある。",
+    "form": "比較言語学",
+    "en": "It was in 1786 that William Jones pointed out the resemblance among Sanskrit, Latin, and Greek. This insight became the starting point of comparative linguistics, and the existence of the large family known as Indo-European was later established. Today, research that statistically analyzes correspondences in vocabulary and sounds is also advancing. However, regarding how old the family is, cautious opinions remain deeply rooted even among experts. Retracing the language of an age with no written records using sound rules alone has the fascination of a detective novel.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "歴史言語学の主要な方法。同系統の証拠を音の対応から探る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "民主化",
+   "reading": "みんしゅか",
+   "pos": "noun",
+   "meaning": "democratization",
+   "defJa": "政治を民主的な体制に変えること",
+   "passage": {
+    "ja": "世界史の論述では、民主化を単に選挙の実施と書くだけでは点が伸びません。大切なのは、軍や特定の党による支配がどう崩れ、市民が政治に参加できる制度がどう整ったかを、時期を追って説明することです。たとえば一九八七年の韓国では、大統領の直接選挙制を求める運動が転機になりました。さらに東西対立の終結に伴って、その動きは各地へ波及していきます。年号の暗記に逃げず因果の線を一本引くだけで、答案の説得力は変わります。",
+    "form": "民主化",
+    "en": "In world-history essays, merely writing democratization as holding elections will not raise your score. What matters is explaining, in chronological order, how rule by the military or a particular party collapsed and how institutions allowing citizens to take part in politics were set up. In South Korea in 1987, for example, the movement demanding direct presidential elections was the turning point. Furthermore, as the East-West confrontation ended, that movement spread to various regions. Simply drawing one line of cause and effect, instead of escaping into memorizing dates, changes how convincing your answer is.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "論述では「〜が崩れ、〜が整う」の過程で書く。冷戦後の波と結びつく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "民族主義",
+   "reading": "みんぞくしゅぎ",
+   "pos": "noun",
+   "meaning": "ethnic nationalism",
+   "defJa": "民族の結びつきを重んじる思想",
+   "passage": {
+    "ja": "「民族主義」と「国家主義」は、似ているようで同じではない。文章でこの二語を使い分けないと、読み手は書き手の立場を取り違えかねない。前者は同じ言語や文化を共有する人々の結びつきを軸にし、後者は国家そのものの優先を軸にする、と整理すると書きやすい。本論を立てる前に、用語の定義を一文で固定しておくことだ。同じ語でも、使う人の立場によって肯定にも批判にもなるため、定義が曖昧だと議論が空回りする。",
+    "form": "民族主義",
+    "en": "'Ethnic nationalism' and 'statism' look similar but are not the same. If you do not use the two terms distinctly in writing, readers may well mistake the writer's position. It is easier to write if you sort them out as follows: the former centers on the bonds among people who share a language or culture, while the latter centers on the primacy of the state itself. Before building your main argument, fix the definition of your terms in a single sentence. The same word can be affirmation or criticism depending on the speaker's stance, so with a vague definition the debate spins its wheels.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「国家主義」「ナショナリズム」との違いを言い分ける用語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "民族大移動",
+   "reading": "みんぞくだいいどう",
+   "pos": "noun",
+   "meaning": "Migration Period",
+   "defJa": "四世紀後半からのゲルマン諸部族の大移動",
+   "passage": {
+    "ja": "四世紀後半、フン人の西進をきっかけにゲルマン諸部族が動き出した。民族大移動と呼ばれるこの連鎖は、西ローマ帝国の国境を揺さぶり、やがて帝国の崩壊を早めることになる。人が動けば、言葉も神も法も動く。歴史を一人の英雄の物語としてではなく、大地の上を流れる人々の波として眺めるとき、栄枯盛衰という言葉の重みと、境界のもろさが同時に見えてくる。国境線が地図の上の約束にすぎないことを、彼らの足跡は何も言わずに教えてくれる。",
+    "form": "民族大移動",
+    "en": "In the latter half of the fourth century, the Germanic tribes began to move, set off by the Huns' advance westward. This chain of movements, called the Migration Period, shook the frontiers of the Western Roman Empire and eventually hastened the empire's collapse. When people move, so do languages, gods, and laws. When we view history not as the tale of a single hero but as waves of people flowing across the land, we see both the weight of the phrase 'rise and fall' and the fragility of borders. Their tracks tell us, without a word, that border lines are merely promises on a map.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「ゲルマン民族の大移動」で知られる。四世紀後半が起点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "民族浄化",
+   "reading": "みんぞくじょうか",
+   "pos": "noun",
+   "meaning": "ethnic cleansing",
+   "defJa": "ある民族を暴力で地域から排除すること",
+   "passage": {
+    "ja": "ボスニア紛争のニュースで、民族浄化って言葉を初めて知ったんだよね。ある民族を暴力で追い出したり殺したりして、地域から消そうとすることなんだけど、聞いただけで胸が苦しくなる。一九九〇年代のヨーロッパで実際に起きたなんて信じられなくて、当時を知る人の証言を読んだら、涙なしには読めなかった。歴史は繰り返す、じゃなくて、繰り返させない努力が要るんだと思った。知っておくことが、すでに小さな抵抗になるのだと思う。",
+    "form": "民族浄化",
+    "en": "In the news about the Bosnian conflict, I learned the word ethnic cleansing for the first time. It means trying to wipe a people out of a region by driving them out or killing them with violence, and my chest tightens just hearing it. I couldn't believe it really happened in Europe in the 1990s, and when I read testimony from people who lived through it, I couldn't read it without tears. I thought that it's not that history repeats itself; it takes effort to not let it repeat. I think that just knowing about it is already a small form of resistance.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "重い語。紛争や虐殺を語る文脈で、事実を淡々と示して使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "民族自決",
+   "reading": "みんぞくじけつ",
+   "pos": "noun",
+   "meaning": "national self-determination",
+   "defJa": "民族が自分たちの政治のあり方を決める権利",
+   "passage": {
+    "ja": "世界史で民族自決を問われたら、まずウィルソンの十四か条を思い出してください。第一次世界大戦後、この原則はヨーロッパの再編に使われましたが、アジアやアフリカの植民地には、ほとんど適用されませんでした。そのため、のちの独立運動は、約束と現実のずれを突く形で広がっていきます。「適用範囲に限界があった」という決まり文句で済ませず、なぜそうなったのかを書くのが論述の核になります。",
+    "form": "民族自決",
+    "en": "If you are asked about national self-determination in world history, first recall Wilson's Fourteen Points. After the First World War, this principle was used in the reorganization of Europe, but it was hardly applied to colonies in Asia and Africa. For that reason, the independence movements that followed spread by exploiting the gap between promise and reality. Instead of settling for the stock phrase 'its scope of application was limited,' writing why that happened is the core of the essay.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "ウィルソン、十四か条、植民地との落差が論述の定番。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気が散る",
+   "reading": "きがちる",
+   "pos": "expression",
+   "meaning": "to be distracted",
+   "defJa": "注意が他に向いて集中できない",
+   "passage": {
+    "ja": "勉強中にスマホの通知が鳴るたびに気が散るのは、意志が弱いからではありません。意志が弱いというより、脳は新しい刺激に反応するようにできていて、通知はその仕組みに直接働きかけるのです。実際、集中が途切れたあと元の状態に戻るのに二十分以上かかるという研究もあります。音で条件づけされた脳は、鳴っていなくても気配に反応します。だから、集中したいなら環境のほうを変えるのが得策です。",
+    "form": "気が散る",
+    "en": "It is not because your willpower is weak that you get distracted every time a phone notification sounds while you are studying. Rather than weak willpower, the brain is built to react to new stimuli, and notifications work directly on that mechanism. In fact, some research says it takes over twenty minutes to return to your original state after concentration breaks. A brain conditioned by a sound reacts to its mere presence even when it is not ringing. So if you want to concentrate, changing your environment is the wiser move.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「〜に気が散る」「気が散って」。集中が途切れる場面。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気づき",
+   "reading": "きづき",
+   "pos": "noun",
+   "meaning": "awareness; realization",
+   "defJa": "ふとわかること。新しい発見",
+   "passage": {
+    "ja": "いい文章は、立派な主張ではなく、書き手のごく小さな気づきから始まる。電車で隣の人がいつも同じ位置に立つ、コーヒーの香りで祖母の台所を思い出す、といった些細な発見である。それを文章にするときは、比喩で飾りすぎず、見たままを具体的に書くに限る。書いたものは一晩置いてから添削し、余計な形容や飾りの言葉を削っていく。すると、最初は平凡に見えた一行が、読む人の記憶に静かに引っかかるようになる。",
+    "form": "気づき",
+    "en": "Good writing begins not with a grand claim but with the writer's very small realizations. They are trivial discoveries, such as the person next to you on the train always standing in the same spot, or the smell of coffee recalling your grandmother's kitchen. When you turn them into writing, nothing beats writing concretely what you saw, without over-decorating with metaphors. Let what you wrote sit overnight, then correct it and cut superfluous modifiers and ornamental words. Then a line that looked ordinary at first begins to catch quietly in the reader's memory.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「気づきを得る」。教育や仕事で小さな発見を指すときの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気を取られる",
+   "reading": "きをとられる",
+   "pos": "expression",
+   "meaning": "to have one's attention taken",
+   "defJa": "他のものに注意を奪われる",
+   "passage": {
+    "ja": "あのさ、友達とカフェで話してるときに、ふと隣の席の会話に気を取られることない？私なんか、それが始まったが最後、目の前の人の話が半分しか入ってこなくなるんだよね。失礼だなって自分でも毎回反省するんだけど、脳が勝手に面白いほうへ引っ張られちゃう。最近は、話の最中にスマホを裏返しておくだけでずいぶん違うって気づいた。話に没頭して耳を傾けていると、気づけば時間まで速く過ぎている。",
+    "form": "気を取られる",
+    "en": "You know, when you're talking with a friend at a cafe, don't you ever find your attention suddenly taken by a conversation at the next table? For me, once that starts, I can only take in half of what the person in front of me is saying. I reflect on how rude that is every single time, but my brain gets pulled toward whatever is more interesting. Lately I noticed that just turning my phone face down during a conversation makes a big difference. When I'm listening absorbed in the talk, I find that time even passes faster.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「〜に気を取られる」。受身の形で、注意が奪われる様子。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "気力",
+   "reading": "きりょく",
+   "pos": "noun",
+   "meaning": "energy; willpower",
+   "defJa": "物事をやり抜く精神的な力",
+   "passage": {
+    "ja": "長引く在宅勤務のなかで、気力が湧かないと訴える人が増えている。ある調査では、仕事と生活の区切りがなくなったことが主な要因として挙げられた。専門家は、朝活や有酸素運動のような小さな習慣で一日に節目を作ることを勧める。もっとも、意欲の低下が数週間にわたって続く場合は、休養にとどまらず医療機関への相談が望ましい。気持ちの問題と片づけず、生活の設計の問題として扱う視点が広がりつつある。",
+    "form": "気力",
+    "en": "Amid prolonged remote work, more people report that their energy won't come. In one survey, the loss of a boundary between work and life was cited as the main factor. Experts recommend creating a milestone in the day through small habits like a morning routine or aerobic exercise. That said, if a loss of motivation continues for several weeks, consulting a medical institution is advisable, not just resting. A view is spreading that treats it not as a matter of attitude but as a matter of how daily life is designed.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「気力が湧く・尽きる」。体力と対にして精神の力をいう。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "汎用",
+   "reading": "はんよう",
+   "pos": "noun",
+   "meaning": "general-purpose",
+   "defJa": "いろいろな用途に使えること",
+   "passage": {
+    "ja": "パソコンの頭脳は汎用の半導体で、どんな計算でも一通りこなせます。一方、画像処理や人工知能向けには、特定の計算だけを極端に速くする専用品が登場しました。万能型は便利な反面、特定の仕事では専用品に太刀打ちできません。最先端の分野では、この両方をどう組み合わせるかが競争の焦点になっています。設計者たちは、一枚の基板に万能の頭脳と専用の回路を同居させる道を探っており、この綱引きは当分続きそうです。",
+    "form": "汎用",
+    "en": "The brain of a personal computer is a general-purpose semiconductor, which can handle any calculation after a fashion. Meanwhile, specialized chips have appeared for image processing and artificial intelligence that make only certain calculations extremely fast. The all-rounder type is convenient, but on the other hand it cannot compete with specialized parts in particular jobs. In cutting-edge fields, how to combine the two has become the focus of competition. Designers are exploring ways to make an all-purpose brain and specialized circuits coexist on a single board, and this tug of war looks set to continue for some time.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「汎用機」「汎用性」。専用との対比で使うことが多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "決まり文句",
+   "reading": "きまりもんく",
+   "pos": "noun",
+   "meaning": "stock phrase",
+   "defJa": "型にはまった決まった言い回し",
+   "passage": {
+    "ja": "面接ともなると、「御社が第一志望です」という決まり文句が飛び交うよね。でも聞く側は、もう何も感じないんだよ。同じ言葉でも、具体的なエピソードを一つ添えるだけで、急に本音と建前の距離が縮まって聞こえるから不思議。型を使うなとは言わないけど、型の中に自分の中身を入れないと、ただの音になっちゃう。型を破る前に、まず型の中で自分の声を見つけるのが、ほんとは意外と難しいんだけどね。",
+    "form": "決まり文句",
+    "en": "When it comes to interviews, the stock phrase 'your company is my first choice' flies around, doesn't it? But the people listening feel nothing anymore. Even with the same words, adding just one concrete episode suddenly makes the gap between the true feelings and the public face sound smaller, strangely enough. I'm not saying don't use formulas, but unless you put your own content inside the formula, it just becomes sound. Before breaking the mold, finding your own voice inside the mold is actually surprisingly hard, you know.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "悪い意味では「紋切り型」。「お決まりの」とも言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "決断力",
+   "reading": "けつだんりょく",
+   "pos": "noun",
+   "meaning": "decisiveness",
+   "defJa": "物事をすばやく決める力",
+   "passage": {
+    "ja": "危機に直面した経営者に最も求められるのは決断力だと言われる。だが、決断の早さそのものより、決めたあとに修正できる柔軟性のほうが成果と結びついているという分析もある。判断を誤ること自体は避けられないからだ。優れた指導者は、情報が不完全でも期限までに結論を出し、有事に状況が変われば躊躇なく方針を改める。それは正解を当てる才能というより、間違いを抱えたまま進みながら直していく覚悟に近い。",
+    "form": "決断力",
+    "en": "It is said that what is most demanded of managers facing a crisis is decisiveness. But some analyses say that the flexibility to revise after deciding is more tied to results than the speed of the decision itself. This is because making a wrong judgment cannot be avoided. Excellent leaders reach a conclusion by the deadline even with incomplete information, and in an emergency they change course without hesitation if circumstances shift. It is closer to a resolve to keep moving with mistakes in hand and fix them as you go than to a talent for picking the right answer.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「決断力がある・欠ける」。リーダー論の定番の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "決断疲れ",
+   "reading": "けつだんづかれ",
+   "pos": "noun",
+   "meaning": "decision fatigue",
+   "defJa": "決める回数が多くて判断力が落ちること",
+   "passage": {
+    "ja": "朝から何を着るか、何を食べるかって細かい選択を重ねるうちに、夕方ともなると決断疲れで頭が回らなくなる。これ、私だけじゃないと思うんだよね。ジョブズが毎日同じ服だったのは、単なるこだわりじゃなくて、選ぶ回数を減らすためだったと言われてる。私も平日の昼ごはんを固定にしたら、気力まで削られずに夜の判断がだいぶ楽になった。選択肢が多いほど自由、って思いがちだけど、実際は選ぶだけで体力を食ってるんだよね。",
+    "form": "決断疲れ",
+    "en": "As you pile up small choices from morning on, like what to wear and what to eat, by evening your head stops working from decision fatigue. I don't think it's just me. It's said that Jobs wearing the same clothes every day wasn't just a quirk but a way to cut down how many choices he made. When I fixed my weekday lunches too, my energy stopped being drained and my evening decisions got a lot easier. We tend to think more options means more freedom, but in reality just choosing eats up your stamina.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "選択の回数が意志力を削るという考え方。習慣で選択を減らす。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "沈黙は金",
+   "reading": "ちんもくはきん",
+   "pos": "expression",
+   "meaning": "silence is golden",
+   "defJa": "黙っているほうが価値がある",
+   "passage": {
+    "ja": "「沈黙は金、雄弁は銀」ということわざは、日本でも会議や交渉の場で、無口を美徳とする文脈でしばしば引かれる。ところが近年は、説明責任を重んじる風潮から、黙っていることがむしろ不誠実と受け取られる場面も増えた。有事の記者会見ではなおさら、沈黙は厳しい目で見られる。言葉を尽くすべき時と、控えるべき時を見極める判断力が、いっそう問われている。本音と建前のあいだで、黙るという選択もまた発言の一つだ。",
+    "form": "沈黙は金",
+    "en": "The proverb 'silence is golden, eloquence is silver' is often cited in meetings and negotiations in Japan, in contexts that treat reticence as a virtue. In recent years, however, with a climate that values accountability, there are more situations where staying silent is taken as insincere. At a press conference in an emergency, silence is viewed with an especially harsh eye. The judgment to discern when to spare no words and when to hold back is being asked of us even more. Between true feelings and public stance, the choice of silence is also a kind of statement.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "対は「雄弁は銀」。場面によって評価が逆転する言葉。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "没入",
+   "reading": "ぼつにゅう",
+   "pos": "noun",
+   "meaning": "immersion",
+   "defJa": "深く入りこんで他のことを忘れること",
+   "passage": {
+    "ja": "優れた小説に没入しているとき、人は時計の存在さえ、自分の名前さえ忘れる。そこでは読むという行為と物語の内容との境界が静かに溶け、自己という主役は一時的に背景へ退く。この感覚が心地よいのは、日常の自分が絶えず抱える浮世の評価や不安が、いっとき沈黙するからではないか。座って息を見つめる瞑想の静けさにも、どこか通じるものがある。物語を求める心は、休息を求める心の別の姿でもあるのだろう。",
+    "form": "没入",
+    "en": "When immersed in a fine novel, a person forgets even the existence of a clock, even their own name. There the boundary between the act of reading and the content melts, and the self retreats temporarily to the background. Is this sensation pleasant because the judgments and worries of the everyday world that the ordinary self constantly carries fall silent for a while? There is something that connects it, somehow, to the stillness of meditation. The heart that seeks stories is perhaps another form of the heart that seeks rest.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「〜に没入する」。物語・ゲーム・仕事などへ深く入る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "没頭",
+   "reading": "ぼっとう",
+   "pos": "noun",
+   "meaning": "absorption; immersion",
+   "defJa": "一つのことに心を集中すること",
+   "passage": {
+    "ja": "子どもは砂場の遊びに没頭するとき、時間も空腹も、親の呼ぶ声すら忘れてしまう。大人になるにつれて、私たちはこの力を少しずつ、しかし確実に手放していく。仕事の締切や鳴りやまない連絡、他人の目が、注意を細かく切り刻むからである。そうして日常は注意散漫が標準になり、深く潜る経験がまれになる。だがその深い集中は、才能ではなく、環境さえ静かに許せば誰にでも戻ってくる、本来の状態ではないか。",
+    "form": "没頭",
+    "en": "When children become absorbed in play, they forget time and hunger. As we grow up, we let go of this power little by little. Work deadlines and the eyes of others chop our attention into fine pieces. In that way, distraction becomes the norm in daily life and the experience of diving deep grows rare. But is such deep focus not a talent but an original state that returns to anyone as long as the environment allows it?",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「〜に没頭する」。「没入」より行動への集中を言うことが多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "治外法権",
+   "reading": "ちがいほうけん",
+   "pos": "noun",
+   "meaning": "extraterritoriality",
+   "defJa": "外国人が滞在国の法の支配を受けない特権",
+   "passage": {
+    "ja": "幕末に結ばれた安政の五か国条約には、外国人が日本の法で裁かれない領事裁判権が含まれていた。これは治外法権の一形態として、近代日本の外交上の屈辱とされ、条約改正は明治政府にとって未曾有の課題となった。一八九四年の日英通商航海条約で撤廃が決まり、関税自主権の完全な回復は一九一一年まで待たねばならなかった。法の及ばぬ領域を他国に許すとは、主権を半分手放すことにほかならない。",
+    "form": "治外法権",
+    "en": "The five-nation treaties of the Ansei era concluded at the end of the shogunate included consular jurisdiction, under which foreigners were not tried under Japanese law. As a form of extraterritoriality, this was regarded as a diplomatic humiliation for modern Japan, and treaty revision became an unprecedented task for the Meiji government. Its abolition was decided in the 1894 Anglo-Japanese Treaty of Commerce and Navigation, and the full recovery of tariff autonomy had to wait until 1911. To allow another country a domain beyond the reach of your law is nothing other than giving up half your sovereignty.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "領事裁判権と結びつく。不平等条約の中心的な問題。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "波及",
+   "reading": "はきゅう",
+   "pos": "noun",
+   "meaning": "spread; ripple effect",
+   "defJa": "影響が次々に他へ及ぶこと",
+   "passage": {
+    "ja": "一九二九年のニューヨーク株式市場の暴落は、アメリカ国内にとどまらず、世界中に波及しました。なぜなら、第一次世界大戦後のヨーロッパ経済は、アメリカからの資金に大きく依存していたからです。資金が引き上げられると、各国の銀行や企業が次々に行き詰まり、弱い銀行は淘汰され、失業が広がります。結局、この連鎖が国際的な保護主義と、のちの政治的混乱を準備したのです。連鎖の速さは、当時すでに世界経済が一つの網になっていたことを物語っています。",
+    "form": "波及",
+    "en": "The 1929 crash of the New York stock market did not stop within the United States but spread across the world. This is because the European economy after the First World War depended heavily on funds from America. When the funds were withdrawn, banks and companies in each country ran into trouble one after another, weak banks were weeded out, and unemployment spread. In the end, this chain of events prepared the way for international protectionism and later political turmoil. The speed of the chain tells us that the world economy had already become a single net by then.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「〜に波及する」。経済危機が国境を越えるときの典型表現。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "注意散漫",
+   "reading": "ちゅういさんまん",
+   "pos": "noun",
+   "meaning": "distractedness",
+   "defJa": "注意が散って集中できないこと",
+   "passage": {
+    "ja": "注意散漫は、現代人の怠慢というより、むしろ環境が生み出した状態である。通知、広告、動画の自動再生はいずれも、私たちの注意を奪い合うために設計されている。そのなかで気を取られてしまうのは、ある意味で当然の反応だ。問われるのは、集中できないことを嘆くことではなく、何に注意を渡すかを自分で選び直せるかどうかである。この選択を取り戻す作業は、情報の洪水の中で静かに座ることから始まる。",
+    "form": "注意散漫",
+    "en": "Distractedness is a state produced by the environment rather than the laziness of modern people. Notifications, ads, and autoplay videos are all designed to compete for our attention. In that setting, having our attention grabbed is in a sense a natural reaction. What is at stake is not lamenting that we cannot concentrate but whether we can choose again what to give our attention to. The work of reclaiming this choice begins with sitting quietly amid a flood of information.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「注意散漫になる」。集中力の欠如を状態として言う硬めの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "注釈",
+   "reading": "ちゅうしゃく",
+   "pos": "noun",
+   "meaning": "annotation",
+   "defJa": "本文の意味や出典を説明した書き添え",
+   "passage": {
+    "ja": "古典を一人で読み進めるときに、いちばん頼りになる道具の一つが注釈です。たとえば枕草子の一節も、原文だけでは当時の習慣がわからず、現代語訳を読んでも肝心の背景が抜け落ちることがあります。そこで脚注や補説が、語の意味や出典、時代の空気をそっと補ってくれるのです。ただし頼りすぎると、自分で文を読む力は育ちません。まず原文に挑み、行き詰まったときに初めて開くくらいが、ちょうどいいでしょう。",
+    "form": "注釈",
+    "en": "One of the most reliable tools when reading the classics on your own is annotation. Even a passage of The Pillow Book, for example, cannot be understood in its customs from the original alone, and reading a modern translation can leave out the crucial background. Footnotes and supplements quietly supply the meaning of words, sources, and the atmosphere of the age. However, if you rely on them too much, your own power to read a text will not grow. It is about right to tackle the original first and open them only when you get stuck.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "古典の本文に付く説明。「脚注」「頭注」の総称的な語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "洗脳",
+   "reading": "せんのう",
+   "pos": "noun",
+   "meaning": "brainwashing",
+   "defJa": "強制的に思想や信念を作りかえること",
+   "passage": {
+    "ja": "「洗脳」という言葉は、朝鮮戦争の時代に、捕虜の思想が変えられたという報道から広まったとされます。心理学では、恐怖や孤立を使って考える自由を奪う操作を指し、単なる説得とは区別されます。本人は自分の意志で選んだつもりでも、実は服従と条件づけの積み重ねだった、という例も少なくありません。だから、情報の出どころを複数に広げることを余儀なくされる時代でもあります。孤立させられた人ほど、聞こえのよい声に頼りやすくなります。",
+    "form": "洗脳",
+    "en": "The word 'brainwashing' is said to have spread from reports during the Korean War that prisoners' thinking had been changed. In psychology, it refers to manipulation that takes away the freedom to think using fear and isolation, and it is distinguished from mere persuasion. There are many cases where the person believed they chose by their own will but it was in fact an accumulation of obedience and conditioning. So it is also an age in which we are forced to broaden the sources of our information. The more isolated a person is made, the more easily they come to rely on a pleasant-sounding voice.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "マインドコントロールに近い。心理学では孤立と報酬・罰を用いる操作。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "洞察",
+   "reading": "どうさつ",
+   "pos": "noun",
+   "meaning": "insight",
+   "defJa": "物事の本質を見抜くこと",
+   "passage": {
+    "ja": "ありふれた事実の羅列に、一行の洞察を添えるだけで、文章は読むに足るものになりはじめる。たとえば、転職を考える人が増えているという事実の後に、「動けないのではなく、動かないことを選んでいるのかもしれない」と書き添えてみる。そこに書き手の目が立ち上がる。深掘りしすぎて本題から離れるのは禁物だが、一歩だけ踏み込む勇気は要る。あとで添削するときも、この一行は残したい。",
+    "form": "洞察",
+    "en": "Just by adding one line of insight to a list of ordinary facts, a piece of writing starts to become worth reading. For example, after the fact that more people are considering changing jobs, try adding “maybe they are not unable to move but are choosing not to.” There the writer's eye comes alive. Digging so deep that you stray from the main subject is taboo, but you do need the courage to step in just one step further. When you revise later, you will want to keep this line.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「洞察を加える」。事実に一歩の読みを足すこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "洞察力",
+   "reading": "どうさつりょく",
+   "pos": "noun",
+   "meaning": "insight; perceptiveness",
+   "defJa": "物事の本質を見抜く力",
+   "passage": {
+    "ja": "優れた投資家に共通するのは、データを集める力ではなく、洞察力だと専門家は指摘する。同じ決算資料を前にしても、数字の背後にある経営者の意図や市場の変化を読み取れるかどうかで、結論は大きく変わるからだ。この力は才能とされがちだが、過去の失敗を丁寧に振り返ることで鍛えられるという。決算期ともなると、その差が最も表れる。数字は誰にでも同じ顔を見せるが、その裏を読む目は、人によってまるで違う。",
+    "form": "洞察力",
+    "en": "Experts point out that what top investors share is not the ability to gather data but perceptiveness. Even when looking at the same financial statements, conclusions differ greatly depending on whether one can read the manager's intentions and market changes behind the figures. This ability tends to be seen as talent, but it is said to be trained by carefully reviewing past failures. The difference shows most when earnings season comes around. Figures show the same face to everyone, but the eye that reads behind them differs completely from person to person.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「洞察」に「力」が付いた能力の語。報道でも評価語として使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "派生語",
+   "reading": "はせいご",
+   "pos": "noun",
+   "meaning": "derived word",
+   "defJa": "ある語から作られた別の語",
+   "passage": {
+    "ja": "「楽しい」から「楽しさ」「楽しむ」「楽しげ」が生まれるように、一つの語幹から多くの派生語が枝分かれしていく。この増殖は、日本語が新しい概念を迎えるときの、最も経済的な方法の一つである。流行語の多くも、既存の語に接尾辞が付いて生まれるが、時間とともに淘汰され、定着するのはごく一部にとどまる。残った語が、やがて辞書に載り、語の家族を広げる。語尾や接頭辞の動きを観察するだけでも、日本語の増え方の癖が見えてくる。",
+    "form": "派生語",
+    "en": "Just as 'tanoshii' gives rise to 'tanoshisa,' 'tanoshimu,' and 'tanoshige,' many derived words branch off from a single stem. This proliferation is one of the most economical ways for Japanese to welcome new concepts. Many buzzwords are also born when a suffix attaches to an existing word, but over time they are weeded out, and only a small fraction settle in. The words that remain eventually get listed in dictionaries and enlarge the family of words. Just by observing how endings and prefixes behave, you can see the habits by which Japanese grows.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "接辞や活用で作られた語。語構成の観察に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "流行語",
+   "reading": "りゅうこうご",
+   "pos": "noun",
+   "meaning": "buzzword",
+   "defJa": "一時的に盛んに使われる言葉",
+   "passage": {
+    "ja": "年末に発表される流行語は、その年の空気を一語に煮詰めた記録である。選ばれた言葉を並べて読み返すと、人々が何を恐れ、何を笑い飛ばしたかが、驚くほど鮮明によみがえる。しかし大半は翌年には誰も口にせず、決まり文句になる前に消えていく。残るのは、言葉そのものではなく、その言葉を必要とした時代の感触なのかもしれない。だからこそ、古い年に流行した言葉を集めた辞典は、一冊のアルバムのように読むことができる。",
+    "form": "流行語",
+    "en": "The buzzwords announced at year's end are a record that boils down the mood of that year into a single word. Reading the chosen words again in a row, what people feared and what they laughed off comes back with surprising clarity. But most are on no one's lips the following year, and vanish before becoming stock phrases. What remains may be not the words themselves but the feel of the era that needed them. That is exactly why a dictionary collecting the buzzwords of past years can be read like an album.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "年末の流行語大賞が代表例。流行して消える言葉。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "浮世",
+   "reading": "うきよ",
+   "pos": "noun",
+   "meaning": "the transient, floating world",
+   "defJa": "はかない現世。憂き世",
+   "passage": {
+    "ja": "古文単語の「浮世」は、もとは「憂き世」、つまり苦しみの多いこの世を指しました。仏教の無常観が背景にあるわけです。それが江戸時代ともなると「浮き世」と書かれ、享楽的で移ろいやすい現世という、明るい響きを帯びます。単語を意味だけでなく、時代の変化とセットで覚えると、栄枯盛衰の感覚ごと記憶に残りやすいですよ。たった一語の裏側に、世の中を暗く見るか明るく見るかという、見方の大きな転換が隠れているのです。",
+    "form": "浮世",
+    "en": "The classical word ukiyo originally meant 'the sorrowful world,' that is, this world full of suffering. Behind it lies the Buddhist view of impermanence. By the Edo period it was written 'floating world' and took on a bright ring: a pleasure-seeking, fleeting present life. If you memorize a word together with the changes of its era, not just its meaning, it sticks in memory along with the feel of rise and fall. Behind a single word lies a major shift in outlook: whether to see the world as dark or bright.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "仏教の無常観から、江戸の享楽的な意味へ。浮世絵の「浮世」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "海上封鎖",
+   "reading": "かいじょうふうさ",
+   "pos": "noun",
+   "meaning": "naval blockade",
+   "defJa": "海上の交通を遮断して敵を孤立させる作戦",
+   "passage": {
+    "ja": "第一次世界大戦中、イギリスが北海で行った海上封鎖は、ドイツの食糧と物資の流れを細らせ、国内に深刻な飢えをもたらした。銃弾が一発も飛ばない場所で、人々の暮らしがじわじわと削られていく。この戦い方は、海洋国家だけが持ち得る力であると同時に、戦場の外にいる民間人にまで犠牲を強いるという点で、倫理的な問いを突きつける。力の使い方に静けさが伴うとき、人はそれを暴力と呼ぶのをためらう。",
+    "form": "海上封鎖",
+    "en": "During the First World War, the naval blockade Britain carried out in the North Sea thinned the flow of food and goods to Germany and brought serious hunger to the country. In places where not a single bullet flew, people's lives were gradually worn away. This way of fighting is a power only a maritime nation can hold and at the same time poses an ethical question in that it forces sacrifice even on civilians outside the battlefield. When quiet accompanies the use of force, people hesitate to call it violence.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「海上封鎖を行う・解除する」。経済戦の手段として語られる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "海洋国家",
+   "reading": "かいようこっか",
+   "pos": "noun",
+   "meaning": "maritime nation",
+   "defJa": "海に面し、海上の活動を基盤とする国",
+   "passage": {
+    "ja": "歴史を語るとき、海洋国家と大陸国家という対比を一本の軸にすると、聞き手は驚くほど整理しやすくなる。たとえばイギリスや日本は、海に守られて貿易で富を築き、ロシアやドイツは陸の国境の防衛に力を割かざるを得なかった。一方で、海上封鎖のように、海の力が相手の暮らしを締めあげる例もある。比較優位の話と合わせて整理すれば、話の筋が太くなる。地図を見る目が変わると、歴史の細部も別の意味を帯びて見えてくる。",
+    "form": "海洋国家",
+    "en": "When talking about history, using the contrast between maritime and continental nations as a single axis makes it surprisingly easy for listeners to organize. For example, Britain and Japan, protected by the sea, built wealth through trade, while Russia and Germany had no choice but to devote strength to defending land borders. On the other hand, there are cases like a naval blockade, where the power of the sea squeezes the other side's livelihood. If you organize it together with comparative advantage, the thread of your talk grows stronger. When the way you look at a map changes, the details of history also take on different meanings.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「大陸国家」と対にする分析枠。地政学の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "海馬",
+   "reading": "かいば",
+   "pos": "noun",
+   "meaning": "hippocampus",
+   "defJa": "記憶に深く関わる脳の部位",
+   "passage": {
+    "ja": "海馬って、たしか記憶をしまっておく倉庫みたいな場所だよね。でも実は、そのまま保存するというより、新しい出来事を整理して長期の記憶へ送る係だって聞いたことがある。眠っているあいだに、今日の出来事がひとつずつ整理されていくとか。だから一夜漬けで詰め込むより、ちゃんと寝たほうが覚えられるんだって。私も試験前は徹夜をやめて朝活に切り替えてから、成績が少しずつ上がってきた。",
+    "form": "海馬",
+    "en": "The hippocampus is the place that's like a warehouse where memories are kept, right? But actually I've heard it's less about storing as is and more about organizing new events and sending them on to long-term memory. Something like today's events get sorted one by one while you sleep. So apparently you remember better by sleeping properly than by cramming overnight. Since I stopped pulling all-nighters before exams and switched to morning study, my grades have been going up little by little.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "記憶の固定に関わる。睡眠と記憶の話で出やすい語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "浸透",
+   "reading": "しんとう",
+   "pos": "noun",
+   "meaning": "permeation, penetration",
+   "defJa": "しみこむように広く行き渡ること",
+   "passage": {
+    "ja": "生成人工知能は、この一、二年で企業の業務に急速に浸透した。メールの下書きから会議の要約まで、使われる場面は広がっている。一方で、機密情報の取り扱いや誤情報の拡散をめぐって、規則作りが追いついていないとの指摘も出ている。汎用の道具が現場に入り込むほど、使い方の責任が個々の社員に重くのしかかる。導入の勢いに比べて、多くの職場で教育や利用指針の整備は後手に回っているのが実情だ。",
+    "form": "浸透",
+    "en": "Generative artificial intelligence has rapidly permeated corporate operations over the past year or two. The scenes in which it is used are expanding, from drafting emails to summarizing meetings. On the other hand, there are also pointers that rule-making has not kept pace regarding the handling of confidential information and the spread of misinformation. The more a general-purpose tool enters the workplace, the more heavily the responsibility for its use falls on each employee. Compared with the momentum of adoption, in many workplaces the development of training and usage guidelines is lagging behind.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「〜に浸透する」。技術や考え方が社会に行き渡るさま。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "淘汰",
+   "reading": "とうた",
+   "pos": "noun",
+   "meaning": "weeding out, selection",
+   "defJa": "不要なもの・劣るものが自然に除かれること",
+   "passage": {
+    "ja": "人工知能の登場で、単純な翻訳や文書作成の仕事は淘汰されるのではないかという懸念が広がっている。確かに定型の作業は自動化されやすい。だが、過去の技術革新を振り返ると、仕事が消える一方で、新しい職種が生まれてきたのも事実である。汎用の道具を使いこなし、人間の洞察力を足せる人が、これからの競争を生き残るにちがいない。問われているのは、機械に勝つことではなく、機械と組んで何を作るかである。",
+    "form": "淘汰",
+    "en": "Concern is spreading that jobs such as simple translation and document creation will be weeded out by the arrival of artificial intelligence. Certainly, routine tasks are easy to automate. But looking back at past technological innovation, it is also true that while jobs disappeared, new occupations were born. Those who can master general-purpose tools and add human insight will surely survive the competition ahead. What is being asked is not how to beat machines but what to make in partnership with them.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「自然淘汰」の淘汰。市場や技術で劣るものが除かれる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "深層心理",
+   "reading": "しんそうしんり",
+   "pos": "noun",
+   "meaning": "deep psychology; inner psyche",
+   "defJa": "本人も気づかない心の深い層",
+   "passage": {
+    "ja": "人がなぜか同じ失敗を繰り返すとき、その背景には、本人も気づかない深層心理が働いていることがあります。たとえば「やる気がない」と感じる裏に、失敗して評価を落とすことへの恐れが隠れている場合です。この場合、気力を絞って頑張るだけでは解決しません。まず、恐れの存在に気づくことが第一歩で、そのうえで小さな挑戦を重ねるのが近道です。恐れに名前を付けた瞬間、それは得体の知れない力から、扱える課題へと変わります。",
+    "form": "深層心理",
+    "en": "When a person somehow repeats the same failure, a deep psychology that even they are unaware of may be at work behind it. For example, behind feeling that you have no motivation, there may be hidden a fear of failing and losing standing. In that case, simply summoning energy and trying harder will not solve it. Noticing the existence of the fear is the first step, and on that basis, piling up small challenges is the shortcut. The moment you give the fear a name, it changes from a mysterious force into a problem you can handle.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「深層心理を探る」。無意識に近い、本人の自覚が及ばない層。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "深掘り",
+   "reading": "ふかぼり",
+   "pos": "noun",
+   "meaning": "digging deeper",
+   "defJa": "物事を一段深く探ること",
+   "passage": {
+    "ja": "インタビューが上手い人は、相手の最初の答えで満足せず、一歩踏み込んで深掘りする。「それはなぜですか」「そのとき何を感じましたか」と、短い問いを重ねるのだ。大事なのは、用意した質問表を読み上げることではなく、相手の言葉の中の小さな引っかかりを逃さないことである。そこから、本題の外にあった本音が、ぽつりと出てくる。あとで録音を聞き返すと、うまくいった質問ほど短く、飾り気がなかったことに気づく。",
+    "form": "深掘り",
+    "en": "Good interviewers are not satisfied with the other person's first answer and dig deeper, stepping a little further in. They pile up short questions, such as why is that, and what did you feel at that moment. What matters is not reading out a prepared list of questions but not missing the small snags in the other person's words. From there, true feelings that lay outside the main subject drop out quietly. Listening back to the recording afterward, you notice that the questions that worked best were the shortest and plainest.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「深掘りする」。取材・分析で一段踏み込むとき。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "添削",
+   "reading": "てんさく",
+   "pos": "noun",
+   "meaning": "correcting (a text)",
+   "defJa": "文章などを直して良くすること",
+   "passage": {
+    "ja": "作文は、書いただけでは伸びません。他人による添削を受けて、はじめて自分の癖が見えてきます。たとえば同じ接続詞を何度も使っていたり、主語がぶれていたりすることは、書いた本人にはなかなか気づけません。赤字を入れてもらったら、直された箇所を清書し直して、なぜ直されたのかを一行で書き添えるのがおすすめです。それは、他人の目を借りて、自分の頭の外から自分の文章を眺め直す作業なのです。",
+    "form": "添削",
+    "en": "Writing does not improve just by being written. Only after receiving someone else's corrections do your own habits become visible. For instance, using the same conjunction repeatedly or having an unsteady subject is hard for the writer to notice. Once you have had red marks put in, I recommend recopying the corrected passages cleanly and adding one line on why each was changed. It is the work of borrowing someone else's eyes to look again at your own writing from outside your own head.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「添削を受ける・する」。作文や答案を直すこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "清教徒革命",
+   "reading": "せいきょうとかくめい",
+   "pos": "noun",
+   "meaning": "Puritan Revolution",
+   "defJa": "一七世紀のイギリスで国王が処刑された革命",
+   "passage": {
+    "ja": "世界史の試験で清教徒革命が出たら、国王チャールズ一世と議会の対立から書き始めましょう。一六四二年に内戦が始まり、クロムウェル率いる議会軍が勝利して、一六四九年に国王が処刑されます。王権が最盛期を過ぎ、議会が主権を握る流れをつかむことが、洞察のある論述の土台になります。年号と人名は、物語の順に並べて覚えると忘れにくくなります。ちなみに、この革命のあとに王政が戻る点まで書けると、評価はもう一段上がります。",
+    "form": "清教徒革命",
+    "en": "If the Puritan Revolution appears on a world-history exam, begin by writing from the conflict between King Charles I and Parliament. Civil war began in 1642, the parliamentary army led by Cromwell won, and the king was executed in 1649. Grasping the flow in which royal power passed its peak and Parliament took sovereignty is the foundation of an insightful essay. Dates and names are harder to forget if you memorize them in the order of the story. Incidentally, if you can also write that the monarchy returned after this revolution, your evaluation goes up another notch.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "一六四二年の内戦、四九年の国王処刑。英語では内戦とも言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "清書",
+   "reading": "せいしょ",
+   "pos": "noun",
+   "meaning": "clean copy",
+   "defJa": "下書きを直して丁寧に書き写すこと",
+   "passage": {
+    "ja": "古い公文書の研究では、草稿と清書を突き合わせる作業が欠かせない。草稿には書き直しや削除の跡が残り、役人たちがどの言葉を選び、どの言葉を捨てたかがわかるからだ。完成稿だけを読んでいては、完成した文面の背後にあった迷いは見えてこない。校閲や注釈の資料と合わせて読むことで、文書が作られた現場の空気まで伝わってくる。推敲の跡こそが、完成した一枚よりも雄弁に、書き手の思考を語ってくれる。",
+    "form": "清書",
+    "en": "In research on old official documents, comparing the draft with the clean copy is indispensable. Revisions and deletions remain in the draft, so you can tell which words the officials chose and which they discarded. Reading only the finished version, you cannot see the hesitation behind the finished text. By reading together with proofreading and annotation materials, even the atmosphere of the scene where the document was made comes across. The traces of revision speak of the writer's thinking more eloquently than the finished sheet.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "下書き(草稿)に対する語。「清書する」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "清朝",
+   "reading": "しんちょう",
+   "pos": "noun",
+   "meaning": "Qing dynasty",
+   "defJa": "満洲人が建て、中国を支配した最後の王朝",
+   "passage": {
+    "ja": "清朝は、満洲人が建てた王朝で、一六四四年に北京に入り、一九一二年の宣統帝の退位まで続きました。最盛期の十八世紀には、朝貢の仕組みを通じて周辺の国々と結びつき、広大な領土を治めます。ところが十九世紀に入ると、アヘン戦争を皮切りに、列強の圧力を受けて不平等な条約を結ぶことになります。長い栄枯盛衰を、制度の変化に沿って整理するのが試験対策のコツです。ここでは年号よりも、なぜ弱体化したかの理由を三つほど言えるようにしておくと安心です。",
+    "form": "清朝",
+    "en": "The Qing dynasty was a dynasty founded by the Manchus; it entered Beijing in 1644 and lasted until the abdication of the Xuantong Emperor in 1912. At its peak in the eighteenth century, it was bound to surrounding countries through the tribute system and governed a vast territory. In the nineteenth century, however, starting with the Opium War, it came under pressure from the great powers and ended up signing unequal treaties. The trick for exam prep is to sort this long rise and fall along the changes in its institutions. Here, rather than dates, it is reassuring to be able to state about three reasons why it weakened.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "一六四四年入関、一九一二年に滅亡。アヘン戦争以降の変化が頻出。",
+    "sense": ""
+   }
+  }
+ ]
+}

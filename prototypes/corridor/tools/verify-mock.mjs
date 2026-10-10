@@ -221,16 +221,16 @@ async function main() {
   await page.waitForSelector('.assessment-room #exam-legacy');
   await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
-  // since the 2026-10-01 polish pass 未確認 is said once for the page (every set is unchecked),
+  // since the 2026-10-01 polish pass Unreviewed is said once for the page (every set is unchecked),
   // not on each of the 25 rows; a row still wears it when the list mixes checked and unchecked
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
-    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === '未確認');
+    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === 'Unreviewed');
     const marked = rows.filter((r) => chips(r).length);
     const page = chips(document.querySelector('#app main')).filter((c) => !c.closest('[data-mock-set]')).length;
     return { rows: rows.length, rowMarks: marked.length, pageMarks: page };
   })()`);
-  check('earlier exercises retain all 25 papers, and 未確認 is said once for the page, not on every row',
+  check('earlier exercises retain all 25 papers, and Unreviewed is said once for the page, not on every row',
     listing.rows === 25 && listing.pageMarks === 1 && listing.rowMarks === 0, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time

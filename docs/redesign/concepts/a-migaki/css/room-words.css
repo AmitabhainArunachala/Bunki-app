@@ -1,0 +1,95 @@
+/* ==========================================================================
+   WORDS 辞書 · drafting vellum on a ruled grid; a technical plate
+   Signature motion: the match-cut re-centre; leaders draw out from the centre
+   At night the leaders become 回路 traces with a current running the walk
+   ========================================================================== */
+.w-head { position: relative; padding: 18px var(--gutter) 4px; }
+.w-top { display: flex; align-items: baseline; justify-content: space-between; margin: 0 22px 10px 0; }
+.w-head h1 { margin: 0; font-family: var(--font-serif); font-size: 22px; line-height: 1; font-weight: 600; letter-spacing: 0; }
+.look { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; margin-right: 18px; background: var(--color-paper); border-radius: 6px; box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong), inset 0 1px 2px rgba(var(--color-shadow), .06); color: var(--color-ink-3); }
+.look input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: var(--color-ink); outline: none; }
+.look input::placeholder { color: var(--color-ink-3); }
+.w-trail { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px var(--gutter) 2px; min-height: 48px; }
+.trail { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.tr-items { display: flex; align-items: center; gap: 2px; overflow: hidden; }
+.tr { font-family: var(--font-display); font-weight: 800; font-size: 15px; min-height: 44px; min-width: 30px; display: inline-flex; align-items: center; justify-content: center; color: var(--color-ink-3); }
+.tr.cur { color: var(--color-ink); box-shadow: inset 0 -2px 0 var(--color-ink); }
+.tr-sep { color: var(--color-ink-3); font-family: var(--font-mono); font-size: 11px; }
+.origin { flex: none; font-size: 13px; padding: 0 10px 0 4px; gap: 2px; }
+.origin .ico { width: 18px; height: 18px; }
+
+.plate { position: relative; margin: 2px 10px 0; background: var(--color-paper); border-radius: 3px; box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong), var(--elevation-1); }
+.grid-ruling {
+  position: absolute; inset: 0; opacity: .9; pointer-events: none;
+  background-image:
+    linear-gradient(var(--color-line) .5px, transparent .5px), linear-gradient(90deg, var(--color-line) .5px, transparent .5px),
+    linear-gradient(rgba(31, 58, 95, .05) .5px, transparent .5px), linear-gradient(90deg, rgba(31, 58, 95, .05) .5px, transparent .5px);
+  background-size: 74px 74px, 74px 74px, 18.5px 18.5px, 18.5px 18.5px; background-position: -12px -2px;
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 45%, #000 50%, rgba(0, 0, 0, .35)); mask-image: radial-gradient(120% 100% at 50% 45%, #000 50%, rgba(0, 0, 0, .35));
+}
+.plate-in { position: absolute; inset: 0; }
+.legend { position: absolute; left: 10px; right: 10px; top: 8px; display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .12em; color: var(--color-ink-3); pointer-events: none; }
+.ring { position: absolute; width: 124px; height: 124px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: inset 0 0 0 1.5px var(--color-signal), 0 0 0 7px var(--color-paper), 0 0 0 7.5px var(--color-line-strong); pointer-events: none; }
+.ring::after { content: ""; position: absolute; inset: -22px; border-radius: 50%; border: 1px dashed var(--color-line); }
+
+.centre { position: absolute; left: 195px; top: 206px; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; z-index: 2; text-align: center; pointer-events: none; }
+.c-rd { font-size: 11.5px; letter-spacing: .14em; color: var(--color-ink-3); margin-bottom: 2px; }
+.c-g { font-family: var(--font-display); font-weight: 800; font-size: 44px; line-height: 1.05; letter-spacing: .02em; color: var(--color-ink); white-space: nowrap; }
+.cp .c-g { font-size: 64px; }
+.c-lbl { margin-top: 6px; max-width: 170px; font-family: var(--font-serif); font-style: italic; font-size: 12.5px; line-height: 1.3; color: var(--color-ink-2); position: absolute; top: 100%; white-space: nowrap; }
+.cw .c-g { font-size: 44px; }
+.cw .c-lbl { top: calc(100% + 40px); }
+.ck .c-lbl { top: calc(100% + 28px); }
+.cp .c-lbl { top: calc(100% + 30px); }
+.ck .strokes.big { width: 92px; height: 92px; overflow: visible; }
+.ck .strokes.big path { stroke-width: 4; }
+.ck .strokes text { font-family: var(--font-mono); font-size: 6px; fill: var(--color-vermilion); font-weight: 700; }
+
+.edge { position: absolute; height: 0; transform-origin: 0 0; pointer-events: none; z-index: 1; }
+.edge i { position: absolute; left: 0; top: -.5px; height: 1px; background: var(--color-line-strong); transform-origin: 0 50%; }
+.edge b { position: absolute; top: -2px; width: 4px; height: 4px; background: var(--color-ink-3); transform-origin: -100px 50%; }
+.edge.e-ctx i { background: repeating-linear-gradient(90deg, var(--color-line-strong) 0 3px, transparent 3px 6px); }
+.edge.e-sib i { background: var(--color-line); }
+
+.node { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; min-width: 44px; min-height: 44px; justify-content: center; color: var(--color-ink); z-index: 3; text-align: center; }
+.node .g { font-family: var(--font-display); font-weight: 800; line-height: 1; }
+.node .lbl { font-size: 10.5px; color: var(--color-ink-3); margin-top: 4px; white-space: nowrap; max-width: 108px; overflow: hidden; text-overflow: ellipsis; }
+.nk .g, .np .g { width: 50px; height: 50px; display: grid; place-items: center; font-size: 28px; background: var(--color-paper); box-shadow: inset 0 0 0 1px var(--color-ink), 0 0 0 4px var(--color-paper); }
+.np .g { border-radius: 50%; box-shadow: inset 0 0 0 1px var(--color-ink-2), 0 0 0 4px var(--color-paper); }
+.nk .lbl { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .06em; font-size: 9.5px; }
+.nw { background: var(--color-paper); padding: 4px 6px; border-radius: 3px; }
+.nw .rd { font-size: 9.5px; letter-spacing: .1em; color: var(--color-ink-3); }
+.nw .g { font-size: 21px; }
+.nw .lbl { font-family: var(--font-serif); font-style: italic; font-size: 11px; max-width: 84px; }
+.nx { width: 114px; align-items: flex-start; text-align: left; padding: 7px 8px 8px; background: var(--color-paper); border-radius: 3px; box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong), var(--elevation-1); }
+.nx .eyebrow { font-size: 9px; letter-spacing: .12em; }
+.nx .snip { font-size: 11.5px; line-height: 1.45; margin-top: 3px; }
+.nx .pat { font-family: var(--font-display); font-weight: 800; font-size: 13.5px; margin-top: 3px; white-space: nowrap; }
+.nx .lbl { white-space: normal; line-height: 1.3; }
+.nx .lbl { max-width: 92px; text-align: left; }
+.node.sel { box-shadow: inset 0 0 0 1.5px var(--color-ink), var(--elevation-1); }
+.node:active .g { transform: scale(.96); }
+
+.detail { position: relative; margin: 16px 10px 0; padding: 14px 14px 12px; background: var(--color-paper); border-radius: 3px; box-shadow: inset 0 0 0 var(--hair) var(--color-line-strong); }
+.dl-head { display: flex; align-items: baseline; gap: 12px; }
+.dl-g { font-family: var(--font-display); font-weight: 800; font-size: 30px; line-height: 1.1; white-space: nowrap; }
+.dl-gloss { font-family: var(--font-serif); font-style: italic; font-size: 15px; color: var(--color-ink-2); line-height: 1.35; }
+.dts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 12px; margin-top: 12px; }
+.dt { display: grid; gap: 3px; padding-top: 6px; border-top: var(--hair) solid var(--color-line-strong); }
+.dt .eyebrow { font-size: 9.5px; }
+.dv { font-size: 15px; font-weight: 600; }
+.dv .small { font-size: 11px; font-weight: 500; }
+.dl-note p { margin: 8px 0 0; font-family: var(--font-serif); font-size: 15px; line-height: 1.6; color: var(--color-ink-2); }
+.dl-note .dl-g { display: block; margin-top: 4px; }
+
+/* night: the plate as a phosphor terminal; leaders become 回路 traces with a current */
+html[data-theme="night"] .grid-ruling { background-image: linear-gradient(var(--color-line) .5px, transparent .5px), linear-gradient(90deg, var(--color-line) .5px, transparent .5px), linear-gradient(rgba(99, 242, 217, .04) .5px, transparent .5px), linear-gradient(90deg, rgba(99, 242, 217, .04) .5px, transparent .5px); }
+html[data-theme="night"] .plate { box-shadow: inset 0 0 0 1px var(--color-line-strong), 0 0 40px -16px rgba(99, 242, 217, .35); }
+html[data-theme="night"] .edge i { background: rgba(99, 242, 217, .55); box-shadow: 0 0 6px rgba(99, 242, 217, .35); }
+html[data-theme="night"] .edge.e-ctx i { background: repeating-linear-gradient(90deg, rgba(99, 242, 217, .5) 0 3px, transparent 3px 6px); box-shadow: none; }
+html[data-theme="night"] .edge b { background: var(--color-signal); }
+html[data-theme="night"] .edge.e-struct i::after { content: ""; position: absolute; top: -1.5px; left: 0; width: 10px; height: 4px; border-radius: 2px; background: #fff; box-shadow: 0 0 8px 2px var(--color-signal); animation: current 6s linear infinite; }
+@keyframes current { 0% { transform: translateX(0); opacity: 0; } 8% { opacity: 1; } 40% { transform: translateX(60px); opacity: 0; } 100% { transform: translateX(60px); opacity: 0; } }
+html[data-theme="night"] .ring { box-shadow: inset 0 0 0 1px var(--color-signal), 0 0 0 7px var(--color-paper), 0 0 0 7.5px var(--color-line-strong), 0 0 30px -4px rgba(99, 242, 217, .4); }
+html[data-theme="night"] .nk .g { box-shadow: inset 0 0 0 1px var(--color-ink-2), 0 0 0 4px var(--color-paper); }
+html[data-theme="night"] .ck .strokes text { fill: var(--color-signal); }

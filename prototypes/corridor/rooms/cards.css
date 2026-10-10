@@ -1,0 +1,30 @@
+/* Bunki room: cards. Loaded after editorial.css (see index.html).
+   Owns html[data-room] identity for this room only. Change values through Tokens v2 roles
+   (--color-* --type-* --space-* --radius-* --elevation-* --motion-* --ease-*) on body. */
+
+/* ---- Skin frame (Skin lane): the deck players share Learn's lacquer stage. Players inject
+   their own sheets later, so tokens only, on body. ---- */
+html:is([data-room='deckplay'], [data-room='contextdeck']) body:not([data-view='drift']) {
+  --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 8%, transparent), transparent 180px);
+}
+
+/* ---- Cards lane: the deck player fills the room edge to edge. Its page (and, while studying,
+   its stage) runs under the main's side padding and on below the last card to the Line, so no
+   strip of the corridor's washi shows around it: a shadow of its own ground, no layout change,
+   nothing drawn over a control. ---- */
+@media (max-width: 520px) {
+  html[data-room='deckplay'] #app > main > .kp { margin-inline: -18px; padding-inline: 18px; }
+}
+html[data-room='deckplay'] #app > main > .kp { box-shadow: 0 50vh 0 0 var(--kp-bg); }
+html[data-room='deckplay'] #app > main > .kp:has(> .kp-study) { box-shadow: 0 50vh 0 0 var(--kp-dock); }
+
+/* ---- Fix round 2: one way out. In the deck the player's own ← (home) and ✕ (study) are the exit;
+   the chrome's Back would leave the same deck by a second door, so it stands down here. ---- */
+html[data-room='deckplay'] body:not(.zen) #app > .chrome > button#back { display: none; }
+/* no strip of the corridor's paper between the chrome and the deck: the player's ground meets the chrome */
+html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp) { padding-top: 0; }
+html[data-room='deckplay'] #app > main > .kp { margin-top: 0; }
+
+/* ---- Fix round 3: the chrome is opaque over the deck. Nothing of the card shows through it, and with
+   the reveal no longer scrolling the page (decks/player windowPassage) it never moves. ---- */
+html[data-room='deckplay'] body:not(.zen) #app > .chrome { background: var(--color-glass-solid, var(--color-page)); -webkit-backdrop-filter: none; backdrop-filter: none; }

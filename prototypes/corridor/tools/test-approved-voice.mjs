@@ -15,8 +15,8 @@ function between(start, end) {
 }
 const narrationSource = between('const readAloud =', '/* ------------------------------------------------ 収録の声');
 const recordedSource = between('const REC_VOICE_KEY =', 'function refreshListenRow(');
-const barSource = between('function buildListenRow(', 'function renderReader(');
-const controlSource = between('function enhanceJapaneseProse(', '/** Lists are chosen');
+const barSource = between('function voicePendingNote(', 'function renderReader(');
+const controlSource = between('function enhanceJapaneseProse(', '/* Save is one tap');
 const settle = () => new Promise(resolve => setImmediate(resolve));
 const passage = { id: 'fixture' };
 const approvedManifest = (voice = 'kore') => ({
@@ -128,13 +128,15 @@ test('The checked-in build stays pending and silent, including every stale saved
     if (!/\bsrc\s*=/.test(attributes)) vm.runInContext(code, boot);
   }
   const words = JSON.parse(readFileSync(new URL('../audio/manifest.json', import.meta.url), 'utf8'));
-  for (const preference of [null, 'f1', 'ami', 'metan', 'zundamon', 'takehiro']) {
-    const f = await fixture({ flags: boot.window, words, preference });
+  for (const language of ['en', 'ja']) for (const preference of [null, 'f1', 'ami', 'metan', 'zundamon', 'takehiro']) {
+    const f = await fixture({ flags: boot.window, words, preference, language });
     const row = f.bar();
     assert.equal(f.loadedNarration(), null);
     assert.equal(row.classList.contains('is-pending'), true);
-    assert.match(row.textContent, /音声準備中 · Kore/);
-    assert.match(row.textContent, /voice in preparation|audio coming soon/);
+    assert.equal(row.textContent, language === 'ja' ? 'この記事の収録音声はありません' : 'No recording for this article');
+    assert.equal(row.querySelector('#listen-note').getAttribute('aria-description'), language === 'ja'
+      ? '音声は Kore、第二話者は Charon に固定されています。' : 'Approved voices: Kore (main), Charon (second).',
+    'The accessible description names the locked voices');
     assert.equal(row.querySelectorAll('button').length, 0);
     assert.equal(row.querySelectorAll('select').length, 0);
     assert.equal(f.fetches.includes('audio/article-narration.json'), false, 'An absent narration flag makes no doomed fetch');
@@ -144,7 +146,8 @@ test('The checked-in build stays pending and silent, including every stale saved
     f.context.speakCardReading('でんしゃ', button, '電車');
     await settle();
     assert.equal(f.created.length, 0, `The saved ${preference} preference cannot play an interim word clip`);
-    assert.equal(note.textContent, 'The Kore voice is on its way', 'Pending copy names the locked voice, not a learner choice');
+    assert.equal(note.textContent, language === 'ja' ? 'Kore の収録音声はありません' : 'No Kore recording',
+      'Absent answer-card recording copy names the locked voice, not a learner choice');
     assert.equal(button.dataset.voiceUnavailable, 'not-recorded');
     assert.equal(f.deviceVoiceCalls.length, 0);
     assert.deepEqual(f.writes, []);
@@ -264,9 +267,9 @@ test('Saved and session preferences resolve only to Kore or Charon without mutat
   assert.deepEqual(denied.writes, []);
 });
 
-test('A word without an approved clip names the voice being prepared, never a learner choice', async () => {
-  for (const [preference, language, expected] of [[null, 'en', 'The Kore voice is on its way'],
-    [null, 'ja', 'Kore の声を準備中です'], ['charon', 'en', 'The Charon voice is on its way']]) {
+test('A word without an approved clip names the absent recording, never a learner choice', async () => {
+  for (const [preference, language, expected] of [[null, 'en', 'No Kore recording'],
+    [null, 'ja', 'Kore の収録音声はありません'], ['charon', 'en', 'No Charon recording']]) {
     const f = await fixture({ words: approvedWords(), preference, language });
     const { button, note } = f.card(); f.context.speakCardReading('ゆき', button, '雪'); await settle();
     assert.equal(note.textContent, expected);

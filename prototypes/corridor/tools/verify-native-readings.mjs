@@ -235,7 +235,7 @@ async function openQuickLook(page, preferredIndex = 0) {
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '',
       };
     });
-    if (quick?.word && quick.gloss && !/語釈なし|no gloss/.test(quick.gloss)) {
+    if (quick?.word && quick.gloss && !/語釈なし|no gloss|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/.test(quick.gloss)) {
       return quick;
     }
     await page.evaluate(() => document.getElementById('mini')?.remove());
@@ -1110,8 +1110,8 @@ try {
     const notes = await page.locator('.shelf-review-note').count();
     if (!notes) return { notes, text: '', count: 0, total: null };
     const text = (await page.locator('.shelf-review-note').first().textContent()) ?? '';
-    // the bilingual note is one short line since the glance pass: 「未確認 · 54 of 120 not yet checked by a person」
-    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|未確認 · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
+    // the bilingual note is one short line since the glance pass: “Unreviewed · 54 of 120 not yet checked by a person”
+    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|Unreviewed · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
     return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
   };
   const jaNote = await reviewNote();

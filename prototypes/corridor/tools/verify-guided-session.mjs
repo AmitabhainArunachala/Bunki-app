@@ -210,6 +210,7 @@ async function journey(browser, browserName, viewport) {
     // D · two doors, one tap each
     await page.locator('#chrome-dojo').click();
     const hallDoor = page.locator('button[data-study-door="guided"]');
+    await hallDoor.waitFor({ state: 'visible', timeout: 20_000 });
     check('D1 the study hall lists the guided session as a door', await hallDoor.isVisible());
     await shot(page, dir, '00-study-hall-door');
     await page.locator('button[data-study-door="mock"]').click();
@@ -228,6 +229,7 @@ async function journey(browser, browserName, viewport) {
       (await room(page).getAttribute('data-stage')) === 'home',
     );
     await page.locator('#back').click();
+    await page.locator('.exam-levels').waitFor({ state: 'visible', timeout: 20_000 });
     check(
       'D4 戻る from the room front returns to the JLPT room',
       await page.locator('.exam-levels').isVisible(),
@@ -252,7 +254,7 @@ async function journey(browser, browserName, viewport) {
     );
     check(
       'J3 the chrome recedes during the attempt (T8)',
-      (await page.evaluate(() => document.documentElement.dataset.room)) === 'attempt',
+      (await page.evaluate(() => document.documentElement.dataset.register)) === 'attempt',
     );
     await shot(page, dir, '03-question-1');
     await axeClean(page, 'question');
@@ -662,7 +664,7 @@ async function journey(browser, browserName, viewport) {
     check('J18 the practised target is marked practised', field.reviewed.includes(Q[0]));
     check(
       'J19 the field reads the real deck: 5 session cards and 支障 from the sheet are ready',
-      /復習する · 6/u.test(await act(page, 'review').innerText()),
+      /review what is ready · 6/u.test(await act(page, 'review').innerText()),
       await act(page, 'review').innerText(),
     );
     check(
@@ -743,6 +745,7 @@ async function journey(browser, browserName, viewport) {
     await page.locator('#zen-exit').click();
     await page.locator('#deck-table').waitFor();
     await page.locator('#back').click();
+    await room(page).waitFor({ state: 'visible', timeout: 20_000 });
     check('S15 戻る from the lists page returns to the guided room', await room(page).isVisible());
 
     check('X1 no horizontal overflow at any stage', overflowAt.length === 0, overflowAt.join(' '));

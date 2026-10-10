@@ -98,10 +98,10 @@ function defaultFetchJson(path) {
 export function createGuidedSession(host) {
   const english = () => host.english();
   const t = (ja, en) => (english() ? en : ja);
-  /** A bilingual label: Japanese first, the English gloss beside it in bilingual mode. */
+  /** Chrome uses the chosen language; Japanese exercises keep their own markup. */
   const bi = (ja, en) =>
     english()
-      ? `<span lang="ja">${ja}</span><small class="gs-gloss" lang="en">${en}</small>`
+      ? `<span lang="en">${en}</span>`
       : `<span lang="ja">${ja}</span>`;
   const storage = (() => {
     try {
@@ -328,7 +328,7 @@ export function createGuidedSession(host) {
       kind = 'gone';
       text = t('いまはデッキにない', 'no longer in your deck');
     }
-    return `<span class="gs-card" data-card="${esc(key)}" data-deck="${kind}"><b lang="ja">覚 ${title}</b> <span>${text}</span></span>`;
+    return `<span class="gs-card" data-card="${esc(key)}" data-deck="${kind}"><b><span>${t('覚','Learn')}</span> <span lang="ja" data-ui-content="learning">${title}</span></b> <span>${text}</span></span>`;
   }
 
   /* Every write re-reads the live rows: emit replaces the state, so a walk over the rows it
@@ -365,7 +365,7 @@ export function createGuidedSession(host) {
       announce(
         t(
           `覚えるデッキに${added}枚入れた。`,
-          `${added} card${added === 1 ? '' : 's'} added to your 覚える deck.`,
+          `${added} card${added === 1 ? '' : 's'} added to your review deck.`,
         ),
       );
     host.render();
@@ -457,7 +457,7 @@ export function createGuidedSession(host) {
         status === 'added'
           ? t(
               `${word.surface} · 覚えるデッキに入れた`,
-              `${word.surface} · added to your 覚える deck`,
+              `${word.surface} · added to your review deck`,
             )
           : t(`${word.surface} · もうデッキにある`, `${word.surface} · already in your deck`);
       redraw({
@@ -568,7 +568,7 @@ export function createGuidedSession(host) {
         const aria = seen
           ? `${q.target.label}, ${status}, ${t('元の問題をひらく', 'open the original question')}`
           : `${t(kindLabel(q)[0], kindLabel(q)[1])}, ${t(`問${i + 1}`, `question ${i + 1}`)}, ${t('これから', 'still ahead')}`;
-        return `<button type="button" class="gs-node ${cls}" style="left:${left}%;top:${top}%" data-action="source" data-index="${i}" ${seen ? '' : 'disabled'} aria-label="${esc(aria)}"><span ${seen ? 'lang="ja"' : ''}>${esc(label)}</span><small>${esc(small)}</small></button>`;
+        return `<button type="button" class="gs-node ${cls}" style="left:${left}%;top:${top}%" data-action="source" data-index="${i}" ${seen ? '' : 'disabled'} aria-label="${esc(aria)}" ${seen ? `data-ui-content-value="${esc(q.target.label)}"` : ''}><span ${seen ? 'lang="ja" data-ui-content="learning"' : ''}>${esc(label)}</span><small>${esc(small)}</small></button>`;
       }).join('')}
     </div>`;
   }
@@ -577,7 +577,7 @@ export function createGuidedSession(host) {
     const ready = [...infos.entries()].filter(([, info]) => info?.ready);
     if (!ready.length) return '';
     const labels = ready.map(([key]) => host.deck.title(nodeOf(key)));
-    return `<div class="gs-duecard"><button type="button" data-action="review" data-scope="field"><b>${bi(`復習 · ${ready.length} 件`, 'ready to review now')}</b><small lang="ja">${esc(labels.slice(0, 4).join(' · '))}${labels.length > 4 ? ' …' : ''}</small><span class="gs-go">${bi('始める', 'begin')} →</span></button><button type="button" class="gs-light" data-action="results"><b>${bi(`${set.level} · 前回`, 'last time')}</b><small>${countRight()} / ${answered()} ${bi('正解', 'correct')} · ${activeLearn().length} ${bi('覚に', 'in Learn')}</small></button></div>`;
+    return `<div class="gs-duecard"><button type="button" data-action="review" data-scope="field"><b>${bi(`復習 · ${ready.length} 件`, `ready to review now · ${ready.length}`)}</b><small lang="ja" data-ui-content="learning">${esc(labels.slice(0, 4).join(' · '))}${labels.length > 4 ? ' …' : ''}</small><span class="gs-go">${bi('始める', 'begin')} →</span></button><button type="button" class="gs-light" data-action="results"><b>${bi(`${set.level} · 前回`, 'last time')}</b><small>${countRight()} / ${answered()} ${bi('正解', 'correct')} · ${activeLearn().length} ${bi('覚に', 'in Learn')}</small></button></div>`;
   }
 
   function roomBar() {
@@ -588,7 +588,7 @@ export function createGuidedSession(host) {
     const returning = state.finished;
     const infos = cardInfo(fieldKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
-    return `<section class="gs-arrival"><div class="gs-intro"><span class="gs-eyebrow">Bunki <span class="gs-dot">/</span> ${bi('生きた糸', 'a living thread')}</span>
+    return `<section class="gs-arrival"><div class="gs-intro"><span class="gs-eyebrow"><span class="gs-brand-mark" lang="ja">回廊</span> KAIRO <span class="gs-dot">/</span> ${bi('案内つきの練習', 'guided practice')}</span>
       <h1 class="gs-title gs-hero" tabindex="-1">${returning ? t('糸の続きを、<br>たどろう。', 'Pick up<br>your thread.') : t('十五分、<br>日本語と<br>ともに。', 'Spend fifteen<br>minutes with<br>Japanese.')}</h1>
       <p class="gs-lede">${
         returning
@@ -621,7 +621,7 @@ export function createGuidedSession(host) {
 
   function setup() {
     const perKind = Q.length / 3;
-    return `<section class="gs-narrow"><span class="gs-eyebrow">${levelChip(set.level)} ${bi('案内つきの稽古', 'a guided session')}</span><h1 class="gs-title" tabindex="-1">${t('わかるための、<br>小さな部屋。', 'A little room<br>to understand.')}</h1><p class="gs-lede">${t('言葉、文法、短いお知らせ。先に答えても、必要なときに解説をひらいてもいい。', 'Words, grammar, and a short notice. Answer first, or ask for an explanation whenever you need one.')}</p><div class="gs-facts"><div><strong>${t(`${Q.length}問`, `${Q.length} questions`)}</strong><span>${Number.isInteger(perKind) ? t(`各分野${perKind}問`, `${perKind === 2 ? 'Two' : perKind} of each kind`) : t('三つの分野', 'Three kinds')}</span></div><div><strong>${t(`${set.minutes}分`, `${set.minutes} minutes`)}</strong><span>${t('目安で、時間制限ではない', 'A guide, not a timer')}</span></div><div><strong>${t('一本の糸', 'One thread')}</strong><span>${t('次へ持っていく', 'To carry forward')}</span></div></div><p>${t('終わると、間違えた問題と旗を立てた問題が「覚」に入り、その言葉は実際の覚えるデッキの札になる。外すことも、元の問題に戻ることも、新しい例で試すこともできる。', 'At the end, missed and flagged questions go into Learn, and their words become cards in your real 覚える deck. You can remove them, revisit the source, or try a new example.')}</p><details class="gs-details"><summary>${bi('この問題について', 'about these questions')}</summary><p>${esc(t(set.sourceNote.ja, set.sourceNote.en))}</p></details><div class="gs-actions">${btn(bi('最初の問題へ', 'start with the first question'), 'start', 'primary')}${textBtn(bi('戻る', 'back'), 'home')}</div></section>`;
+    return `<section class="gs-narrow"><span class="gs-eyebrow">${levelChip(set.level)} ${bi('案内つきの稽古', 'a guided session')}</span><h1 class="gs-title" tabindex="-1">${t('わかるための、<br>小さな部屋。', 'A little room<br>to understand.')}</h1><p class="gs-lede">${t('言葉、文法、短いお知らせ。先に答えても、必要なときに解説をひらいてもいい。', 'Words, grammar, and a short notice. Answer first, or ask for an explanation whenever you need one.')}</p><div class="gs-facts"><div><strong>${t(`${Q.length}問`, `${Q.length} questions`)}</strong><span>${Number.isInteger(perKind) ? t(`各分野${perKind}問`, `${perKind === 2 ? 'Two' : perKind} of each kind`) : t('三つの分野', 'Three kinds')}</span></div><div><strong>${t(`${set.minutes}分`, `${set.minutes} minutes`)}</strong><span>${t('目安で、時間制限ではない', 'A guide, not a timer')}</span></div><div><strong>${t('一本の糸', 'One thread')}</strong><span>${t('次へ持っていく', 'To carry forward')}</span></div></div><p>${t('終わると、間違えた問題と旗を立てた問題が「覚」に入り、その言葉は実際の覚えるデッキの札になる。外すことも、元の問題に戻ることも、新しい例で試すこともできる。', 'At the end, missed and flagged questions go into Learn, and their words become cards in your real review deck. You can remove them, revisit the source, or try a new example.')}</p><details class="gs-details"><summary>${bi('この問題について', 'about these questions')}</summary><p>${esc(t(set.sourceNote.ja, set.sourceNote.en))}</p></details><div class="gs-actions">${btn(bi('最初の問題へ', 'start with the first question'), 'start', 'primary')}${textBtn(bi('戻る', 'back'), 'home')}</div></section>`;
   }
 
   function rail(phase) {
@@ -630,7 +630,7 @@ export function createGuidedSession(host) {
 
   function sessionTop() {
     const [ja, en] = kindLabel(current());
-    return `<div class="gs-session-top"><span class="gs-eyebrow">${levelChip(set.level)} · ${ja}${english() ? `<small class="gs-gloss">${en}</small>` : ''}</span><p class="exam-progress gs-count"><span>${state.index + 1} / ${Q.length}</span></p><nav class="gs-progress" aria-label="${esc(t('問題', 'Questions'))}">${Q.map((q, i) => `<button type="button" data-action="source" data-index="${i}" class="${answer(q).choice !== null ? 'done' : ''}" ${i === state.index ? 'aria-current="step"' : ''} aria-label="${esc(t(`問${i + 1}${answer(q).choice !== null ? '・回答済み' : ''}`, `Question ${i + 1}${answer(q).choice !== null ? ', answered' : ''}`))}">${i + 1}</button>`).join('')}</nav></div>`;
+    return `<div class="gs-session-top"><span class="gs-eyebrow">${levelChip(set.level)} · ${t(ja,en)}</span><p class="exam-progress gs-count"><span>${state.index + 1} / ${Q.length}</span></p><nav class="gs-progress" aria-label="${esc(t('問題', 'Questions'))}">${Q.map((q, i) => `<button type="button" data-action="source" data-index="${i}" class="${answer(q).choice !== null ? 'done' : ''}" ${i === state.index ? 'aria-current="step"' : ''} aria-label="${esc(t(`問${i + 1}${answer(q).choice !== null ? '・回答済み' : ''}`, `Question ${i + 1}${answer(q).choice !== null ? ', answered' : ''}`))}">${i + 1}</button>`).join('')}</nav></div>`;
   }
 
   function aside(q) {
@@ -645,7 +645,7 @@ export function createGuidedSession(host) {
             'ゆっくり見ていい。必要なら解説がある。',
             'There is time to look closely. An explanation is here if you need it.',
           )
-    }</p>${textBtn(a.flagged ? bi('旗を外す', 'flagged · remove the flag') : bi('あとで見直す', 'flag for another look'), 'flag', `aria-pressed="${a.flagged}"`)}${textBtn(bi('保存して離れる', 'save and leave · your place is kept'), 'leave')}</div><div class="gs-rule"><span class="gs-eyebrow">${t(`問 ${state.index + 1} / ${Q.length}`, `Question ${state.index + 1} of ${Q.length}`)}</span><p>${t('Bunki オリジナル練習', 'Original Bunki practice')}<br>${set.level} · ${t('筆記', 'written')}</p><details class="gs-details"><summary>${bi('出典', 'source details')}</summary><p>${esc(q.source.label)}<br>${t(`元の問題: ${esc(q.source.status)}（AI審査済みの練習）。追加の解説: 下書き。`, `Original item: ${esc(q.source.status)} (AI-reviewed practice). Added teaching copy: authored draft.`)}</p><p class="gs-source-id">${esc(q.source.ref)}</p></details>${state.finished ? textBtn(bi('場へ戻る', 'back to your field'), 'field') : ''}</div></aside>`;
+    }</p>${textBtn(a.flagged ? bi('旗を外す', 'flagged · remove the flag') : bi('あとで見直す', 'flag for another look'), 'flag', `aria-pressed="${a.flagged}"`)}${textBtn(bi('保存して離れる', 'save and leave · your place is kept'), 'leave')}</div><div class="gs-rule"><span class="gs-eyebrow">${t(`問 ${state.index + 1} / ${Q.length}`, `Question ${state.index + 1} of ${Q.length}`)}</span><p>${t('回廊オリジナルの練習', 'Original KAIRO practice')}<br>${set.level} · ${t('筆記', 'written')}</p><details class="gs-details"><summary>${bi('出典', 'source details')}</summary><p>${esc(q.source.label)}<br>${t(`元の問題: ${esc(q.source.status)}（AI審査済みの練習）。追加の解説: 下書き。`, `Original item: ${esc(q.source.status)} (AI-reviewed practice). Added teaching copy: authored draft.`)}</p><p class="gs-source-id">${esc(q.source.ref)}</p></details>${state.finished ? textBtn(bi('場へ戻る', 'back to your field'), 'field') : ''}</div></aside>`;
   }
 
   function choices(options, value, locked, name, correct) {
@@ -658,7 +658,7 @@ export function createGuidedSession(host) {
           : wrong
             ? `<small class="gs-outcome" lang="${english() ? 'en' : 'ja'}">${t('あなたの答え · 不正解', 'Your answer · incorrect')}</small>`
             : '';
-        return `<label class="gs-choice ${right ? 'is-answer' : wrong ? 'is-wrong' : ''}"><input type="radio" name="${name}" value="${i}" ${value === i ? 'checked' : ''} ${locked ? 'disabled' : ''}><span class="gs-choice-num">${i + 1}</span><span lang="ja">${esc(option)}${outcome}</span></label>`;
+        return `<label class="gs-choice ${right ? 'is-answer' : wrong ? 'is-wrong' : ''}"><input type="radio" name="${name}" value="${i}" ${value === i ? 'checked' : ''} ${locked ? 'disabled' : ''}><span class="gs-choice-num">${i + 1}</span><span lang="ja" data-ui-content="learning">${esc(option)}</span>${outcome}</label>`;
       })
       .join('')}</div></fieldset>`;
   }
@@ -667,7 +667,7 @@ export function createGuidedSession(host) {
     const ok = choice === correct;
     const icon = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><path d="${ok ? 'M4 12l5 5L20 6' : 'M6 6l12 12M18 6L6 18'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     const word = ok ? t('正解。', 'Correct.') : t('不正解。', 'Incorrect.');
-    return `<div class="gs-feedback ${ok ? 'gs-correct' : 'gs-incorrect'}" role="status" aria-atomic="true" data-verdict="${ok ? 'correct' : 'incorrect'}"><strong class="gs-verdict">${icon}<span>${word}</span></strong>${english() ? `<span class="gs-verdict-ja" lang="ja" aria-hidden="true">${ok ? '正解' : '不正解'}</span>` : ''}<p class="gs-comparison">${t('あなたの答え', 'あなたの答え · your answer')}: <span lang="ja">${esc(options[choice])}</span>${ok ? '' : `<br>${t('正解', '正解 · correct')}: <span lang="ja">${esc(options[correct])}</span>`}</p>${detail ? `<p>${esc(detail)}</p>` : ''}${!ok && moments ? textBtn(bi('侍をもう一度', 'replay the samurai'), 'samurai-replay') : ''}</div>`;
+    return `<div class="gs-feedback ${ok ? 'gs-correct' : 'gs-incorrect'}" role="status" aria-atomic="true" data-verdict="${ok ? 'correct' : 'incorrect'}"><strong class="gs-verdict">${icon}<span>${word}</span></strong>${english() ? `<span class="gs-verdict-ja" lang="ja" aria-hidden="true">${ok ? '正解' : '不正解'}</span>` : ''}<p class="gs-comparison">${t('あなたの答え', 'your answer')}: <span lang="ja" data-ui-content="learning">${esc(options[choice])}</span>${ok ? '' : `<br>${t('正解', 'correct')}: <span lang="ja" data-ui-content="learning">${esc(options[correct])}</span>`}</p>${detail ? `<p>${esc(detail)}</p>` : ''}${!ok && moments ? textBtn(bi('侍をもう一度', 'replay the samurai'), 'samurai-replay') : ''}</div>`;
   }
 
   function question() {
@@ -706,7 +706,7 @@ export function createGuidedSession(host) {
         const word = words[key];
         if (!word) return esc(part);
         const reading = showReadings || q.target.label.includes(word.surface);
-        return `<button type="button" class="gs-word" data-action="word" data-word="${key}" lang="ja">${esc(part)}${reading ? `<span class="gs-reading">（${esc(word.reading)}）</span>` : ''}</button>`;
+        return `<button type="button" class="gs-word" data-ui-content="learning" data-action="word" data-word="${key}" lang="ja">${esc(part)}${reading ? `<span class="gs-reading">（${esc(word.reading)}）</span>` : ''}</button>`;
       })
       .join('');
   }
@@ -736,12 +736,12 @@ export function createGuidedSession(host) {
       a.choice === null
         ? btn(bi('問題に戻る', 'return to your answer'), 'question', 'primary')
         : btn(last() ? bi('終える', 'finish') : bi('次へ', 'next'), 'next', 'primary');
-    return `${sessionTop()}<div class="gs-thread">${rail('insight')}<article class="gs-sheet gs-lacquer" data-question="${esc(q.id)}"><div class="gs-anchor">${anchor}</div><span class="gs-eyebrow">${bi('解説', 'understand')}</span><h1 class="gs-title" tabindex="-1">${esc(q.title)}</h1>${targetLine(q)}<div class="gs-reading-controls">${textBtn(showReadings ? bi('読みを隠す', 'hide supporting readings') : bi('読みを表示', 'show supporting readings'), 'readings', `aria-pressed="${showReadings}"`)}<span>${t('語をひらくと、読みと意味が出る。', 'Open a word for its reading and meaning.')}</span></div>${q.passage ? `<div class="gs-passage" lang="ja">${teachingText(q.passage, q)}</div><p class="gs-question" lang="ja">${teachingText(q.options[q.correct], q)}</p>` : `<p class="gs-completed" lang="ja">${completeSentence(q)}</p>`}<p class="gs-meaning">${esc(x.meaning)}</p><div class="gs-teaching"><p>${teachingText(x.rule, q)}</p><p>${teachingText(x.contrast, q)}</p></div><div class="gs-example"><span class="gs-eyebrow">${bi('もう一文', 'in another sentence')}</span><p lang="ja">${teachingText(x.exampleJa, q)}</p><small>${esc(x.exampleEn)}</small></div>${q.branches.length ? `<span class="gs-eyebrow">${bi('言葉の扉', 'every word is a door')}</span><div class="gs-branch-links">${q.branches.map((key) => `<button type="button" data-action="branch" data-key="${esc(key)}" lang="ja">${esc(set.branches[key].title)} <span aria-hidden="true">↗</span></button>`).join('')}</div>` : ''}<div class="gs-actions">${primary}${a.choice !== null ? textBtn(bi('問題へ', 'back to the question'), 'question') : ''}${state.finished ? textBtn(bi('先生に聞く', 'ask Sensei'), 'sensei-current') : ''}</div></article>${aside(q)}</div>`;
+    return `${sessionTop()}<div class="gs-thread">${rail('insight')}<article class="gs-sheet gs-lacquer" data-question="${esc(q.id)}"><div class="gs-anchor">${anchor}</div><span class="gs-eyebrow">${bi('解説', 'understand')}</span><h1 class="gs-title" tabindex="-1" data-ui-content="learning">${esc(q.title)}</h1>${targetLine(q)}<div class="gs-reading-controls">${textBtn(showReadings ? bi('読みを隠す', 'hide supporting readings') : bi('読みを表示', 'show supporting readings'), 'readings', `aria-pressed="${showReadings}"`)}<span>${t('語をひらくと、読みと意味が出る。', 'Open a word for its reading and meaning.')}</span></div>${q.passage ? `<div class="gs-passage" lang="ja">${teachingText(q.passage, q)}</div><p class="gs-question" lang="ja">${teachingText(q.options[q.correct], q)}</p>` : `<p class="gs-completed" lang="ja">${completeSentence(q)}</p>`}<p class="gs-meaning">${esc(x.meaning)}</p><div class="gs-teaching"><p>${teachingText(x.rule, q)}</p><p>${teachingText(x.contrast, q)}</p></div><div class="gs-example"><span class="gs-eyebrow">${bi('もう一文', 'in another sentence')}</span><p lang="ja">${teachingText(x.exampleJa, q)}</p><small>${esc(x.exampleEn)}</small></div>${q.branches.length ? `<span class="gs-eyebrow">${bi('言葉の扉', 'every word is a door')}</span><div class="gs-branch-links">${q.branches.map((key) => `<button type="button" data-action="branch" data-key="${esc(key)}" lang="ja" data-ui-content="learning">${esc(set.branches[key].title)} <span aria-hidden="true">↗</span></button>`).join('')}</div>` : ''}<div class="gs-actions">${primary}${a.choice !== null ? textBtn(bi('問題へ', 'back to the question'), 'question') : ''}${state.finished ? textBtn(bi('先生に聞く', 'ask Sensei'), 'sensei-current') : ''}</div></article>${aside(q)}</div>`;
   }
 
   function branchView() {
     const b = set.branches[branch];
-    return `${sessionTop()}<div class="gs-thread">${rail('insight')}<article class="gs-sheet gs-lacquer gs-branch"><div class="gs-branch-back">${textBtn(`← ${bi('文へ戻る', 'return to the sentence')}`, 'close-branch')}</div><span class="gs-eyebrow">${bi('言葉の扉', `a branch of question ${state.index + 1}`)}</span><h1 class="gs-title" tabindex="-1" lang="ja">${esc(b.title)}<span class="gs-branch-reading">${esc(b.reading)}</span></h1><p class="gs-meaning">${esc(b.meaning)}</p><p class="gs-teaching">${teachingText(b.body)}</p><div class="gs-example"><p lang="ja">${teachingText(b.exampleJa)}</p><small>${esc(b.exampleEn)}</small></div><p class="gs-side-note">${bi('答えも場所もそのままです。', 'your answer and place are unchanged')}</p></article>${aside(current())}</div>`;
+    return `${sessionTop()}<div class="gs-thread">${rail('insight')}<article class="gs-sheet gs-lacquer gs-branch"><div class="gs-branch-back">${textBtn(`← ${bi('文へ戻る', 'return to the sentence')}`, 'close-branch')}</div><span class="gs-eyebrow">${bi('言葉の扉', `a branch of question ${state.index + 1}`)}</span><h1 class="gs-title" tabindex="-1" lang="ja" data-ui-content="learning">${esc(b.title)}<span class="gs-branch-reading">${esc(b.reading)}</span></h1><p class="gs-meaning">${esc(b.meaning)}</p><p class="gs-teaching">${teachingText(b.body)}</p><div class="gs-example"><p lang="ja">${teachingText(b.exampleJa)}</p><small>${esc(b.exampleEn)}</small></div><p class="gs-side-note">${bi('答えも場所もそのままです。', 'your answer and place are unchanged')}</p></article>${aside(current())}</div>`;
   }
 
   function wordView() {
@@ -760,7 +760,7 @@ export function createGuidedSession(host) {
           'primary',
           status.state === 'held' || deckBusy ? 'disabled' : '',
         );
-    return `<section class="gs-narrow gs-word-room"><div class="gs-branch-back">${textBtn(`← ${bi('元の場所へ', 'back to where you were')}`, 'close-word')}</div><h1 class="gs-title" tabindex="-1" lang="ja">${esc(word.surface)}<span class="gs-branch-reading">${esc(word.reading)}</span></h1><p class="gs-meaning">${esc(word.meaning)}</p><p class="gs-side-note">${esc(word.source)} · ${t('辞書の意味。文脈は元の文にある。', 'Dictionary meaning. The original sentence provides its context.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-actions">${learn}${textBtn(bi('文へ戻る', 'return to the sentence'), 'close-word')}${textBtn(bi('辞書で開く', 'open the full entry'), 'entry')}</div>${taken ? `<p class="gs-deck-line">${deckLine(key, 'added', info)}</p>` : status.state === 'held' ? `<p class="gs-side-note" data-held>${esc(status.reason)}</p>` : ''}<p class="gs-side-note gs-spaced">${t(`出典: ${esc(q.source.label)}。「覚える」を押すと、実際の覚えるデッキに札が一枚加わる。答えの記録は変わらない。`, `From ${esc(q.source.label)}. Learning a word adds one card to your real 覚える deck. Your recorded answer is unchanged.`)}</p></section>`;
+    return `<section class="gs-narrow gs-word-room"><div class="gs-branch-back">${textBtn(`← ${bi('元の場所へ', 'back to where you were')}`, 'close-word')}</div><h1 class="gs-title" tabindex="-1" lang="ja" data-ui-content="learning">${esc(word.surface)}<span class="gs-branch-reading">${esc(word.reading)}</span></h1><p class="gs-meaning">${esc(word.meaning)}</p><p class="gs-side-note">${esc(word.source)} · ${t('辞書の意味。文脈は元の文にある。', 'Dictionary meaning. The original sentence provides its context.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-actions">${learn}${textBtn(bi('文へ戻る', 'return to the sentence'), 'close-word')}${textBtn(bi('辞書で開く', 'open the full entry'), 'entry')}</div>${taken ? `<p class="gs-deck-line">${deckLine(key, 'added', info)}</p>` : status.state === 'held' ? `<p class="gs-side-note" data-held>${esc(status.reason)}</p>` : ''}<p class="gs-side-note gs-spaced">${t(`出典: ${esc(q.source.label)}。「覚える」を押すと、実際の覚えるデッキに札が一枚加わる。答えの記録は変わらない。`, `From ${esc(q.source.label)}. Learning a word adds one card to your real review deck. Your recorded answer is unchanged.`)}</p></section>`;
   }
 
   function summary() {
@@ -789,7 +789,7 @@ export function createGuidedSession(host) {
     const order = [...GAP_ORDER, ...Object.keys(counts).filter((gap) => !GAP_ORDER.includes(gap))];
     return `<p class="gs-gap-line">${order
       .filter((gap) => counts[gap])
-      .map((gap) => `<span><b lang="ja">${esc(gap)}</b> ${counts[gap]}</span>`)
+      .map((gap) => `<span><b>${esc(t(gap,Q.find(q=>q.gap.ja===gap).gap.en))}</b> ${counts[gap]}</span>`)
       .join(
         '<i>·</i>',
       )}${english() ? '<small class="gs-gloss">where the misses were</small>' : ''}</p>`;
@@ -837,7 +837,7 @@ export function createGuidedSession(host) {
                 return `<span class="gs-card-line">${deckLine(card.key, card.status, info)}${retry}</span>`;
               })
               .join('')
-          : `<span class="gs-card-line"><span class="gs-card" data-deck="none">${t('この型の札は、まだ Bunki にない。行が元の問題を覚えている。', 'Bunki has no card for this pattern yet. The row keeps your question.')}</span></span>`;
+          : `<span class="gs-card-line"><span class="gs-card" data-deck="none">${t('この型の札は、まだ回廊にない。行が元の問題を覚えている。', 'KAIRO has no card for this pattern yet. The row keeps your question.')}</span></span>`;
         const practise = !row.removed
           ? textBtn(
               row.reviewed ? bi('もう一度', 'revisit practice') : bi('練習', 'practise'),
@@ -852,7 +852,7 @@ export function createGuidedSession(host) {
               `data-id="${esc(q.id)}" ${deckBusy || enrolling ? 'disabled' : ''}`,
             )
           : '';
-        return `<div class="gs-row ${cls}" data-learn-row="${esc(q.id)}"><span class="gs-row-number">${i + 1}</span><div><h3><span lang="ja">${esc(q.target.label)}</span> <span class="gs-gap-tag"><b lang="ja">${esc(q.gap.ja)}</b>${english() ? `<small class="gs-gloss">${esc(q.gap.en)}</small>` : ''}</span></h3><p>${status}</p><p class="gs-cards">${cards}</p>${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${i}"`)}</div><div class="gs-row-actions">${practise}${undo}</div></div>`;
+        return `<div class="gs-row ${cls}" data-learn-row="${esc(q.id)}"><span class="gs-row-number">${i + 1}</span><div><h3><span lang="ja" data-ui-content="learning">${esc(q.target.label)}</span> <span class="gs-gap-tag"><b>${esc(t(q.gap.ja,q.gap.en))}</b></span></h3><p>${status}</p><p class="gs-cards">${cards}</p>${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${i}"`)}</div><div class="gs-row-actions">${practise}${undo}</div></div>`;
       })
       .join('');
   }
@@ -875,7 +875,7 @@ export function createGuidedSession(host) {
         if (!word) return '';
         const key = keyOf(wordNode(row.wordId));
         const index = Q.findIndex((q) => q.id === row.sourceId);
-        return `<div class="gs-row" data-saved-word="${esc(row.wordId)}"><span class="gs-row-number">覚</span><div><h3><button type="button" class="gs-text" lang="ja" data-action="word" data-word="${esc(row.wordId)}" data-source="${esc(row.sourceId)}">${esc(word.surface)}<span class="gs-reading">（${esc(word.reading)}）</span></button></h3><p>${esc(word.meaning)}</p><p class="gs-cards"><span class="gs-card-line">${deckLine(key, row.status, infos.get(key))}</span></p>${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${index}"`)}</div><div class="gs-row-actions">${textBtn(bi('外す', 'remove'), 'remove-word', `data-word="${esc(row.wordId)}" ${deckBusy ? 'disabled' : ''}`)}</div></div>`;
+        return `<div class="gs-row" data-saved-word="${esc(row.wordId)}"><span class="gs-row-number">${t('覚','Learn')}</span><div><h3><button type="button" class="gs-text" lang="ja" data-ui-content="learning" data-action="word" data-word="${esc(row.wordId)}" data-source="${esc(row.sourceId)}">${esc(word.surface)}<span class="gs-reading">（${esc(word.reading)}）</span></button></h3><p>${esc(word.meaning)}</p><p class="gs-cards"><span class="gs-card-line">${deckLine(key, row.status, infos.get(key))}</span></p>${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${index}"`)}</div><div class="gs-row-actions">${textBtn(bi('外す', 'remove'), 'remove-word', `data-word="${esc(row.wordId)}" ${deckBusy ? 'disabled' : ''}`)}</div></div>`;
       })
       .join('')}</div>`;
   }
@@ -884,11 +884,11 @@ export function createGuidedSession(host) {
     const infos = cardInfo(sessionKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
     const ready = [...infos.values()].filter((info) => info?.ready).length;
-    return `<div class="gs-deck-summary gs-spaced"><p>${t(`この稽古の札: デッキに${inDeck}枚 · いま復習できる${ready}枚`, `This session’s cards: ${inDeck} in your deck · ${ready} ready to review now`)}</p><div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, 'review these now'), 'review', 'primary', 'data-scope="session"') : ''}${btn(bi('覚えるデッキを開く', 'open your 覚える deck'), 'deck', ready ? 'quiet' : '')}</div></div>`;
+    return `<div class="gs-deck-summary gs-spaced"><p>${t(`この稽古の札: デッキに${inDeck}枚 · いま復習できる${ready}枚`, `This session’s cards: ${inDeck} in your deck · ${ready} ready to review now`)}</p><div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, `review these now · ${ready}`), 'review', 'primary', 'data-scope="session"') : ''}${btn(bi('覚えるデッキを開く', 'open your review deck'), 'deck', ready ? 'quiet' : '')}</div></div>`;
   }
 
   function learn() {
-    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('覚', 'learn')} <span class="gs-dot">/</span> ${bi('覚える', 'oboeru')}</span><h1 class="gs-title" tabindex="-1">${bi('もう一度、会いに行く。', 'worth another visit')}</h1><p class="gs-lede">${t('間違えた問題と旗を立てた問題は、最初に出会った場所とつながったまま。', 'Missed questions and the ones you flagged stay connected to where you first met them.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-spaced"><h2 class="gs-sr-only">${t('見直す問題', 'Questions to revisit')}</h2>${followups()}</div>${savedWordsView()}${deckSummary()}<p class="gs-side-note gs-spaced">${t('ここで加えた札は、ほかの札と同じ覚えるデッキに入る。行を外すと、この稽古で加え、まだ復習していない札だけが抜ける。', 'Cards added here join your 覚える deck with every other card. Removing a row takes out only a card this session added and you have not reviewed yet.')}</p><div class="gs-actions">${btn(bi('場へ戻る', 'back to your field'), 'field', 'primary')}${!state.finished ? textBtn(state.started ? bi('続きへ', 'continue session') : bi('はじめる', 'begin session'), state.started ? 'resume' : 'setup') : textBtn(bi('結果へ', 'session results'), 'results')}</div></section>`;
+    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('覚', 'learn')} <span class="gs-dot">/</span> ${bi('覚える', 'oboeru')}</span><h1 class="gs-title" tabindex="-1">${bi('もう一度、会いに行く。', 'worth another visit')}</h1><p class="gs-lede">${t('間違えた問題と旗を立てた問題は、最初に出会った場所とつながったまま。', 'Missed questions and the ones you flagged stay connected to where you first met them.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-spaced"><h2 class="gs-sr-only">${t('見直す問題', 'Questions to revisit')}</h2>${followups()}</div>${savedWordsView()}${deckSummary()}<p class="gs-side-note gs-spaced">${t('ここで加えた札は、ほかの札と同じ覚えるデッキに入る。行を外すと、この稽古で加え、まだ復習していない札だけが抜ける。', 'Cards added here join your review deck with every other card. Removing a row takes out only a card this session added and you have not reviewed yet.')}</p><div class="gs-actions">${btn(bi('場へ戻る', 'back to your field'), 'field', 'primary')}${!state.finished ? textBtn(state.started ? bi('続きへ', 'continue session') : bi('はじめる', 'begin session'), state.started ? 'resume' : 'setup') : textBtn(bi('結果へ', 'session results'), 'results')}</div></section>`;
   }
 
   function freshView() {
@@ -921,7 +921,7 @@ export function createGuidedSession(host) {
     const infos = cardInfo(fieldKeys());
     const inDeck = [...infos.values()].filter((info) => info?.taken).length;
     const ready = [...infos.values()].filter((info) => info?.ready).length;
-    return `<section class="gs-field-layout"><div><span class="gs-eyebrow">${bi('あなたの場', 'your return field')}</span><h1 class="gs-title" tabindex="-1">${t('見慣れたもの。<br>少し深く。', 'Familiar things.<br>A little more depth.')}</h1><p class="gs-lede">${state.started ? t('どの点にも一つの出会いがある。点をひらくと、答えがついたままの元の問題に戻る。', 'Each point holds an encounter. Open one to return to the exact question, with your answer still attached.') : t('場は練習するほど形になる。稽古を始めて、最初の跡を残そう。', 'Your field takes shape as you practise. Begin a session to leave your first traces.')}</p><div class="gs-legend"><span>${t('出会った', 'Encountered')}</span><span>${t('覚・デッキ', 'In Learn · your deck')}</span><span>${t('いま復習できる', 'Ready to review')}</span><span>${t('もう一度練習', 'Practised again')}</span></div>${state.draft ? `<div class="gs-personal-line" lang="ja">${esc(state.draft)}</div><p class="gs-side-note">${t('自分の言葉 · 採点なし', 'Your own words · ungraded')}</p>` : ''}<div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, 'review what is ready'), 'review', 'primary', 'data-scope="field"') : ''}${btn(state.started ? bi('覚を開く', 'open Learn') : bi('はじめる', 'begin a guided session'), state.started ? 'learn' : 'setup', ready ? 'quiet' : 'primary')}${textBtn(bi('戻る', 'home'), state.finished ? 'return-home' : 'home')}</div><p class="gs-side-note gs-spaced">${t('これはこの稽古の跡で、習熟の地図ではない。', 'These are traces of this session, not a map of mastery.')}</p></div><div>${fieldMap(infos)}<div class="gs-field-caption"><strong>${t(`${answered()}問に出会った`, `${answered()} questions encountered`)}</strong><span>${t(`デッキに${inDeck}枚 · もう一度練習${state.reviewed.length}`, `${inDeck} in your deck · ${state.reviewed.length} practised again`)}</span></div></div></section>`;
+    return `<section class="gs-field-layout"><div><span class="gs-eyebrow">${bi('あなたの場', 'your return field')}</span><h1 class="gs-title" tabindex="-1">${t('見慣れたもの。<br>少し深く。', 'Familiar things.<br>A little more depth.')}</h1><p class="gs-lede">${state.started ? t('どの点にも一つの出会いがある。点をひらくと、答えがついたままの元の問題に戻る。', 'Each point holds an encounter. Open one to return to the exact question, with your answer still attached.') : t('場は練習するほど形になる。稽古を始めて、最初の跡を残そう。', 'Your field takes shape as you practise. Begin a session to leave your first traces.')}</p><div class="gs-legend"><span>${t('出会った', 'Encountered')}</span><span>${t('覚・デッキ', 'In Learn · your deck')}</span><span>${t('いま復習できる', 'Ready to review')}</span><span>${t('もう一度練習', 'Practised again')}</span></div>${state.draft ? `<div class="gs-personal-line" lang="ja">${esc(state.draft)}</div><p class="gs-side-note">${t('自分の言葉 · 採点なし', 'Your own words · ungraded')}</p>` : ''}<div class="gs-actions">${ready ? btn(bi(`復習する · ${ready}`, `review what is ready · ${ready}`), 'review', 'primary', 'data-scope="field"') : ''}${btn(state.started ? bi('覚を開く', 'open Learn') : bi('はじめる', 'begin a guided session'), state.started ? 'learn' : 'setup', ready ? 'quiet' : 'primary')}${textBtn(bi('戻る', 'home'), state.finished ? 'return-home' : 'home')}</div><p class="gs-side-note gs-spaced">${t('これはこの稽古の跡で、習熟の地図ではない。', 'These are traces of this session, not a map of mastery.')}</p></div><div>${fieldMap(infos)}<div class="gs-field-caption"><strong>${t(`${answered()}問に出会った`, `${answered()} questions encountered`)}</strong><span>${t(`デッキに${inDeck}枚 · もう一度練習${state.reviewed.length}`, `${inDeck} in your deck · ${state.reviewed.length} practised again`)}</span></div></div></section>`;
   }
 
   function senseiText() {
@@ -932,19 +932,19 @@ export function createGuidedSession(host) {
   function sensei() {
     const q = target();
     const a = answer(q);
-    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('先生', 'sensei')} <span class="gs-dot">/</span> ${bi('用意した質問', 'a prepared conversation')}</span><h1 class="gs-title" tabindex="-1">${t('問題が残した場所から、<br>始める。', 'Begin where<br>the question left you.')}</h1><p class="gs-lede">${t('文と、自分の答えと、もう調べたことを持っていこう。自分の場所を一から説明し直さなくていい。', 'Bring the sentence, your answer, and what you have already explored. You should not have to explain your place all over again.')}</p><div class="gs-sensei-context"><p class="gs-question" lang="ja">${esc(q.prompt.split('\n').slice(-1)[0])}</p><dl><dt>${t('最初の答え', 'Your first answer')}</dt><dd>${a.choice === null ? t('未回答', 'Not answered') : esc(q.options[a.choice])}</dd><dt>${t('解説', 'Explanation')}</dt><dd>${a.explained ? (a.helpBefore ? t('答える前にひらいた', 'Opened before answering') : t('答えたあとにひらいた', 'Opened after answering')) : t('ひらいていない', 'Not opened')}</dd><dt>${t('出典', 'Source')}</dt><dd>${esc(q.source.label)}</dd></dl></div><label for="guided-sensei-prompt" class="gs-draft-label">${bi('用意した質問', 'prepared question · ready to copy')}</label><textarea id="guided-sensei-prompt" class="gs-draft" readonly>${esc(senseiText())}</textarea><div class="gs-actions">${btn(bi('質問と文脈をコピー', 'copy question and context'), 'copy', 'primary')}${host.openTutor ? textBtn(bi('先生の部屋へ', 'open the tutor room'), 'tutor') : ''}${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${Q.indexOf(q)}"`)}</div><p class="gs-copy-message" id="guided-copy-message" role="status"></p><p class="gs-side-note">${t('コピーしても会話は始まらない。先生の部屋で、送るかどうかを自分で決める。', 'Copying starts no conversation. In the tutor room you decide whether to send it.')}</p>${textBtn(bi('場へ戻る', 'back to your field'), 'field')}</section>`;
+    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('先生', 'sensei')} <span class="gs-dot">/</span> ${bi('用意した質問', 'a prepared conversation')}</span><h1 class="gs-title" tabindex="-1">${t('問題が残した場所から、<br>始める。', 'Begin where<br>the question left you.')}</h1><p class="gs-lede">${t('文と、自分の答えと、もう調べたことを持っていこう。自分の場所を一から説明し直さなくていい。', 'Bring the sentence, your answer, and what you have already explored. You should not have to explain your place all over again.')}</p><div class="gs-sensei-context"><p class="gs-question" lang="ja">${esc(q.prompt.split('\n').slice(-1)[0])}</p><dl><dt>${t('最初の答え', 'Your first answer')}</dt><dd ${a.choice !== null ? 'data-ui-content="learning" lang="ja"' : ''}>${a.choice === null ? t('未回答', 'Not answered') : esc(q.options[a.choice])}</dd><dt>${t('解説', 'Explanation')}</dt><dd>${a.explained ? (a.helpBefore ? t('答える前にひらいた', 'Opened before answering') : t('答えたあとにひらいた', 'Opened after answering')) : t('ひらいていない', 'Not opened')}</dd><dt>${t('出典', 'Source')}</dt><dd>${esc(q.source.label)}</dd></dl></div><label for="guided-sensei-prompt" class="gs-draft-label">${bi('用意した質問', 'prepared question · ready to copy')}</label><textarea id="guided-sensei-prompt" class="gs-draft" readonly>${esc(senseiText())}</textarea><div class="gs-actions">${btn(bi('質問と文脈をコピー', 'copy question and context'), 'copy', 'primary')}${host.openTutor ? textBtn(bi('先生の部屋へ', 'open the tutor room'), 'tutor') : ''}${textBtn(bi('元の問題へ', 'open original question'), 'source', `data-index="${Q.indexOf(q)}"`)}</div><p class="gs-copy-message" id="guided-copy-message" role="status"></p><p class="gs-side-note">${t('コピーしても会話は始まらない。先生の部屋で、送るかどうかを自分で決める。', 'Copying starts no conversation. In the tutor room you decide whether to send it.')}</p>${textBtn(bi('場へ戻る', 'back to your field'), 'field')}</section>`;
   }
 
   function about() {
     const source = set.source;
-    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('出典', 'about these questions')}</span><h1 class="gs-title" tabindex="-1">${t('生きた糸。<br>戻ってくる場所。', 'A living thread.<br>A place to return.')}</h1><p class="gs-lede">${esc(t(set.title.ja, set.title.en))}</p><p>${esc(t(set.sourceNote.ja, set.sourceNote.en))}</p><p>${t('答え、解説の使い方、下書きはこの端末に残る。「覚」と覚えるは実際のデッキに書き込む。復習の部屋と同じ札になる。場が示すのは出会いで、習熟ではない。', 'Answers, explanation use and your draft stay on this device. Learn and 覚える write to your real deck: the same cards the review room uses. The return field shows encounters, not mastery.')}</p><p>${t('元の問題には AI 審査の記録がある。新しい文の問題と英語の解説は下書きで、編集の確認を待っている。JLPT の公式問題、模試一回分、聴解の評価ではない。', 'Original items have AI review evidence. Fresh questions and English teaching text are authored drafts, pending editorial review. This is not an official JLPT paper, a full mock or a listening assessment.')}</p><details class="gs-details"><summary>${bi('出典の記録', 'source receipt')}</summary><p>${esc(source.formId)} · ${esc(source.status)}</p><p class="gs-source-id">${esc(source.formRevisionId || '')}</p><p>${esc(set.dictionary.name || '')} · ${esc(set.dictionary.license)} · ${esc(set.dictionary.attribution)}</p><p>${esc(set.teaching.note || '')}</p></details>${setAside ? `<p class="gs-notice">${t('以前の稽古の記録を読めなかったため、別に保管した。', 'An earlier session on this device could not be read, so it was kept aside, untouched.')}</p>` : ''}<div class="gs-actions">${btn(bi('戻る', 'return home'), 'home', 'primary')}${confirmingReset ? `${btn(bi('消す', 'clear it'), 'reset-confirm', 'quiet')}${textBtn(bi('やめる', 'keep it'), 'reset-cancel')}` : textBtn(bi('この端末の記録を消す', 'reset this session on this device'), 'reset')}</div>${confirmingReset ? `<p class="gs-notice" role="status">${t('この稽古の答え、覚の行、下書きをこの端末から消す。デッキの札はそのまま残る。', 'This clears this session’s answers, Learn rows and draft on this device. Cards in your deck stay.')}</p>` : ''}</section>`;
+    return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('出典', 'about these questions')}</span><h1 class="gs-title" tabindex="-1">${t('生きた糸。<br>戻ってくる場所。', 'A living thread.<br>A place to return.')}</h1><p class="gs-lede">${esc(t(set.title.ja, set.title.en))}</p><p>${esc(t(set.sourceNote.ja, set.sourceNote.en))}</p><p>${t('答え、解説の使い方、下書きはこの端末に残る。「覚」と覚えるは実際のデッキに書き込む。復習の部屋と同じ札になる。場が示すのは出会いで、習熟ではない。', 'Answers, explanation use and your draft stay on this device. Learn and Memorize write to your real deck: the same cards the review room uses. The return field shows encounters, not mastery.')}</p><p>${t('元の問題には AI 審査の記録がある。新しい文の問題と英語の解説は下書きで、編集の確認を待っている。JLPT の公式問題、模試一回分、聴解の評価ではない。', 'Original items have AI review evidence. Fresh questions and English teaching text are authored drafts, pending editorial review. This is not an official JLPT paper, a full mock or a listening assessment.')}</p><details class="gs-details"><summary>${bi('出典の記録', 'source receipt')}</summary><p>${esc(source.formId)} · ${esc(source.status)}</p><p class="gs-source-id">${esc(source.formRevisionId || '')}</p><p>${esc(set.dictionary.name || '')} · ${esc(set.dictionary.license)} · ${esc(set.dictionary.attribution)}</p><p>${esc(set.teaching.note || '')}</p></details>${setAside ? `<p class="gs-notice">${t('以前の稽古の記録を読めなかったため、別に保管した。', 'An earlier session on this device could not be read, so it was kept aside, untouched.')}</p>` : ''}<div class="gs-actions">${btn(bi('戻る', 'return home'), 'home', 'primary')}${confirmingReset ? `${btn(bi('消す', 'clear it'), 'reset-confirm', 'quiet')}${textBtn(bi('やめる', 'keep it'), 'reset-cancel')}` : textBtn(bi('この端末の記録を消す', 'reset this session on this device'), 'reset')}</div>${confirmingReset ? `<p class="gs-notice" role="status">${t('この稽古の答え、覚の行、下書きをこの端末から消す。デッキの札はそのまま残る。', 'This clears this session’s answers, Learn rows and draft on this device. Cards in your deck stay.')}</p>` : ''}</section>`;
   }
 
   function momentControls() {
     if (!moments) return '';
     const reduced = moments.reducedMotion();
     const on = moments.enabled();
-    return `<div class="gs-moments"><span class="gs-footer-label">${bi('動き', 'moments')}</span>${textBtn(on ? bi('あり', 'on') : bi('なし', 'off'), 'moments-toggle', `aria-pressed="${on}" aria-label="${esc(on ? t('動き: あり', 'Moments: on') : t('動き: なし', 'Moments: off'))}"`)}<label class="gs-effect">${bi('型', 'style')} <select data-moment-mode aria-label="${esc(t('動きの型', 'Moment style'))}">${moments.modes.map((mode) => `<option value="${mode}" ${moments.mode() === mode ? 'selected' : ''}>${esc(t(MODE_LABELS[mode][0], `${MODE_LABELS[mode][0]} · ${MODE_LABELS[mode][1]}`))}</option>`).join('')}</select></label><label class="gs-effect"><input type="checkbox" data-moment-sound ${moments.soundEnabled() ? 'checked' : ''}> ${bi('音', 'sound')}</label>${reduced ? `<small class="gs-footer-note">${t('端末の設定で、自動の動きは止めている', 'Automatic motion paused by your device preference')}</small>` : ''}<span class="gs-footer-demos">${textBtn(bi('侍を見る', 'watch the samurai'), 'samurai-demo')}${textBtn(bi('再戦を見る', 'watch the rematch'), 'samurai-rematch-demo')}</span></div>`;
+    return `<div class="gs-moments"><span class="gs-footer-label">${bi('動き', 'moments')}</span>${textBtn(on ? bi('あり', 'on') : bi('なし', 'off'), 'moments-toggle', `aria-pressed="${on}" aria-label="${esc(on ? t('動き: あり', 'Moments: on') : t('動き: なし', 'Moments: off'))}"`)}<label class="gs-effect">${bi('型', 'style')} <select data-moment-mode aria-label="${esc(t('動きの型', 'Moment style'))}">${moments.modes.map((mode) => `<option value="${mode}" ${moments.mode() === mode ? 'selected' : ''}>${esc(t(...MODE_LABELS[mode]))}</option>`).join('')}</select></label><label class="gs-effect"><input type="checkbox" data-moment-sound ${moments.soundEnabled() ? 'checked' : ''}> ${bi('音', 'sound')}</label>${reduced ? `<small class="gs-footer-note">${t('端末の設定で、自動の動きは止めている', 'Automatic motion paused by your device preference')}</small>` : ''}<span class="gs-footer-demos">${textBtn(bi('侍を見る', 'watch the samurai'), 'samurai-demo')}${textBtn(bi('再戦を見る', 'watch the rematch'), 'samurai-rematch-demo')}</span></div>`;
   }
   function footer() {
     return `<footer class="gs-footer">${momentControls()}<div class="gs-session-controls">${textBtn(bi('最初から', 'start again'), 'restart')}${previousSession ? textBtn(bi('前の回に戻す', 'restore previous session'), 'restore-session') : ''}<span id="guided-save-status" class="gs-save-status ${saveError ? 'gs-error' : ''}">${saveText()}</span></div></footer>`;

@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "崩れる",
+   "reading": "くずれる",
+   "pos": "verb",
+   "meaning": "to crumble, to collapse",
+   "defJa": "形が保てず、くずれ落ちる。",
+   "passage": {
+    "ja": "仏教では、「諸行無常」と言って、形あるものは必ず崩れると教えます。立派な建物も、長年かけて築いた地位も、そして自分の体さえも、この定めを免れることはできません。ところが私たちは、変わらないものを前提に暮らしているばかりに、壊れた瞬間に大きな苦しみを味わうんです。無常を頭で理解するにとどまらず、日々の暮らしの中で実感することが、心の強さにつながるとされています。",
+    "form": "崩れる",
+    "en": "Buddhism teaches, in the phrase \"all things are impermanent,\" that whatever has form will surely crumble. Splendid buildings, status built over many years, and even our own bodies cannot escape this law. Yet precisely because we live on the premise of things that do not change, we taste great suffering the moment they break. Going beyond merely understanding impermanence in the head, feeling it in daily life is said to lead to strength of mind.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「バランスが崩れる」「山が崩れる」。形やまとまりが保てなくなる意味で、物にも体制にも使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "外れる",
+   "reading": "はずれる",
+   "pos": "verb",
+   "meaning": "to deviate, to be off",
+   "defJa": "決まった位置や予想からずれる。",
+   "passage": {
+    "ja": "十九世紀前半の天文学者たちは、天王星の軌道が計算から外れることに頭を悩ませていた。未知の惑星の引力が働いているのではないかという推測から、海王星の位置が予測され、一八四六年に実際にほぼその方角で発見された。観測の誤差を疑うのが普通だった時代に、観測よりも理論のほうを信じて、大胆に仮説を立てたのである。予想と現実がずれるときこそ、新しい発見の入り口にほかならない。",
+    "form": "外れる",
+    "en": "Astronomers in the first half of the nineteenth century were troubled by the fact that the orbit of Uranus deviated from calculation. From the conjecture that the gravity of an unknown planet might be at work, the position of Neptune was predicted, and it was indeed found in 1846 in nearly that direction. In an age when doubting the observational error was the norm, they believed the theory over the observations and boldly set up a hypothesis. When expectation and reality part ways, that is none other than the doorway to a new discovery.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「予想が外れる」「軌道から外れる」。基準や的からずれることを表す自動詞。",
+    "sense": "ずれる、はずれる"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "姿勢",
+   "reading": "しせい",
+   "pos": "noun",
+   "meaning": "stance, attitude",
+   "defJa": "物事に向かう時の構えや態度。",
+   "passage": {
+    "ja": "インド政府は、伝統医学アーユルヴェーダの国際的な普及を、外交の場でも後押しする姿勢を鮮明にしている。国内の医療を補う役割に加えて、観光や健康食品も含めた輸出産業としての成長も期待されているためだ。一方、科学者の間では、有効性を示す根拠がまだ十分とはいえず、安全性の審査を求める声も根強い。伝統の尊重と科学的な検証をめぐる議論は、国境を越えて、今後も続きそうだ。",
+    "form": "姿勢",
+    "en": "The Indian government has made clear its stance of backing the international spread of the traditional medicine Ayurveda, including in diplomatic settings. This is because, in addition to its role in supplementing domestic healthcare, growth as an export industry, including tourism and health foods, is also anticipated. Meanwhile, among scientists the evidence of efficacy is not yet sufficient, and calls for safety review are persistent. The debate over respecting tradition versus scientific verification looks set to continue across borders.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「前向きな姿勢」「姿勢を示す」。体の構えだけでなく、物事への態度も表す。",
+    "sense": "態度、構え"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "延長",
+   "reading": "えんちょう",
+   "pos": "noun",
+   "meaning": "extension, prolongation",
+   "defJa": "長さや期間をのばすこと。",
+   "passage": {
+    "ja": "データセンターが相次いで建設され、電力需要が急増するなか、米国では石炭火力発電所の運転期間を延長する動きが出ている。本来は脱炭素に向けて閉鎖される予定だった設備が、需要の高まりを背景に延命を余儀なくされているのである。電力の確保を優先すれば温暖化対策は後退しかねず、両立という難題への対処は容易ではない。かといって、供給が不足すれば、産業全体の成長が止まる恐れもある。",
+    "form": "延長",
+    "en": "As data centers are built one after another and electricity demand surges, moves to extend the operating period of coal-fired power plants are emerging in the United States. Facilities originally due to close for decarbonization are being forced to prolong their lives against rising demand. Prioritizing power supply could set back climate measures, and coping with the difficult task of reconciling the two is no easy matter. Yet if supply falls short, there is a risk the growth of whole industries will stall.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「期間を延長する」「延長戦」。時間や距離をそのままのばす時に使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "夫妻",
+   "reading": "ふさい",
+   "pos": "noun",
+   "meaning": "married couple",
+   "defJa": "夫と妻。ふうふ。",
+   "passage": {
+    "ja": "マリ・キュリーとピエールのキュリー夫妻は、粗末な実験小屋で、二人で放射能の研究に没頭し、新しい元素を相次いで発見した。名声や名誉を求めたからではなく、目の前の不思議を解き明かさずにはいられなかったからであろう。ところが、その熱意は、のちに彼女自身の健康を蝕むことになる。当時は放射線の危険がほとんど知られていなかったという事実は、科学の進歩が常に代償を伴うことを物語っている。",
+    "form": "夫妻",
+    "en": "The Curies, Marie and Pierre, in a shabby lab shed, threw themselves together into research on radioactivity and discovered new elements one after another. It was surely not because they sought fame or honor but because they could not help but unravel the mystery before their eyes. Yet that passion would later eat away at her own health. The fact that the dangers of radiation were hardly known at the time speaks to how scientific progress always comes with a price.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「〜夫妻」の形で名字の後につき、夫婦を敬って並べて呼ぶ。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

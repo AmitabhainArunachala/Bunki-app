@@ -86,6 +86,18 @@ describe('sw.js shell', () => {
     }
   });
 
+  it('precaches the six room stylesheets, registered once after editorial.css', () => {
+    const rooms = ['today', 'read', 'learn', 'words', 'me', 'cards'].map(
+      (room) => `rooms/${room}.css`,
+    );
+    const shell = shellPaths(SW);
+    expect(shell).toEqual(expect.arrayContaining(rooms));
+    expect(shell.indexOf('rooms/today.css')).toBe(shell.indexOf('editorial.css') + 1);
+    for (const room of rooms) expect(CORRIDOR_REQUIRED_ROOTS).toContain(room);
+    const html = readFileSync(resolve(CORRIDOR, 'index.html'), 'utf8');
+    for (const room of rooms) expect(html.split(`href="${room}"`).length - 1).toBe(1);
+  });
+
   it('lists only files that exist under prototypes/corridor/', () => {
     const missing = shell.filter((path) => path !== '.' && !existsSync(resolve(CORRIDOR, path)));
     expect(missing).toEqual([]);
@@ -129,5 +141,15 @@ describe('sw.js shell', () => {
     for (const path of shell) expect(record.added, path).toContain(new URL(path, SCOPE).href);
     await run('activate');
     expect(record.deleted).toEqual([older]);
+  });
+
+  it('installs the N2, N1 and specialist decks, leaving tokens for first use (A52)', async () => {
+    const { run, record } = loadWorker([]);
+    await run('install');
+    for (const id of ['n2', 'n1', 'senmon']) {
+      expect(record.added).toContain(new URL(`decks/${id}/deck.json`, SCOPE).href);
+      expect(record.added).not.toContain(new URL(`decks/${id}/tokens.json`, SCOPE).href);
+    }
+    expect(record.added).not.toContain(new URL('decks/n2n1-sample/deck.json', SCOPE).href);
   });
 });

@@ -4,6 +4,7 @@
  * the configured fake HTTPS endpoint is fulfilled and every other external
  * request is aborted. These checks do not establish live teaching acceptance.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -752,7 +753,7 @@ try {
     assert.deepEqual(memorized.record.taken[0].ctx, { p: context.sourceId, i: 9, scope: 'sent' });
     assert.deepEqual(memorized.record.teacherContexts, saved.record.teacherContexts);
     assert.deepEqual(memorized.record.revlog, [], 'Memorization alone creates no grade');
-    await page.locator('#sheet-close').click();
+    await page.locator(await entryCloseSelector(page)).click();
     await page.locator('#sheet').waitFor({ state: 'detached' });
     await page.locator('#tray').click();
     await page.locator('#review-start:not([disabled])').click();
@@ -1205,7 +1206,7 @@ try {
         'App-authored dictionary prompts are not learner evidence',
       );
       await screenshot(fixture, 'separate-word-tutor-answer', '#sheet');
-      await page.locator('#sheet-close').click();
+      await page.locator(await entryCloseSelector(page)).click();
       await selected(page, context);
       assert.equal(
         await page.locator('#chat-input').inputValue(),

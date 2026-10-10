@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "席巻",
+   "reading": "せっけん",
+   "pos": "noun",
+   "meaning": "sweeping dominance",
+   "defJa": "圧倒的な勢いである範囲を広く占めること",
+   "passage": {
+    "ja": "新しい計算装置が市場を席巻したと報じる場合、まず対象とする市場の範囲を確かめたい。一部の研究機関で採用が増えたことと、一般企業まで広く置き換えが進んだことでは、普及の規模が異なる。出荷台数の増加が目立つとしても、金額や用途別の割合まで同じ傾向になるとは限らず、比較する期間にも結果は左右される。勢いのある見出しを支える資料には、どの分野で、何を尺度として、どれほどの位置を占めたのかという情報が伴っているかが問われる。",
+    "form": "席巻",
+    "en": "When reports say a new computing device has swept the market, first establish the market’s scope. Increased adoption at some research institutions differs in scale from widespread replacement at ordinary businesses. Prominent growth in shipment counts does not necessarily imply the same trend in value or usage shares, and comparison periods also affect the result. Evidence supporting a forceful headline should identify the sector, measurement, and extent of the device’s position.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "広い範囲を圧倒する勢いを示す強い語で、単なる増加とは違う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "寸断",
+   "reading": "すんだん",
+   "pos": "noun",
+   "meaning": "severing or disruption",
+   "defJa": "つながっていた経路が途中で切れること",
+   "passage": {
+    "ja": "半導体の物流が寸断される場合を考えると、工場が無事であることと製品が届くことは別だと分かる。生産拠点から出荷先までには、港、道路、倉庫など複数の経路や施設があり、その一部が使えなくなるだけでも配送に影響する。代わりの経路が地図上に存在しても、必要な量を同じ速さで運べるとは限らず、在庫の置かれ方にも制約を受ける。供給の強さを論じるなら、拠点の数だけを数えるのではなく、途切れた経路を何で補い、どの程度の遅れを受け入れるのかまで検討したい。",
+    "form": "寸断",
+    "en": "A disruption to semiconductor logistics illustrates the difference between an intact factory and delivered products. Ports, roads, warehouses, and multiple routes connect production sites to destinations, and losing access to even some can affect delivery. An alternative route on a map may not carry the required volume at the same speed, while inventory locations impose further constraints. Discussing supply resilience calls for examining how a broken route would be replaced and what delay is tolerable, beyond counting sites.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "交通や通信などの経路が切れることを表し、単なる減少と区別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,100 @@
+{
+ "batch": "r5-india-review-001",
+ "items": [
+  {
+   "term": "光明真言",
+   "reading": "こうみょうしんごん",
+   "gloss": "the Mantra of Light",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜からには"
+  },
+  {
+   "term": "梵我一如",
+   "reading": "ぼんがいちにょ",
+   "gloss": "identity of Brahman and ātman",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜に応じて"
+  },
+  {
+   "term": "自力",
+   "reading": "じりき",
+   "gloss": "self-power; one's own efforts",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜ものの",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "解脱",
+   "reading": "げだつ",
+   "gloss": "liberation (mokṣa), release from rebirth",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜にかかわらず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "reviewOf": {
+  "自力": {
+   "batch": "r5-india-001",
+   "reason": "Overbroad all-Buddhism binary and exclusive own-effort generalization; explain term specifically in contrast in Pure Land discourse.",
+   "source": "cards/senmon-p1-r5-india-001.json"
+  },
+  "光明真言": {
+   "batch": "r5-india-003",
+   "reason": "Specific first-person Koyasan ritual scene and links to water/万灯会 not verified; remove invented event and discuss securely attributed doctrine.",
+   "source": "cards/senmon-p1-r5-india-003.json"
+  },
+  "梵我一如": {
+   "batch": "r5-india-003",
+   "reason": "Unsupported generalized 二段階の実践 and instructional sequence; replace with clear attributed Advaita doctrine without invented curriculum.",
+   "source": "cards/senmon-p1-r5-india-003.json"
+  },
+  "解脱": {
+   "batch": "r5-india-004",
+   "reason": "執着を尽くして抜け出す is semantically awkward; use 執着から離れる and clarify doctrinal sense.",
+   "source": "cards/senmon-p1-r5-india-004.json"
+  }
+ }
+}

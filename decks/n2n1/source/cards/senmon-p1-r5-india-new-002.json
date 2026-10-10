@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "五大誓戒",
+   "reading": "ごだいせいかい",
+   "pos": "noun",
+   "meaning": "five great Jain ascetic vows",
+   "defJa": "ジャイナの出家者が守る五つの厳格な誓い",
+   "passage": {
+    "ja": "同じ「盗まない」という教えでも、生活の全体を捧げる修行者と、仕事や家庭を持つ人とでは、守り方の厳しさが違います。ジャイナ教の五大誓戒は、不殺生、真実を語ること、不盗、性的行為を離れること、無所有という、出家者の基本的な誓いをまとめた呼び名です。在家の信者にも対応する誓いがありますが、日々の責任に応じて実践の形は異なります。項目の数を仏教の五戒と比べるだけでなく、何を誓い、誰にどの程度まで求めるのかを見ると、それぞれの輪郭がはっきりします。",
+    "form": "五大誓戒",
+    "en": "Even the same teaching against stealing is observed with different degrees of strictness by someone devoted entirely to practice and someone with work and a family. The five great Jain vows summarize the renunciant commitments to nonviolence, truthfulness, nonstealing, celibacy, and non-possession. Householders have corresponding vows, but their practice differs according to daily responsibilities. Looking beyond the shared number with Buddhism’s five precepts to what is vowed and how strictly it applies to whom clarifies each tradition.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「大誓戒を守る」。仏教の五戒との比較では項目と実践者の立場に注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "パールシュヴァナータ",
+   "reading": "ぱーるしゅゔぁなーた",
+   "pos": "noun",
+   "meaning": "Parshvanatha",
+   "defJa": "ジャイナ教で二十三番目の救済者とされる人物",
+   "passage": {
+    "ja": "一人の有名な師だけを覚えると、その前から続く教えの流れを見落とします。ジャイナ教の伝承では、パールシュヴァナータは二十三番目のティールタンカラであり、二十四番目のマハーヴィーラに先立つ存在として尊ばれています。順番は信仰上の系譜を知る手掛かりになりますが、それだけで二人の生涯の細部まで歴史的に確かめられるわけではありません。伝承の中での位置と、資料から確認できる事柄を別々の欄に書くと、古い宗教の歴史を落ち着いて整理できます。",
+    "form": "パールシュヴァナータ",
+    "en": "Learning only one famous teacher can obscure the teaching’s earlier development. Jain tradition reveres Parshvanatha as the twenty-third tirthankara, preceding Mahavira, the twenty-fourth. The sequence helps readers understand a sacred lineage, but it cannot by itself establish every detail of their lives historically. Writing their positions in tradition and the matters confirmed by evidence in separate columns helps organize the history of an ancient religion.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "人名の前後関係を押さえつつ、伝承上の順番と史実を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "沙門",
+   "reading": "しゃもん",
+   "pos": "noun",
+   "meaning": "renunciant ascetic",
+   "defJa": "古代インドで家を離れて修行した人",
+   "passage": {
+    "ja": "古い仏典に僧の呼び名を見つけると、最初から仏教だけの言葉だったと思いやすい。沙門は、もともと古代インドで家を離れ、修行によって生の問題に向き合う人々を指す語であり、ジャイナ教を含む広い背景の中に置かれる。日本語では仏教の出家者を表す場合が多いものの、その用法だけからインドの宗教世界を眺めれば、同じ土地で異なる教えを説いた人々が消えてしまう。一つの肩書の意味をたどる作業は、後世の宗派の境界をいったん外して読む入口となる。",
+    "form": "沙門",
+    "en": "Finding a title for a monk in an old Buddhist text can make it seem that the word always belonged exclusively to Buddhism. Shramana originally referred to ancient Indian people who left household life to confront questions of existence through practice, within a wider setting that included Jainism. Although Japanese often uses the word for Buddhist renunciants, viewing India only through that usage makes people teaching different doctrines in the same land disappear. Tracing the meaning of one title opens a way to read beyond boundaries imposed by later denominations.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "古代インドの広い用法と、日本語での仏教的用法を区別している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "耆那",
+   "reading": "じな",
+   "pos": "noun",
+   "meaning": "Jina; conqueror of inner passions",
+   "defJa": "内なる欲や迷いに打ち勝った者の呼び名",
+   "passage": {
+    "ja": "漢字だけ見ると、中国の昔の人の名前みたいだよね。耆那っていうのは、インドの言葉の音を漢字で写した呼び名で、ジャイナ教では欲や迷いに打ち勝った者を指すんだ。「勝利者」と訳されるからといって、戦争で領土を広げた王を思い浮かべると、話がまるで違ってしまう。誰を倒すかではなく、自分の執着をどう離れるかという方向で読むと、見慣れない二文字が、教えの名前と修行の目標をつなぐ手掛かりになるよ。",
+    "form": "耆那",
+    "en": "Looking only at the characters, it almost seems like the name of someone from ancient China. Jina is an Indian title rendered phonetically in Chinese characters and refers in Jainism to someone who has overcome desires and delusion. Although it is translated as victor, imagining a king who expanded territory through war takes the discussion in entirely the wrong direction. Reading it in terms of releasing one’s attachment rather than defeating someone makes those two unfamiliar characters a clue linking the religion’s name with the aim of practice.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "意味を漢字から推測しにくい音写語で、「勝利」の対象を補って説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シュラヴァナベラゴラ",
+   "reading": "しゅらゔぁなべらごら",
+   "pos": "noun",
+   "meaning": "Shravanabelagola Jain pilgrimage site",
+   "defJa": "巨大な聖者像で知られる南インドの巡礼地",
+   "passage": {
+    "ja": "丘の上に立つ巨大な裸形の像は、遠くから眺めても強い印象を残す。南インドのシュラヴァナベラゴラで知られるこの像は、ジャイナ教のバーフバリを表し、仏陀やマハーヴィーラをかたどったものではない。寺院の像というだけで見慣れた名前を当てはめず、誰が、どのような修行の姿で表されているかに目を向けたい。大きさに圧倒される一方で、何も所有しない姿に託された理想を読むと、石の量感と執着を離れる教えとの間に、独特な緊張が生まれる。",
+    "form": "シュラヴァナベラゴラ",
+    "en": "The enormous naked figure standing on a hill leaves a powerful impression even from a distance. This image at Shravanabelagola in southern India represents the Jain figure Bahubali, rather than the Buddha or Mahavira. Instead of assigning a familiar name simply because it is a temple statue, we should attend to whom it depicts and the form of practice shown. Alongside awe at its scale, reading the ideal conveyed by a figure without possessions creates a distinctive tension between the weight of stone and the teaching of releasing attachment.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "巡礼地の名は、そこにある像の人物と結び付けて覚える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

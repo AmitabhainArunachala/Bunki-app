@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "機械学習",
+   "reading": "きかいがくしゅう",
+   "pos": "noun",
+   "meaning": "machine learning",
+   "defJa": "データから規則や判断の仕方を学ぶ技術",
+   "passage": {
+    "ja": "写真を見分ける規則を一つずつ人が書く代わりに、例を使って機械に学ばせるのが機械学習の考え方なんだ。犬と猫の写真を分ける場合でも、何を手掛かりにしたかは人が想像したとおりとは限らないから、別の写真で試すことが大事になるよ。見たことのある例だけでよい成績が出ても、新しい場面で使えるかはまだ分からないんだよね。失敗した写真を並べて、暗さや角度など共通する条件を探すと、学ぶ仕組みを作ることと、使える範囲を確かめることの違いがつかめるよ。",
+    "form": "機械学習",
+    "en": "Machine learning teaches machines through examples instead of having people write every rule for recognizing photographs. Even in separating dog and cat photos, the clues used may differ from what people imagine, making tests with other photographs important. Good performance only on familiar examples does not establish usability in new settings. Comparing failed photographs for conditions such as darkness and angle helps distinguish building a learning system from determining where it can be used.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "例から学ぶ仕組みであり、未経験の場面での正しさは別に確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "機会費用",
+   "reading": "きかいひよう",
+   "pos": "noun",
+   "meaning": "opportunity cost",
+   "defJa": "ある選択のために諦めた最善の代案から得られた価値",
+   "passage": {
+    "ja": "研究予算を新しい計算装置へ振り向けるとき、請求書に載る金額だけが判断の対象ではない。同じ資金で専門家を雇い、既存の手法を検証できたなら、その代案から得られたはずの価値が機会費用となる。ただし、実行しなかった案の成果はそのまま観察できないため、想定した効果や実現の確かさを明示せずに比較すると、都合のよい数字を作りやすい。予算案には選んだ設備の利点だけでなく、退けた有力な案とその前提を添えることで、資金をどこへ置く判断だったのかを後から検討できる。",
+    "form": "機会費用",
+    "en": "When directing research funds toward new computing equipment, the invoice amount is not the only consideration. If the same funds could hire experts to test existing methods, the value forgone from that alternative is an opportunity cost. Because unrealized results cannot simply be observed, comparisons can become convenient inventions unless assumptions about effects and feasibility are explicit. Recording the strongest rejected alternative and its assumptions alongside equipment benefits lets the allocation decision be examined later.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "支払った金額ではなく、選ばなかった最善の代案の価値を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "日の丸半導体",
+   "reading": "ひのまるはんどうたい",
+   "pos": "noun",
+   "meaning": "Japan’s semiconductor industry",
+   "defJa": "日本の半導体産業を国の象徴に重ねた呼び方",
+   "passage": {
+    "ja": "日の丸半導体の復活を掲げる議論では、企業の事業と国家への期待が重なって語られる。だが国内に工場を置くこと、日本の企業が設計すること、国内の材料を使うことは、それぞれ異なる条件であり、一つの呼び名でまとめるだけでは実態が曖昧になる。国の象徴を用いた表現には関心を集める力がある一方、工程をまたいだ国際的な分業が見えにくくなる面もある。政策や投資を論じる際には、何の能力をどこに残したいのかを具体的に記すことが、期待を検証できる目標へ置き換える第一歩となる。",
+    "form": "日の丸半導体",
+    "en": "Calls to revive Japan’s semiconductor industry under the national flag combine corporate business with national expectations. But locating a factory in Japan, having Japanese companies design products, and using domestic materials are distinct conditions that one label can obscure. National symbolism attracts attention while potentially hiding international specialization across stages. Specifying which capabilities should be retained where is a first step in translating expectations into verifiable goals when discussing policy or investment.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "国の象徴を用いた呼び方なので、具体的な生産や所有の条件を補う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "ふさがる",
+   "reading": "ふさがる",
+   "pos": "verb",
+   "meaning": "to be occupied; to close",
+   "defJa": "物でいっぱいになり、ほかのことに使えなくなる",
+   "passage": {
+    "ja": "日本語には『手がふさがっている』という表現がある。両手に荷物を抱えて文字どおり動かせない場合はもちろん、仕事に追われて頼みごとを受けられない場合にも使われる。後者は前者からの類推でできた比喩であり、文脈によって意味が分かれる。学習者にとっては、同じ形が二つの状況にまたがる点が、理解を難しくする一因となっている。辞書を引いても、こうした慣用的な広がりまでは載っていないことが多い。",
+    "form": "ふさがっている",
+    "en": "Japanese has the expression 'te ga fusagatte iru,' literally 'my hands are occupied'. It is used not only when you are carrying luggage in both arms and literally cannot move, but also when you are swamped with work and cannot take on a request. The latter is a metaphor formed by analogy with the former, and the meaning splits depending on context. For learners, the fact that one form spans two situations is one reason it is hard to grasp. Even if you look it up in a dictionary, such idiomatic extensions are often not listed.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「手がふさがっている」は、体と忙しさの両方の意味で使える慣用表現。",
+    "sense": "手などが使えない、ほかに使えない"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "もろい",
+   "reading": "もろい",
+   "pos": "i-adj",
+   "meaning": "fragile; brittle",
+   "defJa": "力が加わると、すぐ壊れたり崩れたりしやすい",
+   "passage": {
+    "ja": "最先端のAIでも、実はもろい一面があります。たとえば、パンダの画像に人間には見えないほどの細かなノイズを加えるだけで、モデルがテナガザルだと自信たっぷりに答えてしまう例が研究で示されています。これが『敵対的サンプル』と呼ばれる現象です。性能が高いからといって、安全だとは限らないのです。だからこそ、実際に使う前に、わざと意地悪な入力を何度も与えて試す検査が欠かせないのです。",
+    "form": "もろい",
+    "en": "Even cutting-edge AI turns out to have a fragile side. For example, research has shown that merely adding noise too fine for humans to see to an image of a panda can make a model answer with confidence that it is a gibbon. This phenomenon is called an 'adversarial sample'. High performance does not necessarily mean it is safe. That is why, before real use, tests that deliberately feed it nasty inputs again and again are indispensable.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "強そうに見えて、わずかな力で崩れる弱点を指すときに使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "にわかに",
+   "reading": "にわかに",
+   "pos": "adverb",
+   "meaning": "suddenly; readily",
+   "defJa": "急に。また、すぐには（打ち消しと共に）",
+   "passage": {
+    "ja": "『にわか雨』が突然降る雨を指すように、この語は本来、物事が急に起きるさまを表していました。それが『にわかに信じがたい話』という形になると、『すぐには』という別の意味が顔を出します。後ろに打ち消しの言葉が続くと、急にではなく容易にという読みになるのです。新聞の見出しから日常会話に至るまで、この用法は広く見られます。同じ語でも、肯定か否定かで意味が食い違う点には注意が要ります。",
+    "form": "にわかに",
+    "en": "Just as 'niwaka ame' refers to rain that falls suddenly, this word originally described things happening all at once. Yet in the form 'niwaka ni shinjigatai hanashi,' another meaning, 'not readily,' shows its face. When a negation follows, it reads as 'easily' rather than 'suddenly'. This usage is common everywhere, from newspaper headlines to everyday conversation. Take care that the meaning diverges depending on whether the sentence is affirmative or negative.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "打ち消しを伴う「にわかには信じがたい」の用法を、このカードで押さえる。",
+    "sense": "すぐには、容易には（否定と共に）"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

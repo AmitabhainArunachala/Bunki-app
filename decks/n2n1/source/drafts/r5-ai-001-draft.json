@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "歩留まり",
+   "reading": "ぶどまり",
+   "pos": "noun",
+   "meaning": "yield; the share of good chips from a wafer",
+   "defJa": "製品のうち正常に仕上がった品の割合",
+   "passage": {
+    "ja": "半導体工場では、一枚のウエハーから取れる正常なチップの割合が命綱です。ある朝、この数字が急落し、会議室が一気に騒ぎました。エンジニアが原因を追った末に突き止めたのは、温度管理のわずかな誤差が露光やエッチングに相互作用し、不良品を量産していたという事実でした。歩留まりが悪化したとき、グラフに描けるのは結果だけで、その裏では工場全体の因果関係が動いています。だから現場のエンジニアの仕事は、たった一つの異常から工程の全体像を復元することなんです。",
+    "form": "歩留まり",
+    "en": "In a semiconductor fab, the lifeline is the share of good chips you can pull from a single wafer. One morning the number plunged, and the meeting room erupted. What the engineers tracked down in the end was the fact that a tiny error in temperature control had interacted with the lithography and etching steps and churned out defective chips. When yield deteriorates, the graph can show only the result, and behind it causal relationships across the whole factory are at work. That is why a fab engineer's job is to reconstruct the entire picture of the process from a single anomaly.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "半導体や製造の文脈で「歩留まりが上がる・悪化する」のように良品の割合と結びつく",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国策",
+   "reading": "こくさく",
+   "pos": "noun",
+   "meaning": "national policy set by the state",
+   "defJa": "国が定めた政治や産業の方針",
+   "passage": {
+    "ja": "半導体ともなると、一つの工場の誘致が国の戦略の核として語られる。だが国策と企業戦略は似て非なる概念である。政府は補助金や税制を通じて特定の産業を支え、その狙いは雇用や技術基盤の保全にある。一方、工場を建てる側の企業は採算を計算しており、その判断が結果として国家の目標と重なったとしても、動機はあくまで利益だ。両者は制約も時間軸も違うのに、報道では同じ枠に置かれがちで、具体例で区別しなければ、補助金の額だけが政策のすべてのように見える。",
+    "form": "国策",
+    "en": "When it comes to semiconductors, the recruitment of a single plant gets narrated as the core of a national strategy. But national policy and corporate strategy are concepts that look alike yet differ. The government supports particular industries through subsidies and tax measures, and its aim lies in protecting employment and the technology base. The company building the plant, meanwhile, calculates profitability, and even if its decision happens to overlap with national goals, its motive is profit and nothing else. The two differ in constraints and time horizon, yet reporting tends to put them in the same frame, and unless you tell them apart with concrete examples, the subsidy figure alone looks like the whole of policy.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「国策として」「国策に沿って」の形で出る硬い報道語。企業戦略と区別して使う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "検証",
+   "reading": "けんしょう",
+   "pos": "noun",
+   "meaning": "verification; checking that a claim is true",
+   "defJa": "正しいかどうか確かめること",
+   "passage": {
+    "ja": "対話型のAIに長い答えを書かせるとき、その便利さの代金が一体どこで払われるのか。出力は流暢なものの、誤りは表面には見えない。しかも人の認知は、滑らかな文を何となく正しいと受け取りやすい。だから出力を使う側は、その内容を仮説として検証する時間という形で、必ずどこかで代金を支払うことになる。この費用は道具を選んだ瞬間には見えないのに後から利子のように請求され、結局、便利な選択の本当の値段は、画面に表示された金額ではなく、見落とされた時間の勘定科目にある。",
+    "form": "検証",
+    "en": "When you have a conversational AI write a long answer, where on earth does the price of that convenience get paid? The output is fluent, yet its errors never show on the surface. Moreover, human cognition somehow tends to take smooth prose as true. So whoever uses the output inevitably pays the bill somewhere, in the form of time spent verifying its content as a hypothesis. This cost is invisible at the moment you choose the tool yet gets billed later like interest, and in the end the real price of a convenient choice lies not in the fee shown on screen but in the overlooked ledger entry of time.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「仮説を検証する」の形が典型。正しさを確かめる行為を硬めに言う語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "礎",
+   "reading": "いしずえ",
+   "pos": "noun",
+   "meaning": "cornerstone; the foundation of something",
+   "defJa": "物事の基礎となる大事な部分",
+   "passage": {
+    "ja": "この前、友達に「スマホってなんであんな速く計算できるの」って聞かれてさ。答えは意外と地味で、中身はオンとオフという制約しか持たない小さなスイッチの集まりなんだよね。しかもその理論の礎は、十九世紀に真偽を記号で扱った論理学の研究にある。あの発想が広まって以来、計算は哲学者の話から機械の仕事になった。無数のスイッチが相互作用して今日の半導体が動いてるわけだから、百年以上前の机の上の思考がそのままポケットの中で生きてるんだなって、妙に感心したよ。",
+    "form": "礎",
+    "en": "The other day a friend asked me, 'How can smartphones calculate so fast?' The answer is surprisingly plain: inside, they are a crowd of tiny switches bound by a single constraint, on or off. And the cornerstone of that theory lies in nineteenth-century research in logic that handled truth and falsehood with symbols. Since that idea spread, calculation went from a philosopher's topic to a machine's job. Countless switches interact to drive today's semiconductors, and I was oddly struck by how thinking done at a desk over a hundred years ago lives on, just as it is, inside our pockets.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「〜の礎」「礎を築く」のように、比喩で基礎・土台を表す。話し言葉ではやや硬い",
+    "sense": "比喩として、物事の基礎"
+   }
+  },
+  {
+   "term": "群を抜く",
+   "reading": "ぐんをぬく",
+   "pos": "verb",
+   "meaning": "to stand out from the rest, tower above",
+   "defJa": "他を大きく引き離して際立つこと",
+   "passage": {
+    "ja": "アルゴリズムの勉強で一番確実なのは、小さい例を自分の手で動かすことです。たとえば小さい順に並んだ八個の数字から一つを探すとき、端から順に見る方法は最悪で八回かかります。ところが半分ずつ候補を潰していく方法なら、三回で答えに当たります。この差を手計算で確かめたところ、整列されたデータという制約さえ満たせば、二分探索が群を抜いて速いという話が急に実感に変わりました。数値の比較を自分のノートに書くかどうか、そこが理解の分かれ目です。",
+    "form": "群を抜いて",
+    "en": "The surest way to study algorithms is to run a small example with your own hands. Say eight numbers are lined up in ascending order and you search for one: scanning from one end takes eight tries at worst. But the method that eliminates half the candidates at a time hits the answer in three. When I confirmed this gap by hand calculation, the claim that binary search is outstandingly fast, as long as the constraint of sorted data is met, suddenly turned into something I could feel. Whether you write that numerical comparison in your own notebook is the dividing line of understanding.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「群を抜いて速い」のように他との差を強調。比喩的な動詞の慣用句",
+    "sense": ""
+   }
+  },
+  {
+   "term": "肩を並べる",
+   "reading": "かたをならべる",
+   "pos": "verb",
+   "meaning": "to rank alongside; be on a par with",
+   "defJa": "実力などが同じ水準に達すること",
+   "passage": {
+    "ja": "原稿の添削をしていると、事実の正確さだけでなく、言葉の精度も問われることがある。ある記事には「日本の半導体技術は世界の頂点に立つ」とあった。しかし実態を調べると、素材や装置といった特定の分野で世界と肩を並べる程度で、全工程の頂点とは言えない。だから編集者として、「頂点に立つ」を「一部の分野で並ぶ」に直すよう提案した。強い表現は人を引く一方で、範囲を正確にしないと、読み手の認知は誇張を事実として受け取ってしまう。",
+    "form": "肩を並べる",
+    "en": "When you are editing a manuscript, you get tested on the precision of language, not just the accuracy of facts. One article said, 'Japan's semiconductor technology stands at the summit of the world.' But looking into the reality, Japan ranks alongside the world in particular fields such as materials and equipment, and you cannot call it the summit of the entire process. So, as the editor, I proposed changing 'stands at the summit' to 'ranks alongside in some fields.' Strong wording draws people in, but if its scope is not made precise, the reader's cognition takes the exaggeration as fact.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「〜と肩を並べる」の形で、実力や地位が同じ水準に達したと表す",
+    "sense": "比喩で、実力や地位が同等になる"
+   }
+  },
+  {
+   "term": "莫大",
+   "reading": "ばくだい",
+   "pos": "na-adj",
+   "meaning": "enormous (of sums and amounts)",
+   "defJa": "金額や数量が非常に大きいこと",
+   "passage": {
+    "ja": "半導体の露光装置は一台で莫大な金額が動く、これが現場の意思決定の前提になります。たとえばある工場の会議では、新型機の導入を巡って、技術部門と経理部門の意見が割れました。それぞれの主張は明快です。技術者は性能を、経理は減価償却を、それぞれの制約として持ち寄りましたが、最先端の製品で戦う以上、導入を決めざるを得なかったという結末です。装置の値段は会計の問題ですが、買うかどうかは、その工場が何年後に何を売りたいかという物語で決まるんです。",
+    "form": "莫大な",
+    "en": "With semiconductor lithography machines, an enormous sum moves on a single unit, and that is the premise of decision-making on the ground. At one plant's meeting, for instance, opinions split between the engineering and accounting departments over introducing a new model. Each side's argument was clear-cut. The engineers brought performance and the accountants brought depreciation, each as their own constraint, but since the plant competes on cutting-edge products, the outcome was that they had no choice but to approve the introduction. The machine's price is an accounting matter, but whether to buy is decided by the story of what that plant wants to sell, years from now.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「莫大な費用」「莫大な金額」の形で、金額や数量の大きさを強調する語",
+    "sense": ""
+   }
+  },
+  {
+   "term": "著作権",
+   "reading": "ちょさくけん",
+   "pos": "noun",
+   "meaning": "copyright",
+   "defJa": "作品を創った人が持つ権利",
+   "passage": {
+    "ja": "メディア各社とAI企業の間で、生成AIの学習データをめぐるライセンス契約が相次いでいる。ここで数字の読み方が立場で分かれる。仮に契約額が公表されたとしても、AI企業にとっては学習データの調達費であり、出版社にとっては著作権への対価の先例だ。先例という観点で読めば、一社との数字が他社との交渉の基準になりかねない。報道の数字を検証するとき、それを費用の記録として読むのか、権利の値付けの始まりとして読むのかで、意味は変わる。",
+    "form": "著作権",
+    "en": "Licensing deals have been stacking up between media companies and AI firms over generative AI's training data. This is where the reading of the numbers splits by standpoint. Even if a contract figure were made public, to the AI firm it is a procurement cost for training data, while to the publisher it is a precedent for compensation for copyright. Read as a precedent, one company's number could well become the benchmark in negotiations with others. When you verify a reported figure, whether you read it as a record of expenses or as the start of pricing rights changes what it means.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「著作権を保有する」「著作権に触れる」など、権利として扱う文脈で出る語",
+    "sense": ""
+   }
+  }
+ ]
+}

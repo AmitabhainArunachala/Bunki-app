@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "準ずる",
+   "reading": "じゅんずる",
+   "pos": "verb",
+   "meaning": "to follow; to treat correspondingly",
+   "defJa": "ある基準に従い、それと同じように扱う",
+   "passage": {
+    "ja": "募集案内に「卒業証明書、またはこれに準ずる書類」と書かれていた場合、似た紙なら何でもよいと読むのは危険です。ここでは、示された証明書を基準として、それと同じように扱えるものを求めています。専門用語を平易に言い換えるにしても、単に程度が近いという説明では、基準に照らして扱うという意味が抜けてしまいます。実際にどの書類が認められるかは案内の具体的な条件で確かめ、この表現だけから書類の種類や効力まで決めつけないようにしましょう。",
+    "form": "準ずる",
+    "en": "If an application guide asks for a graduation certificate or a document treated correspondingly, it is risky to read that as allowing any similar-looking paper. Here, the specified certificate serves as the standard, and the requested document must be one that can be treated in the same way. Even when putting technical wording into simpler language, describing mere closeness in degree loses the sense of treatment according to a standard. Check the guide's specific conditions to establish which documents are accepted, and avoid inferring their type or effect from this expression alone.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜に準ずる」は基準に従う、同様に扱うという意味で、「準じる」とも言います。",
+    "sense": "あるものを基準として同様に扱う"
+   }
+  },
+  {
+   "term": "偏る",
+   "reading": "かたよる",
+   "pos": "verb",
+   "meaning": "to be skewed; to be one-sided",
+   "defJa": "一方に集中して、全体の釣り合いを欠く",
+   "passage": {
+    "ja": "賛否が分かれる題材で小論文を書くとき、引用する意見が賛成側に偏ると、反対の理由を知らないまま結論を出しかねません。推敲では、文章の流れを整える前に、どの立場の根拠を拾い、何を取り上げなかったかを点検しましょう。ただし、両側から同じ数の意見を並べれば公平になるとも限らず、資料の確かさや論点との関係も重要です。自分と異なる意見を都合よく弱めずに紹介し、その上でどこに賛成できないのかを示すと、読み手が判断の道筋を確かめられます。",
+    "form": "偏る",
+    "en": "When writing a short essay on a divisive subject, quoting views skewed toward support risks reaching a conclusion without knowing the reasons for opposition. During revision, before smoothing the prose, examine whose evidence you selected and what you left out. However, equal numbers of views from both sides do not necessarily make an account fair, since the reliability of sources and their relevance also matter. Presenting opposing views without conveniently weakening them and then specifying where you disagree lets readers examine the path of your judgment.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「意見が一方に偏る」のように、配分や視点が片側に寄ることを表します。",
+    "sense": "意見や材料が一方に集中し、釣り合いを欠く"
+   }
+  },
+  {
+   "term": "開拓",
+   "reading": "かいたく",
+   "pos": "noun",
+   "meaning": "development of a new market or field",
+   "defJa": "未利用の土地や新しい分野を切り開くこと",
+   "passage": {
+    "ja": "小さな陶器工房が、店頭で売る器を料理店にも使ってもらおうと計画したとします。新たな販路を開拓するにあたっては、作品の美しさだけでなく、重ねて収納できるか、割れたときに同じ寸法のものを追加できるかも聞き取ります。相手の使い方が分かれば、焼く工程を変えずに形の工夫だけで対応できる点と、試作が必要な点を分けられます。売り先をただ増やすのではなく、これまで出会わなかった使い手との関係を作ることが、新しい市場へ踏み出す具体的な一歩になります。",
+    "form": "開拓",
+    "en": "Suppose a small pottery workshop plans to have restaurants use the tableware it sells in its shop. In developing a new sales channel, it asks not only about beauty but also whether pieces can be stacked and whether replacements of the same dimensions can be supplied after breakage. Understanding how customers use the pieces allows the workshop to distinguish what can be addressed through shape alone without changing the firing process from what needs prototypes. Building relationships with users it has not previously encountered, rather than simply increasing outlets, becomes a concrete step into a new market.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「販路を開拓する」「新分野を開拓する」と、未開の分野へ進む意味で使います。",
+    "sense": "新しい市場や活動の分野を切り開くこと"
+   }
+  },
+  {
+   "term": "ヒント",
+   "reading": "ヒント",
+   "pos": "noun",
+   "meaning": "hint; clue",
+   "defJa": "答えや解決に近づくための手がかり",
+   "passage": {
+    "ja": "古い地図から失われた道を探す場合、描かれた線だけを現在の道路に重ねても位置を確定できないことがある。地名や川の曲がり方が場所を絞るヒントになる一方で、地形そのものが後の工事や洪水で変わった可能性も検討する必要がある。年代記に橋の建設が記されていれば、地図の年代との関係を調べる手がかりになる。一つの一致を発見の証拠と急いで扱わず、複数の資料が同じ場所を示すかを確かめることで、推定を支える理由と残る不確かさを明示できる。",
+    "form": "ヒント",
+    "en": "When searching for a lost route on an old map, simply overlaying its lines on present roads may not establish its location. Place names and river bends can provide clues for narrowing the location, but later construction or floods may have changed the terrain itself. If a chronicle records the construction of a bridge, it offers a lead for investigating its relation to the map's date. Checking whether multiple sources point to the same place, rather than rushing to treat one match as proof of discovery, makes it possible to state both the grounds for an estimate and the remaining uncertainty.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「ヒントになる」「ヒントを得る」と使い、結論そのものではなく手がかりを指します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多読",
+   "reading": "たどく",
+   "pos": "noun",
+   "meaning": "extensive reading",
+   "defJa": "多くの文章や本を読むこと。また、その学習法",
+   "passage": {
+    "ja": "日本語の本を一ページ読むたびに辞書を何度も開いているなら、まず負担の少ない作品へ替える選択もあります。多読では、理解できる内容を手がかりに話の流れを追い、さまざまな文章に触れる量を確保します。知らない語があっても大意がつかめる場合は先へ進めますが、筋が分からなくなったら、読み返したり別の本を選んだりして構いません。冊数が増えたからといって新しい語をすべて覚えたとは限らないので、読めた分量と、後で使えた表現は分けて振り返ると学習の様子を捉えやすくなります。",
+    "form": "多読",
+    "en": "If you open a dictionary repeatedly for every page of a Japanese book, one option is to switch first to a less demanding work. Extensive reading follows the flow using what can be understood and ensures exposure to a range of texts. You can continue past unfamiliar words if you grasp the gist, but if you lose the thread, it is fine to reread or choose another book. Since reading more books does not mean that every new word has been learned, reviewing the amount read separately from expressions you could later use makes your learning easier to assess.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "量を重視して読む学習法で、読めた量と定着した語彙は区別して確かめます。",
+    "sense": "多くの文章を読み、言語への接触量を増やす学習法"
+   }
+  },
+  {
+   "term": "製作",
+   "reading": "せいさく",
+   "pos": "noun",
+   "meaning": "making; manufacture",
+   "defJa": "道具や材料を用いて、品物を作り上げること",
+   "passage": {
+    "ja": "椅子の製作を職人に頼むなら、気に入った写真を渡すだけでなく、どんな机で誰が使うかも伝えると相談が具体的になります。机の高さに応じて座面の位置を考え、部屋の広さと使う人の体格から寸法を確かめます。木を切り始める前に模型や仮の部材で座り心地を試せば、図面だけでは判断しづらかった点に気づく場合もあります。材料を選ぶところから仕上げまでの工程を共有すると、依頼した人も、見た目の希望と丈夫さのための工夫をすり合わせながら完成を待てます。",
+    "form": "製作",
+    "en": "When commissioning a craftsperson to make a chair, explaining who will use it and at what desk makes the discussion more concrete than merely handing over a photograph you like. The seat height can be considered according to the desk, and dimensions checked against the room's size and the user's build. Trying a model or temporary components before cutting the wood may reveal points that were difficult to judge from drawings alone. Sharing the stages from material selection to finishing lets the client await completion while reconciling visual preferences with measures needed for strength.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「椅子の製作」「模型を製作する」のように、具体的な品物を作る際に使います。",
+    "sense": "道具や材料を使って品物を作ること"
+   }
+  },
+  {
+   "term": "高学歴",
+   "reading": "こうがくれき",
+   "pos": "noun",
+   "meaning": "advanced educational background",
+   "defJa": "大学院など、高い段階の教育を受けていること",
+   "passage": {
+    "ja": "読書会に博士号を持つ人が来ると聞いて、会う前から何を聞いても答えてくれそうだと期待したことがあるんだ。高学歴だからといって、専門外の本まで詳しく知っているとは限らないのに、経歴から勝手に人物像を作っていたんだね。逆に、相手が専門用語を使わずに話すだけで、内容も簡単なんだろうと思うのも先入観だと思う。どこで何を学んだかは会話のきっかけにできるけど、実際にどんな問いを持っているかは、その人の言葉を聞いてから知りたいよね。",
+    "form": "高学歴",
+    "en": "Once, on hearing that someone with a doctorate was coming to a reading group, I expected before meeting them that they could answer anything I asked. Although advanced education does not mean knowing all about books outside one's specialty, I had built an image of the person from their background. Conversely, assuming that content is simple just because someone speaks without technical terms also seems like a preconception. Where and what someone studied can start a conversation, but I want to learn what questions they actually have by listening to their own words.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "受けた教育の段階を表す語で、専門外の知識や人格を直接示すものではありません。",
+    "sense": "高い段階の教育を受けていること"
+   }
+  }
+ ]
+}

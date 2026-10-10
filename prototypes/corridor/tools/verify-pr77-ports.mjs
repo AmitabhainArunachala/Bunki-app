@@ -14,7 +14,7 @@
  * KAIRO_SITE_DIR / KAIRO_ARTIFACT_SHA256 / KAIRO_EVIDENCE_DIR as the other suites.
  * Usage: node verify-pr77-ports.mjs [--only probe,probe]
  */
-import { openShelfDoor } from './shelf-tools-support.mjs';
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -171,8 +171,9 @@ PROBES['quiz-crumb'] = async () => {
   await page.click('#back');
   await settle(page);
   const backTo = await page.evaluate(() => document.body.dataset.view);
-  check('ea8252a9 · the quiz crumb names the lists tray its 戻る reopens',
-    /リスト|lists/.test(crumb) && backTo === 'tray', JSON.stringify({ crumb, backTo }));
+  // r4: the tray is the Today tab's room, so its crumb names it 今日 / Today, and only that (VERIFIER_CHANGES.md)
+  check('ea8252a9 · the quiz crumb names Today, the tray its 戻る reopens',
+    /今日|Today/.test(crumb) && backTo === 'tray', JSON.stringify({ crumb, backTo }));
   await context.close();
 };
 
@@ -202,11 +203,13 @@ PROBES['crumb-origin'] = async () => {
   }
   await page.waitForSelector('.close-doors');
   const reviewCrumb = await crumbOf(page);
-  await page.click('#back');
+  // with the tab bar, a finished review hides the chrome's 戻る (one way home, r3-rooms): the
+  // close's own way back is then the door that must reopen the tray
+  await page.click((await page.locator('#back').isVisible()) ? '#back' : '.close-doors .take');
   await settle(page);
   const reviewBack = await page.evaluate(() => document.body.dataset.view);
-  check('d9f0b984 · a plain review names the lists tray its 戻る reopens',
-    /(リスト|lists).*(復習|review)/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
+  check('d9f0b984 · a plain review names Today, the tray its 戻る reopens',
+    /(今日|Today).*(復習|review)/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
   await context.close();
 };
 
@@ -235,17 +238,17 @@ PROBES['review-reason'] = async () => {
   const freeze = /archive froze/;
   const human = await openRow(page, 'env:press-press_05591');
   check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
-    /未確認/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
+    /Unreviewed/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
     JSON.stringify(human).slice(0, 400));
   await page.click('#back');
   const rights = await openRow(page, 'yasashii:1');
   check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /未確認/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
+    /Unreviewed/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
     JSON.stringify(rights).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
   check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/未確認/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
+    !/Unreviewed/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
     JSON.stringify(approved).slice(0, 300));
   await context.close();
 };
@@ -307,6 +310,7 @@ PROBES['bunsetsu'] = async () => {
 };
 
 async function openKanjiSheet(page, kanji) {
+  await openShelfTools(page);
   await page.fill('#search', kanji);
   await page.locator(`[data-result="kanji:${kanji}"]`).first().click();
   await page.waitForSelector('#sheet');
@@ -521,6 +525,7 @@ PROBES['chip-focus'] = async () => {
 PROBES['focus-trap'] = async () => {
   const { context, page } = await learner();
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet .headword');
@@ -598,6 +603,7 @@ PROBES['thinking-durable'] = async () => {
 PROBES['failure-line'] = async () => {
   const { context, page, stub } = await learner({ seed: envelope(), tutor: true });
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet .ai-ask');
@@ -756,7 +762,7 @@ PROBES['kanji-numerals'] = async () => {
 PROBES['kdx-chip-state'] = async () => {
   const { context, page } = await learner();
   const seen = {};
-  for (const [lens, attr] of [['画数', 'data-kdx-st'], ['部首', 'data-kdx-rad'], ['頻度', 'data-kdx-freq'], ['漢検', 'data-kdx-kk']]) {
+  for (const [lens, attr] of [['by strokes', 'data-kdx-st'], ['by radical', 'data-kdx-rad'], ['by frequency', 'data-kdx-freq'], ['by level', 'data-kdx-kk']]) {
     await open(page, '?entry=shelf&ui=bi');
     await openShelfDoor(page, '#kanjidex-link');
     await page.locator('main .kdx-lens', { hasText: lens }).first().click();
@@ -781,6 +787,7 @@ PROBES['sheet-summary-tab'] = async () => {
   seed.taken[0].sourceContextRef = `teacher-context:${'a'.repeat(64)}`;
   const { context, page } = await learner({ seed });
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet summary');
@@ -868,6 +875,7 @@ PROBES['eaten-back-strokes'] = async () => {
 PROBES['tutor-sheet-race'] = async () => {
   const { context, page, stub } = await learner({ seed: envelope(), tutor: true });
   await open(page, '?entry=shelf&ui=bi');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.locator('[data-result="word:学校"]').first().click();
   await page.waitForSelector('#sheet .ai-ask');

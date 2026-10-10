@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "誘致",
+   "reading": "ゆうち",
+   "pos": "noun",
+   "meaning": "attracting (a plant, investment) to an area",
+   "defJa": "企業や施設を呼び込もうとすること",
+   "passage": {
+    "ja": "比喩は、初めて触れる仕組みを理解する入口として非常に強力です。たとえば半導体工場の誘致を、磁石が鉄を引き寄せる絵で捉えると、自治体が優遇策を競う構図がすぐ見えます。ただし比喩は入口にすぎず、実際には税制や人材、電力という条件の相互作用が企業を動かしています。引力のような物理法則は働いておらず、他の土地の条件が良ければ企業はそちらを選びます。比喩で仮説を立て、それを検証する二段階が、複雑な仕組みを学ぶ基本手順です。",
+    "form": "誘致",
+    "en": "A metaphor is extremely powerful as a gateway to understanding a mechanism you are touching for the first time. If you picture the attraction of a semiconductor fab as a magnet pulling in iron, for instance, the structure of local governments competing with incentives comes into view at once. But a metaphor is no more than a gateway; in reality it is the interplay of conditions, such as tax treatment, talent, and electricity, that moves the company. No physical law like gravity is at work, and if another region offers better conditions, the company will choose it. Forming a hypothesis through the metaphor and then testing it is the two-step basic procedure for learning a complex mechanism.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "工場誘致・企業誘致・誘致合戦。自治体や政府が主語になることが多い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "近似",
+   "reading": "きんじ",
+   "pos": "noun",
+   "meaning": "approximation (in math and science)",
+   "defJa": "厳密な値ではなく、近い値や形で代用すること",
+   "passage": {
+    "ja": "天気予報から生成AIまで、現代の計算の多くは近似の上に成り立っていると言っていい。現象そのものを再現しようとすればデータが足りず、計算量も莫大になるためだ。半導体の設計現場でも、光がレンズを通る際のふるまいを完全には再現せず、計算しやすい簡易なモデルで工程を進めている。こうした単純化は計算を速めるが、置いた仮定が現実から外れると、誤差が一気に広がる恐れがある。簡略化の便利さと引き換えに、前提を忘れる危険を常に抱えているのである。",
+    "form": "近似",
+    "en": "From weather forecasting to generative AI, it is fair to say that much of modern computation rests on approximation. The reason is that reproducing the phenomenon itself would leave the data short and the computational load enormous. Even on the semiconductor design floor, engineers do not fully reproduce how light behaves as it passes through a lens, but push the process forward with a simplified model that is easy to compute. Such simplification speeds up the calculation, but if the assumptions that were placed depart from reality, there is a risk that the error will spread all at once. In exchange for the convenience of simplification, there is always the danger of forgetting the premises.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "近似値・近似解・関数を近似する。数学と工学の定番で、厳密さを犠牲にする含み。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "見極める",
+   "reading": "みきわめる",
+   "pos": "verb",
+   "meaning": "to ascertain; to see through to the truth of",
+   "defJa": "物事の本質や程度をはっきり見抜くこと",
+   "passage": {
+    "ja": "AIの仕組みを勉強するなら数学から入るべきかなって、この前友人に聞かれたんだけど、俺は逆だと思うんだよね。まず道具として手を動かしてみて、得意なことと苦手なことを見極めるほうがいい。仮説ができてからでないと、数式を読んでも何を検証しているのか見えてこないし、誤差の重みも実際に外した経験がないとわからない。理解の負担も、具体例が頭に入っているかどうかで全然違うし。手がかりのないまま式だけ追っても、たぶん三日で挫折して、せっかくの理論がぜんぜん頭に残らないんだよ。",
+    "form": "見極める",
+    "en": "A friend asked me the other day whether he should start with the math when studying how AI works, and I think it is the other way around. It is better to first get your hands moving with it as a tool and ascertain what it is good at and what it is bad at. Until you have formed a hypothesis, reading the equations will not show you what they are verifying, and the weight of the error means nothing without the experience of actually getting things wrong. The load on your understanding is completely different too, depending on whether concrete examples are in your head. If you just chase the formulas with no footholds, you will probably give up in three days, and none of that precious theory will stick.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "実力・本質・得意不得意を見極める。判断材料が揃って初めて使える語。",
+    "sense": "最後まで見届ける意ではなく、本質や程度を見抜く意"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

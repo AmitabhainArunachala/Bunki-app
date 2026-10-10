@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "化合物半導体",
+   "reading": "かごうぶつはんどうたい",
+   "pos": "noun",
+   "meaning": "compound semiconductor",
+   "defJa": "異なる元素を組み合わせた物質からなる半導体",
+   "passage": {
+    "ja": "「半導体って、全部ケイ素でできているの」と聞かれたら、まず材料にも種類があると答えます。例えば、ケイ素と炭素を組み合わせた炭化ケイ素は、化合物半導体の一つで、電力を制御する部品に使われています。ただ、元素を混ぜれば何でも同じ働きになる、という話ではないんです。物質ごとの性質に加え、結晶を作る難しさや加工の費用も、使い道を考える上では大事です。材料の名前を暗記するだけでなく、どんな場面でその性質が役に立つのかを並べてみると、部品の選び方につながります。",
+    "form": "化合物半導体",
+    "en": "If someone asks whether all semiconductors are made from silicon, I first explain that several materials are used. Silicon carbide, combining silicon and carbon, is one compound semiconductor used in power-control components. That does not mean mixing any elements produces the same function. Choosing applications also requires considering material properties, crystal-growth difficulties, and processing costs. Connecting each material's properties to useful situations helps explain component choices instead of merely memorizing names.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "材料の名前と、その材料が得意な用途を結び付ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

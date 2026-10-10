@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "融通無碍",
+   "reading": "ゆうずうむげ",
+   "gloss": "freely interpenetrating; unobstructed",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-3c8c5eca11-2b0ba51c",
+    "wordId": "nn-3c8c5eca11"
+   }
+  },
+  {
+   "term": "行脚",
+   "reading": "あんぎゃ",
+   "gloss": "pilgrimage seeking Buddhist teachers",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-2ce990bb42-64e39e47",
+    "wordId": "nn-2ce990bb42"
+   }
+  },
+  {
+   "term": "観照",
+   "reading": "かんしょう",
+   "gloss": "detached contemplation",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-8c225ac6ca-8eed62fb",
+    "wordId": "nn-8c225ac6ca"
+   }
+  },
+  {
+   "term": "諸法無我",
+   "reading": "しょほうむが",
+   "gloss": "all phenomena are without a fixed self",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-029.json",
+    "cardId": "nn-abcb494194-dc375cbf",
+    "wordId": "nn-abcb494194"
+   }
+  },
+  {
+   "term": "鎌倉仏教",
+   "reading": "かまくらぶっきょう",
+   "gloss": "Kamakura-period Buddhism",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-bdf7aa72af-1288d798",
+    "wordId": "nn-bdf7aa72af"
+   }
+  },
+  {
+   "term": "陰陽",
+   "reading": "いんよう",
+   "gloss": "yin and yang",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-031.json",
+    "cardId": "nn-e1efe87b7a-17ffdf2a",
+    "wordId": "nn-e1efe87b7a"
+   }
+  },
+  {
+   "term": "離欲",
+   "reading": "りよく",
+   "gloss": "dispassion, freedom from desire (vairāgya)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-3b3c10b161-3bb1eb76",
+    "wordId": "nn-3b3c10b161"
+   }
+  },
+  {
+   "term": "霊験",
+   "reading": "れいげん",
+   "gloss": "miraculous efficacy",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-017c0d850f-61a4eade",
+    "wordId": "nn-017c0d850f"
+   }
+  }
+ ],
+ "weave": [
+  "融通無碍",
+  "行脚",
+  "観照",
+  "諸法無我",
+  "鎌倉仏教",
+  "陰陽",
+  "離欲",
+  "霊験"
+ ]
+}

@@ -28,9 +28,10 @@ page.on('pageerror', e => errors.push(e.message));
 const documentPath = fragment ? resolve(temporary, 'fragment-host.html') : bundle;
 if (fragment) writeFileSync(documentPath, `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${readFileSync(bundle, 'utf8')}</body></html>`);
 const documentURL = pathToFileURL(documentPath);
-documentURL.search = '?entry=shelf&ui=bi';
+documentURL.search = '?entry=shelf&ui=ja';
 const personalURL = new URL(documentURL);
 personalURL.searchParams.set('deck', 'personal');
+personalURL.searchParams.set('ui', 'bi');
 await context.route('**/*', route => {
   const request = route.request();
   // Open the actual handoff from disk. Sending a large HTML body through
@@ -67,15 +68,20 @@ try {
   assert.deepEqual({ ...shelfLook.word, display: undefined },
     { display: undefined, border: 'none', background: 'rgba(0, 0, 0, 0)', padding: '0px', minWidth: '0px', minHeight: '0px' },
     'Lookup words must read as prose, not default buttons');
+  // Japanese shelf prose still exercises the lookup styling contract. The
+  // English chrome no longer supplies incidental Japanese lookup words.
+  await page.locator('#lang [data-lang="bi"]').click();
+  assert.equal(await page.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed'), 'true',
+    'The remaining standalone journey uses English chrome');
   // the study tools sit behind the shelf's one 学習ツール button (glance pass 2026-10-01): the door
   // is closed away until that button opens the panel, and then it is visible and reachable
   assert(!(await kanjidex.isVisible()), 'The dictionary door waits behind the 学習ツール button');
   await openShelfTools(page);
   assert(await kanjidex.isVisible(), 'The dictionary door is visible once the 学習ツール panel is open');
-  assert.equal(await kanjidex.and(page.getByRole('button',{name:/^字引/u})).count(),1,
+  assert.equal(await kanjidex.and(page.getByRole('button',{name:/^kanji by shape$/u})).count(),1,
     'Dictionary tool includes its label in the accessible name');
   await kanjidex.click();
-  await page.locator('.kdx-lens').filter({hasText:'SKIP'}).click();
+  await page.locator('.kdx-lens').filter({hasText:'by its shape'}).click();
   await page.locator('.skip-hit').first().waitFor();
   assert.equal(await page.locator('.skip-wheel').count(),5);
   assert.equal(await page.locator('.skip-wheel-column:not(.skip-wheel-filter)').count(),3);

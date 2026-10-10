@@ -1,0 +1,224 @@
+{
+  "cards": [
+    {
+      "term": "朗読",
+      "reading": "ろうどく",
+      "pos": "noun",
+      "meaning": "reading aloud, recitation",
+      "defJa": "文字を見ながら声に出して読むこと",
+      "passage": {
+        "ja": "みなさん、本というのは黙って読むものだと思っていませんか。実は、声を出さずに読む習慣が日本に広まったのは、歴史的にはかなり最近のことなんです。それ以前は、詩も物語も朗読を通じて伝えられ、声の響きとともに言葉が記憶されてきました。つまり日本語はもともと、耳で楽しむ言葉として育ったんですね。だからこそ今でも、声に出して読む訓練は、文章のリズムをつかむ練習として学びの場に残っているんです。",
+        "form": "朗読",
+        "en": "Everyone, do you assume that books are meant to be read silently? In fact, the habit of reading without voicing the words only spread through Japan quite recently, in historical terms. Before that, poetry and tales were passed along through recitation, and words were memorized together with the sound of the voice. In other words, Japanese was originally a language to be enjoyed with the ears. That's why, even today, reading aloud survives in places of learning as practice for grasping the rhythm of prose.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "「黙読」と対をなす語。詩や物語を声に乗せて聞かせる読み方で、朗読会や朗読劇という形もある。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "人材",
+      "reading": "じんざい",
+      "pos": "noun",
+      "meaning": "talented people; human resources",
+      "defJa": "ある分野で活躍できる優れた人",
+      "passage": {
+        "ja": "さて、AI時代の勝負を決めるのは、結局のところ人なんです。最先端の研究には優秀な人材が不可欠で、各国はその確保に必死になっています。実際、半導体分野では経験を積んだ技術者が足りず、工場を建てても思うように動かせないという話が出ています。機械や設備はお金で買えても、人はそうはいかない。つまりこれからの競争は、技術そのものよりも、人をどう育てるかで決まるんですね。",
+        "form": "人材",
+        "en": "So in the end, what decides the contest in the AI age is people. Cutting-edge research cannot do without talented people, and every country is desperate to secure them. In fact, in the semiconductor field there are reports that seasoned engineers are in short supply, and that even when factories are built, they cannot be run as hoped. Machinery and equipment can be bought with money, but people cannot. In other words, the competition ahead will be decided not by technology itself, but by how well we develop people.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「優秀な人材」「人材を育成する」「人材不足」のように、組織や産業が求める能力のある人を指す。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "仮説",
+      "reading": "かせつ",
+      "pos": "noun",
+      "meaning": "hypothesis",
+      "defJa": "正しいかどうか確かめる前に立てる暫定的な考え",
+      "passage": {
+        "ja": "AIの研究というのは、意外にも地道な作業の連続なんです。まず、こうすれば性能が上がるはずだという仮説を立てます。それから実験でその内容を確かめ、データと合わなければ捨てて、次の考えへと移っていく。この当たり前の積み重ねこそが、ディープラーニングを今日の水準まで押し上げたんです。つまりAIの世界は、天才のひらめきよりも、試して確かめる習慣がものを言う場所なんですね。",
+        "form": "仮説",
+        "en": "AI research is, surprisingly, a steady string of painstaking tasks. First, you form a hypothesis that performance should improve if you do such-and-such. Then you check it through experiments, and if it doesn't match the data, you discard it and move on to the next idea. It was precisely this unremarkable accumulation that pushed deep learning to today's level. In other words, in the world of AI, the habit of trying and verifying matters more than a genius's flash of insight.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「仮説を立てる」「仮説を検証する」が定番の組み合わせ。確かめる前の、まだ証明されていない考えを指す。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "信仰",
+      "reading": "しんこう",
+      "pos": "noun",
+      "meaning": "faith; religious belief",
+      "defJa": "神や仏などを信じ、敬い頼む心",
+      "passage": {
+        "ja": "インドの宗教の面白さは、なんといっても神との距離の近さにあります。ヨーロッパでは、神を信じることは教会を通じて一つの制度として整えられてきました。ところがインドでは、朝の礼拝から店先の祭壇まで、神は日常のあちこちにいます。つまり信仰を持つことは特別な行為ではなく、お茶を飲むのと同じように、生活の中に自然に溶け込んでいるんです。神と共に生きることが、この国では当たり前の日常なんですね。",
+        "form": "信仰",
+        "en": "What makes Indian religion fascinating is, above all, how close the gods feel. In Europe, believing in God was organized into a single institution through the church. In India, though, from morning worship to the little altars in front of shops, gods are everywhere in daily life. In other words, having faith is not a special act here; it is woven into everyday life as naturally as drinking tea. Living alongside the gods is simply the ordinary routine of this country.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「信仰を持つ」「信仰が厚い」が定番。神仏を信じ敬う心、またはその営みを指す。",
+        "sense": "神や宗教を信じ敬う、宗教的な意味での用法"
+      },
+      "deck": "senmon",
+      "field": "india",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "修行",
+      "reading": "しゅぎょう",
+      "pos": "noun",
+      "meaning": "ascetic training; disciplined practice",
+      "defJa": "宗教や武芸などで、心や技をみがくために行う鍛錬",
+      "passage": {
+        "ja": "お釈迦様が悟りに至る前、何年もの間激しい苦行を試みたのは有名な話です。しかし体を痛めつけても心は澄まず、弱っていくばかりだったと伝えられます。そこで釈迦はその道を捨てて、食を整え、心を静める中道の生き方へと移っていきました。そして菩提樹の下で静かに坐り込み、ついに悟りを開いたわけです。つまり修行とは、苦しみに耐えることではなく、正しい方法で心と体を磨くことなんですね。",
+        "form": "修行",
+        "en": "It is a famous story that before reaching enlightenment, the Buddha spent years attempting severe asceticism. Tradition says, however, that even as he tormented his body, his mind never cleared and he only grew weaker. So he abandoned that path and moved toward the middle way, caring for his body and calming his mind. Then, sitting quietly beneath the Bodhi tree, he finally attained enlightenment. In other words, training is not about enduring suffering, but about polishing mind and body through the right method.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「修行を積む」「修行に励む」が定番。仏教やヨーガなどで、心と技を磨く厳しい鍛錬を指す。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "india",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "偏り",
+      "reading": "かたより",
+      "pos": "noun",
+      "meaning": "imbalance; one-sidedness",
+      "defJa": "一部だけが極端に多くなり、全体のバランスが崩れていること",
+      "passage": {
+        "ja": "勉強がうまくいかない人の多くは、実は取り組み方に偏りがあるんです。たとえば好きな科目だけをひたすら進めたり、インプットばかりしてアウトプットを怠ったりするわけです。結果として得意なものはどんどん伸びて、苦手なものはますます手つかずのまま残っていくんです。つまり成績の伸び悩みは、努力不足ではなく、努力の配分の問題なんですね。まずは自分の学びの内訳を、一度冷静に見直してみましょう。",
+        "form": "偏り",
+        "en": "Many people whose studying isn't going well actually have an imbalance in how they go about it. For example, they push ahead only with the subjects they like, or they keep taking in input while neglecting output. As a result, their strengths keep growing while their weak areas remain increasingly untouched. In other words, a plateau in your grades is often not a matter of insufficient effort, but of how that effort is distributed. Start by calmly reviewing the breakdown of your own learning.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "動詞「偏る」の名詞形で、アンバランスの状態を指す。「栄養の偏り」「偏りをなくす」が定番の使い方。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "偏見",
+      "reading": "へんけん",
+      "pos": "noun",
+      "meaning": "prejudice; biased view",
+      "defJa": "根拠もなく一方だけを見て、決めつけてしまう考え方",
+      "passage": {
+        "ja": "人間の脳は、ものごとをすぐに分類して楽をしようとするんです。初対面の人が話し方や服装で何となく「こういう人だ」と決めつけるのは、その典型ですね。この仕組みが素早い判断を可能にする一方で、それが人に向かって根拠もなく固まると、偏見を抱くことになります。しかもこうした見方は、反対の証拠を目の前にしてもなかなか消えません。だからこそ、自分の直感が本当に当てになるものか、ときどき疑ってみる必要があるんですね。",
+        "form": "偏見",
+        "en": "The human brain tries to save itself effort by instantly categorizing things. When we meet someone for the first time and vaguely decide 'this is what they're like' from their speech or clothes, that's a classic example. While this mechanism makes fast judgment possible, when it hardens toward people without any basis, we end up holding prejudice. What's more, such views stubbornly refuse to disappear even when contrary evidence is right in front of us. That's exactly why we need to occasionally question whether our own intuitions are really reliable.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「偏見を抱く」「偏見を持つ」「偏見に基づく」が定番。根拠のない決めつけを指す。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "共感",
+      "reading": "きょうかん",
+      "pos": "noun",
+      "meaning": "empathy; feeling together with someone",
+      "defJa": "相手の気持ちを、自分のことのように感じてわかること",
+      "passage": {
+        "ja": "コミュニケーションの本には、聞き上手になれとよく書いてありますが、本当の鍵は共感を示すことにあります。相手の話をただ聞くのではなく、相手の気持ちに寄り添う。すると「この人はわかってくれている」という安心感が生まれ、話し手は心を開いていくんです。逆にアドバイスばかり返す人は、話している側からすると意外と敬遠されます。つまり人は解決策よりも、まずわかってもらいたい生きものなんですね。",
+        "form": "共感",
+        "en": "Communication books often tell you to be a good listener, but the real key lies in showing empathy. Not just hearing the other person's words, but staying close to their feelings. That creates the sense that 'this person really gets me,' and the speaker gradually opens up. On the flip side, people who keep offering advice are, surprisingly, often kept at a distance by the one doing the talking. In short, human beings want, more than solutions, to be understood.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「共感を示す」「共感を得る」「共感を呼ぶ」が定番。同情とは違い、相手の気持ちを一緒に感じること。",
+        "sense": "単なる同情ではなく、相手の気持ちに添って感じること"
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "冒頭",
+      "reading": "ぼうとう",
+      "pos": "noun",
+      "meaning": "the opening of a text or speech",
+      "defJa": "文章やスピーチなどの、始まりの部分",
+      "passage": {
+        "ja": "日本語の文章術でよく言われるのが、結論は最初に書けという原則です。読み手の時間は限られているので、文章の冒頭で「何を言いたいのか」を示さないと、人はすぐに離れてしまいます。新聞の記事が一番大事な情報を最初の段落にまとめるのは、まさにこの理屈からなんですね。昔ながらの起承転結は物語には合っても、説明文には必ずしも向きません。伝えたいことをまず書き出しに置く習慣をつければ、文章はぐっと読みやすくなります。",
+        "form": "冒頭",
+        "en": "A principle often repeated in Japanese writing guides is to state your conclusion first. Readers' time is limited, so if the opening of a piece doesn't show what it is trying to say, people drift away quickly. Newspapers packing the most important information into the first paragraph follows exactly this logic. The traditional 起承転結 structure suits stories, but doesn't necessarily suit explanatory writing. Build the habit of putting what you want to convey right at the start, and your prose becomes far easier to read.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "「記事の冒頭」「冒頭で述べた」「冒頭を飾る」のように、文章や講演の始まりの部分を指す語。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "執着",
+      "reading": "しゅうじゃく",
+      "pos": "noun",
+      "meaning": "attachment; inability to let go",
+      "defJa": "あるものや考えに心を取られて、離れられなくなること",
+      "passage": {
+        "ja": "仏教では、人間の苦しみの源を、ある心の働きに見ます。欲しいものを手放せない気持ち、大切なものを失いたくないという気持ち、こうした心の縛りが人を苦しめるわけです。だからこそ仏教は、すべてのものは移り変わると知り、執着を捨てることを勧めるんですね。ただし、だからといって何もかも投げ出せという意味ではありません。手放すべきは物そのものではなく、それに縛られる心のほうなんですね。",
+        "form": "執着",
+        "en": "In Buddhism, the source of human suffering is located in a certain working of the mind. The feeling of being unable to let go of what we want, the dread of losing what we hold dear—these bonds of the heart are what torment us. That is why Buddhism urges us to see that everything changes, and to let go of attachment. That said, this does not mean you should throw everything away. What needs releasing is not the things themselves, but the mind that is bound to them.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「執着を捨てる」「執着が強い」が定番。仏教では苦しみの源とされ、手放すべき心の縛りを指す。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "india",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

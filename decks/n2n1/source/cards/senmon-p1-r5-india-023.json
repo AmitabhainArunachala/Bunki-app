@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "相互依存",
+   "reading": "そうごいぞん",
+   "pos": "noun",
+   "meaning": "mutual dependence",
+   "defJa": "複数のものが互いを支え条件となる関係",
+   "passage": {
+    "ja": "一本の木を眺めると、それだけで立っているように見えても、水や土、周囲の生き物との関係が生育を支えています。仏教の縁起を学ぶ入口として相互依存という言葉を使うと、物事を孤立したものとして見る癖を問い直せます。ただし、この身近な例だけで、あらゆる仏教の議論が同じ仕組みを説いているとまとめることはできません。自然の観察から得た理解を足場にしつつ、読む経典では何と何が条件として結び付けられているかを追うと、概念をただの仲良しの標語にせず学べます。",
+    "form": "相互依存",
+    "en": "A tree may appear to stand by itself, yet water, soil, and surrounding organisms help sustain its growth. Using mutual dependence as an entry to Buddhist dependent arising can challenge the habit of seeing things in isolation. This familiar example alone, however, cannot establish that every Buddhist argument describes the same mechanism. Using observations of nature as a foothold while tracing the conditions linked in a particular scripture allows learning without reducing the concept to a slogan about getting along.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "互いに条件となる関係を表す。縁起の議論では具体的な条件も確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "玄奘",
+   "reading": "げんじょう",
+   "pos": "noun",
+   "meaning": "Xuanzang, Buddhist pilgrim and translator",
+   "defJa": "インドへ渡り多くの仏典を漢訳した唐の僧",
+   "passage": {
+    "ja": "仏教の伝来を旅の物語だけで捉えると、帰国後の翻訳が果たした役割を十分に評価できない。玄奘の場合も、インドまで赴いた行程に加えて、持ち帰った仏典を中国語で読める形にする仕事が重要であった。そこで伝えられた唯識の学問は日本にも受け継がれ、法相宗の寺院などで学ばれてきた。海や砂漠を越える身体の移動と、概念を別の言語へ移す知的な営みを重ねて考えると、日本で読まれる漢文の背後にある長い知の連鎖が浮かび上がる。",
+    "form": "玄奘",
+    "en": "Treating Buddhist transmission only as a travel narrative underestimates the role of translation after a traveler’s return. Xuanzang’s work included not only reaching India but also making the scriptures he brought back readable in Chinese. The Yogacara learning transmitted through this work was inherited in Japan and studied at temples of the Hosso school and elsewhere. Considering bodily movement across seas and deserts together with the intellectual work of moving concepts between languages reveals a long chain of knowledge behind Chinese texts read in Japan.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "旅と翻訳の両方に注目し、日本の唯識の学びとのつながりを読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "生老病死",
+   "reading": "しょうろうびょうし",
+   "pos": "noun",
+   "meaning": "birth, aging, illness, and death",
+   "defJa": "人が生きる上で避け難い四つの苦しみ",
+   "passage": {
+    "ja": "仏教の入門書で生老病死って並んでいると、後ろの三つは分かるけど、生まれることまで苦しみに入るのかと驚くよね。ここでの苦しみは、痛いとか悲しいとかいう気分だけを指しているんじゃないんだ。思いどおりに保てない身体を持って生きるという、もっと広い条件に目を向けているから、生そのものも問いの中に入ってくる。新しく生まれた命を喜ぶ気持ちとすぐに対立させず、同じ人生をどの角度から見ているのか考えてみると、重い言葉にも近づける気がするよ。",
+    "form": "生老病死",
+    "en": "In a Buddhist introduction, birth, aging, illness, and death can be surprising because the last three make sense as suffering, but birth too is included. Suffering here does not refer only to feelings of pain or sadness. It attends to the broader condition of living in a body we cannot keep exactly as we wish, which brings life itself into the inquiry. Instead of immediately setting this against joy at a new life, considering the angle from which the same life is viewed can make a weighty expression more approachable.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "仏教の苦は痛みや悲しみより広い意味で使われる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "発心",
+   "reading": "ほっしん",
+   "pos": "noun",
+   "meaning": "arousing the resolve to seek awakening",
+   "defJa": "悟りを求め仏道を歩もうと思い立つこと",
+   "passage": {
+    "ja": "仏教の文章に現れる発心は、単に新しい趣味を始める気持ちとは異なり、悟りを求めて仏道を歩もうとする志を表します。ある人物が修行へ向かう物語なら、その前後に何を見聞きし、何を大切にし直したのかを探すと、転機が具体的になります。ただし、心を起こした瞬間と、その志を保って日々実践することは同じではありません。用語の意味を押さえた上で、その後の生活や他者との関係がどう変わるかまで読むと、一時の感動だけでは捉えられない決意の重みが伝わります。",
+    "form": "発心",
+    "en": "In Buddhist writing, arousing the resolve to seek awakening expresses an aspiration to follow the Buddhist path rather than merely an interest in a new hobby. In a story about someone entering practice, examining what the person heard or saw and came to value makes the turning point concrete. However, the moment that resolve arises and maintaining it through daily practice are not the same. After learning the term, reading how life and relationships change conveys a weight of commitment that cannot be captured by momentary inspiration alone.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "悟りへ向かう志を起こすこと。決意の瞬間と継続する実践を分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+{
+ "cards": [
+  {
+   "term": "再帰的自己改善",
+   "reading": "さいきてきじこかいぜん",
+   "pos": "noun",
+   "meaning": "recursive self-improvement",
+   "defJa": "自らの改良能力も改良する過程を繰り返すという構想",
+   "passage": {
+    "ja": "人工知能の記事で再帰的自己改善に触れるなら、普通の製品更新との違いを一文で示すと伝わりやすくなります。課題を解く力だけでなく、自分を改良する力そのものも変わるという構想だと書けば、繰り返しの意味が明確です。ただし、向上が際限なく加速すると書くと、計算資源や検証時間の制約を省いてしまいます。人が手直しを続ける製品の例を、そのまま構想の実現例として挙げることも避けたいところです。想定した仕組みと確かめられた成果を段落で分けると、読者は議論の足場を見失いません。",
+    "form": "再帰的自己改善",
+    "en": "When writing about recursive self-improvement in AI, a sentence distinguishing it from ordinary product updates helps readers. Explaining that the ability to improve itself changes alongside task-solving ability clarifies what is recursive. However, claiming indefinitely accelerating progress omits constraints such as computing resources and validation time. A product repeatedly revised by people should not simply be presented as a realization of the proposed mechanism. Separate the envisioned mechanism from verified achievements into different paragraphs so readers retain a clear basis for the discussion.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "普通の更新との違いは、改良する能力自体も変わる点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "化合物半導体",
+   "reading": "かごうぶつはんどうたい",
+   "pos": "noun",
+   "meaning": "compound semiconductor",
+   "defJa": "異なる元素を組み合わせた物質からなる半導体",
+   "passage": {
+    "ja": "「半導体って、全部ケイ素でできているの」と聞かれたら、まず材料にも種類があると答えます。例えば、ケイ素と炭素を組み合わせた炭化ケイ素は、化合物半導体の一つで、電力を制御する部品に使われています。ただ、元素を混ぜれば何でも同じ働きになる、という話ではないんです。物質ごとの性質に加え、結晶を作る難しさや加工の費用も、使い道を考える上では大事です。材料の名前を暗記するだけでなく、どんな場面でその性質が役に立つのかを並べてみると、部品の選び方につながります。",
+    "form": "化合物半導体",
+    "en": "If someone asks whether all semiconductors are made from silicon, I first explain that several materials are used. Silicon carbide, combining silicon and carbon, is one compound semiconductor used in power-control components. That does not mean mixing any elements produces the same function. Choosing applications also requires considering material properties, crystal-growth difficulties, and processing costs. Connecting each material's properties to useful situations helps explain component choices instead of merely memorizing names.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "材料の名前と、その材料が得意な用途を結び付ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "半導体製造装置",
+   "reading": "はんどうたいせいぞうそうち",
+   "pos": "noun",
+   "meaning": "semiconductor manufacturing equipment",
+   "defJa": "半導体の加工や検査などに使われる機械",
+   "passage": {
+    "ja": "半導体製造装置を初めて読む人に紹介するなら、大きな機械の写真だけで説明を終えないようにします。薄い膜を作る、不要な部分を削る、寸法を測るという動詞を添えると、それぞれの機械の役割が伝わります。一台へ材料を入れれば完成品が出ると誤解させないためには、同じ板が複数の工程を繰り返し通る図も役立ちます。専門用語を全部並べるより、前の工程から何を受け取り、次へ何を渡すかを順に書くのが効果的です。読者が矢印を指で追える説明なら、写真の奥にある仕事の流れまで描けます。",
+    "form": "半導体製造装置",
+    "en": "When introducing semiconductor manufacturing equipment to newcomers, do not stop at photographs of large machines. Adding verbs such as forming thin films, removing unwanted material, and measuring dimensions conveys each machine’s role. A diagram showing the same wafer repeatedly passing through multiple stages also prevents the impression that one machine turns raw material directly into a finished product. Describing what each stage receives and passes on is more effective than listing every technical term. An explanation whose arrows readers can trace conveys the workflow behind the photographs.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "一台ですべてを完成させる機械だと考えない。",
+    "sense": ""
+   }
+  }
+ ]
+}

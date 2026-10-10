@@ -14,7 +14,7 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'dictionaryReadingSupportsForm', 'dictionarySummaryFor', 'dictionaryRowsForForm', 'dictionaryRowBySeq',
   'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD',
   'LOOKUP_HELPER_POS', 'japaneseLookupRecord', 'openJapaneseLookup', 'appendJapaneseLookup',
-  'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'placeFloating', 'keepFloatingBeside', 'miniAnchor', 'SAVE_PRESS_MS', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
+  'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'placeFloating', 'revealFloatingFocus', 'keepFloatingBeside', 'miniAnchor', 'SAVE_PRESS_MS', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
   'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey'];
 const declarations = new Map();
 for (const statement of ast.statements) {
@@ -116,7 +116,7 @@ test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot 
   const mini = await f.open('ます', { reading: 'ます', pos: '助動詞' });
   assert.equal(find(mini, 'mini-word').textContent, 'ます');
   assert.equal(find(mini, 'mini-reading').textContent, 'ます');
-  assert.equal(find(mini, 'mini-gloss').textContent, '(no gloss yet)');
+  assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
   assert.equal(find(mini, 'mini-take').disabled, true);
   await find(mini, 'mini-take').click();
   assert.deepEqual(f.chosen, []);
@@ -157,7 +157,7 @@ test('Missing and mismatched readings cannot fall through to a different core an
   ]) {
     const f = app({ withIndex }), mini = await f.open(fixture.word, { reading: fixture.reading });
     assert.equal(find(mini, 'mini-reading').textContent, fixture.reading);
-    assert.equal(find(mini, 'mini-gloss').textContent, '(no gloss yet)');
+    assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
     assert.equal(find(mini, 'mini-take').disabled, true);
     assert.equal(find(mini, 'mini-entry').disabled, true);
   }

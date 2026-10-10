@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "ルネサンス",
+   "reading": "るねさんす",
+   "pos": "noun",
+   "meaning": "Renaissance",
+   "defJa": "十四世紀から欧州に広まった文芸復興。",
+   "passage": {
+    "ja": "十四世紀のイタリアで始まったルネサンスは、古代の文献を掘り起こし、人間の言葉で世界を語り直す運動でした。ダンテやペトラルカをはじめ、俗語で詩や物語を書く者が現れ、学者だけのラテン語の壁が揺らぎます。のちに活版印刷が普及すると、この動きは一気に国境を越えて広がっていきました。語彙を磨きたい話し手が学べるのは、先人の言葉を深く知ってこそ新しい表現が生まれるという点です。",
+    "form": "ルネサンス",
+    "en": "The Renaissance, which began in fourteenth-century Italy, was a movement that dug up ancient texts and retold the world in human language. Starting with Dante and Petrarch, writers appeared who wrote poems and tales in the vernacular, and the wall of scholars-only Latin began to shake. Later, when movable-type printing spread, the movement leapt across borders all at once. What a speaker who wants to polish vocabulary can learn is that new expression is born only from knowing the words of one's predecessors deeply.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「ルネサンス期」。古典の再発見から新しい表現が生まれた時代。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ハイパーインフレ",
+   "reading": "はいぱーいんふれ",
+   "pos": "noun",
+   "meaning": "hyperinflation",
+   "defJa": "物価が急激に上がり続ける状態。",
+   "passage": {
+    "ja": "一九二三年のドイツで起きたハイパーインフレは、語り方しだいで、教科書の一行にも、胸に迫る物語にもなります。賃金が日に何度も支払われ、受け取るなり、人々は価値が下がる前に店へ走りました。この一場面を示すだけで、物価という抽象的な言葉が、聞き手の目の前の光景に変わります。数字を語るなら、総人口や総売上より先に、まず一人の暮らしを描くのが鉄則です。聞き手が覚えているのは、数字ではなく、走る人々の姿なのです。",
+    "form": "ハイパーインフレ",
+    "en": "The hyperinflation that struck Germany in 1923 can become either a single line in a textbook or a gripping story, depending on how it is told. Wages were paid several times a day, and the moment they received them, people ran to the shops before their value fell. Showing just this one scene turns the abstract word prices into a sight right before the listener's eyes. When you talk numbers, the iron rule is to first depict one person's life, before total population or total sales. What listeners remember is not the numbers but the figures of people running.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「ハイパーインフレに陥る」。急速な物価上昇を場面で語る例。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ヒューリスティック",
+   "reading": "ひゅーりすてぃっく",
+   "pos": "noun",
+   "meaning": "heuristic",
+   "defJa": "経験則に頼る素早い判断法。",
+   "passage": {
+    "ja": "人は複雑な判断を迫られると、経験則に頼って素早く答えを出す。この簡便な思考法がヒューリスティックであり、多くの場面では実用的な結果をもたらす。反面、思い浮かびやすい事例を実際より起こりやすいと思い込むなど、認知の系統的な偏りを生むことも知られている。サメの事故が大きく報じられた直後に海水浴を控える人が出てくるのは、その典型例といえる。こうしたクセを知っておくことは、自分の判断を点検する第一歩となる。",
+    "form": "ヒューリスティック",
+    "en": "When pressed to make complex judgments, people rely on rules of thumb to produce answers quickly. This quick-and-easy way of thinking is the heuristic, and in many situations it brings practical results. On the other hand, it is also known to produce systematic cognitive biases, such as believing easily recalled cases are likelier than they really are. A typical example is the people who steer clear of the beach right after a shark attack gets heavy coverage. Knowing these quirks is the first step in checking one's own judgments.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「ヒューリスティックに頼る」。素早いが偏りも生む思考の近道を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ご利益",
+   "reading": "ごりやく",
+   "pos": "noun",
+   "meaning": "divine favor, blessing",
+   "defJa": "神仏が与える恵みや幸せ。",
+   "passage": {
+    "ja": "インドの寺院へ行くと、朝から長い行列ができています。人々はガネーシャ像に花輪を捧げ、商売繁盛のご利益を願っているんですね。ところが、アドヴァイタの教えに従えば、神に何かを求める心こそが自我を強めてしまうのです。願いがかなうかどうかはさておき、問われているのは求めている自分の側です。門前では、花輪や供え物の菓子が飛ぶように売れ、どの店の前にも人だかりができています。",
+    "form": "ご利益",
+    "en": "Go to a temple in India and a long line has already formed by morning. People offer garlands to the Ganesha statue, praying for the blessing of a thriving business. Yet according to Advaita teaching, the very mind that asks something of God only strengthens the ego. Setting aside whether the wish is granted, what is being questioned is the one doing the asking. In front of the gate, garlands and sweet offerings sell like hot cakes, and a crowd gathers at every stall.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「ご利益を願う」「ご利益がある」の形で、神仏から授かる現世の恵みを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

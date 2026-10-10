@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "最澄",
+   "reading": "さいちょう",
+   "pos": "noun",
+   "meaning": "Saicho, founder of Japanese Tendai",
+   "defJa": "比叡山を拠点に日本の天台宗を開いた僧",
+   "passage": {
+    "ja": "比叡山が日本仏教の歴史で繰り返し登場するのは、山の景色が美しいからだけではありません。最澄はここを拠点に天台の教えを広め、僧を育てる仕組みにも力を注ぎました。中国から経典を持ち帰ることに加えて、日本でどのような学びと修行を行うかが課題だったのです。宗派と開祖を組み合わせて暗記するだけでは、人が育ち、教えが次の世代へ渡る過程を見落とします。山に集まる僧たちの生活まで想像すると、海を越えた思想が日本の制度として根付いていく様子を具体的に考えられます。",
+    "form": "最澄",
+    "en": "Mount Hiei appears repeatedly in Japanese Buddhist history for reasons beyond the beauty of its scenery. Saicho used it as a base to spread Tendai teaching and devoted effort to systems for training monks. Alongside bringing scriptures from China, there was the question of what study and practice should take place in Japan. Simply memorizing a school and its founder overlooks how people were trained and teachings passed to later generations. Imagining the lives of monks gathering on the mountain makes it possible to consider concretely how ideas crossing the sea took root in Japanese institutions.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "天台宗の開祖として、伝来だけでなく人材育成との関係も読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "未来永劫",
+   "reading": "みらいえいごう",
+   "pos": "noun",
+   "meaning": "for all eternity",
+   "defJa": "これから先の限りなく長い時間",
+   "passage": {
+    "ja": "寺院の縁起や願文には、教えや祈りが未来永劫続くことを願う表現が見られる。そこで述べられる時間は、建物の耐用年数や修理計画の期間と同じ尺度では測れない。限りのない先まで願いをつなぐ言葉であり、具体的な年数を保証する記述とは性格が異なる。歴史資料を読むに当たっては、事業の記録と宗教的な誓いとを区別し、それぞれの表現が何を担うかを確かめる必要がある。永続を願う強い言葉の背後には、実際には修理や伝承を繰り返してきた人々の営みがある。",
+    "form": "未来永劫",
+    "en": "Temple origin accounts and written prayers contain expressions wishing that teachings or prayers will endure for all eternity. The time they describe cannot be measured on the same scale as a building’s service life or a repair schedule. Such language carries a wish into an unlimited future rather than guaranteeing a specific number of years. Reading historical sources requires distinguishing project records from religious vows and examining the role of each expression. Behind powerful wishes for permanence stand people who have repeatedly repaired buildings and transmitted traditions.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "限りなく長い未来を表し、具体的な年数の保証とは異なる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "末法思想",
+   "reading": "まっぽうしそう",
+   "pos": "noun",
+   "meaning": "belief in an age of Buddhist decline",
+   "defJa": "仏の教えを正しく実践し難い時代という考え",
+   "passage": {
+    "ja": "古い仏教の文章に世の衰えが語られていても、それを単なる悲観的な性格の表れと読めば、歴史的な背景が抜け落ちる。末法思想は、釈尊の入滅後に時代が進み、教えを正しく実践することが難しくなるという見方である。日本でもこの見方を背景に、どのような救いの道が可能かが問われた。ただし、同じ時代観を共有するからといって、すべての宗派が同じ実践を選ぶとは限らない。衰退を語る言葉は、何もできないという諦めだけでなく、今の人間に届く教えを求める問いにもつながった。",
+    "form": "末法思想",
+    "en": "Reading references to a declining world in old Buddhist writings merely as a pessimistic temperament loses their historical background. Belief in an age of Buddhist decline holds that advancing time after the Buddha’s passing makes correct practice increasingly difficult. In Japan too, this view provided a background for asking which paths to liberation remained possible. Sharing the same view of the age, however, does not mean that all schools chose the same practices. Language of decline led not only to resignation but also to questions about teachings accessible to people in their present condition.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "時代に伴う教えの実践の難しさを説く見方で、単なる悲観論ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "末那識",
+   "reading": "まなしき",
+   "pos": "noun",
+   "meaning": "manas consciousness in Yogacara",
+   "defJa": "唯識で深層の自己への執着に関わる意識",
+   "passage": {
+    "ja": "頭では相手の言うことが正しいと分かっているのに、自分を守る方へ考えが動くことってあるよね。唯識では、表に出る思考だけでなく、その奥で自分への執着に関わる働きを末那識として論じるんだ。日常の反省から考える入口にはなるけど、この場面だけで教義を全部説明できるということではないよ。まして、現代の脳の一部分にそのまま対応させて、ここが執着の場所だと言い切るのは飛躍がある。心をどう分けて考えてきたかを読む言葉として押さえると、昔の議論と今の経験を丁寧に比べられるね。",
+    "form": "末那識",
+    "en": "Sometimes you understand intellectually that another person is right, yet your thinking moves toward defending yourself. Yogacara discusses not only overt thought but also a deeper function associated with attachment to self as manas consciousness. Everyday reflection offers a starting point, but this one situation does not explain the entire doctrine. Identifying it directly with a modern brain region and calling that the location of attachment would be an unjustified leap. Understanding the term as part of a historical way of analyzing mind allows careful comparison between older arguments and present experience.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "唯識の心の分類に属する語。特定の脳部位の名称とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本地垂迹",
+   "reading": "ほんじすいじゃく",
+   "pos": "noun",
+   "meaning": "honji suijaku theory",
+   "defJa": "日本の神を仏が姿を変えた現れとする考え",
+   "passage": {
+    "ja": "神社と寺が関わる歴史を学ぶと、日本の神が仏や菩薩の現れとして説明される場面に出会います。本地垂迹では、根本にある仏と、その土地に姿を現した神との関係が組み立てられます。ただし、神仏が関係する出来事なら何でもこの一語で説明できるとは限りません。具体的な資料に即して、どの神とどの仏が結び付けられ、どんな物語で語られているかを確かめると理解が進みます。単に二つの宗教が混ざったと覚えるより、関係を描く考え方そのものを押さえると、日本の信仰史の細部を読み分けられます。",
+    "form": "本地垂迹",
+    "en": "Studying connections between shrines and temples reveals accounts of Japanese kami as manifestations of Buddhas or bodhisattvas. Honji suijaku constructs a relationship between an underlying Buddha and a kami appearing in a particular place. Yet not every event involving kami and Buddhas can be explained by this term alone. Understanding improves by checking specific sources to see which kami and Buddha are linked and how their relationship is narrated. Grasping the conceptual relationship rather than simply memorizing a mixture of two religions helps distinguish details of Japan’s religious history.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "神仏習合の一つの考え方。どの神と仏の関係かを具体的に読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本尊",
+   "reading": "ほんぞん",
+   "pos": "noun",
+   "meaning": "the principal object of Buddhist worship",
+   "defJa": "寺や仏堂で中心として礼拝される対象",
+   "passage": {
+    "ja": "寺の案内文で本尊を「いちばん大きな仏像」と言い換えると、信仰上の役割を大きさの問題にしてしまいます。礼拝の中心となる対象を指すので、像の寸法を比べるだけでは、その位置付けを説明できません。また、仏像に限らず、宗派や寺によっては別の形で表されることもあります。案内を書くなら、名前を示した上で、その寺でどのように大切にされているかを続けると、読者が堂内の配置を理解する助けになります。目立つものを主役と決めつける前に、誰に何を祈る場所なのかを文章の軸に据えましょう。",
+    "form": "本尊",
+    "en": "Paraphrasing a temple’s principal object of worship as its largest Buddhist statue turns a religious role into a question of size. The term refers to the focus of worship, so comparing dimensions alone cannot explain its status. Depending on the school or temple, it may also take a form other than a statue. A guide that names it and explains its importance at that temple helps readers understand the hall’s arrangement. Before treating the most visually prominent object as central, organize the explanation around whom people worship and for what purpose.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "礼拝上の中心という役割を表し、大きさや古さで決まる語ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本来無一物",
+   "reading": "ほんらいむいちもつ",
+   "pos": "noun",
+   "meaning": "originally, not a single thing",
+   "defJa": "もともと執着すべき固定した実体はないこと",
+   "passage": {
+    "ja": "禅の言葉として知られる本来無一物を、持ち物を全部捨てなさいという命令だと受け取ると、意味が狭くなります。ここで問われるのは、物や考えを動かない実体として握り締め、それに心を縛られるあり方です。物を減らすことが役に立つ場合はあっても、それだけで執着がなくなるとは限りません。何も持たない自分こそ立派だと思えば、その評価にまた心が引っ掛かることもあります。部屋の空き具合を測る標語として読むより、何に自分の確かさを求めているかを問い直す入口として読むと、禅の議論につながります。",
+    "form": "本来無一物",
+    "en": "Reading the well-known Zen phrase “originally, not a single thing” as a command to discard all possessions narrows its meaning. It questions grasping objects or ideas as fixed entities and allowing the mind to be bound by them. Reducing possessions may help in some situations, but does not by itself guarantee freedom from attachment. Taking pride in owning nothing can become another judgment that catches the mind. Rather than using the phrase to measure empty space in a room, read it as an opening to reconsider where you seek certainty about yourself.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "物の所有数より、固定したものに心を縛られるあり方を問う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "本覚思想",
+   "reading": "ほんがくしそう",
+   "pos": "noun",
+   "meaning": "the doctrine of original enlightenment",
+   "defJa": "悟りが本来備わっているとする考え",
+   "passage": {
+    "ja": "日本の天台仏教などで論じられた本覚思想は、悟りを遠い未来に初めて獲得するものとしてだけは捉えない。もともと悟りが備わっているという立場から、人間や世界のあり方が考察される。そこから修行をどう位置付けるかという問いが生じるが、教えの説明を直ちに何もしなくてよいという主張へ縮めることはできない。関連する文献を比較する際には、何が本来備わるとされ、日々の実践がどう説明されるかを読み分ける必要がある。肯定的な響きのある用語でも、その内部には実践をめぐる複雑な議論が含まれている。",
+    "form": "本覚思想",
+    "en": "The doctrine of original enlightenment, discussed in Japanese Tendai and other Buddhist contexts, does not treat awakening solely as something first acquired in the distant future. It examines human beings and the world from the position that enlightenment is originally present. This raises questions about the place of practice, but the teaching cannot immediately be reduced to a claim that nothing need be done. Comparing related writings requires distinguishing what is considered originally present and how daily practice is explained. Even a positively sounding term can contain complex debate about practice.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "本来の悟りを説く思想。修行不要という単純な主張と同一視しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "来世",
+   "reading": "らいせ",
+   "pos": "noun",
+   "meaning": "the next life",
+   "defJa": "死後に生まれ変わるとされる次の生",
+   "passage": {
+    "ja": "仏教の物語で人が来世の幸福を願うとき、その願いを現実逃避とだけ評するのは急ぎすぎである。死後にも生が続くという見方は、今の行いをどのように意味付けるかとも関わっている。もちろん、その世界観を共有するかどうかと、歴史の中で人々が何を願ったかを理解することは別の問題だ。現代の自分の立場にかかわらず、まず登場人物がどの時間の広がりの中で行動しているかを読んでみたい。有限な生涯の先を思う言葉が、目の前の生活を投げ出す理由にも、丁寧に生きる理由にもなり得るという幅を見失いたくない。",
+    "form": "来世",
+    "en": "When someone in a Buddhist narrative wishes for happiness in the next life, dismissing the wish solely as escapism is premature. The view that life continues after death also relates to how present actions acquire meaning. Sharing that worldview and understanding what people historically hoped for are, of course, separate matters. Regardless of our present position, we can first read the temporal horizon within which a character acts. We should retain the breadth of possibility by which language reaching beyond a finite lifetime can motivate either withdrawal from present life or careful engagement with it.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "死後の次の生を指す。物語の世界観と読み手の信念を区別する。",
+    "sense": ""
+   }
+  }
+ ]
+}

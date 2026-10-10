@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "悪癖",
+   "reading": "あくへき",
+   "pos": "noun",
+   "meaning": "bad habit",
+   "defJa": "身についてしまった好ましくない癖。",
+   "passage": {
+    "ja": "仕事の締め切りが近づくたびに、関係のない資料を読み始めてしまう場合を考える。この悪癖を直すには、意気込みを書き出すだけでなく、実際に作業を止めた場面を記録しておく方法がある。何を調べようとして画面を開き、どこから別の話題へ移ったのかをたどれば、行動を変える手がかりになる。原因を性格の弱さだけに求める一方で、手順の分かりにくさを見落としている可能性もある。本人を責める言葉を増やす前に、次の一歩が具体的に決まっているかを点検する余地がある。",
+    "form": "悪癖",
+    "en": "Consider someone who starts reading unrelated material whenever a work deadline approaches. One way to address this bad habit is to record the moments when work actually stopped, rather than only writing down resolutions. Tracing what they intended to research when they opened the screen and where they shifted to another topic can provide clues for changing the behaviour. While attributing the cause solely to weak character, they may also be overlooking unclear procedures. Before adding more words of self-blame, there is room to check whether the next step has been concretely defined.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「悪癖を直す」は、繰り返して身についた好ましくない習慣を改めることです。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "老衰",
+   "reading": "ろうすい",
+   "pos": "noun",
+   "meaning": "decline due to old age",
+   "defJa": "年を重ねて全身の働きが衰えること。",
+   "passage": {
+    "ja": "伝記に老衰で亡くなったと記されていても、その人が最期まで穏やかだったかどうかは、この一語からは読み取れません。示されているのは年を重ねて体が衰えたことであり、本人の気持ちを直接述べた表現ではないからです。別れの場面を柔らかい言葉で描こうとするあまり、記録にない感情まで補わないようにします。残された手紙や家族の記述に当たる際にも、誰が見たことなのかを区別します。文章の背後にある情報の範囲を自覚すると、事実を伝える語と、読み手が抱く印象を分けて扱えます。",
+    "form": "老衰",
+    "en": "Even if a biography records that someone died of old age, that term alone does not tell us whether the person remained peaceful to the end. It indicates physical decline with age rather than directly describing the person’s feelings. Avoid adding emotions absent from the record in an excessive effort to portray the farewell gently. When consulting surviving letters or family accounts, also distinguish whose observations they report. Awareness of the scope of the information behind the text lets us separate words conveying facts from impressions formed by readers.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "加齢による体の衰えを指し、本人の気持ちまで表す言葉ではありません。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ありのまま",
+   "reading": "ありのまま",
+   "pos": "adverb",
+   "meaning": "as it is; without embellishment",
+   "defJa": "飾ったり変えたりせず、実際のとおりに。",
+   "passage": {
+    "ja": "一日の記録をつけるとき、出来事をありのままに書こうとしても、失敗したという評価が先に出てくることがある。予定の本を読めなかったと書くことと、何もできない一日だったと書くことは同じではない。後者には、その日全体についての判断が加わっている。肝心なのは感想を消すことではなく、起きたことをもとに、どこから自分の評価が始まったかを確かめることである。書いた言葉を読み返し、判断の根拠を一つずつ探るなら、日記は自分を責めるためだけの場所ではなくなる。",
+    "form": "ありのまま",
+    "en": "When keeping a daily record, even an attempt to describe events as they were can be overtaken by a judgment that you failed. Writing that you did not read the book you had planned is not the same as writing that you accomplished nothing all day. The latter adds a judgment about the entire day. What matters is not eliminating impressions, but using what happened to identify where your own evaluation began. If you reread your words and examine the grounds for each judgment, the diary no longer serves only as a place for self-blame.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「ありのままに書く」は、飾ったり内容を変えたりせず事実どおりに書くことです。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "唱える",
+   "reading": "となえる",
+   "pos": "verb",
+   "meaning": "chant; recite aloud",
+   "defJa": "定まった言葉を声に出して述べる。",
+   "passage": {
+    "ja": "仏教の法要で経文を唱える場面を記録する際、文字の内容と、声に出して読む行為は分けて捉える必要がある。同じ文章でも、一人が読むのか、複数の人が声を合わせるのかによって、記録すべき点が異なる。音の長さや区切りを確かめることに加えて、その法要での役割を尋ねれば、儀礼との関わりも調べられる。聞いた人の感想だけを根拠に、参加者全員の気持ちや身体への影響まで言い切ることはできない。信仰に密接に関わる営みを伝えるには、見聞きした事実と解釈の境目を保つ姿勢が求められる。",
+    "form": "唱える",
+    "en": "When documenting the chanting of scriptures at a Buddhist service, it is necessary to distinguish the written content from the act of reciting it aloud. Even with the same text, what needs to be recorded differs depending on whether one person reads or several join their voices. In addition to examining the length and phrasing of the sounds, asking about their role in that service allows the connection with the ritual to be investigated. One listener’s impressions alone cannot establish all participants’ feelings or bodily effects. Reporting an activity closely connected with faith requires maintaining the boundary between observed facts and interpretation.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「経文を唱える」は、経典の言葉を声に出して読むことです。",
+    "sense": "定まった言葉を声に出して読む。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

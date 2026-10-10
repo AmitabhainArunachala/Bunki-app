@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "植民地",
+   "reading": "しょくみんち",
+   "pos": "noun",
+   "meaning": "colony",
+   "defJa": "他国に支配され従属する地域",
+   "passage": {
+    "ja": "十九世紀の英国にとって、インドは単なる植民地ではなく、帝国の経済を支える最重要の基盤でした。綿製品の市場として、また茶やアヘンの供給地として、その役割は計り知れませんでした。しかし一八五七年の大反乱を境に、統治は東インド会社から英国王室へと移ります。これを皮切りに、英国は直接支配のしくみを整えていったのです。その結果、インドの伝統的な手工業は打撃を受け、社会の構造も大きく揺さぶられました。",
+    "form": "植民地",
+    "en": "For nineteenth-century Britain, India was not a mere colony but the most important foundation supporting the imperial economy. As a market for cotton goods and a source of tea and opium, its role was immeasurable. After the great rebellion of 1857, however, rule passed from the East India Company to the British Crown. Starting from this, Britain went on to build the machinery of direct rule. As a result, India's traditional handicrafts were hit hard, and the structure of society was also shaken greatly.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「植民地支配」「旧植民地」。他国の支配下にある地域を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

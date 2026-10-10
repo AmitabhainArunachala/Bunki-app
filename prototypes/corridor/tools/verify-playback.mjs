@@ -3,7 +3,7 @@
  * The voice is locked (operator's blind audition, 2026-09-29): Google Gemini TTS Kore reads and Charon
  * is the second speaker. F1 is withdrawn. There is no device voice, no voice picker and no interim
  * voice. Until the Kore clips ship, index.html raises no narration flag and the reader's play bar is a
- * quiet 音声準備中 · Kore line with nothing to press: that shipped state is checked as the build serves
+ * quiet absence label with the locked voices in its accessible description: that state is checked as the build serves
  * it. The bar's own lifecycle — play, pause, restart, a failed clip, a passage switch, a late manifest —
  * is checked on the same code with a synthetic Kore narration manifest (the test raises the flag; an
  * Audio double answers every clip): the bar Kore will use, before its clips exist. Answer-card 音 follows
@@ -191,7 +191,8 @@ async function press(page) { await page.locator('#listen-toggle').click(); }
 /** The shut bar: the quiet pending line, with no play control to press and no picker. */
 const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-toggle') && !document.querySelector('#listen-voice')
   && !!document.querySelector('.listen-row.is-pending #listen-note'));
-const PENDING = /音声準備中 · Kore/u;
+const PENDING = /^No recording for this article$/u;
+const PENDING_VOICES = 'Approved voices: Kore (main), Charon (second).';
 const FAILED = /could not play|再生できませんでした/u;
 async function counts(page) {
   return page.evaluate(() => ({
@@ -200,6 +201,7 @@ async function counts(page) {
     cancels: window.__playbackFixture.cancels,
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed'),
     note: document.querySelector('#listen-note')?.textContent,
+    description: document.querySelector('#listen-note')?.getAttribute('aria-description') ?? null,
     progress: document.querySelector('#listen-progress')?.getAttribute('aria-valuenow') ?? null,
   }));
 }
@@ -248,6 +250,8 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
     }
     // invariants of every case, from one final observation that the passing row also records
     const final = await counts(f.page);
+    if (PENDING.test(final.note)) assert.equal(final.description, PENDING_VOICES,
+      'Every pending article names the locked voices in its accessible description');
     assert.equal(final.utterances.length, 0, 'the device voice is never called, in any case');
     assert.deepEqual(f.errors, [], 'no uncaught application errors');
     results.push({ name, pass: true, observed: final });
@@ -282,8 +286,8 @@ try {
     const { page } = f;
     assert.equal(await barShut(page), true, 'no play control and no picker: the quiet pending line');
     const before = await counts(page);
-    assert.match(before.note, PENDING, 'the line names the locked voice');
-    assert.match(before.note, /audio coming soon/u, 'and says, in English, that audio is coming');
+    assert.match(before.note, PENDING, 'the line says that this article has no audio yet');
+    assert.equal(before.description, PENDING_VOICES, 'the accessible description names the locked voices');
     await page.locator('#listen-note').click({ force: true });
     await page.waitForTimeout(350);
     const after = await counts(page);
@@ -528,7 +532,7 @@ try {
       || window.__playbackFixture.clips.length > 0, null, { timeout: 5000 });
     const after = await cardState(page);
     assert.equal(after.clips.length, 0, 'a word recorded only in interim voices never plays');
-    assert.match(after.sayNote, /Kore の声を準備中|The Kore voice is on its way/u, 'the card names the voice it waits for');
+    assert.match(after.sayNote, /Kore の収録音声はありません|No Kore recording/u, 'the card names the approved voice with no recording');
     assert.equal(await page.evaluate(() => localStorage.getItem('kairo-rec-voice-v1')), 'ami', 'the old stored choice is left intact');
   }, { learnerRecord: 'graded' });
   await check('an-invalid-stored-voice-reads-as-kore', 'card-invalid', async ({ page }) => {

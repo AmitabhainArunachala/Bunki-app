@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "お邪魔します",
+   "reading": "おじゃまします",
+   "pos": "expression",
+   "meaning": "excuse me for intruding",
+   "defJa": "人の家や部屋に入るときの挨拶",
+   "passage": {
+    "ja": "他人の家を訪ねるに際して「お邪魔します」と言うのは、単なる挨拶ではなく、相手の領域に入ることへの断りである。畳の部屋の文化では、靴を脱ぐ一歩が内と外の境目を示すため、この一言が欠かせない。帰るときには「お邪魔しました」と過去形に変え、訪問が終わったことを告げる。言葉の形を使い分けるだけで、礼儀正しい印象は大きく変わる。靴をそろえる所作とともに、言葉もまた、客としての心づかいの一部になる。",
+    "form": "お邪魔します",
+    "en": "Saying “ojama shimasu” when visiting someone's home is not a mere greeting but a request for permission to enter the other person's territory. In a culture of tatami rooms, the single step of taking off one's shoes marks the boundary between inside and outside, so this phrase is indispensable. On leaving, you change it to the past tense, “ojama shimashita,” to signal that the visit is over. Merely using the different forms appropriately changes the impression of politeness greatly. Along with the gesture of lining up one's shoes, words too become part of a guest's consideration.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "入るときは現在形「お邪魔します」、帰るときは過去形に変える。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

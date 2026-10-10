@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "21世紀の石油",
+   "reading": "にじゅういっせいきのせきゆ",
+   "pos": "expression",
+   "meaning": "\"the oil of the 21st century\" (chips)",
+   "defJa": "半導体など、経済に欠かせないものを燃料資源にたとえた呼び名",
+   "passage": {
+    "ja": "半導体は「21世紀の石油」と呼ばれ、経済報道の定番の表現となって久しい。ただし原油は燃やせば消えるものの、チップは使い切らず、工場と材料があれば再生産できる。この比喩が伝えるのはあくまで経済的な重要性であって、物質としての性質ではない。先端工程を担う工場は世界でもごく少数で、需給が一地域の制約に左右されるため、供給が乱れれば世界の生産が揺れる。記事の語句を正せば、各国が争う対象は埋蔵量ではなく製造能力そのものである。",
+    "form": "21世紀の石油",
+    "en": "Semiconductors have long been called the oil of the 21st century, a stock phrase of business reporting. While oil vanishes once it is burned, however, chips are never used up, and can be reproduced as long as factories and materials exist. What the metaphor conveys is strictly economic importance, not the properties of a substance. The factories handling leading-edge processes are only a handful worldwide, and because supply and demand hinge on the constraints of a single region, any disruption there shakes production around the world. Set the article's wording straight, and what countries compete over is not reserves but manufacturing capacity itself.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "比喩は経済上の重要性を指す。原油と違いチップは使い切らず再生産できる点を、報道分析では押さえたい。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

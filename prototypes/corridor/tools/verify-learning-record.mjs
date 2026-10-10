@@ -50,7 +50,7 @@ const names = new Set([
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
-  'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem',
+  'srsPrefsPending', 'NODE_KIND', 'YOMI_RT_LABEL', 'dayKey', 'renderMockItem', 'kankenGradeLabel',
   'NEW_PER_DAY_MAX', 'REVIEW_LIMIT_MIN', 'REVIEW_LIMIT_MAX',
   // card-system slice 1: the preset buttons, the pacing steppers and the optional break
   'NEW_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_DEFAULT', 'REVIEWS_PER_DAY_MIN', 'REVIEWS_PER_DAY_MAX', 'RETENTION_MIN', 'RETENTION_MAX',
@@ -1149,14 +1149,14 @@ async function browserChecks() {
         });
         await journey('probe-rejection-keeps-card-and-evidence-unminted', async (page) => {
           await boot(page, null, 'drift'); await page.locator('#ginga-symbol').click(); await page.locator('.nav-dojo').click();
-          await page.locator('.focus-mode').filter({ hasText: 'yomi probe' }).click(); await page.locator('.focus-start').click();
+          await page.locator('.focus-mode').filter({ hasText: 'Reading check' }).click(); await page.locator('.focus-start').click();
           await page.locator('#probe-reveal').click(); const word = await page.locator('.review-front').textContent(); const before = await fault(page, 'obslog');
           await page.locator('[data-probe="wrong"]').evaluate((node) => { node.click(); node.click(); }); await failed(page, before);
           assert.equal(await page.locator('.review-front').textContent(), word); assert.equal(await page.locator('[data-probe="wrong"]').count(), 1);
         });
         await journey('probe-miss-atomically-mints-one-card-and-one-observation', async (page) => {
           await boot(page, null, 'drift'); await page.locator('#ginga-symbol').click(); await page.locator('.nav-dojo').click();
-          await page.locator('.focus-mode').filter({ hasText: 'yomi probe' }).click(); await page.locator('.focus-start').click();
+          await page.locator('.focus-mode').filter({ hasText: 'Reading check' }).click(); await page.locator('.focus-start').click();
           await page.locator('#probe-reveal').click(); const word = await page.locator('.review-front').textContent(); const before = await disk(page);
           await page.locator('[data-probe="wrong"]').evaluate((node) => { node.click(); node.click(); });
           const after = await pollDisk(page, (state) => state.obslog.some((row) => row[1] === 'probe'));

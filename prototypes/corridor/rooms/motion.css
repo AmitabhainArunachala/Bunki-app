@@ -1,0 +1,28 @@
+/* The departing frame fades over the live incoming room. Capturing the new
+   room would disable its hit testing until the native transition finishes. */
+:root, #app > main { view-transition-name: none; }
+html[data-room-transition] #app > main[data-room-arrival] {
+  animation: kairo-room-arrive 220ms ease both !important;
+  animation-delay: var(--room-arrival-delay, 0ms) !important;
+}
+#primary-tabs .primary-tab:disabled { opacity: 1; cursor: default; }
+::view-transition { pointer-events: none; }
+::view-transition-group(*) { animation: none; }
+::view-transition-image-pair(*) { isolation: isolate; }
+::view-transition-old(kairo-room) {
+  mix-blend-mode: normal;
+  animation: kairo-room-leave 220ms cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes kairo-room-fade-out { to { opacity: 0; } }
+@keyframes kairo-room-leave { to { opacity: 0; transform: translateY(-6px); } }
+/* Opacity keeps fixed reader/card docks anchored to the viewport. */
+@keyframes kairo-room-arrive { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(kairo-room) {
+    animation: kairo-room-fade-out 80ms linear both;
+  }
+  html[data-room-transition] #app > main[data-room-arrival] {
+    animation: kairo-room-arrive 80ms linear both !important;
+    animation-delay: var(--room-arrival-delay, 0ms) !important;
+  }
+}

@@ -1,0 +1,73 @@
+{
+ "batch": "r5-variety2-gate-015",
+ "items": [
+  {
+   "term": "霊験",
+   "reading": "れいげん",
+   "gloss": "miraculous efficacy",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-017c0d850f-61a4eade",
+    "wordId": "nn-017c0d850f"
+   }
+  },
+  {
+   "term": "自然言語処理",
+   "reading": "しぜんげんごしょり",
+   "gloss": "natural language processing",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-a6cde01e02-f5c24024",
+    "wordId": "nn-a6cde01e02"
+   }
+  },
+  {
+   "term": "八百万の神",
+   "reading": "やおよろずのかみ",
+   "gloss": "the myriad kami",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-6d3423ec75-b86d133b",
+    "wordId": "nn-6d3423ec75"
+   }
+  }
+ ],
+ "reviewOf": {
+  "霊験": {
+   "source": "cards/senmon-p1-r5-variety2-l1-009.json",
+   "cardId": "nn-017c0d850f-61a4eade",
+   "batch": "r5-variety2-l1-009",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 5, register 報). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: The old comparative より has no comparative predicate. Use grammatical natural Japanese and attribute religious efficacy to tradition or belief."
+  },
+  "自然言語処理": {
+   "source": "cards/senmon-p1-r5-variety2-l3-003.json",
+   "cardId": "nn-a6cde01e02-f5c24024",
+   "batch": "r5-variety2-l3-003",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 講). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: The old phrase 否定の向き is unclear for scope of negation. Use natural precise language and concrete actual mechanism/example."
+  },
+  "八百万の神": {
+   "source": "cards/senmon-p1-r5-variety2-l3-005.json",
+   "cardId": "nn-6d3423ec75-b86d133b",
+   "batch": "r5-variety2-l3-005",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 2, register 講). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: Do not merely quote the target as a label or repeat 八百万 beside it: use the target in its normal sense in a concrete Shinto/Buddhist cultural context."
+  }
+ }
+}

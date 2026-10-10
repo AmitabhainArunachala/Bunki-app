@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "パワー半導体",
+   "reading": "ぱわーはんどうたい",
+   "pos": "noun",
+   "meaning": "power semiconductor",
+   "defJa": "電力の変換や制御を担う半導体素子",
+   "passage": {
+    "ja": "ノート型パソコンの電源アダプターでは、パワー半導体が電流を高速に切り替え、電圧を調整する回路で働いています。通電にも切り替えにも熱が生じます。スイッチング方式の電源は、コンセントから来た交流をまず直流へ変え、それを細かく切り替えてトランスへ伝えた後、再び整えて機器が使う直流の電圧に変換します。出力に応じて部品の発熱も変わるので、試験ではパソコンへ電力を送り続け、ケースの温度や内部の熱のたまり方を確かめます。",
+    "form": "パワー半導体",
+    "en": "In a laptop power adapter, power semiconductors switch current rapidly as part of the circuit adjusting voltage. Both conduction and switching generate heat. A switching power supply first converts alternating current from the outlet to direct current, switches it rapidly to transfer energy through a transformer, then rectifies and smooths it again to produce the direct-current voltage used by the device. Because component heating varies with output, tests continue supplying power to the computer while examining case temperature and the accumulation of heat inside.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "電源回路などで、電力の変換や制御を担う半導体素子。",
+    "sense": ""
+   },
+   "cardId": "nn-8855de5d35-bc75aa89",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010-r.json",
+    "cardId": "nn-8855de5d35-bc75aa89",
+    "wordId": "nn-8855de5d35"
+   }
+  },
+  {
+   "term": "プロセスルール",
+   "reading": "ぷろせするーる",
+   "pos": "noun",
+   "meaning": "process rule (node size)",
+   "defJa": "半導体を製造する技術の世代や設計上の基準",
+   "passage": {
+    "ja": "半導体の設計者は新製品の開発に先立って、必要な計算性能と消費電力、製造費を照らし合わせ、どの製造工程なら目標を満たせるかを検討し、その工程で使える回路の情報を集める。名称の数字だけでは決まらない。プロセスルールの世代名は、現在では特定の配線幅をそのまま示す数値とは異なる。回路の密度や性能は工程ごとに確かめられ、設計に使う部品の選択肢も絞られる。採用する工程が決まると、製造上の制約に沿って回路を配置する作業が進む。",
+    "form": "プロセスルール",
+    "en": "Before developing a new semiconductor product, designers compare required computing performance, power consumption, and manufacturing cost, examine which process can meet those goals, and gather information about circuits available in it. The numbers in a name do not decide the choice alone. A process-node generation name today differs from a numerical value directly specifying a particular wiring width. Circuit density and performance are checked for each process, narrowing the component options available to the design. Once the process is selected, circuit placement proceeds according to its manufacturing constraints.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "製造技術の世代や基準を示し、現在の名称を単純な実寸とは扱わない。",
+    "sense": ""
+   },
+   "cardId": "nn-097f926e5b-28b071e7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+    "cardId": "nn-097f926e5b-28b071e7",
+    "wordId": "nn-097f926e5b"
+   }
+  },
+  {
+   "term": "屋台骨",
+   "reading": "やたいぼね",
+   "pos": "noun",
+   "meaning": "a central support or backbone",
+   "defJa": "組織や事業を根本で支えるもの",
+   "passage": {
+    "ja": "半導体の工場で、設備の異常を調べる人が休むと、いつもと同じ装置なのに現場の動きが鈍るんだよね。測定値が少しずれたとき、装置を止めるべきか材料を調べるべきかを判断できる人は、過去の不具合と修理の経験を積み重ねていて、手順書に載っていない手がかりも拾ってるんだ。代役はすぐには育たない。工場の屋台骨を支えてる技術者たちは、後を任せられる人を増やそうと、異常が出るたびに新人を呼んで同じ画面をのぞき込んでるよ。",
+    "form": "屋台骨",
+    "en": "When the people investigating equipment faults at a semiconductor factory are away, work slows even though the machines are unchanged. Someone who can decide whether to stop a machine or examine materials when a measurement is slightly off has accumulated experience of faults and repairs, picking up clues that are absent from the procedure manual. Replacements cannot be trained immediately. The engineers who form the factory’s backbone call new staff over to examine the same screen whenever a fault appears, trying to increase the number of people they can entrust with the work.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「屋台骨を支える」で、組織を根本から成り立たせる働きを表す。",
+    "sense": ""
+   },
+   "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+    "wordId": "nn-1ccc6a0eb9"
+   }
+  }
+ ]
+}

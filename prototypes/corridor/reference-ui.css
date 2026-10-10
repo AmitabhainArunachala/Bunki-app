@@ -195,7 +195,7 @@ body[data-view='levels'] main {
   padding: 14px 16px;
   background: transparent;
   min-width: 0;
-  transition: background 120ms ease;
+  transition: none;
 }
 
 .reference-level:hover {

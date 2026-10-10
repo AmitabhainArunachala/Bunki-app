@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "陽明学",
+   "reading": "ようめいがく",
+   "pos": "noun",
+   "meaning": "the Wang Yangming school",
+   "defJa": "王陽明の思想を受け継ぐ儒学の一派",
+   "passage": {
+    "ja": "親を大切にするべきだと何度も口にしながら、困っている親を放っておいたら、本当に分かっていると言えるかな。陽明学では、知ることと行うことを切り離さず、道徳的な理解が実際の行いに現れる点を重んじるんだ。王陽明の思想を受け継ぐ儒学の一派で、日本にも影響を与えたよ。実践を大事にするところは禅と比べられるにしても、そのまま仏教と同じ教えになるものじゃない。人との関係で何を善いと知り、その知をどう生きるかという問いが、身近な暮らしへ向けられているね。",
+    "form": "陽明学",
+    "en": "If someone repeatedly says parents should be cared for but abandons a parent in difficulty, can that person really be said to understand? The Wang Yangming school values moral understanding appearing in actual conduct, without separating knowing from doing. It is a Confucian tradition inheriting Wang Yangming's thought and also influenced Japan. Its emphasis on practice can be compared with Zen without making it the same teaching as Buddhism. It directs a question toward everyday life about what one knows as good in relationships and how one lives that knowledge.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "王陽明の思想を受け継ぐ儒学で、知ることと行うことの関係を重んじる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-3e188b9102-2a4a3c99",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-3e188b9102-2a4a3c99",
+    "wordId": "nn-3e188b9102"
+   }
+  },
+  {
+   "term": "血脈",
+   "reading": "けちみゃく",
+   "pos": "noun",
+   "meaning": "a lineage of Buddhist transmission",
+   "defJa": "師から弟子へ教えを伝えてきた系譜",
+   "passage": {
+    "ja": "師の名から弟子の名へ、線がつながっている。仏教で血脈と呼ばれる系譜は、家族の血縁ではなく、教えや戒が誰から誰へ伝えられたかを示すものである。伝授を受けた者は、自分の学びを先人からの長い連なりの中に置くことになる。ただし、文書に名が並ぶことだけをもって、遠い時代の師弟関係が一様に史実として確認されるとはいえない。教団が伝承の正統性を示す役割と、個々の人物の関係を歴史的に検証する作業は、同じ系図を扱いながら異なる目的を持つ。",
+    "form": "血脈",
+    "en": "Lines connect a teacher's name to a disciple's. The lineage called kechimyaku in Buddhism records who transmitted teachings or precepts to whom, rather than a family's biological descent. A recipient of transmission places personal learning within a long succession from predecessors. Names in a document alone do not establish that distant teacher-disciple relationships are uniformly verified historical facts. A religious community's demonstration of legitimate transmission and the historical verification of individual relationships address the same chart with different purposes.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏教の教えの系譜を指し、この用法では「けちみゃく」と読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1da3ae9ca6-de0e75b8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-1da3ae9ca6-de0e75b8",
+    "wordId": "nn-1da3ae9ca6"
+   }
+  },
+  {
+   "term": "聖徳太子",
+   "reading": "しょうとくたいし",
+   "pos": "noun",
+   "meaning": "Prince Shotoku",
+   "defJa": "日本で仏教の興隆に関わった飛鳥時代の皇族",
+   "passage": {
+    "ja": "寺に残る幼い皇子の像へ、今も人が手を合わせる。聖徳太子は仏教の興隆に関わった飛鳥時代の皇族であるとともに、死後も長く信仰の対象となってきた存在である。政治に携わった一人の人間の生涯を超えて、慈悲や知恵の理想がその姿に託されてきた。伝記に不思議な出来事があるからといって、そのすべてを同時代の事実として扱うことはできない。それでも、歴史上の人物を慕う人々がどのような願いを抱いたかは、像や儀礼の中に具体的な形で残っている。",
+    "form": "聖徳太子",
+    "en": "People still join their hands before statues of a young prince preserved in temples. Prince Shotoku was both an Asuka-period royal involved in the flourishing of Buddhism and a figure long venerated after death. Ideals of compassion and wisdom came to be entrusted to his image beyond one politically active person's lifetime. Wondrous events in biographies cannot all be treated as contemporary facts simply because they are recorded. Yet the wishes of those who revered this historical figure remain in concrete form in images and rituals.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "飛鳥時代の皇族としての姿と、後世の信仰対象としての姿を併せ持つ人物。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-773f79b1d1-a30833ec",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-773f79b1d1-a30833ec",
+    "wordId": "nn-773f79b1d1"
+   }
+  },
+  {
+   "term": "音写",
+   "reading": "おんしゃ",
+   "pos": "noun",
+   "meaning": "phonetic transliteration (into kanji)",
+   "defJa": "言葉の音を別の文字で写し表すこと",
+   "passage": {
+    "ja": "「般若」の漢字二文字は、それぞれの意味を足して選ばれたものではありません。インドの言葉の音を漢字に移す音写によって、仏教の語が中国へ伝えられ、日本でも受け継がれました。同じ原語の内容を表す「智慧」という訳と比べると、音を残す方法と意味を移す方法の違いがはっきりします。音を受け取る側の言語が違えば、元の発音がそのまま保たれるとも限りません。読経で口にする言葉の響きには、教えの伝来に伴って複数の言語を通ってきた歴史も含まれています。",
+    "form": "音写",
+    "en": "The two characters in hannya were not chosen by adding their individual meanings. Buddhist terms reached China and were inherited in Japan through phonetic transcription of Indian words into Chinese characters. Comparison with the semantic translation “wisdom” clarifies the difference between preserving sound and conveying meaning. Different receiving languages do not necessarily preserve the original pronunciation unchanged. The sounds voiced in recitation also contain the history of passing through multiple languages as the teaching spread.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "他言語の音を文字に写すことで、意味を訳す方法とは区別される。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-ae829ae63c-e5eff498",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-ae829ae63c-e5eff498",
+    "wordId": "nn-ae829ae63c"
+   }
+  }
+ ]
+}

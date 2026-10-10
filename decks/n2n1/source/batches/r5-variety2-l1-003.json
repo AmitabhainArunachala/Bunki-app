@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "寵児",
+   "reading": "ちょうじ",
+   "gloss": "a darling of the age",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-110450b46f-ffd5eddf",
+    "wordId": "nn-110450b46f"
+   }
+  },
+  {
+   "term": "巨大IT企業",
+   "reading": "きょだいあいてぃーきぎょう",
+   "gloss": "Big Tech companies",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-734f254221-0e409518",
+    "wordId": "nn-734f254221"
+   }
+  },
+  {
+   "term": "強化学習",
+   "reading": "きょうかがくしゅう",
+   "gloss": "reinforcement learning",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-302b075c29-5e13bb13",
+    "wordId": "nn-302b075c29"
+   }
+  },
+  {
+   "term": "成膜",
+   "reading": "せいまく",
+   "gloss": "thin-film deposition",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-eb09033600-072e1d36",
+    "wordId": "nn-eb09033600"
+   }
+  },
+  {
+   "term": "技術革新",
+   "reading": "ぎじゅつかくしん",
+   "gloss": "technological innovation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6f817dd058-3edc1df7",
+    "wordId": "nn-6f817dd058"
+   }
+  },
+  {
+   "term": "文脈内学習",
+   "reading": "ぶんみゃくないがくしゅう",
+   "gloss": "in-context learning",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-593530a7d0-700f5948",
+    "wordId": "nn-593530a7d0"
+   }
+  },
+  {
+   "term": "最適解",
+   "reading": "さいてきかい",
+   "gloss": "an optimal solution",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-6964993348-e88f534a",
+    "wordId": "nn-6964993348"
+   }
+  },
+  {
+   "term": "欺瞞",
+   "reading": "ぎまん",
+   "gloss": "deception",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
+    "cardId": "nn-c03dd05187-d8061609",
+    "wordId": "nn-c03dd05187"
+   }
+  }
+ ],
+ "weave": [
+  "寵児",
+  "巨大IT企業",
+  "強化学習",
+  "成膜",
+  "技術革新",
+  "文脈内学習",
+  "最適解",
+  "欺瞞"
+ ]
+}

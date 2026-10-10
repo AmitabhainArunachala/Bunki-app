@@ -30,7 +30,7 @@
  *   (exits non-zero on station, startup or cleanup failure; screenshots and
  *   results.json are retained in the fresh evidence directory)
  */
-import { openShelfDoor } from './shelf-tools-support.mjs';
+import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -237,6 +237,7 @@ try {
   });
 
   await step('3 search + synonym cluster + entry', async () => {
+    await openShelfTools(page);
     await page.fill('#search', '意見');
     await page.waitForTimeout(400);
     if (!(await page.$('.search-syn'))) throw new Error('no cluster under the hits');
@@ -244,6 +245,7 @@ try {
     await page.waitForSelector('.sheet .headword', { timeout: 5000 });
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
+    await openShelfTools(page);
     await page.fill('#search', '');
     await page.waitForTimeout(300);
   });
@@ -301,7 +303,7 @@ try {
     await page.click('#back');
     await page.waitForSelector(JOURNEY_TEXT, { timeout: 5000 });
     const t = await page.evaluate((sel) => document.querySelector(`${sel} .read-tag`)?.textContent || '', JOURNEY_TEXT);
-    if (!t.includes('途中')) throw new Error('tag: ' + JSON.stringify(t));
+    if (!t.includes('in progress')) throw new Error('tag: ' + JSON.stringify(t));
   });
 
   await step('7 JLPT lesson end to end', async () => {
@@ -360,7 +362,7 @@ try {
   });
 
   await step('9 review trace on the tray', async () => {
-    await page.getByRole('button', { name: /リストへ|back to lists/ }).click();
+    await page.getByRole('button', { name: /リストへ|back to lists|今日へ|Back to Today/ }).click();
     await page.waitForTimeout(300);
     const tr = await page.evaluate(() => document.querySelector('.srs-trace')?.textContent);
     if (!tr) throw new Error('no trace line');

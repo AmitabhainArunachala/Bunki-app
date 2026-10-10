@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "フラッシュメモリ",
+   "reading": "ふらっしゅめもり",
+   "pos": "noun",
+   "meaning": "flash memory (retains data without power)",
+   "defJa": "電気で消せ、電源を切っても記録が残る半導体記憶",
+   "passage": {
+    "ja": "スマホの写真が電源を切っても消えないのは、記録がフラッシュメモリに書き込まれているからです。名前は、消去が一瞬で済む様子をカメラのフラッシュに例えたものと伝えられています。ただし「消せる黒板」という比喩が役立つのはそこまでで、一行だけ消すことはできず、消去はブロック単位でまとめて行われます。書き換えの回数にも制約があり、消去と書き込みの繰り返しに伴ってセルはだんだん疲れてきます。比喩が破綻するこの二箇所、消去の単位と書き換えの寿命こそ、この技術の本質が見える場所です。",
+    "form": "フラッシュメモリ",
+    "en": "The photos on your smartphone do not vanish when the power is cut, because they are written into flash memory. The name, it is said, comes from likening that instant erasure to the flash of a camera. But the \"erasable blackboard\" metaphor is useful only up to that point: you cannot erase just one line, and erasure is carried out in blocks, all at once. The number of rewrites is also constrained, and as the cycle of erasing and writing is repeated, the cells gradually grow weary. These two places where the metaphor breaks — the unit of erasure and the lifespan of rewrites — are exactly where the essence of this technology comes into view.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「フラッシュメモリ搭載」「フラッシュメモリの寿命」のように、機器の仕様や部品の寿命の話でよく現れる語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ファウンドリ",
+   "reading": "ふぁうんどり",
+   "pos": "noun",
+   "meaning": "foundry: contract chip manufacturer",
+   "defJa": "設計を預かり、半導体の製造だけを請け負う会社",
+   "passage": {
+    "ja": "先週の勉強会で、ソフトウェア出身の参加者に「ファウンドリって何だっけ」と聞かれた。設計者に向かうときは「図面を預かってチップにして返す工場」、製品を買う人に向かうときは「他社の設計をまとめて受注する専門工場」と、言い換えを使い分けている。同じ言葉でも、聞き手がどこに立つかで像が変わるものだ。品質の鍵を握るのは製造側だから、説明の重心も相手に応じてずらすと決めている。その日は後者の言い方で答え、会のあとに「やっと分かった」と一言もらった。",
+    "form": "ファウンドリ",
+    "en": "At last week's study group, a participant from a software background asked me, \"What was a foundry again?\" When I face a designer, I use \"a factory that takes your blueprints on trust and returns them as chips\"; when I face someone who buys the finished products, I use \"a specialist factory that takes on other companies' designs and makes them to order\" — I keep both paraphrases and switch between them. Even with the same word, the image changes depending on where the listener stands. Since the manufacturing side holds the key to quality, I have made it a rule to shift the weight of my explanation according to the listener. That day I answered with the latter phrasing, and after the meeting I got a single remark: \"Now I finally get it.\"",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "半導体業界の語で、「ファウンドリ各社」「ファウンドリ事業」のように会社や事業の単位と結びつく。",
+    "sense": "金属の鋳造所ではなく、半導体の受託製造会社の意"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

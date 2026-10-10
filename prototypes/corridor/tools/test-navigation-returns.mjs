@@ -22,6 +22,7 @@ function app() {
     document: { activeElement: null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
     activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, personalHost: null,
+    roomTransitionUpdating: false, activeRoomTransition: null,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
     requestAnimationFrame() {}, passage: () => null,
@@ -36,7 +37,7 @@ function app() {
     try { context.renderUntilDOM(); }
     catch (error) { if (error !== drawingBoundary) throw error; }
   };
-  vm.runInContext(['keepNavigationReturn', 'returnFromNavigation', 'openPassage',
+  vm.runInContext(['withoutRoomTransition', 'roomTransition', 'keepNavigationReturn', 'returnFromNavigation', 'openPassage',
     'openReferenceCollection', 'restoreLearningSourceCaller', 'resumeLearningSource']
     .map(actualFunction).join('\n'), context);
   return { context, positions };

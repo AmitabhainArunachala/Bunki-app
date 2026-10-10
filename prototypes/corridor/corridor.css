@@ -31,9 +31,9 @@
   --faint: rgba(28, 47, 66, 0.42); /* depth-by-fade, as Drift ships it */
   --faint-2: rgba(28, 47, 66, 0.3);
 
-  --serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Noto Serif CJK JP',
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif CJK JP',
     'Source Han Serif JP', 'Songti SC', serif;
-  --sans: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+  --sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
 
   /* typographic scale — focused first */
   --t-read: 21px;
@@ -64,14 +64,25 @@ body {
   height: 100%;
 }
 
+/* A control with no face of its own takes the room's bundled face, never the browser's default. */
+:where(button, input, select, textarea) {
+  font-family: inherit;
+}
+
 body {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--sans);
   font-size: var(--t-body);
   line-height: 1.6;
-  overscroll-behavior-y: none;
+  /* r4 (T2: "native ios expeirnce is alreayd way smoother"): pages keep the native bounce but
+     never pull-to-refresh (contain); the full-screen door keeps none. The viewport takes its
+     value from the root element, so html carries it too. */
+  overscroll-behavior-y: contain;
 }
+html:has(> body:not([data-view='drift'])) { overscroll-behavior-y: contain; }
+html:has(> body[data-view='drift']),
+body[data-view='drift'] { overscroll-behavior-y: none; }
 
 /* S1 living paper — the per-world procedural ground grown by corridor.js and
  * hung here through --paper-url. A fixed layer painted once and composited,
@@ -463,8 +474,7 @@ body.ginga #drift-layer #hint.first-cue {
   box-shadow: 0 3px 14px rgba(20, 26, 34, 0.18);
   cursor: pointer;
   transition:
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    color 0.3s ease;
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .nav-symbol svg {
   width: 26px;
@@ -513,9 +523,7 @@ body.ginga #drift-layer #hint.first-cue {
   user-select: none;
   -webkit-user-select: none;
   transition:
-    opacity 0.5s ease,
-    transform 0.3s ease,
-    background 0.3s ease;
+    opacity 0.5s ease, transform 0.3s ease;
 }
 .ginga-seal:hover,
 .ginga-seal:focus-visible,
@@ -571,7 +579,7 @@ body.ginga #drift-layer #hint.first-cue {
   border: 0.5px solid rgb(0 0 0 / 12%);
   border-radius: 18px;
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 18px 44px rgb(20 26 34 / 16%);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
   transform-origin: top center;
   animation: nav-drop 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -605,7 +613,7 @@ body.ginga #drift-layer #hint.first-cue {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: none;
 }
 .nav-arrow:hover:not(:disabled) {
   background: rgb(120 120 128 / 12%);
@@ -645,7 +653,7 @@ body.ginga #drift-layer #hint.first-cue {
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: none;
 }
 .nav-search-door::placeholder {
   color: rgb(60 60 67 / 60%);
@@ -678,7 +686,7 @@ body.ginga #drift-layer #hint.first-cue {
   border-radius: 12px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.14s ease;
+  transition: transform 0.14s ease;
 }
 .nav-review:hover,
 .nav-dojo:hover {
@@ -758,7 +766,7 @@ body.ginga #drift-layer #hint.first-cue {
   font-size: 13px;
   letter-spacing: 0;
   color: var(--ink-2, #55606c);
-  transition: color 0.24s ease;
+  transition: none;
 }
 .lang-knob {
   position: absolute;
@@ -771,8 +779,7 @@ body.ginga #drift-layer #hint.first-cue {
   border-radius: 7px;
   box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%);
   transition:
-    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1),
-    width 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .lang-slide[data-lang='ja'] .lang-knob {
   transform: translateX(39px);
@@ -899,7 +906,7 @@ body.ginga #drift-layer #hint.first-cue {
   gap: 6px;
   min-height: 52px;
   padding: 0 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
   font-size: 17px;
   font-weight: 600;
   line-height: 52px;
@@ -913,7 +920,7 @@ body.ginga #drift-layer #hint.first-cue {
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px rgb(20 26 34 / 14%);
   cursor: pointer;
   animation: bubble-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  transition: transform 0.14s ease, box-shadow 0.2s ease;
+  transition: transform 0.14s ease;
 }
 .corner-bubble:active {
   transform: scale(0.97);
@@ -2373,9 +2380,9 @@ button.pool-tag.cat-chip {
   opacity: 0.6;
 }
 
-/* the ten world-stones — the direct picker. Each stone previews its
- * own world (inline colours from THEME_UI); the active one is ringed in its
- * world's red. */
+/* the eleven world-stones — the direct picker, in two named rows (day, night:
+ * D2, both night looks are offered). Each stone previews its own world (inline
+ * colours from THEME_UI); the active one is ringed in its world's red. */
 /* the stones are a transient modal: they must surface above EVERY overlay —
  * the stroke page rides at z-90 and buried them (operator: "no options to
  * change colors at all"), so the picker tops the whole stack */
@@ -2388,20 +2395,52 @@ button.pool-tag.cat-chip {
 .world-picker {
   position: fixed;
   z-index: 121;
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  gap: 10px;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  max-width: calc(100vw - 16px);
+  padding: 12px 14px 14px;
   background: var(--ground-0);
   border: 1px solid var(--line);
   border-radius: 14px;
-  box-shadow: 0 14px 44px rgba(10, 10, 8, 0.32);
+  box-shadow: 0 1px 2px rgba(10, 10, 8, 0.12), 0 18px 44px -8px rgba(10, 10, 8, 0.36);
+  animation: world-picker-in 180ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
+}
+.world-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.world-row-name {
+  flex: 0 0 100%;
+  margin: 0 0 2px 2px;
+  font: 600 11px/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+.world-picker-name {
+  margin: 2px 2px 0;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--line);
+  font: 500 13px/1.3 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  color: var(--ink);
+  min-height: 1.3em;
+}
+@keyframes world-picker-in {
+  from { opacity: 0.01; transform: translateY(-4px) scale(0.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-picker { animation: none; }
 }
 .world-stone {
   width: var(--tap);
   height: var(--tap);
   border-radius: 999px;
   border: 2px solid var(--line-soft);
+  /* a fine ring in the panel's own ink, so a dark stone (漆 殻 浪) stays drawn on the night panel */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
   font-family: var(--serif);
   font-size: 17px;
   line-height: 1;
@@ -2411,8 +2450,9 @@ button.pool-tag.cat-chip {
 }
 .world-stone.active {
   border-color: var(--stone-red, var(--red));
-  box-shadow: 0 0 0 1px var(--stone-red, var(--red));
+  box-shadow: 0 0 0 1px var(--stone-red, var(--red)), inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
 }
+.world-stone:active { transform: scale(0.92); }
 
 /* ------------------------------------------------------ bilingual chrome */
 .en-sub {
@@ -4071,17 +4111,18 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 [data-stroke-chrome] {
   transition:
-    opacity 0.22s ease,
-    visibility 0s linear 0s;
+    opacity 0.22s ease;
 }
 
 .stroke-page[data-chrome='sleeping'] [data-stroke-chrome] {
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 0.22s ease,
-    visibility 0s linear 0.22s;
+    opacity 0.22s ease;
+}
+
+.stroke-page[data-chrome='sleeping'] [data-stroke-chrome][data-faded] {
+  visibility: hidden;
 }
 
 .stroke-awake-field {
@@ -4109,16 +4150,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 /* the readings open ELEGANTLY — a slow rise and settle, not a pop */
 .stroke-awake-field {
   transition:
-    opacity 0.34s ease,
-    transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1),
-    visibility 0s linear 0s;
+    opacity 0.34s ease, transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .stroke-page[data-chrome='sleeping'] .stroke-awake-field {
   transform: translate(-50%, 16px);
   transition:
-    opacity 0.26s ease,
-    transform 0.26s ease,
-    visibility 0s linear 0.26s;
+    opacity 0.26s ease, transform 0.26s ease;
 }
 
 .stroke-reading-field {
@@ -4184,8 +4221,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
-    opacity 0.22s ease,
-    background-color 0.22s ease;
+    opacity 0.22s ease;
 }
 
 .stroke-chrome-trigger:is(:hover, :focus-visible),
@@ -4255,8 +4291,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.36;
   -webkit-tap-highlight-color: transparent;
   transition:
-    opacity 0.22s ease,
-    background-color 0.22s ease;
+    opacity 0.22s ease;
 }
 .stroke-corner:is(:hover, :focus-visible),
 .stroke-corner[aria-pressed='true'],
@@ -4283,8 +4318,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.36;
   -webkit-tap-highlight-color: transparent;
   transition:
-    opacity 0.22s ease,
-    background-color 0.22s ease;
+    opacity 0.22s ease;
 }
 .stroke-page[data-minimal='on'] #strokes-back:is(:hover, :focus-visible),
 .stroke-page[data-minimal='on'][data-chrome='awake'] #strokes-back {
@@ -4380,7 +4414,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .review-sense {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-style: italic;
   color: var(--ink-2);
   font-size: 15px;
@@ -4583,7 +4617,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .ai-tutor .ai-answer {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-size: 14px;
   color: var(--ink-2);
   white-space: pre-wrap;
@@ -4615,7 +4649,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .lesson-option {
   font: inherit;
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   text-align: left;
   padding: 12px 14px;
   border: 1px solid var(--line);
@@ -5205,6 +5239,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   width: max(100%, var(--tap));
   height: max(100%, var(--tap));
   transform: translate(-50%, -50%);
+}
+
+.rest-toggle .rest-icon {
+  display: block;
+  width: 11px;
+  height: 11px;
 }
 
 .rest-toggle.resting {
@@ -5849,6 +5889,7 @@ body.zen .probe-context {
   cursor: pointer;
   vertical-align: baseline;
   position: relative;
+  z-index: 1;
 }
 
 .sent-door::before {
@@ -5859,6 +5900,13 @@ body.zen .probe-context {
   width: max(100%, var(--tap));
   height: max(100%, var(--tap));
   transform: translate(-50%, -50%);
+}
+
+/* The reveal fade gives this line a stacking context; let its sentence
+ * target stay above the following printed headword without moving either. */
+.review-cloze:has(.sent-door) {
+  position: relative;
+  z-index: 1;
 }
 
 /* the answer face's example lines — quieter than the cloze, still living */
@@ -6472,7 +6520,7 @@ body.zen main {
   height: 100%;
   background: var(--faint);
   opacity: 0.75;
-  transition: width 0.4s ease;
+  transition: none;
 }
 .zen-exit,
 .zen-more {
@@ -6825,10 +6873,12 @@ body.zen .review-front[data-len='8'] {
 /* ------------------------------------- the reading: calligraphy, not UI text */
 body.zen .review-reading-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
+body.zen .review-reading-row > .say { flex-shrink: 0; }
 body.zen .review-reading {
   font-family: 'Yuji Syuku', var(--serif);
   font-size: 27px;
@@ -6853,7 +6903,7 @@ body.zen .review-reading {
   position: relative;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: color 200ms ease;
+  transition: none;
 }
 .say.is-speaking {
   color: var(--card-red, #b7282e);
@@ -6869,7 +6919,7 @@ body.zen .review-reading {
 
 /* ------------------------------------------------ one sense decides the grade */
 body.zen .review-sense-primary {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-style: normal;
   font-size: 18px;
   line-height: 1.5;
@@ -6877,7 +6927,7 @@ body.zen .review-sense-primary {
   max-width: 34ch;
 }
 body.zen .review-sense-rest {
-  font-family: Georgia, serif;
+  font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-size: 13.5px;
   line-height: 1.5;
   color: var(--card-ink-2);
@@ -7056,56 +7106,51 @@ body.zen .review-example {
     }
   }
   /* the answer condenses out of the paper like ink soaking in — each zone a
-   * beat of the ritual, the reading legible by ~450ms, seals last */
+   * beat of the ritual, readings first and every grade ready within 340ms */
   body.zen .reveal {
-    animation: kairo-materialize 520ms var(--ease-ceremony) both;
+    animation: kairo-materialize 180ms var(--ease-ceremony) both;
   }
   @keyframes kairo-materialize {
     from {
       opacity: 0;
       transform: translateY(10px);
-      filter: blur(6px);
-    }
-    60% {
-      filter: blur(1.5px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
-      filter: blur(0);
     }
   }
   body.zen .reveal.r-1 {
-    animation-delay: 120ms;
+    animation-delay: 40ms;
   }
   body.zen .reveal.r-2 {
-    animation-delay: 210ms;
+    animation-delay: 70ms;
   }
   body.zen .reveal.r-3 {
-    animation-delay: 300ms;
+    animation-delay: 100ms;
   }
   body.zen .reveal.r-4 {
-    animation-delay: 390ms;
+    animation-delay: 130ms;
   }
   body.zen .grade-row .grade {
-    animation: kairo-materialize 380ms var(--ease-ceremony) both;
-    animation-delay: 480ms;
+    animation: kairo-materialize 140ms var(--ease-ceremony) both;
+    animation-delay: 110ms;
   }
   body.zen .grade-row .grade:nth-child(2) {
-    animation-delay: 540ms;
+    animation-delay: 140ms;
   }
   body.zen .grade-row .grade:nth-child(3) {
-    animation-delay: 600ms;
+    animation-delay: 170ms;
   }
   body.zen .grade-row .grade:nth-child(4) {
-    animation-delay: 660ms;
+    animation-delay: 200ms;
   }
   /* the stamp: one crisp gesture in a slow room */
   body.zen .grade.hanko:active .g-seal {
     transform: translateY(1px) scale(0.94);
   }
   .say.is-speaking svg {
-    animation: kairo-say-breath 2400ms var(--ease-breath) infinite;
+    animation: kairo-say-breath 6s var(--ease-breath) infinite;
   }
   @keyframes kairo-say-breath {
     0%,
@@ -7166,8 +7211,7 @@ body.zen .review-example {
   user-select: none;
   -webkit-user-select: none;
   transition:
-    opacity 0.5s ease,
-    background 0.3s ease;
+    opacity 0.5s ease;
 }
 .ginga-search svg {
   width: 17px;
@@ -7872,6 +7916,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 .report-line { display: flex; flex-wrap: wrap; gap: .25rem 1rem; justify-content: center; margin: 3rem 0 1.5rem; }
 .report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
+body.zen #app > .report-line-page .report-door { color: var(--zen-text); }
 .report-line-sheet { margin: 2rem 0 .5rem; }
 /* The waking field supplies its own gap; page margins push it over the glyph. */
 .stroke-awake-field .report-line-stroke { margin: 0; }
@@ -7879,6 +7924,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 
 /* the 音 door's reason when it cannot play — visible and announced, never a silent tap */
 .say-note { display: block; flex-basis: 100%; margin-top: .25rem; font-size: .82rem; color: var(--faint); }
+body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .say-note:empty { display: none; }
 
 /* D11 · the reader's honest gloss (2026-09-25). A content word the quick

@@ -1,0 +1,198 @@
+{
+ "items": [
+  {
+   "term": "注意機構",
+   "reading": "ちゅういきこう",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "an attention mechanism",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-01278539f0-c99f3a28",
+    "wordId": "nn-01278539f0"
+   }
+  },
+  {
+   "term": "演算能力",
+   "reading": "えんざんのうりょく",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "computational capacity",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025-r.json",
+    "cardId": "nn-a2ee7ba9ba-b8d2e07e",
+    "wordId": "nn-a2ee7ba9ba"
+   }
+  },
+  {
+   "term": "牽引",
+   "reading": "けんいん",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "driving or leading growth",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-026.json",
+    "cardId": "nn-9ad453dde6-0ee738b3",
+    "wordId": "nn-9ad453dde6"
+   }
+  },
+  {
+   "term": "知的財産",
+   "reading": "ちてきざいさん",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "intellectual property",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-a50bf9fea5-5c852f46",
+    "wordId": "nn-a50bf9fea5"
+   }
+  },
+  {
+   "term": "経済産業省",
+   "reading": "けいざいさんぎょうしょう",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "Japan’s industry and trade ministry",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-028.json",
+    "cardId": "nn-9a8b19130f-0245eb11",
+    "wordId": "nn-9a8b19130f"
+   }
+  },
+  {
+   "term": "自己言及",
+   "reading": "じこげんきゅう",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "self-reference",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-b73777edb3-60917be6",
+    "wordId": "nn-b73777edb3"
+   }
+  },
+  {
+   "term": "要諦",
+   "reading": "ようてい",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "the essential point",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-f6b74e6e2e-340b6868",
+    "wordId": "nn-f6b74e6e2e"
+   }
+  },
+  {
+   "term": "記号接地問題",
+   "reading": "きごうせっちもんだい",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "symbol grounding problem",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-038.json",
+    "cardId": "nn-5153041fe0-79e00ad2",
+    "wordId": "nn-5153041fe0"
+   }
+  },
+  {
+   "term": "試算",
+   "reading": "しさん",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "a provisional calculation",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-b2a785f570-51e15c0b",
+    "wordId": "nn-b2a785f570"
+   }
+  },
+  {
+   "term": "資本集約的",
+   "reading": "しほんしゅうやくてき",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "capital-intensive",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-44b2efa702-94e542d4",
+    "wordId": "nn-44b2efa702"
+   }
+  },
+  {
+   "term": "逼迫",
+   "reading": "ひっぱく",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "gloss": "tightness, strain",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-001-r.json",
+    "cardId": "nn-1e1a713a57-8c203d13",
+    "wordId": "nn-1e1a713a57"
+   }
+  },
+  {
+   "term": "電力需要",
+   "reading": "でんりょくじゅよう",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "electricity demand",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-007.json",
+    "cardId": "nn-9fd754ecc7-5c636687",
+    "wordId": "nn-9fd754ecc7"
+   }
+  }
+ ],
+ "weave": [
+  "注意機構",
+  "演算能力",
+  "牽引",
+  "知的財産",
+  "経済産業省",
+  "自己言及",
+  "要諦",
+  "記号接地問題",
+  "試算",
+  "資本集約的",
+  "逼迫",
+  "電力需要"
+ ]
+}

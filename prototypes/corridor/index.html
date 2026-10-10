@@ -18,7 +18,8 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <!-- TENOHIRA PR 一: the corridor installs to a real home screen -->
     <link rel="manifest" href="manifest.webmanifest" />
-    <meta name="theme-color" content="#f1e9d3" />
+    <!-- r4 skin: the day frame; corridor.js syncThemeColor() follows the frame actually drawn -->
+    <meta name="theme-color" content="#fcfbf8" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <!-- ZEN-DOJO v2 type (operator, 2026-08-20): Shippori Mincho B1 for the
@@ -31,6 +32,9 @@
          all stay silent; a missing file falls back to Hiragino/Yu Mincho
          by design, and unicode-range keeps runtime cost to the chunks a
          card actually shows. -->
+    <!-- Text faces (2026-10-10): Noto Sans JP, Noto Serif JP, Noto Serif and
+         Roboto Mono join the same pool, so the interface, the reading text
+         and the figures no longer depend on the device's own fonts. -->
     <link rel="stylesheet" href="fonts.css" />
     <!-- the recorded roster is aboard: the app may fetch audio/manifest.json.
          No article narration ships until the locked Kore voice is rendered. -->
@@ -44,6 +48,13 @@
     <link rel="stylesheet" href="register.css" />
     <link rel="stylesheet" href="maintenance/report-client.css" />
     <link rel="stylesheet" href="editorial.css" />
+    <link rel="stylesheet" href="rooms/today.css" />
+    <link rel="stylesheet" href="rooms/read.css" />
+    <link rel="stylesheet" href="rooms/learn.css" />
+    <link rel="stylesheet" href="rooms/words.css" />
+    <link rel="stylesheet" href="rooms/motion.css" />
+    <link rel="stylesheet" href="rooms/me.css" />
+    <link rel="stylesheet" href="rooms/cards.css" />
   </head>
   <body>
     <div id="app"></div>

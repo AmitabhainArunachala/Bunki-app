@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "輪廻",
+   "reading": "りんね",
+   "pos": "noun",
+   "meaning": "saṃsāra, the cycle of rebirth",
+   "defJa": "生死の世界を繰り返し巡ること",
+   "passage": {
+    "ja": "輪廻というと美しい生まれ変わりの物語を思い浮かべがちだが、インドの思想ではむしろ執着に縛られる側の話である。善い行いも悪い行いも、その結果が消えない限り、生死を繰り返す仕組み全体が延々と回り続けるとされる。この鎖の解き方は学派ごとに分かれ、仏教は縁起という条件の連なりで読み解き、ジャイナ教は魂に付着する業で説明してきた。解脱の議論に加えて、この循環から抜けるための修行や儀礼までが技術として体系化されてきた点にこそ、欧米の生まれ変わりイメージとの大きな温度差がある。",
+    "form": "輪廻",
+    "en": "Saṃsāra tends to call to mind a beautiful story of rebirth, but in Indian thought it is rather the story of the side that is bound by clinging. Good deeds and bad deeds alike, so long as their results do not vanish, are said to keep the whole mechanism of repeated birth and death turning on and on. How this chain is read differs from school to school: Buddhism reads it as a sequence of conditions called dependent origination, while Jainism has explained it through karma that adheres to the soul. In addition to the debates over liberation, even the practices and rites for escaping this cycle were systematized as techniques, and it is precisely there that the great difference in tone from the Western image of rebirth emerges.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「輪廻から解脱する」のように、抜け出す対象として語られるのが典型。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "陰陽五行",
+   "reading": "いんようごぎょう",
+   "pos": "noun",
+   "meaning": "yin-yang and the five phases",
+   "defJa": "陰と陽、木火土金水で万物の変化を説く中国の思想",
+   "passage": {
+    "ja": "木・火・土・金・水をひとまとめに「五つの元素」と訳してしまうと、陰陽五行はギリシアの四元素の親類のように聞こえてくる。だが木や火は本来、静止した物質ではなく、互いに生じ合い、打ち克ち合う動きの過程として解釈されてきたのである。歴史をたどると、この枠組みは古代中国で生まれ、日本に渡って暦や方違えといった実践にまで深く組み込まれ、仏教とともに渡来したインドの思想とは系譜を異にする。訳語をめぐっては、「元素」を選ぶか「過程」を選ぶかで、この思想の輪郭そのものが変わってしまう。",
+    "form": "陰陽五行",
+    "en": "When wood, fire, earth, metal, and water are lumped together and translated as 'the five elements,' the doctrine of yin-yang and the five phases comes to sound like a cousin of the Greek four elements. Yet wood and fire are not in essence static substances but have been interpreted as processes of movement that generate one another and overcome one another. Tracing its history, this framework was born in ancient China, crossed to Japan, and was built deeply even into practices such as the calendar and direction-avoidance, following a lineage distinct from the Indian thought that arrived together with Buddhism. Around the choice of translation, whether one settles on 'elements' or on 'phases' changes the very outline of this way of thinking.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "五行は「五つの元素」と訳されがちだが、互いに生じ合う過程を指す中国由来の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "アートマン",
+   "reading": "あーとまん",
+   "pos": "noun",
+   "meaning": "ātman, the innermost self",
+   "defJa": "ウパニシャッドで、個人の奥にある永遠の自己",
+   "passage": {
+    "ja": "自己啓発系の要約は、アートマンを「宇宙の大いなる自己、すなわちあなた自身」と一句に圧縮しがちです。伝統の学び方はもっと地味で、師の言葉を聞き、論理で考え抜き、その理解を瞑想で繰り返し深めるという三段階の修行として伝わります。瞑想の神経科学が測っているのは、注意を支える脳領域の活動変化といった相関であって、教義の言う永遠の自己そのものではありません。原典の対話では、思い浮かぶ自己像を一つずつ退けつつ、この自己は最後には言葉の届かない領域へと静かに置かれていきます。",
+    "form": "アートマン",
+    "en": "Self-help-style summaries tend to compress ātman into a single phrase, 'the great self of the universe, in other words, your own self.' The traditional way of learning is plainer, handed down as a three-stage practice of hearing the teacher's words, thinking them through with logic, and deepening that understanding again and again in meditation. What the neuroscience of meditation measures is a correlate, such as changes in the activity of the brain regions that support attention, not the eternal self that the doctrine speaks of. In the dialogues of the original texts, the images of self that come to mind are set aside one by one, and this self is finally placed quietly in a region beyond the reach of words.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "教義上の語なので、神経科学の測定結果と並べるときは「相関」と区別して使う。",
+    "sense": "本来は呼吸・生命を指し、転じて最内奥の自己"
+   }
+  },
+  {
+   "term": "グル",
+   "reading": "ぐる",
+   "pos": "noun",
+   "meaning": "guru, spiritual teacher",
+   "defJa": "弟子を導く霊的師。語源は「重い」",
+   "passage": {
+    "ja": "禅寺の開山堂にまつられるのは、寺を開いた師の肖像、いわゆる頂相で、今も参拝の対象であり続けている。インドの伝統では、そうした師をグルと呼び、その語源は「重い」で、知識と徳の重みをになう人を指した。教えは文書だけでは完結せず、人から人へと渡るものとされ、マントラや奥義は口伝として、修行に入る前に師が弟子へ直接さずけられる。チベット仏教では、一度師弟の縁を結んだからには破れないものとされ、教えの系譜が途切れず連なること自体が、その伝承の正しさの保証とみなされる。",
+    "form": "グル",
+    "en": "What is enshrined in the founder's hall of a Zen temple is the portrait of the master who founded the temple, the so-called chinsō, which remains to this day an object of worship. In the traditions of India, such a master is called a guru, a word whose etymology is 'heavy' and which referred to a person who bears the weight of knowledge and virtue. The teaching is held not to be complete in documents but to pass from person to person, and mantras and esoteric instructions are oral transmission, conferred by the master directly upon the disciple before the practice begins. In Tibetan Buddhism, once the bond of master and disciple has been formed it is held to be unbreakable, and the very fact that the teaching's lineage continues unbroken is regarded as the guarantee of that transmission's validity.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「グルに師事する」のように師を指す語。グループ等の外来語とは無関係。",
+    "sense": "日本語では「第一人者」の意にも使われる"
+   }
+  }
+ ]
+}

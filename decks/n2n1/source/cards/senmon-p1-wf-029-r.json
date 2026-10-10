@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "呉音",
+   "reading": "ごおん",
+   "pos": "noun",
+   "meaning": "go-on reading",
+   "defJa": "漢字の古い日本語読みの一種",
+   "passage": {
+    "ja": "「行」を「ぎょう」と読めば呉音、「こう」と読めば漢音である。仏教語にこの系統の読みが多いのは、仏教が朝鮮半島を経て、五、六世紀ごろの江南の発音とともに伝わったからだとされる。「修行」は「しゅぎょう」であって「しゅこう」ではなく、「四苦八苦」の「苦」を「く」と読むのも、同じ名残である。読経の声に耳を澄ませば、私たちは千年以上前の音の化石に触れていることになる。",
+    "form": "呉音",
+    "en": "Read 「行」 as “gyo” and it is go-on; read it “kō” and it is kan-on. Buddhist terms contain many readings of the former kind because Buddhism came by way of the Korean peninsula together with the pronunciation of Jiangnan around the fifth and sixth centuries, it is said. The word 修行 is “shugyō,” not “shukō,” and reading the 苦 of 四苦八苦 as “ku” is the same vestige. Listen closely to the chanting of sutras, and you are touching a fossil of sound more than a thousand years old.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「呉音で読む」のように、漢音と対比して読みの系統を言う",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

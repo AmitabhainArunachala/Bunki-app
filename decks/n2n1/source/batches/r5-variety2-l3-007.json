@@ -1,0 +1,182 @@
+{
+ "items": [
+  {
+   "term": "臨済宗",
+   "reading": "りんざいしゅう",
+   "gloss": "the Rinzai school of Zen",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-63dca114c0-83a3fb84",
+    "wordId": "nn-63dca114c0"
+   }
+  },
+  {
+   "term": "自業自得",
+   "reading": "じごうじとく",
+   "gloss": "reaping what one sows; self-inflicted result",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-001.json",
+    "cardId": "nn-36774f5ff4-76df6b43",
+    "wordId": "nn-36774f5ff4"
+   }
+  },
+  {
+   "term": "草木国土悉皆成仏",
+   "reading": "そうもくこくどしっかいじょうぶつ",
+   "gloss": "all plants and lands attain buddhahood",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-ab46e85ba1-f846096a",
+    "wordId": "nn-ab46e85ba1"
+   }
+  },
+  {
+   "term": "虚空",
+   "reading": "こくう",
+   "gloss": "empty space, the void",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-002.json",
+    "cardId": "nn-dbf1a5d7a7-9fcb64e5",
+    "wordId": "nn-dbf1a5d7a7"
+   }
+  },
+  {
+   "term": "衆生",
+   "reading": "しゅじょう",
+   "gloss": "sentient beings",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-1934884b32-677777ed",
+    "wordId": "nn-1934884b32"
+   }
+  },
+  {
+   "term": "見性",
+   "reading": "けんしょう",
+   "gloss": "seeing one’s true nature",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-eeebb89a7d-b8d608c6",
+    "wordId": "nn-eeebb89a7d"
+   }
+  },
+  {
+   "term": "誓願",
+   "reading": "せいがん",
+   "gloss": "a solemn Buddhist vow",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-029.json",
+    "cardId": "nn-b4126fd0c6-14281899",
+    "wordId": "nn-b4126fd0c6"
+   }
+  },
+  {
+   "term": "鈴木大拙",
+   "reading": "すずきだいせつ",
+   "gloss": "Daisetz Suzuki",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-46496c3379-27c95ba5",
+    "wordId": "nn-46496c3379"
+   }
+  },
+  {
+   "term": "開祖",
+   "reading": "かいそ",
+   "gloss": "founder (of a sect)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-031.json",
+    "cardId": "nn-2b69e7cbf4-cca1e732",
+    "wordId": "nn-2b69e7cbf4"
+   }
+  },
+  {
+   "term": "隠元",
+   "reading": "いんげん",
+   "gloss": "Ingen Ryuki",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-004.json",
+    "cardId": "nn-3f9835670d-aa179fd4",
+    "wordId": "nn-3f9835670d"
+   }
+  },
+  {
+   "term": "霊性",
+   "reading": "れいせい",
+   "gloss": "spirituality, spiritual nature",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-dabc3baf91-496b9dd1",
+    "wordId": "nn-dabc3baf91"
+   }
+  }
+ ],
+ "weave": [
+  "臨済宗",
+  "自業自得",
+  "草木国土悉皆成仏",
+  "虚空",
+  "衆生",
+  "見性",
+  "誓願",
+  "鈴木大拙",
+  "開祖",
+  "隠元",
+  "霊性"
+ ]
+}

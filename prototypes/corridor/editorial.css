@@ -31,7 +31,7 @@ body, body.v-contrast-wcag {
   --r-control: 12px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur: 220ms;
-  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', system-ui, sans-serif;
+  --sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
   /* the reader's page only: a 2–3% grain, fine fibre, never on chrome */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='240' height='240' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.27 0 0 0 0 0.2 0 0 0 1.4 -0.62'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='0.26'/%3E%3C/svg%3E");
   --ed-paper: var(--surface);
@@ -142,7 +142,7 @@ body:not(.zen) #app > .chrome > button.chrome-search {
   font: 600 16px/44px var(--sans);
   letter-spacing: 0;
   white-space: nowrap;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 body:not(.zen) #app > .chrome > button:hover:not(:disabled) { background: var(--fill); }
 body:not(.zen) #app > .chrome > button :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; font: inherit; letter-spacing: 0; opacity: 1; }
@@ -151,8 +151,8 @@ body:not(.zen) #app > .chrome > button.chrome-search { align-items: center; padd
 body:not(.zen) #app > .chrome > button.chrome-search svg { width: 20px; height: 20px; }
 /* during an attempt the bar still collapses to 戻る · progress · seal (register.css T8): the glass
    doors above must not bring the search, the dojo, the language or the lists back into a test */
-html[data-room='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
-html[data-room='attempt'] body:not(.zen) #app > .chrome > button:last-child { display: none; }
+html[data-register='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
+html[data-register='attempt'] body:not(.zen) #app > .chrome > button:last-child { display: none; }
 /* 戻る wears the iOS back chevron */
 body:not(.zen) #app > .chrome > button#back { padding-left: 6px; }
 body:not(.zen) #app > .chrome > button#back::before {
@@ -209,7 +209,7 @@ body:not(.zen) #app > .chrome .lang-seg button::before {
   z-index: -1;
   inset: 8px 2px;
   border-radius: 7px;
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--label); background: transparent; font-weight: 600; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%); }
@@ -245,7 +245,7 @@ main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
 }
 .view-title > .en-inline { display: block; margin: 6px 0 0; font: 400 17px/1.4 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ed-muted); opacity: 1; }
 main h2 { margin-top: 32px; margin-bottom: 12px; font-family: var(--sans); font-weight: 700; line-height: 1.35; letter-spacing: -0.005em; }
-html[data-room='tutor'] body:not(.zen) #app > .chrome { background: var(--glass-solid); }
+html[data-register='tutor'] body:not(.zen) #app > .chrome { background: var(--glass-solid); }
 .eyebrow { font-size: 13px; letter-spacing: 0.04em; color: var(--ed-muted); }
 body.v-depth-layered main > .eyebrow::before,
 body.v-depth-layered .eyebrow.shelf-section::before { content: none; }
@@ -285,7 +285,7 @@ body .search-page .nav-search-input {
   background: var(--fill);
   color: var(--label);
   font: 400 19px/1.3 var(--sans);
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 body .search-page .nav-search-input:focus { outline: none; background: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
 body .search-page .kdx-lenses { gap: 8px; margin: 14px 0 10px; }
@@ -301,7 +301,7 @@ body .kdx-lens {
   border-radius: 999px;
   background: var(--fill);
   box-shadow: none;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 body .kdx-lens:hover { background: var(--fill-strong); }
 body .kdx-lens .l-ja { display: inline; font: 600 15px/44px var(--sans); color: var(--label); }
@@ -337,7 +337,7 @@ body .search-page-results .nav-search-row {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  transition: background-color 140ms var(--ease);
+  transition: none;
 }
 body .search-page-results .nav-search-row:last-child { border-bottom: 0; }
 body .search-page-results .nav-search-row:hover { background: var(--fill); }
@@ -357,7 +357,7 @@ body .focus-chip, body.v-depth-layered .focus-mode {
   background: var(--fill);
   box-shadow: none;
   color: var(--label);
-  transition: background-color var(--dur) var(--ease), transform 140ms var(--ease);
+  transition: transform 140ms var(--ease);
 }
 body .focus-chip:hover, body.v-depth-layered .focus-mode:hover { background: var(--fill-strong); }
 body .focus-chip.on { background: var(--tint); box-shadow: none; color: #fff; }
@@ -468,8 +468,9 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 
 /* All inline Japanese uses the same lookup affordance, including quoted
  * passages and practice papers. These are words, never button-shaped chips. */
-.japanese-lookup-text { font: inherit; line-height: inherit; letter-spacing: inherit; }
+.japanese-lookup-text { position: relative; isolation: isolate; font: inherit; line-height: inherit; letter-spacing: inherit; }
 .japanese-lookup-word {
+  position: relative;
   display: inline;
   min-width: 0;
   min-height: 0;
@@ -486,6 +487,20 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   vertical-align: baseline;
   cursor: pointer;
   touch-action: manipulation;
+}
+/* Prose keeps its natural word spacing. A real, transparent hit region carries
+ * the 44px touch floor; it sits below neighbouring ink so a glyph's own button
+ * wins at its centre, just as it does in the reader. The isolated text wrapper
+ * keeps the negative layer above the surrounding paper. */
+.japanese-lookup-word::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap, 44px));
+  height: max(100%, var(--tap, 44px));
+  transform: translate(-50%, -50%);
+  z-index: -1;
 }
 .japanese-lookup-word:hover { text-decoration: underline; text-decoration-color: var(--ai); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
 /* Keyboard focus on a prose word wears the app's one focus token, the same ink underline and
@@ -610,11 +625,11 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 
 /* Practice uses a paper and answer register, with the mode clearly outside
  * the question. The source text and official-task sequence stay in the DOM. */
-html[data-room='attempt'] body:not(.zen) #app > main { padding-top: 28px; }
-html[data-room='attempt'] h1.exam-heading { font: 800 26px/1.45 var(--display); color: var(--ed-ink); letter-spacing: 0; margin-bottom: 10px; }
-html[data-room='attempt'] .exam-progress { font: 15px/1.6 var(--sans); color: var(--ed-ink); padding: 12px 0; border-bottom: 1px solid var(--ed-rule); }
-html[data-room='attempt'] .exam-timer { font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; }
-html[data-room='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color: var(--ed-muted); }
+html[data-register='attempt'] body:not(.zen) #app > main { padding-top: 28px; }
+html[data-register='attempt'] h1.exam-heading { font: 800 26px/1.45 var(--display); color: var(--ed-ink); letter-spacing: 0; margin-bottom: 10px; }
+html[data-register='attempt'] .exam-progress { font: 15px/1.6 var(--sans); color: var(--ed-ink); padding: 12px 0; border-bottom: 1px solid var(--ed-rule); }
+html[data-register='attempt'] .exam-timer { font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; }
+html[data-register='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color: var(--ed-muted); }
 .exam-mode-badge { display: inline-flex; align-items: center; padding: 5px 10px; border: 1px solid var(--ed-rule); font: 600 13px/1.5 var(--sans); color: var(--ed-ink); background: var(--ai-wash); }
 .exam-scope-note, .exam-study-help, .exam-bookmark-note { max-width: 68ch; font: 14px/1.75 var(--sans); color: var(--ed-muted); }
 .exam-lookup-assisted { padding: 10px 0; border-bottom: 1px solid var(--ed-rule); font-size: 14px; color: var(--ai); }
@@ -629,11 +644,13 @@ html[data-room='attempt'] .exam-save { font-size: 13px; letter-spacing: 0; color
 }
 .exam-paper-header { margin: 0 0 24px; }
 .assessment-room .exam-task-heading { font: 700 21px/1.6 var(--serif); letter-spacing: 0; margin: 0 0 10px; }
+.assessment-room .exam-heading-original { display: block; font-size: .65em; font-weight: 400; line-height: 1.5; }
+.assessment-room .exam-daimon { display: inline-block; vertical-align: middle; }
 .exam-task-instruction { font: 17px/1.85 var(--serif); margin: 0; color: var(--ed-ink); }
 .exam-question-number { display: inline-block; margin-right: 12px; font: 700 20px/1.5 var(--sans); font-variant-numeric: tabular-nums; }
 .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.2em; }
-html[data-room='attempt'] .exam-paper :is(.exam-prompt, .mock-q),
-html[data-room='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)) {
+html[data-register='attempt'] .exam-paper :is(.exam-prompt, .mock-q),
+html[data-register='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction, + .mock-opts)) {
   font: 21px/2 var(--serif);
   color: var(--ed-ink);
   padding: 12px 0 20px;
@@ -643,7 +660,7 @@ html[data-room='attempt'] .exam-paper .exam-prompt:not(:has(+ .exam-instruction,
   background: transparent;
   box-shadow: none;
 }
-html[data-room='attempt'] .exam-paper .exam-passage {
+html[data-register='attempt'] .exam-paper .exam-passage {
   padding: 20px 24px;
   margin: 8px 0 24px;
   border: 1px solid var(--ed-rule);
@@ -653,9 +670,9 @@ html[data-room='attempt'] .exam-paper .exam-passage {
   background: transparent;
   box-shadow: none;
 }
-html[data-room='attempt'] .exam-paper .exam-instruction { background: transparent; border: 0; padding: 0 0 12px; color: var(--ed-muted); font-size: 14px; }
-html[data-room='attempt'] .exam-paper .mock-opts,
-html[data-room='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .mock-opts {
+html[data-register='attempt'] .exam-paper .exam-instruction { background: transparent; border: 0; padding: 0 0 12px; color: var(--ed-muted); font-size: 14px; }
+html[data-register='attempt'] .exam-paper .mock-opts,
+html[data-register='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .mock-opts {
   padding: 0;
   margin: 0;
   border: 0;
@@ -682,7 +699,7 @@ html[data-room='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) + .m
 .exam-option-row:is(.selected, .chosen) .exam-option-number { color: var(--ed-paper); background: var(--ed-ink); border-color: var(--ed-ink); }
 .exam-option-text { min-width: 0; padding: 3px 0; font: 20px/1.9 var(--serif); color: var(--ed-ink); }
 .exam-paper rt { font-size: 0.63em; color: var(--red); }
-html[data-room='attempt'] .exam-paper .mock-opt {
+html[data-register='attempt'] .exam-paper .mock-opt {
   padding: 16px 12px;
   border: 0;
   border-top: 1px solid var(--ed-rule-light);
@@ -692,11 +709,11 @@ html[data-room='attempt'] .exam-paper .mock-opt {
   min-height: 62px;
   background: transparent;
 }
-html[data-room='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: 2px; }
-html[data-room='attempt'] .exam-paper .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
-html[data-room='attempt'] .exam-paper .mock-opt.right { box-shadow: none; border-bottom: 2px solid var(--ai); }
-html[data-room='attempt'] .exam-paper .mock-opt:hover:not(:disabled):not([aria-pressed='true']) { background: var(--ai-wash); }
-html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number {
+html[data-register='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: 2px; }
+html[data-register='attempt'] .exam-paper .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
+html[data-register='attempt'] .exam-paper .mock-opt.right { box-shadow: none; border-bottom: 2px solid var(--ai); }
+html[data-register='attempt'] .exam-paper .mock-opt:hover:not(:disabled):not([aria-pressed='true']) { background: var(--ai-wash); }
+html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number {
   width: 44px;
   min-height: 44px;
   padding: 4px;
@@ -704,11 +721,11 @@ html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number {
   border-radius: 3px;
   font: 600 18px/1 var(--sans);
 }
-html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
-html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
-html[data-room='attempt'] .mock-nav { gap: 16px; margin: 24px 0 16px; }
-html[data-room='attempt'] #exam-flag, html[data-room='attempt'] .chip#exam-flag { min-height: 44px; font-size: 14px; color: var(--ai); }
-html[data-room='attempt'] :is(.exam-question-map summary, .exam-leave-controls .chip) { font-size: 14px; }
+html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
+html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
+html[data-register='attempt'] .mock-nav { gap: 16px; margin: 24px 0 16px; }
+html[data-register='attempt'] #exam-flag, html[data-register='attempt'] .chip#exam-flag { min-height: 44px; font-size: 14px; color: var(--ai); }
+html[data-register='attempt'] :is(.exam-question-map summary, .exam-leave-controls .chip) { font-size: 14px; }
 .assessment-room .exam-form { padding: 22px 0; margin: 0; background: transparent; border: 0; border-top: 1px solid var(--ed-rule); border-radius: 0; box-shadow: none; }
 .assessment-room .exam-form h2 { font-size: 26px; }
 .assessment-room .exam-form :is(.exam-skills, .exam-status) { font-size: 14px; line-height: 1.7; letter-spacing: 0; }
@@ -739,7 +756,7 @@ html[data-room='attempt'] :is(.exam-question-map summary, .exam-leave-controls .
 
 /* The tutor's existing lacquer surface owns local pigments, so the page
  * frame must inherit those instead of placing pale text on a paper ground. */
-html[data-room='tutor'] body:not(.zen) #app > main {
+html[data-register='tutor'] body:not(.zen) #app > main {
   --ed-paper: var(--sheet-ground);
   --ed-ink: var(--sheet-ink);
   --ed-muted: var(--sheet-ink-2);
@@ -747,7 +764,7 @@ html[data-room='tutor'] body:not(.zen) #app > main {
   --ed-rule-light: var(--sheet-line-soft);
   background: var(--sheet-ground);
 }
-html[data-room='tutor'] main button.japanese-lookup-word { border: 0; background: transparent; color: inherit; }
+html[data-register='tutor'] main button.japanese-lookup-word { border: 0; background: transparent; color: inherit; }
 
 /* Narrow pages keep the same hierarchy, with a one-column reading measure. */
 @media (min-width: 900px) {
@@ -801,8 +818,8 @@ html[data-room='tutor'] main button.japanese-lookup-word { border: 0; background
   .assessment-room .exam-paper { padding-top: 22px; }
   .assessment-room .exam-task-heading { font-size: 19px; }
   .exam-task-instruction { font-size: 16px; }
-  html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
-  html[data-room='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: 19px; }
+  html[data-register='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
+  html[data-register='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: 19px; }
   .exam-option-row { gap: 12px; }
   .exam-option-text { font-size: 19px; }
   .stroke-speed-wrap.stroke-corner { width: min(196px, calc((100vw - 88px) / 2)); padding: 10px 8px; gap: 4px 8px; }
@@ -892,7 +909,7 @@ body .chip, body.v-depth-layered .chip {
   color: var(--tint);
   font: 600 15px/1.25 var(--sans);
   letter-spacing: 0;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), transform 140ms var(--ease);
+  transition: transform 140ms var(--ease);
 }
 body .chip:hover:not(:disabled):not([aria-disabled='true']) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 body .chip:active:not(:disabled):not([aria-disabled='true']) { transform: scale(0.97); }
@@ -904,18 +921,18 @@ body.v-depth-layered .chip.t-radical { background: var(--fill); color: var(--lab
 body.v-depth-layered .chip.t-idiom { background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
 /* fields: one quiet iOS look — a grey fill, 12px corners, no outline until focus (the tutor's
    lacquer room keeps its own) */
-html:not([data-room='tutor']) body .search-field,
-html:not([data-room='tutor']) body .record-note-input {
+html:not([data-register='tutor']) body .search-field,
+html:not([data-register='tutor']) body .record-note-input {
   border: 0;
   border-radius: var(--r-control);
   background-color: var(--fill);
   color: var(--label);
   font-family: var(--sans);
   box-shadow: none;
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
-html:not([data-room='tutor']) body .search-field:focus,
-html:not([data-room='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
+html:not([data-register='tutor']) body .search-field:focus,
+html:not([data-register='tutor']) body .record-note-input:focus { outline: none; background-color: var(--surface); box-shadow: 0 0 0 2px var(--tint); }
 /* the two words of a label centre in the door; the English drops a pixel to sit on the Japanese line */
 body .chip:has(> .l-ja) { flex-direction: row; align-items: center; gap: 6px; }
 body .chip:has(> .l-ja) > .en-sub { position: relative; top: 1px; }
@@ -965,7 +982,7 @@ body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
   background: transparent;
   cursor: pointer;
   list-style: none;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 .icon-button::-webkit-details-marker { display: none; }
 .icon-button:hover { color: var(--tint); background: var(--fill); }
@@ -1040,7 +1057,7 @@ body[data-view='shelf'] main > .eyebrow:first-child { display: none; }
   box-shadow: none;
 }
 /* the look-up field: an iOS search field, a grey fill and a quiet glass */
-html[data-room='shelf'] .search-field {
+html[data-register='shelf'] .search-field {
   min-height: 44px;
   padding: 8px 14px 8px 40px;
   margin: 0 0 var(--s3);
@@ -1050,10 +1067,10 @@ html[data-room='shelf'] .search-field {
   background: var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23767680' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") 13px 50% / 17px 17px no-repeat;
   box-shadow: none;
   font: 17px/1.4 var(--sans);
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
-html[data-room='shelf'] .search-field:focus { background-color: var(--surface); box-shadow: 0 0 0 1px var(--separator), var(--shadow-card); outline: none; }
-html[data-room='shelf'] .search-field::placeholder { color: color-mix(in srgb, var(--label) 58%, transparent); }
+html[data-register='shelf'] .search-field:focus { background-color: var(--surface); box-shadow: 0 0 0 1px var(--separator), var(--shadow-card); outline: none; }
+html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srgb, var(--label) 58%, transparent); }
 #shelf-body { display: block; }
 #shelf-body > * { grid-column: auto; }
 
@@ -1140,7 +1157,7 @@ html[data-room='shelf'] .search-field::placeholder { color: color-mix(in srgb, v
   white-space: nowrap;
   cursor: pointer;
   list-style: none;
-  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: none;
 }
 .filter-chip::-webkit-details-marker { display: none; }
 .filter-chip:hover { background: var(--fill-strong); }
@@ -1199,7 +1216,7 @@ html[data-room='shelf'] .search-field::placeholder { color: color-mix(in srgb, v
   color: var(--label);
   font: 15px/1.4 var(--sans);
   outline: none;
-  transition: width var(--dur) var(--ease);
+  transition: none;
 }
 .shelf-controls .filter-search input::placeholder { color: var(--label-2); }
 .shelf-controls .filter-search input:focus, .shelf-controls .filter-search input:not(:placeholder-shown) { width: 200px; }
@@ -1249,7 +1266,7 @@ html[data-room='shelf'] .search-field::placeholder { color: color-mix(in srgb, v
   font: 600 15px/1 var(--sans);
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--dur) var(--ease);
+  transition: none;
 }
 .shelf-tools-toggle:hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 .shelf-tools-toggle[aria-expanded='true'] { color: #fff; background: var(--tint); }
@@ -1306,7 +1323,7 @@ html[data-room='shelf'] .search-field::placeholder { color: color-mix(in srgb, v
   font: 600 15px/1.3 var(--sans);
   text-align: start;
   white-space: normal;
-  transition: background-color var(--dur) var(--ease);
+  transition: none;
 }
 #shelf-body .shelf-study-tools button.grammar-link:hover { background: var(--tint-wash); }
 /* register.css spaces a door's last span out (0.12em) and can hide it; a tile's name is always shown, set tight */
@@ -1344,7 +1361,7 @@ body #shelf-body .story-card {
   border-radius: var(--r-card);
   background: var(--surface);
   box-shadow: var(--shadow-card);
-  transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease);
 }
 @media (hover: hover) {
   body #shelf-body .story-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-3px); }
@@ -1544,14 +1561,14 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   font: 600 15px/1.55 var(--sans);
   text-align: start;
   cursor: pointer;
-  transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease);
 }
 .shelf-encounter > strong { font-weight: 600; overflow-wrap: anywhere; }
 .shelf-encounter > span { font: 18px/1.7 var(--serif); color: var(--accent); overflow-wrap: anywhere; }
 @media (hover: hover) { .shelf-encounter:hover { box-shadow: var(--shadow-lift); transform: translateY(-2px); } }
 
 /* the shelf's foot: the archive door and sources stay quiet text */
-#shelf-body > button#archive-link.grammar-link {
+#shelf-body button#archive-link.grammar-link {
   display: block;
   width: 100%;
   margin: var(--s2) 0 0;
@@ -1565,7 +1582,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   text-align: start;
   color: var(--tint);
 }
-#shelf-body > button#archive-link.grammar-link .en-sub { font: 500 14px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--label-2); }
+#shelf-body button#archive-link.grammar-link .en-sub { font: 500 14px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--label-2); }
 
 @media (prefers-reduced-motion: reduce) {
   body #shelf-body .story-card, .story-picture .story-img, .shelf-encounter { transition: none; }
@@ -1706,7 +1723,7 @@ body .seg button {
   color: var(--label);
   font: 500 14px/1.25 var(--sans);
   letter-spacing: 0;
-  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: none;
 }
 body .seg button :is(.l-ja, .en-sub) { color: inherit; }
 body .seg button .en-sub { font: 500 11px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
@@ -1756,7 +1773,7 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   inset: 0 auto 0 0;
   width: calc(var(--played, 0) * 100%);
   background: var(--accent);
-  transition: width 240ms linear;
+  transition: none;
 }
 .play-voice { font: 600 12px/1 var(--sans); letter-spacing: 0.04em; color: var(--text-2); }
 .play-rate {
@@ -1926,7 +1943,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
 .article-facts dd .level-note, .article-facts dd .review-reason { font-size: 14px; color: var(--text-2); }
 body .article-about .note { margin: var(--s1) 0 0; padding: 0; border: 0; border-radius: 0; background: transparent; font: 13px/1.7 var(--sans); color: var(--text-2); }
 .article-about .inline-link { display: inline; min-width: 0; min-height: 0; padding: 0; line-height: inherit; text-align: start; color: var(--ai); }
-body .article-about .note .inline-link { color: var(--text-2); text-decoration-color: var(--hairline); }
+body .article-about .note .inline-link { color: var(--text-2); text-decoration-color: var(--hairline); overflow-wrap: anywhere; }
 body .article-about .note .inline-link:hover { color: var(--ai); text-decoration-color: currentColor; }
 .article-about .details-toggle { min-height: 44px; margin: var(--s1) 0 0; padding: 0; font: 600 13px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--ai); }
 
@@ -1994,6 +2011,8 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   /* on the narrowest phones the open text settings take the picture's place entirely */
   body[data-view='reader'] #app > main:has(> .dials) > .reader-picture { display: none; }
   .shelf-tools-toggle > .ui-icon:first-child { display: none; }
+  /* Wider system fonts put the full 44px Tools door on its own row. */
+  .shelf-mast-name { flex-wrap: wrap; }
   /* on the narrowest phones each of today's six takes the whole width (this block precedes the
      520px one, so it carries one more selector to win) */
   body #shelf-today.shelf-today-strip { grid-template-columns: minmax(0, 1fr); }
@@ -2002,7 +2021,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
 }
 @media (max-width: 520px) {
   :root body[data-view='shelf']:not(.zen):not([data-view='entry']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
-  html[data-room='shelf'] .search-field { margin-bottom: var(--s2); }
+  html[data-register='shelf'] .search-field { margin-bottom: var(--s2); }
   .shelf-masthead { gap: var(--s2); padding-bottom: 12px; }
   #shelf-body .shelf-masthead h1 { font-size: 34px; }
   #shelf-body .shelf-masthead h1 .en-inline { display: block; margin: 4px 0 0; font-size: 13px; vertical-align: 0; }
@@ -2072,6 +2091,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
     content: '';
     position: fixed;
     z-index: 40;
+    pointer-events: none;
     left: 0;
     right: 0;
     bottom: 0;
@@ -2213,7 +2233,7 @@ body .sheet .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search
   box-shadow: none;
   color: var(--tint);
   font: 600 16px/1.2 var(--sans);
-  transition: background-color var(--dur) var(--ease);
+  transition: none;
 }
 body .sheet .sheet-bar .sheet-back { display: inline-flex; flex-direction: row; align-items: baseline; gap: 5px; padding: 0 10px 0 6px; line-height: 44px; }
 body .sheet .sheet-bar .sheet-back :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; line-height: 44px; }
@@ -2259,7 +2279,7 @@ body .sheet .entry-row {
   padding: 10px 6px;
   border-bottom: 1px solid var(--hairline);
   border-radius: 0;
-  transition: background-color 120ms ease-out;
+  transition: none;
 }
 body .sheet .entry-row .row-glyph {
   display: grid;
@@ -2432,6 +2452,11 @@ body .sheet .stroke-door {
 #stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 15px/1 var(--sans); }
 #stroke-page .stroke-back .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 #stroke-page .stroke-btn.stroke-corner { padding: 6px 16px; }
+#stroke-page #stroke-numbers {
+  max-width: min(196px, calc((100vw - 88px) / 2));
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 #stroke-page .stroke-btn.stroke-corner .l-ja { font: 600 14px/1.3 var(--sans); color: var(--text); }
 #stroke-page .stroke-btn.stroke-corner .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 #stroke-page :is(.stroke-back, .stroke-btn, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
@@ -2543,7 +2568,7 @@ body .reference-library .reference-level {
   border-radius: 10px;
   background: var(--raised);
   box-shadow: var(--raised-shadow);
-  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+  transition: transform 180ms ease-out;
 }
 body .reference-library .reference-level[data-level] {
   background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 9%, var(--raised)) 0%, var(--raised) 70%);
@@ -2569,7 +2594,7 @@ body .reference-library .reference-level-unknown { min-height: 0; }
    level colours carry how many tests each level holds, the last score there
    and a progress line; the lengths are one segmented control; each test is a
    raised tile; unreviewed tests wear one 未確認 chip. */
-html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+html[data-register='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   width: calc(100% - 2 * var(--s3));
   max-width: 1040px;
   margin: 0 auto var(--s8);
@@ -2578,13 +2603,13 @@ html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='d
   background: transparent;
   box-shadow: none;
 }
-html[data-room='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(32px, 4vw, 44px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
-html[data-room='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 16px/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
-html[data-room='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: 16px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(32px, 4vw, 44px)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+html[data-register='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 16px/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
+html[data-register='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: 16px/1.6 var(--sans); color: var(--text-2); }
 
 /* the level cards */
-html[data-room='jlpt'] .exam-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); margin: 0 0 var(--s3); }
-html[data-room='jlpt'] .exam-levels .chip.exam-level-card {
+html[data-register='jlpt'] .exam-levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); margin: 0 0 var(--s3); }
+html[data-register='jlpt'] .exam-levels .chip.exam-level-card {
   position: relative;
   display: grid;
   align-content: start;
@@ -2599,13 +2624,13 @@ html[data-room='jlpt'] .exam-levels .chip.exam-level-card {
   box-shadow: var(--raised-shadow);
   color: var(--text);
   text-align: start;
-  transition: box-shadow 180ms ease-out, transform 180ms ease-out;
+  transition: transform 180ms ease-out;
 }
-@media (hover: hover) { html[data-room='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
-html[data-room='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
-html[data-room='jlpt'] .exam-level-tests { font: 600 14px/1.4 var(--sans); color: var(--text); }
-html[data-room='jlpt'] .exam-level-last { font: 13px/1.4 var(--sans); color: var(--text-2); font-variant-numeric: tabular-nums; }
-html[data-room='jlpt'] .exam-level-progress {
+@media (hover: hover) { html[data-register='jlpt'] .exam-levels .chip.exam-level-card:hover { box-shadow: var(--raised-shadow-hover); transform: translateY(-2px); } }
+html[data-register='jlpt'] .exam-level-name { font: 800 34px/1.05 var(--display); color: color-mix(in srgb, var(--lv) 82%, var(--ink)); }
+html[data-register='jlpt'] .exam-level-tests { font: 600 14px/1.4 var(--sans); color: var(--text); }
+html[data-register='jlpt'] .exam-level-last { font: 13px/1.4 var(--sans); color: var(--text-2); font-variant-numeric: tabular-nums; }
+html[data-register='jlpt'] .exam-level-progress {
   position: absolute;
   left: var(--s2);
   right: var(--s2);
@@ -2615,25 +2640,25 @@ html[data-room='jlpt'] .exam-level-progress {
   border-radius: 2px;
   background: color-mix(in srgb, var(--lv) 16%, transparent);
 }
-html[data-room='jlpt'] .exam-level-progress::after {
+html[data-register='jlpt'] .exam-level-progress::after {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--done, 0) * 100%);
   background: var(--lv);
 }
-html[data-room='jlpt'] .exam-levels .chip.exam-level-card[aria-pressed='true'] {
+html[data-register='jlpt'] .exam-levels .chip.exam-level-card[aria-pressed='true'] {
   border-color: var(--lv);
   background: var(--lv);
   box-shadow: 0 2px 4px color-mix(in srgb, var(--lv) 30%, transparent), 0 16px 32px -16px color-mix(in srgb, var(--lv) 70%, transparent);
   color: #fbf7ee;
 }
-html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: #fbf7ee; }
-html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress { background: rgb(255 255 255 / 26%); }
-html[data-room='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: #fbf7ee; }
+html[data-register='jlpt'] .exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: #fbf7ee; }
+html[data-register='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress { background: rgb(255 255 255 / 26%); }
+html[data-register='jlpt'] .exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: #fbf7ee; }
 
 /* the lengths: one segmented control */
-html[data-room='jlpt'] .exam-lengths {
+html[data-register='jlpt'] .exam-lengths {
   display: inline-grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
@@ -2644,7 +2669,7 @@ html[data-room='jlpt'] .exam-lengths {
   border-radius: 14px;
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
-html[data-room='jlpt'] .exam-length {
+html[data-register='jlpt'] .exam-length {
   display: grid;
   gap: 2px;
   min-height: 56px;
@@ -2657,35 +2682,35 @@ html[data-room='jlpt'] .exam-length {
   font: 700 16px/1.3 var(--sans);
   text-align: center;
 }
-html[data-room='jlpt'] .exam-length-time { margin: 0; font: 12px/1.3 var(--sans); letter-spacing: 0.01em; color: inherit; opacity: 0.9; }
-html[data-room='jlpt'] .exam-length[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
+html[data-register='jlpt'] .exam-length-time { margin: 0; font: 12px/1.3 var(--sans); letter-spacing: 0.01em; color: inherit; opacity: 0.9; }
+html[data-register='jlpt'] .exam-length[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
 
 /* the guided session: the recommended first step */
-html[data-room='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); border: 0; }
-html[data-room='jlpt'] .study-hall.guided-entry .study-door {
+html[data-register='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); border: 0; }
+html[data-register='jlpt'] .study-hall.guided-entry .study-door {
   padding: 20px var(--s3);
   border: 1px solid var(--raised-edge);
   border-radius: 12px;
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
-@media (hover: hover) { html[data-room='jlpt'] .study-hall.guided-entry .study-door:hover { box-shadow: var(--raised-shadow-hover); background: var(--raised); } }
+@media (hover: hover) { html[data-register='jlpt'] .study-hall.guided-entry .study-door:hover { box-shadow: var(--raised-shadow-hover); background: var(--raised); } }
 
 /* sections and test tiles */
-html[data-room='jlpt'] h2.exam-section-heading {
+html[data-register='jlpt'] h2.exam-section-heading {
   margin: var(--s5) 0 var(--s1);
   padding-top: var(--s2);
   border-top: 2px solid var(--rule-strong);
   font: 800 24px/1.35 var(--display);
   color: var(--text);
 }
-html[data-room='jlpt'] h2.exam-section-heading .en-inline { margin-left: var(--s1); font: 500 15px/1.4 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
-html[data-room='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
-html[data-room='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
-html[data-room='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
-html[data-room='jlpt'] .exam-machine-label { display: flex; align-items: center; gap: var(--s1); margin: 0; font: 13px/1.5 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .exam-written > .exam-status { margin: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .assessment-room .exam-form {
+html[data-register='jlpt'] h2.exam-section-heading .en-inline { margin-left: var(--s1); font: 500 15px/1.4 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
+html[data-register='jlpt'] .exam-written { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
+html[data-register='jlpt'] .exam-written > :not(.exam-form) { grid-column: 1 / -1; }
+html[data-register='jlpt'] .exam-written > h2.exam-section-heading { margin-top: 0; }
+html[data-register='jlpt'] .exam-machine-label { display: flex; align-items: center; gap: var(--s1); margin: 0; font: 13px/1.5 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .exam-written > .exam-status { margin: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .assessment-room .exam-form {
   display: grid;
   align-content: start;
   gap: var(--s1);
@@ -2696,11 +2721,11 @@ html[data-room='jlpt'] .assessment-room .exam-form {
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
-html[data-room='jlpt'] .exam-written .exam-form { margin: 0; }
-html[data-room='jlpt'] .assessment-room .exam-form h2 { margin: 0; font: 800 22px/1.35 var(--display); color: var(--text); }
-html[data-room='jlpt'] .exam-form-meta { margin: 0; font: 600 15px/1.5 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
-html[data-room='jlpt'] .exam-form .exam-skills, html[data-room='jlpt'] .exam-form .exam-status { margin: 0; font: 14px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .exam-form button.take {
+html[data-register='jlpt'] .exam-written .exam-form { margin: 0; }
+html[data-register='jlpt'] .assessment-room .exam-form h2 { margin: 0; font: 800 22px/1.35 var(--display); color: var(--text); }
+html[data-register='jlpt'] .exam-form-meta { margin: 0; font: 600 15px/1.5 var(--sans); color: var(--text); font-variant-numeric: tabular-nums; }
+html[data-register='jlpt'] .exam-form .exam-skills, html[data-register='jlpt'] .exam-form .exam-status { margin: 0; font: 14px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .exam-form button.take {
   justify-self: start;
   min-height: 44px;
   margin-top: var(--s1);
@@ -2712,11 +2737,11 @@ html[data-room='jlpt'] .exam-form button.take {
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
   font: 700 15px/1 var(--sans);
 }
-html[data-room='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
-html[data-room='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
-html[data-room='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
-html[data-room='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
-html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
+html[data-register='jlpt'] .exam-written .exam-form:not(:first-of-type) button.take { background: transparent; color: var(--ai); box-shadow: none; }
+html[data-register='jlpt'] .exam-form .exam-sources { margin: var(--s1) 0 0; border: 0; }
+html[data-register='jlpt'] .exam-form .exam-sources > summary { min-height: 44px; padding: 6px 0; font: 600 13px/1.4 var(--sans); color: var(--ai); cursor: pointer; }
+html[data-register='jlpt'] .exam-form .exam-sources p { font: 14px/1.7 var(--sans); color: var(--text-2); }
+html[data-register='jlpt'] .exam-older .entry-row.exam-older-set {
   min-height: 56px;
   margin: 0;
   padding: 10px var(--s2);
@@ -2725,7 +2750,7 @@ html[data-room='jlpt'] .exam-older .entry-row.exam-older-set {
   border-radius: 0;
   background: transparent;
 }
-html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
+html[data-register='jlpt'] :is(#exam-legacy, #exam-history) {
   min-height: 44px;
   margin: var(--s2) var(--s2) 0 0;
   padding: 0;
@@ -2740,7 +2765,7 @@ html[data-room='jlpt'] :is(#exam-legacy, #exam-history) {
 .exam-review-reason { font: 13px/1.5 var(--sans); color: var(--text-2); }
 /* one secondary-button look for the room's quieter actions: the real-test import and the
    confirm sheet's alternatives sit beside the navy Start as outlined buttons, not serif chips */
-html[data-room='jlpt'] .exam-official .exam-official-import,
+html[data-register='jlpt'] .exam-official .exam-official-import,
 .assessment-room .exam-confirm > button:not(.take) {
   display: inline-flex;
   align-items: center;
@@ -2758,30 +2783,30 @@ html[data-room='jlpt'] .exam-official .exam-official-import,
   cursor: pointer;
 }
 @media (hover: hover) {
-  html[data-room='jlpt'] .exam-official .exam-official-import:hover,
+  html[data-register='jlpt'] .exam-official .exam-official-import:hover,
   .assessment-room .exam-confirm > button:not(.take):hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 }
 .assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
-html[data-room='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
+html[data-register='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
 /* the real-paper section is ruled by its heading like every other section, not boxed in hairlines too */
-html[data-room='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
-html[data-room='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
+html[data-register='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
+html[data-register='jlpt'] .assessment-room .exam-official > h2.exam-section-heading { margin-top: var(--s3); }
 @media (max-width: 760px) {
-  html[data-room='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
+  html[data-register='jlpt'] .exam-written { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
-  html[data-room='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  html[data-register='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
   /* five compact cards in one row: the level, its tests, and the last score once there is one */
-  html[data-room='jlpt'] .exam-levels { gap: 6px; }
-  html[data-room='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
-  html[data-room='jlpt'] .exam-level-name { font-size: 24px; }
-  html[data-room='jlpt'] .exam-level-tests { font-size: 12px; }
-  html[data-room='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
-  html[data-room='jlpt'] .exam-level-last { font-size: 11.5px; }
-  html[data-room='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
-  html[data-room='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
-  html[data-room='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
-  html[data-room='jlpt'] h2.exam-section-heading .en-inline { display: block; margin: 4px 0 0; font-size: 14px; }
+  html[data-register='jlpt'] .exam-levels { gap: 6px; }
+  html[data-register='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
+  html[data-register='jlpt'] .exam-level-name { font-size: 24px; }
+  html[data-register='jlpt'] .exam-level-tests { font-size: 12px; }
+  html[data-register='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
+  html[data-register='jlpt'] .exam-level-last { font-size: 11.5px; }
+  html[data-register='jlpt'] .exam-level-progress { left: 8px; right: 8px; bottom: 9px; height: 3px; }
+  html[data-register='jlpt'] .exam-length { min-height: 52px; padding: 6px; font-size: 15px; }
+  html[data-register='jlpt'] .assessment-room .exam-form { padding: var(--s2); }
+  html[data-register='jlpt'] h2.exam-section-heading .en-inline { display: block; margin: 4px 0 0; font-size: 14px; }
 }
 
 /* ------------------------------------------------------------------ step 4b
@@ -2790,7 +2815,7 @@ html[data-room='jlpt'] .assessment-room .exam-official > h2.exam-section-heading
    raised paper carrying the 問題 header, the instruction and the numbered
    question; the answer numbers are calm outlined squares that fill indigo
    when chosen. Study and timed behaviour are unchanged. */
-html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+html[data-register='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   width: calc(100% - 2 * var(--s3));
   max-width: 860px;
   margin: 0 auto var(--s8);
@@ -2799,8 +2824,8 @@ html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view
   background: transparent;
   box-shadow: none;
 }
-html[data-room='attempt'] .assessment-room > h1.exam-heading { margin: 0 0 var(--s1); font: 800 28px/1.3 var(--display); color: var(--text); }
-html[data-room='attempt'] .exam-mode-badge {
+html[data-register='attempt'] .assessment-room > h1.exam-heading { margin: 0 0 var(--s1); font: 800 28px/1.3 var(--display); color: var(--text); }
+html[data-register='attempt'] .exam-mode-badge {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -2812,13 +2837,13 @@ html[data-room='attempt'] .exam-mode-badge {
   color: var(--ai);
   font: 700 13px/1 var(--sans);
 }
-html[data-room='attempt'][data-exam-mode='timed'] .exam-mode-badge, html[data-room='attempt'] main[data-exam-mode='timed'] .exam-mode-badge {
+html[data-register='attempt'][data-exam-mode='timed'] .exam-mode-badge, html[data-register='attempt'] main[data-exam-mode='timed'] .exam-mode-badge {
   border-color: color-mix(in srgb, var(--accent) 45%, transparent);
   background: var(--accent-wash);
   color: var(--accent);
 }
-html[data-room='attempt'] .exam-scope-note { display: inline; margin: 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='attempt'] .exam-progress {
+html[data-register='attempt'] .exam-scope-note { display: inline; margin: 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='attempt'] .exam-progress {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2833,7 +2858,7 @@ html[data-room='attempt'] .exam-progress {
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
-html[data-room='attempt'] .exam-timer {
+html[data-register='attempt'] .exam-timer {
   display: inline-flex;
   align-items: center;
   min-height: 34px;
@@ -2845,16 +2870,16 @@ html[data-room='attempt'] .exam-timer {
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
 }
-html[data-room='attempt'] .exam-timer:not(:has(*)):is(:empty) { display: none; }
-html[data-room='attempt'] .assessment-room { display: flex; }
-html[data-room='attempt'] .assessment-room { flex-flow: row wrap; align-items: center; column-gap: var(--s1); }
-html[data-room='attempt'] .assessment-room > * { flex: 1 1 100%; }
-html[data-room='attempt'] .assessment-room > :is(.exam-mode-badge, .exam-scope-note, .exam-machine-label) { flex: 0 0 auto; align-self: center; margin-block: 0; }
-html[data-room='attempt'] .assessment-room > .exam-scope-note { flex: 0 1 auto; min-width: 0; }
-html[data-room='attempt'] .assessment-room > #exam-flag { flex: 0 0 auto; }
-html[data-room='attempt'] .exam-save { order: 1; margin: -16px 0 var(--s2); font: 12px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--text-2); text-align: end; }
-html[data-room='attempt'] .assessment-room > :is(#exam-flag, .exam-bookmark-note, .mock-nav, .exam-question-map, .exam-leave-controls) { order: 2; }
-html[data-room='attempt'] .assessment-room .exam-paper {
+html[data-register='attempt'] .exam-timer:not(:has(*)):is(:empty) { display: none; }
+html[data-register='attempt'] .assessment-room { display: flex; }
+html[data-register='attempt'] .assessment-room { flex-flow: row wrap; align-items: center; column-gap: var(--s1); }
+html[data-register='attempt'] .assessment-room > * { flex: 1 1 100%; }
+html[data-register='attempt'] .assessment-room > :is(.exam-mode-badge, .exam-scope-note, .exam-machine-label) { flex: 0 0 auto; align-self: center; margin-block: 0; }
+html[data-register='attempt'] .assessment-room > .exam-scope-note { flex: 0 1 auto; min-width: 0; }
+html[data-register='attempt'] .assessment-room > #exam-flag { flex: 0 0 auto; }
+html[data-register='attempt'] .exam-save { order: 1; margin: -16px 0 var(--s2); font: 12px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--text-2); text-align: end; }
+html[data-register='attempt'] .assessment-room > :is(#exam-flag, .exam-bookmark-note, .mock-nav, .exam-question-map, .exam-leave-controls) { order: 2; }
+html[data-register='attempt'] .assessment-room .exam-paper {
   margin: 0 0 var(--s3);
   padding: var(--s4) clamp(20px, 5vw, 56px) var(--s3);
   border: 1px solid var(--raised-edge);
@@ -2863,16 +2888,16 @@ html[data-room='attempt'] .assessment-room .exam-paper {
   background: var(--washi) 0 0 / 300px 300px, var(--raised);
   box-shadow: var(--raised-shadow);
 }
-html[data-room='attempt'] .exam-paper-header {
+html[data-register='attempt'] .exam-paper-header {
   margin: 0 0 var(--s3);
   padding: 0 0 var(--s2);
   border-bottom: 2px solid var(--rule-strong);
 }
-html[data-room='attempt'] .exam-paper .exam-skill { margin: 0 0 var(--s1); padding: 0; border: 0; font: 600 13px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--text-2); }
-html[data-room='attempt'] .assessment-room .exam-task-heading { margin: 0 0 var(--s1); font: 800 24px/1.45 var(--display); letter-spacing: 0.02em; color: var(--text); }
-html[data-room='attempt'] .exam-task-instruction { margin: 0; font: 17px/1.9 var(--serif); color: var(--text); }
-html[data-room='attempt'] .exam-paper .exam-prompt { font: 22px/2 var(--serif); color: var(--text); }
-html[data-room='attempt'] .exam-question-number {
+html[data-register='attempt'] .exam-paper .exam-skill { margin: 0 0 var(--s1); padding: 0; border: 0; font: 600 13px/1.5 var(--serif); letter-spacing: 0.04em; color: var(--text-2); }
+html[data-register='attempt'] .assessment-room .exam-task-heading { margin: 0 0 var(--s1); font: 800 24px/1.45 var(--display); letter-spacing: 0.02em; color: var(--text); }
+html[data-register='attempt'] .exam-task-instruction { margin: 0; font: 17px/1.9 var(--serif); color: var(--text); }
+html[data-register='attempt'] .exam-paper .exam-prompt { font: 22px/2 var(--serif); color: var(--text); }
+html[data-register='attempt'] .exam-question-number {
   display: inline-grid;
   place-items: center;
   min-width: 34px;
@@ -2883,11 +2908,11 @@ html[data-room='attempt'] .exam-question-number {
   font: 700 18px/1 var(--sans);
   vertical-align: 4px;
 }
-html[data-room='attempt'] .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.28em; text-decoration-color: var(--text); }
-html[data-room='attempt'] .exam-paper .exam-instruction { padding: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); background: transparent; box-shadow: none; }
-html[data-room='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
-html[data-room='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: 6px; }
-html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number, html[data-room='attempt'] .exam-paper .mock-opt.exam-option-number {
+html[data-register='attempt'] .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.28em; text-decoration-color: var(--text); }
+html[data-register='attempt'] .exam-paper .exam-instruction { padding: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); background: transparent; box-shadow: none; }
+html[data-register='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
+html[data-register='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: 6px; }
+html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number, html[data-register='attempt'] .exam-paper .mock-opt.exam-option-number {
   display: grid;
   place-items: center;
   width: 44px;
@@ -2902,19 +2927,19 @@ html[data-room='attempt'] .exam-paper .exam-option-row .exam-option-number, html
   font: 700 18px/1 var(--sans);
   font-variant-numeric: tabular-nums;
 }
-@media (hover: hover) { html[data-room='attempt'] .exam-paper .exam-option-number:hover { border-color: var(--ai); color: var(--ai); background: var(--ai-wash); } }
-html[data-room='attempt'] .exam-paper .exam-option-number:is([aria-checked='true'], [aria-pressed='true']) {
+@media (hover: hover) { html[data-register='attempt'] .exam-paper .exam-option-number:hover { border-color: var(--ai); color: var(--ai); background: var(--ai-wash); } }
+html[data-register='attempt'] .exam-paper .exam-option-number:is([aria-checked='true'], [aria-pressed='true']) {
   border-color: var(--ai);
   background: var(--ai);
   color: var(--raised);
 }
-html[data-room='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
-html[data-room='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
-html[data-room='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
-html[data-room='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
-html[data-room='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
-html[data-room='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
-html[data-room='attempt'] .mock-nav .take, html[data-room='attempt'] #exam-finish-block {
+html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
+html[data-register='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
+html[data-register='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
+html[data-register='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+html[data-register='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
+html[data-register='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
+html[data-register='attempt'] .mock-nav .take, html[data-register='attempt'] #exam-finish-block {
   min-height: 48px;
   padding: 0 var(--s4);
   border: 1px solid var(--ai);
@@ -2924,15 +2949,15 @@ html[data-room='attempt'] .mock-nav .take, html[data-room='attempt'] #exam-finis
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
   font: 700 16px/1 var(--sans);
 }
-html[data-room='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: 10px; background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
+html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: 10px; background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
 @media (max-width: 520px) {
-  html[data-room='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
-  html[data-room='attempt'] .assessment-room .exam-paper { padding: var(--s3) var(--s2) var(--s2); }
-  html[data-room='attempt'] .exam-progress { padding: 8px 10px 8px 14px; font-size: 14px; }
-  html[data-room='attempt'] .exam-timer { font-size: 16px; min-height: 30px; padding: 0 10px; }
-  html[data-room='attempt'] .assessment-room .exam-task-heading { font-size: 21px; }
-  html[data-room='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
-  html[data-room='attempt'] .exam-option-text { font-size: 19px; }
+  html[data-register='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
+  html[data-register='attempt'] .assessment-room .exam-paper { padding: var(--s3) var(--s2) var(--s2); }
+  html[data-register='attempt'] .exam-progress { padding: 8px 10px 8px 14px; font-size: 14px; }
+  html[data-register='attempt'] .exam-timer { font-size: 16px; min-height: 30px; padding: 0 10px; }
+  html[data-register='attempt'] .assessment-room .exam-task-heading { font-size: 21px; }
+  html[data-register='attempt'] .exam-paper .exam-prompt { font-size: 20px; }
+  html[data-register='attempt'] .exam-option-text { font-size: 19px; }
 }
 
 /* ------------------------------------------------------------------ R4 focus
@@ -3177,8 +3202,9 @@ body #mini .mini-status:empty { display: none; }
 .vocabulary-list-popover .vocabulary-list-status { min-height: 0; margin: 6px 0 0; font: 13px/1.5 var(--sans); color: var(--ai); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 
-/* the one-time hint fades where it stands once the first word opens, keeping its room for that visit */
-.reader-tip.is-done { visibility: hidden; opacity: 0; transition: opacity 200ms ease, visibility 0s linear 200ms; }
+/* The one-time hint keeps its space after the first word opens. */
+.reader-tip.is-done { opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
+.reader-tip.is-done[data-faded] { visibility: hidden; }
 
 /* 原文 / やさしい版: a two-sided switch that says what each side is and its level, and one line on what the
    simplified version is */
@@ -3288,5 +3314,1725 @@ body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px
 @media (max-width: 720px) {
   body[data-view='contextdeck'] .cd-room[data-writing='vertical'] .cd-column {
     max-height: calc(100dvh - 15rem);
+  }
+}
+
+
+/* BEGIN BUNKI NAVIGATION SHELL · additive foundation ======================== */
+body { --nav-clearance: 0px; }
+body.has-primary-tabs { --nav-clearance: calc(60px + env(safe-area-inset-bottom, 0px)); }
+body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
+.primary-tabs {
+  /* the Line (concept D graft, skinned C+A): five stations on one hairline track */
+  --tabs-pad: max(8px, env(safe-area-inset-left, 0px));
+  --line-y: 17px;
+  position: fixed;
+  z-index: 70;
+  inset: auto 0 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  box-sizing: border-box;
+  height: var(--nav-clearance);
+  padding: 6px var(--tabs-pad) calc(6px + env(safe-area-inset-bottom, 0px));
+  border-top: var(--stroke-hairline) solid var(--color-edge-strong);
+  background: var(--color-glass);
+  color: var(--color-ink);
+  box-shadow: 0 -10px 24px color-mix(in srgb, var(--color-ink) 5%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  backdrop-filter: saturate(140%) blur(18px);
+}
+.primary-tabs .primary-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 2px 7px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-muted);
+  box-shadow: none;
+  font: 600 11.5px/1 var(--font-ui);
+  letter-spacing: 0.04em;
+  transition: none;
+}
+body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-display); letter-spacing: 0.08em; }
+/* the track: each station draws its own stretch, so the line runs centre to centre */
+.primary-tabs .primary-tab::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--line-y) - 6px);
+  left: 0;
+  right: 0;
+  height: var(--stroke-hairline);
+  background: var(--color-rule);
+  pointer-events: none;
+}
+.primary-tabs .primary-tab:first-child::before { left: 50%; }
+.primary-tabs .primary-tab:nth-child(5)::before { right: 50%; }
+.primary-tabs .primary-tab::after { content: none; }
+.primary-tabs .station-node {
+  position: absolute;
+  top: calc(var(--line-y) - 6px - 4px);
+  left: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-rule);
+  background: var(--color-glass-solid);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.primary-tabs .station-due {
+  position: absolute;
+  top: calc(var(--line-y) - 6px - 13px);
+  left: calc(50% + 9px);
+  padding: 0 3px;
+  background: var(--color-glass-solid);
+  /* ink, not 朱: the screen keeps one 朱 signal, and it belongs to the room (r3-rooms) */
+  color: var(--color-ink);
+  font: 600 10px/1 var(--font-data);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+.primary-tabs .station-due::after { content: attr(data-due); }
+.primary-tabs .primary-tab[aria-current='page'] { background: transparent; color: var(--color-ink); font-weight: 700; }
+body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
+.primary-tabs .primary-tab[aria-current='page'] .station-node { opacity: 0; }
+.primary-tabs .primary-tab:active { color: var(--color-ink); }
+.primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+/* the car: one filled square that travels the line */
+.primary-tabs .line-car {
+  position: absolute;
+  top: calc(var(--line-y) - 6px);
+  left: var(--tabs-pad);
+  width: calc((100% - 2 * var(--tabs-pad)) / 5);
+  height: 12px;
+  pointer-events: none;
+  transform: translateX(calc(var(--ix, 0) * 100%));
+}
+.primary-tabs .line-car::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(50% - 6px);
+  width: 12px;
+  height: 12px;
+  background: var(--color-ink);
+  box-shadow: 0 0 0 3px var(--color-glass-solid);
+}
+.primary-tabs .line-car.moving { animation: line-car-slide 320ms var(--ease-enter) both; }
+@keyframes line-car-slide { from { transform: translateX(calc(var(--from, 0) * 100%)); } }
+body.has-primary-tabs #variants { bottom: var(--nav-clearance); }
+body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(max(var(--nav-clearance), var(--foundation-dock-clearance, 0px)) + 12px); }
+/* Sheets hide tabs and reserve the original report-button strip. */
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail { bottom: 12px; }
+body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px); }
+body.has-primary-tabs .kp-grades,
+body.has-primary-tabs .pc-controls,
+body.has-primary-tabs .cd-dock { bottom: var(--nav-clearance); }
+/* The deck tip's compact glyph has an expanded touch area below its paint. */
+body.has-primary-tabs .kp-grades { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
+/* The private import's confirm/cancel stand one per line, clear of the report rail's column
+   (44px at the right edge), whatever the engine's text metrics. */
+@media (max-width: 520px) {
+  .pc-preview > button { display: flex; width: fit-content; max-width: calc(100vw - 120px); margin-block: 0 var(--space-2); }
+}
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
+.learn-section + .learn-section,
+.foundation-section { margin-top: var(--space-8); }
+.learn-section { padding-top: var(--space-2); }
+.learn-section + .learn-section { border-top: var(--stroke-relief) solid var(--color-edge-strong); }
+.foundation-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-3); }
+.foundation-doors .foundation-door { min-height: var(--hit); margin: 0; }
+.settings-language { display: inline-flex; min-height: var(--hit); }
+.settings-language button { min-height: var(--hit); padding-inline: var(--space-4); }
+@media (max-width: 520px) {
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app::after {
+    bottom: var(--nav-clearance);
+    height: 64px;
+  }
+  body.has-primary-tabs.v-depth-layered[data-view='reader'] .listen-row.play-bar,
+  body.has-primary-tabs[data-view='reader'] .listen-row.play-bar { bottom: calc(var(--nav-clearance) + 8px); }
+  body.has-primary-tabs[data-view='reader'] .listen-row.play-bar.is-pending { bottom: var(--nav-clearance); }
+  body.has-primary-tabs .teacher-door.reader-actions { bottom: calc(var(--nav-clearance) + 72px); }
+  body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 84px); }
+}
+@media (min-width: 521px) {
+  .primary-tabs { --tabs-pad: max(12px, calc((100vw - 720px) / 2)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-tabs .primary-tab { transition: none; }
+  .primary-tabs .line-car.moving { animation: none; }
+}
+/* END BUNKI NAVIGATION SHELL =============================================== */
+
+/* Baseline repairs: raised study surfaces and world-consistent sheet paper.
+   The v2 compatibility bridge above remains an exact baseline mapping. */
+:where(body:not([data-view='drift'])) {
+  --color-relief-edge: color-mix(in srgb, var(--color-ink) 30%, transparent);
+}
+body.v-depth-layered :is(
+  #shelf-body .grammar-link[data-grade='room'], .search-page, .skip-ui,
+  .study-door, .listen-row, #reader, .foundation-door
+) {
+  border: var(--stroke-relief) solid var(--color-relief-edge);
+  box-shadow: var(--elevation-card);
+}
+body.v-depth-layered .eyebrow.shelf-section::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  margin-bottom: var(--space-2);
+  background: var(--color-accent);
+}
+body.v-depth-layered .sheet, body .sheet { background: var(--color-paper); }
+
+/* The reader's opening picture yields the space taken by the navigation dock,
+   preserving the first sentence on the initial screen. */
+body.has-primary-tabs[data-view='reader'] #app > main[data-enter] { animation-fill-mode: backwards; }
+/* Keep the publisher's 44px native target floor during fractional room lifts. */
+body[data-view='publisher'] :is(
+  #publisher-back, #publisher-original, #publisher-finished,
+  .publisher-credit-link, .publisher-license, .publisher-details summary,
+  #publisher-context-save, #publisher-context-open
+) { min-height: calc(var(--hit) + 1px); }
+body.has-primary-tabs[data-view='reader'] .reader-picture-img {
+  max-height: max(60px, calc(100svh - 740px - var(--nav-clearance)));
+}
+@media (max-width: 520px) {
+  #shelf-body .shelf-study-tools .shelf-tools-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* English relation labels and learning notes share narrow thesaurus rows. */
+body:not([data-view='drift']) .sem-row { flex-wrap: wrap; }
+body:not([data-view='drift']) .sem-row .sem-note {
+  flex: 1 1 12ch;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Plain yomi-probe grades use the dark recall dock's own pigments. */
+body.zen .probe-row .grade { color: var(--color-zen-ink); border-color: color-mix(in srgb, var(--color-zen-ink) 45%, transparent); }
+body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
+
+/* Counts must not change the header's line count during a word action. */
+@media (max-width: 520px) {
+  /* The article already names its level. Reserve its capture door even before
+     a word is selected, so selecting/saving never changes header height. */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > .chrome-level { display: none; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take {
+    display: inline-flex; width: 44px; min-width: 44px; padding: 0;
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: hidden; }
+  body.has-primary-tabs[data-view='reader'] #reader-take .l-ja {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  body.has-primary-tabs[data-view='reader'] #reader-take::after { content: '+'; font-size: 24px; }
+  body.has-primary-tabs[data-view='reader'] #reader-take[aria-pressed='true']::after { content: '✓'; }
+  body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
+  body:not(.zen) #app > .chrome > button.chrome-dojo { padding-inline: 4px; }
+  body:not(.zen) #app > .chrome > .level-chip.chrome-level { padding-inline: 4px; margin-inline: 0 2px; }
+  body:not(.zen) #app > .chrome > button#tray {
+    padding-inline: 4px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  body.has-primary-tabs[data-view='reader'] #reader-tip { margin-bottom: 4px; }
+  body.has-primary-tabs[data-view='reader'] #app > main > .view-title-en { margin-bottom: 4px; }
+  body.has-primary-tabs[data-view='reader'] .reader-head { margin-bottom: 8px; }
+  body.has-primary-tabs[data-view='reader'] #app::after { height: calc(44px + env(safe-area-inset-bottom)); }
+  body.has-primary-tabs[data-view='reader'] .listen-row.play-bar.is-pending { height: 44px; }
+  body.has-primary-tabs[data-view='reader'] .reader-picture { margin-bottom: 8px; }
+}
+
+/* ==========================================================================
+   BEGIN BUNKI DESIGN TOKENS V2 · redesign foundation, 8 October 2026
+
+   Concepts change the named VALUES below; existing rooms consume the legacy
+   aliases in the final bridge. Value rules deliberately have zero specificity
+   so a concept or html[data-room] rule can override them without !important.
+   Keep the public worlds: --world-* snapshots resolve on html BEFORE the
+   body's aliases, avoiding a --ink ↔ --color-ink (or palette) variable cycle.
+   The front-door word sky keeps its original variables and appearance.
+   ========================================================================== */
+:root {
+  --world-ground: var(--ground);
+  --world-ground-2: var(--ground-2);
+  --world-paper: var(--ground-0, #faf6ea);
+  --world-ink: var(--ink);
+  --world-accent: var(--ai);
+  --world-accent-wash: var(--ai-wash);
+  --world-signal: var(--red);
+  --world-signal-wash: var(--red-wash);
+  --world-line: var(--line);
+  --world-line-soft: var(--line-soft);
+  --world-serif: var(--serif);
+  --world-display: var(--display);
+  --world-paper-shadow: var(--paper-shadow);
+  --world-sheet-ground: var(--sheet-ground);
+  --world-sheet-ground-2: var(--sheet-ground-2);
+  --world-sheet-surface: var(--sheet-ground-0);
+  --world-sheet-ink: var(--sheet-ink);
+  --world-sheet-ink-2: var(--sheet-ink-2);
+  --world-sheet-signal: var(--sheet-red);
+  --world-sheet-signal-wash: var(--sheet-red-wash);
+  --world-sheet-line: var(--sheet-line);
+  --world-sheet-line-soft: var(--sheet-line-soft);
+  --world-sheet-quiet: var(--sheet-faint);
+  --world-sheet-muted: var(--sheet-faint-2);
+  --world-sheet-accent: var(--sheet-ai);
+  --world-sheet-accent-wash: var(--sheet-ai-wash);
+  --world-card-ground: var(--card-ground);
+  --world-card-ground-2: var(--card-ground-2);
+  --world-card-surface: var(--card-ground-0);
+  --world-card-ink: var(--card-ink);
+  --world-card-ink-2: var(--card-ink-2);
+  --world-card-signal: var(--card-red);
+  --world-card-signal-wash: var(--card-red-wash);
+  --world-card-line: var(--card-line);
+  --world-card-line-soft: var(--card-line-soft);
+  --world-card-quiet: var(--card-faint);
+  --world-card-muted: var(--card-faint-2);
+  --world-card-accent: var(--card-ai);
+  --world-card-accent-wash: var(--card-ai-wash);
+  --world-zen-ground-deep: var(--zen-stage-deep);
+  --world-zen-ground: var(--zen-stage);
+  --world-zen-surface: var(--zen-stage-crown);
+  --world-zen-ink: var(--zen-text);
+  --world-zen-accent: var(--zen-accent);
+  --world-zen-signal: var(--zen-red);
+  --world-zen-glow: var(--zen-glow);
+}
+
+:where(body:not([data-view='drift'])) {
+  /* Colour roles: the world supplies pigments; the page supplies material. */
+  --color-ground: var(--world-ground);
+  --color-ground-2: var(--world-ground-2);
+  --color-paper: var(--world-paper);
+  --color-page: color-mix(in srgb, var(--color-ground) 22%, #faf9f6);
+  --color-surface: #fff;
+  --color-surface-sunk: color-mix(in srgb, var(--color-ink) 3.5%, var(--color-surface));
+  --color-ink: var(--world-ink);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 74%, var(--color-surface));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 80%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 76%, var(--color-paper));
+  --color-accent: var(--world-accent);
+  --color-accent-wash: var(--world-accent-wash);
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-signal: var(--world-signal);
+  --color-signal-wash: var(--world-signal-wash);
+  --color-seal: var(--color-signal);
+  --color-seal-wash: color-mix(in srgb, var(--color-seal) 9%, transparent);
+  --color-line: var(--world-line);
+  --color-line-soft: var(--world-line-soft);
+  --color-separator: color-mix(in srgb, var(--color-ink) 13%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-ink) 38%, var(--color-paper));
+  --color-rule-soft: color-mix(in srgb, var(--color-ink) 18%, var(--color-paper));
+  --color-fill: rgb(120 120 128 / 12%);
+  --color-fill-strong: rgb(120 120 128 / 20%);
+  --color-glass: rgb(250 250 248 / 80%);
+  --color-glass-solid: #fafaf8;
+  --color-glass-line: rgb(0 0 0 / 16%);
+  --color-art-ground: color-mix(in srgb, var(--color-accent) 58%, #07101d);
+  --color-art-ink: #f3ecdc;
+  --color-focus-wash: color-mix(in srgb, var(--color-signal) 16%, transparent);
+
+  /* The existing lacquer, warm recall card and world-specific zen desk each
+     retain their own material. Concepts can tune these through values too. */
+  --color-sheet-ground: var(--world-sheet-ground);
+  --color-sheet-ground-2: var(--world-sheet-ground-2);
+  --color-sheet-surface: var(--world-sheet-surface);
+  --color-sheet-ink: var(--world-sheet-ink);
+  --color-sheet-ink-2: var(--world-sheet-ink-2);
+  --color-sheet-signal: var(--world-sheet-signal);
+  --color-sheet-signal-wash: var(--world-sheet-signal-wash);
+  --color-sheet-line: var(--world-sheet-line);
+  --color-sheet-line-soft: var(--world-sheet-line-soft);
+  --color-sheet-quiet: var(--world-sheet-quiet);
+  --color-sheet-muted: var(--world-sheet-muted);
+  --color-sheet-accent: var(--world-sheet-accent);
+  --color-sheet-accent-wash: var(--world-sheet-accent-wash);
+  --color-card-ground: var(--world-card-ground);
+  --color-card-ground-2: var(--world-card-ground-2);
+  --color-card-surface: var(--world-card-surface);
+  --color-card-ink: var(--world-card-ink);
+  --color-card-ink-2: var(--world-card-ink-2);
+  --color-card-signal: var(--world-card-signal);
+  --color-card-signal-wash: var(--world-card-signal-wash);
+  --color-card-line: var(--world-card-line);
+  --color-card-line-soft: var(--world-card-line-soft);
+  --color-card-quiet: var(--world-card-quiet);
+  --color-card-muted: var(--world-card-muted);
+  --color-card-accent: var(--world-card-accent);
+  --color-card-accent-wash: var(--world-card-accent-wash);
+  --color-zen-ground-deep: var(--world-zen-ground-deep);
+  --color-zen-ground: var(--world-zen-ground);
+  --color-zen-surface: var(--world-zen-surface);
+  --color-zen-ink: var(--world-zen-ink);
+  --color-zen-accent: var(--world-zen-accent);
+  --color-zen-signal: var(--world-zen-signal);
+  --color-zen-glow: var(--world-zen-glow);
+
+  /* Bundled faces first (fonts.css): Noto Sans JP for the interface beside the three ink faces;
+     the system names after it only stand in while a chunk is still on its way. */
+  --font-ui: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
+  --font-reading: var(--world-serif);
+  --font-display: var(--world-display);
+  --font-brush: 'Yuji Syuku', 'Shippori Mincho B1', var(--font-reading);
+  --font-seal: 'Kaisei Tokumin', 'Shippori Mincho B1', var(--font-reading);
+  --type-caption: 12px;
+  --type-label: 13px;
+  --type-chrome: 14px;
+  --type-control: 15px;
+  --type-body: 16px;
+  --type-lead: 18px;
+  --type-reading: 23px;
+  --type-section: 24px;
+  --type-title: 29px;
+  --type-display: 34px;
+  --type-hero: 38px;
+  --type-headword: 42px;
+  --type-seal: 22px;
+  --leading-tight: 1.25;
+  --leading-ui: 1.4;
+  --leading-body: 1.6;
+  --leading-reading: 1.9;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Four-point base, with the current eight-point room rhythm preserved. */
+  --space-0: 0;
+  --space-hair: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --hit: 44px;
+  --size-seal: 56px;
+  --stroke-hairline: 0.5px;
+  --stroke-relief: 1px;
+  --stroke-focus: 2px;
+  --radius-none: 0;
+  --radius-small: 4px;
+  --radius-seal: 5px;
+  --radius-control: 12px;
+  --radius-overlay: 14px;
+  --radius-surface: 16px;
+  --radius-pill: 999px;
+
+  /* Relief remains an edge plus a shadow, independent of a concept's skin. */
+  --elevation-none: none;
+  --elevation-paper: var(--world-paper-shadow);
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 8%);
+  --elevation-lift: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 36px rgb(0 0 0 / 12%);
+  --elevation-float: 0 2px 6px rgb(0 0 0 / 6%), 0 20px 48px rgb(0 0 0 / 16%);
+  --elevation-focus: inset 0 -2px 0 var(--color-ink);
+  --motion-instant: 0ms;
+  --motion-quick: 120ms;
+  --motion-press: 140ms;
+  --motion-fast: 180ms;
+  --motion-standard: 220ms;
+  --motion-room: 240ms;
+  --motion-sheet: 280ms;
+  --motion-long: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-enter: ease-out;
+  --ease-exit: ease-in;
+  --ease-linear: linear;
+}
+
+/* Preserve the current exact default paper and the existing night materials. */
+:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+  --color-page: #f6f5f1;
+}
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+  --color-page: var(--color-ground);
+  --color-surface: var(--color-paper);
+  --color-surface-sunk: color-mix(in srgb, var(--color-paper) 70%, var(--color-ground));
+  --color-separator: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-fill: rgb(120 120 128 / 24%);
+  --color-fill-strong: rgb(120 120 128 / 34%);
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-ground) 72%, transparent);
+  --color-glass-solid: color-mix(in srgb, var(--color-ground) 92%, #fff);
+  --color-glass-line: rgb(255 255 255 / 16%);
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 34%);
+  --elevation-lift: 0 2px 4px rgb(0 0 0 / 34%), 0 16px 36px rgb(0 0 0 / 44%);
+  --elevation-float: 0 2px 6px rgb(0 0 0 / 36%), 0 20px 48px rgb(0 0 0 / 50%);
+}
+@media (max-width: 520px) {
+  /* The shipped contrast variant's body rule keeps the full reading/display
+     sizes; the compact scale applies only when that variant is switched off. */
+  :where(body:not([data-view='drift']):not(.v-contrast-wcag)) {
+    --type-reading: 21px;
+    --type-display: 29px;
+  }
+}
+
+/* Compatibility bridge. Only aliases have the specificity needed to replace
+   the earlier world/body declarations. Room-local pigments remain scoped. */
+:root body:not([data-view='drift']) {
+  --ground: var(--color-ground);
+  --ground-2: var(--color-ground-2);
+  --ground-0: var(--color-paper);
+  --page: var(--color-page);
+  --surface: var(--color-surface);
+  --surface-sunk: var(--color-surface-sunk);
+  --ink: var(--color-ink);
+  --ink-2: var(--color-ink-2);
+  --label: var(--color-ink);
+  --label-2: var(--color-label-2);
+  --faint: var(--color-quiet);
+  --faint-2: var(--color-muted);
+  --text: var(--color-ink);
+  --text-2: var(--color-label-2);
+  --ai: var(--color-accent);
+  --ai-wash: var(--color-accent-wash);
+  --tint: var(--color-accent);
+  --tint-wash: var(--color-tint-wash);
+  --red: var(--color-signal);
+  --red-wash: var(--color-signal-wash);
+  --accent: var(--color-seal);
+  --accent-wash: var(--color-seal-wash);
+  --line: var(--color-line);
+  --line-soft: var(--color-line-soft);
+  --separator: var(--color-separator);
+  --hairline: var(--color-separator);
+  --rule-strong: var(--color-separator);
+  --fill: var(--color-fill);
+  --fill-strong: var(--color-fill-strong);
+  --glass: var(--color-glass);
+  --glass-solid: var(--color-glass-solid);
+  --glass-line: var(--color-glass-line);
+  --raised: var(--color-surface);
+  --raised-edge: var(--color-separator);
+  --raised-edge-strong: var(--color-edge-strong);
+  --chrome: var(--color-glass-solid);
+  --chrome-ink: var(--color-ink);
+  --art-field: var(--color-art-ground);
+  --art-ink: var(--color-art-ink);
+  --focus-wash: var(--color-focus-wash);
+  --focus-ring: var(--elevation-focus);
+  --ed-paper: var(--color-surface);
+  --ed-ink: var(--color-ink);
+  --ed-muted: var(--color-ink-2);
+  --ed-rule: var(--color-rule);
+  --ed-rule-light: var(--color-rule-soft);
+  --ed-mast: var(--color-glass-solid);
+  --ed-mast-ink: var(--color-ink);
+  --sheet-ground: var(--color-sheet-ground);
+  --sheet-ground-2: var(--color-sheet-ground-2);
+  --sheet-ground-0: var(--color-sheet-surface);
+  --sheet-ink: var(--color-sheet-ink);
+  --sheet-ink-2: var(--color-sheet-ink-2);
+  --sheet-red: var(--color-sheet-signal);
+  --sheet-red-wash: var(--color-sheet-signal-wash);
+  --sheet-line: var(--color-sheet-line);
+  --sheet-line-soft: var(--color-sheet-line-soft);
+  --sheet-faint: var(--color-sheet-quiet);
+  --sheet-faint-2: var(--color-sheet-muted);
+  --sheet-ai: var(--color-sheet-accent);
+  --sheet-ai-wash: var(--color-sheet-accent-wash);
+  --card-ground: var(--color-card-ground);
+  --card-ground-2: var(--color-card-ground-2);
+  --card-ground-0: var(--color-card-surface);
+  --card-ink: var(--color-card-ink);
+  --card-ink-2: var(--color-card-ink-2);
+  --card-red: var(--color-card-signal);
+  --card-red-wash: var(--color-card-signal-wash);
+  --card-line: var(--color-card-line);
+  --card-line-soft: var(--color-card-line-soft);
+  --card-faint: var(--color-card-quiet);
+  --card-faint-2: var(--color-card-muted);
+  --card-ai: var(--color-card-accent);
+  --card-ai-wash: var(--color-card-accent-wash);
+  --zen-stage-deep: var(--color-zen-ground-deep);
+  --zen-stage: var(--color-zen-ground);
+  --zen-stage-crown: var(--color-zen-surface);
+  --zen-text: var(--color-zen-ink);
+  --zen-accent: var(--color-zen-accent);
+  --zen-red: var(--color-zen-signal);
+  --zen-glow: var(--color-zen-glow);
+  --sans: var(--font-ui);
+  --serif: var(--font-reading);
+  --display: var(--font-display);
+  --t-body: var(--type-body);
+  --t-label: var(--type-label);
+  --t-chrome: var(--type-chrome);
+  --t-read: var(--type-reading);
+  --t-section: var(--type-section);
+  --t-display: var(--type-display);
+  --t-hero: var(--type-hero);
+  --s-half: var(--space-1);
+  --s1: var(--space-2);
+  --s2: var(--space-4);
+  --s3: var(--space-6);
+  --s4: var(--space-8);
+  --s5: var(--space-10);
+  --s6: var(--space-12);
+  --s8: var(--space-16);
+  --tap: var(--hit);
+  --r-control: var(--radius-control);
+  --r-float: var(--radius-overlay);
+  --r-card: var(--radius-surface);
+  --radius-float: var(--radius-overlay);
+  --radius-card: var(--radius-surface);
+  --seal-radius: var(--radius-seal);
+  --seal-size: var(--size-seal);
+  --seal-font: var(--type-seal);
+  --shadow-card: var(--elevation-card);
+  --shadow-lift: var(--elevation-lift);
+  --shadow-float: var(--elevation-float);
+  --raised-shadow: var(--elevation-card);
+  --raised-shadow-hover: var(--elevation-lift);
+  --float-shadow: var(--elevation-float);
+  --paper-shadow: var(--elevation-paper);
+  --ed-shadow: var(--elevation-card);
+  --paper-edge: var(--stroke-relief) solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --rule: var(--stroke-relief) solid var(--color-line);
+  --dur: var(--motion-standard);
+  --ease: var(--ease-standard);
+}
+/* END BUNKI DESIGN TOKENS V2 =============================================== */
+
+/* ==========================================================================
+   BEGIN BUNKI SKIN · C 生きた本棚 Living Shelf, polished with A 磨き's craft
+   Skin lane, 8 October 2026. Read docs/redesign/build/skin/TOKENS.md.
+
+   Day   = washi under morning light: cream fibre paper, sumi ink, 藍 structure,
+           one 朱 accent (--color-seal/--color-signal: the world's red), and one
+           浅葱 live mark per screen (--color-live).
+   Night = the 藍 room with the city glowing through: lit, never inverted; light
+           is emitted as edges and glows, never a solid phosphor fill.
+
+   Values are zero-specificity (:where), so any room file or html[data-room]
+   rule wins without !important. World GROUNDS are never changed here
+   (verify-theme-consistency, the living-paper law): --color-ground,
+   --color-paper, card and zen grounds stay the world's own; everything
+   derived from them (page, surface, ink ramp, lines, accents, light) moves.
+   ========================================================================== */
+:where(body:not([data-view='drift'])) {
+  /* the page: washi tone between the world's ground and morning light */
+  --color-page: color-mix(in srgb, var(--color-ground) 58%, #fbf8f1);
+  --color-surface: color-mix(in srgb, var(--color-paper) 55%, #fffdf8);
+  --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, var(--color-ink) 4%);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 74%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 74%, var(--color-paper));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 70%, var(--color-paper));
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --color-line: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 13%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-accent) 13%, transparent);
+  --color-fill: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--color-accent) 11%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-page) 94%, transparent);
+  --color-glass-solid: var(--color-page);
+  --color-glass-line: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  /* new roles (C SPEC "new"): the one live mark, earned gold, 藍 lacquer frames */
+  --color-live: #0b6f78;
+  --color-live-wash: rgb(11 111 120 / 12%);
+  --color-live-glow: rgb(11 111 120 / 0%);
+  --color-gold: #94702a;
+  --color-gold-wash: rgb(148 112 42 / 14%);
+  --color-lacquer: #141a28;
+  --color-lacquer-2: #1d2638;
+  --color-lacquer-ink: #e9e2d2;
+  --color-press: color-mix(in srgb, var(--color-accent) 55%, #0b0f18);
+
+  /* type: Shippori B1 800 for display, Noto Serif JP for reading, Noto Sans JP for
+     chrome, Roboto Mono for data. Sizes stay the foundation's (reader ranges are pinned). */
+  --font-data: 'Roboto Mono', 'Noto Sans JP', ui-monospace, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace;
+  --font-headword: 'Shippori Mincho B1', var(--world-serif);
+  --weight-display: 800;
+
+  --radius-small: 2px;
+  --radius-seal: 3px;
+  --radius-card: 4px;
+  --radius-control: 6px;
+  --radius-overlay: 18px;
+  --radius-surface: 8px;
+
+  --elevation-paper: 0 1px 0 rgb(25 28 34 / 6%), 0 6px 18px rgb(25 28 34 / 5%);
+  --elevation-card: 0 1px 0 rgb(25 28 34 / 9%), 0 10px 26px -6px rgb(40 30 16 / 16%);
+  --elevation-lift: 0 2px 0 rgb(25 28 34 / 10%), 0 18px 40px -10px rgb(40 30 16 / 26%);
+  --elevation-float: 0 -1px 0 rgb(25 28 34 / 8%), 0 -16px 48px rgb(25 28 34 / 18%);
+  --elevation-press: 0 2px 0 var(--color-press), 0 8px 18px -6px rgb(20 26 40 / 30%);
+
+  --motion-press: 90ms;
+  --motion-quick: 160ms;
+  --motion-room: 280ms;
+  --motion-ma: 120ms;
+  --motion-ambient: 9000ms;
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* washi: two scales of kōzo fibre, painted once on the fixed page layer, never animated */
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .31 0 0 0 0 .23 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  /* room light (rooms/*.css set --skin-light; the default is morning from the upper left) */
+  --skin-light: radial-gradient(120% 60% at 0% 0%, rgb(255 255 255 / 34%), transparent 60%);
+  --skin-ground: none;
+}
+/* ベロ藍・浪, the default world, is the concept's day palette exactly: sumi ink, 藍 structure */
+:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+  --color-ink: #1b1f26;
+  --color-accent: #1f3a5f;
+  --color-accent-wash: rgb(31 58 95 / 8%);
+  --color-page: #f4eee1;
+  --color-surface: #fbf8f1;
+}
+/* night: lit, never inverted. Each night world keeps its own ground and paper; the
+   light that crosses it is the city's (accent, live phosphor, lantern gold). */
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+  --color-page: var(--color-ground);
+  --color-surface: var(--color-paper);
+  --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, #000);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-ground));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 78%, var(--color-ground));
+  --color-muted: color-mix(in srgb, var(--color-ink) 74%, var(--color-ground));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 68%, var(--color-ground));
+  --color-tint-wash: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-line: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 15%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-live) 36%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-live) 11%, transparent);
+  --color-fill: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --color-glass: color-mix(in srgb, var(--color-ground) 93%, transparent);
+  --color-glass-solid: var(--color-ground);
+  --color-glass-line: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  --color-live: #5df2d6;
+  --color-live-wash: rgb(93 242 214 / 13%);
+  --color-live-glow: rgb(93 242 214 / 45%);
+  --color-gold: #e2bd6c;
+  --color-gold-wash: rgb(226 189 108 / 14%);
+  --color-lacquer: color-mix(in srgb, var(--color-ground) 45%, #000);
+  --color-lacquer-2: color-mix(in srgb, var(--color-ground) 75%, #000);
+  --color-lacquer-ink: var(--color-ink);
+  --color-glow: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  --elevation-paper: inset 0 1px 0 rgb(255 255 255 / 4%), 0 8px 22px rgb(0 0 0 / 35%);
+  --elevation-card: inset 0 1px 0 rgb(255 255 255 / 5%), 0 14px 32px -8px rgb(0 0 0 / 60%);
+  --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 6%), 0 22px 48px -10px rgb(0 0 0 / 70%);
+  --elevation-float: 0 -1px 0 color-mix(in srgb, var(--color-accent) 16%, transparent), 0 -18px 56px rgb(0 0 0 / 60%);
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  /* the city through the paper: a low glow from below, cool above */
+  --skin-light:
+    radial-gradient(130% 42% at 50% 112%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 70%),
+    radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 70%);
+}
+/* 夜 is the 藍 room itself: its light is 藍 (the world's gold stays as lantern gold) */
+:where(:root[data-theme='yoru'] body:not([data-view='drift'])) { --color-accent: #9db8e6; --color-accent-wash: rgb(157 184 230 / 10%); }
+/* 殻 is already phosphor: its own accent is the live light */
+:where(:root[data-theme='kaku'] body:not([data-view='drift'])) { --color-live: var(--world-accent); --color-live-glow: color-mix(in srgb, var(--world-accent) 45%, transparent); }
+
+/* ---- the page itself: washi over the world's ground, lit per room ---- */
+body:not([data-view='drift'])::before { background: var(--skin-light), var(--skin-ground), var(--texture-washi), var(--page); }
+body:not([data-view='drift']) { color: var(--color-ink); }
+
+/* ---- the page frame: on a phone the room sits ON the washi, not in a white card ---- */
+@media (max-width: 520px) {
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']):not([data-view='reader']) #app > main {
+    background: transparent;
+    border-radius: 0;
+  }
+}
+@media (min-width: 521px) {
+  body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
+    border: var(--stroke-hairline) solid var(--color-edge-strong);
+    border-radius: var(--radius-card);
+    box-shadow: var(--elevation-paper);
+  }
+}
+
+/* ---- typography roles ---- */
+main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
+  font-family: var(--font-headword);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+body[data-view='reader'] main > h1.view-title { font-family: var(--font-reading); }
+main h2 { font-family: var(--font-headword); font-weight: 800; letter-spacing: 0.01em; }
+.data, .skin-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+/* ---- section eyebrows: small caps chrome with the 朱 accent rule ---- */
+body:not([data-view='drift']) main .eyebrow,
+body:not([data-view='drift']) #sheet .eyebrow {
+  font: 600 11.5px/1.35 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
+body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: 12px; letter-spacing: 0.2em; text-transform: none; }
+body.v-depth-layered:not([data-view='drift']) .eyebrow.shelf-section::before,
+body:not([data-view='drift']) main > .eyebrow.skin-ruled::before,
+body:not([data-view='drift']) main section > h2.eyebrow::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 2px;
+  margin: 0 0 var(--space-2);
+  background: var(--color-seal);
+}
+
+/* ---- buttons: primary = solid 藍 with physical travel by day; an emitted edge at night ---- */
+body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: #f7f2e8;
+  box-shadow: var(--elevation-press);
+  font: 600 15px/1.25 var(--font-ui);
+  letter-spacing: 0.02em;
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
+body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--color-press), 0 4px 10px -6px rgb(20 26 40 / 30%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
+  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) .en-sub { color: inherit; }
+
+/* ---- chips: no grey-pill soup. A chip is a hairline-ruled slip of paper; on = 藍 ink. ---- */
+body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom),
+body:not([data-view='drift']) .kdx-lens,
+body:not([data-view='drift']) .focus-chip {
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font-weight: 500;
+}
+body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):hover:not(:disabled),
+body:not([data-view='drift']) .kdx-lens:hover,
+body:not([data-view='drift']) .focus-chip:hover { background: var(--color-fill); }
+body:not([data-view='drift']) .kdx-lens .l-ja { color: inherit; font-weight: 500; }
+body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #f7f2e8;
+}
+body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) .l-ja { color: inherit; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) {
+  background: var(--color-tint-wash);
+  color: var(--color-accent);
+  box-shadow: 0 0 12px -4px var(--color-glow);
+}
+body:not([data-view='drift']) .btn-secondary,
+body:not([data-view='drift']) .chip.btn-secondary {
+  border: var(--stroke-hairline) solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-accent);
+}
+
+/* ---- surfaces with relief: a hairline-and-ink edge plus a two-layer paper shadow ---- */
+body.v-depth-layered:not([data-view='drift']) :is(
+  #shelf-body .grammar-link[data-grade='room'], .search-page, .skip-ui,
+  .study-door, .listen-row, #reader, .foundation-door
+) {
+  border-radius: var(--radius-card);
+  box-shadow: var(--elevation-card);
+}
+body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
+  background: var(--color-surface);
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+body.v-depth-layered:not([data-view='drift']) .study-door { padding: var(--space-4) var(--space-4) var(--space-4); margin: 0 0 var(--space-2); }
+body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door):active { transform: translateY(1px); box-shadow: var(--elevation-paper); }
+body:not([data-view='drift']) .foundation-door {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding-inline: var(--space-4);
+  font: 600 16px/1.3 var(--font-ui);
+  color: var(--color-ink);
+  text-align: left;
+}
+body:not([data-view='drift']) .foundation-door > .l-ja { margin-right: auto; text-align: left; }
+body:not([data-view='drift']) .foundation-door::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.55;
+}
+body:not([data-view='drift']) .foundation-doors { gap: var(--space-2); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-accent) 14%, transparent), var(--elevation-card);
+}
+
+/* ---- registration marks (トンボ): "made precisely, for print". Add .skin-reg to a
+   positioned surface; the four corners are drawn in the background, no extra nodes. ---- */
+.skin-reg {
+  --reg: var(--color-edge-strong);
+  background-image:
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
+    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg));
+  background-size: 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px;
+  background-position: 0 6px, 6px 0, 100% 6px, calc(100% - 6px) 0, 0 calc(100% - 6px), 6px 100%, 100% calc(100% - 6px), calc(100% - 6px) 100%;
+  background-repeat: no-repeat;
+}
+
+/* ---- the sheet: one raised washi leaf; its ground stays the world's paper ---- */
+body:not([data-view='drift']) .sheet {
+  border-top: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
+  box-shadow: var(--elevation-float);
+}
+body:not([data-view='drift']) .sheet-grip { width: 36px; height: 4px; border-radius: 2px; background: var(--color-edge-strong); }
+body:not([data-view='drift']) .sheet-bar { border-bottom: var(--stroke-hairline) solid var(--color-seal); }
+body:not([data-view='drift']) .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) {
+  border-width: var(--stroke-hairline);
+  border-radius: var(--radius-control);
+  font-family: var(--font-ui);
+}
+body:not([data-view='drift']) .scrim { background: rgb(12 16 26 / 30%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) .scrim { background: rgb(0 0 0 / 52%); }
+
+/* ---- the top chrome: clean and quiet. Every door keeps its id, place and 44px. ---- */
+body:not(.zen) #app > .chrome {
+  background: var(--color-glass);
+  border-bottom: var(--stroke-hairline) solid var(--color-glass-line);
+}
+body:not(.zen) #app > .chrome > button,
+body:not(.zen) #app > .chrome > button.chrome-dojo,
+body:not(.zen) #app > .chrome > button.chrome-search {
+  color: var(--color-ink-2);
+  font: 500 15px/44px var(--font-ui);
+  border-radius: var(--radius-control);
+}
+body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); }
+body:not(.zen) #app > .chrome > button#back::before { width: 8px; height: 14px; opacity: 0.8; }
+body:not(.zen) #app > .chrome > button.chrome-dojo { font: 600 12px/44px var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; }
+body:not(.zen):not(.ui-bi) #app > .chrome > button.chrome-dojo { font: 800 15px/44px var(--font-display); letter-spacing: 0.08em; text-transform: none; }
+body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'] { color: var(--color-seal); }
+body:not(.zen) #app > .chrome > button.theme-seal {
+  background: none;
+  color: var(--color-seal);
+  font: 800 14px/1 var(--font-display);
+}
+body:not(.zen) #app > .chrome > button.theme-seal::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-seal) 70%, transparent);
+  border-radius: var(--radius-seal);
+  pointer-events: none;
+}
+body:not(.zen) #app > .chrome > button.theme-seal { position: relative; }
+body:not(.zen) #app > .chrome > button.theme-seal:hover { background: none; }
+body:not(.zen) #app > .chrome .lang-seg::before { inset: 9px 0; border-radius: var(--radius-control); background: transparent; box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
+body:not(.zen) #app > .chrome .lang-seg button { color: var(--color-muted); font: 500 12px/1 var(--font-ui); }
+body:not(.zen) #app > .chrome .lang-seg button::before { inset: 9px 0; border-radius: var(--radius-control); }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--color-ink); font-weight: 700; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-surface); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong), 0 1px 2px rgb(0 0 0 / 8%); }
+body:not(.zen) #app > .chrome > button#tray { color: var(--color-ink); font: 500 13px/44px var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+body:not(.zen):not(.ui-bi) #app > .chrome > button#tray { font: 800 15px/44px var(--font-display); }
+
+/* ---- the room sign (縦看板): a vertical name hanging in the right margin ---- */
+body:not([data-view='drift']) #app > main > .room-sign {
+  /* hung from the page's top edge, in a right margin the room keeps free for it */
+  position: absolute;
+  z-index: 1;
+  top: calc(52px + env(safe-area-inset-top, 0px));
+  right: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 24px;
+  padding: 16px 0 12px;
+  border-inline: var(--stroke-hairline) solid var(--color-rule);
+  color: var(--color-ink);
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 520px) {
+  html:is([data-room='tray'], [data-room='learn'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
+  /* the shelf keeps its full measure (its title block is pinned to one-line notes); only the
+     look-up field steps aside, and the sign is cut short above the Tools door */
+  body[data-view='shelf']:not(.zen) #app > main > .room-sign ~ #search { width: calc(100% - 30px); }
+  body[data-view='shelf']:not(.zen) #app > main > .room-sign { padding-block: 10px 8px; gap: 8px; }
+}
+@media (min-width: 521px) {
+  body:not([data-view='drift']) #app > main > .room-sign { right: max(6px, calc((100vw - 920px) / 2 - 36px)); }
+}
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-name {
+  writing-mode: vertical-rl;
+  text-orientation: mixed; /* Latin turns a quarter, never stacks upright (gate 5) */
+  font: 700 10.5px/1 var(--font-ui);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+body:not([data-view='drift']) #app > main > .room-sign[data-script='kanji'] .room-sign-name {
+  text-orientation: upright;
+  font: 800 14px/1 var(--font-display);
+  letter-spacing: 0.3em;
+  text-transform: none;
+}
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum {
+  writing-mode: vertical-rl;
+  font: 400 9.5px/1 var(--font-data);
+  font-style: normal;
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+/* numbers stand upright in the column (縦中横): two digits sit across it, longer runs stack */
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum .rs-tcy {
+  -webkit-text-combine: horizontal;
+  text-combine-upright: all;
+  letter-spacing: 0;
+  font-size: 10.5px;
+}
+body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum .rs-up { text-orientation: upright; letter-spacing: 0; }
+body:not([data-view='drift']) #app > main > .room-sign::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--color-seal);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign {
+  border-color: color-mix(in srgb, var(--color-gold) 34%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign .room-sign-name {
+  color: color-mix(in srgb, var(--color-gold) 30%, #fff6e6);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--color-gold) 60%, transparent), 0 0 1px #fff;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) #app > main > .room-sign::after { box-shadow: 0 0 8px var(--color-seal); }
+/* the shelf's hidden lead eyebrow stays hidden behind the sign */
+body[data-view='shelf'] main > .room-sign:first-child + .eyebrow { display: none; }
+/* fields and filter capsules: ruled paper, not grey fill */
+html:not([data-register='tutor']) body:not([data-view='drift']) :is(.search-field, .record-note-input),
+body:not([data-view='drift']) .filter-chip {
+  background-color: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong);
+  border-radius: var(--radius-control);
+}
+/* chips and doors: a lighter hairline than the relief edge */
+body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom),
+body:not([data-view='drift']) .kdx-lens,
+body:not([data-view='drift']) .focus-chip { border-color: var(--color-line-chip, color-mix(in srgb, var(--color-ink) 24%, transparent)); }
+
+/* ---- night: the Line's car and the tabs are lit from within ---- */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .line-car::before {
+  box-shadow: 0 0 0 3px var(--color-glass-solid), 0 0 10px color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .station-due { text-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  body:not(.zen):not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary, .study-door, .foundation-door) { transition: none; }
+}
+/* END BUNKI SKIN ============================================================ */
+
+/* ==========================================================================
+   BEGIN BUNKI POLISH · the shell, quieted (polish lane, 8 October 2026)
+   John: "too confusing to navigate … clean and organized." The top chrome is one quiet line:
+   back (only when there is somewhere to go), then at the right one compact cluster —
+   the preferences (world seal · EN 日本語) and the doors as glyphs (search · Learn · Lists).
+   The doors that duplicate the tab bar no longer print a second word: #chrome-dojo is the
+   Learn tab's card-stack glyph and #tray a bookmark with its count; both keep their words
+   for a screen reader. The report bug leaves the page: it sits in its own slot at the end of
+   the tab bar, never over a room's controls. Every id, 44px door and pinned text is kept.
+   ========================================================================== */
+body:not(.zen) #app > .chrome {
+  gap: 0;
+  border-bottom: var(--stroke-hairline) solid var(--color-glass-line);
+}
+body:not(.zen) #app > .chrome > button,
+body:not(.zen) #app > .chrome > button.chrome-dojo,
+body:not(.zen) #app > .chrome > button.chrome-search {
+  align-items: center;
+  color: var(--color-ink-2);
+  font: 500 15px/44px var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+}
+body:not(.zen) #app > .chrome > button:hover:not(:disabled) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
+/* back: the chevron and one word, in the tabs' sentence case */
+body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); padding-inline: 4px 10px; }
+body.ui-bi:not(.zen) #app > .chrome > button#back .l-ja { text-transform: capitalize; }
+/* the session close keeps one way home (the tab bar, and its own "Back to Today") */
+body #app > .chrome > button#back[hidden][data-session-closed] { display: none; }
+/* one glyph size for the three doors */
+body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 19px; height: 19px; flex: 0 0 auto; }
+body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo) { width: 44px; min-width: 44px; padding: 0; }
+/* Learn: the glyph on screen, the tab's name to a screen reader */
+body:not(.zen) #app > .chrome > button.chrome-dojo .l-ja {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen):not(.ui-bi) #app > .chrome > button.chrome-dojo { font: 500 15px/44px var(--font-ui); letter-spacing: 0; }
+body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'] { color: var(--color-seal); }
+/* Lists: a bookmark and its count */
+body:not(.zen) #app > .chrome > button#tray,
+body:not(.zen):not(.ui-bi) #app > .chrome > button#tray {
+  min-width: 44px;
+  padding: 0 8px 0 6px;
+  gap: 4px;
+  color: var(--color-ink-2);
+  font: 500 13px/44px var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+body:not(.zen) #app > .chrome > button#tray::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 13px;
+  height: 17px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+body:not(.zen) #app > .chrome > button#tray .tray-word {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen) #app > .chrome > button#tray .l-ja { display: inline-flex; align-items: center; font: inherit; }
+body:not(.zen) #app > .chrome > button#tray[data-count='0'] { color: var(--color-muted); }
+/* the world seal: a small square seal, quieter than a door */
+body:not(.zen) #app > .chrome > button.theme-seal { width: 44px; min-width: 44px; font: 800 12px/1 var(--font-display); }
+body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 11px; }
+/* EN 日本語: two words, the active one inked and underlined — no capsule */
+body:not(.zen) #app > .chrome .lang-seg { margin: 0 2px 0 0; }
+body:not(.zen) #app > .chrome .lang-seg::before { content: none; }
+body:not(.zen) #app > .chrome .lang-seg button {
+  min-width: 44px;
+  padding-inline: 6px;
+  color: var(--color-muted);
+  font: 500 12px/1 var(--font-ui);
+  letter-spacing: 0.02em;
+}
+body:not(.zen) #app > .chrome .lang-seg button::before,
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before {
+  inset: auto 8px 11px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: transparent;
+  box-shadow: none;
+}
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--color-ink); font-weight: 700; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-seal); }
+@media (max-width: 520px) {
+  body:not(.zen) #app > .chrome { padding-inline: 4px; }
+  body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
+}
+/* the narrowest phones keep one line: back keeps its chevron and says its word to a screen reader */
+@media (max-width: 360px) {
+  body:not(.zen) #app > .chrome > button#back { min-width: 44px; padding: 0 10px; }
+  body:not(.zen) #app > .chrome > button#back .l-ja {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+}
+
+/* ---- the report bug: its own slot at the end of the tab bar, never over the page ---- */
+body.has-primary-tabs .primary-tabs {
+  --tabs-end: max(var(--tabs-pad), calc(54px + env(safe-area-inset-right, 0px)));
+  padding-right: var(--tabs-end);
+}
+body.has-primary-tabs .primary-tabs .line-car { width: calc((100% - var(--tabs-pad) - var(--tabs-end)) / 5); }
+body.has-primary-tabs #bunki-reports-root .br-rail {
+  right: calc(4px + env(safe-area-inset-right, 0px));
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  top: auto;
+}
+body.has-primary-tabs #bunki-reports-root .br-rail::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 12px;
+  bottom: 12px;
+  width: var(--stroke-hairline);
+  background: var(--color-rule);
+  pointer-events: none;
+}
+body.has-primary-tabs #bunki-reports-root .br-rail .br-bug { color: color-mix(in srgb, var(--color-muted) 80%, transparent); }
+body.has-primary-tabs #bunki-reports-root .br-rail .br-bug svg { width: 17px; height: 17px; }
+/* a sheet hides the tabs and keeps the original 12px report strip (verify-redesign-docks) */
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail::before { content: none; }
+/* END BUNKI POLISH ========================================================== */
+
+/* ==========================================================================
+   BEGIN BUNKI SHELL · one navigation system (shell fix lane, 8 October 2026)
+   REVIEW #3/#4/#10/#15/#17. The tab bar is the navigation. The top chrome holds
+   back (only where it leads somewhere the bar does not), then one right cluster:
+   the preferences (world seal · EN 日本語), a hairline, and a small TOOLS group
+   (search · Learn · Lists) drawn as quiet glyphs, never as a second row of tabs.
+   #chrome-dojo and #tray stay in the chrome — verify-dojo-door/verify-corridor-doors
+   and ~60 verifiers click them in every room — but they read as tools, not stations.
+   ========================================================================== */
+/* the tab bar: an opaque, quiet surface on a hairline — nothing ghosts through it */
+.primary-tabs,
+body.has-primary-tabs .primary-tabs {
+  background: var(--color-glass-solid);
+  border-top: var(--stroke-hairline) solid var(--color-rule);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* the tools group: glyph-only, quieter than the preferences, set off by one hairline */
+body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg {
+  margin-right: 0;
+  padding-right: 7px;
+  background: linear-gradient(var(--color-rule), var(--color-rule)) right 3px center / 1px 16px no-repeat;
+}
+body.has-primary-tabs:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-muted); }
+body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
+body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 12px/1 var(--font-data); font-variant-numeric: tabular-nums; }
+@media (max-width: 360px) {
+  /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
+     and Lists becomes its bookmark with the count set small at its shoulder. The reader is the
+     exception: verify-corridor pins >= 7 reachable 44px chrome doors there at 320px beside the
+     capture slot it reserves, which cannot share one 320px row, so its chrome keeps two rows. */
+  body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
+  body.has-primary-tabs:not(.zen):not([data-view='reader']) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
+    position: relative;
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja {
+    position: absolute;
+    top: 9px;
+    left: calc(50% + 7px);
+    font-size: 10px;
+  }
+}
+
+/* ---- room entrances: the chrome holds still, the room rises into place (≤216ms).
+   stampRegister marks html[data-room-entering] on arrival; a follow-up render of the same
+   arrival sets --enter-t so the redrawn children continue the rise instead of cutting.
+   Opacity starts at 0.01 and fills backwards only: no control is ever left at 0. ---- */
+@keyframes shell-rise {
+  from { opacity: 0.01; transform: translate3d(0, var(--rise, 12px), 0); }
+  to { opacity: 1; transform: none; }
+}
+html[data-room-entering] body:not([data-view='drift']) #app > main[data-enter] { animation: none; }
+html[data-room-entering] #app > main > * {
+  --rise: 14px;
+  animation: shell-rise 180ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(36ms - var(--enter-t, 0ms)) backwards;
+}
+html[data-room-entering] #app > main > :nth-child(-n + 2) { --rise: 8px; animation-delay: calc(0ms - var(--enter-t, 0ms)); }
+html[data-room-entering] #app > main > :nth-child(3) { --rise: 11px; animation-delay: calc(18ms - var(--enter-t, 0ms)); }
+html[data-room-entering] #app > main > .room-sign {
+  animation: kairo-sign 200ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(0ms - var(--enter-t, 0ms)) backwards;
+}
+html[data-room-entering][data-register='attempt'] #app > main > * { animation-duration: 120ms; animation-delay: calc(0ms - var(--enter-t, 0ms)); }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room-entering] #app > main > *,
+  html[data-room-entering] #app > main > .room-sign { animation: kairo-quiet-enter 80ms linear both; }
+  .reader-word-menu,
+  .vocabulary-list-popover { animation: kairo-quiet-enter 80ms linear both; }
+}
+
+/* ---- the front door (html[data-room=door]): the sky stays the drift's own; its chrome
+   joins the family — square paper seals, one 藍 slip as the room's single primary. ---- */
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 92%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--ink) 26%, transparent);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 4%), 0 8px 20px -12px rgb(20 26 34 / 45%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol svg { width: 22px; height: 22px; }
+html[data-room='door'] body.ginga #ginga-theme-seal.ginga-seal {
+  width: 44px;
+  height: 44px;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 12px;
+  border-radius: 2px;
+  opacity: 1;
+  color: var(--red, #b23a2a);
+  font: 800 13px/1 var(--display);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: isolate;
+}
+html[data-room='door'] body.ginga #ginga-theme-seal.ginga-seal::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid color-mix(in srgb, var(--red, #b23a2a) 75%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 88%, transparent);
+  z-index: -1;
+}
+html[data-room='door'] body.ginga #ginga-search.ginga-search {
+  width: 44px;
+  height: 44px;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 60px;
+  border-radius: 4px;
+  opacity: 0.72;
+  color: var(--ink);
+}
+/* the room's one primary: a 藍 slip, Shippori, sentence case */
+html[data-room='door'] body.ginga #home-review.corner-bubble {
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--ai, #1f3a5f);
+  color: var(--ground-0, #fbf8f1);
+  font: 800 16px/48px var(--display);
+  letter-spacing: 0.04em;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 14px 30px -16px rgb(16 24 40 / 60%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-room='door'] body.ginga #home-review.corner-bubble.quiet {
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 94%, transparent);
+  color: var(--ai, #1f3a5f);
+  box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--ink) 30%, transparent);
+}
+html[data-room='door'] body.ginga #home-review.corner-bubble .l-ja { font: inherit; letter-spacing: inherit; }
+/* the drift's invitation plaque, in the family's voice (its text is set by corridor.js tx()) */
+html[data-room='door'] #drift-layer #hint {
+  border-radius: 4px;
+  padding: 8px 16px;
+  font: 500 12px/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 90%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+}
+/* round 3 (r3-rooms): the door joins the family without touching the sky.
+   (a) the invitation is a caption, not a button: no plaque, no edge — quiet words on the sky */
+html[data-room='door'] body.ginga #drift-layer #hint {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font: italic 400 13px/1.3 'Noto Serif', var(--serif, serif);
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--ink, #23303f) 72%, transparent);
+  text-shadow: 0 0 10px var(--ground-0, #f6f1e6), 0 0 2px var(--ground-0, #f6f1e6);
+}
+body.ginga:not(.ui-bi) #drift-layer #hint { font-style: normal; font-family: var(--serif, serif); }
+/* (b) the torii and the bug are seals of the family: a hairline square on thin paper, no lift */
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  isolation: isolate;
+}
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  z-index: -1;
+  border: 0.5px solid color-mix(in srgb, var(--ink, #23303f) 46%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 70%, transparent);
+}
+html[data-room='door'] body.ginga #ginga-symbol.nav-symbol svg { width: 18px; height: 18px; opacity: 0.86; }
+html[data-room='door'] #bunki-reports-root .br-rail .br-bug { color: color-mix(in srgb, var(--ink, #23303f) 62%, transparent); }
+html[data-room='door'] #bunki-reports-root .br-rail .br-bug::before {
+  inset: 9px;
+  border: 0.5px solid color-mix(in srgb, var(--ink, #23303f) 32%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ground-0, #f6f1e6) 55%, transparent);
+}
+html[data-room='door'] #bunki-reports-root .br-rail .br-bug svg { width: 16px; height: 16px; }
+/* (c) one family touch outside the frozen layer: a thin washi edge and Today's skyline at the
+   foot of the sky. Above the drift (its layer is one stacking context), under the chrome; it
+   never takes a touch and only fades. The edge is a few px of paper, the city a low band. */
+#door-paper { display: none; }
+html[data-room='door'] body.ginga #door-paper {
+  position: fixed;
+  inset: 0;
+  z-index: 16;
+  display: block;
+  pointer-events: none;
+  animation: door-paper-in 400ms ease-out backwards;
+}
+html[data-room='door'] body.ginga #door-paper .door-washi {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 3px color-mix(in srgb, var(--ground-0, #f6f1e6) 70%, transparent),
+    inset 0 0 22px 2px color-mix(in srgb, #efe3c8 46%, transparent);
+}
+html[data-room='door'] body.ginga #door-paper .door-city {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 44px;
+}
+html[data-room='door'] body.ginga #door-paper .today-roofs { fill: color-mix(in srgb, var(--ink, #23303f) 7%, transparent); }
+html[data-room='door'] body.ginga #door-paper :is(.today-wins, .today-lamps) { fill: transparent; }
+html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .door-washi {
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, #d9b45a 10%, transparent),
+    inset 0 0 26px 4px rgb(0 0 0 / 34%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .today-roofs { fill: rgb(6 8 14 / 62%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .today-wins { fill: #d9b45a; opacity: 0.55; animation: door-windows 9s ease-in-out infinite alternate; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #door-paper .today-lamps { fill: #e8c77a; opacity: 0.8; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #drift-layer #hint {
+  text-shadow: 0 0 10px rgb(0 0 0 / 70%), 0 0 2px rgb(0 0 0 / 60%);
+}
+@keyframes door-paper-in { from { opacity: 0.01; } to { opacity: 1; } }
+@keyframes door-windows { from { opacity: 0.55; } to { opacity: 0.38; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='door'] body.ginga #door-paper,
+  html[data-room='door'] body.ginga #door-paper .today-wins { animation: none; }
+}
+/* night: the door's primary is emitted light (a lit edge and glow on the dark sky), never a solid fill */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #home-review.corner-bubble:not(.quiet) {
+  background: color-mix(in srgb, var(--ground, #0e1626) 82%, transparent);
+  color: var(--ai, #d9b45a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ai, #d9b45a) 85%, transparent),
+    0 0 18px -4px color-mix(in srgb, var(--ai, #d9b45a) 55%, transparent);
+}
+/* END BUNKI SHELL ============================================================ */
+
+/* ==========================================================================
+   BEGIN BUNKI R4 SKIN · separation, ink, crispness (round 4, 9 October 2026)
+   John, on the tour (8 Oct): "it all blends together" · "the top header, the background
+   of the picture, th etitle … and the bottom are all the exact same make me wanna puke
+   beige" · "why do i feel that native ios expeirnce is alreayd way smoother and tighter
+   and crisper than almost everythign we have?"
+   Three materials instead of one beige, each with its own tone, edge and depth:
+     FRAME  the top line and the Line: bright 胡粉 paper by day, the deep frame by night,
+            on one crisp hairline — never the page's colour
+     PAGE   washi, cooler and less yellow, with a finer fibre (formation, fibre, tooth)
+     RAISED clean paper with a defined edge and a contact + ambient shadow
+   Ink is near-black sumi; the quiet ramp moves up so nothing reads washed out. Values
+   only and zero specificity: every room file and html[data-room] rule still wins.
+   ========================================================================== */
+:where(body:not([data-view='drift'])) {
+  /* each day world keeps its own paper (柿 stays persimmon, 赤 stays warm): the page is mostly the
+     world's ground, raised paper and the frame are brighter papers tinted from it. The default
+     world, his everyday one, has its own cooler values below. */
+  --color-page: color-mix(in srgb, var(--color-ground) 72%, #f6f4ef);
+  --color-surface: color-mix(in srgb, var(--color-paper) 40%, #fffefb);
+  --color-surface-sunk: color-mix(in srgb, var(--color-page) 90%, var(--color-ink) 6%);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 78%, var(--color-paper));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 74%, var(--color-paper));
+  --color-line: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 28%, transparent);
+  /* the frame: its own material, on one hairline */
+  --color-bar: color-mix(in srgb, var(--color-paper) 30%, #fdfcf9);
+  --color-bar-line: color-mix(in srgb, var(--color-ink) 17%, transparent);
+  --color-bar-ink: var(--color-ink);
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 68%, var(--color-bar));
+  --color-glass: var(--color-bar);
+  --color-glass-solid: var(--color-bar);
+  --color-glass-line: var(--color-bar-line);
+  --elevation-bar: 0 0.5px 0 color-mix(in srgb, var(--color-ink) 6%, transparent), 0 6px 16px -14px color-mix(in srgb, var(--color-ink) 40%, transparent);
+  /* depth: a tight contact shadow plus a soft ambient one */
+  --elevation-paper: 0 0.5px 1px rgb(20 22 28 / 7%), 0 2px 6px -2px rgb(20 22 28 / 7%);
+  --elevation-card: 0 1px 1px rgb(20 22 28 / 6%), 0 3px 8px -3px rgb(20 22 28 / 10%), 0 16px 32px -18px rgb(20 22 28 / 24%);
+  --elevation-lift: 0 1px 2px rgb(20 22 28 / 8%), 0 8px 18px -8px rgb(20 22 28 / 16%), 0 26px 48px -22px rgb(20 22 28 / 30%);
+  --elevation-float: 0 -0.5px 0 rgb(20 22 28 / 8%), 0 -10px 36px rgb(20 22 28 / 16%);
+  --elevation-press: 0 1px 0 var(--color-press), 0 6px 14px -8px rgb(20 26 40 / 34%);
+  /* type: the foundation's sizes stay (one-line pins depend on them); tightness comes from
+     weight, tracking and leading */
+  --leading-ui: 1.35;
+  --leading-body: 1.55;
+  /* motion: short and springy; the sheet curve is the iOS one */
+  --motion-press: 80ms;
+  --motion-quick: 150ms;
+  --motion-standard: 200ms;
+  --motion-room: 240ms;
+  --motion-sheet: 320ms;
+  --ease-standard: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  /* washi, truer: soft formation, short fibres (no long streaks), and a fine tooth */
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .38 0 0 0 0 .3 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .32 0 0 0 0 .25 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5' numOctaves='1' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .24 0 0 0 0 .17 0 0 0 1 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 0 0 0 0 0 .28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --skin-light: radial-gradient(120% 50% at 0% 0%, rgb(255 255 255 / 22%), transparent 60%);
+}
+/* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
+:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+  --color-ink: #14171d;
+  --color-page: #efece5;
+  --color-surface: #fffefb;
+  --color-bar: #fcfbf8;
+}
+/* night: the frame is the deepest tone, the page the world's ground, raised paper steps up
+   in light with a lit top edge. Light is emitted (edges, glows), never a solid phosphor fill. */
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+  --color-page: var(--color-ground);
+  --color-surface: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink) 4%);
+  --color-surface-sunk: color-mix(in srgb, var(--color-ground) 78%, #000);
+  --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-ground));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-ground));
+  --color-muted: color-mix(in srgb, var(--color-ink) 76%, var(--color-ground));
+  --color-quiet: color-mix(in srgb, var(--color-ink) 72%, var(--color-ground));
+  --color-line: color-mix(in srgb, var(--color-ink) 15%, transparent);
+  --color-separator: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--color-ink) 30%, transparent);
+  --color-bar: color-mix(in srgb, var(--color-ground) 62%, #000);
+  --color-bar-line: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 64%, var(--color-bar));
+  --elevation-bar: 0 0.5px 0 color-mix(in srgb, var(--color-accent) 10%, transparent), 0 10px 24px -16px rgb(0 0 0 / 80%);
+  --elevation-paper: inset 0 0.5px 0 rgb(255 255 255 / 6%), 0 6px 18px -6px rgb(0 0 0 / 50%);
+  --elevation-card: inset 0 1px 0 rgb(255 255 255 / 7%), 0 1px 2px rgb(0 0 0 / 45%), 0 16px 32px -14px rgb(0 0 0 / 75%);
+  --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 8%), 0 2px 4px rgb(0 0 0 / 45%), 0 26px 48px -18px rgb(0 0 0 / 80%);
+  --texture-washi:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .7 0 0 0 0 .78 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .85 0 0 0 0 1 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+/* 殻 · the electric night: terminal black, phosphor edges */
+:where(:root[data-theme='kaku'] body:not([data-view='drift'])) {
+  --color-bar: color-mix(in srgb, var(--color-ground) 70%, #000);
+  --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
+  --color-surface: color-mix(in srgb, var(--color-paper) 90%, var(--world-accent) 3%);
+}
+/* deck rooms by day: the frame takes the stage it surrounds (T8 "more distinction", T9 "more
+   crispness"). A dark deck (the default look, 抹茶, 黒板, 高コントラスト) and every deck's study
+   screen sit on a dark stage, so the top line, the Line and the phone's bar become one dark frame
+   on a hairline around it, not a white band at each end. A light deck's home keeps the day frame.
+   The frame's own text and marks are remapped on the frame's elements only (the top line, the
+   Line and the report glyph at its end). */
+:root:not([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='deckplay']:has(.kp:is([data-look='dark'], [data-look='matcha'], [data-look='kokuban'], [data-look='contrast']), .kp > .kp-study) :is(#app > .chrome, #primary-tabs, #bunki-reports-root .br-rail) {
+  color-scheme: dark;
+  --color-bar: #0b0e14;
+  --color-bar-line: rgb(233 240 247 / 13%);
+  --color-bar-ink: #eef2f6;
+  --color-bar-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
+  --color-ink: #eef2f6;
+  --color-ink-2: color-mix(in srgb, #eef2f6 86%, #0b0e14);
+  --color-label: #eef2f6;
+  --color-label-2: color-mix(in srgb, #eef2f6 82%, #0b0e14);
+  --color-muted: color-mix(in srgb, #eef2f6 74%, #0b0e14);
+  --color-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
+  --color-rule: rgb(233 240 247 / 26%);
+  --color-line: rgb(233 240 247 / 16%);
+  --color-edge-strong: rgb(233 240 247 / 30%);
+  --color-glass: #0b0e14;
+  --color-glass-solid: #0b0e14;
+  --color-surface: #161c25;
+  --color-seal: #ef8a78;
+  --color-accent: #8fb7e8;
+  --elevation-bar: 0 0.5px 0 rgb(255 255 255 / 5%), 0 10px 24px -16px rgb(0 0 0 / 80%);
+}
+/* 文脈札 gives html a background of its own, so body's flat ground stopped passing to the canvas
+   and was painted over the page layer: the room read as the old beige. The page shows again. */
+html[data-cd-theme] body:not([data-view='drift']) { background: transparent; }
+
+/* ---- the frame: the top line ---- */
+body:not(.zen) #app > .chrome {
+  background: var(--color-bar);
+  border-bottom: var(--stroke-hairline) solid var(--color-bar-line);
+  box-shadow: var(--elevation-bar);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* ---- the frame: the Line ---- */
+.primary-tabs,
+body.has-primary-tabs .primary-tabs {
+  background: var(--color-bar);
+  border-top: var(--stroke-hairline) solid var(--color-bar-line);
+  box-shadow: 0 -0.5px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+.primary-tabs .primary-tab {
+  color: var(--color-bar-quiet);
+  font: 600 12px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+}
+/* 日本語: the woodblock face at its full weight and size (tonight's 800 13px), only tracked tighter */
+body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-display); letter-spacing: 0.06em; }
+.primary-tabs .primary-tab[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
+body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
+.primary-tabs .station-node { background: var(--color-bar); }
+.primary-tabs .line-car::before { box-shadow: 0 0 0 3px var(--color-bar); }
+
+/* ---- raised paper: a defined edge plus contact and ambient shadow ---- */
+body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
+  background: var(--color-surface);
+  border: 1px solid var(--color-edge-strong);
+  box-shadow: var(--elevation-card);
+}
+
+/* ---- section eyebrows: tight small caps, weight instead of tracking ---- */
+body:not([data-view='drift']) main .eyebrow,
+body:not([data-view='drift']) #sheet .eyebrow {
+  font: 650 11px/1.3 var(--font-ui);
+  letter-spacing: 0.07em;
+  color: var(--color-muted);
+}
+body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
+body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: 12px; letter-spacing: 0.1em; }
+
+/* ---- titles: the woodblock voice, set tight ---- */
+main h1.view-title, main h1.exam-heading, .assessment-room > h1 { letter-spacing: -0.005em; line-height: 1.12; }
+
+/* ---- press: the touch lands at once (iOS gives :active only with a touch listener,
+   which the shell adds); it lets go in 150ms. Zero specificity: a room's own press wins.
+   Text and glyph controls dim; paper doors and cards press down instead; words in the
+   text (reader tokens, lookup words, web nodes) keep their own selection marks. ---- */
+:where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary) {
+  transition-property: opacity;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--ease-standard);
+}
+:where(body:not([data-view='drift'])) :where(button:not(:disabled), [role='button'], a[href], summary):where(:not(.study-door, .foundation-door, .dojo-deck, .shelf-open, .world-stone, .tok, .japanese-lookup-word, .ww-node, .kp-tok)):active {
+  opacity: 0.55;
+  transition-duration: 0s;
+}
+/* type renders as on the phone: greyscale antialiasing (macOS only; iOS already does), and no
+   automatic text inflation when the phone turns */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body:not([data-view='drift']) { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+/* the page layer is composited once, so a scroll never repaints the paper */
+body:not([data-view='drift'])::before { will-change: transform; }
+/* the full entry rises on the iOS sheet curve: the same 280ms and travel, only the curve
+   changes, so it settles like a native sheet instead of easing in mushily */
+body.v-depth-layered .sheet, body .sheet { animation-timing-function: var(--ease-sheet); }
+body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active {
+  transform: scale(0.985);
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary),
+  body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active { transition: none; }
+}
+/* ---- D7 (John: "Keep them for now — figure out the smartest way to work with this"): the
+   header's search · Learn · Lists stay, ids and 44px intact, as one quiet tools group of glyphs.
+   One signal per fact: what is due shows once, on the Line's Today station, where the cards are
+   reviewed, so the Learn cap carries no count of its own; the bookmark is an outline with no
+   number at 0 and a filled mark with its count once words are saved; the door of the room you
+   are in is inked. ---- */
+body:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-bar-quiet); }
+body:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-glyph) { width: 18px; height: 18px; }
+body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'],
+body:not(.zen) #app > .chrome > button#tray[data-here] { color: var(--color-bar-ink); }
+body:not(.zen) #app > .chrome > button#tray[data-count='0'] { width: 44px; padding: 0; justify-content: center; gap: 0; }
+body:not(.zen) #app > .chrome > button#tray[data-count='0'] .tray-count {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+body:not(.zen) #app > .chrome > button#tray:not([data-count='0']) { color: var(--color-bar-ink); }
+body:not(.zen) #app > .chrome > button#tray:not([data-count='0'])::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='black' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 17'%3E%3Cpath d='M1.75 1.75h9.5v13.5L6.5 11.6l-4.75 3.65z' fill='black' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* the preferences: the world seal a little smaller; EN | 日本語 tighter, the active one inked
+   (the screen's one 朱 belongs to the room, and the seal already carries it) */
+body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 12px; }
+body:not(.zen) #app > .chrome .lang-seg button { letter-spacing: 0; }
+body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-bar-ink); height: 2px; }
+/* ---- the reader's top line holds ONE row at every phone width (T2 "tighter and crisper"; it put
+   the bookmark on a second row at 320px, and at 375px once the count reached three digits). Every
+   door keeps its 44px box and stays reachable, selected or not (verify-corridor counts seven). ---- */
+@media (max-width: 520px) {
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  /* the capture + is always drawn, dim until a word is touched, so its slot is never an empty gap */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: visible; cursor: default; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled::after { opacity: 0.32; }
+  /* the saved count sits at the bookmark's shoulder, so the bookmark is always one 44px door */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray {
+    position: relative; width: 44px; min-width: 44px; padding: 0; justify-content: center; gap: 0;
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray:not([data-count='0']) .l-ja {
+    position: absolute; top: 5px; right: 2px; left: auto;
+    padding: 1px 2px; border-radius: 3px; background: var(--color-bar);
+    font: 650 10px/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0;
+  }
+}
+@media (max-width: 374px) {
+  /* the narrowest phones: the Learn cap yields to the Learn tab one thumb away, as in every room */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
+}
+/* END BUNKI R4 SKIN ======================================================== */
+/* R5: a popup owns Save while it is open. Its reserved chrome slot stays
+   in place; dismissing the popup restores the reader's one-tap Save. */
+body[data-view='reader']:has(#mini) #reader-take { visibility: hidden; pointer-events: none; }
+/* Settings owns its two preferences; the same choices do not repeat above it. */
+body[data-view='settings'] #app > .chrome :is(#lang, #theme-seal) { visibility: hidden; pointer-events: none; }
+/* Read's inline lookup lives in Tools. Exactly one lookup door is visible. */
+body[data-view='shelf']:has(#shelf-tools-panel:not([hidden])) #chrome-search { visibility: hidden; pointer-events: none; }
+/* Words already owns the focused search field. Keep the chrome's slot quiet. */
+body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: none; }
+
+/* Revealing the shelf tools answers the press without moving the reading lead. */
+#shelf-tools-panel:not([hidden]) { animation: feel-fade 160ms ease-out; }
+
+/* A reduced-motion response is a short change of ink, rather than a hard cut.
+   These explicit surfaces override corridor.css's older blanket zero-duration
+   rule; ambient loops and unrelated children remain still. */
+@media (prefers-reduced-motion: reduce) {
+  body #app :is(.sheet, .scrim, .nav-bar, .corner-bubble, .shelf-study-tools:not([hidden]), .review-face, .review-clear, .review-rise-w, .reveal, .grade-row .grade),
+  body > :is(.sheet, .scrim, .world-picker, .world-picker-scrim),
+  body #mini,
+  body .reader-toast:not([hidden]) {
+    animation: feel-fade 80ms linear both !important;
+    animation-delay: 0ms !important;
   }
 }

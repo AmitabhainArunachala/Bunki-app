@@ -1,0 +1,21 @@
+{
+ "batch": "r5-variety2-review-002",
+ "items": [
+  {
+   "term": "加持祈祷",
+   "reading": "かじきとう",
+   "gloss": "incantation and prayer rites",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india"
+  }
+ ],
+ "reviewOf": {
+  "加持祈祷": {
+   "source": "cards/senmon-p1-r5-variety2-l1-006.json",
+   "reason": "Whole-corpus phrase わけではありません。 exceeds cap16; one corpus-audit rewrite of a first-pass accepted revision."
+  }
+ }
+}

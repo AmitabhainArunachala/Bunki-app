@@ -1,5 +1,6 @@
 /** Actual reader/provider/storage journeys. Synthetic output demonstrates the
  * integration contract, not Japanese editorial quality or live model quality. */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -190,11 +191,11 @@ try {
   const readingY = await page.evaluate(() => window.scrollY);
   assert(readingY > 400, 'the lookup begins inside the long reading');
   await wordNearEnd.click();
-  await page.locator('#sheet-close').waitFor();
+  await page.locator(await entryCloseSelector(page)).waitFor();
   // the entry finishes opening its complete senses first: a slow runner otherwise leaves the
   // dictionary shard in flight into the later reload, which WebKit reports as a page error
   await page.waitForFunction(() => document.querySelector('#sheet') && !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 20000 });
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.waitForFunction((expected) => Math.abs(window.scrollY - expected) < 3, readingY);
   assert.equal(await page.locator('#airead-title').textContent(), replacement.aiReading.readingVersion.candidate.article.title);
   results.push({ name: 'dictionary-walk-returns-to-the-same-place-in-personal-reading', pass: true });

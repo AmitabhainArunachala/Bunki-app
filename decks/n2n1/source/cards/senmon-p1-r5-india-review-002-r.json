@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "法要",
+   "reading": "ほうよう",
+   "pos": "noun",
+   "meaning": "a Buddhist service or observance",
+   "defJa": "仏を敬い教えに関わって営む仏教の儀式",
+   "passage": {
+    "ja": "寺で営まれる法要と聞くと、亡くなった人の供養を思い浮かべがちですが、目的はそれだけに限られません。仏の誕生を祝う行事などにも、僧や参列者が教えと向き合う儀式があり、目的に応じて内容は異なります。読経が聞こえたというだけで何のための集まりかを決めず、行事の名前や寺の説明を確かめると、その日の意味が分かります。儀式をただ同じ動作の繰り返しとして眺めるより、誰が何を祈り、何を記念しているかを見ることで、寺と人々の時間のつながりを考えられます。",
+    "form": "法要",
+    "en": "A Buddhist service may bring memorial rites for the dead to mind, but it is not limited to those. Events celebrating the Buddha’s birth also include rituals through which clergy and participants engage with the teaching, and their content varies with their purpose. Rather than identifying a gathering’s purpose solely from the sound of chanting, consult its name and the temple’s explanation. Looking at who prays for what and what is commemorated reveals the temporal connections between temples and people beyond repeated ritual movements.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "追善供養だけに限らず、さまざまな仏教の儀式を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "梵字",
+   "reading": "ぼんじ",
+   "pos": "noun",
+   "meaning": "Sanskrit letters in Japanese Buddhist use",
+   "defJa": "インド由来の文字で日本の仏教にも使うもの",
+   "passage": {
+    "ja": "石塔に漢字とも仮名とも違う一文字が刻まれていると、模様だと思って通り過ぎてしまうことがあります。日本の仏教で目にする梵字には、インド由来の文字が中国を経て伝わった歴史があります。その一文字が特定の仏を表す場合もあり、読めないからといって単なる飾りとは言えません。ただし、形が似ているからといって、文字の種類や意味を確かめずに同じものと判断するのは避けたいところです。まず図録などで形と読みを照合すると、石の上の小さな印が、言語と信仰を運んだ道筋の入口になります。",
+    "form": "梵字",
+    "en": "A character carved on a stone monument that resembles neither kanji nor kana may be passed over as decoration. Sanskrit letters encountered in Japanese Buddhism have a history of transmission from India through China. A single character can represent a particular Buddha rather than being merely an unreadable ornament. Similar-looking forms should nevertheless not be identified as the same without checking the script and meaning. Comparing the form and pronunciation with a catalogue makes a small mark on stone an entry point into the transmission of language and devotion.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "文字そのものを指す語。一字で仏を表す使い方もある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

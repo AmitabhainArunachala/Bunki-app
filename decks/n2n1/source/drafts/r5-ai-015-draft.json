@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "内製化",
+   "reading": "ないせいか",
+   "pos": "noun",
+   "meaning": "bringing production in-house",
+   "defJa": "外部に任せていた仕事を自社で行うようにすること",
+   "passage": {
+    "ja": "半導体事業を学ぶ際には、設計と製造を一つの仕事として扱わないことが大切である。機器の会社が設計を内製化しても、実際に回路を作る工程は外部の工場へ委託する場合がある。そのため、新聞の見出しに「自社開発」とあっても、工場まで自前で持つと読み替えてはならない。仕事の境界を図にして、仕様を決める人、回路を設計する人、製造する人を分けると、責任の所在を整理できる。費用や強みを比較する前に、記事がどの工程の変更を伝えているかを図の中に示す。",
+    "form": "内製化",
+    "en": "When studying the semiconductor business, it is important not to treat design and manufacturing as one activity. An equipment company may bring design in-house while contracting the actual fabrication of circuits to an outside factory. A headline about internal development therefore does not necessarily imply owning a factory. Mapping who specifies, designs, and manufactures a product clarifies responsibility. Before comparing costs or strengths, mark the process change described by the article on that map.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "設計から製造まで、どの工程を指すかを確かめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "再帰的自己改善",
+   "reading": "さいきてきじこかいぜん",
+   "pos": "noun",
+   "meaning": "recursive self-improvement",
+   "defJa": "自らの改良能力も改良する過程を繰り返すという構想",
+   "passage": {
+    "ja": "改良した道具で、次にはもっとよい道具を作るという話を読み、私は机の上に二重の矢印を描いた。人工知能の再帰的自己改善という構想では、課題を解く性能だけでなく、自分を改良する能力そのものも変わると想定する。すると向上が速まるように思えたが、図の矢印には、計算資源や検証の時間という制約をまだ書き込んでいなかった。人が繰り返し更新する製品と、この構想が描く仕組みも同じではない。私は勢いよく上へ伸ばした線を止め、各段階で本当に確かめるべき条件を書き添えた。",
+    "form": "再帰的自己改善",
+    "en": "Reading about using improved tools to make still better tools, I drew a double arrow on my desk pad. Recursive self-improvement in AI envisions changes not only in task performance but also in the ability to improve itself. Progress seemed likely to accelerate, but my arrows omitted constraints such as computing resources and validation time. A product repeatedly updated by people is also different from the mechanism envisioned here. I stopped extending the line upward and added the conditions that would need verification at each stage.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "普通の更新との違いは、改良する能力自体も変わる点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "創発",
+   "reading": "そうはつ",
+   "pos": "noun",
+   "meaning": "emergence",
+   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
+   "passage": {
+    "ja": "今日は、人工知能の規模を増やしたときに能力が急に現れたように見えるグラフを考えます。このような変化を創発と呼ぶ議論がありますが、まず採点の仕方を調べましょう。完全な正解だけを一点と数えると、少しずつ改善していた途中の変化が、得点に出ない場合があります。別の尺度で測れば滑らかな伸びが見えることもあるので、急な上昇だけから内部に新しい仕組みが生まれたと断定はできません。同じ回答を二つの方法で採点し、グラフの形がどれだけ変わるかを比べてみましょう。",
+    "form": "創発",
+    "en": "Today we will examine a graph in which an ability seems to appear suddenly as an AI system grows. Such changes are discussed as emergence, but first inspect the scoring method. Awarding a point only for a completely correct answer can conceal gradual improvements along the way. Another measure may reveal smooth progress, so a sharp rise alone does not establish that a new internal mechanism appeared. Score the same answers in two ways and compare the resulting graph shapes.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "急な変化が本物か、測り方による見え方かを確かめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "加速主義",
+   "reading": "かそくしゅぎ",
+   "pos": "noun",
+   "meaning": "accelerationism",
+   "defJa": "技術などの発展を速めて社会の変化を促す立場",
+   "passage": {
+    "ja": "人工知能の開発を巡る記事では、技術の進歩を速めようとする立場が加速主義と呼ばれることがある。ただし、この名称は異なる思想にも使われており、登場人物が何を推進しているかを確認しなければ、議論の対立点は捉えられない。開発の速度、製品の公開範囲、利用時の管理は、それぞれ別に選べる論点だ。開発を支持する発言から、あらゆる制約を否定する立場だと即断することもできない。記事を比較する際は、呼び名よりも、どの提案に賛成し、その理由をどう説明したかに注目したい。",
+    "form": "加速主義",
+    "en": "Articles about AI development sometimes call efforts to speed technological progress accelerationism. However, the label also applies to different philosophies, so the dispute cannot be understood without examining what each speaker advocates. Development speed, the extent of product release, and controls on use are distinct choices. Supporting development does not by itself imply opposition to every constraint. When comparing articles, focus on which proposals people support and their reasons rather than on labels alone.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "異なる思想が同じ名称で呼ばれるため、主張を確認する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "勾配降下法",
+   "reading": "こうばいこうかほう",
+   "pos": "noun",
+   "meaning": "gradient descent",
+   "defJa": "傾きの情報を使って値が小さくなる方向へ更新する方法",
+   "passage": {
+    "ja": "機械学習で誤差を減らす際、現在の設定からどちらへ動けば目的の値が下がるかを調べる方法がある。勾配降下法は、微分で得られる傾きの情報を使い、その反対方向へ設定を少しずつ更新する。坂を下る比喩は方向を理解する助けになるが、一歩が大きすぎれば谷を飛び越して値が増える場合もある。また、複雑な地形では、到達した低い場所が全体で最も低い地点とは限らない。したがって、更新回数だけを増やすのではなく、歩幅に当たる量と目的の値の推移を併せて観察することが重要である。",
+    "form": "勾配降下法",
+    "en": "When reducing error in machine learning, one can examine which direction from the current settings lowers the objective. Gradient descent uses derivative-based slope information to update the settings gradually in the opposite direction. Walking downhill helps explain the direction, but an excessively large step can overshoot a valley and increase the value. In a complex landscape, a low point reached need not be the lowest point overall. It is therefore important to monitor both the step size and the objective's trajectory rather than merely increasing the number of updates.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "進む方向だけでなく、一回に動かす幅にも注意する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "化合物半導体",
+   "reading": "かごうぶつはんどうたい",
+   "pos": "noun",
+   "meaning": "compound semiconductor",
+   "defJa": "異なる元素を組み合わせた物質からなる半導体",
+   "passage": {
+    "ja": "「半導体って、全部ケイ素でできているの」と聞かれたら、まず材料にも種類があると答えます。例えば、ケイ素と炭素を組み合わせた炭化ケイ素は、化合物半導体の一つで、電力を制御する部品に使われています。ただ、元素を混ぜれば何でも同じ働きになる、という話ではないんです。物質ごとの性質に加え、結晶を作る難しさや加工の費用も、使い道を考える上では大事です。材料の名前を暗記するだけでなく、どんな場面でその性質が役に立つのかを並べてみると、部品の選び方につながります。",
+    "form": "化合物半導体",
+    "en": "If someone asks whether all semiconductors are made from silicon, I first explain that several materials are used. Silicon carbide, combining silicon and carbon, is one compound semiconductor used in power-control components. That does not mean mixing any elements produces the same function. Alongside material properties, the difficulty of growing crystals and the cost of processing matter when considering applications. Connecting each material's properties to useful situations helps explain component choices instead of merely memorizing names.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "材料の名前と、その材料が得意な用途を結び付ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "半導体不足",
+   "reading": "はんどうたいぶそく",
+   "pos": "noun",
+   "meaning": "chip shortage",
+   "defJa": "必要とされる半導体を十分に調達できない状態",
+   "passage": {
+    "ja": "半導体不足を扱う記事は、すべての種類の生産量が同時に足りなくなったという意味で読んではいけない。ある車載部品が足りなくても、別の用途向けの記憶用部品には在庫が多い場合がある。製造設備や認証の条件が異なるため、余っている製品を必要な製品へ直ちに置き換えることも難しい。状況を学ぶには、部品の種類と用途を表の別々の列に置き、注文から納入までの期間を比較するとよい。見出しの大きな言葉を具体的な製品へ分解する作業が、需要と供給のずれを読む練習になる。",
+    "form": "半導体不足",
+    "en": "An article about a chip shortage should not be read as saying that every type is simultaneously underproduced. One automotive component may be scarce while memory products for another use have plentiful inventory. Differences in manufacturing equipment and certification also make it difficult to immediately replace needed products with surplus ones. To study the situation, list component types and applications in separate columns and compare order-to-delivery times. Breaking a broad headline into specific products provides practice in reading mismatches between supply and demand.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "部品の種類、用途、時期を分けて供給量を読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "半導体製造装置",
+   "reading": "はんどうたいせいぞうそうち",
+   "pos": "noun",
+   "meaning": "semiconductor manufacturing equipment",
+   "defJa": "半導体の加工や検査などに使われる機械",
+   "passage": {
+    "ja": "工場の写真を眺めた私は、大きな機械へ材料を入れれば、完成した部品がそのまま出てくるのだと思っていた。ところが、半導体製造装置の説明を読むと、薄い膜を作るもの、不要な部分を削るもの、寸法を測るものが並んでいた。同じ板が何度も別の工程を通り、その積み重ねで細かな構造が形になるのだ。私は工程図を一周するだけの矢印を消し、繰り返し戻る線を描いた。写真のどの機械が一番立派かを比べていた目は、隣の工程へ何を渡し、そこで何を確かめるのかを探す目へ変わっていた。",
+    "form": "半導体製造装置",
+    "en": "Looking at a factory photograph, I imagined material entering a large machine and finished components emerging directly. Descriptions of semiconductor manufacturing equipment instead listed tools for forming thin films, removing unwanted material, and measuring dimensions. The same wafer passes through different processes repeatedly, gradually building fine structures. I erased the single loop on my process diagram and drew returning paths. Instead of comparing which machine looked most impressive, I began asking what each passed to the next stage and what was checked there.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "一台ですべてを完成させる機械だと考えない。",
+    "sense": ""
+   }
+  }
+ ]
+}

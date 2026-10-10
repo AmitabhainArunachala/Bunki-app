@@ -1,0 +1,49 @@
+{
+ "batch": "r5-variety2-review-001",
+ "items": [
+  {
+   "term": "試算",
+   "reading": "しさん",
+   "gloss": "a provisional calculation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai"
+  },
+  {
+   "term": "記号接地問題",
+   "reading": "きごうせっちもんだい",
+   "gloss": "symbol grounding problem",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai"
+  },
+  {
+   "term": "ケイ素",
+   "reading": "けいそ",
+   "gloss": "silicon (the element)",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai"
+  }
+ ],
+ "reviewOf": {
+  "試算": {
+   "source": "cards/senmon-p1-r5-variety2-l2-003.json",
+   "reason": "The complete corpus repeats わけではありません。 in 19 cards, above cap16. First-pass accepted replacement receives its one corpus-audit rewrite."
+  },
+  "記号接地問題": {
+   "source": "cards/senmon-p1-r5-variety2-l2-003.json",
+   "reason": "The complete corpus repeats わけではありません。 in 19 cards, above cap16. First-pass accepted replacement receives its one corpus-audit rewrite."
+  },
+  "ケイ素": {
+   "source": "cards/senmon-p1-r5-variety2-l3-001.json",
+   "reason": "The complete corpus repeats わけではありません。 in 19 cards, above cap16. First-pass accepted replacement receives its one corpus-audit rewrite."
+  }
+ }
+}

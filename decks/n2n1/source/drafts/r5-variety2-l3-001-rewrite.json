@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "トランスフォーマー",
+   "reading": "とらんすふぉーまー",
+   "pos": "noun",
+   "meaning": "Transformer (architecture)",
+   "defJa": "要素同士の関係を重み付けして扱うモデルの構造",
+   "passage": {
+    "ja": "「太郎は次郎に傘を貸したが、彼は返し忘れた」という文で、最後の人物を特定するには前の出来事が手がかりになります。トランスフォーマーは、入力中の要素同士の関係に重みを付け、離れた位置にある情報も取り込める構造です。隣の語に限らず参照できるため、長い文の途中で出た人物と後の動作を結び付ける処理にも役立ちます。ただし、計算された関係の強さをそのまま人間の理解と見なすと、流暢な出力の中に残る取り違えを見逃してしまいます。",
+    "form": "トランスフォーマー",
+    "en": "In a sentence saying that Taro lent Jiro an umbrella but he forgot to return it, the earlier event provides a clue to identifying the person mentioned last. A Transformer is an architecture that weights relationships among input elements and can incorporate information from distant positions. Because it can refer beyond adjacent words, it also helps connect a person introduced partway through a long sentence with a later action. Treating the computed strength of relationships as human understanding, however, can conceal mistakes that remain in fluent output.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "入力の要素間の関係を扱う、模型ではなく計算の構造。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-adaa8bc7ed-7667a5ce",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-adaa8bc7ed-7667a5ce",
+    "wordId": "nn-adaa8bc7ed"
+   }
+  }
+ ]
+}

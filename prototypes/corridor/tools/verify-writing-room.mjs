@@ -16,21 +16,25 @@ import { extname, resolve } from 'node:path';
 import process from 'node:process';
 
 import { chromium } from 'playwright-core';
+import { openShelfTools } from './shelf-tools-support.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 
 const CORRIDOR_DIR = resolveCorridorSite();
 const PHONE = { width: 390, height: 844 };
+// D2 (John, 2026-10-08: "Offer both"): eleven public worlds in two rows, day then night;
+// 殻 (kaku) is public again beside 金 (yoru). docs/redesign/VERIFIER_CHANGES.md, round 4 skin.
 const PUBLIC_WORLDS = [
   ['sumi', '墨'],
   ['shu', '朱'],
   ['iwa', '柿'],
-  ['rokusho', '漆'],
-  ['yoru', '金'],
   ['hokusai', '藍'],
   ['akafuji', '赤'],
-  ['nami', '浪'],
   ['keyblock', '板'],
+  ['rokusho', '漆'],
+  ['yoru', '金'],
+  ['kaku', '殻'],
+  ['nami', '浪'],
   ['hakuu', '雷'],
 ];
 
@@ -91,6 +95,7 @@ async function bootShelf(page, base, { clear = false } = {}) {
 
 async function openWritingRoom(page, base, kanji, { clear = false, beforeDoor = null } = {}) {
   await bootShelf(page, base, { clear });
+  await openShelfTools(page);
   await page.locator('#search').fill(kanji);
   const result = page.locator(`[data-result="kanji:${kanji}"]`).first();
   await result.waitFor({ state: 'visible', timeout: 10_000 });
@@ -405,7 +410,7 @@ async function main() {
       .locator('.world-picker .world-stone')
       .evaluateAll((nodes) => nodes.map((node) => node.textContent.trim()));
     check(
-      'the seal opens the public ten 墨 朱 柿 漆 金 藍 赤 浪 板 雷 in order',
+      'the seal opens the public eleven, day 墨 朱 柿 藍 赤 板 then night 漆 金 殻 浪 雷, in order',
       JSON.stringify(palettes) === JSON.stringify(PUBLIC_WORLDS.map((pair) => pair[1])),
       JSON.stringify(palettes),
     );
@@ -502,8 +507,8 @@ async function main() {
     check(
       'readings are two properly labeled Japanese rows',
       readings.length === 2 &&
-        readings[0].label === '音読み' &&
-        readings[1].label === '訓読み' &&
+        readings[0].label === 'on' &&
+        readings[1].label === 'kun' &&
         readings.every((row) => row.lang === 'ja'),
       JSON.stringify(readings),
     );
@@ -848,7 +853,7 @@ async function main() {
       attr: document.documentElement.getAttribute('data-theme'),
     }));
     check(
-      'the retired public 殻 world still loads as an internal saved theme',
+      'a saved 殻 preference still loads (殻 is public again, D2)',
       legacy.stored === 'kaku' && legacy.attr === 'kaku',
       JSON.stringify(legacy),
     );

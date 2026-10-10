@@ -1,0 +1,194 @@
+{
+ "batch": "r5-india-review-gate-001",
+ "items": [
+  {
+   "term": "注意の瞬き",
+   "reading": "ちゅういのまばたき",
+   "gloss": "attentional blink",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138",
+    "https://www.jstage.jst.go.jp/article/cogpsy/2007/0/2007_0_105/_article/-char/ja",
+    "https://www.jstage.jst.go.jp/article/jsoft/34/2/34_63/_pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Second of two quickly presented targets is missed; Slagter studied intensive meditation and EEG, not a universal proof of exceptional attention.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "オープンモニタリング瞑想",
+   "reading": "おーぷんもにたりんぐめいそう",
+   "gloss": "open monitoring meditation",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138",
+    "https://kaken.nii.ac.jp/ja/file/KAKENHI-PROJECT-24650135/24650135seika.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Monitor arising experiences without fixing on one object; does not mean unconsciousness or suppressing every thought.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "裸形",
+   "reading": "らぎょう",
+   "gloss": "nakedness; unclothed form",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:jain-history",
+    "https://www.jaina.org/resource/resmgr/scouting/Stage_4_live_help_live_jain_.pdf",
+    "https://archives.bukkyo-u.ac.jp/rp-contents/HB/A109/HBA1091L001.pdf",
+    "https://dictionary.cegloc.tsukuba.ac.jp/JtoE/index.php?page=36&typedword=RA"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "In Digambara Jainism the naked male ascetic renounces possessions including clothes; not exhibitionism nor a rule for every follower.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "戒名",
+   "reading": "かいみょう",
+   "gloss": "posthumous Buddhist name",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜に反して",
+   "factNote": "Religious name may be received during life, not exclusively assigned after death.",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "安心立命",
+   "reading": "あんしんりつめい",
+   "gloss": "spiritual peace and resignation to fate",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Explore the choice of this word in translation or an everyday explanation; avoid presentation advice and the phrase 発表で.",
+   "grammarSuggestion": "〜とはいえ"
+  },
+  {
+   "term": "実相",
+   "reading": "じっそう",
+   "gloss": "the true aspect of reality",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜をもとに",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "虚無",
+   "reading": "きょむ",
+   "gloss": "nothingness, nihility",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜だけに",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "reviewOf": {
+  "注意の瞬き": {
+   "batch": "r5-india-new-006",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-006.json",
+   "previousTerm": "注意瞬脱",
+   "evidence": [
+    "https://www.jstage.jst.go.jp/article/cogpsy/2007/0/2007_0_105/_article/-char/ja",
+    "https://www.jstage.jst.go.jp/article/jsoft/34/2/34_63/_pdf"
+   ],
+   "finding": "r5-headwords-not-japanese",
+   "reason": "Headword correction for one unchanged concept (attentional blink). The first-pass label 注意瞬脱 / ちゅういしゅんだつ has inadequate Japanese academic support and is the established Chinese research term; 注意の瞬き / ちゅういのまばたき is positively attested in Japanese research (日本認知心理学会 2007 on J-STAGE; reading given as 「注意の瞬き（まばたき）」 in 知能と情報 34(2)). Only term, reading, form and the single passage occurrence change."
+  },
+  "オープンモニタリング瞑想": {
+   "batch": "r5-india-new-005",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-005.json",
+   "previousTerm": "開放監視瞑想",
+   "evidence": [
+    "https://kaken.nii.ac.jp/ja/file/KAKENHI-PROJECT-24650135/24650135seika.pdf"
+   ],
+   "finding": "r5-headwords-not-japanese",
+   "reason": "Headword correction for one unchanged concept (open monitoring meditation). The first-pass label 開放監視瞑想 / かいほうかんしめいそう has inadequate Japanese academic support; オープンモニタリング瞑想 is the name a Kyoto University investigator uses in experimental methods (KAKEN 24650135 final report, 「オープンモニタリング瞑想（OM条件）」). Only term, reading, form and the single passage occurrence change."
+  },
+  "裸形": {
+   "batch": "r5-india-new-002",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-002.json",
+   "previousTerm": "裸形修行",
+   "evidence": [
+    "https://archives.bukkyo-u.ac.jp/rp-contents/HB/A109/HBA1091L001.pdf",
+    "https://dictionary.cegloc.tsukuba.ac.jp/JtoE/index.php?page=36&typedword=RA"
+   ],
+   "finding": "r5-headwords-doubtful",
+   "reason": "Editorial headword normalization for one unchanged concept. 裸形修行 / らぎょうしゅぎょう is an intelligible compositional phrase whose standing as an established lexical item was not demonstrated; 裸形 / らぎょう is a documented lexical headword (University of Tsukuba learner dictionary; used for Jain non-possession in a 佛教大学 doctoral dissertation). Term, reading, form, meaning, defJa, the target clause and tipJa change; the Digambara account is unchanged."
+  },
+  "戒名": {
+   "batch": "r5-india-018",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-018.json",
+   "finding": "r5-kaimyo-meaning-contradicts-passage",
+   "reason": "The English meaning \"posthumous Buddhist name\" states the misconception that the card's own passage, defJa and tip correct (the name may be received during life). meaning becomes \"Buddhist precept name\"; nothing else changes."
+  },
+  "安心立命": {
+   "batch": "r5-india-016",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+   "finding": "r5-english-disagrees-with-card",
+   "reason": "English sentence 2 romanized the headword as Anjin-ryumyo, the Buddhist reading あんじんりゅうみょう, which disagrees with the reading this card teaches (あんしんりつめい). The romanization becomes Anshin-ritsumei; the reading and everything else are unchanged."
+  },
+  "実相": {
+   "batch": "r5-india-016",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+   "finding": "r5-english-disagrees-with-card",
+   "reason": "English sentence 2 rendered the headword as \"Suchness\", the English this deck uses for 真如, and disagreed with the card's own meaning \"the true aspect of reality\". Sentence 2 now says \"The true aspect of things\"; nothing else changes."
+  },
+  "虚無": {
+   "batch": "r5-india-002",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-india-002.json",
+   "finding": "r5-minor-card-inconsistencies",
+   "reason": "defJa and sense gave the nihilistic sense (everything feels meaningless) while the passage and tip use plain nothingness contrasted with Buddhist emptiness. defJa and sense now give the plain-nothingness sense; passage, tip and English are unchanged."
+  }
+ }
+}

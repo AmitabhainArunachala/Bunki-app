@@ -1,0 +1,166 @@
+{
+ "items": [
+  {
+   "term": "形而上学",
+   "reading": "けいじじょうがく",
+   "gloss": "metaphysics",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-017.json",
+    "cardId": "nn-c75f8d500d-8cbaa467",
+    "wordId": "nn-c75f8d500d"
+   }
+  },
+  {
+   "term": "智慧",
+   "reading": "ちえ",
+   "gloss": "wisdom (prajñā)",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-018.json",
+    "cardId": "nn-6e1ab8519c-a0f02f05",
+    "wordId": "nn-6e1ab8519c"
+   }
+  },
+  {
+   "term": "正法眼蔵",
+   "reading": "しょうぼうげんぞう",
+   "gloss": "Dogen’s Shobogenzo",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-020.json",
+    "cardId": "nn-db68d28b47-3fdd710f",
+    "wordId": "nn-db68d28b47"
+   }
+  },
+  {
+   "term": "注意の瞬き",
+   "reading": "ちゅういのまばたき",
+   "gloss": "attentional blink",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "mind",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-1761024b9d-6b0d4d15",
+    "wordId": "nn-1761024b9d"
+   }
+  },
+  {
+   "term": "無明",
+   "reading": "むみょう",
+   "gloss": "ignorance (avidyā), root delusion",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-004-r.json",
+    "cardId": "nn-c6c7e2bb73-ba1a7785",
+    "wordId": "nn-c6c7e2bb73"
+   }
+  },
+  {
+   "term": "盛者必衰",
+   "reading": "じょうしゃひっすい",
+   "gloss": "the prosperous inevitably decline",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-0f6a0c5d20-504990fd",
+    "wordId": "nn-0f6a0c5d20"
+   }
+  },
+  {
+   "term": "知行合一",
+   "reading": "ちこうごういつ",
+   "gloss": "unity of knowing and acting",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-522d312a9d-d5942b41",
+    "wordId": "nn-522d312a9d"
+   }
+  },
+  {
+   "term": "神秘主義",
+   "reading": "しんぴしゅぎ",
+   "gloss": "mysticism",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-054296bb29-534a232f",
+    "wordId": "nn-054296bb29"
+   }
+  },
+  {
+   "term": "空性",
+   "reading": "くうしょう",
+   "gloss": "emptiness; absence of inherent existence",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-d11596b336-6f752956",
+    "wordId": "nn-d11596b336"
+   }
+  },
+  {
+   "term": "絶対無",
+   "reading": "ぜったいむ",
+   "gloss": "absolute nothingness in Nishida’s thought",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-002-r.json",
+    "cardId": "nn-682f8dc808-d15d6ad1",
+    "wordId": "nn-682f8dc808"
+   }
+  }
+ ],
+ "weave": [
+  "形而上学",
+  "智慧",
+  "正法眼蔵",
+  "注意の瞬き",
+  "無明",
+  "盛者必衰",
+  "知行合一",
+  "神秘主義",
+  "空性",
+  "絶対無"
+ ]
+}

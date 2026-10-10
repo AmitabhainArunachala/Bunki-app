@@ -24,8 +24,8 @@
 #drift-layer{height:100%;overflow:hidden;overscroll-behavior:none}
 #drift-layer{
     background:var(--ground); color:var(--ink);
-    font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
-    touch-action:none; transition:background-color 1.2s;
+    font-family:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
+    touch-action:none; transition:none;
   }
 #drift-layer canvas{display:block}
 #drift-layer #ink{position:fixed;inset:0;z-index:0;width:100%;height:100%}
@@ -39,13 +39,13 @@
 #drift-layer .glyph,
 #drift-layer .part{position:absolute;left:0;top:0;white-space:nowrap;cursor:pointer;
     will-change:transform,opacity;user-select:none;-webkit-user-select:none;
-    text-align:center;transition:filter .9s}
+    text-align:center;transition:none}
 #drift-layer .word .base{display:block;line-height:1.15;text-shadow:0 0 1px currentColor}
 #drift-layer .word .yomi{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     font-size:.44em;letter-spacing:.16em;color:var(--pig2);opacity:0;
     transition:opacity .5s;padding-bottom:.12em;pointer-events:none}
 #drift-layer .word .gloss{position:absolute;top:100%;left:50%;transform:translateX(-50%);
-    font-size:.4em;font-style:italic;font-family:Georgia,serif;color:var(--faint);
+    font-size:.4em;font-style:italic;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;color:var(--faint);
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
 #drift-layer .word.unfolded .yomi{opacity:1}
 #drift-layer .word.glossed .yomi,
@@ -67,7 +67,7 @@
 #drift-layer .glyph.comp .g{font-size:24px;color:var(--pig2);border:1px solid var(--line);
     border-radius:6px;padding:2px 7px;background:var(--plaque)}
 #drift-layer .glyph small,
-#drift-layer .part small{display:block;font-size:11px;font-family:Georgia,serif;font-style:italic;
+#drift-layer .part small{display:block;font-size:11px;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     color:var(--faint);letter-spacing:.03em;opacity:0;transition:opacity .5s}
 #drift-layer .glyph.center small,
 #drift-layer .glyph.unfolded small,
@@ -109,13 +109,13 @@
 #drift-layer #card.open{transform:translateY(0)}
 #drift-layer #card .yomi{font-size:13px;letter-spacing:.2em;color:var(--pig2)}
 #drift-layer #card h1{font-size:42px;font-weight:500;margin:2px 0 4px}
-#drift-layer #card .gloss{font-family:Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
+#drift-layer #card .gloss{font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
 #drift-layer #card .row{display:flex;gap:10px;margin-top:14px}
 #drift-layer #card .row div{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
 #drift-layer #card .row .k{font-size:24px}
-#drift-layer #card .row .kg{font-size:11px;color:var(--faint);font-family:Georgia,serif;font-style:italic}
+#drift-layer #card .row .kg{font-size:11px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
 #drift-layer #card .note{margin-top:13px;font-size:11px;color:var(--faint);text-align:center;
-    font-family:Georgia,serif;font-style:italic}
+    font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
 #drift-layer #card .kx{display:flex;align-items:center;gap:14px}
 #drift-layer #card .kx h1{margin:0}
 #drift-layer #card .bt{margin-left:auto;font-size:12px;letter-spacing:.1em;color:var(--pig2);
@@ -136,19 +136,19 @@
 #drift-layer #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
 #drift-layer #card .rds .kun{color:var(--faint)}
 #drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
-    z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
+    z-index:8;opacity:.4;transition:opacity .4s;touch-action:none}
 #drift-layer #lvl.hot{opacity:1;width:56px}
 #drift-layer #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
-    border-radius:2px;transition:background .25s,width .25s,box-shadow .25s}
+    border-radius:2px;transition:none}
 #drift-layer #lvl.hot #lvlTrack{width:3.5px;background:var(--pig1);box-shadow:0 0 10px var(--halo)}
 #drift-layer #lvlHandle{position:absolute;left:10px;width:12px;height:12px;border-radius:50%;
     background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%;
-    transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s}
+    transition:none}
 #drift-layer #lvl.hot #lvlHandle{left:6px;width:22px;height:22px;margin-top:-11px;
     background:var(--accent);border-width:2px;
     box-shadow:0 0 16px var(--halo),0 3px 12px rgba(0,0,0,.28)}
 #drift-layer #lvlLabels{position:absolute;left:22px;top:0;bottom:0;font-size:10px;color:var(--faint);
-    letter-spacing:.05em;opacity:0;transition:opacity .3s,left .25s,font-size .25s;pointer-events:none}
+    letter-spacing:.05em;opacity:0;transition:opacity .3s;pointer-events:none}
 #drift-layer #lvl.hot #lvlLabels{opacity:1;left:34px;font-size:13px;color:var(--ink);font-weight:600}
 #drift-layer .lvlab{position:absolute;transform:translateY(-50%);white-space:nowrap}
 #drift-layer #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:11px;
@@ -156,7 +156,7 @@
     background:var(--plaque);border:1px solid var(--line);border-radius:8px;padding:5px 10px;
     pointer-events:none}
 #drift-layer #lvl.hot #lvlInfo{opacity:1}
-#drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic;
+#drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 #drift-layer #card .study{display:block;width:100%;box-sizing:border-box;margin-top:13px;
     min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
@@ -204,3 +204,18 @@
  * to the corridor's 覚 button, which navigated the whole app away) */
 #drift-layer #radoc { top: 60px; padding-top: 62px; }
 #drift-layer #radoc .x { top: calc(72px + env(safe-area-inset-top)); z-index: 12; }
+
+/* Round 4 (T1, "clean it up a lot"): crisp ink. A word is drawn sharp, never smudged by its own
+ * 1px shadow; only the words that carry meaning (fragile, the bloom's centre and satellites) keep
+ * a soft halo. The paper grain is quieter. The level rail keeps the donor's rest: its scale shows
+ * only while a finger is on it (round 4 review: labels at rest were clutter). Presentation only. */
+#drift-layer .word .base,
+#drift-layer .glyph .g { text-shadow: none; }
+#drift-layer .word.fragile .base { text-shadow: 0 0 9px var(--halo); }
+#drift-layer .word.bctr .base { text-shadow: 0 0 9px var(--bloomHalo); }
+#drift-layer .word.bsat .base { text-shadow: 0 0 6px color-mix(in srgb, var(--bloomHalo) 50%, transparent); }
+#drift-layer #grain { opacity: calc(var(--grainOp) * 0.45); }
+/* the explainer carries both languages and shows the interface's own (round 4 review: the
+ * English setting showed Japanese buttons, and 日本語 showed English prose) */
+body:not(.ui-bi) #drift-layer [data-l='en'],
+body.ui-bi #drift-layer [data-l='ja'] { display: none; }

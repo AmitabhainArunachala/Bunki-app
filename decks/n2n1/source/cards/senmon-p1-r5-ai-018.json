@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "安全性",
+   "reading": "あんぜんせい",
+   "pos": "noun",
+   "meaning": "safety",
+   "defJa": "人や環境に許容できない害を与えにくい性質",
+   "passage": {
+    "ja": "対話システムの安全性を評価する際、正答率だけで判断することはできない。誤った回答が同じ一件でも、雑談の話題を取り違える場合と、機械の操作を誤って案内する場合では、想定される影響が異なるからだ。試験では利用場面や誤用の可能性を整理したうえで、被害に至る経路を調べ、対策後にも問題が残る範囲を記録する。評価結果を公表する資料には、合格という短い言葉に加え、対象とした場面、試した条件、運用中に確認する項目を示すことが求められる。",
+    "form": "安全性",
+    "en": "Safety assessments of dialogue systems cannot rely on accuracy alone. Even a single incorrect answer has different potential consequences when it confuses a casual topic versus misguides machine operation. Testing organizes use contexts and possible misuse, examines paths to harm, and records what problems remain after mitigation. Public evaluation material should accompany a brief pass designation with the covered situations, tested conditions, and items to monitor during operation.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "正答率だけでは測れず、用途ごとの害と対策を含めて考える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "官民一体",
+   "reading": "かんみんいったい",
+   "pos": "noun",
+   "meaning": "public and private sectors acting together",
+   "defJa": "行政と民間が協力して取り組むこと",
+   "passage": {
+    "ja": "半導体の供給を支えるために官民一体で研究拠点を整えるとしても、行政と企業の役割が消えるわけではない。行政が支援の条件を定め、企業が技術や需要を見極めて投資するという分担には、それぞれ説明すべき責任が残る。国産化という共通の目標があっても、個別企業の利益と地域や利用者の利益が常に一致するとは限らない。協力の成果を評価するには、一緒に取り組んだ事実だけでなく、誰が費用を負担し、どの目的に対してどんな結果が得られたかを示すことが欠かせない。",
+    "form": "官民一体",
+    "en": "Even when public and private sectors jointly establish research centers to support semiconductor supply, their roles do not disappear. A division in which government sets support conditions and firms assess technology and demand before investing leaves each side with responsibilities to explain. Even with a shared goal of domestic production, individual corporate interests do not always coincide with those of communities and users. Evaluating cooperation requires showing who bore the costs and what results served which objectives, beyond the fact of working together.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "協力を表すが、責任や利益まで同一になることは意味しない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "定式化",
+   "reading": "ていしきか",
+   "pos": "noun",
+   "meaning": "formalization",
+   "defJa": "問題を式や明確な規則の形で表すこと",
+   "passage": {
+    "ja": "配送の順番を計算機に決めてもらうとき、近い所から回ればいいと伝えるだけでは足りないんだよね。距離を短くしたいのか、配達時間の約束を守りたいのかを分けて、条件を式にする定式化から始めるんだ。荷物の重さや車の台数にも制約があるから、距離だけで一番よい順番が、そのまま使えるとは限らないよ。式ができたら小さな例で結果を検証して、現場の人が当然だと思っていた条件を落としていないか、実際の一日の流れと照らし合わせるといいね。",
+    "form": "定式化",
+    "en": "When asking a computer to choose delivery order, saying to visit nearby places first is not enough. Start by formalizing the conditions into formulas and distinguishing shorter distance from meeting delivery-time commitments. Constraints on cargo weight and vehicle count mean the best route by distance alone may be unusable. Once the formulas are ready, test small cases and compare them with an actual working day to check for conditions that staff took for granted.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "曖昧な課題を、計算や検証ができる形へ置き換えること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

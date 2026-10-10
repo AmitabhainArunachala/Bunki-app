@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "込み上げる",
+   "reading": "こみあげる",
+   "pos": "verb",
+   "meaning": "well up (emotion)",
+   "defJa": "気持ちや笑いが体の奥から強くわき上がる",
+   "passage": {
+    "ja": "外国語で言った冗談に、初めて相手が声を上げて笑ってくれた日のことを覚えています。一日中の会話でぐったりしていたはずなのに、教科書では味わえない喜びが胸の奥から込み上げてきました。そのとき初めて、勉強してきた時間が報われたと思えたのです。言葉が通じるというのは、情報が伝わるのみならず、気持ちが届くことなのだと実感しました。語学が試験の点数だけでは測れない理由は、そこにあります。",
+    "form": "込み上げて",
+    "en": "I remember the day someone first laughed out loud at a joke I made in a foreign language. I should have been worn out from a whole day of conversation, yet a joy you cannot taste from textbooks welled up from deep in my chest. Only then did I feel that the time I had spent studying had been rewarded. Being understood means not only that information gets across, but that feelings arrive. That is why language ability cannot be measured by exam scores alone.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「喜び・涙・怒りが込み上げる」のように、感情が内側から強くわく。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "雇用",
+   "reading": "こよう",
+   "pos": "noun",
+   "meaning": "employment",
+   "defJa": "人をやとって仕事をさせること",
+   "passage": {
+    "ja": "翻訳や通訳の仕事は、機械翻訳の進歩で雇用が減るのではないかと長く言われてきた。その不安は、いまも根強い。確かに、旅行案内や商品説明のような定型文は、機械がすでに十分こなしている。しかし契約書や詩、あるいは冗談のように、文脈と意図が複雑にからむ文章では、人間の判断が今も欠かせない。言葉の仕事は消えるのではなく、機械の出した案を見極める仕事へと形を変えつつあるのではないか。",
+    "form": "雇用",
+    "en": "It has long been said that employment in translation and interpreting will shrink as machine translation advances. That anxiety remains strong even now. Certainly, formulaic texts like travel guides and product descriptions are already handled well enough by machines. But in writing where context and intent are intricately entangled, such as contracts, poems or jokes, human judgment is still indispensable. Might language work not disappear but be changing into the work of judging the proposals machines produce?",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「雇用が増える・減る」「雇用を守る」のように、経済や労働の文脈で使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "領収書",
+   "reading": "りょうしゅうしょ",
+   "pos": "noun",
+   "meaning": "receipt",
+   "defJa": "お金を受け取ったことを書いて渡す書類",
+   "passage": {
+    "ja": "領収書の「上様」という宛名に、職場で首をかしげた経験のある人は少なくない。本来は宛名を書く手間を省くための慣習で、「お上」のような権威を指すわけではないと説明されることが多い。実際、「上様」と書いておけば、客は名前を告げず、店は書き間違いも避けられるとされる。近年は電子化が進み、紙の書類を出さない店も増えつつある。それでも会計の現場では、言葉の古い習慣が静かに生き残っている。",
+    "form": "領収書",
+    "en": "Quite a few people have tilted their heads at the addressee “ue-sama” on a receipt at work. It is often explained that it was originally a custom for saving the trouble of writing a name, and does not refer to an authority like “the Crown.” In practice, writing “ue-sama” is said to spare the customer from giving a name and the shop from making a mistake in writing it. In recent years digitization has advanced, and the number of shops that issue no paper documents is growing. Even so, in accounting practice, old linguistic habits quietly survive.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「領収書をもらう・発行する」。経費の精算で使う書類の名前。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "逸材",
+   "reading": "いつざい",
+   "pos": "noun",
+   "meaning": "outstanding talent",
+   "defJa": "ふつうの人よりはるかにすぐれた才能の持ち主",
+   "passage": {
+    "ja": "将棋界で「十年に一人の逸材」と呼ばれる少年が現れると、周囲の期待は一気に膨らむ。だが才能の持ち主であれ、盤の前では毎日同じ地道な反復から逃れられない。指導者の間では、伸びる子ほど負けた一局を自らの言葉で説明できると言われる。そのため、才能の見極めは、勝った数よりも、負けたあとにどう盤を振り返るかを見るほうが確かだともされる。天賦の才より、振り返る習慣が成長の差を生むという見方は根強い。",
+    "form": "逸材",
+    "en": "When a boy called “a once-in-a-decade talent” appears in the shogi world, the expectations around him swell at once. But however gifted one may be, at the board there is no escaping the same humble repetition every day. Among coaches it is said that the more a child improves, the better he can explain a lost game in his own words. For that reason, in judging talent, it is also said to be more reliable to look at how one reviews the board after a loss than at the number of wins. The view that the habit of looking back, more than innate talent, creates the gap in growth is a persistent one.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「将来の逸材」「逸材を発掘する」のように、人の才能をほめる報道の語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "連携",
+   "reading": "れんけい",
+   "pos": "noun",
+   "meaning": "cooperation, coordination",
+   "defJa": "複数の人や組織が連絡をとり合い協力すること",
+   "passage": {
+    "ja": "言語学者と脳科学者が連携すると、「なぜ子どもは教わらない文法を使いこなせるのか」という素朴な疑問が急に面白くなります。たとえば幼児は、習ってもいない活用の規則を、いつの間にか使い始めているんですね。脳が言葉の規則を自ら見つけ出しているとしか思えません。実際、近年は言語獲得の研究に、コンピューターによる模擬実験が取り入れられています。分野の壁を越えて話し合ってこそ、見えてくる景色があるのです。",
+    "form": "連携",
+    "en": "When linguists and neuroscientists work together, the simple question “why can children use grammar nobody taught them?” suddenly becomes fascinating. Toddlers, for example, start using conjugation rules they were never taught before you know it. It is hard to think of it as anything other than the brain discovering the rules of language by itself. Indeed, in recent years computer simulation experiments have been brought into research on language acquisition. There are views that only emerge when people talk across the walls between fields.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜と連携する」「他機関との連携」の形で、組織や分野が協力する場面。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "辛うじて",
+   "reading": "かろうじて",
+   "pos": "adverb",
+   "meaning": "barely; narrowly",
+   "defJa": "やっとのことでどうにか、ぎりぎりの状態で",
+   "passage": {
+    "ja": "試験の前の晩、私は三章分も残したまま、辛うじて目を開けているだけでした。ところが翌朝の本番では、夜に読んだ数行がなぜかすらすら出てきたんです。脳は眠っている間に記憶を整理するからこそ、徹夜は逆効果になりかねません。実際、睡眠不足のまま受けた模擬試験では、問題文の読み違いが目立ち、見直しの時間さえ残りませんでした。大事なのは、自ら睡眠まで勉強計画に組み入れることです。",
+    "form": "辛うじて",
+    "en": "The night before the exam, I had three chapters left and was only barely keeping my eyes open. Yet the next morning, during the test itself, the few lines I had read at night somehow came out smoothly. Precisely because the brain organizes memories while we sleep, an all-nighter can easily backfire. In fact, in a mock exam I took short on sleep, misreadings of the questions stood out and I did not even have time left to check my work. What matters is to build sleep itself into your study plan on your own initiative.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "ぎりぎりの状態を表す。「辛うじて〜する」の形で、肯定の動詞と使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "過疎化",
+   "reading": "かそか",
+   "pos": "noun",
+   "meaning": "depopulation",
+   "defJa": "人口が減って地域の人が少なくなっていくこと",
+   "passage": {
+    "ja": "インド北部ラダックなど、ヒマラヤの仏教圏の山あいでは、地元に雇用が乏しく、若者が都市へ出ていって村の過疎化が進んでいる。僧院を長く支えてきた村人が少しずつ減り、祭りの担い手も年ごとに足りなくなっている。それでも夏の巡礼や観光の季節になると、谷は人であふれ、暮らしは外から来る旅行者や巡礼者に頼らざるを得ない。村を守ろうとするほど、静けさという財産が削られていく皮肉がある。",
+    "form": "過疎化",
+    "en": "In the mountain valleys of the Himalayan Buddhist regions such as Ladakh in northern India, local jobs are scarce, young people leave for cities, and the depopulation of villages is advancing. The villagers who have supported the monasteries are fewer, and there are not enough people to carry festivals. Even so, when the season of summer pilgrimage and tourism comes, the valleys overflow with people and livelihoods have no choice but to depend on visitors from outside. There is an irony that the more a village tries to protect itself, the more its quiet, its real asset, is whittled away.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「過疎化が進む」「地域の過疎化」の形で、人口流出を伝える報道で使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "高齢化",
+   "reading": "こうれいか",
+   "pos": "noun",
+   "meaning": "population aging",
+   "defJa": "全体の中で高齢者の割合が増えていくこと",
+   "passage": {
+    "ja": "高齢化という言葉を、数字だけで語ると暗くなります。ところが九十歳で新しい楽器を始めた人の話をすると、聞き手の表情はぱっと明るくなるものです。たとえば、八十代の方が毎朝畑を耕している姿を一言添えるだけで、数字だけでは冷たかった話に体温が宿ります。話し手は、統計と一人の物語を交互に差し出すことで、頭と心の両方に届く文章を組み立てられます。数字は地図、人の話は風景だと考えてみてください。",
+    "form": "高齢化",
+    "en": "If you talk about population aging with numbers alone, it turns gloomy. Yet when you tell the story of a person who took up a new instrument at ninety, listeners' faces tend to brighten at once. For example, just adding a line about an eighty-something person who tills their field every morning gives warmth to a story that numbers alone left cold. By offering statistics and one person's story in alternation, a speaker can build writing that reaches both head and heart. Think of the numbers as the map and the person's story as the landscape.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「少子高齢化」「高齢化社会」の形で、社会の変化を述べる語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

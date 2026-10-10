@@ -525,18 +525,18 @@ async function officialPaperCase(page, engine) {
   await openShelfDoor(page, '#mock-link');
   await selectLevel(page, 'N3');
   const card = page.locator(`[data-exam-form=${JSON.stringify(paperEntry.id)}]`);
-  assert.match(await card.locator('.exam-form-timing').innerText(), /言語知識（文字・語彙） 30 min \/ 言語知識（文法）・読解 70 min/u);
+  assert.match(await card.locator('.exam-form-timing').innerText(), /Language knowledge \(vocabulary\) 30 min \/ Grammar · Reading 70 min/u);
   await card.locator('[data-exam-start]').click();
   const papers = page.locator('[data-exam-papers="2"] .exam-paper-list li');
   assert.deepEqual(await papers.allInnerTexts(), [
-    `言語知識（文字・語彙） 30 min · ${paperEntry.skillCounts.vocabulary} questions`,
-    `言語知識（文法）・読解 70 min · ${paperEntry.skillCounts.grammar + paperEntry.skillCounts.reading} questions`,
+    `Language knowledge (vocabulary) 30 min · ${paperEntry.skillCounts.vocabulary} questions`,
+    `Grammar · Reading 70 min · ${paperEntry.skillCounts.grammar + paperEntry.skillCounts.reading} questions`,
   ]);
   await page.locator('#exam-confirm-start').click();
   await page.locator('.exam-paper-question').waitFor();
-  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), '言語知識（文字・語彙）');
+  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), 'Language knowledge (vocabulary)');
   assert.match(await page.locator('#exam-timer').textContent(), /^(30:00|29:\d\d)$/u);
-  assert.equal(await page.locator('.exam-mondai-no').textContent(), '問題１');
+  assert.equal(await page.locator('.exam-mondai-no').textContent(), 'Question 1');
   assert.match(await page.locator('.exam-mondai-instruction').textContent(), /のことばの読み方として最もよいものを、１・２・３・４から一つえらびなさい。$/u);
   assert.equal(await page.locator('.exam-mondai-instruction .exam-underline-blank').count(), 1);
   const first = paperForm.items[0];
@@ -558,8 +558,8 @@ async function officialPaperCase(page, engine) {
   await page.locator('[data-exam-next-paper="grammar-reading"]').waitFor();
   await page.locator('#exam-next-block').click();
   await page.locator('.exam-paper-question').waitFor();
-  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), '言語知識（文法）・読解');
-  assert.equal(await page.locator('.exam-mondai-no').textContent(), '問題１');
+  assert.equal(await page.locator('.exam-paper .exam-skill').textContent(), 'Grammar · Reading');
+  assert.equal(await page.locator('.exam-mondai-no').textContent(), 'Question 1');
   assert.equal(await page.locator('.exam-paper-question .exam-question-number').textContent(), '1');
   assert.match(await page.locator('#exam-timer').textContent(), /^(70:00|69:\d\d)$/u);
   const reading = paperForm.sections.find((section) => section.skill === 'reading').itemIds;
@@ -593,7 +593,7 @@ async function officialPaperStudyHeading(page) {
       numberWords: node.querySelectorAll('.exam-mondai-no .japanese-lookup-word').length,
       nameWords: node.querySelectorAll('.exam-daimon .japanese-lookup-word').length };
   });
-  assert.equal(heading.text, '問題１\u3000漢字読み');
+  assert.equal(heading.text, 'Question 1問題１\u3000Kanji reading漢字読み');
   assert(heading.numberWords >= 1 && heading.nameWords >= 1, 'The 問題 number and the 大問 name are lookup words in study mode');
   assert.equal(heading.stops, 1, 'The 問題 heading is one Tab stop');
   return heading;
@@ -1376,17 +1376,17 @@ async function existingCardCase(page, section, log) {
   return { first: first.attemptId, second: second.attemptId, mark: second.mark };
 }
 
-// Machine-checked written tests, when published, name themselves on the door as awaiting review.
+// Machine-checked written tests name that a person has not yet checked them.
 const machineWritten = catalog.entries.filter((row) => row.availability.ready && row.mode === 'written').length;
 const dojoPracticeLabel = machineWritten
-  ? `${machineWritten} written tests · awaiting review`
-  : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · mock tests in preparation`;
+  ? `${machineWritten} written tests · not yet checked by a person`
+  : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · practice sets available`;
 try {
   for (const engine of engines) {
     for (const section of sections) {
     const { entry, pin, form, formPath, deliveryPath, items, suffix } = section;
     await run(engine, `public-catalog-and-dojo-practice-labels${suffix}`, async (page) => {
-      await page.locator('#chrome-dojo').click();
+      await page.locator('#tab-learn').click();
       const door = page.locator('[data-study-door="mock"]');
       await page.waitForFunction(
         (label) =>
@@ -1405,18 +1405,19 @@ try {
       await door.click();
       await selectLevel(page, pin.level);
       await page.locator(`[data-exam-start=${JSON.stringify(entry.id)}]`).waitFor();
-      // the room's real title is Japanese; English rides as its inline subtitle (E r1 A11)
+      // The active English room title is one heading, without an inline language shadow.
+      const catalogHeading = await page.locator('.assessment-room > h1').evaluate((h1) => ({
+        lang: h1.lang,
+        title: h1.firstChild?.nodeType === Node.TEXT_NODE ? h1.firstChild.textContent : null,
+        subtitleLang: h1.querySelector(':scope > .en-inline')?.lang ?? null,
+      }));
       assert.deepEqual(
-        await page.locator('.assessment-room > h1').evaluate((h1) => ({
-          lang: h1.lang,
-          title: h1.firstChild?.nodeType === Node.TEXT_NODE ? h1.firstChild.textContent : null,
-          subtitleLang: h1.querySelector(':scope > .en-inline')?.lang ?? null,
-        })),
-        { lang: 'ja', title: 'JLPT 模試・練習', subtitleLang: 'en' },
+        catalogHeading,
+        { lang: 'en', title: 'JLPT tests & practice', subtitleLang: null },
       );
       assert.equal(
-        await page.locator('.assessment-room > h1 > .en-inline').textContent(),
-        'JLPT tests & practice',
+        await page.locator('.assessment-room > h1 > .en-inline').count(),
+        0,
       );
       assert.match(
         await page.locator('.exam-section-heading', { hasText: /Practice by skill/u }).innerText(),
@@ -1489,8 +1490,7 @@ try {
       );
       return {
         dojoLabel,
-        catalogTitleJa: 'JLPT 模試・練習',
-        catalogSubtitleEn: 'JLPT tests & practice',
+        catalogHeading,
         readyWrittenSections: sections.length,
         readyMockTests: 0,
         choiceMetrics,
@@ -1669,7 +1669,10 @@ try {
 
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
-      // lists open in a small popover from the popup's "Add to list…" (reader lane 2026-10-02), never a window
+      // lists open in a small popover from the popup's "Add to a list" (reader lane 2026-10-02), never a window;
+      // one path (round 4, T5): the popup offers a list once the word is saved
+      await page.locator('#mini-take').click();
+      await page.waitForFunction(() => document.querySelector('#mini-take')?.getAttribute('aria-pressed') === 'true');
       await page.locator('#mini-lists').click();
       await page.locator('#vocabulary-list-popover').waitFor();
       await page.keyboard.press('Escape');

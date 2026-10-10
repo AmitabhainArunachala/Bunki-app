@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "無為自然",
+   "reading": "むいしぜん",
+   "pos": "noun",
+   "meaning": "non-forcing and naturalness",
+   "defJa": "作為を離れ物事のおのずからの姿に従うこと",
+   "passage": {
+    "ja": "小魚を煮るとき、箸で何度もかき回そうものなら、身はたちまち崩れてしまう。『老子』は大きな国を治めることをこの料理にたとえ、上に立つ者が法令や命令を次々に出して民の暮らしに干渉するほど、世の中はかえって乱れると説いた。では、治める者は何もせずに眠っていればよいのか。老荘思想の説く無為自然は怠惰の勧めではなく、余計な手出しを控えて、物事がおのずからそうなっていく働きに任せる態度を指す。料理人は火加減を見ながら、箸を入れることなく魚が煮上がるのを待つ。",
+    "form": "無為自然",
+    "en": "When you simmer small fish, if you so much as stir them again and again with chopsticks, the flesh falls apart at once. The Laozi likens governing a large state to this dish, teaching that the more those above issue laws and orders one after another and meddle in the people's lives, the more disordered the world becomes. Then should a ruler simply do nothing and sleep? The non-forcing and naturalness taught by Lao-Zhuang thought is not a recommendation of idleness; it refers to an attitude of holding back needless interference and leaving things to the workings by which they come to be so of themselves. The cook watches the heat and, without putting the chopsticks in, waits for the fish to finish simmering.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "老荘思想が説く語。怠惰ではなく、余計な手出しを控えておのずからの働きに任せる態度を指す。",
+    "sense": ""
+   },
+   "cardId": "nn-91de4928d8-1d879303",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023-r.json",
+    "cardId": "nn-91de4928d8-1d879303",
+    "wordId": "nn-91de4928d8"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "学習データ",
+   "reading": "がくしゅうでーた",
+   "pos": "noun",
+   "meaning": "training data",
+   "defJa": "モデルの学習に使われる事例や情報の集まり",
+   "passage": {
+    "ja": "この前、会社で作った音声認識のモデルを実家の祖母に試してもらったら、学習データが東京の若い社員の声ばかりだったせいで、祖母の関西弁が全然聞き取れなかったんですよ。画面には意味の通らない文字が並んで、祖母に大笑いされました。最初はモデルの出来が悪いんだって思ったんですけど、聞いたこともない話し方なんて、人間だって聞き取れっこないですよね。帰り際に祖母から「この機械、東京の人の言葉しか分からへんのやな」って言われました。",
+    "form": "学習データ",
+    "en": "The other day I had my grandmother back home try a speech recognition model we built at work, and because the training data was nothing but the voices of young employees in Tokyo, it could not make out her Kansai dialect at all. Meaningless characters lined up on the screen, and my grandmother laughed out loud at me. At first I thought the model was just badly made, but, you know, even a human could never make out a way of speaking they have never once heard. As I was leaving, my grandmother said to me, \"So this machine only understands the way Tokyo people talk.\"",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「学習データが〜ばかりだ」のように偏りを言う形でよく使う。モデルの出来を左右する材料。",
+    "sense": ""
+   },
+   "cardId": "nn-483cb9c58f-4b0fc1ac",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-483cb9c58f-4b0fc1ac",
+    "wordId": "nn-483cb9c58f"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "個我",
+   "reading": "こが",
+   "pos": "noun",
+   "meaning": "individual self (jīva)",
+   "defJa": "他と区別された個々の自己",
+   "passage": {
+    "ja": "自己はただ一つだと不二一元論は説くが、歯が痛むのは私であって隣の人ではない以上、この痛みを感じている個我まで見かけにすぎないという主張は、にわかには受け入れがたい。シャンカラもこの実感を退けはしない。日常の水準では、人はそれぞれ別の身体と心を持ち、行為の結果も別々に受け取ると認めるからである。そのうえで彼の学派がよく用いるのが、水を張った器に映る太陽のたとえで、器の数だけ像はあっても、空の太陽は一つしかない。では、水が濁って像が曇ったと嘆いているのは、像なのか、太陽なのか。",
+    "form": "個我",
+    "en": "Advaita Vedanta teaches that the self is only one, but since it is I whose tooth aches and not the person next to me, the claim that even the individual self feeling this pain is no more than an appearance is hard to accept at once. Shankara, too, does not dismiss this felt sense. That is because he grants that, at the everyday level, people each have a separate body and mind and receive the results of their actions separately. On that basis, what his school often uses is the simile of the sun reflected in vessels filled with water: there may be as many images as there are vessels, yet there is only one sun in the sky. Then who is it that laments that the water has turned muddy and the image has clouded over, the image or the sun?",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "痛みを感じ行為する個々の自己。不二一元論では唯一の自己アートマンとの関係で論じられる。",
+    "sense": ""
+   },
+   "cardId": "nn-8396c1e0b9-3ee69a31",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011.json",
+    "cardId": "nn-8396c1e0b9-3ee69a31",
+    "wordId": "nn-8396c1e0b9"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "注意機構",
+   "reading": "ちゅういきこう",
+   "pos": "noun",
+   "meaning": "an attention mechanism",
+   "defJa": "入力の各部分の関連に応じて情報を重み付けする仕組み",
+   "passage": {
+    "ja": "「トロフィーがスーツケースに入らないのは、それが大きすぎるからだ」という文を見て、「それ」はスーツケースではなくトロフィーを指していると、人は迷うことなく判断します。言語モデルは、これに近いことを計算で行います。「それ」という語を処理するとき、文中のほかの語一つ一つとの関連の強さを数値で求めるのです。関連が強い語には大きな重みが付き、その語の情報が多く取り込まれます。語と語の関連に応じてこのように重みを割り当てる注意機構は、二〇一七年に発表されたトランスフォーマーという設計の中心に据えられました。",
+    "form": "注意機構",
+    "en": "Seeing the sentence \"The trophy does not fit in the suitcase because it is too big,\" people judge without hesitation that \"it\" refers to the trophy and not the suitcase. A language model does something close to this by calculation. When it processes the word \"it,\" it works out as a number the strength of the relation to each of the other words in the sentence. Words that are strongly related receive large weights, and more of their information is taken in. The attention mechanism, which assigns weights in this way according to the relations between words, was placed at the center of the design called the Transformer, published in 2017.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "語と語の関連に応じて「重みを割り当てる」仕組み。トランスフォーマーの中心にある。",
+    "sense": ""
+   },
+   "cardId": "nn-01278539f0-c99f3a28",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-01278539f0-c99f3a28",
+    "wordId": "nn-01278539f0"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "pos": "noun",
+   "meaning": "provability",
+   "defJa": "定めた公理と規則から結論を導けること",
+   "passage": {
+    "ja": "一九三一年、二十代半ばのゲーデルは、命題の証明可能性そのものを数の性質として扱うという方法で、当時の数学界の常識を覆す定理を発表した。計算機が文字を数で表すように記号の列に番号を振れば、「この命題は証明できる」という主張も数についての主張に変わる。そこで彼は算術の体系の中に、自分自身は証明できないと述べる文を組み立てた。この体系に矛盾がない限り、その文は証明できず、したがって述べている内容は正しい。正しいのに、体系の中でいくら推論を重ねても導けない命題が、こうして姿を現した。",
+    "form": "証明可能性",
+    "en": "In 1931 Gödel, then in his mid-twenties, published a theorem that overturned the conventional wisdom of the mathematical world of the day, using a method that treated the provability of propositions itself as a property of numbers. If you assign numbers to strings of symbols, just as a computer represents characters as numbers, even the claim \"this proposition can be proved\" turns into a claim about numbers. He then constructed, within the system of arithmetic, a sentence stating that it itself cannot be proved. As long as this system contains no contradiction, that sentence cannot be proved, and therefore what it states is correct. Thus there appeared a proposition that is correct and yet cannot be derived however much reasoning is piled up within the system.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「命題の証明可能性」の形。正しいかどうかとは別に、公理と規則から導けるかどうかを指す。",
+    "sense": ""
+   },
+   "cardId": "nn-c2871109c9-6e2c9db2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-c2871109c9-6e2c9db2",
+    "wordId": "nn-c2871109c9"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "離欲",
+   "reading": "りよく",
+   "pos": "noun",
+   "meaning": "dispassion, freedom from desire (vairāgya)",
+   "defJa": "欲望や対象への執着から離れること",
+   "passage": {
+    "ja": "望むものを何でも与えると言われれば、たいていの人は富や長寿を挙げるだろうが、『カタ・ウパニシャッド』に登場する少年ナチケータスは、死の神ヤマが差し出したそれらをすべて断った。少年が知りたかったのは、人が死後どうなるかということだけだった。家畜も黄金も歌や踊りも永遠には続かず、どれほど長い寿命であれ短いものだ、と彼は答えた。神の誘いにも動じなかったこの態度は、ヴェーダーンタの伝統で、離欲の手本とされてきた。",
+    "form": "離欲",
+    "en": "Told they would be given anything they wished for, most people would probably name wealth or long life, but the boy Nachiketas, who appears in the Katha Upanishad, refused every one of those things when Yama, the god of death, held them out to him. All the boy wanted to know was what becomes of a person after death. Cattle, gold, song and dance do not last forever, and however long a life may be, it is a short thing, he answered. This attitude, unshaken even by a god's enticement, has been regarded in the Vedanta tradition as a model of dispassion.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "富や長寿への執着を離れた態度。「離欲の手本」のように、求道者の資質として語られる。",
+    "sense": ""
+   },
+   "cardId": "nn-3b3c10b161-3bb1eb76",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-3b3c10b161-3bb1eb76",
+    "wordId": "nn-3b3c10b161"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "広帯域メモリ",
+   "reading": "こうたいいきめもり",
+   "pos": "noun",
+   "meaning": "high-bandwidth memory",
+   "defJa": "積層構造などで高速な情報転送を図る記憶装置",
+   "passage": {
+    "ja": "メモリ半導体は長らく、市況の変動に業績が左右されやすい汎用品とみなされてきた。ところが、人工知能の学習や推論を担うサーバーの増加に伴って、米エヌビディアなどの画像処理半導体のすぐ隣に配置され、大量のデータを高速でやり取りできる特別な製品に注文が集中するようになった。鍵を握るのは積層技術だ。メモリチップを縦に何層も積み重ね、上下を貫く電極でつないだ広帯域メモリは、一度に送れるデータの量が従来品より格段に多い。製造が難しく、量産できる企業は世界でも数社に限られるため、各社は増産に向けた設備投資を急いでいる。",
+    "form": "広帯域メモリ",
+    "en": "Memory chips were long regarded as commodity products whose makers' earnings are easily swayed by market fluctuations. But as servers handling the training and inference of artificial intelligence multiplied, orders came to concentrate on a special product that is placed right beside the graphics processing chips of America's Nvidia and others and can exchange huge amounts of data at high speed. The key lies in stacking technology. High-bandwidth memory, in which memory chips are stacked vertically in many layers and connected by electrodes running through them from top to bottom, can send far more data at once than conventional products. Because it is hard to manufacture and only a handful of companies in the world can mass-produce it, each of them is rushing capital investment to expand output.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "チップを積み重ねて電極でつなぐ構造と、一度に送れるデータ量の多さを結び付けて覚える。",
+    "sense": ""
+   },
+   "cardId": "nn-cec3f949f8-f1aba2d8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-cec3f949f8-f1aba2d8",
+    "wordId": "nn-cec3f949f8"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "pos": "noun",
+   "meaning": "backpropagation",
+   "defJa": "出力側から各変数の誤差への影響を計算する方法",
+   "passage": {
+    "ja": "誤差逆伝播法による学習は、まず間違えることから始まります。モデルに入力を与えて答えを出させ、正解とのずれを一つの数値にまとめたものが誤差です。次に、この誤差を出力層から入力層へ向かって逆向きにたどります。層を一つさかのぼるたびに、連鎖律という微分の規則を当てはめていきます。すると、膨大な数の重みの一つ一つについて、それを少し動かせば誤差がどれだけ増減するかがまとめて求まるので、その値に応じて重みをわずかに直してはまた答えを出させ、誤差を少しずつ小さくしていきます。",
+    "form": "誤差逆伝播法",
+    "en": "Learning by backpropagation begins with getting things wrong. The model is given an input and made to produce an answer, and the gap between that answer and the correct one, gathered into a single number, is the error. Next, this error is traced backward from the output layer toward the input layer. Each time we go back one layer, we apply a rule of differentiation called the chain rule. This yields, all together and for each one of an enormous number of weights, how much the error would rise or fall if that weight were moved slightly, so we correct the weights a little according to those values, have the model answer again, and shrink the error bit by bit.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「誤差逆伝播法による学習」の形。誤差を出力側から逆向きにたどり、各重みの影響を求める。",
+    "sense": ""
+   },
+   "cardId": "nn-bc45f91770-e83c05cb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031-r.json",
+    "cardId": "nn-bc45f91770-e83c05cb",
+    "wordId": "nn-bc45f91770"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

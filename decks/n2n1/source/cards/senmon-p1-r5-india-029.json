@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "読経",
+   "reading": "どきょう",
+   "pos": "noun",
+   "meaning": "sutra recitation",
+   "defJa": "仏教の経文を声に出して唱えること",
+   "passage": {
+    "ja": "経文を目で追いながら声に出す読経は、文字の意味を調べる学習と同じ作業ではありません。寺の勤めでは声を合わせることや仏への礼拝も大切で、読み方に慣れつつ、どのような場で唱えられるのかを知ると理解が深まります。初めて学ぶ人は、短い一節の区切りと読みを確かめてから、解説を読み、意味のまとまりを自分の言葉で整理するとよいでしょう。音を正確に再現できたという記録と、教えを説明できたという記録を分けておけば、次に練習する点も具体的になります。",
+    "form": "読経",
+    "en": "Reciting a sutra aloud while following its characters is not the same task as studying their meanings. Joining voices and paying homage to the Buddha also matter in temple services, and learning the setting in which a text is chanted deepens understanding as one becomes familiar with its pronunciation. A beginner can check the divisions and readings of a short passage, then read a commentary and organize the units of meaning in their own words. Keeping separate records of accurate vocal reproduction and the ability to explain the teaching makes the next practice goal concrete.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "声に出す実践と、経文の意味を学ぶ作業を区別して使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "観自在菩薩",
+   "reading": "かんじざいぼさつ",
+   "pos": "noun",
+   "meaning": "Avalokiteshvara in the Heart Sutra",
+   "defJa": "般若心経に登場する観音菩薩の別名",
+   "passage": {
+    "ja": "『般若心経』の冒頭に出てくる観自在菩薩は、寺で親しまれている観音さまと別の存在なのでしょうか。呼び名は違っても、同じ菩薩を指しており、経典や翻訳によって名称が変わる点に注意すると混乱を防げます。苦しむ人を救う慈悲の姿に加えて、この経典では深い智慧を実践する姿が示されているのですね。名前だけを暗記するより、どの場面で何をしている存在として描かれるかを確かめると、仏像への信仰と文章に説かれた教えを結び付けて読めます。",
+    "form": "観自在菩薩",
+    "en": "Is the Avalokiteshvara named at the start of the Heart Sutra a different being from the familiar Kannon of Japanese temples? Although the names differ, they refer to the same bodhisattva, and noticing variation across scriptures and translations prevents confusion. In addition to compassion that saves people from suffering, this sutra depicts the practice of profound wisdom. Checking what the figure is shown doing in a particular scene, rather than memorizing only the name, lets us connect devotion to images with the teaching expressed in the text.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "観音と別の菩薩だと取り違えず、呼び名の違いを押さえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "護摩",
+   "reading": "ごま",
+   "pos": "noun",
+   "meaning": "homa fire ritual",
+   "defJa": "炉で供物を焼き、仏に祈る密教の儀礼",
+   "passage": {
+    "ja": "成田山新勝寺で営まれる護摩では、不動明王の前に設けた炉で特別な薪を燃やし、願いの成就を祈る。寺の説明では、炎は人の迷いや執着を焼き尽くすものとして位置づけられている。この説明をもとに儀礼を理解することと、炎に向き合えば特定の病気が治ると医学的に主張することは、区別されるべきである。読経の声や太鼓の響きも含めて信仰が身体を通じて表される場であり、火の大きさだけを見せる映像では、その祈りの内容までは伝わらない。",
+    "form": "護摩",
+    "en": "In the homa rite at Naritasan Shinshoji, special wood is burned in a hearth before Fudo Myoo while participants pray for wishes to be fulfilled. The temple describes the flames as burning away human delusion and attachment. Understanding the ritual through this explanation should be distinguished from medically claiming that facing flames cures a particular illness. Faith is expressed bodily in this setting, including through sutra recitation and drumming, and footage showing only the size of the fire cannot convey the content of its prayers.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "密教の儀礼名であり、火そのものや一般の焚き火とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "説法",
+   "reading": "せっぽう",
+   "pos": "noun",
+   "meaning": "a Buddhist sermon",
+   "defJa": "人々に仏教の教えを説き聞かせること",
+   "passage": {
+    "ja": "友達に執着を捨てろって言われても、気にしていることがすぐに消えるわけじゃないよね。お寺で聞く説法も、難しい言葉をたくさん覚えて帰るだけなら、日々の困り事とは結び付かないと思うんだ。誰かとの別れに際して苦しんでいる人と、腹を立てた自分を責めている人では、同じ教えでも響くたとえが違うだろうし。聞いた話をそのまま他人にぶつける前に、自分がどの言葉で立ち止まったのかを思い返すと、忠告するより先に相手の話を聞きたくなるよ。",
+    "form": "説法",
+    "en": "Being told by a friend to let go of attachment does not instantly remove what troubles you. I think a temple sermon also fails to connect with everyday difficulties if you return having merely memorized lots of hard words. Someone suffering at a separation and someone blaming themselves for getting angry will probably respond to different examples of the same teaching. Before throwing what you heard straight at someone else, recalling which words made you pause can make you want to listen to them before offering advice.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "僧などが人に教えを伝える営みで、単なる叱責とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "認識論",
+   "reading": "にんしきろん",
+   "pos": "noun",
+   "meaning": "epistemology",
+   "defJa": "知識が成り立つ条件や根拠を問う学問",
+   "passage": {
+    "ja": "山の向こうに煙が見えたとき、火そのものを見たと言えるのか。この区別は、何を根拠に物事を知ったと判断するかを問う認識論の問題であり、インド仏教でも知覚と推論を分ける議論が発達した。煙を観察したという報告と、そこに火があると推測したという説明を混同すれば、結論を支える根拠が見失われる。教義の解釈をめぐる議論が細かくなるにつれて、何を直接確かめ、何を手掛かりから導いたのかという区別が、主張の確かさを比べる鍵になる。",
+    "form": "認識論",
+    "en": "When smoke is visible beyond a mountain, can one say that one has seen the fire itself? This distinction concerns epistemology, which asks on what grounds we judge that we know something, and Indian Buddhism developed arguments distinguishing perception from inference. Confusing a report of observing smoke with an explanation inferring fire loses sight of the grounds supporting the conclusion. As debates over doctrinal interpretation become more detailed, distinguishing what was directly established from what was inferred becomes a key to comparing the strength of claims.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「何を知るか」だけでなく「何によって知るか」を問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "諸行無常",
+   "reading": "しょぎょうむじょう",
+   "pos": "noun",
+   "meaning": "all conditioned things are impermanent",
+   "defJa": "条件によって生じたものは変化し続けるという教え",
+   "passage": {
+    "ja": "桜が散る場面だけで諸行無常を説明すると、美しいものが失われて悲しい、という感想に収まってしまいます。仏教で問われるのは、原因や条件によって成り立つものが、そのままの姿を永久に保てるかどうかです。この見方に基づいて暮らしを眺めれば、衰える体に加え、少しずつほどける怒りや、練習を重ねて変わる習慣も視野に入ります。変化を嫌って昨日の状態に執着する気持ちを見直すとき、花の散り際だけを語る説明より、日々の行動に近い教えとして受け取れますね。",
+    "form": "諸行無常",
+    "en": "Explaining impermanence only through falling cherry blossoms reduces it to sadness at losing something beautiful. Buddhism asks whether things constituted by causes and conditions can preserve the same form forever. Looking at life on this basis brings gradually easing anger and habits changed by practice into view, as well as the aging body. When reconsidering the desire to resist change and cling to yesterday’s state, we can receive the teaching as something closer to everyday action than an account limited to falling flowers.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "滅びの悲しみだけでなく、条件あるもの全般の変化を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "身心脱落",
+   "reading": "しんじんだつらく",
+   "pos": "noun",
+   "meaning": "dropping off body and mind",
+   "defJa": "自己への執着を離れることを示す道元の禅語",
+   "passage": {
+    "ja": "坐禅を続けて体が軽く感じられたとしても、それだけで仏教の教えを理解したことにはならない。道元のいう身心脱落を、自分の体が消える珍しい感覚として読むと、自己への執着を離れるという修行の方向を見失う。悟りを自分の所有物にしようとするからには、そこには成果を握り締める新たな自分が残ってしまうのである。姿勢を調え、ただ坐るという実践をめぐる言葉として受け止めるなら、体験の派手さを比べる競争からも距離を置けるだろう。",
+    "form": "身心脱落",
+    "en": "Even if continued zazen makes the body feel light, that alone does not establish an understanding of Buddhist teaching. Reading Dogen’s “dropping off body and mind” as the unusual sensation that one’s body disappears loses sight of practice directed toward relinquishing attachment to the self. In seeking to possess awakening, one leaves a new self clinging tightly to its achievement. Taking the phrase as language concerning the practice of arranging one’s posture and simply sitting allows distance from competition over spectacular experiences.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "肉体の消滅ではなく、坐禅と自己への執着との関係を示す語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

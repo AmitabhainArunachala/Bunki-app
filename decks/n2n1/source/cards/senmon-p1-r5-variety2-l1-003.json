@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "強化学習",
+   "reading": "きょうかがくしゅう",
+   "pos": "noun",
+   "meaning": "reinforcement learning",
+   "defJa": "行動の結果に応じた報酬から方策を学ぶ方法",
+   "passage": {
+    "ja": "迷路を進む機械に、出口へ到達したときだけ点を与えたとします。強化学習では、このような行動の結果から得られる報酬を手掛かりに、どの状態で何をするかという方策を改善します。まだ知らない通路を試せば遠回りにもなりますが、慣れた道ばかり選んでいては近道を発見できません。目先の点だけを追う行動と、将来より良い結果を得るための探索との釣合いが必要であり、何に点を与えるかによって、身に付く振る舞いも変わってきます。",
+    "form": "強化学習",
+    "en": "Suppose a machine navigating a maze receives points only upon reaching the exit. Reinforcement learning uses rewards from the outcomes of actions to improve a policy specifying what to do in each state. Trying an unfamiliar passage may cause a detour, but choosing only familiar routes prevents the discovery of shortcuts. Pursuing immediate rewards must be balanced against exploration for better future outcomes, and the behavior learned changes with what is rewarded.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "行動の結果に応じた報酬から、行動の選び方を改善する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-302b075c29-5e13bb13",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-302b075c29-5e13bb13",
+    "wordId": "nn-302b075c29"
+   }
+  },
+  {
+   "term": "寵児",
+   "reading": "ちょうじ",
+   "pos": "noun",
+   "meaning": "a darling of the age",
+   "defJa": "時代の流れに乗って特に注目される人や企業",
+   "passage": {
+    "ja": "新興企業が次々と資金を集める局面では、赤字であっても将来性を理由に高く評価される場合がある。投資家の期待を一身に集めた企業が時代の寵児となれば、経営者の発言そのものが注目を浴び、人材や取引先も集まりやすくなる。しかし、期待に応えて成長を続けるには、資金を集める力だけでは足りない。顧客が繰り返し対価を払う製品を作れなければ、華やかな評価が実際の事業を追い越したままになり、資金調達の環境が変わった瞬間に弱さが表に出る。",
+    "form": "寵児",
+    "en": "When startups are raising funds rapidly, even loss-making companies may receive high valuations for their prospects. Once a company becomes the darling of its era, attracting investors' hopes, its executives' remarks draw attention and recruitment and partnerships become easier. Yet sustained growth that meets those expectations requires more than fundraising ability. Without products customers repeatedly pay for, glowing valuations can outpace the underlying business, exposing weakness as soon as funding conditions change.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「時代の寵児」。ある時代の期待や人気を特に集める存在。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-110450b46f-ffd5eddf",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-110450b46f-ffd5eddf",
+    "wordId": "nn-110450b46f"
+   }
+  },
+  {
+   "term": "最適解",
+   "reading": "さいてきかい",
+   "pos": "noun",
+   "meaning": "an optimal solution",
+   "defJa": "定めた条件の中で目的を最もよく満たす答え",
+   "passage": {
+    "ja": "配達先をすべて回る最短経路が、その日の仕事で最も良い経路になるとは限らない。昼までに届ける荷物や、通行できない道があれば、距離だけを縮めた案は使えないからである。最適解とは、何を良さの尺度とし、どんな制約を置くかを定めたうえで、その条件を最もよく満たす答えを指す。条件を外して数字だけを競えば計算は華やかになるが、玄関で荷物を待つ人にとって重要な約束が失われ、数式の中の成功と現場の成功が離れてしまう。",
+    "form": "最適解",
+    "en": "The shortest route visiting every delivery address is not necessarily the best route for that day's work. Packages due by noon and impassable roads can make a distance-minimizing proposal unusable. An optimal solution is the answer that best satisfies the conditions after objectives and constraints have been specified. Competing only on numbers while discarding constraints may make the calculation impressive, but it loses promises important to recipients, separating mathematical success from practical success.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "目的と制約を定めた条件の中で、最も良い答えを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6964993348-e88f534a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-6964993348-e88f534a",
+    "wordId": "nn-6964993348"
+   }
+  },
+  {
+   "term": "巨大IT企業",
+   "reading": "きょだいあいてぃーきぎょう",
+   "pos": "noun",
+   "meaning": "Big Tech companies",
+   "defJa": "情報技術分野で大きな影響力を持つ企業群",
+   "passage": {
+    "ja": "写真の保存も店の予約も同じ会社のサービスで済ませると、別のサービスへ移る際の手間が増える。巨大IT企業の強みには、一つの製品の性能に加えて、複数の利用場面を結び付けられる点がある。利用者には便利な反面、新規参入の企業は単独の機能を良くするだけでは、既存の習慣を変えてもらいにくい。データの持ち出しや他社との接続が容易かどうかは、技術上の細部に見えて、利用者が選択肢を保てるかを左右する競争条件でもある。",
+    "form": "巨大IT企業",
+    "en": "Using one company's services for both photo storage and restaurant bookings increases the effort of switching elsewhere. Large technology companies gain strength from linking different activities as well as from individual product performance. This benefits users, but makes it difficult for newcomers to change established habits merely by improving one function. Whether data can be exported and services connected to competitors may seem like technical detail, yet it is also a condition of competition that affects users' ability to retain choices.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "複数のサービスや基盤を通じて広い影響力を持つ企業群。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-734f254221-0e409518",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-734f254221-0e409518",
+    "wordId": "nn-734f254221"
+   }
+  }
+ ]
+}

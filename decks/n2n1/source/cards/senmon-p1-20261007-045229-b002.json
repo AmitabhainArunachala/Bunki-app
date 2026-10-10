@@ -1,0 +1,180 @@
+{
+  "cards": [
+    {
+      "term": "定義",
+      "reading": "ていぎ",
+      "pos": "noun",
+      "meaning": "definition",
+      "defJa": "言葉や概念の意味をはっきり定めること",
+      "passage": {
+        "ja": "今日は「かわいい」という日本語の不思議を掘り下げてみましょう。毎日のように使っているのに、いざ定義しようとすると、ほとんどの人が言葉に詰まります。実はこの語、もともとは「かおはゆし」、つまり見ていて気恥ずかしいという感覚から生まれました。平安時代には、相手を気の毒に思い、いとおしむ気持ちを表したのです。そこから愛らしさへ、さらに様子や雰囲気を表す語へと広がり、その輪郭は今も揺れ続けています。",
+        "form": "定義",
+        "en": "Today, let's dig into what makes the Japanese word kawaii so strange. We use it almost every day, yet the moment we try to define it, most people are lost for words. In fact, the word was born from kaohayushi — the feeling that something makes you flush just to look at it. In the Heian period, it expressed the feeling of pitying someone and finding them dear. From there it widened into loveliness, and then into a word for looks and atmosphere, and its outline is still shifting today.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "「定義する」「定義しようとすると」のように使う。言葉の意味を定める場面のほか、学術的な話にもよく出る硬めの語。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "悪循環",
+      "reading": "あくじゅんかん",
+      "pos": "noun",
+      "meaning": "vicious circle",
+      "defJa": "悪い結果がぐるぐると連鎖して戻ってくること",
+      "passage": {
+        "ja": "今日は「完璧主義」の落とし穴の話をしましょう。高い目標を持つこと自体は悪くないのですが、ミスを一切許さなくなると話が変わってきます。失敗するたびに自己嫌悪が深まり、次は失敗が怖くて行動が遅れ、遅れた分だけ結果が悪くなっていくのです。この悪循環に陥ると、能力とは無関係に成果が出なくなってしまいます。抜け出す鍵は、まず「失敗しても死なない」と認めること、そして小さく動き直すことです。",
+        "form": "悪循環",
+        "en": "Today, let's talk about the trap of perfectionism. Setting high goals is not itself a bad thing, but once you stop tolerating a single mistake, the story changes. Each failure deepens your self-loathing, the fear of the next failure makes you slow to act, and the delay makes the results worse. Once you fall into this vicious circle, results stop coming no matter how able you are. The way out starts with accepting that failure won't kill you, and then moving again in small ways.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「悪循環に陥る」が最も典型的な形。悪い結果が次の悪い結果を呼ぶ構造を、講義調で説くときの定番表現である。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "意欲",
+      "reading": "いよく",
+      "pos": "noun",
+      "meaning": "will, desire; motivation",
+      "defJa": "何かをしようとする積極的な気持ち",
+      "passage": {
+        "ja": "今日は「やる気」の正体の話をしましょう。意欲が湧くかどうかは、実は根性の問題ではなく、その行動に意味を感じられるかどうかで決まります。「なぜやるのか」を自分に説明できないと、脳はなかなか力を出してくれません。逆に、目標が自分の価値観とつながっている人は、外からの報酬がなくても勝手に動き出すものです。勉強が続かないなら、まず「何のためにやるか」を紙に書き出してみてください。",
+        "form": "意欲",
+        "en": "Today, let's talk about what motivation really is. Whether motivation wells up is actually not a matter of grit; it depends on whether you can find meaning in the action. If you can't explain to yourself why you're doing it, your brain is slow to put out effort. Conversely, people whose goals are tied to their own values start moving on their own, even without rewards from outside. If your studying won't stick, start by writing down on paper what it's all for.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「意欲が湧く」が最も自然な組み合わせ。「やる気」を硬く言った語で、講義や本の中ではこちらが好まれる。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "提携",
+      "reading": "ていけい",
+      "pos": "noun",
+      "meaning": "cooperation, tie-up between companies",
+      "defJa": "企業などが手を組んで協力すること",
+      "passage": {
+        "ja": "今日は半導体業界の再編の話をしましょう。生成AIの需要が爆発すると、どの企業も単独では開発スピードに追いつけなくなりました。そこで設計に強い企業と製造に強い企業が互いの弱点を補い合い、技術開発で提携を結ぶ動きが一気に広まったのです。これは合理的な選択ですが、うまくいくかどうかは文化の違いを飲み込めるかにかかってきます。大手同士の組み合わせでも、すれ違いが積み重なれば、あっさり手を引くことになるものです。",
+        "form": "提携",
+        "en": "Today, let's talk about the reshuffling of the semiconductor industry. When demand for generative AI exploded, no company could keep up with the pace of development on its own anymore. So companies strong in design and companies strong in manufacturing began covering each other's weaknesses, and moves to form tie-ups in technology development spread all at once. It's a rational choice, but whether it works comes down to whether the two sides can absorb their cultural differences. Even pairings of major players can see one side pull out abruptly once the misunderstandings pile up.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「提携を結ぶ」が最も典型的な動詞との組み合わせ。企業同士の協力関係を指すビジネス用語である。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "摩擦",
+      "reading": "まさつ",
+      "pos": "noun",
+      "meaning": "friction; rubbing; chafe",
+      "defJa": "こすれ合うこと、また人間関係の対立",
+      "passage": {
+        "ja": "今日は1980年代の日米関係の話をしましょう。当時の日本は自動車や半導体で世界を席巻し、対米輸出を一気に伸ばしていました。ところが米国側では工場の閉鎖が相次ぎ、「日本のせいで仕事が奪われた」という不満が爆発したのです。こうして貿易をめぐる摩擦が表面化し、日本は輸出の自主規制や現地での生産拡大で応じるしかありませんでした。国同士の関係とは、うまくいっているときほど火種が育っているものなのです。",
+        "form": "摩擦",
+        "en": "Today, let's talk about Japan-US relations in the 1980s. Back then, Japan swept the world with its cars and semiconductors, expanding its exports to the United States at a furious pace. But on the American side, factory closures came one after another, and anger exploded over jobs being stolen by Japan. This friction over trade came out into the open, and Japan had no choice but to respond with voluntary export restraints and expanded production on American soil. Relations between countries are such that the better things look, the more the tinder is piling up underneath.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「摩擦が生じる」「摩擦が表面化する」のほか、「貿易摩擦」など複合語も多い。比喩として人間関係の対立にも使う。",
+        "sense": "物がこすれ合う物理の意ではなく、対立やわだかまりの意"
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N2",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "救済",
+      "reading": "きゅうさい",
+      "pos": "noun",
+      "meaning": "relief, aid; (religious) salvation",
+      "defJa": "苦しい境遇から救い助けること",
+      "passage": {
+        "ja": "今日は宗教が語る「救い」の話をしましょう。キリスト教では、神が人間を罪から救済するという考えが信仰の中心にあります。ところがインドの思想は少し違っていて、ヴェーダーンタでは、そもそもあなたと神は別々の存在ではないと説きます。苦しみの原因は無知であり、自分の正体に気づくこと、つまり解脱こそが目的なのです。同じ「救い」を語っていても、その中身はまるで違うという話でした。",
+        "form": "救済",
+        "en": "Today, let's talk about the salvation that religions speak of. In Christianity, the idea at the heart of the faith is that God redeems humanity from sin. Indian thought is a little different, though: Advaita Vedanta teaches that you and God are not separate beings to begin with. The cause of suffering is ignorance, and the aim is to wake up to your own true nature — in other words, liberation. Even when religions speak of the same salvation, what lies inside it is completely different.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「罪から救済する」のように、宗教の文脈では救い上げる意。経済や災害の場面では「金融救済」「被災者救済」にも使う。",
+        "sense": "宗教の文脈で、罪や苦しみから救い上げる意"
+      },
+      "deck": "senmon",
+      "field": "india",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "教訓",
+      "reading": "きょうくん",
+      "pos": "noun",
+      "meaning": "lesson learned, precept",
+      "defJa": "過去の経験から得た戒めや学び",
+      "passage": {
+        "ja": "今日はスペイン風邪の話をしましょう。1918年から世界中に広まったこのインフルエンザは、推計で数千万人の命を奪ったとされます。当時の各国政府は戦争の情報統制を優先し、感染の広がりを隠した結果、対応が後手に回りました。後の歴史家たちは、この出来事を、危機のときこそ透明性が命を守るという教訓として語り継いでいます。歴史が繰り返すかどうかは、過去から何を学ぶかにかかっているのです。",
+        "form": "教訓",
+        "en": "Today, let's talk about the Spanish flu. This influenza, which spread across the world from 1918, is estimated to have claimed tens of millions of lives. The governments of the day put wartime information control first, and because they hid how far the infection had spread, their responses were always a step behind. Later historians have passed the episode down as a lesson that in a crisis, it is transparency that saves lives. Whether history repeats itself depends on what we learn from the past.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「教訓とする」「教訓を得る」が定番の組み合わせ。過去の失敗から学んだ戒めを指し、歴史の講義の締めに好んで使われる。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "変遷",
+      "reading": "へんせん",
+      "pos": "noun",
+      "meaning": "change, transition over time",
+      "defJa": "物事が時代とともに移り変わること",
+      "passage": {
+        "ja": "今日はお金の歴史の変遷をたどってみましょう。実は、かつての中国では貝が通貨でした。紀元前七世紀ごろにはリディアで世界最古の硬貨が鋳造され、十一世紀の中国では交子という紙幣が生まれています。一九七一年のニクソン・ショックで金とドルの交換が停止すると、通貨は国の信用だけに支えられる時代に入りました。形は貝から金属、紙、データへと移り変わったのに、その裏にある人間の欲望は少しも変わっていないんですね。",
+        "form": "変遷",
+        "en": "Today, let's trace the changes money has undergone across its history. In fact, in ancient China, cowrie shells were used as currency. Around the seventh century BC, the world's oldest coins were minted in Lydia, and by the eleventh century China had paper money called jiaozi. When the Nixon Shock of 1971 halted the exchange of dollars for gold, currency entered an age backed by nothing but national credit. The form has shifted from shells to metal, paper, and data, yet the human desire behind it all hasn't changed one bit, you see.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "歴史の変遷をたどる、変遷を遂げるなど、長い時間の移り変わりを表す硬めの名詞で、講義や書き言葉で好んで使われます。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

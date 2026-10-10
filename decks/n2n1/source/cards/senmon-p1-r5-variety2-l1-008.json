@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "苦",
+   "reading": "く",
+   "pos": "noun",
+   "meaning": "suffering; pain (Buddhist duhkha)",
+   "defJa": "心や体の痛み、満たされない状態",
+   "passage": {
+    "ja": "待ち望んだ再会が実現しても、別れの時刻が近づけば喜びの中に寂しさが入り込む。仏教の苦は、身体の痛みだけでなく、求めるものを得られず、愛するものと離れざるを得ない状態なども含む。快い経験が存在することと、それをいつまでも保てることは別である。四諦では、この満たされなさを認めたうえで、その原因と止息、止息へ向かう道を問うため、最初の診断は世界を悲観して終わる宣言ではなく、実践へ向かう出発点となっている。",
+    "form": "苦",
+    "en": "Even a long-awaited reunion brings sadness into its joy as departure approaches. Buddhist suffering includes not only physical pain but also failing to obtain what is wanted and being forced to part from what is loved. Pleasant experiences exist, but that does not mean they can be preserved forever. The Four Noble Truths acknowledge this dissatisfaction and address its origin, cessation, and the path to cessation, making the initial diagnosis a starting point for practice rather than a final declaration of pessimism.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏教では痛みだけでなく、思いどおりにならず満たされないあり方も含む。",
+    "sense": "ここでは仏教の根本概念。一般には辛さ全般を指す。"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1d9de78d51-baf26bb1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-001.json",
+    "cardId": "nn-1d9de78d51-baf26bb1",
+    "wordId": "nn-1d9de78d51"
+   }
+  },
+  {
+   "term": "自他不二",
+   "reading": "じたふに",
+   "pos": "noun",
+   "meaning": "nonduality of self and others",
+   "defJa": "自己と他者を根本で切り離さない見方",
+   "passage": {
+    "ja": "人を助けたつもりが、後になって自分のほうも支えられていたと気付くことがある。仏教の自他不二という見方は、自己と他者を、根本から切り離された二つの実体として固定しない。他人の痛みに無関心でいられないことには、生活が互いの働きに支えられているという事実も関わっている。ただし、相手とつながっているからといって、その人の意思を自分の意思に置き換えてよいのではなく、関係を認めることは、相手の声を聴く責任をむしろ深める。",
+    "form": "自他不二",
+    "en": "One may help someone and later realize that one was also supported in return. The Buddhist view of the nonduality of self and other does not fix them as two fundamentally separate entities. The fact that lives depend on one another's activity also relates to being unable to remain indifferent to another's pain. Connection does not permit substituting one's own will for theirs, however, and recognizing the relationship deepens the responsibility to listen to their voice.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "自分と他人を根本で切り離さない見方で、相手の意思を無視する意味ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6a2db8b67d-5298c076",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-6a2db8b67d-5298c076",
+    "wordId": "nn-6a2db8b67d"
+   }
+  },
+  {
+   "term": "真如",
+   "reading": "しんにょ",
+   "pos": "noun",
+   "meaning": "suchness; reality as it is",
+   "defJa": "仏教で語られるありのままの真実のあり方",
+   "passage": {
+    "ja": "誰かを嫌いだと思った瞬間、その人のあらゆる行動が悪意の表れに見えることがある。仏教で真如と呼ばれるのは、そうした分別によって切り分けられる以前の、ありのままの真実のあり方である。自分の判断が消えれば何でも肯定されるという話ではなく、好き嫌いの物差しで存在の全体を決めない方向を示す。この真実を自分だけが所有したと誇るなら、再び自己への執着を強めかねず、概念をつかむことと、その教えに照らして生きることの隔たりが問われる。",
+    "form": "真如",
+    "en": "The moment someone is disliked, all their actions may appear malicious. Suchness in Buddhism names reality as it is, prior to its division by such discriminations. This does not mean everything becomes acceptable when personal judgments disappear, but points toward not determining an existence entirely through likes and dislikes. Claiming exclusive possession of this truth can strengthen attachment to self, raising the question of the gap between grasping a concept and living in its light.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏教で、分別を超えたありのままの真実のあり方を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8efb88e205-45904b42",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-8efb88e205-45904b42",
+    "wordId": "nn-8efb88e205"
+   }
+  }
+ ]
+}
