@@ -1125,7 +1125,7 @@ function kanjiAnatomy(word) {
     return btn(`kp-anatomy-door kp-anatomy-${kind}`, node, (event) => {
       event.stopPropagation();
       ctx.host.open(entry);
-    }, { [`data-${kind}`]: glyph, 'aria-label': kind === 'kanji' ? t(`${glyph}の漢字の項目を開く`, `Open ${glyph} kanji entry`) : t(`${glyph}の部品の項目を開く`, `Open ${glyph} component entry`) });
+    }, { [`data-${kind}`]: glyph, 'data-ui-content': 'learning', lang: ctx.english === false ? 'ja' : 'en', 'aria-label': kind === 'kanji' ? t(`${glyph}の漢字の項目を開く`, `Open ${glyph} kanji entry`) : t(`${glyph}の部品の項目を開く`, `Open ${glyph} component entry`) });
   };
   for (const k of word.kanji) {
     const parts = el('small', 'kp-kj-parts');
@@ -2150,10 +2150,40 @@ function windowPassage(from) {
   want = Math.max(0, Math.min(passage.scrollHeight - h, Math.round(want)));
   const edges = watchWindowEdges(passage, face);
   if (Math.abs(want - passage.scrollTop) >= 1) passage.scrollTo({ top: want, behavior: 'instant' });
+  seatWindowRow(passage, mark);
   edges();
   // Put a long reading window at the top of the reading area. Its clipped
   // earlier lines then stay behind the chrome, rather than under card controls.
   if (seat > 0) window.scrollTo({ top: window.scrollY + seat, behavior: 'instant' });
+}
+
+/** Initial window fitting must leave a whole first row's 44px reach inside the
+ * clip. Take the nearer inner seat: show that row wholly, or scroll its reach
+ * wholly above the window, while keeping the marked word in view. Restoration
+ * of a learner's saved reading offset does not run this initial fitting step. */
+function seatWindowRow(passage, mark) {
+  const view = passage.getBoundingClientRect();
+  const rows = [...passage.querySelectorAll('.kp-tok, ruby')]
+    .filter(n => !n.matches('ruby') || !n.closest('.kp-tok'))
+    .flatMap(n => [...n.getClientRects()])
+    .filter(r => r.width && r.height && r.bottom > view.top && r.top < view.bottom)
+    .sort((a, b) => a.top - b.top);
+  const first = rows[0];
+  if (!first) return;
+  const center = (first.top + first.bottom) / 2;
+  const reach = 22;
+  if (center - reach >= view.top) return;
+  const prior = passage.scrollTop;
+  const target = mark?.getBoundingClientRect();
+  const max = passage.scrollHeight - passage.clientHeight;
+  const shifts = [Math.floor(center - view.top - reach), Math.ceil(center - view.top + reach)]
+    .sort((a, b) => Math.abs(a) - Math.abs(b));
+  for (const shift of shifts) {
+    if (prior + shift < 0 || prior + shift > max) continue;
+    if (target && (target.top - shift < view.top || target.bottom - shift > view.bottom)) continue;
+    passage.scrollTo({ top: prior + shift, behavior: 'instant' });
+    break;
+  }
 }
 
 function watchWindowEdges(passage, face) {
