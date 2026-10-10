@@ -279,6 +279,7 @@ for (const engine of engines) for (const width of sizes) {
     result.observations.push({ syntheticFault: 'explicit fake provider settings plus deliberate disabled-button tampering',
       sourceTextEgress: false, archiveUnchanged: true, questionPreserved: true });
     await page.locator('#teacher-source-return').click(); await page.locator('#source-reader-back').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'ai' && !document.documentElement.dataset.roomTransition);
     await inbox(page);
     // Fault-only phase, after the ordinary flow and recording observations.
     await page.locator('#source-capture-text').fill('保存に失敗しても、この文章を残す。');
