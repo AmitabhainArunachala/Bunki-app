@@ -936,6 +936,7 @@ const OFFLINE_GATE_CASES = [
   'offline startup uses the installed worker',
   'every linked stylesheet, including editorial.css, and the shelf art load on a cold offline start',
   'cold offline shelf and lookup words retain their packaged styles',
+  'cold offline style fixture returns to active English before the remaining journey',
   'offline editorial.css bytes match the installed artifact',
   'offline design/ink-hoku-nami.png bytes match the installed artifact',
   'uncached network request really fails offline',

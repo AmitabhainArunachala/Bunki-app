@@ -554,7 +554,7 @@ async function ordinary(fixture) {
   await startReview(fixture, sibling.entry);
   const clozeResponse = await answer(fixture, sibling.entry, source.token.s, { label: 'cloze-sibling' });
   await grade(fixture, sibling.entry, clozeResponse.response, 'easy', 'cloze-sibling');
-  await page.locator('.close-doors .take').click(); fixture.siblingId = sibling.entry.plan.id;
+  await page.locator('.close-doors .take').click(); await page.locator('body[data-view="tray"]').waitFor(); fixture.siblingId = sibling.entry.plan.id;
   await openSource(fixture); const beforeKanji = await openWord(fixture);
   await page.locator(`#sheet [data-kanjirow="${source.focus}"]`).click();
   await page.locator(`#sheet[data-node="kanji:${source.focus}"]`).waitFor();
@@ -603,7 +603,7 @@ async function ordinary(fixture) {
   await shot(fixture, 'finite-reading-review-complete'); await undo(fixture, firstGrade, 'correct-reading');
   const final = await answer(fixture, reading.entry, text, { label: 'final-reading' });
   const finalGrade = await grade(fixture, reading.entry, final.response, 'easy', 'final-reading');
-  await fixture.page.locator('.close-doors .take').click();
+  await fixture.page.locator('.close-doors .take').click(); await fixture.page.locator('body[data-view="tray"]').waitFor();
   await history(fixture, reading.entry, finalGrade.after); await shot(fixture, 'saved-reading-history');
   const beforeRestart = await snapshot(fixture, 'saved-history-before-full-restart');
   await close(fixture); await launch(fixture);

@@ -196,9 +196,10 @@ function defineRows() {
       walk(this); return found;
     }
     querySelector(selector) {
-      assert.match(selector, /^[#.][a-z-]+$/u, 'the fake DOM answers one id or one class selector only');
-      const name = selector.slice(1);
-      const hit = (node) => selector[0] === '#' ? node.id === name : !!node.classList?.contains(name);
+      assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector only');
+      const name = selector.replace(/^[#.]/u, '');
+      const hit = (node) => selector[0] === '#' ? node.id === name
+        : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
       const walk = (node) => { for (const child of node.children || []) { const found = hit(child) ? child : walk(child); if (found) return found; } return null; };
       return walk(this);
     }

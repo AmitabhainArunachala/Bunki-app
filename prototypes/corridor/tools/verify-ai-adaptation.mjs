@@ -4,7 +4,7 @@
  * transaction fault. This does not establish provider quality or JLPT ability.
  */
 import { entryCloseSelector } from './sheet-navigation-support.mjs';
-import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
+import { closeShelfTools, openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -144,6 +144,7 @@ async function configure(model = modelName) {
 }
 async function openWord(form) {
   await openShelf();
+  await closeShelfTools(page);
   await page.locator('#chrome-search').click();
   await page.locator('#nav-search-input').fill(form);
   await page.locator('#nav-search-input').press('Enter');
