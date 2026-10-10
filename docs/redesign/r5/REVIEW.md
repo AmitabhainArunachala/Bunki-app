@@ -168,15 +168,9 @@ This is the **before** record. Subsequent sections will retain it and give after
 
 ## Round 5, after
 
-The strict review was committed first, in `a5de2582`, before implementation. Its before section is retained byte-for-byte. The final clean `2d3ed3d1` re-tour supersedes the v7 motion and card geometry observations where later independent probes found misses. V7 evidence remains historical, with exact unchanged-file continuity stated below. The corrected before record above is retained. After scores aggregate the same 19 states, the worst of both widths, both languages and all three selected worlds. They are judgments supported by the final stills, actual videos and checks; the 456 cells include non-applicable P cells. Check 25 remains for a person.
+Final tested source: `4b73e2ab8408b5dc0f36345e436e7768f823e0d7`; clean=True; source/assets `37b8fea2f9464c668bdc69d5b03c3db3c018a2fed1a6a98bdbade46a7d285dc7`; artifact `ac9e731bfb21fe8afadb8af1f570d035949c46a639cd4fc39e4e05e368424635`. Every final verifier lane uses this immutable build. Documentation delivery is separately tied to these actual bytes. The original strict review remains byte-for-byte above; earlier reviews and all failed attempts remain in R5 and git history.
 
-| Result | Before | After |
-|---|---:|---:|
-| P | 294 | 356 |
-| ~ | 93 | 89 |
-| F | 69 | 11 |
-
-40 F and 23 partial cells became P; 18 F became partial; 11 F remain. One baseline P, Reader/check 5, is now partial because R5-13 exposes lost graded-word doors in some archive compounds. The corrected Door language score is excluded from these improvements. A fresh trusted-click audit changes the previously reported N1 back/check 7 P to partial: two expanded left corners of 側 invoke the preceding printed ロシア. Earlier after-score receipts (358/87/11) remain, and the final score is deliberately more conservative. The later Reader correction yields 356 P / 89 partial / 11 F rather than the prior 357/88/11.
+**The requested pass bar is not met.** All 33 required checks returned: 32 pass; `verify-kotoba-mine` fails its unchanged clipped-context reach assertion and two original Focus contrast assertions. Neither failure is an inherited exception. The six supplemental and three focused checks pass. This is completed verification with an unresolved product bar, not a shipping or human-acceptance claim.
 
 | # | Check | Door | Today | Today after | Close | Shelf | Reader | Learn | Words | Me | Settings |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -213,8 +207,8 @@ The strict review was committed first, in `a5de2582`, before implementation. Its
 | 4 | Room identity | P | P | P | P | P | P | P | P | P |
 | 5 | Tap depth | P | P | P | P | P | P | P | P | P |
 | 6 | Motion | P | P | P | P | P | P | P | P | P |
-| 7 | Hit size | P | P | P | P | P | P | P | P | ~ |
-| 8 | Contrast | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ |
+| 7 | Hit size | P | P | P | P | P | ~ | P | P | ~ |
+| 8 | Contrast | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ | F |
 | 9 | Depth | P | P | P | P | P | P | P | P | P |
 | 10 | Content first | P | P | P | P | P | P | P | P | P |
 | 11 | No placeholders | P | P | P | P | P | P | P | P | P |
@@ -227,7 +221,7 @@ The strict review was committed first, in `a5de2582`, before implementation. Its
 | 18 | Day/night parity | P | P | P | P | P | P | P | P | P |
 | 19 | Voice | F | F | F | P | F | F | P | F | F |
 | 20 | Speed | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ |
-| 21 | The bar | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ |
+| 21 | The bar | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ | F |
 | 22 | Three Japans | P | ~ | ~ | ~ | ~ | ~ | ~ | ~ | ~ |
 | 23 | Alive | P | P | P | P | P | P | P | P | P |
 | 24 | The pull | P | P | P | P | P | P | P | P | P |
@@ -240,8 +234,8 @@ The strict review was committed first, in `a5de2582`, before implementation. Its
 | 4. Room identity | 17 / 2 / 0 | 18 / 1 / 0 |
 | 5. Tap depth | 17 / 0 / 2 | 18 / 1 / 0 |
 | 6. Motion | 0 / 3 / 16 | 19 / 0 / 0 |
-| 7. Hit size | 12 / 0 / 7 | 18 / 1 / 0 |
-| 8. Contrast | 0 / 17 / 2 | 0 / 19 / 0 |
+| 7. Hit size | 12 / 0 / 7 | 17 / 2 / 0 |
+| 8. Contrast | 0 / 18 / 1 | 0 / 18 / 1 |
 | 9. Depth | 18 / 1 / 0 | 18 / 1 / 0 |
 | 10. Content first | 19 / 0 / 0 | 19 / 0 / 0 |
 | 11. No placeholders | 18 / 0 / 1 | 19 / 0 / 0 |
@@ -254,108 +248,106 @@ The strict review was committed first, in `a5de2582`, before implementation. Its
 | 18. Day/night parity | 12 / 4 / 3 | 19 / 0 / 0 |
 | 19. Voice | 10 / 0 / 9 | 10 / 0 / 9 |
 | 20. Speed | 0 / 19 / 0 | 0 / 19 / 0 |
-| 21. The bar | 0 / 12 / 7 | 0 / 17 / 2 |
+| 21. The bar | 0 / 12 / 7 | 0 / 16 / 3 |
 | 22. Three Japans | 8 / 11 / 0 | 8 / 11 / 0 |
 | 23. Alive | 0 / 15 / 4 | 19 / 0 / 0 |
 | 24. The pull | 18 / 0 / 1 | 19 / 0 / 0 |
 
-### Evidence for the after scores
+Across 456 cells: **294 P / 94 ~ / 68 F → 355 P / 88 ~ / 13 F**. Thirty-nine F and twenty-three partial cells became P; seventeen F became partial. One prior P became partial (archive graded-word joining); one partial became F (N1 back precision). Check 25 remains a person’s task. Non-applicable P cells are disclosed in the method above, and an automated pass does not promote an unmeasured visual edge.
 
-| Checks | Final evidence and limits |
+### Evidence for the final scores
+
+- **Complete re-tour:** `shots-final/v15` repeats the 36 fresh states; `seeded-final-v15` holds 132 seeded states and 24 completed-session Me states. Widths320/390, EN/JA and all three accepted worlds are retained across11 seeded state types. `supplemental-tour-v15` adds84 documentary views (font readiness awaited; six subsequent Shelf/JA observations still report loading) of Door, Shelf, Reader, Popup, Sentence, Entry and Learn across all12 axis tuples; the final world lane adds72 card home/front/back views across24 deck profiles. Six separate private card states support the numeric traces. The actual new journey, twelve selected video frames and timestamp map are `journey-final-v15/`. The root checks the contact sheet and a bounded representative Door/Settings/N1-back confirmation; no image substitution or new detector pass is used.
+- **Blocking languages and placeholders:** core and full EN/JA tours run unchanged on final source. Core83 visits/10,237 chrome inspections and full230 visits/11,978 inspections each report zero issues. Operating chrome and real learning content are tagged separately; learned Japanese words and anatomy glyphs keep their language. Painted Door words alone enter Tab order. Native54 keyboard assertions/15 journeys and15 level assertions pass; Chrome CDP exposes an empty valueText even for the separate minimal valid slider control, so DOM value wording is not claimed as a spoken AT result. Ready Learn routes replace preparation promises. Maintenance’s closed entry labels localize on mount/rebuild; the opened operational report dialog still has English text outside the19-state tour.
+- **Tap depth and physical targets:** own/other card words reach kanji in one tap and components in two; available anatomy plates now use native44px semantic buttons and the existing host routes. Selected Door words, deck-home doors and Undo have44px targets. 32 grouped interaction/persistence assertions across MCD and N1 at320/390 in the initial Full/EN scope, presentation56 assertions and Undo80 points/two held folds pass. The original REACH assertion still samples three wholly clipped prior words at83.406–118.406px while the window begins at123px, yielding six misses. It remains FAIL. The actual visible first row’s upper/lower point ownership and click are separately observed in MCD/N1; they do not certify Mine. Mine retains partial/check7: the initial-card scope shows wrapped token envelopes whose centre can lie outside a painted fragment; no full native fragment sweep is claimed. Backward native Tab/Enter reaches earlier context through natural scrolling. Each lookup adds its legitimate tuple row; all nonlookup ledger fields and AppRecord stay unchanged. Dense N1 lateral corners remain partial: the earlier50-point sweep gets48/50 callbacks, with all centres correct; two corners choose adjacent printed ink.
+- **Contrast:** original Focus opacity0.38 remains below the measured4.5:1 floor: day MCD world passage2.30893/ruby2.00017; Yoru passage2.27063/ruby1.95876. Separate actual N1 Focus at320/390 measures paper2.30893/Yoru2.27063 with effective opacity0.38, away the clipped edge; no eligible N1 ruby was sampled. At0.49, even black text can reach only3.79836/3.72107 on these carriers. Raising the original bound requires John’s pending product decision; no behavioral threshold is weakened. N1 back remains F/check8. Mine has no Full/Focus control: its503 protected cards all lack type, and actual baseline/final320/390 first-card consumers show no mode control and ordinary sentence opacity1. Mine/check8 is partial for unmeasured edges. This third explicit baseline erratum corrects an MCD Focus failure falsely attributed to Mine: baseline becomes294P/94~/68F, with no product improvement counted. The original Before section stays byte-identical. Textures, fades and gradient edges keep the other17 rooms partial; settled ordinary UI measurements do not census every edge.
+- **One job and world continuity:** Today has one Begin, neutral hook/current stop and the complete next-story title. Popup owns Save; first-depth entry has one Close. Shelf Tools owns its search field. Words has one shape opener and one saved-node signal. Quiet header doors remain under D7 and preserve partial redundancy. Both requested deck flows default to the selected app world while explicit player preferences survive. 殻 Learn has warm paper. Settings visibly names its live localized world and correctly says Me › Settings, but its authored room identity remains weak.
+- **Meaningful motion:** `responses-final-v15` retains actual actions/effects and26 new clips in normal/reduced modes, with three qualifying semantic responses per root state/mode. Actual player consumers retain short response and pinned docks; reduced grade/fallback effects are opacity-only, with80ms retirement and120ms removal. The normal original950ms Drift grade remains outside the19-state three-response tour. Ambient effects are excluded. The twelve-frame actual journey shows Follow, recenter, reveal and article intermediates. `SPEC.md` identifies response/evidence scopes; RAF observations prove response opportunities, not human-readable compositor paint.
+- **Reading correctness and persistence:** transient same-card/deck/face state retains folds, context, window size, inner seat and page anchor through connected async language rebuilds, world reflow and recursive depth returns. Full/Focus refits only when actual controls/target/definition clip. The exact repeated Portsmouth-person 小村 receives the renderer-localこむら projection and honest missing-entry frame ([National Diet Library portrait](https://www.ndl.go.jp/portrait/datas/83)); frozen passage/tokens and unrelatedしょうそん remain unchanged. No fabricated meaning or Save identity is added.
+- **Bundled fonts and actual exports:**451 registered faces include actual licensed source bytes and Roboto Mono weight axes. Canvas text waits for its exact bundled face; failed-face retries do not cache unready labels. A successful stamped SW install verifies/caches all451 fonts (21,103,588bytes), then serves them offline. Both real Kotoba exports regenerate via the existing study-only workflow;100 protected/export files, complete embedded deck/gloss/pin contracts and902 decoded font payloads are checked. Four actual normal/reduced file consumers pass secrecy, popovers, fonts, open-fold grading and durable reload, with12 injected-answer negatives; full/fragment global standalone consumers pass too. Font/cache failure isolation is a separate scope: with all451 font requests permanently503 and an empty cache, six DOM glyphs use native fallback after4.3s. That retained negative does not meet font-only acceptance; zero unready canvas draws are a narrower success.
+- **Real annotation and pull:** unsupported fifteen-minute estimates are removed; queue captions name cards because actual queues include new/due cards. The numeric seed, all candidates, original exclusions and exact sampled-source traces below are retained. Fresh raw117 root candidates become91 eligible UI values after26 explicit corpus exclusions; full mixed draw53 and typed UI draw50 remain, with no favorable resampling. Door, Settings, Popup and Sentence each have fewer than three eligible values; every available value remains and no third is invented. Actual first-three story choices rotate across dates, remain stable within a date and open real articles. Completed study keeps a concrete next-reading door. Archive joined words remain a documented partial tap-depth limit under R5-13.
+
+### Original defects, one line each
+
+| Defect | Disposition |
 |---|---|
-| 1, 12, 13 | Today has one Begin; current stops and the hook are neutral ink. Words has one shape opener and one saved-node signal. Shelf Tools owns its search field; the header field is hidden while Tools is open. Popup owns Save; the reader header Save is hidden until dismissal. First-depth entry has one visible Close; deeper Back and Close have different destinations. Settings owns its world/language controls; Review pace and Backup have distinct actual targets. D7 retains the quiet Learn/Today header doors; those redundancies remain partial. Sentence tutor/practice weights and secondary teaching hints remain partial. |
-| 2, 3, 11, 15 | Actual 230-state EN/JA tour and core language checks. EN month labels are English; Japanese interface headings are excluded from the prose enhancer. Learn offers only ready practice/tests. Audio absence says there is no recording. Dictionary English meaning remains learning content in JA. |
-| 4, 18 | cards-final-v12/world: 24 actual world/width/language profiles × 3 states, plus 24 independent stored-look preservation cases. Both decks default to the selected app world; explicit player preferences remain. Paper deliberately uses its dark lacquer study carrier with a paper card: actual default htmlTheme=hokusai/look=world, carrier #141a28/card #fbf8f1; Yoru carrier is approximately #090c16/card #f2ecdf. This is the authored stage mapping, not a hidden stored look (`world-carrier-diagnostic.json`). 殻 Learn uses warm paper, not mint. Settings remains a weak generic frame. |
-| 5, 7, 16 | Reader archive joining remains partial under R5-13; this is a separate scope from tested curated lookups. Real card-to-own-word/other-word paths: kanji ≤1 tap, part ≤2, caller preserved. Home doors and selected sky words have physical 44px targets; tiny interface lookups are removed. Revealed token prose now has leading 2.5 to keep next-line ruby away from prior targets; fronts retain 2.05. Dense N1 lateral corners remain partial: 50 trusted points per language at 320, all 10 centres correct, 48/50 callbacks correct. Two corners overlap the preceding printed word; original nearest-word arbitration is retained. Both fronts have zero answer, reading or interactive descendants before Reveal. Final missing-voice activation probe additionally checks the full 44px voice button after the note appears. Plain Undo has a full physical 44px target above Reveal, including removal-to-next-card poses; every actual corner/centre restores the prior card and ledger. |
-| 6, 23 | SPEC documents three meaningful responses in every state. `responses-final-v12` has 26 fresh non-player clips in both modes; `cards-final-v12/responses` has four actual films and 36 actions, maximum first RAF 128ms and settled response 457.5ms. 20/36 first RAFs and 59 sampled player frames still have loading font sets; these prove response, not settled typography or compositor paint. The fresh twelve-case late-room observer has zero main/child/post-clear resets, errors absent, final main and visible children opacity 1, and exact minimum post-clear observation 1195.0999999940395ms; the original >=1000ms assertion is unchanged. The historical fourteen early physical hits and native-absent synchronous route/state/focus proofs remain bounded earlier observations. Fresh CSS AST: 20 shipped sheets, zero forbidden properties, 13 ambient loops with minimum 6s. `journey-final-v12/contact-sheet.png` contains twelve actual video frames: its card at 10.058s is populated; Follow, recenter, Reveal and article arrival show intermediate frames. Root visually checked it. The earlier blank-frame sheet remains preserved. |
-| 8 | Worst measured card UI text 5.2294:1; Focus passage 13.7079:1, replacing the failed 0.38-opacity text. Earlier unchanged missing-voice/footer styles measure 8.8201:1 (nearby raster minimum 8.1420:1), and report links at least 11.9118:1 (nearby raster minimum 12.6528:1), verified in `reading-contrast-final-v7/{runtime,contrast}.json`. The historical v7 full 60-card sweep has 600/600 footer hits after settled visibility; two cases needed actual minimal page scroll, with before/after coordinates retained. The earlier v6 supplemental pose placed the footer partly below the 844px viewport; its failed receipt is preserved and its cause is unproved. The subsequent v6 repeat needed zero scrolls; neither that result nor this fresh v7 sweep changes source or behavioral assertions. All ordinary accessibility contrast probes pass. Textures, gradients, pale edge fades and other subdued edge treatments prevent an all-world, every-edge claim; every room stays partial. |
-| 9, 10, 17, 22 | `shots-final/v12` has the same 36 fresh stills; `seeded-final-v12` has 132 seeded poses and 24 completed-session Me states: no horizontal overflow at 320/390. Full-page sentence cards use document flow, not an inner scroller. Original expanded-pane geometry assertions, quote/source invariants and 24 supplemental cases pass. Door relief and the city layer in Settings/deck frames remain partial. |
-| 14 | Fixed recorded random seed, all visible numeric candidates retained; 50 actual UI samples across 19 states traced independently below. Four states have fewer than three; no third number is manufactured. Unsupported “~15 min” estimates were removed. Queue captions now say cards, because the real queue includes new as well as due cards. |
-| 19, 20, 21 | Measurements and five per-room judgments below keep absent approved audio, untested iPhone speed and visual weaknesses visible. Passing software checks does not certify John’s felt bar. |
-| 24 | Actual first-three daily shelf picks now rotate deterministically, stay stable within a day, remain real articles, and differ across the sampled three days. The full Today next-story title is visible and the session close opens a concrete next reading. |
+|1. Cards in a different world|Fixed: selected app materials govern both flows by default; explicit preferences survive.|
+|2. Blocked card word→kanji path|Fixed: real entry/kanji/component routes and exact presentation on return.|
+|3. Tiny targets and dim Focus|Partial: interface targets, visible-row reach, anatomy and Undo repaired; original clipped-context REACH, Focus contrast and two dense N1 corners remain.|
+|4. Mixed interface languages|Fixed: EN month/operating labels; the retracted shipped Door label was already correct and counts as no fix.|
+|5. Promised Learn rooms|Fixed: ready existing practice/tests replace preparation rows.|
+|6. Cuts/reveal jolt|Fixed in observed journey/response scopes: live arrival, inert departing frames, pinned docks, held departing frame and strict reduced opacity; no all-possible-response claim.|
+|7. Nested sentence window|Fixed: whole phone-page flow and exact source/word return.|
+|8. Duplicate Save/exits|Fixed body ownership; D7 header exceptions keep general redundancy partial.|
+|9. Competing signals/clipped next reading|Fixed: one Begin/saved-node signal and complete story title; dense search chrome remains.|
+|10. Mint 殻 Learn|Fixed: warm stage paper.|
+|11. Labels/plurals|Fixed plain labels, Today bookmark naming, singular counts and actual queue captions; operational report-dialog language remains scoped separately.|
+|12. Missing approved voice|Unfixed: no approved narration/card recordings exist; no substitute voice is invented.|
+|13. Static first-three stories|Fixed deterministic daily rotation, stable within the day.|
+|14. Authored detail/bar|Partial: three meaningful responses per toured state observed; Door, Settings and N1 back still fall short of the authored bar; check25 is human.|
 
-### Defect disposition
+Extra repairs: bundled font provenance/canvas/SW handling; real export parity; long-front and safe-area Undo; held reduced-motion outgoing folds; strict Drift grade/fallback motion; actual Door keyboard/level semantics; exact same-card reading state; guarded contextual ruby; native anatomy doors; localized maintenance entry; current-world Settings and corrected breadcrumb.
 
-| Original defect | Result |
-|---|---|
-| 1. Cards: a different world | Fixed: both requested deck flows use the selected app world by default; eight explicit stored player looks are preserved. |
-| 2. Cards: blocked word-to-kanji path | Fixed: own and other words open their real entry with one-tap kanji and two-tap part access, then exact caller return. |
-| 3. Tiny targets and dim Focus | Partly fixed: UI prose lookup is excluded, home doors and vertical learning targets meet 44px, ruby no longer steals the prior line, and Focus meets measured text contrast. Audio-note activation retains 44px. Two N1 lateral corners still select adjacent printed ink; broad edge contrast remains partial. |
-| 4. Mixed interface languages | Fixed: EN months are English. Universe label was already Radicals in the shipped baseline; the initial failure was corrected, not counted as a fix. |
-| 5. Promised Learn rooms | Fixed: unavailable preparation rows are removed; real guided practice/tests start their existing consumers. |
-| 6. Cuts and reveal jolt | Fixed: live arrival fades, held inert outgoing frames, fixed docks, unchanged reveal scroll, and opacity-only reduced responses; the measured room/card responses obey the property and duration rules; the October 11 static audit additionally found forbidden JavaScript-created Drift transitions outside that measured scope. |
-| 7. Nested sentence window | Fixed: expanded geometry reserves the actual card; genuinely tall cards use the page and restore the word and article position on Back. |
-| 8. Duplicate Save and exits | Fixed: popup owns Save; first-depth entry has one Close. D7 header exceptions remain visible and keep general redundancy partial. |
-| 9. Competing signals/clipped reading doors | Fixed: one Begin/saved-node signal, neutral hook/current stop/lens, one shape opener, and full next-reading title. The search/web first frame still has considerable chrome. |
-| 10. Mint 殻 Learn paper | Fixed: warm stage paper in 殻. |
-| 11. Builder labels/plurals | Fixed: Today bookmark, Reading check, Cards due, Kodansha number, Find by shape, Words visited, plain deck names and Save; singular card/answer forms. Verifier pins are individually logged. |
-| 12. Missing voice | Unfixed: no approved Kore/Charon assets for the toured article/card content; no substitute or fabricated narration is shipped. Exact absence is visible and measured. |
-| 13. Fixed first-three shelf stories | Fixed: three daily first stories rotate through actual recent non-glossary articles with stable same-day selection. |
-| 14. Incomplete authored detail/bar | Partly fixed: all 19 states now have three recorded sub-second meaningful responses and a written specification. Door foreground depth, Settings identity/city and dense card-back guidance still need visual authorship. No room is awarded five unqualified yes answers. Archive word-door joining and closing Tools with a live query remain explicit product decisions. |
+### Check 14: random numbers traced to their source
 
-## Post-gate corrections and evidence
+Fixed random seed `5f2f9bba320a90a0fc364e4bc8d85314`; raw visible candidates and corpus exclusions remain. Rooms with fewer than three numbers are reported honestly. The table below names each selected actual value and independent source; it does not manufacture a third value or resample for a favorable result.
 
-The first NoMistakes run (`01M4HBMTSE2ACT5ZDBRDDGKXPP`) failed when its configured 30-minute repair timeout fired while its agent was still producing output. Root did not cancel it. Structured branch_sync released the unchanged submitted branch as user_owned; no pipeline commits existed and no sync/reset was needed. Its managed checkout was automatically removed. An independently preserved immutable build retained the exact production source bytes; `gate-repair-custody/manifest.json` records recovery and original/before/after hashes. Production and independent export/fixture repairs were then committed normally.
+| State | Index / raw index | Value / visible annotation | Independent source |
+| --- | --- | --- | --- |
+| Door | 0 / 0 | 5 · Today · 5 cards | Actual captured record at captured Date: 3 due + 2 started fresh; unchanged todayQueue.order |
+| Today | 2 / 2 | 2026 · Sunday · 11 Oct 2026 | Captured dateMs rendered local Asia/Tokyo by today-date |
+| Today | 3 / 3 | 70 · 70 kanji contain it | data/share_alike/kanji.json radicals[言].kanjiCount; unchanged todayHook/wwPartCap |
+| Today | 4 / 4 | 5 · 5 | Actual captured 3 due + 2 fresh; unchanged todayQueue.order.length |
+| Close | 5 / 5 | 01 · 0:01 | max(1,round((rv.t1-rv.t0)/1000)) second component; normalized source clock nodes match |
+| Close | 7 / 7 | 2026 · 第36回全国産業教育フェア佐賀大会（さんフェア SAGA2026）を開催します！ | data/articles/index.json articles[id=mext:b_menu-houdou-mext_01683].title |
+| Close | 1 / 1 | 5 · Session done — 5 reviews | Actual five durable revlog rows from five real Easy grades in captured record |
+| Today after | 4 / 4 | 4 · 265 kanji contain it · 4 in your words | Actual captured saved-word kanji intersect data/share_alike/kanji.json kanji[].parts containing日; unchanged wwMine/wwPartMembers |
+| Today after | 6 / 6 | 1 · 1 | Normalized renderTodayLine: actual stop-read DOM is conditional on a real selected article and emits exactly1 |
+| Today after | 0 / 0 | 5 · 5 | Actual captured learner record taken.length; renderChrome tray badge |
+| Me | 8 / 8 | 4 · Test expected Sun 4 Jul 2027 | ME_N1_SITTING configured2027/July; unchanged meN1Sitting first-Sunday calculation |
+| Me | 9 / 9 | 2027 · Test expected Sun 4 Jul 2027 | ME_N1_SITTING configured2027/July; unchanged meN1Sitting first-Sunday calculation |
+| Me | 1 / 1 | 11 · 11 Oct 2026 | Actual earliest durable revlog timestamp rendered local Asia/Tokyo by meDays/meDate |
+| Settings | 0 / 0 | 5 · 5 | Actual captured learner record taken.length; renderChrome tray badge |
+| Words | 1 / 1 | 4 · 4 | data/share_alike/kanji.json kanji[日].st; actual node/legend owner日 |
+| Words | 6 / 6 | 4 · 4 | data/share_alike/kanji.json kanji[日].st; actual node/legend owner日 |
+| Words | 2 / 2 | 7 · 7th day of the month | data/share_alike/words.json words[七日].g; unchanged wwShort caption |
+| Learn | 3 / 3 | 2 · new N2 cards | decks/n2/deck.json actual titleEn N2 level identifier |
+| Learn | 14 / 14 | 6 · N2 written · 6 questions · every question explained | guided/sets/n2-living-thread-01.json questions.length |
+| Learn | 5 / 5 | 15 · 15 | Fresh independent frozen engine buildQueue(emptyState n2,captured Learn Date,newPerDay15,skipFor read).fresh.length |
+| Shelf | 8 / 10 | 2026 · 27 Sep 2026 | data/articles/index.json articles[id=jawiki:5294446].date |
+| Shelf | 3 / 3 | 120 · 120 articles | data/articles/index.json:126 entries minus6 adaptations whose originals stand beside them; unchanged shelfStories |
+| Shelf | 0 / 0 | 5 · 5 | Actual captured learner record taken.length; renderChrome tray badge |
+| Reader | 0 / 0 | 5 · 5 | Actual captured learner record taken.length; renderChrome tray badge |
+| Reader | 2 / 2 | 27 · 27 Sep | data/articles/index.json articles[id=jawiki:5294446].date |
+| Reader | 1 / 1 | 2 · 2 | data/articles/index.json articles[id=jawiki:5294446].title; actual Reader heading |
+| Popup | 1 / 7 | 8 · kettle lid radical (no. 8) | data/share_alike/kanji.json kanji[亠].rad and .m; actual mini-kanji-part-meaning metadata caption |
+| Popup | 0 / 0 | 5 · 5 | Actual captured learner record taken.length; renderChrome tray badge |
+| Sentence | 0 / 0 | 5 · 5 | Actual captured learner record taken.length; renderChrome tray badge |
+| Entry | 0 / 0 | 2 · 2 readings or entries share this form | data/share_alike/dict-v2/index.json canonical rows whose writtenForms contain市 and readingWrittenScopes permit市; dictionaryHomographChoices dedup tuple |
+| Entry | 2 / 2 | 4.0 · CC BY-SA 4.0 | data/share_alike/dict-v2/index.json source.licence |
+| Entry | 1 / 1 | 1 · 1 | data/share_alike/dict-v2/07.json canonical seq1308080 first visible sense; unchanged renderDictionaryDetails senseIndex0+1 |
+| kotoba-mine/home | 1 / card | 503 · deck cards | decks/kotoba-mine/deck.json: sum(words[].cards.length) |
+| kotoba-mine/home | 5 / card | 0 · difficult | engine.wordStatus(difficult).length |
+| kotoba-mine/home | 4 / card | 0 · known | engine.wordStatus(known).length |
+| kotoba-mine/front | 0 / card | 1 · position | ui.pos+1; first independently queued card |
+| kotoba-mine/front | 1 / card | 15 · sitting total | engine.buildQueue.queue.length |
+| kotoba-mine/front | 2 / card | 1 · card JLPT level | decks/kotoba-mine/deck.json: words[id=km-064].level=N1; render calls levelChip(word.level) |
+| kotoba-mine/back | 4 / card | 10 · good interval | engine.preview pinned scheduler.repeat ledger.cards[km-064-1] at 2026-10-10T00:00:00.000Z gives 600000ms; player fmtWait renders 10 min |
+| kotoba-mine/back | 7 / card | 2 · other sentences | player otherPassages: words[id=km-064].cards filtered id!==km-064-1; exact IDs km-064-2,km-064-3 |
+| kotoba-mine/back | 2 / card | 1 · again interval | engine.preview pinned scheduler.repeat ledger.cards[km-064-1] at 2026-10-10T00:00:00.000Z gives 60000ms; player fmtWait renders 1 min |
+| n1/home | 0 / card | 666 · deck words | decks/n1/deck.json: words.length |
+| n1/home | 4 / card | 0 · known | engine.wordStatus(known).length |
+| n1/home | 6 / card | 15 · Begin total | engine.buildQueue.queue.length |
+| n1/front | 1 / card | 15 · sitting total | engine.buildQueue.queue.length |
+| n1/front | 2 / card | 1 · card JLPT level | decks/n1/deck.json: words[id=nn-67f6fe4a2f].level=N1; render calls levelChip(word.level) |
+| n1/front | 0 / card | 1 · position | ui.pos+1; first independently queued card |
+| n1/back | 4 / card | 1 · card JLPT level | decks/n1/deck.json: words[id=nn-67f6fe4a2f].level=N1; render calls levelChip(word.level) |
+| n1/back | 2 / card | 10 · good interval | engine.preview pinned scheduler.repeat ledger.cards[nn-67f6fe4a2f-ca1c2c4f] at 2026-10-10T00:00:00.000Z gives 600000ms; player fmtWait renders 10 min |
+| n1/back | 0 / card | 1 · again interval | engine.preview pinned scheduler.repeat ledger.cards[nn-67f6fe4a2f-ca1c2c4f] at 2026-10-10T00:00:00.000Z gives 60000ms; player fmtWait renders 1 min |
 
-The review exposed these misses, now repaired: standalone exports omitted motion.css; three stale Kodansha/assessment/voice label pins; Words lost its open disclosure and Back focus; Review pace re-folded on redraw; Reader Retry passed through the default room; retiring reader/stroke controls hid before their fades; Today did not name its count as saved words. The brief already authorized genuine fades and honest labels. Historical clean 8ab33afb receipts verify 14 early live-control hits, four navigation cases, four contextual-card cases, two calendar cases, one guided internal Back and two asynchronous entry-continuity contexts. These are separate observed scopes, not a combined claim of 22 focus cases.
-
-Bundled fonts were a missed hard rule: OS faces rendered most reading, chrome and data. The corrected local pool adds 270 licensed unicode-ranged sources to the original 181 decorative files. Noto Sans JP, Noto Serif JP, Noto Serif Latin and Roboto Mono retain existing roles/sizes/weights; metadata, OFL licenses and source hashes are committed. This intermediate build loads font subsets lazily; the terminal audit found that unused chunks are unavailable offline, and the October 11 repair addresses that missed hard rule. Unsupported controls now use bundled glyphs or the existing pause SVG. The donor extractor reproduces all three generated outputs. Both standalone modes embed all 451 font sources byte-for-byte and motion.css. No remote runtime font is needed.
-
-Fresh font-final-v7 tour: 52 states, 82,041 platform glyph records, zero native records/overflow/errors. A strict physical probe also found inherited playerQuit and saved-review sentence-door corner gaps; transparent square/stacking repairs preserve printed bounds and pass 40/40 points plus eight real destinations. The full Kotoba verifier found two ruby readings covering prior-line 44px extensions after the font change; its failed v5 receipt is retained. The v7 green REACH result used an ancestor-clipping exclusion and its Focus assertions had been relaxed to opacity <1; those were mistakes. The gate restored the original viewport-centre REACH sampler and both finite <=0.8 Focus limits (the baseline was <0.5, so this was not a restoration of its attenuation), retaining contrast floors. The restored checks exposed nine actual tap misses in a long Full window and a hidden definition; the full unchanged sampler passes after the c14 production seating repair. The ruby-centre owner/lookup evidence remains a separate scope. A separate dense N1 horizontal overlap still invokes adjacent ink at two corners and is scored partial, rather than hidden. These findings are acknowledged rather than hidden by fixture changes.
-
-Unresolved: NoMistakes R5-08 is an informational concern about cloning offscreen player content on phones; no measured phone exit latency is available. R5-11 is a product choice: closing Shelf Tools while a query is active hides its only editor without clearing the query. The exact finding was relayed and remains pending John’s answer (clear and return to stories, or keep lookup and Tools open). No answer or --yes consent was inferred. Approved narration is absent, recent-iPhone speed and an unprompted person/check25 are unmeasured, and the stated bar/edge/material weaknesses remain partial.
-
-The navigation unit fixture missed the newly extracted actual synchronous helper. It now loads that actual dependency with its real transition function; all four original exact-caller/epoch/session/collection assertions pass. The failed v5 receipt and explicit verifier ledger entry remain.
-
-A complete v6 reader/shelf run initially failed G1 phone (48/49): the fixed 250ms sample preceded the asynchronous non-core dictionary popup, while the failure screenshot already showed the correct word. A passive repeat measured actual insertion at 221.8ms with the correct trusted target and no geometry change. The original delay was not instrumented, so concurrency delay remains an inference, not an exact measured cause. The full unchanged rerun and every original assertion are reported below; no delay or behavioral check was weakened.
-
-The isolated v6 speed trace exposed another missed motion defect: index and full-sense arrivals each replaced the whole entry and restarted both sheet and backdrop fades. Five contexts and a separate actual video prove the resets; the earlier v6 assertion of continuous entry arrival was too broad. `8ab33afb` preserves the original CSS animation start across same-entry data redraws, including node-object replacement, while real Open/Kanji/Back/dismissal/reopen start new visits. The helper is UI-only; no CSS, tests, record, pointer-gesture, focus, scroll or epoch handling changed. Clean `sheet-arrival-final-v7` records three actual asynchronous entry nodes with **zero opacity drops** in both normal and reduced modes; the original v6 failed traces remain. That v7 observation repairs the entry/scrim reset only. It did not observe late room arrivals after native transition cleanup; the c14 section below supersedes that broader implication.
-
-### Late room and card repairs
-
-The second NoMistakes run, `01M4HJSMK4CQWTZTN659XM9XTW`, found a late blank room: after native view-transition completion, the still-live room entrance restarted at opacity zero. An unchanged independent observer reproduced 7 failures in 12 original cases (four main resets and twenty child resets); the old 260ms Today frame is blank except chrome. Gate commit `2208ed7b` retires the room entrance when ownership changes and prevents delayed child replay; Me retains one concurrent book entrance. Its four files were custody-captured before the managed checkout disappeared. The re-review then ended failed with **API Error: Can't reach the API server — check your internet or DNS (ENOTFOUND)**. Root used only the offered `axi sync --recover`; custody returned, preserving that commit. No reset, rebase, stash, push, daemon change or --yes was used.
-
-The restored original REACH sampler was not weakened to obtain green. Its nine failures came from actual word centres above an internally scrolled Full window that were still below the viewport's 80px exclusion. `c14dc20c` seats the actual window against the reading inset and uses the visible marked context for lower-fold clearance; the full context stays above the controls. Five diagnostic fixtures have 63 sampled words, zero offset misses and zero cut samples. The exact public REACH pose reproduces the old failure and passes after the repair. The lower edge mask remains a readability limitation and is still scored partial contrast.
-
-A second real race was independent of those offsets: tokens arriving after Reveal dropped the window and moved the word/definition below the grade bar (1371/1411px against a 640px bar). `a5aa8c1a` preserves the reading window and scroll when actual token markup arrives. The unchanged held-response regression now passes on clean `2d3ed3d1`: 59 tokens, same card/text/ledger; term/definition remain 433.59/473.28px above the 639.95px bar, and the marked word remains in the window. This proves the public late-loading behavior, not a source-text test. Before/after failures and natural-flow/cut-context failed alternatives remain intact in R5.
-
-`source-continuity-v7-v11.json` identifies exactly four changed artifact files: corridor.js, decks/player/mount.js, register.css and the generated sw.js. All 21,188 other files and compiled modules are identical. Earlier font-byte, narration coverage and UI material measurements apply to those identical bytes; the previously omitted Undo glyph is a separate actual miss described below; earlier room/card timing observations do not become fresh c14 evidence by that comparison. A subsequent `source-continuity-v11-v12.json` records only player mount, player CSS and generated sw.js changing for the Undo repair; all 21,189 other files and compiled modules remain identical. Fresh v12 captures and suite receipts are listed below. The invariant audit `identity-scope-final-v12.json` preserves the FSRS pin, engine, four deck bodies except display titles, 22 storage/record constants, two cloze templates and N2/N1 source.
-
-The fresh response font records exposed one omitted control: U+21B6 in Undo used native Apple SD Gothic Neo after fonts had loaded, in 13 prior v7 samples and 17 c14 samples. Bundled Noto Serif declared the range but did not actually supply that glyph. Plain `ひとつ戻す` / `Undo last answer` eliminates the decorative arrow in both real consumers, retaining ID, callback and visible words. Live trusted EN/JA grade/remove Undo actions restore the exact prior card and ledger with zero native glyphs. Its 41.59375px height also missed the 44px floor. A min44 diagnostic then found the removal toast moved Undo beneath the independently sticky Reveal button: all five points were obstructed at 390; three hit Reveal and two hit tabs at 320. Actual minimal scroll (52/73px) restored all40 trusted points, but the live docked repair passes all40 trusted centre/corner actions at scrollY0 across EN/JA ×320/390 ×grade/remove, with exact card/ledger restoration, zero native glyphs and zero overflow. Undo is 44px tall and has 16px clear space before Reveal. The candidate and then clean production proofs use no text/CSS overrides. `undo-production-clean-v12/summary.json` verifies 40/40 owned trusted actions and exact card/ledger restorations on clean `2d3ed3d1`, with height 44px, minimum width 94.890625px, gap 16px, scrollY0, and no native glyphs/overflow. The full restored Kotoba suite passes in 109s. All failed and natural-scroll receipts remain historical; no claim that a CSS minimum alone proved actual ownership is made.
-
-R5-13 remains a product decision: joining a place/company name to a following graded katakana noun can remove that noun's lookup, Save and learning mark. The native review counted 359 affected runs among 400 joined archive runs; the curated shelf has 15 joined runs, mostly names. John must choose whether graded words stay separate or current joining is kept. R5-11 also remains pending: clear the active lookup when closing Shelf Tools, or keep Tools open. Both findings were relayed in full and no answer was inferred. R5-15 is informational: a single desktop deck-list exit measured holdScreen at 39.7ms versus 8.1ms baseline over 12,781 cloned nodes; the review's phone multiplier is an unmeasured inference. This is separate from lookup and Reveal timing.
-
-### Check 14: random annotation audit
-
-`numbers-summary-v12.json` uses recorded seed `5f2f9bba320a90a0fc364e4bc8d85314` and Python `Random(int(seed,16))`, sampling without replacement. The typed census covers UI titles, headers, captions, counts and metadata, including word JLPT levels; paragraph corpus numerals are learning content. A new daily article after midnight introduces corpus numerals into the unchanged raw probe. The complete raw pool and 53 mixed-scope selections remain preserved. Before the separate complete typed draw, all 117 raw root candidates are classified: 91 UI candidates and 26 paragraph exclusions (two Shelf lede, six Reader, six Popup, twelve Sentence). Each exclusion retains actual DOM/source. Popup's “kettle lid radical (no. 8)” is eligible metadata, independently traced to kanji[亠].rad=8 and its meaning. This classification follows the earlier UI-caption policy; it is not a selective sample retry.
-
-The same seed draws once from the full typed pool, yielding **50 UI annotations across 19 states**, all independently traced. Door, Settings, Popup and Sentence have fewer than three; Popup has two rather than the historical one. No third number is invented. The original v3/v4/v7 pools and selections remain. The initial unchanged copy of the old literal-equality proof failed on Today text when Saturday 10 October became Sunday 11 October; its script/log remain intact. The fresh proof derives actual dates, article and caption values from their real consumers, with no production/verifier edits or resampling. Visible intervals below are minutes/days, separately proved from raw scheduler milliseconds.
-
-| State | Actual selected numbers and traced source |
-|---|---|
-| Door | **5** — Actual captured record at captured Date: 3 due + 2 started fresh; unchanged todayQueue.order |
-| Today | **2026** — Captured dateMs rendered local Asia/Tokyo by today-date; **70** — data/share_alike/kanji.json radicals[言].kanjiCount; unchanged todayHook/wwPartCap; **5** — Actual captured 3 due + 2 fresh; unchanged todayQueue.order.length |
-| Close | **01** — max(1,round((rv.t1-rv.t0)/1000)) second component; normalized source clock nodes match; **2026** — data/articles/index.json articles[id=mext:b_menu-houdou-mext_01683].title; **5** — Actual five durable revlog rows from five real Easy grades in captured record |
-| Today after | **4** — Actual captured saved-word kanji intersect data/share_alike/kanji.json kanji[].parts containing日; unchanged wwMine/wwPartMembers; **1** — Normalized renderTodayLine: actual stop-read DOM is conditional on a real selected article and emits exactly1; **5** — Actual captured learner record taken.length; renderChrome tray badge |
-| Me | **4** — ME_N1_SITTING configured2027/July; unchanged meN1Sitting first-Sunday calculation; **2027** — ME_N1_SITTING configured2027/July; unchanged meN1Sitting first-Sunday calculation; **11** — Actual earliest durable revlog timestamp rendered local Asia/Tokyo by meDays/meDate |
-| Settings | **5** — Actual captured learner record taken.length; renderChrome tray badge |
-| Words | **4** — data/share_alike/kanji.json kanji[日].st; actual node/legend owner日; **4** — data/share_alike/kanji.json kanji[日].st; actual node/legend owner日; **7** — data/share_alike/words.json words[七日].g; unchanged wwShort caption |
-| Learn | **2** — decks/n2/deck.json actual titleEn N2 level identifier; **6** — guided/sets/n2-living-thread-01.json questions.length; **15** — Fresh independent frozen engine buildQueue(emptyState n2,captured Learn Date,newPerDay15,skipFor read).fresh.length |
-| Shelf | **2026** — data/articles/index.json articles[id=jawiki:5294446].date; **120** — data/articles/index.json:126 entries minus6 adaptations whose originals stand beside them; unchanged shelfStories; **5** — Actual captured learner record taken.length; renderChrome tray badge |
-| Reader | **5** — Actual captured learner record taken.length; renderChrome tray badge; **27** — data/articles/index.json articles[id=jawiki:5294446].date; **2** — data/articles/index.json articles[id=jawiki:5294446].title; actual Reader heading |
-| Popup | **8** — data/share_alike/kanji.json kanji[亠].rad and .m; actual mini-kanji-part-meaning metadata caption; **5** — Actual captured learner record taken.length; renderChrome tray badge |
-| Sentence | **5** — Actual captured learner record taken.length; renderChrome tray badge |
-| Entry | **2** — data/share_alike/dict-v2/index.json canonical rows whose writtenForms contain市 and readingWrittenScopes permit市; dictionaryHomographChoices dedup tuple; **4.0** — data/share_alike/dict-v2/index.json source.licence; **1** — data/share_alike/dict-v2/07.json canonical seq1308080 first visible sense; unchanged renderDictionaryDetails senseIndex0+1 |
-| kotoba-mine/home | **503** — decks/kotoba-mine/deck.json: sum(words[].cards.length); **0** — engine.wordStatus(difficult).length; **0** — engine.wordStatus(known).length |
-| kotoba-mine/front | **1** — ui.pos+1; first independently queued card; **15** — engine.buildQueue.queue.length; **N1** — decks/kotoba-mine/deck.json: words[id=km-064].level=N1; render calls levelChip(word.level) |
-| kotoba-mine/back | **10** — engine.preview pinned scheduler.repeat ledger.cards[km-064-1] at 2026-10-10T00:00:00.000Z gives 600000ms; player fmtWait renders 10 min; **2** — player otherPassages: words[id=km-064].cards filtered id!==km-064-1; exact IDs km-064-2,km-064-3; **1** — engine.preview pinned scheduler.repeat ledger.cards[km-064-1] at 2026-10-10T00:00:00.000Z gives 60000ms; player fmtWait renders 1 min |
-| n1/home | **666** — decks/n1/deck.json: words.length; **0** — engine.wordStatus(known).length; **15** — engine.buildQueue.queue.length |
-| n1/front | **15** — engine.buildQueue.queue.length; **N1** — decks/n1/deck.json: words[id=nn-67f6fe4a2f].level=N1; render calls levelChip(word.level); **1** — ui.pos+1; first independently queued card |
-| n1/back | **10** — engine.preview pinned scheduler.repeat ledger.cards[nn-67f6fe4a2f-ca1c2c4f] at 2026-10-10T00:00:00.000Z gives 600000ms; player fmtWait renders 10 min; **1** — engine.preview pinned scheduler.repeat ledger.cards[nn-67f6fe4a2f-ca1c2c4f] at 2026-10-10T00:00:00.000Z gives 60000ms; player fmtWait renders 1 min; **6** — engine.preview pinned scheduler.repeat ledger.cards[nn-67f6fe4a2f-ca1c2c4f] at 2026-10-10T00:00:00.000Z gives 360000ms; player fmtWait renders 6 min |
-
-The fresh actual Close clock is independently bounded by passive trusted events and DOM arrival: lower 688ms (last grade − first front), upper 747ms (Close DOM − Start click), yielding displayed 0:01 under the minimum-one-second rule. The raw Today-to-Close capture delta is 1,412ms; no private rv timestamp is invented. Twenty numeric AST nodes and ten data/engine/deck hashes match the preserved earlier proof; whole corridor.js and player mount are explicitly not byte-identical. The eligible typed pools and one same-seed draw are independently refreshed on v12. Actual records, captured browser dates, independent N2/player queues, scheduler previews, literal UI text, corpus classifications and source hashes are retained in `numbers-final-v12` and `cards-final-v12/numbers`. The full50-row source table including raw/typed indices is `numbers-final-v12/ui-proof-table.md`; all19states/50selectedUIvalues pass independent derivation with errors absent. The mixed53 proof also passes in its explicitly separate scope. Six-card census retains no uncatalogued UI values; learning prose numerals remain explicitly excluded.
 
 ### Five bar questions, after
+
 
 | Room | Dōgen | Musashi | Bashō | Hakuin | Anime masters |
 |---|---|---|---|---|---|
@@ -374,113 +366,103 @@ The fresh actual Close clock is independently bounded by passive trusted events 
 | Kotoba back | Yes: meaning can be used immediately. | Partly: keyboard/gesture guidance and several folds still crowd the answer. | Yes: the sentence and target stay connected. | Yes: four real grade outcomes land clearly. | Partly: stable docks and selected materials; helper typography still weakens the picture. |
 | N1 home | Yes: Begin is above the fold in the selected world. | Yes: list and preferences are secondary, topic choices live in Settings. | Partly: real counts sit in a stable but static frame. | Yes: 666 words/cards is the source census. | Partly: coherent paper/lacquer, with a sparse background. |
 | N1 front | Yes: the passage itself asks for recall. | Partly: long fronts still reach the chosen shrinking-font floor. | Yes: historical content has substance. | Yes: no answer or reading appears before Reveal. | Partly: strong carrier, but a tall passage leaves little breathing space. |
-| N1 back | Yes: definition moves the same practice forward. | Partly: repeat guidance and folds remain dense. | Yes: passage, definition and recursive word doors connect. | Yes: grade intervals come from the actual pinned scheduler. | Partly: reveal holds scroll, but long context and its fading edges remain weak. |
+| N1 back | Yes: definition moves the same practice forward. | Partly: repeat guidance and folds remain dense. | Yes: passage, definition and recursive word doors connect. | No: dense lateral touch corners and low-contrast Focus context weaken precision despite correct scheduler intervals. | Partly: the held front covers reveal seating; long context and pale edges remain weak. |
 | Words | Yes: following a relationship is language practice. | Partly: one shape opener and one signal; the search/lens slab still takes space. | Yes: following a node re-centres the actual word and keeps the walk. | Yes: stroke/family/record numbers are actual. | Partly: the graph is clearer; the upper frame is still crowded. |
 | Me | Yes: the book shows real study rather than invented rewards. | Partly: retained header/tab repetition remains. | Yes: a stable yearbook records changing actual practice. | Yes: expected test date is labeled expected and evidence is real. | Partly: calendar and earned rows now respond, but the book still needs richer depth. |
 | Settings | Yes: every choice changes the actual app. | Partly: duplicate choices are removed; retained navigation still repeats. | No: generic preferences leave little memorable moment. | Yes: capability and absence labels are honest. | No: a weak paused picture with little identifiable city layer. |
 
 The three rooms furthest from the bar are **Door** (worked foreground/background relief and a less pale day picture), **Settings** (a distinctive purposeful frame, a memorable moment and a city layer), and **N1 back** (less repeat guidance, clearer long-context hierarchy, less pale edge fade and more room for dense-prose touch corners). Approved article/card audio remains a content gap across nine states, beyond these three visual rooms.
 
-### Check 19: approved voice coverage
 
-The fresh v12 journey and audio tour use `jawiki:5294446`, *The Reshuffled Second Takaichi Cabinet* (第2次高市内閣 (改造)), after the daily shelf rotates across midnight in Tokyo. It has no approved narration and no Listen control; the actual page says **No recording for this article**. The earlier v7 Syrian article `global-voices:2026-09-28-65726` also has no approved narration; that earlier observation remains historical. The popup, selected sentence and full entry do not have an approved recording either. The Kotoba and N1 player flows contain no card-audio implementation: both requested fronts/backs are silent. Consequently check 19 remains F in nine states: Shelf, Reader, Popup, Sentence, Entry, and both requested deck fronts/backs.
 
-The saved-word review's five actual reading buttons (世界, 時間, 音楽, 技術, 日) each produce **No Kore recording**, with zero native playback and zero device TTS. The final layout keeps the reading together, the status on its own line, and the voice target 44px after activation. This truthful absence is not a passing voice check.
+### Check 19: actual approved voice coverage
 
-The historical `audio-final-v7/approved-coverage.json` records **8,407 word entries, 77 passage entries in the sentence manifest, and 1,400 sentence cues: zero approved Kore/Charon entries/cues**. The manifest voices are Ami, Metan, Zundamon and Takehiro; cues are Ami. Seventy-seven is a passage census, not a clip count. The manifest/audio bytes remain identical across the recorded v7→v11→v12 build continuity, so this coverage remains unchanged; it is not relabeled a fresh v12 census. `audio/article-narration.json` is absent. The fresh actual native media events, screens and recording are in `audio-final-v12/audio.json` and its associated assets. The playback verifier's explicitly synthetic approved fixture demonstrates behavior only, not shipping coverage. No substitute narration was added.
+The fresh actual article/audio receipt is `audio-final-v15/audio.json`; the native tour witnesses are retained rather than substituted. The toured cabinet article has no approved narration and no Listen control; it truthfully says “No recording for this article”. Popup, sentence, full entry and both requested deck fronts/backs also lack approved audio. Check19 therefore remains F in nine states: Shelf, Reader, Popup, Sentence, Entry and the four card faces. Five actual saved-word reading buttons (世界、時間、音楽、技術、日) show No Kore recording, with zero observed native playback and device TTS. Missing voice is not voice coverage.
 
-### Check 20: measured speed on this Mac
+The fresh coverage census retains8,407 word entries,77 sentence-manifest passage keys,1,400 cues across67 cue passages and zero approved Kore/Charon entries or cues. Seventy-seven is a passage census, not a clip count; article narration manifest is absent. The synthetic approved fixture proves player behavior, not shipping coverage. No replacement narration was added.
 
-Five fresh Chromium contexts at 390×844, service workers blocked, measured only after all task-owned heavy checks and recordings finished (the remaining worker work was lightweight runtime-only numeric proof). Hardware: M5 Max, Mac17,6, 128GiB, macOS 26.5.1 (25F80); Chrome for Testing 153.0.8010.12, metadata read after timing. OS/local-server caches may be warm and unrelated system activity is uncontrolled. This is browser-context cold start, not reboot/network-cold or a recent-iPhone result. Timing begins at in-browser `HTMLElement.click()` dispatch on the actual visible Today word or player Reveal consumer, excluding physical pointer and automation dispatch latency. Separate continuity films use trusted physical clicks. The unchanged runner SHA is `58382897fe1b82886f973c34842fc31de48d0d988999cb7a7ff58987a36f549c`. `speed-final-v12/{diagnostic,summary-compact}.json` retains exact identity, witnesses, events, per-node RAF/opacity and font observations.
+### Check 20: measured on this Mac
+
+Five fresh Chromium mobile/touch contexts at390×844, service workers blocked, after all task-owned heavy jobs and solo Design49 are closed. Apple M5 Max/Mac17,6/128GiB, macOS26.5.1(25F80), Chrome for Testing153.0.8010.12; metadata confirmed after timing. Local/OS caches may be warm and unrelated system activity is uncontrolled. “Cold” means a fresh browser context, not a reboot or network-cold device. Dispatch starts at the actual in-browser HTMLElement.click path, excluding pointer/automation dispatch latency. Separate native interaction proofs use trusted physical clicks. Unchanged runner SHA58382897fe1b82886f973c34842fc31de48d0d988999cb7a7ff58987a36f549c. `speed-final-v15/{diagnostic,summary}.json` retains events, targets, exact fonts and continuous node/opacity traces.
 
 | Measurement | Median ms | Range ms |
 |---|---:|---:|
-| Cold navigation → body-ready DOM insertion | 462.4 | 444.4–467.9 |
-| Cold navigation → locator-observed body-ready upper bound | 474.8 | 466.4–477.4 |
-| Lookup dispatch → core-gloss DOM insertion | 28.2 | 26.3–29.1 |
-| Lookup dispatch → core first positive-opacity RAF | 57.3 | 54.6–58.4 |
-| Lookup dispatch → following positive core RAF | 78.1 | 68.0–81.4 |
-| Lookup dispatch → core opacity ≥0.99 RAF | 248.3 | 247.9–249.6 |
-| Lookup dispatch → full-sense DOM insertion | 317.9 | 293.5–321.3 |
-| Lookup dispatch → full first positive-opacity RAF | 318.1 | 293.7–321.4 |
-| Lookup dispatch → full opacity ≥0.99 RAF | 318.1 | 293.7–321.4 |
-| Lookup dispatch → locator-observed full-sense upper bound | 371.8 | 355.8–376.4 |
-| Reveal dispatch → answer DOM insertion | 33.9 | 32.9–36.6 |
-| Reveal dispatch → answer first positive-opacity RAF | 65.7 | 65.5–65.9 |
-| Reveal dispatch → following positive answer RAF | 82.5 | 81.1–82.7 |
-| Reveal dispatch → answer opacity ≥0.99 RAF | 215.6 | 214.6–215.9 |
+|Cold→body-ready DOM|306.7|304.1–307.5|
+|Cold→body-ready polling upper bound|313.0|310.5–313.7|
+|Core gloss→DOM insertion|31.0|22.8–35.8|
+|Core gloss→first positive-opacity RAF|57.6|50.8–65.5|
+|Core gloss→following positive RAF|71.1|66.6–87.6|
+|Core gloss→opacity≥0.99 RAF|Not observed|0/5 cases|
+|Full senses→DOM insertion|227.4|203.0–236.8|
+|Full senses→first positive-opacity RAF|231.3|203.1–237.0|
+|Full senses→following positive RAF|245.9|215.0–248.9|
+|Full senses→opacity≥0.99 RAF|249.8|245.9–263.6|
+|Reveal answer→DOM insertion|31.0|29.7–34.5|
+|Reveal answer→first positive-opacity RAF|48.9|47.8–51.7|
+|Reveal answer→following positive RAF|65.1|64.4–66.6|
+|Reveal answer→opacity≥0.99 RAF|198.7|198.4–199.9|
+|Lookup whole-page finite-animation polling upper bound|914.5|882.4–914.9|
+|Reveal whole-page finite-animation polling upper bound|248.7|248.0–249.2|
 
-The fresh Sunday witness is 洒落る → “to dress stylishly”; full senses and the N1 交渉 answer are separate actual text witnesses. The earlier v7 witness was 打撃; these are different daily inputs, so the changed medians alone do not prove a performance regression or improvement. Initial core gloss DOM insertion meets the 100ms target on this Mac; full senses at 317.9ms exceed it. First positive alpha and a following RAF are paint opportunities, not proof of compositor painting or human readability. The body-ready marker is a startup milestone, not a fully painted screen. **Check 20 stays partial in every state** because the recent-iPhone measurement remains unperformed.
+**DOM insertion, positive alpha, subsequent RAF, opacity≥0.99, font readiness and compositor painting are separate observations.** RAF is a paint opportunity; opacity≥0.99 is an operational threshold, not a human-reading threshold. Body-ready is not a fully painted screen. Font-set status and ready events can change with new glyph batches; the raw trace discloses status at each milestone and does not identify the face actually painted in every frame. Full-sense insertion exceeds the100ms lookup target on this Mac; initial core is earlier. A recent-iPhone measurement has not been performed, so check20 remains partial in every state. Whole-page finite settling includes underlying Today motion and is not dictionary readiness. Historical v12 timing is retained and not reused as v15 data. Core never reaches0.99 before full senses replace it in these five cases; this is explicitly unobserved, not a zero or reused latency. Full first-alpha range0.974968–0.989509 continues the arrival. Combined meaning has zero sampled missing frames/opacity drops after first positive presence; maximum sampled RAF gap23.4ms, so sub-frame interruptions cannot be excluded. All five contexts have no observed page errors. Core/answer insertion fontsets are loading in all five; first-positive core is loading in2/5, answer in3/5; full insertion is loaded5/5. These distinctions remain in raw events.
 
-All five continuous traces have zero sampled missing-meaning frames or opacity drops after initial positive presence. Core opacity reaches 0.99 in all five; the full node starts at 0.998811–1 and continues the original arrival. Maximum sampled RAF interval is 28.3ms, so sub-frame changes cannot be excluded. The historical v7 independent normal/reduced sheet/scrim films preserve an actual CSS animation start across asynchronous replacements; the original v6 two-reset failures remain intact. The v12 timing is a new bounded observation, not a claim of continuous human-readable paint.
+### Final verifier table
 
-Fonts are loading at body ready and core/answer insertion in all five cases. They remain loading at every first positive core RAF; they are loaded at full-sense insertion and at the first positive answer RAF. The separately body-ready-registered `fonts.ready` milestone is 484.2ms [480.1–493.1] after navigation, 23.0ms [21.8–36.9] after body-ready insertion. Later glyph use starts new batches: lookup completion medians 59.4ms and 103.2ms; answer 56.7ms. No font wait changes the timed action, and set readiness does not identify the face painted in a specific frame. Actual settled glyph ownership is proved separately in the stated font/response scopes.
+All planned42 checks returned: 41 PASS / 1 FAIL, with 0 identity mismatches. Logs and complete attempts are `verify/final-v15-rollup.json` and the six named v15 lanes. Focused setup’s first relative SITE rejection is preserved; its unchanged corrected absolute-site run is listed. No failing assertion is weakened or ignored. Both formerly inherited corridor-doors and PR77 suites pass without exceptions. NoMistakes is a separate gate.
 
-Locator polling yields upper bounds, including median 55.3ms full-sense overhang [34.5–79.7]; it is not exact insertion or product latency. The initial dictionary index is 17,599,909 bytes: internal worker read median 87.0ms and parse 92.7ms, worker-ready receipt 292.9ms after dispatch, then full-sense DOM 24.5ms later. These observations support initial dictionary loading as a large part of the full-data delay. Whole-page finite settling is 998.8ms [982.2–1000.2] for lookup (including underlying Today motion) and 265.8ms [265.0–266.3] for Reveal; those values do not measure dictionary readiness. All five contexts have no observed page errors or font errors. Historical v4/v6/v7 timing remains unchanged.
-
-### Files and invariant boundaries
-
-Production changes are in `prototypes/corridor/corridor.js`, its room/material/motion sheets, `decks/player/mount.js`/`player.css`, deck display titles and their existing build scripts. The new motion sheet is included in index, service worker and the runtime asset census. Shelf and sheet verifier helpers follow the actual visible owner of an action. Individual label/layout pins are recorded in `docs/redesign/VERIFIER_CHANGES.md`; data, source-return, durable capture, scheduling, focus, hit size, and negative controls are retained.
-
-The pinned FSRS data and player engine are byte-identical to the baseline; N2/N1 source has no changes. All four shipped deck JSON bodies are identical except display titles: card IDs, Anki IDs, passages and scheduling content are unchanged. Storage/record markers and bunki-cloze keys remain; real storage-integrity and source-return verifiers pass. The final invariant receipt is `identity-scope-final-v12.json`; the font/target label repair changes no protected data or record contract.
-
-
-### Final verification
-
-All **29 required suites, three direct checks and the full language tour pass (33/33)** on clean source head `2d3ed3d10fb06bab934fca1e1cfedd723940fe43`, artifact `c9bf8817b4f74c6c109f20048b2acb60311ab347e58435d8406c03b91743747e`, source/assets `4d0609348043656cd46317f44d3b99c87e852a6c21c300c0a3ddd36fb6691cdd`. All four supplemental checks and three focused recovery checks pass (40 distinct checks). The report-only delivery commit is tied to these checked bytes by `source-continuity-delivery-v12.json`; tests and application source do not change. Logs/TSVs are in `R5/verify/{root-v12,blocking-v12,cards-v12,seeded-v12,design-v12,direct-v12}`; `final-v12-rollup.json` retains every attempt and identity, with prior failures preserved separately. No inherited exception is needed. The initial runtime collection accidentally globbed two dirty candidate folders; its preserved snapshot and collection-scope note show why they are outside the six canonical lanes. No test or result was changed.
-
-| Verifier | Result | Seconds |
+| Check | Result | Seconds |
 |---|---|---:|
-| verify-corridor | P | 295 |
-| verify-corridor-storage-integrity | P | 1 |
-| verify-corridor-accessibility | P | 43 |
-| lint-ui-language-core | P | 103 |
-| verify-relief | P | 7 |
-| verify-theme-consistency | P | 81 |
-| verify-writing-room | P | 48 |
-| verify-kotoba-mine | P | 109 |
-| verify-n2n1-decks | P | 36 |
-| verify-personal-collections | P | 8 |
-| verify-dojo-door | P | 60 |
-| verify-guided-session | P | 104 |
-| sw-shell | P | 1 |
-| test-navigation-returns | P | 0 |
-| verify-srs-today | P | 259 |
-| verify-experience | P | 162 |
-| verify-drift-hunt | P | 182 |
-| verify-design-reader-shelf | P | 133 |
-| verify-reader-doors | P | 106 |
-| verify-reader-lookup | P | 39 |
-| verify-playback | P | 41 |
-| verify-annotation-lookup | P | 24 |
-| verify-vocabulary-chooser | P | 35 |
-| verify-shelf-search | P | 23 |
-| verify-sentence-drafts | P | 317 |
-| verify-bundled-listening | P | 66 |
-| verify-listening-failures | P | 6 |
-| verify-corridor-doors | P | 54 |
-| verify-pr77-ports | P | 161 |
-| redesign-foundation | P | 34 |
-| redesign-docks | P | 54 |
-| today-sky | P | 79 |
-| language-full | P | 309 |
-| reader-gloss | P | 238 |
-| japanese-lookup-unit | P | 1 |
-| search-lenses | P | 10 |
-| changed-runtime-lint | P | 3 |
-| skip-ui (recovery check) | P | 17.64 |
-| assessment-dojo-label (recovery check) | P | 4.16 |
-| approved-voice (recovery check) | P | 0.24 |
+|verify-corridor|PASS|245|
+|verify-corridor-storage-integrity|PASS|1|
+|verify-corridor-accessibility|PASS|29|
+|lint-ui-language-core|PASS|100|
+|verify-relief|PASS|5|
+|verify-theme-consistency|PASS|61|
+|verify-writing-room|PASS|31|
+|verify-kotoba-mine|FAIL|80|
+|verify-n2n1-decks|PASS|24|
+|verify-personal-collections|PASS|7|
+|verify-dojo-door|PASS|65|
+|verify-guided-session|PASS|101|
+|sw-shell|PASS|1|
+|test-navigation-returns|PASS|0|
+|verify-srs-today|PASS|162|
+|verify-experience|PASS|123|
+|verify-drift-hunt|PASS|174|
+|verify-design-reader-shelf|PASS|119|
+|verify-reader-doors|PASS|76|
+|verify-reader-lookup|PASS|19|
+|verify-playback|PASS|35|
+|verify-annotation-lookup|PASS|19|
+|verify-vocabulary-chooser|PASS|24|
+|verify-shelf-search|PASS|23|
+|verify-sentence-drafts|PASS|234|
+|verify-bundled-listening|PASS|52|
+|verify-listening-failures|PASS|6|
+|verify-corridor-doors|PASS|43|
+|verify-pr77-ports|PASS|144|
+|redesign-foundation|PASS|19|
+|redesign-docks|PASS|32|
+|today-sky|PASS|65|
+|language-full|PASS|290|
+|reader-gloss|PASS|200|
+|japanese-lookup-unit|PASS|1|
+|search-lenses|PASS|10|
+|changed-runtime-lint|PASS|2|
+|verify-player-dock|PASS|39|
+|verify-player-presentation|PASS|16|
+|skip-ui (focused)|PASS|16.29|
+|assessment-dojo-label (focused)|PASS|3.20|
+|approved-voice (focused)|PASS|0.13|
 
-Core: 259/259; accessibility: 53/53; guided: 211/211; writing: 51/51; experience: 42/42; reader/shelf design: fresh unchanged full solo run 49/49 with original G6 geometry intact; reader doors: 93/93 with negative controls; reader gloss: 84/84; docks: 24 Chromium/WebKit cases; Today sky: 81/81; full language: 230 visits, 11,743 inspections, zero issues. The formerly inherited corridor-doors and PR77 suites pass **68/68 and 56/56**. Their stale fault-route and EN label pins are logged with positive interception and unchanged behavioral/negative assertions; this does not count as a product improvement. The navigation unit check retains four exact assertions; recovery checks cover SKIP 58/58, public written-assessment/catalog labels, and approved voice 11/11.
+The Kotoba verifier’s MCD fixture REACH selects12 words, including three wholly clipped prior words and six failing±21px points; its two Focus assertions retain the original0.38 opacity and fail contrast. Export parity passes. Final Design49 runs alone with the original G1/G6 geometry and250ms assertions, after other browser jobs close. The exact first run and any justified failure investigation remain, without hidden retry substitution.
 
-The initial v6 reader/shelf run was **48/49**, failing G1 phone because its fixed 250ms sample saw no third-word popup. The failure screenshot already contains the correct ジャラマナ popup. A passive unchanged actor repeat measured actual insertion at 221.8ms, the correct trusted word target, worker readiness at 214.2ms and no geometry drift/errors. The original latency was not observed; concurrency and first dictionary initialization are a supported inference. The complete unchanged rerun is **49/49**. No assertion, fixed wait or production source was changed to obtain it; both runs and the diagnostic remain. This is a timing limitation of that fixture and lookup path, not a claim of zero historical failures.
+### Delivery boundaries and shipping gate
 
-The first required `$no-mistakes` run ended **failed** at its configured repair timeout; the second ended **failed** during re-review with API ENOTFOUND after committing the room repair and restoring strict verifier pins. Both histories and custody recovery are described above. A fresh required run follows these completed checks with the full original intent, skipping rebase/push/PR/CI for local-only delivery. Its exact result is retained in R5 and reported at delivery; this document does not claim the gate passed. **R5-11 and R5-13 remain pending John's product decisions** about Shelf Tools and graded words within joined archive names. No approve/fix/skip or unattended consent is inferred. This branch is not pushed.
+Small described commits preserve the strict-review-first sequence (`a5de2582`) and the gate’s prior repair commit (`2208ed7b`). Main changes are corridor room/player/Drift/font/SW styles and runtime, existing export builders/two actual Kotoba pages, and the scoped verifiers/docs; full changed-file inventory is `R5/changed-files-final-v15.txt`. No node_modules edit, push, PR, merge, history rewrite or worktree removal was performed.
 
+`identity-scope-final-v15.json` compares protected actual contracts against e34841f1: FSRS pin, player engine, N2/N1 source, four complete deck bodies except permitted display titles,22 storage/record declarations/envelope and two cloze-key templates remain equal. Card/Anki IDs, frozen tokens and storage keys are preserved. Source/AST equality is used for these explicit protected contracts, not as proof of UI behavior. All behavior assertions above execute their real consumers.
 
-### October 11 terminal audit follow-up
+Pending product decisions remain R5-11 (Shelf Tools closing/query results), R5-13 (graded-word doors inside joined archive names), and the incompatible Focus fade/contrast requirements. No reply or approval is inferred. Physical iPhone speed/safe-area behavior, full-dialog localization, first-human-visible font paint under permanent missing assets, approved audio and John’s craft reaction remain outside successful proof.
 
-The fresh required run `01M4K6Z3DS734DHK7GXFBF3K2K` ended **failed** at its configured 30-minute review timeout, with its agent still producing output. No structured findings, gate approval, fix commits or completed test/lint phases were returned. Structured branch_sync reports user_owned/equal at `c2c8f031`; no sync or recovery is needed. Its terminal full log is `no-mistakes-review-final-v12-terminal-full.log`. No gate pass is claimed.
-
-The static audits expose limits in the v12 evidence: actual tracked Kotoba standalone pages still embed the old player; the reduced-motion player verifier accepts settled short non-opacity effects; offline uncached font chunks fall back to OS fonts; two UI glyphs and canvas fonts were outside the settled font tour; JavaScript creates colour/stroke motion outside the clean CSS audit; and long-front/nonzero-safe-area Undo plus an open reduced-motion outgoing fold were outside the earlier physical poses. Repairs and new runtime evidence follow. V12 green receipts remain historical observations of their exact source and tested scope, not proof that these additional cases pass. The after-score table must be reassessed before final delivery.
+Three earlier required NoMistakes attempts ended failed: configured repair timeout; API ENOTFOUND after a preserved mechanical room repair; configured30-minute review timeout with no structured findings or completed test/lint. No gate pass is claimed. A fresh local-only run follows this completed battery, with full original intent and rebase/push/PR/CI skipped under the brief. Its exact terminal result or formally parked user decision is reported separately at delivery. No gate outcome grants mutation/shipping authority.
