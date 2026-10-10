@@ -1293,7 +1293,7 @@ export function createAssessmentView(host) {
     const grid = node('div', 'exam-question-grid');
     ids.forEach((id, i) => {
       const saved = attempt.answers.find(row => row.item.id === id);
-      const control = button(`${i + 1}${saved.flagged ? ' ⚑' : saved.response.kind !== 'unanswered' ? ' ✓' : ''}${saved.assistance ? ' 助' : ''}`, null,
+      const control = button(`${i + 1}${saved.flagged ? tx(' 目印', ' Mark') : saved.response.kind !== 'unanswered' ? ' ✓' : ''}${saved.assistance ? ' 助' : ''}`, null,
         () => command({ kind: 'visit', itemId: id }));
       control.setAttribute('aria-label', tx(`${i + 1}問目${saved.flagged ? '、要見直し' : ''}${saved.assistance ? '、助けあり' : ''}`,
         `Question ${i + 1}${saved.flagged ? ', flagged' : ''}${saved.assistance ? ', assisted' : ''}`));

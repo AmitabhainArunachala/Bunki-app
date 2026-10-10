@@ -44,7 +44,8 @@ const slice = (after, before, label) => {
 let rawCss = slice('<style>', '</style>', 'style block').replace(/\/\*[\s\S]*?\*\//g, '');
 // The donor stays frozen. Presentation state changes land immediately; only
 // transform and opacity interpolate in the fused app (VISION §10.2 check 6).
-// Exact-once anchors keep a donor change from silently escaping this policy.
+// Exact-once anchors pin the known donor declarations; the final policy
+// guard also rejects any new interpolated property after extraction.
 const cssPatch = (from, to, label) => {
   const first = rawCss.indexOf(from);
   if (first < 0 || rawCss.indexOf(from, first + from.length) >= 0)
@@ -225,6 +226,95 @@ patch('pts.forEach((p,i)=>{i?fctx.lineTo(p.x,p.y):fctx.moveTo(p.x,p.y);});',
   'pts.forEach((p,i)=>{if(i)fctx.lineTo(p.x,p.y);else fctx.moveTo(p.x,p.y);});', 'explicit trail drawing');
 patch('let ack=false;', 'let ack;', 'branch-assigned acknowledgement');
 patch('if(wr.lk){}', 'if(wr.lk){/* Locked words keep their anchored position. */}', 'intentional locked position');
+
+// Canvas rasterization cannot use font-display's later swap: a hub sprite
+// would retain the first fallback pixels forever. Wait per label before
+// drawing it, without pausing the field or changing its gesture/physics loop.
+patch('const TAU=Math.PI*2;', `const TAU=Math.PI*2;
+const canvasLabelsReady=new Set(),canvasLabelsLoading=new Set(),canvasLabelsRetryAt=new Map();
+const canvasFontRepairs=new Map();
+const fontName=value=>value.replace(/["']/g,"").trim();
+const fontRange=value=>value.replace(/\\s/g,"").toUpperCase().replace(/U\\+0+([0-9A-F])/g,"U+$1").replace(/-0+([0-9A-F])/g,"-$1");
+function fontRangeCovers(range,text){
+  return [...text].some(character=>range.split(",").some(part=>{
+    const bounds=part.trim().replace(/^U\\+/i,"").split("-");
+    const low=parseInt(bounds[0].replace(/\\?/g,"0"),16);
+    const high=parseInt((bounds[1]||bounds[0]).replace(/\\?/g,"F"),16);
+    return character.codePointAt(0)>=low&&character.codePointAt(0)<=high;
+  }));
+}
+async function loadBundledFont(font,text){
+  try{return await document.fonts.load(font,text);}catch(error){
+    // An errored CSS FontFace cannot be retried by FontFaceSet.load alone.
+    // Recreate only the failed, matching bundled declarations, then install
+    // their loaded faces. This works for local URLs and standalone data URLs.
+    const failed=[...document.fonts].filter(face=>face.status==="error");
+    const repairs=[];
+    for(const sheet of document.styleSheets){
+      let rules;try{rules=sheet.cssRules;}catch{continue;}
+      for(const rule of rules){
+        if(rule.type!==5)continue;
+        const style=rule.style,family=fontName(style.fontFamily);
+        if(!font.includes('"'+family+'"')||!fontRangeCovers(style.unicodeRange,text)||
+          !failed.some(face=>fontName(face.family)===family&&fontRange(face.unicodeRange)===fontRange(style.unicodeRange)&&face.weight===style.fontWeight))continue;
+        const key=family+":"+style.fontWeight+":"+fontRange(style.unicodeRange);
+        if(!canvasFontRepairs.has(key)){
+          const source=style.getPropertyValue("src").replace(/url\\((['"]?)([^'")]+)\\1\\)/g,(_match,_quote,url)=>'url("'+new URL(url,sheet.href||document.baseURI).href+'")');
+          const face=new window.FontFace(family,source,{style:style.fontStyle,weight:style.fontWeight,unicodeRange:style.unicodeRange,display:"block"});
+          const loading=face.load().then(loaded=>{
+            document.fonts.add(loaded);
+            // The failed CSS-connected face remains in FontFaceSet even
+            // after an equivalent loaded face is added. Retire just its
+            // declaration after the replacement is ready, using identity
+            // rather than an index that another completed repair may shift.
+            const index=[...sheet.cssRules].indexOf(rule);
+            if(index>=0)sheet.deleteRule(index);
+            return loaded;
+          });
+          canvasFontRepairs.set(key,loading);
+          loading.catch(()=>{canvasFontRepairs.delete(key);});
+        }
+        repairs.push(canvasFontRepairs.get(key));
+      }
+    }
+    if(!repairs.length)throw error;
+    await Promise.all(repairs);
+    return document.fonts.load(font,text);
+  }
+}
+function canvasLabelReady(text){
+  if(canvasLabelsReady.has(text))return true;
+  if(!canvasLabelsLoading.has(text)&&document.fonts&&performance.now()>=(canvasLabelsRetryAt.get(text)||0)){
+    canvasLabelsLoading.add(text);
+    loadBundledFont('13px "Noto Serif JP"',text).then(faces=>{
+      if(faces.length&&document.fonts.check('13px "Noto Serif JP"',text))canvasLabelsReady.add(text);
+    }).catch(()=>{/* Keep unready labels out of the raster, never cache fallback ink. */})
+      .finally(()=>{canvasLabelsLoading.delete(text);canvasLabelsRetryAt.set(text,performance.now()+3000);});
+  }
+  return false;
+}
+addEventListener("online",()=>{canvasLabelsRetryAt.clear();});
+if(navigator.serviceWorker){
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{canvasLabelsRetryAt.clear();});
+  navigator.serviceWorker.ready.then(()=>{canvasLabelsRetryAt.clear();}).catch(()=>{});
+}`, 'canvas bundled face readiness');
+for(const size of [13,84,11])patch(
+  `${size}px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif`,
+  `${size}px "Noto Serif JP"`, `bundled canvas face ${size}px`);
+patch('fctx.fillText(p.lb,p.x,p.y-10);',
+  'if(canvasLabelReady(p.lb))fctx.fillText(p.lb,p.x,p.y-10);', 'trail font ready before raster');
+patch('if(!sp2){\n      sp2=document.createElement("canvas");',
+  'if(!sp2){\n      if(!canvasLabelReady(h))continue;\n      sp2=document.createElement("canvas");', 'hub font ready before sprite cache');
+patch('fctx.fillText(wr.e[0],wr.sx,wr.sy-8);',
+  'if(canvasLabelReady(wr.e[0]))fctx.fillText(wr.e[0],wr.sx,wr.sy-8);', 'focus font ready before raster');
+patch('transform .95s cubic-bezier(.3,.6,.4,1), opacity .95s, color .3s',
+  'transform .95s cubic-bezier(.3,.6,.4,1), opacity .95s', 'grade only transform and opacity');
+patch('p2.style.transition="stroke-dashoffset "+d2+"ms ease-out";\n        p2.style.strokeDashoffset="0";',
+  'p2.style.transition="opacity "+d2+"ms ease-out";\n        p2.style.strokeDashoffset="0";\n        p2.style.opacity="1";', 'stroke preview opacity reveal');
+patch('p.style.strokeDashoffset=L;',
+  'p.style.strokeDashoffset="0";\n      p.style.opacity="0";', 'stroke preview starts as hidden complete path');
+patch('p2._num.style.transition="opacity .5s";',
+  'p2._num.style.transition=reduced?"opacity 80ms":"opacity .5s";', 'stroke preview number reduced fade');
 
 // 1 · wrap + gate flag + self-mount. The markup is injected before any of the
 // script's parse-time getElementById calls run, so load order is one line in
@@ -726,6 +816,7 @@ function setRecordBridge(bridge){
 // 4 · the public seam the corridor drives
 js += `
 window.__DRIFT__ = {
+  loadBundledFont,
   setRecordBridge,
   refreshRecord,
   setPracticePriorities,
@@ -758,6 +849,23 @@ const cssOut = css.replace(/#tray\b/g, '#drift-tray');
 // splice the markup into the mount snippet; guard the one sequence that can
 // end an inline <script> early when the standalone build embeds this file
 js = js.replace('__MARKUP_JSON__', JSON.stringify(markup));
+// Audit both extracted CSS and JS-created transitions. A new donor property
+// must fail the generator even when it was not one of the exact patch anchors.
+const transitionParts = (value) => value.split(/,(?![^()]*\))/).map((part) => part.trim());
+const checkTransitions = (value, label) => {
+  for (const part of transitionParts(value)) {
+    const property = part.split(/\s+/)[0];
+    if (!['transform', 'opacity', 'none'].includes(property))
+      throw new Error(`non-compositor transition in ${label}: ${part}`);
+  }
+};
+for (const match of cssOut.matchAll(/\btransition(?:-property)?\s*:\s*([^;}]+)/g))
+  checkTransitions(match[1], 'extracted CSS');
+for (const match of js.matchAll(/\.style\.transition\s*=\s*([^;]+);/g)) {
+  const literals = [...match[1].matchAll(/(["'])(.*?)\1/g)].map((literal) => literal[2]);
+  if (!literals.length) throw new Error('JS transition has no auditable property');
+  checkTransitions(literals.join(''), 'extracted JS');
+}
 if (js.includes('</script')) {
   throw new Error('emitted js contains "</script" — standalone embedding would truncate');
 }

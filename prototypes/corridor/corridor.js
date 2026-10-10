@@ -12165,7 +12165,7 @@ function renderTray(main) {
       // 直す・消す — rename and delete live where the list lives; deleting a
       // list never touches its items' taken status (the list is curation,
       // the deck is the deck)
-      const ren = el('button', 'list-op', '✎');
+      const ren = el('button', 'list-op', tx('名前', 'Rename'));
       ren.type = 'button';
       ren.setAttribute('aria-label', tx(`「${sec.name}」の名前を変える`, `rename ${sec.name}`));
       ren.addEventListener('click', () => {
@@ -28240,7 +28240,7 @@ function inkGroundFor(world, size) {
     g.stroke();
   } else {
     grad(['#081218', '#050d12', '#03080c'], 0.3);
-    g.font = `${9 * u}px monospace`;
+    g.font = `${9 * u}px "Roboto Mono","Noto Sans JP"`;
     for (let col = 0; col < 16; col++) {
       const x = ((col + 0.5) * S) / 16;
       let y = r() * S;
@@ -28248,7 +28248,7 @@ function inkGroundFor(world, size) {
       for (let i = 0; i < n; i++) {
         const ch = PAPER_KATA[(r() * PAPER_KATA.length) | 0];
         g.fillStyle = `rgba(55,232,176,${(0.03 + r() * 0.09) * (1 - (i / n) * 0.6)})`;
-        g.fillText(ch, x, y + i * 12 * u);
+        if (paperFontsReady) g.fillText(ch, x, y + i * 12 * u);
       }
     }
     for (let i = 0; i < 3; i++) {
@@ -28298,7 +28298,10 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     // it approves takes AnimCJK's true brush outlines — the gallery hand;
     // everything else, 経 and 衷 among them, keeps the canonical KanjiVG
     // geometry. Both paint through the same fluid-ink engine.
-    const [INK, glyph] = await Promise.all([ensureInkModule(), animcjkGlyphFor(ch)]);
+    const [INK, glyph] = await Promise.all([
+      ensureInkModule(), animcjkGlyphFor(ch),
+      THEME_UI[themeIx()].paper === 'terminal' ? ensurePaperFonts() : undefined,
+    ]);
     if (inkRoom !== room || !document.contains(canvas)) return;
     // 没入 — one paper to every edge. The room ground is painted once,
     // large enough that the sheet's own texture is its exact centre crop:
@@ -29876,6 +29879,24 @@ const PAPER_SEED = {
   terminal: 59,
 };
 const PAPER_KATA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789';
+let paperFontsReady = false;
+let paperFontsLoading;
+function ensurePaperFonts() {
+  if (paperFontsReady) return Promise.resolve(true);
+  if (!paperFontsLoading && document.fonts) {
+    const load = window.__DRIFT__?.loadBundledFont || document.fonts.load.bind(document.fonts);
+    paperFontsLoading = Promise.all([
+      load('9px "Roboto Mono"', '0123456789'),
+      load('9px "Noto Sans JP"', PAPER_KATA),
+    ]).then((faces) => {
+      paperFontsReady = faces.every((rows) => rows.length > 0) &&
+        document.fonts.check('9px "Roboto Mono"', '0123456789') &&
+        document.fonts.check('9px "Noto Sans JP"', PAPER_KATA);
+      return paperFontsReady;
+    }).catch(() => false).finally(() => { paperFontsLoading = undefined; });
+  }
+  return paperFontsLoading || Promise.resolve(false);
+}
 const PAPER_MAX_PIXELS = 1.6e6;
 const paperCache = new Map();
 let paperGrowToken = 0;
@@ -30100,7 +30121,7 @@ function paintPaper(g, w, h, world, base) {
   } else {
     // 殻 terminal black — faint glyph rain and scanlines
     wash([[0, 'rgba(30,70,80,0.03)'], [1, 'rgba(0,0,0,0.05)']], 0.3);
-    g.font = `${9 * u}px monospace`;
+    g.font = `${9 * u}px "Roboto Mono","Noto Sans JP"`;
     for (let col = 0; col < 16; col++) {
       const x = ((col + 0.5) * w) / 16;
       let y = r() * h;
@@ -30108,7 +30129,7 @@ function paintPaper(g, w, h, world, base) {
       for (let i = 0; i < n; i++) {
         const ch = PAPER_KATA[(r() * PAPER_KATA.length) | 0];
         g.fillStyle = `rgba(55,232,176,${(0.02 + r() * 0.05) * (1 - (i / n) * 0.6)})`;
-        g.fillText(ch, x, y + i * 12 * u);
+        if (paperFontsReady) g.fillText(ch, x, y + i * 12 * u);
       }
     }
     for (let i = 0; i < 3; i++) {
@@ -30141,7 +30162,13 @@ function applyPaper(id) {
   }
   // never leave the OLD world's paper hanging over the NEW world's ground
   root.style.setProperty('--paper-url', 'none');
-  const grow = () => {
+  const grow = async () => {
+    if (world.paper === 'terminal' && !(await ensurePaperFonts())) {
+      // Never cache a blank or fallback-font texture after a transient face
+      // failure. Keep the flat ground and retry off the interaction beat.
+      setTimeout(() => { if (token === paperGrowToken) applyPaper(id); }, 3000);
+      return;
+    }
     if (token !== paperGrowToken) return; // superseded by a newer world/viewport
     try {
       const cv = document.createElement('canvas');

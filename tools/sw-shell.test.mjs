@@ -11,7 +11,7 @@
  * exist and be a required release asset (scripts/corridor-assets.mjs), or a
  * stamped install rejects and the worker never installs.
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { URL, fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -46,6 +46,7 @@ function loadWorker(existing) {
       registration: { scope: SCOPE },
     },
     URL,
+    fetch: async () => ({ ok: true, text: async () => readFileSync(resolve(CORRIDOR, 'fonts.css'), 'utf8') }),
     Request: class {
       constructor(url) {
         this.url = url;
@@ -139,6 +140,9 @@ describe('sw.js shell', () => {
     ]);
     await run('install');
     for (const path of shell) expect(record.added, path).toContain(new URL(path, SCOPE).href);
+    const fonts = readdirSync(resolve(CORRIDOR, 'fonts')).filter((name) => name.endsWith('.woff2'));
+    expect(fonts.length).toBeGreaterThan(400);
+    for (const name of fonts) expect(record.added, name).toContain(new URL(`fonts/${name}`, SCOPE).href);
     await run('activate');
     expect(record.deleted).toEqual([older]);
   });

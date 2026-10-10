@@ -1,4 +1,7 @@
-/* 回廊's service worker: a successful install includes the complete boot core.
+/* 回廊's service worker: a successful install includes the complete boot core
+ * and every bundled font. First installation downloads about 21 MB of fonts;
+ * offline type is ready after navigator.serviceWorker.ready resolves. The
+ * first online screen stays usable while the worker installs in parallel.
  *
  * The boot shell and data stay on one installed version, online or offline.
  * A new worker waits for the old app's windows to close before activation;
@@ -13,7 +16,7 @@
 // The release builder prepends the SHA-256 of its sorted source asset paths
 // and digests. Every packaged change then gets a distinct atomic boot cache.
 // Unstaged development installs retain an explicit manually bumped fallback.
-const DEVELOPMENT_VERSION = 'kairo-v11-dev';
+const DEVELOPMENT_VERSION = 'kairo-v13-dev';
 const assetVersion = self.KAIRO_ASSET_VERSION;
 if (
   assetVersion !== undefined &&
@@ -178,6 +181,7 @@ const GUIDED_ROOM = [
   'guided/sets/index.json',
 ];
 const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
+const fontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
 const PRECACHE_URLS = new Set(
   [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM].map((path) => new URL(path, SCOPE).href),
 );
@@ -344,8 +348,17 @@ self.addEventListener('install', (event) => {
     (async () => {
       if (!STAMPED) {
         // Explicit development fallback: no production generation guarantee.
+        // Use the same declared font paths as the app instead of maintaining
+        // a partial subset that silently falls through to platform type.
+        const fontCss = await networkAsset(assetUrl('fonts.css'));
+        if (!fontCss.ok) throw new Error('bundled font stylesheet unavailable');
+        const fontPaths = [...(await fontCss.text()).matchAll(/url\(\s*['"]?(fonts\/[^\s'"()]+\.woff2)['"]?\s*\)/g)]
+          .map((match) => match[1]);
+        if (!fontPaths.length || fontPaths.some((path) => !fontAsset(path)))
+          throw new Error('bundled font paths missing or invalid');
         const cache = await caches.open(CACHE_NAME);
-        await cache.addAll([...PRECACHE_URLS].map((url) => new Request(url, { cache: 'reload' })));
+        const urls = new Set([...PRECACHE_URLS, ...fontPaths.map(assetUrl)]);
+        await cache.addAll([...urls].map((url) => new Request(url, { cache: 'reload' })));
         return;
       }
       const [identity, worker] = await Promise.all([
@@ -354,9 +367,11 @@ self.addEventListener('install', (event) => {
       ]);
       const release = await validateRelease(identity, worker);
       const guided = [...release.entries.values()].map((entry) => entry.path).filter(guidedAsset);
+      const fonts = [...release.entries.values()].map((entry) => entry.path).filter(fontAsset);
+      if (!fonts.length) throw new Error('release bundled fonts missing');
       const urls = [
         ...new Set(
-          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided].map(
+          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided, ...fonts].map(
             assetUrl,
           ),
         ),
@@ -440,7 +455,7 @@ self.addEventListener('fetch', (event) => {
   // API traffic (the report service) is live by nature: never a release asset, never answered
   // from the installed version — it goes to the network, or fails as the network fails
   if (/^api\//.test(relativePath)) return;
-  const isContent = /^(data|vendor|design|modules)\//.test(relativePath);
+  const isContent = /^(data|vendor|design|modules|fonts)\//.test(relativePath);
   const navigation = request.mode === 'navigate';
   const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;
   const task = (async () => {
