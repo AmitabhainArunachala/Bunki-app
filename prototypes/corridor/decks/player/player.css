@@ -942,7 +942,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* Short reading windows keep the complete control row compact, with the same 44px hit reaches. */
 @media (max-height: 720px) and (min-width: 375px) {
   .kp .kp-card[data-window-controls] { gap: 8px; }
-  .kp .kp-card[data-window-controls] .kp-chips { flex-wrap: nowrap; gap: 4px; }
+  .kp .kp-card[data-window-controls] .kp-chips { flex-wrap: wrap; gap: 3px; }
   .kp .kp-card[data-window-controls] .kp-eyebrow { flex: 0 0 auto; order: 0; }
   .kp .kp-card[data-window-controls] .kp-chip { padding-inline: 2px; }
   .kp .kp-card[data-window-controls] .kp-zoom { margin-left: 0; }

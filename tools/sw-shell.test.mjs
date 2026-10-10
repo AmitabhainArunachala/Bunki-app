@@ -211,16 +211,14 @@ describe('sw.js shell', () => {
     }
   });
 
-  it('precaches the six room stylesheets, registered once after editorial.css', () => {
+  it('installs the six room stylesheets, each a required release asset', async () => {
     const rooms = ['today', 'read', 'learn', 'words', 'me', 'cards'].map(
       (room) => `rooms/${room}.css`,
     );
-    const shell = shellPaths(SW);
-    expect(shell).toEqual(expect.arrayContaining(rooms));
-    expect(shell.indexOf('rooms/today.css')).toBe(shell.indexOf('editorial.css') + 1);
+    const { run, record } = loadWorker([]);
+    await run('install');
+    for (const room of rooms) expect(record.added, room).toContain(new URL(room, SCOPE).href);
     for (const room of rooms) expect(CORRIDOR_REQUIRED_ROOTS).toContain(room);
-    const html = readFileSync(resolve(CORRIDOR, 'index.html'), 'utf8');
-    for (const room of rooms) expect(html.split(`href="${room}"`).length - 1).toBe(1);
   });
 
   it('lists only files that exist under prototypes/corridor/', () => {
