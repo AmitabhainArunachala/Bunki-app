@@ -2748,7 +2748,7 @@ async function main() {
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
     const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
-    check('?deck=kotoba opens the sentence deck: a real sentence with the word marked, in the current app world', sent.blank === 0 && sent.look === 'world', JSON.stringify(sent));
+    check('?deck=kotoba opens the sentence deck: a real sentence with the word marked, in its own dark look by day', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
 
     // 覚える is one tap (round-1 save path): the row is written through the
     // guarded commit at once, and the list drawer opens under the finger so

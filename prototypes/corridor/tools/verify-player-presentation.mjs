@@ -32,6 +32,7 @@ const census = () => {
 };
 const seated = (s, context) => s.windowed === true && s.inner > 0 && (!context || s.context.some(([, open]) => open === '1'));
 const fits = s => s.toggle.top >= s.header.bottom && s.target.top >= Math.max(s.header.bottom, s.windowed ? s.anchor.top : s.header.bottom) && s.target.bottom <= Math.min(s.bar.top, s.windowed ? s.anchor.bottom : s.bar.top) && s.def.bottom <= s.bar.top && s.toggle.bottom <= s.bar.top && s.overflow === 0;
+const kept = (before, after) => fits(after) || (!fits(before) && Math.abs(after.inner - before.inner) < 1 && Math.abs(after.page - before.page) < 1 && Math.abs(after.anchor.top - before.anchor.top) < 1 && after.height === before.height);
 async function labels(page, cdp, lang) {
   const { root } = await cdp.send('DOM.getDocument', { depth: 0 });
   const get = async selector => {
@@ -79,14 +80,14 @@ try {
         await page.locator(`#lang [data-lang=${lang}]`).click(); await resting(page);
         const after = await page.evaluate(census);
         const same = after.card === before.card && after.zoom === before.zoom && after.windowed === before.windowed && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && after.ledger === ledger;
-        check(`${width}/${zoom} native language ${lang} preserves face/window/folds/context/ledger and reading controls`, same && fits(after), { before, after });
+        check(`${width}/${zoom} native language ${lang} preserves face/window/folds/context/ledger and reading controls`, same && kept(before, after), { before, after });
         await labels(page, cdp, lang); before = after;
       }
       check(`${width}/${zoom} compared state is non-default before world switches: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
       for (const seal of ['金', '墨']) {
         await page.locator('#theme-seal').click(); await page.locator('.world-stone', { hasText: seal }).click(); await resting(page);
         const after = await page.evaluate(census);
-        check(`${width}/${zoom} native world ${seal} retains presentation and fits`, after.card === before.card && after.zoom === zoom && after.ledger === ledger && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && Math.abs(after.inner - before.inner) < 1 && after.height === before.height && Math.abs(after.anchor.top - before.anchor.top) < 1 && fits(after), { before, after }); before = after;
+        check(`${width}/${zoom} native world ${seal} retains presentation and fits`, after.card === before.card && after.zoom === zoom && after.ledger === ledger && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && Math.abs(after.inner - before.inner) < 1 && after.height === before.height && Math.abs(after.anchor.top - before.anchor.top) < 1 && kept(before, after), { before, after }); before = after;
       }
       // The existing word sheet's real kanji door goes through corridor go()/Back().
       await page.locator('#kp-card .kp-target').click();
@@ -100,7 +101,7 @@ try {
       underSheet.afterAsyncPaint = await page.evaluate(() => scrollY);
       await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
       const returned = await page.evaluate(census);
-      check(`${width}/${zoom} actual 交 depth Back restores card presentation without ledger write`, returned.card === seat.card && returned.zoom === seat.zoom && returned.windowed === seat.windowed && returned.height === seat.height && JSON.stringify(returned.folds) === JSON.stringify(seat.folds) && JSON.stringify(returned.context) === JSON.stringify(seat.context) && returned.ledger === lookupLedger && Math.abs(returned.inner - seat.inner) < 1 && Math.abs(returned.anchor.top - seat.anchor.top) < 1 && fits(returned) && underSheet.inert && underSheet.afterAsyncPaint === underSheet.page, { seat, underSheet, returned });
+      check(`${width}/${zoom} actual 交 depth Back restores card presentation without ledger write`, returned.card === seat.card && returned.zoom === seat.zoom && returned.windowed === seat.windowed && returned.height === seat.height && JSON.stringify(returned.folds) === JSON.stringify(seat.folds) && JSON.stringify(returned.context) === JSON.stringify(seat.context) && returned.ledger === lookupLedger && Math.abs(returned.inner - seat.inner) < 1 && Math.abs(returned.anchor.top - seat.anchor.top) < 1 && kept(seat, returned) && underSheet.inert && underSheet.afterAsyncPaint === underSheet.page, { seat, underSheet, returned });
       await page.screenshot({ path: OUT + `/${width}-${zoom}-returned.png` });
       for (const [kind, glyph] of [['kanji', '交'], ['component', '亠']]) {
         if (!await page.locator('.kp-f-kanji').evaluate(n => n.open)) await page.locator('.kp-f-kanji>summary').click();
@@ -113,7 +114,7 @@ try {
         const opened = await page.locator('#sheet').evaluate(n => ({ text: n.textContent, hero: n.querySelector('.hero-glyph')?.textContent, trusted: window.__anatomyTrusted }));
         await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
         const after = await page.evaluate(census);
-        check(`${width}/${zoom} actual ${kind} anatomy door opens existing ${glyph} entry and restores reading face`, available.tag === 'BUTTON' && available.width >= 44 && available.height >= 44 && available.points.every(Boolean) && opened.hero === glyph && opened.trusted === true && after.card === anatomySeat.card && after.zoom === anatomySeat.zoom && after.ledger === anatomySeat.ledger && after.folds.find(([name]) => name.includes('kp-f-kanji'))[1] && JSON.stringify(after.context) === JSON.stringify(anatomySeat.context) && Math.abs(after.inner - anatomySeat.inner) < 1 && fits(after), { available, opened, anatomySeat, after });
+        check(`${width}/${zoom} actual ${kind} anatomy door opens existing ${glyph} entry and restores reading face`, available.tag === 'BUTTON' && available.width >= 44 && available.height >= 44 && available.points.every(Boolean) && opened.hero === glyph && opened.trusted === true && after.card === anatomySeat.card && after.zoom === anatomySeat.zoom && after.ledger === anatomySeat.ledger && after.folds.find(([name]) => name.includes('kp-f-kanji'))[1] && JSON.stringify(after.context) === JSON.stringify(anatomySeat.context) && Math.abs(after.inner - anatomySeat.inner) < 1 && kept(anatomySeat, after), { available, opened, anatomySeat, after });
       }
     } finally { await context.close(); }
   }

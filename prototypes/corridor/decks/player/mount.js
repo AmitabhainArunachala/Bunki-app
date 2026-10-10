@@ -159,6 +159,7 @@ function restorePresentation(saved, { seat = true } = {}) {
     passage.style.setProperty('--kp-window-h', saved.height);
     watchWindowEdges(passage, face);
   }
+  placeWindowControls(face, passage, saved.windowed);
   passage.scrollTop = saved.inner;
   fitClamps(face);
   if (!seat || externalSheet()) return;
@@ -185,20 +186,21 @@ function backFits() {
   return toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1 && clearTarget && def.getBoundingClientRect().bottom <= bottom + 1;
 }
 
-/** World fonts can reflow in place. Refit only when reading controls that fitted no longer do. */
-function refitBack(saved) {
+/** World fonts can reflow in place. Refit only when reading controls that fitted no longer do;
+ * the learner's own Full/Focus choice rebuilds the passage, so it always refits. */
+function refitBack(saved, always = false) {
   if (!ui.revealed || externalSheet()) return;
-  if (saved.fitted !== true || backFits() !== false) return;
+  if ((!always && saved.fitted !== true) || backFits() !== false) return;
   windowPassage(saved.inner, window.scrollY);
   settleBack();
 }
-export async function refitPresentation() {
+export async function refitPresentation(always = false) {
   const saved = capturePresentation(), owner = ctx;
   if (!saved || externalSheet()) return;
   await document.fonts.ready;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   if (ctx !== owner || !presentationMatches(saved)) return;
-  refitBack(saved);
+  refitBack(saved, always);
 }
 
 const stateKey = (id) => `bunki-cloze:${id}`;
@@ -207,8 +209,10 @@ const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
 /** a stored ledger this player could not read, set aside before anything is saved over it */
 const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
+const NIGHT_WORLDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
+const keepsDarkByDay = (deck) => deck.defaults?.look === 'dark' && !NIGHT_WORLDS.includes(document.documentElement.dataset.theme);
 function prefsFor(storage, deck, followWorld = false) {
-  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(followWorld ? { look: 'world' } : {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
+  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(followWorld && !keepsDarkByDay(deck) ? { look: 'world' } : {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
 }
 function readJson(storage, key) {
   try {
@@ -1107,7 +1111,7 @@ function zoomToggle(zoom) {
       if (face) face.dataset.zoom = value;
       for (const x of wrap.querySelectorAll('.kp-zoom-btn')) x.setAttribute('aria-pressed', String(x === b));
       if (face) fitClamps(face);
-      refitPresentation();
+      refitPresentation(true);
     }, { id: `kp-zoom-${value}`, 'aria-pressed': String(zoom === value) });
     wrap.append(b);
   }
@@ -2106,6 +2110,15 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  * front fades. A fold row the pads would cut is lifted wholly above them.
  * When no window fits (a very short screen) the page keeps its place and settleBack scrolls it as before.
  */
+/** A fitted reading window sits directly under the fixed chrome, so the card's chip row
+ * (level, kind and Full/Focus) moves below it; an unwindowed passage keeps the row above. */
+function placeWindowControls(face, passage, windowed) {
+  face.toggleAttribute('data-window-controls', !!windowed);
+  const chips = face.querySelector('.kp-chips');
+  if (!chips) return;
+  if (windowed) passage.after(chips);
+  else passage.before(chips);
+}
 const WINDOW_LINES = 3;
 const WINDOW_REACH = 12;
 function windowPassage(from, page = from) {
@@ -2120,12 +2133,11 @@ function windowPassage(from, page = from) {
   const tf = getComputedStyle(def.parentElement).transform;
   const lift = tf && tf !== 'none' ? new DOMMatrixReadOnly(tf).m42 : 0; // kp-rise: measure where it lands
   const barTop = Math.min(innerHeight, bar.getBoundingClientRect().top);
+  placeWindowControls(face, passage, true);
   const box = passage.getBoundingClientRect();
   const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
-  // Keep the Full/Focus row above the window as well as the word and definition below it.
-  const chips = face.querySelector('.kp-chips');
-  const head = chips?.getBoundingClientRect() || box;
-  const seat = head.top - topInset() - SETTLE_GAP;
+  // The window seats directly under the chrome; the chip row, word and definition are budgeted below it.
+  const seat = box.top - WINDOW_REACH - topInset() - SETTLE_GAP;
   let over = def.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
   for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
     const r = s.getBoundingClientRect();
@@ -2135,6 +2147,7 @@ function windowPassage(from, page = from) {
     break;
   }
   if (over < 1 || box.height - over < WINDOW_LINES * line) {
+    placeWindowControls(face, passage, false);
     window.scrollTo({ top: page, behavior: 'instant' });
     return;
   }
