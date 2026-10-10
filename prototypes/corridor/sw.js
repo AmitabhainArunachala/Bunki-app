@@ -1,10 +1,12 @@
 /* 回廊's service worker: a successful install includes the complete boot core
  * and no bundled font. Each font is verified and cached the first time a page
- * requests it. After activation a background fill copies the fonts whose
- * digests match this release from the previous version's cache, then fetches
- * the rest a few at a time. That fill holds no install, activation or update
- * promise, and a font it cannot get is left for its first request, so offline
- * type is complete only once the fill or the pages have fetched it.
+ * requests it. Activation drops an older version's boot assets and keeps its
+ * fonts. A background fill copies those whose digests match this release,
+ * removes each older font once it is copied or known not to match, then
+ * fetches the rest a few at a time. A stopped worker resumes the fill on its
+ * next fetch. The fill holds no install, activation or update promise, and a
+ * font it cannot get is left for its first request, so offline type is
+ * complete only once the fill or the pages have fetched it.
  *
  * The boot shell and data stay on one installed version, online or offline.
  * A new worker waits for the old app's windows to close before activation;
@@ -186,6 +188,7 @@ const GUIDED_ROOM = [
 ];
 const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
 const fontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
+const fontUrl = (url) => url.startsWith(SCOPE) && fontAsset(url.slice(SCOPE.length));
 const PRECACHE_URLS = new Set(
   [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM].map((path) => new URL(path, SCOPE).href),
 );
@@ -393,10 +396,20 @@ self.addEventListener('install', (event) => {
   );
 });
 
-async function reusedFont(previous, url, entry) {
-  for (const cache of previous) {
-    const reused = await Promise.resolve()
-      .then(() => cache.match(url))
+// CacheStorage is origin-wide. Even another KAIRO installation on a
+// different Pages subpath owns its own cache. Legacy unscoped keys are
+// left alone because this worker cannot prove exclusive ownership.
+const otherGenerations = () =>
+  caches
+    .keys()
+    .then((keys) => keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME));
+
+async function reusedFont(url, entry) {
+  const names = await otherGenerations().catch(() => []);
+  for (const name of names) {
+    const reused = await caches
+      .open(name)
+      .then((source) => source.match(url))
       .then((hit) => hit && verifiedResponse(hit, entry))
       .catch(() => undefined);
     if (reused) return reused;
@@ -408,26 +421,50 @@ async function fetchedFont(url, entry) {
   return verifiedResponse(await networkAsset(url), entry);
 }
 
-/** Never awaited by a lifecycle event. Every font is settled on its own. */
-async function fillFonts(previous) {
+async function pruneGeneration(name) {
+  const source = await caches.open(name);
+  const requests = await source.keys();
+  const stale = requests.filter((request) => !fontUrl(request.url));
+  await Promise.all(stale.map((request) => source.delete(request)));
+  if (stale.length === requests.length) await caches.delete(name);
+}
+
+/** Only a generation activation has pruned to its fonts is drained: a newer
+ * generation waiting to activate always holds its boot core. */
+async function drainGeneration(name, cache, release, held) {
+  const source = await caches.open(name);
+  const urls = (await source.keys()).map((request) => request.url);
+  if (!urls.length || !urls.every(fontUrl)) return;
+  let left = urls.length;
+  for (const url of urls) {
+    const entry = release.entries.get(url);
+    const removed = await Promise.resolve()
+      .then(async () => {
+        if (held.has(url) || !entry) return;
+        const hit = await source.match(url);
+        const copy = hit && (await verifiedResponse(hit, entry).catch(() => undefined));
+        if (!copy) return;
+        await cache.put(url, copy);
+        held.add(url);
+      })
+      .then(() => source.delete(url))
+      .catch(() => false);
+    if (removed) left -= 1;
+  }
+  if (!left) await caches.delete(name);
+}
+
+/** Never awaited by install or activation. Every font is settled on its own. */
+async function fillFonts() {
   const cache = await caches.open(CACHE_NAME);
   const release = await readInstalledRelease(cache);
-  const missing = [];
-  for (const [url, entry] of release.entries) {
-    if (!fontAsset(entry.path)) continue;
-    const held = await Promise.resolve()
-      .then(() => cache.match(url))
-      .catch(() => undefined);
-    if (held) continue;
-    const reused = await reusedFont(previous, url, entry);
-    const stored = reused
-      ? await cache.put(url, reused).then(
-          () => true,
-          () => false,
-        )
-      : false;
-    if (!stored) missing.push([url, entry]);
+  const held = new Set((await cache.keys()).map((request) => request.url));
+  for (const name of await otherGenerations()) {
+    await drainGeneration(name, cache, release, held).catch(() => {});
   }
+  const missing = [...release.entries].filter(
+    ([url, entry]) => fontAsset(entry.path) && !held.has(url),
+  );
   const lane = async () => {
     for (let next = missing.shift(); next; next = missing.shift()) {
       const [url, entry] = next;
@@ -439,28 +476,27 @@ async function fillFonts(previous) {
   await Promise.all(Array.from({ length: FONT_FILL_LANES }, lane));
 }
 
+let fontFill;
+
+/** One fill per worker lifetime, shared by every trigger; never rejects. */
+function resumeFontFill() {
+  if (!STAMPED) return undefined;
+  if (!fontFill) {
+    fontFill = fillFonts().catch(() => {
+      fontFill = undefined;
+    });
+  }
+  return fontFill;
+}
+
 self.addEventListener('activate', (event) => {
-  // CacheStorage is origin-wide. Even another KAIRO installation on a
-  // different Pages subpath owns its own cache. Legacy unscoped keys are
-  // left alone because this worker cannot prove exclusive ownership.
-  const older = caches
-    .keys()
-    .then((keys) => keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME));
-  // A Cache opened before its name is deleted stays readable, so the older
-  // generations' fonts outlive the deletion without delaying activation.
-  const previous = STAMPED
-    ? older.then((keys) => Promise.all(keys.map((key) => caches.open(key)))).catch(() => [])
-    : Promise.resolve([]);
-  const activated = previous
-    .then(() => older)
-    .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+  const activated = otherGenerations()
+    .then((keys) =>
+      Promise.all(keys.map(STAMPED ? pruneGeneration : (key) => caches.delete(key))),
+    )
     .then(() => self.clients.claim());
   event.waitUntil(activated);
-  if (STAMPED)
-    activated
-      .then(() => previous)
-      .then(fillFonts)
-      .catch(() => {});
+  activated.then(resumeFontFill, () => {});
 });
 
 function fetchAndStore(request, cache) {
@@ -515,7 +551,8 @@ self.addEventListener('fetch', (event) => {
         if (!entry) return { response: updateNeeded() };
         const hit = await cache.match(canonical);
         if (hit) return { response: hit };
-        const response = await verifiedResponse(await networkAsset(canonical), entry);
+        const reused = fontAsset(entry.path) ? await reusedFont(canonical, entry) : undefined;
+        const response = reused ?? (await verifiedResponse(await networkAsset(canonical), entry));
         return { response, stored: cache.put(canonical, response.clone()).catch(() => {}) };
       } catch {
         return { response: updateNeeded() };
@@ -534,5 +571,10 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(task.then(({ response }) => response));
   // Register the lifetime hold during dispatch, including the asynchronous
   // put, while returning the network response without waiting for disk I/O.
-  event.waitUntil(task.then(({ stored }) => stored).catch(() => {}));
+  event.waitUntil(
+    task
+      .then(({ stored }) => stored)
+      .catch(() => {})
+      .then(resumeFontFill),
+  );
 });

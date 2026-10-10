@@ -26,14 +26,17 @@
          card's word (the oldstyle metal-type revival — Android has no system
          mincho at all), Yuji Syuku (real shodō hand) for the kana reading,
          and a 4-glyph Kaisei Tokumin micro-subset for the 再難良易 seals.
-         Successful service-worker installation caches every bundled face. -->
+         Service-worker installation caches the boot core and no font. -->
     <!-- SELF-HOSTED (fonts/, OFL 1.1): all font requests use local assets,
-         with no remote font provider. Offline-after-install uses the cached
-         bundled bytes; standalone exports embed those bytes. unicode-range
-         selects the chunks a card shows. If every external font byte is
-         unavailable in a fresh empty cache, browser block timeout can still
-         expose native DOM fallback; this is a failure limit, not acceptance
-         of system fonts under the bundled-fonts-only brief. -->
+         with no remote font provider. The service worker caches each bundled
+         face the first time a page requests it, and a best-effort background
+         fill after activation fetches the rest; offline type is complete only
+         for the faces already cached. Standalone exports embed the bytes.
+         unicode-range selects the chunks a card shows. Every face is
+         font-display: swap, so text shows in a native fallback until its
+         bundled face arrives, and stays there offline if that face was never
+         cached; this is a failure limit, not acceptance of system fonts under
+         the bundled-fonts-only brief. -->
     <!-- Text faces (2026-10-10): Noto Sans JP, Noto Serif JP, Noto Serif and
          Roboto Mono join the same pool, so the interface, the reading text
          and the figures no longer depend on the device's own fonts. -->
