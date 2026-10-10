@@ -1632,7 +1632,7 @@ async function verifyBack(browser, base) {
     check(
       '5) at the resting position after the reveal no fold row is cut by the pinned bar (each wholly above it or wholly below), the word and definition are above it, and the last fold (出典) scrolls clear of it',
       seen.every((x) => x.cut === 0 && x.term <= x.bar && x.def <= x.bar && x.end.src <= x.end.bar),
-      JSON.stringify(seen.map(({ label, card, y, cut, end }) => ({ label, card, y, cut, src: end.src, bar: end.bar }))),
+      JSON.stringify(seen.map(({ label, card, y, cut, term, def, bar: restBar, end }) => ({ label, card, y, cut, term, def, restBar, src: end.src, bar: end.bar }))),
     );
   }
 
