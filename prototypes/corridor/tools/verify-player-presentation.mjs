@@ -32,7 +32,6 @@ const census = () => {
 };
 const seated = (s, context) => s.windowed === true && s.inner > 0 && (!context || s.context.some(([, open]) => open === '1'));
 const fits = s => s.toggle.top >= s.header.bottom && s.target.top >= Math.max(s.header.bottom, s.windowed ? s.anchor.top : s.header.bottom) && s.target.bottom <= Math.min(s.bar.top, s.windowed ? s.anchor.bottom : s.bar.top) && s.def.bottom <= s.bar.top && s.toggle.bottom <= s.bar.top && s.overflow === 0;
-const kept = (before, after) => fits(after) || (!fits(before) && Math.abs(after.inner - before.inner) < 1 && Math.abs(after.page - before.page) < 1 && Math.abs(after.anchor.top - before.anchor.top) < 1 && after.height === before.height);
 async function labels(page, cdp, lang) {
   const { root } = await cdp.send('DOM.getDocument', { depth: 0 });
   const get = async selector => {
@@ -71,29 +70,53 @@ try {
         check(`${width}/${zoom} folded context before the passage offers its opener before the compared actions`, offered, { offered, context: (await page.evaluate(census)).context });
         if (offered) { await more.click(); await resting(page); await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, initial.page - await page.evaluate(() => scrollY)); await page.waitForTimeout(100); }
       }
+      // Added distinct deliberately off-window cases: trusted inner wheel chooses an earlier paragraph; passive locale/world changes must preserve the exact reading pose.
+      const beforeOff = await page.evaluate(census);
+      await page.locator('.kp-sentence').hover(); await page.mouse.wheel(0, -beforeOff.inner); await page.waitForTimeout(100);
+      await page.mouse.wheel(0, 20); await page.waitForTimeout(100);
+      let offSeat = await page.evaluate(census);
+      check(`${width}/${zoom} deliberate off-window comparison has open/nonzero/windowed pose and target outside`, seated(offSeat, zoom === 'focus') && !fits(offSeat), offSeat);
+      for (const lang of ['ja', 'bi']) {
+        await page.locator(`#lang [data-lang=${lang}]`).click(); await resting(page);
+        const afterOff = await page.evaluate(census);
+        check(`${width}/${zoom} deliberately off-window language ${lang} retains exact reading pose`, afterOff.card === offSeat.card && afterOff.zoom === offSeat.zoom && afterOff.windowed === offSeat.windowed && afterOff.inner === offSeat.inner && afterOff.anchor.top === offSeat.anchor.top && afterOff.height === offSeat.height && afterOff.page === offSeat.page && afterOff.ledger === offSeat.ledger && JSON.stringify(afterOff.context) === JSON.stringify(offSeat.context) && JSON.stringify(afterOff.folds) === JSON.stringify(offSeat.folds), { before: offSeat, after: afterOff }); offSeat = afterOff;
+      }
+      for (const seal of ['金', '墨']) {
+        await page.locator('#theme-seal').click(); await page.locator('.world-stone', { hasText: seal }).click(); await resting(page);
+        const afterOff = await page.evaluate(census);
+        check(`${width}/${zoom} deliberately off-window world ${seal} retains exact reading pose`, afterOff.card === offSeat.card && afterOff.zoom === offSeat.zoom && afterOff.windowed === offSeat.windowed && afterOff.inner === offSeat.inner && afterOff.anchor.top === offSeat.anchor.top && afterOff.height === offSeat.height && afterOff.page === offSeat.page && afterOff.ledger === offSeat.ledger && JSON.stringify(afterOff.context) === JSON.stringify(offSeat.context) && JSON.stringify(afterOff.folds) === JSON.stringify(offSeat.folds), { before: offSeat, after: afterOff }); offSeat = afterOff;
+      }
+      // Use trusted inner scrolling to fit the target before the preserved +20px reading adjustment.
+      const beforeAim = await page.evaluate(census);
+      await page.locator('.kp-sentence').hover();
+      await page.mouse.wheel(0, (beforeAim.target.top + beforeAim.target.bottom - beforeAim.anchor.top - beforeAim.anchor.bottom) / 2);
+      await page.waitForTimeout(100);
       await page.locator('.kp-sentence').hover(); await page.mouse.wheel(0, 20); await page.waitForTimeout(100);
       let before = await page.evaluate(census);
       const ledger = before.ledger;
       check(`${width}/${zoom} compared state is non-default before language switches: windowed, inner seat moved by the wheel${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
+      check(`${width}/${zoom} compared pose actually fits before language switches`, fits(before), before);
       check(`${width}/${zoom} actual reveal surname`, JSON.stringify(before.ruby) === JSON.stringify(['こむら', 'こむら']), before.ruby);
       for (const lang of ['ja', 'bi']) {
         await page.locator(`#lang [data-lang=${lang}]`).click(); await resting(page);
         const after = await page.evaluate(census);
         const same = after.card === before.card && after.zoom === before.zoom && after.windowed === before.windowed && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && after.ledger === ledger;
-        check(`${width}/${zoom} native language ${lang} preserves face/window/folds/context/ledger and reading controls`, same && kept(before, after), { before, after });
+        check(`${width}/${zoom} native language ${lang} preserves face/window/folds/context/ledger and reading controls`, same && fits(after), { before, after });
         await labels(page, cdp, lang); before = after;
       }
       check(`${width}/${zoom} compared state is non-default before world switches: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(before, zoom === 'focus'), { windowed: before.windowed, inner: before.inner, context: before.context });
+      check(`${width}/${zoom} world comparisons start with fitted reading controls`, fits(before), before);
       for (const seal of ['金', '墨']) {
         await page.locator('#theme-seal').click(); await page.locator('.world-stone', { hasText: seal }).click(); await resting(page);
         const after = await page.evaluate(census);
-        check(`${width}/${zoom} native world ${seal} retains presentation and fits`, after.card === before.card && after.zoom === zoom && after.ledger === ledger && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && Math.abs(after.inner - before.inner) < 1 && after.height === before.height && Math.abs(after.anchor.top - before.anchor.top) < 1 && kept(before, after), { before, after }); before = after;
+        check(`${width}/${zoom} native world ${seal} retains presentation and fits`, after.card === before.card && after.zoom === zoom && after.ledger === ledger && JSON.stringify(after.folds) === JSON.stringify(before.folds) && JSON.stringify(after.context) === JSON.stringify(before.context) && Math.abs(after.inner - before.inner) < 1 && after.height === before.height && Math.abs(after.anchor.top - before.anchor.top) < 1 && fits(after), { before, after }); before = after;
       }
       // The existing word sheet's real kanji door goes through corridor go()/Back().
       await page.locator('#kp-card .kp-target').click();
       const lookupLedger = await page.evaluate(() => localStorage.getItem('bunki-cloze:n1'));
       const seat = await page.evaluate(census);
       check(`${width}/${zoom} compared state is non-default before 交 depth: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(seat, zoom === 'focus'), { windowed: seat.windowed, inner: seat.inner, context: seat.context });
+      check(`${width}/${zoom} depth Back comparison starts with fitted reading controls`, fits(seat), seat);
       await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click();
       await page.locator('#sheet').waitFor();
       const underSheet = await page.evaluate(() => ({ page: scrollY, inert: !!document.querySelector('.kp').closest('[inert]') }));
@@ -101,20 +124,39 @@ try {
       underSheet.afterAsyncPaint = await page.evaluate(() => scrollY);
       await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
       const returned = await page.evaluate(census);
-      check(`${width}/${zoom} actual 交 depth Back restores card presentation without ledger write`, returned.card === seat.card && returned.zoom === seat.zoom && returned.windowed === seat.windowed && returned.height === seat.height && JSON.stringify(returned.folds) === JSON.stringify(seat.folds) && JSON.stringify(returned.context) === JSON.stringify(seat.context) && returned.ledger === lookupLedger && Math.abs(returned.inner - seat.inner) < 1 && Math.abs(returned.anchor.top - seat.anchor.top) < 1 && kept(seat, returned) && underSheet.inert && underSheet.afterAsyncPaint === underSheet.page, { seat, underSheet, returned });
+      check(`${width}/${zoom} actual 交 depth Back restores card presentation without ledger write`, returned.card === seat.card && returned.zoom === seat.zoom && returned.windowed === seat.windowed && returned.height === seat.height && JSON.stringify(returned.folds) === JSON.stringify(seat.folds) && JSON.stringify(returned.context) === JSON.stringify(seat.context) && returned.ledger === lookupLedger && Math.abs(returned.inner - seat.inner) < 1 && Math.abs(returned.anchor.top - seat.anchor.top) < 1 && fits(returned) && underSheet.inert && underSheet.afterAsyncPaint === underSheet.page, { seat, underSheet, returned });
       await page.screenshot({ path: OUT + `/${width}-${zoom}-returned.png` });
       for (const [kind, glyph] of [['kanji', '交'], ['component', '亠']]) {
         if (!await page.locator('.kp-f-kanji').evaluate(n => n.open)) await page.locator('.kp-f-kanji>summary').click();
         const button = page.locator(`.kp-anatomy-${kind}[data-${kind}="${glyph}"]`);
+        // Added distinct off-window Back case, preserving exact purposeful outer/inner scrolling before establishing the fitted pose for the unchanged original assertion.
+        await button.scrollIntoViewIfNeeded();
+        const candidateOff = await page.evaluate(census);
+        await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, Math.max(80, candidateOff.target.bottom - candidateOff.header.bottom + 20)); await page.waitForTimeout(100);
+        const anatomyOff = await page.evaluate(census);
+        check(`${width}/${zoom} deliberately off-window ${kind} before opening`, !fits(anatomyOff), anatomyOff);
+        await button.click(); await page.locator('#sheet').waitFor(); await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
+        const returnedOff = await page.evaluate(census);
+        check(`${width}/${zoom} deliberately off-window ${kind} Back retains exact reading pose`, returnedOff.card === anatomyOff.card && returnedOff.zoom === anatomyOff.zoom && returnedOff.windowed === anatomyOff.windowed && returnedOff.inner === anatomyOff.inner && returnedOff.anchor.top === anatomyOff.anchor.top && returnedOff.height === anatomyOff.height && returnedOff.page === anatomyOff.page && returnedOff.ledger === anatomyOff.ledger && JSON.stringify(returnedOff.context) === JSON.stringify(anatomyOff.context) && JSON.stringify(returnedOff.folds) === JSON.stringify(anatomyOff.folds), { before: anatomyOff, after: returnedOff });
+        await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, (await page.evaluate(census)).anchor.top - initial.anchor.top); await page.waitForTimeout(100);
+        // Keep the target near the window bottom, then reveal the anatomy button with the least trusted outer scroll.
+        const beforeAnatomy = await page.evaluate(census);
+        await page.locator('.kp-sentence').hover();
+        await page.mouse.wheel(0, beforeAnatomy.target.bottom - (beforeAnatomy.anchor.bottom - 8));
+        await page.waitForTimeout(100);
+        const anatomyDelta = await button.evaluate(n => n.getBoundingClientRect().bottom - (document.querySelector('.kp-grades').getBoundingClientRect().top - 12));
+        await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, Math.max(0, anatomyDelta)); await page.waitForTimeout(100);
         await button.scrollIntoViewIfNeeded();
         const anatomySeat = await page.evaluate(census);
+        check(`${width}/${zoom} compared ${kind} anatomy pose fitted before opening`, fits(anatomySeat), anatomySeat);
+
         const available = await button.evaluate(n => { const r = n.getBoundingClientRect(); return { tag: n.tagName, width: r.width, height: r.height, name: n.getAttribute('aria-label'), points: [[0, 0], [-21, -21], [21, -21], [-21, 21], [21, 21]].map(([dx, dy]) => n.contains(document.elementFromPoint(r.x + r.width / 2 + dx, r.y + r.height / 2 + dy))) }; });
         await button.evaluate(n => n.addEventListener('click', e => { window.__anatomyTrusted = e.isTrusted; }, { once: true, capture: true }));
         await button.click(); await page.locator('#sheet').waitFor();
         const opened = await page.locator('#sheet').evaluate(n => ({ text: n.textContent, hero: n.querySelector('.hero-glyph')?.textContent, trusted: window.__anatomyTrusted }));
         await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
         const after = await page.evaluate(census);
-        check(`${width}/${zoom} actual ${kind} anatomy door opens existing ${glyph} entry and restores reading face`, available.tag === 'BUTTON' && available.width >= 44 && available.height >= 44 && available.points.every(Boolean) && opened.hero === glyph && opened.trusted === true && after.card === anatomySeat.card && after.zoom === anatomySeat.zoom && after.ledger === anatomySeat.ledger && after.folds.find(([name]) => name.includes('kp-f-kanji'))[1] && JSON.stringify(after.context) === JSON.stringify(anatomySeat.context) && Math.abs(after.inner - anatomySeat.inner) < 1 && kept(anatomySeat, after), { available, opened, anatomySeat, after });
+        check(`${width}/${zoom} actual ${kind} anatomy door opens existing ${glyph} entry and restores reading face`, available.tag === 'BUTTON' && available.width >= 44 && available.height >= 44 && available.points.every(Boolean) && opened.hero === glyph && opened.trusted === true && after.card === anatomySeat.card && after.zoom === anatomySeat.zoom && after.ledger === anatomySeat.ledger && after.folds.find(([name]) => name.includes('kp-f-kanji'))[1] && JSON.stringify(after.context) === JSON.stringify(anatomySeat.context) && Math.abs(after.inner - anatomySeat.inner) < 1 && fits(after), { available, opened, anatomySeat, after });
       }
     } finally { await context.close(); }
   }
