@@ -2146,9 +2146,11 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
 function placeWindowControls(face, passage, windowed) {
   face.toggleAttribute('data-window-controls', !!windowed);
   const chips = face.querySelector('.kp-chips');
-  if (!chips) return;
+  if (!chips || (windowed ? passage.nextElementSibling : passage.previousElementSibling) === chips) return;
+  const held = chips.contains(document.activeElement) ? document.activeElement : null;
   if (windowed) passage.after(chips);
   else passage.before(chips);
+  held?.focus({ preventScroll: true });
 }
 const WINDOW_LINES = 3;
 const WINDOW_REACH = 12;

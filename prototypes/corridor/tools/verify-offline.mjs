@@ -726,7 +726,8 @@ try {
             } catch {
               rules = 0;
             }
-            return { path: new URL(link.href).pathname.split('/').pop(), rules };
+            const { pathname } = new URL(link.href);
+            return { path: pathname.split('/').pop(), href: pathname, rules };
           });
           const word = document.querySelector('#shelf-body .japanese-lookup-word');
           const style = word && getComputedStyle(word);
@@ -736,11 +737,17 @@ try {
               padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
         })
       : { sheets: [], art: null };
+    const editorialAt = offlineLook.sheets.findLastIndex((sheet) => sheet.path === 'editorial.css');
+    const roomsLinkedOnce = ['today', 'read', 'learn', 'words', 'me', 'cards'].every((room) => {
+      const at = offlineLook.sheets.flatMap((sheet, index) => (sheet.href.endsWith(`/rooms/${room}.css`) ? [index] : []));
+      return at.length === 1 && at[0] > editorialAt;
+    });
     check(
       'every linked stylesheet, including editorial.css, and the shelf art load on a cold offline start',
       offlineLook.sheets.length > 0 &&
         offlineLook.sheets.every((sheet) => sheet.rules > 0) &&
         offlineLook.sheets.some((sheet) => sheet.path === 'editorial.css') &&
+        roomsLinkedOnce &&
         offlineLook.art > 0,
       JSON.stringify(offlineLook),
     );

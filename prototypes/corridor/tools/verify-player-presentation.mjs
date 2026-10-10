@@ -59,6 +59,13 @@ try {
         const switched = await page.evaluate(census);
         check(`${width}/${zoom} native ${choice} passage toggle keeps marked word actually inside window`, switched.zoom === choice && fits(switched), switched);
       }
+      for (const choice of [zoom === 'full' ? 'focus' : 'full', zoom]) {
+        const button = page.locator(`#kp-zoom-${choice}`), held = await page.evaluate(census);
+        await button.evaluate(n => { window.__zoomTrusted = undefined; n.addEventListener('click', e => { window.__zoomTrusted = e.isTrusted; }, { once: true, capture: true }); });
+        await button.focus(); await page.keyboard.press('Enter'); await resting(page);
+        const keyed = await page.evaluate(census), focus = await page.evaluate(() => ({ active: document.activeElement?.id || document.activeElement?.tagName, trusted: window.__zoomTrusted }));
+        check(`${width}/${zoom} keyboard Enter on ${choice} keeps focus on that button, the marked word inside the window and the ledger unwritten`, keyed.zoom === choice && focus.active === `kp-zoom-${choice}` && focus.trusted === true && keyed.card === held.card && keyed.ledger === held.ledger && fits(keyed), { held, keyed, focus });
+      }
       await page.locator('#kp-card .kp-target').click(); await page.locator('#kp-sheet-close').click();
       const initial = await page.evaluate(census);
       await page.locator('.kp-f-gloss>summary').click();
