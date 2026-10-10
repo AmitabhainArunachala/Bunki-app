@@ -220,6 +220,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await page.locator('#source-reader-original').getAttribute('href'), 'https://example.org/audio#t=93');
     await screenshot('saved-link');
     await page.locator('#source-reader-back').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'source-inbox');
     const saved = await readAppRecordSnapshot(page); assert.equal(saved.record.sourceInbox.entries.length, 2); noReviewChange(before, saved);
     await shelf(page); await page.locator('#tray').click();
     const downloadWork = page.waitForEvent('download'); await page.locator('#export-store').click();

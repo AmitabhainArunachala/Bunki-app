@@ -192,8 +192,9 @@ try {
         const { old } = await journals(page);
         const record = { ...initial.record, futureBackupRoot: { committedTogether: true } };
         await tray(page);
+        await page.waitForFunction(() => document.body.dataset.view === 'tray' && !document.documentElement.dataset.roomTransition);
         const before = await readAppRecordSnapshot(page);
-        await armRecordWriteFailure(page, mode);
+        await armRecordWriteFailure(page, mode, { roots: ['futureBackupRoot'] });
         await submit(page, createAppBackupFixture(record, archive, old));
         await failedImport(page);
         assert.equal((await clearRecordWriteFailure(page)).fired, 1);

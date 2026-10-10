@@ -358,7 +358,7 @@ try {
     await importFixture('failed-outbound', fixture()); await openShelf(); await openShelfDoor(page, '#ai-link');
     const question = '保存失敗でもこの質問を残してください。';
     await page.locator('#chat-input').fill(question);
-    await waitForAppRecord(page, (record) => JSON.stringify(record.teacherDrafts).includes(question));
+    await waitForAppRecord(page, (record) => JSON.stringify(record.teacherDrafts ?? null).includes(question));
     const before = await readAppRecordSnapshot(page), count = requests.length;
     await armRecordWriteFailure(page, 'quota', { roots: ['aiChat'] });
     try {

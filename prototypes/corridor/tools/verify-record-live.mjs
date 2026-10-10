@@ -767,6 +767,8 @@ try {
         assert.deepEqual(reloaded.record, backup.record);
         assert.deepEqual(reloaded.archive, backup.archive);
         await destination.locator('#tray').click();
+        await destination.locator('#tray .tray-count').waitFor({ state: 'visible' });
+        assert.equal(await destination.locator('#tray .tray-count').isVisible(), true, 'Restored saved-word count is visible');
         assert.equal(await destination.locator('#tray .tray-count').textContent(), '2');
         assert.match(await destination.locator('#tray').getAttribute('aria-label'), /^(?:今日 · 保存した語 2|Today · 2 saved words)$/u);
         await fullPageScreenshot(destination, resolve(caseOut, 'restored.png'));
@@ -819,6 +821,8 @@ try {
               assert.equal(await page.locator('#read-fin').evaluate((node) => node.classList.contains('finished')), mode === 'uncertain');
             } else {
               await page.locator('#tray').click();
+              await page.locator('#tray .tray-count').waitFor({ state: 'visible' });
+              assert.equal(await page.locator('#tray .tray-count').isVisible(), true, 'Fault-result saved-word count is visible');
               assert.equal(await page.locator('#tray .tray-count').textContent(), mode === 'uncertain' ? '2' : '1');
               assert.match(await page.locator('#tray').getAttribute('aria-label'),
                 mode === 'uncertain' ? /^(?:今日 · 保存した語 2|Today · 2 saved words)$/u : /^(?:今日 · 保存した語 1|Today · 1 saved word)$/u);
