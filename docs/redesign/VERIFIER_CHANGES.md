@@ -1,6 +1,6 @@
 # Deliberate verifier changes
 
-Only chrome language and room-material selector pins change. Storage, SRS, ledgers, offline behavior, deck-front concealment, hit-size and contrast assertions remain intact.
+This is a chronological ledger. Early scope statements describe their own round; later entries explicitly record behavioral refinements as well as label and selector pins. Storage, SRS, durable ledgers and deck-front concealment remain protected. A later entry supersedes an earlier assertion only where stated.
 
 | File                                                  | Assertion                  | Before → after                                                        | Reason                                                                                                                       |
 | ----------------------------------------------------- | -------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -783,17 +783,21 @@ All 29 required finish checks are complete: 27 pass, corridor-doors fails only a
 
 ## Round 5: ready practice replaces the unbuilt mock promise (2026-10-10)
 
+Historical copy pin: the “awaiting review” label below was subsequently replaced in “recovered gate label pins”; its count and destination predicates remain.
+
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
 | `prototypes/corridor/tools/verify-assessment-written-section.mjs`, `dojoPracticeLabel` in `public-catalog-and-dojo-practice-labels` | `${sections.length} practice set(s) · mock tests in preparation` → `${sections.length} practice set(s) · practice sets available` | Strict check 11 removes the future-feature placeholder and names the real available practice. The exact catalog-derived section count and singular/plural suffix stay required. Published machine-checked written tests still require their unchanged exact count and “awaiting review” label; all public catalog, delivery, answer, scoring and record assertions remain unchanged. |
 
 ## Round 5: Focus dims context while keeping its actual ink readable (2026-10-10)
 
-The former opacity pin forced nonfocus sentences below 0.5 opacity. That cosmetic value conflicts with check 8's contrast floor, especially for small ruby. Both assertions still require visibly dimmed context (`opacity < 1`) and now also require the measured foreground, after all ancestor opacity is applied over the painted card colour, to reach 4.5:1. The browser measurement samples every nonblank context text node and each reading, uses WCAG relative luminance, and rejects opacity masks that would make that colour calculation incomplete. It does not modify app styles or record data.
+Superseded behavioral change: the original bound was `opacity < 0.5`, not `<= 0.8`. The `< 1` change below was too permissive. The later R5-14 repair sets `<= 0.8`, which bounds attenuation but does **not** restore the baseline. The October 11 follow-up investigates the conflict between the original attenuation and the added 4.5:1 contrast floor; neither historical relaxation is an unchanged behavioral check.
+
+The former opacity pin forced nonfocus sentences below 0.5 opacity. That behavioral attenuation value conflicts with check 8's contrast floor, especially for small ruby. Both assertions still require visibly dimmed context (`opacity < 1`) and now also require the measured foreground, after all ancestor opacity is applied over the painted card colour, to reach 4.5:1. The browser measurement samples every nonblank context text node and each reading, uses WCAG relative luminance, and rejects opacity masks that would make that colour calculation incomplete. It does not modify app styles or record data.
 
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
-| `prototypes/corridor/tools/verify-kotoba-mine.mjs`, “a new passage card opens 全文 … 焦点 … dims the other sentences” | Every nonfocus sentence `opacity < 0.5` → every nonfocus sentence `opacity < 1`, actual text and ruby contrast both ≥4.5:1, at least one text and ruby sample, no ancestor mask | A deliberate cosmetic opacity correction for the strict contrast blocker. Default Full, one focus sentence, focus opacity exactly 1, unchanged sentence count and complete source text, nonrebuilding switch, open translation fold, remembered Focus setting and exact pressed states remain required. |
+| `prototypes/corridor/tools/verify-kotoba-mine.mjs`, “a new passage card opens 全文 … 焦点 … dims the other sentences” | Every nonfocus sentence `opacity < 0.5` → every nonfocus sentence `opacity < 1`, actual text and ruby contrast both ≥4.5:1, at least one text and ruby sample, no ancestor mask | A deliberate behavioral attenuation change for the strict contrast blocker, subsequently superseded as documented above. Default Full, one focus sentence, focus opacity exactly 1, unchanged sentence count and complete source text, nonrebuilding switch, open translation fold, remembered Focus setting and exact pressed states remain required. |
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs`, longest passage `km-298-m02` Focus context groups | Each context group `opacity < 0.5` → `opacity < 1`, every group's actual text and any ruby ≥4.5:1, at least one ruby sample across groups, no ancestor mask | The dimming remains visible and readable. The two-line height, block layout, exact clipping/⋯ equivalence, a real expandable group, aria-expanded/opened height, full source text equality in both modes, and Full's display-contents/no-⋯/opacity-1 requirements remain unchanged. |
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs`, `RESTING` before longest-passage geometry and context-contrast observations | Six unchanged-scroll frames → six unchanged-scroll frames **and** no running finite animation in the revealed card; explicit 5-second failure bound | The new ruby contrast assertion initially sampled the authored opacity entrance before its 180ms reveal completed (3.82:1 during the fade; 5.13:1 once settled). These cases explicitly judge the card at rest. They now require its ink as well as its scroll to have settled; infinite ambient motion cannot block completion. No geometry assertion, line clamp, reading, source text or contrast threshold changes. |
 
@@ -899,6 +903,8 @@ The quiet header bookmark remains `#tray` and opens the same Today room. John ke
 
 ## Round 5: final fixture paths retain their assertions (2026-10-10)
 
+The earlier statement that lint-ui-language was unchanged describes its earlier round. The explicit full-tour Close locator change below supersedes that scope statement.
+
 The first clean final artifact (`59b6278b`, `66633d2a…`) retains each original failure receipt. These changes follow visible controls and observe actual destination completion; app geometry and hit-testing failures are repaired in production instead.
 
 | File / assertion | Before → after | Why / retained requirements |
@@ -918,11 +924,13 @@ No G6 geometry pin is changed. Production popup repair `4b9ae1af` reserves the a
 
 ## Round 5: exact reduced dialog crossfades (2026-10-10)
 
+This is an accessibility behavior change authorized by the brief's reduced-motion crossfade requirement, rather than a cosmetic pin. Its opacity-only, finite-duration, auto-scroll and zero-ambient restrictions remain explicit below.
+
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
-| `verify-corridor-accessibility.mjs`, reduced sheet/scrim observation | Require all dialog animation names `none` or duration zero → require exactly one `feel-fade` for each sheet and scrim, exactly 80 ms, finite single iteration, total including delay ≤80 ms, and every keyframe property solely opacity | The strict brief explicitly requires a short opacity crossfade under reduced motion. This exact authored response replaces an obsolete cosmetic expectation. Ruby stays nonanimated, active infinite ambient animations must be zero, all three surfaces retain zero transition duration and exact auto scrolling. No modal name, focus containment/return, contrast, touch target, keyboard or other accessibility assertion is removed. |
+| `verify-corridor-accessibility.mjs`, reduced sheet/scrim observation | Require all dialog animation names `none` or duration zero → require exactly one `feel-fade` for each sheet and scrim, exactly 80 ms, finite single iteration, total including delay ≤80 ms, and every keyframe property solely opacity | The strict brief explicitly requires a short opacity crossfade under reduced motion. This replaces the prior no-animation behavior with an exact short crossfade. Ruby stays nonanimated, active infinite ambient animations must be zero, all three surfaces retain zero transition duration and exact auto scrolling. No modal name, focus containment/return, contrast, touch target, keyboard or other accessibility assertion is removed. |
 
-## Round 5: final core cosmetic pins (2026-10-10)
+## Round 5: final core label, absence and control-ownership pins (2026-10-10)
 
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
@@ -978,10 +986,12 @@ After the visible-owner actor correction, the unchanged `public-catalog-and-dojo
 
 ## Round 5: gate review repairs R5-14 and R5-16 (2026-10-10)
 
+These are intermediate repairs. R5-16 restores the baseline sampler; R5-14 restores a finite ceiling but not the original below-0.5 ceiling. Earlier clipping-exclusion and opacity-below-1 rows are superseded here.
+
 | File / assertion | Before → after | Why / retained requirements |
 | --- | --- | --- |
 | `prototypes/corridor/tools/verify-kotoba-mine.mjs`, both Focus dimming pins (the new passage card and the longest passage `km-298-m02`) | `opacity < 1` → `opacity <= 0.8` | R5-14. The earlier entry above called `< 1` "visibly dimmed"; that was too loose, since it passes at 0.99. Both pins now enforce the shipped 0.8 attenuation. The text and ruby contrast floors, mask rejection and every other predicate are unchanged. |
-| `prototypes/corridor/tools/verify-kotoba-mine.mjs`, `REACH` token selection | Centre in the viewport band plus the ancestor overflow-clipping exclusion → the pre-R5 selection exactly (one client rectangle, centre between 80px and the grade bar) | R5-16. The clipping exclusion removed sampled centres and so weakened the check. The cap of 12, the minimum of five and the ±21px `elementFromPoint` ownership assertions are unchanged. The existing `RESTING` wait before the sample is kept. |
+| `prototypes/corridor/tools/verify-kotoba-mine.mjs`, `REACH` token selection | Centre in the viewport band plus the ancestor overflow-clipping exclusion → the pre-R5 selection exactly (one client rectangle, centre between 80px and the grade bar) | R5-16. The clipping exclusion removed sampled centres and so weakened the check. The cap of 12, the minimum of five and the ±21px `elementFromPoint` ownership assertions are unchanged. The `RESTING` call before this sample was newly added in Round 5; it was not present in the baseline. Its finite-animation/unchanged-scroll conditions and five-second failure bound are retained. |
 
 Result of the restored `REACH` on the repaired gate build (`sourceDirty: true`, on `0612ef26`): it FAILS, 12 sampled, 9 misses (世 ↑↓, 時代 ↑↓, フランス ↑↓, 重なる ↑, 戦争 ↑, 特に ↑). The product geometry is not repaired in this round, so R5-16 stays open: the collapsed Focus group clips these words, and the fix belongs in the player's fold geometry, not in this fixture. In the same run check "5) at the resting position after the reveal no fold row is cut by the pinned bar" also failed; the machine was running a build and a second browser probe at the time, and its cause is not established. 156 other checks passed. Log: `~/.dharma/bunki_review/2026-10-10/r5-strict/gate-room-repair-v8/fix-095146/logs/verify-kotoba-mine.log`.
 
@@ -1064,3 +1074,15 @@ artifact `c9bf8817b4f74c6c109f20048b2acb60311ab347e58435d8406c03b91743747e`.
 The complete restored Kotoba suite passes84s on that candidate. Both earlier
 min44-only and first plain-label candidate receipts remain; the final clean
 build must pass independently.
+
+
+## Round 5: terminal audit accuracy corrections (2026-10-11)
+
+Run `01M4K6Z3DS734DHK7GXFBF3K2K` ended failed at its configured 30-minute review timeout before returning structured findings. It changed no files or commits; branch custody returned at `c2c8f031`. Its static audit is an observation, not a completed gate or rendered proof. The concrete misses are being repaired and verified separately.
+
+| File / assertion | Before → after | Why / retained requirements |
+| --- | --- | --- |
+| `prototypes/corridor/tools/verify-kotoba-mine.mjs`, home check description | “count and topics” → “count” | The earlier topic-wall move retained the twelve source-backed topics in Settings and kept the exact home count. This row records the previously omitted check-name-only edit; it changes no predicate. |
+| `scripts/corridor-eslint.config.mjs`, browser globals | No `DOMMatrixReadOnly` → readonly `DOMMatrixReadOnly` | The actual browser matrix consumer reads reveal geometry. Declare its existing browser global rather than disabling no-undef. All lint rules and existing global mutability remain. |
+
+The original Focus predicate is below 0.5; the subsequent 0.8 predicate is a behavior change. The wait before REACH was added in this round. Reduced dialog crossfade pins change accessibility behavior under the brief's explicit crossfade requirement. These distinctions correct earlier descriptions; historical failures and receipts remain.
