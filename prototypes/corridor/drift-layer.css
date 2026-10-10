@@ -219,3 +219,26 @@
  * English setting showed Japanese buttons, and 日本語 showed English prose) */
 body:not(.ui-bi) #drift-layer [data-l='en'],
 body.ui-bi #drift-layer [data-l='ja'] { display: none; }
+
+/* Interface arrivals stay short and still when motion is reduced. The card
+ * occupies its final position throughout its fade; direct field gestures
+ * and the separate teaching renderer retain their own geometry. */
+@media (prefers-reduced-motion: reduce) {
+  #drift-layer #veil,
+  #drift-layer #hint,
+  #drift-layer #lvl,
+  #drift-layer #lvlInfo,
+  #drift-layer #depth,
+  #drift-layer #radoc,
+  #drift-layer .word .yomi,
+  #drift-layer .word .gloss,
+  #drift-layer .glyph small,
+  #drift-layer .part small { transition: opacity 80ms; }
+  #drift-layer #card {
+    transform: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 80ms;
+  }
+  #drift-layer #card.open { opacity: 1; pointer-events: auto; }
+}

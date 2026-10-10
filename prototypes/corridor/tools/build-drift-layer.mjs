@@ -156,6 +156,29 @@ ${scopedRules.join('\n')}
  * English setting showed Japanese buttons, and 日本語 showed English prose) */
 body:not(.ui-bi) #drift-layer [data-l='en'],
 body.ui-bi #drift-layer [data-l='ja'] { display: none; }
+
+/* Interface arrivals stay short and still when motion is reduced. The card
+ * occupies its final position throughout its fade; direct field gestures
+ * and the separate teaching renderer retain their own geometry. */
+@media (prefers-reduced-motion: reduce) {
+  #drift-layer #veil,
+  #drift-layer #hint,
+  #drift-layer #lvl,
+  #drift-layer #lvlInfo,
+  #drift-layer #depth,
+  #drift-layer #radoc,
+  #drift-layer .word .yomi,
+  #drift-layer .word .gloss,
+  #drift-layer .glyph small,
+  #drift-layer .part small { transition: opacity 80ms; }
+  #drift-layer #card {
+    transform: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 80ms;
+  }
+  #drift-layer #card.open { opacity: 1; pointer-events: auto; }
+}
 `;
 
 /* -------------------------------------------------------------- markup */
@@ -408,6 +431,19 @@ patchSection('function grade(n,dir){', '  n.gone=true; n.frozen=true;',
   'departure follows confirmed host receipt');
 patch('  if(dir>0){settled++;bloom(n);} else {gathered++;sink(n);}',
   '  if(dir>0)bloom(n);else sink(n);', 'committed host counters are authoritative');
+// Reduced-motion judgments keep the rendered word at its current position
+// and crossfade briefly. The confirmed receipt, counters, recycling and
+// constellation callbacks retain their existing ordering and predicates.
+patch('  if(dir>0)bloom(n);else sink(n);',
+  '  if(!reduced){if(dir>0)bloom(n);else sink(n);}', 'reduced grade has no particle departure');
+patch('  ripples.push({x,y,r:big?10:4,alpha:big?0.5:0.32,sp:big?4.5:2.6,echo:false});',
+  '  if(!reduced)ripples.push({x,y,r:big?10:4,alpha:big?0.5:0.32,sp:big?4.5:2.6,echo:false});',
+  'reduced gesture has no decorative ripple while fluid input stays intact');
+patch('  el.style.transition="transform .95s cubic-bezier(.3,.6,.4,1), opacity .95s";\n  if(dir>0){',
+  '  if(reduced){\n    el.style.transition="opacity 80ms";\n  } else {\n  el.style.transition="transform .95s cubic-bezier(.3,.6,.4,1), opacity .95s";\n  if(dir>0){',
+  'reduced grade crossfades at its rendered position');
+patch('  el.style.opacity="0";\n  removeNode(n,1000);',
+  '  }\n  el.style.opacity="0";\n  removeNode(n,reduced?120:1000);', 'retire reduced grade after the short fade');
 patchSection("// The front door's one first-touch cue.", '\n// ---- radical explainer ----',
   '// The first answered node touch retires this invitation through the host.\n' +
   'if(!store.cue)hint.classList.add("first-cue");\n' +
