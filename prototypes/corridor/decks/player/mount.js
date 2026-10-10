@@ -195,11 +195,20 @@ function refitBack(saved, always = false) {
   settleBack();
 }
 export async function refitPresentation(always = false) {
-  const saved = capturePresentation(), owner = ctx;
+  const saved = capturePresentation(), owner = ctx, request = mountRequest;
+  syncDefaultLook();
   if (!saved || externalSheet()) return;
-  await document.fonts.ready;
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if (ctx !== owner || !presentationMatches(saved)) return;
+  let touched = false;
+  const touch = () => { touched = true; };
+  const inputs = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
+  for (const type of inputs) window.addEventListener(type, touch, { capture: true, passive: true });
+  try {
+    await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  } finally {
+    for (const type of inputs) window.removeEventListener(type, touch, { capture: true });
+  }
+  if (touched || ctx !== owner || request !== mountRequest || !presentationMatches(saved) || externalSheet()) return;
   refitBack(saved, always);
 }
 
@@ -211,8 +220,23 @@ const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
 const NIGHT_WORLDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
 const keepsDarkByDay = (deck) => deck.defaults?.look === 'dark' && !NIGHT_WORLDS.includes(document.documentElement.dataset.theme);
+function defaultLook(deck, followWorld) {
+  return followWorld ? (keepsDarkByDay(deck) ? 'dark' : 'world') : (deck.defaults?.look || PREFS_DEFAULT.look);
+}
 function prefsFor(storage, deck, followWorld = false) {
-  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), ...(followWorld && !keepsDarkByDay(deck) ? { look: 'world' } : {}), ...(readJson(storage, prefsKey(deck.id)) || {}) };
+  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), look: defaultLook(deck, followWorld), ...(readJson(storage, prefsKey(deck.id)) || {}) };
+}
+/** Automatic settings saves retain an implicit look as a default, rather than freezing the
+ * current day/night resolution. Existing stored choices remain explicit. */
+function storePrefs(prefs, explicitLook = ctx.lookExplicit) {
+  const stored = { ...prefs };
+  if (!explicitLook) delete stored.look;
+  return writeJson(ctx.storage, prefsKey(ctx.deck.id), stored);
+}
+function syncDefaultLook() {
+  if (!ctx || ctx.lookExplicit) return;
+  ctx.prefs.look = defaultLook(ctx.deck, !!ctx.host);
+  ctx.root.dataset.look = ctx.prefs.look;
 }
 function readJson(storage, key) {
   try {
@@ -272,8 +296,9 @@ function save(state) {
   return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
 }
 /** adopt new settings only once they are stored */
-function savePrefs(prefs) {
-  if (!writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) return saveFailed();
+function savePrefs(prefs, { explicitLook = ctx.lookExplicit } = {}) {
+  if (!storePrefs(prefs, explicitLook)) return saveFailed();
+  ctx.lookExplicit = explicitLook;
   ctx.prefs = prefs;
   ui.toast = '';
   paintResponse({ hold: false });
@@ -689,6 +714,7 @@ function paint() {
   if (!ctx?.root?.isConnected) return;
   const root = ctx.root;
   root.replaceChildren();
+  syncDefaultLook();
   root.dataset.look = ctx.prefs.look;
   const screens = { home: homeScreen, study: studyScreen, list: listScreen, settings: settingsScreen };
   if (ui.toast) {
@@ -716,7 +742,7 @@ function fitBar() {
  * storage refused it (then the failure toast repaints as usual) */
 function savePrefQuiet(patch) {
   const prefs = { ...ctx.prefs, ...patch };
-  if (!writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) return saveFailed();
+  if (!storePrefs(prefs)) return saveFailed();
   ctx.prefs = prefs;
   return true;
 }
@@ -850,7 +876,7 @@ function startSession() {
   // one more sitting of this deck: the tap and swipe hints count these (HINT_SITTINGS). Not stored
   // (storage full) only means they show a little longer.
   const prefs = { ...ctx.prefs, sittings: (Number(ctx.prefs.sittings) || 0) + 1 };
-  writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs);
+  storePrefs(prefs);
   ctx.prefs = prefs;
   ui.queue = q.queue;
   ui.pos = 0;
@@ -2023,6 +2049,15 @@ function reveal() {
   showHeldStudy(held);
 }
 
+/** Outgoing frames are paint only. Remove every delegated identity from their root and descendants. */
+function stripCloneIdentity(copy) {
+  for (const node of [copy, ...copy.querySelectorAll('*')]) {
+    node.removeAttribute('id');
+    for (const name of ['card', 'pref', 'group', 'word', 'kanji', 'component', 'deckWord', 'returnFocus']) delete node.dataset[name];
+    for (const attr of [...node.attributes]) if (attr.name.startsWith('data-ui-')) node.removeAttribute(attr.name);
+  }
+}
+
 /** Hold the actual front frame while the back finds its final layout. The copy carries no
  * ids, card identity or interaction, and fades away without moving the reader's chrome. */
 function holdStudy(study) {
@@ -2035,9 +2070,7 @@ function holdStudy(study) {
     const key = reveal.getBoundingClientRect();
     Object.assign(copy.style, { position: 'absolute', inset: 'auto', left: `${key.left - rect.left}px`, top: `${key.top - rect.top}px`, width: `${key.width}px`, height: `${key.height}px` });
   }
-  node.removeAttribute('id');
-  for (const child of node.querySelectorAll('[id]')) child.removeAttribute('id');
-  for (const child of node.querySelectorAll('[data-card]')) delete child.dataset.card;
+  stripCloneIdentity(node);
   for (const child of node.querySelectorAll('.kp-ghost, .kp-polish, .kp-slash')) child.remove();
   for (const child of node.querySelectorAll('.kp-enter, .kp-arrive')) child.classList.remove('kp-enter', 'kp-arrive');
   node.classList.add('kp-reveal-hold');
@@ -2071,10 +2104,8 @@ function holdScreen() {
     const box = node.getBoundingClientRect();
     Object.assign(copies[index].style, { position: 'absolute', inset: 'auto', left: `${box.left - rect.left}px`, top: `${box.top - rect.top}px`, width: `${box.width}px`, height: `${box.height}px` });
   });
+  stripCloneIdentity(copy);
   for (const node of [copy, ...copies]) {
-    node.removeAttribute('id');
-    for (const name of ['card', 'pref', 'group', 'word', 'kanji', 'component', 'deckWord', 'returnFocus']) delete node.dataset[name];
-    for (const attr of [...node.attributes]) if (attr.name.startsWith('data-ui-')) node.removeAttribute(attr.name);
     node.classList.remove('kp-enter', 'kp-arrive', 'kp-screen-enter');
   }
   for (const node of copy.querySelectorAll('.kp-ghost, .kp-polish, .kp-slash')) node.remove();
@@ -2357,7 +2388,7 @@ function polish(face, sentence) {
 function retireRule() {
   if (ctx.prefs.ruleSeen) return;
   const prefs = { ...ctx.prefs, ruleSeen: true };
-  if (writeJson(ctx.storage, prefsKey(ctx.deck.id), prefs)) ctx.prefs = prefs;
+  if (storePrefs(prefs)) ctx.prefs = prefs;
 }
 
 function commit(rating, { stay = false } = {}) {
@@ -2433,9 +2464,7 @@ function ghostOf(face, dir) {
   if (!face) return null;
   const rect = face.getBoundingClientRect();
   const node = face.cloneNode(true);
-  node.removeAttribute('id');
-  for (const n of node.querySelectorAll('[id]')) n.removeAttribute('id');
-  delete node.dataset.card;
+  stripCloneIdentity(node);
   node.classList.remove('kp-arrive');
   node.classList.add('kp-ghost', `kp-out-${dir}`);
   node.style.transform = '';
@@ -2675,7 +2704,7 @@ function settingsScreen() {
   for (const [value, label, bg, ink] of THEMES.filter(([value]) => ctx.host || value !== 'world')) {
     const on = ctx.prefs.look === value;
     const b = btn(`kp-swatch${on ? ' is-on' : ''}`, t(label), () => {
-      savePrefs({ ...ctx.prefs, look: value });
+      savePrefs({ ...ctx.prefs, look: value }, { explicitLook: true });
     }, { 'data-pref': `look:${value}`, 'aria-label': t(label), role: 'radio', 'aria-checked': String(on), style: `background:${bg};color:${ink}` });
     sw.append(b);
   }
@@ -2873,6 +2902,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
     prefs: prefsFor(storage, deck, !!lexicon),
+    lookExplicit: Object.hasOwn(readJson(storage, prefsKey(deck.id)) || {}, 'look'),
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
