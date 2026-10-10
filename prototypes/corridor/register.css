@@ -639,7 +639,7 @@ html[data-room-entering][data-register="attempt"] #app > main > * { animation-du
   html[data-register="attempt"] .chrome::after { transition: none; }
 }
 /* Native room snapshots carry the arrival; keep the live children still. */
-html[data-room-transition] #app > main > * { animation: none !important; }
+html[data-room-transition][data-room-entering] #app > main > * { animation: none !important; }
 
 /* ------------------------------------------------------------- 10 · WIDE
    On a desk the house keeps the phone's measure and centres it. */

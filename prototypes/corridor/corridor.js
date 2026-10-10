@@ -29593,6 +29593,16 @@ function continueRoomArrival(main) {
     }
   }, () => {});
 }
+/** An arrival is drawn once. Whichever owner finishes it (the room fade or the
+ * entering beat) retires the older entrance markers, so neither can replay. */
+function retireRoomEntrance() {
+  const html = document.documentElement;
+  document.querySelector('#app > main')?.removeAttribute('data-enter');
+  clearTimeout(stampRegister.enterTimer);
+  cancelAnimationFrame(stampRegister.enterFrame);
+  delete html.dataset.roomEntering;
+  html.style.removeProperty('--enter-t');
+}
 function withoutRoomTransition(change) {
   roomTransitionUpdating = true;
   try { return change(); } finally { roomTransitionUpdating = false; }
@@ -29615,6 +29625,7 @@ function roomTransition(change) {
   const update = () => {
     roomTransitionUpdating = true;
     try { return change(); } finally {
+      retireRoomEntrance();
       incoming = document.querySelector('#app > main');
       if (departing !== incoming) departing?.style.removeProperty('view-transition-name');
       if (incoming) {
@@ -29640,6 +29651,7 @@ function roomTransition(change) {
     if (activeRoomTransition !== transition) return;
     activeRoomTransition = null;
     const lastMain = arrival?.main || incoming;
+    retireRoomEntrance();
     lastMain?.removeAttribute('data-room-arrival');
     lastMain?.style.removeProperty('view-transition-name');
     lastMain?.style.removeProperty('--room-arrival-delay');
@@ -31773,10 +31785,7 @@ function stampRegister() {
     stampRegister.enterFrame = requestAnimationFrame(() => {
       if (arrival !== stampRegister.arrivals || !html.dataset.roomEntering) return;
       stampRegister.enteredAt = performance.now();
-      stampRegister.enterTimer = setTimeout(() => {
-        delete html.dataset.roomEntering;
-        html.style.removeProperty('--enter-t');
-      }, 220);
+      stampRegister.enterTimer = setTimeout(retireRoomEntrance, 220);
     });
   } else if (html.dataset.roomEntering) {
     const elapsed = performance.now() - (stampRegister.enteredAt || 0);

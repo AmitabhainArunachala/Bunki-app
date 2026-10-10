@@ -1014,17 +1014,7 @@ const RESTING = `new Promise((ok, fail) => { let last = -1; let same = 0; const 
 /** the tap targets' reach: elementFromPoint 21px above and below each sampled word's centre lands on that word */
 const REACH = `(() => {
   const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
-  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => {
-    const r = t.getClientRects(); if (r.length !== 1) return false;
-    const x = (r[0].left + r[0].right) / 2, y = (r[0].top + r[0].bottom) / 2;
-    if (y <= 80 || y >= bar - 30 || x <= 0 || x >= innerWidth) return false;
-    for (let n = t.parentElement; n && n.id !== 'kp-card'; n = n.parentElement) {
-      const cs = getComputedStyle(n), box = n.getBoundingClientRect();
-      if (['hidden', 'clip', 'auto', 'scroll'].includes(cs.overflowY) && (y - 21 < box.top || y + 21 > box.bottom)) return false;
-      if (['hidden', 'clip', 'auto', 'scroll'].includes(cs.overflowX) && (x < box.left || x > box.right)) return false;
-    }
-    return true;
-  }).slice(0, 12);
+  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => { const r = t.getClientRects(); if (r.length !== 1) return false; const c = (r[0].top + r[0].bottom) / 2; return c > 80 && c < bar - 30; }).slice(0, 12);
   const miss = [];
   for (const t of toks) {
     const r = t.getClientRects()[0];
@@ -1424,7 +1414,7 @@ async function verifyBack(browser, base) {
     const stored = await o.page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').zoom`);
     check(
       'd) a new passage card opens 全文 after the reveal (no zoom on the front); 焦点 in the card header dims the other sentences, keeps them, and is remembered for the deck',
-      z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x < 1) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.text.min >= 4.5 && z2.contrast.ruby.count > 0 && z2.contrast.ruby.min >= 4.5 && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
+      z1.zoom === 'full' && z1.inChips && z1.full === 'true' && z1.n >= 2 && z1.focus === 1 && z1.dim.every((x) => x === 1) && z1.text === c.ja && z2.zoom === 'focus' && z2.focusBtn === 'true' && z2.n === z1.n && z2.dim.every((x) => x <= 0.8) && z2.contrast.masks.length === 0 && z2.contrast.text.count > 0 && z2.contrast.text.min >= 4.5 && z2.contrast.ruby.count > 0 && z2.contrast.ruby.min >= 4.5 && z2.bright.every((x) => x === 1) && z2.text === c.ja && stored === 'focus',
       JSON.stringify({ before: { zoom: z1.zoom, n: z1.n, dim: z1.dim }, after: { zoom: z2.zoom, dim: z2.dim, contrast: z2.contrast }, stored }),
     );
 
@@ -1550,7 +1540,7 @@ async function verifyBack(browser, base) {
     );
     check(
       '1) 焦点 folds the sentences before and after the target to two dimmed lines each (never removed: the passage text is whole), with ⋯ (aria-expanded) on a group that runs longer, which opens it; 全文 lays the groups out inline with no ⋯',
-      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim < 1 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && g.contrast.text.min >= 4.5 && (!g.contrast.ruby.count || g.contrast.ruby.min >= 4.5) && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
+      f.groups.length >= 1 && f.groups.every((g) => g.display === 'block' && g.h <= Math.ceil(2 * g.line) + 1 && g.dim <= 0.8 && g.contrast.masks.length === 0 && g.contrast.text.count > 0 && g.contrast.text.min >= 4.5 && (!g.contrast.ruby.count || g.contrast.ruby.min >= 4.5) && (g.clip === '1') === g.more) && f.groups.some((g) => g.contrast.ruby.count > 0) && f.groups.some((g) => g.more) && f.opened?.expanded === 'true' && f.opened.h > Math.ceil(2 * f.opened.line) + 1 &&
         f.text === c.ja && full.text === c.ja && full.groups.every((g) => g.display === 'contents' && !g.more && g.dim === 1),
       JSON.stringify({ focus: f.groups, opened: f.opened, full: full.groups.map((g) => [g.side, g.display, g.more]) }),
     );
