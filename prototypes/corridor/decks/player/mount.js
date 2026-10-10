@@ -167,7 +167,7 @@ function restorePresentation(saved, { seat = true } = {}) {
   refitBack(saved);
 }
 
-/** Whether the revealed card's reading controls sit between the header and the grade bar;
+/** Whether the revealed card's reading controls fit and no fold row crosses the grade bar;
  * null when that question does not apply (the front, or no pinned bar). */
 function backFits() {
   if (!ui.revealed) return null;
@@ -177,13 +177,21 @@ function backFits() {
   const passage = face?.querySelector('.kp-sentence');
   const def = face?.querySelector('.kp-answer > .kp-def');
   const bar = ctx.root.querySelector('.kp-grades');
-  if (!toggle || !target || !passage || !def || !bar || getComputedStyle(bar).position !== 'fixed') return null;
-  const top = topInset() + SETTLE_GAP, bottom = bar.getBoundingClientRect().top - SETTLE_GAP;
+  if (!target || !passage || !def || !bar || getComputedStyle(bar).position !== 'fixed') return null;
+  const barTop = bar.getBoundingClientRect().top;
+  const top = topInset() + SETTLE_GAP, bottom = barTop - SETTLE_GAP;
+  const transform = getComputedStyle(def.parentElement).transform;
+  const lift = transform && transform !== 'none' ? new DOMMatrixReadOnly(transform).m42 : 0;
   const mark = target.getBoundingClientRect();
   const view = passage.getBoundingClientRect();
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
-  return toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1 && clearTarget && def.getBoundingClientRect().bottom <= bottom + 1;
+  const clearToggle = !toggle || (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1);
+  const clearFolds = [...face.querySelectorAll('.kp-folds > details > summary')].every(node => {
+    const row = node.getBoundingClientRect();
+    return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);
+  });
+  return clearToggle && clearTarget && def.getBoundingClientRect().bottom - lift <= bottom + 1 && clearFolds;
 }
 
 /** World fonts can reflow in place. Refit only when reading controls that fitted no longer do;
@@ -1569,12 +1577,31 @@ function upgradeTaps() {
   const presentation = capturePresentation({ includeInert: true });
   const opened = [...old.querySelectorAll('.kp-ctx')].map((b) => b.dataset.open || '');
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps });
+  // Enrichment changes tap wrappers, not the reveal. Keep each reading's polish delay and
+  // original animation timeline, including its finished fill, rather than fading it in again.
+  const revealMotion = [];
+  if (old.classList.contains('kp-enter')) {
+    sentence.classList.add('kp-enter');
+    const replacements = [...sentence.querySelectorAll('.kp-target, rt')];
+    [...old.querySelectorAll('.kp-target, rt')].forEach((node, i) => {
+      const replacement = replacements[i];
+      if (!replacement) return;
+      const delay = node.style.getPropertyValue('--kp-rt-delay');
+      if (delay) replacement.style.setProperty('--kp-rt-delay', delay);
+      const animation = node.getAnimations().find(a => a.animationName === 'kp-fade');
+      if (animation) revealMotion.push({ node: replacement, start: animation.startTime ?? document.timeline.currentTime - (animation.currentTime || 0) });
+    });
+  }
   [...sentence.querySelectorAll('.kp-ctx')].forEach((b, i) => {
     if (!opened[i]) return;
     b.dataset.open = opened[i];
     b.querySelector('.kp-more')?.setAttribute('aria-expanded', String(opened[i] === '1'));
   });
   old.replaceWith(sentence);
+  for (const { node, start } of revealMotion) {
+    const animation = node.getAnimations().find(a => a.animationName === 'kp-fade');
+    if (animation) animation.startTime = start;
+  }
   face.querySelector('.kp-answer > .kp-def')?.replaceWith(defLine(card, word));
   fitClamps(face);
   // Async enrichment keeps the learner's chosen offset, including while an external sheet
