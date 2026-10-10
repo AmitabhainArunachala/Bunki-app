@@ -190,6 +190,17 @@ const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 
 /** Actual renderer fonts on visible study-page text, plus self-contained face declarations. */
 async function studyFontEvidence(page) {
+  // The just-opened popover can request another unicode-range face at its
+  // first layout. Settle that actual consumer before sampling readiness;
+  // an earlier fonts.ready promise describes the preceding batch only.
+  await page.evaluate(async () => {
+    for (const node of document.querySelectorAll('.kp *')) {
+      node.getBoundingClientRect();
+      void getComputedStyle(node).font;
+    }
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+  await page.waitForFunction(() => document.fonts.status === 'loaded', null, { timeout: 30000 });
   const census = await page.evaluate(async () => {
     await document.fonts.ready;
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -198,7 +209,7 @@ async function studyFontEvidence(page) {
       [...node.childNodes].some((child) => child.nodeType === Node.TEXT_NODE && child.textContent.trim()) &&
       (() => { const r = node.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(node).visibility === 'visible'; })());
     nodes.forEach((node, i) => node.setAttribute('data-kp-font-probe', String(i)));
-    return { faces: faces.length, embedded: faces.every((rule) => /^url\(["']?data:font\/woff2;base64,/.test(rule.style.getPropertyValue('src'))), registered: document.fonts.size, status: document.fonts.status, textNodes: nodes.length };
+    return { faces: faces.length, embedded: faces.every((rule) => /^url\(["']?data:font\/woff2;base64,/.test(rule.style.getPropertyValue('src'))), registered: document.fonts.size, status: document.fonts.status, errorFaces: [...document.fonts].filter((face) => face.status === 'error').length, textNodes: nodes.length };
   });
   const cdp = await page.context().newCDPSession(page);
   try {
@@ -208,13 +219,14 @@ async function studyFontEvidence(page) {
     const { nodeIds } = await cdp.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector: '[data-kp-font-probe]' });
     const fonts = [];
     for (const nodeId of nodeIds) fonts.push(...(await cdp.send('CSS.getPlatformFontsForNode', { nodeId })).fonts);
-    return { ...census, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
+    const statusAfterGlyphs = await page.evaluate(() => document.fonts.status);
+    return { ...census, statusAfterGlyphs, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
   } finally {
     await page.evaluate(() => { for (const node of document.querySelectorAll('[data-kp-font-probe]')) node.removeAttribute('data-kp-font-probe'); });
     await cdp.detach();
   }
 }
-const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.textNodes > 0 && f.glyphs > 0 && f.nativeGlyphs === 0;
+const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.statusAfterGlyphs === 'loaded' && f.errorFaces === 0 && f.textNodes > 0 && f.glyphs > 0 && f.nativeGlyphs === 0;
 
 /* ------------------------------------------------- half one: the deck */
 function verifyDeck() {
@@ -1286,7 +1298,7 @@ async function verifyTap(browser, base) {
     }
     check(
       'tap, standalone (study-mcd.html, study.html): no tap target on the front; after the reveal furigana and only this deck’s own words are tappable (the built-in gloss map); a tap shows a small popover — term, reading, definition, English behind 英語 — with no 覚える and a one-line note saying so; a press elsewhere closes it; one lookups[] row, the schedule unchanged',
-      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Save to your review cards in Bunki\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
+      seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Save to your review cards in KAIRO\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
       JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
     );
     check('tap, standalone: both actual release backs and their word popovers use bundled fonts for every visible text glyph',
