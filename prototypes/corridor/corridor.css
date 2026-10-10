@@ -5113,6 +5113,8 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .airead-para {
+  position: relative;
+  isolation: isolate;
   margin: 0 0 14px;
 }
 
@@ -5123,6 +5125,8 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .airead-hit {
+  position: relative;
+  touch-action: manipulation;
   background: transparent;
   border: 0;
   padding: 0;

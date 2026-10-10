@@ -469,6 +469,7 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 /* All inline Japanese uses the same lookup affordance, including quoted
  * passages and practice papers. These are words, never button-shaped chips. */
 .japanese-lookup-text { position: relative; isolation: isolate; font: inherit; line-height: inherit; letter-spacing: inherit; }
+.airead-para .japanese-lookup-text { isolation: auto; }
 .japanese-lookup-word {
   position: relative;
   display: inline;
@@ -492,7 +493,8 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
  * the 44px touch floor; it sits below neighbouring ink so a glyph's own button
  * wins at its centre, just as it does in the reader. The isolated text wrapper
  * keeps the negative layer above the surrounding paper. */
-.japanese-lookup-word::before {
+.japanese-lookup-word::before,
+.airead-hit::before {
   content: '';
   position: absolute;
   left: 50%;
