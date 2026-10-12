@@ -4,20 +4,20 @@ One Japanese-learning app: source-anchored reading and listening → contextual
 understanding → explicit learning → finite retrieval → later reuse, with a
 durable learner record and explainable adaptation.
 
-## Current integrated prototype — the Corridor
+## Current phone app — Bunki / KAIRO
 
-The product prototype is **`prototypes/corridor/`** — one integrated browser
+The phone product is **`prototypes/corridor/`** — one integrated browser
 app (shelf, reader, dictionary, kanji, writing room, SRS, Drift, AI, mock practice
-and KAGAMI Mirror). The September 10 committed baseline is `124f08b3`, through
-[PR #90](https://github.com/Amitabhainarunachala/Bunki-app/pull/90). Local September
-14 work combines recovered R35 record history with Perplexity's PRs #91/#92 and
-the observed PR #93 head `7d47063f`. This candidate has not been published.
-It is a preproduction app; native delivery and the full learning loop remain to prove.
-Start with the [production build and acceptance plan](docs/operator/KAIRO_PRODUCTION_BUILD_2026-09-10.md)
-and the
-[current product constitution](docs/operator/BUNKI_CURRENT_PRODUCT_CONSTITUTION_2026-08-15.md);
-it is the dated front door to the frozen product laws, current visual rulings,
-ten public worlds, and the quiet writing-room contract.
+and KAGAMI Mirror). The October 12 integrated baseline was published through
+[PR #129](https://github.com/Amitabhainarunachala/Bunki-app/pull/129), with all 154
+required release gates admitted. Numbered releases begin at 1.0.0; see the
+[current release manifest](release.json), [release history](CHANGELOG.md), and
+[versioning contract](docs/operator/VERSIONING_AND_RELEASES.md). The GitHub
+Release and public build identity establish which exact build is live.
+Native delivery and physical-device acceptance remain separate from browser CI.
+The [production build and acceptance plan](docs/operator/KAIRO_PRODUCTION_BUILD_2026-09-10.md)
+and [product constitution](docs/operator/BUNKI_CURRENT_PRODUCT_CONSTITUTION_2026-08-15.md)
+record the product laws, visual rulings, public worlds, and writing-room contract.
 
 - [Open the deployed corridor](https://amitabhainarunachala.github.io/Bunki-app/)
   (GitHub Pages, deployed from `main` by `.github/workflows/pages-app.yml`)

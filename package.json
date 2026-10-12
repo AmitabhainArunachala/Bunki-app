@@ -1,6 +1,6 @@
 {
   "name": "bunki",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Bunki (分岐) — Phase-0 closed learning loop. Monorepo root (WP-01).",
   "workspaces": [
@@ -42,7 +42,10 @@
     "verify:assessment:question": "node prototypes/corridor/tools/verify-assessment-question-practice.mjs",
     "verify:assessment:question-source": "node prototypes/corridor/tools/verify-assessment-question-source.mjs",
     "verify:assessment:question-view": "node prototypes/corridor/tools/verify-assessment-question-view.mjs",
-    "verify:assessment:written-section": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-written-section.mjs"
+    "verify:assessment:written-section": "KAIRO_BROWSER=all node prototypes/corridor/tools/verify-assessment-written-section.mjs",
+    "release:prepare": "node scripts/release/version.mjs prepare",
+    "release:sync": "node scripts/release/version.mjs sync",
+    "release:verify": "node scripts/release/version.mjs verify"
   },
   "dependencies": {
     "decode-uri-component": "file:./packages/uri-decoder-compat"

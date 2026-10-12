@@ -28,6 +28,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Admit only a synchronized stable product release
+        run: node scripts/release/version.mjs verify
       - name: Plan the current full policy
         run: node scripts/ci/battery.mjs plan --scope full --out "$RUNNER_TEMP/plan.json"
       - name: Independently admit exact-tree proof or require fresh CI
@@ -46,6 +48,11 @@ jobs:
         id: transfer
         if: steps.lookup.outputs.matched == 'true'
         run: node scripts/ci/receipts.mjs verify-transfer --transfer "$RUNNER_TEMP/reuse/transfer.json"
+      - name: Refuse replacement of an already numbered release
+        if: success() && steps.transfer.outputs.verified == 'true' && github.ref == 'refs/heads/main'
+        env:
+          RELEASE_SITE: ${{ steps.transfer.outputs.site_dir }}
+        run: node scripts/release/publish.mjs guard --site "$RELEASE_SITE"
       - name: Retain the transfer evidence
         if: success() && steps.transfer.outputs.verified == 'true'
         uses: actions/upload-artifact@v4
@@ -90,6 +97,8 @@ jobs:
         run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/download" --out "$RUNNER_TEMP/site"
       - name: Recheck complete source and byte identity before Pages packaging
         run: node scripts/verify-release-gates.mjs --verify-artifact "$RUNNER_TEMP/site" --require-clean
+      - name: Refuse replacement of an already numbered release
+        run: node scripts/release/publish.mjs guard --site "$RUNNER_TEMP/site"
       - uses: actions/upload-pages-artifact@v3
         with:
           name: kairo-pages
@@ -114,3 +123,43 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: kairo-pages
+  release:
+    name: retain and publish numbered release
+    if: always() && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
+    needs: [lookup, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BUNKI_RELEASE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Read the proof admitted by this deployment
+        id: producer
+        env:
+          REUSED: ${{ needs.lookup.outputs.matched }}
+        run: |
+          if [ "$REUSED" = true ]; then
+            release_proof_name="bunki-transfer-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          else
+            release_proof_name="bunki-proof-$(git rev-parse 'HEAD^{tree}')"
+          fi
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$release_proof_name" --dir "$RUNNER_TEMP/release-proof"
+          node scripts/release/publish.mjs resolve --proof "$RUNNER_TEMP/release-proof/receipt.json"
+      - name: Check out the original tested producer
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.producer.outputs.producer }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Verify the live app and retain its exact release package
+        run: node scripts/release/publish.mjs publish --proof "$RUNNER_TEMP/release-proof/receipt.json" --out "$RUNNER_TEMP/release-publish"

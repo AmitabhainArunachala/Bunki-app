@@ -20,6 +20,7 @@ export function supplementalGates(out) {
         'scripts/ci/battery.test.mjs',
         'scripts/ci/receipts.test.mjs',
         'scripts/ci/ledger.test.mjs',
+        'scripts/release/release.test.mjs',
       ],
       requiredPath: 'scripts/ci/receipts.test.mjs',
     },
