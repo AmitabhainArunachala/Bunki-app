@@ -33,6 +33,9 @@ Drift fixture, and the guided rematch's briefly visible guard phase.
   order, and requires guard before resolve even when remote polling is delayed.
 - Shards leave evidence-directory creation to the owning verifier, preserving
   the canonical runner's fresh-evidence contract.
+- Later-encounter checks wait for Back to finish its reading-position commit
+  and restore the caller before comparing the whole record or closing the app.
+  The exact comparison remains required; no learner root is excluded.
 
 The consolidated pipeline retains all 135 canonical gates and 19 supplemental
 gates. The newer tokenizer, language tour, redesign navigation/docking, and

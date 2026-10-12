@@ -323,7 +323,8 @@ for (const engine of engines) for (const width of sizes) {
     result.nextReading = await page.locator('.sentence-reading-choice h3').textContent();
     const nextId = await suggestion('new-context').getAttribute('data-reading-recommendation-id');
     await suggestion('new-context').click(); await page.locator('#reader-source-back').waitFor();
-    await page.locator('#reader-source-back').click(); unchanged(corrected, await snapshot('third-context-neutral'));
+    await page.locator('#reader-source-back').click(); await suggestion('new-context').waitFor();
+    unchanged(corrected, await snapshot('third-context-neutral'));
     await close(); await open(); await shelf(page); await suggestion('new-context').waitFor();
     assert.equal(await suggestion('new-context').getAttribute('data-reading-recommendation-id'), nextId);
     unchanged(corrected, await snapshot('restarted'));
@@ -367,6 +368,7 @@ for (const engine of engines) for (const width of sizes) {
     await shelf(page); await suggestion('new-context').waitFor();
     assert.equal(await suggestion('new-context').getAttribute('data-reading-recommendation-id'), nextId);
     await suggestion('new-context').click(); await page.locator('#reader-source-back').click();
+    await suggestion('new-context').waitFor();
     await close(); await open(); await shelf(page); await suggestion('new-context').waitFor();
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
     if (engine === 'webkit') disconnected = true; else await context.setOffline(true);
@@ -374,6 +376,9 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await suggestion('new-context').getAttribute('data-reading-recommendation-id'), nextId);
     await suggestion('new-context').click(); await page.locator('#reader-source-back').waitFor(); await shot('offline-later-source-and-caller');
     await page.locator('#reader-source-back').click();
+    // Back commits the reader position before it restores the caller. Observe
+    // that completed transition before comparing the entire persisted record.
+    await suggestion('new-context').waitFor();
     assert.deepEqual(await snapshot('restored-offline'), expectedRestored);
     assert.deepEqual(result.errors, []); assert.deepEqual(result.externalRequests, []);
     result.passed = true; result.observations.push({ name: 'later-context-and-feedback', sourceIds: [first.context.sourceId, second.context.sourceId],
