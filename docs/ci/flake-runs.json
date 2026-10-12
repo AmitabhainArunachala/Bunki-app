@@ -511,8 +511,8 @@
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-12T07:09:14Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-38211189408-2"
   },
   "37322574141/1": {
@@ -605,48 +605,48 @@
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-2"
   },
   "37496611523/3": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-3"
   },
   "37496611523/4": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-4"
   },
   "37496611523/5": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-5"
   },
   "37496611523/6": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-6"
   },
   "37496611523/7": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 2,
-    "attemptedAt": "2026-10-12T13:51:37.458Z",
+    "failures": 3,
+    "attemptedAt": "2026-10-12T16:34:06.686Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-7"
   },
   "37496611523/8": {
