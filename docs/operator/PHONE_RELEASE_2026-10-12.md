@@ -36,6 +36,15 @@ Drift fixture, and the guided rematch's briefly visible guard phase.
 - Later-encounter checks wait for Back to finish its reading-position commit
   and restore the caller before comparing the whole record or closing the app.
   The exact comparison remains required; no learner root is excluded.
+- The legacy Drift verifier creates its own report directory. The first
+  consolidated run passed all nine storage assertions, then failed to write
+  the report because it had relied on the runner creating that directory.
+- Failed-gate log tails are retained directly in job logs as well as in full
+  evidence archives, so large video/profile bundles cannot hide diagnostics.
+- Foundation navigation waits for the requested shelf transition and asserts
+  both its view and room before measuring layout. WebKit evidence had shown
+  that the earlier check measured the outgoing reader instead of the shelf.
+  The no-horizontal-scroll assertion remains unchanged.
 
 The consolidated pipeline retains all 135 canonical gates and 19 supplemental
 gates. The newer tokenizer, language tour, redesign navigation/docking, and

@@ -215,6 +215,13 @@ try {
             );
           }
           await page.locator('#tab-read').click();
+          // Room changes may finish after click dispatch (including WebKit's
+          // transition lifecycle). Measure the returned shelf, not its caller.
+          await page.waitForFunction(
+            () =>
+              document.body.dataset.view === 'shelf' &&
+              document.documentElement.dataset.room === 'shelf',
+          );
           const horizontal = await page.evaluate(() => ({
             noHorizontalScroll: document.documentElement.scrollWidth <= innerWidth,
             view: document.body.dataset.view,
@@ -230,6 +237,12 @@ try {
               (node) => ({ id: node.id, hidden: node.hidden, rects: node.getClientRects().length }),
             ),
           }));
+          assert.equal(
+            horizontal.view,
+            'shelf',
+            'Read returns to the bookshelf before measurement',
+          );
+          assert.equal(horizontal.room, 'shelf', 'The returned shelf owns the room shell');
           horizontalSamples.push({
             engine,
             width,

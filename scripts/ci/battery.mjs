@@ -521,10 +521,18 @@ export async function executeShard({
       '',
     ].join('\n');
     if (env.GITHUB_STEP_SUMMARY) appendFileSync(env.GITHUB_STEP_SUMMARY, shardSummary);
-    for (const gate of battery.gates.filter((g) => g.status !== 'passed'))
+    for (const gate of battery.gates.filter((g) => g.status !== 'passed')) {
       console.log(
         `::error title=Gate ${gate.name} failed::${gate.name} -> ${gate.status}; attempt ${attempt}${battery.status !== 'interrupted' && attempt === 1 ? '; one fresh-job retry pending' : ''}`,
       );
+      // Keep the actionable failure available even when the complete video and
+      // profile evidence archive exceeds a client's artifact download limit.
+      if (gate.log && existsSync(gate.log)) {
+        console.log(`::group::${gate.name} failure log (last 16 KiB)`);
+        console.log(readFileSync(gate.log, 'utf8').slice(-16384));
+        console.log('::endgroup::');
+      }
+    }
     if (battery.gates.some((g) => g.name === 'e2e-build' && g.status === 'passed'))
       record.dependencies.e2eBuild = e2eBuildIdentity();
     if (retryShard?.dependencies?.e2eBuild)
