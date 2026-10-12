@@ -133,7 +133,11 @@ for (const engine of engines) for (const width of sizes) {
     });
     await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     const assets = await Promise.all(loadedAssets);
-    currentRuntime = assets.length === 3 && assets.every(asset => asset.matchesCandidate);
+    // A controlled reload may report a script again during worker revalidation.
+    // Require every expected resource and check every response, including repeats.
+    currentRuntime = ['corridor.js', 'sentence-practice.mjs', 'corridor.css']
+      .every(path => assets.some(asset => asset.path === path))
+      && assets.every(asset => asset.matchesCandidate);
     result.observations.push({ name: 'loaded-runtime-assets', episode, assets });
     console.log(JSON.stringify({ engine, width, episode, assets }));
     if (episode > 1 || !priorRoot) assert(currentRuntime, 'Every candidate episode must execute the identified script, module and style bytes');

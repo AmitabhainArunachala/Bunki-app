@@ -605,6 +605,25 @@ async function journey(browser, browserName, viewport) {
     );
     await shot(page, dir, '14-fresh');
     await page.locator('.guided-room [name="fresh-answer"][value="0"]').check();
+    if (MOMENTS) await page.evaluate(() => {
+      // Observe inside the page before the click. Remote assertions can miss
+      // the 400ms guard phase entirely on a busy WebKit runner.
+      window.__rematchPhases = [];
+      window.__rematchObserver = new MutationObserver((records) => {
+        let lastRoot = null;
+        for (const record of records) {
+          const root = record.target;
+          if (!(root instanceof Element) || !root.matches('.samurai-effect--rematch')) continue;
+          // oldValue preserves intermediate mutations even if callbacks batch.
+          window.__rematchPhases.push(record.oldValue || '');
+          lastRoot = root;
+        }
+        if (lastRoot) window.__rematchPhases.push(lastRoot.className);
+      });
+      window.__rematchObserver.observe(document.body, {
+        attributes: true, attributeFilter: ['class'], attributeOldValue: true, subtree: true,
+      });
+    });
     await act(page, 'check-fresh').click();
     if (MOMENTS) {
       await page.locator('.samurai-effect--rematch').waitFor({ timeout: 3_000 });
@@ -616,20 +635,18 @@ async function journey(browser, browserName, viewport) {
         'M14 the rematch verdict is explicit',
         (await page.locator('#samurai-effect-title').innerText()).trim() === 'Correct.',
       );
-      // the guard lands on the scene's own timer (impact − 220 ms), the bow at resolve
-      // (impact + 180 ms); a fixed 700 ms sleep left 70 ms of margin, which a loaded machine
-      // outran, so wait for the guard while the bow has not begun
+      // Require an observed guard without resolve before the first resolve.
+      // Capture starts before play, so delayed driver polling loses no phases.
       check(
         'M16 the learner blocks (guard) before the samurai bows',
         await page
           .waitForFunction(
             () => {
-              const root = document.querySelector('.samurai-effect--rematch');
-              return (
-                !!root &&
-                root.classList.contains('samurai-effect--guard') &&
-                !root.classList.contains('samurai-effect--resolve')
-              );
+              const phases = window.__rematchPhases || [];
+              const guard = phases.findIndex(value => value.split(' ').includes('samurai-effect--guard')
+                && !value.split(' ').includes('samurai-effect--resolve'));
+              const resolve = phases.findIndex(value => value.split(' ').includes('samurai-effect--resolve'));
+              return guard >= 0 && (resolve < 0 || guard < resolve);
             },
             null,
             { timeout: 3_000 },
@@ -639,6 +656,7 @@ async function journey(browser, browserName, viewport) {
             () => false,
           ),
       );
+      await page.evaluate(() => window.__rematchObserver.disconnect());
       await page.screenshot({ path: join(dir, '15-rematch-block.png') });
       await page.waitForTimeout(900);
       await page.screenshot({ path: join(dir, '16-rematch-bow.png') });

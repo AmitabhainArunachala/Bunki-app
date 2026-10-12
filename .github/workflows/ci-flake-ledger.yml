@@ -1,0 +1,36 @@
+# Privileged consumer executes only the default branch's trusted policy.
+name: CI flake ledger
+on:
+  workflow_run:
+    workflows: [CI, pages-app, Nightly full verification]
+    types: [completed]
+  schedule:
+    - cron: '19 * * * *'
+permissions:
+  contents: read
+# One writer; queue: max holds up to 100 pending triggers instead of replacing all but one.
+concurrency:
+  group: bunki-flake-ledger
+  cancel-in-progress: false
+  queue: max
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Validate observed attempts and append to the fixed data branch
+        run: node scripts/ci/ledger.mjs

@@ -265,10 +265,22 @@ const check = (name, pass, detail = '') => {
 
 const targetPoint = (selector, label) => page.evaluate(({ selector, label }) => {
   const candidates = [...document.querySelectorAll(selector)].filter((el) => el.querySelector('.base,.g,.pch')?.textContent === label);
-  return candidates.map((el) => {
+  const point = candidates.map((el) => {
     const r = el.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
-    return { label, x, y, hit: el.contains(document.elementFromPoint(x, y)), classes: el.className };
+    return { el, label, x, y, hit: el.contains(document.elementFromPoint(x, y)), classes: el.className };
   }).find((candidate) => candidate.hit) ?? null;
+  if (!point) return null;
+  window.__driftHuntMemberHit = null;
+  addEventListener('pointerdown', (event) => {
+    const actual = event.target?.closest?.(selector);
+    window.__driftHuntMemberHit = {
+      sameNode: actual === point.el,
+      label: actual?.querySelector('.base,.g,.pch')?.textContent ?? null,
+      trusted: event.isTrusted, type: event.pointerType,
+    };
+  }, { capture: true, once: true });
+  const { el: _el, ...geometry } = point;
+  return geometry;
 }, { selector, label });
 async function tapMember(selector, label, trace) {
   let point = null, waitedMs = 0;
@@ -279,8 +291,16 @@ async function tapMember(selector, label, trace) {
     if (!point) { await page.waitForTimeout(100); waitedMs += 100; }
   }
   assert(point, `The current family must expose a hit-owned ${label}`);
-  trace.actions.push({ kind: 'tap', selector, ...point, waitedMs });
+  const action = { kind: 'tap', selector, ...point, waitedMs };
+  trace.actions.push(action);
   await tap(point.x, point.y);
+  action.delivered = await page.evaluate(() => window.__driftHuntMemberHit);
+  if (!action.delivered?.sameNode || !action.delivered.trusted || action.delivered.type !== 'touch') {
+    const error = new Error(`Staging touch for ${label} reached ${JSON.stringify(action.delivered)}`);
+    error.code = action.delivered?.trusted && action.delivered.type === 'touch'
+      && action.delivered.sameNode === false ? 'OBSERVED_TARGET_MISS' : 'UNCONFIRMED_TARGET';
+    throw error;
+  }
   await page.waitForTimeout(1100);
 }
 async function stageMessage(trace) {
@@ -313,6 +333,7 @@ async function stageMessage(trace) {
 async function stageCard(kind) {
   const trace = { name: `${kind}-card`, seed: 1729, actions: [] };
   stagings.push(trace);
+  for (let attempt = 1; attempt <= 3; attempt++) {
   try {
     await stageMessage(trace);
     if (kind === 'radical') {
@@ -329,7 +350,16 @@ async function stageCard(kind) {
     assert(trace.state.card && trace.state.depth, 'The real dive must retain an open Drift card');
     await shot(`staging-${kind}-card.png`);
     return true;
-  } catch (error) { trace.error = error.message; return false; }
+  } catch (error) {
+    trace.error = error.message;
+    trace.attempt = attempt;
+    console.log(JSON.stringify({ staging: trace }));
+    // Only a recorded native touch of the wrong moving body can restart setup.
+    // A correctly delivered interaction that fails its contract remains a failure.
+    if (error.code !== 'OBSERVED_TARGET_MISS' || attempt === 3) return false;
+  }
+  }
+  return false;
 }
 async function stageHubBloom(name) {
   await boot(1729);

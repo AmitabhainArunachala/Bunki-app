@@ -1,0 +1,6325 @@
+{
+  "schemaVersion": 1,
+  "repository": "AmitabhainArunachala/Bunki-app",
+  "measurement": "Each gate's completedAt minus startedAt from uploaded battery.json; seconds, wall clock.",
+  "limitations": [
+    "Five completed batteries, including failed batteries whose later gates still ran; failed gates can finish early.",
+    "Historical SHAs differ; maxSeconds is a conservative observed scheduling weight, not a future upper bound.",
+    "Runner setup, artifact build/download/upload and queue time are excluded from per-gate durations.",
+    "Local f938 log duplicates run 37407758020 attempt 2 and is not a sixth independent sample."
+  ],
+  "sources": [
+    {
+      "runId": 37326384597,
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37326384597",
+      "runAttempt": 2,
+      "headSha": "031db8f4907587d01c2c2ef733050ee90c7cd8f2",
+      "jobId": 111919386044,
+      "diagnosticsArtifactId": 11370874898,
+      "receiptSha256": "6bf94a56d78266b0ff1da51f54095bf9dbaabf782db615691f2440f4d5ab70c1",
+      "source": {
+        "sha": "5fc22a659706a5b49828c8295089474012de7523",
+        "dirty": false,
+        "site": "/home/runner/work/_temp/kairo-site",
+        "artifactSha256": "34e577ce2af02a79c75485363c266cf1c3c73c86b7bea61609bc40fee8a725e8"
+      },
+      "status": "failed",
+      "startedAt": "2026-10-05T18:31:45.545Z",
+      "completedAt": "2026-10-05T21:14:56.516Z",
+      "batterySeconds": 9790.971,
+      "gateCount": 135
+    },
+    {
+      "runId": 37327953066,
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37327953066",
+      "runAttempt": 1,
+      "headSha": "d7bdac78ce9422e3ebc82a76a1549e3d41bb40ac",
+      "jobId": 111825768434,
+      "diagnosticsArtifactId": 11361668574,
+      "receiptSha256": "4b69f5d216a075908b519ef3ac0b9767ad2edab9a40c59617f690b39e69f97d5",
+      "source": {
+        "sha": "92268d3d742496922401c41769d0cf761432b98c",
+        "dirty": false,
+        "site": "/home/runner/work/_temp/kairo-site",
+        "artifactSha256": "34e577ce2af02a79c75485363c266cf1c3c73c86b7bea61609bc40fee8a725e8"
+      },
+      "status": "passed",
+      "startedAt": "2026-10-05T14:57:55.049Z",
+      "completedAt": "2026-10-05T17:40:17.778Z",
+      "batterySeconds": 9742.729,
+      "gateCount": 135
+    },
+    {
+      "runId": 37400558515,
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37400558515",
+      "runAttempt": 1,
+      "headSha": "9a9d8f0563cb56551ebf48df2473af0a3ebda9b0",
+      "jobId": 112067606988,
+      "diagnosticsArtifactId": 11389181507,
+      "receiptSha256": "6afb243e54bc2a74baabf8b0297900b59ff35089370dd43ed5660ac80f090ced",
+      "source": {
+        "sha": "b38c45e68851fceb8e8368032e40c3fe9a065627",
+        "dirty": false,
+        "site": "/home/runner/work/_temp/kairo-site",
+        "artifactSha256": "34e577ce2af02a79c75485363c266cf1c3c73c86b7bea61609bc40fee8a725e8"
+      },
+      "status": "failed",
+      "startedAt": "2026-10-06T01:49:06.791Z",
+      "completedAt": "2026-10-06T03:52:05.051Z",
+      "batterySeconds": 7378.26,
+      "gateCount": 135
+    },
+    {
+      "runId": 37407758020,
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37407758020",
+      "runAttempt": 2,
+      "headSha": "f9383050c8da847868ae0ab8e61a518763d53864",
+      "jobId": 112155234507,
+      "diagnosticsArtifactId": 11404202280,
+      "receiptSha256": "5c07ee41214c661a89f9ee001df90a743980a54780e11542a330a9e7a6e76917",
+      "source": {
+        "sha": "b0e3fc90b74a68747ae4adee56a11b2c5de58bf2",
+        "dirty": false,
+        "site": "/home/runner/work/_temp/kairo-site",
+        "artifactSha256": "10fa8f9970c56d39dce860132933ad8cd6672c269a547bb436eb9a3609aa04e1"
+      },
+      "status": "failed",
+      "startedAt": "2026-10-06T07:23:02.937Z",
+      "completedAt": "2026-10-06T10:09:46.103Z",
+      "batterySeconds": 10003.166,
+      "gateCount": 135
+    },
+    {
+      "runId": 37452295779,
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/37452295779",
+      "runAttempt": 1,
+      "headSha": "e159b673fd1a30167d0ac4605019533d2d6a2428",
+      "jobId": 112232754179,
+      "diagnosticsArtifactId": 11416675874,
+      "receiptSha256": "e2529771156833419ee85bab948ec41295ab0d3e64b9b98283817a07bed45bfd",
+      "source": {
+        "sha": "31659a7f991058db39ffda2669f1e7a0b07d177d",
+        "dirty": false,
+        "site": "/home/runner/work/_temp/kairo-site",
+        "artifactSha256": "04bcb9be24b2dbf3e6de79d4c200eda939bf43245c12430d7f78fb19aa0ebad7"
+      },
+      "status": "passed",
+      "startedAt": "2026-10-06T10:55:39.122Z",
+      "completedAt": "2026-10-06T13:22:00.949Z",
+      "batterySeconds": 8781.827,
+      "gateCount": 135
+    }
+  ],
+  "gates": [
+    {
+      "name": "ai-adaptation",
+      "sampleCount": 5,
+      "medianSeconds": 64.426,
+      "meanSeconds": 61.983,
+      "maxSeconds": 65.875,
+      "minSeconds": 52.861,
+      "successfulMedianSeconds": 64.426,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 65.875,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:16:22.706Z",
+          "completedAt": "2026-10-05T20:17:28.581Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 65.612,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:41:25.669Z",
+          "completedAt": "2026-10-05T16:42:31.281Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 52.861,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:10:02.350Z",
+          "completedAt": "2026-10-06T03:10:55.211Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 64.426,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:09:03.737Z",
+          "completedAt": "2026-10-06T09:10:08.163Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 61.139,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:30:39.355Z",
+          "completedAt": "2026-10-06T12:31:40.494Z"
+        }
+      ]
+    },
+    {
+      "name": "alma-reading",
+      "sampleCount": 5,
+      "medianSeconds": 32.064,
+      "meanSeconds": 30.26,
+      "maxSeconds": 32.955,
+      "minSeconds": 25.035,
+      "successfulMedianSeconds": 32.064,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 32.064,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:28:22.015Z",
+          "completedAt": "2026-10-05T20:28:54.079Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 32.955,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:53:27.387Z",
+          "completedAt": "2026-10-05T16:54:00.342Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 25.035,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:19:47.974Z",
+          "completedAt": "2026-10-06T03:20:13.009Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 32.663,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:21:09.726Z",
+          "completedAt": "2026-10-06T09:21:42.389Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 28.582,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:41:40.409Z",
+          "completedAt": "2026-10-06T12:42:08.991Z"
+        }
+      ]
+    },
+    {
+      "name": "annotation-lookup",
+      "sampleCount": 5,
+      "medianSeconds": 72.84,
+      "meanSeconds": 67.641,
+      "maxSeconds": 73.828,
+      "minSeconds": 53.028,
+      "successfulMedianSeconds": 72.84,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 72.84,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:24:52.958Z",
+          "completedAt": "2026-10-05T20:26:05.798Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 73.703,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:49:57.539Z",
+          "completedAt": "2026-10-05T16:51:11.242Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 53.028,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:17:13.906Z",
+          "completedAt": "2026-10-06T03:18:06.934Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 73.828,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:17:39.340Z",
+          "completedAt": "2026-10-06T09:18:53.168Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 64.808,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:38:35.283Z",
+          "completedAt": "2026-10-06T12:39:40.091Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-app",
+      "sampleCount": 5,
+      "medianSeconds": 233.921,
+      "meanSeconds": 216.433,
+      "maxSeconds": 237.015,
+      "minSeconds": 158.814,
+      "successfulMedianSeconds": 233.921,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 237.015,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:47:08.515Z",
+          "completedAt": "2026-10-05T19:51:05.530Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 233.921,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:12:40.720Z",
+          "completedAt": "2026-10-05T16:16:34.641Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 158.814,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:46:57.537Z",
+          "completedAt": "2026-10-06T02:49:36.351Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 236.266,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:40:10.305Z",
+          "completedAt": "2026-10-06T08:44:06.571Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 216.149,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:04:17.575Z",
+          "completedAt": "2026-10-06T12:07:53.724Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-bank",
+      "sampleCount": 5,
+      "medianSeconds": 8.165,
+      "meanSeconds": 7.572,
+      "maxSeconds": 8.612,
+      "minSeconds": 5.051,
+      "successfulMedianSeconds": 8.165,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 8.612,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:15.199Z",
+          "completedAt": "2026-10-05T19:39:23.811Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 8.224,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:36.647Z",
+          "completedAt": "2026-10-05T16:04:44.871Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 5.051,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:06.748Z",
+          "completedAt": "2026-10-06T02:41:11.799Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 8.165,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:12.435Z",
+          "completedAt": "2026-10-06T08:32:20.600Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 7.808,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:07.410Z",
+          "completedAt": "2026-10-06T11:57:15.218Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-controller",
+      "sampleCount": 5,
+      "medianSeconds": 51.648,
+      "meanSeconds": 48.047,
+      "maxSeconds": 56.856,
+      "minSeconds": 32.853,
+      "successfulMedianSeconds": 51.648,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 56.856,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:35:21.810Z",
+          "completedAt": "2026-10-05T20:36:18.666Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 51.707,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:00:30.667Z",
+          "completedAt": "2026-10-05T17:01:22.374Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 32.853,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:25:14.371Z",
+          "completedAt": "2026-10-06T03:25:47.224Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 51.648,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:28:18.919Z",
+          "completedAt": "2026-10-06T09:29:10.567Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 47.17,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:48:08.796Z",
+          "completedAt": "2026-10-06T12:48:55.966Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-learning",
+      "sampleCount": 5,
+      "medianSeconds": 2.376,
+      "meanSeconds": 2.101,
+      "maxSeconds": 2.417,
+      "minSeconds": 1.367,
+      "successfulMedianSeconds": 2.376,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 2.376,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:31.644Z",
+          "completedAt": "2026-10-05T19:39:34.020Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 2.398,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:52.822Z",
+          "completedAt": "2026-10-05T16:04:55.220Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.367,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:16.145Z",
+          "completedAt": "2026-10-06T02:41:17.512Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 2.417,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:28.503Z",
+          "completedAt": "2026-10-06T08:32:30.920Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.945,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:21.650Z",
+          "completedAt": "2026-10-06T11:57:23.595Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-private-import",
+      "sampleCount": 5,
+      "medianSeconds": 39.151,
+      "meanSeconds": 37.434,
+      "maxSeconds": 39.756,
+      "minSeconds": 33.438,
+      "successfulMedianSeconds": 39.151,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 39.151,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:51:40.042Z",
+          "completedAt": "2026-10-05T19:52:19.193Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 39.756,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:17:08.705Z",
+          "completedAt": "2026-10-05T16:17:48.461Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 33.438,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:50:01.358Z",
+          "completedAt": "2026-10-06T02:50:34.796Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 39.528,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:44:40.787Z",
+          "completedAt": "2026-10-06T08:45:20.315Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 35.295,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:08:23.751Z",
+          "completedAt": "2026-10-06T12:08:59.046Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-question-practice",
+      "sampleCount": 5,
+      "medianSeconds": 1.229,
+      "meanSeconds": 1.097,
+      "maxSeconds": 1.254,
+      "minSeconds": 0.748,
+      "successfulMedianSeconds": 1.229,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.229,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:34.022Z",
+          "completedAt": "2026-10-05T19:39:35.251Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.251,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:55.222Z",
+          "completedAt": "2026-10-05T16:04:56.473Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.748,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:17.513Z",
+          "completedAt": "2026-10-06T02:41:18.261Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.254,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:30.922Z",
+          "completedAt": "2026-10-06T08:32:32.176Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.002,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:23.597Z",
+          "completedAt": "2026-10-06T11:57:24.599Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-question-source",
+      "sampleCount": 5,
+      "medianSeconds": 0.976,
+      "meanSeconds": 0.873,
+      "maxSeconds": 1.001,
+      "minSeconds": 0.591,
+      "successfulMedianSeconds": 0.976,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.988,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:35.252Z",
+          "completedAt": "2026-10-05T19:39:36.240Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.976,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:56.474Z",
+          "completedAt": "2026-10-05T16:04:57.450Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.591,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:18.262Z",
+          "completedAt": "2026-10-06T02:41:18.853Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.001,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:32.177Z",
+          "completedAt": "2026-10-06T08:32:33.178Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.808,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:24.600Z",
+          "completedAt": "2026-10-06T11:57:25.408Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-question-view",
+      "sampleCount": 5,
+      "medianSeconds": 62.288,
+      "meanSeconds": 61.497,
+      "maxSeconds": 62.452,
+      "minSeconds": 59.233,
+      "successfulMedianSeconds": 62.288,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 62.452,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:36.241Z",
+          "completedAt": "2026-10-05T19:40:38.693Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 62.288,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:57.451Z",
+          "completedAt": "2026-10-05T16:05:59.739Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 59.233,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:18.856Z",
+          "completedAt": "2026-10-06T02:42:18.089Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 62.355,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:33.179Z",
+          "completedAt": "2026-10-06T08:33:35.534Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 61.157,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:25.409Z",
+          "completedAt": "2026-10-06T11:58:26.566Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-room",
+      "sampleCount": 5,
+      "medianSeconds": 52.815,
+      "meanSeconds": 50.94,
+      "maxSeconds": 53.309,
+      "minSeconds": 46.049,
+      "successfulMedianSeconds": 52.815,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 53.309,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:46:15.205Z",
+          "completedAt": "2026-10-05T19:47:08.514Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 52.815,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:11:47.903Z",
+          "completedAt": "2026-10-05T16:12:40.718Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 46.049,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:46:11.486Z",
+          "completedAt": "2026-10-06T02:46:57.535Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 52.983,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:39:17.321Z",
+          "completedAt": "2026-10-06T08:40:10.304Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 49.545,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:03:28.026Z",
+          "completedAt": "2026-10-06T12:04:17.571Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-standalone",
+      "sampleCount": 5,
+      "medianSeconds": 34.061,
+      "meanSeconds": 31.56,
+      "maxSeconds": 34.51,
+      "minSeconds": 25.004,
+      "successfulMedianSeconds": 34.061,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 34.51,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:51:05.531Z",
+          "completedAt": "2026-10-05T19:51:40.041Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 34.061,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:16:34.643Z",
+          "completedAt": "2026-10-05T16:17:08.704Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 25.004,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:49:36.352Z",
+          "completedAt": "2026-10-06T02:50:01.356Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 34.214,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:44:06.572Z",
+          "completedAt": "2026-10-06T08:44:40.786Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 30.011,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:07:53.733Z",
+          "completedAt": "2026-10-06T12:08:23.744Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-v2-controller",
+      "sampleCount": 5,
+      "medianSeconds": 7.831,
+      "meanSeconds": 6.878,
+      "maxSeconds": 7.948,
+      "minSeconds": 4.343,
+      "successfulMedianSeconds": 7.831,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 7.831,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:23.812Z",
+          "completedAt": "2026-10-05T19:39:31.643Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 7.948,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:44.873Z",
+          "completedAt": "2026-10-05T16:04:52.821Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 4.343,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:11.800Z",
+          "completedAt": "2026-10-06T02:41:16.143Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 7.9,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:20.601Z",
+          "completedAt": "2026-10-06T08:32:28.501Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 6.366,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:15.274Z",
+          "completedAt": "2026-10-06T11:57:21.640Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-v2-finalize",
+      "sampleCount": 5,
+      "medianSeconds": 109.541,
+      "meanSeconds": 98.335,
+      "maxSeconds": 111.758,
+      "minSeconds": 70.149,
+      "successfulMedianSeconds": 109.541,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 109.541,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:44:25.663Z",
+          "completedAt": "2026-10-05T19:46:15.204Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 111.758,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:09:56.143Z",
+          "completedAt": "2026-10-05T16:11:47.901Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 70.149,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:45:01.335Z",
+          "completedAt": "2026-10-06T02:46:11.484Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 110.751,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:37:26.569Z",
+          "completedAt": "2026-10-06T08:39:17.320Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 89.476,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:01:58.549Z",
+          "completedAt": "2026-10-06T12:03:28.025Z"
+        }
+      ]
+    },
+    {
+      "name": "assessment-written-section",
+      "sampleCount": 5,
+      "medianSeconds": 226.967,
+      "meanSeconds": 213.924,
+      "maxSeconds": 236.401,
+      "minSeconds": 163.242,
+      "successfulMedianSeconds": 226.967,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 226.967,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:40:38.694Z",
+          "completedAt": "2026-10-05T19:44:25.661Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 236.401,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:05:59.740Z",
+          "completedAt": "2026-10-05T16:09:56.141Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 163.242,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:42:18.092Z",
+          "completedAt": "2026-10-06T02:45:01.334Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 231.032,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:33:35.535Z",
+          "completedAt": "2026-10-06T08:37:26.567Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 211.98,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:58:26.568Z",
+          "completedAt": "2026-10-06T12:01:58.548Z"
+        }
+      ]
+    },
+    {
+      "name": "browser-audio-silence-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.055,
+      "meanSeconds": 0.051,
+      "maxSeconds": 0.063,
+      "minSeconds": 0.035,
+      "successfulMedianSeconds": 0.055,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.063,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:49:44.208Z",
+          "completedAt": "2026-10-05T18:49:44.271Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.055,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:15:29.243Z",
+          "completedAt": "2026-10-05T15:15:29.298Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.035,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:02:22.304Z",
+          "completedAt": "2026-10-06T02:02:22.339Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.057,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:41:02.507Z",
+          "completedAt": "2026-10-06T07:41:02.564Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.046,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:11:53.348Z",
+          "completedAt": "2026-10-06T11:11:53.394Z"
+        }
+      ]
+    },
+    {
+      "name": "bundled-listening-catalog",
+      "sampleCount": 5,
+      "medianSeconds": 0.21,
+      "meanSeconds": 0.191,
+      "maxSeconds": 0.217,
+      "minSeconds": 0.137,
+      "successfulMedianSeconds": 0.21,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.217,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:03:58.387Z",
+          "completedAt": "2026-10-05T19:03:58.604Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.21,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:29:22.530Z",
+          "completedAt": "2026-10-05T15:29:22.740Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.137,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:13:20.210Z",
+          "completedAt": "2026-10-06T02:13:20.347Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.215,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:55:25.603Z",
+          "completedAt": "2026-10-06T07:55:25.818Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.174,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:24:52.671Z",
+          "completedAt": "2026-10-06T11:24:52.845Z"
+        }
+      ]
+    },
+    {
+      "name": "bundled-listening-failures",
+      "sampleCount": 5,
+      "medianSeconds": 5.585,
+      "meanSeconds": 5.225,
+      "maxSeconds": 5.755,
+      "minSeconds": 3.93,
+      "successfulMedianSeconds": 5.585,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 5.755,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:03:58.605Z",
+          "completedAt": "2026-10-05T19:04:04.360Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 5.585,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:29:22.741Z",
+          "completedAt": "2026-10-05T15:29:28.326Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 3.93,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:13:20.349Z",
+          "completedAt": "2026-10-06T02:13:24.279Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 5.69,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:55:25.819Z",
+          "completedAt": "2026-10-06T07:55:31.509Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 5.165,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:24:52.847Z",
+          "completedAt": "2026-10-06T11:24:58.012Z"
+        }
+      ]
+    },
+    {
+      "name": "bundled-listening-integration",
+      "sampleCount": 5,
+      "medianSeconds": 89.172,
+      "meanSeconds": 86.933,
+      "maxSeconds": 93.282,
+      "minSeconds": 74.993,
+      "successfulMedianSeconds": 89.172,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 93.282,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:02:25.104Z",
+          "completedAt": "2026-10-05T19:03:58.386Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 89.172,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:27:53.357Z",
+          "completedAt": "2026-10-05T15:29:22.529Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 74.993,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:12:05.215Z",
+          "completedAt": "2026-10-06T02:13:20.208Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 93.004,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:53:52.598Z",
+          "completedAt": "2026-10-06T07:55:25.602Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 84.213,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:23:28.456Z",
+          "completedAt": "2026-10-06T11:24:52.669Z"
+        }
+      ]
+    },
+    {
+      "name": "bundled-practice-integration",
+      "sampleCount": 5,
+      "medianSeconds": 78.104,
+      "meanSeconds": 75.43,
+      "maxSeconds": 81.061,
+      "minSeconds": 63.767,
+      "successfulMedianSeconds": 78.104,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 79.059,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:01:06.043Z",
+          "completedAt": "2026-10-05T19:02:25.102Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 78.104,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:26:35.251Z",
+          "completedAt": "2026-10-05T15:27:53.355Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 63.767,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:11:01.447Z",
+          "completedAt": "2026-10-06T02:12:05.214Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 81.061,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:52:31.536Z",
+          "completedAt": "2026-10-06T07:53:52.597Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 75.158,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:22:13.297Z",
+          "completedAt": "2026-10-06T11:23:28.455Z"
+        }
+      ]
+    },
+    {
+      "name": "corpus-pytest",
+      "sampleCount": 5,
+      "medianSeconds": 1.672,
+      "meanSeconds": 1.732,
+      "maxSeconds": 2.248,
+      "minSeconds": 1.52,
+      "successfulMedianSeconds": 1.672,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 2.248,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:14:53.707Z",
+          "completedAt": "2026-10-05T21:14:55.955Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.694,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:40:15.552Z",
+          "completedAt": "2026-10-05T17:40:17.246Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.672,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:52:02.967Z",
+          "completedAt": "2026-10-06T03:52:04.639Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.528,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:09:44.019Z",
+          "completedAt": "2026-10-06T10:09:45.547Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.52,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:21:58.949Z",
+          "completedAt": "2026-10-06T13:22:00.469Z"
+        }
+      ]
+    },
+    {
+      "name": "corridor",
+      "sampleCount": 5,
+      "medianSeconds": 339.19,
+      "meanSeconds": 327.998,
+      "maxSeconds": 355.602,
+      "minSeconds": 282.469,
+      "successfulMedianSeconds": 339.19,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 352.917,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:11:33.689Z",
+          "completedAt": "2026-10-05T19:17:26.606Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 339.19,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:36:50.282Z",
+          "completedAt": "2026-10-05T15:42:29.472Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 282.469,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:19:33.791Z",
+          "completedAt": "2026-10-06T02:24:16.260Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 355.602,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:04:03.277Z",
+          "completedAt": "2026-10-06T08:09:58.879Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 309.813,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:32:34.563Z",
+          "completedAt": "2026-10-06T11:37:44.376Z"
+        }
+      ]
+    },
+    {
+      "name": "corridor-a11y",
+      "sampleCount": 5,
+      "medianSeconds": 56.363,
+      "meanSeconds": 52.134,
+      "maxSeconds": 59.362,
+      "minSeconds": 38.913,
+      "successfulMedianSeconds": 56.363,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 57.443,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:17:26.607Z",
+          "completedAt": "2026-10-05T19:18:24.050Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 56.363,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:42:29.473Z",
+          "completedAt": "2026-10-05T15:43:25.836Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 38.913,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:24:16.262Z",
+          "completedAt": "2026-10-06T02:24:55.175Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 59.362,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:09:58.880Z",
+          "completedAt": "2026-10-06T08:10:58.242Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 48.591,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:37:44.435Z",
+          "completedAt": "2026-10-06T11:38:33.026Z"
+        }
+      ]
+    },
+    {
+      "name": "corridor-ai",
+      "sampleCount": 5,
+      "medianSeconds": 106.858,
+      "meanSeconds": 102.974,
+      "maxSeconds": 109.343,
+      "minSeconds": 89.548,
+      "successfulMedianSeconds": 106.858,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 109.343,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:14:33.222Z",
+          "completedAt": "2026-10-05T20:16:22.565Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 106.858,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:39:38.679Z",
+          "completedAt": "2026-10-05T16:41:25.537Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 89.548,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:08:32.715Z",
+          "completedAt": "2026-10-06T03:10:02.263Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 107.055,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:07:16.538Z",
+          "completedAt": "2026-10-06T09:09:03.593Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 102.065,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:28:57.099Z",
+          "completedAt": "2026-10-06T12:30:39.164Z"
+        }
+      ]
+    },
+    {
+      "name": "corridor-build",
+      "sampleCount": 5,
+      "medianSeconds": 32.281,
+      "meanSeconds": 31.328,
+      "maxSeconds": 33.635,
+      "minSeconds": 27.776,
+      "successfulMedianSeconds": 32.281,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 33.635,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:02.642Z",
+          "completedAt": "2026-10-05T18:33:36.277Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 32.281,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:07.123Z",
+          "completedAt": "2026-10-05T14:59:39.404Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 27.776,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:08.864Z",
+          "completedAt": "2026-10-06T01:50:36.640Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 32.548,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:24:16.283Z",
+          "completedAt": "2026-10-06T07:24:48.831Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 30.402,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:07.868Z",
+          "completedAt": "2026-10-06T10:57:38.270Z"
+        }
+      ]
+    },
+    {
+      "name": "corridor-lint",
+      "sampleCount": 5,
+      "medianSeconds": 6.42,
+      "meanSeconds": 5.841,
+      "maxSeconds": 6.651,
+      "minSeconds": 4.238,
+      "successfulMedianSeconds": 6.42,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 6.553,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:36:45.797Z",
+          "completedAt": "2026-10-05T18:36:52.350Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 6.42,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:02:44.127Z",
+          "completedAt": "2026-10-05T15:02:50.547Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 4.238,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:53:01.621Z",
+          "completedAt": "2026-10-06T01:53:05.859Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 6.651,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:28:02.205Z",
+          "completedAt": "2026-10-06T07:28:08.856Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 5.342,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:00:26.484Z",
+          "completedAt": "2026-10-06T11:00:31.826Z"
+        }
+      ]
+    },
+    {
+      "name": "desktop-host",
+      "sampleCount": 5,
+      "medianSeconds": 8.958,
+      "meanSeconds": 8.342,
+      "maxSeconds": 9.492,
+      "minSeconds": 6.49,
+      "successfulMedianSeconds": 8.958,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 9.0,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:11:24.688Z",
+          "completedAt": "2026-10-05T19:11:33.688Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 8.958,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:36:41.323Z",
+          "completedAt": "2026-10-05T15:36:50.281Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 6.49,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:19:27.300Z",
+          "completedAt": "2026-10-06T02:19:33.790Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 9.492,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:03:53.783Z",
+          "completedAt": "2026-10-06T08:04:03.275Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 7.772,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:32:26.790Z",
+          "completedAt": "2026-10-06T11:32:34.562Z"
+        }
+      ]
+    },
+    {
+      "name": "drift-fast",
+      "sampleCount": 5,
+      "medianSeconds": 150.321,
+      "meanSeconds": 148.902,
+      "maxSeconds": 151.652,
+      "minSeconds": 143.934,
+      "successfulMedianSeconds": 150.321,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 151.652,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:08:51.167Z",
+          "completedAt": "2026-10-05T20:11:22.819Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 150.321,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:33:58.094Z",
+          "completedAt": "2026-10-05T16:36:28.415Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 143.934,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:03:08.415Z",
+          "completedAt": "2026-10-06T03:05:32.349Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 150.88,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:01:35.217Z",
+          "completedAt": "2026-10-06T09:04:06.097Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 147.723,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:23:22.400Z",
+          "completedAt": "2026-10-06T12:25:50.123Z"
+        }
+      ]
+    },
+    {
+      "name": "drift-hunt",
+      "sampleCount": 5,
+      "medianSeconds": 190.261,
+      "meanSeconds": 187.687,
+      "maxSeconds": 190.438,
+      "minSeconds": 180.363,
+      "successfulMedianSeconds": 190.261,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 190.401,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:11:22.820Z",
+          "completedAt": "2026-10-05T20:14:33.221Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 190.261,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:36:28.416Z",
+          "completedAt": "2026-10-05T16:39:38.677Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 180.363,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:05:32.351Z",
+          "completedAt": "2026-10-06T03:08:32.714Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 190.438,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:04:06.098Z",
+          "completedAt": "2026-10-06T09:07:16.536Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 186.973,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:25:50.125Z",
+          "completedAt": "2026-10-06T12:28:57.098Z"
+        }
+      ]
+    },
+    {
+      "name": "drift-layer-generated",
+      "sampleCount": 5,
+      "medianSeconds": 0.081,
+      "meanSeconds": 0.079,
+      "maxSeconds": 0.088,
+      "minSeconds": 0.064,
+      "successfulMedianSeconds": 0.081,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.088,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:08:50.082Z",
+          "completedAt": "2026-10-05T20:08:50.170Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.081,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:33:57.057Z",
+          "completedAt": "2026-10-05T16:33:57.138Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.064,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:03:07.692Z",
+          "completedAt": "2026-10-06T03:03:07.756Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.083,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:01:34.170Z",
+          "completedAt": "2026-10-06T09:01:34.253Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.08,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:23:21.436Z",
+          "completedAt": "2026-10-06T12:23:21.516Z"
+        }
+      ]
+    },
+    {
+      "name": "drift-practice-priorities",
+      "sampleCount": 5,
+      "medianSeconds": 0.953,
+      "meanSeconds": 0.889,
+      "maxSeconds": 0.994,
+      "minSeconds": 0.657,
+      "successfulMedianSeconds": 0.953,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.994,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:08:50.172Z",
+          "completedAt": "2026-10-05T20:08:51.166Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.953,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:33:57.140Z",
+          "completedAt": "2026-10-05T16:33:58.093Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.657,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:03:07.757Z",
+          "completedAt": "2026-10-06T03:03:08.414Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.961,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:01:34.255Z",
+          "completedAt": "2026-10-06T09:01:35.216Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.882,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:23:21.517Z",
+          "completedAt": "2026-10-06T12:23:22.399Z"
+        }
+      ]
+    },
+    {
+      "name": "drift-record-chromium",
+      "sampleCount": 5,
+      "medianSeconds": 97.91,
+      "meanSeconds": 97.054,
+      "maxSeconds": 98.893,
+      "minSeconds": 93.747,
+      "successfulMedianSeconds": 97.91,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 98.893,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:00:27.443Z",
+          "completedAt": "2026-10-05T20:02:06.336Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 97.91,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:25:38.592Z",
+          "completedAt": "2026-10-05T16:27:16.502Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 93.747,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:56:35.702Z",
+          "completedAt": "2026-10-06T02:58:09.449Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 97.914,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:53:16.702Z",
+          "completedAt": "2026-10-06T08:54:54.616Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 96.806,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:16:03.691Z",
+          "completedAt": "2026-10-06T12:17:40.497Z"
+        }
+      ]
+    },
+    {
+      "name": "drift-record-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 105.523,
+      "meanSeconds": 103.259,
+      "maxSeconds": 105.652,
+      "minSeconds": 98.31,
+      "successfulMedianSeconds": 105.523,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 105.652,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:07:04.429Z",
+          "completedAt": "2026-10-05T20:08:50.081Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 105.649,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:32:11.406Z",
+          "completedAt": "2026-10-05T16:33:57.055Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 98.31,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:01:29.381Z",
+          "completedAt": "2026-10-06T03:03:07.691Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 105.523,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:59:48.646Z",
+          "completedAt": "2026-10-06T09:01:34.169Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 101.159,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:21:40.275Z",
+          "completedAt": "2026-10-06T12:23:21.434Z"
+        }
+      ]
+    },
+    {
+      "name": "e2e",
+      "sampleCount": 5,
+      "medianSeconds": 77.128,
+      "meanSeconds": 72.05,
+      "maxSeconds": 81.479,
+      "minSeconds": 58.334,
+      "successfulMedianSeconds": 77.128,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 77.348,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:13:36.355Z",
+          "completedAt": "2026-10-05T21:14:53.703Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 77.128,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:38:58.423Z",
+          "completedAt": "2026-10-05T17:40:15.551Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 58.334,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:51:04.631Z",
+          "completedAt": "2026-10-06T03:52:02.965Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 81.479,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:08:22.539Z",
+          "completedAt": "2026-10-06T10:09:44.018Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 65.96,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:20:52.988Z",
+          "completedAt": "2026-10-06T13:21:58.948Z"
+        }
+      ]
+    },
+    {
+      "name": "e2e-build",
+      "sampleCount": 5,
+      "medianSeconds": 33.075,
+      "meanSeconds": 32.873,
+      "maxSeconds": 38.104,
+      "minSeconds": 25.162,
+      "successfulMedianSeconds": 33.075,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 33.075,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:13:03.278Z",
+          "completedAt": "2026-10-05T21:13:36.353Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 35.273,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:38:23.149Z",
+          "completedAt": "2026-10-05T17:38:58.422Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 25.162,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:50:39.467Z",
+          "completedAt": "2026-10-06T03:51:04.629Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 38.104,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:07:44.433Z",
+          "completedAt": "2026-10-06T10:08:22.537Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 32.75,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:20:20.236Z",
+          "completedAt": "2026-10-06T13:20:52.986Z"
+        }
+      ]
+    },
+    {
+      "name": "export",
+      "sampleCount": 5,
+      "medianSeconds": 1.139,
+      "meanSeconds": 1.077,
+      "maxSeconds": 1.248,
+      "minSeconds": 0.79,
+      "successfulMedianSeconds": 1.139,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.139,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:13:02.138Z",
+          "completedAt": "2026-10-05T21:13:03.277Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.166,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:38:21.982Z",
+          "completedAt": "2026-10-05T17:38:23.148Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.79,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:50:38.676Z",
+          "completedAt": "2026-10-06T03:50:39.466Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.248,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:07:43.183Z",
+          "completedAt": "2026-10-06T10:07:44.431Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.04,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:20:19.195Z",
+          "completedAt": "2026-10-06T13:20:20.235Z"
+        }
+      ]
+    },
+    {
+      "name": "format-check",
+      "sampleCount": 5,
+      "medianSeconds": 15.239,
+      "meanSeconds": 15.034,
+      "maxSeconds": 19.04,
+      "minSeconds": 10.326,
+      "successfulMedianSeconds": 15.37,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 15.239,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:36:22.392Z",
+          "completedAt": "2026-10-05T18:36:37.631Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 15.501,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:02:20.404Z",
+          "completedAt": "2026-10-05T15:02:35.905Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 10.326,
+          "status": "failed",
+          "startedAt": "2026-10-06T01:52:45.741Z",
+          "completedAt": "2026-10-06T01:52:56.067Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 19.04,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:27:34.515Z",
+          "completedAt": "2026-10-06T07:27:53.555Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 15.064,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:00:03.736Z",
+          "completedAt": "2026-10-06T11:00:18.800Z"
+        }
+      ]
+    },
+    {
+      "name": "guided-offline",
+      "sampleCount": 5,
+      "medianSeconds": 11.754,
+      "meanSeconds": 11.115,
+      "maxSeconds": 12.048,
+      "minSeconds": 9.015,
+      "successfulMedianSeconds": 11.754,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 11.919,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:24:41.037Z",
+          "completedAt": "2026-10-05T20:24:52.956Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 11.754,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:49:45.784Z",
+          "completedAt": "2026-10-05T16:49:57.538Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 9.015,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:17:04.890Z",
+          "completedAt": "2026-10-06T03:17:13.905Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 12.048,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:17:27.291Z",
+          "completedAt": "2026-10-06T09:17:39.339Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 10.838,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:38:24.443Z",
+          "completedAt": "2026-10-06T12:38:35.281Z"
+        }
+      ]
+    },
+    {
+      "name": "guided-session",
+      "sampleCount": 5,
+      "medianSeconds": 220.965,
+      "meanSeconds": 216.046,
+      "maxSeconds": 229.085,
+      "minSeconds": 199.756,
+      "successfulMedianSeconds": 220.965,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 220.965,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:20:59.887Z",
+          "completedAt": "2026-10-05T20:24:40.852Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 222.181,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:46:03.424Z",
+          "completedAt": "2026-10-05T16:49:45.605Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 199.756,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:13:45.005Z",
+          "completedAt": "2026-10-06T03:17:04.761Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 229.085,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:13:38.023Z",
+          "completedAt": "2026-10-06T09:17:27.108Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 208.243,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:34:56.033Z",
+          "completedAt": "2026-10-06T12:38:24.276Z"
+        }
+      ]
+    },
+    {
+      "name": "guided-session-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.175,
+      "meanSeconds": 0.165,
+      "maxSeconds": 0.182,
+      "minSeconds": 0.125,
+      "successfulMedianSeconds": 0.175,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.182,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:24:40.853Z",
+          "completedAt": "2026-10-05T20:24:41.035Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.175,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:49:45.607Z",
+          "completedAt": "2026-10-05T16:49:45.782Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.125,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:17:04.763Z",
+          "completedAt": "2026-10-06T03:17:04.888Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.18,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:17:27.110Z",
+          "completedAt": "2026-10-06T09:17:27.290Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.164,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:38:24.278Z",
+          "completedAt": "2026-10-06T12:38:24.442Z"
+        }
+      ]
+    },
+    {
+      "name": "import-provider",
+      "sampleCount": 5,
+      "medianSeconds": 68.667,
+      "meanSeconds": 64.834,
+      "maxSeconds": 69.102,
+      "minSeconds": 54.026,
+      "successfulMedianSeconds": 68.667,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 69.102,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:18:55.716Z",
+          "completedAt": "2026-10-05T20:20:04.818Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 68.667,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:43:59.917Z",
+          "completedAt": "2026-10-05T16:45:08.584Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 54.026,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:12:06.060Z",
+          "completedAt": "2026-10-06T03:13:00.086Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 69.072,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:11:33.904Z",
+          "completedAt": "2026-10-06T09:12:42.976Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 63.304,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:33:02.466Z",
+          "completedAt": "2026-10-06T12:34:05.770Z"
+        }
+      ]
+    },
+    {
+      "name": "kagami",
+      "sampleCount": 5,
+      "medianSeconds": 56.155,
+      "meanSeconds": 54.642,
+      "maxSeconds": 59.343,
+      "minSeconds": 47.283,
+      "successfulMedianSeconds": 56.155,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 56.155,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:03:01.125Z",
+          "completedAt": "2026-10-05T21:03:57.280Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 56.611,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:28:37.828Z",
+          "completedAt": "2026-10-05T17:29:34.439Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 47.283,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:43:04.106Z",
+          "completedAt": "2026-10-06T03:43:51.389Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 59.343,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:57:15.406Z",
+          "completedAt": "2026-10-06T09:58:14.749Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 53.818,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:11:30.497Z",
+          "completedAt": "2026-10-06T13:12:24.315Z"
+        }
+      ]
+    },
+    {
+      "name": "kanji-capture",
+      "sampleCount": 5,
+      "medianSeconds": 0.524,
+      "meanSeconds": 0.471,
+      "maxSeconds": 0.543,
+      "minSeconds": 0.329,
+      "successfulMedianSeconds": 0.524,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.543,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:54.280Z",
+          "completedAt": "2026-10-05T18:33:54.823Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.524,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:57.034Z",
+          "completedAt": "2026-10-05T14:59:57.558Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.329,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:49.563Z",
+          "completedAt": "2026-10-06T01:50:49.892Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.537,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:07.258Z",
+          "completedAt": "2026-10-06T07:25:07.795Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.421,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:52.839Z",
+          "completedAt": "2026-10-06T10:57:53.260Z"
+        }
+      ]
+    },
+    {
+      "name": "later-encounters-contracts",
+      "sampleCount": 5,
+      "medianSeconds": 0.863,
+      "meanSeconds": 0.775,
+      "maxSeconds": 0.897,
+      "minSeconds": 0.525,
+      "successfulMedianSeconds": 0.863,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.897,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:04:04.361Z",
+          "completedAt": "2026-10-05T19:04:05.258Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.873,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:29:28.327Z",
+          "completedAt": "2026-10-05T15:29:29.200Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.525,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:13:24.280Z",
+          "completedAt": "2026-10-06T02:13:24.805Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.863,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:55:31.511Z",
+          "completedAt": "2026-10-06T07:55:32.374Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.717,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:24:58.013Z",
+          "completedAt": "2026-10-06T11:24:58.730Z"
+        }
+      ]
+    },
+    {
+      "name": "later-encounters-integration",
+      "sampleCount": 5,
+      "medianSeconds": 226.043,
+      "meanSeconds": 222.047,
+      "maxSeconds": 232.807,
+      "minSeconds": 202.713,
+      "successfulMedianSeconds": 222.38,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 232.807,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:04:05.259Z",
+          "completedAt": "2026-10-05T19:07:58.066Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 226.043,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:29:29.202Z",
+          "completedAt": "2026-10-05T15:33:15.245Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 202.713,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:13:24.807Z",
+          "completedAt": "2026-10-06T02:16:47.520Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 229.956,
+          "status": "failed",
+          "startedAt": "2026-10-06T07:55:32.376Z",
+          "completedAt": "2026-10-06T07:59:22.332Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 218.718,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:24:58.731Z",
+          "completedAt": "2026-10-06T11:28:37.449Z"
+        }
+      ]
+    },
+    {
+      "name": "learning-record-chromium",
+      "sampleCount": 5,
+      "medianSeconds": 49.029,
+      "meanSeconds": 46.495,
+      "maxSeconds": 49.389,
+      "minSeconds": 40.397,
+      "successfulMedianSeconds": 49.029,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 49.389,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:59:38.053Z",
+          "completedAt": "2026-10-05T20:00:27.442Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 49.029,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:24:49.562Z",
+          "completedAt": "2026-10-05T16:25:38.591Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 40.397,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:55:55.303Z",
+          "completedAt": "2026-10-06T02:56:35.700Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 49.239,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:52:27.462Z",
+          "completedAt": "2026-10-06T08:53:16.701Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 44.421,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:15:19.269Z",
+          "completedAt": "2026-10-06T12:16:03.690Z"
+        }
+      ]
+    },
+    {
+      "name": "learning-record-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 78.647,
+      "meanSeconds": 70.493,
+      "maxSeconds": 79.818,
+      "minSeconds": 52.869,
+      "successfulMedianSeconds": 78.647,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 79.818,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:05:44.609Z",
+          "completedAt": "2026-10-05T20:07:04.427Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 78.647,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:30:52.758Z",
+          "completedAt": "2026-10-05T16:32:11.405Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 52.869,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:00:36.510Z",
+          "completedAt": "2026-10-06T03:01:29.379Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 78.932,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:58:29.713Z",
+          "completedAt": "2026-10-06T08:59:48.645Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 62.198,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:20:38.066Z",
+          "completedAt": "2026-10-06T12:21:40.264Z"
+        }
+      ]
+    },
+    {
+      "name": "lint",
+      "sampleCount": 5,
+      "medianSeconds": 8.163,
+      "meanSeconds": 7.653,
+      "maxSeconds": 8.648,
+      "minSeconds": 5.552,
+      "successfulMedianSeconds": 8.163,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 8.163,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:36:37.632Z",
+          "completedAt": "2026-10-05T18:36:45.795Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 8.22,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:02:35.906Z",
+          "completedAt": "2026-10-05T15:02:44.126Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 5.552,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:52:56.068Z",
+          "completedAt": "2026-10-06T01:53:01.620Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 8.648,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:27:53.556Z",
+          "completedAt": "2026-10-06T07:28:02.204Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 7.682,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:00:18.801Z",
+          "completedAt": "2026-10-06T11:00:26.483Z"
+        }
+      ]
+    },
+    {
+      "name": "listening-intake-integration",
+      "sampleCount": 5,
+      "medianSeconds": 87.906,
+      "meanSeconds": 84.365,
+      "maxSeconds": 90.125,
+      "minSeconds": 68.899,
+      "successfulMedianSeconds": 87.906,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 87.906,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:54:45.410Z",
+          "completedAt": "2026-10-05T18:56:13.316Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 89.311,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:20:21.496Z",
+          "completedAt": "2026-10-05T15:21:50.807Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 68.899,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:06:09.745Z",
+          "completedAt": "2026-10-06T02:07:18.644Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 90.125,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:46:06.791Z",
+          "completedAt": "2026-10-06T07:47:36.916Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 85.583,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:16:20.265Z",
+          "completedAt": "2026-10-06T11:17:45.848Z"
+        }
+      ]
+    },
+    {
+      "name": "mock",
+      "sampleCount": 5,
+      "medianSeconds": 78.627,
+      "meanSeconds": 72.153,
+      "maxSeconds": 81.013,
+      "minSeconds": 52.518,
+      "successfulMedianSeconds": 78.627,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 78.627,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:34:03.181Z",
+          "completedAt": "2026-10-05T20:35:21.808Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 81.013,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:59:09.652Z",
+          "completedAt": "2026-10-05T17:00:30.665Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 52.518,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:24:21.851Z",
+          "completedAt": "2026-10-06T03:25:14.369Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 79.773,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:26:59.144Z",
+          "completedAt": "2026-10-06T09:28:18.917Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 68.836,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:46:59.958Z",
+          "completedAt": "2026-10-06T12:48:08.794Z"
+        }
+      ]
+    },
+    {
+      "name": "native-readings",
+      "sampleCount": 5,
+      "medianSeconds": 167.621,
+      "meanSeconds": 165.622,
+      "maxSeconds": 176.278,
+      "minSeconds": 153.898,
+      "successfulMedianSeconds": 167.621,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 169.043,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:10:12.018Z",
+          "completedAt": "2026-10-05T21:13:01.061Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 167.621,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:35:33.287Z",
+          "completedAt": "2026-10-05T17:38:20.908Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 153.898,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:48:04.066Z",
+          "completedAt": "2026-10-06T03:50:37.964Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 176.278,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:04:45.730Z",
+          "completedAt": "2026-10-06T10:07:42.008Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 161.271,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:17:36.926Z",
+          "completedAt": "2026-10-06T13:20:18.197Z"
+        }
+      ]
+    },
+    {
+      "name": "navigation-returns",
+      "sampleCount": 5,
+      "medianSeconds": 0.078,
+      "meanSeconds": 0.073,
+      "maxSeconds": 0.085,
+      "minSeconds": 0.054,
+      "successfulMedianSeconds": 0.073,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.085,
+          "status": "failed",
+          "startedAt": "2026-10-05T18:34:10.122Z",
+          "completedAt": "2026-10-05T18:34:10.207Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.078,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:00:12.044Z",
+          "completedAt": "2026-10-05T15:00:12.122Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.054,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:59.734Z",
+          "completedAt": "2026-10-06T01:50:59.788Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.079,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:22.768Z",
+          "completedAt": "2026-10-06T07:25:22.847Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.067,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:58:05.678Z",
+          "completedAt": "2026-10-06T10:58:05.745Z"
+        }
+      ]
+    },
+    {
+      "name": "official-content-guard",
+      "sampleCount": 5,
+      "medianSeconds": 8.044,
+      "meanSeconds": 11.05,
+      "maxSeconds": 24.263,
+      "minSeconds": 5.856,
+      "successfulMedianSeconds": 8.044,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 8.044,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:52:19.194Z",
+          "completedAt": "2026-10-05T19:52:27.238Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 7.797,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:17:48.463Z",
+          "completedAt": "2026-10-05T16:17:56.260Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 5.856,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:50:34.797Z",
+          "completedAt": "2026-10-06T02:50:40.653Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 9.288,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:45:20.316Z",
+          "completedAt": "2026-10-06T08:45:29.604Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 24.263,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:08:59.094Z",
+          "completedAt": "2026-10-06T12:09:23.357Z"
+        }
+      ]
+    },
+    {
+      "name": "offline",
+      "sampleCount": 5,
+      "medianSeconds": 35.75,
+      "meanSeconds": 34.307,
+      "maxSeconds": 37.672,
+      "minSeconds": 26.427,
+      "successfulMedianSeconds": 35.75,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 36.701,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:31:36.447Z",
+          "completedAt": "2026-10-05T20:32:13.148Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 35.75,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:56:45.686Z",
+          "completedAt": "2026-10-05T16:57:21.436Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 26.427,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:22:12.361Z",
+          "completedAt": "2026-10-06T03:22:38.788Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 37.672,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:24:27.674Z",
+          "completedAt": "2026-10-06T09:25:05.346Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 34.986,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:44:34.105Z",
+          "completedAt": "2026-10-06T12:45:09.091Z"
+        }
+      ]
+    },
+    {
+      "name": "personal-reading",
+      "sampleCount": 5,
+      "medianSeconds": 14.413,
+      "meanSeconds": 13.641,
+      "maxSeconds": 14.608,
+      "minSeconds": 11.505,
+      "successfulMedianSeconds": 14.413,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 14.449,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:27:09.947Z",
+          "completedAt": "2026-10-05T20:27:24.396Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 14.413,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:52:13.673Z",
+          "completedAt": "2026-10-05T16:52:28.086Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 11.505,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:18:52.553Z",
+          "completedAt": "2026-10-06T03:19:04.058Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 14.608,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:19:56.479Z",
+          "completedAt": "2026-10-06T09:20:11.087Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 13.232,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:40:35.554Z",
+          "completedAt": "2026-10-06T12:40:48.786Z"
+        }
+      ]
+    },
+    {
+      "name": "personal-reading-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 20.203,
+      "meanSeconds": 18.769,
+      "maxSeconds": 20.822,
+      "minSeconds": 14.731,
+      "successfulMedianSeconds": 20.203,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 20.203,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:27:24.397Z",
+          "completedAt": "2026-10-05T20:27:44.600Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 20.822,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:52:28.087Z",
+          "completedAt": "2026-10-05T16:52:48.909Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 14.731,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:19:04.059Z",
+          "completedAt": "2026-10-06T03:19:18.790Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 20.503,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:20:11.088Z",
+          "completedAt": "2026-10-06T09:20:31.591Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 17.584,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:40:48.787Z",
+          "completedAt": "2026-10-06T12:41:06.371Z"
+        }
+      ]
+    },
+    {
+      "name": "playback",
+      "sampleCount": 5,
+      "medianSeconds": 54.837,
+      "meanSeconds": 52.018,
+      "maxSeconds": 55.066,
+      "minSeconds": 44.915,
+      "successfulMedianSeconds": 54.837,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 55.066,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:20:04.820Z",
+          "completedAt": "2026-10-05T20:20:59.886Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 54.837,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:45:08.585Z",
+          "completedAt": "2026-10-05T16:46:03.422Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 44.915,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:13:00.088Z",
+          "completedAt": "2026-10-06T03:13:45.003Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 55.044,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:12:42.977Z",
+          "completedAt": "2026-10-06T09:13:38.021Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 50.226,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:34:05.805Z",
+          "completedAt": "2026-10-06T12:34:56.031Z"
+        }
+      ]
+    },
+    {
+      "name": "practice-history",
+      "sampleCount": 5,
+      "medianSeconds": 726.129,
+      "meanSeconds": 659.783,
+      "maxSeconds": 741.711,
+      "minSeconds": 479.016,
+      "successfulMedianSeconds": 726.129,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 741.711,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:36:18.668Z",
+          "completedAt": "2026-10-05T20:48:40.379Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 729.13,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:01:22.376Z",
+          "completedAt": "2026-10-05T17:13:31.506Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 479.016,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:25:47.234Z",
+          "completedAt": "2026-10-06T03:33:46.250Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 726.129,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:29:10.569Z",
+          "completedAt": "2026-10-06T09:41:16.698Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 622.929,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:48:55.967Z",
+          "completedAt": "2026-10-06T12:59:18.896Z"
+        }
+      ]
+    },
+    {
+      "name": "practice-history-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 860.743,
+      "meanSeconds": 803.032,
+      "maxSeconds": 958.706,
+      "minSeconds": 557.853,
+      "successfulMedianSeconds": 860.743,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 860.743,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:48:40.380Z",
+          "completedAt": "2026-10-05T21:03:01.123Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 906.319,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:13:31.507Z",
+          "completedAt": "2026-10-05T17:28:37.826Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 557.853,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:33:46.251Z",
+          "completedAt": "2026-10-06T03:43:04.104Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 958.706,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:41:16.699Z",
+          "completedAt": "2026-10-06T09:57:15.405Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 731.541,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:59:18.954Z",
+          "completedAt": "2026-10-06T13:11:30.495Z"
+        }
+      ]
+    },
+    {
+      "name": "prefetch-lifecycle",
+      "sampleCount": 5,
+      "medianSeconds": 110.03,
+      "meanSeconds": 109.174,
+      "maxSeconds": 113.795,
+      "minSeconds": 103.044,
+      "successfulMedianSeconds": 110.03,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 110.03,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:32:13.149Z",
+          "completedAt": "2026-10-05T20:34:03.179Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 108.212,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:57:21.438Z",
+          "completedAt": "2026-10-05T16:59:09.650Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 103.044,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:22:38.806Z",
+          "completedAt": "2026-10-06T03:24:21.850Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 113.795,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:25:05.347Z",
+          "completedAt": "2026-10-06T09:26:59.142Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 110.79,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:45:09.093Z",
+          "completedAt": "2026-10-06T12:46:59.883Z"
+        }
+      ]
+    },
+    {
+      "name": "publisher-contracts",
+      "sampleCount": 5,
+      "medianSeconds": 1.251,
+      "meanSeconds": 1.152,
+      "maxSeconds": 1.289,
+      "minSeconds": 0.857,
+      "successfulMedianSeconds": 1.251,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.289,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:28:20.724Z",
+          "completedAt": "2026-10-05T20:28:22.013Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.251,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:53:26.135Z",
+          "completedAt": "2026-10-05T16:53:27.386Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.857,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:19:47.116Z",
+          "completedAt": "2026-10-06T03:19:47.973Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.277,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:21:08.448Z",
+          "completedAt": "2026-10-06T09:21:09.725Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.088,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:41:39.320Z",
+          "completedAt": "2026-10-06T12:41:40.408Z"
+        }
+      ]
+    },
+    {
+      "name": "publisher-reading",
+      "sampleCount": 5,
+      "medianSeconds": 48.628,
+      "meanSeconds": 45.88,
+      "maxSeconds": 48.938,
+      "minSeconds": 36.807,
+      "successfulMedianSeconds": 48.738,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 48.848,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:28:54.080Z",
+          "completedAt": "2026-10-05T20:29:42.928Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 48.628,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:54:00.344Z",
+          "completedAt": "2026-10-05T16:54:48.972Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 36.807,
+          "status": "failed",
+          "startedAt": "2026-10-06T03:20:13.010Z",
+          "completedAt": "2026-10-06T03:20:49.817Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 48.938,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:21:42.391Z",
+          "completedAt": "2026-10-06T09:22:31.329Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 46.181,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:42:08.992Z",
+          "completedAt": "2026-10-06T12:42:55.173Z"
+        }
+      ]
+    },
+    {
+      "name": "publisher-reading-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 73.775,
+      "meanSeconds": 68.354,
+      "maxSeconds": 75.362,
+      "minSeconds": 54.77,
+      "successfulMedianSeconds": 73.775,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 73.775,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:29:42.929Z",
+          "completedAt": "2026-10-05T20:30:56.704Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 75.362,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:54:48.973Z",
+          "completedAt": "2026-10-05T16:56:04.335Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 54.77,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:20:49.818Z",
+          "completedAt": "2026-10-06T03:21:44.588Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 75.293,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:22:31.330Z",
+          "completedAt": "2026-10-06T09:23:46.623Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 62.57,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:42:55.175Z",
+          "completedAt": "2026-10-06T12:43:57.745Z"
+        }
+      ]
+    },
+    {
+      "name": "reading-candidates",
+      "sampleCount": 5,
+      "medianSeconds": 27.589,
+      "meanSeconds": 26.213,
+      "maxSeconds": 29.004,
+      "minSeconds": 21.472,
+      "successfulMedianSeconds": 27.589,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 29.004,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:26:05.800Z",
+          "completedAt": "2026-10-05T20:26:34.804Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 27.589,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:51:11.243Z",
+          "completedAt": "2026-10-05T16:51:38.832Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 21.472,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:18:06.935Z",
+          "completedAt": "2026-10-06T03:18:28.407Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 28.21,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:18:53.169Z",
+          "completedAt": "2026-10-06T09:19:21.379Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 24.792,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:39:40.093Z",
+          "completedAt": "2026-10-06T12:40:04.885Z"
+        }
+      ]
+    },
+    {
+      "name": "reading-candidates-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 34.838,
+      "meanSeconds": 31.977,
+      "maxSeconds": 35.14,
+      "minSeconds": 24.144,
+      "successfulMedianSeconds": 34.838,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 35.14,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:26:34.806Z",
+          "completedAt": "2026-10-05T20:27:09.946Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 34.838,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:51:38.833Z",
+          "completedAt": "2026-10-05T16:52:13.671Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 24.144,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:18:28.408Z",
+          "completedAt": "2026-10-06T03:18:52.552Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 35.098,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:19:21.380Z",
+          "completedAt": "2026-10-06T09:19:56.478Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 30.666,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:40:04.886Z",
+          "completedAt": "2026-10-06T12:40:35.552Z"
+        }
+      ]
+    },
+    {
+      "name": "reading-facets",
+      "sampleCount": 5,
+      "medianSeconds": 0.529,
+      "meanSeconds": 0.505,
+      "maxSeconds": 0.559,
+      "minSeconds": 0.405,
+      "successfulMedianSeconds": 0.529,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.559,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:14:55.956Z",
+          "completedAt": "2026-10-05T21:14:56.515Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.529,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:40:17.248Z",
+          "completedAt": "2026-10-05T17:40:17.777Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.405,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:52:04.640Z",
+          "completedAt": "2026-10-06T03:52:05.045Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.553,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:09:45.549Z",
+          "completedAt": "2026-10-06T10:09:46.102Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.477,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:22:00.471Z",
+          "completedAt": "2026-10-06T13:22:00.948Z"
+        }
+      ]
+    },
+    {
+      "name": "reading-position-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.992,
+      "meanSeconds": 1.01,
+      "maxSeconds": 1.446,
+      "minSeconds": 0.639,
+      "successfulMedianSeconds": 0.992,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.001,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:10:04.954Z",
+          "completedAt": "2026-10-05T19:10:05.955Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.972,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:35:21.207Z",
+          "completedAt": "2026-10-05T15:35:22.179Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.639,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:18:32.258Z",
+          "completedAt": "2026-10-06T02:18:32.897Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.992,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:01:32.922Z",
+          "completedAt": "2026-10-06T08:01:33.914Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.446,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:30:34.571Z",
+          "completedAt": "2026-10-06T11:30:36.017Z"
+        }
+      ]
+    },
+    {
+      "name": "reading-position-integration",
+      "sampleCount": 5,
+      "medianSeconds": 13.96,
+      "meanSeconds": 12.98,
+      "maxSeconds": 14.394,
+      "minSeconds": 10.419,
+      "successfulMedianSeconds": 13.96,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 14.377,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:10:05.956Z",
+          "completedAt": "2026-10-05T19:10:20.333Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 13.96,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:35:22.180Z",
+          "completedAt": "2026-10-05T15:35:36.140Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 10.419,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:18:32.898Z",
+          "completedAt": "2026-10-06T02:18:43.317Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 14.394,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:01:33.916Z",
+          "completedAt": "2026-10-06T08:01:48.310Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 11.751,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:30:36.019Z",
+          "completedAt": "2026-10-06T11:30:47.770Z"
+        }
+      ]
+    },
+    {
+      "name": "record-app-chromium",
+      "sampleCount": 5,
+      "medianSeconds": 24.357,
+      "meanSeconds": 22.383,
+      "maxSeconds": 25.833,
+      "minSeconds": 17.01,
+      "successfulMedianSeconds": 24.357,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 25.833,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:58:08.452Z",
+          "completedAt": "2026-10-05T19:58:34.285Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 24.357,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:23:22.846Z",
+          "completedAt": "2026-10-05T16:23:47.203Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 17.01,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:48.746Z",
+          "completedAt": "2026-10-06T02:55:05.756Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 24.377,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:51:00.675Z",
+          "completedAt": "2026-10-06T08:51:25.052Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 20.34,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:14:03.603Z",
+          "completedAt": "2026-10-06T12:14:23.943Z"
+        }
+      ]
+    },
+    {
+      "name": "record-app-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 29.5,
+      "meanSeconds": 27.039,
+      "maxSeconds": 30.854,
+      "minSeconds": 20.62,
+      "successfulMedianSeconds": 29.5,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 30.854,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:02:59.324Z",
+          "completedAt": "2026-10-05T20:03:30.178Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 29.629,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:28:11.258Z",
+          "completedAt": "2026-10-05T16:28:40.887Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 20.62,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:58:44.940Z",
+          "completedAt": "2026-10-06T02:59:05.560Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 29.5,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:55:48.959Z",
+          "completedAt": "2026-10-06T08:56:18.459Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 24.591,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:18:23.188Z",
+          "completedAt": "2026-10-06T12:18:47.779Z"
+        }
+      ]
+    },
+    {
+      "name": "record-binding",
+      "sampleCount": 5,
+      "medianSeconds": 0.089,
+      "meanSeconds": 0.088,
+      "maxSeconds": 0.111,
+      "minSeconds": 0.068,
+      "successfulMedianSeconds": 0.089,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.111,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:57:31.892Z",
+          "completedAt": "2026-10-05T19:57:32.003Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.097,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:48.574Z",
+          "completedAt": "2026-10-05T16:22:48.671Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.068,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:22.342Z",
+          "completedAt": "2026-10-06T02:54:22.410Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.089,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:50:26.080Z",
+          "completedAt": "2026-10-06T08:50:26.169Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.074,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:13:34.486Z",
+          "completedAt": "2026-10-06T12:13:34.560Z"
+        }
+      ]
+    },
+    {
+      "name": "record-binding-browser",
+      "sampleCount": 5,
+      "medianSeconds": 1.393,
+      "meanSeconds": 1.321,
+      "maxSeconds": 1.548,
+      "minSeconds": 1.084,
+      "successfulMedianSeconds": 1.393,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.548,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:57:34.426Z",
+          "completedAt": "2026-10-05T19:57:35.974Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.393,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:50.853Z",
+          "completedAt": "2026-10-05T16:22:52.246Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.084,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:24.058Z",
+          "completedAt": "2026-10-06T02:54:25.142Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.404,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:50:28.367Z",
+          "completedAt": "2026-10-06T08:50:29.771Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.177,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:13:36.514Z",
+          "completedAt": "2026-10-06T12:13:37.691Z"
+        }
+      ]
+    },
+    {
+      "name": "record-binding-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 2.207,
+      "meanSeconds": 2.054,
+      "maxSeconds": 2.407,
+      "minSeconds": 1.614,
+      "successfulMedianSeconds": 2.207,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 2.407,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:57:35.975Z",
+          "completedAt": "2026-10-05T19:57:38.382Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 2.225,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:52.247Z",
+          "completedAt": "2026-10-05T16:22:54.472Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.614,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:25.144Z",
+          "completedAt": "2026-10-06T02:54:26.758Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 2.207,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:50:29.773Z",
+          "completedAt": "2026-10-06T08:50:31.980Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.818,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:13:37.695Z",
+          "completedAt": "2026-10-06T12:13:39.513Z"
+        }
+      ]
+    },
+    {
+      "name": "record-controller",
+      "sampleCount": 5,
+      "medianSeconds": 78.381,
+      "meanSeconds": 72.767,
+      "maxSeconds": 81.307,
+      "minSeconds": 56.107,
+      "successfulMedianSeconds": 78.381,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 81.307,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:54:09.207Z",
+          "completedAt": "2026-10-05T19:55:30.514Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 78.381,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:19:36.635Z",
+          "completedAt": "2026-10-05T16:20:55.016Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 56.107,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:52:02.378Z",
+          "completedAt": "2026-10-06T02:52:58.485Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 79.468,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:47:11.324Z",
+          "completedAt": "2026-10-06T08:48:30.792Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 68.572,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:10:47.868Z",
+          "completedAt": "2026-10-06T12:11:56.440Z"
+        }
+      ]
+    },
+    {
+      "name": "record-controller-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 67.561,
+      "meanSeconds": 63.949,
+      "maxSeconds": 72.551,
+      "minSeconds": 50.473,
+      "successfulMedianSeconds": 67.561,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 72.551,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:55:30.515Z",
+          "completedAt": "2026-10-05T19:56:43.066Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 67.561,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:20:55.018Z",
+          "completedAt": "2026-10-05T16:22:02.579Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 50.473,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:52:58.486Z",
+          "completedAt": "2026-10-06T02:53:48.959Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 69.256,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:48:30.794Z",
+          "completedAt": "2026-10-06T08:49:40.050Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 59.906,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:11:56.441Z",
+          "completedAt": "2026-10-06T12:12:56.347Z"
+        }
+      ]
+    },
+    {
+      "name": "record-host",
+      "sampleCount": 5,
+      "medianSeconds": 21.535,
+      "meanSeconds": 19.844,
+      "maxSeconds": 22.534,
+      "minSeconds": 15.669,
+      "successfulMedianSeconds": 21.535,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 22.534,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:56:43.067Z",
+          "completedAt": "2026-10-05T19:57:05.601Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 21.688,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:02.580Z",
+          "completedAt": "2026-10-05T16:22:24.268Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 15.669,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:53:48.960Z",
+          "completedAt": "2026-10-06T02:54:04.629Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 21.535,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:49:40.051Z",
+          "completedAt": "2026-10-06T08:50:01.586Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 17.792,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:12:56.348Z",
+          "completedAt": "2026-10-06T12:13:14.140Z"
+        }
+      ]
+    },
+    {
+      "name": "record-host-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 24.303,
+      "meanSeconds": 22.627,
+      "maxSeconds": 26.288,
+      "minSeconds": 17.708,
+      "successfulMedianSeconds": 24.303,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 26.288,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:57:05.603Z",
+          "completedAt": "2026-10-05T19:57:31.891Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 24.303,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:24.269Z",
+          "completedAt": "2026-10-05T16:22:48.572Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 17.708,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:04.633Z",
+          "completedAt": "2026-10-06T02:54:22.341Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 24.491,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:50:01.588Z",
+          "completedAt": "2026-10-06T08:50:26.079Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 20.344,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:13:14.141Z",
+          "completedAt": "2026-10-06T12:13:34.485Z"
+        }
+      ]
+    },
+    {
+      "name": "record-integrity",
+      "sampleCount": 5,
+      "medianSeconds": 100.371,
+      "meanSeconds": 94.033,
+      "maxSeconds": 101.966,
+      "minSeconds": 81.723,
+      "successfulMedianSeconds": 100.371,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 101.966,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:52:27.240Z",
+          "completedAt": "2026-10-05T19:54:09.206Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 100.371,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:17:56.263Z",
+          "completedAt": "2026-10-05T16:19:36.634Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 81.723,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:50:40.654Z",
+          "completedAt": "2026-10-06T02:52:02.377Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 101.717,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:45:29.606Z",
+          "completedAt": "2026-10-06T08:47:11.323Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 84.39,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:09:23.477Z",
+          "completedAt": "2026-10-06T12:10:47.867Z"
+        }
+      ]
+    },
+    {
+      "name": "record-live-chromium",
+      "sampleCount": 5,
+      "medianSeconds": 62.357,
+      "meanSeconds": 58.679,
+      "maxSeconds": 63.766,
+      "minSeconds": 49.543,
+      "successfulMedianSeconds": 62.357,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 63.766,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:58:34.286Z",
+          "completedAt": "2026-10-05T19:59:38.052Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 62.357,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:23:47.204Z",
+          "completedAt": "2026-10-05T16:24:49.561Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 49.543,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:55:05.757Z",
+          "completedAt": "2026-10-06T02:55:55.300Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 62.408,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:51:25.053Z",
+          "completedAt": "2026-10-06T08:52:27.461Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 55.323,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:14:23.945Z",
+          "completedAt": "2026-10-06T12:15:19.268Z"
+        }
+      ]
+    },
+    {
+      "name": "record-live-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 131.252,
+      "meanSeconds": 119.724,
+      "maxSeconds": 134.428,
+      "minSeconds": 90.948,
+      "successfulMedianSeconds": 131.252,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 134.428,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:03:30.180Z",
+          "completedAt": "2026-10-05T20:05:44.608Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 131.868,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:28:40.888Z",
+          "completedAt": "2026-10-05T16:30:52.756Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 90.948,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:59:05.561Z",
+          "completedAt": "2026-10-06T03:00:36.509Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 131.252,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:56:18.460Z",
+          "completedAt": "2026-10-06T08:58:29.712Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 110.126,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:18:47.938Z",
+          "completedAt": "2026-10-06T12:20:38.064Z"
+        }
+      ]
+    },
+    {
+      "name": "record-note-create",
+      "sampleCount": 5,
+      "medianSeconds": 113.367,
+      "meanSeconds": 114.019,
+      "maxSeconds": 121.795,
+      "minSeconds": 100.593,
+      "successfulMedianSeconds": 113.367,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 112.697,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:22:54.394Z",
+          "completedAt": "2026-10-05T19:24:47.091Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 121.795,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:48:11.008Z",
+          "completedAt": "2026-10-05T15:50:12.803Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 100.593,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:27:54.690Z",
+          "completedAt": "2026-10-06T02:29:35.283Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 121.645,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:15:45.961Z",
+          "completedAt": "2026-10-06T08:17:47.606Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 113.367,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:42:18.738Z",
+          "completedAt": "2026-10-06T11:44:12.105Z"
+        }
+      ]
+    },
+    {
+      "name": "record-note-lifecycle",
+      "sampleCount": 5,
+      "medianSeconds": 300.582,
+      "meanSeconds": 289.435,
+      "maxSeconds": 303.371,
+      "minSeconds": 259.023,
+      "successfulMedianSeconds": 300.582,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 303.371,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:24:47.092Z",
+          "completedAt": "2026-10-05T19:29:50.463Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 300.619,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:50:12.805Z",
+          "completedAt": "2026-10-05T15:55:13.424Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 259.023,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:29:35.284Z",
+          "completedAt": "2026-10-06T02:33:54.307Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 300.582,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:17:47.608Z",
+          "completedAt": "2026-10-06T08:22:48.190Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 283.58,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:44:12.346Z",
+          "completedAt": "2026-10-06T11:48:55.926Z"
+        }
+      ]
+    },
+    {
+      "name": "record-note-restore",
+      "sampleCount": 5,
+      "medianSeconds": 271.074,
+      "meanSeconds": 262.754,
+      "maxSeconds": 273.772,
+      "minSeconds": 238.835,
+      "successfulMedianSeconds": 271.074,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 273.772,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:29:50.465Z",
+          "completedAt": "2026-10-05T19:34:24.237Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 271.074,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:55:13.425Z",
+          "completedAt": "2026-10-05T15:59:44.499Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 238.835,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:33:54.308Z",
+          "completedAt": "2026-10-06T02:37:53.143Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 272.116,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:22:48.191Z",
+          "completedAt": "2026-10-06T08:27:20.307Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 257.973,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:48:55.927Z",
+          "completedAt": "2026-10-06T11:53:13.900Z"
+        }
+      ]
+    },
+    {
+      "name": "record-note-views",
+      "sampleCount": 5,
+      "medianSeconds": 67.686,
+      "meanSeconds": 69.006,
+      "maxSeconds": 76.512,
+      "minSeconds": 57.623,
+      "successfulMedianSeconds": 67.686,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 67.686,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:21:46.707Z",
+          "completedAt": "2026-10-05T19:22:54.393Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 76.499,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:46:54.508Z",
+          "completedAt": "2026-10-05T15:48:11.007Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 57.623,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:26:57.066Z",
+          "completedAt": "2026-10-06T02:27:54.689Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 76.512,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:14:29.448Z",
+          "completedAt": "2026-10-06T08:15:45.960Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 66.711,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:41:12.026Z",
+          "completedAt": "2026-10-06T11:42:18.737Z"
+        }
+      ]
+    },
+    {
+      "name": "record-practice-finalize",
+      "sampleCount": 5,
+      "medianSeconds": 289.904,
+      "meanSeconds": 259.553,
+      "maxSeconds": 291.113,
+      "minSeconds": 192.964,
+      "successfulMedianSeconds": 289.904,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 289.904,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:34:24.238Z",
+          "completedAt": "2026-10-05T19:39:14.142Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 291.113,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:59:44.500Z",
+          "completedAt": "2026-10-05T16:04:35.613Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 192.964,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:37:53.144Z",
+          "completedAt": "2026-10-06T02:41:06.108Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 291.095,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:27:20.308Z",
+          "completedAt": "2026-10-06T08:32:11.403Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 232.689,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:53:13.901Z",
+          "completedAt": "2026-10-06T11:57:06.590Z"
+        }
+      ]
+    },
+    {
+      "name": "record-sync",
+      "sampleCount": 5,
+      "medianSeconds": 2.179,
+      "meanSeconds": 2.078,
+      "maxSeconds": 2.42,
+      "minSeconds": 1.646,
+      "successfulMedianSeconds": 2.179,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 2.42,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:57:32.004Z",
+          "completedAt": "2026-10-05T19:57:34.424Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 2.179,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:48.673Z",
+          "completedAt": "2026-10-05T16:22:50.852Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.646,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:22.411Z",
+          "completedAt": "2026-10-06T02:54:24.057Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 2.195,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:50:26.171Z",
+          "completedAt": "2026-10-06T08:50:28.366Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.95,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:13:34.562Z",
+          "completedAt": "2026-10-06T12:13:36.512Z"
+        }
+      ]
+    },
+    {
+      "name": "record-sync-backup-chromium",
+      "sampleCount": 5,
+      "medianSeconds": 28.372,
+      "meanSeconds": 26.641,
+      "maxSeconds": 30.067,
+      "minSeconds": 21.986,
+      "successfulMedianSeconds": 28.372,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 30.067,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:57:38.383Z",
+          "completedAt": "2026-10-05T19:58:08.450Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 28.372,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:22:54.473Z",
+          "completedAt": "2026-10-05T16:23:22.845Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 21.986,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:54:26.759Z",
+          "completedAt": "2026-10-06T02:54:48.745Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 28.693,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:50:31.981Z",
+          "completedAt": "2026-10-06T08:51:00.674Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 24.087,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:13:39.515Z",
+          "completedAt": "2026-10-06T12:14:03.602Z"
+        }
+      ]
+    },
+    {
+      "name": "record-sync-backup-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 52.985,
+      "meanSeconds": 48.05,
+      "maxSeconds": 54.752,
+      "minSeconds": 35.485,
+      "successfulMedianSeconds": 52.985,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 52.985,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:02:06.338Z",
+          "completedAt": "2026-10-05T20:02:59.323Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 54.752,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:27:16.504Z",
+          "completedAt": "2026-10-05T16:28:11.256Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 35.485,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:58:09.450Z",
+          "completedAt": "2026-10-06T02:58:44.935Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 54.339,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:54:54.618Z",
+          "completedAt": "2026-10-06T08:55:48.957Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 42.687,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:17:40.498Z",
+          "completedAt": "2026-10-06T12:18:23.185Z"
+        }
+      ]
+    },
+    {
+      "name": "reference-browser",
+      "sampleCount": 5,
+      "medianSeconds": 45.644,
+      "meanSeconds": 44.141,
+      "maxSeconds": 46.255,
+      "minSeconds": 39.475,
+      "successfulMedianSeconds": 45.644,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 46.255,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:34:18.877Z",
+          "completedAt": "2026-10-05T18:35:05.132Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 45.644,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:00:20.609Z",
+          "completedAt": "2026-10-05T15:01:06.253Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 39.475,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:51:05.643Z",
+          "completedAt": "2026-10-06T01:51:45.118Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 46.151,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:31.665Z",
+          "completedAt": "2026-10-06T07:26:17.816Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 43.182,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:58:12.802Z",
+          "completedAt": "2026-10-06T10:58:55.984Z"
+        }
+      ]
+    },
+    {
+      "name": "reference-connections",
+      "sampleCount": 5,
+      "medianSeconds": 42.432,
+      "meanSeconds": 40.974,
+      "maxSeconds": 44.921,
+      "minSeconds": 34.286,
+      "successfulMedianSeconds": 42.432,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 44.921,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:35:05.133Z",
+          "completedAt": "2026-10-05T18:35:50.054Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 42.432,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:01:06.254Z",
+          "completedAt": "2026-10-05T15:01:48.686Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 34.286,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:51:45.120Z",
+          "completedAt": "2026-10-06T01:52:19.406Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 44.625,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:26:17.817Z",
+          "completedAt": "2026-10-06T07:27:02.442Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 38.608,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:58:55.985Z",
+          "completedAt": "2026-10-06T10:59:34.593Z"
+        }
+      ]
+    },
+    {
+      "name": "reference-core",
+      "sampleCount": 5,
+      "medianSeconds": 9.923,
+      "meanSeconds": 9.435,
+      "maxSeconds": 10.55,
+      "minSeconds": 7.613,
+      "successfulMedianSeconds": 9.923,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 10.509,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:36.278Z",
+          "completedAt": "2026-10-05T18:33:46.787Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 9.923,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:39.406Z",
+          "completedAt": "2026-10-05T14:59:49.329Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 7.613,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:36.651Z",
+          "completedAt": "2026-10-06T01:50:44.264Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 10.55,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:24:48.833Z",
+          "completedAt": "2026-10-06T07:24:59.383Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 8.582,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:38.271Z",
+          "completedAt": "2026-10-06T10:57:46.853Z"
+        }
+      ]
+    },
+    {
+      "name": "reference-data",
+      "sampleCount": 5,
+      "medianSeconds": 1.082,
+      "meanSeconds": 1.02,
+      "maxSeconds": 1.136,
+      "minSeconds": 0.827,
+      "successfulMedianSeconds": 1.082,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.13,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:46.788Z",
+          "completedAt": "2026-10-05T18:33:47.918Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.082,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:49.330Z",
+          "completedAt": "2026-10-05T14:59:50.412Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.827,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:44.275Z",
+          "completedAt": "2026-10-06T01:50:45.102Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.136,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:24:59.384Z",
+          "completedAt": "2026-10-06T07:25:00.520Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.927,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:46.876Z",
+          "completedAt": "2026-10-06T10:57:47.803Z"
+        }
+      ]
+    },
+    {
+      "name": "reference-packaging",
+      "sampleCount": 5,
+      "medianSeconds": 7.183,
+      "meanSeconds": 6.562,
+      "maxSeconds": 7.436,
+      "minSeconds": 4.939,
+      "successfulMedianSeconds": 7.183,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 7.327,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:34:10.208Z",
+          "completedAt": "2026-10-05T18:34:17.535Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 7.183,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:00:12.124Z",
+          "completedAt": "2026-10-05T15:00:19.307Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 4.939,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:59.790Z",
+          "completedAt": "2026-10-06T01:51:04.729Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 7.436,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:22.849Z",
+          "completedAt": "2026-10-06T07:25:30.285Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 5.924,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:58:05.748Z",
+          "completedAt": "2026-10-06T10:58:11.672Z"
+        }
+      ]
+    },
+    {
+      "name": "reference-ui-contracts",
+      "sampleCount": 5,
+      "medianSeconds": 0.054,
+      "meanSeconds": 0.051,
+      "maxSeconds": 0.059,
+      "minSeconds": 0.042,
+      "successfulMedianSeconds": 0.054,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.059,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:47.920Z",
+          "completedAt": "2026-10-05T18:33:47.979Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.054,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:50.413Z",
+          "completedAt": "2026-10-05T14:59:50.467Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.042,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:45.105Z",
+          "completedAt": "2026-10-06T01:50:45.147Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.057,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:00.521Z",
+          "completedAt": "2026-10-06T07:25:00.578Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.045,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:47.805Z",
+          "completedAt": "2026-10-06T10:57:47.850Z"
+        }
+      ]
+    },
+    {
+      "name": "release-gates",
+      "sampleCount": 5,
+      "medianSeconds": 73.343,
+      "meanSeconds": 74.652,
+      "maxSeconds": 88.68,
+      "minSeconds": 62.071,
+      "successfulMedianSeconds": 73.343,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 77.094,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:31:45.546Z",
+          "completedAt": "2026-10-05T18:33:02.640Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 72.071,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:57:55.050Z",
+          "completedAt": "2026-10-05T14:59:07.121Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 62.071,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:49:06.791Z",
+          "completedAt": "2026-10-06T01:50:08.862Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 73.343,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:23:02.938Z",
+          "completedAt": "2026-10-06T07:24:16.281Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 88.68,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:55:39.122Z",
+          "completedAt": "2026-10-06T10:57:07.802Z"
+        }
+      ]
+    },
+    {
+      "name": "replay",
+      "sampleCount": 5,
+      "medianSeconds": 1.071,
+      "meanSeconds": 1.004,
+      "maxSeconds": 1.172,
+      "minSeconds": 0.709,
+      "successfulMedianSeconds": 1.071,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.074,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:13:01.063Z",
+          "completedAt": "2026-10-05T21:13:02.137Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.071,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:38:20.909Z",
+          "completedAt": "2026-10-05T17:38:21.980Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.709,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:50:37.966Z",
+          "completedAt": "2026-10-06T03:50:38.675Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.172,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:07:42.009Z",
+          "completedAt": "2026-10-06T10:07:43.181Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.996,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:20:18.198Z",
+          "completedAt": "2026-10-06T13:20:19.194Z"
+        }
+      ]
+    },
+    {
+      "name": "search-fallback-core",
+      "sampleCount": 5,
+      "medianSeconds": 2.234,
+      "meanSeconds": 2.04,
+      "maxSeconds": 2.272,
+      "minSeconds": 1.429,
+      "successfulMedianSeconds": 2.234,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 2.272,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:17:28.584Z",
+          "completedAt": "2026-10-05T20:17:30.856Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 2.242,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:42:31.283Z",
+          "completedAt": "2026-10-05T16:42:33.525Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.429,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:10:55.213Z",
+          "completedAt": "2026-10-06T03:10:56.642Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 2.234,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:10:08.165Z",
+          "completedAt": "2026-10-06T09:10:10.399Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 2.022,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:31:40.496Z",
+          "completedAt": "2026-10-06T12:31:42.518Z"
+        }
+      ]
+    },
+    {
+      "name": "search-fallback-ui",
+      "sampleCount": 5,
+      "medianSeconds": 20.06,
+      "meanSeconds": 18.939,
+      "maxSeconds": 20.609,
+      "minSeconds": 15.44,
+      "successfulMedianSeconds": 20.06,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 20.06,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:17:30.858Z",
+          "completedAt": "2026-10-05T20:17:50.918Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 20.156,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:42:33.526Z",
+          "completedAt": "2026-10-05T16:42:53.682Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 15.44,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:10:56.644Z",
+          "completedAt": "2026-10-06T03:11:12.084Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 20.609,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:10:10.400Z",
+          "completedAt": "2026-10-06T09:10:31.009Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 18.431,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:31:42.519Z",
+          "completedAt": "2026-10-06T12:32:00.950Z"
+        }
+      ]
+    },
+    {
+      "name": "sentence-drafts-contract",
+      "sampleCount": 5,
+      "medianSeconds": 1.701,
+      "meanSeconds": 1.523,
+      "maxSeconds": 1.761,
+      "minSeconds": 1.014,
+      "successfulMedianSeconds": 1.701,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.761,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:43:20.418Z",
+          "completedAt": "2026-10-05T18:43:22.179Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.701,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:09:11.361Z",
+          "completedAt": "2026-10-05T15:09:13.062Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 1.014,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:57:24.108Z",
+          "completedAt": "2026-10-06T01:57:25.122Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.756,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:34:37.748Z",
+          "completedAt": "2026-10-06T07:34:39.504Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.382,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:06:05.448Z",
+          "completedAt": "2026-10-06T11:06:06.830Z"
+        }
+      ]
+    },
+    {
+      "name": "sentence-drafts-integration",
+      "sampleCount": 5,
+      "medianSeconds": 376.179,
+      "meanSeconds": 356.98,
+      "maxSeconds": 383.001,
+      "minSeconds": 297.179,
+      "successfulMedianSeconds": 376.179,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 382.027,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:43:22.180Z",
+          "completedAt": "2026-10-05T18:49:44.207Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 376.179,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:09:13.063Z",
+          "completedAt": "2026-10-05T15:15:29.242Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 297.179,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:57:25.123Z",
+          "completedAt": "2026-10-06T02:02:22.302Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 383.001,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:34:39.505Z",
+          "completedAt": "2026-10-06T07:41:02.506Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 346.515,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:06:06.831Z",
+          "completedAt": "2026-10-06T11:11:53.346Z"
+        }
+      ]
+    },
+    {
+      "name": "sentence-feedback-integration",
+      "sampleCount": 5,
+      "medianSeconds": 71.113,
+      "meanSeconds": 69.436,
+      "maxSeconds": 74.426,
+      "minSeconds": 59.048,
+      "successfulMedianSeconds": 71.113,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 72.691,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:59:53.351Z",
+          "completedAt": "2026-10-05T19:01:06.042Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 71.113,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:25:24.137Z",
+          "completedAt": "2026-10-05T15:26:35.250Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 59.048,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:10:02.398Z",
+          "completedAt": "2026-10-06T02:11:01.446Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 74.426,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:51:17.109Z",
+          "completedAt": "2026-10-06T07:52:31.535Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 69.904,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:21:03.284Z",
+          "completedAt": "2026-10-06T11:22:13.188Z"
+        }
+      ]
+    },
+    {
+      "name": "sentence-practice-integration",
+      "sampleCount": 5,
+      "medianSeconds": 59.637,
+      "meanSeconds": 56.142,
+      "maxSeconds": 62.666,
+      "minSeconds": 43.23,
+      "successfulMedianSeconds": 59.637,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 62.191,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:58:51.159Z",
+          "completedAt": "2026-10-05T18:59:53.350Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 59.637,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:24:24.498Z",
+          "completedAt": "2026-10-05T15:25:24.135Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 43.23,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:09:19.167Z",
+          "completedAt": "2026-10-06T02:10:02.397Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 62.666,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:50:14.442Z",
+          "completedAt": "2026-10-06T07:51:17.108Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 52.988,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:20:10.294Z",
+          "completedAt": "2026-10-06T11:21:03.282Z"
+        }
+      ]
+    },
+    {
+      "name": "shelf-search",
+      "sampleCount": 5,
+      "medianSeconds": 66.469,
+      "meanSeconds": 62.173,
+      "maxSeconds": 69.309,
+      "minSeconds": 47.782,
+      "successfulMedianSeconds": 66.469,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 69.096,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:20:37.610Z",
+          "completedAt": "2026-10-05T19:21:46.706Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 66.469,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:45:48.038Z",
+          "completedAt": "2026-10-05T15:46:54.507Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 47.782,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:26:09.283Z",
+          "completedAt": "2026-10-06T02:26:57.065Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 69.309,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:13:20.138Z",
+          "completedAt": "2026-10-06T08:14:29.447Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 58.209,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:40:13.816Z",
+          "completedAt": "2026-10-06T11:41:12.025Z"
+        }
+      ]
+    },
+    {
+      "name": "skip-browser",
+      "sampleCount": 5,
+      "medianSeconds": 20.986,
+      "meanSeconds": 20.243,
+      "maxSeconds": 21.237,
+      "minSeconds": 18.281,
+      "successfulMedianSeconds": 20.986,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 21.237,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:35:50.056Z",
+          "completedAt": "2026-10-05T18:36:11.293Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 20.986,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:01:48.687Z",
+          "completedAt": "2026-10-05T15:02:09.673Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 18.281,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:52:19.407Z",
+          "completedAt": "2026-10-06T01:52:37.688Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 21.162,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:27:02.443Z",
+          "completedAt": "2026-10-06T07:27:23.605Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 19.547,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:59:34.767Z",
+          "completedAt": "2026-10-06T10:59:54.314Z"
+        }
+      ]
+    },
+    {
+      "name": "skip-core",
+      "sampleCount": 5,
+      "medianSeconds": 6.218,
+      "meanSeconds": 5.715,
+      "maxSeconds": 6.601,
+      "minSeconds": 4.346,
+      "successfulMedianSeconds": 6.218,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 6.218,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:47.981Z",
+          "completedAt": "2026-10-05T18:33:54.199Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 6.493,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:50.468Z",
+          "completedAt": "2026-10-05T14:59:56.961Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 4.346,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:45.148Z",
+          "completedAt": "2026-10-06T01:50:49.494Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 6.601,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:00.579Z",
+          "completedAt": "2026-10-06T07:25:07.180Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 4.919,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:47.857Z",
+          "completedAt": "2026-10-06T10:57:52.776Z"
+        }
+      ]
+    },
+    {
+      "name": "skip-packaging",
+      "sampleCount": 5,
+      "medianSeconds": 1.3,
+      "meanSeconds": 1.201,
+      "maxSeconds": 1.377,
+      "minSeconds": 0.896,
+      "successfulMedianSeconds": 1.3,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.339,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:34:17.537Z",
+          "completedAt": "2026-10-05T18:34:18.876Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.3,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:00:19.308Z",
+          "completedAt": "2026-10-05T15:00:20.608Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.896,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:51:04.733Z",
+          "completedAt": "2026-10-06T01:51:05.629Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.377,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:30.286Z",
+          "completedAt": "2026-10-06T07:25:31.663Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.091,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:58:11.709Z",
+          "completedAt": "2026-10-06T10:58:12.800Z"
+        }
+      ]
+    },
+    {
+      "name": "skip-standalone",
+      "sampleCount": 5,
+      "medianSeconds": 10.728,
+      "meanSeconds": 10.041,
+      "maxSeconds": 11.097,
+      "minSeconds": 8.051,
+      "successfulMedianSeconds": 10.728,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 11.097,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:36:11.294Z",
+          "completedAt": "2026-10-05T18:36:22.391Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 10.728,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:02:09.675Z",
+          "completedAt": "2026-10-05T15:02:20.403Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 8.051,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:52:37.689Z",
+          "completedAt": "2026-10-06T01:52:45.740Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 10.908,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:27:23.606Z",
+          "completedAt": "2026-10-06T07:27:34.514Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 9.419,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:59:54.315Z",
+          "completedAt": "2026-10-06T11:00:03.734Z"
+        }
+      ]
+    },
+    {
+      "name": "skip-ui-contracts",
+      "sampleCount": 5,
+      "medianSeconds": 0.071,
+      "meanSeconds": 0.068,
+      "maxSeconds": 0.078,
+      "minSeconds": 0.054,
+      "successfulMedianSeconds": 0.071,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.078,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:54.200Z",
+          "completedAt": "2026-10-05T18:33:54.278Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.071,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:56.962Z",
+          "completedAt": "2026-10-05T14:59:57.033Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.054,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:49.508Z",
+          "completedAt": "2026-10-06T01:50:49.562Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.076,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:07.181Z",
+          "completedAt": "2026-10-06T07:25:07.257Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.06,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:52.778Z",
+          "completedAt": "2026-10-06T10:57:52.838Z"
+        }
+      ]
+    },
+    {
+      "name": "source-inbox-contract",
+      "sampleCount": 5,
+      "medianSeconds": 1.397,
+      "meanSeconds": 1.251,
+      "maxSeconds": 1.473,
+      "minSeconds": 0.861,
+      "successfulMedianSeconds": 1.397,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.397,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:53:38.149Z",
+          "completedAt": "2026-10-05T18:53:39.546Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.433,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:19:17.496Z",
+          "completedAt": "2026-10-05T15:19:18.929Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.861,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:05:17.334Z",
+          "completedAt": "2026-10-06T02:05:18.195Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.473,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:44:57.688Z",
+          "completedAt": "2026-10-06T07:44:59.161Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 1.09,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:15:19.855Z",
+          "completedAt": "2026-10-06T11:15:20.945Z"
+        }
+      ]
+    },
+    {
+      "name": "source-inbox-integration",
+      "sampleCount": 5,
+      "medianSeconds": 62.565,
+      "meanSeconds": 61.384,
+      "maxSeconds": 67.627,
+      "minSeconds": 51.548,
+      "successfulMedianSeconds": 62.565,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 65.861,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:53:39.548Z",
+          "completedAt": "2026-10-05T18:54:45.409Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 62.565,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:19:18.930Z",
+          "completedAt": "2026-10-05T15:20:21.495Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 51.548,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:05:18.196Z",
+          "completedAt": "2026-10-06T02:06:09.744Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 67.627,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:44:59.163Z",
+          "completedAt": "2026-10-06T07:46:06.790Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 59.318,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:15:20.946Z",
+          "completedAt": "2026-10-06T11:16:20.264Z"
+        }
+      ]
+    },
+    {
+      "name": "source-kanji-practice-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.87,
+      "meanSeconds": 0.788,
+      "maxSeconds": 0.915,
+      "minSeconds": 0.526,
+      "successfulMedianSeconds": 0.87,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.881,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:49:44.272Z",
+          "completedAt": "2026-10-05T18:49:45.153Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.87,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:15:29.299Z",
+          "completedAt": "2026-10-05T15:15:30.169Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.526,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:02:22.340Z",
+          "completedAt": "2026-10-06T02:02:22.866Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.915,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:41:02.565Z",
+          "completedAt": "2026-10-06T07:41:03.480Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.746,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:11:53.395Z",
+          "completedAt": "2026-10-06T11:11:54.141Z"
+        }
+      ]
+    },
+    {
+      "name": "source-kanji-practice-integration",
+      "sampleCount": 5,
+      "medianSeconds": 227.325,
+      "meanSeconds": 214.919,
+      "maxSeconds": 234.205,
+      "minSeconds": 174.466,
+      "successfulMedianSeconds": 227.325,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 232.994,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:49:45.154Z",
+          "completedAt": "2026-10-05T18:53:38.148Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 227.325,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:15:30.170Z",
+          "completedAt": "2026-10-05T15:19:17.495Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 174.466,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:02:22.867Z",
+          "completedAt": "2026-10-06T02:05:17.333Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 234.205,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:41:03.481Z",
+          "completedAt": "2026-10-06T07:44:57.686Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 205.605,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:11:54.142Z",
+          "completedAt": "2026-10-06T11:15:19.747Z"
+        }
+      ]
+    },
+    {
+      "name": "source-learning-integration",
+      "sampleCount": 5,
+      "medianSeconds": 80.017,
+      "meanSeconds": 77.236,
+      "maxSeconds": 83.236,
+      "minSeconds": 63.978,
+      "successfulMedianSeconds": 80.017,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 83.236,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:57:27.906Z",
+          "completedAt": "2026-10-05T18:58:51.142Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 80.017,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:23:04.479Z",
+          "completedAt": "2026-10-05T15:24:24.496Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 63.978,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:08:15.188Z",
+          "completedAt": "2026-10-06T02:09:19.166Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 82.871,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:48:51.570Z",
+          "completedAt": "2026-10-06T07:50:14.441Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 76.077,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:18:54.119Z",
+          "completedAt": "2026-10-06T11:20:10.196Z"
+        }
+      ]
+    },
+    {
+      "name": "source-processing-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.129,
+      "meanSeconds": 0.119,
+      "maxSeconds": 0.14,
+      "minSeconds": 0.086,
+      "successfulMedianSeconds": 0.129,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.14,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:07:58.067Z",
+          "completedAt": "2026-10-05T19:07:58.207Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.129,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:33:15.246Z",
+          "completedAt": "2026-10-05T15:33:15.375Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.086,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:16:47.521Z",
+          "completedAt": "2026-10-06T02:16:47.607Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.134,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:59:22.333Z",
+          "completedAt": "2026-10-06T07:59:22.467Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.108,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:28:37.451Z",
+          "completedAt": "2026-10-06T11:28:37.559Z"
+        }
+      ]
+    },
+    {
+      "name": "source-processing-integration",
+      "sampleCount": 5,
+      "medianSeconds": 86.21,
+      "meanSeconds": 82.591,
+      "maxSeconds": 89.974,
+      "minSeconds": 71.025,
+      "successfulMedianSeconds": 86.21,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 86.21,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:07:58.208Z",
+          "completedAt": "2026-10-05T19:09:24.418Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 86.408,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:33:15.376Z",
+          "completedAt": "2026-10-05T15:34:41.784Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 71.025,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:16:47.608Z",
+          "completedAt": "2026-10-06T02:17:58.633Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 89.974,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:59:22.468Z",
+          "completedAt": "2026-10-06T08:00:52.442Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 79.339,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:28:37.560Z",
+          "completedAt": "2026-10-06T11:29:56.899Z"
+        }
+      ]
+    },
+    {
+      "name": "source-shelf",
+      "sampleCount": 5,
+      "medianSeconds": 14.903,
+      "meanSeconds": 14.193,
+      "maxSeconds": 15.152,
+      "minSeconds": 11.647,
+      "successfulMedianSeconds": 14.903,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 15.024,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:27:44.602Z",
+          "completedAt": "2026-10-05T20:27:59.626Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 15.152,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:52:48.910Z",
+          "completedAt": "2026-10-05T16:53:04.062Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 11.647,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:19:18.792Z",
+          "completedAt": "2026-10-06T03:19:30.439Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 14.903,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:20:31.593Z",
+          "completedAt": "2026-10-06T09:20:46.496Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 14.241,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:41:06.373Z",
+          "completedAt": "2026-10-06T12:41:20.614Z"
+        }
+      ]
+    },
+    {
+      "name": "source-shelf-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 21.096,
+      "meanSeconds": 20.081,
+      "maxSeconds": 22.071,
+      "minSeconds": 16.668,
+      "successfulMedianSeconds": 21.096,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 21.096,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:27:59.627Z",
+          "completedAt": "2026-10-05T20:28:20.723Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 22.071,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:53:04.063Z",
+          "completedAt": "2026-10-05T16:53:26.134Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 16.668,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:19:30.446Z",
+          "completedAt": "2026-10-06T03:19:47.114Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 21.948,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:20:46.498Z",
+          "completedAt": "2026-10-06T09:21:08.446Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 18.623,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:41:20.616Z",
+          "completedAt": "2026-10-06T12:41:39.239Z"
+        }
+      ]
+    },
+    {
+      "name": "srs-today",
+      "sampleCount": 5,
+      "medianSeconds": 358.845,
+      "meanSeconds": 337.968,
+      "maxSeconds": 390.978,
+      "minSeconds": 252.673,
+      "successfulMedianSeconds": 358.845,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 374.736,
+          "status": "passed",
+          "startedAt": "2026-10-05T21:03:57.281Z",
+          "completedAt": "2026-10-05T21:10:12.017Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 358.845,
+          "status": "passed",
+          "startedAt": "2026-10-05T17:29:34.441Z",
+          "completedAt": "2026-10-05T17:35:33.286Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 252.673,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:43:51.391Z",
+          "completedAt": "2026-10-06T03:48:04.064Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 390.978,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:58:14.750Z",
+          "completedAt": "2026-10-06T10:04:45.728Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 312.608,
+          "status": "passed",
+          "startedAt": "2026-10-06T13:12:24.317Z",
+          "completedAt": "2026-10-06T13:17:36.925Z"
+        }
+      ]
+    },
+    {
+      "name": "standalone-journey",
+      "sampleCount": 5,
+      "medianSeconds": 62.892,
+      "meanSeconds": 61.879,
+      "maxSeconds": 66.232,
+      "minSeconds": 53.962,
+      "successfulMedianSeconds": 62.892,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 64.795,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:17:50.920Z",
+          "completedAt": "2026-10-05T20:18:55.715Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 66.232,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:42:53.684Z",
+          "completedAt": "2026-10-05T16:43:59.916Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 53.962,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:11:12.096Z",
+          "completedAt": "2026-10-06T03:12:06.058Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 62.892,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:10:31.011Z",
+          "completedAt": "2026-10-06T09:11:33.903Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 61.513,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:32:00.952Z",
+          "completedAt": "2026-10-06T12:33:02.465Z"
+        }
+      ]
+    },
+    {
+      "name": "storage-integ",
+      "sampleCount": 5,
+      "medianSeconds": 1.03,
+      "meanSeconds": 0.914,
+      "maxSeconds": 1.054,
+      "minSeconds": 0.637,
+      "successfulMedianSeconds": 1.03,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 1.054,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:39:14.143Z",
+          "completedAt": "2026-10-05T19:39:15.197Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 1.031,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:04:35.614Z",
+          "completedAt": "2026-10-05T16:04:36.645Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.637,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:41:06.109Z",
+          "completedAt": "2026-10-06T02:41:06.746Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 1.03,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:32:11.404Z",
+          "completedAt": "2026-10-06T08:32:12.434Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.818,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:57:06.591Z",
+          "completedAt": "2026-10-06T11:57:07.409Z"
+        }
+      ]
+    },
+    {
+      "name": "teacher-context-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.308,
+      "meanSeconds": 0.284,
+      "maxSeconds": 0.331,
+      "minSeconds": 0.193,
+      "successfulMedianSeconds": 0.308,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.308,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:37:42.481Z",
+          "completedAt": "2026-10-05T18:37:42.789Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.325,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:03:42.144Z",
+          "completedAt": "2026-10-05T15:03:42.469Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.193,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:53:37.850Z",
+          "completedAt": "2026-10-06T01:53:38.043Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.331,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:29:01.071Z",
+          "completedAt": "2026-10-06T07:29:01.402Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.263,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:01:11.729Z",
+          "completedAt": "2026-10-06T11:01:11.992Z"
+        }
+      ]
+    },
+    {
+      "name": "teacher-context-integration",
+      "sampleCount": 5,
+      "medianSeconds": 154.963,
+      "meanSeconds": 141.406,
+      "maxSeconds": 161.173,
+      "minSeconds": 101.514,
+      "successfulMedianSeconds": 154.963,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 161.173,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:37:42.790Z",
+          "completedAt": "2026-10-05T18:40:23.963Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 154.963,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:03:42.470Z",
+          "completedAt": "2026-10-05T15:06:17.433Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 101.514,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:53:38.044Z",
+          "completedAt": "2026-10-06T01:55:19.558Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 158.733,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:29:01.403Z",
+          "completedAt": "2026-10-06T07:31:40.136Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 130.645,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:01:11.993Z",
+          "completedAt": "2026-10-06T11:03:22.638Z"
+        }
+      ]
+    },
+    {
+      "name": "teacher-drafts-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.181,
+      "meanSeconds": 0.163,
+      "maxSeconds": 0.194,
+      "minSeconds": 0.11,
+      "successfulMedianSeconds": 0.181,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.194,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:40:23.965Z",
+          "completedAt": "2026-10-05T18:40:24.159Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.181,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:06:17.434Z",
+          "completedAt": "2026-10-05T15:06:17.615Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.11,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:55:19.559Z",
+          "completedAt": "2026-10-06T01:55:19.669Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.184,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:31:40.137Z",
+          "completedAt": "2026-10-06T07:31:40.321Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.147,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:03:22.710Z",
+          "completedAt": "2026-10-06T11:03:22.857Z"
+        }
+      ]
+    },
+    {
+      "name": "teacher-drafts-integration",
+      "sampleCount": 5,
+      "medianSeconds": 173.743,
+      "meanSeconds": 162.887,
+      "maxSeconds": 177.425,
+      "minSeconds": 124.435,
+      "successfulMedianSeconds": 173.743,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 176.256,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:40:24.160Z",
+          "completedAt": "2026-10-05T18:43:20.416Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 173.743,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:06:17.616Z",
+          "completedAt": "2026-10-05T15:09:11.359Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 124.435,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:55:19.671Z",
+          "completedAt": "2026-10-06T01:57:24.106Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 177.425,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:31:40.322Z",
+          "completedAt": "2026-10-06T07:34:37.747Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 162.575,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:03:22.859Z",
+          "completedAt": "2026-10-06T11:06:05.434Z"
+        }
+      ]
+    },
+    {
+      "name": "teaching-context",
+      "sampleCount": 5,
+      "medianSeconds": 0.13,
+      "meanSeconds": 0.121,
+      "maxSeconds": 0.142,
+      "minSeconds": 0.084,
+      "successfulMedianSeconds": 0.13,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.137,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:16:22.567Z",
+          "completedAt": "2026-10-05T20:16:22.704Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.13,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:41:25.538Z",
+          "completedAt": "2026-10-05T16:41:25.668Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.084,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:10:02.265Z",
+          "completedAt": "2026-10-06T03:10:02.349Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.142,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:09:03.594Z",
+          "completedAt": "2026-10-06T09:09:03.736Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.113,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:30:39.166Z",
+          "completedAt": "2026-10-06T12:30:39.279Z"
+        }
+      ]
+    },
+    {
+      "name": "timed-transcript-integration",
+      "sampleCount": 5,
+      "medianSeconds": 73.67,
+      "meanSeconds": 69.51,
+      "maxSeconds": 74.652,
+      "minSeconds": 56.542,
+      "successfulMedianSeconds": 73.67,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 74.588,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:56:13.317Z",
+          "completedAt": "2026-10-05T18:57:27.905Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 73.67,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:21:50.808Z",
+          "completedAt": "2026-10-05T15:23:04.478Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 56.542,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:07:18.645Z",
+          "completedAt": "2026-10-06T02:08:15.187Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 74.652,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:47:36.917Z",
+          "completedAt": "2026-10-06T07:48:51.569Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 68.1,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:17:45.849Z",
+          "completedAt": "2026-10-06T11:18:53.949Z"
+        }
+      ]
+    },
+    {
+      "name": "tutor-quiz-storage",
+      "sampleCount": 5,
+      "medianSeconds": 16.283,
+      "meanSeconds": 15.466,
+      "maxSeconds": 16.322,
+      "minSeconds": 12.73,
+      "successfulMedianSeconds": 16.283,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 16.283,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:30:56.706Z",
+          "completedAt": "2026-10-05T20:31:12.989Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 16.312,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:56:04.336Z",
+          "completedAt": "2026-10-05T16:56:20.648Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 12.73,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:21:44.590Z",
+          "completedAt": "2026-10-06T03:21:57.320Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 16.322,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:23:46.625Z",
+          "completedAt": "2026-10-06T09:24:02.947Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 15.681,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:43:57.747Z",
+          "completedAt": "2026-10-06T12:44:13.428Z"
+        }
+      ]
+    },
+    {
+      "name": "tutor-quiz-storage-webkit",
+      "sampleCount": 5,
+      "medianSeconds": 23.455,
+      "meanSeconds": 21.785,
+      "maxSeconds": 25.036,
+      "minSeconds": 15.039,
+      "successfulMedianSeconds": 23.455,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 23.455,
+          "status": "passed",
+          "startedAt": "2026-10-05T20:31:12.991Z",
+          "completedAt": "2026-10-05T20:31:36.446Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 25.036,
+          "status": "passed",
+          "startedAt": "2026-10-05T16:56:20.649Z",
+          "completedAt": "2026-10-05T16:56:45.685Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 15.039,
+          "status": "passed",
+          "startedAt": "2026-10-06T03:21:57.321Z",
+          "completedAt": "2026-10-06T03:22:12.360Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 24.723,
+          "status": "passed",
+          "startedAt": "2026-10-06T09:24:02.949Z",
+          "completedAt": "2026-10-06T09:24:27.672Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 20.673,
+          "status": "passed",
+          "startedAt": "2026-10-06T12:44:13.429Z",
+          "completedAt": "2026-10-06T12:44:34.102Z"
+        }
+      ]
+    },
+    {
+      "name": "tutor-request-binding-integration",
+      "sampleCount": 5,
+      "medianSeconds": 39.421,
+      "meanSeconds": 38.345,
+      "maxSeconds": 40.534,
+      "minSeconds": 33.622,
+      "successfulMedianSeconds": 39.421,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 40.534,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:09:24.419Z",
+          "completedAt": "2026-10-05T19:10:04.953Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 39.421,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:34:41.785Z",
+          "completedAt": "2026-10-05T15:35:21.206Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 33.622,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:17:58.634Z",
+          "completedAt": "2026-10-06T02:18:32.256Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 40.478,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:00:52.443Z",
+          "completedAt": "2026-10-06T08:01:32.921Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 37.67,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:29:56.900Z",
+          "completedAt": "2026-10-06T11:30:34.570Z"
+        }
+      ]
+    },
+    {
+      "name": "typecheck",
+      "sampleCount": 5,
+      "medianSeconds": 50.129,
+      "meanSeconds": 45.165,
+      "maxSeconds": 52.213,
+      "minSeconds": 31.989,
+      "successfulMedianSeconds": 50.129,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 50.129,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:36:52.351Z",
+          "completedAt": "2026-10-05T18:37:42.480Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 51.595,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:02:50.548Z",
+          "completedAt": "2026-10-05T15:03:42.143Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 31.989,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:53:05.860Z",
+          "completedAt": "2026-10-06T01:53:37.849Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 52.213,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:28:08.857Z",
+          "completedAt": "2026-10-06T07:29:01.070Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 39.901,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:00:31.827Z",
+          "completedAt": "2026-10-06T11:01:11.728Z"
+        }
+      ]
+    },
+    {
+      "name": "vitest",
+      "sampleCount": 5,
+      "medianSeconds": 65.18,
+      "meanSeconds": 79.6,
+      "maxSeconds": 125.47,
+      "minSeconds": 43.981,
+      "successfulMedianSeconds": 65.18,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 64.353,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:10:20.334Z",
+          "completedAt": "2026-10-05T19:11:24.687Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 65.18,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:35:36.141Z",
+          "completedAt": "2026-10-05T15:36:41.321Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 43.981,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:18:43.318Z",
+          "completedAt": "2026-10-06T02:19:27.299Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 125.47,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:01:48.312Z",
+          "completedAt": "2026-10-06T08:03:53.782Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 99.016,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:30:47.772Z",
+          "completedAt": "2026-10-06T11:32:26.788Z"
+        }
+      ]
+    },
+    {
+      "name": "word-saved-answer",
+      "sampleCount": 5,
+      "medianSeconds": 14.377,
+      "meanSeconds": 13.301,
+      "maxSeconds": 15.184,
+      "minSeconds": 9.764,
+      "successfulMedianSeconds": 14.377,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 15.184,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:33:54.825Z",
+          "completedAt": "2026-10-05T18:34:10.009Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 14.377,
+          "status": "passed",
+          "startedAt": "2026-10-05T14:59:57.559Z",
+          "completedAt": "2026-10-05T15:00:11.936Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 9.764,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:49.893Z",
+          "completedAt": "2026-10-06T01:50:59.657Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 14.856,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:07.796Z",
+          "completedAt": "2026-10-06T07:25:22.652Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 12.325,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:57:53.261Z",
+          "completedAt": "2026-10-06T10:58:05.586Z"
+        }
+      ]
+    },
+    {
+      "name": "word-saved-answer-controls",
+      "sampleCount": 5,
+      "medianSeconds": 0.105,
+      "meanSeconds": 0.097,
+      "maxSeconds": 0.114,
+      "minSeconds": 0.073,
+      "successfulMedianSeconds": 0.105,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 0.11,
+          "status": "passed",
+          "startedAt": "2026-10-05T18:34:10.011Z",
+          "completedAt": "2026-10-05T18:34:10.121Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 0.105,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:00:11.938Z",
+          "completedAt": "2026-10-05T15:00:12.043Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 0.073,
+          "status": "passed",
+          "startedAt": "2026-10-06T01:50:59.659Z",
+          "completedAt": "2026-10-06T01:50:59.732Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 0.114,
+          "status": "passed",
+          "startedAt": "2026-10-06T07:25:22.653Z",
+          "completedAt": "2026-10-06T07:25:22.767Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 0.084,
+          "status": "passed",
+          "startedAt": "2026-10-06T10:58:05.588Z",
+          "completedAt": "2026-10-06T10:58:05.672Z"
+        }
+      ]
+    },
+    {
+      "name": "writing-room",
+      "sampleCount": 5,
+      "medianSeconds": 133.557,
+      "meanSeconds": 118.509,
+      "maxSeconds": 142.2,
+      "minSeconds": 74.105,
+      "successfulMedianSeconds": 133.557,
+      "samples": [
+        {
+          "runId": 37326384597,
+          "seconds": 133.557,
+          "status": "passed",
+          "startedAt": "2026-10-05T19:18:24.052Z",
+          "completedAt": "2026-10-05T19:20:37.609Z"
+        },
+        {
+          "runId": 37327953066,
+          "seconds": 142.2,
+          "status": "passed",
+          "startedAt": "2026-10-05T15:43:25.837Z",
+          "completedAt": "2026-10-05T15:45:48.037Z"
+        },
+        {
+          "runId": 37400558515,
+          "seconds": 74.105,
+          "status": "passed",
+          "startedAt": "2026-10-06T02:24:55.176Z",
+          "completedAt": "2026-10-06T02:26:09.281Z"
+        },
+        {
+          "runId": 37407758020,
+          "seconds": 141.894,
+          "status": "passed",
+          "startedAt": "2026-10-06T08:10:58.243Z",
+          "completedAt": "2026-10-06T08:13:20.137Z"
+        },
+        {
+          "runId": 37452295779,
+          "seconds": 100.787,
+          "status": "passed",
+          "startedAt": "2026-10-06T11:38:33.027Z",
+          "completedAt": "2026-10-06T11:40:13.814Z"
+        }
+      ]
+    }
+  ]
+}
