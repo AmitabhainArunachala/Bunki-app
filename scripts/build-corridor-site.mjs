@@ -18,6 +18,7 @@ import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { buildCorridorModules } from './build-reading-module.mjs';
 import { assetFilesUnder, corridorAssetFiles } from './corridor-assets.mjs';
+import { verifyRelease } from './release/version.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = join(repo, 'prototypes/corridor');
@@ -122,6 +123,7 @@ try {
   ]) {
     execFileSync(process.execPath, ['--check', join(source, path)], { stdio: 'pipe' });
   }
+  const release = verifyRelease(repo);
   const gitSha = git('rev-parse', 'HEAD');
   const sourceDirty = git('status', '--porcelain', '--untracked-files=normal') !== '';
   const modules = buildCorridorModules(repo);
@@ -169,6 +171,8 @@ try {
   const manifest = {
     schemaVersion: 1,
     product: 'KAIRO',
+    release,
+    buildId: `${release.version}+git.${gitSha.slice(0, 12)}`,
     gitSha,
     sourceDirty,
     sourceAssetSha256,

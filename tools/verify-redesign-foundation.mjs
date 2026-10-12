@@ -4,7 +4,7 @@ import { URL } from 'node:url';
 import assert from 'node:assert/strict';
 import console from 'node:console';
 import process from 'node:process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../scripts/serve-corridor-dev.mjs';
@@ -17,6 +17,9 @@ mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
 const checks = [];
 const diagnostics = [];
+const releaseVersion = JSON.parse(
+  readFileSync(new URL('../release.json', import.meta.url)),
+).version;
 const horizontalSamples = [];
 const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { chromium, webkit };
 try {
@@ -98,6 +101,14 @@ try {
           await page.locator('#tab-me').click();
           await page.locator('#me-settings').click();
           await page.waitForFunction(() => document.documentElement.dataset.room === 'settings');
+          assert.equal(
+            await page.locator('#settings-release-version').getAttribute('data-version'),
+            releaseVersion,
+          );
+          assert.equal(
+            await page.locator('#settings-release-notes').getAttribute('href'),
+            `https://github.com/Amitabhainarunachala/Bunki-app/releases/tag/v${releaseVersion}`,
+          );
           assert.equal(await page.locator('html').getAttribute('data-room'), 'settings');
           assert.equal(
             await page.locator('.crumb').getAttribute('title'),

@@ -26,6 +26,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { buildCorridorModules } from './build-reading-module.mjs';
 import { corridorAssetFiles } from './corridor-assets.mjs';
+import { verifyRelease } from './release/version.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -68,6 +69,12 @@ export function verifyArtifact(path, requireClean = false) {
   const manifest = json(join(site, 'build-identity.json'));
   assert.equal(manifest.schemaVersion, 1);
   assert.equal(manifest.product, 'KAIRO');
+  assert.deepEqual(
+    manifest.release,
+    verifyRelease(ROOT),
+    'Release metadata differs from the candidate',
+  );
+  assert.equal(manifest.buildId, `${manifest.release.version}+git.${manifest.gitSha.slice(0, 12)}`);
   assert.equal(
     manifest.gitSha,
     execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim(),

@@ -35,6 +35,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Validate product identity, release notes and version progression
+        env:
+          BUNKI_RELEASE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/release/version.mjs verify
       - name: Print and compare original and candidate required gates
         run: |
           base=$(node --input-type=module -e "import fs from 'node:fs'; console.log(JSON.parse(fs.readFileSync('scripts/ci/gate-baseline.json')).baseSha)")

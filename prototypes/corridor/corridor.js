@@ -12,6 +12,10 @@
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
 
+// BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
+const APP_RELEASE = Object.freeze({"version":"1.0.0","channel":"stable","releasedOn":"2026-10-12","learnerDataEpoch":1});
+// END GENERATED RELEASE IDENTITY
+
 const DATA = {
   safe: ['kanken', 'sem'],
   sa: ['kanji', 'words', 'idioms', 'dict', 'strokes', 'radicals214'],
@@ -31754,7 +31758,22 @@ function renderSettings(main) {
       });
     }),
   );
-  main.append(language, doors);
+  const about = el('section', 'foundation-section');
+  about.id = 'settings-release';
+  about.append(el('h2', 'eyebrow', tx('このアプリについて', 'About this app')));
+  const version = el('p', '', `Bunki / KAIRO ${APP_RELEASE.version}`);
+  version.id = 'settings-release-version';
+  version.dataset.version = APP_RELEASE.version;
+  about.append(version, el('p', 'card-kind', APP_RELEASE.channel === 'stable'
+    ? tx('通常版', 'Stable release') : tx('テスト版', 'Test release')));
+  const notes = el('a', 'grammar-link', tx('この版の変更点', 'Changes in this release'));
+  notes.id = 'settings-release-notes';
+  notes.href = `https://github.com/Amitabhainarunachala/Bunki-app/releases/tag/v${APP_RELEASE.version}`;
+  notes.target = '_blank'; notes.rel = 'noopener noreferrer';
+  about.append(notes, el('p', 'card-kind', tx(
+    '更新するには、オンラインで開いた後、このアプリの画面をすべて閉じて、もう一度開いてください。保存データは消さないでください。',
+    'To update, open online, then close all app windows and reopen. Keep your saved website data.')));
+  main.append(language, doors, about);
 }
 function renderWordsDoors(main) {
   // the Words tab opens on the word web (the last word looked up, else the

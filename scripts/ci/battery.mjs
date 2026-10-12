@@ -84,6 +84,7 @@ export function policyDigest() {
     '--',
     '.github/workflows',
     'scripts/ci',
+    'scripts/release',
     'scripts/verify-release-gates.mjs',
     'docs/ci/gate-timings.json',
     '.github/actions',
@@ -99,7 +100,8 @@ export function policyDigest() {
       else if (/\.(mjs|json|ya?ml|sh|py|txt)$/.test(file)) files.push(file);
     }
   };
-  for (const dir of ['scripts/ci', '.github/workflows', '.github/actions']) walk(dir);
+  for (const dir of ['scripts/ci', 'scripts/release', '.github/workflows', '.github/actions'])
+    walk(dir);
   return digest(
     [...new Set(files)]
       .sort()
