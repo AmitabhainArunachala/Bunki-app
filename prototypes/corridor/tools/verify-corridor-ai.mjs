@@ -335,6 +335,19 @@ async function main() {
     contract.timeoutMs === 10000,
     `timeoutMs=${contract.timeoutMs}`,
   );
+  const budgets = await page.evaluate(`({
+    chat: window.__KAIRO_AI__.requestTimeoutMs({ surface: 'chat', maxTokens: 16000 }),
+    short: window.__KAIRO_AI__.requestTimeoutMs({ surface: 'reading', maxTokens: 3000 }),
+    medium: window.__KAIRO_AI__.requestTimeoutMs({ surface: 'reading', maxTokens: 8000 }),
+    long: window.__KAIRO_AI__.requestTimeoutMs({ surface: 'reading', maxTokens: 16000 }),
+    unsized: window.__KAIRO_AI__.requestTimeoutMs({ surface: 'reading' }),
+  })`);
+  check(
+    'only the article room scales its budget with the requested length (ten-minute cap)',
+    budgets.chat === 10000 && budgets.unsized === 10000 && budgets.short === 130000 &&
+      budgets.medium === 330000 && budgets.long === 600000,
+    JSON.stringify(budgets),
+  );
   check(
     'explicit device settings reach the provider seam',
     contract.provider.baseUrl === OVERRIDE_BASE_URL && contract.provider.model === OVERRIDE_MODEL,
