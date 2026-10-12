@@ -78,5 +78,101 @@
   "36647241640/1": {
     "result": "observed",
     "startedAt": "2026-10-01T13:36:06Z"
+  },
+  "38206323499/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-12T05:03:38Z",
+    "reason": "Producer verification policy differs from trusted default branch"
+  },
+  "36647241640/2": {
+    "result": "observed",
+    "startedAt": "2026-10-01T13:36:06Z"
+  },
+  "36647241640/3": {
+    "result": "observed",
+    "startedAt": "2026-10-01T13:36:06Z"
+  },
+  "36647241640/4": {
+    "result": "observed",
+    "startedAt": "2026-10-01T13:36:06Z"
+  },
+  "36647241640/5": {
+    "result": "observed",
+    "startedAt": "2026-10-01T13:36:06Z"
+  },
+  "36663319739/1": {
+    "result": "observed",
+    "startedAt": "2026-09-30T03:12:02Z"
+  },
+  "36802759604/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T01:47:22Z"
+  },
+  "36834519872/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T08:08:49Z",
+    "reason": "Deploy runs come from main"
+  },
+  "36834523844/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T08:08:52Z"
+  },
+  "36834604304/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T08:09:42Z"
+  },
+  "36834604384/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T08:09:42Z",
+    "reason": "Unexpected producer event"
+  },
+  "36838534835/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T08:47:28Z",
+    "reason": "Deploy runs come from main"
+  },
+  "36838560750/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T08:47:43Z"
+  },
+  "36838580182/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T08:47:53Z",
+    "reason": "Unexpected producer event"
+  },
+  "36838580203/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T08:47:53Z"
+  },
+  "36839104831/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T08:52:51Z",
+    "reason": "Deploy runs come from main"
+  },
+  "36839120282/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T08:53:00Z"
+  },
+  "36839134544/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T08:53:08Z"
+  },
+  "36839134889/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T08:53:08Z",
+    "reason": "Unexpected producer event"
+  },
+  "36844724063/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T09:44:55Z",
+    "reason": "Deploy runs come from main"
   }
 }
