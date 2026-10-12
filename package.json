@@ -1,6 +1,6 @@
 {
   "name": "bunki",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Bunki (分岐) — Phase-0 closed learning loop. Monorepo root (WP-01).",
   "workspaces": [
