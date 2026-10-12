@@ -174,5 +174,89 @@
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-01T09:44:55Z",
     "reason": "Deploy runs come from main"
+  },
+  "36844740700/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T09:45:05Z"
+  },
+  "36844762553/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T09:45:16Z"
+  },
+  "36844762575/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-01T09:45:16Z",
+    "reason": "Unexpected producer event"
+  },
+  "36883106569/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T15:42:31Z"
+  },
+  "36883106569/2": {
+    "result": "observed",
+    "startedAt": "2026-10-01T15:42:31Z"
+  },
+  "36904858367/1": {
+    "result": "observed",
+    "startedAt": "2026-10-01T18:10:29Z"
+  },
+  "37113571443/1": {
+    "result": "observed",
+    "startedAt": "2026-10-04T10:16:50Z"
+  },
+  "37113571443/2": {
+    "result": "observed",
+    "startedAt": "2026-10-04T10:16:50Z"
+  },
+  "37113571443/3": {
+    "result": "observed",
+    "startedAt": "2026-10-04T10:16:50Z"
+  },
+  "37114904308/1": {
+    "result": "observed",
+    "startedAt": "2026-10-03T09:59:53Z"
+  },
+  "37114925360/1": {
+    "result": "observed",
+    "startedAt": "2026-10-03T10:00:14Z"
+  },
+  "37115399635/1": {
+    "result": "observed",
+    "startedAt": "2026-10-03T10:08:17Z"
+  },
+  "37116455075/1": {
+    "result": "observed",
+    "startedAt": "2026-10-03T10:27:00Z"
+  },
+  "37116836731/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-03T10:34:04Z",
+    "reason": "Unexpected producer event"
+  },
+  "37116836764/1": {
+    "result": "observed",
+    "startedAt": "2026-10-03T10:34:04Z"
+  },
+  "37129568608/1": {
+    "result": "observed",
+    "startedAt": "2026-10-03T14:26:03Z"
+  },
+  "37137260501/1": {
+    "result": "observed",
+    "startedAt": "2026-10-05T18:29:15Z"
+  },
+  "37137260501/2": {
+    "result": "observed",
+    "startedAt": "2026-10-05T18:29:15Z"
+  },
+  "37137260501/3": {
+    "result": "observed",
+    "startedAt": "2026-10-05T18:29:15Z"
+  },
+  "37137260501/4": {
+    "result": "observed",
+    "startedAt": "2026-10-05T18:29:15Z"
   }
 }
