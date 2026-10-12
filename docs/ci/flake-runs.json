@@ -510,9 +510,9 @@
   "38211189408/2": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
-    "startedAt": "2026-10-12T07:05:21Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:10:08.856Z",
+    "startedAt": "2026-10-12T07:09:14Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-38211189408-2"
   },
   "37322574141/1": {
@@ -605,48 +605,48 @@
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:41:52.694Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-2"
   },
   "37496611523/3": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:41:52.694Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-3"
   },
   "37496611523/4": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:41:52.694Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-4"
   },
   "37496611523/5": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:41:52.694Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-5"
   },
   "37496611523/6": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:41:52.694Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-6"
   },
   "37496611523/7": {
     "result": "retry",
     "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
     "startedAt": "2026-10-10T22:08:31Z",
-    "failures": 1,
-    "attemptedAt": "2026-10-12T07:41:52.694Z",
+    "failures": 2,
+    "attemptedAt": "2026-10-12T13:51:37.458Z",
     "reason": "Observation artifact not yet available: bunki-plan-37496611523-7"
   },
   "37496611523/8": {
@@ -1184,5 +1184,59 @@
   "38071892280/1": {
     "result": "observed",
     "startedAt": "2026-10-10T17:28:39Z"
+  },
+  "38072394457/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T17:36:00Z"
+  },
+  "38074597445/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T18:08:47Z"
+  },
+  "38077289677/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T18:48:49Z"
+  },
+  "38084667849/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T20:40:32Z"
+  },
+  "38085962016/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T21:00:34Z"
+  },
+  "38087251579/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T21:20:36Z"
+  },
+  "38092327889/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T22:40:51Z"
+  },
+  "38093535646/1": {
+    "result": "observed",
+    "startedAt": "2026-10-10T23:01:02Z"
+  },
+  "38100392399/1": {
+    "result": "observed",
+    "startedAt": "2026-10-11T01:01:06Z"
+  },
+  "38160384483/1": {
+    "result": "observed",
+    "startedAt": "2026-10-11T17:36:52Z"
+  },
+  "38198479220/1": {
+    "result": "observed",
+    "startedAt": "2026-10-12T03:06:54Z"
+  },
+  "38199020878/1": {
+    "result": "rejected",
+    "policy": "f7cdf17969e1bf9a1c51bb33f70c5304469c2549fb5ef6782d61214893652aba",
+    "startedAt": "2026-10-12T03:15:14Z",
+    "reason": "Producer verification policy differs from trusted default branch"
+  },
+  "38201440424/1": {
+    "result": "observed",
+    "startedAt": "2026-10-12T03:51:51Z"
   }
 }
