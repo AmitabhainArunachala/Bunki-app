@@ -1,0 +1,166 @@
+{
+ "items": [
+  {
+   "term": "教師あり学習",
+   "reading": "きょうしありがくしゅう",
+   "gloss": "supervised learning",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-167fb28e72-70e889f0",
+    "wordId": "nn-167fb28e72"
+   }
+  },
+  {
+   "term": "最適化",
+   "reading": "さいてきか",
+   "gloss": "optimization",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-de32ec8669-014956d3",
+    "wordId": "nn-de32ec8669"
+   }
+  },
+  {
+   "term": "次世代",
+   "reading": "じせだい",
+   "gloss": "the next generation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-1aa745f9c2-ef91249c",
+    "wordId": "nn-1aa745f9c2"
+   }
+  },
+  {
+   "term": "法整備",
+   "reading": "ほうせいび",
+   "gloss": "development of a legal framework",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024-r.json",
+    "cardId": "nn-36a1b9d38a-9331c540",
+    "wordId": "nn-36a1b9d38a"
+   }
+  },
+  {
+   "term": "流動性",
+   "reading": "りゅうどうせい",
+   "gloss": "market liquidity",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-0f27cb5487-75f98850",
+    "wordId": "nn-0f27cb5487"
+   }
+  },
+  {
+   "term": "演繹",
+   "reading": "えんえき",
+   "gloss": "deduction",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-b433ef562e-3d530a6f",
+    "wordId": "nn-b433ef562e"
+   }
+  },
+  {
+   "term": "生産能力",
+   "reading": "せいさんのうりょく",
+   "gloss": "production capacity",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-026.json",
+    "cardId": "nn-8541a7cc2b-108b51cc",
+    "wordId": "nn-8541a7cc2b"
+   }
+  },
+  {
+   "term": "確率分布",
+   "reading": "かくりつぶんぷ",
+   "gloss": "probability distribution",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-4d5ef5002d-563ea4f9",
+    "wordId": "nn-4d5ef5002d"
+   }
+  },
+  {
+   "term": "胎動",
+   "reading": "たいどう",
+   "gloss": "early stirrings of a new development",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029-r.json",
+    "cardId": "nn-80f13cee43-fe45b100",
+    "wordId": "nn-80f13cee43"
+   }
+  },
+  {
+   "term": "自然言語処理",
+   "reading": "しぜんげんごしょり",
+   "gloss": "natural language processing",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-a6cde01e02-f5c24024",
+    "wordId": "nn-a6cde01e02"
+   }
+  }
+ ],
+ "weave": [
+  "教師あり学習",
+  "最適化",
+  "次世代",
+  "法整備",
+  "流動性",
+  "演繹",
+  "生産能力",
+  "確率分布",
+  "胎動",
+  "自然言語処理"
+ ]
+}

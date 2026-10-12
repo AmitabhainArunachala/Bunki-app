@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "純粋意識",
+   "reading": "じゅんすいいしき",
+   "pos": "noun",
+   "meaning": "pure consciousness",
+   "defJa": "対象や思考内容から区別される気づき",
+   "passage": {
+    "ja": "目の前の風景が変わり、考えも次々に移り変わるとき、それに気づく側はどう捉えられるのか。インドの非二元論では、特定の対象や思考内容に限定されない気づきを、純粋意識として論じる場合がある。心に現れる内容と、それが現れていることを知るあり方が区別されるのである。この区別に基づいて自己の本質を問う立場は、脳の測定値から直ちに導かれる結論とは性質が異なる。同じ語でも思想や実践の伝統によって位置付けが変わり、すべての瞑想法に共通する一つの状態を指すとは限らない。",
+    "form": "純粋意識",
+    "en": "As the scene before us changes and thoughts shift in succession, how can the side aware of them be understood? Indian nondual traditions sometimes discuss awareness unrestricted to particular objects or thoughts as pure consciousness. They distinguish mental contents from the manner of knowing that they are appearing. A position questioning the self's nature on this basis differs from a conclusion immediately derived from brain measurements. The term's role varies among philosophical and practical traditions and need not denote one state common to every meditation method.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "特定の対象や思考内容から区別される気づきを指す哲学上の語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-25f46b4fac-f7653151",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-25f46b4fac-f7653151",
+    "wordId": "nn-25f46b4fac"
+   }
+  },
+  {
+   "term": "無自性",
+   "reading": "むじしょう",
+   "pos": "noun",
+   "meaning": "absence of independent intrinsic nature",
+   "defJa": "他に依存しない固定した本質がないこと",
+   "passage": {
+    "ja": "机の上の器は、土も職人の働きもなく、器だけの力で生じたものではない。大乗仏教でいう無自性は、このように他の条件に依存せず成り立つ固定的な本質を認めない立場である。条件に支えられるからこそ、器は作られ、使われ、やがて壊れる。独立した実体がないからといって、水を入れて使う日常の働きまで消えることにはならない。すべてを存在か無かの二択に押し込めるより、何との関係で今の姿が成り立つかを問う点に、この教義の特徴がある。",
+    "form": "無自性",
+    "en": "The bowl on the table did not arise through its own power without clay or a craftsperson's work. In Mahayana Buddhism, absence of intrinsic nature rejects a fixed essence that exists independently of other conditions. It is precisely through supporting conditions that a bowl is made, used, and eventually broken. Lacking an independent essence does not erase its everyday function of holding water. This doctrine asks through which relationships the present form exists, rather than forcing everything into a binary of existence or nothingness.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "他に依存せず成り立つ固定的な本質がないことを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1660c24079-0ad333df",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-1660c24079-0ad333df",
+    "wordId": "nn-1660c24079"
+   }
+  },
+  {
+   "term": "弘法大師",
+   "reading": "こうぼうだいし",
+   "pos": "noun",
+   "meaning": "Kōbō Daishi (Kūkai's title)",
+   "defJa": "空海に後から贈られた尊称",
+   "passage": {
+    "ja": "空海に会った人が、生前からみんな同じ尊称で呼んでいたと思うと、時代がずれてしまうんだ。弘法大師という称号は後から贈られたもので、今では寺のお参りでも親しまれているよ。本人が唐から持ち帰った教えを広めた仕事と、後の時代に各地で語られた不思議な物語は、つながりながら別々に育った面がある。だから井戸を開いたという伝承が残っていても、それだけで本人の足跡を確定はできない。多くの土地で身近な救い手として慕われたこと自体が、信仰の広がりを示しているね。",
+    "form": "弘法大師",
+    "en": "Assuming everyone who met Kukai used the same honorific during his lifetime would mix up periods. The title Kobo Daishi was bestowed later and is now warmly familiar in temple worship. His work spreading teachings brought from Tang China and the wondrous stories later told in many places developed in connected yet distinct ways. A tradition that he opened a well therefore cannot by itself establish that he visited a site. Being revered as a familiar helper in many places itself shows how widely the faith spread.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "空海に後から贈られた尊称で、「お大師さま」という呼び方にもつながる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-539d1d52f3-f3022d91",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-017.json",
+    "cardId": "nn-539d1d52f3-f3022d91",
+    "wordId": "nn-539d1d52f3"
+   }
+  },
+  {
+   "term": "法話",
+   "reading": "ほうわ",
+   "pos": "noun",
+   "meaning": "Buddhist sermon, dharma talk",
+   "defJa": "仏教の教えを聞き手に説き伝える話",
+   "passage": {
+    "ja": "寺院で営まれる法要には、参列者が僧の法話に耳を傾ける時間が設けられることがある。亡くなった人との別れを入口にして、無常や慈悲の教えを日々の暮らしへ結び付ける場である。経典の語句に加え、身近な食事や家族の出来事も話題になる。聞き手の年齢や置かれた状況に応じて題材が変わるため、同じ教義でも語り方は一様ではない。儀礼に参列した人が教えを受け取り、自分の経験と照らすこの時間は、寺院と地域の人々をつなぐ働きも担っている。",
+    "form": "法話",
+    "en": "Temple memorial services sometimes include time for participants to listen to a monk's Dharma talk. Farewell to the deceased may serve as an entry point for connecting teachings on impermanence and compassion with daily life. Familiar meals and family events may appear alongside scriptural phrases. Topics vary with listeners' ages and circumstances, so the same doctrine is not always presented alike. This time for participants to receive the teaching and relate it to experience also connects temples with local people.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "僧などが仏教の教えを聞き手へ説き伝える話。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-19a1f0c1f4-c7e8aaf6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-004-r.json",
+    "cardId": "nn-19a1f0c1f4-c7e8aaf6",
+    "wordId": "nn-19a1f0c1f4"
+   }
+  }
+ ]
+}

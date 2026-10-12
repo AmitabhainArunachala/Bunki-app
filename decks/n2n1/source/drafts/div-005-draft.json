@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "献身",
+   "reading": "けんしん",
+   "pos": "noun",
+   "meaning": "devotion, self-sacrifice",
+   "defJa": "人や物事のために自分の力を惜しまず尽くすこと",
+   "passage": {
+    "ja": "寺の行事で食事が出されるとき、客の目に入る前から、台所では野菜を洗い、器をそろえる人が動いています。布施を金銭だけの話にせず、時間や労力を差し出す行為にも目を向けると、共同体を支える献身の姿が見えてきます。ただし、善意を頼みに仕事を任せきりにしては、支える人が休む機会を失いかねません。誰か一人が黙って無理をする美談で終わらせず、役割を交代できる仕組みまで考えることが、互いを大切にする実践につながります。",
+    "form": "献身",
+    "en": "When food is served at a temple event, people have already been washing vegetables and arranging dishes in the kitchen before guests see it. Looking beyond monetary giving to the offering of time and labor reveals devotion that supports a community. Yet leaving work entirely to people’s goodwill can deprive those doing it of opportunities to rest. Moving beyond an uplifting story of one person silently overextending themselves to consider arrangements for sharing roles can turn mutual care into practice.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「献身的な働き」の形でも使い、力を尽くす姿勢を表します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "です・ます調",
+   "reading": "ですますちょう",
+   "pos": "noun",
+   "meaning": "desu/masu style",
+   "defJa": "文末を丁寧な言い方でそろえる文体",
+   "passage": {
+    "ja": "工房の案内を書くとき、「見学できる」と言い切るか、「見学できます」と呼びかけるかで、読み手との距離が変わります。です・ます調を選ぶなら、見出しや引用は別として、本文の文末をそろえると、声の調子が途中で揺れにくくなります。ただし、丁寧な語尾を付けたからといって、命令の多い文章が自然に親切になるとは限りません。相手への敬意を示したいときは、禁止事項を並べるだけでなく、その理由や代わりにできることも添えると、案内の受け取り方が変わります。",
+    "form": "です・ます調",
+    "en": "When writing a workshop guide, the distance from readers changes depending on whether we state that visits are possible in plain form or address them in polite form. If we choose desu-masu style, keeping the main text’s endings consistent, apart from headings and quotations, helps the voice remain steady. Adding polite endings, however, does not automatically make a text full of commands kind. To show respect for readers, adding reasons and permitted alternatives instead of merely listing prohibitions changes how the guidance is received.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "読み手への丁寧さを表しますが、尊敬語や謙譲語とは別です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "人名用漢字",
+   "reading": "じんめいようかんじ",
+   "pos": "noun",
+   "meaning": "kanji for personal names",
+   "defJa": "子の名に使えると定められた常用漢字表以外の漢字",
+   "passage": {
+    "ja": "名前に使いたい漢字を辞書で見つけても、その字を子の名として届け出られるかどうかは、意味の説明だけでは分かりません。常用漢字とは別に認められた人名用漢字もあるので、候補を選ぶにあたっては、公式の一覧で使える字かどうかを確かめます。見た目が似ていても字体が異なる場合があるため、形を曖昧に覚えたまま探すと、別の字と取り違える恐れがあります。字の由来を調べる楽しみと、制度上どの字を使えるかを確認する作業を分けると、情報を整理しやすくなります。",
+    "form": "人名用漢字",
+    "en": "Finding a kanji you want for a name in a dictionary does not tell you from its meaning alone whether it can be registered as a child’s name. Since designated name-use kanji are permitted in addition to the common-use kanji, check the official list when choosing candidates. Similar-looking characters can have different forms, so searching with only a vague memory of the shape risks confusing one with another. Separating the pleasure of investigating a character’s origins from checking which characters the system permits makes the information easier to organize.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "名前に使える字の範囲を示す区分で、読み方とは区別します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "熟字訓",
+   "reading": "じゅくじくん",
+   "pos": "noun",
+   "meaning": "whole-word kun reading",
+   "defJa": "複数の漢字からなる語全体に当てた訓読み",
+   "passage": {
+    "ja": "「大人」を「おとな」と読むとき、「大」が「お」で「人」が「とな」だと切り分けると、ほかの語を読む際に困ってしまいます。このように漢字のまとまり全体に訓読みを当てる熟字訓は、一字ずつの音読みや訓読みを足す方法では読みが導けません。知らない語を見たら、まず字ごとの読みで確かめつつも、辞書に載る語全体の読みを調べる余地を残しましょう。学習帳にも字をばらして並べるより、使われていた短い文と一緒に語を残すと、意味と音を結びつけて振り返れます。",
+    "form": "熟字訓",
+    "en": "When reading 大人 as otona, dividing it as though 大 were o and 人 were tona will cause trouble when reading other words. In whole-word kun readings, where a native reading is assigned to a group of kanji, the pronunciation cannot be derived by adding the individual characters’ on or kun readings. With an unfamiliar word, check individual readings but also leave room to look up the whole word’s pronunciation in a dictionary. Recording the word with the short sentence in which it appeared, rather than splitting the characters apart, lets you review its meaning and sound together.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「大人」を「おとな」と読むように、語全体と読みを結びます。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "海洋国家",
+   "reading": "かいようこっか",
+   "pos": "noun",
+   "meaning": "maritime nation",
+   "defJa": "海上交通や貿易を国の活動の基盤とする国",
+   "passage": {
+    "ja": "地図で海岸線を示すだけなら「海に面した国」で足りますが、それだけでは歴史上の役割までは伝わりません。「海洋国家」と表現すると、船による貿易や港の運営など、海を通じた活動を国の基盤として捉える視点が加わります。島であるかどうかにかかわらず、何を運び、どこへ航路を伸ばしたのかを具体的に示すと、説明に中身が生まれます。陸地の広さばかりを比べていた地図も、船の行き先を線で結び直せば、国と国との距離を別の角度から眺められます。",
+    "form": "海洋国家",
+    "en": "Calling a country one that faces the sea is enough to point out its coastline on a map, but it does not convey its historical role. Describing it as a maritime nation adds a perspective that regards seaborne trade, port operations, and similar activities as foundations of the country. Regardless of whether it is an island, specifying what it carried and where it extended its shipping routes gives the explanation substance. Even a map previously used mainly to compare land area can offer a different view of distances between countries when ships’ destinations are connected with lines.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "島国という地形だけでなく、海を通じた活動に注目する語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "異端",
+   "reading": "いたん",
+   "pos": "noun",
+   "meaning": "heresy",
+   "defJa": "正統とされる信仰や学説に反する立場",
+   "passage": {
+    "ja": "宗教上の争いを読書会で紹介する際、ある教えを「間違った考え」と言い換えると、説明する人まで一方の立場に立ってしまいます。「異端とされた」と書けば、正統とされる教義から外れると判断されたことを、評価の主体と切り離さずに示せます。さらに、誰が何を問題にしたのかを資料に基づいて補うと、単に変わった人物が批判されたという話で終わらずに済みます。歴史の中で使われた強い呼び名ほど、その言葉を発した側と、そう呼ばれた側を分けて記すことが大切です。",
+    "form": "異端",
+    "en": "When presenting a religious dispute at a reading group, paraphrasing a teaching as a mistaken idea makes the presenter take one side. Writing that it was deemed heretical conveys that it was judged to depart from orthodox doctrine without detaching the label from those making the judgment. Adding who objected to what on the basis of sources keeps the account from ending as a story of an unusual person being criticized. The stronger a historical label is, the more important it is to distinguish those who used it from those to whom it was applied.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「異端とされる」のように、誰がそう判断したかも大切です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "文才",
+   "reading": "ぶんさい",
+   "pos": "noun",
+   "meaning": "literary talent",
+   "defJa": "優れた文章を生み出す才能",
+   "passage": {
+    "ja": "書き出しが一行も浮かばない日に、好きな作家の随筆を開くと、平凡な出来事が鮮やかな文章に変わっていて気後れする。文才に恵まれた人は最初からこんなふうに書けるのだと思いがちだが、読者の前にあるのは、書き直しを経て残された文章である。消された表現や段落の順番まで見えたとしたら、滑らかな一節にも迷いの跡を想像できるだろう。他人の完成稿と自分の書きかけを比べて手を止めるより、推敲で何を残すかを一つ決めるほうが、次の一行につながる。",
+    "form": "文才",
+    "en": "On a day when not even an opening line comes to mind, reading a favorite author’s essay can be intimidating as ordinary events turn into vivid prose. We tend to think people blessed with literary talent can write like this from the outset, but readers see the text that remains after revision. If we could see deleted expressions and changes in paragraph order, we might imagine traces of hesitation even in a fluent passage. Deciding on one thing to preserve in revision leads more readily to the next line than stopping to compare someone else’s finished work with our own unfinished draft.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「文才に恵まれる」は、文章を書く優れた力を持つこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "口語",
+   "reading": "こうご",
+   "pos": "noun",
+   "meaning": "colloquial language",
+   "defJa": "日常の会話で使われる話し言葉",
+   "passage": {
+    "ja": "友人との会話を録音して文字に起こすと、文が最後まで続かず、相手の一言で話が先へ進んでいることに気づきます。口語では、その場で共有している状況や声の調子が意味を補うため、文字だけを切り取ると分かりにくくなる場合があります。省略が多いからといって雑な言葉だと決めず、何が二人の間で分かっていたのかを考えると、短いやり取りにも仕組みが見えてきます。会話を文章に整えるときは、消えた状況をどの程度補えば、元の軽やかさを保てるかが腕の見せどころです。",
+    "form": "口語",
+    "en": "When you transcribe a recording of a conversation with a friend, you notice that sentences often remain unfinished as a remark from the other person moves things forward. In spoken language, the shared situation and tone of voice supplement meaning, so isolating the written words can make them difficult to understand. Rather than labeling language sloppy merely because it has many omissions, considering what both people already knew reveals structure even in short exchanges. When turning conversation into prose, the skill lies in deciding how much of the lost context to supply while preserving the original lightness.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "文語と対になる語で、ここでは実際の会話の言葉です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "相関関係",
+   "reading": "そうかんかんけい",
+   "pos": "noun",
+   "meaning": "correlation",
+   "defJa": "二つの量の変化に一定の関連があること",
+   "passage": {
+    "ja": "朝の自習に来る回数が多い生徒ほど成績が高いという資料があったとして、それだけで自習の効果が証明されたと言えるでしょうか。この二つに相関関係が見られたからといって、もともと勉強への意欲が強い生徒が多く参加していた可能性は消えません。因果を検証するには、参加する前の成績や家庭での学習時間など、別の要因にも目を向ける必要があります。資料を読む際は、数字が一緒に動いているという観察と、その動きがなぜ生じたかという説明を分けると、結論を急がずに済みます。",
+    "form": "相関関係",
+    "en": "If a dataset showed that students who attended morning self-study more often had higher grades, would that alone prove the study sessions were effective? A correlation between the two does not rule out the possibility that students who were already more motivated participated more frequently. Examining causation requires attention to other factors, such as grades before participation and time spent studying at home. When reading the data, separating the observation that figures vary together from an explanation of why they do so helps avoid a rushed conclusion.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "一方が原因で他方が結果だと、それだけで判断はできません。",
+    "sense": ""
+   }
+  }
+ ]
+}

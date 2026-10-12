@@ -1,0 +1,73 @@
+{
+ "batch": "r5-variety2-gate-014",
+ "items": [
+  {
+   "term": "省人化",
+   "reading": "しょうじんか",
+   "gloss": "reducing required staffing",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-119f380d56-1fb87653",
+    "wordId": "nn-119f380d56"
+   }
+  },
+  {
+   "term": "知行合一",
+   "reading": "ちこうごういつ",
+   "gloss": "unity of knowing and acting",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-522d312a9d-d5942b41",
+    "wordId": "nn-522d312a9d"
+   }
+  },
+  {
+   "term": "時価総額",
+   "reading": "じかそうがく",
+   "gloss": "market capitalization",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-5621e81683-994ee96b",
+    "wordId": "nn-5621e81683"
+   }
+  }
+ ],
+ "reviewOf": {
+  "省人化": {
+   "source": "cards/senmon-p1-r5-variety2-l1-004.json",
+   "cardId": "nn-119f380d56-1fb87653",
+   "batch": "r5-variety2-l1-004",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 話). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: Translate the whole last sentence faithfully, including specialist desk and system; new subject-focused scene."
+  },
+  "知行合一": {
+   "source": "cards/senmon-p1-r5-variety2-l3-006.json",
+   "cardId": "nn-522d312a9d-d5942b41",
+   "batch": "r5-variety2-l3-006",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 話). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: The old closing はずだと問う is unnatural and English turns a claim into an open question. Make a precise subject-focused passage."
+  },
+  "時価総額": {
+   "source": "cards/senmon-p1-r5-variety2-l2-002.json",
+   "cardId": "nn-5621e81683-994ee96b",
+   "batch": "r5-variety2-l2-002",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 話). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: The old passage says cash is sold. Cash is already cash; distinguish market capitalization from asset sale value precisely."
+  }
+ }
+}

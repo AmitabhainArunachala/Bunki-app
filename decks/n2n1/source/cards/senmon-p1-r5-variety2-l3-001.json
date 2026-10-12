@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "シリコンサイクル",
+   "reading": "しりこんさいくる",
+   "pos": "noun",
+   "meaning": "the silicon (chip-industry) cycle",
+   "defJa": "半導体の需要や供給と市況が循環する動き",
+   "passage": {
+    "ja": "注文が殺到した時期に着工した工場が、完成した頃には売れ残りを抱えることがある。半導体の需要は短期間で変化する一方、設備の建設と立ち上げには時間がかかり、このずれがシリコンサイクルの一因となる。在庫を減らすため各社が投資を抑えれば、その後に需要が回復しても供給がすぐには追いつかない。もっとも、記憶装置と自動車向けの部品が常に同じ動きをするとは限らず、業界全体の好不況の陰で、個々の工場の稼働状況には差が生じる。",
+    "form": "シリコンサイクル",
+    "en": "A factory begun during a flood of orders can face unsold stock by the time it is completed. Semiconductor demand changes quickly while construction and production startup take time, and this mismatch contributes to the silicon cycle. If companies restrain investment to reduce inventories, supply cannot immediately catch up when demand subsequently recovers. Memory devices and automotive components do not always move together, however, so individual factories can operate at different rates behind the industry-wide business cycle.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "需要と供給の時間差を伴う、市況の循環を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-705b5f5310-2b35f8d8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-705b5f5310-2b35f8d8",
+    "wordId": "nn-705b5f5310"
+   }
+  }
+ ]
+}

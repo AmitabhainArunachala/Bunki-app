@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "証人",
+   "reading": "しょうにん",
+   "pos": "noun",
+   "meaning": "witness",
+   "defJa": "事実を見届けて語る人。また、見守る意識。",
+   "passage": {
+    "ja": "本番で頭が真っ白になりそうなとき、有効なのは、感情から距離を置いて眺めるもうひとりの自分をつくることだ。インド哲学のアドヴァイタでは、心の動きをただ見ている意識を、証人と呼ぶ伝統がある。心拍が上がり、手が冷たくなっているなと、他人事かのように実況するだけで、緊張に飲まれにくくなる。試験会場でも一度試してみる価値はあるし、練習を重ねるほど、切り替えは速くなっていく。",
+    "form": "証人",
+    "en": "When you are about to go blank in a high-stakes moment, what works is creating another self who watches from a distance from your emotions. In Indian philosophy's Advaita, there is a tradition of calling the awareness that simply watches the movements of the mind the witness. Just by narrating as if it were someone else's matter that your heart rate is rising and your hands are getting cold, you become harder to swallow up in tension. It is worth trying once even at the exam venue, and the more you practice, the faster the switch becomes.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "法廷の「証人」のほか、アドヴァイタでは、心を見守る意識を指す語としても訳される。",
+    "sense": "見守る意識の意"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "再三",
+   "reading": "さいさん",
+   "pos": "adverb",
+   "meaning": "repeatedly; again and again",
+   "defJa": "同じことが何度も繰り返されるさま。",
+   "passage": {
+    "ja": "古い役所の記録に、村へ再三通知したと書かれていたら、一度だけではなく、何度も知らせたことが分かります。ただし、それだけをもとに、村人が命令に従わなかったと決めつけることはできません。最初の文書が届かなかったのか、通知の対象が広がったのか、前後の記録も必要になります。直感で一つの物語にまとめる前に、送り先や日付を並べて、実際の経過を把握しましょう。史料に書かれた回数と、その回数になった理由を分けて考える練習が、歴史を読む際の推測を慎重にしてくれます。",
+    "form": "再三",
+    "en": "If an old government record says that a village was notified repeatedly, we know that it was informed several times rather than just once. That alone, however, does not justify concluding that the villagers disobeyed an order. Surrounding records are also needed to establish whether the first document failed to arrive or the notification was extended to more recipients. Before intuitively shaping a single story, arrange the addressees and dates to establish the actual sequence. Practising the distinction between the number of times recorded and the reason for that number makes our inferences more careful when reading history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「再三通知する」は、一度にとどまらず何度も知らせることです。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

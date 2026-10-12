@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "阿頼耶識",
+   "reading": "あらやしき",
+   "pos": "noun",
+   "meaning": "ālaya-vijñāna, storehouse consciousness",
+   "defJa": "唯識で経験の種子を保つとされる深層の識",
+   "passage": {
+    "ja": "経験したことが、その場限りで消えず、後のものの見方に影響するのはなぜでしょうか。唯識の阿頼耶識は、経験や行為の種子を保つ深い識として説かれ、認識が生じる仕組みを考えるうえで重要な位置を占めます。ただし、種子という比喩を使うからといって、脳の中に経典どおりの小さな粒が存在するという主張ではありません。記憶を扱う現代の研究と比べるなら、似ている働きに注目するとともに、それぞれが何を根拠に説明を組み立てるかも分けて読むと、比較が豊かになります。",
+    "form": "阿頼耶識",
+    "en": "Why do experiences continue to influence perception rather than vanishing when they end? Yogacara describes storehouse consciousness as a deep consciousness retaining the seeds of experience and action, giving it an important role in accounts of cognition. The metaphor of seeds does not assert that tiny scripturally described particles exist inside the brain. Comparing it with modern memory research becomes richer when similarities in function are considered alongside the different grounds on which each explanation is built.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「阿頼耶識に種子が薫習される」という教義の背景を、身近な問いから示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "如来蔵",
+   "reading": "にょらいぞう",
+   "pos": "noun",
+   "meaning": "tathāgatagarbha, buddha-nature within",
+   "defJa": "衆生に仏となる可能性があると説く大乗の概念",
+   "passage": {
+    "ja": "人の現在の迷いが、その人の可能性をすべて決めてしまうのだろうか。如来蔵は衆生に仏となる可能性があると説く大乗仏教の概念であり、迷いに覆われていても目覚めの可能性を失わないという考え方に関わる。ただし、内側に永久不変の魂が一個入っているという像に置き換えると、仏教が自己をどう捉えるかという問いとの緊張を見落とす。経典や解釈による違いを踏まえ、可能性を肯定する言葉がどのように修行を促すのかを読むことで、人を固定しない見方と実践との関係を考えられる。",
+    "form": "如来蔵",
+    "en": "Does a person’s present confusion exhaust their possibilities? Tathagatagarbha is a Mahayana concept concerning the possibility of Buddhahood even when obscured by delusion. Treating it as a permanent soul located inside a person overlooks its tension with Buddhist accounts of self. Reading how different texts connect this affirmative language with practice clarifies its relation to a less fixed view of people.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "目覚めの可能性を説く概念を、単純に不変の魂と置き換えない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

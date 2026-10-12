@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "多読",
+   "reading": "たどく",
+   "pos": "noun",
+   "meaning": "extensive reading",
+   "defJa": "多くの文章や本を読むこと。また、その学習法",
+   "passage": {
+    "ja": "日本語の本を一ページ読むたびに辞書を何度も開いているなら、まず負担の少ない作品へ替える選択もあります。多読では、理解できる内容を手がかりに話の流れを追い、さまざまな文章に触れる量を確保します。知らない語があっても大意がつかめる場合は先へ進めますが、筋が分からなくなったら、読み返したり別の本を選んだりして構いません。冊数が増えたからといって新しい語をすべて覚えたとは限らないので、読めた分量と、後で使えた表現は分けて振り返ると学習の様子を捉えやすくなります。",
+    "form": "多読",
+    "en": "If you open a dictionary repeatedly for every page of a Japanese book, one option is to switch first to a less demanding work. Extensive reading follows the flow using what can be understood and ensures exposure to a range of texts. You can continue past unfamiliar words if you grasp the gist, but if you lose the thread, it is fine to reread or choose another book. Since reading more books does not mean that every new word has been learned, reviewing the amount read separately from expressions you could later use makes your learning easier to assess.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "量を重視して読む学習法で、読めた量と定着した語彙は区別して確かめます。",
+    "sense": "多くの文章を読み、言語への接触量を増やす学習法"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

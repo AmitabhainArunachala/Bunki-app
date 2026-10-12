@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" data-theme="day" data-lang="en" data-room="today">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bunki · Migaki</title>
+<meta name="description" content="Concept A, 磨き Migaki: today's Bunki, polished to a mirror.">
+<script>
+  // theme and language before first paint
+  (function () { var q = new URLSearchParams(location.search), h = document.documentElement;
+    h.dataset.theme = q.get('theme') === 'night' ? 'night' : 'day'; h.dataset.lang = q.get('lang') === 'ja' ? 'ja' : 'en';
+    if (h.dataset.lang === 'ja') h.lang = 'ja'; })();
+</script>
+<link rel="stylesheet" href="/prototypes/corridor/fonts.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/room-today.css">
+<link rel="stylesheet" href="css/room-read.css">
+<link rel="stylesheet" href="css/room-learn.css">
+<link rel="stylesheet" href="css/room-words.css">
+<link rel="stylesheet" href="css/room-me.css">
+</head>
+<body>
+<div class="washi" aria-hidden="true"></div>
+<div class="washi-fine" aria-hidden="true"></div>
+<div class="city" aria-hidden="true"></div>
+<div id="app"></div>
+<script src="js/data.js"></script>
+<script src="js/web.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

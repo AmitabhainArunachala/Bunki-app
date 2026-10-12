@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "噴く",
+   "reading": "ふく",
+   "pos": "verb",
+   "meaning": "to spout; to emit",
+   "defJa": "勢いよく外へ吹き出す",
+   "passage": {
+    "ja": "ヒマラヤの麓にあるインド北部の温泉地では、冷たく澄んだ朝の空気の中で、岩の割れ目から白い蒸気が噴く光景に出会う。周辺の聖地では、こうした現象を神の働きとして崇める習わしが今も続く。科学的には、地下の熱が水を温めて湧き出させていると説明できるが、人々はそこに、説明しきれない畏れも感じ取ってきた。自然の不思議と信仰が、ここでは日々の暮らしの中でひとつに溶け合っている。",
+    "form": "噴く",
+    "en": "In a hot-spring town in northern India at the foot of the Himalayas, in the cold morning air, one comes across the sight of white steam spouting from cracks in the rock. In the surrounding holy places, the custom of revering such phenomena as the work of the gods continues even today. Scientifically it can be explained that underground heat warms water and makes it well up, but people have also sensed there an awe that cannot be fully explained. Here, the wonders of nature and faith melt into one within daily life.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「火を噴く」「蒸気が噴く」。内部から勢いよく吹き出す様子。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "仕掛け",
+   "reading": "しかけ",
+   "pos": "noun",
+   "meaning": "mechanism; device; setup",
+   "defJa": "あらかじめ用意した工夫やからくり",
+   "passage": {
+    "ja": "歴史を語る名手は、聞き手の関心を引く仕掛けを、話の最初に置く。たとえば「本能寺の変の前夜、中国へ向かうはずだった軍勢が、なぜか京へ進路を変えた」と切り出せば、聞き手は、なぜ、と先を知りたくなる。答えをすぐに渡さず、疑問を持ち越させることが、その技の核心だ。そそっかしい聞き手でさえ、続きを待たずにはいられない。話の構成は、情報の順序を設計する仕事にほかならない。",
+    "form": "仕掛け",
+    "en": "A master at telling history places a device that draws the listener's interest at the very beginning of the story. If he opens with, for example, 'On the eve of the Honnoji Incident, an army that was supposed to head for the western provinces changed course, for some reason, toward Kyoto', the listener wants to know what comes next, and why. Not handing over the answer at once, but making the question carry over, is the core of the technique. Even a careless listener cannot help waiting for the continuation. Structuring a story is nothing other than the work of designing the order of information.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「仕掛けを施す・置く」。聞き手の関心を引くために前もって用意した工夫。",
+    "sense": "からくり、前もっての工夫"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "内臓",
+   "reading": "ないぞう",
+   "pos": "noun",
+   "meaning": "internal organs",
+   "defJa": "胸や腹の中にある器官",
+   "passage": {
+    "ja": "お腹の調子が悪いと気分まで沈み、整うとほっとする。この当たり前の経験に、科学がようやく答えを出しつつあります。内臓の中でも腸には、数億ともいわれる神経細胞が網の目のように広がり、「第二の脳」と呼ばれることがあるのです。腸内細菌が気分に影響する可能性も、研究が進んでいる最中ですから、断定はできません。それでも、心と体を別物と考える昔ながらの見方は、すでに揺らぎ始めています。",
+    "form": "内臓",
+    "en": "When your stomach is off your mood sinks too, and when it settles you feel relieved. Science is at last beginning to give an answer to this ordinary experience. Among the internal organs, the intestine in particular has nerve cells, said to number in the hundreds of millions, spread through it like a net, and it is sometimes called the 'second brain'. The possibility that gut bacteria affect mood is still in the middle of being researched, so no firm conclusion can be drawn. Even so, the old view that mind and body are separate things has already begun to waver.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「内臓の働き・疾患」。胃や腸、肝臓など体内の器官をまとめて指す語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "使命感",
+   "reading": "しめいかん",
+   "pos": "noun",
+   "meaning": "sense of mission",
+   "defJa": "果たすべき務めがあるという意識",
+   "passage": {
+    "ja": "そういえば、うちの国語の先生、授業のたびに「言葉は人を傷つけも救いもする」って言ってたんですよ。国語を教える人だけあって、言葉に対する使命感がすごかったんです。最初は大げさだなと思ったけど、作文を返すときも、赤ペンの一言まで毎回本気でした。卒業して十年たった今、人にかける一言をふと選んでる自分がいて、ちょっと驚いてます。あの先生に、ちゃんと伝わってたんだなって、今さら思います。",
+    "form": "使命感",
+    "en": "Come to think of it, my Japanese teacher used to say every class, 'Words can both hurt and save a person', you know. As someone who taught Japanese, his sense of mission about language was incredible. At first I thought it was exaggerated, but he meant it every time, down to the single line in red pen when he handed back our essays. Ten years after graduating, I sometimes catch myself choosing the words I say to people, and it surprises me a little. I think now, rather late, that his message really did get through to me.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「使命感に燃える・駆られる」。自分に課された役目を果たそうとする強い意識。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

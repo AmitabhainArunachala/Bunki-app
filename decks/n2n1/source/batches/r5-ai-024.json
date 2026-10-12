@@ -1,0 +1,156 @@
+{
+ "batch": "r5-ai-024",
+ "items": [
+  {
+   "term": "次世代",
+   "reading": "じせだい",
+   "gloss": "next generation",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "欺瞞",
+   "reading": "ぎまん",
+   "gloss": "deception",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "水平分業",
+   "reading": "すいへいぶんぎょう",
+   "gloss": "horizontal division of labor",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "汎用人工知能",
+   "reading": "はんようじんこうちのう",
+   "gloss": "artificial general intelligence (AGI)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "汎用性",
+   "reading": "はんようせい",
+   "gloss": "versatility",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "法整備",
+   "reading": "ほうせいび",
+   "gloss": "building a legal framework",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "波及効果",
+   "reading": "はきゅうこうか",
+   "gloss": "ripple effect",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "注意機構",
+   "reading": "ちゅういきこう",
+   "gloss": "attention mechanism",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Artificial attention weights/selects relevant information in a computation; the name is an analogy, not evidence of human attention or awareness."
+  }
+ ],
+ "weave": [
+  "期待値",
+  "楽観論",
+  "機会費用",
+  "機械学習",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

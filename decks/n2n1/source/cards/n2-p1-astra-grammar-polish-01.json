@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "零度",
+   "reading": "れいど",
+   "pos": "noun",
+   "meaning": "zero degrees",
+   "defJa": "温度などの目盛りで、ゼロに当たる値。",
+   "passage": {
+    "ja": "冬の海を見て、気温が摂氏零度を下回ってるのに、なんで水面が全部凍らないんだろうって思ったんだ。海水には塩が含まれているから、淡水とは凍り始める温度が違うんだって。ただ、塩だけの話にしてしまうと、水そのものの温度や波の動きを見落とすよね。気温を測っただけでは海の状態を言い切れないんだと知ってから、天気予報の数字も、何をどこで測ったものか気にするようになったよ。専門用語の難しさはさておき、散歩中に生まれた疑問とつながると、もう少し先まで知りたくなるんだ。",
+    "form": "零度",
+    "en": "Looking at the winter sea, I wondered why the whole surface was not freezing even though the air temperature was below zero degrees Celsius. Apparently, because seawater contains salt, it starts freezing at a different temperature from fresh water. But if we make it only about salt, we overlook the temperature of the water itself and the movement of the waves. Since learning that air temperature alone cannot tell us the state of the sea, I have started paying attention to what was measured and where when I hear weather figures. Putting the difficulty of technical terms aside, when they connect with a question from a walk, I want to learn a little more.",
+    "register": "話",
+    "topic": "other",
+    "tipJa": "「摂氏零度」「零度を下回る」。温度の尺度を添えると意味が明確になる。",
+    "sense": "温度の目盛りでゼロに当たる値。"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

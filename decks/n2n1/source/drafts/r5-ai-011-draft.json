@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "フォトレジスト",
+   "reading": "ふぉとれじすと",
+   "pos": "noun",
+   "meaning": "photoresist",
+   "defJa": "光を受けて性質が変わる微細加工用の材料",
+   "passage": {
+    "ja": "光の模様を物の形へ変えるには、光を受けた場所と受けなかった場所を、後の加工で区別できなければならない。フォトレジストは光によって性質が変わる材料で、表面へ薄く塗られ、細かな模様を作る過程を支える。材料の種類に応じて、光を受けた部分が除かれる場合も残る場合もあるため、照らすことと削ることを同じ動作として理解するのは早い。目には見えない化学的な変化が次の工程の選別を可能にするというつながりに、情報が物質へ写される技術の面白さがある。",
+    "form": "フォトレジスト",
+    "en": "Turning a light pattern into a physical form requires later processing to distinguish exposed from unexposed areas. Photoresist is a light-sensitive material applied as a thin coating to support fine-pattern fabrication. Depending on its type, exposed areas may be removed or retained, so equating illumination with removal is premature. The link by which invisible chemical changes enable selection in the next process makes the transfer of information into matter intriguing.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "光を受けた部分が残るか消えるかは種類で異なる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "フッ化水素",
+   "reading": "ふっかすいそ",
+   "pos": "noun",
+   "meaning": "hydrogen fluoride (2019 export curbs)",
+   "defJa": "フッ素と水素からなる反応性の高い化合物",
+   "passage": {
+    "ja": "半導体を作る話には、チップとして残る材料だけじゃなく、途中の加工に使う薬品も出てくるよね。フッ化水素はその一つで、酸化した層を取り除く加工などに関わるから、完成品に目立つ形で残らなくても製造には大事なんだ。こうした材料は純度や供給の安定も結果に影響するし、強い反応性に応じた取り扱いが必要になる。部品の値段だけで供給網を眺める代わりに、どの工程で何のために消費されるかまで追うと、材料を作る会社の役割をもう少し具体的に見られるよ。",
+    "form": "フッ化水素",
+    "en": "Semiconductor production involves not only materials remaining in chips but also chemicals used during processing. Hydrogen fluoride is one example, involved in tasks such as removing oxide layers, so it matters even when it leaves no prominent feature in the finished product. Purity and dependable supply affect results, and its strong reactivity requires suitable handling. Tracing where and why a material is consumed, instead of viewing supply chains only through component prices, makes the supplier's role more concrete.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "半導体では加工や洗浄に関わる材料として読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ブラックボックス",
+   "reading": "ぶらっくぼっくす",
+   "pos": "noun",
+   "meaning": "black box",
+   "defJa": "内部の仕組みが外から把握しにくい対象",
+   "passage": {
+    "ja": "同じ画像を入れると答えが返る装置について、その内部の計算を知らずに使う場面を考えましょう。中で何が起きているかを把握しにくいブラックボックスでも、入力を変えたときの出力を記録すれば、振る舞いの一部は調べられます。ただし、その記録が多いからといって、未知の条件で必ず正しく働くと証明されたことにはなりません。仕組みの説明と、試した範囲での性能確認をノートの別の欄に置くと、何が分かり、どこに仮説が残っているかを整理して学習を進められます。",
+    "form": "ブラックボックス",
+    "en": "Consider using a device that returns an answer for an image without knowing its internal computation. Even for a black box whose internals are hard to grasp, recording how outputs change with inputs reveals part of its behavior. A large record does not, however, prove correct behavior under every unfamiliar condition. Separating explanations of mechanisms from measured performance over tested conditions clarifies what is known and where hypotheses remain.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "入出力を調べることと、内部を理解することを分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "プロセスルール",
+   "reading": "ぷろせするーる",
+   "pos": "noun",
+   "meaning": "process rule (node size)",
+   "defJa": "半導体を製造する技術の世代や設計上の基準",
+   "passage": {
+    "ja": "半導体の記事で「二ナノ」と書かれていても、内部のどの部分も二ナノメートルだという意味にはなりません。プロセスルールを説明する際には、現在の世代名の数字と、実際に測った回路の寸法を区別して示すことが必要です。同じ世代として紹介される技術であれ、会社や用途によって設計や性能の条件は異なります。数字が小さいほど無条件に優れているという文章を、性能、消費電力、面積をどの条件で比べたかという説明に改めると、見出しだけでは分からない技術の違いを伝えられます。",
+    "form": "プロセスルール",
+    "en": "A semiconductor article's reference to two nanometers does not mean every internal part measures two nanometers. Explaining a process node requires distinguishing today's generation labels from measured circuit dimensions. Technologies described as the same generation may differ in design and performance conditions across companies and uses. Replacing the claim that smaller numbers are unconditionally better with comparisons of performance, power, and area under specified conditions communicates differences hidden by headlines.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "世代名の数字を、すべての部品の寸法と同一視しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "プロンプト",
+   "reading": "ぷろんぷと",
+   "pos": "noun",
+   "meaning": "prompt",
+   "defJa": "人工知能に処理を求める際の入力や指示",
+   "passage": {
+    "ja": "同じ文章を要約してもらう場合でも、誰が何のために読むかによって、残してほしい情報は変わります。人工知能へ渡すプロンプトに目的や条件を含めると、その違いを出力へ反映させやすくなりますが、指示が詳しければ必ず正確になるという保証はありません。内容の確認が必要な仕事なら、参照してよい資料や、分からない点をどう示すかも依頼の条件として考えます。気の利いた一言を探すより、頼みたい仕事を分け、返ってきた結果を同じ基準で比べることが、使い方を改善する手がかりになります。",
+    "form": "プロンプト",
+    "en": "Even when summarizing the same text, the information to retain varies with the intended reader and purpose. Including goals and conditions in an AI prompt helps reflect those differences in the output but does not guarantee accuracy merely through detail. For work requiring verification, permitted reference material and how uncertainty should be expressed are also relevant conditions. Breaking down the task and comparing results consistently provides a better basis for improvement than searching for one clever phrase.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "目的と条件を伝える役割を、魔法の命令と区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ベイズの法則",
+   "reading": "べいずのほうそく",
+   "pos": "noun",
+   "meaning": "Bayes' rule",
+   "defJa": "新たな証拠に応じて確率を更新するための関係式",
+   "passage": {
+    "ja": "工場の検査で異常を示す信号が出ても、それだけで製品に欠陥があると断定できるとは限らない。ベイズの法則を用いると、もともと欠陥が生じる確率と、欠陥の有無に応じて信号が出る確率を組み合わせ、信号を得た後の見込みを計算できる。欠陥があるときに信号が出やすいことと、その信号が出た製品に欠陥がある確率が高いことは、同じ条件ではない。検査の精度を論じる際には、対象集団の中で欠陥がどれほどあるかも含めて評価し、条件を逆に読まない注意が要る。",
+    "form": "ベイズの法則",
+    "en": "An abnormal signal in factory inspection does not necessarily establish a product defect. Bayes' theorem combines the initial probability of a defect with the probabilities of signals under defective and nondefective conditions to calculate the probability after observing the signal. A test that readily signals when a defect is present is not the same condition as a high probability of a defect given that signal. Evaluating inspection accuracy therefore includes defect prevalence in the population and requires care not to reverse conditional probabilities.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "観測の前の見込みと、その証拠の出やすさを結ぶ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ベクトル",
+   "reading": "べくとる",
+   "pos": "noun",
+   "meaning": "vector",
+   "defJa": "向きと大きさや、複数の数の組で表す量",
+   "passage": {
+    "ja": "言葉の関係を計算で扱うために、一つの語をいくつもの数の組へ置き換えることがある。こうしたベクトルとしての表現では、数の間の距離や向きを使い、語や文章の似方を調べる手がかりを作れる。だが、二つの表現が近いという結果をもって、人間が感じる意味の近さをあらゆる場面で言い尽くしたことにはならない。何を学習し、どの尺度で比べるかによって関係の見え方も変わるため、数の並びを意味の実体と見るより、ある目的に沿って作った見取り図として読むほうが慎重である。",
+    "form": "ベクトル",
+    "en": "To compute relationships between words, a word may be represented by a collection of numbers. Such vector representations use distances and directions to provide clues about similarities among words or texts. But closeness between two representations does not exhaust every human sense of semantic similarity in every context. Because learned data and comparison measures affect the relationships displayed, it is more cautious to read the numbers as a map made for a purpose than as meaning itself.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "言語処理では、意味そのものではなく数による表現。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ベンチマーク",
+   "reading": "べんちまーく",
+   "pos": "noun",
+   "meaning": "benchmark",
+   "defJa": "性能を共通の条件で比べるための試験や基準",
+   "passage": {
+    "ja": "新しい計算機が試験で一位になったと聞くと、自分の仕事も全部速くなると思いたくなるよね。でも、ベンチマークで測った作業と、普段やる作業が違えば、その順位がそのまま使い勝手の順になるとは限らないんだ。短時間だけ速いのか、長く動かしても同じなのか、使う電力や設定はそろっているのか、と条件も読みたい。数値を疑って何も選べなくなるより、自分の用途に近い試験を選び、何が測られていないかも書き出すと、順位表を判断の道具として使いやすくなるよ。",
+    "form": "ベンチマーク",
+    "en": "Hearing that a new computer ranks first in a test makes it tempting to expect all your work to become faster. But if the benchmark task differs from your usual work, its ranking may not translate directly into practical usefulness. Conditions also matter: whether speed lasts only briefly, whether sustained performance matches it, and whether power and settings are comparable. Choosing tests close to your workload and noting what they omit makes rankings useful for decisions without turning skepticism into paralysis.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "得点を比べる前に、試験の仕事と条件を確かめる。",
+    "sense": ""
+   }
+  }
+ ]
+}

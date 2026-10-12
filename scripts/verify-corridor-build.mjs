@@ -10,11 +10,12 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   unlinkSync,
   writeFileSync,
 } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { tmpdir } from 'node:os';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { homedir } from 'node:os';
 import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath, pathToFileURL, URL } from 'node:url';
 import { chromium } from 'playwright-core';
@@ -371,7 +372,31 @@ try {
   await check('builders reject unsafe or pre-existing output without replacement', () => {
     const directory = join(OUT, 'output-boundaries');
     const env = environment(directory, site);
-    const outside = join(tmpdir(), `kairo-build-must-not-exist-${process.pid}`);
+    // TMPDIR can itself be permitted evidence; select a genuinely excluded
+    // destination instead of treating the current temp directory as unsafe.
+    const canonical = (path) => {
+      let ancestor = path;
+      while (!existsSync(ancestor)) ancestor = dirname(ancestor);
+      return resolve(realpathSync(ancestor), relative(ancestor, path));
+    };
+    const allowedRoots = [join(homedir(), '.dharma')];
+    if (process.env.CI && process.env.RUNNER_TEMP) allowedRoots.push(process.env.RUNNER_TEMP);
+    const underAllowedRoot = (candidate) =>
+      allowedRoots.some((root) => {
+        const path = relative(canonical(root), canonical(candidate));
+        return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path));
+      });
+    const outside = [dirname(ROOT), join(homedir(), '.cache'), '/tmp']
+      .map((parent) => join(parent, `kairo-build-must-not-exist-${process.pid}`))
+      .find((candidate) => !existsSync(candidate) && !underAllowedRoot(candidate));
+    assert(
+      outside,
+      'Negative-output fixture needs an unused destination outside all allowed roots',
+    );
+    assert(
+      !underAllowedRoot(outside),
+      'Negative-output fixture must be canonically outside allowed roots',
+    );
     assert(!existsSync(outside));
     for (const output of [ROOT, outside, site]) {
       const child = spawnSync(
@@ -380,6 +405,8 @@ try {
         { cwd: ROOT, env, encoding: 'utf8', timeout: 30_000 },
       );
       assert.equal(child.status, 1, child.stderr || String(child.error));
+      if (output === outside)
+        assert.match(child.stderr, /Build output must be under ~\/\.dharma or CI RUNNER_TEMP\./u);
     }
     const html = join(OUT, 'corridor-standalone.html');
     const original = readFileSync(html);

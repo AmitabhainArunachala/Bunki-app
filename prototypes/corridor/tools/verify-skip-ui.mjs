@@ -4,6 +4,7 @@
  * Usage: node prototypes/corridor/tools/verify-skip-ui.mjs [--shots DIR]
  * Requires playwright-core + its Chromium (or CHROMIUM_PATH).
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import { chromium } from 'playwright-core';
 import { createServer } from 'node:http';
@@ -56,7 +57,7 @@ async function open(context) {
   await openShelfTools(p); // the dictionary door sits in the shelf's 学習ツール panel
   await kanjidex.waitFor();
   check('dictionary tool includes its label in the accessible name',
-    await kanjidex.and(p.getByRole('button', { name: /^字引/u })).count() === 1);
+    await kanjidex.and(p.getByRole('button', { name: /^kanji by shape$/u })).count() === 1);
   return p;
 }
 async function query(raw) {
@@ -78,11 +79,11 @@ try {
   page = await open(context);
   check('JSON sidecar absent at boot', await page.evaluate(() => !performance.getEntriesByType('resource').some((e) => e.name.endsWith('/skip.json'))));
   await openShelfDoor(page, '#kanjidex-link');
-  await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
+  await page.locator('.kdx-lens').filter({ hasText: 'by its shape' }).click();
   await page.locator('.skip-hit').first().waitFor();
-  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === '字引' &&
+  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === 'Kanji finder' &&
     JSON.stringify(await page.locator('.kdx-lens .l-ja').allTextContents()) ===
-      JSON.stringify(['部品', 'SKIP', '手書き', '音訓', '意味', '画数', '部首', '頻度', '漢検', 'Kodansha']));
+      JSON.stringify(['by its parts', 'by its shape', 'draw it', 'by reading', 'by meaning', 'by strokes', 'by radical', 'by frequency', 'by level', 'Kodansha number']));
   await page.locator('.skip-hit').first().click();
   await page.locator('#sheet-search').click();
   await query('１－３－８');
@@ -173,9 +174,9 @@ try {
   check('code-free shape door opens nested lookup', await page.locator('.sheet .skip-ui').count() === 1);
   await page.locator('#sheet-back').click();
   check('nested Back returns to same fallback entry', await page.locator('.sheet .hero-glyph').innerText() === '㐆');
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.locator('.theme-seal').first().click();
-  await page.locator('.world-stone[aria-label="紺紙金泥"]').click();
+  await page.locator('.world-stone[aria-label="Gold on indigo"]').click();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await query('1-3-8');
   await page.locator('#skip-wheel-search-3-option-64').click();
@@ -208,7 +209,7 @@ try {
   check('cold ordinary sheet does not expose SKIP codes or fetch the sidecar', await page.locator('.sheet .skip-code-door-wrap').count() === 0 &&
     await page.evaluate(() => !performance.getEntriesByType('resource').some(entry => entry.name.endsWith('/skip.json'))));
   await page.screenshot({ path: resolve(out, 'skip-cold-captured-sheet.png') });
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.locator('#review-start').click();
   let grades = 0;
   for (; grades < 12 && !(await page.locator('.review-summary').isVisible()); grades++) {
@@ -226,7 +227,7 @@ try {
   const reviewed = await waitForAppRecord(page, record => record.revlog.length === grades);
   check('explicit grades preserve exact identity and one scheduled kanji', grades > 0 &&
     reviewed.revlog.every(row => row[1] === 'kanji:㐆') && Object.keys(reviewed.srs).join() === 'kanji:㐆');
-  await page.getByRole('button', { name: /back to lists|リストへ/ }).click();
+  await page.getByRole('button', { name: /back to lists|リストへ|Back to Today|今日へ/ }).click();
   const exportStarted = Date.now();
   const download = page.waitForEvent('download');
   await page.locator('#export-store').click();
@@ -249,7 +250,7 @@ try {
   await page.locator('.tray-line').filter({ hasText: '㐆' }).click();
   await page.locator('#sheet-take').click();
   await waitForAppRecord(page, record => !record.taken.some(item => item.id === '㐆'));
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await Promise.all([page.waitForEvent('load'), page.setInputFiles('#import-file', backupPath)]);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
   const restored = await readAppRecord(page);
@@ -276,7 +277,7 @@ try {
   });
   page = await open(failureContext);
   await openShelfDoor(page, '#kanjidex-link');
-  await page.locator('.kdx-lens').filter({ hasText: 'SKIP' }).click();
+  await page.locator('.kdx-lens').filter({ hasText: 'by its shape' }).click();
   await page.locator('.skip-retry').waitFor();
   check('fresh-context load failure is recoverable', await page.locator('.skip-error').count() === 1);
   await page.locator('.skip-retry').click();

@@ -1,6 +1,6 @@
 /** The sentence listening lock under an armed corrupt-transport fixture. The voice is Kore
  * (Charon second): the bundled Ami cues are never offered or requested, so the corrupt-byte
- * fault never fires, and the listening mode shows the reader's quiet 音声準備中 · Kore state.
+ * fault never fires, and the listening mode explains the absence with Kore/Charon in its accessible description.
  * This establishes the lock, not a fault-free learner journey, hearing quality or comprehension. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -94,7 +94,7 @@ for (const engine of engines) {
     await silenceBrowserAudio(context);const servedFrom=served.length;
     await page.goto(`${ORIGIN}/index.html?ui=bi`);await ready(page);await shelf(page);
     await page.locator('.shelf-item:not([data-recommendation])').filter({has:page.locator('.shelf-title',{hasText:/^静かな朝$/u})}).locator('.shelf-open').click();
-    await sourceToken(page).click();await page.locator('#reader-sentence-practice').click();
+    await sourceToken(page).click();await page.locator('#mini-sentence-open').click();await page.locator('#reader-sentence-practice').click();
     await page.locator('#sentence-practice-confirm').waitFor();
     assert(served.slice(servedFrom).includes('/audio/sentence-cues.json'),'The bundled cue catalog was consulted');
     assert.equal(await page.locator('#sentence-choose-listening').count(),0,'The Ami cue is not offered as a practice');
@@ -102,7 +102,9 @@ for (const engine of engines) {
     const before=await snapshot('before-armed-fault');const count=fault.served;fault.corruptAudio=true;
     await page.locator('#sentence-practice-confirm').click();await page.locator('#sentence-production-text').waitFor();
     const pending=page.locator('#sentence-listening-pending');await pending.waitFor();
-    assert.match(await pending.innerText(),/音声準備中 · Kore/u);
+    assert.equal(await pending.innerText(),'No recording for this sentence');
+    assert.equal(await pending.getAttribute('aria-description'),'Approved voices: Kore (main), Charon (second).',
+      'The pending sentence keeps the locked voice provenance in its accessible description');
     assert.equal(await page.locator('#sentence-add-listening, #sentence-listening-start, #sentence-listening-play').count(),0);
     const chosen=await snapshot('production-chosen-listening-pending');
     unchanged(before,chosen,['taken','srs','revlog','stats']);
@@ -111,7 +113,7 @@ for (const engine of engines) {
     await shot('listening-pending-kore');
     assert.equal(fault.served,count,'The armed corrupt-byte fault never fired');
     assert.deepEqual(served.filter(path=>path.startsWith('/audio/s/')),[],'No sentence recording was requested');
-    result.observations.push({name:'sentence-listening-locked-under-armed-fault',listeningOffered:false,pendingKoreVisible:true,
+    result.observations.push({name:'sentence-listening-locked-under-armed-fault',listeningOffered:false,pendingKoreDescribed:true,
       faultFired:fault.served-count,sentenceRecordingRequests:0});
     assert.deepEqual(result.errors,[]);assert.deepEqual(result.externalRequests,[]);result.passed=true;
   } catch(error){result.failure=error.stack||String(error);await shot('failure').catch(()=>{});}

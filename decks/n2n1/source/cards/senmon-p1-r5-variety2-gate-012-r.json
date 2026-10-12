@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "梵天",
+   "reading": "ぼんてん",
+   "pos": "noun",
+   "meaning": "Brahma as a Buddhist deity",
+   "defJa": "インドの神に由来する仏教の守護神の一つ",
+   "passage": {
+    "ja": "悟りを得た釈迦が、すぐに教え始めなかったという物語を仏典は伝えています。自らが悟った教えはあまりに深く、欲望に心を奪われている人々には理解しがたいと考え、伝わらない教えを説く苦労よりも、静かにとどまることへ心が傾いたとされます。そこへ神が現れます。わずかな迷いしか持たない人もいるとして、その神は釈迦に説法を願います。インドの神に由来する梵天は、仏教の物語の中で、悟った者に頭を下げて教えを請う側に立っています。",
+    "form": "梵天",
+    "en": "Buddhist scripture tells a story in which the Buddha did not begin teaching immediately after awakening. He is said to have considered his realization so profound and so difficult for people absorbed in desire to understand that he inclined toward remaining at peace rather than enduring the trouble of teaching what would not be understood. A deity then appears. The deity asks the Buddha to teach, saying that some people have only a little delusion. Brahma, a deity of Indian origin, stands in the Buddhist story on the side of one who bows before the awakened teacher and requests instruction.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏教では教えを守る神で、釈迦に説法を願う物語にも登場する。",
+    "sense": ""
+   },
+   "cardId": "nn-105610172d-cbd05045",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-020.json",
+    "cardId": "nn-105610172d-cbd05045",
+    "wordId": "nn-105610172d"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "布施",
+   "reading": "ふせ",
+   "pos": "noun",
+   "meaning": "giving (dāna); offering to monks",
+   "defJa": "見返りに執着せず他者へ財や教えなどを与えること",
+   "passage": {
+    "ja": "寄付って、お金に余裕のある人がすることだと、ずっと思ってたんだよね。財布が空だと出番がないって。でも、仏教で布施を実践する人は、持ち物を渡すことに限らず、知っていることを教えたり、怖がっている人を安心させたりすることでも、相手を支えられるんだ。助けたからといって、後で言うことを聞いてもらう権利まで手に入るんじゃないよね？道に迷った人を駅まで案内したら、改札の前で手を振って別れたよ。",
+    "form": "布施",
+    "en": "I used to think donating was something people with money to spare did. An empty wallet seemed to leave me no role. But someone practicing Buddhist giving can support others not only by handing over possessions but also by sharing knowledge or reassuring someone who is frightened. Helping someone does not also give you the right to make them obey you later, does it? After guiding a lost person to the station, I waved goodbye at the ticket gates.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "財物だけでなく、教えや安心を与える実践にも用いる。",
+    "sense": ""
+   },
+   "cardId": "nn-a5f719a60d-6e7af3c7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-a5f719a60d-6e7af3c7",
+    "wordId": "nn-a5f719a60d"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "解脱",
+   "reading": "げだつ",
+   "pos": "noun",
+   "meaning": "liberation (mokṣa), release from rebirth",
+   "defJa": "煩悩の束縛から抜け出し、輪廻の連鎖を断つこと",
+   "passage": {
+    "ja": "善い行いの報いとして天に生まれることを願って長く修行を続けても、仏教の教義では、そこで得られた快い生が永遠に続くとはされない。天の寿命も尽きる。解脱を目指す修行は、次の生をより好ましいものにする願いを越えて、苦しみを生む煩悩によって生と死が繰り返される束縛そのものを断ち、輪廻から離れることへ向けられる。快い生まれ変わりを選び続ける限り、いつ生と死の繰り返しから自由になれるのだろうか？",
+    "form": "解脱",
+    "en": "Even when someone practices for a long time in the hope of heavenly rebirth as the reward for good conduct, Buddhist doctrine does not regard the pleasant life attained there as everlasting. A heavenly lifespan also ends. Practice aimed at liberation goes beyond wishing for a more favorable next life and seeks to sever the bondage through which suffering-producing mental afflictions perpetuate birth and death, leaving the cycle of rebirth. As long as one keeps choosing pleasant rebirths, when can one become free of the repetition of birth and death?",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "煩悩の束縛と輪廻から離れる、宗教上の解放を指す。",
+    "sense": "輪廻からの解放という教義上の意味"
+   },
+   "cardId": "nn-801287ee80-fda394b2",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-001-r.json",
+    "cardId": "nn-801287ee80-fda394b2",
+    "wordId": "nn-801287ee80"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "安心立命",
+   "reading": "あんしんりつめい",
+   "pos": "noun",
+   "meaning": "spiritual peace and resignation to fate",
+   "defJa": "心を落ち着かせて揺るがない生き方の拠り所を得ること",
+   "passage": {
+    "ja": "静かな坐禅堂にいても、明日の判断に迷う心までは置いてこられない。座れば予定が消えるのでもない。禅の修行を、都合の悪い出来事を遠ざける手段と見なす限り、外の世界が変わるたびに落ち着きは失われるだろう。そこで求める安心立命は、問題のない暮らしより、揺れる暮らしを引き受ける生き方の拠り所に関わる。坐禅堂を出れば保留した返事も困難な相談も待っているが、迷いが完全に消える日まで足を止めることなく、人は履物をそろえ、約束した相手のもとへ歩き出す。",
+    "form": "安心立命",
+    "en": "Even in a quiet meditation hall, one cannot leave behind the mind that hesitates over tomorrow’s decisions. Sitting does not erase the schedule. As long as Zen practice is treated as a way to keep unwelcome events away, each change in the outside world will threaten that calm. The spiritual peace and settled orientation sought here concern a foundation for embracing an unsettled life rather than a life without problems. Deferred replies and difficult conversations await outside the hall, yet without waiting for every doubt to vanish, a person straightens their footwear and sets off to meet the person they promised to see.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「求める」と結び付き、心の安定と生き方の拠り所を表す。",
+    "sense": ""
+   },
+   "cardId": "nn-55168eea5d-6b971c30",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-55168eea5d-6b971c30",
+    "wordId": "nn-55168eea5d"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "内観",
+   "reading": "ないかん",
+   "pos": "noun",
+   "meaning": "introspection; the Naikan method",
+   "defJa": "自分の経験や心の働きを内に向かって省みること",
+   "passage": {
+    "ja": "人前でほめられた日の内観は、失敗を反省する作業とは違う角度から、自分の欲望を照らす。うれしさにも筋道がある。仕事が終わった満足なのか、競争相手より高く評価された喜びなのか、それとも長く気にしていた人に認められた安堵なのか、同じ拍手を受けても胸の内で起きることは一様でない。喜びを疑って消す必要はない。外からの評価が静まった後も残る感覚を確かめるうちに、忘れたはずの人の顔が、その日の会場より鮮やかに浮かぶこともある。",
+    "form": "内観",
+    "en": "Introspection on a day when one receives public praise illuminates personal desire from a different angle than reflection on failure. Happiness has its own course. Whether it is satisfaction at finishing work, delight at being rated above a rival, or relief at recognition from someone whose opinion has long mattered, the same applause need not produce the same inner experience. There is no need to distrust joy and extinguish it. While examining what remains after the external praise has subsided, a supposedly forgotten face may emerge more vividly than the venue where the praise was given.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "自分の経験や心の働きを内側から省みるという一般的な意味。",
+    "sense": "自分の経験や心の働きを省みること"
+   },
+   "cardId": "nn-2b83b94cf2-0f620148",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-2b83b94cf2-0f620148",
+    "wordId": "nn-2b83b94cf2"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "神仏分離",
+   "reading": "しんぶつぶんり",
+   "pos": "noun",
+   "meaning": "separation of Shinto and Buddhism",
+   "defJa": "神の祭祀と仏教を制度上分けること",
+   "passage": {
+    "ja": "日光山輪王寺の三仏堂は、江戸時代に造られた建物を受け継ぎながら、明治の宗教政策によって二荒山神社の近くから現在の場所へ移され、寺と神社の配置そのものが変わる歴史を経験した。仏堂が動いたのである。神を祀る側と仏教の側を制度上切り分ける方針は、僧侶や祭具の扱いにも及んだ。神仏分離に伴うこの移転では、長く重なっていた信仰の場に新たな境界が引かれた。今の三仏堂の位置と古い境内の姿を比べると、政策によって動いた建物の足跡が地図上に残る。",
+    "form": "神仏分離",
+    "en": "The Sanbutsudo hall of Rinnoji in Nikko, retaining its Edo-period building, was moved from near Futarasan Shrine to its present site under Meiji religious policy, changing the very arrangement of temple and shrine. The Buddhist hall itself moved. The policy of institutionally separating kami worship from Buddhism also affected the treatment of monks and ritual implements. This relocation accompanying the separation of Shinto and Buddhism drew a new boundary through a place where faiths had long overlapped. Comparing the hall’s present location with the former grounds leaves a trace on the map of a building displaced by policy.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "神の祭祀と仏教を制度上分ける政策で、建物の移転にも及んだ。",
+    "sense": ""
+   },
+   "cardId": "nn-fc6558f9c3-14802c43",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-003.json",
+    "cardId": "nn-fc6558f9c3-14802c43",
+    "wordId": "nn-fc6558f9c3"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "神仏習合",
+   "reading": "しんぶつしゅうごう",
+   "pos": "noun",
+   "meaning": "interweaving of kami and Buddhist traditions",
+   "defJa": "日本の神への信仰と仏教が結び付くこと",
+   "passage": {
+    "ja": "宇佐神宮の境内には、かつて弥勒寺という寺院が置かれていた。神前で経が唱えられた。寺から派遣された僧侶が祭事を担い、神への信仰と仏教の実践は、儀礼を通じて深く結び付いていた。神仏習合が進んだこの地では、社と寺の関係が日々の祭祀を支える仕組みにもなった。現在の境内に残る寺の礎石をたどると、かつて仏堂を支えていた柱の位置が足元に現れ、神を祀る場所と僧侶が活動した場所が近接していた往時の配置を確かめられる。",
+    "form": "神仏習合",
+    "en": "A temple called Mirokuji once stood within the grounds of Usa Jingu. Sutras were chanted before the deity. Monks dispatched from the temple took part in ceremonies, closely connecting kami worship and Buddhist practice through ritual. In this place where kami and Buddhist traditions interwove, the relationship between shrine and temple also became part of the organization supporting regular worship. Tracing the temple’s surviving foundation stones reveals the positions of columns that once supported Buddhist halls and allows the former proximity of kami worship and monastic activity to be examined on the ground.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "日本の神への信仰と仏教が、儀礼や寺社の仕組みで結び付くこと。",
+    "sense": ""
+   },
+   "cardId": "nn-83d486716f-b716c467",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-83d486716f-b716c467",
+    "wordId": "nn-83d486716f"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "蓮華",
+   "reading": "れんげ",
+   "pos": "noun",
+   "meaning": "lotus flower in Buddhist imagery",
+   "defJa": "仏教で清らかさなどを象徴するハスの花",
+   "passage": {
+    "ja": "石仏の足元に重なる蓮華の花びらは、重い像を受ける台座に清らかな輪郭を与える。泥の中に根を下ろしながら美しく花を開く植物の姿に、汚れた世にあってもそれに染まらない仏のあり方を重ねることで、足元の装飾は信仰を支える象徴となる。石の花は枯れない。生身の花とは異なる時間を生きる彫刻を前にすると、季節が過ぎても保たれる清らかさへの願いが感じられる。雨水は花びらの溝を伝って流れ、濡れた石の色が深くなる。",
+    "form": "蓮華",
+    "en": "The lotus petals layered beneath a stone Buddha give a pure outline to the pedestal bearing its weight. By relating the plant that blooms beautifully while rooted in mud to a Buddha unstained by the defiled world, the decoration at its feet becomes a symbol sustaining faith. The stone flower does not wither. Standing before a sculpture that inhabits a different timescale from a living flower evokes a wish for purity that lasts beyond the passing seasons. Rainwater runs along the grooves of the petals, deepening the color of the wet stone.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏像の台座にも用いられる、清らかさを象徴するハスの花。",
+    "sense": ""
+   },
+   "cardId": "nn-7e0091499e-b1d7a15e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-7e0091499e-b1d7a15e",
+    "wordId": "nn-7e0091499e"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

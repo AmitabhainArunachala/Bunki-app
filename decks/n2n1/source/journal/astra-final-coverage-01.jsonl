@@ -1,0 +1,3 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"締めくくり": []}, "model": "deepseek-v4-pro:cloud", "secs": 20, "out": 3742, "verdicts": [{"term": "締めくくり", "editor": "pass", "editorWhy": "自然な日本語で、締めくくりの挨拶が一度だけ使われ、定義も適切。", "facts": "fail", "factsWhy": "トピックが「language」だが、内容は日本語そのものではなく読書会での挨拶の助言なので、topicをotherなどに変更する。"}]}
+{"step": "rewrite", "writer": "gpt-6-astra", "mech": {"締めくくり": []}, "model": "deepseek-v4-pro:cloud", "secs": 32, "out": 4603, "verdicts": [{"term": "締めくくり", "editor": "fail", "editorWhy": "空欄は「最後の挨拶」でも自然に成立し、締めくくりを特定させない。", "facts": "pass", "factsWhy": "確認できる事実関係はなく、英語訳も原文に忠実。"}]}
+{"step": "dropped", "dropped": {"締めくくり": "空欄は「最後の挨拶」でも自然に成立し、締めくくりを特定させない。 / 確認できる事実関係はなく、英語訳も原文に忠実。"}}

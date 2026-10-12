@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "原典",
+   "reading": "げんてん",
+   "pos": "noun",
+   "meaning": "original text, source text",
+   "defJa": "翻訳や注釈のもとになった文献",
+   "passage": {
+    "ja": "サンスクリット語の原典に当たると、翻訳では見えなかった語の幅に気づかされる。たとえば「アートマン」を「我」と訳せば、仏教が否定した「我」と区別がつかなくなってしまう。訳語は便利だが、便利であるがゆえに、読む者の思考を一つの型に固定しかねない。数年かけてでも自分の目で読み通す価値は、そこにこそある。一語ずつ辞書を引き直す地道な手間が、やがて訳語の向こうにある書き手の息づかいを聞き取る耳を育てるのである。",
+    "form": "原典",
+    "en": "Going to the Sanskrit original reveals a breadth of meaning that no translation shows. If, for example, you render ātman as \"self,\" it becomes indistinguishable from the \"self\" that Buddhism denied. A translated word is convenient, but precisely because it is convenient, it can lock the reader's thinking into a single mold. The value of reading it through with your own eyes, even if it takes several years, lies exactly there. That patient effort of looking each word up again in the dictionary eventually trains an ear for the writer's breathing beyond the translated words.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「原典に当たる」の形で、翻訳や解説ではなく大元の文献を読むことを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "反乱",
+   "reading": "はんらん",
+   "pos": "noun",
+   "meaning": "rebellion, revolt",
+   "defJa": "支配者に対して武力で起こす抵抗",
+   "passage": {
+    "ja": "世界史の反乱ってさ、成功するほうがむしろ珍しいんじゃないですか。スパルタクスの乱は、わずか七十人ほどの剣闘士の脱走から始まって、数万とも言われる人々が一斉に加わったものの、結局ローマ軍に鎮圧されたじゃないですか。それでも二千年以上たった今も名前が残っているのは、勝ったからではなく、自由を求める叫びだったからなんですよね。負けた側がこれほど語り継がれるのは、世界史ではかなり例外的なことです。",
+    "form": "反乱",
+    "en": "Aren't rebellions in world history rather rarely successful? The revolt of Spartacus began with a mere seventy or so gladiators escaping, and tens of thousands are said to have joined all at once, yet in the end the Roman army crushed it, didn't it? Even so, the reason his name survives after more than two thousand years is not that he won but that it was a cry for freedom. For the losing side to be remembered this well is quite exceptional in world history.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「反乱を起こす・鎮圧する」と使う。権力に対する武力の抵抗を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "収益",
+   "reading": "しゅうえき",
+   "pos": "noun",
+   "meaning": "earnings, proceeds, profit",
+   "defJa": "事業などから得られる利益",
+   "passage": {
+    "ja": "半導体メーカーの収益を伝える上で大切なのは、数字を並べることではなく、比べる相手を一つに絞ることです。「前の年の二倍になりました」と言えば、聞き手の頭には増え方の大きさが残ります。さらにその理由を一言そえれば、数字は物語に変わります。話すスピードも、肝心の数字の直前でわずかに落とすと、耳に届きやすくなります。数字の背後にある人の動きまで語れれば、聞き手は最後まで離れません。",
+    "form": "収益",
+    "en": "What matters in conveying a chipmaker's earnings is not lining up numbers but narrowing it down to one thing to compare against. If you say \"it doubled from the year before,\" the scale of the growth stays in the listener's mind. Add one phrase of reason, and the numbers turn into a story. Slowing your speaking pace slightly just before the key figure also makes it easier to hear. If you can speak even of the people moving behind the numbers, listeners will not leave until the end.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「収益が増える・収益を上げる」と使う。企業の稼ぎを数字で語る場面に多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "可塑性",
+   "reading": "かそせい",
+   "pos": "noun",
+   "meaning": "plasticity",
+   "defJa": "形や性質が変わりうる性質",
+   "passage": {
+    "ja": "脳の可塑性とは、経験に応じて神経のつながりが組み替わる性質のことです。ロンドンのタクシー運転手を調べた研究では、複雑な道を覚えた期間が長い人ほど、記憶に関わる海馬の後ろの部分が大きいと報告されました。つまり、大人になってからの学び直しでも、脳は変わりうるのです。ただし変化を起こすのは、同じ回路を繰り返し使う地道な練習だという点は押さえておきましょう。年齢を言い訳にしないための、科学的な根拠でもあります。",
+    "form": "可塑性",
+    "en": "Brain plasticity is the property by which neural connections are rearranged in response to experience. In a study of London taxi drivers, those who had spent longer learning the complex streets were reported to have a larger rear part of the hippocampus, which is involved in memory. In other words, even relearning in adulthood can change the brain. Bear in mind, though, that what produces the change is steady practice that uses the same circuit again and again. It is also a scientific basis for not using age as an excuse.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「脳の可塑性」の形で、経験によって構造が変わる性質を指す学術語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "可能性",
+   "reading": "かのうせい",
+   "pos": "noun",
+   "meaning": "possibility, potential",
+   "defJa": "実現しうる見込み。起こりうること",
+   "passage": {
+    "ja": "さて、ナーガールジュナ、日本では龍樹と呼ばれる大乗仏教の思想家が何を言ったのか、一言でまとめてみましょう。あらゆるものは他との関係によってのみ成り立ち、それ自体の固定した本質を持たない。これが「空」の教えです。もし本質が固定されていたら、人が変わる可能性はゼロになってしまいますよね。変われるという事実そのものが、悟りを目指す修行が成り立つ証拠だと、彼は考えたのです。",
+    "form": "可能性",
+    "en": "Now, let me sum up in a word what Nagarjuna, the Mahayana thinker known in Japan as Ryuju, actually said. Everything arises only through its relations to other things and has no fixed essence of its own. This is the teaching of \"emptiness.\" If essence were fixed, the possibility of a person changing would be reduced to zero, wouldn't it? The very fact that we can change, he reasoned, is the proof that practice aimed at awakening can work.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「可能性がある・ゼロになる」と使い、起こりうる見込みの大小を語る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "各国",
+   "reading": "かっこく",
+   "pos": "noun",
+   "meaning": "each country, various countries",
+   "defJa": "それぞれの国。いくつもの国々",
+   "passage": {
+    "ja": "外国語の教え方は、各国で驚くほど違います。ある国では小学校から会話を重視し、別の国では文法の正確さを徹底して鍛える、といった具合です。とはいえ、どの方式にも共通しているのは、インプットの量が上達の土台になっているという点です。使う場面を想定したコミュニケーションの練習は、その土台の上ではじめて生きてきます。自分に合った方式を選ぶ目を持つことが、独学では特に大切です。",
+    "form": "各国",
+    "en": "How foreign languages are taught differs surprisingly from country to country. In one country conversation is stressed from elementary school, while in another accuracy of grammar is drilled thoroughly, and so on. That said, what every method has in common is that the amount of input forms the foundation of improvement. Communication practice that imagines real situations first comes alive on top of that foundation. Having the eye to choose the method that suits you is especially important in self-study.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「各国の事情・各国で違う」と使い、複数の国を一つずつ見渡す言い方。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "名場面",
+   "reading": "めいばめん",
+   "pos": "noun",
+   "meaning": "famous scene, memorable scene",
+   "defJa": "物語や劇で特に印象に残る場面",
+   "passage": {
+    "ja": "インドの二大叙事詩の一つ『マハーバーラタ』には、名場面が数多くある。なかでも戦場でアルジュナが親族と戦うことをためらい、御者のクリシュナが語りかける場面は、のちに『バガヴァッド・ギーター』として独立した聖典になった。この対話で説かれるのは、結果に執着せず行為そのものを引き受ける生き方である。長きにわたり宗派を問わず読み継がれてきたことが、その重みを物語っている。",
+    "form": "名場面",
+    "en": "The Mahabharata, one of India's two great epics, has many famous scenes. Among them, the scene on the battlefield where Arjuna hesitates to fight his own kin and his charioteer Krishna speaks to him later became an independent scripture, the Bhagavad Gita. What this dialogue teaches is a way of life that takes on action itself without clinging to its results. That it has been read for so long, whatever the school, speaks to its weight.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「名場面を振り返る」のように、物語の山場を人に紹介するときの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和尚",
+   "reading": "おしょう",
+   "pos": "noun",
+   "meaning": "Buddhist priest, abbot",
+   "defJa": "寺の住職など、僧を敬って呼ぶ語",
+   "passage": {
+    "ja": "寺の和尚が動画で法話を配信する例が目立つようになった。本堂に足を運べない人に向けて、仕事の合間の息抜きにも聞ける短い話をするのが基本の形だ。専門用語を並べるのではなく、仏教になじみのない人にも届く言葉で語ることが不可欠とされている。画面越しとはいえ、声の間や呼吸の伝わり方は、対面の法話に近いと感じる視聴者もいる。寺の外へ出ていく試みが増えれば、寺と暮らしの距離も少しずつ縮まっていくだろう。",
+    "form": "和尚",
+    "en": "Cases of a temple priest streaming Dharma talks as videos have become conspicuous. The basic form is a short talk, meant for people who cannot make it to the main hall, that can be listened to even as a break between bits of work. Speaking in words that reach people unfamiliar with Buddhism, rather than lining up technical terms, is said to be indispensable. Even through a screen, some viewers feel that the pauses in the voice and the sense of breathing come close to a face-to-face talk. If attempts to go beyond the temple grounds increase, the distance between temple and daily life will probably narrow little by little.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「寺の和尚」「和尚さん」と使う。僧への敬意をこめた呼び名。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "啓蒙",
+   "reading": "けいもう",
+   "pos": "noun",
+   "meaning": "enlightenment (of the public)",
+   "defJa": "人々に知識を与え、迷いを解くこと",
+   "passage": {
+    "ja": "十八世紀のヨーロッパで広がった啓蒙は、理性の光で迷信や因習を照らそうとした運動である。カントはこれを、人間が自ら招いた未成年の状態から抜け出すことだと定義した。他人の指図なしには考えられない状態から、自分で考える主体へと変わる、というのである。やがてこの思想は、人民にこそ主権があるという考えを経て、革命へと至った。ただし、理性の光を当てる側もまた不完全だという反省は、のちの時代に生まれた。",
+    "form": "啓蒙",
+    "en": "The Enlightenment that spread through eighteenth-century Europe was a movement that tried to shine the light of reason on superstition and custom. Kant defined it as the human being's emergence from a state of minority that he has brought upon himself. It means changing from a state in which one cannot think without another's direction into an agent who thinks for himself. In time this way of thinking passed through the idea that sovereignty belongs to the people and led to revolution. Yet the reflection that those who shine the light of reason are themselves imperfect arose in a later age.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「啓蒙思想・啓蒙運動」と使い、理性で人々の無知を解く動きを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "喜んで",
+   "reading": "よろこんで",
+   "pos": "adverb",
+   "meaning": "gladly, with pleasure",
+   "defJa": "うれしい気持ちで進んで",
+   "passage": {
+    "ja": "頼まれごとを断れない人と、喜んで引き受ける人は、外から見ればまったく同じに映る。だが内側では、前者は負担を、後者は自分で選んだという感覚を抱いている。この違いは、のちの疲労感の差となって現れやすい。報酬のない仕事ですら続けられるかどうかは、この感覚がどれだけ自分の中にあるかで決まる。同じ作業をこなしても、動機が自分の内側にあるかどうかで、一日の終わりの顔つきはまるで違ってくる。",
+    "form": "喜んで",
+    "en": "A person who cannot refuse requests and a person who gladly takes them on look exactly the same from the outside. Inside, though, the former feels a burden and the latter a sense of having chosen. This difference tends to show up later as a difference in fatigue. Whether one can keep going even at unpaid work is decided by how much of this feeling lies within oneself. Even when doing the same task, whether the motive lies within oneself makes the expression at the end of the day quite different.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「喜んで〜する」の形。ここでは自分で選んだ前向きさを表す副詞的な用法。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "四割引き",
+   "reading": "よんわりびき",
+   "pos": "noun",
+   "meaning": "40 percent discount",
+   "defJa": "定価の四割を安くすること",
+   "passage": {
+    "ja": "スーパーで「四割引き」のシールを見ると、つい手が伸びちゃうんですよね。でも日本語の割って、十分の一のことじゃないですか。だからこのシールは、値段が六割になるって意味なんです。日本語を習いたての外国の人には意外と難しいらしくて、四割だけ払うのかなと勘違いしかねません。二割引きを二倍にすると四割、と覚えるのも手ですし、乗車券のシニア割引にも同じ数え方が出てきます。",
+    "form": "四割引き",
+    "en": "When I see a \"40 percent off\" sticker at the supermarket, my hand just reaches out, you know. But the Japanese unit wari is one tenth, isn't it? So that sticker means the price becomes sixty percent. It seems to be surprisingly hard for foreigners just learning Japanese, who might well mistake it for paying only forty percent. Remembering that doubling 20 percent off gives 40 percent works too, and the same way of counting turns up in senior discounts on train tickets.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "割は十分の一。「四割引き」は定価の六割で買えるという意味になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "回路",
+   "reading": "かいろ",
+   "pos": "noun",
+   "meaning": "circuit (electric or neural)",
+   "defJa": "電流や信号が通る道すじ",
+   "passage": {
+    "ja": "人工知能の学習は、脳の神経細胞のつながりになぞらえて説明されることが多い。入力から出力に至るまでの経路のうち、正解に役立った結びつきは強まり、役立たなかったものは弱まる。この回路を少しずつ組み替える作業を、何億回も繰り返すのである。人間の脳が持つ可塑性と同じく、変わりうる構造であることが、学習の前提になっている。だから学習とは、固定された答えを覚えることではなく、結びつきの強さを整えることなのだ。",
+    "form": "回路",
+    "en": "The learning of artificial intelligence is often explained by analogy to the connections between neurons in the brain. Along the path from input to output, connections that helped produce the right answer grow stronger and those that did not grow weaker. This work of gradually rearranging the circuit is repeated hundreds of millions of times. Like the plasticity of the human brain, being a structure that can change is the premise of learning. So learning is not memorizing fixed answers but adjusting the strength of the connections.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "電気だけでなく、神経や情報の通り道にも「回路」と使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "地政学",
+   "reading": "ちせいがく",
+   "pos": "noun",
+   "meaning": "geopolitics",
+   "defJa": "地理的条件から国の政治を考える学問",
+   "passage": {
+    "ja": "地政学は、地図の上に国家の運命を読み取ろうとする学問である。イギリスのマッキンダーは、ユーラシア大陸の中心部を制する者が世界の命運を握ると論じた。この見方は、のちの列強の戦略に影響を与えたとされる。だが隣り合う両国が必ず争うとは限らないのに、地図だけを見て敵対を必然と呼べば、現実を取り違えかねない。地図は事実を教えてくれるが、そこから何を読むかは、いつも人間の判断に委ねられている。",
+    "form": "地政学",
+    "en": "Geopolitics is a discipline that tries to read the destiny of states from a map. Britain's Mackinder argued that whoever controls the heart of the Eurasian continent holds the fate of the world. This view is said to have influenced the strategies of later great powers. But two neighboring countries do not always fight, and to call hostility inevitable by looking only at the map could well mean misreading reality. A map tells us facts, but what to read from it is always left to human judgment.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「地政学的リスク」の形で多用される。地理から国際政治を読む学問。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "報酬",
+   "reading": "ほうしゅう",
+   "pos": "noun",
+   "meaning": "reward, remuneration",
+   "defJa": "仕事や行いに対して与えられる見返り",
+   "passage": {
+    "ja": "脳科学では、ドーパミンは快楽そのものよりも、報酬への期待に深く関わる物質だと考えられている。結果が思いがけないとき、脳はとりわけ強く反応するという。ただし「やり抜く力」のような長期の努力は、わずかな成功体験の積み重ねに伴って育つとされ、一度の高揚だけでは説明できない。快楽を追う脳の仕組みと、粘り強さの育ち方は、分けて考える必要がある。ゲームに夢中になる理由と、勉強が続く理由は、似ているようで別物なのだ。",
+    "form": "報酬",
+    "en": "In neuroscience, dopamine is thought to be tied less to pleasure itself than to the expectation of reward. When the result is unexpected, the brain is said to react especially strongly. However, long-term effort such as grit is said to grow along with an accumulation of small successes and cannot be explained by a single burst of elation. The brain's mechanism for chasing pleasure and the way perseverance grows need to be considered separately. The reason one gets absorbed in a game and the reason one keeps studying look alike but are different things.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「報酬を得る・報酬系」と使う。金銭にも脳科学の快の仕組みにも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "多くても",
+   "reading": "おおくても",
+   "pos": "expression",
+   "meaning": "at most, at the very most",
+   "defJa": "どんなに多く見積もっても",
+   "passage": {
+    "ja": "新しく覚える単語は、一日に多くても二十個程度にとどめておくのがいい、とよく言われます。それ以上を詰め込んでも、翌朝にはわずかしか残らないからです。そのかわり、覚えた単語はシャドーイングの中でもう一度口に出し、音と意味を結びつけておきましょう。量を追うより、思い出す回数を増やすほうが、定着にはずっと効きます。毎日の小さな復習を欠かさないことが、いちばん確実な近道です。",
+    "form": "多くても",
+    "en": "It is often said that new words are best kept to about twenty a day at most. Even if you cram in more than that, only a little remains by the next morning. In exchange, say each word you learned out loud again during shadowing and tie sound to meaning. Increasing the number of times you recall a word works far better for retention than chasing quantity. Never skipping a small review each day is the surest shortcut.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「多くても〜程度」と上限を示す。少なめの数に続けて使うことが多い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "好きになる",
+   "reading": "すきになる",
+   "pos": "expression",
+   "meaning": "to come to like, to fall for",
+   "defJa": "好意を持つようになる",
+   "passage": {
+    "ja": "織田信長の話を、年表から始める人は多い。けれども聞き手がその人物を好きになるのは、年号を聞いたときではなく、迷いや失敗が見えた瞬間である。桶狭間の名場面で、少ない兵を率いて今川義元の本陣を突いたと語るなら、雨の音、泥のにおい、息を殺した兵の顔を描写せずにはいられない。そうして年表の人物が、血の通った一人の人間に変わったとき、聞き手の想像は、ようやく自分の力で動きはじめる。",
+    "form": "好きになる",
+    "en": "Many people begin a talk about Oda Nobunaga with a chronology. But the moment listeners come to like the person is not when they hear the dates but when they see his hesitation and failures. If you tell the famous scene at Okehazama, where he led a small force and struck Imagawa Yoshimoto's main camp, you cannot help describing the sound of rain, the smell of mud, and the faces of soldiers holding their breath. When the figure in the chronology turns into a flesh-and-blood human being that way, the listener's imagination at last begins to move under its own power.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「〜を好きになる」と、気持ちの変化を表す。聞き手の心が動く瞬間を語る語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "好況",
+   "reading": "こうきょう",
+   "pos": "noun",
+   "meaning": "prosperity, boom",
+   "defJa": "景気がよい状態",
+   "passage": {
+    "ja": "一九二〇年代のアメリカは、ラジオも自動車も庶民に行き渡る大きな好況に沸いていた。株価は上がり続けると誰もが信じ、借金をして株を買う人まで現れた。しかし楽観が膨らむほど、その足もとは脆くなる。一九二九年の暴落から始まった崩壊は、数年のうちに銀行をはじめ工場や家計を飲み込み、世界へ波及していったのである。景気がよい最中にいる人ほど、その終わりを想像するのは難しいものである。",
+    "form": "好況",
+    "en": "In the 1920s America was caught up in a great boom in which radios and cars reached ordinary people. Everyone believed share prices would keep rising, and some even borrowed money to buy stock. But the more optimism swelled, the more fragile its footing became. The collapse that began with the crash of 1929 swallowed banks, factories and households within a few years and spread to the world. The more one is in the middle of good times, the harder it is to imagine their end.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「好況に沸く」「好況期」と使い、景気のよさを表す。反対は不況。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "婉曲",
+   "reading": "えんきょく",
+   "pos": "na-adj",
+   "meaning": "euphemistic, indirect",
+   "defJa": "遠回しにやわらげて言うこと",
+   "passage": {
+    "ja": "日本語の「検討します」が、断りの婉曲表現として働くことがある。それは相手の面子を守ることから生まれた配慮であり、言葉の裏のニュアンスを読み合うことで成り立っている。ただし、この読みが共有されていなければ、コミュニケーションは食い違ったままだ。外国の取引先との交渉では、はっきり言わないことが誤解の火種になりかねない。言葉の裏を読む文化には、利点と同じだけ、すれ違いの危うさも潜んでいる。",
+    "form": "婉曲",
+    "en": "The Japanese phrase \"I will consider it\" can function as a euphemistic refusal. It is a consideration born of protecting the other person's face and rests on people reading the nuance behind the words. If that reading is not shared, however, communication remains at cross purposes. In negotiations with foreign partners, not speaking plainly could well become the spark of a misunderstanding. A culture of reading behind the words hides as much danger of missing each other as it has advantages.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「婉曲な表現・婉曲に断る」と使い、角を立てない遠回しの言い方を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "学び直し",
+   "reading": "まなびなおし",
+   "pos": "noun",
+   "meaning": "relearning as an adult, reskilling",
+   "defJa": "社会に出たあと、もう一度学ぶこと",
+   "passage": {
+    "ja": "働く期間が長くなるのに伴って、社会人の学び直しが注目を集めている。大学の講座や資格の勉強に取り組む人は、仕事の合間に時間をやりくりしている。そこで不可欠になるのは、意欲よりも、毎日続けられる小さな仕組みだ。教養を深めたいという動機で始めても、壁を乗り越えるころには、実務に役立つ力が身についていることが多い。必要なのは、完璧な計画ではなく、今夜の十五分を確保する小さな決断だろう。",
+    "form": "学び直し",
+    "en": "As working lives grow longer, adult relearning is drawing attention. People who take university courses or study for qualifications juggle their time between jobs. What becomes indispensable there is less motivation than a small system that can be kept up every day. Even if one starts out of a wish to deepen one's learning, by the time one gets over the wall, practical skills have often been acquired. What is needed is probably not a perfect plan but the small decision to secure fifteen minutes tonight.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「社会人の学び直し」と使う。一度学び終えた人がまた学ぶことを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "客観",
+   "reading": "きゃっかん",
+   "pos": "noun",
+   "meaning": "objective (viewpoint)",
+   "defJa": "自分の考えを離れて物事を見ること",
+   "passage": {
+    "ja": "メタ認知とは、自分の考えや感情を客観的にとらえる働きを指す。たとえば試験中に「いま焦っている」と気づければ、呼吸を整えて問題に戻ることができる。逆に主観だけで動くと、誤った自信や思い込みに気づけず、突き進みかねない。教育現場では、振り返りの時間を設けることが、この力を育てる方法として広がっている。自分を外から眺めるこの技術は、勉強や仕事はもちろん、人間関係にまで応用がきくとされる。",
+    "form": "客観",
+    "en": "Metacognition refers to the function of grasping one's own thoughts and feelings objectively. If, for example, you can notice during an exam that you are flustered right now, you can steady your breathing and return to the problem. Conversely, if you act on subjective feeling alone, you may fail to notice false confidence or assumptions and rush ahead. In schools, setting aside time for reflection is spreading as a way to build this ability. This skill of viewing oneself from outside is said to apply not only to study and work but even to human relationships.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「客観的に見る」と使う。反対は主観。自分を外から見る目を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "容姿",
+   "reading": "ようし",
+   "pos": "noun",
+   "meaning": "appearance, looks",
+   "defJa": "顔だちや体つき",
+   "passage": {
+    "ja": "仏像のあの顔って、ブッダ本人の容姿を写したものじゃないんですよね。初期の仏教では、ブッダを人の姿で描くことすら避けて、足跡や菩提樹で代わりに表していました。人の姿の仏像が作られはじめたのは、ガンダーラやマトゥラーあたりで、紀元後一世紀ごろからと言われています。ガンダーラはアレクサンドロス大王の征服の影響が残る土地で、ギリシャ彫刻の様式が混ざったという説が有力なんです。",
+    "form": "容姿",
+    "en": "That face on Buddha statues isn't a likeness of the Buddha's own looks, you know. In early Buddhism people even avoided depicting the Buddha in human form, representing him instead with footprints or a bodhi tree. Statues in human form began to be made around Gandhara and Mathura, from about the first century CE, it is said. Gandhara was a land where the influence of Alexander the Great's conquest lingered, and the theory that Greek sculptural style mixed in there is a strong one.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「容姿が整っている」と使う。顔だちや体つきなど、見た目の全体を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "封鎖",
+   "reading": "ふうさ",
+   "pos": "noun",
+   "meaning": "blockade, freezing",
+   "defJa": "出入りをふさいで通れなくすること",
+   "passage": {
+    "ja": "一八〇六年、ナポレオンはイギリスを経済的に孤立させるべく、大陸の港の封鎖に踏み切った。ヨーロッパ各地の港をイギリス船に閉ざし、貿易で稼ぐ国力を削ごうとしたのである。だが大陸の側でも物資が不足し、各国の不満が募った。ロシアが従わなくなったことは、一八一二年の遠征の一因とされ、帝国の没落へとつながった。経済の道を断つ戦い方は、剣を交えない戦争として、その後も繰り返し用いられてきた。",
+    "form": "封鎖",
+    "en": "In 1806, Napoleon, in order to isolate Britain economically, went ahead with a blockade of the continent's ports. He closed ports across Europe to British ships, trying to cut the national strength Britain earned through trade. But supplies ran short on the continental side too, and discontent grew in each country. Russia's ceasing to comply is regarded as one cause of the 1812 campaign and led to the empire's decline. Cutting off economic routes has been used again and again since then as a war without crossed swords.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「港を封鎖する・封鎖を解く」と使う。出入りを断つ強い措置を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "崩壊",
+   "reading": "ほうかい",
+   "pos": "noun",
+   "meaning": "collapse, breakdown",
+   "defJa": "組織や構造が崩れてなくなること",
+   "passage": {
+    "ja": "さて、ローマ帝国はいつ滅んだのでしょうか。教科書では四七六年、西ローマ帝国の崩壊とされています。ところが当時の人々が、その年に世界が変わったと感じたかというと、おそらくそうではありません。実際には、数年どころか数世紀にわたる衰えの末に、気づけば皇帝がいなくなっていた、というのが近い姿でしょう。歴史の転換点は、あとから振り返ったときにだけ、はっきりとした線に見えるのである。",
+    "form": "崩壊",
+    "en": "Now, when did the Roman Empire fall? Textbooks put it at 476, the collapse of the Western Roman Empire. But whether the people of the time felt the world had changed in that year is probably not the case. In reality, it is closer to say that after a decline lasting not just several years but several centuries, they found one day that there was no emperor. A turning point in history looks like a clear line only when viewed afterward.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「帝国の崩壊」のように、大きな体制が崩れて終わることを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "差し支えない",
+   "reading": "さしつかえない",
+   "pos": "i-adj",
+   "meaning": "no problem, acceptable",
+   "defJa": "問題がなく、そうしてもよい",
+   "passage": {
+    "ja": "人工知能が下書きした文章を、自分の名前で発表して差し支えないのだろうか。道具として使っただけなら問題ないという意見は根強い。だが文章の主体は誰なのかと問われれば、構想を決め、結果に責任を負った人間だと答えるほかない。逆に言えば、責任を引き受けない者が署名する文章は、どれほど滑らかといえども、自分のものとは呼べないのである。技術が進むほど、署名という行為の意味はかえって重くなっていくだろう。",
+    "form": "差し支えない",
+    "en": "Is it acceptable to publish, under one's own name, text that artificial intelligence drafted? The view that there is no problem if it was merely used as a tool is deeply rooted. But asked who the agent behind the text is, one has no choice but to answer that it is the person who decided the plan and bore responsibility for the result. Conversely, text signed by someone who does not take on that responsibility cannot be called one's own, however smooth it may be. The more technology advances, the heavier the meaning of the act of signing will probably become.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「〜しても差し支えない」の形で、許可や問題なしを丁寧に述べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "帝国",
+   "reading": "ていこく",
+   "pos": "noun",
+   "meaning": "empire",
+   "defJa": "皇帝が治める、広い領土をもつ国",
+   "passage": {
+    "ja": "オスマン帝国は十四世紀初めに興り、二十世紀の二〇年代に幕を下ろすまで、六百年以上続いた。その版図は、最盛期にはバルカン半島から中東、北アフリカにまで及んでいた。宗教ごとに共同体の自治を認める仕組みは、各国の研究者から多民族の統治の例としてしばしば取り上げられる。一方で、列強の圧力と内部の改革の遅れが、主権を守る力を少しずつ削っていった。その遺産は、今の地中海世界の街並みや料理にも色濃く残っている。",
+    "form": "帝国",
+    "en": "The Ottoman Empire arose in the early fourteenth century and lasted more than six hundred years until it came to an end in the 1920s. At its height its territory extended from the Balkans through the Middle East to North Africa. Its system of granting communities autonomy by religion is often cited by researchers in various countries as an example of multiethnic rule. On the other hand, pressure from the great powers and delayed internal reform gradually eroded its power to protect its sovereignty. Its legacy remains strongly even in the townscapes and cooking of the Mediterranean world today.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「〜帝国」「帝国主義」と使う。皇帝が君臨する大きな国家を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引き受ける",
+   "reading": "ひきうける",
+   "pos": "verb",
+   "meaning": "to undertake, to take on",
+   "defJa": "仕事や責任を自分のものとして受けもつ",
+   "passage": {
+    "ja": "『バガヴァッド・ギーター』は、行為の結果ではなく、行為そのものを引き受けることを説く。成功するか失敗するかは、自分の力の及ばない縁に左右されるからである。結果への執着を手放せばこそ、人は目の前の務めに全力で向き合える。この教えは、報酬を求めて動く現代の働き方にも、行為の主体はだれなのかという静かな問いを投げかけている。うまくいくかどうかは天に任せて今日の一歩に集中することは、諦めではなく力の使い方なのだ。",
+    "form": "引き受ける",
+    "en": "The Bhagavad Gita teaches us to take on action itself, not the results of action. This is because success or failure depends on conditions beyond one's own power. Precisely because one lets go of attachment to results, one can face the duty before one with all one's strength. This teaching also puts a quiet question to modern ways of working driven by pay: who is the agent of the action? Leaving success to heaven and focusing on today's single step is not resignation but a way of using one's strength.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「責任を引き受ける」と使う。結果ではなく務めそのものを受けもつ意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "当て字",
+   "reading": "あてじ",
+   "pos": "noun",
+   "meaning": "phonetic-equivalent kanji, ateji",
+   "defJa": "音や意味に合わせて当てた漢字の表記",
+   "passage": {
+    "ja": "「倶楽部」や「珈琲」のように、意味よりも音を優先して漢字を選んだ表記を、当て字と呼ぶ。もとの語に漢字の意味が重なることで、外来語に独特のニュアンスが加わった例もある。いっぽうで、文語の時代に作られた表記は、読み方のみならず由来まで忘れられていることが少なくない。語源を知らずに使っている表記は、思いのほか多いのではないか。日本語は、音と意味のあいだを漢字で行き来できる、珍しい言語でもある。",
+    "form": "当て字",
+    "en": "Notations in which kanji were chosen to favor sound over meaning, such as \"club\" and \"coffee,\" are called ateji. In some cases the meaning of the kanji overlapping with the original word gave a loanword a distinctive nuance. On the other hand, notations created in the era of classical written Japanese often have forgotten not only their readings but even their origins. There may be more notations than we think that we use without knowing their etymology. Japanese is also a rare language that can move between sound and meaning through kanji.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「倶楽部」など、音を表す漢字を当てた表記。意味より音が先に立つ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "当意即妙",
+   "reading": "とういそくみょう",
+   "pos": "expression",
+   "meaning": "ready wit, quick-witted response",
+   "defJa": "その場に合った機転のきいた応じ方",
+   "passage": {
+    "ja": "落語の名人は、客席の思いがけない反応にすら、当意即妙に応じてみせる。それが咳であれ携帯の着信音であれ、噺の一部に取り込んでしまうのである。この芸は、準備した台本をなぞるだけでは身につかない。体にしみ込んだ教養と、場の空気を読む力がひとつになったとき、はじめて口をついて出るものだ。笑いを取る間合いも、一朝一夕には身につかず、数えきれない高座での失敗が土台になっている。",
+    "form": "当意即妙",
+    "en": "A master of rakugo responds with quick wit even to unexpected reactions from the audience. Whether it is a cough or a ringing phone, he folds it into the story. This art cannot be acquired by merely tracing a prepared script. It comes out only when cultivation soaked into the body and the ability to read the room become one. The timing for getting a laugh also cannot be acquired overnight and rests on countless failures on stage.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「当意即妙の答え」と使う。その場で即座に、うまく切り返す機転を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "征服",
+   "reading": "せいふく",
+   "pos": "noun",
+   "meaning": "conquest, subjugation",
+   "defJa": "武力で相手を従え、支配すること",
+   "passage": {
+    "ja": "一五二一年、スペイン人のコルテスは、アステカ帝国の都テノチティトランを陥落させた。しかし、征服が少数の兵だけで成し遂げられたと考えるのは正確ではない。天然痘の流行に加えて、アステカに従属していた周辺の諸勢力が協力したことが、大きく響いたとされる。思いがけない形で歴史の流れが動いた例として、今も研究が続いている。勝敗の理由を一つに絞らない姿勢が、歴史を読む上では欠かせない。",
+    "form": "征服",
+    "en": "In 1521 the Spaniard Cortés brought down Tenochtitlan, the capital of the Aztec Empire. But it is not accurate to think the conquest was accomplished by a handful of soldiers alone. Along with the smallpox epidemic, the cooperation of surrounding powers that had been subject to the Aztecs is said to have weighed heavily. It remains the subject of research today as an example of history turning in an unexpected way. An attitude of not narrowing the reasons for victory and defeat to a single one is essential in reading history.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「〜を征服する」「征服者」と使う。武力で土地や民を従えること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "必然",
+   "reading": "ひつぜん",
+   "pos": "noun",
+   "meaning": "inevitability, necessity",
+   "defJa": "必ずそうなるほかない成りゆき",
+   "passage": {
+    "ja": "一九一四年六月、ボスニアのサラエボで皇太子夫妻が暗殺された。この事件があれほど大きな世界大戦へ発展したのは、必然だったのだろうか。同盟の網が張りめぐらされ、軍の動員計画が時刻表のように組まれていた以上、火がつけば燃え広がる構造はたしかにあった。とはいえ、オーストリア＝ハンガリーとセルビアの両国が交渉を続ける可能性は残されており、結果から遡って運命のように語るのは危うい。",
+    "form": "必然",
+    "en": "In June 1914 the crown prince and his wife were assassinated in Sarajevo, Bosnia. Was it inevitable that this incident grew into so vast a world war? Since a web of alliances had been spread and military mobilization plans were arranged like timetables, there was certainly a structure in which a spark would spread. Even so, the possibility remained that the two countries, Austria-Hungary and Serbia, would continue negotiating, and it is risky to speak as if it were fate, looking back from the result.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「必然だった・必然的に」と使う。偶然に対し、そうなるほかない流れ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "思いがけない",
+   "reading": "おもいがけない",
+   "pos": "i-adj",
+   "meaning": "unexpected, unforeseen",
+   "defJa": "まったく予想していなかった",
+   "passage": {
+    "ja": "一九二八年、細菌学者のフレミングは、休暇から戻って培養皿にカビが生え、周りの細菌が死んでいるのを見つけた。この思いがけない光景が、のちのペニシリンの発見につながったとされる。セレンディピティと呼ばれるこの種の幸運は、偶然を待つだけでは訪れない。観察をやめることなく続けた人だけが、わずかな違いを可能性に変えられるのである。偶然を味方にできるかどうかは、準備と注意深さの差で決まる。",
+    "form": "思いがけない",
+    "en": "In 1928 the bacteriologist Fleming returned from vacation and found mold growing on a culture dish and the bacteria around it dead. This unexpected sight is said to have led to the later discovery of penicillin. This kind of luck, called serendipity, does not come merely from waiting for chance. Only those who keep observing without letting up can turn a slight difference into a possibility. Whether one can make chance an ally is decided by differences in preparation and attentiveness.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「思いがけない出来事・発見」と使う。予想外のことが起きたときの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "思いつく",
+   "reading": "おもいつく",
+   "pos": "verb",
+   "meaning": "to think of, to hit upon",
+   "defJa": "ふとある考えが頭に浮かぶ",
+   "passage": {
+    "ja": "インドの数学者ラマヌジャンは、新しい公式を思いつくたびに、ナマギリ女神が夢で示してくれたのだと語っていたという。学習科学の立場から見れば、これは無意識の処理が実を結んだ例と読める。夢の話そのものは検証できないが、行き詰まったとき、一度課題から離れて息抜きをすると、解決に近づくことがあるからだ。メタ認知を働かせて、自分がどんな時間帯にひらめきやすいかを知っておくに越したことはない。",
+    "form": "思いつく",
+    "en": "The Indian mathematician Ramanujan is said to have told people that each time he hit upon a new formula, the goddess Namagiri had shown it to him in a dream. From the standpoint of learning science, this can be read as an example of unconscious processing bearing fruit. The dream story itself cannot be verified, but when stuck, stepping away from the problem for a break can sometimes bring one closer to a solution. It is best to use metacognition to know at what time of day one is likely to have flashes of insight.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「新案を思いつく」と使う。ふと頭に浮かぶ発想を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "息抜き",
+   "reading": "いきぬき",
+   "pos": "noun",
+   "meaning": "breather, break, relaxation",
+   "defJa": "仕事の合間にひと休みすること",
+   "passage": {
+    "ja": "ヨーガと聞くと、今では健康法や息抜きのイメージが強いかもしれません。しかし本来は、古代インドで育まれた、心の働きを静めるための修行の体系でした。古い時代に編まれたパタンジャリの『ヨーガ・スートラ』は、ヨーガを心の作用の止滅と定義しています。身体を動かすポーズの練習は、ほんの入口の一部にすぎません。原典にあたると、体操ではなく、心を扱う精密な技法だったことがよくわかります。",
+    "form": "息抜き",
+    "en": "Hearing the word yoga, you may today have a strong image of a health method or a way to unwind. Originally, however, it was a system of training nurtured in ancient India meant to quiet the workings of the mind. Patanjali's Yoga Sutras, compiled long ago, define yoga as the cessation of the mind's fluctuations. Practicing the physical poses is only a small part of its entrance. Turning to the original text, you can see clearly that it was a precise technique for working with the mind, not gymnastics.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「息抜きに散歩する」と使う。緊張を解いてひと休みすること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "悟り",
+   "reading": "さとり",
+   "pos": "noun",
+   "meaning": "enlightenment, awakening",
+   "defJa": "迷いが消え、真理を深く知ること",
+   "passage": {
+    "ja": "悟りって、特別な体験というより、見え方の変化なんじゃないでしょうか。禅の人たちは、悟ったあとも朝は庭を掃いて、昼はご飯を食べると言うんですよね。人が別物になるわけじゃなくて、同じ毎日の景色が、ふっと違って見えるようになるだけなんだと思います。ワンネスなんて言葉で語られることもあるけど、そこを乗り越えた先の暮らしは、案外ふつうで、拍子抜けするくらい静かなものなんじゃないですか。",
+    "form": "悟り",
+    "en": "Isn't awakening less a special experience than a change in the way things look? Zen people say that even after awakening they sweep the garden in the morning and eat their meals at noon, you know. A person doesn't become someone else; I think it's just that the scenery of the same days suddenly comes to look different. It's sometimes spoken of with words like oneness, but life beyond having gotten past that is probably quite ordinary, almost anticlimactically quiet, isn't it?",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「悟りを開く」と使う。仏教で迷いを離れ、真理に目覚めること。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "情緒",
+   "reading": "じょうちょ",
+   "pos": "noun",
+   "meaning": "emotion, feeling, atmosphere",
+   "defJa": "物事に触れて起こる、こまやかな感情",
+   "passage": {
+    "ja": "数学者の岡潔は、随筆集『春宵十話』などで、数学の発見にも情緒が欠かせないと説いた。論理だけで推論を積み上げても、新しい世界は開けないというのである。感情を抑えて冷静であれ、という常識とは逆の主張に聞こえるかもしれない。だが自分の心の動きを不可欠な手がかりとして使うという見方は、現代の認知科学にも通じるものがある。計算の速さよりも美しさへの感受性が発見を導く、という考えは興味深い。",
+    "form": "情緒",
+    "en": "The mathematician Oka Kiyoshi argued, in essay collections such as Shunsho Juwa, that emotional sensibility is indispensable even to mathematical discovery. Piling up inference with logic alone, he held, will not open a new world. It may sound like the opposite of the common sense that one should suppress feelings and stay calm. But the view that one uses the movements of one's own mind as an indispensable clue has something in common with modern cognitive science. The idea that sensitivity to beauty, rather than speed of calculation, leads to discovery is intriguing.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「情緒豊か」「情緒不安定」と使う。感情の細やかな動きや風情を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "想像上の秩序",
+   "reading": "そうぞうじょうのちつじょ",
+   "pos": "expression",
+   "meaning": "imagined order",
+   "defJa": "人々が共有して信じる、仮の仕組み",
+   "passage": {
+    "ja": "イスラエルの歴史家ハラリは『サピエンス全史』で、貨幣も国家も人権も、人々が共有する想像上の秩序に支えられていると論じた。紙幣は印刷された、ただの紙切れにすぎないが、みなが価値を信じるからこそ、買い物の道具として働く。国の主権や国境線もまた、地図に引かれた線ではなく、各国が互いに認め合う約束事である。そう考えると、秩序が揺らぐのは、信じる人が静かに減ったときなのだろう。",
+    "form": "想像上の秩序",
+    "en": "The Israeli historian Harari argued in Sapiens that money, nations and human rights are all supported by an imagined order that people share. A banknote is nothing more than a printed scrap of paper, but because everyone believes in its value, it works as a tool for shopping. A country's sovereignty and borders, too, are not lines drawn on a map but conventions that countries mutually recognize. Seen this way, an order probably begins to waver when the people who believe in it quietly decrease.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "ハラリの用語。貨幣や国家など、共有された信念で成り立つ仕組みを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "慧眼",
+   "reading": "けいがん",
+   "pos": "noun",
+   "meaning": "keen insight, perspicacity",
+   "defJa": "物事の本質を見抜く鋭い目",
+   "passage": {
+    "ja": "「見れる」「食べれる」のようないわゆるら抜き言葉は、長きにわたって誤りとして批判されてきた。しかし言語学の立場からは、可能の意味を一つの形に整理しようとする自然な変化と見ることもできる。言葉の移ろいを、乱れとみるか規則化とみるかは、観察者の慧眼が問われるところだ。文語の規範だけで測っていては、生きた日本語の動きは見えてこないだろう。表面の乱れの下に流れの向きを読み取るのは、簡単なことではない。",
+    "form": "慧眼",
+    "en": "So-called ra-dropped forms such as \"mireru\" and \"tabereru\" have been criticized as errors for a long time. From the standpoint of linguistics, though, they can be seen as a natural change that tries to organize the meaning of potential into a single form. Whether to see the drift of language as disorder or as regularization is where the observer's keen insight is tested. Measuring only by the norms of literary Japanese, one will probably not see the movement of living Japanese. Reading the direction of the current beneath surface disorder is not easy.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「慧眼の持ち主」「慧眼に感服する」と使い、本質を見抜く力をほめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "憂鬱",
+   "reading": "ゆううつ",
+   "pos": "na-adj",
+   "meaning": "melancholy, depression, gloom",
+   "defJa": "気分が晴れず、ふさぎこむこと",
+   "passage": {
+    "ja": "憂鬱は、単なる悲しみとは違う。悲しみには対象があるが、それは理由のないまま、空気のように広がっていく。ボードレールがそれを「スプリーン」と呼んで詩にせずにはいられなかったのは、名前を与えれば少しは扱えるようになると感じたからではないか。うまく描写できたとき、人はその重さをすこしだけ乗り越えているのかもしれない。名前を得た感情は、少なくとも一人で抱え込む重さから、少しだけ解放される。",
+    "form": "憂鬱",
+    "en": "Melancholy is different from mere sadness. Sadness has an object, but it spreads like air, without a reason. The reason Baudelaire could not help calling it \"spleen\" and turning it into poetry may be that he felt that giving it a name would make it somewhat easier to handle. When one manages to describe it well, one may have already overcome a little of its weight. A feeling that has gained a name is, at least, freed a little from the weight of carrying it alone.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「憂鬱な気分」「憂鬱になる」と使う。理由のはっきりしない沈んだ気持ち。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "手が空く",
+   "reading": "てがあく",
+   "pos": "expression",
+   "meaning": "to be free, to have time on one's hands",
+   "defJa": "仕事が一段落して、ほかのことができる",
+   "passage": {
+    "ja": "人工知能に議事録を書かせるようになってから、毎週一時間くらい手が空くようになったんですよ。で、その空いた時間に何をするかが、実は一番むずかしいんです。メールの返信を片づけるだけでは、かえって忙しくなるに決まっているじゃないですか。スピードが上がったぶん、考える仕事にその時間を回さないと、せっかくの変化がもったいないですよね。空いたぶんを休みに充てるのも、立派な選択だとは思いますけどね。",
+    "form": "手が空く",
+    "en": "Since I started having artificial intelligence write the minutes, I've ended up with about an hour free every week, you know. But what to do with that freed-up time is actually the hardest part. If I just clear email replies, I'm bound to get busier, aren't I? Since things got faster, if I don't put that time into thinking work, the change goes to waste, doesn't it? Of course, using the freed-up time for rest is a perfectly good choice too.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「手が空いたら手伝う」と使う。仕事が途切れて余裕があるとき。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "抑圧",
+   "reading": "よくあつ",
+   "pos": "noun",
+   "meaning": "repression, oppression",
+   "defJa": "感情や欲望を押さえつけること",
+   "passage": {
+    "ja": "さて、フロイトの抑圧です。耐えがたい記憶や欲望を、意識の外へ締め出してしまう心の働きのことですね。ところが締め出されたものは消えるわけではなく、夢や言い間違いの形で戻ってくる、と彼は臨床の観察に基づいて考えました。ここで大事なのは、本人が気づかないうちに情緒が体の不調として現れる、という発想です。憂鬱の背後に言葉にならない何かが隠れている可能性も、そこから出てきました。",
+    "form": "抑圧",
+    "en": "Now, Freud's repression. It is the workings of the mind that shut unbearable memories and desires out of consciousness. But what has been shut out does not vanish, and based on his clinical observation he thought it returns in the form of dreams and slips of the tongue. What matters here is the idea that, without the person noticing, emotion may appear as bodily ailments. The possibility that something unspoken lies behind melancholy also came out of that.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "精神分析の語。「感情の抑圧」と使い、意識から押し込める働きを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "探索",
+   "reading": "たんさく",
+   "pos": "noun",
+   "meaning": "search, exploration",
+   "defJa": "まだ知らないものを探して試すこと",
+   "passage": {
+    "ja": "人工知能の世界には、探索と活用っていうジレンマがあるんですよ。行きつけのラーメン屋に通い続けるのが活用で、知らない店に入ってみるほうが冒険ですね。活用ばかりだと、もっとおいしい店に出会う機会を逃しかねない一方で、新しい店ばかり試していると、外れを引いて報酬が下がっちゃうんです。だから最初のうちは思いきって冒険して、だんだん安定させるっていうやり方が、よく使われます。",
+    "form": "探索",
+    "en": "In the world of artificial intelligence there's a dilemma called exploration versus exploitation. Going on and on to your regular ramen shop is exploitation, and walking into a shop you don't know is the adventurous side. If you only exploit, you may miss the chance to find a tastier shop, while if you keep trying only new shops, you draw duds and your reward drops. So the approach of venturing out boldly at first and gradually settling down is often used.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「探索と活用」の対で使う。未知の選択肢を試す側を指す学術用語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "接続詞",
+   "reading": "せつぞくし",
+   "pos": "noun",
+   "meaning": "conjunction",
+   "defJa": "文と文、語と語をつなぐ品詞",
+   "passage": {
+    "ja": "文章の読みやすさを左右するのは、実は接続詞です。「しかし」「だから」「たとえば」といった言葉は、次の文が前の文とどんな関係にあるかを、読者に先に教えてくれる道しるべになります。逆にそれらを抜きにして書くと、読者は自分で推論して関係を補わなければなりません。では多ければ多いほどよいのかというと、そうでもなく、主題が変わらない部分では削ったほうが流れが滑らかです。",
+    "form": "接続詞",
+    "en": "What actually determines how readable writing is, is conjunctions. Words like \"however,\" \"therefore\" and \"for example\" serve as signposts that tell the reader in advance how the next sentence relates to the previous one. Conversely, if you write without them, readers have to infer and supply the relations themselves. As for whether more is always better, not necessarily, since in stretches where the topic does not change, cutting them makes the flow smoother.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「接続詞を使う・省く」と使う。文どうしの関係を示す品詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "推論",
+   "reading": "すいろん",
+   "pos": "noun",
+   "meaning": "inference, reasoning",
+   "defJa": "すでに知っていることから結論を導くこと",
+   "passage": {
+    "ja": "ホームズの推論は演繹だとよく言われるが、実際には観察から最もありそうな説明を選ぶ、アブダクションに近い。初対面のワトスンを一目見て、アフガニスタン帰りだと言い当てる場面は、数多くの可能性の中から一つを選び取る作業にほかならない。ここで鍵になるのは、自分の見立てを一度疑うメタ思考である。主観に流されず、他の説明の余地を残すことが、探偵にも科学者にも求められる。",
+    "form": "推論",
+    "en": "Holmes's reasoning is often said to be deduction, but in practice it is closer to abduction, choosing the likeliest explanation from observation. The scene in which he takes one look at Watson, whom he is meeting for the first time, and tells him he has come back from Afghanistan is nothing other than the work of picking one out of many possibilities. The key here is meta-thinking that doubts one's own reading once. Not being swept along by subjectivity, and leaving room for other explanations, is demanded of detectives and scientists alike.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「推論を立てる・推論する」と使う。根拠から結論へ筋道を立てる思考。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "描写",
+   "reading": "びょうしゃ",
+   "pos": "noun",
+   "meaning": "depiction, description",
+   "defJa": "物事のようすを言葉などで描き出すこと",
+   "passage": {
+    "ja": "小説がうまい人って、景色をそのまま写すどころか、音とかにおいで描写するじゃないですか。「夕焼けがきれいだった」って書くより、「焼きいもを売る声が遠くで伸びていた」って書いたほうが、読んでいる側の頭には夕方が立ち上がるんですよ。映画の名場面を思い出しても、残っているのは映像より、音やせりふの響きだったりします。そういうニュアンスの積み重ねが、文章の空気をつくるんでしょうね。",
+    "form": "描写",
+    "en": "Good novelists, far from copying a landscape as it is, depict it through sounds and smells, don't they? Rather than writing \"the sunset was beautiful,\" writing \"the voice of a roasted-sweet-potato seller stretched out in the distance\" makes the evening rise in the reader's head. Even when I recall famous movie scenes, what remains is often not the image but the sound and the ring of the lines. I suppose the accumulation of such nuances creates the air of a piece of writing.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「心理描写・情景描写」と使う。様子を言葉で描き出すこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "放送局",
+   "reading": "ほうそうきょく",
+   "pos": "noun",
+   "meaning": "broadcasting station",
+   "defJa": "ラジオやテレビの番組を送り出す会社",
+   "passage": {
+    "ja": "ラジオの放送局って、昔は電波の数が限られていたから、誰でも始められるわけじゃなかったんですよね。今は動画の配信があるから、個人でも番組みたいなものを流せちゃいます。人工知能に台本の下書きを任せる配信者の話も、よく聞くようになりました。スピードはたしかに上がるものの、声の温度までコピーされてしまったら、聞く側はちょっとさみしいですよね。それでも、画面の向こうの一人に語りかける感覚は、昔のラジオと変わらないのかもしれません。",
+    "form": "放送局",
+    "en": "A radio broadcasting station, back then, couldn't be started by just anyone because the number of radio wave bands was limited, right? Now that there's video streaming, even individuals can put out something like a program. I've also come to hear often about streamers who leave script drafts to artificial intelligence. Speed certainly goes up, but if even the warmth of a voice gets copied, listeners would feel a little lonely, wouldn't they? Even so, the feeling of speaking to a single person on the other side of the screen may be no different from the radio of old.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「放送局に勤める」と使う。ラジオ・テレビの番組を送り出す事業体。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "敗れる",
+   "reading": "やぶれる",
+   "pos": "verb",
+   "meaning": "to be defeated, to lose",
+   "defJa": "戦いや競争で負ける",
+   "passage": {
+    "ja": "かつてヨーロッパの学術語だったラテン語は、各国の言葉との競争に敗れる形で、一般の読み書きの場から退いていった。十七世紀ごろまでは、学者が母語ではなくラテン語で論文を書くことも多かった。やがて自国語で書く人が増えるに伴い、文語としての力は教会や法律など限られた分野に狭まった。ただし、その語彙は今も科学の用語に深く残っている。言語の盛衰は、使う人の数だけでなく、使われる場面の広がりで決まるのだ。",
+    "form": "敗れる",
+    "en": "Latin, once the scholarly language of Europe, withdrew from the sphere of general reading and writing by losing out in competition with the languages of each country. Up to around the seventeenth century, scholars often wrote papers in Latin rather than in their mother tongues. As more people came to write in their own national languages, its power as a written language narrowed to limited fields such as the church and law. Its vocabulary, however, still remains deep in scientific terms. The rise and fall of a language is decided not only by the number of its users but by the range of situations where it is used.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「競争に敗れる」と使う。「負ける」よりやや硬く、戦いや争いに用いる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "教養",
+   "reading": "きょうよう",
+   "pos": "noun",
+   "meaning": "culture, education, learning",
+   "defJa": "学んで身につけた幅広い知識と心の豊かさ",
+   "passage": {
+    "ja": "教養という言葉の背景には、西洋の自由七科の伝統があります。文法、修辞学、論理学、算術、幾何、天文、音楽の七つで、実用の技術ではなく、自由な人間として考える上での土台とされました。大事なのは、知識の量ではなく、物事を多面的にとらえるメタ認知の力です。社会に出てからの学び直しで、この土台を組み直す人が増えているのも、うなずける流れですね。詰め込みではなく、考える習慣そのものが、その中身なのです。",
+    "form": "教養",
+    "en": "Behind the word kyoyo, or cultivation, lies the Western tradition of the seven liberal arts. They were grammar, rhetoric, logic, arithmetic, geometry, astronomy and music, seen not as practical skills but as the foundation for thinking as a free person. What matters is not the amount of knowledge but the power of metacognition to grasp things from many sides. It is an understandable trend that more people are rebuilding this foundation through relearning after entering society. Not cramming but the habit of thinking itself is what it is made of.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「教養を身につける」と使う。知識の量でなく、幅広く深い学びの身につき方。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "数年",
+   "reading": "すうねん",
+   "pos": "noun",
+   "meaning": "several years, a few years",
+   "defJa": "二、三年から五、六年ほどの年月",
+   "passage": {
+    "ja": "歴史の話は、時間の物差しを先に決めると聞きやすくなります。たとえば明治維新から数年のうちに、廃藩置県、学制、徴兵令と、大きな改革が矢継ぎ早に続きました。この矢継ぎ早という感覚を伝える上では、年号を並べる前に、スピード感を一言で示すのがコツです。そのうえで、一八七一年、一八七二年、一八七三年と順に出せば、聞き手は変化の連なりを一斉につかめます。数字は少なく、順序は明確に、が基本です。",
+    "form": "数年",
+    "en": "Talk about history becomes easier to follow if you decide the yardstick of time first. For example, within several years of the Meiji Restoration, big reforms followed in rapid succession: the abolition of domains, the school system and conscription. To convey this sense of rapid succession, the trick is to show the feeling of speed in a single phrase before lining up dates. Then, if you give 1871, 1872 and 1873 in order, listeners can grasp the chain of change all at once. The basics are few numbers and a clear order.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「数年のうちに」「数年前」と使う。はっきり数えない、少し長めの年数。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "整列",
+   "reading": "せいれつ",
+   "pos": "noun",
+   "meaning": "lining up, forming a line, ordering",
+   "defJa": "順序よく一列に並べること",
+   "passage": {
+    "ja": "半導体の工場の話を人前でするとき、専門用語を一気に並べるのは避けたいところです。ウエハーの上に回路を焼き付けて切り出す、という工程の順に沿って話を整列させれば、聞き手は頭の中で工場を歩くことができます。順序が決まれば、細かな用語は必要になったときに一つずつ出せばよいのです。一斉に情報を浴びせるより、一列に並べて手渡すほうが、はるかに伝わります。整理された順序そのものが、聞き手への親切になります。",
+    "form": "整列",
+    "en": "When you talk about a semiconductor factory in front of people, you want to avoid listing technical terms all at once. If you line up your talk along the order of the process, in which circuits are printed onto a wafer and then cut out, listeners can walk through the factory in their heads. Once the order is set, the fine terms can be brought out one at a time when they are needed. Handing information over in a single line gets across far better than showering it on people all at once. An organized order is itself a kindness to the listener.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "ここでは話や情報を順に並べる意味。「整列して待つ」と人にも使う。",
+    "sense": "人や物、情報を順序よく並べること"
+   }
+  },
+  {
+   "term": "文語",
+   "reading": "ぶんご",
+   "pos": "noun",
+   "meaning": "literary language, classical written Japanese",
+   "defJa": "昔の書き言葉。口語に対することば",
+   "passage": {
+    "ja": "日本の法律は、長く文語体で書かれてきた。刑法が口語化されたのは一九九五年で、民法が現代語に改められたのは二〇〇四年の改正のときである。条文の読みやすさが上がり、国民主権の考え方に基づく法の運用が、より身近になったと評価する声もある。ただし、「ただし」「ならびに」のような独特の接続詞の使い分けは、今も専門家でなければ難しい。法の言葉が変われば、人々と法の距離もまた変わっていくのだろう。",
+    "form": "文語",
+    "en": "Japanese laws were written for a long time in literary style. The Criminal Code was put into colloquial language in 1995, and the Civil Code was rewritten in modern language in the 2004 amendment. Some people say the readability of the provisions has risen and that the operation of law, based on the idea of popular sovereignty, has become more familiar. Still, even now the distinctive usage of conjunctions such as tadashi and narabini is hard unless one is a specialist. If the language of law changes, the distance between people and the law will probably change as well.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「文語体・文語文」と使う。反対は口語。昔の書き言葉の文体を指す。",
+    "sense": ""
+   }
+  }
+ ]
+}

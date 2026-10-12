@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "知行合一",
+   "reading": "ちこうごういつ",
+   "pos": "noun",
+   "meaning": "unity of knowing and acting",
+   "defJa": "知ることと行うことを一体と捉える考え",
+   "passage": {
+    "ja": "頭では分かっているけど行動できない、ってよく言うよね。王陽明の知行合一は、本当に知ることと行うことを切り離さずに捉える考えで、ただ約束を守ろうという標語より踏み込んでいるんだ。日本の仏教で、教えを覚えることと修行との関係を読むときにも比較の手掛かりになるけど、もともとの思想の系統は分けておきたいね。同じように実践を重んじていても、何を知ることが目指され、どんな行いに結び付くのかを比べると、似ているところの奥にある違いまで考えられるよ。",
+    "form": "知行合一",
+    "en": "We often say that we understand something intellectually but cannot act on it. Wang Yangming’s unity of knowing and acting treats genuine knowing as inseparable from doing, going further than a slogan about keeping promises. It can provide a comparison when reading about learning teachings and practicing in Japanese Buddhism, but the original intellectual traditions should be distinguished. Even where both value practice, comparing what is to be known and the actions connected with it reveals differences beneath similarities.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "陽明学の語。仏教と比較する場合も、思想の由来を区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "祇園精舎",
+   "reading": "ぎおんしょうじゃ",
+   "pos": "noun",
+   "meaning": "Jetavana monastery",
+   "defJa": "釈尊が教えを説いたと伝わるインドの僧院",
+   "passage": {
+    "ja": "平家物語の冒頭で有名な祇園精舎は、京都の町の名前だけを手掛かりにすると、場所を取り違えてしまいます。釈尊が教えを説いたと伝わるインドの僧院であり、日本の物語では、その名と鐘の響きが無常を語る入口になっています。ここでは、古代インドの施設についての歴史的な説明と、日本の文学がその場所をどう描くかを分けて読むことが大切です。耳に残る冒頭の言葉から地図を開けば、日本で親しまれる物語の中に遠い仏教の世界が織り込まれていることを確かめられます。",
+    "form": "祇園精舎",
+    "en": "Jetavana, famous from the opening of The Tale of the Heike, can be misplaced if one relies only on the name of a Kyoto district. It is an Indian monastery where the Buddha is said to have taught, while in the Japanese tale its name and the sound of a bell introduce impermanence. It is important here to separate historical explanations of the ancient Indian institution from the way Japanese literature depicts it. Opening a map from the memorable opening words reveals how a distant Buddhist world is woven into a familiar Japanese narrative.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "インドの僧院を指す。京都の地名や物語上の描写と区別して読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "神仏習合",
+   "reading": "しんぶつしゅうごう",
+   "pos": "noun",
+   "meaning": "interweaving of kami and Buddhist traditions",
+   "defJa": "日本の神への信仰と仏教が結び付くこと",
+   "passage": {
+    "ja": "寺と神社の歴史を説明する文章で神仏習合を「二つの宗教が混ざったこと」とだけ訳すと、そこで起きた具体的な関係が見えません。日本の神を仏の現れとして捉える考え方もあれば、祭りや土地の管理を通じて寺社が結び付く場合もあります。場所や時代による違いを省いて、全国で同じ教義が共有されていたと書くのは避けたいところです。誰が何を祀り、どの儀礼や組織がつながっていたかを一つ添えると、抽象的な用語が地域の信仰の姿を伝える言葉になります。",
+    "form": "神仏習合",
+    "en": "Translating the interweaving of kami and Buddhist traditions merely as two religions mixing leaves the specific historical relationships invisible. These could include interpreting kami as manifestations of Buddhas or connections between shrines and temples through festivals and land administration. Omitting differences of place and period risks implying that one doctrine was shared nationwide. Adding who worshipped what and which rituals or organizations were connected turns an abstract term into language conveying a community’s religious life.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "一様な教義名ではない。神と仏、儀礼や寺社の具体的な関係を示す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "神秘主義",
+   "reading": "しんぴしゅぎ",
+   "pos": "noun",
+   "meaning": "mysticism",
+   "defJa": "究極の実在との直接的な合一や直観を求める立場",
+   "passage": {
+    "ja": "宗教の比較で神秘主義という言葉が出てきても、不思議な出来事を何でも信じる態度という意味ではありません。言葉や概念だけでは捉え切れない究極の実在に、直接触れたり一体となったりすることを重んじる立場を指します。インドの思想や日本の仏教の体験をこの語で比べる場合、何との一致が語られ、本人がその体験をどう説明するかに注目しましょう。外から付けた分類名が同じでも、修行の目的や世界観まで一致するとは限らず、共通点と相違点の両方を残す説明が必要です。",
+    "form": "神秘主義",
+    "en": "In comparative religion, mysticism does not mean an attitude of believing every strange event. It refers to positions valuing direct contact or union with ultimate reality that cannot be fully captured by words or concepts. When using the term to compare experiences in Indian thought or Japanese Buddhism, attend to what a person describes becoming united with and how the experience is explained. A shared external category does not guarantee identical aims or worldviews, so an account must preserve both similarities and differences.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "不思議な話を信じる態度ではなく、究極の実在への直接的な体験を重んじる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "禅",
+   "reading": "ぜん",
+   "pos": "noun",
+   "meaning": "Zen Buddhism",
+   "defJa": "坐る修行などを通じて自己のあり方を問う仏教",
+   "passage": {
+    "ja": "日本文化の紹介では禅が簡素な庭や静かな空間と結び付けて語られるが、その印象だけでは宗教としての内容を捉えられない。寺院で受け継がれる修行や師弟の関係には、空間の見た目とは異なる歴史と意味がある。現代の注意研究で座って呼吸を観察する課題が用いられても、それが伝統の全体を実験室で再現したことにはならない。文化の様式、宗教的な実践、研究で測定する行動を分けて示すことによって、それぞれの文脈で何を説明しているのかが明確になる。",
+    "form": "禅",
+    "en": "Introductions to Japanese culture associate Zen with simple gardens and quiet spaces, but those impressions alone do not capture its religious content. Practices and teacher-student relations transmitted in temples have histories and meanings beyond visual appearance. Even when contemporary attention research uses a seated breathing-observation task, it has not thereby reproduced an entire tradition in the laboratory. Distinguishing cultural style, religious practice, and experimentally measured behavior clarifies what is being explained in each context.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "文化の印象、宗教の実践、科学の測定を同一のものとして扱わない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "禅問答",
+   "reading": "ぜんもんどう",
+   "pos": "noun",
+   "meaning": "Zen dialogue; a seemingly baffling exchange",
+   "defJa": "師弟の問いと応答を通じて悟りへ導くやり取り",
+   "passage": {
+    "ja": "日常語では、話がかみ合わないやり取りを禅問答と呼ぶことがあるが、その用法だけで宗教的な実践を理解することはできない。師弟の間で行われる問いと応答には、知識を暗記して正解を返すという枠組み自体を問い直す働きがある。言葉が常識から外れて見えることと、発言に何の意味もないことは区別されるべきである。対話の背景にある修行や指導の関係を考慮せず、奇妙なせりふだけを抜き出しても、その問いが相手の理解をどこへ向けようとしていたかは捉えられない。",
+    "form": "禅問答",
+    "en": "In everyday language, Zen dialogue can mean an exchange in which people seem to talk past each other, but that usage alone cannot explain the religious practice. Questions and responses between teacher and student can challenge the framework of memorizing knowledge and supplying the correct answer. Language appearing contrary to common sense should be distinguished from speech having no meaning. Extracting strange lines without considering practice and instruction behind a dialogue cannot reveal where a question sought to direct the other person’s understanding.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "日常の比喩的用法と、修行における師弟の問答を分けて読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "禅定",
+   "reading": "ぜんじょう",
+   "pos": "noun",
+   "meaning": "meditative concentration",
+   "defJa": "心を一つの対象に集め安定させること",
+   "passage": {
+    "ja": "静かに座っている人を見ても、心まで落ち着いているかどうかは外からは分からないよね。仏教でいう禅定は、姿勢の形だけでなく、心を一つの対象に集めて安定させることに関わるんだ。呼吸を観察しているつもりでも、途中から昨日の出来事をずっと考えていた、という経験を思い浮かべると、外見との違いが分かるね。ただし、その実感をそのまま昔の修行の段階に当てはめるんじゃなくて、今読んでいる教えではどんな心の状態を指すのか、説明も一緒に確かめたいな。",
+    "form": "禅定",
+    "en": "Even when someone sits quietly, we cannot tell from outside whether the mind is calm. Buddhist meditative concentration concerns gathering and stabilizing the mind on an object, not merely the shape of a posture. Recalling an occasion when apparent breath observation turned into extended thinking about yesterday makes the distinction from appearance clear. But instead of directly assigning that experience to traditional stages of practice, we should also check which state of mind the teaching we are reading describes.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "姿勢だけでなく心の集中と安定に関わる語。教義上の段階も確認する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "究竟",
+   "reading": "くきょう",
+   "pos": "noun",
+   "meaning": "ultimate completion",
+   "defJa": "仏教で物事が最後まで徹底し完成すること",
+   "passage": {
+    "ja": "仏教の文献で究竟という語に出会ったら、この文脈では「くきょう」と読むことを押さえましょう。物事が最後まで徹底し、完成したあり方を示す語で、修行や悟りの最終的な位置付けを述べるときなどに使われます。単なる強調として「とても」と訳すと、途中の段階との違いや、何を完成とするのかという論点が消えてしまいます。まず後ろに続く語を確かめ、どの過程の終点を示しているかを考えると、難しい漢字の読みを覚えるだけでなく、文章の中での働きまで理解できます。",
+    "form": "究竟",
+    "en": "When encountering the term for ultimate completion in a Buddhist text, note that its reading in this context is kukyo. It indicates something carried through to completion and can describe the ultimate status of practice or awakening. Translating it merely as an intensifier such as very erases both its distinction from intermediate stages and the question of what counts as completion. Checking the word that follows and asking which process reaches its endpoint reveals its role in the passage beyond the reading of difficult characters.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "仏教では「くきょう」と読む。最終的な完成を示す働きに注目する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "空即是色",
+   "reading": "くうそくぜしき",
+   "pos": "noun",
+   "meaning": "emptiness is form",
+   "defJa": "固定的実体がないことと現象が別物でないこと",
+   "passage": {
+    "ja": "般若心経の空即是色を「何もない所から物が生まれる」と言い換えると、空という語の意味を取り違えてしまいます。ここでの空は、他から独立した固定的な実体がないことに関わり、現象とは別に広がる空っぽの場所を指すのではありません。目の前のものと、そのようなあり方を二つの別世界に分けない表現として読むことが大切です。説明文では、物が存在する世界と、それを消し去った世界を対比する図より、同じ現象をどう捉えるかという問いを中心に据えると、誤解を避けられます。",
+    "form": "空即是色",
+    "en": "Paraphrasing the Heart Sutra’s “emptiness is form” as things arising from a place containing nothing misconstrues emptiness. Here emptiness concerns the absence of fixed, independently existing entities, rather than an empty space separate from phenomena. The expression should be read as refusing to divide things before us and this way of being into two separate worlds. An explanation centered on how the same phenomena are understood avoids the misconception encouraged by contrasting a world with things and one in which they have been erased.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "無から物が生まれる話ではなく、空と現象を別世界に分けない表現。",
+    "sense": ""
+   }
+  }
+ ]
+}

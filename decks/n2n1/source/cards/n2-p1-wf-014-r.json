@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "刺す",
+   "reading": "さす",
+   "pos": "verb",
+   "meaning": "to pierce, to stab, to prick",
+   "defJa": "とがったものを突き入れる",
+   "passage": {
+    "ja": "歴史を話すときは、年号をそっけなく並べるより、具体的な場面をひとつ差し出すほうが、聞き手が一気に引き込まれます。たとえば、古代中国の医師が、患者の手首のくぼみに細い針を刺す場面です。それだけで、聞き手はその場に居合わせたかのように、診察室の静けさまで思い浮かべます。そのあとで、鍼という治療法が気の流れという考え方に支えられていたと説明すれば、理屈もすっと入ります。絵が先、説明が後という順序が、話し方の基本です。",
+    "form": "刺す",
+    "en": "When you talk about history, offering a single concrete scene tends to draw listeners in all at once far better than flatly lining up dates. For example, the scene of a physician in ancient China inserting a thin needle into the hollow of a patient's wrist. That alone lets listeners picture even the stillness of the consulting room, as if they had been present. If you then explain that the treatment called acupuncture rested on the idea of a flow of qi, the reasoning goes in smoothly too. Picture first, explanation after, is the basic order of speaking.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「針を刺す」「とげが刺す」。細くとがったものを突き入れる動作。",
+    "sense": "とがったものを突き入れる"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "友好",
+   "reading": "ゆうこう",
+   "pos": "noun",
+   "meaning": "friendship, amity",
+   "defJa": "仲よくして助け合う関係",
+   "passage": {
+    "ja": "半導体の世界では、友好関係があるだけでは、供給網の安定までは保証されません。台湾の製造能力、オランダの露光装置、日本の素材のように、国の垣根を越えた分業が進み、一か所が止まれば全体が止まる構造だからです。だからこそ、各国は仲良くするかたわら、補助金を使って自前の工場も確保しようと動いています。友情だけでは守れない領域が、そこにはあるのです。経済と安全保障が重なり合う分野では、善意より仕組みが物を言います。",
+    "form": "友好",
+    "en": "In the world of semiconductors, friendly ties alone do not guarantee even the stability of a supply chain. With Taiwan's manufacturing capacity, the Netherlands' lithography equipment, and Japan's materials, the division of labor has advanced across borders, and it is a structure in which if one place stops, everything stops. That is exactly why countries are moving to secure their own factories with subsidies even as they keep on good terms. There is a domain that friendship alone cannot protect. In fields where the economy and security overlap, mechanisms count for more than goodwill.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「友好関係を築く・保つ」。国や団体が互いに仲よくする関係を表す名詞。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "兼ねる",
+   "reading": "かねる",
+   "pos": "verb",
+   "meaning": "to serve two or more purposes",
+   "defJa": "一つで二つ以上の役目を果たす",
+   "passage": {
+    "ja": "かつてのヨーロッパの徒弟制度では、親方の仕事場は工房と教室を兼ねる場所だった。弟子は座学より先に手を動かし、失敗の痛みを最良の教師として育っていった。効率の面では劣るにせよ、身体に刻まれた知識の確かさは、今日のどんな教材にも真似しがたい。寝起きも食事も親方の家で共にしたため、技術だけでなく、仕事への姿勢までもが自然に受け渡された。倣うとは、本来そういう営みだったのだろう。",
+    "form": "兼ねる",
+    "en": "Under the old European apprenticeship system, the master's workplace was a place that doubled as workshop and classroom. Apprentices moved their hands before they sat through theory, and grew up with the pain of failure as their best teacher. Even if it was inferior in efficiency, the certainty of knowledge carved into the body is hard for any modern teaching material to imitate. Because they slept and ate together in the master's house, not only skills but even attitudes toward work were passed on naturally. Following a model was probably originally that kind of practice.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「工房と教室を兼ねる」のように、一つのものが二つの役を同時に果たす。",
+    "sense": "一つで二つ以上の役を果たす"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

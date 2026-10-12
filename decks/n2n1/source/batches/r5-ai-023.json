@@ -1,0 +1,155 @@
+{
+ "batch": "r5-ai-023",
+ "items": [
+  {
+   "term": "日の丸半導体",
+   "reading": "ひのまるはんどうたい",
+   "gloss": "Japan's national chip industry",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "時価総額",
+   "reading": "じかそうがく",
+   "gloss": "market capitalization",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "最適化",
+   "reading": "さいてきか",
+   "gloss": "optimization",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "最適解",
+   "reading": "さいてきかい",
+   "gloss": "optimal solution",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "期待値",
+   "reading": "きたいち",
+   "gloss": "expected value",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "楽観論",
+   "reading": "らっかんろん",
+   "gloss": "optimistic view",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "機会費用",
+   "reading": "きかいひよう",
+   "gloss": "opportunity cost",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "機械学習",
+   "reading": "きかいがくしゅう",
+   "gloss": "machine learning",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "教師あり学習",
+  "教師なし学習",
+  "文脈内学習",
+  "新興企業",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

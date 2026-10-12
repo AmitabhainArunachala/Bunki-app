@@ -1,0 +1,20 @@
+{
+  "cards": [
+    {
+      "term": "瓦解",
+      "reading": "がかい",
+      "pos": "noun",
+      "meaning": "collapse; disintegration",
+      "defJa": "組織や体制がまとまりを失って崩れること",
+      "passage": {
+        "ja": "歴史の答案で、戦争に負けたので帝国が瓦解した、と一文で済ませてしまうと、崩れた仕組みが何だったのかは伝わりません。軍への命令が届かなくなったのか、税を集める力を失ったのか、具体的な変化を資料で確かめてみてください。特権階級の支持が離れたという説明にしても、誰がいつ、どのような行動を取ったかを示す必要があります。異民族による独立運動も調べるなら、中央の弱体化との前後関係を年表に書き込みます。大きな出来事の名前を覚えることに加えて、体制を支えた結びつきがどこで切れたのかを追うと、因果関係を説明しやすくなります。",
+        "form": "瓦解",
+        "en": "If a history exam answer simply says that an empire disintegrated because it lost a war, it does not communicate which mechanisms broke down. Check the sources for concrete changes, such as whether orders stopped reaching the army or the state lost its ability to collect taxes. Even an explanation that the privileged classes withdrew their support needs to show who did what and when. If you also investigate independence movements by other ethnic groups, put their timing relative to the weakening of the central government on a timeline. Alongside learning the names of major events, tracing where the connections supporting a regime broke makes causal relationships easier to explain.",
+        "register": "学",
+        "topic": "history",
+        "tipJa": "帝国や体制など、結びついていた全体が崩れてまとまりを失う場面で使う。",
+        "sense": ""
+      }
+    }
+  ]
+}

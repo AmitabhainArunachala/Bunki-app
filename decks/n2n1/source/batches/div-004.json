@@ -1,0 +1,184 @@
+{
+ "batch": "div-004",
+ "writer": "gpt-6-astra",
+ "items": [
+  {
+   "term": "不透明",
+   "reading": "ふとうめい",
+   "gloss": "unclear; opaque",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "移行",
+    "導入"
+   ],
+   "fixThis": [
+    "opening 生成AIの… appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "主導権",
+   "reading": "しゅどうけん",
+   "gloss": "initiative; leadership",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "依存",
+    "進路"
+   ],
+   "fixThis": [
+    "opening 生成AIの… appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "出遅れ",
+   "reading": "でおくれ",
+   "gloss": "late start; lagging behind",
+   "level": "N1",
+   "register": "報",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "量産",
+    "工程"
+   ],
+   "fixThis": [
+    "opening 生成AIの… appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "急務",
+   "reading": "きゅうむ",
+   "gloss": "urgent task",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "検証",
+    "整備"
+   ],
+   "fixThis": [
+    "opening 生成AIの… appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "掌握",
+   "reading": "しょうあく",
+   "gloss": "grasp, command",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "権力",
+    "役人"
+   ],
+   "fixThis": [
+    "opening 生成AIの… appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "未曾有",
+   "reading": "みぞう",
+   "gloss": "unprecedented",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "規模",
+    "資料"
+   ],
+   "fixThis": [
+    "opening 生成AIの… appears in 17 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "名場面",
+   "reading": "めいばめん",
+   "gloss": "famous scene, memorable scene",
+   "level": "N2",
+   "register": "論",
+   "preferTopic": "other",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "沈黙",
+    "余韻"
+   ],
+   "fixThis": [
+    "phrase 「バガヴァッド・ギータ」 appears in 16 cards (cap 11)",
+    "phrase 「ガヴァッド・ギーター」 appears in 16 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "引き受ける",
+   "reading": "ひきうける",
+   "gloss": "to undertake, to take on",
+   "level": "N2",
+   "register": "話",
+   "preferTopic": "other",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "司会",
+    "調整"
+   ],
+   "fixThis": [
+    "phrase 「バガヴァッド・ギータ」 appears in 16 cards (cap 11)",
+    "phrase 「ガヴァッド・ギーター」 appears in 16 cards (cap 11)",
+    "phrase 「ヴァッド・ギーター』」 appears in 13 cards (cap 11)",
+    "phrase 「『バガヴァッド・ギー」 appears in 13 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "甥",
+   "reading": "おい",
+   "gloss": "nephew",
+   "level": "N2",
+   "register": "話",
+   "preferTopic": "language",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "方言",
+    "語尾"
+   ],
+   "fixThis": [
+    "phrase 「バガヴァッド・ギータ」 appears in 16 cards (cap 11)",
+    "phrase 「ガヴァッド・ギーター」 appears in 16 cards (cap 11)",
+    "phrase 「ヴァッド・ギーター』」 appears in 13 cards (cap 11)",
+    "phrase 「『バガヴァッド・ギー」 appears in 13 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "不滅",
+   "reading": "ふめつ",
+   "gloss": "immortality; indestructibility",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "other",
+   "deck": "senmon",
+   "field": "india",
+   "weave": [
+    "神話",
+    "寿命"
+   ],
+   "fixThis": [
+    "phrase 「バガヴァッド・ギータ」 appears in 16 cards (cap 11)",
+    "phrase 「ガヴァッド・ギーター」 appears in 16 cards (cap 11)"
+   ]
+  }
+ ]
+}

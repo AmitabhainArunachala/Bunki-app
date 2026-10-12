@@ -1,0 +1,184 @@
+{
+ "batch": "r5-india-001",
+ "items": [
+  {
+   "term": "無常",
+   "reading": "むじょう",
+   "gloss": "impermanence",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "linked": true,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜に応じて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "聖典",
+   "reading": "せいてん",
+   "gloss": "scripture, sacred text",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜に伴って",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "聖地",
+   "reading": "せいち",
+   "gloss": "sacred site",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜に限らず",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "聖者",
+   "reading": "せいじゃ",
+   "gloss": "saint, holy person",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜からといって",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "自力",
+   "reading": "じりき",
+   "gloss": "self-power; one's own efforts",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜ものの",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "自業自得",
+   "reading": "じごうじとく",
+   "gloss": "reaping what one sows",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Explore the choice of this word in translation or an everyday explanation; avoid presentation advice and the phrase 発表で.",
+   "grammarSuggestion": "〜一方で",
+   "factNote": "Use ordinary consequence or explain the doctrine without blaming victims of illness or violence."
+  },
+  {
+   "term": "至福",
+   "reading": "しふく",
+   "gloss": "bliss, supreme happiness (ānanda)",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Trace one idea or artifact across cultures, with attribution of traditions and no invented chronology.",
+   "grammarSuggestion": "〜に至る",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "苦",
+   "reading": "く",
+   "gloss": "suffering (duḥkha)",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜としても",
+   "factNote": "Buddhist duhkha includes instability and unsatisfactoriness, not just physical pain. Single-character target 苦 must appear once only, never again inside 苦しみ or 苦行.",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "菩薩",
+   "reading": "ぼさつ",
+   "gloss": "bodhisattva",
+   "level": "N1",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜を通じて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

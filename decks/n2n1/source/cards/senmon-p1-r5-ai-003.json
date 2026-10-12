@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "量産",
+   "reading": "りょうさん",
+   "pos": "noun",
+   "meaning": "mass production",
+   "defJa": "同じ物を大量に作ること",
+   "passage": {
+    "ja": "試作チップが動いた時点では、半導体の新技術はまだ半分しか成功していない。量産に入るまでに、工場ごとに異なる工程条件の調整と、歩留まりと呼ばれる良品率の安定化が待っている。露光や成膜の条件は設備ごとに微妙にずれ、研究室で出た数値をそのまま転用できない。この壁の高さゆえに、設計で追随する企業は多くても、生産技術で躍進できる企業は限られる。先端チップの報道も、設計の話と生産の話を分けて読むようにすると、見通しが急に立ってくる。",
+    "form": "量産",
+    "en": "At the point when a prototype chip runs, a new semiconductor technology is still only half a success. Before mass production can begin, there await the tuning of process conditions that differ from fab to fab, and the stabilization of the good-chip ratio known as yield. Conditions for exposure and film deposition drift subtly from tool to tool, so figures obtained in the lab cannot simply be carried over. Because this wall is so high, companies able to follow along in design are many, while those able to leap ahead in production technology are few. Even reporting on leading-edge chips suddenly comes into focus once you make a habit of reading design stories and production stories separately.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "量産に入る、量産化する、量産体制と組む。試作との対比で使われることが多い。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

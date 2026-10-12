@@ -1,0 +1,74 @@
+{
+ "batch": "div-006",
+ "writer": "gpt-6-astra",
+ "items": [
+  {
+   "term": "単刀直入",
+   "reading": "たんとうちょくにゅう",
+   "gloss": "straight to the point",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "前置き",
+    "混同"
+   ],
+   "fixThis": [
+    "phrase 「わけではありません。」 appears in 14 cards (cap 12)"
+   ]
+  },
+  {
+   "term": "圧縮",
+   "reading": "あっしゅく",
+   "gloss": "compression, condensation",
+   "level": "N2",
+   "register": "学",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "輪郭",
+    "分類"
+   ],
+   "fixThis": [
+    "phrase 「わけではありません。」 appears in 14 cards (cap 12)"
+   ]
+  },
+  {
+   "term": "探究心",
+   "reading": "たんきゅうしん",
+   "gloss": "spirit of inquiry",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "仮説",
+    "検証"
+   ],
+   "fixThis": [
+    "ending …みてください appears in 13 cards (cap 12)"
+   ]
+  },
+  {
+   "term": "日清戦争",
+   "reading": "にっしんせんそう",
+   "gloss": "First Sino-Japanese War",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "条約",
+    "割譲"
+   ],
+   "fixThis": [
+    "ending …る必要がある appears in 13 cards (cap 12)"
+   ]
+  }
+ ]
+}

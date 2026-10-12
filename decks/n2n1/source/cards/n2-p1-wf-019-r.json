@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "過ぎる",
+   "reading": "～すぎる",
+   "pos": "verb",
+   "meaning": "too much ~",
+   "defJa": "程度が限度を超えること。動詞の後ろにつく",
+   "passage": {
+    "ja": "完璧を目指して頑張り過ぎる人ほど、三日もたたないうちに息切れしてしまいます。これは意志が弱いからではなく、脳が急な生活の変化を危険と見なして、元の習慣へ引き戻そうとするからだと言われます。ですから、最初は物足りないと感じるほど小さく始めてこそ、挫折することなく無理なく続けられます。腕立て伏せなら一回だけ、読書なら一ページだけ。そのくらいの小ささなら、疲れた夜でも、つい手が出ます。",
+    "form": "過ぎる",
+    "en": "People who try too hard to be perfect run out of steam in three days. This is said to be not because their willpower is weak but because the brain sees sudden change as a danger and tries to pull you back to the old habit. So it is only by starting small enough to feel unsatisfying that you can keep going without giving up. One push-up, or one page of reading. At that level, your hand reaches out even on a tired night.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "動詞の連用形につき、限度を超える。「頑張り過ぎる」は努力の度が過ぎること。",
+    "sense": "限度を超える"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

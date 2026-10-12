@@ -1,0 +1,136 @@
+{
+  "cards": [
+    {
+      "term": "背景",
+      "reading": "はいけい",
+      "pos": "noun",
+      "meaning": "background; the conditions behind something",
+      "defJa": "物事が起こったもとにある事情",
+      "passage": {
+        "ja": "今のAIブームを冷静に見ると、その背景には半導体の進化があることに気づきます。学習に使える計算資源が桁違いに増えたからこそ、大規模モデルは現実のものになったんですね。つまり、ソフトウェアだけの物語ではなく、ハードウェアの物語でもあるわけです。だからこそ、各国が半導体の生産に巨額を投じるのも当然の流れなんです。技術のニュースを読むときは、その裏にある条件まで目を配りたいものです。",
+        "form": "背景",
+        "en": "Look calmly at today's AI boom and you notice that in its background lies the evolution of semiconductors. It is precisely because the computing resources available for training grew by orders of magnitude that large-scale models became a reality. In other words, this is not just a story of software; it is a story of hardware as well. That is why it is only natural that countries are pouring enormous sums into semiconductor production. When you read technology news, you want to keep an eye on the conditions lying behind it.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "背景には〜がある/〜の背景を理解するの形で、物事の裏にある事情・条件を言う",
+        "sense": "物事の裏にある事情や経緯の意"
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "街頭",
+      "reading": "がいとう",
+      "pos": "noun",
+      "meaning": "the street (as in street interviews, speeches)",
+      "defJa": "町の通り。人通りの多い場所",
+      "passage": {
+        "ja": "日本語の話し言葉というのは、辞書や文法書だけではなかなか見えてきません。そこで有効なのが、通行人に声をかける街頭インタビューなんです。駅前で若い世代の言い回しを集めてみると、教科書には載っていない変化がどんどん見つかります。新しい省略形や語尾のゆれは、机の上ではなく現場で初めて観察できるものです。言葉は生き物ですから、データは人の集まる場所で取るしかないんですね。",
+        "form": "街頭",
+        "en": "Spoken Japanese is something that dictionaries and grammar books alone will hardly reveal. That is where the street interview, calling out to passersby, proves effective. Go collect the turns of phrase of the younger generation in front of a station, and you keep finding changes that no textbook records. New abbreviated forms and wavering sentence endings can be observed for the first time in the field, not at a desk. Language is a living thing, so the data can only be gathered where people gather.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "街頭演説・街頭インタビューのように、町の通りで人に働きかける場面で使う",
+        "sense": ""
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "要請",
+      "reading": "ようせい",
+      "pos": "noun",
+      "meaning": "a formal demand or request made of someone",
+      "defJa": "強く求めること。また、その求め",
+      "passage": {
+        "ja": "大人の学び直しというテーマが、なぜ今これほど注目されるのか、考えてみましょう。かつては一度学校を出れば学びは終わり、という人生設計で通用しました。しかし技術が一変する今では、知識を更新し続けることが生存条件になりつつあります。つまり、学び直しは個人の趣味ではなく、時代の要請だと言えるわけです。学びを続けられる人と続けられない人とで、これからの差は開いていくんですね。",
+        "form": "要請",
+        "en": "Let us consider why the theme of adults relearning is drawing so much attention right now. There was a time when a life design of finishing school once and being done with learning worked fine. But today, when technology is transforming wholesale, continually updating one's knowledge is becoming a condition for survival. In other words, relearning is not a personal hobby; it can be called a demand that the times are making. The gap from here on will widen between those who can keep learning and those who cannot.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "時代の要請・社会の要請の形で、状況が人に強く求めてくることを言う",
+        "sense": ""
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "視野",
+      "reading": "しや",
+      "pos": "noun",
+      "meaning": "field of vision; breadth of one's outlook",
+      "defJa": "目に入る範囲。転じて、考えや関心の及ぶ範囲",
+      "passage": {
+        "ja": "1492年にコロンブスが大西洋を渡ったことは、世界史の大きな分岐点でした。それまで狭かったヨーロッパ人の視野が、一気に地球全体へと広がることになるんですね。未知の大陸、未知の産物、未知の文明——目にするものが一挙に増え、世界観そのものが作り変えられていきます。地理的な発見とは同時に、考え方の発見でもあったわけです。歴史の転換点というのは、人々の見る世界が変わるところから始まるのかもしれません。",
+        "form": "視野",
+        "en": "Columbus crossing the Atlantic in 1492 was a great fork in the road of world history. The field of vision of Europeans, narrow until then, would suddenly stretch to the entire globe. Unknown continents, unknown products, unknown civilizations: the things to be seen multiplied at a stroke, and the worldview itself was remade. The geographical discovery was at the same time a discovery of ways of thinking. Turning points in history, perhaps, always begin where the world people see changes.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "視野が広がる/視野に入れるが定番。比喩では考えや関心の広がりを指す",
+        "sense": "ここは比喩で、考えや関心の及ぶ範囲の意"
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "該当",
+      "reading": "がいとう",
+      "pos": "noun",
+      "meaning": "to fall under or correspond to (a condition)",
+      "defJa": "定められた条件や範囲に当てはまること",
+      "passage": {
+        "ja": "19世紀末、ヨーロッパ列強は鉄道や蒸気船の発展を背景に、アフリカへの進出を加速させていきました。ベルリン会議では、アフリカ側の代表がいないまま、大陸を分割するルールが決められました。では、どんな国が帝国主義国家なのでしょうか。植民地を獲得し、軍事力で他民族を支配する——この条件に該当する国を、私たちは帝国主義国家と呼ぶのです。歴史家の間では定義をめぐる議論も残りますが、イギリスやフランスはまさにその典型と言えるでしょう。",
+        "form": "該当する",
+        "en": "In the late nineteenth century, the European powers accelerated their advance into Africa, backed by developments such as railways and steamships. At the Berlin Conference, the rules for carving up the continent were decided without a single African representative present. So what kind of country counts as an imperialist power? Acquiring colonies and dominating other peoples through military force — a country that falls under these conditions is what we call an imperialist power. Debate over the definition still remains among historians, but Britain and France are surely the classic examples.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "『条件に該当する』が典型。定義を示して分類するときの語で、話し言葉では『当てはまる』に言い換えられる。",
+        "sense": ""
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "認識",
+      "reading": "にんしき",
+      "pos": "noun",
+      "meaning": "recognition, cognizance",
+      "defJa": "物事をはっきり心に受け止め、理解すること",
+      "passage": {
+        "ja": "勉強が続かないのは、意志が弱いからでしょうか。実は、問題は意志の弱さではなく、自分の現状に対する認識の甘さにあるんです。『明日から毎日三時間やる』と決めた時点で、計画はすでに破綻しているんです。集中がどこで切れるか、何に気を取られるか——こうした現実を把握して初めて、習慣は設計できるわけです。この自己観察の力は、心理学でメタ認知と呼ばれ、学習の質を左右する要素として重視されています。",
+        "form": "認識",
+        "en": "Is it weak willpower that keeps us from sticking with our studies? In fact, the problem lies not in weak will but in a shallow awareness of our own current situation. The moment you decide, 'Starting tomorrow, I'll do three hours a day,' the plan has already collapsed. Only when you grasp such realities — where your concentration gives out, what pulls your attention away — can you actually design a habit. This power of observing yourself is called metacognition in psychology, and it is valued as a factor that shapes the quality of learning.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "『認識が甘い・認識を改める』が典型セット。自己や現状をどう理解しているかを表す語です。",
+        "sense": "哲学用語の意味ではなく、日常の『理解・把握』の意で使用"
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

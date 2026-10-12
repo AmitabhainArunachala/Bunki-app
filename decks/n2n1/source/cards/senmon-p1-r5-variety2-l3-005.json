@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "五蘊",
+   "reading": "ごうん",
+   "pos": "noun",
+   "meaning": "the five aggregates (skandhas)",
+   "defJa": "人の存在を成り立たせる五つの要素",
+   "passage": {
+    "ja": "腹が立った瞬間を振り返ると、胸の熱さ、不快な感じ、相手への解釈、言い返したい衝動などが重なっています。仏教の五蘊は、色・受・想・行・識という五つの集まりによって、人の存在や経験を捉える枠組みです。現代の脳の部位を五つに分けたものではなく、身体や心の働きを観察し、そこに変わらぬ自分を見いだせるかを問います。「私は怒りそのものだ」と決めるかわりに、条件に応じて変化する働きへ目を向けると、固く見えていた自己像にも隙間が生まれます。",
+    "form": "五蘊",
+    "en": "Looking back at a moment of anger reveals bodily heat, unpleasant feeling, interpretations of the other person, and an urge to answer back. The Buddhist five aggregates frame human existence and experience through the collections of form, feeling, perception, formations, and consciousness. Rather than dividing the modern brain into five regions, this framework observes bodily and mental functions and asks whether an unchanging self can be found there. Attending to functions that change with conditions instead of deciding that I am anger itself opens space in a seemingly fixed self-image.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "色・受・想・行・識という五つの集まりを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5814636254-735e68d7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010-r.json",
+    "cardId": "nn-5814636254-735e68d7",
+    "wordId": "nn-5814636254"
+   }
+  },
+  {
+   "term": "即身成仏",
+   "reading": "そくしんじょうぶつ",
+   "pos": "noun",
+   "meaning": "attaining buddhahood in this very body",
+   "defJa": "この身のままで仏となるという真言密教の教え",
+   "passage": {
+    "ja": "悟りは死後の遠い世界でしか得られない、と考えると、今ここで動く身体はただの待合室になってしまいます。真言密教の即身成仏は、この身のままで仏となるという可能性を説き、身体を捨てるべき邪魔物として扱いません。印を結ぶ身、真言を唱える口、仏を観じる意という三つの働きを通じて、行者と仏の関わりを実践するのです。この教えに照らすと、身体の動きや声は思想を飾る付属物ではなく、悟りをめぐる修行そのものの大切な場となります。",
+    "form": "即身成仏",
+    "en": "If awakening is thought attainable only in a distant world after death, the living body becomes merely a waiting room. Shingon Buddhism teaches the possibility of attaining buddhahood in this very body and does not treat the body as an obstacle to discard. Through the body forming ritual gestures, speech reciting mantras, and mind contemplating the Buddha, practitioners enact their relationship with the Buddha. In light of this teaching, bodily movement and voice are essential sites of practice concerning awakening rather than decorative additions to thought.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "真言密教で、この身のままで仏となることを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f80abb4fcd-c909d0ef",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-f80abb4fcd-c909d0ef",
+    "wordId": "nn-f80abb4fcd"
+   }
+  },
+  {
+   "term": "内受容感覚",
+   "reading": "ないじゅようかんかく",
+   "pos": "noun",
+   "meaning": "interoception",
+   "defJa": "心拍など身体内部の状態を感じ取る感覚",
+   "passage": {
+    "ja": "瞑想の最中に呼吸へ注意を向けると、鼻先の感触だけでなく、胸の動きや心拍の速さが気になることがあります。内受容感覚は、心臓や胃などを含む身体内部の状態を感じ取る働きに関わる言葉です。「心がざわつく」とひとまとめにした経験にも、体の変化と、それに対する不安な解釈が入り交じっています。感覚を細かく区別できたとしても、それだけで病気の有無が判断できるとは限らず、主観的に感じる強さと実際の身体の状態との関係が研究の対象になります。",
+    "form": "内受容感覚",
+    "en": "During meditation, directing attention to breathing can bring awareness of chest movement or heartbeat as well as sensations near the nostrils. Interoception concerns sensing internal bodily states, including those of the heart and stomach. An experience summarized as inner unease mixes bodily changes with anxious interpretations of them. Even precise distinctions among sensations cannot by themselves determine whether illness is present, and the relationship between subjective intensity and bodily state is a subject of research.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "身体内部の状態を感じ取る感覚で、診断能力とは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-7cc7b18b07-63cf3b05",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-005.json",
+    "cardId": "nn-7cc7b18b07-63cf3b05",
+    "wordId": "nn-7cc7b18b07"
+   }
+  }
+ ]
+}

@@ -1,0 +1,100 @@
+{
+  "cards": [
+    {
+      "term": "擬音語",
+      "reading": "ぎおんご",
+      "pos": "noun",
+      "meaning": "onomatopoeic word",
+      "defJa": "実際の音を言葉でまねて表した語",
+      "passage": {
+        "ja": "雨の場面を書くとき、屋根をたたく音をどう表すかで、読者が思い浮かべる降り方も変わります。「ぽつぽつ」と「ざあざあ」のような擬音語は、実際の音をまねながら、場面に具体的な響きを添える言葉です。ただし、響きが面白いからといって、同じ段落にいくつも詰め込むと、何の音に注目してほしいのかがぼやけてしまいます。文体に合わせて一つ選び、ほかの部分は動作や景色で補ってみてください。声に出して文末表現まで読めば、その音だけが不自然に目立っていないかも確かめられます。",
+        "form": "擬音語",
+        "en": "When you write a scene with rain, the way you express its sound on the roof changes how readers imagine it falling. Onomatopoeic words such as potsupotsu and zaazaa imitate actual sounds while giving a scene a concrete auditory quality. But cramming several into the same paragraph just because they sound interesting can blur which sound you want readers to notice. Try choosing one to suit your writing style and filling in the rest with actions and scenery. Reading aloud all the way through the sentence endings also lets you check whether that sound stands out unnaturally.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "音を表す語を選び分けると、同じ雨でも場面の聞こえ方が変わる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "斜陽",
+      "reading": "しゃよう",
+      "pos": "noun",
+      "meaning": "decline; waning prosperity",
+      "defJa": "以前の勢いを失い衰えていくこと",
+      "passage": {
+        "ja": "昔の映画館の写真って、入口に人がぎっしり並んでいて、それだけで町の熱気が伝わってくるじゃないですか。でも、家で好きな作品を選べるようになると、わざわざ外へ出る理由も変わってくるんですよね。だからって、映画館を全部まとめて斜陽産業と呼んでしまうと、今そこで何が起きているのかは見えなくなります。時流に合わせて上映会や監督との対話を企画するなど、担い手が新しい楽しみ方を探す余地もあるわけです。客が減ったという話に加えて、どんな体験なら足を運びたいかも聞いてみたいですね。",
+        "form": "斜陽",
+        "en": "In old photographs of movie theaters, people are packed around the entrance, and that alone gives you a sense of the town's energy, doesn't it? But once you can choose what to watch at home, your reasons for going out change too. Still, lumping all movie theaters together as a declining industry makes it harder to see what is happening in them now. There is also room for the people running them to explore new ways to enjoy films, such as organizing screenings and conversations with directors that respond to the times. Alongside hearing about falling attendance, I would like to ask what kinds of experiences people would actually go out for.",
+        "register": "話",
+        "topic": "other",
+        "tipJa": "「斜陽産業」は、かつての勢いを失いつつある産業を指す比喩。",
+        "sense": "勢いが衰えていくこと"
+      }
+    },
+    {
+      "term": "新興国",
+      "reading": "しんこうこく",
+      "pos": "noun",
+      "meaning": "emerging economy; emerging nation",
+      "defJa": "経済などが成長して新たに力をつけてきた国",
+      "passage": {
+        "ja": "経済記事で国々を一つの集団として紹介するときは、便利な呼び名ほど、その範囲に注意してください。新興国という語には経済的に力をつけてきた国という意味がありますが、どの国を含めるかは文脈によって変わります。国が最近できたという意味だと受け取られないよう、成長を語る根拠を具体的に添えると親切です。市場の拡大に加えて、産業や所得の変化も明示すれば、読者は何を基準にまとめたのかを確かめられます。一つの名前で括ることと、その国々の違いまで消してしまうことは分けて考えましょう。",
+        "form": "新興国",
+        "en": "When introducing countries as a group in an economic article, be especially careful about the scope of convenient labels. The term emerging economy refers to a country that has gained economic strength, but which countries it includes varies with the context. To prevent readers from taking it to mean a recently founded country, it helps to add concrete grounds for describing its growth. If you specify changes in industry and income alongside market expansion, readers can check the criteria behind the grouping. Distinguish grouping countries under one name from erasing the differences among them.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "「新しく成立した国」と混同せず、経済成長などを踏まえた呼称として使う。",
+        "sense": "経済的に台頭してきた国"
+      }
+    },
+    {
+      "term": "明晰",
+      "reading": "めいせき",
+      "pos": "na-adj",
+      "meaning": "clear; lucid",
+      "defJa": "考えや説明の筋道がはっきりしているさま",
+      "passage": {
+        "ja": "説明の短さと、内容の理解しやすさは必ずしも一致しない。結論だけを断定しても、前提や判断の根拠が省かれていれば、聞き手は話の筋道を追えないためである。明晰な説明には、何が確かな事実で、どこからが推測なのかを区別し、両者のつながりを示すことが求められる。これは専門用語を減らすことに加えて、指示語が何を指すかを明示するなど、日本語の細部を整える作業でもある。難しい内容を扱う場合にも、曖昧さを残した箇所を具体的に示すことが、読み手の理解を支える。",
+        "form": "明晰",
+        "en": "Brevity and ease of understanding do not necessarily coincide. This is because listeners cannot follow the reasoning if assumptions and grounds for judgment are omitted, even when the conclusion is stated firmly. A lucid explanation needs to distinguish established facts from conjecture and show how the two connect. Alongside reducing technical terminology, this also involves refining details of the Japanese, such as specifying what demonstratives refer to. Even with difficult material, identifying the specific points that remain ambiguous supports the reader's understanding.",
+        "register": "報",
+        "topic": "language",
+        "tipJa": "「明晰な説明」は、事実と推測の区別や論理のつながりが明らかな説明。",
+        "sense": "考えや表現がはっきりしているさま"
+      }
+    },
+    {
+      "term": "景気循環",
+      "reading": "けいきじゅんかん",
+      "pos": "noun",
+      "meaning": "business cycle",
+      "defJa": "経済活動の拡大と縮小が繰り返されること",
+      "passage": {
+        "ja": "工場の注文が増えると、企業は人を雇い、設備を増やすことを考えますが、その勢いがいつまでも続くとは限りません。売れ行きが落ちれば、今度は投資や採用を控える動きが出てきます。こうした経済全体の拡大と縮小の繰り返しを捉えるのが、景気循環という見方です。ただし、循環といっても時計のように決まった間隔で回るわけではないので、過去の成長曲線だけから次の転換点を断定することはできません。数字を読むにあたっては、今の増減だけでなく、企業や家計が何を見込んで動いているかにも目を向けましょう。",
+        "form": "景気循環",
+        "en": "When factory orders increase, companies consider hiring people and expanding their facilities, but that momentum does not necessarily last forever. If sales weaken, moves to curb investment and recruitment begin to appear instead. The concept of the business cycle captures this repeated expansion and contraction of the economy as a whole. However, a cycle does not run at fixed intervals like a clock, so past growth curves alone cannot establish the next turning point. When reading the figures, look beyond current increases and decreases to what companies and households expect as they act.",
+        "register": "講",
+        "topic": "other",
+        "tipJa": "景気の拡大と縮小を一続きの動きとして捉える語で、周期は一定ではない。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "書き出し",
+      "reading": "かきだし",
+      "pos": "noun",
+      "meaning": "opening of a piece of writing",
+      "defJa": "文章を書き始めた最初の部分",
+      "passage": {
+        "ja": "部屋に残された一脚の椅子から物語を始めるとき、読者はそこに座っていた誰かの不在を意識する。書き出しは単なる最初の説明ではなく、何に目を向けて読むかを読者に渡す場所でもある。人物の経歴を先に並べるかわりに、一つの物や動作を置くことで、後から明かされる事情への関心を生むこともできる。ただし、謎を作ろうとして手がかりまで隠せば、文脈をつかめないまま読者を置き去りにしかねない。冒頭の短い一節にも、その作品が選んだ視点や文体がすでに表れているのである。",
+        "form": "書き出し",
+        "en": "When a story begins with a single chair left in a room, the reader becomes aware of the absence of someone who sat there. The opening is more than an initial explanation: it also gives the reader a focus for what follows. Rather than first listing a character's background, placing an object or action at the start can create interest in circumstances revealed later. However, hiding even the clues in an attempt to create mystery risks leaving readers behind without enough context. Even a brief opening passage already reveals the work's chosen viewpoint and style.",
+        "register": "論",
+        "topic": "language",
+        "tipJa": "文章の最初の部分を指し、作品への入り方や読者の視点を決める。",
+        "sense": "文章の冒頭"
+      }
+    }
+  ]
+}

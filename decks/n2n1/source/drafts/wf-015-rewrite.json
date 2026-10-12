@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "大げさ",
+   "reading": "おおげさ",
+   "pos": "na-adj",
+   "meaning": "exaggerated",
+   "defJa": "実際よりも誇張した様子",
+   "passage": {
+    "ja": "話し方の悩みの多くは、実は技術よりも、日ごろの心の癖から来ている。言い間違えを、取り返しのつかない一生の失態のように大げさに受け止めてしまうのが、その典型だ。聞き手は、聞き流した言い間違いのほとんどを、数秒で忘れてしまう。言い間違えるのは当たり前だと、話す前に言い聞かせるだけでも、声は驚くほどやわらかく変わる。失敗を小さく見積もれる人ほど、次の一言を落ち着いて選べるのだ。",
+    "form": "大げさ",
+    "en": "Many worries about speaking come, in fact, from mental habits rather than technique. Taking a slip of the tongue exaggeratedly, as if it were a lifelong blunder, is the typical case. Listeners forget most slips within a few seconds. Merely telling yourself before you speak that slipping is natural changes your voice surprisingly. The people who can estimate a failure as small are the ones who can choose their next words calmly.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「大げさに受け止める」。事実より大きく扱う悪い癖を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "大惨事",
+   "reading": "だいさんじ",
+   "pos": "noun",
+   "meaning": "catastrophe, disaster",
+   "defJa": "多くの被害や犠牲を出す大きな事故",
+   "passage": {
+    "ja": "『バガヴァッド・ギーター』は、戦場の真ん中で始まります。クルクシェートラの大戦争を目前にして、王子アルジュナは、親族や師とも戦わざるを得ない現実に打ちのめされ、弓を置いてしまいます。迫りくる大惨事を前に、彼は戦うことの意味を問います。そこへ、御者を務めるクリシュナが、結果への執着を捨てて自分の務めを果たすよう説くのです。試験前の不安にも通じる、行為と結果をめぐる教えです。",
+    "form": "大惨事",
+    "en": "The Bhagavad Gita begins on a battlefield. On the eve of the great war at Kurukshetra, Prince Arjuna is crushed by the reality that he must fight even his kin and teachers, and lays down his bow. Facing the approaching catastrophe, he asks what the meaning of fighting is. Then Krishna, serving as his charioteer, teaches him to cast aside attachment to results and do his duty. It is a teaching about action and outcome that speaks even to the anxiety before an exam.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「大惨事を前にする」。取り返しのつかない大きな被害を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "奇数",
+   "reading": "きすう",
+   "pos": "noun",
+   "meaning": "odd number",
+   "defJa": "二で割り切れない整数",
+   "passage": {
+    "ja": "スピーチの指南書は、要点を三つにまとめよとほとんど口をそろえて説く。二つでは対比に見え、四つ以上になると、聞き手の頭にはなかなか残りにくい。奇数のうちでも三は、始まりと中間と終わりを備えた、最小のまとまりだからであろう。もっとも、この型に安易に頼ると、内容が三つに収まるはずだという窮屈な思い込みを生みかねない。型は、考えを助ける道具であって、考えそのものを縛る枷ではない。",
+    "form": "奇数",
+    "en": "Speech guidebooks all but unanimously urge you to sum up your points in three. Two looks like a contrast, and with four or more, little stays in the listener's head. Among odd numbers, three is perhaps the smallest unit of coherence, having a beginning, a middle and an end. Still, relying on this form too easily can breed the assumption that the content must fit into three. A form is a tool that helps thinking, not a shackle that binds it.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「奇数」は二で割れない数。「偶数」と対にして使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宙",
+   "reading": "ちゅう",
+   "pos": "noun",
+   "meaning": "midair; left hanging",
+   "defJa": "決着がつかず中途半端な状態",
+   "passage": {
+    "ja": "技術発表で「精度は九割です」と言ったきり、話が宙に浮いてしまうことがある。聞き手が知りたいのは、残りの一割に隠れた実情だ。数字は、意味とセットで初めて言葉になる。半導体の歩留まりでも、モデルの精度でも、事情は変わらない。たとえば歩留まりが八割だと聞いても、残りの二割が検査で外れた不良品なのか、使えはするが動作の遅いものなのかで、次に打つべき手はまるで違ってくる。",
+    "form": "宙",
+    "en": "In technical talks, someone says \"accuracy is ninety percent\" and then the talk is left hanging in midair. What the audience wants to know is the real situation hidden in the remaining ten percent. A number becomes language only when paired with its meaning. The situation is the same for semiconductor yield and for model accuracy. Even if you hear a yield is eighty percent, the next move to make is wholly different depending on whether the remaining twenty percent are defective chips that failed inspection or chips that work but run slowly.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「宙に浮く」は、決着がつかず中途半端な状態に置かれることも表す。",
+    "sense": "決着のつかない状態"
+   }
+  },
+  {
+   "term": "寄せる",
+   "reading": "よせる",
+   "pos": "verb",
+   "meaning": "to draw near; to lend (heart)",
+   "defJa": "心や関心を相手や物事に向けること",
+   "passage": {
+    "ja": "歴史の語りが上手い人は、年表をなぞるより、伝記を読むように人物に心を寄せる。たとえば古い戦いの話なら、勝敗の数字や戦力の比較より先に、一兵士が遠い故郷へ送った手紙から入るに限る。聞き手は、その手紙を書いた人の不安や期待を、いつのまにか自分のものとして感じ始めるからだ。数字や年号は、そのあとで落ち着いて添えればいい。順番を変えるだけで、同じ史実が、まるで別物のように生き生きと響く。",
+    "form": "寄せる",
+    "en": "Those who tell history well draw close to people, as if reading a biography, rather than tracing the timeline. For a story of a battle, for instance, nothing beats entering through a letter one soldier sent home, before any figures of victory or defeat. The listener begins to feel the anxiety and hope of the person who wrote it as their own. Numbers and dates can be added afterward. Changing only the order makes the same facts ring like something else entirely.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「心を寄せる」で、相手に関心や共感を向ける意味になる。",
+    "sense": "心や関心を向ける"
+   }
+  },
+  {
+   "term": "対照的",
+   "reading": "たいしょうてき",
+   "pos": "na-adj",
+   "meaning": "contrasting",
+   "defJa": "二つを比べると違いがはっきりする様子",
+   "passage": {
+    "ja": "AIの規制をめぐる各国の姿勢は、驚くほど対照的だ。欧州連合は、リスクの大きさに応じて用途を分類する包括的な法律を成立させた。一方、米国は、業界の自主的な取り組みを重んじる傾向が強いと言われる。この違いは、速い技術の進歩に法律が追いつけるのか、また規制が新しい技術の芽を摘まないかという、根深い問いの表れでもある。どちらが妥当かという問いへの答えは、まだ出ていない。",
+    "form": "対照的",
+    "en": "The stances of countries over AI regulation are strikingly contrasting. The European Union enacted a comprehensive law that classifies uses according to the size of the risk. The United States, on the other hand, is said to lean strongly toward respecting voluntary industry efforts. This difference also expresses a deep question: whether law can keep up with fast technological progress, and whether regulation might nip new technologies in the bud. The answer to which is appropriate has not yet emerged.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「両者は対照的だ」「対照的な姿勢」。二つの差を際立たせる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "山",
+   "reading": "～さん",
+   "pos": "other",
+   "meaning": "mountain (-san)",
+   "defJa": "寺や峰の名のあとにつけて呼ぶ語",
+   "passage": {
+    "ja": "日本の仏教を学ぶとき、比叡山は避けて通れません。中国での修学を経て、天台宗を開いた最澄は、教えを日本に根づかせようとしました。のちに法然、親鸞、道元、日蓮といった人たちが、強い使命感を持ってこの地で修行しています。いま延暦寺を訪れる人は、杉木立に包まれた静けさと、そこに積み重なった歴史の厚みに、思わず足を止めるでしょう。鎌倉仏教の多彩な顔ぶれは、ここから旅立っていきました。",
+    "form": "山",
+    "en": "You cannot avoid Mount Hiei when studying Japanese Buddhism. After studying in China, Saicho, who founded the Tendai school, tried to root the teachings in Japan. Later, figures such as Honen, Shinran, Dogen and Nichiren trained in this place with a strong sense of mission. Those who visit Enryaku-ji today will surely stop in their tracks at the stillness wrapped in cedar groves and the thickness of history piled up there. The varied faces of Kamakura Buddhism set out from here.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「比叡山」「高野山」のように、固有名詞の後ろで「〜さん」と読む。",
+    "sense": "地名の後ろにつく「さん」"
+   }
+  },
+  {
+   "term": "島",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "island (-tou)",
+   "defJa": "海に囲まれた陸地",
+   "passage": {
+    "ja": "1883年8月、ジャワ島の西の海峡にあるクラカタウ火山が、大噴火を起こしました。その爆発音は、四千キロ以上離れた場所でも聞こえたと記録されています。噴火に伴い、大規模な津波も発生し、沿岸に大きな被害を出しました。当時すでに海底電信網が発達していたため、この災害のニュースは、記録的な速さで世界各地へ伝わりました。自然の大事件が、世界を一つの情報網で結んだ最初期の例ともいえるのです。",
+    "form": "島",
+    "en": "In August 1883, the Krakatoa volcano in the strait west of Java erupted violently. The sound of the explosion is recorded as having been heard even more than four thousand kilometers away. With the eruption, a large-scale tsunami also occurred and caused great damage along the coasts. Because undersea telegraph networks had already developed by then, news of the disaster spread around the world at record speed. It can be called one of the earliest examples of a natural event that tied the world together in a single information network.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "ジャワ島のように、外国の島名の後ろで「とう」と読むことがある。",
+    "sense": "外国の島名の後ろで「とう」と読む"
+   }
+  },
+  {
+   "term": "幼児",
+   "reading": "ようじ",
+   "pos": "noun",
+   "meaning": "infant, toddler",
+   "defJa": "まだ幼い、小学校に入る前の子ども",
+   "passage": {
+    "ja": "インドでは、幼児が初めて固形の食事を口にする日に、アンナプラーシャナと呼ばれる儀式を行う家庭が多い。通常は生後六か月前後の吉日を選んで、司祭が祈りを唱えるなか、米の粥などを少量ずつ与える。この儀式は、人生の節目ごとに行われる通過儀礼、すなわちサンスカーラの一つに数えられる。形は地域や宗派で異なるものの、子の健やかな成長と長寿を願う点は、どの家庭でも共通している。",
+    "form": "幼児",
+    "en": "In India, many families hold a ceremony called annaprashana on the day an infant first takes solid food. It is usually around six months after birth, and rice porridge and the like are given in small amounts as a priest recites prayers. This ceremony is counted as one of the samskaras, the rites of passage performed at each milestone of life. Although the form differs by region and sect, they share the wish for the child's healthy growth.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「幼児期」「幼児教育」。小学校に上がる前の小さな子どもを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引力",
+   "reading": "いんりょく",
+   "pos": "noun",
+   "meaning": "gravitational pull; attraction",
+   "defJa": "物同士が互いに引き合う力",
+   "passage": {
+    "ja": "仏教心理の解説では、執着を、心に働く引力にたとえて説明することがあります。重いものほど周りを強く引き寄せるように、強い欲望は、注意を一点へ縛りつけて簡単には離しません。ただし、この力は消すものではなく、向きを知って付き合うものです。思いが頭の中を巡るたびに、引き戻される感覚をそっと眺めて観察する。坐禅で呼吸に意識を戻し続けるのは、その練習にほかならないのです。",
+    "form": "引力",
+    "en": "Explanations of Buddhist psychology sometimes liken attachment to a gravitational pull acting on the mind. Just as heavier things pull their surroundings harder, a strong desire ties attention to a single point and will not let go. But this force is not something to eliminate; it is something to live with by knowing its direction. Each time thoughts circle through your head, you quietly observe the sensation of being pulled back. Continually returning awareness to the breath in seated meditation is nothing other than practice for that.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "物理の引力のほか、心を引きつける力の比喩にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "当たり前",
+   "reading": "あたりまえ",
+   "pos": "na-adj",
+   "meaning": "obvious, natural",
+   "defJa": "そうなるのが自然で、特別ではないこと",
+   "passage": {
+    "ja": "顔認証でスマホが開くのが当たり前になって、もう誰も不思議に思わないじゃないですか。でも、あれは赤外線で顔に三万個ほどの点を投げる仕掛けで、凹凸を読み取ってるんですよ。写真だと開かないのは、その立体の情報を見てるからなんです。便利だからといって、中身を知らなくていいわけじゃないですよね。技術の仕組みを少しでも知っていると、AIのニュースの見え方まで、ずいぶん変わってきますよ。",
+    "form": "当たり前",
+    "en": "Unlocking your phone by face recognition has become the norm, and nobody finds it strange anymore, right? But it works by projecting about thirty thousand dots of infrared light onto the face, reading the contours. A photo does not open it because it is looking at that three-dimensional information. Just because it is convenient does not mean you need not know what is inside, does it? If you know even a little about how the technology works, even how AI news looks to you changes quite a lot.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「当たり前になる」「当たり前のこと」。自然で特別でない。",
+    "sense": ""
+   }
+  }
+ ]
+}

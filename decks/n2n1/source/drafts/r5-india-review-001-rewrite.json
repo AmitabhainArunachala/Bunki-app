@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "光明真言",
+   "reading": "こうみょうしんごん",
+   "pos": "other",
+   "meaning": "the Mantra of Light",
+   "defJa": "光を放つとされ、加持や土砂に用いられる密教の呪文",
+   "passage": {
+    "ja": "意味の分からない音を唱えることにも、宗教の実践では独自の位置がある。日本の密教で受け継がれてきた光明真言は、梵語の音を保ちながら唱える短い真言で、その功徳を説く教えとともに信仰を集めてきた。音の形を伝えることと、内容を日本語で解説することは、どちらか一方で他方を置き換えられる関係ではない。原典の語義を確かめる作業に加えて、誰からどう唱え方を受け継ぐかに目を向けると、文章の内容だけでは捉えきれない教えの継承が見えてくる。",
+    "form": "光明真言",
+    "en": "Reciting sounds whose meanings one does not understand can have a distinctive place in religious practice. The Mantra of Light, preserved in Japanese esoteric Buddhism, is a short mantra chanted in a form retaining Sanskrit sounds and venerated alongside teachings about its merit. Preserving its sound and explaining its content in Japanese are not activities in which one simply replaces the other. Attending to how recitation is learned from others alongside examining the original meanings reveals transmission beyond textual content alone.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「光明真言を唱える」。音の継承と意味の解説を別の働きとして捉える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "梵我一如",
+   "reading": "ぼんがいちにょ",
+   "pos": "noun",
+   "meaning": "identity of Brahman and ātman",
+   "defJa": "宇宙の根本原理と個人の自我が同一だとする見方",
+   "passage": {
+    "ja": "自分の身体や気分は日ごとに変わるのに、その奥に変わらないものがあるとしたら、何なのでしょうか。ウパニシャッドを重んじる不二一元論では、個人の根底にある自己と、世界の究極の根本とは別々のものではないと説き、この一致を梵我一如と表します。目に見える性格を宇宙全体と同じだと言っているのではなく、何を本当の自己と考えるかが議論の出発点です。仏教の無我と比べるにあたっても、似た修行の姿から教義まで同じだと決めず、それぞれが自己をどう論じるかを読むと違いが明瞭になります。",
+    "form": "梵我一如",
+    "en": "If something unchanging lies beneath a body and moods that change daily, what might it be. Advaita, which reveres the Upanishads, teaches that the self underlying the individual and the ultimate foundation of the world are not separate, expressing this as the unity of Brahman and atman. The argument starts with what counts as the true self, rather than equating visible personality with the entire universe. Comparing it with Buddhist no-self becomes clearer by examining each account of self rather than assuming similar-looking practices imply identical doctrines.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「梵我一如を説く」。自己と世界の根本の一致を、特定の教義として説明する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "自力",
+   "reading": "じりき",
+   "pos": "noun",
+   "meaning": "one's own power; self-effort (Buddhism)",
+   "defJa": "他に頼らず、自分の力だけで物事をすること",
+   "passage": {
+    "ja": "浄土教の本を読むとき、努力をするかしないかという二択だけでは、議論を取り違えます。自力という語は、自分の修行や功徳を頼みとして救いを求める立場を表し、阿弥陀仏の本願に任せる他力との対比の中で使われます。ただし、日本の仏教全体を、勤勉な人と何もしない人の二群に分けるための言葉ではありません。どの教えが何を頼りとするのかに注目して読めば、同じ念仏や修行という行為でも、その意味の捉え方が異なることを整理できます。",
+    "form": "自力",
+    "en": "Reading Pure Land texts as a simple choice between making an effort and making none misrepresents the argument. Self-power denotes seeking liberation by relying on one’s own practice and merit, in contrast with other-power that entrusts itself to Amida Buddha’s vow. These terms do not divide all Japanese Buddhists into diligent people and people who do nothing. Attending to what each teaching takes as its basis clarifies how even the same act of chanting or practice can receive different interpretations.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「自力に頼る」。努力の量より、救いの拠り所を問う文脈で使われる。",
+    "sense": "仏教では他力と対になる専門語。一般には自分の力の意。"
+   }
+  },
+  {
+   "term": "解脱",
+   "reading": "げだつ",
+   "pos": "noun",
+   "meaning": "liberation (mokṣa), release from rebirth",
+   "defJa": "煩悩の束縛から抜け出し、輪廻の連鎖を断つこと",
+   "passage": {
+    "ja": "「面倒な役目から解放された」と書くところに、宗教的な語を置くと、文章の重みが急に変わります。解脱は、インドの宗教や仏教で、執着や生死の繰り返しから離れることを指す語であり、少し気分が楽になったという感想とは射程が異なります。比喩に使うにしても、その大きな隔たりを読み手と共有できれば、誇張の面白さが生まれます。逆に、瞑想の体験記で教義上の達成を述べたいなら、一時の安堵と同じ言葉でまとめず、何から離れたと考えるのかを具体的に書く方が伝わります。",
+    "form": "解脱",
+    "en": "Using a religious term where one might write that an annoying duty has ended suddenly changes a sentence’s weight. Liberation in Indian religions and Buddhism refers to release from attachment and recurring birth and death, extending beyond a feeling of temporary relief. Even in metaphor, sharing that large gap with the reader can make the exaggeration interesting. Conversely, an account of meditation claiming a doctrinal attainment should specify what the writer believes has been released instead of merging it with temporary ease.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "宗教的な意味と口語の誇張を分け、文章でどちらを使うかを明らかにする。",
+    "sense": "ここでは輪廻からの解放の教義の意。口語の「解放」の意は別"
+   }
+  }
+ ]
+}

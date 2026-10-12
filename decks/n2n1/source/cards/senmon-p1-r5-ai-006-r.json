@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "激震",
+   "reading": "げきしん",
+   "pos": "noun",
+   "meaning": "violent shock, upheaval",
+   "defJa": "物事に与える大きな衝撃、比喩的に使う語",
+   "passage": {
+    "ja": "「業界に激震が走った」という見出しを見て、友人が地震の話かと聞いてきた。比喩であることはすぐ分かるが、では何が揺れたのかと問い直すと意外に答えにくい。株価でも供給網でもなく人々の見通しだったとすれば、この語が指すのは仮説の組み替えを迫られる出来事ということになる。しかも新技術が実際に量産できるかはまだ検証されていないのだから、揺れたのは事実ではなく期待の相互作用だ。見出しの震度を測る代わりに、どの仮説が書き換わったかを数えてみると、報道の距離感がはっきり掴める。",
+    "form": "激震",
+    "en": "Seeing the headline \"a violent shock ran through the industry,\" a friend asked whether it was about an earthquake. That it is a metaphor is obvious at once, but asking what exactly was shaken proves surprisingly hard to answer. If it was neither share prices nor the supply network but people's outlooks, then the word refers to events that force a rearrangement of hypotheses. Moreover, since whether the new technology can actually be mass-produced is not yet verified, what shook was not fact but an interaction of expectations. Instead of measuring the headline's seismic intensity, count how many hypotheses were rewritten, and the distance of the reporting becomes clear.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "地震の比喩で、業界や市場の見通しの揺れを表す書き言葉。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "日米貿易摩擦",
+   "reading": "にちべいぼうえきまさつ",
+   "pos": "noun",
+   "meaning": "US–Japan trade friction",
+   "defJa": "輸出の急増などをめぐる日米間の経済的な対立",
+   "passage": {
+    "ja": "半導体の歴史を学ぶとき、年表の暗記から入ると頭に残りにくい。まず1986年に結ばれた日米半導体協定を押さえ、その背景にあった日米貿易摩擦を「輸出の急増への反発が政策を変えた構図」として捉える。この構図は半導体に限らず自動車や鉄鋼でも同じ形で現れるので、一つを丁寧に学ぶと他の分野への転用が利く。順序としては協定から摩擦、各社の対応へと並べ、因果関係の鎖でつなぐと忘れにくい。投資の実務でも、過去の貿易政策がなぜ生まれたかを説明できるかが銘柄理解の分かれ目になる。",
+    "form": "日米貿易摩擦",
+    "en": "When studying semiconductor history, starting with memorizing chronologies leaves little in the mind. First grasp the 1986 US–Japan semiconductor agreement, and understand the US–Japan trade friction behind it as a pattern in which backlash against a surge in exports changed policy. Since this pattern appears in the same form in automobiles and steel, not just semiconductors, studying one case carefully transfers to other fields. As for order, arrange agreement, friction, and each company's response, linking them in a chain of cause and effect, and they become hard to forget. In the practice of investing too, whether you can explain why past trade policies arose is what separates levels of understanding of a stock.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "摩擦を抽象語のままにせず、輸出の急増と政策の変化という構図で捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "転生",
+   "reading": "てんせい",
+   "pos": "noun",
+   "meaning": "rebirth",
+   "defJa": "死後に別の生を受けること",
+   "passage": {
+    "ja": "前の人生の記憶を持った主人公って物語ではおなじみだけど、それをそのまま仏教の説明に使うのは難しいね。転生を語る伝統でも、変わらない魂が体を乗り換えると考えるとは限らないからさ。仏教の無我という教えを読む前に、同じ自分が永久に続くという前提をいったん外しておくと、輪廻との関係がちゃんと問いになるんだ。生まれ変わりを信じるかだけで話を終えるより、何が次の生をつなぐと説明されているかを確かめたほうが面白いよ。",
+    "form": "転生",
+    "en": "A protagonist with memories of a previous life is familiar from stories, but using that image directly to explain Buddhism is difficult. Even traditions that speak of rebirth do not necessarily assume that an unchanging soul switches bodies. Before reading the Buddhist teaching of non-self, setting aside the assumption of the same self lasting forever makes its relation to the cycle of rebirth a real question. It is more interesting to check what is said to connect lives than to end the discussion simply with whether one believes in being born again.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "死後の生を表すが、不変の魂を認めるかは伝統によって異なる。",
+    "sense": ""
+   }
+  }
+ ]
+}

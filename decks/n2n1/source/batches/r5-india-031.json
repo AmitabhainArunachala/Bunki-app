@@ -1,0 +1,177 @@
+{
+ "batch": "r5-india-031",
+ "items": [
+  {
+   "term": "鎮護国家",
+   "reading": "ちんごこっか",
+   "gloss": "Buddhism for protecting the state",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Trace one idea or artifact across cultures, with attribution of traditions and no invented chronology.",
+   "grammarSuggestion": "〜に至る"
+  },
+  {
+   "term": "開祖",
+   "reading": "かいそ",
+   "gloss": "founder (of a sect)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜としても",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "阿修羅",
+   "reading": "あしゅら",
+   "gloss": "asura, fighting demigod",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜を通じて"
+  },
+  {
+   "term": "阿字観",
+   "reading": "あじかん",
+   "gloss": "meditation on the syllable A",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜だけに"
+  },
+  {
+   "term": "阿弥陀如来",
+   "reading": "あみだにょらい",
+   "gloss": "Amitābha Buddha",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜に反して"
+  },
+  {
+   "term": "阿羅漢",
+   "reading": "あらかん",
+   "gloss": "arhat",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜にかかわらず"
+  },
+  {
+   "term": "阿頼耶識",
+   "reading": "あらやしき",
+   "gloss": "ālaya-vijñāna, storehouse consciousness",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜に加えて"
+  },
+  {
+   "term": "陀羅尼",
+   "reading": "だらに",
+   "gloss": "dhāraṇī, long incantation",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜につれて"
+  },
+  {
+   "term": "陰陽",
+   "reading": "いんよう",
+   "gloss": "yin and yang",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜をめぐって",
+   "factNote": "Chinese concept, not Buddhist doctrine or brain hemispheres.",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence.",
+   "topicConnection": "Mandatory scope: connect this Chinese-origin term to Japanese Buddhism or compare its meaning with Buddhist practice; do NOT write a wholly unrelated Chinese history passage. Clearly distinguish traditions, never fabricate direct influence. A careful conceptual comparison is enough."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

@@ -1,0 +1,84 @@
+{
+ "cards": [
+  {
+   "term": "かねがね",
+   "reading": "かねがね",
+   "pos": "adverb",
+   "meaning": "for some time, long since",
+   "defJa": "ずっと前から",
+   "passage": {
+    "ja": "初めまして、かねがねお噂は伺っておりました。ポンペイの発掘に長く関わっておられると聞いて、ぜひ一度お話を伺いたかったんです。噴火で一瞬のうちに埋もれた町が、パン屋の窯や壁の落書きまで残しているなんて、本当に驚きですよね。実際に歩いてみたところ、二千年近く前の人の暮らしが急に身近に感じられました。先生のお話で、その続きをもっと知りたいんです。",
+    "form": "かねがね",
+    "en": "Pleased to meet you; I have long heard of you. When I heard you had been involved with the Pompeii excavations for many years, I very much wanted to hear from you. It is truly astonishing that a town buried in an instant by an eruption kept even its bakery ovens and wall graffiti, isn't it. When I actually walked around, the lives of people nearly two thousand years ago suddenly felt close. I would love to learn more about what comes next through your talk.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「かねがね伺っております」など、前から知っていたと伝える改まった副詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "魂",
+   "reading": "たましい",
+   "pos": "noun",
+   "meaning": "soul, spirit",
+   "defJa": "人の体に宿る心の働き",
+   "passage": {
+    "ja": "「三つ子の魂百まで」ということわざがあるように、幼いころに身についた気質は、大人になっても変わりにくいと考えられています。実際、幼少期の習慣や環境が、のちの学習意欲に影響することは多くの研究が示しています。とはいえ、大人になってからの学び直しが無駄になるわけではありません。身の回りの環境を変えれば、習慣は少しずつ書き換えられます。習慣は、環境という土台の上に育っていくのです。",
+    "form": "魂",
+    "en": "As the proverb “the soul of a three-year-old lasts until a hundred” says, the temperament acquired in early childhood has been thought to be hard to change even in adulthood. In fact, many studies show that childhood habits and environment affect later motivation to learn. That said, relearning as an adult is not wasted. If you change your surroundings, habits can be rewritten little by little. Habits grow on the foundation of one's environment.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「魂」は「心」より深い、人の核。ことわざ「三つ子の魂百まで」で使われる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "お邪魔します",
+   "reading": "おじゃまします",
+   "pos": "expression",
+   "meaning": "excuse me for intruding",
+   "defJa": "人の家や部屋に入るときの挨拶",
+   "passage": {
+    "ja": "他人の家を訪ねるに際して「お邪魔します」と言うのは、単なる挨拶ではなく、相手の領域に入ることへの断りである。畳の部屋の文化では、靴を脱ぐ一歩が内と外の境目を示すため、この一言が欠かせない。帰るときには「お邪魔しました」と過去形に変え、訪問が終わったことを告げる。言葉の形を使い分けるだけで、礼儀正しい印象は大きく変わる。靴をそろえる所作とともに、言葉もまた、客としての心づかいの一部になる。",
+    "form": "お邪魔します",
+    "en": "Saying “ojama shimasu” when visiting someone's home is not a mere greeting but a request for permission to enter the other person's territory. In a culture of tatami rooms, the single step of taking off one's shoes marks the boundary between inside and outside, so this phrase is indispensable. On leaving, you change it to the past tense, “ojama shimashita,” to signal that the visit is over. Merely using the different forms appropriately changes the impression of politeness greatly. Along with the gesture of lining up one's shoes, words too become part of a guest's consideration.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "入るときは現在形「お邪魔します」、帰るときは過去形に変える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "くれぐれも",
+   "reading": "くれぐれも",
+   "pos": "adverb",
+   "meaning": "please be sure to, earnestly",
+   "defJa": "何度も念を押して頼むさま",
+   "passage": {
+    "ja": "睡眠を削って働き続けることのないよう、専門家はくれぐれも気をつけてほしいと呼びかけている。眠りが足りない状態が続くと、判断力は酒に酔ったときに近づくという指摘もある。眠気は、体からの警戒信号と受け止めるべきだ。仕事の負担が重なる時期ほど、まず休息を確保することが求められる。とりわけ、納期が迫って気持ちが焦るときほど、短い休憩を意識して挟むことが、結果として仕事の質を守ることにつながる。",
+    "form": "くれぐれも",
+    "en": "Experts are earnestly appealing to people not to keep working while cutting into their sleep. Some point out that when sleep deprivation continues, judgment approaches that of someone drunk. Drowsiness should be taken as a warning signal from the body. The more the workload piles up, the more important it is to secure rest first. Especially when a deadline looms and you feel rushed, deliberately inserting short breaks ends up protecting the quality of your work.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「くれぐれもお体に気をつけて」。念を重ねて頼む、気づかいの副詞。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "非難",
+   "reading": "ひなん",
+   "pos": "noun",
+   "meaning": "blame, criticism",
+   "defJa": "あやまちを責めとがめること",
+   "passage": {
+    "ja": "ネットで誰かの言葉づかいを非難する人って、結構いるじゃないですか。でも、言葉は時代で変わるものだから、「その使い方は間違いだ」と決めつけても、あとで昔からある用法だったと分かることがよくあるんです。「すごい」だって、もとはぞっとするほど恐ろしいという意味だったらしいですよ。文句をつける前に、辞書や古い用例を一度調べてみるのがおすすめです。意外と、自分のほうが新しい使い方をしていたりして、そのときは顔から火が出ますよ。",
+    "form": "非難",
+    "en": "There are quite a few people online who criticize how someone uses words, aren't there? But because language changes with the times, even when you declare “that usage is wrong,” it often turns out later to be an old usage. Even “sugoi” apparently originally meant something so terrible it makes you shudder. Before you complain, I recommend checking a dictionary or old examples once. Surprisingly, you may turn out to be the one using the newer usage, and then your face will burn with embarrassment.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「〜を非難する」「非難を浴びる」。「批判」より責める調子が強い。",
+    "sense": ""
+   }
+  }
+ ]
+}

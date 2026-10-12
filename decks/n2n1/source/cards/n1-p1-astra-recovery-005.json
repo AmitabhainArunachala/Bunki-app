@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "軒並み",
+   "reading": "のきなみ",
+   "pos": "adverb",
+   "meaning": "across the board; nearly all",
+   "defJa": "並ぶもののほとんどすべてに及ぶさま。",
+   "passage": {
+    "ja": "商店街の店が軒並み閉まっていたという旅行記には、何店かが休みだった場合よりも、通り全体の静けさが感じられる。もとは家々の並びを思わせる語であり、ここでは見渡す先の店がほぼ例外なく休んでいる様子を伝えている。売上が下がった企業についても使えるものの、一社だけの出来事には合わない。対象の範囲を示さずに使えば、実際より広い変化を読み手に想像させる恐れがある。便利な言葉ほど、それが指す集まりを前後に書き添え、どこまで確かめた記述なのかを透明にしておきたい。",
+    "form": "軒並み",
+    "en": "A travel account saying that shops along a shopping street were closed almost across the board conveys greater stillness than saying a few shops were shut. The word originally evokes rows of houses and here communicates that almost every shop in view is closed. It can also describe companies whose sales fell, but it does not fit an event involving just one company. Using it without specifying the scope may lead readers to imagine a more widespread change than actually occurred. With such convenient expressions, we should identify the group in the surrounding text and make clear how much the description has verified.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "店や企業など、ある集まりのほぼ全体に同じ状態が及ぶときに使います。",
+    "sense": "ほぼ例外なく全体に及ぶこと。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "踏み場",
+   "reading": "ふみば",
+   "pos": "noun",
+   "meaning": "space to step; foothold",
+   "defJa": "歩いたり立ったりするための場所。",
+   "passage": {
+    "ja": "部屋に本や紙袋が積み重なり、足の踏み場もないと、勉強を始める前に移動の手間まで増えてしまいます。全部を一度に片づけようとして疲れるなら、まず入口から机までの通り道だけを確保します。物の分類はさておき、今から使う場所を空けることに目的を絞ってください。職場でも自宅でも、準備の作業を大きくしすぎると、本来やりたかったことが後回しになります。理想の部屋を完成させる日と、今日の学習を始める時刻を分けて考えると、小さな整理からでも行動へ移れます。",
+    "form": "踏み場",
+    "en": "When books and paper bags are piled up until there is nowhere to step, even moving around adds effort before you can begin studying. If trying to tidy everything at once is exhausting, first clear only the route from the door to your desk. Set classification aside and limit your goal to freeing the space you are about to use. Whether at work or at home, making preparation too large a task pushes back what you originally wanted to do. Separating the day you complete your ideal room from the time you start today’s study lets even a small amount of tidying lead to action.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「足の踏み場もない」は、物が多くて歩く場所さえない様子を表します。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "慎む",
+   "reading": "つつしむ",
+   "pos": "verb",
+   "meaning": "refrain from; exercise restraint",
+   "defJa": "言動を控え、軽はずみなことを避ける。",
+   "passage": {
+    "ja": "取材相手の話が面白いほど、まだ確かめていない部分まで記事に盛り込みたくなります。勢いに任せて断定するのは慎むとして、何が本人の記憶で、何が資料で確認できたことかを分けておきます。詳しく聞いたからといって、語られた内容のすべてが事実だと決まるものではありません。相手への愛着があると、疑問を挟むのをためらいがちですが、確かめる作業は感想を否定することとは違います。聞き手としての敬意と、書き手としての確認を両立させるところに、取材文の難しさがあります。",
+    "form": "慎む",
+    "en": "The more interesting an interviewee’s account is, the more tempting it becomes to include parts that have not yet been verified. While refraining from making categorical claims in the excitement, distinguish what comes from personal memory from what documents confirm. Hearing a detailed account does not establish that everything in it is factual. Affection for the person may make you hesitate to raise questions, but verification is different from rejecting their impressions. The difficulty of interview-based writing lies in combining respect as a listener with scrutiny as a writer.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「断定するのは慎む」は、軽々しく言い切らないよう自分を抑える意味です。",
+    "sense": "軽率な言動を控える。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

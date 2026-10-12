@@ -1,0 +1,246 @@
+{
+ "cards": [
+  {
+   "term": "貝殻",
+   "reading": "かいがら",
+   "pos": "noun",
+   "meaning": "seashell",
+   "defJa": "貝の外側をおおう硬い殻",
+   "passage": {
+    "ja": "インド洋の浜辺で拾った貝殻を、勉強机の端に置いている人がいる。それを見るたびに旅の記憶がよみがえるのは、物と体験が結びついているからだ。学習も同じで、単語を風景や匂いと一緒に覚えると、思い出す手がかりが何倍にも増える。象徴的な品を机に一つ置くことをきっかけに、集中を取り戻せる人もいる。旅先の品に限らず、思い出と結びついた小さな物は、記憶の入り口として立派に働いてくれる。",
+    "form": "貝殻",
+    "en": "Some people keep a seashell picked up on a beach on the Indian Ocean at the edge of their study desk. Each time they see it the memory of the trip comes back, because the object is tied to the experience. Learning works the same way: if you memorize words together with scenery and smells, the cues for recalling them multiply many times over. Placing one symbolic item on the desk can even be the occasion for some people to regain their focus. Not only souvenirs but any small object tied to a memory works admirably as a doorway into it.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「貝殻を拾う」「貝殻の模様」。「貝」だけより、外側の殻に焦点がある。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "酪農",
+   "reading": "らくのう",
+   "pos": "noun",
+   "meaning": "dairy farming",
+   "defJa": "牛を飼って乳や乳製品をつくる農業",
+   "passage": {
+    "ja": "北海道の酪農現場で、AIを使った牛の健康管理が広がっている。首に取り付けたセンサーが牛の動きや反芻の回数を常時記録し、発情や病気の兆候を自動で知らせる。従来は、農家が早朝から夜遅くまで牛舎を見回って気づいていた変化である。過疎に悩む地域にとっては、作業の負担を軽くする切り札になっているものの、導入費用の高さが課題として残っている。センサーが集めたデータは、餌の量や出産の時期の見極めにも生かされている。",
+    "form": "酪農",
+    "en": "In dairy farming settings in Hokkaido, AI-based health management of cattle is spreading. Sensors attached to the neck constantly record the cows' movement and the number of times they ruminate, automatically signaling signs of heat or illness. These are changes that farmers used to notice by walking around the barn from early morning to late at night. For regions struggling with depopulation, it has become a trump card for lightening the workload, though the high cost of adoption remains an issue. The data the sensors collect is also used to judge feed amounts and the timing of calving.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「酪農家」「酪農地帯」。牛乳・バター・チーズなどをつくる農業。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "論理",
+   "reading": "ろんり",
+   "pos": "noun",
+   "meaning": "logic",
+   "defJa": "物事の筋道。考えの道筋",
+   "passage": {
+    "ja": "日本語は曖昧で筋が通らない、という話をよく耳にします。しかし、主語を省くからといって、論理が弱いわけではありません。文脈で分かることは言わないという、別の約束事に従っているのです。たとえば身近な場面なら、「雨が降ってきたので傘を買った」と言えば、誰が買ったのかを言わなくても通じます。言語が違えば筋道の立て方も違うという事実は、翻訳の現場でも日々実感されています。",
+    "form": "論理",
+    "en": "You often hear that Japanese is vague and does not hold together. But omitting the subject does not mean the logic is weak. It follows a different convention: what context already makes clear is left unsaid. In an everyday situation, for instance, if you say 'it started to rain so I bought an umbrella,' it gets across without saying who bought it. That different languages build their reasoning differently is something translators feel every day on the job.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「論理が弱い」「論理を組み立てる」のように、筋道の意味で使う。形容詞形は「論理的」。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "軌道",
+   "reading": "きどう",
+   "pos": "noun",
+   "meaning": "orbit; track",
+   "defJa": "天体や乗り物が進む道すじ",
+   "passage": {
+    "ja": "インド宇宙研究機関の月探査機チャンドラヤーン3号は、月周回の軌道に入ったのち着陸機を切り離し、二〇二三年八月に南極に近い地域への軟着陸を果たした。この地域への着陸成功は世界で初めてとされる。打ち上げ費用が比較的低いことも国内外で注目され、同国の宇宙産業では民間の進出を促す動きが強まりつつある。探査の成功は、国の威信にとどまらず、産業の裾野を広げるきっかけにもなっている。",
+    "form": "軌道",
+    "en": "The Indian Space Research Organisation's lunar probe Chandrayaan-3 entered an orbit around the Moon, separated its lander, and achieved a soft landing in a region near the south pole in August 2023. This is regarded as the first successful landing in that region in the world. Its comparatively low launch cost also drew attention at home and abroad, and moves to encourage private-sector entry are strengthening in the country's space industry. The mission's success goes beyond national prestige and is also becoming an occasion to widen the base of the industry.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「軌道に乗る」「軌道を修正する」は比喩にも使う。ここでは物理的な周回の道すじ。",
+    "sense": "天体や機体が回る道すじ"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "豊作",
+   "reading": "ほうさく",
+   "pos": "noun",
+   "meaning": "bumper crop; good harvest",
+   "defJa": "作物がたくさんとれること",
+   "passage": {
+    "ja": "「豊作貧乏」という言葉は、字面だけ見るとまるで矛盾しています。収穫が増えるのに伴って値段が下がり、かえって農家の収入が減ってしまう現象を指すのです。豊かさと貧しさを一語に押し込んだこの表現は、経済の仕組みまで教えてくれる、知恵の結晶と言えます。日本語には、こうした逆説を凝縮した言い回しが意外に多いものです。ぜひ、普段の会話や新聞の見出しの中から、似た言い回しを探してみてください。",
+    "form": "豊作",
+    "en": "The word 'hōsaku binbō' looks outright contradictory on the page. It refers to the phenomenon where, as the harvest grows, prices fall and farmers end up earning less. Squeezing wealth and poverty into a single phrase, this expression is a crystallization of wisdom that even teaches how the economy works. Japanese has a surprising number of such turns of phrase that condense a paradox. Do try searching everyday conversation and newspaper headlines for similar turns of phrase.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「今年は豊作だ」「豊作貧乏」。反対語は「凶作」「不作」。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "還暦",
+   "reading": "かんれき",
+   "pos": "noun",
+   "meaning": "60th birthday",
+   "defJa": "数え年六十一歳。六十歳の祝い",
+   "passage": {
+    "ja": "還暦を過ぎてから新しい言語を学び始める人が増えつつある。脳の可塑性は年齢とともに低下するものの、完全に失われるわけではなく、使えば使うほど保たれると考えられている。実際、外国語の学習は認知機能の低下を遅らせる可能性があると報告されている。年齢の壁を自覚しつつも、毎日十分だけ続けることが、何よりの近道である。完璧を目指さず、昨日より一語多く覚えることを目標にすると、挫折しにくい。",
+    "form": "還暦",
+    "en": "The number of people who begin learning a new language after passing their sixtieth birthday is on the rise. Although the brain's plasticity declines with age, it is not lost entirely, and it is thought to be maintained the more it is used. In fact, it has been reported that foreign-language study may slow cognitive decline. While being aware of the wall that age creates, continuing for just ten minutes a day is the surest shortcut of all. If you aim not for perfection but to learn one more word than yesterday, you are less likely to give up.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「還暦を迎える」「還暦祝い」。数えで六十一歳、干支が一巡して生まれ年に還る意味。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "趣",
+   "reading": "おもむき",
+   "pos": "noun",
+   "meaning": "charm; air; effect",
+   "defJa": "しみじみとした味わい。ようす",
+   "passage": {
+    "ja": "京都の町家には、新しい建材では出せない趣がある。柱の艶、障子を通した柔らかな光の色彩、年月が刻んだ床のきしみ。そうした細部を通して、かつての商人たちの繁栄までが伝わってくる。同じ空気を言葉で伝えたいなら、「古い」と言うのではなく、何がどのように古びているかを描くことだ。写真なら一瞬で済むものを、あえて言葉で描こうとするとき、書き手の観察の深さと語彙の豊かさが同時に問われる。",
+    "form": "趣",
+    "en": "Kyoto's machiya townhouses have a charm that new building materials cannot produce. The gloss of the pillars, the colors of soft light filtering through paper screens, the creak of floors carved by the years. Through such details, even the prosperity of the merchants of old comes across. If you want to convey the same atmosphere in words, don't just say 'old' but describe what has aged, and how. What a photo captures in an instant, when you deliberately try to paint it in words, tests the depth of the writer's observation and the richness of vocabulary at once.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「趣がある」「趣のある建物」。古さ・静けさのなかの味わいをほめる、美的な語。",
+    "sense": "しみじみとした味わい"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "貫く",
+   "reading": "つらぬく",
+   "pos": "verb",
+   "meaning": "to carry through; to pierce",
+   "defJa": "最後まで通す。突き通す",
+   "passage": {
+    "ja": "一本の筋が通った文章を書くには、書き始める前に「結局何が言いたいのか」を一行で言えるようにしておく必要がある。それが言えないまま書き進めると、段落ごとに話題が散らばり、読み手は途中で迷子になってしまう。主張を最後まで貫く文章は、削る作業にも耐えられるものだ。構成を練る時間こそ、文章力の本体にほかならない。逆に、思いつきを並べただけの文章は、どれほど美しくても、読み終えたあとに何も残らない。",
+    "form": "貫く",
+    "en": "To write a piece with a single through-line, you need to be able to say in one line, before you start, what you ultimately want to say. If you press on without being able to, the topics scatter paragraph by paragraph and the reader gets lost midway. A text that carries its claim through to the end can withstand the work of cutting. The time spent working out the structure is nothing other than the core of writing ability. Conversely, a text that merely lines up whims, however beautiful, leaves nothing behind once it is read.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「主張を貫く」「信念を貫く」。一本の筋を最後まで通す感覚で、「貫通」とも通じる。",
+    "sense": "最後まで通す（意志・主張など）"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "誤る",
+   "reading": "あやまる",
+   "pos": "verb",
+   "meaning": "to err; to get wrong",
+   "defJa": "まちがえる。しくじる",
+   "passage": {
+    "ja": "サンスクリットの経典を朗誦するとき、一音でも誤ると呪文の力が失われると信じられてきた。話し方を磨く私たちにとって、これは笑い話ではない。言い間違いを恐れるあまり、声が縮こまってしまう人は少なくないからだ。大切なのは間違えないことではなく、間違えても続けられる呼吸を自覚することである。私が研修で最初に教えるのは、間違いを隠さずに言い直す、小さな勇気の使い方である。",
+    "form": "誤る",
+    "en": "When chanting Sanskrit scriptures, people have long believed that getting even a single sound wrong robs a mantra of its power. For those of us honing how we speak, this is no laughing matter. Not a few people let their voices shrink out of fear of misspeaking. What matters is not never making mistakes but becoming aware of a breath that lets you carry on even after one. What I teach first in my workshops is how to use the small courage of restating things without hiding a mistake.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「一音でも誤ると」のように、判断や手順を失敗する意味。「道を誤る」「誤った」も頻出。",
+    "sense": "動詞「誤る」＝まちがえる"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "郷里",
+   "reading": "きょうり",
+   "pos": "noun",
+   "meaning": "hometown; native place",
+   "defJa": "生まれ育った土地。ふるさと",
+   "passage": {
+    "ja": "吉田松陰は、郷里の萩で松下村塾を運営し、身分を問わず若者を受け入れました。短い期間であったにもかかわらず、高杉晋作や伊藤博文など、明治維新と近代国家の建設を担う人材が出ています。松陰が貫いたのは、知識を覚えさせることより、自分の頭で国の行方を考えさせることでした。教室の外に広がる世界を見よ、という姿勢は、今の学び方にもそのまま通じます。建物は今も萩に残り、世界遺産の構成資産として多くの人が訪れる。",
+    "form": "郷里",
+    "en": "Yoshida Shoin ran the Shokason-juku academy in his home town of Hagi and accepted young people regardless of social rank. Although the period was short, it produced people who would carry the Meiji Restoration and the building of a modern state, such as Takasugi Shinsaku and Ito Hirobumi. What Shoin held to was not making students memorize knowledge but making them think for themselves about the country's direction. The attitude of looking at the world beyond the classroom applies directly to how we learn today. The building still stands in Hagi, and many people visit it as a component of a World Heritage site.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「郷里に帰る」「郷里の父母」。「故郷」より書き言葉で、生まれ育った土地を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "遂げる",
+   "reading": "とげる",
+   "pos": "verb",
+   "meaning": "to accomplish; to undergo",
+   "defJa": "目的を果たす。ある結果に達する",
+   "passage": {
+    "ja": "人ってさ、ある日突然変わるわけじゃないんだよね。でも、振り返ってみると、あれが転換点だったな、と思う時期が誰にでもあると思うんだ。たいていそれは、居心地のいい場所を出て、苦しいことに挑戦してた頃で、そこで人は大きな成長を遂げるんだ。焦って成長しようとするというより、少し背伸びする環境に身を置くほうが、案外うまくいくんだよ。あの頃の苦しさがあったから今がある、と笑って言える日がきっと来るよ。",
+    "form": "遂げる",
+    "en": "People don't change suddenly one day, you know. But looking back, I think everyone has a stretch they feel was a turning point. Usually it was a time when you left a comfortable place and took on something hard, and that's where people achieve big growth. Rather than rushing to grow, putting yourself in an environment that stretches you a bit tends to work out better than you'd expect. The day will surely come when you can say with a smile that you are where you are because of the hardship back then.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「成長を遂げる」「変貌を遂げる」「目的を遂げる」。結果にたどり着く固い語。",
+    "sense": "目的を果たす。変化に達する"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

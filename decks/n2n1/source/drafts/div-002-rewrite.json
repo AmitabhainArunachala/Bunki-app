@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "環境設計",
+   "reading": "かんきょうせっけい",
+   "pos": "noun",
+   "meaning": "designing one's environment",
+   "defJa": "望む行動が起こりやすいよう周囲を整えること",
+   "passage": {
+    "ja": "机に向かうたびに参考書を探し、筆記具をそろえていると、勉強を始める前に面倒になってしまいます。学習に先立って必要な道具を一か所に置き、開くページに印を付ける環境設計なら、意志の弱さを責めずに取り入れられます。これは行動を強制する方法ではなく、やろうと思った瞬間に手を動かせるよう準備する工夫です。続かなかった日を振り返る際も、集中できなかったという感想だけで終わらせず、最初の一歩を邪魔した物や手順を書き出すと、直す場所が見えてきます。",
+    "form": "環境設計",
+    "en": "If you search for your reference book and gather writing materials every time you sit down, studying can feel burdensome before you start. Designing your surroundings by putting the needed tools in one place and marking the page in advance is something you can adopt without blaming weak willpower. This does not force behavior; it prepares things so that you can act the moment you want to. When reflecting on a day you did not follow through, listing the objects or procedures that obstructed the first step, instead of stopping at the impression that you could not concentrate, reveals places to improve.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "ここでは、行動を支える物の配置や仕組みづくりを指します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "目標設定",
+   "reading": "もくひょうせってい",
+   "pos": "noun",
+   "meaning": "goal setting",
+   "defJa": "実現したい成果や到達点を具体的に決めること",
+   "passage": {
+    "ja": "外国語をもっと上手に話したいと思っても、練習の終わりに何ができればよいのかが曖昧だと、教材を次々に変えるだけになりがちです。目標設定では、来週の旅行までに宿の設備について一つ質問するなど、場面と期限を結びつける方法があります。達成できたら、相手の返事に応じて追加で尋ねる段階へ進めば、課題の難しさも少しずつ調整できます。練習帳には成功した回数だけでなく、どの返事を聞いたときに言葉が出なくなったかも残すと、翌日の課題がはっきりします。",
+    "form": "目標設定",
+    "en": "Even if you want to speak a foreign language better, being unclear about what you should be able to do by the end of practice can leave you merely switching materials. One approach to goal setting is to connect a situation with a deadline, such as asking one question about accommodation facilities by next week’s trip. Once you succeed, moving to follow-up questions according to the other person’s reply lets you adjust the difficulty gradually. Recording not only successes but also which replies left you unable to speak makes the next day’s task clear.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「目標設定を見直す」のように、目指す水準を決め直せます。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,181 @@
+{
+ "batch": "r5-ai-038",
+ "items": [
+  {
+   "term": "階層構造",
+   "reading": "かいそうこうぞう",
+   "gloss": "hierarchical structure",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Naturally name ホフスタッター where useful. His strange loops return through levels to the referring system, not just ordinary repetition or circular process; his account of self/consciousness is a proposal, not an experimentally established mechanism."
+  },
+  {
+   "term": "自己相似",
+   "reading": "じこそうじ",
+   "gloss": "self-similarity",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "記号接地問題",
+   "reading": "きごうせっちもんだい",
+   "gloss": "symbol grounding problem",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "Harnad original 1990 paper https://eprints.soton.ac.uk/250382/: how symbols acquire meaning grounded beyond other symbols, rather than meaning solely assigned by an external interpreter. Do not say the problem has been solved or that grounding proves consciousness."
+  },
+  {
+   "term": "メタ言語",
+   "reading": "めたげんご",
+   "gloss": "metalanguage",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "工場の小さな異常から工程の全体像へ",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "再帰呼び出し",
+   "reading": "さいきよびだし",
+   "gloss": "recursive call",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "基底条件",
+   "reading": "きていじょうけん",
+   "gloss": "base case in recursion",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-HOFSTADTER-RECURSION"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "動的計画法",
+   "reading": "どうてきけいかくほう",
+   "gloss": "dynamic programming",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "メモ化",
+   "reading": "めもか",
+   "gloss": "memoization",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "記事の語句を直し意味を正確にする",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "証明可能性",
+  "停止問題",
+  "対角線論法",
+  "固定点",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

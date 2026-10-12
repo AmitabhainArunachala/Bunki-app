@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "傍ら",
+   "reading": "かたわら",
+   "pos": "noun",
+   "meaning": "beside; at one’s side",
+   "defJa": "ある物や人のすぐそば。",
+   "passage": {
+    "ja": "机の上を片づけるついでに、いつも傍らに置いていた携帯を、隣の部屋の棚に移してみたんだ。通知が鳴るたびに手を伸ばす癖があって、本を読んでいても話の大意をすぐ見失ってたからさ。最初は何か大事な連絡を逃してる気がして、落ち着かなかったよ。でも、読みかけの一章を最後まで読めた日は、内容を自分の言葉で友達に話せたんだ。多読の冊数を増やすことばかり気にしてたけど、手の届く場所に何を置くかも、僕には大きな問題だったんだね。",
+    "form": "傍ら",
+    "en": "While tidying my desk, I moved the phone I always kept beside me to a shelf in the next room. I had a habit of reaching for it whenever a notification sounded, and I would quickly lose the thread even while reading. At first I felt restless, as if I were missing an important message. But on a day when I finished the chapter I had started, I could tell a friend about it in my own words. I had only been worrying about how many books I could get through, but what I kept within reach turned out to be a big issue for me too.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "場所を表す読みは「かたわら」。「仕事の傍ら」では並行する活動を表す。",
+    "sense": "人や物のすぐそば。"
+   }
+  },
+  {
+   "term": "災害",
+   "reading": "さいがい",
+   "pos": "noun",
+   "meaning": "disaster",
+   "defJa": "地震や洪水などによって生じる被害。",
+   "passage": {
+    "ja": "大雨で川があふれた場合、住宅の被害に加えて、橋や道路の寸断が地域の暮らしを長く左右する。災害への備えを考える際には、堤防の強化だけでなく、食料や薬をどう届けるかという視点も欠かせない。巨額の工事費を投じても、集落へ通じる道が一本しかなければ、そこが使えなくなったときの対応が必要である。避難先までの距離が同じでも、歩ける人と介助が要る人では移動にかかる時間が違う。地図上の線を引くだけでは、住民が実際に動ける計画にはならない。",
+    "form": "災害",
+    "en": "If heavy rain causes a river to overflow, damage to homes and the severing of bridges and roads can affect local life for a long time. Preparing for a disaster requires attention not only to strengthening levees but also to how food and medicine will be delivered. Even if huge sums are spent on construction, a community with just one access road still needs a response for when that road becomes unusable. Even over the same distance to a shelter, people who can walk and those who need assistance take different amounts of time to travel. Drawing lines on a map alone does not produce a plan residents can actually follow.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "「災害に備える」「災害が発生する」と使う。避難や復旧が伴う規模の被害。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "古事記",
+   "reading": "こじき",
+   "pos": "noun",
+   "meaning": "Kojiki, an early Japanese chronicle",
+   "defJa": "日本の神話や皇統などを記した古代の書物。",
+   "passage": {
+    "ja": "神々の争いを読んでいたはずが、いつの間にか天皇の系譜や婚姻の話につながっていきます。『古事記』を開くと、現代の歴史書とは違う仕方で、国の始まりが語られていることに気づきます。そこでは、神話と人間の営みが切り離されることなく、一続きの物語として並びます。出来事を年ごとに追う年代記を読むつもりで臨むと、歌や系譜がなぜ挟まれるのか、戸惑うでしょう。事実かどうかを問うだけでなく、誰と誰のつながりが大切にされているかをたどると、編まれた物語の輪郭が見えてきます。",
+    "form": "古事記",
+    "en": "What seemed to be a story about quarrels among gods gradually leads into accounts of emperors’ genealogies and marriages. Opening the Kojiki, you notice that it tells of the country’s beginnings differently from a modern history book. Myth and human affairs appear as one continuous narrative without being separated. If you approach it expecting a chronicle that follows events year by year, you may wonder why songs and genealogies are interspersed. Looking not only at whether something is factual but also at which relationships receive emphasis helps reveal the shape of the compiled narrative.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "書名にはかぎ括弧を添えることが多い。神話と歴史の関係を考える資料。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "潜在能力",
+   "reading": "せんざいのうりょく",
+   "pos": "noun",
+   "meaning": "latent ability; potential",
+   "defJa": "まだ十分に表れていない力や可能性。",
+   "passage": {
+    "ja": "発言の少ない受講者に図で説明してもらったところ、言葉だけでは見落としていた関係を、丁寧につなげて示してくれました。試験の点や弁舌の巧みさだけで評価すると、こうした潜在能力を見逃す恐れがあります。ただし、誰にも天賦の才が眠っていると決めつければよいのではありません。課題の出し方や答える方法を変え、本人がどんな場面で力を発揮できるか、具体的に確かめる必要があります。できなかった理由を性格の一言で片づける前に、力が表に出る条件を一緒に探したいですね。",
+    "form": "潜在能力",
+    "en": "When I asked a participant who rarely spoke to explain something with a diagram, they carefully showed connections we had missed when using words alone. Judging only by test scores or eloquence risks overlooking latent ability like this. But that does not mean we should simply assume everyone has a natural gift lying dormant. We need to vary how tasks are presented and how people can answer, and check specifically which situations allow them to show their abilities. Before dismissing a difficulty as a matter of personality, I would like us to look together for conditions that let their abilities emerge.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「潜在能力を引き出す」。現在の成績として表れた力とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "言語学",
+   "reading": "げんごがく",
+   "pos": "noun",
+   "meaning": "linguistics",
+   "defJa": "人間のことばの仕組みや働きを研究する学問。",
+   "passage": {
+    "ja": "子どもが「行った」を「行いた」と言ったら、大人はすぐ言い直させたくなるものです。しかし、その間違いを手がかりにすると、子どもが動詞の変化をどう捉えているかという問いが生まれます。言語学では、正しい言い方を勧めるだけでなく、実際の発話を集めて、背後にある仕組みを探ります。専門用語を覚えることは、観察した違いを平明な言葉で説明する作業と切り離せません。一つの言い間違いにも、別の動詞なら同じ形になるのかと問い直すことで、調べる価値のある筋道が見つかります。",
+    "form": "言語学",
+    "en": "When a child uses the nonstandard “行いた” instead of “行った” for “went,” an adult may immediately want to correct them. Yet taking that error as a clue raises the question of how the child understands changes in verb forms. Linguistics goes beyond recommending correct expressions to collect actual utterances and investigate the systems behind them. Learning technical terms is inseparable from the work of explaining observed differences in clear language. Even a single verbal error can open up a worthwhile line of investigation if we ask whether another verb would take the same form.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "ことばの正誤を指導する活動とは区別する。「言語学の研究」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "忘却",
+   "reading": "ぼうきゃく",
+   "pos": "noun",
+   "meaning": "forgetting; oblivion",
+   "defJa": "覚えていたことが記憶から失われること。",
+   "passage": {
+    "ja": "旅先で毎晩つけた日記を読み返すと、風景よりも、なぜその言葉を書いたのかが思い出せない。記録さえあれば過去を取り戻せると考えていたが、文字と当時の気持ちの間には距離がある。忘却を恐れるあまり、何もかも残そうとすれば、今度は記録する作業が旅の中心になってしまう。写真も文章も、経験の全体ではなく、そのとき選んだ一部分にすぎない。それでも一行の記述が引き金となって、すっかり失われたと思っていた声や匂いが、思いがけず戻ってくることはある。",
+    "form": "忘却",
+    "en": "When I reread the diary I kept each night while traveling, it is why I wrote those words, more than the scenery, that I cannot recall. I used to think a record would let me recover the past, but there is a distance between the words and what I felt then. If fear of forgetting makes us try to preserve everything, keeping records can itself become the center of the trip. Photographs and prose are only portions selected at the time, rather than the whole experience. Still, a single line can act as a trigger and unexpectedly bring back a voice or smell we thought was completely lost.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「忘却の彼方」「忘却に抗う」など、記憶の喪失を文章語で表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "王朝",
+   "reading": "おうちょう",
+   "pos": "noun",
+   "meaning": "dynasty",
+   "defJa": "同じ家系の君主が代々支配する時代や政権。",
+   "passage": {
+    "ja": "歴史地図で国名が変わったからといって、住民の暮らしまで一度に変わったとは限らない。王朝の交代に伴って君主の家系が替わる一方、役人や徴税の仕組みが引き継がれる場合もある。新たな支配者は、自らの正統性を示すため、前の時代との違いを強調することがある。年代記に描かれた大きな断絶と、地方の記録に残る日々の連続は、同じ出来事の異なる面である。政権の名前だけを追うのではなく、誰が税を集め、どの法が使われたかを比べることで、交代の実態を検討できる。",
+    "form": "王朝",
+    "en": "A change of country name on a historical map does not necessarily mean residents’ lives changed all at once. A change of dynasty brings a new ruling family, while officials and systems of taxation may be carried over. New rulers sometimes emphasize differences from the preceding era to establish their legitimacy. The sharp break depicted in a chronicle and the everyday continuity preserved in local records are different aspects of the same event. Comparing who collected taxes and which laws were used, rather than following government names alone, allows us to examine what the transition actually involved.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「王朝が交代する」。建物を指す「王宮」とは異なり、支配の系統を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "統語論",
+   "reading": "とうごろん",
+   "pos": "noun",
+   "meaning": "syntax",
+   "defJa": "語を組み合わせて文を作る仕組みの研究。",
+   "passage": {
+    "ja": "「犬が猫を追った」と「猫が犬を追った」は、使っている単語が同じでも、描いている出来事が逆です。単語の意味を一つずつ足すだけでは、この違いを説明しきれません。どの語がどの語と結び付き、文全体がどんな構造を持つかを調べるのが統語論です。単語の内部を扱う形態論と区別しつつ、助詞の働きなど、両方に関わる現象にも目を向けます。専門用語に慣れてからでないと始められないと思わず、まずは短い文を並べ、何を変えると意味が変わるのかを観察してみてください。",
+    "form": "統語論",
+    "en": "“The dog chased the cat” and “The cat chased the dog” use the same words but describe opposite events. Merely adding up the meanings of individual words cannot fully explain the difference. Syntax investigates which words connect with which and what structure the sentence has as a whole. It is distinguished from morphology, which deals with the internal structure of words, while also considering phenomena such as particles that concern both areas. Rather than thinking you cannot begin until you know the terminology, start by comparing short sentences and observing what changes alter their meaning.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "単語内部を扱う「形態論」に対し、語句どうしの関係や文の構造を扱う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "絶対王政",
+   "reading": "ぜったいおうせい",
+   "pos": "noun",
+   "meaning": "absolute monarchy",
+   "defJa": "君主に強い権力を集中させた政治体制。",
+   "passage": {
+    "ja": "近世ヨーロッパの王が強い権力を持ったと習うと、一人ですべてを決められたように想像しがちです。絶対王政を学ぶ際には、王権の強さに加えて、それを支えた役人や軍隊、税の仕組みを整理しましょう。王がどれほど命令を出しても、地方で実行する人と費用がなければ政治は動きません。また、貴族や都市との関係を抜きにして、専制君主の意思だけから時代を説明するのも危険です。市民革命との対比を覚える前に、命令が社会の隅々まで届く条件を図にすると、体制の特徴がつかみやすくなります。",
+    "form": "絶対王政",
+    "en": "When we learn that early modern European kings held great power, we tend to imagine they could decide everything alone. In studying absolute monarchy, organize your understanding of the officials, armies, and tax systems that supported royal authority as well as its strength. No matter how many commands a king issued, government could not function without people and money to implement them locally. It is also risky to explain an era solely through an autocrat’s will while leaving out relations with nobles and towns. Before memorizing the contrast with bourgeois revolutions, diagramming the conditions that let commands reach throughout society can make the system easier to understand.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "近世ヨーロッパ史などで使う。実際の王権を無制限とみなすのは避ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "継続は力なり",
+   "reading": "けいぞくはちからなり",
+   "pos": "expression",
+   "meaning": "steady effort builds strength",
+   "defJa": "地道に続けることが実力につながるという教え。",
+   "passage": {
+    "ja": "毎日同じ難しい本を開いてるのに、同じページで止まっちゃうって、それはしんどいよね。「継続は力なり」って言葉は好きだけど、苦しいやり方まで守り抜く必要はないと思うんだ。僕も多読を始めたころ、辞書を引いてばかりで、話の続きが全然気にならなくなってたよ。そこで、知らない単語があっても大意を追える本に替えたところ、寝る前に自然と手が伸びるようになったんだ。続けるために方法を変えたっていいし、昨日より短くても、面白いと思える一節を読めたら、それを今日の一歩にしようよ。",
+    "form": "継続は力なり",
+    "en": "Opening the same difficult book every day and getting stuck on the same page sounds exhausting. I like the saying that steady effort builds strength, but I do not think we have to persist with a painful method too. When I first tried extensive reading, I spent so much time consulting the dictionary that I stopped caring what happened next. Then I switched to a book whose main thread I could follow despite unfamiliar words, and found myself naturally reaching for it before bed. It is fine to change methods so you can keep going, and even if you read less than yesterday, let one passage you enjoy count as today’s step.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "努力の積み重ねを励ますことわざ。やり方の見直しと組み合わせて使う。",
+    "sense": ""
+   }
+  }
+ ]
+}

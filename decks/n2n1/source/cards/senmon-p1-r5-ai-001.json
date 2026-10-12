@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "著作権",
+   "reading": "ちょさくけん",
+   "pos": "noun",
+   "meaning": "copyright",
+   "defJa": "作品を創った人が持つ権利",
+   "passage": {
+    "ja": "メディア各社とAI企業の間で、生成AIの学習データをめぐるライセンス契約が相次いでいる。ここで数字の読み方が立場で分かれる。仮に契約額が公表されたとしても、AI企業にとっては学習データの調達費であり、出版社にとっては著作権への対価の先例だ。先例という観点で読めば、一社との数字が他社との交渉の基準になりかねない。報道の数字を検証するとき、それを費用の記録として読むのか、権利の値付けの始まりとして読むのかで、意味は変わる。",
+    "form": "著作権",
+    "en": "Licensing deals have been stacking up between media companies and AI firms over generative AI's training data. This is where the reading of the numbers splits by standpoint. Even if a contract figure were made public, to the AI firm it is a procurement cost for training data, while to the publisher it is a precedent for compensation for copyright. Read as a precedent, one company's number could well become the benchmark in negotiations with others. When you verify a reported figure, whether you read it as a record of expenses or as the start of pricing rights changes what it means.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「著作権を保有する」「著作権に触れる」など、権利として扱う文脈で出る語",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "検証",
+   "reading": "けんしょう",
+   "pos": "noun",
+   "meaning": "verification; checking that a claim is true",
+   "defJa": "正しいかどうか確かめること",
+   "passage": {
+    "ja": "対話型のAIに長い答えを書かせるとき、その便利さの代金が一体どこで払われるのか。出力は流暢なものの、誤りは表面には見えない。しかも人の認知は、滑らかな文を何となく正しいと受け取りやすい。だから出力を使う側は、その内容を仮説として検証する時間という形で、必ずどこかで代金を支払うことになる。この費用は道具を選んだ瞬間には見えないのに後から利子のように請求され、結局、便利な選択の本当の値段は、画面に表示された金額ではなく、見落とされた時間の勘定科目にある。",
+    "form": "検証",
+    "en": "When you have a conversational AI write a long answer, where on earth does the price of that convenience get paid? The output is fluent, yet its errors never show on the surface. Moreover, human cognition somehow tends to take smooth prose as true. So whoever uses the output inevitably pays the bill somewhere, in the form of time spent verifying its content as a hypothesis. This cost is invisible at the moment you choose the tool yet gets billed later like interest, and in the end the real price of a convenient choice lies not in the fee shown on screen but in the overlooked ledger entry of time.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「仮説を検証する」の形が典型。正しさを確かめる行為を硬めに言う語",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

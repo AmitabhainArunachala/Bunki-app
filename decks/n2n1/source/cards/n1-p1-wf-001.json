@@ -1,0 +1,312 @@
+{
+ "cards": [
+  {
+   "term": "はらはら",
+   "reading": "はらはら",
+   "pos": "adverb",
+   "meaning": "anxiously, on edge",
+   "defJa": "危なっかしくて、心配で落ち着かないさま",
+   "passage": {
+    "ja": "歴史の語り手は、聴き手を最後までずっとはらはらさせる術を知っている。たとえば一九四五年の八月、御前会議の席上で意見が割れたまま時間だけが過ぎていった場面を、「その夜、まだ誰も結論を知らなかった」と語り始める。結末を把握しているはずの聴き手ですら、息を詰めて、画面の前で続きを待つ。事実に忠実でありながら、語りの順序をほんの少し工夫するだけで、これほどの緊張は生まれるのだ。",
+    "form": "はらはら",
+    "en": "Storytellers of history know how to keep their listeners on edge. In August 1945, for instance, they begin the scene in which opinions in the meeting stayed split while time slipped by by saying that no one yet knew the conclusion that night. Even listeners who surely know the ending hold their breath and wait for what follows. Merely by arranging the order of the telling, while staying faithful to the facts, this much tension is produced.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「はらはらさせる」「はらはらしながら見守る」と使い、危うさへの不安を表す擬態語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "富豪",
+   "reading": "ふごう",
+   "pos": "noun",
+   "meaning": "wealthy person, millionaire",
+   "defJa": "大きな財産を持っている人",
+   "passage": {
+    "ja": "かつて富豪とは、鉄道や石油のように、目に見える資産を抱える人を指した。いま世界の長者番付の上位には、ソフトウェアや半導体など、テクノロジー企業を率いる人々が並ぶ。形のない知識や設計図が、これほど巨大な価値を生むという事実は、経済の重心が「物」から「思考」へ移ったことを物語っている。もっとも、どれほどの富といえども、それが社会に還元されるかどうかは別の問いとして残る。",
+    "form": "富豪",
+    "en": "In the past, a person of great wealth meant someone holding visible assets such as railways and oil. Today the upper ranks of the world's rich lists are lined with people who lead technology companies. The fact that formless knowledge and blueprints produce this much value tells us that the center of gravity of the economy has moved from things to thought. Still, however great the wealth, whether it is returned to society remains a separate question.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「大富豪」「富豪の暮らし」と使い、財産が非常に多い人を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "賢明",
+   "reading": "けんめい",
+   "pos": "na-adj",
+   "meaning": "wise, prudent",
+   "defJa": "物事の道理をわきまえ、判断が的確なさま",
+   "passage": {
+    "ja": "『バガヴァッド・ギーター』の冒頭、戦場で立ちすくむアルジュナに、クリシュナは行動の結果を握りしめるなと説く。成果への執着を手放し、為すべきことだけに打ち込む。これは現代の仕事術にも通じる賢明な態度だと、多くの解説者が指摘している。もっとも、手放すことと投げやりになることは別物であり、そこを混同しては元も子もない。試験の前夜に参考書を開く受験生にも、同じ教えが当てはまるだろう。",
+    "form": "賢明",
+    "en": "At the opening of the Bhagavad Gita, Krishna tells Arjuna, frozen on the battlefield, not to clutch at the fruits of his actions. Let go of attachment to results and devote yourself only to what must be done. Many commentators point out that this is a wise attitude that applies to modern working life too. Still, letting go is not the same as being half-hearted, and if the two are confused, the whole point is lost. The same teaching probably applies to a student opening a reference book the night before an exam.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「賢明な判断」「〜するのが賢明だ」の形で、状況を見極めた上での的確な選択をほめる語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "切ない",
+   "reading": "せつない",
+   "pos": "i-adj",
+   "meaning": "painful, heartrending",
+   "defJa": "胸がしめつけられるほど、悲しくやるせない",
+   "passage": {
+    "ja": "インド北部の町ヴァラナシでは、ガンジス川の岸で毎夕、日没のころになると祈りの火が川面にかざされる。観光客の多くはその華やかさに目を奪われるが、岸辺の火葬場から立ちのぼる煙を見て、胸がどこか切なくなったという人も少なくない。寿命の尽きる日をこの町で迎えたいと願い、はるばる訪れる人さえいる。観光地としての人気にもかかわらず、町の本質は、あくまで生と死が隣り合う巡礼の場である。",
+    "form": "切なく",
+    "en": "In Varanasi, a town in northern India, a fire of prayer is held out over the surface of the Ganges every evening. Most tourists are captivated by the splendor, but not a few say their hearts ached at the sight of smoke rising from the cremation ground on the bank. Some even travel a long way hoping to meet the day their life ends in this town. Despite its popularity as a sightseeing spot, the true nature of the town remains that of a pilgrimage place where life and death sit side by side.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「切ない気持ち」「胸が切なくなる」と使い、悲しさと恋しさが混じった痛みを表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "合間",
+   "reading": "あいま",
+   "pos": "noun",
+   "meaning": "interval, gap (between things)",
+   "defJa": "仕事や用事と用事のあいだの短い空き時間",
+   "passage": {
+    "ja": "忙しい人ほど「まとまった時間ができたらやろう」と言いますが、そんな日はほとんど来ません。成果を出す人は、電車の待ち時間や会議の合間といった五分十分の隙間を、使い倒しています。細切れの時間とはいえ、やることを小さく分けておけば、思考はすぐに切り替わります。習慣は、時間を探す技術ではなく、置き場所を決める技術です。私の場合は、歯を磨いたあとの二分間を、毎日同じ一つの作業にあてています。",
+    "form": "合間",
+    "en": "The busier people are, the more they say they will do it once they have a block of time, but such a day hardly ever comes. People who produce results use up every five- or ten-minute gap, such as waiting for a train or the breaks between meetings. Even when time comes in fragments, if you divide what you must do into small pieces, thought switches over quickly. A habit is not a skill of searching for time but a skill of deciding where things go. In my own case, I give the two minutes after brushing my teeth to the same single task every day.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「仕事の合間に」「合間を縫って」と使い、用事と用事のあいだの短い時間を表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ややこしい",
+   "reading": "ややこしい",
+   "pos": "i-adj",
+   "meaning": "complicated, confusing",
+   "defJa": "事情が入り組んで、わかりにくいさま",
+   "passage": {
+    "ja": "日本語の「ある」と「いる」は、一見ややこしいです。人や動物は「いる」、物は「ある」と習いますが、ロボットや映画の登場人物となると、とたんに判断が揺らぎます。実は、動いて意志を持つように見えるかどうかが、感覚的な分かれ目になっているのです。母語話者が理屈抜きで使い分けられるのは、この感覚を無意識に把握していればこそです。だから教える側は、規則を並べる前に、まず例を見せて感覚を育てるほうがいいのです。",
+    "form": "ややこしい",
+    "en": "The Japanese words aru and iru are confusing at first glance. We learn that people and animals take iru and things take aru, but when it comes to robots or characters in movies, judgment suddenly wavers. In fact, whether something seems to move and have a will is the intuitive dividing line. That native speakers can tell the two apart without reasoning is precisely because they grasp this feeling unconsciously. So teachers are better off showing examples first to build the feel, before lining up rules.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「ややこしい話」「ややこしい関係」と使い、事情や仕組みが入り組んでいることを表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "挑む",
+   "reading": "いどむ",
+   "pos": "verb",
+   "meaning": "to challenge, to take on",
+   "defJa": "困難な相手や課題に、立ち向かっていくこと",
+   "passage": {
+    "ja": "紀元前四九〇年、マラトンの平原で、アテナイの市民軍は数で勝るとされるペルシア軍に挑んだ。勝敗を分けたのは兵の数ではなく、重装歩兵の密集隊形と、地形を生かした戦い方だったと伝えられる。もっとも、史料の大半がギリシア側の記述であるため、実際の規模を一概に決めることはできない。強者に立ち向かう物語は魅力的だが、後世の人々が意味を与えればこそ、この戦いは語り継がれてきたのである。",
+    "form": "挑んだ",
+    "en": "In 490 BC, on the plain of Marathon, the Athenian citizen army took on a Persian army said to be superior in numbers. What decided the outcome was said to be not the number of troops but the dense formation of heavy infantry and a way of fighting that used the terrain. Still, since most of the sources are Greek accounts, the actual scale cannot be decided unconditionally. A story of standing up to the strong is attractive, but it is precisely because later generations gave it meaning that this battle has been handed down.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「強敵に挑む」「記録に挑む」と使い、手ごわい相手や課題に立ち向かう。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "先",
+   "reading": "せん",
+   "pos": "noun",
+   "meaning": "initiative, precedence",
+   "defJa": "相手より早く仕掛けて主導を握る位置",
+   "passage": {
+    "ja": "剣道の稽古では、「先を取る」という言葉がよく使われます。相手が動き出す前に、気配を読んで自分から仕掛けることです。ビジネスの交渉でも同じで、資料を整えて待つより、相手の関心を察する最初の一言を選ぶ人のほうが、会話の主導権を握ります。技術の差どころか、一歩目の意識の差が結果を分けるのです。打たれる前に間合いを詰める練習を、何百回も根気よく繰り返すのだそうです。",
+    "form": "先",
+    "en": "In kendo there is an expression meaning to take the initiative. It means reading the signs and striking first, before the opponent starts to move. The same goes for business negotiations: the person who senses the other side's interest and chooses the first words holds more control of the conversation than one who prepares materials and waits. More than a difference in skill, it is a difference in awareness of the first step that divides the results. They are said to repeat, hundreds of times, the practice of closing the distance before being struck.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "武道で「先（せん）を取る」と読み、相手より早く主導権を握ることを表す。",
+    "sense": "せん：武道で先に仕掛けること"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "察する",
+   "reading": "さっする",
+   "pos": "verb",
+   "meaning": "to sense, to guess, to infer",
+   "defJa": "言葉に出ない相手の気持ちや事情を推し量る",
+   "passage": {
+    "ja": "大規模言語モデルは、文面の裏にある相手の事情を察するのが苦手だとされてきた。「寒いですね」という一言が、窓を閉めてほしいという依頼だと読み取れるかどうかは、文脈の理解に直結する。近年のモデルはこの種の問いにかなり的確に答えられるようになったものの、実際の会話で安定して成功するかは別の話である。評価の方法そのものを含め、検証はまだ途上にあると指摘する研究者もいる。",
+    "form": "察する",
+    "en": "Large language models have been said to be poor at sensing the circumstances of the other party behind the surface of a text. Whether one can read a remark like it's cold as a request to close the window bears directly on understanding of context. Although recent models can now answer questions of this kind fairly well, whether they succeed steadily in actual conversation is another matter. Some researchers point out that verification is still under way.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「気持ちを察する」「事情を察する」と使い、言われなくても相手の心を推し量る。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "嘆く",
+   "reading": "なげく",
+   "pos": "verb",
+   "meaning": "to lament, to grieve",
+   "defJa": "悲しいと思って、声や言葉に出して悲しむ",
+   "passage": {
+    "ja": "「AIに仕事を奪われる」と嘆く前に、自分の仕事を一度ばらしてみたことある？やってみると、資料集めも下書きも、データの整理も、AIに任せられる作業は意外と多いんだよ。逆に、相手の顔色を見て話の順番を変えたり、最後に責任を取ったりするのは、まだ当分は人間の領分でしょ。そこが把握できれば、悲観するどころか、むしろ自分のキャリアの見通しがすっと楽になる人もいるはずだ。",
+    "form": "嘆く",
+    "en": "Before you lament that AI will take your job, have you ever taken your own work apart? Once you try, there turn out to be a surprising number of tasks, like gathering materials and writing first drafts, that you could leave to AI. Conversely, reading the other person's face and changing the order of what you say, or taking responsibility in the end, are still human territory. If you can grasp that, some people may find their career outlook easier, far from becoming pessimistic.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「現状を嘆く」「嘆いても始まらない」と使い、悲しみや不満を口に出して悲しむ。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "幹線",
+   "reading": "かんせん",
+   "pos": "noun",
+   "meaning": "main line, trunk line",
+   "defJa": "鉄道や道路などの中心となる主要な路線",
+   "passage": {
+    "ja": "インドの鉄道は、イギリス統治下の一八五三年にボンベイ近郊で最初の旅客列車が走ったのが始まりです。その後に敷かれた幹線は、綿花をはじめとする物資を港へ運ぶのが主な目的でしたが、結果として人々の移動も一気に広げ、庶民もその恩恵を受けるようになりました。いまも世界有数の規模で、毎日きわめて多くの乗客を運んでいます。鉄道が国の一体感を育てたと語る歴史家も少なくありません。",
+    "form": "幹線",
+    "en": "Indian railways began in 1853 under British rule, when the first passenger train ran near Bombay. The trunk lines laid afterward were meant mainly to carry goods such as cotton to the ports, but as a result they also broadened people's movement all at once, and ordinary people came to enjoy the benefits. Even now, on a scale among the world's largest, they carry an extremely large number of passengers every day. Not a few historians say the railways nurtured the nation's sense of unity.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「幹線道路」「幹線鉄道」と使い、枝線に対して中心となる主要な路線を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "志す",
+   "reading": "こころざす",
+   "pos": "verb",
+   "meaning": "to aspire to, to set one's heart on",
+   "defJa": "ある目標を目指して心に決めること",
+   "passage": {
+    "ja": "近年、文系の学部を出てから半導体やAIの研究者を志す社会人が増えているという。大学院が社会人向けの夜間コースを設けたり、企業が学び直しを応援する制度を整えたりと、受け皿も整いつつある。もっとも、数学の基礎が不足したまま入学すれば、授業についていけずに途中で挫折する恐れがある。入学に先立って、地味でも線形代数と確率の復習から始めるよう助言する教員が少なくない。",
+    "form": "志す",
+    "en": "It is said that in recent years more working adults who graduated from humanities departments are aspiring to become researchers in semiconductors and AI. Graduate schools are offering evening courses for working people and companies are putting in place systems that support re-learning, so the receiving structures are coming together. Still, if one enrolls with a weak foundation in mathematics, there is a risk of failing to keep up and giving up. Many instructors advise starting, before enrollment, by reviewing linear algebra and probability.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「医学の道を志す」「研究者を志す」と使い、目標を心に決めてそれを目指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "人影",
+   "reading": "ひとかげ",
+   "pos": "noun",
+   "meaning": "human figure, silhouette",
+   "defJa": "人の姿や、物に映った人の影",
+   "passage": {
+    "ja": "夜道で人影を見た気がして振り返ったら、ただの電柱だった、なんて経験ない？あの嫌な直感は、脳が曖昧なものを人と決めつけるように進化したせいらしいよ。見逃して襲われるより、見間違えて笑われるほうが生存にはずっと有利だったから、そう判断せざるを得なかったわけだ。だから怖がりの自分を責める必要はなくて、脳がまじめに仕事をした証拠だと、それこそむしろ誇ってもいいくらいだよ。",
+    "form": "人影",
+    "en": "Haven't you had the experience of feeling you saw a human figure on a night road, turning around, and finding it was just a utility pole? That unpleasant hunch is apparently because the brain evolved to treat ambiguous things as people. Missing a threat and being attacked was far worse than mistaking something and being laughed at, so the brain had no choice but to judge that way. So there's no need to blame yourself for being timid; think of it as proof that your brain was doing its job seriously.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「人影がない」「人影が動く」と使い、はっきり見えない人の姿や、人気のなさを表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一概に",
+   "reading": "いちがいに",
+   "pos": "adverb",
+   "meaning": "unconditionally, without exception",
+   "defJa": "全部をひとまとめにして決めつけるさま",
+   "passage": {
+    "ja": "歴史上の人物を「名君」「暴君」と一概に決めつけると、話はたちまち平板になる。同じ人物が、家臣には手厚い待遇を与え、敵には容赦なく刃を向けた例は珍しくない。聞き手に伝えたいなら、評価の言葉をひとつ選ぶ前に、その人が置かれた状況を具体的に描くことだ。そうすれば、断定を避けながらも、輪郭のはっきりした人物像が浮かんでくる。評価は、聞き手が自分で下したくなる材料を並べたあとに、そっと添えるものだ。",
+    "form": "一概に",
+    "en": "If you flatly label a historical figure a wise ruler or a tyrant, the story immediately turns flat. It is not rare for the same person to give retainers generous treatment and turn the blade on enemies without mercy. If you want to get through to your listener, before choosing a single word of judgment, describe concretely the situation that person was in. Then, while avoiding assertion, a figure with a clear outline comes to mind. A verdict is something to add gently, after lining up the material that makes the listener want to reach it on their own.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「一概に〜とは言えない」「一概には決められない」と、否定とともに使うのが基本。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

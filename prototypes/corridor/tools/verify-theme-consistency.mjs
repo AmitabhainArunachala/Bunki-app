@@ -24,7 +24,8 @@ const { server, base } = await new Promise((ok, fail) => {
   s.once('error', fail);
   s.listen(0, '127.0.0.1', () => ok({ server: s, base: `http://127.0.0.1:${s.address().port}` }));
 });
-const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu'];
+// D2 (round 4): 殻 is a public world again, so the sweep covers it too
+const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku'];
 const browser = await chromium.launch();
 const failures = [];
 const norm = (c) => c.replace(/\s/g, '');

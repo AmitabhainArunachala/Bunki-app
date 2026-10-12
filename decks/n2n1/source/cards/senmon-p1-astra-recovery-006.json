@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "万物",
+   "reading": "ばんぶつ",
+   "pos": "noun",
+   "meaning": "all things; all creation",
+   "defJa": "この世界に存在するあらゆるもの。",
+   "passage": {
+    "ja": "インド哲学を学びながら、万物の根底に共通するものはあるのかという問いを考えてみます。目の前の器と、それを見ている自分を、初めから全く別のものとして扱ってよいのかという疑問です。こうした問いは、外の世界のみならず、世界を分けて捉える自分の見方にも向けられます。一つの答えを急いで丸暗記するより、何を同じものと呼び、どこに違いを認めるのかを言葉にしてみましょう。普段は意識しない区別を確かめることが、慣れ親しんだ世界観を問い直す練習になります。",
+    "form": "万物",
+    "en": "While studying Indian philosophy, consider the question of whether something common underlies all things. It asks whether we may treat the vessel before us and the self looking at it as completely separate from the outset. Such a question concerns not only the external world but also our own way of dividing and perceiving it. Rather than rushing to memorise one answer, try putting into words what you call the same and where you acknowledge differences. Examining distinctions we ordinarily take for granted becomes an exercise in questioning a familiar worldview.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「万物の根底」は、世界にあるあらゆるものの基にあるものを問う表現です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "整列",
+   "reading": "せいれつ",
+   "pos": "noun",
+   "meaning": "lining up; forming orderly rows",
+   "defJa": "決められた順序や形にきちんと並ぶこと。",
+   "passage": {
+    "ja": "画像認識で動く搬送ロボットの案内に、待機場所で整列してくださいという指示を書くとします。並ぶ向きや間隔を示さなければ、人間には大まかに通じても、動作の条件を決める説明としては不十分です。ロボットが周囲の画像をもとに位置を判断するなら、何を目印として扱うかも書き分ける必要があります。推論の可能性を広く語るより、入力された情報と求める動きを一組で示すほうが、仕様を確かめやすくなります。日常語で済む箇所と、数値や図で定める箇所を分けるのが、技術文書を整える出発点です。",
+    "form": "整列",
+    "en": "Suppose guidance for transport robots that use image recognition instructs them to line up in a waiting area. Without specifying orientation and spacing, this may convey a rough idea to a human but is insufficient as an explanation of the conditions governing movement. If the robots determine their positions from images of their surroundings, the text also needs to distinguish what they should treat as landmarks. Presenting the input information together with the desired movement makes specifications easier to check than discussing inference capabilities broadly. Distinguishing what everyday language can convey from what requires numbers or diagrams is a starting point for refining technical documentation.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「整列する」は、決めた向きや順序で、乱れずに並ぶことです。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "知性",
+   "reading": "ちせい",
+   "pos": "noun",
+   "meaning": "intelligence; intellect",
+   "defJa": "物事を理解し、筋道を立てて考える能力。",
+   "passage": {
+    "ja": "対話型の人工知能を紹介する記事で、流暢な返答を見せた後、知性を感じるとだけ書けば、評価の中身が曖昧になります。言葉が滑らかだからといって、説明の筋道まで正しいとは限りません。未知の問いを考えられるという意味なのか、利用者の意図を読み取れるという意味なのかを、具体例とともに示したいですね。同じ表現でも、何を能力の本質と見るかによって、読者の想像する姿は変わります。印象を伝える一語を残す場合も、その印象を生んだやり取りを添えると、読者が自分で判断する手がかりになります。",
+    "form": "知性",
+    "en": "In an article introducing a conversational AI, merely saying that you sense intelligence after showing a fluent reply leaves the basis of the assessment vague. Smooth language does not necessarily mean that the reasoning in the explanation is correct. Specify with examples whether you mean an ability to think through an unfamiliar question or to interpret a user’s intention. Even with the same expression, what readers imagine changes according to what is regarded as the essential ability. If you retain a single word conveying an impression, adding the exchange that produced it gives readers a basis for their own judgment.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "文章の滑らかさだけでなく、理解や筋道立てた思考の能力を指す語です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "レトリック",
+   "reading": "れとりっく",
+   "pos": "noun",
+   "meaning": "rhetoric; rhetorical technique",
+   "defJa": "言葉を工夫して表現の効果を高める技法。",
+   "passage": {
+    "ja": "広告の文で、朝が変われば一日が変わるって繰り返すと、ただ便利な品だと言うより耳に残るよね。こういうレトリックは、事実を増やさなくても、言葉の並べ方で印象を強められるんだ。ただ、もっともらしい響きに引かれるあまり、何を約束している文なのかを確かめずに読むと危ない。朝がどう変わるのかを普通の言葉に直してみると、具体的な説明があるかどうか分かるよ。表現の面白さを楽しみつつ、その奥の主張も読めると、広告を眺める時間がちょっとした言葉の練習になるね。",
+    "form": "レトリック",
+    "en": "When an advertisement repeats that changing your morning changes your day, it is more memorable than merely calling the product useful. Rhetorical techniques like this strengthen an impression through the arrangement of words without adding facts. But it is risky to become so drawn to a persuasive sound that you read without checking what the sentence promises. Rephrasing how the morning will change in ordinary language shows whether a concrete explanation exists. Enjoying the expression while also reading the claim beneath it can turn time spent looking at advertisements into a little language practice.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "ここでは繰り返しなど、言葉の配置で印象を強める表現技法を指します。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シャドーイング",
+   "reading": "しゃどーいんぐ",
+   "pos": "noun",
+   "meaning": "shadowing spoken language",
+   "defJa": "聞こえる音声を少し遅れて繰り返す練習。",
+   "passage": {
+    "ja": "日本語の短い会話を流し、聞こえた言葉を少し遅れて声に出すのがシャドーイングです。文を最後まで聞いてから繰り返す方法とは違い、音を追いかけながら口を動かします。初めはスピードに気を取られがちですが、語尾の上がり方や助詞のつながりにも注意を向けます。意味を確認した上で同じ会話を聞き直すと、文字で読んだときには気づかなかった言い方を探れます。速い音声を追えたかだけで終わらず、自分がどの音を落としたかを振り返る時間も、練習の中に組み込みましょう。",
+    "form": "シャドーイング",
+    "en": "Shadowing involves playing a short Japanese conversation and saying the words aloud slightly after hearing them. Unlike repeating a sentence after listening to the end, you move your mouth while following the incoming sounds. At first you may focus mainly on speed, but also attend to rising sentence endings and the links between particles and neighbouring sounds. Listening to the same conversation again after checking its meaning lets you explore expressions you missed when reading it. Include time to examine which sounds you omitted rather than judging the exercise only by whether you kept up with fast speech.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "聞き終えてから言うのではなく、音声のすぐ後を追って発声する練習です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "国債",
+   "reading": "こくさい",
+   "pos": "noun",
+   "meaning": "government bond",
+   "defJa": "国が資金を借りるために発行する債券。",
+   "passage": {
+    "ja": "昔の戦争の費用を調べていると、税金を集める話と、国債を発行してお金を借りる話が出てくるよね。同じ国の収入に見えても、後で返す約束を伴うかどうかで、資金の集め方は違うんだ。大きな戦費が必要だったからといって、その額を全部その年の税金で用意したとは限らない。利息や返済の条件を追えば、お金を貸す側が国をどれだけ信用したかという問いにもつながる。戦場で何が起きたかだけでなく、誰が費用を引き受けたかを見ると、国力を支える仕組みにも目が向くよ。",
+    "form": "国債",
+    "en": "When researching the cost of historical wars, you encounter accounts both of collecting taxes and of issuing government bonds to borrow money. Although both may look like government income, they differ in whether they entail a promise to repay it later. The need for a large war budget does not mean that the entire sum was raised from that year’s taxes. Tracing interest and repayment terms also leads to questions about how much confidence lenders had in the state. Looking at who bore the costs as well as what happened on the battlefield draws attention to the mechanisms supporting national power.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "国が借金をするために発行し、条件に従った返済を約束する証券です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "たとえ話",
+   "reading": "たとえばなし",
+   "pos": "noun",
+   "meaning": "illustrative story; analogy",
+   "defJa": "似た別の場面に置き換えて説明する話。",
+   "passage": {
+    "ja": "文法の役割を説明するとき、言葉を町の中を走る車に見立ててみます。交通規則がなければ行き先へ進みにくいというたとえ話なら、語を知っているだけでは文を組み立てられないことを伝えられます。ただし、語彙を増やすことが車を増やすことと完全に同じだと思わせると、かえって理解を妨げます。分かりやすい話を作るにしても、元の内容とどの点が似ているのかを絞る必要があります。ひらめきで面白い場面を思いついたら、その場面のどこまでを説明に使うか、最後に確かめておきたいですね。",
+    "form": "たとえ話",
+    "en": "When explaining the role of grammar, try imagining words as cars travelling through a town. An illustrative story about the difficulty of reaching a destination without traffic rules can convey that knowing words alone does not enable us to construct sentences. But suggesting that increasing vocabulary is exactly the same as increasing the number of cars can obstruct understanding instead. Even when creating an accessible story, we need to narrow down the respects in which it resembles the original subject. If inspiration produces an interesting scene, make a final check of how much of that scene you intend to use in the explanation.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "別の身近な場面を物語として示し、似た点から理解を助ける説明です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

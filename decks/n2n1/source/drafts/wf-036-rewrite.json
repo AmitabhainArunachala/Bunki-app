@@ -1,0 +1,52 @@
+{
+  "cards": [
+    {
+      "term": "母語話者",
+      "reading": "ぼごわしゃ",
+      "pos": "noun",
+      "meaning": "native speaker",
+      "defJa": "幼い頃から自然に身につけた言語を話す人",
+      "passage": {
+        "ja": "ある表現を自然だと感じることと、その理由を文法の言葉で説明できることは、別の能力である。日本語の母語話者であっても、日々使っている助詞の違いを突然尋ねられれば、答えに迷うことがある。だからといって、その人の言語感覚が頼りにならないという結論にはならない。添削を受ける際は、正しい形だけを求めるのではなく、どんな場面なら元の文も使えるかを確かめると、説明だけでは見えなかった違いに気づける。身についた感覚と、意識して学ぶ知識を結びつけるところに、対話を通じて言葉を学ぶ面白さがある。",
+        "form": "母語話者",
+        "en": "Finding an expression natural and being able to explain why in grammatical terms are separate abilities. Even a native speaker of Japanese may struggle to answer a sudden question about the difference between particles they use every day. That does not mean their feel for the language is unreliable. When receiving corrections, asking in what situations the original sentence might also work, rather than seeking only the correct form, can reveal differences that explanation alone did not show. Connecting an acquired feel for language with consciously learned knowledge is part of what makes learning through dialogue interesting.",
+        "register": "論",
+        "topic": "language",
+        "tipJa": "幼少期からその言語を身につけた人を指し、文法の専門家とは限らない。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "比較優位",
+      "reading": "ひかくゆうい",
+      "pos": "noun",
+      "meaning": "comparative advantage",
+      "defJa": "他の生産を諦める量が相対的に少ないこと",
+      "passage": {
+        "ja": "料理も片付けも相手より速い人が、両方を全部引き受けるべきだとは限りません。役割分担を考えるにあたっては、片付けに時間を使うことで、それぞれがどれだけ料理を作る機会を失うかにも注目できます。このように、ある仕事のために諦める別の仕事の量が相対的に少ないことを、比較優位といいます。単に手が速いかどうかではなく、何を選ぶと何を失うかを比べるわけです。この家事の比喩を手がかりにすれば、貿易で分業の利益を考えるときにも、生産能力の大小だけを見ていては足りないと分かります。",
+        "form": "比較優位",
+        "en": "Someone who is faster than their partner at both cooking and cleaning does not necessarily need to take on both tasks entirely. When dividing the work, we can also consider how much cooking each person gives up the opportunity to do by spending time cleaning. Having a relatively smaller amount of other work to give up for a particular task is called comparative advantage. The comparison is about what you forgo when choosing something, rather than simply how fast you work. Using this household analogy as a guide makes it clear that production capacity alone is not enough when considering the benefits of specialization in trade.",
+        "register": "講",
+        "topic": "other",
+        "tipJa": "絶対的な速さや量ではなく、ほかの生産を諦める割合に注目する。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "民族主義",
+      "reading": "みんぞくしゅぎ",
+      "pos": "noun",
+      "meaning": "ethnic nationalism",
+      "defJa": "言語や文化を共有する集団の統一や自立を重んじる思想",
+      "passage": {
+        "ja": "帝国からの独立を求める運動を書くときは、人々が何を共有し、何を自分たちで決めようとしたのかを具体的に示しましょう。民族主義を背景にした運動と述べるなら、言語や文化の共有が政治的なまとまりを支えた点まで説明すると、歴史上の意味が伝わります。民族自決という要求に加えて、その地域に暮らす別の集団がどのように扱われたかにも目を向けてください。独立を達成したという結末だけでは、新しい国の中に残った対立を描き切れません。誰の自立を語っているのかを明らかにすることが、出来事を一面的に書かないための出発点です。",
+        "form": "民族主義",
+        "en": "When writing about a movement seeking independence from an empire, show concretely what people shared and what they wanted to decide for themselves. If you describe a movement as grounded in ethnic nationalism, explaining how shared language and culture supported political unity conveys its historical significance. Alongside the demand for national self-determination, pay attention to how other groups living in the region were treated. Ending the account with independence being achieved cannot fully portray the conflicts that remained within the new country. Making clear whose autonomy you are discussing is the starting point for avoiding a one-sided account of events.",
+        "register": "語",
+        "topic": "history",
+        "tipJa": "独立運動などの背景を表す際、文化的なまとまりと政治的な要求を結ぶ。",
+        "sense": "民族の統一や政治的自立を重んじる思想"
+      }
+    }
+  ]
+}

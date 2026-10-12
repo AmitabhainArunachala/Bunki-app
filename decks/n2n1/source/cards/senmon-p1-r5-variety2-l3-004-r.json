@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "起死回生",
+   "reading": "きしかいせい",
+   "pos": "noun",
+   "meaning": "dramatic revival",
+   "defJa": "絶望的な状況から立ち直ること",
+   "passage": {
+    "ja": "資金が底をつきかけた架空の会社が、最後に残った加工技術を医療機器の部品へ転用したとします。経営者はこの起死回生の一手に賭け、試験を重ねた末に大口の契約を得て、倒産を免れました。受注まで費用を抑え続けた担当者や、顧客の厳しい条件に工程を合わせた技術者が、一つの契約を支えていました。新しい用途への転換は一度のひらめきから始まるとしても、それを危機からの脱出につなげるには、限られた現金と人手をどこへ振り向けるかという判断が欠かせません。",
+    "form": "起死回生",
+    "en": "Suppose a fictional company running out of funds applies its last remaining machining technology to medical-device components. Its managers stake the company’s recovery on this last-ditch move and win a major contract after repeated testing, avoiding bankruptcy. That single contract rests on staff who kept spending down until orders arrived and engineers who adapted processes to the customer’s demanding requirements. Even if a shift to a new application begins with one flash of inspiration, turning it into an escape from crisis requires decisions about where to direct limited cash and personnel.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「起死回生の一手」は、絶望的な局面を覆す決定的な手段。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-89b9081580-569ccce1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-89b9081580-569ccce1",
+    "wordId": "nn-89b9081580"
+   }
+  },
+  {
+   "term": "一元論",
+   "reading": "いちげんろん",
+   "pos": "noun",
+   "meaning": "monism",
+   "defJa": "世界の根本を一つの原理や実在に求める立場",
+   "passage": {
+    "ja": "世界には石があり、植物が育ち、考える人間がいるが、その根本まで互いに別物なのだろうか。一元論は、この多様さを認めながらも、究極には一つの原理や実在に基づくと考える立場である。アドヴァイタのように究極的実在を問う思想と、物質を根本とする立場とでは、何を一つと認めるかが異なる。見える違いを単に消してしまうのでなく、その違いがいかなる意味で成立するのかを問うところに、同じ「一つ」という答えを持つ思想の間にも深い隔たりが生まれる。",
+    "form": "一元論",
+    "en": "The world contains stones, plants, and thinking humans, but are they fundamentally separate kinds of reality? Monism acknowledges this diversity while holding that it ultimately rests on one principle or reality. Traditions such as Advaita that inquire into ultimate reality differ from materialist positions over what counts as that one basis. Asking how differences exist rather than simply erasing them creates deep divisions even among philosophies that share the answer one.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "世界の根本を一つとする立場で、何を根本とするかには違いがある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-57e15a0394-c3f6745b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007-r.json",
+    "cardId": "nn-57e15a0394-c3f6745b",
+    "wordId": "nn-57e15a0394"
+   }
+  }
+ ]
+}

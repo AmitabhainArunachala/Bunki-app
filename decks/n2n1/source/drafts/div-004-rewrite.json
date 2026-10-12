@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "主導権",
+   "reading": "しゅどうけん",
+   "pos": "noun",
+   "meaning": "initiative; leadership",
+   "defJa": "物事の進め方を中心となって決める力や立場",
+   "passage": {
+    "ja": "文章の作成から保存までを一つの開発ツールに任せると、仕事は速く進む反面、提供元の仕様変更に左右されやすくなる。成果物を別の場所へ取り出せない契約なら、進め方を自分で選んでいるつもりでも、事業の主導権が相手に移る恐れがある。導入前に移行の方法やサービス終了時の扱いを確かめれば、便利さと引き換えに受け入れる依存の深さを把握できる。価格や速度を比べる表には、将来も自分たちで進路を決められるかという項目を加え、選択の余地まで検討したい。",
+    "form": "主導権",
+    "en": "Entrusting everything from text creation to storage to a single development tool can speed up work while making it more vulnerable to changes in the provider’s specifications. If the contract prevents retrieving work products elsewhere, control over the business may shift to the provider even though the user believes it is choosing how to proceed. Checking migration options and arrangements for service termination before adoption reveals the depth of dependence accepted in exchange for convenience. A comparison of price and speed should include whether the company can continue choosing its own direction, so that its room for choice is also examined.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「主導権を握る」は、相手に従うのでなく進め方を決めること。",
+    "sense": ""
+   }
+  }
+ ]
+}

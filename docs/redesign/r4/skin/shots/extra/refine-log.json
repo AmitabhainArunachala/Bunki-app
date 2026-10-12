@@ -1,0 +1,175 @@
+[
+  {
+    "shot": "reader-top-320-en",
+    "chromeHeight": 53,
+    "errors": []
+  },
+  {
+    "shot": "reader-top-375-en",
+    "chromeHeight": 53,
+    "errors": []
+  },
+  {
+    "shot": "reader-top-320-ja",
+    "chromeHeight": 53,
+    "errors": []
+  },
+  {
+    "shot": "reader-top-375-ja",
+    "chromeHeight": 53,
+    "errors": []
+  },
+  {
+    "shot": "shelf-saved-hokusai",
+    "dojo": {
+      "label": "Learn",
+      "due": null
+    },
+    "meta": "#fcfbf8",
+    "view": "shelf",
+    "errors": []
+  },
+  {
+    "shot": "shelf-saved-yoru",
+    "dojo": {
+      "label": "Learn",
+      "due": null
+    },
+    "meta": "#0c101e",
+    "view": "shelf",
+    "errors": []
+  },
+  {
+    "shot": "learn-decks-day-en",
+    "scrolledTo": 677,
+    "rows": [
+      "Your own textsparagraphs and conversations you add",
+      "N2 vocabulary · passages358 words0 due15 new",
+      "N1 vocabulary · passages666 words0 due15 new",
+      "Your five fields · master’s level976 words0 due15 new",
+      "Words you looked up · passages323 words0 due15 new",
+      "Words you looked up · sentences323 words0 due15 new",
+      "One word, one paragrapha short paragraph for each word",
+      "Your saved words0 to review"
+    ],
+    "errors": []
+  },
+  {
+    "shot": "learn-decks-day-ja",
+    "scrolledTo": 641,
+    "rows": [
+      "自分の文章自分で加えた段落や会話",
+      "N2・文章で覚える358 語0 復習15 新",
+      "N1・文章で覚える666 語0 復習15 新",
+      "専門・五つの分野976 語0 復習15 新",
+      "言葉の鉱脈・MCD323 語0 復習15 新",
+      "言葉の鉱脈・文323 語0 復習15 新",
+      "一語一段落語ごとに短い段落",
+      "保存した語復習 0 枚"
+    ],
+    "errors": []
+  },
+  {
+    "shot": "picker-night-en",
+    "errors": []
+  },
+  {
+    "shot": "picker-day-en",
+    "errors": []
+  },
+  {
+    "shot": "picker-night-kaku",
+    "errors": []
+  },
+  {
+    "shot": "worlds-today",
+    "pages": {
+      "sumi": {
+        "page": "color(srgb 0.961882 0.942745 0.894902)",
+        "bar": "color(srgb 0.988627 0.981176 0.958824)"
+      },
+      "shu": {
+        "page": "color(srgb 0.973176 0.959686 0.925961)",
+        "bar": "color(srgb 0.992157 0.985882 0.968235)"
+      },
+      "iwa": {
+        "page": "color(srgb 0.894118 0.764863 0.632314)",
+        "bar": "color(srgb 0.965098 0.914118 0.855294)"
+      },
+      "hokusai": {
+        "page": "rgb(239, 236, 229)",
+        "bar": "rgb(252, 251, 248)"
+      },
+      "akafuji": {
+        "page": "color(srgb 0.956235 0.908863 0.846902)",
+        "bar": "color(srgb 0.986274 0.969412 0.942353)"
+      },
+      "keyblock": {
+        "page": "color(srgb 0.953412 0.928627 0.866667)",
+        "bar": "color(srgb 0.988627 0.981176 0.958824)"
+      },
+      "rokusho": {
+        "page": "rgb(23, 19, 16)",
+        "bar": "color(srgb 0.0559216 0.0461961 0.038902)"
+      },
+      "yoru": {
+        "page": "rgb(19, 26, 48)",
+        "bar": "color(srgb 0.0461961 0.0632157 0.116706)"
+      },
+      "kaku": {
+        "page": "rgb(5, 13, 18)",
+        "bar": "color(srgb 0.0137255 0.0356863 0.0494118)"
+      },
+      "nami": {
+        "page": "rgb(17, 39, 59)",
+        "bar": "color(srgb 0.0413333 0.0948235 0.143451)"
+      },
+      "hakuu": {
+        "page": "rgb(34, 27, 18)",
+        "bar": "color(srgb 0.0826667 0.0656471 0.0437647)"
+      }
+    }
+  },
+  {
+    "shot": "n1-day-en",
+    "home": {
+      "meta": "#fcfbf8",
+      "view": "deckplay"
+    },
+    "study": {
+      "meta": "#0b0e14",
+      "view": "deckplay"
+    },
+    "errors": []
+  },
+  {
+    "shot": "n1-day-ja",
+    "home": {
+      "meta": "#fcfbf8",
+      "view": "deckplay"
+    },
+    "study": {
+      "meta": "#0b0e14",
+      "view": "deckplay"
+    },
+    "errors": []
+  },
+  {
+    "shot": "context-day-en",
+    "meta": "#fcfbf8",
+    "view": "contextdeck",
+    "errors": []
+  },
+  {
+    "shot": "personal-day-en",
+    "meta": "#efece5",
+    "view": "personaldeck",
+    "errors": []
+  },
+  {
+    "shot": "personal-day-ja",
+    "meta": "#efece5",
+    "view": "personaldeck",
+    "errors": []
+  }
+]

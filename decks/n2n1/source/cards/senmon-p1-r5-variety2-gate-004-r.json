@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "計算可能性",
+   "reading": "けいさんかのうせい",
+   "pos": "noun",
+   "meaning": "computability",
+   "defJa": "一定の手順で求める答えに到達できる性質",
+   "passage": {
+    "ja": "計算機は年々速くなっている。ならば、いまは手に負えない問題も、いずれは解けるようになると考えたくなる。だが、計算可能性の理論が問うのは、速いか遅いかではなく、答えにたどり着く手順がそもそも存在するかどうかである。チューリングは1936年、どんなプログラムを与えられても、それがいつか止まるかどうかを正しく判定できる万能の手順は存在しないことを示した。どれほど速い機械を何台並べたとしても、動かしたプログラムが止まらないとき、計算がまだ途中なのか、それとも永遠に終わらないのかを一般に見分ける方法はなく、ただ結果を待ち続けるほかない。",
+    "form": "計算可能性",
+    "en": "Computers are getting faster every year. That being so, one is tempted to think that problems beyond our reach today will sooner or later become solvable. But what the theory of computability asks is not whether a machine is fast or slow, but whether a procedure for reaching the answer exists in the first place. In 1936 Turing showed that there is no universal procedure that, whatever program it is given, can correctly decide whether that program will ever halt. However many fast machines are lined up, when a program that has been set running does not stop, there is in general no way to tell whether the calculation is still under way or will never end, and nothing is left but to go on waiting for the result.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「計算可能性の理論」のように使う。速さの問題ではなく、答えに至る手順が存在するかどうかを問う語。",
+    "sense": ""
+   },
+   "cardId": "nn-f2b554f67d-fed42923",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-039.json",
+    "cardId": "nn-f2b554f67d-fed42923",
+    "wordId": "nn-f2b554f67d"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "パラメータ",
+   "reading": "ぱらめーた",
+   "pos": "noun",
+   "meaning": "parameter",
+   "defJa": "モデルの働きを決める調整可能な数値",
+   "passage": {
+    "ja": "学習を始める前のモデルって、どんな質問をしても、でたらめな答えしか返さないんです。中に並んでいる膨大な数の数値がまだランダムなままだからで、答えが外れるたびに、正解とのずれが小さくなるほうへその数値をほんの少しずつ動かしていく、という作業を数えきれないほど繰り返して、やっとまともな答えが出るようになります。こんなにたくさんの数値、人の手で決められっこないですよね。実際、でき上がったモデルのファイルを開いてみても、中身はそうやって調整されたパラメータ、つまり数字の列ばかりなんですよ。",
+    "form": "パラメータ",
+    "en": "A model that hasn't started training yet gives nothing but nonsense answers, whatever question you put to it. That's because the enormous number of values lined up inside it are still random, and every time an answer is off, those values get moved just a tiny bit in the direction that shrinks the gap from the correct answer, and only after this has been repeated more times than anyone could count does the model start giving decent answers. There's simply no way a person could set this many values by hand, after all. In fact, even if you open up the finished model's file, what's inside is the parameters that were adjusted in that way, which is to say nothing but rows of numbers.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「パラメータを調整する」が典型。人が決めるのではなく、学習によって値が決まるモデル内部の数値を指す。",
+    "sense": "機械学習で、学習によって調整されるモデル内部の数値"
+   },
+   "cardId": "nn-e6b99d4693-083ec16b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010.json",
+    "cardId": "nn-e6b99d4693-083ec16b",
+    "wordId": "nn-e6b99d4693"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "右肩上がり",
+   "reading": "みぎかたあがり",
+   "pos": "noun",
+   "meaning": "a sustained upward trend",
+   "defJa": "数値などが全体として上向きに増えていくこと",
+   "passage": {
+    "ja": "世界の半導体市場は2023年、メモリー価格の下落が響いて前年を下回った。2019年にも同様の落ち込みがあった。それでも数十年の単位で見れば、市場は右肩上がりの成長を続けてきた。需要が伸びると各社が一斉に増産に動き、数年後には製品が余って価格が崩れるという波を繰り返しながらも、パソコン、スマートフォン、データセンターと、半導体を必要とする製品そのものが増え続けてきたからだ。2024年には人工知能向けの需要が加わり、市場規模は過去最高を更新した。",
+    "form": "右肩上がり",
+    "en": "The world semiconductor market fell below the previous year's level in 2023, weighed down by falling memory prices. There was a similar slump in 2019. Even so, viewed on a scale of several decades, the market has kept growing in a sustained upward trend. This is because, even while repeating a cycle in which makers all move to raise output when demand grows and then, a few years later, products pile up and prices collapse, the very range of products that need semiconductors has kept growing, from personal computers to smartphones to data centers. In 2024 demand for artificial intelligence was added on top, and the size of the market set a new record high.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「右肩上がりの成長」「右肩上がりで伸びる」が定番。途中に落ち込みがあっても、全体の上向きの傾向を言う。",
+    "sense": ""
+   },
+   "cardId": "nn-aeec7671c1-7fb5d3aa",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-016.json",
+    "cardId": "nn-aeec7671c1-7fb5d3aa",
+    "wordId": "nn-aeec7671c1"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "功徳",
+   "reading": "くどく",
+   "pos": "noun",
+   "meaning": "merit, virtue",
+   "defJa": "善い行いや修行によって得られる宗教上の恵み",
+   "passage": {
+    "ja": "四国でお遍路をしていたとき、道ばたで知らないおばあさんにみかんを差し出されたことがあるんです。悪いなと思ったものだから、つい断ろうとしました。そうしたら一緒に歩いていた人が、あれは「お接待」といって、お遍路さんをもてなすのは地元の人にとっても善い行いになるんだから、遠慮しないで受け取るのが礼儀なんですよって、小声で教えてくれたんです。あわててお礼を言って受け取りました。おばあさんのほうが逆に手を合わせて、「こっちこそ功徳を積ませてもらいました」って言うんですよ。",
+    "form": "功徳",
+    "en": "Once, when I was walking the pilgrimage in Shikoku, an old woman I didn't know held out a mandarin orange to me by the roadside. I felt bad about taking it, so I started to turn it down without thinking. Then someone who was walking with me quietly told me that this was called osettai, that offering hospitality to pilgrims was a good deed for the local people too, and that the polite thing was to accept without holding back. I hurriedly thanked her and took it. It was the old woman who put her palms together instead and said, \"I'm the one who has been allowed to build up merit.\"",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「功徳を積む」の形が定番。善い行いが自分の身に積み重なっていくという仏教の考え方が表れる。",
+    "sense": "よい報いのもとになる善い行い、またその積み重ね"
+   },
+   "cardId": "nn-5a9f7f2600-0a1be56d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-5a9f7f2600-0a1be56d",
+    "wordId": "nn-5a9f7f2600"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "法然",
+   "reading": "ほうねん",
+   "pos": "noun",
+   "meaning": "Honen, founder of the Jodo school",
+   "defJa": "念仏を勧め日本の浄土宗を開いた僧",
+   "passage": {
+    "ja": "法然が人々に求めたのは、ただ「南無阿弥陀仏」と唱えることだけだった。当時の有力な寺院は、経典の学問と厳しい修行を重んじていた。比叡山延暦寺で長く学んだこの僧は、そうした学問や修行ができない人であれ、阿弥陀仏の力を信じて念仏を唱えれば誰もが浄土に生まれることができると説き、その教えは武士や庶民の間にまで広がった。反発した既存の寺院の訴えもあって、1207年、朝廷はその教えを禁じ、本人を四国へ流した。のちに許されて戻り、生涯を閉じた京都・東山の地には、いま浄土宗の総本山である知恩院が建つ。",
+    "form": "法然",
+    "en": "All that Honen asked of people was that they recite \"Namu Amida Butsu.\" The powerful temples of the day set great store by the study of the scriptures and harsh ascetic training. This monk, who had studied for many years at Enryaku-ji on Mount Hiei, taught that even those unable to pursue such learning and training could all be born in the Pure Land if they trusted in the power of Amida Buddha and recited the nembutsu, and his teaching spread as far as the warriors and the common people. Partly because of complaints from the established temples that opposed him, in 1207 the court banned his teaching and exiled him to Shikoku. On the ground in Higashiyama, Kyoto, where he later returned after being pardoned and ended his life, Chion-in, the head temple of the Jodo school, stands today.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「法然が説く」「法然の教え」の形で使う。ひたすら念仏を唱えることを説いた浄土宗の開祖で、親鸞の師でもある。",
+    "sense": ""
+   },
+   "cardId": "nn-608c055ed6-56d25335",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-021.json",
+    "cardId": "nn-608c055ed6-56d25335",
+    "wordId": "nn-608c055ed6"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "確率分布",
+   "reading": "かくりつぶんぷ",
+   "pos": "noun",
+   "meaning": "probability distribution",
+   "defJa": "各結果や値にどれほどの確率があるかの分布",
+   "passage": {
+    "ja": "チャットボットに同じ質問を何度かしてみたら、答えが毎回少しずつ違った、なんてことありませんか？あれ、気まぐれで変えているんじゃないんです。言語モデルは次に来る語を決めるとき、候補のひとつひとつに「これは六割、こっちは二割」というふうに確率を割り振っておいて、いちばん高いものを必ず選ぶんじゃなく、その確率に応じてくじを引くみたいにして選んでいるんですよ。つまり、モデルが出しているのは決まった答えじゃなくて、次の語についての確率分布なんですね。だから「温度」という設定を下げて、確率の高い候補ばかりが選ばれるようにすると、答えはほとんど毎回同じになります。",
+    "form": "確率分布",
+    "en": "Have you ever put the same question to a chatbot several times and found that the answer was a little different each time? It isn't changing things on a whim. In deciding on the next word, a language model assigns a probability to each of the candidates, along the lines of \"sixty percent for this one, twenty percent for that one,\" and rather than always choosing the highest, it picks as if drawing lots according to those probabilities. In other words, what the model puts out is not a fixed answer but a probability distribution over the next word. So if you lower the setting called \"temperature\" so that only the high-probability candidates get chosen, the answer comes out almost the same every time.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「次の語についての確率分布」のように、候補全体への確率の割り振りを指す。言語モデルの出力を語る定番の語。",
+    "sense": ""
+   },
+   "cardId": "nn-4d5ef5002d-563ea4f9",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-4d5ef5002d-563ea4f9",
+    "wordId": "nn-4d5ef5002d"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "流動性",
+   "reading": "りゅうどうせい",
+   "pos": "noun",
+   "meaning": "market liquidity",
+   "defJa": "値を大きく変えずに売買を成立させやすい度合い",
+   "passage": {
+    "ja": "同じ金額の株を持っていても、すぐ現金にできるものと、そうはいかないものがあるんですよ。エヌビディアみたいな株は、毎日ものすごい量が売買されています。買いたい人がいつも大勢並んでいるから、少量を売る程度なら、値段は大きく動きにくいんです。困るのは、取引の少ない小さな会社の株みたいに、流動性が低いものなんです。実は前に、そういう株を急いで全部売ろうとしたら、注文を出すそばから値段が下がっていって、売り終わったときには、画面で見ていた評価額より一割近くも少ないお金しか手元に残りませんでした。",
+    "form": "流動性",
+    "en": "Even if you hold stocks worth the same amount, there are ones you can turn into cash right away and ones where it doesn't go that smoothly. A stock like Nvidia is bought and sold in enormous volume every day. Because there are always lots of people lined up wanting to buy, the price is unlikely to move much if you are only selling a small amount. The trouble comes with stocks that have low liquidity, like the shares of a small company that are rarely traded. In fact, I once tried to sell all of a stock like that in a hurry, and the price kept dropping as fast as I put my orders in, so that by the time I had finished selling, I was left with nearly ten percent less money in hand than the valuation I had been looking at on the screen.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「流動性が低い・高い」と言う。買い手や売り手がすぐ見つかり、値を崩さずに売買できるかどうかの度合い。",
+    "sense": "市場で資産を値を崩さずに売買・換金しやすい度合い"
+   },
+   "cardId": "nn-0f27cb5487-75f98850",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-0f27cb5487-75f98850",
+    "wordId": "nn-0f27cb5487"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "因陀羅網",
+   "reading": "いんだらもう",
+   "pos": "noun",
+   "meaning": "Indra's net",
+   "defJa": "珠が互いを映す網で関わり合いを示す華厳の譬え",
+   "passage": {
+    "ja": "雨上がりの朝、庭のクモの巣に細かい水滴がびっしりと並んでいた。顔を近づけると、どの粒にも庭の木と空が小さく映っており、さらに目を凝らせば、隣の粒までがその中に収まっていて、どれが映す側でどれが映される側なのか分からなくなる。華厳の教えが因陀羅網の譬えで説いたのは、遠い天上の話というより、こういう光景なのだろう。帝釈天の宮殿に掛かる網には結び目ごとに珠があり、その珠のそれぞれが他のすべての珠を映しているという。風が吹いて粒がひとつ落ちると、残った粒の中の景色もわずかに揺れた。",
+    "form": "因陀羅網",
+    "en": "On a morning after rain, fine drops of water were lined up thickly on a spider's web in the garden. When I brought my face close, every drop held a small reflection of the garden's trees and the sky, and when I looked harder still, even the neighbouring drops sat inside it, until I could no longer tell which was reflecting and which was being reflected. What the Kegon teaching explained through the metaphor of Indra's net was probably not so much a tale of a distant heaven as a sight like this. In the net that hangs in the palace of the god Indra there is a jewel at every knot, and each of those jewels is said to reflect all the other jewels. When the wind blew and one drop fell, the scenery inside the remaining drops trembled slightly too.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「因陀羅網の譬え」として使う。帝釈天の網の珠が互いを映し合う姿で、万物の関わり合いを表す華厳の語。",
+    "sense": ""
+   },
+   "cardId": "nn-213946c36b-14180ed7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-213946c36b-14180ed7",
+    "wordId": "nn-213946c36b"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

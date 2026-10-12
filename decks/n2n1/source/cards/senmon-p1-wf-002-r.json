@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "色",
+   "reading": "～しょく",
+   "pos": "other",
+   "meaning": "-colored (counter for colors)",
+   "defJa": "彩りの数を数えるときに付ける接尾語",
+   "passage": {
+    "ja": "チベットの寺に行くと、山の斜面や屋根の上で風にはためく鮮やかな五色の旗がまず目に入るんですよね。青、白、赤、緑、黄で、それぞれ空、風、火、水、地を表すんだそうです。標高が高いだけあって、風が絶えないので、旗に印刷されたお経が祈りとして空へ運ばれるという考え方なんです。読んでもらうというより、風に預けるわけですね。ちょっと不思議だけど、なんか素直でいいなあって思いません？",
+    "form": "色",
+    "en": "When you visit a Tibetan temple, the first thing that catches your eye is the vivid five-colored flags fluttering in the wind on hillsides and rooftops. They are blue, white, red, green and yellow, and apparently stand for sky, wind, fire, water and earth respectively. Being at high altitude, the wind never stops, so the idea is that the scriptures printed on the flags are carried to the sky as prayers. It is less about being read than about entrusting them to the wind. A bit odd, but somehow honest and nice, don't you think?",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "五色・三色のように、数のあとに付いて色の数を表す接尾語。",
+    "sense": "色の数を数える接尾語"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

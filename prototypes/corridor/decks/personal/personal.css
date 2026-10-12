@@ -44,7 +44,7 @@
 .pc-japanese { font:400 clamp(20px,2.4vw,26px)/2.1 var(--serif); line-break:strict; word-break:normal; overflow-wrap:anywhere; letter-spacing:.035em; margin:0!important; }
 .pc mark { color:inherit; background:transparent; border-bottom:2px solid var(--red); padding-bottom:3px; }
 .pc ruby { ruby-position:over; }
-.pc rt { font-family:var(--sans); font-size:.52em; letter-spacing:.02em; font-weight:400; color:var(--ink-2); }
+.pc rt { font-family:var(--sans); font-size:max(11px,.52em); letter-spacing:.02em; font-weight:400; color:var(--ink-2); }
 .pc-japanese rt { font-family:var(--sans); font-size:max(11px,.46em); letter-spacing:.025em; color:var(--ink-2); }
 .pc .pc-token { display:inline; min-height:0; padding:0 1px; border:0; border-bottom:1px dotted var(--line); border-radius:0; color:inherit; background:transparent; font:inherit; letter-spacing:inherit; line-height:inherit; vertical-align:baseline; }
 .pc .pc-token:hover:not(:disabled) { color:var(--tint,var(--ink)); border-color:var(--tint,var(--ink)); background:transparent; }
@@ -119,6 +119,7 @@
 .pc-check input { width:20px; height:20px; flex:none; accent-color:var(--tint,var(--ink)); }
 .pc-status { position:fixed; bottom:calc(125px + env(safe-area-inset-bottom)); left:18px; right:18px; max-width:904px; margin-inline:auto; z-index:30; background:var(--surface,var(--ground)); border:1px solid var(--raised-edge,var(--line)); padding:12px 16px; box-shadow:var(--shadow-float,0 4px 16px #0002); border-radius:var(--r-float,14px); }
 .pc-status:empty { display:none; }
+.pc-status.pc-status-inline { position:static; margin:12px 0 0; max-width:none; }
 .pc[aria-busy='true'] button { opacity:.6; cursor:wait; }
 @media (max-width:999px) {
   .pc-revealed .pc-focus > h2, .pc-revealed .pc-focus > .pc-small { display:none; }

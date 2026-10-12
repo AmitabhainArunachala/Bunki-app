@@ -1,0 +1,163 @@
+{
+ "batch": "r5-india-new-004",
+ "items": [
+  {
+   "term": "修験道",
+   "reading": "しゅげんどう",
+   "gloss": "Shugendo mountain asceticism",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Japanese mountain ascetic tradition combining Buddhist and local mountain religious practice; not merely hiking.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "山伏",
+   "reading": "やまぶし",
+   "gloss": "mountain ascetic",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Practitioner associated with Japanese mountain ascetic traditions; avoid invented initiations or universal clothing details.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  },
+  {
+   "term": "五山制度",
+   "reading": "ござんせいど",
+   "gloss": "Five Mountains temple ranking system",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.kyuhaku.jp/pdf/asiage_07.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Ranking/protection of prominent Zen temples, notably Kyoto and Kamakura; not five literal mountains.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "寺請制度",
+   "reading": "てらうけせいど",
+   "gloss": "temple certification system",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://jpsearch.go.jp/en/item/adeac-R100000094_I1611452"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Early modern Japanese temple certification tied religious affiliation to anti-Christian control and household registration. Avoid universal one-date creation story.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "黄檗宗",
+   "reading": "おうばくしゅう",
+   "gloss": "Obaku Zen school",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://obakusan.or.jp/about/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Manpukuji founded by Ingen in 1661; Ming Chinese ritual/cultural elements retained; independent denomination naming dates to Meiji.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "隠元",
+   "reading": "いんげん",
+   "gloss": "Ingen Ryuki",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://obakusan.or.jp/about/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Chinese monk arrived in 1654 and founded Manpukuji Uji in 1661; avoid attributing all familiar vegetables to him as established history.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "悉曇",
+   "reading": "しったん",
+   "gloss": "Siddham script and its study",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://dglb01.ninjal.ac.jp/ninjaldl/cv/sittanzo/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Sanskrit script/phonological learning maintained in Japanese Buddhist traditions; distinguish script from language. Annen authored Shittanzo in 880.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "檀越",
+   "reading": "だんおつ",
+   "gloss": "Buddhist lay donor",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.todaiji.or.jp/history/",
+    "https://jodoshuzensho.jp/daijiten/index.php/%E6%AA%80%E8%B6%8A"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Buddhist donor or supporter; not a synonym restricted to modern hereditary danka membership; do not invent etymological claims.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  }
+ ],
+ "weave": [
+  "修行",
+  "執着",
+  "慈悲",
+  "系譜",
+  "戒律",
+  "比較",
+  "注意",
+  "伝来",
+  "解釈",
+  "原典"
+ ],
+ "note": "Use grounded factNote only for historical or scientific claims; ordinary explanatory examples may elaborate without adding invented facts. All topic india. Four sentences, 215–255 chars. Avoid stock endings る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

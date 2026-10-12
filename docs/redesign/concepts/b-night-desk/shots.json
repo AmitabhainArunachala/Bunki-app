@@ -1,0 +1,33 @@
+{
+  "title": "B 夜の文机 Night Desk",
+  "screens": [
+    { "name": "today", "path": "index.html#/today", "settle": 3200 },
+    { "name": "read", "path": "index.html#/read" },
+    { "name": "article", "path": "index.html#/read/article", "settle": 900 },
+    { "name": "popup", "path": "index.html#/read/popup", "settle": 2600 },
+    { "name": "learn", "path": "index.html#/learn" },
+    { "name": "front", "path": "index.html#/learn/front" },
+    { "name": "back", "path": "index.html#/learn/back", "settle": 1800 },
+    { "name": "words", "path": "index.html#/words", "settle": 1800 },
+    { "name": "me", "path": "index.html#/me", "settle": 3400 },
+    { "name": "done", "path": "index.html#/learn/done" },
+    { "name": "words-walk", "path": "index.html#/words", "steps": [{ "wait": 1400 }, { "click": ".node[data-id='K:記']" }, { "wait": 1200 }, { "click": ".node[data-id='P:己']" }], "settle": 1600 },
+    { "name": "today-ja", "path": "index.html?lang=ja#/today", "settle": 3200 },
+    { "name": "learn-ja", "path": "index.html?lang=ja#/learn" },
+    { "name": "back-ja", "path": "index.html?lang=ja#/learn/back", "settle": 1800 }
+  ],
+  "journey": [
+    { "go": "index.html#/today" }, { "wait": 700 }, { "frame": "Today: the word inks in" },
+    { "wait": 1300 }, { "frame": "light runs word → kanji → parts" },
+    { "click": ".t-big" }, { "wait": 420 }, { "frame": "Words: web lays out (mid)" },
+    { "wait": 900 }, { "click": ".node[data-id='K:記']" }, { "wait": 260 }, { "frame": "re-centring on 記 (mid-move)" },
+    { "wait": 1000 }, { "click": ".node[data-id='P:己']" }, { "wait": 1100 }, { "frame": "part 己 — the walk stays lit" },
+    { "click": "#tabs [data-go=read]" }, { "wait": 700 }, { "frame": "Read: the shelf" },
+    { "click": ".r-open" }, { "wait": 2000 }, { "frame": "article, resumed at the line" },
+    { "eval": "[...document.querySelectorAll('.tk.c')].find(e=>e.textContent.startsWith('記憶')).click()" }, { "wait": 300 }, { "frame": "the word lifts out (match-cut)" },
+    { "wait": 900 }, { "frame": "word sheet: kanji traced" },
+    { "eval": "location.hash='#/learn/front'" }, { "wait": 800 }, { "frame": "Learn: card front on the stage" },
+    { "click": ".c-reveal" }, { "wait": 650 }, { "frame": "the beam reads; readings appear" },
+    { "wait": 1400 }, { "frame": "card back with shared part" }
+  ]
+}

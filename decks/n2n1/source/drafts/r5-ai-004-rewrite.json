@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "高騰",
+   "reading": "こうとう",
+   "pos": "noun",
+   "meaning": "soaring, sharp rise (of prices)",
+   "defJa": "値段が急激に大きく上がること",
+   "passage": {
+    "ja": "まずメモリー一個を三千円と置いて、手計算を始めます。四個載った基板一枚の部品費は一万二千円、ここまでは暗算でもできますね。ところが生成AI向けの需要が伸びる一方で、供給の能力は頭打ちです。需給が崩れてメモリー価格が高騰すれば、単価は三千円から三万円へ、部品費は一万二千円から十二万円へと跳びます。紙に需給の二本の線を描いて交点が遠くへ移動する様子を確かめてみると、毎年数パーセントの値上がりとは桁の違う世界が手のひらに現れます。",
+    "form": "高騰",
+    "en": "First, set the price of one memory chip at three thousand yen, and let's start calculating by hand. The parts cost of a board carrying four chips comes to twelve thousand yen — up to here you can manage by mental arithmetic. But while demand for generative AI keeps growing, supply capacity has hit a ceiling. When the supply-demand balance breaks and memory prices soar, the unit price leaps from three thousand yen to thirty thousand, and the parts cost from twelve thousand to one hundred twenty thousand. Draw the two supply-and-demand lines on paper and check how far the intersection moves, and a world an order of magnitude away from a few percent of yearly increase appears right there in your palm.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「価格が高騰する」「地価が高騰する」のように急激で大きな値上がりに使い、緩やかな上昇には使わない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ファウンドリ",
+   "reading": "ふぁうんどり",
+   "pos": "noun",
+   "meaning": "foundry: contract chip manufacturer",
+   "defJa": "設計を預かり、半導体の製造だけを請け負う会社",
+   "passage": {
+    "ja": "先週の勉強会で、ソフトウェア出身の参加者に「ファウンドリって何だっけ」と聞かれた。設計者に向かうときは「図面を預かってチップにして返す工場」、製品を買う人に向かうときは「他社の設計をまとめて受注する専門工場」と、言い換えを使い分けている。同じ言葉でも、聞き手がどこに立つかで像が変わるものだ。品質の鍵を握るのは製造側だから、説明の重心も相手に応じてずらすと決めている。その日は後者の言い方で答え、会のあとに「やっと分かった」と一言もらった。",
+    "form": "ファウンドリ",
+    "en": "At last week's study group, a participant from a software background asked me, \"What was a foundry again?\" When I face a designer, I use \"a factory that takes your blueprints on trust and returns them as chips\"; when I face someone who buys the finished products, I use \"a specialist factory that takes on other companies' designs and makes them to order\" — I keep both paraphrases and switch between them. Even with the same word, the image changes depending on where the listener stands. Since the manufacturing side holds the key to quality, I have made it a rule to shift the weight of my explanation according to the listener. That day I answered with the latter phrasing, and after the meeting I got a single remark: \"Now I finally get it.\"",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "半導体業界の語で、「ファウンドリ各社」「ファウンドリ事業」のように会社や事業の単位と結びつく。",
+    "sense": "金属の鋳造所ではなく、半導体の受託製造会社の意"
+   }
+  },
+  {
+   "term": "フラッシュメモリ",
+   "reading": "ふらっしゅめもり",
+   "pos": "noun",
+   "meaning": "flash memory (retains data without power)",
+   "defJa": "電気で消せ、電源を切っても記録が残る半導体記憶",
+   "passage": {
+    "ja": "スマホの写真が電源を切っても消えないのは、記録がフラッシュメモリに書き込まれているからです。名前は、消去が一瞬で済む様子をカメラのフラッシュに例えたものと伝えられています。ただし「消せる黒板」という比喩が役立つのはそこまでで、一行だけ消すことはできず、消去はブロック単位でまとめて行われます。書き換えの回数にも制約があり、消去と書き込みの繰り返しに伴ってセルはだんだん疲れてきます。比喩が破綻するこの二箇所、消去の単位と書き換えの寿命こそ、この技術の本質が見える場所です。",
+    "form": "フラッシュメモリ",
+    "en": "The photos on your smartphone do not vanish when the power is cut, because they are written into flash memory. The name, it is said, comes from likening that instant erasure to the flash of a camera. But the \"erasable blackboard\" metaphor is useful only up to that point: you cannot erase just one line, and erasure is carried out in blocks, all at once. The number of rewrites is also constrained, and as the cycle of erasing and writing is repeated, the cells gradually grow weary. These two places where the metaphor breaks — the unit of erasure and the lifespan of rewrites — are exactly where the essence of this technology comes into view.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「フラッシュメモリ搭載」「フラッシュメモリの寿命」のように、機器の仕様や部品の寿命の話でよく現れる語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "人類滅亡",
+   "reading": "じんるいめつぼう",
+   "pos": "noun",
+   "meaning": "extinction of humanity",
+   "defJa": "人間という種が地球上からいなくなること",
+   "passage": {
+    "ja": "半導体工場では、一枚のウェハーに現れた点状の欠陥から、工程全体の異常を探り当てる技術が日々磨かれている。AIの安全性をめぐる議論も、実は同じ構造を持つ。人類滅亡というシナリオは、たいてい小さな異常の報告を足場に組み上げられる。たとえば学習中のモデルが意図しない出力を繰り返す、そんな些細な観察が、より大きな問題の兆候として扱われる。ただし観察から種の存続が危うくなる想定までは距離があり、因果関係の各段階は仮説にすぎず、検証の対象にとどまる。",
+    "form": "人類滅亡",
+    "en": "In semiconductor plants, the craft of tracing a fault in an entire process from a single dot-like defect on one wafer is honed day after day. The debate surrounding AI safety has, in fact, the same structure. The scenario of human extinction is, for the most part, built up on the footing of reports of small anomalies. For instance, the trivial observation that a model in training repeatedly produces unintended output is treated as a sign of a larger problem. There is, however, a distance from observation to the assumption that the survival of the species is at stake; each link in the causal chain is no more than a hypothesis, and remains a subject of verification.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "リスク報道では「人類滅亡のシナリオ」「人類滅亡のリスク」のように、想定や仮説と結びつけて使われる。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "甥",
+   "reading": "おい",
+   "pos": "noun",
+   "meaning": "nephew",
+   "defJa": "自分の兄弟姉妹の息子",
+   "passage": {
+    "ja": "兄の息子が遊びに来ると、最近学校で覚えた言葉を次々に教えてくれて、こっちが意味を尋ねる側になるんだ。小さいころから知っている甥とはいえ、使う語尾や話の間の取り方には、家族と過ごすだけでは身につかないものが増えているんだよね。僕が子供のころ使っていた方言を話すと、今度は向こうが面白がって、どんなときに言うのか詳しく聞いてくる。同じ土地の言葉でも、世代が違えば知らない表現があるから、教える役を交代しながら話すのが楽しいんだ。",
+    "form": "甥",
+    "en": "When my brother’s son visits, he tells me one new expression after another that he has learned at school, leaving me to ask what they mean. Although I have known my nephew since he was little, his sentence endings and conversational timing increasingly include things he would not acquire solely with family. When I use dialect expressions from my own childhood, he is the one who gets interested and asks in detail when people say them. Even in the language of the same area, different generations have unfamiliar expressions, so it is fun to take turns teaching each other.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "兄弟の息子にも姉妹の息子にも使い、年齢は問いません。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "名場面",
+   "reading": "めいばめん",
+   "pos": "noun",
+   "meaning": "famous scene, memorable scene",
+   "defJa": "作品や出来事の中で特に印象深く優れた一場面",
+   "passage": {
+    "ja": "舞台で父と娘が向かい合い、長い沈黙のあとに片方が椅子を少し引くだけで、客席の空気が変わることがある。何が語られたかだけを数えていては、こうした名場面がなぜ心に残るのかを説明しきれない。それまで席を譲らなかった人物が相手のために場所を空けたと分かれば、小さな動作にも関係の変化を読み取れる。強い言葉を並べるかわりに、観客が覚えている以前の振る舞いと今の動きを響かせることで、舞台には台詞の量を超えた余韻が生まれる。",
+    "form": "名場面",
+    "en": "On stage, a father and daughter may face one another, and after a long silence one of them merely moves a chair slightly, changing the atmosphere in the audience. Counting only what was said cannot fully explain why such memorable scenes stay with us. If we understand that a person who previously refused to yield a seat has now made room for the other, even a small movement reveals a change in their relationship. Letting the present action resonate with earlier behavior remembered by the audience, instead of piling up powerful words, gives the stage a lingering effect beyond the quantity of dialogue.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "物語や試合などで、心に残る優れた場面をいう。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "引き受ける",
+   "reading": "ひきうける",
+   "pos": "verb",
+   "meaning": "to undertake, to take on",
+   "defJa": "頼まれた仕事や責任を自分の担当として受け持つ",
+   "passage": {
+    "ja": "町内の読書会で司会を頼まれたとき、好きな本の話ならできると思って、詳しい段取りを聞かずに返事をしそうになったんだ。仕事を引き受けるからには責任があるし、当日しゃべる以外に、会場の準備や参加者への連絡も必要なのかを確かめたいよね。苦手な調整まで一人で抱えてから困るより、どこまで自分が担当して、どこを手伝ってもらうか、先に話しておくほうがやりやすい。頼みを断らないことと、約束した役割を最後まで果たせることは、分けて考えたいんだ。",
+    "form": "引き受ける",
+    "en": "When I was asked to host the neighborhood book club, I thought I could talk about books I liked and almost agreed without asking about the arrangements. Taking on a job brings responsibility, so I want to check whether it includes preparing the venue and contacting participants as well as speaking on the day. It is easier to discuss in advance what I will handle and where I will need help than to struggle after taking on all the coordination I find difficult. I want to distinguish never refusing a request from being able to fulfill an agreed role to the end.",
+    "register": "話",
+    "topic": "other",
+    "tipJa": "「仕事を引き受ける」は、自分が担当すると承諾すること。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

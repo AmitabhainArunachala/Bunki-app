@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "波及効果",
+   "reading": "はきゅうこうか",
+   "pos": "noun",
+   "meaning": "spillover effects",
+   "defJa": "一つの変化が周囲へ広がって及ぼす影響",
+   "passage": {
+    "ja": "半導体工場の建設が決まると、仕事が増えるのは工事を請け負った会社だけではありません。作業員が泊まる宿や食事を出す店にも需要が生まれ、そこで受け取った収入がさらに別の買い物へ回れば、波及効果は地域へ広がります。ただし、必要な資材を地域外から買う場合には、その支出の多くは外へ流れます。大きな建設費が示されていても、地域内にどのような取引先があり、増えた需要を引き受ける余力があるかによって、地元に残る恩恵の大きさは異なります。",
+    "form": "波及効果",
+    "en": "A decision to build a semiconductor factory creates work beyond the construction contractor. Demand also reaches accommodation and restaurants for workers, and if those earnings fund further purchases, ripple effects spread through the region. However, when materials are purchased from outside, much of that spending leaves the area. Even a large construction budget brings different levels of local benefit depending on available regional suppliers and their capacity to meet the increased demand.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "最初の変化が取引などを通じて周囲へ広がる影響。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-910a5ed112-1e0142c6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-910a5ed112-1e0142c6",
+    "wordId": "nn-910a5ed112"
+   }
+  },
+  {
+   "term": "消費電力",
+   "reading": "しょうひでんりょく",
+   "pos": "noun",
+   "meaning": "power consumption",
+   "defJa": "機器が単位時間に消費する電気エネルギー",
+   "passage": {
+    "ja": "電気を多く使う装置でも、仕事を早く終えて停止できれば、一回の処理に使う総量は少なくなる場合があります。消費電力は単位時間あたりに使う電気エネルギーの大きさなので、使用時間を抜きにして電気代への影響は判断できません。逆に、動作中の値が小さくても、一日中待機させた機器では、その時間の積み重ねが効いてきます。計算の速さを比べる実験では、装置だけでなく冷却などもどこまで数えるかをそろえると、同じ仕事を終えるための負担を公平に比べられます。",
+    "form": "消費電力",
+    "en": "Even a power-hungry device may use less total energy for one task if it finishes quickly and stops. Power consumption measures electrical energy used per unit time, so its effect on electricity costs cannot be judged without operating duration. Conversely, even a low operating value can add up when equipment remains on standby all day. In computing-speed experiments, defining consistently whether cooling and other support systems are counted enables a fair comparison of the burden of completing the same work.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "電力は単位時間あたりの量で、使用時間を含む電力量とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-7b0ed95780-2b7e376d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-7b0ed95780-2b7e376d",
+    "wordId": "nn-7b0ed95780"
+   }
+  },
+  {
+   "term": "牙城",
+   "reading": "がじょう",
+   "pos": "noun",
+   "meaning": "a firmly held stronghold",
+   "defJa": "他者が容易に崩せない強固な支配領域",
+   "passage": {
+    "ja": "長年使われてきた業務ソフトには、操作に慣れた人材と、その形式で蓄積された大量の資料がある。競合製品の性能が上回っても、研修やデータ移行に費用がかかるため、既存企業の牙城を崩すのは容易ではない。新規参入側は価格を下げるだけでなく、古い資料を移す仕組みや利用者への支援を用意せざるを得ない。購入時の機能比較には表れにくい移行の負担が、次の購入先を事実上決めることもあり、強固な地位は製品の外側にも支えを持っている。",
+    "form": "牙城",
+    "en": "Long-established business software has both trained users and large archives stored in its format. Even superior competing products struggle to breach the incumbent's stronghold because retraining and data migration cost money. New entrants must provide migration tools and user support as well as lower prices. Switching burdens that barely appear in feature comparisons can effectively determine the next purchase, giving a dominant position support beyond the product itself.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「牙城を崩す」。容易には奪えない強固な支配領域を城にたとえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-91eb393f37-72ed71af",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-91eb393f37-72ed71af",
+    "wordId": "nn-91eb393f37"
+   }
+  },
+  {
+   "term": "省人化",
+   "reading": "しょうじんか",
+   "pos": "noun",
+   "meaning": "reducing required staffing",
+   "defJa": "作業に必要な人数を少なくすること",
+   "passage": {
+    "ja": "受付の端末を増やしたら、係員を減らせると思っていたんだけど、初日は操作の案内に追われたんだ。省人化って、ただ機械を置くことじゃなくて、必要な仕事を少ない人数で回せるようにすることなんだよね。予約変更や端末の故障が重なると、ふだんは見えない対応の仕事が一気に表に出る。人数を減らすにしても、利用者が迷う場所を直したり、例外を専門の窓口へ回したりして、残った人のところに全部の負担が集まらない仕組みが要るんだ。",
+    "form": "省人化",
+    "en": "We thought adding reception terminals would let us reduce staffing, but spent the first day explaining how to operate them. Reducing staffing needs means enabling fewer people to handle the necessary work, not simply installing machines. When booking changes and terminal failures coincide, normally hidden support tasks suddenly surface. Even if staffing is reduced, confusing interfaces and routing of exceptions need attention so the remaining workers do not receive the entire burden.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "必要な人数を減らすこと。機械化しただけで実現するとは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-119f380d56-1fb87653",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-119f380d56-1fb87653",
+    "wordId": "nn-119f380d56"
+   }
+  },
+  {
+   "term": "経済安全保障",
+   "reading": "けいざいあんぜんほしょう",
+   "pos": "noun",
+   "meaning": "economic security",
+   "defJa": "経済上の手段で国民生活や国家の安全を守ること",
+   "passage": {
+    "ja": "重要な部品を一つの国からしか調達できなければ、輸送や取引が止まった際に国内の生産も止まりかねない。経済安全保障では、こうした依存が国民生活や社会の基盤を脅かす危険を抑えるため、供給先の分散や備蓄などが課題となる。ただし、すべてを国内で作ろうとすれば、費用の増加や資源の制約に直面する。安さだけで調達先を決める場合とは違い、平常時に負担を引き受けてでも、途絶したときの代替手段を確保するという判断が求められる。",
+    "form": "経済安全保障",
+    "en": "If an essential component can be sourced from only one country, domestic production may also stop when transport or trade is disrupted. Economic security addresses risks such dependencies pose to livelihoods and social infrastructure through measures such as supplier diversification and stockpiles. Producing everything domestically, however, brings higher costs and resource constraints. Unlike choosing suppliers solely on price, this requires decisions to secure alternatives during disruptions even at a cost in normal times.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "供給の途絶などによる経済上の危険から生活や社会基盤を守る考え。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bee6b210d3-026673e3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-028.json",
+    "cardId": "nn-bee6b210d3-026673e3",
+    "wordId": "nn-bee6b210d3"
+   }
+  },
+  {
+   "term": "自動化",
+   "reading": "じどうか",
+   "pos": "noun",
+   "meaning": "automation",
+   "defJa": "人が行っていた作業を機械などに任せること",
+   "passage": {
+    "ja": "夜中に注文が届いても、倉庫の係員が端末を見ているとは限らない。受注を検知して在庫を確保し、出荷の一覧へ加える自動化によって、人が一件ずつ転記する手間は減らせる。ただし、住所が途中で切れている場合など、通常の条件から外れた注文までそのまま流せば、誤配送の原因になる。人の判断をどこへ残すかを決めることも仕組みの一部であり、正常時の速さに加えて、例外が起きたとき確実に止まり、担当者へ届く経路が重要になる。",
+    "form": "自動化",
+    "en": "A warehouse worker may not be watching a terminal when an order arrives at night. Automation that detects the order, reserves stock, and adds it to a shipping list reduces manual transcription. Yet allowing unusual orders, such as those with incomplete addresses, to pass unchanged can cause incorrect deliveries. Deciding where human judgment remains is part of the system, making reliable stopping and notification for exceptions important alongside normal processing speed.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "人が行っていた処理を機械や仕組みに実行させること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f703a9b237-635c5343",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-f703a9b237-635c5343",
+    "wordId": "nn-f703a9b237"
+   }
+  },
+  {
+   "term": "蓋然性",
+   "reading": "がいぜんせい",
+   "pos": "noun",
+   "meaning": "likelihood",
+   "defJa": "ある事柄が起こると考えられる確かさの程度",
+   "passage": {
+    "ja": "「起こる可能性はある」って言われても、どのくらいありそうなのかは分からないよね。蓋然性が高いという判断なら、単にゼロではないという話より、手元の証拠から見て起こる見込みが強いという意味になる。ただ、似た例が続いたからといって、次も同じだと決められるとは限らない。前提が変わっていないか、新しい情報が増えていないかを気にしながら判断を更新する必要があって、確実だと言い切る手前にも、見込みの強弱には幅があるんだ。",
+    "form": "蓋然性",
+    "en": "Being told something is possible does not tell you how likely it is. Judging its probability to be high means the available evidence makes it strongly expected, beyond merely having a nonzero chance. Still, a run of similar cases does not guarantee the next will be the same. Judgments need updating as assumptions and information change, and there is a range of likelihood short of certainty.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "単なる可能性の有無ではなく、起こる見込みの確かさの程度。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-521b3cb009-94a94af7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-521b3cb009-94a94af7",
+    "wordId": "nn-521b3cb009"
+   }
+  },
+  {
+   "term": "計算可能性",
+   "reading": "けいさんかのうせい",
+   "pos": "noun",
+   "meaning": "computability",
+   "defJa": "一定の手順で求める答えに到達できる性質",
+   "passage": {
+    "ja": "十分な時間を与えれば、どんな問いにも計算で答えられるのでしょうか。計算可能性は、速い機械を買えるかではなく、決められた手順を有限回進めることで答えに到達できるかを問題にします。答えを出す手順が存在しても、入力が大きくなるに伴って必要な時間が膨らみ、実用にならない場合はあります。反対に、一般に使える手順そのものが存在しない問題なら、処理速度を上げてもその欠落は埋まらず、時間の不足とは別の限界が残ります。",
+    "form": "計算可能性",
+    "en": "Given enough time, can computation answer every question? Computability concerns whether an answer can be reached through finitely many steps of a defined procedure, rather than whether a fast machine can be bought. Even when such a procedure exists, its running time may grow with the input until it becomes impractical. Conversely, if no generally applicable procedure exists, greater processing speed cannot fill that absence, leaving a limit distinct from insufficient time.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "手順によって答えを得られるかという性質で、計算の速さとは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f2b554f67d-fed42923",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-039.json",
+    "cardId": "nn-f2b554f67d-fed42923",
+    "wordId": "nn-f2b554f67d"
+   }
+  }
+ ]
+}

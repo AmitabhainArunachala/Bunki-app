@@ -1,0 +1,144 @@
+{
+ "cards": [
+  {
+   "term": "再帰的自己改善",
+   "reading": "さいきてきじこかいぜん",
+   "pos": "noun",
+   "meaning": "recursive self-improvement",
+   "defJa": "自らの改良能力も改良する過程を繰り返すという構想",
+   "passage": {
+    "ja": "プログラムが自分の欠点を探し、修正案を作って試すとします。その変更によって欠点を探す能力自体も高まり、次の改良がさらに進むという構想が再帰的自己改善です。単に同じ作業を繰り返すのとは異なり、改良を生み出す側の能力も更新される点に特徴があります。ただし、能力が上がるに伴って検証に必要な計算やデータが増えることも考えられ、この循環を想定しただけで無限の成長や安全性まで約束されることにはなりません。",
+    "form": "再帰的自己改善",
+    "en": "Suppose a program finds its own shortcomings, produces revisions, and tests them. Recursive self-improvement is the proposal that these changes also strengthen its ability to find shortcomings, enabling further improvement in the next round. Its distinctive feature is that the ability producing improvements is itself updated, unlike simply repeating the same task. However, stronger capabilities may also require more computation or data for verification, so proposing this cycle does not promise unlimited growth or safety.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "改良の対象に、改良する能力自体が含まれるという構想。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5c684cf3fd-56fae9b8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015-r.json",
+    "cardId": "nn-5c684cf3fd-56fae9b8",
+    "wordId": "nn-5c684cf3fd"
+   }
+  },
+  {
+   "term": "先端パッケージング",
+   "reading": "せんたんぱっけーじんぐ",
+   "pos": "noun",
+   "meaning": "advanced packaging",
+   "defJa": "複数の半導体などを高密度に接続し実装する技術",
+   "passage": {
+    "ja": "一つの巨大な半導体に全機能を詰め込む代わりに、小さな部品を近づけてつなぐ方法があります。先端パッケージングは、こうした複数のチップを高密度に接続し、一つの製品として働かせる技術です。計算する部分と記憶する部分の距離が縮まれば、大量のデータをやり取りする際の負担を減らせる一方で、熱の逃がし方や接続の検査が難しくなります。外から見える箱の小ささだけでなく、内部で部品をどう結び、安定して動かすかが設計の中心です。",
+    "form": "先端パッケージング",
+    "en": "Instead of placing every function on one enormous semiconductor, smaller components can be brought close together and connected. Advanced packaging is the technology of connecting multiple chips at high density so they work as one product. Bringing processing and memory closer can reduce the burden of transferring large amounts of data, while making heat removal and connection testing harder. Design centers on how components are connected and operated reliably inside, as well as on the small size of the visible package.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「接続する」「実装する」と結び付き、単なる外装の技術を超える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-359f9d5db7-cf5c08c1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-005-r.json",
+    "cardId": "nn-359f9d5db7-cf5c08c1",
+    "wordId": "nn-359f9d5db7"
+   }
+  },
+  {
+   "term": "チューリングテスト",
+   "reading": "ちゅーりんぐてすと",
+   "pos": "noun",
+   "meaning": "the Turing test",
+   "defJa": "対話で相手が人か機械かを見分けられるかの試験",
+   "passage": {
+    "ja": "壁の向こうにいる相手から、画面を通じて返事が届きます。声も顔も分からないまま質問を重ね、人間か機械かを判断するチューリングテストでは、対話が判断の手がかりになります。自然な受け答えが続けば機械を人だと思う可能性はありますが、それだけで相手に喜びや痛みの経験があると確認できるわけではありません。返事の巧みさに加えて内面まで認めるべきかという問いは、この試験で観察できる振る舞いの範囲を超えています。",
+    "form": "チューリングテスト",
+    "en": "Replies arrive on a screen from someone behind a wall. In the Turing test, questions are asked without seeing a face or hearing a voice, and dialogue provides the clues for deciding whether the respondent is human or a machine. A series of natural responses may lead someone to mistake a machine for a human, but that alone cannot establish that it experiences joy or pain. Whether an inner life should be acknowledged along with skillful replies goes beyond the behavior observable in this test.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「試験に通る」という成績と、意識があるという判断は別の問題。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-7eba44a781-aa5b0a20",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-7eba44a781-aa5b0a20",
+    "wordId": "nn-7eba44a781"
+   }
+  },
+  {
+   "term": "不可逆",
+   "reading": "ふかぎゃく",
+   "pos": "na-adj",
+   "meaning": "irreversible",
+   "defJa": "元の状態へそのまま戻すことができない性質",
+   "passage": {
+    "ja": "コーヒーに落としたミルクは、かき混ぜると全体へ広がっていきます。スプーンを逆向きに回したところで元の一滴には戻らず、このように日常の条件では逆にたどれない変化を不可逆と呼びます。熱い飲み物が周囲へ熱を渡す過程でも、放置するだけで周囲から熱を集めて元の温度になることはありません。身近な変化を観察する際には、物質が消えたかどうかと、外から仕事を加えずに前の状態へ戻れるかどうかを、別々に確かめる必要があります。",
+    "form": "不可逆",
+    "en": "Milk dropped into coffee spreads throughout it when stirred. Turning the spoon in the opposite direction does not restore the original drop, and a change that cannot be retraced under ordinary conditions is called irreversible. When a hot drink transfers heat to its surroundings, leaving it alone will not make it gather heat and return to its former temperature. Observing everyday changes requires distinguishing whether matter has disappeared from whether the previous state can be restored without external work.",
+    "register": "学",
+    "topic": "other",
+    "tipJa": "変化を逆にたどって元へ戻せない性質に用い、「消滅」とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f2a97d79a0-46f4fc77",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-012.json",
+    "cardId": "nn-f2a97d79a0-46f4fc77",
+    "wordId": "nn-f2a97d79a0"
+   }
+  },
+  {
+   "term": "化学機械研磨",
+   "reading": "かがくきかいけんま",
+   "pos": "noun",
+   "meaning": "chemical mechanical polishing",
+   "defJa": "薬液の作用と物理的な摩擦で表面を平らにする加工",
+   "passage": {
+    "ja": "回路の層を積み重ねる半導体では、下の層の凹凸が次の加工の邪魔になります。表面を平らにする化学機械研磨は、薬液による化学的な作用と、研磨材などによる物理的な力を組み合わせる工程です。削ればよいというものではなく、材料に応じて薬液や圧力を調整し、必要な部分を残しながら高さをそろえます。削り過ぎも傷も後の工程に響くため、滑らかな表面の裏には、異なる材料を狙いどおりの速さで取り除く細かな制御があります。",
+    "form": "化学機械研磨",
+    "en": "In semiconductors built with stacked circuit layers, unevenness in a lower layer interferes with the next processing step. Chemical mechanical polishing flattens surfaces by combining chemical action from liquids with physical force from abrasive materials and other means. It requires adjusting liquids and pressure to the material and leveling the surface while preserving necessary portions, rather than simply grinding away. Excess removal and scratches affect later steps, so a smooth surface depends on finely controlling the removal of different materials at the intended rates.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "薬液と物理的な力を併用して「表面を平らにする」工程。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-2294b7f645-b266dfbc",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-040.json",
+    "cardId": "nn-2294b7f645-b266dfbc",
+    "wordId": "nn-2294b7f645"
+   }
+  }
+ ]
+}

@@ -1,0 +1,176 @@
+{
+ "batch": "div-002",
+ "writer": "gpt-6-astra",
+ "items": [
+  {
+   "term": "本論",
+   "reading": "ほんろん",
+   "gloss": "main body",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "序論",
+    "根拠"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "治外法権",
+   "reading": "ちがいほうけん",
+   "gloss": "extraterritoriality",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "条約",
+    "主権"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "環境設計",
+   "reading": "かんきょうせっけい",
+   "gloss": "designing one's environment",
+   "level": "N1",
+   "register": "学",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "工夫",
+    "強制"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "熟達者",
+   "reading": "じゅくたつしゃ",
+   "gloss": "expert",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "手順",
+    "職人"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "王道",
+   "reading": "おうどう",
+   "gloss": "reliable, orthodox route",
+   "level": "N1",
+   "register": "話",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "基礎",
+    "応用"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "目標設定",
+   "reading": "もくひょうせってい",
+   "gloss": "goal setting",
+   "level": "N1",
+   "register": "学",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "期限",
+    "達成"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "知能",
+   "reading": "ちのう",
+   "gloss": "intelligence",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "推論",
+    "正解"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "何となく",
+   "reading": "なんとなく",
+   "gloss": "somehow",
+   "level": "N2",
+   "register": "話",
+   "preferTopic": "language",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "語順",
+    "正解"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "人工知能",
+   "reading": "じんこうちのう",
+   "gloss": "artificial intelligence",
+   "level": "N1",
+   "register": "話",
+   "preferTopic": "ai",
+   "deck": "senmon",
+   "field": "ai",
+   "weave": [
+    "分類",
+    "誤差"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "流動性知能",
+   "reading": "りゅうどうせいちのう",
+   "gloss": "fluid intelligence",
+   "level": "N1",
+   "register": "講",
+   "preferTopic": "mind",
+   "deck": "senmon",
+   "field": "mind",
+   "weave": [
+    "図形",
+    "法則"
+   ],
+   "fixThis": [
+    "phrase 「じゃないですか。でも」 appears in 18 cards (cap 11)"
+   ]
+  }
+ ]
+}

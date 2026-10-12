@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "陰陽",
+   "reading": "いんよう",
+   "pos": "noun",
+   "meaning": "yin and yang",
+   "defJa": "対立し補い合う二つの働きで世界を捉える考え",
+   "passage": {
+    "ja": "昼が長くなれば夜は短くなり、やがて季節が巡ってその関係も変わる。中国の思想に由来する陰陽は、対立しながら補い合う二つの働きによって世界を捉える枠組みである。片方だけを善、もう片方だけを悪として取り除こうとする見方とは異なり、関係や変化の中で両者を考える。日本でも広く受け入れられたが、仏教と同じ場所で用いられたからといって起源まで同じになるのではなく、複数の思想が重なった暮らしの中で、それぞれの系譜を保ってきた。",
+    "form": "陰陽",
+    "en": "As days lengthen, nights shorten, and the relationship changes again with the seasons. Originating in Chinese thought, yin and yang frame the world through two contrasting yet complementary forces. Rather than treating one as good and eliminating the other as evil, this view considers them through relationships and change. Although widely received in Japan, sharing settings with Buddhism did not give them the same origin, and each retained its lineage within a life shaped by overlapping traditions.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "対立しつつ補い合う二つの働きで世界を捉える、中国由来の枠組み。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-e1efe87b7a-17ffdf2a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-031.json",
+    "cardId": "nn-e1efe87b7a-17ffdf2a",
+    "wordId": "nn-e1efe87b7a"
+   }
+  }
+ ]
+}

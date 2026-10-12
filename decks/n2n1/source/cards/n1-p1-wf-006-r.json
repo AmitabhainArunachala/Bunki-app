@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "名残",
+   "reading": "なごり",
+   "pos": "noun",
+   "meaning": "remains, vestige",
+   "defJa": "過ぎ去ったものの面影や余韻。",
+   "passage": {
+    "ja": "港町の古い通りには、海運で江戸時代に栄えた廻船問屋の名残が、白壁の蔵や石畳の坂となって、今も点々と残っている。近年の観光客の増加を受け、市は昔ながらの景観を守るべく、建て替えの規制を強めてきた。ところが、住民の高齢化に伴って空き家が増え、所有者にとって維持の費用は重くなる一方だ。保存と暮らしの両立という難しい問いが、いま、この町の最大の課題として浮かび上がっている。",
+    "form": "名残",
+    "en": "On the old streets of a port town, traces of the shipping wholesalers who flourished through maritime trade in the Edo period still survive here and there as white-walled storehouses and stone-paved slopes. Following the recent increase in tourists, the city has tightened rebuilding restrictions in order to protect the traditional scenery. However, as residents age, vacant houses are multiplying and the cost of upkeep keeps growing heavier for owners. The difficult question of balancing preservation with daily life is now emerging as this town's greatest challenge.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「〜の名残」の形で、かつての盛んな姿が今も少し残っているさまを表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

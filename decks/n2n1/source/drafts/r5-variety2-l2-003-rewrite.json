@@ -1,0 +1,88 @@
+{
+ "cards": [
+  {
+   "term": "牽引",
+   "reading": "けんいん",
+   "pos": "noun",
+   "meaning": "driving or leading growth",
+   "defJa": "全体の発展を先頭に立って引っ張ること",
+   "passage": {
+    "ja": "人工知能向けのサーバーの大量注文をきっかけに、部品工場が設備を増やし、材料会社も人を採り始めました。新しい製品への需要が関連産業の成長を牽引する場面では、最終製品の会社だけに変化がとどまりません。ただし、注文の勢いを永続するものとして扱えば、設備が余る恐れもあります。学習用の事例としてこの流れを追うと、先頭の需要がどの会社へ伝わり、どこで資金や人材が不足するかが見えてきます。成長を引っ張る力と、それを受け止める側の準備は一組の課題です。",
+    "form": "牽引",
+    "en": "A large order for artificial intelligence servers prompted a component factory to add equipment and a materials company to begin hiring. When demand for a new product drives growth in related industries, change extends beyond the final-product company. However, treating the pace of orders as permanent risks leaving excess equipment. Following this sequence as a learning case reveals which companies receive the initial demand and where funding or personnel become insufficient. The force driving growth and recipients' readiness form a linked set of challenges.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「成長を牽引する」の形で、発展の先頭に立って引っ張る力を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9ad453dde6-0ee738b3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-026.json",
+    "cardId": "nn-9ad453dde6-0ee738b3",
+    "wordId": "nn-9ad453dde6"
+   }
+  },
+  {
+   "term": "経済産業省",
+   "reading": "けいざいさんぎょうしょう",
+   "pos": "noun",
+   "meaning": "Japan’s industry and trade ministry",
+   "defJa": "日本で産業や通商などの政策を担う行政機関",
+   "passage": {
+    "ja": "半導体工場への支援では、企業が工場を建設する決定と、国が予算を使う判断が接点を持ちます。産業や通商の政策を担う経済産業省は、このような政策に関わる行政機関の一つです。工場が完成すれば終わりというものではなく、人材の育成や材料の供給も事業の継続を左右します。地域の電力需要が増えれば、工場の外でも調整が必要になります。企業の投資計画と公共の支援が結び付くところでは、事業の利益だけでなく、政策の目的と費用の関係も問われます。",
+    "form": "経済産業省",
+    "en": "Support for semiconductor factories brings corporate decisions to build factories into contact with government decisions to spend public funds. The Ministry of Economy, Trade and Industry is one administrative body involved in such policies, with responsibility for industry and trade. Completion of a factory is not the end, since personnel development and material supply also affect its continued operation. Rising local electricity demand requires coordination outside the factory as well. Where corporate investment and public support meet, the relationship between policy goals and costs matters alongside business profits.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "産業や通商などの政策を担当する日本の行政機関。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9a8b19130f-0245eb11",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-028.json",
+    "cardId": "nn-9a8b19130f-0245eb11",
+    "wordId": "nn-9a8b19130f"
+   }
+  },
+  {
+   "term": "要諦",
+   "reading": "ようてい",
+   "pos": "noun",
+   "meaning": "the essential point",
+   "defJa": "物事を行ううえで特に重要な点",
+   "passage": {
+    "ja": "半導体回路の計算問題の答案を見直すと、難しい計算よりも問題の条件を取り違えた失点が目立ちました。練習量を増やす前に誤りを分類したところ、単位をそろえず数値を式に入れる癖が見つかりました。この生徒にとって改善の要諦は、計算を速めることより、式を立てる前に量の意味を確かめることにあります。手順を一つ変えてから、新しい問題で同じ間違いが減るかを確かめます。努力を続けるにしても、どこを変えれば結果が動くかをつかめば、練習の目的ははるかにはっきりします。",
+    "form": "要諦",
+    "en": "Reviewing an answer sheet for semiconductor circuit calculations revealed more lost marks from misreading conditions than from difficult calculations. Classifying errors before increasing practice uncovered a habit of inserting numbers into formulas without aligning units. For this student, the essential point for improvement lies in checking what quantities mean before setting up an equation, more than in calculating faster. After changing that step, the student checks whether the same mistake declines on new problems. Even when continuing to work hard, identifying what change affects results makes the purpose of practice much clearer.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "全体を左右する特に大切な点で、「改善の要諦」のように使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f6b74e6e2e-340b6868",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-f6b74e6e2e-340b6868",
+    "wordId": "nn-f6b74e6e2e"
+   }
+  }
+ ]
+}

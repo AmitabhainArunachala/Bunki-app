@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "破片",
+   "reading": "はへん",
+   "pos": "noun",
+   "meaning": "fragment; broken piece",
+   "defJa": "割れたり砕けたりしてできた小さな部分",
+   "passage": {
+    "ja": "窯から出したばかりの器が床に落ちると、職人は箒を持つ手を止め、散らばった破片を一つずつ拾い上げた。継ぎ合わせれば輪郭は戻るとしても、釉薬の流れまで同じ姿に復元することはできない。それでも、どこに力がかかって割れたのかは、欠けた縁を見比べることで分かる場合がある。完成品だけを棚に並べていては見えてこない土の厚みや焼き方の癖が、壊れた器にはむき出しになっている。",
+    "form": "破片",
+    "en": "When a vessel fresh from the kiln fell to the floor, the potter paused with a broom in hand and picked up the scattered fragments one by one. Even if joining them restores its outline, the flow of the glaze cannot be reconstructed exactly as it was. Still, comparing the broken edges can sometimes reveal where force caused the vessel to crack. Habits in the clay thickness and firing that remain hidden when only finished pieces line the shelves lie exposed in a broken vessel.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "「破片を拾う」のように、壊れた物の一部分をいう。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "見本",
+   "reading": "みほん",
+   "pos": "noun",
+   "meaning": "sample, model",
+   "defJa": "商品の形や品質を示すために用意したもの",
+   "passage": {
+    "ja": "椅子の張り替えを頼むとき、色の名前だけで希望を伝えるのは案外難しいものです。店頭で気に入った青でも、部屋の照明の下では冷たく見えることがあるので、生地の見本を借りて帰りましょう。写真に加えて小さな布が手元にあれば、指で触れながら、光沢の強さや肌に当たる感じまで比べられます。注文書には単に明るい青と書くより、選んだ布の番号と、どの面に使いたいかを添えるほうが確実です。",
+    "form": "見本",
+    "en": "When having a chair reupholstered, communicating your wishes through color names alone can be surprisingly difficult. Even a blue you like in the shop can look cold under your room lighting, so borrow a fabric sample to take home. With a small piece of cloth as well as a photograph at hand, you can touch it and compare everything from its sheen to its feel against your skin. On the order form, giving the chosen fabric number and the surfaces you want covered is more reliable than simply writing bright blue.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "ここでは、商品の質感を確かめるための実物を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "コピー",
+   "reading": "こぴー",
+   "pos": "noun",
+   "meaning": "copy",
+   "defJa": "元の文書などを写して作ったもの",
+   "passage": {
+    "ja": "祖母の手紙を家族で読むためにコピーを配ると、同じ文章を見ているのに、ある人は句読点を、別の人は筆跡を気にします。内容を知るだけなら文字を打ち直す方法もありますが、行の途中の迷いや書き損じは、その過程で消えてしまいます。だからこそ資料を残すにあたっては、何を伝えたいのかを先に決める必要があります。読める文字だけを残すのか、紙の上にためらった跡まで残すのかで、写し方の選択も変わるのです。",
+    "form": "コピー",
+    "en": "When copies of a grandmother’s letter are handed out for the family to read, some people notice its punctuation and others its handwriting, despite looking at the same text. Retyping is an option if all we want is its content, but the hesitations midway through a line and the writing errors disappear in the process. Precisely for this reason, when preserving materials we need to decide first what we want to convey. Whether we preserve only the legible words or even the traces of hesitation on the page changes our choice of how to reproduce them.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "ここでは広告文ではなく、元の手紙を写したものをいう。",
+    "sense": "元の文書や画像を複製したもの"
+   }
+  },
+  {
+   "term": "占領",
+   "reading": "せんりょう",
+   "pos": "noun",
+   "meaning": "occupation, possession",
+   "defJa": "軍事力で他国の土地を支配下に置くこと",
+   "passage": {
+    "ja": "地図の上で首都の色が変わると、その国をめぐる戦いは終わったように見える。だが、軍隊が都市を占領したからといって、住民の日々の暮らしまで直ちに統治できるとは限らない。食料の補給、水道の修理、商店の再開といった仕事には、街の事情を知る人々の協力が必要になる。戦況を示す地図から一度目を離し、台所の火がいつ戻ったかを調べると、軍事的な勝利とは別の時間を生きた人々の姿が見えてくる。",
+    "form": "占領",
+    "en": "When a capital changes color on a map, the struggle over that country seems to be over. Yet an army’s occupation of a city does not necessarily mean it can immediately govern the residents’ daily lives. Tasks such as supplying food, repairing water systems, and reopening shops require cooperation from people familiar with the city. Looking away from the military map to investigate when kitchen fires returned reveals people living according to a different timeline from that of military victory.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「都市を占領する」は軍事的に支配下に置くこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "七五調",
+   "reading": "しちごちょう",
+   "pos": "noun",
+   "meaning": "seven-five mora meter",
+   "defJa": "七音と五音を基本に繰り返す言葉の調子",
+   "passage": {
+    "ja": "歌詞を読んでいて、意味を考える前に自然と足で拍子を取った経験はありませんか。七五調の文章は七音と五音を基本に進むので、区切りに沿って声に出すと、目で読むだけでは気づきにくい調子を確かめられます。ここでいう音は拍を指し、音節とは数え方が異なるため、小さな「っ」や伸ばす音も一つとして数えます。数が合っているかだけに気を取られず、どこで息を継ぐと意味が伝わり、どの言葉に余韻が残るかも聞き比べてください。",
+    "form": "七五調",
+    "en": "Have you ever found yourself tapping your foot to song lyrics before thinking about their meaning? Prose in seven-five meter proceeds on a basic pattern of seven and five sound units, so reading it aloud at the divisions lets you check rhythms that can be hard to notice silently. Here, the units are morae, counted differently from syllables, so a small tsu and the extra length of a long vowel each count as one. Rather than focusing solely on whether the count fits, compare where a breath helps convey the meaning and which words leave a lingering resonance.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "音の数は拍で数え、長音なども一拍として扱います。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "偉業",
+   "reading": "いぎょう",
+   "pos": "noun",
+   "meaning": "great achievement",
+   "defJa": "並外れて優れた大きな事業や功績",
+   "passage": {
+    "ja": "古い橋の完成を祝う碑には設計者の名が刻まれているが、石を運んだ人々の名はまず見当たらない。後世に残る偉業を成し遂げた人物をたたえる一方で、その仕事を支えた無名の人々にも目を向けたい。設計図だけでは川を渡れず、現場で寸法を確かめ、危険を避けながら手を動かす人が必要だったからである。誰の功績を記録するかという問いを携えて橋を眺めると、完成までの歳月は、一人の才能だけでは語れない厚みを持ち始める。",
+    "form": "偉業",
+    "en": "A monument celebrating an old bridge’s completion bears its designer’s name, but the names of those who carried the stones are rarely to be found. While honoring the person who accomplished a great feat that endures for posterity, we should also consider the unnamed people who supported the work. A drawing alone cannot get us across a river; people were needed to check dimensions and work with their hands while avoiding danger. Viewing the bridge with the question of whose contributions get recorded gives the years leading to its completion a depth that one person’s talent alone cannot explain.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「偉業を成し遂げる」は非常に大きな功績を残すこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "句読点",
+   "reading": "くとうてん",
+   "pos": "noun",
+   "meaning": "punctuation marks",
+   "defJa": "文の終わりや途中の区切りを示す記号",
+   "passage": {
+    "ja": "「弟は笑いながら走る兄を追った」という文を読むと、笑っているのがどちらなのか、少し迷います。書き手の意図に応じて句読点を補えば関係が見えやすくなりますが、記号を増やすだけで誤解がなくなるとは限りません。弟が笑っているなら、「弟は笑いながら、走っている兄を追った」と言葉も整えられます。推敲の際は息継ぎの場所だけを探すのではなく、動作の主が読み手にどう伝わるかを確かめると、直すべき箇所がはっきりします。",
+    "form": "句読点",
+    "en": "In the sentence about a younger brother chasing an older brother while laughing and running, we may hesitate over which brother is laughing. Adding punctuation according to the writer’s intent can clarify the relationships, but more marks alone do not necessarily eliminate misunderstanding. If the younger brother is laughing, the wording can also be revised to say that, while laughing, he chased his older brother, who was running. During revision, checking how the agent of each action comes across to readers, rather than merely looking for breathing points, makes the places needing correction clearer.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "句点は文の終わり、読点は文中の区切りに使います。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "口調",
+   "reading": "くちょう",
+   "pos": "noun",
+   "meaning": "tone of voice",
+   "defJa": "話すときの声の調子や言い回し",
+   "passage": {
+    "ja": "「もう一度確認してください」という依頼は、語尾を低く静かに置くか、強く短く切るかで、相手への響きが変わる。同じ敬語を使っていても、厳しい口調になれば、受け手は依頼よりも非難を感じ取ることがある。丁寧な言葉を選んだつもりの話し手が、録音を聞いて初めて自分の声の強さに驚くのも、そのためだろう。伝え方を振り返るに際しては、何と言ったかに加えて、相手が返事をする余地を声の中に残していたかも問う必要がある。",
+    "form": "口調",
+    "en": "The request to check something again lands differently depending on whether its ending is delivered quietly in a low voice or cut off sharply and forcefully. Even with the same polite wording, a stern tone can make the recipient hear blame rather than a request. That may explain why someone who thought they had chosen courteous words is surprised by the force of their own voice on a recording. When reflecting on delivery, we need to ask not only what was said but also whether the voice left room for the other person to respond.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「穏やかな口調」「厳しい口調」のように話し方を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "和製英語",
+   "reading": "わせいえいご",
+   "pos": "noun",
+   "meaning": "Japan-made English",
+   "defJa": "英語の語を材料に日本で作られた言葉",
+   "passage": {
+    "ja": "海外の友人に暮らしぶりを伝える文章で、「マイペース」をそのまま英字にすると、自分の速度という意味が伝わるでしょうか。これは英語の材料から日本で作られた和製英語なので、日本語での意味を先にほどいて考える必要があります。外来語に慣れている人であれ、形が似ているという理由だけで、同じ文脈に使えると思い込むのは危険です。この場合は無理に一語を探さず、周りに急かされずに自分の調子で暮らしている、と内容を具体的に言い換えられます。",
+    "form": "和製英語",
+    "en": "In a piece telling an overseas friend about your life, would putting the Japanese expression mai pēsu into Roman letters convey the idea of moving at your own speed? It is a Japan-made English expression assembled from English material, so we first need to unpack its Japanese meaning. Even people familiar with loanwords risk error if they assume that similar forms work in the same contexts. In this case, instead of forcing a single-word equivalent, we can spell out the idea of living at our own pace without being hurried by others.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "英語に似た形でも、そのまま英語で通じるとは限りません。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "悪文",
+   "reading": "あくぶん",
+   "pos": "noun",
+   "meaning": "bad writing",
+   "defJa": "意味や構造が分かりにくい文章",
+   "passage": {
+    "ja": "一文を三度読み返しても、誰が何に反対したのか分からない報告書がある。こうした悪文は、難しい専門用語が多いから生まれるというより、主語を省いたまま別の人物の行動へ移ることで生まれやすい。書き手には背景が分かっているだけに、読み手が途中で話の主を見失うとは想像しにくいのである。推敲では美しい表現を探す前に、それぞれの動詞に誰の行動かを書き添え、必要なら文を分けると、絡まった関係をほどく糸口が見つかる。",
+    "form": "悪文",
+    "en": "Some reports leave us unable to tell who opposed what even after reading a sentence three times. Such bad writing often arises less from difficult terminology than from shifting to another person’s actions while continuing to omit the subject. Precisely because writers know the background, they can struggle to imagine readers losing track of who the passage is about. During revision, before searching for elegant expressions, noting whose action each verb describes and splitting sentences where needed can provide a way to untangle the relationships.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「悪文を直す」では文の関係を読み取れる形に整える。",
+    "sense": ""
+   }
+  }
+ ]
+}

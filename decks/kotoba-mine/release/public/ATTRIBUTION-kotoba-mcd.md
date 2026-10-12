@@ -1,4 +1,4 @@
-# Sources: 言葉の鉱脈・MCD (kotoba-mcd)
+# Sources: 調べた言葉・長文 (kotoba-mcd)
 
 Built for sharing (public build; sources that may not be shared are left out). 22 passages come from the 9 sources below; 1443 passages were written for this deck (書き下ろし) and are not listed.
 

@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "自然言語処理",
+   "reading": "しぜんげんごしょり",
+   "pos": "noun",
+   "meaning": "natural language processing",
+   "defJa": "人が使う言葉を計算機で分析や生成する技術",
+   "passage": {
+    "ja": "映画の感想にある「面白くない」と「面白くないとは思わない」は、同じ否定の語を含んでいても、前者が作品を否定的に評価するのに対して、後者はその評価を打ち消しています。単語の数は手がかりの一部です。自然言語処理で感想を分類する際には、否定が文のどの部分にかかるかも扱います。「ない」を見つけたからといって、感想全体をすぐに否定的とは決められません。文の構造をたどると、後者では否定的な評価そのものが、もう一度否定の対象になります。",
+    "form": "自然言語処理",
+    "en": "The film-review phrases “It is not interesting” and “I do not think it is uninteresting” contain the same negative wording, yet the former evaluates the film negatively while the latter rejects that evaluation. Word counts provide only part of the evidence. Classifying reviews through natural language processing also involves handling which part of a sentence the negation applies to. Finding a negative word does not immediately justify classifying the whole review as negative. Following the sentence structure shows that in the latter example, the negative evaluation itself becomes the object of another negation.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "人の言葉を計算機で扱う技術で、文中の否定がかかる範囲も分析の対象。",
+    "sense": ""
+   },
+   "cardId": "nn-a6cde01e02-f5c24024",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-029.json",
+    "cardId": "nn-a6cde01e02-f5c24024",
+    "wordId": "nn-a6cde01e02"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "八百万の神",
+   "reading": "やおよろずのかみ",
+   "pos": "noun",
+   "meaning": "the myriad kami",
+   "defJa": "数え切れないほど多くの神々",
+   "passage": {
+    "ja": "寺の本堂で仏を拝んだ人が、同じ境内にある小さな社にも立ち寄る。そこに祀られた神を寺の守り手とみなす信仰では、仏の教えを受け入れたからといって土地の神との縁が切れるのではなく、異なる由来を持つ存在が日々の祈りの中で結ばれている。祈る手は同じである。教義の区別を細かく言い立てるより先に、人々は本堂の前で合掌し、次には社へ向き直り、暮らしの周囲に満ちる八百万の神にも敬意を寄せて手を合わせる。",
+    "form": "八百万の神",
+    "en": "Someone who worships a Buddha in a temple's main hall also stops at a small shrine in the same precincts. In a faith that regards the enshrined deity as the temple's guardian, accepting Buddhist teachings does not sever ties with the local god, and beings of different origins become connected in everyday prayer. The praying hands are the same. Before spelling out fine doctrinal distinctions, people join their hands before the main hall, then turn toward the shrine and pray with reverence for the myriad kami filling the world around their lives.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "数え切れない神々を、暮らしの中で敬意や祈りを向ける相手として用いる。",
+    "sense": ""
+   },
+   "cardId": "nn-6d3423ec75-b86d133b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-6d3423ec75-b86d133b",
+    "wordId": "nn-6d3423ec75"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

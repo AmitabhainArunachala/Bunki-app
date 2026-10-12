@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "日米貿易摩擦",
+   "reading": "にちべいぼうえきまさつ",
+   "pos": "noun",
+   "meaning": "US–Japan trade friction",
+   "defJa": "輸出の急増などをめぐる日米間の経済的な対立",
+   "passage": {
+    "ja": "半導体の歴史を学ぶとき、年表の暗記から入ると頭に残りにくい。まず1986年に結ばれた日米半導体協定を押さえ、その背景にあった日米貿易摩擦を「輸出の急増への反発が政策を変えた構図」として捉える。この構図は半導体に限らず自動車や鉄鋼でも同じ形で現れるので、一つを丁寧に学ぶと他の分野への転用が利く。順序としては協定から摩擦、各社の対応へと並べ、因果関係の鎖でつなぐと忘れにくい。投資の実務でも、過去の貿易政策がなぜ生まれたかを説明できるかが銘柄理解の分かれ目になる。",
+    "form": "日米貿易摩擦",
+    "en": "When studying semiconductor history, starting with memorizing chronologies leaves little in the mind. First grasp the 1986 US–Japan semiconductor agreement, and understand the US–Japan trade friction behind it as a pattern in which backlash against a surge in exports changed policy. Since this pattern appears in the same form in automobiles and steel, not just semiconductors, studying one case carefully transfers to other fields. As for order, arrange agreement, friction, and each company's response, linking them in a chain of cause and effect, and they become hard to forget. In the practice of investing too, whether you can explain why past trade policies arose is what separates levels of understanding of a stock.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "摩擦を抽象語のままにせず、輸出の急増と政策の変化という構図で捉える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "最適停止",
+   "reading": "さいてきていし",
+   "pos": "noun",
+   "meaning": "optimal stopping (decision theory)",
+   "defJa": "いつやめるかを数理的に選ぶ問題の枠組み",
+   "passage": {
+    "ja": "家探しの定番の考え方に、最初の三分の一は見るだけにして、以降は今までの最良を上回る候補が出たら即決する、というものがある。あれが最適停止の有名な例だ。ただし比喩が役立つのは、候補を断るとやり直せない、順番がランダム、評価がその場で出る、という前提が揃った範囲だけだ。投資の売り時の話に持ち込むと、価格は後から同じ水準に戻ることもあるし順番も決まっていないから、探索と活用のトレードオフを扱う枠組みとは別物になる。原典の前提を一行メモに書き添え、比喩を使うたびに照らし合わせれば、使いすぎていないかを自分で検証できる。",
+    "form": "最適停止",
+    "en": "A classic piece of house-hunting advice says to spend the first third only looking, then commit as soon as a candidate beats the best so far. That is the famous example of optimal stopping. But the metaphor helps only within the range where the premises hold: turning down a candidate cannot be undone, the order is random, and evaluation is immediate. Bring it into the timing of selling investments, and prices can return to the same level later and the order is not fixed, so it becomes something quite different from the framework handling the explore-versus-exploit trade-off. Add the original premises as a one-line note and check against them each time you use the metaphor, and you can verify for yourself whether you have stretched it too far.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "前提条件が揃った範囲でのみ成り立つ話で、比喩の適用限界を確認する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "極端紫外線",
+   "reading": "きょくたんしがいせん",
+   "pos": "noun",
+   "meaning": "extreme ultraviolet (EUV) light",
+   "defJa": "波長が極めて短い光で、リソグラフィに使うもの",
+   "passage": {
+    "ja": "リソグラフィの話でよく混ざるのが、光の波長と回路の最小幅です。極端紫外線は、波長が13.5ナノメートルと極めて短いことから、レンズを通さず鏡で光を導く仕組みになっています。ここで「13.5ナノの回路が描ける」と書きたくなる人があとを絶ちません。波長と描ける寸法は別の概念で、解像度は数値開口やプロセスの工夫も絡みます。この混同はカメラの解像度や音の周波数の話でも起こるので、二つの数字を並べてどちらが光の性質でどちらが加工の結果かを問う自習をすると区別が身につきます。",
+    "form": "極端紫外線",
+    "en": "In lithography talk, the light's wavelength and the circuit's minimum width are often conflated. Because its wavelength of 13.5 nanometers is extremely short, extreme ultraviolet uses a setup that guides light with mirrors rather than lenses. People keep wanting to write \"13.5-nanometer circuits can be drawn.\" Wavelength and drawable dimensions are different concepts, and resolution also involves numerical aperture and process innovations. Since this confusion also arises in camera resolution and sound frequency discussions, a self-study exercise of lining up the two numbers and asking which reflects the light's nature and which is a result of processing will make the distinction stick.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "波長13.5ナノメートルは光の性質で、描ける回路の寸法とは別概念。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "汎化",
+   "reading": "はんか",
+   "pos": "noun",
+   "meaning": "generalization (in machine learning)",
+   "defJa": "初めて見るデータに対しても性能を保つこと",
+   "passage": {
+    "ja": "機械学習のモデルは訓練データに対する誤差を減らすだけでなく、初めて見るデータでも同じ性能を保つことが求められる。この性質を汎化と呼ぶ。訓練例を暗記するだけのモデルは手元の誤差こそ小さいものの、新しい入力に対して脆く、容量を増やしたことがそのまま性能を保証しない。後者を高める選択肢として正則化やデータの多様化が知られているが、いずれも手元の成績をある程度犠牲にする費用を伴う。便利な手法を採用する際には、何を制約として手放しているのかを仕様書に書き分ける習慣が現場に広がりつつある。",
+    "form": "汎化",
+    "en": "A machine learning model is expected not only to reduce error on training data but also to maintain the same performance on data it has never seen. This property is called generalization. A model that merely memorizes training examples has small error on hand, yet is fragile against new inputs, and increased capacity does not by itself guarantee performance. Regularization and data diversification are known options for improving the latter, but each carries the cost of partly sacrificing in-sample results. At sites where convenient techniques are adopted, the habit of recording separately in the specification what is being given up as a constraint is spreading.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "訓練時の誤差の小ささと区別し、未知のデータへの性能を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "激震",
+   "reading": "げきしん",
+   "pos": "noun",
+   "meaning": "violent shock, upheaval",
+   "defJa": "物事に与える大きな衝撃、比喩的に使う語",
+   "passage": {
+    "ja": "「業界に激震が走った」という見出しを見て、友人が地震の話かと聞いてきた。比喩であることはすぐ分かるが、では何が揺れたのかと問い直すと意外に答えにくい。株価でも供給網でもなく人々の見通しだったとすれば、この語が指すのは仮説の組み替えを迫られる出来事ということになる。しかも新技術が実際に量産できるかはまだ検証されていないのだから、揺れたのは事実ではなく期待の相互作用だ。見出しの震度を測る代わりに、どの仮説が書き換わったかを数えてみると、報道の距離感がはっきり掴める。",
+    "form": "激震",
+    "en": "Seeing the headline \"a violent shock ran through the industry,\" a friend asked whether it was about an earthquake. That it is a metaphor is obvious at once, but asking what exactly was shaken proves surprisingly hard to answer. If it was neither share prices nor the supply network but people's outlooks, then the word refers to events that force a rearrangement of hypotheses. Moreover, since whether the new technology can actually be mass-produced is not yet verified, what shook was not fact but an interaction of expectations. Instead of measuring the headline's seismic intensity, count how many hypotheses were rewritten, and the distance of the reporting becomes clear.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "地震の比喩で、業界や市場の見通しの揺れを表す書き言葉。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "生成AI",
+   "reading": "せいせいえーあい",
+   "pos": "noun",
+   "meaning": "generative AI",
+   "defJa": "文章や画像などを新たに作り出す人工知能",
+   "passage": {
+    "ja": "生成AIの中身を説明するとき、僕はいつも手で小さな表を描くんですよ。単語を番号に置き換えた行列を書いて、次に来やすい番号に重みを振る、たったそれだけの計算だと。そうすると流暢な文と正しい文が別物だという話に筋が通るし、数字の並びを確かめる工程に真実の確認は入っていないから、自信たっぷりの間違い、つまり捏造も出る。図を描いたあとだと「認知してる」みたいな擬人化には戻れっこないんだよね。手計算一枚のほうが、どんな長い議論よりも早く誤解をほどいてくれる。",
+    "form": "生成AI",
+    "en": "When explaining how generative AI works, I always draw a small table by hand. You write out a grid with words replaced by numbers, assign weights to which number is likely to come next, and that is the entire calculation. Then the claim that fluent text and correct text are different things holds together, and since the process of checking number sequences includes no verification of truth, confidently delivered errors, in other words confabulations, also occur. Once the diagram is drawn, you cannot go back to anthropomorphizing it as \"it's thinking.\" A single page of hand calculation dissolves misunderstanding faster than any long debate.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "技術の説明に図や手計算を添えると、擬人化を防げる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "画像処理半導体",
+   "reading": "がぞうしょりはんどうたい",
+   "pos": "noun",
+   "meaning": "GPU; graphics processing chip",
+   "defJa": "画像の処理向けに設計され、並列計算に使われる半導体",
+   "passage": {
+    "ja": "技術記事の添削をすると、「画像処理半導体は絵を描く専用パーツ」という書き出しがよく引っかかります。元々は画面の描画のために大量の並列計算をまとめて処理する設計で、同じ構造が行列計算に向いていたため学習にも使われた、という順に直すと因果関係が正確になります。「絵を描く」は起源であって現在の主な用途ではありません。さらに「脳に近い」という表現は、認知の仕組みとの対応を示す根拠がないので削ります。書き手の意図に沿って語句だけを入れ替え、記事を学習教材へと仕上げるのが後工程です。",
+    "form": "画像処理半導体",
+    "en": "When editing technical articles, the opening \"graphics processing chips are dedicated parts for drawing pictures\" often catches my eye. The accurate causal order is that they were originally designed to process massive parallel computation for screen rendering, and because the same structure suited matrix computation, they came to be used for learning as well. \"Drawing pictures\" is the origin, not the current main use. Also, the phrase \"close to the brain\" gets cut, since there is no basis showing a correspondence with the mechanisms of cognition. Replacing only the wording while following the writer's intent and finishing the article as study material is the later step of the work.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "起源の用途と現在の用途を区別して説明すると誤解が減る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "警鐘を鳴らす",
+   "reading": "けいしょうをならす",
+   "pos": "expression",
+   "meaning": "to sound the alarm, warn urgently",
+   "defJa": "危険が近づいていると強く注意を促す",
+   "passage": {
+    "ja": "このままでは警鐘を鳴らすしかない、と言いたくなる気持ちは分かるけど、警告が効くのは条件が揃ったときだけだ。昔の失敗では、根拠の数字を示さず「危ない」と連呼したら、聞き手は最初こそ頷くものの、三回目で飽きて何も変わらなかった。効いたのは、期限と対象と代替案を一枚のメモに書いたときだった。警告は相手の行動を変えかねない力を持つぶん、事実と仮説を分けて伝えないと信頼を失う。鳴らす前に、誰に・何を・いつまでにを書き出してから声を大きくすればいい。",
+    "form": "警鐘を鳴らす",
+    "en": "I understand the urge to say \"at this rate there is nothing for it but to sound the alarm,\" but a warning works only when the conditions are in place. In a failure of mine years ago, I repeated \"it's dangerous\" without supporting numbers; the listener nodded at first, but by the third time they were tired of it and nothing changed. What worked was writing the deadline, the target, and the alternative on a single memo. Because a warning carries power enough to change people's behavior, conveying facts and hypotheses separately is essential or trust is lost. Before ringing it, write out to whom, about what, and by when, and only then raise your voice.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "比喩的な表現で、根拠と対象を添えないと効果が失われる。",
+    "sense": ""
+   }
+  }
+ ]
+}

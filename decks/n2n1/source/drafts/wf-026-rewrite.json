@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "仮名遣い",
+   "reading": "かなづかい",
+   "pos": "noun",
+   "meaning": "kana orthography",
+   "defJa": "かなの使い方に関する決まり。",
+   "passage": {
+    "ja": "現代仮名遣いでは、「は」「へ」「を」のように、発音と文字のずれが今も残っている助詞があります。たとえば「わたしは」の「は」は、実際には「わ」と読みますよね。1946年に告示された現代かなづかいは、昔の表記を大きく簡略化したものの、このずれまでは消しませんでした。古い書物を読むなら、旧来の綴りの知識が欠かせません。万葉仮名から続く表記の歴史を知ると、不思議なずれにも理由があると納得できます。",
+    "form": "仮名遣い",
+    "en": "In modern kana orthography, particles such as ha, he and wo still preserve a mismatch between sound and writing. For instance, the ha in watashi-wa is actually read as wa, isn’t it. The modern kana usage announced in 1946 greatly simplified the old spellings, but it did not erase this mismatch. If you read old books, knowing the traditional spellings is indispensable. Once you learn the history of writing that runs back to man’yogana, you can see there is a reason even for that odd mismatch.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「現代仮名遣い」「歴史的仮名遣い」の形でよく出る。表記の規則を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "併合",
+   "reading": "へいごう",
+   "pos": "noun",
+   "meaning": "annexation",
+   "defJa": "他国の領土を自国に組み入れること。",
+   "passage": {
+    "ja": "歴史を語る場面では、一つの言葉の選び方が、聞き手の受け取り方を大きく左右します。たとえば1910年の韓国併合を「合併」と言い換えると、対等な合意があったかのような印象を与えかねません。この語には、一方が他方を自国の領土に組み入れたという力の関係が含まれているのです。だから話し手は、用語の定義を確かめたうえで使う必要があります。言葉の重さに無自覚な語りは、聞き手の信頼を失うだけでなく、話し手の倫理まで疑わせます。",
+    "form": "併合",
+    "en": "When speaking about history, the choice of a single word greatly affects how listeners take it in. If you rephrase the 1910 annexation of Korea as a “merger,” for instance, you could give the impression that there was an agreement between equals. Within this word is contained a relationship of power, in which one side incorporated the other into its own territory. So a speaker needs to confirm a term's definition before using it. A way of speaking that is unaware of the weight of words not only loses the listener's trust but makes people doubt the speaker's ethics.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「韓国併合」「領土を併合する」。力関係を含む語なので言い換えに注意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "使役",
+   "reading": "しえき",
+   "pos": "noun",
+   "meaning": "causative",
+   "defJa": "他の人にある動作をさせる文法形。",
+   "passage": {
+    "ja": "「子どもに野菜を食べさせる」。この「させる」が、日本語の使役の代表的な形です。これは、誰かに何かをさせる、またはさせてしまう関係を表す文法で、受け身と並んで、学習者がつまずきやすい項目です。面白いのは、「笑わせる」のように、意図せず相手の感情を動かす場合にも使われる点で、俗語では「笑わせるな」が「ばかばかしい」という皮肉にもなります。さらに「させられる」の形にすると、「やらされる」という不満や被害の気持ちまで加わります。",
+    "form": "使役",
+    "en": "“I make my child eat vegetables.” This “saseru” is the typical form of the Japanese causative. It is grammar that expresses a relationship in which someone makes, or ends up making, someone do something, and along with the passive it is an item learners easily stumble over. What is interesting is that it is also used, as in “to make someone laugh,” when one moves another's feelings unintentionally, and in slang “don't make me laugh” becomes a sarcastic “how ridiculous.” Further, putting it in the “saserareru” form adds even a feeling of grievance or victimhood, as in “being made to do it.”",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「させる」の形。させる側と、させられる側の関係を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "依存症",
+   "reading": "いぞんしょう",
+   "pos": "noun",
+   "meaning": "addiction, dependence",
+   "defJa": "やめたくてもやめられない状態の病気。",
+   "passage": {
+    "ja": "スマホをいじる時間が増えるほど、「自分は依存症なのでは」と不安になる人もいるでしょう。けれども、専門家は、これを意志の弱さではなく、脳の報酬系が変化した状態として説明します。気合いで抜け出そうとする発想そのものが、的を外している場合があるのです。必要なのは、本人を責めることではなく、環境を変え、周りが傾聴の姿勢で支えることです。回復には長い停滞期があるものの、積み上げ直す価値は十分にあります。",
+    "form": "依存症",
+    "en": "As your time fiddling with your smartphone grows, some people may worry, “Am I addicted?” Yet specialists explain it not as weakness of will but as a state in which the brain's reward system has changed. The very idea of escaping by sheer willpower can be off the mark. What is needed is not to blame the person but to change the environment and for those around them to support them by listening attentively. Although recovery has a long plateau, rebuilding step by step is well worth it.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「ギャンブル依存症」。意志の弱さではなく、病気として捉える語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "促音",
+   "reading": "そくおん",
+   "pos": "noun",
+   "meaning": "geminate consonant (small tsu)",
+   "defJa": "小さな「っ」で表される、つまる音。",
+   "passage": {
+    "ja": "日本語の促音は、小さな「っ」で表されるが、外国人学習者には聞き分けがたい音である。「さか」と「さっか」のように、わずかな間の違いが意味を分けるからだ。母語にこうした音のない話者は、この無音の長さを一つの音として捉えにくい。日本語教育の現場では、手拍子を打ちながら拍を数える練習が、効果的だとされる。「ベッド」や「バッグ」のような借用語にも現れ、外来語の発音を左右している。",
+    "form": "促音",
+    "en": "The Japanese geminate, written with a small tsu, is a sound that foreign learners find hard to tell apart. A slight difference in pause separates meaning, as in “saka” and “sakka.” Speakers whose native language lacks such sounds have trouble perceiving this stretch of silence as a sound in its own right. In Japanese-language teaching, practice of counting beats while clapping is said to be effective. It also appears in loanwords such as “beddo” and “baggu,” and shapes the pronunciation of foreign words.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「小さな『っ』」。拍の長さで意味が変わるので、学習者には難しい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "俗語",
+   "reading": "ぞくご",
+   "pos": "noun",
+   "meaning": "slang",
+   "defJa": "日常会話で使う、くだけた言葉。",
+   "passage": {
+    "ja": "試験の長文で「やばい」という言葉が出てきたら、あなたは意味を取れますか。俗語は、辞書の見出しに載りにくいうえに、時代に伴って意味がどんどん変わります。たとえば「やばい」は、本来は危険を表す語でしたが、いまは称賛にも使われますし、「ナイス」のように借用語から生まれた言い回しも少なくありません。ただし作文や面接で使うと、場にそぐわない印象を与えかねないので、読んで分かる語と、自分で使う語は分けておきましょう。",
+    "form": "俗語",
+    "en": "If the word “yabai” came up in a long reading passage on an exam, could you grasp its meaning? Slang is hard to find in dictionary headwords, and its meaning keeps changing with the times. For example, “yabai” originally meant danger but is now also used as praise, and there are not a few expressions born of loanwords, like “nice.” Used in essays or interviews, however, it could give an ill-fitting impression, so keep words you can read separate from words you use yourself.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「俗語的な表現」。話し言葉で使い、書き言葉や面接では避ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "修飾語",
+   "reading": "しゅうしょくご",
+   "pos": "noun",
+   "meaning": "modifier",
+   "defJa": "他の語の意味を詳しく説明する語。",
+   "passage": {
+    "ja": "文章を磨くとは、修飾語を足すことではなく、思い切って削ることである。「とても素晴らしい美しい景色」のように言葉を重ねるほど、かえって情景はぼやけてしまう。名詞や動詞が的確であれば、修辞を凝らさなくても、情景は伝わるからだ。一方で、飾る言葉の位置が一つずれるだけで、文の意味が変わる場合もある。「美しい母の友人」は、美しいのが母なのか友人なのか、読み手を迷わせかねない。",
+    "form": "修飾語",
+    "en": "Polishing prose means not adding modifiers but cutting them. The more you pile on words, as in “a very wonderful beautiful view,” the more the scene actually blurs. If the nouns and verbs are exact, the scene comes across without any rhetorical elaboration. On the other hand, a shift of just one position in a modifying word can change the meaning of a sentence. “A beautiful mother's friend” could leave the reader unsure whether it is the mother or the friend who is beautiful.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「修飾語を削る」。名詞・動詞を飾る語。位置次第で意味が変わる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "倫理",
+   "reading": "りんり",
+   "pos": "noun",
+   "meaning": "ethics",
+   "defJa": "人として守るべき道。善悪の判断の基準。",
+   "passage": {
+    "ja": "AIの話をするとき、倫理という言葉を安易に使うと、聞き手は身構えてしまいます。かといって、AIの影響を語る以上、触れざるを得ません。そこで、聞き手の関心を優先順位の先頭に置き、具体的な場面から話し始めると、抽象的な議論よりずっと伝わりやすくなります。たとえば、採用面接でAIが応募者を選別するとき、誰が責任を取るのか、という問いです。身近な例を一つ挟んでから原則に戻る構成は、難しい話題ほど効果を発揮します。",
+    "form": "倫理",
+    "en": "When talking about AI, using the word ethics too casually makes listeners brace themselves. Yet as long as you speak of AI's effects, you cannot help touching on it. So putting the listener's interest at the top of your priorities and beginning with a concrete scene makes it far easier to get across than abstract argument. For example: when AI screens applicants in a hiring interview, who takes responsibility? A structure that inserts one familiar example and then returns to principle works better the harder the topic.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「人工知能の倫理」「倫理観」。善悪や責任の基準を問う語。",
+    "sense": ""
+   }
+  }
+ ]
+}

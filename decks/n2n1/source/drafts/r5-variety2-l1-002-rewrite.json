@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "分散投資",
+   "reading": "ぶんさんとうし",
+   "pos": "noun",
+   "meaning": "investment diversification",
+   "defJa": "資金を異なる複数の運用先に振り分けること",
+   "passage": {
+    "ja": "別々の会社の株を持っていても、どれも同じ原料に頼っていれば、その原料の値上がりで一緒に打撃を受けます。分散投資で重要なのは銘柄の数だけではなく、どんな出来事に対して運用先が同じ方向に動くかです。地域や業種を分けるにしても、景気の急変など、広い範囲に及ぶ要因を消すことはできません。一社の不振で資金全体が大きく減る危険を減らす働きと、市場全体が下がる危険が残ることを分けると、資金を振り分ける目的がはっきりします。",
+    "form": "分散投資",
+    "en": "Shares in different companies can all suffer from a rise in the same raw material's price if they depend on it. What matters in diversification is not only the number of holdings but which events make those investments move together. Even spreading investments across regions and industries cannot remove factors with broad effects, such as an abrupt economic downturn. Distinguishing the reduction of damage from one company's problems from the remaining risk of a market-wide decline clarifies why funds are spread out.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "運用先を分けて特定の相手への集中を減らすが、損失をなくすものではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b9cfca5e1d-17b84818",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-034.json",
+    "cardId": "nn-b9cfca5e1d-17b84818",
+    "wordId": "nn-b9cfca5e1d"
+   }
+  }
+ ]
+}

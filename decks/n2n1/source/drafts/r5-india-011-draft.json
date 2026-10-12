@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "仏陀",
+   "reading": "ぶっだ",
+   "pos": "noun",
+   "meaning": "the Buddha",
+   "defJa": "真理に目覚めた者を意味する仏教の呼び名",
+   "passage": {
+    "ja": "一人の人物の名前だと思っていた言葉が、実はその人のあり方を表す呼び名であることがあります。仏陀は、目覚めた者という意味を持ち、普通は釈迦を指して使われますが、文献によっては他の仏にも関わる語です。釈迦という歴史上の人物を調べることと、目覚めをどう捉えるかという教義を学ぶことは、重なりながらも異なる問いになります。日本の寺でさまざまな仏像に出会うときも、すべてを別名の一人物だと考える前に、その像がどの教えの中に置かれているかを見ると整理できます。",
+    "form": "仏陀",
+    "en": "A word assumed to be a personal name may instead describe an attained condition. Buddha means awakened one and commonly refers to Shakyamuni, although texts also apply it to other Buddhas. Historical inquiry into Shakyamuni overlaps with, but differs from, doctrinal inquiry into awakening. Understanding the teaching surrounding each image helps distinguish the many Buddhas encountered in Japanese temples.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "人名としての用法と、目覚めた者という称号の意味を併せて示す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "他力",
+   "reading": "たりき",
+   "pos": "noun",
+   "meaning": "other-power",
+   "defJa": "浄土教で救いの拠り所とされる阿弥陀仏の本願の力",
+   "passage": {
+    "ja": "何もせずに人任せにする態度と、浄土教が説く救いの拠り所とは区別される。他力はこの文脈では阿弥陀仏の本願の力を指し、自分の修行や功徳を頼みとする立場との対比で論じられる。念仏を唱えるという行為があるからといって、その回数を自分の成果として積み上げる考え方だけで説明できるわけではない。日常語の意味から宗教の文章を読み替える前に、何の力を指しているかを確かめることで、同じ行為に異なる意味を与える議論の構造が見えてくる。",
+    "form": "他力",
+    "en": "Leaving everything to others differs from the foundation of salvation discussed in Pure Land Buddhism. Other-power here means the power of Amida’s vow, contrasted with reliance on one’s practice and merit. The act of reciting the nenbutsu therefore cannot be explained solely as accumulating a personal achievement through repetition. Identifying whose power is meant reveals how similar actions receive different interpretations.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「他力に任せる」。ここでは一般的な人任せでなく、阿弥陀仏の本願を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "会者定離",
+   "reading": "えしゃじょうり",
+   "pos": "noun",
+   "meaning": "those who meet must part",
+   "defJa": "出会った者は必ず別れるということ",
+   "passage": {
+    "ja": "別れが避けられないと知ることは、出会いを無意味にするのだろうか。会者定離という仏教に由来する言葉は、人と人との関係も移り変わるという事実を示し、今日の時間を永遠のものとして扱う心に立ち止まらせる。だからこそ今を大切にするという読み方もあれば、失う不安への執着を見つめ直す読み方もあり、一つの感想に閉じる必要はない。久しぶりに友と食卓を囲むような場面でこの語を思い出すと、悲しい未来の予告だけでなく、いま交わす言葉の重みを確かめる契機にもなる。",
+    "form": "会者定離",
+    "en": "Does knowing that parting is inevitable make meeting meaningless. The Buddhist-derived saying that those who meet must part challenges the treatment of present relationships as permanent. It can prompt appreciation of the present or reflection on attachment to fears of loss. Recalling it over a meal with an old friend can deepen attention to present words rather than merely predict sadness.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「会者定離の理」。出会いの価値を否定せず、関係の移ろいを述べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "侘び寂び",
+   "reading": "わびさび",
+   "pos": "noun",
+   "meaning": "wabi-sabi",
+   "defJa": "簡素さや古びたものなどに趣を見出す美意識",
+   "passage": {
+    "ja": "古い茶碗のひびや色のむらを見て、傷だから価値がないとは限らないんだと思うことがあるよね。侘び寂びという言葉は、簡素さや古びたものに見出す趣を表すけど、汚れていれば何でもよいという意味ではないんだ。禅の無常観と並べて話すこともできるけれど、美意識の歴史を一つの教義だけから説明すると、茶の湯や生活の工夫の話が抜けてしまう。誰がどんな場でその器を使い、何を美しいと感じたかを想像すると、便利な日本文化の看板よりも、手に取る一椀に近い言葉になるよ。",
+    "form": "侘び寂び",
+    "en": "Cracks and uneven color in an old tea bowl can challenge the idea that damage always destroys value. Wabi-sabi concerns qualities found in simplicity and age, rather than approving anything dirty. Discussing it alongside Zen impermanence should not erase the histories of tea and everyday craft. Considering who used a vessel and what they appreciated brings the term closer to a tangible bowl than a cultural slogan.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「侘び寂びを感じる」。美意識と仏教の教義を一つにまとめない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "個我",
+   "reading": "こが",
+   "pos": "noun",
+   "meaning": "individual self (jīva)",
+   "defJa": "他と区別された個々の自己",
+   "passage": {
+    "ja": "「私」という言葉が出てきたら、身体や性格だけを指すのか、もっと根本の自己を指すのかを確かめましょう。インド哲学で個我を論じる際は、個々の存在と、世界の究極の根本との関係が問題になり、学派によってその説明は異なります。不二一元論が両者の究極的な一致を説くのに対して、別の立場では個別性の捉え方が変わります。同じ自己という訳語を使っていても、仏教の無我やジャイナ教の魂の議論へそのまま置き換えず、何を認め何を否定するかを表にすると、比較の軸が定まります。",
+    "form": "個我",
+    "en": "When a text says I, check whether it means body and personality or a more fundamental self. Indian discussions of the individual self examine its relationship with ultimate reality, with explanations varying among schools. Advaita affirms ultimate identity, while other positions understand individuality differently. Mapping what each view affirms and denies prevents confusion with Buddhist no-self or Jain accounts of souls.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「個我と普遍的な実在」。自己という訳語の意味を学派ごとに分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "儒教",
+   "reading": "じゅきょう",
+   "pos": "noun",
+   "meaning": "Confucianism",
+   "defJa": "人倫や社会の秩序を重んじる中国由来の思想と伝統",
+   "passage": {
+    "ja": "先祖を敬う行為を見ただけで、すべて仏教の教えから説明すると、文章の視野が狭くなります。儒教は中国に由来し、人との関係や社会の秩序を重んじる伝統で、日本の暮らしや思想の中でも仏教と接してきました。二つを比べる文章では、似た儀礼があることと、その行為をどう意味付けるかが同じであることを分けて書けます。宗教や思想の名前を一つ選んで原因にするより、家族、寺院、教育といった場を具体的に示すと、異なる教えが重なって働く様子を伝えられます。",
+    "form": "儒教",
+    "en": "Explaining every act of honoring ancestors solely through Buddhism narrows an account. Confucianism originated in China, emphasizing relationships and social order, and has interacted with Buddhism in Japanese life and thought. Similar rituals can still receive different meanings. Describing families, temples, and education concretely reveals overlapping traditions more clearly than assigning one label as the sole cause.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「儒教の影響」。似た行為の存在と、教えの由来を区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "克己",
+   "reading": "こっき",
+   "pos": "noun",
+   "meaning": "self-mastery, self-denial",
+   "defJa": "自分の欲や衝動を抑えて律すること",
+   "passage": {
+    "ja": "腹が立ったとき、すぐ言い返さずに一呼吸置くことは、簡単そうで難しい実践です。克己は、自分の欲や衝動を抑えて律することで、仏教の戒律や修養の話でも、日常の行動を振り返る際に役立つ語です。ただし、感情が生じたこと自体を悪いと決め、力ずくで押し込めることだけが、自分を整える道とは限りません。何が怒りを強めたのかに注意を向け、相手を傷つける言葉を選ばないという具体的な行動まで考えると、厳しい響きの言葉が生活の小さな選択につながります。",
+    "form": "克己",
+    "en": "Pausing before replying in anger is a deceptively difficult practice. Self-mastery means regulating desires and impulses and can frame reflection on daily conduct in Buddhist discipline and cultivation. Regulating oneself need not mean condemning a feeling merely for arising or forcibly suppressing it. Examining what intensified anger and choosing words that do not harm makes the austere term concrete.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「克己の精神」。感情を消すことより、衝動に従う行動を律する意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "入定",
+   "reading": "にゅうじょう",
+   "pos": "noun",
+   "meaning": "entering (eternal) meditation",
+   "defJa": "深い瞑想に入ることや高僧の死を指す仏教語",
+   "passage": {
+    "ja": "高野山の信仰では、空海は奥之院で今も深い瞑想を続ける存在として敬われている。入定という語は瞑想に入ることを指すとともに、高僧の死を語る際にも用いられ、ここでは大師を身近に感じる信仰の核心と結び付く。こうした伝統の記述は、生物学的に生命が継続していると確認した報告とは、述べようとする内容が異なる。御廟で営まれる供養や、人々が語り継ぐ物語に目を向けると、歴史上の人物が現在の祈りの相手として生き続けるという宗教的な時間の捉え方が浮かぶ。",
+    "form": "入定",
+    "en": "At Koyasan, Kukai is revered as continuing in deep meditation at Okunoin. Entering meditation also serves as a term for a great teacher’s death, connecting here with faith in the master’s continuing presence. Such tradition differs in purpose from a biological report establishing continued life. Offerings and inherited stories reveal a religious understanding of a historical figure’s presence in current devotion.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "瞑想に入る意味と高僧の死を語る用法を示し、信仰上の説明として読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "入滅",
+   "reading": "にゅうめつ",
+   "pos": "noun",
+   "meaning": "entering nirvana; death of the Buddha",
+   "defJa": "仏や高僧が亡くなることを表す仏教語",
+   "passage": {
+    "ja": "同じ死を伝える文章でも、選ばれる言葉によって、その人と共同体との関係が表れる。入滅は仏や高僧の死を述べる仏教の語であり、苦や迷いを離れる教義上の意味とも重なりながら使われる。釈迦の最後を描く涅槃図には、弟子やさまざまな生き物の姿が配され、別れを受け止める側の世界まで描き込まれる。出来事の日付だけを拾って読む一方で、何を終わりとし、何を教えとして受け継ぐかにも目を向けると、死を表す一語が伝記の結び以上の役割を持つことが分かる。",
+    "form": "入滅",
+    "en": "Words chosen to announce a death express the relationship between a person and a community. Entering nirvana is a Buddhist expression for the death of the Buddha or a great teacher, overlapping with doctrinal release from suffering and delusion. Images of Shakyamuni’s final passing include disciples and other beings, depicting the world receiving the loss. Considering what ends and what is transmitted as teaching reveals more than a biographical closing date.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「入滅する」。仏や高僧の死を、敬意と教義を伴って表す。",
+    "sense": ""
+   }
+  }
+ ]
+}

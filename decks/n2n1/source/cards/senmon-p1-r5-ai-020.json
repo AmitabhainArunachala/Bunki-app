@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "微調整",
+   "reading": "びちょうせい",
+   "pos": "noun",
+   "meaning": "fine-tuning",
+   "defJa": "既に学んだモデルを追加の学習で用途に合わせること",
+   "passage": {
+    "ja": "文章を扱うモデルを特定の業務へ合わせる微調整では、追加の資料を使ってモデルの内部の値を更新する。指示文に例を添えて答え方を変える方法とは異なり、学習の工程をもう一度行う点が特徴だ。ただし、ある業務の成績が上がったとしても、別の質問への対応が同じ水準に保たれるとは限らない。導入時の評価では、狙った仕事の改善に加え、以前は正しく扱えた例に変化がないかも調べ、追加の学習で得たものと損なわれたものを併せて記録する。",
+    "form": "微調整",
+    "en": "Fine-tuning a text model for a particular task updates its internal values using additional material. Unlike changing responses by adding examples to a prompt, it involves another training stage. Improved performance on one task does not guarantee the same standard on other questions. Deployment evaluation therefore checks previously successful examples alongside intended improvements and records both gains and losses from the extra training.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "ここではモデルの追加学習を指し、指示文を変える操作とは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "心の哲学",
+   "reading": "こころのてつがく",
+   "pos": "noun",
+   "meaning": "philosophy of mind",
+   "defJa": "意識や心と身体との関係などを考える哲学分野",
+   "passage": {
+    "ja": "対話する機械に心があるかという問いは、出力の正しさを測る試験だけでは片付かない。心の哲学では、意識や経験とは何か、それが物理的な働きとどう関係するかが論点となり、滑らかな応答を見せる機械もその問いを投げかける。人間らしい言葉を返すからといって、苦痛や喜びを感じていることが確認されたとは言えず、逆の断定にも検討が残る。議論を進めるには、外から観察できる行動と、本人にしか分からないとされる経験を区別し、自分が何を証拠として認めるのかを明らかにしたい。",
+    "form": "心の哲学",
+    "en": "Whether a conversational machine has a mind cannot be settled just by testing output correctness. Philosophy of mind addresses consciousness, experience, and their relation to physical processes, questions also raised by fluently responding machines. Humanlike language does not establish experiences of pain or pleasure, while categorical denial also requires scrutiny. Progress requires distinguishing observable behavior from experience regarded as privately accessible and clarifying what one accepts as evidence.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "機械の能力試験と、意識や経験の有無を問う議論を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "急落",
+   "reading": "きゅうらく",
+   "pos": "noun",
+   "meaning": "a sharp fall",
+   "defJa": "価格などが短い間に大きく下がること",
+   "passage": {
+    "ja": "半導体の会社が好調だという記事の翌日に株価が急落したら、話が逆だと驚くよね。でも株の値段には先への期待も入っているから、売上が増えたとしても、買っていた人が想像したほどでなければ値下がりすることはあるんだ。もちろん一日の値動きだけで理由を一つに決めるのは難しくて、ほかのニュースや市場全体の動きも一緒に見たいよ。記事の見出しからすぐ結論を出すより、発表された数字と、それまでに期待されていた数字を分けてメモすると読み解きやすいね。",
+    "form": "急落",
+    "en": "A sharp fall in a semiconductor company’s share price the day after a positive article can seem contradictory. But prices include expectations, so even rising sales can accompany a fall if they disappoint what buyers anticipated. Of course, one day’s movement is hard to reduce to one cause, so other news and the broader market also matter. Separately noting reported figures and previously expected ones makes interpretation easier than jumping from a headline to a conclusion.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "値下がりの速さと大きさを表し、原因までは含まない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "帰納",
+   "reading": "きのう",
+   "pos": "noun",
+   "meaning": "inductive reasoning",
+   "defJa": "個別の事例から一般的な規則を考える推論",
+   "passage": {
+    "ja": "何枚もの部品写真を見て、こういう傷がある物は不良だと考えるのは、個別の例から規則を探す帰納の一例だよ。機械に写真を学ばせるときも、見た例で成り立つ傾向が、まだ見ていない品物でも続くかが気になるよね。ただ、今まで白い背景ばかりだったなら、違う工場の暗い写真で同じ結果が出るとは限らないんだ。例をたくさん集めることに加えて、どんな条件の例が抜けているかを探すと、自分が見つけた規則の頼れる範囲を少しずつ確かめられるよ。",
+    "form": "帰納",
+    "en": "Inferring from many photographs that parts with a certain scratch are defective is an example of induction, finding rules from individual cases. When teaching a machine from photos, we also want to know whether observed tendencies persist for unseen products. But if previous backgrounds were all white, dark photographs from another factory may yield different results. Beyond collecting many examples, looking for missing conditions gradually reveals how far the discovered rule can be trusted.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "個々の事例から一般化する考え方で、必ず正しい結論とは限らない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "帯域幅",
+   "reading": "たいいきはば",
+   "pos": "noun",
+   "meaning": "data-transfer bandwidth",
+   "defJa": "一定時間に運べるデータ量の上限や能力",
+   "passage": {
+    "ja": "計算装置の性能を道路にたとえるなら、演算の速さと、データを運ぶ道の広さは分けて考えるべきだ。メモリとの帯域幅が不足すれば、演算器が速くても必要な情報を待つ時間が生じ、装置全体の処理は期待ほど進まない。逆に運べる量だけを増やしたところで、計算そのものが遅さの原因であれば、同じだけの改善は得られない。機器を比較する際には、最大の数字を並べるだけでなく、対象の仕事でどこに待ち時間が生まれるかを測ることが、費用と性能の関係を見定める手掛かりとなる。",
+    "form": "帯域幅",
+    "en": "If computing equipment is compared to roads, arithmetic speed and the width of the paths carrying data should be distinguished. Insufficient memory bandwidth leaves even fast processors waiting for information, so overall work proceeds more slowly than expected. Conversely, increasing transfer capacity alone gives limited improvement if computation itself is the bottleneck. Comparing equipment requires measuring where a given task waits, beyond lining up maximum figures, to understand the relation between cost and performance.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "ここでは通信や記憶装置が一定時間に運べる情報量を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

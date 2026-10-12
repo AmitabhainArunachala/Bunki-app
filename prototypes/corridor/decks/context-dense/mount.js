@@ -48,6 +48,8 @@ const ui = {
   missed: false,
 };
 let paintedTurn = null;
+let english = false;
+const t = (ja, en) => english ? en : ja;
 
 function loadState(storage) {
   try {
@@ -121,7 +123,7 @@ function gapNode(card) {
   gap.append(h('span', 'cd-gap-line'));
   const note = h('span', 'cd-footnote', `${codePoints(card.target).length}字`);
   gap.append(note);
-  gap.setAttribute('aria-label', '空欄');
+  gap.setAttribute('aria-label', t('空欄', 'blank'));
   return gap;
 }
 
@@ -240,6 +242,7 @@ function writingMode(look) {
 }
 
 function paint(host, opts, state) {
+  english = opts.bilingual === true;
   const turn = `${ui.screen}:${ui.screen === 'card' ? ui.queue[ui.index]?.id : ui.screen === 'preview' ? ui.previewId : ''}`;
   const resetScroll = turn !== paintedTurn;
   const storage = opts.storage;
@@ -247,12 +250,12 @@ function paint(host, opts, state) {
   const writing = writingMode(look);
   host.replaceChildren();
   const room = h('section', 'cd-room');
-  room.lang = 'ja';
+  room.lang = english ? 'en' : 'ja';
   room.dataset.deck = deck.id;
   applyLook(room, look, writing);
   document.documentElement.dataset.cdFocus = ui.screen === 'card' ? '1' : '0';
 
-  const level = h('span', 'level-chip cd-level', opts.bilingual ? '級未判定 · Level ungraded' : '級未判定');
+  const level = h('span', 'level-chip cd-level', t('級未判定', 'Level ungraded'));
   level.title = opts.bilingual ? 'This deck has no assigned JLPT level.' : 'この札にはJLPTの級がまだ付いていない。';
   room.append(level);
 
@@ -270,16 +273,16 @@ function paint(host, opts, state) {
 function paintHome(room, opts, state, look) {
   const now = new Date();
   const tally = counts(deck, state, now);
-  room.append(h('h1', 'cd-title', '文脈札'));
-  room.append(h('p', 'cd-lead', '一段落。空欄は一語。裏で、読みが全文につく。'));
+  room.append(h('h1', 'cd-title', t('文脈札', 'Context cards')));
+  room.append(h('p', 'cd-lead', t('一段落。空欄は一語。裏で、読みが全文につく。', 'One paragraph, one missing word. Reveal the answer to see readings throughout.')));
   const list = h('ul', 'cd-counts');
-  for (const [ja, value] of [
-    ['札', tally.total],
-    ['今日出せる', tally.newToday],
-    ['期限', tally.due],
-    ['未学習', tally.unseen],
+  for (const [ja, en, value] of [
+    ['札', 'Cards', tally.total],
+    ['今日出せる', 'New today', tally.newToday],
+    ['期限', 'Due', tally.due],
+    ['未学習', 'Unseen', tally.unseen],
   ]) {
-    list.append(h('li', null, `${ja} ${value}`));
+    list.append(h('li', null, `${t(ja, en)} ${value}`));
   }
   room.append(list);
 
@@ -290,20 +293,20 @@ function paintHome(room, opts, state, look) {
       paint(opts.host, opts, state);
     });
     dot.style.background = color;
-    dot.setAttribute('aria-label', name);
+    dot.setAttribute('aria-label', t(name, ({kinari:'Natural paper',torinoko:'Eggshell',gekkou:'Moonlight',sakura:'Pale cherry',wakakusa:'Young grass',aijiro:'Indigo white',gofun:'Chalk white',tan:'Pale yellow',asagi:'Pale blue',momo:'Peach'})[id]));
     dot.setAttribute('aria-pressed', String(look.theme === id));
     swatches.append(dot);
   }
   room.append(swatches);
 
   const tools = h('div', 'cd-tools');
-  tools.append(button(writingMode(look) === 'vertical' ? '横書き' : '縦書き', 'cd-btn', () => {
+  tools.append(button(writingMode(look) === 'vertical' ? t('横書き', 'Horizontal text') : t('縦書き', 'Vertical text'), 'cd-btn', () => {
     const current = loadLook(opts.storage);
     const vertical = writingMode(current) !== 'vertical';
     saveLook(opts.storage, { ...current, vertical });
     paint(opts.host, opts, state);
   }));
-  tools.append(button(look.english ? '英語を隠す' : '英語を出す', 'cd-btn', () => {
+  tools.append(button(look.english ? t('英語を隠す', 'Hide English') : t('英語を出す', 'Show English'), 'cd-btn', () => {
     const current = loadLook(opts.storage);
     saveLook(opts.storage, { ...current, english: !current.english });
     paint(opts.host, opts, state);
@@ -311,7 +314,7 @@ function paintHome(room, opts, state, look) {
   room.append(tools);
 
   const actions = h('div', 'cd-actions');
-  const start = button('今日の札', 'cd-btn cd-primary', () => {
+  const start = button(t('今日の札', 'Today’s cards'), 'cd-btn cd-primary', () => {
     const queue = studyQueue(deck, loadState(opts.storage), new Date());
     ui.queue = queue.queue;
     ui.index = 0;
@@ -321,18 +324,18 @@ function paintHome(room, opts, state, look) {
   });
   start.id = 'cd-start';
   actions.append(start);
-  actions.append(button('目次', 'cd-btn', () => {
+  actions.append(button(t('目次', 'Contents'), 'cd-btn', () => {
     ui.screen = 'index';
     paint(opts.host, opts, state);
   }));
-  if (opts.onLeave) actions.append(button('本棚へ', 'cd-btn', () => opts.onLeave()));
+  if (opts.onLeave) actions.append(button(t('本棚へ', 'To the shelf'), 'cd-btn', () => opts.onLeave()));
   room.append(actions);
 
   const io = h('div', 'cd-actions');
-  io.append(button('台帳を書き出す', 'cd-btn', () => {
+  io.append(button(t('台帳を書き出す', 'Export review history'), 'cd-btn', () => {
     download(`${deck.id}-state.json`, `${JSON.stringify(loadState(opts.storage), null, 2)}\n`, 'application/json');
   }));
-  io.append(button('Anki用の札', 'cd-btn', () => {
+  io.append(button(t('Anki用の札', 'Export Anki cards'), 'cd-btn', () => {
     download(`${deck.id}-basic.tsv`, basicTsv(deck), 'text/tab-separated-values');
   }));
   const file = h('input', 'cd-file');
@@ -350,7 +353,7 @@ function paintHome(room, opts, state, look) {
       /* a file that is not this deck's ledger is ignored */
     }
   });
-  io.append(button('台帳を読み込む', 'cd-btn', () => file.click()), file);
+  io.append(button(t('台帳を読み込む', 'Import review history'), 'cd-btn', () => file.click()), file);
   room.append(io);
 }
 
@@ -362,8 +365,8 @@ function paintCard(room, opts, state, look) {
 
   if (!revealed) {
     const actions = h('div', 'cd-dock');
-    const got = button('思い出せた', 'cd-choice cd-primary', () => showAnswer(opts.host, opts, state, false));
-    const miss = button('まだ', 'cd-choice', () => showAnswer(opts.host, opts, state, true));
+    const got = button(t('思い出せた', 'I recalled it'), 'cd-choice cd-primary', () => showAnswer(opts.host, opts, state, false));
+    const miss = button(t('まだ', 'Not yet'), 'cd-choice', () => showAnswer(opts.host, opts, state, true));
     got.id = 'cd-got';
     miss.id = 'cd-miss';
     actions.append(got, miss);
@@ -395,28 +398,28 @@ function paintCard(room, opts, state, look) {
 
   const grades = h('div', 'cd-dock cd-grades');
   const seal = (glyph, className, id, rating, label) => {
-    const node = button(glyph, `cd-seal ${className}`, () => commit(opts.host, opts, state, rating));
+    const node = button(english ? label : glyph, `cd-seal ${className}`, () => commit(opts.host, opts, state, rating));
     node.id = id;
     node.setAttribute('aria-label', label);
     return node;
   };
   if (ui.missed) {
-    grades.append(seal('再', 'cd-seal-again', 'cd-again', RATINGS.again, 'もう一度'));
+    grades.append(seal('再', 'cd-seal-again', 'cd-again', RATINGS.again, t('もう一度', 'Again')));
   } else {
     grades.append(
-      seal('再', 'cd-seal-again', 'cd-again', RATINGS.again, 'もう一度'),
-      seal('難', 'cd-seal-hard', 'cd-hard', RATINGS.hard, '難しい'),
-      seal('良', 'cd-seal-good', 'cd-good', RATINGS.good, '普通'),
-      seal('易', 'cd-seal-easy', 'cd-easy', RATINGS.easy, '易しい'),
+      seal('再', 'cd-seal-again', 'cd-again', RATINGS.again, t('もう一度', 'Again')),
+      seal('難', 'cd-seal-hard', 'cd-hard', RATINGS.hard, t('難しい', 'Hard')),
+      seal('良', 'cd-seal-good', 'cd-good', RATINGS.good, t('普通', 'Good')),
+      seal('易', 'cd-seal-easy', 'cd-easy', RATINGS.easy, t('易しい', 'Easy')),
     );
   }
   room.append(grades);
 }
 
 function paintDone(room, opts) {
-  room.append(h('h1', 'cd-title', '今日の分はここまで'));
+  room.append(h('h1', 'cd-title', t('今日の分はここまで', 'That’s all for today')));
   const actions = h('div', 'cd-actions');
-  actions.append(button('戻る', 'cd-btn cd-primary', () => {
+  actions.append(button(t('戻る', 'Back'), 'cd-btn cd-primary', () => {
     ui.screen = 'home';
     paint(opts.host, opts, loadState(opts.storage));
   }));
@@ -424,7 +427,7 @@ function paintDone(room, opts) {
 }
 
 function paintIndex(room, opts, state) {
-  room.append(h('h1', 'cd-title', '目次'));
+  room.append(h('h1', 'cd-title', t('目次', 'Contents')));
   const now = new Date();
   const list = h('ol', 'cd-toc');
   deck.cards.forEach((card, index) => {
@@ -438,12 +441,12 @@ function paintIndex(room, opts, state) {
     });
     open.append(h('span', 'cd-toc-n', String(index + 1)));
     open.append(h('span', 'cd-toc-word', card.target));
-    if (due) open.append(h('span', 'cd-toc-due', '今'));
+    if (due) open.append(h('span', 'cd-toc-due', t('今', 'Due')));
     item.append(open);
     list.append(item);
   });
   room.append(list);
-  room.append(button('戻る', 'cd-btn', () => {
+  room.append(button(t('戻る', 'Back'), 'cd-btn', () => {
     ui.screen = 'home';
     paint(opts.host, opts, state);
   }));
@@ -461,7 +464,7 @@ function paintPreview(room, opts, look) {
   page.column.append(h('p', 'cd-readings', readingsOf(card).join('・')));
   page.column.append(h('p', 'cd-gloss', card.glossJa));
   if (look.english) page.column.append(h('p', 'cd-en', card.glossEn));
-  room.append(button('目次へ', 'cd-btn', () => {
+  room.append(button(t('目次へ', 'To contents'), 'cd-btn', () => {
     ui.screen = 'index';
     paint(opts.host, opts, loadState(opts.storage));
   }));

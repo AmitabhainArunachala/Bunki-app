@@ -1,3 +1,4 @@
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
@@ -156,8 +157,8 @@ try {
       assert.deepEqual((await stored(otherPage)).progress.events,exported.progress.events);
       assert.equal((await stored(otherPage)).enrichment.enrichmentHash,enrichment.enrichmentHash);
       await other.close();checks.push(name+': complete backup round-trips into a second device context');
-      // Every palette comes from Bunki's existing public roster.
-      assert.equal(await page.locator('.pc [data-theme]').count(),10);
+      // Every palette comes from Bunki's existing public roster (eleven since round 4: D2 made 殻 public).
+      assert.equal(await page.locator('.pc [data-theme]').count(),11);
       await page.locator('[data-theme="yoru"]').click();
       await page.screenshot({path:path.join(out,`${name}-390-settings-night.png`),fullPage:true});
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
@@ -199,7 +200,7 @@ try {
       await page.locator('#sheet .dictionary-warning').waitFor().catch(error=>{throw new Error(`${name}: dictionary fallback failed; page errors=${JSON.stringify(errors)}`,{cause:error});});
       assert(await page.locator('#sheet .dictionary-retry').isVisible());
       stage='offline grade';
-      await page.locator('#sheet-close').click();await page.locator('#sheet').waitFor({state:'detached'});
+      await page.locator(await entryCloseSelector(page)).click();await page.locator('#sheet').waitFor({state:'detached'});
       await page.locator('[data-grade="3"]').click();
       await page.waitForFunction(()=>document.querySelector('.pc-status').textContent==='Review saved.');
       assert.equal((await stored(page)).progress.events.length,4);

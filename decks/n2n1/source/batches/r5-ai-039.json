@@ -1,0 +1,179 @@
+{
+ "batch": "r5-ai-039",
+ "items": [
+  {
+   "term": "計算可能性",
+   "reading": "けいさんかのうせい",
+   "gloss": "computability",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "二分探索",
+   "reading": "にぶんたんさく",
+   "gloss": "binary search",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "スタック",
+   "reading": "すたっく",
+   "gloss": "stack data structure",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "型推論",
+   "reading": "かたすいろん",
+   "gloss": "type inference",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "不変条件",
+   "reading": "ふへんじょうけん",
+   "gloss": "invariant",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "ハッシュ関数",
+   "reading": "はっしゅかんすう",
+   "gloss": "hash function",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "工場の小さな異常から工程の全体像へ",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "キャッシュ整合性",
+   "reading": "きゃっしゅせいごうせい",
+   "gloss": "cache coherence",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "分散合意",
+   "reading": "ぶんさんごうい",
+   "gloss": "distributed consensus",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-COMPUTER-SCIENCE"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "再帰呼び出し",
+  "基底条件",
+  "動的計画法",
+  "メモ化",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

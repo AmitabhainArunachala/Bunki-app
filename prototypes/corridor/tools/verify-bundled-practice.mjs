@@ -131,13 +131,13 @@ for (const engine of engines) for (const width of sizes) {
     await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
     await waitForAppRecord(page, record => record.readingSettings?.startingLevel === 'N5');
     assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
-    await page.locator('#back').click();
+    await page.locator('#back').click(); await page.locator('body[data-view="shelf"]').waitFor();
     const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup
     assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await sourceToken(page).click();
-    await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('reader-choice-neutral')); await page.locator('#sentence-practice-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
     const surfaces = await page.locator('#reader .tok[data-index]').evaluateAll(nodes => nodes.map(node => {
@@ -195,7 +195,9 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('.grade.g-easy').click(); await page.locator('.review-summary').waitFor();
     const graded = await snapshot('finite-review'); assert.equal(graded.revlog.length, 1);
     assert.equal(graded.sentencePractice.grades[0].observation.grade, 'easy'); assert.equal(graded.srs[`sentence:${entry.plan.id}`].reps, 1);
-    await page.locator('.close-doors .take').click(); await openSaved();
+    await page.locator('.close-doors .take').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'tray' && !document.documentElement.dataset.roomTransition);
+    await openSaved();
     await page.locator('[data-sentence-teacher-response]').click(); await page.locator('#chat-input').waitFor();
     const prepared = await page.locator('#chat-input').inputValue(); assert(prepared.startsWith(`${QUESTION}\n\n`)); assert(prepared.includes(PRODUCTION));
     await savedQuestion(page, ref, prepared); assert(await page.locator('#chat-send').isDisabled());

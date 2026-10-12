@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "送電網",
+   "reading": "そうでんもう",
+   "pos": "noun",
+   "meaning": "power grid",
+   "defJa": "発電した電気を各地へ運ぶ設備のつながり",
+   "passage": {
+    "ja": "風の強い場所で電気を作っても、工場や住宅へ運ぶ道が足りなければ十分に利用できません。送電網は発電所と需要地を結ぶ設備のつながりであり、発電設備を増やすだけでは解消しない制約を持っています。電線には安全に流せる量の限界があり、離れた地域同士を結ぶ設備にも容量があります。そのため、需要が別の場所にあるからといって余った電気を無制限に回すことはできず、どこで作り、どこへ届けるかを一組にした計画が必要になります。",
+    "form": "送電網",
+    "en": "Generating electricity in a windy location is insufficient if there are not enough routes to factories and homes. The transmission grid connects power plants with demand centers and has constraints that adding generation alone cannot resolve. Power lines have safe flow limits, and connections between distant regions also have limited capacity. Surplus electricity therefore cannot be transferred without limit simply because demand exists elsewhere, so planning must link generation locations with destinations.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "発電所と需要地を結ぶ設備網で、輸送できる電気の量にも制約がある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-4df5acf04c-0179f6d5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-032.json",
+    "cardId": "nn-4df5acf04c-0179f6d5",
+    "wordId": "nn-4df5acf04c"
+   }
+  }
+ ]
+}

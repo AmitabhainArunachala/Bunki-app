@@ -1,0 +1,390 @@
+{"term": "半導体", "reading": "はんどうたい", "gloss": "semiconductor", "field": "ai", "level": "N1", "why": "seed from 半導体戦争 (Chris Miller); S3 brief seed list"}
+{"term": "微細化", "reading": "びさいか", "gloss": "miniaturization (of circuit features)", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "露光", "reading": "ろこう", "gloss": "exposure (lithography)", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "露光装置", "reading": "ろこうそうち", "gloss": "lithography (exposure) tool", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "歩留まり", "reading": "ぶどまり", "gloss": "yield (share of good chips)", "field": "ai", "level": "N1", "why": "seed from S3 brief seed list"}
+{"term": "ファウンドリ", "reading": "ふぁうんどり", "gloss": "foundry (contract chipmaker)", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "前工程", "reading": "まえこうてい", "gloss": "front-end process (wafer fabrication)", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "後工程", "reading": "あとこうてい", "gloss": "back-end process (assembly, packaging, test)", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "回路線幅", "reading": "かいろせんはば", "gloss": "circuit line width", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "プロセスルール", "reading": "ぷろせするーる", "gloss": "process rule (node size)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "集積回路", "reading": "しゅうせきかいろ", "gloss": "integrated circuit", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "トランジスタ", "reading": "とらんじすた", "gloss": "transistor", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "素子", "reading": "そし", "gloss": "element, device (electronic)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "演算", "reading": "えんざん", "gloss": "computation, operation", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "演算能力", "reading": "えんざんのうりょく", "gloss": "computing power", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "計算資源", "reading": "けいさんしげん", "gloss": "compute resources", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "フラッシュメモリ", "reading": "ふらっしゅめもり", "gloss": "flash memory", "field": "ai", "level": "beyond", "why": "seed from 半導体戦争 (Chris Miller)"}
+{"term": "ロジック半導体", "reading": "ろじっくはんどうたい", "gloss": "logic chip", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "パワー半導体", "reading": "ぱわーはんどうたい", "gloss": "power semiconductor", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "化合物半導体", "reading": "かごうぶつはんどうたい", "gloss": "compound semiconductor", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ケイ素", "reading": "けいそ", "gloss": "silicon (the element)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ウエハー", "reading": "うえはー", "gloss": "wafer", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "高純度", "reading": "こうじゅんど", "gloss": "high purity", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "不純物", "reading": "ふじゅんぶつ", "gloss": "impurity; dopant", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "成膜", "reading": "せいまく", "gloss": "film deposition", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "エッチング", "reading": "えっちんぐ", "gloss": "etching", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "絶縁体", "reading": "ぜつえんたい", "gloss": "insulator", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "導体", "reading": "どうたい", "gloss": "conductor", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "配線", "reading": "はいせん", "gloss": "wiring, interconnect", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "回路", "reading": "かいろ", "gloss": "circuit", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "フォトマスク", "reading": "ふぉとますく", "gloss": "photomask", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "フォトレジスト", "reading": "ふぉとれじすと", "gloss": "photoresist", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "極端紫外線", "reading": "きょくたんしがいせん", "gloss": "extreme ultraviolet (EUV)", "field": "ai", "level": "beyond", "why": "seed from ASML High NA EUV video (EN)"}
+{"term": "EUV露光", "reading": "いーゆーぶいろこう", "gloss": "EUV lithography", "field": "ai", "level": "beyond", "why": "seed from ASML High NA EUV video (EN)"}
+{"term": "解像度", "reading": "かいぞうど", "gloss": "resolution", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "開口数", "reading": "かいこうすう", "gloss": "numerical aperture (NA)", "field": "ai", "level": "beyond", "why": "seed from ASML High NA EUV video (EN)"}
+{"term": "精度", "reading": "せいど", "gloss": "precision, accuracy", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "半導体製造装置", "reading": "はんどうたいせいぞうそうち", "gloss": "semiconductor manufacturing equipment", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "部材", "reading": "ぶざい", "gloss": "components and materials", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "フッ化水素", "reading": "ふっかすいそ", "gloss": "hydrogen fluoride (2019 export curbs)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "輸出規制", "reading": "ゆしゅつきせい", "gloss": "export controls", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "禁輸", "reading": "きんゆ", "gloss": "embargo", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "経済安全保障", "reading": "けいざいあんぜんほしょう", "gloss": "economic security", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "安全保障", "reading": "あんぜんほしょう", "gloss": "(national) security", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "地政学", "reading": "ちせいがく", "gloss": "geopolitics", "field": "ai", "level": "beyond", "why": "seed from 中田敦彦 地政学 なぜ紛争は同じ場所で起きるのか"}
+{"term": "覇権", "reading": "はけん", "gloss": "hegemony", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "覇権争い", "reading": "はけんあらそい", "gloss": "struggle for hegemony", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "米中対立", "reading": "べいちゅうたいりつ", "gloss": "US–China rivalry", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "技術覇権", "reading": "ぎじゅつはけん", "gloss": "technological hegemony", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "供給網", "reading": "きょうきゅうもう", "gloss": "supply network", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "サプライチェーン", "reading": "さぷらいちぇーん", "gloss": "supply chain", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "寸断", "reading": "すんだん", "gloss": "severing, disruption", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "半導体不足", "reading": "はんどうたいぶそく", "gloss": "chip shortage", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "需給", "reading": "じゅきゅう", "gloss": "supply and demand", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "逼迫", "reading": "ひっぱく", "gloss": "tightness, strain", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "シリコンサイクル", "reading": "しりこんさいくる", "gloss": "the silicon (chip-industry) cycle", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "設備投資", "reading": "せつびとうし", "gloss": "capital investment", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "先端半導体", "reading": "せんたんはんどうたい", "gloss": "leading-edge chips", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "最先端", "reading": "さいせんたん", "gloss": "cutting edge", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "次世代", "reading": "じせだい", "gloss": "next generation", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "汎用", "reading": "はんよう", "gloss": "general-purpose", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "量産", "reading": "りょうさん", "gloss": "mass production", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "内製化", "reading": "ないせいか", "gloss": "bringing production in-house", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "受託生産", "reading": "じゅたくせいさん", "gloss": "contract manufacturing", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ファブレス", "reading": "ふぁぶれす", "gloss": "fabless (design-only) company", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "垂直統合", "reading": "すいちょくとうごう", "gloss": "vertical integration", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "水平分業", "reading": "すいへいぶんぎょう", "gloss": "horizontal division of labor", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "拠点", "reading": "きょてん", "gloss": "base, hub", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "誘致", "reading": "ゆうち", "gloss": "attracting (a plant, investment)", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "補助金", "reading": "ほじょきん", "gloss": "subsidy", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "国策", "reading": "こくさく", "gloss": "national policy", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "産業政策", "reading": "さんぎょうせいさく", "gloss": "industrial policy", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "経済産業省", "reading": "けいざいさんぎょうしょう", "gloss": "Ministry of Economy, Trade and Industry (METI)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "官民一体", "reading": "かんみんいったい", "gloss": "public and private sectors acting together", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "日米半導体協定", "reading": "にちべいはんどうたいきょうてい", "gloss": "US–Japan Semiconductor Agreement (1986)", "field": "ai", "level": "beyond", "why": "seed from 半導体戦争 (Chris Miller)"}
+{"term": "日米貿易摩擦", "reading": "にちべいぼうえきまさつ", "gloss": "US–Japan trade friction", "field": "ai", "level": "beyond", "why": "seed from 半導体戦争 (Chris Miller)"}
+{"term": "日の丸半導体", "reading": "ひのまるはんどうたい", "gloss": "Japan's national chip industry", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "21世紀の石油", "reading": "にじゅういっせいきのせきゆ", "gloss": "\"the oil of the 21st century\" (chips)", "field": "ai", "level": "beyond", "why": "seed from 中田敦彦 半導体① / PIVOT 基礎から分かる半導体"}
+{"term": "戦略物資", "reading": "せんりゃくぶっし", "gloss": "strategic goods", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "軍民両用", "reading": "ぐんみんりょうよう", "gloss": "dual-use (civil and military)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "冷戦", "reading": "れいせん", "gloss": "the Cold War", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "台湾有事", "reading": "たいわんゆうじ", "gloss": "a Taiwan contingency", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "有事", "reading": "ゆうじ", "gloss": "emergency, contingency", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "抑止力", "reading": "よくしりょく", "gloss": "deterrent", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "シリコンの盾", "reading": "しりこんのたて", "gloss": "\"silicon shield\" (Taiwan's chip leverage)", "field": "ai", "level": "beyond", "why": "seed from 半導体戦争 (Chris Miller)"}
+{"term": "国産化", "reading": "こくさんか", "gloss": "domestic production, localization", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "デカップリング", "reading": "でかっぷりんぐ", "gloss": "decoupling", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "凋落", "reading": "ちょうらく", "gloss": "decline, fall from glory", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "衰退", "reading": "すいたい", "gloss": "decline", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "台頭", "reading": "たいとう", "gloss": "rise, emergence", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "躍進", "reading": "やくしん", "gloss": "rapid advance", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "寡占", "reading": "かせん", "gloss": "oligopoly", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "独占", "reading": "どくせん", "gloss": "monopoly", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "牙城", "reading": "がじょう", "gloss": "stronghold", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "一強", "reading": "いっきょう", "gloss": "sole dominant player", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "独走", "reading": "どくそう", "gloss": "running far ahead alone", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "席巻", "reading": "せっけん", "gloss": "sweeping, conquering (a market)", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "後塵を拝する", "reading": "こうじんをはいする", "gloss": "to trail behind (a rival)", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "巻き返し", "reading": "まきかえし", "gloss": "comeback, rally", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "起死回生", "reading": "きしかいせい", "gloss": "dramatic revival", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "再興", "reading": "さいこう", "gloss": "revival, restoration", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "出遅れ", "reading": "でおくれ", "gloss": "late start, lagging", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "周回遅れ", "reading": "しゅうかいおくれ", "gloss": "a lap behind, hopelessly behind", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "追随", "reading": "ついずい", "gloss": "following, keeping pace", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "優位性", "reading": "ゆういせい", "gloss": "advantage, superiority", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "競争力", "reading": "きょうそうりょく", "gloss": "competitiveness", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "参入障壁", "reading": "さんにゅうしょうへき", "gloss": "barrier to entry", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "参入", "reading": "さんにゅう", "gloss": "market entry", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "撤退", "reading": "てったい", "gloss": "withdrawal, pulling out", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "再編", "reading": "さいへん", "gloss": "reorganization, consolidation", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "買収", "reading": "ばいしゅう", "gloss": "acquisition, buyout", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "合従連衡", "reading": "がっしょうれんこう", "gloss": "shifting alliances", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "提携", "reading": "ていけい", "gloss": "tie-up, partnership", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "技術流出", "reading": "ぎじゅつりゅうしゅつ", "gloss": "technology leakage", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "知的財産", "reading": "ちてきざいさん", "gloss": "intellectual property", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "特許", "reading": "とっきょ", "gloss": "patent", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "規格", "reading": "きかく", "gloss": "standard, specification", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "ムーアの法則", "reading": "むーあのほうそく", "gloss": "Moore's law", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "消費電力", "reading": "しょうひでんりょく", "gloss": "power consumption", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "電力効率", "reading": "でんりょくこうりつ", "gloss": "power efficiency", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "帯域幅", "reading": "たいいきはば", "gloss": "bandwidth", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "広帯域メモリ", "reading": "こうたいいきめもり", "gloss": "high-bandwidth memory (HBM)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "三次元積層", "reading": "さんじげんせきそう", "gloss": "3D stacking", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "実装", "reading": "じっそう", "gloss": "mounting, packaging; implementation (software)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "先端パッケージング", "reading": "せんたんぱっけーじんぐ", "gloss": "advanced packaging", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "チップレット", "reading": "ちっぷれっと", "gloss": "chiplet", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "基板", "reading": "きばん", "gloss": "substrate, circuit board", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "量子トンネル効果", "reading": "りょうしとんねるこうか", "gloss": "quantum tunneling", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "物理的限界", "reading": "ぶつりてきげんかい", "gloss": "physical limit", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "クリーンルーム", "reading": "くりーんるーむ", "gloss": "clean room", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "欠陥", "reading": "けっかん", "gloss": "defect", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "稼働率", "reading": "かどうりつ", "gloss": "utilization rate", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "稼働", "reading": "かどう", "gloss": "operation, running", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "生産能力", "reading": "せいさんのうりょく", "gloss": "production capacity", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "減産", "reading": "げんさん", "gloss": "production cut", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "工程", "reading": "こうてい", "gloss": "process step, stage", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "時価総額", "reading": "じかそうがく", "gloss": "market capitalization", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "収益", "reading": "しゅうえき", "gloss": "earnings, revenue", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "収益化", "reading": "しゅうえきか", "gloss": "monetization", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "巨額", "reading": "きょがく", "gloss": "huge sum", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "莫大", "reading": "ばくだい", "gloss": "enormous", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "画像処理半導体", "reading": "がぞうしょりはんどうたい", "gloss": "GPU (graphics processing chip)", "field": "ai", "level": "beyond", "why": "seed from PIVOT 基礎から分かる半導体 NVIDIAの設計"}
+{"term": "中央演算処理装置", "reading": "ちゅうおうえんざんしょりそうち", "gloss": "CPU", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "AI半導体", "reading": "えーあいはんどうたい", "gloss": "AI chip", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "並列処理", "reading": "へいれつしょり", "gloss": "parallel processing", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "データセンター", "reading": "でーたせんたー", "gloss": "data center", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "電力需要", "reading": "でんりょくじゅよう", "gloss": "electricity demand", "field": "ai", "level": "beyond", "why": "seed from PIVOT AIで高まるエネルギー需要"}
+{"term": "送電網", "reading": "そうでんもう", "gloss": "power grid", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "人工知能", "reading": "じんこうちのう", "gloss": "artificial intelligence", "field": "ai", "level": "N1", "why": "seed from ヨビノリ AI(人工知能)開発の流れ"}
+{"term": "生成AI", "reading": "せいせいえーあい", "gloss": "generative AI", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "大規模言語モデル", "reading": "だいきぼげんごもでる", "gloss": "large language model", "field": "ai", "level": "beyond", "why": "seed from 大規模言語モデルは新たな知能か (岡野原大輔)"}
+{"term": "基盤モデル", "reading": "きばんもでる", "gloss": "foundation model", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "機械学習", "reading": "きかいがくしゅう", "gloss": "machine learning", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "深層学習", "reading": "しんそうがくしゅう", "gloss": "deep learning", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "強化学習", "reading": "きょうかがくしゅう", "gloss": "reinforcement learning", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "教師あり学習", "reading": "きょうしありがくしゅう", "gloss": "supervised learning", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "教師なし学習", "reading": "きょうしなしがくしゅう", "gloss": "unsupervised learning", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "学習データ", "reading": "がくしゅうでーた", "gloss": "training data", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "事前学習", "reading": "じぜんがくしゅう", "gloss": "pre-training", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "微調整", "reading": "びちょうせい", "gloss": "fine-tuning, fine adjustment", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "推論", "reading": "すいろん", "gloss": "inference; reasoning", "field": "ai", "level": "N1", "why": "seed from S3 brief seed list"}
+{"term": "汎化", "reading": "はんか", "gloss": "generalization", "field": "ai", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "過学習", "reading": "かがくしゅう", "gloss": "overfitting", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "損失関数", "reading": "そんしつかんすう", "gloss": "loss function", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "誤差逆伝播法", "reading": "ごさぎゃくでんぱほう", "gloss": "backpropagation", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "勾配", "reading": "こうばい", "gloss": "gradient; slope", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "勾配降下法", "reading": "こうばいこうかほう", "gloss": "gradient descent", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "最適化", "reading": "さいてきか", "gloss": "optimization", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "最適解", "reading": "さいてきかい", "gloss": "optimal solution", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "パラメータ", "reading": "ぱらめーた", "gloss": "parameter", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "重み", "reading": "おもみ", "gloss": "weight (of a network); importance", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "ニューラルネットワーク", "reading": "にゅーらるねっとわーく", "gloss": "neural network", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "神経細胞", "reading": "しんけいさいぼう", "gloss": "neuron", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "注意機構", "reading": "ちゅういきこう", "gloss": "attention mechanism", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "トランスフォーマー", "reading": "とらんすふぉーまー", "gloss": "Transformer (architecture)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "埋め込み", "reading": "うめこみ", "gloss": "embedding", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ベクトル", "reading": "べくとる", "gloss": "vector", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "高次元", "reading": "こうじげん", "gloss": "high-dimensional", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "特徴量", "reading": "とくちょうりょう", "gloss": "feature (in ML)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "潜在空間", "reading": "せんざいくうかん", "gloss": "latent space", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "トークン", "reading": "とーくん", "gloss": "token", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "文脈", "reading": "ぶんみゃく", "gloss": "context", "field": "ai", "level": "N2", "why": "register word"}
+{"term": "文脈内学習", "reading": "ぶんみゃくないがくしゅう", "gloss": "in-context learning", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "確率分布", "reading": "かくりつぶんぷ", "gloss": "probability distribution", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "画像認識", "reading": "がぞうにんしき", "gloss": "image recognition", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "自然言語処理", "reading": "しぜんげんごしょり", "gloss": "natural language processing", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "拡散モデル", "reading": "かくさんもでる", "gloss": "diffusion model", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ハルシネーション", "reading": "はるしねーしょん", "gloss": "hallucination (AI)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "もっともらしい", "reading": "もっともらしい", "gloss": "plausible-sounding", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "バイアス", "reading": "ばいあす", "gloss": "bias", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "偏り", "reading": "かたより", "gloss": "bias, imbalance", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "公平性", "reading": "こうへいせい", "gloss": "fairness", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "透明性", "reading": "とうめいせい", "gloss": "transparency", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "説明可能性", "reading": "せつめいかのうせい", "gloss": "explainability", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "解釈可能性", "reading": "かいしゃくかのうせい", "gloss": "interpretability", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ブラックボックス", "reading": "ぶらっくぼっくす", "gloss": "black box", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "頑健性", "reading": "がんけんせい", "gloss": "robustness", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "安全性", "reading": "あんぜんせい", "gloss": "safety", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "アライメント", "reading": "あらいめんと", "gloss": "alignment (AI)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "暴走", "reading": "ぼうそう", "gloss": "running out of control", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "人類滅亡", "reading": "じんるいめつぼう", "gloss": "extinction of humanity", "field": "ai", "level": "beyond", "why": "seed from 楽待 AI2027 元Anthropic研究者 (松田卓也)"}
+{"term": "実存的リスク", "reading": "じつぞんてきりすく", "gloss": "existential risk", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "破局的", "reading": "はきょくてき", "gloss": "catastrophic", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "汎用人工知能", "reading": "はんようじんこうちのう", "gloss": "artificial general intelligence (AGI)", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "超知能", "reading": "ちょうちのう", "gloss": "superintelligence", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "技術的特異点", "reading": "ぎじゅつてきとくいてん", "gloss": "technological singularity", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "シンギュラリティ", "reading": "しんぎゅらりてぃ", "gloss": "the singularity", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "知能爆発", "reading": "ちのうばくはつ", "gloss": "intelligence explosion", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "再帰的自己改善", "reading": "さいきてきじこかいぜん", "gloss": "recursive self-improvement", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "自律", "reading": "じりつ", "gloss": "autonomy", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "AIエージェント", "reading": "えーあいえーじぇんと", "gloss": "AI agent", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "自動化", "reading": "じどうか", "gloss": "automation", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "省人化", "reading": "しょうじんか", "gloss": "labor saving, reducing headcount", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "代替", "reading": "だいたい", "gloss": "substitution, replacement", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "生産性", "reading": "せいさんせい", "gloss": "productivity", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "付加価値", "reading": "ふかかち", "gloss": "added value", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "実用化", "reading": "じつようか", "gloss": "practical application", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "社会実装", "reading": "しゃかいじっそう", "gloss": "deployment in society", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "浸透", "reading": "しんとう", "gloss": "permeation, penetration", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "技術革新", "reading": "ぎじゅつかくしん", "gloss": "technological innovation", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "破壊的イノベーション", "reading": "はかいてきいのべーしょん", "gloss": "disruptive innovation", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "創造的破壊", "reading": "そうぞうてきはかい", "gloss": "creative destruction (Schumpeter)", "field": "ai", "level": "beyond", "why": "seed from PIVOT 今こそシュンペーターを学ぶ理由"}
+{"term": "転換点", "reading": "てんかんてん", "gloss": "turning point", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "分水嶺", "reading": "ぶんすいれい", "gloss": "watershed, decisive point", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "黎明期", "reading": "れいめいき", "gloss": "dawn, early period", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "過渡期", "reading": "かとき", "gloss": "transition period", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "隆盛", "reading": "りゅうせい", "gloss": "prosperity, flourishing", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "群雄割拠", "reading": "ぐんゆうかっきょ", "gloss": "many rivals vying for power", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "熾烈", "reading": "しれつ", "gloss": "fierce, intense", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "激化", "reading": "げきか", "gloss": "intensification", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "開発競争", "reading": "かいはつきょうそう", "gloss": "development race", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "軍拡競争", "reading": "ぐんかくきょうそう", "gloss": "arms race", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "スケーリング則", "reading": "すけーりんぐそく", "gloss": "scaling law", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "創発", "reading": "そうはつ", "gloss": "emergence", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "収穫逓減", "reading": "しゅうかくていげん", "gloss": "diminishing returns", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "指数関数的", "reading": "しすうかんすうてき", "gloss": "exponential", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "飛躍的", "reading": "ひやくてき", "gloss": "dramatic, by leaps and bounds", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "桁違い", "reading": "けたちがい", "gloss": "an order of magnitude different", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "推論コスト", "reading": "すいろんこすと", "gloss": "inference cost", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "アルゴリズム", "reading": "あるごりずむ", "gloss": "algorithm", "field": "ai", "level": "beyond", "why": "seed from アルゴリズム思考術 (Brian Christian)"}
+{"term": "探索", "reading": "たんさく", "gloss": "search, exploration", "field": "ai", "level": "N1", "why": "seed from アルゴリズム思考術 ch.2 探索と…"}
+{"term": "探索と活用", "reading": "たんさくとかつよう", "gloss": "explore vs exploit", "field": "ai", "level": "beyond", "why": "seed from アルゴリズム思考術 ch.2 探索と…"}
+{"term": "最適停止", "reading": "さいてきていし", "gloss": "optimal stopping", "field": "ai", "level": "beyond", "why": "seed from アルゴリズム思考術 (Brian Christian)"}
+{"term": "整列", "reading": "せいれつ", "gloss": "sorting (CS); lining up", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "キャッシュ", "reading": "きゃっしゅ", "gloss": "cache", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ベイズの法則", "reading": "べいずのほうそく", "gloss": "Bayes' rule", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ゲーム理論", "reading": "げーむりろん", "gloss": "game theory", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "近似", "reading": "きんじ", "gloss": "approximation", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "総当たり", "reading": "そうあたり", "gloss": "brute force; round-robin", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "経験則", "reading": "けいけんそく", "gloss": "rule of thumb", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "ヒューリスティック", "reading": "ひゅーりすてぃっく", "gloss": "heuristic", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "期待値", "reading": "きたいち", "gloss": "expected value", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "機会費用", "reading": "きかいひよう", "gloss": "opportunity cost", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "意思決定", "reading": "いしけってい", "gloss": "decision-making", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "不確実性", "reading": "ふかくじつせい", "gloss": "uncertainty", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "計算量", "reading": "けいさんりょう", "gloss": "computational complexity, amount of computation", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "定式化", "reading": "ていしきか", "gloss": "formulation", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "抽象化", "reading": "ちゅうしょうか", "gloss": "abstraction", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "演繹", "reading": "えんえき", "gloss": "deduction", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "帰納", "reading": "きのう", "gloss": "induction", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "仮説", "reading": "かせつ", "gloss": "hypothesis", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "検証", "reading": "けんしょう", "gloss": "verification", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "実証", "reading": "じっしょう", "gloss": "empirical proof", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "再現性", "reading": "さいげんせい", "gloss": "reproducibility", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "評価指標", "reading": "ひょうかしひょう", "gloss": "evaluation metric", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ベンチマーク", "reading": "べんちまーく", "gloss": "benchmark", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "汎用性", "reading": "はんようせい", "gloss": "versatility", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "冗長", "reading": "じょうちょう", "gloss": "redundant, verbose", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "圧縮", "reading": "あっしゅく", "gloss": "compression", "field": "ai", "level": "N2", "why": "register word"}
+{"term": "量子コンピュータ", "reading": "りょうしこんぴゅーた", "gloss": "quantum computer", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "身体性", "reading": "しんたいせい", "gloss": "embodiment", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "知能", "reading": "ちのう", "gloss": "intelligence", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "知性", "reading": "ちせい", "gloss": "intellect", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "擬人化", "reading": "ぎじんか", "gloss": "anthropomorphism", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "倫理", "reading": "りんり", "gloss": "ethics", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "規制", "reading": "きせい", "gloss": "regulation", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "法整備", "reading": "ほうせいび", "gloss": "building a legal framework", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "指針", "reading": "ししん", "gloss": "guideline", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "ガバナンス", "reading": "がばなんす", "gloss": "governance", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "著作権", "reading": "ちょさくけん", "gloss": "copyright", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "偽情報", "reading": "にせじょうほう", "gloss": "disinformation", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ディープフェイク", "reading": "でぃーぷふぇいく", "gloss": "deepfake", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "悪用", "reading": "あくよう", "gloss": "misuse, abuse", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "監視社会", "reading": "かんししゃかい", "gloss": "surveillance society", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "分断", "reading": "ぶんだん", "gloss": "division, fragmentation", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "楽観論", "reading": "らっかんろん", "gloss": "optimistic view", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "悲観論", "reading": "ひかんろん", "gloss": "pessimistic view", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "警鐘を鳴らす", "reading": "けいしょうをならす", "gloss": "to sound the alarm", "field": "ai", "level": "beyond", "why": "seed from 楽待 AI2027 video (truncated title 元Anthropic研究者の警…)"}
+{"term": "見通し", "reading": "みとおし", "gloss": "outlook, prospect", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "試算", "reading": "しさん", "gloss": "trial calculation, estimate", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "想定", "reading": "そうてい", "gloss": "assumption, supposition", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "加速主義", "reading": "かそくしゅぎ", "gloss": "accelerationism", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "新興企業", "reading": "しんこうきぎょう", "gloss": "startup, emerging company", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "巨大IT企業", "reading": "きょだいあいてぃーきぎょう", "gloss": "Big Tech", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "生態系", "reading": "せいたいけい", "gloss": "ecosystem", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "囲い込み", "reading": "かこいこみ", "gloss": "lock-in, enclosure", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "先行者利益", "reading": "せんこうしゃりえき", "gloss": "first-mover advantage", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "規模の経済", "reading": "きぼのけいざい", "gloss": "economies of scale", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "ネットワーク効果", "reading": "ねっとわーくこうか", "gloss": "network effect", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "差別化", "reading": "さべつか", "gloss": "differentiation", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "資本集約的", "reading": "しほんしゅうやくてき", "gloss": "capital-intensive", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "人材", "reading": "じんざい", "gloss": "talent, human resources", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "頭脳流出", "reading": "ずのうりゅうしゅつ", "gloss": "brain drain", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "報酬", "reading": "ほうしゅう", "gloss": "reward; remuneration", "field": "ai", "level": "N1", "why": "core concept"}
+{"term": "欺瞞", "reading": "ぎまん", "gloss": "deception", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "検閲", "reading": "けんえつ", "gloss": "censorship", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "プロンプト", "reading": "ぷろんぷと", "gloss": "prompt", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "心の哲学", "reading": "こころのてつがく", "gloss": "philosophy of mind", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "中国語の部屋", "reading": "ちゅうごくごのへや", "gloss": "the Chinese Room argument", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "チューリングテスト", "reading": "ちゅーりんぐてすと", "gloss": "the Turing test", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "共進化", "reading": "きょうしんか", "gloss": "coevolution", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "思考停止", "reading": "しこうていし", "gloss": "ceasing to think for oneself", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "化石化", "reading": "かせきか", "gloss": "fossilization", "field": "ai", "level": "beyond", "why": "seed from RECODE「思考が化石化する人間」"}
+{"term": "問いを立てる", "reading": "といをたてる", "gloss": "to pose the right question", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "課題設定", "reading": "かだいせってい", "gloss": "problem setting, framing the task", "field": "ai", "level": "beyond", "why": "core concept"}
+{"term": "批判的思考", "reading": "ひはんてきしこう", "gloss": "critical thinking", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "牽引", "reading": "けんいん", "gloss": "driving, pulling (growth)", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "喫緊", "reading": "きっきん", "gloss": "pressing, urgent", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "急務", "reading": "きゅうむ", "gloss": "urgent task", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "不可欠", "reading": "ふかけつ", "gloss": "indispensable", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "要諦", "reading": "ようてい", "gloss": "essential point, crux", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "根幹", "reading": "こんかん", "gloss": "core, foundation", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "中核", "reading": "ちゅうかく", "gloss": "core, nucleus", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "基幹産業", "reading": "きかんさんぎょう", "gloss": "key industry", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "礎", "reading": "いしずえ", "gloss": "cornerstone, foundation", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "屋台骨", "reading": "やたいぼね", "gloss": "mainstay, backbone", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "鍵を握る", "reading": "かぎをにぎる", "gloss": "to hold the key", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "一翼を担う", "reading": "いちよくをになう", "gloss": "to play a part", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "担い手", "reading": "にないて", "gloss": "bearer, the one who carries (a role)", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "布石", "reading": "ふせき", "gloss": "groundwork, strategic first move", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "先手を打つ", "reading": "せんてをうつ", "gloss": "to make the first move, forestall", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "舵を切る", "reading": "かじをきる", "gloss": "to change course (policy)", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "追い風", "reading": "おいかぜ", "gloss": "tailwind", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "逆風", "reading": "ぎゃくふう", "gloss": "headwind", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "頭打ち", "reading": "あたまうち", "gloss": "leveling off, peaking", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "伸び悩み", "reading": "のびなやみ", "gloss": "sluggish growth", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "右肩上がり", "reading": "みぎかたあがり", "gloss": "steady upward trend", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "急落", "reading": "きゅうらく", "gloss": "sharp fall", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "高騰", "reading": "こうとう", "gloss": "soaring (prices)", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "過熱", "reading": "かねつ", "gloss": "overheating", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "投機", "reading": "とうき", "gloss": "speculation", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "思惑", "reading": "おもわく", "gloss": "expectation, speculation, intent", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "織り込む", "reading": "おりこむ", "gloss": "to price in, factor in", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "懸念", "reading": "けねん", "gloss": "concern, worry", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "不透明", "reading": "ふとうめい", "gloss": "unclear, opaque", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "先行き", "reading": "さきゆき", "gloss": "outlook, future prospects", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "見極める", "reading": "みきわめる", "gloss": "to ascertain, see through", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "余波", "reading": "よは", "gloss": "aftermath, repercussions", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "波及効果", "reading": "はきゅうこうか", "gloss": "ripple effect", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "相乗効果", "reading": "そうじょうこうか", "gloss": "synergy", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "好循環", "reading": "こうじゅんかん", "gloss": "virtuous cycle", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "起爆剤", "reading": "きばくざい", "gloss": "catalyst, trigger", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "呼び水", "reading": "よびみず", "gloss": "pump-priming, trigger", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "立役者", "reading": "たてやくしゃ", "gloss": "key figure, star player", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "縁の下の力持ち", "reading": "えんのしたのちからもち", "gloss": "unsung hero", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "肩を並べる", "reading": "かたをならべる", "gloss": "to rank alongside", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "一線を画す", "reading": "いっせんをかくす", "gloss": "to draw a clear line, stand apart", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "群を抜く", "reading": "ぐんをぬく", "gloss": "to stand out from the rest", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "他の追随を許さない", "reading": "たのついずいをゆるさない", "gloss": "unrivaled", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "不可逆", "reading": "ふかぎゃく", "gloss": "irreversible", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "抜本的", "reading": "ばっぽんてき", "gloss": "drastic, fundamental", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "前代未聞", "reading": "ぜんだいみもん", "gloss": "unprecedented", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "未曾有", "reading": "みぞう", "gloss": "unprecedented", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "地殻変動", "reading": "ちかくへんどう", "gloss": "seismic shift", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "激震", "reading": "げきしん", "gloss": "violent shock", "field": "ai", "level": "beyond", "why": "seed from ReHacQ「AI業界大激震」"}
+{"term": "萌芽", "reading": "ほうが", "gloss": "germ, budding", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "胎動", "reading": "たいどう", "gloss": "stirrings, early signs", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "端緒", "reading": "たんしょ", "gloss": "beginning, first clue", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "嚆矢", "reading": "こうし", "gloss": "the first instance, pioneer", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "先駆け", "reading": "さきがけ", "gloss": "forerunner", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "寵児", "reading": "ちょうじ", "gloss": "darling (of the era)", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "第一人者", "reading": "だいいちにんしゃ", "gloss": "leading authority", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "知見", "reading": "ちけん", "gloss": "knowledge, findings", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "示唆", "reading": "しさ", "gloss": "suggestion, implication", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "示唆に富む", "reading": "しさにとむ", "gloss": "highly suggestive, thought-provoking", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "含意", "reading": "がんい", "gloss": "implication", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "帰結", "reading": "きけつ", "gloss": "consequence, conclusion", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "蓋然性", "reading": "がいぜんせい", "gloss": "probability, likelihood", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "費用対効果", "reading": "ひようたいこうか", "gloss": "cost-effectiveness", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "採算", "reading": "さいさん", "gloss": "profitability", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "過当競争", "reading": "かとうきょうそう", "gloss": "excessive competition", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "恩恵", "reading": "おんけい", "gloss": "benefit, blessing", "field": "ai", "level": "N2", "why": "register word"}
+{"term": "享受", "reading": "きょうじゅ", "gloss": "enjoyment (of benefits)", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "淘汰", "reading": "とうた", "gloss": "weeding out, selection", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "二極化", "reading": "にきょくか", "gloss": "polarization", "field": "ai", "level": "beyond", "why": "register word"}
+{"term": "均衡", "reading": "きんこう", "gloss": "equilibrium, balance", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "是正", "reading": "ぜせい", "gloss": "correction, redress", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "掌握", "reading": "しょうあく", "gloss": "grasp, command", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "主導権", "reading": "しゅどうけん", "gloss": "initiative, leadership", "field": "ai", "level": "N1", "why": "register word"}
+{"term": "覇者", "reading": "はしゃ", "gloss": "champion, dominant power", "field": "ai", "level": "beyond", "why": "register word"}

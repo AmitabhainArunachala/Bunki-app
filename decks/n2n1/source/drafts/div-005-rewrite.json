@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "文才",
+   "reading": "ぶんさい",
+   "pos": "noun",
+   "meaning": "literary talent",
+   "defJa": "優れた文章を生み出す才能",
+   "passage": {
+    "ja": "「雨が降った」と一行だけ書いたあと、次の文をどう続けるか迷って、好きな日本語の随筆を開くことがある。文才に恵まれた書き手の文章では、雨そのものの説明より、濡れた袖を気にする動作や、短く置かれた語尾が場面を生き生きと伝えている。難しい言葉を知っているからといって同じ効果を出せるとは限らず、どの名詞に助詞を添え、どこで文を切るかにも選択がある。推敲では才能の有無を嘆く前に、一文の終わり方を二通り書き、声に出したときの調子を比べることから始められる。",
+    "form": "文才",
+    "en": "After writing just one line saying that it rained, we sometimes hesitate over the next sentence and open a favorite Japanese essay. In the work of a gifted writer, an action such as noticing a wet sleeve or a brief sentence ending can convey the scene vividly instead of a description of the rain itself. Knowing difficult words alone does not necessarily produce the same effect; choices also lie in which nouns take particles and where sentences end. Before lamenting whether we have talent, we can begin revision by writing two endings for a sentence and comparing how they sound aloud.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「文才に恵まれる」は、文章を書く優れた力を持つこと。",
+    "sense": ""
+   }
+  }
+ ]
+}

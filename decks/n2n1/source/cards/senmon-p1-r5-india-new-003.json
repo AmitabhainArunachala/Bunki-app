@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "国分寺",
+   "reading": "こくぶんじ",
+   "pos": "noun",
+   "meaning": "provincial state Buddhist temple",
+   "defJa": "奈良時代に国ごとに設けられた官寺",
+   "passage": {
+    "ja": "地方の町に残る寺の名が、かつての国家の構想を今に伝えることがある。奈良時代、聖武天皇のもとで進められた国分寺の建立は、仏教の力によって国を守ろうとする願いを、各地の寺院という形にした事業であった。国ごとに拠点を置く仕組みは、信仰に限らず、中央と地方の関係を考えるうえでも意味を持つ。現在の境内に立つとき、今見えている建物と創建時の姿をそのまま重ねず、残る地名や遺構から古い配置をたどれば、祈りと政治が接する空間が現れる。",
+    "form": "国分寺",
+    "en": "A temple name surviving in a provincial town can preserve the memory of a state project. The establishment of provincial Buddhist temples under Emperor Shomu in the Nara period gave physical form to the wish to protect the country through Buddhism. A network with a center in each province also matters for understanding relations between the center and the regions. Rather than equating present buildings with the original layout, tracing old names and remains reveals a space where prayer and government met.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「国分寺の建立」。寺院の配置を国家と地方の関係から捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "南都六宗",
+   "reading": "なんとろくしゅう",
+   "pos": "noun",
+   "meaning": "six Nara schools of Buddhist study",
+   "defJa": "奈良を中心に学ばれた六つの仏教学派",
+   "passage": {
+    "ja": "奈良のお寺の説明で宗派がいくつも出てくると、今のお寺の所属と同じものだと思うよね。南都六宗の「宗」は、仏教の教えをどう研究するかという学問の流れとして捉えると、一人が別の教えも学ぶ姿を想像しやすいんだ。今の宗派名と似ているからといって、人も寺もきっぱり六つに分かれていたと考えると、当時の学び方を狭く見てしまう。たとえば戒律を扱う律宗から唐招提寺につなげてみると、難しい名前の一覧が、何を学ぶ場所だったかという地図に変わるよ。",
+    "form": "南都六宗",
+    "en": "When descriptions of Nara temples list several schools, they can seem like modern institutional affiliations. Understanding the school in the six Nara schools as a tradition of Buddhist study makes it easier to imagine someone also learning another teaching. Similarity to modern sect names does not mean people and temples were neatly divided into six exclusive groups. Connecting the Ritsu school’s study of discipline with Toshodaiji, for example, turns a list of difficult names into a map of what people studied where.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「六つの宗派」とだけ覚えず、教義を研究する学派という側面を押さえる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "遣唐使",
+   "reading": "けんとうし",
+   "pos": "noun",
+   "meaning": "Japanese missions to Tang China",
+   "defJa": "古代の日本が唐に派遣した外交使節",
+   "passage": {
+    "ja": "空海と最澄が唐に渡った八〇四年の出来事は、日本仏教の二つの系譜をたどる接点となる。両者の留学は遣唐使による往来の中に位置付けられ、教えを学ぶ旅も、船や外交関係という現実の条件に支えられていた。密教や経典の内容だけを比べても、それを運んだ人と制度の働きまでは捉えきれない。思想が広まる過程を検討するにあたり、何を学んだかに加えて、誰が渡航を可能にしたかを見ることは、宗教史を社会の動きと結び付ける手掛かりとなる。",
+    "form": "遣唐使",
+    "en": "Kukai and Saicho’s journeys to Tang China in the year eight hundred four form a point of connection between two Japanese Buddhist lineages. Their study abroad occurred within the Japanese diplomatic missions to Tang, showing how journeys for religious learning depended on ships and diplomatic relations. Comparing esoteric teachings and scriptures alone cannot fully capture the work of the people and institutions that transported them. Examining who made travel possible alongside what was learned connects the spread of ideas with wider social history.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "使節そのものと、その機会に渡航した学問僧の役割を分けている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "遣隋使",
+   "reading": "けんずいし",
+   "pos": "noun",
+   "meaning": "Japanese missions to Sui China",
+   "defJa": "古代の日本が隋に派遣した外交使節",
+   "passage": {
+    "ja": "国書を届ける船には、外交上の交渉だけでなく、異国で学ぼうとする人々の期待も乗っていました。遣隋使を通じた交流を考えるとき、留学生や学問僧の動きまで視野を広げると、政治と仏教の学びが接していたことが分かります。使節が戻れば交流が終わるというものではなく、現地に残って学び、後に知識を持ち帰る人もいました。後の唐への派遣と一まとめにせず、相手の王朝が変わる中で何が引き継がれたのかを追うと、年表の名前にも流れが生まれます。",
+    "form": "遣隋使",
+    "en": "Ships carrying diplomatic letters also carried the hopes of people seeking to study abroad. Looking beyond diplomacy to students and monks in the Japanese missions to Sui China reveals the meeting of politics and Buddhist learning. Exchange did not simply end when the envoys returned, since some people remained to study and brought knowledge home later. Rather than merging these missions with later ones to Tang China, following what continued across a change of dynasty gives the names on a timeline a sense of development.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「遣隋使を派遣する」。隋と唐を区別し、学問僧の往来を補っている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "神宮寺",
+   "reading": "じんぐうじ",
+   "pos": "noun",
+   "meaning": "Buddhist temple associated with a shrine",
+   "defJa": "神社と関わりを持って設けられた仏教寺院",
+   "passage": {
+    "ja": "古い境内図に神社と寺院が並んでいても、地図の間違いではありません。神宮寺は神社と結び付いて置かれた仏教寺院で、神と仏への信仰が同じ場所で営まれた歴史を知る手掛かりになります。現在の区分に基づいて昔の景色を想像すると、かつて行き来していた人や儀礼のつながりを見落とすことがあります。寺がいつ設けられ、その後どう変わったかを地域ごとに調べれば、神仏習合という大きな言葉を、建物の配置や失われた道の跡から具体的に理解できます。",
+    "form": "神宮寺",
+    "en": "A shrine and a Buddhist temple appearing together on an old precinct map are not necessarily a mapping error. A jinguji was a Buddhist temple connected with a shrine and offers evidence of a history in which kami and Buddhas were worshipped in the same place. Imagining the past through present classifications can obscure former connections among people and rituals. Investigating when such a temple was established and how it changed makes the broad concept of religious syncretism concrete through building layouts and traces of vanished paths.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「神宮寺が置かれる」。境内図や遺構が制度の意味を具体化している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

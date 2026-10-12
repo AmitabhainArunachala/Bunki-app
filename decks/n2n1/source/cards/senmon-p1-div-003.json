@@ -1,0 +1,224 @@
+{
+ "cards": [
+  {
+   "term": "歴史は繰り返す",
+   "reading": "れきしはくりかえす",
+   "pos": "expression",
+   "meaning": "history repeats itself",
+   "defJa": "過去と似た出来事が後の時代にも起こるということ",
+   "passage": {
+    "ja": "昔の投機熱を扱った本を読むと、値上がりの話を聞いて慌てて買う人の姿に、今の世の中を重ねたくなるんだよね。「歴史は繰り返す」と言えば分かった気になるけど、似た場面を見つけただけで、背景まで同じだと決めるのは早いと思う。当時は情報が誰にどう届いたのか、お金を借りる仕組みはどうだったのかを比べてからでないと、違いの大きさも見えてこない。過去との比較は未来の答えを当てるためだけじゃなく、今の状況にどんな問いを立てるかを考える材料になるんだ。",
+    "form": "歴史は繰り返す",
+    "en": "When I read about speculative frenzies in the past, people rushing to buy after hearing about rising prices make me want to see the present in them. Saying that history repeats itself feels like an explanation, but finding a similar scene seems too little grounds for assuming the background was identical. We cannot see how large the differences are until we compare who received information and how, or what borrowing arrangements existed then. Comparing with the past offers material not just for predicting the future but also for deciding what questions to ask about the present.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "似た出来事への言い回しで、全く同じ再現を意味しません。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "アウトプット",
+   "reading": "あうとぷっと",
+   "pos": "noun",
+   "meaning": "output",
+   "defJa": "学んだ内容を言葉や行動として外に表すこと",
+   "passage": {
+    "ja": "本を閉じて内容を説明しようとすると、読んでいる間には滑らかにつながっていた話が、途中で途切れることがあります。学んだことを自分の言葉で話すアウトプットは、記憶を試すだけでなく、理解が曖昧な箇所を探す機会にもなります。説明できなかったからといって、すぐに最初のページから読み直す必要はなく、つまずいた問いを持って該当する段落に戻ればよいのです。読む時間と説明する時間を分けて記録すると、長く机に向かうこと以外にも、学びの進み方を確かめる手掛かりが得られます。",
+    "form": "アウトプット",
+    "en": "When you close a book and try to explain its contents, an account that seemed smoothly connected while reading can break off midway. Output in the form of speaking about what you learned in your own words offers a chance not only to test memory but also to locate uncertain understanding. Failing to explain it does not mean you must immediately reread from the first page; you can return to the relevant paragraph with the question that caused trouble. Recording reading time and explanation time separately provides clues to your learning progress beyond how long you sit at a desk.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "学習では、説明や解答などによって知識を使うことです。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "内発的動機づけ",
+   "reading": "ないはつてきどうきづけ",
+   "pos": "noun",
+   "meaning": "intrinsic motivation",
+   "defJa": "活動そのものへの興味や楽しさから生じる意欲",
+   "passage": {
+    "ja": "ベランダの鉢を毎朝見に行くのは、誰かに褒められるためじゃなくて、昨日閉じていた芽が開いたか知りたいからなんだ。こういう、活動そのものが面白くて動きたくなる気持ちは、内発的動機づけの例として考えられるよね。観察を続けるうちに、同じ日に植えた種なのに育ち方が違うことに気づいて、好奇心から置く場所まで変えてみたんだ。成果を記録するにしても、たくさん育てる競争にするより、今日初めて気づいた変化を一行残すほうが、僕には楽しみが続くんだよ。",
+    "form": "内発的動機づけ",
+    "en": "I go to look at the pots on the balcony every morning because I want to know whether a bud that was closed yesterday has opened, not because someone will praise me. Wanting to act because the activity itself is interesting can be understood as an example of intrinsic motivation. As I kept observing, I noticed that seeds planted on the same day were growing differently, and curiosity even led me to try changing their locations. Even when recording results, I find the enjoyment lasts longer if I note one newly noticed change each day rather than making it a competition to grow a lot.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "褒美よりも、知りたい、やってみたいという気持ちが中心です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "筆致",
+   "reading": "ひっち",
+   "pos": "noun",
+   "meaning": "style of writing",
+   "defJa": "文章や絵に表れる書き方や描き方の調子",
+   "passage": {
+    "ja": "旅先の雨を題材にしても、窓を打つ音を重ねる文章と、濡れた靴を一足だけ描く文章とでは、読後に残る景色が違います。後者のように説明を控えた筆致は、寂しいと書かずに寂しさを伝えることがあります。細かな描写を足す一方で、感情を名付ける言葉を削ってみると、読み手がその場の空気を受け取る余地を作れます。推敲では何を加えるかだけでなく、どこまで言わずに置けば余韻が残るかを考えると、同じ出来事にも別の声が生まれます。",
+    "form": "筆致",
+    "en": "Even with rain on a journey as the subject, writing that layers the sounds against a window and writing that depicts just one pair of wet shoes leave different scenes with the reader. A restrained style like the latter can convey loneliness without naming it. Adding concrete details while removing words that label emotions can leave room for readers to take in the atmosphere. Considering not only what to add during revision but also how much to leave unsaid for resonance gives even the same event a different voice.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「淡々とした筆致」のように、描き方の特徴を表します。",
+    "sense": "文章の書きぶりや表現の調子"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "再興",
+   "reading": "さいこう",
+   "pos": "noun",
+   "meaning": "revival, restoration",
+   "defJa": "衰えたり途絶えたりしたものを再び盛んにすること",
+   "passage": {
+    "ja": "伝統工芸の産地を評価する際、工房の数が増えたかどうかだけでは、その先を見通せない。衰えた産業の再興を目指すなら、技術の継承に加えて、作り手が暮らしを支えられるだけの需要を確保する必要がある。展示会で一度注目を集めても、修理の相談に応じる店や継続して注文する客がなければ、生産の見通しは立てにくい。古い意匠を守る仕事と、今の住まいで使える形を探る仕事をどう結びつけるかが、産地の将来を考える上で重要な論点となる。",
+    "form": "再興",
+    "en": "When assessing a traditional craft region, a rise in the number of workshops alone does not reveal what lies ahead. Reviving a declining industry requires securing enough demand for makers to earn a living as well as passing on techniques. Even after attracting attention at an exhibition, planning production is difficult without shops that handle repair requests and customers who place repeat orders. How to connect preserving old designs with finding forms suited to present-day homes is an important issue for the region’s future.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "「産業の再興を目指す」のように、かつての盛んな状態を意識する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不可欠",
+   "reading": "ふかけつ",
+   "pos": "na-adj",
+   "meaning": "indispensable, essential",
+   "defJa": "それがなければ成り立たないほど必要なこと",
+   "passage": {
+    "ja": "相談窓口の回答文を機械に作らせる仕組みを導入するなら、もっともらしい文章が出たところで作業を終えてはいけません。実際の規定と照らして内容を検証する工程が不可欠で、ここを省くと、誤った案内を丁寧な言葉で届けることになりかねません。正解を一つ覚えさせれば済むとは限らず、条件によって扱いが変わる質問や、担当者へ引き継ぐべき質問も用意する必要があります。導入の計画には応答の速さだけでなく、確認する人の手順と、判断できない場合の出口まで含めましょう。",
+    "form": "不可欠",
+    "en": "If you introduce a system that has a machine draft answers for a help desk, the work must not stop once plausible text appears. A stage for checking the content against the actual rules is indispensable, and omitting it can mean delivering incorrect guidance in courteous language. Teaching it one correct answer is not necessarily enough; you also need questions whose handling varies with the conditions and questions that should be passed to a staff member. Plans for introduction should cover not only response speed but also the reviewer’s procedure and a route out when the system cannot decide.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「検証が不可欠だ」のように、欠かせない条件を表します。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "瞑想",
+   "reading": "めいそう",
+   "pos": "noun",
+   "meaning": "meditation",
+   "defJa": "心を落ち着け、意識を集中したり観察したりすること",
+   "passage": {
+    "ja": "静かに座った途端、夕飯の買い物や返し忘れた連絡が次々に浮かんできて、頭の中って忙しいなと驚いたんだ。呼吸に注意を向ける瞑想を試していたんだけど、何も考えまいと力むほど、考え事が気になってしまった。そこで、息を感じて、別のことを考えていたと気づいたらまた戻る、という小さな動きだけを続けてみたんだよ。終わってから何回それたかを採点するより、今どこに注意が向いているかに気づく練習だったと考えるほうが、僕には続けやすいね。",
+    "form": "瞑想",
+    "en": "The moment I sat down quietly, grocery shopping for dinner and messages I had forgotten to answer kept coming to mind, and I was surprised by how busy my mind was. I was trying meditation focused on breathing, but the harder I tried not to think, the more my thoughts bothered me. So I just kept making the small movement of feeling my breath and returning to it whenever I noticed I had been thinking about something else. For me, it is easier to continue if I regard it as practice in noticing where my attention is, rather than scoring how often it wandered afterward.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "ここでは呼吸に注意を向け、心の動きを観察する実践です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "漢語",
+   "reading": "かんご",
+   "pos": "noun",
+   "meaning": "Chinese word, Sino-Japanese word",
+   "defJa": "中国語由来または漢字の音で組み立てた語",
+   "passage": {
+    "ja": "「開始時刻を厳守してください」と書かれた案内は意味が明確ですが、近所の集まりには少し堅く響くことがあります。「開始」や「厳守」のような漢語を、「始まる時間」や「必ず守る」と言い換えると、文の調子を変えられます。和語に直しさえすればよいと考えず、掲示の短さを優先するのか、初めて来る人の緊張を和らげたいのかに応じて選びましょう。言い換えは言葉の難易度を下げるだけの作業ではなく、相手との距離や、その場に合った声を整える作業でもあります。",
+    "form": "漢語",
+    "en": "A notice telling people to strictly observe the starting time is clear, but it can sound rather stiff for a neighborhood gathering. Replacing Sino-Japanese words such as kaishi and genshu with native expressions meaning when it starts and be sure to observe can change the tone. Instead of assuming that native wording is always sufficient, choose according to whether you prioritize brevity on a sign or easing newcomers’ nervousness. Rephrasing is not only a matter of lowering vocabulary difficulty; it also adjusts the distance from readers and the voice appropriate to the situation.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "音読みをもとにする語で、日本で作られたものもあります。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "浮世",
+   "reading": "うきよ",
+   "pos": "noun",
+   "meaning": "the transient, floating world",
+   "defJa": "移り変わりが多く、はかないこの世",
+   "passage": {
+    "ja": "春に咲いた花の下で交わした約束が、秋にはもう果たせなくなっていることがある。浮世のはかなさを嘆く言葉には、変わらないものを求めながらも、暮らしの中で変化を避けられない人の思いがにじむ。仏教の無常という見方に触れると、失われる物を軽く扱うのではなく、今ある関係への執着をどう見つめるかという問いが生まれる。別れを恐れて出会いまで遠ざけるのか、終わりがあると知りつつ目の前の人に言葉を尽くすのかは、日々の小さな選択に表れる。",
+    "form": "浮世",
+    "en": "A promise made beneath spring blossoms can already be impossible to keep by autumn. Words lamenting the transience of this world carry the feelings of people who seek something unchanging yet cannot escape change in daily life. Encountering the Buddhist view of impermanence raises a question of how to examine attachment to present relationships, rather than treating things lightly because they will be lost. Whether we avoid even new encounters for fear of parting or speak fully to those before us while knowing there will be an end appears in small everyday choices.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "ここでは楽しみの世界ではなく、はかない現世の意味。",
+    "sense": "はかなく移ろう現世"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "文語体",
+   "reading": "ぶんごたい",
+   "pos": "noun",
+   "meaning": "classical literary style",
+   "defJa": "古くからの書き言葉の文法に基づく文体",
+   "passage": {
+    "ja": "古い歌の歌詞にある「来たり」や「去りぬ」を、普段の会話と同じ文法で読むと、時の捉え方を取り違えることがあります。文語体の文章では、現代語とは異なる助動詞や語尾が使われるので、見慣れた漢字だけを頼りに意味を決めないことが大切です。難しい単語の多さはさておき、まず文末まで音読して、どこで動作が終わったと述べているのかを確かめましょう。今の言葉に直したあとで原文へ戻ると、短い語尾に意味が詰まり、独特の調子が生まれていることにも気づけます。",
+    "form": "文語体",
+    "en": "Reading forms such as kitari and sarinu in old song lyrics through everyday modern grammar can lead us to misunderstand how time is expressed. Classical literary prose uses auxiliaries and endings different from modern Japanese, so familiar kanji alone should not determine our interpretation. Setting aside the number of difficult words, first read through to the sentence ending aloud and check where the text presents an action as completed. Returning to the original after paraphrasing it in modern language can also reveal how meaning is packed into short endings to create a distinctive rhythm.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "単に堅い文章をいうのではなく、古典の文法が基礎です。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

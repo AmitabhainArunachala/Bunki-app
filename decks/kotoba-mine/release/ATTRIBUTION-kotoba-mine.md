@@ -1,4 +1,4 @@
-# Sources: 言葉の鉱脈・文 (kotoba-mine)
+# Sources: 調べた言葉・例文 (kotoba-mine)
 
 Built for the learner's own study (private build; some sources below may not be shared). 492 passages come from the 162 sources below; 11 passages were written for this deck (書き下ろし) and are not listed.
 

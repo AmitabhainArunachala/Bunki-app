@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "不服",
+   "reading": "ふふく",
+   "pos": "noun",
+   "meaning": "dissatisfaction; objection",
+   "defJa": "決定や扱いに納得できない気持ち。",
+   "passage": {
+    "ja": "答案を返された学生が、自分の説明は間違っていないはずだと、採点基準を何度も読み直しています。評価に不服があるなら、腹を立てたまま抗議する前に、どの部分が認められなかったのかを確かめたいですね。直感に反して低い点がついたときほど、自分と採点者の見方の違いが表に出ます。点数への不満を、説明のどこを直せば意図が伝わるかという問いに変えてみます。納得できない気持ちそのものが、学び直す場所を教えてくれることもあります。",
+    "form": "不服",
+    "en": "A student who has received a marked paper keeps rereading the grading criteria, convinced that the explanation cannot be wrong. If you object to the assessment, you should check which part was not accepted before protesting in anger. Differences between your perspective and the marker’s become especially visible when a score is lower than your intuition led you to expect. Try turning dissatisfaction with the score into a question about where to revise the explanation so that your intention gets across. The very feeling that you cannot accept something can sometimes show you where to resume learning.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「評価に不服がある」は、受けた評価に納得できないという意味です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "光",
+   "reading": "ひかり",
+   "pos": "noun",
+   "meaning": "light",
+   "defJa": "目に入り、物の形や色を見せるもの。",
+   "passage": {
+    "ja": "人工知能に画像を見せるとき、写っている物だけに目を向けていると、撮影条件の違いを見落とす。同じ部品でも、表面で光が反射する角度が変われば、傷のような白い線が現れることがある。画像を大量に集めたからといって、工場で生じるあらゆる見え方を把握できたとは限らない。撮影台の位置を少しずらす作業が、複雑な計算方法の変更より役に立つ場合もある。何を学習させるかという問いは、何がカメラに届いているかという問いから始まる。",
+    "form": "光",
+    "en": "When showing images to artificial intelligence, focusing only on the objects pictured can make us overlook differences in shooting conditions. Even on the same component, a change in the angle at which light reflects from the surface can produce a white line resembling a scratch. Collecting a large number of images does not necessarily mean that we have captured every possible appearance in a factory. Moving the photography platform slightly can sometimes help more than changing a complex computational method. The question of what to teach a system begins with the question of what is reaching its camera.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「光が反射する」のように、明るさを生む物理的なものを指します。",
+    "sense": "目に見える明るさを生むもの。"
+   }
+  },
+  {
+   "term": "忠告",
+   "reading": "ちゅうこく",
+   "pos": "noun",
+   "meaning": "warning; cautionary advice",
+   "defJa": "相手のためを思って与える注意。",
+   "passage": {
+    "ja": "昔の航海日誌を読むとき、船長が進路を決めた場面だけを追うと、判断の背景を見落とします。仮に船員が嵐の危険を再三訴えていたなら、その忠告に耳を貸したかどうかも大切な手がかりになります。無事に港へ着いたという結果だけで、出航が賢明だったとは言い切れません。当人たちが何を知り、何をまだ知らなかったのかを、記録に沿って確かめる必要があります。成功した人の決断にも迷いや反対があったと分かると、過去の姿がずっと立体的に見えてきます。",
+    "form": "忠告",
+    "en": "When reading an old ship’s log, following only the moments when the captain chose a course can obscure the background to those decisions. If crew members had repeatedly raised the danger of a storm, whether the captain listened to their warnings would also be an important clue. A safe arrival in port alone is not enough to show that setting sail was wise. We need to examine the records to establish what the people involved knew and what they did not yet know. Discovering the hesitation and opposition behind a successful person’s decisions gives us a much fuller picture of the past.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「忠告に耳を貸す」は、相手が心配して伝えた注意を聞くことです。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "こつ",
+   "reading": "こつ",
+   "pos": "noun",
+   "meaning": "knack; practical trick",
+   "defJa": "物事を上手に進めるための要点。",
+   "passage": {
+    "ja": "頼み事の文章を何度書き直しても、相手に何をしてほしいのかがぼやけてしまうことがあります。伝わる依頼文のこつは、事情を並べる前に、求める行動と期限を一組にして示すことです。たとえば資料の確認を頼むなら、読んでほしい部分まできっちり指定すると、受け手は返事を考えやすくなります。丁寧さにこだわるあまり、お願いの中身を長い前置きに埋めてはいけません。読み終えた相手が次に何をするか、その場面を思い描いて一文を整えてみてください。",
+    "form": "こつ",
+    "en": "Sometimes, however often you rewrite a request, what you want the other person to do remains vague. The knack of writing a clear request is to present the desired action together with its deadline before listing the circumstances. For example, when asking someone to review a document, specifying exactly which part to read makes it easier for them to formulate a reply. Do not become so concerned with politeness that you bury the request itself in a long introduction. Try refining a sentence while imagining what the reader will do next after finishing it.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「こつをつかむ」とも言い、うまく行うための具体的な要点を指します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "スペース",
+   "reading": "スペース",
+   "pos": "noun",
+   "meaning": "blank space",
+   "defJa": "文字などを置かずに空けた部分。",
+   "passage": {
+    "ja": "駅の案内板に文字がぎっしり並んでいると、知りたい出口の番号を探すだけでも時間がかかります。情報を一括して載せるかわりに、行き先のまとまりごとにスペースを設けると、項目の境目が目で追いやすくなります。ここで優先したいのは、文章を最後まで読ませることより、必要な箇所に視線を導くことです。空いている部分を無駄だと思って説明を足すと、かえって案内の役割を弱めます。言葉を減らせない場合にも、配置を整える余地は残っています。",
+    "form": "スペース",
+    "en": "When a station sign is crammed with text, even finding the number of the exit you need takes time. Instead of displaying all the information as one block, leaving blank space between groups of destinations makes the boundaries between entries easier to follow. The priority here is to guide the eye to the relevant section rather than to make people read every word. Treating empty areas as waste and filling them with explanations can actually weaken the sign’s usefulness. Even when you cannot reduce the wording, there is still room to improve its arrangement.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "ここでは場所全体ではなく、文字の間に設ける余白を指します。",
+    "sense": "文字や項目の間の空白。"
+   }
+  },
+  {
+   "term": "与党",
+   "reading": "よとう",
+   "pos": "noun",
+   "meaning": "ruling party",
+   "defJa": "政権を担い、政府を支える政党。",
+   "passage": {
+    "ja": "政治記事の見出しを訳すとき、政党名をそのまま移しただけでは、誰が政策を進める側なのか伝わらないことがあります。原文に与党とあれば、単に選挙で人気のある集団ではなく、政権を担う立場を示している点に注意します。連立の場合もあるだけに、一つの党がすべてを主導していると決めつける表現は避けたいところです。本文を参照して了承した主体を確かめ、必要なら短く補います。肩書きを正確に訳すことは、記事の中の責任の所在を読者に示す作業でもあります。",
+    "form": "与党",
+    "en": "When translating a political headline, simply transferring a party’s name may fail to show who is responsible for advancing a policy. If the original refers to a ruling party, note that it indicates a role in government rather than merely a group with electoral popularity. Since governments may be coalitions, it is best to avoid wording that assumes one party directs everything. Check the main text to establish who gave approval, and add a brief clarification if needed. Translating a designation accurately also helps readers identify who bears responsibility in the article.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "政府を支える側を表し、単に議席が多い党という意味には限りません。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "停滞",
+   "reading": "ていたい",
+   "pos": "noun",
+   "meaning": "stagnation; stalled progress",
+   "defJa": "物事が先へ進まず、とどまること。",
+   "passage": {
+    "ja": "共同で書いている原稿が、修正のたびに最初の案へ戻ってしまうとします。編集の停滞を抜け出すには、言葉の好みを争う前に、誰に何を伝える文章なのかを全員で確かめる必要があります。見出しの工夫はさておき、読み手に残したい内容を一文にすると、意見の食い違いが見つかります。その一文の了承を得てから細部に戻れば、修正の理由を互いに説明しやすくなります。話し合いを重ねることと、原稿が前へ進むことを、同じだと思わないようにしましょう。",
+    "form": "停滞",
+    "en": "Suppose a jointly written draft keeps returning to its original version after every revision. To break an editorial deadlock, everyone needs to establish what the piece should communicate and to whom before arguing over word preferences. Setting headline techniques aside and expressing what you want readers to retain in one sentence exposes differences of opinion. Returning to details after securing agreement on that sentence makes it easier to explain the reasons for revisions to one another. Be careful not to equate repeated discussions with progress on the manuscript.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「編集の停滞」のように、作業や活動が進まない状態に使います。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "即座に",
+   "reading": "そくざに",
+   "pos": "adverb",
+   "meaning": "immediately; on the spot",
+   "defJa": "時間を置かず、その場ですぐに。",
+   "passage": {
+    "ja": "取材相手から予想外の答えが返ってきた瞬間、話題を変える言葉ばかり探してしまうことがあります。会話を円滑に進めたいなら、即座に次の質問を重ねるより、今の発言のどこが意外だったかを一言返してみてください。相手の話を受け入れる姿勢が見えれば、用意した質問にはなかった説明が続くこともあります。短い沈黙が生まれたからといって、聞き手が失敗したと決める必要はありません。返事の速さだけを磨く練習から、相手の言葉を受け止める練習へと目を向けます。",
+    "form": "即座に",
+    "en": "The moment an interviewee gives an unexpected answer, you may find yourself searching only for words to change the subject. To keep the conversation flowing, try briefly saying what surprised you in that remark rather than immediately piling on the next question. If your willingness to take in the other person’s account is apparent, they may continue with an explanation that none of your prepared questions would have elicited. A brief silence does not in itself mean that the interviewer has failed. Shift your attention from practising only quick replies to practising how to receive another person’s words.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「即座に質問を重ねる」は、間を置かずその場で質問することです。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "実費",
+   "reading": "じっぴ",
+   "pos": "noun",
+   "meaning": "actual expenses",
+   "defJa": "実際にかかった費用。",
+   "passage": {
+    "ja": "講座の案内に参加無料とだけ書いてあるのに、当日になって教材代を求められたら、読み手は戸惑います。資料の印刷にかかった分を受け取るなら、実費をご負担くださいと明記し、何の代金なのかも添えます。金額がまだ決まっていない場合には、見込み額と確定する時期を知らせると、参加の判断を助けられます。案内を公開するに先立って、各種の支払いが別々の箇所に散らばっていないか確認してください。丁寧な言い回しだけでなく、条件を探さず読めることも相手への配慮です。",
+    "form": "実費",
+    "en": "Readers will be confused if a course notice says only that participation is free but they are asked to pay for materials on the day. If you are collecting the amount spent on printing handouts, explicitly state that participants must cover the actual expenses and specify what the payment is for. When the amount is not yet fixed, giving an estimate and saying when it will be confirmed can help people decide whether to attend. Before publishing the notice, check that the various payments are not scattered across separate sections. Consideration for the reader means making conditions easy to find as well as using polite wording.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「実費を負担する」は、実際にかかった分の費用を払うことです。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "展示",
+   "reading": "てんじ",
+   "pos": "noun",
+   "meaning": "display; exhibition",
+   "defJa": "品物や作品を並べて人に見せること。",
+   "passage": {
+    "ja": "古い辞書をガラスケースに収めるとき、説明札に出版年だけを書いても、その本の面白さは伝わりにくいものです。展示を見る人が目の前のページと見比べられるよう、今とは違う言葉の意味を一つ取り上げてみます。限られた紙面で知識を尽くすというより、実物を読みたくなるきっかけを渡すつもりで書くと、内容を絞れます。大胆に短くした文章ほど、指している行や語が合致しているか確かめたいですね。説明は本の代わりをするものではなく、本へ視線を戻すための案内になります。",
+    "form": "展示",
+    "en": "When placing an old dictionary in a glass case, a label giving only its publication year rarely conveys what makes it interesting. Try highlighting one word whose meaning differs from today’s so that visitors viewing the display can compare the explanation with the page in front of them. You can narrow the content by writing to spark an interest in reading the object itself rather than to exhaust your knowledge in a limited space. The more boldly you shorten the text, the more carefully you should check that the line or word it refers to matches. The explanation becomes a guide that returns the visitor’s gaze to the book rather than a substitute for it.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「展示を見る」のように、見せる行為だけでなく並べた資料も指します。",
+    "sense": "人に見せるために並べた品物や資料。"
+   }
+  }
+ ]
+}

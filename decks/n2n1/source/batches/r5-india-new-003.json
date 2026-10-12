@@ -1,0 +1,162 @@
+{
+ "batch": "r5-india-new-003",
+ "items": [
+  {
+   "term": "菩提僊那",
+   "reading": "ぼだいせんな",
+   "gloss": "Bodhisena",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.todaiji.or.jp/history/narajidai/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Indian monk officiated at the Todaiji great Buddha eye-opening ceremony in 752; material evidence of transmission reaching Japan.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "鑑真",
+   "reading": "がんじん",
+   "gloss": "Jianzhen; Ganjin",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://toshodaiji.jp/s/about-j.html"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Chinese monk arrived in Japan in 753 after failed voyages, taught Buddhist precepts and founded Toshodaiji in 759.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "遣隋使",
+   "reading": "けんずいし",
+   "gloss": "Japanese missions to Sui China",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.mofa.go.jp/mofaj/area/china/pdfs/rekishi_kk_c_translate.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Diplomatic missions to Sui China also connected religious study and textual transmission; not the same dynasty as Tang.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "遣唐使",
+   "reading": "けんとうし",
+   "gloss": "Japanese missions to Tang China",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.koyasan.or.jp/sp/shingonshu/kobodaishi.html"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Kukai and Saicho travelled to Tang in 804 in the mission context; no invented ship number.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  },
+  {
+   "term": "国分寺",
+   "reading": "こくぶんじ",
+   "gloss": "provincial state Buddhist temple",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.todaiji.or.jp/history/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Provincial Buddhist temples associated with Shomu national program in 741; Todaiji became Yamato provincial temple.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "南都六宗",
+   "reading": "なんとろくしゅう",
+   "gloss": "six Nara schools of Buddhist study",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://toshodaiji.jp/s/about-j.html"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Nara schools were traditions of study rather than modern exclusive membership denominations; Ritsu includes Toshodaiji.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "神宮寺",
+   "reading": "じんぐうじ",
+   "gloss": "Buddhist temple associated with a shrine",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Shrine-associated Buddhist temple manifests institutional links of kami and Buddha worship. Do not imply every shrine had one.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "神仏分離",
+   "reading": "しんぶつぶんり",
+   "gloss": "separation of Shinto and Buddhism",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:japanese-transmission",
+    "https://www.mlit.go.jp/kankocho/content/001998181.pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Meiji policy separated kami and Buddhist institutions; distinguish separation policy from anti-Buddhist destruction, not identical terms.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  }
+ ],
+ "weave": [
+  "修行",
+  "執着",
+  "慈悲",
+  "系譜",
+  "戒律",
+  "比較",
+  "注意",
+  "伝来",
+  "解釈",
+  "原典"
+ ],
+ "note": "Use grounded factNote only for historical or scientific claims; ordinary explanatory examples may elaborate without adding invented facts. All topic india. Four sentences, 215–255 chars. Avoid stock endings る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

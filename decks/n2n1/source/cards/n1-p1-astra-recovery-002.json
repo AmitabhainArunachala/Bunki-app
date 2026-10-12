@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "怪獣",
+   "reading": "かいじゅう",
+   "pos": "noun",
+   "meaning": "monster; fantastic giant beast",
+   "defJa": "物語などに現れる異様で巨大な獣。",
+   "passage": {
+    "ja": "映画の紹介文で、海から巨大な怪獣が現れると書けば、日常にはいない生き物の姿を読者に想像させられます。これを単に動物と置き換えると、文法は正しくても、作品の雰囲気が弱まってしまいます。言葉を選ぶにあたっては、指すものが同じかどうかだけでなく、その語が呼び起こす場面にも目を向けたいですね。人々が圧倒されて見上げるのか、悲鳴を上げて逃げるのかを添えると、巨大さも伝わります。説明を細かくするより、一つの反応を描くほうが、紹介文の調子を保てる場合もあります。",
+    "form": "怪獣",
+    "en": "Writing in a film description that a giant monster emerges from the sea lets readers imagine a creature outside everyday experience. Replacing that with simply an animal may be grammatically correct, but it weakens the atmosphere of the work. When choosing words, consider not only whether they refer to the same thing but also the scenes they evoke. Adding whether people look up in awe or flee screaming conveys its enormous size as well. Sometimes describing one reaction preserves the tone of a film introduction better than providing a more detailed explanation.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "現実の動物ではなく、映画などに登場する巨大な異形の生き物を指します。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "控える",
+   "reading": "ひかえる",
+   "pos": "verb",
+   "meaning": "refrain from; hold back",
+   "defJa": "ある行動をしないようにする。",
+   "passage": {
+    "ja": "昔の町の記録を読むと、祭りの翌日に店が閉まっていたと書いてあることがあるよね。でも、それだけで町の人はみんな仕事嫌いだったなんて決めるのは無茶だよ。働き手が疲れていたのか、客が少ないと見込んだのか、別の記録も探してからでないと事情は分からない。史料にない気持ちまで想像で埋めるのは控えるとして、休んだ店と開けた店の違いを追ってみる手はある。その小さな違いから、誰が祭りを支え、どんな仕事に従事していたかという問いも生まれるんだ。",
+    "form": "控える",
+    "en": "When you read old town records, you sometimes find a note that shops were closed the day after a festival. But it would be unreasonable to conclude from that alone that everyone in town disliked work. You cannot know whether the workers were tired or expected few customers until you have looked for other records. While refraining from inventing feelings that the sources do not mention, you could trace the differences between shops that closed and those that opened. That small difference can prompt questions about who supported the festival and what work they did.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「想像で埋めるのは控える」のように、行動を意識してやめる意味です。",
+    "sense": "ある行動を差し控える。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "突く",
+   "reading": "つつく",
+   "pos": "verb",
+   "meaning": "poke; prod lightly",
+   "defJa": "指や先の細い物で軽く押す。",
+   "passage": {
+    "ja": "時代小説の一場面で、子どもが隣の男の袖を指先で突くと書けば、声を出さずに気を引く動きが伝わります。ここはつつくと読み、強く一度押す動作よりも、軽く触れて促す感じを出しています。何かを頼みたいのか、見てほしいものがあるのかは、次の視線の描写を手がかりに読めます。気持ちをすべて説明するかわりに、小さな動作を選ぶと、無言のやり取りにも幅が生まれます。漢字が同じでも読み方で動きの印象が変わるので、読み手が迷う箇所には振り仮名を添えたいですね。",
+    "form": "突く",
+    "en": "In a scene from a historical novel, writing that a child pokes the sleeve of the man beside them with a fingertip conveys an attempt to get attention without speaking. Here the verb is read as tsutsuku and suggests a light prompting touch rather than a single forceful push. The subsequent description of where the child looks can indicate whether they want to ask a favour or point something out. Choosing a small action instead of explaining every feeling adds possibilities to an unspoken exchange. Because the reading of the same kanji can alter the impression of movement, it is useful to add pronunciation guides where readers might hesitate.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "ここは「つつく」と読み、指先で軽く触れて相手を促す動作です。",
+    "sense": "指先などで軽くつついて促す。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "種",
+   "reading": "しゅ",
+   "pos": "noun",
+   "meaning": "species",
+   "defJa": "生物を分類する際の基本的な単位。",
+   "passage": {
+    "ja": "図鑑の文章で、姿が似ているという説明と、同じ種に属するという説明は、同じ意味ではありません。前者は見た目の印象ですが、後者は生物の分類上の位置を述べています。難しい語を避けようとして仲間とだけ書くと、どの範囲を指すのか漠然としてしまうことがあります。読みやすくするにしても、文章の要となる区別まで消しては、正確な説明を保てません。専門語をそのまま置いて短い補足を添える方法と、日常語に言い換える方法を、目的に応じて使い分けます。",
+    "form": "種",
+    "en": "In an illustrated nature guide, saying that organisms look alike is not the same as saying that they belong to the same species. The former describes a visual impression, whereas the latter states their place in biological classification. Avoiding a difficult term by calling them merely related creatures can leave the scope of the reference vague. Even when making a text easier to read, you cannot preserve accuracy if you erase its essential distinctions. Choose between retaining a technical term with a short explanation and rephrasing it in everyday language according to your purpose.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "ここでは「しゅ」と読み、生物を分類する基本的な単位を表します。",
+    "sense": "生物の分類単位。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "応募",
+   "reading": "おうぼ",
+   "pos": "noun",
+   "meaning": "application; entry",
+   "defJa": "募集に応じて申し込むこと。",
+   "passage": {
+    "ja": "短編小説の募集案内を読んでも、原稿をどこへ送ればよいのか見つからないと、書き手は心細いものです。応募を呼びかける文章では、作品への期待に加えて、提出先や締め切りをひとまとまりに示します。参加してほしい相手の顔を思い浮かべ、初めて読む人にも条件が分かる言葉を選んでください。詳しい規定へ進む前に概要がつかめると、読み手にとって心強い案内になります。熱意を伝える文章と手続きの説明を、それぞれの役割が見えるように並べてみましょう。",
+    "form": "応募",
+    "en": "A writer can feel uneasy if a short-story competition notice does not make it clear where to send the manuscript. In a text inviting entries, present the submission address and deadline together, in addition to your hopes for the work. Picture the people you want to take part and choose wording that makes the conditions clear even to a first-time reader. Being able to grasp the outline before proceeding to detailed rules makes the notice reassuring. Try arranging the enthusiastic invitation and the procedural explanation so that their respective roles are clear.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「応募を呼びかける」は、募集への申し込みを人に勧めることです。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "拒否",
+   "reading": "きょひ",
+   "pos": "noun",
+   "meaning": "refusal; rejection",
+   "defJa": "求められたことを受け入れないこと。",
+   "passage": {
+    "ja": "招待への返事を訳すとき、行けないと行かないの違いは小さくない。前者は事情による不参加を示しやすく、後者は本人の意思をより直接に表す。どちらも結果は同じとはいえ、相手の申し出に対する拒否なのか、参加したくてもできないのかによって、言葉の響きは変わる。丁寧な表現を選ぶだけでは、強硬な姿勢を和らげたことにはならない。断る理由をどこまで明かすかも含め、原文が保とうとしている相手との距離を読むことが、訳者には求められる。",
+    "form": "拒否",
+    "en": "When translating a reply to an invitation, the difference between being unable to go and choosing not to go is significant. The former readily suggests that circumstances prevent attendance, while the latter expresses personal intention more directly. Although the outcome is the same, the words sound different depending on whether they convey rejection of the offer or an inability to attend despite wanting to. Simply choosing polite expressions does not necessarily soften a firm stance. Translators must read the distance the original seeks to maintain from the other person, including how much it reveals about the reason for declining.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「申し出に対する拒否」は、相手の求めを受け入れない意思を表します。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "負担",
+   "reading": "ふたん",
+   "pos": "noun",
+   "meaning": "burden; expense borne",
+   "defJa": "引き受けて担う費用や労力。",
+   "passage": {
+    "ja": "申込書に送料は購入者の負担とあれば、品物の代金とは別に、買う人が配送の費用を払うことになります。これを丁寧に書こうとして遠回しな表現に変えると、支払いの主体が見えにくくなります。誤解を避けるべく、誰が何を払うのかを一文の中で結びつけてください。金額が地域によって変わるなら、その条件も料金表の近くに置くと、読み手の手間を減らせます。文末を柔らかくする工夫と、必要な情報をはっきり示す工夫は、分けて考えると両立させやすくなります。",
+    "form": "負担",
+    "en": "If an order form states that shipping is at the buyer’s expense, the purchaser must pay the delivery costs in addition to the price of the item. Replacing this with indirect wording in an effort to sound polite can obscure who must pay. To avoid misunderstandings, connect who pays with what they pay for within a single sentence. If the amount varies by region, placing that condition near the price list can also save readers effort. It is easier to combine softer sentence endings with clear information when you consider the two techniques separately.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「購入者の負担」のように、費用を引き受ける側を示す使い方です。",
+    "sense": "費用を引き受けること。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,4 +1,12 @@
-/* 回廊's service worker: a successful install includes the complete boot core.
+/* 回廊's service worker: a successful install includes the complete boot core
+ * and no bundled font. Each font is verified and cached the first time a page
+ * requests it. Activation drops an older version's boot assets and keeps its
+ * fonts. A background fill copies those whose digests match this release,
+ * removes each older font once it is copied or known not to match, then
+ * fetches the rest a few at a time. A stopped worker resumes the fill on its
+ * next fetch. The fill holds no install, activation or update promise, and a
+ * font it cannot get is left for its first request, so offline type is
+ * complete only once the fill or the pages have fetched it.
  *
  * The boot shell and data stay on one installed version, online or offline.
  * A new worker waits for the old app's windows to close before activation;
@@ -13,7 +21,7 @@
 // The release builder prepends the SHA-256 of its sorted source asset paths
 // and digests. Every packaged change then gets a distinct atomic boot cache.
 // Unstaged development installs retain an explicit manually bumped fallback.
-const DEVELOPMENT_VERSION = 'kairo-v11-dev';
+const DEVELOPMENT_VERSION = 'kairo-v13-dev';
 const assetVersion = self.KAIRO_ASSET_VERSION;
 if (
   assetVersion !== undefined &&
@@ -30,12 +38,20 @@ const IDENTITY_PATH = 'build-identity.json';
 const MAX_MANIFEST_BYTES = 16 * 1024 * 1024;
 const MAX_MANIFEST_FILES = 100000;
 const DIGEST = /^[a-f0-9]{64}$/;
+const FONT_FILL_LANES = 4;
 const SHELL = [
   '.',
   'index.html',
   'fonts.css',
   'corridor.css',
   'editorial.css',
+  'rooms/today.css',
+  'rooms/read.css',
+  'rooms/learn.css',
+  'rooms/words.css',
+  'rooms/motion.css',
+  'rooms/me.css',
+  'rooms/cards.css',
   'design/ink-hoku-nami.png',
   'corridor.js',
   'maintenance/report-client.js',
@@ -118,7 +134,10 @@ const SHELL = [
   'data/original/grammar-v11.json',
   'decks/kotoba-mine/deck.json',
   'decks/kotoba-mcd/deck.json',
-  // Their tokens side files (deck.tokens, ~6.5 MB) are NOT precached: the fetch handler verifies
+  'decks/n2/deck.json',
+  'decks/n1/deck.json',
+  'decks/senmon/deck.json',
+  // Their tokens side files (deck.tokens) are NOT precached: the fetch handler verifies
   // and caches them on first use, so the back's tap targets work offline after one sitting while
   // the install stays light (A52).
   'decks/context-dense/mount.js',
@@ -168,6 +187,8 @@ const GUIDED_ROOM = [
   'guided/sets/index.json',
 ];
 const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
+const fontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
+const fontUrl = (url) => url.startsWith(SCOPE) && fontAsset(url.slice(SCOPE.length));
 const PRECACHE_URLS = new Set(
   [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM].map((path) => new URL(path, SCOPE).href),
 );
@@ -375,22 +396,107 @@ self.addEventListener('install', (event) => {
   );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      // CacheStorage is origin-wide. Even another KAIRO installation on a
-      // different Pages subpath owns its own cache. Legacy unscoped keys are
-      // left alone because this worker cannot prove exclusive ownership.
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
-            .map((key) => caches.delete(key)),
-        ),
-      )
-      .then(() => self.clients.claim()),
+// CacheStorage is origin-wide. Even another KAIRO installation on a
+// different Pages subpath owns its own cache. Legacy unscoped keys are
+// left alone because this worker cannot prove exclusive ownership.
+const otherGenerations = () =>
+  caches
+    .keys()
+    .then((keys) => keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME));
+
+async function reusedFont(url, entry) {
+  const names = await otherGenerations().catch(() => []);
+  for (const name of names) {
+    const reused = await caches
+      .open(name)
+      .then((source) => source.match(url))
+      .then((hit) => hit && verifiedResponse(hit, entry))
+      .catch(() => undefined);
+    if (reused) return reused;
+  }
+  return undefined;
+}
+
+async function fetchedFont(url, entry) {
+  return verifiedResponse(await networkAsset(url), entry);
+}
+
+async function pruneGeneration(name) {
+  const source = await caches.open(name);
+  const requests = await source.keys();
+  const stale = requests.filter((request) => !fontUrl(request.url));
+  await Promise.all(stale.map((request) => source.delete(request)));
+  if (stale.length === requests.length) await caches.delete(name);
+}
+
+/** Only a generation activation has pruned to its fonts is drained: a newer
+ * generation waiting to activate always holds its boot core. */
+async function drainGeneration(name, cache, release, held) {
+  const source = await caches.open(name);
+  const urls = (await source.keys()).map((request) => request.url);
+  if (!urls.length || !urls.every(fontUrl)) return;
+  let left = urls.length;
+  for (const url of urls) {
+    const entry = release.entries.get(url);
+    const removed = await Promise.resolve()
+      .then(async () => {
+        if (held.has(url) || !entry) return;
+        const hit = await source.match(url);
+        const copy = hit && (await verifiedResponse(hit, entry).catch(() => undefined));
+        if (!copy) return;
+        await cache.put(url, copy);
+        held.add(url);
+      })
+      .then(() => source.delete(url))
+      .catch(() => false);
+    if (removed) left -= 1;
+  }
+  if (!left) await caches.delete(name);
+}
+
+/** Never awaited by install or activation. Every font is settled on its own. */
+async function fillFonts() {
+  const cache = await caches.open(CACHE_NAME);
+  const release = await readInstalledRelease(cache);
+  const held = new Set((await cache.keys()).map((request) => request.url));
+  for (const name of await otherGenerations()) {
+    await drainGeneration(name, cache, release, held).catch(() => {});
+  }
+  const missing = [...release.entries].filter(
+    ([url, entry]) => fontAsset(entry.path) && !held.has(url),
   );
+  const lane = async () => {
+    for (let next = missing.shift(); next; next = missing.shift()) {
+      const [url, entry] = next;
+      await fetchedFont(url, entry)
+        .then((response) => cache.put(url, response))
+        .catch(() => {});
+    }
+  };
+  await Promise.all(Array.from({ length: FONT_FILL_LANES }, lane));
+}
+
+let fontFill;
+
+/** One fill per worker lifetime, shared by every trigger; never rejects. */
+function resumeFontFill() {
+  if (!STAMPED) return undefined;
+  if (!fontFill) {
+    fontFill = fillFonts().catch(() => {
+      fontFill = undefined;
+    });
+  }
+  return fontFill;
+}
+
+self.addEventListener('activate', (event) => {
+  const activated = otherGenerations()
+    .then((keys) =>
+      Promise.all(keys.map(STAMPED ? pruneGeneration : (key) => caches.delete(key))),
+    )
+    .then(() => self.clients.claim());
+  event.waitUntil(activated);
+  activated.then(resumeFontFill, () => {});
 });
 
 function fetchAndStore(request, cache) {
@@ -430,7 +536,7 @@ self.addEventListener('fetch', (event) => {
   // API traffic (the report service) is live by nature: never a release asset, never answered
   // from the installed version — it goes to the network, or fails as the network fails
   if (/^api\//.test(relativePath)) return;
-  const isContent = /^(data|vendor|design|modules)\//.test(relativePath);
+  const isContent = /^(data|vendor|design|modules|fonts)\//.test(relativePath);
   const navigation = request.mode === 'navigate';
   const cacheFirst = navigation || PRECACHE_URLS.has(url.href) || isContent;
   const task = (async () => {
@@ -445,7 +551,8 @@ self.addEventListener('fetch', (event) => {
         if (!entry) return { response: updateNeeded() };
         const hit = await cache.match(canonical);
         if (hit) return { response: hit };
-        const response = await verifiedResponse(await networkAsset(canonical), entry);
+        const reused = fontAsset(entry.path) ? await reusedFont(canonical, entry) : undefined;
+        const response = reused ?? (await verifiedResponse(await networkAsset(canonical), entry));
         return { response, stored: cache.put(canonical, response.clone()).catch(() => {}) };
       } catch {
         return { response: updateNeeded() };
@@ -464,5 +571,10 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(task.then(({ response }) => response));
   // Register the lifetime hold during dispatch, including the asynchronous
   // put, while returning the network response without waiting for disk I/O.
-  event.waitUntil(task.then(({ stored }) => stored).catch(() => {}));
+  event.waitUntil(
+    task
+      .then(({ stored }) => stored)
+      .catch(() => {})
+      .then(resumeFontFill),
+  );
 });

@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "リバランス",
+   "reading": "りばらんす",
+   "pos": "noun",
+   "meaning": "portfolio rebalancing",
+   "defJa": "運用資産の比率を決めていた水準へ戻すこと",
+   "passage": {
+    "ja": "株式と債券の比率を決めて運用を始めても、その後の値動きによって実際の構成は変わる。株式だけが大きく上がった場合、資産全体が株価の下落から受ける影響も、当初想定したものより大きくなる。こうしたずれを修正するリバランスでは、増えた資産の一部を売るほか、新たに入れる資金を比率の下がった資産に回す方法もある。好調な資産を減らす行為は直感に反するものの、目的は直近の勝ち組を当てることではなく、保有の構成を選んだ方針へ近づけることにある。",
+    "form": "リバランス",
+    "en": "Even if an investment begins with specified proportions of stocks and bonds, subsequent price changes alter the actual mix. If stocks alone rise substantially, the overall portfolio becomes more exposed to a decline in share prices than originally intended. Rebalancing corrects this drift by selling some assets whose weight has increased or directing new money toward assets whose weight has fallen. Reducing a successful holding may feel counterintuitive, but the purpose is to bring the portfolio closer to its chosen policy rather than identify recent winners.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "好調な資産を減らす場合もある調整を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自己資本利益率",
+   "reading": "じこしほんりえきりつ",
+   "pos": "noun",
+   "meaning": "return on equity",
+   "defJa": "株主側の資本に対する純利益の割合",
+   "passage": {
+    "ja": "同じ利益を出している会社なら、経営の効率も同じだと思いがちだよね。でも、その利益を生むために株主側の資本をどれだけ使ったかを見る自己資本利益率では、違う数字が出ることがあるんだ。分母になる資本が小さくなれば割合は上がるから、数字が改善したからといって、工場の生産性まで上がったとは言い切れない。借金を増やしていないか、資本を減らす取引がなかったかも一緒にたどると、成績表の同じ上向きの矢印にも、違う事情が隠れていると分かるよ。",
+    "form": "自己資本利益率",
+    "en": "It is tempting to think that companies earning the same profit are equally efficient. But return on equity, which looks at how much shareholders' capital was used to generate that profit, can give different figures. Because the ratio rises when the capital in its denominator shrinks, an improvement does not necessarily mean that factory productivity increased. Checking whether debt increased or a transaction reduced equity reveals how different circumstances can lie behind the same upward arrow on a scorecard.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "借入金や資本の増減も比率を動かす。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "インデックス投資",
+   "reading": "いんでっくすとうし",
+   "pos": "noun",
+   "meaning": "index investing",
+   "defJa": "特定の市場指標に連動する成果を目指す運用",
+   "passage": {
+    "ja": "次に勝つ企業を探し続ける代わりに、市場の一定のまとまりを保有しようとする発想がある。特定の株価指数などに連動する成績を目指すインデックス投資では、個別の企業を選び抜く判断の比重が小さくなる。ただし、指数という名前であれ、特定の業種に集中したものもあり、それだけで世界中の資産に広く資金を配ったことにはならない。選択を減らす仕組みを利用するときほど、何を選ばずに済ませたのかと同時に、どの市場を選んでいるのかが問われる。",
+    "form": "インデックス投資",
+    "en": "Instead of continually searching for the next winning company, one approach is to hold a defined segment of the market. Index investing seeks to track a particular stock index or another benchmark, reducing the role of selecting individual companies. However, even an index may focus on a single industry, so using one does not automatically spread money widely across assets around the world. The more we rely on a mechanism that reduces choices, the more we should consider both which decisions it removes and which market we have still chosen.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "指標の対象範囲が、投資先の範囲を決める。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "配当利回り",
+   "reading": "はいとうりまわり",
+   "pos": "noun",
+   "meaning": "dividend yield",
+   "defJa": "株価に対する一年分の配当金の割合",
+   "passage": {
+    "ja": "同じ金額の配当を出す株でも、買う価格が違えば、投じた資金に対する受取額の割合は変わる。年間の一株当たり配当金を株価で割る配当利回りは、その関係をひとつの数字にしたものである。値が高くなった理由が増配とは限らず、業績への懸念から株価が下がっただけという場合もある。将来の配当が減る可能性を抜きにして目先の割合だけを追えば、受け取る利益より元本の値下がりが大きい投資を、安定した収入源と読み違えてしまう。",
+    "form": "配当利回り",
+    "en": "Even when shares pay the same dividend, the amount received relative to the money invested changes with the purchase price. Dividend yield expresses this relationship by dividing the annual dividend per share by the share price. A higher value does not necessarily reflect a dividend increase; the price may simply have fallen because of concerns about earnings. Chasing the current ratio without considering possible dividend cuts can lead someone to mistake an investment whose capital loss exceeds its income for a stable source of income.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "株価の下落でも上がるため、配当額と分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "債券利回り",
+   "reading": "さいけんりまわり",
+   "pos": "noun",
+   "meaning": "bond yield",
+   "defJa": "債券の購入価格に対する利息などの収益の割合",
+   "passage": {
+    "ja": "額面が同じ債券でも、高く買った人と安く買った人では、得られる収益の割合が違うんだよね。毎年の利息だけでなく、買った値段と満期に戻る金額との差も考える債券利回りなら、その違いを比べられる。同じ条件の固定利付債では、価格が下がるに伴ってこの割合は上がるけれど、支払いへの不安が値下がりの原因になっている場合もあるんだ。だから大きな数字を見て喜ぶ前に、どの利息と償還を前提に計算した値なのか、発行者は約束を守れそうかと読み進めたいね。",
+    "form": "債券利回り",
+    "en": "Even with bonds of the same face value, the proportion earned differs between someone who bought at a high price and someone who bought cheaply. Bond yield allows that difference to be compared by considering not just annual interest but also the gap between the purchase price and the amount returned at maturity. For a fixed-rate bond under otherwise unchanged conditions, the ratio rises as the price falls, but concerns about payment may be causing the decline. Before celebrating a large figure, it is worth examining which interest payments and redemption it assumes and whether the issuer appears able to honor them.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "利息の率と、買う値段を含む収益率は別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

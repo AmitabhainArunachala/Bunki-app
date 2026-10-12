@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "賄う",
+   "reading": "まかなう",
+   "pos": "verb",
+   "meaning": "cover; meet the cost of",
+   "defJa": "必要な費用や物を用意して足りさせる。",
+   "passage": {
+    "ja": "参加者の会費で食事代を賄う会なら、案内状には料理の内容だけでなく、支払いの条件も書きます。会場を無料で借りられた場合でも、飲み物や皿の代金まで不要になるとは限りません。準備を引き受ける人の負担に応じて、立て替えた費用をいつ精算するかも決めておくと、説明が具体的になります。お金の話を避けた丁寧な文章より、含まれる代金と別に必要な代金を分けた案内のほうが親切です。相手に安心して参加してもらえるよう、楽しみな企画と費用の情報を、それぞれ分かりやすく伝えます。",
+    "form": "賄う",
+    "en": "If an event uses participants’ fees to cover the meal costs, the invitation should state payment conditions as well as the menu. Even when the venue is available free of charge, that does not necessarily eliminate the cost of drinks and plates. Deciding when to reimburse advance payments in light of the burden on the organisers also makes the explanation concrete. Guidance that distinguishes included costs from separate charges is kinder than polite writing that avoids discussing money. To help people attend with confidence, communicate both the enjoyable plans and the cost information clearly.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「会費で食事代を賄う」は、集めたお金を食事に必要な費用に充てることです。",
+    "sense": "費用を用意して支払いに充てる。"
+   }
+  }
+ ]
+}

@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "児童",
+   "reading": "じどう",
+   "pos": "noun",
+   "meaning": "schoolchild; child",
+   "defJa": "小学校に通う年ごろの子ども",
+   "passage": {
+    "ja": "小学校の児童に向けて人工知能の仕組みを説明する文章を書くとき、私は一文を四十字以内に収めると決めています。専門用語は避けるのではなく、身近なものにたとえて置き換えます。たとえば学習とは「間違えながらコツをつかむこと」だと書けば、画面の前の子どもも即座にうなずいてくれます。伝えたいなら、相手の目線まで下りるに越したことはありません。難しい言葉で背伸びをする必要は、そこにはありません。",
+    "form": "児童",
+    "en": "When I write explanations of how artificial intelligence works for elementary school pupils, I make it a rule to keep every sentence within forty characters. I do not avoid technical terms; I replace them with comparisons to familiar things. For example, if I write that learning is \"getting the knack while making mistakes,\" the child in front of the screen nods right away. If you want to get through, nothing beats coming down to the listener's eye level. There is no need there to stretch yourself with difficult words.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「児童」は小学生を指す改まった語。「児童館」「児童文学」など複合語も多い。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "口",
+   "reading": "～くち",
+   "pos": "other",
+   "meaning": "opening; mouth; exit",
+   "defJa": "出入りする所を表す接尾語",
+   "passage": {
+    "ja": "悩みの渦中にいるとき、人は出口を探して走り回る。しかし、どの扉から入ったのかを振り返らない限り、同じ部屋へ戻ってくるだけである。原因の見えない苦しみは、地図を持たぬ迷路にどこか似ている。いったん走るのを中断し、その地図を一枚ずつ描き足していく静かな作業が、内省にほかならない。抜け道は、闇雲な疾走の先ではなく、歩いてきた道筋を見つめ直した先に、ようやくその姿を現す。",
+    "form": "出口",
+    "en": "When in the midst of trouble, a person runs around looking for the exit. But unless they look back at which door they entered by, they only return to the same room. Suffering whose cause cannot be seen is like a maze without a map. Stopping the running for a while and quietly adding to that map one sheet at a time is nothing other than introspection. The way out appears at last not at the end of blind running but after looking afresh at the path one has walked.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「出口」「入口」「窓口」のように、〜口は出入りする所や取っかかりを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "反映",
+   "reading": "はんえい",
+   "pos": "noun",
+   "meaning": "reflection; influence",
+   "defJa": "影響や考えが他に現れ映ること",
+   "passage": {
+    "ja": "歴史の試験で差がつくのは、年号の暗記よりも、史料が書かれた時代の事情を読む力です。たとえば同じ戦争でも、一見すると正反対に見える勝者と敗者の記録には、書き手の立場が色濃く反映されます。史料を読む上で、「誰が、いつ、誰に向けて書いたか」を毎回確かめる習慣をつけてください。この三点を押さえるだけで、正誤を迷う問題がぐっと減ります。史料の癖を読む力は、そのまま新聞や広告を読む力にもつながります。",
+    "form": "反映",
+    "en": "What makes the difference in a history exam is less the memorization of dates than the ability to read the circumstances of the era in which a source was written. For example, even for the same war, the records of the winners and the losers, which look like opposites at first glance, strongly reflect the writer's position. When reading sources, build the habit of checking each time who wrote it, when, and for whom. Just by pinning down these three points, the questions where you waver between right and wrong drop sharply. The ability to read a source's biases carries straight over to reading newspapers and advertisements.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「民意を反映する」「時代を反映した作品」のように、影響が結果に現れることを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "創作",
+   "reading": "そうさく",
+   "pos": "noun",
+   "meaning": "creative work; creation",
+   "defJa": "新しいものを作り出すこと",
+   "passage": {
+    "ja": "小説の創作に人工知能を使うことの是非をめぐって、文学賞の応募規定を見直す動きが広がっている。問題の核心は、道具を使ったかどうかよりも、作品の最終的な責任を誰が負うのかという点にある。読者にとっても、一見して見分けのつかない文章の価値が、書き手によって変わるのかは悩ましい問題だ。結局のところ、人は何をもって作者と呼ばれるのかという古い問いが、形を変えて戻ってきたのである。",
+    "form": "創作",
+    "en": "Over the question of whether it is right to use artificial intelligence in writing fiction, moves to revise the entry rules of literary prizes are spreading. The heart of the problem is less whether a tool was used than who bears ultimate responsibility for the work. For readers too, it is a troubling question whether the value of a text that looks indistinguishable at first glance changes depending on its writer. In the end, the old question of what makes a person an author has come back in a new form.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「創作活動」「創作料理」「創作童話」など、新しく作り出す行為に広く使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "厳重",
+   "reading": "げんじゅう",
+   "pos": "na-adj",
+   "meaning": "strict; stringent; tight",
+   "defJa": "警戒や処置が非常にきびしいさま",
+   "passage": {
+    "ja": "ヴェーダは、文字ではなく口頭で伝えられた聖典です。間違いが一音でも入らないよう、「パーター」と呼ばれる厳重な暗唱法が整えられました。同じ詩句を順番を入れ替えて何通りも唱えることで、互いが互いの誤りを見張る仕組みになっています。おかげで数千年たった今に至るまで、語句がほぼ原形のまま残っていると言われます。声が文字の代わりを務めるという発想が、ここまでの徹底ぶりを生んだのです。",
+    "form": "厳重",
+    "en": "The Vedas are sacred texts that were transmitted not in writing but orally. To keep even a single sound from going wrong, strict methods of recitation called patha were developed. By chanting the same verse in many different orders, the versions watch over one another's errors. Thanks to this, the wording is said to remain almost in its original form even today, thousands of years later. The idea of the voice standing in for writing produced this degree of thoroughness.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「厳重に注意する」「厳重な警備」のように、警戒や管理の厳しさを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,181 @@
+{
+ "batch": "r5-india-005",
+ "items": [
+  {
+   "term": "輪廻",
+   "reading": "りんね",
+   "gloss": "saṃsāra, the cycle of rebirth",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A casual friend-to-friend explanation beginning mid-conversation; no canned ending and no repeated two-person Q/A frame.",
+   "grammarSuggestion": "〜に加えて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "釈迦如来",
+   "reading": "しゃかにょらい",
+   "gloss": "Śākyamuni Buddha (as icon)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜につれて"
+  },
+  {
+   "term": "陰陽五行",
+   "reading": "いんようごぎょう",
+   "gloss": "yin-yang and the five phases",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Explore the choice of this word in translation or an everyday explanation; avoid presentation advice and the phrase 発表で.",
+   "grammarSuggestion": "〜をめぐって",
+   "factNote": "Chinese conceptual framework adapted in Japan, not imported Indian doctrine; five phases not Greek elements.",
+   "topicConnection": "Mandatory scope: connect this Chinese-origin term to Japanese Buddhism or compare its meaning with Buddhist practice; do NOT write a wholly unrelated Chinese history passage. Clearly distinguish traditions, never fabricate direct influence. A careful conceptual comparison is enough."
+  },
+  {
+   "term": "高野山",
+   "reading": "こうやさん",
+   "gloss": "Mt. Kōya",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "angle": "Trace one idea or artifact across cultures, with attribution of traditions and no invented chronology.",
+   "grammarSuggestion": "〜に際して"
+  },
+  {
+   "term": "アートマン",
+   "reading": "あーとまん",
+   "gloss": "ātman, the innermost self",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "Compare lived practice with an oversimplified popular description, without ending in the same moral.",
+   "grammarSuggestion": "〜つつ"
+  },
+  {
+   "term": "ウパニシャッド",
+   "reading": "うぱにしゃっど",
+   "gloss": "the Upanishads",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "angle": "Explain how a primary text uses this term; omit attributed quotations unless exact and reliable.",
+   "grammarSuggestion": "〜とはいえ"
+  },
+  {
+   "term": "カルマ",
+   "reading": "かるま",
+   "gloss": "karma",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜に基づいて"
+  },
+  {
+   "term": "カースト制度",
+   "reading": "かーすとせいど",
+   "gloss": "the caste system",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜をもとに"
+  },
+  {
+   "term": "グル",
+   "reading": "ぐる",
+   "gloss": "guru, spiritual teacher",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜からには",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  }
+ ],
+ "weave": [
+  "信仰",
+  "修行",
+  "執着",
+  "慈悲",
+  "原典",
+  "系譜",
+  "相互依存",
+  "注意",
+  "解釈",
+  "戒律",
+  "縁起",
+  "認識"
+ ],
+ "note": "All passages remain topic india, including comparative philosophy and meditation science. Tradition and legend must be marked as such. For the target バガヴァッド・ギーター only, mentioning that text is required despite the general avoid list. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

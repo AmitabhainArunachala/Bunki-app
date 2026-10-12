@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "消費電力",
+   "reading": "しょうひでんりょく",
+   "pos": "noun",
+   "meaning": "power consumption",
+   "defJa": "機器が単位時間に消費する電気エネルギー",
+   "passage": {
+    "ja": "同じサーバーでも、待機中と大量の計算を実行している最中では電気の使い方が異なり、部品の性能や使用率に応じて、電源に求められる出力も変化する。機器の数が同じでも負荷は一定ではない。稼働の状況を追うには、時刻ごとの測定値を並べる方法が使える。単位時間あたりに使う電気エネルギーを示す消費電力は、その変化を捉える数値となる。処理が集中した時刻には、測定された値の山が記録に残る。",
+    "form": "消費電力",
+    "en": "Even on the same server, electrical use differs between standby and heavy computation, with the output required from its power supply changing according to component performance and utilization. The load is not constant even when the number of machines stays the same. Measurements arranged by time can track operating conditions. Power consumption, which indicates electrical energy used per unit time, provides a measure of those changes. Periods of concentrated processing leave peaks in the measurement record.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "単位時間あたりに使う電気エネルギーの大きさで、稼働状況によって変わる。",
+    "sense": ""
+   },
+   "cardId": "nn-7b0ed95780-2b7e376d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-025.json",
+    "cardId": "nn-7b0ed95780-2b7e376d",
+    "wordId": "nn-7b0ed95780"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "営業キャッシュフロー",
+   "reading": "えいぎょうきゃっしゅふろー",
+   "pos": "noun",
+   "meaning": "cash flow from operating activities",
+   "defJa": "本業の取引によって出入りした現金の差額",
+   "passage": {
+    "ja": "半導体メーカーの営業キャッシュフローを確かめると、製品を出荷して売上を計上した月でも、顧客からの入金が翌月以降なら、その売上に見合う現金がまだ入っていないことが分かります。支払いは待ってくれません。材料代や従業員への給与が先に出ていけば、帳簿に利益があっても手元の現金は減ります。製品を売ることと、代金を受け取ることには時間差が生じ得ます。入金日に通帳へ記された金額が、その隔たりを埋めます。",
+    "form": "営業キャッシュフロー",
+    "en": "Examining a semiconductor manufacturer's cash flow from operating activities reveals that even in a month when products are shipped and sales recognized, the corresponding cash has not yet arrived if customers pay in the following month or later. Payments will not wait. When materials and wages are paid first, cash on hand falls even with a profit on the books. Selling a product and receiving payment can occur at different times. The amount entered in the bank record on the payment date closes that gap.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "本業の現金収支で、売上の計上時期と実際の入金時期のずれが表れる。",
+    "sense": ""
+   },
+   "cardId": "nn-3066501f28-19c47269",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-3066501f28-19c47269",
+    "wordId": "nn-3066501f28"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自己探究",
+   "reading": "じこたんきゅう",
+   "pos": "noun",
+   "meaning": "self-inquiry",
+   "defJa": "自分とは何かを内面に向かって問う実践",
+   "passage": {
+    "ja": "「あなたは誰ですか」と聞かれて職業や家族の中での役割を答えるのは自然だけど、ラマナ・マハルシの教えだと、その答えを知っている「私」そのものへ注意を戻すんだよね。肩書を増やす方向じゃないんだ。名前も思い出も浮かんでは消えるとしても、それを経験しているのは誰なのかと問うんだ。別の考えが出てきたら、それが誰に浮かんだのかをたどる。自己探究を続ける人の注意は、思い出の中の出来事から、それに気付いている自分へと向かうんだ。",
+    "form": "自己探究",
+    "en": "Answering a question about who you are with your occupation or family role is natural, but Ramana Maharshi's teaching turns attention back toward the very “I” that knows those answers. It does not proceed by adding titles. Even as names and memories arise and disappear, the question is who experiences them. When another thought appears, one traces whom it has occurred to. Someone continuing self-inquiry directs attention from events in memory toward the self aware of them.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "ラマナの教えでは、経験している「私」の根源へ注意を向ける実践。",
+    "sense": ""
+   },
+   "cardId": "nn-a254898119-144ecf51",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-a254898119-144ecf51",
+    "wordId": "nn-a254898119"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "実存",
+   "reading": "じつぞん",
+   "pos": "noun",
+   "meaning": "existence (existential sense)",
+   "defJa": "自分自身の生として引き受けられる具体的な存在",
+   "passage": {
+    "ja": "会社での役目を離れた人が禅寺の坐禅会に参加し、肩書も職歴も問われずに静かに座るとき、他人から与えられた評価を離れて、自分はこれから何をよりどころに生きるのかという問いが起こることがある。代わりに座ってもらうことはできない。そこで向き合う実存の問題は、人間一般の性質を知ることより、他人に代われない生を自分で引き受けることにある。坐禅が終わって門を出た足は、来た道と同じ道を、今度は帰るために歩き始める。",
+    "form": "実存",
+    "en": "When someone who has left a workplace role attends a Zen sitting session and sits quietly without being asked for a title or career history, the question may arise of what to live by beyond evaluations bestowed by others. No one can sit in their place. The question of personal existence encountered there concerns taking responsibility for a life no one else can live, more than knowing the characteristics of humanity in general. When sitting ends and the person leaves through the gate, their feet begin along the same road as before, now on the journey home.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "一般的な人間論よりも、他人に代われない自分の生を引き受ける意味。",
+    "sense": ""
+   },
+   "cardId": "nn-57e6dab18f-be727d9e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-57e6dab18f-be727d9e",
+    "wordId": "nn-57e6dab18f"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "電力需要",
+   "reading": "でんりょくじゅよう",
+   "pos": "noun",
+   "meaning": "electricity demand",
+   "defJa": "使うために必要とされる電気の量",
+   "passage": {
+    "ja": "計算処理の実行時刻にも調整の余地がある。データセンターでは、利用者への即時応答が必要な処理を続ける一方、期限までに終わればよい大量の計算を、設備の稼働状況に応じて別の時間帯へ移す運用が考えられる。これにより、電力需要が特定の時間に集中するのを抑えられる場合がある。総使用量が減るかどうかとは別の効果だ。夜間へ回された処理は順番に実行され、翌朝の利用に向けて結果が保存される。",
+    "form": "電力需要",
+    "en": "The scheduling of computation leaves room for adjustment. A data center can continue tasks requiring immediate responses while shifting large calculations that only need to meet a deadline to other periods according to equipment utilization. This can sometimes reduce the concentration of electricity demand in particular hours. That effect is separate from whether total consumption falls. Tasks shifted to nighttime run in sequence, and their results are saved for use the following morning.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "必要とされる電気の量を指し、時間帯による集中も問題となる。",
+    "sense": ""
+   },
+   "cardId": "nn-9fd754ecc7-5c636687",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-007.json",
+    "cardId": "nn-9fd754ecc7-5c636687",
+    "wordId": "nn-9fd754ecc7"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "頭打ち",
+   "reading": "あたまうち",
+   "pos": "noun",
+   "meaning": "leveling off, hitting a ceiling",
+   "defJa": "伸びが止まって、それ以上上がらない状態",
+   "passage": {
+    "ja": "解答を見れば分かる問題でも、白紙から解こうとすると途中で手が止まります。分かった感覚と再現は別です。成績が頭打ちになった段階では、教材を増やす前に、どこまで自力で進めるかを確かめる方法が役立ちます。例えば数学なら、解答を伏せたまま途中の式を再現し、根拠を言えなかった箇所に印を付け、その部分だけを確認してから、別の問題で同じ考え方を使えるか試します。次のノートには、答えより先に計算の道筋が並びます。",
+    "form": "頭打ち",
+    "en": "Even with a problem that makes sense when the solution is visible, you can get stuck when starting from a blank page. Feeling that you understand differs from reproducing the solution. When scores plateau, checking how far you can get independently before adding more materials can help. In mathematics, for example, reconstruct the intermediate steps with the solution hidden, mark any step you cannot justify, review that part, and then test whether the same reasoning works on another problem. The next notebook page presents the path of calculation before the answer.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "成績などの伸びが止まった状態で、「頭打ちになる」と使う。",
+    "sense": ""
+   },
+   "cardId": "nn-5d37b60e93-dd2051ac",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-003-r.json",
+    "cardId": "nn-5d37b60e93-dd2051ac",
+    "wordId": "nn-5d37b60e93"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "次世代",
+   "reading": "じせだい",
+   "pos": "noun",
+   "meaning": "the next generation",
+   "defJa": "現在のものに続いて登場する新しい世代",
+   "passage": {
+    "ja": "次世代の通信規格へ移るにあたっては、携帯端末の中の半導体を新しくするだけで済まず、その規格で信号を送受信する基地局側の対応や、使う地域の通信環境も普及の条件となる。端末だけが先に進んでもつながらない。利用者の手元では、対応する場所へ移動して初めて新しい方式が使える場合もある。旧来の方式を使い続けられる機能は、移行の途中を支える。街を離れた端末が、利用できる別の方式へ通信を切り替える。",
+    "form": "次世代",
+    "en": "Moving to the next generation of communications standards requires more than replacing semiconductors inside mobile devices, because base stations must also support transmitting and receiving the signals and local network conditions affect adoption. Devices moving ahead alone cannot establish a connection. A user may only be able to use the new mode after moving into a supported area. Retaining the ability to use older modes supports the transition. As a device leaves the city, it switches communications to another available mode.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "現在のものに続く新しい世代で、「次世代の通信規格」のように使う。",
+    "sense": ""
+   },
+   "cardId": "nn-1aa745f9c2-ef91249c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-1aa745f9c2-ef91249c",
+    "wordId": "nn-1aa745f9c2"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "天竺",
+   "reading": "てんじく",
+   "pos": "noun",
+   "meaning": "India (classical name)",
+   "defJa": "日本や中国でかつてインドを指した呼び名",
+   "passage": {
+    "ja": "日本の古い仏教説話にインドの王や僧が登場すると、身近な寺で受け継がれてきた教えの舞台が海の向こうへ広がり、人々が釈迦が教えを説いた土地を遠い聖地として思い描いたことが伝わります。信仰は、行ったことのない土地とも人を結びます。中国や朝鮮半島を経て届いた経典とともに、その地の名も日本へ伝わり、物語の中に残りました。天竺を目指す旅人は、道中の困難を越えながら、インドにあると伝え聞いた仏の教えの源へ近づいていきます。",
+    "form": "天竺",
+    "en": "When Indian kings or monks appear in old Japanese Buddhist tales, the setting of teachings passed down at familiar temples expands overseas, conveying how people imagined the land where the Buddha taught as a distant sacred land. Faith connects people with places they have never visited. Along with scriptures reaching Japan through China or the Korean Peninsula, the name of that land traveled and remained in stories. Travelers bound for Tenjiku overcome difficulties along the road as they approach the source of the Buddha's teaching that they have heard lies in India.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "かつてインドを指した名で、仏教説話や求法の旅の舞台として現れる。",
+    "sense": ""
+   },
+   "cardId": "nn-b53dd35cbd-149f66d3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-b53dd35cbd-149f66d3",
+    "wordId": "nn-b53dd35cbd"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

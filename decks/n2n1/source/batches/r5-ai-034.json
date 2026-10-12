@@ -1,0 +1,167 @@
+{
+ "batch": "r5-ai-034",
+ "items": [
+  {
+   "term": "頭脳流出",
+   "reading": "ずのうりゅうしゅつ",
+   "gloss": "brain drain",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "高次元",
+   "reading": "こうじげん",
+   "gloss": "high-dimensional",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "高純度",
+   "reading": "こうじゅんど",
+   "gloss": "high purity",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "黎明期",
+   "reading": "れいめいき",
+   "gloss": "dawn, early period",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "比喩が役立つ範囲と破綻する箇所",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "分散投資",
+   "reading": "ぶんさんとうし",
+   "gloss": "investment diversification",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "工場の小さな異常から工程の全体像へ",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "資産配分",
+   "reading": "しさんはいぶん",
+   "gloss": "asset allocation",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "株価収益率",
+   "reading": "かぶかしゅうえきりつ",
+   "gloss": "price-to-earnings ratio",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "株価純資産倍率",
+   "reading": "かぶかじゅんしさんばいりつ",
+   "gloss": "price-to-book ratio",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "R5-JOHN-FIELD3-20261010",
+    "R5-AI-INVESTING"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "linked": false,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [
+  "集積回路",
+  "電力効率",
+  "露光装置",
+  "頑健性",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

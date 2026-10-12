@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "梵我一如",
+   "reading": "ぼんがいちにょ",
+   "pos": "noun",
+   "meaning": "identity of Brahman and ātman",
+   "defJa": "宇宙の根本原理と個人の自我が同一だとする見方",
+   "passage": {
+    "ja": "自分の身体や気分は日ごとに変わるのに、その奥に変わらないものがあるとしたら、何なのでしょうか。ウパニシャッドを重んじる不二一元論では、個人の根底にある自己と、世界の究極の根本とは別々のものではないと説き、この一致を梵我一如と表します。目に見える性格を宇宙全体と同じだと言っているのではなく、何を本当の自己と考えるかが議論の出発点です。仏教の無我と比べるにあたっても、似た修行の姿から教義まで同じだと決めず、それぞれが自己をどう論じるかを読むと違いが明瞭になります。",
+    "form": "梵我一如",
+    "en": "If something unchanging lies beneath a body and moods that change daily, what might it be. Advaita, which reveres the Upanishads, teaches that the self underlying the individual and the ultimate foundation of the world are not separate, expressing this as the unity of Brahman and atman. The argument starts with what counts as the true self, rather than equating visible personality with the entire universe. Comparing it with Buddhist no-self becomes clearer by examining each account of self rather than assuming similar-looking practices imply identical doctrines.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「梵我一如を説く」。自己と世界の根本の一致を、特定の教義として説明する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

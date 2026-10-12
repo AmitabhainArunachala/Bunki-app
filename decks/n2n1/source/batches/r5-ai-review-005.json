@@ -1,0 +1,27 @@
+{
+ "batch": "r5-ai-review-005",
+ "items": [
+  {
+   "term": "先端パッケージング",
+   "reading": "せんたんぱっけーじんぐ",
+   "gloss": "advanced packaging",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [],
+ "reviewOf": {
+  "先端パッケージング": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json"
+ },
+ "note": "One editorial rewrite of initial-passed new card to match assigned craft register."
+}

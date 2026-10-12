@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "部品",
+   "reading": "ぶひん",
+   "pos": "noun",
+   "meaning": "part; component",
+   "defJa": "機械などを組み立てる一つ一つの品",
+   "passage": {
+    "ja": "機械の部品は、取り替えがきく。しかし、人間を機械のように扱う社会は、結束を失って内側から壊れていく。インドの古い思想は、個人を全体の一部と見る一方で、各人の内に宇宙全体と同じ本質が宿っていると教える。部分でありながら全体でもある、という逆説こそ、機械の比喩が決して届かない領域なのである。機械には取り替えの効く未来しかないが、人間には、まだ誰も見たことのない未来がある。",
+    "form": "部品",
+    "en": "The parts of a machine can be replaced. But a society that treats people like machines loses its cohesion and breaks down from within. Ancient Indian thought sees the individual as part of the whole while teaching that the same essence as the entire cosmos dwells in each person. The paradox of being both a part and the whole is precisely the realm that the metaphor of the machine can never reach. A machine has only a replaceable future, but a human has a future that no one has yet seen.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「部品を交換する」「自動車部品」。機械を組み立てる一つ一つ。比喩で人にも使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "迫る",
+   "reading": "せまる",
+   "pos": "verb",
+   "meaning": "to approach; to press",
+   "defJa": "近づく。強く求める",
+   "passage": {
+    "ja": "米国の輸出統制をめぐり、半導体メーカー各社は対応策の決定を急いでいる。規制の期限が迫るなか、一部の企業は在庫の積み増しや調達先の分散に動き始めた。ただ、先端品の製造装置は代替が難しく、短期間で供給網を組み替えるのは容易ではない。専門家は、各社の判断が数年先の勢力図を左右すると指摘する。各国政府は補助金で国内生産を後押ししており、企業は規制と支援の両方を見据えて動かざるを得ない。",
+    "form": "迫る",
+    "en": "Over the U.S. export controls, semiconductor makers are hurrying to decide on responses. As the regulatory deadline draws near, some companies have begun building up inventory and diversifying suppliers. However, equipment for advanced products is hard to replace, and reorganizing a supply chain in a short time is not easy. Experts point out that each company's decisions will shape the balance of power several years ahead. Governments are backing domestic production with subsidies, and companies have no choice but to move with both regulation and support in view.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「期限が迫る」「危機が迫る」。時間や出来事が近づき、余裕がなくなる意味。",
+    "sense": "時間や危機が間近にくる"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "資料",
+   "reading": "しりょう",
+   "pos": "noun",
+   "meaning": "materials; data; documents",
+   "defJa": "調べたり説明したりするための材料",
+   "passage": {
+    "ja": "外国語の勉強では、立派な学習資料を何冊もそろえるより、一冊を繰り返し使うほうが大切です。新しい教材に目移りするたびに、前に覚えた表現が薄れていきます。私の経験では、三回目に開いたときが、ようやく自分の言葉になり始めるときでした。ですから、購入したばかりの本を棚に並べて満足するのではなく、ぼろぼろになるまで使い抜いてください。本の周りに付箋やメモが増えていくほど、その一冊はあなた専用の道具になります。",
+    "form": "資料",
+    "en": "In foreign-language study, it matters more to use one book repeatedly than to gather several impressive study materials. Every time you are distracted by a new textbook, the expressions you learned before fade. In my experience, the third time I opened a book was when it finally began to become my own language. So instead of lining up a freshly purchased book on a shelf and feeling satisfied, use it through until it is falling apart. The more sticky notes and memos accumulate around a book, the more that one volume becomes a tool made just for you.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「学習資料」「参考資料」。調べるための材料全般。「教材」は教えるための資料。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

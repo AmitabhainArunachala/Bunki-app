@@ -11,7 +11,8 @@
  *     node prototypes/drift/tools/verify-storage-integrity.mjs [--out FILE]
  */
 
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import process from 'node:process';
 
 import { launchDrift, touchPath, touchTap } from './red-team-harness.mjs';
@@ -369,6 +370,7 @@ const report = {
   browserErrors,
   evidence: { valid, malformed, quota },
 };
+mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(report, null, 2));
 console.log(`\n${passed}/${results.length} checks passed`);
 console.log(`results -> ${OUT}`);

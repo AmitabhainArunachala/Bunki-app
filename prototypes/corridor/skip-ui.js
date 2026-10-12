@@ -120,7 +120,9 @@
       const item = node('li');
       const heading = node('strong', null, `${p} · ${text(ja, en, bi)}`);
       heading.prepend(symbol(p));
-      item.append(heading, node('p', null, text(descJa, descEn, bi)));
+      const description = node('p', null, text(descJa, descEn, bi));
+      description.dataset.uiContentValue = (descEn.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+/gu) || []).join('|');
+      item.append(heading, description);
       list.append(item);
     }
     body.append(list);
@@ -133,9 +135,10 @@
     body.append(node('p', null, text(
       '一体型の優先順：① 上に横線 → ② 下に横線 → ③ 全体を貫く縦線 → ④ その他。複数に当てはまるときは、この順の最初を選びます。',
       'Solid subtype precedence: 1 top horizontal line → 2 bottom horizontal line → 3 vertical line through the whole character → 4 other. If more than one applies, choose the first in this order.', bi)));
-    body.append(node('p', null, text(
+    const strokeExamples = node('p', null, text(
       '画数はペンを紙から離すまでを一画とします。曲がりや鉤を別々に数えないこと。口は3画、日は4画、氵と忄は各3画です。字体・印刷体で違って見えることがあります。迷ったら * で片方を省略するか、別分類を明示的に含めてください。',
-      'Count one continuous pen movement as one stroke; a bend or hook is not automatically another stroke. 口 has 3, 日 has 4, and 氵 and 忄 each have 3. Printed and regional forms can mislead. If unsure, leave a count as * or explicitly include recorded alternate classifications.', bi)));
+      'Count one continuous pen movement as one stroke; a bend or hook is not automatically another stroke. 口 has 3, 日 has 4, and 氵 and 忄 each have 3. Printed and regional forms can mislead. If unsure, leave a count as * or explicitly include recorded alternate classifications.', bi));
+    strokeExamples.dataset.uiContentValue = '口|日|氵|忄'; body.append(strokeExamples);
     body.append(node('p', null, text(
       '標準コードを先に表示します。別分類は、資料に記録された位置の違いや数え違いです。習熟度や正誤の評価ではありません。',
       'Canonical codes come first. Alternates are source-recorded positional classifications or common miscounts, not mastery levels or a judgment of your answer.', bi)));
@@ -309,6 +312,7 @@
         const meaning = hit.meanings?.slice(0, 2).join('; ') || '';
         entry.setAttribute('aria-label', `${hit.literal} · ${meaning} · SKIP ${hit.matchedCode}${alternate ? ` · ${text('別分類', 'alternate', bi)} ${hit.misclass || ''}` : ''}`);
         entry.title = `${hit.literal} · ${hit.matchedCode}${alternate ? ` · alternate: ${hit.misclass || ''}` : ''} · ${meaning}`;
+        entry.dataset.uiContentValue = hit.literal;
         entry.append(node('span', 'skip-hit-glyph', hit.literal));
         if (alternate) entry.append(node('span', 'skip-hit-alt', text('別分類', 'alternate', bi)));
         grid.append(entry);
@@ -489,6 +493,7 @@
             row.id = `${list.id}-option-${ix}`;
             row.setAttribute('role', 'option');
             row.setAttribute('aria-selected', 'false');
+            if (number === 3 || number === 4) row.dataset.uiContent = 'learning';
             row.setAttribute('aria-label', option.aria || `${option.label}${option.sub ? ` ${option.sub}` : ''}`);
             if (option.pattern) row.append(symbol(option.pattern));
             row.append(node('span', 'skip-option-value', option.label));

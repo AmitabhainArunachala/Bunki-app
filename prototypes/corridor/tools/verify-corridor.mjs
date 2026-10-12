@@ -20,6 +20,7 @@
  * checkout clean (refresh the tracked copy with --report docs/prototype/verification-report.json).
  */
 
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -266,14 +267,14 @@ async function waitForFiniteMotion(page, selector) {
 }
 
 async function sheetViewportGeometry(page) {
-  return page.evaluate(() => {
+  return page.evaluate((closeSelector) => {
     const sheet = document.querySelector('#sheet').getBoundingClientRect();
-    const close = document.querySelector('#sheet-close').getBoundingClientRect();
+    const close = document.querySelector(closeSelector).getBoundingClientRect();
     return { innerWidth, clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       visualWidth: window.visualViewport?.width ?? innerWidth,
       sheet: sheet.toJSON(), close: close.toJSON() };
-  });
+  }, await entryCloseSelector(page));
 }
 
 async function shoot(page, dir, name) {
@@ -327,7 +328,13 @@ function summariesMeetAA(rows) {
 
 async function measureChromeTargets(page) {
   return page.evaluate(() => {
-    const rows = [...document.querySelectorAll('.chrome button')].filter(n => {
+    const headerSave = document.querySelector('#reader-take');
+    const popupSave = document.querySelector('#mini #mini-take');
+    const popupOpen = !!document.querySelector('#mini');
+    const relocatedSave = popupOpen && !!popupSave && !!headerSave && getComputedStyle(headerSave).visibility === 'hidden';
+    const targets = [...document.querySelectorAll('.chrome button')];
+    if (relocatedSave) targets.push(popupSave);
+    const rows = targets.filter(n => {
       const r = n.getBoundingClientRect();
       return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
     }).map(n => {
@@ -342,7 +349,9 @@ async function measureChromeTargets(page) {
       if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
           Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
     }
-    return { width: innerWidth, rows, overlaps, valid: rows.length >= 7 && !overlaps.length &&
+    const saveOwnership = !popupOpen || (!!headerSave && getComputedStyle(headerSave).visibility === 'hidden' && !!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
+      && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44));
+    return { width: innerWidth, rows, overlaps, relocatedSave, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
   });
 }
@@ -686,7 +695,7 @@ async function main() {
   // one tally counts every story and says how many of them are glossary entries
   const glossaryProbe = await page.evaluate(`(() => {
     const cards = [...document.querySelectorAll('#shelf-reading-results .shelf-item')];
-    const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === '用語集');
+    const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === 'Glossary');
     // the masthead prints the tally twice (long on a desk, short on a phone): read the long copy
     const intro = document.querySelector('.dateline-tally .tally-long')?.textContent ?? '';
     const results = document.querySelector('.shelf-results-count')?.textContent ?? '';
@@ -697,10 +706,11 @@ async function main() {
     return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
   };
   const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);
-  check('glossary rows wear 用語集, and the one tally counts every story and names its glossary entries',
+  check('glossary rows wear Glossary, and the one tally counts every story and names its glossary entries',
     glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
       JSON.stringify(resulted) === JSON.stringify(billed),
     `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
+  await openShelfTools(page);
   await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
   await page.locator('#shelf-reading-search').press('Enter');
   await page.waitForFunction(() => document.querySelectorAll('#shelf-reading-results .shelf-item').length === 0);
@@ -780,7 +790,7 @@ async function main() {
   const sigValues = await page.evaluate(
     `[...document.querySelectorAll('.article-about .sig .sig-val')].map((n) => n.textContent)`,
   );
-  const ninjalRow = sigNames.findIndex((n) => n.includes('国語研'));
+  const ninjalRow = sigNames.findIndex((n) => n === 'NINJAL pair');
   const firstGrading = gradingTruth.articles[0].grading;
   check('the NINJAL pair is either measured or marked 未測定 — never faked',
     firstGrading.signals.lexical_coverage
@@ -1046,7 +1056,7 @@ async function main() {
   // the popup's Full entry → the full entry (from a clean slate: whatever the menu
   // interlude did, close it and re-aim)
   if (await page.locator('#sheet').count()) {
-    await page.locator('#sheet-close').dispatchEvent('click');
+    await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
     await page.waitForTimeout(150);
   }
   await page.evaluate('window.scrollTo(0, 0)');
@@ -1137,8 +1147,8 @@ async function main() {
     kanjiPage.node.startsWith('kanji:') && kanjiPage.glyph.length === 1 && kanjiPage.meaning.length > 0,
     `${kanjiPage.glyph} — ${kanjiPage.meaning}; ${kanjiPage.tags.join(' / ')}`);
   check('the kanji page carries its 漢検級',
-    kanjiPage.tags.some((t) => t.includes('漢検')),
-    kanjiPage.tags.filter((t) => t.includes('漢検')).join(','));
+    kanjiPage.tags.some((t) => t.includes('Kanji Kentei')),
+    kanjiPage.tags.filter((t) => t.includes('Kanji Kentei')).join(','));
   await waitForFiniteMotion(page, '#sheet');
   const phoneSheet = await sheetViewportGeometry(page);
   report.measurements.kanjiPhoneViewport = phoneSheet;
@@ -1157,7 +1167,7 @@ async function main() {
   for (let step = 0; step < 3; step++) await page.keyboard.press('Tab');
   check('phone kanji header keeps its close in keyboard order',
     await page.evaluate(() => document.activeElement?.id === 'sheet-close'));
-  await page.locator('#sheet-close').click();
+  await page.locator(await entryCloseSelector(page)).click();
   await page.waitForSelector('#sheet', { state: 'detached' });
   check('phone kanji close dismisses the full entry', await page.locator('#sheet').count() === 0);
 
@@ -1193,7 +1203,7 @@ async function main() {
   await tap(page, '#sheet [data-kanjirow]');
   await waitForFiniteMotion(page, '#sheet');
 
-  const idiomHeading = await page.locator('#sheet .eyebrow', { hasText: '熟語' }).count();
+  const idiomHeading = await page.locator('#sheet .eyebrow', { hasText: /^\d+ idioms and set phrases$/u }).count();
   report.idiomSectionPresent = idiomHeading > 0;
   check('idioms hang off the kanji page (provenance lives in the sources panel)',
     idiomHeading > 0, `${idiomHeading} idiom section(s)`);
@@ -1201,7 +1211,7 @@ async function main() {
   // kanji → a word containing it (same page, before descending)
   const markWordChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('よく使う語') || x.textContent.includes('含む語'));
+    const h = heads.find((x) => x.textContent === 'common compounds' || x.textContent === 'words that contain it');
     if (!h) return 0;
     const first = h.nextElementSibling?.querySelector('.entry-row');
     if (!first) return 0;
@@ -1223,7 +1233,7 @@ async function main() {
   // kanji → radical
   const markPartChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('部品'));
+    const h = heads.find((x) => x.textContent === 'main components');
     if (!h) return 0;
     const first = h.nextElementSibling?.querySelector('.entry-row');
     if (!first) return 0;
@@ -1254,7 +1264,7 @@ async function main() {
   // radical → back out to another kanji that uses it
   const markFamilyChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('含む字'));
+    const h = heads.find((x) => x.textContent === 'kanji that contain this part');
     if (!h) return 0;
     const chips = [...(h.nextElementSibling?.querySelectorAll('.chip') ?? [])];
     const pick = chips[chips.length > 1 ? 1 : 0];
@@ -1275,7 +1285,7 @@ async function main() {
   console.log('\n— step 5 · 覚える');
   await tap(page, '#take');
   const taken = await page.locator('#tray').textContent();
-  check('any node can be taken into study', /覚\s*[1-9]/.test(taken), `chrome reads "${taken.trim()}"`);
+  check('any node can be taken into study', /^Today\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
     const p = document.querySelector('.list-picker .fold-sub');
     return p ? p.textContent : null;
@@ -1435,7 +1445,7 @@ async function main() {
       placeholder: !!document.querySelector('.note.placeholder'),
     }))()`);
     check(`variant D · ${mode} entry`,
-      mode === 'field' ? landed.field && landed.words > 8 && landed.placeholder : landed.shelf >= 8,
+      mode === 'field' ? landed.field && landed.words > 8 && !landed.placeholder : landed.shelf >= 8,
       mode === 'field' ? `${landed.words} drifting words, placeholder marked=${landed.placeholder}` : `${landed.shelf} texts`);
     variantShots[`D-${mode}`] = await shoot(page, shotsDir, `V-D-entry-${mode}`);
     if (mode === 'field') {
@@ -1639,18 +1649,20 @@ async function main() {
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   // 2026-09-30: the voice is locked (Kore; Charon second). With no Kore clip for this article
-  // the play bar is a quiet 音声準備中 · Kore state: no play control, no picker, no device voice.
+  // the play bar explains the absence; its accessible description names the locked voices.
   await page.waitForSelector('#listen-note', { timeout: 15000 });
   const listenBefore = await page.evaluate(`({
     toggles: document.querySelectorAll('#listen-toggle, #listen-voice').length,
     note: document.querySelector('#listen-note')?.textContent ?? '',
+    description: document.querySelector('#listen-note')?.getAttribute('aria-description') ?? '',
   })`);
   // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
   // is shut and the note says why honestly (no recording, or recorded only in the interim
   // アミ voice, or recordings still being checked); it never offers a device voice.
   check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /音声準備中/u.test(listenBefore.note) && /Kore/u.test(listenBefore.note) &&
-      !/device voice|端末の声|F1/u.test(listenBefore.note),
+    listenBefore.toggles === 0 && /^No recording for this article$/u.test(listenBefore.note) &&
+      listenBefore.description === 'Approved voices: Kore (main), Charon (second).' &&
+      !/device voice|端末の声|F1/u.test(`${listenBefore.note} ${listenBefore.description}`),
     JSON.stringify(listenBefore));
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
@@ -1666,7 +1678,7 @@ async function main() {
   // were on the strip, so it passed for any five rows and failed for the right
   // seven. The four Wayfinder tickets keep their own count; every other row the
   // strip is supposed to carry is now named here and must actually be present.
-  const NON_TICKET_ROWS = ['E 奥行', 'F 触れの段', 'G 衛星の触れ'];
+  const NON_TICKET_ROWS = ['navigation', 'E depth', 'F tap ladder', 'G satellite tap'];
   const rowKeys = await page.evaluate(
     `[...document.querySelectorAll('#variants .vseg button')].map((b) => b.dataset.variant.split(':')[0])
        .filter((k, i, a) => a.indexOf(k) === i)`,
@@ -1685,15 +1697,15 @@ async function main() {
   await open('?entry=shelf');
   const biChrome = await page.evaluate(`(() => ({
     backEn: /back/i.test(document.querySelector('#back')?.textContent ?? ''),
-    trayEn: /lists/i.test(document.querySelector('#tray')?.textContent ?? ''),
-    trayJa: /覚/.test(document.querySelector('#tray')?.textContent ?? ''),
+    trayEn: /^Today [0-9]+$/u.test(document.querySelector('#tray')?.textContent ?? ''),
+    chromeCjk: /[\\u3040-\\u30ff\\u3400-\\u9fff]/u.test(['#back', '#tray'].map((sel) => document.querySelector(sel)?.textContent ?? '').join(' ')),
     segEn: document.querySelector('#lang [data-lang="bi"]')?.textContent === 'EN',
     segJa: document.querySelector('#lang [data-lang="ja"]')?.textContent === '日本語',
     active: document.querySelector('#lang [data-lang="bi"]')?.getAttribute('aria-pressed'),
   }))()`);
-  check('v1.1 · navigation is bilingual by default (a learner can steer)',
-    biChrome.backEn && biChrome.trayEn && biChrome.trayJa && biChrome.active === 'true',
-    `back carries "back", 覚 carries "lists", EN active=${biChrome.active}`);
+  check('language law · navigation is English by default (a learner can steer)',
+    biChrome.backEn && biChrome.trayEn && !biChrome.chromeCjk && biChrome.active === 'true',
+    `back carries "back", lists keeps its count, chrome CJK=${biChrome.chromeCjk}, EN active=${biChrome.active}`);
   check('v1.2 · the language toggle reads exactly EN | 日本語',
     biChrome.segEn && biChrome.segJa, `EN=${biChrome.segEn} 日本語=${biChrome.segJa}`);
 
@@ -1798,6 +1810,7 @@ async function main() {
     ['ばかり', 'grammar:bakari', 'grammar', '〜ばかり', 'N3', 'just did …; nothing but …', null],
   ];
   for (const [q, want, door, word, reading, gloss, seq] of doors) {
+    await openShelfTools(page);
     await page.fill('#search', q);
     await page.waitForTimeout(350);
     const actual = await page.evaluate(() => ({
@@ -1839,6 +1852,7 @@ async function main() {
   check('search · the canonical four doors are counted honestly (B4 gap stated)',
     present >= 1,
     `${present}/4 canonical entry modes present (typed only today; handwriting · radical · SKIP are spec B4)`);
+  await openShelfTools(page);
   await page.fill('#search', 'kaisai');
   await page.waitForTimeout(350);
   await page.locator('[data-result]').first().click();
@@ -1916,6 +1930,7 @@ async function main() {
     .filter({ has: page.locator('.row-reading', { hasText: new RegExp(`^${reading}$`, 'u') }) });
   const d23PageSearch = async () => {
     await open('?entry=shelf');
+    await openShelfTools(page);
     await page.fill('#search', '上手');
     await page.waitForSelector('#search-results [data-result="word:上手:1580400"]', { timeout: 20000 });
     return page.evaluate(() => ({
@@ -2020,7 +2035,7 @@ async function main() {
   // the seal keeps its product ink (paintSeal reads the spelling's row) and is disabled: its taken/aria-pressed are
   // reported, not required either way
   check('D23 · at a core mini the 1353320 card is held, says only that a saved card exists, and offers that card',
-    d23Heldmini.disabled && d23Held.includes(d23Heldmini.reason) && d23Heldmini.open && d23Heldmini.openLabel === 'そのカードを開く',
+    d23Heldmini.disabled && d23Held.includes(d23Heldmini.reason) && d23Heldmini.open && d23Heldmini.openLabel === 'open that card',
     JSON.stringify(d23Heldmini));
   // the action and its DOM observation, in one guard: a failure is latched in the report at once, the bounded after
   // snapshot is still attempted and kept, and the row is incomplete
@@ -2086,11 +2101,14 @@ async function main() {
   // ------------------------------------------ v1.6 · particles as doors
   console.log('\n— v1.6 · particles: no dead pixels');
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', 'wa');
   await page.waitForTimeout(350);
   check('particles · the search knows は',
     await page.evaluate(`[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === 'particle:wa')`),
     '"wa" → particle:wa');
+
+  await openShelfTools(page);
 
   await page.fill('#search', '');
   await page.waitForTimeout(250);
@@ -2171,7 +2189,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: '読み探査' }).click();
+  await page.locator('.focus-mode', { hasText: 'Reading check' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   const probeZen = await page.evaluate(`document.body.classList.contains('zen')`);
@@ -2220,7 +2238,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+  await page.locator('.focus-mode', { hasText: 'kanji only' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   // card 1 · the taken 水 leads the pool — honest intervals, full deck path
@@ -2335,6 +2353,7 @@ async function main() {
   // ------------------ 用例の蔵 · examples everywhere, sentences that answer
   console.log('\n— the example bank: ≥4 sentences, every token a door');
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result="word:学校"]');
@@ -2356,7 +2375,7 @@ async function main() {
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
   // the eyebrow teaches the gesture: one tap gives the meaning (reader lane 2026-10-02)
   const exampleEyebrow = await page.evaluate(
-    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t.includes('用例')) ?? ''`,
+    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t === 'examples — tap a word for its meaning') ?? ''`,
   );
   check('the 用例 eyebrow says that a tap on a word gives its meaning',
     /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
@@ -2396,6 +2415,7 @@ async function main() {
   // the first sense wins — 半島 is the canary (its JMdict entry carries a
   // short minor sense, "Korea", that a shortest-wins gloss once surfaced)
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '半島');
   await page.waitForSelector('[data-result="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result="word:半島"]');
@@ -2587,6 +2607,7 @@ async function main() {
     revlog: [[1754000000000, 'word:学校', 3, 0, null, null, null, null, 3, 5, 1, 1200]],
   })`));
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
@@ -2613,7 +2634,7 @@ async function main() {
   check('R2-B · un-memorize removes the active card; revlog and FSRS state stay whole',
     afterUntake.taken === 0 && afterUntake.revlog === 1 && afterUntake.srsKept,
     JSON.stringify(afterUntake));
-  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForTimeout(200);
@@ -2622,6 +2643,7 @@ async function main() {
     'no review door on an empty deck');
   await tap(page, '#back');
   await page.waitForTimeout(200);
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
@@ -2639,7 +2661,7 @@ async function main() {
     JSON.stringify(reTaken));
 
   // lists are born, renamed and deleted on the lists surface itself
-  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForSelector('#list-maker-field');
@@ -2726,21 +2748,13 @@ async function main() {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  // reader lane 2026-10-02 (John #17): lists open from the word popup's "Add to list…" in a small popover;
-  // opening it enrolls nothing. Save — here the chrome's 覚える, the popup's Save or the menu's Save word — is one tap.
-  await page.waitForSelector('#mini #mini-lists');
-  await tap(page, '#mini-lists');
-  await page.waitForSelector('#vocabulary-list-popover');
-  const popoverBits = await page.evaluate(`(() => ({
-    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
-    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
-    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
-  }))()`);
-  check('R2-B · opening the lists does not enroll the word, and they open as a small popover, not a window',
-    (await readAppRecord(page)).taken.length === envBefore.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
-    JSON.stringify(popoverBits));
+  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"): Save — here the
+  // chrome's 覚える, the popup's Save or the menu's Save word — is one tap, and the popup offers a list only once the
+  // word is saved; its "Add to a list" opens a small popover that enrolls nothing more.
+  await page.waitForSelector('#mini #mini-take');
+  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists')?.getClientRects().length`);
   await page.keyboard.press('Escape');
-  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  await page.waitForSelector('#mini', { state: 'detached' });
   await tap(page, '#reader-take');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit reader save' });
@@ -2753,6 +2767,26 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
+  if (!await page.locator('#mini').count()) await tap(page, '#reader .tok.content', 9);
+  await page.waitForSelector('#mini #mini-lists:not([hidden])');
+  await tap(page, '#mini-lists');
+  await page.waitForSelector('#vocabulary-list-popover');
+  const popoverBits = await page.evaluate(`(() => ({
+    modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
+    role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
+  }))()`);
+  check('R2-B · the popup offers lists only after Save; they open as a small popover, not a window, and enroll nothing more',
+    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
+    JSON.stringify({ listsBeforeSave, ...popoverBits }));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
+  // the old order's last press (覚える, outside the popup) put the popup away before the next step opens it
+  // again; here Escape on the popup does that
+  if (await page.locator('#mini').count()) {
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+  }
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
@@ -2785,7 +2819,7 @@ async function main() {
   }
   captureSheetLoads.dispose();
   await shoot(page, shotsDir, '19-capture-sovereignty');
-  await page.locator('#sheet-close').dispatchEvent('click');
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
   // the popup's "Saved ✓" takes the card back out
   await tap(page, '#reader .tok.content', 9);
@@ -2855,6 +2889,7 @@ async function main() {
 
   // the sentence page carries the seal for the word it is built around
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '半島');
   await page.waitForSelector('[data-result^="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:半島"]');
@@ -3181,9 +3216,11 @@ async function main() {
       recalledRow.whens.length === 4 && recalledRow.whens.every(Boolean) &&
       recalledRow.declared === null && recalledRow.reading,
     JSON.stringify(recalledRow));
-  // (c) the 3 key presses Good
+  // (c) the 3 key presses Good; wait for the durable commit itself, as the Again check does
+  const revlogBeforeGood = await evaluateAppRecord(page, `(record.revlog || []).length`);
   await page.keyboard.press('3');
-  await page.waitForTimeout(250);
+  await waitForAppRecord(page, (record) => (record.revlog || []).length === revlogBeforeGood + 1,
+    { description: 'the 3 key commits a grade' });
   const goodCommit = await evaluateAppRecord(page, `(() => {
     const e = record;
     const row = (e.revlog || [])[(e.revlog || []).length - 1] || [];
@@ -3861,6 +3898,7 @@ async function main() {
     ],
   })`));
   await open('?entry=shelf');
+  await openShelfTools(page);
   await page.fill('#search', '学校');
   await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
@@ -3887,7 +3925,7 @@ async function main() {
   })()`);
   check('R4-C · reading the ledger writes nothing to the deck',
     trailWordsOnly.srs === 0 && trailWordsOnly.revlog === 0, JSON.stringify(trailWordsOnly));
-  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForTimeout(200);
   await tap(page, '#tray');
   await page.waitForSelector('.rest-toggle');
@@ -3989,7 +4027,7 @@ async function main() {
   await page.waitForSelector('.nav-dojo');
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
-  await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+  await page.locator('.focus-mode', { hasText: 'kanji only' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   {
@@ -4042,7 +4080,7 @@ async function main() {
   await page.waitForSelector('.lesson-row');
   const lessonBreadth = await page.evaluate(`({
     jlptHeads: [...document.querySelectorAll('.list-head')].filter((n) => /^N[1-5]/.test(n.textContent.trim())).length,
-    kanken: [...document.querySelectorAll('.eyebrow')].some((n) => n.textContent.includes('漢検')),
+    kanken: [...document.querySelectorAll('.eyebrow')].some((n) => n.textContent.includes('Kanji Kentei')),
   })`);
   check('R4-B · the lesson lanes keep their breadth — JLPT levels and the 漢検 grades',
     lessonBreadth.jlptHeads >= 3 && lessonBreadth.kanken,
@@ -4141,13 +4179,13 @@ async function main() {
   await tap(page, '.nav-dojo');
   await page.waitForSelector('.focus-mode');
   const dueModeSub = await page.evaluate(`(() => {
-    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('覚えるの札'));
+    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('Cards due'));
     return mode?.querySelector('.focus-mode-sub')?.textContent ?? '';
   })()`);
-  check('R4-B · the due-mode copy says what the refill does — after the first lap, practice',
-    /稽古|practice/.test(dueModeSub) && dueModeSub.includes('2'),
+  check('R4-B · the due-mode copy says what the refill does — then extra rounds',
+    /追加の練習|then extra rounds/.test(dueModeSub) && dueModeSub.includes('2'),
     `sub "${dueModeSub}"`);
-  await page.locator('.focus-mode', { hasText: '覚えるの札' }).click();
+  await page.locator('.focus-mode', { hasText: 'Cards due' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
   for (let i = 0; i < 2; i += 1) {

@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "あっさり",
+   "reading": "あっさり",
+   "pos": "adverb",
+   "meaning": "easily, simply, lightly",
+   "defJa": "こだわらず簡単にするさま",
+   "passage": {
+    "ja": "「彼は反論されると、あっさり引き下がった」という一文は、聞き方によって褒め言葉にも皮肉にもなりうる。たとえ同じ言葉でも、潔さと取るか、粘りのなさと取るかは一概に決められず、前後の文脈と話し手の口調に左右される。日本語には、このように評価の向きが文脈ひとつで反転する副詞が少なくない。辞書の説明は手がかりにすぎず、言葉の意味は、実際に使われる場面の中にこそ息づいている。",
+    "form": "あっさり",
+    "en": "The sentence \"When he was countered, he backed down readily\" can be either praise or sarcasm, depending on how it is heard. Even with the same words, whether it is taken as grace or as lack of tenacity cannot be settled across the board and depends on the surrounding context and the speaker's tone. Japanese has quite a few adverbs whose evaluative direction flips with context alone. A dictionary's explanation is only a clue, and the meaning of a word lives precisely in the situations where it is actually used.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "あっさり負ける・あっさり認めるのように、簡単にあきらめる様子。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

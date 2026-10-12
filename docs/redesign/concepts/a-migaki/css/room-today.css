@@ -1,0 +1,118 @@
+/* ==========================================================================
+   TODAY 今日 · thin washi sky at dawn; the ritual line; one verb
+   Signature motion: the arrival (due words leave the sky and arrive as a train)
+   ========================================================================== */
+.room-today { padding-bottom: calc(var(--nav-clearance) + 18px); }
+.room-today .sky { position: absolute; left: 0; right: 0; top: 0; height: 560px; overflow: hidden; pointer-events: none; -webkit-mask-image: linear-gradient(#000 62%, transparent); mask-image: linear-gradient(#000 62%, transparent); }
+.sky-band {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(150, 178, 205, .30), rgba(240, 226, 205, .0) 55%, rgba(236, 204, 168, .32)),
+    linear-gradient(180deg, rgba(255, 255, 255, .0) 60%, var(--color-page));
+}
+.sky-l { position: absolute; inset: 0; font-family: var(--font-serif); color: var(--color-ink-4); opacity: 0; animation: fadein 900ms var(--ease-ink) forwards; }
+.sky-l span { position: absolute; white-space: nowrap; }
+.sky-l.l0 { opacity: 0; color: rgba(31, 58, 95, .16); animation: fadein 900ms forwards, drift0 var(--motion-ambient) ease-in-out 900ms infinite alternate; }
+.sky-l.l1 { color: rgba(31, 58, 95, .22); animation: fadein 900ms 120ms forwards, drift1 18s ease-in-out 900ms infinite alternate; }
+.sky-l.l2 { color: rgba(31, 58, 95, .3); animation: fadein 900ms 240ms forwards, drift2 22s ease-in-out 900ms infinite alternate; }
+@keyframes drift0 { to { transform: translate3d(-4px, -3px, 0); } }
+@keyframes drift1 { to { transform: translate3d(5px, -5px, 0); } }
+@keyframes drift2 { to { transform: translate3d(-7px, -8px, 0); } }
+.sky-due span { position: absolute; font-family: var(--font-serif); font-size: 16px; color: var(--color-indigo-2); opacity: 0; animation: fadein 600ms 300ms forwards; font-weight: 600; }
+.torii { position: absolute; left: 50%; top: 78px; width: 30px !important; margin-left: -15px !important; width: 40px; margin-left: -20px; stroke: var(--color-indigo); stroke-width: 1.4; fill: none; opacity: .55; }
+.torii circle { fill: var(--color-vermilion); stroke: none; }
+
+.t-head { position: relative; z-index: 2; padding: 90px var(--gutter) 0; }
+.t-date { font-family: var(--font-serif); font-size: 15px; color: var(--color-ink-2); letter-spacing: .02em; }
+.t-date span { display: block; font-size: 32px; line-height: 1.12; color: var(--color-ink); font-weight: 600; letter-spacing: -.01em; margin-top: 2px; }
+html[data-lang="ja"] .t-date span { font-family: var(--font-display); font-weight: 800; letter-spacing: .04em; }
+.t-head .data { margin-top: 8px; }
+
+/* the day's word: vertical, inked, a door */
+.dayword { position: relative; z-index: 2; display: block; height: 274px; margin: 4px 0 0; color: inherit; }
+.dw-label { position: absolute; left: var(--gutter); top: 14px; }
+.dw-glyph {
+  position: absolute; right: 46px; top: 4px; writing-mode: vertical-rl; font-family: var(--font-display); font-weight: 800;
+  font-size: 96px; line-height: 1; color: var(--color-ink); letter-spacing: .02em;
+}
+.dw-glyph .ink { display: block; opacity: 0; transform: scale(.975); animation: inkin var(--motion-ink) var(--ease-ink) 260ms forwards; }
+.dw-glyph .ok { font-size: .74em; }
+.dw-glyph .ink-blur { position: absolute; inset: 0; filter: blur(7px); color: var(--color-indigo); opacity: 0; animation: bleed 1100ms var(--ease-ink) 200ms forwards; }
+.dw-glyph .ink-blur { font-size: inherit; }
+@keyframes inkin { to { opacity: 1; transform: none; } }
+@keyframes bleed { 0% { opacity: 0; } 30% { opacity: .55; } 100% { opacity: 0; transform: scale(1.04); } }
+.dw-rt {
+  position: absolute; right: -24px; top: 6px; font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: .5em;
+  color: var(--color-ink-3); opacity: 0; animation: fadein 400ms 900ms forwards;
+}
+.dw-passage {
+  position: absolute; right: 166px; top: 34px; writing-mode: vertical-rl; font-family: var(--font-serif); font-size: 14.5px; line-height: 1.9;
+  color: var(--color-ink-2); height: 238px; opacity: 0; transform: translateX(6px); animation: rise 520ms var(--ease-settle) 700ms forwards;
+  border-right: var(--hair) solid var(--color-line); padding-right: 10px;
+}
+.dw-passage em { font-style: normal; color: var(--color-vermilion); font-weight: 700; }
+.dw-meta { position: absolute; left: var(--gutter); top: 42px; width: 132px; }
+.dw-meta > * { opacity: 0; animation: rise 420ms var(--ease-settle) forwards; }
+.dw-gloss { font-family: var(--font-serif); font-style: italic; font-size: 20px; line-height: 1.3; color: var(--color-ink); animation-delay: 820ms !important; }
+html[data-lang="ja"] .dw-gloss { font-style: normal; font-size: 14.5px; line-height: 1.6; }
+.dw-meta .data { margin-top: 12px; line-height: 1.75; animation-delay: 900ms !important; }
+.dw-data > span { display: block; }
+.dw-open { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; margin-top: 10px; color: var(--color-indigo); font-weight: 600; font-size: 14px; animation-delay: 980ms !important; border-bottom: var(--hair) solid var(--color-line-strong); }
+.dayword:active .dw-glyph .ink { transform: scale(.985); }
+
+/* the train: today's due words arrive as one line */
+.train { position: relative; z-index: 2; margin: 0 0 6px; }
+.train-head { display: flex; justify-content: space-between; align-items: baseline; padding: 0 var(--gutter); }
+.rails { position: relative; display: flex; gap: 6px; padding: 10px var(--gutter) 12px; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+.rails::-webkit-scrollbar { display: none; }
+.track { position: absolute; left: 0; right: 0; top: 50%; border-top: var(--hair) solid var(--color-line-strong); }
+.car {
+  position: relative; flex: none; display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: var(--color-ink); padding: 7px 10px 8px;
+  background: var(--color-paper); border-radius: 3px; box-shadow: 0 0 0 var(--hair) var(--color-line-strong), var(--elevation-1);
+  opacity: 0;
+}
+.room-today:not(.ritual) .car { opacity: 1; }
+
+/* the line: a transit map of the day */
+.line { position: relative; z-index: 2; list-style: none; margin: 4px 0 0; padding: 0 var(--gutter) 0 calc(var(--gutter) + 6px); }
+.ritual:not(.arrived) .line::before { opacity: 0; }
+.ritual.arrived .line::before { animation: fadein 300ms both; }
+.line::before { content: ""; position: absolute; left: calc(var(--gutter) + 12px); top: 22px; bottom: 26px; width: 2px; background: var(--color-indigo); opacity: .85; }
+.line .st > a, .line .st > span { position: relative; display: grid; grid-template-columns: 30px 1fr; align-items: center; min-height: 44px; padding: 2px 0; }
+.line .st i { grid-row: span 2; width: 14px; height: 14px; border-radius: 50%; background: var(--color-page); box-shadow: inset 0 0 0 2px var(--color-indigo); position: relative; z-index: 1; }
+.line .st.now i { width: 16px; height: 16px; margin-left: -1px; background: var(--color-indigo); box-shadow: 0 0 0 4px var(--color-page), 0 0 0 5px var(--color-line-strong); }
+.line .st-name { font-size: 15.5px; font-weight: 620; color: var(--color-ink); line-height: 1.25; }
+.line .st .data { grid-column: 2; margin-top: 2px; }
+.line .st.end .st-name { color: var(--color-ink-2); font-weight: 500; }
+.line .st.end i { box-shadow: inset 0 0 0 1px var(--color-line-strong); }
+.half { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: 16px; vertical-align: -2px; color: var(--color-ink); -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 75%); mask-image: linear-gradient(180deg, #000 45%, transparent 75%); }
+.ritual .line .st { opacity: 0; transform: translateX(-6px); }
+.ritual.arrived .line .st { animation: rise 360ms var(--ease-settle) forwards; }
+.ritual.arrived .line .st:nth-child(2) { animation-delay: 70ms; }
+.ritual.arrived .line .st:nth-child(3) { animation-delay: 140ms; }
+.ritual.arrived .line .st:nth-child(4) { animation-delay: 210ms; }
+.t-go { position: relative; z-index: 2; padding: 8px var(--gutter) 0; }
+.ritual .t-go { opacity: 0; transform: translateY(10px); }
+.ritual.arrived .t-go { animation: rise 420ms var(--ease-settle) 300ms forwards; }
+
+/* night: the sky becomes the city seen from a quiet window */
+html[data-theme="night"] .sky-band {
+  background:
+    radial-gradient(70% 40% at 80% 100%, rgba(99, 242, 217, .07), transparent 70%),
+    linear-gradient(180deg, #0a1222 0%, #0f1b33 60%, var(--color-page) 100%);
+}
+html[data-theme="night"] .sky-band::after { /* far windows: a lit grid at the horizon */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 30px; height: 120px; opacity: .55;
+  background-image: radial-gradient(circle, rgba(232, 200, 115, .55) 0 .9px, transparent 1.3px), radial-gradient(circle, rgba(99, 242, 217, .35) 0 .8px, transparent 1.2px);
+  background-size: 11px 9px, 17px 13px; background-position: 0 0, 5px 4px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 60%, transparent); mask-image: linear-gradient(180deg, transparent, #000 60%, transparent);
+}
+html[data-theme="night"] .sky-l.l0 { color: rgba(170, 195, 235, .22); }
+html[data-theme="night"] .sky-l.l1 { color: rgba(170, 195, 235, .3); }
+html[data-theme="night"] .sky-l.l2 { color: rgba(170, 195, 235, .42); }
+html[data-theme="night"] .sky-due span { color: var(--color-gold); }
+html[data-theme="night"] .dw-glyph .ink-blur { color: var(--color-signal); }
+html[data-theme="night"] .torii { stroke: var(--color-ink-3); }
+html[data-theme="night"] .line::before { background: var(--color-indigo); opacity: .6; }
+html[data-theme="night"] .line .st.now i { background: var(--color-ink); }
+html[data-theme="night"] .car { background: var(--color-paper); box-shadow: 0 0 0 var(--hair) var(--color-line-strong); }

@@ -213,8 +213,8 @@ evidence, verify every edge target, preserve source collisions and exercise
 independent restriction, normalization and missing-target fixtures.
 
 The feature includes service-worker cache entries, standalone and fragment
-embedding, Pages asset copying and smoke checks, and a dedicated reference
-workflow. Network-blocked standalone testing covers both N1 and advanced
+embedding, Pages asset copying and smoke checks, and reference gates in the CI
+battery. Network-blocked standalone testing covers both N1 and advanced
 Kentei reference browsing.
 
 Machine-readable counts and source evidence are in

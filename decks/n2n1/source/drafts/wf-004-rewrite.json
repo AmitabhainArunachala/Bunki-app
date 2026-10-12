@@ -1,0 +1,100 @@
+{
+ "cards": [
+  {
+   "term": "スペース",
+   "reading": "スペース",
+   "pos": "noun",
+   "meaning": "space; room to breathe",
+   "defJa": "余白。空いた場所や間",
+   "passage": {
+    "ja": "インドの古い聖典を朗唱する場では、一語ごとに息を整えるための長い間が置かれる。あの沈黙は単なる飾りではなく、聞き手が意味を受け取って自分の中で反芻するためのスペースなのだ。話し手が言葉を詰め込めば詰め込むほど、相手の中で考えが育つ余地は消えていく。沈黙を怖がる話し手ほど、つい早口になって間を埋めてしまう。人前で話す台本を書くときにも、何も言わない一行の設計をおろそかにしないに越したことはない。",
+    "form": "スペース",
+    "en": "At gatherings where India's old scriptures are chanted, a long pause is set aside after every word to steady the breath. That silence is no mere ornament; it is the space in which listeners take in the meaning and turn it over within themselves. The more a speaker crams in words, the less room remains for thought to grow in the other person. Speakers who fear silence tend to hurry along and fill the gaps. When writing a script for public speaking, too, it is best not to neglect the design of a line in which nothing is said.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "話術では「間」も一つの空間として扱う。「スペースを取る」「スペースを空ける」と組む。",
+    "sense": "余白、間の意味"
+   }
+  },
+  {
+   "term": "与党",
+   "reading": "よとう",
+   "pos": "noun",
+   "meaning": "ruling party",
+   "defJa": "政権を担当している政党",
+   "passage": {
+    "ja": "インドの総選挙は、七つの段階に分けて数週間にわたり行われる。世界最大の民主主義国と呼ばれるのは、有権者の数が桁外れに多いからだ。開票日が近づくと、与党と野党の論客がテレビに並び、ヒンディー語と英語を混ぜながら畳みかけるように語り合う。聞いていて面白いのは、議論がこじれる前に、司会者が一拍置いて話の向きを変える瞬間だ。声の大きさで競う場であっても、間の取り方で流れは決まる。",
+    "form": "与党",
+    "en": "India's general election is held in seven phases spread over several weeks. It is called the world's largest democracy because the number of voters is staggeringly large. As counting day nears, spokesmen for the ruling party and the opposition line up on television and talk in a rapid-fire way, mixing Hindi and English. What is interesting to listen to is the moment when, before the debate gets tangled, the host takes a beat and turns the conversation in another direction. Even in a setting that competes on loudness, the flow is decided by timing.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「与党と野党」「与党内」。政権を担う側の政党。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "停滞",
+   "reading": "ていたい",
+   "pos": "noun",
+   "meaning": "stagnation; standstill",
+   "defJa": "物事が進まず滞ること",
+   "passage": {
+    "ja": "会議の議論の停滞を破る一言が、司会者の腕前をいちばんはっきり見せる。AI開発の現場で毎週開かれる進捗会議ともなると、同じ数字の報告が続き、しぶとい沈黙が場を支配する。そんなとき、うまい司会者は「いま一番困っているのは誰ですか」と問いを変える。答えを求めるのではなく、話の向きを変えて流れをつくる技術である。司会者の仕事とは、空気を読むことよりも、空気を少しずつ動かすことにある。",
+    "form": "停滞",
+    "en": "The one phrase that breaks a stagnation in a meeting's discussion shows the host's skill most clearly. At a progress meeting held every week in AI development, once reports of the same numbers keep coming, a stubborn silence takes over the room. At such times a skilled host changes the question to: who is struggling most right now? It is the technique of creating flow by turning the conversation's direction rather than demanding an answer. A host's job lies less in reading the air than in moving it little by little.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「景気の停滞」「議論の停滞」。進展せず滞る様子。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "一歳",
+   "reading": "いっさい",
+   "pos": "noun",
+   "meaning": "one year old",
+   "defJa": "生まれて一年目の年齢",
+   "passage": {
+    "ja": "数え年の世界では、生まれたその日に一歳になる。数え年では年齢を元日に一括して加えるため、大みそかに生まれた子が翌日には二歳になる計算だった。母の胎内にいた月日も人生の一部と見なす、この考え方は東アジアに広く共有されていた。満年齢への切り替えを法律が促したのは明治三十五年だが、民間では戦後に至るまで数え年が生き続けた。年齢の数え方一つにも、命をどこから始まりとするかという哲学が潜んでいる。",
+    "form": "一歳",
+    "en": "In the traditional kazoedoshi system of reckoning age, a child becomes one year old on the very day of birth. Because everyone's age was added in one go on New Year's Day, a baby born on New Year's Eve counted as two the next day. This view, which counts the months spent in the mother's womb as part of life, was widely shared across East Asia. It was in 1902 that a law encouraged the switch to counting by completed years, yet among ordinary people the old system lived on until after the war. Even in a single way of counting age, a philosophy lurks about where life is taken to begin.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「一歳」は数え年なら誕生日に、満年齢なら一年後に迎える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "人質",
+   "reading": "ひとじち",
+   "pos": "noun",
+   "meaning": "hostage",
+   "defJa": "要求を通すために捕らえられた人",
+   "passage": {
+    "ja": "「人質」という一見物騒な語は、字を分解すると意味が見えてくる。「質」は質屋の質と同じ字で、もとは約束を守る証として差し出す担保を指したことから、それは人間そのものを担保に差し出すことだった。戦国時代の大名が、同盟の証として妻子を送り合ったのは、まさにこの仕組みである。現代の事件報道で使われる意味は、そこから脅迫の側面だけが肥大した姿にほかならない。語の成り立ちを知れば、ぞんざいに読み流していた言葉にも、歴史の層が見えてくる。",
+    "form": "人質",
+    "en": "The somewhat ominous word hitojichi reveals its meaning when you break down the characters. The character for shichi is the same as in pawnshop; it originally referred to a pledge handed over as proof that a promise would be kept, so it meant a human being handed over as the pledge itself. It is precisely this mechanism that the daimyo of the Sengoku period used when they exchanged wives and children as proof of an alliance. The meaning used in today's crime reporting is nothing other than that form with only the aspect of coercion swollen. Once you know how a word is built, layers of history show even in words you had been skimming past carelessly.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "字の成り立ち（人＋質）から意味を考える。「人質に取る」「人質になる」と組む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "万人",
+   "reading": "ばんにん",
+   "pos": "noun",
+   "meaning": "everybody; all people",
+   "defJa": "すべての人。多くの人",
+   "passage": {
+    "ja": "「やさしい日本語」は、一九九五年の阪神・淡路大震災をきっかけに生まれた考え方です。避難の情報が外国人住民に伝わらなかった反省から、短く、曖昧さのない言い方が研究されました。たとえば「高台に避難してください」は「高いところへ逃げてください」と言い換えます。万人に通じる日本語は存在しないとしても、通じる人を一人でも増やす工夫はできるのです。ぞんざいな言い換えでは意味が崩れるので、相手の立場を想像しながら言葉を選ぶ必要があります。",
+    "form": "万人",
+    "en": "Plain Japanese is an idea that grew out of the 1995 Great Hanshin-Awaji Earthquake. From the regret that evacuation information had not reached foreign residents, ways of speaking that are short and free of ambiguity came to be studied. For example, 'Please evacuate to high ground' is rephrased as 'Please run to a high place'. Even if there is no Japanese that gets through to everyone, effort can still be made to add even one more person who understands. Careless rephrasing breaks the meaning, so you need to choose words while imagining the other person's position.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「万人向け」「万人に通じる」。例外なくすべての人、という硬い言い方。",
+    "sense": ""
+   }
+  }
+ ]
+}

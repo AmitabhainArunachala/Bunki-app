@@ -1,0 +1,71 @@
+/* TODAY 今日 — dawn over thin washi; a hanging scroll and a station timetable.
+   Night: the same plate becomes the city seen from a quiet window. */
+.plate[data-room='today'] { display: flex; flex-direction: column; }
+.plate[data-room='today']::before { /* dawn band: cool left → warm right, a horizontal light */
+  content: ''; position: absolute; left: 0; right: 0; top: 40px; height: 360px; pointer-events: none;
+  background: linear-gradient(90deg, rgba(196,214,228,.55), rgba(245,243,238,0) 45%, rgba(240,205,170,.45));
+  -webkit-mask: linear-gradient(180deg, transparent, #000 30%, #000 60%, transparent);
+          mask: linear-gradient(180deg, transparent, #000 30%, #000 60%, transparent);
+}
+html[data-theme='night'] .plate[data-room='today']::before {
+  top: 300px; height: 260px;
+  background: radial-gradient(60% 70% at 70% 100%, rgba(92,240,208,.10), transparent 70%), radial-gradient(50% 60% at 20% 100%, rgba(255,106,74,.08), transparent 70%);
+  -webkit-mask: none; mask: none;
+}
+
+.today-hero { display: grid; grid-template-columns: 148px 1fr; gap: 18px; padding: 6px var(--gutter) 0; position: relative; }
+.dw-frame { position: relative; align-self: start; margin-top: 2px; }
+.dayword { display: flex; gap: 6px; align-items: flex-start; padding: 10px 6px 10px 10px; min-height: var(--hit); border-radius: 2px; transition: transform var(--motion-tick) var(--ease-crisp); }
+.dayword:active { transform: scale(.985); }
+.dw-glyphs { display: flex; flex-direction: column; gap: 6px; }
+.dw-cell { position: relative; width: 104px; height: 104px; display: grid; place-items: center; border: 1px solid var(--color-line-strong); background: var(--color-paper); }
+.dw-cell::before, .dw-cell::after { content: ''; position: absolute; background: none; pointer-events: none; }
+.dw-cell::before { left: 50%; top: 4px; bottom: 4px; border-left: 1px dashed var(--color-line); }
+.dw-cell::after { top: 50%; left: 4px; right: 4px; border-top: 1px dashed var(--color-line); }
+.dw-glyph { font: var(--weight-display) 84px/1 var(--font-display); color: var(--color-ink); position: relative; z-index: 1; }
+.dw-st { position: absolute; right: -1px; top: -1px; transform: translateX(100%); padding-left: 4px; font-size: 9.5px; letter-spacing: .04em; }
+.dw-reading { writing-mode: vertical-rl; font: 500 15px/1 var(--font-serif); letter-spacing: .28em; color: var(--color-ink-2); margin-top: 6px; margin-left: 14px; }
+.dw-side { padding-top: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.dw-side .eyebrow, .dw-meaning { padding-right: 40px; }
+.dw-meaning { font: 600 21px/1.2 var(--font-serif); letter-spacing: -.005em; color: var(--color-ink); }
+.dw-def { font: 15px/1.6 var(--font-serif); color: var(--color-ink-2); }
+.dw-kanji { list-style: none; margin: 4px 0 0; padding: 10px 0 0; border-top: 1px solid var(--color-line); display: grid; gap: 7px; }
+.dw-kanji li { display: grid; grid-template-columns: 22px 1fr auto; align-items: baseline; column-gap: 8px; font-size: 13px; color: var(--color-ink-2); }
+.dw-kanji b { font: var(--weight-display) 19px/1 var(--font-display); color: var(--color-ink); }
+.dw-kanji .num { font: 600 11px/1 var(--font-sans); color: var(--color-ink-3); }
+.dw-kanji i { grid-column: 2 / 4; font-style: normal; font-size: 13px; letter-spacing: .3em; color: var(--color-ink-3); }
+.dw-shared { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; text-transform: none; letter-spacing: .02em; font-size: 11px; color: var(--color-ink-2); }
+.dw-shared b { font: 800 15px/1 var(--font-display); color: var(--color-mark); }
+.dw-shared .dot { width: 6px; height: 6px; background: var(--color-mark); }
+
+/* the city: a technical elevation by day, lit windows by night */
+.city { display: block; width: 100%; height: 84px; margin-top: 14px; }
+.city .bld { fill: none; stroke: var(--color-ink); stroke-opacity: .18; stroke-width: .6; vector-effect: non-scaling-stroke; }
+.city .mast { fill: var(--color-ink); fill-opacity: .25; }
+.city .win { fill: var(--color-ink); fill-opacity: .12; }
+.city .win.sig { fill: var(--color-mark); fill-opacity: .55; }
+.city .gl { stroke: var(--color-line-strong); stroke-width: 1; vector-effect: non-scaling-stroke; }
+html[data-theme='night'] .city .bld { fill: #0f1830; stroke: rgba(143,176,230,.28); stroke-opacity: 1; }
+html[data-theme='night'] .city .win { fill: #ffcf84; fill-opacity: .85; }
+html[data-theme='night'] .city .win.sig { fill: #5cf0d0; fill-opacity: .95; }
+html[data-theme='night'] .city .win.blink { animation: window var(--d, 9s) ease-in-out var(--o, 0s) infinite; }
+@keyframes window { 0%, 100% { opacity: 1 } 45% { opacity: 1 } 50% { opacity: .15 } 82% { opacity: .15 } 86% { opacity: 1 } }
+
+/* today's line: a vertical transit diagram */
+.board { margin: 0 var(--gutter); padding-top: 14px; border-top: 1px solid var(--color-ink); position: relative; }
+html[data-theme='night'] .board { border-top-color: var(--color-line-strong); }
+.board-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.board-stops { position: relative; }
+.board-track { position: absolute; left: 7px; top: 26px; bottom: 26px; width: 2px; background: var(--color-ink); transform-origin: top; }
+.stop { display: grid; grid-template-columns: 16px 26px 1fr auto; align-items: center; column-gap: 10px; width: 100%; min-height: 58px; text-align: left; border-bottom: 1px solid var(--color-line); position: relative; transition: transform var(--motion-tick) var(--ease-crisp); }
+.stop:last-child { border-bottom: 0; }
+button.stop:active { transform: translateX(3px); }
+.stop-node { width: 16px; height: 16px; border: 2px solid var(--color-ink); background: var(--color-ground); position: relative; z-index: 1; }
+.stop.now .stop-node { background: var(--color-ink); box-shadow: 0 0 0 3px var(--color-ground), 0 0 0 4px var(--color-ink); }
+.stop-k { letter-spacing: .06em; }
+.stop-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.stop-label { font: 700 15px/1.2 var(--font-sans); color: var(--color-ink); }
+.stop-detail { font-size: 13px; color: var(--color-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stop-detail.jp { font: 14px/1.3 var(--font-serif); }
+.stop-min { font: 600 12px/1 var(--font-sans); color: var(--color-ink-3); }
+.today-foot { padding: 14px var(--gutter) 22px; margin-top: auto; }

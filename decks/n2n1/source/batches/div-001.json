@@ -1,0 +1,179 @@
+{
+ "batch": "div-001",
+ "writer": "gpt-6-astra",
+ "items": [
+  {
+   "term": "破片",
+   "reading": "はへん",
+   "gloss": "fragment; broken piece",
+   "level": "N2",
+   "register": "論",
+   "preferTopic": "other",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "復元",
+    "輪郭"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "見本",
+   "reading": "みほん",
+   "gloss": "sample, model",
+   "level": "N2",
+   "register": "語",
+   "preferTopic": "other",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "店頭",
+    "光沢",
+    "手元"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "コピー",
+   "reading": "こぴー",
+   "gloss": "copy",
+   "level": "N2",
+   "register": "講",
+   "preferTopic": "language",
+   "deck": "n2",
+   "field": null,
+   "weave": [
+    "句読点",
+    "筆跡"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "占領",
+   "reading": "せんりょう",
+   "gloss": "occupation, possession",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "統治",
+    "補給"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "七五調",
+   "reading": "しちごちょう",
+   "gloss": "seven-five mora meter",
+   "level": "N1",
+   "register": "学",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "音節",
+    "余韻"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "偉業",
+   "reading": "いぎょう",
+   "gloss": "great achievement",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "history",
+   "deck": "senmon",
+   "field": "history",
+   "weave": [
+    "功績",
+    "寸法",
+    "後世"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "句読点",
+   "reading": "くとうてん",
+   "gloss": "punctuation marks",
+   "level": "N2",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "推敲",
+    "意図"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "口調",
+   "reading": "くちょう",
+   "gloss": "tone of voice",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "敬語",
+    "語尾",
+    "非難"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "和製英語",
+   "reading": "わせいえいご",
+   "gloss": "Japan-made English",
+   "level": "N1",
+   "register": "語",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "外来語",
+    "文脈"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  },
+  {
+   "term": "悪文",
+   "reading": "あくぶん",
+   "gloss": "bad writing",
+   "level": "N1",
+   "register": "論",
+   "preferTopic": "language",
+   "deck": "senmon",
+   "field": "language",
+   "weave": [
+    "主語",
+    "推敲"
+   ],
+   "fixThis": [
+    "ending …ほかならない appears in 28 cards (cap 11)"
+   ]
+  }
+ ]
+}

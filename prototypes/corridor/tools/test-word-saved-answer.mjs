@@ -97,8 +97,9 @@ function defineRows() {
     'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
     // remove route, with a toast that can undo it; the list chooser left the seal for a popover beside it
-    'wordSaveFacts', 'paintWordSave', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
+    'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
     'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
+    'miniKanjiWeb', 'revealFloatingFocus',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -193,6 +194,14 @@ function defineRows() {
       assert.match(selector, /^[a-z]+$/u, 'the fake DOM answers tag selectors only');
       const found = [], walk = (node) => { for (const child of node.children || []) { if (child.tag === selector) found.push(child); walk(child); } };
       walk(this); return found;
+    }
+    querySelector(selector) {
+      assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector only');
+      const name = selector.replace(/^[#.]/u, '');
+      const hit = (node) => selector[0] === '#' ? node.id === name
+        : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
+      const walk = (node) => { for (const child of node.children || []) { const found = hit(child) ? child : walk(child); if (found) return found; } return null; };
+      return walk(this);
     }
     showModal() { this.open = true; }
     close() { this.open = false; this.listeners.close?.(); }
@@ -1281,7 +1290,7 @@ function defineRows() {
     assert.deepEqual([exact(sameInBoth(kanji), '学校'), exact(sameInBoth(kana), '学校')], [['word:学校'], ['word:学校']]);
     assert.equal(kanji.worker.dictionaryHomographChoices('学校')[0].enabledOnCore, true);
     const sheet = coreSheet(app({ mode: 'main' }), '学校');
-    assert.deepEqual(sheet.title, ['辞書の項目', 'Dictionary entry']);
+    assert.deepEqual(sheet.title, ['Dictionary entry']);
     assert.deepEqual(sheet.doors.map(({ seq, reading, pressed, active }) => [seq, reading, pressed, active]), [['1206730', 'がっこう', 'false', false]]);
     assert.deepEqual(clickRow(kanji, 'word:学校'), { t: 'word', id: '学校' });
   });

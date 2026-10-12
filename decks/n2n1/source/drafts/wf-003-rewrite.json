@@ -1,0 +1,132 @@
+{
+  "cards": [
+    {
+      "term": "きっちり",
+      "reading": "きっちり",
+      "pos": "adverb",
+      "meaning": "precisely, exactly",
+      "defJa": "寸分の狂いなく正確なさま",
+      "passage": {
+        "ja": "上座部仏教の寺院では、正午を過ぎると僧が食事をとらないという戒律が、いまもきっちり守られている。これは出家者の規則をまとめた律に基づいて定められた習慣で、仏教の始まりにさかのぼるとされる。僧は托鉢で得た食事を午前中にいただき、午後は瞑想や学びの時間を確保して、夜まで静かに過ごすのが一般的だ。日常の細部を整えることが、そのまま心を整えることにつながると考えられている。",
+        "form": "きっちり",
+        "en": "In Theravada Buddhist temples, the precept that monks do not eat after noon is still strictly observed today. It is a custom established on the basis of the Vinaya, the collection of rules for the ordained, and is said to go back to the beginnings of Buddhism. Monks generally take the food gained on the alms round in the morning and secure the afternoon for meditation and study, passing the time quietly until night. Setting the details of daily life in order is believed to lead directly to setting the mind in order.",
+        "register": "報",
+        "topic": "india",
+        "tipJa": "「時刻・規則をきっちり守る」の形で、ずれのない正確さを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ゆとり",
+      "reading": "ゆとり",
+      "pos": "other",
+      "meaning": "leeway, leisure",
+      "defJa": "余裕があること",
+      "passage": {
+        "ja": "英語のスクールの語源は、ギリシャ語で「余暇」を意味する言葉だと言われます。古代ギリシャの市民にとって、学問とは、労働から解放されたゆとりのある時間に行うものでした。奴隷制に支えられていた一方で、考えること自体を目的とする態度は、のちのヨーロッパの大学の伝統へつながっていきます。いま私たちが効率ばかり求めて学ぶとき、時間の浪費ではないこの原点の発想を、思い出す価値はあるでしょう。",
+        "form": "ゆとり",
+        "en": "The English word school is said to derive from a Greek word meaning leisure. For citizens of ancient Greece, scholarship was something done in time with breathing room, freed from labor. Though it rested on slavery, the attitude of thinking for its own sake leads on to the later tradition of European universities. When we study today chasing only efficiency, it is worth remembering this original idea, which is not a waste of time.",
+        "register": "学",
+        "topic": "history",
+        "tipJa": "「ゆとりのある時間」のように、時間や気持ちに余裕があることを表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "どうやら",
+      "reading": "どうやら",
+      "pos": "adverb",
+      "meaning": "it seems that, apparently",
+      "defJa": "どうも〜らしいと推測するさま",
+      "passage": {
+        "ja": "生成AIに質問すると、もっともらしい文章で、事実と違うことを答える場合があります。この現象は「ハルシネーション」と呼ばれ、どうやらモデルが、わからないと認める代わりに、確率の高い言葉をつなげてしまうために起きるようです。ですから、重要な数字や日付は、必ず出典に当たって確かめる必要があります。AIは便利な相棒ですが、根拠のない自信に引きずられては、元も子もありません。検証する習慣こそが、これからの時代の読み書きなのです。",
+        "form": "どうやら",
+        "en": "When you put a question to generative AI, it may answer with plausible-sounding prose that is contrary to fact. This phenomenon is called hallucination, and it seems to occur because the model strings together high-probability words instead of admitting it does not know. So for important figures and dates, you must always check the source. AI is a handy partner, but if you are dragged along by confidence with no grounds, it defeats the whole purpose. The habit of verifying is the literacy of the coming age.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「どうやら〜ようだ・らしい」の形で、確かではないが、そう思われる推測を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "まみれ",
+      "reading": "まみれ",
+      "pos": "other",
+      "meaning": "covered in, smeared with",
+      "defJa": "一面に汚れが付くこと",
+      "passage": {
+        "ja": "バラナシに行ったとき、いちばん驚いたのは、人も牛も灰色のほこりにまみれて暮らしているのに、誰もそれを気にしていないことでした。朝の沐浴場では、老若男女を問わず、祈る人と洗濯する人と遊ぶ子どもが、同じ川辺で当たり前のように混じり合っているんですよ。汚いとか神聖だとかを分ける線は、あの場所ではあまり意味をもたないのかもしれません。帰国してからも、私の中の「きれい」の基準は、ずっと曖昧なままです。",
+        "form": "まみれて",
+        "en": "When I went to Varanasi, what surprised me most was that people and cows alike lived covered in gray dust and nobody minded it. At the bathing ghats in the morning, regardless of age or sex, people praying, people washing clothes, and children playing mingle at the same riverside as a matter of course. The line that separates the dirty from the sacred perhaps carries little meaning in that place. Even since coming home, my own standard of what is clean has stayed vague.",
+        "register": "話",
+        "topic": "india",
+        "tipJa": "「ほこりにまみれる」のように、「〜にまみれる」で汚れが一面に付く様子を表す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "ガレージ",
+      "reading": "がれーじ",
+      "pos": "other",
+      "meaning": "garage",
+      "defJa": "自動車をしまう建物",
+      "passage": {
+        "ja": "いまAI研究の最前線に立つ企業のなかにも、小さなガレージから出発した例があることに、気づきます。グーグルは一九九八年、カリフォルニア州メンローパークで、友人宅の車庫を借りて事業を始めました。二人の創業者は、まだ大学院の博士課程の学生でした。資金も設備も乏しいながらも、彼らは検索という一点に集中し、のちに機械学習の分野でも世界を引っぱる存在になっていきました。制約は、ときに最良の教師になります。",
+        "form": "ガレージ",
+        "en": "Among the companies now at the frontier of AI research, you notice, there are cases that started out in a small garage. Google began its business in 1998 in Menlo Park, California, renting a friend's carport. The two founders were still doctoral students in graduate school. Though short of funds and equipment, they concentrated on the single point of search and went on to become a force leading the world in machine learning too. Constraints sometimes make the best teachers.",
+        "register": "学",
+        "topic": "ai",
+        "tipJa": "創業の物語でガレージと言えば、小さな出発点を示す象徴になる。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "こつ",
+      "reading": "こつ",
+      "pos": "other",
+      "meaning": "knack, trick",
+      "defJa": "うまくやるための要領",
+      "passage": {
+        "ja": "瞑想を始めたばかりの人が、まずつまずくのは、雑念を消そうとすることです。仏教の多くの指導者が説くこつは、消そうとせず、ただ呼吸に気づき続けることにあります。雑念が浮かんだら、浮かんだと認めて、静かに呼吸へ戻ればよいのです。この「気づいて戻る」という繰り返しが、心を落ち着かせる力そのものを育てます。緊張を緩和する話し方の訓練にも、そのまま使える考え方でしょう。",
+        "form": "こつ",
+        "en": "The first thing that trips up someone who has just begun meditating is trying to erase stray thoughts. The knack that many Buddhist teachers advocate lies in not trying to erase them but simply continuing to notice the breath. When a stray thought arises, acknowledge that it has arisen and quietly return to the breath. This repetition of noticing and returning cultivates the very power of calming the mind. It is a way of thinking that can be used as it is in speaking practice for easing tension.",
+        "register": "語",
+        "topic": "india",
+        "tipJa": "「〜するこつ」で、うまくやる要領を言う。「こつをつかむ」の形も多い。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "シック",
+      "reading": "しっく",
+      "pos": "na-adj",
+      "meaning": "chic",
+      "defJa": "落ち着いて洗練されたさま",
+      "passage": {
+        "ja": "日本語で「シックな装い」と言うときの語は、もとはフランス語に由来する外来語です。もとの語には上品さや洗練といった含みがあり、日本語ではそこから、派手さを抑えた落ち着きの意味に絞られて使われています。色で言えば、黒や濃紺、深い緑などが、典型的な連想でしょう。外来語を使いこなす要領は、辞書の訳語だけでなく、場面に応じてどう使われているかを、たくさんの例をもとに確かめることなのです。",
+        "form": "シック",
+        "en": "The word used when Japanese speakers say a chic outfit is a loanword originally derived from French. The original word carries overtones of elegance and refinement, and Japanese narrows it down to a sense of composure with showiness held back. In terms of color, black, navy, and deep green are the typical associations. The knack for mastering loanwords is to check, not just from dictionary translations, how a word is used according to the occasion, on the basis of many examples.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "外来語の「シック」は、派手さを抑えた落ち着いた上品さに意味が絞られている。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "とぼける",
+      "reading": "とぼける",
+      "pos": "verb",
+      "meaning": "to play dumb, to feign ignorance",
+      "defJa": "知らないふりをする",
+      "passage": {
+        "ja": "禅の師は、弟子の切実な問いに、とぼけたような答えを返すことがある。趙州は、悟りを求めて訪れた僧に、「茶を飲んでいきなさい」と応じたと伝えられる。一見すると質問をはぐらかしているようだが、その実、概念はおろか言葉にすら頼らず、答えを求める心を、いまここの体験へ引き戻そうとしているのである。仏教がインドから中国へ渡るなかで、このように直接に悟りへ向かう道が重んじられるようになった。",
+        "form": "とぼけた",
+        "en": "A Zen master will sometimes give a seemingly feigned-innocent answer to a disciple's earnest question. Zhaozhou is said to have responded to a monk who came seeking enlightenment with the words, have some tea before you go. At a glance it looks like dodging the question, but in fact, relying on neither concepts nor even words, he is trying to pull the mind that seeks an answer back to the experience of here and now. As Buddhism passed from India to China, such a direct path toward enlightenment came to be valued.",
+        "register": "論",
+        "topic": "india",
+        "tipJa": "「とぼけた顔・とぼけた答え」の形と、「知らないふりをする」意味がある。",
+        "sense": "知らないふりをする"
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+ "batch": "r5-variety2-gate-016",
+ "items": [
+  {
+   "term": "パワー半導体",
+   "reading": "ぱわーはんどうたい",
+   "gloss": "power semiconductor",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010-r.json",
+    "cardId": "nn-8855de5d35-bc75aa89",
+    "wordId": "nn-8855de5d35"
+   }
+  },
+  {
+   "term": "プロセスルール",
+   "reading": "ぷろせするーる",
+   "gloss": "process rule (node size)",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+    "cardId": "nn-097f926e5b-28b071e7",
+    "wordId": "nn-097f926e5b"
+   }
+  },
+  {
+   "term": "屋台骨",
+   "reading": "やたいぼね",
+   "gloss": "a central support or backbone",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+    "wordId": "nn-1ccc6a0eb9"
+   }
+  }
+ ],
+ "reviewOf": {
+  "パワー半導体": {
+   "source": "cards/senmon-p1-r5-variety2-l3-001.json",
+   "cardId": "nn-8855de5d35-bc75aa89",
+   "batch": "r5-variety2-l3-001",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-010-r.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 1, register 語). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: Old 語 label mismatches subject-focused prose. Explain a real device operation without a nonexistent antecedent for 電気を止める."
+  },
+  "プロセスルール": {
+   "source": "cards/senmon-p1-r5-variety2-l3-001.json",
+   "cardId": "nn-097f926e5b-28b071e7",
+   "batch": "r5-variety2-l3-001",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 2, register 語). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: Old 語 label mismatches subject-focused prose. Use accurate technical process generation, not literal modern linewidth."
+  },
+  "屋台骨": {
+   "source": "cards/senmon-p1-r5-variety2-l3-002.json",
+   "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+   "batch": "r5-variety2-l3-002",
+   "original": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+   "reason": "Round-2 review finding r5v2-one-template: the first-pass replacement shares the common skeleton (was: target in sentence 2, longest sentence 4, register 学). It receives its one editorial rewrite with a different structure. Also resolves a named wording/English defect: Old 学 label mismatches subject-focused prose. Keep AI/chip/investing context, conversational, and subject-focused."
+  }
+ }
+}

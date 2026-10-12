@@ -1,0 +1,78 @@
+{
+ "batch": "r5-ai-review-gate-001",
+ "items": [
+  {
+   "term": "露光",
+   "reading": "ろこう",
+   "gloss": "exposure (lithography)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "仕組みを学ぶ順序と考える手がかり",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "電力効率",
+   "reading": "でんりょくこうりつ",
+   "gloss": "power efficiency",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "導体",
+   "reading": "どうたい",
+   "gloss": "conductor",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "linked": true,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "reviewOf": {
+  "露光": {
+   "batch": "r5-ai-007",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-007.json",
+   "finding": "r5-minor-card-inconsistencies",
+   "reason": "Japanese sentence 2 said 必要な部分と残す部分, naming the kept side twice, while the English says removed versus remaining. It becomes 除く部分と残す部分; nothing else changes."
+  },
+  "電力効率": {
+   "batch": "r5-ai-033",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+   "finding": "r5-minor-card-inconsistencies",
+   "reason": "English sentence 2 (\"looking at work relative to power efficiency\") garbled 仕事の量に対する電力効率. It is replaced with a faithful rendering; the Japanese and everything else are unchanged."
+  },
+  "導体": {
+   "batch": "r5-ai-019",
+   "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+   "finding": "r5-conductor-tip",
+   "reason": "tipJa said the word is separate from how easily heat is transmitted, which can imply the headword excludes thermal conductors. tipJa now scopes the electrical sense used here and acknowledges the thermal use; nothing else changes."
+  }
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "どうせ",
+   "reading": "どうせ",
+   "pos": "adverb",
+   "meaning": "anyway, after all (resigned)",
+   "defJa": "結局は同じ結果だという気持ち",
+   "passage": {
+    "ja": "「どうせ無理だ」という口ぐせは、話し方より先に、考え方を縛ってしまう。人は、自分が口にした言葉を、自分の耳でいちばん多く聞いているからだ。言葉を「やってみよう」に置き換えるだけで、声の調子も表情も、心のゆとりと一緒に、少しずつ前向きなものに変わっていく。話す技術を磨く前に、まず自分に聞かせる言葉を整えてみてはどうだろうか。ためしに今日から一週間、口ぐせを一つだけ変えてみるのもよい。",
+    "form": "どうせ",
+    "en": "The verbal habit of saying it's hopeless anyway binds your way of thinking before it binds your way of speaking. This is because people hear the words they utter most often with their own ears. Merely replacing the phrase with let's give it a try gradually turns the tone of voice and the expression more positive, along with some breathing room in the heart. Before polishing speaking technique, why not first tidy the words you let yourself hear? As an experiment, it is also worth changing just one verbal habit for a week starting today.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「どうせ無理だ」のように、あきらめや投げやりな気持ちを前置きする。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "かなう",
+   "reading": "かなう",
+   "pos": "verb",
+   "meaning": "to come true",
+   "defJa": "願いが実現する",
+   "passage": {
+    "ja": "願いがかなった瞬間のうれしさは、長くは続きません。仏教では、これを渇愛、つまり尽きることのない欲望のはたらきとして説明してきました。ほしいものを手に入れたからといって、心が満たされるとは限らず、満足が外にあると信じているかぎり、人は同じ追いかけっこを続けます。肝心なのは、満たす量を増やすことではなく、欲望に振りまわされなくなることなのです。真の満足は、何かを得た結果ではなく、求めることをやめた静けさの中にあるといいます。",
+    "form": "かなった",
+    "en": "The joy of the moment a wish comes true does not last long. Buddhism has explained this as craving, the workings of a desire that never runs out. Just because you have obtained what you wanted does not mean your heart is filled, and as long as you believe satisfaction lies outside, you keep running the same chase. What matters is not increasing how much you fill but no longer being tossed about by desire. True satisfaction, it is said, lies not in the result of obtaining something but in the stillness of having stopped seeking.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「願い・夢がかなう」の形で、望んだことが実現する意味になる。",
+    "sense": "願いや望みが実現する"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "万物",
+   "reading": "ばんぶつ",
+   "pos": "noun",
+   "meaning": "all things; all creation",
+   "defJa": "この世にあるすべてのもの",
+   "passage": {
+    "ja": "古代インドの思想家たちは、万物の根底にひとつの原理があると考えました。ウパニシャッドでは、それを宇宙の本質ブラフマンと呼び、個人の内なる本質アートマンと同じものだと説きます。これが「梵我一如」と呼ばれる有名な教えです。目の前の花や石に限らず、自分自身までもが根っこでは同じだというのですから、世界観が大きく揺さぶられますよね。この発想は、のちの仏教やヨーガにも、形を変えて受け継がれていきます。",
+    "form": "万物",
+    "en": "Thinkers of ancient India believed that there is a single principle at the root of all things. The Upanishads call it Brahman, the essence of the cosmos, and teach that it is the same as Atman, the essence within each individual. This is the famous doctrine known as bon ga ichinyo, the oneness of Brahman and the self. Not only the flower or stone before your eyes but even yourself are said to be the same at the root, so it greatly shakes your worldview, doesn't it? This idea was handed down in altered forms to later Buddhism and yoga as well.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「万物の根源」「万物は流転する」など、哲学で全体を指す時の語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "三昧",
+   "reading": "さんまい",
+   "pos": "noun",
+   "meaning": "absorption; indulgence (~zanmai)",
+   "defJa": "一つのことに心を集中して没頭すること",
+   "passage": {
+    "ja": "ヨガの聖地として知られるリシケシュには、世界中から修行に訪れる人が絶えない。ある旅行者は、会社員時代の疲れから逃れるべく、半年間の瞑想三昧の日々を選んだという。朝から晩まで呼吸と向き合ううちに、世界観まで静かに変わっていったそうだ。この語はもともとサンスクリットのサマーディの音写で、心を一点に集中して乱さない境地を指す。もとの宗教的な意味から離れ、日本語では没頭や耽溺を表す言い方としても定着している。",
+    "form": "三昧",
+    "en": "Rishikesh, known as a holy site of yoga, never lacks people coming from around the world to train. One traveler reportedly chose half a year of days given over to meditation in order to escape the fatigue of his time as an office worker. As he faced his breathing from morning to night, even his worldview apparently changed quietly. The word is originally a transliteration of the Sanskrit samadhi, and refers to a state of fixing the mind on one point without disturbance. Apart from its original religious sense, in Japanese it has also become established as a way of expressing absorption and indulgence.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「〜三昧」は没頭や耽溺を表す。もとは仏教の、心が静まった集中状態。",
+    "sense": "没頭・集中の状態"
+   }
+  }
+ ]
+}

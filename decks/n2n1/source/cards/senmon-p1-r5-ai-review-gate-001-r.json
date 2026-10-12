@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "導体",
+   "reading": "どうたい",
+   "pos": "noun",
+   "meaning": "an electrical conductor",
+   "defJa": "電流を通しやすい物質",
+   "passage": {
+    "ja": "電子回路の線に銅がよく使われるのは、電流を流しやすい導体だからなんだ。反対に電気を通しにくい材料で線の外側を覆えば、隣の線や人の手へ意図しない電流が流れるのを防ぐ役目を持たせられるよ。ただし材料の名前だけで安全が決まるわけではなくて、厚さや温度、使う電圧などの条件も関係するんだよね。回路図を勉強するときは、電気を流したい道と流したくない場所を分けて印を付けると、二つの性質をどう組み合わせて装置を作るのかが分かるよ。",
+    "form": "導体",
+    "en": "Copper is often used for circuit wires because it is a conductor that lets current flow easily. Covering wires with materials that resist electrical flow can help prevent unintended current from reaching adjacent wires or people. But safety is not determined by a material’s name alone, since thickness, temperature, and operating voltage also matter. When studying a circuit diagram, mark desired current paths separately from places where it should not flow to understand how devices combine the two properties.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "ここでは電気を通す物質の意味。熱をよく伝える物質にも使う語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

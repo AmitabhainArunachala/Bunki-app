@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "接合",
+   "reading": "せつごう",
+   "pos": "noun",
+   "meaning": "semiconductor junction",
+   "defJa": "性質の異なる半導体領域をつないだ境界",
+   "passage": {
+    "ja": "電気を通す性質の異なる半導体を隣り合わせにすると、境界は単なる継ぎ目ではなくなる。電子が多い側と、電子の抜けた穴が電気を運ぶ側との接合では、電荷の分布が変わり、電流の流れ方に方向による違いが生じる。これは部品を近づけるだけで何でも同じ働きになるという話ではなく、材料の状態と加える電圧によって振る舞いが決まる仕組みである。回路図の小さな記号を読むにあたって、その内側で異なる領域が出会っていると想像すると、つなぐこと自体が機能を作る点に目が向く。",
+    "form": "接合",
+    "en": "Placing semiconductor regions with different electrical properties next to each other makes the boundary more than a simple seam. At a junction between an electron-rich region and one where missing-electron holes carry charge, the charge distribution changes and current flows differently according to direction. This does not mean that merely bringing any components together produces the same effect; behavior depends on the material states and applied voltage. When reading a small circuit symbol, imagining the different regions meeting inside draws attention to how joining itself creates function.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "つなぐことで境界に新たな働きが生まれる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "電子設計自動化",
+   "reading": "でんしせっけいじどうか",
+   "pos": "noun",
+   "meaning": "electronic design automation",
+   "defJa": "電子回路の設計や検証を計算機で支える技術",
+   "passage": {
+    "ja": "大量の素子を並べる半導体の設計って、人が一本ずつ線を引いて完成させると思うと、気が遠くなるよね。電子設計自動化の道具は、回路の記述をもとに配置や配線を探したり、動作や製造上の条件を確かめたりして、その仕事を支えるんだ。ただ、道具を使ったからといって、何を作りたいかという課題設定や、速さと電力のどちらを優先するかまで勝手に決まるわけではない。計算機に任せる範囲が広がるほど、入力した制約が狙いに合っているかを見直す設計者の目が、結果を左右するんだよ。",
+    "form": "電子設計自動化",
+    "en": "Thinking of semiconductor design as a person drawing every connection among enormous numbers of devices is overwhelming. Electronic design automation tools support the work by exploring placement and routing from circuit descriptions and checking operation and manufacturing conditions. Using them does not automatically decide the problem to solve or whether speed should take priority over power consumption. The more work computers handle, the more the outcome depends on designers reviewing whether the supplied constraints match the intent.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "設計者の判断と、道具による探索や確認を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

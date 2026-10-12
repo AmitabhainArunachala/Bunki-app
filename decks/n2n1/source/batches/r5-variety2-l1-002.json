@@ -1,0 +1,134 @@
+{
+ "items": [
+  {
+   "term": "停止問題",
+   "reading": "ていしもんだい",
+   "gloss": "halting problem",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-41b7b83f1e-94e1a9e2",
+    "wordId": "nn-41b7b83f1e"
+   }
+  },
+  {
+   "term": "再帰",
+   "reading": "さいき",
+   "gloss": "recursion",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-4138b9ed53-6ce4e738",
+    "wordId": "nn-4138b9ed53"
+   }
+  },
+  {
+   "term": "分散投資",
+   "reading": "ぶんさんとうし",
+   "gloss": "investment diversification",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-034.json",
+    "cardId": "nn-b9cfca5e1d-17b84818",
+    "wordId": "nn-b9cfca5e1d"
+   }
+  },
+  {
+   "term": "加速主義",
+   "reading": "かそくしゅぎ",
+   "gloss": "accelerationism",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
+    "cardId": "nn-cb13400b49-88b5cc02",
+    "wordId": "nn-cb13400b49"
+   }
+  },
+  {
+   "term": "右肩上がり",
+   "reading": "みぎかたあがり",
+   "gloss": "a sustained upward trend",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-016.json",
+    "cardId": "nn-aeec7671c1-7fb5d3aa",
+    "wordId": "nn-aeec7671c1"
+   }
+  },
+  {
+   "term": "嚆矢",
+   "reading": "こうし",
+   "gloss": "a pioneering first instance",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-38272dfd4e-e6cfa4e4",
+    "wordId": "nn-38272dfd4e"
+   }
+  },
+  {
+   "term": "基板",
+   "reading": "きばん",
+   "gloss": "a substrate or circuit board",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-f2ff749724-64ec98f6",
+    "wordId": "nn-f2ff749724"
+   }
+  },
+  {
+   "term": "学習データ",
+   "reading": "がくしゅうでーた",
+   "gloss": "training data",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-483cb9c58f-4b0fc1ac",
+    "wordId": "nn-483cb9c58f"
+   }
+  }
+ ],
+ "weave": [
+  "停止問題",
+  "再帰",
+  "分散投資",
+  "加速主義",
+  "右肩上がり",
+  "嚆矢",
+  "基板",
+  "学習データ"
+ ]
+}

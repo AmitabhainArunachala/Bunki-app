@@ -1,0 +1,84 @@
+{
+ "cards": [
+  {
+   "term": "蒸発",
+   "reading": "じょうはつ",
+   "pos": "noun",
+   "meaning": "evaporation; vanishing",
+   "defJa": "液体が気体になること。人が行方不明になること",
+   "passage": {
+    "ja": "塩は、古代世界では黄金に匹敵するほどの価値を持つ商品だった。海辺の人々は、浅い池に海水を引き、太陽の熱で水分を蒸発させて結晶を取り出した。ローマ兵に支払われた報酬を意味するサラリーの語源は塩にある、とする説もよく知られている。塩をめぐる交易路はやがて帝国の道となり、ヴェネツィアやリューベックの繁栄を支えた。塩の白い粒には、国家の財布を左右するほどの力が宿っていたのである。",
+    "form": "蒸発",
+    "en": "In the ancient world, salt was a commodity worth as much as gold. People on the coast drew seawater into shallow ponds and let the sun's heat evaporate the water to extract the crystals. There is also a well-known theory that the word salary, meaning pay given to Roman soldiers, derives from salt. The trade routes built around salt eventually became the roads of empires and supported the prosperity of Venice and Lübeck. In those white grains lay power enough to sway the purses of states.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "水を「蒸発させる」の形で、理科・産業の文脈。人が姿を消す意味とは別。",
+    "sense": "液体が気体になること"
+   }
+  },
+  {
+   "term": "練る",
+   "reading": "ねる",
+   "pos": "verb",
+   "meaning": "to work out, to knead",
+   "defJa": "念入りに考えて内容を整えること",
+   "passage": {
+    "ja": "世界史の論述では、カンナエの戦いがよく題材になる。紀元前二一六年、ハンニバルは数で勝るローマ軍を、陣形の中央をわざと後退させて引き込み、最後は騎兵が背後に回って包囲し、壊滅させた。この勝利は、地形を見極め、敵の動きを読んで作戦を練った成果にほかならない。受験生も、年号を暗記するだけでなく、なぜその陣形が機能したのかを自分の言葉で説明できるようにしておくに越したことはない。",
+    "form": "練った",
+    "en": "The Battle of Cannae is often the subject of essay questions in world history. In 216 BC, Hannibal drew in the numerically superior Roman army by deliberately pulling back the center of his formation, and in the end his cavalry circled behind to encircle and destroy it. This victory is nothing other than the result of working out a plan by sizing up the terrain and reading the enemy's moves. Exam candidates, too, are best off not merely memorizing dates but being able to explain in their own words why that formation worked.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「作戦を練る／計画を練る」が典型。ねるように繰り返し考えて質を高める。",
+    "sense": "念入りに考えて整える"
+   }
+  },
+  {
+   "term": "見込み",
+   "reading": "みこみ",
+   "pos": "noun",
+   "meaning": "prospect, expectation",
+   "defJa": "先の見通しや可能性",
+   "passage": {
+    "ja": "中国の科挙は、隋の時代に始まり、一九〇五年に廃止されるまで千年以上続いた官吏登用試験である。受験者は幼いころから儒教の規範を記した四書五経を暗記し、何十年も挑み続ける人も珍しくなかった。合格の見込みが薄いと知りながらも受け続けたのは、及第すれば一族の地位まで変わったからだ。今日の受験生の苦労も、こうした長い歴史の延長線上にあるのかと思うと、少し不思議な気持ちになる。",
+    "form": "見込み",
+    "en": "China's imperial examination was an official-recruitment exam that began in the Sui period and lasted over a thousand years until its abolition in 1905. Candidates memorized from childhood the Four Books and Five Classics, which set out Confucian norms, and it was not rare for people to keep challenging it for decades. They kept sitting it even knowing the prospect of passing was slim, because passing would change the standing of their entire clan. Thinking that the struggles of today's examinees lie on the extension of such a long history, I feel a slightly strange sensation.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「見込みが薄い／見込みがある」。将来の可能性の予想を表す。",
+    "sense": "先の見通しや可能性"
+   }
+  },
+  {
+   "term": "衰え",
+   "reading": "おとろえ",
+   "pos": "noun",
+   "meaning": "decline, weakening",
+   "defJa": "勢いや力が弱まること",
+   "passage": {
+    "ja": "年をとると記憶力の衰えが避けられないという通念は、半分しか正しくない。新しい情報を素早く処理する力は下がるが、経験を結びつけて判断する力は、むしろ長く保たれるとされる。若い脳は処理速度に、成熟した脳は知識の蓄積に強みがある、と言い換えてもよい。だから学習法も、年齢に応じて変えていくのがよい。六十代から楽器や語学を始める人がいるのも、この強みを生かしているからだろう。",
+    "form": "衰え",
+    "en": "The common belief that memory inevitably declines with age is only half right. The power to process new information quickly falls, but the power to link experience and judge is said to be kept longer, if anything. One could rephrase this as a young brain having its strength in processing speed and a mature brain in accumulated knowledge. So it is good to change study methods according to age as well. That some people take up an instrument or a language in their sixties is probably because they are making use of this strength.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「体力の衰え／衰えを感じる」。力や勢いが弱まる変化を名詞で言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "絡む",
+   "reading": "からむ",
+   "pos": "verb",
+   "meaning": "to get entangled; to be involved",
+   "defJa": "複雑に関わり合う",
+   "passage": {
+    "ja": "歴史の授業って、年号を暗記するだけの科目だと思ってたんですよ。でも大人になって読み返すと、戦争の背後にはお金も宗教も家同士の結婚も、全部絡んでるじゃないですか。三十年戦争なんて、もとは信仰をめぐる争いだったのに、最後はカトリックのフランスが新教側について参戦する始末です。ちょっと待ってよ、と教科書にツッコみたくなりますよね。歴史って、実は人間関係の巨大なドラマなんだと気づいてから、読むのが楽しくなりました。",
+    "form": "絡んで",
+    "en": "I used to think history class was just a subject of memorizing dates. But when I reread it as an adult, behind a war, money, religion and marriages between families are all tangled up together, aren't they? The Thirty Years' War, for one, began as a dispute over faith, yet in the end Catholic France ended up joining on the Protestant side. You can't help wanting to say, wait a minute, to the textbook. Since realizing that history is actually one enormous drama of human relations, reading it has become fun.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「事情が絡む」「利害が絡み合う」など、物事が複雑に結びつく場面で使う。",
+    "sense": "複雑に関わり合う"
+   }
+  }
+ ]
+}

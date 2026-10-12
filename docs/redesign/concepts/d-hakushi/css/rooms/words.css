@@ -1,0 +1,106 @@
+/* WORDS 辞書 — drafting vellum on a ruled grid: a technical plate (Akira mechanical sheet).
+   Night: the plate becomes a phosphor blueprint (the 殻 world). */
+.plate[data-room='words'] {
+  background-color: var(--color-ground);
+  background-image:
+    linear-gradient(var(--color-grid-major) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid-major) 1px, transparent 1px),
+    linear-gradient(var(--color-grid) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 65px 65px, 65px 65px, 13px 13px, 13px 13px;
+  background-position: -1px -1px;
+}
+.words-top { padding: 10px 60px 4px var(--gutter); }
+.search { position: relative; }
+.search-in { width: 100%; height: 44px; border: 1px solid var(--color-line-strong); background: var(--color-paper); color: var(--color-ink); border-radius: var(--radius-control); padding: 0 12px 0 36px; font: 15px/1 var(--font-sans); -webkit-appearance: none; appearance: none; }
+.search-in::placeholder { color: var(--color-ink-3); }
+.search-ico { position: absolute; left: 12px; top: 14px; width: 12px; height: 12px; border: 1.6px solid var(--color-ink-2); border-radius: 50%; }
+.search-ico::after { content: ''; position: absolute; width: 6px; height: 1.6px; background: var(--color-ink-2); right: -6px; bottom: -3px; transform: rotate(45deg); }
+.search-res { position: absolute; left: 0; right: 0; top: 48px; z-index: 10; background: var(--color-paper); box-shadow: var(--elevation-raised); }
+.search-res:empty { display: none; }
+.sr { display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: baseline; width: 100%; min-height: 44px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--color-line); }
+.sr-t { font: 800 17px/1 var(--font-display); } .sr-r { font-size: 12px; color: var(--color-ink-3); } .sr-m { font-size: 13px; color: var(--color-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-none { padding: 14px 12px; }
+
+.crumbs { display: flex; align-items: center; gap: 2px; padding: 4px 60px 0 var(--gutter); min-height: 44px; overflow-x: auto; scrollbar-width: none; }
+.crumb { min-height: 44px; min-width: 44px; padding: 0 8px; font: 800 15px/1 var(--font-display); color: var(--color-ink-3); }
+.crumb.here { color: var(--color-ink); box-shadow: inset 0 -2px 0 var(--color-ink); }
+.crumb-sep { font-style: normal; color: var(--color-ink-3); font-size: 13px; }
+
+.field { position: relative; height: 452px; width: 390px; max-width: 100%; margin: 0 auto; }
+.traces { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.traces path { fill: none; stroke: var(--color-structure); stroke-width: 1.25; stroke-opacity: .55; stroke-linejoin: miter; }
+.traces .via { fill: var(--color-ground); stroke: var(--color-structure); stroke-width: 1; }
+.traces .tr-part path { stroke-dasharray: 2 3; }
+.traces .tr-word path { stroke-opacity: .4; }
+html[data-theme='night'] .traces path { stroke-opacity: .7; filter: drop-shadow(0 0 3px rgba(92,240,208,.45)); }
+
+.node { position: absolute; transform-origin: center; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 2; }
+button.node { transition: transform var(--motion-tick) var(--ease-crisp); }
+button.node:active { transform: scale(.94); }
+.node .n-glyph { color: var(--color-ink); }
+.centre { min-width: 128px; padding: 14px 18px 12px; background: var(--color-paper); box-shadow: 0 0 0 1px var(--color-ink), var(--elevation-raised); z-index: 3; gap: 4px; }
+.centre .n-glyph { font: var(--weight-display) 46px/1.05 var(--font-display); letter-spacing: .02em; }
+.centre.k-kanji .n-glyph, .centre.k-part .n-glyph { font-size: 62px; }
+.centre .n-read { font: 600 13px/1 var(--font-serif); color: var(--color-ink-2); letter-spacing: .1em; }
+.centre .n-gloss { font: 600 11.5px/1.25 var(--font-sans); color: var(--color-ink-2); max-width: 150px; }
+.centre .ring { position: absolute; inset: -7px; border: 2px solid var(--color-signal); pointer-events: none; box-shadow: 0 0 18px var(--color-signal-glow); }
+.centre .reg::before, .centre .reg::after { background: var(--color-ink); }
+.centre .reg-tl { top: -14px; left: -14px } .centre .reg-tr { top: -14px; right: -14px } .centre .reg-bl { bottom: -14px; left: -14px } .centre .reg-br { bottom: -14px; right: -14px }
+.n-kanji { width: 66px; min-height: 70px; background: var(--color-paper); box-shadow: 0 0 0 1px var(--color-line-strong), var(--elevation-paper); padding: 6px 4px 5px; }
+.n-kanji .n-glyph { font: 800 32px/1 var(--font-display); }
+.n-sub { font: 600 9.5px/1.15 var(--font-sans); color: var(--color-ink-3); margin-top: 3px; max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.n-st { position: absolute; top: 2px; right: 3px; font-size: 8.5px; letter-spacing: 0; }
+.n-part { width: 48px; height: 48px; border-radius: 50%; background: var(--color-ground); box-shadow: 0 0 0 1px var(--color-structure); }
+.n-part .n-glyph { font: 800 21px/1 var(--font-display); color: var(--color-structure); }
+.n-part .n-sub { position: absolute; top: 100%; margin-top: 3px; width: 76px; max-width: none; white-space: normal; line-height: 1.1; }
+.n-word { min-width: 66px; min-height: 48px; padding: 6px 8px; background: var(--color-paper); border-left: 3px solid var(--color-ink); box-shadow: 0 0 0 1px var(--color-line); }
+.n-word .n-glyph { font: 800 16px/1.1 var(--font-display); }
+.n-word .n-read { font: 10px/1.2 var(--font-sans); color: var(--color-ink-3); margin-top: 3px; }
+.n-doc { min-width: 92px; min-height: 52px; padding: 6px 10px; background: var(--color-ink); }
+.n-doc .n-count { font: 800 20px/1 var(--font-sans); color: var(--color-ground); }
+.n-doc .n-sub { color: var(--color-ground); opacity: .8; }
+.n-note { min-width: 110px; min-height: 52px; padding: 6px 10px; background: var(--color-paper); box-shadow: 0 0 0 1px var(--color-line-strong); }
+.n-note .n-glyph { font: 800 15px/1.2 var(--font-display); }
+.n-note .n-sub { margin: 0 0 3px; text-transform: uppercase; letter-spacing: .12em; }
+.n-cult { border-top: 3px solid var(--color-mark); }
+.n-gram { border-top: 3px solid var(--color-structure); }
+.ghost-node { pointer-events: none; z-index: 1; }
+.plate-legend { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+.crumbs .grow { flex: 1; }
+
+.panel { padding: 8px var(--gutter) 36px; }
+.entry { background: var(--color-paper); box-shadow: 0 0 0 1px var(--color-line-strong); padding: 18px 18px 20px; display: grid; gap: 16px; position: relative; }
+.e-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.e-word { font: 800 30px/1 var(--font-display); } .e-read { font: 600 15px/1 var(--font-serif); color: var(--color-ink-2); letter-spacing: .08em; }
+.e-gloss { font: 600 18px/1.3 var(--font-serif); } .e-def { font: 15px/1.6 var(--font-serif); color: var(--color-ink-2); margin-top: -8px; }
+.e-note { border-top: 1px solid var(--color-line); padding-top: 12px; display: grid; gap: 6px; }
+.e-pat { font: 800 18px/1.3 var(--font-display); }
+.e-note-t { font-size: 14px; line-height: 1.55; color: var(--color-ink-2); }
+.e-src { font: 14px/1.5 var(--font-serif); color: var(--color-ink-3); }
+.p-pass { border-top: 1px solid var(--color-line); padding-top: 12px; display: grid; gap: 10px; }
+.pass-line { margin: 0; font: 15.5px/1.75 var(--font-serif); }
+.pass-line mark { background: none; color: var(--color-mark); font-weight: 700; box-shadow: inset 0 -2px 0 var(--color-mark); }
+.pass-src { margin-top: 2px; text-transform: none; letter-spacing: .02em; }
+
+/* the anatomy plate: 田字格 grid, leader callouts */
+.anat-plate { position: relative; display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: center; }
+.ap-grid { position: relative; width: 150px; height: 150px; border: 1px solid var(--color-ink); display: grid; place-items: center; background: var(--color-ground); }
+.ap-grid::before, .ap-grid::after { content: ''; position: absolute; }
+.ap-grid::before { left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--color-line-strong); }
+.ap-grid::after { top: 50%; left: 0; right: 0; border-top: 1px dashed var(--color-line-strong); }
+.ap-glyph { font: 800 112px/1 var(--font-display); position: relative; z-index: 1; }
+.ap-call { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ap-call li { display: grid; grid-template-columns: 28px 26px 1fr; align-items: center; gap: 6px; font-size: 12.5px; color: var(--color-ink-2); }
+.ap-call .lead { height: 1px; background: var(--color-structure); position: relative; }
+.ap-call .lead::before { content: ''; position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-structure); background: var(--color-paper); }
+.ap-call b { font: 800 22px/1 var(--font-display); color: var(--color-structure); }
+.ap-marks { display: grid; grid-template-columns: repeat(5, auto); gap: 4px 14px; margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--color-line); }
+.ap-marks dt { grid-row: 1; } .ap-marks dd { grid-row: 2; margin: 0; font: 700 16px/1.2 var(--font-sans); color: var(--color-ink); }
+.ap-list { margin-top: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { min-height: 44px; min-width: 44px; padding: 0 12px; font: 800 17px/1 var(--font-display); background: var(--color-ground); box-shadow: 0 0 0 1px var(--color-line-strong); transition: transform var(--motion-tick); }
+.chip:active { transform: translateY(1px); }
+
+.pulse { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; background: var(--color-signal); box-shadow: 0 0 12px var(--color-signal-glow), 0 0 0 2px var(--color-ground); z-index: 4; pointer-events: none; opacity: 0; }
+/* narrow phones: the plate keeps its drawing, scaled as a whole */
+@media (max-width: 389px) { .field { zoom: .92; } }
+@media (max-width: 359px) { .field { zoom: .82; } }

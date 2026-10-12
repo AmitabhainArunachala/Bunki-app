@@ -176,7 +176,7 @@ try {
   }
 
   // T10 — N1 is not a dead end: with no checked N1 test, the room names the older N1 sets
-  // (each marked 未確認) and one of them opens into a real question.
+  // (each marked Unreviewed) and one of them opens into a real question.
   for (const [viewport, fromDoor] of [[{ width: 1728, height: 996 }, false], [{ width: 1728, height: 996 }, true],
     [{ width: 390, height: 844 }, false], [{ width: 390, height: 844 }, true]]) {
     const context = await browser.newContext({ viewport });
@@ -194,13 +194,13 @@ try {
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: after a reload the room opens at the level he chose (N1)`, remembered === 'N1', `opened at ${remembered}`);
     const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
     await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
-    // the learner-facing mark is 未確認 (since the design pass of 2026-09-30); since the polish pass of
+    // the learner-facing mark is Unreviewed in English (未確認 in Japanese); since the polish pass of
     // 2026-10-01 a section whose sets are all unchecked says it once, in its header. A mark counts only as
-    // verify-mock reads it: a VISIBLE status chip whose text is exactly 未確認 (gate review on 8dea3c2e:
+    // verify-mock reads it: a VISIBLE status chip whose text is exactly Unreviewed (gate review on 8dea3c2e:
     // any chip, or the bare word anywhere in a row, let a hidden or reworded mark pass)
     const olderSets = () => page.evaluate(() => {
       const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden' && Number(getComputedStyle(n).opacity) > 0;
-      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === '未確認' && shown(chip));
+      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === 'Unreviewed' && shown(chip));
       const block = document.querySelector('[data-exam-older="N1"]');
       const sectionMarked = marked(block?.querySelector('[data-older-mark]'));
       return [...(block?.querySelectorAll('[data-legacy-set]') || [])]
@@ -212,11 +212,11 @@ try {
     const hidden = await olderSets();
     await hide.evaluate((node) => node.remove());
     const original = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
-      .map((chip) => { const text = chip.textContent; chip.textContent = '確認済'; return text; }));
+      .map((chip) => { const text = chip.textContent; chip.textContent = 'Reviewed'; return text; }));
     const reworded = await olderSets();
     await page.evaluate((texts) => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
       .forEach((chip, i) => { chip.textContent = texts[i]; }), original);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the 未確認 mark is read only from a visible chip saying exactly 未確認 (controls: hidden, reworded)`,
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the Unreviewed mark is read only from a visible chip saying exactly Unreviewed (controls: hidden, reworded)`,
       original.length > 0 && hidden.length > 0 && hidden.every((row) => !row.pending) && reworded.every((row) => !row.pending),
       JSON.stringify({ chips: original, hiddenMarked: hidden.filter((row) => row.pending).length, rewordedMarked: reworded.filter((row) => row.pending).length }));
     // expected identities and counts come from the artifact's own data, never from this file
@@ -226,7 +226,7 @@ try {
       JSON.stringify({ listed: listed.map((row) => row.id), expected: expected.map((set) => `${set.setId}:${set.items}`) }));
     const limits = await page.evaluate(() => document.querySelector('[data-exam-older="N1"] .exam-older-limits')?.textContent || '');
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the room says what these sets lack (no listening, no timer)`, /no listening|聴解/u.test(limits), limits);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked 未確認 (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked Unreviewed (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
     if (listed.length) {
       await doors.first().click();
       const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
@@ -251,7 +251,7 @@ try {
       if (present) await door.click();
       const started = present && await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
       const running = await page.evaluate(() => ({ set: document.querySelector('#app main')?.dataset.mockSet || null,
-        progress: (document.querySelector('#app main')?.innerText.match(/(\d+)\s*\/\s*(\d+)\s*問/u) || []).slice(1) }));
+        progress: (document.querySelector('#app main')?.innerText.match(/Question\s+(\d+)\s+of\s+(\d+)/u) || []).slice(1) }));
       check(`T11 ${set.setId}: its door starts that set, with its ${set.items} questions`,
         started && running.set === set.setId && Number(running.progress[1]) === set.items, JSON.stringify(running));
       await context.close();
@@ -262,9 +262,12 @@ try {
   {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(() => { try { localStorage.setItem('kairo-exam-level-v1', 'N1'); } catch { /* preference only */ } });
-    let failIndex = true, failSet = true;
+    let failIndex = true, failSet = true, setRequests = 0;
     await context.route('**/data/mock/index.json', (route) => failIndex ? route.fulfill({ status: 503, body: 'down' }) : route.continue());
-    await context.route('**/data/mock/n1-02.json', (route) => failSet ? route.abort() : route.continue());
+    await context.route('**/data/mock/sets/n1-02.json', (route) => {
+      setRequests += 1;
+      return failSet ? route.abort() : route.continue();
+    });
     const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
     await enterJlptFromDojo(page); await catalogComplete(page);
     const failedState = await page.waitForSelector('[data-exam-older="N1"][data-older-state="failed"]', { timeout: 10_000 }).then(() => true, () => false);
@@ -275,10 +278,12 @@ try {
     check('T12 retry loads the older sets', recovered);
     if (await page.locator('[data-legacy-set="n1-02"]').count()) await page.locator('[data-legacy-set="n1-02"]').click();
     const setFailed = await page.waitForSelector('[data-older-failed="n1-02"]', { timeout: 10_000 }).then(() => true, () => false);
+    check('T13 the actual set request was intercepted and failed', setRequests === 1, `requests=${setRequests}`);
     check('T13 a set that fails to load says so beside its door', setFailed);
     failSet = false;
     if (await page.locator('[data-legacy-set="n1-02"]').count()) await page.locator('[data-legacy-set="n1-02"]').click();
     const retried = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);
+    check('T13 retry makes the actual set request again', setRequests === 2, `requests=${setRequests}`);
     check('T13 pressing the door again retries and starts the set', retried &&
       await page.evaluate(() => document.querySelector('#app main')?.dataset.mockSet === 'n1-02'));
     await context.close();
@@ -288,13 +293,17 @@ try {
   {
     const context = await browser.newContext({ viewport: { width: 1728, height: 996 } });
     await context.addInitScript(() => { try { localStorage.setItem('kairo-exam-level-v1', 'N1'); } catch { /* preference only */ } });
-    let release; const held = new Promise((done) => { release = done; });
-    await context.route('**/data/mock/n1-03.json', async (route) => { await held; await route.continue(); });
+    let release, intercepted; const held = new Promise((done) => { release = done; });
+    const requested = new Promise((done) => { intercepted = done; });
+    await context.route('**/data/mock/sets/n1-03.json', async (route) => { intercepted(route.request().url()); await held; await route.continue(); });
     const page = await context.newPage(); await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
     await enterJlptFromDojo(page); await catalogComplete(page);
     const lateDoor = await page.locator('[data-legacy-set="n1-03"]').waitFor({ timeout: 10_000 }).then(() => true, () => false);
     check('T14 the n1-03 door exists to press', lateDoor);
     if (lateDoor) await page.locator('[data-legacy-set="n1-03"]').click();
+    const heldUrl = await Promise.race([requested, new Promise((done) => setTimeout(() => done(null), 10_000))]);
+    check('T14 the actual n1-03 download is held before leaving', !!heldUrl && heldUrl.endsWith('/data/mock/sets/n1-03.json'), heldUrl || 'no intercepted request');
+    assert(heldUrl, 'The stale-download path must hold its actual request');
     await page.locator('#chrome-dojo').click();   // leave the room while n1-03 is still downloading
     await page.waitForSelector('button[data-study-door="mock"]');
     release();
@@ -302,12 +311,16 @@ try {
     const still = await page.evaluate(() => !!document.querySelector('button[data-study-door="mock"]'));
     check('T14 a late download after leaving starts nothing and does not pull the learner back', !leaked && still, JSON.stringify({ leaked, still }));
     // leave AND return before the download lands: the stale tap still must not start the set
-    let releaseAgain; const heldAgain = new Promise((done) => { releaseAgain = done; });
-    await context.unroute('**/data/mock/n1-03.json');
-    await context.route('**/data/mock/n1-04.json', async (route) => { await heldAgain; await route.continue(); });
+    let releaseAgain, interceptedAgain; const heldAgain = new Promise((done) => { releaseAgain = done; });
+    const requestedAgain = new Promise((done) => { interceptedAgain = done; });
+    await context.unroute('**/data/mock/sets/n1-03.json');
+    await context.route('**/data/mock/sets/n1-04.json', async (route) => { interceptedAgain(route.request().url()); await heldAgain; await route.continue(); });
     await page.locator('button[data-study-door="mock"]').click(); await catalogComplete(page);
     const door4 = await page.locator('[data-legacy-set="n1-04"]').waitFor({ timeout: 10_000 }).then(() => true, () => false);
     if (door4) await page.locator('[data-legacy-set="n1-04"]').click();
+    const heldAgainUrl = await Promise.race([requestedAgain, new Promise((done) => setTimeout(() => done(null), 10_000))]);
+    check('T14 the actual n1-04 download is held before leaving and returning', !!heldAgainUrl && heldAgainUrl.endsWith('/data/mock/sets/n1-04.json'), heldAgainUrl || 'no intercepted request');
+    assert(heldAgainUrl, 'The stale-return path must hold its actual request');
     await page.locator('#chrome-dojo').click();
     await page.locator('button[data-study-door="mock"]').click(); await catalogComplete(page);
     releaseAgain();

@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "圧縮",
+   "reading": "あっしゅく",
+   "pos": "noun",
+   "meaning": "compression, condensation",
+   "defJa": "データの表し方を変えて必要な容量を減らすこと",
+   "passage": {
+    "ja": "画像を使って機械に分類を学習させるとき、保存に必要な容量を減らそうとして、写真の細部を失ってしまう場合があります。データを圧縮する方式の中には、一部の情報を捨てて容量を小さくするものがあり、その情報を完全には元に戻せません。輪郭のわずかな違いが手掛かりになる課題なら、見た目が似ているからといって、加工前と同じ条件だとは判断できません。容量の数字だけで処理を選ばず、分類に必要な特徴が残っているかを確認すると、保存の工夫と学習の目的を結びつけられます。",
+    "form": "圧縮",
+    "en": "When training a machine to classify images, attempts to save storage space can cause photographic detail to be lost. Some data compression methods reduce file size by discarding information that cannot be fully restored. If a task relies on slight differences in outlines, a similar appearance alone does not justify treating the processed image as equivalent to the original. Checking whether the features needed for classification remain, instead of choosing a process solely by file size, connects storage decisions with the learning objective.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "画像では、容量を減らす方式によって細部が失われることもあります。",
+    "sense": "データを表すのに必要な容量を小さくすること"
+   }
+  }
+ ]
+}

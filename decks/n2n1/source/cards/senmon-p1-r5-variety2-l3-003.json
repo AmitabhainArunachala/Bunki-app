@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "生産能力",
+   "reading": "せいさんのうりょく",
+   "pos": "noun",
+   "meaning": "production capacity",
+   "defJa": "一定の条件と期間で製品を作れる量",
+   "passage": {
+    "ja": "工場に新しい装置が届いても、その日のうちに出荷量が倍になるとは限りません。生産能力を増やすには、装置を据え付けるだけでなく、材料の供給や検査、担当者の訓練もそろえる必要があります。前の工程が速くなる一方で最後の検査が詰まれば、仕掛かり品が増えるだけで、完成品は予定どおりに出てきません。一台の機械の速さと工場全体で作れる量を分けて考えると、投資の効果を測るには、どこで流れが細くなっているかを確かめることが欠かせないと分かります。",
+    "form": "生産能力",
+    "en": "The arrival of new equipment does not necessarily double a factory’s shipments that day. Increasing production capacity requires not just installation but material supplies, inspections, and staff training. If earlier processes accelerate while final inspection remains a bottleneck, work in progress grows without finished goods appearing as planned. Distinguishing an individual machine’s speed from total factory output shows why measuring the effect of investment requires identifying where the flow narrows.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "設備一台の速さではなく、一定期間に作れる量として捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8541a7cc2b-108b51cc",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-026.json",
+    "cardId": "nn-8541a7cc2b-108b51cc",
+    "wordId": "nn-8541a7cc2b"
+   }
+  }
+ ]
+}

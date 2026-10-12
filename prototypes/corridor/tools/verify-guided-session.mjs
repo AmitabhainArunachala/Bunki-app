@@ -210,6 +210,7 @@ async function journey(browser, browserName, viewport) {
     // D · two doors, one tap each
     await page.locator('#chrome-dojo').click();
     const hallDoor = page.locator('button[data-study-door="guided"]');
+    await hallDoor.waitFor({ state: 'visible', timeout: 20_000 });
     check('D1 the study hall lists the guided session as a door', await hallDoor.isVisible());
     await shot(page, dir, '00-study-hall-door');
     await page.locator('button[data-study-door="mock"]').click();
@@ -228,6 +229,7 @@ async function journey(browser, browserName, viewport) {
       (await room(page).getAttribute('data-stage')) === 'home',
     );
     await page.locator('#back').click();
+    await page.locator('.exam-levels').waitFor({ state: 'visible', timeout: 20_000 });
     check(
       'D4 戻る from the room front returns to the JLPT room',
       await page.locator('.exam-levels').isVisible(),
@@ -252,7 +254,7 @@ async function journey(browser, browserName, viewport) {
     );
     check(
       'J3 the chrome recedes during the attempt (T8)',
-      (await page.evaluate(() => document.documentElement.dataset.room)) === 'attempt',
+      (await page.evaluate(() => document.documentElement.dataset.register)) === 'attempt',
     );
     await shot(page, dir, '03-question-1');
     await axeClean(page, 'question');
@@ -603,6 +605,25 @@ async function journey(browser, browserName, viewport) {
     );
     await shot(page, dir, '14-fresh');
     await page.locator('.guided-room [name="fresh-answer"][value="0"]').check();
+    if (MOMENTS) await page.evaluate(() => {
+      // Observe inside the page before the click. Remote assertions can miss
+      // the 400ms guard phase entirely on a busy WebKit runner.
+      window.__rematchPhases = [];
+      window.__rematchObserver = new MutationObserver((records) => {
+        let lastRoot = null;
+        for (const record of records) {
+          const root = record.target;
+          if (!(root instanceof Element) || !root.matches('.samurai-effect--rematch')) continue;
+          // oldValue preserves intermediate mutations even if callbacks batch.
+          window.__rematchPhases.push(record.oldValue || '');
+          lastRoot = root;
+        }
+        if (lastRoot) window.__rematchPhases.push(lastRoot.className);
+      });
+      window.__rematchObserver.observe(document.body, {
+        attributes: true, attributeFilter: ['class'], attributeOldValue: true, subtree: true,
+      });
+    });
     await act(page, 'check-fresh').click();
     if (MOMENTS) {
       await page.locator('.samurai-effect--rematch').waitFor({ timeout: 3_000 });
@@ -614,20 +635,18 @@ async function journey(browser, browserName, viewport) {
         'M14 the rematch verdict is explicit',
         (await page.locator('#samurai-effect-title').innerText()).trim() === 'Correct.',
       );
-      // the guard lands on the scene's own timer (impact − 220 ms), the bow at resolve
-      // (impact + 180 ms); a fixed 700 ms sleep left 70 ms of margin, which a loaded machine
-      // outran, so wait for the guard while the bow has not begun
+      // Require an observed guard without resolve before the first resolve.
+      // Capture starts before play, so delayed driver polling loses no phases.
       check(
         'M16 the learner blocks (guard) before the samurai bows',
         await page
           .waitForFunction(
             () => {
-              const root = document.querySelector('.samurai-effect--rematch');
-              return (
-                !!root &&
-                root.classList.contains('samurai-effect--guard') &&
-                !root.classList.contains('samurai-effect--resolve')
-              );
+              const phases = window.__rematchPhases || [];
+              const guard = phases.findIndex(value => value.split(' ').includes('samurai-effect--guard')
+                && !value.split(' ').includes('samurai-effect--resolve'));
+              const resolve = phases.findIndex(value => value.split(' ').includes('samurai-effect--resolve'));
+              return guard >= 0 && (resolve < 0 || guard < resolve);
             },
             null,
             { timeout: 3_000 },
@@ -637,6 +656,7 @@ async function journey(browser, browserName, viewport) {
             () => false,
           ),
       );
+      await page.evaluate(() => window.__rematchObserver.disconnect());
       await page.screenshot({ path: join(dir, '15-rematch-block.png') });
       await page.waitForTimeout(900);
       await page.screenshot({ path: join(dir, '16-rematch-bow.png') });
@@ -662,7 +682,7 @@ async function journey(browser, browserName, viewport) {
     check('J18 the practised target is marked practised', field.reviewed.includes(Q[0]));
     check(
       'J19 the field reads the real deck: 5 session cards and 支障 from the sheet are ready',
-      /復習する · 6/u.test(await act(page, 'review').innerText()),
+      /review what is ready · 6/u.test(await act(page, 'review').innerText()),
       await act(page, 'review').innerText(),
     );
     check(
@@ -743,6 +763,7 @@ async function journey(browser, browserName, viewport) {
     await page.locator('#zen-exit').click();
     await page.locator('#deck-table').waitFor();
     await page.locator('#back').click();
+    await room(page).waitFor({ state: 'visible', timeout: 20_000 });
     check('S15 戻る from the lists page returns to the guided room', await room(page).isVisible());
 
     check('X1 no horizontal overflow at any stage', overflowAt.length === 0, overflowAt.join(' '));

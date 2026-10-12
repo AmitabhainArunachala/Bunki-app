@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "察し",
+   "reading": "さっし",
+   "pos": "noun",
+   "meaning": "perceptiveness; understanding",
+   "defJa": "言葉にされない事情や気持ちを推し量ること",
+   "passage": {
+    "ja": "お茶のおかわりを勧めて「結構です」と返された場合、言葉の表面だけでは承諾か辞退かを取り違えることがあります。日本語の会話で察しがいいと言われる人は、直前のやり取りや声の調子も手がかりにして、相手の意図をくみ取ります。しかし、同じ表現でも場面に応じて意味が変わるので、学習者の理解を気配りの有無だけで評価するのは避けたいところです。辞退を明確に伝えるなら、常套句に頼りきらず、感謝とともに「もう十分いただきました」と補う方法もあります。",
+    "form": "察し",
+    "en": "When you offer someone more tea and they reply kekko desu, relying on the words alone can lead you to confuse acceptance with refusal. People described as perceptive in Japanese conversation infer intentions using clues such as the preceding exchange and tone of voice. However, because the same expression changes meaning with the situation, it is best to avoid judging learners' understanding solely in terms of their consideration for others. To make a refusal clear, one option is to avoid relying entirely on a stock phrase and add 'I have already had plenty' along with your thanks.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「察しがいい」は文脈などから意図をくみ取る力を評価する言い方です。",
+    "sense": "相手の言動から気持ちや事情を推し量ること"
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

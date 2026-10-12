@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "ファブレス",
+   "reading": "ふぁぶれす",
+   "pos": "noun",
+   "meaning": "fabless (design-only) company",
+   "defJa": "製造工場を持たず回路の設計などを担う企業",
+   "passage": {
+    "ja": "ファブレス企業が新しい半導体を売り出す際、製造の発注が資金計画の節目となる。工場の建設費を自社で負担しない一方で、外部の製造会社へ支払う費用や、製品の販売代金が入るまでの期間を見込み、設計から出荷までの資金を確保するからだ。工場がなくても製造費はかかる。売れる量を多く見積もりすぎれば、完成したチップが在庫として残り、次の開発に使う現金を圧迫する。設計を担う会社の机にも、製造委託の請求書が届く。",
+    "form": "ファブレス",
+    "en": "When a fabless company launches a new semiconductor, placing the manufacturing order becomes a milestone in its financial planning. Although it does not bear factory construction costs itself, it must secure funds from design through shipment while accounting for payments to an outside manufacturer and the delay before sales proceeds arrive. Manufacturing costs remain even without an owned factory. Overestimating sales volume leaves finished chips in inventory and squeezes the cash available for the next development project. An invoice for outsourced manufacturing arrives at the design company too.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "半導体の設計などを担い、工場を持たず製造を外部へ委託する企業。",
+    "sense": ""
+   },
+   "cardId": "nn-2d5a055221-d3b3eb63",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010.json",
+    "cardId": "nn-2d5a055221-d3b3eb63",
+    "wordId": "nn-2d5a055221"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "日蓮",
+   "reading": "にちれん",
+   "pos": "noun",
+   "meaning": "Nichiren",
+   "defJa": "法華経を重んじ題目を唱える実践を説いた鎌倉時代の僧",
+   "passage": {
+    "ja": "題目を唱える声が、法華経への信仰を今に伝える。鎌倉時代の仏教では、さまざまな教えの中で何をよりどころに救いを求めるかが問われ、経典を学ぶ僧侶たちは、修行の方法や人々を導く道をめぐって異なる立場を示した。実践の選択が争点となった。日蓮は法華経を重んじ、南無妙法蓮華経という題目を唱えることを説いた。その教えを受け継ぐ寺院では、僧侶と参拝者が共に声を重ね、経典の名を繰り返し唱えている。",
+    "form": "日蓮",
+    "en": "The sound of chanting the daimoku carries faith in the Lotus Sutra into the present. In Kamakura-period Buddhism, the question of which teachings to rely on for salvation led monks studying the scriptures to take different positions on methods of practice and paths for guiding people. The choice of practice became a point of dispute. Nichiren emphasized the Lotus Sutra and taught the chanting of the daimoku, Namu Myoho Renge Kyo. In temples continuing his teaching, monks and visitors join their voices in repeatedly chanting the name of the sutra.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "法華経を重んじ、題目を唱える実践を説いた僧。時代と土地を混同しない。",
+    "sense": ""
+   },
+   "cardId": "nn-7ac742ba51-f8f1898c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-018.json",
+    "cardId": "nn-7ac742ba51-f8f1898c",
+    "wordId": "nn-7ac742ba51"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不生不滅",
+   "reading": "ふしょうふめつ",
+   "pos": "noun",
+   "meaning": "neither arising nor ceasing",
+   "defJa": "本来的には生じも滅びもしないという仏教の表現",
+   "passage": {
+    "ja": "粘土から器が作られ、割れた器が細かな破片になっても、その過程を支える条件から独立した不変の何かが、初めて現れたり完全に消えたりしたとまでは言えない。形は確かに変わっている。般若心経が説く不生不滅も、固定した本質を否定する空の理解に根差す。条件によって成り立つものを、条件抜きで生まれる実体として扱わないのである。机に残った破片にも、もとの土の色と、窯で焼かれた跡がある。",
+    "form": "不生不滅",
+    "en": "Even when clay becomes a vessel and the broken vessel becomes fragments, it does not follow that something unchanging and independent of the conditions supporting that process has newly appeared or vanished completely. The form certainly changes. The Heart Sutra's teaching of neither arising nor ceasing likewise rests on an understanding of emptiness that denies a fixed essence. What depends on conditions is not treated as an entity arising without them. The fragments remaining on the desk still bear the original clay's color and traces of firing in a kiln.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "空の理解に関わる語で、日常の形の変化を否定する意味ではない。",
+    "sense": ""
+   },
+   "cardId": "nn-f52ba89ddb-daadec6e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-f52ba89ddb-daadec6e",
+    "wordId": "nn-f52ba89ddb"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "株価収益率",
+   "reading": "かぶかしゅうえきりつ",
+   "pos": "noun",
+   "meaning": "price-to-earnings ratio",
+   "defJa": "株価が一株当たり利益の何倍かを示す数値",
+   "passage": {
+    "ja": "同じ会社の株を同じ値段で見ているのに、投資家によって「利益に対して安い」という人と「そうでもない」という人がいるのは、割り算に使う利益が違うからだったりするんだ。昨年度の実績を使う人も、今年度の予想を使う人もいる。割る数が違うんだね。株価を一株当たり利益で割る株価収益率は、どの期間の利益かをそろえてからでないと比べにくいよ。予想を実績にそろえたら、さっきまで違っていた二つの計算結果が重なるんだ。",
+    "form": "株価収益率",
+    "en": "Investors looking at the same company's shares at the same price can disagree about whether they are cheap relative to earnings simply because they use different earnings figures in their division. Some use last year's actual earnings and others this year's forecast. They are dividing by different numbers. The price-to-earnings ratio, calculated by dividing the share price by earnings per share, is hard to compare until the earnings periods are aligned. Once the forecast is replaced with the same actual earnings figure, the two previously different results coincide.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "株価と一株当たり利益の比で、実績か予想かなどの条件に左右される。",
+    "sense": ""
+   },
+   "cardId": "nn-6586533b09-2b9bc08c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-034.json",
+    "cardId": "nn-6586533b09-2b9bc08c",
+    "wordId": "nn-6586533b09"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "配線",
+   "reading": "はいせん",
+   "pos": "noun",
+   "meaning": "wiring, interconnect",
+   "defJa": "電気を通す道を部品の間につなぐこと",
+   "passage": {
+    "ja": "「このチップ、計算する場所をもっと詰めれば速くなるんじゃないの」と聞かれたんだ。ところが、信号にも移動時間が要るんだよね。素子を増やすにしても、離れた場所へ何度も信号を送る配線が長くなれば待ち時間が増えるし、線を通す場所や熱を逃がす方法も一緒に考えないと、狙った速さが出ないんだ。計算が終わっても、次の場所に答えが届かなければ待つしかない。その間は、受け取る側の回路が暇になっちゃう。",
+    "form": "配線",
+    "en": "Someone asked me whether packing more computing units onto this chip would make it faster. But signals need time to travel too. Even when adding devices, longer interconnects carrying signals repeatedly to distant locations increase waiting time, and the intended speed will not materialize without also considering space for the wires and ways to remove heat. Even after a calculation finishes, the next location must wait until the answer arrives. During that interval, the receiving circuit ends up idle.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "半導体では素子を結ぶ信号や電力の通り道で、長さも動作に影響する。",
+    "sense": ""
+   },
+   "cardId": "nn-f4235c89ba-e92e4701",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-f4235c89ba-e92e4701",
+    "wordId": "nn-f4235c89ba"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "他の追随を許さない",
+   "reading": "たのついずいをゆるさない",
+   "pos": "expression",
+   "meaning": "unrivaled",
+   "defJa": "同業の相手が追いつけないほど優れていること",
+   "passage": {
+    "ja": "半導体向けの設計ソフトで他の追随を許さない地位を築いた企業であっても、顧客が使う製造工程が変われば、新しい条件に合う設計を検証できるよう製品を改良し続けることになる。過去の実績だけでは新工程に対応できない。ソフトの精度が不足すれば、画面上では動く回路が工場では狙いどおりに仕上がらない恐れがある。顧客は設計結果と実際の製品を照合する。次の版へ向けた修正項目は、その差を手掛かりに積み上がっていく。",
+    "form": "他の追随を許さない",
+    "en": "Even a company that has established an unrivaled position in semiconductor design software must keep improving its product to verify designs against new conditions when customers change manufacturing processes. Past achievements alone cannot support a new process. If the software lacks accuracy, a circuit that works on screen may fail to turn out as intended in the factory. Customers compare design results with the actual products. The discrepancies become the basis for an accumulating list of fixes for the next version.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「他の追随を許さない地位」。同業者が追いつけないほどの優位を表す。",
+    "sense": ""
+   },
+   "cardId": "nn-c82e01a10b-24104ed5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+    "cardId": "nn-c82e01a10b-24104ed5",
+    "wordId": "nn-c82e01a10b"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "形而上学",
+   "reading": "けいじじょうがく",
+   "pos": "noun",
+   "meaning": "metaphysics",
+   "defJa": "存在や世界の根本原理を問う哲学の分野",
+   "passage": {
+    "ja": "眠っている間も、昨日の自分と同じ人間であり続ける根拠は何だろう？記憶だけでは答えきれない。仏教の無我説に向き合うと、体や感情や意識が変化するのに、それらを所有する不変の主人を別に立てる必要があるのかという問いが、日常の自明さを揺さぶる。ここで形而上学が問うのは、眠りの深さよりも、そもそも自己がどのように存在するかである。目覚めた人は同じ名で呼ばれながら、また違う気分で朝の支度を始める。",
+    "form": "形而上学",
+    "en": "What grounds our remaining the same person as yesterday even while asleep? Memory alone cannot fully answer that. Confronting the Buddhist doctrine of nonself unsettles everyday certainties by asking whether changes in body, feelings, and consciousness require a separate, unchanging owner of them all. Metaphysics here concerns how a self exists in the first place, rather than how deeply someone sleeps. On waking, the person is called by the same name yet starts preparing for the morning in a different mood.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "存在の成り立ちを問う分野で、ここでは自己の同一性が問題となる。",
+    "sense": ""
+   },
+   "cardId": "nn-c75f8d500d-8cbaa467",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-017.json",
+    "cardId": "nn-c75f8d500d-8cbaa467",
+    "wordId": "nn-c75f8d500d"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "一強",
+   "reading": "いっきょう",
+   "pos": "noun",
+   "meaning": "sole dominant player",
+   "defJa": "一つの勢力だけが他を大きく上回る状態",
+   "passage": {
+    "ja": "検索サービスの一強を崩そうとする企業には、検索結果の質とは別の壁もある。利用者は毎回サービスを選び直さない。ブラウザーを開いた際に最初から指定されている検索先を使い続けるなら、新規参入の企業は性能を高めても、試してもらう機会そのものを得にくいからである。既定の設定を切り替えられる場所が、競争の入口となる。利用者が別の検索先を選ぶと、次に入力した言葉はそちらの画面へ送られる。",
+    "form": "一強",
+    "en": "A company trying to challenge a single dominant search service faces a barrier separate from the quality of search results. Users do not choose their service afresh each time. If they continue using the search provider preset in their browser, a newcomer can struggle to gain even an opportunity to be tried despite improving its performance. The place where default settings can be changed becomes an entry point for competition. When a user selects another provider, the next search terms entered are sent to that service's screen.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "一つの勢力が他を大きく引き離した状態で、「一強を崩す」とも使う。",
+    "sense": ""
+   },
+   "cardId": "nn-2e5a2cb8e1-6c446309",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-012.json",
+    "cardId": "nn-2e5a2cb8e1-6c446309",
+    "wordId": "nn-2e5a2cb8e1"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

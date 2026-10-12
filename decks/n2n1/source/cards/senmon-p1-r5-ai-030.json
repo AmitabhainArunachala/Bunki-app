@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "規模の経済",
+   "reading": "きぼのけいざい",
+   "pos": "noun",
+   "meaning": "economies of scale",
+   "defJa": "生産規模が大きくなると平均費用が下がること",
+   "passage": {
+    "ja": "半導体工場の説明で、規模の経済を「たくさん作れば必ずもうかる」と言い換えると、費用と利益を混同します。生産量が増えることで、一個当たりに配分する設備や設計の費用が下がる、と具体的に書くほうが正確ですね。ただし一定の範囲で成り立つ説明であって、需要が足りず製品が売れ残れば、工場の大きさだけで収益は保証されません。増産を提案する資料なら、平均費用が下がる仕組みに加えて、売れると見込む数量と、その見通しが外れた場合の負担も別に示しましょう。",
+    "form": "規模の経済",
+    "en": "Paraphrasing economies of scale in a semiconductor factory as “making more always means profit” confuses cost with profit. It is more accurate to explain specifically that increased output reduces the equipment and design costs allocated to each unit. This explanation holds within limits, however, and factory size alone does not guarantee earnings if insufficient demand leaves products unsold. A proposal to increase output should separately show expected sales volume and the burden if that forecast fails, alongside the mechanism reducing average costs.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "平均費用の低下を指し、利益や販売数量の保証ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "設備投資",
+   "reading": "せつびとうし",
+   "pos": "noun",
+   "meaning": "investment in productive facilities",
+   "defJa": "生産や事業に使う設備を新設・更新するための投資",
+   "passage": {
+    "ja": "検査待ちの半導体が積み上がっているなら、まず検査装置を増やせばいいと思うよね。だけど設備投資を決める前に、装置が足りないのか、前の工程から不良が多く流れてきているのかを切り分けたいんだ。新しい機械を買ったとしても、材料を運ぶ人や結果を確認する人が足りなければ、待ち時間が別の場所へ移るだけということもあるよ。工場の一部分だけを見るより、製品が入ってから出るまでを図にして、どこで止まり、何に費用がかかるかを一緒に追ったほうが話が早いね。",
+    "form": "設備投資",
+    "en": "If semiconductors are piling up waiting for inspection, you might first think of adding inspection equipment. But before deciding on capital investment, I would distinguish a shortage of machines from too many defective items arriving from the previous process. Even after buying a machine, a shortage of people transporting material or checking results may merely move the waiting time elsewhere. Rather than looking at one part of the factory, it is quicker to diagram products from entry to exit and trace stoppages and costs together.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "工場や機械などへの支出で、日々の材料費とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "解釈可能性",
+   "reading": "かいしゃくかのうせい",
+   "pos": "noun",
+   "meaning": "interpretability",
+   "defJa": "機械の判断や出力の意味を人が理解できる度合い",
+   "passage": {
+    "ja": "検査画像に不良という判定が出ても、現場の担当者は結果だけで納得するとは限りません。判断や出力を人が理解できる度合いを表す解釈可能性は、精度とは別に、人工知能を使ううえで問われる性質です。開発者には計算の仕組みが大切でも、利用者にはどの情報を手掛かりに結果を確かめればよいかが重要になる場合があります。もっとも、画像の一部を色で強調しただけで判断の因果関係まで証明されたとは言えず、その表示が何を示すのかも併せて検証します。",
+    "form": "解釈可能性",
+    "en": "Even when an inspection image is classified as defective, a worker may not be satisfied with the result alone. Interpretability, the degree to which people can understand judgments and outputs, is a quality at issue when using AI alongside accuracy. While a developer may care about the computational mechanism, a user may care more about which information helps them check the result. Merely highlighting part of an image in color does not prove a causal explanation of the judgment, so what the display represents must also be tested.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "精度の高さと分けて、人が判断の意味を理解できるかを問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

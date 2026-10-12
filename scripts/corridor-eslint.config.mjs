@@ -14,7 +14,7 @@ const browser = readonly(`window document navigator location history localStorag
   setTimeout clearTimeout setInterval clearInterval requestAnimationFrame cancelAnimationFrame
   queueMicrotask structuredClone addEventListener removeEventListener dispatchEvent atob btoa
   getComputedStyle matchMedia innerWidth innerHeight scrollY devicePixelRatio Image OffscreenCanvas
-  GPUBufferUsage GPUTextureUsage Path2D Storage IDBDatabase IDBObjectStore IDBIndex scrollX`);
+  GPUBufferUsage GPUTextureUsage Path2D DOMMatrixReadOnly Storage IDBDatabase IDBObjectStore IDBIndex scrollX`);
 
 export default [
   ...base,

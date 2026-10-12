@@ -1,0 +1,155 @@
+/* ==========================================================================
+   MIGAKI · Tokens v2 (role names from docs/redesign/FOUNDATION.md)
+   Day = paper in morning light. Night = the 藍 room with the city glowing through.
+   Rooms override roles on body via html[data-room]; the world (palette) never changes.
+   ========================================================================== */
+
+:root {
+  /* --- type --- */
+  --font-display: 'Shippori Mincho B1', "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif;
+  --font-serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif", Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans CJK JP", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, "Noto Sans Mono CJK JP", monospace;
+  --font-hand: 'Yuji Syuku', "Hiragino Mincho ProN", "Noto Serif CJK JP", serif;
+  --font-grade: 'Kaisei Tokumin', 'Shippori Mincho B1', "Noto Serif CJK JP", serif;
+
+  --type-micro: 10.5px;
+  --type-caption: 12px;
+  --type-ui: 15px;
+  --type-body: 16.5px;
+  --type-reading: 19px;
+  --type-ruby: 10.5px;
+  --type-title: 25px;
+  --type-display: 44px;
+  --type-hero: 92px;
+
+  --leading-tight: 1.18;
+  --leading-ui: 1.38;
+  --leading-body: 1.62;
+  --leading-reading: 2.2;
+
+  --weight-regular: 400;
+  --weight-medium: 520;
+  --weight-bold: 650;
+  --weight-display: 800;
+
+  /* --- space (4pt) --- */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 48px; --space-9: 64px;
+  --gutter: 20px;
+  --hair: .5px;
+
+  --radius-hair: 2px;
+  --radius-surface: 6px;
+  --radius-sheet: 14px;
+  --radius-pill: 999px;
+
+  /* --- motion --- */
+  --motion-tick: 90ms;
+  --motion-crisp: 160ms;
+  --motion-settle: 280ms;
+  --motion-breath: 480ms;
+  --motion-ink: 720ms;
+  --motion-ma: 320ms;
+  --motion-ambient: 14s;
+  --ease-crisp: cubic-bezier(.2, .8, .2, 1);
+  --ease-settle: cubic-bezier(.22, 1, .36, 1);
+  --ease-ink: cubic-bezier(.65, 0, .35, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+
+  --tabbar-h: 62px;
+  --nav-clearance: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+}
+
+/* ---------------- DAY (default) ---------------- */
+body {
+  --color-page: #f2ede2;
+  --color-paper: #f9f5ec;
+  --color-paper-2: #ece5d6;
+  --color-ink: #1b1f26;
+  --color-ink-2: #3f4552;
+  --color-ink-3: #596070;
+  --color-ink-4: #8a8f99;          /* decorative only, never text that must be read */
+  --color-line: rgba(31, 58, 95, .26);
+  --color-line-strong: rgba(31, 58, 95, .52);
+  --color-indigo: #1f3a5f;
+  --color-indigo-2: #2b4c78;
+  --color-indigo-wash: rgba(31, 58, 95, .07);
+  --color-vermilion: #b3321f;
+  --color-vermilion-wash: rgba(179, 50, 31, .09);
+  --color-signal: #08737d;          /* 浅葱 asagi by day */
+  --color-signal-glow: rgba(8, 115, 125, .16);
+  --color-gold: #8f6d1f;
+  --color-gold-leaf: #c9a54a;
+  --color-lacquer: #16181e;
+  --color-lacquer-2: #24272f;
+  --color-lacquer-edge: #3a3326;
+  --color-lacquer-ink: #efe9dc;
+  --color-lacquer-ink-2: #b9b4a8;
+  --color-shadow: 40, 30, 16;
+
+  --elevation-1: 0 1px 0 rgba(var(--color-shadow), .07), 0 6px 18px -6px rgba(var(--color-shadow), .14);
+  --elevation-2: 0 1px 0 rgba(var(--color-shadow), .08), 0 14px 34px -10px rgba(var(--color-shadow), .26);
+  --elevation-3: 0 -1px 0 rgba(255, 255, 255, .5) inset, 0 24px 60px -18px rgba(var(--color-shadow), .45);
+
+  --color-card: #faf6ec;
+  --color-card-ink: #1b1f26;
+  --color-card-ink-3: #555c69;
+  --washi-alpha: .3;
+  --grain-alpha: .45;
+}
+
+/* ---------------- NIGHT ---------------- */
+html[data-theme="night"] body {
+  --color-page: #0d1423;
+  --color-paper: #141e33;
+  --color-paper-2: #0a101c;
+  --color-ink: #efe9dc;
+  --color-ink-2: #c6ccd7;
+  --color-ink-3: #a3adbd;
+  --color-ink-4: #5d6a80;
+  --color-line: rgba(150, 180, 225, .2);
+  --color-line-strong: rgba(150, 180, 225, .44);
+  --color-indigo: #9dbbe6;
+  --color-indigo-2: #b6cdef;
+  --color-indigo-wash: rgba(120, 160, 230, .08);
+  --color-vermilion: #ff7461;
+  --color-vermilion-wash: rgba(255, 116, 97, .12);
+  --color-signal: #63f2d9;          /* phosphor, from the 殻 world */
+  --color-signal-glow: rgba(99, 242, 217, .22);
+  --color-gold: #e2bd66;
+  --color-gold-leaf: #e8c873;
+  --color-lacquer: #05080f;
+  --color-lacquer-2: #10172a;
+  --color-lacquer-edge: #2b3b5c;
+  --color-lacquer-ink: #efe9dc;
+  --color-lacquer-ink-2: #a8b2c4;
+  --color-shadow: 0, 0, 0;
+
+  --elevation-1: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 8px 22px -8px rgba(0, 0, 0, .7);
+  --elevation-2: 0 1px 0 rgba(255, 255, 255, .05) inset, 0 18px 40px -12px rgba(0, 0, 0, .8);
+  --elevation-3: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 26px 64px -16px rgba(0, 0, 0, .9);
+
+  --color-card: #e9e1cf;          /* lantern-lit washi: the card stays paper at night */
+  --color-card-ink: #191c22;
+  --color-card-ink-3: #4b515d;
+  --washi-alpha: .22;
+  --grain-alpha: .3;
+}
+
+/* ---------------- ROOMS: material and light within one world ---------------- */
+/* Today: thin washi sky at dawn */
+html[data-room="today"] body { --color-page: #e8eef0; --color-paper: #f4f6f3; }
+html[data-room="today"][data-theme="night"] body { --color-page: #0a1222; --color-paper: #111b30; }
+/* Read: thick kōzo, magazine weight */
+html[data-room="read"] body { --color-page: #f4eee2; --color-paper: #fbf7ee; }
+html[data-room="read"][data-theme="night"] body { --color-page: #101827; --color-paper: #172138; }
+/* Learn: paper ground, lacquer stage, washi card */
+html[data-room="learn"] body { --color-page: #ebe5d8; --color-paper: #faf6ec; }
+html[data-room="learn"][data-theme="night"] body { --color-page: #0b111d; --color-paper: #141d31; }
+/* Words: drafting vellum on a ruled grid */
+html[data-room="words"] body { --color-page: #eef0ec; --color-paper: #f7f8f4; }
+html[data-room="words"][data-theme="night"] body { --color-page: #0a1519; --color-paper: #0f1f25; --color-line: rgba(99, 242, 217, .16); --color-line-strong: rgba(99, 242, 217, .4); }
+/* Me: a bound book in late gold light */
+html[data-room="me"] body { --color-page: #efe6d3; --color-paper: #faf4e6; }
+html[data-room="me"][data-theme="night"] body { --color-page: #12131f; --color-paper: #1b1c2b; }

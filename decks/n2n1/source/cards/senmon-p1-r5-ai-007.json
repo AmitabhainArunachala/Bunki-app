@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "AI半導体",
+   "reading": "えーあいはんどうたい",
+   "pos": "noun",
+   "meaning": "AI chip",
+   "defJa": "人工知能の計算を効率よく行うための集積回路",
+   "passage": {
+    "ja": "製品名に人工知能という言葉が付いていると、同じ種類の仕事をする部品だと思いがちです。けれども、AI半導体と呼ばれるものでも、学習向けか実行向けか、扱う計算や使える電力の条件によって、設計の重点は変わります。性能表を読む練習では、速さの数字に加えて、どんな処理をどの精度で行ったかを横に書き添えると、比較の前提がそろいます。まず一つの利用場面を決め、必要な仕事から部品の特徴へ戻って考えると、名前の新しさと実際の適性を別々に評価できます。",
+    "form": "AI半導体",
+    "en": "A product name containing artificial intelligence can make different chips sound as though they perform the same work. Yet AI chips emphasize different designs depending on training versus inference, the computations involved, and available power. When practicing reading performance tables, noting the workload and numerical precision alongside speed makes the comparison assumptions consistent. Starting with a particular use case and working backward from its requirements to component characteristics separates novelty of naming from practical suitability.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "名称だけで判断せず、得意な計算を確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "エッチング",
+   "reading": "えっちんぐ",
+   "pos": "noun",
+   "meaning": "etching",
+   "defJa": "薬液や気体などで材料の不要な部分を除く加工",
+   "passage": {
+    "ja": "半導体の製造では、光で模様を写すだけで必要な立体構造が完成するわけではない。エッチングは、保護された部分を残しながら不要な材料を取り除き、溝や穴などの形を作る工程に使われる。加工を進める際には、どの材料をどれだけ除くかに加えて、横方向へ広がり過ぎないか、下の層へ影響しないかといった条件も管理する。完成した寸法の小ささだけに注目すると見落とされるが、残す部分を傷めずに除く部分を選ぶ精度が、回路の働きを支える。",
+    "form": "エッチング",
+    "en": "Semiconductor manufacturing does not produce the necessary three-dimensional structure merely by transferring a pattern with light. Etching removes unwanted material while leaving protected areas, forming features such as trenches and holes. Processing controls not only which material and how much to remove but also excessive sideways spread and effects on underlying layers. Focusing only on the small finished dimensions can obscure how selectively removing material without damaging what remains supports circuit operation.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "模様を写す段階と、材料を取り除く段階を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "開口数",
+   "reading": "かいこうすう",
+   "pos": "noun",
+   "meaning": "numerical aperture (NA)",
+   "defJa": "光学系が取り込める光の角度などを表す尺度",
+   "passage": {
+    "ja": "半導体に細かな模様を写すには、使う光の波長を短くする方法だけがあるのでしょうか。光学系がどの範囲から光を取り込めるかに関わる開口数も、細部を見分ける能力を左右する大切な尺度です。他の条件が同じなら、この値を大きくすることでより細かい模様を扱えますが、そのぶん装置の光学系や加工の条件にも工夫が要ります。二つの装置を比べるにあたっては、波長とこの値を別々の欄に置くと、同じ光を使いながら性能を変える技術の意味を整理できます。",
+    "form": "開口数",
+    "en": "Is shortening the wavelength the only way to transfer finer patterns onto a semiconductor? Numerical aperture, related to the range of angles from which an optical system gathers light, is another important measure affecting its ability to distinguish detail. Other conditions being equal, increasing it enables finer patterns but requires changes to the optics and processing conditions. Placing wavelength and aperture in separate columns when comparing machines clarifies how technology can change performance while using the same light.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "光の波長と並び、細部を写す能力に関わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ウエハー",
+   "reading": "うえはー",
+   "pos": "noun",
+   "meaning": "wafer",
+   "defJa": "半導体の回路を作る土台となる薄い円板",
+   "passage": {
+    "ja": "完成したチップは小さな四角形でも、製造の出発点には薄い円板のウエハーが使われます。その表面で多数の回路をまとめて作り、後から個々のチップへ切り分けるので、一枚のどこに不良が現れたかが工程を調べる手がかりになります。端に近い場所と中央で結果が違うとしたら、材料だけでなく、加工の条件が面の上でどう変わったかも検討することになります。一枚の板を単なる入れ物と見るより、回路を同時に作る場として捉えると、良品率と製造条件の関係を具体的に想像できます。",
+    "form": "ウエハー",
+    "en": "Although finished chips are small rectangles, manufacturing starts with a thin disk called a wafer. Many circuits are made together on its surface and later separated into chips, so the locations of defects provide clues about processing. If results differ between the edge and center, investigation considers not only the material but also how processing conditions varied across the surface. Seeing the disk as a place where circuits are made simultaneously rather than merely a container makes the relationship between yield and manufacturing conditions easier to imagine.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一枚から多数のチップを作る工程の単位を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "AIエージェント",
+   "reading": "えーあいえーじぇんと",
+   "pos": "noun",
+   "meaning": "AI agent",
+   "defJa": "目標に沿って道具を使い複数の作業を進める仕組み",
+   "passage": {
+    "ja": "質問に答えるだけでなく、予定を調べて作業の順序を決める仕組みを想像してみて。AIエージェントは、与えられた目標に沿って道具を使い、途中の結果を見ながら次の操作へ進む仕組みとして語られることが多いんだ。ただし、任せる範囲が広がるほど、間違った返答だけでなく、外の情報を書き換えるような行動の影響も考えたいよね。だから実際に使うときは、何を読めるかと何を変更できるかを分けて決めると、どこまで自動で進める設計なのかが具体的になるよ。",
+    "form": "AIエージェント",
+    "en": "Imagine a system that not only answers questions but checks schedules and decides the order of tasks. An AI agent is often described as using tools toward an assigned goal and selecting subsequent operations based on intermediate results. As its remit expands, one must consider not only incorrect responses but also the effects of actions such as changing external information. Separately defining what it can read and what it can modify makes the intended scope of automation concrete.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "文章を返すだけの場合と、外部に作用する場合を分ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

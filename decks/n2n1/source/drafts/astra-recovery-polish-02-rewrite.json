@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "頭",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "counter for large animals",
+   "defJa": "牛や馬などを数える語。",
+   "passage": {
+    "ja": "牧場の日記に牛が三頭生まれたとあれば、数え方だけでも大きな動物のいる場面が浮かびます。小さい生き物によく使う匹とは、語から受ける印象も少し異なります。ただし、生まれたばかりの牛にも同じ単位を使うので、その場の体の重量だけでは使い分けを説明しきれません。文章を声に出すにあたっては、何を数える単位なのかに加えて、数字に続くときの読みも確認します。知っている漢字が並んでいても、まとまりとして発音できるかを確かめる時間が要ります。",
+    "form": "頭",
+    "en": "If a farm diary says that three calves were born, the counter itself evokes a setting with large animals. Its impression differs somewhat from hiki, which is often used for smaller creatures. Yet the same counter applies to a newborn calf, so the weight of the body in front of us cannot fully explain the choice. When reading a passage aloud, check not only what the unit counts but also how it is pronounced after a numeral. Even if the characters are individually familiar, you need time to verify that you can pronounce the combination.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "ここでは「とう」と読み、牛などの動物を数える助数詞です。",
+    "sense": "牛や馬などを数える助数詞。"
+   }
+  }
+ ]
+}

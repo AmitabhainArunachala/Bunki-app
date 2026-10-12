@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "pos": "noun",
+   "meaning": "backpropagation",
+   "defJa": "出力側から各変数の誤差への影響を計算する方法",
+   "passage": {
+    "ja": "画像を分類する模型が答えを外したとき、内部のどの数値を動かせば誤りが減るのでしょうか。誤差逆伝播法は、出力から入力側へと計算をさかのぼり、各段階の数値が損失にどう影響するかを求める方法です。求めた情報をもとに数値を更新しますが、一度の変更で必ず正しい分類になるわけではなく、学習には多くの例と繰り返しが関わります。単に間違いを後ろへ送ると覚えるより、計算の途中にある小さな変化が最後の結果へどう響くかを、つないで調べる仕組みとして捉えてみましょう。",
+    "form": "誤差逆伝播法",
+    "en": "When an image-classification model makes a mistake, which internal values should change to reduce it? Backpropagation works backward from the output toward the input to determine how values at each stage affect the loss. That information guides updates, but one change does not necessarily produce the correct classification, and learning involves many examples and repetitions. Rather than memorizing it as sending errors backward, understand it as tracing how small changes along a computation connect to the final result.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "誤りそのものを逆向きに流す比喩とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "説明可能性",
+   "reading": "せつめいかのうせい",
+   "pos": "noun",
+   "meaning": "explainability",
+   "defJa": "判断や出力の根拠を人が理解できる性質",
+   "passage": {
+    "ja": "融資の判断に機械学習を使う場合、結果の正しさに加えて、なぜその結果になったかを示すことが課題となる。説明可能性を高める手法には、判断に影響した特徴を示すものなどがあるが、表示が分かりやすければ十分ということではない。人が納得する筋書きを後から作れても、それが実際の計算を忠実に表しているとは限らないためだ。運用を検証する際には、誰に何を伝える説明なのかを定め、利用者の理解しやすさと、仕組みの根拠に照らした正確さを合わせて確かめる。",
+    "form": "説明可能性",
+    "en": "When machine learning is used for lending decisions, showing why a result arose becomes an issue alongside its accuracy. Methods for increasing explainability include identifying influential features, but an easily understood display alone is insufficient. A persuasive story constructed afterward does not necessarily represent the actual computation faithfully. Operational evaluation therefore specifies whom the explanation serves and what it communicates, checking both accessibility and fidelity to the mechanism.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "もっともらしい説明と、実際の処理の根拠を分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "課題設定",
+   "reading": "かだいせってい",
+   "pos": "noun",
+   "meaning": "problem setting, framing the task",
+   "defJa": "何を解くべき問題とするかを定めること",
+   "passage": {
+    "ja": "問い合わせへの返答を速くするために、すぐ対話型の人工知能を導入するという発想がある。だが、質問が増えた原因が説明書の分かりにくさにあるなら、課題設定を返答速度だけに絞った時点で、解決の道を狭めている。道具の性能を比較するに先立って、利用者がどこで迷い、どの状態になれば困り事が減ったと言えるかを定めたい。計算機に解かせる問いを上手に書くことは、欲しい答えを先に決めて誘導することではなく、現場で起きている問題の輪郭を確かめる仕事である。",
+    "form": "課題設定",
+    "en": "One instinct is to introduce conversational AI immediately to speed up replies to inquiries. But if confusing instructions caused the increase in questions, defining the problem solely in terms of response speed has already narrowed the path to a solution. Before comparing tools, identify where users become confused and what state would indicate that their difficulty has diminished. Writing a good problem for a computer to solve is not steering it toward a predetermined answer but clarifying the problem occurring in practice.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "手段を選ぶ前に、解決したい状態を明確にする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "費用対効果",
+   "reading": "ひようたいこうか",
+   "pos": "noun",
+   "meaning": "cost-effectiveness",
+   "defJa": "投入した金や手間に対して得られる成果の程度",
+   "passage": {
+    "ja": "人工知能の道具って、月額料金だけ比べると、安いほうを選べば得だと思いやすいよね。でも、出てきた答えの確認に何時間もかかるなら、費用対効果を考えるうえで、その人の手間も抜きにはできないんだ。反対に、少し高い道具でも、担当者が繰り返していた作業を減らせるなら、全体としては負担が軽くなる場合もある。まず試す仕事の範囲を決めて、使う前と後で時間と品質を同じ基準で記録すると、安いか高いかという印象だけでは見えなかった違いを比べられるよ。",
+    "form": "費用対効果",
+    "en": "Comparing only monthly subscription prices for AI tools makes the cheaper option seem like the better deal. But if checking the output takes hours, that human effort cannot be excluded from cost-effectiveness. Conversely, a somewhat more expensive tool may reduce the overall burden if it eliminates repetitive work. Defining a trial task and recording time and quality consistently before and after use allows comparison of differences that impressions of cheapness or expense miss.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "値段だけでなく、導入後の仕事も費用に数える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "資本集約的",
+   "reading": "しほんしゅうやくてき",
+   "pos": "na-adj",
+   "meaning": "capital-intensive",
+   "defJa": "事業に多額の設備や資金を必要とするさま",
+   "passage": {
+    "ja": "半導体工場の経営を学ぶなら、売上と人件費の二つだけで計算を終えないようにしましょう。製造装置や建物に巨額の資金を先に投じる資本集約的な事業では、工場が動き始める前から多くのお金が必要です。注文が減っても設備の費用がすぐ消えるとは限らないため、生産量に伴って増減する支出と、短期には減らしにくい支出を分けて表にします。この区別を付けたうえで稼働率を変えて計算すると、同じ製品を作る工場でも、設備の使われ方で採算が大きく動く理由を追えます。",
+    "form": "資本集約的",
+    "en": "When studying semiconductor factory management, do not finish the calculation after considering only sales and wages. A capital-intensive business that invests heavily in equipment and buildings requires substantial funds before production starts. Because equipment costs do not immediately disappear when orders decline, separate expenses that vary with output from those difficult to reduce in the short term. Changing utilization in a calculation built on that distinction reveals why profitability can vary greatly with equipment use even at factories making the same product.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "人件費の多さとは別の軸で、産業の特徴を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "起死回生",
+   "reading": "きしかいせい",
+   "pos": "noun",
+   "meaning": "dramatic revival",
+   "defJa": "絶望的な状況から立ち直ること",
+   "passage": {
+    "ja": "赤字の半導体企業が新製品を発表した記事で、起死回生の一手と書けば、読み手は大きな逆転を期待します。けれども、発表した段階では量産の準備も販売の結果も分からないとしたら、その表現は出来事より先へ走っています。「再建を目指す新製品」と直せば、会社の狙いを伝えつつ、成功が決まったかのような響きを抑えられます。見出しの勢いを生かすにしても、危機からどこまで回復したのかを本文の数字と照らし、期待を示す語と実績を述べる語を使い分けたいところです。",
+    "form": "起死回生",
+    "en": "Calling a loss-making semiconductor company's newly announced product a comeback move makes readers expect a dramatic reversal. Yet if neither production readiness nor sales results are known at the announcement, the wording runs ahead of events. Changing it to “a new product intended to support recovery” conveys the company's aim without sounding as though success is settled. Even when preserving a forceful headline, compare the extent of recovery with the figures in the article and distinguish words of expectation from descriptions of results.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "危機の深さと、その後の回復を確かめて使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "起爆剤",
+   "reading": "きばくざい",
+   "pos": "noun",
+   "meaning": "catalyst, trigger",
+   "defJa": "大きな変化を引き起こすきっかけとなるもの",
+   "passage": {
+    "ja": "新しい計算技術が登場しても、それだけで産業全体の仕事が変わるとは限りません。利用しやすい道具や教材がそろうことが普及の起爆剤となり、それまで試せなかった人まで手を動かし始める場合があります。ここで注目したいのは、元の技術が同じであっても、周囲の条件が変わることで使う人と用途が増える点です。人工知能の広がりを振り返るときも、性能が上がった瞬間だけでなく、誰がどの手間から解放され、新たな試みを始められたのかをたどると、変化の入口が見つかります。",
+    "form": "起爆剤",
+    "en": "The emergence of a new computing technology does not by itself transform work across an industry. Accessible tools and teaching materials can act as a catalyst for adoption, allowing people who previously could not experiment to begin. The point is that even with the underlying technology unchanged, altered surrounding conditions can broaden its users and applications. Looking back at the spread of AI, tracing who was freed from which obstacles and could begin new experiments reveals entry points of change beyond moments of improved performance.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "比喩では、変化の始まりを促す働きを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "超知能",
+   "reading": "ちょうちのう",
+   "pos": "noun",
+   "meaning": "superintelligence",
+   "defJa": "人間を広く上回る知的能力を持つと仮定される存在",
+   "passage": {
+    "ja": "特定の試験で人工知能が人間を上回ったという結果から、あらゆる知的活動で人間を超えたとは言えない。超知能は、幅広い領域で人間の能力を大きく超える存在を想定する議論に使われる概念であり、個別の高得点とは区別される。将来の可能性を検討するにしても、どの能力をどの条件で比べるのかを明示しなければ、予測を評価する足場が定まらない。安全性をめぐる論点も、その存在や到来時期が確定したという前提に置かず、仮定と観測済みの事実を分けて整理される。",
+    "form": "超知能",
+    "en": "AI outperforming humans on a particular test does not establish superiority across all intellectual activity. Superintelligence is a concept used in discussions positing an entity whose capabilities greatly exceed humans' across broad domains, distinct from an isolated high score. Even discussion of future possibilities needs explicit abilities and comparison conditions to provide a basis for evaluating predictions. Safety issues likewise should be organized by distinguishing assumptions from observed facts rather than presuming that such an entity or its arrival date is established.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "実在が確認された能力と、仮定の概念を分ける。",
+    "sense": ""
+   }
+  }
+ ]
+}

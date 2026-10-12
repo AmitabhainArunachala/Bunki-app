@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "察し",
+   "reading": "さっし",
+   "pos": "noun",
+   "meaning": "perceptiveness; understanding",
+   "defJa": "言わなくても相手の気持ちをくみ取る力",
+   "passage": {
+    "ja": "話し上手な人ほど、相手の沈黙にじっと耳を澄ませている。常套句で間を埋めず、表情の揺れや声の調子を見ながら、足りない部分を自分の察しで補うのである。とはいえ、思い込みで先走れば、かえって誤解を招きかねない。だから最後に、短い確認の一言を添えて、相手に訂正する余地を残しておく。聞き上手は大器晩成で、失敗を含めた場数を踏むほど、静かに、しかし確実に磨かれていくものだ。",
+    "form": "察し",
+    "en": "The best talkers listen closely to the other person's silence. They do not fill the gap with clichés, but watch the flicker of an expression and the tone of voice, and fill in what is missing with their own perceptiveness. Still, rushing ahead on assumptions could instead cause a misunderstanding. So at the end they add one short word of confirmation, leaving the other person room to correct them. Good listeners are late bloomers, quietly but surely polished the more experience, failures included, they gather.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「察しがいい・察しが悪い」の形で、相手の気持ちを読む力を表す。話し方の技術に欠かせない語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "寡占",
+   "reading": "かせん",
+   "pos": "noun",
+   "meaning": "oligopoly",
+   "defJa": "少数の企業が市場の大部分を支配すること",
+   "passage": {
+    "ja": "世界史の論述問題で寡占という語が出たら、まず「少数の企業が市場の大半を握る状態」と一行で定義しよう。19世紀末のアメリカでは、石油や鉄道の分野で巨大企業が競争を圧倒し、独占を規制する法律の制定をきっかけに、議論が全国へ広がった。定義と具体例をセットで書けば、採点者にも伝わりやすい。用語だけを並べても点にならないので、帝国主義の背景とあわせて覚えるのがコツだ。",
+    "form": "寡占",
+    "en": "When the word oligopoly turns up in a world history essay question, first define it in one line as a state in which a few companies hold most of the market. In late nineteenth-century America, giant firms overwhelmed competition in fields such as oil and railroads, and after a law was passed to regulate monopolies, the debate spread across the country. If you write the definition together with concrete examples, the grader will understand you easily. Listing terms alone earns no points, so the trick is to memorize it together with the background of imperialism.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「市場を寡占する」「寡占状態」が基本の組み合わせ。「独占」より少数の複数企業を指す点に注意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "寡黙",
+   "reading": "かもく",
+   "pos": "na-adj",
+   "meaning": "taciturn",
+   "defJa": "口数が少なく、あまりしゃべらないさま",
+   "passage": {
+    "ja": "小論文の面接練習で寡黙な受験生を見ると、つい準備不足だと決めつけたくなる。しかし話す量が少ないだけで、頭の中では答えを何度も磨いている場合が多く、考え抜いた人ほど口が重くなることさえある。とはいえ、本番で沈黙が三秒を超えると、どうしても不安げに見えてしまう。そこで、結論を一文で言い切り、理由を二つ添える型を身につけておこう。型さえあれば、口数の少ない人でも十分に戦えるし、緊張も和らぐ。",
+    "form": "寡黙",
+    "en": "Seeing a taciturn candidate in interview practice for the short essay exam, you are tempted to conclude he is underprepared. But often he simply speaks little while polishing his answers again and again in his head, and the more he has thought things through, the heavier his tongue may become. Even so, once silence exceeds three seconds in the real thing, he inevitably looks anxious. So let us master a template of stating the conclusion in one sentence and adding two reasons. With a template, even a person of few words can hold his own, and the nerves ease too.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「寡黙な人」の形で性格を表す。「無口」より落ち着いた、肯定的な響きがある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対句",
+   "reading": "ついく",
+   "pos": "noun",
+   "meaning": "parallel couplet",
+   "defJa": "形のそろった二つの句を並べる表現",
+   "passage": {
+    "ja": "「山高く、谷深し」のように、同じ形の句を二つ並べるのが対句である。古典の漢詩から現代の広告コピーまで、この型は千年以上も使われ続けてきた。人前で話すときにこの技を使うと、言葉に拍子が生まれて、聞き手の記憶にも自然と残りやすい。ただし、凝りすぎれば芝居がかった印象を与えかねないし、連発すると拍子が耳障りな癖に変わってしまう。要所に一度だけ、しかも平易な言葉で使うのがいちばん効く。",
+    "form": "対句",
+    "en": "A parallel couplet is a pair of phrases of the same form set side by side, like a phrase pairing tall mountains with deep valleys. From classical Chinese poetry to modern advertising copy, this pattern has been used for more than a thousand years. When you use this technique in public speaking, your words gain a rhythm and naturally stay in the listener's memory. However, if you overdo it, you may well give a theatrical impression, and repeated use turns the rhythm into a grating habit. It works best used once at a key point, and in plain words.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「対句を用いる・対句をなす」の形で使う。話し方でも文章でも、リズムを生む修辞法。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対峙",
+   "reading": "たいじ",
+   "pos": "verb",
+   "meaning": "confront; face off",
+   "defJa": "向かい合って、互いに譲らず立つこと",
+   "passage": {
+    "ja": "1962年10月、アメリカとソ連は核戦争の瀬戸際で対峙した。キューバに配備されたミサイルをめぐって、両首脳は十三日間、互いに一歩も引けない状況に置かれた。大陸国家ソ連にとって、これは封じ込め政策の包囲網を破る大胆な賭けでもあった。結局、ソ連がミサイルを撤去し、アメリカもトルコの基地の件を密かに約束して決着した。緊迫した交渉の最中にも対話の窓口が閉じなかったことが、世界を救ったのである。",
+    "form": "対峙",
+    "en": "In October 1962, America and the Soviet Union faced off on the brink of nuclear war. Over the missiles deployed in Cuba, the two leaders were placed for thirteen days in a situation where neither could give an inch. For the continental power of the Soviet Union, it was also a bold gamble to break through the ring of the containment policy. In the end the Soviets withdrew the missiles, and America secretly promised something about its bases in Turkey, settling the matter. That the channel of dialogue never closed even in the midst of tense negotiations is what saved the world.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「〜と対峙する」の形で、強い相手や大きな問題に正面から向き合う意味を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対照群",
+   "reading": "たいしょうぐん",
+   "pos": "noun",
+   "meaning": "control group",
+   "defJa": "実験で、比べる基準にする何もしない集団",
+   "passage": {
+    "ja": "新しい勉強法の効果を確かめるとき、研究者は必ず対照群を用意します。たとえば一方の学生には復習テストを受けさせ、もう一方にはただ教科書を読み直してもらって、一週間後の成績を比べるのです。比べる相手がいなければ、成績が上がったのが勉強法のおかげなのか、単に時間がたって慣れただけなのか区別できません。この仕組みがあればこそ、テストによる記憶の強化という主張にも説得力が生まれるのです。",
+    "form": "対照群",
+    "en": "When checking the effect of a new study method, researchers always prepare a control group. For example, one group of students takes a review test, while the other simply rereads the textbook, and their scores a week later are compared. Without someone to compare against, you cannot tell whether the scores rose thanks to the method or merely because time passed and students grew used to the material. It is precisely because of this mechanism that the claim of memory strengthening through testing gains persuasive force.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「対照群をおく・対照群と比較する」の形で使う。実験群と対になる語で、研究の説明に頻出する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対照言語学",
+   "reading": "たいしょうげんごがく",
+   "pos": "noun",
+   "meaning": "contrastive linguistics",
+   "defJa": "二つ以上の言語を比べて違いを調べる学問",
+   "passage": {
+    "ja": "日本語と韓国語、あるいは日本語と英語を並べて違いを調べる対照言語学が、外国語教育の現場で見直されつつある。学習者がつまずく箇所を、母語との差から予測できるからだ。たとえば外来語の発音が苦手な人の母語を調べれば、教材の改良に直接役立てられる。助詞の使い分けも、母語に似た仕組みがあるかどうかで難しさが変わる。ただし、差異だけに目を向けると、共通点という大きな資源を見落としかねない。",
+    "form": "対照言語学",
+    "en": "Contrastive linguistics, which compares Japanese with Korean or with English to study their differences, is being reconsidered in foreign-language teaching. This is because the spots where learners stumble can be predicted from the differences with their native language. For instance, examining the native language of people who struggle with the pronunciation of loanwords can feed directly into improving materials. The difficulty of using particles correctly also changes depending on whether the learner's mother tongue has a similar mechanism. However, if one looks only at differences, one may overlook the great resource of what the languages share.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「対照言語学的な研究」のように形容的にも使う。比べて違いを明らかにする分野名。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対義語",
+   "reading": "たいぎご",
+   "pos": "noun",
+   "meaning": "antonym",
+   "defJa": "意味が反対になっている言葉",
+   "passage": {
+    "ja": "国語の授業で「対義語を書きなさい」と言われると、「大きい」の反対はすぐ「小さい」と書けるのに、「寛容」の反対となると手が止まる人は多いでしょう。実は、反対の語は一つに決まらないことが少なくありません。「寛容」に対しては、「厳格」も「狭量」も入り得るのです。大切なのは、どの側面を反対にするのかを自分で決めることです。多義語ほどこの傾向は強く、辞書の例文から確かめるのが近道です。",
+    "form": "対義語",
+    "en": "When told in Japanese class to write an antonym, many people can instantly write small as the opposite of big, yet freeze when it comes to the opposite of tolerant. In fact, the opposite of a word is often not a single choice. For tolerant, both strict and narrow-minded can fit. What matters is deciding for yourself which aspect you are reversing. The tendency is stronger with polysemous words, and checking against dictionary example sentences is the shortcut.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜の対義語は…」と問う形が基本。対義語は文脈や側面によって複数ありうる点も覚えておく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "封じ込め政策",
+   "reading": "ふうじこめせいさく",
+   "pos": "noun",
+   "meaning": "containment policy",
+   "defJa": "相手の勢力が広がらないよう抑える外交方針",
+   "passage": {
+    "ja": "冷戦の初期、1947年に、アメリカはソ連の勢力拡大を抑えるため、トルーマン大統領のもとで封じ込め政策を外交の柱に据えた。軍事力で押し返すのではなく、経済援助と同盟網によって相手の広がりを止めようとした点に特徴がある。マーシャル・プランをはじめ、西ヨーロッパの国々との軍事同盟は、その具体的な表れだった。もっとも、この考え方が後にベトナム戦争の泥沼を招いたとする批判も、研究者の間では根強い。",
+    "form": "封じ込め政策",
+    "en": "In the early Cold War, in 1947, America under President Truman made the containment policy a pillar of its diplomacy in order to check the expansion of Soviet power. Its distinguishing feature was that it sought to halt the other side's spread through economic aid and a network of alliances, rather than pushing back with military force. The Marshall Plan, among others, and the military alliance with Western European countries were concrete expressions of it. That said, there is also deep-rooted criticism among researchers that this way of thinking later led into the quagmire of the Vietnam War.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「封じ込め政策をとる・打ち出す」の形で使う。冷戦期の米国外交を語るときの基本語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "封建制",
+   "reading": "ほうけんせい",
+   "pos": "noun",
+   "meaning": "feudalism",
+   "defJa": "土地を介した主従関係でなりたつ社会の仕組み",
+   "passage": {
+    "ja": "世界史の記述問題で封建制を説明するときは、「土地を媒介にした主従関係」という軸を外さないことが大切だ。中世ヨーロッパでは、君主が家臣に土地を与える代わりに、軍事的な奉仕を求めた。日本の鎌倉幕府も、御恩と奉公という似た仕組みで成り立っていた。ただし、同じ言葉でくくれるからといって、中身まで同じとは限らない。農民が年貢を納める形も違うので、比較する際は土地の所有のあり方に注目するとよい。",
+    "form": "封建制",
+    "en": "When explaining feudalism in a world history written question, it is important not to lose the axis of a master-vassal relationship mediated by land. In medieval Europe, a ruler gave land to vassals in exchange for demanding military service. Japan's Kamakura shogunate likewise rested on a similar mechanism of favor and service. However, just because the two can be bundled under the same word does not mean the contents are the same. The way peasants paid land tax also differed, so when comparing, it is good to focus on how land was held.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「封建制度」とも言う。「〜からといって」の前後で、似て見える制度の違いを論じる型に使える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "専制",
+   "reading": "せんせい",
+   "pos": "noun",
+   "meaning": "despotism, autocracy",
+   "defJa": "一人が思いのままに政治を行うこと",
+   "passage": {
+    "ja": "ルイ14世は「朕は国家なり」と言ったとされますが、実はこの言葉は後世の創作だという見方が有力です。それでも、彼の時代のフランスが専制の典型と呼ばれるのは、三部会を開かず、貴族の力も宮廷に取り込んで抑えたからです。ヴェルサイユ宮殿は、その権力を見せつける巨大な舞台でした。しかし巨額の戦費と宮廷の浪費は財政を圧迫し、後の王は増税せざるを得なくなり、やがて市民革命の土壌が育っていきます。",
+    "form": "専制",
+    "en": "Louis XIV is said to have declared 'I am the state,' but the view that this phrase is actually a later invention is strong. Even so, the France of his day is called a model of despotism because he did not convene the Estates General and absorbed the nobility into his court to curb its power. The Palace of Versailles was an enormous stage for displaying that power. But the huge sums spent on war and the court's extravagance strained the finances, later kings were forced to raise taxes, and gradually the soil for a civil revolution grew.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「専制政治」「専制的」の形が多い。一人の支配者が法に縛られず決める政治を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "専制君主",
+   "reading": "せんせいくんしゅ",
+   "pos": "noun",
+   "meaning": "despot; autocrat",
+   "defJa": "政治の権力を一人で握っている王",
+   "passage": {
+    "ja": "専制君主と聞くと、一人の王が思いのままに国を動かす姿を思い浮かべがちだが、現実はもう少し複雑である。帝政ロシアのピョートル1世は、改革を強引に進めたことで知られるが、彼ですら貴族や軍の協力なしには何も動かせなかった。絶対的な権力といえども、それを支える人々の了解の上に成り立っている。近年の研究は、君主の個性よりも、官僚制や徴税の仕組みに光を当てる傾向にある。",
+    "form": "専制君主",
+    "en": "Hearing the word despot, we tend to picture a single king moving the country at will, but reality is somewhat more complex. Peter the Great of imperial Russia is known for pushing reforms through by force, yet even he could move nothing without the cooperation of the nobles and the army. Even absolute power rests on the tacit consent of the people who support it. Recent research tends to shine its light on bureaucracy and the machinery of taxation rather than on the monarch's personality.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「〜ですら」「〜といえども」と組み合わせ、権力の限界を論じる文脈でよく使われる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "専門用語",
+   "reading": "せんもんようご",
+   "pos": "noun",
+   "meaning": "technical term",
+   "defJa": "ある分野でだけ使われる特別な言葉",
+   "passage": {
+    "ja": "大学院のゼミや授業を聞いていると、最初は専門用語の多さに圧倒され、辞書に頼らざるを得ない。ところが、関連する論文を十本も読むうちに、同じ語が何度も同じ文脈で現れることに気づく。そうなれば、意味を一語ずつ引くより、用例から輪郭をつかむほうが速い。一見すると遠回りだが、多読こそが、実は最短の道なのだ。最初の百語を越えれば、あとは雪だるま式に、読むたびに語彙が増えていく。",
+    "form": "専門用語",
+    "en": "Listening to graduate classes, at first you are overwhelmed by the sheer number of technical terms and have no choice but to rely on the dictionary. But after reading about ten papers, you notice the same words appearing again and again in the same contexts. Then, grasping the outline from usage examples is faster than looking up meanings one word at a time. It looks like a detour at first glance, but extensive reading is the shortest path. Once you get past the first hundred words, your vocabulary snowballs from there.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「専門用語を使う・避ける・かみ砕く」の形で使う。分野の言葉を指す基本語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "小作人",
+   "reading": "こさくにん",
+   "pos": "noun",
+   "meaning": "tenant farmer",
+   "defJa": "地主から土地を借りて耕す農民",
+   "passage": {
+    "ja": "明治の日本では、耕地の半分近くが小作地で、地主から田畑を借りて耕す小作人が、村のあちこちに暮らしていました。収穫の半分ほどを年貢のように現物で納めたため、凶作の年には家族の食べるものにすら困ったと言います。第二次世界大戦後、占領下で進められた農地改革によって、多くの農民が自分の名義の土地を手にしました。この改革が、戦後日本の中間層を厚くした大きな土台の一つだと評価されています。",
+    "form": "小作人",
+    "en": "In Meiji Japan, nearly half of the cultivated land was tenant land, and tenant farmers who rented and tilled fields from landlords were found all over the villages. They paid about half their harvest in kind, like a land tax, so in years of poor harvest they are said to have struggled even to find food. After the Second World War, the land reform carried out under the Occupation gave many farmers land of their own. This reform is regarded as one of the foundations that thickened the middle class of postwar Japan.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「小作人と地主」の対で出る。農地改革の説明に欠かせない語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "小論文",
+   "reading": "しょうろんぶん",
+   "pos": "noun",
+   "meaning": "short essay",
+   "defJa": "決められた題で意見を短くまとめる文章",
+   "passage": {
+    "ja": "小論文の試験でいちばん多い失敗は、書きたいことを一つ残らず全部詰め込んでしまうことだ。八百字という制限の中では、主張は一つ、根拠は二つか三つに絞ったほうが説得力が出る。構成は、序論で問いを示し、本論で理由を述べ、結論で主張を言い直す形が基本になる。具体例を一つ挟むと、抽象的な主張にも血が通う。書き終えたら、最後の五分で声に出して読み返す時間を残しておくに越したことはない。",
+    "form": "小論文",
+    "en": "The most common failure in a short essay exam is cramming in everything you want to write. Within a limit of eight hundred characters, narrowing it to one claim and two grounds gives more persuasive force. The basic structure is to pose the question in the introduction, state reasons in the body, and restate the claim in the conclusion. Slipping in a single concrete example brings an abstract claim to life. After finishing, it is best to leave the last five minutes to read it back aloud.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「小論文を書く・小論文対策」の形。入試や就職試験で出る、短い意見文を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "少数民族",
+   "reading": "しょうすうみんぞく",
+   "pos": "noun",
+   "meaning": "ethnic minority",
+   "defJa": "国の中で人口が少ない民族",
+   "passage": {
+    "ja": "中国には、人口の大半を占める漢族のほかに、五十五の少数民族が政府によって公式に認められている。チワン族やウイグル族をはじめ、それぞれが固有の言語や習慣、衣装や祭りを保ち、政府は地域ごとに自治区を設けてきた。もっとも、自治の実態をめぐっては、国内外で立場によって評価が大きく分かれている。多民族国家の統合と文化の保護をどう両立させるかは、今なお難しい課題である。",
+    "form": "少数民族",
+    "en": "In China, besides the Han who make up most of the population, fifty-five ethnic minorities are officially recognized by the government. Starting with the Zhuang and the Uyghur, each keeps its own language, customs, costumes and festivals, and the government has established autonomous regions by area. That said, evaluations of the reality of that autonomy are sharply divided at home and abroad depending on one's position. How to reconcile the integration of a multiethnic state with the protection of culture remains a difficult problem to this day.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「少数民族の言語・権利」の形で、国家と文化の問題を扱う報道に頻出する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "屈折語",
+   "reading": "くっせつご",
+   "pos": "noun",
+   "meaning": "inflectional language",
+   "defJa": "語尾などが変わって文法の役割を示す言語",
+   "passage": {
+    "ja": "ラテン語やロシア語のように、語の形そのものが変わって文法上の役割を示す言語を屈折語といいます。ラテン語では、名詞の語尾が変わるだけで「主語」か「目的語」かがわかるので、語順をかなり自由に動かせました。ロシア語の名詞は六つの格で形を変え、それだけで文中の役割が決まります。一方、日本語は助詞をつなげて役割を示す膠着語に分類されます。この違いを知っておくと、外国語を学ぶ際に何に注意すべきかが見えてきます。",
+    "form": "屈折語",
+    "en": "A language like Latin or Russian, in which the form of the word itself changes to show its grammatical role, is called an inflectional language. In Latin, you could tell subject from object merely by a change in a noun's ending, so word order could be moved around quite freely. Russian nouns change form across six cases, and that alone settles their role in the sentence. Japanese, by contrast, is classified as an agglutinative language that attaches particles to show roles. Knowing this difference lets you see what to watch for when studying a foreign language.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜を屈折語という」と定義する形で出る。膠着語・孤立語と並べて覚える分類名。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "属国",
+   "reading": "ぞっこく",
+   "pos": "noun",
+   "meaning": "vassal state",
+   "defJa": "他の国の支配や保護を受けている国",
+   "passage": {
+    "ja": "古代の東アジアでは、大陸国家である中国の皇帝に周辺の国々が貢ぎ物を送り、臣下の礼をとる習わしがあった。この関係にある国は、しばしば属国と表現される。ただし実際には、形だけの名目的な服従で、内政に口を出されなかった例も多い。邪馬台国の女王卑弥呼も、魏に使いを送って「親魏倭王」の称号を授かった。形式の上では従いながらも、自らの支配を固めるために外の権威を巧みに利用したのである。",
+    "form": "属国",
+    "en": "In ancient East Asia, there was a custom for neighboring states to send tribute to the emperor of China, a continental power, and bow as subjects. A country in this relationship is often described as a vassal state. In practice, however, the submission was merely nominal in form, and there were many cases in which internal affairs were not interfered with. Himiko, queen of Yamatai, also sent envoys to Wei and received the title of King of Wa, friend of Wei. While following in form, she skillfully used outside authority to consolidate her own rule.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「〜の属国となる・属国化」の形で使う。名目上の服従と実質の自立の差を語る場面で効く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "巡礼",
+   "reading": "じゅんれい",
+   "pos": "noun",
+   "meaning": "pilgrimage",
+   "defJa": "聖地や霊場をめぐって参拝すること",
+   "passage": {
+    "ja": "ヒンドゥー教徒にとって、ガンジス川の畔の聖地ヴァーラーナシーへの巡礼は、一生に一度は果たしたい願いとされ、この地で亡くなれば輪廻から解放されるとも信じられている。毎年、遠い村々から家族連れが徒歩やバスで何日もかけて訪れ、夜明けの冷たい川で沐浴をする。一方で、観光客の増加に伴って、川の水質汚染やゴミの問題も深刻になってきた。信仰と環境を両立させ、観光収入との好循環を目指す取り組みが、地元でも少しずつ広がっている。",
+    "form": "巡礼",
+    "en": "For Hindus, a pilgrimage to the holy city of Varanasi on the banks of the Ganges is said to be a wish to fulfill at least once in a lifetime, and it is also believed that one who dies there is released from the cycle of rebirth. Every year, families come from distant villages on foot or by bus, taking days, and bathe in the cold river at dawn. On the other hand, with the rise in tourists, problems of water pollution and garbage in the river have also become serious. Efforts to reconcile faith with the environment and aim for a virtuous circle with tourism income are gradually spreading locally too.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「巡礼に出る・巡礼地」の形で使う。聖地を目指す信仰の旅を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "工業化",
+   "reading": "こうぎょうか",
+   "pos": "noun",
+   "meaning": "industrialization",
+   "defJa": "産業の中心が農業から工業に移ること",
+   "passage": {
+    "ja": "イギリスで産業革命が始まった18世紀後半から、世界の工業化の歴史は動き出しました。蒸気機関の改良で工場が都市に集まり、農村を離れた人々が労働者として働くようになります。原料の綿花の多くは、アメリカ南部の奴隷制のもとで栽培されたものでした。生産量は飛躍的に増えた反面、長時間労働や劣悪な住環境が社会問題になりました。この矛盾への反省が、後に労働組合や社会保障を生み出す原動力となったのです。",
+    "form": "工業化",
+    "en": "From the late eighteenth century, when the Industrial Revolution began in Britain, the history of the world's industrialization got under way. Improved steam engines gathered factories in cities, and people who left the countryside came to work as laborers. Much of the raw cotton had been grown under the slavery of the American South. Output grew by leaps and bounds, but on the other hand long working hours and wretched housing became social problems. Reflection on this contradiction became the driving force that later produced labor unions and social security.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「工業化が進む・急速な工業化」の形。産業革命から現代の発展途上国まで幅広く使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "工程",
+   "reading": "こうてい",
+   "pos": "noun",
+   "meaning": "process step, stage",
+   "defJa": "作業を進める順序の一つひとつの段階",
+   "passage": {
+    "ja": "半導体の製造は、数百に及ぶ工程を経て、シリコンの円盤が指先ほどの小さなチップに変わっていく。そのどれか一つでも歩留まりが落ちれば、最終的な不良品の数は急激に跳ね上がる。だからこそ、工場では各段階の検査データを集め、わずかな異常にも早めに対応して、改善の好循環を地道に生み出している。これは勉強にも通じる話で、基礎の抜けを放置すると、いくら応用問題を解いても、後の単元でまとめて崩れてしまう。",
+    "form": "工程",
+    "en": "Semiconductor manufacturing passes through hundreds of process steps, and a silicon disc turns into a chip as small as a fingertip. If the yield falls at even one of them, the final number of defective products jumps sharply. That is precisely why factories collect inspection data at each stage, respond early to even slight anomalies, and steadily create a virtuous circle of improvement. This applies to study as well: if you leave gaps in the basics, however many applied problems you solve, they collapse all at once in later units.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「製造工程・工程を管理する」の形で使う。順序のある作業の段階を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "巨額",
+   "reading": "きょがく",
+   "pos": "na-adj",
+   "meaning": "huge sum",
+   "defJa": "非常に大きな金額",
+   "passage": {
+    "ja": "最先端の半導体工場を一つ建てるのに、数兆円もの巨額の投資が必要だと言われ、国の補助金なしには決断しにくい規模になっている。それほどの金を投じても、需要の読みを一度でも誤れば、工場はたちまち重荷に変わってしまう。投資する側にとっては、技術の優劣はさておき、まず資金を回収できるかどうかが生死を分ける。世界が多極化するなかで、この冷徹な現実を知れば、半導体をめぐる覇権争いが単なる技術競争ではないことが見えてくる。",
+    "form": "巨額",
+    "en": "It is said that building a single cutting-edge semiconductor factory requires a huge investment of several trillion yen, a scale at which a decision is hard to make without state subsidies. Even having poured in such money, if the reading of demand is wrong even once, the factory quickly turns into a burden. For the investor, technical superiority aside, whether the capital can first be recovered decides life or death. Knowing this cold reality in a world growing multipolar, one sees that the struggle for hegemony over semiconductors is not merely a technological contest.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「巨額の投資・巨額の赤字」の形で、名詞を修飾する。金額の大きさを強調する語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "巻き返し",
+   "reading": "まきかえし",
+   "pos": "noun",
+   "meaning": "comeback, rally",
+   "defJa": "負けていた側が勢いを取り戻すこと",
+   "passage": {
+    "ja": "生成AIの競争では、先行したアメリカ企業に対し、ほかの国々の巻き返しが目立ってきた。注目すべきは、大きなモデルを力任せに作るのではなく、学習の工程を見直し、小さくても効率のよいモデルで着実に追い上げつつある点だ。限られた計算資源という制約が、かえって知恵と工夫を生む。この構図は、受験勉強で出遅れた人が、闇雲に量を増やさず、勉強法の見直しで逆転する姿とよく似ている。",
+    "form": "巻き返し",
+    "en": "In the race over generative AI, comebacks by other countries have become conspicuous against the American companies that took the lead. What deserves attention is that, rather than building huge models by brute force, they are steadily catching up by reviewing the training process and using models that are small but efficient. The constraint of limited computing resources instead breeds wisdom and ingenuity. This picture closely resembles someone who fell behind in exam study staging a reversal by revising their method instead of blindly piling on volume.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「巻き返しを図る・巻き返しに出る」の形。出遅れた側の反撃を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "市場経済",
+   "reading": "しじょうけいざい",
+   "pos": "noun",
+   "meaning": "market economy",
+   "defJa": "価格と競争で生産や分配が決まる経済",
+   "passage": {
+    "ja": "1978年、中国は改革開放へと舵を切り、計画経済の枠の中に少しずつ市場経済の仕組みを取り込んでいきました。農家が決められた量を納めたあとの余った作物を自由に売れるようになると、生産意欲が一気に高まります。この動きが工場や都市へと広がり、数十年にわたって急速な工業化が進みました。ただし、国の関与が強く残る点で、西側の自由市場とは同じではないと指摘されています。",
+    "form": "市場経済",
+    "en": "In 1978, China turned toward reform and opening up, gradually taking the mechanisms of a market economy into the framework of its planned economy. Once farmers could freely sell the surplus crops left after delivering a fixed quantity, their motivation to produce rose all at once. This movement spread to factories and cities, and rapid industrialization advanced over several decades. However, it is pointed out that because strong state involvement remains, it is not the same as the free markets of the West.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「市場経済を導入する・市場経済化」の形。計画経済と対にして使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "市民社会",
+   "reading": "しみんしゃかい",
+   "pos": "noun",
+   "meaning": "civil society",
+   "defJa": "自由な市民が集まって作る社会のあり方",
+   "passage": {
+    "ja": "17世紀のロンドンのコーヒーハウスでは、身分の違う男たちが同じ卓を囲み、新聞を回し読みして政治や商売の話を論じた。国家からも家庭からも離れた、自由に議論できる場所が、やがて市民社会の土台になったとされる。国王が危険視して、取り締まりを試みたこともある。話し手の立場にかかわらず、意見が内容で評価されることが何より重要だった。弁舌に長けた者だけでなく、聞く力のある者も、そこでは同じように敬意を集めたに違いない。",
+    "form": "市民社会",
+    "en": "In the coffeehouses of seventeenth-century London, men of differing rank sat around the same table, passed newspapers around, and debated politics and business. Places where people could argue freely, apart from both state and household, are said to have become the foundation of civil society. The king, seeing them as dangerous, even tried to suppress them. Regardless of the speaker's standing, what mattered most was that opinions were judged on their content. Not only those skilled in eloquence but also those with the power to listen must have earned the same respect there.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「市民社会の成熟・市民社会の担い手」の形。国家と私的領域の間にある公共の場を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "市民革命",
+   "reading": "しみんかくめい",
+   "pos": "noun",
+   "meaning": "bourgeois revolution",
+   "defJa": "市民が身分制の支配をくつがえした革命",
+   "passage": {
+    "ja": "1789年に始まったフランス革命は、典型的な市民革命として教科書に載っています。身分制のもとで税を負担しながら発言権を持たなかった第三身分が、自由と平等を掲げて立ち上がったからです。第三身分には、商人や法律家、農民や都市の職人など、さまざまな人々が含まれていました。ところが革命は、やがて恐怖政治という皮肉な帰結を迎えます。その混乱の中から、ナポレオンという新しい専制の担い手が現れたのは、歴史の皮肉というほかありません。",
+    "form": "市民革命",
+    "en": "The French Revolution, which began in 1789, appears in textbooks as a typical bourgeois revolution. This is because the Third Estate, which bore the burden of taxes under the class system yet had no voice, rose up under the banners of liberty and equality. The Third Estate included a variety of people, such as merchants and lawyers, farmers and urban craftsmen. But the revolution soon met an ironic outcome in the Reign of Terror. That Napoleon, a new bearer of despotism, emerged from that chaos can only be called an irony of history.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「市民革命を経て〜」の形で近代の入口を語る。英・米・仏の三つの例が定番。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "布石",
+   "reading": "ふせき",
+   "pos": "noun",
+   "meaning": "groundwork, strategic first move",
+   "defJa": "先を見据えてあらかじめ打っておく手",
+   "passage": {
+    "ja": "エヌビディアが2006年に発表した計算用ソフトウェア基盤「CUDA」は、のちのAIブームを見据えた布石だったと評される。当時は画像処理用のチップを科学計算に使うという発想が珍しく、投資に見合うのか疑う声もあった。しかし開発者の増加に伴って、他社が簡単には乗り換えられない囲い込みが生まれた。巻き返しを図る競合も、まずこのソフトの壁を越えざるを得ず、その分だけ追撃は遅れがちだ。",
+    "form": "布石",
+    "en": "The computing software platform CUDA, announced by Nvidia in 2006, is said to have been groundwork laid with the later AI boom in view. At the time, the idea of using image-processing chips for scientific computation was rare, and some doubted whether it would repay the investment. But as the number of developers grew, a lock-in arose that other companies could not easily switch away from. Even rivals seeking a comeback have no choice but to first clear the wall of this software, and their pursuit tends to be delayed accordingly.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「布石を打つ」が基本の形。囲碁の用語から、先を見据えた準備一般を表すようになった。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "帝国主義",
+   "reading": "ていこくしゅぎ",
+   "pos": "noun",
+   "meaning": "imperialism",
+   "defJa": "他国を植民地にして支配を広げる政策",
+   "passage": {
+    "ja": "世界史の論述で帝国主義を問われたら、時期・動機・結果の三点で整理しよう。時期は19世紀後半から20世紀初頭にかけてである。動機は、工業化で余った資本と原料を求め、新たな市場を確保し、国力を誇示することだった。結果として、ベルリン会議の後にアフリカの大部分が列強に分割され、大英帝国をはじめとする国々が世界各地に植民地を築いた。この三点を押さえておけば、どんな問い方をされても対応できる。",
+    "form": "帝国主義",
+    "en": "If imperialism is asked about in a world history essay, organize it by three points: period, motive and result. The period is from the late nineteenth to the early twentieth century. The motive was to seek the capital and raw materials left over by industrialization, secure new markets and display national power. As a result, after the Berlin Conference most of Africa was partitioned among the Great Powers, and countries beginning with the British Empire built colonies around the world. If you have these three points down, you can handle any way the question is put.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「帝国主義列強・帝国主義政策」の形。論述では時期・動機・結果の三点で整理する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "帝政",
+   "reading": "ていせい",
+   "pos": "noun",
+   "meaning": "imperial rule",
+   "defJa": "皇帝が国を治める政治の形",
+   "passage": {
+    "ja": "ローマは共和政から帝政へと移るとき、すぐに王を名乗ったわけではない。アウグストゥスは、カエサルの養子として権力を引き継ぎ、元老院との協調という体裁を保ちながらも、実際には軍と財政を握った。彼自身は「第一人者」を意味するプリンケプスと名乗り、王や皇帝という呼び名を避けた。名は共和国のまま、中身は一人の支配へと変わったのである。民主的な制度を残したまま独裁へ傾くという帰結は、のちの権力者たちの手本になった。",
+    "form": "帝政",
+    "en": "When Rome moved from a republic to imperial rule, it did not immediately call itself a monarchy. Augustus inherited power as Caesar's adopted son and, while keeping up the appearance of cooperation with the Senate, in reality held the army and the finances. He styled himself princeps, meaning first citizen, and avoided titles such as king or emperor. In name it remained a republic, while in substance it had turned into the rule of one man. The outcome of tilting toward dictatorship while leaving democratic institutions in place became a model for later men of power.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「帝政ローマ・帝政ロシア」の形で時代や国名に付く。共和政・王政と区別して覚える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "帰結",
+   "reading": "きけつ",
+   "pos": "noun",
+   "meaning": "consequence; outcome",
+   "defJa": "ある原因からたどりついた最後の結果",
+   "passage": {
+    "ja": "戦争って、始めるときは「すぐ終わる」と、どっちの陣営でも誰もが思うじゃないですか。でも第一次世界大戦なんて、クリスマスどころか四年以上も続いたんですよね。その帰結が、ヨーロッパの帝国がいくつも一気に消えるという大変動でした。ロシアの帝政が倒れ、ドイツもオスマンも崩れ、多民族国家のオーストリア＝ハンガリーは解体して、国境線が引き直されたんですから、影響は百年たった今も続いています。",
+    "form": "帰結",
+    "en": "With war, everyone on both sides thinks at the start that it will be over soon, don't they? But the First World War, for instance, lasted more than four years, to say nothing of Christmas. The consequence was an upheaval in which several European empires vanished all at once. The Russian imperial order fell, Germany and the Ottomans collapsed, and multiethnic Austria-Hungary broke up and the borders were redrawn, so the effects continue even a hundred years later.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「必然の帰結・当然の帰結として」の形。原因からたどる論理の終点を示す語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "常体",
+   "reading": "じょうたい",
+   "pos": "noun",
+   "meaning": "plain (da/de-aru) style",
+   "defJa": "「だ・である」で文を結ぶ文体",
+   "passage": {
+    "ja": "小論文では、文末をです・ます体の敬体ではなく、である調の常体にそろえるのが基本だ。途中で混ざると、それだけで減点の対象になりかねない。ただしこの文体は、断定の調子が強まり、語り口が硬くなりやすいという面もある。そのため、一文を短めに保ち、接続の語を丁寧に選び、主語を省きすぎないことで、読みやすさを補うとよい。書き終えたら、文末を声に出して確認するのがいちばん確実だ。",
+    "form": "常体",
+    "en": "In a short essay, the basic rule is to unify sentence endings in the plain style of de-aru rather than the polite desu-masu style. If the two get mixed midway, that alone could become grounds for losing points. However, this style also has the side that its assertive tone strengthens and its manner of speaking tends to become stiff. So it is good to make up for readability by keeping each sentence short and choosing connecting words with care. After finishing, the surest way is to check the sentence endings aloud.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「常体で書く・常体と敬体」の対で出る。文章の文末のそろえ方を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "常套句",
+   "reading": "じょうとうく",
+   "pos": "noun",
+   "meaning": "cliché",
+   "defJa": "いつも決まって使われる言い回し",
+   "passage": {
+    "ja": "不祥事を受けた会見で「真摯に受け止める」「遺憾である」といった常套句が繰り返されると、聞き手は内容を聞き流すようになる。言葉が決まった型に収まるほど、そこに込められた責任の重さは見えにくくなるからだ。弁舌さわやかな謝罪といえども、再発防止策が具体的でなければ、信頼は容易には戻らない。型どおりの表現を避け、事実と数字を示しながら、平易な自分の言葉で語ることが問われている。",
+    "form": "常套句",
+    "en": "When stock phrases such as 'we take it seriously' or 'it is regrettable' are repeated at a press conference after a scandal, listeners come to tune out the content. The more words settle into fixed forms, the harder it becomes to see the weight of responsibility put into them. Even an eloquent apology will not easily restore trust unless the measures to prevent recurrence are concrete. What is being asked is to avoid formulaic expressions and speak in one's own plain words while presenting facts and figures.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「常套句を並べる・常套句に頼る」の形で、型にはまった表現への批判を含みやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "常用漢字",
+   "reading": "じょうようかんじ",
+   "pos": "noun",
+   "meaning": "jōyō kanji",
+   "defJa": "日常で使う目安として国が定めた漢字",
+   "passage": {
+    "ja": "2010年、常用漢字表が約三十年ぶりに改定され、「鬱」や「麒麟」など196字が加わった。たとえば「鬱」は画数が多くて書きにくいため、以前は仮名で書かれることが多かった。新聞やテレビは、この表を目安に表記を決めている。とはいえ、表はあくまで目安であって、個人の使用を制限するものではないとされる。字数が増えたぶん、外来語や固有名詞の書き方にも幅が出て、校正の現場は判断に追われている。",
+    "form": "常用漢字",
+    "en": "In 2010, the list of jōyō kanji was revised for the first time in about thirty years, adding 196 characters such as 鬱 and 麒麟. For example, 鬱 has many strokes and is hard to write, so it was often written in kana before. Newspapers and television decide their orthography using this list as a guide. That said, the list is only a guide and is not considered a restriction on individual use. With the greater number of characters, the way loanwords and proper nouns are written has gained leeway, and proofreading workplaces are pressed to make judgments.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「常用漢字表」の形で出る。使用の目安であって、使える漢字の上限ではない点に注意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平たく言えば",
+   "reading": "ひらたくいえば",
+   "pos": "expression",
+   "meaning": "to put it plainly",
+   "defJa": "難しい話を分かりやすい言葉で言い直すと",
+   "passage": {
+    "ja": "年金や医療の制度が改正されても、細部まで正確に理解できている人は多くない。そこで解説者は、平たく言えば自己負担に上限を設ける仕組みです、といった具合に言い換えを挟む。専門用語を平易な言葉に置き換える作業は、正確さと分かりやすさの綱引きでもある。簡略にしすぎると、肝心な例外が抜け落ちかねない。かといって例外ばかり並べれば、今度は聞き手が混乱して、誰も最後まで聞いてくれない。",
+    "form": "平たく言えば",
+    "en": "Even when pension and medical systems are revised, not many people understand them down to the details. So commentators insert a paraphrase, saying something like, to put it plainly, it is a mechanism that sets a cap on out-of-pocket costs. Replacing technical terms with plain language is also a tug-of-war between accuracy and clarity. If you simplify too much, crucial exceptions may well drop out. Yet if you line up nothing but exceptions, this time nobody will listen to the end.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "文頭で難しい内容を言い直す合図になる。言い換えの前置きとして、解説でよく使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平均寿命",
+   "reading": "へいきんじゅみょう",
+   "pos": "noun",
+   "meaning": "life expectancy",
+   "defJa": "ある年に生まれた人が生きる平均の年数",
+   "passage": {
+    "ja": "日本人の平均寿命は、明治の中ごろには40歳台前半にとどまっていたとされる。その後、工業化が進むなか、衛生環境の改善と乳幼児の死亡率の低下に伴って、1947年ごろには50歳を超え、1970年代には70歳を超えた。ただし、この数字は幼い子の死亡に大きく左右されるため、昔の人がみな短命だったと考えるのは誤りである。無事に成人すれば、六十代、七十代まで生きた人も少なくなかった。",
+    "form": "平均寿命",
+    "en": "The life expectancy of the Japanese is said to have remained in the early forties in the middle of the Meiji era. Afterward, as industrialization advanced, with improved sanitation and falling infant mortality, it passed fifty around 1947 and passed seventy in the 1970s. However, this figure is strongly swayed by the deaths of young children, so it is a mistake to think that people of old were all short-lived. If one safely reached adulthood, not a few lived into their sixties and seventies.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「平均寿命が延びる」の形。平均値は乳幼児の死亡に左右される点も読み取れる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平常心",
+   "reading": "へいじょうしん",
+   "pos": "noun",
+   "meaning": "composure; presence of mind",
+   "defJa": "どんな時も動じない、いつもの落ち着いた心",
+   "passage": {
+    "ja": "大事な試合の前って、緊張しないようにと意識するものだから、かえって手が震えるじゃないですか。平常心を保つコツは、緊張をなくすことじゃなくて、緊張したままでもやることを決めておくことなんです。たとえば、深呼吸を三回して、最初の一手だけを考える。そうやって小さな手順に意識を預ければ、雑念は自然に引いていって、達人の境地にも少しだけ近づけます。一流の選手ほど、緊張を消すより、付き合う手順を持っていると言われます。",
+    "form": "平常心",
+    "en": "Before a big match, the more you try not to be nervous, the more your hands shake, don't they? The trick to keeping your composure is not to eliminate nerves but to decide in advance what you will do even while nervous. For example, take three deep breaths and think only about the first move. If you entrust your attention to small steps like that, stray thoughts recede naturally, and you get a little closer to the state of a master. It is said that top athletes have routines for living with nerves rather than erasing them.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「平常心を保つ・失う」の形。結果を左右する場面で動じない心を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平明",
+   "reading": "へいめい",
+   "pos": "na-adj",
+   "meaning": "plain and clear",
+   "defJa": "わかりやすく、飾りがないさま",
+   "passage": {
+    "ja": "いい文章って、難しい言葉を知っているというより、読んでいて引っかからないことだと思うんですよね。たとえば夏目漱石の『坊っちゃん』は、今読んでもとても平明で、声に出すと自然に流れていくんです。ところが少し格好をつけようとして、専門用語や常套句を重ねたとたん、文は急に重くなる。だから私は、書き終えたら必ず声に出して音読して、息が詰まる箇所を一つずつ削ることにしています。",
+    "form": "平明",
+    "en": "Good writing, I think, is less about knowing difficult words than about reading without snagging. For example, Natsume Soseki's Botchan is still very plain and clear when read today, and flows naturally when read aloud. But the moment you try to look cool and pile on technical terms and clichés, the sentences suddenly grow heavy. So when I finish writing, I always read it out loud and cut, one by one, the places where my breath catches.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「平明な文章・平明に書く」の形。飾らず誰にもわかる文体をほめる語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平易",
+   "reading": "へいい",
+   "pos": "na-adj",
+   "meaning": "plain; easy",
+   "defJa": "むずかしくなく、すぐ理解できるさま",
+   "passage": {
+    "ja": "子どもに「光合成って何?」と聞かれて、答えに詰まった人は多いと思います。専門家でも、専門用語に頼ることなく平易な言葉に直すのは、実は苦手なんですよね。コツは、「植物が日光を食べものに変える仕組み」みたいに、身近なものに置き換えることです。わかっているつもりのことほど、人に説明してみると穴が見つかります。言い換えが出てこない部分が、そのまま自分の理解の穴なのです。",
+    "form": "平易",
+    "en": "I think many people have been stumped when a child asked them what photosynthesis is. Even experts are in fact poor at recasting things in plain words without relying on technical terms. The trick is to substitute something familiar, like the mechanism by which plants turn sunlight into food. The things you think you understand are exactly the ones where holes turn up when you try to explain them to someone. The parts where no paraphrase comes are, as they stand, the holes in your own understanding.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「平易な言葉・平易に説く」の形。難しい内容を、読み手に合わせてやさしく言う場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "年代記",
+   "reading": "ねんだいき",
+   "pos": "noun",
+   "meaning": "chronicle",
+   "defJa": "出来事を年の順に書き並べた記録",
+   "passage": {
+    "ja": "中世の修道院で書かれた年代記って、読んでみると意外にも面白いんですよ。王の即位や戦争をはじめ、「この年は長雨で麦が実らなかった」とか、彗星を見たといった記述が、淡々とさらっと出てくる。1066年には、ハレー彗星がイングランドの空に現れたと、当時の記録にも残っているそうです。封建制の時代の大事件と庶民の暮らしが、同じページに並んでいる、そこが一番の魅力ですね。",
+    "form": "年代記",
+    "en": "Chronicles written in medieval monasteries are surprisingly interesting, as it turns out when you read them. Starting with the accession of kings and wars, entries like 'this year the wheat did not ripen because of long rains' or sightings of a comet turn up matter-of-factly and casually. It is said that in 1066 Halley's Comet appeared in the skies over England, as left in the records of the time too. The great events of the feudal age and the lives of ordinary people sit on the same page, and that is the biggest charm.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「年代記を編む・年代記作者」の形。年ごとに出来事を記した歴史記録を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "年貢",
+   "reading": "ねんぐ",
+   "pos": "noun",
+   "meaning": "feudal land tax",
+   "defJa": "江戸時代に農民が領主へ納めた米などの税",
+   "passage": {
+    "ja": "江戸時代の農民は、収穫した米の四割から五割を年貢として納めたと言われています。四公六民や五公五民という言葉は、領主と農民の取り分の割合を表しているからです。ただし、検地で決まった石高をもとに課されたので、凶作の年でも原則として減りにくく、百姓一揆の原因になりました。明治政府は廃藩置県の後、1873年の地租改正で、米ではなく金で税を納める制度へと切り替えました。",
+    "form": "年貢",
+    "en": "Farmers in the Edo period are said to have paid forty to fifty percent of their harvested rice as land tax. The terms four-to-six and five-to-five describe the proportions of the share between lord and farmer. However, since it was levied on the yield fixed by land surveys, it was in principle hard to reduce even in bad harvest years, and became a cause of peasant uprisings. After the abolition of the domains, the Meiji government switched, with the land tax reform of 1873, to a system in which tax was paid in money rather than rice.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「年貢を納める・年貢の取り立て」の形。領主と農民の関係を語るときの基本語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "幻影",
+   "reading": "げんえい",
+   "pos": "noun",
+   "meaning": "illusion, phantom",
+   "defJa": "実際にはないのに、あるように見えるもの",
+   "passage": {
+    "ja": "インド哲学のアドヴァイタ・ヴェーダーンタでは、目の前に広がる多様な世界は、真理を覆い隠す幻影、すなわちマーヤーだと説かれる。有名な譬えは、薄暗い道で縄を蛇と見間違える話である。見間違えている限り恐怖は本物だが、明かりをともせば蛇は消え、そこにはもともと縄しかなかったと分かる。聖典に基づいて、この気づきの境地こそが解脱への道だと論じたのが、八世紀ごろの哲学者シャンカラである。",
+    "form": "幻影",
+    "en": "In the Advaita Vedanta of Indian philosophy, the diverse world spread before us is taught to be an illusion that veils the truth, that is, maya. A famous analogy is the tale of mistaking a rope for a snake on a dim road. As long as one has mistaken it, the fear is real, but when a light is brought, the snake vanishes and one sees that there was only a rope all along. The philosopher Shankara, around the eighth century, argued on the basis of scripture that this state of realization is the path to liberation.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「幻影を追う・幻影にすぎない」の形。マーヤーの説明では、実体のない見かけを指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "序論",
+   "reading": "じょろん",
+   "pos": "noun",
+   "meaning": "introduction",
+   "defJa": "論文や本の最初に置く、導入の部分",
+   "passage": {
+    "ja": "論文の序論には、最低でも三つのことを書きます。第一に何が問題なのか、第二にこれまでの研究では何がわかっていて、何がわかっていないのか、第三にこの論文は何を明らかにするのか。この三点が揃っていれば、読者は本論に入る前に大意をつかめて、安心して読み進められます。逆に冒頭が長く曖昧だと、本論が良くても、読む気をなくされかねません。さらに、書き上げた後で冒頭を書き直すと、全体と噛み合わせやすくなります。",
+    "form": "序論",
+    "en": "In the introduction to a paper, you write at least three things. First, what the problem is; second, what is known and what is not yet known from research so far; third, what this paper will make clear. If these three points are in place, the reader can grasp the gist before entering the main body and read on with peace of mind. Conversely, if the opening is long and vague, readers may lose the will to read even when the main body is good. Moreover, rewriting the opening after finishing the whole makes it easier to fit it to the rest.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「序論・本論・結論」の三部構成で出る。論文の導入で、問題と目的を示す部分。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "廃藩置県",
+   "reading": "はいはんちけん",
+   "pos": "noun",
+   "meaning": "abolition of domains for prefectures",
+   "defJa": "藩をなくして県を置いた明治の改革",
+   "passage": {
+    "ja": "1871年の廃藩置県は、江戸時代から続いた約260の藩を県に改め、藩主を東京へ集めた大事件だった。ところが意外なことに、大きな流血は起きていない。藩はすでに財政難に陥り、借金を政府に肩代わりしてもらえるとあって、抵抗する余力が乏しかったのだ。しかも政府は、薩摩・長州・土佐の藩兵を御親兵として東京に集め、軍事力の裏づけを用意していた。大政奉還から四年、武士の世は静かに終わりを告げたのである。",
+    "form": "廃藩置県",
+    "en": "The abolition of the domains in 1871 was a great event that converted some 260 domains, which had continued since the Edo period, into prefectures and gathered the lords in Tokyo. Surprisingly, though, there was no major bloodshed. The domains had already fallen into financial trouble, and with the government to take over their debts, they had little strength left to resist. Moreover, the government had gathered the domain troops of Satsuma, Choshu and Tosa in Tokyo as an imperial guard and prepared military backing. Four years after the restoration of imperial rule, the age of the samurai quietly came to an end.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「廃藩置県を断行する」の形。中央集権化の決定打として、明治維新の流れの中で語られる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "弁舌",
+   "reading": "べんぜつ",
+   "pos": "noun",
+   "meaning": "speech; eloquence",
+   "defJa": "話しぶり。特に、人を動かす巧みな話",
+   "passage": {
+    "ja": "古代ギリシャの民主政では、弁舌の巧みさがそのまま政治的な力になった。市民が広場で直接議論に加わるとあって、説得に成功した者が政策を動かしたからだ。そこから、対句や比喩といった話し方の技術を教える職業として、ソフィストが現れる。雄弁家として名高いデモステネスは、吃音を克服するために口に小石を含んで練習したと伝えられる。ただし、雄弁と誠実は別物であり、聞き手の側にも、言葉を見抜く目が求められた。",
+    "form": "弁舌",
+    "en": "In the democracy of ancient Greece, skill in speech translated directly into political power. Because citizens joined the debate directly in the public square, those who succeeded in persuading moved policy. From there arose the sophists, a profession teaching the techniques of speaking such as parallel phrases and metaphor. Demosthenes, renowned as an orator, is said to have practiced with pebbles in his mouth to overcome a stammer. However, eloquence and sincerity are different things, and the listeners too were required to have an eye for seeing through words.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「弁舌をふるう・弁舌さわやか」の形。人を動かす力のある話しぶりを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "引き金",
+   "reading": "ひきがね",
+   "pos": "noun",
+   "meaning": "trigger",
+   "defJa": "行動や出来事を起こすきっかけになるもの",
+   "passage": {
+    "ja": "悪い習慣を断ち切りたければ、まず何がその引き金になっているかを、一週間記録して探すのが先決だ。夜に延々とスマホを見てしまう人の多くは、布団に入ったことをきっかけに、無意識に手を伸ばしている。そこで、充電器を寝室の外に置くという一手を打つと、朝の時間を取り戻す好循環につながる。意志の力に頼るより、行動の連鎖を断つ環境を整えるほうが、はるかに長続きするし、自己嫌悪も減る。",
+    "form": "引き金",
+    "en": "If you want to break a bad habit, the first thing is to find out, by keeping a record for a week, what is acting as its trigger. Many people who end up scrolling on their phones endlessly at night reach out unconsciously, taking getting into bed as their cue. So making the move of placing the charger outside the bedroom leads to a virtuous circle of winning back your morning time. Setting up an environment that cuts the chain of behavior lasts far longer than relying on willpower, and spares you self-reproach too.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「引き金になる・引き金を引く」の形。習慣や事件の発端となる出来事を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "強化",
+   "reading": "きょうか",
+   "pos": "verb",
+   "meaning": "strengthen, intensify",
+   "defJa": "力や働きを、いっそう強くすること",
+   "passage": {
+    "ja": "記憶を強化する方法として、何度も読み返すよりも、思い出す練習のほうが有効だとされています。心理学では、これを検索練習と呼び、テストを通じて思い出す経験をするだけで、同じ時間を復習に使うよりも長く記憶が残ると報告されています。思い出そうとして苦労するほど、記憶の痕跡は深く刻まれるのです。だから、多読で量をこなす合間に、教科書を閉じて、今読んだ内容を自分の言葉で書き出してみてください。",
+    "form": "強化",
+    "en": "As a way of strengthening memory, practicing recall is said to be more effective than rereading many times. In psychology this is called retrieval practice, and it is reported that merely having the experience of recalling through a test leaves memory lasting longer than spending the same time reviewing. The more you struggle while trying to remember, the deeper the trace of memory is etched. So between rounds of volume reading, close the textbook and try writing out in your own words what you just read.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「機能を強化する・強化される」の形。記憶や体制、規制など幅広い名詞と結びつく。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "弾圧",
+   "reading": "だんあつ",
+   "pos": "noun",
+   "meaning": "oppression; crackdown",
+   "defJa": "権力で相手の動きを力ずくで抑えつけること",
+   "passage": {
+    "ja": "宗教改革のころって、プロテスタントもカトリックも、お互いに相手を弾圧してたんですよね。フランスでは、1572年のサン・バルテルミの虐殺で、数千人以上とも言われる新教徒が命を落としたと伝えられています。のちに大英帝国となるイギリスでも、カトリックが厳しく取り締まられた時期がありました。宗教をめぐる争いは、政治や貿易とも絡み合ったあげく、なかなか収まらなかったんです。",
+    "form": "弾圧",
+    "en": "In the age of the Reformation, both Protestants and Catholics were persecuting each other, you know. In France, the Saint Bartholomew's Day massacre of 1572 is said to have taken the lives of several thousand or more Protestants. In England too, the future British Empire, there was a period when Catholics were severely suppressed. The conflicts over religion became entangled with politics and trade as well, and in the end did not subside easily.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「弾圧を加える・弾圧を受ける」の形。権力が自由な活動を抑えつける場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "形態論",
+   "reading": "けいたいろん",
+   "pos": "noun",
+   "meaning": "morphology",
+   "defJa": "語がどんな部品でできているかを研究する分野",
+   "passage": {
+    "ja": "形態論とは、語がどんな部品でできているかを調べる言語学の分野です。たとえば「食べさせられた」という一語は、「食べ」「させ」「られ」「た」に分けられます。ラテン語のような屈折語は語尾の変化で役割を示す一方で、日本語は部品を次々とつなげて、一つの語に多くの意味を詰め込めます。この性質を理解すると、外来語がどんな形で日本語に取り込まれるかも、説明しやすくなります。",
+    "form": "形態論",
+    "en": "Morphology is the field of linguistics that investigates what parts a word is made of. For example, the single word tabesaserareta can be divided into tabe, sase, rare and ta. While an inflectional language such as Latin shows roles through changes in word endings, Japanese can chain parts one after another and pack much meaning into a single word. Understanding this property makes it easier to explain in what form loanwords are taken into Japanese.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「形態論的な分析」の形でも使う。語の内部の仕組みを扱い、文の仕組みを扱う統語論と対になる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "彼岸",
+   "reading": "ひがん",
+   "pos": "noun",
+   "meaning": "the other shore (nirvana); equinox week",
+   "defJa": "悟りの境地。迷いの此岸に対する語",
+   "passage": {
+    "ja": "仏教でいう彼岸とは、迷いの世界である此岸の向こうにある、悟りの岸のことです。「波羅蜜」という言葉は、サンスクリット語の「パーラミター」を音写したもので、「向こう岸に渡ること」を意味します。修行を通じて、苦しみに満ちた娑婆から、静かな境地へ舟で渡っていくようなものだと説かれてきました。日本では、春分と秋分をはさむ七日間に墓参りをして先祖を供養する習慣があり、これもこの思想に由来するとされます。",
+    "form": "彼岸",
+    "en": "In Buddhism, the other shore means the shore of enlightenment that lies beyond this shore, the world of delusion. The word paramita is a transliteration of the Sanskrit word paramita and means crossing to the other shore. Through practice, it has been taught, it is like crossing by boat from this world full of suffering to a quiet state. In Japan there is a custom of visiting graves and honoring ancestors during the seven days around the spring and autumn equinoxes, which is also said to derive from this thought.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「彼岸に渡る」は悟りの岸へ至ること。此岸と対で覚える。春秋の彼岸の行事もこの語に由来する。",
+    "sense": "悟りの境地としての彼岸"
+   }
+  },
+  {
+   "term": "往生",
+   "reading": "おうじょう",
+   "pos": "noun",
+   "meaning": "rebirth in the Pure Land; death; being stuck",
+   "defJa": "死後に極楽浄土へ生まれ変わること",
+   "passage": {
+    "ja": "日本史の試験で浄土教が出てきたら、往生を「死ぬこと」ではなく「極楽浄土に生まれ変わること」と押さえておこう。平安時代、1052年を末法の入口と考えて恐れた貴族たちは、ひたすら念仏を唱えて阿弥陀仏にすがった。藤原頼通が建てた平等院鳳凰堂は、娑婆の苦しみのない極楽浄土を地上に再現しようとしたものだ。法然や親鸞の教えを通じて、この信仰は都の貴族から地方の庶民へと広がっていった。",
+    "form": "往生",
+    "en": "When Pure Land Buddhism comes up on a Japanese history exam, grasp ojo not as dying but as being reborn in the Pure Land of Paradise. In the Heian period, nobles who feared that 1052 marked the entrance to the Age of Decline chanted the nenbutsu and clung to Amida Buddha. The Phoenix Hall of Byodoin, built by Fujiwara no Yorimichi, was an attempt to recreate on earth a Pure Land free of the suffering of this world. Through the teachings of Honen and Shinran, this faith spread from the nobility to the common people.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「極楽往生」の形で、阿弥陀仏の浄土に生まれ変わる意味。「往生する」で困り果てる意もある。",
+    "sense": "極楽浄土に生まれ変わること"
+   }
+  }
+ ]
+}

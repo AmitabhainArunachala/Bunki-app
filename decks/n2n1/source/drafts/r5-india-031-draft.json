@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "鎮護国家",
+   "reading": "ちんごこっか",
+   "pos": "noun",
+   "meaning": "Buddhism for protecting the state",
+   "defJa": "仏教の力によって国の安定を守ろうとすること",
+   "passage": {
+    "ja": "奈良の大仏を、個人が静かに祈るための像としてだけ見ると、造立を支えた大きな構想を見落とします。古代の朝廷は、仏教の教えや儀礼によって国を守る鎮護国家の考えに基づき、寺院や僧の活動を政治と結び付けました。人々の救いと国家の安定が、今の私たちほどはっきり別々の領域に置かれていたわけではありません。各地の国分寺と中央の大寺院を地図で結ぶと、一つの像の背後に、祈りを広く行き渡らせようとする制度の姿が見えてきます。",
+    "form": "鎮護国家",
+    "en": "Viewing Nara’s Great Buddha only as an image for private prayer obscures the larger project behind its creation. The ancient court connected temples and monks with government through the idea of protecting the state by Buddhist teachings and rituals. Personal salvation and national stability were not divided into separate spheres as sharply as we might imagine today. Connecting provincial temples and major central institutions on a map reveals the institutional network behind a single statue.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「鎮護国家の思想」。個人の信仰だけでなく、朝廷の政策を述べる語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "開祖",
+   "reading": "かいそ",
+   "pos": "noun",
+   "meaning": "founder (of a sect)",
+   "defJa": "一つの宗教や宗派を初めて開いた人物",
+   "passage": {
+    "ja": "宗派の歴史をたどると、最初に教えを伝えた人と、組織を広く育てた人とが別々に現れることがある。開祖という呼び名は、その宗派を開いた人物の位置を示すが、教団が後に整えた系譜の中で意味を与えられる場合もある。日本の仏教史を読む際は、一人の伝記だけで全体の成立を説明しようとせず、弟子や支援者の働きにも目を向けたい。寺の創建、教えの伝来、宗派としての独立という出来事を分けることで、人名と年号の対応だけでは見えない組織の歴史を捉えられる。",
+    "form": "開祖",
+    "en": "The history of a denomination may feature different people who first transmitted its teaching and who later expanded its organization. Founder identifies the person regarded as establishing the tradition, although the title may acquire its meaning within a lineage organized later. Japanese Buddhist history therefore calls for attention to disciples and supporters alongside the biography of a single person. Distinguishing a temple’s establishment, a teaching’s transmission, and a denomination’s independence reveals institutional history beyond matching names to dates.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「宗派の開祖」。寺の創建者や教団の発展を担った人物とは役割を分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "阿修羅",
+   "reading": "あしゅら",
+   "pos": "noun",
+   "meaning": "asura, fighting demigod",
+   "defJa": "仏教で争いの世界と関わる神的な存在",
+   "passage": {
+    "ja": "静かな表情の仏像を見て、その名が争いと結び付くことに意外さを覚える。阿修羅はインドから仏教へ取り入れられた神的な存在であり、教義や図像の中での位置は一つの姿に固定されていない。六道の説明では争いの世界と関わる一方、仏法を守る存在として像が造られる場合もある。同じ名前に矛盾を見つけて片方を誤りとする前に、どの文献や信仰の場に置かれているかを確かめると、文化を移りながら意味を重ねてきた像の歴史が浮かび上がる。",
+    "form": "阿修羅",
+    "en": "A calm Buddhist image can seem surprising when its name is associated with conflict. Asuras are divine beings incorporated into Buddhism from India, whose place in doctrine and imagery is not fixed to a single form. Accounts of the six realms associate them with conflict, while images may also represent them as protectors of Buddhist teaching. Before treating these uses as contradictory, examining the textual and devotional setting reveals a history of meanings layered across cultures.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「阿修羅の像」。六道の説明と守護者としての図像を文脈で区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "阿字観",
+   "reading": "あじかん",
+   "pos": "noun",
+   "meaning": "meditation on the syllable A",
+   "defJa": "梵字の阿などを観想する真言密教の瞑想法",
+   "passage": {
+    "ja": "一つの文字を見つめるだけで瞑想になるのかって、最初は不思議に感じるよね。真言密教の阿字観は、梵字の「阿」などを手掛かりに観想する修行で、文字の形を眺めることと、教義に沿って心を向けることが結び付いているんだ。呼吸だけに注意を戻す練習と比べるにしても、何を対象にしているのかを分けないと、同じ手順だと勘違いしてしまう。脳の研究で瞑想の方法を分類する場面でも、ただ坐っているという外見より、その人が何をするよう教わったかが大事になるよ。",
+    "form": "阿字観",
+    "en": "At first, it seems curious that attending to a single character could be meditation. Ajikan in Shingon Buddhism uses the Sanskrit letter A and related imagery for contemplation, connecting visual form with attention guided by doctrine. Even a comparison with returning attention only to the breath requires distinguishing the objects of practice to avoid confusing the procedures. In brain research classifying meditation methods, what practitioners were taught to do matters more than the outward appearance of sitting.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「阿字観を修する」。観想の対象と教義を伴う実践として捉える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "阿弥陀如来",
+   "reading": "あみだにょらい",
+   "pos": "noun",
+   "meaning": "Amitābha Buddha",
+   "defJa": "西方の極楽浄土に住むと説かれる仏",
+   "passage": {
+    "ja": "寺の本尊を調べるとき、同じ仏の像でも、どの経典や教えを背景に置くかで見方が変わります。阿弥陀如来は、浄土教で西方の極楽浄土と結び付けて説かれ、その本願を頼りとする信仰の中心にあります。ここで住む場所を地図上の国と同じ意味に取るより、教えの中でどのような救いの場として語られるかを読む方が筋道を追えます。念仏の言葉、仏像の名前、経典の物語を別々に暗記するだけでなく、三つのつながりを確かめると寺院の説明も理解しやすくなります。",
+    "form": "阿弥陀如来",
+    "en": "Investigating a temple’s principal image involves understanding which scriptures and teachings frame it. Amida Buddha is associated in Pure Land traditions with the western Land of Bliss and stands at the center of faith relying on his vow. Rather than treating that realm exactly like a country on a map, reading how it functions as a place of salvation makes the teaching easier to follow. Connecting the words of the nenbutsu, the image’s name, and scriptural narratives also clarifies temple explanations.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「阿弥陀如来の本願」。仏名と浄土教の救済の教えを結び付ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "阿羅漢",
+   "reading": "あらかん",
+   "pos": "noun",
+   "meaning": "arhat",
+   "defJa": "煩悩を断ち解脱に達したとされる仏教の修行者",
+   "passage": {
+    "ja": "「自分だけが救われる人」と訳してしまうと、教義上の位置を述べるはずの文章に、書き手の評価が入り込みます。阿羅漢は、煩悩を断って解脱に達した者を指す仏教の呼び名で、別の立場から向けられた批判だけでは意味を捉えきれません。菩薩との違いを説明するにあたっても、どの文献が何を理想とするかを示すと、比較が人物への悪口になるのを避けられます。訳語を選ぶ前に、定義と評価を別々の文にしておけば、読み手は教えそのものと、その教えをめぐる議論を区別できます。",
+    "form": "阿羅漢",
+    "en": "Translating the term as someone who saves only themselves inserts judgment into what should explain a doctrinal position. Arhat is a Buddhist title for someone regarded as having ended the defilements and attained liberation, whose meaning cannot be captured solely through criticism from another standpoint. A comparison with bodhisattvas becomes clearer when it specifies which texts uphold which ideals. Separating definition from evaluation before choosing a translation helps readers distinguish a teaching from debates about it.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "教義上の達成を表す語で、他の立場からの評価を定義に混ぜない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "阿頼耶識",
+   "reading": "あらやしき",
+   "pos": "noun",
+   "meaning": "ālaya-vijñāna, storehouse consciousness",
+   "defJa": "唯識で経験の種子を保つとされる深層の識",
+   "passage": {
+    "ja": "経験したことが、その場限りで消えず、後のものの見方に影響するのはなぜでしょうか。唯識の阿頼耶識は、経験や行為の種子を保つ深い識として説かれ、認識が生じる仕組みを考えるうえで重要な位置を占めます。ただし、種子という比喩を使うからといって、脳の中に経典どおりの小さな粒が存在するという主張ではありません。記憶を扱う現代の研究と比べるなら、似ている働きに注目するとともに、それぞれが何を根拠に説明を組み立てるかも分けて読むと、比較が豊かになります。",
+    "form": "阿頼耶識",
+    "en": "Why do experiences continue to influence perception rather than vanishing when they end. Yogacara describes storehouse consciousness as a deep consciousness retaining the seeds of experience and action, giving it an important role in accounts of cognition. The metaphor of seeds does not assert that tiny scripturally described particles exist inside the brain. Comparing it with modern memory research becomes richer when similarities in function are considered alongside the different grounds on which each explanation is built.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「阿頼耶識に種子が薫習される」という教義の背景を、身近な問いから示す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "陀羅尼",
+   "reading": "だらに",
+   "pos": "noun",
+   "meaning": "dhāraṇī, long incantation",
+   "defJa": "梵語の音を保って唱える仏教の呪句",
+   "passage": {
+    "ja": "経典を漢語に訳す際、意味を移す代わりに、元の言葉の音を漢字で残した部分がある。陀羅尼はそうした形で伝えられてきた仏教の呪句であり、漢字の通常の意味を一字ずつ足しても、句全体の内容には届かない。日本の寺院に伝わる読誦を調べるときは、原語、漢字による音写、実際の唱え方という複数の層を分けることが有効である。文字を通じて声を保とうとした工夫に目を向ければ、翻訳の歴史が、文章の意味だけでなく音をどう継いだかの歴史でもあることが分かる。",
+    "form": "陀羅尼",
+    "en": "When Buddhist texts were translated into Chinese, some passages retained the original sounds through Chinese characters rather than translating their meanings. Dharanis are Buddhist formulas transmitted in such forms, so adding the ordinary meanings of individual characters does not reveal the whole phrase. Studying recitation in Japanese temples benefits from distinguishing the original language, phonetic transcription, and actual pronunciation. Examining how writing preserved sound shows that translation history concerns the transmission of voices as well as textual meaning.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「陀羅尼を唱える」。漢字の意味を読むことと音写を読むことを分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "陰陽",
+   "reading": "いんよう",
+   "pos": "noun",
+   "meaning": "yin and yang",
+   "defJa": "対立し補い合う二つの働きで世界を捉える考え",
+   "passage": {
+    "ja": "古い宗教の語をすべて仏教の言葉だと思い込むと、日本の思想の重なり方が見えなくなる。陰陽は中国に由来する世界の捉え方であり、インドから伝わった仏教の教義と、出発点を同じくするものではない。とはいえ、日本で用いられたという共通点だけでも、寺社や暮らしの資料を読む際には、両方の語彙に出会う理由になる。二つの働きの関係を説く議論と、縁起によって存在を捉える議論とを丁寧に読み分けることで、似た響きの背後にある問いの違いが際立つ。",
+    "form": "陰陽",
+    "en": "Treating every old religious word as Buddhist obscures the layering of Japanese thought. Yin and yang originate in a Chinese account of the world rather than sharing the starting point of Buddhist doctrines transmitted from India. Their common use in Japan nevertheless means that readers of materials about temples, shrines, and everyday life can encounter both vocabularies. Distinguishing an account of two interacting forces from an account of existence through dependent arising brings the different questions behind similar-sounding language into focus.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "中国由来の枠組みと仏教の縁起を、類似だけで同一視しない。",
+    "sense": ""
+   }
+  }
+ ]
+}

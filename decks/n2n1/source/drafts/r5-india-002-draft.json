@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "虚無",
+   "reading": "きょむ",
+   "pos": "noun",
+   "meaning": "nothingness, nihility",
+   "defJa": "すべてが無意味で、むなしく感じられること",
+   "passage": {
+    "ja": "枯山水の庭って、白い砂を丹念にならした面に石が数個載っているだけで、遠くから見ると何もないように見えるじゃないですか。砂の紋様は水を、石は島を表すとされるから、あの空白はただの虚無ではなく、見る人の心が自由に描き込む余地なんですよね。仏教でいう空も同じで、単なる無ではなく、ものが縁起で成り立つことを静かに見渡す知恵の側なんです。何も置いていないだけに、一つ一つの石の存在感がかえって際立つわけで、禅寺の庭は本当にうまくできています。",
+    "form": "虚無",
+    "en": "A dry-landscape garden, with just a few stones set on a surface of carefully raked white sand, looks from a distance like nothing at all, doesn't it? Since the raked patterns are said to stand for water and the stones for islands, that blank space is not mere nothingness; it is room for the viewer's mind to paint freely. The emptiness of Buddhism is the same: not mere nothing, but the wisdom that quietly surveys how things come into being through dependent arising. Precisely because nothing has been placed there, the presence of each individual stone stands out all the more; the gardens of Zen temples are truly well made.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「ただの虚無ではなく」のように単なる無を指し、仏教の「空」と対比される場面が多い",
+    "sense": "無意味で、何もないと感じられる状態"
+   }
+  },
+  {
+   "term": "虚空",
+   "reading": "こくう",
+   "pos": "noun",
+   "meaning": "empty space, the void",
+   "defJa": "何もなく、ただ広がりだけがある空間のこと",
+   "passage": {
+    "ja": "瞑想を学ぶとき、教義の主張と観察できる経験を区別する癖をつけておくと、あとあと理解が速い。仏典は心を虚空にたとえるけれど、これはあらゆるものを包み込み、どちらにも偏らないという教えであって、測定の結果ではない。語感から想像される完全な空白に反して、坐禅の修行を続けた人の報告では、音や体の感覚がむしろ鮮明に浮かび上がるという。教義が何を説くか、経験が何を示すか、この二つを別の欄に書き分けておくと、原典と研究のどちらを読んでも混乱しない。",
+    "form": "虚空",
+    "en": "When you study meditation, getting into the habit of separating doctrinal claims from observable experience will speed up your understanding later. The Buddhist scriptures liken the mind to empty space, but this is a teaching, that the mind embraces all things without leaning to either side, and not the result of a measurement. Contrary to the total blank the sound of the word suggests, reports from people who have kept up zazen practice say that sounds and bodily sensations surface all the more vividly. If you write down what the doctrine teaches and what experience shows in separate columns, you will not get confused, whether you are reading the original texts or the research.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "仏典では心の広がりのたとえとして「〜にたとえる」の形で現れることが多い",
+    "sense": "仏教で、ものを包み込む広大な空を指す語"
+   }
+  },
+  {
+   "term": "識別",
+   "reading": "しきべつ",
+   "pos": "noun",
+   "meaning": "discernment, discrimination (viveka)",
+   "defJa": "よく似たものの違いを見分けること",
+   "passage": {
+    "ja": "お寺の本堂で使われる線香の匂いは、香りに慣れた人なら沈香と白檀をひと嗅ぎで嗅ぎ分けられるという。この二つを分ける力を、ヨーガの原典の訳では識別と呼んでいて、単なる知識ではなく、混ざり合った対象を鋭く切り分ける認識の働きを指す。教義の上では、純粋に観るものと観られる世界をこの力で見極めることが、解脱の条件とされる。訳語を選ぶ立場から言えば、読み手の好みや慣れにかかわらず、隣の「区別」との違いが一文で伝わるかどうかで決めるほかない。",
+    "form": "識別",
+    "en": "With the incense used in a temple's main hall, they say a nose that knows can tell agarwood from sandalwood in a single breath. In translations of the Yoga scriptures the power of telling those two apart is called discernment, and it refers not to mere knowledge but to the mind's work of sharply separating what is blended together. On the level of doctrine, using this power to see through the difference between what purely sees and what is seen is held to be the condition of liberation. From the standpoint of choosing a translation, regardless of the reader's tastes and habits, the choice comes down to whether the difference from the neighboring word 'distinction' can be conveyed in a single line.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "混ざり合ったものを切り分ける知的能力を指す。哲学の訳語としても定着している",
+    "sense": "ヨーガ哲学で、観るものと観られるものを見極めること"
+   }
+  },
+  {
+   "term": "超越",
+   "reading": "ちょうえつ",
+   "pos": "noun",
+   "meaning": "transcendence",
+   "defJa": "あるものの限界を超えて、その外にあること",
+   "passage": {
+    "ja": "「超越」と「内在」、この二語の違いを押さえないと、ウパニシャッド系の原典は遠くの神様の話として誤読されやすいんですよ。ブラフマンは名前や形の向こうにあるものと説かれつつ、同じ伝統の語りでは、あらゆる生き物の心の内にも宿るとされます。すると、ブラフマンは世界から完全に切り離された存在ではなく、世界を超えながらその内にもいるという解釈が自然に成り立ちます。こうした二面性に加えて、読み手がどちらに重心を置くかで、信仰の形も神のイメージも変わってきます。",
+    "form": "超越",
+    "en": "If you do not grasp the difference between 'transcendence' and 'immanence,' texts in the Upanishadic line are easily misread as talk of a god far away. Brahman is taught as what lies beyond name and form, yet in the same tradition's telling it is also said to dwell within the heart of every living being. Then an interpretation takes shape naturally: Brahman is not a being cut off from the world, but one that is beyond the world while also within it. In addition to this two-sidedness, where the reader places the weight changes both the shape of faith and the image of the divine.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「超越と内在」のように内在と対で語られることが多く、宗教哲学の解説で頻出する",
+    "sense": "哲学・宗教で、経験の世界を超えてあること"
+   }
+  },
+  {
+   "term": "達磨",
+   "reading": "だるま",
+   "pos": "noun",
+   "meaning": "Bodhidharma; daruma doll",
+   "defJa": "禅の祖師の名。また、その姿をかたどった人形",
+   "passage": {
+    "ja": "正月のだるま市に並ぶ赤い人形には、願いをかけて片目を黒く入れ、かなった時に残りの目を入れる習慣がある。願いがかなわなかった人形をどう扱うかは持ち主ごとの小さな悩みで、多くは寺の納め場に集められることになる。焼き納めの行事は各地の寺で開かれ、倒しても起き上がる丸い形の由来は、禅の祖師・達磨の面壁九年という伝承に求められてきた。壁に向かう修行者の像が、願いごとの道具として生活に定着するにつれて、信仰と暮らしの境目はさらにあいまいになった。",
+    "form": "達磨",
+    "en": "For the red dolls lined up at New Year daruma markets, there is a custom of painting in one eye when making a wish, and the remaining eye once the wish has been granted. What to do with a doll whose wish went unfulfilled is each owner's small dilemma, and most end up gathered at a temple's receiving place. Burning ceremonies are held at temples around the country, and the origin of the round shape that rights itself when tipped over has been traced to the legend of Bodhidharma, the Zen patriarch, sitting nine years facing a wall. As the figure of an ascetic facing a wall took root in daily life as a tool for making wishes, the line between faith and everyday living grew only more blurred.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "僧の名と人形の両方を指す。人形は平仮名の「だるま」と書き分けられることも多い",
+    "sense": "禅宗の祖師とされる僧を指す語"
+   }
+  },
+  {
+   "term": "題目",
+   "reading": "だいもく",
+   "pos": "noun",
+   "meaning": "the daimoku chant; title, theme",
+   "defJa": "経典の題名。特に唱える対象となる題名",
+   "passage": {
+    "ja": "「南無妙法蓮華経って、お経の題名でしょ」と酒の席で友人に聞かれたとき、返事に少し手間取ったことがある。日蓮を祖とする諸宗では、法華経の題名そのものを題目と呼び、これを声に出して唱える唱題が、修行の中心に据えられている。題名に経の全体が宿るからこそ、一行を唱えることが経を読み、経を生きることと等しくなるという解釈が、ここには働いている。一つの題名をめぐって、信仰のかたちがこれほど変わる例は、ほかの宗教のなかにもあまり見当たらない。",
+    "form": "題目",
+    "en": "When a friend asked me over drinks, 'Namu Myoho Renge Kyo is just the title of a sutra, right?' I found myself taking a moment over how to answer. In the schools that regard Nichiren as their founder, the very title of the Lotus Sutra is called the daimoku, and chanting it aloud, a practice known as shodai, is placed at the center of training. What is at work here is the interpretation that because the whole sutra dwells within its title, chanting that single line becomes equal to reading the sutra and living it. An example in which the shape of faith changes this much around a single title is hard to find even among the other religions.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "ここでは経の題名を指す仏教語。唱題と組み合わせて覚えると区別しやすい",
+    "sense": "日蓮系仏教で唱える経の題名のこと"
+   }
+  },
+  {
+   "term": "餓鬼",
+   "reading": "がき",
+   "pos": "noun",
+   "meaning": "hungry ghost; brat",
+   "defJa": "仏教で、食べ物にありつけず苦しむ死者のこと",
+   "passage": {
+    "ja": "お盆の由来って、実は目連というお弟子さんの母親が餓鬼の道に落ちてしまった、という経の物語なんですよ。経によると、母はどんな食べ物も口に入る寸前に火に変わってしまう世界にいて、目連が運んだごちそうもだめだったという。目連が助けを求めると、夏の修行を終えた僧たちに食べ物を捧げなさいという勧めがあり、その施しが盆に際しての供養のしきたりになったという。一方でこの語、満たされない執着の象徴のはずなのに、口語では小さい子どもを指す悪態にもなるんですよね。",
+    "form": "餓鬼",
+    "en": "The origin of Obon is actually a story from a sutra in which the mother of a disciple named Mokuren falls into the way of hungry ghosts. According to the sutra, she is in a world where any food turns to fire the instant before it enters her mouth, and even the feast Mokuren carried to her was lost. When Mokuren sought help, he was told to offer food to the monks who had finished their summer practice, and that giving became the custom of offerings made at Obon. And yet this word, which ought to be a symbol of craving that is never satisfied, also turns up in everyday speech as an insult for little kids.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「〜の道」「〜の世界」と組んで死後の世界を指す。口語では子どもへの悪態という別の顔もある",
+    "sense": "死後に落ちるとされる苦しみの世界の住人"
+   }
+  },
+  {
+   "term": "マントラ",
+   "reading": "まんとら",
+   "pos": "noun",
+   "meaning": "mantra",
+   "defJa": "仏教やヨーガで、唱えるために決められた言葉",
+   "passage": {
+    "ja": "マントラを日本語に置くとき、呪文、真言、カタカナのまま、という三つの選択肢があって、多くの人は一度は迷うことになります。呪文はゲームの魔法のような印象が強すぎますし、真言は真言宗の専門用語の響きが強くて、日常の説明には少し硬いです。原典の世界では、決まった音節を唱えること自体が修行に組み込まれていたので、どの訳語も完全な外れではありません。響きの違いを一つずつ確かめつつ、伝える相手と場に合う語を選んでいく、という地道な作業になります。",
+    "form": "マントラ",
+    "en": "When you render 'mantra' into Japanese, there are three options: the word for a spell, the Buddhist term shingon, or the katakana as it stands, and most people hesitate at least once. 'Spell' carries too strong an image of magic in games, while shingon has the ring of a technical term of the Shingon school and feels a bit stiff for an everyday explanation. In the world of the original texts, chanting fixed syllables was itself built into the practice, so none of the renderings is completely off the mark. It becomes the patient work of checking the feel of each word one by one while choosing the one that fits the listener and the setting.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "訳語には呪文・真言があり、場面によって使い分けられる。カタカナのまま使われることも多い",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ヴェーダーンタ",
+   "reading": "ゔぇーだーんた",
+   "pos": "noun",
+   "meaning": "Vedānta",
+   "defJa": "ヴェーダの末尾を指す語。転じて、一つの哲学の流派",
+   "passage": {
+    "ja": "ヴェーダーンタは、元をただせば「ヴェーダの終わりの部分」を指す、ごく素直な作りをした語なんです。ヴェーダの末尾に置かれたウパニシャッドが、いつしか一つの哲学の系譜を名乗る学派へと育っていく、という歩みをたどってきました。一八九三年、シカゴの宗教会議でヴィヴェーカーナンダが英語で講演してからは、原典の名ではなく思想の名として広く通用するようになりました。長いカタカナ語とはいえ、この履歴を知っておくと、一語に訳せない理由もはっきり見えてくるものです。",
+    "form": "ヴェーダーンタ",
+    "en": "Vedanta, if you trace it back, is a very plainly built word meaning 'the concluding part of the Vedas.' It is a word that has followed a path in which the Upanishads, placed at the end of the Vedas, grew in time into a school that claimed a whole lineage of philosophy. After Vivekananda lectured in English at the Chicago parliament of religions in eighteen ninety-three, it circulated widely in the West as the name of a philosophy rather than of a scripture. Long katakana word though it is, once you know this history, the reason it cannot be rendered in a single word also comes clearly into view.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "「終わりの部分」から流派の名へと意味が広がってきた語。語源を押さえると全体が見える",
+    "sense": "元は経典の末尾、転じて哲学の流派の名"
+   }
+  }
+ ]
+}

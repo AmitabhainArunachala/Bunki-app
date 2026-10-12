@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "ケイ素",
+   "reading": "けいそ",
+   "pos": "noun",
+   "meaning": "silicon (the element)",
+   "defJa": "半導体材料などに使われる元素の一つ",
+   "passage": {
+    "ja": "砂浜の砂粒が、そのまま計算機の中で働いていると思うと、材料づくりの大切な工程が抜け落ちます。ケイ素は元素の名前であり、砂に含まれる二酸化物から取り出した後も、材料には高度な精製が必要です。不純物を除く工程を経て整えた結晶に、今度は電気的な性質を変えるため、別の元素をごく少量加えることがあります。同じ「混ぜ物」でも、偶然入り込んだ汚れと狙って加えた成分とでは、回路にとっての意味が正反対になるのです。",
+    "form": "ケイ素",
+    "en": "Imagining grains of beach sand working unchanged inside a computer leaves out essential stages of making the material. Silicon is the name of an element, and even after extraction from its dioxide in sand, the material requires extensive purification. A crystal prepared through impurity removal may then receive tiny amounts of another element to alter its electrical properties. Even under the same label of added material, accidental contamination and deliberately introduced ingredients mean opposite things for the circuit.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "元素名であり、砂そのものや化合物の名前ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6f3cd6ef9f-fcb82a15",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-6f3cd6ef9f-fcb82a15",
+    "wordId": "nn-6f3cd6ef9f"
+   }
+  },
+  {
+   "term": "試算",
+   "reading": "しさん",
+   "pos": "noun",
+   "meaning": "a provisional calculation",
+   "defJa": "一定の仮定を置いておおよその数値を計算すること",
+   "passage": {
+    "ja": "新しい工場の計画で、担当者は生産量と設備費を表に並べました。試算では黒字になる見込みでも、前提にした販売量が達成できなければ収支は変わります。そこで注文が少ない場合や、材料費が上がる場合も計算し直します。数字を細かく示しても、仮定が外れれば結果は大きく変わります。計画に資金を出すかを決めるにあたっては、予想した一つの結果に加え、条件を変えたときに損失へ転じる境目も判断の材料になります。",
+    "form": "試算",
+    "en": "For a new factory plan, the manager tabulated production volumes and equipment costs. An estimate may suggest a profit, but the balance changes if the assumed sales volume is not achieved. Calculations are therefore repeated for fewer orders or higher material costs. Even if the figures are presented in detail, the result changes greatly when the assumptions prove wrong. Deciding whether to fund the plan requires considering the point where changed conditions produce losses, alongside one projected result.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "仮定を置いておおよその数値を求めることで、確定した実績とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-b2a785f570-51e15c0b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-b2a785f570-51e15c0b",
+    "wordId": "nn-b2a785f570"
+   }
+  }
+ ]
+}

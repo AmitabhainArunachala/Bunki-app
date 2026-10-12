@@ -1,0 +1,312 @@
+{
+ "cards": [
+  {
+   "term": "張る",
+   "reading": "はる",
+   "pos": "verb",
+   "meaning": "to stretch, to spread (roots)",
+   "defJa": "根などが広がって定着すること",
+   "passage": {
+    "ja": "仏教は、苦しみの原因を執着に見る。執着は、木が土に根を張るように心の奥へ深く広がり、いったん定着したが最後、簡単には引き抜けなくなる。だからこそ、まだ小さな芽のうちに気づくことが何よりも大切になる。庭の草取りと同じで、根が浅いうちにほんの数分手を入れておくことが、のちの大仕事を未然に防いでくれる。瞑想で自分の心の動きを日ごろから観察するよう心がけるのも、そのためである。",
+    "form": "張る",
+    "en": "Buddhism sees attachment as the cause of suffering. Attachment spreads deep in the mind the way a tree sets roots in soil, and once settled it cannot be easily pulled out. That is exactly why noticing it while it is still a small sprout matters above all. As with weeding a garden, putting in just a few minutes of work while the roots are shallow prevents big jobs later. This is also the reason for making a point of observing the movements of the mind in meditation every day.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「根を張る」は、植物にも比喩にも使う。ほかに「気を張る」など。",
+    "sense": "根などが広がり定着する"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "完璧",
+   "reading": "かんぺき",
+   "pos": "na-adj",
+   "meaning": "perfect, flawless",
+   "defJa": "欠点がまったくないこと",
+   "passage": {
+    "ja": "ダ・ヴィンチみたいに偉い芸術家でも、完璧を求めすぎて未完成のまま手放した作品がいくつもあるんですよ。《東方三博士の礼拝》なんかもそうです。依頼主を待たせたあげく、結局ミラノへ旅立ってしまったんですね。完成させるより次の興味に移る人だったんでしょうね。理想が高い人に言いたいんですけど、巨匠でさえ未完成と折り合いをつけながら次へ進んでいたんですから、もう少し肩の力を抜いていいと思うんですよ。",
+    "form": "完璧",
+    "en": "Even a great artist like da Vinci left several works unfinished because he demanded perfection. The Adoration of the Magi is one such case. After keeping his client waiting, he ended up leaving for Milan. He was probably the kind of person who moved on to the next interest rather than finish. To those with high ideals, I'd say even a master went on to the next thing while making peace with the unfinished, so I think you can relax your shoulders a little.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「完璧を求める」「完璧主義」。欠点のなさを理想とする語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "廃れる",
+   "reading": "すたれる",
+   "pos": "verb",
+   "meaning": "to fall out of use, to decline",
+   "defJa": "使われなくなって衰えること",
+   "passage": {
+    "ja": "ラジオ体操とか、毎朝やってた習慣って、気づいたら廃れてたりしません？あれ、意志が弱いというより、きっかけがなくなっただけなんですよね。夏休みに公園へ集まるっていう仕掛けがなくなれば、続ける理由も消えるわけで。習慣を残したいなら、気合いより先に、きっかけの置き場所を考えたほうがいいですよ。習慣も言葉も、使う場がなくなると、誰にも気づかれないまま静かに消えていくものなんですよ。",
+    "form": "廃れて",
+    "en": "Things like radio calisthenics, a habit you did every morning, haven't they fallen out of use before you noticed? That is less weak will than the trigger simply being gone. Once the setup of gathering in the park during summer vacation is gone, the reason to continue disappears too. If you want to keep a habit, think about where to place the trigger before you rely on willpower. Habits and words alike, once their place of use is gone, quietly vanish without anyone noticing.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「習慣が廃れる」「伝統が廃れる」。使われず衰えていく。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "大規模",
+   "reading": "だいきぼ",
+   "pos": "na-adj",
+   "meaning": "large-scale",
+   "defJa": "仕組みや範囲が大きいこと",
+   "passage": {
+    "ja": "国立国語研究所は、全国各地の方言を記録する大規模な調査を、長年にわたって続けてきた。若い世代ほど方言が薄れているとはいえ、語尾や抑揚には地域差が依然として残る。研究者たちは、消えつつある語彙を録音するとともに、使われ方の変化を追っている。調査の成果は、教育の現場や地域の言葉の保存にも役立てられている。言葉の変化は、辞書の改訂を待たずに、人々の暮らしの中で静かに、しかし確実に進んでいる。",
+    "form": "大規模",
+    "en": "The National Institute for Japanese Language and Linguistics has for many years continued a large-scale survey that records dialects across the country. Although dialects are fading faster among younger generations, regional differences still remain in sentence endings and intonation. The researchers are recording vocabulary that is disappearing while also tracking changes in how it is used. The results are also put to use in schools and in preserving local speech. Language change does not wait for dictionary revisions; it proceeds quietly but surely within people's daily lives.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「大規模な調査・工事・災害」のように、規模の大きさを硬い文で述べる。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "怖がる",
+   "reading": "こわがる",
+   "pos": "verb",
+   "meaning": "to be afraid of",
+   "defJa": "おそろしいと感じて避けようとする",
+   "passage": {
+    "ja": "新しい技術を怖がるのは、人間にとってごく自然な反応です。電卓が教室に入ってきた時代にも、計算力が落ちるのではないかと心配する先生や親の声がありました。恐れるあまり触れずにいると、使いこなす人との差が、気づかないうちに静かに開いていきます。かといって、AIの答えを何でも鵜呑みにするのも、同じくらい危険です。大事なのは、疑う目を持ちながらも、まず手を動かして小さく試してみる姿勢でしょう。",
+    "form": "怖がる",
+    "en": "Being afraid of a new technology is a perfectly natural human reaction. Even in the era when calculators came into classrooms, there were voices of teachers and parents worried that calculation ability would fall. If you avoid touching it out of fear, the gap with those who master it quietly opens without your noticing. That said, swallowing everything an AI says whole is just as dangerous. What matters is probably the attitude of keeping a doubting eye while still trying things out in small ways with your own hands.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「新技術を怖がる」。「怖い」から作る動詞で、人の態度を述べる。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "安堵",
+   "reading": "あんど",
+   "pos": "noun",
+   "meaning": "relief",
+   "defJa": "心配が消えてほっとすること",
+   "passage": {
+    "ja": "戦国の武将ってさ、勝つ側につくのは命がけだけに、読みを誤れば一族ごと消えるじゃないですか。関ヶ原のあと、領地を取り上げられずに済んだ大名は、心底安堵しただろうなって思うんですよ。逆に、西軍についた毛利は大きく減らされたわけで、この差が後の幕末まで響くんです。勝ち負けの実情は、いつも紙一重なんですよね。歴史の教科書には出てこない、そういう人間くさい感情を想像すると、急に面白くなりませんか？",
+    "form": "安堵",
+    "en": "Warlords of the Sengoku era, you see, risked their lives choosing the winning side, so one misjudgment could wipe out a whole clan. I imagine the daimyo who were not stripped of their domains after Sekigahara felt deep relief. Mori, on the other hand, sided with the Western Army and was cut down sharply, and that gap echoes all the way to the end of the shogunate. The reality of winning and losing is always a hair's breadth apart. Doesn't it suddenly get interesting when you imagine such human feelings that never show up in textbooks?",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「安堵の息をつく」「胸をなで下ろして安堵する」。ほっとする気持ち。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "実情",
+   "reading": "じつじょう",
+   "pos": "noun",
+   "meaning": "actual situation",
+   "defJa": "表からは見えにくい本当の事情",
+   "passage": {
+    "ja": "生成AIの普及に伴い、データセンターの電力消費が各国で問題になっている。ただ、実情を正確に示す統計はまだ少なく、事業者ごとの公表も限られる。そのため、電力会社や自治体は、見通しの立てにくい状況での設備計画を余儀なくされている。省エネ型の半導体の開発は、その対策の一つとして期待されている。足元の数字が十分にそろわないうちは、拙速な結論を避け、慎重に議論を進める姿勢が求められる。",
+    "form": "実情",
+    "en": "With the spread of generative AI, power consumption by data centers has become a problem in many countries. Yet statistics that accurately show the actual situation remain scarce, and disclosure by operators is limited. As a result, utilities and municipalities are forced to plan facilities under hard-to-predict conditions. The development of energy-saving semiconductors is expected to be one countermeasure. Until the figures at hand are sufficiently in, an attitude of avoiding hasty conclusions and proceeding carefully with debate is called for.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「実情を把握する・に合わせる」のように、現場の本当の事情を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "廃棄物",
+   "reading": "はいきぶつ",
+   "pos": "noun",
+   "meaning": "waste, refuse",
+   "defJa": "使い道がなく捨てられるもの",
+   "passage": {
+    "ja": "十九世紀のロンドンは、人口の急増に伴って、し尿や工場の廃棄物がテムズ川に流れ込む街でした。1858年の夏には、耐えがたい悪臭が議事堂まで届き、「大悪臭」と呼ばれる事態になります。これを機に、技師バザルジェットが大規模な下水道網をつくり、街の衛生は大きく改善しました。この事業は、都市のインフラが人の命を守ることを示した代表的な例です。ロンドンの経験は、衛生が都市の課題として意識される転機となりました。",
+    "form": "廃棄物",
+    "en": "Nineteenth-century London, with its rapidly growing population, was a city where sewage and factory waste flowed into the Thames. In the summer of 1858, an unbearable stench reached Parliament in what came to be called the Great Stink. Taking this as the occasion, the engineer Bazalgette built a large-scale sewer network, and the city's sanitation improved greatly. This project is a representative example showing that urban infrastructure protects human lives. London's experience became a turning point at which sanitation came to be recognized as an urban issue.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「産業廃棄物」「廃棄物処理」。捨てられるものを総称する。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "心がける",
+   "reading": "こころがける",
+   "pos": "verb",
+   "meaning": "to keep in mind, to make a point of",
+   "defJa": "いつも気をつけて努めること",
+   "passage": {
+    "ja": "ヨーガ・スートラは、心の揺れを静める方法として、修習と離欲の二つを挙げる。修習とは、静けさを保つ努力を、日々の平凡な反復の中で長く続けることである。離欲とは、見聞きするものへの執着から離れようと心がけることにほかならない。どちらか一方だけでは足りず、車の両輪のように働いてこそ、心は落ち着きを得る。修習と離欲の釣り合いという視点は、情報にあふれた現代の暮らしにも、そのまま通じる教えといえよう。",
+    "form": "心がける",
+    "en": "The Yoga Sutras list two methods for stilling the mind's fluctuations: practice and non-attachment. Practice is continuing the effort to keep stillness over a long time in ordinary daily repetition. Non-attachment is nothing other than making a point of leaving behind attachment to what is seen and heard. Neither alone is enough; only when they work like the two wheels of a cart does the mind find calm. The viewpoint of balancing practice and non-attachment can be called a teaching that applies as it is even to modern life, overflowing with information.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「〜しようと心がける」。日ごろから意識して努める。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "夕闇",
+   "reading": "ゆうやみ",
+   "pos": "noun",
+   "meaning": "dusk, twilight",
+   "defJa": "日が暮れて暗くなりかける頃",
+   "passage": {
+    "ja": "窓の外に夕闇が降りてくる頃、研究室の画面では、学習の誤差がまだ下がり続けていました。この仕組みを知らずに欲張ってモデルを大きくすると、過学習に陥りかねません。止めどきを見極めるのも、立派な技術です。経験を積んだ研究者ほど、派手な新手法を試す前に、この地味な見極めへ時間をかけるものです。夜が更けるにつれ、部屋に残っているのは、計算機の唸りだけになっていきました。",
+    "form": "夕闇",
+    "en": "As dusk settled outside the window, the training error on the lab screen was still dropping. If you enlarge the model greedily without knowing this mechanism, you may well fall into overfitting. Knowing when to stop is also a real skill. The more experienced the researcher, the more time they spend on this plain judgment before trying a flashy new method. As the night deepened, all that remained in the room was the hum of the computers.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「夕闇が迫る・降りる」の形で、日暮れの薄暗さを表す文章語。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "応接室",
+   "reading": "おうせつしつ",
+   "pos": "noun",
+   "meaning": "reception room",
+   "defJa": "客を迎えて応対するための部屋",
+   "passage": {
+    "ja": "初対面の相手を応接室で待つ間、人は想像以上に、こちらの様子を観察されている。入室の瞬間に何を言うかより、座る姿勢や資料の置き方、余計な動きの少なさが、印象を左右することも多い。話し方を磨く前に、まず黙っている時間の過ごし方を整えておくといい。入室の前に深呼吸を一つして、手元の資料の順番を確かめるだけで、動作は驚くほど落ち着くものだ。第一声は、その静けさの延長にすぎない。",
+    "form": "応接室",
+    "en": "While waiting in a reception room for someone you meet for the first time, you are being observed more than you imagine. More than what you say the moment you enter, your sitting posture, how you place your documents and how few needless movements you make often sway the impression. Before polishing how you speak, it is good to first prepare how you spend the silent time. Just taking one deep breath before entering and checking the order of your documents makes your movements calm down surprisingly. Your first words are merely an extension of that stillness.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「応接室に通す」。客を迎える部屋。会社や学校で使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "多岐",
+   "reading": "たき",
+   "pos": "na-adj",
+   "meaning": "wide-ranging, many-branched",
+   "defJa": "いくつにも分かれて広がること",
+   "passage": {
+    "ja": "世界史が苦手だという人は、出来事の膨大さに圧倒されているだけです。たとえば大航海時代ひとつとっても、航海術や香辛料の貿易はもちろん、宗教や銀の流通まで、話題は多岐に及びます。ばらばらに覚えるのではなく、まず大まかな原因と結果の糸でつなぐのがコツです。糸が一本通れば、暗記の量は驚くほど減ります。地図の上で、点ではなく線で歴史を追う癖がつくと、新しい時代に出会っても慌てずに済みます。",
+    "form": "多岐",
+    "en": "People who say they are bad at world history are often simply overwhelmed by the sheer number of events. Take the Age of Discovery alone: the topics range widely, from navigation and the spice trade to religion and the flow of silver. The trick is not to memorize things separately but first to connect them with a rough thread of cause and effect. Once one thread runs through, the amount you have to memorize drops surprisingly. Once you get into the habit of following history as lines rather than points on a map, you will not panic when you meet a new era.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「多岐にわたる」「多岐に及ぶ」の形で、分野や内容の広がりを表す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "忠実",
+   "reading": "ちゅうじつ",
+   "pos": "na-adj",
+   "meaning": "faithful, loyal",
+   "defJa": "元のものに正確に従う様子",
+   "passage": {
+    "ja": "翻訳は、原文に忠実であろうとするほど、訳文が不自然になるという矛盾を抱えている。機械翻訳が進歩した今も、この緊張は依然として消えていない。言葉の意味は、辞書の中ではなく、文化の背景と文脈に宿るがゆえである。本当の正確さとは、単語を一対一で置き換えることではなく、読み手に同じ効果を生むことなのかもしれない。訳者の腕は、辞書に載っていない部分の判断でこそ、いちばん試されるのである。",
+    "form": "忠実",
+    "en": "Translation harbors the contradiction that the more it tries to be faithful to the original, the more unnatural the translated text becomes. Even now that machine translation has advanced, this tension has still not disappeared. This is because the meaning of words dwells not in the dictionary but in cultural background and context. True accuracy may be not replacing words one to one but producing the same effect in the reader. A translator's skill is tested most in judgments about the parts that are not in the dictionary.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「原文に忠実」「事実に忠実」。元のものから離れず正確に従う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "大まか",
+   "reading": "おおまか",
+   "pos": "na-adj",
+   "meaning": "rough, broad",
+   "defJa": "細部にこだわらず全体をとらえる様子",
+   "passage": {
+    "ja": "辞書が示す語義は、言葉の動きを大まかに区切った地図にすぎない。実際の用法は、その境界を平気でまたぎ、文脈ごとに色を変えていく。地図を暗記したところで、旅をしたことにはならないのと同じである。ゆえに、言葉の習得とは、語義の暗記ではなく、用例の中を巡ることにほかならない。辞書を引く目的は、正解を確かめることより、言葉の輪郭が揺れる場所を見つけることにあるのではないか。",
+    "form": "大まか",
+    "en": "The senses a dictionary lists are merely a map that divides the movement of words roughly. Actual usage casually crosses those borders and changes color with each context. Memorizing a map does not mean you have made a journey. Hence, acquiring a language is not memorizing senses but nothing other than traveling through examples. Perhaps the point of consulting a dictionary lies less in confirming the right answer than in finding the places where a word's outline wavers.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「大まかに区切る」「大まかな流れ」のように、細部を捨てて全体をつかむ意味。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

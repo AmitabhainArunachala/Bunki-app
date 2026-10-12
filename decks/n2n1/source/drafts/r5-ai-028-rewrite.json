@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "素子",
+   "reading": "そし",
+   "pos": "noun",
+   "meaning": "an electronic device or element",
+   "defJa": "電子回路を構成し、一定の働きをする要素",
+   "passage": {
+    "ja": "基板に載った黒いチップは一個の部品に見えるけど、その中には電流を制御する仕組みがたくさん作り込まれているんだ。回路の中で抵抗や増幅など一定の働きを担う基本要素を素子と呼んでいて、トランジスターもその一種だよ。一個の部品と一個の基本要素が対応するとは限らないから、外から見える個数だけで回路の複雑さは決められないんだね。集積回路の図を読むなら、外側の箱と内側の機能を分け、端子を通じてどんな信号が出入りするかを追うと面白いよ。",
+    "form": "素子",
+    "en": "The black chip on a circuit board looks like one component, but many mechanisms for controlling current are built inside it. A basic element performing a particular circuit function such as resistance or amplification is called a device or element, and a transistor is one example. One packaged component does not necessarily correspond to one basic element, so the count visible from outside cannot determine a circuit’s complexity. When reading an integrated-circuit diagram, it is interesting to distinguish the outer package from the functions inside and trace signals passing through its terminals.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "機能を担う基本要素を指し、一個の外装に多数が収まる場合もある。",
+    "sense": ""
+   }
+  }
+ ]
+}

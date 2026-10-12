@@ -1,0 +1,48 @@
+{
+  "cards": [
+    {
+      "term": "惜しむ",
+      "reading": "おしむ",
+      "pos": "verb",
+      "meaning": "to be frugal with, to hold back; to regret",
+      "defJa": "労力や金を出すのをためらうこと",
+      "passage": {
+        "ja": "今日は隋の大運河の話をしましょう。江南の豊かな物資を北方へ運ぼうにも水路がつながっておらず、陸送のコストが国家を苦しめていました。そこで煬帝は膨大な数の民衆を動員し、労力を惜しまず運河の建設を一気に進めたのです。完成した水路は後の王朝も活用するほど優れたものでしたが、重い負担に耐えかねた民衆の反乱が、隋を滅ぼす一因にもなりました。歴史の大事業は、いつも栄光と代償がセットなのです。",
+        "form": "惜しまず",
+        "en": "Today, let's talk about the Grand Canal of the Sui dynasty. There were no connected waterways for carrying the rich goods of the Jiangnan region north, and the cost of moving them overland was crushing the state. So Emperor Yang mobilized a vast number of commoners and, sparing no labor, drove the canal's construction forward in one great push. The finished waterway was so good that later dynasties used it too, but rebellions by people who could no longer bear the heavy burden also became one cause of the Sui's fall. The great projects of history always come as a set: glory and its price.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「労力を惜しまず」「費用を惜しまない」など、打消し形と組んで「全力を注ぐ」の意になるのが定番である。",
+        "sense": "労力や金を出し惜しみする意で、多く打消し形で使う"
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "態勢",
+      "reading": "たいせい",
+      "pos": "noun",
+      "meaning": "posture, readiness; setup for action",
+      "defJa": "物事に取り組むための構えや準備",
+      "passage": {
+        "ja": "今日は半導体をめぐる駆け引きの話をしましょう。米国が中国への先端チップの輸出を規制したのを受けて、中国は国産化に活路を見いだします。政府主導で巨額の資金が投入され、海外で活躍する技術者を呼び戻す動きまで加速しました。その結果、旧型チップの分野では自前で量産できる態勢が急速に整いつつあるのです。技術開発とは、締め付けが強まるほどかえって速くなる、不思議な生き物なのです。",
+        "form": "態勢",
+        "en": "Today, let's talk about the games being played over semiconductors. When the United States moved to restrict exports of advanced chips to China, China looked for a way out in making its own. Huge sums were poured in under government leadership, and the drive to call home engineers who had been thriving overseas even picked up speed. As a result, in the field of older-generation chips, a setup for mass-producing them domestically is rapidly falling into place. Technological development is a strange creature: the tighter the squeeze, the faster it moves.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「態勢を整える」「態勢が整う」が定番。準備や構えが整った状態を指し、報道や解説でも頻出する語である。",
+        "sense": ""
+      },
+      "deck": "n1",
+      "field": null,
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

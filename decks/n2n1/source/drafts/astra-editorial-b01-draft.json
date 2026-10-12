@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "悪癖",
+   "reading": "あくへき",
+   "pos": "noun",
+   "meaning": "bad habit",
+   "defJa": "身についてしまった好ましくない癖。",
+   "passage": {
+    "ja": "仕事の締め切りが近づくたびに、関係のない資料を読み始めてしまう場合を考える。この悪癖を直すには、意気込みを書き出すだけでなく、実際に作業を止めた場面を記録しておく方法がある。何を調べようとして画面を開き、どこから別の話題へ移ったのかをたどれば、行動を変える手がかりになる。原因を性格の弱さだけに求める一方で、手順の分かりにくさを見落としている可能性もある。本人を責める言葉を増やす前に、次の一歩が具体的に決まっているかを点検する余地がある。",
+    "form": "悪癖",
+    "en": "Consider someone who starts reading unrelated material whenever a work deadline approaches. One way to address this bad habit is to record the moments when work actually stopped, rather than only writing down resolutions. Tracing what they intended to research when they opened the screen and where they shifted to another topic can provide clues for changing the behaviour. While attributing the cause solely to weak character, they may also be overlooking unclear procedures. Before adding more words of self-blame, there is room to check whether the next step has been concretely defined.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「悪癖を直す」は、繰り返して身についた好ましくない習慣を改めることです。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "老衰",
+   "reading": "ろうすい",
+   "pos": "noun",
+   "meaning": "decline due to old age",
+   "defJa": "年を重ねて全身の働きが衰えること。",
+   "passage": {
+    "ja": "伝記に老衰で亡くなったと記されていても、その人が最期まで穏やかだったかどうかは、この一語からは読み取れません。示されているのは年を重ねて体が衰えたことであり、本人の気持ちを直接述べた表現ではないからです。別れの場面を柔らかい言葉で描こうとするあまり、記録にない感情まで補わないようにします。残された手紙や家族の記述に当たる際にも、誰が見たことなのかを区別します。文章の背後にある情報の範囲を自覚すると、事実を伝える語と、読み手が抱く印象を分けて扱えます。",
+    "form": "老衰",
+    "en": "Even if a biography records that someone died of old age, that term alone does not tell us whether the person remained peaceful to the end. It indicates physical decline with age rather than directly describing the person’s feelings. Avoid adding emotions absent from the record in an excessive effort to portray the farewell gently. When consulting surviving letters or family accounts, also distinguish whose observations they report. Awareness of the scope of the information behind the text lets us separate words conveying facts from impressions formed by readers.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "加齢による体の衰えを指し、本人の気持ちまで表す言葉ではありません。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "再三",
+   "reading": "さいさん",
+   "pos": "adverb",
+   "meaning": "repeatedly; again and again",
+   "defJa": "同じことが何度も繰り返されるさま。",
+   "passage": {
+    "ja": "古い役所の記録に、村へ再三通知したと書かれていたら、一度だけではなく、何度も知らせたことが分かります。ただし、それだけをもとに、村人が命令に従わなかったと決めつけることはできません。最初の文書が届かなかったのか、通知の対象が広がったのか、前後の記録も必要になります。直感で一つの物語にまとめる前に、送り先や日付を並べて、実際の経過を把握しましょう。史料に書かれた回数と、その回数になった理由を分けて考える練習が、歴史を読む際の推測を慎重にしてくれます。",
+    "form": "再三",
+    "en": "If an old government record says that a village was notified repeatedly, we know that it was informed several times rather than just once. That alone, however, does not justify concluding that the villagers disobeyed an order. Surrounding records are also needed to establish whether the first document failed to arrive or the notification was extended to more recipients. Before intuitively shaping a single story, arrange the addressees and dates to establish the actual sequence. Practising the distinction between the number of times recorded and the reason for that number makes our inferences more careful when reading history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「再三通知する」は、一度にとどまらず何度も知らせることです。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "宣教師",
+   "reading": "せんきょうし",
+   "pos": "noun",
+   "meaning": "missionary",
+   "defJa": "宗教を広めるために派遣される人。",
+   "passage": {
+    "ja": "異文化の出会いを描く歴史文で、宣教師の手紙を引用するなら、布教を目的に訪れた人の記録だと分かるようにします。現地の習慣を詳しく書いていても、社会全体を代表する声だとは限りません。文章の大意をつかんだ上で、誰に向けて、どんな状況を伝えようとした手紙なのかを確かめます。現地側の記録も残っているなら、同じ出来事がどう語られているかを並べて読むと、視点の違いを示せます。読みやすい物語にまとめる際も、一人の観察をその土地のすべてへ広げないよう配慮したいですね。",
+    "form": "宣教師",
+    "en": "If you quote a missionary’s letter in historical writing about encounters between cultures, make clear that it is the record of someone who came to spread a religion. Even a detailed account of local customs does not necessarily represent the voice of the whole society. After grasping the text’s overall meaning, establish whom the letter addressed and what circumstances it sought to convey. If local records also survive, placing accounts of the same event alongside each other can show differences of perspective. Even when shaping a readable narrative, take care not to extend one person’s observations to everything about the place.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "布教のために派遣された人を指し、その人の立場も記録の読み方に関わります。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "唱える",
+   "reading": "となえる",
+   "pos": "verb",
+   "meaning": "chant; recite aloud",
+   "defJa": "定まった言葉を声に出して述べる。",
+   "passage": {
+    "ja": "仏教の法要で経文を唱える場面を記録する際、文字の内容と、声に出して読む行為は分けて捉える必要がある。同じ文章でも、一人が読むのか、複数の人が声を合わせるのかによって、記録すべき点が異なる。音の長さや区切りを確かめることに加えて、その法要での役割を尋ねれば、儀礼との関わりも調べられる。聞いた人の感想だけを根拠に、参加者全員の気持ちや身体への影響まで言い切ることはできない。信仰に密接に関わる営みを伝えるには、見聞きした事実と解釈の境目を保つ姿勢が求められる。",
+    "form": "唱える",
+    "en": "When documenting the chanting of scriptures at a Buddhist service, it is necessary to distinguish the written content from the act of reciting it aloud. Even with the same text, what needs to be recorded differs depending on whether one person reads or several join their voices. In addition to examining the length and phrasing of the sounds, asking about their role in that service allows the connection with the ritual to be investigated. One listener’s impressions alone cannot establish all participants’ feelings or bodily effects. Reporting an activity closely connected with faith requires maintaining the boundary between observed facts and interpretation.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「経文を唱える」は、経典の言葉を声に出して読むことです。",
+    "sense": "定まった言葉を声に出して読む。"
+   }
+  },
+  {
+   "term": "心理言語学",
+   "reading": "しんりげんごがく",
+   "pos": "noun",
+   "meaning": "psycholinguistics",
+   "defJa": "言葉の理解や産出を心の働きから調べる学問。",
+   "passage": {
+    "ja": "日本語の文を読むとき、助詞が一つ変わるだけで、誰が何をしたのかという理解が変わることがあります。そうした理解の過程を、心の働きとして調べる分野が心理言語学です。たとえば、文の条件をそろえた上で、読み終えるまでの時間や内容への答えを比べる実験を考えられます。時間の微差が出た場合にも、その原因をすぐ一つに決めず、語の難しさなど別の条件を確かめます。自分には自然に読めるという感覚を入り口にしながら、確かめられる問いへ変えていくところに、この分野の面白さがあります。",
+    "form": "心理言語学",
+    "en": "When reading a Japanese sentence, changing a single particle can alter our understanding of who did what. Psycholinguistics studies such processes of understanding as functions of the mind. For example, one could design an experiment comparing reading times and answers about content while matching the conditions of the sentences. Even if a small timing difference appears, other conditions such as word difficulty must be checked rather than immediately assigning it a single cause. The appeal of the field lies in taking a feeling such as finding something natural to read and turning it into a testable question.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "言葉を理解したり話したりする過程を、実験や観察で調べる学問です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ありのまま",
+   "reading": "ありのまま",
+   "pos": "adverb",
+   "meaning": "as it is; without embellishment",
+   "defJa": "飾ったり変えたりせず、実際のとおりに。",
+   "passage": {
+    "ja": "一日の記録をつけるとき、出来事をありのままに書こうとしても、失敗したという評価が先に出てくることがある。予定の本を読めなかったと書くことと、何もできない一日だったと書くことは同じではない。後者には、その日全体についての判断が加わっている。肝心なのは感想を消すことではなく、起きたことをもとに、どこから自分の評価が始まったかを確かめることである。書いた言葉を読み返し、判断の根拠を一つずつ探るなら、日記は自分を責めるためだけの場所ではなくなる。",
+    "form": "ありのまま",
+    "en": "When keeping a daily record, even an attempt to describe events as they were can be overtaken by a judgment that you failed. Writing that you did not read the book you had planned is not the same as writing that you accomplished nothing all day. The latter adds a judgment about the entire day. What matters is not eliminating impressions, but using what happened to identify where your own evaluation began. If you reread your words and examine the grounds for each judgment, the diary no longer serves only as a place for self-blame.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「ありのままに書く」は、飾ったり内容を変えたりせず事実どおりに書くことです。",
+    "sense": ""
+   }
+  }
+ ]
+}

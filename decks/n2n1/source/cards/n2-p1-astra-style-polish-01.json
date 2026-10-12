@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "非公式",
+   "reading": "ひこうしき",
+   "pos": "na-adj",
+   "meaning": "unofficial; informal",
+   "defJa": "正式な手続きや立場によらないさま。",
+   "passage": {
+    "ja": "授業後の廊下では質問できるのに、教室で手を挙げるとなると、言葉が出なくなることがあります。先生との非公式なやり取りでは、答えを評価されるという意識が薄れ、自分の疑問を出しやすいのでしょう。ただし、その場の助言だけで、試験の採点方針まで変わったと受け取るのは早計です。専門用語に関して聞いた話と、提出方法について確認したことを、あとでノートに分けて書くと整理できます。質問する機会を増やすことと、聞いた話の位置づけを確かめることを組み合わせれば、学びを支える好循環を作れます。",
+    "form": "非公式",
+    "en": "Sometimes we can ask a question in the corridor after class but cannot find the words when it comes to raising a hand in the classroom. In an informal exchange with a teacher, reduced awareness of being assessed may make it easier to express our questions. It is premature, however, to take advice given there alone as a change in the grading policy for an exam. We can organize what we heard by noting explanations concerning technical terms separately from information about how to submit work. Combining more opportunities to ask questions with checking the status of what we hear can create a positive cycle that supports learning.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「非公式な相談」「非公式の見解」。秘密であることを必ずしも意味しない。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

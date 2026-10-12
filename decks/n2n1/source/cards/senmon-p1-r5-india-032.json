@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "非二元",
+   "reading": "ひにげん",
+   "pos": "noun",
+   "meaning": "non-duality",
+   "defJa": "二つに分かれているとの見方を超えること",
+   "passage": {
+    "ja": "「二つではない」と聞いたら、何と何を分けないのかまで確かめると、抽象的な文章が読みやすくなります。非二元という語は、自己と世界、見る側と見られる側などの分離を問い直す議論に使われますが、思想ごとに前提は異なります。インドの不二一元論と仏教の説明を比べる際も、似た体験を語るからといって、自己の存在について同じ立場だとは限りません。文章の余白に二つの項を書き出し、それらのどの関係を否定しているのかを追うと、短い用語の中に隠れた主張が見えてきます。",
+    "form": "非二元",
+    "en": "When told that something is not two, identifying which two things are at issue makes an abstract text easier to read. Non-duality is used in arguments questioning separations such as self and world or observer and observed, but its premises differ across philosophies. Similar reports of experience in Indian Advaita and Buddhism do not guarantee agreement about the existence of self. Writing the two terms in a margin and following which relationship is being denied brings the claim within the compact expression into view.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「非二元を説く」。何と何の区別を問い直すかを補うと意味が定まる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "霊験",
+   "reading": "れいげん",
+   "pos": "noun",
+   "meaning": "miraculous efficacy",
+   "defJa": "神仏の不思議な力が現れたとされる効き目",
+   "passage": {
+    "ja": "寺社の縁起には、祈りによって病が癒えた、危難を免れたとする物語が収められている。霊験を伝えるこうした記述は、その場所がなぜ信仰を集めたかを知る資料となる一方、現代の治療効果の記録と同じ条件で書かれたものではない。物語を歴史資料として読む際は、いつ、誰が、どのような目的で語りを残したかを検討することが意味を持つ。出来事の真偽だけを急いで決めるより、願いがどのような言葉で共有されたかを追うことで、巡礼や寄進を支えた人々の世界に近づける。",
+    "form": "霊験",
+    "en": "Temple and shrine histories contain stories of illness healed or danger escaped through prayer. Accounts of miraculous efficacy help explain a place’s devotional appeal, while differing in how they were produced from modern records of treatment effects. Reading them as historical sources makes their date, authorship, and purpose significant. Following how hopes were shared in language, rather than rushing only to decide whether each event happened, brings readers closer to the world supporting pilgrimage and donations.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「霊験を伝える」「霊験あらたか」。伝承の内容を効能の保証にしない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "霊魂",
+   "reading": "れいこん",
+   "pos": "noun",
+   "meaning": "soul, spirit",
+   "defJa": "身体とは別に存在すると考えられる精神的実体",
+   "passage": {
+    "ja": "死後も何かが続くという話を聞くと、変わらない自分が別の身体へ移る姿を想像しやすい。だが、仏教の輪廻を論じる際、独立して永遠に存続する霊魂を当然の前提にすると、無我を説く教えとの関係が見えなくなる。生まれ変わりを語る宗教であっても、何がつながり、何を実体として認めるかは同じではない。ジャイナ教が個々の魂を認める立場と比べれば、似た物語の形を持つことと、存在について同じ説明をすることとの違いが、よりはっきりと浮かぶ。",
+    "form": "霊魂",
+    "en": "Accounts of something continuing after death readily evoke an unchanged self moving into another body. But assuming an independent eternal soul in an account of Buddhist rebirth obscures its relationship with the teaching of no-self. Religions that describe rebirth can differ over what continues and what counts as an entity. Comparison with Jainism’s affirmation of individual souls clarifies the difference between similar narrative forms and identical accounts of existence.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「霊魂の存在を認める」。輪廻を語る教え同士でも、魂への立場は異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "静慮",
+   "reading": "じょうりょ",
+   "pos": "noun",
+   "meaning": "dhyāna, meditative absorption",
+   "defJa": "心を落ち着かせ対象を深く観じること",
+   "passage": {
+    "ja": "禅という字が、もともとインドの言葉の音を写した呼び名につながるって、ちょっと意外だよね。その音ではなく意味の側から訳した語の一つが静慮で、心を静めて深く観じるという方向を示しているんだ。だから、ただ静かな部屋に座ればそれで済むというより、心をどう整えるかという修行の文脈で読むと分かりやすい。日本の禅宗を知る言葉が、訳し方をたどるにつれてインドの瞑想の語へ戻っていくところに、教えが国境を越えた足跡が残っているんだよ。",
+    "form": "静慮",
+    "en": "It is a little surprising that the character for Zen connects with a phonetic rendering of an Indian word. Joryo is one rendering of its meaning rather than its sound, pointing toward settling the mind and contemplating deeply. The word therefore makes more sense in the context of cultivating the mind than as merely sitting in a quiet room. Following its translation back from Japanese Zen to an Indian term for meditation reveals traces of the teaching’s movement across borders.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "音を写す訳と意味を示す訳の違いから、禅に関わる語彙を整理する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

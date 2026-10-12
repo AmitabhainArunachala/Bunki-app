@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "缶詰",
+   "reading": "かんづめ",
+   "pos": "noun",
+   "meaning": "canning; canned food",
+   "defJa": "食品を缶に詰めて密封したもの",
+   "passage": {
+    "ja": "英語の「スパム」といえば迷惑メールだが、もとはアメリカで売られている缶詰の肉の商品名である。コメディ番組で同じ言葉が延々と繰り返されることから、迷惑メールにこの名がついたと言われる。いまやAIの仕事の一つは、膨大な蓄積データから、この大量のスパムをふるい分けることだ。あの四角い肉が巡り巡って機械学習の教材になったのだから、言葉の旅は面白い。ちなみに、名前の由来には諸説ある。",
+    "form": "缶詰",
+    "en": "The English word spam means junk email, but it began as the brand name of a canned meat sold in America. The junk mail is said to have gotten the name because a comedy show repeated the same word endlessly. These days one job of AI is to sort this mass of spam out of enormous accumulated data. That square block of meat has gone round and round to become teaching material for machine learning, and the journey of words is fascinating. Incidentally, there are several theories about the origin of the name.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「缶詰」は食品の保存形態のほか、「缶詰になる（閉じ込められて仕事する）」の比喩もある。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "続く",
+   "reading": "～つづく",
+   "pos": "verb",
+   "meaning": "to continue, to follow",
+   "defJa": "物事が途切れずに先へつながる",
+   "passage": {
+    "ja": "「ら抜き言葉」を使う人は年々増えている。文化庁の調査でも、若い世代を中心にこの傾向が続くと見られている。たとえば「食べれる」は、日常会話では自然に聞こえるのに、面接の場では減点されるのではと不安になる人が多い。一方で、公的な文書ではいまも規範的な形が求められ、使い分けを意識する人も少なくない。変化は止まらないが、場面や相手に応じた言葉の選択は今後も欠かせない。",
+    "form": "続く",
+    "en": "The number of people using ra-dropped forms rises every year. Surveys by the Agency for Cultural Affairs, too, suggest this trend will continue, centered on younger generations. For example, taberareru in its dropped form sounds natural in everyday conversation, yet many people worry it will cost them points in an interview. On the other hand, official documents still call for the normative form, and not a few people are conscious of using each appropriately. Change will not stop, but choosing words according to the occasion and the listener will remain indispensable.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「傾向が続く」「長く続く」のように、状態や流れが途切れず続く意味。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

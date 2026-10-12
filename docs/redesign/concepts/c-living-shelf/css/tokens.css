@@ -1,0 +1,137 @@
+/* ==========================================================================
+   C 生きた本棚 Living Shelf · Tokens v2 values (role names from FOUNDATION.md)
+   One colour world (藍) in every room; rooms change material + light only.
+   ========================================================================== */
+:root {
+  /* ---- colour: day = washi in morning light ---- */
+  --color-ground: #ece5d6;          /* washi ground */
+  --color-ground-2: #e3dbc9;
+  --color-page: #f1ebdf;
+  --color-paper: #f7f2e8;           /* raised paper */
+  --color-surface: #fbf8f2;
+  --color-surface-sunk: #e6dece;
+  --color-ink: #191c22;             /* sumi */
+  --color-ink-2: #383d47;
+  --color-muted: #555b66;           /* 6.1:1 on ground */
+  --color-quiet: #6b6a64;           /* 4.6:1 on ground, captions only */
+  --color-line: rgba(25, 28, 34, .16);
+  --color-line-soft: rgba(25, 28, 34, .08);
+  --color-rule: rgba(31, 58, 95, .38);
+  --color-rule-soft: rgba(31, 58, 95, .12);
+  --color-edge-strong: rgba(25, 28, 34, .34);
+  --color-accent: #1f3a5f;          /* 藍 structure */
+  --color-accent-wash: rgba(31, 58, 95, .08);
+  --color-seal: #b4301c;            /* 朱: this, now (5.6:1 on paper) */
+  --color-seal-wash: rgba(180, 48, 28, .09);
+  --color-signal: #0b6f78;          /* 浅葱 asagi: the one live thing */
+  --color-signal-wash: rgba(11, 111, 120, .12);
+  --color-signal-glow: rgba(11, 111, 120, 0);
+  --color-gold: #94702a;            /* earned only (proposed role) */
+  --color-gold-wash: rgba(148, 112, 42, .14);
+  --color-lacquer: #141a28;         /* 藍漆: frames only */
+  --color-lacquer-2: #1d2638;
+  --color-lacquer-ink: #e9e2d2;
+  --color-tab: rgba(247, 242, 232, .94);
+
+  /* ---- type (only bundled faces + system stacks) ---- */
+  --font-display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif;
+  --font-reading: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+  --font-seal: "Kaisei Tokumin", "Shippori Mincho B1", serif;      /* 再 難 良 易 only */
+  --font-brush: "Yuji Syuku", "Hiragino Mincho ProN", serif;      /* a human note, rare */
+  --font-data: ui-monospace, "SF Mono", Menlo, "DejaVu Sans Mono", monospace; /* system mono: data only */
+
+  --type-caption: 11px;
+  --type-label: 12px;
+  --type-chrome: 13px;
+  --type-control: 15px;
+  --type-body: 16px;
+  --type-reading: 19px;
+  --type-lead: 21px;
+  --type-section: 24px;
+  --type-title: 30px;
+  --type-headword: 48px;
+  --type-display: 88px;
+  --type-hero: 132px;
+  --type-seal: 22px;
+
+  --leading-tight: 1.15;
+  --leading-ui: 1.35;
+  --leading-body: 1.6;
+  --leading-reading: 2.15;          /* room for ruby without reflow */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 800;               /* Shippori B1 ships 800 only */
+
+  /* ---- space: 4px base ---- */
+  --space-hair: .5px;
+  --space-0: 0; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+
+  --radius-none: 0; --radius-small: 2px; --radius-control: 6px; --radius-card: 4px; --radius-surface: 10px;
+  --radius-float: 14px; --radius-overlay: 18px; --radius-pill: 999px; --radius-seal: 3px;
+
+  --elevation-none: none;
+  --elevation-paper: 0 1px 0 rgba(25, 28, 34, .06), 0 6px 18px rgba(25, 28, 34, .05);
+  --elevation-card: 0 1px 0 rgba(25, 28, 34, .10), 0 10px 28px rgba(25, 28, 34, .10);
+  --elevation-lift: 0 2px 0 rgba(25, 28, 34, .10), 0 18px 40px rgba(25, 28, 34, .16);
+  --elevation-float: 0 -1px 0 rgba(25, 28, 34, .08), 0 -16px 48px rgba(25, 28, 34, .18);
+  --elevation-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-signal);
+
+  /* ---- motion: interactive ≤300ms, ambient ≥6s ---- */
+  --motion-instant: 0ms;
+  --motion-press: 90ms;
+  --motion-quick: 160ms;
+  --motion-standard: 220ms;
+  --motion-sheet: 280ms;
+  --motion-room: 280ms;
+  --motion-ma: 120ms;               /* 間: the held beat between cause and answer */
+  --motion-long: 9000ms;            /* ambient breath */
+  --ease-standard: cubic-bezier(.2, .8, .2, 1);
+  --ease-enter: cubic-bezier(.22, 1, .36, 1);
+  --ease-exit: cubic-bezier(.4, 0, 1, 1);
+  --ease-ink: cubic-bezier(.65, 0, .35, 1);
+  --ease-linear: linear;
+
+  --tab-h: 64px;
+  color-scheme: light;
+}
+
+/* ---- night = the 藍 room with the city glowing through the paper (designed, not inverted) ---- */
+html[data-theme="night"] {
+  --color-ground: #0c1423;
+  --color-ground-2: #0f192b;
+  --color-page: #101a2c;
+  --color-paper: #141f33;
+  --color-surface: #18253b;
+  --color-surface-sunk: #0a111e;
+  --color-ink: #ede6d6;             /* 胡粉 shell white, 14.9:1 */
+  --color-ink-2: #cfc8b8;
+  --color-muted: #a3acbb;           /* 7.6:1 */
+  --color-quiet: #8c96a8;           /* 5.6:1 */
+  --color-line: rgba(220, 230, 255, .16);
+  --color-line-soft: rgba(220, 230, 255, .08);
+  --color-rule: rgba(120, 220, 210, .34);
+  --color-rule-soft: rgba(120, 220, 210, .10);
+  --color-edge-strong: rgba(220, 230, 255, .30);
+  --color-accent: #9db8e6;
+  --color-accent-wash: rgba(157, 184, 230, .10);
+  --color-seal: #ff7657;
+  --color-seal-wash: rgba(255, 118, 87, .13);
+  --color-signal: #5df2d6;          /* phosphor, the 殻 descendant */
+  --color-signal-wash: rgba(93, 242, 214, .13);
+  --color-signal-glow: rgba(93, 242, 214, .45);
+  --color-gold: #e2bd6c;
+  --color-gold-wash: rgba(226, 189, 108, .14);
+  --color-lacquer: #060a13;
+  --color-lacquer-2: #0b1220;
+  --color-lacquer-ink: #ede6d6;
+  --color-tab: rgba(10, 16, 28, .92);
+  --elevation-paper: 0 1px 0 rgba(0, 0, 0, .4), 0 8px 22px rgba(0, 0, 0, .35);
+  --elevation-card: 0 1px 0 rgba(0, 0, 0, .5), 0 14px 36px rgba(0, 0, 0, .45);
+  --elevation-lift: 0 2px 0 rgba(0, 0, 0, .5), 0 22px 48px rgba(0, 0, 0, .55);
+  --elevation-float: 0 -1px 0 rgba(157, 184, 230, .14), 0 -18px 56px rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}

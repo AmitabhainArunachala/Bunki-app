@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "省人化",
+   "reading": "しょうじんか",
+   "pos": "noun",
+   "meaning": "reducing required staffing",
+   "defJa": "作業に必要な人数を少なくすること",
+   "passage": {
+    "ja": "半導体工場の省人化では、材料の容器を装置から装置へ運ぶ仕事を、機械に任せる方法も使われるんだ。運搬にも手間がかかるからね。容器を自動で次の装置へ送れるようにすれば、生産の進み具合に応じて担当者が通路を歩いて運んでいた作業が減って、少ない人数で装置を見守れるようになるんだ。途中で荷物が止まると、監視システムがその情報を専門の窓口へ送り、担当者の画面に停止位置が映るんだよ。",
+    "form": "省人化",
+    "en": "In semiconductor factories, one way of reducing staffing needs is to have machines carry material containers between processing tools. Transportation takes work too. When containers can be sent automatically to the next tool, workers spend less time walking them through the corridors as production progresses, allowing fewer people to monitor the tools. If a load stops along the way, the monitoring system sends that information to a specialist support desk, and its stopped location appears on the responsible person's screen.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "作業に必要な人数を減らすこと。ここでは工場内の運搬を機械に任せる。",
+    "sense": ""
+   },
+   "cardId": "nn-119f380d56-1fb87653",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-027.json",
+    "cardId": "nn-119f380d56-1fb87653",
+    "wordId": "nn-119f380d56"
+   }
+  },
+  {
+   "term": "知行合一",
+   "reading": "ちこうごういつ",
+   "pos": "noun",
+   "meaning": "unity of knowing and acting",
+   "defJa": "知ることと行うことを一体と捉える考え",
+   "passage": {
+    "ja": "禅寺で食事の作法を習う者が、食べ物を粗末にしない理由を暗唱できても、器に残した米を平気で捨てるなら、教えが身に付いたと認めるにはためらいが残る。知識は口にできる。王陽明の知行合一は、真に知ることと行うことを切り離さずに捉える。儒学のこの立場と禅の教えは同一ではないが、実践を通して理解を確かめるという問いは、作法を学ぶ者の足元にも及ぶ。食事を終える手が、器の底に残った米へもう一度伸びる。",
+    "form": "知行合一",
+    "en": "If someone learning mealtime practices at a Zen temple can recite reasons for not wasting food yet casually discards rice left in a bowl, there is reason to hesitate before accepting that the teaching has taken root. Knowledge can be put into words. Wang Yangming's unity of knowing and acting treats genuine knowledge and action as inseparable. This Confucian position and Zen teaching are not identical, yet the question of testing understanding through practice also reaches the immediate situation of someone learning the forms. At the end of the meal, a hand reaches again toward the rice remaining at the bottom of the bowl.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "王陽明の思想で、真に知ることと実際の行いを一体と捉える。",
+    "sense": ""
+   },
+   "cardId": "nn-522d312a9d-d5942b41",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-522d312a9d-d5942b41",
+    "wordId": "nn-522d312a9d"
+   }
+  },
+  {
+   "term": "時価総額",
+   "reading": "じかそうがく",
+   "pos": "noun",
+   "meaning": "market capitalization",
+   "defJa": "株価に発行済み株式数を掛けた企業価値の指標",
+   "passage": {
+    "ja": "新しい半導体が好評で、その製品を開発した会社の株価が上がったとするよ。投資家が将来の利益を前より期待したとしても、その日のうちに会社の現金が増えるとは限らないし、工場や設備を売って得られる金額まで株価と同じ割合で動くとは限らないんだ。株式の市場で評価が変わったんだね。株価に発行済み株式数を掛ける時価総額も、株数が変わらなければ上がって、画面には前日より大きな金額が表示されるんだ。",
+    "form": "時価総額",
+    "en": "Suppose a new semiconductor is well received and the share price of the company that developed it rises. Even if investors now expect higher future profits, the company's cash need not increase that day, and the proceeds it could obtain by selling factories and equipment need not move in the same proportion as its share price. Its valuation in the stock market has changed. Market capitalization, calculated by multiplying the share price by outstanding shares, also rises if the share count stays unchanged, and the screen displays a larger amount than the previous day.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "株式全体への市場の評価を表す数値で、現金の額や設備の売却額とは異なる。",
+    "sense": ""
+   },
+   "cardId": "nn-5621e81683-994ee96b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-023.json",
+    "cardId": "nn-5621e81683-994ee96b",
+    "wordId": "nn-5621e81683"
+   }
+  }
+ ]
+}

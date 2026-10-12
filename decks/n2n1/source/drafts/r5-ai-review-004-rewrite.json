@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "破局的",
+   "reading": "はきょくてき",
+   "pos": "na-adj",
+   "meaning": "catastrophic",
+   "defJa": "取り返しのつかない大きな破綻に至るさま",
+   "passage": {
+    "ja": "いろんな種類の失敗を人工知能が起こしたとき、全部を同じように数えていいのかな。文章の誤字と、重要な設備の制御を誤って人命を危険にさらす事態とでは、被害の大きさがまるで違う。破局的な結果を避けるという話なら、ただ間違いの回数を数えるだけでなく、一度の失敗がどこまで広がるのかも考えたいんだ。起こりやすさが低いからといって、回復できないほどの被害を無視していいとは限らないよ。だから、止める手段や人が判断を引き取る仕組みまで含めて、その使い道を検討するんだね。",
+    "form": "破局的",
+    "en": "When artificial intelligence causes different kinds of failures, is it reasonable to count them all in the same way? A typo and incorrect control of critical equipment that endangers lives differ enormously in the scale of harm. Avoiding catastrophic outcomes requires considering how far a single failure could spread, not just counting errors. Low likelihood does not necessarily justify ignoring damage from which recovery would be impossible. That is why an application is assessed together with ways to stop it and arrangements for people to take over decisions.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "単に悪いだけでなく、重大な破綻に至る程度を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "透明性",
+   "reading": "とうめいせい",
+   "pos": "noun",
+   "meaning": "transparency",
+   "defJa": "仕組みや判断の過程を外から確かめられる性質",
+   "passage": {
+    "ja": "利用者が人工知能の判断に疑問を持ったとき、どの情報をもとに調べられるでしょうか。仕組みや運用の過程を外から確かめられる透明性は、単に大量の資料を公開することと同じではありません。用語の説明がなく、何が変更されたかも追えない資料では、情報があるにもかかわらず、必要な確認を進めにくいからです。誰が何を知るための記録なのかを決め、変更の履歴や評価の条件を読み取れる形で示すと、開発者と利用者が同じ根拠を前に議論する足場ができます。",
+    "form": "透明性",
+    "en": "When users question an AI decision, what information can they use to investigate it? Transparency, which allows the mechanism and operational process to be examined externally, is not the same as simply publishing large quantities of documents. Without terminology explanations or traceable changes, available information can still be difficult to use for the required checks. Defining the audience and purpose of records and presenting readable change histories and evaluation conditions gives developers and users a shared basis for discussion.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "資料を公開するだけでなく、調べられる形も問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

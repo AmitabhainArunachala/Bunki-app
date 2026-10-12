@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "ヒント",
+   "reading": "ヒント",
+   "pos": "noun",
+   "meaning": "hint; clue",
+   "defJa": "答えや解決に近づくための手がかり",
+   "passage": {
+    "ja": "古い地図から失われた道を探す場合、描かれた線だけを現在の道路に重ねても位置を確定できないことがある。地名や川の曲がり方が場所を絞るヒントになる一方で、地形そのものが後の工事や洪水で変わった可能性も検討する必要がある。年代記に橋の建設が記されていれば、地図の年代との関係を調べる手がかりになる。一つの一致を発見の証拠と急いで扱わず、複数の資料が同じ場所を示すかを確かめることで、推定を支える理由と残る不確かさを明示できる。",
+    "form": "ヒント",
+    "en": "When searching for a lost route on an old map, simply overlaying its lines on present roads may not establish its location. Place names and river bends can provide clues for narrowing the location, but later construction or floods may have changed the terrain itself. If a chronicle records the construction of a bridge, it offers a lead for investigating its relation to the map's date. Checking whether multiple sources point to the same place, rather than rushing to treat one match as proof of discovery, makes it possible to state both the grounds for an estimate and the remaining uncertainty.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「ヒントになる」「ヒントを得る」と使い、結論そのものではなく手がかりを指します。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "開拓",
+   "reading": "かいたく",
+   "pos": "noun",
+   "meaning": "development of a new market or field",
+   "defJa": "未利用の土地や新しい分野を切り開くこと",
+   "passage": {
+    "ja": "小さな陶器工房が、店頭で売る器を料理店にも使ってもらおうと計画したとします。新たな販路を開拓するにあたっては、作品の美しさだけでなく、重ねて収納できるか、割れたときに同じ寸法のものを追加できるかも聞き取ります。相手の使い方が分かれば、焼く工程を変えずに形の工夫だけで対応できる点と、試作が必要な点を分けられます。売り先をただ増やすのではなく、これまで出会わなかった使い手との関係を作ることが、新しい市場へ踏み出す具体的な一歩になります。",
+    "form": "開拓",
+    "en": "Suppose a small pottery workshop plans to have restaurants use the tableware it sells in its shop. In developing a new sales channel, it asks not only about beauty but also whether pieces can be stacked and whether replacements of the same dimensions can be supplied after breakage. Understanding how customers use the pieces allows the workshop to distinguish what can be addressed through shape alone without changing the firing process from what needs prototypes. Building relationships with users it has not previously encountered, rather than simply increasing outlets, becomes a concrete step into a new market.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「販路を開拓する」「新分野を開拓する」と、未開の分野へ進む意味で使います。",
+    "sense": "新しい市場や活動の分野を切り開くこと"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "準ずる",
+   "reading": "じゅんずる",
+   "pos": "verb",
+   "meaning": "to follow; to treat correspondingly",
+   "defJa": "ある基準に従い、それと同じように扱う",
+   "passage": {
+    "ja": "募集案内に「卒業証明書、またはこれに準ずる書類」と書かれていた場合、似た紙なら何でもよいと読むのは危険です。ここでは、示された証明書を基準として、それと同じように扱えるものを求めています。専門用語を平易に言い換えるにしても、単に程度が近いという説明では、基準に照らして扱うという意味が抜けてしまいます。実際にどの書類が認められるかは案内の具体的な条件で確かめ、この表現だけから書類の種類や効力まで決めつけないようにしましょう。",
+    "form": "準ずる",
+    "en": "If an application guide asks for a graduation certificate or a document treated correspondingly, it is risky to read that as allowing any similar-looking paper. Here, the specified certificate serves as the standard, and the requested document must be one that can be treated in the same way. Even when putting technical wording into simpler language, describing mere closeness in degree loses the sense of treatment according to a standard. Check the guide's specific conditions to establish which documents are accepted, and avoid inferring their type or effect from this expression alone.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「〜に準ずる」は基準に従う、同様に扱うという意味で、「準じる」とも言います。",
+    "sense": "あるものを基準として同様に扱う"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

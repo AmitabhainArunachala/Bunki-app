@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "大蔵経",
+   "reading": "だいぞうきょう",
+   "pos": "noun",
+   "meaning": "the Buddhist canon",
+   "defJa": "経・律・論を丸ごと集めた仏教聖典の全集",
+   "passage": {
+    "ja": "古い寺の境内の隅に、手を押せばくるりと回る八角の巨大な書架、輪蔵が据えられているのを見たことがあるだろう。中に収めるのは経と律と論を一括りにした大蔵経という聖典の全集で、経は仏の説法、律は戒律、論は教理を論じた書である。一回りさせれば全巻を読んだのと同じ功徳が得られる、と古くから伝えられ、信仰の厚い人は今も静かに手を押して回すという。受験勉強にせよ専門書にせよ、まず全体を一周して触れてから、気になる一冊を改めて拾って読むのが定石で、あの回し方と妙に重なる。",
+    "form": "大蔵経",
+    "en": "In a corner of the grounds of an old temple, you have surely seen a huge octagonal bookcase, a revolving repository known as a rinzo, that turns around when you push it with your hand. What it holds is the Buddhist canon, a collected edition of scripture that bundles the sutras, the rules, and the treatises together, with the sutras as the Buddha's sermons, the rules as the precepts, and the treatises as works that argue out doctrine. Tradition has long taught that one full turn earns the same merit as reading every volume, and people of deep faith are said to push it around quietly even today. Whether it is studying for an exam or reading specialist books, the standard method of first making a full circuit and touching the whole, then going back to pick up and read the one volume that interests you, overlaps strangely with that way of turning.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "回転式の書架は輪蔵、それを納める堂は経蔵と呼び分ける。大蔵経は『収める』『編纂する』のように聖典全集のほうに結ぶ語だ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "涅槃",
+   "reading": "ねはん",
+   "pos": "noun",
+   "meaning": "nirvana",
+   "defJa": "煩悩の火が消え、苦が止まった境地",
+   "passage": {
+    "ja": "薪が燃え尽き、炎が静かに消えたあとの、何ひとつ動かない静けさを、仏教は古くから涅槃と呼んできた。その原義は『吹き消すこと』であり、消えた炎は貪欲と怒りと迷いという三つの火と解釈された。執着と訳される原語には元来、薪や燃料の意味もあり、燃料を絶てば火はひとりでに消える、という図式が言葉のうちに最初から仕込まれていた。この語を用いるのは仏教に限らず、ジャイナ教もまた、魂がそのまま完全な知のうちに留まる境地をそう呼ぶが、無我を説く仏教とは、行き着く先がまるで違う。",
+    "form": "涅槃",
+    "en": "That stillness, with not a single thing stirring, after the firewood has burned out and the flames have quietly gone, is what Buddhism has long called nirvana. Its original meaning is 'blowing out,' and the flame that went out came to be read as the three fires of greed, anger, and delusion. The source word translated as clinging originally also meant firewood and fuel, so the scheme that the fire dies out of itself once the fuel is cut away was built into the word from the very beginning. It is not only Buddhism that uses this word, for Jainism also gives this name to the state in which the soul remains just as it is within perfect knowledge, but as for where one finally arrives, it differs utterly from the Buddhism that teaches non-self.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "『涅槃に入る』『涅槃に達する』と結ぶ。原義は火を吹き消すことで、消えるのは煩悩の火のほうだと説かれる。",
+    "sense": "悟りの境地の意と、仏の死を指す意とがある"
+   }
+  }
+ ]
+}

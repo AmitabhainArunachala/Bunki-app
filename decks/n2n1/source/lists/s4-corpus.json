@@ -1,0 +1,8750 @@
+[
+  {
+    "term": "朝日",
+    "reading": "あさひ",
+    "gloss": "morning sun",
+    "pos": "noun",
+    "freq": 230,
+    "docs": 118,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "読売",
+    "reading": "よみうり",
+    "gloss": "Yomiuri (newspaper, etc. group); kawaraban (type of Edo-period single-page newsp",
+    "pos": "noun",
+    "freq": 206,
+    "docs": 104,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一部",
+    "reading": "いちぶ",
+    "gloss": "one part; one portion; one section",
+    "pos": "noun · adverb",
+    "freq": 124,
+    "docs": 99,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最大",
+    "reading": "さいだい",
+    "gloss": "biggest; greatest; largest",
+    "pos": "noun · no-adjective",
+    "freq": 84,
+    "docs": 67,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "多く",
+    "reading": "おおく",
+    "gloss": "many; much; plenty",
+    "pos": "noun · adverb · no-adjective",
+    "freq": 86,
+    "docs": 66,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "当初",
+    "reading": "とうしょ",
+    "gloss": "beginning; start; outset",
+    "pos": "noun · no-adjective",
+    "freq": 58,
+    "docs": 58,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "事務",
+    "reading": "じむ",
+    "gloss": "office work; clerical work; administration",
+    "pos": "noun",
+    "freq": 82,
+    "docs": 53,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "容疑",
+    "reading": "ようぎ",
+    "gloss": "suspicion; charge",
+    "pos": "noun · n-suf",
+    "freq": 183,
+    "docs": 52,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "表明",
+    "reading": "ひょうめい",
+    "gloss": "declaration; indication; representation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 73,
+    "docs": 52,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "人々",
+    "reading": "ひとびと",
+    "gloss": "people; men and women; each person",
+    "pos": "noun",
+    "freq": 77,
+    "docs": 51,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "昨年",
+    "reading": "さくねん",
+    "gloss": "last year",
+    "pos": "noun · adverb",
+    "freq": 68,
+    "docs": 51,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "疑い",
+    "reading": "うたがい",
+    "gloss": "doubt; question; uncertainty",
+    "pos": "noun",
+    "freq": 55,
+    "docs": 51,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "会長",
+    "reading": "かいちょう",
+    "gloss": "president (of a society); chairman",
+    "pos": "noun",
+    "freq": 175,
+    "docs": 50,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同日",
+    "reading": "どうじつ",
+    "gloss": "the same day",
+    "pos": "noun · adverb",
+    "freq": 60,
+    "docs": 50,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "終わる",
+    "reading": "おわる",
+    "gloss": "to end; to come to an end; to finish",
+    "pos": "godan verb · intransitive verb",
+    "freq": 57,
+    "docs": 50,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "支援",
+    "reading": "しえん",
+    "gloss": "support; backing; aid",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 69,
+    "docs": 48,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "時事",
+    "reading": "じじ",
+    "gloss": "events of the day; current affairs",
+    "pos": "noun",
+    "freq": 87,
+    "docs": 46,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公開",
+    "reading": "こうかい",
+    "gloss": "opening to the public; making available to the public; exhibiting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 62,
+    "docs": 46,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "高校",
+    "reading": "こうこう",
+    "gloss": "senior high school; high school",
+    "pos": "noun",
+    "freq": 96,
+    "docs": 44,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "時点",
+    "reading": "じてん",
+    "gloss": "point in time; occasion",
+    "pos": "noun",
+    "freq": 53,
+    "docs": 44,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "野球",
+    "reading": "やきゅう",
+    "gloss": "baseball",
+    "pos": "noun",
+    "freq": 93,
+    "docs": 43,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "判明",
+    "reading": "はんめい",
+    "gloss": "becoming clear; coming to light; being ascertained",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 48,
+    "docs": 43,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "開幕",
+    "reading": "かいまく",
+    "gloss": "raising the curtain; opening (of an event); start",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 50,
+    "docs": 41,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "理事",
+    "reading": "りじ",
+    "gloss": "director; trustee",
+    "pos": "noun",
+    "freq": 81,
+    "docs": 38,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "思い",
+    "reading": "おもい",
+    "gloss": "thought; imagination; mind",
+    "pos": "noun",
+    "freq": 45,
+    "docs": 38,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同社",
+    "reading": "どうしゃ",
+    "gloss": "the same company; the said firm; the same (Shinto) shrine",
+    "pos": "noun",
+    "freq": 117,
+    "docs": 37,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "当局",
+    "reading": "とうきょく",
+    "gloss": "authorities; relevant authorities; authorities concerned",
+    "pos": "noun",
+    "freq": 58,
+    "docs": 37,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "週間",
+    "reading": "しゅうかん",
+    "gloss": "week",
+    "pos": "noun",
+    "freq": 41,
+    "docs": 35,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "再開",
+    "reading": "さいかい",
+    "gloss": "reopening; resumption; restarting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 46,
+    "docs": 34,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "史上",
+    "reading": "しじょう",
+    "gloss": "in history; ever; historical",
+    "pos": "no-adjective · noun · adverb",
+    "freq": 40,
+    "docs": 34,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "車両",
+    "reading": "しゃりょう",
+    "gloss": "(wheeled) vehicle; car; (railroad) car",
+    "pos": "noun",
+    "freq": 75,
+    "docs": 33,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "国内",
+    "reading": "こくない",
+    "gloss": "within the country; inside the county; domestic",
+    "pos": "no-adjective · noun",
+    "freq": 40,
+    "docs": 33,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "動画",
+    "reading": "どうが",
+    "gloss": "video (esp. digital); video clip; clip",
+    "pos": "noun",
+    "freq": 66,
+    "docs": 32,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前回",
+    "reading": "ぜんかい",
+    "gloss": "previous time; last time; previous installment",
+    "pos": "noun · adverb",
+    "freq": 54,
+    "docs": 32,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "受賞",
+    "reading": "じゅしょう",
+    "gloss": "winning a prize; receiving an award; being awarded",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 66,
+    "docs": 31,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最多",
+    "reading": "さいた",
+    "gloss": "most (numerous); largest (number of)",
+    "pos": "no-adjective · noun",
+    "freq": 44,
+    "docs": 31,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "通報",
+    "reading": "つうほう",
+    "gloss": "report; notification; tip",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 39,
+    "docs": 31,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "更新",
+    "reading": "こうしん",
+    "gloss": "renewal; update; replacement",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 44,
+    "docs": 30,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "多数",
+    "reading": "たすう",
+    "gloss": "large number (of); many; majority",
+    "pos": "noun · no-adjective",
+    "freq": 40,
+    "docs": 30,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "距離",
+    "reading": "きょり",
+    "gloss": "distance; range; interval",
+    "pos": "noun",
+    "freq": 39,
+    "docs": 30,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "落ちる",
+    "reading": "おちる",
+    "gloss": "to fall; to drop; to come down",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 58,
+    "docs": 29,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "半数",
+    "reading": "はんすう",
+    "gloss": "half the number; half (of an amount); haploid (organism, cell, etc.)",
+    "pos": "noun · no-adjective",
+    "freq": 55,
+    "docs": 28,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "市長",
+    "reading": "しちょう",
+    "gloss": "mayor",
+    "pos": "noun",
+    "freq": 54,
+    "docs": 28,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "警視",
+    "reading": "けいし",
+    "gloss": "police superintendent",
+    "pos": "noun",
+    "freq": 51,
+    "docs": 28,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "通算",
+    "reading": "つうさん",
+    "gloss": "total; sum; aggregate",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 40,
+    "docs": 28,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "連携",
+    "reading": "れんけい",
+    "gloss": "cooperation; coordination; collaboration",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 39,
+    "docs": 28,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "競走",
+    "reading": "きょうそう",
+    "gloss": "race; run; dash",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 71,
+    "docs": 27,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "総理",
+    "reading": "そうり",
+    "gloss": "prime minister (as the head of a cabinet government); premier; leading",
+    "pos": "noun",
+    "freq": 58,
+    "docs": 27,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同市",
+    "reading": "どうし",
+    "gloss": "same city",
+    "pos": "noun",
+    "freq": 45,
+    "docs": 27,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "都内",
+    "reading": "とない",
+    "gloss": "within the (Tokyo) metropolitan area",
+    "pos": "noun · no-adjective",
+    "freq": 29,
+    "docs": 27,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "法人",
+    "reading": "ほうじん",
+    "gloss": "corporation; corporate body; company",
+    "pos": "noun",
+    "freq": 51,
+    "docs": 25,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "敗れる",
+    "reading": "やぶれる",
+    "gloss": "to be defeated; to be beaten; to be unsuccessful",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 48,
+    "docs": 25,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "指示",
+    "reading": "しじ",
+    "gloss": "indication; denotation; designation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 40,
+    "docs": 25,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "呼びかける",
+    "reading": "よびかける",
+    "gloss": "to call out to; to hail; to address",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 32,
+    "docs": 25,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "在住",
+    "reading": "ざいじゅう",
+    "gloss": "residing; living; dwelling",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 28,
+    "docs": 25,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同じく",
+    "reading": "おなじく",
+    "gloss": "in the same way; like; likewise",
+    "pos": "adverb · conjunction",
+    "freq": 27,
+    "docs": 25,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "国土",
+    "reading": "こくど",
+    "gloss": "country; territory; domain",
+    "pos": "noun",
+    "freq": 39,
+    "docs": 24,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同年",
+    "reading": "どうねん",
+    "gloss": "that year; same year; same age",
+    "pos": "noun · adverb",
+    "freq": 33,
+    "docs": 24,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "関わる",
+    "reading": "かかわる",
+    "gloss": "to be involved (in); to get involved (in); to concern oneself (with)",
+    "pos": "godan verb · intransitive verb",
+    "freq": 30,
+    "docs": 24,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "南部",
+    "reading": "なんぶ",
+    "gloss": "southern part; the south (of a region)",
+    "pos": "noun",
+    "freq": 30,
+    "docs": 24,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "翌日",
+    "reading": "よくじつ",
+    "gloss": "next day",
+    "pos": "noun · adverb",
+    "freq": 25,
+    "docs": 24,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "対戦",
+    "reading": "たいせん",
+    "gloss": "fighting (against); taking on (an opponent); facing",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 48,
+    "docs": 23,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公明",
+    "reading": "こうめい",
+    "gloss": "fairness; openness; impartiality",
+    "pos": "noun · na-adjective",
+    "freq": 47,
+    "docs": 23,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "運行",
+    "reading": "うんこう",
+    "gloss": "operation (of a bus or train service); service; running",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 42,
+    "docs": 23,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日刊",
+    "reading": "にっかん",
+    "gloss": "daily publication; daily issue",
+    "pos": "noun · no-adjective",
+    "freq": 31,
+    "docs": 23,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大量",
+    "reading": "たいりょう",
+    "gloss": "large quantity; massive (quantity); mass (e.g. mass production, mass transit, ma",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 27,
+    "docs": 23,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "表彰",
+    "reading": "ひょうしょう",
+    "gloss": "(official) commendation; public recognition (of someone's achievements, good dee",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 65,
+    "docs": 22,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "種目",
+    "reading": "しゅもく",
+    "gloss": "item; event",
+    "pos": "noun",
+    "freq": 52,
+    "docs": 22,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "厚生",
+    "reading": "こうせい",
+    "gloss": "welfare; public welfare; social welfare",
+    "pos": "noun",
+    "freq": 47,
+    "docs": 22,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "事態",
+    "reading": "じたい",
+    "gloss": "situation; (present) state of affairs; circumstances",
+    "pos": "noun",
+    "freq": 30,
+    "docs": 22,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "懸念",
+    "reading": "けねん",
+    "gloss": "worry; fear; anxiety",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 26,
+    "docs": 22,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発覚",
+    "reading": "はっかく",
+    "gloss": "detection (of a plot, fraud, etc.); discovery; coming to light",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 24,
+    "docs": 22,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "予選",
+    "reading": "よせん",
+    "gloss": "preliminary contest; qualifying round; trial",
+    "pos": "noun",
+    "freq": 63,
+    "docs": 21,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "開業",
+    "reading": "かいぎょう",
+    "gloss": "opening a business; opening a practice",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 55,
+    "docs": 21,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "選出",
+    "reading": "せんしゅつ",
+    "gloss": "election; selection; choice",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 33,
+    "docs": 21,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "自体",
+    "reading": "じたい",
+    "gloss": "itself; one's own body; oneself",
+    "pos": "n-suf · noun",
+    "freq": 26,
+    "docs": 21,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "ヶ月",
+    "reading": "かげつ",
+    "gloss": "counter for months",
+    "pos": "counter",
+    "freq": 24,
+    "docs": 21,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "議席",
+    "reading": "ぎせき",
+    "gloss": "parliamentary seat",
+    "pos": "noun",
+    "freq": 121,
+    "docs": 20,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "維新",
+    "reading": "いしん",
+    "gloss": "reformation; revolution; renewal",
+    "pos": "noun",
+    "freq": 46,
+    "docs": 20,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "死去",
+    "reading": "しきょ",
+    "gloss": "death; decease; passing away",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 26,
+    "docs": 20,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "抑える",
+    "reading": "おさえる",
+    "gloss": "to keep within limits (e.g. spending); to restrain (e.g. emotions); to control",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 23,
+    "docs": 20,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "概要",
+    "reading": "がいよう",
+    "gloss": "outline; summary; overview",
+    "pos": "noun",
+    "freq": 22,
+    "docs": 20,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "現役",
+    "reading": "げんえき",
+    "gloss": "active duty; active service; student taking (university) entrance exams while st",
+    "pos": "noun · no-adjective",
+    "freq": 27,
+    "docs": 19,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "由来",
+    "reading": "ゆらい",
+    "gloss": "origin; source; history",
+    "pos": "noun · suru verb",
+    "freq": 25,
+    "docs": 19,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大手",
+    "reading": "おおて",
+    "gloss": "major company; big company; front castle gate",
+    "pos": "noun · no-adjective",
+    "freq": 20,
+    "docs": 19,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "学院",
+    "reading": "がくいん",
+    "gloss": "institute; academy",
+    "pos": "noun",
+    "freq": 48,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "認定",
+    "reading": "にんてい",
+    "gloss": "authorization; authorisation; acknowledgment",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 45,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "連覇",
+    "reading": "れんぱ",
+    "gloss": "successive championships",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 37,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同県",
+    "reading": "どうけん",
+    "gloss": "the same prefecture; the said prefecture",
+    "pos": "noun",
+    "freq": 34,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初戦",
+    "reading": "しょせん",
+    "gloss": "first match (in a series)",
+    "pos": "noun",
+    "freq": 29,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "立憲",
+    "reading": "りっけん",
+    "gloss": "constitutionalism; Constitutional Democratic Party of Japan",
+    "pos": "noun",
+    "freq": 28,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "先制",
+    "reading": "せんせい",
+    "gloss": "head start; initiative; preemption",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 27,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "戦後",
+    "reading": "せんご",
+    "gloss": "postwar period; period after Second World War",
+    "pos": "noun · no-adjective · adverb",
+    "freq": 26,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "死者",
+    "reading": "ししゃ",
+    "gloss": "dead person; (the) deceased; (the) dead",
+    "pos": "noun",
+    "freq": 26,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "犯行",
+    "reading": "はんこう",
+    "gloss": "crime; criminal act; offence",
+    "pos": "noun",
+    "freq": 26,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "検証",
+    "reading": "けんしょう",
+    "gloss": "verification; confirmation; substantiation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 25,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "幹事",
+    "reading": "かんじ",
+    "gloss": "executive secretary; coordinator; organizer",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 25,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "編成",
+    "reading": "へんせい",
+    "gloss": "composition; formation; organization",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 23,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "未明",
+    "reading": "みめい",
+    "gloss": "early dawn; grey of morning; gray of morning",
+    "pos": "noun · adverb",
+    "freq": 22,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発信",
+    "reading": "はっしん",
+    "gloss": "dispatch; despatch; transmission",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 21,
+    "docs": 18,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "騎手",
+    "reading": "きしゅ",
+    "gloss": "horseman; rider; jockey",
+    "pos": "noun",
+    "freq": 69,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "震源",
+    "reading": "しんげん",
+    "gloss": "hypocentre (of an earthquake); hypocenter; focus",
+    "pos": "noun",
+    "freq": 34,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "震災",
+    "reading": "しんさい",
+    "gloss": "earthquake disaster",
+    "pos": "noun",
+    "freq": 31,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "文部",
+    "reading": "もんぶ",
+    "gloss": "Ministry of Education, Science and Culture (1871-2001)",
+    "pos": "noun",
+    "freq": 29,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "警報",
+    "reading": "けいほう",
+    "gloss": "warning; alarm; alert",
+    "pos": "noun",
+    "freq": 29,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "陸上",
+    "reading": "りくじょう",
+    "gloss": "(on) land; ground; shore",
+    "pos": "noun · no-adjective",
+    "freq": 29,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "衆院",
+    "reading": "しゅういん",
+    "gloss": "House of Representatives (lower house of the National Diet of Japan)",
+    "pos": "noun",
+    "freq": 27,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "総務",
+    "reading": "そうむ",
+    "gloss": "general affairs; general business; manager",
+    "pos": "noun",
+    "freq": 26,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "知れる",
+    "reading": "しれる",
+    "gloss": "to become known; to come to light; to be discovered",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 23,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "拠点",
+    "reading": "きょてん",
+    "gloss": "base (of operations); site; location",
+    "pos": "noun",
+    "freq": 22,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "搬送",
+    "reading": "はんそう",
+    "gloss": "transportation; conveyance; delivery",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 22,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "共有",
+    "reading": "きょうゆう",
+    "gloss": "joint ownership; co-ownership; sharing (e.g. a viewpoint)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 21,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "気づく",
+    "reading": "きづく",
+    "gloss": "to notice; to realize; to realise",
+    "pos": "godan verb · intransitive verb",
+    "freq": 19,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "国外",
+    "reading": "こくがい",
+    "gloss": "outside the country; abroad",
+    "pos": "noun",
+    "freq": 19,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日曜",
+    "reading": "にちよう",
+    "gloss": "Sunday",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 17,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "路線",
+    "reading": "ろせん",
+    "gloss": "route (bus, train, air, etc.); line; line (taken by a group, organization, etc.)",
+    "pos": "noun",
+    "freq": 25,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "放つ",
+    "reading": "はなつ",
+    "gloss": "to fire (gun, arrow, questions, etc.); to shoot; to hit (e.g. baseball)",
+    "pos": "godan verb · transitive verb",
+    "freq": 23,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "謝罪",
+    "reading": "しゃざい",
+    "gloss": "apology",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 22,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "殺害",
+    "reading": "さつがい",
+    "gloss": "killing; murder",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 22,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "想定",
+    "reading": "そうてい",
+    "gloss": "hypothesis; supposition; assumption",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 21,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "聴取",
+    "reading": "ちょうしゅ",
+    "gloss": "hearing (of a statement, opinion, explanation, etc.); asking; questioning (e.g. ",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 18,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "付け",
+    "reading": "つけ",
+    "gloss": "bill; bill of sale; payment invoice",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "言及",
+    "reading": "げんきゅう",
+    "gloss": "reference; allusion",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 17,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "供述",
+    "reading": "きょうじゅつ",
+    "gloss": "affidavit; deposition; testimony",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "小学",
+    "reading": "しょうがく",
+    "gloss": "elementary school; primary school; grade school",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "近年",
+    "reading": "きんねん",
+    "gloss": "recent years",
+    "pos": "noun · adverb",
+    "freq": 16,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "人数",
+    "reading": "にんずう",
+    "gloss": "the number of people; many people; a large number of people",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 16,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "震度",
+    "reading": "しんど",
+    "gloss": "seismic intensity",
+    "pos": "noun",
+    "freq": 63,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "投手",
+    "reading": "とうしゅ",
+    "gloss": "pitcher",
+    "pos": "noun",
+    "freq": 48,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "学園",
+    "reading": "がくえん",
+    "gloss": "educational institution; school; academy",
+    "pos": "noun",
+    "freq": 40,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "遺体",
+    "reading": "いたい",
+    "gloss": "(dead) body; corpse; remains",
+    "pos": "noun",
+    "freq": 34,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "配信",
+    "reading": "はいしん",
+    "gloss": "distribution (of information, news, etc.); broadcast; delivery",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 32,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "投稿",
+    "reading": "とうこう",
+    "gloss": "contribution (to a newspaper, magazine, etc.); submission; post (on a blog, soci",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 27,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "地裁",
+    "reading": "ちさい",
+    "gloss": "district court",
+    "pos": "noun",
+    "freq": 26,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "取得",
+    "reading": "しゅとく",
+    "gloss": "obtaining (a qualification, right, object, etc.); acquisition (of land, property",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 21,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "連勝",
+    "reading": "れんしょう",
+    "gloss": "consecutive victories; series of victories; winning streak",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 21,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "機器",
+    "reading": "きき",
+    "gloss": "device; equipment; machinery",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "被災",
+    "reading": "ひさい",
+    "gloss": "suffering (from a disaster); being hit (by an earthquake, typhoon, etc.); fallin",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 20,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一環",
+    "reading": "いっかん",
+    "gloss": "link (e.g. in a chain of events); part (of a plan, campaign, activities, etc.); ",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "落とす",
+    "reading": "おとす",
+    "gloss": "to drop; to lose; to let fall",
+    "pos": "godan verb · transitive verb",
+    "freq": 17,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "復帰",
+    "reading": "ふっき",
+    "gloss": "return; reversion; comeback",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 17,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "北西",
+    "reading": "ほくせい",
+    "gloss": "northwest",
+    "pos": "noun · no-adjective",
+    "freq": 16,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "仕組み",
+    "reading": "しくみ",
+    "gloss": "structure; construction; arrangement",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 15,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "調教",
+    "reading": "ちょうきょう",
+    "gloss": "training (animals); breaking (animals)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 58,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "店舗",
+    "reading": "てんぽ",
+    "gloss": "shop; store; establishment",
+    "pos": "noun",
+    "freq": 42,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "招致",
+    "reading": "しょうち",
+    "gloss": "invitation; summons; bidding (e.g. to host the Olympics)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 36,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "加盟",
+    "reading": "かめい",
+    "gloss": "joining (an association, agreement, etc.); participation; affiliation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 34,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "地上",
+    "reading": "ちじょう",
+    "gloss": "above ground; on the ground; earth's surface",
+    "pos": "noun · no-adjective",
+    "freq": 28,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "往来",
+    "reading": "おうらい",
+    "gloss": "coming and going; traffic; road",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 28,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "読者",
+    "reading": "どくしゃ",
+    "gloss": "reader",
+    "pos": "noun",
+    "freq": 25,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "広報",
+    "reading": "こうほう",
+    "gloss": "public relations; PR; publicity",
+    "pos": "noun",
+    "freq": 24,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "五輪",
+    "reading": "ごりん",
+    "gloss": "Olympic Games; Olympics; Olympic rings",
+    "pos": "noun",
+    "freq": 24,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "戦略",
+    "reading": "せんりゃく",
+    "gloss": "strategy; tactics",
+    "pos": "noun · no-adjective",
+    "freq": 23,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "答え",
+    "reading": "こたえ",
+    "gloss": "answer; reply; response",
+    "pos": "noun",
+    "freq": 22,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "検察",
+    "reading": "けんさつ",
+    "gloss": "criminal investigation; prosecution; examination",
+    "pos": "noun",
+    "freq": 22,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "飲食",
+    "reading": "いんしょく",
+    "gloss": "food and drink; eating and drinking",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 21,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "虚偽",
+    "reading": "きょぎ",
+    "gloss": "falsehood; untruth; lie",
+    "pos": "noun · no-adjective",
+    "freq": 20,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "諸島",
+    "reading": "しょとう",
+    "gloss": "archipelago; group of islands",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "外務",
+    "reading": "がいむ",
+    "gloss": "foreign affairs",
+    "pos": "noun",
+    "freq": 19,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "事例",
+    "reading": "じれい",
+    "gloss": "example; precedent; case",
+    "pos": "noun · no-adjective",
+    "freq": 18,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "諸国",
+    "reading": "しょこく",
+    "gloss": "various countries; various regions; various provinces",
+    "pos": "noun · n-suf",
+    "freq": 18,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "周年",
+    "reading": "しゅうねん",
+    "gloss": "whole year; entire year; n-th year anniversary",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "楽しむ",
+    "reading": "たのしむ",
+    "gloss": "to enjoy; to take pleasure in; to have a good time",
+    "pos": "godan verb · transitive verb",
+    "freq": 17,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "両手",
+    "reading": "りょうて",
+    "gloss": "both hands; both arms; ten",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "北部",
+    "reading": "ほくぶ",
+    "gloss": "northern part; the north (of a region)",
+    "pos": "noun · no-adjective",
+    "freq": 16,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "暫定",
+    "reading": "ざんてい",
+    "gloss": "provisional; temporary; tentative",
+    "pos": "no-adjective · noun",
+    "freq": 16,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全面",
+    "reading": "ぜんめん",
+    "gloss": "whole surface; entire",
+    "pos": "noun · no-adjective",
+    "freq": 16,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "各国",
+    "reading": "かっこく",
+    "gloss": "each country; every country; various countries",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "任期",
+    "reading": "にんき",
+    "gloss": "term of office",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "双方",
+    "reading": "そうほう",
+    "gloss": "both parties; both sides",
+    "pos": "noun · no-adjective",
+    "freq": 15,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "官邸",
+    "reading": "かんてい",
+    "gloss": "official residence (e.g. of the prime minister)",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "並び",
+    "reading": "ならび",
+    "gloss": "line; row; rank",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 14,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "画面",
+    "reading": "がめん",
+    "gloss": "screen (of a TV, computer, etc.); image (on a screen); picture",
+    "pos": "noun",
+    "freq": 36,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大雨",
+    "reading": "おおあめ",
+    "gloss": "heavy rain; torrential rainfall; downpour",
+    "pos": "noun",
+    "freq": 35,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "連立",
+    "reading": "れんりつ",
+    "gloss": "coalition; alliance; union",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 33,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "視聴",
+    "reading": "しちょう",
+    "gloss": "looking and listening; (television) viewing; watching",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 25,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "生成",
+    "reading": "せいせい",
+    "gloss": "creation; generation; formation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 20,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "次期",
+    "reading": "じき",
+    "gloss": "next term; next period; next version",
+    "pos": "noun · no-adjective",
+    "freq": 20,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "入り",
+    "reading": "いり",
+    "gloss": "entering; entrance; entry",
+    "pos": "noun · n-suf",
+    "freq": 20,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "首位",
+    "reading": "しゅい",
+    "gloss": "first place; head position; leading position",
+    "pos": "noun · no-adjective",
+    "freq": 19,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同国",
+    "reading": "どうこく",
+    "gloss": "same country; same province; the (said) country",
+    "pos": "noun",
+    "freq": 19,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "移す",
+    "reading": "うつす",
+    "gloss": "to transfer (to a different place, group, etc.); to change; to move (something)",
+    "pos": "godan verb · transitive verb",
+    "freq": 18,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "両国",
+    "reading": "りょうこく",
+    "gloss": "both countries; Ryōgoku (area of Tokyo)",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "祝福",
+    "reading": "しゅくふく",
+    "gloss": "celebration (of a joyous occasion); blessing; giving one's blessing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "参院",
+    "reading": "さんいん",
+    "gloss": "House of Councillors (upper house of the National Diet of Japan)",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "官房",
+    "reading": "かんぼう",
+    "gloss": "government secretariat",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大型",
+    "reading": "おおがた",
+    "gloss": "large; large-sized; large-scale",
+    "pos": "no-adjective · noun",
+    "freq": 15,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "東部",
+    "reading": "とうぶ",
+    "gloss": "eastern part; the east (of a region)",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "浮かぶ",
+    "reading": "うかぶ",
+    "gloss": "to float; to be suspended; to rise to the surface",
+    "pos": "godan verb · intransitive verb",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "示唆",
+    "reading": "しさ",
+    "gloss": "suggestion; hint; implication",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "男女",
+    "reading": "だんじょ",
+    "gloss": "men and women; man and woman; both sexes",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前日",
+    "reading": "ぜんじつ",
+    "gloss": "previous day; day before; eve",
+    "pos": "noun · adverb",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "追いつく",
+    "reading": "おいつく",
+    "gloss": "to catch up (with); to draw level; to pull even",
+    "pos": "godan verb · intransitive verb",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "少数",
+    "reading": "しょうすう",
+    "gloss": "small number; few; minority",
+    "pos": "noun · adverb · no-adjective",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "解明",
+    "reading": "かいめい",
+    "gloss": "elucidation; explication; explaining",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 14,
+    "docs": 13,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "安打",
+    "reading": "あんだ",
+    "gloss": "safe hit",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 41,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "辞任",
+    "reading": "じにん",
+    "gloss": "resignation (from a position)",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 25,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "指名",
+    "reading": "しめい",
+    "gloss": "naming; nominating; designating",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 23,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "土砂",
+    "reading": "どしゃ",
+    "gloss": "sediment; earth and sand",
+    "pos": "noun",
+    "freq": 22,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "取り組み",
+    "reading": "とりくみ",
+    "gloss": "effort; initiative; dealing with",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "総裁",
+    "reading": "そうさい",
+    "gloss": "president (of an organization); director general; governor (of a central bank)",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "新型",
+    "reading": "しんがた",
+    "gloss": "new type; new style; new model",
+    "pos": "noun · no-adjective",
+    "freq": 20,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "社員",
+    "reading": "しゃいん",
+    "gloss": "company employee; member of a corporation; company stockholder (esp. in legal co",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "先発",
+    "reading": "せんぱつ",
+    "gloss": "starting in advance; starting first; going first",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 20,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "実質",
+    "reading": "じっしつ",
+    "gloss": "substance; essence; substantive",
+    "pos": "noun",
+    "freq": 19,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同点",
+    "reading": "どうてん",
+    "gloss": "same score; deadlock; tie",
+    "pos": "noun · no-adjective",
+    "freq": 18,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "制覇",
+    "reading": "せいは",
+    "gloss": "conquest; domination; supremacy",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "失点",
+    "reading": "しってん",
+    "gloss": "lost point (in a game); point given away; conceded goal",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "本日",
+    "reading": "ほんじつ",
+    "gloss": "today; this day",
+    "pos": "noun · adverb",
+    "freq": 16,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "式典",
+    "reading": "しきてん",
+    "gloss": "ceremony; rites",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "重傷",
+    "reading": "じゅうしょう",
+    "gloss": "serious wound; serious injury",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "代行",
+    "reading": "だいこう",
+    "gloss": "acting as agent; acting on (someone's) behalf; executing business for",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 15,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "自信",
+    "reading": "じしん",
+    "gloss": "self-confidence; confidence (in oneself)",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "閣僚",
+    "reading": "かくりょう",
+    "gloss": "cabinet ministers",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "土曜",
+    "reading": "どよう",
+    "gloss": "Saturday",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "半年",
+    "reading": "はんとし",
+    "gloss": "half a year; six months",
+    "pos": "noun · adverb",
+    "freq": 13,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "球場",
+    "reading": "きゅうじょう",
+    "gloss": "baseball stadium; ballpark",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "当面",
+    "reading": "とうめん",
+    "gloss": "current; urgent; pressing",
+    "pos": "no-adjective · noun · adverb",
+    "freq": 13,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "積極",
+    "reading": "せっきょく",
+    "gloss": "active; positive; progressive",
+    "pos": "adj-f",
+    "freq": 12,
+    "docs": 12,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大賞",
+    "reading": "たいしょう",
+    "gloss": "big prize; first prize",
+    "pos": "noun",
+    "freq": 29,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打ち上げる",
+    "reading": "うちあげる",
+    "gloss": "to launch; to shoot up; to hit (a ball) high",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 26,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "流出",
+    "reading": "りゅうしゅつ",
+    "gloss": "outflow; effluence; efflux",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 25,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "検出",
+    "reading": "けんしゅつ",
+    "gloss": "detection; sense (e.g. sensor)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 23,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出走",
+    "reading": "しゅっそう",
+    "gloss": "entry in a race",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 22,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "適正",
+    "reading": "てきせい",
+    "gloss": "reasonable; suitable",
+    "pos": "na-adjective · noun",
+    "freq": 18,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "風速",
+    "reading": "ふうそく",
+    "gloss": "wind speed",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "得票",
+    "reading": "とくひょう",
+    "gloss": "number of votes polled; poll votes",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 18,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "表記",
+    "reading": "ひょうき",
+    "gloss": "expression in writing; written representation; notation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "選定",
+    "reading": "せんてい",
+    "gloss": "selection",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "速報",
+    "reading": "そくほう",
+    "gloss": "news flash; prompt report; bulletin",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 16,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "走り",
+    "reading": "はしり",
+    "gloss": "running; gliding; first (harvest) of the season",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初日",
+    "reading": "しょにち",
+    "gloss": "first day; opening day",
+    "pos": "noun · adverb",
+    "freq": 16,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "侵害",
+    "reading": "しんがい",
+    "gloss": "infringement; violation; invasion",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 16,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "立派",
+    "reading": "りっぱ",
+    "gloss": "splendid; fine; handsome",
+    "pos": "na-adjective",
+    "freq": 16,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "高齢",
+    "reading": "こうれい",
+    "gloss": "advanced age; old age",
+    "pos": "noun · no-adjective",
+    "freq": 15,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "起訴",
+    "reading": "きそ",
+    "gloss": "prosecution; indictment",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 15,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "車内",
+    "reading": "しゃない",
+    "gloss": "inside a car (train, bus, etc.)",
+    "pos": "noun · no-adjective",
+    "freq": 14,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日米",
+    "reading": "にちべい",
+    "gloss": "Japan and the United States; Japanese-American",
+    "pos": "noun · no-adjective",
+    "freq": 13,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "西部",
+    "reading": "せいぶ",
+    "gloss": "western part; the west (of a region); the West (United States)",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発令",
+    "reading": "はつれい",
+    "gloss": "official announcement; proclamation; issuance (of an order, ordinance, or warnin",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 13,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "金曜",
+    "reading": "きんよう",
+    "gloss": "Friday",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後半",
+    "reading": "こうはん",
+    "gloss": "second half; latter half",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "回る",
+    "reading": "まわる",
+    "gloss": "to turn; to rotate; to revolve",
+    "pos": "godan verb · intransitive verb",
+    "freq": 11,
+    "docs": 11,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "証券",
+    "reading": "しょうけん",
+    "gloss": "bond; bill; certificate",
+    "pos": "noun",
+    "freq": 45,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "順位",
+    "reading": "じゅんい",
+    "gloss": "order; rank; position (e.g. in a race)",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "中道",
+    "reading": "ちゅうどう",
+    "gloss": "middle of the road; centrism; moderation",
+    "pos": "noun · no-adjective",
+    "freq": 19,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "帰還",
+    "reading": "きかん",
+    "gloss": "return (home); repatriation; feedback (in an electronic circuit, biological syst",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 18,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "報知",
+    "reading": "ほうち",
+    "gloss": "information; news; intelligence",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 16,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "放火",
+    "reading": "ほうか",
+    "gloss": "arson; setting fire",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 16,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "違法",
+    "reading": "いほう",
+    "gloss": "illegal; illicit; unlawful",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 15,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "農林",
+    "reading": "のうりん",
+    "gloss": "agriculture and forestry",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "役員",
+    "reading": "やくいん",
+    "gloss": "director; executive; officer",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "搭乗",
+    "reading": "とうじょう",
+    "gloss": "embarkation; boarding (a ship or aircraft)",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 14,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "敗退",
+    "reading": "はいたい",
+    "gloss": "being defeated; being eliminated (from competition)",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 14,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "施策",
+    "reading": "しさく",
+    "gloss": "policy; measure",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "総数",
+    "reading": "そうすう",
+    "gloss": "total (number); count",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "開設",
+    "reading": "かいせつ",
+    "gloss": "establishment; opening; setting up",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "競う",
+    "reading": "きそう",
+    "gloss": "to compete; to contend; to vie",
+    "pos": "godan verb · intransitive verb",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "年内",
+    "reading": "ねんない",
+    "gloss": "remainder of the year; rest of the year",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "意気",
+    "reading": "いき",
+    "gloss": "spirit; heart; disposition",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "数多く",
+    "reading": "かずおおく",
+    "gloss": "in great numbers",
+    "pos": "expression · adverb · no-adjective",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公示",
+    "reading": "こうじ",
+    "gloss": "public announcement; official notice; edict",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "体調",
+    "reading": "たいちょう",
+    "gloss": "physical condition; state of health; shape",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "長年",
+    "reading": "ながねん",
+    "gloss": "many years; a long time",
+    "pos": "noun · adverb",
+    "freq": 11,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "近づく",
+    "reading": "ちかづく",
+    "gloss": "to approach; to draw near; to get close",
+    "pos": "godan verb · intransitive verb",
+    "freq": 11,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "定着",
+    "reading": "ていちゃく",
+    "gloss": "sticking (in one place, position, etc.); settling; fixing",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 11,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "南東",
+    "reading": "なんとう",
+    "gloss": "southeast",
+    "pos": "noun · no-adjective",
+    "freq": 11,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "総額",
+    "reading": "そうがく",
+    "gloss": "total amount (of money); total sum; sum total",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "生み出す",
+    "reading": "うみだす",
+    "gloss": "to create; to bring forth; to produce",
+    "pos": "godan verb · transitive verb",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "反論",
+    "reading": "はんろん",
+    "gloss": "objection; refutation; rebuttal",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "異例",
+    "reading": "いれい",
+    "gloss": "exceptional; unusual; extraordinary",
+    "pos": "no-adjective · na-adjective · noun",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前年",
+    "reading": "ぜんねん",
+    "gloss": "the preceding year; the previous year; last year",
+    "pos": "noun · adverb",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見込む",
+    "reading": "みこむ",
+    "gloss": "to anticipate; to expect; to estimate",
+    "pos": "godan verb · transitive verb",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "軽傷",
+    "reading": "けいしょう",
+    "gloss": "minor injury",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "怪我",
+    "reading": "けが",
+    "gloss": "injury; wound; mistake",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "分間",
+    "reading": "ふんかん",
+    "gloss": "minutes (period of)",
+    "pos": "counter",
+    "freq": 10,
+    "docs": 10,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "遺産",
+    "reading": "いさん",
+    "gloss": "inheritance; bequest; legacy",
+    "pos": "noun",
+    "freq": 47,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "被告",
+    "reading": "ひこく",
+    "gloss": "defendant; the accused",
+    "pos": "noun",
+    "freq": 42,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "巨人",
+    "reading": "きょじん",
+    "gloss": "giant; great man; Tokyo Giants (baseball team)",
+    "pos": "noun",
+    "freq": 31,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "神宮",
+    "reading": "じんぐう",
+    "gloss": "high-status Shinto shrine with connection to imperial family; imperial Shinto sh",
+    "pos": "noun · n-suf",
+    "freq": 26,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "保全",
+    "reading": "ほぜん",
+    "gloss": "preservation; conservation; maintenance",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 25,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "再編",
+    "reading": "さいへん",
+    "gloss": "reorganization; reorganisation; reshuffle",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 25,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "天井",
+    "reading": "てんじょう",
+    "gloss": "ceiling; ceiling price; (price) ceiling",
+    "pos": "noun",
+    "freq": 22,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "命名",
+    "reading": "めいめい",
+    "gloss": "naming; christening",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 22,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "衛生",
+    "reading": "えいせい",
+    "gloss": "hygiene; sanitation; cleanliness",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打者",
+    "reading": "だしゃ",
+    "gloss": "batter",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "東経",
+    "reading": "とうけい",
+    "gloss": "east longitude",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "豪雨",
+    "reading": "ごうう",
+    "gloss": "torrential rain; heavy rain; cloudburst",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "倫理",
+    "reading": "りんり",
+    "gloss": "ethics; morals",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "競泳",
+    "reading": "きょうえい",
+    "gloss": "competitive swimming; swimming race",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 17,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "送検",
+    "reading": "そうけん",
+    "gloss": "committing a suspect to trial; referring a case to a public prosecutor",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 16,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "空白",
+    "reading": "くうはく",
+    "gloss": "blank space (in a document); blank; void",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "海上",
+    "reading": "かいじょう",
+    "gloss": "(on the) sea; surface of the sea",
+    "pos": "noun · no-adjective",
+    "freq": 16,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "解消",
+    "reading": "かいしょう",
+    "gloss": "cancellation; liquidation; resolution",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 16,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "定数",
+    "reading": "ていすう",
+    "gloss": "fixed number; quorum (for an assembly); constant",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "祭り",
+    "reading": "まつり",
+    "gloss": "festival; feast; matsuri",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "要件",
+    "reading": "ようけん",
+    "gloss": "important matter; requirement; requisite",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "採取",
+    "reading": "さいしゅ",
+    "gloss": "picking; collecting; harvesting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 14,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "県立",
+    "reading": "けんりつ",
+    "gloss": "prefectural; managed by a prefectural government",
+    "pos": "no-adjective · noun",
+    "freq": 14,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "構築",
+    "reading": "こうちく",
+    "gloss": "construction; building; putting up",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "満塁",
+    "reading": "まんるい",
+    "gloss": "bases loaded",
+    "pos": "noun · no-adjective",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "機体",
+    "reading": "きたい",
+    "gloss": "fuselage; airframe",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "入団",
+    "reading": "にゅうだん",
+    "gloss": "joining (a group, team, etc.); enrollment; enrolment",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "落選",
+    "reading": "らくせん",
+    "gloss": "failing to be elected; election defeat; losing an election",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "保有",
+    "reading": "ほゆう",
+    "gloss": "possession; retention; maintenance",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "搭載",
+    "reading": "とうさい",
+    "gloss": "loading (on a ship); equipping (an aircraft, car, etc.) with; being equipped wit",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 13,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "執行",
+    "reading": "しっこう",
+    "gloss": "execution; carrying out; performance",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前線",
+    "reading": "ぜんせん",
+    "gloss": "(weather) front; front line; the front",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "移籍",
+    "reading": "いせき",
+    "gloss": "transfer (of one's name into another family register); transfer (to another team",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出馬",
+    "reading": "しゅつば",
+    "gloss": "running (for election); coming forward as a candidate; going on horseback (to a ",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 12,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "悪質",
+    "reading": "あくしつ",
+    "gloss": "malicious; vicious; malignant",
+    "pos": "na-adjective · noun",
+    "freq": 11,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "建造",
+    "reading": "けんぞう",
+    "gloss": "building; construction",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "愛称",
+    "reading": "あいしょう",
+    "gloss": "pet name; nickname; affectionate name",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "救急",
+    "reading": "きゅうきゅう",
+    "gloss": "first-aid; emergency (aid)",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "行使",
+    "reading": "こうし",
+    "gloss": "use; exercise (of one's right, authority, power, etc.)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "本社",
+    "reading": "ほんしゃ",
+    "gloss": "head office; main office; headquarters",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "生む",
+    "reading": "うむ",
+    "gloss": "to give birth; to bear (child); to lay (eggs)",
+    "pos": "godan verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "添付",
+    "reading": "てんぷ",
+    "gloss": "attaching (documents, etc.); appending; affixing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "北上",
+    "reading": "ほくじょう",
+    "gloss": "going north",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "北東",
+    "reading": "ほくとう",
+    "gloss": "northeast",
+    "pos": "noun · no-adjective",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "巻き込む",
+    "reading": "まきこむ",
+    "gloss": "to roll up; to enfold; to swallow up",
+    "pos": "godan verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "歴代",
+    "reading": "れきだい",
+    "gloss": "successive generations; successive emperors",
+    "pos": "noun · no-adjective",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見つめる",
+    "reading": "みつめる",
+    "gloss": "to stare (at); to gaze (at); to look hard (at)",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "快挙",
+    "reading": "かいきょ",
+    "gloss": "brilliant achievement; spectacular feat; splendid accomplishment",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "人権",
+    "reading": "じんけん",
+    "gloss": "human rights; civil liberties",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "現職",
+    "reading": "げんしょく",
+    "gloss": "present post; current office; (an) incumbent",
+    "pos": "noun · no-adjective",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "披露",
+    "reading": "ひろう",
+    "gloss": "announcement; presentation; demonstration",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "名乗る",
+    "reading": "なのる",
+    "gloss": "to give one's name (as); to introduce oneself (as); to claim to be",
+    "pos": "godan verb · intransitive verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "撤去",
+    "reading": "てっきょ",
+    "gloss": "removal; taking away; dismantling (a building, facilities, etc.)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "創設",
+    "reading": "そうせつ",
+    "gloss": "establishment; founding; organization",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "内側",
+    "reading": "うちがわ",
+    "gloss": "inside; interior; inner part",
+    "pos": "noun · no-adjective",
+    "freq": 9,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最小",
+    "reading": "さいしょう",
+    "gloss": "smallest (in size, degree, etc.); least; minimum",
+    "pos": "no-adjective · noun",
+    "freq": 9,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見守る",
+    "reading": "みまもる",
+    "gloss": "to watch over; to keep watch over; to keep an eye on",
+    "pos": "godan verb · transitive verb",
+    "freq": 9,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最短",
+    "reading": "さいたん",
+    "gloss": "shortest",
+    "pos": "no-adjective · noun",
+    "freq": 9,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "無職",
+    "reading": "むしょく",
+    "gloss": "without an occupation; unemployed; jobless",
+    "pos": "no-adjective · noun",
+    "freq": 9,
+    "docs": 9,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打ち上げ",
+    "reading": "うちあげ",
+    "gloss": "launch (of a rocket, satellite, etc.); lift-off; shooting off (fireworks)",
+    "pos": "noun",
+    "freq": 20,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "周知",
+    "reading": "しゅうち",
+    "gloss": "common knowledge; being well-known; making (something) well-known",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "法令",
+    "reading": "ほうれい",
+    "gloss": "statute; law; act",
+    "pos": "noun",
+    "freq": 17,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "撤退",
+    "reading": "てったい",
+    "gloss": "evacuation; withdrawal; revocation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 16,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出荷",
+    "reading": "しゅっか",
+    "gloss": "shipping; shipment; forwarding",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 15,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "運航",
+    "reading": "うんこう",
+    "gloss": "operation (of a ship or aircraft route); service; navigation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 15,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "保安",
+    "reading": "ほあん",
+    "gloss": "peace preservation; security; safety",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "球団",
+    "reading": "きゅうだん",
+    "gloss": "baseball team",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "若者",
+    "reading": "わかもの",
+    "gloss": "young person; youngster; young people",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "新党",
+    "reading": "しんとう",
+    "gloss": "new (political) party",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "在来",
+    "reading": "ざいらい",
+    "gloss": "pre-existing; already there; conventional",
+    "pos": "noun · no-adjective",
+    "freq": 14,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "南海",
+    "reading": "なんかい",
+    "gloss": "southern sea",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "本線",
+    "reading": "ほんせん",
+    "gloss": "main line; trunk line",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後世",
+    "reading": "こうせい",
+    "gloss": "posterity; future generations; future life",
+    "pos": "noun · adverb",
+    "freq": 13,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "北緯",
+    "reading": "ほくい",
+    "gloss": "north latitude",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "党首",
+    "reading": "とうしゅ",
+    "gloss": "party leader",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "検索",
+    "reading": "けんさく",
+    "gloss": "looking up (e.g. a word in a dictionary); search (e.g. on the Internet); retriev",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "本塁",
+    "reading": "ほんるい",
+    "gloss": "base; stronghold; main fort",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "強風",
+    "reading": "きょうふう",
+    "gloss": "strong wind; high wind; moderate gale",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "参戦",
+    "reading": "さんせん",
+    "gloss": "participation in a war; going to war; taking part in a competition or contest",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 12,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "余震",
+    "reading": "よしん",
+    "gloss": "aftershock",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初期",
+    "reading": "しょき",
+    "gloss": "early days; early years; early stages",
+    "pos": "noun · no-adjective",
+    "freq": 11,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "修復",
+    "reading": "しゅうふく",
+    "gloss": "restoration; repair; mending",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前半",
+    "reading": "ぜんはん",
+    "gloss": "first half",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公約",
+    "reading": "こうやく",
+    "gloss": "public commitment; public promise; campaign pledge",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "党内",
+    "reading": "とうない",
+    "gloss": "party-internal; within the party",
+    "pos": "no-adjective · noun",
+    "freq": 10,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "老朽",
+    "reading": "ろうきゅう",
+    "gloss": "infirmity (due to old age); decrepitude; senility",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 10,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "目撃",
+    "reading": "もくげき",
+    "gloss": "witnessing; observing; sighting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日々",
+    "reading": "ひび",
+    "gloss": "daily; everyday; days (e.g. of one's youth)",
+    "pos": "no-adjective",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後押し",
+    "reading": "あとおし",
+    "gloss": "pushing; support; backing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "閣議",
+    "reading": "かくぎ",
+    "gloss": "cabinet meeting",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最新",
+    "reading": "さいしん",
+    "gloss": "latest; newest; late-breaking (news)",
+    "pos": "noun · no-adjective",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "張る",
+    "reading": "はる",
+    "gloss": "to stick; to paste; to affix",
+    "pos": "godan verb · transitive verb",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "運休",
+    "reading": "うんきゅう",
+    "gloss": "suspension (of a transportation service); cancellation; stoppage",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "損傷",
+    "reading": "そんしょう",
+    "gloss": "damage; injury",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "持ち込む",
+    "reading": "もちこむ",
+    "gloss": "to bring in; to take in; to carry in",
+    "pos": "godan verb · transitive verb",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "昇格",
+    "reading": "しょうかく",
+    "gloss": "promotion; raising of status",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "翌年",
+    "reading": "よくねん",
+    "gloss": "following year",
+    "pos": "noun · adverb",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "南西",
+    "reading": "なんせい",
+    "gloss": "southwest",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "高騰",
+    "reading": "こうとう",
+    "gloss": "sharp rise (in prices); steep rise; substantial increase",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後継",
+    "reading": "こうけい",
+    "gloss": "succession; successor",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "市内",
+    "reading": "しない",
+    "gloss": "in the city; within the city",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "間違う",
+    "reading": "まちがう",
+    "gloss": "to be mistaken; to be incorrect; to be wrong",
+    "pos": "godan verb · intransitive verb",
+    "freq": 8,
+    "docs": 8,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "陛下",
+    "reading": "へいか",
+    "gloss": "Your Majesty; His Majesty; Her Majesty",
+    "pos": "noun · n-suf",
+    "freq": 44,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "年金",
+    "reading": "ねんきん",
+    "gloss": "annuity; pension",
+    "pos": "noun · no-adjective",
+    "freq": 28,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "風呂",
+    "reading": "ふろ",
+    "gloss": "bath; bathing; bathtub",
+    "pos": "noun",
+    "freq": 23,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "条例",
+    "reading": "じょうれい",
+    "gloss": "regulations; rules; (local) regulation",
+    "pos": "noun",
+    "freq": 21,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "探査",
+    "reading": "たんさ",
+    "gloss": "probe; inquiry; enquiry",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 20,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "育英",
+    "reading": "いくえい",
+    "gloss": "education of gifted young people; providing financial support to gifted students",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "書き込み",
+    "reading": "かきこみ",
+    "gloss": "writing; entry (e.g. to a form); posting (e.g. to a blog)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 18,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "懲役",
+    "reading": "ちょうえき",
+    "gloss": "penal servitude; imprisonment with hard labor (hard labour)",
+    "pos": "noun",
+    "freq": 16,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "防災",
+    "reading": "ぼうさい",
+    "gloss": "disaster preparedness; prevention of damage resulting from a natural disaster; p",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "連結",
+    "reading": "れんけつ",
+    "gloss": "connection; linking; joining",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 15,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "作動",
+    "reading": "さどう",
+    "gloss": "operation; functioning; running",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 15,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "財団",
+    "reading": "ざいだん",
+    "gloss": "foundation (institution); syndicate; group",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "乗員",
+    "reading": "じょういん",
+    "gloss": "crew member; crewman; crew",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "伝承",
+    "reading": "でんしょう",
+    "gloss": "handing down (information); legend; tradition",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 13,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "悲しみ",
+    "reading": "かなしみ",
+    "gloss": "sadness; sorrow; grief",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "三振",
+    "reading": "さんしん",
+    "gloss": "strikeout",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 13,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発する",
+    "reading": "はっする",
+    "gloss": "to let out; to utter; to produce",
+    "pos": "vs-s · transitive verb",
+    "freq": 12,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "電鉄",
+    "reading": "でんてつ",
+    "gloss": "electric railway",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "生前",
+    "reading": "せいぜん",
+    "gloss": "while alive; during one's lifetime",
+    "pos": "noun · adverb",
+    "freq": 12,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "選抜",
+    "reading": "せんばつ",
+    "gloss": "selection; choice; picking out",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "死因",
+    "reading": "しいん",
+    "gloss": "cause of death",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "系譜",
+    "reading": "けいふ",
+    "gloss": "genealogy; lineage; family tree",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "小型",
+    "reading": "こがた",
+    "gloss": "small-sized; small-scale; miniature",
+    "pos": "no-adjective · noun",
+    "freq": 11,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "観戦",
+    "reading": "かんせん",
+    "gloss": "watching a (sports) game; spectating; observing (military operations)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "年末",
+    "reading": "ねんまつ",
+    "gloss": "end-of-year; year-end",
+    "pos": "noun · adverb",
+    "freq": 11,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "裁定",
+    "reading": "さいてい",
+    "gloss": "decision; ruling; award",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "語り",
+    "reading": "かたり",
+    "gloss": "talk; recital; narration",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "哀悼",
+    "reading": "あいとう",
+    "gloss": "condolence; regret; tribute",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "自粛",
+    "reading": "じしゅく",
+    "gloss": "self-restraint; voluntary restraint; self-imposed control",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "開票",
+    "reading": "かいひょう",
+    "gloss": "counting ballots; tally (of votes)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "仲裁",
+    "reading": "ちゅうさい",
+    "gloss": "arbitration; intercession; mediation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "上記",
+    "reading": "じょうき",
+    "gloss": "above-mentioned; above-named; above",
+    "pos": "noun · no-adjective",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "取りまとめる",
+    "reading": "とりまとめる",
+    "gloss": "to collect; to gather; to compile",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "言い渡す",
+    "reading": "いいわたす",
+    "gloss": "to announce; to tell; to sentence",
+    "pos": "godan verb · transitive verb",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "人員",
+    "reading": "じんいん",
+    "gloss": "number of persons; personnel",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "暴行",
+    "reading": "ぼうこう",
+    "gloss": "assault; outrage; act of violence",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "抱負",
+    "reading": "ほうふ",
+    "gloss": "aspiration; ambition; plan",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同月",
+    "reading": "どうげつ",
+    "gloss": "the same month",
+    "pos": "noun · adverb",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "損壊",
+    "reading": "そんかい",
+    "gloss": "damage; destruction",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "争点",
+    "reading": "そうてん",
+    "gloss": "point at issue",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "細長い",
+    "reading": "ほそながい",
+    "gloss": "long and narrow",
+    "pos": "i-adjective",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "木の葉",
+    "reading": "このは",
+    "gloss": "leaf (of a tree); tree leaves; foliage",
+    "pos": "expression · noun",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "思い切る",
+    "reading": "おもいきる",
+    "gloss": "to give up (all thoughts of); to abandon; to despair of",
+    "pos": "godan verb · transitive verb",
+    "freq": 9,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "下記",
+    "reading": "かき",
+    "gloss": "the following",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "始め",
+    "reading": "はじめ",
+    "gloss": "beginning; start; outset",
+    "pos": "noun · adverb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "枠組み",
+    "reading": "わくぐみ",
+    "gloss": "frame (physical structure); framework; framework (of a plan, system, etc.)",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "尽力",
+    "reading": "じんりょく",
+    "gloss": "efforts; exertion; endeavour",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "落ち着く",
+    "reading": "おちつく",
+    "gloss": "to calm down; to compose oneself; to regain presence of mind",
+    "pos": "godan verb · intransitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "喫する",
+    "reading": "きっする",
+    "gloss": "to eat; to drink; to smoke",
+    "pos": "vs-s · transitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全線",
+    "reading": "ぜんせん",
+    "gloss": "the whole (railway) line; the entire (bus) route; all lines",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "傷つける",
+    "reading": "きずつける",
+    "gloss": "to wound; to injure; to hurt someone's feelings (pride, etc.)",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後方",
+    "reading": "こうほう",
+    "gloss": "rear; back; behind",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "究明",
+    "reading": "きゅうめい",
+    "gloss": "investigation (esp. in academic and scientific contexts); finding out the facts;",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全長",
+    "reading": "ぜんちょう",
+    "gloss": "full length; total length; overall length",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "転倒",
+    "reading": "てんとう",
+    "gloss": "fall; falling down; tumbling",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "画像",
+    "reading": "がぞう",
+    "gloss": "image; picture; portrait",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "次回",
+    "reading": "じかい",
+    "gloss": "next time (occasion)",
+    "pos": "noun · adverb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "自社",
+    "reading": "じしゃ",
+    "gloss": "one's company; company one works for; in-house",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "引き継ぐ",
+    "reading": "ひきつぐ",
+    "gloss": "to take over (someone's duties, business, etc.); to inherit; to succeed to",
+    "pos": "godan verb · transitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "陥る",
+    "reading": "おちいる",
+    "gloss": "to fall into (e.g. a hole); to fall into (chaos, depression, dilemma, illness, e",
+    "pos": "godan verb · intransitive verb",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "近隣",
+    "reading": "きんりん",
+    "gloss": "neighbourhood; neighborhood; vicinity",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "題材",
+    "reading": "だいざい",
+    "gloss": "subject; theme",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "持てる",
+    "reading": "もてる",
+    "gloss": "to be able to possess (hold, get, etc.); to be well liked; to be popular",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "明言",
+    "reading": "めいげん",
+    "gloss": "declaration; statement",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "支障",
+    "reading": "ししょう",
+    "gloss": "obstacle; hindrance; impediment",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見直し",
+    "reading": "みなおし",
+    "gloss": "review; reconsideration; revision",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "無人",
+    "reading": "むじん",
+    "gloss": "unmanned; uninhabited; unattended",
+    "pos": "no-adjective · noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "早期",
+    "reading": "そうき",
+    "gloss": "early stage",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "夏季",
+    "reading": "かき",
+    "gloss": "summer season; summer; summertime",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全容",
+    "reading": "ぜんよう",
+    "gloss": "full portrait; whole aspect; full story",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "書き込む",
+    "reading": "かきこむ",
+    "gloss": "to fill in (field, entry, etc.); to fill out (form); to post a message (e.g. on ",
+    "pos": "godan verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "地検",
+    "reading": "ちけん",
+    "gloss": "District Public Prosecutor's Office",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "再度",
+    "reading": "さいど",
+    "gloss": "a second time; again; once more",
+    "pos": "adverb · noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "窃盗",
+    "reading": "せっとう",
+    "gloss": "theft; stealing; larceny",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "盛り込む",
+    "reading": "もりこむ",
+    "gloss": "to incorporate; to include; to fill (a vessel) with",
+    "pos": "godan verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "専務",
+    "reading": "せんむ",
+    "gloss": "special duty; being in sole charge of a duty; senior managing director",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "遺憾",
+    "reading": "いかん",
+    "gloss": "regrettable; unsatisfactory; deplorable",
+    "pos": "na-adjective · noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出火",
+    "reading": "しゅっか",
+    "gloss": "outbreak of fire",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "盛り上げる",
+    "reading": "もりあげる",
+    "gloss": "to pile up; to heap up; to stir up",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "踏み切る",
+    "reading": "ふみきる",
+    "gloss": "to take off; to jump; to leap",
+    "pos": "godan verb · transitive verb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "何事",
+    "reading": "なにごと",
+    "gloss": "what; what sort of thing; everything",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "恐る恐る",
+    "reading": "おそるおそる",
+    "gloss": "fearfully; timidly; nervously",
+    "pos": "adverb",
+    "freq": 7,
+    "docs": 7,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "改選",
+    "reading": "かいせん",
+    "gloss": "election (for a seat or position at the end of a term)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 27,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "管制",
+    "reading": "かんせい",
+    "gloss": "control (by the state); controlling; coordination",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 25,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "博物",
+    "reading": "はくぶつ",
+    "gloss": "natural history; wide learning; broad area of learning",
+    "pos": "noun",
+    "freq": 21,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "原告",
+    "reading": "げんこく",
+    "gloss": "plaintiff; accuser; prosecutor",
+    "pos": "noun",
+    "freq": 19,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "木々",
+    "reading": "きぎ",
+    "gloss": "(many) trees; every tree; all kinds of trees",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "買収",
+    "reading": "ばいしゅう",
+    "gloss": "acquisition (esp. corporate); buy-out; takeover",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 17,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "実証",
+    "reading": "じっしょう",
+    "gloss": "demonstration; verification; substantiation",
+    "pos": "noun · suru verb · no-adjective",
+    "freq": 17,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "滑走",
+    "reading": "かっそう",
+    "gloss": "gliding; sliding; skating (on ice)",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 16,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "譲渡",
+    "reading": "じょうと",
+    "gloss": "transfer; assignment; conveyance",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 15,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "比喩",
+    "reading": "ひゆ",
+    "gloss": "simile; metaphor; allegory",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "反復",
+    "reading": "はんぷく",
+    "gloss": "repetition; repeat; reiteration",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "開示",
+    "reading": "かいじ",
+    "gloss": "release (of information, documents, etc.); disclosure; display",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "雇用",
+    "reading": "こよう",
+    "gloss": "employment; hire",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "教団",
+    "reading": "きょうだん",
+    "gloss": "religious organization; religious organisation",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "送信",
+    "reading": "そうしん",
+    "gloss": "transmission; sending",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "第一",
+    "reading": "だいいち",
+    "gloss": "first; foremost; number one",
+    "pos": "no-adjective · noun",
+    "freq": 12,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打席",
+    "reading": "だせき",
+    "gloss": "batter's box; one's turn at bat",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "呼称",
+    "reading": "こしょう",
+    "gloss": "name; designation; denomination",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "二塁",
+    "reading": "にるい",
+    "gloss": "second base",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "部隊",
+    "reading": "ぶたい",
+    "gloss": "force; unit; corps",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "参入",
+    "reading": "さんにゅう",
+    "gloss": "entering (the marketplace); introducing (something) to the market; access",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 11,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "商工",
+    "reading": "しょうこう",
+    "gloss": "commerce and industry",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日韓",
+    "reading": "にっかん",
+    "gloss": "Japan and South Korea; Japanese-Korean",
+    "pos": "noun · no-adjective",
+    "freq": 10,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "株価",
+    "reading": "かぶか",
+    "gloss": "stock prices",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "提訴",
+    "reading": "ていそ",
+    "gloss": "presenting a case; suing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "与野党",
+    "reading": "よやとう",
+    "gloss": "ruling and opposition parties; parties in and out of power",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "野原",
+    "reading": "のはら",
+    "gloss": "field; plain; prairie",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "静けさ",
+    "reading": "しずけさ",
+    "gloss": "stillness; silence; quiet",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "庁舎",
+    "reading": "ちょうしゃ",
+    "gloss": "government office building",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "浸水",
+    "reading": "しんすい",
+    "gloss": "inundation; submersion; flood",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "他者",
+    "reading": "たしゃ",
+    "gloss": "another person; others",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "支払い",
+    "reading": "しはらい",
+    "gloss": "payment",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "締結",
+    "reading": "ていけつ",
+    "gloss": "conclusion; execution (of a contract); entering (into treaty)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "支部",
+    "reading": "しぶ",
+    "gloss": "branch; branch office; subdivision",
+    "pos": "noun · no-adjective",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "海底",
+    "reading": "かいてい",
+    "gloss": "bottom of the ocean; seafloor; seabed",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "不快",
+    "reading": "ふかい",
+    "gloss": "displeasure; discomfort; unpleasantness",
+    "pos": "noun · na-adjective",
+    "freq": 9,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "精度",
+    "reading": "せいど",
+    "gloss": "precision; accuracy",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "両者",
+    "reading": "りょうしゃ",
+    "gloss": "pair; the two; both persons",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "視線",
+    "reading": "しせん",
+    "gloss": "one's line of sight; one's gaze; one's eyes (looking)",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "保持",
+    "reading": "ほじ",
+    "gloss": "retention; maintenance; preservation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "離陸",
+    "reading": "りりく",
+    "gloss": "takeoff",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "継投",
+    "reading": "けいとう",
+    "gloss": "relieving the (starting) pitcher",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "主将",
+    "reading": "しゅしょう",
+    "gloss": "commander-in-chief; supreme commander; captain (of a team)",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "応える",
+    "reading": "こたえる",
+    "gloss": "to respond; to answer; to meet (e.g. demands, expectations)",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全域",
+    "reading": "ぜんいき",
+    "gloss": "the whole area; the entire region; all parts (of)",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "カ国",
+    "reading": "かこく",
+    "gloss": "counter for countries",
+    "pos": "counter",
+    "freq": 8,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見聞",
+    "reading": "けんぶん",
+    "gloss": "information; experience; knowledge",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "解体",
+    "reading": "かいたい",
+    "gloss": "demolition; taking down; dismantling",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "訪日",
+    "reading": "ほうにち",
+    "gloss": "visit to Japan",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "新規",
+    "reading": "しんき",
+    "gloss": "new; fresh; new item (e.g. customer, regulation)",
+    "pos": "no-adjective · na-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "隣接",
+    "reading": "りんせつ",
+    "gloss": "adjacency; contiguity; being adjoined",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "告示",
+    "reading": "こくじ",
+    "gloss": "notice; bulletin",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "断念",
+    "reading": "だんねん",
+    "gloss": "abandoning (hope, plans); giving up",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "定例",
+    "reading": "ていれい",
+    "gloss": "regular; ordinary (e.g. session of parliament); established usage",
+    "pos": "no-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "財務",
+    "reading": "ざいむ",
+    "gloss": "financial affairs",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "栄誉",
+    "reading": "えいよ",
+    "gloss": "honour; honor",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "高裁",
+    "reading": "こうさい",
+    "gloss": "High Court",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "国政",
+    "reading": "こくせい",
+    "gloss": "national politics; political situation; statecraft",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "両党",
+    "reading": "りょうとう",
+    "gloss": "both (political) parties",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "突入",
+    "reading": "とつにゅう",
+    "gloss": "rushing into; breaking into; storming",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "傘下",
+    "reading": "さんか",
+    "gloss": "affiliated with; under jurisdiction of; under the umbrella",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "週刊",
+    "reading": "しゅうかん",
+    "gloss": "weekly publication",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "管内",
+    "reading": "かんない",
+    "gloss": "within the jurisdiction (of); one's jurisdiction; in a pipe",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "顧問",
+    "reading": "こもん",
+    "gloss": "adviser; advisor; consultant",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "撤回",
+    "reading": "てっかい",
+    "gloss": "withdrawal; retraction; revocation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "付着",
+    "reading": "ふちゃく",
+    "gloss": "sticking to; clinging to; adhesion",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "切り替える",
+    "reading": "きりかえる",
+    "gloss": "to change; to switch; to change over (to)",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "未遂",
+    "reading": "みすい",
+    "gloss": "failed attempt (at a crime, suicide, etc.)",
+    "pos": "noun · n-suf · no-adjective",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打ち切り",
+    "reading": "うちきり",
+    "gloss": "end; close; finish",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "厳格",
+    "reading": "げんかく",
+    "gloss": "strict; severe; stern",
+    "pos": "na-adjective · noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "教員",
+    "reading": "きょういん",
+    "gloss": "teacher; instructor; teaching staff",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "我が",
+    "reading": "わが",
+    "gloss": "my; our; one's own",
+    "pos": "adj-pn",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "呼び名",
+    "reading": "よびな",
+    "gloss": "popular name; common name; given name",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "明記",
+    "reading": "めいき",
+    "gloss": "clear writing; specification",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "集う",
+    "reading": "つどう",
+    "gloss": "to meet; to assemble; to congregate",
+    "pos": "godan verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "放棄",
+    "reading": "ほうき",
+    "gloss": "abandonment; renouncement; renunciation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "引き受ける",
+    "reading": "ひきうける",
+    "gloss": "to take on; to undertake; to accept",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "火曜",
+    "reading": "かよう",
+    "gloss": "Tuesday",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "細部",
+    "reading": "さいぶ",
+    "gloss": "details; particulars",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "談話",
+    "reading": "だんわ",
+    "gloss": "talk; conversation; dialogue",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "顕著",
+    "reading": "けんちょ",
+    "gloss": "remarkable; striking; obvious",
+    "pos": "na-adjective · noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "減税",
+    "reading": "げんぜい",
+    "gloss": "tax reduction",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "工程",
+    "reading": "こうてい",
+    "gloss": "process; operation; stage of a process",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "順次",
+    "reading": "じゅんじ",
+    "gloss": "in order; sequential; seriatim",
+    "pos": "adverb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一覧",
+    "reading": "いちらん",
+    "gloss": "look; glance; sight",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "念頭",
+    "reading": "ねんとう",
+    "gloss": "(on one's) mind; heed",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初代",
+    "reading": "しょだい",
+    "gloss": "first generation; founder",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "早朝",
+    "reading": "そうちょう",
+    "gloss": "early morning",
+    "pos": "noun · adverb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "在籍",
+    "reading": "ざいせき",
+    "gloss": "being enrolled (at a school); being registered; being a member (of a team, organ",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "登板",
+    "reading": "とうばん",
+    "gloss": "taking the mound; pitching a game",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "愛す",
+    "reading": "あいす",
+    "gloss": "to love",
+    "pos": "godan verb · vs-c · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "低迷",
+    "reading": "ていめい",
+    "gloss": "hanging low (of clouds); remaining low (of sales, stock prices, etc.); remaining",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "即日",
+    "reading": "そくじつ",
+    "gloss": "(on) the same day",
+    "pos": "noun · adverb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "多発",
+    "reading": "たはつ",
+    "gloss": "repeated occurrence; frequently occurring",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "身柄",
+    "reading": "みがら",
+    "gloss": "one's person",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "駆けつける",
+    "reading": "かけつける",
+    "gloss": "to run to; to come running; to rush (someplace)",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "室内",
+    "reading": "しつない",
+    "gloss": "indoor; inside the room",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "成し遂げる",
+    "reading": "なしとげる",
+    "gloss": "to accomplish; to achieve; to complete",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "手作り",
+    "reading": "てづくり",
+    "gloss": "handmade; handcrafted; homemade",
+    "pos": "no-adjective · noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前方",
+    "reading": "ぜんぽう",
+    "gloss": "ahead; forward; (in) front",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "殺到",
+    "reading": "さっとう",
+    "gloss": "rush; flood; deluge",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "不全",
+    "reading": "ふぜん",
+    "gloss": "partial; incomplete; imperfect",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "売り",
+    "reading": "うり",
+    "gloss": "sale; selling; selling point",
+    "pos": "noun · n-suf",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "否認",
+    "reading": "ひにん",
+    "gloss": "denial; negation; repudiation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "系列",
+    "reading": "けいれつ",
+    "gloss": "series; sequence; system",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "飛躍",
+    "reading": "ひやく",
+    "gloss": "leap; jump; stepping out into the wider world",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "国営",
+    "reading": "こくえい",
+    "gloss": "government management; state management",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "禁ずる",
+    "reading": "きんずる",
+    "gloss": "to forbid; to ban; to prohibit",
+    "pos": "vz · transitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "断続",
+    "reading": "だんぞく",
+    "gloss": "intermittence; being intermittent; occurring intermittently",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 6,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "駅伝",
+    "reading": "えきでん",
+    "gloss": "long-distance relay race; stagecoach; post horse",
+    "pos": "noun",
+    "freq": 18,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "落語",
+    "reading": "らくご",
+    "gloss": "rakugo; traditional Japanese comic storytelling; comic story (told by a professi",
+    "pos": "noun",
+    "freq": 15,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "功労",
+    "reading": "こうろう",
+    "gloss": "meritorious deed; services",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公益",
+    "reading": "こうえき",
+    "gloss": "public interest; public benefit; public good",
+    "pos": "noun · no-adjective",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "教職員",
+    "reading": "きょうしょくいん",
+    "gloss": "teaching staff; faculty",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "遺族",
+    "reading": "いぞく",
+    "gloss": "bereaved family; surviving family; family of the deceased",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "下院",
+    "reading": "かいん",
+    "gloss": "lower house; lower legislative chamber",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "平年",
+    "reading": "へいねん",
+    "gloss": "non-leap year; average year (for rainfall, temperature, etc.); normal year",
+    "pos": "noun",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "予告",
+    "reading": "よこく",
+    "gloss": "(advance) notice; preliminary announcement; warning",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "無期",
+    "reading": "むき",
+    "gloss": "indefinite; unlimited; life imprisonment",
+    "pos": "no-adjective · noun",
+    "freq": 12,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公社",
+    "reading": "こうしゃ",
+    "gloss": "public corporation",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "告発",
+    "reading": "こくはつ",
+    "gloss": "indictment; prosecution; complaint",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "収録",
+    "reading": "しゅうろく",
+    "gloss": "recording (in a book, the minutes, etc.); printing; including",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "控訴",
+    "reading": "こうそ",
+    "gloss": "appeal to a higher court; intermediate appeal",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 11,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "啓発",
+    "reading": "けいはつ",
+    "gloss": "enlightenment; development; edification",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "盗塁",
+    "reading": "とうるい",
+    "gloss": "base stealing; steal; stolen base",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "海域",
+    "reading": "かいいき",
+    "gloss": "area of sea; waters",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打率",
+    "reading": "だりつ",
+    "gloss": "batting average",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "海水",
+    "reading": "かいすい",
+    "gloss": "seawater; saltwater",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日報",
+    "reading": "にっぽう",
+    "gloss": "daily report",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "履く",
+    "reading": "はく",
+    "gloss": "to put on (lower-body clothing, e.g. pants, skirt, footwear); to wear; to affix ",
+    "pos": "godan verb · transitive verb",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "飲料",
+    "reading": "いんりょう",
+    "gloss": "beverage; drink",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "奇跡",
+    "reading": "きせき",
+    "gloss": "miracle; wonder; marvel",
+    "pos": "noun · no-adjective",
+    "freq": 9,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "複製",
+    "reading": "ふくせい",
+    "gloss": "reproduction; duplication; reprinting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 9,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発着",
+    "reading": "はっちゃく",
+    "gloss": "arrival and departure",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 9,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "冬季",
+    "reading": "とうき",
+    "gloss": "winter season; winter",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "地中",
+    "reading": "ちちゅう",
+    "gloss": "in the ground; in the earth; underground",
+    "pos": "no-adjective · noun",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "消火",
+    "reading": "しょうか",
+    "gloss": "extinguishing a fire; fire fighting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "持ち帰る",
+    "reading": "もちかえる",
+    "gloss": "to take home; to carry home; to bring back home",
+    "pos": "godan verb · transitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "年始",
+    "reading": "ねんし",
+    "gloss": "beginning of the year; new year; New Year's call",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "返上",
+    "reading": "へんじょう",
+    "gloss": "return; giving back; giving up",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "閉じ込める",
+    "reading": "とじこめる",
+    "gloss": "to lock up; to shut up; to imprison",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "降板",
+    "reading": "こうばん",
+    "gloss": "leaving the mound; being knocked out; resignation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "馬主",
+    "reading": "うまぬし",
+    "gloss": "owner of a horse (esp. racehorse); registered owner (of a racehorse)",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "銃撃",
+    "reading": "じゅうげき",
+    "gloss": "shooting; gunning (down)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "合戦",
+    "reading": "かっせん",
+    "gloss": "battle; fight; fighting",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "主流",
+    "reading": "しゅりゅう",
+    "gloss": "(the) mainstream; main course (of a river); main stream",
+    "pos": "noun · no-adjective",
+    "freq": 8,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "匿名",
+    "reading": "とくめい",
+    "gloss": "anonymity; using an assumed name",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "応答",
+    "reading": "おうとう",
+    "gloss": "reply; answer; response",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "創出",
+    "reading": "そうしゅつ",
+    "gloss": "creation; generation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "退場",
+    "reading": "たいじょう",
+    "gloss": "leaving (a hall, meeting, stadium, etc.); exit; walkout",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "在留",
+    "reading": "ざいりゅう",
+    "gloss": "residing (esp. abroad); staying; living",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "離党",
+    "reading": "りとう",
+    "gloss": "secession from a political party",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "土壌",
+    "reading": "どじょう",
+    "gloss": "soil; breeding ground (for); fertile ground (for)",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "参拝",
+    "reading": "さんぱい",
+    "gloss": "going and worshipping (at a shrine or temple); visit (to a shrine or temple to w",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "定番",
+    "reading": "ていばん",
+    "gloss": "standard item; usual thing; (a) classic",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "切断",
+    "reading": "せつだん",
+    "gloss": "cutting; severance; section",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "機長",
+    "reading": "きちょう",
+    "gloss": "captain (of an aircraft)",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "即時",
+    "reading": "そくじ",
+    "gloss": "prompt; immediate; in real time",
+    "pos": "no-adjective · noun · adverb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "三塁",
+    "reading": "さんるい",
+    "gloss": "third base",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "調達",
+    "reading": "ちょうたつ",
+    "gloss": "supply; provision; raising",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同党",
+    "reading": "どうとう",
+    "gloss": "same (political) party; the said party",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "銀色",
+    "reading": "ぎんいろ",
+    "gloss": "silver (color, colour)",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "個室",
+    "reading": "こしつ",
+    "gloss": "single (room); room for one; one's own room",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "親族",
+    "reading": "しんぞく",
+    "gloss": "relative; relation; kin",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "断層",
+    "reading": "だんそう",
+    "gloss": "fault; dislocation; gap",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "総長",
+    "reading": "そうちょう",
+    "gloss": "president (of a university); vice-chancellor; chancellor",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "金色",
+    "reading": "きんいろ",
+    "gloss": "gold (colour, color)",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初頭",
+    "reading": "しょとう",
+    "gloss": "beginning (of a century, etc.)",
+    "pos": "noun · adverb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "持ち出す",
+    "reading": "もちだす",
+    "gloss": "to take out; to carry out; to bring out from where it belongs",
+    "pos": "godan verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出資",
+    "reading": "しゅっし",
+    "gloss": "investment; contribution; financing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "政令",
+    "reading": "せいれい",
+    "gloss": "government ordinance; cabinet order",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "若手",
+    "reading": "わかて",
+    "gloss": "young person",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "切り離す",
+    "reading": "きりはなす",
+    "gloss": "to cut off (from); to separate; to detach",
+    "pos": "godan verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "当社",
+    "reading": "とうしゃ",
+    "gloss": "this company; this firm; this shrine",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "足音",
+    "reading": "あしおと",
+    "gloss": "(sound of) footsteps; sense or sign that something is approaching",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "多角",
+    "reading": "たかく",
+    "gloss": "many-sided; versatile; polygonal",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "効能",
+    "reading": "こうのう",
+    "gloss": "effect; effectiveness; efficacy",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "法的",
+    "reading": "ほうてき",
+    "gloss": "legal",
+    "pos": "na-adjective",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "上流",
+    "reading": "じょうりゅう",
+    "gloss": "upper stream; upper course; upper reaches",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "親子",
+    "reading": "おやこ",
+    "gloss": "parent and child",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "平泳ぎ",
+    "reading": "ひらおよぎ",
+    "gloss": "breaststroke (swimming)",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "炎上",
+    "reading": "えんじょう",
+    "gloss": "going up in flames; destruction by fire (esp. of a large building); stirring up ",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最悪",
+    "reading": "さいあく",
+    "gloss": "worst; horrible; horrid",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "毎回",
+    "reading": "まいかい",
+    "gloss": "every time; each round",
+    "pos": "noun · adverb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "走者",
+    "reading": "そうしゃ",
+    "gloss": "runner; base runner",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "実業",
+    "reading": "じつぎょう",
+    "gloss": "industry; business",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "頭部",
+    "reading": "とうぶ",
+    "gloss": "head",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "起用",
+    "reading": "きよう",
+    "gloss": "appointment (to a position, job, etc.); being used for a role; promotion",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見出す",
+    "reading": "みいだす",
+    "gloss": "to find out; to discover; to notice",
+    "pos": "godan verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "脱落",
+    "reading": "だつらく",
+    "gloss": "dropping out; falling behind; falling by the wayside",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "汚職",
+    "reading": "おしょく",
+    "gloss": "corruption (esp. by a government employee); bribery; graft",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "贈呈",
+    "reading": "ぞうてい",
+    "gloss": "presentation (of a gift, prize, etc.)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "梗塞",
+    "reading": "こうそく",
+    "gloss": "stoppage; blocking; infarction",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打ち出す",
+    "reading": "うちだす",
+    "gloss": "to emboss; to print out; to print",
+    "pos": "godan verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "案件",
+    "reading": "あんけん",
+    "gloss": "matter (to discuss); item (on the agenda); issue",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "認知",
+    "reading": "にんち",
+    "gloss": "acknowledgement; acknowledgment; recognition",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "内務",
+    "reading": "ないむ",
+    "gloss": "internal or domestic affairs",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "召集",
+    "reading": "しょうしゅう",
+    "gloss": "convening; calling together (e.g. parliament); call-up (for military service)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "安否",
+    "reading": "あんぴ",
+    "gloss": "safety; welfare; well-being",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "節目",
+    "reading": "ふしめ",
+    "gloss": "turning point; critical juncture; knot (in a tree, etc.)",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "聞き取る",
+    "reading": "ききとる",
+    "gloss": "to catch (someone's words); to make out; to follow",
+    "pos": "godan verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "追求",
+    "reading": "ついきゅう",
+    "gloss": "pursuit (of a goal, ideal, etc.); search; chase",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前向き",
+    "reading": "まえむき",
+    "gloss": "front-facing; forward-looking; positive",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "本件",
+    "reading": "ほんけん",
+    "gloss": "this matter; this case",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "始動",
+    "reading": "しどう",
+    "gloss": "starting (a machine, engine, etc.); starting (a project, plan, etc.); beginning",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "拒む",
+    "reading": "こばむ",
+    "gloss": "to refuse; to reject; to decline",
+    "pos": "godan verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大国",
+    "reading": "たいこく",
+    "gloss": "large country; major nation; great power",
+    "pos": "noun · n-suf",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "司令",
+    "reading": "しれい",
+    "gloss": "command; commander; commandant",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "万全",
+    "reading": "ばんぜん",
+    "gloss": "perfection; flawlessness",
+    "pos": "noun · no-adjective · na-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公判",
+    "reading": "こうはん",
+    "gloss": "public hearing; trial",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "営み",
+    "reading": "いとなみ",
+    "gloss": "activity; action; performance",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "決戦",
+    "reading": "けっせん",
+    "gloss": "decisive battle; deciding match; play-off",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "知り合う",
+    "reading": "しりあう",
+    "gloss": "to get to know each other; to make acquaintance",
+    "pos": "godan verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "早く",
+    "reading": "はやく",
+    "gloss": "early; soon; quickly",
+    "pos": "adverb · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "外側",
+    "reading": "そとがわ",
+    "gloss": "exterior; outside; outer",
+    "pos": "noun · no-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "手渡す",
+    "reading": "てわたす",
+    "gloss": "to hand (over); to deliver in person",
+    "pos": "godan verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "素敵",
+    "reading": "すてき",
+    "gloss": "lovely; wonderful; charming",
+    "pos": "na-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "皇后",
+    "reading": "こうごう",
+    "gloss": "empress (consort)",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "立ち上げる",
+    "reading": "たちあげる",
+    "gloss": "to start (something); to start up; to launch (a business)",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "多額",
+    "reading": "たがく",
+    "gloss": "large (amount of money); huge; hefty",
+    "pos": "no-adjective · na-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "消滅",
+    "reading": "しょうめつ",
+    "gloss": "extinction; extinguishment; disappearance",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "委ねる",
+    "reading": "ゆだねる",
+    "gloss": "to entrust (a matter) to; to leave to; to abandon oneself to (e.g. pleasure)",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "幅広い",
+    "reading": "はばひろい",
+    "gloss": "extensive; wide; broad",
+    "pos": "i-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "活性",
+    "reading": "かっせい",
+    "gloss": "activity; active",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "公的",
+    "reading": "こうてき",
+    "gloss": "public; official",
+    "pos": "na-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "社内",
+    "reading": "しゃない",
+    "gloss": "within a company; in-house; within a shrine",
+    "pos": "no-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "上映",
+    "reading": "じょうえい",
+    "gloss": "screening (a movie); showing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "陸軍",
+    "reading": "りくぐん",
+    "gloss": "army",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "抵触",
+    "reading": "ていしょく",
+    "gloss": "infringement (of a law, treaty, etc.); contravention; running afoul",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初回",
+    "reading": "しょかい",
+    "gloss": "first time; first innings; initial attempt",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "内野",
+    "reading": "ないや",
+    "gloss": "infield; diamond",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "陽性",
+    "reading": "ようせい",
+    "gloss": "positive (result); positive (attitude); cheerful",
+    "pos": "no-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同校",
+    "reading": "どうこう",
+    "gloss": "the same school; the said school",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "本拠",
+    "reading": "ほんきょ",
+    "gloss": "stronghold; inner citadel; base",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "光栄",
+    "reading": "こうえい",
+    "gloss": "honour; honor; glory",
+    "pos": "noun · na-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "浮上",
+    "reading": "ふじょう",
+    "gloss": "surfacing; rising to the surface; emerging",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "形跡",
+    "reading": "けいせき",
+    "gloss": "traces; evidence",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "交わす",
+    "reading": "かわす",
+    "gloss": "to exchange (messages, greetings, arguments, etc.); to intersect; to cross",
+    "pos": "godan verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "何者",
+    "reading": "なにもの",
+    "gloss": "who; what kind of person",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "帰国",
+    "reading": "きこく",
+    "gloss": "return to one's country; return to one's hometown",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最長",
+    "reading": "さいちょう",
+    "gloss": "longest; oldest",
+    "pos": "no-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "過激",
+    "reading": "かげき",
+    "gloss": "extreme (measure, idea, etc.); radical; violent (language)",
+    "pos": "na-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "平行",
+    "reading": "へいこう",
+    "gloss": "parallelism; running parallel (to, with); running concurrently",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "創業",
+    "reading": "そうぎょう",
+    "gloss": "establishment (of a business); founding",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "主力",
+    "reading": "しゅりょく",
+    "gloss": "main force; main strength; main effort",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "政界",
+    "reading": "せいかい",
+    "gloss": "(world of) politics; political world; political circles",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "待機",
+    "reading": "たいき",
+    "gloss": "standing by; awaiting an opportunity; being on alert",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "人的",
+    "reading": "じんてき",
+    "gloss": "human; personal",
+    "pos": "na-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "先ほど",
+    "reading": "さきほど",
+    "gloss": "a short while ago; a moment ago; just now",
+    "pos": "noun · adverb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一挙",
+    "reading": "いっきょ",
+    "gloss": "one effort; one action",
+    "pos": "adverb · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "接戦",
+    "reading": "せっせん",
+    "gloss": "close contest; close match; close game",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "満了",
+    "reading": "まんりょう",
+    "gloss": "expiration; termination",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "擁立",
+    "reading": "ようりつ",
+    "gloss": "backing (for a position); giving support to; helping (someone) to a position",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "形状",
+    "reading": "けいじょう",
+    "gloss": "shape; form",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "半身",
+    "reading": "はんしん",
+    "gloss": "half the body; half length",
+    "pos": "noun · no-adjective",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "絶望",
+    "reading": "ぜつぼう",
+    "gloss": "despair; hopelessness",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "合法",
+    "reading": "ごうほう",
+    "gloss": "legal; lawful; legitimate",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "幻想",
+    "reading": "げんそう",
+    "gloss": "fantasy; illusion; vision",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "夕食",
+    "reading": "ゆうしょく",
+    "gloss": "evening meal; dinner",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 5,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "銭湯",
+    "reading": "せんとう",
+    "gloss": "public bath; bathhouse",
+    "pos": "noun",
+    "freq": 43,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "医薬",
+    "reading": "いやく",
+    "gloss": "medicine; (pharmaceutical) drug; medical treatment",
+    "pos": "noun",
+    "freq": 30,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "移植",
+    "reading": "いしょく",
+    "gloss": "transplanting (a plant); transplant; grafting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 23,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "皇室",
+    "reading": "こうしつ",
+    "gloss": "Imperial household",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "卓球",
+    "reading": "たっきゅう",
+    "gloss": "table tennis; ping-pong",
+    "pos": "noun",
+    "freq": 14,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "株主",
+    "reading": "かぶぬし",
+    "gloss": "shareholder; stockholder",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "馬術",
+    "reading": "ばじゅつ",
+    "gloss": "horsemanship; equestrian art; (art of) riding",
+    "pos": "noun",
+    "freq": 13,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "遺棄",
+    "reading": "いき",
+    "gloss": "abandonment; desertion",
+    "pos": "noun · no-adjective · suru verb",
+    "freq": 12,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発注",
+    "reading": "はっちゅう",
+    "gloss": "ordering (materials); placing an order; order",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 12,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "崩落",
+    "reading": "ほうらく",
+    "gloss": "collapse; break; cave-in",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 12,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "物件",
+    "reading": "ぶっけん",
+    "gloss": "article; thing; object",
+    "pos": "noun",
+    "freq": 11,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "解析",
+    "reading": "かいせき",
+    "gloss": "analysis; analytical study; parsing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 11,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "家宅",
+    "reading": "かたく",
+    "gloss": "domicile; premises",
+    "pos": "noun",
+    "freq": 10,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "書記",
+    "reading": "しょき",
+    "gloss": "clerk; secretary; writing down",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "進入",
+    "reading": "しんにゅう",
+    "gloss": "entry; going into; approach",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 9,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同省",
+    "reading": "どうしょう",
+    "gloss": "the said ministry; the same ministry",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "顧客",
+    "reading": "こきゃく",
+    "gloss": "customer; client; patron",
+    "pos": "noun · no-adjective",
+    "freq": 9,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "商標",
+    "reading": "しょうひょう",
+    "gloss": "trademark",
+    "pos": "noun",
+    "freq": 9,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "進捗",
+    "reading": "しんちょく",
+    "gloss": "progress; advance; making (good) progress",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "指標",
+    "reading": "しひょう",
+    "gloss": "index; indices; indicator",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "政務",
+    "reading": "せいむ",
+    "gloss": "government affairs",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "海軍",
+    "reading": "かいぐん",
+    "gloss": "navy; naval force",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "受信",
+    "reading": "じゅしん",
+    "gloss": "receiving (a message, letter, email, etc.); reception (radio, TV, etc.)",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "不法",
+    "reading": "ふほう",
+    "gloss": "unlawful; illegal; unreasonable",
+    "pos": "na-adjective · noun",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "着用",
+    "reading": "ちゃくよう",
+    "gloss": "wearing (e.g. a uniform, seat belt, helmet); having on",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "飲酒",
+    "reading": "いんしゅ",
+    "gloss": "drinking alcohol",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "急性",
+    "reading": "きゅうせい",
+    "gloss": "acute (illness)",
+    "pos": "no-adjective · noun",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "米軍",
+    "reading": "べいぐん",
+    "gloss": "US armed forces",
+    "pos": "noun",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "評議",
+    "reading": "ひょうぎ",
+    "gloss": "conference; discussion",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "遮断",
+    "reading": "しゃだん",
+    "gloss": "isolation; cut off; blockade",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 8,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "推移",
+    "reading": "すいい",
+    "gloss": "transition; change; progress",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "民事",
+    "reading": "みんじ",
+    "gloss": "civil affairs; civil case",
+    "pos": "noun · no-adjective",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "百姓",
+    "reading": "ひゃくしょう",
+    "gloss": "farmer; peasant; farm laborer",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "配送",
+    "reading": "はいそう",
+    "gloss": "delivery",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "発熱",
+    "reading": "はつねつ",
+    "gloss": "generation of heat; (attack of) fever; pyrexia",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "打線",
+    "reading": "だせん",
+    "gloss": "batting line-up; batting order",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "退任",
+    "reading": "たいにん",
+    "gloss": "retirement; resignation; stepping down",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "上場",
+    "reading": "じょうじょう",
+    "gloss": "listing (on the stock exchange, etc.); taking (a company) public; performance (o",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "刃物",
+    "reading": "はもの",
+    "gloss": "edged tool; cutting instrument; knife",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "男児",
+    "reading": "だんじ",
+    "gloss": "boy; son; man",
+    "pos": "noun",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "共闘",
+    "reading": "きょうとう",
+    "gloss": "joint struggle; common (united) front",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 7,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "陣営",
+    "reading": "じんえい",
+    "gloss": "camp (supporters of a doctrine, party, etc.); faction (of a party); military cam",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "食材",
+    "reading": "しょくざい",
+    "gloss": "foodstuff; ingredient",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "疑わしい",
+    "reading": "うたがわしい",
+    "gloss": "doubtful; questionable; uncertain",
+    "pos": "i-adjective",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "融和",
+    "reading": "ゆうわ",
+    "gloss": "harmony; reconciliation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "語り手",
+    "reading": "かたりて",
+    "gloss": "narrator; storyteller; reciter",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "授与",
+    "reading": "じゅよ",
+    "gloss": "awarding; conferment; granting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "復元",
+    "reading": "ふくげん",
+    "gloss": "restoration (to the original state or location); reconstruction; restitution",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "立案",
+    "reading": "りつあん",
+    "gloss": "planning; devising (a plan); drafting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "快速",
+    "reading": "かいそく",
+    "gloss": "high speed; rapidity; rapid-service train (not as fast as express)",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "喚起",
+    "reading": "かんき",
+    "gloss": "arousal; excitation; awakening",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "白紙",
+    "reading": "はくし",
+    "gloss": "white paper; flyleaf; blank paper",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "協賛",
+    "reading": "きょうさん",
+    "gloss": "support; mutual aid; cooperation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "新作",
+    "reading": "しんさく",
+    "gloss": "new work; new production; new composition",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "時価",
+    "reading": "じか",
+    "gloss": "current value; price; market value",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "致死",
+    "reading": "ちし",
+    "gloss": "lethal; fatal",
+    "pos": "no-adjective · noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "馬券",
+    "reading": "ばけん",
+    "gloss": "betting ticket; betting slip",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "歌唱",
+    "reading": "かしょう",
+    "gloss": "song; singing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "放映",
+    "reading": "ほうえい",
+    "gloss": "televising; broadcasting; airing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "離脱",
+    "reading": "りだつ",
+    "gloss": "withdrawal; secession; separation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "釈放",
+    "reading": "しゃくほう",
+    "gloss": "release; liberation; acquittal",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "実刑",
+    "reading": "じっけい",
+    "gloss": "prison sentence (without a stay of execution)",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全焼",
+    "reading": "ぜんしょう",
+    "gloss": "total destruction by fire; being burned down",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "作り上げる",
+    "reading": "つくりあげる",
+    "gloss": "to build up; to complete; to construct",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "求刑",
+    "reading": "きゅうけい",
+    "gloss": "recommended sentence; prosecution's demand for punishment",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "解任",
+    "reading": "かいにん",
+    "gloss": "dismissal (from a post); discharge; removal",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出頭",
+    "reading": "しゅっとう",
+    "gloss": "appearance; presence; attendance",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "放牧",
+    "reading": "ほうぼく",
+    "gloss": "pasturage; grazing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "高台",
+    "reading": "たかだい",
+    "gloss": "high ground; elevation; hill",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "教諭",
+    "reading": "きょうゆ",
+    "gloss": "(licensed) teacher",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "入り口",
+    "reading": "いりぐち",
+    "gloss": "entrance; entry; gate",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "教師",
+    "reading": "きょうし",
+    "gloss": "teacher; instructor",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "番手",
+    "reading": "ばんて",
+    "gloss": "(yarn) count; nth place (in a race); nth position (in a starting lineup)",
+    "pos": "noun",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大声",
+    "reading": "おおごえ",
+    "gloss": "loud voice",
+    "pos": "noun · no-adjective",
+    "freq": 6,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "国々",
+    "reading": "くにぐに",
+    "gloss": "countries; (various) nations",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "史料",
+    "reading": "しりょう",
+    "gloss": "historical materials; historical records; historical sources",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "辞意",
+    "reading": "じい",
+    "gloss": "intention to resign",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "担保",
+    "reading": "たんぽ",
+    "gloss": "security; guarantee; collateral",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "養成",
+    "reading": "ようせい",
+    "gloss": "training; education; development",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後援",
+    "reading": "こうえん",
+    "gloss": "support; backing",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "中退",
+    "reading": "ちゅうたい",
+    "gloss": "leaving school during a term",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "登用",
+    "reading": "とうよう",
+    "gloss": "appointment; assignment; promotion",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "受注",
+    "reading": "じゅちゅう",
+    "gloss": "accepting an order; receiving an order; orders received",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "旅人",
+    "reading": "たびびと",
+    "gloss": "traveller; traveler; wayfarer",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "前面",
+    "reading": "ぜんめん",
+    "gloss": "front part; frontage; facade",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "拍子",
+    "reading": "ひょうし",
+    "gloss": "time; meter; metre",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "自家",
+    "reading": "じか",
+    "gloss": "one's own house; own; personal",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "右側",
+    "reading": "みぎがわ",
+    "gloss": "right side; right-hand side",
+    "pos": "noun · no-adjective",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "担い手",
+    "reading": "にないて",
+    "gloss": "bearer; carrier; person bearing responsibility",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "月曜",
+    "reading": "げつよう",
+    "gloss": "Monday",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "呼びかけ",
+    "reading": "よびかけ",
+    "gloss": "call; appeal",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "原発",
+    "reading": "げんぱつ",
+    "gloss": "nuclear power plant; nuclear power generation; primary (e.g. primary immunodefic",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "告知",
+    "reading": "こくち",
+    "gloss": "notice; notification; announcement",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "新年",
+    "reading": "しんねん",
+    "gloss": "New Year",
+    "pos": "noun · adverb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "有害",
+    "reading": "ゆうがい",
+    "gloss": "harmful; hazardous",
+    "pos": "na-adjective · noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "混入",
+    "reading": "こんにゅう",
+    "gloss": "mixing; blending; adding",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "容認",
+    "reading": "ようにん",
+    "gloss": "approval; acceptance; toleration",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "広域",
+    "reading": "こういき",
+    "gloss": "wide area; wide view (of a digitally displayed map); zoomed-out view",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "内戦",
+    "reading": "ないせん",
+    "gloss": "civil war",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "宣誓",
+    "reading": "せんせい",
+    "gloss": "oath; abjuration; pledge",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "路上",
+    "reading": "ろじょう",
+    "gloss": "on the road; on the street; in the street",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "帝国",
+    "reading": "ていこく",
+    "gloss": "empire; Empire of Japan",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "売却",
+    "reading": "ばいきゃく",
+    "gloss": "selling off; disposal by sale; sale",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "罰金",
+    "reading": "ばっきん",
+    "gloss": "fine; penalty",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "戦績",
+    "reading": "せんせき",
+    "gloss": "war or military record; score; military achievements",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "構内",
+    "reading": "こうない",
+    "gloss": "premises; grounds; campus",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "標高",
+    "reading": "ひょうこう",
+    "gloss": "elevation; height above sea level",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "侵攻",
+    "reading": "しんこう",
+    "gloss": "invasion",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "同町",
+    "reading": "どうちょう",
+    "gloss": "the same town; that town",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "追悼",
+    "reading": "ついとう",
+    "gloss": "mourning",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "皇太子",
+    "reading": "こうたいし",
+    "gloss": "crown prince",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "葬儀",
+    "reading": "そうぎ",
+    "gloss": "funeral; funeral service",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "授賞",
+    "reading": "じゅしょう",
+    "gloss": "awarding a prize; giving an award",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "罰則",
+    "reading": "ばっそく",
+    "gloss": "punishment; penalty; penal regulations",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "店頭",
+    "reading": "てんとう",
+    "gloss": "shopfront; storefront; shopwindow",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "後任",
+    "reading": "こうにん",
+    "gloss": "successor",
+    "pos": "noun · no-adjective",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "下位",
+    "reading": "かい",
+    "gloss": "low rank; lower position; subordinate position",
+    "pos": "noun · no-adjective",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "終盤",
+    "reading": "しゅうばん",
+    "gloss": "endgame; final stage",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "絵本",
+    "reading": "えほん",
+    "gloss": "picture book",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "無償",
+    "reading": "むしょう",
+    "gloss": "without compensation; without reward; without pay",
+    "pos": "no-adjective · noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "口座",
+    "reading": "こうざ",
+    "gloss": "account (e.g. bank)",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "真夏",
+    "reading": "まなつ",
+    "gloss": "middle of summer; height of summer; midsummer",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "初夏",
+    "reading": "しょか",
+    "gloss": "early summer; fourth month of the lunar calendar",
+    "pos": "noun",
+    "freq": 5,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "参画",
+    "reading": "さんかく",
+    "gloss": "taking part (in planning); participation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "要約",
+    "reading": "ようやく",
+    "gloss": "summary; digest",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "培う",
+    "reading": "つちかう",
+    "gloss": "to cultivate; to foster",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "内面",
+    "reading": "ないめん",
+    "gloss": "inside; interior; (within) one's mind",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "向き",
+    "reading": "むき",
+    "gloss": "direction; orientation; aspect",
+    "pos": "noun · n-suf",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見かける",
+    "reading": "みかける",
+    "gloss": "to (happen to) see; to notice; to catch sight of",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "庭園",
+    "reading": "ていえん",
+    "gloss": "garden; park",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "就航",
+    "reading": "しゅうこう",
+    "gloss": "entering service (on a route; of a plane or ship); going into commission; being ",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "木曜",
+    "reading": "もくよう",
+    "gloss": "Thursday",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "税制",
+    "reading": "ぜいせい",
+    "gloss": "tax system",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "大敗",
+    "reading": "たいはい",
+    "gloss": "crushing defeat",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "母体",
+    "reading": "ぼたい",
+    "gloss": "mother's body (esp. when pregnant or after giving birth); parent body; parent or",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "厳粛",
+    "reading": "げんしゅく",
+    "gloss": "grave; solemn; serious",
+    "pos": "na-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "週末",
+    "reading": "しゅうまつ",
+    "gloss": "weekend",
+    "pos": "adverb · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "多大",
+    "reading": "ただい",
+    "gloss": "great (quantity, amount, etc.); huge; enormous",
+    "pos": "na-adjective · no-adjective · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "進路",
+    "reading": "しんろ",
+    "gloss": "route; course; path",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "実務",
+    "reading": "じつむ",
+    "gloss": "(practical) business; business practice; business affairs",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "名義",
+    "reading": "めいぎ",
+    "gloss": "name (esp. on a deed, contract, work, etc.); formal name; published name",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "職能",
+    "reading": "しょくのう",
+    "gloss": "occupational ability; function; role",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "頻発",
+    "reading": "ひんぱつ",
+    "gloss": "frequent occurrence",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一貫",
+    "reading": "いっかん",
+    "gloss": "consistency; coherence; integration",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "不備",
+    "reading": "ふび",
+    "gloss": "defect; deficiency; imperfection",
+    "pos": "noun · na-adjective · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "組み合わせ",
+    "reading": "くみあわせ",
+    "gloss": "combination; assortment; set",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "明示",
+    "reading": "めいじ",
+    "gloss": "elucidation; explicit statement; specification",
+    "pos": "noun · no-adjective · suru verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "捉える",
+    "reading": "とらえる",
+    "gloss": "to catch; to capture; to seize",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "輪郭",
+    "reading": "りんかく",
+    "gloss": "contour; outline; silhouette",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "境内",
+    "reading": "けいだい",
+    "gloss": "grounds (esp. of shrines and temples); compound; churchyard",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "翌朝",
+    "reading": "よくあさ",
+    "gloss": "next morning",
+    "pos": "noun · adverb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "自発",
+    "reading": "じはつ",
+    "gloss": "spontaneity; spontaneous passive",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "実在",
+    "reading": "じつざい",
+    "gloss": "actual existence; real existence; existing in real life",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "論点",
+    "reading": "ろんてん",
+    "gloss": "point in question (at issue)",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "既存",
+    "reading": "きそん",
+    "gloss": "existing",
+    "pos": "no-adjective · noun · suru verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "山間",
+    "reading": "さんかん",
+    "gloss": "among the mountains",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "立ち入り",
+    "reading": "たちいり",
+    "gloss": "entering; going into",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "楽曲",
+    "reading": "がっきょく",
+    "gloss": "musical composition; tune",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "序盤",
+    "reading": "じょばん",
+    "gloss": "opening (in a game of go, chess, etc.); early stages; initial phase",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "騒然",
+    "reading": "そうぜん",
+    "gloss": "noisy; confused; uproarious",
+    "pos": "taru-adjective · adverb (to)",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "積み重ねる",
+    "reading": "つみかさねる",
+    "gloss": "to pile up; to accumulate",
+    "pos": "ichidan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "切り替え",
+    "reading": "きりかえ",
+    "gloss": "exchange; conversion; replacement",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "特設",
+    "reading": "とくせつ",
+    "gloss": "setting up specially; special installation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "資する",
+    "reading": "しする",
+    "gloss": "to contribute; to play a part in; to have a hand in",
+    "pos": "vs-s · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "作り出す",
+    "reading": "つくりだす",
+    "gloss": "to manufacture; to produce; to raise (crops)",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "共催",
+    "reading": "きょうさい",
+    "gloss": "joint sponsorship (of an event); cosponsorship; joint hosting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "営利",
+    "reading": "えいり",
+    "gloss": "money-making; commercialized; commercialised",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "入り込む",
+    "reading": "はいりこむ",
+    "gloss": "to go into; to come into; to penetrate",
+    "pos": "godan verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "圧勝",
+    "reading": "あっしょう",
+    "gloss": "overwhelming victory; crushing victory; sweeping victory",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "住人",
+    "reading": "じゅうにん",
+    "gloss": "dweller; inhabitant; resident",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "出港",
+    "reading": "しゅっこう",
+    "gloss": "departure from a port; leaving port; setting sail",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "家電",
+    "reading": "かでん",
+    "gloss": "household (electrical) appliances; home appliances; consumer electronics",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "管区",
+    "reading": "かんく",
+    "gloss": "jurisdiction",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "通称",
+    "reading": "つうしょう",
+    "gloss": "popular name; common name; nickname",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "近海",
+    "reading": "きんかい",
+    "gloss": "coastal waters; adjacent seas",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "新設",
+    "reading": "しんせつ",
+    "gloss": "establishing; founding; setting up",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "持ち味",
+    "reading": "もちあじ",
+    "gloss": "inherent flavor; inherent flavour; natural taste",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "振り切る",
+    "reading": "ふりきる",
+    "gloss": "to shake off; to shake free from; to swing completely (bat, club, etc.)",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "全米",
+    "reading": "ぜんべい",
+    "gloss": "all-America; pan-American; all of America",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "両氏",
+    "reading": "りょうし",
+    "gloss": "both persons",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "常務",
+    "reading": "じょうむ",
+    "gloss": "managing director; executive director; routine business",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "肺炎",
+    "reading": "はいえん",
+    "gloss": "pneumonia",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "執る",
+    "reading": "とる",
+    "gloss": "to take (trouble); to attend (to business); to command (army)",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "声援",
+    "reading": "せいえん",
+    "gloss": "(shout of) encouragement; cheering; rooting",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "難航",
+    "reading": "なんこう",
+    "gloss": "difficult voyage; stormy passage; hard flight",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "極み",
+    "reading": "きわみ",
+    "gloss": "height; acme; extremity",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "躍進",
+    "reading": "やくしん",
+    "gloss": "making rapid progress; making great advances; rush",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "救出",
+    "reading": "きゅうしゅつ",
+    "gloss": "rescue; extricate; reclaim",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日系",
+    "reading": "にっけい",
+    "gloss": "(of) Japanese descent; non-Japanese of Japanese descent; nikkeijin",
+    "pos": "n-pref",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "統括",
+    "reading": "とうかつ",
+    "gloss": "unification; bringing together; generalization",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "車体",
+    "reading": "しゃたい",
+    "gloss": "body (of car); frame",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "軽量",
+    "reading": "けいりょう",
+    "gloss": "light weight",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "減速",
+    "reading": "げんそく",
+    "gloss": "deceleration",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "売り物",
+    "reading": "うりもの",
+    "gloss": "article for sale; goods for sale; offering",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "強豪",
+    "reading": "きょうごう",
+    "gloss": "overwhelming strength; extremely strong person; powerhouse",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "飛び降りる",
+    "reading": "とびおりる",
+    "gloss": "to jump down; to leap down; to jump off",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "緑色",
+    "reading": "みどりいろ",
+    "gloss": "green; green color",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "当地",
+    "reading": "とうち",
+    "gloss": "this place; here",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "恒例",
+    "reading": "こうれい",
+    "gloss": "established practice; custom",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "入居",
+    "reading": "にゅうきょ",
+    "gloss": "moving in (to a house, apartment, etc.); taking up residence",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "早々",
+    "reading": "そうそう",
+    "gloss": "as soon as ...; just after ...; immediately after ...",
+    "pos": "n-suf · noun · adverb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "最期",
+    "reading": "さいご",
+    "gloss": "one's last moment; one's death; one's end",
+    "pos": "noun · adverb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "略称",
+    "reading": "りゃくしょう",
+    "gloss": "abbreviation",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "患う",
+    "reading": "わずらう",
+    "gloss": "to be ill; to suffer from",
+    "pos": "godan verb · transitive verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "仕方ない",
+    "reading": "しかたない",
+    "gloss": "there's no (other) way; cannot be helped; unavoidable",
+    "pos": "i-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "傷害",
+    "reading": "しょうがい",
+    "gloss": "injury; inflicting bodily injury",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "所要",
+    "reading": "しょよう",
+    "gloss": "required; needed; necessary",
+    "pos": "no-adjective · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "間際",
+    "reading": "まぎわ",
+    "gloss": "the point just before ...; the point of (doing); the verge (of)",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "乗り出す",
+    "reading": "のりだす",
+    "gloss": "to set out; to set sail; to embark on (a new venture)",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "目玉",
+    "reading": "めだま",
+    "gloss": "eyeball; special feature; centerpiece",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "隣国",
+    "reading": "りんごく",
+    "gloss": "neighbouring country; neighboring country; adjacent country",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "西側",
+    "reading": "にしがわ",
+    "gloss": "west side; west bank",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "日没",
+    "reading": "にちぼつ",
+    "gloss": "sunset",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "先駆ける",
+    "reading": "さきがける",
+    "gloss": "to do (something) before (something or someone else); to be ahead of (others, th",
+    "pos": "ichidan verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "身元",
+    "reading": "みもと",
+    "gloss": "(one's) identity; background; upbringing",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "乱れ",
+    "reading": "みだれ",
+    "gloss": "disorder; disturbance; unrest",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "宣告",
+    "reading": "せんこく",
+    "gloss": "sentence; verdict; pronouncement",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "仰向け",
+    "reading": "あおむけ",
+    "gloss": "facing upward",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "上部",
+    "reading": "じょうぶ",
+    "gloss": "top part; surface",
+    "pos": "noun · no-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "例年",
+    "reading": "れいねん",
+    "gloss": "average (normal, ordinary) year; every year; annually",
+    "pos": "noun · adverb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "回避",
+    "reading": "かいひ",
+    "gloss": "evasion; avoidance; recusal (of a judge)",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "手口",
+    "reading": "てぐち",
+    "gloss": "modus operandi; criminal technique; trick",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "常勤",
+    "reading": "じょうきん",
+    "gloss": "full-time employment",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "押し",
+    "reading": "おし",
+    "gloss": "push; pushing; weight",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "鮮明",
+    "reading": "せんめい",
+    "gloss": "vivid; clear; distinct",
+    "pos": "na-adjective · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "左腕",
+    "reading": "ひだりうで",
+    "gloss": "left arm; left-handed (baseball pitcher)",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "知名",
+    "reading": "ちめい",
+    "gloss": "well-known",
+    "pos": "na-adjective · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "木造",
+    "reading": "もくぞう",
+    "gloss": "wooden; made of wood; wooden construction",
+    "pos": "no-adjective · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "強打",
+    "reading": "きょうだ",
+    "gloss": "heavy blow; thump; wallop",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "完封",
+    "reading": "かんぷう",
+    "gloss": "total blockage; complete shutdown; stopping completely",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "監査",
+    "reading": "かんさ",
+    "gloss": "inspection; audit; judgement",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "連載",
+    "reading": "れんさい",
+    "gloss": "serialization; serialisation; serial story",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "撤廃",
+    "reading": "てっぱい",
+    "gloss": "annulment; abolition; repeal",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "策定",
+    "reading": "さくてい",
+    "gloss": "formulation (of a plan, policy, etc.); decision; settling on",
+    "pos": "noun · suru verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "安らか",
+    "reading": "やすらか",
+    "gloss": "peaceful; tranquil; calm",
+    "pos": "na-adjective · noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "亡命",
+    "reading": "ぼうめい",
+    "gloss": "fleeing from one's country; seeking asylum; defection",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "追い風",
+    "reading": "おいかぜ",
+    "gloss": "tailwind; fair wind; favorable wind (favourable)",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "差し止め",
+    "reading": "さしとめ",
+    "gloss": "prohibition; ban; suspension",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "推す",
+    "reading": "おす",
+    "gloss": "to recommend; to endorse (e.g. a candidate); to nominate",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "真偽",
+    "reading": "しんぎ",
+    "gloss": "truth or falsehood; genuineness; authenticity",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "見失う",
+    "reading": "みうしなう",
+    "gloss": "to lose sight of; to miss",
+    "pos": "godan verb · transitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "壊滅",
+    "reading": "かいめつ",
+    "gloss": "(complete) destruction; annihilation; devastation",
+    "pos": "noun · suru verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "瞬く",
+    "reading": "またたく",
+    "gloss": "to twinkle (e.g. stars); to flicker; to waver",
+    "pos": "godan verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "手足",
+    "reading": "てあし",
+    "gloss": "hands and feet; limbs; person at one's beck and call",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "手早い",
+    "reading": "てばやい",
+    "gloss": "nimble; quick; agile",
+    "pos": "i-adjective",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "四方",
+    "reading": "しほう",
+    "gloss": "the four cardinal directions; north, east, south and west; all directions",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一向",
+    "reading": "いっこう",
+    "gloss": "completely; absolutely; totally",
+    "pos": "adverb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "四百",
+    "reading": "よんひゃく",
+    "gloss": "400; four hundred",
+    "pos": "numeric",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "年配",
+    "reading": "ねんぱい",
+    "gloss": "(approximate) age; years; elderly",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "何百",
+    "reading": "なんびゃく",
+    "gloss": "hundreds",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "際限",
+    "reading": "さいげん",
+    "gloss": "limits; end; bounds",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "返る",
+    "reading": "かえる",
+    "gloss": "to return; to come back; to go back",
+    "pos": "godan verb · intransitive verb",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  },
+  {
+    "term": "一口",
+    "reading": "ひとくち",
+    "gloss": "mouthful; morsel; bite",
+    "pos": "noun",
+    "freq": 4,
+    "docs": 4,
+    "sources": ["S4:corpus"]
+  }
+]

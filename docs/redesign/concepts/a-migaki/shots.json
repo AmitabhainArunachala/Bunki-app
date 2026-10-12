@@ -1,0 +1,199 @@
+{
+ "title": "A 磨き Migaki: evolution, refined",
+ "screens": [
+  {
+   "name": "today",
+   "path": "index.html#/today",
+   "settle": 3400
+  },
+  {
+   "name": "read",
+   "path": "index.html#/read",
+   "settle": 1400
+  },
+  {
+   "name": "article",
+   "path": "index.html#/read/article",
+   "settle": 1400
+  },
+  {
+   "name": "popup",
+   "path": "index.html#/read/popup",
+   "settle": 1800
+  },
+  {
+   "name": "learn",
+   "path": "index.html#/learn",
+   "settle": 1400
+  },
+  {
+   "name": "front",
+   "path": "index.html#/learn/front",
+   "settle": 1200
+  },
+  {
+   "name": "back",
+   "path": "index.html#/learn/back",
+   "settle": 1200
+  },
+  {
+   "name": "words",
+   "path": "index.html#/words",
+   "settle": 2200
+  },
+  {
+   "name": "me",
+   "path": "index.html#/me",
+   "settle": 2000
+  },
+  {
+   "name": "me-book",
+   "path": "index.html#/me",
+   "settle": 2400,
+   "steps": [
+    {
+     "wait": 300
+    },
+    {
+     "eval": "document.querySelector('.view').scrollTop=820"
+    }
+   ]
+  },
+  {
+   "name": "done",
+   "path": "index.html#/learn/done",
+   "settle": 1600
+  },
+  {
+   "name": "today-ja",
+   "path": "index.html?lang=ja#/today",
+   "settle": 3400
+  },
+  {
+   "name": "learn-ja",
+   "path": "index.html?lang=ja#/learn",
+   "settle": 1400
+  },
+  {
+   "name": "back-ja",
+   "path": "index.html?lang=ja#/learn/back",
+   "settle": 1200
+  }
+ ],
+ "journey": [
+  {
+   "go": "index.html#/today"
+  },
+  {
+   "wait": 1250
+  },
+  {
+   "frame": "Today: due words leave the sky (mid-arrival)"
+  },
+  {
+   "wait": 2200
+  },
+  {
+   "click": ".dayword"
+  },
+  {
+   "wait": 420
+  },
+  {
+   "frame": "Tap the day's word: the web draws out from 研ぐ"
+  },
+  {
+   "wait": 1300
+  },
+  {
+   "click": "[data-k='k:研']"
+  },
+  {
+   "wait": 260
+  },
+  {
+   "frame": "Match-cut: 研 travels to the centre (mid)"
+  },
+  {
+   "wait": 1500
+  },
+  {
+   "click": "[data-k='p:石']"
+  },
+  {
+   "wait": 1100
+  },
+  {
+   "frame": "Into the part: 石, the stone family"
+  },
+  {
+   "click": "[data-k='k:磨']"
+  },
+  {
+   "wait": 1400
+  },
+  {
+   "frame": "磨: migaki, polish. Strokes in order"
+  },
+  {
+   "click": ".origin"
+  },
+  {
+   "wait": 3600
+  },
+  {
+   "frame": "Back to the exact door: Today"
+  },
+  {
+   "click": "[data-go=read]"
+  },
+  {
+   "wait": 700
+  },
+  {
+   "frame": "Read: the magazine shelf"
+  },
+  {
+   "click": ".lead"
+  },
+  {
+   "wait": 900
+  },
+  {
+   "click": ".w[data-b='反復']"
+  },
+  {
+   "wait": 200
+  },
+  {
+   "frame": "Tap 反復: the word lifts, the sheet springs up (mid)"
+  },
+  {
+   "wait": 900
+  },
+  {
+   "frame": "The word sheet: recursion, its kanji, its other story"
+  },
+  {
+   "go": "index.html#/learn/front"
+  },
+  {
+   "wait": 900
+  },
+  {
+   "click": ".show"
+  },
+  {
+   "wait": 300
+  },
+  {
+   "frame": "研ぎ出し: the polish band crosses the card (mid)"
+  },
+  {
+   "wait": 1200
+  },
+  {
+   "frame": "The back: furigana, anatomy, grade"
+  }
+ ]
+}

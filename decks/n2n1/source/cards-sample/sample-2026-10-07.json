@@ -1,0 +1,384 @@
+{
+  "cards": [
+    {
+      "term": "災害",
+      "reading": "さいがい",
+      "pos": "noun",
+      "meaning": "calamity, disaster",
+      "defJa": "地震や火事、洪水などで受ける大きな被害",
+      "passage": {
+        "ja": "1755年、ポルトガルのリスボンを大地震が襲いました。市全体が大規模な災害に見舞われ、礼拝中の教会が倒壊し、火災と津波で数万人が命を落としたと言われています。当時のヨーロッパでは、この出来事を神の罰だと説く聖職者が少なくなかったのです。しかし哲学者のヴォルテールは、なぜ幼い子どもまで犠牲にならなければならないのかと問い、楽観主義を批判しました。この問いをきっかけに、悲劇を天罰ではなく自然現象として考える思想の転換が始まっていくのです。",
+        "form": "災害",
+        "en": "In 1755, a great earthquake struck Lisbon, in Portugal. The entire city was hit by a massive disaster: churches collapsed in the middle of worship, and fires and a tsunami are said to have claimed tens of thousands of lives. In the Europe of that time, not a few members of the clergy preached that this event was a punishment from God. But the philosopher Voltaire asked why young children had to be among the victims, and took aim at optimism itself. Starting from that question, a shift in thought began, in which tragedy came to be read as a natural phenomenon rather than a divine punishment.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "天災・人災を問わず使われ、『見舞われる』『発生する』と結びやすい報道・講義の語です。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N1"
+    },
+    {
+      "term": "傍ら",
+      "reading": "かたわら",
+      "pos": "noun",
+      "meaning": "beside; while (something else happens)",
+      "defJa": "ある事柄が進むのと並行して、別の動きがある意",
+      "passage": {
+        "ja": "生成AIを巡る開発競争が激化する傍らで、人材の争奪戦も深刻さを増している。モデルの性能が研究者の質に直結する以上、企業は経験を積んだ人材に破格の報酬を提示せざるを得ないという。その結果、大手IT企業の引き抜き合戦は激しさを増し、若手の間でも転職が当たり前という声が聞かれる。一方、大学側は基礎研究を担う学生が企業に流出すると懸念を示す。産業の成長を支える人材の育成が、次の課題になりそうだ。",
+        "form": "傍ら",
+        "en": "While the race to develop generative AI keeps intensifying, the battle to secure talent is growing more serious as well. Given that a model's performance depends directly on the quality of its researchers, companies reportedly have no choice but to offer extraordinary compensation to experienced people. As a result, the poaching war among the major IT firms has escalated, and even among younger researchers one hears that changing jobs is simply the norm. Universities, for their part, voice concern that the students who would carry on basic research are draining away into industry. Developing the human talent that underpins the industry's growth looks set to become the next challenge.",
+        "register": "報",
+        "topic": "ai",
+        "tipJa": "報道文でよく使うのは「〜が進む傍らで、〜も…」の形。並行して起きる別の動きを付け加える書き言葉だ。",
+        "sense": "「〜する傍らで」の形で、同時進行の別の動きを示す"
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N1"
+    },
+    {
+      "term": "説得",
+      "reading": "せっとく",
+      "pos": "noun",
+      "meaning": "persuasion",
+      "defJa": "言葉や理屈で相手の心を動かし、同意させること",
+      "passage": {
+        "ja": "真理は言葉によって伝わるのか。インドの伝統はこの問いに懐疑的で、師の言葉は弟子を入口まで招くだけで、悟りそのものは各自の内で開かれるとされる。とはいえ、仏教やヴェーダーンタの論者たちは、論争の場で相手を説得し、自らの陣営へ引き込むことに多大な精力を注いだ。勝敗が教団の存続と王の帰依を左右したからである。真理を運べないはずの言葉が、それでも真理を探す者を導くのであり、この矛盾こそ言葉の役割なのだろう。",
+        "form": "説得",
+        "en": "Can truth be transmitted through words? The Indian tradition seems skeptical of the question: a teacher's words only usher the disciple to the entrance, and awakening itself, it is said, unfolds within each person. And yet Buddhist and Vedantic debaters poured enormous energy into persuading opponents on the debating ground and drawing them into their own camp. Victory or defeat could decide an order's survival and a king's conversion. Words, incapable of carrying truth itself, still guide those who seek it — and that contradiction may be precisely the role words play.",
+        "register": "論",
+        "topic": "india",
+        "tipJa": "「人を説得する」「説得に成功する」が定番。論破と違い、相手の同意を得る点が核心。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N1"
+    },
+    {
+      "term": "庇う",
+      "reading": "かばう",
+      "pos": "verb",
+      "meaning": "to shield someone from blame; to cover for them",
+      "defJa": "人の失敗や弱点を責めから守ること",
+      "passage": {
+        "ja": "人って、基本的に自分が正しいと思いたい生き物じゃないですか。だから失敗しても、脳はまず言い訳を探して、自分を庇おうとするんですよね。こういう自己正当化、心理学では『合理化』って呼ぶらしくて、成長の一番の邪魔になるって言われてます。実際、『間違えた』ってすぐ認められる人のほうが、スキルは伸びるみたいですし。結局、頭を守ることより、育てることを選んだほうがいいんですよね。",
+        "form": "庇おう",
+        "en": "People basically want to think of themselves as being right, don't they? So even when we fail, the brain first hunts for excuses, trying to shield ourselves. Psychology apparently calls this kind of self-justification 'rationalization,' and it's said to be the biggest obstacle to growth. In fact, people who can admit 'I got that wrong' right away seem to build their skills faster, too. In the end, you're better off choosing to grow your mind rather than protect it.",
+        "register": "話",
+        "topic": "mind",
+        "tipJa": "『言い訳を探して自分を庇う』のように、責めから守る相手・理由とセットで使われ、話し言葉にもなじむ",
+        "sense": "責めや非難から人を守り、肩を持つ意"
+      },
+      "deck": "n2n1-sample",
+      "level": "N1",
+      "field": null
+    },
+    {
+      "term": "組み合わせる",
+      "reading": "くみあわせる",
+      "pos": "verb",
+      "meaning": "to combine, join together (elements)",
+      "defJa": "二つ以上のものを一つにまとめて、全体を作る意",
+      "passage": {
+        "ja": "効果的な勉強法は、一つの技法を極めることではなく、複数の技法を組み合わせることにあります。分散復習は忘れかけた頃に記憶を引き戻し、練習問題は抜けている箇所を暴き出します。この二つが同時に働けば、記憶は定着しやすくなるわけです。実際、認知科学では、技法を併用する方が記憶に残りやすいという報告が積み重なっています。まずは今日から、手軽な二つの技法から試してみるのがおすすめです。",
+        "form": "組み合わせる",
+        "en": "An effective study method lies not in perfecting one technique, but in combining multiple techniques. Spaced review pulls a memory back just as you are about to forget, while practice problems expose the spots you have missed. When the two operate at the same time, memories become far easier to consolidate. In fact, cognitive science has accumulated reports that using several techniques together leads to better retention. The recommendation is to start today, with two easy ones.",
+        "register": "学",
+        "topic": "mind",
+        "tipJa": "「技法・方法・要素を組み合わせる」が定番。勉強法の話では「一つに絞らず組み合わせる」という対比でよく出る。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N1"
+    },
+    {
+      "term": "欲望",
+      "reading": "よくぼう",
+      "pos": "noun",
+      "meaning": "desire, appetite",
+      "defJa": "何かを強く欲しいと願い、求める気持ち",
+      "passage": {
+        "ja": "AIって、本当に欲を持っているのか、よく議論になりますよね。結論から言うと、今のAIには欲求そのものがありません。あるのは、人間の行動データから好みのパターンを学び、それを先回りして満たそうとする仕組みだけです。おすすめ動画が延々と続くのは、あなたの欲望を刺激するのがとにかく上手だからなんです。つまり、AIそのものが欲しているわけではなく、人間の心を映す鏡になっているというわけです。",
+        "form": "欲望",
+        "en": "Whether AI truly has desires — that gets debated a lot, doesn't it? To give the conclusion first, today's AI has no wants of its own. All it has is a mechanism that learns patterns of preference from human behavioral data and tries to satisfy them ahead of time. Your recommended videos go on and on precisely because it is astonishingly good at stimulating your desires. In other words, the AI is not craving anything itself; it has become a mirror that reflects the human mind.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「欲望を刺激する」「欲望を満たす」が定番の結びつき。欲求より強く、官能的・批判的な響きを持つ。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N1"
+    },
+    {
+      "term": "宛名",
+      "reading": "あてな",
+      "pos": "noun",
+      "meaning": "the addressee's name on a letter or parcel",
+      "defJa": "手紙や荷物の、送り先の氏名や住所",
+      "passage": {
+        "ja": "江戸時代の書簡は、日記や記録と並んで歴史研究の貴重な資料とされる。筆跡や文面だけでなく、宛名の書き方にも作法があり、相手との距離感が読み取れるからだ。例えば、目上の人物には敬称を幾重にも重ね、親しい間柄では逆にそれを省略する。こうした細部から、差出人の交遊関係や身分が浮き彫りになる。デジタル化が進む現在、書簡のデータベース化が江戸の社会像を塗り替えつつあるという。",
+        "form": "宛名",
+        "en": "Letters of the Edo period, alongside diaries and official records, are prized as valuable sources for historical research. It is not only the handwriting and the wording: there were conventions governing how the addressee's name was written, and from them one can read the distance between writer and recipient. With a social superior, honorifics were layered many times over; between intimates, they were omitted instead. From such details, the sender's network of acquaintance and standing come into relief. Now, as digitization advances, databases of these letters are said to be rewriting the received picture of Edo-period society.",
+        "register": "報",
+        "topic": "history",
+        "tipJa": "手紙の話では「宛名を書く」「宛名の作法」の形で出る。差出人と対になる語で、書簡の礼儀を語るときの定番。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N2"
+    },
+    {
+      "term": "牧畜",
+      "reading": "ぼくちく",
+      "pos": "noun",
+      "meaning": "stock-farming, raising livestock",
+      "defJa": "牛や羊などの家畜を草地で飼い、利用する営み",
+      "passage": {
+        "ja": "私たちの祖先は、畑と牧草地で初めて、目の前の獲物より遠い未来を見ることを学んだ。牧畜には、生まれたばかりの子羊をすぐ殺さず、雪を越させて毛と乳を取る忍耐が要る。先の見えない時間を信じて待つ。この待つ力こそ、計画し、我慢し、あとで受け取る文明最初の投資だった。現代人が将来に不安を感じながらも明日のために働けるのは、あの草原の習性がまだ体に残っているからかもしれない。",
+        "form": "牧畜",
+        "en": "It was in fields and pastures that our ancestors first learned to look at a distant future rather than the prey before their eyes. Herding requires the patience not to slaughter a newborn lamb at once, but to carry it through the winter for its wool and milk. You trust and wait through a stretch of time whose end you cannot see. This capacity to wait — to plan, to endure, to receive later — was civilization's first investment. The fact that modern people can still work for tomorrow while feeling anxious about the future may be because the habits of those grasslands remain in our bodies.",
+        "register": "論",
+        "topic": "mind",
+        "tipJa": "「牧畜が始まった」「牧畜を営む」など人類史の語りで定番。農耕と対にして並べるのが最も自然な使い方。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N2"
+    },
+    {
+      "term": "金魚",
+      "reading": "きんぎょ",
+      "pos": "noun",
+      "meaning": "goldfish",
+      "defJa": "フナを品種改良した観賞用の魚で、赤や白が鮮やか",
+      "passage": {
+        "ja": "文章に絵を浮かべたいなら、抽象的な言葉を並べるより、具体物を一つ置くのが近道です。たとえば『夏の午後の家』と書いても、読者の頭にはぼんやりとした像しか浮かびません。ところが『縁側の水槽で赤い金魚がゆっくり泳いでいる』と書くと、色と光と静けさが一緒に届きます。なぜなら、一つの物が季節の空気を丸ごと運んでくれるからです。だから伝えたい雰囲気があるときは、まず一つの具体的な物を選ぶことです。",
+        "form": "金魚",
+        "en": "If you want your writing to conjure images, the shortcut is to place a single concrete object rather than stringing abstract words together. Write 'a house on a summer afternoon,' and only a vague picture floats up in the reader's head. But write 'a red goldfish swims slowly in the tank on the veranda,' and color, light, and stillness arrive all at once. That's because one object carries the whole atmosphere of a season with it. So when there's a mood you want to convey, start by choosing one concrete object.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "金魚は俳句では夏の季語。『赤い金魚が泳ぐ』のように色や動きを添えると映像が立ちます。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N2"
+    },
+    {
+      "term": "話し掛ける",
+      "reading": "はなしかける",
+      "pos": "verb",
+      "meaning": "to address someone, start talking to them",
+      "defJa": "相手に向かって、自分から話を始めること",
+      "passage": {
+        "ja": "ブッダは悟りを開いた後、そのまま一人で静かに暮らすこともできたはずです。しかし彼は、街角で出会う人々一人ひとりに、自ら話し掛ける道を選びます。相手の立場に合わせて、農夫には畑の言葉で、母には子を思う言葉で説いたと言われています。教えは待っているだけでは届かず、こちらから声をかけて初めて対話が始まるんです。だからこそ、初期の経典の多くは対話の記録として残っているわけです。",
+        "form": "話し掛ける",
+        "en": "After his awakening, the Buddha could surely have gone on living quietly by himself. Instead, he chose a path of speaking to each and every person he met on the street corner. It is said that he taught in words fitted to the listener — the language of the fields for farmers, the words of a parent's love for mothers. A teaching does not reach people just by waiting; dialogue begins only when you offer your voice first. That is precisely why so many of the early scriptures survive as records of dialogue.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "「人に話し掛ける」の形が定番で、自分から声をかける意。掛ける相手を「に」で示す点が要点。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": null,
+      "level": "N2"
+    },
+    {
+      "term": "潜在能力",
+      "reading": "せんざいのうりょく",
+      "pos": "noun",
+      "meaning": "latent ability; potential not yet shown",
+      "defJa": "今は表に出ていない、内に秘めた力",
+      "passage": {
+        "ja": "才能は生まれつきのもので、もう伸びないと思い込んでいませんか。脳科学では、使われない機能はどんどん削られていく一方で、適切な負荷がかかり続ければ何歳からでも回路は伸ばせることが分かっています。つまり、今見えている実力は氷山の一角にすぎず、水面下にはまだ目覚めていない力が眠っているんです。人生を変えるかどうかは、その潜在能力を習慣と環境で引き出せるかに尽きるんです。",
+        "form": "潜在能力",
+        "en": "You don't still believe that talent is something you're born with and can no longer grow, do you? Brain science shows that while unused functions keep getting pruned, the brain's circuits can keep extending at any age as long as the right load keeps being applied. In other words, the ability you can see now is just the tip of the iceberg, and beneath the surface lies power that has yet to awaken. Whether your life changes comes down to whether you can draw out that latent ability through habit and environment.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "『潜在能力を引き出す』が最も典型な組み合わせで、講義では『眠っている力』の言い換えとしてよく登場します。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "mind",
+      "level": "N1"
+    },
+    {
+      "term": "忘却",
+      "reading": "ぼうきゃく",
+      "pos": "noun",
+      "meaning": "forgetting; memory slipping away",
+      "defJa": "忘れて、記憶から消えてしまうこと",
+      "passage": {
+        "ja": "19世紀末、心理学者のエビングハウスは自らを実験台に、記憶が時間とともにどう消えていくかを測定しました。その結果、何も復習しなければ、覚えた内容は一日もしないうちに大半が失われることが分かったんです。しかし忘却は脳のバグではなく、大事な情報だけを残すためのフィルターだと考えられます。だからこそ、忘れかけたタイミングで思い出し直すことが、最も効率のいい学習法になるんですね。",
+        "form": "忘却",
+        "en": "At the end of the nineteenth century, the psychologist Ebbinghaus made himself the test subject, measuring how memory fades over time. What he found was that with no review at all, most of what you have learned is lost within a single day. Yet forgetting is not a bug in the brain; it can be thought of as a filter that keeps only what matters. That is exactly why recalling material just as you are about to forget it makes for the most efficient way to learn.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "『忘れること』の硬い語で、講義や論文では『忘却が進む』『忘却曲線』のように名詞のまま使われます。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "mind",
+      "level": "N1"
+    },
+    {
+      "term": "古事記",
+      "reading": "こじき",
+      "pos": "noun",
+      "meaning": "Kojiki, Japan's oldest chronicle (712 CE)",
+      "defJa": "日本最古の歴史書で、神話と歴代天皇の記録",
+      "passage": {
+        "ja": "712年、太安万侂の手によって朝廷に献上された古事記は、日本最古の書物とされる。漢字の音を借りてやまとことばの響きを書き留めたその文章は、目で追うよりも、声に出して初めて本来の姿を取り戻す。天地開闢から神々の誕生、国土の形成、そして神武天皇の即位へと続く語りは、事実の記録にとどまらず、人がこの世界をどう生きるべきかを問う物語でもあった。千三百年を経てなお私たちがその冒頭に引き込まれるのは、そこにあるのが歴史というより祈りの言葉だからかもしれない。",
+        "form": "古事記",
+        "en": "In 712, the Kojiki was presented to the court by the hand of Ō no Yasumaro, and it is regarded as Japan's oldest book. Its text, which borrowed the sounds of Chinese characters to capture the resonance of the Yamato tongue, recovers its true form not when traced with the eye but when given voice. The tale that runs from the parting of heaven and earth, through the birth of the gods and the shaping of the land, to the enthronement of Emperor Jinmu is not merely a record of facts; it is also a story that asks how human beings ought to live in this world. The reason we are still drawn into its opening after thirteen hundred years may be that what lies there is less history than a language of prayer.",
+        "register": "論",
+        "topic": "history",
+        "tipJa": "『日本最古の書』『和銅五年の献上』と結んで覚える語で、日本書紀と併せて『記紀』と呼ばれます。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "india",
+      "level": "N1+"
+    },
+    {
+      "term": "王朝",
+      "reading": "おうちょう",
+      "pos": "noun",
+      "meaning": "dynasty; a royal house's generations of rule",
+      "defJa": "一つの王家が代々続く支配の体制",
+      "passage": {
+        "ja": "王朝の交代は、世界史が何千年も刻み続けてきた最も古いリズムである。唐は三百年近く栄え続けたが、9世紀の大反乱で都の長安が焼かれると、かつて天下に号令した権威は急速に崩れていった。軍事と財政という土台が揺らぎ始めれば、どれほど神聖化された権力も、たちまち絵空事に変わってしまう。歴代の皇帝が築き上げた秩序が一代で消えるのを、人類は歴史の中で何度も目にしてきたのである。",
+        "form": "王朝",
+        "en": "The turnover of dynasties is the oldest rhythm that world history has kept marking off for thousands of years. The Tang flourished for nearly three hundred years, but when the capital, Chang'an, was burned in the great rebellion of the ninth century, an authority that had once commanded all under heaven rapidly crumbled. Once the foundations of military force and finance begin to shake, however sacralized a power may be, it turns into a pipe dream in no time. Humankind has watched, again and again in the course of history, as orders built up by successive emperors vanish within a single generation.",
+        "register": "論",
+        "topic": "history",
+        "tipJa": "『王朝が交代する』『王朝の盛衰』が定番の組み合わせで、唐や明など具体的な王朝名と並べて覚えると定着します。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "history",
+      "level": "N1"
+    },
+    {
+      "term": "言語学",
+      "reading": "げんごがく",
+      "pos": "noun",
+      "meaning": "linguistics (the scientific study of language)",
+      "defJa": "人間のことばの構造や歴史を研究する学問",
+      "passage": {
+        "ja": "文章術の本を読むと、『一文を短く』『主語を明確に』といった指示が並びます。でも、なぜそれで伝わるのかを説明できる人は少ないです。実はその答えの多くは言語学にあって、読み手が文をどう処理するかを、この学問はきちんと調べているんですね。だから伝わる文章を書きたいなら、小手先のテクニックを暗記するより、一冊の入門書で基礎から学ぶほうが早いこともあります。仕組みがわかれば、応用が利くようになるからです。",
+        "form": "言語学",
+        "en": "Open a book on the craft of writing, and you'll find the same instructions lined up: 'keep sentences short,' 'make the subject clear,' and so on. Yet few people can explain why those moves actually help a message get through. In fact, most of those answers lie in linguistics, a field that has seriously studied how readers process sentences. So if you want to write in a way that reaches people, it can sometimes be faster to learn the basics from one introductory book than to memorize surface-level techniques. Once you understand the mechanism, you become able to apply it on your own.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "『言語学の知見』『言語学に答えがある』のように、学問として名前を出して根拠を示す使い方が多い",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "language",
+      "level": "N1"
+    },
+    {
+      "term": "返り点",
+      "reading": "かえりてん",
+      "pos": "noun",
+      "meaning": "kanbun reordering marks (kaeriten)",
+      "defJa": "漢文を読み下す際、読む順番を示すために漢字の左に添える符号",
+      "passage": {
+        "ja": "高校で漢文に苦手意識を持った人は多いはずです。原因はたいてい、動詞や目的語が日本語の語順とは違う位置に置かれ、上から順に読んでも意味が通らない点にあります。そこで先人は、どこで前の字に戻るかを指示する記号を漢字の左下に書き添えることを考えました。レ点や一二点といった、いわゆる返り点です。この小さな符号のおかげで、千年以上前に書かれた文章を、今でも声に出して読み下すことができるわけです。",
+        "form": "返り点",
+        "en": "Plenty of people came out of high school with a dread of classical Chinese. The cause, more often than not, is that verbs and objects are placed in positions different from Japanese word order, so reading straight down the line yields no sense. So the ancients came up with the idea of writing small marks at the lower left of the characters to indicate where to loop back to an earlier one. These are the so-called kaeriten, such as the re mark and the one-two marks. Thanks to these tiny symbols, we can still read texts written more than a thousand years ago aloud, in Japanese word order.",
+        "register": "語",
+        "topic": "language",
+        "tipJa": "『返り点を打つ』『返り点に従って読む』のように使い、レ点・一二点・上レ点など種類の名とセットで覚える語です。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "language",
+      "level": "N1+"
+    },
+    {
+      "term": "ヴェーダーンタ",
+      "reading": "ゔぇーだーんた",
+      "pos": "noun",
+      "meaning": "Vedānta, Hindu school based on the Upanishads",
+      "defJa": "ウパニシャッドの思想を基礎とするインド六派哲学の一派",
+      "passage": {
+        "ja": "インド哲学を語るうえで避けて通れないのが、ヴェーダーンタです。その名は「ヴェーダの終わり」を意味し、まさにその最終部にあたるウパニシャッドの思想を体系化した学派で、六派哲学の一つに数えられます。その核心は、宇宙の根本原理であるブラフマンと、個人の本質であるアートマンが実は同一だという教え、いわゆる梵我一如です。後にシャンカラが唱えた不二一元論は、この立場を徹底的に突き詰めたものと言っていいでしょう。何やら難しそうに聞こえますが、要は「あなたと世界の根っこはもともと一つなんだ」という話なんです。",
+        "form": "ヴェーダーンタ",
+        "en": "In Indian philosophy, one school you simply cannot avoid is Vedānta. Its name means \"the end of the Veda,\" and it is the school that systematized the thought of the Upanishads, the very final layer of those scriptures, and it is counted as one of the six orthodox schools. Its core is the teaching known as the identity of Brahman and Ātman: that Brahman, the fundamental principle of the universe, and Ātman, the essence of the individual, are in fact one and the same. The non-dualism later expounded by Shankara can fairly be called this position taken to its logical extreme. It all sounds terribly difficult, but the point, in short, is that \"you and the root of the world were one all along.\"",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "名は「ヴェーダの終わり」の意。六派哲学の一つ、梵我一如を説く学派として、講義の導入でよく紹介される。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "india",
+      "level": "N1+"
+    },
+    {
+      "term": "法要",
+      "reading": "ほうよう",
+      "pos": "noun",
+      "meaning": "Buddhist memorial service (for the dead)",
+      "defJa": "亡き人のための仏教の供養の儀式",
+      "passage": {
+        "ja": "法要というと、亡き人を偲ぶ日本の儀式だと思う人が多いだろう。だが仏教の教えから見れば、あの席の中心は、実は生きている側にある。集う人々に、命はいつまでも続かぬものだとまざまざと示す場だからである。読経や焼香は故人への追善のしるしだが、残された者には、執着を手放す訓練にもなる。死者を送ることを通して、生者自身が教えに立ち返ることに、この営みの本来の意味があるのだろう。",
+        "form": "法要",
+        "en": "When you say hōyō, most people picture a Japanese ritual for remembering the dead. But seen from the side of Buddhist teaching, the true center of that gathering is, in fact, the living. It is a setting that shows, vividly, to everyone who assembles there that life does not go on forever. The recitation of sutras and the offering of incense are signs of merit dedicated to the departed, and yet for those left behind they also become training in letting go of attachment. The original meaning of this practice lies, perhaps, in how the living themselves return to the teaching through the act of seeing off the dead.",
+        "register": "論",
+        "topic": "india",
+        "tipJa": "『法要を行う』『法要に参列する』のように仏事の動詞と組み、無常や追善の教えと結び付けて論じることも多い",
+        "sense": "仏法の要点ではなく、供養の儀式の意で使う"
+      },
+      "deck": "n2n1-sample",
+      "field": "india",
+      "level": "N1+"
+    },
+    {
+      "term": "探索と活用",
+      "reading": "たんさくとかつよう",
+      "pos": "expression",
+      "meaning": "explore vs exploit tradeoff in machine learning",
+      "defJa": "未知の選択肢を試すことと、既知の最善を用いることのトレードオフ",
+      "passage": {
+        "ja": "AIが最適な判断を下すには、探索と活用のバランスが鍵となる。既知の選択肢の中から最良のものを使い続ければ効率は上がるが、より良い選択肢を見逃すリスクが残る。逆に、未知の選択肢を試すことばかり重ねれば、得た情報を成果に変えられない。この二律背反は強化学習の基本問題で、スロットマシンをモデル化した「バンディット問題」として知られる。推薦システムや広告配信では、この調整が収益を直接左右するため、各社がアルゴリズムの改良を競っている。",
+        "form": "探索と活用",
+        "en": "For AI to make optimal decisions, the balance between exploration and exploitation is key. If it keeps using the best of its known options, efficiency rises, but the risk remains of missing better choices. Conversely, if it does nothing but try unknown options, the information gained never turns into results. This dilemma is a fundamental problem of reinforcement learning, known as the \"bandit problem,\" modeled on slot machines. In recommendation systems and ad delivery, this tuning directly affects revenue, so companies compete to improve their algorithms.",
+        "register": "報",
+        "topic": "ai",
+        "tipJa": "強化学習では「探索と活用のトレードオフ」という形で頻出。試す側と使う側、両者の緊張関係を表す対概念である。",
+        "sense": ""
+      },
+      "deck": "n2n1-sample",
+      "field": "ai",
+      "level": "N1+"
+    },
+    {
+      "term": "破壊的イノベーション",
+      "reading": "はかいてきいのべーしょん",
+      "pos": "noun",
+      "meaning": "disruptive innovation (Christensen's concept)",
+      "defJa": "性能は劣るが安い新製品が、既存企業の市場を奪う現象",
+      "passage": {
+        "ja": "生成AIの普及は、破壊的イノベーションの典型例としてよく挙げられる。この言葉は経営学者クリステンセンが提唱した概念で、当初は性能の劣る製品が低価格帯から市場に入り、やがて既存企業を追い出す現象を指す。ただし、既存製品を一気に置き換える画期的な技術は、本来この概念には含まれない。生成AIがどの層から市場を侵食していくのか、その見極めが各社の経営戦略を分けることになる。流行語としての濫用が進むいま、概念の本来の定義を確認しておく必要がある。",
+        "form": "破壊的イノベーション",
+        "en": "The spread of generative AI is often cited as a textbook case of disruptive innovation. The term is a concept put forward by the business scholar Clayton Christensen, referring to the phenomenon in which initially inferior products enter the market at the low-price end and eventually drive out established companies. Note, however, that a breakthrough technology that replaces existing products at a stroke does not, by definition, fall under this concept. Which layer of the market generative AI will erode first—getting that judgment right will determine each company's strategy. Now that the term is overused as a buzzword, it is worth revisiting its original definition.",
+        "register": "報",
+        "topic": "ai",
+        "tipJa": "「〜の典型例として挙げられる」など報道で頻出。本来は低価格参入による市場破壊を指し、単なる技術突破とは違う。",
+        "sense": "低価格帯から参入し既存市場を覆す、本来の定義の意"
+      },
+      "deck": "n2n1-sample",
+      "field": "ai",
+      "level": "N1+"
+    }
+  ]
+}

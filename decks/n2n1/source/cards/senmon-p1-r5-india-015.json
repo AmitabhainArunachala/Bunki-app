@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "如来",
+   "reading": "にょらい",
+   "pos": "noun",
+   "meaning": "tathāgata, a buddha",
+   "defJa": "悟りを開いた仏に用いられる称号",
+   "passage": {
+    "ja": "寺の仏像を分類する際には、姿の違いだけでなく、名称に含まれる称号も手掛かりとなる。如来は悟りを開いた仏に用いられる呼び名で、釈迦や阿弥陀などの名に付けられる一方、菩薩という呼称とは区別される。すべての像を同じ意味の仏様としてまとめると、教義上の位置付けや、像が担う役割の違いを読み取りにくくなる。展示で名前を確かめながら、どの経典や信仰と関わる姿なのかを調べることで、一見似た像の間にも異なる歴史と人々の願いが見出される。",
+    "form": "如来",
+    "en": "Classifying Buddhist images involves titles as well as visual appearance. Tathagata is a title for an awakened Buddha, used with names such as Shakyamuni and Amida and distinguished from bodhisattva. Grouping every figure under one undifferentiated label obscures doctrinal roles. Connecting names with scriptures and devotional histories reveals different histories and wishes behind similar-looking images.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「如来」と「菩薩」は像の呼称を読み分ける手掛かりになる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "坐禅",
+   "reading": "ざぜん",
+   "pos": "noun",
+   "meaning": "seated meditation",
+   "defJa": "姿勢を整えて坐り心身を調える禅の実践",
+   "passage": {
+    "ja": "静かに座る人の姿は、外から見ると何もしていない時間に見える。坐禅を続ける中では、姿勢や呼吸を整えながら、次々に浮かぶ思いに気付くという、見た目では捉えにくい経験がある。思考をすべて消せたかどうかだけで成否を測れば、浮かぶものを追い払うこと自体に心を奪われかねない。教え方や位置付けは宗派によって異なるとしても、何かを獲得する速さばかりを問う生活の中で、坐るという行為をどう引き受けるかは、実践を考える一つの入り口となる。",
+    "form": "坐禅",
+    "en": "A seated person can appear from outside to be doing nothing. Zazen involves posture, breathing, and awareness of thoughts in ways that are not externally visible. Measuring success solely by eliminating thought can itself lead to preoccupation with suppression. Although teaching and interpretation vary among schools, considering sitting within a life focused on rapid acquisition opens one approach to practice.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「坐禅を組む」。見た目の静止と、実践の中で経験することを区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "在家",
+   "reading": "ざいけ",
+   "pos": "noun",
+   "meaning": "lay (householder) life",
+   "defJa": "出家せずに家庭や社会で生活する仏教徒の立場",
+   "passage": {
+    "ja": "仏教を支えてきた人々の歴史には、寺で修行する僧だけでなく、社会で生活する信者の活動がある。在家という区分は出家との対比で用いられ、家にいる時間が長いという日常的な意味ではない。布施や戒めの実践、法会への参加などを通じて教えに関わる形は、地域や時代によってさまざまであった。寺院の建立を記す史料でも、教えを説いた僧の名前だけでなく、寄進した人々や日々の維持を担った人々に目を向けることで、信仰を支える社会の広がりを捉えられる。",
+    "form": "在家",
+    "en": "Buddhist history includes believers living in society as well as monastics training in temples. Lay status contrasts with renunciation rather than meaning spending much time at home. Giving, observance, and participation in ceremonies have varied across places and periods. Attention to donors and those sustaining temples reveals the wider society supporting religious life.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「在家の信者」。住居や職業の説明ではなく、出家との対比で用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "大乗仏教",
+   "reading": "だいじょうぶっきょう",
+   "pos": "noun",
+   "meaning": "Mahāyāna Buddhism",
+   "defJa": "菩薩の道と広く人々の救済を重んじる仏教の流れ",
+   "passage": {
+    "ja": "自分だけが苦しみから離れればそれで終わり、と考えない教えが仏教にはあるんだ。大乗仏教では、菩薩の道や広く人々を救うことが大切にされるけれど、一人がある日に作った一枚岩の団体を指すわけではないよ。インドからさまざまな土地へ伝わる中で、読まれる経典や実践の形も広がり、日本の仏教にも深く関わっている。同じ大きな流れに属していても、念仏や禅や密教の説明を全部一つにまとめず、どの教えが何を重んじるかを比べると、共通点も違いもつかみやすいね。",
+    "form": "大乗仏教",
+    "en": "Some Buddhist teachings do not treat personal release from suffering as the end of the path. Mahayana emphasizes the bodhisattva path and broad liberation, without naming a uniform organization founded by one person on one day. Scriptures and practices developed as it spread from India, deeply shaping Japanese Buddhism. Comparing priorities among Pure Land, Zen, and esoteric traditions reveals differences within that larger current.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「大乗仏教の教え」。広い流れの名称であり、内部の多様性にも注意する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

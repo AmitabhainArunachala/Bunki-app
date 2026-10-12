@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "先端パッケージング",
+   "reading": "せんたんぱっけーじんぐ",
+   "pos": "noun",
+   "meaning": "advanced packaging",
+   "defJa": "複数の半導体などを高密度に接続し実装する技術",
+   "passage": {
+    "ja": "先端パッケージングを紹介する記事では、読者が製品の外箱を思い浮かべないよう、何を組み合わせる技術かを先に示します。別々に作った半導体を近くに並べたり、上下に重ねたりして接続すると書けば、内部の配置を扱う話だと伝わります。ただし、小さくまとめる利点だけを強調すると、熱を逃がす設計や製造の難しさが隠れてしまいます。図を添える場合も、部品の位置だけでなく、それらを結ぶ線に説明を付けると効果的です。名称を訳すだけで済ませず、何をどうつなぐかを動詞で描くことが、読者の理解を支えます。",
+    "form": "先端パッケージング",
+    "en": "An article introducing advanced packaging should first identify what the technology combines so readers do not imagine an outer shipping box. Explaining that separately made chips are connected side by side or stacked conveys that the subject is internal layout. Emphasizing compactness alone, however, conceals thermal-design and manufacturing challenges. In a diagram, label the connections as well as the positions of components. Describing what is connected and how, using concrete verbs rather than merely translating the name, supports understanding.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "包みの外観ではなく、接続や配置の技術に注目する。",
+    "sense": ""
+   }
+  }
+ ]
+}

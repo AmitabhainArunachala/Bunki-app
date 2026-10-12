@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "ガバナンス",
+   "reading": "がばなんす",
+   "pos": "noun",
+   "meaning": "governance",
+   "defJa": "組織の判断や運用を監督し統制する仕組み",
+   "passage": {
+    "ja": "人工知能の利用方針を掲げても、問題が起きたとき誰が止めるかを決めていなければ、言葉は現場の行動につながらない。ガバナンスとは、望ましい目標を述べるだけでなく、判断の責任、監督の方法、見直しの手順を組織の働きとして成立させる問いでもある。性能の向上を急ぐ一方で、失敗を報告した人が不利益を受ける組織では、掲げた安全の方針と実際の行動が離れてしまう。仕組みを評価するには、規則の厚さよりも、異常を伝える声がどこへ届き、誰の判断を変えるかをたどる必要がある。",
+    "form": "ガバナンス",
+    "en": "An AI policy does not guide action if no one has been assigned to stop operations when problems arise. Governance concerns making responsibility, oversight, and revision procedures function within an organization, not merely stating desirable goals. An organization that rushes performance improvements while penalizing people who report failures separates its declared safety policy from actual behavior. Evaluating the arrangement requires tracing where reports of anomalies go and whose decisions they change, rather than measuring the thickness of the rulebook.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "よい方針だけでなく、責任と確認の手順を含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "キャッシュ",
+   "reading": "きゃっしゅ",
+   "pos": "noun",
+   "meaning": "cache",
+   "defJa": "よく使う情報を近くに置いて再利用する記憶",
+   "passage": {
+    "ja": "同じ地図を何度も開くなら、毎回遠くから全部取り寄せるより、近くに写しがあったほうが速いよね。計算機のキャッシュも、使う情報を取り出しやすい場所に置き、待ち時間を減らすための仕組みなんだ。ただし、元の地図が更新されたのに写しが古いままなら、便利さが間違った案内につながることもある。速くする工夫を考えるときは、何を保存するかに加えて、いつ捨て、いつ取り直すかも一緒に決めると、同じ情報を持っているつもりの機械同士で話が合わない理由も分かるよ。",
+    "form": "キャッシュ",
+    "en": "If you open the same map repeatedly, a nearby copy is faster than retrieving everything from far away each time. A computer cache similarly reduces waiting by keeping information in an accessible location. But if the original map changes while the copy remains old, that convenience can produce wrong directions. Deciding when to discard and refetch information alongside what to store helps explain why machines that supposedly hold the same information can disagree.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "速く取り出す利点と、古い情報が残る問題を結ぶ。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "クリーンルーム",
+   "reading": "くりーんるーむ",
+   "pos": "noun",
+   "meaning": "clean room",
+   "defJa": "微粒子などの量を管理した清浄な作業室",
+   "passage": {
+    "ja": "半導体工場の写真で白い服を見たら、作業者を汚れから守るためだけの服だと覚えないようにしましょう。微細な回路を作るクリーンルームでは、作業者や設備から出る小さな粒子も製品の不良につながり得るため、空気や動き方を管理します。部屋を一度掃除しただけでは済まず、製造を続けながら必要な清浄さを保つことが工程の条件となります。図に人、空気、材料の流れを別々の色で描くと、目には見えない混入を防ぐ仕事が、装置の性能と並んで良品率を支えることを具体的に追えます。",
+    "form": "クリーンルーム",
+    "en": "When you see white suits in photographs of a semiconductor factory, do not assume they merely protect workers from dirt. In a cleanroom making fine circuits, tiny particles from people and equipment can cause defects, so airflow and movement are controlled. Cleaning the room once is insufficient; the required cleanliness must be maintained throughout production. Drawing separate flows for people, air, and materials helps trace how preventing invisible contamination supports yield alongside equipment performance.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "見た目の清潔さと、空気中の粒子の管理を分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ケイ素",
+   "reading": "けいそ",
+   "pos": "noun",
+   "meaning": "silicon (the element)",
+   "defJa": "半導体材料などに使われる元素の一つ",
+   "passage": {
+    "ja": "「半導体は砂でできている」と書くと、身近な話になりますが、砂をそのまま回路に加工するような印象も与えます。ケイ素は半導体材料として広く使われる元素であり、砂に含まれるその化合物と、精製した結晶とは同じものではありません。記事で材料の由来をたどるにしても、何を取り出し、どのような性質へ整えるかという段階を省かないことが大切です。「身近な原料から精密な材料を作る」と表現を補えば、比喩の親しみやすさを残しながら、元素と化合物の取り違えを避けられます。",
+    "form": "ケイ素",
+    "en": "Writing that semiconductors are made from sand makes the story familiar but can suggest that sand is directly shaped into circuits. Silicon is an element widely used as a semiconductor material, and its compounds in sand are not the same as a purified crystal. Even when tracing material origins, an article should retain the stages of extracting the element and preparing the desired properties. Adding that familiar raw materials become precisely engineered materials preserves accessibility while avoiding confusion between elements and compounds.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "元素名と、それを含む化合物の名を区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ゲーム理論",
+   "reading": "げーむりろん",
+   "pos": "noun",
+   "meaning": "game theory",
+   "defJa": "互いの選択が結果に影響する状況を分析する理論",
+   "passage": {
+    "ja": "二つの会社が同じ製品の値下げを考えているとき、自社だけの費用を計算すれば判断できるでしょうか。ゲーム理論は、相手が何を選ぶかによって自分の結果も変わる状況を、選択肢と利得の関係から分析するための道具です。一社が価格を下げた場合と両社が下げた場合を分けると、個々には合理的な行動でも、全体では利益が減る可能性を検討できます。ただし、現実の企業の目的を一つの数字で表すのは単純化にすぎないため、計算の結論を使う前に、何を利得として置いたかを確かめましょう。",
+    "form": "ゲーム理論",
+    "en": "When two companies consider cutting the price of the same product, can either decide by calculating only its own costs? Game theory analyzes situations where one's outcome depends on another's choice through relationships between options and payoffs. Separating cases where one company cuts prices from those where both do allows examination of how individually rational actions might reduce combined profit. Representing actual corporate objectives with one number is only a simplification, so check what was counted as payoff before applying the conclusion.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "相手の反応を含めて、自分の選択を考える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "シリコンサイクル",
+   "reading": "しりこんさいくる",
+   "pos": "noun",
+   "meaning": "the silicon (chip-industry) cycle",
+   "defJa": "半導体の需要や供給と市況が循環する動き",
+   "passage": {
+    "ja": "半導体は需要が強まった直後に、必要な工場をすぐ完成させられるとは限らない。増産の投資から供給が増えるまでの時間差も、市況が不足と余剰の間で揺れるシリコンサイクルを理解する手がかりとなる。ただし、製品の種類や用途によって動きは異なり、一定の年数ごとに必ず同じ順序で景気が変わるという法則ではない。企業の見通しを読む際には、業界全体の売上だけでなく、扱う製品の在庫や注文、設備が動く時期を分けて確認することが、循環のどこにいるかを判断する材料になる。",
+    "form": "シリコンサイクル",
+    "en": "Semiconductor manufacturers cannot necessarily complete the needed factories immediately after demand strengthens. The lag between investment and additional output helps explain the silicon cycle, in which market conditions fluctuate between shortage and surplus. Movements vary by product and application, however, and do not follow a rule requiring the same sequence at fixed intervals. Reading company outlooks requires separating product inventories, orders, and the timing of new capacity from total industry sales to assess the position in the cycle.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "決まった周期で必ず繰り返す法則とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "シンギュラリティ",
+   "reading": "しんぎゅらりてぃ",
+   "pos": "noun",
+   "meaning": "the singularity",
+   "defJa": "技術の変化が予測困難になると想定される転換点",
+   "passage": {
+    "ja": "技術の進歩を一本の上向きの線で描けば、その先に人間の予測が及ばなくなる地点を置きたくなる。シンギュラリティという概念は、人工知能などの発展が社会を大きく変える転換点を想定する議論で使われるが、到来する時期が確定した出来事ではない。処理速度の伸びを、そのまま知性や社会の変化の速さへ置き換えるには、間にある多くの仮定を検討しなければならない。未来の大きな言葉に引かれるときこそ、どの観測からどこまで推論し、何をまだ知らないのかを分ける作業が、議論の足場を作る。",
+    "form": "シンギュラリティ",
+    "en": "Drawing technological progress as one ascending line makes it tempting to posit a point beyond human prediction. The singularity is a concept used in discussions imagining a transformative threshold in developments such as AI, not an event with an established arrival date. Turning gains in processing speed directly into gains in intelligence or rates of social change requires examining many intervening assumptions. When drawn to grand language about the future, distinguishing observations, inferences, and unknowns provides a foundation for discussion.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "実証された予定日ではなく、将来を論じる概念。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "スケーリング則",
+   "reading": "すけーりんぐそく",
+   "pos": "noun",
+   "meaning": "scaling law",
+   "defJa": "規模の変化と性能などの関係を表す経験的な規則",
+   "passage": {
+    "ja": "モデルを大きくしたら、どれくらい成績がよくなるかを、毎回当てずっぽうで決めたくはないよね。スケーリング則は、モデルやデータ、計算に使う量を変えたときの性能の傾向を、実験から捉えるための手がかりなんだ。ただし、観測した範囲で関係がきれいに見えたからといって、どこまでも同じ割合で賢くなるという保証にはならない。使うデータの質や評価する仕事が変われば話も変わるので、線を未来へ延ばす前に、何を測って得た線なのかを確かめると、予想と事実を混ぜずに済むよ。",
+    "form": "スケーリング則",
+    "en": "It would be useful not to guess every time how much a larger model will improve. Scaling laws help capture experimentally observed performance trends as model size, data, or computation changes. But a clear relationship within the observed range does not guarantee that intelligence will improve at the same rate indefinitely. Since data quality and the evaluated task can change the situation, checking what was measured before extending the line into the future keeps predictions distinct from facts.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "実験で確かめた範囲と、将来への予測を分ける。",
+    "sense": ""
+   }
+  }
+ ]
+}

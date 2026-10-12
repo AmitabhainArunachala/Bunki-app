@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "帝釈天",
+   "reading": "たいしゃくてん",
+   "pos": "noun",
+   "meaning": "Indra (Śakra) as Buddhist guardian",
+   "defJa": "インドの神に由来する仏教の守護神",
+   "passage": {
+    "ja": "日本の寺で出会う神々の中には、仏教が広まる以前のインドに由来するものがあります。帝釈天はインドラを起源とし、仏教では教えを守る神として位置付けられ、梵天とともに表されることもあります。同じ神の由来をたどっても、異なる宗教の中で役割がまったく同じとは限らず、伝わる過程で新たな意味が重ねられます。像の日本語の名前に加え、その背景にある神話と仏教の関わりを知ると、一体の像が長い文化の交流を伝える手掛かりになります。",
+    "form": "帝釈天",
+    "en": "Some deities encountered in Japanese temples have origins in India before Buddhism’s spread. Taishakuten derives from Indra and serves as a Buddhist protector, sometimes represented with Brahma. A shared origin does not guarantee identical roles across religions, as transmission adds meanings. Connecting the Japanese name with that background makes an image evidence of long cultural exchanges.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "インドのインドラに由来し、仏教の守護神として受け継がれた存在。",
+    "sense": ""
+   }
+  }
+ ]
+}

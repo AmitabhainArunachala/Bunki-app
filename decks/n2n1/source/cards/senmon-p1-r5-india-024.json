@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "禅",
+   "reading": "ぜん",
+   "pos": "noun",
+   "meaning": "Zen Buddhism",
+   "defJa": "坐る修行などを通じて自己のあり方を問う仏教",
+   "passage": {
+    "ja": "日本文化の紹介では禅が簡素な庭や静かな空間と結び付けて語られるが、その印象だけでは宗教としての内容を捉えられない。寺院で受け継がれる修行や師弟の関係には、空間の見た目とは異なる歴史と意味がある。現代の注意研究で座って呼吸を観察する課題が用いられても、それが伝統の全体を実験室で再現したことにはならない。文化の様式、宗教的な実践、研究で測定する行動を分けて示すことによって、それぞれの文脈で何を説明しているのかが明確になる。",
+    "form": "禅",
+    "en": "Introductions to Japanese culture associate Zen with simple gardens and quiet spaces, but those impressions alone do not capture its religious content. Practices and teacher-student relations transmitted in temples have histories and meanings beyond visual appearance. Even when contemporary attention research uses a seated breathing-observation task, it has not thereby reproduced an entire tradition in the laboratory. Distinguishing cultural style, religious practice, and experimentally measured behavior clarifies what is being explained in each context.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "文化の印象、宗教の実践、科学の測定を同一のものとして扱わない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "禅定",
+   "reading": "ぜんじょう",
+   "pos": "noun",
+   "meaning": "meditative concentration",
+   "defJa": "心を一つの対象に集め安定させること",
+   "passage": {
+    "ja": "静かに座っている人を見ても、心まで落ち着いているかどうかは外からは分からないよね。仏教でいう禅定は、姿勢の形だけでなく、心を一つの対象に集めて安定させることに関わるんだ。呼吸を観察しているつもりでも、途中から昨日の出来事をずっと考えていた、という経験を思い浮かべると、外見との違いが分かるね。ただし、その実感をそのまま昔の修行の段階に当てはめるんじゃなくて、今読んでいる教えではどんな心の状態を指すのか、説明も一緒に確かめたいな。",
+    "form": "禅定",
+    "en": "Even when someone sits quietly, we cannot tell from outside whether the mind is calm. Buddhist meditative concentration concerns gathering and stabilizing the mind on an object, not merely the shape of a posture. Recalling an occasion when apparent breath observation turned into extended thinking about yesterday makes the distinction from appearance clear. But instead of directly assigning that experience to traditional stages of practice, we should also check which state of mind the teaching we are reading describes.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "姿勢だけでなく心の集中と安定に関わる語。教義上の段階も確認する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "禅問答",
+   "reading": "ぜんもんどう",
+   "pos": "noun",
+   "meaning": "Zen dialogue; a seemingly baffling exchange",
+   "defJa": "師弟の問いと応答を通じて悟りへ導くやり取り",
+   "passage": {
+    "ja": "日常語では、話がかみ合わないやり取りを禅問答と呼ぶことがあるが、その用法だけで宗教的な実践を理解することはできない。師弟の間で行われる問いと応答には、知識を暗記して正解を返すという枠組み自体を問い直す働きがある。言葉が常識から外れて見えることと、発言に何の意味もないことは区別されるべきである。対話の背景にある修行や指導の関係を考慮せず、奇妙なせりふだけを抜き出しても、その問いが相手の理解をどこへ向けようとしていたかは捉えられない。",
+    "form": "禅問答",
+    "en": "In everyday language, Zen dialogue can mean an exchange in which people seem to talk past each other, but that usage alone cannot explain the religious practice. Questions and responses between teacher and student can challenge the framework of memorizing knowledge and supplying the correct answer. Language appearing contrary to common sense should be distinguished from speech having no meaning. Extracting strange lines without considering practice and instruction behind a dialogue cannot reveal where a question sought to direct the other person’s understanding.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "日常の比喩的用法と、修行における師弟の問答を分けて読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "祇園精舎",
+   "reading": "ぎおんしょうじゃ",
+   "pos": "noun",
+   "meaning": "Jetavana monastery",
+   "defJa": "釈尊が教えを説いたと伝わるインドの僧院",
+   "passage": {
+    "ja": "平家物語の冒頭で有名な祇園精舎は、京都の町の名前だけを手掛かりにすると、場所を取り違えてしまいます。釈尊が教えを説いたと伝わるインドの僧院であり、日本の物語では、その名と鐘の響きが無常を語る入口になっています。ここでは、古代インドの施設についての歴史的な説明と、日本の文学がその場所をどう描くかを分けて読むことが大切です。耳に残る冒頭の言葉から地図を開けば、日本で親しまれる物語の中に遠い仏教の世界が織り込まれていることを確かめられます。",
+    "form": "祇園精舎",
+    "en": "Jetavana, famous from the opening of The Tale of the Heike, can be misplaced if one relies only on the name of a Kyoto district. It is an Indian monastery where the Buddha is said to have taught, while in the Japanese tale its name and the sound of a bell introduce impermanence. It is important here to separate historical explanations of the ancient Indian institution from the way Japanese literature depicts it. Opening a map from the memorable opening words reveals how a distant Buddhist world is woven into a familiar Japanese narrative.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "インドの僧院を指す。京都の地名や物語上の描写と区別して読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

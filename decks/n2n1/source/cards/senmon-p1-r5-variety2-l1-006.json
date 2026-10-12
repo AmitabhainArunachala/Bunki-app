@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "京都学派",
+   "reading": "きょうとがくは",
+   "pos": "noun",
+   "meaning": "the Kyoto School",
+   "defJa": "西田幾多郎らに連なる日本の哲学的な思想潮流",
+   "passage": {
+    "ja": "西洋から入った哲学を学ぶことは、日本の思想家にとって、既存の宗教経験を問い直す契機ともなった。京都学派と呼ばれる思想の流れでは、西田幾多郎や田辺元、西谷啓治らが、それぞれに自己や世界、宗教の根底を探究した。共通の学問的な関係があったとはいえ、同じ結論を一斉に唱えた集団ではない。仏教を含む東洋思想と西洋哲学の双方に向き合う過程で、師の問いを受け継ぐことと、その答えを批判して先へ進むことが、同時に起こったのである。",
+    "form": "京都学派",
+    "en": "Studying philosophy introduced from the West also prompted Japanese thinkers to reconsider existing religious experience. In the tradition known as the Kyoto School, Nishida Kitaro, Tanabe Hajime, Nishitani Keiji, and others individually explored the foundations of self, world, and religion. Despite shared academic relationships, they did not form a group uniformly declaring the same conclusions. Confronting both Eastern thought, including Buddhism, and Western philosophy involved inheriting teachers' questions while also criticizing their answers and moving beyond them.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "西田幾多郎らに連なる哲学の流れで、思想家ごとの相違も含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1fcd2e18aa-1b29f03d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-1fcd2e18aa-1b29f03d",
+    "wordId": "nn-1fcd2e18aa"
+   }
+  },
+  {
+   "term": "不立文字",
+   "reading": "ふりゅうもんじ",
+   "pos": "noun",
+   "meaning": "not relying on words",
+   "defJa": "悟りを文字の説明だけに依存させないという禅の立場",
+   "passage": {
+    "ja": "熱い茶を口に含む前から、湯の温度や味を詳しく知っている人がいるとする。それでも、知識を蓄えたことと、その一口を実際に味わったことには隔たりがある。禅の不立文字は、悟りを言葉の理解だけに委ねず、自らの実践を通して確かめるという立場を表す。だからといって経典も対話も不要になるのではなく、教えをいくら覚えても、それを自分の生き方において引き受ける働きを他人に代わってもらうことはできないという厳しさが残る。",
+    "form": "不立文字",
+    "en": "Suppose someone knows the temperature and flavor of hot tea in detail before taking a sip. Accumulating that knowledge still differs from actually tasting it. The Zen principle of not relying on words places awakening in verification through one's own practice rather than verbal understanding alone. This does not make scriptures or dialogue unnecessary, but retains the demanding point that no amount of memorization lets another person undertake the work of embodying a teaching in one's life.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "禅で、悟りを文字や言葉の理解だけに依存させない立場。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c1f104a22e-3ade12b5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-c1f104a22e-3ade12b5",
+    "wordId": "nn-c1f104a22e"
+   }
+  }
+ ]
+}

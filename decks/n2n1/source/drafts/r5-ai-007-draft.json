@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "開口数",
+   "reading": "かいこうすう",
+   "pos": "noun",
+   "meaning": "numerical aperture (NA)",
+   "defJa": "光学系が取り込める光の角度などを表す尺度",
+   "passage": {
+    "ja": "半導体に細かな模様を写すには、使う光の波長を短くする方法だけがあるのでしょうか。光学系がどの範囲から光を取り込めるかに関わる開口数も、細部を見分ける能力を左右する大切な尺度です。他の条件が同じなら、この値を大きくすることでより細かい模様を扱えますが、そのぶん装置の光学系や加工の条件にも工夫が要ります。二つの装置を比べるにあたっては、波長とこの値を別々の欄に置くと、同じ光を使いながら性能を変える技術の意味を整理できます。",
+    "form": "開口数",
+    "en": "Is shortening the wavelength the only way to transfer finer patterns onto a semiconductor? Numerical aperture, related to the range of angles from which an optical system gathers light, is another important measure affecting its ability to distinguish detail. Other conditions being equal, increasing it enables finer patterns but requires changes to the optics and processing conditions. Placing wavelength and aperture in separate columns when comparing machines clarifies how technology can change performance while using the same light.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "光の波長と並び、細部を写す能力に関わる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "電力需要",
+   "reading": "でんりょくじゅよう",
+   "pos": "noun",
+   "meaning": "electricity demand",
+   "defJa": "使うために必要とされる電気の量",
+   "passage": {
+    "ja": "人工知能を動かす設備が増えても、必要な電気の量は装置の台数だけでは決まらない。電力需要を見積もる際には、処理の内容や稼働時間に加えて、装置の効率や冷却に使う電力も条件となる。一台当たりの効率が改善しても、利用が大きく増えれば全体の消費が増える場合があり、技術の進歩と総量の変化を同じ指標として扱うことはできない。設備計画の数字を読むときは、どの範囲の施設を、どの期間、どれほど使うと想定した推計なのかが、比較の出発点になる。",
+    "form": "電力需要",
+    "en": "As AI infrastructure grows, the electricity required is not determined by the number of machines alone. Estimates of power demand also depend on workload, operating time, equipment efficiency, and cooling power. Even if efficiency per machine improves, overall consumption can rise with substantial growth in use, so technological progress and changes in total volume are different measures. Comparing infrastructure estimates begins by identifying which facilities, period, and utilization assumptions their figures cover.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "装置の台数と効率、使い方を合わせて見積もる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "露光",
+   "reading": "ろこう",
+   "pos": "noun",
+   "meaning": "exposure (lithography)",
+   "defJa": "光に反応する材料へ光を当てること",
+   "passage": {
+    "ja": "半導体の回路を光で描くという表現は分かりやすいが、光が直接すべての溝を削るわけではない。露光では、光に反応する材料へ模様の情報を与え、その後の処理で必要な部分と残す部分を分ける準備をする。完成した形だけを見れば一本の線でも、そこへ至るまでには光、材料、加工の条件が重なっている。細かなものを作るとは、単に小さな道具を使うことではなく、目に見えない変化を次の工程へ確実に引き渡すことなのだと、この作業の位置付けから読み取れる。",
+    "form": "露光",
+    "en": "Describing semiconductor circuits as drawn with light is accessible, but light does not directly carve every groove. Exposure gives pattern information to a photosensitive material, preparing for subsequent processing that distinguishes what will be removed from what will remain. What looks like one line in the finished structure results from a combination of optical, material, and processing conditions. The role of this step shows that making fine structures involves reliably passing invisible changes into the next process, not merely using smaller tools.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "回路そのものを光だけで彫る工程とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "AIエージェント",
+   "reading": "えーあいえーじぇんと",
+   "pos": "noun",
+   "meaning": "AI agent",
+   "defJa": "目標に沿って道具を使い複数の作業を進める仕組み",
+   "passage": {
+    "ja": "質問に答えるだけでなく、予定を調べて作業の順序を決める仕組みを想像してみて。AIエージェントは、与えられた目標に沿って道具を使い、途中の結果を見ながら次の操作へ進む仕組みとして語られることが多いんだ。ただし、任せる範囲が広がるほど、間違った返答だけでなく、外の情報を書き換えるような行動の影響も考えたいよね。だから実際に使うときは、何を読めるかと何を変更できるかを分けて決めると、どこまで自動で進める設計なのかが具体的になるよ。",
+    "form": "AIエージェント",
+    "en": "Imagine a system that not only answers questions but checks schedules and decides the order of tasks. An AI agent is often described as using tools toward an assigned goal and selecting subsequent operations based on intermediate results. As its remit expands, one must consider not only incorrect responses but also the effects of actions such as changing external information. Separately defining what it can read and what it can modify makes the intended scope of automation concrete.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "文章を返すだけの場合と、外部に作用する場合を分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "AI半導体",
+   "reading": "えーあいはんどうたい",
+   "pos": "noun",
+   "meaning": "AI chip",
+   "defJa": "人工知能の計算を効率よく行うための集積回路",
+   "passage": {
+    "ja": "製品名に人工知能という言葉が付いていると、同じ種類の仕事をする部品だと思いがちです。けれども、AI半導体と呼ばれるものでも、学習向けか実行向けか、扱う計算や使える電力の条件によって、設計の重点は変わります。性能表を読む練習では、速さの数字に加えて、どんな処理をどの精度で行ったかを横に書き添えると、比較の前提がそろいます。まず一つの利用場面を決め、必要な仕事から部品の特徴へ戻って考えると、名前の新しさと実際の適性を別々に評価できます。",
+    "form": "AI半導体",
+    "en": "A product name containing artificial intelligence can make different chips sound as though they perform the same work. Yet AI chips emphasize different designs depending on training versus inference, the computations involved, and available power. When practicing reading performance tables, noting the workload and numerical precision alongside speed makes the comparison assumptions consistent. Starting with a particular use case and working backward from its requirements to component characteristics separates novelty of naming from practical suitability.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "名称だけで判断せず、得意な計算を確かめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "アライメント",
+   "reading": "あらいめんと",
+   "pos": "noun",
+   "meaning": "alignment (AI)",
+   "defJa": "人工知能の振る舞いを人の意図や価値に合わせること",
+   "passage": {
+    "ja": "「人の言うことを聞く機械」と書くだけでは、命令同士が食い違う場面や、指示自体が有害な場合が抜け落ちます。アライメントを紹介する文章では、人工知能の振る舞いを人の意図や価値にどう合わせるかという問いを、その難しさごと残したいところです。利用者の希望に沿うことと、周囲の人への影響を考えることは、いつも同じ答えを導くとは限りません。解決済みの機能名のように扱う代わりに、誰のどんな判断を基準に評価したかを添えると、技術の課題を正確に伝えられます。",
+    "form": "アライメント",
+    "en": "Merely describing a machine as obeying people omits conflicting commands and cases where the instructions themselves are harmful. An introduction to alignment should retain both the question of bringing AI behavior into accord with human intentions and values and the difficulty involved. Satisfying a user's wishes and considering effects on others do not always lead to the same answer. Instead of treating alignment as the name of a solved feature, stating whose judgments formed the evaluation criteria communicates the technical challenge more accurately.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "誰の意図をどの状況で満たすかまで言葉にする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ウエハー",
+   "reading": "うえはー",
+   "pos": "noun",
+   "meaning": "wafer",
+   "defJa": "半導体の回路を作る土台となる薄い円板",
+   "passage": {
+    "ja": "完成したチップは小さな四角形でも、製造の出発点には薄い円板のウエハーが使われます。その表面で多数の回路をまとめて作り、後から個々のチップへ切り分けるので、一枚のどこに不良が現れたかが工程を調べる手がかりになります。端に近い場所と中央で結果が違うとしたら、材料だけでなく、加工の条件が面の上でどう変わったかも検討することになります。一枚の板を単なる入れ物と見るより、回路を同時に作る場として捉えると、良品率と製造条件の関係を具体的に想像できます。",
+    "form": "ウエハー",
+    "en": "Although finished chips are small rectangles, manufacturing starts with a thin disk called a wafer. Many circuits are made together on its surface and later separated into chips, so the locations of defects provide clues about processing. If results differ between the edge and center, investigation considers not only the material but also how processing conditions varied across the surface. Seeing the disk as a place where circuits are made simultaneously rather than merely a container makes the relationship between yield and manufacturing conditions easier to imagine.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "一枚から多数のチップを作る工程の単位を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "エッチング",
+   "reading": "えっちんぐ",
+   "pos": "noun",
+   "meaning": "etching",
+   "defJa": "薬液や気体などで材料の不要な部分を除く加工",
+   "passage": {
+    "ja": "半導体の製造では、光で模様を写すだけで必要な立体構造が完成するわけではない。エッチングは、保護された部分を残しながら不要な材料を取り除き、溝や穴などの形を作る工程に使われる。加工を進める際には、どの材料をどれだけ除くかに加えて、横方向へ広がり過ぎないか、下の層へ影響しないかといった条件も管理する。完成した寸法の小ささだけに注目すると見落とされるが、残す部分を傷めずに除く部分を選ぶ精度が、回路の働きを支える。",
+    "form": "エッチング",
+    "en": "Semiconductor manufacturing does not produce the necessary three-dimensional structure merely by transferring a pattern with light. Etching removes unwanted material while leaving protected areas, forming features such as trenches and holes. Processing controls not only which material and how much to remove but also excessive sideways spread and effects on underlying layers. Focusing only on the small finished dimensions can obscure how selectively removing material without damaging what remains supports circuit operation.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "模様を写す段階と、材料を取り除く段階を分ける。",
+    "sense": ""
+   }
+  }
+ ]
+}

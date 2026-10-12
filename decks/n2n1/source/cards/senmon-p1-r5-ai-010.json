@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "ネットワーク効果",
+   "reading": "ねっとわーくこうか",
+   "pos": "noun",
+   "meaning": "network effect",
+   "defJa": "利用者などが増えるほど利用価値が高まる働き",
+   "passage": {
+    "ja": "連絡用のサービスは機能が同じでも、連絡したい相手が使っていなければ、その人にとっての価値が小さい。利用者の増加が他の利用者の便益も増やすネットワーク効果は、こうしたサービスの競争を考える要素となる。ただし、人数が増えるに伴って混雑や迷惑な投稿が増える場合もあり、規模の拡大が無条件に利用体験を改善するわけではない。企業の優位を評価する際には、単なる利用者数の多さと、参加者が増えることで実際に得られる追加の価値を分けて確認する。",
+    "form": "ネットワーク効果",
+    "en": "A messaging service with identical features has little value to someone whose intended contacts do not use it. Network effects, where growth in users increases benefits to other users, therefore matter in competition between such services. But growth can also bring congestion or unwanted posts, so increased scale does not unconditionally improve the experience. Evaluating a company's advantage requires distinguishing a large user count from the additional value actually created by more participants.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "規模が大きいこと自体と、価値の増え方を区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "バイアス",
+   "reading": "ばいあす",
+   "pos": "noun",
+   "meaning": "bias",
+   "defJa": "データや判断が特定の方向へ偏ること",
+   "passage": {
+    "ja": "顔を見分ける仕組みを作るとき、集めた写真が特定の年齢層に偏っていたら、どうなると思うかな。すべての人に同じ精度で働くとは限らず、データに含まれるバイアスが、使う場面での成績の違いにつながる場合があるんだ。ただ、写真の枚数をそろえれば問題が全部消えるというわけでもなく、撮影条件や正解の付け方にも目を向けたい。全体の正答率だけを眺めるのに加えて、どの人や条件で外しやすいかを分けて見ると、平均値の陰に隠れた失敗を具体的に探せるよ。",
+    "form": "バイアス",
+    "en": "What might happen if photographs collected to build a face-recognition system disproportionately represented one age group? Accuracy may differ between people, with bias in the data contributing to performance differences in use. Yet equalizing photo counts does not solve everything; shooting conditions and labeling also deserve attention. Looking at which people or conditions generate more mistakes alongside overall accuracy helps locate failures hidden behind an average.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "平均の成績だけでは見えない偏りにも使う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "フォトマスク",
+   "reading": "ふぉとますく",
+   "pos": "noun",
+   "meaning": "photomask",
+   "defJa": "光で転写する回路の模様を持つ原板",
+   "passage": {
+    "ja": "半導体の製造では、設計した回路の模様を光の働きに結び付け、材料の上へ正確に転写する過程がある。フォトマスクはその模様の情報を持つ原板であり、使う光学系に応じて、光を通したり反射させたりする仕組みが採られる。原板に意図しない傷や欠陥があれば、転写される模様に影響する場合があるため、作製と検査の精度が重要になる。装置本体の性能に加えて、模様を与える部品の品質も結果を左右する点に、設計の情報を量産へ移す難しさが表れている。",
+    "form": "フォトマスク",
+    "en": "Semiconductor manufacturing links designed circuit patterns with optical action to transfer them accurately onto material. A photomask is the master carrying that pattern information, using transmission or reflection according to the optical system. Unintended damage or defects can affect the transferred pattern, making fabrication and inspection accuracy important. The influence of this pattern-carrying component alongside the machine itself illustrates the difficulty of transferring design information into mass production.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "模様の情報を持つ部品で、製造するチップとは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ハルシネーション",
+   "reading": "はるしねーしょん",
+   "pos": "noun",
+   "meaning": "hallucination (AI)",
+   "defJa": "人工知能がもっともらしい誤情報を出す現象",
+   "passage": {
+    "ja": "存在しない論文が、著者名と雑誌名まで整った形で示されると、読む側は調べる前から信用してしまうことがある。人工知能のハルシネーションが厄介なのは、誤りが文章の不自然さとして現れるとは限らない点にある。流暢な出力を真実の証拠と見なせば、確認に使うはずの引用情報まで誤っている事態を見落とす。機械が人をだます意図を持つと仮定する以前に、何を根拠として採用し、元の記録へどう戻るかを考えることが、便利な文章を知識へ変えるための作業となる。",
+    "form": "ハルシネーション",
+    "en": "A nonexistent paper presented with plausible author and journal names can gain a reader's trust before verification. AI hallucinations are troublesome because errors do not necessarily appear as unnatural prose. Treating fluent output as evidence of truth can obscure that even the citations intended for checking are false. Before assuming an intention to deceive, deciding which evidence to accept and how to return to original records is part of turning convenient text into knowledge.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "意図的なうそと決めつけず、内容を確かめる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

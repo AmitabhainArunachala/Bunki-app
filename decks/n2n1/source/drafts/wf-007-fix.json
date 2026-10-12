@@ -1,0 +1,12 @@
+{
+ "愚か": "Form is 愚か but passage uses 愚かさ; use the target form exactly. / WWI leaders claim accurate.",
+ "応急": "Natural; target used once. / Passage is about exam strategy, not AI/semiconductors.",
+ "怪獣": "Natural; target used once. / Topic is 'other', outside allowed list.",
+ "扶養": "Natural; target used once. / Passage is about tax/social insurance, not mind.",
+ "抑制": "Natural; target used once. / Passage is mainly about announcers, not AI/semiconductors.",
+ "応募": "Natural; target used once. / Passage is about résumé writing, not AI/semiconductors.",
+ "控える": "defJa defines the refrain sense, but passage uses the jot-down sense. / French Revolution flow accurate.",
+ "強制": "「通知を物理的に遠ざける」は不自然。スマホを物理的に遠ざけるなどに修正。 / Passage is about app design/attention, not AI or semiconductors.",
+ "拒否": "拒否: 日本語には、「いいえ」と言わずに拒否の意思を伝え… the English has 4 sentences, the Japanese 5: they must match",
+ "手掛かり": "defJa contains the term itself (手がかり). / Indus script claims accurate."
+}

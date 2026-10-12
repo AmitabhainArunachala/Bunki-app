@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "準優勝",
+   "reading": "じゅんゆうしょう",
+   "pos": "noun",
+   "meaning": "runner-up",
+   "defJa": "決勝で敗れ、優勝に次ぐ二位になること",
+   "passage": {
+    "ja": "1996年夏の甲子園決勝は、延長十回に右翼手が見せた好返球で、今も語り継がれています。敗れた熊本工は準優勝に終わりましたが、最後まであきらめない戦いぶりは、勝った松山商とともに名場面として記憶されています。勝った側の物語は残りやすいものですが、敗れた側にも同じだけの物語があります。勝ち負けだけでは測れない価値が、スポーツにはあるということでしょう。だからこそ、私たちは結果にかかわらず熱戦を何度でも見返したくなるのです。",
+    "form": "準優勝",
+    "en": "The final of the summer 1996 Koshien is still talked about for the fine throw by the right fielder in the tenth inning. The defeated Kumamoto Kogyo finished as runners-up, but their never-give-up fighting spirit is remembered, along with the winning Matsuyama Shogyo, as a great scene. The stories of the winning side tend to survive, but the losing side has just as many stories. Sports must hold a value that cannot be measured by wins and losses alone. That is exactly why we want to rewatch a hard-fought game again and again regardless of the result.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「準優勝に終わる」「準優勝校」。「準〜」は一歩手前の意を表す接頭辞。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "真っ先に",
+   "reading": "まっさきに",
+   "pos": "adverb",
+   "meaning": "first of all",
+   "defJa": "何よりも先に、いちばん最初に",
+   "passage": {
+    "ja": "新しい技術が現れると、人は真っ先に「これで何が楽になるか」を考える。電卓や検索エンジンが現れたときも、同じ期待と不安が繰り返されてきた。だが歴史が教えるのは、本当に問うべきは「これで何が失われるか」のほうだということだ。AIが文章を書き、絵を描く時代に、私たちが手放しかけているのは、迷いながら考えるという営みそのものかもしれない。便利さに浮かれるのは簡単でも、その代償を直視することには根気が要る。",
+    "form": "真っ先に",
+    "en": "When a new technology appears, people first of all ask what it will make easier. The same hopes and anxieties were repeated when calculators and search engines appeared. But what history teaches is that the question we should truly ask is what this will cost us. In an age when AI writes text and draws pictures, what we are on the verge of letting go of may be the very act of thinking while wavering. Getting carried away by convenience is easy, but facing its price squarely takes perseverance.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「真っ先に〜する」。順序の一番手であることを強調する副詞。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "構わない",
+   "reading": "かまわない",
+   "pos": "expression",
+   "meaning": "doesn't matter",
+   "defJa": "気にしない、差し支えない",
+   "passage": {
+    "ja": "友達と議事録の話をしていて、AIに任せるなら多少の言い回しの違いなんて構わない、という点では意見が一致したんだよね。ただ、人の名前を間違えようものなら、取り返しがつかないじゃない。だから人名と日付だけは人間が確認して、あとは任せちゃおうって決めたんだ。それなら今週中にも、会議のあとの面倒な作業がかなり楽になるはずだよ。ただ、AIが勝手に話を盛ってしまう可能性もあるから、そこだけは気をつけたいな。",
+    "form": "構わない",
+    "en": "Talking about meeting minutes with a friend, we agreed that if we leave it to AI, slight differences in phrasing don't matter. But if it gets a person's name wrong, there's no undoing it, right? So we decided that a human will check just the names and dates and leave the rest to it. That should make the tedious work after meetings a lot easier, even this week. Still, there's a chance the AI will embellish things on its own, so we should be careful about that.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「〜ても構わない」「構わないと思う」。許容を表す。会話で多用する。",
+    "sense": "差し支えない"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "温暖化",
+   "reading": "おんだんか",
+   "pos": "noun",
+   "meaning": "(global) warming",
+   "defJa": "気温が次第に高くなっていくこと",
+   "passage": {
+    "ja": "2023年7月、国連のグテーレス事務総長は「地球温暖化の時代は終わり、地球沸騰の時代が到来した」と述べた。日本語のこの語はどこか婉曲で穏やかな響きがあり、危機の切迫感が伝わりにくいという指摘が以前からあった。「沸騰」ほど強い言葉なら、確かに報道の見出しにも載りやすい。言葉の選び方ひとつで、受け手の行動が左右される恐れがある。それだけに、各国の報道が表現をどう選ぶかは、見過ごせない問題である。",
+    "form": "温暖化",
+    "en": "In July 2023, UN Secretary-General Guterres said that the era of global warming had ended and the era of global boiling had arrived. It had long been pointed out that the Japanese term has a somewhat euphemistic, mild ring, which makes the urgency of the crisis hard to convey. A word as strong as boiling would, admittedly, also find its way into headlines more easily. There is a risk that the audience's behavior is swayed by a single choice of word. All the more so, how each country's media chooses its expressions is a problem that cannot be overlooked.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「地球温暖化」の形で多く現れる。「〜化」は変化の進行を表す接尾辞。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "熱演",
+   "reading": "ねつえん",
+   "pos": "noun",
+   "meaning": "passionate performance",
+   "defJa": "熱のこもった演技や演奏をすること",
+   "passage": {
+    "ja": "こないだ大河ドラマの総集編を見たんだけど、織田信長役の俳優の熱演がすごかったんだよ。本能寺の場面ときたら、画面から目が離せなくて、ついテレビの前で息を止めてたよ。共演者に向ける殺気立った視線まで画面ににじんで、こっちまで手に汗を握ったよ。史実とは違うところも多いのかもしれないけど、あの数分間だけでも見る価値があるなって思った。歴史の名場面って、こうやって演じる人の力で何度でも生き返るんだよね。",
+    "form": "熱演",
+    "en": "The other day I watched a recap of a taiga drama, and the passionate performance of the actor playing Oda Nobunaga was amazing. When it comes to the Honnoji scene, I couldn't take my eyes off the screen and found myself holding my breath in front of the TV. Even the murderous glare he turned on his co-stars seeped through the screen, and I was gripping my hands in sweat myself. There may be a lot that differs from the historical record, but just those few minutes were worth watching. Great scenes from history come back to life again and again through the power of the people who play them.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「熱演を見せる」「熱演が光る」。俳優の演技を称えるときの語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "注意する",
+   "reading": "ちゅういする",
+   "pos": "verb",
+   "meaning": "to take care",
+   "defJa": "気を配り、悪いことが起きないよう用心する",
+   "passage": {
+    "ja": "日本語学習者がよく注意するよう言われるのが、助詞の「は」と「が」の使い分けです。この二つは、文法書の説明を読んでもなかなか腑に落ちないんですよね。たとえば「私が行きます」と「私は行きます」では、相手に伝わる焦点がまるで違います。実は、「は」は話題を、「が」は新しい情報を示すという目安で、かなりの場面が整理できます。もちろん例外はあるものの、まず原則を押さえてから例外に進むのが、独学でも効率のいい道です。",
+    "form": "注意する",
+    "en": "What Japanese learners are often told to watch out for is the distinction between the particles wa and ga. These two just don't click, no matter how much of the grammar book's explanation you read. For example, watashi ga ikimasu and watashi wa ikimasu convey a completely different focus to the listener. In fact, with the rule of thumb that wa marks the topic and ga marks new information, you can sort out quite a lot of cases. There are of course exceptions, but grasping the principle first and then moving on to the exceptions is an efficient path even for self-study.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「注意するよう言われる」「〜に注意する」。気をつける意で使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

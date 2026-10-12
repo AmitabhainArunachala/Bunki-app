@@ -1,0 +1,60 @@
+{
+ "cards": [
+  {
+   "term": "無明",
+   "reading": "むみょう",
+   "pos": "noun",
+   "meaning": "ignorance (avidyā), root delusion",
+   "defJa": "物事の真実を知らず迷いを生む根本的な無知",
+   "passage": {
+    "ja": "欲しかった品を買えば心が落ち着くはずだったのに、手に入れるそばから次の品が気になり始めます。仏教の無明は、単に情報を持っていないことではなく、変わるものを確かな拠り所と見なし、苦しみの成り立ちを捉え損なう根本的な無知を指します。値段や性能を詳しく知っていても、所有すれば満たされ続けるという思い込みまでは消えません。この教えが向き合うのは知識不足を穴埋めする問題にとどまらず、欲望と不満を繰り返し生む見方そのものです。",
+    "form": "無明",
+    "en": "Buying a desired object was supposed to bring peace, yet another object begins attracting attention as soon as the first is acquired. Buddhist ignorance is not merely lacking information but a fundamental misunderstanding that treats changing things as secure foundations and misses how suffering arises. Detailed knowledge of prices and performance does not eliminate the assumption that ownership will provide lasting satisfaction. This teaching addresses not just gaps in knowledge but the outlook that repeatedly produces desire and dissatisfaction.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "情報不足一般でなく、迷いを生む根本的な無知。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c6c7e2bb73-ba1a7785",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-004-r.json",
+    "cardId": "nn-c6c7e2bb73-ba1a7785",
+    "wordId": "nn-c6c7e2bb73"
+   }
+  },
+  {
+   "term": "正法眼蔵",
+   "reading": "しょうぼうげんぞう",
+   "pos": "noun",
+   "meaning": "Dogen’s Shobogenzo",
+   "defJa": "道元の仏教思想と修行を説く著作",
+   "passage": {
+    "ja": "悟りを手に入れるまで修行し、手に入れたらやめるという発想には、練習と完成を別々に置く見方があります。道元の正法眼蔵では、坐禅の実践と悟りを切り離さない考えが重要な位置を占めます。目標へ届くためだけの手段だとしたら、座っている今は、いつか訪れる完成に比べて価値の低い時間になってしまいます。修行そのものを悟りの現れとして捉える立場は、成果を獲得するまでの待ち時間として現在を消費する習慣に対し、実践の意味を問い直します。",
+    "form": "正法眼蔵",
+    "en": "The idea of practicing until awakening is obtained and then stopping treats practice and completion as separate. Dogen’s Shobogenzo gives an important place to the inseparability of zazen practice and awakening. If sitting is only a means of reaching a goal, the present becomes less valuable than a completion that will arrive someday. Understanding practice itself as an expression of awakening challenges the habit of consuming the present as waiting time until a result is acquired.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "道元の著作名であり、ここでは修行と悟りの関係を扱う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-db68d28b47-3fdd710f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-020.json",
+    "cardId": "nn-db68d28b47-3fdd710f",
+    "wordId": "nn-db68d28b47"
+   }
+  }
+ ]
+}

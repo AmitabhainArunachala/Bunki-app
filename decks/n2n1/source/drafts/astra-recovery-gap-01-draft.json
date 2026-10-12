@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "賄う",
+   "reading": "まかなう",
+   "pos": "verb",
+   "meaning": "cover; meet the cost of",
+   "defJa": "必要な費用や物を用意して足りさせる。",
+   "passage": {
+    "ja": "演奏会の会計報告に、会場費を入場料収入で賄うと書けば、何に使うお金をどこから用意するのかが分かります。寄付も受けている場合は、その使い道を別の文で示すと、二つの収入を混同せずに読めます。数字を並べるだけでは、主催者がどの費用を負担したかまで伝わるとは限りません。報告を通じて収支の仕組みを伝えるなら、費用の名前と対応する収入を近くに置いてください。読み手が計算をやり直さなくても資金の流れを追えるよう、表と説明文の役割を分けて構成します。",
+    "form": "賄う",
+    "en": "If a concert’s accounts state that ticket revenue covers the venue costs, readers can see where the money for that expense comes from. If donations are also received, giving their use in a separate sentence lets readers distinguish the two sources of income. Listing figures alone does not necessarily convey which costs the organisers bore. If the report is intended to explain the income-and-expenditure structure, place the name of each expense near its corresponding source of funds. Give the table and the explanatory text distinct roles so that readers can follow the flow of money without redoing the calculations.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「会場費を入場料収入で賄う」は、その収入を必要な費用に充てることです。",
+    "sense": "費用を用意して支払いに充てる。"
+   }
+  }
+ ]
+}

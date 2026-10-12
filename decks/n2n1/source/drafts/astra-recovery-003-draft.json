@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "賄う",
+   "reading": "まかなう",
+   "pos": "verb",
+   "meaning": "cover; meet the cost of",
+   "defJa": "必要な費用や物を用意して足りさせる。",
+   "passage": {
+    "ja": "地域の文芸誌が、印刷代を会費で賄うと案内に書いているとします。この一文では、必要な費用とその出所が結びついているので、会員のお金が何に使われるかを読み取れます。ただし、会費だけでは足りず寄付も受けているなら、実態に応じて表現を補う必要があります。収入の話と負担を頼む話を一度に詰め込むと、読み手は金額の関係を誤る恐れがあります。資金の流れを説明するときは、集め方と使い道を分け、最後に両者のつながりを確かめると明快です。",
+    "form": "賄う",
+    "en": "Suppose a local literary magazine states in its notice that it covers printing costs with membership fees. Because the sentence connects a necessary expense with its source of funds, readers can see what members’ money is used for. If fees alone are insufficient and donations are also collected, however, the wording needs to reflect that reality. Cramming information about income and a request for contributions together may cause readers to misunderstand how the amounts relate. When explaining the flow of funds, separating how money is collected from how it is spent and then checking the connection makes the account clear.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「費用を会費で賄う」のように、必要な費用とその出所を組み合わせます。",
+    "sense": "費用を用意して支払いに充てる。"
+   }
+  },
+  {
+   "term": "質疑",
+   "reading": "しつぎ",
+   "pos": "noun",
+   "meaning": "questions; questioning",
+   "defJa": "説明などの不明な点について質問すること。",
+   "passage": {
+    "ja": "講演の最後に設ける質疑の時間は、感想を順番に述べる場とは役割が違います。聞き取れなかった条件や、説明だけでは分からない理由を確かめるために、まず質問を一つに絞ります。長い前置きで自分の論理を語るより、どの発言に関して尋ねたいのかを先に示すと、相手も答えやすくなります。答えを聞いてなお疑問が残った場合は、理解した部分と残った部分を分けて伝えてください。問いの焦点が見えれば、その場で聞いているほかの人にも、やり取りの意味が伝わります。",
+    "form": "質疑",
+    "en": "The question period at the end of a lecture serves a different purpose from taking turns expressing impressions. To check a condition you missed or a reason the explanation left unclear, first narrow your inquiry to one question. Rather than presenting your own reasoning in a long preamble, identify which statement you are asking about so that the speaker can respond more easily. If a doubt remains after the answer, distinguish what you understood from what remains unresolved. A clear focus also helps the other people listening understand the significance of the exchange.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「質疑の時間」は、説明を受けた側が不明点を尋ねるための時間です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "購入",
+   "reading": "こうにゅう",
+   "pos": "noun",
+   "meaning": "purchase",
+   "defJa": "代金を払って品物などを手に入れること。",
+   "passage": {
+    "ja": "商品を手に入れるという文には、それを借りたのか、譲り受けたのかが書かれていない。購入という語を選べば、代金を支払って得たという条件が加わる。広告の短い文章であれ、この違いを曖昧にすると、読み手は契約の内容を誤ることがある。月額の支払いで利用する仕組みなら、物を自分のものにする場合と区別して記す必要がある。魅力を伝える表現を整える前に、読み手に何を約束し、どの費用を負担してもらうのかを確かめることが、言葉への信頼を支える。",
+    "form": "購入",
+    "en": "A sentence saying that someone obtains a product does not state whether they borrowed it or received it as a gift. Choosing the word purchase adds the condition that money was paid to acquire it. Even in a short advertisement, blurring this difference can cause readers to misunderstand the agreement. If the arrangement permits use for a monthly fee, it needs to be distinguished from making the object one’s own. Checking what is promised to readers and which expenses they must bear before polishing the appealing language supports trust in the wording.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "代金を払う点が中心で、借りたり無料でもらったりすることとは区別します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "購読",
+   "reading": "こうどく",
+   "pos": "noun",
+   "meaning": "paid subscription; paid reading",
+   "defJa": "新聞や雑誌などを買って読むこと。",
+   "passage": {
+    "ja": "古い新聞の購読料を調べると、書かれた記事だけでは見えない読者の暮らしが研究の対象になる。紙面の値段が記録に残っていても、それだけで当時の負担の大きさを判断することはできない。同じ時期の賃金や、ほかの品物の価格と照らし合わせる必要がある。さらに、一部の新聞を複数の人が読んでいた可能性もあるため、販売部数を読者数と同じものとして扱うのは誤りを招きかねない。文字が誰の手に届き、どこで読まれたかという問いが、新聞を社会の中に置き直すのである。",
+    "form": "購読",
+    "en": "Examining historical newspaper subscription prices brings readers’ lives into focus in ways that the articles alone cannot. Even when the price of the paper is recorded, it cannot by itself establish how great an expense it represented. It must be compared with wages and the prices of other goods in the same period. Furthermore, because several people may have shared a single copy, treating circulation as identical to readership risks error. Asking whose hands the printed words reached and where they were read places the newspaper back in its social setting.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「購読料」は、新聞や雑誌などを買って読むために支払う料金です。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "足",
+   "reading": "～そく",
+   "pos": "other",
+   "meaning": "counter for pairs of footwear",
+   "defJa": "靴や靴下などの組を数える語。",
+   "passage": {
+    "ja": "靴屋で二足を試したいと伝えるとき、数えているのは左右がそろった組であって、片方だけではありません。日本語の数え方では、物の形だけでなく、どう使うものかという見方も表れます。たとえば手袋は組という単位でも数えられますが、何でも同じ言い方に置き換えられるとは限りません。単位を誤ることを恐れるあまり、数字だけを口にすると、かえって何を求めているのか伝わりにくくなります。買い物の場面ごとに、品物と数え方をひとまとめに覚えると実際に使いやすいですよ。",
+    "form": "足",
+    "en": "When you say in a shoe shop that you want to try two pairs, you are counting a matching left and right shoe, not one shoe alone. Japanese ways of counting reflect not only an object’s shape but also how it is used. Gloves, for example, can be counted in sets, but that does not mean the same wording can be substituted for every object. If fear of using the wrong counter makes you say only the number, it can actually become harder to convey what you want. Learning an item together with its counter in particular shopping situations makes the expression easier to use in practice.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "ここでは「そく」と読み、左右そろった靴の組を数えます。",
+    "sense": "靴など左右一組のものを数える助数詞。"
+   }
+  },
+  {
+   "term": "軽快",
+   "reading": "けいかい",
+   "pos": "na-adj",
+   "meaning": "light and lively; brisk",
+   "defJa": "動きや調子が軽やかで快いさま。",
+   "passage": {
+    "ja": "朝の散歩で軽快な音楽を選ぶと、重い気分のまま歩いていたときとは、同じ道の感じ方も変わってきます。弾むようなリズムにつられ、次の角まで行ってみようと思える日もあるでしょう。ただし、歩く速さを無理に曲へ合わせる必要はなく、体への負担に応じて調整します。習慣を続けるには強い意志だけが必要だと思いがちですが、行動そのものを少し楽しめる工夫にも目を向けたいですね。運動の記録に距離だけでなく、その日に心地よかったことも残してみると、自分に合う続け方を探れます。",
+    "form": "軽快",
+    "en": "Choosing light, lively music for a morning walk can change how the same route feels compared with walking in a gloomy mood. On some days its bouncing rhythm may make you want to continue to the next corner. You do not need to force your walking pace to match the music, however, and should adjust it according to the strain on your body. Although it is easy to think that sustaining a habit requires only strong willpower, it is also worth finding ways to enjoy the activity itself a little. Recording what felt pleasant that day as well as the distance can help you find a way of continuing that suits you.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「軽快な音楽」は、リズムや調子が軽やかで気持ちよい音楽です。",
+    "sense": "音楽などの調子が軽やかで快いこと。"
+   }
+  },
+  {
+   "term": "辛抱",
+   "reading": "しんぼう",
+   "pos": "noun",
+   "meaning": "patience; endurance",
+   "defJa": "苦しさや不満をこらえて耐えること。",
+   "passage": {
+    "ja": "日本語の小説を辞書と一緒に読んでいると、一段落も進まないうちに投げ出したくなる日があります。筋が見えるまでの辛抱だと自分に言い聞かせても、知らない語が続けば負担は増すばかりです。そこで、すべての語を調べるかわりに、登場人物が何をしたかを追う読み方を試します。細部を確かめる時間と物語を楽しむ時間を分ければ、分からない部分を抱えたまま先へ進む練習にもなります。苦しさに耐えるだけで終わらせず、読み方を変える余地がないかを探ることも、長く本と付き合う知恵です。",
+    "form": "辛抱",
+    "en": "When reading a Japanese novel with a dictionary, some days you feel like giving up before finishing even one paragraph. Even if you tell yourself to hold on until the plot becomes clear, a succession of unfamiliar words only increases the burden. Try following what the characters do instead of looking up every word. Separating time for checking details from time for enjoying the story also gives you practice in continuing despite unresolved points. Looking for ways to change how you read, rather than merely enduring the difficulty, is part of learning how to stay with books over the long term.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「もう少しの辛抱」のように、つらさをこらえる必要がある場面に使います。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "逃れる",
+   "reading": "のがれる",
+   "pos": "verb",
+   "meaning": "escape; get free from",
+   "defJa": "危険や苦しい状態から離れる。",
+   "passage": {
+    "ja": "机に向かうたびに間違えた答案が浮かぶと、勉強に取りかかること自体が負担になってしまいます。失敗への不安から逃れるためだけに予定を埋めると、肝心の復習を後回しにすることもあります。不安を完全に消そうとするより、今なら取り組める小さな問いを選んで、答えを書いてみます。一度に全部を直せないまでも、どこで考え違いをしたかが一つ分かれば、次の作業は具体的になります。気分と行動をいつも同時に変えようとせず、手を動かせる範囲から再開する方法を持っておきましょう。",
+    "form": "逃れる",
+    "en": "If memories of incorrect answers surface whenever you sit down at your desk, beginning to study can itself become a burden. Filling your schedule simply to escape anxiety about failure can also push the essential revision into the background. Rather than trying to eliminate the anxiety entirely, choose a small question you can tackle now and write an answer. Even if you cannot correct everything at once, identifying one mistaken line of thought makes the next task concrete. Instead of always trying to change your feelings and actions together, develop a way to resume within the range of what you can do.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「不安から逃れる」は、苦しい心理状態から離れようとする表現です。",
+    "sense": "不安などの苦しい状態から離れる。"
+   }
+  },
+  {
+   "term": "連帯",
+   "reading": "れんたい",
+   "pos": "noun",
+   "meaning": "solidarity",
+   "defJa": "共通の目的のために互いに結びつくこと。",
+   "passage": {
+    "ja": "支援を呼びかける文章で、苦境にある人に連帯を示すと書くと、遠くから同情するだけではない姿勢が表れます。相手と同じ立場で問題に向き合おうとする言葉だけに、その後に何をするのかが問われます。費用の負担を分けるのか、声を届ける手伝いをするのか、できる行動を具体的に続けてください。強い表現を誇張して並べるより、約束の範囲を確かめられる文章のほうが、相手も頼りにできます。書き手の気持ちと受け手の必要をつなぐところまで考えて、言葉を選びたいものです。",
+    "form": "連帯",
+    "en": "Writing in an appeal for support that you stand in solidarity with people in difficulty expresses more than sympathy from a distance. Precisely because the wording suggests facing the problem alongside them, it raises the question of what you will do next. Follow it with concrete actions you can take, such as sharing costs or helping their voices reach others. A statement that lets people check the scope of a promise is more dependable than a string of exaggerated, forceful expressions. We should choose words with an eye to connecting the writer’s feelings to the recipient’s needs.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「連帯を示す」は、相手と結びつき、共に問題に向き合う姿勢を表します。",
+    "sense": ""
+   }
+  }
+ ]
+}

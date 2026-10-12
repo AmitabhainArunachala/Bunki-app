@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "呉音",
+   "reading": "ごおん",
+   "pos": "noun",
+   "meaning": "go-on reading",
+   "defJa": "漢字の古い日本語読みの一種",
+   "passage": {
+    "ja": "「行」を「ぎょう」と読めば呉音、「こう」と読めば漢音である。仏教語にこの系統の読みが多いのは、仏教が朝鮮半島を経て、五、六世紀ごろの江南の発音とともに伝わったからだとされる。「修行」は「しゅぎょう」であって「しゅこう」ではなく、「四苦八苦」の「苦」を「く」と読むのも、同じ名残である。読経の声に耳を澄ませば、私たちは千年以上前の音の化石に触れていることになる。",
+    "form": "呉音",
+    "en": "Read 「行」 as “gyo” and it is go-on; read it “kō” and it is kan-on. Buddhist terms contain many readings of the former kind because Buddhism came by way of the Korean peninsula together with the pronunciation of Jiangnan around the fifth and sixth centuries, it is said. The word 修行 is “shugyō,” not “shukō,” and reading the 苦 of 四苦八苦 as “ku” is the same vestige. Listen closely to the chanting of sutras, and you are touching a fossil of sound more than a thousand years old.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "「呉音で読む」のように、漢音と対比して読みの系統を言う",
+    "sense": ""
+   }
+  },
+  {
+   "term": "国債",
+   "reading": "こくさい",
+   "pos": "noun",
+   "meaning": "government bond",
+   "defJa": "国が資金を借りるために出す債券",
+   "passage": {
+    "ja": "日露戦争の戦費って、実はほとんど借金でまかなわざるを得なかったんですよ。日本は国債を国内外で発行して、高橋是清がロンドンやニューヨークを回って買い手を探しました。しかも賠償金が取れなかったので、返済は昭和に入ってもずっと続いたんです。国力でいえばロシアのほうがはるかに大きかったわけで、あの綱渡りぶりは、いま聞いても冷や汗が出ますよね。",
+    "form": "国債",
+    "en": "The cost of the Russo-Japanese War, you know, had to be covered almost entirely by borrowing. Japan issued government bonds at home and abroad, and Takahashi Korekiyo went around London and New York looking for buyers. And since no indemnity could be extracted, repayment kept going well into the Showa era. In terms of national power Russia was far larger, so that tightrope act still makes you break into a cold sweat just hearing about it.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "戦費を借りる話で使う。「国債を発行する」の形で、国が出す債券を指す。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+5:Tour n2 / ai
+6:n2 / ai: online answer and cached tokens passed
+7:Tour n1 / ai
+8:n1 / ai: online answer and cached tokens passed
+9:HTTP 503 http://localhost:39123/data/articles/bunki-graded-n4-bicycle.json
+10:Tour senmon / ai
+11:senmon / ai: online answer and cached tokens passed
+12:Tour n2 / washi
+13:n2 / washi: online answer and cached tokens passed
+14:Tour n1 / washi
+15:n1 / washi: online answer and cached tokens passed
+16:Tour senmon / washi
+17:senmon / washi: online answer and cached tokens passed
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'n1/ai: Failed to load resource: the server responded with a status of 503 ()'
++ ]
+- []
+
+    at file:///root/wt-base/prototypes/corridor/tools/verify-n2n1-decks.mjs:119:10 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    'n1/ai: Failed to load resource: the server responded with a status of 503 ()'
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+# other runs (same race, different article/deck):
+verify-n2n1-decks.premerge-1.log: HTTP 503 data/articles/bunki-essay-n2-translation.json 'n1/ai: Failed to load resource: the server responded with a status of 503 ()'
+verify-n2n1-decks.premerge-2.log: HTTP 503 data/articles/bunki-essay-n2-rain.json 'n1/washi: Failed to load resource: the server responded with a status of 503 ()'
+verify-n2n1-decks.premerge-3.log: HTTP 503 data/articles/bunki-essay-n2-notebook.json 'n1/ai: Failed to load resource: the server responded with a status of 503 ()'
+verify-n2n1-decks.rerun-2.log: HTTP 503 data/articles/bunki-essay-n2-translation.json 'senmon/ai: Failed to load resource: the server responded with a status of 503 ()'
+verify-n2n1-decks.rerun-3.log:  PASS

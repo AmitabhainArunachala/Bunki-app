@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "別荘",
+   "reading": "べっそう",
+   "pos": "noun",
+   "meaning": "holiday home; second home",
+   "defJa": "普段の住居とは別に設けた休養用の家。",
+   "passage": {
+    "ja": "画家の伝記に、夏は湖畔の別荘で過ごしたと記されていたとする。その一語から、読者は普段の住まいとは別に、休養などのために使う家を思い描く。建物が豪華だったとは限らないものの、豊かな暮らしを連想する余地はある。作者が伝えたいのが静かな制作環境であれば、付近の景色や部屋での過ごし方を具体的に描くことで、印象を調整できる。場所を表す語は、建物の位置を示すと同時に、そこに暮らす人の生活まで想像させる働きを持っている。",
+    "form": "別荘",
+    "en": "Suppose a painter’s biography states that they spent summers at a holiday home beside a lake. That one term leads readers to imagine a house used for rest or similar purposes, separate from the usual residence. Although the building need not have been luxurious, the word leaves room for an association with wealth. If the author wishes to convey a quiet setting for painting, concrete descriptions of the nearby scenery and time spent in the rooms can adjust that impression. A word for a place locates a building while also inviting readers to imagine the life of its occupant.",
+    "register": "論",
+    "topic": "language",
+    "tipJa": "休養などのために、普段の住まいとは別に使う家を指します。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

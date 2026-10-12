@@ -1,0 +1,1 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"賄う": []}, "model": "deepseek-v4-pro:cloud", "secs": 21, "out": 3076, "verdicts": [{"term": "賄う", "editor": "pass", "editorWhy": "「人手を住民だけで賄う」は自然なコロケーションで、説明も的確。", "facts": "pass", "factsWhy": "言語用法の説明に事実誤認はなく、英語訳も原文に忠実。"}]}

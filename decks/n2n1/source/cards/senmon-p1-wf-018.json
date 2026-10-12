@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "語源",
+   "reading": "ごげん",
+   "pos": "noun",
+   "meaning": "word origin, etymology",
+   "defJa": "言葉のもとになった形や意味。",
+   "passage": {
+    "ja": "語源を知ると、言葉を使うときの手応えが変わる。たとえば「ありがとう」は、「有ることが難しい」を意味する「有り難し」から来ており、めったにない幸運への驚きが感謝の言葉に転じたものだ。そう思って口にすれば、同じ五文字でも、込める気持ちが違ってくるだろう。派手な言い回しを探すより、一語の由来をたどるほうが、文章に深みが出る。話し方や書き方に迷ったら、まず言葉の出自を調べてみるのが近道である。",
+    "form": "語源",
+    "en": "Once you know a word's etymology, the feel of using it changes. For example, arigatō comes from arigatashi, meaning hard to exist, and surprise at a rare stroke of luck turned into a word of thanks. If you say it with that in mind, even the same five syllables will carry different feeling. Tracing the origin of a single word gives writing more depth than hunting for flashy phrases. When you are unsure how to speak or write, the shortcut is to first look into the word's origins.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「言葉の語源」「語源をたどる」のように、語のもとの成り立ちを言う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "language",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

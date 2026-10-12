@@ -1,0 +1,52 @@
+{
+ "cards": [
+  {
+   "term": "蒸す",
+   "reading": "むす",
+   "pos": "verb",
+   "meaning": "to be hot and humid; to steam",
+   "defJa": "湿気が多くて、むしむしと暑くなる。",
+   "passage": {
+    "ja": "インド南西部のケララ州では、例年六月初めごろモンスーンの雨期が始まり、蒸す日が続く。気温はさほど高くなくても湿度が極端に上がり、屋外の作業は体力を消耗しやすく、昼間の外出を控える人も多い。気象当局は降水量を測定して、雨期入りの時期を発表する。一方で、この雨は農業にとって欠かせない恵みでもあり、遅れると稲の作付けに響くとして、毎年のように予報が注目される。",
+    "form": "蒸す",
+    "en": "In Kerala in southwestern India, the monsoon rainy season normally begins around the start of June, and muggy days continue. Even if the temperature is not so high, humidity rises extremely and outdoor work easily drains one's strength, so many people avoid going out in the daytime. The meteorological authorities measure rainfall and announce the timing of the onset of the rains. On the other hand, this rain is also an indispensable blessing for agriculture, and since a delay affects the planting of rice, the forecast draws attention almost every year.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「蒸す日」「蒸し暑い」のように、湿気が多くて暑い意。料理の「蒸す」とは別の意味。",
+    "sense": "蒸し暑い意"
+   }
+  },
+  {
+   "term": "証人",
+   "reading": "しょうにん",
+   "pos": "noun",
+   "meaning": "witness",
+   "defJa": "事実を見届けて語る人。また、見守る意識。",
+   "passage": {
+    "ja": "本番で頭が真っ白になりそうなとき、有効なのは、感情から距離を置いて眺めるもうひとりの自分をつくることだ。インド哲学のアドヴァイタでは、心の動きをただ見ている意識を、証人と呼ぶ伝統がある。心拍が上がり、手が冷たくなっているなと、他人事かのように実況するだけで、緊張に飲まれにくくなる。試験会場でも一度試してみる価値はあるし、練習を重ねるほど、切り替えは速くなっていく。",
+    "form": "証人",
+    "en": "When you are about to go blank in a high-stakes moment, what works is creating another self who watches from a distance from your emotions. In Indian philosophy's Advaita, there is a tradition of calling the awareness that simply watches the movements of the mind the witness. Just by narrating as if it were someone else's matter that your heart rate is rising and your hands are getting cold, you become harder to swallow up in tension. It is worth trying once even at the exam venue, and the more you practice, the faster the switch becomes.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "法廷の「証人」のほか、アドヴァイタでは、心を見守る意識を指す語としても訳される。",
+    "sense": "見守る意識の意"
+   }
+  },
+  {
+   "term": "踏み場",
+   "reading": "ふみば",
+   "pos": "noun",
+   "meaning": "place to step, foothold",
+   "defJa": "足をおろして立てる場所。",
+   "passage": {
+    "ja": "慣用句の「足の踏み場もない」は、床に物があふれて、歩く隙間すらない状態を表す。「も」を抜いた形でもよく使われるが、「も」が入ると強調の度合いが一段上がる点に注意したい。語源をたどれば、文字どおり足を置く場所のことだが、比喩として、祭りの人混みにも使える。試験対策では、丸暗記より、散らかった部屋を思い浮かべながら覚えるほうが、定着しやすく、例文を声に出して読めばなおさらだ。",
+    "form": "踏み場",
+    "en": "The idiom no place to put a foot describes a state in which things overflow the floor and there is not even a gap to walk through. A form with the particle dropped is also commonly used, but note that with the particle in, the degree of emphasis goes up a notch. Trace its etymology and it literally means a place to set your foot, but it can also be used figuratively for a festival crowd. For exam prep, memorizing while picturing a messy room should make it stick better than rote memorization, all the more if you read example sentences aloud.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "「足の踏み場もない」の形で使う。散らかりや混雑の度合いを強調する。",
+    "sense": ""
+   }
+  }
+ ]
+}

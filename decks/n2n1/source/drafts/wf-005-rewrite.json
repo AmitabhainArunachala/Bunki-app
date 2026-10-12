@@ -1,0 +1,36 @@
+{
+ "cards": [
+  {
+   "term": "冴える",
+   "reading": "さえる",
+   "pos": "verb",
+   "meaning": "to be clear; to be sharp",
+   "defJa": "頭や感覚が澄んで鋭く働く",
+   "passage": {
+    "ja": "同じ人でも、頭が冴える時間帯には波があることが、睡眠研究でわかっています。朝型か夜型かという体質も、遺伝の影響を受けるそうです。だからといって、誰もが朝五時に起きれば天才になれるわけではありません。大切なのは、自分の頭のピークの時間帯を知り、一番重い仕事をそこに置くことです。そうすれば、同じ八時間の仕事でも、効率は段違いに変わり、夕方の疲れ方まで違ってきます。",
+    "form": "冴える",
+    "en": "Sleep research shows that even in the same person, the hours when the mind is sharp rise and fall. Whether you are a morning or an evening type is also said to be influenced by genes. That does not mean anyone who gets up at five in the morning becomes a genius. What matters is to know the hours of your own peak and to place your heaviest work there. Do that, and even in the same eight hours of work, efficiency changes dramatically, and even how tired you feel by evening is different.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「頭が冴える」「目が冴える」のように、感覚や頭脳が澄んで鋭いさまを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "即座に",
+   "reading": "そくざに",
+   "pos": "adverb",
+   "meaning": "on the spot; at once",
+   "defJa": "間をおかず、その場で行うさま",
+   "passage": {
+    "ja": "部下への指摘には、即座に伝えるべきものと、一晩置いてから伝えるべきものがあります。事実の誤りや安全にかかわることは、その場で正すのが原則です。いっぽう、やり方や態度への批判は、感情のまま伝えれば関係を壊しかねないので、翌朝に回したほうが相手に届きます。私は腹が立ったときほど、メールの下書きを閉じて、あえて一日待つようにしています。",
+    "form": "即座に",
+    "en": "Some remarks to a subordinate should be made on the spot, and others only after a night's wait. Factual errors and anything touching on safety should in principle be corrected right there. Criticism of someone's methods or attitude, on the other hand, could damage the relationship if delivered while emotions run high, so it lands better if left until the next morning. When I am angry especially, I close the email draft and deliberately wait a day.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「即座に伝える」「即座に対応する」のように、その場で遅れなく行う動作に使う。",
+    "sense": ""
+   }
+  }
+ ]
+}

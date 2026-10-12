@@ -1,0 +1,76 @@
+{
+ "batch": "r5-india-review-002",
+ "items": [
+  {
+   "term": "梵字",
+   "reading": "ぼんじ",
+   "gloss": "Siddham/Sanskrit script",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "A visit to a place prompts a compact interpretation of the term; imagined ordinary scenes must not be presented as reported events.",
+   "grammarSuggestion": "〜に至る",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "法要",
+   "reading": "ほうよう",
+   "gloss": "Buddhist memorial service",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Discuss the difference between a doctrinal claim and observable experience, avoid formulaic warnings.",
+   "grammarSuggestion": "〜に基づいて",
+   "surfaceNote": "The literal target must occur exactly once, including substrings inside longer compounds; avoid repeating that character sequence."
+  },
+  {
+   "term": "絶対無",
+   "reading": "ぜったいむ",
+   "gloss": "absolute nothingness (Nishida)",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "angle": "A concrete temple object or ordinary scene opens the passage; use it to explain the term through a distinct detail.",
+   "grammarSuggestion": "〜ものの",
+   "factNote": "Nishida philosophical concept, not literal total nonexistence."
+  }
+ ],
+ "reviewOf": {
+  "梵字": {
+   "batch": "r5-india-020",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated phrase わけではありません。",
+   "source": "cards/senmon-p1-r5-india-020.json"
+  },
+  "法要": {
+   "batch": "r5-india-021",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated phrase わけではありません。",
+   "source": "cards/senmon-p1-r5-india-021.json"
+  },
+  "絶対無": {
+   "batch": "r5-india-025",
+   "reason": "Whole-deck 0.6% variety audit: reduce repeated closing …すくなります",
+   "source": "cards/senmon-p1-r5-india-025.json"
+  }
+ }
+}

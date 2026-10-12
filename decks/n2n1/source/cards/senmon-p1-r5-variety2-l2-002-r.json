@@ -1,0 +1,172 @@
+{
+ "cards": [
+  {
+   "term": "国産化",
+   "reading": "こくさんか",
+   "pos": "noun",
+   "meaning": "domestic production",
+   "defJa": "外国に頼っていた製品などを国内で作ること",
+   "passage": {
+    "ja": "海外から半導体部品が届かず、組み立て工場が止まると、供給網の弱点が表に出ます。そこで部品の国産化を進めても、製造装置や原料まで外国から買っていれば、外部への依存がすべて消えるわけではありません。国内で作れる品目が増えるに伴って修理や調達の選択肢は広がりますが、少ない生産量では費用が高くなる場合もあります。どの工程を国内に持ち、どこで海外と分担するかという判断が、工場を一つ建てる決定の後にも続いていきます。",
+    "form": "国産化",
+    "en": "When assembly stops because semiconductor components have not arrived from overseas, weaknesses in the supply chain become visible. Even if domestic production of those components is developed, foreign dependence does not disappear entirely if production equipment and raw materials are still imported. Increasing the range of domestically made items expands repair and procurement options, but small production volumes can also raise costs. Decisions about which processes to keep at home and which to share overseas continue after the decision to build a factory.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "外国に頼っていた物の生産を国内へ移すことを指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-dcf5f12732-25ccc62e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-dcf5f12732-25ccc62e",
+    "wordId": "nn-dcf5f12732"
+   }
+  },
+  {
+   "term": "実存的リスク",
+   "reading": "じつぞんてきりすく",
+   "pos": "noun",
+   "meaning": "existential risk",
+   "defJa": "人類の存続や長期的な可能性を永久に損なう危険",
+   "passage": {
+    "ja": "ある事故で大きな損害が出ても、社会が回復し、その先の世代が暮らせるなら未来は続きます。これに対して実存的リスクは、人類そのものの存続や、長期的に開かれている可能性を永久に失わせる危険を指します。人工知能をめぐる議論にもこの観点があり、今の利用者への被害だけでなく、制御を失った場合の影響が問われます。将来の出来事だけに確率の推定は難しく、危険が小さいと決めつけることも、破局が必ず来ると断定することも慎重であるべきです。",
+    "form": "実存的リスク",
+    "en": "Even after an accident causes enormous damage, the future continues if society recovers and later generations can live. Existential risk, by contrast, concerns dangers that permanently destroy humanity's survival or its long-term possibilities. This perspective also appears in debates about artificial intelligence, where the consequences of losing control are examined alongside harm to present users. Because these are future events, probabilities are difficult to estimate, and both dismissing the danger and declaring catastrophe inevitable require caution.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "人類の長期的な存続や可能性が永久に失われる危険を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-f7775d45d1-c8f76f2e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json",
+    "cardId": "nn-f7775d45d1-c8f76f2e",
+    "wordId": "nn-f7775d45d1"
+   }
+  },
+  {
+   "term": "喫緊",
+   "reading": "きっきん",
+   "pos": "noun",
+   "meaning": "pressing and urgent",
+   "defJa": "すぐに取り組むべき差し迫った状態",
+   "passage": {
+    "ja": "半導体の実験用の装置が故障し、学生たちは今週の測定を続けられなくなりました。来年度の研究計画も大事ですが、今は代わりの装置を確保することが喫緊の課題で、対応が遅れるほど試料を無駄にする恐れがあります。指導教員は近隣の研究室に協力を求める一方で、故障の原因を調べる担当も決めました。急ぐ仕事を一つ選ぶのは他の仕事を捨てるためではなく、時間を失うと取り返しがつかない作業から順に進め、全体の研究を守るためです。",
+    "form": "喫緊",
+    "en": "A semiconductor research apparatus broke down, leaving students unable to continue this week's measurements. Next year's research plan matters, but securing a replacement is now the urgent issue, and delay increases the risk of wasting samples. The supervisor sought help from nearby laboratories while also assigning someone to investigate the failure. Choosing one urgent task is a way of protecting the research as a whole by prioritizing work where lost time cannot be recovered, rather than abandoning other tasks.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「喫緊の課題」は、時間的な余裕がなく今すぐ扱うべき問題。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-29d99da149-c1cbf3dc",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-29d99da149-c1cbf3dc",
+    "wordId": "nn-29d99da149"
+   }
+  },
+  {
+   "term": "決算短信",
+   "reading": "けっさんたんしん",
+   "pos": "noun",
+   "meaning": "earnings report summary",
+   "defJa": "企業が決算の概要を速やかに伝える開示資料",
+   "passage": {
+    "ja": "取引時間が終わった後、ある上場企業が売上高や利益、配当の情報を公表しました。決算短信は、このように決算の概要を速やかに知らせるための資料で、投資家は会社の状況を判断する手がかりを得ます。前の期に比べて利益が伸びたとしても、事業そのものが伸びたのか、資産を売った影響なのかによって、数字の背景は異なります。実績の欄と業績予想の欄も役割が違い、会社がすでに達成した結果と、今後を見込んだ数値が同じ資料に収まっています。",
+    "form": "決算短信",
+    "en": "After trading ended, a listed company disclosed information on sales, profits, and dividends. An earnings summary is a document for promptly announcing an overview of financial results, giving investors clues about the company's condition. Even if profit rose from the previous period, the background differs depending on whether the business grew or assets were sold. The actual-results and forecast sections also play different roles, placing completed results and projected figures in the same document.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "上場企業が決算の概要を迅速に知らせる開示資料。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-40d453db4b-a545691e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-40d453db4b-a545691e",
+    "wordId": "nn-40d453db4b"
+   }
+  },
+  {
+   "term": "基盤モデル",
+   "reading": "きばんもでる",
+   "pos": "noun",
+   "meaning": "a foundation model",
+   "defJa": "多様な用途への応用の土台となる大規模な学習モデル",
+   "passage": {
+    "ja": "同じ土台から、質問に答える仕組みも文章を分類する仕組みも作れます。幅広いデータで学習し、さまざまな用途への応用を支える基盤モデルは、仕事ごとに最初からモデルを作る手間を減らす可能性があります。追加の学習や指示によって動作を変えられる一方で、元の学習に含まれる偏りが複数のサービスへ共通して持ち込まれることもあります。一つの土台を多くの人が使う便利さには、同じ弱点が広く影響するという、共有ならではの課題も伴います。",
+    "form": "基盤モデル",
+    "en": "A question-answering system and a text-classification system can be built from the same base. A foundation model, trained on broad data to support adaptation to many applications, can reduce the work of building a model from scratch for each task. Further training or instructions can change its behavior, while biases from its original training may also carry over into multiple services. The convenience of many people using one foundation brings the distinctive challenge that shared weaknesses can have widespread effects.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "個々の用途を支える共通の土台としての役割に焦点を当てる語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-7741c9f6f9-268c0d2c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-7741c9f6f9-268c0d2c",
+    "wordId": "nn-7741c9f6f9"
+   }
+  },
+  {
+   "term": "差別化",
+   "reading": "さべつか",
+   "pos": "noun",
+   "meaning": "differentiation",
+   "defJa": "他との違いを作って選ばれる理由を示すこと",
+   "passage": {
+    "ja": "小さな産業用計算機の会社が、大手と同じ工場向けの機種で競えば、価格で苦しくなります。そこで修理の速さと細かな注文への対応を強みにして差別化を図ると、停止時間を嫌う工場に選ばれる理由が生まれます。特殊な機能を増やすだけでは費用がかさむばかりで、顧客の困り事に結び付かなければ価値にはなりません。知的財産として守れる設計に加え、現場で積み上げた経験も強みになるため、違いを作る場所は製品の中だけとは限りません。",
+    "form": "差別化",
+    "en": "A small industrial-computer company will struggle on price if it competes with major firms using the same factory-oriented models. Differentiating itself through fast repairs and customized service gives factories that dislike downtime a reason to choose it. Simply adding special features only raises costs unless those features address customers' problems. Experience accumulated on site can be a strength alongside designs protected as intellectual property, so distinctions need not be confined to the product itself.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「差別化を図る」は、顧客に選ばれる根拠となる違いを作ること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8219ad3580-a9573555",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-8219ad3580-a9573555",
+    "wordId": "nn-8219ad3580"
+   }
+  }
+ ]
+}

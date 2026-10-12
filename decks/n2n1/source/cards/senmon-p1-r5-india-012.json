@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "六波羅蜜",
+   "reading": "ろくはらみつ",
+   "pos": "noun",
+   "meaning": "the six perfections",
+   "defJa": "菩薩が行う布施など六つの完成への実践",
+   "passage": {
+    "ja": "他者を助ける行為と、自分の心を整える修行とを別々に扱わないところに、大乗仏教の実践の特徴がある。六波羅蜜は、布施、持戒、忍辱、精進、禅定、智慧という六つを通じて、菩薩の歩みを示す教えである。物を与えることも、ただ量を増やせばよいのではなく、どのような意図で行うかという問いと結び付く。項目を一列に並べて読むだけでなく、他者との関係に働く面と、自分の執着を見つめる面とがどう支え合うかを見ることで、教義と生活との接点が明らかになる。",
+    "form": "六波羅蜜",
+    "en": "Mahayana practice connects helping others with cultivating one’s own mind. The six perfections describe the bodhisattva path through giving, discipline, patience, effort, meditation, and wisdom. Giving concerns intention as well as quantity. Examining the mutual support between relationships and awareness of attachment connects the doctrinal list with daily life.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「六波羅蜜を修める」。六項目を互いに関わる菩薩の実践として読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "六道",
+   "reading": "ろくどう",
+   "pos": "noun",
+   "meaning": "the six realms of rebirth",
+   "defJa": "仏教で生き物が生まれ変わるとされる六つの世界",
+   "passage": {
+    "ja": "昔の絵巻には、地獄の怖い場面だけじゃなく、人や動物の暮らしも一緒に描かれることがあるんだ。六道は、生き物が生まれ変わるとされる世界を六つに分けた仏教の枠組みで、人間もその中に含まれているんだよ。だから、悪い人だけが行く別世界の一覧だと思うと、自分たちの生き方も問いの中に入っていることを見落とす。絵を眺めるときも、怖さだけで終わらず、どんな行為や執着がその場面と結び付けられているかを見ると、当時の人が何を伝えようとしたのかを考えられるよ。",
+    "form": "六道",
+    "en": "Old illustrated scrolls can depict ordinary human and animal lives alongside frightening hell scenes. The six realms classify worlds of rebirth in Buddhism, including the human world. Treating them merely as destinations for bad people misses how they question our own lives. Looking at the acts and attachments linked with each scene moves interpretation beyond fear alone.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「六道を輪廻する」。人間も含む世界の区分として説明している。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "八支則",
+   "reading": "はっしそく",
+   "pos": "noun",
+   "meaning": "the eight limbs of yoga",
+   "defJa": "古典ヨーガの実践を八つに整理した体系",
+   "passage": {
+    "ja": "ヨーガの写真って姿勢が目立つから、それが修行の全部だと思いやすいよね。古典の八支則は実践を八つに整理したもので、姿勢だけでなく、行いを律することや呼吸を整えること、心を集中させることも含むんだ。体を動かす授業で一部を学ぶからといって、その授業が古典の体系を全部扱っているとは限らない。仏教の八正道と同じ八という数でも、中身や背景まで同じではないから、何を練習する項目なのかを一つずつ比べると、名前の似た教えを混ぜずに覚えられるよ。",
+    "form": "八支則",
+    "en": "Yoga photographs emphasize postures, making them seem like the whole practice. Its classical eight limbs also include ethical discipline, breathing, and concentration. A class using part of the tradition does not necessarily cover its entire system. Comparing what each element trains prevents confusion with Buddhism’s eightfold path merely because both have eight components.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「八支則に基づく」。姿勢だけでなく、行動や呼吸や集中を含む体系。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "八正道",
+   "reading": "はっしょうどう",
+   "pos": "noun",
+   "meaning": "the Noble Eightfold Path",
+   "defJa": "苦の滅に向かう仏教の八つの正しい実践",
+   "passage": {
+    "ja": "正しい見方を持っていても、日々の言葉や仕事がそれと離れていれば、学びは生活に結び付きません。八正道は、苦の滅へ向かう道を、見方、言葉、行い、集中など八つの面から示す仏教の教えです。一番を終えたら次へ進むだけの順番表として覚えるより、それぞれがどう支え合うかを考えると、実践の全体を捉えられます。たとえば注意深く話すためには、言おうとする内容だけでなく、自分の意図や相手への反応にも気付くことが関わると整理すると、項目の間に具体的なつながりが生まれます。",
+    "form": "八正道",
+    "en": "Understanding does not enter daily life if speech and work remain disconnected from it. The noble eightfold path presents the way toward the cessation of suffering through eight aspects including view, speech, action, and concentration. Considering their mutual support is more useful than treating them as a checklist completed sequentially. Reflecting on how attentive speech involves intentions and reactions makes those connections concrete.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「八正道を実践する」。順番だけでなく、八つの面の支え合いを見る。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "公案",
+   "reading": "こうあん",
+   "pos": "noun",
+   "meaning": "kōan",
+   "defJa": "禅の修行で参究する言葉や問答などの課題",
+   "passage": {
+    "ja": "意味がすぐにはつかめない禅の問答を読むと、面白い謎解きとして答えを探したくなります。公案は修行の中で参究する課題であり、言葉の仕掛けを見破れば終わる知識問題としてだけ捉えると、その役割を取り違えます。師とのやり取りや日々の実践に結び付いて用いられるため、同じ短い言葉でも、単独で読む場合とは位置付けが変わります。なぜ分かりにくいのかを考えるとともに、自分がいつもの理解の枠組みに何を押し込めようとしているかへ注意を向けると、読む姿勢そのものが問いになります。",
+    "form": "公案",
+    "en": "A puzzling Zen exchange can tempt readers to solve it like a riddle. A koan functions as a matter for investigation in practice, beyond detecting a verbal trick. Its place in teacher-student interaction and daily cultivation changes how a short expression functions. Asking what familiar framework one is imposing makes the reader’s approach itself part of the inquiry.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「公案を参究する」。知識の正解を当てる問題との違いを示す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

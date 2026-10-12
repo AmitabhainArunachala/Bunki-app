@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "漢和",
+   "reading": "かんわ",
+   "pos": "noun",
+   "meaning": "Chinese character-Japanese (dictionary)",
+   "defJa": "漢字や漢語を日本語で解説する辞書",
+   "passage": {
+    "ja": "経典を読み解くうえで、漢和辞典は今も有益な道具である。サンスクリット語から漢訳された語は、日本語の中で意味が変化した例が少なくないからだ。たとえば「覚」や「空」は、原語の概念をたどって初めて深みがわかる。原典の語と漢訳語を見比べる作業は、一見遠回りに見えて、実は理解への最短の道なのだ。一語の来歴をたどる手間を惜しまない人ほど、経典の読みは確実に深くなっていく。",
+    "form": "漢和",
+    "en": "In reading and interpreting the scriptures, the kanji dictionary remains a useful tool even now. This is because words translated into Chinese from Sanskrit have often changed in meaning within Japanese. For example, the depth of 'awakening' or 'emptiness' becomes clear only after tracing the concept in the original language. Comparing the original word with its Chinese rendering looks like a detour at first glance, but is in fact the shortest path to understanding. The more a person is willing to take the trouble of tracing a word's lineage, the more surely their reading of the scriptures deepens.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「漢和辞典」の形で使う複合語。漢字と日本語の橋渡しをする辞書を指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "符号",
+   "reading": "ふごう",
+   "pos": "noun",
+   "meaning": "sign, mark, code",
+   "defJa": "しるしや記号。暗号などの印",
+   "passage": {
+    "ja": "暗号の歴史って、符号を組み替えるだけの単純なものから始まってるんですよ。古代ローマのカエサルは、アルファベットを三つずらして文を書いたと伝えられています。でも、そんな方法は、規則さえ知られてしまえばそれまでです。結局、解読する側との知恵比べが、暗号を精密に進化させていったんですよね。解読の技術が進むたびに、暗号もまた新しい仕組みを求めて、何度も複雑に姿を変えてきました。",
+    "form": "符号",
+    "en": "The history of ciphers began with something simple, just rearranging the signs. Caesar of ancient Rome is said to have written text by shifting the alphabet by three. But a method like that is finished once the rule is known. In the end, the contest of wits with the decoders is what made ciphers evolve in precision. Each time decoding techniques advanced, ciphers too sought new mechanisms and changed form into something more complex, again and again.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「符号を打つ」「暗号の符号」。意味を運ぶしるしを指し、記号・コードに近い。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "発売",
+   "reading": "はつばい",
+   "pos": "noun",
+   "meaning": "sale, release",
+   "defJa": "商品を新しく売り出すこと",
+   "passage": {
+    "ja": "新しいインド哲学の入門書が発売されるたびに買い込む人がいる。しかし、本を揃えただけで満足してしまえばそれまでだ。学習効果を高めるには、一冊を読み終えたあとで、自分の言葉で要約するのが有益である。『バガヴァッド・ギーター』のような古典ほど、一行ごとに立ち止まって考える価値がある。書棚に積まれた背表紙より、ノートに残った自分の一行のほうが、後になって役に立つものだ。",
+    "form": "発売",
+    "en": "There are people who buy up every new introduction to Indian philosophy the moment it goes on sale. But if you are satisfied merely with having collected the books, that is the end of it. To raise the effect of learning, it is useful to summarize in your own words after finishing a book. The more a work is a classic like the Bhagavad Gita, the more it is worth stopping on every line to think. Rather than the spines lined up on a shelf, the single line of your own left in a notebook turns out more useful later.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「新商品を発売する」「発売日」。商品が市場で売り出される時点を指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

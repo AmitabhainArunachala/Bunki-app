@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "乾燥",
+   "reading": "かんそう",
+   "pos": "noun",
+   "meaning": "dryness; aridity",
+   "defJa": "水分が少なくなること",
+   "passage": {
+    "ja": "データセンターってさ、サーバーを冷やすのに水を使うところが多いじゃん。乾燥した地域に建てると、蒸発する水の量がどうしても心配になるんだよね。たとえば雨の少ない地域では、地下水をくみ上げすぎると農業用水まで足りなくなる。しかも水をめぐって、地元の人たちと企業が争いになる例も出てきてる。AIの利用が増えるにつれて、質問一回に使われる水の量まで議論されるようになった。",
+    "form": "乾燥",
+    "en": "Lots of data centers use water to cool their servers, right? If you build one in a dry region, the amount of evaporating water becomes a real worry. In a region with little rain, for example, pumping up too much groundwater can leave even farm irrigation short. On top of that, there are now cases where local people and companies end up in disputes over water. As AI use grows, even the amount of water used per question has come to be debated.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「乾燥した空気」「乾燥地帯」。水分が少ない状態。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "余る",
+   "reading": "あまる",
+   "pos": "verb",
+   "meaning": "to be left over; to be in excess",
+   "defJa": "必要な分より多く残る",
+   "passage": {
+    "ja": "たとえGPUが余るほどあっても、誰でもAIの学習ができるわけじゃないんですよ。大事なのは、チップを何千枚もずらっとつなぐ高速のネットワークと、それを動かし続ける電力です。昔は計算力が足りなくて困ってたのに、いまは電気が足りなくて新しいデータセンターが建たない地域まである。半導体の供給より、変電所や送電線の整備のほうが追いつかないんですよ。ボトルネックは、毎年のように場所を変えるんです。",
+    "form": "余る",
+    "en": "Even if you had GPUs to spare, not just anybody can train AI, you know. What matters is a high-speed network linking thousands of chips in a row and the electric power to keep it running. It used to be that there wasn't enough computing power, but now there are even regions where new data centers can't be built because there isn't enough electricity. It's the building of substations and power lines, rather than the chip supply, that can't keep up. The bottleneck changes its location almost every year.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "「予算が余る」「時間が余る」。必要を超えて残る。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

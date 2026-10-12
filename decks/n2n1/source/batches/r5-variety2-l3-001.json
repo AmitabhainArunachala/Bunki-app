@@ -1,0 +1,166 @@
+{
+ "items": [
+  {
+   "term": "ケイ素",
+   "reading": "けいそ",
+   "gloss": "silicon (the element)",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "語",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-6f3cd6ef9f-fcb82a15",
+    "wordId": "nn-6f3cd6ef9f"
+   }
+  },
+  {
+   "term": "シリコンサイクル",
+   "reading": "しりこんさいくる",
+   "gloss": "the silicon (chip-industry) cycle",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "報",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-705b5f5310-2b35f8d8",
+    "wordId": "nn-705b5f5310"
+   }
+  },
+  {
+   "term": "トランスフォーマー",
+   "reading": "とらんすふぉーまー",
+   "gloss": "Transformer (architecture)",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-adaa8bc7ed-7667a5ce",
+    "wordId": "nn-adaa8bc7ed"
+   }
+  },
+  {
+   "term": "パワー半導体",
+   "reading": "ぱわーはんどうたい",
+   "gloss": "power semiconductor",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "語",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010-r.json",
+    "cardId": "nn-8855de5d35-bc75aa89",
+    "wordId": "nn-8855de5d35"
+   }
+  },
+  {
+   "term": "プロセスルール",
+   "reading": "ぷろせするーる",
+   "gloss": "process rule (node size)",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "語",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+    "cardId": "nn-097f926e5b-28b071e7",
+    "wordId": "nn-097f926e5b"
+   }
+  },
+  {
+   "term": "リスク許容度",
+   "reading": "りすくきょようど",
+   "gloss": "risk tolerance",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "語",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-bc17e5f2c0-ddf9a38a",
+    "wordId": "nn-bc17e5f2c0"
+   }
+  },
+  {
+   "term": "不完全性定理",
+   "reading": "ふかんぜんせいていり",
+   "gloss": "incompleteness theorem",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-dff15cbcaf-9798f261",
+    "wordId": "nn-dff15cbcaf"
+   }
+  },
+  {
+   "term": "他の追随を許さない",
+   "reading": "たのついずいをゆるさない",
+   "gloss": "unrivaled",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+    "cardId": "nn-c82e01a10b-24104ed5",
+    "wordId": "nn-c82e01a10b"
+   }
+  },
+  {
+   "term": "先端半導体",
+   "reading": "せんたんはんどうたい",
+   "gloss": "leading-edge chips",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json",
+    "cardId": "nn-96088cb646-de99aa63",
+    "wordId": "nn-96088cb646"
+   }
+  },
+  {
+   "term": "分散合意",
+   "reading": "ぶんさんごうい",
+   "gloss": "distributed consensus",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "語",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-039-r.json",
+    "cardId": "nn-0e4de817c8-167fc0a7",
+    "wordId": "nn-0e4de817c8"
+   }
+  }
+ ],
+ "weave": [
+  "ケイ素",
+  "シリコンサイクル",
+  "トランスフォーマー",
+  "パワー半導体",
+  "プロセスルール",
+  "リスク許容度",
+  "不完全性定理",
+  "他の追随を許さない",
+  "先端半導体",
+  "分散合意"
+ ]
+}

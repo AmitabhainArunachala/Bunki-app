@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "ゲート絶縁膜",
+   "reading": "げーとぜつえんまく",
+   "pos": "noun",
+   "meaning": "gate dielectric",
+   "defJa": "制御電極と電流の通り道を隔てる薄い膜",
+   "passage": {
+    "ja": "流れを動かすには、必ずそこへ何かを流し込まなければならないとは限らない。トランジスタのゲート絶縁膜は、制御する電極と電流の通り道を隔てながら、電圧による働きかけを可能にする。薄くすればよいという発想だけを押し進めると、意図しない電流が膜を通りやすくなるなどの制約に突き当たるため、材料の性質も含めた工夫が要る。隔てることと働きかけることを同時に成立させる小さな層に注目すると、回路の性能が線のつなぎ方だけでは決まらないことが分かる。",
+    "form": "ゲート絶縁膜",
+    "en": "Controlling a flow does not always require directly injecting something into it. A transistor's gate dielectric separates the controlling electrode from the current path while allowing voltage to exert its influence. Pursuing thinness alone encounters constraints such as unintended current passing more easily through the layer, requiring attention to material properties. Focusing on this tiny layer that simultaneously separates and enables control shows why circuit performance depends on more than how wires connect.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "電気を直接通さず、電流を制御する場を伝える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ナノシート",
+   "reading": "なのしーと",
+   "pos": "noun",
+   "meaning": "nanosheet transistor channel",
+   "defJa": "極めて薄い板状に作られた微細な構造",
+   "passage": {
+    "ja": "電流の通り道を細くすると、横から押さえるだけでは流れを十分に制御しにくくなることがあります。そこで、薄い板状のナノシートを通り道として用い、その周囲をゲートで囲む構造が、先端のトランジスタで採られています。これは部品の名前を新しくしただけではなく、電流を制御する場所と通り道との位置関係を変える工夫です。ただし、囲めばすべての問題が消えるわけではなく、薄い層を均一に作る工程や熱を逃がす設計も含めて、性能と作りやすさを両立させます。",
+    "form": "ナノシート",
+    "en": "As current paths become narrower, controlling them from the sides alone may become insufficient. Advanced transistors therefore use thin, sheet-shaped nanosheets as channels surrounded by a gate. This is more than a new component name: it changes the spatial relationship between the current path and the structure controlling it. Surrounding the channel does not eliminate every problem, however, so performance must be balanced with manufacturability through uniform layer formation and heat-removal design.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "半導体では、電流の通り道となる薄い層を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "背面給電",
+   "reading": "はいめんきゅうでん",
+   "pos": "noun",
+   "meaning": "backside power delivery",
+   "defJa": "素子の裏側から電力を届ける配線方式",
+   "passage": {
+    "ja": "半導体の配線には、計算の結果を伝える信号用の経路だけでなく、素子へ電力を届ける経路も必要となる。背面給電は、電力の経路を裏側へ移し、表側の配線を信号のために使いやすくする技術である。微細化に伴って配線が混み合うなか、役割の異なる経路を分けることが、配置や電力供給の改善につながる。ただし、単に完成品を裏返す工程ではなく、裏側から接続するための加工や検査が必要となるため、回路の設計と製造方法を合わせて見直す技術として捉えられる。",
+    "form": "背面給電",
+    "en": "Semiconductor wiring needs not only signal paths carrying computational results but also paths delivering power to devices. Backside power delivery moves the power paths to the rear, making frontside wiring more available for signals. As miniaturization crowds the wiring, separating routes with different roles can improve layout and power delivery. This is not simply flipping a finished product; the processing and inspection needed for rear connections make it a technology that revises circuit design and manufacturing together.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "信号用と電力用の経路を分ける発想を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "漏れ電流",
+   "reading": "もれでんりゅう",
+   "pos": "noun",
+   "meaning": "leakage current",
+   "defJa": "本来流したくない経路や状態で流れる電流",
+   "passage": {
+    "ja": "スマホが何もしていないように見えると、回路の電気も完全に止まっていると思いたくなるよね。でも、トランジスタを切った状態でも意図しない小さな流れが残ることがあり、こうした漏れ電流は消費電力や発熱を考えるうえで無視できないんだ。部品が小さくなるに伴って電気を閉じ込める難しさも変わるので、速く動かす工夫と、休んでいるときに無駄を減らす工夫は一緒に考えることになる。画面の明るさだけでなく、見えないところで流れを抑える設計も、電池の持ちを支えているんだね。",
+    "form": "漏れ電流",
+    "en": "When a phone appears idle, it is tempting to think that electricity in its circuits has stopped completely. Yet small unintended flows can remain even when a transistor is switched off, and this leakage current matters for power consumption and heat. As components shrink, containing electricity poses changing challenges, so designs for fast operation must be considered alongside designs that reduce waste at rest. Battery life is supported not only by screen-brightness choices but also by unseen designs that suppress those flows.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "動作していないように見える回路の消費にも関わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "バンドギャップ",
+   "reading": "ばんどぎゃっぷ",
+   "pos": "noun",
+   "meaning": "band gap",
+   "defJa": "電子が属する二つの帯の間のエネルギー差",
+   "passage": {
+    "ja": "半導体の性質は、材料の内部で電子がどのようなエネルギーの状態を取れるかと結び付いている。バンドギャップは、電子で満たされた側の帯と電気を運ぶ側の帯の間にあるエネルギーの隔たりを表し、結晶の中に空洞があるという意味ではない。この大きさは電気や光への応答に関わるため、材料を選ぶにあたっては、使う電圧や温度、求める用途との関係を検討する。単に値が大きければ万能という指標ではなく、加工のしやすさや費用も含む設計上の選択の一要素となる。",
+    "form": "バンドギャップ",
+    "en": "Semiconductor properties are related to the energy states electrons can occupy within a material. The band gap is the energy separation between the occupied band and the conducting band, not a physical cavity inside the crystal. Its size affects electrical and optical responses, so material selection considers its relation to operating voltage, temperature, and application. A larger value is not universally better; it is one factor in design choices that also involve processing and cost.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "材料中の物理的な隙間を指す語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "熱抵抗",
+   "reading": "ねつていこう",
+   "pos": "noun",
+   "meaning": "thermal resistance",
+   "defJa": "熱の逃げ道が温度差を生む程度を示す量",
+   "passage": {
+    "ja": "同じ量の熱を出す部品でも、取り付け方や放熱先が違えば、部品の温度は変わります。一定の条件で、流れる熱に対してどれほど温度差が生じるかを表す熱抵抗を使うと、熱の逃げにくさを数値で比較できます。小さな半導体だけを見ているつもりでも、その外側の材料や接触の状態を抜きにして、温度上昇を見積もることはできません。冷却の設計では発熱する場所から周囲までの道筋を分け、どこで温度差が大きくなるかを追うと、改善すべき接点を絞れます。",
+    "form": "熱抵抗",
+    "en": "Components producing the same amount of heat can reach different temperatures depending on mounting and the destination of the heat. Under specified conditions, thermal resistance numerically compares how difficult heat is to remove by relating heat flow to the resulting temperature difference. Even when focusing on a tiny semiconductor, its temperature rise cannot be estimated without considering surrounding materials and contact conditions. Dividing the path from the heat source to the surroundings and tracing where temperature differences grow helps narrow down which interfaces need improvement.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "熱量ではなく、熱の移動しにくさを表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

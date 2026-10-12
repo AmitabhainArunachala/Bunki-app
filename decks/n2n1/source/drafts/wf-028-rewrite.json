@@ -1,0 +1,52 @@
+{
+ "cards": [
+  {
+   "term": "勃興",
+   "reading": "ぼっこう",
+   "pos": "noun",
+   "meaning": "sudden rise",
+   "defJa": "勢いよく盛んになること",
+   "passage": {
+    "ja": "ねえ、モンゴル帝国の勃興って、よく考えたらすごくないですか。十三世紀の初め、草原を駆けていた遊牧民の集団が、わずか数十年で東アジアから東ヨーロッパに及ぶ広大な地域を勢力下に置いたんですよ。史料を読むと、ただ暴れたわけじゃなくて、宿場と馬を備えた駅伝みたいな連絡網で、広い土地をちゃんと運営していたのがわかります。ここまで来ると、強さというより仕組みの勝利だと思うんですよね。しかも、宗教や出身を問わず優秀な人材を登用したことも、見逃せません。",
+    "form": "勃興",
+    "en": "Hey, when you think about it, isn't the rise of the Mongol Empire amazing? At the start of the thirteenth century, a band of nomads who had been galloping across the steppe brought a vast region stretching from East Asia to Eastern Europe under its power in just a few decades. Reading the historical sources, you can see they did not simply rampage but actually ran their vast lands through a relay-style network of waystations and horses. At this point I think it was less about strength than a victory of systems. And its practice of recruiting able people regardless of religion or origin should not be overlooked.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「帝国の勃興」「新興勢力の勃興」のように、勢力が一気に盛んになる時に使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "努力家",
+   "reading": "どりょくか",
+   "pos": "noun",
+   "meaning": "hard worker",
+   "defJa": "こつこつと努力を重ねる人",
+   "passage": {
+    "ja": "話し方が上達する人は、生まれつきの才能というより努力家であることのほうが多いものです。彼らは、うまくいかなかった場面を捨てずに、録音して、口調や間の取り方まで一語ずつ聞き返します。そのうえ、人前に立つ機会があれば、緊張していても断らずに引き受けて、場数を踏んでいきます。千里の道も一歩からと言うとおり、毎日のわずかな反復が一年後のあなたの声をじっくりと作っていくのです。",
+    "form": "努力家",
+    "en": "People whose speaking improves are more often hard workers than naturally gifted. Hard workers do not discard the occasions that went badly; they record them and listen back, down to tone and pauses, word by word. On top of that, when a chance to stand before an audience comes, they accept it even when nervous and gain experience. As the saying goes, a journey of a thousand miles begins with a single step, and small daily repetitions build the voice you will have a year from now.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「努力家」は人の性質を言う語。「天才肌」と対比されやすく、「〜な努力家」と続く。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "即時報酬",
+   "reading": "そくじほうしゅう",
+   "pos": "noun",
+   "meaning": "immediate reward",
+   "defJa": "行動の直後に得られる報酬",
+   "passage": {
+    "ja": "スマホのゲームがやめられないのは、意志が弱いからではありません。タップするたびに得点と音という即時報酬が返ってくるので、脳は次の一回を求めずにはいられないのです。一方、勉強や貯金の成果は何か月も先にならないと見えません。だからこそ、進み具合を可視化して、自分に手応えを与える工夫が欠かせないのです。ゲームの設計者は、この仕組みを知り尽くしているからこそ、プレイヤーを飽きさせないのです。",
+    "form": "即時報酬",
+    "en": "The reason you cannot quit a phone game is not that your will is weak. Every tap brings back an immediate reward in the form of points and sound, so the brain cannot help craving the next one. By contrast, the results of studying or saving do not show for months. That is exactly why it is essential to make your progress visible and give yourself a sense of traction. Game designers know this mechanism inside out, which is precisely why they keep players from getting bored.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "行動の直後に得られる報酬。習慣化の話では、遅れて来る報酬と対にして語られる。",
+    "sense": ""
+   }
+  }
+ ]
+}

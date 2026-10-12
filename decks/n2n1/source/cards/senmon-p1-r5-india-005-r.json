@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "輪廻",
+   "reading": "りんね",
+   "pos": "noun",
+   "meaning": "saṃsāra, the cycle of rebirth",
+   "defJa": "生死の世界を繰り返し巡ること",
+   "passage": {
+    "ja": "輪廻というと美しい生まれ変わりの物語を思い浮かべがちだが、インドの思想ではむしろ執着に縛られる側の話である。善い行いも悪い行いも、その結果が消えない限り、生死を繰り返す仕組み全体が延々と回り続けるとされる。この鎖の解き方は学派ごとに分かれ、仏教は縁起という条件の連なりで読み解き、ジャイナ教は魂に付着する業で説明してきた。解脱の議論に加えて、この循環から抜けるための修行や儀礼までが技術として体系化されてきた点にこそ、欧米の生まれ変わりイメージとの大きな温度差がある。",
+    "form": "輪廻",
+    "en": "Saṃsāra tends to call to mind a beautiful story of rebirth, but in Indian thought it is rather the story of the side that is bound by clinging. Good deeds and bad deeds alike, so long as their results do not vanish, are said to keep the whole mechanism of repeated birth and death turning on and on. How this chain is read differs from school to school: Buddhism reads it as a sequence of conditions called dependent origination, while Jainism has explained it through karma that adheres to the soul. In addition to the debates over liberation, even the practices and rites for escaping this cycle were systematized as techniques, and it is precisely there that the great difference in tone from the Western image of rebirth emerges.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「輪廻から解脱する」のように、抜け出す対象として語られるのが典型。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

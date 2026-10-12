@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "即座に",
+   "reading": "そくざに",
+   "pos": "adverb",
+   "meaning": "immediately; on the spot",
+   "defJa": "時間を置かず、その場ですぐに。",
+   "passage": {
+    "ja": "会議の記録に、彼女は即座に異議を唱えたとあれば、提案を聞いたその場で、間を置かず反対した様子が伝わります。後で考え直して返事をしたという場面には、この言い方は合いません。近いうちにという意味も持つすぐと比べ、動作が起きた時点との結びつきが強い表現です。口頭のやり取りを書き起こすに際しては、反応までの短い間にも注意を向けます。返事の内容に加えて、いつ言葉が出たかを記すことで、話し手のためらいや決意も描き分けられます。",
+    "form": "即座に",
+    "en": "If meeting minutes say that she immediately raised an objection, they convey that she opposed the proposal on the spot, without a pause after hearing it. This expression does not fit a scene in which she thought things over and replied later. Compared with sugu, which can also mean before long, it is more closely tied to the moment an action occurs. When transcribing an oral exchange, pay attention even to the brief interval before a reaction. Recording when the words emerged as well as what the reply contained can distinguish hesitation from resolve.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "提案を聞いたその場で間を置かずに反応する、時間の近さを強調します。",
+    "sense": ""
+   }
+  }
+ ]
+}

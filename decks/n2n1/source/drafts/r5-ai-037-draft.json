@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "不完全性定理",
+   "reading": "ふかんぜんせいていり",
+   "pos": "noun",
+   "meaning": "incompleteness theorem",
+   "defJa": "一定の公理系で証明に限界があるとする定理",
+   "passage": {
+    "ja": "数学の問いなら、公理と推論の規則を整えれば、必ず白黒がつくのでしょうか。不完全性定理が示すのは、十分な算術を扱え、公理を機械的に列挙できる無矛盾な体系であっても、そこで証明も反証もできない文があるという限界です。条件を外して「何も証明できない」と言い換えると、その体系で多くの定理が証明できることまで否定してしまいます。機械による証明を考える際にも、ある問いに答えられないことと、推論の仕組み全体が役に立たないことを、混同しないようにしましょう。",
+    "form": "不完全性定理",
+    "en": "Can every mathematical question be settled by establishing axioms and rules of inference? The incompleteness theorem shows that even a consistent system capable of sufficient arithmetic, with mechanically enumerable axioms, contains sentences it can neither prove nor refute. Removing those conditions and paraphrasing this as “Nothing can be proved” would also deny the many theorems the system can establish. When considering machine-generated proofs, distinguish inability to answer a particular question from the entire reasoning system being useless.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "適用される公理系の条件を省かずに述べる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ゲーデル数",
+   "reading": "げーでるすう",
+   "pos": "noun",
+   "meaning": "Gödel number",
+   "defJa": "式や証明に規則に従って割り当てた自然数",
+   "passage": {
+    "ja": "論理式は記号の並びであり、通常の算術が扱うのは数である。この隔たりを結ぶため、式や証明に一定の規則で自然数を対応させたものがゲーデル数と呼ばれる。適切な符号化を用いれば、ある記号列が正しい証明であるかという問いを、対応する数の性質についての問いへ移せる。数字を付ける作業は単なる資料整理にとどまらず、算術の内部で算術の証明について語る道を開くため、自己言及を含む議論の技術的な土台として位置付けられる。",
+    "form": "ゲーデル数",
+    "en": "Logical formulas are strings of symbols, whereas ordinary arithmetic deals with numbers. Gödel numbers bridge this gap by assigning natural numbers to formulas and proofs according to fixed rules. With suitable encoding, the question of whether a symbol sequence is a valid proof can be translated into a question about properties of the corresponding numbers. Numbering thus goes beyond organizing material: it opens a way for arithmetic to discuss its own proofs and provides a technical foundation for arguments involving self-reference.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "記号を数として扱えるようにする符号化を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "形式体系",
+   "reading": "けいしきたいけい",
+   "pos": "noun",
+   "meaning": "formal system",
+   "defJa": "記号と公理と推論規則を定めた仕組み",
+   "passage": {
+    "ja": "記号の意味が分からなくても、決められた置き換えの規則に沿って文字列を動かすことはできる。使える記号、公理、推論の規則を定めた形式体系では、どの結論がどの手順で導かれたかを追跡できることが強みとなる。ホフスタッターが記号の操作と意味の関係を探るときも、規則に従えることと、その記号が何を表すかを理解することの隔たりが思考を促す。ただし、機械的な操作だから意味がないと切り捨てれば、検証可能な証明を組み立てるという、この仕組みの働きまで見失う。",
+    "form": "形式体系",
+    "en": "Even without knowing what symbols mean, one can manipulate strings according to specified replacement rules. A formal system defining its symbols, axioms, and inference rules gains strength from making it possible to trace which procedure produced a conclusion. In Hofstadter's exploration of symbol manipulation and meaning, the gap between following rules and understanding what the symbols represent also invites reflection. Dismissing mechanical manipulation as meaningless, however, would overlook its role in constructing verifiable proofs.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "意味の解釈と、規則に従う操作とを分ける語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "無矛盾性",
+   "reading": "むむじゅんせい",
+   "pos": "noun",
+   "meaning": "consistency of a formal system",
+   "defJa": "同じ命題とその否定を共に導けない性質",
+   "passage": {
+    "ja": "ある決まりから「この文は正しい」と「この文は正しくない」が両方出てきたら、そのまま推論を進めてよいのか困るよね。同じ命題とその否定をともに証明できないという無矛盾性は、形式的な推論の仕組みを調べるときの大事な性質なんだ。ただ、それを確保したとしても、あらゆる問いに答えられるという約束まで手に入るわけではない。証明を機械に任せる話でも、矛盾を導かないことと、必要な答えを全部出せることを別々の欄に書くと、何を期待しているのか整理できるよ。",
+    "form": "無矛盾性",
+    "en": "If a set of rules produces both “This statement is true” and “This statement is not true,” you would wonder whether it is safe to keep reasoning from them. Consistency, the inability to prove both a proposition and its negation, is an important property when examining formal reasoning systems. But securing it does not also promise answers to every question. Even when discussing automated proof, putting freedom from contradiction and the ability to produce every needed answer in separate columns helps clarify what is being expected.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "真実をすべて言える性質とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "pos": "noun",
+   "meaning": "provability",
+   "defJa": "定めた公理と規則から結論を導けること",
+   "passage": {
+    "ja": "問題文に「正しい」とあったら、何に照らして正しいのかを余白に書き足してみましょう。形式的な論理を学ぶ際には、ある文が意図した解釈の下で真であることと、特定の公理と規則から導けるという証明可能性を区別します。十分な算術を含む体系を扱うともなれば、この違いを消したままでは、不完全性をめぐる議論の前提を読み落とします。まず使ってよい公理を紙の上に固定し、結論までの各段がどの規則によるかを確認すると、「真らしい」という感覚とは別の作業を体験できます。",
+    "form": "証明可能性",
+    "en": "If a problem says that something is correct, try noting in the margin what makes it correct. In formal logic, distinguish a sentence's truth under an intended interpretation from its provability using particular axioms and rules. When working with systems containing sufficient arithmetic, erasing this distinction causes one to miss assumptions in discussions of incompleteness. Fixing the permitted axioms on paper and checking the rule behind each step toward a conclusion provides an experience different from merely feeling that something seems true.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "どの体系の内部で成り立つかを必ず意識する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "停止問題",
+   "reading": "ていしもんだい",
+   "pos": "noun",
+   "meaning": "halting problem",
+   "defJa": "任意のプログラムが実行を終えるかを問う問題",
+   "passage": {
+    "ja": "「プログラムが止まるかどうかは分からない」とだけ書くと、短い計算の終了すら確かめられないように読めます。停止問題について説明する文章では、任意のプログラムと入力の組について、終了するかを必ず正しく判定する万能な手順は存在しない、と範囲を明らかにします。個々の例なら終わると証明できる場合もあるので、一般的な限界からすべての検証が無意味だとは言えません。「どんな場合にも」という条件を省かず残すだけで、計算の限界を述べる文の精度は大きく変わります。",
+    "form": "停止問題",
+    "en": "Merely writing that one cannot know whether a program stops can suggest that even a short calculation's completion cannot be established. An explanation of the halting problem should specify that no universal procedure can always correctly decide termination for every program and input pair. Some individual cases can be proved to terminate, so the general limitation does not make all verification meaningless. Retaining the condition “in every case” substantially changes the precision of a statement about the limits of computation.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "万能な判定手順の不存在と、個別の判定を分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "対角線論法",
+   "reading": "たいかくせんろんぽう",
+   "pos": "noun",
+   "meaning": "diagonal argument",
+   "defJa": "一覧の各項と異なるものを作って限界を示す方法",
+   "passage": {
+    "ja": "無限に続く零と一の列を、全部集めたと称する一覧があると想像してください。一行目の一番目、二行目の二番目という順に数字を拾い、それぞれを反転させて新しい列を作るのが、対角線論法の基本的な仕掛けです。できた列は、一覧のどの行と比べても、その行の番号に当たる場所で必ず違うので、全部あるという主張に反します。この手法を学ぶにあたっては、無限という言葉に圧倒される前に、相手の各項と違う箇所を一つずつ確保する工夫を、数行の図で追ってみましょう。",
+    "form": "対角線論法",
+    "en": "Imagine a list claiming to contain every infinite sequence of zeros and ones. The basic device of the diagonal argument is to take the first digit of the first row, the second of the second row, and so on, then flip each to make a new sequence. The resulting sequence differs from every listed row at the position matching that row's number, contradicting the claim of completeness. Before being overwhelmed by infinity, study the technique using a diagram of a few rows to trace how it secures one differing position for each entry.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "各行と違う箇所を一つずつ確保するのが要点。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "固定点",
+   "reading": "こていてん",
+   "pos": "noun",
+   "meaning": "fixed point",
+   "defJa": "ある操作をしても変わらない対象や値",
+   "passage": {
+    "ja": "ある変換に値を入れたとき、出力が入力と一致するなら、その値は変換の固定点と呼ばれる。数値計算では、出力を次の入力へ戻す操作を繰り返し、こうした値に近づける方法が用いられる。ただし、反復したからといって必ず収束するとは限らず、選んだ変換や初期値によっては値が行き来したり、離れていったりする。アルゴリズムの説明では、変わらなくなる値の存在と、採用した手順でそこへ到達できることを分けて示し、誤差をどこまで許すかも定める。",
+    "form": "固定点",
+    "en": "When a transformation produces an output equal to its input, that value is called a fixed point of the transformation. Numerical computation uses methods that feed outputs back as subsequent inputs to approach such values. Repetition does not necessarily converge, however; depending on the transformation and starting value, the results may oscillate or diverge. Algorithm descriptions distinguish the existence of an unchanged value from the chosen procedure's ability to reach it and specify acceptable error.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "同じ計算結果が偶然出ることとは区別する。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,158 @@
+{
+ "cards": [
+  {
+   "term": "ガバナンス",
+   "reading": "がばなんす",
+   "pos": "noun",
+   "meaning": "governance",
+   "defJa": "組織の判断や運用を監督し統制する仕組み",
+   "passage": {
+    "ja": "組織が人工知能を使う方針を掲げても、問題が起きたとき誰が止めるかを決めていなければ、言葉は現場の行動につながらない。ガバナンスとは、望ましい目標を述べるだけでなく、判断の責任、監督の方法、見直しの手順を組織の働きとして成立させる問いでもある。性能の向上を急ぐ一方で、失敗を報告した人が不利益を受ける組織では、掲げた安全の方針と実際の行動が離れてしまう。仕組みを評価するには、規則の厚さよりも、異常を伝える声がどこへ届き、誰の判断を変えるかをたどる必要がある。",
+    "form": "ガバナンス",
+    "en": "An AI policy does not guide action if no one has been assigned to stop operations when problems arise. Governance concerns making responsibility, oversight, and revision procedures function within an organization, not merely stating desirable goals. An organization that rushes performance improvements while penalizing people who report failures separates its declared safety policy from actual behavior. Evaluating the arrangement requires tracing where reports of anomalies go and whose decisions they change, rather than measuring the thickness of the rulebook.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "よい方針だけでなく、責任と確認の手順を含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "基板",
+   "reading": "きばん",
+   "pos": "noun",
+   "meaning": "a substrate or circuit board",
+   "defJa": "回路や部品を載せる土台となる板",
+   "passage": {
+    "ja": "電子工作の図を読むときは、部品の名前だけでなく、それらを支える基板にも注目しましょう。部品を置く位置と電気が流れる道筋は関係しており、同じ部品を集めても、それだけで同じ装置ができるとは限りません。配線の図と完成した写真を並べ、どの接続がどの線に対応するかを追うと、平面の記号と実物の立体的な配置を結び付けられます。授業では電源をつながない模型を使い、電流の経路を色分けしてから、線が交差して見える場所に接続があるかを確かめましょう。",
+    "form": "基板",
+    "en": "When reading an electronics diagram, notice the circuit board supporting the parts as well as their names. Part placement is related to the paths along which electricity flows, and simply collecting identical parts does not produce identical devices. Comparing the wiring diagram with a completed photograph and tracing corresponding connections links flat symbols to the physical arrangement. In class, use an unpowered model, color the current paths, and then check whether apparently crossing lines are actually connected.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「基盤」と同音だが、こちらは回路などを支える物理的な板。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "実存的リスク",
+   "reading": "じつぞんてきりすく",
+   "pos": "noun",
+   "meaning": "existential risk",
+   "defJa": "人類の存続や長期的な可能性を永久に損なう危険",
+   "passage": {
+    "ja": "人工知能を巡る議論では、実存的リスクという言葉が、日常の誤回答とは違う規模の危険を指して使われます。人類の絶滅や、将来の可能性が永久に大きく失われる事態を問題にしているので、単に重大な損失が出るという話と分けて読みましょう。そうした事態に至る仮説を示すことと、発生する確率や時期を確定することは別であり、強い表現だけでは予測の根拠になりません。論点を整理する際は、想定された経路、未確認の前提、反対の見解を別々の欄に書き出すと、それぞれの主張を比較できます。",
+    "form": "実存的リスク",
+    "en": "In discussions of artificial intelligence, existential risk refers to danger on a different scale from everyday incorrect answers. It concerns human extinction or a permanent major loss of future potential, so distinguish it from merely substantial losses. Proposing a pathway to such an event is different from establishing its probability or timing, and strong language alone cannot support a forecast. To organize the debate, put proposed pathways, unverified assumptions, and opposing views into separate columns for comparison.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "被害の大きさに加え、人類の長期的な可能性の喪失を含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "技術的特異点",
+   "reading": "ぎじゅつてきとくいてん",
+   "pos": "noun",
+   "meaning": "technological singularity",
+   "defJa": "技術の進歩で社会の先行きが大きく読めなくなる転換点",
+   "passage": {
+    "ja": "高度な人工知能の将来を語る際に技術的特異点を持ち出す議論は、単なる性能の向上を超えた社会の転換を想定している。機械が人間の能力を上回り、さらなる改良を加速するという筋道が示されることもあるが、定義や到来の見通しは一様ではない。特定の試験で得点が上がったからといって、その筋道全体が確認されたことにはならず、間にある前提の検討が残る。議論の魅力や不安の強さから一度離れ、どの能力が何を変え、次の変化へどうつながるという主張なのかを分解することが、予測を読む土台となる。",
+    "form": "技術的特異点",
+    "en": "Invoking a technological singularity in discussions of AI assumes a societal turning point beyond mere performance improvement. Some accounts propose machines surpassing human abilities and accelerating further improvement, but definitions and expectations of arrival differ. Higher scores on particular tests do not establish that entire pathway, leaving intervening assumptions to examine. Setting aside excitement or anxiety to separate which abilities change what and how those changes lead onward provides a basis for evaluating the forecast.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "定義や時期に合意がある事実として扱わず、予測の前提を読む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "楽観論",
+   "reading": "らっかんろん",
+   "pos": "noun",
+   "meaning": "an optimistic outlook",
+   "defJa": "将来をよい方向へ進むと見る考え",
+   "passage": {
+    "ja": "新たな人工知能を導入すれば生産性が高まるという楽観論には、作業の短縮がほかの価値ある仕事へつながるという期待がある。だが下書きを速く作れても、確認や修正に多くの時間がかかれば、全体の負担が同じ割合で減るとは限らない。効果を調べる際は、導入前後の作業時間に加え、成果物の品質や担当者に移った新しい仕事も対象となる。将来の利益を説明する資料には、どの業務で何を省けるのか、残る工程にどの程度の費用がかかるのかという前提を示すことが、予測の比較を可能にする。",
+    "form": "楽観論",
+    "en": "Optimistic views that AI will raise productivity assume time saved will translate into other valuable work. But faster drafts may not reduce total burdens proportionally if checking and revision take substantial time. Evaluating effects requires looking at output quality and new tasks shifted to workers as well as before-and-after working time. Forecasts become comparable when they state which tasks can be removed in which operations and how much the remaining stages cost.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "よい見通しを指す語で、実際の効果や根拠の確かさとは別。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "知的財産",
+   "reading": "ちてきざいさん",
+   "pos": "noun",
+   "meaning": "intellectual property",
+   "defJa": "発明や創作などから生まれる無形の財産",
+   "passage": {
+    "ja": "半導体の価値を考えるとき、工場や装置のように目に見えるものだけを数えると、大事な部分が抜け落ちます。回路の発明や設計上の工夫など、創造的な活動から生まれる知的財産も、企業の競争力に関わるからです。ただし、発明の内容を公開して保護を求めることと、情報を秘密として管理することでは、選ぶ仕組みも考え方も異なります。何かを生み出したからといって、すべてを同じ条件で自動的に独占できるとは限りません。技術紹介を読む際は、製品そのものと、その背後で利用が管理されるアイデアや情報とを分けて考えましょう。",
+    "form": "知的財産",
+    "en": "When assessing the value of semiconductors, counting only visible assets such as factories and equipment leaves out something important. Intellectual property arising from creative work, including circuit inventions and design innovations, also contributes to competitiveness. However, disclosing an invention to seek protection and keeping information confidential involve different mechanisms and approaches. Creating something does not automatically grant exclusive control over everything under identical conditions. When reading a technology introduction, distinguish the product itself from the ideas and information behind it whose use is managed.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "目に見える設備とは異なる、発明や創作などによる財産を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "計算資源",
+   "reading": "けいさんしげん",
+   "pos": "noun",
+   "meaning": "computing resources",
+   "defJa": "処理に使う演算能力や記憶容量などの設備上の能力",
+   "passage": {
+    "ja": "大規模な人工知能を育てる学習計画では、使える計算資源を把握することが、実行可能な実験の範囲を定める。演算装置の台数が多くても、記憶容量が足りなかったり、装置間の通信に時間がかかったりすれば、期待どおりの速さにはならない。大きなモデルを選ぶにしても、先に小規模な試行で処理時間と使用量を測定し、どこに制約があるかを確かめる手順が考えられる。限られた設備を複数の研究者が使う場合には、実験の優先順位と利用時間の割り当ても、研究計画の具体的な条件となる。",
+    "form": "計算資源",
+    "en": "In a training plan for large-scale artificial intelligence, understanding available computing resources defines the range of feasible experiments. Even many processors will not deliver the expected speed if memory is insufficient or communication between devices takes too long. Even when choosing a large model, small trials can first measure processing time and resource use to identify constraints. When several researchers share limited equipment, experiment priorities and time allocation also become concrete conditions of the research plan.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "演算の速さだけでなく、記憶容量なども含めて捉える。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

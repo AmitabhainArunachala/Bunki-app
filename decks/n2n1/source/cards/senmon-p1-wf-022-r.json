@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "畜生",
+   "reading": "ちくしょう",
+   "pos": "noun",
+   "meaning": "beast, brute",
+   "defJa": "人以外の動物。仏教で六道の一つ",
+   "passage": {
+    "ja": "仏教の世界観では、生き物は六つの世界を輪廻するとされ、人間や天の世界のほかに、畜生や餓鬼の世界も数えられる。地獄と阿修羅を加えたこの六つは、あわせて六道と呼ばれる。この語は本来、人間以外の動物を指し、本能と愚かさに支配された状態の象徴でもあった。後に罵りの言葉として日本語に定着し、元の宗教的な意味は薄れていった。だが和尚の法話では今も、人は心のあり方次第で、天にも地獄にも近づくと説かれる。",
+    "form": "畜生",
+    "en": "In the Buddhist worldview, living beings are said to transmigrate through six realms, which count the worlds of humans and devas as well as those of beasts and hungry ghosts. Adding hell and the asuras gives six realms, called together the six paths. The word originally referred to animals other than humans and was also a symbol of a state ruled by instinct and folly. Later it settled into Japanese as an expletive, and its original religious meaning faded. Yet in a monk's sermon even now, it is taught that, depending on the state of one's mind, a person can approach either heaven or hell.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「畜生道」は六道の一つ。罵り言葉の「ちくしょう」とは語の来歴が重なる。",
+    "sense": "動物、六道の一つ"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "米中対立",
+   "reading": "べいちゅうたいりつ",
+   "pos": "noun",
+   "meaning": "US-China rivalry",
+   "defJa": "米国と中国が互いに対抗し合う状態",
+   "passage": {
+    "ja": "米中対立は、2018年に米国が中国製品への追加関税を発動したのを機に、一気に表面化した。関税の応酬は、双方の暮らしにも少なからず跳ね返ってきた。その後、争点は貿易から先端半導体の輸出管理へと広がり、地政学の問題として各国の企業を巻き込んでいる。台湾に集中する半導体の生産は、供給網の最も脆い部分だと指摘されて久しい。企業は効率だけでなく、調達先の分散という安全保障の視点からも、戦略の見直しを余儀なくされている。",
+    "form": "米中対立",
+    "en": "The US-China rivalry surfaced all at once when, in 2018, the United States imposed additional tariffs on Chinese goods. The exchange of tariffs also rebounded to no small degree on people's lives on both sides. Since then, the point of contention has broadened from trade to export controls on advanced semiconductors and, as a geopolitical issue, is drawing in companies in many countries. It has long been pointed out that semiconductor production concentrated in Taiwan is the most fragile part of the supply chain. Companies are being forced to rethink strategy not just for efficiency but also from the security viewpoint of diversifying suppliers.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「米中対立の激化」「米中対立が深まる」。国名の略称を並べた複合語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "特許",
+   "reading": "とっきょ",
+   "pos": "noun",
+   "meaning": "special permission, patent",
+   "defJa": "発明に対して国が認める独占的な権利",
+   "passage": {
+    "ja": "特許の仕組みを学び始めたばかりの人は、まず条文の言い回しの硬さに驚くはずです。しかし、この制度の目的が「発明を公開するかわりに、一定期間の独占を認める」ことだと押さえれば、細かい規定の多くが一本の筋でつながります。半導体やAIの分野で出願が相次ぐ理由も、同じ仕組みから説明できます。たとえば新しい半導体の製造方法が公開されると、他社はそれを手がかりに改良を重ねられます。暗記より先に趣旨を理解するのが、法律科目の定石ですね。",
+    "form": "特許",
+    "en": "Someone who has just begun learning how patents work will surely be surprised first by how stiff the wording of the provisions is. But once you grasp that the purpose of the system is to 'grant a monopoly for a fixed period in exchange for disclosing the invention,' many of the detailed rules connect along a single thread. The reason filings keep coming in the fields of semiconductors and AI can also be explained by the same mechanism. For example, once a new semiconductor manufacturing method is published, other companies can build on it with further improvements. Understanding the purpose before memorizing is the standard approach for legal subjects.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「特許を取る」「特許権」。発明を保護する法制度の語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "科学革命",
+   "reading": "かがくかくめい",
+   "pos": "noun",
+   "meaning": "Scientific Revolution",
+   "defJa": "近代科学が成立した、世界観の大転換",
+   "passage": {
+    "ja": "科学革命というと、ガリレオやニュートンの名前が浮かびますが、それを支えたのは、印刷術や望遠鏡といった技術の普及でした。もちろん、一夜にして世界観が変わったわけではありません。16世紀から17世紀にかけて、技術の普及に伴って、人々は「古代の権威が言うから正しい」という態度から、「観察と実験によって客観的に確かめる」という態度へ移っていきます。この転換が、のちの啓蒙思想や産業革命の土台になったのです。",
+    "form": "科学革命",
+    "en": "When people say the Scientific Revolution, the names of Galileo and Newton come to mind, but what supported it was the spread of technologies such as printing and the telescope. Of course, worldviews did not change overnight. From the sixteenth to the seventeenth century, along with the spread of technology, people moved from the attitude that ancient authority makes a thing right to the attitude of verifying objectively through observation and experiment. This shift became the foundation of the later Enlightenment and the Industrial Revolution.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「科学革命」は十六〜十七世紀の知の転換を指す。「産業革命」と区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "history",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "粘る",
+   "reading": "ねばる",
+   "pos": "verb",
+   "meaning": "to be sticky, to be adhesive",
+   "defJa": "あきらめず、しつこく続けて頑張る",
+   "passage": {
+    "ja": "勉強に限らず、最後にうまくいく人は、才能よりも踏ん張れるかどうかで決まる気がするんだよね。ただ、粘るって言うと根性論みたいに聞こえるけど、実際は「やめ方を工夫する」ことに近いんだ。根性を絞り出すより、仕組みで続けるという発想だね。たとえば、わからない問題は十分だけ考えると決めて、それでもだめなら解説を読む。そうやって区切りをつけておけば、決意が揺らぐ日でも、根気を使い果たさずに続けられるんだよ。",
+    "form": "粘る",
+    "en": "Not just in studying, I feel that those who succeed in the end are decided by whether they can hang in there rather than by talent. But saying persevere sounds like grit-talk, whereas it's actually closer to devising how to quit. It's the idea of continuing through a system rather than wringing out guts. For instance, you decide to think about an unsolved problem for just ten minutes and, if that doesn't work, read the explanation. If you set limits like that, you can keep going without exhausting your stamina even on days when your resolve wavers.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「粘って頑張る」「粘り強い」。粘る＝手放さず続ける意の比喩的用法。",
+    "sense": "あきらめずに頑張る"
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "生まれつき",
+   "reading": "うまれつき",
+   "pos": "adverb",
+   "meaning": "by nature, by birth",
+   "defJa": "生まれたときから備わっていること",
+   "passage": {
+    "ja": "「天才は先天的なものか、育ちか」という古い問いに、近年の研究は第三の答えを加えつつある。遺伝は気質など個人差の一部を確かに説明するが、その現れ方は環境によって大きく変わるというのだ。実際、双子の研究でも、環境が異なれば似た素質の持ち主が別々の道を歩む例が報告されている。同じ素質でも、練習の量と質が違えば、到達点には開きが出る。生まれつきの才能を信じるあまり、努力の余地を見失うのは大きな損失である。",
+    "form": "生まれつき",
+    "en": "Recent research is adding a third answer to the old question of whether genius is innate or the product of upbringing. Genes certainly explain part of individual differences, such as temperament, but how they manifest changes greatly with the environment. Indeed, twin studies too have reported cases in which people of similar aptitude walk separate paths when their environments differ. Even with the same aptitude, if the amount and quality of practice differ, the point reached will differ. To lose sight of room for effort through excessive belief in innate talent is a great loss.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「生まれつきの才能」「生まれつき〜だ」。後天的な育ちと対比される。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "mind",
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

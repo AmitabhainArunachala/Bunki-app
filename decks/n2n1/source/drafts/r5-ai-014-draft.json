@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "供給網",
+   "reading": "きょうきゅうもう",
+   "pos": "noun",
+   "meaning": "supply network",
+   "defJa": "原料から製品の供給を結ぶ企業や工程のつながり",
+   "passage": {
+    "ja": "半導体の供給網を評価するには、直接の取引先を数えるだけでなく、その先にある材料や設備の調達先も確認する必要がある。購入先が二社あっても、両社が同じ工場の材料に依存していれば、障害への備えは見かけほど厚くない。反対に、在庫や代替工程があれば、一か所の停止が直ちに全体の停止を意味するとも限らない。重要なのは、線の本数よりも、どの線が同じ地点に集まっているかである。その依存関係を図にすることで、追加の備えを置く場所を具体的に議論できる。",
+    "form": "供給網",
+    "en": "Evaluating a semiconductor supply network requires examining sources of materials and equipment beyond direct suppliers. Two vendors may offer less protection than they appear to if both depend on material from the same factory. Conversely, inventory or alternative processes can prevent one interruption from immediately halting the whole system. Where connections converge matters more than simply counting them. Drawing those dependencies makes it possible to discuss precisely where additional safeguards belong.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "一本の流れだけでなく、分岐や共通の依存先も含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "偽情報",
+   "reading": "にせじょうほう",
+   "pos": "noun",
+   "meaning": "disinformation",
+   "defJa": "人を欺く意図で作られたり広められたりする情報",
+   "passage": {
+    "ja": "「この動画、有名な技術者が開発中止を発表しているよ」と送られてきたら、再生回数だけで本物だと決めないでね。声や口の動きを人工知能で作れるので、本人の公式発表と一致するかを先に調べたいところです。ただ、間違った内容があっただけで、すぐに偽情報と断定するのも早いんです。意図して人を欺いたのか、勘違いで伝えたのかは、内容の真偽とは別に確かめる話だからです。友人へ転送する前に元の発表を探す、その一手間が、うわさを増幅する流れを止めます。",
+    "form": "偽情報",
+    "en": "If someone sends a video claiming that a famous engineer has announced the end of development, do not judge its authenticity by its view count. Because AI can generate voices and lip movements, first check it against the person's official statement. Yet finding an error alone is not enough to immediately label something disinformation. Whether someone intended to deceive or passed on a misunderstanding is a separate question from whether the content is true. Taking time to locate the original announcement before forwarding it can interrupt the spread of a rumor.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "内容の誤りと、発信者の意図は分けて確かめる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "優位性",
+   "reading": "ゆういせい",
+   "pos": "noun",
+   "meaning": "advantage, superiority",
+   "defJa": "比較する相手より有利な性質や立場",
+   "passage": {
+    "ja": "計算機の性能を比較する授業では、まず処理の速さだけが評価基準ではないことを押さえる。同じ作業を短時間で終える機器にも、電力や価格の面で不利な点があり得るからである。そこで、優位性を述べる際には、比較する相手と指標を示し、測定した条件をそろえる。ある半導体が画像の処理で優れていても、その結果をすべての計算へ広げることはできない。性能表の各列を別々に読んだ上で、利用する場面にとって何が重要かを選ぶと、数値と購入の判断が結び付く。",
+    "form": "優位性",
+    "en": "A lesson comparing computers first establishes that processing speed is not the only criterion. A device that finishes a task quickly may have disadvantages in power use or price. Claims of superiority should therefore identify the comparison and metric under matched measurement conditions. A chip's strength in image processing cannot be generalized to every computation. Reading each column of a performance table separately and choosing what matters for the intended use connects the figures to a purchasing decision.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "何について、誰より有利なのかを明示する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先端パッケージング",
+   "reading": "せんたんぱっけーじんぐ",
+   "pos": "noun",
+   "meaning": "advanced packaging",
+   "defJa": "複数の半導体などを高密度に接続し実装する技術",
+   "passage": {
+    "ja": "小さな計算機を一枚の巨大な板に描こうとして、私は途中で鉛筆を止めた。別々に作った部分を近くに並べたり、上下に重ねたりして結ぶ方法もあると知ったからだ。先端パッケージングという言葉は、製品をきれいな箱に入れる話だと思っていたが、実際には内部の接続や配置が性能を左右する技術の話だった。図の中で部品を重ねてみると、距離を縮める利点だけでなく、熱をどこへ逃がすかという疑問も生まれた。私は板の輪郭を消し、部品の間をつなぐ線と、熱の出口を描き足した。",
+    "form": "先端パッケージング",
+    "en": "I stopped halfway through drawing a small computer as one enormous board. I had learned that separately made parts can also be connected side by side or stacked. I had thought advanced packaging meant putting products in attractive boxes, but it concerns internal connections and layouts that influence performance. Stacking the parts in my sketch raised questions about removing heat as well as the benefits of shorter distances. I erased the board's outline and added connections between the parts and paths for heat to escape.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "包みの外観ではなく、接続や配置の技術に注目する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先端半導体",
+   "reading": "せんたんはんどうたい",
+   "pos": "noun",
+   "meaning": "leading-edge chips",
+   "defJa": "その時点で高度な製造技術などを用いた半導体",
+   "passage": {
+    "ja": "今日は、先端半導体という言葉だけでは、製品の用途まで分からないことを確認しましょう。細かな回路を作る技術は、限られた面積へ多くの素子を集めるための重要な手段です。しかし、電力を制御する部品や感覚器のような働きをする部品には、別の性能や製造上の条件も関わります。新しい世代だからどの用途でも最適だと考えると、費用や信頼性の比較を飛ばしてしまいますね。製造技術の新しさを表す説明を読んだ後には、その部品が何をするのかを製品図で確かめてください。",
+    "form": "先端半導体",
+    "en": "Today, let us establish that the label leading-edge semiconductor does not by itself identify a product's purpose. Making fine circuits is an important way to fit many devices into a limited area. However, power-control and sensing components also depend on other performance requirements and manufacturing conditions. Assuming the newest generation is best for every use skips comparisons of cost and reliability. After reading about manufacturing advances, check a product diagram to see what the component actually does.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "新しさの基準と、実際の用途を分けて考える。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "先行者利益",
+   "reading": "せんこうしゃりえき",
+   "pos": "noun",
+   "meaning": "first-mover advantage",
+   "defJa": "早く市場へ参入したことで得られる有利な条件",
+   "passage": {
+    "ja": "生成型人工知能の事業を巡る報道では、先行者利益が競争の焦点として取り上げられる。利用者を早期に集め、使用上の課題を学べれば、製品を改善する材料を得られるためだ。一方、先に開発費を負担した企業が、後から参入した企業に価格や使いやすさで追い越される可能性もある。利用者数だけでは、乗り換えにくさや継続的な収益まで判断できない。企業の強みを比較する記事には、参入時期に加え、顧客が使い続ける理由と、その関係を維持する費用を示す視点が求められる。",
+    "form": "先行者利益",
+    "en": "Coverage of generative AI businesses discusses first-mover advantage as a focus of competition. Attracting users early and learning their problems can provide material for product improvement. However, later entrants may surpass a company that bore the initial development costs in price or ease of use. User numbers alone do not reveal switching barriers or recurring revenue. Comparing company strengths requires examining why customers remain and what maintaining those relationships costs, alongside entry dates.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "早さだけで利益が保証されるという意味ではない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "公平性",
+   "reading": "こうへいせい",
+   "pos": "noun",
+   "meaning": "fairness",
+   "defJa": "人や集団を不当に有利または不利に扱わないこと",
+   "passage": {
+    "ja": "採用を支援する人工知能の公平性は、すべての応募者に同じ計算式を使うだけでは確保できない。過去の選考に偏りがあれば、それを学んだ仕組みが同じ偏りを引き継ぐ場合があるからだ。他方、集団ごとの採用率を一致させることと、誤判定の割合をそろえることも、同一の目標ではない。どの指標を重視するかは、影響を受ける人々と選考の目的を踏まえて説明されるべきである。単一の数値で正しさを宣言する前に、誰のどの不利益を減らそうとしているのかを明らかにしたい。",
+    "form": "公平性",
+    "en": "Fairness in AI-assisted hiring is not secured simply by applying the same formula to everyone. A system trained on biased past selections may inherit those biases. Matching selection rates across groups and matching error rates are also different objectives. The choice of metric should be explained with reference to affected people and the purpose of selection. Before declaring correctness through one figure, we should identify whose disadvantage we aim to reduce and in what respect.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "同じ扱いと、同じ結果になることを混同しない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "共進化",
+   "reading": "きょうしんか",
+   "pos": "noun",
+   "meaning": "coevolution",
+   "defJa": "複数のものが互いに影響しながら変化すること",
+   "passage": {
+    "ja": "「新しい対話機能を使っていたら、私の質問の仕方まで変わったんだ」と友人が言っていました。開発側も利用者の反応を見て機能を変えるなら、人と技術は一方通行ではなく、互いに影響しているんですね。この関係を共進化と呼ぶことがありますが、生物の遺伝的な変化をそのまま説明しているのではなく、比喩としての使い方です。それに、一回の会話で製品全体が更新されるとは限りません。自分が慣れる速さと、開発者が改良を届ける速さを分けて考えると、二つの変化を追えます。",
+    "form": "共進化",
+    "en": "A friend told me that using a new chat feature had even changed the way she asked questions. If developers also change features in response to users, people and technology influence each other rather than moving in one direction. This relationship is sometimes called coevolution, using the biological term metaphorically rather than describing genetic change itself. Nor does one conversation necessarily update the whole product. Distinguishing the pace of personal adaptation from the pace of product improvements lets us follow both changes.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "技術と人の関係では、生物学から広げた比喩として使う。",
+    "sense": ""
+   }
+  }
+ ]
+}

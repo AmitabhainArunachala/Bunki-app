@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "普及",
+   "reading": "ふきゅう",
+   "pos": "noun",
+   "meaning": "spread, diffusion",
+   "defJa": "広く行き渡ること",
+   "passage": {
+    "ja": "生成AIの普及は、歴史的に見ても異例の速さだった。二〇二二年末に公開されたChatGPTは、二か月ほどで月間利用者が一億人に達したと報じられた。専用の機器が要らず、画面に文章を打つだけで使えたことが大きい。学校や企業は使用を認めるか禁じるかの判断を余儀なくされ、各国で規制をめぐる議論が活発になった。便利さの裏で、出力された情報の真偽を自分で確かめる習慣が、いっそう重要になっている。",
+    "form": "普及",
+    "en": "The spread of generative AI was unusually fast even by historical standards. ChatGPT, released at the end of 2022, was reported to have reached a hundred million monthly users in about two months. It mattered that no special device was needed, only typing text on a screen. Schools and companies were forced to decide whether to allow or forbid its use, and debate over regulation grew heated in many countries. Behind the convenience, the habit of checking for yourself whether the output is true has become all the more important.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「技術の普及」「普及率」。新しいものが社会に広がる流れを指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "森林",
+   "reading": "しんりん",
+   "pos": "noun",
+   "meaning": "forest, woods",
+   "defJa": "木が広く茂っている所",
+   "passage": {
+    "ja": "インドでは古来、人生を四つの時期に分ける考え方があり、その三番目が「林住期」です。家督を子に譲った人が、森林に入って静かな暮らしを送る時期のことです。静かな暮らしに憧れる人は、いまも少なくありません。俗世を離れるというより、世間の役割を手放して本来の自分に戻る時間だと考えると、現代の私たちにも他人事ではありません。ブッダも家を出てのち、各地の森の中で長く修行を重ねたと伝えられる。",
+    "form": "森林",
+    "en": "In India since ancient times there has been a way of dividing life into four stages, and the third is the 'forest-dwelling stage'. It is the period when a person who has passed the household to a child goes into the forest to lead a quiet life. Even now, not a few people long for a quiet life. If you think of it less as leaving the world than as putting down society's roles and returning to your true self, it is no stranger to us today. The Buddha too is said to have practiced for a long time in forests in various places after leaving home.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「森林」は広く木が茂る場所。「森林浴」「森林伐採」と使う。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "楽器",
+   "reading": "がっき",
+   "pos": "noun",
+   "meaning": "musical instrument",
+   "defJa": "音楽を演奏する道具",
+   "passage": {
+    "ja": "楽器の練習で上達が速い人は、通しで弾くより、つまずく小節だけを何度も繰り返す。AIの学習も似たところがあり、すでに正解できる例ばかり見せても、性能は伸びるどころか、ほとんど変わらない。意図的に苦手な例を与えることで、モデルはようやく弱点を直していく。勉強の効率は、時間の長さよりも、間違いに向き合う密度で決まるものだ。同じ時間を使うなら、できる部分より、できない部分に使うべきだ。",
+    "form": "楽器",
+    "en": "People who improve quickly at a musical instrument repeat only the bars where they stumble, rather than playing through. AI training is similar: showing only examples it can already answer correctly leaves performance almost unchanged, let alone improved. By deliberately giving it weak examples, the model finally fixes its weaknesses. The efficiency of study is determined not by the length of time but by the density with which you face your mistakes. If you are spending the same time, you should spend it on the parts you cannot do rather than on the parts you can.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「楽器を演奏する」。弦楽器・管楽器など、音を出す道具の総称。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "改める",
+   "reading": "あらためる",
+   "pos": "verb",
+   "meaning": "to correct, to change for the better",
+   "defJa": "悪い点を直して良くする",
+   "passage": {
+    "ja": "江戸の町人は、年の暮れになると帳面を締め、借金も人間関係のもつれも清算して新年を迎えた。過ちを改めるのに暦は要らないとはいえ、区切りの日が人を動かす力は侮れない。暦とは時間を測る道具であると同時に、生き方を見直す口実を社会が共有するための仕掛けでもあったのだ。そこに込められた意図は、人間の弱さへの思いやりだったのではないか。新年の誓いが三日で消えるのもまた、人間らしい話である。",
+    "form": "改める",
+    "en": "Townspeople in Edo closed their account books at year's end, settling debts and tangled relationships before welcoming the new year. True, one needs no calendar to correct a mistake, but the power of a dividing day to move people should not be underestimated. A calendar was a tool for measuring time and, at the same time, a device by which society shared a pretext for reviewing how to live. Perhaps the intent behind it was kindness toward human weakness. That new-year resolutions vanish within three days is also very human.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「過ちを改める」のように、悪い点を直す意味で使う。",
+    "sense": "誤りや態度を直す"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "文房具",
+   "reading": "ぶんぼうぐ",
+   "pos": "noun",
+   "meaning": "stationery",
+   "defJa": "筆記や事務に使う道具の総称",
+   "passage": {
+    "ja": "紀元前のエジプトで、文房具といえばパピルスと葦のペンだった。紙が広まる以前、書くという行為は一部の書記だけが担う専門技術だったのである。やがて中国で紙が改良され、筆や墨とともに東へ西へ運ばれると、知識の流通する速度は一変した。紙の普及に伴って、何を使うかが何を学べるかを決める時代が来たのだ。現代の私たちが万年筆や付箋を選ぶときの小さなこだわりも、その長い歴史の延長線上にある。",
+    "form": "文房具",
+    "en": "In ancient Egypt before our era, stationery meant papyrus and a reed pen. Before paper spread, writing was a specialized skill carried out only by a few scribes. When paper was later improved in China and carried east and west along with brushes and ink, the speed at which knowledge circulated changed completely. As paper became widespread, an age arrived in which what you used decided what you could learn. Even the small preferences we have today when choosing a fountain pen or sticky notes lie on the extension of that long history.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「文房具」は筆記・事務用の道具全般。筆や紙も含む。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

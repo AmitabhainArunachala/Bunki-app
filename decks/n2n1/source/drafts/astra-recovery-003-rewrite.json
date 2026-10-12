@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "賄う",
+   "reading": "まかなう",
+   "pos": "verb",
+   "meaning": "cover; meet the cost of",
+   "defJa": "必要な費用や物を用意して足りさせる。",
+   "passage": {
+    "ja": "小さな読書会の案内に、会場費は参加費で賄うと書くと、集めたお金の使い道が一文で示せます。これに対して、参加者に協力を求めるとだけ書いた場合、金銭の負担があるかどうかは伝わりません。丁寧に頼もうとするあまり、必要な条件までぼかしてしまう文章には注意が要ります。費用の説明を先に明確にしてから、参加を歓迎する言葉を添えると、案内全体の役割が整います。読み手が安心して返事をするためには、感じのよい表現と同じくらい、判断できる情報が大切です。",
+    "form": "賄う",
+    "en": "Stating in a small reading group’s notice that participation fees will cover the venue costs shows how the collected money will be used in a single sentence. By contrast, merely asking participants to cooperate does not communicate whether they must pay anything. Be careful of writing that becomes so concerned with making a polite request that it obscures essential conditions. Clarifying the costs first and then adding words of welcome gives the notice a coherent function. Information that enables a decision is as important as pleasant wording if readers are to respond with confidence.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「費用を会費で賄う」のように、必要な費用とその出所を組み合わせます。",
+    "sense": "費用を用意して支払いに充てる。"
+   }
+  },
+  {
+   "term": "連帯",
+   "reading": "れんたい",
+   "pos": "noun",
+   "meaning": "solidarity",
+   "defJa": "共通の目的のために互いに結びつくこと。",
+   "passage": {
+    "ja": "声明文の翻訳で、苦境にある仲間との連帯を表す一節に出会ったら、単なる同情と訳してよいか立ち止まります。そこには、相手と結びつき、共に問題を引き受けようとする姿勢が含まれています。具体的な支援の約束に至らないまでも、離れた場所から気の毒に思うだけの言葉とは響きが違います。原文の前後を読み、誰が誰の負担を分かち合おうとしているのかを確かめます。似た意味の語に置き換える際ほど、その文章が人と人の関係をどう描いているかに注意を払いたいですね。",
+    "form": "連帯",
+    "en": "When translating a statement, if you encounter a passage expressing solidarity with colleagues in difficulty, pause before rendering it as mere sympathy. It includes a willingness to connect with them and take on the problem together. Even if it stops short of promising specific assistance, it sounds different from simply feeling sorry for someone at a distance. Read the surrounding text to establish who seeks to share whose burden. Especially when substituting a word with a similar meaning, consider how the text portrays the relationship between people.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "共に問題に向き合う結びつきで、離れた所からの同情とは区別されます。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "辛抱",
+   "reading": "しんぼう",
+   "pos": "noun",
+   "meaning": "patience; endurance",
+   "defJa": "苦しさや不満をこらえて耐えること。",
+   "passage": {
+    "ja": "日本語の小説で、冬を越すまでの辛抱だと職人が弟子に声をかける場面を想像してください。苦しい時期にすぐ仕事を投げ出さず、先の見通しを持って耐え忍ぶよう励ましています。単に順番を待つ場合とは違い、続けることのつらさをこらえる気持ちが言葉に含まれます。どんな負担に耐えているのかを前後から読み取ると、励ましが優しく響くのか、厳しく聞こえるのかも変わります。辞書の訳語だけでなく、誰がどの立場から口にしたかまで追うと、短い台詞にも奥行きが生まれます。",
+    "form": "辛抱",
+    "en": "Imagine a scene in a Japanese novel where a craftsperson tells an apprentice that they must endure until winter is over. The speaker is encouraging them not to abandon the work in a difficult period but to bear it with a prospect of better things ahead. Unlike merely waiting one’s turn, the words carry the idea of enduring the hardship of continuing. Understanding from the context what burden is being borne also changes whether the encouragement sounds gentle or stern. Following who spoke and from what position, rather than relying only on a dictionary translation, gives depth even to a short line of dialogue.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "つらい時期を投げ出さずに耐え忍ぶことを、励ましの場面で表しています。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "逃れる",
+   "reading": "のがれる",
+   "pos": "verb",
+   "meaning": "escape; get free from",
+   "defJa": "危険や苦しい状態から離れる。",
+   "passage": {
+    "ja": "不得意な問題を開くと胸が重くなり、机を片づける作業ばかり続けてしまうことがあります。苦手意識から逃れるために別の用事を探しても、取り組むべき問題は残っています。そこで、全部を解き直す目標はともかく、間違えた理由を一つだけ言葉にするところから始めます。作業を小さくすれば、負担を抑えながら勉強に戻る入り口を作れます。不安がなくなるまで待つ方法だけに頼らず、不安があってもできる行動を用意しておくと、予定が崩れた日の立て直しにも使えます。",
+    "form": "逃れる",
+    "en": "Opening a problem in a weak subject can feel so heavy that you keep tidying your desk instead. Even if you seek other chores to escape the feeling of inadequacy, the problem you need to tackle remains. Set aside the goal of redoing everything and start by putting just one reason for a mistake into words. Making the task small creates a way back into study while limiting the burden. Rather than relying only on waiting until anxiety disappears, having an action you can take even while anxious can also help you recover on days when your plans fall apart.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「苦手意識から逃れる」は、つらい心理状態から離れようとすることです。",
+    "sense": "不安などの苦しい状態から離れる。"
+   }
+  }
+ ]
+}

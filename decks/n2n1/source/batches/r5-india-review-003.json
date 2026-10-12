@@ -1,0 +1,74 @@
+{
+ "batch": "r5-india-review-003",
+ "items": [
+  {
+   "term": "会者定離",
+   "reading": "えしゃじょうり",
+   "gloss": "those who meet must part",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "Help a reader understand an unfamiliar idea through one concrete example and a contrast, with no stock exam coaching.",
+   "grammarSuggestion": "〜からには"
+  },
+  {
+   "term": "如来蔵",
+   "reading": "にょらいぞう",
+   "gloss": "tathāgatagarbha, buddha-nature within",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "angle": "A small dilemma in daily practice leads to a reflective argument; do not force a scientific analogy.",
+   "grammarSuggestion": "〜をめぐって",
+   "factNote": "Buddha-nature thought; do not simplistically equate with an eternal individual soul."
+  },
+  {
+   "term": "阿頼耶識",
+   "reading": "あらやしき",
+   "gloss": "ālaya-vijñāna, storehouse consciousness",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "angle": "Start with a distinction that matters when reading a historical source; explain why this distinction changes interpretation.",
+   "grammarSuggestion": "〜に加えて"
+  }
+ ],
+ "reviewOf": {
+  "会者定離": {
+   "batch": "r5-india-011",
+   "source": "cards/senmon-p1-r5-india-011.json",
+   "reason": "First English sentence is a question but ends in a period; change only its terminal punctuation to a question mark."
+  },
+  "如来蔵": {
+   "batch": "r5-india-015",
+   "source": "cards/senmon-p1-r5-india-015.json",
+   "reason": "First English sentence is a question but ends in a period; change only its terminal punctuation to a question mark."
+  },
+  "阿頼耶識": {
+   "batch": "r5-india-031",
+   "source": "cards/senmon-p1-r5-india-031.json",
+   "reason": "First English sentence is a question but ends in a period; change only its terminal punctuation to a question mark."
+  }
+ }
+}

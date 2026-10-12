@@ -1,0 +1,162 @@
+{
+ "batch": "r5-india-new-006",
+ "items": [
+  {
+   "term": "前帯状皮質",
+   "reading": "ぜんたいじょうひしつ",
+   "gloss": "anterior cingulate cortex",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://arxiv.org/abs/2010.06078"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Region studied in cognitive control and meditation, also multiple other functions; no simple concentration switch.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "注意制御",
+   "reading": "ちゅういせいぎょ",
+   "gloss": "attentional control",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://www.sciencedirect.com/science/article/pii/S0165178113005192"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Direct, maintain or redirect attention; measured with tasks, not identical to self-reported calm.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  },
+  {
+   "term": "脱中心化",
+   "reading": "だつちゅうしんか",
+   "gloss": "decentering",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://www.jstage.jst.go.jp/article/personality/22/2/22_108/_pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "india",
+   "factNote": "Observing thoughts as mental events rather than identifying with them or treating them as facts; do not equate with Buddhist enlightenment.",
+   "angle": "A concrete scene opens a short substantive explanation."
+  },
+  {
+   "term": "心拍変動",
+   "reading": "しんぱくへんどう",
+   "gloss": "heart rate variability",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://www.jstage.jst.go.jp/article/jje/56/Supplement/56_2G1-02/_pdf"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "india",
+   "factNote": "Variation in beat-to-beat intervals; respiratory timing affects it, so an increase during breathing practice alone cannot prove broad mental benefit.",
+   "angle": "A historical or research distinction changes interpretation, with no invented news."
+  },
+  {
+   "term": "能動対照群",
+   "reading": "のうどうたいしょうぐん",
+   "gloss": "active control group",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC9122316/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "india",
+   "factNote": "Comparison group receives matched alternative activity to separate meditation-specific effects from contact, expectation, time; rigorous MBSR studies use it.",
+   "angle": "Reflective essay with an exact example, no blanket moral ending."
+  },
+  {
+   "term": "呼吸性洞性不整脈",
+   "reading": "こきゅうせいどうせいふせいみゃく",
+   "gloss": "respiratory sinus arrhythmia",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://imis.igaku-shoin.co.jp/journal/404/50/3/1404902441/?lang=ja"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "india",
+   "factNote": "Heart rate typically speeds with inspiration and slows with expiration; normal physiological variation, not automatically illness or a meditation achievement.",
+   "angle": "Mid-conversation informal explanation, natural spoken Japanese."
+  },
+  {
+   "term": "瞑想経験者",
+   "reading": "めいそうけいけんしゃ",
+   "gloss": "experienced meditator",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://pubmed.ncbi.nlm.nih.gov/35524072/"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "india",
+   "factNote": "Experience is defined differently by studies; comparing experienced and novice groups is not automatically randomized evidence of training causality.",
+   "angle": "One concrete study or learning comparison, without generic exam coaching."
+  },
+  {
+   "term": "注意瞬脱",
+   "reading": "ちゅういしゅんだつ",
+   "gloss": "attentional blink",
+   "level": "N1+",
+   "field": "india",
+   "sources": [
+    "R5-curated:meditation-neuroscience",
+    "https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.0050138"
+   ],
+   "pastTests": 0,
+   "priority": 2,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "india",
+   "factNote": "Second of two quickly presented targets is missed; Slagter studied intensive meditation and EEG, not a universal proof of exceptional attention.",
+   "angle": "Word choice or translation puzzle, no presentation-advice frame."
+  }
+ ],
+ "weave": [
+  "修行",
+  "執着",
+  "慈悲",
+  "系譜",
+  "戒律",
+  "比較",
+  "注意",
+  "伝来",
+  "解釈",
+  "原典"
+ ],
+ "note": "Use grounded factNote only for historical or scientific claims; ordinary explanatory examples may elaborate without adding invented facts. All topic india. Four sentences, 215–255 chars. Avoid stock endings る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. Avoid these automatic last-six-character endings: る必要がある,みてください,ほかならない,すくなります,かもしれない,見えてきます,ているのです. End with a specific detail or concrete consequence."
+}

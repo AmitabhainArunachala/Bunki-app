@@ -1,0 +1,1 @@
+{"step": "draft", "writer": "gpt-6-astra", "mech": {"寡黙": []}, "model": "deepseek-v4-pro:cloud", "secs": 52, "out": 6884, "verdicts": [{"term": "寡黙", "editor": "pass", "editorWhy": "自然な教育文で、文脈から「口数が少ない」語義が明確に推測できる。", "facts": "pass", "factsWhy": "事実誤認はなく、トピック・レベル・英訳も適切。"}]}

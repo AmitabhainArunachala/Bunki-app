@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "ニューラルネットワーク",
+   "reading": "にゅーらるねっとわーく",
+   "pos": "noun",
+   "meaning": "neural network",
+   "defJa": "多数の計算単位をつないで情報を処理するモデル",
+   "passage": {
+    "ja": "入力された数値がいくつもの計算を経て、最後に分類の答えへ変わる様子を思い浮かべてください。ニューラルネットワークは、多数の計算単位を結び、その間の数値を調整して情報を処理するモデルです。名前には神経とのつながりがありますが、人工の仕組みがそのまま人間の脳を再現していると考えると、できることも限界も見誤ります。学習の例を一つ選び、どの入力からどの答えを出し、その誤りをどう数えて数値を更新するかを追うと、名前の印象より具体的な理解が得られます。",
+    "form": "ニューラルネットワーク",
+    "en": "Imagine input numbers passing through several computations before becoming a classification. A neural network is a model that connects many computational units and adjusts numerical values between them to process information. Although its name relates to nerves, treating the artificial mechanism as a direct reproduction of the human brain misrepresents both capabilities and limits. Following an example from inputs to outputs, error measurement, and parameter updates provides a more concrete understanding than the impression given by the name.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "脳との類似を手がかりにしても、同一視はしない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

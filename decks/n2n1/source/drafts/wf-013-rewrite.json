@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "カロリー",
+   "reading": "カロリー",
+   "pos": "noun",
+   "meaning": "calorie",
+   "defJa": "食べ物が体内で生む熱量の単位。またその量",
+   "passage": {
+    "ja": "『カロリー』は英語から来た外来語ですが、日本語ではずいぶん独特な使われ方をします。『高い』『低い』と言えば、本来の熱量の単位というより、食べ物の太りやすさを指すのがふつうです。しかも『オフ』『ゼロ』のように、成分を減らした商品の宣伝文句にまで広がっています。外来語は、元の意味と食い違ったまま、その国の暮らしに合わせて育っていく好例です。言葉の意味は、使う人の暮らしの中で静かに動いていくものです。",
+    "form": "カロリー",
+    "en": "'Karori' is a loanword from English, but it is used in rather unique ways in Japanese. When people say 'high' or 'low,' they usually mean how fattening a food is rather than the original unit of heat. It has even spread to the advertising phrases of products with reduced ingredients, like 'off' and 'zero'. It is a good example of a loanword that grows to fit the life of its country, out of step with its original meaning. The meaning of a word moves quietly within the lives of those who use it.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "単位としての意味より、食べ物の太りやすさを指す日本的な使い方を見る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "はきはき",
+   "reading": "はきはき",
+   "pos": "adverb",
+   "meaning": "briskly; clearly",
+   "defJa": "言葉や動作が明るく、はっきりしているさま",
+   "passage": {
+    "ja": "1871年、岩倉使節団と共にアメリカへ渡った女子留学生の中に、満6歳の津田梅子がいました。幼い子どもは、異国の言葉に囲まれた生活に入ると、大人よりずっと速く、現地の言葉をはきはき話せるようになると言われます。実際、梅子は十一年後に帰国したとき、日本語のほうを学び直さざるを得なかったほどでした。この例は、言語の習得に年齢がどう影響するのかを、順序立てて考える手がかりになります。",
+    "form": "はきはき",
+    "en": "In 1871, among the girls who went to America with the Iwakura Mission was Tsuda Umeko, just six years old. It is said that when a small child enters a life surrounded by a foreign language, she comes to speak the local tongue clearly and briskly, much faster than an adult. In fact, when Umeko returned eleven years later, she had no choice but to relearn Japanese. This example gives a clue for thinking, step by step, about how age affects language acquisition.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「はきはき話す」の形で、言葉が明快で、聞き取りやすいことを表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "もろい",
+   "reading": "もろい",
+   "pos": "i-adj",
+   "meaning": "fragile; brittle",
+   "defJa": "力が加わると、すぐ壊れたり崩れたりしやすい",
+   "passage": {
+    "ja": "最先端のAIでも、実はもろい一面があります。たとえば、パンダの画像に人間には見えないほどの細かなノイズを加えるだけで、モデルがテナガザルだと自信たっぷりに答えてしまう例が研究で示されています。これが『敵対的サンプル』と呼ばれる現象です。性能が高いからといって、安全だとは限らないのです。だからこそ、実際に使う前に、わざと意地悪な入力を何度も与えて試す検査が欠かせないのです。",
+    "form": "もろい",
+    "en": "Even cutting-edge AI turns out to have a fragile side. For example, research has shown that merely adding noise too fine for humans to see to an image of a panda can make a model answer with confidence that it is a gibbon. This phenomenon is called an 'adversarial sample'. High performance does not necessarily mean it is safe. That is why, before real use, tests that deliberately feed it nasty inputs again and again are indispensable.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "強そうに見えて、わずかな力で崩れる弱点を指すときに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "ふさがる",
+   "reading": "ふさがる",
+   "pos": "verb",
+   "meaning": "to be occupied; to close",
+   "defJa": "物でいっぱいになり、ほかのことに使えなくなる",
+   "passage": {
+    "ja": "日本語には『手がふさがっている』という表現がある。両手に荷物を抱えて文字どおり動かせない場合はもちろん、仕事に追われて頼みごとを受けられない場合にも使われる。後者は前者からの類推でできた比喩であり、文脈によって意味が分かれる。学習者にとっては、同じ形が二つの状況にまたがる点が、理解を難しくする一因となっている。辞書を引いても、こうした慣用的な広がりまでは載っていないことが多い。",
+    "form": "ふさがっている",
+    "en": "Japanese has the expression 'te ga fusagatte iru,' literally 'my hands are occupied'. It is used not only when you are carrying luggage in both arms and literally cannot move, but also when you are swamped with work and cannot take on a request. The latter is a metaphor formed by analogy with the former, and the meaning splits depending on context. For learners, the fact that one form spans two situations is one reason it is hard to grasp. Even if you look it up in a dictionary, such idiomatic extensions are often not listed.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「手がふさがっている」は、体と忙しさの両方の意味で使える慣用表現。",
+    "sense": "手などが使えない、ほかに使えない"
+   }
+  },
+  {
+   "term": "にわかに",
+   "reading": "にわかに",
+   "pos": "adverb",
+   "meaning": "suddenly; readily",
+   "defJa": "急に。また、すぐには（打ち消しと共に）",
+   "passage": {
+    "ja": "『にわか雨』が突然降る雨を指すように、この語は本来、物事が急に起きるさまを表していました。それが『にわかに信じがたい話』という形になると、『すぐには』という別の意味が顔を出します。後ろに打ち消しの言葉が続くと、急にではなく容易にという読みになるのです。新聞の見出しから日常会話に至るまで、この用法は広く見られます。同じ語でも、肯定か否定かで意味が食い違う点には注意が要ります。",
+    "form": "にわかに",
+    "en": "Just as 'niwaka ame' refers to rain that falls suddenly, this word originally described things happening all at once. Yet in the form 'niwaka ni shinjigatai hanashi,' another meaning, 'not readily,' shows its face. When a negation follows, it reads as 'easily' rather than 'suddenly'. This usage is common everywhere, from newspaper headlines to everyday conversation. Take care that the meaning diverges depending on whether the sentence is affirmative or negative.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "打ち消しを伴う「にわかには信じがたい」の用法を、このカードで押さえる。",
+    "sense": "すぐには、容易には（否定と共に）"
+   }
+  },
+  {
+   "term": "そそっかしい",
+   "reading": "そそっかしい",
+   "pos": "i-adj",
+   "meaning": "careless; hasty",
+   "defJa": "落ち着きがなく、うっかり失敗しがちなさま",
+   "passage": {
+    "ja": "アルキメデスって、お風呂で浮力の原理をひらめいて、裸のまま街へ飛び出したっていう逸話がありますよね。いくらなんでもそそっかしいにもほどがあると思うんですけど、これはローマの建築家ウィトルウィウスが後世に書き残した話で、実際にあったかどうかは分からないんです。王様の金の冠に銀が混ぜられていないか調べるよう頼まれて、悩んでいた最中のひらめきだった、という筋書きです。どんなアイデアも、考え抜いた末に降りてくる瞬間は、人を夢中にさせずにはおかないんでしょうね。",
+    "form": "そそっかしい",
+    "en": "Archimedes supposedly got the principle of buoyancy in the bath and ran out into the street naked, right? I think that is careless beyond all reason, but the story was written down long afterward by the Roman architect Vitruvius, and nobody knows whether it really happened. The setup is that he had been asked to check whether silver had been mixed into the king's gold crown, and the flash came while he was stuck on it. Any idea that arrives after thinking something through to the end probably grips people irresistibly.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "計画性のなさや、先を読まない軽率な行動を、やや笑いを込めて言う口語的な評価語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "よほど",
+   "reading": "よほど",
+   "pos": "adverb",
+   "meaning": "considerably; quite",
+   "defJa": "普通の程度をかなり超えているさま",
+   "passage": {
+    "ja": "日本語の程度を表す副詞のなかでも、この語は、話し手の推し量りを含んでいる点が独特です。類似した『かなり』や『相当』は、事実の大きさを淡々と述べますが、『よほど疲れていたのだろう』と言えば、疲れの理由まで想像していることになります。そのため、確かな数字を示す報告文では、この語を避けざるを得ません。話し言葉では『よっぽど』と形を変え、いっそう感情をこめた言い方になります。日本語を読み書きするうえで、こうした含みの差は、辞書の訳語だけでは見えてきません。",
+    "form": "よほど",
+    "en": "Among Japanese adverbs of degree, this word is unusual in that it includes the speaker's inference. Similar words like 'kanari' and 'soto' state the size of a fact flatly, but if you say 'yohodo tsukarete ita no darou,' you are imagining even the reason for the fatigue. For that reason, one has to avoid this word in reports that present firm figures. In speech it changes shape to 'yoppodo' and becomes a more emotionally charged way of speaking. In reading and writing Japanese, such differences in implication do not show up through dictionary translations alone.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「よほど疲れていたのだろう」のように、推量と結びついて程度の大きさを表す。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,198 @@
+{
+ "items": [
+  {
+   "term": "聖徳太子",
+   "reading": "しょうとくたいし",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Prince Shotoku",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-773f79b1d1-a30833ec",
+    "wordId": "nn-773f79b1d1"
+   }
+  },
+  {
+   "term": "自己探究",
+   "reading": "じこたんきゅう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "self-inquiry",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-a254898119-144ecf51",
+    "wordId": "nn-a254898119"
+   }
+  },
+  {
+   "term": "苦行",
+   "reading": "くぎょう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "ascetic practice; austerities",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-a42f8529b5-8efcb212",
+    "wordId": "nn-a42f8529b5"
+   }
+  },
+  {
+   "term": "蓮華",
+   "reading": "れんげ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "lotus flower in Buddhist imagery",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-7e0091499e-b1d7a15e",
+    "wordId": "nn-7e0091499e"
+   }
+  },
+  {
+   "term": "血脈",
+   "reading": "けちみゃく",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "a lineage of Buddhist transmission",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-1da3ae9ca6-de0e75b8",
+    "wordId": "nn-1da3ae9ca6"
+   }
+  },
+  {
+   "term": "西田幾多郎",
+   "reading": "にしだきたろう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Nishida Kitaro",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-e3eafd61ab-99ebc244",
+    "wordId": "nn-e3eafd61ab"
+   }
+  },
+  {
+   "term": "解脱",
+   "reading": "げだつ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "liberation (mokṣa), release from rebirth",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-001-r.json",
+    "cardId": "nn-801287ee80-fda394b2",
+    "wordId": "nn-801287ee80"
+   }
+  },
+  {
+   "term": "輪廻転生",
+   "reading": "りんねてんしょう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the cycle of rebirth",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-767064e71f-489fc916",
+    "wordId": "nn-767064e71f"
+   }
+  },
+  {
+   "term": "鑑真",
+   "reading": "がんじん",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Jianzhen; Ganjin",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-003.json",
+    "cardId": "nn-ca725d819a-85cce922",
+    "wordId": "nn-ca725d819a"
+   }
+  },
+  {
+   "term": "陽明学",
+   "reading": "ようめいがく",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "the Wang Yangming school",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-3e188b9102-2a4a3c99",
+    "wordId": "nn-3e188b9102"
+   }
+  },
+  {
+   "term": "雲水",
+   "reading": "うんすい",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "itinerant Zen monk",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-79a6339f13-a9e91373",
+    "wordId": "nn-79a6339f13"
+   }
+  },
+  {
+   "term": "音写",
+   "reading": "おんしゃ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "phonetic transliteration (into kanji)",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-032.json",
+    "cardId": "nn-ae829ae63c-e5eff498",
+    "wordId": "nn-ae829ae63c"
+   }
+  }
+ ],
+ "weave": [
+  "聖徳太子",
+  "自己探究",
+  "苦行",
+  "蓮華",
+  "血脈",
+  "西田幾多郎",
+  "解脱",
+  "輪廻転生",
+  "鑑真",
+  "陽明学",
+  "雲水",
+  "音写"
+ ]
+}

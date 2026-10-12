@@ -1,0 +1,198 @@
+{
+ "items": [
+  {
+   "term": "安心立命",
+   "reading": "あんしんりつめい",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "spiritual peace and resignation to fate",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-55168eea5d-6b971c30",
+    "wordId": "nn-55168eea5d"
+   }
+  },
+  {
+   "term": "密教",
+   "reading": "みっきょう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "esoteric Buddhism",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-016.json",
+    "cardId": "nn-8d4df6f214-fe89f6b2",
+    "wordId": "nn-8d4df6f214"
+   }
+  },
+  {
+   "term": "弘法大師",
+   "reading": "こうぼうだいし",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Kōbō Daishi (Kūkai's title)",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-017.json",
+    "cardId": "nn-539d1d52f3-f3022d91",
+    "wordId": "nn-539d1d52f3"
+   }
+  },
+  {
+   "term": "日蓮",
+   "reading": "にちれん",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Nichiren",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-018.json",
+    "cardId": "nn-7ac742ba51-f8f1898c",
+    "wordId": "nn-7ac742ba51"
+   }
+  },
+  {
+   "term": "梵天",
+   "reading": "ぼんてん",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Brahma as a Buddhist deity",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-020.json",
+    "cardId": "nn-105610172d-cbd05045",
+    "wordId": "nn-105610172d"
+   }
+  },
+  {
+   "term": "法話",
+   "reading": "ほうわ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "Buddhist sermon, dharma talk",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-004-r.json",
+    "cardId": "nn-19a1f0c1f4-c7e8aaf6",
+    "wordId": "nn-19a1f0c1f4"
+   }
+  },
+  {
+   "term": "無の境地",
+   "reading": "むのきょうち",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "a state free from distracting attachment",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-022.json",
+    "cardId": "nn-7ccc86a7e7-4348dfe7",
+    "wordId": "nn-7ccc86a7e7"
+   }
+  },
+  {
+   "term": "無自性",
+   "reading": "むじしょう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "absence of independent intrinsic nature",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-1660c24079-0ad333df",
+    "wordId": "nn-1660c24079"
+   }
+  },
+  {
+   "term": "瞑想経験者",
+   "reading": "めいそうけいけんしゃ",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "experienced meditator",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-006.json",
+    "cardId": "nn-d1be9b3cb2-9e906c6e",
+    "wordId": "nn-d1be9b3cb2"
+   }
+  },
+  {
+   "term": "神仏習合",
+   "reading": "しんぶつしゅうごう",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "interweaving of kami and Buddhist traditions",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-83d486716f-b716c467",
+    "wordId": "nn-83d486716f"
+   }
+  },
+  {
+   "term": "空即是色",
+   "reading": "くうそくぜしき",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "emptiness is form",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-0f3a2735ee-df2e3dba",
+    "wordId": "nn-0f3a2735ee"
+   }
+  },
+  {
+   "term": "純粋意識",
+   "reading": "じゅんすいいしき",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "gloss": "pure consciousness",
+   "register": "報",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-25f46b4fac-f7653151",
+    "wordId": "nn-25f46b4fac"
+   }
+  }
+ ],
+ "weave": [
+  "安心立命",
+  "密教",
+  "弘法大師",
+  "日蓮",
+  "梵天",
+  "法話",
+  "無の境地",
+  "無自性",
+  "瞑想経験者",
+  "神仏習合",
+  "空即是色",
+  "純粋意識"
+ ]
+}

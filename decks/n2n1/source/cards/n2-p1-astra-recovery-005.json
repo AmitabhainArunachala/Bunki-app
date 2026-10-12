@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "重量",
+   "reading": "じゅうりょう",
+   "pos": "noun",
+   "meaning": "weight",
+   "defJa": "物の重さ。",
+   "passage": {
+    "ja": "荷物の説明に重量制限とあれば、大きさではなく重さに上限があると分かります。ところが、箱が規定の寸法に収まることだけを確認して案内を書けば、読む人はそれで条件を満たしたと思ってしまいます。荷造りの手順を示すに際しては、測る対象ごとに条件を分け、箱自体を含めるかどうかも明記します。追加料金がかかる境目は、注意書きの奥へ埋めず、数字の近くに置くと見落としを減らせます。文章を整えた後には、初めて荷物を送る人が順番に確認できるか、一つずつ読み返しましょう。",
+    "form": "重量",
+    "en": "A reference to a baggage weight limit shows that the restriction concerns heaviness rather than size. But if you write the guidance after checking only that the box fits the specified dimensions, readers may assume that this satisfies the conditions. When giving packing instructions, separate the conditions according to what is being measured and specify whether the box itself is included. Placing the threshold for extra charges near the relevant figures rather than burying it deep in the notes helps prevent oversights. After polishing the text, read it through point by point to see whether a first-time sender can check everything in order.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「重量制限」は、物の重さに定められた上限を表す言い方です。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "蒸す",
+   "reading": "むす",
+   "pos": "verb",
+   "meaning": "steam; cook with steam",
+   "defJa": "湯気を当てて食材を加熱する。",
+   "passage": {
+    "ja": "料理の手順を編集する際、食材を蒸すという指示を、単に温めると言い換えることはできない。前者は湯気で熱を加える方法を示すのに対し、後者だけでは鍋の水に入れるのか、別の器具を使うのかが分からない。短くまとめるために動作の名を削ると、調理方法そのものを変えてしまう恐れがある。読み手が再現できる文章にするには、何を使い、どの状態まで加熱するのかを確かめる必要がある。分かりやすさを目指す言い換えでも、その語が担っている手順まで消してはならない。",
+    "form": "蒸す",
+    "en": "When editing cooking instructions, an instruction to steam an ingredient cannot simply be reworded as heating it. The former specifies applying heat through steam, whereas the latter alone does not show whether to put the food into water in a pot or use another appliance. Removing the name of an action to shorten the text risks changing the cooking method itself. To produce instructions readers can reproduce, the editor needs to check what is used and the state to which the food should be heated. Even a rephrasing intended to improve clarity must preserve the procedure conveyed by the word.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "湯に食材を入れて煮るのではなく、湯気を当てて加熱する動作です。",
+    "sense": "湯気で食材を加熱する。"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "じきに",
+   "reading": "じきに",
+   "pos": "adverb",
+   "meaning": "soon; before long",
+   "defJa": "そう長い時間を置かないうちに。",
+   "passage": {
+    "ja": "工事はじきに終わるという連絡では、完了が遠い先ではないという見通しは伝わるが、具体的な日付は分からない。この言い方には、相手を長く待たせないだろうという時間の近さが含まれている。間もなくと同様に、どれほどの長さを指すかは、話題や状況に応じて変わる。友人同士の会話では十分でも、通行止めの案内で使えば、利用者が予定を立てるには情報が足りない。自然な表現かどうかに加え、その文章が求められている判断に役立つかという視点も、言葉の点検には必要である。",
+    "form": "じきに",
+    "en": "A message saying that construction will finish soon conveys that completion is not far off, but gives no specific date. The expression includes a sense of temporal closeness, suggesting that the other person will probably not have to wait long. As with mamonaku, the length of time it indicates varies according to the subject and circumstances. While it may suffice in a conversation between friends, a road-closure notice using it would not give users enough information to make plans. Reviewing wording requires asking not only whether it is natural but also whether it supports the decisions the text needs to help people make.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "近い将来を表しますが、何分後や何日後かまで決める語ではありません。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "農産物",
+   "reading": "のうさんぶつ",
+   "pos": "noun",
+   "meaning": "agricultural produce",
+   "defJa": "農業によって生産される作物など。",
+   "passage": {
+    "ja": "直売所の案内で、地域の農産物を販売していますと書けば、畑などで育てた品が中心だと伝わります。これを土地の名物と言い換えると、酒や工芸品まで含む広い表現になります。親しみやすい言葉を選ぶにしても、売り場にあるものの範囲が変わって見えないかを確かめたいですね。見出しでは大きな分類を示し、その下に野菜や果物の具体例を置くと、初めて訪れる人も内容をつかめます。難しい漢字を減らすことだけにこだわらず、言葉がどこまでを指すかにも注意すると、案内の精度が上がります。",
+    "form": "農産物",
+    "en": "A farm-shop notice stating that it sells local agricultural produce communicates that the main goods are products grown in fields and similar places. Rephrasing this as local specialities broadens the expression to include such things as alcoholic drinks and crafts. Even when choosing friendly wording, check that it does not appear to change the range of goods on sale. Giving the broad category in a heading and concrete examples such as vegetables and fruit below it helps first-time visitors grasp the contents. Paying attention to the scope of words, rather than focusing solely on reducing difficult kanji, improves the accuracy of a notice.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "農業で生産された品をまとめて指し、土地の名物すべてを表す語ではありません。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "淡水",
+   "reading": "たんすい",
+   "pos": "noun",
+   "meaning": "fresh water",
+   "defJa": "塩分をほとんど含まない水。",
+   "passage": {
+    "ja": "透明な水を二つの容器に入れても、見た目だけで塩分の違いを判断するのは難しい。海水と淡水を比べる展示では、色の差を探させるより、塩分の測定結果を並べたほうが、何を比べているかが明確になる。水という同じ呼び名であっても、含まれるものは場所によって異なる。身近な川について考えるにあたっても、澄んでいるという印象だけを、水の性質を知る根拠にはできない。目で捉えられる特徴と、器具で確かめる必要のある特徴を分けることが、観察を一段深めるのである。",
+    "form": "淡水",
+    "en": "Even with clear water in two containers, it is difficult to judge differences in salt content by appearance alone. In an exhibit comparing seawater and fresh water, displaying salinity measurements makes the basis of comparison clearer than asking viewers to look for a colour difference. Although both are called water, their contents differ from place to place. Even when considering a familiar river, the impression that it looks clear is not enough to establish its properties. Distinguishing features visible to the eye from those requiring instruments takes observation a step deeper.",
+    "register": "報",
+    "topic": "other",
+    "tipJa": "海水と対比され、塩分がごく少ない水を指します。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

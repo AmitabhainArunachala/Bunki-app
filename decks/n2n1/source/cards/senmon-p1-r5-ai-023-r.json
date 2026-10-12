@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "期待値",
+   "reading": "きたいち",
+   "pos": "noun",
+   "meaning": "expected value",
+   "defJa": "各結果の値を起こる確率で重み付けして足した値",
+   "passage": {
+    "ja": "故障検知の仕組みを比べるために期待値を使うなら、起こり得る結果とその確率を組にして考えます。たとえば半分の確率で処理時間が一秒、残りの半分で三秒になる簡単なモデルでは、確率で重みを付けた平均は二秒です。ただし一回の処理が必ず二秒で終わるわけではなく、平均が同じ二つの仕組みでも、極端に遅い結果の出やすさは異なり得ます。装置を選ぶ説明では、この平均に加えて時間のばらつきや許容できる遅れも示すと、数値を実際の運用条件へ結び付けられます。",
+    "form": "期待値",
+    "en": "Using expected value to compare fault-detection systems pairs possible outcomes with their probabilities. In a simple model taking one second half the time and three seconds the other half, the probability-weighted average is two seconds. But individual runs need not last two seconds, and systems with equal averages may differ in their chance of extreme delays. Equipment comparisons connect figures to operating conditions better by including variability and tolerable delays alongside the average.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "日常語の「期待する額」と違い、確率で重みを付けた平均を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

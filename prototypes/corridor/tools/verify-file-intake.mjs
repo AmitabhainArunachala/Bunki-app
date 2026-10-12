@@ -1,4 +1,5 @@
 /** Persistent normal-control file intake checks. Native chooser and viewer are explicit fixtures; the compiled Vision/PDFKit helper processes real synthetic file bytes. No native GUI or full learner acceptance. */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -87,7 +88,7 @@ async function selectWord(page) {
   return point.start;
 }
 async function inbox(page) {
-  if (await page.locator('#sheet-close').isVisible()) await page.locator('#sheet-close').click();
+  if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
   if (await page.locator('body').getAttribute('data-view') === 'source-reader') {
     await page.locator('#source-reader-back').click(); await page.locator('#source-reader-back').waitFor({ state: 'hidden' });
   }

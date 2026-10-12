@@ -1,0 +1,52 @@
+{
+ "cards": [
+  {
+   "term": "樹木",
+   "reading": "じゅもく",
+   "pos": "noun",
+   "meaning": "trees and shrubs",
+   "defJa": "幹や枝をもつ木の総称",
+   "passage": {
+    "ja": "国際研究チームは、衛星画像とAIを使って、アフリカ西部の乾燥地にある樹木を一本ずつ数えあげた。従来の推定では見落とされていた、畑や牧草地に点在する木々が、十億本を超えて見つかったという。森林として地図に載らない木も、炭素の貯蔵や土壌の保全に重要な役割を担う。画像認識技術が環境の調査を大きく変えつつあり、見えなかった木を数えることには、温暖化対策を考えるうえで大きな意味がある。",
+    "form": "樹木",
+    "en": "An international research team used satellite images and AI to count, one by one, the trees in the drylands of West Africa. Trees scattered across fields and pastures, overlooked in earlier estimates, were reportedly found in numbers exceeding a billion. Trees that don't appear on maps as forest also play an important role in storing carbon and conserving soil. Image recognition technology is greatly changing environmental surveys, and counting trees that had been invisible carries great significance when considering measures against warming.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「樹木」は木の総称。「街路樹」「樹木医」など専門的な語にも。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "活躍",
+   "reading": "かつやく",
+   "pos": "noun",
+   "meaning": "success in an active role, prominent work",
+   "defJa": "目立った働きをすること",
+   "passage": {
+    "ja": "自分の業績を言葉にするとき、人はつい褒め言葉に頼りたくなる。履歴書に「営業で活躍しました」と書く人は多いが、読み手は中身を想像できない。「三年間で新規顧客を四十社開拓した」のように数字と動詞で示せば、褒め言葉を使わなくても働きぶりは伝わる。形容詞を並べるより、事実を一つ差し出すほうが、はるかに信用に足る。",
+    "form": "活躍",
+    "en": "When putting their own achievements into words, people are tempted to lean on praise words. Many write 'I was highly active in sales' on their resume, but readers cannot imagine what is behind it. If you show it with numbers and verbs, like 'opened forty new accounts in three years', your work comes across even without praise words. Offering one fact is far more trustworthy than lining up adjectives.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「活躍する」。目立つ成果や働きを出す意味。自分には使いにくい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "放射能",
+   "reading": "ほうしゃのう",
+   "pos": "noun",
+   "meaning": "radioactivity",
+   "defJa": "物質が放射線を出す性質",
+   "passage": {
+    "ja": "キュリー夫人が放射能という言葉を生んだのは、一八九八年ごろのことです。ウランが出す目に見えない線の強さが、化合物の形に左右されず、含まれるウランの量だけで決まると気づいたとき、彼女は原子の根底に秘密があると考えました。この発想は試験でもよく問われるので、年号と人物をセットで覚えておくに越したことはありません。ただし暗記より先に、なぜ常識外れだったのかを自分の言葉で説明できるようにしてください。",
+    "form": "放射能",
+    "en": "Marie Curie coined the word radioactivity around 1898. When she noticed that the strength of the invisible rays given off by uranium did not depend on the form of the compound and was determined only by the amount of uranium it contained, she concluded that the secret lay at the root of the atom itself. This idea is often asked about in exams, so it is best to memorize the year and the person as a set. Before memorizing, though, make sure you can explain in your own words why it defied common sense.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「放射能」は性質を指す語。物質そのものや線とは区別する。",
+    "sense": ""
+   }
+  }
+ ]
+}

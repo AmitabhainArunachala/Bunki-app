@@ -1,0 +1,390 @@
+{"term": "縁起", "reading": "えんぎ", "gloss": "dependent origination (pratītyasamutpāda); also omen, luck", "field": "india", "level": "N1", "why": "seed from S3 brief seed list"}
+{"term": "無我", "reading": "むが", "gloss": "non-self (anātman); selflessness", "field": "india", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "空", "reading": "くう", "gloss": "emptiness (śūnyatā)", "field": "india", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "涅槃", "reading": "ねはん", "gloss": "nirvana", "field": "india", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "解脱", "reading": "げだつ", "gloss": "liberation (mokṣa), release from rebirth", "field": "india", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "輪廻", "reading": "りんね", "gloss": "saṃsāra, the cycle of rebirth", "field": "india", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "梵我一如", "reading": "ぼんがいちにょ", "gloss": "identity of Brahman and ātman", "field": "india", "level": "beyond", "why": "seed from 日本ヴェーダーンタ協会 subscription (S3 brief seed)"}
+{"term": "不二一元", "reading": "ふにいちげん", "gloss": "non-dual monism (Advaita)", "field": "india", "level": "beyond", "why": "seed from 日本ヴェーダーンタ協会 subscription (S3 brief seed)"}
+{"term": "真我", "reading": "しんが", "gloss": "the true Self (ātman)", "field": "india", "level": "beyond", "why": "seed from 日本ヴェーダーンタ協会 subscription (S3 brief seed)"}
+{"term": "無明", "reading": "むみょう", "gloss": "ignorance (avidyā), root delusion", "field": "india", "level": "beyond", "why": "seed from 日本ヴェーダーンタ協会 subscription (S3 brief seed)"}
+{"term": "般若心経", "reading": "はんにゃしんぎょう", "gloss": "the Heart Sutra", "field": "india", "level": "beyond", "why": "seed from Floating Stories 空海×般若心経"}
+{"term": "空海", "reading": "くうかい", "gloss": "Kūkai (774–835), founder of Shingon", "field": "india", "level": "beyond", "why": "seed from Floating Stories 空海 videos"}
+{"term": "悟り", "reading": "さとり", "gloss": "enlightenment, awakening", "field": "india", "level": "N1", "why": "seed from 三枝英彦「悟り」と「ワンネス」"}
+{"term": "ワンネス", "reading": "わんねす", "gloss": "oneness (spiritual-genre term)", "field": "india", "level": "beyond", "why": "seed from 三枝英彦 ワンネス video"}
+{"term": "瞑想", "reading": "めいそう", "gloss": "meditation", "field": "india", "level": "N1", "why": "seed from S3 brief seed list"}
+{"term": "唯識", "reading": "ゆいしき", "gloss": "Consciousness-only (Yogācāra) doctrine", "field": "india", "level": "beyond", "why": "seed from S3 brief seed list"}
+{"term": "梵", "reading": "ぼん", "gloss": "Brahman (the absolute); prefix for \"Sanskrit/Indian\"", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ブラフマン", "reading": "ぶらふまん", "gloss": "Brahman, the absolute reality", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "アートマン", "reading": "あーとまん", "gloss": "ātman, the innermost self", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "我", "reading": "が", "gloss": "self, ego; ātman in philosophical texts", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "ウパニシャッド", "reading": "うぱにしゃっど", "gloss": "the Upanishads", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ヴェーダ", "reading": "ゔぇーだ", "gloss": "the Vedas", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ヴェーダーンタ", "reading": "ゔぇーだーんた", "gloss": "Vedānta", "field": "india", "level": "beyond", "why": "seed from 日本ヴェーダーンタ協会 subscription"}
+{"term": "不二一元論", "reading": "ふにいちげんろん", "gloss": "Advaita Vedānta, the doctrine of non-dualism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "シャンカラ", "reading": "しゃんから", "gloss": "Śaṅkara, Advaita philosopher (8th c.)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "バラモン", "reading": "ばらもん", "gloss": "Brahmin (priestly class)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "バラモン教", "reading": "ばらもんきょう", "gloss": "Brahmanism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ヒンドゥー教", "reading": "ひんどぅーきょう", "gloss": "Hinduism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "カースト制度", "reading": "かーすとせいど", "gloss": "the caste system", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "六派哲学", "reading": "ろっぱてつがく", "gloss": "the six orthodox schools of Indian philosophy", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "バガヴァッド・ギーター", "reading": "ばがゔぁっどぎーたー", "gloss": "the Bhagavad Gita", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "聖典", "reading": "せいてん", "gloss": "scripture, sacred text", "field": "india", "level": "N1", "why": "register word"}
+{"term": "経典", "reading": "きょうてん", "gloss": "sutra, scripture (Confucian classics: けいてん)", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "梵語", "reading": "ぼんご", "gloss": "Sanskrit (traditional term)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "サンスクリット語", "reading": "さんすくりっとご", "gloss": "Sanskrit", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "音写", "reading": "おんしゃ", "gloss": "phonetic transliteration (into kanji)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "漢訳", "reading": "かんやく", "gloss": "Chinese translation (of scripture)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "業", "reading": "ごう", "gloss": "karma, deeds and their force", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "カルマ", "reading": "かるま", "gloss": "karma", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "輪廻転生", "reading": "りんねてんしょう", "gloss": "reincarnation, transmigration", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "転生", "reading": "てんせい", "gloss": "rebirth, reincarnation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "化身", "reading": "けしん", "gloss": "incarnation, avatar", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "梵天", "reading": "ぼんてん", "gloss": "Brahmā (as a Buddhist deva)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "帝釈天", "reading": "たいしゃくてん", "gloss": "Indra (Śakra) as Buddhist guardian", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "苦行", "reading": "くぎょう", "gloss": "ascetic practice, austerities", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "出家", "reading": "しゅっけ", "gloss": "renouncing the world, becoming a monk", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "在家", "reading": "ざいけ", "gloss": "lay (householder) life", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "自我", "reading": "じが", "gloss": "ego, the self (psychological)", "field": "india", "level": "N1", "why": "register word"}
+{"term": "個我", "reading": "こが", "gloss": "individual self (jīva)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "純粋意識", "reading": "じゅんすいいしき", "gloss": "pure consciousness", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "至福", "reading": "しふく", "gloss": "bliss, supreme happiness (ānanda)", "field": "india", "level": "N1", "why": "register word"}
+{"term": "観照", "reading": "かんしょう", "gloss": "contemplation, witnessing", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "識別", "reading": "しきべつ", "gloss": "discernment, discrimination (viveka)", "field": "india", "level": "N1", "why": "register word"}
+{"term": "離欲", "reading": "りよく", "gloss": "dispassion, freedom from desire (vairāgya)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "グル", "reading": "ぐる", "gloss": "guru, spiritual teacher", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "聖者", "reading": "せいじゃ", "gloss": "saint, holy person", "field": "india", "level": "N1", "why": "register word"}
+{"term": "覚者", "reading": "かくしゃ", "gloss": "awakened one", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "自己探究", "reading": "じこたんきゅう", "gloss": "self-inquiry (Ramana Maharshi's method)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "非二元", "reading": "ひにげん", "gloss": "non-duality", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ノンデュアリティ", "reading": "のんでゅありてぃ", "gloss": "non-duality (contemporary spiritual books)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "二元論", "reading": "にげんろん", "gloss": "dualism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "一元論", "reading": "いちげんろん", "gloss": "monism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "主客未分", "reading": "しゅかくみぶん", "gloss": "undivided subject and object (Nishida)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "主体", "reading": "しゅたい", "gloss": "subject, agent", "field": "india", "level": "N1", "why": "register word"}
+{"term": "客体", "reading": "きゃくたい", "gloss": "object (of perception)", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "主観", "reading": "しゅかん", "gloss": "subjectivity, subjective view", "field": "india", "level": "N1", "why": "register word"}
+{"term": "客観", "reading": "きゃっかん", "gloss": "objectivity", "field": "india", "level": "N1", "why": "register word"}
+{"term": "形而上学", "reading": "けいじじょうがく", "gloss": "metaphysics", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "存在論", "reading": "そんざいろん", "gloss": "ontology", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "認識論", "reading": "にんしきろん", "gloss": "epistemology", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "実在", "reading": "じつざい", "gloss": "reality, real existence", "field": "india", "level": "N1", "why": "register word"}
+{"term": "実体", "reading": "じったい", "gloss": "substance, true entity", "field": "india", "level": "N1", "why": "register word"}
+{"term": "本質", "reading": "ほんしつ", "gloss": "essence, true nature", "field": "india", "level": "N1", "why": "register word"}
+{"term": "現象", "reading": "げんしょう", "gloss": "phenomenon", "field": "india", "level": "N2", "why": "register word"}
+{"term": "超越", "reading": "ちょうえつ", "gloss": "transcendence", "field": "india", "level": "N1", "why": "register word"}
+{"term": "内在", "reading": "ないざい", "gloss": "immanence", "field": "india", "level": "N1", "why": "register word"}
+{"term": "根源", "reading": "こんげん", "gloss": "root, ultimate source", "field": "india", "level": "N1", "why": "register word"}
+{"term": "幻影", "reading": "げんえい", "gloss": "illusion, phantom (used for māyā)", "field": "india", "level": "N1", "why": "register word"}
+{"term": "マーヤー", "reading": "まーやー", "gloss": "māyā, cosmic illusion", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "覚醒", "reading": "かくせい", "gloss": "awakening", "field": "india", "level": "N1", "why": "register word"}
+{"term": "目覚め", "reading": "めざめ", "gloss": "awakening (spiritual)", "field": "india", "level": "N1", "why": "register word"}
+{"term": "霊性", "reading": "れいせい", "gloss": "spirituality, spiritual nature", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "神秘主義", "reading": "しんぴしゅぎ", "gloss": "mysticism", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "汎神論", "reading": "はんしんろん", "gloss": "pantheism", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "世界観", "reading": "せかいかん", "gloss": "worldview", "field": "india", "level": "N1", "why": "register word"}
+{"term": "死生観", "reading": "しせいかん", "gloss": "view of life and death", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "潜在意識", "reading": "せんざいいしき", "gloss": "the subconscious", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "霊魂", "reading": "れいこん", "gloss": "soul, spirit", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "不滅", "reading": "ふめつ", "gloss": "immortality, indestructibility", "field": "india", "level": "N1", "why": "register word"}
+{"term": "悠久", "reading": "ゆうきゅう", "gloss": "eternity, perpetuity", "field": "india", "level": "N1", "why": "register word"}
+{"term": "タントラ", "reading": "たんとら", "gloss": "tantra", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "チャクラ", "reading": "ちゃくら", "gloss": "chakra", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ヨーガ", "reading": "よーが", "gloss": "yoga (scholarly spelling)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ヨーガ・スートラ", "reading": "よーがすーとら", "gloss": "the Yoga Sutras of Patañjali", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "八支則", "reading": "はっしそく", "gloss": "the eight limbs of yoga", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "静慮", "reading": "じょうりょ", "gloss": "dhyāna, meditative absorption", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "三昧", "reading": "さんまい", "gloss": "samādhi; total absorption (also \"~三昧\" indulgence)", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "不殺生", "reading": "ふせっしょう", "gloss": "non-killing (precept)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "バクティ", "reading": "ばくてぃ", "gloss": "bhakti, devotion", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "献身", "reading": "けんしん", "gloss": "devotion, self-sacrifice", "field": "india", "level": "N1", "why": "register word"}
+{"term": "釈迦", "reading": "しゃか", "gloss": "Śākyamuni, the Buddha", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "仏陀", "reading": "ぶっだ", "gloss": "the Buddha", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "釈尊", "reading": "しゃくそん", "gloss": "Śākyamuni (honorific)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "苦", "reading": "く", "gloss": "suffering (duḥkha)", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "無常", "reading": "むじょう", "gloss": "impermanence", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "諸行無常", "reading": "しょぎょうむじょう", "gloss": "all conditioned things are impermanent", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "諸法無我", "reading": "しょほうむが", "gloss": "all dharmas are without self", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "涅槃寂静", "reading": "ねはんじゃくじょう", "gloss": "nirvana is perfect peace", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "一切皆苦", "reading": "いっさいかいく", "gloss": "all is suffering", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "三法印", "reading": "さんぼういん", "gloss": "the three seals of the Dharma", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "四諦", "reading": "したい", "gloss": "the Four Noble Truths", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "八正道", "reading": "はっしょうどう", "gloss": "the Noble Eightfold Path", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "中道", "reading": "ちゅうどう", "gloss": "the Middle Way", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "四苦八苦", "reading": "しくはっく", "gloss": "the four and eight sufferings; great hardship", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "生老病死", "reading": "しょうろうびょうし", "gloss": "birth, aging, sickness and death", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "煩悩", "reading": "ぼんのう", "gloss": "kleśa, worldly passions", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "三毒", "reading": "さんどく", "gloss": "the three poisons", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "執着", "reading": "しゅうちゃく", "gloss": "attachment, clinging (Buddhist texts also しゅうじゃく)", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "渇愛", "reading": "かつあい", "gloss": "craving (tṛṣṇā)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "我執", "reading": "がしゅう", "gloss": "clinging to self", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "慈悲", "reading": "じひ", "gloss": "compassion, loving-kindness", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "布施", "reading": "ふせ", "gloss": "giving (dāna); offering to monks", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "精進", "reading": "しょうじん", "gloss": "diligence, devotion; vegetarian diet", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "禅定", "reading": "ぜんじょう", "gloss": "meditative concentration", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "智慧", "reading": "ちえ", "gloss": "wisdom (prajñā)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "六波羅蜜", "reading": "ろくはらみつ", "gloss": "the six perfections", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "般若", "reading": "はんにゃ", "gloss": "prajñā, transcendent wisdom", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "色即是空", "reading": "しきそくぜくう", "gloss": "form is emptiness", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "空即是色", "reading": "くうそくぜしき", "gloss": "emptiness is form", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "色", "reading": "しき", "gloss": "form, matter (rūpa)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "五蘊", "reading": "ごうん", "gloss": "the five aggregates (skandhas)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "五蘊皆空", "reading": "ごうんかいくう", "gloss": "the five aggregates are all empty", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "不生不滅", "reading": "ふしょうふめつ", "gloss": "neither arising nor ceasing", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "観自在菩薩", "reading": "かんじざいぼさつ", "gloss": "Avalokiteśvara (as named in the Heart Sutra)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "羯諦羯諦", "reading": "ぎゃていぎゃてい", "gloss": "\"gone, gone\" (Heart Sutra mantra)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "菩提", "reading": "ぼだい", "gloss": "bodhi, enlightenment", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "菩提心", "reading": "ぼだいしん", "gloss": "bodhicitta, aspiration to awaken", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "写経", "reading": "しゃきょう", "gloss": "copying sutras", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "読経", "reading": "どきょう", "gloss": "sutra chanting", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "法話", "reading": "ほうわ", "gloss": "Buddhist sermon, dharma talk", "field": "india", "level": "beyond", "why": "seed from 【公式】高野山の法話"}
+{"term": "説法", "reading": "せっぽう", "gloss": "preaching, sermon", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "仏法", "reading": "ぶっぽう", "gloss": "the Buddha's teaching", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "三宝", "reading": "さんぼう", "gloss": "the Three Jewels", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "帰依", "reading": "きえ", "gloss": "taking refuge, devotion", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "僧侶", "reading": "そうりょ", "gloss": "monk, priest", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "戒律", "reading": "かいりつ", "gloss": "precepts, monastic rules", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "五戒", "reading": "ごかい", "gloss": "the five precepts", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "修行", "reading": "しゅぎょう", "gloss": "ascetic training, practice", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "行者", "reading": "ぎょうじゃ", "gloss": "practitioner, ascetic", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "托鉢", "reading": "たくはつ", "gloss": "alms round", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "縁", "reading": "えん", "gloss": "karmic connection; relationship, bond", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "因縁", "reading": "いんねん", "gloss": "cause and condition; fate; pretext", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "因果", "reading": "いんが", "gloss": "cause and effect; karma", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "因果応報", "reading": "いんがおうほう", "gloss": "karmic retribution", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "自業自得", "reading": "じごうじとく", "gloss": "reaping what one sows", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "十二因縁", "reading": "じゅうにいんねん", "gloss": "the twelve links of dependent origination", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "相互依存", "reading": "そうごいぞん", "gloss": "interdependence", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "自性", "reading": "じしょう", "gloss": "own-being, intrinsic nature (svabhāva)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "無自性", "reading": "むじしょう", "gloss": "lack of intrinsic nature", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "空性", "reading": "くうしょう", "gloss": "emptiness (śūnyatā)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "中観派", "reading": "ちゅうがんは", "gloss": "the Madhyamaka school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "龍樹", "reading": "りゅうじゅ", "gloss": "Nāgārjuna", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "阿頼耶識", "reading": "あらやしき", "gloss": "ālaya-vijñāna, storehouse consciousness", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "末那識", "reading": "まなしき", "gloss": "manas, the self-clinging mind", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "種子", "reading": "しゅうじ", "gloss": "seeds (karmic potentials in Yogācāra; everyday しゅし)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "如来蔵", "reading": "にょらいぞう", "gloss": "tathāgatagarbha, buddha-nature within", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "仏性", "reading": "ぶっしょう", "gloss": "buddha-nature", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "一切衆生悉有仏性", "reading": "いっさいしゅじょうしつうぶっしょう", "gloss": "all sentient beings have buddha-nature", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "衆生", "reading": "しゅじょう", "gloss": "sentient beings", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "救済", "reading": "きゅうさい", "gloss": "salvation, relief", "field": "india", "level": "N1", "why": "register word"}
+{"term": "本覚思想", "reading": "ほんがくしそう", "gloss": "doctrine of original enlightenment", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "草木国土悉皆成仏", "reading": "そうもくこくどしっかいじょうぶつ", "gloss": "plants, trees and lands all attain buddhahood", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "成仏", "reading": "じょうぶつ", "gloss": "attaining buddhahood; dying peacefully", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "大乗仏教", "reading": "だいじょうぶっきょう", "gloss": "Mahāyāna Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "上座部仏教", "reading": "じょうざぶぶっきょう", "gloss": "Theravāda Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "初期仏教", "reading": "しょきぶっきょう", "gloss": "early Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "チベット仏教", "reading": "ちべっとぶっきょう", "gloss": "Tibetan Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "大蔵経", "reading": "だいぞうきょう", "gloss": "the Buddhist canon", "field": "india", "level": "beyond", "why": "seed from 大蔵経 channel subscription"}
+{"term": "仏典", "reading": "ぶってん", "gloss": "Buddhist scriptures", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "玄奘", "reading": "げんじょう", "gloss": "Xuanzang (Tang pilgrim-translator)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "天竺", "reading": "てんじく", "gloss": "India (classical name)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "如来", "reading": "にょらい", "gloss": "tathāgata, a buddha", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "菩薩", "reading": "ぼさつ", "gloss": "bodhisattva", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "阿羅漢", "reading": "あらかん", "gloss": "arhat", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "誓願", "reading": "せいがん", "gloss": "vow", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "発心", "reading": "ほっしん", "gloss": "resolving to seek enlightenment", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "利他", "reading": "りた", "gloss": "altruism, benefiting others", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "方便", "reading": "ほうべん", "gloss": "skillful means (upāya); expedient", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "嘘も方便", "reading": "うそもほうべん", "gloss": "a lie can be skillful means", "field": "india", "level": "N1", "why": "register word"}
+{"term": "袖振り合うも他生の縁", "reading": "そでふりあうもたしょうのえん", "gloss": "even a brush of sleeves comes from past-life karma", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "縁起でもない", "reading": "えんぎでもない", "gloss": "ominous, don't even say that", "field": "india", "level": "N1", "why": "register word"}
+{"term": "真如", "reading": "しんにょ", "gloss": "suchness (tathatā)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "一如", "reading": "いちにょ", "gloss": "oneness, non-duality", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "法身", "reading": "ほっしん", "gloss": "dharmakāya, the truth body", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "実相", "reading": "じっそう", "gloss": "the true aspect of reality", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "華厳経", "reading": "けごんきょう", "gloss": "the Avataṃsaka (Flower Garland) Sutra", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "因陀羅網", "reading": "いんだらもう", "gloss": "Indra's net", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "一即一切", "reading": "いっそくいっさい", "gloss": "one is all", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "融通無碍", "reading": "ゆうずうむげ", "gloss": "free and unobstructed, flexible", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "止観", "reading": "しかん", "gloss": "calming and insight (śamatha-vipaśyanā)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ヴィパッサナー瞑想", "reading": "ゔぃぱっさなーめいそう", "gloss": "vipassanā (insight) meditation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "マインドフルネス", "reading": "まいんどふるねす", "gloss": "mindfulness", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "気づき", "reading": "きづき", "gloss": "awareness, noticing", "field": "india", "level": "N1", "why": "register word"}
+{"term": "結跏趺坐", "reading": "けっかふざ", "gloss": "full lotus posture", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "刹那", "reading": "せつな", "gloss": "kṣaṇa, an instant", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "劫", "reading": "こう", "gloss": "kalpa, an aeon", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "億劫", "reading": "おっくう", "gloss": "bothersome (from \"a myriad aeons\")", "field": "india", "level": "N1", "why": "register word"}
+{"term": "未来永劫", "reading": "みらいえいごう", "gloss": "for all eternity", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "寂静", "reading": "じゃくじょう", "gloss": "tranquility, serenity", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "入滅", "reading": "にゅうめつ", "gloss": "entering nirvana; death of the Buddha", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "安心立命", "reading": "あんしんりつめい", "gloss": "spiritual peace and resignation to fate", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "平常心", "reading": "へいじょうしん", "gloss": "composure, everyday mind", "field": "india", "level": "N1", "why": "register word"}
+{"term": "日日是好日", "reading": "にちにちこれこうじつ", "gloss": "every day is a good day", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "本来無一物", "reading": "ほんらいむいちもつ", "gloss": "originally, not a single thing exists", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "無心", "reading": "むしん", "gloss": "no-mind; innocence", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "無の境地", "reading": "むのきょうち", "gloss": "state of no-mind", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "境地", "reading": "きょうち", "gloss": "state of mind, stage reached", "field": "india", "level": "N1", "why": "register word"}
+{"term": "心身一如", "reading": "しんしんいちにょ", "gloss": "unity of body and mind", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "自他不二", "reading": "じたふに", "gloss": "non-duality of self and other", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "生死", "reading": "しょうじ", "gloss": "birth and death; saṃsāra (Buddhist reading; everyday せいし)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "六道", "reading": "ろくどう", "gloss": "the six realms of rebirth", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "餓鬼", "reading": "がき", "gloss": "hungry ghost; brat", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "畜生", "reading": "ちくしょう", "gloss": "beast realm; \"damn it\"", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "阿修羅", "reading": "あしゅら", "gloss": "asura, fighting demigod", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "三界", "reading": "さんがい", "gloss": "the three realms (desire, form, formless)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "娑婆", "reading": "しゃば", "gloss": "this world of suffering; the outside world", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "浮世", "reading": "うきよ", "gloss": "the transient, floating world", "field": "india", "level": "N1", "why": "register word"}
+{"term": "彼岸", "reading": "ひがん", "gloss": "the other shore (nirvana); equinox week", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "此岸", "reading": "しがん", "gloss": "this shore (world of suffering)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "前世", "reading": "ぜんせ", "gloss": "previous life", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "来世", "reading": "らいせ", "gloss": "next life", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "回向", "reading": "えこう", "gloss": "transferring merit; memorial service", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "供養", "reading": "くよう", "gloss": "memorial service, offering", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "功徳", "reading": "くどく", "gloss": "merit, virtue", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "ご利益", "reading": "ごりやく", "gloss": "divine favor, blessing", "field": "india", "level": "N1", "why": "register word"}
+{"term": "懺悔", "reading": "さんげ", "gloss": "repentance, confession (Buddhist reading; everyday ざんげ)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "内省", "reading": "ないせい", "gloss": "introspection", "field": "india", "level": "N1", "why": "register word"}
+{"term": "省察", "reading": "せいさつ", "gloss": "reflection, self-examination", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "修養", "reading": "しゅうよう", "gloss": "self-cultivation", "field": "india", "level": "N1", "why": "register word"}
+{"term": "克己", "reading": "こっき", "gloss": "self-mastery, self-denial", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "無私", "reading": "むし", "gloss": "selflessness, impartiality", "field": "india", "level": "N1", "why": "register word"}
+{"term": "無欲", "reading": "むよく", "gloss": "freedom from desire", "field": "india", "level": "N1", "why": "register word"}
+{"term": "真言", "reading": "しんごん", "gloss": "mantra; the Shingon school", "field": "india", "level": "beyond", "why": "seed from 玉置慶海 不動明王真言 1080回"}
+{"term": "マントラ", "reading": "まんとら", "gloss": "mantra", "field": "india", "level": "beyond", "why": "seed from Floating Stories 般若心経 マントラ video"}
+{"term": "陀羅尼", "reading": "だらに", "gloss": "dhāraṇī, long incantation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "曼荼羅", "reading": "まんだら", "gloss": "mandala", "field": "india", "level": "beyond", "why": "seed from 曼荼羅 kaz studio subscription"}
+{"term": "護摩", "reading": "ごま", "gloss": "homa fire ritual", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "密教", "reading": "みっきょう", "gloss": "esoteric Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "顕教", "reading": "けんぎょう", "gloss": "exoteric Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "即身成仏", "reading": "そくしんじょうぶつ", "gloss": "attaining buddhahood in this very body", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "三密", "reading": "さんみつ", "gloss": "the three mysteries (body, speech, mind)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "加持祈祷", "reading": "かじきとう", "gloss": "incantation and prayer rites", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "阿字観", "reading": "あじかん", "gloss": "meditation on the syllable A", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "大日如来", "reading": "だいにちにょらい", "gloss": "Mahāvairocana Buddha", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "胎蔵界", "reading": "たいぞうかい", "gloss": "the Womb Realm", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "金剛界", "reading": "こんごうかい", "gloss": "the Diamond Realm", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "高野山", "reading": "こうやさん", "gloss": "Mt. Kōya", "field": "india", "level": "beyond", "why": "seed from 【公式】高野山の法話"}
+{"term": "真言宗", "reading": "しんごんしゅう", "gloss": "the Shingon school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "弘法大師", "reading": "こうぼうだいし", "gloss": "Kōbō Daishi (Kūkai's title)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "入定", "reading": "にゅうじょう", "gloss": "entering (eternal) meditation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "灌頂", "reading": "かんじょう", "gloss": "abhiṣeka, esoteric initiation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "四国遍路", "reading": "しこくへんろ", "gloss": "the Shikoku 88-temple pilgrimage", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "同行二人", "reading": "どうぎょうににん", "gloss": "\"two travelling together\" (pilgrim with Kūkai)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "不動明王", "reading": "ふどうみょうおう", "gloss": "Acala, the Immovable Wisdom King", "field": "india", "level": "beyond", "why": "seed from 玉置慶海 不動明王真言 1080回"}
+{"term": "光明真言", "reading": "こうみょうしんごん", "gloss": "the Mantra of Light", "field": "india", "level": "beyond", "why": "seed from 玉置慶海 Mantra of Light"}
+{"term": "梵字", "reading": "ぼんじ", "gloss": "Siddham/Sanskrit script", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "観音菩薩", "reading": "かんのんぼさつ", "gloss": "Avalokiteśvara, bodhisattva of compassion", "field": "india", "level": "beyond", "why": "seed from 玉置慶海 mantra video"}
+{"term": "釈迦如来", "reading": "しゃかにょらい", "gloss": "Śākyamuni Buddha (as icon)", "field": "india", "level": "beyond", "why": "seed from 玉置慶海 mantra video"}
+{"term": "阿弥陀如来", "reading": "あみだにょらい", "gloss": "Amitābha Buddha", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "天台宗", "reading": "てんだいしゅう", "gloss": "the Tendai school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "最澄", "reading": "さいちょう", "gloss": "Saichō, founder of Tendai", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "比叡山", "reading": "ひえいざん", "gloss": "Mt. Hiei", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "法華経", "reading": "ほけきょう", "gloss": "the Lotus Sutra", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "浄土", "reading": "じょうど", "gloss": "Pure Land", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "浄土宗", "reading": "じょうどしゅう", "gloss": "the Jōdo school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "浄土真宗", "reading": "じょうどしんしゅう", "gloss": "the True Pure Land school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "法然", "reading": "ほうねん", "gloss": "Hōnen", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "親鸞", "reading": "しんらん", "gloss": "Shinran", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "念仏", "reading": "ねんぶつ", "gloss": "nenbutsu, invoking Amida", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "南無阿弥陀仏", "reading": "なむあみだぶつ", "gloss": "\"I take refuge in Amida Buddha\"", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "他力本願", "reading": "たりきほんがん", "gloss": "salvation through Amida's vow; relying on others", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "他力", "reading": "たりき", "gloss": "other-power", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "自力", "reading": "じりき", "gloss": "self-power; one's own efforts", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "悪人正機", "reading": "あくにんしょうき", "gloss": "the wicked are the true object of salvation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "極楽浄土", "reading": "ごくらくじょうど", "gloss": "the Pure Land of Bliss", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "往生", "reading": "おうじょう", "gloss": "rebirth in the Pure Land; death; being stuck", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "末法思想", "reading": "まっぽうしそう", "gloss": "belief in the Dharma's decline", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "日蓮", "reading": "にちれん", "gloss": "Nichiren", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "南無妙法蓮華経", "reading": "なむみょうほうれんげきょう", "gloss": "\"Homage to the Lotus Sutra\"", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "題目", "reading": "だいもく", "gloss": "the daimoku chant; title, theme", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "禅", "reading": "ぜん", "gloss": "Zen", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "臨済宗", "reading": "りんざいしゅう", "gloss": "the Rinzai school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "曹洞宗", "reading": "そうとうしゅう", "gloss": "the Sōtō school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "栄西", "reading": "えいさい", "gloss": "Eisai (Yōsai), Rinzai pioneer", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "道元", "reading": "どうげん", "gloss": "Dōgen, founder of Sōtō", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "只管打坐", "reading": "しかんたざ", "gloss": "just sitting", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "坐禅", "reading": "ざぜん", "gloss": "seated meditation", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "公案", "reading": "こうあん", "gloss": "kōan", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "禅問答", "reading": "ぜんもんどう", "gloss": "Zen dialogue; cryptic exchange", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "不立文字", "reading": "ふりゅうもんじ", "gloss": "not relying on words", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "見性", "reading": "けんしょう", "gloss": "seeing one's true nature", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "身心脱落", "reading": "しんじんだつらく", "gloss": "dropping off body and mind (Dōgen)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "正法眼蔵", "reading": "しょうぼうげんぞう", "gloss": "Shōbōgenzō, Dōgen's masterwork", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "達磨", "reading": "だるま", "gloss": "Bodhidharma; daruma doll", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "以心伝心", "reading": "いしんでんしん", "gloss": "mind-to-mind transmission", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "一期一会", "reading": "いちごいちえ", "gloss": "once-in-a-lifetime encounter", "field": "india", "level": "N1", "why": "register word"}
+{"term": "侘び寂び", "reading": "わびさび", "gloss": "wabi-sabi", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "雲水", "reading": "うんすい", "gloss": "itinerant Zen monk", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "行脚", "reading": "あんぎゃ", "gloss": "pilgrimage on foot", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "老師", "reading": "ろうし", "gloss": "Zen master, venerable teacher", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "和尚", "reading": "おしょう", "gloss": "Buddhist priest, preceptor", "field": "india", "level": "N1", "why": "seed from 大愚和尚の一問一答 subscription"}
+{"term": "住職", "reading": "じゅうしょく", "gloss": "chief priest of a temple", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "仏教伝来", "reading": "ぶっきょうでんらい", "gloss": "the arrival of Buddhism in Japan", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "聖徳太子", "reading": "しょうとくたいし", "gloss": "Prince Shōtoku", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "鎮護国家", "reading": "ちんごこっか", "gloss": "Buddhism for protecting the state", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "鎌倉仏教", "reading": "かまくらぶっきょう", "gloss": "Kamakura Buddhism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "神仏習合", "reading": "しんぶつしゅうごう", "gloss": "syncretism of kami and buddhas", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "本地垂迹", "reading": "ほんじすいじゃく", "gloss": "buddhas manifesting as kami", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "廃仏毀釈", "reading": "はいぶつきしゃく", "gloss": "Meiji anti-Buddhist movement", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "檀家", "reading": "だんか", "gloss": "temple parishioner family", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "本尊", "reading": "ほんぞん", "gloss": "principal image of worship", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "開祖", "reading": "かいそ", "gloss": "founder (of a sect)", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "宗派", "reading": "しゅうは", "gloss": "sect, denomination", "field": "india", "level": "N1", "why": "register word"}
+{"term": "教義", "reading": "きょうぎ", "gloss": "doctrine, dogma", "field": "india", "level": "N1", "why": "register word"}
+{"term": "教団", "reading": "きょうだん", "gloss": "religious order", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "戒名", "reading": "かいみょう", "gloss": "posthumous Buddhist name", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "法要", "reading": "ほうよう", "gloss": "Buddhist memorial service", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "霊験", "reading": "れいげん", "gloss": "miraculous efficacy", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "巡礼", "reading": "じゅんれい", "gloss": "pilgrimage", "field": "india", "level": "N1", "why": "register word"}
+{"term": "聖地", "reading": "せいち", "gloss": "sacred site", "field": "india", "level": "N1", "why": "register word"}
+{"term": "菩提樹", "reading": "ぼだいじゅ", "gloss": "bodhi tree", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "蓮華", "reading": "れんげ", "gloss": "lotus flower", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "法輪", "reading": "ほうりん", "gloss": "the wheel of the Dharma", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "祇園精舎", "reading": "ぎおんしょうじゃ", "gloss": "Jetavana monastery", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "盛者必衰", "reading": "じょうしゃひっすい", "gloss": "the prosperous must decline", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "会者定離", "reading": "えしゃじょうり", "gloss": "those who meet must part", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "方丈記", "reading": "ほうじょうき", "gloss": "Hōjōki, Kamo no Chōmei's essay on impermanence", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "無常観", "reading": "むじょうかん", "gloss": "sense of impermanence", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "老子", "reading": "ろうし", "gloss": "Laozi", "field": "india", "level": "beyond", "why": "seed from Floating Stories『老子』video"}
+{"term": "荘子", "reading": "そうし", "gloss": "Zhuangzi", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "老荘思想", "reading": "ろうそうしそう", "gloss": "Lao-Zhuang (Taoist) thought", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "道教", "reading": "どうきょう", "gloss": "Taoism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "無為自然", "reading": "むいしぜん", "gloss": "non-action and naturalness", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "上善は水の如し", "reading": "じょうぜんはみずのごとし", "gloss": "the highest good is like water", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "陰陽", "reading": "いんよう", "gloss": "yin and yang", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "陰陽五行", "reading": "いんようごぎょう", "gloss": "yin-yang and the five phases", "field": "india", "level": "beyond", "why": "seed from 久宗式 陰陽五行 subscription"}
+{"term": "儒教", "reading": "じゅきょう", "gloss": "Confucianism", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "陽明学", "reading": "ようめいがく", "gloss": "the Wang Yangming school", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "知行合一", "reading": "ちこうごういつ", "gloss": "unity of knowledge and action", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "森羅万象", "reading": "しんらばんしょう", "gloss": "all things in the universe", "field": "india", "level": "N1", "why": "register word"}
+{"term": "万物", "reading": "ばんぶつ", "gloss": "all things, all creation", "field": "india", "level": "N1", "why": "register word"}
+{"term": "神道", "reading": "しんとう", "gloss": "Shinto", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "八百万の神", "reading": "やおよろずのかみ", "gloss": "the myriad kami", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "記紀", "reading": "きき", "gloss": "the Kojiki and Nihon Shoki together", "field": "india", "level": "beyond", "why": "seed from TOLAND VLOG 記紀"}
+{"term": "古事記", "reading": "こじき", "gloss": "Kojiki (712)", "field": "india", "level": "beyond", "why": "seed from TOLAND VLOG 記紀"}
+{"term": "日本書紀", "reading": "にほんしょき", "gloss": "Nihon Shoki (720)", "field": "india", "level": "beyond", "why": "seed from TOLAND VLOG 記紀"}
+{"term": "西田幾多郎", "reading": "にしだきたろう", "gloss": "Nishida Kitarō", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "絶対無", "reading": "ぜったいむ", "gloss": "absolute nothingness (Nishida)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "純粋経験", "reading": "じゅんすいけいけん", "gloss": "pure experience (Nishida)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "京都学派", "reading": "きょうとがくは", "gloss": "the Kyoto School", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "鈴木大拙", "reading": "すずきだいせつ", "gloss": "D. T. Suzuki", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "守破離", "reading": "しゅはり", "gloss": "obey, break, leave (stages of mastery)", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "初心忘るべからず", "reading": "しょしんわするべからず", "gloss": "never forget the beginner's spirit", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "脳科学", "reading": "のうかがく", "gloss": "brain science", "field": "india", "level": "beyond", "why": "seed from 三枝英彦 脳科学 videos"}
+{"term": "体得", "reading": "たいとく", "gloss": "mastery through experience", "field": "india", "level": "N1", "why": "register word"}
+{"term": "会得", "reading": "えとく", "gloss": "grasping, understanding fully", "field": "india", "level": "N1", "why": "register word"}
+{"term": "体現", "reading": "たいげん", "gloss": "embodiment", "field": "india", "level": "N1", "why": "register word"}
+{"term": "顕現", "reading": "けんげん", "gloss": "manifestation", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "具現", "reading": "ぐげん", "gloss": "embodiment, concrete realization", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "内観", "reading": "ないかん", "gloss": "introspection; the Naikan method", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "観想", "reading": "かんそう", "gloss": "contemplation, visualization", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "直観", "reading": "ちょっかん", "gloss": "intuition (philosophical)", "field": "india", "level": "N1", "why": "register word"}
+{"term": "洞察", "reading": "どうさつ", "gloss": "insight", "field": "india", "level": "N1", "why": "register word"}
+{"term": "叡智", "reading": "えいち", "gloss": "wisdom, intellect", "field": "india", "level": "N1", "why": "register word"}
+{"term": "真理", "reading": "しんり", "gloss": "truth", "field": "india", "level": "N1", "why": "register word"}
+{"term": "普遍", "reading": "ふへん", "gloss": "universality", "field": "india", "level": "N1", "why": "register word"}
+{"term": "究極", "reading": "きゅうきょく", "gloss": "ultimate", "field": "india", "level": "N1", "why": "register word"}
+{"term": "究竟", "reading": "くきょう", "gloss": "ultimate, final (Buddhist reading)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "本性", "reading": "ほんしょう", "gloss": "true nature", "field": "india", "level": "N1", "why": "register word"}
+{"term": "実存", "reading": "じつぞん", "gloss": "existence (existential sense)", "field": "india", "level": "beyond", "why": "register word"}
+{"term": "虚無", "reading": "きょむ", "gloss": "nothingness, nihility", "field": "india", "level": "N1", "why": "register word"}
+{"term": "虚空", "reading": "こくう", "gloss": "empty space, the void", "field": "india", "level": "N1", "why": "register word"}
+{"term": "信心", "reading": "しんじん", "gloss": "faith, piety", "field": "india", "level": "N1", "why": "core concept"}
+{"term": "信仰", "reading": "しんこう", "gloss": "faith, belief", "field": "india", "level": "N1", "why": "register word"}
+{"term": "伝承", "reading": "でんしょう", "gloss": "tradition, oral transmission", "field": "india", "level": "N1", "why": "register word"}
+{"term": "口伝", "reading": "くでん", "gloss": "oral transmission of teachings", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "系譜", "reading": "けいふ", "gloss": "lineage, genealogy", "field": "india", "level": "N1", "why": "register word"}
+{"term": "血脈", "reading": "けちみゃく", "gloss": "lineage of transmission (Buddhist reading; everyday けつみゃく)", "field": "india", "level": "beyond", "why": "core concept"}
+{"term": "注釈", "reading": "ちゅうしゃく", "gloss": "commentary, annotation", "field": "india", "level": "N1", "why": "register word"}
+{"term": "原典", "reading": "げんてん", "gloss": "original text", "field": "india", "level": "N1", "why": "register word"}

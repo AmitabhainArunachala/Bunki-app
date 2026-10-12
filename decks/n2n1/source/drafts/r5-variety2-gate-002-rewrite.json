@@ -1,0 +1,180 @@
+{
+ "cards": [
+  {
+   "term": "輪廻転生",
+   "reading": "りんねてんしょう",
+   "pos": "noun",
+   "meaning": "the cycle of rebirth",
+   "defJa": "生き物が死と新たな生を繰り返すこと",
+   "passage": {
+    "ja": "仏教は、変わることのない自己というものを認めない。では、死んだ後、来世に生まれてくるのはいったい何なのか。『ミリンダ王の問い』のなかで、移っていくものがないのに生まれ変わることがあるのかと王に問われた僧ナーガセーナは、灯火のたとえで答えている。ある灯火から別の灯火へ火を移しても、前の灯火がそのまま向こうへ渡ったわけではないが、後の火は前の火がなければともらなかったはずで、ここでは実体が運ばれることなく、原因と結果だけがつながっている。思えば、輪廻転生から抜け出した境地を指す「涅槃」という語も、もともとは火が吹き消された状態を意味していた。",
+    "form": "輪廻転生",
+    "en": "Buddhism does not accept any self that never changes. Then what exactly is it that is born into the next life after death? In The Questions of King Milinda, the monk Nagasena, asked by the king whether one can be reborn when there is nothing that passes across, answers with the simile of a lamp. When a flame is passed from one lamp to another, the first lamp has not itself crossed over, yet the later flame would never have been lit without the earlier one; here no substance is carried across, and only cause and effect are linked. Come to think of it, the word nirvana, which refers to the state of having escaped the cycle of rebirth, also originally meant the state of a fire that has been blown out.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「輪廻転生から抜け出す」「輪廻転生を繰り返す」が典型。解脱や涅槃と対にして語られる。",
+    "sense": ""
+   },
+   "cardId": "nn-767064e71f-489fc916",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-767064e71f-489fc916",
+    "wordId": "nn-767064e71f"
+   }
+  },
+  {
+   "term": "空衣派",
+   "reading": "くうえは",
+   "pos": "noun",
+   "meaning": "Digambara Jain tradition",
+   "defJa": "衣服も所有しない男性修行者を理想とする一派",
+   "passage": {
+    "ja": "二〇一八年二月、インド南部カルナータカ州にあるジャイナ教空衣派の聖地シュラヴァナベルゴラで、十二年に一度の大祭が営まれた。各地から集まった信者たちが見守る中、丘の上に立つ巨大な石像の頭から、牛乳などが次々と注がれた。像は聖者バーフバリを表しており、衣を一切身に着けていないその姿は、所有を捨てる誓いを徹底して、男性の出家者が衣服すら持たないことを理想とする同派の教えをそのまま体現している。僧が持ち歩くのは、孔雀の羽のほうきと水入れくらいだ。",
+    "form": "空衣派",
+    "en": "In February 2018, a great festival held once every twelve years took place at Shravanabelagola, a holy site of the Digambara Jain tradition in the southern Indian state of Karnataka. As believers gathered from many regions looked on, milk and other offerings were poured one after another over the head of the huge stone statue standing on the hill. The statue represents the saint Bahubali, and its figure, wearing nothing at all, directly embodies the teaching of this tradition, which pushes the vow of renouncing possessions to its limit and holds as its ideal that male renunciants own not even clothing. About all its monks carry with them is a peacock-feather whisk and a water pot.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「ジャイナ教の空衣派」と宗教名に続けて使う。裸の出家者を理想とし、白衣派と対をなす。",
+    "sense": ""
+   },
+   "cardId": "nn-82fadd5be4-8e2177d0",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-001.json",
+    "cardId": "nn-82fadd5be4-8e2177d0",
+    "wordId": "nn-82fadd5be4"
+   }
+  },
+  {
+   "term": "ヨーガ",
+   "reading": "よーが",
+   "pos": "noun",
+   "meaning": "yoga (scholarly spelling)",
+   "defJa": "心身を整え解放を目指すインド由来の実践",
+   "passage": {
+    "ja": "パタンジャリがまとめたと伝えられるヨーガの根本経典は、座り方や呼吸の説明に先立って、目指すのは心の働きを止めることだと言い切っています。この段階では、体を動かす話はまだどこにも出てきません。実践の道筋は八段階に分けられ、最初に置かれるのは、生き物を傷つけない、うそをつかないといった戒めです。姿勢が登場するのは三番目で、条件として挙げられるのも、安定していて快適であることくらいです。その後に呼吸の調整、感覚の制御、集中、瞑想と続き、最後の八番目に三昧が置かれています。",
+    "form": "ヨーガ",
+    "en": "Before it gives any account of how to sit or breathe, the root scripture of yoga, said to have been compiled by Patanjali, flatly declares that the aim is to bring the workings of the mind to a stop. At this stage, nothing about moving the body has come up anywhere yet. The path of practice is divided into eight stages, and placed first are restraints such as not harming living things and not telling lies. Posture appears third, and about the only condition given for it is that it be steady and comfortable. After that come regulation of the breath, control of the senses, concentration and meditation, and samadhi is placed last, as the eighth.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「ヨーガの根本経典」「ヨーガの行者」など、古典や思想を語るときは長音を入れて表す。",
+    "sense": ""
+   },
+   "cardId": "nn-79c37337bc-aeb552a7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-79c37337bc-aeb552a7",
+    "wordId": "nn-79c37337bc"
+   }
+  },
+  {
+   "term": "対角線論法",
+   "reading": "たいかくせんろんぽう",
+   "pos": "noun",
+   "meaning": "diagonal argument",
+   "defJa": "一覧の各項と異なるものを作って限界を示す方法",
+   "passage": {
+    "ja": "対角線論法を使えば、どんなプログラムにも出力できない数列があることを示せます。まず、零と一を無限に出力し続けるプログラムをすべて集め、番号を付けて一覧にします。次に、その出力を上から順に並べた表の対角線に沿って、最初の数列からは先頭の数字、二番目の数列からは二つ目の数字というように拾っていき、零なら一、一なら零と、すべて逆にした新しい数列を作ります。この数列は、何番目のプログラムの出力と比べても、ちょうどその番号の位置で食い違うため、一覧にあるどのプログラムからも出てきません。",
+    "form": "対角線論法",
+    "en": "With the diagonal argument, you can show that there are sequences no program can output. First, gather every program that keeps outputting zeros and ones forever, number them, and make a list. Next, lay their outputs out in a table from the top down and pick digits along its diagonal, the first digit from the first sequence, the second digit from the second sequence and so on, then make a new sequence by flipping them all, zero to one and one to zero. Whichever numbered program's output you compare it with, this sequence differs at exactly the position of that number, so it does not come out of any program on the list.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「対角線論法を使う・用いる」の形で、一覧に収まらないものの存在を示す証明に出てくる。",
+    "sense": ""
+   },
+   "cardId": "nn-b0f0e76a81-317df859",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-b0f0e76a81-317df859",
+    "wordId": "nn-b0f0e76a81"
+   }
+  },
+  {
+   "term": "西田幾多郎",
+   "reading": "にしだきたろう",
+   "pos": "noun",
+   "meaning": "Nishida Kitaro",
+   "defJa": "純粋経験を論じた日本の近代哲学者",
+   "passage": {
+    "ja": "京都の東山のふもとには、西田幾多郎が思索にふけりながら歩いたという水路沿いの小道が、「哲学の道」の名で残っている。最初の著書『善の研究』は、見る自分と見られる物とがまだ分かれていない経験を出発点としている。美しい音楽に心を奪われているとき、そこには聞く自分も聞かれる音もなく、ただ響きだけがあるのであって、主観と客観という区別は、後から振り返って付け加えたものにすぎないというのである。若いころの彼は、座禅に打ち込んでいた。金沢で同級生だった鈴木大拙が禅を英語で海外に紹介したのに対し、彼は西洋哲学の言葉で考え抜く道を選んだ。",
+    "form": "西田幾多郎",
+    "en": "At the foot of Higashiyama in Kyoto, a canal-side path where Nishida Kitaro is said to have walked deep in thought survives under the name the Philosopher's Path. His first book, An Inquiry into the Good, takes as its starting point an experience in which the self that sees and the thing that is seen have not yet separated. When we are carried away by beautiful music, he says, there is neither a self that hears nor a sound that is heard but only the resonance, and the distinction between subject and object is nothing more than something added afterwards on looking back. As a young man, he was devoted to seated Zen meditation. While Suzuki Daisetsu, his classmate in Kanazawa, introduced Zen abroad in English, he chose the path of thinking things through in the language of Western philosophy.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "『善の研究』、純粋経験、禅、鈴木大拙といった語と一緒に出てくる近代日本の哲学者。",
+    "sense": ""
+   },
+   "cardId": "nn-e3eafd61ab-99ebc244",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-e3eafd61ab-99ebc244",
+    "wordId": "nn-e3eafd61ab"
+   }
+  },
+  {
+   "term": "先端半導体",
+   "reading": "せんたんはんどうたい",
+   "pos": "noun",
+   "meaning": "leading-edge chips",
+   "defJa": "その時点で高度な製造技術などを用いた半導体",
+   "passage": {
+    "ja": "同じ国内の半導体工場でも、熊本と北海道では扱う製品が大きく異なる。熊本県菊陽町で台湾積体電路製造の子会社が運営する工場は、車や画像センサー向けの製品を手がけ、回路の細かさでは数世代前の技術を使う。これに対し、北海道千歳市を生産拠点に選んだラピダスは、二ナノメートル世代の先端半導体を二〇二七年に量産する計画を掲げ、人工知能向けなど高い計算性能が求められる用途を狙っている。新しい会社だけに、量産の実績はない。巨額の公費を投じて作るチップを、誰が買うのか。",
+    "form": "先端半導体",
+    "en": "Even among semiconductor plants in the same country, the products handled in Kumamoto and in Hokkaido differ greatly. The plant run by a subsidiary of Taiwan Semiconductor Manufacturing Company in Kikuyo, Kumamoto Prefecture, makes products for cars and image sensors, and in fineness of circuitry it uses technology several generations old. By contrast, Rapidus, which chose Chitose in Hokkaido as its production base, has set out a plan to mass-produce leading-edge chips of the two-nanometer generation in 2027, and is aiming at uses that demand high computing performance, such as artificial intelligence. Being a new company, it has no track record in mass production. Who is going to buy the chips made by pouring in vast sums of public money?",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「先端半導体を量産する」「先端半導体の工場」が典型。数世代前の製品との対比で使う。",
+    "sense": ""
+   },
+   "cardId": "nn-96088cb646-de99aa63",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-014.json",
+    "cardId": "nn-96088cb646-de99aa63",
+    "wordId": "nn-96088cb646"
+   }
+  },
+  {
+   "term": "資本集約的",
+   "reading": "しほんしゅうやくてき",
+   "pos": "na-adj",
+   "meaning": "capital-intensive",
+   "defJa": "事業に多額の設備や資金を必要とするさま",
+   "passage": {
+    "ja": "最新の露光装置は一台で数百億円、工場をまるごと建てれば兆円単位の資金が要るという資本集約的な産業とあって、半導体の受託製造では、世代が進むたびに投資を続けられる企業が減ってきた。ついていけなければ、競争から降りざるを得ない。二〇一八年、米グローバルファウンドリーズは七ナノメートル世代の製造技術の開発を無期限で凍結すると発表した。大口顧客の米アドバンスト・マイクロ・デバイスは、この世代の製品の製造をすべて台湾の受託製造大手に委ねることになった。",
+    "form": "資本集約的",
+    "en": "Given that this is a capital-intensive industry in which a single state-of-the-art lithography machine costs tens of billions of yen and building a whole plant takes funds on the scale of trillions of yen, contract chip manufacturing has seen the number of companies able to keep investing shrink with each new generation. A company that cannot keep up has no choice but to drop out of the race. In 2018, GlobalFoundries of the United States announced that it would freeze development of its seven-nanometer generation manufacturing technology indefinitely. Advanced Micro Devices of the United States, a major customer, ended up entrusting all manufacturing of its products of this generation to the leading Taiwanese contract chipmaker.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「資本集約的な産業」が決まった形。巨額の設備投資が要る業種を分析する硬い語。",
+    "sense": ""
+   },
+   "cardId": "nn-44b2efa702-94e542d4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-44b2efa702-94e542d4",
+    "wordId": "nn-44b2efa702"
+   }
+  },
+  {
+   "term": "技術革新",
+   "reading": "ぎじゅつかくしん",
+   "pos": "noun",
+   "meaning": "technological innovation",
+   "defJa": "新しい技術によって生産や利用の仕方が変わること",
+   "passage": {
+    "ja": "技術革新は天才のひらめきから生まれる、という物語は分かりやすい。しかし、半導体の歴史をたどると、様子はかなり違う。ひらめきは始まりにすぎない。最先端の回路を焼き付けるのに欠かせなくなった極端紫外線の露光技術が、その好例である。基礎的な実験が始まったのは一九八〇年代だが、光源の出力不足をはじめとする壁に何度も阻まれ、量産の工場で使われるようになったのは、三十年余りが過ぎた二〇一〇年代の終わりであった。",
+    "form": "技術革新",
+    "en": "The story that technological innovation is born from a genius's flash of insight is easy to follow. But if you trace the history of semiconductors, the picture is quite different. The flash of insight is no more than a beginning. Extreme ultraviolet lithography, which has become indispensable for printing the most advanced circuits, is a good example. Basic experiments began in the 1980s, but the work was blocked again and again by obstacles, starting with the light source's lack of output power, and it was the end of the 2010s, a little over thirty years later, before it came to be used in mass-production plants.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「技術革新が生まれる・進む」が基本の形。発明より、作り方や使い方の変化を指す。",
+    "sense": ""
+   },
+   "cardId": "nn-6f817dd058-3edc1df7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6f817dd058-3edc1df7",
+    "wordId": "nn-6f817dd058"
+   }
+  }
+ ]
+}

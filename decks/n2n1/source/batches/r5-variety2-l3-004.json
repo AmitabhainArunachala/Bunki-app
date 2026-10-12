@@ -1,0 +1,166 @@
+{
+ "items": [
+  {
+   "term": "規模の経済",
+   "reading": "きぼのけいざい",
+   "gloss": "economies of scale",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-bc2c278c89-0fdd76d4",
+    "wordId": "nn-bc2c278c89"
+   }
+  },
+  {
+   "term": "証明可能性",
+   "reading": "しょうめいかのうせい",
+   "gloss": "provability",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-037.json",
+    "cardId": "nn-c2871109c9-6e2c9db2",
+    "wordId": "nn-c2871109c9"
+   }
+  },
+  {
+   "term": "誤差逆伝播法",
+   "reading": "ごさぎゃくでんぱほう",
+   "gloss": "backpropagation",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031-r.json",
+    "cardId": "nn-bc45f91770-e83c05cb",
+    "wordId": "nn-bc45f91770"
+   }
+  },
+  {
+   "term": "起死回生",
+   "reading": "きしかいせい",
+   "gloss": "dramatic revival",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-89b9081580-569ccce1",
+    "wordId": "nn-89b9081580"
+   }
+  },
+  {
+   "term": "配線",
+   "reading": "はいせん",
+   "gloss": "wiring, interconnect",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-f4235c89ba-e92e4701",
+    "wordId": "nn-f4235c89ba"
+   }
+  },
+  {
+   "term": "露光装置",
+   "reading": "ろこうそうち",
+   "gloss": "lithography (exposure) tool",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-033.json",
+    "cardId": "nn-6f2afb50e4-9bf92300",
+    "wordId": "nn-6f2afb50e4"
+   }
+  },
+  {
+   "term": "オープンモニタリング瞑想",
+   "reading": "おーぷんもにたりんぐめいそう",
+   "gloss": "open monitoring meditation",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-ee2ce3cd4b-075a69f7",
+    "wordId": "nn-ee2ce3cd4b"
+   }
+  },
+  {
+   "term": "マーヤー",
+   "reading": "まーやー",
+   "gloss": "māyā, cosmic illusion",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "話",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-8a74fd44c3-e5445a7b",
+    "wordId": "nn-8a74fd44c3"
+   }
+  },
+  {
+   "term": "一元論",
+   "reading": "いちげんろん",
+   "gloss": "monism",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "論",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007-r.json",
+    "cardId": "nn-57e15a0394-c3f6745b",
+    "wordId": "nn-57e15a0394"
+   }
+  },
+  {
+   "term": "不生不滅",
+   "reading": "ふしょうふめつ",
+   "gloss": "neither arising nor ceasing",
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "register": "講",
+   "preferTopic": "india",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-f52ba89ddb-daadec6e",
+    "wordId": "nn-f52ba89ddb"
+   }
+  }
+ ],
+ "weave": [
+  "規模の経済",
+  "証明可能性",
+  "誤差逆伝播法",
+  "起死回生",
+  "配線",
+  "露光装置",
+  "オープンモニタリング瞑想",
+  "マーヤー",
+  "一元論",
+  "不生不滅"
+ ]
+}

@@ -1,6 +1,7 @@
 /** Source approval through ordinary controls in fresh persistent profiles.
  * Provider replies and separate native-storage/lifecycle failures are synthetic.
  * No actual provider endpoint is contacted and no learner record is seeded. */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -68,8 +69,8 @@ async function shelf(page) {
   for (let step = 0; step < 12; step += 1) {
     const view = await page.locator('body').getAttribute('data-view');
     visited.push(view);
-    if (await page.locator('#sheet-close').isVisible()) {
-      await page.locator('#sheet-close').click();
+    if (await page.locator('#sheet').isVisible()) {
+      await page.locator(await entryCloseSelector(page)).click();
       continue;
     }
     if (view === 'shelf') {
@@ -90,7 +91,7 @@ async function shelf(page) {
   assert.fail(`Shelf return exceeded its bounded visible route: ${visited.join(' → ')}`);
 }
 async function inbox(page) {
-  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
+  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet').isVisible()) {
     await shelf(page);
     await openShelfDoor(page, '#source-inbox-link');
   }

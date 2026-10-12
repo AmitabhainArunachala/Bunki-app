@@ -5,6 +5,11 @@ steps that followed the [review](../review-2026-10-04/REVIEW.md) and its
 [refinement](../review-2026-10-04/REFINEMENT.md). Nothing in this plan changes the two
 shipped decks, their card IDs, their Anki identities or the `bunki-cloze:<deckId>` ledgers.
 
+Superseded in part (2026-10-07): the collection shipped as three decks, `n2`, `n1` and
+`senmon`, with ledgers `bunki-cloze:<id>` and deep links `?deck=<id>`, registered by hand in
+`DOJO_DECKS` rather than through `registry.json`. The identity in §5 does not describe them;
+see `decks/n2n1/BATON_CODEX_2026-10-07.md`.
+
 The learner's direction (PR #117): a combined N2/N1 collection covering vocabulary, grammar,
 expressions and contextual kanji knowledge; every released card carries at least one
 coherent, substantive, multi-sentence Japanese paragraph while its scored task stays focused

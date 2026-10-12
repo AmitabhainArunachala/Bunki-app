@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "阿弥陀如来",
+   "reading": "あみだにょらい",
+   "pos": "noun",
+   "meaning": "Amitābha Buddha",
+   "defJa": "西方の極楽浄土に住むと説かれる仏",
+   "passage": {
+    "ja": "寺の本尊を調べるとき、同じ仏の像でも、どの経典や教えを背景に置くかで見方が変わります。阿弥陀如来は、浄土教で西方の極楽浄土と結び付けて説かれ、その本願を頼りとする信仰の中心にあります。その住む場所を地図上の国と同じ意味に取るより、教えの中でどのような救いの場として語られるかを読む方が筋道を追えます。念仏の言葉、仏像の名前、経典の物語を別々に暗記するだけでなく、三つのつながりを確かめると寺院の説明も理解しやすくなります。",
+    "form": "阿弥陀如来",
+    "en": "Investigating a temple’s principal image involves understanding which scriptures and teachings frame it. Amida Buddha is associated in Pure Land traditions with the western Land of Bliss and stands at the center of faith relying on his vow. Rather than treating that realm exactly like a country on a map, reading how it functions as a place of salvation makes the teaching easier to follow. Connecting the words of the nenbutsu, the image’s name, and scriptural narratives also clarifies temple explanations.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「阿弥陀如来の本願」。仏名と浄土教の救済の教えを結び付ける。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "阿修羅",
+   "reading": "あしゅら",
+   "pos": "noun",
+   "meaning": "asura, fighting demigod",
+   "defJa": "仏教で争いの世界と関わる神的な存在",
+   "passage": {
+    "ja": "静かな表情の仏像を見て、その名が争いと結び付くことに意外さを覚える。阿修羅はインドから仏教へ取り入れられた神的な存在であり、教義や図像の中での位置は一つの姿に固定されていない。六道の説明では争いの世界と関わる一方、仏法を守る存在として像が造られる場合もある。同じ名前に矛盾を見つけて片方を誤りとする前に、どの文献や信仰の場に置かれているかを確かめると、文化を越えながら意味を重ねてきた像の歴史が浮かび上がる。",
+    "form": "阿修羅",
+    "en": "A calm Buddhist image can seem surprising when its name is associated with conflict. Asuras are divine beings incorporated into Buddhism from India, whose place in doctrine and imagery is not fixed to a single form. Accounts of the six realms associate them with conflict, while images may also represent them as protectors of Buddhist teaching. Before treating these uses as contradictory, examining the textual and devotional setting reveals a history of meanings layered across cultures.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「阿修羅の像」。六道の説明と守護者としての図像を文脈で区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

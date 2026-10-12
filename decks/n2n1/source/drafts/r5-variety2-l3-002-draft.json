@@ -1,0 +1,284 @@
+{
+ "cards": [
+  {
+   "term": "創発",
+   "reading": "そうはつ",
+   "pos": "noun",
+   "meaning": "emergence",
+   "defJa": "部分だけからは捉えにくい性質が全体に現れること",
+   "passage": {
+    "ja": "渋滞の先頭まで進んだのに、事故も工事も見当たらなかった経験はありませんか。車が密集していると、一台の小さな減速が後ろへ伝わるにつれて増幅され、全体に止まっては進む波が生じることがあります。個々の運転手が計画していない集団の動きが現れる点に、創発という見方の面白さがあります。一台ずつの性能を詳しく調べるだけでなく、車間距離や反応の連鎖まで考えに入れると、なぜ全員が前へ進みたいのに列が止まるのかが見えてきます。",
+    "form": "創発",
+    "en": "Have you ever reached the front of a traffic jam without finding an accident or roadworks. When cars are packed together, a small slowdown by one can amplify as it travels backward, producing waves of stopping and starting across the whole group. The interest of emergence lies in collective behavior appearing without individual drivers planning it. Considering following distances and chains of reactions alongside individual vehicle performance reveals why the queue stops even though everyone wants to move forward.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "部分の相互作用から全体に現れる性質に用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-2eb1d177bb-db85825f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015.json",
+    "cardId": "nn-2eb1d177bb-db85825f",
+    "wordId": "nn-2eb1d177bb"
+   }
+  },
+  {
+   "term": "台湾有事",
+   "reading": "たいわんゆうじ",
+   "pos": "noun",
+   "meaning": "a crisis around Taiwan",
+   "defJa": "台湾周辺で武力衝突などの重大な危機が起こる事態",
+   "passage": {
+    "ja": "ある電子機器の会社が、主要な部品の出荷が止まるという条件で、机上の訓練を行うとします。台湾有事を想定した場合、工場の被害に限らず、輸送や電力、通信の混乱も調達へ波及し得ます。倉庫に在庫があっても、代替の部品を組み込むには設計変更や試験が必要で、数を確保するだけでは製品を出せない場面があります。訓練の焦点は発生時期を当てることより、どの工程が先に止まり、復旧のために誰と何を調整する必要があるかを確かめることです。",
+    "form": "台湾有事",
+    "en": "Suppose an electronics company conducts a tabletop exercise in which shipments of a key component stop. In a Taiwan contingency, disruption to transport, electricity, and communications could affect procurement as well as damage to factories. Even with inventory in a warehouse, incorporating substitute components requires design changes and testing, so securing enough units alone may not allow products to ship. The exercise focuses less on predicting when the event will happen than on identifying which process stops first and what coordination recovery requires.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "危機の発生予測ではなく、想定条件として用いている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-93c24f55ab-a1082fb5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-016.json",
+    "cardId": "nn-93c24f55ab-a1082fb5",
+    "wordId": "nn-93c24f55ab"
+   }
+  },
+  {
+   "term": "営業キャッシュフロー",
+   "reading": "えいぎょうきゃっしゅふろー",
+   "pos": "noun",
+   "meaning": "cash flow from operating activities",
+   "defJa": "本業の取引によって出入りした現金の差額",
+   "passage": {
+    "ja": "売上が増えたのに、仕入れ先へ払うお金が足りない会社を想像してください。商品を引き渡しても代金の回収が先なら、帳簿の利益と手元の現金は一致せず、営業キャッシュフローが悪化することもあります。注文に応えて在庫を積み増す間にも、仕入れや人件費の支払いは続きます。黒字という結果に安心する前に、本業から入る現金と出ていく現金の時期を合わせて捉えると、成長している会社が資金繰りに苦しむ理由が分かります。",
+    "form": "営業キャッシュフロー",
+    "en": "Imagine a company whose sales rise but that lacks money to pay its suppliers. If payment will be collected later even after goods are delivered, accounting profit and cash on hand diverge, and operating cash flow can worsen. Payments for supplies and labor continue while the company builds inventory to meet orders. Understanding the timing of cash entering and leaving the core business before taking comfort in a profit explains why a growing company can struggle to fund its operations.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "本業による現金の出入りを表し、帳簿上の利益と区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-3066501f28-19c47269",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-3066501f28-19c47269",
+    "wordId": "nn-3066501f28"
+   }
+  },
+  {
+   "term": "基幹産業",
+   "reading": "きかんさんぎょう",
+   "pos": "noun",
+   "meaning": "a core industry",
+   "defJa": "経済や他の多くの産業を支える重要な産業",
+   "passage": {
+    "ja": "半導体って、スマホのためだけに作ってると思うと、その広がりを見落とすよね。自動車の制御にも工場の機械にも入り込んでいて、供給が詰まると別の業界まで止まりかねないから、経済を支える基幹産業として扱われるんだ。もちろん、チップを作る会社だけが頑張れば成り立つ仕事でもなくて、材料や製造装置を作る会社にも支えられてる。目立つ完成品の裏をたどると、普段は名前を聞かない会社の小さな部品が、ずいぶん大きな仕事をしてるんだな。",
+    "form": "基幹産業",
+    "en": "Thinking semiconductors are made only for smartphones misses how widely they are used. They are embedded in vehicle controls and factory equipment, and a supply bottleneck can stop other industries, which makes them a core industry supporting the economy. Of course, chipmakers cannot sustain that work alone but depend on companies producing materials and manufacturing equipment. Tracing what lies behind familiar finished products reveals how much work is done by tiny components from companies whose names we rarely hear.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "広く他の産業と経済を支える分野を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-9d4e3b2985-165a8f29",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-017.json",
+    "cardId": "nn-9d4e3b2985-165a8f29",
+    "wordId": "nn-9d4e3b2985"
+   }
+  },
+  {
+   "term": "奇妙なループ",
+   "reading": "きみょうなるーぷ",
+   "pos": "noun",
+   "meaning": "strange loop",
+   "defJa": "階層をたどると自分へ戻る自己言及的な構造",
+   "passage": {
+    "ja": "紙の中の人物が絵を描き、その絵の中の人物が最初の画家を描いている場面を想像してください。外側が内側を生むはずなのに、関係をたどるうちに出発点へ戻る、この階層のねじれが奇妙なループの手がかりです。単に同じ作業を何度も繰り返す循環とは違い、描く側と描かれる側の境界そのものが揺らぎます。ホフスタッターが自己言及を考える際に重視したのも、このように上下の区別を越えて自分自身へ戻ってくる構造でした。",
+    "form": "奇妙なループ",
+    "en": "Imagine a person on paper drawing a picture whose subject is drawing the original artist. Although the outside should generate the inside, following the relationship returns us to the starting point, and this twist in hierarchy offers a clue to a strange loop. Unlike simply repeating the same task, it destabilizes the boundary between the one depicting and the one depicted. Hofstadter emphasized structures that cross distinctions of level and return to themselves when considering self-reference.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "普通の反復と異なり、階層を越えて自己へ戻る構造。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c7fa0fd0d4-d33c2471",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-036.json",
+    "cardId": "nn-c7fa0fd0d4-d33c2471",
+    "wordId": "nn-c7fa0fd0d4"
+   }
+  },
+  {
+   "term": "実用化",
+   "reading": "じつようか",
+   "pos": "noun",
+   "meaning": "practical deployment",
+   "defJa": "研究成果を現実の用途で使えるようにすること",
+   "passage": {
+    "ja": "研究室で一度動いた装置を、毎朝止まらず働く工場へ持ち込むと、成功の意味が変わります。実用化には性能の高さに加えて、故障した際に直せることや、現場で払える費用に収まることが求められます。「動いた」と「使い続けられる」の間には、温度や振動への対策、部品の調達、作業員の訓練といった仕事が積み重なっています。発明の瞬間ほど目立たなくても、この隙間を埋める工夫によって、新しい技術が日々の生産を担う道具へ変わります。",
+    "form": "実用化",
+    "en": "Moving a device that worked once in a laboratory into a factory that must operate reliably every morning changes what success means. Practical deployment requires not just strong performance but repairability and costs the workplace can afford. Between it worked and we can keep using it lie measures against temperature and vibration, component procurement, and worker training. Though less conspicuous than the moment of invention, closing that gap turns new technology into a tool that sustains daily production.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "研究成果を現場で継続して使える状態へ移すこと。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-84e41e69ce-cf48f529",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-018.json",
+    "cardId": "nn-84e41e69ce-cf48f529",
+    "wordId": "nn-84e41e69ce"
+   }
+  },
+  {
+   "term": "屋台骨",
+   "reading": "やたいぼね",
+   "pos": "noun",
+   "meaning": "a central support or backbone",
+   "defJa": "組織や事業を根本で支えるもの",
+   "passage": {
+    "ja": "新製品の発表会が華やかでも、会社の毎月の支払いを支えているのは昔からの保守契約、という場合があります。その事業が収益の屋台骨を支えているなら、売上の伸びが小さいからといって、役割まで小さいとは言えません。契約を維持する技術者や、顧客の設備を知り尽くした担当者が去れば、目立たなかった弱点が一気に表面へ出ます。事業を学ぶ際には、新しさだけで順位を付けず、ほかの挑戦が失敗しても組織を立たせておける収入源に注目すると、違う輪郭が見えてきます。",
+    "form": "屋台骨",
+    "en": "Even when a new-product launch is glamorous, longstanding maintenance contracts may fund the company’s monthly payments. If that business forms the backbone of earnings, low sales growth alone does not make its role small. Departures of engineers who maintain contracts or staff intimately familiar with customers’ equipment can suddenly expose hidden weaknesses. Studying which income sources keep an organization standing even when other ventures fail, instead of ranking businesses solely by novelty, reveals a different outline.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「収益の屋台骨を支える」のように、存立の土台を比喩的に表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-019.json",
+    "cardId": "nn-1ccc6a0eb9-df0e6e7b",
+    "wordId": "nn-1ccc6a0eb9"
+   }
+  },
+  {
+   "term": "広帯域メモリ",
+   "reading": "こうたいいきめもり",
+   "pos": "noun",
+   "meaning": "high-bandwidth memory",
+   "defJa": "積層構造などで高速な情報転送を図る記憶装置",
+   "passage": {
+    "ja": "計算する装置だけを速くしても、必要なデータが届かなければ待ち時間が増えます。広帯域メモリは、記憶用のチップを積み重ね、多くの接続を使うことで、大量の情報をやり取りできるようにしたものです。倉庫を大きくするのが容量の増加だとすれば、荷物を出し入れする道を広げることが転送の速さに対応します。ただし、積み重ねれば熱や製造の難しさも伴うため、計算側との接続に至るまで一体として設計する必要があります。",
+    "form": "広帯域メモリ",
+    "en": "Speeding up only the computing device increases waiting time if the data it needs cannot arrive. High-bandwidth memory stacks memory chips and uses many connections to exchange large amounts of information. If increasing capacity is like enlarging a warehouse, widening the routes for moving goods in and out corresponds to transfer speed. Stacking also brings heat and manufacturing challenges, however, so the design must integrate everything through the connections with the computing side.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "容量ではなく、主に情報を大量に転送できる構造へ注目する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-cec3f949f8-f1aba2d8",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-cec3f949f8-f1aba2d8",
+    "wordId": "nn-cec3f949f8"
+   }
+  },
+  {
+   "term": "悲観論",
+   "reading": "ひかんろん",
+   "pos": "noun",
+   "meaning": "a pessimistic outlook",
+   "defJa": "将来を悪い方向へ進むと見る考え",
+   "passage": {
+    "ja": "ある工場への注文が急に減ったとき、担当者の一人は、この産業全体が衰退へ向かうと判断しました。別の担当者は、顧客が抱えていた在庫を減らしている途中にすぎないと見ています。前者のような悲観論を検討するには、最悪の結果を想像するだけでなく、その結果へ至る条件が実際に続いているかを確かめる必要があります。もし別の用途から注文が増え始めたなら、初めの見通しに反して状況が変わった可能性も含め、判断の根拠を組み直すことになります。",
+    "form": "悲観論",
+    "en": "When orders to a factory suddenly fell, one manager concluded that the entire industry was heading into decline. Another saw it as nothing more than customers working down their inventories. Examining a pessimistic outlook such as the first requires more than imagining the worst outcome, since the conditions leading to it must actually persist. If orders from another application begin growing, the basis of the judgment must be reconstructed to allow for conditions changing contrary to the initial outlook.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "将来が悪化するとみる立場であり、慎重さ一般とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6053cca230-c355360d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021.json",
+    "cardId": "nn-6053cca230-c355360d",
+    "wordId": "nn-6053cca230"
+   }
+  },
+  {
+   "term": "技術覇権",
+   "reading": "ぎじゅつはけん",
+   "pos": "noun",
+   "meaning": "technological hegemony",
+   "defJa": "技術を背景に他へ強い支配的影響を及ぼす立場",
+   "passage": {
+    "ja": "一番速いチップを作れた国が、そのまま世界の主導権を握るとは限らないよね。設計用の道具や製造装置、部品をつなぐ規格まで他の国に頼っていたら、自分だけで決められる範囲は狭いままだ。技術覇権をめぐる争いでは、製品の性能だけじゃなく、誰の仕組みをみんなが使うかも大事になる。いったん広く使われた仕組みを替えるには費用も手間もかかるから、便利だから選ばれたものが、後から交渉力の差を生むことだってあるんだよ。",
+    "form": "技術覇権",
+    "en": "The country making the fastest chip does not necessarily take global leadership automatically. If it depends on other countries for design tools, manufacturing equipment, and standards connecting components, its independent room for decision remains limited. Competition for technological dominance concerns not only product performance but whose systems everyone uses. Replacing a widely adopted system takes money and effort, so something originally selected for convenience can later create unequal bargaining power.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "単なる技術力の高さでなく、他へ及ぼす支配的な影響を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bfa93b3789-a6c1a19e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-021-r.json",
+    "cardId": "nn-bfa93b3789-a6c1a19e",
+    "wordId": "nn-bfa93b3789"
+   }
+  }
+ ]
+}

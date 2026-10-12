@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "単刀直入",
+   "reading": "たんとうちょくにゅう",
+   "pos": "noun",
+   "meaning": "straight to the point",
+   "defJa": "前置きをせず、すぐに本題へ入ること",
+   "passage": {
+    "ja": "頼んだ原稿が届かず予定を組めないとき、季節の挨拶を長く書いてから遠回しに進み具合を聞くと、肝心の問いが埋もれてしまいます。「いつまでに送れますか」と単刀直入に尋ねた上で、印刷の日程を決めたいという事情を添える方法もあります。前置きを省くかわりに理由を具体的に示せば、相手も何を答えるべきか判断しやすくなります。要点を先に出すことと相手を責めることを混同せず、こちらの希望と相手が対応できる範囲を確かめる言葉を選びましょう。",
+    "form": "単刀直入",
+    "en": "When a commissioned manuscript has not arrived and you cannot plan, a long seasonal greeting followed by an indirect inquiry about progress can bury the essential question. One approach is to ask directly when it can be sent and then explain that you want to fix the printing schedule. Replacing a preamble with a concrete reason makes it easier for the recipient to judge what to answer. Distinguish presenting the main point first from blaming the other person, and choose words that clarify both your wishes and what they can manage.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「単刀直入に尋ねる」のように、遠回しにせず要点に進みます。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "圧縮",
+   "reading": "あっしゅく",
+   "pos": "noun",
+   "meaning": "compression, condensation",
+   "defJa": "データの表し方を変えて必要な容量を減らすこと",
+   "passage": {
+    "ja": "画像を使って機械に分類を学習させるとき、保存場所を節約しようとして、写真の細部を失ってしまう場合があります。データを圧縮する方式の中には、一部の情報を捨てて容量を小さくするものがあり、その情報を完全には元に戻せません。輪郭のわずかな違いが手掛かりになる課題なら、見た目が似ているからといって、加工前と同じ条件だとは判断できません。容量の数字だけで処理を選ばず、分類に必要な特徴が残っているかを確認すると、保存の工夫と学習の目的を結びつけられます。",
+    "form": "圧縮",
+    "en": "When training a machine to classify images, attempts to save storage space can cause photographic detail to be lost. Some data compression methods reduce file size by discarding information that cannot be fully restored. If a task relies on slight differences in outlines, a similar appearance alone does not justify treating the processed image as equivalent to the original. Checking whether the features needed for classification remain, instead of choosing a process solely by file size, connects storage decisions with the learning objective.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "画像では、容量を減らす方式によって細部が失われることもあります。",
+    "sense": "データを表すのに必要な容量を小さくすること"
+   }
+  },
+  {
+   "term": "探究心",
+   "reading": "たんきゅうしん",
+   "pos": "noun",
+   "meaning": "spirit of inquiry",
+   "defJa": "理由や仕組みを深く知ろうとする気持ち",
+   "passage": {
+    "ja": "川原で拾った石の白い筋を見て、石の名前を調べるだけで満足する人もいれば、どうして筋ができたのかまで知りたくなる人もいます。こうした探究心を学びにつなげるには、分かったことを集める一方で、まだ説明できない部分も書き残す方法があります。自分なりの仮説を立て、図鑑や別の石と比べて検証すると、答えが違っていても、どこで考えが変わったかを追えます。知らないことの多さを恥じるより、昨日は気づかなかった問いを一つ持てたことに、学習の広がりを見いだせます。",
+    "form": "探究心",
+    "en": "On noticing a white vein in a stone picked up by a river, some people are satisfied to look up the stone’s name, while others want to know how the vein formed. One way to connect this spirit of inquiry with learning is to record what remains unexplained while gathering what has been understood. Forming your own hypothesis and checking it against an illustrated guide or other stones lets you trace where your thinking changed even when your answer was wrong. Rather than feeling ashamed of how much you do not know, you can find expanding learning in having one question you had not noticed yesterday.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「探究心を育てる」は、答えの先まで調べようとする心を育むこと。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "日清戦争",
+   "reading": "にっしんせんそう",
+   "pos": "noun",
+   "meaning": "First Sino-Japanese War",
+   "defJa": "一八九四年から翌年にかけての日本と清の戦争",
+   "passage": {
+    "ja": "下関条約の条文を開くと、戦いの終わりが領土や賠償金の取り決めとして記されている。一八九四年に始まった日清戦争では、朝鮮への影響力をめぐって日本と清が対立し、翌年の条約で清は台湾などの割譲と賠償金の支払いを認めた。戦場の勝敗のみならず、どの土地で誰が支配するようになったかを追えば、戦争が終わったあとに始まる変化も見えてくる。年表の短い一行から条文や地図へと視線を移すことで、国家間の合意が地域の暮らしにどう及んだのかという問いを持てる。",
+    "form": "日清戦争",
+    "en": "Opening the Treaty of Shimonoseki reveals the end of the fighting recorded as arrangements for territory and indemnities. In the First Sino-Japanese War, which began in 1894, Japan and Qing China clashed over influence in Korea, and in the following year’s treaty Qing China accepted the cession of Taiwan and other territories and payment of an indemnity. Following not only battlefield outcomes but also who came to rule which places reveals changes beginning after the war ended. Moving from a brief line in a chronology to treaty provisions and maps lets us ask how an agreement between states affected life in the regions.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "朝鮮をめぐる対立が背景にあり、下関条約で講和しました。",
+    "sense": ""
+   }
+  }
+ ]
+}

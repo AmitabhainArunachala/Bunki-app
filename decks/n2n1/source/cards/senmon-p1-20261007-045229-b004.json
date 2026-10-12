@@ -1,0 +1,92 @@
+{
+  "cards": [
+    {
+      "term": "空",
+      "reading": "くう～",
+      "pos": "noun",
+      "meaning": "Buddhist emptiness; absence of fixed substance",
+      "defJa": "固定した実体がないという仏教の考え",
+      "passage": {
+        "ja": "仏教の話になると、必ず出てくるのが空という概念です。ここで注意したいのは、これを「何もない」という意味にとらないことなんですね。ものには固定した実体がなく、すべては縁によって成り立つ、そういうあり方を指しています。龍樹はこの考えを中観という立場から体系的に説き、般若心経の智慧もここに集約されるわけです。だからこそ執着を手放せる、というのが仏教の大きなポイントなんです。",
+        "form": "空",
+        "en": "When the subject turns to Buddhism, one concept that always comes up is śūnyatā, emptiness. What you need to be careful about is not taking it to mean that nothing exists. It points to the way things have no fixed substance and everything arises through conditions. Nāgārjuna systematized this idea from the standpoint of the Madhyamaka school, and the wisdom of the Heart Sutra, too, is distilled right here. That is why attachment can be let go of, and that is one of Buddhism's biggest points.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "空という概念/空を説くが定番。「無」と違い、実体がなくても縁起は成り立つとする考え",
+        "sense": "仏教で、万物に固定した実体がないこと"
+      },
+      "deck": "senmon",
+      "field": "india",
+      "level": "N2",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "簡潔",
+      "reading": "かんけつ",
+      "pos": "na-adj",
+      "meaning": "concise, brief and to the point",
+      "defJa": "むだがなく、短くて要点だけのさま",
+      "passage": {
+        "ja": "日本語の文章術の話になると、必ずと言っていいほど「簡潔に書け」という助言が出てきます。ただ、ここで誤解しがちなのは、単に文を短く切ればいいと思ってしまうことなんですね。無駄な修飾を削り、伝えたい核心だけを残す、その結果として短くなるのが理想です。俳句が十七音の中に一つの世界を切り取るのは、まさにこの精神の極致です。つまりそこで求められるのは、思い切って削る勇気なんです。",
+        "form": "簡潔に",
+        "en": "In any discussion of the craft of writing Japanese, the advice to write concisely comes up almost without fail. The misunderstanding to watch out for, though, is thinking you can simply chop sentences short. The ideal is to cut the needless modifiers and leave only the core you want to convey, so that brevity comes as a result. Haiku, cutting out a whole world within seventeen syllables, is the ultimate expression of this spirit. What is really being asked for, in the end, is the courage to cut.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "簡潔に書け/簡潔な文章が定番。短さそのものではなく、削った結果の密度をいう",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "規制",
+      "reading": "きせい",
+      "pos": "noun",
+      "meaning": "regulation; (legal) control, restriction",
+      "defJa": "決まりで行動や営みを制限すること",
+      "passage": {
+        "ja": "生成AIが急速に広がる今、規制をどう設計するかが各国の大きな課題になっています。強すぎれば革新を殺し、緩すぎれば偽情報や権利侵害を野放しにする、という板挟みがあるんですね。欧州連合は包括的な枠組みを先陣切って打ち出しましたが、その影響は世界全体に及ぶと見られています。技術の進化の方が速い以上、法整備は永遠の追いかけっこです。結局、どこで線を引くかは、これから何年も議論され続ける問題なんです。",
+        "form": "規制",
+        "en": "With generative AI spreading rapidly, how to design regulation has become a major issue for every country. There is a bind: make it too strict and it kills innovation; make it too loose and it lets misinformation and rights violations run wild. The European Union was first out of the gate with a comprehensive framework, and its influence is expected to extend across the whole world. Since technology evolves faster, legal frameworks are forever playing catch-up. In the end, where to draw the line is a question that will be debated for years to come.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "規制を強める/規制を緩和するのように対で使われ、政策論で頻出の語",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N2",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "誘惑",
+      "reading": "ゆうわく",
+      "pos": "noun",
+      "meaning": "temptation, allurement",
+      "defJa": "人の心を引きつけて惑わすこと",
+      "passage": {
+        "ja": "勉強習慣の話をするとき、避けて通れないのがスマホの存在です。通知音が鳴るたびに手が伸びるのは、意志が弱いからではなく、脳そのものが報酬に敏感にできているからなんですね。つまり、誘惑にひたすら耐え続ける戦略は、最初から分が悪いわけです。だったら、発信源そのものを物理的に遠ざけるほうがよほど有効です。要は、意志の問題ではなく環境設計の問題だと割り切ってしまうことなんです。",
+        "form": "誘惑",
+        "en": "When we talk about study habits, the smartphone is a presence we cannot get around. That your hand reaches out each time a notification sounds is not weakness of will; it is that the brain itself is built to be sensitive to reward. In other words, a strategy of endlessly enduring temptation is at a disadvantage from the start. If that is the case, it is far more effective to physically remove the source itself. The point is to accept that this is a matter of environmental design, not willpower.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "誘惑に負ける/誘惑に耐えるが定番。快感や報酬への引きを、意志の話と絡めて使う",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

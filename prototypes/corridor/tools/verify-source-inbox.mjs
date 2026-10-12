@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -60,8 +61,8 @@ async function shelf(page) {
   for (let step = 0; step < 12; step += 1) {
     const view = await page.locator('body').getAttribute('data-view');
     visited.push(view);
-    if (await page.locator('#sheet-close').isVisible()) {
-      await page.locator('#sheet-close').click();
+    if (await page.locator('#sheet').isVisible()) {
+      await page.locator(await entryCloseSelector(page)).click();
       continue;
     }
     if (view === 'shelf') {
@@ -82,7 +83,7 @@ async function shelf(page) {
   assert.fail(`Shelf return exceeded its bounded visible route: ${visited.join(' → ')}`);
 }
 async function inbox(page) {
-  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet-close').isVisible()) {
+  if (await page.locator('body').getAttribute('data-view') !== 'source-inbox' || await page.locator('#sheet').isVisible()) {
     await shelf(page);
     await openShelfDoor(page, '#source-inbox-link');
   }
@@ -219,6 +220,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await page.locator('#source-reader-original').getAttribute('href'), 'https://example.org/audio#t=93');
     await screenshot('saved-link');
     await page.locator('#source-reader-back').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'source-inbox');
     const saved = await readAppRecordSnapshot(page); assert.equal(saved.record.sourceInbox.entries.length, 2); noReviewChange(before, saved);
     await shelf(page); await page.locator('#tray').click();
     const downloadWork = page.waitForEvent('download'); await page.locator('#export-store').click();
@@ -277,6 +279,7 @@ for (const engine of engines) for (const width of sizes) {
     result.observations.push({ syntheticFault: 'explicit fake provider settings plus deliberate disabled-button tampering',
       sourceTextEgress: false, archiveUnchanged: true, questionPreserved: true });
     await page.locator('#teacher-source-return').click(); await page.locator('#source-reader-back').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'ai' && !document.documentElement.dataset.roomTransition);
     await inbox(page);
     // Fault-only phase, after the ordinary flow and recording observations.
     await page.locator('#source-capture-text').fill('保存に失敗しても、この文章を残す。');

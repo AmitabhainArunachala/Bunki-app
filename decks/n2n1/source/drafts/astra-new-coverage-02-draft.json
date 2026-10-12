@@ -1,0 +1,164 @@
+{
+ "cards": [
+  {
+   "term": "緊張緩和",
+   "reading": "きんちょうかんわ",
+   "pos": "noun",
+   "meaning": "easing of international tensions",
+   "defJa": "対立する国などの険悪な関係が和らぐこと。",
+   "passage": {
+    "ja": "冷戦期の米ソ関係は、対立が深まる一方の単純な流れでは捉えられない。軍備管理の交渉や首脳間の対話を通じて、緊張緩和を図る局面もあった。しかし、交渉の席に着いたからといって、互いの政治体制への不信や世界各地での競争が消えたわけではない。対峙する相手との連絡経路を確保することには、対立を抱えたままでも、誤解が衝突の引き金となる危険を減らす意味があった。握手する首脳の写真だけで和解の完成を読み取らず、何を合意し、何を残したのかを見る必要がある。",
+    "form": "緊張緩和",
+    "en": "Cold War relations between the United States and the Soviet Union cannot be understood as a simple progression of worsening confrontation. There were also periods when they sought to ease tensions through arms-control negotiations and dialogue between leaders. But sitting down to negotiate did not erase distrust of each other’s political systems or competition around the world. Maintaining channels of communication with an adversary served to reduce the risk of misunderstandings triggering a clash even while conflict persisted. Rather than reading a photograph of leaders shaking hands as completed reconciliation, we need to examine what they agreed on and what remained unresolved.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "冷戦史では「デタント」とも呼ぶ。軍事的対立が完全になくなることとは異なる。",
+    "sense": "国家間の対立が和らぐこと。"
+   }
+  },
+  {
+   "term": "総力戦",
+   "reading": "そうりょくせん",
+   "pos": "noun",
+   "meaning": "total war",
+   "defJa": "軍事以外の社会の力も広く動員して行う戦争。",
+   "passage": {
+    "ja": "前線へ送る兵器を増やすには、工場の機械だけでなく、原料を運ぶ鉄道や、働く人の食料も必要です。総力戦では、軍隊に限らず、生産や輸送、国民の生活まで、社会の幅広い部分が戦争のために動員されます。工業化によって物を大量に作れるようになれば、それを支える労働力や資源の確保も大きな課題になります。家に残った人の仕事や買い物にも、戦争の影響が入り込んでくるのですから、戦場の地図だけでは全体をつかめません。歴史を読むときには、兵士の背後にある工場や台所にも目を向けてください。",
+    "form": "総力戦",
+    "en": "Increasing the supply of weapons to the front requires not only factory machinery but also railways to carry raw materials and food for workers. In total war, broad areas of society, including production, transport, and civilian life, are mobilized for war rather than the military alone. Once industrialization enables mass production, securing the labor and resources that support it also becomes a major challenge. Since war reaches into the work and shopping of those at home, a map of the battlefield cannot convey the whole picture. When reading history, look also at the factories and kitchens behind the soldiers.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「総力戦体制」「総力戦に動員する」。兵士だけで戦うという見方を超える語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "締めくくり",
+   "reading": "しめくくり",
+   "pos": "noun",
+   "meaning": "conclusion; closing section",
+   "defJa": "話や文章などをまとめて終えることやその部分。",
+   "passage": {
+    "ja": "推敲中の随筆を声に出して読むと、最後の段落だけ、急に話題が遠くへ飛んでいました。旅先の小さな食堂を書いていたのに、結末で世界の食料問題を持ち出したため、店主の表情が薄れてしまったのです。締めくくりを大きな主張にするかわりに、食器を返したときの短い会話へ戻してみます。常套句で感動を言い切るより、読者がその場にもう少しいられる余地を残したいからです。序論から結末までを立派にそろえることより、この文章で出会った人の声が、最後にも聞こえるかどうかを確かめます。",
+    "form": "締めくくり",
+    "en": "When I read the essay I was revising aloud, only the final paragraph suddenly veered far off topic. I had been writing about a small restaurant I visited, but bringing up global food problems at the end made the owner’s expression fade from view. Instead of making a grand statement in the conclusion, I will return to our brief exchange when I handed back the dishes. That is because I want to leave room for readers to linger there rather than declare my emotion with a cliché. Rather than making everything from the introduction to the ending look impressive, I check whether the voice of the person encountered in the essay can still be heard at the end.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「締めくくりに述べる」「話の締めくくり」。最後に新しい論点を増やさない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "緩衝国",
+   "reading": "かんしょうこく",
+   "pos": "noun",
+   "meaning": "buffer state",
+   "defJa": "対立する大国の間に位置し衝突を和らげる国。",
+   "passage": {
+    "ja": "大国どうしの間にある小さな国を、地図の空白のように扱ってよいはずがない。緩衝国という呼び名は、その国が周囲の対立を和らげる位置にあることを示すが、そこに暮らす人々の望みまでは語らない。独立を保とうと交渉する政府にも、自国の利益や歴史がある。隣国の圧力が強いとはいえ、最初から属国と同じものだと考えると、外交上の選択や抵抗を見落とす。大国にとって何の役に立ったかという問いに加え、その土地からは国際関係がどう見えたかを問う余地がある。",
+    "form": "緩衝国",
+    "en": "It cannot be right to treat a small country between great powers as empty space on a map. The label “buffer state” describes its position in easing surrounding rivalries, but says nothing about the wishes of its people. A government negotiating to preserve independence has interests and a history of its own. Strong pressure from neighboring countries does not justify equating it with a vassal state from the outset, which would obscure its diplomatic choices and resistance. Alongside asking what use it served for great powers, there is room to ask how international relations looked from that country itself.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "周囲の大国との関係から見た呼び名。独立を失った「属国」とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "緩衝地帯",
+   "reading": "かんしょうちたい",
+   "pos": "noun",
+   "meaning": "buffer zone",
+   "defJa": "対立する勢力などを隔てて衝突を抑える区域。",
+   "passage": {
+    "ja": "停戦合意で向かい合う部隊を引き離す場合、その間に緩衝地帯を設け、直接の接触を避ける方法がある。ただし、地図に境界線を引くことと、現地で衝突を防ぐことは同じではない。対峙する双方が、誰の立ち入りを認め、違反をどう確認するかについて、共通の取り決めを持つ必要がある。監視の仕組みが不十分なら、わずかな動きが相手の攻撃準備と受け取られ、再び対立の引き金になりかねない。住民の通行や耕作をどう扱うかも含めて、区切られた場所を維持する具体策が問われる。",
+    "form": "緩衝地帯",
+    "en": "When a ceasefire agreement separates opposing troops, one option is to establish a buffer zone between them to avoid direct contact. But drawing boundaries on a map is not the same as preventing clashes on the ground. Both opposing sides need shared arrangements on who may enter and how violations will be verified. If monitoring is inadequate, even a small movement may be interpreted as preparation for an attack and trigger renewed confrontation. Concrete measures for maintaining the designated area are needed, including provisions for residents’ passage and farming.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「緩衝地帯を設ける」。区域であり、それ自体が独立国家であるとは限らない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "縁の下の力持ち",
+   "reading": "えんのしたのちからもち",
+   "pos": "expression",
+   "meaning": "unsung hero",
+   "defJa": "目立たない所で全体を支える人。",
+   "passage": {
+    "ja": "新しい半導体の発表では、性能の数字や設計者に注目が集まりがちです。その製品を安定して作るために、装置の点検を続ける担当者もまた、工場を支える縁の下の力持ちです。工程に異常が見つかれば、記録をたどり、どこからずれが生じたかを関係者と確かめます。巨額の投資で装置をそろえたとしても、日々の小さな変化を見過ごしてよい理由にはなりません。目立つ発明だけでなく、昨日と同じ品質を今日も保つ仕事に目を向けると、技術を社会へ届ける人の姿が広く見えてきます。",
+    "form": "縁の下の力持ち",
+    "en": "Announcements of new semiconductors tend to draw attention to performance figures and designers. The staff who keep inspecting equipment so those products can be manufactured consistently are also unsung heroes supporting the factory. When an abnormality is found in a process, they trace records and work with others to establish where the deviation began. Even huge investments in equipment are no reason to overlook small day-to-day changes. Looking beyond conspicuous inventions to the work of maintaining yesterday’s quality today reveals a broader picture of the people who bring technology to society.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "人に対する評価。「半導体そのもの」を指す比喩より、支える仕事が見える用例。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "縁起でもない",
+   "reading": "えんぎでもない",
+   "pos": "expression",
+   "meaning": "what an ominous thing to say",
+   "defJa": "悪いことが起こりそうで、不吉だと感じるさま。",
+   "passage": {
+    "ja": "山へ出かける前に、友達が帰ってこられなかったら本をもらうよなんて言うから、縁起でもないことを言うなよって返したんだ。冗談だとは分かってても、出発間際にそんなことを聞くと、平常心ではいられないよ。それで話をやめるかわりに、どの道を通って、何時までに連絡するかを一緒に確かめたんだ。相手も、怖がらせたいんじゃなくて、心配してるんだって言ってくれたよ。言葉の響きに腹を立てるだけで終わらずに、無事に戻るための話へつなげられたのはよかったと思う。",
+    "form": "縁起でもない",
+    "en": "Before I set off for the mountains, a friend joked about taking my books if I did not return, so I told them not to say something so ominous. Even knowing it is a joke, hearing that just before leaving makes it hard to stay calm. Instead of ending the conversation there, we checked together which route I would take and by what time I would get in touch. My friend also said they were worried rather than trying to scare me. I think it was good that we turned it into a conversation about returning safely instead of ending with my annoyance at how their words sounded.",
+    "register": "話",
+    "topic": "other",
+    "tipJa": "相手の不吉な発言をとがめる決まり文句。仏教の「縁起」の教義とは別の用法。",
+    "sense": "不吉な言葉や想像を嫌って言う表現。"
+   }
+  },
+  {
+   "term": "罪悪感",
+   "reading": "ざいあくかん",
+   "pos": "noun",
+   "meaning": "guilt",
+   "defJa": "悪いことをしたと思って自分を責める気持ち。",
+   "passage": {
+    "ja": "休暇を取った日に仕事の連絡を見ると、自分だけ楽をしているようで、椅子から立ち上がりたくなる。休む権利があると知りつつも、罪悪感を覚える人はいるだろう。しかし、胸が痛むという事実だけで、実際に誰かを不当に苦しめたと判断することはできない。責任の範囲を確かめずに謝り続ければ、休むことそのものが悪いという考えを強化してしまう。引き継ぎが足りなかったのなら補い、必要な手続きを済ませたのなら休むというように、気持ちと行動の検討を分けることも大切である。",
+    "form": "罪悪感",
+    "en": "Seeing a work message on a day off can make us want to get out of our chair, as if we alone were taking it easy. Some people may feel guilt even while knowing they have a right to rest. But the fact that our conscience hurts does not establish that we have actually caused someone unjustified hardship. Continuing to apologize without checking the bounds of our responsibility can reinforce the idea that resting is itself wrong. It is also important to separate feelings from an assessment of actions, addressing an inadequate handover if needed and resting if the necessary arrangements are complete.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「罪悪感を覚える」「罪悪感にさいなまれる」。刑事上の罪があるとは限らない。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "美化語",
+   "reading": "びかご",
+   "pos": "noun",
+   "meaning": "beautifying expression",
+   "defJa": "ものごとの言い方を上品に整えることば。",
+   "passage": {
+    "ja": "自分で飲むものでも「お酒」と言えるのは、酒の持ち主を敬っているからではありません。ものごとの言い方を上品に整える、こうした働きを持つ表現が美化語です。「お料理」もその例ですが、どの名詞にも同じように「お」を足せるとは限りません。専門用語の分類を覚えるだけにとどまらず、普段の会話で何に付き、何には付かないかを集めてみましょう。相手を高く扱う言い方なのか、表現そのものを整える言い方なのかを見分けると、敬語の形が同じでも、働きには違いがあると分かります。",
+    "form": "美化語",
+    "en": "You can say “osake” even for sake you drink yourself, not because you are honoring its owner. Expressions with this function of making the wording more refined are called beautifying expressions. “Oryōri” is another example, but that does not mean you can add “o” to any noun in the same way. Go beyond memorizing the technical categories and collect examples of what takes it and what does not in everyday conversation. Distinguishing language that elevates another person from language that refines the expression itself shows that honorific forms can look alike while serving different functions.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「お酒」「お料理」など。相手や持ち主を高める尊敬語とは働きが異なる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "美文",
+   "reading": "びぶん",
+   "pos": "noun",
+   "meaning": "elegant, ornate prose",
+   "defJa": "美しい語句や調子で飾られた文章。",
+   "passage": {
+    "ja": "雨の路地を描いた原稿に、宝石や銀糸の比喩が重なり、読んでいるうちに足元の水たまりが見えなくなりました。美文を目指すあまり、書き手が本当に見たものより、飾りの言葉が前へ出てしまった例です。対句を一つ残してほかを削ると、傘から落ちるしずくの音が、前よりはっきり伝わってきます。平易な表現に直すことは、文章から美しさを奪う作業とは違います。声に出して読んだときに、言葉の調子と描きたい景色が互いを支えているか、その関係を確かめながら推敲します。",
+    "form": "美文",
+    "en": "Jewels and silver-thread metaphors piled up in a draft describing a rainy alley until the puddles underfoot disappeared from view as I read. This is an example of striving so hard for elegant prose that decorative words overshadow what the writer actually saw. Keeping one parallel construction and cutting the others makes the sound of drops falling from an umbrella come through more clearly. Rewriting in plain language is different from stripping beauty out of prose. In revising, I read aloud and check whether the rhythm of the words and the scene I want to depict support one another.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「美文を綴る」。美しさへの評価にも、内容より装飾を重んじるという批評にも使う。",
+    "sense": "美しい表現で飾った文章。"
+   }
+  }
+ ]
+}

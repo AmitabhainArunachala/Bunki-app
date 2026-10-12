@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "見本",
+   "reading": "みほん",
+   "pos": "noun",
+   "meaning": "sample, model",
+   "defJa": "商品の形や品質を示すために用意したもの",
+   "passage": {
+    "ja": "椅子の張り替えを頼むとき、色の名前だけで希望を伝えるのは案外難しいものです。店頭で気に入った青でも、部屋の照明の下では冷たく見えることがあるので、生地の見本を借りて帰りましょう。写真に加えて小さな布が手元にあれば、指で触れながら、光沢の強さや肌に当たる感じまで比べられます。注文書には単に明るい青と書くより、選んだ布の番号と、どの面に使いたいかを添えるほうが確実です。",
+    "form": "見本",
+    "en": "When having a chair reupholstered, communicating your wishes through color names alone can be surprisingly difficult. Even a blue you like in the shop can look cold under your room lighting, so borrow a fabric sample to take home. With a small piece of cloth as well as a photograph at hand, you can touch it and compare everything from its sheen to its feel against your skin. On the order form, giving the chosen fabric number and the surfaces you want covered is more reliable than simply writing bright blue.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "ここでは、商品の質感を確かめるための実物を指す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "破片",
+   "reading": "はへん",
+   "pos": "noun",
+   "meaning": "fragment; broken piece",
+   "defJa": "割れたり砕けたりしてできた小さな部分",
+   "passage": {
+    "ja": "窯から出したばかりの器が床に落ちると、職人は箒を持つ手を止め、散らばった破片を一つずつ拾い上げた。継ぎ合わせれば輪郭は戻るとしても、釉薬の流れまで同じ姿に復元することはできない。それでも、どこに力がかかって割れたのかは、欠けた縁を見比べることで分かる場合がある。完成品だけを棚に並べていては見えてこない土の厚みや焼き方の癖が、壊れた器にはむき出しになっている。",
+    "form": "破片",
+    "en": "When a vessel fresh from the kiln fell to the floor, the potter paused with a broom in hand and picked up the scattered fragments one by one. Even if joining them restores its outline, the flow of the glaze cannot be reconstructed exactly as it was. Still, comparing the broken edges can sometimes reveal where force caused the vessel to crack. Habits in the clay thickness and firing that remain hidden when only finished pieces line the shelves lie exposed in a broken vessel.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "「破片を拾う」のように、壊れた物の一部分をいう。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "コピー",
+   "reading": "こぴー",
+   "pos": "noun",
+   "meaning": "copy",
+   "defJa": "元の文書などを写して作ったもの",
+   "passage": {
+    "ja": "祖母の手紙を家族で読むためにコピーを配ると、同じ文章を見ているのに、ある人は句読点を、別の人は筆跡を気にします。内容を知るだけなら文字を打ち直す方法もありますが、行の途中の迷いや書き損じは、その過程で消えてしまいます。だからこそ資料を残すにあたっては、何を伝えたいのかを先に決める必要があります。読める文字だけを残すのか、紙の上にためらった跡まで残すのかで、写し方の選択も変わるのです。",
+    "form": "コピー",
+    "en": "When copies of a grandmother’s letter are handed out for the family to read, some people notice its punctuation and others its handwriting, despite looking at the same text. Retyping is an option if all we want is its content, but the hesitations midway through a line and the writing errors disappear in the process. Precisely for this reason, when preserving materials we need to decide first what we want to convey. Whether we preserve only the legible words or even the traces of hesitation on the page changes our choice of how to reproduce them.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "ここでは広告文ではなく、元の手紙を写したものをいう。",
+    "sense": "元の文書や画像を複製したもの"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

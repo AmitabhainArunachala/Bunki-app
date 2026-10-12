@@ -2,6 +2,7 @@
  * context. Deep-index latency/failure are network faults, never app-state
  * substitutions. All other bytes must match the supplied immutable artifact.
  */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -213,7 +214,7 @@ try {
     await sheetIdentity('原典', source.r, source.g);
     const reopened = await readAppRecord(page);
     check('the exact captured fallback reopens from Lists after a cold reload with the deep index unavailable', () => assert.deepEqual(reopened.taken, captured.taken));
-    await page.locator('#sheet-close').click(); await page.locator('#review-start').click();
+    await page.locator(await entryCloseSelector(page)).click(); await page.locator('#review-start').click();
     let grades = 0;
     while (grades < 12 && !await page.locator('.review-summary').isVisible()) {
       await page.locator('#reveal').waitFor();

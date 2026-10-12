@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "重み",
+   "reading": "おもみ",
+   "pos": "noun",
+   "meaning": "weight (in a neural network); importance",
+   "defJa": "学習のたびに更新され、入力の効き方を決める数値",
+   "passage": {
+    "ja": "ニューラルネットが賢くなる仕組みは案外素朴で、何億個もの重みが学習のたびに少しずつ更新され、誤差を減らしていくのです。ところが、実際にそれを使う人には、何が更新されているのかすら見えていません。画面に出てくる答えが当てになるか、月額は見合うか、使い心地はどうか、その外側だけが判断材料です。設計者は内部の数値から、利用者は外の挙動から、同じ一つの仕組みを眺めているわけです。この二つの視線が交差するのは、答えが外れて「なぜ」と問われる瞬間なんです。",
+    "form": "重み",
+    "en": "The mechanism by which a neural network grows smarter is surprisingly plain: with each round of training, hundreds of millions of weights are updated little by little, whittling the error down. Yet the people who actually use these systems cannot even see what is being updated. Whether the answers on screen hold up, whether the monthly fee is worth it, how it feels to use — only that outer surface is their material for judgment. The designer gazes at one and the same mechanism from the numbers inside; the user, from the behavior outside. The two lines of sight cross at the moment an answer misses and someone demands to know why.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "機械学習では、学習のたびに更新される数値を指す。物の重さではなく効き方の強さ。",
+    "sense": "ここでは物の重さではなく、学習で更新される数値の意"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

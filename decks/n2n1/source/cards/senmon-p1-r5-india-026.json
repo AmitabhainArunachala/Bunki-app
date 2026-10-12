@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "胎蔵界",
+   "reading": "たいぞうかい",
+   "pos": "noun",
+   "meaning": "the Womb Realm in esoteric Buddhism",
+   "defJa": "密教で仏の慈悲などを表す世界",
+   "passage": {
+    "ja": "この曼荼羅、真ん中の花の周りにたくさんの仏さまが並んでいて、最初はどこから見ればいいか迷うね。胎蔵界は密教で大日如来の慈悲などを表す世界で、金剛界と対にして説明されるんだ。名前に「胎」の字があるだけに、お腹の中の絵を思い浮かべそうだけど、人体の図ではないんだよ。仏たちの配置も、ただ空いた場所を埋めるために決められているわけじゃない。まず中心の大日如来を見つけて、その周りがどうまとまっているかを図録の解説と照らし合わせてみよう。",
+    "form": "胎蔵界",
+    "en": "With so many Buddhas arranged around the central flower in this mandala, it is hard to know where to look first. The Womb Realm represents aspects such as Mahavairocana’s compassion in esoteric Buddhism and is explained alongside the Diamond Realm. The character for womb may bring an image of the inside of a belly to mind, but this is not an anatomical diagram. Nor were the Buddhas arranged merely to fill empty spaces. First find Mahavairocana at the center, then compare the surrounding arrangement with the catalogue’s explanation.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "密教の世界観を表す語で、金剛界と対にして用いられる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "般若",
+   "reading": "はんにゃ",
+   "pos": "noun",
+   "meaning": "prajna; wisdom into reality",
+   "defJa": "物事の真実のあり方を見抜く智慧",
+   "passage": {
+    "ja": "仏教の学びでは、経典の語句を多く覚えたことと、その教えが自分の見方を変えることとは区別される。般若という語が指す智慧も、知識の量を競うための物差しではなく、物事のあり方を見抜く働きに関わる。何をもって真実を見るとするかをめぐって、学派ごとの説明には違いがある。それでも、言葉を暗記するだけで理解が完成すると考えれば、執着や思い込みを問い直すという実践の側面を落としてしまう。知っているはずの一文が、ある経験の後で違って響くこともあるのだ。",
+    "form": "般若",
+    "en": "Buddhist study distinguishes memorizing many scriptural phrases from having the teaching transform one’s perspective. The wisdom called prajna is likewise not a measure for competing over quantities of knowledge, but concerns insight into how things are. Schools differ in their accounts of what it means to see reality. Still, assuming that memorization completes understanding neglects the practical aspect of questioning attachments and assumptions. A sentence one thought familiar can sound different after a particular experience.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "知識量よりも、物事の真実を見抜く智慧を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "自性",
+   "reading": "じしょう",
+   "pos": "noun",
+   "meaning": "inherent nature; svabhava",
+   "defJa": "他の条件に依存せず成り立つ固有の本質",
+   "passage": {
+    "ja": "中観派の議論では、物が他の条件に依存せず、それだけで成り立つ固有の本質を持つのかが問われる。この文脈で検討される自性は、日常語でいう個性や、その人らしい性格と同じ意味ではない。器の材料や作り方をたどるにつれて、独立した本質という想定と、条件から生じる物の姿との隔たりが論点になる。ただし、別の仏教文献にも同じ漢字があるからといって、常に全く同じ用法とは限らない。訳語を比較する作業では、どの学派が何を肯定し、何を否定しているかを読み分けることが欠かせない。",
+    "form": "自性",
+    "en": "Madhyamaka arguments ask whether things possess an intrinsic essence that exists by itself without depending on other conditions. In this context, inherent nature does not mean individuality or a person’s characteristic personality. Tracing a vessel’s materials and production brings into focus the gap between an assumed independent essence and things arising from conditions. However, the same Chinese characters in another Buddhist text do not guarantee exactly the same usage. Comparing translations requires distinguishing which school affirms or denies what.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "中観派で問題とされる固有の本質の意味。日常の個性とは異なる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

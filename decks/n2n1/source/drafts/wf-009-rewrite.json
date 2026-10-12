@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "突く",
+   "reading": "つつく",
+   "pos": "verb",
+   "meaning": "to poke, to pick at (a weak point)",
+   "defJa": "先で強く押す。弱点を責める",
+   "passage": {
+    "ja": "会議で、重箱の隅を突く人が一人いると、場の空気は一気に窮屈になる。細かな誤りを指摘すること自体は、決して悪いことではない。ただ、全体の方向を論じている最中に、枝葉の数字をあげつらえば、話し手は萎縮し、肝心の議論が止まってしまう。指摘をするなら、まず結論への賛否を述べ、そのうえで誤りを添えるのが望ましい。結論を先に認めてもらえた相手は、その後の細かな指摘も素直に聞き入れやすい。",
+    "form": "突く",
+    "en": "When one person in a meeting picks at every tiny detail, the atmosphere instantly turns stifling. Pointing out small errors is in itself by no means a bad thing. But if you carp about peripheral numbers in the middle of discussing the overall direction, the speaker shrinks back and the essential discussion stops. When you do point something out, it is desirable to first state your view on the conclusion and then add the error. A person who has first had their conclusion accepted finds it easier to take in the later detailed remarks as well.",
+    "register": "語",
+    "topic": "other",
+    "tipJa": "「重箱の隅を突く」で、ごく細かな点まで責める意味。この読みは「つつく」。",
+    "sense": "細かい点まで責め立てる"
+   }
+  },
+  {
+   "term": "無言",
+   "reading": "むごん",
+   "pos": "noun",
+   "meaning": "silence; saying nothing",
+   "defJa": "ひと言も口をきかないこと",
+   "passage": {
+    "ja": "言語学では、声を出さずに意思を伝える手段も、コミュニケーションの研究対象になる。うなずきや視線、ため息といった声にならないしぐさは、言葉以上に本音を映すことがある。日本の職場では、会議で上司が無言でうなずいただけで、部下がそれを承認と受け取る場面も少なくない。ただし、解釈が食い違えば、後で大きなトラブルに発展しかねない。しぐさに敏感であればあるほど、確認の一言が欠かせないのである。",
+    "form": "無言",
+    "en": "In linguistics, ways of conveying intent without voice also become objects of communication research. Wordless gestures such as nods, glances and sighs can reflect true feelings more than words do. In Japanese workplaces, there are not a few occasions when subordinates take a boss's mere silent nod in a meeting as approval. However, if the interpretations diverge, it could develop into serious trouble later. The more sensitive one is to gestures, the more indispensable a confirming word becomes.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「無言でうなずく」「無言のまま」。言葉を発さずに何かをする様子を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "濫用",
+   "reading": "らんよう",
+   "pos": "noun",
+   "meaning": "abuse, misuse of authority",
+   "defJa": "むやみに、度を越して使うこと",
+   "passage": {
+    "ja": "刑法には、公務員が職権をむやみに使って人の権利の行使を妨げる行為を罰する規定があり、「職権濫用罪」と呼ばれている。新聞やテレビでは、常用漢字にない「濫」を避けて「乱用」と書き換えることが多いが、条文では今も「濫」の字が使われる。「濫」には水があふれるという意味があり、限度を超えるニュアンスが強い。公務への信頼という秩序を守るために、この字はあえて残されてきたといえる。法律の言葉を学ぶ人は、字の成り立ちまで意識しておくとよい。",
+    "form": "濫用",
+    "en": "The Penal Code has a provision punishing public officials who use their authority recklessly to obstruct others from exercising their rights, and it is called the crime of abuse of official authority. Newspapers and television often avoid the character 濫, which is not a jōyō kanji, and rewrite it as 乱用 with a simpler character, yet statutes still use the original one. The character carries the meaning of water overflowing, and it strongly suggests exceeding limits. It can be said that the character has been deliberately kept in order to protect the order of trust in public service. Those who study legal language would do well to be aware even of how a character is built.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「職権濫用」のように、法律語として使う。「乱用」は新聞用の書き換えで、条文は「濫用」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "煙たい",
+   "reading": "けむたい",
+   "pos": "i-adj",
+   "meaning": "awkward to be around; smoky",
+   "defJa": "煙で息苦しい。気づまりで避けたい",
+   "passage": {
+    "ja": "インドの本場の修行道場では、師匠の存在を煙たく感じる弟子が必ずいるそうなんですよ。何も言われなくても、自分のごまかしを全部見抜かれている気がして、つい身構えずにはいられないからです。でも、居心地の悪さを避けて離れてしまう人ほど、結局は一番大事なことを学び損ねるんじゃないですか。耳に痛い一言をくれる人こそ、ありがたい存在だと気づくのは、たいてい何年もあとのことですよね。",
+    "form": "煙たく",
+    "en": "In the home-ground training halls of India, they say there is always a disciple who finds the master's presence awkward to be near. Even when nothing is said, he feels all his pretenses are seen through, and cannot help bracing himself. But isn't it the people who avoid the discomfort and leave who end up missing the most important thing? That the person who gives you the painful word is the one to be grateful for is something you usually notice only years later.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「煙たい存在」「煙たく感じる」。気づまりで近づきたくない相手にいう。",
+    "sense": "気づまりで、近づきたくない"
+   }
+  },
+  {
+   "term": "疲労",
+   "reading": "ひろう",
+   "pos": "noun",
+   "meaning": "fatigue, weariness",
+   "defJa": "体や心が疲れて力が出ないこと",
+   "passage": {
+    "ja": "ナポレオンのロシア遠征って、数字だけ追うと退屈なんですけど、兵士の疲労に目を向けると急に生々しくなるんですよ。一八一二年、補給が尽きた大軍は、真冬の撤退で寒さと飢えに苦しみ、ほとんどが失われました。足を引きずって雪道を歩く兵士の姿を想像できたら、もう年号なんて忘れようがないですよね。歴史の丸暗記は禁物だと言われる理由が、ここにあると思います。数字の裏にある人の体と心の限界まで想像できてこそ、歴史は自分のものになるのです。",
+    "form": "疲労",
+    "en": "Napoleon's Russian campaign is boring if you only chase the numbers, but when you look at the soldiers' fatigue it suddenly becomes vivid. In 1812, the army, its supplies exhausted, suffered cold and hunger in the midwinter retreat, and most of it was lost. If you can picture soldiers dragging their feet along snowy roads, you can hardly forget the dates anymore. I think this is the reason people say rote memorization of history is to be avoided. Only when you can imagine the limits of the body and mind behind the numbers does history become your own.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「疲労がたまる」「疲労困憊」。体力や気力が使い果たされた状態。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "種",
+   "reading": "しゅ",
+   "pos": "noun",
+   "meaning": "species",
+   "defJa": "生物を分ける基本の区分",
+   "passage": {
+    "ja": "ダーウィンの『種の起源』が発売されたのは一八五九年で、初版は初日に売り切れたといわれます。この本が衝撃を与えたのは、神がすべての生き物を別々に創ったという当時の常識に、証拠をもって異議を唱えたからでした。彼は、船旅で見たガラパゴスの鳥や亀の違いから、生き物は少しずつ姿を変えると考えたのです。もっとも、その考えを発表するまでには、二十年ほどの慎重な準備を要しました。",
+    "form": "種",
+    "en": "Darwin's 'On the Origin of Species' went on sale in 1859, and the first edition is said to have sold out on the first day. The book shocked because it lodged an objection, backed by evidence, against the common sense of the time that God had created every living thing separately. From the differences in the birds and tortoises he saw on his voyage to the Galapagos, he came to think that living things change form little by little. Still, it took about twenty years of careful preparation before he published that idea.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「種の起源」「種を保存する」。「しゅ」と読み、生物分類の単位を指す。",
+    "sense": "生物分類の基本単位"
+   }
+  },
+  {
+   "term": "無礼",
+   "reading": "ぶれい",
+   "pos": "na-adj",
+   "meaning": "rude, impolite",
+   "defJa": "礼儀にはずれた失礼なこと",
+   "passage": {
+    "ja": "江戸時代の武士には「無礼討ち」と呼ばれる慣習があり、身分の高い者に対する失礼な振る舞いが、その理由とされた。もっとも、実際に斬り捨てるには厳しい取り調べが伴い、むやみに行われたわけではないとされる。それでも、この言葉は、身分秩序を守ることがいかに重く見られていたかを物語っている。町人も武士の前では、一言一句に敏感にならざるを得なかったのである。礼を欠くことへの恐れが、当時の社会の安定を支えていたともいえる。",
+    "form": "無礼",
+    "en": "Samurai of the Edo period had a custom called 'cutting down for rudeness', and impolite conduct toward a person of higher rank was given as its reason. Even so, actually striking someone down was accompanied by strict investigation, and it is said not to have been done recklessly. Still, the word tells how heavily the preservation of the status order was regarded. Townspeople, too, had no choice but to be sensitive to every word before a samurai. It may even be said that fear of lacking in courtesy supported the stability of society at the time.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「無礼討ち」「無礼を働く」。礼を欠いた振る舞いを重く見る語で、「失礼」より強い。",
+    "sense": ""
+   }
+  }
+ ]
+}

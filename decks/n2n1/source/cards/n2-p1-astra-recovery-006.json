@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "出版社",
+   "reading": "しゅっぱんしゃ",
+   "pos": "noun",
+   "meaning": "publishing company",
+   "defJa": "書籍や雑誌を編集し発行する会社。",
+   "passage": {
+    "ja": "日本語の文章を本にまとめる際、書き手の原稿は、そのまま完成品になるとは限りません。出版社の編集者は、章の順序や説明の抜けを確かめ、読者が読み進められる形を著者と相談します。文章の内容に加えて、漢字の表記や注の付け方をそろえる作業もあります。著者の言い方を何でも直せばよいのではなく、独特のニュアンスを残す部分と、誤解を防ぐために補う部分を見極めます。一冊の本の読みやすさを考えるときには、文を書いた人だけでなく、読者への届き方を整えた人の仕事にも目を向けたいですね。",
+    "form": "出版社",
+    "en": "When Japanese writing is made into a book, the author’s manuscript does not necessarily become the finished product unchanged. An editor at a publishing company checks chapter order and gaps in explanation, consulting the author about a form readers can follow. In addition to the content, there is work to standardise kanji usage and how notes are attached. The aim is not to correct every turn of phrase, but to distinguish where a distinctive nuance should be retained from where clarification is needed to prevent misunderstanding. When considering a book’s readability, we should notice not only the person who wrote the sentences but also those who shaped how they reach readers.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "印刷だけを行う会社ではなく、編集し、本として発行する会社を指します。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "両国",
+   "reading": "りょうこく",
+   "pos": "noun",
+   "meaning": "both countries; the two countries",
+   "defJa": "話題になっている二つの国。",
+   "passage": {
+    "ja": "ニュース原稿で二つの国の交渉を紹介した後、両国は協議を続けるとまとめると、同じ国名を繰り返さずに済みます。ただし、途中で第三の国が登場した場合には、どの二者を指すかが曖昧になることがあります。前提を共有している書き手には明らかでも、音声で一度だけ聞く人が同じように理解できるとは限りません。原稿を読み直すにあたっては、指し示す語を国名へ戻しても意味が変わらないかを確かめます。省略による短さと、聞き手が関係を追える明確さを、場面に応じて調整してください。",
+    "form": "両国",
+    "en": "After introducing negotiations between two countries in a news script, summarising that both countries will continue talks avoids repeating the same names. If a third country has appeared in the meantime, however, it may become unclear which two are meant. Even if the reference is obvious to the writer who shares the background assumptions, a listener hearing the audio once may not understand it in the same way. When reviewing the script, check whether replacing the referring expression with country names leaves the meaning unchanged. Adjust the balance between brevity through omission and clarity that lets listeners follow the relationships according to the situation.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "直前などで示された二つの国を一組として指す語です。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

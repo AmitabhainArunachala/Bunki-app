@@ -1,0 +1,804 @@
+{
+ "cards": [
+  {
+   "term": "結婚観",
+   "reading": "けっこんかん",
+   "pos": "noun",
+   "meaning": "view of marriage",
+   "defJa": "結婚についての考え方や価値観",
+   "passage": {
+    "ja": "「結婚観が合わない」と言って別れを選んだ友人の話を、先日あるインタビューで聞いた。本人は、価値観の衝突というより、考えを言葉にして伝えてこなかっただけだと振り返る。曖昧なまま同居を始めたばかりに、お互いの期待がすれ違い続けたのだ。話し方を磨く上で大切なのは、相手の想像に頼る前に、自分の考えを具体例つきで語ることである。実際、うまくいく夫婦ほど、最初の一年で互いの前提をしつこいほど言葉にしている。",
+    "form": "結婚観",
+    "en": "In a recent interview I heard about a friend who split up saying their views of marriage did not match. The friend now looks back and says it was less a clash of values than a failure to put their thinking into words. Because they moved in together without settling anything, their expectations kept missing each other. What matters in refining how you speak is to state your own thinking with concrete examples before relying on the other person to guess. In fact, the couples who do well are the ones who put each other's assumptions into words almost insistently during the first year.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「結婚観が合わない」「結婚観を語る」のように、考え方の違いを述べる名詞として使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "絶対的",
+   "reading": "ぜったいてき",
+   "pos": "na-adj",
+   "meaning": "absolute",
+   "defJa": "他に比べるものがなく、完全であるさま",
+   "passage": {
+    "ja": "「このモデルは絶対的に正確です」と信じ込むのは、機械学習を学ぶ人がまず避けたい思い込みです。精度九割といっても、学習に使ったデータの外へ出れば、あっという間に崩れかねません。だからこそ、完璧な正解を探すより、どんな条件で外れるのかを調べるほうが力になります。半導体の性能表を読むときも、本質は同じです。数字が高いか低いかより、その数字がどんな試験で測られたかを問う習慣が、技術を見る目を育てます。",
+    "form": "絶対的",
+    "en": "Believing that a model is absolutely accurate is the first assumption people learning machine learning should avoid. Even at ninety percent accuracy, it can fall apart in no time once it leaves the data it was trained on. That is exactly why investigating the conditions under which it fails is more useful than hunting for a perfect answer. The same essence applies when you read a semiconductor spec sheet. A habit of asking not whether a number is high or low but what test it was measured by trains your eye for technology.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「絶対的に正確」「絶対的な基準」のように、比べようのない完全さを表す。否定形と相性がよい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "総人口",
+   "reading": "そうじんこう",
+   "pos": "noun",
+   "meaning": "total population",
+   "defJa": "ある国や地域に住む人の全体の数",
+   "passage": {
+    "ja": "インドの総人口は十四億を超え、二〇二三年には中国を抜いて世界一になったと国連が推計しています。人口が多いだけでなく、若い世代の割合が高いのも特徴です。とはいえ、数字だけを丸暗記しても、試験では「なぜそうなるのか」を問われます。人口ピラミッドの形と、教育や雇用の見通しを結びつけて覚えると、知識が使える形で残ります。たとえばカースト制度の歴史も、人口全体の中での各層の比率という視点で読むと、見え方が変わります。",
+    "form": "総人口",
+    "en": "The UN estimates that India's total population has passed 1.4 billion and that it overtook China in 2023 to become the world's largest. It is not only large; the share of younger people is also high. That said, memorizing the figures alone will not help, because exams ask why things are the way they are. If you link the shape of the population pyramid to prospects for education and employment, the knowledge stays in a usable form. The history of the caste system, for example, looks different when read from the viewpoint of each stratum's share of the whole population.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「日本の総人口」「総人口の減少」のように、国や地域全体の人口を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "総売上",
+   "reading": "そううりあげ",
+   "pos": "noun",
+   "meaning": "total sales",
+   "defJa": "一定期間の売上をすべて合わせた額",
+   "passage": {
+    "ja": "たとえば小さな辞書出版社の総売上が、一年で一割落ちたとしましょう。原因は電子辞書でも無料サイトでもなく、学校の指定教材から外れたことだった、ということもあり得ます。語彙の説明がどれほど優れていても、手に取ってもらえなければ数字には表れません。売れ筋を見誤ると、良い辞書ほど静かに姿を消しかねないのです。数字の裏にいる読者の顔まで想像できるかどうかが、出版という仕事の分かれ目なのかもしれません。",
+    "form": "総売上",
+    "en": "Suppose a small dictionary publisher's total sales fall by ten percent in a year. The cause may well be neither electronic dictionaries nor free websites, but simply having been dropped from a school's designated materials. However good the explanations of vocabulary are, they do not show up in the figures if nobody picks the book up. Misread what sells, and the better dictionaries may be the ones that quietly disappear. Whether you can imagine the readers' faces behind the numbers may be what divides the work of publishing.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「総売上が落ちる」「総売上の三割」のように、全体の売上額を数字で語る場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "線引き",
+   "reading": "せんびき",
+   "pos": "noun",
+   "meaning": "underlining; highlighting",
+   "defJa": "文字や図の上に線を引くこと",
+   "passage": {
+    "ja": "参考書に線引きするのって、安心するじゃないですか。でも気づいたら全ページ真っ黄色で、結局どこが大事なのか分からなくなってる、なんてこと、ありませんか。線を引くのは「選んだ」証拠というより、選ぶのを先延ばしにしているだけだったりするんですよね。本当に力がつくのは、線を引いたあと本を閉じて、自分の言葉で言語化してみる人ですよ。ちなみに、線は一ページにつき三本までと決めると、選ぶ力が鍛えられますよ。",
+    "form": "線引き",
+    "en": "Underlining a reference book feels reassuring, doesn't it? But have you ever found every page glowing yellow and no longer knowing what actually matters? Drawing lines is less proof that you chose than it is a way of putting off choosing, isn't it. The people who really improve are the ones who close the book after underlining and try to put it into their own words. By the way, if you limit yourself to three lines per page, your power of choosing gets trained.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「線引きする」のように、勉強で大事な箇所に線を引く行為を指す。「線引きをする」は区別の意味にも広がる。",
+    "sense": "勉強で重要箇所に線を引くこと"
+   }
+  },
+  {
+   "term": "縁",
+   "reading": "へり",
+   "pos": "noun",
+   "meaning": "edge; rim",
+   "defJa": "物の端の部分",
+   "passage": {
+    "ja": "インドに限らず、古い絵画では、主役の人物よりも絵の縁にこそ、細かな文様が描き込まれていることがあります。蓮や蔓草の連なりが、画面をぐるりと取り巻く例は少なくありません。中心が大事で周辺は飾りだというのは見かけにすぎず、曼荼羅では外側の円も教えの一部として読まれます。端を軽く見ない眼こそが、図像を読み解くときの本質なのです。仏像の光背や寺院の欄間を見るときも、中心だけでなく端まで目を配ってみてください。",
+    "form": "縁",
+    "en": "Not only in India, in old paintings it is often along the edge of the picture, rather than on the main figure, that fine patterns are worked in. Chains of lotus and tendrils running all the way around the frame are not uncommon. The idea that the center matters and the periphery is decoration is mere appearance; in a mandala even the outer circles are read as part of the teaching. An eye that does not make light of the margins is the essence of reading imagery. When you look at a Buddha's halo or a temple's transom as well, try letting your eyes reach the edges and not only the center.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「紙の縁」「縁に沿って」のように、物の端を指す。「ふち」と読む「縁」との違いに注意。",
+    "sense": "物のはし、ふち（読みはへり）"
+   }
+  },
+  {
+   "term": "縁起",
+   "reading": "えんぎ",
+   "pos": "noun",
+   "meaning": "dependent origination; omen, luck",
+   "defJa": "すべては関係によって成り立つという仏教の教え",
+   "passage": {
+    "ja": "仏教の縁起とは、あらゆるものが他との関係のなかで成り立つという見方を指す。お守りや初詣で語られる運の良し悪しとは、同じ文字でも次元が違う。独立した実体があるかのように思い込む心こそ苦しみの根だと、釈迦は説いたとされる。話し手がこの語を使うときは、その本質を表す「関係」という一語を添えると、聞き手に誤解されにくい。たとえば一杯の茶も、水と茶葉と火と人の手が揃って初めて成り立つ、と考えるのである。",
+    "form": "縁起",
+    "en": "Dependent origination in Buddhism means the view that everything comes into being within its relations with other things. It is on a different plane from the luck, good or bad, spoken of at amulets and New Year shrine visits, even though the characters are the same. The Buddha is said to have taught that the mind that imagines an independent entity is itself the root of suffering. When a speaker uses this word, adding the single word relation, which expresses its essence, makes a misunderstanding by the listener less likely. A single cup of tea, for example, is thought of as coming into being only when water, leaves, fire and human hands come together.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "仏教語の「縁起」は関係による成立、俗語の「縁起がいい」は吉兆。文脈で読み分ける。",
+    "sense": "仏教の、すべては関係で生じるという教え"
+   }
+  },
+  {
+   "term": "習慣化",
+   "reading": "しゅうかんか",
+   "pos": "noun",
+   "meaning": "habit formation",
+   "defJa": "ある行動を毎日の習慣にすること",
+   "passage": {
+    "ja": "文章がうまくなりたいなら、まず書くことを習慣化してしまうのが近道である。気合いで一日三時間書こうとする人は、たいてい三日で息切れする。毎朝五分、同じ場所で、同じ一行から始めるくらいがちょうどいい。根気に頼らず、考えすぎることなく手が動くようになれば、語彙も文の運びも自然と身についていく。書き出しの一行を前の晩のうちに決めておくと、朝、白い画面の前で固まる時間が驚くほど減り、続ける負担も軽くなる。",
+    "form": "習慣化",
+    "en": "If you want to write better, the shortest path is to make writing a habit first. People who try to write three hours a day on sheer willpower usually run out of steam in three days. Five minutes every morning, in the same place, beginning from the same single line is about right. Once your hand moves without relying on perseverance and without overthinking, vocabulary and the flow of sentences will settle in naturally. If you decide the opening line the night before, the time spent frozen in front of a blank screen in the morning shrinks surprisingly, and the burden of continuing lightens too.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「習慣化する」「習慣化できない」のように、行動を続く形に定着させる意味で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "考古学",
+   "reading": "こうこがく",
+   "pos": "noun",
+   "meaning": "archaeology",
+   "defJa": "遺跡や遺物から昔の人間の生活を研究する学問",
+   "passage": {
+    "ja": "考古学は、文字を持たなかった人々の声を、土の中から聞き取ろうとする営みである。割れた土器の破片ひとつからでも、煮炊きの方法や交易の範囲が見えてくることがある。文献が豊富な時代といえども、記紀の記述が発掘された遺物と食い違う例は珍しくない。書かれたものを疑い、物を手がかりに考える態度が、この学問の根にある。たとえば古墳の副葬品の並び方ひとつが、被葬者の地位や当時の交流網を静かに物語ってくれる。",
+    "form": "考古学",
+    "en": "Archaeology is an enterprise that tries to hear, from the soil, the voices of people who had no writing. From a single broken potsherd, one can sometimes see how food was cooked and how far trade reached. Even in eras rich in written sources, it is not rare for the accounts in the Kojiki and Nihon Shoki to conflict with excavated artifacts. Doubting what was written and reasoning from objects is the root of this discipline. The arrangement of grave goods in a burial mound, for instance, quietly tells of the occupant's rank and the networks of contact at the time.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「考古学者」「考古学的」など、遺物から過去を探る学問の名。文献史学との対比で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "脳科学",
+   "reading": "のうかがく",
+   "pos": "noun",
+   "meaning": "brain science",
+   "defJa": "脳のしくみや働きを研究する科学",
+   "passage": {
+    "ja": "最近の脳科学では、記憶は一度しまえば動かない箱ではなく、思い出すたびに書き換えられる過程だと考えられています。鮮明に覚えているつもりの出来事ほど、何度もなぞられて形が変わっているおそれがあります。だとしたら、読み直しは単なる確認ではなく、記憶を作り直す作業になるわけです。日をあけて何度も取り出すほうが、一夜漬けよりも記憶は強くなります。結局、記憶は倉庫ではなく、使うたびに育つ庭に近いのです。",
+    "form": "脳科学",
+    "en": "In recent brain science, memory is thought of not as a box that stays fixed once stored but as a process rewritten each time it is recalled. The events you feel you remember most vividly may be the ones that have changed shape from being traced over again and again. If so, rereading is not a mere check but work that rebuilds the memory. Retrieving it repeatedly over several days makes memory stronger than cramming in one night. In the end, memory is closer to a garden that grows each time you use it than to a warehouse.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「脳科学の知見」「脳科学者」のように、学習や行動を説明する根拠として使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "膨張",
+   "reading": "ぼうちょう",
+   "pos": "noun",
+   "meaning": "expansion, swelling",
+   "defJa": "大きさや量がふくれて増えること",
+   "passage": {
+    "ja": "十六世紀のスペインは、新大陸の銀で財政を一時は潤したものの、領土の膨張に軍事費が追いつかず、たびたび国家の破産を余儀なくされた。拡大は国力の証に見えて、実は維持費という重荷を背負い込むことでもある。ローマ帝国にも、似た例を見いだすことができる。帝国の没落を語るとき、外敵よりも内側の負担を先に見るべきだという主張には、一理ある。現代のテクノロジー企業の急成長にも、同じ視点を当てはめることができる。",
+    "form": "膨張",
+    "en": "In the sixteenth century Spain, though its finances were buoyed for a time by silver from the New World, could not keep military spending up with the swelling of its territory and was repeatedly forced into state bankruptcy. Expansion looks like proof of national strength but in fact also means taking on the burden of upkeep. Similar cases can be found in the Roman Empire as well. When we speak of the fall of an empire, the claim that we should look first at the burden within rather than at external enemies has something to it. The same viewpoint can be applied to the rapid growth of modern technology companies.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「領土の膨張」「人口の膨張」のように、国家や数量が際限なくふくらむ場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "自尊心",
+   "reading": "じそんしん",
+   "pos": "noun",
+   "meaning": "self-respect, conceit",
+   "defJa": "自分の価値を認め、誇りに思う気持ち",
+   "passage": {
+    "ja": "テストで一度失敗しただけで頭が真っ白になり、「自分はだめだ」と思い込む人は、自尊心が成績という一本の柱に寄りかかりすぎているのかもしれません。最大の敵は他人ではなく、点数で自分を測る癖です。「負けたらどうしよう」と焦るあまり手が止まるなら、一度、評価と自分を切り離してみましょう。昨日より問題を解く手が動くようになった、という小さな変化に目を向けると、土台は広がります。",
+    "form": "自尊心",
+    "en": "Someone whose mind goes blank after failing a single test and who concludes I am hopeless may be leaning their self-esteem on the one pillar of grades. The greatest enemy is not other people but the habit of measuring yourself by scores. If you freeze up from the fear of losing, try separating evaluation from yourself for once. Turning your eyes to small changes, such as solving problems more easily than yesterday, widens your foundation.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「自尊心が高い」「自尊心を傷つける」のように、誇りや面子の意味でも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "自我",
+   "reading": "じが",
+   "pos": "noun",
+   "meaning": "self, ego",
+   "defJa": "自分という意識。他と区別される自分",
+   "passage": {
+    "ja": "スピーチで「私は」を連発する人が、自我の強い人だとは限りません。むしろ年齢を問わず、不安な人ほど主語を前に出して、自分を守ろうとします。逆に、堂々と話す人は、「私」を省いたまま、内容で語りかけます。話し方を直すなら、なぜ自分が「私は」と言いたくなるのか、その理由を言語化してみてください。録音した自分の声を聞いて、「私は」が何回出てくるか数えてみるのも、いい出発点です。",
+    "form": "自我",
+    "en": "A person who keeps saying I in a speech does not necessarily have a strong ego. Rather, regardless of age, the more anxious people are, the more they push the subject forward to protect themselves. Conversely, confident speakers leave out I and address the audience through content. If you want to fix how you speak, try putting into words why you feel like saying I. Listening to a recording of your own voice and counting how many times I appears is also a good starting point.",
+    "register": "語",
+    "topic": "mind",
+    "tipJa": "「自我が強い」「自我の芽生え」のように、他と区別される自分の意識を表す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "虚構",
+   "reading": "きょこう",
+   "pos": "noun",
+   "meaning": "fiction; shared myth",
+   "defJa": "事実ではなく、想像で作り上げたこと",
+   "passage": {
+    "ja": "ハラリによれば、人類が地球の覇者になれたのは、国や貨幣や会社といった虚構を、大勢で一斉に信じられたからです。チンパンジーが、見たことのないものを皆で信じるわけがありません。ところが人間は、紙切れに価値があると信じ合い、共通の物語を通じて、顔も知らない相手と取引を始めました。壮大な物語を共有する力こそが、協力の規模を一気に押し広げたのです。お金も例外ではなく、その価値は皆が信じているあいだだけ保たれます。",
+    "form": "虚構",
+    "en": "According to Harari, humans became masters of the earth because large numbers of them could believe all at once in fictions such as nations, money and companies. There is no way chimpanzees would all believe in something they had never seen. Humans, however, believed together that scraps of paper had value, and through shared stories began trading with people whose faces they did not know. It was the power to share grand stories that suddenly pushed out the scale of cooperation. Money is no exception; its value holds only as long as everyone believes in it.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「虚構の物語」「虚構を信じる」のように、事実でない想像の産物を指す。「フィクション」より硬い語。",
+    "sense": "事実でなく想像でつくられたもの"
+   }
+  },
+  {
+   "term": "複利",
+   "reading": "ふくり",
+   "pos": "noun",
+   "meaning": "compound interest; compounding",
+   "defJa": "利子にも利子がつく計算の方法",
+   "passage": {
+    "ja": "勉強量を一日一パーセントずつ増やすと、一年後には約三十八倍になる、という計算を聞いたことがあるでしょう。これが複利の力です。逆に一パーセントずつ手を抜けば、ほとんどゼロに近づきます。ただし現実の学習は数式どおりには進まないので、ここで言う倍率は、続けることの効果を実感するためのたとえにすぎません。貯金の利息にたとえるなら、勉強の「元金」は、昨日までに身についた知識そのものです。",
+    "form": "複利",
+    "en": "You may have heard the calculation that if you raise your study load by one percent a day, after a year it is about thirty-eight times larger. That is the power of compounding. Conversely, if you slack off by one percent each day, it approaches zero. Real learning does not follow the formula, however, so the multiplier here is only an analogy for feeling the effect of persistence. If we liken it to savings interest, the principal of study is the knowledge you had acquired up to yesterday.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「複利効果」「複利で増える」のように、積み重ねが雪だるま式に効く場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "見かけ",
+   "reading": "みかけ",
+   "pos": "noun",
+   "meaning": "appearance",
+   "defJa": "外から見たようす",
+   "passage": {
+    "ja": "万里の長城は「宇宙から肉眼で見える」と長く語られてきたが、通説に反して、これは誤りだとされる。実際、周回軌道から見ると幅が狭く、色も周囲の地面に近いため、判別は極めて難しい。見かけの規模が事実を追い越して、伝説になった例である。歴史上の通説の多くは、検証されないまま教科書にまで入り込んできた。外見の印象に引きずられず、一次資料まで遡る癖が、歴史を学ぶ人の最初の防具になる。",
+    "form": "見かけ",
+    "en": "The Great Wall was long said to be visible to the naked eye from space, but contrary to the popular account this is held to be false. In fact, seen from orbit it is narrow and close in color to the surrounding ground, so picking it out is extremely difficult. It is a case where its apparent scale outran the facts and became legend. Many received views in history have crept even into textbooks without being verified. The habit of going back to primary sources without being dragged along by first impressions is the first armor of anyone studying history.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「見かけ倒し」「見かけによらず」のように、中身と食い違う外観を言うときの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "見通し",
+   "reading": "みとおし",
+   "pos": "noun",
+   "meaning": "perspective, unobstructed view",
+   "defJa": "先のなりゆきを予想すること",
+   "passage": {
+    "ja": "人工知能の需要が急に伸びたせいで、先端半導体の見通しを立てるのは、専門家にとっても難しくなっています。工場は建てるのに数年かかるので、今日の注文に応えて明日から生産が増えるわけではありません。最大の課題は、需要が読めないまま投資を決めなければならないことです。試験でも同じで、満点の計画より、崩れても立て直せる計画のほうが強いのです。たとえ外れても、なぜ外れたのかを記録しておけば、次の予測は確実に精度を上げます。",
+    "form": "見通し",
+    "en": "Because demand for artificial intelligence has surged, forming an outlook for advanced semiconductors has become difficult even for experts. A factory takes several years to build, so output does not rise from tomorrow in answer to today's orders. The biggest challenge is having to decide on investment without being able to read demand. It is the same with exams: a plan that can be rebuilt after it collapses is stronger than a plan aiming for full marks. Even if you miss, recording why you missed will surely raise the accuracy of the next forecast.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「見通しが立つ」「見通しが甘い」のように、先の展開を予想する意味。景色の見通しにも使う。",
+    "sense": "先のなりゆきの予想"
+   }
+  },
+  {
+   "term": "規格",
+   "reading": "きかく",
+   "pos": "noun",
+   "meaning": "standard, norm",
+   "defJa": "製品の大きさや品質などについての決まり",
+   "passage": {
+    "ja": "充電器の端子が機種ごとにばらばらだった時代、規格の統一は消費者にとって夢のような話でした。ところが統一が進むほど、メーカーは機能や品質で勝負するしかなくなります。半導体の世界でも、世界共通の標準に沿って設計できるかどうかが、取引の入り口になります。共通のルールがあるからこそ、競争は意味を持つのです。実際、仕様が固まった瞬間に、市場の関心は性能から価格へ移ることがよくあります。",
+    "form": "規格",
+    "en": "In the days when charger connectors differed from model to model, unifying the standard was a dream to consumers. Yet the further unification goes, the more manufacturers have no choice but to compete on features and quality. In the semiconductor world too, whether you can design to a worldwide standard becomes the entrance to doing business. It is precisely because there are shared rules that competition has meaning. In fact, the moment the specification is settled, the market's interest often shifts from performance to price.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "「規格に合う」「規格外」のように、製品が満たすべき公式の基準を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "言い難い",
+   "reading": "いいがたい",
+   "pos": "i-adj",
+   "meaning": "hard to say",
+   "defJa": "はっきり言うことが難しい",
+   "passage": {
+    "ja": "インドで生まれた宗教は、ヒンドゥー教、仏教、ジャイナ教、シク教と並べて呼ばれるが、その境目は一概に言い難いほど入り組んでいる。たとえば輪廻や業の考え方は、複数の伝統に共通して見られる。このため、ある教えがどの宗教のものかを、線引きするのは容易ではない。信者の数を数える統計にしても、自己申告に頼る以上、数字は目安にすぎない。宗派や学派の違いも、教科書のように一本の線では割り切れない。",
+    "form": "言い難い",
+    "en": "Religions born in India are listed together as Hinduism, Buddhism, Jainism and Sikhism, but the boundaries between them are so tangled that it is hard to state them flatly. The ideas of rebirth and karma, for instance, are found across several traditions. For this reason, it is not easy to draw a line saying which religion a given teaching belongs to. Even statistics counting believers are only a rough guide, since they depend on self-reporting. Differences between sects and schools also cannot be sorted by a single line the way a textbook does.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「一概に言い難い」「何とも言い難い」のように、断定をためらう場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "言語化",
+   "reading": "げんごか",
+   "pos": "noun",
+   "meaning": "putting into words; verbalizing",
+   "defJa": "考えや気持ちを言葉で表すこと",
+   "passage": {
+    "ja": "頭ではわかっているのに口に出すと説明できない、という経験は誰にでもあるでしょう。人に教える上で、言語化の壁にぶつかるのは、実は理解がまだ浅いというサインであることが多いんです。そこで大事なのが、友達に話しかけるつもりで、自分の言葉で書き出してみること。曖昧な箇所が、そのまま空白になって見えてきます。書き出したメモを声に出して読むと、どこで言葉に詰まるかが、さらにはっきり分かります。",
+    "form": "言語化",
+    "en": "Everyone has had the experience of understanding something in their head but being unable to explain it aloud. When you hit the wall of putting things into words while teaching someone, it is often a sign that your understanding is actually still shallow. So what matters is writing it out in your own words as if speaking to a friend. The vague parts show up as blanks, just as they are. If you read your notes aloud, where your words stall becomes even clearer.",
+    "register": "講",
+    "topic": "mind",
+    "tipJa": "「言語化する」「言語化が苦手」のように、もやもやした考えを言葉にする意味で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "記紀",
+   "reading": "きき",
+   "pos": "noun",
+   "meaning": "the Kojiki and Nihon Shoki",
+   "defJa": "古事記と日本書紀をまとめた呼び方",
+   "passage": {
+    "ja": "『古事記』と『日本書紀』を合わせて、記紀と呼ぶ。両者は八世紀の初めに成立し、天皇家の由来を語る点で重なるが、編纂の目的も文体も大きく異なる。漢文で書かれた書紀が対外的な公式の歴史であるのに対し、古事記には日本語の語りを残そうとした跡が濃い。その違いをめぐって、研究者の議論は今も続いている。たとえば国生みの神話でも、細部の記述が微妙に食い違い、読み比べるほど編者の意図が透けて見える。",
+    "form": "記紀",
+    "en": "The Kojiki and the Nihon Shoki together are called Kiki. Both were completed in the early eighth century and overlap in telling the origins of the imperial house, but they differ greatly in purpose of compilation and in style. Whereas the Shoki, written in classical Chinese, is an official history aimed outward, the Kojiki shows strong traces of an effort to preserve Japanese oral narration. Scholars' debate over that difference continues today. Even in the myth of the birth of the islands, details differ subtly, and the more you compare the two, the more the compilers' intentions show through.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「記紀神話」「記紀の記述」のように、古事記と日本書紀をひとまとめに指す略称。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "話しかける",
+   "reading": "はなしかける",
+   "pos": "verb",
+   "meaning": "to speak to",
+   "defJa": "相手に向かって声をかける",
+   "passage": {
+    "ja": "ガンジス川のほとりで、見知らぬおじさんにいきなり話しかけられてさ。「どこから来た」「何を探してる」って、もう質問攻めなんだよ。最初は怪しいと思って身構えたんだけど、聞いてみたら「探すものなんてない、ただ川を見てるだけだ」って笑うの。あの人ときたら、ヴェーダーンタの本なんて読んだこともないくせに、そういう気質のまま「いま、ここ」を誰より深く生きてる感じだった。あの川の風景、いまでも思い出すんだよね。",
+    "form": "話しかけられて",
+    "en": "On the bank of the Ganges, a stranger of a man suddenly spoke to me, you know. Where are you from, what are you looking for, it was nothing but a barrage of questions. At first I thought he was shady and braced myself, but when I asked, he laughed and said there is nothing to look for, he is just watching the river. That man, honestly, had never even read a book on Vedanta, yet he seemed to live the here and now more deeply than anyone, just by temperament. I still remember that river scenery, you know.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「話しかけられる」「話しかけてみる」のように、相手に声を向ける動作。受け身がよく出る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "認知",
+   "reading": "にんち",
+   "pos": "noun",
+   "meaning": "cognition",
+   "defJa": "物事を見分け、理解し、判断する心の働き",
+   "passage": {
+    "ja": "超高齢社会の日本では、認知機能の低下を遅らせる方法に関心が高まっている。研究では、運動や人との交流、十分な睡眠が、発症の危険を下げる可能性が指摘されている。ただし、特効薬のような単独の対策はなく、飲酒の量に注意する必要もあるなど、生活全体を整えることが求められる。自治体の中には、地域の集いを通じて高齢者を孤立させない取り組みを始めたところもある。個人の努力だけでなく、地域の支えも欠かせないという認識が広がっている。",
+    "form": "認知",
+    "en": "In Japan, a super-aged society, interest is growing in ways to slow the decline of cognitive function. Studies point to the possibility that exercise, contact with others and sufficient sleep lower the risk of onset. However, there is no single remedy like a wonder drug, and since one must also watch how much one drinks, what is called for is putting one's whole way of life in order. Some local governments have started initiatives that keep older people from isolation through community gatherings. There is a growing recognition that, beyond individual effort, community support is indispensable.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「認知機能」「認知症」など複合語で多く使う。知覚・記憶・判断などの働きの総称。",
+    "sense": "物事を理解し判断する心の働き"
+   }
+  },
+  {
+   "term": "認知革命",
+   "reading": "にんちかくめい",
+   "pos": "noun",
+   "meaning": "Cognitive Revolution",
+   "defJa": "約七万年前に人類の言語や想像力が飛躍した変化",
+   "passage": {
+    "ja": "今から七万年ほど前、ホモ・サピエンスに何かが起きたと、ハラリは『サピエンス全史』で述べています。認知革命と呼ばれるこの転換によって、人類は「あそこにライオンがいる」という事実だけでなく、目に見えない精霊や国についても語れるようになりました。噂話に始まった言葉の力は、やがて見知らぬ者同士が協力する土台になります。農業革命に先立って、人間はすでに想像の世界に住み始めていたのです。",
+    "form": "認知革命",
+    "en": "About seventy thousand years ago, something happened to Homo sapiens, Harari writes in Sapiens. Through this turning point called the Cognitive Revolution, humans became able to speak not only of facts like there is a lion over there but also of unseen spirits and of nations. The power of words, which began with gossip, eventually became the foundation for strangers to cooperate. Before the Agricultural Revolution, humans had already begun to live in a world of imagination.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "ハラリの用語。「認知革命」は言語と想像力の飛躍で、「農業革命」より前の転換とされる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "語彙",
+   "reading": "ごい",
+   "pos": "noun",
+   "meaning": "vocabulary, glossary",
+   "defJa": "ある人や分野で使われる単語の全体",
+   "passage": {
+    "ja": "日本語を学ぶ人が増えるなか、語彙の習得に特化した教材が目立つようになっている。頻度順に単語を並べる従来型に加えて、場面ごとに言い回しを覚えさせる形式も出てきた。背景には、文法は分かるのに単語が出てこないという声が根強いことがある。もっとも、数を覚えるだけでは使えないとして、とりわけ漢語が多い専門分野では、例文の質を重視する動きも見られる。学習者の側も、自分の目的に合った一冊を見極める目が問われている。",
+    "form": "語彙",
+    "en": "As the number of people learning Japanese grows, teaching materials specializing in vocabulary acquisition have become conspicuous. In addition to the conventional type that lines up words by frequency, formats that teach set phrases scene by scene have also appeared. Behind this lies a persistent complaint that learners grasp the grammar but the words will not come. Then again, on the view that memorizing numbers alone does not make words usable, there is also a move to emphasize the quality of example sentences, especially in specialist fields heavy with Sino-Japanese words. Learners, for their part, are asked to have the eye to pick the one book that fits their own goals.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「語彙力」「語彙が豊富」「専門語彙」のように、持っている単語の量や範囲を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "読み直し",
+   "reading": "よみなおし",
+   "pos": "noun",
+   "meaning": "rereading",
+   "defJa": "もう一度読み返すこと",
+   "passage": {
+    "ja": "試験の前日に教科書を最初から読み直しなんて、間に合うわけがないじゃないですか。それより、間違えた問題の周りだけを拾って、もう一回ノートに書き出すほうがずっと効くんですよ。ぼくは暗記が苦手だったので、「何がわからなかったか」を一行にして、それだけ眺めてました。読み直す量を減らして集中力を上げる、これが意外と近道なんです。ちなみに、この一行をためたものが、ぼくの本番前のお守りになりました。",
+    "form": "読み直し",
+    "en": "Rereading the textbook from the beginning the day before an exam, there is no way you will finish in time. It works far better to pick out only the area around the questions you got wrong and write them out in your notebook once more. I was bad at rote memorization, so I made one line of what I did not understand and just looked at that. Cutting the amount you reread and raising your concentration turns out, unexpectedly, to be the shortcut. Incidentally, the collection of those single lines became my good-luck charm before the real thing.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「読み直しをする」「読み直しが必要」のように、一度読んだものをもう一度確認する作業を指す。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "諸国",
+   "reading": "しょこく",
+   "pos": "noun",
+   "meaning": "various countries",
+   "defJa": "いくつもの国々",
+   "passage": {
+    "ja": "欧州連合には二十を超える公用語があり、加盟諸国の言語はすべて対等とされている。ところが実務の現場では、会議の資料の大半が少数の言語で作られているのが実情だ。通訳や翻訳にかかる費用は最大の負担のひとつで、全言語を対等に扱うという理想は、掲げられているものの、現実とのずれが指摘されている。小さな言語を持つ国ほど、この対等の原則を手放せない。各国の通訳者は、その綱引きの最前線に立たされている。",
+    "form": "諸国",
+    "en": "The European Union has more than twenty official languages, and the languages of the member countries are all considered equal. In day-to-day practice, however, most meeting documents are in fact produced in a small number of languages. The cost of interpretation and translation is one of the biggest burdens, and although the ideal of treating all languages equally is upheld, a gap with reality has been pointed out. The countries with smaller languages are the ones least able to let go of this principle of equality. Interpreters in each country are made to stand on the front line of that tug-of-war.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「欧州諸国」「近隣諸国」のように、複数の国をまとめて指す硬い語。「諸」は「もろもろの」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "貨幣",
+   "reading": "かへい",
+   "pos": "noun",
+   "meaning": "money, currency",
+   "defJa": "商品の売り買いの手段として使われるお金",
+   "passage": {
+    "ja": "貝殻や塩の塊が貨幣として通用した社会は、世界のあちこちにあった。誰もが価値を認めるかぎり、物は何でも交換の道具になり得る。逆にいえば、信用が崩れた瞬間、金貨でさえただの金属に戻ってしまう。話し手にとっても同じで、言葉という通貨は、聞き手の信頼があればこそ価値を持つ。だから商人は、重い荷を運ぶ以上に、取引相手との信用を築くことに、長い年月と労力を費やしてきたのである。",
+    "form": "貨幣",
+    "en": "There were societies all over the world in which shells and lumps of salt circulated as money. As long as everyone recognizes value in it, anything can become a tool of exchange. Conversely, the instant trust collapses, even gold coins go back to being mere metal. It is the same for a speaker: the currency called words has value precisely because the listener trusts it. That is why merchants have spent long years and effort building trust with trading partners, more than carrying heavy loads.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「貨幣経済」「貨幣価値」のように、お金を制度や歴史の面から語るときに使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "資本主義",
+   "reading": "しほんしゅぎ",
+   "pos": "noun",
+   "meaning": "capitalism",
+   "defJa": "利益を求めて資本を投じる経済のしくみ",
+   "passage": {
+    "ja": "資本主義って、言葉は聞いたことあるけど、じゃあ何かって聞かれると意外と答えられないんですよね。簡単にいうと、お金を元手にもっとお金を増やすことをみんなが目指す仕組みのこと。そこに貨幣と信用が絡んでくるから、お金を抜きにしては説明しにくいんですよ。でも、江戸時代の大坂の米市場を見ると、すでに先物取引みたいなことをやってて、本質はもう同じだったんじゃないかと思うんです。",
+    "form": "資本主義",
+    "en": "Capitalism, you have heard the word, but when someone asks what it is, you surprisingly cannot answer. Put simply, it is a system in which everybody aims to use money as capital to make more money. Money and credit get tangled in, so it is hard to explain without bringing money into it. But if you look at the rice market of Edo-period Osaka, they were already doing something like futures trading, so I think the essence was already the same.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "「資本主義経済」「資本主義社会」のように、時代や制度を説明する語。社会主義と対にする。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "賠償",
+   "reading": "ばいしょう",
+   "pos": "noun",
+   "meaning": "reparations, indemnity",
+   "defJa": "相手に与えた損害を金銭などでつぐなうこと",
+   "passage": {
+    "ja": "第一次世界大戦後のヴェルサイユ条約は、敗戦国ドイツに巨額の賠償を課した。支払いのために、ドイツは増税や紙幣の増発を余儀なくされ、のちの経済的な混乱の背景のひとつになったとされる。もっとも、ケインズは一九一九年に『平和の経済的帰結』を著し、この額の過大さを批判した。支払い能力に見合う水準だったかどうかが、今も最大の論点である。いずれにせよ、この条約の評価は、その後に何が起きたかを知る私たちの目に左右されやすい。",
+    "form": "賠償",
+    "en": "After the First World War the Treaty of Versailles imposed enormous reparations on the defeated Germany. To pay, Germany was forced into tax increases and issuing more banknotes, which is said to have been one background factor in later economic turmoil. Keynes, however, wrote The Economic Consequences of the Peace in 1919 and criticized the excessive size of the sum. Whether it was a level matching Germany's ability to pay remains the biggest point at issue. In any case, the evaluation of this treaty is easily swayed by our eyes, which know what happened afterward.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「賠償金」「戦争賠償」のように、損害をつぐなう支払い。「補償」「弁償」との違いに注意。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "農業革命",
+   "reading": "のうぎょうかくめい",
+   "pos": "noun",
+   "meaning": "Agricultural Revolution",
+   "defJa": "狩猟採集から農耕定住へ移った大きな転換",
+   "passage": {
+    "ja": "農業革命は、人類が狩猟採集から定住農耕へ移った大きな転換を指す。ただし、この変化は一夜で起きたのではなく、数千年にわたって地域ごとに異なる速度で進んだ。小麦の栽培が始まると人口は増えたが、食事の種類は減り、骨の調査からは栄養状態がかえって悪化した例も報告されている。ハラリはこれを「史上最大の詐欺」と表現した。豊かさと引き換えに、人類は安定と重労働を手にしたとも言える。",
+    "form": "農業革命",
+    "en": "The Agricultural Revolution refers to the great shift in which humans moved from hunting and gathering to settled farming. However, this change did not happen overnight but proceeded over thousands of years at different speeds in different regions. Once wheat cultivation began, population grew, but the variety of diets shrank, and bone studies have reported cases where nutrition actually worsened. Harari described this as the biggest fraud in history. One could say that in exchange for abundance, humanity gained stability and hard labor.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「農業革命」は定住農耕への転換を指す。ハラリの『サピエンス全史』では「認知革命」の後に置かれる。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "迫害",
+   "reading": "はくがい",
+   "pos": "noun",
+   "meaning": "persecution",
+   "defJa": "力で苦しめて、しいたげること",
+   "passage": {
+    "ja": "一六八五年、ルイ十四世がナントの勅令を廃止したのをきっかけに、新教徒ユグノーへの迫害は一気に激しくなりました。彼らの多くは商人や職人で、国外へ逃れた人は二十万人前後ともいわれます。行き先のオランダやイギリス、プロイセンでは、その技術と資本が新たな産業を育てることになりました。国を追われた人々が、逆にその国の繁栄を支えたという皮肉な話です。宗教の自由が、国の経済にまで響くことを、この歴史は教えてくれます。",
+    "form": "迫害",
+    "en": "In 1685, after Louis XIV revoked the Edict of Nantes, persecution of the Protestant Huguenots suddenly became fierce. Many of them were merchants and artisans, and those who fled abroad are said to number around two hundred thousand. In the Netherlands, England and Prussia where they went, their skills and capital helped nurture new industries. It is an ironic story: people driven out of one country ended up supporting the prosperity of another. This history teaches that religious freedom echoes even into a country's economy.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「宗教的迫害」「迫害を受ける」のように、信仰や民族を理由に苦しめる意味で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "追い越し",
+   "reading": "おいこし",
+   "pos": "noun",
+   "meaning": "overtaking; passing",
+   "defJa": "先を行くものを後ろから抜くこと",
+   "passage": {
+    "ja": "十九世紀の終わりごろ、アメリカの工業生産高はイギリスを上回ったと推定されるが、海運ではその後も英国が首位を保った。大国の追い越しは、ある日突然起きるのではなく、数字の上で何十年もかけて静かに進む。しかも、抜かれた側は、自国の優位を疑うことなく過ごしがちである。のちに振り返って初めて、あれが没落の始まりだったと分かるのだ。いまの技術競争に当てはめて考えると、決して他人事ではない。",
+    "form": "追い越し",
+    "en": "Around the end of the nineteenth century, American industrial output is estimated to have surpassed Britain's, but in shipping Britain kept the lead for some time afterward. The overtaking of one great power by another does not happen suddenly one day but proceeds quietly over decades in the figures. Moreover, the side being passed tends to carry on without doubting its own superiority. Only looking back later do we see that that was the beginning of the decline. Applied to today's technological competition, it is by no means someone else's problem.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "「追い越し車線」のほか、国や企業が相手を抜く意味でも使う。「追い抜き」とほぼ同じ。",
+    "sense": "相手を抜いて先に出ること"
+   }
+  },
+  {
+   "term": "逆に",
+   "reading": "ぎゃくに",
+   "pos": "adverb",
+   "meaning": "on the contrary",
+   "defJa": "予想や普通とは反対になるさま",
+   "passage": {
+    "ja": "人工知能が文章を書き、絵まで描く時代には、人間の仕事は消えていくと言われる。だが、答えを出す速度が上がるほど、逆に「何を問うか」の価値は高まるのではないか。正解を即座に得られる環境では、問いの質こそが、本質的な差を生む。計算機を手にした数学者が、計算のかわりに新しい定理を探し始めたように、道具の進歩は人間の関心を一段上に押し上げてきた。では、私たちが磨くべきは、答えの速さではなく、問いの深さなのだろう。",
+    "form": "逆に",
+    "en": "In an age when artificial intelligence writes text and even draws pictures, it is said that human work will vanish. But the faster answers are produced, might not the value of what to ask rise, on the contrary? In an environment where correct answers come instantly, it is the quality of the question that makes an essential difference. Just as mathematicians who got calculators began searching for new theorems in place of calculating, advances in tools have pushed human interest up a level. Then what we should hone is not the speed of answers but the depth of questions.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「逆に」は予想の反対を示す。文頭で「むしろ」に近く、「かえって」より論理の転換が強い。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "速さ",
+   "reading": "はやさ",
+   "pos": "noun",
+   "meaning": "speed",
+   "defJa": "動きや進み方がはやい程度",
+   "passage": {
+    "ja": "話す速さは、聞き手の理解にどう影響するのでしょうか。日本語のアナウンサーは、一分に三百字前後で読むのが標準とされています。それより速くなると、情報量は増えても、頭の中で意味が追いつかなくなります。逆に遅すぎると間延びして集中が切れるので、いくら滑舌が良くても、内容に応じて緩急を使い分けるのが上手な話し手です。録音した自分の声を一度聞き直すと、思った以上に速いことに驚くはずです。",
+    "form": "速さ",
+    "en": "How does the speed of speech affect the listener's understanding? Japanese announcers are said to read at a standard of around three hundred characters per minute. Faster than that, the amount of information increases, but the meaning stops keeping up in the listener's head. Conversely, if it is too slow it drags and attention breaks, so however clear your enunciation, a good speaker varies the pace according to the content. If you play back a recording of your own voice once, you will be surprised at how fast it is.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「話す速さ」「速さを競う」のように、程度としての「はやい」を名詞にした語。「早さ」と書き分ける。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "進学率",
+   "reading": "しんがくりつ",
+   "pos": "noun",
+   "meaning": "rate of advancing to higher school",
+   "defJa": "上の学校へ進む人の割合",
+   "passage": {
+    "ja": "日本の大学進学率は、一九五五年にはまだ一割に届かなかったものの、高度経済成長に伴って上がり続け、いまでは五割を超えています。その上昇は、社会が高学歴の人材を求めるようになった結果であり、同時に受験競争を激しくした要因でもあります。受験では、年表の数字を暗記するより、産業の変化と結びつけて説明できるかが問われます。背景まで言えれば、論述問題でも使える知識になります。",
+    "form": "進学率",
+    "en": "Japan's university advancement rate was still short of ten percent in 1955, but it kept rising along with high economic growth and now exceeds fifty percent. That rise is the result of society coming to want highly educated people, and also a factor that intensified exam competition. In exams, what is tested is not memorizing the numbers in a chronology but whether you can explain them in connection with industrial change. If you can state the background, it becomes knowledge you can use even in essay questions.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「大学進学率」「進学率が上がる」のように、統計を読むときの語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "適性",
+   "reading": "てきせい",
+   "pos": "noun",
+   "meaning": "aptitude",
+   "defJa": "ある仕事や物事に向いている性質",
+   "passage": {
+    "ja": "就職活動で適性検査を課す企業は、いまや珍しくない。ただ、性格や気質の傾向を数値にした結果が、入社後の活躍を予測するに足る精度を持つとは限らない。専門家の間では、検査は面接の補助にとどめ、本人の経験や意欲を総合的に見るべきだという意見が多い。一方で、結果に一喜一憂するあまり、本来の志望を見失う学生もいる。向き不向きは、経験を重ねる中で後から見えてくることも少なくない。",
+    "form": "適性",
+    "en": "Companies that impose aptitude tests in job hunting are no longer rare. But there is no guarantee that results turning tendencies of personality and temperament into numbers are accurate enough to predict success after joining. Among experts, many hold that tests should be limited to supporting interviews and that a person's experience and motivation should be viewed comprehensively. On the other hand, some students are so swayed by their results that they lose sight of what they originally wanted. Fit and misfit often become visible only later, as experience accumulates.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "「適性検査」「適性がある」のように、向き不向きを測る場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "部分的",
+   "reading": "ぶぶんてき",
+   "pos": "na-adj",
+   "meaning": "partial",
+   "defJa": "全体ではなく、一部分にかぎられるさま",
+   "passage": {
+    "ja": "自動運転には段階があって、部分的に運転を支援するだけの車から、人が一切ハンドルを握らない車まで幅があります。いま市販されているのは、高速道路などで加速や車線維持を助ける、前者に近いものが大半です。運転するにあたって、「任せきり」にしてよいわけではなく、いつでも引き継げるよう注意する必要があります。名前に「自動」とあっても、責任は人にあるという点を、見かけに惑わされず押さえておきたいところです。",
+    "form": "部分的",
+    "en": "Self-driving comes in stages, ranging from cars that only partially assist driving to cars where no one touches the wheel at all. What is on sale now is mostly close to the former, helping with acceleration and lane keeping on expressways and the like. In driving, you must not leave everything to the car, and you need to be careful to be able to take over at any time. Even when the name says automatic, it is worth firmly keeping in mind, without being deceived by appearances, that responsibility lies with the person.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「部分的に認める」「部分的な成功」のように、全部ではない一部を表す。対義語は「全面的」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "開封",
+   "reading": "かいふう",
+   "pos": "noun",
+   "meaning": "opening (a package)",
+   "defJa": "閉じてある袋や箱を開けること",
+   "passage": {
+    "ja": "半導体の部品は、防湿袋に入れて出荷されます。開封した瞬間から、空気中の湿気を吸い始めるからです。そのまま高温ではんだ付けをすると、吸った水分が一気に蒸気になって、内部にひびが入りかねません。そのため工場では、袋を開けた後の放置時間を厳しく管理し、未使用の部品は再び密封するのが決まりです。同じ理屈で、食品や医薬品も、袋を開けた瞬間から品質の変化が静かに始まっています。",
+    "form": "開封",
+    "en": "Semiconductor parts are shipped in moisture-proof bags. This is because from the moment the bag is opened, they begin to absorb moisture from the air. If they are soldered at high temperature as they are, the absorbed water can turn to steam all at once and crack the inside. For that reason, factories strictly control how long parts sit after the bag is opened, and unused parts are sealed again as a rule. By the same logic, food and medicine also begin to change in quality, quietly, from the moment the bag is opened.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「開封済み」「未開封」のように、包みを初めて開ける行為。手紙や荷物にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "間",
+   "reading": "～かん",
+   "pos": "other",
+   "meaning": "between, during (suffix)",
+   "defJa": "日数や年数を表す語につく接尾語",
+   "passage": {
+    "ja": "試験勉強を三か月間続けた人と、直前の三日だけ頑張った人とでは、記憶の定着がまったく違います。数字のあとに付くこの接尾語は、日数や年数の長さを、持続として際立たせます。「三日」だけなら一点を指すにすぎませんが、接尾語がつくと、その日々をずっと過ごした感覚が出るのです。作文では書き分けに気をつけるといいですよ。たとえば「三日ぶり」とは意味が違うので、そこも区別して覚えましょう。",
+    "form": "間",
+    "en": "Someone who kept up exam study for three months and someone who pushed hard only for the last three days end up with completely different memory retention. This suffix attached after a number highlights the length of days or years as continuity. Three days by itself merely points to a single point, but once the suffix is attached, it conveys the sense of having lived through those days. In compositions it is good to take care to distinguish the two. For instance, it differs in meaning from the expression for the first time in three days, so learn to tell those apart as well.",
+    "register": "学",
+    "topic": "language",
+    "tipJa": "数詞のあとにつき「三日間」「五年間」のように継続した長さを示す。「かん」と読む。",
+    "sense": "期間の長さを表す接尾語"
+   }
+  },
+  {
+   "term": "関税",
+   "reading": "かんぜい",
+   "pos": "noun",
+   "meaning": "customs, duty",
+   "defJa": "輸入品などにかかる税金",
+   "passage": {
+    "ja": "一八二八年、アメリカ議会は輸入品に高い関税をかける法律を通しました。北部の工業を守るための措置でしたが、綿花を輸出して工業製品を買う南部にとっては、消費者として払わされる余計な出費にほかなりません。南部では「忌まわしい法」と呼ばれ、サウスカロライナ州は後に連邦法の無効を宣言するところまで進みました。経済の仕組みが違えば、同じ政策でも誰が得をするかは大きく分かれるのです。",
+    "form": "関税",
+    "en": "In 1828 the American Congress passed a law placing high tariffs on imports. It was a measure to protect Northern industry, but for the South, which exported cotton and bought manufactured goods, it was nothing other than an extra expense forced on it as consumers. In the South it was called the law of abominations, and South Carolina later went as far as declaring federal law null. If economic structures differ, who benefits from the same policy diverges greatly.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「関税をかける」「関税を引き上げる」のように、輸入品に課す税。保護貿易と結びつけて語る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "集中力",
+   "reading": "しゅうちゅうりょく",
+   "pos": "noun",
+   "meaning": "power of concentration",
+   "defJa": "一つのことに心を向け続ける力",
+   "passage": {
+    "ja": "集中力は、気合いの問題というより、環境で決まる部分が大きいものです。机の上にスマートフォンが見えているだけで作業の質が下がると報告した研究もあります。そこで、勉強を始める前に、机の上を教材と時計だけにしてみてください。毎日同じ時刻に始めて習慣化すれば、根気に頼ることなく席に着けるようになります。スマートフォンを別の部屋に置くだけでも、机に向かう最初の十分が変わったと感じる人は多いようです。",
+    "form": "集中力",
+    "en": "Concentration is less a matter of willpower than something largely determined by environment. Some studies report that merely having a smartphone in sight on the desk lowers the quality of work. So before you begin studying, try leaving only your materials and a clock on the desk. If you start at the same time every day and make it a habit, you will be able to sit down without relying on perseverance. Many people seem to feel that just putting the smartphone in another room changes the first ten minutes at the desk.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「集中力が続く」「集中力を保つ」のように、注意を向け続ける力を言う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "零度",
+   "reading": "れいど",
+   "pos": "noun",
+   "meaning": "zero degrees",
+   "defJa": "温度の目盛りでゼロの点",
+   "passage": {
+    "ja": "量子コンピューターの超伝導チップは、絶対零度にごく近い温度まで冷やさざるを得ません。わずかな熱の揺らぎでも、量子の状態は壊れてしまうからです。冷凍機の大きさに比べて、中にあるチップは爪ほどしかありません。最大の課題は、この冷却を保ったまま、配線の数を増やしていくことです。この極低温を保つ冷凍機は、家庭の冷蔵庫とは比べものにならない大きさと電力を必要とし、研究室の一角を占めるものもあります。",
+    "form": "零度",
+    "en": "The superconducting chip of a quantum computer has no choice but to be cooled to a temperature extremely close to absolute zero. This is because even a slight fluctuation of heat destroys the quantum state. Compared with the size of the refrigerator, the chip inside is only as big as a fingernail. The greatest challenge is to increase the number of wires while keeping this cooling. The refrigerators that maintain this extreme cold need size and power incomparable to a household fridge, and some occupy a corner of a laboratory.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「絶対零度」は零度を基準にした温度の下限。普通の「零度」は水がこおる温度をいう。",
+    "sense": "温度のゼロ点（ここでは絶対零度の一部）"
+   }
+  },
+  {
+   "term": "非公式",
+   "reading": "ひこうしき",
+   "pos": "na-adj",
+   "meaning": "unofficial",
+   "defJa": "正式なものではないこと",
+   "passage": {
+    "ja": "外交の舞台では、公式な会談の裏で、食事や散歩のついでに交わされる非公式な会話が、実際の取引を決めることがある。肩書きを外した場であればこそ、相手は決まり文句を離れて本音に近い言葉を口にするのだ。話し手の側から見れば、この種の場では結論を急がず、相手が話しかけてくるのを待つ姿勢が大切になる。曖昧に聞こえる雑談の中に、次の一手の暗示が隠れている。だからこそ、会談の合間の十分を、外交官たちは大切にする。",
+    "form": "非公式",
+    "en": "On the diplomatic stage, an unofficial conversation exchanged behind the official talks, in passing over a meal or a walk, sometimes decides the actual deal. Precisely because it is a setting without titles, the other party departs from stock phrases and says words closer to their true feelings. From the speaker's side, in this kind of setting what matters is a stance of not rushing to a conclusion and waiting for the other person to start talking. Within small talk that sounds vague, a hint of the next move lies hidden. That is exactly why diplomats value the ten minutes between sessions.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「非公式会談」「非公式に伝える」のように、正式な手続きや立場を踏まない場面で使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "革靴",
+   "reading": "かわぐつ",
+   "pos": "noun",
+   "meaning": "leather shoes",
+   "defJa": "なめした革で作った靴",
+   "passage": {
+    "ja": "スーツに革靴という組み合わせは、日本式の会社員の定番でした。この語の読みは「かわぐつ」で、「くつ」が「ぐつ」に濁ります。これを連濁といい、「手紙」をはじめ、身近な語にも広く見られる現象です。ただし「靴下」のように濁らない語もあり、規則を丸暗記するより、用例に慣れるほうが近道です。日本語を学ぶ人にとっては、この濁りの規則性を意識するだけで、初めて見る複合語の読みも当てやすくなります。",
+    "form": "革靴",
+    "en": "Leather shoes with a suit were the standard combination for the Japanese-style company employee. The reading of this word is kawagutsu, in which kutsu becomes gutsu. This is called rendaku, a phenomenon also widely seen in everyday words, including tegami. However, some words do not voice, as in kutsushita, so getting used to examples is a shortcut compared with memorizing the rule by rote. For learners of Japanese, just being aware of the regularity of this voicing makes it easier to guess the reading of compounds seen for the first time.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "読みは「かわぐつ」。「くつ」が「ぐつ」になる連濁の例として覚えやすい。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "飛び回る",
+   "reading": "とびまわる",
+   "pos": "verb",
+   "meaning": "to run around, fly about",
+   "defJa": "あちこちを忙しく動き回る",
+   "passage": {
+    "ja": "フリーランスの通訳者は、国際会議や商談の現場を飛び回り、機内やホテルで準備に追われることも珍しくない。依頼の多くは専門性が高く、医療や半導体など、分野ごとに膨大な語彙を前もって頭に入れておく必要がある。しかも、話し手の滑舌や話す速度は選べない。にもかかわらず、聞き手には自然な訳が求められる。その分、現場でうまく訳せた日の手応えが、この仕事を続ける理由になっていると語る人も多い。",
+    "form": "飛び回り",
+    "en": "Freelance interpreters fly around the sites of international conferences and business talks, and it is not unusual for them to be pressed with preparation on planes and in hotels. Most assignments are highly specialized, and they must have an enormous vocabulary for each field, such as medicine or semiconductors, in their heads beforehand. Moreover, they cannot choose how clearly or how fast the speaker talks. Even so, the listener expects a natural translation. In return, many say the sense of satisfaction on days when the translation went well in the field is their reason for continuing the work.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "「国中を飛び回る」のように、忙しく動き回る意味。実際に飛ぶ場合も比喩にも使う。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "飲酒",
+   "reading": "いんしゅ",
+   "pos": "noun",
+   "meaning": "drinking alcohol",
+   "defJa": "酒を飲むこと",
+   "passage": {
+    "ja": "試験前に「景気づけに一杯」と考える人もいますが、飲酒は、学んだ内容を記憶に定着させる睡眠の質を下げかねません。酔って眠ると、寝つきは良くても眠りが浅くなり、夜中に目が覚めやすくなるからです。記憶は寝ている間に整理されるといわれるので、勉強した晩こそ、お酒を控えたほうがいいのです。翌日の集中力も、全然違ってきます。お祝いの一杯は、試験が終わってからにとっておきましょう。",
+    "form": "飲酒",
+    "en": "Some people think a drink before an exam will pep them up, but drinking can lower the quality of the sleep that fixes what you studied in memory. If you sleep drunk, you may fall asleep easily but the sleep is shallow and you wake easily in the night. Memory is said to be organized while you sleep, so the night you study is exactly when you should cut back on alcohol. Your concentration the next day will also be quite different. Save the celebratory drink for after the exam is over.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「飲酒運転」「飲酒量」のように、制度や健康の話題で使う硬い語。話し言葉では「お酒を飲む」。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "饒舌",
+   "reading": "じょうぜつ",
+   "pos": "na-adj",
+   "meaning": "loquacious; talkative",
+   "defJa": "口数が多く、よくしゃべること",
+   "passage": {
+    "ja": "うちの祖父は、ふだんは挨拶はおろか返事すらろくにしないのに、孫の誕生日になると突然饒舌になるんですよ。年のせいか滑舌はだいぶ怪しいのに、昔の苦労話から畑のこと、近所の噂話まで、話の勢いだけは止まりません。母はいつも「また始まった」と呆れ顔ですが、ぼくはあの気質が、実はちょっとうらやましいんです。無口な人の心にも、ちゃんと言葉は溜まっているんだなと思います。あの日の祖父の笑顔は、いまも忘れられません。",
+    "form": "饒舌",
+    "en": "My grandfather, who ordinarily does not even properly answer, let alone greet people, suddenly turns talkative whenever it is a grandchild's birthday. Perhaps because of his age his enunciation is quite shaky, yet from stories of old hardships to the fields to neighborhood gossip, the momentum of his talk never stops. My mother always puts on an exasperated face and says here he goes again, but I am actually a little envious of that temperament. I think even a quiet person's heart keeps its words stored up properly. I still cannot forget my grandfather's smile that day.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「饒舌になる」「饒舌な人」のように、口数が多いことを言う。ときに「多弁」より少し皮肉を含む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "高学歴",
+   "reading": "こうがくれき",
+   "pos": "noun",
+   "meaning": "high educational background",
+   "defJa": "学校を長く、または上のほうまで出ていること",
+   "passage": {
+    "ja": "「高学歴なのに仕事ができない」って、よく聞くじゃないですか。でもあれは学歴の問題というより、正解のある試験で点を取る力と、答えのない状況で動く力が、そもそも別物なだけなんです。ぼくの知り合いにも、成績優秀だった人ほど、失敗を恐れて最初の一歩が遅い人がいます。逆に、勉強は苦手だったのに、決意が早くて、気づけば自分の事業を回している人もいます。どちらが優れているかではなく、場面ごとに必要な力が違うだけなんですよ。",
+    "form": "高学歴",
+    "en": "You often hear people who are highly educated yet cannot do the job, don't you? But that is less a problem of education than that the ability to score on an exam with right answers and the ability to act in situations without answers are simply different things. Among my acquaintances too, there are people who, the better their grades were, the slower their first step is for fear of failure. Conversely, there are also people who were poor at studying but quick to decide, and before you know it are running their own business. It is not about which is better; it is just that the ability needed differs from situation to situation.",
+    "register": "話",
+    "topic": "mind",
+    "tipJa": "「高学歴」は学歴の高さを言う語で、「高学歴化」「高学歴社会」の形でも出る。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "高水準",
+   "reading": "こうすいじゅん",
+   "pos": "noun",
+   "meaning": "high standard, high level",
+   "defJa": "基準になる程度が高いこと",
+   "passage": {
+    "ja": "江戸時代の日本は、庶民の識字率が同時代の世界でも高水準にあったと言われます。寺子屋と呼ばれる私設の学び場が、町や農村に広く根づいていたからです。貸本屋を通じて、浮世絵や読み物が庶民の手に届き、読み手は同時に消費者でもありました。明治の学制が短期間で定着したのは、これに先立って読み書きの土台が整っていたからだとされます。文字を読める人が多いことは、のちの近代化の見えない資産になったのです。",
+    "form": "高水準",
+    "en": "Edo-period Japan is said to have had a literacy rate among commoners at a high level even by the standards of the contemporary world. This is because private places of learning called terakoya had taken root widely in towns and farming villages. Through lending-book peddlers, ukiyo-e and reading matter reached the hands of ordinary people, and readers were at the same time consumers. The Meiji school system is said to have taken hold in a short time because the foundation of reading and writing had been prepared beforehand. That many people could read became an invisible asset for the later modernization.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「高水準を保つ」「高水準の教育」のように、質や数値が高い段階にあることを言う。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+  "cards": [
+    {
+      "term": "相槌",
+      "reading": "あいづち",
+      "pos": "noun",
+      "meaning": "back-channel response",
+      "defJa": "話の途中に挟む聞き手の短い返事やうなずき",
+      "passage": {
+        "ja": "日本語の会話では、話し手が文を言い終える前に、聞き手が短く返事を挟むことがある。こうした相槌は、聞いていることや理解の進み具合を示す働きを持ち、必ずしも内容への賛成を意味しない。同じ「はい」であっても、直前の発言や声の調子に応じて、受け取り方は変わる。返事をすべて同意だと見なせば、話を続けるための合図と、提案を受け入れる意思表示を取り違えかねない。会話を的確に理解するには、言葉を一つずつ直訳するだけでなく、二人が発言をどうつないでいるかを追う必要がある。",
+        "form": "相槌",
+        "en": "In Japanese conversation, listeners sometimes insert a short response before the speaker finishes a sentence. Such back-channel responses can signal attention or the progress of understanding and do not necessarily mean agreement with the content. Even the same word, hai, can be interpreted differently depending on the preceding remark and the tone of voice. Treating every response as agreement risks confusing a signal to continue speaking with an expression of intent to accept a proposal. To understand a conversation accurately, it is necessary to follow how the two people connect their contributions rather than simply translate each word literally.",
+        "register": "報",
+        "topic": "language",
+        "tipJa": "「相槌を打つ」と言い、聞いている合図と内容への同意を区別する。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "神道",
+      "reading": "しんとう",
+      "pos": "noun",
+      "meaning": "Shinto",
+      "defJa": "日本の神々への信仰や祭祀を中心とする伝統",
+      "passage": {
+        "ja": "神社の祭りを理解するには、鳥居や社殿の形を見るだけでなく、何を祭り、誰が祭りを支えてきたかを知る必要がある。神道は、日本の神々への信仰や祭祀を中心とする伝統であり、その実践は地域の暮らしとも結びついている。ただし、すべての神社で同じ神を祭り、同じ儀礼を行うわけではない。境内の碑文に加えて、祭神や由来を記した案内を読めば、その場所に伝わる固有の歴史をたどる手がかりになる。参拝という目に見える行為だけでは捉えきれない、土地と人々の関係にも目を向けることが大切である。",
+        "form": "神道",
+        "en": "To understand a shrine festival, it is necessary to learn what is worshipped and who has sustained the festival, rather than only look at the shapes of torii gates and shrine buildings. Shinto is a tradition centered on the worship of Japanese deities and ritual observances, and its practices are also connected with local life. However, not every shrine worships the same deity or conducts the same rituals. Reading information about the enshrined deities and origins, alongside inscriptions in the grounds, provides clues to the particular history handed down at that site. It is also important to look at relationships between a place and its people that the visible act of worship alone cannot fully capture.",
+        "register": "報",
+        "topic": "other",
+        "tipJa": "日本の神々への信仰と祭祀の伝統を指し、各神社の祭神や由来は異なる。",
+        "sense": ""
+      }
+    }
+  ]
+}

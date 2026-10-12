@@ -1,0 +1,164 @@
+{
+ "batch": "r5-ai-005",
+ "items": [
+  {
+   "term": "前工程",
+   "reading": "まえこうてい",
+   "gloss": "front-end process (wafer fabrication)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "化石化",
+   "reading": "かせきか",
+   "gloss": "fossilization",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "回路線幅",
+   "reading": "かいろせんはば",
+   "gloss": "circuit line width",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "友人の素朴な疑問を対話でほどく",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "大規模言語モデル",
+   "reading": "だいきぼげんごもでる",
+   "gloss": "large language model",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "語",
+   "preferTopic": "ai",
+   "angle": "小さな図や手計算を使って理解する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "後工程",
+   "reading": "あとこうてい",
+   "gloss": "back-end process (assembly, packaging, test)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "微細化",
+   "reading": "びさいか",
+   "gloss": "miniaturization (of circuit features)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "探索と活用",
+   "reading": "たんさくとかつよう",
+   "gloss": "explore vs exploit",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "日米半導体協定",
+   "reading": "にちべいはんどうたいきょうてい",
+   "gloss": "US–Japan Semiconductor Agreement (1986)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "METI primary history (https://www.meti.go.jp/policy/trade_policy/wto/3_dispute_settlement/33_panel_kenkyukai/r1993semiconductor1987.pdf): initial agreement signed 1986-09-02; concerned semiconductor trade incl market access and dumping. Avoid claiming one policy alone destroyed an industry."
+  }
+ ],
+ "weave": [
+  "シリコンの盾",
+  "ファウンドリ",
+  "フラッシュメモリ",
+  "人類滅亡",
+  "仮説",
+  "検証",
+  "認知",
+  "因果関係",
+  "誤差",
+  "制約",
+  "相互作用"
+ ],
+ "note": "All cards topic ai. Concrete angle is optional if unnatural. Rotate registers. Newly added terms are expert-vocabulary estimates, not official JLPT labels."
+}

@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "逃れる",
+   "reading": "のがれる",
+   "pos": "verb",
+   "meaning": "escape; get free from",
+   "defJa": "危険や苦しい状態から離れる。",
+   "passage": {
+    "ja": "不得意な問題を開くと胸が重くなり、机を片づける作業ばかり続けてしまうことがあります。苦手意識から逃れるために別の用事を探しても、取り組むべき問題は残っています。そこで、全部を解き直す目標はともかく、間違えた理由を一つだけ言葉にするところから始めます。作業を小さくすれば、負担を抑えながら勉強に戻る入り口を作れます。不安がなくなるまで待つ方法だけに頼らず、不安があってもできる行動を用意しておくと、予定が崩れた日の立て直しにも使えます。",
+    "form": "逃れる",
+    "en": "Opening a problem in a weak subject can feel so heavy that you keep tidying your desk instead. Even if you seek other chores to escape the feeling of inadequacy, the problem you need to tackle remains. Set aside the goal of redoing everything and start by putting just one reason for a mistake into words. Making the task small creates a way back into study while limiting the burden. Rather than relying only on waiting until anxiety disappears, having an action you can take even while anxious can also help you recover on days when your plans fall apart.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「苦手意識から逃れる」は、つらい心理状態から離れようとすることです。",
+    "sense": "不安などの苦しい状態から離れる。"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "連帯",
+   "reading": "れんたい",
+   "pos": "noun",
+   "meaning": "solidarity",
+   "defJa": "共通の目的のために互いに結びつくこと。",
+   "passage": {
+    "ja": "声明文の翻訳で、苦境にある仲間との連帯を表す一節に出会ったら、単なる同情と訳してよいか立ち止まります。そこには、相手と結びつき、共に問題を引き受けようとする姿勢が含まれています。具体的な支援の約束に至らないまでも、離れた場所から気の毒に思うだけの言葉とは響きが違います。原文の前後を読み、誰が誰の負担を分かち合おうとしているのかを確かめます。似た意味の語に置き換える際ほど、その文章が人と人の関係をどう描いているかに注意を払いたいですね。",
+    "form": "連帯",
+    "en": "When translating a statement, if you encounter a passage expressing solidarity with colleagues in difficulty, pause before rendering it as mere sympathy. It includes a willingness to connect with them and take on the problem together. Even if it stops short of promising specific assistance, it sounds different from simply feeling sorry for someone at a distance. Read the surrounding text to establish who seeks to share whose burden. Especially when substituting a word with a similar meaning, consider how the text portrays the relationship between people.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "共に問題に向き合う結びつきで、離れた所からの同情とは区別されます。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

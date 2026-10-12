@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "マントラ",
+   "reading": "まんとら",
+   "pos": "noun",
+   "meaning": "mantra, a phrase chanted in yoga and Buddhism",
+   "defJa": "信仰や修行の中で、繰り返し唱えるために決めた語句",
+   "passage": {
+    "ja": "ヨーガや瞑想の本を読むと、マントラが呪文とも真言とも訳されていて、まずどの語で覚えるかで手が止まります。呪文は外に働き掛ける魔法の響きが強く、原典では繰り返し唱えること自体が修行だった、という側面を伝えにくいです。真言はもともと同じ梵語を仏教が漢訳した語で、日本では密教の宗派名にまでなっているので、ヨーガの説明に置くと枠組みがずれます。語ごとに背景をノートに書き分けつつ、カタカナのまま残す道も含めて訳し方を選ぶと、語彙の定着も一段と深まります。",
+    "form": "マントラ",
+    "en": "When you read a book on yoga or meditation, you find 'mantra' rendered sometimes as the word for a spell and sometimes as shingon, and you stop short, wondering which word to learn it as. The word for a spell carries too strong a ring of magic working on something outside, and it hardly conveys the aspect that in the original texts the repeated chanting itself was the practice. Shingon is originally the word into which Chinese Buddhism translated that very same Sanskrit term, and in Japan it has even become the name of an esoteric school, so setting it into an explanation of yoga shifts the whole frame. If you sort the background of each word into separate notes while weighing how to render it, including the option of keeping it in katakana, the vocabulary will settle in that much more deeply.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "呪文・真言と訳し分けられ、カタカナのまま残る道もある。唱える行が修行になる伝統を踏まえる語",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "ヴェーダーンタ",
+   "reading": "ゔぇーだーんた",
+   "pos": "noun",
+   "meaning": "Vedānta, Hindu philosophy from the Upanishads",
+   "defJa": "ヴェーダの終わりの部分の呼び名。転じて、哲学の流派",
+   "passage": {
+    "ja": "ヴェーダーンタは元来、ヴェーダの終わりの部分、つまり経典の末尾に置かれたウパニシャッドを指す、ごく素直な語です。そこから転じて、ウパニシャッドの解釈を原理的に組織した学派の名となり、とくにシャンカラの不二一元論が有名です。一八九三年、シカゴの宗教会議でヴィヴェーカーナンダが英語で語ってからは、思想の名として西洋にも広く通用するようになりました。長いカタカナ語とはいえ、経典の位置、学派の系譜、思想の看板という三つの層が一語に重なった例は、ほかになかなか見つかりません。",
+    "form": "ヴェーダーンタ",
+    "en": "Vedanta is by origin a very straightforward word referring to the concluding part of the Vedas, that is, the Upanishads placed at the end of that scripture. From there it turned into the name of the school that organized interpretations of the Upanishads into a system, and Shankara's non-dualism is especially well known. After Vivekananda spoke in English at the parliament of religions in Chicago in eighteen ninety-three, the word came to circulate widely in the West as well, as the name of a philosophy. Long katakana word though it is, you will hardly find another example in which the position within a scripture, the lineage of a school, and the banner of a philosophy are layered within a single word.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "経典の末尾から学派、思想の名へと広がった語。語源の『終わり』を押さえると意味の層が見えてくる",
+    "sense": "元は経典の末尾、転じて哲学の流派の名"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

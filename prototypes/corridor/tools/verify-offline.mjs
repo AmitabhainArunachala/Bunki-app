@@ -53,6 +53,7 @@ const STREAM_SHARD = 'data/share_alike/dict-v2/02.json';
 const PAGE_ERROR_PROBE = process.argv.includes('--page-error-probe');
 const GENERATION_ONLY = process.argv.includes('--generation-only');
 const LEGACY_ONLY = process.argv.includes('--legacy-migration-only');
+const barrierEvidence = [];
 const results = [];
 const requests = [];
 const browserErrors = [];
@@ -432,6 +433,45 @@ async function until(predicate, description, timeout = 10000) {
   throw new Error(`Timed out: ${description}`);
 }
 
+// Wait for the healthy fixture's exact font set and digests before full inventory equality.
+// This follows the original immediate boot checks and opens no app page.
+async function waitForVerifiedFontFill(page, base, scope, names) {
+  const expected = [...INITIAL.entries]
+    .filter(([path]) => /^fonts\/[^/]+\.woff2$/.test(path))
+    .map(([path, entry]) => ({ url: `${base}${scope}${path}`, ...entry }));
+  if (expected.length !== 451) throw new Error(`Healthy font fixture changed: ${expected.length}`);
+  const started = Date.now();
+  await until(
+    () => page.evaluate(async ({ expected, names }) => {
+      const present = await caches.keys();
+      if (!names.every((name) => present.includes(name))) return false;
+      const containers = await Promise.all(names.map((name) => caches.open(name)));
+      const fontRequests = (await Promise.all(containers.map((cache) => cache.keys())))
+        .flat().filter((request) => /\/fonts\/[^/]+\.woff2$/.test(new URL(request.url).pathname));
+      const observed = new Set(fontRequests.map((request) => request.url));
+      if (observed.size !== expected.length || !expected.every((entry) => observed.has(entry.url))) return false;
+      for (const entry of expected) {
+        let response;
+        for (const cache of containers) {
+          response = await cache.match(entry.url);
+          if (response) break;
+        }
+        if (!response) return false;
+        const bytes = await response.arrayBuffer();
+        if (bytes.byteLength !== entry.bytes) return false;
+        const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))]
+          .map((byte) => byte.toString(16).padStart(2, '0')).join('');
+        if (digest !== entry.sha256) return false;
+      }
+      return true;
+    }, { expected, names }),
+    'healthy initial font fill completes exact manifest membership, bytes and SHA256 before independent-scope equality',
+    30000,
+  );
+  barrierEvidence.push({ barrier: 'initial verified font fill', expectedFonts: expected.length,
+    cacheNames: names, elapsedMs: Date.now() - started, openedAppPage: false });
+}
+
 // Exact-source handler probes supplement the browser lifecycle. A blocked
 // cache.put must remain in the fetch event's waitUntil promise set; a quota
 // failure must not replace a successful network response with an error.
@@ -621,7 +661,7 @@ try {
     });
 
     check('Pages-subpath first install activates', (await install(probe, APP)) === 'activated');
-    const initialInventory = await cacheInventory(probe, APP);
+    let initialInventory = await cacheInventory(probe, APP);
     writeFileSync(join(RUN_DIR, 'initial-cache.json'), JSON.stringify(initialInventory, null, 2));
     const totalBytes = initialInventory
       .flatMap((cache) => cache.entries)
@@ -643,6 +683,10 @@ try {
         return names.includes('neighbor-reader-v1') && names.includes('kairo-neighbor-v1');
       }),
     );
+    // Immediate boot was measured before this bounded, page-free font-fill barrier.
+    await waitForVerifiedFontFill(probe, base, APP, initialInventory.map((cache) => cache.name));
+    initialInventory = await cacheInventory(probe, APP);
+    writeFileSync(join(RUN_DIR, 'initial-cache-settled.json'), JSON.stringify(initialInventory, null, 2));
     check('a second KAIRO installation activates', (await install(probe, OTHER)) === 'activated');
     const afterNeighbor = await cacheInventory(probe, APP);
     check(
@@ -664,7 +708,7 @@ try {
     state.online = false;
     await launch(profile);
     await context.setOffline(true);
-    let app = await newPage(base, `${APP}?entry=shelf&ui=bi`);
+    let app = await newPage(base, `${APP}?entry=shelf&ui=ja`);
     const booted = await ready(app, 'first app startup after browser restart works offline');
     check(
       'offline startup uses the installed worker',
@@ -682,7 +726,8 @@ try {
             } catch {
               rules = 0;
             }
-            return { path: new URL(link.href).pathname.split('/').pop(), rules };
+            const { pathname } = new URL(link.href);
+            return { path: pathname.split('/').pop(), href: pathname, rules };
           });
           const word = document.querySelector('#shelf-body .japanese-lookup-word');
           const style = word && getComputedStyle(word);
@@ -692,11 +737,17 @@ try {
               padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
         })
       : { sheets: [], art: null };
+    const editorialAt = offlineLook.sheets.findLastIndex((sheet) => sheet.path === 'editorial.css');
+    const roomsLinkedOnce = ['today', 'read', 'learn', 'words', 'me', 'cards'].every((room) => {
+      const at = offlineLook.sheets.flatMap((sheet, index) => (sheet.href.endsWith(`/rooms/${room}.css`) ? [index] : []));
+      return at.length === 1 && at[0] > editorialAt;
+    });
     check(
       'every linked stylesheet, including editorial.css, and the shelf art load on a cold offline start',
       offlineLook.sheets.length > 0 &&
         offlineLook.sheets.every((sheet) => sheet.rules > 0) &&
         offlineLook.sheets.some((sheet) => sheet.path === 'editorial.css') &&
+        roomsLinkedOnce &&
         offlineLook.art > 0,
       JSON.stringify(offlineLook),
     );
@@ -705,6 +756,9 @@ try {
         offlineLook.word.border === 'none' && offlineLook.word.background === 'rgba(0, 0, 0, 0)' &&
         offlineLook.word.padding === '0px' && offlineLook.word.minWidth === '0px' && offlineLook.word.minHeight === '0px',
       JSON.stringify(offlineLook));
+    await app.locator('#lang [data-lang="bi"]').click();
+    check('cold offline style fixture returns to active English before the remaining journey',
+      await app.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed') === 'true');
     for (const path of ['editorial.css', 'design/ink-hoku-nami.png']) {
       const cached = await fetchOutcome(app, `${base}${APP}${path}`);
       check(`offline ${path} bytes match the installed artifact`,
@@ -960,6 +1014,18 @@ try {
         30000,
       );
       check('new version activates after the old app closes', true);
+      // Wait for bounded post-activation font migration before enumerating old caches.
+      const oldGenerationNames = initialInventory.map((cache) => cache.name);
+      const drainStarted = Date.now();
+      await until(
+        () => probe.evaluate(async (names) => {
+          const present = await caches.keys();
+          return names.every((name) => !present.includes(name));
+        }, oldGenerationNames),
+        'obsolete font-only generations finish migration before complete inventory snapshot',
+        30000,
+      );
+      barrierEvidence.push({ barrier: 'old generation drain', oldGenerationNames, elapsedMs: Date.now() - drainStarted });
       const updatedInventory = await cacheInventory(probe, APP);
       writeFileSync(join(RUN_DIR, 'updated-cache.json'), JSON.stringify(updatedInventory, null, 2));
       const oldNames = initialInventory.map((cache) => cache.name);
@@ -1048,6 +1114,7 @@ try {
         initialArtifactSha256: INITIAL.manifest.artifactSha256,
         compiledModules: stagedIdentity.modules,
         updateSourceAssetSha256: UPDATE.manifest.sourceAssetSha256,
+        barrierEvidence,
         results,
         failures,
         browserErrors,

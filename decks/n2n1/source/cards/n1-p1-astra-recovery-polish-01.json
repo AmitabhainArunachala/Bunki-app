@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "辛抱",
+   "reading": "しんぼう",
+   "pos": "noun",
+   "meaning": "patience; endurance",
+   "defJa": "苦しさや不満をこらえて耐えること。",
+   "passage": {
+    "ja": "日本語の小説で、冬を越すまでの辛抱だと職人が弟子に声をかける場面を想像してください。苦しい時期にすぐ仕事を投げ出さず、先の見通しを持って耐え忍ぶよう励ましています。単に順番を待つ場合とは違い、続けることのつらさをこらえる気持ちが言葉に含まれます。どんな負担に耐えているのかを前後から読み取ると、励ましが優しく響くのか、厳しく聞こえるのかも変わります。辞書の訳語のみならず、誰がどの立場から口にしたかまで追うと、短い台詞にも奥行きが生まれます。",
+    "form": "辛抱",
+    "en": "Imagine a scene in a Japanese novel where a craftsperson tells an apprentice that they must endure until winter is over. The speaker is encouraging them not to abandon the work in a difficult period but to bear it with a prospect of better things ahead. Unlike merely waiting one’s turn, the words carry the idea of enduring the hardship of continuing. Understanding from the context what burden is being borne also changes whether the encouragement sounds gentle or stern. Following who spoke and from what position, rather than relying only on a dictionary translation, gives depth even to a short line of dialogue.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "つらい時期を投げ出さずに耐え忍ぶことを、励ましの場面で表しています。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

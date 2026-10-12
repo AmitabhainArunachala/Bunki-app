@@ -1,0 +1,92 @@
+{
+ "cards": [
+  {
+   "term": "大惨事",
+   "reading": "だいさんじ",
+   "pos": "noun",
+   "meaning": "catastrophe, disaster",
+   "defJa": "多くの被害や犠牲を出す大きな事故",
+   "passage": {
+    "ja": "『バガヴァッド・ギーター』は、戦場の真ん中で始まります。クルクシェートラの大戦争を目前にして、王子アルジュナは、親族や師とも戦わざるを得ない現実に打ちのめされ、弓を置いてしまいます。迫りくる大惨事を前に、彼は戦うことの意味を問います。そこへ、御者を務めるクリシュナが、結果への執着を捨てて自分の務めを果たすよう説くのです。試験前の不安にも通じる、行為と結果をめぐる教えです。",
+    "form": "大惨事",
+    "en": "The Bhagavad Gita begins on a battlefield. On the eve of the great war at Kurukshetra, Prince Arjuna is crushed by the reality that he must fight even his kin and teachers, and lays down his bow. Facing the approaching catastrophe, he asks what the meaning of fighting is. Then Krishna, serving as his charioteer, teaches him to cast aside attachment to results and do his duty. It is a teaching about action and outcome that speaks even to the anxiety before an exam.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「大惨事を前にする」。取り返しのつかない大きな被害を指す。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "奇数",
+   "reading": "きすう",
+   "pos": "noun",
+   "meaning": "odd number",
+   "defJa": "二で割り切れない整数",
+   "passage": {
+    "ja": "スピーチの指南書は、要点を三つにまとめよとほとんど口をそろえて説く。二つでは対比に見え、四つ以上になると、聞き手の頭にはなかなか残りにくい。奇数のうちでも三は、始まりと中間と終わりを備えた、最小のまとまりだからであろう。もっとも、この型に安易に頼ると、内容が三つに収まるはずだという窮屈な思い込みを生みかねない。型は、考えを助ける道具であって、考えそのものを縛る枷ではない。",
+    "form": "奇数",
+    "en": "Speech guidebooks all but unanimously urge you to sum up your points in three. Two looks like a contrast, and with four or more, little stays in the listener's head. Among odd numbers, three is perhaps the smallest unit of coherence, having a beginning, a middle and an end. Still, relying on this form too easily can breed the assumption that the content must fit into three. A form is a tool that helps thinking, not a shackle that binds it.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "「奇数」は二で割れない数。「偶数」と対にして使う。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "対照的",
+   "reading": "たいしょうてき",
+   "pos": "na-adj",
+   "meaning": "contrasting",
+   "defJa": "二つを比べると違いがはっきりする様子",
+   "passage": {
+    "ja": "AIの規制をめぐる各国の姿勢は、驚くほど対照的だ。欧州連合は、リスクの大きさに応じて用途を分類する包括的な法律を成立させた。一方、米国は、業界の自主的な取り組みを重んじる傾向が強いと言われる。この違いは、速い技術の進歩に法律が追いつけるのか、また規制が新しい技術の芽を摘まないかという、根深い問いの表れでもある。どちらが妥当かという問いへの答えは、まだ出ていない。",
+    "form": "対照的",
+    "en": "The stances of countries over AI regulation are strikingly contrasting. The European Union enacted a comprehensive law that classifies uses according to the size of the risk. The United States, on the other hand, is said to lean strongly toward respecting voluntary industry efforts. This difference also expresses a deep question: whether law can keep up with fast technological progress, and whether regulation might nip new technologies in the bud. The answer to which is appropriate has not yet emerged.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「両者は対照的だ」「対照的な姿勢」。二つの差を際立たせる。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "宙",
+   "reading": "ちゅう",
+   "pos": "noun",
+   "meaning": "midair; left hanging",
+   "defJa": "決着がつかず中途半端な状態",
+   "passage": {
+    "ja": "技術発表で「精度は九割です」と言ったきり、話が宙に浮いてしまうことがある。聞き手が知りたいのは、残りの一割に隠れた実情だ。数字は、意味とセットで初めて言葉になる。半導体の歩留まりでも、モデルの精度でも、事情は変わらない。たとえば歩留まりが八割だと聞いても、残りの二割が検査で外れた不良品なのか、使えはするが動作の遅いものなのかで、次に打つべき手はまるで違ってくる。",
+    "form": "宙",
+    "en": "In technical talks, someone says \"accuracy is ninety percent\" and then the talk is left hanging in midair. What the audience wants to know is the real situation hidden in the remaining ten percent. A number becomes language only when paired with its meaning. The situation is the same for semiconductor yield and for model accuracy. Even if you hear a yield is eighty percent, the next move to make is wholly different depending on whether the remaining twenty percent are defective chips that failed inspection or chips that work but run slowly.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "「宙に浮く」は、決着がつかず中途半端な状態に置かれることも表す。",
+    "sense": "決着のつかない状態"
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+ "cards": [
+  {
+   "term": "賄う",
+   "reading": "まかなう",
+   "pos": "verb",
+   "meaning": "supply; provide for",
+   "defJa": "必要な費用や物、人手などを用意する。",
+   "passage": {
+    "ja": "祭りの運営に必要な人手を、地域の住民だけで賄うという計画を文章にするとします。この表現は、足りない人数を少し補うというより、必要な働き手を全体としてそろえることに重点を置いています。費用についても使う語ですが、ここで用意するのはお金ではなく、人の働きです。受付や警備などの役割を別々に示すと、計画がどの範囲を扱うのかも明確になります。短い一文で全体の方針を伝え、その下に具体的な配置を記すことで、読む人が自分の担当を確かめられる説明になります。",
+    "form": "賄う",
+    "en": "Suppose you are writing a plan to provide all the labour needed to run a festival using only local residents. This wording emphasises securing the workforce as a whole rather than merely making up a small shortfall in numbers. The verb is also used for expenses, but what is provided here is human labour rather than money. Listing roles such as reception and security separately also clarifies the scope of the plan. Stating the overall policy in one brief sentence and giving the specific assignments below it produces an explanation that lets readers check their own responsibilities.",
+    "register": "語",
+    "topic": "language",
+    "tipJa": "「人手を住民だけで賄う」は、必要な働き手をその範囲でそろえることです。",
+    "sense": "必要な人員を用意して間に合わせる。"
+   }
+  }
+ ]
+}

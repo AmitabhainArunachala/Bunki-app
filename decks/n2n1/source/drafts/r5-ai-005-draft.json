@@ -1,0 +1,132 @@
+{
+ "cards": [
+  {
+   "term": "前工程",
+   "reading": "まえこうてい",
+   "pos": "noun",
+   "meaning": "front-end process (wafer fabrication)",
+   "defJa": "ウェハ上に回路を作る工程",
+   "passage": {
+    "ja": "シリコン円盤に回路を焼き込む前工程と、切り出したチップを封じ込める後工程は、扱う誤差の桁がまるで違う。前者がナノメートルの光学的限界と格闘する一方、後者はミリの組み立て精度と熱膨張に支配される。同じ半導体という言葉で括られがちだが、現場の技術者は別の学問を歩んでいると言っても過言ではない。設計データが完璧でも、片方の歩留まりが崩れれば製品は出荷できない。",
+    "form": "前工程",
+    "en": "The front-end process, which burns circuits onto silicon discs, and the back-end process, which encapsulates diced chips deal with error orders of magnitude apart. While the former wrestles with the optical limits of nanometres, the latter is governed by millimetre-scale assembly precision and thermal expansion. They tend to be lumped together under the word semiconductor, but to say the engineers on the ground walk different disciplines is no exaggeration. Even with perfect design data, if the yield on either side collapses the product cannot ship.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「前工程」と「後工程」を対で用い、半導体製造の二段階を区別する用法を示した。",
+    "sense": "半導体製造で回路形成を行う前半の工程"
+   }
+  },
+  {
+   "term": "化石化",
+   "reading": "かせきか",
+   "pos": "noun",
+   "meaning": "fossilization",
+   "defJa": "古い仕組みが残り続けること",
+   "passage": {
+    "ja": "昔のファウンドリが作ったレガシーな制約に合わせたコードって、便利だからってそのまま残しませんか。それが化石化して、新しいノードに移行するたびに互換性の重りになるんですよ。便利な選択の裏で、将来の設計自由度を少しずつ売り払っているのと同じです。次にアーキテクチャを見直すとき、そのコードを本当に持ち越すのか一回書き出してみると面白いですよ。",
+    "form": "化石化",
+    "en": "Don't we just leave code that was matched to the constraints of an old foundry as-is because it's convenient? It then fossilizes and becomes a weight of compatibility every time you move to a new node. Behind the convenient choice, you are slowly selling off future design freedom, which is the same thing. Next time you review the architecture, it is interesting to actually write out whether you truly carry that code over.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "レガシーコードや古い制約が残り続ける状況を「化石化する」と話し言葉で使った。",
+    "sense": "古い仕組みやコードが残り続け改革を妨げること"
+   }
+  },
+  {
+   "term": "回路線幅",
+   "reading": "かいろせんはば",
+   "pos": "noun",
+   "meaning": "circuit line width",
+   "defJa": "基板上の配線の太さ",
+   "passage": {
+    "ja": "友人から「2ナノって何の寸法ですか」と聞かれ、回路線幅の話をしたのですが、すぐに光の波長の話に行き着きました。実際の波長よりずっと細かい溝を描くために、回折という物理的な制約と何十年も戦ってきたのが半導体の微細化の歴史です。数字だけ見れば単なる長さですが、そこには誤差を抑え込む光学の工夫が詰まっています。次に広告で極小の数字を見たら、波長と比較してみてください。",
+    "form": "回路線幅",
+    "en": "When a friend asked me what the 2-nanometre figure refers to, I explained circuit line width, and we immediately landed on the topic of light wavelength. The history of semiconductor miniaturization has been a decades-long battle against a physical constraint called diffraction, in order to draw grooves far finer than the actual wavelength. Looked at by the number alone it is simply a length, but packed inside it is optical ingenuity for suppressing error. Next time you see an extremely small number in an advertisement, compare it with the wavelength.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "半導体の微細化を語る際、「回路線幅」を物理的な寸法の指標として用いた。",
+    "sense": "集積回路の配線パターンの最小幅"
+   }
+  },
+  {
+   "term": "大規模言語モデル",
+   "reading": "だいきぼげんごもでる",
+   "pos": "noun",
+   "meaning": "large language model",
+   "defJa": "膨大な文章で学習した生成AI",
+   "passage": {
+    "ja": "大規模言語モデルの仕組みを語るとき、一文を三つのベクトルに分ける小さな図を描いてから話すと聴き手が急に落ち着きます。次の単語の確率を計算するだけの作業を、手計算で二段階だけなぞってもらうのです。すると「魂がある」といった比喩が検証すらない仮説に過ぎないことが、自ずと見えてくる。複雑な現象を一つの図に切り詰める編集の力は、技術の説明でも変わらない。",
+    "form": "大規模言語モデル",
+    "en": "When explaining how a large language model works, if you draw a small diagram splitting a sentence into three vectors before talking, the listener suddenly settles down. You have them trace only two steps of the task, which is nothing more than calculating the probability of the next word, by hand. Then it becomes clear on its own that metaphors like saying it has a soul are no more than hypotheses lacking verification. The power of editing, which distills a complex phenomenon into a single diagram, does not change even in technical explanations.",
+    "register": "語",
+    "topic": "ai",
+    "tipJa": "専門用語を説明する際、図解と手計算で抽象度を下げる語り口の例を示した。",
+    "sense": "膨大なテキストで訓練された巨大な言語生成モデル"
+   }
+  },
+  {
+   "term": "後工程",
+   "reading": "あとこうてい",
+   "pos": "noun",
+   "meaning": "back-end process (assembly, packaging, test)",
+   "defJa": "チップの組み立てと検査の工程",
+   "passage": {
+    "ja": "前工程で完璧に焼けたチップも、後工程のパッケージングで熱が逃げなければ製品として死にます。ある現場では銅ピンの位置が数ミクロンずれただけで歩留まりが崩れ、数億円のロットが廃棄されたそうです。回路の微細化ばかりが脚光を浴びますが、実際の収益を握るのは梱包と検査の精度です。次に半導体工場の写真を見たら、クリーンルームより組み立てラインの手間を数えてみてください。",
+    "form": "後工程",
+    "en": "Even a chip perfectly burned in the front-end process dies as a product if heat cannot escape during back-end packaging. At one site, a copper pin being off by just a few microns collapsed the yield, and a lot worth hundreds of millions of yen was reportedly discarded. Only circuit miniaturization tends to grab the spotlight, but what actually holds the keys to profit is the precision of packaging and inspection. Next time you see a photo of a semiconductor factory, try counting the labour of the assembly line rather than the clean room.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「後工程」を前工程と対比し、パッケージングと検査の重要性を強調した。",
+    "sense": "半導体製造で組み立て、封止、検査を行う後半の工程"
+   }
+  },
+  {
+   "term": "微細化",
+   "reading": "びさいか",
+   "pos": "noun",
+   "meaning": "miniaturization (of circuit features)",
+   "defJa": "回路パターンを小さくする技術",
+   "passage": {
+    "ja": "ファウンドリ各社が競う微細化の尺度は、単なる技術の自慢ではなく一つの経営の賭けです。波長の壁に近づくにつれて開発費は指数関数的に膨らみ、一つのノードに失敗すれば次世代への投資資金すら消えかねない。実際の集積度は回路の幾何学だけでなく、配線の相互作用や誤差の蓄積にも左右される。現場の意思決定者は毎日、物理の制約と予算の板挟みで線を引いている。",
+    "form": "微細化",
+    "en": "The metric of miniaturization that foundries compete on is not mere technological bravado but a managerial gamble. As it approaches the wavelength wall, development costs balloon exponentially, and failing on a single node could well evaporate even the funds for investing in the next generation. Actual integration density is governed not only by circuit geometry but also by wiring interactions and the accumulation of error. Decision-makers on the ground draw the line every day, caught between physical constraints and the budget.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「微細化」を技術指標として使い、開発費と物理的制約の板挟みを描いた。",
+    "sense": "半導体の回路パターンをより小さく縮小すること"
+   }
+  },
+  {
+   "term": "探索と活用",
+   "reading": "たんさくとかつよう",
+   "pos": "expression",
+   "meaning": "explore vs exploit",
+   "defJa": "新しい選択肢を試すか既存の最善を取るか",
+   "passage": {
+    "ja": "探索と活用のトレードオフは、投資家が未知の銘柄を買うか既存の勝ち筋に資金を注ぐかという問いにそのまま重なる。同じ利回りの数字を見ても、過去の検証だけで選ぶ人は活用に偏り、新しい市場を試す人は探索に賭けている。両者の差は認知の枠組みそのものに根ざしており、片方を正解と呼ぶわけにはいかない。次にポートフォリオを見直すとき、今の配分がどちらに傾いているか一つの数字で書き出してみてください。",
+    "form": "探索と活用",
+    "en": "The trade-off between exploration and exploitation maps directly onto the question of whether an investor should buy unknown stocks or pour funds into an existing winning formula. Even looking at the same yield figure, a person who chooses based on past verification is biased toward exploitation, while one who tries a new market is betting on exploration. The difference between the two is rooted in the framework of cognition itself, and one cannot call either the correct answer. Next time you review your portfolio, try writing down in a single number which way the current allocation leans.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "投資判断の意思決定を「探索と活用」の枠組みで読み解く用法を示した。",
+    "sense": "新しい選択肢を試すことと既存の最善を利用することの対立"
+   }
+  },
+  {
+   "term": "日米半導体協定",
+   "reading": "にちべいはんどうたいきょうてい",
+   "pos": "noun",
+   "meaning": "US–Japan Semiconductor Agreement (1986)",
+   "defJa": "1986年に結ばれた半導体貿易の協定",
+   "passage": {
+    "ja": "1986年に調印された日米半導体協定って、設計する側と使う側で見え方が全然違うんですよ。日本のメーカーは市場アクセスの制約と受け取ったし、向こうは不当な安売りの是正だと主張した。一つの文書を読んでも、因果関係の解釈が立場でこれだけ食い違う。次に歴史の条約を読むときは、誰の視点で書かれたか一行だけメモを残すと面白いですよ。",
+    "form": "日米半導体協定",
+    "en": "The US–Japan Semiconductor Agreement signed in 1986 is seen completely differently depending on whether you are on the designing side or the using side, you know. Japanese makers took it as a constraint on market access, and the other side argued it was a correction of unfair dumping. Even reading a single document, the interpretation of cause and effect diverges this much depending on standpoint. Next time you read a historical treaty, it is interesting to leave a one-line note on whose perspective it was written from.",
+    "register": "話",
+    "topic": "ai",
+    "tipJa": "歴史的協定を話題にし、立場による解釈の違いを「〜って」「〜ですよ」で語った。",
+    "sense": "1986年に日米間で結ばれた半導体貿易に関する協定"
+   }
+  }
+ ]
+}

@@ -1,0 +1,136 @@
+{
+ "cards": [
+  {
+   "term": "未曾有",
+   "reading": "みぞう",
+   "pos": "na-adj",
+   "meaning": "unprecedented",
+   "defJa": "これまで一度もなかったこと",
+   "passage": {
+    "ja": "災害の記録を読んでいると、書き手が被害の大きさに圧倒され、過去の出来事と比べる言葉を失う場面に出会います。「未曾有の事態」と記された箇所を引用するに際しては、それが当時の人の受け止め方なのか、資料を比べた上での判断なのかを区別しましょう。残っている記録が少ない時代まで含めて、史上最大だったと断定するには慎重さが必要です。驚きの強さを伝える表現と、被害の規模を示す情報を分けて読むと、文章の切実さを保ちながら根拠も確かめられます。",
+    "form": "未曾有",
+    "en": "Reading disaster records, we encounter moments when writers are overwhelmed by the damage and lose the words to compare it with past events. When quoting a description of an unprecedented situation, distinguish whether it expresses how contemporaries experienced it or a judgment based on comparison of sources. Declaring something the greatest ever requires caution when the claim includes eras with few surviving records. Reading expressions of profound shock separately from information about the damage’s scale lets us check the evidence while preserving the text’s urgency.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「未曾有の災害」のように、前例のない規模や事態を表します。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不透明",
+   "reading": "ふとうめい",
+   "pos": "na-adj",
+   "meaning": "unclear; opaque",
+   "defJa": "事情や先行きがはっきり分からないこと",
+   "passage": {
+    "ja": "文章を自動で作るサービスが安く使えても、来年の利用条件まで同じとは限りません。料金の決まり方やデータの扱いが不透明なまま仕事の中心に置くと、条件が変わった際に移行の費用が膨らむ恐れがあります。導入時には今の便利さに目が向きがちですが、保存した文章を取り出せるか、別の仕組みでも続きを進められるかも確認したいところです。見通せない部分を無理に予測で埋めるより、何が決まったら計画を見直すのかを先に決めるほうが、判断を整理できます。",
+    "form": "不透明",
+    "en": "Even if a service for automatically generating text is inexpensive now, its terms of use may not be the same next year. Making it central to work while its pricing and data practices remain unclear risks increasing migration costs when the terms change. Convenience tends to attract attention at introduction, but it is also worth checking whether saved text can be retrieved and work continued in another system. Rather than filling unknowns with forced predictions, deciding what developments would trigger a review can make decisions more orderly.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "ここでは光を通さない意味ではなく、先を見通せないことです。",
+    "sense": "事情や将来の見通しがはっきりしないこと"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "不滅",
+   "reading": "ふめつ",
+   "pos": "noun",
+   "meaning": "immortality; indestructibility",
+   "defJa": "いつまでも滅びず、存在し続けること",
+   "passage": {
+    "ja": "いつまでも生きられる登場人物を置くと、物語から死の恐ろしさが消えるように思える。ところが、不滅の存在であればこそ、出会った人との別れを何度も経験し、変わり続ける世界に取り残される寂しさを描くこともできる。神話を読む際は、長く生きる力が褒美として与えられているのか、逃れられない重荷として描かれているのかに目を向けたい。寿命の長さをうらやむだけでは見落とす問いが、その人物が誰の名を覚え、誰を待ち続けているかという細部から浮かび上がる。",
+    "form": "不滅",
+    "en": "Introducing a character who can live forever seems as though it would remove the terror of death from a story. Yet precisely because the character is imperishable, a story can depict repeated partings with those they meet and the loneliness of being left behind in an ever-changing world. When reading myths, we should attend to whether long life is bestowed as a reward or portrayed as an inescapable burden. Questions we miss by merely envying longevity emerge from details of whose names the character remembers and whom they keep waiting for.",
+    "register": "論",
+    "topic": "other",
+    "tipJa": "「不滅の存在」は消えたり死んだりしない存在を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "掌握",
+   "reading": "しょうあく",
+   "pos": "noun",
+   "meaning": "grasp, command",
+   "defJa": "人や組織を意のままに動かせる状態に置くこと",
+   "passage": {
+    "ja": "王が代わったという知らせだけでは、その国の政治が誰の意向で動くようになったかは分からない。新しい王が権力を掌握したと言えるかどうかは、軍を動かし、役人を任命し、財源を確保する命令が実際に届く範囲を調べて判断すべきである。立派な称号を持つ一方で、地方の有力者が反対すれば何も決められない場合も考えられる。王位の継承を記した短い一行の背後には、命令を受け入れさせるための交渉や、従来の取り決めを変える長い過程が隠れている。",
+    "form": "掌握",
+    "en": "News that a king has changed does not tell us whose wishes now drive the country’s politics. Whether the new king can be said to have seized power should be judged by examining how far his orders to move troops, appoint officials, and secure revenue actually reach. A ruler may hold an impressive title yet be unable to decide anything if local power holders object. Behind a brief line recording succession to the throne lie negotiations to secure obedience and a long process of changing existing arrangements.",
+    "register": "論",
+    "topic": "history",
+    "tipJa": "「権力を掌握する」は、実際に支配する力を手中に収めること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "急務",
+   "reading": "きゅうむ",
+   "pos": "noun",
+   "meaning": "urgent task",
+   "defJa": "他より優先して急いで取り組むべき仕事",
+   "passage": {
+    "ja": "社内文書を検索する仕組みが誤った回答を返し、それを確かめずに顧客へ送る状況を想定してみる。こうした運用では、検索の速度を上げること以上に、回答の根拠を検証する手順の整備が急務となる。利用範囲の拡大に伴って、誰が誤りを発見し、どこへ報告するのかが曖昧なままでは、同じ間違いが別の部署にも広がり得る。責任の所在を決めるだけで安心せず、訂正された内容が次の回答へ反映されるところまで、仕事の流れをつなぐ必要がある。",
+    "form": "急務",
+    "en": "Imagine an internal document search system returning an incorrect answer that is then sent to a customer without checking. In such an operation, establishing a procedure to verify the answer’s basis becomes more urgent than increasing search speed. As use expands, leaving unclear who detects errors and where to report them can let the same mistake spread to other departments. Assigning responsibility alone should not be reassuring; the workflow needs to extend through to having corrected information reflected in subsequent answers.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "「対応が急務となる」のように、先延ばしできない課題をいう。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "出遅れ",
+   "reading": "でおくれ",
+   "pos": "noun",
+   "meaning": "late start; lagging behind",
+   "defJa": "周囲より取り掛かりが遅くなること",
+   "passage": {
+    "ja": "半導体の新たな製造技術を導入する際、設備を買いそろえただけで、安定した量産が始まるとは限らない。競合への出遅れを取り戻そうと急ぐあまり、試験工程で見つかった問題を残せば、後の修正に時間がかかる恐れがある。装置の条件を合わせる作業と、異常の原因を判断できる人材の育成は、並行して進める必要がある。投資の規模だけを比べるのでなく、試作で得た経験を次の工程へどう引き継ぐかを見ることが、生産体制の実力を評価する手掛かりとなる。",
+    "form": "出遅れ",
+    "en": "Introducing new semiconductor manufacturing technology does not necessarily lead to stable mass production simply by purchasing the equipment. In excessive haste to make up for a late start against competitors, leaving problems found during testing unresolved risks time-consuming corrections later. Adjusting equipment conditions and developing people who can diagnose abnormalities need to proceed in parallel. Looking at how experience from trial production is passed to the next stage, rather than comparing investment size alone, provides a clue to the production system’s actual capabilities.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「出遅れを取り戻す」は、開始の遅さによる差を埋めること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

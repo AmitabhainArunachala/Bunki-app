@@ -17,6 +17,7 @@
  * Pin KAIRO_SITE_DIR, KAIRO_ARTIFACT_SHA256 and KAIRO_EXPECT_GITSHA for a prior build.
  */
 
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -280,10 +281,19 @@ async function press(page, selector, options) {
   await page.mouse.click(x, y);
   await delay(150);
 }
-const pressSeal = (page) => press(page, '#reader-take', { scroll: false });
+const dismissMiniForSeal = async (page) => {
+  if (await page.locator('#mini').count()) {
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+  }
+};
+const pressSeal = async (page) => {
+  await dismissMiniForSeal(page);
+  return press(page, '#reader-take', { scroll: false });
+};
 async function closeIfOpen(page) {
   if (!(await page.locator('#sheet').count())) return;
-  await press(page, '#sheet-close');
+  await press(page, await entryCloseSelector(page));
   await page.waitForFunction(() => !document.getElementById('sheet'), null, { timeout: 5_000 });
 }
 const chooserFocus = (page, id) => page.waitForFunction((focusId) => document.querySelector('#sheet #reader-choice')?.dataset.state === 'choose'
@@ -510,7 +520,7 @@ async function chooserFixture(page, once, { fixture, id, choices, pick, pickRow,
   once(`${id}.chooser`, `${at(fixture)}: an explicit chooser of exactly ${choices.map((c) => `${c.head}/${c.reading}#${c.seq}`).join(', ')}, in that order, as native buttons, nothing opened by itself, 覚 held`,
     state?.node === `word:${fixture.token.b}` && state.choiceState === 'choose' && state.noteSeq === null && !state.senses
       && canonical(listed) === canonical(choices) && state.candidates.every((c) => c.tag === 'button' && c.type === 'button')
-      && state.title === CHOOSER_TITLE.ja && state.titleEn === CHOOSER_TITLE.en && state.takeDisabled === true && state.reasonVisible,
+      && state.title === CHOOSER_TITLE.en && state.titleEn === null && state.takeDisabled === true && state.reasonVisible,
     brief(state), observe(state));
   const button = `#reader-choice-${pick.seq}`;
   if ((await page.locator(button).count()) === 1) {
@@ -634,7 +644,7 @@ async function matchRun(open, rec) {
 async function captureRun(open, rec) {
   const doors = [
     { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => openPopup(page, CORE) },
-    { door: 'seal', name: 'the chrome seal 覚える', selector: '#reader-take', seal: true, prepare: (page) => tap(page, CORE) },
+    { door: 'seal', name: 'the chrome seal 覚える', selector: '#reader-take', seal: true, prepare: async (page) => { await tap(page, CORE); await dismissMiniForSeal(page); } },
     { door: 'sheet', name: "the entry sheet bar's 覚", selector: '#sheet-take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
     { door: 'foot', name: "the entry foot's 覚える", selector: '#take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
   ];
@@ -882,7 +892,7 @@ try {
       check(`G2 ${lang}: one tap shows the honest dictionary miss in the popup`,
         mini?.word === IU.token.b && mini.reading === IU.token.r
           && mini.gloss === `<span class="mini-gloss mini-miss">${MISS[lang]}</span>`
-          && !/no gloss yet|語釈なし/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
+          && !/no gloss yet|語釈なし|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
       check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
         one?.surface === IU.token.s && one.lines === 0 && !one.hasEn
           && one.label === `${IU.token.s} · ${WORD[lang]} · ${HINT[lang]}`, JSON.stringify(one), { id: `G2.${lang}.prose` });

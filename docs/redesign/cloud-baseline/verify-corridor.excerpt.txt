@@ -1,0 +1,18 @@
+# verify-corridor (run 1, base 7576f527) — 257/259; rerun 2: 259/259 PASS
+87-
+88-— step 5 · 覚える
+89: FAIL  any node can be taken into study  — chrome reads "Lists 0"
+90: FAIL  after saving, the sheet says plainly where the word went  — null
+91-  ok   the schedule preview shows what FSRS-6 would do  — again→in 1 min · hard→in 6 min · good→in 10 min · easy→in 8 d
+92-
+93-— step 6 · return without losing your place
+
+# premerge cd30c2a5 run — 255/259
+89: FAIL  any node can be taken into study  — chrome reads "Lists 0"
+90: FAIL  after saving, the sheet says plainly where the word went  — null
+91: FAIL  the schedule preview shows what FSRS-6 would do
+212: FAIL  文字設定 rides the envelope — a chosen dial survives the session  — stored furigana=undefined
+332:255/259 checks passed
+257/259 checks passed
+screenshots → /root/.dharma/bunki-run/evidence/verify-corridor/screenshots
+report → /root/.dharma/bunki-run/evidence/verify-corridor/verification-report.json

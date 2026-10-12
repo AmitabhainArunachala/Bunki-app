@@ -1,21 +1,141 @@
-# One build/test chain: PRs verify locally staged bytes; main calls this same
-# workflow from pages-app and may publish only the artifact it verified.
+# One immutable build; canonical gates partitioned by measured duration.
 name: CI
-
 on:
   pull_request:
+  workflow_dispatch:
   workflow_call:
-
+    outputs:
+      site-id:
+        value: ${{ jobs.build.outputs.site-id }}
+      site-digest:
+        value: ${{ jobs.build.outputs.site-digest }}
 permissions:
   contents: read
-
+  actions: read
 concurrency:
-  group: kairo-checks-${{ github.ref }}
+  group: bunki-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
-  apple-sync:
-    name: native CloudKit compile and offline contract checks
+  plan:
+    name: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      scope: ${{ steps.plan.outputs.scope }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      fast-matrix: ${{ steps.plan.outputs.fast-matrix }}
+      has-battery: ${{ steps.plan.outputs.has-battery }}
+      tree: ${{ steps.tree.outputs.tree }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Print and compare original and candidate required gates
+        run: |
+          base=$(node --input-type=module -e "import fs from 'node:fs'; console.log(JSON.parse(fs.readFileSync('scripts/ci/gate-baseline.json')).baseSha)")
+          node scripts/ci/parity.mjs --base "$base" --out "$RUNNER_TEMP/parity.json"
+      - name: Classify the complete candidate diff conservatively
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { writeFileSync } from 'node:fs';
+          let paths = [];
+          if (process.env.GITHUB_EVENT_NAME === 'pull_request' && /^[a-f0-9]{40}$/.test(process.env.BASE_SHA || '')) {
+            try { paths = execFileSync('git', ['diff', '--name-only', '-z', '--no-renames', `${process.env.BASE_SHA}...HEAD`], { encoding: 'utf8' }).split('\0').filter(Boolean); }
+            catch { paths = []; }
+          }
+          writeFileSync(`${process.env.RUNNER_TEMP}/paths.json`, JSON.stringify(paths));
+          NODE
+      - id: plan
+        run: node scripts/ci/battery.mjs plan --paths "$RUNNER_TEMP/paths.json" --out "$RUNNER_TEMP/plan.json"
+      - id: tree
+        run: echo "tree=$(git rev-parse 'HEAD^{tree}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/plan.json
+            ${{ runner.temp }}/parity.json
+          if-no-files-found: error
+          retention-days: 14
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      site-id: ${{ steps.site.outputs.artifact-id }}
+      site-digest: ${{ steps.site.outputs.artifact-digest }}
+    steps:
+      - name: Set canonical artifact path outside checkout
+        run: echo "KAIRO_SITE_DIR=$RUNNER_TEMP/kairo-site" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build once and verify source identity
+        run: |
+          mkdir -p "$RUNNER_TEMP/build-evidence" "$RUNNER_TEMP/site-package"
+          node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$RUNNER_TEMP/build-evidence/build.json"
+          node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$RUNNER_TEMP/build-evidence/artifact-before.json"
+      - name: Smoke-test every packaged path, dictionary, licence and archive obligation
+        run: bash scripts/ci/smoke.sh
+      - name: Seal the exact packaged bytes
+        run: |
+          node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$RUNNER_TEMP/build-evidence/artifact-after.json"
+          tar -cf "$RUNNER_TEMP/site-package/site.tar" -C "$KAIRO_SITE_DIR" .
+      - id: site
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-site-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/site-package/site.tar
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
+      - name: Bind immutable artifact metadata
+        env:
+          SITE_ID: ${{ steps.site.outputs.artifact-id }}
+          SITE_DIGEST: ${{ steps.site.outputs.artifact-digest }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          import { execFileSync } from 'node:child_process';
+          const manifest = readFileSync(`${process.env.KAIRO_SITE_DIR}/build-identity.json`);
+          const json = JSON.parse(manifest);
+          writeFileSync(`${process.env.RUNNER_TEMP}/artifact.json`, JSON.stringify({id:process.env.SITE_ID,name:`bunki-site-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`,digest:process.env.SITE_DIGEST.startsWith('sha256:')?process.env.SITE_DIGEST:`sha256:${process.env.SITE_DIGEST}`,artifactSha256:json.artifactSha256,manifestSha256:createHash('sha256').update(manifest).digest('hex'),producerSha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()}));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/artifact.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Compress build evidence
+        if: always()
+        run: tar -czf "$RUNNER_TEMP/build-evidence.tar.gz" -C "$RUNNER_TEMP" build-evidence corridor-smoke.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-build-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/build-evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  native:
+    name: native
+    needs: plan
+    if: needs.plan.outputs.scope == 'full'
     runs-on: macos-26
     timeout-minutes: 25
     steps:
@@ -43,7 +163,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kairo-apple-sync-evidence
+          name: kairo-apple-sync-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/kairo-apple-sync/
           retention-days: 14
           if-no-files-found: warn
@@ -52,255 +172,627 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kairo-native-rpc-evidence
+          name: kairo-native-rpc-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/kairo-native-rpc/
           retention-days: 14
           if-no-files-found: warn
-
-  checks:
-    name: complete required battery / tested Corridor artifact
-    needs: apple-sync
+  fast:
+    name: battery / ${{ matrix.shard }}
+    needs: [plan, build]
     runs-on: ubuntu-latest
-    timeout-minutes: 210
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.fast-matrix) }}
     env:
+      GH_TOKEN: ${{ github.token }}
       KAIRO_CORPUS_PYTHON: python3
-
     steps:
-      - name: Set release artifact and evidence paths
-        run: |
-          mkdir -p "$RUNNER_TEMP/kairo-release"
-          echo "KAIRO_SITE_DIR=$RUNNER_TEMP/kairo-site" >> "$GITHUB_ENV"
-          echo "KAIRO_EVIDENCE_ROOT=$RUNNER_TEMP/kairo-release" >> "$GITHUB_ENV"
-
-      - name: Check out the exact candidate with source-history fixtures
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Set up Node 22
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/ci-setup
+        with:
+          python: ${{ matrix.python }}
+          corpus: ${{ matrix.corpus }}
+          browsers: ${{ matrix.browsers }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - name: Verify immutable archive digest before extraction
+        env:
+          SITE_ID: ${{ needs.build.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.build.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/site-download" --out "$RUNNER_TEMP/site"
+      - name: Bind this actual GitHub job identity
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const suffix=`battery / ${process.env.SHARD}`;
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs.json`)).flatMap(x=>x.jobs).filter(x=>x.name===suffix||x.name.endsWith(` / ${suffix}`));
+          assert.equal(jobs.length,1); appendFileSync(process.env.GITHUB_ENV,`CI_JOB_ID=${jobs[0].id}\n`);
+          NODE
+      - name: Run the exact planned gates and retain first failures
+        id: gates
+        continue-on-error: true
+        timeout-minutes: 45
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --out "$RUNNER_TEMP/evidence"
+      - name: Compress evidence before upload
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/evidence" ]; then tar -czf "$RUNNER_TEMP/evidence.tar.gz" -C "$RUNNER_TEMP" evidence; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-shard-${{ matrix.shard }}-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence/shard.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-evidence-${{ matrix.shard }}-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  fast-retry-plan:
+    name: fast-retry-plan
+    if: always() && needs.plan.result == 'success' && needs.build.result == 'success'
+    needs: [plan, build, fast]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      matrix: ${{ steps.retry.outputs.matrix }}
+      has-retries: ${{ steps.retry.outputs.has-retries }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-
-      - name: Install pinned JavaScript dependencies
-        run: npm ci
-
-      - name: Set up corpus Python
-        uses: actions/setup-python@v5
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
         with:
-          python-version: '3.12'
-
-      - name: Install corpus test dependencies
-        run: python3 -m pip install './corpus[dev,wikinews,aozora,snow,grading]'
-
-      - name: Install the pinned browser and system libraries
-        run: npx playwright install --with-deps chromium webkit
-
-      - name: Install assessment media inspection
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y ffmpeg
-
-      - name: Assemble the canonical Corridor artifact once
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bunki-shard-fast-*-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipts
+      - name: Independently admit completed first-attempt jobs before retry planning
         run: |
-          mkdir -p "$KAIRO_EVIDENCE_ROOT"
-          node scripts/build-corridor-site.mjs --out "$KAIRO_SITE_DIR" > "$KAIRO_EVIDENCE_ROOT/build.json"
-          node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$KAIRO_EVIDENCE_ROOT/artifact-before.json"
-
-      - name: Smoke-test packaged assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          port_file=$(mktemp "$RUNNER_TEMP/corridor-port.XXXXXX")
-          python3 - "$KAIRO_SITE_DIR" "$port_file" >"$RUNNER_TEMP/corridor-smoke.log" 2>&1 <<'PYEOF' &
-          import functools, http.server, pathlib, sys
-          handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=sys.argv[1])
-          with http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler) as server:
-              pathlib.Path(sys.argv[2]).write_text(str(server.server_port))
-              server.serve_forever()
-          PYEOF
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true; rm -f "$port_file"' EXIT
-          for _ in {1..50}; do
-            [ -s "$port_file" ] && break
-            if ! kill -0 "$server_pid" 2>/dev/null; then
-              cat "$RUNNER_TEMP/corridor-smoke.log" >&2
-              exit 1
-            fi
-            sleep 0.1
-          done
-          [ -s "$port_file" ] || { echo 'Smoke server did not become ready' >&2; exit 1; }
-          port=$(cat "$port_file")
-
-          # curl, not node fetch: unconsumed keep-alive bodies trip an undici
-          # internal assertion at process exit on some Node lines (seen live:
-          # "assert(!this.paused)" AFTER every path had already printed 200)
-          for path in '' 'apple-touch-icon.png' 'corridor.css' 'fonts.css' 'corridor.js' \
-                      'corridor-ink.js' 'dictionary-worker.js' 'reading-controller.mjs' 'feed-controller.mjs' 'assessment-controller.mjs' 'record-controller.mjs' 'record-host.mjs' 'record-app.mjs' 'record-binding.mjs' 'publisher-controller.mjs' 'modules/reading-core.mjs' 'modules/feed-core.mjs' 'modules/assessment-core.mjs' 'modules/record-core.mjs' \
-                      'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' 'build-identity.json' \
-                      'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
-                      'data/manifest.json' 'data/articles/index.json' \
-                      'data/mock/index.json' 'data/mock/sets/n5-01.json' \
-                      'data/articles/archive-index.json' \
-                      'data/share_alike/dict-v2/index.json' \
-                      'data/share_alike/animcjk/index.json' \
-                      'data/share_alike/animcjk/00.json' \
-                      'data/share_alike/animcjk/equivalence.json' \
-                      'data/share_alike/dict-v2/00.json' \
-                      'data/share_alike/dict-v2/0f.json' \
-                      'decks/context-dense/mount.js' \
-                      'decks/context-dense/engine.js' \
-                      'decks/context-dense/deck.json' \
-                      'decks/context-dense/context-deck.css' \
-                      'decks/context-dense/standalone.html' \
-                      'decks/player/engine.js' \
-                      'decks/player/mount.js' \
-                      'decks/player/player.css' \
-                      'decks/personal/engine.mjs' \
-                      'decks/personal/mount.mjs' \
-                      'decks/personal/schema.mjs' \
-                      'decks/personal/host-bridge.mjs' \
-                      'decks/personal/enrichment.mjs' \
-                      'decks/personal/store.mjs' \
-                      'decks/personal/personal.css' \
-                      'decks/kotoba-mine/deck.json' \
-                      'decks/kotoba-mcd/deck.json'; do
-            code=""
-            for _ in 1 2 3 4 5; do
-              code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$port/$path" || true)
-              [ "$code" = "200" ] && break
-              sleep 0.2
-            done
-            if [ "$code" != "200" ]; then
-              echo "FAIL $code /$path" >&2
-              exit 1
-            fi
-            echo "200 /$path"
-          done
-
-          # the deep dictionary the site ships must be the pinned, sharded one
-          python3 - "$KAIRO_SITE_DIR" <<'PYEOF'
-          import json, sys
-          site = sys.argv[1]
-          index = json.load(open(f"{site}/data/share_alike/dict-v2/index.json"))
-          assert index["schemaVersion"] == 3, "dict-v2 schema (sense tags, DICT_TAGS_CONTRACT_2026-08-12)"
-          assert index["shardCount"] == 16, "dict-v2 shard count"
-          assert index["sharding"]["id"] == "fnv1a32-ascii-seq-mask15", "dict-v2 shard algorithm"
-          assert index["source"]["pin"] == "3.6.2+20260803141815", "dict-v2 source pin"
-          counts = index["sharding"]["entryCounts"]
-          assert len(counts) == 16 and all(c > 0 for c in counts), "dict-v2 entry counts"
-          assert len(index["entries"]) == sum(counts), "dict-v2 index entry total"
-          for shard_id in ("00", "07", "0f"):
-              shard = json.load(open(f"{site}/data/share_alike/dict-v2/{shard_id}.json"))
-              assert shard["sourcePin"] == index["source"]["pin"], f"shard {shard_id} pin"
-              assert len(shard["entries"]) == counts[int(shard_id, 16)], f"shard {shard_id} count"
-          print(f"dict-v2 verified: {len(index['entries'])} entries across 16 shards")
-          PYEOF
-
-          # rights are fail-closed: no shelf item ships without complete,
-          # registry-consistent licence metadata (round-3 review, 2026-08-11 —
-          # this very check would have caught the live CC BY 4.0 mislabel)
-          python3 - "$KAIRO_SITE_DIR" <<'PYEOF'
-          import json, sys
-          site = sys.argv[1]
-          base = f"{site}/data/articles"
-          idx = json.load(open(f"{base}/index.json"))
-          source_by_name = {}
-          for pool, records in idx["sources"].items():
-              for s in records:
-                  for k in ("name", "licence", "attribution"):
-                      assert s.get(k, "").strip(), f"source record missing {k}: {s}"
-                  assert "url" in s, f"source record {s['name']!r} missing url field"
-                  source_by_name[s["name"]] = (pool, s)
-          for a in idx["articles"]:
-              aid = a.get("id", "?")
-              for k in ("pool", "licence", "attribution", "source", "file"):
-                  assert a.get(k, "").strip(), f"{aid}: missing {k}"
-              assert "url" in a, f"{aid}: missing url field"
-              pool, src = source_by_name.get(a["source"], (None, None))
-              assert src is not None, f"{aid}: source {a['source']!r} not in the sources registry"
-              assert pool == a["pool"], f"{aid}: pool {a['pool']!r} != registry pool {pool!r}"
-              if src["url"].strip():
-                  assert a["url"].strip(), f"{aid}: source has a home URL but the item has no per-item url"
-              if a["source"] == "ja.wikinews":
-                  assert a["licence"] == "CC BY 2.5", f"{aid}: ja.wikinews content is CC BY 2.5, labeled {a['licence']!r}"
-                  assert "CC BY 2.5" in a["attribution"], f"{aid}: attribution must state CC BY 2.5"
-              body = json.load(open(f"{base}/{a['file']}"))
-              for k in ("pool", "licence", "attribution", "url", "source"):
-                  assert body.get(k) == a.get(k), f"{aid}: body {k!r} disagrees with the index"
-          print(f"rights verified: {len(idx['articles'])} shelf items — licensed, attributed, pooled, linked where a source home exists")
-
-          # the newspaper archive answers to the same law: every item fully
-          # labeled, registry-consistent, body agreeing with its index row
-          arc = json.load(open(f"{base}/archive-index.json"))
-          seen_ids = {a["id"] for a in idx["articles"]}
-          for a in arc["articles"]:
-              aid = a.get("id", "?")
-              assert aid not in seen_ids, f"{aid}: archive duplicates a shelf item"
-              for k in ("pool", "licence", "attribution", "source", "file", "url", "date"):
-                  assert a.get(k, "").strip(), f"{aid}: archive row missing {k}"
-              pool, src = source_by_name.get(a["source"], (None, None))
-              assert src is not None and pool == a["pool"], f"{aid}: archive source/pool not registry-consistent"
-              assert a["licence"] == "CC BY 2.5" and "CC BY 2.5" in a["attribution"], f"{aid}: archive licence must be CC BY 2.5"
-              assert a["file"].startswith("archive/"), f"{aid}: archive body must live under archive/"
-              body = json.load(open(f"{base}/{a['file']}"))
-              for k in ("pool", "licence", "attribution", "url", "source"):
-                  assert body.get(k) == a.get(k), f"{aid}: archive body {k!r} disagrees with its row"
-              assert body.get("tokens"), f"{aid}: archive body carries no tokens"
-          print(f"rights verified: {len(arc['articles'])} archive items — same law, same gate")
-          PYEOF
-
-      # Children run even after another child fails. The aggregate exit code
-      # blocks every publication step. Browser verifiers serve KAIRO_SITE_DIR;
-      # logs, screenshots and receipts live outside the source checkout.
-      - name: Run every required current-app and domain gate
-        id: battery
-        timeout-minutes: 180
-        # Replace the step shell so cancellation reaches the battery's signal handlers.
-        run: exec bash docs/build-evidence/renkan/battery.sh "$KAIRO_EVIDENCE_ROOT/battery"
-
-      - name: Verify tested bytes and source identity have not changed
-        run: node scripts/verify-release-gates.mjs --verify-artifact "$KAIRO_SITE_DIR" --require-clean > "$KAIRO_EVIDENCE_ROOT/artifact-after.json"
-
-      - name: Retain battery diagnostics before bulk evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs-pages.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs-pages.json`)).flatMap(page=>page.jobs);
+          writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
+          NODE
+      - id: retry
+        run: node scripts/ci/battery.mjs retry-plan --phase fast --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/fast-retry-plan.json"
+      - uses: actions/upload-artifact@v4
         with:
-          name: kairo-release-diagnostics
-          path: |
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/build.json
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/artifact-before.json
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/artifact-after.json
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/artifact-verification.json
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/battery.json
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/SUMMARY.md
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/*.log
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/battery/corridor/verification-report.json
-            ${{ runner.temp }}/corridor-smoke.log
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/fast-retry-plan.json
           retention-days: 14
-          if-no-files-found: warn
-
-      - name: Retain battery receipts, traces and logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: kairo-release-evidence
-          path: |
-            ${{ env.KAIRO_EVIDENCE_ROOT }}/
-            ${{ runner.temp }}/corridor-smoke.log
-          retention-days: 14
-          if-no-files-found: warn
-
-      - name: Attach the tested site for review
-        uses: actions/upload-artifact@v4
-        with:
-          name: kairo-tested-site
-          path: ${{ env.KAIRO_SITE_DIR }}
-          retention-days: 7
           if-no-files-found: error
-
-      - name: Upload the tested main artifact for Pages
-        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+  fast-retry:
+    name: retry / ${{ matrix.shard }}
+    if: always() && needs.fast-retry-plan.result == 'success' && needs.fast-retry-plan.outputs.has-retries == 'true'
+    needs: [plan, build, fast-retry-plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.fast-retry-plan.outputs.matrix) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KAIRO_CORPUS_PYTHON: python3
+    steps:
+      - uses: actions/checkout@v4
         with:
-          name: kairo-pages
-          path: ${{ env.KAIRO_SITE_DIR }}
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          python: ${{ matrix.python }}
+          corpus: ${{ matrix.corpus }}
+          browsers: ${{ matrix.browsers }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - name: Verify immutable archive digest before extraction
+        env:
+          SITE_ID: ${{ needs.build.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.build.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/site-download" --out "$RUNNER_TEMP/site"
+      - name: Bind this actual GitHub job identity
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const suffix=`retry / ${process.env.SHARD}`;
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs.json`)).flatMap(x=>x.jobs).filter(x=>x.name===suffix||x.name.endsWith(` / ${suffix}`));
+          assert.equal(jobs.length,1); appendFileSync(process.env.GITHUB_ENV,`CI_JOB_ID=${jobs[0].id}\n`);
+          NODE
+      - name: Run the exact planned gates and record the second and final attempt
+        id: gates
+        timeout-minutes: 45
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --out "$RUNNER_TEMP/evidence"
+      - name: Compress evidence before upload
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/evidence" ]; then tar -czf "$RUNNER_TEMP/evidence.tar.gz" -C "$RUNNER_TEMP" evidence; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-shard-${{ matrix.shard }}-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence/shard.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-evidence-${{ matrix.shard }}-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  fast-signal:
+    name: bunki / fast
+    if: always()
+    needs: [plan, build, fast, fast-retry-plan, fast-retry]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Require complete planning and independently successful build
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          RETRY_PLAN_RESULT: ${{ needs.fast-retry-plan.result }}
+        run: test "$PLAN_RESULT" = success && test "$BUILD_RESULT" = success && test "$RETRY_PLAN_RESULT" = success
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          pattern: bunki-shard-fast-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipts
+      - name: Read actual jobs from this exact run attempt
+        if: always()
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs-pages.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs-pages.json`)).flatMap(page=>page.jobs);
+          writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
+          NODE
+      - name: Fail closed on incomplete evidence, cancellation or repeated failures
+        id: aggregate
+        if: always()
+        run: node scripts/ci/battery.mjs aggregate --phase fast --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+      - name: Retain infrastructure summary even when setup or evidence was unavailable
+        if: always() && steps.aggregate.outcome != 'success'
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, pathlib
+          evidence = pathlib.Path(os.environ['RUNNER_TEMP']) / 'proof'
+          evidence.mkdir(exist_ok=True)
+          text = '\n## Required workflow admission failed\n\n'
+          text += 'Setup, evidence collection or aggregate admission failed. No promotable full receipt was issued.\n\n'
+          if int(os.environ['GITHUB_RUN_ATTEMPT']) > 1:
+              rerun = ('Every job admits only this attempt\'s own plan, build and shard artifacts, so a '
+                       '"Re-run failed jobs" attempt always fails closed with missing artifacts. Failed gates '
+                       'already received one automatic fresh-runner retry; to rerun, use "Re-run all jobs".')
+              print('::warning title=Re-run all jobs required::' + rerun)
+              text += '**Attempt ' + os.environ['GITHUB_RUN_ATTEMPT'] + ':** ' + rerun + '\n\n'
+          text += 'Required dependency results:\n\n```json\n' + json.dumps(json.loads(os.environ['NEEDS_JSON']), indent=2) + '\n```\n'
+          (evidence / 'WORKFLOW_FAILURE.md').write_text(text)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(text)
+          PYEOF
+      - name: Retain summary and appendable flake ledger entries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-fast-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/proof/
+          retention-days: 14
+          if-no-files-found: warn
+  battery:
+    name: battery / ${{ matrix.shard }}
+    if: needs.plan.outputs.has-battery == 'true'
+    needs: [plan, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KAIRO_CORPUS_PYTHON: python3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          python: ${{ matrix.python }}
+          corpus: ${{ matrix.corpus }}
+          browsers: ${{ matrix.browsers }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - name: Verify immutable archive digest before extraction
+        env:
+          SITE_ID: ${{ needs.build.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.build.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/site-download" --out "$RUNNER_TEMP/site"
+      - name: Bind this actual GitHub job identity
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const suffix=`battery / ${process.env.SHARD}`;
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs.json`)).flatMap(x=>x.jobs).filter(x=>x.name===suffix||x.name.endsWith(` / ${suffix}`));
+          assert.equal(jobs.length,1); appendFileSync(process.env.GITHUB_ENV,`CI_JOB_ID=${jobs[0].id}\n`);
+          NODE
+      - name: Run the exact planned gates and retain first failures
+        id: gates
+        continue-on-error: true
+        timeout-minutes: 45
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --out "$RUNNER_TEMP/evidence"
+      - name: Retain the built app for an exact failed-e2e retry
+        if: always() && matrix.e2e
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: apps/app/dist/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Compress evidence before upload
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/evidence" ]; then tar -czf "$RUNNER_TEMP/evidence.tar.gz" -C "$RUNNER_TEMP" evidence; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-shard-${{ matrix.shard }}-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence/shard.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-evidence-${{ matrix.shard }}-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  retry-plan:
+    name: retry-plan
+    if: always() && needs.plan.result == 'success' && needs.build.result == 'success' && needs.plan.outputs.has-battery == 'true'
+    needs: [plan, build, battery]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      matrix: ${{ steps.retry.outputs.matrix }}
+      has-retries: ${{ steps.retry.outputs.has-retries }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bunki-shard-*-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipts
+      - name: Independently admit completed first-attempt jobs before retry planning
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs-pages.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs-pages.json`)).flatMap(page=>page.jobs);
+          writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
+          NODE
+      - id: retry
+        run: node scripts/ci/battery.mjs retry-plan --phase battery --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/retry-plan.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bunki-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/retry-plan.json
+          retention-days: 14
+          if-no-files-found: error
+  retry:
+    name: retry / ${{ matrix.shard }}
+    if: always() && needs.retry-plan.result == 'success' && needs.retry-plan.outputs.has-retries == 'true'
+    needs: [plan, build, retry-plan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.retry-plan.outputs.matrix) }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KAIRO_CORPUS_PYTHON: python3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          python: ${{ matrix.python }}
+          corpus: ${{ matrix.corpus }}
+          browsers: ${{ matrix.browsers }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        with:
+          name: bunki-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - name: Determine whether the failed e2e needs its original build
+        id: e2e
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const plan=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/inputs/retry-plan.json`));
+          const shard=plan.shards.find(row=>row.id===process.env.SHARD);
+          appendFileSync(process.env.GITHUB_OUTPUT,`restore=${Boolean(shard.dependencies?.e2eBuild)}\n`);
+          NODE
+      - uses: actions/download-artifact@v4
+        if: steps.e2e.outputs.restore == 'true'
+        with:
+          name: bunki-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: apps/app/dist/
+      - name: Verify immutable archive digest before extraction
+        env:
+          SITE_ID: ${{ needs.build.outputs.site-id }}
+          SITE_DIGEST: ${{ needs.build.outputs.site-digest }}
+        run: node scripts/ci/receipts.mjs download-site --id "$SITE_ID" --run-id "$GITHUB_RUN_ID" --digest "$SITE_DIGEST" --temp "$RUNNER_TEMP/site-download" --out "$RUNNER_TEMP/site"
+      - name: Bind this actual GitHub job identity
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs.json"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const suffix=`retry / ${process.env.SHARD}`;
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs.json`)).flatMap(x=>x.jobs).filter(x=>x.name===suffix||x.name.endsWith(` / ${suffix}`));
+          assert.equal(jobs.length,1); appendFileSync(process.env.GITHUB_ENV,`CI_JOB_ID=${jobs[0].id}\n`);
+          NODE
+      - name: Run the exact planned gates and record the second and final attempt
+        id: gates
+        timeout-minutes: 45
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: exec node scripts/ci/battery.mjs run --plan "$RUNNER_TEMP/inputs/plan.json" --shard "$SHARD" --artifact "$RUNNER_TEMP/inputs/artifact.json" --site "$RUNNER_TEMP/site" --retry-plan "$RUNNER_TEMP/inputs/retry-plan.json" --out "$RUNNER_TEMP/evidence"
+      - name: Compress evidence before upload
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/evidence" ]; then tar -czf "$RUNNER_TEMP/evidence.tar.gz" -C "$RUNNER_TEMP" evidence; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-shard-${{ matrix.shard }}-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence/shard.json
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bunki-evidence-${{ matrix.shard }}-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evidence.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+  required:
+    name: bunki / required
+    if: always()
+    needs:
+      [
+        plan,
+        build,
+        native,
+        fast,
+        fast-retry-plan,
+        fast-retry,
+        fast-signal,
+        battery,
+        retry-plan,
+        retry,
+      ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Require complete planning and independently successful build
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          FAST_RESULT: ${{ needs.fast-signal.result }}
+          FAST_RETRY_PLAN_RESULT: ${{ needs.fast-retry-plan.result }}
+          RETRY_PLAN_RESULT: ${{ needs.retry-plan.result }}
+          CI_SCOPE: ${{ needs.plan.outputs.scope }}
+        run: |
+          test "$PLAN_RESULT" = success && test "$BUILD_RESULT" = success && test "$FAST_RESULT" = success && test "$FAST_RETRY_PLAN_RESULT" = success
+          if [ "$CI_SCOPE" = full ]; then test "$RETRY_PLAN_RESULT" = success; else test "$RETRY_PLAN_RESULT" = skipped; fi
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-build-metadata-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          name: bunki-fast-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always() && needs.plan.outputs.scope == 'full'
+        with:
+          name: bunki-retry-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/inputs
+      - uses: actions/download-artifact@v4
+        if: always()
+        with:
+          pattern: bunki-shard-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipts
+      - name: Read actual jobs from this exact run attempt
+        if: always()
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" > "$RUNNER_TEMP/jobs-pages.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const jobs=JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/jobs-pages.json`)).flatMap(page=>page.jobs);
+          writeFileSync(`${process.env.RUNNER_TEMP}/jobs.json`,JSON.stringify(jobs));
+          NODE
+      - name: Fail closed on incomplete evidence, cancellation or repeated failures
+        id: aggregate
+        if: always()
+        env:
+          CI_SCOPE: ${{ needs.plan.outputs.scope }}
+        run: |
+          if [ "$CI_SCOPE" = full ]; then
+            node scripts/ci/battery.mjs aggregate --phase all --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --fast-retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --retry-plan "$RUNNER_TEMP/inputs/retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+          else
+            node scripts/ci/battery.mjs aggregate --phase all --plan "$RUNNER_TEMP/inputs/plan.json" --artifact "$RUNNER_TEMP/inputs/artifact.json" --fast-retry-plan "$RUNNER_TEMP/inputs/fast-retry-plan.json" --receipts "$RUNNER_TEMP/receipts" --jobs "$RUNNER_TEMP/jobs.json" --out "$RUNNER_TEMP/proof"
+          fi
+      - name: Retain infrastructure summary even when setup or evidence was unavailable
+        if: always() && steps.aggregate.outcome != 'success'
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, pathlib
+          evidence = pathlib.Path(os.environ['RUNNER_TEMP']) / 'proof'
+          evidence.mkdir(exist_ok=True)
+          text = '\n## Required workflow admission failed\n\n'
+          text += 'Setup, evidence collection or aggregate admission failed. No promotable full receipt was issued.\n\n'
+          if int(os.environ['GITHUB_RUN_ATTEMPT']) > 1:
+              rerun = ('Every job admits only this attempt\'s own plan, build and shard artifacts, so a '
+                       '"Re-run failed jobs" attempt always fails closed with missing artifacts. Failed gates '
+                       'already received one automatic fresh-runner retry; to rerun, use "Re-run all jobs".')
+              print('::warning title=Re-run all jobs required::' + rerun)
+              text += '**Attempt ' + os.environ['GITHUB_RUN_ATTEMPT'] + ':** ' + rerun + '\n\n'
+          text += 'Required dependency results:\n\n```json\n' + json.dumps(json.loads(os.environ['NEEDS_JSON']), indent=2) + '\n```\n'
+          (evidence / 'WORKFLOW_FAILURE.md').write_text(text)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(text)
+          PYEOF
+      - name: Publish a full proof only after aggregate admission
+        if: success() && needs.plan.outputs.scope == 'full'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-proof-${{ needs.plan.outputs.tree }}
+          overwrite: true
+          path: ${{ runner.temp }}/proof/receipt.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Retain summary and appendable flake ledger entries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/proof/
+          retention-days: 14
+          if-no-files-found: warn

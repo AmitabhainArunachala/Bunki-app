@@ -1,0 +1,28 @@
+  FAIL T13 a set that fails to load says so beside its door
+  ok   T13 pressing the door again retries and starts the set
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#chrome-dojo')
+    - locator resolved to <button type="button" id="chrome-dojo" class="chrome-dojo" aria-label="go to the focus dojo">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and stable
+       - element is not visible
+     - retrying click action
+       - waiting 500ms
+
+    at /root/wt-base/prototypes/corridor/tools/verify-corridor-doors.mjs:311:40 {
+  log: [
+    "  - waiting for locator('#chrome-dojo')",
+    '    - locator resolved to <button type="button" id="chrome-dojo" class="chrome-dojo" aria-label="go to the focus dojo">…</button>',
+    '  - attempting click action',

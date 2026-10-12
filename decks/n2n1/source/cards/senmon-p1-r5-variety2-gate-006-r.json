@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "智慧",
+   "reading": "ちえ",
+   "pos": "noun",
+   "meaning": "wisdom (prajñā)",
+   "defJa": "物事の真実を見極め迷いを離れる仏教の理解",
+   "passage": {
+    "ja": "幼い息子を亡くしたキサーゴータミーが、その子を生き返らせる薬を求めて釈迦を訪ねたところ、釈迦は、まだ死者を出したことのない家からカラシの種をもらってくるようにと告げたといいます。彼女は亡きがらを抱えたまま、村の家々の戸をたたいて回りました。しかし、どの家でも誰かが亡くなっていたと知ったとき、彼女の心に生じたのが、生まれた者は必ず死ぬという真実をありのままに見極める智慧でした。村を出る彼女の手に、カラシの種はありませんでした。",
+    "form": "智慧",
+    "en": "When Kisa Gotami, who had lost her young son, went to the Buddha seeking a medicine to bring the child back to life, the Buddha is said to have told her to get mustard seeds from a house that had never yet had a death. Still carrying the body, she went around knocking on the doors of the houses in the village. But when she learned that someone had died in every house, what arose in her mind was the wisdom to see, just as it is, the truth that everyone who is born must die. As she left the village, there were no mustard seeds in her hand.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「智慧が生じる」「真実を見極める智慧」のように、知識とは区別される仏教の理解を指す。日常の語は「知恵」。",
+    "sense": ""
+   },
+   "cardId": "nn-6e1ab8519c-a0f02f05",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-018.json",
+    "cardId": "nn-6e1ab8519c-a0f02f05",
+    "wordId": "nn-6e1ab8519c"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "波及効果",
+   "reading": "はきゅうこうか",
+   "pos": "noun",
+   "meaning": "spillover effects",
+   "defJa": "一つの変化が周囲へ広がって及ぼす影響",
+   "passage": {
+    "ja": "米バージニア州北部は、データセンターが世界で最も集中する地域として知られる。ここ数年は人工知能の計算需要を見込んだ新設がこの地域をはじめ各地で相次ぎ、画像処理半導体や半導体メモリーはもちろん、サーバーの冷却装置から変圧器に至るまで、関連する製品の注文が急増した。人工知能への投資の波及効果は、こうして半導体産業の外へと広がっている。電力も例外ではない。同州の電力会社は需要の見通しを大幅に引き上げ、発電所や送電線の増設を急いでいる。",
+    "form": "波及効果",
+    "en": "Northern Virginia in the United States is known as the region where data centers are most concentrated in the world. In the past few years, new facilities built in anticipation of demand for artificial intelligence computing have gone up one after another in this region and elsewhere, and orders for related products have surged, not only for graphics processing chips and memory chips, of course, but for everything from server cooling systems to transformers. In this way, the spillover effects of investment in artificial intelligence are spreading beyond the semiconductor industry. Electric power is no exception. The state's power company has sharply raised its demand forecast and is hurrying to add power plants and transmission lines.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「波及効果が広がる・及ぶ」と使い、一つの投資や変化の影響が周辺の産業へ次々に伝わることを表す。",
+    "sense": ""
+   },
+   "cardId": "nn-910a5ed112-1e0142c6",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-024.json",
+    "cardId": "nn-910a5ed112-1e0142c6",
+    "wordId": "nn-910a5ed112"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "文脈内学習",
+   "reading": "ぶんみゃくないがくしゅう",
+   "pos": "noun",
+   "meaning": "in-context learning",
+   "defJa": "入力中の例や説明を手掛かりに課題へ対応すること",
+   "passage": {
+    "ja": "言語モデルが文脈内学習を行うとき、重みと呼ばれる内部の数値はまったく更新されません。たとえば、問い合わせの文を「苦情」か「注文」かに分けた例を入力の先頭にいくつか置くと、モデルは注意機構を通じてそれらを参照し、続く新しい文も同じ基準で分類して返します。変わったのは入力だけです。訓練で決まった重みはそのままで、与えられた文脈に応じて出力が変わるにすぎません。入力から例を消せば、モデルは何事もなかったように元の答え方に戻ります。",
+    "form": "文脈内学習",
+    "en": "When a language model performs in-context learning, the internal numbers called weights are not updated at all. For example, if you place at the top of the input a few examples in which inquiry messages are sorted into \"complaint\" or \"order\", the model refers to them through its attention mechanism and classifies the new message that follows by the same standard. The only thing that has changed is the input. The weights fixed in training stay as they are, and the output merely changes according to the context given. If you delete the examples from the input, the model goes back to its original way of answering as if nothing had happened.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "「文脈内学習を行う」と使う。入力の例を手掛かりにするだけで、重みは一切更新されない点が要になる。",
+    "sense": ""
+   },
+   "cardId": "nn-593530a7d0-700f5948",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-022.json",
+    "cardId": "nn-593530a7d0-700f5948",
+    "wordId": "nn-593530a7d0"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "後塵を拝する",
+   "reading": "こうじんをはいする",
+   "pos": "expression",
+   "meaning": "to lag behind others",
+   "defJa": "競争で相手より遅れた位置に立つこと",
+   "passage": {
+    "ja": "米インテルは半導体を自ら設計し、自社の工場で製造してきた。台湾積体電路製造は自社の製品を持つことなく、他社が設計した半導体の製造だけを請け負う。二〇一〇年代後半、回路をさらに細かくする次世代技術への移行でつまずいたのは、インテルのほうだった。量産は計画から何年も遅れた。その間に台湾積体電路製造はアップルやエヌビディアなど多くの顧客から注文を集めて量産の経験を重ね、かつて微細化の先頭に立っていたインテルは、製造技術で同社の後塵を拝する形となった。",
+    "form": "後塵を拝する",
+    "en": "Intel of the United States has designed its own semiconductors and manufactured them in its own factories. Taiwan Semiconductor Manufacturing Company, without having products of its own, takes on only the manufacturing of semiconductors designed by other companies. In the late 2010s, it was Intel that stumbled in the move to next-generation technology that makes circuits still finer. Mass production fell years behind plan. In the meantime, the Taiwanese company gathered orders from many customers such as Apple and Nvidia and built up experience in mass production, and Intel, which had once stood at the forefront of miniaturization, ended up lagging behind it in manufacturing technology.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「〜の後塵を拝する」の形で、競争相手に先を越されて後れを取ることを表す。報道でよく使う硬い表現。",
+    "sense": ""
+   },
+   "cardId": "nn-d906b6d23e-6f1c2663",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-020.json",
+    "cardId": "nn-d906b6d23e-6f1c2663",
+    "wordId": "nn-d906b6d23e"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "シリコンの盾",
+   "reading": "しりこんのたて",
+   "pos": "expression",
+   "meaning": "\"silicon shield\" (Taiwan's chip leverage)",
+   "defJa": "半導体への依存が軍事的攻撃を抑止するという比喩",
+   "passage": {
+    "ja": "二〇二五年三月、台湾積体電路製造は米国への投資を千億ドル上積みすると発表した。台湾では不安の声が広がった。世界の最先端半導体の大半を島内で生産していることが中国による武力行使を思いとどまらせるという、いわゆるシリコンの盾が、工場の海外移転によって弱まりかねないと受け止められたためだ。当局は最先端の製造技術を島内に残すと説明したが、世論の疑問は消えなかった。生産拠点が米国に移っても、米国は台湾を守るのか。",
+    "form": "シリコンの盾",
+    "en": "In March 2025, Taiwan Semiconductor Manufacturing Company announced that it would add 100 billion dollars to its investment in the United States. Voices of unease spread in Taiwan. This was because people took it to mean that the so-called silicon shield, the idea that producing most of the world's most advanced semiconductors on the island deters China from using military force, could well be weakened by the relocation of factories overseas. The authorities explained that the most advanced manufacturing technology would be kept on the island, but the doubts in public opinion did not go away. Even if production bases move to the United States, will the United States defend Taiwan?",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "「シリコンの盾が弱まる・を保つ」と使う。半導体生産の集中が台湾への攻撃を抑えるという比喩。",
+    "sense": ""
+   },
+   "cardId": "nn-57dc85bb27-6bf1e2ea",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-003-r.json",
+    "cardId": "nn-57dc85bb27-6bf1e2ea",
+    "wordId": "nn-57dc85bb27"
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "絶対無",
+   "reading": "ぜったいむ",
+   "pos": "noun",
+   "meaning": "absolute nothingness in Nishida’s thought",
+   "defJa": "有と無の対立を超える根本的な立場",
+   "passage": {
+    "ja": "若いころ禅に打ち込んだ西田幾多郎は、なぜ自らの哲学の根底に絶対無を据えたのか。彼によれば、有るものはすべて何らかの「場所」においてある。物は空間のうちに、その物についての知識は意識のうちにあるというように場所をたどっていくと、最後にはすべてを包む場所に行き着く。だが、それが有るものなら、さらにそれを包む場所が要る。だからその場所は、有と対立する無ですらなく、有と無の対立までも内に包むものでなければならず、色を持たないがゆえにあらゆる色を映す鏡のように、自らは何ものでもないことによって万物を映し出す。",
+    "form": "絶対無",
+    "en": "Why did Kitaro Nishida, who devoted himself to Zen in his youth, place absolute nothingness at the foundation of his philosophy? According to him, everything that exists exists in some \"place\". If we trace such places, with a thing lying within space and knowledge of that thing lying within consciousness, we arrive in the end at a place that envelops everything. But if that place is itself something that exists, a further place is needed to envelop it. So that place must not even be the nothingness that stands opposed to being but something that holds within itself the very opposition of being and nothingness, and, like a mirror that reflects every color precisely because it has no color of its own, it reflects all things by being nothing itself.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「絶対無を根底に据える」「絶対無の場所」と使う。有に対する無ではなく、有と無の対立ごと包むものを指す。",
+    "sense": ""
+   },
+   "cardId": "nn-682f8dc808-d15d6ad1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-002-r.json",
+    "cardId": "nn-682f8dc808-d15d6ad1",
+    "wordId": "nn-682f8dc808"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "神秘主義",
+   "reading": "しんぴしゅぎ",
+   "pos": "noun",
+   "meaning": "mysticism",
+   "defJa": "究極の実在との直接的な合一や直観を求める立場",
+   "passage": {
+    "ja": "ものを知るには二つの道がある。塩について本で学ぶ道と、なめてみる道である。インドの神秘主義が求めてきたのは後者であり、究極の実在は論じる対象というより、自ら直観し、それと一つになるべきものとされた。『チャーンドーギヤ・ウパニシャッド』では、父が息子に塩を水に入れさせ、翌朝、器のあちこちからその水を飲ませる。塩は見えないのにどこを飲んでも塩辛いと答える息子に、父は、目に見えないその微細なものこそが万物の本質なのだと説き、「汝はそれなり」と告げる。",
+    "form": "神秘主義",
+    "en": "There are two paths to knowing a thing. One is to learn about salt from a book, and the other is to taste it. What Indian mysticism has sought is the latter, and ultimate reality was regarded less as an object of discussion than as something to intuit for oneself and become one with. In the Chandogya Upanishad, a father has his son put salt into water and, the next morning, has him drink that water from different parts of the vessel. When the son answers that the salt cannot be seen and yet the water is salty wherever he drinks, the father teaches that this subtle thing, invisible to the eye, is the very essence of all things, and tells him, \"You are that.\"",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「インドの神秘主義」「神秘主義の伝統」と使い、論じるより直接に知り、実在と一つになることを求める立場を指す。",
+    "sense": ""
+   },
+   "cardId": "nn-054296bb29-534a232f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-054296bb29-534a232f",
+    "wordId": "nn-054296bb29"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "五戒",
+   "reading": "ごかい",
+   "pos": "noun",
+   "meaning": "the five precepts",
+   "defJa": "在家の仏教徒の基本となる五つの戒め",
+   "passage": {
+    "ja": "去年、インドのブッダガヤで瞑想の合宿に参加したんですけど、最初にやったのは瞑想じゃなかったんですよ。先生の後について、みんなでパーリ語の文句を唱えるんです。意味を聞いて、ちょっと身構えました。生き物を殺さない、盗まない、不適切な性関係を持たない、うそをつかない、お酒を飲まないっていう、在家の信者の基本になる五戒を、合宿の間はきちんと守りますって誓う言葉だったんですよね。お酒以外は普段から守れてる気がしたので、その晩飲むはずだったビールだけあきらめました。",
+    "form": "五戒",
+    "en": "Last year I joined a meditation retreat in Bodh Gaya in India, and the first thing we did was not meditation. Following the teacher, we all chant some phrases in Pali. When I asked what they meant, I braced myself a little. They turned out to be words vowing that, for the length of the retreat, we would properly keep the five precepts that are the basis for lay followers: not killing living things, not stealing, not engaging in sexual misconduct, not lying and not drinking alcohol. Apart from the alcohol, I felt I usually manage to keep them, so I just gave up the beer I had been going to drink that night.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「五戒を守る・受ける」と使う。殺生、盗み、邪淫、うそ、飲酒を避けるという在家信者の基本の戒め。",
+    "sense": ""
+   },
+   "cardId": "nn-de1ba1b137-b72c66cb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-de1ba1b137-b72c66cb",
+    "wordId": "nn-de1ba1b137"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "claude-opus-5-5 + codex-astra editorial preflight",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

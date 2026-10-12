@@ -1,6 +1,7 @@
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -208,7 +209,7 @@ for (const engine of engines) for (const width of sizes) {
       await waitForAppRecord(page, (record) => record.lists['図書館で出会った言葉']?.length === 1);
       const listed = await readAppRecordSnapshot(page);
       assert.equal(listed.record.lists['図書館で出会った言葉'][0].sourceContextRef, item.sourceContextRef);
-      await page.locator('#sheet-close').click();
+      await page.locator(await entryCloseSelector(page)).click();
       await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
       await openLists(page);
       await page.getByRole('button', { name: 'open the 図書館で出会った言葉 list page', exact: true }).click();
@@ -223,7 +224,7 @@ for (const engine of engines) for (const width of sizes) {
       await page.locator('#source-reader-back').click();
       await page.waitForFunction(() => document.activeElement?.id === 'learning-source-return');
       assert.equal(await page.locator('body').getAttribute('data-view'), 'list');
-      await page.locator('#sheet-close').click();
+      await page.locator(await entryCloseSelector(page)).click();
       await page.locator('.list-review').click();
       await page.locator('#reveal').waitFor();
       assert.equal(await page.locator('#review-source-return').count(), 0, 'The original sentence does not reveal the review answer early');
@@ -254,7 +255,7 @@ for (const engine of engines) for (const width of sizes) {
       await page.locator('#learning-source-return').click();
       await page.locator('#source-context-return').waitFor();
       await page.locator('#source-reader-back').click();
-      await page.locator('#sheet-close').click();
+      await page.locator(await entryCloseSelector(page)).click();
       await page.locator('#back').click(); await page.locator('#source-reader-back').waitFor();
       assert.match(await page.locator('#source-reader-back').textContent(), /Resume review/u, 'Nested lookup retains the original review return');
       await page.locator('#source-reader-back').click();
@@ -343,7 +344,7 @@ for (const engine of engines) for (const width of sizes) {
       assert.equal(retried.record.lists['図書館で出会った言葉'][0].sourceContextRef, encounter.id);
       assert.deepEqual(retried.record.srs, reviewed.record.srs);
       assert.equal(retried.record.teacherDrafts.entries.find((draft) => draft.contextRef === encounter.id).text, QUESTION);
-      await page.locator('#sheet-close').click(); await openLists(page);
+      await page.locator(await entryCloseSelector(page)).click(); await openLists(page);
       await page.getByRole('button', { name: 'open the 図書館で出会った言葉 list page', exact: true }).click();
       await page.locator('.tray-line').click(); await page.locator('#sheet .learning-source summary').click();
       await page.locator('#learning-source-return').click(); await page.locator('#source-context-return').waitFor();

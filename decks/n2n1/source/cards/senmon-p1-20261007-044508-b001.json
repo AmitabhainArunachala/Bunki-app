@@ -1,0 +1,180 @@
+{
+  "cards": [
+    {
+      "term": "均衡",
+      "reading": "きんこう",
+      "pos": "noun",
+      "meaning": "equilibrium, balance",
+      "defJa": "釣り合いがとれて安定している状態",
+      "passage": {
+        "ja": "19世紀のヨーロッパ外交は、ある発想の上に成り立っていました。ナポレオン戦争後のウィーン会議で列強は、特定の国が力を持ちすぎないよう、互いを牽制し合う仕組みを設けます。これが勢力の均衡という原理で、おかげで大陸はしばらく大規模な戦争を回避できました。ところがドイツの統一が力関係を一変させると、この仕組みは次第に崩れ、やがて第一次世界大戦へとつながっていくのです。",
+        "form": "均衡",
+        "en": "European diplomacy in the nineteenth century rested on a single idea. After the Napoleonic Wars, the great powers gathered at the Congress of Vienna and built a system in which they checked one another, so that no single state would become too powerful. This was the principle of the balance of power, and thanks to it the continent avoided large-scale war for some time. Yet when German unification upended the balance of forces, the system gradually broke down, eventually leading into the First World War.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「勢力の均衡」「均衡が崩れる」が定番。外交や経済の分析で、力の釣り合いを表す硬めの語。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "妥協",
+      "reading": "だきょう",
+      "pos": "noun",
+      "meaning": "compromise, giving in",
+      "defJa": "自分の主張を譲って相手と合意すること",
+      "passage": {
+        "ja": "1938年、チェコスロバキアのズデーテン地方をめぐり、ヨーロッパは戦争一歩手前の危機にありました。イギリスのチェンバレン首相は開戦を避けるため、ミュンヘン会談でヒトラーに妥協する道を選びます。会談の後、彼は戦争は回避されたと国民に告げて帰国しました。しかしその一年後、ドイツはポーランドに侵攻し、第二次世界大戦が始まります。この経験は、対立を先送りするだけの譲歩がかえって破局を招くという教訓として、今も語り継がれているのです。",
+        "form": "妥協",
+        "en": "In 1938, Europe stood on the brink of war over the Sudetenland region of Czechoslovakia. Seeking to avoid an outbreak of war, British Prime Minister Chamberlain chose the path of compromise with Hitler at the Munich talks. After the conference, he returned home and told his people that war had been averted. Yet just one year later, Germany invaded Poland and the Second World War began. The episode is still passed down as a lesson: a concession that does nothing but postpone a conflict can end up inviting catastrophe.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「相手に妥協する」「妥協するしかない」のように動詞としても使う。歩み寄りに否定的な響きを含むことも。",
+        "sense": "対立を避けるため互いに譲り合うこと"
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "紛争",
+      "reading": "ふんそう",
+      "pos": "noun",
+      "meaning": "dispute, conflict",
+      "defJa": "国家や集団の間で起こる争い",
+      "passage": {
+        "ja": "20世紀初頭のバルカン半島は、ヨーロッパの火薬庫と呼ばれていました。複数の民族がひとつの土地に混住し、独立や領土の拡大をめぐって激しく対立していたからです。1914年、サラエボでオーストリアの皇位継承者が暗殺されると、地域の紛争が勃発し、それがたちまち世界大戦へと拡大していきます。では、なぜ局地的な対立がここまで広がったのでしょうか。実は、そこには列強同士の複雑な同盟関係が絡んでいたのです。",
+        "form": "紛争",
+        "en": "In the early twentieth century, the Balkan Peninsula was known as the powder keg of Europe. Multiple peoples lived mingled on the same land, clashing fiercely over independence and territorial expansion. When the heir to the Austrian throne was assassinated in Sarajevo in 1914, a regional conflict broke out and swiftly widened into a world war. So why did a localized confrontation spread that far? In fact, the complex web of alliances binding the great powers lay entangled behind it.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「紛争が勃発する」「領土紛争」が定番。戦争ほど大規模でない争いにも広く使われる。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "虚しい",
+      "reading": "むなしい",
+      "pos": "i-adj",
+      "meaning": "empty; futile",
+      "defJa": "心が満たされず、張り合いのないさま",
+      "passage": {
+        "ja": "目標を達成した瞬間だけ満足して、すぐにまた物足りなさを感じたことはありませんか。心理学ではこの現象を、快感に慣れてしまう人間の性質として説明しています。つまり、外側の報酬だけを追いかけても、喜びは長続きせず、かえって虚しくなってしまうのです。それに対して、行為そのものに意味を見出せる人は、外からの報酬がなくても充実感を保てると言われています。要するに、満足は外から手に入るものではなく、向き合い方しだいで変わるものなのです。",
+        "form": "虚しく",
+        "en": "Have you ever felt satisfied only in the moment of achieving a goal, only to sense something missing again soon after? Psychology explains this as the human tendency to grow accustomed to pleasure. In other words, if you chase only external rewards, the joy does not last, and it can leave you feeling hollow instead. By contrast, people who can find meaning in the activity itself are said to keep a sense of fulfillment even without rewards from outside. The bottom line is that satisfaction is not something handed to you from without; it changes depending on how you engage.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「虚しくなる」「虚しい勝利」のように、達成しても満たされない場面でよく使う。",
+        "sense": "中身がなく、満たされないさま"
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "適応",
+      "reading": "てきおう",
+      "pos": "noun",
+      "meaning": "adaptation, accommodation",
+      "defJa": "周囲の環境に合わせて自分を変えること",
+      "passage": {
+        "ja": "人間の脳は、置かれた環境に応じて自分を変える力を持っています。引っ越しや転職で生活が一変しても、最初は疲れを感じるものの、数週間もすれば新しいリズムに馴染んでいきます。これは怠けているのではなく、脳が環境への適応を自動的に進めているからです。おかげで私たちは、移り変わる世界を生き延びてこられたのです。ただしこの力には限界があり、変化が大きすぎると心の不調として現れることがあるのです。",
+        "form": "適応",
+        "en": "The human brain has the power to change itself to match the environment it is placed in. Even when a move or a job change turns your life upside down, you feel worn out at first, but within a few weeks you settle into a new rhythm. This is not laziness; the brain is simply carrying out its adaptation to the environment automatically. Thanks to that ability, we have survived in an ever-changing world. But the power has its limits, and when change is too great, it can show up as psychological distress.",
+        "register": "講",
+        "topic": "mind",
+        "tipJa": "「環境に適応する」「適応力」が定番。生物や心の話で、周りに合わせて自分を変えること。",
+        "sense": "環境や状況に合わせて自分を調整すること"
+      },
+      "deck": "senmon",
+      "field": "mind",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "遺跡",
+      "reading": "いせき",
+      "pos": "noun",
+      "meaning": "historic ruins, remains",
+      "defJa": "過去の人々が残した建造物や暮らしの跡",
+      "passage": {
+        "ja": "イタリアのポンペイは、世界で最も有名な古代遺跡の一つです。紀元79年、ヴェスヴィオ火山の大噴火によって、この町は厚い火山灰の下に埋もれてしまいました。しかし皮肉なことに、そのおかげで当時のパンや壁画までがそのまま保存されています。道には飛び石のような横断歩道が残り、壁には選挙運動の落書きまで見つかっています。発掘が進むにつれて、二千年前のローマ人の暮らしが鮮やかに蘇ってくるのです。",
+        "form": "遺跡",
+        "en": "Pompeii, in Italy, is one of the most famous ancient ruins in the world. In the year 79, a great eruption of Mount Vesuvius buried the town deep in volcanic ash. Ironically, thanks to that, even the bread and wall paintings of the day have been preserved just as they were. Stepping-stone crosswalks remain in the streets, and even graffiti from election campaigns has been found on the walls. As excavation goes on, the everyday life of Romans two thousand years ago comes vividly back to life.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「古代の遺跡」「遺跡が発掘される」が定番。歴史の講義や報道で頻出する言葉。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "享受",
+      "reading": "きょうじゅ",
+      "pos": "noun",
+      "meaning": "enjoyment (of benefits)",
+      "defJa": "与えられた良いものを利益として受けること",
+      "passage": {
+        "ja": "現代の私たちは、AIの発展がもたらす恩恵を、当たり前のように享受しています。翻訳も文章の生成も一瞬で済み、かつては専門家に頼まなければならなかった作業が自分でできるようになりました。しかし一方で、仕事が奪われる不安や著作権の問題など、課題も同時に浮かび上がっています。技術の進歩は、受け取る側の私たちがどう向き合うかで、その価値が変わってくるのです。だからこそ、便利さの裏側にある仕組みまで理解しておくことが求められているのです。",
+        "form": "享受",
+        "en": "Today we enjoy, as a matter of course, the benefits that advances in AI have brought. Translation and text generation are finished in an instant, and work that once had to be entrusted to specialists can now be done ourselves. At the same time, however, problems have surfaced as well: anxiety about jobs being taken away, copyright issues, and more. The value of technological progress changes depending on how we, the ones receiving it, choose to engage with it. That is precisely why we are expected to understand not just the convenience but the mechanisms that lie behind it.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「恩恵を享受する」が最も定番。硬い書き言葉で、話し言葉では「受ける」を使うことが多い。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "採算",
+      "reading": "さいさん",
+      "pos": "noun",
+      "meaning": "profitability; whether revenue covers costs",
+      "defJa": "収支のつり合い。儲けが見込めるかどうか。",
+      "passage": {
+        "ja": "半導体ビジネスの恐ろしさは、まずお金の規模にあります。先端の工場を一つ建てるだけで一兆円を超える投資が必要で、世界でも数社しか参入できないのはこのためです。しかも設備は数年で陳腐化するので、投資したお金を回収できるかどうかが常に問われます。つまり、収入と支出がつり合うのか、採算が取れるのかが、事業の生命線になるんです。どれだけ技術で先行していても、このつり合いが崩れれば、企業は市場からあっという間に撤退します。",
+        "form": "採算",
+        "en": "What makes the semiconductor business frightening is, first of all, the scale of the money involved. Building a single state-of-the-art plant requires investment of more than a trillion yen, and that is why only a handful of companies in the world can enter the field. What's more, equipment becomes obsolete within a few years, so whether the money invested can ever be recovered is constantly in question. In other words, whether income and expenditure balance out—whether the operation is profitable—is the lifeline of the business. However far ahead a company is technologically, once that balance breaks down, it withdraws from the market in the blink of an eye.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "『採算が取れる』『採算が合う』が定番の言い方で、収支のつり合いを表す。ビジネスや事業の話でよく出る。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

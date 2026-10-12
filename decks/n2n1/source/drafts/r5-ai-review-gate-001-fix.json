@@ -1,0 +1,5 @@
+{
+ "露光": "Japanese sentence 2 said 必要な部分と残す部分, naming the kept side twice, while the English says removed versus remaining. It becomes 除く部分と残す部分; nothing else changes.",
+ "電力効率": "English sentence 2 (\"looking at work relative to power efficiency\") garbled 仕事の量に対する電力効率. It is replaced with a faithful rendering; the Japanese and everything else are unchanged.",
+ "導体": "tipJa said the word is separate from how easily heat is transmitted, which can imply the headword excludes thermal conductors. tipJa now scopes the electrical sense used here and acknowledges the thermal use; nothing else changes."
+}

@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "はきはき",
+   "reading": "はきはき",
+   "pos": "adverb",
+   "meaning": "briskly; clearly",
+   "defJa": "言葉や動作が明るく、はっきりしているさま",
+   "passage": {
+    "ja": "1871年、岩倉使節団と共にアメリカへ渡った女子留学生の中に、満6歳の津田梅子がいました。幼い子どもは、異国の言葉に囲まれた生活に入ると、大人よりずっと速く、現地の言葉をはきはき話せるようになると言われます。実際、梅子は十一年後に帰国したとき、日本語のほうを学び直さざるを得なかったほどでした。この例は、言語の習得に年齢がどう影響するのかを、順序立てて考える手がかりになります。",
+    "form": "はきはき",
+    "en": "In 1871, among the girls who went to America with the Iwakura Mission was Tsuda Umeko, just six years old. It is said that when a small child enters a life surrounded by a foreign language, she comes to speak the local tongue clearly and briskly, much faster than an adult. In fact, when Umeko returned eleven years later, she had no choice but to relearn Japanese. This example gives a clue for thinking, step by step, about how age affects language acquisition.",
+    "register": "学",
+    "topic": "history",
+    "tipJa": "「はきはき話す」の形で、言葉が明快で、聞き取りやすいことを表す。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "そそっかしい",
+   "reading": "そそっかしい",
+   "pos": "i-adj",
+   "meaning": "careless; hasty",
+   "defJa": "落ち着きがなく、うっかり失敗しがちなさま",
+   "passage": {
+    "ja": "アルキメデスって、お風呂で浮力の原理をひらめいて、裸のまま街へ飛び出したっていう逸話がありますよね。いくらなんでもそそっかしいにもほどがあると思うんですけど、これはローマの建築家ウィトルウィウスが後世に書き残した話で、実際にあったかどうかは分からないんです。王様の金の冠に銀が混ぜられていないか調べるよう頼まれて、悩んでいた最中のひらめきだった、という筋書きです。どんなアイデアも、考え抜いた末に降りてくる瞬間は、人を夢中にさせずにはおかないんでしょうね。",
+    "form": "そそっかしい",
+    "en": "Archimedes supposedly got the principle of buoyancy in the bath and ran out into the street naked, right? I think that is careless beyond all reason, but the story was written down long afterward by the Roman architect Vitruvius, and nobody knows whether it really happened. The setup is that he had been asked to check whether silver had been mixed into the king's gold crown, and the flash came while he was stuck on it. Any idea that arrives after thinking something through to the end probably grips people irresistibly.",
+    "register": "話",
+    "topic": "history",
+    "tipJa": "計画性のなさや、先を読まない軽率な行動を、やや笑いを込めて言う口語的な評価語。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "カロリー",
+   "reading": "カロリー",
+   "pos": "noun",
+   "meaning": "calorie",
+   "defJa": "食べ物が体内で生む熱量の単位。またその量",
+   "passage": {
+    "ja": "『カロリー』は英語から来た外来語ですが、日本語ではずいぶん独特な使われ方をします。『高い』『低い』と言えば、本来の熱量の単位というより、食べ物の太りやすさを指すのがふつうです。しかも『オフ』『ゼロ』のように、成分を減らした商品の宣伝文句にまで広がっています。外来語は、元の意味と食い違ったまま、その国の暮らしに合わせて育っていく好例です。言葉の意味は、使う人の暮らしの中で静かに動いていくものです。",
+    "form": "カロリー",
+    "en": "'Karori' is a loanword from English, but it is used in rather unique ways in Japanese. When people say 'high' or 'low,' they usually mean how fattening a food is rather than the original unit of heat. It has even spread to the advertising phrases of products with reduced ingredients, like 'off' and 'zero'. It is a good example of a loanword that grows to fit the life of its country, out of step with its original meaning. The meaning of a word moves quietly within the lives of those who use it.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "単位としての意味より、食べ物の太りやすさを指す日本的な使い方を見る。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "claude-sonnet-5-5",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

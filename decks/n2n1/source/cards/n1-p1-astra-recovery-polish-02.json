@@ -1,0 +1,26 @@
+{
+ "cards": [
+  {
+   "term": "応急",
+   "reading": "おうきゅう",
+   "pos": "noun",
+   "meaning": "emergency; stopgap",
+   "defJa": "急な事態に、ひとまず対応すること。",
+   "passage": {
+    "ja": "試験の前夜に苦手な範囲が見つかると、心細い気持ちになり、眠る時間を削ってでも全部を覚えたくなります。要点だけを紙にまとめるのは応急の対策として役立ちますが、それで理解が完成したと思うと、同じ所でまた迷います。試験を終えたら、答えを見ずに説明できなかった箇所を改めて確かめてください。焦って無理に勉強を続けたあげく、復習そのものが嫌になっては残念です。その場を乗り切る工夫と、時間をかけて身につける練習の違いを知っておくと、学習計画を立て直せます。",
+    "form": "応急",
+    "en": "Finding a weak area on the night before an exam can make you feel uneasy and want to learn everything even at the expense of sleep. Writing down just the key points can serve as an emergency measure, but assuming that this completes your understanding will leave you confused in the same places again. After the exam, revisit the points you could not explain without looking at the answers. It would be unfortunate to force yourself to keep studying in a panic only to end up disliking revision itself. Recognising the difference between getting through an immediate difficulty and practising for lasting mastery allows you to rebuild your study plan.",
+    "register": "学",
+    "topic": "mind",
+    "tipJa": "「応急の対策」は、その場の困難にひとまず対応する手段です。",
+    "sense": ""
+   },
+   "deck": "n1",
+   "field": null,
+   "level": "N1",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

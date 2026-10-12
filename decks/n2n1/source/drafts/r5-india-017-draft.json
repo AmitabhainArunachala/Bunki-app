@@ -1,0 +1,148 @@
+{
+ "cards": [
+  {
+   "term": "帝釈天",
+   "reading": "たいしゃくてん",
+   "pos": "noun",
+   "meaning": "Indra (Śakra) as Buddhist guardian",
+   "defJa": "インドの神に由来する仏教の守護神",
+   "passage": {
+    "ja": "日本の寺で出会う神々の中には、仏教が広まる以前のインドに由来するものがあります。帝釈天はインドラを起源とし、仏教では教えを守る神として位置付けられ、梵天とともに表されることもあります。同じ神の由来をたどっても、異なる宗教の中で役割がまったく同じとは限らず、伝わる過程で新たな意味が重ねられます。像の名前を日本語だけで覚える一方で、その背景にある神話と仏教の関わりを知ると、一体の像が長い文化の交流を伝える手掛かりになります。",
+    "form": "帝釈天",
+    "en": "Some deities encountered in Japanese temples have origins in India before Buddhism’s spread. Taishakuten derives from Indra and serves as a Buddhist protector, sometimes represented with Brahma. A shared origin does not guarantee identical roles across religions, as transmission adds meanings. Connecting the Japanese name with that background makes an image evidence of long cultural exchanges.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "インドのインドラに由来し、仏教の守護神として受け継がれた存在。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "帰依",
+   "reading": "きえ",
+   "pos": "noun",
+   "meaning": "taking refuge, devotion",
+   "defJa": "仏やその教えなどを信じ心のよりどころとすること",
+   "passage": {
+    "ja": "寺院の歴史を記す文章には、有力者がある僧や教えを信じ、寺の建立を支えた経緯が現れる。帰依という語は仏や教えを信じて心のよりどころとすることを表し、知識として関心を持つだけの場合とは区別される。もっとも、史料にこの語が記されているからといって、その人の内面をすべて確かめられるわけではない。寄進や儀礼への参加などの記録と照らし合わせることで、信仰を語る表現と、寺院を支える具体的な行為がどのように結び付いていたかを検討できる。",
+    "form": "帰依",
+    "en": "Temple histories describe patrons supporting construction through devotion to teachers or teachings. Taking refuge means trusting them as a spiritual foundation, beyond intellectual interest alone. The word’s presence in a record does not provide complete access to a person’s inner life. Comparison with donations and ritual participation helps examine how declarations of faith connected with concrete support.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "「仏に帰依する」。関心を持つだけでなく、心のよりどころとする意味。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "廃仏毀釈",
+   "reading": "はいぶつきしゃく",
+   "pos": "noun",
+   "meaning": "Meiji anti-Buddhist movement",
+   "defJa": "明治初期などに起きた仏教排斥や寺院破壊の動き",
+   "passage": {
+    "ja": "古い仏像がなぜ元の寺を離れて博物館にあるのか、その移動には時代の大きな変化が刻まれている。廃仏毀釈は明治初期の神仏分離に伴って各地で起きた仏教排斥や破壊の動きで、寺院や仏像、地域の信仰に深い影響を残した。制度として神と仏を分けることと、現場で起きた破壊をまったく同じ行為として扱えば、経緯や地域差を見失う。現在残る文化財の美しさを見るときも、守られたものと失われたものの双方を考えることで、伝統が続くという言葉に含まれる断絶へ目を向けられる。",
+    "form": "廃仏毀釈",
+    "en": "An old image’s move from temple to museum can reflect major historical disruption. Anti-Buddhist destruction accompanying early Meiji separation of kami and Buddhas profoundly affected temples, images, and local devotion. Equating institutional separation with every act of destruction obscures developments and regional differences. Considering what was lost alongside what survives reveals ruptures within narratives of continuing tradition.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "神仏分離の制度と、それに伴って起きた排斥や破壊の動きを区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "弘法大師",
+   "reading": "こうぼうだいし",
+   "pos": "noun",
+   "meaning": "Kōbō Daishi (Kūkai's title)",
+   "defJa": "空海に後から贈られた尊称",
+   "passage": {
+    "ja": "空海と別の人だと思っていた名前が、同じ人物を指していると分かることがあるよね。弘法大師は空海に後から贈られた尊称で、真言宗の歴史を読むときだけでなく、各地の寺や伝説でもよく出会う名前なんだ。生涯の出来事を調べることと、人々がその後どんな物語を語り継いだかを調べることは、つながっているけれど同じではない。井戸を開いた話などを読んだら、いつ誰が記した伝承なのかにも目を向けると、歴史上の僧と、身近に感じられてきたお大師さまの両方を考えられるよ。",
+    "form": "弘法大師",
+    "en": "A name thought to belong to someone else may turn out to refer to Kukai. Kobo Daishi is a title granted to him afterward, appearing in temple histories and local legends as well as Shingon accounts. Investigating his lifetime and investigating later stories are related but distinct tasks. Asking when and by whom a well-digging legend was recorded illuminates both the historical monk and the beloved master of popular devotion.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "空海の尊称であり、史実と各地に伝わる大師伝説を分けて読む。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "形而上学",
+   "reading": "けいじじょうがく",
+   "pos": "noun",
+   "meaning": "metaphysics",
+   "defJa": "存在や世界の根本原理を問う哲学の分野",
+   "passage": {
+    "ja": "世界の根本に何があるのかという問いは、目の前の物を測る作業だけでは答えが定まりません。形而上学は存在や世界の根本原理を問う哲学の分野で、インド思想の自己や究極的な実在をめぐる議論を読む際にも関わります。難しい話という印象だけで覚えず、何が存在し、何を根本とし、どんな理由でそう考えるのかに分けて整理しましょう。仏教や他の学派を比較するときにも、結論の違いを並べる前に問いの立て方を確かめると、互いの議論がどこで接し、どこですれ違うかを捉えられます。",
+    "form": "形而上学",
+    "en": "Questions about the world’s ultimate ground are not settled solely by measuring nearby objects. Metaphysics investigates fundamental principles of existence and reality, including questions relevant to Indian accounts of self and ultimate being. Separating what exists, what is fundamental, and the supporting reasons makes the subject more than a label for difficult discussion. Comparing questions before conclusions clarifies where philosophical schools meet or diverge.",
+    "register": "学",
+    "topic": "india",
+    "tipJa": "「形而上学的な問い」。難解という評価ではなく、問う対象を示す語。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "心身一如",
+   "reading": "しんしんいちにょ",
+   "pos": "noun",
+   "meaning": "unity of body and mind",
+   "defJa": "心と身体を切り離せない一つのものとする考え",
+   "passage": {
+    "ja": "「心と体は同じ」とだけ訳すと、二つの働きに違いがないという意味に受け取られます。心身一如は、心と身体を切り離せないものとして捉える言葉で、禅の実践を紹介する際にも、姿勢と心のあり方の関係を示すために使えます。たとえば坐り方を整えることを、内面とは無関係な形だけの作法として説明しないための語として働きます。ただし、この考え方を特定の脳の仕組みが証明されたという報告に置き換えず、実践上の捉え方と科学的な説明を分けて書くと、語の役割が明確になります。",
+    "form": "心身一如",
+    "en": "Translating it merely as mind and body being identical can imply no differences in function. Their inseparability can describe how posture and mental orientation relate in Zen practice. The expression helps avoid treating seated form as etiquette unrelated to inner life. Distinguishing this practical conception from proof of a particular brain mechanism clarifies its explanatory role.",
+    "register": "語",
+    "topic": "india",
+    "tipJa": "心身を切り離さない捉え方を示し、個別の科学的な実証とは区別する。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "念仏",
+   "reading": "ねんぶつ",
+   "pos": "noun",
+   "meaning": "nenbutsu, invoking Amida",
+   "defJa": "仏を心に念じたりその名を唱えたりすること",
+   "passage": {
+    "ja": "お寺で聞く声の繰り返しは、同じ言葉を言う練習というだけでは説明しきれません。念仏には仏を心に念じる意味もありますが、日本の浄土教では阿弥陀仏の名を唱える実践として身近に知られています。声に出す行いをどう位置付けるかは教えによって違いがあるため、回数だけで信仰の深さを比べると、大切な点を見落とします。誰をよりどころにし、その行いにどのような意味を与えているのかを確かめることで、聞こえる音の背後にある教えとのつながりを捉えられます。",
+    "form": "念仏",
+    "en": "Repeated words heard in a temple cannot be explained merely as verbal rehearsal. Recollection of the Buddha also has a contemplative meaning, while Japanese Pure Land practice is familiar through reciting Amida’s name. Interpretations of vocal practice vary, so counting repetitions alone misses important differences. Identifying the object of trust and the action’s meaning connects the sound with its teaching.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "心に仏を念じる意味と、仏の名を唱える実践としての用法がある。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "悪人正機",
+   "reading": "あくにんしょうき",
+   "pos": "noun",
+   "meaning": "the wicked are the true object of salvation",
+   "defJa": "煩悩を抱える者こそ阿弥陀仏の救いの対象とする教え",
+   "passage": {
+    "ja": "親鸞の教えを論じる際には、善人と悪人という日常的な区分だけでは理解できない問いが現れる。悪人正機は、自らの力で善を全うできない者こそ阿弥陀仏の本願による救いの対象とする考えで、悪事を勧める主張ではない。ここでいう悪人は、他人を犯罪者と決め付けるための呼称というより、煩悩を離れられない自分を問い直す言葉として読まれる。行いを正当化する解釈と、自己の限界を知って他力に向かう教えとを区別することで、逆説的な表現が担う意味を捉えられる。",
+    "form": "悪人正機",
+    "en": "Discussions of Shinran raise questions beyond everyday divisions into good and bad people. The teaching that the evil person is the primary object of salvation concerns those unable to accomplish good through their own power, rather than encouraging wrongdoing. The evil person is read as oneself bound by affliction, not merely a label for criminals. Distinguishing self-justification from recognition of limits and reliance on other-power clarifies the paradox.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "悪事の勧めではなく、煩悩を抱える自己と本願の救いをめぐる教え。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "懺悔",
+   "reading": "さんげ",
+   "pos": "noun",
+   "meaning": "repentance",
+   "defJa": "自分の罪や過ちを認め悔い改めること",
+   "passage": {
+    "ja": "過ちを認める言葉は、口にしただけで他者の傷を消せるものではない。仏教で懺悔を考えるときも、罪を告げて気が楽になることだけでなく、自らの行いを省みて改めようとする姿勢に目を向けたい。自分は悪い人間だという固定した評価に閉じこもれば、今から何を変えられるかという問いが見えなくなることもある。過去の行為を曖昧にせず、それでも現在の行動へ責任を持って向き直ることを考えると、悔いるという営みは自己への非難だけでは終わらないものとして読める。",
+    "form": "懺悔",
+    "en": "Words acknowledging wrongdoing cannot by themselves erase another person’s hurt. Buddhist repentance invites attention to reviewing and changing conduct beyond the relief of confession. Becoming fixed in the judgment that one is a bad person can obscure what may now change. Facing past actions while taking responsibility for present conduct makes repentance more than self-condemnation.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "「懺悔する」。過ちを認めることと、自己への非難に留まることを分ける。",
+    "sense": ""
+   }
+  }
+ ]
+}

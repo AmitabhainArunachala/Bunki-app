@@ -1,0 +1,70 @@
+{
+ "cards": [
+  {
+   "term": "安全余裕",
+   "reading": "あんぜんよゆう",
+   "pos": "noun",
+   "meaning": "margin of safety in valuation",
+   "defJa": "価値の見積もりと購入価格の間に設ける余地",
+   "passage": {
+    "ja": "企業の価値を細かく計算しても、将来の売上や利益を正確に知ることはできない。見積もった価値より十分低い価格で買おうとする安全余裕の考え方は、その不確実性を購入時の判断に組み込むものである。だが、見積もり自体が過大であれば、計算上の差が広いからといって、損失から守られるとは限らない。半導体需要の楽観的な予想を一つ採るだけで終えず、需要が弱い場合や設備の稼働が遅れる場合にも値を出し直すと、余裕がどこに依存しているかが露わになる。",
+    "form": "安全余裕",
+    "en": "Even a detailed valuation cannot reveal future sales and earnings with certainty. The concept of a margin of safety incorporates that uncertainty into the purchase decision by seeking a price well below estimated value. Yet if the estimate itself is excessive, a wide calculated gap does not necessarily protect against losses. Recalculating under weaker semiconductor demand or delayed factory operation, instead of relying on a single optimistic forecast, exposes what the apparent cushion depends on.",
+    "register": "論",
+    "topic": "ai",
+    "tipJa": "見積もりの誤差を吸収する考え方で、保証ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "フリーキャッシュフロー",
+   "reading": "ふりーきゃっしゅふろー",
+   "pos": "noun",
+   "meaning": "free cash flow",
+   "defJa": "事業と必要な投資の後に残る現金の余力",
+   "passage": {
+    "ja": "半導体工場の新設は、決算の利益とは異なる時間軸で多額の現金を動かす。営業活動で得た現金から設備への支出などを差し引くフリーキャッシュフローは、投資後に残る資金の余力を読む手がかりとなる。ただし、計算に含める項目は資料によって異なるため、会社間で比較するにあたっては、指標の定義をそろえる作業が欠かせない。値が一時的にマイナスでも、それだけで経営不振とは断定できず、何に支出し、将来どのように回収する計画なのかが検討の焦点となる。",
+    "form": "フリーキャッシュフロー",
+    "en": "Building a semiconductor factory moves large amounts of cash on a different timeline from reported profit. Free cash flow, which subtracts spending such as capital investment from operating cash generated, helps reveal the funds remaining after investment. However, because the included items vary across documents, comparisons between companies require consistent definitions. A temporarily negative value alone does not establish poor business performance; attention turns to what was purchased and how the spending is expected to be recovered.",
+    "register": "報",
+    "topic": "ai",
+    "tipJa": "計算の範囲が資料ごとに異なるため定義を確認する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "信用リスク",
+   "reading": "しんようりすく",
+   "pos": "noun",
+   "meaning": "credit risk",
+   "defJa": "相手が約束どおり支払えず損失が生じる危険",
+   "passage": {
+    "ja": "債券の仕組みを覚えるとき、満期にお金が戻るという説明だけで思考を止めないでください。発行した会社が経営難に陥れば、約束した利息や元本を支払えず、信用リスクが現実の損失につながる場合があります。価格の上がり下がりを予想する練習に加えて、誰が支払いを約束しているか、その資金をどう用意するかも図に書くと、別の種類の危険が浮かびます。半導体工場への巨額の投資を債券で賄う例なら、完成する時期と収益が入る時期を分けて追う練習にもなります。",
+    "form": "信用リスク",
+    "en": "When learning how bonds work, do not stop thinking at the explanation that money comes back at maturity. If the issuing company encounters financial trouble, it may fail to pay promised interest or principal, turning credit risk into an actual loss. Besides practicing predictions of price changes, diagramming who promises payment and how they will fund it reveals another kind of risk. The example of financing a major semiconductor factory investment through bonds also provides practice in separately tracing completion and the arrival of earnings.",
+    "register": "学",
+    "topic": "ai",
+    "tipJa": "価格変動とは別に、支払う側の能力を問う。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

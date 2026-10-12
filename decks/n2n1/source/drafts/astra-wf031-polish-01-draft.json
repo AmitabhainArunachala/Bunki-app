@@ -1,0 +1,68 @@
+{
+ "cards": [
+  {
+   "term": "寡占",
+   "reading": "かせん",
+   "pos": "noun",
+   "meaning": "oligopoly",
+   "defJa": "少数の企業が市場の大部分を占める状態",
+   "passage": {
+    "ja": "町の大半の食料品店を三つの会社が経営していると仮定し、一社が値下げした後の動きを考えてみましょう。他社が対抗して価格を下げる場合もあれば、品ぞろえや配達の速さで客を引きつけようとする場合もあります。寡占は競争が完全になくなることを意味せず、少数の企業が互いの判断を強く意識する市場の状態です。市場経済を学ぶ際には、企業数だけに限らず、新しい会社が店を出す費用や、買い手が別の店へ移る手間も図に書き添えると理解が進みます。",
+    "form": "寡占",
+    "en": "Suppose three companies run most of a town's grocery stores, and consider what happens after one lowers its prices. Competitors might cut their own prices or try to attract customers with their product range or delivery speed. Oligopoly does not mean that competition disappears completely, but describes a market in which a few firms pay close attention to one another's decisions. When studying market economies, understanding improves if you go beyond memorizing company numbers and add to your diagram the cost of opening a store and the effort buyers face in switching shops.",
+    "register": "学",
+    "topic": "other",
+    "tipJa": "市場を少数の企業が占める状態で、競争が全くないという意味ではありません。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "専制",
+   "reading": "せんせい",
+   "pos": "noun",
+   "meaning": "autocratic rule",
+   "defJa": "支配者が他の制約を受けず独断で行う政治",
+   "passage": {
+    "ja": "王の決定に異議を唱えた商人が、その理由を審査されることもなく投獄される国を想像してください。専制の問題を捉えるには、支配者の性格に加えて、その命令を止めたり取り消したりできる仕組みがあるかを見る必要があります。市民社会が育つ過程を学ぶ際も、単に優しい王が現れればよいという話にはなりません。税を集める権限や裁判の手続きを誰が監督するかまで調べると、権力への制約を求めた人々の関心が暮らしに直結していたことを理解できます。",
+    "form": "専制",
+    "en": "Imagine a country in which a merchant who objects to the king's decision is imprisoned without even an examination of his reasons. To grasp the problem of autocratic rule, we need to look beyond the ruler's character and ask whether mechanisms exist to stop or overturn his orders. When studying the development of civil society, too, the issue is not simply the appearance of a kind king. Examining who oversees taxation powers and judicial procedures shows how the concerns of those seeking limits on power were directly connected to daily life.",
+    "register": "講",
+    "topic": "history",
+    "tipJa": "「専制政治」「専制的な支配」のように、権力が制約されない状態を表します。",
+    "sense": "支配者の独断で行う政治"
+   }
+  },
+  {
+   "term": "平均寿命",
+   "reading": "へいきんじゅみょう",
+   "pos": "noun",
+   "meaning": "life expectancy at birth",
+   "defJa": "ある年の死亡状況から算出する零歳の平均余命",
+   "passage": {
+    "ja": "昔の人は全員若くして亡くなったという印象は、人口全体の指標と個人の生涯を混同するところから生まれやすい。平均寿命は、ある年の年齢別の死亡状況が続くと仮定して、新生児が平均して何年生きるかを表した数値である。幼い子どもの死亡が多ければ値は低くなるため、成人まで育った人の残りの人生をそのまま示すものとはいえない。年代記に長生きした人物が登場する一方で、人口全体の指標が低い時代もあり、過去の暮らしを比べる際には、どの年齢の死亡が全体を左右したかが手がかりとなる。",
+    "form": "平均寿命",
+    "en": "The impression that everyone in the past died young can arise from confusing an indicator for an entire population with individual lives. Life expectancy at birth is the average number of years a newborn would live if the age-specific mortality conditions of a particular year continued. Since many deaths among young children lower the value, it does not directly represent the remaining lives of people who reached adulthood. Long-lived figures can appear in chronicles even in periods with low population-wide values, and identifying which ages' mortality shaped the overall figure provides a clue when comparing past living conditions.",
+    "register": "報",
+    "topic": "history",
+    "tipJa": "亡くなった人の年齢を単純に平均した値とは異なり、零歳の平均余命を指します。",
+    "sense": ""
+   }
+  },
+  {
+   "term": "平易",
+   "reading": "へいい",
+   "pos": "na-adj",
+   "meaning": "easy to understand; accessible",
+   "defJa": "難しくなく、理解しやすい様子",
+   "passage": {
+    "ja": "病院の案内に「受診」とだけあると、日本語を勉強し始めたばかりの人には、何をすればいいのか伝わらないことがあるよね。平易な言葉に直すなら、「医者に診てもらう」のように、その場で必要な行動が浮かぶ言い方を探すといい。外来語に置き換えたとしても、相手がその言葉を知っていなければ、難しさは残るんだ。短く書くことだけにこだわらず、受付で出すものや待つ場所まで具体的に示せれば、説明を読む人が次に動くための手がかりになるよ。",
+    "form": "平易",
+    "en": "When a hospital notice says only jushin, someone who has just started learning Japanese may not understand what to do. To rewrite it in accessible language, look for wording such as 'be examined by a doctor' that brings the required action to mind. Replacing it with a loanword still leaves the difficulty if the other person does not know that word. If you go beyond merely keeping the text short and specify what to present at reception and where to wait, readers gain clues that help them take the next step.",
+    "register": "話",
+    "topic": "language",
+    "tipJa": "「平易な言葉で説明する」と使い、読み手が理解しやすいことに重点があります。",
+    "sense": ""
+   }
+  }
+ ]
+}

@@ -1,0 +1,198 @@
+{
+ "items": [
+  {
+   "term": "クリーンルーム",
+   "reading": "くりーんるーむ",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "clean room",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-008.json",
+    "cardId": "nn-07fcfacecd-34c211e2",
+    "wordId": "nn-07fcfacecd"
+   }
+  },
+  {
+   "term": "シリコンの盾",
+   "reading": "しりこんのたて",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "\"silicon shield\" (Taiwan's chip leverage)",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-003-r.json",
+    "cardId": "nn-57dc85bb27-6bf1e2ea",
+    "wordId": "nn-57dc85bb27"
+   }
+  },
+  {
+   "term": "チューリングテスト",
+   "reading": "ちゅーりんぐてすと",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "the Turing test",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-7eba44a781-aa5b0a20",
+    "wordId": "nn-7eba44a781"
+   }
+  },
+  {
+   "term": "パラメータ",
+   "reading": "ぱらめーた",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "parameter",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-010.json",
+    "cardId": "nn-e6b99d4693-083ec16b",
+    "wordId": "nn-e6b99d4693"
+   }
+  },
+  {
+   "term": "ブラックボックス",
+   "reading": "ぶらっくぼっくす",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "black box",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-011.json",
+    "cardId": "nn-795b2d8270-d42b912e",
+    "wordId": "nn-795b2d8270"
+   }
+  },
+  {
+   "term": "メタ言語",
+   "reading": "めたげんご",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "metalanguage",
+   "register": "語",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-038.json",
+    "cardId": "nn-4786bade8f-5e3a6031",
+    "wordId": "nn-4786bade8f"
+   }
+  },
+  {
+   "term": "不可逆",
+   "reading": "ふかぎゃく",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "irreversible",
+   "register": "学",
+   "preferTopic": "other",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-012.json",
+    "cardId": "nn-f2a97d79a0-46f4fc77",
+    "wordId": "nn-f2a97d79a0"
+   }
+  },
+  {
+   "term": "事前学習",
+   "reading": "じぜんがくしゅう",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "pre-training",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-013.json",
+    "cardId": "nn-4cd6f93eb3-914bb137",
+    "wordId": "nn-4cd6f93eb3"
+   }
+  },
+  {
+   "term": "先端パッケージング",
+   "reading": "せんたんぱっけーじんぐ",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "advanced packaging",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-review-005-r.json",
+    "cardId": "nn-359f9d5db7-cf5c08c1",
+    "wordId": "nn-359f9d5db7"
+   }
+  },
+  {
+   "term": "再帰的自己改善",
+   "reading": "さいきてきじこかいぜん",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "recursive self-improvement",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-015-r.json",
+    "cardId": "nn-5c684cf3fd-56fae9b8",
+    "wordId": "nn-5c684cf3fd"
+   }
+  },
+  {
+   "term": "割引現在価値",
+   "reading": "わりびきげんざいかち",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "discounted present value",
+   "register": "学",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-035.json",
+    "cardId": "nn-1bfa81faff-f2bd90e3",
+    "wordId": "nn-1bfa81faff"
+   }
+  },
+  {
+   "term": "化学機械研磨",
+   "reading": "かがくきかいけんま",
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "gloss": "chemical mechanical polishing",
+   "register": "講",
+   "preferTopic": "ai",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-040.json",
+    "cardId": "nn-2294b7f645-b266dfbc",
+    "wordId": "nn-2294b7f645"
+   }
+  }
+ ],
+ "weave": [
+  "クリーンルーム",
+  "シリコンの盾",
+  "チューリングテスト",
+  "パラメータ",
+  "ブラックボックス",
+  "メタ言語",
+  "不可逆",
+  "事前学習",
+  "先端パッケージング",
+  "再帰的自己改善",
+  "割引現在価値",
+  "化学機械研磨"
+ ]
+}

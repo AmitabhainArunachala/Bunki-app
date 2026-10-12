@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "諸法無我",
+   "reading": "しょほうむが",
+   "pos": "noun",
+   "meaning": "all phenomena are without a fixed self",
+   "defJa": "どの存在にも不変で独立した本体はないという教え",
+   "passage": {
+    "ja": "昨日まで親しかった相手との口論だけで、「自分は誰からも好かれない人間だ」と決めてしまうことがある。仏教の諸法無我は、そのような自己像に限らず、どの存在にも独立して変わらない本体を認めない教えである。体も感情も、周囲との関係も変化する中で、それらを離れた固定的な自分を取り出すことはできない。この見方は人の価値を否定するためのものではなく、今の状態を永遠の本質として抱え込むかわりに、条件によって成り立つ存在へ目を向ける契機となる。",
+    "form": "諸法無我",
+    "en": "A single quarrel with someone who was close until yesterday can lead a person to decide that nobody likes them. The Buddhist teaching that all phenomena lack a self denies an independent, unchanging essence in any existence, not only in such self-images. With bodies, emotions, and relationships changing, a fixed self cannot be extracted apart from them. Rather than denying human worth, this perspective opens attention to conditioned existence instead of holding one's present state as an eternal essence.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "どの存在にも独立不変の本体を認めない教えで、自己の無価値を説く語ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-abcb494194-dc375cbf",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-029.json",
+    "cardId": "nn-abcb494194-dc375cbf",
+    "wordId": "nn-abcb494194"
+   }
+  },
+  {
+   "term": "融通無碍",
+   "reading": "ゆうずうむげ",
+   "pos": "noun",
+   "meaning": "freely interpenetrating; unobstructed",
+   "defJa": "互いに妨げず自由に通じ合うこと",
+   "passage": {
+    "ja": "一つの灯明の光が別の灯明の光と重なっても、どちらかが押し出されて消えることはありません。華厳の教えでいう融通無碍は、多様な存在が互いを妨げずに関わるあり方を表し、光の重なりはその入口となるたとえです。個々の違いをなくして全部を同じものにするというより、違いを保ちながら隔てなく通じ合うところに焦点があります。日常の利害では一方を立てれば他方が困る場面も多いだけに、この世界観は、存在を場所の奪い合いだけで捉える発想とは大きく異なります。",
+    "form": "融通無碍",
+    "en": "When the light of one lamp overlaps another's, neither is displaced and extinguished. In Huayan teaching, unobstructed interpenetration describes diverse beings relating without impeding one another, with overlapping light serving as an introductory analogy. The focus is on communicating without separation while retaining differences, rather than eliminating individuality and making everything identical. Because everyday interests often involve one side benefiting at another's expense, this worldview differs markedly from seeing existence solely as competition for space.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "華厳では、存在が互いを妨げず通じ合う意味で用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-3c8c5eca11-2b0ba51c",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-3c8c5eca11-2b0ba51c",
+    "wordId": "nn-3c8c5eca11"
+   }
+  },
+  {
+   "term": "鎌倉仏教",
+   "reading": "かまくらぶっきょう",
+   "pos": "noun",
+   "meaning": "Kamakura-period Buddhism",
+   "defJa": "鎌倉時代に展開した日本仏教の諸潮流",
+   "passage": {
+    "ja": "念仏や禅の教えが広がった時代にも、古くからの寺院が一斉に活動を終えたのではない。鎌倉仏教の展開には、新しい宗派の成立に加えて、既存の仏教の中で戒律や教学を立て直す動きも含まれる。人々が求めたのは一つの形の救いだけではなく、修行や祈りの場も重なり合っていた。新旧の交代という単線の変化として捉えるより、異なる実践が同じ社会に並び、批判や交流を通じて互いの立場を変えていった過程として見ると、当時の宗教世界の厚みが分かる。",
+    "form": "鎌倉仏教",
+    "en": "Older temples did not all cease activity when nenbutsu and Zen teachings spread. The development of Kamakura Buddhism included movements renewing discipline and doctrinal study within established Buddhism as well as the founding of new schools. People sought more than one form of salvation, and settings for practice and prayer overlapped. Viewing the period as different practices coexisting and changing through criticism and exchange, rather than a single replacement of old by new, reveals the depth of its religious world.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "鎌倉時代の仏教の諸動向で、新宗派だけでなく既存の伝統の復興も含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bdf7aa72af-1288d798",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-030.json",
+    "cardId": "nn-bdf7aa72af-1288d798",
+    "wordId": "nn-bdf7aa72af"
+   }
+  },
+  {
+   "term": "観照",
+   "reading": "かんしょう",
+   "pos": "noun",
+   "meaning": "detached contemplation",
+   "defJa": "主観的な執着を離れて対象を静かに見つめること",
+   "passage": {
+    "ja": "庭石を眺めていると、初めは好き嫌いばかりが浮かび、置き場所を変えたいとさえ思う。それでもしばらく座っているうちに、石を自分の好みに従わせることより、その上を移る影へ注意が向くことがある。観照という態度には、対象を手に入れたり評価したりする衝動をいったん離れ、静かに見つめる働きがある。何も感じない状態を作るというより、感じたことにすぐ結論を与えず、目の前のものが現れてくる余地を残すという点に、その姿勢の特徴がある。",
+    "form": "観照",
+    "en": "Looking at garden stones, one may initially think only of liking or disliking them and even want to move them. After sitting for a while, however, attention may turn from making the stones conform to personal taste toward the shadows crossing them. Detached contemplation involves stepping back from impulses to possess or judge an object and regarding it quietly. Rather than producing a state without feeling, the attitude leaves room for what is present to emerge without immediately turning feelings into conclusions.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "執着や主観的な判断を離れて、対象を静かに見つめる態度。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8c225ac6ca-8eed62fb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-028.json",
+    "cardId": "nn-8c225ac6ca-8eed62fb",
+    "wordId": "nn-8c225ac6ca"
+   }
+  }
+ ]
+}

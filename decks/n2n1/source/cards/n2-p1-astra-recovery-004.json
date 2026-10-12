@@ -1,0 +1,114 @@
+{
+ "cards": [
+  {
+   "term": "くれぐれも",
+   "reading": "くれぐれも",
+   "pos": "adverb",
+   "meaning": "earnestly; with repeated emphasis",
+   "defJa": "念を押して十分に注意を促すさま。",
+   "passage": {
+    "ja": "資料館の閲覧案内に、くれぐれも書類の順序を変えないようお願いしますとあれば、単なる提案より強い注意が読み取れる。この副詞は、守ってほしいことを念を押して伝える働きを持つ。しかし、注意書きを増やす一方で、書類を戻す場所が示されていなければ、利用者は適切に行動しにくい。言葉の強さに頼るだけでなく、扱い方を図で示したり、迷った際の相談先を添えたりする工夫が要る。依頼の切実さを伝える表現と、それを実行できる案内がそろって、初めて注意書きが役立つ。",
+    "form": "くれぐれも",
+    "en": "If an archive’s reading-room instructions earnestly ask visitors not to alter the order of documents, they convey stronger caution than a mere suggestion. This adverb reinforces a request about something the writer wants observed. Yet if warnings multiply while the place to return documents remains unspecified, users will struggle to act appropriately. Rather than relying only on forceful language, the notice needs measures such as diagrams showing handling procedures or a contact for questions. A warning becomes useful when wording that conveys urgency is paired with guidance that makes compliance possible.",
+    "register": "報",
+    "topic": "language",
+    "tipJa": "守ってほしい注意を念入りに伝える副詞で、強い依頼に用いられます。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "山",
+   "reading": "～さん",
+   "pos": "other",
+   "meaning": "mount; mountain-name suffix",
+   "defJa": "高く盛り上がった地形の名に添える語。",
+   "passage": {
+    "ja": "旅行記の原稿に富士山という名前が出てきたら、声に出して読む人のために、ふじさんという読みを確かめます。地名の漢字は、普段よく使う読みだけで判断すると間違うことがあります。同じ字であれ、土地ごとに読み方が違う場合には、その地域で使われる呼び名を調べる必要があります。書き手の大まかな知識で決めず、信頼できる案内や資料に当たる姿勢が大切です。朗読の準備では、意味を知っている語ほど確認を飛ばしやすいので、固有名詞を先に拾っておくと作業が進みます。",
+    "form": "山",
+    "en": "If the name Mount Fuji appears in a travel manuscript, verify its reading, Fujisan, for whoever will read it aloud. Judging place-name kanji solely by their familiar everyday readings can lead to mistakes. Even when the character is the same, if its pronunciation differs between places, the local name needs to be checked. It is important to consult reliable guides and references rather than decide from the writer’s rough knowledge. Because familiar meanings can tempt us to skip pronunciation checks when preparing a reading, identifying proper names first helps the work proceed.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「富士山」では「さん」と読み、固有の地形名の後ろに付きます。",
+    "sense": "地形名の後に付く「さん」という読み。"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "寄せる",
+   "reading": "よせる",
+   "pos": "verb",
+   "meaning": "contribute; submit",
+   "defJa": "文章や意見などを送って提供する。",
+   "passage": {
+    "ja": "郷土史の冊子に文章を寄せる人へ依頼するとき、昔の思い出を自由に書いてほしいというだけでは、内容が広がりすぎます。港で働いていた頃の一日など、時代を知る手がかりになる場面を示すと、書き手も記憶をたどりやすくなります。個人の回想をもとに全体の姿を描く以上、年月や場所をほかの記録と照らす作業も欠かせません。編集者は細部を確かめつつ、本人の語り口まで大げさに整えないよう注意します。事実を支える確認と、その人らしい言葉を残す配慮が、読み応えのある記録を育てます。",
+    "form": "寄せる",
+    "en": "When inviting someone to contribute an article to a local-history booklet, simply asking for freely written memories can leave the subject too broad. Suggesting a scene that illuminates the period, such as a day working at the harbour, helps the writer retrace their memories. Since individual recollections are being used to depict a broader picture, dates and places also need to be checked against other records. While verifying details, editors take care not to over-polish the person’s distinctive way of speaking. Factual checking and consideration for the speaker’s own words together develop an engaging record.",
+    "register": "語",
+    "topic": "history",
+    "tipJa": "「冊子に文章を寄せる」は、掲載してもらう文章を送ることです。",
+    "sense": "文章などを投稿・寄稿する。"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "幼児",
+   "reading": "ようじ",
+   "pos": "noun",
+   "meaning": "young child; preschool child",
+   "defJa": "乳児期を過ぎ、就学前にある子ども。",
+   "passage": {
+    "ja": "絵本を読んでもらっている幼児が、同じ場面でもう一度と頼んだ場合、話の結末を知らないからだと決めつけることはできない。絵の細部を確かめたいのか、聞き慣れた言葉を楽しみたいのか、求めているものはその場で異なる。読み手が先へ進むことを優先する一方で、子どもは立ち止まった所に関心を持っている場合もある。指さした絵や繰り返した言葉を手がかりにすると、次の問いかけを考えやすくなる。冊数を増やすことだけに目を向けず、一冊を囲むやり取りそのものを学びの基盤として捉える視点が必要だ。",
+    "form": "幼児",
+    "en": "When a young child listening to a picture book asks for the same scene again, we cannot assume that it is because they do not know the ending. They may want to inspect details in the picture or enjoy familiar words, and what they seek varies with the moment. While the reader prioritises moving forward, the child may be interested in precisely the place where they paused. Using the picture they point to or the words they repeat as clues makes it easier to consider the next question. Rather than focusing only on increasing the number of books, we need to view the interaction around a single book as a foundation for learning.",
+    "register": "報",
+    "topic": "mind",
+    "tipJa": "乳児期の後、小学校に入る前の子どもを指す使い方です。",
+    "sense": ""
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "島",
+   "reading": "～とう",
+   "pos": "other",
+   "meaning": "island; suffix read tō",
+   "defJa": "周囲を水に囲まれた陸地を表す語。",
+   "passage": {
+    "ja": "地理の説明に火山島とあったら、まず、かざんとうという読みと、噴火によってできた陸地を指すことを押さえます。一つずつの漢字を知っていても、熟語になったときの読みは別に確かめる必要があります。大まかな意味だけで済ませてきた語ほど、朗読の最中に口が止まりやすいものです。辞書で読みを確認した上で、前後の文と続けて声に出すと、説明全体の流れもつかめます。文字を目で理解する作業と、それを聞き手へ届ける準備は、重なる部分を持ちながらも少し違います。",
+    "form": "島",
+    "en": "When volcanic island appears in a geographical explanation, first establish its reading, kazantō, and that it refers to land formed by eruptions. Even if you know each kanji individually, the reading of the compound needs to be checked separately. Words whose meanings you have only grasped roughly are particularly likely to halt you during a reading aloud. After checking the pronunciation in a dictionary, speaking the word with the surrounding sentences helps you grasp the flow of the explanation as a whole. Understanding written characters visually and preparing to convey them to listeners overlap, but they are slightly different tasks.",
+    "register": "講",
+    "topic": "language",
+    "tipJa": "「火山島」では「とう」と読み、陸地を指す熟語の後半になります。",
+    "sense": "熟語の中で「とう」と読む場合。"
+   },
+   "deck": "n2",
+   "field": null,
+   "level": "N2",
+   "pass": 1,
+   "writer": "gpt-6-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "不立文字",
+   "reading": "ふりゅうもんじ",
+   "pos": "noun",
+   "meaning": "not relying on words",
+   "defJa": "悟りを文字の説明だけに依存させないという禅の立場",
+   "passage": {
+    "ja": "熱い茶を口に含む前から、湯の温度や味を詳しく知っている人がいるとする。それでも、知識を蓄えたことと、その一口を実際に味わったことには隔たりがある。禅の不立文字は、悟りを言葉の理解だけに委ねず、自らの実践を通して確かめるという立場を表す。だからといって経典も対話も不要になるのではなく、教えをいくら覚えても、それを自分の生き方において引き受ける働きを他人に代わってもらうことはできないという厳しさが残る。",
+    "form": "不立文字",
+    "en": "Suppose someone knows the temperature and flavor of hot tea in detail before taking a sip. Accumulating that knowledge still differs from actually tasting it. The Zen principle of not relying on words places awakening in verification through one's own practice rather than verbal understanding alone. This does not make scriptures or dialogue unnecessary, but retains the demanding point that no amount of memorization lets another person undertake the work of embodying a teaching in one's life.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "禅で、悟りを文字や言葉の理解だけに依存させない立場。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c1f104a22e-3ade12b5",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-009.json",
+    "cardId": "nn-c1f104a22e-3ade12b5",
+    "wordId": "nn-c1f104a22e"
+   }
+  },
+  {
+   "term": "京都学派",
+   "reading": "きょうとがくは",
+   "pos": "noun",
+   "meaning": "the Kyoto School",
+   "defJa": "西田幾多郎らに連なる日本の哲学的な思想潮流",
+   "passage": {
+    "ja": "西洋から入った哲学を学ぶことは、日本の思想家にとって、既存の宗教経験を問い直す契機ともなった。京都学派と呼ばれる思想の流れでは、西田幾多郎や田辺元、西谷啓治らが、それぞれに自己や世界、宗教の根底を探究した。共通の学問的な関係があったとはいえ、同じ結論を一斉に唱えた集団ではない。仏教を含む東洋思想と西洋哲学の双方に向き合う過程で、師の問いを受け継ぐことと、その答えを批判して先へ進むことが、同時に起こったのである。",
+    "form": "京都学派",
+    "en": "Studying philosophy introduced from the West also prompted Japanese thinkers to reconsider existing religious experience. In the tradition known as the Kyoto School, Nishida Kitaro, Tanabe Hajime, Nishitani Keiji, and others individually explored the foundations of self, world, and religion. Despite shared academic relationships, they did not form a group uniformly declaring the same conclusions. Confronting both Eastern thought, including Buddhism, and Western philosophy involved inheriting teachers' questions while also criticizing their answers and moving beyond them.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "西田幾多郎らに連なる哲学の流れで、思想家ごとの相違も含む。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1fcd2e18aa-1b29f03d",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-010.json",
+    "cardId": "nn-1fcd2e18aa-1b29f03d",
+    "wordId": "nn-1fcd2e18aa"
+   }
+  },
+  {
+   "term": "儒教",
+   "reading": "じゅきょう",
+   "pos": "noun",
+   "meaning": "Confucianism",
+   "defJa": "人倫や社会の秩序を重んじる中国由来の思想と伝統",
+   "passage": {
+    "ja": "家族への責任を果たすことと、家を離れて修行することを、同じ社会がどちらも尊んできました。東アジアでは、人と人との関係や社会秩序を重んじる儒教と、出家の伝統を持つ仏教とが、長く接触してきたからです。両者は対立するだけでなく、親への恩に報いる行為などをめぐって互いに応答し、それぞれの実践を位置付け直しました。一人の生活の中にも複数の価値が重なり、家族を大切にする理由と、修行に向かう理由とが、簡単には一つに割り切れない場合があります。",
+    "form": "儒教",
+    "en": "The same societies have valued both fulfilling family responsibilities and leaving home for religious training. In East Asia, Confucianism's concern with interpersonal relations and social order has long interacted with Buddhism's monastic tradition. Besides conflict, the two responded to each other over actions such as repaying parental kindness and reconsidered the place of their practices. Multiple values can overlap within one life, making concern for family and commitment to practice difficult to reduce to a single principle.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "人倫や秩序を重んじる中国由来の伝統で、東アジアでは仏教とも交渉した。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-cfe7fdf604-460727eb",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-011-r.json",
+    "cardId": "nn-cfe7fdf604-460727eb",
+    "wordId": "nn-cfe7fdf604"
+   }
+  },
+  {
+   "term": "六派哲学",
+   "reading": "ろっぱてつがく",
+   "pos": "noun",
+   "meaning": "the six orthodox schools of Indian philosophy",
+   "defJa": "ヴェーダの権威を認めるインドの六つの哲学体系",
+   "passage": {
+    "ja": "同じ聖典の権威を認めても、世界が何から成り、どうすれば人が解放されるかについては一致しない。インドの六派哲学は、そのような違いを保ちながらヴェーダの権威を認める、六つの主要な体系をまとめた呼び名である。例えば、正しい推論の条件を重視する立場もあれば、心の働きを静める実践を重視する立場もある。共通の土台を持つがゆえに、相手の主張を無視するだけでは済まず、知識の確かさや自己のあり方をめぐる議論が、体系の境界を越えて続いた。",
+    "form": "六派哲学",
+    "en": "Accepting the authority of the same sacred texts does not ensure agreement about the world's constitution or human liberation. The six orthodox systems of Indian philosophy groups six major traditions that acknowledge Vedic authority while retaining such differences. Some emphasize conditions for valid reasoning, while others emphasize practices that still mental activity. Precisely because they shared a foundation, they could not simply ignore one another, and debates over knowledge and selfhood continued across the systems' boundaries.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "ヴェーダの権威を認める主要な六体系の総称で、教義は一様ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-64daeceee9-0e51b4ac",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-64daeceee9-0e51b4ac",
+    "wordId": "nn-64daeceee9"
+   }
+  },
+  {
+   "term": "内観",
+   "reading": "ないかん",
+   "pos": "noun",
+   "meaning": "introspection; the Naikan method",
+   "defJa": "自分の経験や心の働きを内に向かって省みること",
+   "passage": {
+    "ja": "口論が終わっても、相手の失礼な言葉ばかり頭に浮かぶことがある。そのとき内観を通して自分の経験を静かに振り返ると、怒りの下に、認めてもらえなかった寂しさを見いだす場合がある。他人を責める材料を増やすかわりに、自分が何を期待し、何に反応したのかへ注意を向けるのである。ただし、浮かんだ説明をそのまま唯一の原因と決める必要はなく、内側から見えることにも偏りがあると承知する姿勢が、省みる作業を独りよがりにしない。",
+    "form": "内観",
+    "en": "After an argument ends, the other person's rude remarks may continue to occupy the mind. Quiet reflection on one's experience can sometimes reveal loneliness at not being acknowledged beneath the anger. Rather than gathering more reasons to blame someone else, attention turns to one's expectations and reactions. There is no need to treat the explanation that arises as the sole cause, however, and recognizing the limits of inward observation helps keep reflection from becoming self-absorbed.",
+    "register": "論",
+    "topic": "mind",
+    "tipJa": "自分の経験や心の動きを内へ向かって省みる意味で用いる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-2b83b94cf2-0f620148",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-012.json",
+    "cardId": "nn-2b83b94cf2-0f620148",
+    "wordId": "nn-2b83b94cf2"
+   }
+  },
+  {
+   "term": "加持祈祷",
+   "reading": "かじきとう",
+   "pos": "noun",
+   "meaning": "incantation and prayer rites",
+   "defJa": "仏の力をよりどころとして願いを祈ること",
+   "passage": {
+    "ja": "病気の家族の無事を願って寺を訪れる人にとって、手を合わせる時間は日常の不安と切り離されていません。加持祈祷は、仏の力をよりどころとして願いを祈る宗教的な実践です。治療を受ける生活のかたわら、祈りを通して願いを託したり、家族との結び付きを確かめたりする人もいます。そこに見いだされる支えを尊重することと、祈った結果として病気が治ると保証することは別であり、信仰上の意味が、そのまま医学的な効能を示すわけではありません。",
+    "form": "加持祈祷",
+    "en": "For someone visiting a temple to pray for a sick relative, the time spent praying is connected to everyday anxiety. Kaji kito is a religious practice of praying for wishes with reliance on a Buddha's power. Alongside medical treatment, some people entrust their hopes to prayer or reaffirm their family bonds through it. Respecting the support found there differs from guaranteeing recovery through prayer, and religious significance does not itself demonstrate medical efficacy.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "仏の力によりどころを求め、願いを祈る宗教的な実践。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-0a333818a4-068938a3",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-013.json",
+    "cardId": "nn-0a333818a4-068938a3",
+    "wordId": "nn-0a333818a4"
+   }
+  },
+  {
+   "term": "口伝",
+   "reading": "くでん",
+   "pos": "noun",
+   "meaning": "oral transmission of teachings",
+   "defJa": "言葉を直接交わして教えなどを伝えること",
+   "passage": {
+    "ja": "同じ経文を唱えていても、息を継ぐ場所や声を合わせる間は、紙の文字だけではつかみにくいものです。師の声を聞き、そばで繰り返す口伝には、内容とともに、その場で実践する調子まで受け渡す働きがあります。記録が残っているからといって、教えを直接交わす場の役割が消えることはありません。弟子がつまずいた箇所に応じて師が声を返すという往復の中で、受け継がれるものは、言葉の列に加えて、その言葉を生きた行為にするための手掛かりを含みます。",
+    "form": "口伝",
+    "en": "Even when chanting the same scripture, breathing points and the timing of joining voices can be hard to grasp from written characters alone. Oral transmission through listening to a teacher and repeating nearby conveys the manner of practice along with content. The existence of records does not erase the role of direct exchange. As a teacher responds to where a student struggles, what is transmitted includes cues for turning words into living action as well as the sequence of words themselves.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "人から人へ直接伝えること。音や間など、文字に収まりにくい要素も受け継ぐ。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c8272ca2a5-7dd1d185",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-014.json",
+    "cardId": "nn-c8272ca2a5-7dd1d185",
+    "wordId": "nn-c8272ca2a5"
+   }
+  },
+  {
+   "term": "大日如来",
+   "reading": "だいにちにょらい",
+   "pos": "noun",
+   "meaning": "Mahāvairocana Buddha",
+   "defJa": "真言密教で中心となる仏",
+   "passage": {
+    "ja": "高野山の根本大塔へ入ると、中央の仏を囲むように、ほかの仏や菩薩の姿が配置されています。中心にある大日如来は真言密教で根本となる仏であり、この堂内は仏の世界を立体的に表す構成になっています。一体だけを独立した作品として見るのに加えて、周囲との位置関係に目を向けると、建物全体が教えを示していることに気付きます。仏像を包む空間そのものが信仰の対象を理解する手掛かりとなり、参拝者は自分の体をその配置の中へ置くことになります。",
+    "form": "大日如来",
+    "en": "Entering Koyasan's Great Stupa, visitors find other Buddhas and bodhisattvas arranged around the central figure. That central figure, Dainichi Nyorai, is fundamental to Shingon Esoteric Buddhism, and the interior gives three-dimensional form to the Buddhist realm. Considering the relationships among the figures as well as individual works reveals that the whole building presents the teaching. The space surrounding the statues itself becomes a way of understanding the focus of faith, with visitors placing their bodies within that arrangement.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "真言密教の中心となる仏で、曼荼羅の構成とも関わる。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-2f62565f77-c5b2da1a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-015.json",
+    "cardId": "nn-2f62565f77-c5b2da1a",
+    "wordId": "nn-2f62565f77"
+   }
+  }
+ ]
+}

@@ -1,0 +1,228 @@
+{
+ "cards": [
+  {
+   "term": "真如",
+   "reading": "しんにょ",
+   "pos": "noun",
+   "meaning": "suchness; reality as it is",
+   "defJa": "仏教で語られるありのままの真実のあり方",
+   "passage": {
+    "ja": "誰かを嫌いだと思った瞬間、その人のあらゆる行動が悪意の表れに見えることがある。仏教で真如と呼ばれるのは、そうした分別によって切り分けられる以前の、ありのままの真実のあり方である。自分の判断が消えれば何でも肯定されるという話ではなく、好き嫌いの物差しで存在の全体を決めない方向を示す。この真実を自分だけが所有したと誇るなら、再び自己への執着を強めかねず、概念をつかむことと、その教えに照らして生きることの隔たりが問われる。",
+    "form": "真如",
+    "en": "The moment someone is disliked, all their actions may appear malicious. Suchness in Buddhism names reality as it is, prior to its division by such discriminations. This does not mean everything becomes acceptable when personal judgments disappear, but points toward not determining an existence entirely through likes and dislikes. Claiming exclusive possession of this truth can strengthen attachment to self, raising the question of the gap between grasping a concept and living in its light.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏教で、分別を超えたありのままの真実のあり方を指す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8efb88e205-45904b42",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-023.json",
+    "cardId": "nn-8efb88e205-45904b42",
+    "wordId": "nn-8efb88e205"
+   }
+  },
+  {
+   "term": "神仏分離",
+   "reading": "しんぶつぶんり",
+   "pos": "noun",
+   "meaning": "separation of Shinto and Buddhism",
+   "defJa": "神の祭祀と仏教を制度上分けること",
+   "passage": {
+    "ja": "神社の境内に仏像があったことは、かつて神と仏への信仰が重なっていた痕跡となる。明治初めの神仏分離は、このような関係を制度上切り分け、神社に関わる僧侶や仏教的な祭具の扱いを変える政策として進められた。その過程で仏像や寺院の破壊に及んだ地域もあったが、制度の分離と破壊行為は同じ意味ではない。地域ごとの受け止め方に応じて帰結が異なったため、残された建物や移された像には、中央の方針だけでは捉えきれない土地の歴史が刻まれている。",
+    "form": "神仏分離",
+    "en": "Buddhist statues once placed within shrine precincts are traces of overlapping worship of kami and Buddhas. The early Meiji separation of kami and Buddhism proceeded as a policy institutionally dividing these relationships and changing the treatment of monks and Buddhist ritual objects connected to shrines. Some regions experienced destruction of statues and temples, but institutional separation and destructive acts are not the same thing. Different local responses produced different outcomes, leaving surviving buildings and relocated images marked by histories not captured by central policy alone.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "制度上の分離を指し、仏教施設などの破壊行為そのものとは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-fc6558f9c3-14802c43",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-003.json",
+    "cardId": "nn-fc6558f9c3-14802c43",
+    "wordId": "nn-fc6558f9c3"
+   }
+  },
+  {
+   "term": "究竟",
+   "reading": "くきょう",
+   "pos": "noun",
+   "meaning": "ultimate completion",
+   "defJa": "仏教で物事が最後まで徹底し完成すること",
+   "passage": {
+    "ja": "座っている間だけ心が静かになっても、席を立った途端に怒りへ戻るなら、修行の課題はまだ残っています。仏教で究竟の悟りを求めるという場合、目指すのは一時的な落ち着きにとどまらず、最後まで徹底された完成です。途中で得た体験が鮮やかであるほど、それを終点だと思い込む誘惑も強くなります。快い感覚をつかんだことだけを成果にせず、その後の日常で執着や他者への態度がどう現れるかを問い続ける姿勢が、道の途中にいるという自覚を支えます。",
+    "form": "究竟",
+    "en": "If calm lasts only while sitting and anger returns upon standing, the work of practice remains unfinished. Seeking ultimate awakening in Buddhism aims at completion carried through to the end, beyond temporary tranquility. The more vivid an experience along the way, the stronger the temptation to mistake it for the destination. Continuing to examine attachment and treatment of others in everyday life, rather than counting pleasant sensations alone as achievement, supports awareness of still being on the path.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "「究竟の悟り」のように、最終的で徹底した完成を表す。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6b01be4faa-348be317",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-024.json",
+    "cardId": "nn-6b01be4faa-348be317",
+    "wordId": "nn-6b01be4faa"
+   }
+  },
+  {
+   "term": "空衣派",
+   "reading": "くうえは",
+   "pos": "noun",
+   "meaning": "Digambara Jain tradition",
+   "defJa": "衣服も所有しない男性修行者を理想とする一派",
+   "passage": {
+    "ja": "何も所有しないという誓いを、身に着ける布にまで徹底したらどうなるでしょうか。ジャイナ教の空衣派では、衣服を持たない男性修行者が、所有への執着を離れる理想を示します。ただし、この姿を見て、女性の修行者や在家の信者も全員同じ生活をすると受け取るのは誤りです。共同体の中には異なる立場があり、同じ教えを支えるにしても実践の形は一様ではなく、目立つ外見だけで信仰に関わる人々の暮らし全体を決め付けることはできません。",
+    "form": "空衣派",
+    "en": "What happens when a vow to possess nothing extends even to the cloth one wears? In the Digambara Jain tradition, unclothed male ascetics embody the ideal of relinquishing attachment to possessions. It would be mistaken, however, to assume that female ascetics and lay followers all live the same way. The community contains different roles and forms of practice, so a striking appearance cannot define the lives of everyone associated with the faith.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "ジャイナ教の一派で、衣服を所有しない男性修行者を理想とする。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-82fadd5be4-8e2177d0",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-new-001.json",
+    "cardId": "nn-82fadd5be4-8e2177d0",
+    "wordId": "nn-82fadd5be4"
+   }
+  },
+  {
+   "term": "老師",
+   "reading": "ろうし",
+   "pos": "noun",
+   "meaning": "venerable Zen teacher",
+   "defJa": "禅の修行を導く師への敬称",
+   "passage": {
+    "ja": "坐禅の姿勢を整えても、修行が自分の思い込みだけで進んでしまうことはあります。禅の場で老師と呼ばれる師は、弟子を導く相手として敬われ、修行の上で生じる問いを受け止めます。その呼称は単に年齢が高い人を指すのではなく、教えを受ける関係の中での敬意を含みます。ただし、師への信頼があるからといって、自分で確かめる働きまで手放す必要はなく、問いを抱えたまま向き合う弟子の真剣さも、教えを受け継ぐ場を成り立たせる要素です。",
+    "form": "老師",
+    "en": "Even with a proper sitting posture, practice can proceed solely through personal assumptions. A teacher addressed as roshi in Zen is respected as a guide who receives questions arising in practice. The title conveys respect within a teaching relationship rather than simply denoting an elderly person. Trust in a teacher need not mean abandoning personal verification, and the student's seriousness in approaching with unresolved questions also helps sustain the transmission of teaching.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "禅の修行を導く師への敬称で、単なる高齢者の呼び名ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a4ddeda7d1-780ddb66",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-025.json",
+    "cardId": "nn-a4ddeda7d1-780ddb66",
+    "wordId": "nn-a4ddeda7d1"
+   }
+  },
+  {
+   "term": "自他不二",
+   "reading": "じたふに",
+   "pos": "noun",
+   "meaning": "nonduality of self and others",
+   "defJa": "自己と他者を根本で切り離さない見方",
+   "passage": {
+    "ja": "人を助けたつもりが、後になって自分のほうも支えられていたと気付くことがある。仏教の自他不二という見方は、自己と他者を、根本から切り離された二つの実体として固定しない。他人の痛みに無関心でいられないことには、生活が互いの働きに支えられているという事実も関わっている。ただし、相手とつながっているからといって、その人の意思を自分の意思に置き換えてよいのではなく、関係を認めることは、相手の声を聴く責任をむしろ深める。",
+    "form": "自他不二",
+    "en": "One may help someone and later realize that one was also supported in return. The Buddhist view of the nonduality of self and other does not fix them as two fundamentally separate entities. The fact that lives depend on one another's activity also relates to being unable to remain indifferent to another's pain. Connection does not permit substituting one's own will for theirs, however, and recognizing the relationship deepens the responsibility to listen to their voice.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "自分と他人を根本で切り離さない見方で、相手の意思を無視する意味ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6a2db8b67d-5298c076",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-026.json",
+    "cardId": "nn-6a2db8b67d-5298c076",
+    "wordId": "nn-6a2db8b67d"
+   }
+  },
+  {
+   "term": "苦",
+   "reading": "く",
+   "pos": "noun",
+   "meaning": "suffering; pain (Buddhist duhkha)",
+   "defJa": "心や体の痛み、満たされない状態",
+   "passage": {
+    "ja": "待ち望んだ再会が実現しても、別れの時刻が近づけば喜びの中に寂しさが入り込む。仏教の苦は、身体の痛みだけでなく、求めるものを得られず、愛するものと離れざるを得ない状態なども含む。快い経験が存在することと、それをいつまでも保てることは別である。四諦では、この満たされなさを認めたうえで、その原因と止息、止息へ向かう道を問うため、最初の診断は世界を悲観して終わる宣言ではなく、実践へ向かう出発点となっている。",
+    "form": "苦",
+    "en": "Even a long-awaited reunion brings sadness into its joy as departure approaches. Buddhist suffering includes not only physical pain but also failing to obtain what is wanted and being forced to part from what is loved. Pleasant experiences exist, but that does not mean they can be preserved forever. The Four Noble Truths acknowledge this dissatisfaction and address its origin, cessation, and the path to cessation, making the initial diagnosis a starting point for practice rather than a final declaration of pessimism.",
+    "register": "報",
+    "topic": "india",
+    "tipJa": "仏教では痛みだけでなく、思いどおりにならず満たされないあり方も含む。",
+    "sense": "ここでは仏教の根本概念。一般には辛さ全般を指す。"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "glm-5.3:cloud",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-1d9de78d51-baf26bb1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-001.json",
+    "cardId": "nn-1d9de78d51-baf26bb1",
+    "wordId": "nn-1d9de78d51"
+   }
+  },
+  {
+   "term": "華厳経",
+   "reading": "けごんきょう",
+   "pos": "noun",
+   "meaning": "the Avatamsaka Sutra",
+   "defJa": "あらゆる存在の関わりを説く大乗の経典",
+   "passage": {
+    "ja": "奈良の大仏を見上げるとき、その大きさだけでなく、どんな世界を表す仏なのかも気になってきます。東大寺が根本とする華厳経は、広大な仏の世界と、菩薩たちの実践を展開する大乗の経典です。大仏は盧舎那仏であり、像の造形と寺の教えには深いつながりがあります。巨大な像を造るには多くの人の働きが必要だったことに加えて、その背景には、個々の存在を広い関係の中で捉える宗教的な世界観があり、寺という場所に形を与えています。",
+    "form": "華厳経",
+    "en": "Looking up at Nara's Great Buddha invites curiosity not only about its size but also about the world it represents. The Avatamsaka Sutra, foundational to Todaiji, is a Mahayana scripture presenting a vast Buddhist realm and the practices of bodhisattvas. The Great Buddha represents Vairocana, with a close connection between the image's form and the temple's teaching. Alongside the many people's efforts required to construct the huge statue lies a religious worldview of individual beings within broad relationships, giving form to the temple as a place.",
+    "register": "講",
+    "topic": "india",
+    "tipJa": "東大寺が根本とする大乗経典で、大仏の背景にある世界観とも結び付く。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-934c031e5f-9679736f",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-027.json",
+    "cardId": "nn-934c031e5f-9679736f",
+    "wordId": "nn-934c031e5f"
+   }
+  }
+ ]
+}

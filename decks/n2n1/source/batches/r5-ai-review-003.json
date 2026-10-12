@@ -1,0 +1,192 @@
+{
+ "batch": "r5-ai-review-003",
+ "items": [
+  {
+   "term": "莫大",
+   "reading": "ばくだい",
+   "gloss": "enormous",
+   "level": "N1",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "国策",
+   "reading": "こくさく",
+   "gloss": "national policy",
+   "level": "N1",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "linked": true,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "報",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "補助金",
+   "reading": "ほじょきん",
+   "gloss": "subsidy",
+   "level": "N1",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "設計者と利用者の違う見方を重ねる",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "躍進",
+   "reading": "やくしん",
+   "gloss": "rapid advance",
+   "level": "N1",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "講",
+   "preferTopic": "ai",
+   "angle": "一見便利な選択の費用と見落としを考える",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "頭打ち",
+   "reading": "あたまうち",
+   "gloss": "leveling off, peaking",
+   "level": "N1",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "priority": 4,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "二つの似た概念を具体例で区別する",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "EUV露光",
+   "reading": "いーゆーぶいろこう",
+   "gloss": "EUV lithography",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "身近な失敗例から条件を切り分ける",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "シリコンの盾",
+   "reading": "しりこんのたて",
+   "gloss": "\"silicon shield\" (Taiwan's chip leverage)",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "学",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation.",
+   "factGuard": "A debated geopolitical metaphor, not a guarantee: reliance on Taiwan chips may raise conflict costs, but does not prove war impossible. Avoid any forecast or invented numeric market share."
+  },
+  {
+   "term": "アルゴリズム",
+   "reading": "あるごりずむ",
+   "gloss": "algorithm",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "話",
+   "preferTopic": "ai",
+   "angle": "現場の意思決定を一場面だけ描く",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  },
+  {
+   "term": "探索と活用",
+   "reading": "たんさくとかつよう",
+   "gloss": "explore vs exploit",
+   "level": "N1+",
+   "field": "ai",
+   "sources": [
+    "S3"
+   ],
+   "pastTests": 0,
+   "seed": true,
+   "priority": 3,
+   "deck": "senmon",
+   "register": "論",
+   "preferTopic": "ai",
+   "angle": "同じ数字を別の観点から読む",
+   "endingGuard": "Never finish with る必要がある、みてください、ほかならない、すくなります、かもしれない、見えてきます、ているのです. Conclude with a fresh concrete action or observation."
+  }
+ ],
+ "weave": [],
+ "reviewOf": {
+  "莫大": "decks/n2n1/source/cards/senmon-p1-r5-ai-001.json",
+  "国策": "decks/n2n1/source/cards/senmon-p1-r5-ai-001.json",
+  "補助金": "decks/n2n1/source/cards/senmon-p1-r5-ai-002.json",
+  "躍進": "decks/n2n1/source/cards/senmon-p1-r5-ai-002.json",
+  "頭打ち": "decks/n2n1/source/cards/senmon-p1-r5-ai-003.json",
+  "EUV露光": "decks/n2n1/source/cards/senmon-p1-r5-ai-004.json",
+  "シリコンの盾": "decks/n2n1/source/cards/senmon-p1-r5-ai-004.json",
+  "アルゴリズム": "decks/n2n1/source/cards/senmon-p1-r5-ai-004.json",
+  "探索と活用": "decks/n2n1/source/cards/senmon-p1-r5-ai-005.json"
+ },
+ "note": "One editorial rewrite of initial-passed new cards; substantive fact and framing corrections.",
+ "administrativeRelabel": {
+  "step": "administrative_relabel",
+  "from": "r5-ai-review-002",
+  "to": "r5-ai-review-003",
+  "reason": "Distinct nine-card factual review accidentally reused root seven-card variety review batch name. Both exact input/result sets retained; no target resubmitted during recovery. Root seven-card review002 restored byte-for-byte from committed HEAD. Nine-card review receives unused003 identity.",
+  "sourceJournalSha256": "9179750d892ba831dd59db90eb35f94861a1fc77f2d2cc273d32b3aa1dec0364",
+  "snapshot": "/Users/dhyana/.dharma/bunki_review/2026-10-10/r5-fields/review-name-collision/final-nine",
+  "sourceHashes": {
+   "decks/n2n1/source/batches/r5-ai-review-002.json": "3b7a1cd7f11cbf3586ba569770848d67593ad42537e4e50e65ebc28c5c7948eb",
+   "decks/n2n1/source/drafts/r5-ai-review-002-rewrite.json": "a744a1d5edda0d8b429d3a366d7b31112ed819606a7042e80f6c0753780aa48f",
+   "decks/n2n1/source/drafts/r5-ai-review-002-fix.json": "2583182833ea1b0b0cb653d0a5f22fedf7d78a4facf177f6db70ce78b85498ce",
+   "decks/n2n1/source/cards/senmon-p1-r5-ai-review-002-r.json": "0b57542b00a1319627d8472db54cd67120ab5e5d1e908f1b44cd396c83435d32",
+   "decks/n2n1/source/journal/r5-ai-review-002.jsonl": "9179750d892ba831dd59db90eb35f94861a1fc77f2d2cc273d32b3aa1dec0364"
+  }
+ }
+}

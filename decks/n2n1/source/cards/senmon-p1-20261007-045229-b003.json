@@ -1,0 +1,180 @@
+{
+  "cards": [
+    {
+      "term": "是正",
+      "reading": "ぜせい",
+      "pos": "noun",
+      "meaning": "correction, redress (of something wrong)",
+      "defJa": "偏りや間違いを正しく直すこと",
+      "passage": {
+        "ja": "半導体不足で世界中の工場が困った、というのはみなさん記憶に新しいですよね。実はこの騒動で浮き彫りになったのが、特定の地域に生産が集中するリスクでした。生産が一極に集中していると、災害や紛争の影響を一気に受けてしまうんですね。そこで各国は補助金を出して国内工場を誘致し、供給の偏りを是正しようとしているんです。偏りを正してバランスを取り戻す、これが今の産業政策の核心というわけです。",
+        "form": "是正",
+        "en": "The semiconductor shortage that left factories around the world scrambling is still fresh in everyone's memory. What that turmoil exposed was the risk of concentrating production in one particular region. When production is clustered in a single place, the impact of a disaster or conflict hits all at once. So countries are now offering subsidies to attract domestic fabs, trying to correct this imbalance in supply. Restoring balance by fixing the skew — that is the heart of today's industrial policy.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "「格差を是正」「不均衡を是正」など、偏りを正す硬い語。報道や政策論で好んで使われる。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "格差",
+      "reading": "かくさ",
+      "pos": "noun",
+      "meaning": "disparity, gap (e.g., rich–poor, regional)",
+      "defJa": "二つのものの間にできる開き",
+      "passage": {
+        "ja": "産業革命というと「人類を豊かにした転換点」と語られがちですけど、裏面を見落としてはいけないんですね。機械のおかげで富は爆発的に増えた、しかし分配はごく一部の資本家に偏りました。労働者は長時間働いても取り分はわずかで、貧富の格差はむしろ拡大していったんです。豊かさの総量が増えることと、それが行き渡ることは、そもそも別の話なんですね。人類はこの二つを混同した代償を、さんざん払わされてきたというわけです。",
+        "form": "格差",
+        "en": "When we talk about the Industrial Revolution, we tend to frame it as 'the turning point that enriched humanity,' but we mustn't overlook its flip side. Thanks to machines, wealth exploded — but its distribution was skewed toward a small group of capitalists. Workers toiled long hours for a meager share, and the gap between rich and poor actually widened. The total amount of prosperity growing and that prosperity reaching everyone are, at bottom, two different things. Humanity has paid dearly, time and again, for confusing the two.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「貧富の格差」「格差が広がる」が定番。差が開く意味で、報道でも講義でも頻出する語。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "概念",
+      "reading": "がいねん",
+      "pos": "noun",
+      "meaning": "concept, abstract idea",
+      "defJa": "物事を抽象的にとらえた考え",
+      "passage": {
+        "ja": "日本語の文法を考えるとき、「主語」という言葉を使うと、かえって混乱が起きることがあるんですよ。たとえば「象は鼻が長い」、この「は」は主語を示しているわけではないんですね。そこで言語学者の中には、主語という概念そのものが英語文法の鋳型だ、と疑う人も出てきたわけです。外来の枠組みをそのまま当てはめると、目の前の日本語が見えなくなってしまうんです。まず現象をそのまま観察する、これが言語学の基本スタンスというわけです。",
+        "form": "概念",
+        "en": "When thinking about Japanese grammar, using the word 'subject' can actually cause confusion. Take 'The elephant has a long nose': the 'wa' here is not marking a subject. That is why some linguists came to suspect that the very concept of the subject is a mold taken from English grammar. When you force a borrowed framework onto it, the Japanese right in front of you becomes invisible. Observe the phenomenon as it is, first — that is the basic stance of linguistics.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "「〜という概念」の形でよく現れる。抽象的な考えのまとまりを指す、やや硬い語。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "断言",
+      "reading": "だんげん",
+      "pos": "verb",
+      "meaning": "flat assertion; declaring with certainty",
+      "defJa": "迷いを見せず、はっきり言い切ること。",
+      "passage": {
+        "ja": "日本語は曖昧な言語だ、という指摘をよく耳にします。確かに「たぶん」「〜かもしれません」といった、ものごとを言い切らない表現が好まれるのは事実です。ただ、あれは曖昧さではなく、相手の顔色をうかがう配慮の表れだと私は思います。むしろ問題なのは、その癖が染みついて、肝心な場面でも言い切れなくなることです。会議で誰一人として断言しなければ、決断はずるずると先送りされるばかりです。",
+        "form": "断言",
+        "en": "You often hear the claim that Japanese is an ambiguous language. It's true that expressions that hedge — 'tabun' (probably), '~kamo shiremasen' (it might) — tend to be favored. But I think that's not vagueness; it's consideration showing through, a way of reading the other person's face. The real problem, rather, is when that habit becomes so ingrained that you can't state things flatly even when it really counts. If not a single person in a meeting will flatly assert anything, decisions just get dragged out and postponed.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "言い切らない文化の話の中で使われ、「誰も断言しない」のように打消しと結びつきやすい。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "欠陥",
+      "reading": "けっかん",
+      "pos": "noun",
+      "meaning": "defect; flaw in a product or system",
+      "defJa": "製品や仕組みに含まれる、品質を損なう不具合。",
+      "passage": {
+        "ja": "半導体製造では、歩留まりという指標が生命線になります。一枚のウェハーから何百、何千ものチップが切り出され、そのうち正常に動くものの割合を指すからです。ところが製造過程では、目に見えないほど小さなゴミや傷が必ずどこかに混入します。この欠陥を含んだチップは動かなくなり、歩留まりが下がります。ですから各社は、ゴミの混入を防ぐだけでなく、一部が壊れても全体は動き続ける回路の設計にも必死なのです。",
+        "form": "欠陥",
+        "en": "In semiconductor manufacturing, the metric known as yield is the industry's lifeline. That's because a single wafer is cut into hundreds or thousands of chips, and the figure refers to the share of them that work properly. During production, however, dust and scratches far too small to see inevitably get in somewhere. A chip containing such a defect no longer works, and the yield drops. That's why companies work desperately not only to keep out contaminants, but also to design circuits that keep running even when one part fails.",
+        "register": "講",
+        "topic": "ai",
+        "tipJa": "品質の話では「欠陥を含む」「欠陥が見つかる」のように検出・含有と結び、歩留まり低下の原因として語られる。",
+        "sense": ""
+      },
+      "deck": "senmon",
+      "field": "ai",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "独裁",
+      "reading": "どくさい",
+      "pos": "noun",
+      "meaning": "dictatorship; absolute rule by one person",
+      "defJa": "一人の人間が国の権力をすべて握って政治を行うこと。",
+      "passage": {
+        "ja": "古代ローマには、独裁という制度が実際に存在しました。強敵の襲来といった国家の危機のときだけ、通常の政治を止めて、一人に全権を任せる仕組みです。任期は最長六か月と決められていて、任務が終われば権力を手放すのがルールでした。ところがカエサルは、内戦に勝利した後、この地位を終身のものにしてしまいます。危機のために用意されたはずの権力への固執が、共和政ローマを内側から崩したのです。",
+        "form": "独裁",
+        "en": "In ancient Rome, a system called dictatorship actually existed. Only in a national crisis, such as an invasion by a powerful enemy, would ordinary politics be suspended and full authority entrusted to one man. The term of office was fixed at six months at most, and the rule was that once the mission was done, the power was relinquished. Caesar, however, after winning the civil war, turned this office into a lifelong one. It was clinging to a power that was supposed to exist only for emergencies that destroyed the Roman Republic from within.",
+        "register": "講",
+        "topic": "history",
+        "tipJa": "「独裁という制度」のように支配の仕組みを指す語。ローマ史では期限つきの危機対応制度としても語られる。",
+        "sense": "一人が権力を独占する支配の語義"
+      },
+      "deck": "senmon",
+      "field": "history",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "皮肉",
+      "reading": "ひにく",
+      "pos": "na-adj",
+      "meaning": "irony; sarcastic remark",
+      "defJa": "結果が予想と逆になり、運命をあざけっているようなさま。",
+      "passage": {
+        "ja": "日本語には未来時制がありません。明日のことも、現在形のまま「行く」「食べる」と言えてしまいます。その代わり、話し手は「つもり」「予定」「だろう」などの表現を選んで、実現の確かさを自分で示すことになります。同じ未来でも、固い約束なのか、単なる希望なのか、推測なのかを、いちいち言葉で区別するわけです。皮肉なことに、曖昧だと言われ続けてきた言語のほうが、未来についての確信の度合いを細かく表現し分けているのです。",
+        "form": "皮肉",
+        "en": "Japanese has no future tense. Even talk of tomorrow can be handled in the non-past form, as in 'iku' (go) or 'taberu' (eat). In exchange, the speaker ends up choosing among expressions like 'tsumori' (intend to), 'yotei' (scheduled to), or 'darou' (probably) to indicate how certain the event is. The same future has to be marked, word by word, as a firm promise, a mere hope, or a guess. Ironically, it is precisely the language that has kept being called vague that distinguishes degrees of confidence about the future in such fine detail.",
+        "register": "講",
+        "topic": "language",
+        "tipJa": "「皮肉なことに」は結果が予想と逆になる場面で使う定型表現。あてこすりの意味と区別しよう。",
+        "sense": "あてこすりではなく、結果が裏返る語義で使用"
+      },
+      "deck": "senmon",
+      "field": "language",
+      "level": "N2",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    },
+    {
+      "term": "種子",
+      "reading": "しゅし",
+      "pos": "noun",
+      "meaning": "seed; karmic imprint stored in the mind",
+      "defJa": "行為の結果として心に残り、後の経験を生み出すもととなるもの。",
+      "passage": {
+        "ja": "唯識という仏教思想では、心の最も奥に阿頼耶識という層があると説かれます。そこには、日々の行為が残した印象が種子として貯えられると考えます。善い行いも悪しき行いも、すべて何らかの形でそこに記録され、やがて芽を出して、私たちの経験や性格として現れるというわけです。つまり、今の行動が見えない場所に未来の自分をつくる材料を埋めていることになります。この教えによれば、運命は外から与えられるものではなく、自分の行為の積み重ねが実った結果なのです。",
+        "form": "種子",
+        "en": "In the Buddhist school of thought called Yuishiki (Yogacara), there is said to be a layer of mind at the very depths, called the araya consciousness. There, the impressions left by our daily actions are held to be stored as seeds. Good deeds and bad deeds alike are all recorded there in some form, and in time they sprout, appearing as our experiences and our character. In other words, your actions at this very moment are burying, in an unseen place, the material that will make your future self. According to this teaching, fate is not something bestowed from outside; it is the fruit borne by the accumulation of your own actions.",
+        "register": "講",
+        "topic": "india",
+        "tipJa": "唯識では「種子が貯えられる」「種子が芽を出す」のように、行為の印象を植物にたとえて語る。",
+        "sense": "植物の意味ではなく、唯識で業の印象を指す語義"
+      },
+      "deck": "senmon",
+      "field": "india",
+      "level": "N1",
+      "pass": 1,
+      "writer": "glm-5.3:cloud",
+      "judge": "deepseek-v4-pro:cloud"
+    }
+  ]
+}

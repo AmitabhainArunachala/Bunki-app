@@ -1,0 +1,36 @@
+{
+  "cards": [
+    {
+      "term": "五蘊",
+      "reading": "ごうん",
+      "pos": "noun",
+      "meaning": "the five aggregates (skandhas)",
+      "defJa": "人の存在を成り立たせる五つの要素",
+      "passage": {
+        "ja": "「人間は五つの部品からできている」と書くと、取り外せる物を組み立てた機械のように聞こえます。仏教の五蘊を説明するなら、身体に関わる色と、受、想、行、識という心の働きの区分を示し、人を固定した一つの実体と見ないための分析だと補えます。感じること、対象を捉えること、働きかけることなどは、日々の体験の中では重なって生じています。分類の名前を並べるだけで終わらず、たとえば同じ音を聞いても反応が変わる場面を添えると、区分する目的も読み手に伝わります。",
+        "form": "五蘊",
+        "en": "Saying humans consist of five parts can evoke a machine assembled from removable components. Explaining the five aggregates means identifying form and the mental categories of feeling, perception, formations, and consciousness as an analysis challenging a fixed self. These processes overlap in experience rather than occurring as isolated objects. An example of changing reactions to the same sound helps explain the purpose of the classification.",
+        "register": "語",
+        "topic": "india",
+        "tipJa": "分類名だけでなく、固定した自己を分析するという目的を示す。",
+        "sense": ""
+      }
+    },
+    {
+      "term": "仏教伝来",
+      "reading": "ぶっきょうでんらい",
+      "pos": "noun",
+      "meaning": "the arrival of Buddhism in Japan",
+      "defJa": "日本へ仏教が伝えられたこと",
+      "passage": {
+        "ja": "日本に仏教が来た年を一つ覚えても、その前後に人や物がどう動いたかは残ります。仏教伝来を学ぶ際は、六世紀に百済から朝廷へ仏像や経典が届けられたとされる公的な出来事と、それ以前からの人々の往来を分けて考えましょう。年について複数の説があることも、単なる暗記の邪魔ではなく、史料によって記述が異なると知る機会になります。受け入れた側で誰が信仰し、どのような寺が造られたかまで追うと、文化は届いた瞬間に完成するのではなく、そこから根を下ろしていくことが分かります。",
+        "form": "仏教伝来",
+        "en": "Memorizing a year for Buddhism’s arrival in Japan leaves questions about earlier and later exchanges. Study should distinguish the traditionally described sixth-century official presentation of images and scriptures from Baekje from other movements of people. Competing dates provide an opportunity to understand differences among historical sources. Following supporters and temple construction shows how a transmitted culture continues taking root after arrival.",
+        "register": "学",
+        "topic": "india",
+        "tipJa": "「仏教伝来の年代」。公的な伝来と、それを支えた往来を区別する。",
+        "sense": ""
+      }
+    }
+  ]
+}

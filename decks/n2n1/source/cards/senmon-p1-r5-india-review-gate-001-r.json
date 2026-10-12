@@ -1,0 +1,48 @@
+{
+ "cards": [
+  {
+   "term": "虚無",
+   "reading": "きょむ",
+   "pos": "noun",
+   "meaning": "nothingness, nihility",
+   "defJa": "何もなく、空っぽであること",
+   "passage": {
+    "ja": "枯山水の庭って、白い砂を丹念にならした面に石が数個載っているだけで、遠くから見ると何もないように見えるじゃないですか。砂の紋様は水を、石は島を表すとされるから、あの空白はただの虚無ではなく、見る人の心が自由に描き込む余地なんですよね。仏教でいう空も同じで、単なる無ではなく、ものが縁起で成り立つことを静かに見渡す知恵の側なんです。何も置いていないだけに、一つ一つの石の存在感がかえって際立つわけで、禅寺の庭は本当にうまくできています。",
+    "form": "虚無",
+    "en": "A dry-landscape garden, with just a few stones set on a surface of carefully raked white sand, looks from a distance like nothing at all, doesn't it? Since the raked patterns are said to stand for water and the stones for islands, that blank space is not mere nothingness; it is room for the viewer's mind to paint freely. The emptiness of Buddhism is the same: not mere nothing, but the wisdom that quietly surveys how things come into being through dependent arising. Precisely because nothing has been placed there, the presence of each individual stone stands out all the more; the gardens of Zen temples are truly well made.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "「ただの虚無ではなく」のように単なる無を指し、仏教の「空」と対比される場面が多い",
+    "sense": "何も存在しない空虚な状態"
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  },
+  {
+   "term": "裸形",
+   "reading": "らぎょう",
+   "pos": "noun",
+   "meaning": "nakedness; unclothed form",
+   "defJa": "衣服を身に着けない姿",
+   "passage": {
+    "ja": "服を着ないことが、どうして修行になるのかって、写真だけだと分かりにくいよね。ジャイナ教の空衣派で裸形のまま修行する男性の出家者は、衣服まで手放す姿に、何も所有しないという理想を表しているんだ。だから、珍しい格好として眺めるだけだと、執着を離れようとする教えとのつながりを取り逃がしてしまう。とはいえ、宗派の信者なら誰もがそうするという話ではなく、家庭を持って暮らす人と、生活を丸ごと修行に向ける人とでは、引き受ける誓いが違うんだよ。",
+    "form": "裸形",
+    "en": "It is hard to understand from a photograph alone why going without clothes would count as religious practice. Male renunciants practicing naked asceticism in the Digambara Jain tradition express the ideal of owning nothing by giving up even clothing. Looking at it merely as an unusual appearance misses its connection with the teaching of releasing attachment. Yet this is not something every follower does, since householders and people who devote their entire lives to practice undertake different vows.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "ここでは出家者の姿を指し、所有を離れる誓いと結び付けている。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud"
+  }
+ ]
+}

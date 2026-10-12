@@ -1,0 +1,116 @@
+{
+ "cards": [
+  {
+   "term": "規模の経済",
+   "reading": "きぼのけいざい",
+   "pos": "noun",
+   "meaning": "economies of scale",
+   "defJa": "生産規模が大きくなると平均費用が下がること",
+   "passage": {
+    "ja": "同じ型の部品を十個だけ作る場合、金型を準備する費用が一個当たりの値段を大きく押し上げます。注文が増えて千個作れるなら、その固定費を多くの製品へ分けられ、規模の経済が働きます。ただし、生産量を増やすにつれて管理の手間や保管場所も必要になるので、大きくするほど際限なく安くなるという話ではありません。工場を拡張する判断には、機械の速さだけでなく、増やした製品を売り切れる需要があるかという見通しも関わります。",
+    "form": "規模の経済",
+    "en": "When making only ten identical parts, the cost of preparing a mold drives up the price per unit substantially. If orders increase enough to make a thousand, that fixed cost can be spread across more products, creating economies of scale. Increasing output also requires more management and storage, however, so expansion does not reduce costs without limit. Decisions to expand a factory therefore involve not only machine speed but also whether demand will absorb the additional products.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "生産規模の拡大に伴って平均費用が下がること。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-bc2c278c89-0fdd76d4",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-030.json",
+    "cardId": "nn-bc2c278c89-0fdd76d4",
+    "wordId": "nn-bc2c278c89"
+   }
+  },
+  {
+   "term": "起死回生",
+   "reading": "きしかいせい",
+   "pos": "noun",
+   "meaning": "dramatic revival",
+   "defJa": "絶望的な状況から立ち直ること",
+   "passage": {
+    "ja": "資金が底をつきかけた架空の会社が、最後に残った加工技術を医療機器の部品へ転用したとします。経営者はこの起死回生の一手に賭け、試験を重ねた末に大口の契約を得て、倒産を免れました。受注まで費用を抑え続けた担当者や、顧客の厳しい条件に工程を合わせた技術者が、一つの契約を支えていました。新しい用途への転換は一度のひらめきから始まるとしても、それを危機からの脱出につなげるには、限られた現金と人手をどこへ振り向けるかという判断が欠かせません。",
+    "form": "起死回生",
+    "en": "Suppose a fictional company running out of funds applies its last remaining machining technology to medical-device components. Its managers stake the company’s recovery on this last-ditch move and win a major contract after repeated testing, avoiding bankruptcy. That single contract rests on staff who kept spending down until orders arrived and engineers who adapted processes to the customer’s demanding requirements. Even if a shift to a new application begins with one flash of inspiration, turning it into an escape from crisis requires decisions about where to direct limited cash and personnel.",
+    "register": "講",
+    "topic": "other",
+    "tipJa": "「起死回生の一手」は、絶望的な局面を覆す決定的な手段。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-89b9081580-569ccce1",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-031.json",
+    "cardId": "nn-89b9081580-569ccce1",
+    "wordId": "nn-89b9081580"
+   }
+  },
+  {
+   "term": "マーヤー",
+   "reading": "まーやー",
+   "pos": "noun",
+   "meaning": "māyā, cosmic illusion",
+   "defJa": "世界の多様な現れやそれを実在と誤る力を指す語",
+   "passage": {
+    "ja": "薄暗い道で縄を蛇だと思ったら、本当に怖くなるけど、明かりを当てても蛇の死体は残らないよね。見間違いが解けただけで、初めから縄だったんだ。アドヴァイタでマーヤーを考えるときにも、現れを独立した実在として受け取ることと、その土台を知ることの違いが問題になる。ただし、このたとえだからといって日々の痛みや責任を全部無視してよいとはならず、経験の世界で生きることと、究極的に何が実在するかという問いは区別されるんだよ。",
+    "form": "マーヤー",
+    "en": "Mistaking a rope for a snake on a dark path can cause real fear, but shining a light leaves no dead snake. The mistake has simply cleared, and it was a rope all along. Considering maya in Advaita likewise raises the distinction between taking appearances as independently real and knowing their basis. This analogy does not permit ignoring everyday pain or responsibility, since living in the experienced world is distinguished from asking what is ultimately real.",
+    "register": "話",
+    "topic": "india",
+    "tipJa": "現れを独立した実在と受け取ることをめぐる、思想上の専門語。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-8a74fd44c3-e5445a7b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007.json",
+    "cardId": "nn-8a74fd44c3-e5445a7b",
+    "wordId": "nn-8a74fd44c3"
+   }
+  },
+  {
+   "term": "一元論",
+   "reading": "いちげんろん",
+   "pos": "noun",
+   "meaning": "monism",
+   "defJa": "世界の根本を一つの原理や実在に求める立場",
+   "passage": {
+    "ja": "世界には石があり、植物が育ち、考える人間がいるが、その根本まで互いに別物なのだろうか。一元論は、この多様さを認めながらも、究極には一つの原理や実在に基づくと考える立場である。アドヴァイタのように究極的実在を問う思想と、物質を根本とする立場とでは、何を一つと認めるかが異なる。見える違いを単に消してしまうのでなく、その違いがいかなる意味で成立するのかを問うところに、同じ「一つ」という答えを持つ思想の間にも深い隔たりが生まれる。",
+    "form": "一元論",
+    "en": "The world contains stones, plants, and thinking humans, but are they fundamentally separate kinds of reality? Monism acknowledges this diversity while holding that it ultimately rests on one principle or reality. Traditions such as Advaita that inquire into ultimate reality differ from materialist positions over what counts as that one basis. Asking how differences exist rather than simply erasing them creates deep divisions even among philosophies that share the answer one.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "世界の根本を一つとする立場で、何を根本とするかには違いがある。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-57e15a0394-c3f6745b",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-007-r.json",
+    "cardId": "nn-57e15a0394-c3f6745b",
+    "wordId": "nn-57e15a0394"
+   }
+  }
+ ]
+}

@@ -1,0 +1,144 @@
+{
+ "cards": [
+  {
+   "term": "アライメント",
+   "reading": "あらいめんと",
+   "pos": "noun",
+   "meaning": "alignment (AI)",
+   "defJa": "人工知能の振る舞いを人の意図や価値に合わせること",
+   "passage": {
+    "ja": "利用者が「この相談は秘密にして」と頼んだ直後、別の担当者が記録の提出を命じたとします。両方の指示に従えない場面で、誰の意図やどんな価値を優先するかは、アライメントの中心にある問題です。丁寧な返事さえできれば安全だと決めつけると、情報を渡す相手や、その結果受ける被害が見えなくなります。言葉の調子に加えて、実際に何を許可し、どこで判断を人に戻すのかまで定めて初めて、応答の評価に共通の足場ができます。",
+    "form": "アライメント",
+    "en": "Suppose a user asks for a consultation to remain confidential and another staff member immediately orders the record released. When both instructions cannot be followed, deciding whose intentions and which values take priority is a central problem in alignment. Assuming polite replies are sufficient for safety obscures who receives information and the harm that might follow. Only by specifying what actions are allowed and when decisions return to humans, alongside tone, can a shared basis for evaluating responses be established.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "返答の丁寧さだけでなく、行動を誰の意図や価値に合わせるかが焦点。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c91dba124b-ef98fe46",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-007.json",
+    "cardId": "nn-c91dba124b-ef98fe46",
+    "wordId": "nn-c91dba124b"
+   }
+  },
+  {
+   "term": "チップレット",
+   "reading": "ちっぷれっと",
+   "pos": "noun",
+   "meaning": "chiplet",
+   "defJa": "複数を組み合わせて使う小さな半導体の単位",
+   "passage": {
+    "ja": "大きな半導体を一枚で作る設計には、途中で欠陥が生じたときに使えなくなる範囲も大きいという難しさがあります。そこで小さなチップレットを組み合わせれば、検査済みの部分を選び、機能に応じて異なる製造技術を使えます。ただし、分割した部分の間では信号を受け渡すための回路や電力が必要になり、つなぎ方が性能を左右します。部品単体の歩留まりが良くても、組み立てに失敗すれば製品にならないため、製造と接続の両方を含めた設計が必要です。",
+    "form": "チップレット",
+    "en": "A difficulty with manufacturing one large semiconductor is that a defect can render a large area unusable. Combining small chiplets allows tested components to be selected and different manufacturing technologies to be used for different functions. However, transferring signals between the separate pieces requires circuits and power, making their connections important to performance. Even good component yields do not produce a usable product if assembly fails, so design must account for both fabrication and interconnection.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "小さく分けた半導体を接続し、全体の機能を構成する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-69ede98142-03b6baf7",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-69ede98142-03b6baf7",
+    "wordId": "nn-69ede98142"
+   }
+  },
+  {
+   "term": "トークン",
+   "reading": "とーくん",
+   "pos": "noun",
+   "meaning": "token",
+   "defJa": "文章などを処理のために分けた単位",
+   "passage": {
+    "ja": "翻訳の依頼欄に短い日本語を入れたのに、画面の使用量が文字数より大きくなる場合があります。言語モデルが数えるトークンは、入力を処理するために区切った単位であり、辞書の単語や一文字と必ず一致するものではありません。同じ表現でも区切り方は仕組みによって変わり、一つの語が細かく分かれることもあります。そのため、入力できる上限に近づいた場面では、見た目の短さを頼りに削るよりも、実際の区切りで残りの容量を確かめる必要があります。",
+    "form": "トークン",
+    "en": "Even a short Japanese translation request can produce a displayed usage count larger than its character count. The tokens counted by a language model are units into which input is divided for processing and do not necessarily match dictionary words or individual characters. Segmentation varies between systems even for the same expression, and one word may split into several pieces. Near an input limit, therefore, remaining capacity needs to be checked using actual segmentation rather than shortening text solely by its visible length.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "文字数や単語数とは一致しない処理上の単位。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-5be7ec4422-bbf6d34e",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-009.json",
+    "cardId": "nn-5be7ec4422-bbf6d34e",
+    "wordId": "nn-5be7ec4422"
+   }
+  },
+  {
+   "term": "ムーアの法則",
+   "reading": "むーあのほうそく",
+   "pos": "noun",
+   "meaning": "Moore's law",
+   "defJa": "集積される素子数が一定期間で倍増するとの経験則",
+   "passage": {
+    "ja": "同じ大きさのチップに多くの素子を詰め込めても、すべてを同時に動かせば熱が問題になります。ムーアの法則が捉えたのは、集積されるトランジスタの数が一定期間で倍増していく傾向であり、あらゆる計算の速さを保証する自然法則ではありません。回路が増えるに伴って、電力の配分やデータを運ぶ経路にも工夫が要ります。人数の多い教室でも入口が狭ければ一度には移動できないように、計算する部分を増やすだけでは解消できない制約が残ります。",
+    "form": "ムーアの法則",
+    "en": "Even when more devices fit onto a chip of the same size, running them all together can create heat problems. Moore's law described the tendency for integrated transistor counts to double over a certain period, rather than a natural law guaranteeing the speed of every computation. As circuits multiply, power allocation and data paths also require ingenuity. Just as a crowded classroom with a narrow entrance cannot empty all at once, adding computing units leaves some constraints unresolved.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "集積される素子数の経験則であり、処理速度そのものの保証ではない。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-6deb93ae43-bfcccd22",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-012.json",
+    "cardId": "nn-6deb93ae43-bfcccd22",
+    "wordId": "nn-6deb93ae43"
+   }
+  },
+  {
+   "term": "不純物添加",
+   "reading": "ふじゅんぶつてんか",
+   "pos": "noun",
+   "meaning": "semiconductor doping",
+   "defJa": "別の元素を少量加えて材料の性質を変えること",
+   "passage": {
+    "ja": "同じシリコンでも、加える元素によって電流の流れ方を変えることができます。半導体の不純物添加は、不要な汚れを混ぜる作業ではなく、電子や正孔を増やすために別の元素を量や場所を制御して入れる工程です。例えばリンとホウ素では、結晶中で電気の運び手を増やす仕方が異なります。わずかな量で性質が変わるだけに、偶然入り込んだ物質を取り除く清浄さと、必要な物質を狙いどおりに加える精密さの両方が、回路を作るために欠かせません。",
+    "form": "不純物添加",
+    "en": "The same silicon can conduct electricity differently depending on which elements are added. Semiconductor doping deliberately introduces controlled amounts of other elements at chosen locations to increase electrons or holes, rather than adding unwanted dirt. Phosphorus and boron, for example, increase charge carriers in different ways within the crystal. Because small quantities change its properties, making circuits requires both cleanliness to remove accidental contaminants and precision to introduce the intended substances.",
+    "register": "講",
+    "topic": "ai",
+    "tipJa": "汚染とは異なり、電気的性質を調整するために元素を加える工程。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "ai",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-c9ce878610-7bcb554a",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-ai-040.json",
+    "cardId": "nn-c9ce878610-7bcb554a",
+    "wordId": "nn-c9ce878610"
+   }
+  }
+ ]
+}

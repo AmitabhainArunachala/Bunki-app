@@ -1,0 +1,32 @@
+{
+ "cards": [
+  {
+   "term": "実相",
+   "reading": "じっそう",
+   "pos": "noun",
+   "meaning": "the true aspect of reality",
+   "defJa": "仏教で物事のありのままの真実の姿",
+   "passage": {
+    "ja": "咲いた花を美しいと感じても、その美しさだけで花のあり方をすべて捉えたことにはならない。仏教で実相を問うことは、好悪や思い込みを通して見た姿から離れ、物事の真実のあり方へ向き合うことである。例えば、花は土や水などの条件に支えられ、見る者がいつまでも咲いていてほしいと願っても変化していく。ありのままという言葉は単純に響くが、自分に都合のよい面だけを残そうとする心の働きを含めて問い直すなら、決して容易な課題ではない。",
+    "form": "実相",
+    "en": "Finding a blooming flower beautiful does not exhaust what that flower is. Asking about true reality in Buddhism means approaching things as they really are beyond appearances shaped by preferences and assumptions. A flower, for example, depends on conditions such as soil and water and changes even when a viewer wishes it would bloom forever. Being as it is sounds simple, but reconsidering the mind's tendency to preserve only favorable aspects makes it a demanding task.",
+    "register": "論",
+    "topic": "india",
+    "tipJa": "仏教で物事の真実のあり方を表す語。単なる外見とは区別する。",
+    "sense": ""
+   },
+   "deck": "senmon",
+   "field": "india",
+   "level": "N1+",
+   "pass": 1,
+   "writer": "codex-astra",
+   "judge": "deepseek-v4-pro:cloud",
+   "cardId": "nn-a3be153f80-c2148680",
+   "reviewOf": {
+    "source": "decks/n2n1/source/cards/senmon-p1-r5-india-review-gate-001-r.json",
+    "cardId": "nn-a3be153f80-c2148680",
+    "wordId": "nn-a3be153f80"
+   }
+  }
+ ]
+}

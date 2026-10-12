@@ -16,6 +16,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
+import { openShelfTools } from './shelf-tools-support.mjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
@@ -120,6 +121,7 @@ async function main() {
           decodedBodySize: entry.decodedBodySize,
         }))`);
 
+        await openShelfTools(page);
         for (let sample = 0; sample < DIAGNOSTIC_LOOKUP_RUNS; sample += 1) {
           const query = sample % 2 === 0 ? 'kaisai' : 'peninsula';
           const elapsed = await page.evaluate(async (value) => {

@@ -133,7 +133,11 @@ for (const engine of engines) for (const width of sizes) {
     });
     await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     const assets = await Promise.all(loadedAssets);
-    currentRuntime = assets.length === 3 && assets.every(asset => asset.matchesCandidate);
+    // A controlled reload may report a script again during worker revalidation.
+    // Require every expected resource and check every response, including repeats.
+    currentRuntime = ['corridor.js', 'sentence-practice.mjs', 'corridor.css']
+      .every(path => assets.some(asset => asset.path === path))
+      && assets.every(asset => asset.matchesCandidate);
     result.observations.push({ name: 'loaded-runtime-assets', episode, assets });
     console.log(JSON.stringify({ engine, width, episode, assets }));
     if (episode > 1 || !priorRoot) assert(currentRuntime, 'Every candidate episode must execute the identified script, module and style bytes');
@@ -224,7 +228,7 @@ for (const engine of engines) for (const width of sizes) {
       await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
       const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
       await item.locator('.shelf-open').click(); await page.locator('#reader .tok[data-index="9"][data-word="窓"]').click();
-      await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
+      await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
       await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
       await page.locator('#sentence-production-text').fill('  私の部屋の窓を開けます。\n e\u0301 🚀  ');
       await page.locator('#sentence-production-save').click(); await waitForAppRecord(page, r => r.sentencePractice.responses.length === 1);
@@ -248,7 +252,7 @@ for (const engine of engines) for (const width of sizes) {
     await suggestion('new-context').click(); await atToken(120, '駅で待つ時間');
     // the reader opens on the focused word; Enter opens its popup, whose last row practises the sentence (reader lane 2026-10-02)
     await page.keyboard.press('Enter'); await page.locator('#mini').waitFor();
-    await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
+    await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('later-choice-neutral')); await page.locator('#sentence-practice-confirm').click();
     await page.locator('#sentence-review-start').waitFor();
     const enrolled = await snapshot('later-explicit-practice');
@@ -319,7 +323,8 @@ for (const engine of engines) for (const width of sizes) {
     result.nextReading = await page.locator('.sentence-reading-choice h3').textContent();
     const nextId = await suggestion('new-context').getAttribute('data-reading-recommendation-id');
     await suggestion('new-context').click(); await page.locator('#reader-source-back').waitFor();
-    await page.locator('#reader-source-back').click(); unchanged(corrected, await snapshot('third-context-neutral'));
+    await page.locator('#reader-source-back').click(); await suggestion('new-context').waitFor();
+    unchanged(corrected, await snapshot('third-context-neutral'));
     await close(); await open(); await shelf(page); await suggestion('new-context').waitFor();
     assert.equal(await suggestion('new-context').getAttribute('data-reading-recommendation-id'), nextId);
     unchanged(corrected, await snapshot('restarted'));
@@ -363,6 +368,7 @@ for (const engine of engines) for (const width of sizes) {
     await shelf(page); await suggestion('new-context').waitFor();
     assert.equal(await suggestion('new-context').getAttribute('data-reading-recommendation-id'), nextId);
     await suggestion('new-context').click(); await page.locator('#reader-source-back').click();
+    await suggestion('new-context').waitFor();
     await close(); await open(); await shelf(page); await suggestion('new-context').waitFor();
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
     if (engine === 'webkit') disconnected = true; else await context.setOffline(true);
@@ -370,6 +376,9 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await suggestion('new-context').getAttribute('data-reading-recommendation-id'), nextId);
     await suggestion('new-context').click(); await page.locator('#reader-source-back').waitFor(); await shot('offline-later-source-and-caller');
     await page.locator('#reader-source-back').click();
+    // Back commits the reader position before it restores the caller. Observe
+    // that completed transition before comparing the entire persisted record.
+    await suggestion('new-context').waitFor();
     assert.deepEqual(await snapshot('restored-offline'), expectedRestored);
     assert.deepEqual(result.errors, []); assert.deepEqual(result.externalRequests, []);
     result.passed = true; result.observations.push({ name: 'later-context-and-feedback', sourceIds: [first.context.sourceId, second.context.sourceId],
