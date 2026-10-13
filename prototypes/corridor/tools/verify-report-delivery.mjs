@@ -52,9 +52,25 @@ const waitFor = async (predicate, timeout = 20_000) => {
 };
 const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { chromium, webkit };
 const checks = [];
+// In GitHub Actions a failed check is also an annotation, so the failure is
+// readable from the check run without downloading the job log.
+const annotate = (text) => {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  const escaped = text.slice(0, 900).replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
+  console.log(`::error title=report-delivery check failed::${escaped}`);
+};
 const check = (name, pass, detail = '') => {
   checks.push({ name, pass: !!pass, detail });
   console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? `  — ${detail}` : ''}`);
+  if (!pass) annotate(`${name}${detail ? ` — ${detail}` : ''}`);
+};
+// A scenario that throws is recorded as a failed check, and the next one still runs.
+const scenario = async (name, body) => {
+  try {
+    await body();
+  } catch (error) {
+    check(`${name} ran to completion`, false, String(error?.message || error).split('\n').slice(0, 3).join(' '));
+  }
 };
 
 async function openSheet(page, beforeProbe) {
@@ -106,7 +122,7 @@ try {
       };
 
       // 1–2 · one tap opens the prefilled issue and saves the same report
-      {
+      await scenario(`${engine} · prefilled issue`, async () => {
         const { context, page, errors } = await fresh();
         await openSheet(page);
         const note = await page.locator('#br-form > .br-note').last().textContent();
@@ -146,10 +162,10 @@ try {
         await page.screenshot({ path: join(out, `${engine}-sent.png`) });
         check(`${engine} · no console errors (sent)`, errors.length === 0, errors.join(' | '));
         await context.close();
-      }
+      });
 
       // 3 · long words are shortened to fit, with the full text kept on the device
-      {
+      await scenario(`${engine} · long report`, async () => {
         const { context, page, errors } = await fresh();
         await openSheet(page);
         const long = '長い説明の文章です。'.repeat(500);
@@ -165,10 +181,10 @@ try {
         check(`${engine} · the device keeps the full words`, row?.report.user_words === long, `${Array.from(row?.report.user_words || '').length} characters saved`);
         check(`${engine} · no console errors (long)`, errors.length === 0, errors.join(' | '));
         await context.close();
-      }
+      });
 
       // 4 · a blocked window still saves, and the link sends it (also covers older saved reports)
-      {
+      await scenario(`${engine} · blocked window`, async () => {
         // The service probe answers late here: until it confirms there is no service,
         // the sheet must not offer GitHub (a real service may still answer).
         const { context, page, errors } = await fresh({ blockWindows: true, probeDelayMs: 2500 });
@@ -197,9 +213,9 @@ try {
         check(`${engine} · My reports lists it as opened on GitHub`, listed === 'Opened on GitHub', listed);
         check(`${engine} · no console errors (blocked window)`, errors.length === 0, errors.join(' | '));
         await context.close();
-      }
+      });
       // 5 · the relay: one setup link, then reports go straight to GitHub
-      {
+      await scenario(`${engine} · relay`, async () => {
         github.state.issues.length = 0;
         github.state.comments.length = 0;
         const { context, page, errors } = await fresh({ blockWindows: true });
@@ -248,7 +264,7 @@ try {
         await page.screenshot({ path: join(out, `${engine}-relay.png`) });
         check(`${engine} · no console errors (relay)`, errors.length === 0, errors.join(' | '));
         await context.close();
-      }
+      });
     } finally {
       await browser.close();
     }
