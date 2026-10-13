@@ -244,6 +244,26 @@
       });
     }
     const putMeta = (key, value) => transact(['meta'], tx => tx.objectStore('meta').put({ key, value }));
+    // Some WebKit builds cannot store a Blob in IndexedDB (private browsing, and
+    // some iPhones). A screenshot is stored as its Blob where the browser accepts
+    // that, so earlier versions still read it; otherwise its bytes are stored.
+    const blobOf = item => item.blob || new Blob([item.bytes], { type: item.mime_type });
+    const liveDraft = value => Array.isArray(value?.attachments) && value.attachments.some(item => !item.blob && item.bytes)
+      ? { ...value, attachments: value.attachments.map(({ bytes, ...item }) => ({ ...item, blob: item.blob || new Blob([bytes], { type: item.mime_type }) })) }
+      : value;
+    async function asBytes(item) {
+      if (!item.blob) return item;
+      const { blob, ...rest } = item;
+      return { ...rest, bytes: await blob.arrayBuffer() };
+    }
+    // A write that fails while holding screenshots as Blobs runs once more with their bytes.
+    async function withBlobFallback(attachments, write) {
+      try { return await write(attachments); }
+      catch (error) {
+        if (!attachments.some(item => item.blob)) throw error;
+        return write(await Promise.all(attachments.map(asBytes)));
+      }
+    }
     function announce(value) { root.querySelector('#br-live').textContent = value; }
     function setMessage(value) { message = value; announce(value); const element = body.querySelector('.br-notice'); if (element) { element.textContent = value; element.hidden = !value; } if (closing) protectClosingDialog(); }
     const canQueueReview = () => typeof window.lavish?.queuePrompt === 'function';
@@ -322,12 +342,12 @@
       try { pointer = sessionStorage.getItem(`bunki-reports-editor:${metaKey(name)}`); } catch { /* Recovery remains available below. */ }
       const row = pointer ? await read('meta', `${metaKey(name)}:${pointer}`) : null;
       if (row?.value?.draft_id === pointer && Number.isSafeInteger(row.value.revision) && row.value.revision > 0) {
-        return { slot: { id: pointer, revision: row.value.revision }, value: row.value.draft, recovered: true };
+        return { slot: { id: pointer, revision: row.value.revision }, value: liveDraft(row.value.draft), recovered: true };
       }
       // Copy legacy slots without deleting them. Older clients and another tab
       // may still own the old key; migration must not erase their only copy.
       const legacy = await read('meta', metaKey(name));
-      return { slot: newSlot(), value: legacy?.value || fallback(), recovered: !!legacy?.value };
+      return { slot: newSlot(), value: legacy?.value ? liveDraft(legacy.value) : fallback(), recovered: !!legacy?.value };
     }
     async function savedSlots(name, current) {
       const prefix = `${metaKey(name)}:`;
@@ -347,7 +367,10 @@
       const write = async () => {
         const db = await dbPromise;
         let nextId = slot.id, nextRevision, forked = false;
-        await new Promise((resolve, reject) => {
+        const attachments = Array.isArray(snapshot?.attachments) ? snapshot.attachments : [];
+        await withBlobFallback(attachments, stored => new Promise((resolve, reject) => {
+          nextId = slot.id; forked = false;
+          const draftValue = attachments.length ? { ...snapshot, attachments: stored } : snapshot;
           const tx = db.transaction('meta', 'readwrite'), store = tx.objectStore('meta');
           tx.oncomplete = resolve;
           tx.onerror = tx.onabort = () => reject(tx.error || new Error('The draft could not be saved on this device.'));
@@ -358,9 +381,11 @@
               nextId = id('draft'); forked = true;
             }
             nextRevision = forked ? 1 : slot.revision + 1;
-            store.put({ key: `${metaKey(name)}:${nextId}`, value: { draft_id: nextId, revision: nextRevision, owner: documentOwner, draft: snapshot } });
+            // A refused value fails this save; it must not escape as an uncaught error.
+            try { store.put({ key: `${metaKey(name)}:${nextId}`, value: { draft_id: nextId, revision: nextRevision, owner: documentOwner, draft: draftValue } }); }
+            catch (error) { reject(error); try { tx.abort(); } catch { /* The transaction has already ended. */ } }
           };
-        });
+        }));
         slot.id = nextId; slot.revision = nextRevision;
         // A queued save for a prior editor must not replace the current pointer.
         if ((name === 'draft' && slot === draftSlot) || (name.startsWith('followup:') && followupSlots[name.slice(9)] === slot)) rememberSlot(name, slot);
@@ -396,7 +421,7 @@
         if (!row || (key !== metaKey(name) && !key.startsWith(prefix))) throw new Error('That draft is no longer available.');
         // Recovery gets its own identity; the source stays intact even if another
         // tab is still editing it or the browser restarts during the next save.
-        const slot = newSlot(), value = structuredClone(row.value?.draft_id ? row.value.draft : row.value);
+        const slot = newSlot(), value = liveDraft(structuredClone(row.value?.draft_id ? row.value.draft : row.value));
         if (name === 'draft') { draft = value; draftSlot = slot; draftDirty = true; draftCanAdoptBuild = false; }
         else { const reportId = name.slice(9); followups[reportId] = value; followupSlots[reportId] = slot; }
         await persistSlot(name, slot, value);
@@ -458,8 +483,8 @@
       const attachments = [];
       for (const attachmentId of report.attachment_ids) {
         const item = await read('attachments', attachmentId);
-        if (!item?.blob) throw new Error('A saved attachment is missing. The report was kept and has not been sent.');
-        attachments.push({ id: item.id, name: item.name, mime_type: item.mime_type, data_base64: await attachmentBase64(item.blob) });
+        if (!item?.blob && !item?.bytes) throw new Error('A saved attachment is missing. The report was kept and has not been sent.');
+        attachments.push({ id: item.id, name: item.name, mime_type: item.mime_type, data_base64: await attachmentBase64(blobOf(item)) });
       }
       const wire_text = canonical({ idempotency_key: row.idempotency_key, report, attachments });
       const frozen = { ...row, report, wire_text, wire_sha256: await digest(wire_text) };
@@ -612,15 +637,15 @@
         const submittedDraft = structuredClone(draft), submittedSlot = { ...draftSlot };
         const reportId = preset?.id || id('report'), report = buildReport(submittedDraft, reportId, preset?.created_at);
         const row = { id: reportId, idempotency_key: id('delivery'), service, created_at: report.created_at, report, view: null, delivery_error: '', ...(preset?.opened ? { github_opened_at: new Date().toISOString() } : {}) };
-        await transact(['records', 'attachments', 'meta'], tx => {
+        await withBlobFallback(submittedDraft.attachments, attachments => transact(['records', 'attachments', 'meta'], tx => {
           tx.objectStore('records').put(row);
-          for (const item of submittedDraft.attachments) tx.objectStore('attachments').put({ ...item, report_id: reportId });
+          for (const item of attachments) tx.objectStore('attachments').put({ ...item, report_id: reportId });
           const store = tx.objectStore('meta'), key = slotKey('draft', submittedSlot), request = store.get(key);
           request.onsuccess = () => {
             const saved = request.result?.value;
             if (saved?.owner === documentOwner && saved.revision === submittedSlot.revision) store.delete(key);
           };
-        });
+        }));
         draft = emptyDraft(); draftSlot = newSlot(); rememberSlot('draft', draftSlot); draftDirty = false;
         selectedId = reportId; active = 'detail';
         message = preset?.opened ? 'GitHub opened with this report filled in. Tap “Submit new issue” there to send it. A copy is saved here.'

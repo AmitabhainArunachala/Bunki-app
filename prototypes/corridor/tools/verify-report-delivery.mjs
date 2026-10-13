@@ -20,9 +20,11 @@
  *   9. a new report with a screenshot becomes a labelled issue, linked in the app,
  *      with the screenshot served by the relay;
  *  10. the fixer's comment and status appear in the app, and a reply from the app
- *      becomes an issue comment.
+ *      becomes an issue comment;
+ *  11. a browser that cannot store a Blob in IndexedDB still saves and files the
+ *      screenshot.
  */
-/* global document, window, indexedDB, navigator, location, fetch */
+/* global document, window, indexedDB, navigator, location, fetch, IDBObjectStore, Blob, DOMException */
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import console from 'node:console';
@@ -84,6 +86,10 @@ async function openSheet(page, beforeProbe) {
   // The sheet settles once the service probe has answered with the host's 404.
   await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send to GitHub', null, { timeout: 15_000 });
 }
+// What the sheet shows, for a failure message.
+const sheetState = (page) =>
+  page.evaluate(() => [document.querySelector('#br-title')?.textContent, document.querySelector('.br-body h3')?.textContent,
+    document.querySelector('.br-notice')?.textContent, document.querySelector('.br-error, [role="alert"]')?.textContent].filter(Boolean).join(' · ') || 'no sheet');
 const savedRows = (page) =>
   page.evaluate(() => new Promise((resolve, reject) => {
     const request = indexedDB.open('bunki-maintenance-reports-v1');
@@ -260,7 +266,8 @@ try {
         check(`${engine} · the report becomes a labelled issue, linked from the app`,
           received && !!filed && filed.labels.some((label) => label.name === 'kairo-report') && filed.body.includes('The tutor reply is cut off.') &&
             filed.body.includes(`- App: KAIRO ${version}`) && link === filed.html_url,
-          `${filed?.html_url} · app link ${link}`);
+          received ? `${filed?.html_url} · app link ${link}` : await sheetState(page));
+        if (!filed) throw new Error('No issue was filed for the report with a screenshot.');
         const shot = /\((http:\/\/127\.0\.0\.1:\d+\/v1\/shots\/shot_[a-f0-9]{32})\)/.exec(filed?.body || '')?.[1];
         const bytes = shot ? Buffer.from(await (await fetch(shot)).arrayBuffer()) : null;
         check(`${engine} · the screenshot is in the issue, served by the relay`, !!bytes && bytes.equals(PIXEL_PNG), shot || 'no screenshot link');
@@ -279,7 +286,41 @@ try {
         check(`${engine} · no console errors (relay)`, errors.length === 0, errors.join(' | '));
         await context.close();
       });
-      // 6 · the setup link opened in the browser is stored and leaves the address
+      // 6 · a browser that cannot store a Blob in IndexedDB (WebKit private browsing,
+      //     and some iPhones) still saves and sends the screenshot
+      await scenario(`${engine} · no Blob storage`, async () => {
+        const { context, page, errors } = await fresh();
+        await context.addInitScript(() => {
+          const put = IDBObjectStore.prototype.put;
+          const holdsBlob = (value, depth = 0) => value instanceof Blob ||
+            (depth < 6 && !!value && typeof value === 'object' && !(value instanceof ArrayBuffer) && Object.values(value).some((item) => holdsBlob(item, depth + 1)));
+          IDBObjectStore.prototype.put = function (value, ...rest) {
+            if (this.transaction.db.name === 'bunki-maintenance-reports-v1' && holdsBlob(value))
+              throw new DOMException('Error preparing Blob/File data to be stored in object store', 'UnknownError');
+            return put.call(this, value, ...rest);
+          };
+        });
+        const before = github.state.issues.length;
+        await page.goto(setupLink().replace('index.html?', 'index.html?entry=shelf&'), { waitUntil: 'load' });
+        await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+        await page.locator('#bunki-report-bug').click();
+        await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 });
+        await page.locator('#br-actual').fill('Screenshot from a browser without Blob storage.');
+        await page.locator('#br-files').setInputFiles({ name: 'blobless.png', mimeType: 'image/png', buffer: PIXEL_PNG });
+        await page.locator('.br-attachments figure').waitFor();
+        await page.locator('#br-form .br-primary').click();
+        const received = await page.waitForFunction(() => document.querySelector('.br-body h3')?.textContent === 'Received', null, { timeout: 20_000 }).then(() => true, () => false);
+        const filed = github.state.issues.length > before ? github.state.issues.at(-1) : null;
+        const shot = /\((http:\/\/127\.0\.0\.1:\d+\/v1\/shots\/shot_[a-f0-9]{32})\)/.exec(filed?.body || '')?.[1];
+        const bytes = shot ? Buffer.from(await (await fetch(shot)).arrayBuffer()) : null;
+        check(`${engine} · without Blob storage, the report and its screenshot are saved and filed`,
+          received && !!filed && filed.body.includes('Screenshot from a browser without Blob storage.') && !!bytes && bytes.equals(PIXEL_PNG),
+          received ? shot || 'no screenshot link' : await sheetState(page));
+        check(`${engine} · no console errors (no Blob storage)`, errors.length === 0, errors.join(' | '));
+        await context.close();
+      });
+
+      // 7 · the setup link opened in the browser is stored and leaves the address
       await scenario(`${engine} · setup link`, async () => {
         const { context, page, errors } = await fresh();
         await page.goto(setupLink().replace('index.html?', 'index.html?entry=shelf&'), { waitUntil: 'load' });
