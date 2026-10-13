@@ -121,6 +121,9 @@ try {
   assert(healthy, `The relay at ${url} did not answer its health and configuration checks.`);
 
   console.log(`Report relay live at ${url}`);
+  // A notice annotation keeps the address readable from the check run's API.
+  if (process.env.GITHUB_ACTIONS === 'true')
+    console.log(`::notice title=Report relay live::${url}`);
   if (process.env.GITHUB_STEP_SUMMARY) {
     appendFileSync(
       process.env.GITHUB_STEP_SUMMARY,
