@@ -1,7 +1,7 @@
 /** CPU diagnostic, not an interaction or phone-performance release receipt.
  * node scripts/benchmark-record-backend.mjs [--baseline /path/record-core.mjs]
  */
-import { build } from 'esbuild';
+import { buildCorridorModules } from './build-reading-module.mjs';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { cpus } from 'node:os';
@@ -11,16 +11,12 @@ import assert from 'node:assert/strict';
 
 const args = process.argv.slice(2);
 assert(args.length === 0 || (args.length === 2 && args[0] === '--baseline'));
-const built = await build({
-  entryPoints: ['scripts/corridor-record-entry.ts'],
-  bundle: true,
-  write: false,
-  platform: 'browser',
-  format: 'esm',
-  target: 'es2022',
-  metafile: true,
-});
-const bytes = built.outputFiles[0].contents;
+// Use the exact pinned production compiler, targets, minification and charset.
+const built = buildCorridorModules(process.cwd()).find(
+  (module) => module.path === 'modules/record-core.mjs',
+);
+assert(built, 'The canonical release builder must produce the record module');
+const bytes = built.bytes;
 const current = await import(
   `data:text/javascript;base64,${Buffer.from(bytes).toString('base64')}`
 );
@@ -84,10 +80,8 @@ console.log(
       cpu: cpus()[0].model,
       moduleSha256: digest(bytes),
       baselineSha256: args[1] ? digest(readFileSync(args[1])) : null,
-      inputs: Object.keys(built.metafile.inputs)
-        .filter((path) => !path.includes('node_modules/'))
-        .sort()
-        .map((path) => ({ path, sha256: digest(readFileSync(path)) })),
+      compiler: built.compiler,
+      inputs: built.inputs,
       limitations: [
         'Synthetic JSON, not a real learner record.',
         'Nine samples after one warmup per case; medians/ranges, not reliable tail percentiles.',

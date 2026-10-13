@@ -1,0 +1,1121 @@
+{
+  "kind": "synthetic-node-cpu-diagnostic",
+  "node": "v24.19.0",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "moduleSha256": "3eafb3fecc0f769ee5a5073695d21a1a757336625516eaefdf1385efe0c928df",
+  "baselineSha256": "257065eb60b2ed0cf8c1043d1e71764b8b9dc04977db830b61025854e26d2b9e",
+  "compiler": {
+    "name": "esbuild",
+    "version": "0.28.2"
+  },
+  "inputs": [
+    {
+      "path": "package-lock.json",
+      "sha256": "a65e30633ceb772abc2282af333f4ca2ce7b0d4cbd8f503ebedbf7669162ace2"
+    },
+    {
+      "path": "package.json",
+      "sha256": "4384b013e04ae8af642ff7b0f0fe46a68b8ae4510da68470d847e30180b282b3"
+    },
+    {
+      "path": "packages/ai/package.json",
+      "sha256": "85af25d9b5571043bdbda94932175cee4974bcab8dde9c3e43cb17699efa67ef"
+    },
+    {
+      "path": "packages/ai/src/hash.ts",
+      "sha256": "196367b80bf7c3d3edef70677c57d25de0adebecc369a245255565f2137b4618"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/index.js",
+      "sha256": "c733a1897d6b4b30dad6998597f6896b265b094a65534359ada34b08ecf8932c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/checks.js",
+      "sha256": "78a162d29e06001b4d919e1ed08f6e7d0d665bba0ef983201373745410d7b354"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/coerce.js",
+      "sha256": "fb2efe3b6eacc475c77cbb571b5fb8650d92a10f316dc869e49b722973d83c3c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/compat.js",
+      "sha256": "0e948b101771cc0e7b753e54b3f5b486929d3db9bd4c09d98fe4ce86271bcf7b"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/errors.js",
+      "sha256": "b155316267f79068ddc2dddc7046e13785804b768ca36e6deff1691d154f7c20"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/external.js",
+      "sha256": "179a03ace3d1d77895cc5b3c54a3fcbf2b7f8bad44d6f030092491c10e5d9097"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/from-json-schema.js",
+      "sha256": "d8866bf5232e55d12cda032bde6a56a05a0a8b276945c2e4eed66432ef5cc9b2"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/iso.js",
+      "sha256": "3cc5e6b4da086b8ffc7ee3188c69e4d3c945b368092e78d2299b5321182752c5"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/parse.js",
+      "sha256": "14cbcc416ab9169abc2cde97af77da54ca769684eac1e03a3753c16ea4a7cd95"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/classic/schemas.js",
+      "sha256": "eb4af7946a092aff8678b9251728ea58dab40154920cd65ec4a2ca1d4df68393"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/api.js",
+      "sha256": "00cb5edcfde8098e5a169e66c1dce50c101484d21436e3d78e137e1fa87c4836"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/checks.js",
+      "sha256": "5a33a20dcad372b4d18ead8d1e58b1950454f136a2216e62f247e0e5601ac838"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/core.js",
+      "sha256": "a5e713beaac4647151e03716a83f51ab714e5337cf66850f3b28eaf072a0bbfe"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/doc.js",
+      "sha256": "e084bbcc536746a8942fd33b08afe4db345554b3a0383114f1dca95261c958d9"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/errors.js",
+      "sha256": "bdd0ed8fd4a6e9d04fe6423b0f9df3a0b403939bc7dcedd8930a4b8df1fb118c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/index.js",
+      "sha256": "f9698820ee8371215e8d015cfa060230c62e65428397dce83f78e6538976301c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/json-schema-generator.js",
+      "sha256": "9cc884cdb535a9c87b85b66e61a593ff6b686222f038834f81c5e92552cd6e23"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/json-schema-processors.js",
+      "sha256": "ff15f567c9401dd7d3151ce11736283ff747c9a9e205cc08ee96f90eadc1c0c6"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/json-schema.js",
+      "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/parse.js",
+      "sha256": "2578b8d1341c3882a6c089f9ec57ce1c1a16b8b2b477721d4d89ba3d3ee50c9c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/regexes.js",
+      "sha256": "3cb122080c1154321331322ebc0cbe04878fe104c8c7b335891d9f85fc4b3f63"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/registries.js",
+      "sha256": "620ea1a715ccc4e6e605a271343bf47942dccae90885dc71f137b1f08a972e50"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/schemas.js",
+      "sha256": "09da9b0cb9b9d2d795c349bc47c7521d5aaffe241885f0c9728f2aa7de3834c9"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/to-json-schema.js",
+      "sha256": "fb3c9ab59947582f7671a53c8e20a3ced5eaa92d1c220ce8b27717a59033ad0d"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/util.js",
+      "sha256": "968e3433e810cf7ba5efb609a1cb6d9a6cfb51215fd1f699938228f7ac25deb3"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/core/versions.js",
+      "sha256": "bf082fde98fa7725412d713c7f56da3a5603bdef199d68d5769263f30ce9c756"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ar.js",
+      "sha256": "220ca3ca8cf67e4ccc05d789eeed2692d970269fe0cd82f05db8fd899b661b9e"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/az.js",
+      "sha256": "4725ffef0b2f2df947194f9698c792b69f52a8c3a5a1e1bdfabbf62259a1dd46"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/be.js",
+      "sha256": "da4bda7fbc940dd9f50efdd914caa9397243be779a505b82bd4be5395d3b795e"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/bg.js",
+      "sha256": "48511ad2f86043f0eea6e7673d5e2b848a3295a26c9c4650e96b3884d640196d"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ca.js",
+      "sha256": "796f9ba7dcd53648171aa0132c50271ef358936765cec0a44a642c41d05b3e8c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/cs.js",
+      "sha256": "670a75fe1db1104db090c95aabb01e4eb6decd451fe77fd830c2e4dafc79b49a"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/da.js",
+      "sha256": "cdaad7a1fa370abda1943fe9c2caba961e7896b9808d51275daf33f964af49cc"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/de.js",
+      "sha256": "521a4ed29fcaf3f781163875dc282cfb5262047773aa2b70a852996b1d8a51b9"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/el.js",
+      "sha256": "9857a9e4909282b2efd86317fc3e67ed86e24287f32329cfa5ab833c05fc0d81"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/en.js",
+      "sha256": "232a0828d64df8e410b23ac9825a667bd9d485fd70acdc4b4d0870539faef0a4"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/eo.js",
+      "sha256": "ebe08048aa3ee9871ce9fe1271e254cb672b1968ec40ac253066d08d176e8a65"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/es.js",
+      "sha256": "4edd9302e9724c408b024220e99092fbd2f90100ac3c6407a94543b79843610c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/fa.js",
+      "sha256": "2dc1bee1e984e8a15191fb3c69aaecaa26c922e12a0d4486ac005a0372b78565"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/fi.js",
+      "sha256": "3911184979f01d2ae580ce611710ee40597eff97a410d0fa823ab6ea27cee88c"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/fr-CA.js",
+      "sha256": "f8716c2baaccdfd1d958743bbc5250c9bdef5152d0801470e9b9a380d618f4ab"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/fr.js",
+      "sha256": "3ea466ca5737984bb5acc9008822060272f596317004618cfe1e05109f707577"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/he.js",
+      "sha256": "290512e43d2907700211da09dc3959fd98d120bfb89f8836e6e3f83a472e26fe"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/hr.js",
+      "sha256": "1ea65433c32b89bead43113ac69b3acc520bb73ae231dd2e05fedf8e8c5656d6"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/hu.js",
+      "sha256": "913ee94a253db79b31463ae23a337060b6fe28be73dfc7657d8a83a4942bd8a8"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/hy.js",
+      "sha256": "0d3bbb96c0f8bc74468a2dfc7d066e838bb56fab64fd5ec03ce9c4d89eccbe99"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/id.js",
+      "sha256": "cd2c19b5c30dade3ed91ffcff3deb0b068713be24f02248e7e46b87b2b9553ee"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/index.js",
+      "sha256": "d73f41a76614855d43eea493030a1aa05dca30c9a17015a0da5b8b70da61b6b1"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/is.js",
+      "sha256": "ead5b14eac892229f915fe38ec94ab3b1e676f8aa2df2a8450848ba9ca9a1612"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/it.js",
+      "sha256": "439969d199427d77ebf1e477bf2295b226712804b25437d442f9dfc78aca95e0"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ja.js",
+      "sha256": "43ee10378cac22b0b8aee912a66c3f36a834d5b4c76e9748f88a784044f248fd"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ka.js",
+      "sha256": "0ab5322368f9ac6e6b58f93dac484a4f4f06cdf4c0677f4df88164e9d8b4bf81"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/kh.js",
+      "sha256": "78c3d1991041bb8c8fc0f7c5d745aae422d4c2e4e8f30bae44f3fef4765900a8"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/km.js",
+      "sha256": "dbdabda94dd93d4a1827e6c809505c79fa6aa7abefec91dc50fa0871382c99cc"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ko.js",
+      "sha256": "d2efe22ac069d9b32b0109fa07713ac0695ac1c1357afc4e4277056466f2e196"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/lt.js",
+      "sha256": "dad886e52c56a1329d22e072f8b08dc8730f69c3dc5e5acf8267cac18df1ab28"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/mk.js",
+      "sha256": "9eb4af0392fc5b9c438cdc6ceea446acc541b59e221dba918f7b80800d9da3d1"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ms.js",
+      "sha256": "c550a9185d997e8fcd17311951aa1e29793a50b8e825e18310efd5a46c641795"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/nl.js",
+      "sha256": "acba414579c5bbd7f83dc6661fa1a12d65f1822f9b0f5035549ac60f46d93763"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/no.js",
+      "sha256": "1854483c7cf158b8f97f0faf6fd799eb1f762009018b5fde893ca33f2fb0b313"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ota.js",
+      "sha256": "34ae496104bc17fea7d30c3d45c94cfe3d1d569b5d39a6ca51de6c177690c556"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/pl.js",
+      "sha256": "18eab58f395e30b906e8e3fddc5f212eb19f2c4362410889a5c5e0141ebe2144"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ps.js",
+      "sha256": "f977b5141fa8fb6a8459372e0b2895d74b381c9f2ff4899141f7ee3e639a4513"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/pt.js",
+      "sha256": "df172afc585544dee7c063c484f5a07b5ed103e2c1072a782c763ad8ceb08e17"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ro.js",
+      "sha256": "ecae409f4299ab91e2aff1095db14e23f3cf2c05b3654e242047655352c7f46b"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ru.js",
+      "sha256": "c397a473e94d7d189a9c09c7890fe379c4f6f46d9556d52a040a90ffa56f7b93"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/sl.js",
+      "sha256": "ee2ff3a19b62cd2f89b54b165088773b937de15df7253df220bef07d9adf2d80"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/sv.js",
+      "sha256": "97d6718fb643e05d6fe30fa4f9f09b8d9a3eda4a3a350b57dfb2944943d19502"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ta.js",
+      "sha256": "04bbde9766251f9047e786fdd77632f2ecd53aec2eb060eb2fc85bf576ad729d"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/th.js",
+      "sha256": "aea70c9ac2b399fe4749e19ba3aa99c3efb4dfb50eadfb62b0b2a6e005748f3d"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/tr.js",
+      "sha256": "4449f41d22c6f15ede5066f79d840a52ec45a6b694c859e16f9121062b6fad2f"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ua.js",
+      "sha256": "9391169ffbc72f777a83230b6ffcc3f4cf46ab5945ec540de9ef4609dca1f4cc"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/uk.js",
+      "sha256": "77136a2a60eef62f7cc803a0f9971aebbc641403af77c1b41fd5ce59abfa5de3"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/ur.js",
+      "sha256": "858f4f38d651073e7a3fbec7ed356692578b3ad1fae1b453cb3d85312a4f39d2"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/uz.js",
+      "sha256": "d540bed482d15c47cb45439cff34e053379c53019c7c7c5fbe43f222d0c81f04"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/vi.js",
+      "sha256": "2c61bd3f4a733f3cbb1ad85e75a053cb15a8ebeb83ab56dc21f2948b1138e12f"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/yo.js",
+      "sha256": "98b9cbf31bf00c8b2c00de62725a9dd7cb718ac72d6e8fd4e0a1a7c49723e0f4"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/zh-CN.js",
+      "sha256": "99a4b16af598834a0b11607fcdebd1c6de026386ff1d6a5a306b364c154c5899"
+    },
+    {
+      "path": "packages/domain/node_modules/zod/v4/locales/zh-TW.js",
+      "sha256": "37dcae620e1553e9174a4b9434bbcc4e465150a627e80c9c17fd01de8baaf59a"
+    },
+    {
+      "path": "packages/domain/package.json",
+      "sha256": "4b75ffd8320b7fc2ef7fd0ca58fcd93bfa8113ab7c5fe77221c72efab647b91a"
+    },
+    {
+      "path": "packages/domain/src/events/shared.ts",
+      "sha256": "286857e44007de4b93dd81a2c96e7c1ea8d4591475f5bb1c4d27b887ab72f62a"
+    },
+    {
+      "path": "packages/domain/src/primitives.ts",
+      "sha256": "87bb61d3bccb01fd50ded592989cf5a65a11e96413fcf251334ff4cde674aed1"
+    },
+    {
+      "path": "packages/domain/src/replay/canonical-json.ts",
+      "sha256": "2e998ba36e885c0c9bfcfa63ea9b55b101419a3aa2c910f884d535958dee55d5"
+    },
+    {
+      "path": "packages/persistence/package.json",
+      "sha256": "32aaa9a07a674f8fb8f9cd014ba80c00c8e6b00ee6432998065d1ddaead70cd3"
+    },
+    {
+      "path": "packages/persistence/src/hash.ts",
+      "sha256": "f67caae0ef0303cee41f1285afe8781c6f85527b2e32af71399c0cba460feea5"
+    },
+    {
+      "path": "packages/persistence/src/replication/backup.ts",
+      "sha256": "f66d9dafd8d478c2138d3c5b2c97ee69ce99b066d97fceb1a66f96ed415c4f35"
+    },
+    {
+      "path": "packages/persistence/src/replication/browser.ts",
+      "sha256": "75d72e4e9542cf720a1f0512fd7f320cf242228fafd26d2193b38a9d9e5eb73d"
+    },
+    {
+      "path": "packages/persistence/src/replication/coordinator.ts",
+      "sha256": "5ecef53aeab890e68408e88c56ff7f8fd9b0bfa40076bd8b9af0b60398902729"
+    },
+    {
+      "path": "packages/persistence/src/replication/errors.ts",
+      "sha256": "f05bb517051ac92af35a35e5478e8dc0972e4862556395b0664dca30838fa347"
+    },
+    {
+      "path": "packages/persistence/src/replication/indexeddb.ts",
+      "sha256": "e7498bf380afcbe10297acde84c163b155788840d1a2a1a7a7187c5693bfbd53"
+    },
+    {
+      "path": "packages/persistence/src/replication/json.ts",
+      "sha256": "8535d75afe2e482f8945e36c26d2f25e17b8a92ec6851a91be9a3a834ed56c53"
+    },
+    {
+      "path": "packages/persistence/src/replication/read-cache.ts",
+      "sha256": "6722d73b12b8ed133990ea5cca7ff1a3b7b21ea86a3ec2c81b36da872de4a14a"
+    },
+    {
+      "path": "packages/persistence/src/replication/replica-read-cache.ts",
+      "sha256": "13ad331ea387b8a8693c902b2ff8890b34e2f2112da63a5a49d3ba46f196ce8a"
+    },
+    {
+      "path": "packages/persistence/src/replication/replica-view.ts",
+      "sha256": "15f198d4ad2a2795076638b2dc0b0c4ca278272f04b43667d9f2a43b7d80e698"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/index.js",
+      "sha256": "c733a1897d6b4b30dad6998597f6896b265b094a65534359ada34b08ecf8932c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/checks.js",
+      "sha256": "78a162d29e06001b4d919e1ed08f6e7d0d665bba0ef983201373745410d7b354"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/coerce.js",
+      "sha256": "fb2efe3b6eacc475c77cbb571b5fb8650d92a10f316dc869e49b722973d83c3c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/compat.js",
+      "sha256": "0e948b101771cc0e7b753e54b3f5b486929d3db9bd4c09d98fe4ce86271bcf7b"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/errors.js",
+      "sha256": "b155316267f79068ddc2dddc7046e13785804b768ca36e6deff1691d154f7c20"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/external.js",
+      "sha256": "179a03ace3d1d77895cc5b3c54a3fcbf2b7f8bad44d6f030092491c10e5d9097"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/from-json-schema.js",
+      "sha256": "d8866bf5232e55d12cda032bde6a56a05a0a8b276945c2e4eed66432ef5cc9b2"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/iso.js",
+      "sha256": "3cc5e6b4da086b8ffc7ee3188c69e4d3c945b368092e78d2299b5321182752c5"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/parse.js",
+      "sha256": "14cbcc416ab9169abc2cde97af77da54ca769684eac1e03a3753c16ea4a7cd95"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/classic/schemas.js",
+      "sha256": "eb4af7946a092aff8678b9251728ea58dab40154920cd65ec4a2ca1d4df68393"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/api.js",
+      "sha256": "00cb5edcfde8098e5a169e66c1dce50c101484d21436e3d78e137e1fa87c4836"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/checks.js",
+      "sha256": "5a33a20dcad372b4d18ead8d1e58b1950454f136a2216e62f247e0e5601ac838"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/core.js",
+      "sha256": "a5e713beaac4647151e03716a83f51ab714e5337cf66850f3b28eaf072a0bbfe"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/doc.js",
+      "sha256": "e084bbcc536746a8942fd33b08afe4db345554b3a0383114f1dca95261c958d9"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/errors.js",
+      "sha256": "bdd0ed8fd4a6e9d04fe6423b0f9df3a0b403939bc7dcedd8930a4b8df1fb118c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/index.js",
+      "sha256": "f9698820ee8371215e8d015cfa060230c62e65428397dce83f78e6538976301c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/json-schema-generator.js",
+      "sha256": "9cc884cdb535a9c87b85b66e61a593ff6b686222f038834f81c5e92552cd6e23"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/json-schema-processors.js",
+      "sha256": "ff15f567c9401dd7d3151ce11736283ff747c9a9e205cc08ee96f90eadc1c0c6"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/json-schema.js",
+      "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/parse.js",
+      "sha256": "2578b8d1341c3882a6c089f9ec57ce1c1a16b8b2b477721d4d89ba3d3ee50c9c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/regexes.js",
+      "sha256": "3cb122080c1154321331322ebc0cbe04878fe104c8c7b335891d9f85fc4b3f63"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/registries.js",
+      "sha256": "620ea1a715ccc4e6e605a271343bf47942dccae90885dc71f137b1f08a972e50"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/schemas.js",
+      "sha256": "09da9b0cb9b9d2d795c349bc47c7521d5aaffe241885f0c9728f2aa7de3834c9"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/to-json-schema.js",
+      "sha256": "fb3c9ab59947582f7671a53c8e20a3ced5eaa92d1c220ce8b27717a59033ad0d"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/util.js",
+      "sha256": "968e3433e810cf7ba5efb609a1cb6d9a6cfb51215fd1f699938228f7ac25deb3"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/core/versions.js",
+      "sha256": "bf082fde98fa7725412d713c7f56da3a5603bdef199d68d5769263f30ce9c756"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ar.js",
+      "sha256": "220ca3ca8cf67e4ccc05d789eeed2692d970269fe0cd82f05db8fd899b661b9e"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/az.js",
+      "sha256": "4725ffef0b2f2df947194f9698c792b69f52a8c3a5a1e1bdfabbf62259a1dd46"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/be.js",
+      "sha256": "da4bda7fbc940dd9f50efdd914caa9397243be779a505b82bd4be5395d3b795e"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/bg.js",
+      "sha256": "48511ad2f86043f0eea6e7673d5e2b848a3295a26c9c4650e96b3884d640196d"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ca.js",
+      "sha256": "796f9ba7dcd53648171aa0132c50271ef358936765cec0a44a642c41d05b3e8c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/cs.js",
+      "sha256": "670a75fe1db1104db090c95aabb01e4eb6decd451fe77fd830c2e4dafc79b49a"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/da.js",
+      "sha256": "cdaad7a1fa370abda1943fe9c2caba961e7896b9808d51275daf33f964af49cc"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/de.js",
+      "sha256": "521a4ed29fcaf3f781163875dc282cfb5262047773aa2b70a852996b1d8a51b9"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/el.js",
+      "sha256": "9857a9e4909282b2efd86317fc3e67ed86e24287f32329cfa5ab833c05fc0d81"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/en.js",
+      "sha256": "232a0828d64df8e410b23ac9825a667bd9d485fd70acdc4b4d0870539faef0a4"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/eo.js",
+      "sha256": "ebe08048aa3ee9871ce9fe1271e254cb672b1968ec40ac253066d08d176e8a65"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/es.js",
+      "sha256": "4edd9302e9724c408b024220e99092fbd2f90100ac3c6407a94543b79843610c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/fa.js",
+      "sha256": "2dc1bee1e984e8a15191fb3c69aaecaa26c922e12a0d4486ac005a0372b78565"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/fi.js",
+      "sha256": "3911184979f01d2ae580ce611710ee40597eff97a410d0fa823ab6ea27cee88c"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/fr-CA.js",
+      "sha256": "f8716c2baaccdfd1d958743bbc5250c9bdef5152d0801470e9b9a380d618f4ab"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/fr.js",
+      "sha256": "3ea466ca5737984bb5acc9008822060272f596317004618cfe1e05109f707577"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/he.js",
+      "sha256": "290512e43d2907700211da09dc3959fd98d120bfb89f8836e6e3f83a472e26fe"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/hr.js",
+      "sha256": "1ea65433c32b89bead43113ac69b3acc520bb73ae231dd2e05fedf8e8c5656d6"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/hu.js",
+      "sha256": "913ee94a253db79b31463ae23a337060b6fe28be73dfc7657d8a83a4942bd8a8"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/hy.js",
+      "sha256": "0d3bbb96c0f8bc74468a2dfc7d066e838bb56fab64fd5ec03ce9c4d89eccbe99"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/id.js",
+      "sha256": "cd2c19b5c30dade3ed91ffcff3deb0b068713be24f02248e7e46b87b2b9553ee"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/index.js",
+      "sha256": "d73f41a76614855d43eea493030a1aa05dca30c9a17015a0da5b8b70da61b6b1"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/is.js",
+      "sha256": "ead5b14eac892229f915fe38ec94ab3b1e676f8aa2df2a8450848ba9ca9a1612"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/it.js",
+      "sha256": "439969d199427d77ebf1e477bf2295b226712804b25437d442f9dfc78aca95e0"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ja.js",
+      "sha256": "43ee10378cac22b0b8aee912a66c3f36a834d5b4c76e9748f88a784044f248fd"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ka.js",
+      "sha256": "0ab5322368f9ac6e6b58f93dac484a4f4f06cdf4c0677f4df88164e9d8b4bf81"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/kh.js",
+      "sha256": "78c3d1991041bb8c8fc0f7c5d745aae422d4c2e4e8f30bae44f3fef4765900a8"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/km.js",
+      "sha256": "dbdabda94dd93d4a1827e6c809505c79fa6aa7abefec91dc50fa0871382c99cc"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ko.js",
+      "sha256": "d2efe22ac069d9b32b0109fa07713ac0695ac1c1357afc4e4277056466f2e196"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/lt.js",
+      "sha256": "dad886e52c56a1329d22e072f8b08dc8730f69c3dc5e5acf8267cac18df1ab28"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/mk.js",
+      "sha256": "9eb4af0392fc5b9c438cdc6ceea446acc541b59e221dba918f7b80800d9da3d1"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ms.js",
+      "sha256": "c550a9185d997e8fcd17311951aa1e29793a50b8e825e18310efd5a46c641795"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/nl.js",
+      "sha256": "acba414579c5bbd7f83dc6661fa1a12d65f1822f9b0f5035549ac60f46d93763"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/no.js",
+      "sha256": "1854483c7cf158b8f97f0faf6fd799eb1f762009018b5fde893ca33f2fb0b313"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ota.js",
+      "sha256": "34ae496104bc17fea7d30c3d45c94cfe3d1d569b5d39a6ca51de6c177690c556"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/pl.js",
+      "sha256": "18eab58f395e30b906e8e3fddc5f212eb19f2c4362410889a5c5e0141ebe2144"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ps.js",
+      "sha256": "f977b5141fa8fb6a8459372e0b2895d74b381c9f2ff4899141f7ee3e639a4513"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/pt.js",
+      "sha256": "df172afc585544dee7c063c484f5a07b5ed103e2c1072a782c763ad8ceb08e17"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ro.js",
+      "sha256": "ecae409f4299ab91e2aff1095db14e23f3cf2c05b3654e242047655352c7f46b"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ru.js",
+      "sha256": "c397a473e94d7d189a9c09c7890fe379c4f6f46d9556d52a040a90ffa56f7b93"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/sl.js",
+      "sha256": "ee2ff3a19b62cd2f89b54b165088773b937de15df7253df220bef07d9adf2d80"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/sv.js",
+      "sha256": "97d6718fb643e05d6fe30fa4f9f09b8d9a3eda4a3a350b57dfb2944943d19502"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ta.js",
+      "sha256": "04bbde9766251f9047e786fdd77632f2ecd53aec2eb060eb2fc85bf576ad729d"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/th.js",
+      "sha256": "aea70c9ac2b399fe4749e19ba3aa99c3efb4dfb50eadfb62b0b2a6e005748f3d"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/tr.js",
+      "sha256": "4449f41d22c6f15ede5066f79d840a52ec45a6b694c859e16f9121062b6fad2f"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ua.js",
+      "sha256": "9391169ffbc72f777a83230b6ffcc3f4cf46ab5945ec540de9ef4609dca1f4cc"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/uk.js",
+      "sha256": "77136a2a60eef62f7cc803a0f9971aebbc641403af77c1b41fd5ce59abfa5de3"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/ur.js",
+      "sha256": "858f4f38d651073e7a3fbec7ed356692578b3ad1fae1b453cb3d85312a4f39d2"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/uz.js",
+      "sha256": "d540bed482d15c47cb45439cff34e053379c53019c7c7c5fbe43f222d0c81f04"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/vi.js",
+      "sha256": "2c61bd3f4a733f3cbb1ad85e75a053cb15a8ebeb83ab56dc21f2948b1138e12f"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/yo.js",
+      "sha256": "98b9cbf31bf00c8b2c00de62725a9dd7cb718ac72d6e8fd4e0a1a7c49723e0f4"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/zh-CN.js",
+      "sha256": "99a4b16af598834a0b11607fcdebd1c6de026386ff1d6a5a306b364c154c5899"
+    },
+    {
+      "path": "packages/sync/node_modules/zod/v4/locales/zh-TW.js",
+      "sha256": "37dcae620e1553e9174a4b9434bbcc4e465150a627e80c9c17fd01de8baaf59a"
+    },
+    {
+      "path": "packages/sync/src/assessment-operations-v2.ts",
+      "sha256": "1b89b8fe5566f164364c471df3ade34df71367be72c42451c9f6c1322daf4904"
+    },
+    {
+      "path": "packages/sync/src/assessment-views-v2.ts",
+      "sha256": "9a952d322ba7cefffb32929b4af5324b7b2092ea8656deb698e06090f393aff4"
+    },
+    {
+      "path": "packages/sync/src/common.ts",
+      "sha256": "aead851f600393030b10a951f56fc73714734e9205d639234c0942c1a47dad8b"
+    },
+    {
+      "path": "packages/sync/src/exam-attempt-views.ts",
+      "sha256": "dc466394a46b5148d7cf2bf7595dc7f3a0b5f3b8da696010cdcd458ef802c0c3"
+    },
+    {
+      "path": "packages/sync/src/index.ts",
+      "sha256": "05186eef1d1e2c1c84a81cca2863b75121b0801ef412301695a2bc89090c274b"
+    },
+    {
+      "path": "packages/sync/src/note-views.ts",
+      "sha256": "4305f66dfde8048a63a1d29ab612d948dac6cdac18f0bc9e6a019e84c722bbb6"
+    },
+    {
+      "path": "packages/sync/src/operations.ts",
+      "sha256": "b7f6625c99baca37e4d659e962ce7c892e4b370989098a0124ef35444c80a490"
+    },
+    {
+      "path": "packages/sync/src/reading-views.ts",
+      "sha256": "cc4cd3a0f8eac519fbbbdbe4215c30e0bb3381307d19c377dcf6785be953bafe"
+    },
+    {
+      "path": "packages/sync/src/replica.ts",
+      "sha256": "8827b5cd75eb520afb9b2d7f086599badc07678ac440cd4207dba6a7f62eaf4b"
+    },
+    {
+      "path": "packages/sync/src/source-reference-views.ts",
+      "sha256": "9a49918b66ba86692f758d8b85607ca6991f6e3d295843b386ed28c55f274019"
+    },
+    {
+      "path": "packages/sync/src/view-index.ts",
+      "sha256": "946a75357a6fd4e2ccd03c4555e51b0088b6e893f3a9d86a1391d0739be72c0c"
+    },
+    {
+      "path": "scripts/build-reading-module.mjs",
+      "sha256": "dc9a5627ee4ea0ea402e5ed91f40e590cbaaf91fa1541984199fd24bf1fa7898"
+    },
+    {
+      "path": "scripts/corridor-record-entry.ts",
+      "sha256": "f13b7a86e43fde8635aa73b0817217e42ef947edf74b395b0c6e63e9b27a1e7c"
+    }
+  ],
+  "limitations": [
+    "Synthetic JSON, not a real learner record.",
+    "Nine samples after one warmup per case; medians/ranges, not reliable tail percentiles.",
+    "CPU only: excludes browser rendering, IndexedDB, worker messaging and physical-phone latency.",
+    "Checked cases require this module’s own immutable values; do not apply their timing to arbitrary input."
+  ],
+  "rows": [
+    {
+      "reviewRows": 100,
+      "observationRows": 100,
+      "encodedBytes": 7266,
+      "coldEncode": {
+        "medianMs": 1.1935330000000022,
+        "minMs": 0.9778499999999894,
+        "maxMs": 5.656905000000052,
+        "samplesMs": [
+          1.3844500000000153,
+          1.1935330000000022,
+          1.1360049999999546,
+          1.3824130000000423,
+          2.6206489999999576,
+          5.656905000000052,
+          1.1668349999999919,
+          0.9778499999999894,
+          1.1103520000000344
+        ]
+      },
+      "checkedEncode": {
+        "medianMs": 0.0007860000000619038,
+        "minMs": 0.0006389999999782958,
+        "maxMs": 0.0031219999999620995,
+        "samplesMs": [
+          0.0031219999999620995,
+          0.0009660000000621949,
+          0.0007860000000619038,
+          0.0006389999999782958,
+          0.0007140000000163127,
+          0.0006850000000895307,
+          0.0006919999999581705,
+          0.0023390000000063083,
+          0.0018199999999524152
+        ]
+      },
+      "checkedCopy": {
+        "medianMs": 0.003191000000015265,
+        "minMs": 0.002514000000019223,
+        "maxMs": 0.017023999999992157,
+        "samplesMs": [
+          0.006380000000035579,
+          0.003191000000015265,
+          0.002530999999976302,
+          0.0027220000000625078,
+          0.0025329999999712527,
+          0.002514000000019223,
+          0.017023999999992157,
+          0.003888999999958287,
+          0.0038869999999633364
+        ]
+      },
+      "baselineEncode": {
+        "medianMs": 2.2882390000000896,
+        "minMs": 1.890517999999929,
+        "maxMs": 3.416599999999903,
+        "samplesMs": [
+          2.2882390000000896,
+          2.5995690000000877,
+          2.133205000000089,
+          2.7627090000000862,
+          2.803514000000064,
+          3.416599999999903,
+          1.9794920000000502,
+          1.994688999999994,
+          1.890517999999929
+        ]
+      },
+      "baselineCopy": {
+        "medianMs": 1.0942589999999655,
+        "minMs": 0.9796629999999595,
+        "maxMs": 4.365071999999941,
+        "samplesMs": [
+          1.9876859999999397,
+          4.365071999999941,
+          1.0846720000000687,
+          1.0942589999999655,
+          0.9938850000000912,
+          1.0555869999999459,
+          1.1749979999999596,
+          0.9796629999999595,
+          1.387974999999983
+        ]
+      }
+    },
+    {
+      "reviewRows": 1000,
+      "observationRows": 1000,
+      "encodedBytes": 73866,
+      "coldEncode": {
+        "medianMs": 9.302021999999852,
+        "minMs": 8.245564000000059,
+        "maxMs": 12.657313000000158,
+        "samplesMs": [
+          12.657313000000158,
+          10.194219000000203,
+          8.656930000000102,
+          8.245564000000059,
+          9.835244000000102,
+          9.302021999999852,
+          11.334602000000132,
+          8.91577499999994,
+          8.779295000000047
+        ]
+      },
+      "checkedEncode": {
+        "medianMs": 0.00037999999995008693,
+        "minMs": 0.00029799999992974335,
+        "maxMs": 0.0008569999999963329,
+        "samplesMs": [
+          0.0008569999999963329,
+          0.0005419999999958236,
+          0.0004269999999451102,
+          0.0007500000001527951,
+          0.00037999999995008693,
+          0.00029799999992974335,
+          0.0003010000000358559,
+          0.00035299999990456854,
+          0.0003209999999853608
+        ]
+      },
+      "checkedCopy": {
+        "medianMs": 0.0022309999999379215,
+        "minMs": 0.0011200000001281296,
+        "maxMs": 0.01457799999980125,
+        "samplesMs": [
+          0.0026539999998931307,
+          0.0022309999999379215,
+          0.01457799999980125,
+          0.0024599999999281863,
+          0.001202999999804888,
+          0.0012199999998756539,
+          0.0026239999999688735,
+          0.0011200000001281296,
+          0.0012890000000425061
+        ]
+      },
+      "baselineEncode": {
+        "medianMs": 12.338279000000057,
+        "minMs": 10.65876000000003,
+        "maxMs": 15.368161999999984,
+        "samplesMs": [
+          15.368161999999984,
+          10.65876000000003,
+          12.777166999999963,
+          12.110237999999981,
+          11.168766999999889,
+          12.187889000000041,
+          12.338279000000057,
+          13.642283000000134,
+          13.800179999999955
+        ]
+      },
+      "baselineCopy": {
+        "medianMs": 12.584101000000146,
+        "minMs": 10.691283999999996,
+        "maxMs": 15.600449000000026,
+        "samplesMs": [
+          12.59263400000009,
+          15.600449000000026,
+          12.703816999999844,
+          12.135941999999886,
+          10.957405999999992,
+          13.530578000000105,
+          11.68169399999988,
+          12.584101000000146,
+          10.691283999999996
+        ]
+      }
+    },
+    {
+      "reviewRows": 10000,
+      "observationRows": 10000,
+      "encodedBytes": 748986,
+      "coldEncode": {
+        "medianMs": 104.1313819999998,
+        "minMs": 98.10316200000011,
+        "maxMs": 126.32702500000005,
+        "samplesMs": [
+          98.10316200000011,
+          104.1313819999998,
+          98.32294500000035,
+          126.32702500000005,
+          115.84909100000004,
+          103.84924899999987,
+          119.07860900000014,
+          113.80622099999982,
+          103.94768700000031
+        ]
+      },
+      "checkedEncode": {
+        "medianMs": 0.000367999999980384,
+        "minMs": 0.0003000000001520675,
+        "maxMs": 0.0009099999997488339,
+        "samplesMs": [
+          0.0009099999997488339,
+          0.0006640000001425506,
+          0.00037999999995008693,
+          0.000367999999980384,
+          0.0003420000002734014,
+          0.000311000000237982,
+          0.0003000000001520675,
+          0.00035399999978835694,
+          0.0005400000000008731
+        ]
+      },
+      "checkedCopy": {
+        "medianMs": 0.002041999999619293,
+        "minMs": 0.0013989999997647828,
+        "maxMs": 0.004053999999996449,
+        "samplesMs": [
+          0.003083000000060565,
+          0.0039029999998092535,
+          0.0020009999998364947,
+          0.004053999999996449,
+          0.001758999999765365,
+          0.002041999999619293,
+          0.0016720000003260793,
+          0.0013989999997647828,
+          0.0022409999996853003
+        ]
+      },
+      "baselineEncode": {
+        "medianMs": 125.0892960000001,
+        "minMs": 117.32710099999986,
+        "maxMs": 146.19904799999995,
+        "samplesMs": [
+          129.9956470000002,
+          117.32710099999986,
+          146.19904799999995,
+          127.74879200000032,
+          125.0892960000001,
+          117.47398599999997,
+          134.84205500000007,
+          120.2420390000002,
+          118.4246519999997
+        ]
+      },
+      "baselineCopy": {
+        "medianMs": 128.9855580000003,
+        "minMs": 119.68949399999929,
+        "maxMs": 168.59665500000028,
+        "samplesMs": [
+          128.90599699999984,
+          119.68949399999929,
+          141.35805400000027,
+          125.7148819999993,
+          128.9855580000003,
+          133.77664399999958,
+          141.34659899999951,
+          168.59665500000028,
+          126.7649309999997
+        ]
+      }
+    },
+    {
+      "reviewRows": 50000,
+      "observationRows": 50000,
+      "encodedBytes": 3744586,
+      "coldEncode": {
+        "medianMs": 783.4958769999994,
+        "minMs": 544.2084159999995,
+        "maxMs": 1002.9139720000003,
+        "samplesMs": [
+          783.4958769999994,
+          834.814644,
+          1002.9139720000003,
+          769.3177379999997,
+          550.4806540000009,
+          544.2084159999995,
+          965.7038360000006,
+          838.8674439999995,
+          596.718175
+        ]
+      },
+      "checkedEncode": {
+        "medianMs": 0.0003400000005058246,
+        "minMs": 0.00029800000083923806,
+        "maxMs": 0.0007600000008096686,
+        "samplesMs": [
+          0.0007600000008096686,
+          0.0006090000006224727,
+          0.0007569999997940613,
+          0.0003400000005058246,
+          0.0003039999992324738,
+          0.00031399999897985253,
+          0.0003130000004603062,
+          0.00029800000083923806,
+          0.000669999999445281
+        ]
+      },
+      "checkedCopy": {
+        "medianMs": 0.0020719999993161764,
+        "minMs": 0.0015110000003915047,
+        "maxMs": 0.007739000000583474,
+        "samplesMs": [
+          0.005403000001024338,
+          0.0019679999986692565,
+          0.002246000000013737,
+          0.0025830000013229437,
+          0.0020719999993161764,
+          0.0018870000003516907,
+          0.007739000000583474,
+          0.0015110000003915047,
+          0.002066999999442487
+        ]
+      },
+      "baselineEncode": {
+        "medianMs": 861.2054489999973,
+        "minMs": 728.6016799999998,
+        "maxMs": 1089.5638929999986,
+        "samplesMs": [
+          958.2949939999999,
+          861.2054489999973,
+          836.2518569999993,
+          901.0581499999971,
+          1089.5638929999986,
+          999.041505000001,
+          790.4843189999992,
+          783.9356529999968,
+          728.6016799999998
+        ]
+      },
+      "baselineCopy": {
+        "medianMs": 771.3353999999999,
+        "minMs": 750.4262950000011,
+        "maxMs": 867.9748599999984,
+        "samplesMs": [
+          753.1950030000007,
+          767.1202760000015,
+          750.4262950000011,
+          867.9748599999984,
+          851.9667850000005,
+          833.5877989999972,
+          845.016421999997,
+          764.0546009999998,
+          771.3353999999999
+        ]
+      }
+    }
+  ]
+}
