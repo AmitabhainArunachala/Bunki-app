@@ -35,11 +35,12 @@ const check = (name, pass, detail = '') => {
   console.log(`  ${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? `  — ${detail}` : ''}`);
 };
 
-async function openSheet(page) {
+async function openSheet(page, beforeProbe) {
   await page.goto(`${host.origin}/index.html?entry=shelf`, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
   await page.locator('#bunki-report-bug').click();
   await page.locator('#br-actual').waitFor();
+  if (beforeProbe) await beforeProbe();
   // The sheet settles once the service probe has answered with the host's 404.
   await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send to GitHub', null, { timeout: 15_000 });
 }
@@ -63,8 +64,12 @@ try {
     console.log(`\n— ${engine}`);
     const browser = await browserType.launch({ ...(engine === 'chromium' && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
     try {
-      const fresh = async ({ blockWindows = false } = {}) => {
+      const fresh = async ({ blockWindows = false, probeDelayMs = 0 } = {}) => {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+        if (probeDelayMs) await context.route(`${host.origin}/api/config`, async (route) => {
+          await new Promise((resolve) => setTimeout(resolve, probeDelayMs));
+          await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+        });
         await context.route('https://github.com/**', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>stub</title><p>GitHub stub</p>' }));
         if (engine === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: host.origin });
         if (blockWindows) await context.addInitScript(() => { window.open = () => null; });
@@ -82,6 +87,8 @@ try {
       {
         const { context, page, errors } = await fresh();
         await openSheet(page);
+        const note = await page.locator('#br-form > .br-note').last().textContent();
+        check(`${engine} · the sheet says GitHub issues are public before anything is sent`, /public/.test(note), note);
         const words = 'The reader popup covers the word 天気 after I tap it.\nSecond line with detail.';
         await page.locator('#br-actual').fill(words);
         await page.locator('#br-expected').fill('The popup should sit below the word.');
@@ -140,8 +147,13 @@ try {
 
       // 4 · a blocked window still saves, and the link sends it (also covers older saved reports)
       {
-        const { context, page, errors } = await fresh({ blockWindows: true });
-        await openSheet(page);
+        // The service probe answers late here: until it confirms there is no service,
+        // the sheet must not offer GitHub (a real service may still answer).
+        const { context, page, errors } = await fresh({ blockWindows: true, probeDelayMs: 2500 });
+        let pendingLabel = '';
+        await openSheet(page, async () => { pendingLabel = await page.locator('#br-form .br-primary').textContent(); });
+        check(`${engine} · GitHub is offered only after the probe confirms there is no service`,
+          !!pendingLabel && pendingLabel !== 'Send to GitHub', `while pending: ${pendingLabel}`);
         await page.locator('#br-actual').fill('Saved while the window was blocked.');
         await page.locator('#br-form .br-primary').click();
         await page.waitForFunction(() => document.querySelector('#br-title')?.textContent === 'Your report');

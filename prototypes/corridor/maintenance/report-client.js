@@ -148,11 +148,13 @@
         return { url: url.href, label: /^[a-z0-9-]{1,50}$/.test(gh.label || '') ? gh.label : '', version: clip(gh.version, 40) };
       } catch { return null; }
     }
-    const githubMode = () => !!githubTarget() && !config && !canQueueReview();
+    // A pending probe is not an absent service: GitHub is offered only when no
+    // service is configured or the probe confirmed this host has none (404/405).
+    const githubMode = () => !!githubTarget() && !canQueueReview() && (!service || serviceUnavailable);
     // GitHub rejects very long new-issue addresses; the words are shortened to fit
     // and the full text stays in the saved report on this device.
     const MAX_ISSUE_URL = 7000;
-    function issueParts(report, words, shortened) {
+    function issueParts(report, words, shortened, compact = false) {
       const target = githubTarget();
       const ctx = report.context;
       let diagnostics = {};
@@ -164,38 +166,45 @@
       const body = [
         '<!-- kairo-report v1 -->',
         '### What happened', '', words + (shortened ? '\n\n_(Shortened to fit; the full text is saved in the app.)_' : ''), '',
-        '### What I expected', '', clip(report.expected, 600), '',
+        '### What I expected', '', clip(report.expected, compact ? 200 : 600), '',
         '### Where', '',
         `- App: KAIRO ${target?.version || '(version unknown)'}`,
         `- Screen: ${code(ctx.surface)}`,
-        `- Path: ${code(ctx.route)}`,
-        ...(ctx.content_ids.length ? [`- Content: ${ctx.content_ids.map(code).join(', ')}`] : []),
+        `- Path: ${code(compact ? clip(ctx.route, 120) : ctx.route)}`,
+        ...(ctx.content_ids.length ? [`- Content: ${(compact ? ctx.content_ids.slice(0, 4).map(value => clip(value, 60)) : ctx.content_ids).map(code).join(', ')}`] : []),
         `- Interface language: ${ctx.locale}`,
         ...(diagnostics.viewport ? [`- Viewport: ${diagnostics.viewport.width}×${diagnostics.viewport.height}`] : []),
         `- Category: ${report.category}`,
         `- Reported: ${report.created_at}`,
         `- Report ID on the device: ${code(report.id)}`,
         ...(shots ? [`- Screenshots: ${shots} saved on the device. Attach them here if they help.`] : []),
-        '', '<details><summary>Recent screens</summary>', '', '```json', JSON.stringify(diagnostics.action_trace || []), '```', '', '</details>',
+        ...(compact ? ['', '_Some screen details were left out to fit; Copy report text in the app has them all._'] : ['', '<details><summary>Recent screens</summary>', '', '```json', JSON.stringify(diagnostics.action_trace || []), '```', '', '</details>']),
       ].join('\n');
       return { title, body };
     }
     function issueUrl(report) {
       const target = githubTarget();
       if (!target) return '';
-      const address = (words, shortened) => {
-        const { title, body } = issueParts(report, words, shortened);
+      const address = (words, shortened, compact) => {
+        const { title, body } = issueParts(report, words, shortened, compact);
         return `${target.url}?${new URLSearchParams({ title, body, ...(target.label ? { labels: target.label } : {}) })}`;
       };
-      const full = address(report.user_words, false);
-      if (full.length <= MAX_ISSUE_URL) return full;
       const chars = Array.from(report.user_words);
-      let low = 0, high = chars.length;
-      while (low < high) {
-        const middle = Math.ceil((low + high) / 2);
-        if (address(chars.slice(0, middle).join(''), true).length <= MAX_ISSUE_URL) low = middle; else high = middle - 1;
+      // Full words first; then the shortest form of the screen details; then
+      // the longest prefix of the words that still fits. Never over the limit.
+      for (const compact of [false, true]) {
+        const full = address(report.user_words, false, compact);
+        if (full.length <= MAX_ISSUE_URL) return full;
+        if (address('', true, compact).length > MAX_ISSUE_URL) continue;
+        let low = 0, high = chars.length;
+        while (low < high) {
+          const middle = Math.ceil((low + high) / 2);
+          if (address(chars.slice(0, middle).join(''), true, compact).length <= MAX_ISSUE_URL) low = middle; else high = middle - 1;
+        }
+        if (!compact && low >= Math.min(chars.length, 400)) return address(chars.slice(0, low).join(''), true, false);
+        if (compact) return address(chars.slice(0, low).join(''), true, true);
       }
-      return address(chars.slice(0, low).join(''), true);
+      return `${target.url}?${new URLSearchParams({ title: issueParts(report, '', false).title, body: '<!-- kairo-report v1 -->\n\nThis report was too long to fill in here. Paste it from Copy report text in the app.', ...(target.label ? { labels: target.label } : {}) })}`;
     }
     const metaKey = name => `${name}:${service || 'unconfigured'}`;
     const emptyDraft = () => { draftCanAdoptBuild = true; return { actual: '', expected: '', category: 'bug', context: capture(), attachments: [], created_at: new Date().toISOString() }; };
@@ -463,7 +472,7 @@
       try {
         await refreshRows();
         if (!config && !await loadConfig()) return;
-        for (let row of rows.filter(item => !item.view?.receipt)) {
+        for (let row of rows.filter(item => !item.view?.receipt && !item.github_opened_at)) {
           try {
             const auth = await session();
             row = await freezePayload(row, auth);
@@ -481,7 +490,7 @@
         await refreshRows();
         if (dialog.open && active !== 'new' && !busy && !body.querySelector('textarea:focus')) render();
       } catch (error) { configError = errorText(error); }
-      finally { syncing = false; if (!disposed && !closing && service && !serviceUnavailable && !canQueueReview() && rows.some(row => !row.view?.receipt)) retryTimer = setTimeout(() => run(sync), 30000); }
+      finally { syncing = false; if (!disposed && !closing && service && !serviceUnavailable && !canQueueReview() && rows.some(row => !row.view?.receipt && !row.github_opened_at)) retryTimer = setTimeout(() => run(sync), 30000); }
     }
 
     function snapshotReturn() {
@@ -557,7 +566,7 @@
         <label class="br-field"><span>What did you expect? <small>Optional</small></span><textarea id="br-expected" name="expected" ${busy ? 'readonly' : ''} maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
         <label class="br-field"><span>Category</span><select id="br-category" name="category" ${busy ? 'disabled' : ''}>${[['bug', 'Something isn’t working'], ['content', 'Language or content'], ['experience', 'Learning experience'], ['idea', 'An idea']].map(([value, label]) => `<option value="${value}" ${draft?.category === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
         ${exactContext(draft?.context)}${githubMode() && !draft?.attachments?.length ? '<p class="br-note">To include a screenshot, attach it on GitHub after the report opens there.</p>' : `<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>`}
-        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : githubMode() ? 'Send to GitHub' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : githubMode() ? 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. A copy stays on this device.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
+        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : githubMode() ? 'Send to GitHub' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : githubMode() ? 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
     }
     function listMarkup() {
       return `${notice()}<p class="br-note">${githubMode() ? 'Reports are saved in this browser. Open one to send it to GitHub, where it is filed for fixing.' : 'Reports and guest access are saved in this browser. Clearing browser data removes that access.'}</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
@@ -570,7 +579,7 @@
       if (!row) { active = 'list'; return listMarkup(); }
       const report = row.report, view = row.view, isReceived = !!view?.receipt, follow = followups[row.id]?.text || '', pending = followups[row.id]?.pending;
       const protectedAnswer = typeof options.protectAnswers === 'function' ? options.protectAnswers() : options.protectAnswers === true;
-      const githubSend = !isReceived && !canQueueReview() && !!githubTarget();
+      const githubSend = !isReceived && githubMode();
       return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : githubSend ? (row.github_opened_at ? 'GitHub was opened with this report. If you did not tap “Submit new issue” there, send it again.' : 'Not sent yet. Send it to GitHub to file it for fixing.') : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${githubSend ? `<div class="br-actions"><a class="br-primary br-link" href="${esc(issueUrl(report))}" target="_blank" rel="noopener" data-br="github" data-id="${esc(row.id)}">${row.github_opened_at ? 'Send to GitHub again' : 'Send to GitHub'}</a><button type="button" data-br="copy" data-id="${esc(row.id)}">Copy report text</button></div>` : ''}${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions">${githubSend ? '' : `<button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>`}${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
         ${isReceived ? `<h3>Sensei analysis</h3>${protectedAnswer ? '<p class="br-note">Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.</p>' : `<p class="br-note">${esc(triageText(view))}</p>${view.conversation?.length ? `<ol class="br-thread">${view.conversation.map(item => `<li><strong>${esc(item.actor === 'sensei' ? 'Sensei · AI interpretation' : item.actor === 'user' ? 'You' : 'Service update')}</strong><p class="br-verbatim">${esc(item.text)}</p></li>`).join('')}</ol>` : ''}${(view.proposals || []).map(proposalMarkup).join('')}`}${recoveryMarkup(savedFollowups, 'recover-followup', 'follow-ups')}${pending ? `<section class="br-pending"><h4>Awaiting confirmation</h4><p class="br-verbatim">${esc(pending.data.text)}</p><button type="button" data-br="retry-followup" ${busy ? 'disabled' : ''}>Retry pending follow-up</button><p class="br-note">This retries the same message and request ID. The text below is kept separately.</p></section>` : ''}<form id="br-follow-form"><label class="br-field"><span>Add a detail or reply</span><textarea id="br-follow" ${recovering || !followupSlots[row.id] ? 'readonly' : ''} maxlength="4000" rows="3">${esc(follow)}</textarea></label><div class="br-actions"><button type="submit" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Send follow-up</button><button type="button" data-br="reopen" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Still happening</button></div><p class="br-note">“Still happening” keeps this thread and adds the current screen context.</p></form>` : ''}`;
     }
@@ -837,7 +846,7 @@
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     });
-    function onOnline() { if (engaged || rows.some(row => !row.view?.receipt)) run(() => loadConfig(true).then(sync)); }
+    function onOnline() { if (engaged || rows.some(row => !row.view?.receipt && !row.github_opened_at)) run(() => loadConfig(true).then(sync)); }
     function onVisibility() { if (document.visibilityState === 'hidden' && draftDirty) run(persistDraft).catch(() => {}); }
     window.addEventListener('online', onOnline);
     document.addEventListener('visibilitychange', onVisibility);
@@ -851,7 +860,7 @@
       catch (error) { draft = emptyDraft(); draftSlot = newSlot(); configError = `Report storage is unavailable. ${errorText(error)}`; }
       initialized = true;
       // Ordinary lessons are network-idle. Only a prior pending outbox warrants reconnecting.
-      if (rows.some(row => !row.view?.receipt)) run(() => loadConfig().then(sync));
+      if (rows.some(row => !row.view?.receipt && !row.github_opened_at)) run(() => loadConfig().then(sync));
     })();
     return {
       ready,
@@ -890,7 +899,7 @@
             setMessage('Reports could not finish saving. Your editor is still available here; keep this page open and copy your text before leaving.');
             render();
             if (draftDirty) scheduleDraft();
-            if (service && rows.some(row => !row.view?.receipt)) retryTimer = setTimeout(() => run(sync), 30000);
+            if (service && rows.some(row => !row.view?.receipt && !row.github_opened_at)) retryTimer = setTimeout(() => run(sync), 30000);
             if (resumePolling && dialog.open && active === 'detail') pollTimer = setTimeout(() => run(updateReports), 12000);
             throw error;
           }
