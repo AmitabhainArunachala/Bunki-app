@@ -31788,7 +31788,7 @@ function renderSettings(main) {
   about.append(notes, el('p', 'card-kind', tx(
     '更新するには、オンラインで開いた後、このアプリの画面をすべて閉じて、もう一度開いてください。保存データは消さないでください。',
     'To update, open online, then close all app windows and reopen. Keep your saved website data.')));
-  main.append(language, doors, about);
+  main.append(language, doors, renderReportRelaySettings(), about);
 }
 function renderWordsDoors(main) {
   // the Words tab opens on the word web (the last word looked up, else the
@@ -32488,26 +32488,34 @@ function reportEntries(className) {
   return line;
 }
 /* The report relay. A device set up with the relay's address and key sends its
- * problem reports there, and the relay files each one as a GitHub issue. Setup is
- * one link opened on the device, ?report-relay=<https address>&report-key=<key>;
- * ?report-relay=off forgets it. Both stay on this device only, and are removed
- * from the address bar as soon as they are read. */
+ * problem reports there, and the relay files each one as a GitHub issue. The setup
+ * link is <app>?report-relay=<https address>&report-key=<key>; ?report-relay=off
+ * forgets it. Opened in the browser, the link is read and removed from the address
+ * bar. A home-screen app keeps its own storage, so the same link can be pasted in
+ * Me → Settings → Bug reports. Both stay on this device only. */
 const REPORT_RELAY_STORE = 'kairo-report-relay-v1';
+function saveReportRelay(address, key) {
+  try {
+    if (address === 'off') { localStorage.removeItem(REPORT_RELAY_STORE); return 'off'; }
+    const url = new URL(address);
+    const loopback = url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname);
+    if ((url.protocol === 'https:' || loopback) && !url.search && !url.hash && !url.username && /^[A-Za-z0-9_-]{16,128}$/.test(key)) {
+      localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url: `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}` }));
+      return 'saved';
+    }
+  } catch { /* An unusable link changes nothing. */ }
+  return '';
+}
+function saveReportRelayLink(text) {
+  let params;
+  try { params = new URL(String(text).trim()).searchParams; } catch { return ''; }
+  return params.has('report-relay') ? saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '') : '';
+}
 const REPORT_RELAY_URL = (() => {
   let params = null;
   try { params = new URLSearchParams(location.search); } catch { /* No address to read. */ }
   if (params?.has('report-relay')) {
-    const value = params.get('report-relay') || '', key = params.get('report-key') || '';
-    try {
-      if (value === 'off') localStorage.removeItem(REPORT_RELAY_STORE);
-      else {
-        const url = new URL(value);
-        const loopback = url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname);
-        if ((url.protocol === 'https:' || loopback) && !url.search && !url.hash && !url.username && /^[A-Za-z0-9_-]{16,128}$/.test(key)) {
-          localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url: `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}` }));
-        }
-      }
-    } catch { /* An unusable link changes nothing. */ }
+    saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '');
     params.delete('report-relay');
     params.delete('report-key');
     try { history.replaceState(history.state, '', `${location.pathname}${params.toString() ? `?${params}` : ''}${location.hash}`); } catch { /* The address keeps the link. */ }
@@ -32517,6 +32525,36 @@ const REPORT_RELAY_URL = (() => {
     return typeof saved?.url === 'string' ? saved.url : '';
   } catch { return ''; }
 })();
+function renderReportRelaySettings() {
+  const section = el('section', 'foundation-section');
+  section.id = 'settings-reports';
+  section.append(el('h2', 'eyebrow', tx('不具合の報告', 'Bug reports')));
+  let host = '';
+  try { host = REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { host = ''; }
+  const status = el('p', 'teacher-note', host
+    ? tx(`この端末の報告は GitHub に自動で送られる（${host}）。`, `Reports from this device go to GitHub automatically (${host}).`)
+    : tx('この端末は未設定。報告は入力済みの GitHub ページを開くので、そこで送信する。', 'Not set up on this device. A report opens a prefilled GitHub page for you to submit.'));
+  status.id = 'settings-reports-status';
+  const form = el('form', 'listening-form settings-report-form'); form.id = 'settings-report-form';
+  const field = listeningField(form, 'settings-report-link', tx('報告用リンクを貼り付ける', 'Paste your report setup link'));
+  field.type = 'url'; field.spellcheck = false; field.autocapitalize = 'off'; field.inputMode = 'url';
+  const save = el('button', 'chip', host ? tx('リンクを変更する', 'Change link') : tx('設定する', 'Set up')); save.type = 'submit'; save.id = 'settings-report-save';
+  const note = el('p', 'teacher-note'); note.id = 'settings-report-note'; note.setAttribute('role', 'status');
+  form.append(save, note);
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (saveReportRelayLink(field.value) !== 'saved') {
+      note.textContent = tx('報告用リンクとして読めない。リンク全体を貼り付ける。', 'That is not a report setup link. Paste the whole link.');
+      return;
+    }
+    // The report client reads its service once, when the app starts.
+    note.textContent = tx('設定した。再読み込みする。', 'Set up. Reloading.');
+    save.disabled = true;
+    location.reload();
+  });
+  section.append(status, form);
+  return section;
+}
 function mountMaintenanceReports() {
   if (!window.BunkiReports) return;
   maintenanceReports = window.BunkiReports.mount({

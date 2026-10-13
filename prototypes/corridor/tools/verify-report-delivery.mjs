@@ -14,7 +14,8 @@
  *   5. "Copy report text" copies the same issue text (Chromium only);
  *   6. no console errors.
  * and for the relay (services/report-relay):
- *   7. one setup link stores the relay on the device and leaves the address;
+ *   7. the setup link, pasted in Settings (as in a home-screen app) or opened in
+ *      the browser, sets up the device and leaves the address;
  *   8. a report saved before setup is filed automatically;
  *   9. a new report with a screenshot becomes a labelled issue, linked in the app,
  *      with the screenshot served by the relay;
@@ -40,6 +41,7 @@ mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
 const version = JSON.parse(readFileSync(new URL('../../../release.json', import.meta.url))).version;
 const RELAY_KEY = 'relay-test-key-0123456789';
+const setupLink = () => `${host.origin}/index.html?report-relay=${relay.origin}&report-key=${RELAY_KEY}`;
 const github = await startMockGithub();
 const relay = await startRelay({ REPORTS: memoryKv(), GITHUB_TOKEN: 'test-github-token', REPORT_KEY: RELAY_KEY, GITHUB_REPO: 'AmitabhainArunachala/Bunki-app', GITHUB_API: github.origin, ALLOW_LOOPBACK: '1' });
 const waitFor = async (predicate, timeout = 20_000) => {
@@ -224,10 +226,22 @@ try {
         await page.locator('#br-actual').fill('Saved before the relay was set up.');
         await page.locator('#br-form .br-primary').click();
         await page.waitForFunction(() => document.querySelector('#br-title')?.textContent === 'Your report');
-        await page.goto(`${host.origin}/index.html?entry=shelf&report-relay=${encodeURIComponent(relay.origin)}&report-key=${RELAY_KEY}`, { waitUntil: 'load' });
+        // A home-screen app keeps its own storage, so the link is pasted in Settings.
+        await page.locator('.br-sheet .br-close').click();
+        await page.locator('#tab-me').click();
+        await page.locator('#me-settings').click();
+        await page.waitForFunction(() => document.documentElement.dataset.room === 'settings');
+        const before = await page.locator('#settings-reports-status').textContent();
+        await page.locator('#settings-report-link').fill('https://example.com/not-a-setup-link');
+        await page.locator('#settings-report-save').click();
+        const refused = await page.locator('#settings-report-note').textContent();
+        check(`${engine} · Settings refuses text that is not a setup link`, /not a report setup link/.test(refused) && !(await page.evaluate(() => localStorage.getItem('kairo-report-relay-v1'))), refused);
+        await page.locator('#settings-report-link').fill(setupLink());
+        await Promise.all([page.waitForEvent('load'), page.locator('#settings-report-save').click()]);
         await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
-        const address = await page.evaluate(() => location.search);
-        check(`${engine} · the setup link is stored on the device and removed from the address`, address === '?entry=shelf', address);
+        const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-report-relay-v1') || 'null')?.url);
+        check(`${engine} · pasting the setup link in Settings sets up this device`,
+          /Not set up/.test(before) && stored === `${relay.origin}/k/${RELAY_KEY}`, `${before} → ${stored}`);
         await waitFor(() => github.state.issues.length === 1);
         check(`${engine} · the report saved before setup is filed automatically`,
           github.state.issues.length === 1 && github.state.issues[0].body.includes('Saved before the relay was set up.'), github.state.issues[0]?.title || 'no issue');
@@ -263,6 +277,22 @@ try {
         check(`${engine} · a reply from the app becomes an issue comment`, replied, `${github.state.comments.length} comment(s)`);
         await page.screenshot({ path: join(out, `${engine}-relay.png`) });
         check(`${engine} · no console errors (relay)`, errors.length === 0, errors.join(' | '));
+        await context.close();
+      });
+      // 6 · the setup link opened in the browser is stored and leaves the address
+      await scenario(`${engine} · setup link`, async () => {
+        const { context, page, errors } = await fresh();
+        await page.goto(setupLink().replace('index.html?', 'index.html?entry=shelf&'), { waitUntil: 'load' });
+        await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+        const address = await page.evaluate(() => location.search);
+        const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-report-relay-v1') || 'null')?.url);
+        check(`${engine} · the setup link is stored on the device and removed from the address`,
+          address === '?entry=shelf' && stored === `${relay.origin}/k/${RELAY_KEY}`, `${address} · ${stored}`);
+        await page.locator('#tab-me').click();
+        await page.locator('#me-settings').click();
+        const status = await page.locator('#settings-reports-status').textContent();
+        check(`${engine} · Settings says reports go to GitHub automatically`, status.includes('automatically') && status.includes(new URL(relay.origin).host), status);
+        check(`${engine} · no console errors (setup link)`, errors.length === 0, errors.join(' | '));
         await context.close();
       });
     } finally {
