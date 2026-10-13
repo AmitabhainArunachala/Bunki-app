@@ -32694,12 +32694,9 @@ function crumbPlaces(parts) {
  * found again by the very press that moved the keyboard */
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
-  // the layout under test stamps the root for its styles; the current layout leaves it unmarked
-  if (placesLayout()) {
-    document.documentElement.dataset.layout = 'places';
-    // Today folds into Review there; anything that still names it opens Review, its successor
-    if (S.view === 'tray') S.view = 'dojo';
-  } else delete document.documentElement.dataset.layout;
+  // Today folds into Review in the layout under test; anything that still names it opens
+  // Review, its successor. The current layout is asked only when the view is Today.
+  if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
   syncSheetActionVisit();
   if (personalHost) { personalHost.paint(); return; }
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
@@ -32773,6 +32770,9 @@ function render() {
   // the reading measure is per-view: a column for the texts, the full window
   // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.
   document.body.dataset.view = S.view;
+  // the layout under test stamps the root for its styles; the current layout leaves it unmarked
+  if (placesLayout()) document.documentElement.dataset.layout = 'places';
+  else delete document.documentElement.dataset.layout;
 
   // 銀河 hero: at home on the drift the galaxy stands alone but for its symbol;
   // the ordinary top bar is replaced by the tap-to-open nav, and the drift's
