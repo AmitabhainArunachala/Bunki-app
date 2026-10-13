@@ -25,6 +25,11 @@ const REPO = resolve(TOOL_DIR, '..', '..', '..');
 const EVIDENCE_DIR = resolveCorridorEvidence();
 const SHOTS_DIR = resolve(EVIDENCE_DIR, 'screenshots');
 const VIEWPORT = { width: 390, height: 844 };
+// The shelf's first stories rotate once a day (stable within the day). Every
+// probe below opens the first story and works its third word, so the tour
+// pins the day it runs on: the same story, and the same words, on every run.
+// The clock still moves forward from here; only the starting instant is fixed.
+const SHELF_DAY = new Date('2026-10-12T03:00:00Z');
 
 const MIME = {
   '.css': 'text/css; charset=utf-8',
@@ -212,6 +217,7 @@ async function main() {
       hasTouch: true,
       isMobile: true,
     });
+    await context.clock.setSystemTime(SHELF_DAY);
     // a passive observer: how long each press was held, as the app's own Date.now() clock sees it
     await context.addInitScript(() => {
       let downAt = 0;
@@ -640,6 +646,7 @@ async function main() {
       isMobile: true,
       reducedMotion: 'reduce',
     });
+    await reducedContext.clock.setSystemTime(SHELF_DAY);
     const reducedPage = await reducedContext.newPage();
     await openReader(reducedPage, base);
     await openWordDialog(reducedPage);
