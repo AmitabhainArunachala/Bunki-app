@@ -15,7 +15,9 @@
  *   6. no console errors.
  * and for the relay (services/report-relay):
  *   7. the setup link, pasted in Settings (as in a home-screen app) or opened in
- *      the browser, sets up the device and leaves the address;
+ *      the browser, sets up the device and leaves the address; an opened link
+ *      changes nothing by itself: it waits in Settings, naming the host the
+ *      reports would go to, until Set up is chosen;
  *   8. a report saved before setup is filed automatically;
  *   9. a new report with a screenshot becomes a labelled issue, linked in the app,
  *      with the screenshot served by the relay;
@@ -76,6 +78,15 @@ const scenario = async (name, body) => {
     check(`${name} ran to completion`, false, String(error?.message || error).split('\n').slice(0, 3).join(' '));
   }
 };
+
+// An opened setup link waits in Settings, naming its host; Set up stores it and reloads.
+async function acceptSetupLink(page) {
+  await page.goto(setupLink().replace('index.html?', 'index.html?entry=shelf&'), { waitUntil: 'load' });
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+  await page.locator('#settings-report-offer').waitFor();
+  await Promise.all([page.waitForEvent('load'), page.locator('#settings-report-save').click()]);
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+}
 
 async function openSheet(page, beforeProbe) {
   await page.goto(`${host.origin}/index.html?entry=shelf`, { waitUntil: 'load' });
@@ -256,6 +267,9 @@ try {
         await page.locator('#br-actual').waitFor();
         const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
         check(`${engine} · with the relay set up, the sheet sends reports itself`, ready, await page.locator('#br-form .br-primary').textContent());
+        const sendNote = await page.locator('#br-form > p.br-note').last().textContent();
+        check(`${engine} · before sending, the sheet says the report and its screenshots become a public GitHub issue`,
+          /public GitHub issue, with its screenshots/.test(sendNote), sendNote);
         await page.locator('#br-actual').fill('The tutor reply is cut off.');
         await page.locator('#br-files').setInputFiles({ name: 'screen.png', mimeType: 'image/png', buffer: PIXEL_PNG });
         await page.locator('.br-attachments figure').waitFor();
@@ -311,8 +325,7 @@ try {
           };
         });
         const before = github.state.issues.length;
-        await page.goto(setupLink().replace('index.html?', 'index.html?entry=shelf&'), { waitUntil: 'load' });
-        await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+        await acceptSetupLink(page);
         await page.locator('#bunki-report-bug').click();
         await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 });
         await page.locator('#br-actual').fill('Screenshot from a browser without Blob storage.');
@@ -330,19 +343,36 @@ try {
         await context.close();
       });
 
-      // 7 · the setup link opened in the browser is stored and leaves the address
+      // 7 · the setup link opened in the browser leaves the address and waits in
+      //     Settings, naming its host, until Set up stores it
       await scenario(`${engine} · setup link`, async () => {
         const { context, page, errors } = await fresh();
         await page.goto(setupLink().replace('index.html?', 'index.html?entry=shelf&'), { waitUntil: 'load' });
         await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+        const offered = await page.evaluate(() => ({
+          address: location.search,
+          stored: localStorage.getItem('kairo-report-relay-v1'),
+          room: document.documentElement.dataset.room,
+          offer: document.querySelector('#settings-report-offer')?.textContent || '',
+          field: document.querySelector('#settings-report-link')?.value || '',
+        }));
+        check(`${engine} · an opened setup link changes nothing by itself: it leaves the address and waits in Settings, naming its host`,
+          offered.address === '?entry=shelf' && offered.stored === null && offered.room === 'settings' &&
+            offered.offer.includes(new URL(relay.origin).host) && /public GitHub issues/.test(offered.offer) && offered.field.includes(relay.origin),
+          JSON.stringify(offered));
+        const focused = await page.waitForFunction(() => document.activeElement?.id === 'settings-report-save', null, { timeout: 5_000 }).then(() => true, () => false);
+        check(`${engine} · Set up is focused, one tap away`, focused, await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName));
+        await Promise.all([page.waitForEvent('load'), page.locator('#settings-report-save').click()]);
+        await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
         const address = await page.evaluate(() => location.search);
         const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-report-relay-v1') || 'null')?.url);
-        check(`${engine} · the setup link is stored on the device and removed from the address`,
+        check(`${engine} · Set up stores the opened link on the device, and the address stays clean`,
           address === '?entry=shelf' && stored === `${relay.origin}/k/${RELAY_KEY}`, `${address} · ${stored}`);
         await page.locator('#tab-me').click();
         await page.locator('#me-settings').click();
         const status = await page.locator('#settings-reports-status').textContent();
-        check(`${engine} · Settings says reports go to GitHub automatically`, status.includes('automatically') && status.includes(new URL(relay.origin).host), status);
+        const offerAgain = await page.locator('#settings-report-offer').count();
+        check(`${engine} · Settings says reports go to GitHub automatically, with no link waiting`, status.includes('automatically') && status.includes(new URL(relay.origin).host) && offerAgain === 0, `${status} · offers ${offerAgain}`);
         check(`${engine} · no console errors (setup link)`, errors.length === 0, errors.join(' | '));
         await context.close();
       });

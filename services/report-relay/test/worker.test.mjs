@@ -106,6 +106,7 @@ test('the key gates every report endpoint; health and config answer', async () =
   const config = await (await call(api('/config'))).json();
   assert.equal(config.schema_version, 'bunki.maintenance/v1');
   assert.equal(config.ai.status, 'none');
+  assert.equal(config.public_reports, true);
   assert.equal(
     (
       await call(api('/reports'), {
@@ -312,6 +313,40 @@ test('each device sees only its own reports', async () => {
   const macList = await (await call(api('/reports'), { token: mac.token })).json();
   assert.equal(phoneList.reports.length, 1);
   assert.equal(macList.reports.length, 0);
+});
+
+test('hourly ceilings: no new issue past the limit, a filed report still answers its retry', async () => {
+  const session = await signIn();
+  const filed = {
+    idempotency_key: 'delivery_ceiling_01',
+    report: report(session.actor_ref),
+    attachments: [],
+  };
+  assert.equal((await file(session, filed)).response.status, 201);
+  const hour = (offset) => new Date(Date.now() + offset * 3600_000).toISOString().slice(0, 13);
+  assert.equal(await env.REPORTS.get(`limit:create:${hour(0)}`), '1');
+  // a leaked key reaching the ceiling (this hour and the next, should the clock turn mid-test)
+  for (const offset of [0, 1]) {
+    await env.REPORTS.put(`limit:create:${hour(offset)}`, '20');
+    await env.REPORTS.put(`limit:list:${hour(offset)}`, '30');
+  }
+  const refused = await file(session, {
+    idempotency_key: 'delivery_ceiling_02',
+    report: report(session.actor_ref, { id: 'report_' + 'b'.repeat(32) }),
+    attachments: [],
+  });
+  assert.equal(refused.response.status, 429);
+  assert.equal(refused.view.error.code, 'rate_limited');
+  assert.match(refused.view.error.message, /stays on your device/);
+  assert.equal(github.state.issues.length, 1);
+  assert.equal(await env.REPORTS.get(`report:${session.actor_ref}:report_${'b'.repeat(32)}`), null);
+  // the report filed before the ceiling still answers its own retry with its receipt
+  const retried = await file(session, filed);
+  assert.equal(retried.response.status, 200);
+  assert.equal(retried.view.issue.number, github.state.issues[0].number);
+  const listed = await call(api('/reports'), { token: session.token });
+  assert.equal(listed.status, 429);
+  assert.equal((await listed.json()).error.code, 'rate_limited');
 });
 
 test('only the app origins get CORS access', async () => {

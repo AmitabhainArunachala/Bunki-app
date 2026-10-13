@@ -39,8 +39,11 @@ The relay is a separate service. It never builds or publishes the phone app;
    `https://amitabhainarunachala.github.io/Bunki-app/?report-relay=<relay address>&report-key=<REPORT_KEY>`.
    Paste it in the app under **Me → Settings → Bug reports**, or open it in
    the browser that runs the app. A home-screen app keeps its own storage, so
-   on a phone paste it in Settings. The app stores both on the device and
-   removes them from the address bar.
+   on a phone paste it in Settings. An opened link is removed from the address
+   bar and waits in **Settings → Bug reports**, naming the host the reports
+   would go to; nothing is stored until **Set up** is chosen. That way a link
+   from someone else cannot quietly send a device's reports and screenshots to
+   another relay. The app then keeps the address and key on the device.
    Reports saved on that device before setup are then sent automatically.
    `?report-relay=off` forgets the relay.
 
@@ -53,7 +56,7 @@ Under `/k/<REPORT_KEY>`:
 
 | Request                                           | Result                                                                                                           |
 | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `GET /api/config`                                 | Contract identity and limits (`ai.status: "none"`)                                                               |
+| `GET /api/config`                                 | Contract identity and limits (`ai.status: "none"`, `public_reports: true`)                                       |
 | `POST /api/session`                               | A signed device identity (`token`, `actor_ref`)                                                                  |
 | `POST /api/reports`                               | Files the issue; idempotent by `idempotency_key`; the receipt digest is the SHA-256 of the exact request bytes   |
 | `GET /api/reports`, `GET /api/reports/:id`        | Report views built from the live issue: status from its state and `fixer:*` labels, comments as the conversation |
@@ -62,6 +65,16 @@ Under `/k/<REPORT_KEY>`:
 | `GET /api/reports/:id/attachments/:attachment_id` | The original screenshot                                                                                          |
 
 Public: `GET /health`, and `GET /v1/shots/<id>` for the screenshot images in issues.
+The issues are public, so their screenshots are too: the app says so before a
+report is sent (`public_reports: true` in the config).
+
+Every keyed request beyond the config and the session counts against an hourly
+ceiling for the whole relay: 20 new issues, 30 report lists and 200 other report
+requests. Past it the relay answers `429 rate_limited`, and the app keeps the
+report and retries later. A learner files a few reports a day; the ceilings stop a
+leaked key from filing issues as the owner without end or spending the GitHub
+token's API quota. If the key leaks, change `REPORT_KEY` and set up each device
+again.
 
 Only `https://amitabhainarunachala.github.io` gets CORS access, plus loopback
 pages when `ALLOW_LOOPBACK=1` (local verification only).
