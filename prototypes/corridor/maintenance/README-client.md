@@ -28,6 +28,20 @@ The native modal dialog provides background inertness. Closing with Escape or ei
 
 When the page is opened through Lavish (`window.lavish.queuePrompt` exists), the client never contacts a report service: saving keeps the report on this device and queues its words and screen context in Lavish (tag `bunki-report`), shown as “Queued in Lavish”. A queued report is not a service receipt, and a queue failure leaves the saved report intact with a retry.
 
+## GitHub delivery (the published app)
+
+The published app has no report service: GitHub Pages answers the `/api/config` probe with 404. When the host passes `github: { newIssueUrl, label, version }` and no service or Lavish queue is connected, **Send to GitHub** files the report as a GitHub issue:
+
+- The tap that submits the form also opens `newIssueUrl` with `title`, `body` and `labels` filled in. The window is opened before any await, because browsers block windows opened later. The learner taps **Submit new issue** under their own GitHub account; no token is held by the app.
+- The body starts with `<!-- kairo-report v1 -->`. It holds the learner's words and expectation, the app version, the screen (`surface`, path, content IDs, language, viewport), the category, the time and the device's report ID, plus the recent-screen trace. Words are shortened so the address stays within 7,000 characters; the full text stays in the saved report.
+- The report is still saved in IndexedDB first-class. If the window was blocked, or the report was saved by an earlier version, its detail view offers a **Send to GitHub** link and **Copy report text**. Opening the link records `github_opened_at` and shows **Opened on GitHub**. The client cannot see whether the issue was actually submitted.
+- Screenshots are attached on GitHub; the picker is hidden in this mode unless a draft already holds images.
+- Only an exact `https://github.com/<owner>/<repo>/issues/new` address is accepted.
+
+Issues with the `kairo-report` label are picked up by the scheduled fixer agent, which opens a pull request for review; nothing is merged or deployed without full CI and a human merge.
+
+`prototypes/corridor/tools/verify-report-github.mjs` exercises this path on the built site with github.com stubbed, in Chromium and WebKit.
+
 ## Delivery and persistence
 
 Fresh mounts make no network requests. Opening reports or finding a pending local outbox enables service access. HTTPS and loopback HTTP services are supported. There is no implicit endpoint fallback.

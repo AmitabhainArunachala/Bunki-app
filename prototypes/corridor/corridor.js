@@ -13,7 +13,7 @@
  */
 
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.0.1","channel":"stable","releasedOn":"2026-10-13","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.1.0","channel":"stable","releasedOn":"2026-10-13","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 
 const DATA = {
@@ -32493,6 +32493,9 @@ function mountMaintenanceReports() {
     rail: true,
     locale: S.lang === 'ja' ? 'ja' : 'en',
     serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
+    // With no report service (the published site), a report is filed as a GitHub
+    // issue under the learner's own account; the fixer agent picks up that label.
+    github: { newIssueUrl: 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new', label: 'kairo-report', version: APP_RELEASE.version },
     getContext: maintenanceContext,
     clockNotice: () => {
       try { const selected = currentAssessmentV2(); return selected?.attempt?.status === 'in-progress' && selected.attempt.mode === 'timed' ? 'The test clock continues while this report is open.' : ''; }

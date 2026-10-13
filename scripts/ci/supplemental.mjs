@@ -35,6 +35,7 @@ export function supplementalGates(out) {
       requiredPath: 'prototypes/corridor/tools/test_segment_overrides.py',
     },
     node('n2n1-decks-browser', 'prototypes/corridor/tools/verify-n2n1-decks.mjs'),
+    node('report-github', 'prototypes/corridor/tools/verify-report-github.mjs'),
     node('redesign-language', 'tools/lint-ui-language.mjs', ['--screenshots', '--both-languages']),
     node('redesign-foundation', 'tools/verify-redesign-foundation.mjs'),
     node('redesign-docks', 'tools/verify-redesign-docks.mjs'),

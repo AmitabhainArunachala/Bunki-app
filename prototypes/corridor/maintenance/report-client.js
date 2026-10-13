@@ -134,6 +134,69 @@
         return url.href.replace(/\/$/, '');
       } catch { return ''; }
     }
+    // GitHub delivery. A static host has no report service, so a report is filed
+    // as a prefilled GitHub issue that the learner submits under their own
+    // account. Only an exact github.com new-issue address is accepted; a working
+    // report service or Lavish review still takes precedence.
+    function githubTarget() {
+      const gh = options.github;
+      if (!gh || typeof gh.newIssueUrl !== 'string') return null;
+      try {
+        const url = new URL(gh.newIssueUrl);
+        if (url.origin !== 'https://github.com' || url.search || url.hash || url.username || url.password ||
+          !/^\/[A-Za-z0-9-]+\/[A-Za-z0-9._-]+\/issues\/new$/.test(url.pathname)) return null;
+        return { url: url.href, label: /^[a-z0-9-]{1,50}$/.test(gh.label || '') ? gh.label : '', version: clip(gh.version, 40) };
+      } catch { return null; }
+    }
+    const githubMode = () => !!githubTarget() && !config && !canQueueReview();
+    // GitHub rejects very long new-issue addresses; the words are shortened to fit
+    // and the full text stays in the saved report on this device.
+    const MAX_ISSUE_URL = 7000;
+    function issueParts(report, words, shortened) {
+      const target = githubTarget();
+      const ctx = report.context;
+      let diagnostics = {};
+      try { diagnostics = JSON.parse(report.evidence.find(item => item.kind === 'action_trace')?.summary || '{}') || {}; } catch { /* Context lines below still identify the screen. */ }
+      const code = value => `\`${String(value).replace(/`/g, "'")}\``;
+      const shots = report.attachment_ids.length;
+      const first = words.split(/\r?\n/).find(line => line.trim()) || 'Problem report';
+      const title = `[KAIRO] ${clip(first.trim(), 72)}`;
+      const body = [
+        '<!-- kairo-report v1 -->',
+        '### What happened', '', words + (shortened ? '\n\n_(Shortened to fit; the full text is saved in the app.)_' : ''), '',
+        '### What I expected', '', clip(report.expected, 600), '',
+        '### Where', '',
+        `- App: KAIRO ${target?.version || '(version unknown)'}`,
+        `- Screen: ${code(ctx.surface)}`,
+        `- Path: ${code(ctx.route)}`,
+        ...(ctx.content_ids.length ? [`- Content: ${ctx.content_ids.map(code).join(', ')}`] : []),
+        `- Interface language: ${ctx.locale}`,
+        ...(diagnostics.viewport ? [`- Viewport: ${diagnostics.viewport.width}×${diagnostics.viewport.height}`] : []),
+        `- Category: ${report.category}`,
+        `- Reported: ${report.created_at}`,
+        `- Report ID on the device: ${code(report.id)}`,
+        ...(shots ? [`- Screenshots: ${shots} saved on the device. Attach them here if they help.`] : []),
+        '', '<details><summary>Recent screens</summary>', '', '```json', JSON.stringify(diagnostics.action_trace || []), '```', '', '</details>',
+      ].join('\n');
+      return { title, body };
+    }
+    function issueUrl(report) {
+      const target = githubTarget();
+      if (!target) return '';
+      const address = (words, shortened) => {
+        const { title, body } = issueParts(report, words, shortened);
+        return `${target.url}?${new URLSearchParams({ title, body, ...(target.label ? { labels: target.label } : {}) })}`;
+      };
+      const full = address(report.user_words, false);
+      if (full.length <= MAX_ISSUE_URL) return full;
+      const chars = Array.from(report.user_words);
+      let low = 0, high = chars.length;
+      while (low < high) {
+        const middle = Math.ceil((low + high) / 2);
+        if (address(chars.slice(0, middle).join(''), true).length <= MAX_ISSUE_URL) low = middle; else high = middle - 1;
+      }
+      return address(chars.slice(0, low).join(''), true);
+    }
     const metaKey = name => `${name}:${service || 'unconfigured'}`;
     const emptyDraft = () => { draftCanAdoptBuild = true; return { actual: '', expected: '', category: 'bug', context: capture(), attachments: [], created_at: new Date().toISOString() }; };
     function serviceBuild() {
@@ -343,7 +406,7 @@
       root.querySelector('.br-count').hidden = !rows.length;
     }
     function statusLabel(row) {
-      if (!row.view?.receipt) return row.review_queued_at ? 'Queued in Lavish' : 'Saved on this device';
+      if (!row.view?.receipt) return row.review_queued_at ? 'Queued in Lavish' : row.github_opened_at ? 'Opened on GitHub' : 'Saved on this device';
       // A release claim needs server evidence; unknown client/model statuses cannot claim a fix.
       if (row.view.status === 'fixed' && row.view.release?.verified === true && row.view.release?.version) return `Fixed in ${row.view.release.version}`;
       return STATUS[row.view.status] || 'Received';
@@ -490,14 +553,14 @@
       const scopeChanged = canonical({ surface: context?.surface, ids: context?.content_ids }) !== canonical({ surface: currentContext.surface, ids: currentContext.content_ids });
       const scope = [context?.surface?.replace(/^corridor\//, '').replaceAll('/', ' › '), ...(context?.content_ids || [])].filter(Boolean).join(' · ');
       return `${notice()}<p>Tell us what happened. Your place in the lesson stays here.</p><p class="br-context-summary"><strong>Reporting this screen</strong><br>${esc(scope)}${scopeChanged ? '<br><button type="button" data-br="context">Use the current screen for this draft</button>' : ''}</p>${options.clockNotice ? `<p class="br-note">${esc(typeof options.clockNotice === 'function' ? options.clockNotice() : options.clockNotice)}</p>` : ''}
-        ${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${recoveryMarkup(savedDrafts, 'recover-draft', 'reports')}<form id="br-form"><label class="br-field"><span>What happened?</span><textarea id="br-actual" name="actual" ${busy ? 'readonly' : ''} required maxlength="12000" rows="4" placeholder="Which sentence or control was involved?">${esc(draft?.actual)}</textarea></label>
+        ${configError && !githubMode() ? `<p class="br-note">${esc(configError)}</p>` : ''}${recoveryMarkup(savedDrafts, 'recover-draft', 'reports')}<form id="br-form"><label class="br-field"><span>What happened?</span><textarea id="br-actual" name="actual" ${busy ? 'readonly' : ''} required maxlength="12000" rows="4" placeholder="Which sentence or control was involved?">${esc(draft?.actual)}</textarea></label>
         <label class="br-field"><span>What did you expect? <small>Optional</small></span><textarea id="br-expected" name="expected" ${busy ? 'readonly' : ''} maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
         <label class="br-field"><span>Category</span><select id="br-category" name="category" ${busy ? 'disabled' : ''}>${[['bug', 'Something isn’t working'], ['content', 'Language or content'], ['experience', 'Learning experience'], ['idea', 'An idea']].map(([value, label]) => `<option value="${value}" ${draft?.category === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
-        ${exactContext(draft?.context)}<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>
-        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
+        ${exactContext(draft?.context)}${githubMode() && !draft?.attachments?.length ? '<p class="br-note">To include a screenshot, attach it on GitHub after the report opens there.</p>' : `<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>`}
+        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : githubMode() ? 'Send to GitHub' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : githubMode() ? 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. A copy stays on this device.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
     }
     function listMarkup() {
-      return `${notice()}<p class="br-note">Reports and guest access are saved in this browser. Clearing browser data removes that access.</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
+      return `${notice()}<p class="br-note">${githubMode() ? 'Reports are saved in this browser. Open one to send it to GitHub, where it is filed for fixing.' : 'Reports and guest access are saved in this browser. Clearing browser data removes that access.'}</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
     }
     function proposalMarkup(proposal) {
       return `<section class="br-proposal"><h3>${esc(proposal.title)}</h3><p class="br-note">Sensei proposal · ${esc(proposal.origin?.model_ref || 'Model not supplied')} · Requires operator review</p><p class="br-verbatim">${esc(proposal.problem)}</p><h4>Suggested change</h4><p class="br-verbatim">${esc(proposal.proposed_change)}</p>${proposal.claims?.length ? `<h4>Claims and evidence</h4><ul>${proposal.claims.map(claim => `<li><strong>${esc(({ user_report: 'Reported', inspection: 'Inspected', hypothesis: 'Hypothesis' })[claim.basis] || claim.basis)}:</strong> ${esc(claim.text)}<br><span class="br-note">Evidence: ${esc((claim.evidence_ids || []).join(', '))}</span></li>`).join('')}</ul>` : ''}<h4>Acceptance checks</h4><ol>${(proposal.acceptance_cases || []).map(item => `<li><strong>Given</strong> ${esc(item.given)}<br><strong>When</strong> ${esc(item.when)}<br><strong>Then</strong> ${esc(item.then)}</li>`).join('')}</ol>${proposal.unknowns?.length ? `<h4>Still uncertain</h4><ul>${proposal.unknowns.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : ''}<h4>Rollback</h4><p>${esc(proposal.rollback)}</p><p class="br-note">Source reports: ${esc((proposal.source_report_ids || []).join(', '))}</p><details><summary>Inspect complete proposal JSON</summary><pre>${esc(JSON.stringify(proposal, null, 2))}</pre></details><button type="button" data-br="export" data-id="${esc(proposal.id)}">Export this proposal JSON</button><p class="br-note">This proposal requests review. It cannot change the app or grant execution permission.</p></section>`;
@@ -507,7 +570,8 @@
       if (!row) { active = 'list'; return listMarkup(); }
       const report = row.report, view = row.view, isReceived = !!view?.receipt, follow = followups[row.id]?.text || '', pending = followups[row.id]?.pending;
       const protectedAnswer = typeof options.protectAnswers === 'function' ? options.protectAnswers() : options.protectAnswers === true;
-      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
+      const githubSend = !isReceived && !canQueueReview() && !!githubTarget();
+      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : githubSend ? (row.github_opened_at ? 'GitHub was opened with this report. If you did not tap “Submit new issue” there, send it again.' : 'Not sent yet. Send it to GitHub to file it for fixing.') : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${githubSend ? `<div class="br-actions"><a class="br-primary br-link" href="${esc(issueUrl(report))}" target="_blank" rel="noopener" data-br="github" data-id="${esc(row.id)}">${row.github_opened_at ? 'Send to GitHub again' : 'Send to GitHub'}</a><button type="button" data-br="copy" data-id="${esc(row.id)}">Copy report text</button></div>` : ''}${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions">${githubSend ? '' : `<button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>`}${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
         ${isReceived ? `<h3>Sensei analysis</h3>${protectedAnswer ? '<p class="br-note">Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.</p>' : `<p class="br-note">${esc(triageText(view))}</p>${view.conversation?.length ? `<ol class="br-thread">${view.conversation.map(item => `<li><strong>${esc(item.actor === 'sensei' ? 'Sensei · AI interpretation' : item.actor === 'user' ? 'You' : 'Service update')}</strong><p class="br-verbatim">${esc(item.text)}</p></li>`).join('')}</ol>` : ''}${(view.proposals || []).map(proposalMarkup).join('')}`}${recoveryMarkup(savedFollowups, 'recover-followup', 'follow-ups')}${pending ? `<section class="br-pending"><h4>Awaiting confirmation</h4><p class="br-verbatim">${esc(pending.data.text)}</p><button type="button" data-br="retry-followup" ${busy ? 'disabled' : ''}>Retry pending follow-up</button><p class="br-note">This retries the same message and request ID. The text below is kept separately.</p></section>` : ''}<form id="br-follow-form"><label class="br-field"><span>Add a detail or reply</span><textarea id="br-follow" ${recovering || !followupSlots[row.id] ? 'readonly' : ''} maxlength="4000" rows="3">${esc(follow)}</textarea></label><div class="br-actions"><button type="submit" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Send follow-up</button><button type="button" data-br="reopen" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Still happening</button></div><p class="br-note">“Still happening” keeps this thread and adds the current screen context.</p></form>` : ''}`;
     }
     function triageText(view) {
@@ -518,15 +582,20 @@
       return config?.ai?.status && !['ready', 'available'].includes(config.ai.status) ? `AI service: ${config.ai.status}. No model response has been received.` : 'No model response has been received yet. Ask Sensei for a proposal when you are ready.';
     }
 
-    async function submitReport() {
+    function buildReport(source, reportId, createdAt = new Date().toISOString()) {
+      return { schema_version: SCHEMA, id: reportId, revision: 1, created_at: createdAt, origin: { kind: 'user', actor_ref: 'pending_guest_session', model_ref: null }, context: source.context.context, evidence: [{ id: id('evidence'), kind: 'user_quote', summary: clip(source.actual.trim(), 4000), artifact_ref: null }, { id: id('evidence'), kind: 'action_trace', summary: JSON.stringify(source.context.diagnostics), artifact_ref: null }, ...source.attachments.map(item => ({ id: id('evidence'), kind: 'screenshot', summary: `User-selected screenshot: ${item.name}`, artifact_ref: `attachment:${item.id}` }))], execution_authority: 'none', kind: 'learner_report', category: source.category, user_words: clip(source.actual.trim(), 12000), expected: clip(source.expected.trim(), 4000) || 'Not specified', actual: clip(source.actual.trim(), 4000), reproduction_steps: [], attachment_ids: source.attachments.map(item => item.id) };
+    }
+    // preset carries the identity of a report already opened on GitHub in the
+    // submit gesture, so the saved copy and the filed issue name the same report.
+    async function submitReport(preset = null) {
       if (busy || attachmentBusy || !draft?.actual.trim()) return;
       busy = true; setMessage('Saving the report and selected screenshots on this device…'); render();
       try {
         if (draftCanAdoptBuild && service && new URL(service).origin === location.origin && !draft.context.context.build.git_sha) await loadConfig();
         await persistDraft();
         const submittedDraft = structuredClone(draft), submittedSlot = { ...draftSlot };
-        const reportId = id('report'), report = { schema_version: SCHEMA, id: reportId, revision: 1, created_at: new Date().toISOString(), origin: { kind: 'user', actor_ref: 'pending_guest_session', model_ref: null }, context: submittedDraft.context.context, evidence: [{ id: id('evidence'), kind: 'user_quote', summary: clip(submittedDraft.actual.trim(), 4000), artifact_ref: null }, { id: id('evidence'), kind: 'action_trace', summary: JSON.stringify(submittedDraft.context.diagnostics), artifact_ref: null }, ...submittedDraft.attachments.map(item => ({ id: id('evidence'), kind: 'screenshot', summary: `User-selected screenshot: ${item.name}`, artifact_ref: `attachment:${item.id}` }))], execution_authority: 'none', kind: 'learner_report', category: submittedDraft.category, user_words: clip(submittedDraft.actual.trim(), 12000), expected: clip(submittedDraft.expected.trim(), 4000) || 'Not specified', actual: clip(submittedDraft.actual.trim(), 4000), reproduction_steps: [], attachment_ids: submittedDraft.attachments.map(item => item.id) };
-        const row = { id: reportId, idempotency_key: id('delivery'), service, created_at: report.created_at, report, view: null, delivery_error: '' };
+        const reportId = preset?.id || id('report'), report = buildReport(submittedDraft, reportId, preset?.created_at);
+        const row = { id: reportId, idempotency_key: id('delivery'), service, created_at: report.created_at, report, view: null, delivery_error: '', ...(preset?.opened ? { github_opened_at: new Date().toISOString() } : {}) };
         await transact(['records', 'attachments', 'meta'], tx => {
           tx.objectStore('records').put(row);
           for (const item of submittedDraft.attachments) tx.objectStore('attachments').put({ ...item, report_id: reportId });
@@ -538,7 +607,9 @@
         });
         draft = emptyDraft(); draftSlot = newSlot(); rememberSlot('draft', draftSlot); draftDirty = false;
         selectedId = reportId; active = 'detail';
-        message = 'Saved on this device. It has not been sent.';
+        message = preset?.opened ? 'GitHub opened with this report filled in. Tap “Submit new issue” there to send it. A copy is saved here.'
+          : preset ? 'Saved here. Tap “Send to GitHub” below to file it.'
+            : 'Saved on this device. It has not been sent.';
         if (canQueueReview()) await queueReview(row);
         await refreshRows();
         announce(message);
@@ -666,9 +737,29 @@
       const link = document.createElement('a'); link.href = url; link.download = `bunki-${proposal.id.replace(/[^a-z0-9_-]/g, '')}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
+    // Clipboard writes must happen inside the tap itself (WebKit refuses them
+    // after an await), so the copy action runs before the shared async handler.
+    function copyReport(reportId) {
+      const row = rows.find(item => item.id === reportId);
+      if (!row || !navigator.clipboard?.writeText) { setMessage('Copying is not available here. Use Send to GitHub instead.'); return; }
+      const { title, body } = issueParts(row.report, row.report.user_words, false);
+      navigator.clipboard.writeText(`${title}\n\n${body}\n`).then(
+        () => setMessage('Copied. Paste it into a GitHub issue or a chat with Claude.'),
+        () => setMessage('Copying was not allowed here. Use Send to GitHub instead.'),
+      );
+    }
+    async function markGithubOpened(reportId) {
+      const row = await read('records', reportId);
+      if (!row || row.github_opened_at) return;
+      await transact(['records'], tx => tx.objectStore('records').put({ ...row, github_opened_at: new Date().toISOString() }));
+      await refreshRows();
+      if (dialog.open && active === 'detail' && selectedId === reportId) render();
+    }
     root.addEventListener('click', event => {
       event.stopPropagation();
       if (closing || disposed) return;
+      const copyButton = event.target.closest('[data-br="copy"]');
+      if (copyButton && !copyButton.disabled) { copyReport(copyButton.dataset.id); return; }
       run(async () => {
         const button = event.target.closest('[data-br]');
         if (!button || button.disabled) return;
@@ -700,6 +791,8 @@
           return recoverSlot(button.dataset.id, action === 'recover-draft' ? 'draft' : `followup:${selectedId}`);
         }
         else if (action === 'export') exportProposal(button.dataset.id);
+        // The link itself navigates to GitHub; this only records that it was opened.
+        else if (action === 'github') return markGithubOpened(button.dataset.id);
       }).catch(error => setMessage(errorText(error)));
     });
     root.addEventListener('input', event => {
@@ -719,7 +812,22 @@
       if (event.target.id === 'br-category' && !busy) { draft.category = event.target.value; scheduleDraft(); }
       if (event.target.id === 'br-files') { const files = [...event.target.files]; run(() => addFiles(files)); }
     });
-    root.addEventListener('submit', event => { event.preventDefault(); if (closing || disposed) return; if (event.target.id === 'br-form') run(submitReport); if (event.target.id === 'br-follow-form') run(() => followup(false)); });
+    root.addEventListener('submit', event => {
+      event.preventDefault();
+      if (closing || disposed) return;
+      if (event.target.id === 'br-form') {
+        let preset = null;
+        if (githubMode() && !busy && !attachmentBusy && draft?.actual.trim()) {
+          // Open GitHub inside the tap: a browser blocks a window opened after the
+          // save's await. If it is blocked anyway, the saved report keeps a link.
+          preset = { id: id('report'), created_at: new Date().toISOString(), opened: false };
+          const opened = window.open(issueUrl(buildReport(draft, preset.id, preset.created_at)), '_blank');
+          if (opened) { try { opened.opener = null; } catch { /* Cross-origin windows may refuse this. */ } preset.opened = true; }
+        }
+        run(() => submitReport(preset));
+      }
+      if (event.target.id === 'br-follow-form') run(() => followup(false));
+    });
     dialog.addEventListener('close', restoreReturn);
     dialog.addEventListener('cancel', event => { if (closing) event.preventDefault(); /* Otherwise native Escape restores the exact origin. */ });
     dialog.addEventListener('keydown', event => {
