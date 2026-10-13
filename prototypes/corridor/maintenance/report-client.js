@@ -486,7 +486,9 @@
         attachments.push({ id: item.id, name: item.name, mime_type: item.mime_type, data_base64: await attachmentBase64(blobOf(item)) });
       }
       const wire_text = canonical({ idempotency_key: row.idempotency_key, report, attachments });
-      const frozen = { ...row, report, wire_text, wire_sha256: await digest(wire_text) };
+      // A report adopted from before setup is bound to this service as it is frozen, so a failed
+      // first delivery keeps it listed here and retried, rather than tied to where it was saved.
+      const frozen = { ...row, service, report, wire_text, wire_sha256: await digest(wire_text) };
       await transact(['records'], tx => tx.objectStore('records').put(frozen));
       return frozen;
     }

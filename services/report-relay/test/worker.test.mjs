@@ -220,16 +220,32 @@ test('bad input is refused before anything is filed', async () => {
 
 test('a GitHub outage leaves nothing recorded, so the same request succeeds later', async () => {
   const session = await signIn();
+  const shot = {
+    id: 'attachment_0123456789abcdef',
+    name: 'screen.png',
+    mime_type: 'image/png',
+    data_base64: PIXEL_PNG.toString('base64'),
+  };
   const payload = {
     idempotency_key: 'delivery_outage_001',
-    report: report(session.actor_ref),
-    attachments: [],
+    report: report(session.actor_ref, { attachment_ids: [shot.id] }),
+    attachments: [shot],
   };
+  const shots = () => [...env.REPORTS.items.keys()].filter((key) => key.startsWith('shot:'));
   github.state.failCreate = true;
   assert.equal((await file(session, payload)).response.status, 502);
+  assert.equal((await file(session, payload)).response.status, 502);
+  assert.equal(
+    shots().length,
+    1,
+    'retries during an outage rewrite one screenshot, not one per try',
+  );
   github.state.failCreate = false;
   assert.equal((await file(session, payload)).response.status, 201);
   assert.equal(github.state.issues.length, 1);
+  assert.deepEqual(shots(), [
+    `shot:${/\/v1\/shots\/(shot_[a-f0-9]{32})/.exec(github.state.issues[0].body)[1]}`,
+  ]);
 });
 
 test('views follow the fixer: labels set the status, its comments appear, the app can reply and reopen', async () => {
@@ -247,6 +263,15 @@ test('views follow the fixer: labels set the status, its comments appear, the ap
   assert.equal(current.status, 'needs_info');
   assert.deepEqual(current.conversation.at(-1).actor, 'service');
   assert.equal(current.conversation.at(-1).text, 'Which article were you reading?');
+  // the issue is public: a stranger's comment wearing the app's marker is not the learner
+  github.comment(1, '<!-- kairo-app-message -->\n**From the app**\n\nNever mind, it works.', {
+    login: 'someone-else',
+    association: 'NONE',
+  });
+  current = await read();
+  assert.equal(current.conversation.at(-1).actor, 'service');
+  assert.match(current.conversation.at(-1).text, /kairo-app-message/);
+  github.state.comments.pop();
   const reply = await call(api(`/reports/${id}/messages`), {
     method: 'POST',
     token: session.token,

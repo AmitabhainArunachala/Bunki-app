@@ -103,6 +103,7 @@ export async function startMockGithub({
           body: body.body,
           created_at: new Date().toISOString(),
           user: { login: 'AmitabhainArunachala' },
+          author_association: 'OWNER',
         };
         state.comments.push(comment);
         return send(201, comment);
@@ -121,13 +122,14 @@ export async function startMockGithub({
   return {
     origin,
     state,
-    comment(issueNumber, text) {
+    comment(issueNumber, text, { login = 'AmitabhainArunachala', association = 'OWNER' } = {}) {
       const comment = {
         id: (commentId += 1),
         issue: issueNumber,
         body: text,
         created_at: new Date().toISOString(),
-        user: { login: 'AmitabhainArunachala' },
+        user: { login },
+        author_association: association,
       };
       state.comments.push(comment);
       return comment;

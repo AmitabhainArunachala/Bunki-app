@@ -76,6 +76,12 @@ leaked key from filing issues as the owner without end or spending the GitHub
 token's API quota. If the key leaks, change `REPORT_KEY` and set up each device
 again.
 
+A comment shows in the app as the learner's only when it carries the
+`<!-- kairo-app-message -->` mark and its author has write access to the
+repository (`OWNER`, `MEMBER` or `COLLABORATOR`); every other comment is shown as
+a GitHub comment. Screenshots are stored under keys derived from the report and
+attachment with the relay key, so a retry rewrites the same objects.
+
 Only `https://amitabhainarunachala.github.io` gets CORS access, plus loopback
 pages when `ALLOW_LOOPBACK=1` (local verification only).
 
