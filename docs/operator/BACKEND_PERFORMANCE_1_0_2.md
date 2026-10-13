@@ -15,7 +15,7 @@ This compatible patch removes repeated backend work while preserving the existin
 | Launch               | Independent validator imports overlap.                                                                                                                                  | All validators settle before ownership, record admission and ordered recovery. Failure text and protection remain.                        |
 | Deep search          | 80 ms coalescing instead of 320 ms; redraws do not restart an unchanged pending query. Composition pauses deep dispatch.                                                | One active request, one replaceable pending query, generation/current-query checks; existing core/exact lookup and rendering retained.    |
 | Offline installation | Four complete fetch/verify/cache lanes. Identity is written after all required writes. Drain in-flight lanes before failure cleanup.                                    | Entire promised offline core, content hashes, old working cache and waiting-worker activation rules retained.                             |
-| Optional warming     | Article queue observes input, gestures, visibility, idle callbacks and departure. Font warming receives bounded activity notifications.                                 | Required installation, demanded content and durable writes are not cancelled. Article warming remains one request at a time.              |
+| Optional warming     | Article queue observes input, gestures, visibility, connectivity, idle callbacks and departure. Font warming receives bounded activity notifications.                   | Required installation, demanded content and durable writes are not cancelled. Article warming remains one request at a time.              |
 
 ## Frontend scope
 
@@ -29,6 +29,8 @@ No HTML, CSS, render functions, public/private deck player, card controls, navig
 - Focused backend run: 362 tests pass, including real SQLite abort/retry, commit-acknowledgement loss, SIGKILL/reopen, restore and ownership isolation.
 - Full local Vitest: non-browser tests pass. IndexedDB and restore browser fixtures cannot launch because the pinned Chromium/WebKit binaries are unavailable after a failed browser download. These required suites and the complete release battery must run in CI; they have not been removed or relaxed.
 - Added coverage exercises corrupted bytes after cache warmup, changed operation metadata, row removal, policy changes, repeated-subtree budgets, immutable view invalidation, IME/stale replies, validator ordering, input/visibility/departure pauses, install concurrency and incomplete-candidate cleanup.
+
+The first full CI candidate exposed missing browser state in three isolated verifier fixtures and optional article requests after offline navigation. The fixtures now supply the actual composition binding and browser scheduling environment, retain their existing lifecycle assertions, and assert the intended shorter 80 ms search delay. Runtime warming pauses while offline and retains the existing 40 ms gap between eligible requests. A regression test covers connectivity changing after an idle callback was scheduled. The original failed receipts remain in CI run `38432435449`; its WebKit restore and written-section failures passed their permitted fresh-job retries. Final admission must come from a new complete run of the corrected source.
 
 The synthetic CPU diagnostic is reproducible with:
 

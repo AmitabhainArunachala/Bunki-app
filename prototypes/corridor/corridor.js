@@ -4555,20 +4555,20 @@ function prefetchArticles() {
     // A queued closure can outlive timer cancellation. Its run stays stopped
     // even if a persisted pageshow starts a fresh background queue.
     if (stopped || articlePrefetchDeparted) return;
-    if (document.hidden || performance.now() < optionalWorkAfter) {
-      timer = setTimeout(next, document.hidden ? 1000 : Math.max(100, optionalWorkAfter - performance.now()));
+    if (document.hidden || navigator.onLine === false || performance.now() < optionalWorkAfter) {
+      timer = setTimeout(next, document.hidden || navigator.onLine === false ? 1000 : Math.max(100, optionalWorkAfter - performance.now()));
       return;
     }
     const load = () => {
       idle = null;
       if (stopped || articlePrefetchDeparted) return;
-      if (document.hidden || performance.now() < optionalWorkAfter) { next(); return; }
+      if (document.hidden || navigator.onLine === false || performance.now() < optionalWorkAfter) { next(); return; }
       const p = queue.shift();
       if (!p) return;
       ensureArticle(p)
         .catch((err) => console.warn(`prefetch ${p.id}`, err))
         .then(() => {
-          if (!stopped && !articlePrefetchDeparted) timer = setTimeout(next, 100);
+          if (!stopped && !articlePrefetchDeparted) timer = setTimeout(next, 40);
         });
     };
     if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(load);

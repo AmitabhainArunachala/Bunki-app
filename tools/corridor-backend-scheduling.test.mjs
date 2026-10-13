@@ -37,7 +37,7 @@ describe('foreground-aware article prefetch', () => {
       },
       document,
       console,
-      navigator: { serviceWorker: { controller: { postMessage: vi.fn() } } },
+      navigator: { onLine: true, serviceWorker: { controller: { postMessage: vi.fn() } } },
       window: idle
         ? {
             requestIdleCallback: (callback) => {
@@ -84,11 +84,26 @@ describe('foreground-aware article prefetch', () => {
     await vi.advanceTimersByTimeAsync(5000);
     expect(h.calls).toEqual(['a']);
     h.holds[0].resolve();
-    await vi.advanceTimersByTimeAsync(100);
+    await vi.advanceTimersByTimeAsync(40);
     expect(h.calls).toEqual(['a', 'b']);
     h.holds[1].resolve();
     await vi.advanceTimersByTimeAsync(1000);
     expect(h.calls).not.toContain('archive');
+  });
+
+  it('checks offline state again after an idle callback and resumes warming after connectivity returns', async () => {
+    const h = harness(true);
+    await vi.advanceTimersByTimeAsync(350);
+    h.environment.navigator.onLine = false;
+    h.callbacks[0]();
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(h.calls).toEqual([]);
+    expect(h.callbacks).toHaveLength(1);
+    h.environment.navigator.onLine = true;
+    await vi.advanceTimersByTimeAsync(1000);
+    h.callbacks[1]();
+    expect(h.calls).toEqual(['a']);
+    h.holds[0].resolve();
   });
 
   it('drops idle callbacks after departure and never cancels an in-flight shared read', async () => {

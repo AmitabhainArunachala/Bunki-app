@@ -113,7 +113,7 @@ function defineRows() {
     'hiraToKata', 'ROMAJI', 'JLPT_RANK', 'jlptRank', 'searchIndex', 'buildSearchIndex', 'dictionarySearchContext', 'searchResults',
     'searchRowShownByCore', 'renderSearchResults', 'dictionaryQueryKey', 'activeDictionaryQuery', 'clearDictionarySearchTimer',
     'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'dictionarySearchGeneration',
-    'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer',
+    'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer', 'dictionaryComposing',
     'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor'];
   /** The authored top-level statements declaring `names`, each exactly once. */
   const liftFrom = (tree, names) => {
@@ -354,7 +354,7 @@ function defineRows() {
     Object.assign(worker.S, { view: 'shelf', query });
     const immediate = ids(pageRows(worker, query));
     const timer = worker.timers.at(-1);
-    assert.equal(timer?.ms, 320, `${query}: the one request waits out the settle window`);
+    assert.equal(timer?.ms, 80, `${query}: the one request waits out the shorter settle window`);
     worker.clock += timer.ms;
     timer.run();
     for (let turn = 0; turn < 20 && !worker.D.dictionarySearchCache.has(query); turn += 1) await new Promise((done) => setImmediate(done));
