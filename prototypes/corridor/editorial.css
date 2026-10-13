@@ -152,7 +152,7 @@ body:not(.zen) #app > .chrome > button.chrome-search svg { width: 20px; height: 
 /* during an attempt the bar still collapses to 戻る · progress · seal (register.css T8): the glass
    doors above must not bring the search, the dojo, the language or the lists back into a test */
 html[data-register='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
-html[data-register='attempt'] body:not(.zen) #app > .chrome > button:last-child { display: none; }
+html[data-register='attempt'] body:not(.zen) #app > .chrome > button#tray { display: none; }
 /* 戻る wears the iOS back chevron */
 body:not(.zen) #app > .chrome > button#back { padding-left: 6px; }
 body:not(.zen) #app > .chrome > button#back::before {
@@ -3722,6 +3722,10 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   }
   body.has-primary-tabs[data-view='reader'] #reader-take::after { content: '+'; font-size: 24px; }
   body.has-primary-tabs[data-view='reader'] #reader-take[aria-pressed='true']::after { content: '✓'; }
+  /* one way around (2026-10-13): the bar holds only Back, search and the capture door, so the
+     reader's Back says its name as it does in every other room */
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#back { min-width: 0; padding: 0 10px 0 4px; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#back .l-ja { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
   body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 4px; }
   body:not(.zen) #app > .chrome > button.chrome-dojo { padding-inline: 4px; }
   body:not(.zen) #app > .chrome > .level-chip.chrome-level { padding-inline: 4px; margin-inline: 0 2px; }

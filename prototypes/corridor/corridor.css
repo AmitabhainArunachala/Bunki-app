@@ -302,8 +302,8 @@ main {
   margin-inline: auto;
 }
 
-/* A received note must not resize the tray or move an open draft sideways. */
-body[data-view='tray'] main {
+/* A received note must not resize the room it lands in or move an open draft sideways. */
+body:is([data-view='tray'], [data-view='saved']) main {
   width: 100%;
 }
 
@@ -666,133 +666,84 @@ body.ginga #drift-layer #hint.first-cue {
 .nav-search-door::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
-/* 復習 N and 集中道場: tinted doors in the one accent; the due count a small vermilion capsule */
-.nav-review,
-.nav-dojo {
-  flex: none;
+/* the door's five rooms, named and ordered as the tab bar (2026-10-13): one tinted segment each,
+ * in the one accent; Today carries its due count as a small vermilion capsule */
+.nav-stations {
+  flex: 1 1 100%;
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+.nav-station {
+  flex: 1 1 0;
+  min-width: 0;
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 4px;
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  line-height: 44px;
+  line-height: 1;
   letter-spacing: 0;
   color: var(--ai, #2e4d6e);
-  background: color-mix(in srgb, var(--ai, #2e4d6e) 12%, transparent);
+  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, transparent);
   border: none;
   border-radius: 12px;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.14s ease;
 }
-.nav-review:hover,
-.nav-dojo:hover {
-  background: color-mix(in srgb, var(--ai, #2e4d6e) 18%, transparent);
+.nav-station:hover {
+  background: color-mix(in srgb, var(--ai, #2e4d6e) 16%, transparent);
 }
-.nav-review:active,
-.nav-dojo:active {
+/* Today carries its count: the segment widens by the capsule's width so the word never crowds */
+.nav-station:has(.nav-count) {
+  flex-grow: 1.45;
+}
+.nav-station:active {
   transform: scale(0.97);
-}
-.nav-review .l-ja,
-.nav-dojo .l-ja {
-  display: inline;
-  line-height: inherit;
-}
-.nav-review .en-sub,
-.nav-dojo .en-sub {
-  display: inline;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  opacity: 0.78;
 }
 .nav-count {
   align-self: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 7px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
   font-size: 12px;
   font-weight: 700;
-  line-height: 22px;
+  line-height: 20px;
   text-align: center;
   color: #fff;
   background: var(--red, #b03a2e);
   border-radius: 999px;
   font-variant-numeric: tabular-nums;
 }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-bar {
+  /* at night the sheet is dark glass, so the rooms' gold reads on it (on pale glass it was lost) */
+  background: color-mix(in srgb, var(--color-ground, #10141f) 80%, transparent);
+  border-color: rgb(255 255 255 / 14%);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 30%), 0 18px 44px rgb(0 0 0 / 40%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station {
+  color: color-mix(in srgb, var(--color-gold, #d9b45a) 82%, var(--color-ink, #f4efe4));
+  background: rgb(255 255 255 / 7%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-station:hover { background: rgb(255 255 255 / 12%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-door {
+  color: var(--color-ink, #f4efe4);
+  background: rgb(255 255 255 / 9%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-door::placeholder,
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-field svg { color: rgb(255 255 255 / 55%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-search-door:focus { background: rgb(255 255 255 / 14%); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-arrow { color: color-mix(in srgb, var(--color-gold, #d9b45a) 82%, var(--color-ink, #f4efe4)); }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .nav-arrow:disabled { color: rgb(255 255 255 / 25%); }
 @media (max-width: 600px) {
-  /* a phone keeps the field on the first row with the arrows; the doors and the language below */
+  /* a phone keeps the field on the first row with the arrows; the five rooms below */
   .nav-search-field {
     flex: 1 1 calc(100% - 96px);
-  }
-  .nav-review,
-  .nav-dojo {
-    flex: 1 1 auto;
-    justify-content: center;
-    padding: 0 10px;
-  }
-}
-
-/* EN⇄日本語: an iOS segmented control (one button that swaps the language) */
-.lang-slide {
-  position: relative;
-  flex: none;
-  display: flex;
-  align-items: stretch;
-  min-height: 44px;
-  padding: 6px 0;
-  background: transparent;
-  border: 0;
-  border-radius: 10px;
-  cursor: pointer;
-  font: inherit;
-}
-.lang-slide::before {
-  content: '';
-  position: absolute;
-  inset: 6px 0;
-  background: rgb(120 120 128 / 12%);
-  border-radius: 9px;
-}
-.lang-opt {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  padding: 0 11px;
-  font-size: 13px;
-  letter-spacing: 0;
-  color: var(--ink-2, #55606c);
-  transition: none;
-}
-.lang-knob {
-  position: absolute;
-  z-index: 0;
-  top: 8px;
-  bottom: 8px;
-  left: 2px;
-  width: 40px;
-  background: #fff;
-  border-radius: 7px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%);
-  transition:
-    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.lang-slide[data-lang='ja'] .lang-knob {
-  transform: translateX(39px);
-  width: 57px;
-}
-.lang-slide[data-lang='bi'] .lang-opt.en,
-.lang-slide[data-lang='ja'] .lang-opt.ja {
-  color: var(--ink, #23303f);
-  font-weight: 600;
-}
-@media (prefers-reduced-motion: reduce) {
-  .lang-knob {
-    transition: none;
   }
 }
 
