@@ -1658,9 +1658,16 @@ function logTap(card, where, frame, depth) {
   if (save(next)) ctx.state = next;
 }
 
+/** the word whose meaning is open shows its reading; closing the meaning returns the clean text */
+function lightWord(node) {
+  if (!ctx?.root) return;
+  for (const lit of ctx.root.querySelectorAll('.kp-tok.kp-lit')) if (lit !== node) lit.classList.remove('kp-lit');
+  node?.classList.add('kp-lit');
+}
 function tapped(unit, node, { card, where, depth }) {
   const frame = frameOf(unit);
   logTap(card, where, frame, depth);
+  if (depth === 1) lightWord(node);
   if (ctx.host) openSheet(frame, node, depth);
   else openPop(frame, node);
 }
@@ -1690,6 +1697,7 @@ function openSheet(frame, node, depth) {
 function closeSheet() {
   const back = ui.sheet?.returnTo;
   ui.sheet = null;
+  lightWord(null);
   ctx.root.querySelector('.kp-sheet-wrap')?.remove();
   if (back?.isConnected) back.focus({ preventScroll: true });
 }
@@ -1827,6 +1835,7 @@ function openPop(frame, node) {
 }
 function closePop() {
   ui.pop = null;
+  lightWord(null);
   ctx.root.querySelector('.kp-pop')?.remove();
 }
 function drawPop() {

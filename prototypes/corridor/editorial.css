@@ -3450,6 +3450,25 @@ body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
   .pc-preview > button { display: flex; width: fit-content; max-width: calc(100vw - 120px); margin-block: 0 var(--space-2); }
 }
 body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
+/* The focus room (John, 2026-10-13: "SRS section very clear and smooth with NO CLUTTER at all").
+   While a deck card is up the world recedes, as 復習's zen already does: no top bar, no tabs.
+   The session's own bar (×, progress, count) stays at the top, and the report button sits in it. */
+body:has(#app .kp-study) #app > .chrome,
+body:has(#app .kp-study) .primary-tabs { display: none; }
+body.has-primary-tabs:has(#app .kp-study) { --nav-clearance: env(safe-area-inset-bottom, 0px); }
+body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-stage); padding-block: 8px; margin-block: -8px; padding-right: 48px; }
+body:has(#app .kp-study):not(:has(.kp-sheet-wrap)) #bunki-reports-root .br-rail { top: calc(env(safe-area-inset-top, 0px) + 8px); bottom: auto; right: 10px; }
+/* Above the passage, one quiet line: the task and the level. The deck, topic and new/review
+   chips stay off the card in the app; Remove is a quiet word, not a boxed button. */
+#app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip) { display: none; }
+#app .kp-study .kp-chips { flex-wrap: nowrap; }
+#app .kp-study .kp-eyebrow { flex: 1 1 auto; min-width: 0; }
+#app .kp-top-study .kp-delete { border-color: transparent; background: transparent; color: color-mix(in srgb, var(--kp-stage-ink) 62%, transparent); padding: 0 6px; }
+/* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
+   while its meaning is open. Hidden readings keep their line, so nothing moves. */
+#app .kp-sentence ruby rt { visibility: hidden; }
+#app .kp-sentence .kp-target rt,
+#app .kp-sentence .kp-tok.kp-lit rt { visibility: visible; }
 .learn-section + .learn-section,
 .foundation-section { margin-top: var(--space-8); }
 .learn-section { padding-top: var(--space-2); }
