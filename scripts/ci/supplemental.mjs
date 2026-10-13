@@ -35,6 +35,7 @@ export function supplementalGates(out) {
       requiredPath: 'prototypes/corridor/tools/test_segment_overrides.py',
     },
     node('n2n1-decks-browser', 'prototypes/corridor/tools/verify-n2n1-decks.mjs'),
+    node('places-layout', 'prototypes/corridor/tools/verify-places-layout.mjs'),
     node('report-delivery', 'prototypes/corridor/tools/verify-report-delivery.mjs'),
     {
       name: 'report-relay',
