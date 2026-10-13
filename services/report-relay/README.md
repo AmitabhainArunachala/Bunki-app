@@ -35,9 +35,12 @@ The relay is a separate service. It never builds or publishes the phone app;
    Run workflow). It tests the relay, creates the KV namespace, deploys the
    Worker, stores the secrets and checks the live relay. Its summary shows the
    relay address. It also redeploys on every merge that changes this folder.
-5. **Each device, once.** Open the app with
+5. **Each device, once.** The setup link is
    `https://amitabhainarunachala.github.io/Bunki-app/?report-relay=<relay address>&report-key=<REPORT_KEY>`.
-   The app stores both on the device and removes them from the address bar.
+   Paste it in the app under **Me → Settings → Bug reports**, or open it in
+   the browser that runs the app. A home-screen app keeps its own storage, so
+   on a phone paste it in Settings. The app stores both on the device and
+   removes them from the address bar.
    Reports saved on that device before setup are then sent automatically.
    `?report-relay=off` forgets the relay.
 

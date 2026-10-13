@@ -106,4 +106,5 @@ branches. The owner's merge is the release decision.
 ## Setting up the relay
 
 One-time setup and deployment: `services/report-relay/README.md`. A device is
-set up by opening the app once with the setup link that README describes.
+set up with the setup link that README describes, pasted in **Me → Settings →
+Bug reports** (required for the home-screen app) or opened in the browser.
