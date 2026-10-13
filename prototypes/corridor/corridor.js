@@ -4213,6 +4213,12 @@ async function boot() {
     S.view = params.get('room');
     if (S.view === 'search') S.searchFrom = 'shelf';
   }
+  // an opened report setup link waits in Settings for Set up; Back leads to Me
+  if (reportRelayOffer) {
+    S.view = 'me';
+    keepNavigationReturn('settings', null);
+    S.view = 'settings';
+  }
 
   render();
 
@@ -33295,19 +33301,27 @@ function reportEntries(className) {
 /* The report relay. A device set up with the relay's address and key sends its
  * problem reports there, and the relay files each one as a GitHub issue. The setup
  * link is <app>?report-relay=<https address>&report-key=<key>; ?report-relay=off
- * forgets it. Opened in the browser, the link is read and removed from the address
- * bar. A home-screen app keeps its own storage, so the same link can be pasted in
- * Me → Settings → Bug reports. Both stay on this device only. */
+ * forgets it. A link opened in the browser is never taken silently: it is removed
+ * from the address bar and offered in Me → Settings → Bug reports, naming the host
+ * the reports would go to, and only Set up stores it — so a link from someone else
+ * cannot quietly send this device's reports and screenshots elsewhere. A home-screen
+ * app keeps its own storage, so the same link can be pasted there. Both stay on
+ * this device only. */
 const REPORT_RELAY_STORE = 'kairo-report-relay-v1';
+function relayServiceUrl(address, key) {
+  try {
+    const url = new URL(address);
+    const loopback = url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname);
+    if ((url.protocol === 'https:' || loopback) && !url.search && !url.hash && !url.username && /^[A-Za-z0-9_-]{16,128}$/.test(key))
+      return `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}`;
+  } catch { /* An unusable link names no service. */ }
+  return '';
+}
 function saveReportRelay(address, key) {
   try {
     if (address === 'off') { localStorage.removeItem(REPORT_RELAY_STORE); return 'off'; }
-    const url = new URL(address);
-    const loopback = url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname);
-    if ((url.protocol === 'https:' || loopback) && !url.search && !url.hash && !url.username && /^[A-Za-z0-9_-]{16,128}$/.test(key)) {
-      localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url: `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}` }));
-      return 'saved';
-    }
+    const url = relayServiceUrl(address, key);
+    if (url) { localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url })); return 'saved'; }
   } catch { /* An unusable link changes nothing. */ }
   return '';
 }
@@ -33316,11 +33330,20 @@ function saveReportRelayLink(text) {
   try { params = new URL(String(text).trim()).searchParams; } catch { return ''; }
   return params.has('report-relay') ? saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '') : '';
 }
+// a setup link opened in the browser, waiting in Settings for the learner's Set up
+let reportRelayOffer = null;
 const REPORT_RELAY_URL = (() => {
   let params = null;
   try { params = new URLSearchParams(location.search); } catch { /* No address to read. */ }
   if (params?.has('report-relay')) {
-    saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '');
+    const address = params.get('report-relay') || '', key = params.get('report-key') || '';
+    // turning the relay off only returns reports to the prefilled GitHub page, so it needs no question
+    if (address === 'off') saveReportRelay('off', '');
+    else if (relayServiceUrl(address, key)) {
+      // shown as the setup link is written, with the address's : and / left readable
+      const query = new URLSearchParams({ 'report-relay': address, 'report-key': key }).toString().replace(/%3A/gi, ':').replace(/%2F/gi, '/');
+      reportRelayOffer = { link: `${location.origin}${location.pathname}?${query}`, host: new URL(address).host };
+    }
     params.delete('report-relay');
     params.delete('report-key');
     try { history.replaceState(history.state, '', `${location.pathname}${params.toString() ? `?${params}` : ''}${location.hash}`); } catch { /* The address keeps the link. */ }
@@ -33346,6 +33369,20 @@ function renderReportRelaySettings() {
   const save = el('button', 'chip', host ? tx('リンクを変更する', 'Change link') : tx('設定する', 'Set up')); save.type = 'submit'; save.id = 'settings-report-save';
   const note = el('p', 'teacher-note'); note.id = 'settings-report-note'; note.setAttribute('role', 'status');
   form.append(save, note);
+  if (reportRelayOffer) {
+    // the opened link waits here, with the host it names, until the learner chooses Set up
+    field.value = reportRelayOffer.link;
+    const offer = el('p', 'teacher-note', tx(
+      `開いたリンクは、この端末の報告と画面写真を ${reportRelayOffer.host} に送る。報告は公開の GitHub issue になる。自分の報告用リンクのときだけ「${save.textContent}」を押す。`,
+      `The link you opened sends this device's reports and screenshots to ${reportRelayOffer.host}, which files them as public GitHub issues. Choose ${save.textContent} only if it is your own report link.`));
+    offer.id = 'settings-report-offer';
+    form.prepend(offer);
+    requestAnimationFrame(() => {
+      if (!save.isConnected) return;
+      section.scrollIntoView({ block: 'center' });
+      save.focus({ preventScroll: true });
+    });
+  }
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     if (saveReportRelayLink(field.value) !== 'saved') {
@@ -33353,6 +33390,7 @@ function renderReportRelaySettings() {
       return;
     }
     // The report client reads its service once, when the app starts.
+    reportRelayOffer = null;
     note.textContent = tx('設定した。再読み込みする。', 'Set up. Reloading.');
     save.disabled = true;
     location.reload();

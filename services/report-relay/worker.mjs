@@ -29,6 +29,10 @@ const IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const REPORT_LABEL = 'kairo-report';
 const APP_MESSAGE = '<!-- kairo-app-message -->';
 const MAX_LISTED = 20;
+// Hourly ceilings across the whole relay. The key is shared by the learner's devices, so a
+// leaked key must not let anyone file issues as the owner without end or spend the GitHub
+// token's API quota: a learner files a few reports a day, and a list can cost 40 API calls.
+const HOURLY = { create: 20, list: 30, view: 200 };
 
 class HttpError extends Error {
   constructor(status, code, message) {
@@ -380,6 +384,20 @@ async function readBody(request) {
   }
 }
 
+async function withinHour(env, kind) {
+  const key = `limit:${kind}:${new Date().toISOString().slice(0, 13)}`;
+  const used = Number(await env.REPORTS.get(key)) || 0;
+  if (used >= HOURLY[kind])
+    throw new HttpError(
+      429,
+      'rate_limited',
+      kind === 'create'
+        ? 'The relay has filed as many reports as it allows this hour. Your report stays on your device and will be retried.'
+        : 'The relay has answered as many requests as it allows this hour. Try again later.',
+    );
+  await env.REPORTS.put(key, String(used + 1), { expirationTtl: 2 * 60 * 60 });
+}
+
 async function session(request, env) {
   const header = request.headers.get('Authorization') || '';
   const match = /^Bearer (actor_[a-f0-9]{32})\.([a-f0-9]{64})$/.exec(header);
@@ -410,6 +428,7 @@ async function createReport(request, env, actor, origin) {
         'idempotency_conflict',
         'This request ID was already used for a different report.',
       );
+    await withinHour(env, 'view');
     return json(200, await buildView(env, await loadRecord(env, actor, previous.report_id)));
   }
   const attachments = readAttachments(value.attachments || []);
@@ -417,6 +436,7 @@ async function createReport(request, env, actor, origin) {
   const report = value.report;
   if (await env.REPORTS.get(`report:${actor}:${report.id}`))
     throw new HttpError(409, 'duplicate_report', 'This report was already filed.');
+  await withinHour(env, 'create');
   const shots = [];
   for (const attachment of attachments) {
     const shotId = randomId('shot');
@@ -456,6 +476,7 @@ async function createReport(request, env, actor, origin) {
 
 async function addMessage(request, env, actor, reportId, reopen) {
   const record = await loadRecord(env, actor, reportId);
+  await withinHour(env, 'view');
   const { value } = await readBody(request);
   if (!isString(value?.idempotency_key, 200, 8))
     throw new HttpError(400, 'invalid_request', 'An idempotency key is required.');
@@ -495,6 +516,7 @@ async function addMessage(request, env, actor, reportId, reopen) {
 }
 
 async function listReports(env, actor) {
+  await withinHour(env, 'list');
   const listed = await env.REPORTS.list({ prefix: `report:${actor}:` });
   const records = (
     await Promise.all(listed.keys.map((key) => env.REPORTS.get(key.name, 'json')))
@@ -540,6 +562,8 @@ async function route(request, env) {
       content_ids: [],
       limits: LIMITS,
       ai: { status: 'none' },
+      // every report becomes an issue in a public repository; the app says so before sending
+      public_reports: true,
     });
   }
   if (request.method === 'POST' && api === '/api/session') {
@@ -556,8 +580,11 @@ async function route(request, env) {
   );
   if (!one) return json(404, { error: { code: 'not_found', message: 'Not found.' } });
   const [, reportId, action, attachmentId] = one;
-  if (!action && request.method === 'GET')
-    return json(200, await buildView(env, await loadRecord(env, actor, reportId)));
+  if (!action && request.method === 'GET') {
+    const record = await loadRecord(env, actor, reportId);
+    await withinHour(env, 'view');
+    return json(200, await buildView(env, record));
+  }
   if (action === 'messages' && request.method === 'POST')
     return addMessage(request, env, actor, reportId, false);
   if (action === 'reopen' && request.method === 'POST')

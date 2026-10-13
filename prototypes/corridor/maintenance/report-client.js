@@ -595,7 +595,7 @@
         <label class="br-field"><span>What did you expect? <small>Optional</small></span><textarea id="br-expected" name="expected" ${busy ? 'readonly' : ''} maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
         <label class="br-field"><span>Category</span><select id="br-category" name="category" ${busy ? 'disabled' : ''}>${[['bug', 'Something isn’t working'], ['content', 'Language or content'], ['experience', 'Learning experience'], ['idea', 'An idea']].map(([value, label]) => `<option value="${value}" ${draft?.category === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
         ${exactContext(draft?.context)}${githubMode() && !draft?.attachments?.length ? '<p class="br-note">To include a screenshot, attach it on GitHub after the report opens there.</p>' : `<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>`}
-        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : githubMode() ? 'Send to GitHub' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : githubMode() ? 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
+        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : githubMode() ? 'Send to GitHub' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : githubMode() ? 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.' : config?.public_reports === true && service && !serviceUnavailable ? 'Send report files it as a public GitHub issue, with its screenshots, so leave out anything private. A copy stays on this device.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
     }
     function listMarkup() {
       return `${notice()}<p class="br-note">${githubMode() ? 'Reports are saved in this browser. Open one to send it to GitHub, where it is filed for fixing.' : 'Reports and guest access are saved in this browser. Clearing browser data removes that access.'}</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
@@ -630,6 +630,7 @@
     async function submitReport(preset = null) {
       if (busy || attachmentBusy || !draft?.actual.trim()) return;
       busy = true; setMessage('Saving the report and selected screenshots on this device…'); render();
+      let stored = false;
       try {
         if (draftCanAdoptBuild && service && new URL(service).origin === location.origin && !draft.context.context.build.git_sha) await loadConfig();
         await persistDraft();
@@ -646,6 +647,7 @@
             if (saved?.owner === documentOwner && saved.revision === submittedSlot.revision) store.delete(key);
           };
         });
+        stored = true;
         draft = emptyDraft(); draftSlot = newSlot(); rememberSlot('draft', draftSlot); draftDirty = false;
         selectedId = reportId; active = 'detail';
         message = preset?.opened ? 'GitHub opened with this report filled in. Tap “Submit new issue” there to send it. A copy is saved here.'
@@ -654,7 +656,13 @@
         if (canQueueReview()) await queueReview(row);
         await refreshRows();
         announce(message);
-      } catch (error) { message = `The report could not be saved. Your draft is still here. ${errorText(error)}`; }
+      } catch (error) {
+        // GitHub may already be open with a shortened copy that says the full text is saved
+        // here; when the save failed, the full words exist only in this form, so say so
+        message = preset?.opened && !stored
+          ? `GitHub opened, but this report could not be saved on this device, so its full words are only in this form. Copy them before you close it. ${errorText(error)}`
+          : `The report could not be saved. Your draft is still here. ${errorText(error)}`;
+      }
       finally { busy = false; render(); }
       run(sync);
     }
