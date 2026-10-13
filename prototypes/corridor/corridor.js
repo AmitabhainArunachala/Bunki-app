@@ -32529,7 +32529,7 @@ function renderReportRelaySettings() {
   const section = el('section', 'foundation-section');
   section.id = 'settings-reports';
   section.append(el('h2', 'eyebrow', tx('不具合の報告', 'Bug reports')));
-  let host = '';
+  let host;
   try { host = REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { host = ''; }
   const status = el('p', 'teacher-note', host
     ? tx(`この端末の報告は GitHub に自動で送られる（${host}）。`, `Reports from this device go to GitHub automatically (${host}).`)
