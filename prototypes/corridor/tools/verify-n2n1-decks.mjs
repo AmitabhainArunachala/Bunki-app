@@ -104,6 +104,12 @@ try {
         return !!response;
       }, id);
       console.log(`${id} / ${look}: online answer and cached tokens passed`);
+      // Leave the app before cutting the network. Boot keeps prefetching the
+      // shelf's articles in the background; one still in flight at the switch
+      // fails with the worker's 503 and the browser logs it as a console error,
+      // so whether this tour passed depended on timing. The offline visit below
+      // is still a fresh navigation under the installed worker.
+      await page.goto('about:blank');
       await context.setOffline(true);
       await page.goto(`${host.origin}/index.html?deck=${id}`, { waitUntil: 'load' });
       await page.locator('#kp-start').waitFor();

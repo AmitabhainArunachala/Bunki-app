@@ -13,7 +13,7 @@
  */
 
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.0.0","channel":"stable","releasedOn":"2026-10-12","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.0.1","channel":"stable","releasedOn":"2026-10-13","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 
 const DATA = {
@@ -25157,6 +25157,20 @@ const AI_DEFAULT_MODEL = 'claude-opus-5';
  * live socket. A stalled request used to leave 考え中… on screen until the
  * browser gave up the socket; now it takes each caller's quiet failure line. */
 const AI_TIMEOUT_MS = 10000;
+/** The one exception is the article room. Its single non-streamed reply may be
+ * 3,000–16,000 tokens (2,000–12,000 characters), which no provider writes in
+ * ten seconds, so every generated article used to abort before it arrived.
+ * Its budget is the interactive ten seconds plus the requested length at a
+ * conservative 25 tokens a second, capped at ten minutes, the same per-call
+ * override packages/ai/src/runtime.ts accepts as timeoutMs. The room keeps
+ * its cancel control throughout; every other surface keeps ten seconds. */
+const AI_READING_TOKENS_PER_SECOND = 25;
+const AI_READING_TIMEOUT_CAP_MS = 600000;
+function aiRequestTimeoutMs(meta = {}) {
+  if (meta.surface !== 'reading' || !Number.isInteger(meta.maxTokens) || meta.maxTokens <= 0) return AI_TIMEOUT_MS;
+  const writing = Math.ceil(Math.min(meta.maxTokens, 16000) / AI_READING_TOKENS_PER_SECOND) * 1000;
+  return Math.min(AI_READING_TIMEOUT_CAP_MS, AI_TIMEOUT_MS + writing);
+}
 function canonicalAiBaseUrl(value) {
   if (!nonEmptyString(value) || value.length > 2048 || /[\s\\]/u.test(value) ||
       Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return null;
@@ -25502,7 +25516,7 @@ async function aiConverse(system, messages, meta = {}) {
     const cancel = () => controller.abort();
     if (meta.signal?.aborted) cancel();
     else meta.signal?.addEventListener('abort', cancel, { once: true });
-    const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), aiRequestTimeoutMs(meta));
     let data;
     try {
       // one budget covers headers AND body — a stalled stream is the same stall
@@ -25706,6 +25720,7 @@ window.__KAIRO_AI__ = Object.freeze({
   dropped: () => aiLogDropped,
   provider: () => aiProvider(),
   timeoutMs: AI_TIMEOUT_MS,
+  requestTimeoutMs: (meta) => aiRequestTimeoutMs(meta),
   exportRecord: () => buildExportRecord(),
 });
 /** The newest archived reply for one surface and one word — the read-back
