@@ -24222,6 +24222,15 @@ function renderDeckPlay(main) {
       english: bi(),
       presentation: deckPresentation,
       storage: localStorage, host: deckHost(),
+      // the sitting's close opens one door forward: today's reading, as the Today room names it
+      next() {
+        const read = todayReadPick();
+        return read ? {
+          label: read.count ? tx(`今日の読み物 · あなたの語 ${read.count}`, `Today's reading · ${read.count} of your words`) : tx('今日の読み物', "Today's reading"),
+          title: read.passage.title,
+          open: () => openPassage(read.passage.id),
+        } : null;
+      },
       onLeave() {
         delete deckSummaries[S.deckPlay];
         S.view = 'dojo';
