@@ -293,6 +293,11 @@ try {
     const { context, page, errors } = await newPage();
     await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi&layout=places`);
     await ready(page);
+    // a layout link is applied and kept on the device, and its word leaves the address
+    check('link · ?layout=places applies, stays chosen and leaves the address',
+      (await page.evaluate(() => [location.search, localStorage.getItem('kairo-layout')].join(' '))) === '?entry=shelf&ui=bi places' &&
+        (await tabNames(page)).join() === 'Review,Bookshelf,Dictionary,Tests,Progress',
+      await page.evaluate(() => location.search));
     await page.locator('#tab-review').click();
     await page.waitForTimeout(1200);
     await page.locator('.learn-go-deck[data-stage-deck="n2"]').click();
@@ -336,6 +341,12 @@ try {
     check('focus · the Readings switch returns the clean text', (await readings()) <= 2, `${await readings()} shown`);
     check('focus · turning readings off moves no line', JSON.stringify(await lines()) === JSON.stringify(front));
     check('focus · no page errors', !errors.length, errors.slice(0, 2).join(' | '));
+    // a private collection boots on its own page and never runs render(); it wears the layout too
+    await page.goto(`${host.origin}/index.html?deck=personal&ui=bi`);
+    const leave = page.locator('.pc-top [data-action="leave"]');
+    await leave.waitFor({ timeout: 20_000 });
+    const marked = await page.evaluate(() => document.documentElement.dataset.layout || 'none');
+    check('collection · a private collection page names its way back Review', (await leave.textContent()).trim() === '← Review' && marked === 'places', `${(await leave.textContent()).trim()} · ${marked}`);
     await context.close();
   }
 } catch (error) {

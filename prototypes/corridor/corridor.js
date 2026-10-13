@@ -4149,6 +4149,16 @@ async function boot() {
   await resumeAssessmentV2();
   await installDriftRecord();
   setKairoTheme(themeId());
+  // The layout under test can be chosen by link. The choice stays on this device and the word
+  // leaves the address, so reloading the same page cannot undo a choice made since in Settings.
+  if (params.has('layout')) {
+    if (['places', 'current'].includes(params.get('layout'))) setLayout(params.get('layout'));
+    const rest = new URLSearchParams(location.search);
+    rest.delete('layout');
+    try { history.replaceState(history.state, '', `${location.pathname}${rest.toString() ? `?${rest}` : ''}${location.hash}`); } catch { /* The address keeps the word. */ }
+  }
+  // the root mark comes before any page draws: a private collection never runs render()
+  if (placesLayout()) document.documentElement.dataset.layout = 'places';
   // A private collection boots from the cached app shell alone. Its content
   // arrives through the learner's file picker, never a public repository URL.
   if (params.get('deck') === 'personal' && window.__CORRIDOR_STANDALONE__ !== true) {
@@ -4202,8 +4212,6 @@ async function boot() {
   }
   // Private collections leave through the same five destinations on a fresh
   // host page. These are UI routes only, never learner-record state.
-  // the layout under test can be chosen by link (and stays chosen on this device)
-  if (['places', 'current'].includes(params.get('layout'))) setLayout(params.get('layout'));
   if (primaryTabs().some(tab => tab.view === params.get('room'))) {
     if (params.get('room') === 'me') {
       S.view = 'shelf';
