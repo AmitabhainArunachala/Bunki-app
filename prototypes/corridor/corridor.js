@@ -24196,12 +24196,14 @@ function studyHallDoors() {
     }],
   ];
   const doors = {};
+  // the layout under test names every door in sentence case, as its places are named
+  const cap = (text) => (placesLayout() && bi() ? text.replace(/^[a-z]/, (c) => c.toUpperCase()) : text);
   for (const [id, ja, en, sub, go] of defs) {
     const b = el('button', 'study-door');
     b.type = 'button';
     b.dataset.studyDoor = id;
-    b.append(el('span', 'study-door-t', tx(ja, en)));
-    b.append(el('span', 'study-door-sub', sub));
+    b.append(el('span', 'study-door-t', cap(tx(ja, en))));
+    b.append(el('span', 'study-door-sub', cap(sub)));
     b.addEventListener('click', go);
     doors[id] = b;
   }
