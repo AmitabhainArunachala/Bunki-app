@@ -32462,7 +32462,7 @@ function renderLayoutChoice() {
     });
     choices.append(button);
   }
-  section.append(choices, el('p', 'card-kind settings-layout-note', tx(
+  section.append(choices, el('p', 'settings-layout-note', tx(
     '新しい形：復習・本棚・辞書・試験・記録の五つ。カードと記録はどちらも同じ。いつでも戻せる。',
     'New: five places — Review, Bookshelf, Dictionary, Tests, Progress. Your cards and record are the same in both; switch back any time.')));
   return section;
