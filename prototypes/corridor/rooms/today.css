@@ -393,7 +393,7 @@ html[data-room='tray'] .today-then-l {
   text-transform: uppercase;
 }
 html[data-room='tray'] body:not(.ui-bi) .today-then-l { letter-spacing: 0.2em; text-transform: none; }
-html:is([data-room='tray'], [data-room='search']) .today-then .today-arrow { grid-area: a; }
+html[data-room='tray'] .today-then .today-arrow { grid-area: a; }
 html[data-room='tray'] .today-then-title {
   grid-area: t;
   min-width: 0;
@@ -408,14 +408,14 @@ html[data-room='tray'] .today-then-title {
   font: 600 14px/1.3 var(--font-reading);
   color: var(--color-ink-2);
 }
-html:is([data-room='tray'], [data-room='search']) .today-then .today-arrow { grid-area: a; }
+html[data-room='tray'] .today-then .today-arrow { grid-area: a; }
 html[data-room='tray'] .today-then-n {
   grid-area: n;
   font: 400 12px/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
-html:is([data-room='tray'], [data-room='search']) .today-then .today-arrow { color: var(--color-accent); }
+html[data-room='tray'] .today-then .today-arrow { color: var(--color-accent); }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line + .sem-empty { margin-top: 26px; }
 html[data-room='tray'] .today-then.solo {
   margin: 18px 0 8px;
@@ -427,15 +427,54 @@ html[data-room='tray'] .today-then.solo {
   box-shadow: var(--elevation-paper);
 }
 
-/* ---- Me → Saved: the cards at a glance, mono numbers on hairlines (the old Today fold, open) ---- */
-html[data-room='saved'] .saved-cards { margin: 18px 0 30px; }
-html[data-room='saved'] .saved-cards .deck-counts {
+/* ---- the deck room, folded under the line: mono numbers on hairlines ---- */
+html[data-room='tray'] .today-detail { margin: 30px 0 8px; }
+html[data-room='tray'] .today-detail-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 2px;
+  border: 0;
+  border-block: var(--stroke-hairline) solid var(--color-line);
+  background: none;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+html[data-room='tray'] .today-detail-name {
+  font: 600 11.5px/1 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='tray'] body:not(.ui-bi) .today-detail-name { letter-spacing: 0.2em; font-size: 12px; }
+html[data-room='tray'] .today-detail-sum {
+  margin-left: auto;
+  font: 400 12px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-2);
+}
+html[data-room='tray'] .today-detail-caret {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin: 0 4px 3px 2px;
+  border-right: 1px solid var(--color-muted);
+  border-bottom: 1px solid var(--color-muted);
+  transform: rotate(45deg);
+  transition: transform var(--motion-quick) var(--ease-standard);
+}
+html[data-room='tray'] .today-detail-toggle[aria-expanded='false'] .today-detail-caret { transform: rotate(-45deg); }
+html[data-room='tray'] .today-detail-body { padding-top: 4px; }
+html[data-room='tray'] .today-detail-body .deck-counts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
   margin: 14px 0 12px;
 }
-html[data-room='saved'] .saved-cards .deck-count {
+html[data-room='tray'] .today-detail-body .deck-count {
   padding: 4px 0 2px 12px;
   border: 0;
   border-left: var(--stroke-hairline) solid var(--color-line);
@@ -443,51 +482,51 @@ html[data-room='saved'] .saved-cards .deck-count {
   background: none;
   text-align: left;
 }
-html[data-room='saved'] .saved-cards .deck-count:first-child { padding-left: 2px; border-left: 0; }
-html[data-room='saved'] .saved-cards .deck-count .deck-count-n {
+html[data-room='tray'] .today-detail-body .deck-count:first-child { padding-left: 2px; border-left: 0; }
+html[data-room='tray'] .today-detail-body .deck-count .deck-count-n {
   font: 500 26px/1.1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
-html[data-room='saved'] .saved-cards .deck-count .deck-count-l {
+html[data-room='tray'] .today-detail-body .deck-count .deck-count-l {
   margin-top: 4px;
   font: 500 11px/1.2 var(--font-ui);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html[data-room='saved'] .saved-cards .deck-count.c-due .deck-count-n { color: var(--color-accent); }
-html[data-room='saved'] .saved-cards .srs-forecast {
+html[data-room='tray'] .today-detail-body .deck-count.c-due .deck-count-n { color: var(--color-accent); }
+html[data-room='tray'] .today-detail-body .srs-forecast {
   margin: 6px 0;
   font: 400 12px/1.6 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
-html[data-room='saved'] .saved-cards .srs-held { color: var(--color-ink-2); }
-html[data-room='saved'] .saved-cards .deck-table { margin: 18px 0 12px; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
-html[data-room='saved'] .saved-cards .deck-row {
+html[data-room='tray'] .today-detail-body .srs-held { color: var(--color-ink-2); }
+html[data-room='tray'] .today-detail-body .deck-table { margin: 18px 0 12px; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
+html[data-room='tray'] .today-detail-body .deck-row {
   min-height: 46px;
   padding: 8px 2px;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
   font: 400 15px/1.3 var(--font-ui);
   color: var(--color-ink);
 }
-html[data-room='saved'] .saved-cards .deck-row > span:not(.d-name) {
+html[data-room='tray'] .today-detail-body .deck-row > span:not(.d-name) {
   font: 500 14px/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
-html[data-room='saved'] .saved-cards .deck-row > span.zero { color: var(--color-quiet); font-weight: 400; }
-html[data-room='saved'] .saved-cards .deck-row > span.c-due:not(.zero) { color: var(--color-accent); }
-html[data-room='saved'] .saved-cards .deck-row.deck-head { min-height: 0; padding-block: 8px; }
-html[data-room='saved'] .saved-cards .deck-row.deck-head > span {
+html[data-room='tray'] .today-detail-body .deck-row > span.zero { color: var(--color-quiet); font-weight: 400; }
+html[data-room='tray'] .today-detail-body .deck-row > span.c-due:not(.zero) { color: var(--color-accent); }
+html[data-room='tray'] .today-detail-body .deck-row.deck-head { min-height: 0; padding-block: 8px; }
+html[data-room='tray'] .today-detail-body .deck-row.deck-head > span {
   font: 500 10.5px/1 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html[data-room='saved'] .saved-cards .deck-row.deck-all .d-name { font-weight: 600; }
-html[data-room='saved'] .saved-cards .deck-row:disabled { color: var(--color-ink-2); }
+html[data-room='tray'] .today-detail-body .deck-row.deck-all .d-name { font-weight: 600; }
+html[data-room='tray'] .today-detail-body .deck-row:disabled { color: var(--color-ink-2); }
 
 /* ---- round 4 (T1): the sky is the doorway into the whole universe ----
    Every star is a real word; open sky in the band is the door up; the caption says so in words. */
@@ -527,7 +566,7 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero >
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-sky + .today-universe { margin-top: -44px; }
 html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 13px/1 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='tray'] #app > main > .today-hero > .today-universe:active { transform: scale(0.97); }
-html:is([data-room='tray'], [data-room='search']) .today-universe .today-arrow { width: 16px; margin-left: 0; }
+html[data-room='tray'] .today-universe .today-arrow { width: 16px; margin-left: 0; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-universe {
   color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));
 }
@@ -551,8 +590,8 @@ html[data-arrive='sky'] #drift-layer.active {
 @keyframes today-universe-rise { from { opacity: 0.01; transform: scale(0.86); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  html:is([data-room='tray'], [data-room='search']) :is(.today-sky-lane, .today-sky-lane .today-star, .today-star.due, .dw-k, .today-train .car, .today-wins) { animation: none; }
-  html:is([data-room='tray'], [data-room='search']) :is(.today-star, .dw-word, .today-arrow, .today-universe) { transition: none; }
+  html[data-room='tray'] :is(.today-sky-lane, .today-sky-lane .today-star, .today-star.due, .dw-k, .today-train .car, .today-wins) { animation: none; }
+  html[data-room='tray'] :is(.today-star, .dw-word, .today-arrow, .today-detail-caret, .today-universe) { transition: none; }
   html[data-arrive='sky'] #drift-layer.active { animation: none; }
 }
 
@@ -725,46 +764,69 @@ html[data-room='door'] body.ginga:has(#drift-layer #card.open, #drift-layer #rad
   opacity: 0;
   pointer-events: none;
 }
-html[data-room='saved'] .deck-row.deck-total,
-html[data-room='saved'] .deck-row.deck-total:hover { cursor: default; background: none; }
+html[data-room='tray'] .deck-row.deck-total,
+html[data-room='tray'] .deck-row.deck-total:hover { cursor: default; background: none; }
 
-/* 2026-10-13 · Today is one next step: under the line, only two quiet text doors — the backup
-   reminder when a copy is due, and the way to everything kept — in the room's accent voice */
-html[data-room='tray'] .today-foot {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+/* ---- the layout under test (2026-10-14): Saved's cards at a glance wear the Today fold's ledger ---- */
+html[data-room='saved'] .saved-cards { margin: 18px 0 30px; }
+html[data-room='saved'] .saved-cards .deck-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  margin: 26px 2px 8px;
+  margin: 14px 0 12px;
 }
-html[data-room='tray'] .today-foot .store-nudge {
-  margin: 0;
-  font: 400 13px/1.5 var(--font-ui);
-  color: var(--color-ink-2);
-}
-html[data-room='tray'] body:not(.zen) #app .today-door {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: auto;
-  min-height: 44px;
-  margin: 0;
-  padding: 0;
+html[data-room='saved'] .saved-cards .deck-count {
+  padding: 4px 0 2px 12px;
   border: 0;
+  border-left: var(--stroke-hairline) solid var(--color-line);
   border-radius: 0;
   background: none;
-  box-shadow: none;
-  color: var(--color-accent);
-  font: 600 14px/1.2 var(--font-ui);
-  letter-spacing: 0.01em;
-  cursor: pointer;
+  text-align: left;
 }
-html[data-room='tray'] body:not(.ui-bi) #app .today-door { font: 800 14px/1.2 var(--font-headword); letter-spacing: 0.06em; }
-html:is([data-room='tray'], [data-room='search']) .today-door:hover .today-arrow { transform: translateX(3px); }
-html[data-room='tray'] .store-nudge + .today-door { margin-bottom: 6px; }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] body:not(.zen) #app .today-door {
-  color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));
+html[data-room='saved'] .saved-cards .deck-count:first-child { padding-left: 2px; border-left: 0; }
+html[data-room='saved'] .saved-cards .deck-count .deck-count-n {
+  font: 500 26px/1.1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
 }
-@media (prefers-reduced-motion: reduce) {
-  html:is([data-room='tray'], [data-room='search']) .today-door .today-arrow { transition: none; }
+html[data-room='saved'] .saved-cards .deck-count .deck-count-l {
+  margin-top: 4px;
+  font: 500 11px/1.2 var(--font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
+html[data-room='saved'] .saved-cards .deck-count.c-due .deck-count-n { color: var(--color-accent); }
+html[data-room='saved'] .saved-cards .srs-forecast {
+  margin: 6px 0;
+  font: 400 12px/1.6 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+html[data-room='saved'] .saved-cards .srs-held { color: var(--color-ink-2); }
+html[data-room='saved'] .saved-cards .deck-table { margin: 18px 0 12px; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
+html[data-room='saved'] .saved-cards .deck-row {
+  min-height: 46px;
+  padding: 8px 2px;
+  border-bottom: var(--stroke-hairline) solid var(--color-line);
+  font: 400 15px/1.3 var(--font-ui);
+  color: var(--color-ink);
+}
+html[data-room='saved'] .saved-cards .deck-row > span:not(.d-name) {
+  font: 500 14px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+html[data-room='saved'] .saved-cards .deck-row > span.zero { color: var(--color-quiet); font-weight: 400; }
+html[data-room='saved'] .saved-cards .deck-row > span.c-due:not(.zero) { color: var(--color-accent); }
+html[data-room='saved'] .saved-cards .deck-row.deck-head { min-height: 0; padding-block: 8px; }
+html[data-room='saved'] .saved-cards .deck-row.deck-head > span {
+  font: 500 10.5px/1 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='saved'] .saved-cards .deck-row.deck-all .d-name { font-weight: 600; }
+html[data-room='saved'] .saved-cards .deck-row:disabled { color: var(--color-ink-2); }
+html[data-room='saved'] .deck-row.deck-total,
+html[data-room='saved'] .deck-row.deck-total:hover { cursor: default; background: none; }

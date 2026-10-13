@@ -110,6 +110,7 @@ const UI_JA = {
   "Share backup": "バックアップを共有",
   "Import a JSON file": "JSON ファイルを読み込む",
   "Colour theme": "配色",
+  "← Learn": "← 学ぶ",
   "← Review": "← 復習",
   "About this collection": "このコレクションについて",
   "FSRS-6 · ts-fsrs 5.4.1 · retention 0.90 · 1m/10m learning · 10m relearning. Each answer stays learner-graded. Views and lookups never count as mastery.": "FSRS-6・ts-fsrs 5.4.1・目標記憶率 0.90・学習 1分/10分・再学習 10分。答えは自分で採点します。表示や検索だけで習得とは判定しません。",
@@ -209,7 +210,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     finally { busy = false; root.removeAttribute('aria-busy'); }
   }
   function top(title) {
-    return `<header class="pc-top">${button('← Review','data-action="leave"')}<span class="pc-kicker">${text("Your own texts", "自分の文章")}</span></header><h1 tabindex="-1" ${record?'data-ui-content="learning"':''}>${esc(title)}</h1>`;
+    return `<header class="pc-top">${button(document.documentElement.dataset.layout === 'places' ? '← Review' : '← Learn','data-action="leave"')}<span class="pc-kicker">${text("Your own texts", "自分の文章")}</span></header><h1 tabindex="-1" ${record?'data-ui-content="learning"':''}>${esc(title)}</h1>`;
   }
   function tabs() {
     return `<nav aria-label="${text("Collection")}">${[['study',tx("Study")],['read',tx("Read")],['connections',tx("Threads")],['settings',tx("Settings")],['home',tx("Library")]].map(([id,label]) => button(label,`data-screen="${id}" aria-current="${screen===id?'page':'false'}"`)).join('')}</nav>`;
