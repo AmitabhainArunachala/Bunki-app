@@ -1,0 +1,52 @@
+# Tests the report relay and, once its secrets exist, deploys it to Cloudflare
+# Workers. The relay files in-app problem reports as GitHub issues; it is a
+# separate service and never publishes the phone app.
+name: report-relay
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'services/report-relay/**'
+      - '.github/workflows/report-relay.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-relay
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      REPORT_GITHUB_TOKEN: ${{ secrets.REPORT_GITHUB_TOKEN }}
+      REPORT_KEY: ${{ secrets.REPORT_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test the relay
+        run: node --test services/report-relay/test/worker.test.mjs
+      - name: Check that the deployment secrets exist
+        id: configured
+        run: |
+          missing=""
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID REPORT_GITHUB_TOKEN REPORT_KEY; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::notice::Report relay not deployed; missing repository secrets:$missing (see services/report-relay/README.md)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy to Cloudflare Workers
+        if: steps.configured.outputs.ready == 'true'
+        run: node services/report-relay/deploy.mjs

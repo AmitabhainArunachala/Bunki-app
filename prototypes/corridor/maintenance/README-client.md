@@ -28,7 +28,13 @@ The native modal dialog provides background inertness. Closing with Escape or ei
 
 When the page is opened through Lavish (`window.lavish.queuePrompt` exists), the client never contacts a report service: saving keeps the report on this device and queues its words and screen context in Lavish (tag `bunki-report`), shown as “Queued in Lavish”. A queued report is not a service receipt, and a queue failure leaves the saved report intact with a retry.
 
-## GitHub delivery (the published app)
+## Report relay (the published app)
+
+The published app files reports through the report relay (`services/report-relay/`), a Cloudflare Worker that implements this client's service contract and turns each report into a GitHub issue with its screenshots. A device is set up once by opening the app with `?report-relay=<relay address>&report-key=<key>`; the app stores `<address>/k/<key>` as its `serviceUrl` and removes both from the address bar. From then on the ordinary delivery path applies: the report is saved, sent with its idempotency key, and shows **Received** with a link to its issue. Its status follows the issue (`fixer:*` labels, closed), the fixer's comments appear under **Progress**, and replies and **Still happening** become issue comments.
+
+Reports that were never sent anywhere (no receipt, no frozen request, not opened on GitHub, not queued in Lavish) follow the device to its current service, so reports saved before setup are delivered by the relay automatically.
+
+## GitHub delivery (a device without a report service)
 
 The published app has no report service: GitHub Pages answers the `/api/config` probe with 404. When the host passes `github: { newIssueUrl, label, version }` and no service or Lavish queue is connected, **Send to GitHub** files the report as a GitHub issue:
 
@@ -40,7 +46,7 @@ The published app has no report service: GitHub Pages answers the `/api/config` 
 
 Issues with the `kairo-report` label are picked up by the scheduled fixer agent, which opens a pull request for review; nothing is merged or deployed without full CI and a human merge.
 
-`prototypes/corridor/tools/verify-report-github.mjs` exercises this path on the built site with github.com stubbed, in Chromium and WebKit.
+`prototypes/corridor/tools/verify-report-delivery.mjs` exercises both paths on the built site, with github.com stubbed and the relay running locally against a mock GitHub API, in Chromium and WebKit.
 
 ## Delivery and persistence
 

@@ -1,8 +1,10 @@
-/** The bug button on the published (service-less) app files a prefilled GitHub issue.
+/** Problem reports reach GitHub, through the report relay or, on a device not set
+ * up for it, through a prefilled GitHub issue.
  *
- * Runs the built site with no report service, as GitHub Pages serves it: the
- * client's /api/config probe gets the host's own 404. github.com is stubbed so no
- * real issue is ever opened. Checks, per engine:
+ * Runs the built site as GitHub Pages serves it: with no service of its own, the
+ * client's /api/config probe gets the host's 404. github.com is stubbed so no real
+ * issue is ever opened, and the relay runs locally against a mock GitHub API.
+ * Checks, per engine, for the prefilled-issue fallback:
  *   1. the sheet offers "Send to GitHub" and opens one prefilled new-issue page
  *      in the same tap (title, label, marker, words, version, screen, report ID);
  *   2. the saved copy names the same report and is marked "Opened on GitHub";
@@ -11,9 +13,17 @@
  *      "Send to GitHub" link (the path for reports saved by earlier versions);
  *   5. "Copy report text" copies the same issue text (Chromium only);
  *   6. no console errors.
+ * and for the relay (services/report-relay):
+ *   7. one setup link stores the relay on the device and leaves the address;
+ *   8. a report saved before setup is filed automatically;
+ *   9. a new report with a screenshot becomes a labelled issue, linked in the app,
+ *      with the screenshot served by the relay;
+ *  10. the fixer's comment and status appear in the app, and a reply from the app
+ *      becomes an issue comment.
  */
-/* global document, window, indexedDB, navigator */
+/* global document, window, indexedDB, navigator, location, fetch */
 import assert from 'node:assert/strict';
+import { Buffer } from 'node:buffer';
 import console from 'node:console';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -22,12 +32,24 @@ import { URL } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { memoryKv, PIXEL_PNG, startMockGithub, startRelay } from '../../../services/report-relay/test-support.mjs';
 
 const ISSUE = 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new';
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
 const version = JSON.parse(readFileSync(new URL('../../../release.json', import.meta.url))).version;
+const RELAY_KEY = 'relay-test-key-0123456789';
+const github = await startMockGithub();
+const relay = await startRelay({ REPORTS: memoryKv(), GITHUB_TOKEN: 'test-github-token', REPORT_KEY: RELAY_KEY, GITHUB_REPO: 'AmitabhainArunachala/Bunki-app', GITHUB_API: github.origin, ALLOW_LOOPBACK: '1' });
+const waitFor = async (predicate, timeout = 20_000) => {
+  const deadline = Date.now() + timeout;
+  while (!predicate()) {
+    if (Date.now() > deadline) return false;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  return true;
+};
 const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { chromium, webkit };
 const checks = [];
 const check = (name, pass, detail = '') => {
@@ -176,15 +198,68 @@ try {
         check(`${engine} · no console errors (blocked window)`, errors.length === 0, errors.join(' | '));
         await context.close();
       }
+      // 5 · the relay: one setup link, then reports go straight to GitHub
+      {
+        github.state.issues.length = 0;
+        github.state.comments.length = 0;
+        const { context, page, errors } = await fresh({ blockWindows: true });
+        // A report saved before the relay was set up, as on a phone running 1.0.x.
+        await openSheet(page);
+        await page.locator('#br-actual').fill('Saved before the relay was set up.');
+        await page.locator('#br-form .br-primary').click();
+        await page.waitForFunction(() => document.querySelector('#br-title')?.textContent === 'Your report');
+        await page.goto(`${host.origin}/index.html?entry=shelf&report-relay=${encodeURIComponent(relay.origin)}&report-key=${RELAY_KEY}`, { waitUntil: 'load' });
+        await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
+        const address = await page.evaluate(() => location.search);
+        check(`${engine} · the setup link is stored on the device and removed from the address`, address === '?entry=shelf', address);
+        await waitFor(() => github.state.issues.length === 1);
+        check(`${engine} · the report saved before setup is filed automatically`,
+          github.state.issues.length === 1 && github.state.issues[0].body.includes('Saved before the relay was set up.'), github.state.issues[0]?.title || 'no issue');
+
+        await page.locator('#bunki-report-bug').click();
+        await page.locator('#br-actual').waitFor();
+        const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
+        check(`${engine} · with the relay set up, the sheet sends reports itself`, ready, await page.locator('#br-form .br-primary').textContent());
+        await page.locator('#br-actual').fill('The tutor reply is cut off.');
+        await page.locator('#br-files').setInputFiles({ name: 'screen.png', mimeType: 'image/png', buffer: PIXEL_PNG });
+        await page.locator('.br-attachments figure').waitFor();
+        await page.locator('#br-form .br-primary').click();
+        const received = await page.waitForFunction(() => document.querySelector('.br-body h3')?.textContent === 'Received', null, { timeout: 20_000 }).then(() => true, () => false);
+        const filed = github.state.issues[1];
+        const link = received ? await page.locator('.br-body > .br-note a').first().getAttribute('href') : null;
+        check(`${engine} · the report becomes a labelled issue, linked from the app`,
+          received && !!filed && filed.labels.some((label) => label.name === 'kairo-report') && filed.body.includes('The tutor reply is cut off.') &&
+            filed.body.includes(`- App: KAIRO ${version}`) && link === filed.html_url,
+          `${filed?.html_url} · app link ${link}`);
+        const shot = /\((http:\/\/127\.0\.0\.1:\d+\/v1\/shots\/shot_[a-f0-9]{32})\)/.exec(filed?.body || '')?.[1];
+        const bytes = shot ? Buffer.from(await (await fetch(shot)).arrayBuffer()) : null;
+        check(`${engine} · the screenshot is in the issue, served by the relay`, !!bytes && bytes.equals(PIXEL_PNG), shot || 'no screenshot link');
+
+        github.comment(2, 'Found it: the reply box clips long answers. The fix is in review.');
+        github.label(2, 'fixer:pr-open');
+        await page.locator('[data-br="refresh"]').click();
+        const updated = await page.waitForFunction(() => document.querySelector('.br-body h3')?.textContent === 'Ready for review', null, { timeout: 20_000 }).then(() => true, () => false);
+        const thread = updated ? await page.locator('.br-thread').textContent() : '';
+        check(`${engine} · the fixer's status and comment appear on the report`, updated && thread.includes('On GitHub') && thread.includes('The fix is in review.'), thread.slice(0, 160));
+        await page.locator('#br-follow').fill('It also happens on the Mac.');
+        await page.locator('#br-follow-form button[type="submit"]').click();
+        const replied = await waitFor(() => github.state.comments.some((item) => item.issue === 2 && item.body.startsWith('<!-- kairo-app-message -->') && item.body.includes('It also happens on the Mac.')));
+        check(`${engine} · a reply from the app becomes an issue comment`, replied, `${github.state.comments.length} comment(s)`);
+        await page.screenshot({ path: join(out, `${engine}-relay.png`) });
+        check(`${engine} · no console errors (relay)`, errors.length === 0, errors.join(' | '));
+        await context.close();
+      }
     } finally {
       await browser.close();
     }
   }
 } finally {
   await host.close?.();
+  await relay.close();
+  await github.close();
 }
 
 const failed = checks.filter((item) => !item.pass);
-writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({ suite: 'report-github', version, checks }, null, 2)}\n`);
+writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({ suite: 'report-delivery', version, checks }, null, 2)}\n`);
 console.log(`\n${checks.length - failed.length}/${checks.length} checks passed`);
 if (failed.length) process.exitCode = 1;

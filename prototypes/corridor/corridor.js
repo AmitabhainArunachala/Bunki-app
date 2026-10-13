@@ -32487,14 +32487,46 @@ function reportEntries(className) {
   line.append(open, list);
   return line;
 }
+/* The report relay. A device set up with the relay's address and key sends its
+ * problem reports there, and the relay files each one as a GitHub issue. Setup is
+ * one link opened on the device, ?report-relay=<https address>&report-key=<key>;
+ * ?report-relay=off forgets it. Both stay on this device only, and are removed
+ * from the address bar as soon as they are read. */
+const REPORT_RELAY_STORE = 'kairo-report-relay-v1';
+const REPORT_RELAY_URL = (() => {
+  let params = null;
+  try { params = new URLSearchParams(location.search); } catch { /* No address to read. */ }
+  if (params?.has('report-relay')) {
+    const value = params.get('report-relay') || '', key = params.get('report-key') || '';
+    try {
+      if (value === 'off') localStorage.removeItem(REPORT_RELAY_STORE);
+      else {
+        const url = new URL(value);
+        const loopback = url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname);
+        if ((url.protocol === 'https:' || loopback) && !url.search && !url.hash && !url.username && /^[A-Za-z0-9_-]{16,128}$/.test(key)) {
+          localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url: `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}` }));
+        }
+      }
+    } catch { /* An unusable link changes nothing. */ }
+    params.delete('report-relay');
+    params.delete('report-key');
+    try { history.replaceState(history.state, '', `${location.pathname}${params.toString() ? `?${params}` : ''}${location.hash}`); } catch { /* The address keeps the link. */ }
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem(REPORT_RELAY_STORE) || 'null');
+    return typeof saved?.url === 'string' ? saved.url : '';
+  } catch { return ''; }
+})();
 function mountMaintenanceReports() {
   if (!window.BunkiReports) return;
   maintenanceReports = window.BunkiReports.mount({
     rail: true,
     locale: S.lang === 'ja' ? 'ja' : 'en',
-    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
-    // With no report service (the published site), a report is filed as a GitHub
-    // issue under the learner's own account; the fixer agent picks up that label.
+    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || REPORT_RELAY_URL || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
+    appVersion: APP_RELEASE.version,
+    // Without a report service (a device not yet set up for the relay), a report is
+    // filed as a prefilled GitHub issue that the learner submits; the fixer agent
+    // picks up that label either way.
     github: { newIssueUrl: 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new', label: 'kairo-report', version: APP_RELEASE.version },
     getContext: maintenanceContext,
     clockNotice: () => {
