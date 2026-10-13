@@ -6,12 +6,91 @@ import {
   operationReference,
   parseSyncOperation,
   planReceive,
+  readSourceReferenceViews,
+  readExamAttemptViews,
+  readAssessmentResultViewsV2,
+  readAssessmentLearningViewsV2,
 } from '../src/index.ts';
 import { policy as POLICY, note, op } from './fixtures.ts';
 
-import { assertJsonBudget } from '../src/common.ts';
+import { readNoteViews } from '../src/note-views.ts';
+import { readReadingViews } from '../src/reading-views.ts';
+
+import { assertJsonBudget, immutable } from '../src/common.ts';
 
 describe('Validated immutable operation reuse never supplies session authority', () => {
+  it('shares immutable derived views only within the same admitted replica', () => {
+    const before = createReplica(POLICY);
+    const after = planReceive(before, {
+      binding: POLICY.binding,
+      operations: [op(note('view-note'))],
+    }).next;
+    for (const read of [
+      readNoteViews,
+      readReadingViews,
+      readSourceReferenceViews,
+      readExamAttemptViews,
+      readAssessmentResultViewsV2,
+      readAssessmentLearningViewsV2,
+    ]) {
+      const original = read(before);
+      expect(read(before)).toBe(original);
+      const changed = read(after);
+      expect(changed).not.toBe(original);
+      expect(read(after)).toBe(changed);
+      expect(Object.isFrozen(changed)).toBe(true);
+      expect(() => read(immutable(JSON.parse(JSON.stringify(after))))).toThrow('invalid-replica');
+      let accessed = false;
+      const forged = new Proxy(after, {
+        get() {
+          accessed = true;
+          throw new Error('getter');
+        },
+      });
+      expect(() => read(forged)).toThrow('invalid-replica');
+      expect(accessed).toBe(false);
+    }
+    expect(readNoteViews(before)).toEqual([]);
+    expect(readNoteViews(after)[0]?.noteId).toBe('view-note');
+  });
+  it('reuses a sealed replica for empty and duplicate deliveries after checking authority', () => {
+    const operation = op(note('note-a', 'unchanged'));
+    const state = planReceive(createReplica(POLICY), {
+      binding: POLICY.binding,
+      operations: [operation],
+    }).next;
+    const empty = planReceive(state, { binding: POLICY.binding, operations: [] });
+    expect(empty.next).toBe(state);
+    expect(empty).toMatchObject({
+      insert: [],
+      duplicates: [],
+      newlyReady: [],
+      projectionChanged: false,
+    });
+    expect(planReceive(state, { binding: POLICY.binding, operations: [operation] }).next).toBe(
+      state,
+    );
+    expect(() =>
+      planReceive(state, { binding: { ...POLICY.binding, sessionId: 'old' }, operations: [] }),
+    ).toThrow('stale-session');
+    expect(() =>
+      planReceive(state, { binding: { ...POLICY.binding, learnerId: 'other' }, operations: [] }),
+    ).toThrow('ownership-mismatch');
+    const clone = immutable(JSON.parse(JSON.stringify(state)));
+    expect(() => planReceive(clone, { binding: POLICY.binding, operations: [] })).toThrow(
+      'invalid-replica',
+    );
+    expect(Object.isFrozen(empty)).toBe(true);
+    expect(Object.isFrozen(empty.insert)).toBe(true);
+  });
+
+  it('still freezes descendants of a caller-supplied shallow-frozen object', () => {
+    const child = { value: 1 };
+    const raw = Object.freeze({ child });
+    immutable(raw);
+    expect(Object.isFrozen(child)).toBe(true);
+    expect(Reflect.set(child, 'value', 2)).toBe(false);
+  });
   it('rejects non-JSON numbers in parsed output even when the caller descriptors are valid', () => {
     const small = JSON.parse(JSON.stringify(op(note('note-a', 'proxy-negative-zero'))));
     small.deletionEpoch = 0;

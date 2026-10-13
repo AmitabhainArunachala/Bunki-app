@@ -1,0 +1,14 @@
+{
+  "changed": [
+    "boot",
+    "departArticlePrefetch",
+    "prefetchArticles",
+    "dispatchQueuedDictionarySearch",
+    "requestDictionarySearch"
+  ],
+  "added": [
+    "announceBackgroundPressure",
+    "deferOptionalWork"
+  ],
+  "unchanged": 990
+}

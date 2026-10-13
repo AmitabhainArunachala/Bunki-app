@@ -7,7 +7,7 @@
  * records, archives, command receipts and migration custody never become sync
  * operations merely because this host can persist them.
  */
-import { createSyncOperation, encodeLocalJson, exportOperationJournal, operationReference, parseOperationJournalBackup, parseReadingAnchor, readNoteViews, readReadingViews, readSourceReferenceViews, readExamAttemptViews } from './modules/record-core.mjs';
+import { copyLocalJson, createSyncOperation, encodeLocalJson, exportOperationJournal, operationReference, parseOperationJournalBackup, parseReadingAnchor, readNoteViews, readReadingViews, readSourceReferenceViews, readExamAttemptViews } from './modules/record-core.mjs';
 import { parseSourceReferenceInput, sourceReferenceIntent, prepareSourceReferenceCapture } from './source-inbox.mjs';
 
 const PRACTICE_FINALIZE = 'host.practice-finalize/1';
@@ -32,7 +32,7 @@ const NOTE_COMMANDS = new Set([NOTE_CREATE, NOTE_EDIT, NOTE_DELETE, NOTE_RESTORE
 const BUILTIN = new Set(['host.observations/1', 'host.archive/1', 'host.restore/1', 'host.restore/2', ...NOTE_COMMANDS, PRACTICE_FINALIZE, ASSESSMENT_FINALIZE, ASSESSMENT_SUPPRESS, ASSESSMENT_RECONCILE, ASSESSMENT_ENRICH, READING_RESUME, SOURCE_REFERENCE]);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const plain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const copy = (value) => encodeLocalJson(value).value;
+const copy = copyLocalJson;
 const digest = (value) => encodeLocalJson(value).sha256;
 const same = (a, b) => encodeLocalJson(a).text === encodeLocalJson(b).text;
 const scopeOf = (binding) => ({ accountId: binding.accountId, learnerId: binding.learnerId });

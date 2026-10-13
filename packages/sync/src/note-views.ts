@@ -1,4 +1,5 @@
 import { immutable, SyncValidationError } from './common.ts';
+import { viewOperationIndex } from './view-index.ts';
 import type { OperationRef, RecordOperation } from './operations.ts';
 import { planReceive, type EntityProjection, type SyncReplica } from './replica.ts';
 
@@ -20,14 +21,16 @@ export interface NoteView {
   readonly projection: EntityProjection;
 }
 
+const viewCache = new WeakMap<SyncReplica, readonly NoteView[]>();
+
 /**
  * Read the complete note projection of a planner-owned in-process replica.
  * The caller supplies the current handle; this function does not establish
  * account/session authority, source admission, persistence or scheduling.
  * Serialized replicas must first be rebuilt through the existing core planner.
  *
- * The existing empty receive plan validates the handle and re-derives the full
- * journal projection. No pending/quarantined arrival becomes visible here, and
+ * The empty receive plan validates the handle and its current binding before
+ * reusing its immutable journal projection. No pending/quarantined arrival becomes visible here, and
  * no timestamp or version label selects a winner. Hidden/restore-only notes
  * remain in the result with empty headVersions and their complete core state.
  */
@@ -40,7 +43,9 @@ export function readNoteViews(replica: SyncReplica): readonly NoteView[] {
     },
     operations: [],
   }).next;
-  const operations = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+  const cached = viewCache.get(checked);
+  if (cached) return cached;
+  const operations = viewOperationIndex(checked);
   const views: NoteView[] = [];
   for (const projection of checked.projection.entities) {
     if (projection.target.kind !== 'note') continue;
@@ -77,5 +82,7 @@ export function readNoteViews(replica: SyncReplica): readonly NoteView[] {
       projection,
     });
   }
-  return immutable(views);
+  const result = immutable(views);
+  viewCache.set(checked, result);
+  return result;
 }

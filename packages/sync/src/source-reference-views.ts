@@ -1,4 +1,5 @@
 import { immutable, SyncValidationError } from './common.ts';
+import { viewOperationIndex } from './view-index.ts';
 import type { OperationRef, SourceReferencePayload } from './operations.ts';
 import { planReceive, type EntityProjection, type SyncReplica } from './replica.ts';
 
@@ -18,9 +19,11 @@ export interface SourceReferenceView {
   readonly projection: EntityProjection;
 }
 
+const viewCache = new WeakMap<SyncReplica, readonly SourceReferenceView[]>();
+
 /**
  * Read source references from a planner-owned in-process replica. An empty
- * receive validates the handle and derives the complete journal projection;
+ * receive validates the handle before reusing its immutable journal projection;
  * pending and quarantined operations cannot supply visible reference content.
  * Serialized replicas must first be rebuilt through the existing planner.
  * No URL canonicalization, clock winner, source retrieval, scheduling or account
@@ -35,7 +38,9 @@ export function readSourceReferenceViews(replica: SyncReplica): readonly SourceR
     },
     operations: [],
   }).next;
-  const operations = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+  const cached = viewCache.get(checked);
+  if (cached) return cached;
+  const operations = viewOperationIndex(checked);
   const views: SourceReferenceView[] = [];
   for (const projection of checked.projection.entities) {
     if (projection.target.kind !== 'source-reference') continue;
@@ -68,5 +73,7 @@ export function readSourceReferenceViews(replica: SyncReplica): readonly SourceR
       projection,
     });
   }
-  return immutable(views);
+  const result = immutable(views);
+  viewCache.set(checked, result);
+  return result;
 }

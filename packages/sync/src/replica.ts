@@ -446,6 +446,18 @@ export function planReceive(replica: SyncReplica, delivery: ReceiveDelivery): Re
   if (!Array.isArray(delivery.operations) || delivery.operations.length > 1000) {
     throw new SyncValidationError('invalid-input', ['delivery.operations']);
   }
+  // A genuine sealed replica already has the projection for these exact
+  // immutable operations. Validate authority above on every call, but do not
+  // replay its journal for read-only view access or document-only commits.
+  if (delivery.operations.length === 0) {
+    return immutable({
+      next: replica,
+      insert: [],
+      duplicates: [],
+      newlyReady: [],
+      projectionChanged: false,
+    });
+  }
   const byId = new Map(replica.operations.map((operation) => [operation.opId, operation]));
   const insert: SyncOperation[] = [];
   const duplicates: OperationRef[] = [];
@@ -461,6 +473,15 @@ export function planReceive(replica: SyncReplica, delivery: ReceiveDelivery): Re
       byId.set(operation.opId, operation);
       insert.push(operation);
     }
+  }
+  if (insert.length === 0) {
+    return immutable({
+      next: replica,
+      insert: [],
+      duplicates: duplicates.sort((a, b) => compare(a.opId, b.opId)),
+      newlyReady: [],
+      projectionChanged: false,
+    });
   }
   const graph = causalGraph([...byId.values()]);
   const projection = project(graph);

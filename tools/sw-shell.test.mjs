@@ -100,7 +100,10 @@ async function until(check) {
  *  fetched and deleted. `existing` names caches already present, or maps them to entries.
  *  `stores` hands a second worker instance the first one's CacheStorage; `beforePut` may
  *  return a promise a cache write waits on. */
-function loadWorker(existing, { source = SW, network, stores: shared, beforePut } = {}) {
+function loadWorker(
+  existing,
+  { source = SW, network, stores: shared, beforePut, now = () => Date.now() } = {},
+) {
   const handlers = {};
   const record = { added: null, deleted: [], fetched: [], puts: [] };
   const stores =
@@ -146,6 +149,11 @@ function loadWorker(existing, { source = SW, network, stores: shared, beforePut 
     TextDecoder,
     Uint8Array,
     crypto: webcrypto,
+    Date: class extends Date {
+      static now() {
+        return now();
+      }
+    },
     fetch: async (request) => {
       const path = decodeURIComponent(request.url.slice(SCOPE.length));
       record.fetched.push(path);
@@ -194,7 +202,18 @@ function loadWorker(existing, { source = SW, network, stores: shared, beforePut 
     const hit = stores.get(cacheName)?.get(SCOPE + path);
     return hit ? Buffer.from(await hit.clone().arrayBuffer()).toString() : undefined;
   };
-  return { run, dispatch, request, stored, record, stores };
+  const message = (state, url = SCOPE + 'index.html') => {
+    let pending;
+    handlers.message({
+      data: { type: 'kairo-background-pressure/1', state },
+      source: { url },
+      waitUntil: (promise) => {
+        pending = promise;
+      },
+    });
+    return pending;
+  };
+  return { run, dispatch, request, stored, record, stores, message };
 }
 
 describe('sw.js shell', () => {
@@ -289,6 +308,83 @@ describe('sw.js bundled fonts (R5-19)', () => {
       return bodies.has(path) ? new Response(bodies.get(path)) : new Response('', { status: 404 });
     };
   const isFont = (path) => path.startsWith('fonts/');
+
+  it('pauses optional font warming during interaction while demanded assets remain available', async () => {
+    let now = 0;
+    const worker = loadWorker([], { source, network: serve(), now: () => now });
+    worker.message('busy');
+    await worker.run('install');
+    await worker.run('activate');
+    expect(worker.record.fetched.filter(isFont)).toEqual([]);
+    expect((await worker.request(FONT_A)).status).toBe(200);
+    expect(await worker.stored(cacheName, FONT_B)).toBeUndefined();
+    now = 1000;
+    await worker.message('idle');
+    expect(await worker.stored(cacheName, FONT_B)).toBe(bodies.get(FONT_B).toString());
+  });
+
+  it('bounds complete fetch/verify/write lanes and writes identity only after the boot core', async () => {
+    let active = 0;
+    let peak = 0;
+    const up = serve();
+    const { run, record } = loadWorker([], {
+      source,
+      network: async (path) => {
+        if (path !== 'sw.js' && path !== 'build-identity.json') {
+          active += 1;
+          peak = Math.max(peak, active);
+        }
+        return up(path);
+      },
+      beforePut: async (_name, path) => {
+        if (path !== 'sw.js' && path !== 'build-identity.json') {
+          await new Promise((resolve) => setTimeout(resolve, 1));
+          active -= 1;
+        } else expect(active).toBe(0);
+      },
+    });
+    await run('install');
+    expect(peak).toBeGreaterThan(1);
+    expect(peak).toBeLessThanOrEqual(4);
+    expect(record.puts.at(-1)).toBe(`${cacheName} build-identity.json`);
+  });
+
+  it('drains in-flight lanes before deleting a failed candidate and preserves the working generation', async () => {
+    const previous = `kairo:${SCOPE}:kairo-previous`;
+    const up = serve();
+    let writes = 0;
+    const { run, record, stores, stored } = loadWorker(
+      { [previous]: { 'index.html': 'working' } },
+      {
+        source,
+        network: up,
+        beforePut: async (_name, path) => {
+          if (path === 'index.html') throw new Error('synthetic cache-full');
+          await new Promise((resolve) => setTimeout(resolve, 5));
+          writes += 1;
+        },
+      },
+    );
+    await expect(run('install')).rejects.toThrow('synthetic cache-full');
+    expect(writes).toBeGreaterThan(0);
+    const finished = record.puts.length;
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    expect(record.puts).toHaveLength(finished);
+    expect(stores.has(cacheName)).toBe(false);
+    expect(await stored(previous, 'index.html')).toBe('working');
+    expect(record.puts.some((path) => path.endsWith('build-identity.json'))).toBe(false);
+  });
+
+  it('rejects corrupt mandatory bytes without publishing a completion marker', async () => {
+    const up = serve();
+    const { run, stores, record } = loadWorker([], {
+      source,
+      network: (path) => (path === 'index.html' ? new Response('corrupt') : up(path)),
+    });
+    await expect(run('install')).rejects.toThrow();
+    expect(stores.has(cacheName)).toBe(false);
+    expect(record.puts.some((path) => path.endsWith('build-identity.json'))).toBe(false);
+  });
 
   it('stamped install succeeds and caches the boot core when every font request fails', async () => {
     const { run, stored, record, stores } = loadWorker([], { source, network: serve(isFont) });

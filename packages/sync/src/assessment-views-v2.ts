@@ -1,5 +1,6 @@
 import { inputHashOf } from '@bunki/ai/hash';
 import { immutable } from './common.ts';
+import { viewOperationIndex } from './view-index.ts';
 import type {
   AssessmentResultPayloadV2,
   LearningFollowupPayloadV2,
@@ -18,6 +19,9 @@ export interface AssessmentResultViewV2 {
   readonly headResults: readonly AssessmentResultHeadV2[];
   readonly projection: EntityProjection;
 }
+const resultCache = new WeakMap<SyncReplica, readonly AssessmentResultViewV2[]>();
+const learningCache = new WeakMap<SyncReplica, AssessmentLearningViewsV2>();
+
 function checkedReplica(replica: SyncReplica) {
   return planReceive(replica, {
     get binding() {
@@ -32,7 +36,9 @@ export function readAssessmentResultViewsV2(
   replica: SyncReplica,
 ): readonly AssessmentResultViewV2[] {
   const checked = checkedReplica(replica);
-  const operations = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+  const cached = resultCache.get(checked);
+  if (cached) return cached;
+  const operations = viewOperationIndex(checked);
   const views: AssessmentResultViewV2[] = [];
   for (const projection of checked.projection.entities) {
     if (projection.target.kind !== 'exam-attempt') continue;
@@ -54,7 +60,9 @@ export function readAssessmentResultViewsV2(
     }
     views.push({ attemptId: projection.target.id, headResults: [...results.values()], projection });
   }
-  return immutable(views);
+  const result = immutable(views);
+  resultCache.set(checked, result);
+  return result;
 }
 
 export interface LearningFollowupHeadV2 {
@@ -75,8 +83,10 @@ export interface AssessmentLearningViewsV2 {
  */
 export function readAssessmentLearningViewsV2(replica: SyncReplica): AssessmentLearningViewsV2 {
   const checked = checkedReplica(replica);
+  const cached = learningCache.get(checked);
+  if (cached) return cached;
   const results = readAssessmentResultViewsV2(checked);
-  const operations = new Map(checked.operations.map((operation) => [operation.opId, operation]));
+  const operations = viewOperationIndex(checked);
   const suppressions = new Map<string, LearningSuppressPayloadV2>();
   const followups = new Map<
     string,
@@ -103,7 +113,7 @@ export function readAssessmentLearningViewsV2(replica: SyncReplica): AssessmentL
   const suppressedTargets = new Set(
     suppressionList.map((entry) => `${entry.target.t}:${entry.target.id}`),
   );
-  return immutable({
+  const result = immutable({
     followups: [...followups.values()].map((entry): LearningFollowupHeadV2 => {
       const result = results.find((view) => view.attemptId === entry.payload.attemptId);
       const matched = result?.headResults.find(
@@ -154,6 +164,8 @@ export function readAssessmentLearningViewsV2(replica: SyncReplica): AssessmentL
       };
     }),
     suppressions: suppressionList,
-    scheduling: 'not-computed',
+    scheduling: 'not-computed' as const,
   });
+  learningCache.set(checked, result);
+  return result;
 }

@@ -39,6 +39,9 @@ const MAX_MANIFEST_BYTES = 16 * 1024 * 1024;
 const MAX_MANIFEST_FILES = 100000;
 const DIGEST = /^[a-f0-9]{64}$/;
 const FONT_FILL_LANES = 4;
+const INSTALL_LANES = 4;
+let foregroundUntil = 0;
+const foregroundBusy = () => Date.now() < foregroundUntil;
 const SHELL = [
   '.',
   'index.html',
@@ -372,20 +375,32 @@ self.addEventListener('install', (event) => {
           ),
         ),
       ];
-      const verified = await Promise.all(
-        urls.map(async (url) => [
-          url,
-          await verifiedResponse(await networkAsset(url), release.entries.get(url)),
-        ]),
-      );
-      verified.push([IDENTITY_URL, release.identity], [WORKER_URL, release.worker]);
-      // No candidate entry is published until all mandatory bytes match. The
-      // candidate is not active until every write commits; failed new caches
-      // are removed without disturbing an existing generation of this identity.
+      // This generation is an unpublished candidate until install succeeds.
+      // Each lane releases its response after the cache write, rather than
+      // retaining the complete offline package in memory before any write.
       const existed = (await caches.keys()).includes(CACHE_NAME);
       const cache = await caches.open(CACHE_NAME);
       try {
-        await Promise.all(verified.map(([url, response]) => cache.put(url, response.clone())));
+        let cursor = 0;
+        let failure;
+        let failed = false;
+        const lane = async () => {
+          while (!failed && cursor < urls.length) {
+            const url = urls[cursor++];
+            try {
+              const response = await verifiedResponse(await networkAsset(url), release.entries.get(url));
+              await cache.put(url, response);
+            } catch (error) { failed = true; failure = error; }
+          }
+        };
+        // Drain already-started writes before cleanup: no late lane can
+        // recreate a failed candidate after the cache has been deleted.
+        await Promise.all(Array.from({ length: INSTALL_LANES }, lane));
+        if (failed) throw failure;
+        await cache.put(WORKER_URL, release.worker.clone());
+        // Identity is the completion marker and is written last. A restarted
+        // worker cannot validate an incomplete new candidate as an installed release.
+        await cache.put(IDENTITY_URL, release.identity.clone());
       } catch (error) {
         if (!existed) await caches.delete(CACHE_NAME);
         throw error;
@@ -437,6 +452,7 @@ async function drainGeneration(name, cache, release, held) {
   if (!urls.length || !urls.every(fontUrl)) return;
   let left = urls.length;
   for (const url of urls) {
+    if (foregroundBusy()) return;
     const entry = release.entries.get(url);
     const removed = await Promise.resolve()
       .then(async () => {
@@ -456,17 +472,20 @@ async function drainGeneration(name, cache, release, held) {
 
 /** Never awaited by install or activation. Every font is settled on its own. */
 async function fillFonts() {
+  if (foregroundBusy()) return false;
   const cache = await caches.open(CACHE_NAME);
   const release = await readInstalledRelease(cache);
   const held = new Set((await cache.keys()).map((request) => request.url));
   for (const name of await otherGenerations()) {
+    if (foregroundBusy()) return false;
     await drainGeneration(name, cache, release, held).catch(() => {});
   }
   const missing = [...release.entries].filter(
     ([url, entry]) => fontAsset(entry.path) && !held.has(url),
   );
   const lane = async () => {
-    for (let next = missing.shift(); next; next = missing.shift()) {
+    while (!foregroundBusy() && missing.length) {
+      const next = missing.shift();
       const [url, entry] = next;
       await fetchedFont(url, entry)
         .then((response) => cache.put(url, response))
@@ -474,6 +493,7 @@ async function fillFonts() {
     }
   };
   await Promise.all(Array.from({ length: FONT_FILL_LANES }, lane));
+  return missing.length === 0;
 }
 
 let fontFill;
@@ -482,12 +502,23 @@ let fontFill;
 function resumeFontFill() {
   if (!STAMPED) return undefined;
   if (!fontFill) {
-    fontFill = fillFonts().catch(() => {
+    fontFill = fillFonts().then((complete) => {
+      if (!complete) fontFill = undefined;
+    }).catch(() => {
       fontFill = undefined;
     });
   }
   return fontFill;
 }
+
+// This message only defers reproducible font warming. It never cancels a
+// demanded asset request, installation or a learner's durable write.
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== 'kairo-background-pressure/1' ||
+      typeof event.source?.url !== 'string' || !event.source.url.startsWith(SCOPE)) return;
+  if (event.data.state === 'busy') foregroundUntil = Date.now() + 900;
+  else if (event.data.state === 'idle') event.waitUntil(Promise.resolve(resumeFontFill()));
+});
 
 self.addEventListener('activate', (event) => {
   const activated = otherGenerations()

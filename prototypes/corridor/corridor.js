@@ -13,7 +13,7 @@
  */
 
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.0.1","channel":"stable","releasedOn":"2026-10-13","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.0.2","channel":"stable","releasedOn":"2026-10-14","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 
 const DATA = {
@@ -3486,7 +3486,7 @@ let srsCustom = null;
 const DICTIONARY_INDEX_PATH = 'data/share_alike/dict-v2/index.json';
 const DICTIONARY_CORE_PATH = 'data/share_alike/dict.json';
 const DICTIONARY_SHARD_PATH = (id) => `data/share_alike/dict-v2/${id}.json`;
-const DICTIONARY_SEARCH_SETTLE_MS = 320;
+const DICTIONARY_SEARCH_SETTLE_MS = 80;
 let dictionaryIndexPromise = null;
 const dictionaryShardPromises = new Map();
 let dictionaryWorker = null;
@@ -3495,8 +3495,26 @@ let dictionarySearchGeneration = 0;
 let dictionarySearchInFlight = null;
 let dictionarySearchQueued = null;
 let dictionarySearchTimer = null;
+let dictionaryComposing = false;
 let navSearchRepaint = null;
 const dictionaryWorkerRequests = new Map();
+const isDictionaryInput = (target) => target?.matches?.('#search, #nav-search-input, #nav-search-door');
+addEventListener('compositionstart', (event) => {
+  if (isDictionaryInput(event.target)) dictionaryComposing = true;
+}, { capture: true });
+addEventListener('compositionend', (event) => {
+  if (!isDictionaryInput(event.target)) return;
+  dictionaryComposing = false;
+  queueMicrotask(refreshDictionaryBodies);
+  if (dictionarySearchQueued) {
+    dictionarySearchQueued.eligibleAt = performance.now() + DICTIONARY_SEARCH_SETTLE_MS;
+    clearDictionarySearchTimer();
+    dictionarySearchTimer = setTimeout(dispatchQueuedDictionarySearch, DICTIONARY_SEARCH_SETTLE_MS);
+  }
+}, { capture: true });
+addEventListener('focusout', (event) => {
+  if (isDictionaryInput(event.target)) dictionaryComposing = false;
+}, { capture: true });
 
 function embeddedDictionaryJson(name) {
   const node = document.getElementById(`corridor-dictionary-${name}`);
@@ -4120,28 +4138,28 @@ async function boot() {
   }
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
-  try { await ensureReadingModule(); }
-  catch { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
+  const validators = await Promise.allSettled([
+    ensureReadingModule(), ensureTeacherContextModule(), ensureTeacherDraftModule(),
+    ensureSentenceDraftModule(), ensureFeedModule(), ensurePublisherModule(),
+    ensureSourceInboxModule(),
+    import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs')
+      .then(module => { sentencePracticeModule = module; }),
+    import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs')
+      .then(module => { sourceProcessingModule = module; }),
+    ensureAssessmentModule(),
+  ]);
+  // All saved-data validators settle before ownership, recovery or record
+  // admission. Failure protection stays in the original deterministic order.
+  if (validators[0].status === 'rejected') { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
     'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.'); }
-  try { await ensureTeacherContextModule(); }
-  catch { protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
+  if (validators[1].status === 'rejected') { protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
     'Saved teaching contexts could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureTeacherDraftModule(); }
-  catch { protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
+  if (validators[2].status === 'rejected') { protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
     'Saved questions could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureSentenceDraftModule(); }
-  catch { protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
+  if (validators[3].status === 'rejected') { protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
     'Saved practice drafts could not load. Reconnect and reload to protect your record.'); }
-  // If there are existing source records, their validator will protect them
-  // when this module is unavailable. Older records can still open normally.
-  try { await ensureFeedModule(); } catch { /* The source shelf offers retry. */ }
-  try { await ensurePublisherModule(); } catch { /* Existing originals fail closed; the source shelf offers retry. */ }
-  try { await ensureSourceInboxModule(); } catch { /* Existing captures fail closed; the inbox offers retry. */ }
-  try { sentencePracticeModule = await import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs'); }
-  catch { /* Existing source practice fails closed; neutral captures remain available. */ }
-  try { sourceProcessingModule = await import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs'); }
-  catch { /* Local reading remains available; sending an excerpt requires this module. */ }
-  try { await ensureAssessmentModule(); } catch { /* Existing typed attempts fail closed in loadStore. */ }
+  // Optional source/practice/assessment failures retain their existing
+  // fail-closed validators in loadStore and their existing retry doors.
   if (await acquireRecordOwnership()) await openAppRecord();
   await resumeSavedPractice();
   await resumeAssessmentV2();
@@ -4479,6 +4497,26 @@ function renderArchive(main) {
 
 let articlePrefetchDeparted = false;
 let stopArticlePrefetch = () => {};
+let optionalWorkAfter = 0;
+let optionalWorkWake = null;
+let optionalWorkLastMessage = -Infinity;
+function announceBackgroundPressure(state) {
+  try { navigator.serviceWorker?.controller?.postMessage({ type: 'kairo-background-pressure/1', state }); }
+  catch { /* Optional scheduling cannot interrupt an input or a durable command. */ }
+}
+function deferOptionalWork() {
+  const now = performance.now();
+  optionalWorkAfter = now + 900;
+  if (now - optionalWorkLastMessage >= 100) {
+    optionalWorkLastMessage = now;
+    announceBackgroundPressure('busy');
+  }
+  clearTimeout(optionalWorkWake);
+  optionalWorkWake = setTimeout(() => announceBackgroundPressure('idle'), 1000);
+}
+for (const type of ['pointerdown', 'keydown', 'input', 'wheel', 'touchmove'])
+  addEventListener(type, deferOptionalWork, { capture: true, passive: true });
+addEventListener('visibilitychange', deferOptionalWork);
 // WebKit can cancel in-flight loads before pagehide while a replacement
 // document is still pending. Stop warming at beforeunload so a rejected load
 // cannot schedule another fetch in that gap. If navigation is cancelled, the
@@ -4486,6 +4524,7 @@ let stopArticlePrefetch = () => {};
 // ensureArticle loads remain available and are never cancelled here.
 function departArticlePrefetch() {
   articlePrefetchDeparted = true;
+  clearTimeout(optionalWorkWake);
   stopArticlePrefetch();
 }
 addEventListener('beforeunload', departArticlePrefetch, { capture: true });
@@ -4503,23 +4542,37 @@ function prefetchArticles() {
   const queue = D.passages.filter((p) => !p.tokens && !String(p.file || '').startsWith('archive/'));
   let stopped = false;
   let timer = null;
+  let idle = null;
   stopArticlePrefetch = () => {
     stopped = true;
     if (timer !== null) clearTimeout(timer);
+    if (idle !== null) window.cancelIdleCallback?.(idle);
     timer = null;
+    idle = null;
   };
   const next = () => {
     timer = null;
     // A queued closure can outlive timer cancellation. Its run stays stopped
     // even if a persisted pageshow starts a fresh background queue.
     if (stopped || articlePrefetchDeparted) return;
-    const p = queue.shift();
-    if (!p) return;
-    ensureArticle(p)
-      .catch((err) => console.warn(`prefetch ${p.id}`, err))
-      .then(() => {
-        if (!stopped && !articlePrefetchDeparted) timer = setTimeout(next, 40);
-      });
+    if (document.hidden || performance.now() < optionalWorkAfter) {
+      timer = setTimeout(next, document.hidden ? 1000 : Math.max(100, optionalWorkAfter - performance.now()));
+      return;
+    }
+    const load = () => {
+      idle = null;
+      if (stopped || articlePrefetchDeparted) return;
+      if (document.hidden || performance.now() < optionalWorkAfter) { next(); return; }
+      const p = queue.shift();
+      if (!p) return;
+      ensureArticle(p)
+        .catch((err) => console.warn(`prefetch ${p.id}`, err))
+        .then(() => {
+          if (!stopped && !articlePrefetchDeparted) timer = setTimeout(next, 100);
+        });
+    };
+    if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(load);
+    else load();
   };
   timer = setTimeout(next, 350);
 }
@@ -18824,7 +18877,7 @@ function clearDictionarySearchTimer() {
 
 function dispatchQueuedDictionarySearch() {
   clearDictionarySearchTimer();
-  if (dictionarySearchInFlight || !dictionarySearchQueued) return;
+  if (dictionaryComposing || dictionarySearchInFlight || !dictionarySearchQueued) return;
   const queued = dictionarySearchQueued;
   if (
     activeDictionaryQuery() !== queued.key ||
@@ -18922,17 +18975,18 @@ function dispatchQueuedDictionarySearch() {
 function requestDictionarySearch(context, matchingCoreIds) {
   const key = context.q;
   if (
-    !key ||
+    !key || dictionaryComposing ||
     D.dictionaryMode !== 'worker' ||
     D.dictionaryState !== 'ready' ||
     D.dictionarySearchCache?.has(key) ||
-    dictionarySearchInFlight?.key === key
+    dictionarySearchInFlight?.key === key ||
+    dictionarySearchQueued?.key === key
   ) {
     return;
   }
   // Exactly one replaceable request waits behind the active worker call. A
-  // natural typing stream continuously replaces this slot; only 320ms of
-  // quiet makes the latest visible query eligible to cross the worker seam.
+  // natural typing stream continuously replaces this slot. A short quiet
+  // interval coalesces typing without adding a third of a second to every query.
   dictionarySearchQueued = {
     key,
     context,

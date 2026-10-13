@@ -6,10 +6,16 @@ export type DeepReadonly<T> = T extends readonly (infer U)[]
     ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
     : T;
 
+const immutableValues = new WeakSet<object>();
+
 export function immutable<T>(value: T): DeepReadonly<T> {
   if (value !== null && typeof value === 'object') {
+    // Only skip a tree this function already traversed and froze. A caller's
+    // shallow Object.freeze does not establish immutable descendants.
+    if (immutableValues.has(value)) return value as DeepReadonly<T>;
     for (const child of Object.values(value)) immutable(child);
     Object.freeze(value);
+    immutableValues.add(value);
   }
   return value as DeepReadonly<T>;
 }
