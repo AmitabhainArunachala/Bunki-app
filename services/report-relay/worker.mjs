@@ -29,6 +29,9 @@ const IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const REPORT_LABEL = 'kairo-report';
 const APP_MESSAGE = '<!-- kairo-app-message -->';
 const MAX_LISTED = 20;
+// Only people with write access can speak for the app on a public issue: the relay posts
+// with the owner's token, and anyone else's comment shows as a GitHub comment, never as "You".
+const TRUSTED_AUTHORS = new Set(['OWNER', 'MEMBER', 'COLLABORATOR']);
 // Hourly ceilings across the whole relay. The key is shared by the learner's devices, so a
 // leaked key must not let anyone file issues as the owner without end or spend the GitHub
 // token's API quota: a learner files a few reports a day, and a list can cost 40 API calls.
@@ -347,7 +350,9 @@ async function buildView(env, record) {
       context: null,
     },
     ...(comments || []).map((comment) => {
-      const own = appMessage(comment.body || '');
+      const own = TRUSTED_AUTHORS.has(comment.author_association)
+        ? appMessage(comment.body || '')
+        : null;
       return {
         id: `msg_${comment.id}`,
         actor: own === null ? 'service' : 'user',
@@ -439,7 +444,9 @@ async function createReport(request, env, actor, origin) {
   await withinHour(env, 'create');
   const shots = [];
   for (const attachment of attachments) {
-    const shotId = randomId('shot');
+    // Keyed by the report and attachment, and unguessable without the relay's key: a retry
+    // after a GitHub outage rewrites the same objects instead of leaving new ones behind.
+    const shotId = `shot_${(await hmac(env.REPORT_KEY, `shot:${actor}:${report.id}:${attachment.id}`)).slice(0, 32)}`;
     await env.REPORTS.put(`shot:${shotId}`, attachment.bytes, {
       metadata: { type: attachment.type },
     });
