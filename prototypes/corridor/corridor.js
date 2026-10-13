@@ -32535,9 +32535,9 @@ const REPORT_RELAY_URL = (() => {
     // turning the relay off only returns reports to the prefilled GitHub page, so it needs no question
     if (address === 'off') saveReportRelay('off', '');
     else if (relayServiceUrl(address, key)) {
-      const link = new URL(location.pathname, location.origin);
-      link.search = new URLSearchParams({ 'report-relay': address, 'report-key': key }).toString();
-      reportRelayOffer = { link: link.href, host: new URL(address).host };
+      // shown as the setup link is written, with the address's : and / left readable
+      const query = new URLSearchParams({ 'report-relay': address, 'report-key': key }).toString().replace(/%3A/gi, ':').replace(/%2F/gi, '/');
+      reportRelayOffer = { link: `${location.origin}${location.pathname}?${query}`, host: new URL(address).host };
     }
     params.delete('report-relay');
     params.delete('report-key');

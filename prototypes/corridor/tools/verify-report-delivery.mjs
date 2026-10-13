@@ -356,9 +356,11 @@ try {
           offer: document.querySelector('#settings-report-offer')?.textContent || '',
           field: document.querySelector('#settings-report-link')?.value || '',
         }));
+        const fieldLink = new URL(offered.field);
         check(`${engine} · an opened setup link changes nothing by itself: it leaves the address and waits in Settings, naming its host`,
           offered.address === '?entry=shelf' && offered.stored === null && offered.room === 'settings' &&
-            offered.offer.includes(new URL(relay.origin).host) && /public GitHub issues/.test(offered.offer) && offered.field.includes(relay.origin),
+            offered.offer.includes(new URL(relay.origin).host) && /public GitHub issues/.test(offered.offer) &&
+            fieldLink.searchParams.get('report-relay') === relay.origin && fieldLink.searchParams.get('report-key') === RELAY_KEY,
           JSON.stringify(offered));
         const focused = await page.waitForFunction(() => document.activeElement?.id === 'settings-report-save', null, { timeout: 5_000 }).then(() => true, () => false);
         check(`${engine} · Set up is focused, one tap away`, focused, await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName));
