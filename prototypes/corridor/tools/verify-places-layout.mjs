@@ -88,6 +88,37 @@ const view = (page) => page.evaluate(() => document.body.dataset.view);
 const station = (page) => page.evaluate(() => document.querySelector('#primary-tabs')?.dataset.station || '');
 const layout = (page) => page.evaluate(() => document.documentElement.dataset.layout || 'current');
 const tabNames = (page) => page.locator('#primary-tabs .primary-tab').evaluateAll((ns) => ns.map((n) => n.firstChild.textContent.trim()));
+/** The grade pads as the learner chose them on 10-08 (D1: four, colour coded): each word's colour as
+ * painted, its contrast on the pad as painted over the dock (canvas compositing), and four hues
+ * apart from one another. */
+async function gradesColourCoded(page, world) {
+  const pads = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const g = canvas.getContext('2d', { willReadFrequently: true });
+    const paint = (...fills) => {
+      g.clearRect(0, 0, 1, 1);
+      for (const fill of fills) { g.fillStyle = fill; g.fillRect(0, 0, 1, 1); }
+      return [...g.getImageData(0, 0, 1, 1).data].slice(0, 3);
+    };
+    const lum = (c) => {
+      const [r, gg, b] = c.map((v) => { const x = v / 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
+      return 0.2126 * r + 0.7152 * gg + 0.0722 * b;
+    };
+    const ratio = (a, b) => { const [hi, lo] = [lum(a), lum(b)].sort((p, q) => q - p); return (hi + 0.05) / (lo + 0.05); };
+    const dock = getComputedStyle(document.querySelector('.kp')).getPropertyValue('--kp-dock').trim();
+    return ['again', 'hard', 'good', 'easy'].map((id) => {
+      const pad = document.querySelector(`#kp-grade-${id}`);
+      const ink = paint(getComputedStyle(pad.querySelector('b')).color);
+      const ground = paint(dock, getComputedStyle(pad).backgroundColor);
+      return { id, ink, ratio: Math.round(ratio(ink, ground) * 10) / 10 };
+    });
+  });
+  const apart = pads.every((a, i) => pads.every((b, j) => i === j || Math.max(...a.ink.map((v, k) => Math.abs(v - b.ink[k]))) >= 40));
+  const detail = pads.map((p) => `${p.id} rgb(${p.ink.join(',')}) ${p.ratio}:1`).join(' · ');
+  check(`focus · ${world}: the four grades are colour coded, each in its own hue`, apart, detail);
+  check(`focus · ${world}: every grade word reads at 4.5:1 or more on its pad`, pads.every((p) => p.ratio >= 4.5), detail);
+}
 async function openSettings(page) {
   await page.locator('#tab-me, #tab-progress').first().click();
   await page.waitForTimeout(600);
@@ -333,6 +364,7 @@ try {
     await page.touchscreen.tap(Math.round(width * 0.8), 420);
     await page.waitForTimeout(800);
     check('focus · a tap on the right half turns the card', (await room()).revealed);
+    await gradesColourCoded(page, 'day');
     const total = await page.locator('#kp-card .kp-sentence ruby[data-rt]').count();
     check('focus · after the turn every kanji carries its reading', total > 0 && (await readings()) === total, `${await readings()}/${total}`);
     check('focus · the readings move no line', JSON.stringify(await lines()) === JSON.stringify(front));
@@ -340,6 +372,18 @@ try {
     await page.waitForTimeout(500);
     check('focus · the Readings switch returns the clean text', (await readings()) <= 2, `${await readings()} shown`);
     check('focus · turning readings off moves no line', JSON.stringify(await lines()) === JSON.stringify(front));
+    // the same pads in a night world (夜)
+    await page.evaluate(() => localStorage.setItem('kairo-theme', 'yoru'));
+    await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
+    await ready(page);
+    await page.locator('#tab-review').click();
+    await page.waitForTimeout(1200);
+    await page.locator('.learn-go-deck[data-stage-deck="n2"]').click();
+    await page.locator('#kp-card').waitFor();
+    await page.waitForTimeout(800);
+    await page.touchscreen.tap(Math.round(width * 0.8), 420);
+    await page.waitForTimeout(800);
+    await gradesColourCoded(page, 'night');
     check('focus · no page errors', !errors.length, errors.slice(0, 2).join(' | '));
     // a private collection boots on its own page and never runs render(); it wears the layout too
     await page.goto(`${host.origin}/index.html?deck=personal&ui=bi`);

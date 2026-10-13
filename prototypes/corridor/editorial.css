@@ -3613,23 +3613,32 @@ html[data-layout='places'] #app .kp-done .kp-door-l { font: 500 12px/1 var(--san
 html[data-layout='places'] #app .kp-done .kp-door-t { font-family: var(--kp-serif); font-weight: 600; font-size: 19px; line-height: 1.5; letter-spacing: 0.03em; }
 html[data-layout='places'] #app .kp-done .kp-home-quiet, html[data-layout='places'] #app .kp-done > .kp-start:not(.kp-door) { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; box-shadow: none; font: 500 15px/1 var(--sans, system-ui); color: var(--kp-stage-ink); text-decoration: none; }
 html[data-layout='places'] #app .kp-done .kp-undo { justify-self: start; padding: 0; font: 500 13px/1 var(--sans, system-ui); color: var(--kp-stage-mute); }
-/* ─ grading: four calm pads on the stage, the usual answer lit like the paper, Again in 朱 alone.
-   Words and intervals in the interface face, intervals as tabular figures */
+/* ─ grading: four pads on the stage, colour coded as chosen on 10-08 (D1: "Four (Again · Hard · Good ·
+   Easy) — and color coded"), red · amber · green · blue as in the decks. Each word takes its hue at a
+   lightness drawn from the dock's own ink, so it reads on every stage, dark or light (measured ≥ 5.9:1);
+   Good, the usual answer, is tinted. Words in the interface face, intervals as tabular figures */
 html[data-layout='places'] #app .kp-study .kp-grades { column-gap: 8px; border-top: 0; background: linear-gradient(transparent, var(--kp-dock) 14px); padding-top: 16px; }
 html[data-layout='places'] #app .kp-study .kp-grade {
+  --kp-grade-ink: var(--kp-dock-ink);
   min-height: 60px; gap: 4px; border-radius: 3px; box-shadow: none;
-  border: 1px solid color-mix(in srgb, var(--kp-stage-ink) 18%, transparent);
-  background: color-mix(in srgb, var(--kp-stage-ink) 6%, transparent); color: var(--kp-stage-ink);
+  border: 1px solid color-mix(in srgb, var(--kp-dock-ink) 18%, transparent); border-top: 2px solid var(--kp-grade-ink);
+  background: color-mix(in srgb, var(--kp-dock-ink) 6%, transparent); color: var(--kp-dock-ink);
 }
-html[data-layout='places'] #app .kp-study .kp-grade b { color: inherit; font: 600 16px/1.1 var(--sans, system-ui); letter-spacing: 0.01em; }
-html[data-layout='places'] #app .kp-study .kp-grade small { color: var(--kp-stage-mute); font: 400 12px/1 var(--sans, system-ui); letter-spacing: 0; font-variant-numeric: tabular-nums; }
-html[data-layout='places'] #app .kp-study .kp-again b { color: color-mix(in srgb, var(--kp-shu) 88%, var(--kp-stage-ink)); }
-html[data-layout='places'] #app .kp-study .kp-good { border-color: transparent; background: var(--kp-panel); color: var(--kp-ink); }
-html[data-layout='places'] #app .kp-study .kp-good small { color: var(--kp-ink-2); }
-html[data-layout='places'] #app .kp-study .kp-grade-seal { color: inherit; font-size: 22px; }
+html[data-layout='places'] #app .kp-study .kp-grade b { color: var(--kp-grade-ink); font: 600 16px/1.1 var(--sans, system-ui); letter-spacing: 0.01em; }
+html[data-layout='places'] #app .kp-study .kp-grade small { color: var(--kp-dock-mute); font: 400 12px/1 var(--sans, system-ui); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+html[data-layout='places'] #app .kp-study .kp-grade-seal { color: var(--kp-grade-ink); font-size: 22px; }
+@supports (color: oklch(from red l c h)) {
+  html[data-layout='places'] #app .kp-study .kp-again { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 28); }
+  html[data-layout='places'] #app .kp-study .kp-hard { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 75); }
+  html[data-layout='places'] #app .kp-study .kp-good {
+    --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 150);
+    border-color: color-mix(in srgb, var(--kp-grade-ink) 45%, transparent); border-top-color: var(--kp-grade-ink);
+    background: color-mix(in srgb, var(--kp-grade-ink) 16%, transparent);
+  }
+  html[data-layout='places'] #app .kp-study .kp-easy { --kp-grade-ink: oklch(from var(--kp-dock-ink) calc(l * 0.8 + 0.1) 0.14 255); }
+}
 /* in 日本語 the seal is the pad's face and the word a quiet caption under it (as the r4 skin meant) */
 html[data-layout='places'] #app .kp-study .kp-grade:has(.kp-grade-seal) b { font: 500 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; }
-html[data-layout='places'] #app .kp-study .kp-again .kp-grade-seal { color: color-mix(in srgb, var(--kp-shu) 88%, var(--kp-stage-ink)); }
 .learn-section + .learn-section,
 .foundation-section { margin-top: var(--space-8); }
 .learn-section { padding-top: var(--space-2); }
