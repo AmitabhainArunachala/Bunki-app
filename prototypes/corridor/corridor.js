@@ -3487,6 +3487,7 @@ const DICTIONARY_INDEX_PATH = 'data/share_alike/dict-v2/index.json';
 const DICTIONARY_CORE_PATH = 'data/share_alike/dict.json';
 const DICTIONARY_SHARD_PATH = (id) => `data/share_alike/dict-v2/${id}.json`;
 const DICTIONARY_SEARCH_SETTLE_MS = 80;
+const DICTIONARY_SEARCH_PREFIX_SETTLE_MS = 320;
 let dictionaryIndexPromise = null;
 const dictionaryShardPromises = new Map();
 let dictionaryWorker = null;
@@ -18984,18 +18985,22 @@ function requestDictionarySearch(context, matchingCoreIds) {
   ) {
     return;
   }
-  // Exactly one replaceable request waits behind the active worker call. A
-  // natural typing stream continuously replaces this slot. A short quiet
-  // interval coalesces typing without adding a third of a second to every query.
+  // Broad one/two-letter Roman prefixes can start a large unused lookup while
+  // a slow input turn is still painting. Give those fragments the original
+  // settle interval; longer queries and Japanese text use the faster lane.
+  const settleMs = /^[a-z]{1,2}$/iu.test(key)
+    ? DICTIONARY_SEARCH_PREFIX_SETTLE_MS
+    : DICTIONARY_SEARCH_SETTLE_MS;
+  // Exactly one replaceable request waits behind the active worker call.
   dictionarySearchQueued = {
     key,
     context,
     matchingCoreIds: new Set(matchingCoreIds),
-    eligibleAt: performance.now() + DICTIONARY_SEARCH_SETTLE_MS,
+    eligibleAt: performance.now() + settleMs,
   };
   if (!dictionarySearchInFlight) {
     clearDictionarySearchTimer();
-    dictionarySearchTimer = setTimeout(dispatchQueuedDictionarySearch, DICTIONARY_SEARCH_SETTLE_MS);
+    dictionarySearchTimer = setTimeout(dispatchQueuedDictionarySearch, settleMs);
   }
 }
 

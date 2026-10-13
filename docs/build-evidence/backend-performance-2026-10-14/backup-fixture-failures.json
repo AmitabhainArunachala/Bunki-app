@@ -1,0 +1,36 @@
+{
+  "kind": "retained-backup-fixture-failures",
+  "observations": [
+    {
+      "sourceCommit": "ef215fa960eb4d9d33337e219d7f06116df332dd",
+      "ciRunId": 38432435449,
+      "artifactSha256": "9d1b02466490da84939f86f536dabb69b0d9766b1f5203528d32ceb3425632c8",
+      "results": [
+        {
+          "engine": "webkit",
+          "name": "foreign-scope-ui-backup-rejected-without-any-record-change",
+          "pass": false,
+          "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at failedImport (/home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:86:14)\n    at /home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:187:15\n    at async test (/home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:118:9)\n    at async file:///home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:176:66",
+          "elapsedMs": 33107
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "sourceCommit": "f2190c2abe0271f29720f6f9cfc145d9a44956b8",
+      "ciRunId": 38440037000,
+      "artifactSha256": "6869f473032bd55d3e4d6f3a2a6cb26763e0a82ea936e63121042cabb1d4a960",
+      "results": [
+        {
+          "engine": "webkit",
+          "name": "corrupt-operation-ui-backup-rejected-without-any-record-change",
+          "pass": false,
+          "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at failedImport (/home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:86:14)\n    at /home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:187:15\n    at async test (/home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:118:9)\n    at async file:///home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-record-sync-backup.mjs:176:66",
+          "elapsedMs": 32612
+        }
+      ],
+      "pageErrors": []
+    }
+  ],
+  "change": "The opening helper now awaits the existing tray view, completed room transition and attached import input before returning. Previously the rejection cases called the helper twice around a fast record snapshot and could click the old navigation door again while its first transition was pending. The rejection message, unmodified-record comparisons, journal checks and 30-second failure deadline remain unchanged. These receipts timed out before their final record comparisons; they are not evidence that those comparisons passed."
+}

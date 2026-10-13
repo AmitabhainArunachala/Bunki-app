@@ -1,0 +1,36 @@
+{
+  "kind": "retained-search-coalescing-failure",
+  "sourceCommit": "f2190c2abe0271f29720f6f9cfc145d9a44956b8",
+  "ciRunId": 38440037000,
+  "artifactSha256": "6869f473032bd55d3e4d6f3a2a6cb26763e0a82ea936e63121042cabb1d4a960",
+  "verifierSha256": "ba0eb7c7a5162ecf6ae3445fc70d3b7506a3916040c71953d4a77357f9411282",
+  "engine": "webkit",
+  "browserVersion": "26.6",
+  "case": "shelf-delayed-worker-reply-cannot-replace-new-query",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'ka,kaisai,peninsula'\n- 'kaisai,peninsula'\n     ^\n\n    at file:///home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-shelf-search.mjs:246:12\n    at async file:///home/runner/work/Bunki-app/Bunki-app/prototypes/corridor/tools/verify-shelf-search.mjs:295:11",
+  "pageErrors": [],
+  "searchRequests": [
+    {
+      "at": 3211,
+      "id": 2,
+      "generation": 1,
+      "query": "ka"
+    },
+    {
+      "at": 3614,
+      "id": 3,
+      "generation": 2,
+      "query": "kaisai"
+    },
+    {
+      "at": 4392,
+      "id": 4,
+      "generation": 3,
+      "query": "peninsula"
+    }
+  ],
+  "renderedQueriesAfterRelease": [
+    "peninsula"
+  ],
+  "interpretation": "An unnecessary short-prefix worker search preceded the held final query. The current-query DOM, focus, input identity and stale-response assertions passed before the request-count assertion failed. Short Roman prefixes now retain the original 320 ms settle interval; longer queries and Japanese text keep the 80 ms interval. The browser verifier and its strict latency and request-count assertions are unchanged."
+}

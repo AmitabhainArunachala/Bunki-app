@@ -112,7 +112,7 @@ function defineRows() {
     'learningEnrollHeldText', 'heldEnrollRoute', 'renderLessons', 'renderMockResult', 'mockSubjectKey',
     'hiraToKata', 'ROMAJI', 'JLPT_RANK', 'jlptRank', 'searchIndex', 'buildSearchIndex', 'dictionarySearchContext', 'searchResults',
     'searchRowShownByCore', 'renderSearchResults', 'dictionaryQueryKey', 'activeDictionaryQuery', 'clearDictionarySearchTimer',
-    'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'dictionarySearchGeneration',
+    'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'DICTIONARY_SEARCH_PREFIX_SETTLE_MS', 'dictionarySearchGeneration',
     'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer', 'dictionaryComposing',
     'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor'];
   /** The authored top-level statements declaring `names`, each exactly once. */

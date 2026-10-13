@@ -175,14 +175,35 @@ describe('deep dictionary scheduling', () => {
 
   it('coalesces typing into the latest query without resetting the timer on unrelated redraws', async () => {
     const h = harness();
-    h.query('a');
+    h.query('kai');
     await vi.advanceTimersByTimeAsync(40);
-    h.query('ab');
+    h.query('kaisai');
     await vi.advanceTimersByTimeAsync(60);
-    h.query('ab');
+    h.query('kaisai');
     expect(h.calls).toEqual([]);
     await vi.advanceTimersByTimeAsync(20);
-    expect(h.calls.map((call) => call.payload.context.q)).toEqual(['ab']);
+    expect(h.calls.map((call) => call.payload.context.q)).toEqual(['kaisai']);
+  });
+
+  it('coalesces a short Roman prefix across a slow input turn before sending the longer query', async () => {
+    const h = harness();
+    h.query('ka');
+    await vi.advanceTimersByTimeAsync(200);
+    expect(h.calls).toEqual([]);
+    h.query('kaisai');
+    await vi.advanceTimersByTimeAsync(80);
+    expect(h.calls.map((call) => call.payload.context.q)).toEqual(['kaisai']);
+    await vi.advanceTimersByTimeAsync(320);
+    expect(h.calls).toHaveLength(1);
+  });
+
+  it('still searches a short Roman query when the learner stops typing', async () => {
+    const h = harness();
+    h.query('ka');
+    await vi.advanceTimersByTimeAsync(319);
+    expect(h.calls).toEqual([]);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(h.calls.map((call) => call.payload.context.q)).toEqual(['ka']);
   });
 
   it('does not dispatch composition fragments or publish obsolete replies', async () => {
