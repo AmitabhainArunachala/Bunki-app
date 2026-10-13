@@ -244,25 +244,26 @@
       });
     }
     const putMeta = (key, value) => transact(['meta'], tx => tx.objectStore('meta').put({ key, value }));
-    // Some WebKit builds cannot store a Blob in IndexedDB (private browsing, and
-    // some iPhones). A screenshot is stored as its Blob where the browser accepts
-    // that, so earlier versions still read it; otherwise its bytes are stored.
+    // Screenshots are stored as bytes, never as Blobs: some WebKit builds (Safari
+    // private browsing, some iPhones) fail, or never finish, a Blob write to
+    // IndexedDB. Earlier versions stored Blobs, and every reader accepts either form.
+    // A stored draft keeps its screenshots under `screenshots`, so an earlier version
+    // sees the draft without them instead of a screenshot it cannot preview.
     const blobOf = item => item.blob || new Blob([item.bytes], { type: item.mime_type });
-    const liveDraft = value => Array.isArray(value?.attachments) && value.attachments.some(item => !item.blob && item.bytes)
-      ? { ...value, attachments: value.attachments.map(({ bytes, ...item }) => ({ ...item, blob: item.blob || new Blob([bytes], { type: item.mime_type }) })) }
-      : value;
     async function asBytes(item) {
       if (!item.blob) return item;
       const { blob, ...rest } = item;
       return { ...rest, bytes: await blob.arrayBuffer() };
     }
-    // A write that fails while holding screenshots as Blobs runs once more with their bytes.
-    async function withBlobFallback(attachments, write) {
-      try { return await write(attachments); }
-      catch (error) {
-        if (!attachments.some(item => item.blob)) throw error;
-        return write(await Promise.all(attachments.map(asBytes)));
-      }
+    async function storedDraft(value) {
+      if (!Array.isArray(value?.attachments) || !value.attachments.length) return value;
+      return { ...value, attachments: [], screenshots: await Promise.all(value.attachments.map(asBytes)) };
+    }
+    function liveDraft(value) {
+      if (!value || typeof value !== 'object' || (!Array.isArray(value.attachments) && !Array.isArray(value.screenshots))) return value;
+      const { screenshots, ...rest } = value;
+      const items = [...(Array.isArray(rest.attachments) ? rest.attachments : []), ...(Array.isArray(screenshots) ? screenshots : [])];
+      return { ...rest, attachments: items.map(({ bytes, ...item }) => item.blob ? item : { ...item, blob: new Blob([bytes], { type: item.mime_type }) }) };
     }
     function announce(value) { root.querySelector('#br-live').textContent = value; }
     function setMessage(value) { message = value; announce(value); const element = body.querySelector('.br-notice'); if (element) { element.textContent = value; element.hidden = !value; } if (closing) protectClosingDialog(); }
@@ -367,10 +368,8 @@
       const write = async () => {
         const db = await dbPromise;
         let nextId = slot.id, nextRevision, forked = false;
-        const attachments = Array.isArray(snapshot?.attachments) ? snapshot.attachments : [];
-        await withBlobFallback(attachments, stored => new Promise((resolve, reject) => {
-          nextId = slot.id; forked = false;
-          const draftValue = attachments.length ? { ...snapshot, attachments: stored } : snapshot;
+        const draftValue = await storedDraft(snapshot);
+        await new Promise((resolve, reject) => {
           const tx = db.transaction('meta', 'readwrite'), store = tx.objectStore('meta');
           tx.oncomplete = resolve;
           tx.onerror = tx.onabort = () => reject(tx.error || new Error('The draft could not be saved on this device.'));
@@ -385,7 +384,7 @@
             try { store.put({ key: `${metaKey(name)}:${nextId}`, value: { draft_id: nextId, revision: nextRevision, owner: documentOwner, draft: draftValue } }); }
             catch (error) { reject(error); try { tx.abort(); } catch { /* The transaction has already ended. */ } }
           };
-        }));
+        });
         slot.id = nextId; slot.revision = nextRevision;
         // A queued save for a prior editor must not replace the current pointer.
         if ((name === 'draft' && slot === draftSlot) || (name.startsWith('followup:') && followupSlots[name.slice(9)] === slot)) rememberSlot(name, slot);
@@ -637,7 +636,8 @@
         const submittedDraft = structuredClone(draft), submittedSlot = { ...draftSlot };
         const reportId = preset?.id || id('report'), report = buildReport(submittedDraft, reportId, preset?.created_at);
         const row = { id: reportId, idempotency_key: id('delivery'), service, created_at: report.created_at, report, view: null, delivery_error: '', ...(preset?.opened ? { github_opened_at: new Date().toISOString() } : {}) };
-        await withBlobFallback(submittedDraft.attachments, attachments => transact(['records', 'attachments', 'meta'], tx => {
+        const attachments = await Promise.all(submittedDraft.attachments.map(asBytes));
+        await transact(['records', 'attachments', 'meta'], tx => {
           tx.objectStore('records').put(row);
           for (const item of attachments) tx.objectStore('attachments').put({ ...item, report_id: reportId });
           const store = tx.objectStore('meta'), key = slotKey('draft', submittedSlot), request = store.get(key);
@@ -645,7 +645,7 @@
             const saved = request.result?.value;
             if (saved?.owner === documentOwner && saved.revision === submittedSlot.revision) store.delete(key);
           };
-        }));
+        });
         draft = emptyDraft(); draftSlot = newSlot(); rememberSlot('draft', draftSlot); draftDirty = false;
         selectedId = reportId; active = 'detail';
         message = preset?.opened ? 'GitHub opened with this report filled in. Tap “Submit new issue” there to send it. A copy is saved here.'

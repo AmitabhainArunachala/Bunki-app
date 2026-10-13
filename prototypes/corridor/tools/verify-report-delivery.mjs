@@ -271,6 +271,16 @@ try {
         const shot = /\((http:\/\/127\.0\.0\.1:\d+\/v1\/shots\/shot_[a-f0-9]{32})\)/.exec(filed?.body || '')?.[1];
         const bytes = shot ? Buffer.from(await (await fetch(shot)).arrayBuffer()) : null;
         check(`${engine} · the screenshot is in the issue, served by the relay`, !!bytes && bytes.equals(PIXEL_PNG), shot || 'no screenshot link');
+        const kept = await page.evaluate(() => new Promise((resolve, reject) => {
+          const request = indexedDB.open('bunki-maintenance-reports-v1');
+          request.onerror = () => reject(request.error);
+          request.onsuccess = () => {
+            const read = request.result.transaction('attachments').objectStore('attachments').getAll();
+            read.onsuccess = () => { resolve(read.result.map((item) => ({ blob: 'blob' in item, bytes: item.bytes instanceof ArrayBuffer ? item.bytes.byteLength : null }))); request.result.close(); };
+            read.onerror = () => reject(read.error);
+          };
+        }));
+        check(`${engine} · the device stores the screenshot as bytes, not as a Blob`, kept.length === 1 && !kept[0].blob && kept[0].bytes === PIXEL_PNG.length, JSON.stringify(kept));
 
         github.comment(2, 'Found it: the reply box clips long answers. The fix is in review.');
         github.label(2, 'fixer:pr-open');
