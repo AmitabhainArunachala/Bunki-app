@@ -213,6 +213,8 @@ try {
     await page.locator('#tab-bookshelf').click();
     await wait(1000);
     check('bookshelf · titled Bookshelf', (await page.locator('.shelf-mast-name .view-title').textContent()) === 'Bookshelf');
+    // Today listed the bookmarks (栞) too; with Today folded into Review, the shelf is where they stand
+    check('bookshelf · the bookmarks stand on the shelf', (await page.locator('#app main #record-reading-places').count()) === 1);
     const pick = (await page.locator('#shelf-today-read .shelf-today-read-t').textContent()) || '';
     await page.locator('#shelf-today-read').click();
     await wait(1500);
