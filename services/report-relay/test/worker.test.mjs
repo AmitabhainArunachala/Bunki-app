@@ -252,6 +252,11 @@ test('views follow the fixer: labels set the status, its comments appear, the ap
     body: { idempotency_key: 'message_reply_0001', text: 'The rain essay.' },
   });
   current = await reply.json();
+  assert.equal(current.status, 'received', 'an answer hands the report back to the fixer');
+  assert.deepEqual(
+    github.state.issues[0].labels.map((label) => label.name),
+    ['kairo-report'],
+  );
   assert.equal(current.conversation.at(-1).actor, 'user');
   assert.equal(current.conversation.at(-1).text, 'The rain essay.');
   assert(github.state.comments.at(-1).body.startsWith('<!-- kairo-app-message -->'));
@@ -267,6 +272,12 @@ test('views follow the fixer: labels set the status, its comments appear, the ap
   );
   github.state.issues[0].labels = [{ name: 'kairo-report' }, { name: 'fixer:pr-open' }];
   assert.equal((await read()).status, 'ready_for_review');
+  const note = await call(api(`/reports/${id}/messages`), {
+    method: 'POST',
+    token: session.token,
+    body: { idempotency_key: 'message_note_00001', text: 'It also happens on the Mac.' },
+  });
+  assert.equal((await note.json()).status, 'ready_for_review', 'a note keeps a fix in review');
   github.state.issues[0].state = 'closed';
   assert.equal((await read()).status, 'closed');
   const reopened = await (
@@ -281,7 +292,11 @@ test('views follow the fixer: labels set the status, its comments appear, the ap
     })
   ).json();
   assert.equal(github.state.issues[0].state, 'open');
-  assert.notEqual(reopened.status, 'closed');
+  assert.equal(reopened.status, 'received', 'a reopened report goes back to the fixer');
+  assert.deepEqual(
+    github.state.issues[0].labels.map((label) => label.name),
+    ['kairo-report'],
+  );
   assert(github.state.comments.at(-1).body.includes('**Still happening**'));
 });
 

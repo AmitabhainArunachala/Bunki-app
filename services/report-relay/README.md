@@ -3,7 +3,8 @@
 A Cloudflare Worker that receives problem reports from the app's bug button and
 files each one as a GitHub issue in this repository, with its screenshots. The
 hourly fixer agent picks up those issues (label `kairo-report`), and the app
-shows the issue's status and comments on the report.
+shows the issue's status and comments on the report. The whole pipeline and
+the fixer's procedure are in `docs/operator/BUG_REPORTS.md`.
 
 The relay speaks the report-service contract the app's report client already
 uses (`prototypes/corridor/maintenance/README-backend.md`, "Browser API"). A
@@ -53,8 +54,8 @@ Under `/k/<REPORT_KEY>`:
 | `POST /api/session`                               | A signed device identity (`token`, `actor_ref`)                                                                  |
 | `POST /api/reports`                               | Files the issue; idempotent by `idempotency_key`; the receipt digest is the SHA-256 of the exact request bytes   |
 | `GET /api/reports`, `GET /api/reports/:id`        | Report views built from the live issue: status from its state and `fixer:*` labels, comments as the conversation |
-| `POST /api/reports/:id/messages`                  | Adds the app's reply as an issue comment (marked `<!-- kairo-app-message -->`)                                   |
-| `POST /api/reports/:id/reopen`                    | Comments "Still happening" with the current screen and reopens the issue                                         |
+| `POST /api/reports/:id/messages`                  | Adds the app's reply as an issue comment (marked `<!-- kairo-app-message -->`) and removes `fixer:needs-info`    |
+| `POST /api/reports/:id/reopen`                    | Comments "Still happening" with the current screen, reopens the issue and removes its `fixer:*` labels           |
 | `GET /api/reports/:id/attachments/:attachment_id` | The original screenshot                                                                                          |
 
 Public: `GET /health`, and `GET /v1/shots/<id>` for the screenshot images in issues.

@@ -293,10 +293,11 @@ const repoPath = (env) => {
   return `/repos/${env.GITHUB_REPO}`;
 };
 
+const labelNames = (issue) =>
+  (issue.labels || []).map((label) => (typeof label === 'string' ? label : label.name));
+
 function statusOf(issue) {
-  const labels = new Set(
-    (issue.labels || []).map((label) => (typeof label === 'string' ? label : label.name)),
-  );
+  const labels = new Set(labelNames(issue));
   if (issue.state === 'closed')
     return { status: 'closed', reason: 'This report is closed on GitHub.' };
   if (labels.has('fixer:pr-open'))
@@ -463,6 +464,20 @@ async function addMessage(request, env, actor, reportId, reopen) {
     throw new HttpError(400, 'invalid_request', 'Write a message of up to 4,000 characters.');
   const key = `msg:${actor}:${value.idempotency_key}`;
   if (!(await env.REPORTS.get(key))) {
+    // Hand the report back to the fixer first; repeating this is harmless. An
+    // answer clears the fixer's question, and "Still happening" reopens the issue
+    // and clears every fixer label, so the fixer picks the report up again.
+    const issuePath = `${repoPath(env)}/issues/${record.issue_number}`;
+    const issue = await github(env, issuePath);
+    const labels = labelNames(issue);
+    const kept = labels.filter((name) =>
+      reopen ? !name.startsWith('fixer:') : name !== 'fixer:needs-info',
+    );
+    if ((reopen && issue.state !== 'open') || kept.length !== labels.length)
+      await github(env, issuePath, {
+        method: 'PATCH',
+        body: JSON.stringify({ ...(reopen ? { state: 'open' } : {}), labels: kept }),
+      });
     const where =
       reopen && value.context?.surface
         ? `\n\nScreen: ${code(clip(value.context.surface, 160))}${value.context.route ? `, path ${code(clip(value.context.route, 500))}` : ''}`
@@ -474,11 +489,6 @@ async function addMessage(request, env, actor, reportId, reopen) {
         body: `${APP_MESSAGE}\n${heading}\n\n${text || 'Still happening.'}${where}`,
       }),
     });
-    if (reopen)
-      await github(env, `${repoPath(env)}/issues/${record.issue_number}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ state: 'open' }),
-      });
     await env.REPORTS.put(key, '1', { expirationTtl: 60 * 60 * 24 * 30 });
   }
   return json(200, await buildView(env, record));

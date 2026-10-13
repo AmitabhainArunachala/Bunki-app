@@ -109,7 +109,8 @@ export async function startMockGithub({
       }
       if (request.method === 'GET') return send(200, issue);
       if (request.method === 'PATCH') {
-        Object.assign(issue, body.state ? { state: body.state } : {});
+        if (body.state) issue.state = body.state;
+        if (body.labels) issue.labels = body.labels.map((name) => ({ name }));
         return send(200, issue);
       }
     }
