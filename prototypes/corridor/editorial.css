@@ -4486,7 +4486,7 @@ body:not([data-view='drift']) #app > main > .room-sign {
   user-select: none;
 }
 @media (max-width: 520px) {
-  html:is([data-room='tray'], [data-room='learn'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
+  html:is([data-room='learn'], [data-room='tests'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
   /* the shelf keeps its full measure (its title block is pinned to one-line notes); only the
      look-up field steps aside, and the sign is cut short above the Tools door */
   body[data-view='shelf']:not(.zen) #app > main > .room-sign ~ #search { width: calc(100% - 30px); }
@@ -5223,4 +5223,10 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
     animation: feel-fade 80ms linear both !important;
     animation-delay: 0ms !important;
   }
+}
+
+/* 2026-10-13 · the five places' names are plain words of their own lengths (Bookshelf, Dictionary):
+   at a phone's width the labels set a size smaller and untracked so no two of them touch */
+@media (max-width: 520px) {
+  body.ui-bi .primary-tabs .primary-tab { font-size: 11px; letter-spacing: 0; }
 }

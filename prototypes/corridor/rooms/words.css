@@ -436,3 +436,9 @@ html[data-room='search'] body .search-page .kdx-lens.on :is(.l-ja, .en-sub) { co
 html[data-room='search'] .words-index > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
 /* The shape-code lens above is the one door to this wheel. */
 html[data-room='search'] body .search-page #search-skip-opener { display: none; }
+
+/* 2026-10-13 · the day's word opens the Dictionary (it stood on Today); it steps aside, with the
+   web, while a search or a finder lens is showing */
+html[data-room='search'] body:not([data-view='drift']) { --today-halo: var(--color-page); }
+html[data-room='search'] #app > main > .today-dayword { margin: var(--space-6, 32px) auto 0; }
+html[data-room='search'] #app > main > .search-page.search-page-busy ~ .today-dayword { display: none; }
