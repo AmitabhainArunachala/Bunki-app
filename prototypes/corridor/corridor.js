@@ -8703,7 +8703,6 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     event.preventDefault();
     event.stopPropagation();
     removeMini();
-    clearReaderReadings({ marked: true });
     span.focus({ preventScroll: true });
   });
   document.body.append(mini);
@@ -9220,13 +9219,17 @@ function readerWordKey(event, span, door) {
     void openReaderWordMenu(span, door, { keyboard: true });
     return;
   }
+  // Escape steps out one layer at a time: the popup or the menu first, then the marked word and its
+  // summoned reading, back to the original text
   if (event.key === 'Escape') {
+    const open = !!document.getElementById('mini') || !!readerWordMenu;
     const marked = !!(S.revealed?.size || S.readerTake);
-    if (!document.getElementById('mini') && !readerWordMenu && !marked) return;
+    if (!open && !marked) return;
     event.preventDefault();
-    removeMini();
-    closeReaderWordMenu();
-    clearReaderReadings({ marked: true });
+    if (open) {
+      removeMini();
+      closeReaderWordMenu();
+    } else clearReaderReadings({ marked: true });
     return;
   }
   if (event.key !== 'Enter') return;
@@ -19007,7 +19010,6 @@ function wireParticleGestures(span, particle, index, p) {
       event.preventDefault();
       event.stopPropagation();
       removeMini();
-      clearReaderReadings({ marked: true });
       span.focus({ preventScroll: true });
     });
     document.body.append(mini);

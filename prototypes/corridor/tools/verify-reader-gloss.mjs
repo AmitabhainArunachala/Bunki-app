@@ -4,7 +4,8 @@
  * The lexical fixtures, exact candidate/head/reading/sense assertions, all four
  * durable capture doors, miss-state holds, dictionary failure/retry/stale-answer
  * checks and eight executable mutation controls remain independently asserted.
- * G2 also checks popup dismissal, keyboard reopening and unchanged prose in bi/ja.
+ * G2 also checks the tap cycle (1.3.0: a second tap opens the full entry, one more after it returns the
+ * original text), keyboard reopening and unchanged prose in bi/ja.
  *
  * Fixtures are checked against served articles, core dictionary, index and shards
  * before a control can count as killed. Mutations affect served bytes only, must
@@ -265,7 +266,7 @@ async function tap(page, fixture) {
   await page.mouse.click(x, y);
   await delay(150);
 }
-/** One real tap opens the popup; a second tap would dismiss it. */
+/** One real tap opens the popup; a second tap on the same word opens its full entry (1.3.0). */
 async function openPopup(page, fixture) {
   if (await page.locator('#mini .mini-word').count() && await page.locator('#mini .mini-word').textContent() === fixture.token.b) return;
   await tap(page, fixture);
@@ -273,7 +274,8 @@ async function openPopup(page, fixture) {
 }
 async function fullEntry(page, fixture) {
   await openPopup(page, fixture);
-  await press(page, '#mini .mini-entry');
+  // the second tap on the same word dives (John, 2026-10-14: the popup has no Full entry button)
+  await tap(page, fixture);
   await page.locator('#sheet').waitFor();
 }
 async function press(page, selector, options) {
@@ -897,14 +899,20 @@ try {
         one?.surface === IU.token.s && one.lines === 0 && !one.hasEn
           && one.label === `${IU.token.s} · ${WORD[lang]} · ${HINT[lang]}`, JSON.stringify(one), { id: `G2.${lang}.prose` });
       await tap(page, IU);
-      check(`G2 ${lang}: tapping the same word dismisses its popup without a gloss rung`,
-        await page.locator('#mini').count() === 0 && (await tokenState(page, IU))?.lines === 0, '', { id: `G2.${lang}.dismiss` });
+      await page.locator('#sheet').waitFor();
+      check(`G2 ${lang}: tapping the same word again opens its full entry, without a gloss rung`,
+        await page.locator('#mini').count() === 0 && await page.locator('#sheet').count() === 1 && (await tokenState(page, IU))?.lines === 0, '', { id: `G2.${lang}.dismiss` });
+      await closeIfOpen(page);
+      await tap(page, IU);
+      const back = await tokenState(page, IU);
+      check(`G2 ${lang}: back from the entry, one more tap returns the original word: no popup, no summoned reading, no gloss rung`,
+        await page.locator('#mini').count() === 0 && back?.surface === IU.token.s && back.visibleRuby === '' && back.lines === 0, JSON.stringify(back), { id: `G2.${lang}.original` });
       const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
       await word.focus();
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
-      check(`G2 ${lang}: Enter reopens the popup and focuses Full entry for an unsavable word`,
-        await page.locator('#mini .mini-entry').evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.keyboard` });
+      check(`G2 ${lang}: Enter reopens the popup and focuses the word, its door into the full entry, for an unsavable word`,
+        await page.locator('#mini .mini-word[data-action="entry.open"]').evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.keyboard` });
       await page.keyboard.press('Escape');
       await page.locator('#mini').waitFor({ state: 'detached' });
       check(`G2 ${lang}: Escape returns focus to the original word`,
