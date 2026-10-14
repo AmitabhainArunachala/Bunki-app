@@ -2441,8 +2441,8 @@ const SETTLE_GAP = 12;
  * definition in view between the host's pinned header and the pinned grade bar, by the least
  * scroll that does it (up when the learner had scrolled past the target sentence, down when the
  * answer is under the bar); when all three cannot fit, the word and its definition win. Then no
- * fold row is left cut by the bar: it is scrolled wholly into view, or wholly under the bar,
- * whichever keeps the rest in view. Smooth unless reduced motion; nothing moves when it fits.
+ * fold row is left cut by the bar: the least further whole-pixel move that leaves every row wholly
+ * in view or wholly under the bar while keeping the rest in view. Nothing moves when it fits.
  */
 function settleBack() {
   const face = ctx.root.querySelector('#kp-card');
@@ -2474,18 +2474,31 @@ function settleBack() {
   } else dy = bottom - bottomLimit;
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
-  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+  // then no fold row cut by the bar (backFits: none crosses its top edge by more than half a pixel on
+  // both sides). The scroll lands on a whole pixel while the rows and the bar sit on fractions of one,
+  // so the plan is made in whole-pixel moves: a row seated against the bar here is seated there
+  const whole = (d) => Math.round(window.scrollY + d) - window.scrollY;
+  dy = Math.abs(dy) < 1 ? 0 : whole(dy); // under a pixel off is at rest
+  const rows = [...face.querySelectorAll('.kp-folds > details > summary')].map((s) => {
     const r = s.getBoundingClientRect();
-    const [rTop, rBottom] = [r.top - lift - dy, r.bottom - lift - dy];
-    if (!(rTop < barTop && rBottom > barTop)) continue;
-    // rows touch, so the edge goes exactly at the bar: the next (or the previous) row is then whole
-    const intoView = rBottom - barTop + 1; // scroll down: the row just above the bar
-    const underBar = barTop - rTop; // scroll up: the row wholly under the bar
-    if (top - dy - intoView >= topLimit && dy + intoView <= room.down) dy += intoView;
-    else if (bottom - dy + underBar <= bottomLimit && dy - underBar >= room.up) dy -= underBar;
-    break;
+    return [r.top - lift, r.bottom - lift];
+  });
+  const clear = (d) => rows.every(([rTop, rBottom]) => !(rTop - d < barTop - 0.5 && rBottom - d > barTop + 0.5));
+  if (!clear(dy)) {
+    // the least further move (down first) that clears every row, keeping the target sentence below the
+    // top when it scrolls down and the definition above the bar when it scrolls up; none in a row's
+    // height: leave it
+    const reach = Math.ceil(Math.max(...rows.map(([rTop, rBottom]) => rBottom - rTop))) + 2;
+    const fits = (d) =>
+      d <= room.down && d >= room.up && (d > dy ? top - d >= topLimit : bottom - d <= bottomLimit) && clear(d);
+    for (let k = 1; k <= reach; k++) {
+      const d = [dy + k, dy - k].find(fits);
+      if (d === undefined) continue;
+      dy = d;
+      break;
+    }
   }
-  if (Math.abs(dy) < 1) return;
+  if (!dy) return;
   window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
