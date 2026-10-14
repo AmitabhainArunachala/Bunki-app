@@ -263,6 +263,9 @@ try {
     // Progress
     await page.locator('#tab-progress').click();
     await wait(800);
+    // the goals that are not begun say where their decks are: Review here, never the old Learn
+    const homes = await page.locator('#app main').evaluate((m) => (m.textContent.match(/deck is in \w+/gu) || []).join(' ; '));
+    check('progress · unbegun goals send you to Review, never to Learn', /deck is in Review/.test(homes) && !/in Learn/.test(homes), homes);
     await page.locator('#me-collections').click();
     await wait(800);
     check('progress · Saved words & lists opens Saved', (await view(page)) === 'saved');

@@ -32109,6 +32109,11 @@ function meBreakable(tag, cls, text) {
   for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
   return node;
 }
+/** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. */
+function fieldsDeckHome() {
+  return placesLayout() ? tx('まだ始めていない · 専門デッキは復習に', 'not begun · the fields deck is in Review')
+    : tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+}
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
 function meHorizonRow(h, { quiet = false } = {}) {
   const row = el('div', 'me-hz');
@@ -32137,8 +32142,9 @@ function meHorizonRow(h, { quiet = false } = {}) {
   if (!h.begun) sub.textContent = {
     saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
     kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
-    n1: tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
-  }[h.id] || tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+    n1: placesLayout() ? tx('まだ始めていない · N1デッキは復習に', 'not begun · the N1 deck is in Review')
+      : tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
+  }[h.id] || fieldsDeckHome();
   else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
   else {
     sub.append(el('span', '', h.measure));
@@ -32185,7 +32191,7 @@ function meHorizonsPart(decks) {
   const fields = rows.filter((h) => h.field);
   // until the fields deck is opened, the three fields say so once, not three times
   const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
-  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn')));
+  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', fieldsDeckHome()));
   for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
   sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
   for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
