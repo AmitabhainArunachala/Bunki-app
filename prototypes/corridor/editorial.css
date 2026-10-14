@@ -3524,6 +3524,8 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
      full line needs no stretching and justification only absorbs kinsoku */
   width: round(down, 100%, 1.05em); margin-inline: auto;
 }
+/* 焦点 folds the sentences around the target to exactly two of these lines (2 × 2.3), never a sliver of a third */
+#app .kp .kp-study .kp-card[data-zoom='focus'] .kp-sentence .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 4.6em; }
 /* ─ the marked word: ink, not a colour code; held by two 朱 corner ticks over a breath of wash.
    One mark, not three (the underline goes) */
 #app .kp-study .kp-target { color: var(--kp-ink); font-weight: 700; text-decoration: none; padding: 0 0.1em; margin: 0 -0.1em; }
